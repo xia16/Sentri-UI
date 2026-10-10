@@ -41,8 +41,7 @@ The colours follow the Status map: green is done (resolved), amber needs attenti
 | Pressed, selected, disabled | none: the Row or Button around it owns them (the tag is never a target) | none |
 | Error, loading | none | none |
 | Empty | absent: no condition, no tag (the list shows `—`) | absent |
-| Long name | the name ends in an ellipsis; the icon and day stay | wraps |
-| Chinese | `食欲差 · 第3天` fits | fits |
+| Longest label | name at the Copy budget fits one line with the icon and day | same |
 | Pending removal (`pending`) | muted, struck name, drawn inside the component | n/a |
 | Overflow in a line | the host folds the extra tags into `+N` (Inspection's `fitRecordedTags`) | n/a |
 
@@ -52,7 +51,21 @@ The colours follow the Status map: green is done (resolved), amber needs attenti
 - No events. A tag inside a tappable row is carried by that row's tap target (48px).
 
 ## Content rules
-- Name: the catalogue name, sentence case, ideally under 20 characters; the tag truncates with an ellipsis at the line's width. Day: `Day 3`, `12 days`, `第3天`. Care word: under 20 characters.
+
+### Copy budget
+
+| Text | English | 中文 | Lines |
+| --- | --- | --- | --- |
+| Name | 20 | 10 | 1 |
+| Day | 8 | 5 | 1 |
+| Care word | 20 | 10 | 1 |
+| Note (detail variant) | 60 | 30 | 2 |
+
+Over-budget copy is rewritten to the shortest copy that still names the act; it is never wrapped, shrunk or ellipsised to fit. The “Longest label” state shows real copy at this limit in the real container at 390px. Budgets come from what fits at 390px inside the screen gutters; a `{n}` or `{name}` slot counts as 3 characters.
+
+### Writing rules
+
+- Name: the catalogue name, sentence case. Day: `Day 3`, `12 days`, `第3天`.
 - One tag per condition. The tag never repeats the care word in text beside it.
 
 ## Accessibility

@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"></head><body>
 <section data-state="Default" id="danger-0"></section>
 <section data-state="Pressed" id="danger-1"></section>
-<section data-state="Long label / Chinese" id="danger-3"></section>
+<section data-state="Longest label · 中文" id="danger-3"></section>
 <section data-state="Disabled" id="danger-disabled"></section>
 <script>
 const mark=(id,v)=>document.querySelectorAll('[data-state]').forEach(el=>{const b=el.id===id&&el.querySelector('button');if(b)b.dataset.preview=v});
@@ -10,7 +10,7 @@ const put=(id,html)=>document.querySelectorAll('[data-state]').forEach(el=>{if(e
 put("danger-0",SentriUI.banner({"tone": "danger", "headline": "Recording ends farrowing", "consequence": "9 alive stay under piglet care", "state": "Default", "id": "danger-0-banner", "detail": "Batch F26 · B1", "actions": [{"label": "Review", "action": "review"}]}));
 put("danger-1",SentriUI.banner({"tone": "danger", "headline": "Recording ends farrowing", "consequence": "9 alive stay under piglet care", "state": "Pressed", "id": "danger-1-banner", "actions": [{"label": "Review", "action": "review"}]}));
 mark("danger-1","pressed");
-put("danger-3",SentriUI.banner({"tone": "danger", "headline": "删除后将无法恢复这头母猪本次分娩已经记录的所有仔猪数据", "consequence": "结束分娩后不能再修改 · 请先确认", "state": "Long label / Chinese", "id": "danger-3-banner", "actions": [{"label": "Review", "action": "review"}]}));
+put("danger-3",SentriUI.banner({"tone": "danger", "headline": "记录后分娩即告结束，不可再修改", "consequence": "9头存活仔猪转入仔猪护理 · 请先确认", "state": "Longest label · 中文", "id": "danger-3-banner", "actions": [{"label": "核对", "action": "review"}]}));
 put('danger-disabled',SentriUI.banner({tone:'danger',headline:'Review the consequence',state:'Disabled',reason:'Waiting for the current review to finish',door:{action:'review'}}));
 SentriUI.liveFill(document.body,{delay:0});
 </script>

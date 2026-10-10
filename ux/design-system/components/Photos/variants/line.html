@@ -11,7 +11,7 @@
 <section data-state="Disabled" id="line-10"></section>
 <section data-state="Full" id="line-11"></section>
 <section data-state="Cancelled" id="line-12"></section>
-<section data-state="Long label / Chinese" id="line-13"></section>
+<section data-state="Longest label · 中文" id="line-13"></section>
 <script>
 const put=(id,html)=>document.querySelectorAll('[data-state]').forEach(el=>{if(el.id===id)el.innerHTML=html});
 put("line-0",SentriUI.photos({"id": "line-0-photos", "key": "line-0"}));
@@ -25,7 +25,7 @@ put("line-8",SentriUI.photos({"id": "line-8-photos", "key": "line-8", "preview":
 put("line-10",SentriUI.photos({"id": "line-10-photos", "key": "line-10", "active": false, "disabledReason": "Choose a cause first · photos ride that record"}));
 put("line-11",SentriUI.photos({"id": "line-11-photos", "key": "line-11", "items": [{"id": "0", "pending": false}, {"id": "1", "pending": false}, {"id": "2", "pending": false}, {"id": "3", "pending": false}, {"id": "4", "pending": false}, {"id": "5", "pending": false}, {"id": "6", "pending": false}, {"id": "7", "pending": false}, {"id": "8", "pending": false}, {"id": "9", "pending": false}, {"id": "10", "pending": false}, {"id": "11", "pending": false}]}));
 put("line-12",SentriUI.photos({"id": "line-12-photos", "key": "line-12", "items": [{"id": "0", "pending": false}, {"id": "1", "pending": false}], "error": "cancelled"}));
-put("line-13",SentriUI.photos({"id": "line-13-photos", "key": "line-13", "label": "为本次分娩事件附加现场照片以便之后检查记录", "optional": "选填", "hint": "照片保存在此设备上 · 无网络连接 · 等待上传"}));
+put("line-13",SentriUI.photos({"id": "line-13-photos", "key": "line-13", "label": "本次分娩现场照片", "optional": "选填", "hint": "照片保存在此设备上 · 无网络连接 · 等待上传"}));
 SentriUI.liveFill(document.body,{delay:0});
 </script>
 </body></html>

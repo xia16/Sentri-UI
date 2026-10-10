@@ -27,13 +27,28 @@ The drawer that narrows a list: Farrowing's room filter and Inspection's pig fil
 | Default | Every facet on "Any"; the commit shows the unfiltered count. |
 | Active | Facets set; the commit shows the narrowed count. |
 | Pressed | The touched control darkens at once. |
-| Long / Chinese | Titles and help wrap; the footer keeps its size. |
+| Longest label (and Longest label · 中文) | Real copy at the Copy budget, in the real container at 390px: one line, nothing wrapped or cut. Longer copy is rewritten. |
 
 ## Behaviour
 
 The sheet edits a draft. **Back** and ✕ return to the list and keep the draft; **Reset** clears the draft to "Any" and stays; the commit applies it. The host rewrites the commit label as the draft changes, so the count is live. A zero count still commits (the list then shows its own empty state). The filter button on the list carries a badge with the number of facets applied.
 
 ## Content rules
+
+### Copy budget
+
+| Text | English | 中文 | Lines |
+| --- | --- | --- | --- |
+| Sheet title | 24 | 12 | 1 |
+| Section title | 24 | 12 | 1 |
+| Help (under a section) | 48 | 24 | 1 |
+| Segment option, five options | 6 | 3 | 1 |
+| Commit button (“Show 12 sows”) | 24 | 12 | 1 |
+| Reset | 12 | 6 | 1 |
+
+Over-budget copy is rewritten, never wrapped, shrunk or ellipsised. The “Longest label” state shows real copy at this limit in the real container at 390px; budgets come from what fits at 390px inside the screen gutters (a `{n}` slot counts as 3 characters).
+
+### Writing rules
 
 Sentence-case section titles that name the facet ("Parity"), never the control. Help is one line, only when the facet needs it. The commit is "Show" plus the count and the noun; Reset is one word. Reset resets (Clear in Inspection, where the fields read as a form).
 

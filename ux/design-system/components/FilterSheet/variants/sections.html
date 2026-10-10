@@ -4,10 +4,10 @@
 .ph .bar{display:flex;justify-content:space-between;align-items:center;height:var(--statusbar-height);padding:0 var(--space-24);font:700 var(--type-panel-title-size) var(--font-sans)}
 .ph[data-pressed] .sheet-footer .button.primary{filter:brightness(.96);transform:translateY(1px)}
 </style></head><body>
-<div class="ph" data-state="Default" data-demo="default"><div class="bg"></div><div class="over"></div></div>
-<div class="ph" data-state="Active" data-demo="active"><div class="bg"></div><div class="over"></div></div>
-<div class="ph" data-state="Pressed" data-demo="active" data-pressed=""><div class="bg"></div><div class="over"></div></div>
-<div class="ph" data-state="Long / Chinese" data-demo="zh"><div class="bg"></div><div class="over"></div></div>
+<div class="ph" data-state="Default" data-bleed data-demo="default"><div class="bg"></div><div class="over"></div></div>
+<div class="ph" data-state="Active" data-bleed data-demo="active"><div class="bg"></div><div class="over"></div></div>
+<div class="ph" data-state="Pressed" data-bleed data-demo="active" data-pressed=""><div class="bg"></div><div class="over"></div></div>
+<div class="ph" data-state="Longest label · 中文" data-bleed data-demo="zh"><div class="bg"></div><div class="over"></div></div>
 <script>
 const UI=window.SentriUI,icon=window.SentriIcons.icon;
 const en=n=>n===-7?'7+ days ago':n===7?'In 7+ days':n===0?'Today':n===-1?'Yesterday':n===1?'Tomorrow':n<0?(-n)+' days ago':'In '+n+' days';

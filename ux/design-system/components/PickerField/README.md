@@ -33,7 +33,7 @@ Visible label; trigger value, chosen names (record forms) or count (filters); tr
 | Error | Picker trigger has `aria-invalid`, border and persistent corrective text. ChoiceList is not a validated field: host supplies the field error. |
 | Loading | Busy trigger and Loading options status; selection unavailable until loaded. |
 | Empty | No options available or search-specific no-match status. Never a blank panel. |
-| Long label | Row labels wrap, including Chinese; trigger ellipsizes, full label remains accessible and visible in the sheet. |
+| Longest label (and Longest label · 中文) | Real copy at the Copy budget, in the real container at 390px: one line, nothing wrapped or cut. Longer copy is rewritten. |
 
 Every declared state is in `variants/<id>.html`; these documents rely on atlas-injected resources. Each state owns its rendering script so the atlas can isolate it without loading unrelated states. Rendered proof is in [picker-choice-proof](../picker-choice-proof/verification.md).
 
@@ -45,7 +45,21 @@ Cascade opens one level at a time; choosing a branch auto-advances. Tappable ste
 
 ## Content rules
 
-Sentence case, farm vocabulary, nouns for options. Aim for labels ≤32 English characters or 16 Chinese characters, meta ≤64 / 32; never truncate the catalogue label to meet the budget. Trigger label ≤24 / 12; its value may ellipsize. Inline options ≤8 English or 4 Chinese characters; use radio rows for longer outcomes. Search placeholders describe search, not the field label. Names on a record trigger are joined with “ · ”, not commas; no duplicate count summaries, nested cards or decorative status colour.
+### Copy budget
+
+| Text | English | 中文 | Lines |
+| --- | --- | --- | --- |
+| Field label | 32 | 16 | 1 |
+| Selected value in the trigger | 32 | 16 | 1 |
+| Option label | 36 | 18 | 1 |
+| Option meta | 44 | 22 | 1 |
+| Inline option | 8 | 4 | 1 |
+
+Over-budget copy is rewritten to the shortest copy that still names the act; it is never wrapped, shrunk or ellipsised to fit. The “Longest label” state shows real copy at this limit in the real container at 390px. Budgets come from what fits at 390px inside the screen gutters; a `{n}` or `{name}` slot counts as 3 characters. Several selected names are joined with “ · ” and summarised as a count past two; the trigger never wraps.
+
+### Writing rules
+
+Sentence case, farm vocabulary, nouns for options. Search placeholders describe search, not the field label. Names on a record trigger are joined with “ · ”, not commas; no duplicate count summaries, nested cards or decorative status colour.
 
 ## Accessibility
 

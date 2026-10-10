@@ -11,7 +11,7 @@
       "Ongoing",
       "Resolved",
       "Notice (standing instruction)",
-      "Long name (ellipsis)",
+      "Longest label",
       "Chinese"
     ]
   },
@@ -26,7 +26,7 @@
       "Needs attention · Hospital pen",
       "Ongoing",
       "Resolved",
-      "Long note (wraps)",
+      "Longest label",
       "Chinese"
     ]
   },

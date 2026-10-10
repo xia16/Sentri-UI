@@ -33,7 +33,7 @@ Group heading (optional); lead control (optional); option label; meta line (opti
 | Disabled | Prefer omission. Otherwise readable text, `aria-disabled`, and a persistent reason line; no dimming. |
 | Loading | Loading options status in place of rows. |
 | Empty | No options or no search match; never a blank panel. |
-| Long label | Labels and meta wrap, including Chinese; rows grow, never truncate. |
+| Longest label (and Longest label · 中文) | Real copy at the Copy budget, in the real container at 390px: one line, nothing wrapped or cut. Longer copy is rewritten. |
 
 Every state is in `variants/<id>.html`. Rendered proof is in [picker-choice-proof](../picker-choice-proof/verification.md).
 
@@ -43,7 +43,20 @@ Show at most eight rows before search. Single rows toggle `aria-pressed` and com
 
 ## Content rules
 
-Sentence case, farm vocabulary, nouns for options. Aim for labels up to 32 English characters or 16 Chinese characters, meta up to 64 / 32. Inline options up to 8 English or 4 Chinese characters. Do not truncate a label to fit; wrap it.
+### Copy budget
+
+| Text | English | 中文 | Lines |
+| --- | --- | --- | --- |
+| Option label | 36 | 18 | 1 |
+| Option meta | 44 | 22 | 1 |
+| Inline option | 8 | 4 | 1 |
+| Group heading | 24 | 12 | 1 |
+
+Over-budget copy is rewritten to the shortest copy that still names the act; it is never wrapped, shrunk or ellipsised to fit. The “Longest label” state shows real copy at this limit in the real container at 390px. Budgets come from what fits at 390px inside the screen gutters; a `{n}` or `{name}` slot counts as 3 characters. A label that needs more is two choices or a Row with a description.
+
+### Writing rules
+
+Sentence case, farm vocabulary, nouns for options. Use radio rows, not inline options, for longer outcomes.
 
 ## Accessibility
 

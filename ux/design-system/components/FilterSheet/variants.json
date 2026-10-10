@@ -4,7 +4,7 @@
     "name": "Sections",
     "use": "Use to narrow a list by facets that each need a title: a range, a segmented row.",
     "notUse": "Not for tags that change by job (use FilterChips) or fixed views (use Segment)",
-    "states": ["Default", "Active", "Pressed", "Long / Chinese"],
+    "states": ["Default", "Active", "Pressed", "Longest label · 中文"],
     "usedBy": ["farrowing.room"]
   },
   {

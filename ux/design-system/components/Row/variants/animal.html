@@ -1,14 +1,14 @@
-<div data-state="Default" id="animal-state-0"></div>
-<div data-state="Pressed" id="animal-state-1"></div>
-<div data-state="Long label / Chinese" id="animal-state-3"></div>
-<div data-state="Disabled" id="animal-state-4"></div>
+<div data-state="Default" data-bleed id="animal-state-0"></div>
+<div data-state="Pressed" data-bleed id="animal-state-1"></div>
+<div data-state="Longest label · 中文" data-bleed id="animal-state-3"></div>
+<div data-state="Disabled" data-bleed id="animal-state-4"></div>
 <script>
 // Each state renders in its own iframe in the atlas: draw only the states present.
 var UI = window.SentriUI;
 var RENDER = {
   "animal-state-0": () => SentriUI.row({"title": "12 alive · 1 dead", "description": "2h ago · parity 3", "action": "open", "value": "A02", "variant": "animal", "wrap": true, "attrs": {}, "code": "000418", "mono": true, "chip": {"variant": "chip", "kind": "active", "text": "Active"}}),
   "animal-state-1": () => SentriUI.row({"title": "12 alive · 1 dead", "description": "2h ago · parity 3", "action": "open", "value": "A02", "variant": "animal", "wrap": true, "attrs": {"data-preview": "pressed"}, "code": "000418", "mono": true, "chip": {"variant": "chip", "kind": "active", "text": "Active"}}),
-  "animal-state-3": () => SentriUI.row({"title": "检查待处理的母猪与仔猪记录", "description": "记录时间 09:41 · 饲养员张伟 · 长文字完整换行", "action": "open", "value": "A02", "variant": "animal", "wrap": true, "attrs": {}, "code": "000418", "mono": true, "chip": {"variant": "chip", "kind": "active", "text": "Active"}}),
+  "animal-state-3": () => SentriUI.row({"title": "核对今天待处理的母猪和仔猪记录", "description": "09:41 · 张伟 · 共3头待处理", "action": "open", "value": "A02", "variant": "animal", "wrap": true, "attrs": {}, "code": "000418", "mono": true, "chip": {"variant": "chip", "kind": "active", "text": "Active"}}),
   "animal-state-4": () => SentriUI.row({"title": "12 alive · 1 dead", "description": "2h ago · parity 3", "action": "open", "value": "A02", "variant": "animal", "wrap": true, "attrs": {}, "code": "000418", "mono": true, "chip": {"variant": "chip", "kind": "active", "text": "Active"}, "disabled": true, "reason": "Unavailable — unit is closed"})
 };
 document.querySelectorAll('[data-state]').forEach(function (s) {

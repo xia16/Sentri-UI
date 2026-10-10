@@ -1,8 +1,8 @@
 <!doctype html>
 <meta charset="utf-8">
 <title>ConditionTag mark</title>
-<div data-state="Monitor"><script>document.currentScript.parentElement.insertAdjacentHTML("beforeend", SentriUI.conditionTag({variant:"mark",care:"attention",level:"monitor"}))</script></div>
-<div data-state="Treat in place"><script>document.currentScript.parentElement.insertAdjacentHTML("beforeend", SentriUI.conditionTag({variant:"mark",care:"attention",level:"treat"}))</script></div>
-<div data-state="Hospital pen"><script>document.currentScript.parentElement.insertAdjacentHTML("beforeend", SentriUI.conditionTag({variant:"mark",care:"attention",level:"hospital"}))</script></div>
-<div data-state="Ongoing"><script>document.currentScript.parentElement.insertAdjacentHTML("beforeend", SentriUI.conditionTag({variant:"mark",care:"ongoing"}))</script></div>
-<div data-state="Resolved"><script>document.currentScript.parentElement.insertAdjacentHTML("beforeend", SentriUI.conditionTag({variant:"mark",care:"resolved"}))</script></div>
+<div data-state="Monitor" data-bleed><script>document.currentScript.parentElement.insertAdjacentHTML("beforeend", SentriUI.rowGroup(SentriUI.row({ title: 'Sow 000254', description: 'Pen B4' }).replace('<span class="st-row-copy">', SentriUI.conditionTag({variant:"mark",care:"attention",level:"monitor"}) + '<span class="st-row-copy">')))</script></div>
+<div data-state="Treat in place" data-bleed><script>document.currentScript.parentElement.insertAdjacentHTML("beforeend", SentriUI.rowGroup(SentriUI.row({ title: 'Sow 000254', description: 'Pen B4' }).replace('<span class="st-row-copy">', SentriUI.conditionTag({variant:"mark",care:"attention",level:"treat"}) + '<span class="st-row-copy">')))</script></div>
+<div data-state="Hospital pen" data-bleed><script>document.currentScript.parentElement.insertAdjacentHTML("beforeend", SentriUI.rowGroup(SentriUI.row({ title: 'Sow 000254', description: 'Pen B4' }).replace('<span class="st-row-copy">', SentriUI.conditionTag({variant:"mark",care:"attention",level:"hospital"}) + '<span class="st-row-copy">')))</script></div>
+<div data-state="Ongoing" data-bleed><script>document.currentScript.parentElement.insertAdjacentHTML("beforeend", SentriUI.rowGroup(SentriUI.row({ title: 'Sow 000254', description: 'Pen B4' }).replace('<span class="st-row-copy">', SentriUI.conditionTag({variant:"mark",care:"ongoing"}) + '<span class="st-row-copy">')))</script></div>
+<div data-state="Resolved" data-bleed><script>document.currentScript.parentElement.insertAdjacentHTML("beforeend", SentriUI.rowGroup(SentriUI.row({ title: 'Sow 000254', description: 'Pen B4' }).replace('<span class="st-row-copy">', SentriUI.conditionTag({variant:"mark",care:"resolved"}) + '<span class="st-row-copy">')))</script></div>

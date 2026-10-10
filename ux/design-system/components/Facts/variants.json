@@ -9,7 +9,7 @@
       "With a trail",
       "ID in mono",
       "Missing value",
-      "Long value wraps",
+      "Longest label",
       "Chinese"
     ]
   },
@@ -21,7 +21,7 @@
     "states": [
       "Default",
       "Zero is not missing",
-      "Long label wraps",
+      "Longest label",
       "Chinese"
     ]
   }

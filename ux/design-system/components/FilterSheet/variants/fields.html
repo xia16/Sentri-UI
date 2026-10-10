@@ -3,8 +3,8 @@
 .ph .bg{padding:0 var(--space-gutter)}
 .ph .bar{display:flex;justify-content:space-between;align-items:center;height:var(--statusbar-height);padding:0 var(--space-24);font:700 var(--type-panel-title-size) var(--font-sans)}
 </style></head><body>
-<div class="ph" data-state="Default" data-demo="default"><div class="bg"></div><div class="over"></div></div>
-<div class="ph" data-state="Active" data-demo="active"><div class="bg"></div><div class="over"></div></div>
+<div class="ph" data-state="Default" data-bleed data-demo="default"><div class="bg"></div><div class="over"></div></div>
+<div class="ph" data-state="Active" data-bleed data-demo="active"><div class="bg"></div><div class="over"></div></div>
 <script>
 const UI=window.SentriUI;
 const bg=()=>'<div class="bar" aria-hidden="true"><span>9:41</span></div>'+UI.heading({title:'Inspection',kind:'page'})+UI.panel(UI.row({title:'C1 · 3 pigs',description:'Gestation · 40 days'}),{className:'st-row-group'});

@@ -28,7 +28,7 @@ Use [Button](../Button/README.md) for Record, Move or Set count. Use [ChoiceList
 | Default | Label or glyph at rest. |
 | Pressed | Visible press fill / darkening and movement; static examples use `data-preview="pressed"`. |
 | Disabled | Persistent text reason via `reason` or `describedby`; never colour alone. Prefer omitting unavailable acts. |
-| Long / Chinese | The target stays 48 x 48; the accessible name stays complete in both languages. |
+| Longest label (and Longest label · 中文) | The accessible name at the Copy budget; the target stays 48 x 48. |
 | Selected | Optional `aria-pressed` plus a visible check, for the breeder mark. |
 | Badge | Count is visible and included in the accessible name, e.g. “Filter pigs, 2 applied”. |
 
@@ -40,9 +40,17 @@ Native button activation emits `data-action` / `data-value`. Bordered is the def
 
 ## Content rules
 
-Label rule: verbs come from [strings.json](../../../laws/strings.json), and each verb has exactly its registered meaning. Back keeps a draft; Close exits a per-tap sheet; Clear discards a draft; Edit corrects a posted record; Record commits an act; End task ends the batch task. Name the act and subject/count; never “Submit”. Save is reserved by the registry for a staged event, not a substitute for Record.
+### Copy budget
 
-Aim for an accessible name within 64 English characters or 32 Chinese characters. This is a writing budget, not a validation limit. Sentence case; never truncate the accessible name. Name the action and subject, and include badge counts once. The Chinese example keeps its complete name while the target stays square.
+| Text | English | 中文 | Lines |
+| --- | --- | --- | --- |
+| Accessible name (aria-label; no visible text) | 40 | 20 | 1 spoken phrase |
+
+Over-budget copy is rewritten to the shortest copy that still names the act; it is never wrapped, shrunk or ellipsised to fit. The “Longest label” state shows real copy at this limit in the real container at 390px. Budgets come from what fits at 390px inside the screen gutters; a `{n}` or `{name}` slot counts as 3 characters. The target stays a 48px square; the name is never shown, so the budget keeps the screen reader’s phrase short.
+
+### Writing rules
+
+Label rule: verbs come from [strings.json](../../../laws/strings.json), and each verb has exactly its registered meaning. Back keeps a draft; Close exits a per-tap sheet; Clear discards a draft; Edit corrects a posted record; Record commits an act. Name the action and subject, include badge counts once, sentence case.
 
 ## Accessibility
 

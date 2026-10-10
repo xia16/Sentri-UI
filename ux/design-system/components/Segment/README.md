@@ -34,7 +34,7 @@ See [variants.json](variants.json) for use boundaries and each variant’s rende
 | Pressed | An unselected option darkens to the handle tone at once on touch (visibly different from both unselected and selected); a selected option keeps its paper face. The static demo presses the second option. |
 | Selected | Raised paper face plus a stronger label weight (700), in every variant. No underline. Fill and weight both change, so it is never colour alone. |
 | Disabled | Native disabled button, dashed outline; host supplies one visible reason beside the row. Prefer omission unless temporarily unavailable. |
-| Long-label | English and Chinese labels wrap without clipping or ellipsis. |
+| Longest label (and Longest label · 中文) | Real copy at the Copy budget, in the real container at 390px: one line, nothing wrapped or cut. Longer copy is rewritten. |
 
 Error and loading belong to the list/sheet, not this synchronous control. Empty options omit the entire control; an empty result retains the current filters and shows a list-level empty state with a clear-filter action.
 
@@ -44,7 +44,20 @@ Selection changes the content below immediately through the host’s data-action
 
 ## Content rules
 
-Sentence case; nouns or states, never commit verbs. Aim for 1–2 words, ≤12 English characters / 6 Chinese characters at 2–3 choices; ≤8 / 4 at 4–5. Translate rather than abbreviate states. Long translations wrap and increase height; never ellipsize a status. Counts are optional properties, defined once, never repeated in the label. Legacy labels may contain trusted HTML; never pass unsanitized user content.
+### Copy budget
+
+| Text | English | 中文 | Lines |
+| --- | --- | --- | --- |
+| Label, 2–3 options | 12 | 6 | 1 |
+| Label, 4 options | 8 | 4 | 1 |
+| Label, 5 options | 6 | 3 | 1 |
+| Count (optional, separate from the label) | 4 digits | 4 digits | 1 |
+
+Over-budget copy is rewritten to the shortest copy that still names the act; it is never wrapped, shrunk or ellipsised to fit. The “Longest label” state shows real copy at this limit in the real container at 390px. Budgets come from what fits at 390px inside the screen gutters; a `{n}` or `{name}` slot counts as 3 characters. Measured with the segment inside the gutters (354px) beside no other control: three options fit 19 English / 8 Chinese characters, five fit 10 / 4. An adjacent filter IconButton takes 56px more, which is why the budget keeps a margin.
+
+### Writing rules
+
+Sentence case; nouns or states, never commit verbs. One or two words. Translate rather than abbreviate states. Counts are optional properties, defined once, never repeated in the label. Legacy labels may contain trusted HTML; never pass unsanitized user content.
 
 ## Accessibility
 

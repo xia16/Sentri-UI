@@ -27,7 +27,7 @@ Pick a from–to range of whole steps with two round handles on one track: Farro
 | Default | Handles at both ends; the value line says the open phrase. |
 | Narrowed | Handles moved in; the fill sits between them and the value line names both ends. |
 | Same value | Both handles on one step; the value line names it once. |
-| Long / Chinese | The value line wraps; the track keeps its size. |
+| Longest label (and Longest label · 中文) | Real copy at the Copy budget, in the real container at 390px: one line, nothing wrapped or cut. Longer copy is rewritten. |
 
 There is no designed pressed state: the handle follows the finger. Handles never cross; a handle pushed past the other carries it along.
 
@@ -36,6 +36,19 @@ There is no designed pressed state: the handle follows the finger. Handles never
 A touch anywhere on the 48px-tall rail moves the nearest handle, and a drag keeps hold of it, so the 32px handle is never the target. When both handles share a step, the next touch picks the side it lands on. Each change updates the fill, the value line and the handle's spoken value, then fires `sentri-range-change` with `{ key, values: { from, to } }`; the host reads that and re-counts its list.
 
 ## Content rules
+
+### Copy budget
+
+| Text | English | 中文 | Lines |
+| --- | --- | --- | --- |
+| Title | 24 | 12 | 1 |
+| Value line (the range in words) | 32 | 16 | 1 |
+| End label (three under the track) | 14 | 7 | 1 |
+| Handle name (aria-label, not shown) | 40 | 20 | 1 spoken phrase |
+
+Over-budget copy is rewritten, never wrapped, shrunk or ellipsised. The “Longest label” state shows real copy at this limit in the real container at 390px; budgets come from what fits at 390px inside the screen gutters (a `{n}` slot counts as 3 characters).
+
+### Writing rules
 
 The value line is the range in plain words, never raw numbers alone. End labels are short nouns or phrases; the middle label names the neutral point. `format(n)` supplies one value's words (also each handle's spoken value); `summary(from, to)` supplies the whole line.
 

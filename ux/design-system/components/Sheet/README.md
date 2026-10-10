@@ -67,7 +67,7 @@ A **page** has a status bar in place of the grab and scrim, no ✕, and its head
 | Error | A `red` status line says what is wrong and how to fix it (`48 kg is over the scale limit · check the number`); the primary waits. |
 | Loading | Not drawn. A hold that was sent shows its pending phase; the sheet stays. |
 | Empty | The body holds the empty line of what it contains (`Nothing selected yet. Tap a pig in the list to add it.`). |
-| Long / Chinese | Titles wrap (`overflow-wrap: anywhere`), the subtitle wraps; Back is 86px wide and the primary takes the rest. A primary label longer than about 20 characters (10 Chinese) should be shortened. |
+| Longest label (and Longest label · 中文) | Real copy at the Copy budget, in the real container at 390px: one line, nothing wrapped or cut. Longer copy is rewritten. |
 
 Every state is drawn in `variants/drawer.html`, `variants/page.html` and `variants/dialog.html`.
 
@@ -82,11 +82,25 @@ Every state is drawn in `variants/drawer.html`, `variants/page.html` and `varian
 
 ## Content rules
 
-- **Title:** a noun or verb phrase, sentence case, up to 28 characters in English (about 14 Chinese). It names the step (`Record a death`), not the screen under it.
+### Copy budget
+
+| Text | English | 中文 | Lines |
+| --- | --- | --- | --- |
+| Title | 28 | 14 | 1 |
+| Subtitle | 40 | 20 | 1 |
+| Primary / footer label | 24 | 12 | 1 |
+| Status line | 48 | 24 | 1 |
+| Dialog title | 28 | 14 | 1 |
+| Dialog description | 80 | 40 | 3 |
+
+Over-budget copy is rewritten to the shortest copy that still names the act; it is never wrapped, shrunk or ellipsised to fit. The “Longest label” state shows real copy at this limit in the real container at 390px. Budgets come from what fits at 390px inside the screen gutters; a `{n}` or `{name}` slot counts as 3 characters.
+
+### Writing rules
+
+- **Title:** a noun or verb phrase, sentence case. It names the step (`Record a death`), not the screen under it.
 - **Subtitle:** one line of context in the form `place · amount · day` (`B4 · 11 alive`); `muted`; no full stops.
 - **Primary label:** a verb with its count and place (`Record 12 piglets`, `Move 3 to B6`), not Save, Submit or Done (see Button).
 - **Status line:** a short instruction, no colon, no full stop.
-- Chinese strings are shorter than the English; nothing is clipped, titles wrap to two lines.
 
 ## Accessibility
 

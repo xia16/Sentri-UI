@@ -27,7 +27,7 @@ Optional row: visible label, muted Optional word, optional attached/upload count
 | Disabled | Inactive or custom visible reason, aria-disabled, dashed camera outline |
 | Full | 12 photos at most; same reason pattern |
 | Cancelled | No error message; the photos already attached remain |
-| Long label / Chinese | Label and help wrap; action remains inside the row |
+| Longest label (and Longest label · 中文) | Real copy at the Copy budget, in the real container at 390px; longer copy is rewritten. |
 
 No selected state: tapping a thumbnail opens it. [State documents](variants.json) show every state.
 
@@ -39,7 +39,19 @@ The host guards aria-disabled taps with `SentriUI.guard`, answers the visible re
 Viewer has visible Back. Draft viewer offers Delete as a full-size danger Button; saved evidence has no Delete. Deletion returns “Photo deleted · Undo” for 5 seconds; host restores the snapshot on Undo. Return focus to the originating thumbnail, or camera if deleted. Capture returns focus to camera. Before Undo expires use `SentriUI.handFocus` so only focus still on Undo moves. The viewer is a Sheet, never another nested overlay.
 
 ## Content rules
-Sentence case; label target 24 English / 8 Chinese characters, with wrapping for excess. Optional stays visible. Help target 100 English / 45 Chinese characters, wrapping without clipping. Example “照片 · 选填”; long Chinese proof is included. Derived counts say “3 attached · 1 waiting to upload”, not a second copy elsewhere. Alt labels name the evidence; fallback labels give the photo index and pending status.
+
+### Copy budget
+
+| Text | English | 中文 | Lines |
+| --- | --- | --- | --- |
+| Label | 24 | 12 | 1 |
+| Help | 60 | 30 | 2 |
+
+Over-budget copy is rewritten, never wrapped, shrunk or ellipsised. The “Longest label” state shows real copy at this limit in the real container at 390px; budgets come from what fits at 390px inside the screen gutters.
+
+### Writing rules
+
+Sentence case; Optional stays visible. Example “照片 · 选填”; Derived counts say “3 attached · 1 waiting to upload”, not a second copy elsewhere. Alt labels name the evidence; fallback labels give the photo index and pending status.
 
 ## Accessibility
 Optional row is a native button with a visible label and spoken label; hint is `role="status"`, linked by `aria-describedby`. Thumbnails are labelled native buttons; images have empty alt to avoid duplicate announcements. ≥48px targets, no gesture-only deletion. Disabled reason is readable and the camera outline changes shape, not just colour.
