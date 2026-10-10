@@ -45,6 +45,40 @@ for (const f of features) for (const s of f.screens || []) {
   s.status = t.status;   // the same screen has the same status
   for (const k of ['url', 'preset', 'steps', 'notes']) if (s[k] === undefined && t[k] !== undefined) s[k] = t[k];
 }
+
+// approvals: features/<id>/approvals.json (SCHEMA.md, "Approval records"). Only the owner approves; a record says who,
+// when and which commit. An approved screen that a later change touched is "changed since approval": back in design,
+// with its approved version still viewable at the approval commit.
+const atCommit = {};
+const atlasAt = (sha) => {
+  if (!(sha in atCommit)) {
+    try { atCommit[sha] = JSON.parse(execSync(`git show ${sha}:atlas/atlas.json`, { cwd: root, stdio: ['ignore', 'pipe', 'ignore'], maxBuffer: 64 << 20 }).toString()); }
+    catch { atCommit[sha] = null; }
+  }
+  return atCommit[sha];
+};
+const screenAt = (sha, id) => { const a = atlasAt(sha); if (!a) return null; for (const p of a.platforms) for (const s of p.sections) for (const f of s.features) for (const c of f.screens) if (c.id === id) return c; return null; };
+for (const f of features) {
+  const file = join(root, 'features', f.id, 'approvals.json');
+  if (!existsSync(file)) continue;
+  const where = `features/${f.id}/approvals.json`;
+  let recs; try { recs = JSON.parse(readFileSync(file, 'utf8')); } catch (e) { problems.push(`${where}: ${e.message}`); continue; }
+  if (!Array.isArray(recs)) { problems.push(`${where}: must be a list of approval records`); continue; }
+  for (const r of recs) {
+    const s = (f.screens || []).find((x) => x.id === r.screen);
+    if (!s) { problems.push(`${where}: ${r.screen} is not one of the feature's screens`); continue; }
+    if (!r.commit || !r.date || !r.by) { problems.push(`${where}: ${r.screen} needs commit, date and by`); continue; }
+    const then = screenAt(r.commit, r.screen);
+    if (!atlasAt(r.commit)) { problems.push(`${where}: ${r.screen} was approved at ${r.commit}, which has no atlas in this repo`); continue; }
+    if (!then || !then.url) { problems.push(`${where}: ${r.screen} has no rendered screen at ${r.commit}`); continue; }
+    if (r.changed && !(r.changed.since && r.changed.why)) problems.push(`${where}: ${r.screen} "changed" needs since and why`);
+    s.approval = { commit: r.commit, date: r.date, by: r.by, note: r.note || '', url: then.url, changed: r.changed || null }; // the last record wins
+  }
+}
+for (const f of features) for (const s of f.screens || []) {
+  if (s.approval) s.status = s.approval.changed ? (s.status === 'approved' ? 'in-design' : s.status) : 'approved';
+  else if (s.status === 'approved') problems.push(`features/${f.id}: ${s.id} says approved but has no approval record (features/${f.id}/approvals.json)`);
+}
 for (const f of features) {
   const own = new Set((f.screens || []).map((s) => s.id));
   const where = `features/${f.id}`;
