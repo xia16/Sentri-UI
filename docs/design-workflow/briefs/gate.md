@@ -69,7 +69,7 @@ Screenshot each screen on BASE and on CANDIDATE in the same state, at 390×844 a
 
 For each pair, judge **better / same / worse** and give the one reason that decides it. The bar is the screens the owner approved (Farrowing and Inspection): calm, aligned, nothing extra, one surface, ink not colour. A change that meets a rule but looks worse is **worse**.
 
-- **Normal**: it passes only if no pair is worse, at least one changed pair is better, and the cold look found no defect. A pair with one side (a new screen, or a removed one) is judged **pass** or **fail**, and any fail fails the change. When no screen changed or was added, only a change declared behaviour can pass, on a walk where every entry is ok: a behaviour fix may leave every first frame alone.
+- **Normal**: it passes only if no pair is worse, at least one changed pair is better, and the cold look found no defect. A pair with one side (a new screen, or a removed one) is judged **pass** or **fail**, and any fail fails the change. When no screen changed or was added, only a change declared behaviour (or shared) can pass, on a walk where every entry is ok: a behaviour fix may leave every first frame alone.
 - **Refactor**: it passes only if every pair is **same**, pixel-identical where the change claims identity, and the cold look found no defect.
 - **Shared component**: no pair on any feature using it may be worse. Approving one feature doesn't approve the variant for the others.
 - **Frozen screen**: any change to a frozen screen fails unless the owner reopened it.

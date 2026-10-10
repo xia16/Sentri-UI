@@ -176,7 +176,7 @@ export function checkVerdict(verdict, mech) {
       // Nothing visible changed: only a behaviour fix (which may leave every first frame alone) passes, and on a walk.
       const behaviour = ['behaviour', 'shared'].includes(mech.class?.declared);
       const walked = (verdict.walk || []).length > 0 && verdict.walk.every((w) => w.ok === true);
-      if (!behaviour || !walked) problems.push(`no screen changed: only a change declared behaviour passes that way, with a walk where every entry is ok (declared ${mech.class?.declared || 'nothing'}, ${(verdict.walk || []).length} walk entries)`);
+      if (!behaviour || !walked) problems.push(`no screen changed: only a change declared behaviour (or shared) passes that way, with a walk where every entry is ok (declared ${mech.class?.declared || 'nothing'}, ${(verdict.walk || []).length} walk entries)`);
     }
   }
   return { ok: problems.length === 0, problems };
