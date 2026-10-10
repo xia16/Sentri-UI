@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-10T04:14:18.505Z",
- "commit": "5bd4e11",
+ "generated": "2026-10-10T04:30:31.470Z",
+ "commit": "3464241",
  "platforms": [
   {
    "id": "mobile",
@@ -6955,17 +6955,15 @@
            {
             "name": "Filter fields",
             "shows": "Production stage, Disease or symptom, Care",
-            "logic": "Options come from the unit’s pigs. Clear restores draft defaults; Back retains the draft; Clear on the list resets the draft too. Show n pigs applies it; zero matches blocks commit with No pigs match. SentriUI.filterSheet owns the drawer and counted footer.",
+            "logic": "Options come from the unit's pigs: stages and condition names found there. Care: No action needed · Monitor · Treat in place · Move to hospital pen. Reset clears the draft; Show pigs applies it.",
             "source": "filter state in main()",
             "at": "Production stage"
            }
           ],
           "controls": [],
           "copy": [
-           "Filter pigs",
-           "Clear (act.clear)",
-           "Show n pigs",
-           "No pigs match"
+           "Filter pigs (raw)",
+           "Show pigs (raw)"
           ],
           "edge": [
            "Batch can be filtered but has no control here (set by the unreachable batch sheet)."
@@ -14071,379 +14069,6 @@
      }
     },
     {
-     "name": "FilterSheet",
-     "group": "Inputs and filters",
-     "status": "agent-checked",
-     "gate": {
-      "status": "agent-checked",
-      "round": 2,
-      "judged": "2026-10-10",
-      "commit": "af1de4c",
-      "model": "claude-opus-5-5",
-      "previous": {
-       "round": 1,
-       "commit": "78d747e",
-       "status": "in-design",
-       "lowest": 5,
-       "scores": {
-        "clarity": 8,
-        "budget": 7,
-        "hierarchy": 7,
-        "spacing": 6,
-        "broken": 5
-       }
-      },
-      "scores": {
-       "clarity": 8,
-       "budget": 8,
-       "hierarchy": 8,
-       "spacing": 8,
-       "broken": 8
-      },
-      "lowest": 8,
-      "checklist": [
-       {
-        "line": 1,
-        "pass": true,
-        "why": "Purpose line names Sheet as the alternative for record forms."
-       },
-       {
-        "line": 2,
-        "pass": true,
-        "why": "When / when not present; PickerField and ChoiceList exist."
-       },
-       {
-        "line": 3,
-        "pass": true,
-        "why": "Anatomy named and shown: drawer, scope, Clear, groups, help, Back, counted commit, reason."
-       },
-       {
-        "line": 4,
-        "pass": true,
-        "why": "One variant (List filters) used by farrowing.room and inspection.filters."
-       },
-       {
-        "line": 5,
-        "pass": true,
-        "why": "Default, active, empty, disabled, error, loading, long/zh rendered; Disabled now distinct (fieldset and Clear disabled, 'Syncing · filters return when it finishes'); Pressed dropped."
-       },
-       {
-        "line": 6,
-        "pass": true,
-        "why": "Measured at 390: Clear/Close 48x48, chips 54-72x48 wrapped to two rows, handles 48x48, pickers 348x48, Back 86x48, Show 248x48."
-       },
-       {
-        "line": 7,
-        "pass": true,
-        "why": "Five parity chips wrap and stay visible; PickerField beyond."
-       },
-       {
-        "line": 8,
-        "pass": true,
-        "why": "Selected chip has a check; blocked commit and disabled sheet each carry a written reason."
-       },
-       {
-        "line": 9,
-        "pass": true,
-        "why": "zh cell renders 清除 / 返回 / 显示 12 头母猪 / 7天以上前 – 7天以后; labels come from strings.json (act.clear, act.back, ds.filter.show, fa/in.filter.show.*)."
-       },
-       {
-        "line": 10,
-        "pass": true,
-        "why": "Dialog semantics, visible Back/Close, keyboard on chips and sliders, count in an aria-live button."
-       },
-       {
-        "line": 11,
-        "pass": true,
-        "why": "New CSS resolves to existing tokens."
-       },
-       {
-        "line": 12,
-        "pass": true,
-        "why": "Group labels visible; sheet and list summary now agree ('Due: 5 days ago – In 7+ days · Parity 2–5')."
-       },
-       {
-        "line": 13,
-        "pass": true,
-        "why": "Back keeps the draft; list Clear resets applied and draft; reopening after list Clear shows defaults on both screens."
-       },
-       {
-        "line": 14,
-        "pass": true,
-        "why": "Links Sheet, FilterChips, ChoiceList, PickerField, RangeSlider."
-       },
-       {
-        "line": 15,
-        "pass": true,
-        "why": "Atlas Overview + List filters: 8 cells, zero 4xx, zero console errors; farrowing.room and inspection.filters console clean; no horizontal overflow at 390."
-       }
-      ],
-      "classification": "component",
-      "variants": [
-       {
-        "name": "List filters",
-        "usedBy": [
-         "farrowing.room",
-         "inspection.filters"
-        ],
-        "status": "agent-checked",
-        "scores": {
-         "clarity": 8,
-         "budget": 8,
-         "hierarchy": 8,
-         "spacing": 8,
-         "broken": 8
-        },
-        "findings": [
-         "Used end to end at 390x844: drag, arrows/Home/End, chips, pickers; 0 results blocks Show with 'No sows match' / 'No pigs match'; sheet Clear; Back then reopen keeps the draft; Show applies with summary and badge (farrowing 2, inspection 1); list Clear then reopen shows defaults (Show 7 sows / Show 7 pigs)."
-        ]
-       }
-      ],
-      "round1": [
-       {
-        "finding": "Stale draft after list Clear",
-        "fixed": true
-       },
-       {
-        "finding": "Atlas cells 404 on relative assets",
-        "fixed": true
-       },
-       {
-        "finding": "Parity chips clipped",
-        "fixed": true
-       },
-       {
-        "finding": "Commit/Clear/Back not localisable",
-        "fixed": true
-       },
-       {
-        "finding": "Disabled duplicated Empty; Pressed not a state",
-        "fixed": true
-       },
-       {
-        "finding": "inspection.filters note hand-edited in atlas.json",
-        "fixed": true,
-        "note": "now in features/inspection/feature.json; a rebuild carries it"
-       }
-      ],
-      "findings": [
-       {
-        "severity": "medium",
-        "text": "Disabled and Error still print a count the sheet does not know: 'Show 0 sows' while syncing, 'Show 12 sows' beside 'Results unavailable'.",
-        "fix": "When disabled or error, label the commit without a number ('Show sows')."
-       },
-       {
-        "severity": "low",
-        "text": "Farrowing's filter IconButton shows badge '2' but its aria-label stays 'Filter sows'; Inspection says 'Filter pigs, 1 applied'.",
-        "fix": "Pass the applied count into the farrowing IconButton label as Inspection does."
-       },
-       {
-        "severity": "low",
-        "text": "Chip rows sit 18px inside the group heading's left edge (Parity at x=21, chips at x=39).",
-        "fix": "Drop the chips-track inline padding inside .st-filter-group."
-       }
-      ],
-      "proposals": []
-     },
-     "files": {
-      "variantsJson": true,
-      "variants": [
-       "list"
-      ]
-     }
-    },
-    {
-     "name": "RangeSlider",
-     "group": "Inputs and filters",
-     "status": "agent-checked",
-     "gate": {
-      "status": "agent-checked",
-      "round": 2,
-      "judged": "2026-10-10",
-      "commit": "af1de4c",
-      "model": "claude-opus-5-5",
-      "previous": {
-       "round": 1,
-       "commit": "78d747e",
-       "status": "in-design",
-       "lowest": 5,
-       "scores": {
-        "clarity": 7,
-        "budget": 7,
-        "hierarchy": 6,
-        "spacing": 7,
-        "broken": 5
-       }
-      },
-      "scores": {
-       "clarity": 8,
-       "budget": 8,
-       "hierarchy": 8,
-       "spacing": 8,
-       "broken": 8
-      },
-      "lowest": 8,
-      "checklist": [
-       {
-        "line": 1,
-        "pass": true,
-        "why": "Purpose line names Measure for one exact value."
-       },
-       {
-        "line": 2,
-        "pass": true,
-        "why": "When / when not present; a Not for section names the feed slider."
-       },
-       {
-        "line": 3,
-        "pass": true,
-        "why": "Label, bounds, track with filled span, two handles, end labels, reason named and shown."
-       },
-       {
-        "line": 4,
-        "pass": true,
-        "why": "One Range variant used by farrowing.room."
-       },
-       {
-        "line": 5,
-        "pass": true,
-        "why": "Default, pressed (dragging), focus, at limits, disabled (grey fill, dashed handles, reason), error, long/zh rendered; data-dragging set on a live drag."
-       },
-       {
-        "line": 6,
-        "pass": true,
-        "why": "Handles 48x48, staggered so equal bounds stay grabbable."
-       },
-       {
-        "line": 7,
-        "pass": true,
-        "why": "Not a choice control; the copied five-row rule is gone."
-       },
-       {
-        "line": 8,
-        "pass": true,
-        "why": "Selection carried by handles and written value as well as the fill; disabled has a reason."
-       },
-       {
-        "line": 9,
-        "pass": true,
-        "why": "zh value '昨天 – 3天后' stays on one line; the long label wraps above it."
-       },
-       {
-        "line": 10,
-        "pass": true,
-        "why": "role=slider; aria-valuetext uses format ('4 days ago', 'In 7+ days'); arrows/Home/End and track tap verified."
-       },
-       {
-        "line": 11,
-        "pass": true,
-        "why": "Tokens only (--green, --disabled-border; README token list misses them, see findings)."
-       },
-       {
-        "line": 12,
-        "pass": true,
-        "why": "format gives '7+ days ago – In 7+ days'; equal bounds collapse to one value; matches the list summary."
-       },
-       {
-        "line": 13,
-        "pass": true,
-        "why": "Not an overlay."
-       },
-       {
-        "line": 14,
-        "pass": true,
-        "why": "Links FilterSheet, FilterChips, ChoiceList, PickerField, Sheet."
-       },
-       {
-        "line": 15,
-        "pass": true,
-        "why": "Atlas Overview + Range: 8 cells, zero 4xx, zero console errors; guard test covers the asset tags."
-       }
-      ],
-      "classification": "component",
-      "variants": [
-       {
-        "name": "Range",
-        "usedBy": [
-         "farrowing.room"
-        ],
-        "status": "agent-checked",
-        "scores": {
-         "clarity": 8,
-         "budget": 8,
-         "hierarchy": 8,
-         "spacing": 8,
-         "broken": 8
-        },
-        "findings": [
-         "Mouse drag, keys and track tap update value text, fill and aria-valuetext together; handles never cross; 0-result range blocks the sheet commit."
-        ]
-       }
-      ],
-      "round1": [
-       {
-        "finding": "Raw negative value text, no formatter",
-        "fixed": true
-       },
-       {
-        "finding": "Atlas cells 404 on relative assets",
-        "fixed": true
-       },
-       {
-        "finding": "No fill between handles",
-        "fixed": true,
-        "note": "fill is --green; the design-system README colour law lists green for 'done, recorded, synced, selected', so a selected span in green is within the law. Not reversed."
-       },
-       {
-        "finding": "zh value wraps mid-range",
-        "fixed": true
-       },
-       {
-        "finding": "README FilterSheet boilerplate",
-        "fixed": true
-       }
-      ],
-      "findings": [
-       {
-        "severity": "low",
-        "text": "Label and formatted value run together with a capital mid-line: 'Due In 7+ days', 'Due 4 days ago – In 7+ days'.",
-        "fix": "Set the value on its own line under the label so the formatter's sentence case reads as a value."
-       },
-       {
-        "severity": "low",
-        "text": "If the owner's 'green = approved/done only' rule is meant to override the README, the green span conflicts; the README names selection green, so it passes today.",
-        "fix": "Owner decides: keep the README, or switch the fill to --ink and drop 'selected' from the green law."
-       },
-       {
-        "severity": "low",
-        "text": "README token list omits --green and --disabled-border, which the fill now uses.",
-        "fix": "Add both to the API and tokens line."
-       },
-       {
-        "severity": "low",
-        "text": "zh end label '7天以后' drops the open-ended '+' that 'In 7+ days' and '7天以上前' carry.",
-        "fix": "Use '7天以上后' in the zh formatter."
-       }
-      ],
-      "proposals": [
-       {
-        "kind": "merge",
-        "name": "Feed adjustment slider",
-        "why": "Still open (README now says so): Inspection's feed edit records a value; it belongs with Stepper/Measure.",
-        "seenIn": [
-         "inspection.actions"
-        ]
-       }
-      ]
-     },
-     "files": {
-      "variantsJson": true,
-      "variants": [
-       "range"
-      ]
-     }
-    },
-    {
      "name": "Field",
      "group": "Fields",
      "status": "agent-checked",
@@ -16442,6 +16067,24 @@
       "variantsJson": false,
       "variants": []
      }
+    },
+    {
+     "name": "Filter sheet",
+     "group": "Inputs and filters",
+     "status": "placeholder",
+     "seenIn": [
+      "farrowing.room"
+     ],
+     "note": "A sheet that narrows a list by due range and parity, with Back, Reset and a Show-n-sows button."
+    },
+    {
+     "name": "Range slider",
+     "group": "Inputs and filters",
+     "status": "placeholder",
+     "seenIn": [
+      "farrowing.room"
+     ],
+     "note": "A two-handle slider for a due-date range, with its end labels."
     }
    ],
    "copy": {
@@ -21042,102 +20685,6 @@
      "severity": "low",
      "title": "A stale categoryFooter with the c.disabled option survives in ux/system/sentri-components.js (no…",
      "detail": "A stale categoryFooter with the c.disabled option survives in ux/system/sentri-components.js (no page loads it).\nFix: Delete ux/system/sentri-components.js with the legacy icon registry.",
-     "source": "gate"
-    },
-    {
-     "id": "gate:FilterSheet:0",
-     "target": {
-      "kind": "component",
-      "id": "FilterSheet"
-     },
-     "kind": "broken",
-     "severity": "medium",
-     "title": "Disabled and Error still print a count the sheet does not know: 'Show 0 sows' while syncing,…",
-     "detail": "Disabled and Error still print a count the sheet does not know: 'Show 0 sows' while syncing, 'Show 12 sows' beside 'Results unavailable'.\nFix: When disabled or error, label the commit without a number ('Show sows').",
-     "source": "gate"
-    },
-    {
-     "id": "gate:FilterSheet:1",
-     "target": {
-      "kind": "component",
-      "id": "FilterSheet"
-     },
-     "kind": "design",
-     "severity": "low",
-     "title": "Farrowing's filter IconButton shows badge '2' but its aria-label stays 'Filter sows'; Inspection…",
-     "detail": "Farrowing's filter IconButton shows badge '2' but its aria-label stays 'Filter sows'; Inspection says 'Filter pigs, 1 applied'.\nFix: Pass the applied count into the farrowing IconButton label as Inspection does.",
-     "source": "gate"
-    },
-    {
-     "id": "gate:FilterSheet:2",
-     "target": {
-      "kind": "component",
-      "id": "FilterSheet"
-     },
-     "kind": "design",
-     "severity": "low",
-     "title": "Chip rows sit 18px inside the group heading's left edge (Parity at x=21, chips at x=39).",
-     "detail": "Chip rows sit 18px inside the group heading's left edge (Parity at x=21, chips at x=39).\nFix: Drop the chips-track inline padding inside .st-filter-group.",
-     "source": "gate"
-    },
-    {
-     "id": "gate:RangeSlider:0",
-     "target": {
-      "kind": "component",
-      "id": "RangeSlider"
-     },
-     "kind": "design",
-     "severity": "low",
-     "title": "Label and formatted value run together with a capital mid-line: 'Due In 7+ days', 'Due 4 days…",
-     "detail": "Label and formatted value run together with a capital mid-line: 'Due In 7+ days', 'Due 4 days ago – In 7+ days'.\nFix: Set the value on its own line under the label so the formatter's sentence case reads as a value.",
-     "source": "gate"
-    },
-    {
-     "id": "gate:RangeSlider:1",
-     "target": {
-      "kind": "component",
-      "id": "RangeSlider"
-     },
-     "kind": "design",
-     "severity": "low",
-     "title": "If the owner's 'green = approved/done only' rule is meant to override the README, the green span…",
-     "detail": "If the owner's 'green = approved/done only' rule is meant to override the README, the green span conflicts; the README names selection green, so it passes today.\nFix: Owner decides: keep the README, or switch the fill to --ink and drop 'selected' from the green law.",
-     "source": "gate"
-    },
-    {
-     "id": "gate:RangeSlider:2",
-     "target": {
-      "kind": "component",
-      "id": "RangeSlider"
-     },
-     "kind": "design",
-     "severity": "low",
-     "title": "README token list omits --green and --disabled-border, which the fill now uses.",
-     "detail": "README token list omits --green and --disabled-border, which the fill now uses.\nFix: Add both to the API and tokens line.",
-     "source": "gate"
-    },
-    {
-     "id": "gate:RangeSlider:3",
-     "target": {
-      "kind": "component",
-      "id": "RangeSlider"
-     },
-     "kind": "design",
-     "severity": "low",
-     "title": "zh end label '7天以后' drops the open-ended '+' that 'In 7+ days' and '7天以上前' carry.",
-     "detail": "zh end label '7天以后' drops the open-ended '+' that 'In 7+ days' and '7天以上前' carry.\nFix: Use '7天以上后' in the zh formatter.",
-     "source": "gate"
-    },
-    {
-     "id": "gate:RangeSlider:p0",
-     "target": {
-      "kind": "component",
-      "id": "RangeSlider"
-     },
-     "kind": "decision",
-     "severity": "medium",
-     "title": "Merge Feed adjustment slider?",
-     "detail": "Still open (README now says so): Inspection's feed edit records a value; it belongs with Stepper/Measure.\nSeen in: inspection.actions",
      "source": "gate"
     },
     {
