@@ -692,29 +692,6 @@ button.st-row[data-variant="tick"]:active:not(:disabled){background:var(--press)
 .st-row[data-variant="select-door"] .st-row-door{padding:var(--space-row-y) 0}
 label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-row-x) var(--space-row-y) 0;gap:0}
 
-/* FilterSheet and RangeSlider: shared list narrowing. */
-.st-filter-group{margin-bottom:var(--space-24)}
-.st-filter-group h3,.st-range p{font-size:var(--type-input-size);overflow-wrap:break-word}
-.st-filter-group>p,.st-range-ends{color:var(--muted);font-size:var(--type-description-size)}
-.st-range{padding-inline:var(--space-24)}
-.st-range p{margin-inline:calc(-1 * var(--space-24))}
-.st-range output{font-variant-numeric:tabular-nums;white-space:nowrap}
-.st-range p{overflow-wrap:break-word}
-.st-range-fill{position:absolute;top:50%;height:var(--space-4);background:var(--green);pointer-events:none}
-.st-range:has(:disabled) .st-range-fill{background:var(--disabled-border)}
-.st-filter-fields{min-width:0;margin:0;padding:0;border:0}
-.st-filter-fields:disabled{opacity:.6}
-.st-filter-group .st-filter-chips-track{flex-wrap:wrap;overflow-x:visible;padding-inline:0}
-.st-range-rail{position:relative;height:calc(2 * var(--tap-min));touch-action:none}
-.st-range-rail::before{content:'';position:absolute;inset-inline:0;top:50%;height:var(--space-4);background:var(--line)}
-.st-range-handle{position:absolute;top:0;transform:translateX(-50%);width:var(--tap-min);height:var(--tap-min);min-width:var(--tap-min);border:var(--border-width) solid var(--ink);border-radius:50%;background:var(--paper);color:var(--ink);font-size:var(--type-sheet-title-size);touch-action:none}
-.st-range-handle:active,.st-range[data-dragging] .st-range-handle,.st-range[data-state="Pressed"] .st-range-handle:first-child{background:var(--well);border-width:var(--space-3)}
-.st-range-handle:disabled{border-style:dashed;color:var(--muted)}
-.st-range-ends{display:flex;justify-content:space-between;margin-top:var(--space-8)}
-
-.st-range-handle[data-handle="1"]{top:var(--tap-min)}
-.st-range-handle::after{content:"";position:absolute;left:50%;top:100%;height:calc(var(--tap-min) / 2);border-left:var(--border-width) solid var(--ink);pointer-events:none}
-.st-range-handle[data-handle="1"]::after{top:auto;bottom:100%}
 .field .st-field-message{font:400 var(--type-description-size)/1.5 var(--font-sans);color:var(--muted)}
 .field.error .st-field-message{color:var(--red)}
 .field :is(input,textarea):disabled{background:var(--well);color:var(--muted)}

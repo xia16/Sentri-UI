@@ -629,17 +629,15 @@
           {
             "name": "Filter fields",
             "shows": "Production stage, Disease or symptom, Care",
-            "logic": "Options come from the unit’s pigs. Clear restores draft defaults; Back retains the draft; Clear on the list resets the draft too. Show n pigs applies it; zero matches blocks commit with No pigs match. SentriUI.filterSheet owns the drawer and counted footer.",
+            "logic": "Options come from the unit's pigs: stages and condition names found there. Care: No action needed · Monitor · Treat in place · Move to hospital pen. Reset clears the draft; Show pigs applies it.",
             "source": "filter state in main()",
             "at": "Production stage"
           }
         ],
         "controls": [],
         "copy": [
-          "Filter pigs",
-          "Clear (act.clear)",
-          "Show n pigs",
-          "No pigs match"
+          "Filter pigs (raw)",
+          "Show pigs (raw)"
         ],
         "edge": [
           "Batch can be filtered but has no control here (set by the unreachable batch sheet)."
