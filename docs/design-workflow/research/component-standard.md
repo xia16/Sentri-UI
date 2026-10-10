@@ -1,6 +1,6 @@
-# What a finished mobile component looks like in mature design systems
+# What a finished component of the mobile app looks like in mature design systems
 
-Research for Sentri: the standard every component page and every component gate is judged against.
+Research for Sentri: the standard every **mobile app** component page and component gate is judged against. It is the standard for the mobile app only (a native-feel phone app used with touch): web-only rules such as hover, focus rings and keyboard navigation are not adopted. A web app, when it exists, gets its own standard.
 Date: 2026-10-09. Method: primary docs and the libraries' own source docs only.
 
 ## Source access and caveats (read first)

@@ -103,6 +103,8 @@ A variant's states are drawn in `ux/design-system/components/<Name>/variants/<va
 
 ## Generated `atlas/atlas.json`
 
-`{ "generated", "commit", "backlog": [the items above], "components": [{ name, group, status (gate.json's, else "in-design"; "placeholder" for proposed ones), gate (the gate.json or null), seenIn?, note? }], "platforms": [{ id, name, sections: [{ id, name, zh, shared, features: [<feature.json> + "status" derived from its screens + "prd" (the PRD.md text)] }] }], "oldUi": <references/figma/index.json> }`
+`{ "generated", "commit", "platforms": [{ id, name, sections: [{ id, name, zh, shared, features: [<feature.json> + "status" derived from its screens + "prd" (the PRD.md text)] }], components: [{ name, group, status (gate.json's, else "in-design"; "placeholder" for proposed ones), gate (the gate.json or null), files, seenIn?, note? }], copy: { "registry": "ux/laws/strings.json" } | null, backlog: [the items above], oldUi: <references/figma/index.json> }] }`
+
+**The platform is the top level.** Components, copy, backlog and the Old UI catalogue are each a platform's own; the atlas draws every view for the selected platform. Everything that exists today is `mobile`: the components and strings are the mobile app's (touch, no hover or focus rings), and the Figma catalogue is the old mobile app. `web` has `components: []`, `copy: null`, `backlog: []`, `oldUi: []` until it has any: its views show a one-line empty state, no invented content. A backlog item sits under the platform of the feature or screen it targets; items that target a component, a section or nothing known are mobile.
 
 Feature status: `placeholder` when every screen is a placeholder; `in-design` when any screen is below agent-checked; `agent-checked` when all are agent-checked or approved; `frozen` when all are approved (and there is at least one).

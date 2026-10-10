@@ -4,7 +4,7 @@
 
 const q = new URLSearchParams(location.search);
 const S = { data: null, view: 'atlas', platformId: 'mobile' };
-const VIEWS = [['atlas', 'Atlas'], ['components', 'Components'], ['copy', 'Copy'], ['old', 'Old UI'], ['backlog', 'Backlog']];
+const VIEWS = [['atlas', 'Features'], ['components', 'Components'], ['copy', 'Copy'], ['backlog', 'Backlog'], ['old', 'Old UI']];
 const STATUS = { 'in-design': 'In design', 'agent-checked': 'Agent-checked', approved: 'Approved', frozen: 'Frozen', placeholder: 'Placeholder' };
 
 const el = (h) => { const t = document.createElement('template'); t.innerHTML = h.trim(); return t.content.firstElementChild; };
@@ -14,6 +14,9 @@ const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
 const platform = () => S.data.platforms.find((p) => p.id === S.platformId) || S.data.platforms[0];
+const backlogItems = () => platform().backlog || [];
+/* a platform with nothing yet says so in one line, naming what will appear */
+function emptyView(what) { const pl = platform(), main = document.getElementById('main'); main.innerHTML = ''; main.append(el(`<div class="empty"><b>No ${esc(pl.name)} ${esc(what)} yet</b><span>${esc(pl.name)} ${esc(what)} will appear here when the ${esc(pl.name)} app has them.</span></div>`)); }
 const allFeatures = () => S.data.platforms.flatMap((p) => p.sections.flatMap((s) => s.features.map((f) => Object.assign({}, f, { sectionRef: s }))));
 const screenIndex = () => Object.fromEntries(allFeatures().flatMap((f) => f.screens.map((s) => [s.id, Object.assign({}, s, { feature: f })])));
 const setParam = (k, v) => { const u = new URLSearchParams(location.search); v == null || v === '' ? u.delete(k) : u.set(k, v); history.replaceState(null, '', u.toString() ? '?' + u : location.pathname); };
@@ -22,8 +25,8 @@ const setParam = (k, v) => { const u = new URLSearchParams(location.search); v =
 function header(crumb) {
   const v = document.getElementById('views'); v.innerHTML = '';
   VIEWS.forEach(([id, n]) => { const b = el(`<button aria-pressed="${S.view === id}">${n}</button>`); b.onclick = () => setView(id); v.append(b); });
-  const p = document.getElementById('platforms'); p.innerHTML = ''; p.style.display = S.view === 'atlas' ? '' : 'none';
-  S.data.platforms.forEach((pl) => { const b = el(`<button aria-pressed="${pl.id === S.platformId}">${esc(pl.name)}</button>`); b.onclick = () => { S.platformId = pl.id; closeFeature(); render(); }; p.append(b); });
+  const p = document.getElementById('platforms'); p.innerHTML = '';
+  S.data.platforms.forEach((pl) => { const b = el(`<button aria-pressed="${pl.id === S.platformId}">${esc(pl.name)}</button>`); b.onclick = () => { S.platformId = pl.id; closeFeature(); ['component', 'key', 'variant'].forEach((k) => setParam(k, null)); render(); }; p.append(b); });
   document.getElementById('crumb').innerHTML = crumb || '';
 }
 function setView(id) { S.view = id; ['feature', 'screen', 'component', 'key'].forEach((k) => setParam(k, null)); closeFeature(); render(); }
@@ -156,7 +159,7 @@ async function renderPattern(sec, pt) {
 function renderBoard() {
   const main = document.getElementById('main'); main.innerHTML = '';
   const pl = platform();
-  if (!pl.sections.length) { main.append(el(`<div class="empty"><b>No ${esc(pl.name.toLowerCase())} features yet</b><span>They appear here once the first ${esc(pl.name.toLowerCase())} feature is mapped.</span></div>`)); return; }
+  if (!pl.sections.length) { emptyView('features'); return; }
   const board = el(`<div class="board"><div class="plane"></div></div>`);
   const zoomEl = el('<div class="zoom"><button data-z="-1" title="Zoom out">−</button><button data-z="0" title="Fit everything">⤢</button><button data-z="1" title="Zoom in">+</button></div>');
   const plane = board.querySelector('.plane'); main.append(board, zoomEl);
@@ -185,8 +188,10 @@ function renderBoard() {
 /* ---------- Old UI: the only place Figma appears ---------- */
 function renderOld() {
   const main = document.getElementById('main'); main.innerHTML = '';
-  const files = S.data.oldUi || [], total = files.reduce((n, f) => n + f.screens, 0);
-  const wrap = el(`<div class="index"><aside><h1>Old UI</h1><p>The product as it is today, in Figma: ${plural(files.length, 'file')}, about ${total} screens. Reference for research; not part of the atlas.</p></aside><div class="list"></div></div>`);
+  const files = platform().oldUi || [];
+  if (!files.length) { emptyView('old UI'); return; }
+  const total = files.reduce((n, f) => n + f.screens, 0);
+  const wrap = el(`<div class="index"><aside><h1>Old UI</h1><p>The mobile app as it is today, in Figma: ${plural(files.length, 'file')}, about ${total} screens. Reference for research; not part of the atlas.</p></aside><div class="list"></div></div>`);
   const list = wrap.querySelector('.list');
   files.forEach((f) => {
     list.append(el(`<h2><span>${esc(f.file)}</span> <span class="n">${plural(f.screens, 'screen')}</span><a class="fileopen" href="https://www.figma.com/design/${esc(f.key)}/" target="_blank" rel="noopener">Open file ↗</a></h2>`));

@@ -200,7 +200,7 @@ function openFeature(id, sel) {
   S.view = 'atlas';
   const idx = screenIndex(); setParam('feature', id);
   const n = f.screens.length;
-  const ownIds = new Set(f.screens.map((s) => s.id)), mine = (S.data.backlog || []).filter((b) => (b.target.kind === 'feature' && b.target.id === f.id) || (b.target.kind === 'screen' && ownIds.has(b.target.id)));
+  const ownIds = new Set(f.screens.map((s) => s.id)), mine = backlogItems().filter((b) => (b.target.kind === 'feature' && b.target.id === f.id) || (b.target.kind === 'screen' && ownIds.has(b.target.id)));
   const todos = mine.filter((b) => b.kind !== 'decision').length, confirm = mine.length - todos; // the same sets the Backlog opens on
   const planned = f.status === 'placeholder', prd = hasPrd(f), sameName = String(f.name).toLowerCase() === String(f.sectionRef.name).toLowerCase();
   header(`${sameName ? '' : `<a href="#" id="crumb-back">${esc(f.sectionRef.name)}</a> / `}<b>${esc(f.name)}</b> <span class="zh">${esc(f.zh || '')}</span>
@@ -391,7 +391,7 @@ function openFeature(id, sel) {
   }
 
   function specHtml(s, nt) {
-    const issues = nt.issues || [], confirm = (JSON.stringify(nt).match(/to confirm/gi) || []).concat((S.data.backlog || []).filter((b) => b.kind === 'decision' && b.target.kind === 'screen' && b.target.id === s.id));
+    const issues = nt.issues || [], confirm = (JSON.stringify(nt).match(/to confirm/gi) || []).concat(backlogItems().filter((b) => b.kind === 'decision' && b.target.kind === 'screen' && b.target.id === s.id));
     const els = (nt.elements || []).filter((e) => !CHROME.test(`${e.name} ${e.shows}`));
     const states = (nt.states || []).map(splitState), ctrls = nt.controls || [], copy = nt.copy || [], edge = nt.edge || [], rules = nt.rules || [];
     const sec = (id, label, n, open, inner) => `<section class="sec" id="sec-${id}" data-open="${open}"><h3 class="sh" tabindex="0" role="button" aria-expanded="${open}"><span class="lbl">${label}</span><span class="n">${n}</span><span class="caret">${ICON.caret}</span></h3><div class="sb">${inner}</div></section>`;

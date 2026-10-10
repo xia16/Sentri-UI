@@ -145,16 +145,29 @@ if (problems.length) {
 
 let commit = '';
 try { commit = execSync('git rev-parse --short HEAD', { cwd: root }).toString().trim(); } catch {}
+// Components, copy, backlog and the Old UI catalogue belong to a platform. Everything that exists today is mobile.
+// A backlog item inherits the platform of the feature or screen it targets; component, section and unknown targets are mobile.
+const platOfFeature = Object.fromEntries(features.map((f) => [f.id, f.platform]));
+const backlogPlatform = (b) => {
+  const t = b.target || {};
+  if (t.kind === 'feature') return platOfFeature[t.id] || 'mobile';
+  if (t.kind === 'screen') return platOfFeature[owner[t.id]] || 'mobile';
+  return 'mobile';
+};
 const atlas = {
   generated: new Date().toISOString(),
   commit,
-  platforms: sections.platforms.map((p) => ({
-    id: p.id, name: p.name,
-    sections: p.sections.map((s) => ({ ...s, features: features.filter((f) => f.platform === p.id && f.section === s.id).map((f) => ({ ...f, status: statusOf(f) })) })),
-  })),
-  components,
-  backlog,
-  oldUi,
+  platforms: sections.platforms.map((p) => {
+    const mobile = p.id === 'mobile';
+    return {
+      id: p.id, name: p.name,
+      sections: p.sections.map((s) => ({ ...s, features: features.filter((f) => f.platform === p.id && f.section === s.id).map((f) => ({ ...f, status: statusOf(f) })) })),
+      components: mobile ? components : [],
+      copy: mobile ? { registry: 'ux/laws/strings.json' } : null,
+      backlog: backlog.filter((b) => backlogPlatform(b) === p.id),
+      oldUi: mobile ? oldUi : [],
+    };
+  }),
 };
 const counts = features.reduce((c, f) => ((c[statusOf(f)] = (c[statusOf(f)] || 0) + 1), c), {});
 if (check) { console.log(`atlas: ok — ${features.length} features`, counts); process.exit(0); }
