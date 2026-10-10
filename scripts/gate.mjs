@@ -168,13 +168,20 @@ if (byFiles.cls !== declared) console.log(`class: ${declared} → ${byFiles.cls}
 // The atlas rebuild rewrites the candidate's atlas/atlas.json, so it runs before any page loads that file.
 let r;
 {
-  const file = path.join(wt.cand, 'atlas/atlas.json');
   const strip = (s) => { const j = JSON.parse(s); delete j.generated; delete j.commit; return JSON.stringify(j); };
-  const before = fs.readFileSync(file, 'utf8');
-  r = run(process.execPath, ['scripts/build-atlas.mjs'], wt.cand);
-  const same = r.code === 0 && strip(before) === strip(fs.readFileSync(file, 'utf8'));
-  git(['checkout', '--', 'atlas/atlas.json'], wt.cand);
-  check('atlas.json is regenerated', same, same ? '' : r.code ? r.tail : 'npm run atlas changes atlas/atlas.json beyond its stamps: rebuild and commit it');
+  const fresh = (dir) => {
+    const file = path.join(dir, 'atlas/atlas.json'), before = fs.readFileSync(file, 'utf8');
+    const res = run(process.execPath, ['scripts/build-atlas.mjs'], dir);
+    const same = res.code === 0 && strip(before) === strip(fs.readFileSync(file, 'utf8'));
+    git(['checkout', '--', 'atlas/atlas.json'], dir);
+    return { same, res };
+  };
+  const c = fresh(wt.cand); r = c.res;
+  // A stale atlas on main is main's debt: it blocks only a change that touches what the atlas is built from.
+  const sources = files.filter((f) => /^(features|sections|references|review|atlas)\/|^ux\/design-system\/components\/[^/]+\/(gate|variants)\.json$|^scripts\/build-atlas\.mjs$/.test(f));
+  const debt = !c.same && !sources.length && !fresh(wt.base).same;
+  if (debt) gaps.push('atlas/atlas.json is stale on main itself (npm run atlas changes it); this change touches none of its sources');
+  check('atlas.json is regenerated', c.same || debt, c.same ? '' : debt ? 'stale on main too, so main owns it' : r.code ? r.tail : 'npm run atlas changes atlas/atlas.json beyond its stamps: rebuild and commit it');
 }
 
 r = git(['grep', '-n', '-E', '^(<<<<<<<|>>>>>>>)( |$)', mech.candidate]);
