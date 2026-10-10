@@ -1,0 +1,3622 @@
+[
+  {
+    "component": "Banner",
+    "variant": "correction",
+    "state": "Default",
+    "problems": []
+  },
+  {
+    "component": "Banner",
+    "variant": "correction",
+    "state": "Pressed",
+    "problems": []
+  },
+  {
+    "component": "Banner",
+    "variant": "correction",
+    "state": "Focus",
+    "problems": []
+  },
+  {
+    "component": "Banner",
+    "variant": "correction",
+    "state": "Disabled",
+    "problems": []
+  },
+  {
+    "component": "Banner",
+    "variant": "correction",
+    "state": "Cleared",
+    "problems": []
+  },
+  {
+    "component": "Banner",
+    "variant": "correction",
+    "state": "Long label / Chinese",
+    "problems": [
+      {
+        "check": "f",
+        "detail": "\"è¯·å…ˆä¿å­˜æ‚¨å¯¹ä¹‹å‰åˆ†å¨©\" overflows its box (730px in 320px, ellipsised)"
+      }
+    ]
+  },
+  {
+    "component": "Banner",
+    "variant": "correction",
+    "state": "Changed",
+    "problems": []
+  },
+  {
+    "component": "Banner",
+    "variant": "danger",
+    "state": "Default",
+    "problems": []
+  },
+  {
+    "component": "Banner",
+    "variant": "danger",
+    "state": "Pressed",
+    "problems": []
+  },
+  {
+    "component": "Banner",
+    "variant": "danger",
+    "state": "Focus",
+    "problems": []
+  },
+  {
+    "component": "Banner",
+    "variant": "danger",
+    "state": "Long label / Chinese",
+    "problems": [
+      {
+        "check": "f",
+        "detail": "\"åˆ é™¤åŽå°†æ— æ³•æ¢å¤è¿™å¤´\" overflows its box (773px in 332px, ellipsised)"
+      }
+    ]
+  },
+  {
+    "component": "Banner",
+    "variant": "danger",
+    "state": "Disabled",
+    "problems": []
+  },
+  {
+    "component": "Banner",
+    "variant": "notice",
+    "state": "Default",
+    "problems": []
+  },
+  {
+    "component": "Banner",
+    "variant": "notice",
+    "state": "Pressed",
+    "problems": []
+  },
+  {
+    "component": "Banner",
+    "variant": "notice",
+    "state": "Focus",
+    "problems": []
+  },
+  {
+    "component": "Banner",
+    "variant": "notice",
+    "state": "Disabled",
+    "problems": []
+  },
+  {
+    "component": "Banner",
+    "variant": "notice",
+    "state": "Loading",
+    "problems": []
+  },
+  {
+    "component": "Banner",
+    "variant": "notice",
+    "state": "Long label / Chinese",
+    "problems": [
+      {
+        "check": "f",
+        "detail": "\"æœ‰å¤šæ¡åˆ†å¨©è®°å½•å·²ä¿å­˜\" overflows its box (708px in 320px, ellipsised)"
+      }
+    ]
+  },
+  {
+    "component": "Banner",
+    "variant": "notice",
+    "state": "Error",
+    "problems": []
+  },
+  {
+    "component": "Button",
+    "variant": "destructive",
+    "state": "Default",
+    "problems": []
+  },
+  {
+    "component": "Button",
+    "variant": "destructive",
+    "state": "Pressed",
+    "problems": [
+      {
+        "check": "a",
+        "detail": "section.example content 50px is taller than its frame 48px"
+      },
+      {
+        "check": "a",
+        "detail": "div.demo content 50px is taller than its frame 48px"
+      }
+    ]
+  },
+  {
+    "component": "Button",
+    "variant": "destructive",
+    "state": "Focus",
+    "problems": []
+  },
+  {
+    "component": "Button",
+    "variant": "destructive",
+    "state": "Disabled",
+    "problems": []
+  },
+  {
+    "component": "Button",
+    "variant": "destructive",
+    "state": "Long / Chinese",
+    "problems": []
+  },
+  {
+    "component": "Button",
+    "variant": "destructive",
+    "state": "Waiting",
+    "problems": []
+  },
+  {
+    "component": "Button",
+    "variant": "destructive",
+    "state": "Loading",
+    "problems": []
+  },
+  {
+    "component": "Button",
+    "variant": "hold",
+    "state": "Default",
+    "problems": []
+  },
+  {
+    "component": "Button",
+    "variant": "hold",
+    "state": "Pressed",
+    "problems": [
+      {
+        "check": "a",
+        "detail": "section.example content 58px is taller than its frame 56px"
+      },
+      {
+        "check": "a",
+        "detail": "div.demo content 58px is taller than its frame 56px"
+      }
+    ]
+  },
+  {
+    "component": "Button",
+    "variant": "hold",
+    "state": "Focus",
+    "problems": []
+  },
+  {
+    "component": "Button",
+    "variant": "hold",
+    "state": "Disabled",
+    "problems": []
+  },
+  {
+    "component": "Button",
+    "variant": "hold",
+    "state": "Long / Chinese",
+    "problems": []
+  },
+  {
+    "component": "Button",
+    "variant": "hold",
+    "state": "Waiting",
+    "problems": []
+  },
+  {
+    "component": "Button",
+    "variant": "hold",
+    "state": "Loading",
+    "problems": []
+  },
+  {
+    "component": "Button",
+    "variant": "hold",
+    "state": "Holding",
+    "problems": []
+  },
+  {
+    "component": "Button",
+    "variant": "hold",
+    "state": "Armed",
+    "problems": []
+  },
+  {
+    "component": "Button",
+    "variant": "hold",
+    "state": "Pending",
+    "problems": []
+  },
+  {
+    "component": "Button",
+    "variant": "hold",
+    "state": "Done",
+    "problems": []
+  },
+  {
+    "component": "Button",
+    "variant": "hold",
+    "state": "Unknown",
+    "problems": []
+  },
+  {
+    "component": "Button",
+    "variant": "hold",
+    "state": "Failed",
+    "problems": []
+  },
+  {
+    "component": "Button",
+    "variant": "primary",
+    "state": "Default",
+    "problems": []
+  },
+  {
+    "component": "Button",
+    "variant": "primary",
+    "state": "Pressed",
+    "problems": [
+      {
+        "check": "a",
+        "detail": "section.example content 50px is taller than its frame 48px"
+      },
+      {
+        "check": "a",
+        "detail": "div.demo content 50px is taller than its frame 48px"
+      }
+    ]
+  },
+  {
+    "component": "Button",
+    "variant": "primary",
+    "state": "Focus",
+    "problems": []
+  },
+  {
+    "component": "Button",
+    "variant": "primary",
+    "state": "Disabled",
+    "problems": []
+  },
+  {
+    "component": "Button",
+    "variant": "primary",
+    "state": "Long / Chinese",
+    "problems": []
+  },
+  {
+    "component": "Button",
+    "variant": "primary",
+    "state": "Waiting",
+    "problems": []
+  },
+  {
+    "component": "Button",
+    "variant": "primary",
+    "state": "Loading",
+    "problems": []
+  },
+  {
+    "component": "Button",
+    "variant": "secondary",
+    "state": "Default",
+    "problems": []
+  },
+  {
+    "component": "Button",
+    "variant": "secondary",
+    "state": "Pressed",
+    "problems": [
+      {
+        "check": "a",
+        "detail": "section.example content 50px is taller than its frame 48px"
+      },
+      {
+        "check": "a",
+        "detail": "div.demo content 50px is taller than its frame 48px"
+      }
+    ]
+  },
+  {
+    "component": "Button",
+    "variant": "secondary",
+    "state": "Focus",
+    "problems": []
+  },
+  {
+    "component": "Button",
+    "variant": "secondary",
+    "state": "Disabled",
+    "problems": []
+  },
+  {
+    "component": "Button",
+    "variant": "secondary",
+    "state": "Long / Chinese",
+    "problems": []
+  },
+  {
+    "component": "Button",
+    "variant": "secondary",
+    "state": "Waiting",
+    "problems": []
+  },
+  {
+    "component": "Button",
+    "variant": "secondary",
+    "state": "Loading",
+    "problems": []
+  },
+  {
+    "component": "Button",
+    "variant": "text",
+    "state": "Default",
+    "problems": []
+  },
+  {
+    "component": "Button",
+    "variant": "text",
+    "state": "Pressed",
+    "problems": []
+  },
+  {
+    "component": "Button",
+    "variant": "text",
+    "state": "Focus",
+    "problems": []
+  },
+  {
+    "component": "Button",
+    "variant": "text",
+    "state": "Disabled",
+    "problems": []
+  },
+  {
+    "component": "Button",
+    "variant": "text",
+    "state": "Long / Chinese",
+    "problems": []
+  },
+  {
+    "component": "Button",
+    "variant": "text",
+    "state": "Waiting",
+    "problems": []
+  },
+  {
+    "component": "Button",
+    "variant": "text",
+    "state": "Loading",
+    "problems": []
+  },
+  {
+    "component": "Button",
+    "variant": "tool",
+    "state": "Default",
+    "problems": []
+  },
+  {
+    "component": "Button",
+    "variant": "tool",
+    "state": "Pressed",
+    "problems": [
+      {
+        "check": "a",
+        "detail": "section.example content 50px is taller than its frame 48px"
+      },
+      {
+        "check": "a",
+        "detail": "div.demo content 50px is taller than its frame 48px"
+      }
+    ]
+  },
+  {
+    "component": "Button",
+    "variant": "tool",
+    "state": "Focus",
+    "problems": []
+  },
+  {
+    "component": "Button",
+    "variant": "tool",
+    "state": "Disabled",
+    "problems": []
+  },
+  {
+    "component": "Button",
+    "variant": "tool",
+    "state": "Long / Chinese",
+    "problems": [
+      {
+        "check": "f",
+        "detail": "\"è®°å½•è¿™ä¸€æ ä»Šå¤©å·²å®Œæˆ\" overflows its box (620px in 354px, ellipsised)"
+      }
+    ]
+  },
+  {
+    "component": "Button",
+    "variant": "tool",
+    "state": "Waiting",
+    "problems": []
+  },
+  {
+    "component": "Button",
+    "variant": "tool",
+    "state": "Loading",
+    "problems": []
+  },
+  {
+    "component": "CategoryFooter",
+    "variant": "default",
+    "state": "Default",
+    "problems": []
+  },
+  {
+    "component": "CategoryFooter",
+    "variant": "default",
+    "state": "Pressed",
+    "problems": []
+  },
+  {
+    "component": "CategoryFooter",
+    "variant": "default",
+    "state": "Active",
+    "problems": []
+  },
+  {
+    "component": "CategoryFooter",
+    "variant": "default",
+    "state": "Focused",
+    "problems": []
+  },
+  {
+    "component": "CategoryFooter",
+    "variant": "default",
+    "state": "Empty",
+    "problems": []
+  },
+  {
+    "component": "CategoryFooter",
+    "variant": "default",
+    "state": "Five categories at 300px",
+    "problems": [
+      {
+        "check": "d",
+        "detail": "value baselines differ across columns by 2px in \"Back\" / \"HealthRoutineP\""
+      },
+      {
+        "check": "f",
+        "detail": "\"Records\" runs past the screen edge"
+      }
+    ]
+  },
+  {
+    "component": "CategoryFooter",
+    "variant": "default",
+    "state": "Long label / Chinese",
+    "problems": [
+      {
+        "check": "f",
+        "detail": "\"æ—¥å¸¸å·¥ä½œ\" runs past the screen edge"
+      },
+      {
+        "check": "f",
+        "detail": "\"ç”Ÿäº§\" runs past the screen edge"
+      }
+    ]
+  },
+  {
+    "component": "CategoryFooter",
+    "variant": "default",
+    "state": "Back pressed",
+    "problems": []
+  },
+  {
+    "component": "CategoryFooter",
+    "variant": "default",
+    "state": "Scrolled",
+    "problems": [
+      {
+        "check": "d",
+        "detail": "value baselines differ across columns by 2px in \"Back\" / \"HealthRoutineP\""
+      }
+    ]
+  },
+  {
+    "component": "ChoiceList",
+    "variant": "inline",
+    "state": "Default",
+    "problems": [
+      {
+        "check": "a",
+        "detail": "span.st-visually-hidden content 20px is taller than its frame 1px"
+      }
+    ]
+  },
+  {
+    "component": "ChoiceList",
+    "variant": "inline",
+    "state": "Pressed",
+    "problems": []
+  },
+  {
+    "component": "ChoiceList",
+    "variant": "inline",
+    "state": "Selected",
+    "problems": []
+  },
+  {
+    "component": "ChoiceList",
+    "variant": "inline",
+    "state": "Disabled",
+    "problems": []
+  },
+  {
+    "component": "ChoiceList",
+    "variant": "inline",
+    "state": "Focus",
+    "problems": []
+  },
+  {
+    "component": "ChoiceList",
+    "variant": "inline",
+    "state": "Loading",
+    "problems": []
+  },
+  {
+    "component": "ChoiceList",
+    "variant": "inline",
+    "state": "Empty",
+    "problems": []
+  },
+  {
+    "component": "ChoiceList",
+    "variant": "inline",
+    "state": "Long-label",
+    "problems": []
+  },
+  {
+    "component": "ChoiceList",
+    "variant": "multi",
+    "state": "Default",
+    "problems": []
+  },
+  {
+    "component": "ChoiceList",
+    "variant": "multi",
+    "state": "Pressed",
+    "problems": []
+  },
+  {
+    "component": "ChoiceList",
+    "variant": "multi",
+    "state": "Selected",
+    "problems": []
+  },
+  {
+    "component": "ChoiceList",
+    "variant": "multi",
+    "state": "Disabled",
+    "problems": []
+  },
+  {
+    "component": "ChoiceList",
+    "variant": "multi",
+    "state": "Focus",
+    "problems": []
+  },
+  {
+    "component": "ChoiceList",
+    "variant": "multi",
+    "state": "Loading",
+    "problems": []
+  },
+  {
+    "component": "ChoiceList",
+    "variant": "multi",
+    "state": "Empty",
+    "problems": []
+  },
+  {
+    "component": "ChoiceList",
+    "variant": "multi",
+    "state": "Long-label",
+    "problems": []
+  },
+  {
+    "component": "ChoiceList",
+    "variant": "navigate",
+    "state": "Default",
+    "problems": []
+  },
+  {
+    "component": "ChoiceList",
+    "variant": "navigate",
+    "state": "Pressed",
+    "problems": []
+  },
+  {
+    "component": "ChoiceList",
+    "variant": "navigate",
+    "state": "Disabled",
+    "problems": []
+  },
+  {
+    "component": "ChoiceList",
+    "variant": "navigate",
+    "state": "Focus",
+    "problems": []
+  },
+  {
+    "component": "ChoiceList",
+    "variant": "navigate",
+    "state": "Loading",
+    "problems": []
+  },
+  {
+    "component": "ChoiceList",
+    "variant": "navigate",
+    "state": "Empty",
+    "problems": []
+  },
+  {
+    "component": "ChoiceList",
+    "variant": "navigate",
+    "state": "Long-label",
+    "problems": []
+  },
+  {
+    "component": "ChoiceList",
+    "variant": "radio",
+    "state": "Default",
+    "problems": []
+  },
+  {
+    "component": "ChoiceList",
+    "variant": "radio",
+    "state": "Pressed",
+    "problems": []
+  },
+  {
+    "component": "ChoiceList",
+    "variant": "radio",
+    "state": "Selected",
+    "problems": []
+  },
+  {
+    "component": "ChoiceList",
+    "variant": "radio",
+    "state": "Disabled",
+    "problems": []
+  },
+  {
+    "component": "ChoiceList",
+    "variant": "radio",
+    "state": "Focus",
+    "problems": []
+  },
+  {
+    "component": "ChoiceList",
+    "variant": "radio",
+    "state": "Loading",
+    "problems": []
+  },
+  {
+    "component": "ChoiceList",
+    "variant": "radio",
+    "state": "Empty",
+    "problems": []
+  },
+  {
+    "component": "ChoiceList",
+    "variant": "radio",
+    "state": "Long-label",
+    "problems": []
+  },
+  {
+    "component": "ChoiceList",
+    "variant": "single",
+    "state": "Default",
+    "problems": []
+  },
+  {
+    "component": "ChoiceList",
+    "variant": "single",
+    "state": "Pressed",
+    "problems": []
+  },
+  {
+    "component": "ChoiceList",
+    "variant": "single",
+    "state": "Selected",
+    "problems": []
+  },
+  {
+    "component": "ChoiceList",
+    "variant": "single",
+    "state": "Disabled",
+    "problems": []
+  },
+  {
+    "component": "ChoiceList",
+    "variant": "single",
+    "state": "Focus",
+    "problems": []
+  },
+  {
+    "component": "ChoiceList",
+    "variant": "single",
+    "state": "Loading",
+    "problems": []
+  },
+  {
+    "component": "ChoiceList",
+    "variant": "single",
+    "state": "Empty",
+    "problems": []
+  },
+  {
+    "component": "ChoiceList",
+    "variant": "single",
+    "state": "Long-label",
+    "problems": []
+  },
+  {
+    "component": "ConditionTag",
+    "variant": "detail",
+    "state": "Needs attention · Monitor",
+    "problems": []
+  },
+  {
+    "component": "ConditionTag",
+    "variant": "detail",
+    "state": "Needs attention · Treat in place",
+    "problems": []
+  },
+  {
+    "component": "ConditionTag",
+    "variant": "detail",
+    "state": "Needs attention · Hospital pen",
+    "problems": []
+  },
+  {
+    "component": "ConditionTag",
+    "variant": "detail",
+    "state": "Ongoing",
+    "problems": []
+  },
+  {
+    "component": "ConditionTag",
+    "variant": "detail",
+    "state": "Resolved",
+    "problems": []
+  },
+  {
+    "component": "ConditionTag",
+    "variant": "detail",
+    "state": "Long note (wraps)",
+    "problems": []
+  },
+  {
+    "component": "ConditionTag",
+    "variant": "detail",
+    "state": "Chinese",
+    "problems": []
+  },
+  {
+    "component": "ConditionTag",
+    "variant": "mark",
+    "state": "Monitor",
+    "problems": []
+  },
+  {
+    "component": "ConditionTag",
+    "variant": "mark",
+    "state": "Treat in place",
+    "problems": []
+  },
+  {
+    "component": "ConditionTag",
+    "variant": "mark",
+    "state": "Hospital pen",
+    "problems": []
+  },
+  {
+    "component": "ConditionTag",
+    "variant": "mark",
+    "state": "Ongoing",
+    "problems": []
+  },
+  {
+    "component": "ConditionTag",
+    "variant": "mark",
+    "state": "Resolved",
+    "problems": []
+  },
+  {
+    "component": "ConditionTag",
+    "variant": "tag",
+    "state": "Needs attention · Monitor",
+    "problems": [
+      {
+        "check": "a",
+        "detail": "span.st-visually-hidden content 12px is taller than its frame 1px"
+      },
+      {
+        "check": "f",
+        "detail": "\"· Monitor\" overflows its box (43px in 1px)"
+      }
+    ]
+  },
+  {
+    "component": "ConditionTag",
+    "variant": "tag",
+    "state": "Needs attention · Treat in place",
+    "problems": [
+      {
+        "check": "a",
+        "detail": "span.st-visually-hidden content 12px is taller than its frame 1px"
+      },
+      {
+        "check": "f",
+        "detail": "\"· Treat in place\" overflows its box (68px in 1px)"
+      }
+    ]
+  },
+  {
+    "component": "ConditionTag",
+    "variant": "tag",
+    "state": "Needs attention · Hospital pen",
+    "problems": [
+      {
+        "check": "a",
+        "detail": "span.st-visually-hidden content 12px is taller than its frame 1px"
+      },
+      {
+        "check": "f",
+        "detail": "\"· Hospital pen\" overflows its box (66px in 1px)"
+      }
+    ]
+  },
+  {
+    "component": "ConditionTag",
+    "variant": "tag",
+    "state": "Ongoing",
+    "problems": [
+      {
+        "check": "a",
+        "detail": "span.st-visually-hidden content 12px is taller than its frame 1px"
+      },
+      {
+        "check": "f",
+        "detail": "\"· Ongoing\" overflows its box (48px in 1px)"
+      }
+    ]
+  },
+  {
+    "component": "ConditionTag",
+    "variant": "tag",
+    "state": "Resolved",
+    "problems": [
+      {
+        "check": "a",
+        "detail": "span.st-visually-hidden content 12px is taller than its frame 1px"
+      },
+      {
+        "check": "f",
+        "detail": "\"· Resolved\" overflows its box (50px in 1px)"
+      }
+    ]
+  },
+  {
+    "component": "ConditionTag",
+    "variant": "tag",
+    "state": "Notice (standing instruction)",
+    "problems": [
+      {
+        "check": "a",
+        "detail": "span.st-visually-hidden content 12px is taller than its frame 1px"
+      },
+      {
+        "check": "f",
+        "detail": "\"· 1.8 kg/day Â· fixed amount\" overflows its box (130px in 1px)"
+      }
+    ]
+  },
+  {
+    "component": "ConditionTag",
+    "variant": "tag",
+    "state": "Long name (ellipsis)",
+    "problems": [
+      {
+        "check": "a",
+        "detail": "span.st-visually-hidden content 12px is taller than its frame 1px"
+      },
+      {
+        "check": "f",
+        "detail": "\"Respiratory infection with lab\" overflows its box (217px in 57px, ellipsised)"
+      },
+      {
+        "check": "f",
+        "detail": "\"· Treat in place\" overflows its box (68px in 1px)"
+      }
+    ]
+  },
+  {
+    "component": "ConditionTag",
+    "variant": "tag",
+    "state": "Chinese",
+    "problems": [
+      {
+        "check": "a",
+        "detail": "span.st-visually-hidden content 12px is taller than its frame 1px"
+      },
+      {
+        "check": "f",
+        "detail": "\"· è§‚å¯Ÿ\" overflows its box (37px in 1px)"
+      }
+    ]
+  },
+  {
+    "component": "Facts",
+    "variant": "three-column",
+    "state": "Default",
+    "problems": []
+  },
+  {
+    "component": "Facts",
+    "variant": "three-column",
+    "state": "Zero is not missing",
+    "problems": []
+  },
+  {
+    "component": "Facts",
+    "variant": "three-column",
+    "state": "Long label wraps",
+    "problems": []
+  },
+  {
+    "component": "Facts",
+    "variant": "three-column",
+    "state": "Chinese",
+    "problems": []
+  },
+  {
+    "component": "Facts",
+    "variant": "two-column",
+    "state": "Default",
+    "problems": []
+  },
+  {
+    "component": "Facts",
+    "variant": "two-column",
+    "state": "With a trail",
+    "problems": []
+  },
+  {
+    "component": "Facts",
+    "variant": "two-column",
+    "state": "ID in mono",
+    "problems": []
+  },
+  {
+    "component": "Facts",
+    "variant": "two-column",
+    "state": "Missing value",
+    "problems": []
+  },
+  {
+    "component": "Facts",
+    "variant": "two-column",
+    "state": "Long value wraps",
+    "problems": [
+      {
+        "check": "e",
+        "detail": "Facts value \"Gestation 1 Â· restricted Â· t\" wraps to 2 lines"
+      }
+    ]
+  },
+  {
+    "component": "Facts",
+    "variant": "two-column",
+    "state": "Chinese",
+    "problems": []
+  },
+  {
+    "component": "Field",
+    "variant": "number",
+    "state": "Default",
+    "problems": []
+  },
+  {
+    "component": "Field",
+    "variant": "number",
+    "state": "Focus",
+    "problems": []
+  },
+  {
+    "component": "Field",
+    "variant": "number",
+    "state": "Filled",
+    "problems": []
+  },
+  {
+    "component": "Field",
+    "variant": "number",
+    "state": "Error",
+    "problems": []
+  },
+  {
+    "component": "Field",
+    "variant": "number",
+    "state": "Disabled",
+    "problems": []
+  },
+  {
+    "component": "Field",
+    "variant": "number",
+    "state": "Long Chinese label",
+    "problems": []
+  },
+  {
+    "component": "Field",
+    "variant": "text",
+    "state": "Default",
+    "problems": []
+  },
+  {
+    "component": "Field",
+    "variant": "text",
+    "state": "Focus",
+    "problems": []
+  },
+  {
+    "component": "Field",
+    "variant": "text",
+    "state": "Filled",
+    "problems": []
+  },
+  {
+    "component": "Field",
+    "variant": "text",
+    "state": "Error",
+    "problems": []
+  },
+  {
+    "component": "Field",
+    "variant": "text",
+    "state": "Disabled",
+    "problems": []
+  },
+  {
+    "component": "Field",
+    "variant": "text",
+    "state": "Long Chinese label",
+    "problems": []
+  },
+  {
+    "component": "Field",
+    "variant": "textarea",
+    "state": "Default",
+    "problems": []
+  },
+  {
+    "component": "Field",
+    "variant": "textarea",
+    "state": "Focus",
+    "problems": []
+  },
+  {
+    "component": "Field",
+    "variant": "textarea",
+    "state": "Filled",
+    "problems": []
+  },
+  {
+    "component": "Field",
+    "variant": "textarea",
+    "state": "Error",
+    "problems": []
+  },
+  {
+    "component": "Field",
+    "variant": "textarea",
+    "state": "Disabled",
+    "problems": []
+  },
+  {
+    "component": "Field",
+    "variant": "textarea",
+    "state": "Long Chinese label",
+    "problems": []
+  },
+  {
+    "component": "FilterChips",
+    "variant": "tags",
+    "state": "Default",
+    "problems": [
+      {
+        "check": "f",
+        "detail": "\"Castrate\" runs past the screen edge"
+      },
+      {
+        "check": "f",
+        "detail": "\"5\" runs past the screen edge"
+      },
+      {
+        "check": "f",
+        "detail": "\"Coccidiosis\" runs past the screen edge"
+      },
+      {
+        "check": "f",
+        "detail": "\"6\" runs past the screen edge"
+      },
+      {
+        "check": "f",
+        "detail": "\"Tag\" runs past the screen edge"
+      },
+      {
+        "check": "f",
+        "detail": "\"7\" runs past the screen edge"
+      },
+      {
+        "check": "f",
+        "detail": "\"Weight\" runs past the screen edge"
+      },
+      {
+        "check": "f",
+        "detail": "\"8\" runs past the screen edge"
+      }
+    ]
+  },
+  {
+    "component": "FilterChips",
+    "variant": "tags",
+    "state": "Pressed",
+    "problems": [
+      {
+        "check": "f",
+        "detail": "\"Castrate\" runs past the screen edge"
+      },
+      {
+        "check": "f",
+        "detail": "\"5\" runs past the screen edge"
+      },
+      {
+        "check": "f",
+        "detail": "\"Coccidiosis\" runs past the screen edge"
+      },
+      {
+        "check": "f",
+        "detail": "\"6\" runs past the screen edge"
+      },
+      {
+        "check": "f",
+        "detail": "\"Tag\" runs past the screen edge"
+      },
+      {
+        "check": "f",
+        "detail": "\"7\" runs past the screen edge"
+      },
+      {
+        "check": "f",
+        "detail": "\"Weight\" runs past the screen edge"
+      },
+      {
+        "check": "f",
+        "detail": "\"8\" runs past the screen edge"
+      }
+    ]
+  },
+  {
+    "component": "FilterChips",
+    "variant": "tags",
+    "state": "Selected",
+    "problems": [
+      {
+        "check": "f",
+        "detail": "\"Castrate\" runs past the screen edge"
+      },
+      {
+        "check": "f",
+        "detail": "\"5\" runs past the screen edge"
+      },
+      {
+        "check": "f",
+        "detail": "\"Coccidiosis\" runs past the screen edge"
+      },
+      {
+        "check": "f",
+        "detail": "\"6\" runs past the screen edge"
+      },
+      {
+        "check": "f",
+        "detail": "\"Tag\" runs past the screen edge"
+      },
+      {
+        "check": "f",
+        "detail": "\"7\" runs past the screen edge"
+      },
+      {
+        "check": "f",
+        "detail": "\"Weight\" runs past the screen edge"
+      },
+      {
+        "check": "f",
+        "detail": "\"8\" runs past the screen edge"
+      }
+    ]
+  },
+  {
+    "component": "FilterChips",
+    "variant": "tags",
+    "state": "Disabled",
+    "problems": [
+      {
+        "check": "f",
+        "detail": "\"Castrate\" runs past the screen edge"
+      },
+      {
+        "check": "f",
+        "detail": "\"5\" runs past the screen edge"
+      },
+      {
+        "check": "f",
+        "detail": "\"Coccidiosis\" runs past the screen edge"
+      },
+      {
+        "check": "f",
+        "detail": "\"6\" runs past the screen edge"
+      },
+      {
+        "check": "f",
+        "detail": "\"Tag\" runs past the screen edge"
+      },
+      {
+        "check": "f",
+        "detail": "\"7\" runs past the screen edge"
+      },
+      {
+        "check": "f",
+        "detail": "\"Weight\" runs past the screen edge"
+      },
+      {
+        "check": "f",
+        "detail": "\"8\" runs past the screen edge"
+      }
+    ]
+  },
+  {
+    "component": "FilterChips",
+    "variant": "tags",
+    "state": "Focus",
+    "problems": [
+      {
+        "check": "f",
+        "detail": "\"Castrate\" runs past the screen edge"
+      },
+      {
+        "check": "f",
+        "detail": "\"5\" runs past the screen edge"
+      },
+      {
+        "check": "f",
+        "detail": "\"Coccidiosis\" runs past the screen edge"
+      },
+      {
+        "check": "f",
+        "detail": "\"6\" runs past the screen edge"
+      },
+      {
+        "check": "f",
+        "detail": "\"Tag\" runs past the screen edge"
+      },
+      {
+        "check": "f",
+        "detail": "\"7\" runs past the screen edge"
+      },
+      {
+        "check": "f",
+        "detail": "\"Weight\" runs past the screen edge"
+      },
+      {
+        "check": "f",
+        "detail": "\"8\" runs past the screen edge"
+      }
+    ]
+  },
+  {
+    "component": "FilterChips",
+    "variant": "tags",
+    "state": "Long-label",
+    "problems": []
+  },
+  {
+    "component": "FilterSheet",
+    "variant": "list",
+    "state": "Default",
+    "problems": [
+      {
+        "check": "a",
+        "detail": "button.st-range-handle content 70px is taller than its frame 46px"
+      }
+    ]
+  },
+  {
+    "component": "FilterSheet",
+    "variant": "list",
+    "state": "Active",
+    "problems": [
+      {
+        "check": "a",
+        "detail": "button.st-range-handle content 70px is taller than its frame 46px"
+      }
+    ]
+  },
+  {
+    "component": "FilterSheet",
+    "variant": "list",
+    "state": "Empty",
+    "problems": [
+      {
+        "check": "a",
+        "detail": "button.st-range-handle content 70px is taller than its frame 46px"
+      }
+    ]
+  },
+  {
+    "component": "FilterSheet",
+    "variant": "list",
+    "state": "Disabled",
+    "problems": [
+      {
+        "check": "a",
+        "detail": "button.st-range-handle content 70px is taller than its frame 46px"
+      }
+    ]
+  },
+  {
+    "component": "FilterSheet",
+    "variant": "list",
+    "state": "Error",
+    "problems": [
+      {
+        "check": "a",
+        "detail": "button.st-range-handle content 70px is taller than its frame 46px"
+      }
+    ]
+  },
+  {
+    "component": "FilterSheet",
+    "variant": "list",
+    "state": "Loading",
+    "problems": [
+      {
+        "check": "a",
+        "detail": "button.st-range-handle content 70px is taller than its frame 46px"
+      }
+    ]
+  },
+  {
+    "component": "FilterSheet",
+    "variant": "list",
+    "state": "Long / Chinese",
+    "problems": [
+      {
+        "check": "a",
+        "detail": "button.st-range-handle content 70px is taller than its frame 46px"
+      }
+    ]
+  },
+  {
+    "component": "Heading",
+    "variant": "group",
+    "state": "Default",
+    "problems": []
+  },
+  {
+    "component": "Heading",
+    "variant": "group",
+    "state": "With description",
+    "problems": []
+  },
+  {
+    "component": "Heading",
+    "variant": "group",
+    "state": "Chinese",
+    "problems": []
+  },
+  {
+    "component": "Heading",
+    "variant": "page",
+    "state": "Default",
+    "problems": []
+  },
+  {
+    "component": "Heading",
+    "variant": "page",
+    "state": "With description",
+    "problems": []
+  },
+  {
+    "component": "Heading",
+    "variant": "page",
+    "state": "In a drawer",
+    "problems": []
+  },
+  {
+    "component": "Heading",
+    "variant": "page",
+    "state": "Long title wraps",
+    "problems": []
+  },
+  {
+    "component": "Heading",
+    "variant": "page",
+    "state": "Chinese",
+    "problems": []
+  },
+  {
+    "component": "Heading",
+    "variant": "section",
+    "state": "Default",
+    "problems": []
+  },
+  {
+    "component": "Heading",
+    "variant": "section",
+    "state": "With icon",
+    "problems": []
+  },
+  {
+    "component": "Heading",
+    "variant": "section",
+    "state": "With description",
+    "problems": []
+  },
+  {
+    "component": "Heading",
+    "variant": "section",
+    "state": "With meta",
+    "problems": []
+  },
+  {
+    "component": "Heading",
+    "variant": "section",
+    "state": "With action",
+    "problems": [
+      {
+        "check": "a",
+        "detail": "div content 34px is taller than its frame 20px"
+      },
+      {
+        "check": "a",
+        "detail": "div.st-heading content 34px is taller than its frame 20px"
+      },
+      {
+        "check": "a",
+        "detail": "div.st-heading-aside content 34px is taller than its frame 20px"
+      },
+      {
+        "check": "a",
+        "detail": "span.st-heading-action content 34px is taller than its frame 20px"
+      }
+    ]
+  },
+  {
+    "component": "Heading",
+    "variant": "section",
+    "state": "Action pressed",
+    "problems": [
+      {
+        "check": "a",
+        "detail": "div content 34px is taller than its frame 20px"
+      },
+      {
+        "check": "a",
+        "detail": "div.st-heading content 34px is taller than its frame 20px"
+      },
+      {
+        "check": "a",
+        "detail": "div.st-heading-aside content 34px is taller than its frame 20px"
+      },
+      {
+        "check": "a",
+        "detail": "span.st-heading-action content 34px is taller than its frame 20px"
+      }
+    ]
+  },
+  {
+    "component": "Heading",
+    "variant": "section",
+    "state": "Action focused",
+    "problems": [
+      {
+        "check": "a",
+        "detail": "div content 34px is taller than its frame 20px"
+      },
+      {
+        "check": "a",
+        "detail": "div.st-heading content 34px is taller than its frame 20px"
+      },
+      {
+        "check": "a",
+        "detail": "div.st-heading-aside content 34px is taller than its frame 20px"
+      },
+      {
+        "check": "a",
+        "detail": "span.st-heading-action content 34px is taller than its frame 20px"
+      }
+    ]
+  },
+  {
+    "component": "Heading",
+    "variant": "section",
+    "state": "Long title beside meta",
+    "problems": []
+  },
+  {
+    "component": "Heading",
+    "variant": "section",
+    "state": "Chinese",
+    "problems": [
+      {
+        "check": "a",
+        "detail": "div.st-heading-aside content 34px is taller than its frame 20px"
+      },
+      {
+        "check": "a",
+        "detail": "span.st-heading-action content 34px is taller than its frame 20px"
+      }
+    ]
+  },
+  {
+    "component": "Icon",
+    "variant": "key",
+    "state": "Default",
+    "problems": []
+  },
+  {
+    "component": "Icon",
+    "variant": "standard",
+    "state": "Default",
+    "problems": []
+  },
+  {
+    "component": "Icon",
+    "variant": "standard",
+    "state": "Unknown",
+    "problems": []
+  },
+  {
+    "component": "IconButton",
+    "variant": "bordered",
+    "state": "Default",
+    "problems": []
+  },
+  {
+    "component": "IconButton",
+    "variant": "bordered",
+    "state": "Pressed",
+    "problems": [
+      {
+        "check": "a",
+        "detail": "section.example content 50px is taller than its frame 48px"
+      },
+      {
+        "check": "a",
+        "detail": "div.demo content 50px is taller than its frame 48px"
+      }
+    ]
+  },
+  {
+    "component": "IconButton",
+    "variant": "bordered",
+    "state": "Focus",
+    "problems": []
+  },
+  {
+    "component": "IconButton",
+    "variant": "bordered",
+    "state": "Disabled",
+    "problems": []
+  },
+  {
+    "component": "IconButton",
+    "variant": "bordered",
+    "state": "Long / Chinese",
+    "problems": []
+  },
+  {
+    "component": "IconButton",
+    "variant": "bordered",
+    "state": "Selected",
+    "problems": []
+  },
+  {
+    "component": "IconButton",
+    "variant": "bordered",
+    "state": "Badge",
+    "problems": []
+  },
+  {
+    "component": "IconButton",
+    "variant": "plain",
+    "state": "Default",
+    "problems": []
+  },
+  {
+    "component": "IconButton",
+    "variant": "plain",
+    "state": "Pressed",
+    "problems": [
+      {
+        "check": "a",
+        "detail": "section.example content 50px is taller than its frame 48px"
+      },
+      {
+        "check": "a",
+        "detail": "div.demo content 50px is taller than its frame 48px"
+      }
+    ]
+  },
+  {
+    "component": "IconButton",
+    "variant": "plain",
+    "state": "Focus",
+    "problems": []
+  },
+  {
+    "component": "IconButton",
+    "variant": "plain",
+    "state": "Disabled",
+    "problems": []
+  },
+  {
+    "component": "IconButton",
+    "variant": "plain",
+    "state": "Long / Chinese",
+    "problems": []
+  },
+  {
+    "component": "IconButton",
+    "variant": "plain",
+    "state": "Selected",
+    "problems": []
+  },
+  {
+    "component": "IconButton",
+    "variant": "plain",
+    "state": "Badge",
+    "problems": []
+  },
+  {
+    "component": "Log",
+    "variant": "categorised",
+    "state": "Default",
+    "problems": []
+  },
+  {
+    "component": "Log",
+    "variant": "categorised",
+    "state": "Corrected entry",
+    "problems": []
+  },
+  {
+    "component": "Log",
+    "variant": "categorised",
+    "state": "Filter matches nothing",
+    "problems": []
+  },
+  {
+    "component": "Log",
+    "variant": "categorised",
+    "state": "Empty",
+    "problems": []
+  },
+  {
+    "component": "Log",
+    "variant": "categorised",
+    "state": "Chinese",
+    "problems": []
+  },
+  {
+    "component": "Log",
+    "variant": "day",
+    "state": "Default",
+    "problems": []
+  },
+  {
+    "component": "Log",
+    "variant": "day",
+    "state": "One entry for a run of acts",
+    "problems": []
+  },
+  {
+    "component": "Log",
+    "variant": "day",
+    "state": "Corrected entry",
+    "problems": []
+  },
+  {
+    "component": "Log",
+    "variant": "day",
+    "state": "With a photo",
+    "problems": []
+  },
+  {
+    "component": "Log",
+    "variant": "day",
+    "state": "Missing author is left out",
+    "problems": []
+  },
+  {
+    "component": "Log",
+    "variant": "day",
+    "state": "Empty",
+    "problems": []
+  },
+  {
+    "component": "Log",
+    "variant": "day",
+    "state": "Long entry wraps",
+    "problems": []
+  },
+  {
+    "component": "Log",
+    "variant": "day",
+    "state": "Chinese",
+    "problems": []
+  },
+  {
+    "component": "Panel",
+    "variant": "drawer",
+    "state": "Default",
+    "problems": [
+      {
+        "check": "b",
+        "detail": "dl.st-panel draws a surface inside div"
+      },
+      {
+        "check": "b",
+        "detail": "div.st-panel draws a surface inside div"
+      }
+    ]
+  },
+  {
+    "component": "Panel",
+    "variant": "drawer",
+    "state": "Empty",
+    "problems": []
+  },
+  {
+    "component": "Panel",
+    "variant": "drawer",
+    "state": "Long label / Chinese",
+    "problems": [
+      {
+        "check": "b",
+        "detail": "dl.st-panel draws a surface inside div"
+      },
+      {
+        "check": "b",
+        "detail": "div.st-panel draws a surface inside div"
+      }
+    ]
+  },
+  {
+    "component": "Panel",
+    "variant": "page",
+    "state": "Default",
+    "problems": []
+  },
+  {
+    "component": "Panel",
+    "variant": "page",
+    "state": "Empty",
+    "problems": []
+  },
+  {
+    "component": "Panel",
+    "variant": "page",
+    "state": "Long label / Chinese",
+    "problems": []
+  },
+  {
+    "component": "Photos",
+    "variant": "line",
+    "state": "Default",
+    "problems": []
+  },
+  {
+    "component": "Photos",
+    "variant": "line",
+    "state": "One photo",
+    "problems": []
+  },
+  {
+    "component": "Photos",
+    "variant": "line",
+    "state": "Several photos",
+    "problems": []
+  },
+  {
+    "component": "Photos",
+    "variant": "line",
+    "state": "Adding",
+    "problems": []
+  },
+  {
+    "component": "Photos",
+    "variant": "line",
+    "state": "Uploading",
+    "problems": []
+  },
+  {
+    "component": "Photos",
+    "variant": "line",
+    "state": "Denied",
+    "problems": []
+  },
+  {
+    "component": "Photos",
+    "variant": "line",
+    "state": "Too large",
+    "problems": []
+  },
+  {
+    "component": "Photos",
+    "variant": "line",
+    "state": "Pressed",
+    "problems": []
+  },
+  {
+    "component": "Photos",
+    "variant": "line",
+    "state": "Focus",
+    "problems": []
+  },
+  {
+    "component": "Photos",
+    "variant": "line",
+    "state": "Disabled",
+    "problems": []
+  },
+  {
+    "component": "Photos",
+    "variant": "line",
+    "state": "Full",
+    "problems": []
+  },
+  {
+    "component": "Photos",
+    "variant": "line",
+    "state": "Cancelled",
+    "problems": []
+  },
+  {
+    "component": "Photos",
+    "variant": "line",
+    "state": "Long label / Chinese",
+    "problems": []
+  },
+  {
+    "component": "PickerField",
+    "variant": "cascade-multi",
+    "state": "Default",
+    "problems": [
+      {
+        "check": "i",
+        "detail": "button.st-picker-trigger \"None\" and input \"\" are 0px apart"
+      },
+      {
+        "check": "k",
+        "detail": "closed trigger div.field stacked with sheet content footer.sheet-footer outside a sheet or phone frame"
+      }
+    ]
+  },
+  {
+    "component": "PickerField",
+    "variant": "cascade-multi",
+    "state": "Pressed",
+    "problems": []
+  },
+  {
+    "component": "PickerField",
+    "variant": "cascade-multi",
+    "state": "Active",
+    "problems": [
+      {
+        "check": "a",
+        "detail": "span.st-picker-sep content 16px is taller than its frame 14px"
+      },
+      {
+        "check": "i",
+        "detail": "button.st-picker-trigger \"Low appetite\" and input \"\" are 0px apart"
+      },
+      {
+        "check": "k",
+        "detail": "closed trigger div.field stacked with sheet content footer.sheet-footer outside a sheet or phone frame"
+      }
+    ]
+  },
+  {
+    "component": "PickerField",
+    "variant": "cascade-multi",
+    "state": "Disabled",
+    "problems": []
+  },
+  {
+    "component": "PickerField",
+    "variant": "cascade-multi",
+    "state": "Focus",
+    "problems": []
+  },
+  {
+    "component": "PickerField",
+    "variant": "cascade-multi",
+    "state": "Error",
+    "problems": [
+      {
+        "check": "k",
+        "detail": "closed trigger div.field stacked with sheet content footer.sheet-footer outside a sheet or phone frame"
+      }
+    ]
+  },
+  {
+    "component": "PickerField",
+    "variant": "cascade-multi",
+    "state": "Loading",
+    "problems": [
+      {
+        "check": "k",
+        "detail": "closed trigger div.field stacked with sheet content footer.sheet-footer outside a sheet or phone frame"
+      }
+    ]
+  },
+  {
+    "component": "PickerField",
+    "variant": "cascade-multi",
+    "state": "Empty",
+    "problems": [
+      {
+        "check": "i",
+        "detail": "button.st-picker-trigger \"None\" and input \"\" are 0px apart"
+      },
+      {
+        "check": "k",
+        "detail": "closed trigger div.field stacked with sheet content footer.sheet-footer outside a sheet or phone frame"
+      }
+    ]
+  },
+  {
+    "component": "PickerField",
+    "variant": "cascade-multi",
+    "state": "Long-label",
+    "problems": [
+      {
+        "check": "k",
+        "detail": "closed trigger div.field stacked with sheet content section.st-choice-group outside a sheet or phone frame"
+      }
+    ]
+  },
+  {
+    "component": "PickerField",
+    "variant": "cascade",
+    "state": "Default",
+    "problems": [
+      {
+        "check": "i",
+        "detail": "button.st-picker-trigger \"Select\" and input \"\" are 0px apart"
+      },
+      {
+        "check": "k",
+        "detail": "closed trigger div.field stacked with sheet content footer.sheet-footer outside a sheet or phone frame"
+      }
+    ]
+  },
+  {
+    "component": "PickerField",
+    "variant": "cascade",
+    "state": "Pressed",
+    "problems": []
+  },
+  {
+    "component": "PickerField",
+    "variant": "cascade",
+    "state": "Active",
+    "problems": [
+      {
+        "check": "a",
+        "detail": "span.st-picker-sep content 16px is taller than its frame 14px"
+      },
+      {
+        "check": "i",
+        "detail": "button.st-picker-trigger \"Antibiotics › \" and input \"\" are 0px apart"
+      },
+      {
+        "check": "k",
+        "detail": "closed trigger div.field stacked with sheet content footer.sheet-footer outside a sheet or phone frame"
+      }
+    ]
+  },
+  {
+    "component": "PickerField",
+    "variant": "cascade",
+    "state": "Disabled",
+    "problems": []
+  },
+  {
+    "component": "PickerField",
+    "variant": "cascade",
+    "state": "Focus",
+    "problems": []
+  },
+  {
+    "component": "PickerField",
+    "variant": "cascade",
+    "state": "Error",
+    "problems": [
+      {
+        "check": "k",
+        "detail": "closed trigger div.field stacked with sheet content footer.sheet-footer outside a sheet or phone frame"
+      }
+    ]
+  },
+  {
+    "component": "PickerField",
+    "variant": "cascade",
+    "state": "Loading",
+    "problems": [
+      {
+        "check": "k",
+        "detail": "closed trigger div.field stacked with sheet content footer.sheet-footer outside a sheet or phone frame"
+      }
+    ]
+  },
+  {
+    "component": "PickerField",
+    "variant": "cascade",
+    "state": "Empty",
+    "problems": [
+      {
+        "check": "i",
+        "detail": "button.st-picker-trigger \"Select\" and input \"\" are 0px apart"
+      },
+      {
+        "check": "k",
+        "detail": "closed trigger div.field stacked with sheet content footer.sheet-footer outside a sheet or phone frame"
+      }
+    ]
+  },
+  {
+    "component": "PickerField",
+    "variant": "cascade",
+    "state": "Long-label",
+    "problems": [
+      {
+        "check": "f",
+        "detail": "\"Antibiotics › é’éœ‰ç´ ç±»æŠ—è\" overflows its box (830px in 339px, ellipsised)"
+      },
+      {
+        "check": "k",
+        "detail": "closed trigger div.field stacked with sheet content section.st-choice-group outside a sheet or phone frame"
+      }
+    ]
+  },
+  {
+    "component": "PickerField",
+    "variant": "multi",
+    "state": "Default",
+    "problems": [
+      {
+        "check": "i",
+        "detail": "button.st-picker-trigger \"None\" and input \"\" are 0px apart"
+      },
+      {
+        "check": "k",
+        "detail": "closed trigger div.field stacked with sheet content footer.sheet-footer outside a sheet or phone frame"
+      }
+    ]
+  },
+  {
+    "component": "PickerField",
+    "variant": "multi",
+    "state": "Pressed",
+    "problems": []
+  },
+  {
+    "component": "PickerField",
+    "variant": "multi",
+    "state": "Active",
+    "problems": [
+      {
+        "check": "i",
+        "detail": "button.st-picker-trigger \"1 selected\" and input \"\" are 0px apart"
+      },
+      {
+        "check": "k",
+        "detail": "closed trigger div.field stacked with sheet content footer.sheet-footer outside a sheet or phone frame"
+      }
+    ]
+  },
+  {
+    "component": "PickerField",
+    "variant": "multi",
+    "state": "Disabled",
+    "problems": []
+  },
+  {
+    "component": "PickerField",
+    "variant": "multi",
+    "state": "Focus",
+    "problems": []
+  },
+  {
+    "component": "PickerField",
+    "variant": "multi",
+    "state": "Error",
+    "problems": [
+      {
+        "check": "k",
+        "detail": "closed trigger div.field stacked with sheet content footer.sheet-footer outside a sheet or phone frame"
+      }
+    ]
+  },
+  {
+    "component": "PickerField",
+    "variant": "multi",
+    "state": "Loading",
+    "problems": [
+      {
+        "check": "k",
+        "detail": "closed trigger div.field stacked with sheet content footer.sheet-footer outside a sheet or phone frame"
+      }
+    ]
+  },
+  {
+    "component": "PickerField",
+    "variant": "multi",
+    "state": "Empty",
+    "problems": [
+      {
+        "check": "i",
+        "detail": "button.st-picker-trigger \"None\" and input \"\" are 0px apart"
+      },
+      {
+        "check": "k",
+        "detail": "closed trigger div.field stacked with sheet content footer.sheet-footer outside a sheet or phone frame"
+      }
+    ]
+  },
+  {
+    "component": "PickerField",
+    "variant": "multi",
+    "state": "Long-label",
+    "problems": [
+      {
+        "check": "k",
+        "detail": "closed trigger div.field stacked with sheet content section.st-choice-group outside a sheet or phone frame"
+      }
+    ]
+  },
+  {
+    "component": "PickerField",
+    "variant": "single",
+    "state": "Default",
+    "problems": [
+      {
+        "check": "i",
+        "detail": "button.st-picker-trigger \"Select\" and input \"\" are 0px apart"
+      },
+      {
+        "check": "k",
+        "detail": "closed trigger div.field stacked with sheet content footer.sheet-footer outside a sheet or phone frame"
+      }
+    ]
+  },
+  {
+    "component": "PickerField",
+    "variant": "single",
+    "state": "Pressed",
+    "problems": []
+  },
+  {
+    "component": "PickerField",
+    "variant": "single",
+    "state": "Active",
+    "problems": [
+      {
+        "check": "i",
+        "detail": "button.st-picker-trigger \"Low appetite\" and input \"\" are 0px apart"
+      },
+      {
+        "check": "k",
+        "detail": "closed trigger div.field stacked with sheet content footer.sheet-footer outside a sheet or phone frame"
+      }
+    ]
+  },
+  {
+    "component": "PickerField",
+    "variant": "single",
+    "state": "Disabled",
+    "problems": []
+  },
+  {
+    "component": "PickerField",
+    "variant": "single",
+    "state": "Focus",
+    "problems": []
+  },
+  {
+    "component": "PickerField",
+    "variant": "single",
+    "state": "Error",
+    "problems": [
+      {
+        "check": "k",
+        "detail": "closed trigger div.field stacked with sheet content footer.sheet-footer outside a sheet or phone frame"
+      }
+    ]
+  },
+  {
+    "component": "PickerField",
+    "variant": "single",
+    "state": "Loading",
+    "problems": [
+      {
+        "check": "k",
+        "detail": "closed trigger div.field stacked with sheet content footer.sheet-footer outside a sheet or phone frame"
+      }
+    ]
+  },
+  {
+    "component": "PickerField",
+    "variant": "single",
+    "state": "Empty",
+    "problems": [
+      {
+        "check": "i",
+        "detail": "button.st-picker-trigger \"Select\" and input \"\" are 0px apart"
+      },
+      {
+        "check": "k",
+        "detail": "closed trigger div.field stacked with sheet content footer.sheet-footer outside a sheet or phone frame"
+      }
+    ]
+  },
+  {
+    "component": "PickerField",
+    "variant": "single",
+    "state": "Long-label",
+    "problems": [
+      {
+        "check": "f",
+        "detail": "\"é’éœ‰ç´ ç±»æŠ—èŒè¯ç‰© / é˜¿\" overflows its box (748px in 339px, ellipsised)"
+      },
+      {
+        "check": "k",
+        "detail": "closed trigger div.field stacked with sheet content section.st-choice-group outside a sheet or phone frame"
+      }
+    ]
+  },
+  {
+    "component": "RangeSlider",
+    "variant": "range",
+    "state": "Default",
+    "problems": [
+      {
+        "check": "a",
+        "detail": "button.st-range-handle content 70px is taller than its frame 46px"
+      }
+    ]
+  },
+  {
+    "component": "RangeSlider",
+    "variant": "range",
+    "state": "Pressed",
+    "problems": [
+      {
+        "check": "a",
+        "detail": "button.st-range-handle content 70px is taller than its frame 46px"
+      }
+    ]
+  },
+  {
+    "component": "RangeSlider",
+    "variant": "range",
+    "state": "Focus",
+    "problems": [
+      {
+        "check": "a",
+        "detail": "button.st-range-handle content 70px is taller than its frame 46px"
+      }
+    ]
+  },
+  {
+    "component": "RangeSlider",
+    "variant": "range",
+    "state": "At limits",
+    "problems": [
+      {
+        "check": "a",
+        "detail": "button.st-range-handle content 70px is taller than its frame 46px"
+      }
+    ]
+  },
+  {
+    "component": "RangeSlider",
+    "variant": "range",
+    "state": "Disabled",
+    "problems": [
+      {
+        "check": "a",
+        "detail": "button.st-range-handle content 70px is taller than its frame 46px"
+      }
+    ]
+  },
+  {
+    "component": "RangeSlider",
+    "variant": "range",
+    "state": "Error",
+    "problems": [
+      {
+        "check": "a",
+        "detail": "button.st-range-handle content 70px is taller than its frame 46px"
+      }
+    ]
+  },
+  {
+    "component": "RangeSlider",
+    "variant": "range",
+    "state": "Long / Chinese",
+    "problems": [
+      {
+        "check": "a",
+        "detail": "button.st-range-handle content 70px is taller than its frame 46px"
+      }
+    ]
+  },
+  {
+    "component": "Row",
+    "variant": "animal",
+    "state": "Default",
+    "problems": []
+  },
+  {
+    "component": "Row",
+    "variant": "animal",
+    "state": "Pressed",
+    "problems": []
+  },
+  {
+    "component": "Row",
+    "variant": "animal",
+    "state": "Focus",
+    "problems": []
+  },
+  {
+    "component": "Row",
+    "variant": "animal",
+    "state": "Long label / Chinese",
+    "problems": []
+  },
+  {
+    "component": "Row",
+    "variant": "animal",
+    "state": "Disabled",
+    "problems": []
+  },
+  {
+    "component": "Row",
+    "variant": "door-act",
+    "state": "Default",
+    "problems": []
+  },
+  {
+    "component": "Row",
+    "variant": "door-act",
+    "state": "Pressed",
+    "problems": []
+  },
+  {
+    "component": "Row",
+    "variant": "door-act",
+    "state": "Focus",
+    "problems": []
+  },
+  {
+    "component": "Row",
+    "variant": "door-act",
+    "state": "Long label / Chinese",
+    "problems": []
+  },
+  {
+    "component": "Row",
+    "variant": "door-act",
+    "state": "Loading",
+    "problems": []
+  },
+  {
+    "component": "Row",
+    "variant": "door-act",
+    "state": "Error",
+    "problems": []
+  },
+  {
+    "component": "Row",
+    "variant": "navigation",
+    "state": "Default",
+    "problems": []
+  },
+  {
+    "component": "Row",
+    "variant": "navigation",
+    "state": "Pressed",
+    "problems": []
+  },
+  {
+    "component": "Row",
+    "variant": "navigation",
+    "state": "Focus",
+    "problems": []
+  },
+  {
+    "component": "Row",
+    "variant": "navigation",
+    "state": "Long label / Chinese",
+    "problems": []
+  },
+  {
+    "component": "Row",
+    "variant": "navigation",
+    "state": "Disabled",
+    "problems": []
+  },
+  {
+    "component": "Row",
+    "variant": "record",
+    "state": "Default",
+    "problems": []
+  },
+  {
+    "component": "Row",
+    "variant": "record",
+    "state": "Pressed",
+    "problems": []
+  },
+  {
+    "component": "Row",
+    "variant": "record",
+    "state": "Focus",
+    "problems": []
+  },
+  {
+    "component": "Row",
+    "variant": "record",
+    "state": "Long label / Chinese",
+    "problems": []
+  },
+  {
+    "component": "Row",
+    "variant": "record",
+    "state": "Disabled",
+    "problems": []
+  },
+  {
+    "component": "Row",
+    "variant": "scope",
+    "state": "Default",
+    "problems": []
+  },
+  {
+    "component": "Row",
+    "variant": "scope",
+    "state": "Pressed",
+    "problems": []
+  },
+  {
+    "component": "Row",
+    "variant": "scope",
+    "state": "Focus",
+    "problems": []
+  },
+  {
+    "component": "Row",
+    "variant": "scope",
+    "state": "Long label / Chinese",
+    "problems": []
+  },
+  {
+    "component": "Row",
+    "variant": "scope",
+    "state": "Current",
+    "problems": []
+  },
+  {
+    "component": "Row",
+    "variant": "scope",
+    "state": "Disabled",
+    "problems": []
+  },
+  {
+    "component": "Row",
+    "variant": "select-door",
+    "state": "Default",
+    "problems": []
+  },
+  {
+    "component": "Row",
+    "variant": "select-door",
+    "state": "Pressed (door)",
+    "problems": []
+  },
+  {
+    "component": "Row",
+    "variant": "select-door",
+    "state": "Selected",
+    "problems": []
+  },
+  {
+    "component": "Row",
+    "variant": "select-door",
+    "state": "Selected + Pressed",
+    "problems": []
+  },
+  {
+    "component": "Row",
+    "variant": "select-door",
+    "state": "No door",
+    "problems": []
+  },
+  {
+    "component": "Row",
+    "variant": "select-door",
+    "state": "Long label / Chinese",
+    "problems": []
+  },
+  {
+    "component": "Row",
+    "variant": "summary-count",
+    "state": "Default",
+    "problems": []
+  },
+  {
+    "component": "Row",
+    "variant": "summary-count",
+    "state": "Pressed",
+    "problems": []
+  },
+  {
+    "component": "Row",
+    "variant": "summary-count",
+    "state": "Focus",
+    "problems": []
+  },
+  {
+    "component": "Row",
+    "variant": "summary-count",
+    "state": "Long label / Chinese",
+    "problems": []
+  },
+  {
+    "component": "Row",
+    "variant": "summary-count",
+    "state": "Empty",
+    "problems": []
+  },
+  {
+    "component": "Row",
+    "variant": "tick",
+    "state": "Default",
+    "problems": []
+  },
+  {
+    "component": "Row",
+    "variant": "tick",
+    "state": "Ticked",
+    "problems": []
+  },
+  {
+    "component": "Row",
+    "variant": "tick",
+    "state": "Ticked + count act",
+    "problems": []
+  },
+  {
+    "component": "Row",
+    "variant": "tick",
+    "state": "Pressed",
+    "problems": []
+  },
+  {
+    "component": "Row",
+    "variant": "tick",
+    "state": "Long label / Chinese",
+    "problems": []
+  },
+  {
+    "component": "Segment",
+    "variant": "facet",
+    "state": "Default",
+    "problems": []
+  },
+  {
+    "component": "Segment",
+    "variant": "facet",
+    "state": "Pressed",
+    "problems": []
+  },
+  {
+    "component": "Segment",
+    "variant": "facet",
+    "state": "Selected",
+    "problems": []
+  },
+  {
+    "component": "Segment",
+    "variant": "facet",
+    "state": "Disabled",
+    "problems": []
+  },
+  {
+    "component": "Segment",
+    "variant": "facet",
+    "state": "Focus",
+    "problems": []
+  },
+  {
+    "component": "Segment",
+    "variant": "facet",
+    "state": "Long-label",
+    "problems": [
+      {
+        "check": "f",
+        "detail": "\"å·²å®Œæˆçš„æ¯çŒªè®°å½•\" runs past the screen edge"
+      }
+    ]
+  },
+  {
+    "component": "Segment",
+    "variant": "lens",
+    "state": "Default",
+    "problems": []
+  },
+  {
+    "component": "Segment",
+    "variant": "lens",
+    "state": "Pressed",
+    "problems": []
+  },
+  {
+    "component": "Segment",
+    "variant": "lens",
+    "state": "Selected",
+    "problems": []
+  },
+  {
+    "component": "Segment",
+    "variant": "lens",
+    "state": "Disabled",
+    "problems": []
+  },
+  {
+    "component": "Segment",
+    "variant": "lens",
+    "state": "Focus",
+    "problems": []
+  },
+  {
+    "component": "Segment",
+    "variant": "lens",
+    "state": "Long-label",
+    "problems": [
+      {
+        "check": "f",
+        "detail": "\"å·²å®Œæˆçš„æ¯çŒªè®°å½•\" runs past the screen edge"
+      }
+    ]
+  },
+  {
+    "component": "Segment",
+    "variant": "two-line-lens",
+    "state": "Default",
+    "problems": []
+  },
+  {
+    "component": "Segment",
+    "variant": "two-line-lens",
+    "state": "Pressed",
+    "problems": []
+  },
+  {
+    "component": "Segment",
+    "variant": "two-line-lens",
+    "state": "Selected",
+    "problems": []
+  },
+  {
+    "component": "Segment",
+    "variant": "two-line-lens",
+    "state": "Disabled",
+    "problems": []
+  },
+  {
+    "component": "Segment",
+    "variant": "two-line-lens",
+    "state": "Focus",
+    "problems": []
+  },
+  {
+    "component": "Segment",
+    "variant": "two-line-lens",
+    "state": "Long-label",
+    "problems": [
+      {
+        "check": "f",
+        "detail": "\"å·²å®Œæˆçš„æ¯çŒªè®°å½•\" runs past the screen edge"
+      }
+    ]
+  },
+  {
+    "component": "Segment",
+    "variant": "view-switch",
+    "state": "Default",
+    "problems": []
+  },
+  {
+    "component": "Segment",
+    "variant": "view-switch",
+    "state": "Pressed",
+    "problems": []
+  },
+  {
+    "component": "Segment",
+    "variant": "view-switch",
+    "state": "Selected",
+    "problems": []
+  },
+  {
+    "component": "Segment",
+    "variant": "view-switch",
+    "state": "Disabled",
+    "problems": []
+  },
+  {
+    "component": "Segment",
+    "variant": "view-switch",
+    "state": "Focus",
+    "problems": []
+  },
+  {
+    "component": "Segment",
+    "variant": "view-switch",
+    "state": "Long-label",
+    "problems": [
+      {
+        "check": "f",
+        "detail": "\"å·²å®Œæˆçš„æ¯çŒªè®°å½•\" runs past the screen edge"
+      }
+    ]
+  },
+  {
+    "component": "Sheet",
+    "variant": "dialog",
+    "state": "Default (glyph)",
+    "problems": [
+      {
+        "check": "b",
+        "detail": "div.st-panel draws a surface inside div.ph"
+      },
+      {
+        "check": "b",
+        "detail": "div.dialog-backdrop draws a surface inside div.ph"
+      },
+      {
+        "check": "c",
+        "detail": "\"Choose what changed.\" starts -23px from the heading \"Born 14 · correct it\" left edge"
+      }
+    ]
+  },
+  {
+    "component": "Sheet",
+    "variant": "dialog",
+    "state": "Without glyph",
+    "problems": [
+      {
+        "check": "b",
+        "detail": "div.st-panel draws a surface inside div.ph"
+      },
+      {
+        "check": "b",
+        "detail": "div.dialog-backdrop draws a surface inside div.ph"
+      }
+    ]
+  },
+  {
+    "component": "Sheet",
+    "variant": "dialog",
+    "state": "Pressed",
+    "problems": [
+      {
+        "check": "b",
+        "detail": "div.st-panel draws a surface inside div.ph"
+      },
+      {
+        "check": "b",
+        "detail": "div.dialog-backdrop draws a surface inside div.ph"
+      },
+      {
+        "check": "c",
+        "detail": "\"Choose what changed.\" starts -23px from the heading \"Born 14 · correct it\" left edge"
+      }
+    ]
+  },
+  {
+    "component": "Sheet",
+    "variant": "dialog",
+    "state": "Waiting (reason shown)",
+    "problems": [
+      {
+        "check": "b",
+        "detail": "div.st-panel draws a surface inside div.ph"
+      },
+      {
+        "check": "b",
+        "detail": "div.dialog-backdrop draws a surface inside div.ph"
+      },
+      {
+        "check": "c",
+        "detail": "\"Unfinished work stays incomple\" starts -23px from the heading \"End task early?\" left edge"
+      },
+      {
+        "check": "c",
+        "detail": "\"Tick the box to confirm\" starts -23px from the heading \"End task early?\" left edge"
+      }
+    ]
+  },
+  {
+    "component": "Sheet",
+    "variant": "dialog",
+    "state": "Long / Chinese",
+    "problems": [
+      {
+        "check": "b",
+        "detail": "div.st-panel draws a surface inside div.ph"
+      },
+      {
+        "check": "b",
+        "detail": "div.dialog-backdrop draws a surface inside div.ph"
+      },
+      {
+        "check": "c",
+        "detail": "\"已经记录的内容不会丢失，未完成的工作仍然保持未完成状态。\" starts -23px from the heading \"要提前结束这项任务吗？未完成的工作会保留\" left edge"
+      }
+    ]
+  },
+  {
+    "component": "Sheet",
+    "variant": "drawer",
+    "state": "Default",
+    "problems": [
+      {
+        "check": "b",
+        "detail": "div.st-panel draws a surface inside div.ph"
+      }
+    ]
+  },
+  {
+    "component": "Sheet",
+    "variant": "drawer",
+    "state": "Pressed",
+    "problems": [
+      {
+        "check": "b",
+        "detail": "div.st-panel draws a surface inside div.ph"
+      }
+    ]
+  },
+  {
+    "component": "Sheet",
+    "variant": "drawer",
+    "state": "Aside",
+    "problems": [
+      {
+        "check": "b",
+        "detail": "div.st-panel draws a surface inside div.ph"
+      }
+    ]
+  },
+  {
+    "component": "Sheet",
+    "variant": "drawer",
+    "state": "Waiting (reason shown)",
+    "problems": [
+      {
+        "check": "b",
+        "detail": "div.st-panel draws a surface inside div.ph"
+      }
+    ]
+  },
+  {
+    "component": "Sheet",
+    "variant": "drawer",
+    "state": "Error",
+    "problems": [
+      {
+        "check": "b",
+        "detail": "div.st-panel draws a surface inside div.ph"
+      },
+      {
+        "check": "g",
+        "detail": "numeric field \"Weight (kg)\" is a textarea"
+      }
+    ]
+  },
+  {
+    "component": "Sheet",
+    "variant": "drawer",
+    "state": "Empty",
+    "problems": [
+      {
+        "check": "b",
+        "detail": "div.st-panel draws a surface inside div.ph"
+      },
+      {
+        "check": "c",
+        "detail": "\"Nothing selected yet. Tap a pi\" starts 17px from the heading \"Selected0 pigs\" left edge"
+      }
+    ]
+  },
+  {
+    "component": "Sheet",
+    "variant": "drawer",
+    "state": "Long / Chinese",
+    "problems": [
+      {
+        "check": "b",
+        "detail": "div.st-panel draws a surface inside div.ph"
+      }
+    ]
+  },
+  {
+    "component": "Sheet",
+    "variant": "drawer",
+    "state": "Held at its size",
+    "problems": [
+      {
+        "check": "b",
+        "detail": "div.st-panel draws a surface inside div.ph"
+      },
+      {
+        "check": "b",
+        "detail": "div.st-panel draws a surface inside section.sheet"
+      }
+    ]
+  },
+  {
+    "component": "Sheet",
+    "variant": "drawer",
+    "state": "Lead + Above (drill-down)",
+    "problems": [
+      {
+        "check": "b",
+        "detail": "div.st-panel draws a surface inside div.ph"
+      },
+      {
+        "check": "b",
+        "detail": "div.st-panel draws a surface inside section.sheet"
+      }
+    ]
+  },
+  {
+    "component": "Sheet",
+    "variant": "page",
+    "state": "Default",
+    "problems": [
+      {
+        "check": "b",
+        "detail": "div.st-panel draws a surface inside div.ph"
+      },
+      {
+        "check": "b",
+        "detail": "div.st-panel draws a surface inside section.sheet"
+      },
+      {
+        "check": "b",
+        "detail": "div.sheet-footer draws a surface inside section.sheet"
+      }
+    ]
+  },
+  {
+    "component": "Sheet",
+    "variant": "page",
+    "state": "Pressed",
+    "problems": [
+      {
+        "check": "b",
+        "detail": "div.st-panel draws a surface inside div.ph"
+      },
+      {
+        "check": "b",
+        "detail": "div.st-panel draws a surface inside section.sheet"
+      },
+      {
+        "check": "b",
+        "detail": "div.sheet-footer draws a surface inside section.sheet"
+      }
+    ]
+  },
+  {
+    "component": "Sheet",
+    "variant": "page",
+    "state": "Aside",
+    "problems": [
+      {
+        "check": "b",
+        "detail": "div.st-panel draws a surface inside div.ph"
+      },
+      {
+        "check": "b",
+        "detail": "div.st-panel draws a surface inside section.sheet"
+      },
+      {
+        "check": "b",
+        "detail": "div.sheet-footer draws a surface inside section.sheet"
+      }
+    ]
+  },
+  {
+    "component": "Sheet",
+    "variant": "page",
+    "state": "Waiting (reason shown)",
+    "problems": [
+      {
+        "check": "b",
+        "detail": "div.st-panel draws a surface inside div.ph"
+      },
+      {
+        "check": "b",
+        "detail": "div.st-panel draws a surface inside section.sheet"
+      },
+      {
+        "check": "b",
+        "detail": "div.sheet-footer draws a surface inside section.sheet"
+      }
+    ]
+  },
+  {
+    "component": "Sheet",
+    "variant": "page",
+    "state": "Empty",
+    "problems": [
+      {
+        "check": "b",
+        "detail": "div.st-panel draws a surface inside div.ph"
+      },
+      {
+        "check": "b",
+        "detail": "div.sheet-footer draws a surface inside section.sheet"
+      },
+      {
+        "check": "c",
+        "detail": "\"No activity recorded yet.\" starts 17px from the heading \"Pen logB4 · Sow 0002\" left edge"
+      }
+    ]
+  },
+  {
+    "component": "Sheet",
+    "variant": "page",
+    "state": "Long / Chinese",
+    "problems": [
+      {
+        "check": "b",
+        "detail": "div.st-panel draws a surface inside div.ph"
+      },
+      {
+        "check": "b",
+        "detail": "div.st-panel draws a surface inside section.sheet"
+      },
+      {
+        "check": "b",
+        "detail": "div.sheet-footer draws a surface inside section.sheet"
+      }
+    ]
+  },
+  {
+    "component": "Sheet",
+    "variant": "page",
+    "state": "Drawer over a page",
+    "problems": [
+      {
+        "check": "b",
+        "detail": "div.st-panel draws a surface inside div.ph"
+      },
+      {
+        "check": "b",
+        "detail": "div.st-panel draws a surface inside section.sheet"
+      },
+      {
+        "check": "b",
+        "detail": "div.sheet-footer draws a surface inside section.sheet"
+      }
+    ]
+  },
+  {
+    "component": "Status",
+    "variant": "chip",
+    "state": "Awaiting",
+    "problems": []
+  },
+  {
+    "component": "Status",
+    "variant": "chip",
+    "state": "Active",
+    "problems": []
+  },
+  {
+    "component": "Status",
+    "variant": "chip",
+    "state": "Done",
+    "problems": []
+  },
+  {
+    "component": "Status",
+    "variant": "chip",
+    "state": "Late",
+    "problems": []
+  },
+  {
+    "component": "Status",
+    "variant": "chip",
+    "state": "Overdue",
+    "problems": []
+  },
+  {
+    "component": "Status",
+    "variant": "chip",
+    "state": "Sow died",
+    "problems": []
+  },
+  {
+    "component": "Status",
+    "variant": "chip",
+    "state": "Long label (wraps)",
+    "problems": []
+  },
+  {
+    "component": "Status",
+    "variant": "chip",
+    "state": "Chinese",
+    "problems": []
+  },
+  {
+    "component": "Status",
+    "variant": "line",
+    "state": "Default",
+    "problems": []
+  },
+  {
+    "component": "Status",
+    "variant": "line",
+    "state": "Receipt (dot separator)",
+    "problems": []
+  },
+  {
+    "component": "Status",
+    "variant": "line",
+    "state": "Mono line 2",
+    "problems": []
+  },
+  {
+    "component": "Status",
+    "variant": "line",
+    "state": "Live (announced)",
+    "problems": []
+  },
+  {
+    "component": "Status",
+    "variant": "line",
+    "state": "Long (wraps)",
+    "problems": []
+  },
+  {
+    "component": "Status",
+    "variant": "line",
+    "state": "Chinese",
+    "problems": []
+  },
+  {
+    "component": "Status",
+    "variant": "word",
+    "state": "Awaiting",
+    "problems": []
+  },
+  {
+    "component": "Status",
+    "variant": "word",
+    "state": "Active",
+    "problems": []
+  },
+  {
+    "component": "Status",
+    "variant": "word",
+    "state": "Done",
+    "problems": []
+  },
+  {
+    "component": "Status",
+    "variant": "word",
+    "state": "Late",
+    "problems": []
+  },
+  {
+    "component": "Status",
+    "variant": "word",
+    "state": "Overdue",
+    "problems": []
+  },
+  {
+    "component": "Status",
+    "variant": "word",
+    "state": "Sow died",
+    "problems": []
+  },
+  {
+    "component": "Status",
+    "variant": "word",
+    "state": "Long label (wraps)",
+    "problems": []
+  },
+  {
+    "component": "Status",
+    "variant": "word",
+    "state": "Chinese",
+    "problems": []
+  },
+  {
+    "component": "Stepper",
+    "variant": "count",
+    "state": "Default",
+    "problems": [
+      {
+        "check": "a",
+        "detail": "span.st-stepper-keys content 83px is taller than its frame 78px"
+      },
+      {
+        "check": "a",
+        "detail": "span.st-stepper-value content 83px is taller than its frame 78px"
+      }
+    ]
+  },
+  {
+    "component": "Stepper",
+    "variant": "count",
+    "state": "Empty",
+    "problems": [
+      {
+        "check": "a",
+        "detail": "span.st-stepper-keys content 83px is taller than its frame 78px"
+      },
+      {
+        "check": "a",
+        "detail": "span.st-stepper-value content 83px is taller than its frame 78px"
+      }
+    ]
+  },
+  {
+    "component": "Stepper",
+    "variant": "count",
+    "state": "Pressed",
+    "problems": [
+      {
+        "check": "a",
+        "detail": "span.st-stepper-keys content 83px is taller than its frame 78px"
+      },
+      {
+        "check": "a",
+        "detail": "span.st-stepper-value content 83px is taller than its frame 78px"
+      }
+    ]
+  },
+  {
+    "component": "Stepper",
+    "variant": "count",
+    "state": "Focus",
+    "problems": [
+      {
+        "check": "a",
+        "detail": "span.st-stepper-keys content 83px is taller than its frame 78px"
+      },
+      {
+        "check": "a",
+        "detail": "span.st-stepper-value content 83px is taller than its frame 78px"
+      }
+    ]
+  },
+  {
+    "component": "Stepper",
+    "variant": "count",
+    "state": "Floor",
+    "problems": [
+      {
+        "check": "a",
+        "detail": "span.st-stepper-keys content 83px is taller than its frame 78px"
+      },
+      {
+        "check": "a",
+        "detail": "span.st-stepper-value content 83px is taller than its frame 78px"
+      }
+    ]
+  },
+  {
+    "component": "Stepper",
+    "variant": "count",
+    "state": "Ceiling",
+    "problems": [
+      {
+        "check": "a",
+        "detail": "span.st-stepper-keys content 83px is taller than its frame 78px"
+      },
+      {
+        "check": "a",
+        "detail": "span.st-stepper-value content 83px is taller than its frame 78px"
+      }
+    ]
+  },
+  {
+    "component": "Stepper",
+    "variant": "count",
+    "state": "Disabled",
+    "problems": [
+      {
+        "check": "a",
+        "detail": "span.st-stepper-keys content 83px is taller than its frame 78px"
+      },
+      {
+        "check": "a",
+        "detail": "span.st-stepper-value content 83px is taller than its frame 78px"
+      }
+    ]
+  },
+  {
+    "component": "Stepper",
+    "variant": "count",
+    "state": "Error",
+    "problems": [
+      {
+        "check": "a",
+        "detail": "span.st-stepper-keys content 83px is taller than its frame 78px"
+      },
+      {
+        "check": "a",
+        "detail": "span.st-stepper-value content 83px is taller than its frame 78px"
+      }
+    ]
+  },
+  {
+    "component": "Stepper",
+    "variant": "count",
+    "state": "Loading",
+    "problems": [
+      {
+        "check": "a",
+        "detail": "span.st-stepper-keys content 83px is taller than its frame 78px"
+      },
+      {
+        "check": "a",
+        "detail": "span.st-stepper-value content 83px is taller than its frame 78px"
+      }
+    ]
+  },
+  {
+    "component": "Stepper",
+    "variant": "count",
+    "state": "Draft",
+    "problems": [
+      {
+        "check": "a",
+        "detail": "span.st-stepper-keys content 83px is taller than its frame 78px"
+      },
+      {
+        "check": "a",
+        "detail": "span.st-stepper-value content 83px is taller than its frame 78px"
+      }
+    ]
+  },
+  {
+    "component": "Stepper",
+    "variant": "count",
+    "state": "Corrected",
+    "problems": [
+      {
+        "check": "a",
+        "detail": "span.st-stepper-keys content 83px is taller than its frame 78px"
+      },
+      {
+        "check": "a",
+        "detail": "span.st-stepper-value content 83px is taller than its frame 78px"
+      }
+    ]
+  },
+  {
+    "component": "Stepper",
+    "variant": "count",
+    "state": "Long Chinese label",
+    "problems": [
+      {
+        "check": "a",
+        "detail": "span.st-stepper-keys content 83px is taller than its frame 78px"
+      },
+      {
+        "check": "a",
+        "detail": "span.st-stepper-value content 83px is taller than its frame 78px"
+      }
+    ]
+  },
+  {
+    "component": "Stepper",
+    "variant": "row",
+    "state": "Default",
+    "problems": []
+  },
+  {
+    "component": "Stepper",
+    "variant": "row",
+    "state": "Empty",
+    "problems": []
+  },
+  {
+    "component": "Stepper",
+    "variant": "row",
+    "state": "Pressed",
+    "problems": []
+  },
+  {
+    "component": "Stepper",
+    "variant": "row",
+    "state": "Focus",
+    "problems": []
+  },
+  {
+    "component": "Stepper",
+    "variant": "row",
+    "state": "Floor",
+    "problems": []
+  },
+  {
+    "component": "Stepper",
+    "variant": "row",
+    "state": "Ceiling",
+    "problems": []
+  },
+  {
+    "component": "Stepper",
+    "variant": "row",
+    "state": "Disabled",
+    "problems": []
+  },
+  {
+    "component": "Stepper",
+    "variant": "row",
+    "state": "Error",
+    "problems": []
+  },
+  {
+    "component": "Stepper",
+    "variant": "row",
+    "state": "Loading",
+    "problems": []
+  },
+  {
+    "component": "Stepper",
+    "variant": "row",
+    "state": "Draft",
+    "problems": []
+  },
+  {
+    "component": "Stepper",
+    "variant": "row",
+    "state": "Corrected",
+    "problems": []
+  },
+  {
+    "component": "Stepper",
+    "variant": "row",
+    "state": "Long Chinese label",
+    "problems": []
+  },
+  {
+    "component": "Stepper",
+    "variant": "well",
+    "state": "Default",
+    "problems": []
+  },
+  {
+    "component": "Stepper",
+    "variant": "well",
+    "state": "Empty",
+    "problems": []
+  },
+  {
+    "component": "Stepper",
+    "variant": "well",
+    "state": "Pressed",
+    "problems": []
+  },
+  {
+    "component": "Stepper",
+    "variant": "well",
+    "state": "Focus",
+    "problems": []
+  },
+  {
+    "component": "Stepper",
+    "variant": "well",
+    "state": "Floor",
+    "problems": []
+  },
+  {
+    "component": "Stepper",
+    "variant": "well",
+    "state": "Ceiling",
+    "problems": []
+  },
+  {
+    "component": "Stepper",
+    "variant": "well",
+    "state": "Disabled",
+    "problems": []
+  },
+  {
+    "component": "Stepper",
+    "variant": "well",
+    "state": "Error",
+    "problems": []
+  },
+  {
+    "component": "Stepper",
+    "variant": "well",
+    "state": "Loading",
+    "problems": []
+  },
+  {
+    "component": "Stepper",
+    "variant": "well",
+    "state": "Draft",
+    "problems": []
+  },
+  {
+    "component": "Stepper",
+    "variant": "well",
+    "state": "Corrected",
+    "problems": []
+  },
+  {
+    "component": "Stepper",
+    "variant": "well",
+    "state": "Long Chinese label",
+    "problems": []
+  }
+]
