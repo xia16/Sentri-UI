@@ -82,13 +82,14 @@ Never invent an expected result to make a leaf pass.
 
 1. Run every leaf (`node scripts/run-scenarios.mjs`) and grade every screen state on the round's start commit.
 2. **Select**: first the hard failures, then the worst usability defect with evidence. A fix must improve its target with no regression elsewhere. A shared component may change only if every other feature using it stays the same or better.
-3. **Build** with `build.md`. Changes are presentation and behaviour restoration only, in the feature.
+   Once no hard failure is left, a round may also take one **enhancement** ([Room to design](../README.md#room-to-design)): a screen state graded only adequate that a different design would make clearly better. The designer sketches alternatives, including one that departs from the current pattern, and builds the best. The gate judges it like any fix.
+3. **Build** with `build.md`. Changes stay inside the product-neutral boundary (§5), in the feature.
 4. **Gate** with `gate.md` on the exact merge candidate. Presentation changes rerun the walks and leaves they touch.
 5. **Merge** automatically when it passes. Record the round: commit, grades, leaf results, and what changed.
 
 ## 7. Stop conditions
 
-- **Done**: two clean rounds in a row (no hard failure, no defect selected) with every required leaf covered or blocked by a filed decision.
+- **Done**: two clean rounds in a row with every required leaf covered or blocked by a filed decision. A clean round has no hard failure, selects no defect and merges no enhancement. An enhancement the gate rejects leaves the round clean.
 - **Stopped incomplete**: after the round cap (5), or after a round that makes no progress (grades and leaf results unchanged).
 
 ## 8. Review packet (for the owner)
