@@ -1,0 +1,18 @@
+[
+  {
+    "id": "sections",
+    "name": "Sections",
+    "use": "Use to narrow a list by facets that each need a title: a range, a segmented row.",
+    "notUse": "Not for tags that change by job (use FilterChips) or fixed views (use Segment)",
+    "states": ["Default", "Active", "Pressed", "Long / Chinese"],
+    "usedBy": ["farrowing.room"]
+  },
+  {
+    "id": "fields",
+    "name": "Fields",
+    "use": "Use to narrow a list by a few pick-one fields that carry their own labels.",
+    "notUse": "Not for a range or a segmented row with a help line (use Sections)",
+    "states": ["Default", "Active"],
+    "usedBy": ["inspection.filters"]
+  }
+]

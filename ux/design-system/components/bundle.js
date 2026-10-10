@@ -1,4 +1,4 @@
-/* @ds-bundle: {"format":4,"namespace":"SentriUI","components":[{"name":"Heading"},{"name":"Panel"},{"name":"Facts"},{"name":"Row"},{"name":"Log"},{"name":"Segment"},{"name":"IconButton"},{"name":"Button"},{"name":"Field"},{"name":"PickerField"},{"name":"ChoiceList"},{"name":"CategoryFooter"},{"name":"Sheet"},{"name":"Icon"},{"name":"Stepper"},{"name":"Measure"},{"name":"Numpad"},{"name":"Status"},{"name":"ConditionTag"},{"name":"Banner"},{"name":"Photos"}]} */
+/* @ds-bundle: {"format":4,"namespace":"SentriUI","components":[{"name":"Heading"},{"name":"Panel"},{"name":"Facts"},{"name":"Row"},{"name":"Log"},{"name":"Segment"},{"name":"IconButton"},{"name":"Button"},{"name":"Field"},{"name":"PickerField"},{"name":"ChoiceList"},{"name":"CategoryFooter"},{"name":"Sheet"},{"name":"FilterSheet"},{"name":"RangeSlider"},{"name":"Icon"},{"name":"Stepper"},{"name":"Measure"},{"name":"Numpad"},{"name":"Status"},{"name":"ConditionTag"},{"name":"Banner"},{"name":"Photos"}]} */
 /* SentriIcons (sentri-icons.js) and the SentriUI parts, in one file. */
 /* Shared icon registry for the Sentri prototypes. One path vocabulary so every
    app renders the same glyphs; apps keep a local fallback for source-only checks. */
@@ -977,7 +977,56 @@
     e.preventDefault();e.stopImmediatePropagation();const target=buttons.find(x=>x.dataset.value===next);target.click();
     const fresh=Array.from(host.querySelectorAll('[data-ds="Segment"] button,[data-ds="FilterChips"] button')).find(x=>x.dataset.action===b.dataset.action&&x.dataset.value===next);fresh?.focus();fresh?.scrollIntoView({block:'nearest',inline:'nearest'});
   },true);
-  const api=Object.freeze({optionalRow,heading,panel,facts,row,rowGroup,log,logDay,logStamp,logGroups,categoryFooter,field,pickerField,pickerOptions,pickerBody,pickerFooter,filterChips,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowSelectDoor,rowAction,rowSelectChange,status,conditionTag,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
+  /* RangeSlider: two round handles on one track, for a from-to range of whole steps (a due range, a weight band).
+     rangeSlider({ min, max, step, value:[from,to], title, icon, key, names:['from','to'], labels:[first handle, second handle],
+     format(n) → the word for one value (also each handle's aria-valuetext), summary(from,to) → the line under the title,
+     ends:[left, middle, right] }). The track is two native range inputs, so the keyboard and screen readers come free; the whole
+     48px rail takes the touch (the nearest handle moves), so a glove never has to hit the 32px handle. A change moves the fill,
+     the value line and the aria text, then fires `sentri-range-change` { key, values:{from,to} } for the host to read. */
+  const rangeFormats=new Map(),rangeClamp=(n,lo,hi)=>Math.max(lo,Math.min(hi,n));
+  const rangeLine=(f,a,b)=>f.summary?f.summary(a,b):(a===b?f.format(a):f.format(a)+' – '+f.format(b));
+  const rangeVars=(a,b,min,max)=>`--from:${(a-min)/(max-min)*100}%;--to:${(b-min)/(max-min)*100}%`;
+  function rangeSlider({min=0,max=10,step=1,value=[min,max],title='',icon='',key='range',names=['from','to'],labels=['Lowest','Highest'],format=String,summary=null,ends=[],className=''}={}){
+    if(!(max>min&&step>0))throw new RangeError('RangeSlider requires max > min and step > 0');
+    const v=value.map(x=>rangeClamp(min+Math.round((Number(x)-min)/step)*step,min,max)).sort((a,b)=>a-b),f={format,summary};
+    rangeFormats.set(key,f);
+    return `<div class="st-range${className?' '+esc(className):''}" data-ds="RangeSlider" data-key="${esc(key)}" data-names="${esc(names.join(','))}"><div class="st-range-head">${title?heading({title,icon,kind:'section',level:4,className:'st-range-title'}):''}<output class="st-range-value">${esc(rangeLine(f,v[0],v[1]))}</output></div><div class="st-range-rail" style="${rangeVars(v[0],v[1],min,max)}"><div class="st-range-track"></div>${v.map((x,i)=>`<input type="range" min="${min}" max="${max}" step="${step}" value="${x}" data-range="${esc(names[i])}" aria-label="${esc(labels[i])}" aria-valuetext="${esc(format(x))}">`).join('')}</div>${ends.length?`<div class="st-range-ends">${ends.map(t=>`<span>${esc(t)}</span>`).join('')}</div>`:''}</div>`;
+  }
+  function rangeSet(root,input,n){
+    const ins=[...root.querySelectorAll('input[type="range"]')],i=ins.indexOf(input),min=+input.min,max=+input.max,step=+input.step,f=rangeFormats.get(root.dataset.key)||{format:String};
+    n=rangeClamp(min+Math.round((n-min)/step)*step,min,max);input.value=n;
+    if(i===0&&n>+ins[1].value)ins[1].value=n;if(i===1&&n<+ins[0].value)ins[0].value=n;
+    const a=+ins[0].value,b=+ins[1].value;
+    root.querySelector('.st-range-rail').style.cssText=rangeVars(a,b,min,max);
+    ins.forEach(x=>x.setAttribute('aria-valuetext',f.format(+x.value)));
+    root.querySelector('.st-range-value').textContent=rangeLine(f,a,b);
+    const names=root.dataset.names.split(',');
+    root.dispatchEvent(new CustomEvent('sentri-range-change',{bubbles:true,detail:{key:root.dataset.key,values:{[names[0]]:a,[names[1]]:b}}}));
+  }
+  /* FilterSheet: the drawer that narrows a list. It is a Sheet with Reset in the head and, in the footer, Back (keeps the draft)
+     and the one commit, whose label carries the live count ("Show 4 sows"; the host rewrites it as the draft changes).
+     filterSheet({ title, subtitle, sections:[{ title, icon, content, help }] | body, apply:{label, action}, reset:{label, action},
+     backAction, closeAction, className, size }). A section is a titled group; sections come as the host's own controls
+     (a rangeSlider, a segment) so the sheet owns only the frame, the spacing and the exits. Without `sections`, `body` is used as is. */
+  function filterSheet({title='Filter',subtitle='',sections=[],body='',apply={},reset={},backAction='filter-back',closeAction='',className='',size='medium',label}={}){
+    const exit=closeAction||backAction,list=sections.map(x=>`<section class="st-filter-section">${x.title?heading({title:x.title,icon:x.icon||'',kind:'section',level:4,className:'st-filter-title'}):''}${x.content||''}${x.help?`<p class="st-filter-help">${esc(x.help)}</p>`:''}</section>`).join('');
+    return sheet({title,subtitle,size,label:label||title,className:'st-filter-sheet'+(className?' '+esc(className):''),aside:button({label:reset.label||'Reset',register:'text',action:reset.action||'filter-reset'}),body:list||body,footer:sheetFooter({content:backButton({action:backAction})+button({label:apply.label||'Show',register:'primary',action:apply.action||'filter-apply'})}),close:{action:exit,label:'Close '+title},scrim:{action:exit,label:'Dismiss '+title}});
+  }
+  if(typeof document!=='undefined'){
+    let drag=null;
+    const rangeValue=(rail,e)=>{const r=rail.getBoundingClientRect(),a=rail.querySelector('input');return +a.min+rangeClamp((e.clientX-r.left)/r.width,0,1)*(+a.max-+a.min);};
+    document.addEventListener('input',e=>{const i=e.target.closest?.('.st-range input[type="range"]');if(i)rangeSet(i.closest('.st-range'),i,+i.value);});
+    document.addEventListener('pointerdown',e=>{
+      const rail=e.target.closest?.('.st-range-rail');if(!rail||e.button!==0)return;
+      e.preventDefault();const ins=[...rail.querySelectorAll('input')],n=rangeValue(rail,e),lo=+ins[0].value,hi=+ins[1].value;
+      const input=Math.abs(n-lo)<Math.abs(n-hi)||lo===hi&&n<=lo?ins[0]:ins[1];
+      drag={rail,input};rail.setPointerCapture(e.pointerId);input.focus({preventScroll:true});rangeSet(rail.closest('.st-range'),input,n);
+    });
+    document.addEventListener('pointermove',e=>{if(drag)rangeSet(drag.rail.closest('.st-range'),drag.input,rangeValue(drag.rail,e));});
+    const end=()=>{drag=null;};
+    document.addEventListener('pointerup',end);document.addEventListener('pointercancel',end);if(typeof globalThis.addEventListener==='function')globalThis.addEventListener('blur',end);
+  }
+  const api=Object.freeze({rangeSlider,filterSheet,optionalRow,heading,panel,facts,row,rowGroup,log,logDay,logStamp,logGroups,categoryFooter,field,pickerField,pickerOptions,pickerBody,pickerFooter,filterChips,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowSelectDoor,rowAction,rowSelectChange,status,conditionTag,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
   root.SentriUI=api;
   if(typeof module!=='undefined')module.exports=api;
 })(globalThis);

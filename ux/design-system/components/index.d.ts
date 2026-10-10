@@ -743,3 +743,7 @@ export type IconName =
 declare global {
   interface Window { SentriUI: SentriUI; SentriIcons: SentriIcons }
 }
+
+export interface RangeSliderProps { min?:number; max?:number; step?:number; value?:[number,number]; title?:string; icon?:string; key?:string; names?:[string,string]; labels?:[string,string]; format?:(value:number)=>string; summary?:(from:number,to:number)=>string; ends?:string[]; className?:string }
+export interface FilterSheetProps { title?:string; subtitle?:string; sections?:{title?:string;icon?:string;content?:string;help?:string}[]; body?:string; apply?:{label?:string;action?:string}; reset?:{label?:string;action?:string}; backAction?:string; closeAction?:string; className?:string; size?:'compact'|'short'|'medium'|'long'; label?:string }
+export interface SentriUI { rangeSlider(props?:RangeSliderProps):string; filterSheet(props?:FilterSheetProps):string }

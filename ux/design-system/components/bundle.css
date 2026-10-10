@@ -717,3 +717,22 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
 .field{font-family:var(--font-sans)}
 /* Surface consumers own layout; Panel owns border, radius and context fill. */
 .st-panel.pen-card{padding:0;box-shadow:none}
+
+/* FilterSheet: a Sheet that narrows a list. Sections sit 28 apart; the last one has no gap before the footer. */
+.st-filter-section{margin:0 0 var(--space-28);padding:0}
+.st-filter-section:last-child{margin-bottom:0}
+.st-filter-help{margin:var(--space-10) 0 0;font-size:var(--type-description-size);line-height:1.7;color:var(--muted)}
+
+/* RangeSlider: two native range inputs laid over one track. The rail is 48px tall and takes the whole touch (the nearest handle moves),
+   so the 32px handle is never the target. */
+.st-range-head{display:flex;flex-direction:column;gap:var(--space-7);margin-bottom:var(--space-14)}
+.st-range-value{font-size:var(--type-choice-meta-size);line-height:1.6;color:var(--muted);min-height:var(--size-20);font-variant-numeric:tabular-nums}
+.st-range-rail{position:relative;height:var(--tap-min);margin:var(--space-16) var(--space-16) 0;touch-action:none;cursor:ew-resize}
+.st-range-track{position:absolute;left:0;right:0;top:var(--size-22);height:var(--size-4);border-radius:var(--radius-4);background:linear-gradient(to right,var(--line) 0 var(--from),var(--range-fill) var(--from) var(--to),var(--line) var(--to) 100%)}
+.st-range-rail input[type=range]{position:absolute;inset:0;width:calc(100% + var(--space-32));left:calc(-1 * var(--space-16));height:var(--tap-min);padding:0;margin:0;appearance:none;-webkit-appearance:none;pointer-events:none;background:transparent;accent-color:var(--range-fill)}
+.st-range-rail input[type=range]:focus-visible{outline:none}
+.st-range-rail input[type=range]::-webkit-slider-runnable-track{height:var(--size-4);background:transparent}
+.st-range-rail input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;width:var(--space-32);height:var(--space-32);margin-top:calc(-1 * var(--size-14));background:var(--paper);border:calc(1.5 * var(--border-width)) solid var(--range-handle);border-radius:50%;box-shadow:var(--shadow-handle);pointer-events:auto;cursor:ew-resize}
+.st-range-rail input[type=range]::-moz-range-track{height:var(--size-4);background:transparent}
+.st-range-rail input[type=range]::-moz-range-thumb{width:var(--space-32);height:var(--space-32);background:var(--paper);border:calc(1.5 * var(--border-width)) solid var(--range-handle);border-radius:50%;pointer-events:auto;cursor:ew-resize}
+.st-range-ends{display:flex;justify-content:space-between;font-size:var(--type-range-end-size);color:var(--muted);margin:0 0 var(--space-17)}
