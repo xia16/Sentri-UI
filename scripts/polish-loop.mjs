@@ -31,9 +31,10 @@ const load = () => { if (!fs.existsSync(ledgerFile)) { console.error(`no loop fo
 const save = (l) => fs.writeFileSync(ledgerFile, JSON.stringify(l, null, 2));
 
 // Evidence is only good for the commit it was taken on, and a round starts on main as it is now.
+// SENTRI_LOOP_TEST_MAIN=HEAD tests these scripts on a branch; a real loop never sets it.
 function onMain() {
   sh('git', ['fetch', '-q', 'origin']);
-  const main = sh('git', ['rev-parse', 'origin/main']).stdout.trim();
+  const main = sh('git', ['rev-parse', process.env.SENTRI_LOOP_TEST_MAIN || 'origin/main']).stdout.trim();
   const dirty = sh('git', ['status', '--porcelain', '--untracked-files=no']).stdout.trim();
   if (head() !== main || dirty) {
     console.error(`run this on a clean checkout of origin/main (${main.slice(0, 7)}); HEAD is ${head().slice(0, 7)}${dirty ? ' with local changes' : ''}.\n  git switch --detach origin/main`);
@@ -41,6 +42,9 @@ function onMain() {
   }
   return main;
 }
+
+// The checks rewrite tracked reports (review/legibility.json, review/scenarios-*.json); a ledger checkout stays clean.
+const restoreReview = () => sh('git', ['checkout', '--', 'review']);
 
 function shoot(out) {
   const r = sh(process.execPath, ['scripts/shoot-screens.mjs', out, '--feature', feature, '--widths', '390,360', '--langs', 'en,zh'], { stdio: ['ignore', 'pipe', 'inherit'] });
@@ -80,6 +84,7 @@ if (cmd === 'start') {
     const r = spawnSync(`npm ${args.join(' ')}`, { cwd: root, encoding: 'utf8', shell: true, maxBuffer: 64 << 20 });
     if (r.status) { console.error(`${name} fails on the baseline ${baseline.slice(0, 7)}: fix main before a loop starts\n${(r.stdout + r.stderr).trim().split('\n').slice(-6).join('\n')}`); process.exit(1); }
   }
+  restoreReview();
   const s = shoot(path.join(dir, 'r0'));
   save({ feature, job: opt('job') || 'polish', baseline, cap: Number(opt('cap')) || 5, started: new Date().toISOString(), screens: screens().map((x) => x.id), zhIgnored: s.zhIgnored, decisions: [], rounds: [] });
   console.log(`loop ${feature} started on ${baseline.slice(0, 7)}: ${screens().length} screens shot at 390/360 × en/zh (${s.tail})`);
@@ -99,6 +104,7 @@ if (cmd === 'round') {
   fs.rmSync(out, { recursive: true, force: true });
   const s = shoot(out);
   const evidence = { n, start, at: new Date().toISOString(), legibility: legibility(out), leaves: leaves(out), shotFailures: s.failed.map((x) => `${x.screen} ${x.lang}-${x.width}: ${x.error}`) };
+  restoreReview();
   fs.writeFileSync(path.join(out, 'evidence.json'), JSON.stringify(evidence, null, 2));
   l.rounds.push({ n, start, recorded: false });
   save(l);
