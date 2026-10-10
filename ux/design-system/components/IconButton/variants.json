@@ -7,7 +7,6 @@
     "states": [
       "Default",
       "Pressed",
-      "Focus",
       "Disabled",
       "Long / Chinese",
       "Selected",
@@ -22,7 +21,6 @@
     "states": [
       "Default",
       "Pressed",
-      "Focus",
       "Disabled",
       "Long / Chinese",
       "Selected",

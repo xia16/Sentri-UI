@@ -40,7 +40,7 @@ Status is text and holds no action, so most interaction states do not apply.
 | State | Chip | Word | Line |
 |---|---|---|---|
 | Default (one per kind) | drawn, 6 kinds | drawn, 6 kinds | drawn |
-| Pressed, focus | none: the Row or Button around it owns them | same | same |
+| Pressed | none: the Row or Button around it owns them | same | same |
 | Selected, disabled | none: a state is a fact, not a control | same | same |
 | Error, loading | none: a pending upload is the amber word `waiting to upload` | same | same |
 | Empty | absent: a row with nothing to flag has no chip | same | same |
@@ -63,7 +63,7 @@ Status is text and holds no action, so most interaction states do not apply.
 
 ## Accessibility
 - Chip and word are plain text: the state is read in order with the row. The chip's icon is `aria-hidden`; the word is always there, so colour and icon are never the only cue.
-- A live line is `role="status"`, `aria-live="polite"`, `aria-atomic`. Status takes no focus and has no keyboard behaviour.
+- A live line is `role="status"`, `aria-live="polite"`, `aria-atomic`. Status is not a control.
 - Contrast: every tone holds 4.5:1 or more on its wash. Nothing here is a tap target; the 48px floor belongs to the Row that carries it.
 
 ## Do / Don't

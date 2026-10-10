@@ -33,7 +33,7 @@ Facts are static text.
 | State | Rendering |
 |---|---|
 | Default | label over value |
-| Pressed, selected, disabled, focus, error, loading | none: facts hold no controls |
+| Pressed, selected, disabled, error, loading | none: facts hold no controls |
 | Empty value | `null` or blank renders an em dash `—`. `0` is a value and renders `0` |
 | Empty set | the whole panel is absent when every fact is missing |
 | Long value | wraps at word breaks; an ID (`mono: true`) never breaks mid-ID |
@@ -41,7 +41,7 @@ Facts are static text.
 
 ## Behaviour
 
-None. Facts have no focus stop and no click handler.
+None. Facts have no click handler.
 
 ## Content rules
 
@@ -54,7 +54,7 @@ None. Facts have no focus stop and no click handler.
 ## Accessibility
 
 - Role: a description list (`dl` with `dt` label and `dd` value), so a screen reader reads each pair together.
-- No focus stop, no keyboard behaviour.
+- Nothing to operate: the screen reader reads it as a list.
 - Target size: not applicable, because there are no targets. This is why a tappable fact is forbidden: a 26px `›` inside a cell fails the glove floor.
 
 ## CSS variables

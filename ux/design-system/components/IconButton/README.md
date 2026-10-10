@@ -27,7 +27,6 @@ Use [Button](../Button/README.md) for Record, Move or Set count. Use [ChoiceList
 | --- | --- |
 | Default | Label or glyph at rest. |
 | Pressed | Visible press fill / darkening and movement; static examples use `data-preview="pressed"`. |
-| Focus | Token focus ring; static `data-preview="focus"`. |
 | Disabled | Persistent text reason via `reason` or `describedby`; never colour alone. Prefer omitting unavailable acts. |
 | Long / Chinese | The target stays 48 x 48; the accessible name stays complete in both languages. |
 | Selected | Optional `aria-pressed` plus a visible check, for the breeder mark. |
@@ -47,11 +46,6 @@ Aim for an accessible name within 64 English characters or 32 Chinese characters
 
 ## Accessibility
 
-| Input | Behaviour |
-| --- | --- |
-| Tab / Shift+Tab | Moves focus among controls; visible token ring. |
-| Enter / Space | Native activation. |
-
 Native `button` role; the glyph is `aria-hidden`, so `aria-label` is required and names the act and what it acts on ("Close pen sheet", not "Close"). A disabled icon stays focusable with `aria-disabled` and a visible reason. Targets use `tap-min`, never less than 48 × 48. Respect reduced motion.
 
 ## Do / don’t
@@ -62,7 +56,7 @@ Do use a glyph people already know, and name what closes or opens in the label. 
 
 Implementation: [bundle.js](../bundle.js), [bundle.css](../bundle.css), [index.d.ts](../index.d.ts). Factories return HTML; event delegation and business writes belong to the host. Existing `action`, `value`, `badge` and `className` signatures remain supported; variant selection belongs to this factory.
 
-Geometry/type: `tap-min`, `radius-control`, `border-width`, `size-2`, `size-3`, `type-description-size`. Colour/state: `ink`, `paper`, `line`, `disabled-ink`, `press`, `focus`. The reason line uses Button’s shared tokens.
+Geometry/type: `tap-min`, `radius-control`, `border-width`, `size-2`, `size-3`, `type-description-size`. Colour/state: `ink`, `paper`, `line`, `disabled-ink`, `press`. The reason line uses Button’s shared tokens.
 
 ## Related components
 

@@ -30,7 +30,6 @@ Visible label; trigger value, chosen names (record forms) or count (filters); tr
 | Pressed | `choice-press`; static `pressed` prop for rows and triggers. |
 | Selected / active | Trailing check, checkbox or ring plus stronger label; trigger shows the picked value or path (never the field label), the chosen names (record forms) or a count (filters). |
 | Disabled | Prefer omission. If needed, retain readable text and a persistent reason; `aria-disabled`, no dimming. Host rejects activation and announces the reason. |
-| Focus | `focus` ring; keyboard focus never depends on colour alone. |
 | Error | Picker trigger has `aria-invalid`, border and persistent corrective text. ChoiceList is not a validated field: host supplies the field error. |
 | Loading | Busy trigger and Loading options status; selection unavailable until loaded. |
 | Empty | No options available or search-specific no-match status. Never a blank panel. |
@@ -42,7 +41,7 @@ Every declared state is in `variants/<id>.html`; these documents rely on atlas-i
 
 Show at most eight rows before using a scrollable catalogue and search. Search is required above eight leaves and spans the entire tree, including aliases and path labels. Do not duplicate selected leaves in a second list or disclosure. Multi triggers on a record form (the chosen items are the record, as on Record health) show the chosen names, wrapping to two lines, then “+n”; only filters show “n selected”. Ticks stay visible in their original rows. Group counts describe selected descendants and appear only above zero; categories in a single cascade carry no count.
 
-Cascade opens one level at a time; choosing a branch auto-advances. Tappable steps reopen earlier levels; changing a branch replaces the downstream path without clearing ticks in other branches. A single leaf writes its complete path back to the trigger. Multi keeps one exit pair that says different things: **Back** leaves the sheet and keeps the draft selection on the device (pure navigation, per the Back verb law); **Done · n** confirms it; a **Clear** text action, where offered, discards it. A single pick commits at once, so single sheets have Back only and no Done. Modal hosts use one active dialog, inert background, focus trapping, Escape → Back, and return focus to the trigger.
+Cascade opens one level at a time; choosing a branch auto-advances. Tappable steps reopen earlier levels; changing a branch replaces the downstream path without clearing ticks in other branches. A single leaf writes its complete path back to the trigger. Multi keeps one exit pair that says different things: **Back** leaves the sheet and keeps the draft selection on the device (pure navigation, per the Back verb law); **Done · n** confirms it; a **Clear** text action, where offered, discards it. A single pick commits at once, so single sheets have Back only and no Done. Modal hosts use one active dialog, inert background, focus trapping, and return focus to the trigger.
 
 ## Content rules
 
@@ -50,13 +49,13 @@ Sentence case, farm vocabulary, nouns for options. Aim for labels ≤32 English 
 
 ## Accessibility
 
-Whole rows and every step, footer and Clear action meet `tap-min`. Buttons use Enter/Space and Tab; checkboxes use native Space and an enclosing row label. Single catalogue buttons expose `aria-pressed`; radio rows use `radio` within a labelled `radiogroup`, `aria-checked` and roving tabindex. `radioBind` supports arrows, Home and End. Navigation buttons expose the next-level action. Search uses `type=search` and an accessible label. Reasons persist via meta / `aria-describedby`; error and loading text use a status region. A visible focus ring is required in the modal host.
+Whole rows and every step, footer and Clear action meet `tap-min`. Checkboxes use an enclosing row label. Single catalogue buttons expose `aria-pressed`; radio rows use `radio` within a labelled `radiogroup`, `aria-checked` and a roving tab stop. Navigation buttons expose the next-level action. Search uses `type=search` and an accessible label. Reasons persist via meta / `aria-describedby`; error and loading text use a status region.
 
 ## API and tokens
 
 Implementation: `../bundle.js`, `../bundle.css`, types in `../index.d.ts`. Legacy call signatures remain supported. `pickerOptions` is a compatibility adapter to ChoiceList, not another row renderer. `pickerBody` takes controlled `items` (value, label, children?, aliases?, meta?, attrs?), `path`, `selected`, `query`, action and stepAction. Hosts append a branch value or slice the path at a step; leaf selection toggles only in multi. `pickerFooter` renders the sole exit pair. Hosts own data, persistence and modal lifecycle. Keep display paths separate from recorded ids/names. Breadcrumb activation clears search and reopens the requested level. Multi inputs emit native change with `value` and `checked`; branch buttons emit `data-action` and `data-value`. `secondaryAction` exposes a separately named removal control for session-defined options. Do not route checkbox clicks through the branch action.
 
-Tokens: `tap-min`, `choice-row-min`, `radio-row-min`, `field-height`, `radius-control`, `control-border`, `rule`, `paper`, `ink`, `muted`, `green`, `choice-press`, `disabled-surface`, `disabled-ink`, `focus`, `red`, `font-sans`, `font-size-14`, `type-weight-strong`, `space-8`, `space-12`, `size-20`, `size-24`. No per-screen trigger sizing.
+Tokens: `tap-min`, `choice-row-min`, `radio-row-min`, `field-height`, `radius-control`, `control-border`, `rule`, `paper`, `ink`, `muted`, `green`, `choice-press`, `disabled-surface`, `disabled-ink`, `red`, `font-sans`, `font-size-14`, `type-weight-strong`, `space-8`, `space-12`, `size-20`, `size-24`. No per-screen trigger sizing.
 
 Shared copy (Select, None, counts, All, Done, loading and empty) has English/Chinese registry ids in `ux/laws/strings.json`; hosts resolve `data-str` / `data-args` and search `data-str-attr`, or supply localized search copy through `choiceSearch`. Item labels/meta accept `strs` / `args`.
 
@@ -77,7 +76,7 @@ Component: generic and shared across sections. Selection modes are variants of t
 
 ## References
 
-The one-level, auto-advance and tappable-step model follows Ant Design Mobile Cascader and TDesign Mobile step Cascader, with Apple/Material guidance for containment, keyboard and dismissal, as recorded in [the component standard, section 4.5](../../../../docs/design-workflow/research/component-standard.md). Sentri uses its own `tap-min` floor rather than smaller library defaults.
+The one-level, auto-advance and tappable-step model follows Ant Design Mobile Cascader and TDesign Mobile step Cascader, with Apple/Material guidance for containment and dismissal, as recorded in [the component standard, section 4.5](../../../../docs/design-workflow/research/component-standard.md). Sentri uses its own `tap-min` floor rather than smaller library defaults.
 
 ## Changelog
 

@@ -248,7 +248,7 @@ export interface StepperProps {
   action?: string;
   /** row: inline record (default) · count: primary screen count · well: foster/reconcile. hero is a compatibility alias for count. */
   variant?: 'row' | 'count' | 'well' | 'hero';
-  disabled?: boolean; reason?: string; error?: string; loading?: boolean; pressed?: boolean; focus?: boolean; status?: string; hintHtml?: string;
+  disabled?: boolean; reason?: string; error?: string; loading?: boolean; pressed?: boolean; status?: string; hintHtml?: string;
   /** A corrected value in Edit, amber plus the word Corrected. `tone: 'changed'` is accepted as an alias. */
   changed?: boolean;
   /** The value carries an unsaved staged addition (dead drawer): green plus a status receipt (pass the actual delta in status). Wins over changed.
@@ -425,7 +425,7 @@ export interface PhotoItem { id?: string; src?: string; alt?: string; pending?: 
 export interface PhotosProps {
   adding?: boolean;
   disabledReason?: string;
-  preview?: 'pressed' | 'focus' | '';
+  preview?: 'pressed' | '';
   label?: string;
   optional?: string;
   /** The count and upload state beside the label: `3 attached · 1 waiting to upload`. */

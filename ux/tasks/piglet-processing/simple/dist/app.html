@@ -416,14 +416,12 @@
 body{margin:0;background:var(--ground);color:var(--ink);font:var(--font-size-14) var(--font-sans);-webkit-font-smoothing:antialiased}
 button,input,select{font:inherit}
 button{cursor:pointer;color:inherit;border:0}
-button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:var(--size-3) solid var(--focus-strong);outline-offset:var(--size-3)}
 button:disabled,button[aria-disabled=true]{cursor:default;color:var(--disabled-ink);background:var(--disabled-surface);border-color:var(--disabled-border)}
 svg{width:var(--size-20);height:var(--size-20);display:block;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:var(--icon-stroke);stroke-linecap:round;stroke-linejoin:round;pointer-events:none}
 .button{min-height:var(--tap-min);min-width:var(--tap-min);padding:var(--space-10) var(--space-17);display:flex;align-items:center;justify-content:center;gap:var(--space-7);border:var(--border-width) solid var(--control-border);background:var(--paper);border-radius:var(--radius-control);font-weight:var(--type-weight-strong);font-size:var(--type-button-size);text-align:center;line-height:1.3}
 .button.primary{flex:1;background:var(--ink);border-color:var(--ink);color:var(--paper)}
 .button.primary:disabled{background:var(--disabled-fill);border-color:var(--disabled-fill);color:var(--disabled-ink)}
 .button.secondary{min-width:var(--back-width);font-weight:600}
-.button:hover:not(:disabled){filter:brightness(.96)}
 .button:active:not(:disabled){transform:translateY(var(--size-2))}
 .button.danger:not(:disabled):not([aria-disabled="true"]){background:var(--red);border-color:var(--red)}
 .icon-button{background:transparent;min-width:var(--tap-min);height:var(--tap-min);display:grid;place-items:center;border-radius:var(--radius-control);position:relative}
@@ -561,7 +559,6 @@ body{background:var(--ground);color:var(--ink)}
 :is(.farrowing-phone,.inspection-phone) :is(.button,.key){font-weight:500;border-radius:var(--radius-12);min-height:var(--tap-min)}
 :is(.farrowing-phone,.inspection-phone) .button.secondary{background:var(--paper);border-color:var(--control-border);color:var(--ink)}
 :is(.farrowing-phone,.inspection-phone) .button.primary:not(:disabled):not([aria-disabled="true"]){background:var(--ink);border-color:var(--ink);color:var(--paper)}
-:is(.farrowing-phone,.inspection-phone) :is(button,a,input,select,textarea,summary):focus-visible{outline:var(--size-3) solid var(--focus);outline-offset:var(--size-2)}
 /* Action semantics remain explicit; destructive controls never inherit the green treatment. */
 :is(.farrowing-phone,.inspection-phone) .button:is(.danger,.task-end-confirm):not(:disabled):not([aria-disabled="true"]){background:var(--red);border-color:var(--red);color:var(--paper)}
 @media(max-width:370px){
@@ -653,7 +650,6 @@ button.st-row[aria-current="location"]{background:var(--green-wash);box-shadow:i
 /* Screen-level controls follow the existing footer/back contract. */
 :is(.inspection-phone,.farrowing-phone,.device) :is(.button.primary,.primary-button,.lifecycle-primary):not(:disabled):not([aria-disabled="true"]):not(.danger):not(.task-end-confirm){background:var(--ink);border-color:var(--ink);color:var(--paper)}
 :is(.inspection-phone,.farrowing-phone) .button.task-complete:not(:disabled){background:var(--ink);border-color:var(--ink);color:var(--paper)}
-:is(.st-row,.st-heading-action button,.st-heading-action a):focus-visible{outline:var(--size-3) solid var(--focus);outline-offset:calc(-1 * var(--size-3))}
 .device .page-head .st-heading{margin:0}
 .device :is(.page-footer,.sheet-body,.environment-page,.maintenance-page) .primary:not(:disabled){background:var(--st-ink);border-color:var(--st-ink);color:var(--paper)}
 @media(max-width:370px){.st-panel,.st-facts.st-facts,.st-log.st-log{padding:var(--space-12)}.st-panel.st-row-group{padding:0}.st-heading{gap:var(--space-8)}.st-row.st-row{padding-left:var(--space-12);padding-right:var(--space-12)}}
@@ -679,7 +675,6 @@ button.st-row[aria-current="location"]{background:var(--green-wash);box-shadow:i
 .st-category-footer .st-category-tabs button[aria-current="location"]{background:transparent;color:var(--tab-ink-active);font-weight:700}
 .st-category-tabs button[aria-current="location"]:after{content:"";position:absolute;bottom:var(--border-width);left:var(--space-8);right:var(--space-8);height:var(--size-3);border-radius:var(--radius-2);background:var(--current-marker)}
 .st-category-footer .st-category-tabs button:is(:active,[data-preview="pressed"]){background:var(--press)}
-.st-category-tabs button:is(:focus-visible,[data-preview="focus"]){outline:var(--size-3) solid var(--focus);outline-offset:calc(-1 * var(--size-3))}
 @container(max-width:310px){.st-category-footer .st-category-tabs button{padding-left:var(--space-4);padding-right:var(--space-4);font-size:var(--font-size-11)}}
 
 /* Picker field: the mobile-standard choice control that replaces native selects.
@@ -752,8 +747,6 @@ button.st-row[aria-current="location"]{background:var(--green-wash);box-shadow:i
 /* the floor-gray: a key with nothing to do (DS README, States) */
 .st-stepper-key[aria-disabled="true"] .st-stepper-face,.st-numpad-key.st-numpad-key[aria-disabled="true"]{background:var(--disabled-fill);border-color:var(--disabled-fill);color:var(--disabled-ink);cursor:default}
 .st-stepper-key:not([aria-disabled="true"]):is(:active,[data-preview~="pressed"]) .st-stepper-face,.st-numpad-key.st-numpad-key:not([aria-disabled="true"]):is(:active,[data-preview~="pressed"]){transform:scale(.96);background:var(--press);border-color:var(--ink-2)}
-.st-stepper-key.st-stepper-key:focus-visible{outline:none}
-:is(.st-stepper-key:focus-visible,.st-stepper-key[data-preview~="focus"]) .st-stepper-face,:is(.st-numpad-key,.st-measure-box,.st-stepper-value,.st-text-action):is(:focus-visible,[data-preview~="focus"]){outline:var(--size-3) solid var(--focus);outline-offset:var(--size-2)}
 .st-field-hint.st-field-hint{display:flex;align-items:center;flex-wrap:wrap;gap:var(--space-6);margin:0;padding:0;font:400 var(--type-input-size)/1.4 var(--font-sans);color:var(--muted)}
 .st-field-hint[data-reserve="text"]{min-height:calc(var(--type-input-size) * 1.4)}
 .st-field-hint[data-reserve="action"]{min-height:var(--tap-min)}
@@ -891,7 +884,6 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 .st-row.st-row[data-act]{padding-top:0;padding-bottom:0}
 .st-row-door.st-row-door{display:flex;align-items:center;gap:var(--space-row-y);flex:1;min-width:0;align-self:stretch;min-height:var(--row-min);margin:0;padding:0;border:0;border-radius:0;background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer}
 .st-row-door:active{background:var(--press)}
-.st-row-door:is(:focus-visible,[data-preview~="focus"]){outline:var(--size-3) solid var(--focus);outline-offset:var(--size-2)}
 .st-row.st-row .st-row-door strong{display:flex;align-items:center;gap:var(--space-4)}
 .st-row-door-chevron{display:flex;flex:none;color:var(--muted)}
 .st-row-door-chevron svg{width:var(--glyph-key);height:var(--glyph-key);stroke-width:var(--icon-stroke)}
@@ -903,7 +895,6 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 .st-text-action.st-text-action{justify-content:flex-start;min-width:var(--tap-min)}
 .st-text-action:not([aria-disabled="true"]):is(:active,[data-preview~="pressed"]){color:var(--ink);background:var(--press);border-radius:var(--radius-control)}
 .st-text-action.st-text-action[aria-disabled="true"]{color:var(--disabled-ink);background:transparent;cursor:default}
-.button:is(:focus-visible,[data-preview~="focus"]){outline:var(--size-3) solid var(--focus);outline-offset:var(--size-2)}
 /* waiting: present, quiet, focusable (aria-disabled); outranks every register's fill */
 .button.button[aria-disabled="true"]{background:var(--disabled-fill);border-color:var(--disabled-fill);color:var(--disabled-ink);cursor:default;filter:none;transform:none}
 .st-button-reason.st-button-reason{flex-basis:100%;font-size:var(--type-row-title-size);border-radius:var(--radius-control);transition:background 1100ms ease-out,box-shadow 1100ms ease-out}
@@ -935,7 +926,6 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 .st-choice-heading-row>.st-choice-heading.st-choice-heading{flex:1;min-width:0;padding-bottom:0}
 .st-choice-group>.st-choice-heading-row{margin-bottom:var(--space-4)}
 .st-choice-row.st-choice-row[data-mode="radio"]:is(:active,[data-preview~="pressed"]){background:var(--choice-press)}
-.st-choice-row.st-choice-row[data-mode="radio"]:is(:focus-visible,[data-preview~="focus"]){outline:var(--size-3) solid var(--focus);outline-offset:calc(-1 * var(--size-3))}
 .st-choice-inline{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;column-gap:var(--space-row-y);min-height:var(--stepper-row-min)}
 .st-choice-inline-clear{display:flex;min-height:var(--tap-min)}
 .st-choice-inline-label{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;font:600 var(--type-choice-label-size)/1.4 var(--font-sans);color:var(--ink)}
@@ -945,7 +935,6 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 .st-choice-inline-opt.st-choice-inline-opt{display:flex;align-items:center;gap:var(--space-key-gap);min-width:var(--back-width);min-height:var(--stepper-row-min);margin:0;padding:0 var(--space-row-y);border:0;border-radius:var(--radius-control);background:transparent;color:var(--ink);font:500 var(--type-choice-label-size)/1.4 var(--font-sans);cursor:pointer;touch-action:manipulation}
 .st-choice-inline-opt[aria-checked="true"]{font-weight:var(--type-weight-strong)}
 .st-choice-inline-opt:is(:active,[data-preview~="pressed"]){background:var(--press)}
-.st-choice-inline-opt:is(:focus-visible,[data-preview~="focus"]){outline:var(--size-3) solid var(--focus);outline-offset:var(--size-2)}
 
 /* Banner: headline over consequence on a wash; danger red, correction amber with its live summary and Clear */
 .st-banner{flex:none;margin:0;padding:var(--space-row-y) var(--space-row-x);border:var(--border-width) solid var(--danger-border);border-radius:var(--radius-control);background:var(--red-wash);color:var(--ink);text-align:left}
@@ -962,7 +951,6 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 .st-banner .st-text-action{min-height:var(--control-height);min-width:var(--tap-min)}
 .st-banner[data-door]{width:100%;min-height:var(--tap-min);cursor:pointer}
 .st-banner[data-door]:is(:active,[data-state="Pressed"]){background:var(--press)}
-.st-banner[data-door]:is(:focus-visible,[data-state="Focus"]){outline:var(--size-3) solid var(--focus);outline-offset:var(--size-2)}
 .st-banner:disabled{border-style:dashed;cursor:default}
 .st-banner-icon svg{width:var(--glyph-pad);height:var(--glyph-pad)}
 .st-photos{display:flex;flex-direction:column;padding:var(--space-row-y) 0;color:var(--ink)}
@@ -974,7 +962,6 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 .st-photos-camera[aria-disabled="true"] .st-optional-act{color:var(--disabled-ink)}
 .st-photos-camera[aria-disabled="true"] .st-optional-act svg{border-style:dashed}
 .st-photos-camera:is(:active,[data-preview="pressed"]){background:var(--press)}
-.st-photos-camera:is(:focus-visible,[data-preview="focus"]),.st-photos-thumb:focus-visible{outline:var(--size-3) solid var(--focus);outline-offset:var(--size-2)}
 .st-photos-items{display:flex;flex-wrap:wrap;gap:var(--space-key-gap);margin:0;padding:var(--space-8) 0;list-style:none}
 .st-photos-thumb.st-photos-thumb{position:relative;display:grid;place-items:center;min-width:var(--tap-min);width:var(--photo-tile);height:var(--photo-tile);padding:0;overflow:hidden;border:var(--border-width) solid var(--line);border-radius:var(--radius-segment);background:var(--paper);color:var(--muted)}
 .st-photos-thumb img{width:100%;height:100%;object-fit:cover}
@@ -992,7 +979,6 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 /* OptionalRow: the one look of every optional input: label (row-title) · muted "Optional" · trailing icon action. See Field/README. */
 .st-optional-row{display:flex;align-items:center;gap:var(--space-12);width:100%;min-height:var(--tap-min);margin:var(--space-12) 0 0;padding:0 0 0 var(--space-row-x);border:0;border-radius:var(--radius-control);background:var(--well);text-align:left;font-family:var(--font-sans);color:var(--ink);touch-action:manipulation}
 .st-optional-row:active{background:var(--press)}
-.st-optional-row:focus-visible{outline:var(--size-3) solid var(--focus);outline-offset:var(--size-2)}
 .st-optional-row:disabled{opacity:.5}
 .st-optional-copy{display:flex;flex-direction:column;flex:1;min-width:0;padding:var(--space-7) 0}
 .st-optional-head{display:flex;align-items:baseline;gap:var(--space-8);min-width:0}
@@ -1027,20 +1013,17 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 .st-picker-footer{display:flex;justify-content:space-between;gap:var(--space-12);padding-block:var(--space-12)}
 .st-choice-search input{min-height:var(--tap-min)}
 
-[data-state="Focus"] :is(.st-picker-trigger,.st-choice-row,.st-choice-inline-opt:first-child){outline:var(--size-3) solid var(--focus);outline-offset:calc(-1 * var(--size-3))}
 .st-choice-inline-opt:is([data-preview="pressed"],:active){background:var(--choice-press)}
 .st-choice-inline-opt[aria-disabled="true"]{background:var(--disabled-surface);color:var(--ink)}
 
 .st-picker-steps button{background:transparent;border:0;border-radius:var(--radius-control);color:var(--ink)}
-.st-picker-steps button:is(:active,:focus-visible){background:var(--choice-press)}
+.st-picker-steps button:active{background:var(--choice-press)}
 .st-picker-steps button:last-child{font-weight:var(--type-weight-strong)}
 .st-picker-footer .button.primary{min-width:var(--tap-min)}
 .st-picker-field{min-width:0}
 .st-choice-inline{flex-wrap:wrap}
 .st-choice-extra{display:flex;justify-content:flex-end;padding:0 var(--space-16);border-bottom:1px solid var(--rule)}
 
-.st-choice-row.st-choice-row:focus-visible{outline:var(--size-3) solid var(--focus);outline-offset:calc(-1 * var(--size-3))}
-.st-picker-trigger:focus-visible{outline:var(--size-3) solid var(--focus);outline-offset:var(--size-2)}
 .st-choice-inline-clear{min-width:var(--tap-min)}
 /* Segment and FilterChips: independent of phone/prototype scopes. */
 .st-selection{min-width:0;flex:none}
@@ -1054,7 +1037,6 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 .st-segment[data-variant=two-line-lens] button{flex-direction:column}
 .st-segment[data-variant=two-line-lens] .st-selection-count:empty{min-height:1.4em}
 .st-segment button:not([aria-pressed=true]):not(:disabled):active,.st-filter-chips button:not([aria-checked=true]):not(:disabled):active,[data-state=Pressed].st-segment button:nth-child(2),[data-state=Pressed].st-filter-chips button:nth-child(2){background:var(--handle)}
-.st-segment button:focus-visible,.st-filter-chips button:focus-visible,[data-state=Focus] button:first-child:not(.st-stepper-key){outline:var(--space-3) solid var(--focus);outline-offset:var(--space-2)}
 .st-segment button:disabled,.st-filter-chips button:disabled{cursor:default;border:1px dashed var(--control-border)}
 .st-selection-reason{margin:var(--space-6) 0;color:var(--muted);font:400 var(--type-description-size)/1.4 var(--font-sans)}
 .st-filter-chips{min-width:0;padding:var(--space-6) 0}
@@ -1077,7 +1059,6 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 .icon-button.icon-button{box-sizing:border-box;flex:none;width:var(--tap-min);min-width:var(--tap-min);height:var(--tap-min);min-height:var(--tap-min);padding:0;border:var(--border-width) solid var(--line);border-radius:var(--radius-control);background:var(--paper);color:var(--ink)}
 .icon-button.icon-button[data-variant="plain"]{border-color:transparent;background:transparent}
 .icon-button:is(:active,[data-preview~="pressed"]):not([aria-disabled="true"]){background:var(--press);transform:translateY(var(--size-2))}
-.icon-button:is(:focus-visible,[data-preview~="focus"]){outline:var(--size-3) solid var(--focus);outline-offset:var(--size-2)}
 .icon-button[aria-disabled="true"]{color:var(--disabled-ink);cursor:default}
 .st-icon-selected svg{width:var(--space-12);height:var(--space-12)}
 .st-icon-selected{position:absolute;right:0;bottom:0;font-size:var(--type-description-size);background:var(--paper)}
@@ -1087,7 +1068,6 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 .st-row[data-variant="animal"],.st-row[data-variant="record"]{min-height:var(--animal-row-min)}
 .st-row[data-act] .button{min-height:var(--control-height);min-width:var(--tap-min)}
 .st-row[data-preview~="pressed"],.st-row-door[data-preview~="pressed"],.st-row[data-preview~="pressed"] .st-row-door{background:var(--press)}
-.st-row[data-preview~="focus"],.st-row:focus-within{outline:var(--size-3) solid var(--focus);outline-offset:calc(-1 * var(--size-3))}
 .st-row[data-select] .st-choice-trail{min-width:var(--tap-min);min-height:var(--tap-min);display:grid;place-items:center}
 .st-row[data-select] .st-choice-trail input{width:var(--size-24);height:var(--size-24)}
 /* Tick in place: an empty ring while due, a check disc once ticked. The whole row is the 48px target; the ring is only the cue. */
@@ -1126,7 +1106,6 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
 .st-range-rail{position:relative;height:calc(2 * var(--tap-min));touch-action:none}
 .st-range-rail::before{content:'';position:absolute;inset-inline:0;top:50%;height:var(--space-4);background:var(--line)}
 .st-range-handle{position:absolute;top:0;transform:translateX(-50%);width:var(--tap-min);height:var(--tap-min);min-width:var(--tap-min);border:var(--border-width) solid var(--ink);border-radius:50%;background:var(--paper);color:var(--ink);font-size:var(--type-sheet-title-size);touch-action:none}
-.st-range-handle:focus-visible,.st-range[data-state="Focus"] .st-range-handle:first-child{outline:var(--space-3) solid var(--focus);outline-offset:var(--space-2)}
 .st-range-handle:active,.st-range[data-dragging] .st-range-handle,.st-range[data-state="Pressed"] .st-range-handle:first-child{background:var(--well);border-width:var(--space-3)}
 .st-range-handle:disabled{border-style:dashed;color:var(--muted)}
 .st-range-ends{display:flex;justify-content:space-between;margin-top:var(--space-8)}
@@ -1136,7 +1115,6 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
 .st-range-handle[data-handle="1"]::after{top:auto;bottom:100%}
 .field .st-field-message{font:400 var(--type-description-size)/1.5 var(--font-sans);color:var(--muted)}
 .field.error .st-field-message{color:var(--red)}
-.field :is(input,textarea):is(:focus-visible),.field[data-preview="focus"] :is(input,textarea){outline:var(--size-3) solid var(--focus);outline-offset:var(--size-2)}
 .field :is(input,textarea):disabled{background:var(--well);color:var(--muted)}
 .st-stepper[data-variant="well"] .st-stepper-keys{padding:var(--space-row-y);background:var(--well);border-radius:var(--radius-inset)}
 .st-stepper[data-variant="well"] .st-stepper-value{font-size:var(--type-figure-well-size);letter-spacing:0}
@@ -1792,7 +1770,7 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
   }
   const chevron=root.SentriIcons.icon('chevron');
   const check=root.SentriIcons.icon('check');
-  function field({label='',control='',className='',ds='Field',variant='text',value='',unit='',hint='',error='',disabled=false,reason='',id='',placeholder='',labelHidden=false,focus=false}={}){
+  function field({label='',control='',className='',ds='Field',variant='text',value='',unit='',hint='',error='',disabled=false,reason='',id='',placeholder='',labelHidden=false}={}){
     const fid=id||fieldId('st-field'),hid=fid+'-hint';
     const bad=!!error||className.split(' ').includes('error');
     const message=error|| (bad?'Invalid value. Enter a valid value.':disabled?(reason||'This record cannot be edited.'):hint);
@@ -1804,7 +1782,7 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
       if(bad)attrs=attrs.replace(/\saria-invalid=["'][^"']*["']/i,'');
       return `<${tag}${attrs}${label&&!/aria-label(?:ledby)?=/.test(attrs)?` aria-labelledby="${esc(fid)}-label"`:""}${message?` aria-describedby="${esc([previous,hid].filter(Boolean).join(' '))}"`:''}${bad?' aria-invalid="true"':''}${disabled&&!/\bdisabled\b/.test(attrs)?' disabled':''}>`;
     });
-    return `<label class="field ${bad?'error ':''}${esc(className)}" data-ds="${esc(ds||'Field')}" data-variant="${esc(variant)}"${focus?' data-preview="focus"':''}>${label||unit?`<span${labelHidden?' class="visually-hidden"':''} id="${esc(fid)}-label">${label}${unit?` (${esc(unit)})`:''}</span>`: ''}${control}${message?`<span class="st-field-message" id="${esc(hid)}" role="${bad?'alert':'status'}">${esc(message)}</span>`:''}</label>`;
+    return `<label class="field ${bad?'error ':''}${esc(className)}" data-ds="${esc(ds||'Field')}" data-variant="${esc(variant)}">${label||unit?`<span${labelHidden?' class="visually-hidden"':''} id="${esc(fid)}-label">${label}${unit?` (${esc(unit)})`:''}</span>`: ''}${control}${message?`<span class="st-field-message" id="${esc(hid)}" role="${bad?'alert':'status'}">${esc(message)}</span>`:''}</label>`;
   }
   /* Mobile-standard choice control: a trigger button that opens a picker sheet.
      Replaces native <select>; the host app owns the picker view and state.
@@ -1932,14 +1910,14 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
   /* Stepper: `− n +`, the one counting shape. variant 'row' (a 60px sheet row) or 'hero' (the count sheet's one number).
      A key emits a requested delta; the host posts it (immediate host) or adds it to a draft (staged host).
      pointers: text actions shown in the status region at the floor. */
-  function stepper({label='',description='',value=0,min=0,max=null,step=1,action='step',key='',variant='row',changed=false,draft=false,tone='',hint='',pointers=[],reserveHint,id='',className='',disabled=false,reason='',error='',loading=false,pressed=false,focus=false,status='',hintHtml='',strs,args}={}){
+  function stepper({label='',description='',value=0,min=0,max=null,step=1,action='step',key='',variant='row',changed=false,draft=false,tone='',hint='',pointers=[],reserveHint,id='',className='',disabled=false,reason='',error='',loading=false,pressed=false,status='',hintHtml='',strs,args}={}){
     const o={strs,args},s=strs||{},a=args||{};
     const n=Number(value)||0,hero=variant!=='row',lid=id||fieldId('st-stepper'),hid=lid+'-hint',d=Math.abs(Number(step)||1);
     variant=variant==='hero'?'count':variant;
     const floorGray=disabled||loading||n<=min,ceilGray=disabled||loading||(max!=null&&n>=max);
     // draft: the value carries an unsaved staged addition (green, the number is the receipt); it wins over changed.
     const isDraft=draft||tone==='draft',isChanged=!isDraft&&(changed||tone==='changed');
-    const key1=(dir,gray)=>{const kid=`${lid}-${dir<0?'dec':'inc'}`;return `<button type="button" class="st-stepper-key" id="${esc(kid)}" data-action="${esc(action)}" data-value="${esc(key)}" data-step="${dir*d}" aria-labelledby="${esc(lid)} ${esc(kid)}" aria-describedby="${esc(hid)}"${pressed&&dir>0?' data-preview="pressed"':focus&&dir>0?' data-preview="focus"':''}${gray?' aria-disabled="true"':''}${dir<0?ariaText('Decrease',s.decrease,a.decrease):ariaText('Increase',s.increase,a.increase)}><span class="st-stepper-face">${glyph(dir<0?'minus':'plus')}</span></button>`;};
+    const key1=(dir,gray)=>{const kid=`${lid}-${dir<0?'dec':'inc'}`;return `<button type="button" class="st-stepper-key" id="${esc(kid)}" data-action="${esc(action)}" data-value="${esc(key)}" data-step="${dir*d}" aria-labelledby="${esc(lid)} ${esc(kid)}" aria-describedby="${esc(hid)}"${pressed&&dir>0?' data-preview="pressed"':''}${gray?' aria-disabled="true"':''}${dir<0?ariaText('Decrease',s.decrease,a.decrease):ariaText('Increase',s.increase,a.increase)}><span class="st-stepper-face">${glyph(dir<0?'minus':'plus')}</span></button>`;};
     const copy=`<span class="st-stepper-copy"><span class="st-stepper-label" id="${esc(lid)}">${tx(label,o,'label')}</span>${description||has(o,'description')?`<small class="st-stepper-description">${tx(description,o,'description')}</small>`:''}</span>`;
     const vargs=a.value||(s.value?{n:String(n)}:null);
     const val=`<span class="st-stepper-value" role="spinbutton" tabindex="0" data-st-spin${disabled||loading?' aria-disabled="true"':''}${error?' aria-invalid="true"':''} aria-labelledby="${esc(lid)}" aria-describedby="${esc(hid)}" aria-valuenow="${n}" aria-valuemin="${esc(min)}"${max!=null?` aria-valuemax="${esc(max)}"`:''} aria-live="polite"${sa(s.value,vargs)}>${esc(n)}</span>`;
@@ -2538,7 +2516,7 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
     const blocked=count===0||loading||!!error||disabled,reason=disabled?(why||error):(error||(loading?(labels.counting||'Counting results…'):count===0?emptyReason:'')),
       show=labels.show?labels.show(count,noun):`Show ${count} ${noun}`,quiet=disabled||!!error,
       showSpec=loading?{text:labels.counting||'Counting results…',str:'ds.filter.counting'}:quiet?{text:labels.showNone||`Show ${noun}`,str:'ds.filter.show.none',args:{noun}}:{text:show,str:showStr?(count===1?showStr.one:showStr.many):'ds.filter.show',args:showStr?{n:count}:{n:count,noun}};
-    return sheet({title,subtitle,className:'st-filter-sheet '+className,close:{action:backAction},scrim:scrim?{action:backAction}:false,aside:button({label:labels.clear||'Clear',register:'text',action:clearAction,disabled,strs:{label:'act.clear'}}),body:`<div data-ds="FilterSheet" data-state="${esc(state)}"><fieldset class="st-filter-fields"${disabled?' disabled':''}>${groups.map(g=>`<section class="st-filter-group">${g.label?`<h3>${esc(g.label)}</h3>`:''}${g.content}${g.help?`<p>${esc(g.help)}</p>`:''}</section>`).join('')}</fieldset></div>`,footer:sheetFooter({back:{action:backAction,label:{text:labels.back||'Back',str:'act.back'}},primary:{label:showSpec,action:applyAction,disabled:blocked,attrs:{'aria-live':'polite','aria-atomic':'true'}},status:{text:reason,id:fieldId('st-filter-status'),visible:!!reason}})});
+    return sheet({title,subtitle,className:'st-filter-sheet '+className,close:{action:backAction,label:{text:'Close '+String(title).replace(/^./,c=>c.toLowerCase())}},scrim:scrim?{action:backAction}:false,aside:button({label:labels.clear||'Clear',register:'text',action:clearAction,disabled,strs:{label:'act.clear'}}),body:`<div data-ds="FilterSheet" data-state="${esc(state)}"><fieldset class="st-filter-fields"${disabled?' disabled':''}>${groups.map(g=>`<section class="st-filter-group">${g.label?`<h3>${esc(g.label)}</h3>`:''}${g.content}${g.help?`<p>${esc(g.help)}</p>`:''}</section>`).join('')}</fieldset></div>`,footer:sheetFooter({back:{action:backAction,label:{text:labels.back||'Back',str:'act.back'}},primary:{label:showSpec,action:applyAction,disabled:blocked,attrs:{'aria-live':'polite','aria-atomic':'true'}},status:{text:reason,id:fieldId('st-filter-status'),visible:!!reason}})});
   }
   if(typeof document!=='undefined'){
     const update=(root,handle,n)=>{

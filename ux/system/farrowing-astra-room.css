@@ -13,7 +13,7 @@
 .room-appbar .icon-button{margin-left:-7px}
 .room-appbar h2{margin:0;font-size:24px;letter-spacing:-.8px}
 .room-scroll{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#cbd2c1 transparent;--room-sticky-height:64px;scroll-padding-top:var(--room-sticky-height)}
-.room-scroll:focus{outline:none}
+
 .room-intro{padding:0 18px 12px}
 .room-intro .room-latest{margin:0 0 5px}
 

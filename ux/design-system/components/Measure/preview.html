@@ -12,7 +12,6 @@ m.innerHTML = [
   UI.measure({ ...base, value: '16.8', key: 'default' }),
   UI.measure({ ...base, value: '', key: 'empty' }),
   UI.measure({ ...base, label: 'Pressed', value: '16.8', key: 'pressed' }),
-  UI.measure({ ...base, label: 'Focus', value: '16.8', key: 'focus' }),
   UI.measure({ ...base, label: 'Typing · not checked yet', value: '30.4', active: true, key: 'typing' }),
   UI.measure({ ...base, value: '30.4', key: 'warn', hint: 'Usual 8.8–27.5 kg · this is 30.4' }),
   UI.measure({ ...base, value: '304', tone: 'refused', key: 'refused', hint: 'Not recorded · over 55 kg for 11 piglets' }),
@@ -22,7 +21,6 @@ m.innerHTML = [
   '<div class="dock">' + UI.measure({ ...base, value: '16.', active: true, key: 'open', controls: 'pad-open' }) + UI.numpad({ id: 'pad-open', decimals: 1, intLength: 2, value: '16.', key: 'open' }) + '</div>'
 ].map(h => '<div>' + h + '</div>').join('');
 document.querySelector('.st-measure-box[data-value="pressed"]').setAttribute('data-preview', 'pressed');
-document.querySelector('.st-measure-box[data-value="focus"]').setAttribute('data-preview', 'focus');
 </script>
 </body>
 </html>

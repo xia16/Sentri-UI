@@ -24,7 +24,6 @@ Label; optional description; decrease key; spinbutton value; increase key; persi
 | Default | See rendered variant examples. |
 | Empty | See rendered variant examples. |
 | Pressed | See rendered variant examples. |
-| Focus | See rendered variant examples. |
 | Floor | See rendered variant examples. |
 | Ceiling | See rendered variant examples. |
 | Disabled | Visible reason; controls cannot change the value. |
@@ -43,15 +42,15 @@ Show at most seven row steppers in a drawer (six death causes plus one live-coun
 Sentence case, labels normally ≤14 English characters or 8 Chinese characters. Longer labels wrap without truncation; descriptions ≤60 characters. Status lines state a single consequence; never repeat the label or count in a receipt. A pointer is a verb plus destination.
 
 ## Accessibility
-Group is labelled by the visible label; value is a focusable spinbutton with aria-valuenow/min/max. Every key has a Decrease/Increase accessible name and describes the status region. Tab reaches keys and value; Enter/Space activate keys; arrow keys change the value through the host. Focus uses the focus ring. Keys, spinbuttons and text actions are at least tap-min in both dimensions.
+Group is labelled by the visible label; value is a spinbutton with aria-valuenow/min/max; the screen reader's increment and decrement (sent as ArrowUp / ArrowDown) change it through the host. Every key has a Decrease/Increase accessible name and describes the status region. Keys act on activation. Keys, spinbuttons and text actions are at least tap-min in both dimensions.
 
 ## Do / don't
 Do use row for repeated fields and count for the primary count. Do reject refused deltas in the host and explain why. Don’t type counts or use colour alone for drafts. Don’t reserve a blank hint beneath every row.
 
 ## API and tokens
-SentriUI.stepper({variant, label, description, value, min, max, step, key, action, draft, changed, status, hint, hintHtml, pointers, reserveHint, disabled, reason, error, loading, pressed, focus, strs, args}). Legacy hero maps to count. SentriTask.stepper is a compatibility adapter only; face maps to variant.
+SentriUI.stepper({variant, label, description, value, min, max, step, key, action, draft, changed, status, hint, hintHtml, pointers, reserveHint, disabled, reason, error, loading, pressed, strs, args}). Legacy hero maps to count. SentriTask.stepper is a compatibility adapter only; face maps to variant.
 
-CSS variables: tap-min, control-height, field-height, stepper-row-min, hero-key, glyph-key, glyph-key-hero, space-key-gap, space-row-y, space-8, space-panel, radius-control, radius-count, radius-inset, font-sans, font-mono, type-entry-label-size, type-step-value-size, type-section-title-size, type-hero-count-size, type-figure-well-size, type-description-size, ink, muted, paper, well, control-border, disabled-fill, disabled-ink, press, amber, green, focus, size-2, size-3. All sizing and colour resolve to tokens.
+CSS variables: tap-min, control-height, field-height, stepper-row-min, hero-key, glyph-key, glyph-key-hero, space-key-gap, space-row-y, space-8, space-panel, radius-control, radius-count, radius-inset, font-sans, font-mono, type-entry-label-size, type-step-value-size, type-section-title-size, type-hero-count-size, type-figure-well-size, type-description-size, ink, muted, paper, well, control-border, disabled-fill, disabled-ink, press, amber, green, size-2, size-3. All sizing and colour resolve to tokens.
 
 ## Related components
 [Measure](../Measure/README.md), [Numpad](../Numpad/README.md), [Field](../Field/README.md), [Sheet](../Sheet/README.md).
@@ -60,7 +59,7 @@ CSS variables: tap-min, control-height, field-height, stepper-row-min, hero-key,
 Component: generic input used across sections. The named faces are variants, not copies. Optional input reveal is a pattern composed from OptionalRow and Field.
 
 ## Examples and references
-[Preview](preview.html); [verification and screenshots](verification.md); each variant's states live in variants/*.html and variants.json. Primary guidance: the [component standard](../../../../docs/design-workflow/research/component-standard.md), Ant Design Mobile and TDesign; Material 3 and Apple HIG guide focus, labels and target sizes.
+[Preview](preview.html); [verification and screenshots](verification.md); each variant's states live in variants/*.html and variants.json. Primary guidance: the [component standard](../../../../docs/design-workflow/research/component-standard.md), Ant Design Mobile and TDesign; Material 3 and Apple HIG guide labels and target sizes.
 
 ## Changelog
 2026-10-10: consolidated variants, corrected gate findings, documented states and migrated prototype forks. Numpad / Measure decisions remain outside this pass.

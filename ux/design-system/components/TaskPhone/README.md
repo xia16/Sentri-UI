@@ -13,7 +13,7 @@ The frame every task page renders in. **Wider than a phone, the page sits in far
 
 **States**
 - Default: framed or full-bleed, by the window's width only (`@media (min-width: 431px)`).
-- Pressed, disabled, focus, error, loading, empty: none. The phone is a container.
+- Pressed, disabled, error, loading, empty: none. The phone is a container.
 
 **Component contract**
 - **Props:** `SentriTask.phone(inner, { label, bar = true, id })` → `<main class="tk-phone inspection-phone" data-ds="TaskPhone" data-st-context="page">`. `SentriTask.screen({ header, body, dock, inert, label })`. `SentriTask.statusbar({ time })`.
