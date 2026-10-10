@@ -49,6 +49,8 @@ Presentation changes rerun the walks they touch. A presentation fix once hid the
 
 ## 3. Cold look (before reading anything about the change)
 
+**Calibrate first.** The bar is the owner's approved screens and the rejected examples below. Where a screen has an approval record, look at its approved version before you judge.
+
 **Judge blind.** For §3 and §4 open only the `pairs/` images. Don't open `mechanical.json`, the PR or the builder's notes until §5: check output anchors judgement. Write down every issue you see before you write any verdict. A listed issue is dismissed only by a measurement, never by argument. Finding nothing is a valid result; there is no quota.
 
 Screenshot each screen on BASE and on CANDIDATE in the same state, at 390×844 and 360×800, in EN and ZH. Look at every pair. List every visible defect on the CANDIDATE side:
@@ -111,7 +113,11 @@ Write `OUT/verdict.json`:
   "pairs": [{ "screen": "", "lang": "en|zh", "width": 390, "verdict": "better|same|worse (both sides) | pass|fail (one side)", "why": "" }],
   "defects": [{ "screen": "", "what": "", "fix": "" }],
   "gone": [{ "screen": "", "why": "" }],
-  "rejected": ["R#"], "contradicted": [""] }
+  "rejected": ["R#"], "contradicted": [""], "notes": "" }
 ```
 `pairs` judges every pair in `mechanical.json`, not only EN 390; a pixel-identical pair is **same**. `gone` accounts for every screen `mechanical.json` lists as removed from the atlas: where its job went, or why it no longer exists.
+**Re-checks report changes only.** When a fix comes back after a failed gate, report each earlier finding as resolved, partial or unresolved, plus at most 3 new regressions.
+
+**DEGRADED.** If you couldn't work as a separate judge (you saw the builder's reasoning, or no fresh agent was available), start your report and `verdict.json`'s `notes` with DEGRADED and why.
+
 Report in 150 words or fewer: pass or fail, the commit, failed checks, the pairs table, and the defects. Don't suggest redesigns; name the smallest fix.
