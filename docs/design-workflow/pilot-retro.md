@@ -74,3 +74,32 @@ reference material that predates it.
 URL-addressable. Consistency checks against a reference compare what a board
 shows at load; states behind interactions are not reachable, and the
 cross-task lens is told so.
+
+## Found while building the gate (2026-10-10)
+
+### R5 · gate · a guard that parses shell command lines can always be talked around
+
+**What happened.** The merge guard first accepted any line with a pinned commit somewhere on it. A gate judge got a second, unpinned merge through by chaining it (`;`, then `&`), by putting the commit in a quoted subject or after `#`, by repeating the flag, and by writing `gh.exe` or quoting the words.
+
+**Why.** Each fix closed one spelling. A parser of shell syntax written as patterns is always one spelling short.
+
+**Workflow change.** Guards are allowlists. Anything that looks like a merge, after quotes and `.exe` are stripped, or any push to main is blocked unless the whole command is exactly one pinned merge. Every bypass a judge finds becomes a test (`tests/merge-guard.test.mjs`).
+
+### R6 · gate · pixel diffs failed on things the change never touched
+
+**What happened.** Three gate runs of a no-change workflow PR failed:
+- a font that failed to load once (prototype pages load Google Fonts) rendered in the fallback face on 98 screens;
+- a resource error showed up as a new state-check problem;
+- a blurred backdrop behind a sheet rendered a few pixels differently on each run.
+
+**Why.** The renders depend on the network and on timing, not only on the code.
+
+**Workflow change.** Shots wait for fonts and retry a screen whose font failed. A new state-check problem must reproduce on a rerun. A screen that renders differently twice on base still goes to the judge, but it doesn't fail a refactor or escalate the class by itself. Vendoring the fonts into the repo would remove the network from renders entirely; it's a later design-system change.
+
+### R7 · gate · main itself failed a check every PR is held to
+
+**What happened.** Two merges to main (#109, #110) left `atlas/atlas.json` stale against its sources. Every candidate then failed "atlas.json is regenerated", whatever it changed.
+
+**Why.** Those merges ran before the gate runner existed, and nothing on main checks main.
+
+**Workflow change.** Main's debt is reported, not charged to the next PR: a stale atlas blocks only a change that touches the atlas sources. The gate on every merge stops main from going stale again.
