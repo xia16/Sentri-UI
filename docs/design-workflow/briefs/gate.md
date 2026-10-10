@@ -19,7 +19,7 @@ On CANDIDATE:
 1. `npm test`. All pass. Skips must state a reason.
 2. `npm run check`. It must report the atlas OK. `npm run atlas` must produce no diff in `atlas/atlas.json` beyond its `generated` and `commit` stamps.
 3. `git grep -n '^<<<<<<<\|^>>>>>>>'` finds nothing.
-4. For a component class: with the server running, `node scripts/check-button-components.cjs` or the component's own check script, if it has one. Set `SENTRI_PREVIEW_ORIGIN` and `SENTRI_PLAYWRIGHT`. No console errors, no target under 48px, no horizontal overflow.
+4. For presentation, component and shared classes: `node scripts/check-states.mjs`. It renders every design-system state the way the atlas draws it and writes `review/state-check.json`; its known-bad fixtures (`scripts/check-states.fixtures/`) are the rejected examples it already catches. If the component has its own check script (e.g. `node scripts/check-button-components.cjs`), run that too, with the server running. Set `SENTRI_PREVIEW_ORIGIN` and `SENTRI_PLAYWRIGHT`. No console errors, no target under 48px, no horizontal overflow.
 5. For behaviour (and presentation that touches a walked screen): `node scripts/run-scenarios.mjs` for each affected feature. Every leaf the change touches passes, in EN and ZH at 360 and 390. A blocked leaf stays blocked; it never becomes a pass.
 6. For copy: every changed string meets the copy budget, uses a verb from `ux/laws/strings.json` with its one meaning, and renders in EN and ZH without clipping.
 
@@ -68,7 +68,7 @@ Only now, read the PR body, the README and the references table. Re-measure ever
 
 ## Rejected examples
 
-Each of these was rejected by the owner. The gate must fail a change that shows any of them. Where a test in `ux/system/*.test.cjs` or `tests/` covers one, it runs in step 1. Otherwise you look for it in step 3. Add each new owner rejection here and, where possible, as a test.
+Each of these was rejected by the owner. The gate must fail a change that shows any of them. Where `scripts/check-states.mjs` (its fixtures) or a test in `ux/system/*.test.cjs` / `tests/` covers one, it runs in step 1. Otherwise you look for it in step 3. Add each new owner rejection here and, where possible, as a test.
 
 | # | Rejected | Fails because |
 |---|---|---|

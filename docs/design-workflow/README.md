@@ -53,7 +53,7 @@ New features and the polish loop both use the same scenario step. It has three p
 | Change | Runs |
 |---|---|
 | Copy only | Copy budget and wrapping rules, verb registry (`ux/laws/strings.json`), EN/ZH render of the touched screens |
-| Presentation in one feature | The above, plus the mechanical checks, plus before/after on the feature's screens |
+| Presentation in one feature | The above, plus the mechanical checks (incl. `node scripts/check-states.mjs`), plus before/after on the feature's screens |
 | Behaviour | The above, plus the scenario leaves and walks that touch it (390/360, EN/ZH), screen-reader order and keyboard cover |
 | Shared component | All of the above on **every** feature that uses it. A refactor must be identical. Any change to a frozen screen needs the owner's approval. |
 
