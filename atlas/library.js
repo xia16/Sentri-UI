@@ -68,7 +68,8 @@ function verdictOf(g) {
   const sc = (g && g.scores) || {}, ks = SCORE_KEYS.filter((k) => sc[k] != null);
   if (!ks.length) return null;
   const low = ks.reduce((m, k) => (sc[k] < sc[m] ? k : m), ks[0]), n = (g.findings || []).length, pass = sc[low] >= PASS;
-  return { pass, low, text: pass ? `Passing · lowest ${sc[low]}/10` : `Not passing · lowest: ${cap(low)} ${sc[low]}/10${n ? ` · ${n} finding${n === 1 ? '' : 's'}` : ''}` };
+  // an agent's score, never approval (gate.md R11): only the owner approves
+  return { pass, low, text: `Agent score ${sc[low]}/10 · lowest: ${cap(low)}${n ? ` · ${n} finding${n === 1 ? '' : 's'}` : ''}` };
 }
 /* a gate, collapsed to one line: status pill, verdict, "Gate details"; the bars and the findings open on demand */
 function gateBlock(g, status) {

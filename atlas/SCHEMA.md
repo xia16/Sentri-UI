@@ -66,6 +66,15 @@ Rules the generator checks: ids unique across all features; every id in `anchor`
 
 When no scenario of the prototype opens a screen, give it the `url`/`preset` of the nearest state it can start from, and `steps`: an ordered list of taps `atlas-bare.js` replays inside the phone (after the preset, waiting for the phone to settle between taps) before it renders and posts `{atlasReady}`. A step is the control's visible text, its `aria-label` / `title`, or a CSS selector (starts with `[`, `.` or `#`); `{ "tap": "...", "hold": ms }` presses and holds for hold-to-commit buttons. A screen with `url` may have `steps`; a step that finds nothing logs an error and is skipped. Keep paths short, and use text over selectors so they survive restyling.
 
+## Approval records
+
+`features/<id>/approvals.json` is a list of the owner's approvals: `[{ "screen", "commit", "date", "by": "owner", "note"?, "changed"?: { "since", "why" } }]`. Only the owner approves. An agent writes a record (`node scripts/approve.mjs`) when the owner says "approve <screens or feature>", never on its own judgement. The last record for a screen wins.
+
+- A screen with a record and no `changed` is **approved**, whatever `feature.json` says. `status: "approved"` without a record is a generator error.
+- A change that touches an approved screen marks it `changed` (`approve.mjs --changed --since <commit or PR> --why "..."`). The screen is then **changed since approval**: back in design, with the approved version still viewable until the owner approves again.
+- The generator checks that the commit exists and that the screen rendered at it, and copies that commit's `url` into `screen.approval`.
+- The atlas shows the approved version by rendering the screen from that commit. `scripts/serve-ux.cjs` serves any file as it was at a commit under `/@<commit>/<path>`, straight from git. On a changed screen the dock offers "Approved · <date>" (shown first) and "Changed since".
+
 ## `earlier` and `aliasOf`
 
 - `"status": "earlier"`: a design that was superseded (the archive decks). It needs a `url`, shows as "Earlier design" with its own dot, and is left out of its feature's derived status, so it never counts as "in design" (a feature with only earlier screens is itself `earlier`).
