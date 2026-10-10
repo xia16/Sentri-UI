@@ -28,6 +28,7 @@ An agent score is never shown as approval. The approved version of a screen stay
 - **No reason line above a disabled button.**
 - **Green means approved or done only.**
 - **No cards on cards; information budget.** One surface, and only items are boxes. Colour only where it means something. Nothing said twice. Rank what the farmer must see first.
+- **Attention budget before layout.** Showing too much is like showing nothing: when every fact gets equal weight, nothing stands out and workers stop reading. Every new or changed list, card or screen starts from an attention budget: the facts it could show, the worker's questions in order, an attention level for each fact, and a written cut list. Only then comes layout. Passing the legibility floors is not the same as being focused ([build.md §1b](briefs/build.md#1b-attention-budget-before-any-layout)).
 - **Design for the medium.** The atlas is a web page; the designs in it are a native phone app. Use the iOS or Android native component wherever one fits: sheets, action sheets, segmented controls, switches, wheel pickers for dates and numbers, the system keyboard, a navigation bar. Build a custom one only where none fits, and say why. No web conventions: hover rows, breadcrumbs, dropdown selects, data tables, underlined text links, tooltips, visible scrollbars, pagination, centred web modals.
 - **Simple beats complete.** Design for the 95% of real cases. Leave out what would add noise for farmers or need heavy infrastructure, and list it as not supported. Easy to act and to record matters more than feature count: a frustrated farmer stops using the app.
 - **Design for gloves and reach; no device testing.** The screen in its natural state is the evidence.
@@ -35,6 +36,7 @@ An agent score is never shown as approval. The approved version of a screen stay
 ## Room to design
 
 The design system and the rules above are a floor, not a ceiling (owner, 2026-10-10). Agents are designers, not copyists. If a better layout, interaction, variant or component would serve the farmer, build it:
+- **Budget first, then explore.** Visual and blind explorations start from the agreed attention budget. Every candidate is judged against the current screen, never only against the other candidates.
 - **When a job is only adequate, look wider.** Before you build, sketch at least one alternative that departs from the current pattern. Then build the one that serves the farmer best.
 - **The gate decides, not familiarity.** The new design must beat what it replaces, side by side. Being different never makes it worse, and matching the system never makes it better.
 - **Only a much better design is worth the change.** The system stays consistent. A small improvement isn't built; a much better one is propagated to every feature that uses it.

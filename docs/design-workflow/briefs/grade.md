@@ -22,7 +22,7 @@ Score each dimension **0, 1 or 2**. A 2 means nothing to fix: as calm, aligned a
 
 | Dimension | 2 means |
 |---|---|
-| **hierarchy** | The first thing seen is what the farmer needs first. |
+| **hierarchy** | The first thing seen is what the farmer needs first, and only the act-now fact is loud. The attention budget holds: one coloured element per row at most, a second line only when it changes what the worker does, nothing the header says, no zeros, no derived figure beside its parts. Everything at one weight is a 0. |
 | **alignment** | One track, even rows, one surface; nothing said twice; the information budget holds. |
 | **legibility** | Floors met: text ≥ 13px everywhere, ≥ 16px for primary content, contrast ≥ 4.5:1 (≥ 7:1 for numbers acted on). Copy is in budget with registry verbs, EN and ZH fit, and real data wraps safely. Use `legibility.txt`. |
 | **touch** | Targets ≥ 48px, the primary action within one-handed reach, no gesture-only action. |

@@ -118,6 +118,10 @@ _Avoid_: Open question, TBD
 **Decision queue**:
 A feature's list of things to confirm, each with the agents' recommendation; only decisions that change what the farm records or what a worker must do.
 
+**Attention budget**:
+The step before any layout that decides what a screen shows and how loudly: the facts it could show, the worker's questions in order, an attention level per fact (act now, watch, coming up, settled, audit) and a written cut list.
+_Avoid_: Information hierarchy, content audit
+
 **Enhancement**:
 A design change that makes an adequate screen, interaction or component clearly better, as opposed to fixing a defect. It's gated like any change: it must beat what it replaces.
 _Avoid_: Redesign, polish
