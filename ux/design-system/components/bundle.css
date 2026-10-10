@@ -360,17 +360,19 @@ button.st-row[aria-current="location"]{background:var(--green-wash);box-shadow:i
 .st-stepper+.st-stepper{border-top:1px solid var(--rule)}
 .st-stepper-copy{display:flex;flex-direction:column;gap:var(--space-2);min-width:0}
 .st-stepper-label{font:600 var(--type-choice-label-size)/1.4 var(--font-sans);color:var(--ink);overflow-wrap:anywhere}
+.st-stepper[data-variant="row"] .st-stepper-copy{flex-direction:row;flex-wrap:wrap;align-items:baseline;column-gap:var(--space-6)}
+.st-stepper[data-variant="row"] .st-stepper-description{flex:0 0 100%}
+.st-stepper-note{font:400 var(--type-description-size)/1.4 var(--font-sans);color:var(--muted)}
 .st-stepper-description{font:400 var(--type-description-size)/1.5 var(--font-sans);color:var(--muted)}
 .st-stepper-keys{display:flex;align-items:center;gap:var(--space-key-gap);align-self:stretch}
 .st-stepper-key.st-stepper-key{display:grid;place-items:center;flex:none;width:var(--field-height);min-height:var(--stepper-row-min);align-self:stretch;border:0;border-radius:0;background:transparent;color:inherit}
 .st-stepper-face{width:var(--field-height);height:var(--field-height)}
 .st-stepper-face svg{width:var(--glyph-key);height:var(--glyph-key);stroke-width:var(--icon-key-stroke)}
-.st-stepper-key[data-step^="-"] .st-stepper-face{color:var(--ink)}
+.st-stepper-key[data-step^="-"]:not([aria-disabled="true"]) .st-stepper-face{color:var(--ink)}
 .st-stepper-value{min-width:3ch;text-align:center;font:500 var(--type-figure-size)/1.2 var(--font-mono);font-variant-numeric:tabular-nums;color:var(--ink);-webkit-user-select:none;user-select:none}
 .st-stepper[data-wide] .st-stepper-value{min-width:4ch}
 .st-stepper[data-zero] .st-stepper-value{color:var(--muted)}
 .st-stepper[data-changed] .st-stepper-value{color:var(--amber)}
-.st-stepper[data-draft] .st-stepper-value{color:var(--green)}
 .st-stepper-hint.st-stepper-hint{grid-column:1/-1}
 .st-stepper[data-variant="row"] .st-stepper-hint[data-reserve="text"]{margin-bottom:var(--space-row-y)}
 /* Stepper · hero */
@@ -384,7 +386,6 @@ button.st-row[aria-current="location"]{background:var(--green-wash);box-shadow:i
 .st-stepper:is([data-variant="count"],[data-variant="well"]) .st-stepper-value{flex:1;font:600 var(--type-hero-count-size)/1.15 var(--font-mono);letter-spacing:var(--tracking-hero);color:var(--count-ink)}
 .st-stepper:is([data-variant="count"],[data-variant="well"])[data-zero] .st-stepper-value{color:var(--muted)}
 .st-stepper:is([data-variant="count"],[data-variant="well"])[data-changed] .st-stepper-value{color:var(--amber)}
-.st-stepper:is([data-variant="count"],[data-variant="well"])[data-draft] .st-stepper-value{color:var(--green)}
 .st-stepper:is([data-variant="count"],[data-variant="well"]) .st-stepper-hint{justify-content:center;text-align:center}
 
 /* Measure: label above, a field-shaped box, value in mono with its unit always written */
@@ -634,7 +635,7 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 .st-segment button{flex:1 0 auto;min-width:var(--tap-min);flex-wrap:wrap}
 .st-selection-label{white-space:nowrap;min-width:0}
 .st-selection-count{font:500 var(--type-meta-size)/1.4 var(--font-mono);color:var(--muted)}
-.st-segment button[aria-pressed=true]{background:var(--paper);font-weight:500;box-shadow:inset 0 calc(-1 * var(--space-3)) var(--ink)}
+.st-segment button[aria-pressed=true]{background:var(--paper);font-weight:var(--type-weight-strong)}
 .st-segment[data-variant=two-line-lens] button{flex-direction:column}
 .st-segment[data-variant=two-line-lens] .st-selection-count:empty{min-height:1.4em}
 .st-segment button:not([aria-pressed=true]):not(:disabled):active,.st-filter-chips button:not([aria-checked=true]):not(:disabled):active,[data-state=Pressed].st-segment button:nth-child(2),[data-state=Pressed].st-filter-chips button:nth-child(2){background:var(--handle)}
