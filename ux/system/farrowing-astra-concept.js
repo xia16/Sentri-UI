@@ -168,7 +168,7 @@ function recordStamp(s){
 }
 function identity(s){
  if(s.view==='finish')return {title:'Finish farrowing',subtitle:`${s.tag} · ${s.pen} · Parity ${s.parity}`,close:{action:'dismiss',label:'Close finish drawer'}};
- if(s.view==='death'){const n=sum(s.deathDraft),sow=s.mode==='sow';return {title:sow?'Sow died':`Dead ${sum(s.dead)+n}`,subtitle:sow?'Choose the cause':'Born dead or died',aside:btn('clearDeath','Clear','st-text-action','',!n&&!s.sowCause),close:{action:'dismiss',label:'Close record dead'}};}
+ if(s.view==='death'){const n=sum(s.deathDraft),sow=s.mode==='sow';return {title:sow?'Sow died':`Dead ${sum(s.dead)+n}`,subtitle:sow?'Choose the cause':'Born dead or died',aside:SentriUI.button({label:'Clear',register:'text',action:'clearDeath',disabled:!n&&!s.sowCause,strs:{label:'act.clear'}}),close:{action:'dismiss',label:'Close record dead'}};}
  if(['edit','editFinish'].includes(s.view))return {title:s.view==='editFinish'?'Edit finish details':'Edit record',subtitle:`${s.tag} · ${s.pen}`,close:{action:'dismiss',label:'Close edit'}};
  const state=s.ended?'Sow died':s.locked?'Finished':s.view==='finish'?'Finishing':born(s)?'Farrowing':s.due.split(' · day')[0];
  return {title:{html:btn('profile',esc(s.tag)+icon('chevron'),'sow-title-link').replace('<button',`<button aria-label="View sow ${s.tag} details"`)},subtitle:{html:`<span class="sow-context"><span class="sow-location">${esc(s.pen)} / Parity ${s.parity}</span> <span>${esc(recordStamp(s)||state)}</span></span>`},close:{action:'dismiss',label:'Close sow drawer'},label:'Sow '+s.tag};
