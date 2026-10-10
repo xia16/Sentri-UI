@@ -128,10 +128,11 @@ if (existsSync(proposedPath)) for (const c of read('ux/design-system/components/
 for (const p of sections.platforms) for (const s of p.sections) for (const pt of s.patterns || []) for (const id of pt.screens || []) if (!owner[id]) problems.push(`sections.json: pattern "${pt.name}" names ${id}, which no feature has`);
 
 // backlog: review/*.json (written by review sweeps) plus every component gate finding and proposal
+// review/scenarios*.json (and review/scenarios/) are the behaviour gate's run results (scripts/run-scenarios.mjs), not backlog.
 const backlog = [];
 const KINDS = ['decision', 'design', 'broken', 'unclear'];
 const reviewDir = join(root, 'review');
-if (existsSync(reviewDir)) for (const fn of readdirSync(reviewDir).filter((n) => n.endsWith('.json') && n !== 'state-check.json')) {
+if (existsSync(reviewDir)) for (const fn of readdirSync(reviewDir).filter((n) => n.endsWith('.json') && !['state-check.json', 'legibility.json'].includes(n) && !n.startsWith('scenarios'))) {
   let data; try { data = JSON.parse(readFileSync(join(reviewDir, fn), 'utf8')); } catch (e) { problems.push(`review/${fn}: ${e.message}`); continue; }
   for (const it of Array.isArray(data) ? data : data.items || [data]) {
     if (!it || !it.id || !it.title || !it.target) { problems.push(`review/${fn}: an item needs id, target and title`); continue; }
