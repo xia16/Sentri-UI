@@ -14,7 +14,7 @@
 .inspection-phone .action-group-label{margin-top:18px;color:var(--muted);}
 .inspection-phone .review-list li:not(.st-row){min-height:56px;padding:8px 0;border-bottom:1px solid #e8eddf;}
 .inspection-phone .review-list li>span{min-width:0;}
-.inspection-phone .review-list strong{font:500 13px var(--font-mono);}
+.inspection-phone .review-list strong{font:500 var(--type-identifier-strong-size) var(--font-mono);}
 .inspection-phone .review-list small{color:var(--muted);}
 
 /* Embedded subject detail, pen detail and production records. */
@@ -42,7 +42,7 @@
 .inspection-phone .feed-breakdown{min-width:0;}
 .inspection-phone .feed-pig-row{min-height:64px;padding:8px 12px;border-bottom:1px solid #e8eddf;}
 .inspection-phone .feed-pig-row:last-child{border-bottom:0;}
-.inspection-phone .feed-reading{font:500 12px var(--font-mono);}
+.inspection-phone .feed-reading{font:500 var(--type-identifier-strong-size) var(--font-mono);}
 .inspection-phone .feed-change-state{max-width:145px;line-height:1.35;}
 .inspection-phone .plan-preview{padding:8px 12px;border:1px solid #dfe8d8;border-radius:10px;background:var(--green-wash);}
 .inspection-phone .individual-ration{border:1px solid #dfe8d8;}
@@ -108,7 +108,7 @@
 .inspection-phone .bulk-action-layout>.bulk-dock{position:sticky;bottom:0;z-index:1;display:flex;flex-direction:column;flex:none;gap:0;margin:auto 0 0;max-height:none;min-height:0;box-sizing:border-box;padding:4px var(--space-gutter,18px) 16px;border:0;border-top:1px solid var(--line,#e2e7dc);border-radius:0;background:var(--paper,#fff);box-shadow:none;overflow:visible}
 .inspection-phone .bulk-action-layout>.bulk-dock.is-collapsed{padding-bottom:4px}
 .inspection-phone .sheet:has(>.sheet-body>.bulk-action-layout)>.sheet-footer{border-top-color:transparent}
-.inspection-phone .bulk-dock .bulk-controls-toggle{flex-shrink:0;min-height:var(--tap-min,48px);color:var(--muted,#5c6b58);font:600 12px/1.4 var(--font-sans)}
+.inspection-phone .bulk-dock .bulk-controls-toggle{flex-shrink:0;min-height:var(--tap-min,48px);color:var(--muted,#5c6b58);font:600 var(--type-row-title-size)/1.4 var(--font-sans)}
 .inspection-phone .bulk-dock .bulk-control-fields{display:flex;flex-direction:column;gap:12px;min-height:0}
 .inspection-phone .bulk-dock .field input,.inspection-phone .bulk-dock .field select,.inspection-phone .bulk-dock .field textarea{background:var(--paper,#fff)}
 .inspection-phone .bulk-pig-row{grid-template-columns:24px minmax(0,1fr) minmax(84px,112px);padding:12px 18px;gap:8px}
@@ -151,7 +151,7 @@
 .inspection-phone .chooser-background .scrim{display:none}
 .inspection-phone .picker-step .sheet-body{gap:12px;padding:16px 18px}
 .inspection-phone .picker-step .catalog-search{margin:0}
-.inspection-phone .picker-step .catalog-search input{min-height:48px;font-size:14px;font-weight:400}
+.inspection-phone .picker-step .catalog-search input{min-height:48px;font-size:var(--type-row-title-size);font-weight:400}
 .inspection-phone .picker-step :is(.health-catalog,.medicine-results,.st-picker-options){scrollbar-width:none;overscroll-behavior:contain}
 .inspection-phone .picker-step :is(.health-catalog,.medicine-results,.st-picker-options)::-webkit-scrollbar{display:none}
 .inspection-phone .picker-step :is(.catalog-categories,.catalog-items,.chooser-options,.st-picker-options){border:1px solid var(--st-rule,#dce2d5);border-radius:14px;background:var(--st-paper,#fff);overflow:hidden}
@@ -159,16 +159,16 @@
 .inspection-phone .picker-step :is(.catalog-category,.catalog-item,.medicine-option,.st-picker-option){box-sizing:border-box;min-height:52px;padding:12px 14px;margin:0;border:0;border-bottom:1px solid var(--st-rule,#dce2d5);border-radius:0;background:transparent}
 .inspection-phone .picker-step :is(.catalog-category,.catalog-item,.medicine-option,.st-picker-option):last-child{border-bottom:0}
 .inspection-phone .picker-step :is(.catalog-item:has(input:checked),.medicine-option[aria-pressed="true"],.st-picker-option[aria-selected="true"]){background:#edf2e7}
-.inspection-phone .picker-step :is(.catalog-category strong,.catalog-item strong,.medicine-option strong,.st-picker-option strong){font-size:14px;font-weight:500;line-height:1.45}
-.inspection-phone .picker-step :is(.catalog-category small,.catalog-item small,.medicine-option small){font-size:11px;line-height:1.4;color:var(--st-muted,#68745d)}
+.inspection-phone .picker-step :is(.catalog-category strong,.catalog-item strong,.medicine-option strong,.st-picker-option strong){font-size:var(--type-row-title-size);font-weight:500;line-height:1.45}
+.inspection-phone .picker-step :is(.catalog-category small,.catalog-item small,.medicine-option small){font-size:var(--type-meta-size);line-height:1.4;color:var(--st-muted,#68745d)}
 .inspection-phone .picker-step .catalog-path{position:static;min-height:44px;padding:0 0 12px;border:0;background:transparent}
-.inspection-phone .picker-step .catalog-path strong{font-size:14px;font-weight:600}
+.inspection-phone .picker-step .catalog-path strong{font-size:var(--type-row-title-size);font-weight:600}
 .inspection-phone .picker-step .catalog-path-back{flex:none}
-.inspection-phone .picker-step .catalog-group h5{padding:16px 4px 8px;font:600 12px/1.4 var(--font-sans);letter-spacing:0;text-transform:none;color:var(--st-muted,#68745d)}
+.inspection-phone .picker-step .catalog-group h5{padding:16px 4px 8px;font:600 var(--type-meta-size)/1.4 var(--font-sans);letter-spacing:0;text-transform:none;color:var(--st-muted,#68745d)}
 .inspection-phone .picker-step .catalog-items{padding-bottom:0}
 .inspection-phone .picker-step .chooser-selection{display:grid;place-items:center;width:22px;height:22px;flex:none;border:1px solid #b7c1ad;border-radius:50%;color:#486141}
 .inspection-phone .picker-step .chooser-selection svg{width:15px;height:15px}
-.inspection-phone .picker-step .chooser-selected{flex:none;max-height:160px;overflow:auto;font-size:12px;color:var(--st-ink,#293525)}
+.inspection-phone .picker-step .chooser-selected{flex:none;max-height:160px;overflow:auto;font-size:var(--type-meta-size);color:var(--st-ink,#293525)}
 .inspection-phone .picker-step .chooser-selected summary{padding:10px 4px;cursor:pointer;min-height:44px;box-sizing:border-box}
 .inspection-phone .option-picker-step>.sheet-body{overflow-y:auto;flex:0 1 auto}
 .inspection-phone .option-picker-step .st-picker-options{flex:none}
@@ -193,11 +193,70 @@
 .inspection-phone .inspect-dock .selection-action{min-height:var(--tap-min,48px)}
 
 /* Bulk rows say only the exceptions (Already recorded, Not eligible, an error), in plain muted text: no tag, no green. */
-.inspection-phone .bulk-action-sheet .bulk-pig-row .feed-change-state{min-height:0;padding:0;border-radius:0;background:none;color:var(--muted);font:400 13px/1.35 var(--font-sans);font-weight:400;white-space:normal;max-width:150px;text-align:right}
+.inspection-phone .bulk-action-sheet .bulk-pig-row .feed-change-state{min-height:0;padding:0;border-radius:0;background:none;color:var(--muted);font:400 var(--type-meta-size)/1.35 var(--font-sans);font-weight:400;white-space:normal;max-width:150px;text-align:right}
 /* Selection is ink: the tick is ink and a ticked row takes the neutral well, never green (green is done). */
 .inspection-phone .check-target input,.inspection-phone .bulk-pig-check input{accent-color:var(--ink)}
 .inspection-phone .roster-pig.selected{background:var(--well)}
 .inspection-phone .catalog-item:has(input:checked){background:var(--well)}
 /* Required: the word sits at the end of the field's label line, so marking fields never changes the details' height. */
 .inspection-phone .bulk-controls .field.error{position:relative}
-.inspection-phone .bulk-controls .field.error>:is(.st-field-message,.st-picker-hint){position:absolute;top:0;right:0;margin:0;font:600 12px/1.4 var(--font-sans);color:var(--red)}
+.inspection-phone .bulk-controls .field.error>:is(.st-field-message,.st-picker-hint){position:absolute;top:0;right:0;margin:0;font:600 var(--type-meta-size)/1.4 var(--font-sans);color:var(--red)}
+
+/* Round 2, the bulk page: 48px targets (the whole checkbox cell and every dose box); one "Same dose for all" control above
+   the list (the unit sits inside it, with the dose it measures); a compact details dock so at least three pigs and their
+   doses stay in view; the folded dock reads as one line. */
+.inspection-phone .bulk-action-layout>.bulk-pigs{margin:12px var(--space-gutter,18px)}
+.inspection-phone .bulk-action-sheet .bulk-pig-row,
+.inspection-phone .bulk-action-sheet [data-bulk-kind="treatment"] .bulk-pig-row{grid-template-columns:var(--tap-min,48px) minmax(0,1fr) auto;column-gap:4px;min-height:64px;padding:6px 12px 6px 0}
+.inspection-phone .bulk-action-sheet .bulk-pig-row.is-single{grid-template-columns:minmax(0,1fr) auto;padding-left:12px}
+.inspection-phone .bulk-pig-check{display:grid;place-items:center;width:var(--tap-min,48px);height:var(--tap-min,48px);min-height:var(--tap-min,48px)}
+.inspection-phone .bulk-pig-check input{width:24px;height:24px;margin:0}
+.inspection-phone .bulk-pig-copy{gap:2px}
+.inspection-phone .bulk-pig-copy>small{color:var(--muted)}
+.inspection-phone .bulk-action-sheet .bulk-reading input{height:var(--field-height,48px);min-height:var(--field-height,48px)}
+.inspection-phone [data-bulk-kind="treatment"] .bulk-pig-change{width:auto;align-items:flex-end}
+.inspection-phone [data-bulk-kind="treatment"] .feed-pig-values{display:flex;justify-content:flex-end;width:auto}
+.inspection-phone [data-bulk-kind="treatment"] .bulk-reading,
+.inspection-phone .bulk-same-box{flex-direction:row;align-items:center;gap:0;box-sizing:border-box;width:auto;min-width:112px;height:var(--field-height,48px);padding:0 0 0 4px;border:0;border-radius:var(--radius-control,12px);background:var(--paper);box-shadow:inset 0 0 0 1px var(--control-border)}
+.inspection-phone [data-bulk-kind="treatment"] .bulk-reading:focus-within,
+.inspection-phone .bulk-same-box:focus-within{box-shadow:inset 0 0 0 2px var(--ink)}
+.inspection-phone [data-bulk-kind="treatment"] .bulk-reading:has(input[aria-invalid="true"]),
+.inspection-phone .bulk-same-box.is-invalid{box-shadow:inset 0 0 0 2px var(--red)}
+.inspection-phone .bulk-action-sheet [data-bulk-kind="treatment"] .bulk-reading input,
+.inspection-phone .bulk-same-box input{flex:1 1 auto;width:64px;min-width:0;height:var(--field-height,48px);min-height:0;box-sizing:border-box;padding:0 6px;border:0;border-radius:0;background:transparent;text-align:right;color:var(--ink)}
+.inspection-phone .bulk-unit{padding:0 12px 0 0;font:400 var(--type-meta-size)/1 var(--font-sans);color:var(--muted)}
+.inspection-phone .bulk-unit-button{display:flex;align-items:center;gap:2px;height:var(--field-height,48px);padding:0 8px 0 10px;border:0;border-left:1px solid var(--line);border-radius:0 var(--radius-control,12px) var(--radius-control,12px) 0;background:transparent;color:var(--ink);font:500 var(--type-row-title-size)/1 var(--font-sans)}
+.inspection-phone .bulk-unit-button svg{width:14px;height:14px;transform:rotate(90deg)}
+.inspection-phone .bulk-unit-button.is-invalid{color:var(--red-ink)}
+.inspection-phone .bulk-same-dose{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:64px;padding:8px 12px 8px 16px;box-sizing:border-box;border-bottom:1px solid var(--line);background:var(--well)}
+.inspection-phone .bulk-same-label{display:flex;flex-direction:column;gap:2px;min-width:0;font:500 var(--type-row-title-size)/1.3 var(--font-sans);color:var(--ink)}
+.inspection-phone .bulk-required{font:500 var(--type-meta-size)/1.3 var(--font-sans);color:var(--red-ink)}
+.inspection-phone .bulk-dose-field>span>.bulk-required{margin-left:8px}
+.inspection-phone .bulk-dose-field .bulk-same-box{align-self:flex-start;width:100%}
+.inspection-phone .bulk-action-layout>.bulk-dock{padding:0 var(--space-gutter,18px) 8px}
+.inspection-phone .bulk-action-layout>.bulk-dock.is-collapsed{padding-bottom:0}
+.inspection-phone .bulk-dock .bulk-control-fields{gap:8px}
+.inspection-phone .bulk-dock .bulk-control-fields .field{gap:4px;margin:0}
+.inspection-phone .bulk-dock .st-optional-list{margin-top:0}
+.inspection-phone .bulk-dock .bulk-controls-toggle{color:var(--ink)}
+.inspection-phone .bulk-toggle-text{display:flex;flex-direction:column;min-width:0;text-align:left}
+.inspection-phone .bulk-toggle-text>small{overflow:hidden;font:400 var(--type-row-title-size)/1.4 var(--font-sans);color:var(--ink);text-overflow:ellipsis;white-space:nowrap}
+
+/* Search "Clear" keeps clear of the field's border: its word ends well inside, and the 48px target stays. */
+.inspection-phone .st-search-box>.st-search-clear{padding:0 14px 0 8px}
+.inspection-phone .st-search-box:has(.st-search-clear)>input{padding-right:calc(var(--tap-min) + var(--space-24))}
+
+/* A long breed ("Landrace × Yorkshire") takes the full row instead of breaking after its ×. */
+.inspection-phone .st-facts .st-fact-inline{grid-column:1/-1}
+.inspection-phone .field .bulk-same-box>input{height:var(--field-height,48px);border:0;border-radius:0;background:transparent;box-shadow:none}
+
+/* Measurement pages (weight, backfat, temperature): "Current → New · kg" is said once, in the list heading, so a row carries
+   only its values: the current reading, an arrow, and a 48px box for the new one. The per-row captions stay for screen readers. */
+.inspection-phone .bulk-action-layout:not([data-bulk-kind="treatment"]) .bulk-pig-change .feed-pig-values{display:grid;grid-template-columns:minmax(40px,auto) 14px 84px;align-items:center;justify-content:end;column-gap:4px;width:auto}
+.inspection-phone .bulk-action-layout:not([data-bulk-kind="treatment"]) .feed-reading small{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.inspection-phone .bulk-action-layout:not([data-bulk-kind="treatment"]) .feed-reading{align-items:flex-end;position:relative}
+.inspection-phone .bulk-action-layout:not([data-bulk-kind="treatment"]) .feed-reading.is-new{flex-direction:row;align-items:center;width:84px;gap:0}
+.inspection-phone .bulk-action-layout:not([data-bulk-kind="treatment"]) .feed-change-arrow{align-self:center;padding:0;color:var(--muted)}
+.inspection-phone .bulk-action-layout:not([data-bulk-kind="treatment"]) .bulk-reading input{width:84px;box-sizing:border-box;padding:0 8px;border:1px solid var(--control-border);border-radius:var(--radius-control,12px);text-align:right;font:600 var(--type-identifier-strong-size) var(--font-mono);color:var(--ink);background:var(--paper)}
+.inspection-phone .bulk-action-layout:not([data-bulk-kind="treatment"]) .bulk-reading input:focus{border-color:var(--ink);outline:1px solid var(--ink)}
+.inspection-phone .bulk-action-layout:not([data-bulk-kind="treatment"]) .bulk-reading input[aria-invalid="true"]{border-color:var(--red)}

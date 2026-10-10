@@ -266,22 +266,23 @@ function penFeedEntry(pe){
 function pigRow(c,p){
  const cs=cases(p);
  const metadata=stageSummary(p);
- const tags=[...cs.slice().sort((a,b)=>Number(needsHealthAttention(b))-Number(needsHealthAttention(a))).map(k=>({label:k.name,day:Number.isFinite(k.day)?(issueStatus(k)==='ongoing'?k.day+' days':'Day '+k.day):'',...careAppearance(k)})),...pigFeedTags(p)];
+ const tags=[...cs.slice().sort((a,b)=>(Number.isFinite(a.day)?a.day:Infinity)-(Number.isFinite(b.day)?b.day:Infinity)||Number(needsHealthAttention(b))-Number(needsHealthAttention(a))).map(k=>({label:k.name,day:Number.isFinite(k.day)?(issueStatus(k)==='ongoing'?k.day+' days':'Day '+k.day):'',...careAppearance(k)})),...pigFeedTags(p)];
  const labels=tags.map(recordedTag).join('');
  const accessible=[p.id,metadata,...tags.map(tagDescription)].filter(Boolean).join('. ');
  const content='<span class="roster-content"><span class="roster-top"><strong class="roster-id">'+p.id+'</strong><span class="roster-meta" title="'+esc(metadata)+'">'+esc(metadata)+'</span></span>'+(labels?'<span class="roster-second"><span class="recorded-tags">'+labels+'<span class="tag-more" hidden></span></span></span>':'')+'</span>';
  return SentriUI.rowSelectDoor({className:'inspect-pig roster-pig'+(c.selected.has(p.id)?' selected':''),doorClass:'pig-open',action:'',contentHtml:content,checked:c.selected.has(p.id),value:p.id,openAction:'pig',openValue:p.id,label:accessible,inputAttrs:{'data-pig-select':p.id,'aria-label':'Select pig '+p.id}});
 }
 function dockBulkDetails(root){root._detailsObserver?.disconnect();}
+/* The newest condition leads. Tags wrap onto a second line before any is hidden; only what still does not fit in two lines
+   collapses into "+N more". A tag is never cut: one tag may be as wide as the line. */
 function fitRecordedTags(root){
  root.querySelectorAll('.recorded-tags').forEach(line=>{
   const tags=[...line.querySelectorAll('.st-condition')],more=line.querySelector('.tag-more'),width=line.clientWidth;
   if(!width)return;
-  tags.forEach(tag=>{tag.hidden=false;tag.style.maxWidth=Math.min(tags.length>1?160:width,width)+'px';});more.hidden=true;
-  const gap=4;let shown=tags.length;
-  const used=()=>tags.slice(0,shown).reduce((sum,t)=>sum+t.getBoundingClientRect().width,0)+Math.max(0,shown-1)*gap+(more.hidden?0:more.getBoundingClientRect().width+gap);
-  while(shown>1&&used()>width){tags[--shown].hidden=true;more.hidden=false;more.textContent='+'+(tags.length-shown);}
-  if(!more.hidden){if(shown===1)tags[0].style.maxWidth=Math.max(0,width-more.getBoundingClientRect().width-gap)+'px';more.title=(tags.length-shown)+' more · open pig details';}
+  tags.forEach(tag=>{tag.hidden=false;tag.style.maxWidth=width+'px';});more.hidden=true;
+  const lines=()=>new Set([...tags.filter(t=>!t.hidden),...(more.hidden?[]:[more])].map(t=>Math.round(t.offsetTop))).size;
+  let shown=tags.length;
+  while(shown>1&&lines()>2){tags[--shown].hidden=true;more.hidden=false;more.textContent='+'+(tags.length-shown)+' more';}
  });
 }
 function displayPigs(c,pe){return visiblePigs(c,pe);}
@@ -483,7 +484,7 @@ function overviewNextTask(p,c){
 // One fact for Facts: an empty value draws the em dash and no trail.
 function factItem(label,value,unit='',meta='',mono=false){const has=hasRecordValue(value);return {label,value:has?value+(unit?(unit==='%'?'':' ')+unit:''):null,meta:has?meta:'',mono};}
 function overviewDetails(p,c){
- const r=p.registry||{},facts=[factItem('Age',p.age??daysFromWalk(r.birthDate),'days'),factItem('Type',animalType(p)),factItem('Breed',r.breed),factItem('Batch',p.batchId)];
+ const r=p.registry||{},facts=[factItem('Age',p.age??daysFromWalk(r.birthDate),'days'),factItem('Type',animalType(p)),{...factItem('Breed',r.breed),inline:String(r.breed||'').length>12},factItem('Batch',p.batchId)];
  for(const [key,label,unit] of [['weight','Weight','kg'],['temperature','Temperature','°C']])facts.push(factItem(label,p[key],unit,measurementAge(p,key)));
  facts.push(factItem('On farm',r.onFarm===undefined?null:r.onFarm?'Yes':'No'));
  
@@ -601,24 +602,26 @@ function bulkSelect(c,label,key,options,error=''){return fieldSelect(c,label,key
    own facts help the choice; a row that will change says nothing, the commit carries the count. */
 const bulkSamePrompt=['Choose conditions','Complete treatment details','No note entered','No reading · unchanged'];
 function bulkRowState(row,view){if(row.change&&row.eligible&&!row.error)return '';if(view==='treatment'&&row.eligible&&!row.error)return '';if(row.eligible&&!row.error&&!row.change&&bulkSamePrompt.includes(row.summary))return '';return !row.eligible||row.error?row.summary:row.change?'Ready to save':row.summary;}
+/* "C1 · Gestation · 40 days" breaks only after a "·", never inside "40 days". */
+function bulkMeta(text){return String(text).split(' · ').map(part=>esc(part).replace(/ /g,'&nbsp;')).join('&nbsp;· ');}
 function bulkRows(c){
  const f=c.form,m=bulkMeasurements[c.view],dose=c.view==='treatment',firstMissing=f.showRequired&&m&&!bulkActionValid(c)?bulkChanges(c).find(r=>r.eligible&&!r.change)?.id:'';
  return bulkChanges(c).map(row=>{
   const p=row.p,blocked=p?.stage==='Sow died'&&c.view!=='note'||c.view==='backfat'&&!['Sow','Gilt'].includes(animalType(p));
   const value=m?f.values[row.id]:Object.hasOwn(f.values,row.id)?f.values[row.id]:f.dose;
   const state=bulkRowState(row,c.view);
-  const change=(m||dose)?'<span class="pig-review-change bulk-pig-change"><span class="feed-pig-values">'+(m?'<span class="feed-reading"><small>Current</small><span>'+esc(p?.[c.view]??'—')+'</span></span><span class="feed-change-arrow" aria-hidden="true">→</span>':'')+'<label class="feed-reading is-new bulk-reading">'+(m?'<small>New</small>':'')+'<input type="number" inputmode="decimal" min="0" step="any" data-bulk-value="'+esc(row.id)+'" value="'+esc(value??'')+'" aria-label="'+(m?m.label:'Dose')+' for '+esc(row.id)+'" placeholder="—"'+(!row.eligible?' disabled':'')+' aria-invalid="'+(row.error||row.id===firstMissing)+'"></label></span><small class="feed-change-state" data-bulk-summary="'+esc(row.id)+'"'+(!state?' hidden':'')+'>'+esc(state)+'</small></span>':'<span class="pig-review-change bulk-pig-change"><small class="feed-change-state" data-bulk-summary="'+esc(row.id)+'"'+(!state?' hidden':'')+'>'+esc(state)+'</small></span>';
+  const change=(m||dose)?'<span class="pig-review-change bulk-pig-change"><span class="feed-pig-values">'+(m?'<span class="feed-reading"><small>Current</small><span>'+esc(p?.[c.view]??'—')+'</span></span><span class="feed-change-arrow" aria-hidden="true">→</span>':'')+'<label class="feed-reading is-new bulk-reading">'+(m?'<small>New</small>':'')+'<input type="number" inputmode="decimal" min="0" step="any" data-bulk-value="'+esc(row.id)+'" value="'+esc(value??'')+'" aria-label="'+(m?m.label:'Dose')+' for '+esc(row.id)+'" placeholder="—"'+(!row.eligible?' disabled':'')+' aria-invalid="'+(row.error||row.id===firstMissing)+'">'+(dose&&f.doseUnit?'<span class="bulk-unit" aria-hidden="true">'+esc(f.doseUnit)+'</span>':'')+'</label></span><small class="feed-change-state" data-bulk-summary="'+esc(row.id)+'"'+(!state?' hidden':'')+'>'+esc(state)+'</small></span>':'<span class="pig-review-change bulk-pig-change"><small class="feed-change-state" data-bulk-summary="'+esc(row.id)+'"'+(!state?' hidden':'')+'>'+esc(state)+'</small></span>';
   const include=f.bulk?'<label class="bulk-pig-check"><input type="checkbox" data-bulk-include="'+esc(row.id)+'" aria-label="Include pig '+esc(row.id)+'"'+(!f.excluded.includes(row.id)&&!blocked?' checked':'')+(blocked?' disabled':'')+'></label>':'';
-  return '<div class="pig-review-row bulk-pig-row'+(!f.bulk?' is-single':'')+(!row.eligible?' is-excluded':row.change?' is-changed':' is-unchanged')+'">'+include+'<span class="pig-review-identity bulk-pig-copy"><strong>'+esc(row.id)+'</strong><small>'+esc(p?penOf(c,row.id).id+' · '+stageSummary(p):'Unavailable')+'</small>'+(c.view==='resolve'&&row.finding?.feedLinked?'<small>Resets linked feed adjustment</small>':'')+'</span>'+change+'</div>';
+  return '<div class="pig-review-row bulk-pig-row'+(!f.bulk?' is-single':'')+(!row.eligible?' is-excluded':row.change?' is-changed':' is-unchanged')+'">'+include+'<span class="pig-review-identity bulk-pig-copy"><strong>'+esc(row.id)+'</strong><small>'+(p?bulkMeta(penOf(c,row.id).id+' · '+stageSummary(p)):'Unavailable')+'</small>'+(c.view==='resolve'&&row.finding?.feedLinked?'<small>Resets linked feed adjustment</small>':'')+'</span>'+change+'</div>';
  }).join('');
 }
 // The bulk action page (one component, every use): the selected pigs as one list of select rows on top, and the details
 // docked on the bottom edge above the footer: one surface with the footer (paper, a rule above, no card, no shadow).
 // The list and the dock share the page: the list takes what the dock leaves and scrolls on its own; the dock is capped and
 // scrolls on its own; neither sits inside the other. The dock's heading folds it away to give the list the room.
-function bulkListOverlay(c,{kind,rowsHtml,heading,sub,column,toggleLabel,controlsHtml,short,listClass='',overlayClass='',layoutClass='',collapsed}){
+function bulkListOverlay(c,{kind,rowsHtml,heading,sub,column,headHtml,summary='',toggleLabel,controlsHtml,short,listClass='',overlayClass='',layoutClass='',collapsed}){
  collapsed=collapsed??!!c.form.controlsCollapsed;
- return '<div class="bulk-action-layout'+(layoutClass?' '+esc(layoutClass):'')+(short?' is-short':'')+'" data-bulk-kind="'+esc(kind)+'"><section class="pig-review-card bulk-pigs'+(short?' is-short':'')+'"><div class="pig-review-heading feed-pigs-heading"><span><h4>'+esc(heading)+'</h4>'+(sub?'<small>'+esc(sub)+'</small>':'')+'</span>'+(column?'<strong>'+column+'</strong>':'')+'</div><div class="pig-review-list bulk-pig-list'+(listClass?' '+esc(listClass):'')+'" role="region" aria-label="'+esc(heading)+'" tabindex="0" data-bulk-rows>'+rowsHtml+'</div></section><section class="bulk-controls bulk-dock'+(overlayClass?' '+esc(overlayClass):'')+(collapsed?' is-collapsed':'')+'" aria-label="'+esc(toggleLabel)+'">'+button('bulk-toggle-controls','<span>'+esc(toggleLabel)+'</span>'+icon('chevron'),'bulk-controls-toggle').replace('<button','<button aria-expanded="'+!collapsed+'"')+(!collapsed?'<div class="bulk-control-fields">'+controlsHtml+'</div>':'')+'</section></div>';
+ return '<div class="bulk-action-layout'+(layoutClass?' '+esc(layoutClass):'')+(short?' is-short':'')+'" data-bulk-kind="'+esc(kind)+'"><section class="pig-review-card bulk-pigs'+(short?' is-short':'')+'">'+(headHtml||'<div class="pig-review-heading feed-pigs-heading"><span><h4>'+esc(heading)+'</h4>'+(sub?'<small>'+esc(sub)+'</small>':'')+'</span>'+(column?'<strong>'+column+'</strong>':'')+'</div>')+'<div class="pig-review-list bulk-pig-list'+(listClass?' '+esc(listClass):'')+'" role="region" aria-label="'+esc(heading)+'" tabindex="0" data-bulk-rows>'+rowsHtml+'</div></section><section class="bulk-controls bulk-dock'+(overlayClass?' '+esc(overlayClass):'')+(collapsed?' is-collapsed':'')+'" aria-label="'+esc(toggleLabel)+'">'+button('bulk-toggle-controls','<span class="bulk-toggle-text"><span>'+esc(toggleLabel)+'</span>'+(collapsed&&summary?'<small>'+esc(summary)+'</small>':'')+'</span>'+icon('chevron'),'bulk-controls-toggle').replace('<button','<button aria-expanded="'+!collapsed+'"')+(!collapsed?'<div class="bulk-control-fields">'+controlsHtml+'</div>':'')+'</section></div>';
 }
 function bulkWaitingReason(c){
  const f=c.form,view=c.view;
@@ -642,17 +645,33 @@ function refreshBulkCommit(root,c){
 }
 /* Tapping a waiting Save marks the empty required fields "Required" (f.showRequired) and scrolls to the first; no line is
    drawn above the footer. */
+/* One shortcut, said once: "Same dose for all" fills every pig's dose; each pig's own box stays editable. The unit sits with
+   the dose it measures. */
+function bulkDoseControl(c,{single,label,needDose,needUnit}){
+ const f=c.form;
+ pickerEntry(c,'doseUnit',{items:[['','Choose unit'],['mL','mL'],['mg','mg'],['g','g']],label:'Unit',target:'bulk',value:f.doseUnit||''});
+ const unit='<button type="button" class="bulk-unit-button'+(needUnit?' is-invalid':'')+'" data-action="open-picker" data-picker-key="doseUnit" aria-haspopup="dialog" aria-label="Dose unit, '+esc(f.doseUnit||'not chosen')+'"'+(needUnit?' aria-invalid="true"':'')+'><span>'+esc(f.doseUnit||'Unit')+'</span>'+icon('chevron')+'</button>';
+ const input='<input data-bulk-key="dose" type="number" min="0" step="any" inputmode="decimal" aria-label="'+esc(label)+'" placeholder="—" value="'+esc(f.dose||'')+'"'+(needDose?' aria-invalid="true"':'')+'>';
+ const box='<span class="bulk-reading bulk-same-box'+(needDose?' is-invalid':'')+'">'+input+unit+'</span>';
+ return single?'<div class="field bulk-dose-field"><span>'+esc(label)+(needDose?' <small class="bulk-required">'+needDose+'</small>':'')+'</span>'+box+'</div>':'<div class="bulk-same-dose"><span class="bulk-same-label">'+esc(label)+(needDose?'<small class="bulk-required">'+needDose+'</small>':'')+'</span>'+box+'</div>';
+}
+function bulkDetailsSummary(c){
+ const f=c.form;
+ if(c.view==='treatment')return [f.medicine.trim(),f.method].filter(Boolean).join(' · ');
+ if(c.view==='health')return f.conditions.length?f.conditions.join(' · ')+' · '+careLabel(f.triage):'';
+ return '';
+}
 function bulkActionPage(c){
  const f=c.form,view=c.view,single=!f.bulk,conditions=[...new Set(f.subjects.flatMap(id=>cases(pig(c,id)).map(k=>k.name)))],need=v=>f.showRequired&&!v?'Required':'';
- const target=bulkSelect(c,'Condition','target',[['','Choose condition'],...conditions.map(n=>[n,n])],need(f.target));let controls='';
+ const target=bulkSelect(c,'Condition','target',[['','Choose condition'],...conditions.map(n=>[n,n])],need(f.target));let controls='',sameDose='';
  if(view==='health')controls=SentriUI.pickerField({label:'Conditions',strs:{label:'ds.picker.conditions'},variant:'cascade-multi',selected:f.conditions,names:f.conditions,action:'bulk-pick-health',error:need(f.conditions.length),required:true})+bulkSelect(c,'Care','triage',careOptions);
  if(view==='edit-conditions'||view==='triage')controls=target+bulkSelect(c,'Care','triage',[['keep','Keep current care'],...careOptions],f.target&&f.showRequired&&!bulkActionValid(c)?'Required':'');
  if(view==='resolve')controls=target+bulkSelect(c,'Outcome','outcome',[['','Choose outcome'],['recover','Recovered'],['strike','Entered in error']],need(f.outcome));
  if(view==='treatment'){
   const method=bulkSelect(c,'Method','method',[['','Choose method'],['Injection','Injection'],['Oral','Oral'],['Topical','Topical'],['In feed','In feed'],['In water','In water']],need(f.method));
   const anyDose=String(f.dose||'').trim()!==''||Object.values(f.values||{}).some(v=>String(v).trim()!=='');
-  const dose=SentriUI.field({label:single?'Dose':'Set dose for all',unit:f.doseUnit||'',variant:'number',error:need(anyDose),control:'<input data-bulk-key="dose" type="number" min="0" step="any" inputmode="decimal" value="'+esc(f.dose||'')+'"'+(need(anyDose)?' aria-invalid="true"':'')+'>'}),unit=bulkSelect(c,'Unit','doseUnit',[['','Choose unit'],['mL','mL'],['mg','mg'],['g','g']],need(f.doseUnit));
-  controls=SentriUI.pickerField({label:f.taskId==='vaccination'?'Vaccine':'Medicine',value:f.medicine,path:f.medicinePath||[],action:'medicine-open',variant:'cascade',error:need(f.medicine.trim()),required:true})+method+unit+dose+(f.returnFinding?'<div class="field">Condition<strong>'+esc(f.returnFinding)+'</strong></div>':'');
+  const dose=bulkDoseControl(c,{single,label:single?'Dose':'Same dose for all',needDose:need(anyDose),needUnit:need(f.doseUnit)});
+  controls=SentriUI.pickerField({label:f.taskId==='vaccination'?'Vaccine':'Medicine',value:f.medicine,path:f.medicinePath||[],action:'medicine-open',variant:'cascade',error:need(f.medicine.trim()),required:true})+method+(single?dose:'')+(f.returnFinding?'<div class="field">Condition<strong>'+esc(f.returnFinding)+'</strong></div>':'');sameDose=single?'':dose;
  }
  if(view==='body')controls=bulkSelect(c,'Condition','condition',[['','Choose condition'],['Thin','Thin'],['Over-conditioned','Over-conditioned']],need(f.condition));
  const note=view==='note'?(SentriUI.field({label:"Note",error:need(f.note.trim()),control:"<textarea data-bulk-key=\"note\" rows=\"2\""+(need(f.note.trim())?' aria-invalid="true"':'')+">"+(esc(f.note))+"</textarea>"})):recordOptionalControls(c);
@@ -663,7 +682,7 @@ function bulkActionPage(c){
   const title=f.taskId==='vaccination'?'Record vaccination':m?'Record '+m.label.toLowerCase():bulkTitles[view];
   return sheet(c,title,p.id+' · '+penOf(c,p.id).id,'<section class="bulk-controls single-controls" aria-label="Record details">'+controls+note+'</section>',footer(back(),bulkCommit(c))).replace('class="sheet"','class="sheet single-action-sheet"');
  }
- const body=bulkListOverlay(c,{kind:view,rowsHtml:bulkRows(c),heading:'Pigs',sub:'',column:(bulkMeasurements[view]?'Current → New · '+bulkMeasurements[view].unit:view==='treatment'?'Dose'+(f.doseUnit?' · '+esc(f.doseUnit):''):''),toggleLabel:view==='treatment'?'Treatment details':'Details',controlsHtml:controls+note,short:f.subjects.length<=3});
+ const body=bulkListOverlay(c,{kind:view,rowsHtml:bulkRows(c),heading:'Pigs',sub:'',column:(bulkMeasurements[view]?'Current → New · '+bulkMeasurements[view].unit:''),headHtml:sameDose,summary:bulkDetailsSummary(c),toggleLabel:view==='treatment'?'Treatment details':'Details',controlsHtml:controls+note,short:f.subjects.length<=3});
  return sheet(c,bulkTitles[view],countLabel(f.subjects.length),body,footer(back(),bulkCommit(c))).replace('class="sheet"','class="sheet bulk-action-sheet"');
 }
 // Sample catalogue illustrates browsing and selection; it is not a treatment recommendation.
@@ -676,7 +695,7 @@ const medicineCatalogue=[
  {id:'vaccine-b',category:'Vaccines',name:'Vaccine B',detail:'Oral suspension · Sample product'}
 ];
 function medicineTree(c){return [...new Set(medicineCatalogue.filter(m=>c.form.taskId!=='vaccination'||m.category==='Vaccines').map(m=>m.category))].map(category=>({value:category,label:category,children:medicineCatalogue.filter(m=>m.category===category).map(m=>({value:m.id,label:m.name,meta:m.detail.replace(' · Sample product','')}))}));}
-function medicineResults(c){return SentriUI.pickerBody({variant:'cascade',items:medicineTree(c),path:c.form.medicineCategory?[c.form.medicineCategory]:[],selected:[c.form.medicineId],query:c.form.medicineSearch||'',action:'medicine-select',stepAction:'medicine-step',searchAttrs:{'data-medicine-search':''}});}
+function medicineResults(c){return searchAllBody({variant:'cascade',items:medicineTree(c),path:c.form.medicineCategory?[c.form.medicineCategory]:[],selected:[c.form.medicineId],query:c.form.medicineSearch||'',action:'medicine-select',stepAction:'medicine-step',searchAttrs:{'data-medicine-search':''}});}
 function medicinePicker(c){return sheet(c,c.form.taskId==='vaccination'?'Vaccines':'Medicines','','<div class="medicine-results">'+medicineResults(c)+'</div>',SentriUI.pickerFooter({multi:false})).replace('class="sheet"','class="sheet picker-step medicine-picker-step"');}
 function optionalFieldControls(items,openAction){return '<div class="st-optional-list">'+items.map(({key,label,value})=>stOptionalRow({label:label.replace(/^Add /,'').replace(/^./,m=>m.toUpperCase()),value,icon:icon('plus'),editIcon:icon('edit'),action:openAction,key})).join('')+'</div>';}
 function optNote(label,field,value){return stOptionalRow({label,value,icon:icon('plus'),editIcon:icon('edit'),inline:field});}
@@ -717,14 +736,25 @@ function recordOptionalEditor(c){
   return sheet(c,'Link condition','',(root||f.search?SentriUI.choiceSearch({label:'Search conditions',placeholder:'Search diseases and symptoms',value:f.search||'',attrs:{'data-v2':'search'}}):'')+'<div class="health-catalog st-choice-body">'+linkConditionResults(c)+'</div>',footer(back(),'')).replace('class="sheet"','class="sheet picker-step health-picker-step condition-link-picker-step"');
  }
  const brand=key==='brand',title=brand?'Add a brand':'Note';
- const control=brand?'<input maxlength="80" data-record-optional-input autofocus value="'+esc(value)+'">':'<textarea aria-label="Treatment note" rows="5" data-record-optional-input>'+esc(value)+'</textarea>';
+ const control=brand?'<input maxlength="80" data-record-optional-input autofocus value="'+esc(value)+'">':'<textarea aria-label="Note" rows="5" data-record-optional-input>'+esc(value)+'</textarea>';
  const field=brand?SentriUI.field({label:'Brand name',control,error:f.showRequired&&!value.trim()?'Required':''}):SentriUI.field({label:'Note',labelHidden:true,control});
  return sheet(c,title,'',field,footer(back(),button('record-optional-save',brand?'Add brand':'Done','button primary','',brand?!value.trim():!optionalEditorChanged(c)))).replace('class="sheet"','class="sheet feed-optional-sheet"');
 }
 
 function conditionMeta(c,n){const recorded=c.form.subjects.filter(id=>cases(pig(c,id)).some(k=>k.name===n.name)).length;return [n.custom?'Custom':'',recorded?'Already on '+countLabel(recorded):''].filter(Boolean).join(' · ');}
 function conditionTree(c){return ['Disease','Symptom'].map(kind=>({value:kind,label:kind==='Disease'?'Diseases':'Symptoms',children:[...new Set(healthCatalogue(c.form).filter(n=>n.kind===kind).map(n=>n.group))].map(group=>({value:group,label:group,children:healthCatalogue(c.form).filter(n=>n.kind===kind&&n.group===group).map(n=>({value:n.name,label:n.name,aliases:n.aliases,secondaryAction:n.custom?{label:'Remove custom condition',action:'health-remove-custom'}:undefined,meta:conditionMeta(c,n),attrs:{'data-condition':n.name,'data-condition-kind':kind}}))}))}));}
-function bulkHealthBody(c){if(c.form.customDraft)return customCategoryPicker(c);return SentriUI.pickerBody({variant:'cascade-multi',items:conditionTree(c),selected:c.form.conditions,path:c.form.conditionPath||[],query:c.form.search||'',action:'condition-level',stepAction:'condition-step',searchAttrs:{'data-v2':'search'}})+(c.form.search?.trim()&&!healthCatalogue(c.form).some(n=>normalizedCondition(n.name)===normalizedCondition(c.form.search))?button('health-add-custom','Add “'+esc(c.form.search.trim())+'” · '+c.form.kind.toLowerCase(),'st-text-action',c.form.search.trim()):'');}
+/* Search finds what exists: it always covers the whole catalogue, whatever level is open, and each result says its category
+   ("Coughing" · "Respiratory system"). "Add …" is offered only when nothing matches. Browsing keeps its level; the search
+   box says "Search all options" at every level so it never claims a scope it does not have. */
+function searchAllBody({variant,items,path=[],query='',action,stepAction,searchAttrs,selected}){
+ const q=query.trim().toLocaleLowerCase(),search=SentriUI.choiceSearch({label:'Search all options',value:query,attrs:searchAttrs,strs:{label:'ds.picker.search',placeholder:'ds.picker.search'}});
+ const swap=html=>html.replace(/<label class="field catalog-search st-choice-search"[^]*?<[/]label>/,()=>search);
+ if(!q)return swap(SentriUI.pickerBody({variant,items,path,query:'',selected,action,stepAction,searchAttrs}));
+ const leaves=(nodes,trail=[])=>nodes.flatMap(n=>n.children?leaves(n.children,[...trail,n.label]):[{...n,trail}]);
+ const hits=leaves(items).filter(n=>[n.label,...n.trail,...(n.aliases||[])].join(' ').toLocaleLowerCase().includes(q)).map(n=>({...n,aliases:[...(n.aliases||[]),...n.trail],meta:[n.trail[n.trail.length-1],n.meta].filter(Boolean).join(' · ')}));
+ return hits.length?swap(SentriUI.pickerBody({variant,items:hits,path:[],query:'',selected,action,stepAction,searchAttrs})):'<div class="st-picker-body" data-ds="PickerField" data-variant="'+variant+'">'+search+SentriUI.choiceEmpty('No options match “'+query+'”.',{strs:{text:'ds.picker.no_match'},args:{text:{query}}})+'</div>';
+}
+function bulkHealthBody(c){if(c.form.customDraft)return customCategoryPicker(c);const q=(c.form.search||'').trim(),body=searchAllBody({variant:'cascade-multi',items:conditionTree(c),selected:c.form.conditions,path:c.form.conditionPath||[],query:c.form.search||'',action:'condition-level',stepAction:'condition-step',searchAttrs:{'data-v2':'search'}});return body+(q&&body.includes('st-choice-empty')?button('health-add-custom','Add “'+esc(q)+'” · '+c.form.kind.toLowerCase(),'st-text-action',q):'');}
 /* Back (and the scrim) close the condition picker without applying: the trigger keeps what was applied, and the ticks
    stay as a draft that the next open shows again. Done · n applies them. */
 function leaveConditionPicker(c){const f=c.form,applied=f.conditionsBeforePicker||[],draft=f.conditions||[];if(draft.length!==applied.length||draft.some(n=>!applied.includes(n)))f.conditionsDraft=[...draft];else delete f.conditionsDraft;f.conditions=[...applied];delete f.conditionsBeforePicker;delete f.customDraft;c.view='health';}
@@ -737,11 +767,12 @@ function installBulkInputs(){
   const el=e.target,root=el.closest('[data-card]');if(!root)return;
   const i=+root.dataset.card,c=states[i];if(!c.form?.recordEditor)return;
   if(!el.hasAttribute('data-bulk-key')&&!el.hasAttribute('data-bulk-value')&&!el.hasAttribute('data-bulk-include'))return;
-  e.stopImmediatePropagation();const f=c.form;
+  e.stopImmediatePropagation();if(e.type==='change'&&!el.hasAttribute('data-bulk-include'))return; /* input already applied it; redrawing the rows on blur would drop the tap that caused the blur */
+  const f=c.form;
   if(el.hasAttribute('data-bulk-include')){f.excluded=el.checked?f.excluded.filter(id=>id!==el.dataset.bulkInclude):[...new Set([...f.excluded,el.dataset.bulkInclude])];}
   else if(el.hasAttribute('data-bulk-value'))f.values[el.dataset.bulkValue]=el.value;
   else {f[el.dataset.bulkKey]=el.value;if(el.dataset.bulkKey==='dose')f.values={};}
-  if(el.value.trim()!==''&&el.getAttribute('aria-invalid')==='true'&&!el.hasAttribute('data-bulk-value')){el.setAttribute('aria-invalid','false');const fd=el.closest('.field');fd?.classList.remove('error');fd?.querySelector('.st-field-message')?.remove();}
+  if(el.value.trim()!==''&&el.getAttribute('aria-invalid')==='true'&&!el.hasAttribute('data-bulk-value')){el.setAttribute('aria-invalid','false');const fd=el.closest('.field');fd?.classList.remove('error');el.closest('.bulk-same-box')?.classList.remove('is-invalid');el.closest('.bulk-same-dose,.bulk-dose-field')?.querySelector('.bulk-required')?.remove();fd?.querySelector('.st-field-message')?.remove();}
   const rail=root.querySelector('[data-bulk-rows]');
   if(el.hasAttribute('data-bulk-value')){
    for(const row of bulkChanges(c)){const text=[...root.querySelectorAll('[data-bulk-summary]')].find(x=>x.dataset.bulkSummary===row.id);if(text){const state=bulkRowState(row,c.view);text.textContent=state;text.hidden=!state;}}
@@ -1479,7 +1510,7 @@ function legacyOverlay(c){
  if(c.view==='report')return sheet(c,'Report an issue',`Pen ${c.penId}`,`${choices([['Feeder empty','Feeder empty'],['Feed flow blocked','Feed flow blocked'],['Water point issue','Water point issue'],['Other','Other']],c.form.choice,'choice',states.indexOf(c))}${c.form.choice==='Other'?textField('Describe the issue','note',c.form.note,'Where is the problem?'):optNote('Note',textField('','note',c.form.note,'Where is the problem?'),c.form.note)}`,footer(back(),button('save-pen','Save issue','button primary','',!valid(c))));
  if(c.view==='history')return sheet(c,'This walk',unitName(c)+' · G. Hansen',`${c.events.map(e=>`<article class="walk-event"><strong>${esc(e.title)}</strong><p>${esc(e.subjects.join(' · '))}${e.note?'<br>'+esc(e.note):''}</p><small>${e.time} · ${e.who}</small></article>`).join('')||'<div class="empty-inspect"><strong>No updates yet</strong>Health findings, measurements and pen updates will appear here.</div>'}`,footer(back(),''));
  if(c.view==='finish')return sheet(c,'End walk',unitName(c),`<div class="feed-feature"><p class="kicker">Recorded during this walk</p><strong>${c.events.length}</strong><p>Updates already saved to their pigs or pens.</p></div><p class="quiet-note">Check in as G. Hansen to record that you walked this unit. This does not mark every pig as healthy or every instruction as completed.</p>`,footer(back(),button('check-in','Check in to '+unitName(c),'button primary')));
- if(c.view==='complete')return sheet(c,'Walk recorded',unitName(c),`<div class="walk-complete"><span class="complete-mark">${icon('check')}</span><h4>Checked in at 09:41</h4><p>G. Hansen · ${unitName(c)}<br>${c.events.length} ${c.events.length===1?'update':'updates'} recorded</p></div>`,footer(back(),button('back','Back to unit','button primary')));
+ if(c.view==='complete')return sheet(c,'Walk recorded',unitName(c),`<div class="walk-complete"><span class="complete-mark">${icon('check')}</span><h4>Checked in at 09:41</h4><p>G. Hansen · ${unitName(c)}<br>${c.events.length} ${c.events.length===1?'update':'updates'} recorded</p></div>`,footer(back()));
  if(c.view==='home')return sheet(c,'Today','Your work',`<div class="action-list st-panel st-row-group">${action('back','check','Inspection · '+unitName(c),c.checkedIn?'Checked in at 09:41':'Last check-in 06:40')}</div>`,footer(back(),''));
  if(c.view==='grid')return penMapSheet(c);
  if(c.view==='search'||c.view==='scan')return sheet(c,c.view==='scan'?'Scan ear tag':'Find a pig',unitName(c),(c.view==='scan'?`<p class="quiet-note">Camera scanning is not connected in this prototype.</p>${button('sample-scan','Try sample tag 000306','button secondary')}`:'')+(SentriUI.field({label:"Ear tag or pen",control:"<input type=\"search\" data-search placeholder=\"e.g. 000254 or C1\" value=\""+(esc(c.query))+"\">",className:"inspect-search"}))+"<div class=\"search-results\">"+(searchResults(c))+"</div>",footer(back(),''));
