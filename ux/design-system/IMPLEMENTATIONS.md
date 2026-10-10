@@ -105,3 +105,8 @@ See [verification and rendered proof](components/pass-proof/README.md).
 `SentriUI.banner` owns danger, correction and notice; door and small size are properties. `SentriTask.warning` is only an adapter for legacy string slots and tone names. TaskWarning CSS, Farrowing danger/door markup, Inspection removal warnings and Home sync-card styling are retired. Piglet processing's ended notice uses notice and its dist is rebuilt.
 
 `SentriUI.photos` owns the line face built on the existing `optionalRow`; `SentriTask.photos` delegates without rewriting markup or styling. Farrowing death and piglet mortality use it. The unused well/circle face and TaskPhotos CSS are retired. Optional-row labels share choice-label type; Farrowing litter weight already uses that row. Give IDs Measure is unchanged pending the owner's Numpad split. State documents and 375px screenshots live with the two component pages.
+
+## State check
+
+`node scripts/check-states.mjs [baseUrl]` renders every `[data-state]` of every component variant as the atlas does (390px, tokens + bundle) and writes `review/state-check.json`; it exits non-zero on any problem.
+It needs Playwright from `C:/Users/ying_/.cache/adam-design/playwright-1.63.0` (override with `PLAYWRIGHT_DIR`); with no argument it serves the repo itself.
