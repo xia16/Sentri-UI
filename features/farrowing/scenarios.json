@@ -1859,7 +1859,7 @@
          "type": "outcome",
          "id": "fa-k1-overview-adds-up",
          "tree": "K-1",
-         "label": "The overview's progress adds up: Farrowed + Active + Awaiting = sows",
+         "label": "The overview's progress adds up: Done + Active + Awaiting = sows, the same total as End task and the room tabs",
          "authority": [
           {
            "src": "PRD",

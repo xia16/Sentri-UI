@@ -17,11 +17,11 @@
 body{margin:0;background:var(--ground);color:var(--ink);font:var(--font-size-14) var(--font-sans);-webkit-font-smoothing:antialiased}
 button,input,select{font:inherit}
 button{cursor:pointer;color:inherit;border:0}
-button:disabled,button[aria-disabled=true]{cursor:default;color:var(--disabled-ink);background:var(--disabled-surface);border-color:var(--disabled-border)}
+button:disabled,button[aria-disabled=true]{cursor:default;color:var(--ink);background:var(--disabled-surface);border-color:var(--disabled-border)}
 svg{width:var(--size-20);height:var(--size-20);display:block;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:var(--icon-stroke);stroke-linecap:round;stroke-linejoin:round;pointer-events:none}
 .button{min-height:var(--tap-min);min-width:var(--tap-min);padding:var(--space-10) var(--space-17);display:flex;align-items:center;justify-content:center;gap:var(--space-7);border:var(--border-width) solid var(--control-border);background:var(--paper);border-radius:var(--radius-control);font-weight:var(--type-weight-strong);font-size:var(--type-button-size);text-align:center;line-height:1.3}
 .button.primary{flex:1;background:var(--ink);border-color:var(--ink);color:var(--paper)}
-.button.primary:disabled{background:var(--disabled-fill);border-color:var(--disabled-fill);color:var(--disabled-ink)}
+.button.primary:disabled{background:var(--disabled-fill);border-color:var(--disabled-border);color:var(--ink)}
 .button.secondary{min-width:var(--back-width);font-weight:600}
 .button:active:not(:disabled){transform:translateY(var(--size-2))}
 .button.danger:not(:disabled):not([aria-disabled="true"]){background:var(--red);border-color:var(--red)}
@@ -525,9 +525,9 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 .button:not([aria-disabled="true"])[data-preview~="pressed"]{filter:brightness(.96);transform:translateY(var(--size-2))}
 .st-text-action.st-text-action{justify-content:center;min-width:var(--tap-min)}
 .st-text-action:not([aria-disabled="true"]):is(:active,[data-preview~="pressed"]){color:var(--ink);background:var(--press);border-radius:var(--radius-control)}
-.st-text-action.st-text-action[aria-disabled="true"]{color:var(--disabled-ink);background:transparent;cursor:default}
+.st-text-action.st-text-action[aria-disabled="true"]{color:var(--muted);background:transparent;cursor:default}
 /* waiting: present, quiet, focusable (aria-disabled); outranks every register's fill */
-.button.button[aria-disabled="true"]{background:var(--disabled-fill);border-color:var(--disabled-fill);color:var(--disabled-ink);cursor:default;filter:none;transform:none}
+.button.button[aria-disabled="true"]{background:var(--disabled-fill);border-color:var(--disabled-border);color:var(--ink);cursor:default;filter:none;transform:none}
 .button[data-busy]{cursor:progress}
 /* hold: the sweep fills the button over hold-commit; the caption rides under the verb */
 .button.st-hold{position:relative;overflow:hidden;flex-direction:column;gap:var(--space-4);touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
@@ -897,11 +897,20 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
 .st-optional-answer{font:400 13px/1.4 var(--font-sans);color:var(--ink)}
 .st-optional-act{order:-1;width:16px;height:16px;color:inherit}
 .st-optional-act svg{box-sizing:border-box;width:16px;height:16px;padding:0;border:0;border-radius:0;background:none;stroke-width:1.8}
-.st-optional-row[data-filled="true"],.st-optional-row[aria-expanded="true"]{border-color:#aebba3;background:#edf1e7;color:#293525}
+.st-optional-row[data-filled="true"]{border-color:var(--control-border);background:var(--well);color:var(--ink)}
+.st-optional-row[aria-expanded="true"]{border-color:var(--ink);color:var(--ink)}
+/* Filled: a full-width row, label over its value (two lines at most), the edit icon on the right. Empty stays the small "+ Label" card. */
+.st-optional-row[data-filled="true"]{width:100%;justify-content:flex-start;padding:6px 4px 6px 14px;text-align:left}
+.st-optional-row[data-filled="true"] .st-optional-copy{flex:1 1 0;align-items:flex-start;min-width:0}
+.st-optional-row[data-filled="true"] .st-optional-head{justify-content:flex-start;gap:var(--space-8)}
+.st-optional-row[data-filled="true"] .st-optional-act{order:0;flex:none;display:grid;place-items:center;width:44px;height:44px}
+.st-optional-answer{min-width:0;max-width:100%;white-space:normal;overflow-wrap:anywhere;text-align:left;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
 .st-optional-row:active{background:#edf1e7}
 .st-optional-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0 0}
 .st-optional-list>.st-optional{display:contents}
 .st-optional-list .st-optional-row{width:100%;margin:0}
+.st-optional-list .st-optional-row[data-filled="true"]{grid-column:1/-1}
+.st-optional-list>.st-choice-inline,.st-optional-body>.st-choice-inline{display:flex;justify-content:flex-start;min-height:48px;padding:0 var(--space-6);border:1px solid #e5eadc;border-radius:12px;background:#f8f9f3}
 .st-optional-list .st-optional-body,.st-optional-list>.finish-field,.st-optional-list>.st-choice-inline{grid-column:1/-1;margin:0}
 .st-photos .st-optional-row{margin:0}
 .st-photos-camera{width:calc(50% - 5px)}
@@ -952,3 +961,5 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 .st-banner[data-tone="danger"] .st-banner-headline{color:var(--red-ink)}
 /* A landmark focused by script (tabindex=-1: a list, a sheet) is not a control: no ring. */
 :is(.phone,.tk-phone,.atlas-phone,.device,.st-phone,.sp-phone,[data-st-context]) [tabindex="-1"]:focus{outline:none}
+/* A waiting or disabled control says so with its surface and rim; its text stays readable (4.5:1, farm legibility law). */
+.st-hold[aria-disabled="true"] :is(.st-hold-label,.st-hold-caption){color:var(--ink);opacity:1}

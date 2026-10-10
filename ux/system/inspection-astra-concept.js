@@ -462,7 +462,7 @@ function pigCurrentTasks(c){
  return '<section class="pig-current-tasks" aria-label="Current tasks">'+heading+'<div class="pig-current-task-list" role="region" aria-label="Current task cards" tabindex="0" data-task-count="'+tasks.length+'">'+tasks.map(t=>{const type=t.type||'General',slug=type.toLowerCase().replace(/[^a-z0-9]+/g,'-'),state=/in progress/i.test(t.status||'')?' is-active':/due today|today/i.test(t.status||'')?' is-due':'';return button(t.action||'sow-current-task','<span class="pig-current-task-icon">'+icon(taskIcon(t))+'</span><span class="pig-current-task-copy"><strong>'+esc(t.title)+'</strong><small>'+esc([t.status,t.summary].filter(Boolean).join(' · '))+'</small></span><span class="pig-current-task-type">'+esc(type)+'</span>'+icon('chevron'),'pig-current-task-entry task-'+slug+state,t.value||t.id);}).join('')+'</div></section>';
 }
 function pigFeedFacts(p,pe){
- if(pe.mode==='unknown')return '<section class="detail-section reading-section pig-feeding-facts">'+stHeading({title:'Feeding',icon:icon('feed'),kind:'section',level:4})+'<p class="detail-empty facts-surface">No feeding plan recorded.</p></section>';
+ if(pe.mode==='unknown')return '';
  const amount=pe.mode==='adlib'?'Ad-lib':quantity(pigAllocation(p,pe))+' <small>kg/day</small>';
  const context=pe.mode==='station'?'Station-fed':pe.mode==='trough'?'Included in pen allocation':'No fixed ration';
  const tags=pigFeedTags(p).map(t=>t.kind==='ration'?{...t,label:'Feed '+t.delta,day:feedAdjustmentReason(p)}:t);
@@ -501,8 +501,10 @@ function typeDetails(p,c){
  else if(['Grower','Finisher','Weaner'].includes(type)){title='Growth';items=[['Entry weight',r.entryWeight,'kg'],['Entry date',r.growthEntryDate]];}
  if(!title)return '';
  const titleHeading=stHeading({title,icon:icon(type==='Sow'||type==='Gilt'?'clock':type==='Boar'?'profile':'weight'),kind:'section',level:4});
- const known=knownFacts([...items.map(([label,value,unit,meta,mono])=>factItem(label,value,unit,meta,mono)),overviewNextTask(p,c),...(['Sow','Gilt'].includes(type)?[factItem('Parity',p.parity)]:[])]);return known.length?'<section class="detail-section reading-section animal-type-section">'+titleHeading+stFacts(known)+'</section>':'';
+ const known=knownFacts([...items.map(([label,value,unit,meta,mono])=>factItem(label,shortDate(value),unit,meta,mono)),overviewNextTask(p,c),...(['Sow','Gilt'].includes(type)?[factItem('Parity',p.parity)]:[])]);return known.length?'<section class="detail-section reading-section animal-type-section">'+titleHeading+stFacts(known)+'</section>':'';
 }
+/* A date the way the rest of the app writes it: "May 21", with the year only when it is not this one. */
+function shortDate(date){const m=/^([0-9]{4})-([0-9]{2})-([0-9]{2})$/.exec(date||'');if(!m)return date;const name=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+m[2]-1];return name+' '+(+m[3])+(m[1]!==walkDate.slice(0,4)?', '+m[1]:'');}
 function measurementDateAge(date){const days=daysFromWalk(date);return days===null?'':days===0?'Today':days>0?days+' days ago':'';}
 function dueDateLabel(date){const days=daysFromWalk(date);return days===null?'':days===0?'Today':days<0?'In '+(-days)+' days':days+' days past expected';}
 function pigRecordToolbar(p){return SentriUI.sheetFooter({content:back()+button('pig-actions',`${icon('grid')}<span>More actions</span>`,'button primary pig-actions-entry',p.id),className:'pig-detail-footer'});}
@@ -860,12 +862,12 @@ function actionCatalogue(c){
 }
 function sowTaskCard(c){if(picked(c).length!==1||c.selectedPens.size)return '';const tasks=currentTasksForPig(c,picked(c)[0]);if(!tasks.length)return '';const heading=stHeading({title:'Current tasks',meta:String(tasks.length),kind:'section',level:4});return `<section class="sow-task-section" aria-label="Linked tasks">${heading}<div class="sow-task-rail" aria-label="Current tasks">${tasks.map(t=>button(t.action||'sow-current-task',`<span class="sow-task-card-main"><strong>${esc(t.title)}</strong>${icon('chevron')}</span><span class="sow-task-card-meta"><span class="sow-task-status">${esc(t.status)}</span><span class="sow-task-type" data-type="${esc((t.type||'General').toLowerCase())}">${esc(t.type||'General')}</span></span>`,'sow-task-card',t.value||t.id)).join('')}</div></section>`;}
 
-function actionRows(items,disabled=false){return items.map(x=>{const row=action(x.a,x.k,x.title,x.sub,x.value);return disabled?row.replace('<button','<button disabled aria-disabled="true"'):row;}).join('');}
+function actionRows(items,disabled=false){return items.map(x=>action(x.a,x.k,x.title,x.sub,x.value,disabled)).join('');}
 function productionActionGroups(c,items,disabled=false){
  const farrowingIds=new Set(['miscarriage','edit']),processingIds=new Set(['piglets','death','countReconcile','foster']);
  const taskScope=x=>['farrowing','piglet-processing','pregnancy-check','gestation','breeding','lactation','growth','other'].includes(x.section)?x.section:farrowingIds.has(x.value)?'farrowing':processingIds.has(x.value)?'piglet-processing':'other';
  const byScope=scope=>items.filter(x=>taskScope(x)===scope),farrowing=byScope('farrowing'),processing=byScope('piglet-processing'),pregnancy=byScope('pregnancy-check'),gestation=byScope('gestation'),breeding=byScope('breeding'),lactation=byScope('lactation'),growth=byScope('growth'),other=byScope('other');
- const cluster=(title,rows)=>rows.length?'<section class="production-action-cluster" aria-label="'+title+' actions">'+SentriUI.rowGroup(actionRows(rows,disabled),{title,className:'compact-actions st-action-list'})+'</section>':'';
+ const cluster=(title,rows)=>rows.length?'<section class="production-action-cluster" aria-label="'+title+' actions">'+stHeading({title,kind:'group',level:5})+'<div class="compact-actions st-panel st-row-group st-action-list">'+actionRows(rows,disabled)+'</div></section>':'';
  return '<div class="production-action-groups">'+cluster('Farrowing',farrowing)+cluster('Piglet processing',processing)+cluster('Pregnancy check',pregnancy)+cluster('Gestation',gestation)+cluster('Breeding',breeding)+cluster('Lactation',lactation)+cluster('Growth',growth)+cluster('Shared',other)+'</div>';
 }
 function actionSections(c,groups,disabled=false){return groups.map(g=>{const categoryIcon=icon(g.id==='production'?'chart':g.id==='health'?'condition':g.id==='feed'?'feed':'note');const heading=stHeading({title:g.label,icon:categoryIcon,kind:'section',level:4,className:'section-title st-category-heading'});return `<section class="sow-action-group st-action-section${disabled?' unavailable-action-group':''}" data-action-group="${g.id}" aria-label="${g.label}">${heading}${g.id==='production'&&g.items.length?productionActionGroups(c,g.items,disabled):'<div class="compact-actions st-panel st-row-group st-action-list">'+actionRows(g.items,disabled)+'</div>'}${g.empty?'<p class="action-category-empty">'+esc(g.empty)+'</p>':''}</section>`;}).join('');}
@@ -1488,7 +1490,7 @@ function sheet(c,title,scope,body,actions,aside=''){
 }
 function back(){return SentriUI.backButton({action:'back'});}
 function scope(c){const ids=c.form.subjects||[...c.selected],pens=[...new Set(ids.map(id=>penOf(c,id)?.id))];return `${countLabel(ids.length)} · ${pens.join(' / ')}`;}
-function action(a,k,title,sub,v=''){return stRow({action:a,title,description:sub,icon:icon(k),value:v,className:'action-item',attrs:entryFor(a)?{'data-entry':entryFor(a)}:{}});}
+function action(a,k,title,sub,v='',disabled=false){return stRow({action:a,title,description:sub,icon:icon(k),value:v,disabled,className:'action-item',attrs:entryFor(a)?{'data-entry':entryFor(a)}:{}});}
 function textField(label,key,value='',placeholder=''){return SentriUI.field({label:label||'Note',variant:'textarea',control:`<textarea data-field="${key}" placeholder="${placeholder}">${esc(value)}</textarea>`});}
 
 function choices(items,current,key,group){return SentriUI.choiceRadios({label:'Reason',key,action:'form-choice',selected:current||'',options:items.map(([value,label,meta])=>({value,label,meta}))});}

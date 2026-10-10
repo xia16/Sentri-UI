@@ -2,9 +2,9 @@
 (()=>{
  const e=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const arrow='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>';
- function statusProgress({farrowed=0,active=0,awaiting=0},compact=false){
-  const names=['farrowed','active','awaiting'],counts=[farrowed,active,awaiting].map(n=>Math.max(0,Number(n)||0)),total=counts.reduce((a,b)=>a+b,0);
-  return `<span class="task-status-bar${compact?' task-status-bar-compact':''}" role="progressbar" aria-label="Farrowing progress" aria-valuemin="0" aria-valuemax="${total||1}" aria-valuenow="${counts[0]}" aria-valuetext="${counts.map((n,i)=>n+' '+names[i]).join(', ')}; ${total} sows">${counts.map((n,i)=>n?`<i class="task-status-${names[i]}" style="width:${100*n/total}%"></i>`:'').join('')}</span>`;
+ function statusProgress({farrowed=0,active=0,awaiting=0},compact=false,words){
+  const names=['farrowed','active','awaiting'],said=words||names,counts=[farrowed,active,awaiting].map(n=>Math.max(0,Number(n)||0)),total=counts.reduce((a,b)=>a+b,0);
+  return `<span class="task-status-bar${compact?' task-status-bar-compact':''}" role="progressbar" aria-label="Farrowing progress" aria-valuemin="0" aria-valuemax="${total||1}" aria-valuenow="${counts[0]}" aria-valuetext="${counts.map((n,i)=>n+' '+said[i]).join(', ')}; ${total} sows">${counts.map((n,i)=>n?`<i class="task-status-${names[i]}" style="width:${100*n/total}%"></i>`:'').join('')}</span>`;
  }
  function render({unit,task,action='room-overview',href,headingIcons=false}){
   const unitIcon=headingIcons?'<svg class="tc-leading-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z"/></svg>':'';
