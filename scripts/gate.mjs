@@ -313,12 +313,15 @@ if (zhIgnored.size) gaps.push(`no Chinese rendering (?lang=zh is ignored) on ${z
 if (zhLost.size) gaps.push(`${zhLost.size} screen(s) rendered Chinese on base and not on the candidate: ${[...zhLost].slice(0, 6).join(', ')} (their zh pairs say so)`);
 
 // ---------- the class, now that the screens are known; the checks that follow from it ----------
-const ec = effectiveClass({ declared, files, diffs: moved, scope, shared });
+// A screen that renders differently twice on base can't be judged by pixels: its pairs still go to the judge, but it doesn't
+// escalate the class or fail a refactor by itself.
+const steady = moved.filter((s) => !mech.flaky.includes(s.id));
+const ec = effectiveClass({ declared, files, diffs: steady, scope, shared });
 mech.class = { declared, effective: ec.cls, why: ec.why };
 if (ec.cls !== byFiles.cls) console.log(`class: ${declared} → ${ec.cls} (${ec.why.join('; ')})`);
-if (mode === 'refactor') check('refactor: every screen identical', !moved.length, moved.map((s) => s.id).slice(0, 5).join(', '));
+if (mode === 'refactor') check('refactor: every screen identical', !steady.length, steady.length ? steady.map((s) => s.id).slice(0, 5).join(', ') : mech.flaky.length ? `${mech.flaky.length} unstable on base, not counted` : '');
 const tools = touchesTools(files);
-if (tools.length && moved.length) check('workflow changes in their own PR', false, `this change moves ${moved.length} screen(s) and also edits the workflow or the gate's tools (${tools.slice(0, 3).join(', ')}): split it`);
+if (tools.length && steady.length) check('workflow changes in their own PR', false, `this change moves ${steady.length} screen(s) and also edits the workflow or the gate's tools (${tools.slice(0, 3).join(', ')}): split it`);
 // The shared-component queue: one shared change at a time, oldest first. A shared candidate waits while an older open,
 // non-draft PR also touches the shared system (the same shared set); once that merges, this one merges main forward and is
 // gated against it.
