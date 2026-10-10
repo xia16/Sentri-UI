@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { existsSync } from "node:fs";
 import { access, readFile, readdir } from "node:fs/promises";
 import test from "node:test";
 
@@ -6,6 +7,12 @@ const developmentPreviewMeta =
   /<meta(?=[^>]*\bname=["']codex-preview["'])(?=[^>]*\bcontent=["']development["'])[^>]*>/i;
 const templateRoot = new URL("../", import.meta.url);
 const previewRoot = new URL("../app/_sites-preview/", import.meta.url);
+
+// These two tests cover the site starter's loading skeleton (app/_sites-preview) and its built worker (dist/server).
+// The design repo removed that skeleton, so they skip until it exists again; they do not cover any Sentri design.
+const starterSkip = existsSync(previewRoot)
+  ? false
+  : "starter loading skeleton (app/_sites-preview) is not in this repo; nothing to render";
 
 async function render() {
   const workerUrl = new URL("../dist/server/index.js", import.meta.url);
@@ -28,7 +35,7 @@ async function render() {
   );
 }
 
-test("server-renders the starter loading skeleton", async () => {
+test("server-renders the starter loading skeleton", { skip: starterSkip }, async () => {
   const response = await render();
   assert.equal(response.status, 200);
   assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
@@ -47,7 +54,7 @@ test("server-renders the starter loading skeleton", async () => {
   assert.match(html, /role="status"/);
 });
 
-test("keeps the loading skeleton scoped and disposable", async () => {
+test("keeps the loading skeleton scoped and disposable", { skip: starterSkip }, async () => {
   const [preview, css, page, layout, packageJson, files] = await Promise.all([
     readFile(new URL("SkeletonPreview.tsx", previewRoot), "utf8"),
     readFile(new URL("preview.css", previewRoot), "utf8"),
