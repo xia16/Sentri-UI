@@ -8,59 +8,248 @@
   "duplicates": "built inside Inspection — see inspection / health-record",
   "groups": [
     [
-      "Old UI",
+      "Add condition",
       [
-        "disease.add",
-        "disease.remove",
-        "disease.triage",
-        "disease.result"
+        "disease.add-select",
+        "disease.add-drawer",
+        "disease.catalogue",
+        "disease.add-committed"
+      ]
+    ],
+    [
+      "Resolve",
+      [
+        "disease.resolve-one",
+        "disease.resolve-many",
+        "disease.resolve-in-place",
+        "disease.resolve-committed"
       ]
     ]
   ],
   "screens": [
     {
-      "id": "disease.add",
-      "name": "Add disease or symptom",
-      "zh": "添加疾病 / 添加症状",
-      "status": "placeholder",
+      "id": "disease.add-select",
+      "name": "Select pigs · verb sheet",
+      "zh": "选择猪只",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-condition&slide=1",
       "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
       "notes": {
-        "purpose": "Add a disease to several pigs or a symptom to one pig, with the selected-pigs list.",
-        "issues": []
+        "purpose": "Two ticked pigs raise the verb sheet; Condition is a tile under Health.",
+        "rules": [
+          "Blocked verbs are omitted, not greyed; one line accounts for them."
+        ],
+        "edge": [
+          "A missing Production strip (growers) is a reading, not a gap."
+        ]
       }
     },
     {
-      "id": "disease.remove",
-      "name": "Remove or recover",
-      "zh": "移除疾病/症状",
-      "status": "placeholder",
+      "id": "disease.add-drawer",
+      "name": "Add condition · one drawer",
+      "zh": "添加疾病 / 症状",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-condition&slide=2",
       "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
       "notes": {
-        "purpose": "Remove a disease or symptom, or mark it recovered; default state and the state after.",
-        "issues": []
+        "purpose": "The whole add flow is one sheet: conditions, triage preset and the primary that says what it writes.",
+        "elements": [
+          {
+            "name": "Triage",
+            "at": "Triage",
+            "shows": "Inline Choice with Monitor preselected",
+            "rule": "Triage rides inline with the preset Monitor because no null level exists. Its option hints carry the consequences."
+          }
+        ],
+        "rules": [
+          "The drawer is the review: the picker step, the confirm card, the read-only roster and the toast were removed.",
+          "view > filters the live list, which can still deselect."
+        ]
       }
     },
     {
-      "id": "disease.triage",
-      "name": "Choose triage level",
-      "zh": "选择健康分诊等级",
-      "status": "placeholder",
+      "id": "disease.catalogue",
+      "name": "Condition catalogue",
+      "zh": "疾病目录",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-condition&slide=3",
       "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
       "notes": {
-        "purpose": "Choose the triage level after a change.",
-        "issues": []
+        "purpose": "One flat list under body-system groups with search; each entry carries its class silently.",
+        "elements": [
+          {
+            "name": "Condition row",
+            "shows": "Name, class behind the info icon, and how many of the selected pigs already carry it",
+            "logic": "The per-item count answers \"already carrying\" before the tick. A fever writes a case with a day count; a hernia writes a characteristic on the pig page.",
+            "source": "wf-condition, slide 3"
+          }
+        ],
+        "rules": [
+          "Groups are body words (Belly), never the class (Standing). The footnote states a consequence: a tick adds no second case."
+        ],
+        "edge": [
+          "Ambiguous entries split in the catalogue (injury versus chronic lameness) rather than asking the farmer."
+        ]
       }
     },
     {
-      "id": "disease.result",
-      "name": "Confirm and result",
-      "zh": "二次确认 / 操作结果",
-      "status": "placeholder",
+      "id": "disease.add-committed",
+      "name": "After adding · list is the receipt",
+      "zh": "添加完成",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-condition&slide=4",
       "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
       "notes": {
-        "purpose": "Second confirmation and result.",
-        "issues": []
+        "purpose": "The walk list after commit: rows update in place, selection clears, scroll is kept.",
+        "elements": [
+          {
+            "name": "What prints",
+            "shows": "The walk list after commit: rows update in place, selection clears, scroll is kept.",
+            "states": [
+              {
+                "state": "Newly added",
+                "when": "Pig did not carry the condition",
+                "shows": "Opens at today with the amber dot (Monitor preset: dot, no trail means watching)"
+              },
+              {
+                "state": "Already carried",
+                "when": "Pig already had it open",
+                "shows": "No duplicate case; day count keeps aging"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "disease.resolve-one",
+      "name": "Resolve · one pig",
+      "zh": "康复 / 移除 · 单只",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-resolve&slide=1",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "One pig: her open cases as verdict lines, Recover (big tick, left) and Strike (small chip, right).",
+        "elements": [
+          {
+            "name": "Verdict line",
+            "shows": "One open condition with its trail",
+            "rule": "Left tick = Recover (the outcome, the walk's normal act). Right chip \"wrong\" = Strike (correction of a wrong entry). Characteristics never appear."
+          }
+        ],
+        "edge": [
+          "A hernia ends by correction on the pig record, not here."
+        ]
+      }
+    },
+    {
+      "id": "disease.resolve-many",
+      "name": "Resolve · verdict page",
+      "zh": "康复 / 移除 · 多只",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-resolve&slide=2",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "Several pigs: one line per pig and open condition, pen-grouped, in the walk row grammar.",
+        "rules": [
+          "The master row and pen headers are recover-all shortcuts.",
+          "The primary is disabled at zero verdicts.",
+          "The zero rule keeps pigs with nothing open off the page; the footnote counts them."
+        ],
+        "edge": [
+          "Production was condition-major (one line per disease across 10 pigs); this page is pig-major and the condition-major shortcuts are cut."
+        ]
+      }
+    },
+    {
+      "id": "disease.resolve-in-place",
+      "name": "Resolve · verdicts in place",
+      "zh": "康复 / 移除 · 已选",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-resolve&slide=3",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "Mixed verdicts on one page: recover some, strike one, one commit.",
+        "elements": [
+          {
+            "name": "Verdict lines",
+            "shows": "Mixed verdicts on one page: recover some, strike one, one commit.",
+            "states": [
+              {
+                "state": "Recover ticked",
+                "when": "Big tick pressed",
+                "shows": "Line marked to close as recovered"
+              },
+              {
+                "state": "Struck",
+                "when": "Wrong chip pressed",
+                "shows": "Row struck through (struck · wrong entry) with an undo"
+              },
+              {
+                "state": "Group line",
+                "when": "Un-identified group",
+                "shows": "Recovers by count; an inline stepper lowers the number (12 to 5)"
+              }
+            ]
+          }
+        ],
+        "rules": [
+          "One commit carries both verbs; no mode switch, no leave guard.",
+          "Strike is plain human-error correction: no KPI language; the audit keeps the record."
+        ]
+      }
+    },
+    {
+      "id": "disease.resolve-committed",
+      "name": "After resolving",
+      "zh": "完成",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-resolve&slide=4",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "The walk list after commit: what remains is what prints.",
+        "rules": [
+          "Recovery prints as silence: closed lines vanish and nothing says \"recovered\". The group ledger re-aggregates (12 to 7).",
+          "A struck entry prints nothing anywhere; audit keeps it, history lines do not. No toast."
+        ]
       }
     }
+  ],
+  "flow": [
+    [
+      "disease.add-select",
+      "disease.add-drawer",
+      "tap Condition in the verb sheet"
+    ],
+    [
+      "disease.add-drawer",
+      "disease.catalogue",
+      "tap the Conditions field"
+    ],
+    [
+      "disease.catalogue",
+      "disease.add-drawer",
+      "tap a condition"
+    ],
+    [
+      "disease.add-drawer",
+      "disease.add-committed",
+      "tap Record"
+    ],
+    [
+      "disease.resolve-one",
+      "disease.resolve-committed",
+      "tap Recover or the wrong-entry chip"
+    ],
+    [
+      "disease.resolve-many",
+      "disease.resolve-in-place",
+      "tick verdicts"
+    ],
+    [
+      "disease.resolve-in-place",
+      "disease.resolve-committed",
+      "tap the primary"
+    ]
   ]
 }

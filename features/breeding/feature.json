@@ -8,11 +8,19 @@
   "duplicates": "",
   "groups": [
     [
-      "Old UI",
+      "Earlier design (pre-Astra)",
       [
         "breeding.list",
-        "breeding.overview",
         "breeding.record",
+        "breeding.filter",
+        "breeding.picker",
+        "breeding.peek",
+        "breeding.overview"
+      ]
+    ],
+    [
+      "Old UI only (Figma, not redesigned)",
+      [
         "breeding.search",
         "breeding.end",
         "breeding.ended"
@@ -24,32 +32,221 @@
       "id": "breeding.list",
       "name": "Pig list tab",
       "zh": "配种猪只列表",
-      "status": "placeholder",
+      "status": "earlier",
+      "url": "/ux/archive/screens.html?sec=01&slide=4",
       "figma": "https://www.figma.com/design/psrxDa9LRWLdTL9XMZmWdc?node-id=7845-6780",
       "notes": {
-        "purpose": "Pigs due for mating by pen, with filter (Tab：配种（猪只List）, 筛选, Grid).",
-        "issues": []
+        "purpose": "Sows due for mating, by pen; lens Open / Mated / All. A rail task: tap the row, no boxes.",
+        "elements": [
+          {
+            "name": "Task row",
+            "shows": "one sow (or litter): tag, one fact line, one memory line, rail",
+            "states": [
+              {
+                "state": "Ready",
+                "when": "next mating can be given now",
+                "shows": "Mating 2, line 2 \"last 2d\", READY rail"
+              },
+              {
+                "state": "Interval long",
+                "when": "time since the last mating over the configured limit",
+                "shows": "chip \"LAST 26H\" on line 1"
+              },
+              {
+                "state": "Wait",
+                "when": "next mating not yet due (dimmed)",
+                "shows": "line 2 \"next 9h\", WAIT rail"
+              },
+              {
+                "state": "Done",
+                "when": "configured number of matings reached",
+                "shows": "Done · 2 matings, \"JY001 · 07:14 · G.H\", edit pencil"
+              }
+            ],
+            "logic": "Line 1 is words (state + when), line 2 is tokens (history, stamps). A chip appears only for an escalated measurement or a flagged observation; stamps appear on done rows and on rows that descend from a record. Everything on the row is derived; the worker types nothing here.",
+            "source": "ux/model/unified-task-list.md; ux/archive/screens.html §01; ux/research/tasks/BRIEF.md (row law)"
+          },
+          {
+            "name": "Lens row",
+            "shows": "Open / Mated / All; funnel filters by mating count 0, 1, 2, 3, more than 3",
+            "logic": "Mating count filter is breeding-only (archive 01c).",
+            "source": "ux/model/unified-task-list.md; ux/archive/screens.html §01"
+          },
+          {
+            "name": "Unit KPI and Task overview",
+            "shows": "1h heat to mating, target 12h or less; Task overview \"32 mated · 14 to mate\"",
+            "logic": "The KPI is the heat-to-mating interval; no formula is documented beyond its name and target.",
+            "source": "ux/model/unified-task-list.md; ux/archive/screens.html §01"
+          }
+        ],
+        "rules": [
+          "Breeding has no boxes and no bulk: scan opens the sow's sequence sheet directly."
+        ],
+        "issues": [
+          "Pre-Astra look: rows, header and dock predate the Astra task skeleton.",
+          "Open question (research): is READY a window that expires? Today nothing escalates until the record is made."
+        ]
       }
     },
     {
       "id": "breeding.overview",
-      "name": "Task overview",
-      "zh": "任务概览",
-      "status": "placeholder",
+      "name": "Task detail",
+      "zh": "任务详情",
+      "status": "earlier",
+      "url": "/ux/archive/screens.html?sec=03&slide=4",
       "figma": "https://www.figma.com/design/psrxDa9LRWLdTL9XMZmWdc?node-id=7845-6780",
       "notes": {
-        "purpose": "Whole-task progress and the pen grid.",
-        "issues": []
+        "purpose": "The sheet behind the Task overview cell for breeding: whole-task progress, KPI, configuration, SOP link and, where the task has one, End task. What failed the \"does this change what a hand does at the pen right now?\" test lives here, one tap from the room.",
+        "elements": [
+          {
+            "name": "End task",
+            "shows": "No End task button.",
+            "rule": "Breeding is an event task and closes itself record by record. The batch breeding phase close is a console action showing a derived split (mated once, twice, three or more stay; un-mated leave the batch), blocked until the heat check is closed (research delta 4). Whether the phone also needs a supervisor path is open (research).",
+            "source": "ux/archive/screens.html section 03"
+          },
+          {
+            "name": "Configuration",
+            "shows": "Sequence rules.",
+            "logic": "Number of matings, interval limit (24 h in the research example), semen plan.",
+            "source": "ux/research/tasks/breeding.html"
+          },
+          {
+            "name": "Unit KPI",
+            "shows": "Heat to mating interval against its target.",
+            "logic": "Derived.",
+            "source": "ux/research/tasks/breeding.html"
+          }
+        ],
+        "issues": [
+          "Pre-Astra look: header, KPI cells and sheet styling predate the Astra task skeleton."
+        ]
       }
     },
     {
       "id": "breeding.record",
       "name": "Record mating",
       "zh": "配种",
-      "status": "placeholder",
+      "status": "earlier",
+      "url": "/ux/archive/screens.html?sec=04b&slide=3",
       "figma": "https://www.figma.com/design/psrxDa9LRWLdTL9XMZmWdc?node-id=7845-6780",
       "notes": {
-        "purpose": "Record a mating, an extra mating, and change the semen (配种-默认态, 配种, 额外配种, 更换精液).",
+        "purpose": "The sequence sheet for one sow: a timeline of matings with the current one ready to confirm.",
+        "elements": [
+          {
+            "name": "Interval warning",
+            "shows": "amber line when the interval since the last mating is over the limit",
+            "rule": "Shown only when over the configured limit; the row also carries the LAST chip. Dismissed by scrolling on.",
+            "source": "ux/research/tasks/breeding.html"
+          },
+          {
+            "name": "Semen batch",
+            "shows": "the batch for this mating",
+            "logic": "List comes from the console breeding plan. Default is the previous mating's batch; changing it at mating k forward-fills k+1 onward; always editable. The confirm button names the batch.",
+            "source": "ux/research/tasks/breeding.html delta 1"
+          },
+          {
+            "name": "Add mating",
+            "shows": "a done sow's sheet shows one ghost row to add the next mating",
+            "rule": "Extra matings continue the numbering and interval logic; no cap is documented.",
+            "source": "ux/research/tasks/breeding.html delta 2"
+          }
+        ],
+        "edge": [
+          "A sow found off the happy path (not in this unit, not in the batch, not marked in heat) goes through a guard sheet; a not-in-heat sow asks to confirm in heat and writes the heat record with attribution (research delta 3). That guard sheet is not drawn in the earlier deck."
+        ],
+        "issues": []
+      }
+    },
+    {
+      "id": "breeding.picker",
+      "name": "Pen picker",
+      "zh": "栏位选择",
+      "status": "earlier",
+      "url": "/ux/archive/task-screens-combined.html?sec=02&slide=3",
+      "figma": "https://www.figma.com/design/psrxDa9LRWLdTL9XMZmWdc?node-id=7845-6780",
+      "notes": {
+        "purpose": "The unit as a map: is there work here, how much, how urgent. Tap lands in the pen; it never acts.",
+        "elements": [
+          {
+            "name": "Pen cell",
+            "shows": "pen code and at most one chip. For breeding, green READY chips mark pens with sows to mate now; done pens read, for example, \"6 mated\".",
+            "states": [
+              {
+                "state": "Overdue",
+                "when": "past its window",
+                "shows": "red chip"
+              },
+              {
+                "state": "Attention",
+                "when": "signs, due today, long interval, needs check",
+                "shows": "amber chip"
+              },
+              {
+                "state": "Ready",
+                "when": "breeding only: go now",
+                "shows": "green chip"
+              },
+              {
+                "state": "Done",
+                "when": "all handled",
+                "shows": "tick beside the code, outcome in muted text"
+              },
+              {
+                "state": "Nothing asked",
+                "when": "waiting or scheduled",
+                "shows": "grey text"
+              },
+              {
+                "state": "No task pigs",
+                "when": "no pigs of this task in the pen",
+                "shows": "dimmed cell"
+              }
+            ],
+            "logic": "Priority is fixed: red, amber, green, neutral, done, grey; one chip per cell, most urgent wins. Counts lead the word and appear only from 2. The picker never inherits the lens or filter: every pen shows its real state.",
+            "rule": "Tap = land (header pinned). Long-press shows the peek. The grid never acts.",
+            "source": "ux/archive/task-screens-combined.html sections 02 and 02b"
+          }
+        ],
+        "issues": []
+      }
+    },
+    {
+      "id": "breeding.filter",
+      "name": "Filter sheet",
+      "zh": "筛选",
+      "status": "earlier",
+      "url": "/ux/archive/task-screens-combined.html?sec=01c&slide=3",
+      "figma": "https://www.figma.com/design/psrxDa9LRWLdTL9XMZmWdc?node-id=7845-6780",
+      "notes": {
+        "purpose": "The filter: mating time plus mating count, two groups.",
+        "elements": [
+          {
+            "name": "Dimensions kept",
+            "shows": "what survived from production",
+            "logic": "Heat status and pen row are dropped (lens, Go to pen). Mating count 0, 1, 2, 3, more than 3 stays and is breeding-only.",
+            "source": "ux/archive/task-screens-combined.html section 01c"
+          }
+        ],
+        "issues": []
+      }
+    },
+    {
+      "id": "breeding.peek",
+      "name": "Peek",
+      "zh": "栏位预览",
+      "status": "earlier",
+      "url": "/ux/archive/task-screens-combined.html?sec=02c&slide=2",
+      "figma": "https://www.figma.com/design/psrxDa9LRWLdTL9XMZmWdc?node-id=7845-6780",
+      "notes": {
+        "purpose": "Long-press a pen cell: one line per sow, the mating number and its one relevant fact.",
+        "elements": [
+          {
+            "name": "Peek card",
+            "shows": "sequence memory per sow",
+            "rule": "Read-only. Ready sows carry the chip, waiting sows dim, done sows show a tick. It answers which sows are ready before walking in.",
+            "source": "ux/archive/task-screens-combined.html section 02c"
+          }
+        ],
         "issues": []
       }
     },

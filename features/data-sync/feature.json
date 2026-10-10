@@ -8,37 +8,146 @@
   "duplicates": "",
   "groups": [
     [
-      "Old UI",
+      "Saved work on this phone",
       [
         "data-sync.banner",
         "data-sync.list",
-        "data-sync.detail",
-        "data-sync.upload"
+        "data-sync.upload",
+        "data-sync.failed"
+      ]
+    ],
+    [
+      "Old UI, not built",
+      [
+        "data-sync.detail"
       ]
     ]
   ],
   "screens": [
     {
       "id": "data-sync.banner",
-      "name": "Entry",
+      "name": "Entry · saved-work card",
       "zh": "公告栏位置示意",
-      "status": "placeholder",
+      "status": "in-design",
       "figma": "https://www.figma.com/design/LhQhJho192tNKCFvf5Drnf?node-id=10541-8073",
       "notes": {
-        "purpose": "Where the sync notice sits: home entry and the all-treatments list.",
-        "issues": []
-      }
+        "purpose": "Where the sync notice sits: the first card of Home, below the scope switch.",
+        "states": [],
+        "elements": [
+          {
+            "name": "Saved-work card",
+            "at": "records saved on this device",
+            "shows": "\"N records saved on this device\" and the connection line",
+            "states": [
+              {
+                "state": "Offline",
+                "when": "No connection (default)",
+                "shows": "\"No connection · waiting to upload\""
+              },
+              {
+                "state": "Connected",
+                "when": "Connection available",
+                "shows": "\"Connection available · tap to upload\""
+              },
+              {
+                "state": "Uploading",
+                "when": "An upload is running",
+                "shows": "\"Uploading N records\" · \"Sending saved work…\""
+              },
+              {
+                "state": "Failed",
+                "when": "The last upload did not complete",
+                "shows": "\"Upload interrupted · tap to retry\""
+              },
+              {
+                "state": "All uploaded",
+                "when": "The queue is empty",
+                "shows": "Quiet row \"All records uploaded\" at the bottom of Home, not the top"
+              }
+            ],
+            "logic": "The queue is device-wide: not scoped to the section or unit. A pending queue puts the card first; an empty one moves it to the bottom.",
+            "source": "syncCard(); sync{}"
+          }
+        ],
+        "controls": [],
+        "copy": [
+          "(raw)"
+        ],
+        "edge": [],
+        "rules": [],
+        "issues": [
+          "Treatment sync from the old design (the all-treatments list) has no entry here."
+        ]
+      },
+      "url": "/ux/system/home-astra-prototype.html?section=gestation&connection=online"
     },
     {
       "id": "data-sync.list",
-      "name": "Sync list",
+      "name": "Saved work (sync list)",
       "zh": "数据同步列表",
-      "status": "placeholder",
+      "status": "in-design",
       "figma": "https://www.figma.com/design/LhQhJho192tNKCFvf5Drnf?node-id=10541-8073",
       "notes": {
-        "purpose": "The list of items to sync, and its empty state.",
-        "issues": []
-      }
+        "purpose": "Shows what is saved on the phone and not yet sent, and lets the worker upload it.",
+        "states": [],
+        "elements": [
+          {
+            "name": "Upload button and message",
+            "shows": "Upload 3 records · No connection · check Wi-Fi or mobile signal",
+            "states": [
+              {
+                "state": "Offline",
+                "when": "No connection (default; \"Connection preview\" select outside the phone)",
+                "shows": "\"3 records waiting to upload\", button \"Upload 3 records\"; pressing it reports \"Still no connection. All 3 records remain on this device.\""
+              },
+              {
+                "state": "Ready",
+                "when": "Connected, records waiting",
+                "shows": "Upload icon; button uploads"
+              },
+              {
+                "state": "Uploading",
+                "when": "About 0.9 s after pressing",
+                "shows": "Button \"Uploading…\" disabled, \"Uploading saved records…\""
+              },
+              {
+                "state": "Failed",
+                "when": "The simulated upload fails",
+                "shows": "\"Upload did not complete. Your records are still on this device. Try again.\" with \"Retry upload\""
+              },
+              {
+                "state": "Done",
+                "when": "Queue empty",
+                "shows": "\"Everything is uploaded\", \"There are no records waiting on this device.\", button \"Done\""
+              }
+            ],
+            "rule": "Only a successful upload clears the queue; a failure keeps every record. The drawer separates records saved on this device from records uploaded for the team.",
+            "source": "showSync(); sync.connection",
+            "at": "Upload 3 records"
+          },
+          {
+            "name": "Record row",
+            "shows": "Pregnancy check · 000308 · Gestation · Unit 7 · Batch 31 · 09:32",
+            "logic": "Task, animal, place and save time of a queued record. Three fictional samples; nothing the other screens do feeds this queue.",
+            "source": "pendingExamples",
+            "at": "Pregnancy check · 000308"
+          }
+        ],
+        "controls": [],
+        "copy": [
+          "(raw)"
+        ],
+        "edge": [],
+        "rules": [],
+        "issues": [
+          "The offline queue is entirely simulated: records made in the other prototypes never appear here.",
+          "unclear: where the old Figma data-sync list and detail (数据同步) fit relative to this drawer."
+        ]
+      },
+      "url": "/ux/system/home-astra-prototype.html?layout=focus&section=farrowing",
+      "steps": [
+        "3 records saved on this device"
+      ]
     },
     {
       "id": "data-sync.detail",
@@ -48,19 +157,128 @@
       "figma": "https://www.figma.com/design/LhQhJho192tNKCFvf5Drnf?node-id=10541-8073",
       "notes": {
         "purpose": "Detail by pig or by treatment: waiting, syncing, conflict, and empty.",
-        "issues": []
+        "issues": [
+          "Old design only: the per-pig and per-treatment detail with conflict and empty states is not built; the drawer lists a flat queue."
+        ]
       }
     },
     {
       "id": "data-sync.upload",
-      "name": "Data upload",
+      "name": "Upload complete",
       "zh": "数据上传",
-      "status": "placeholder",
+      "status": "in-design",
       "figma": "https://www.figma.com/design/LhQhJho192tNKCFvf5Drnf?node-id=10541-8073",
       "notes": {
-        "purpose": "The upload screens.",
+        "purpose": "The saved-work drawer after a successful upload.",
+        "states": [],
+        "elements": [
+          {
+            "name": "Upload button and message",
+            "at": "Everything is uploaded",
+            "shows": "\"Everything is uploaded\" · \"There are no records waiting on this device.\" · Done",
+            "states": [
+              {
+                "state": "Uploading",
+                "when": "About 0.9 s after Upload is pressed",
+                "shows": "Button \"Uploading…\" disabled; \"Uploading saved records…\""
+              },
+              {
+                "state": "Done",
+                "when": "The upload succeeds",
+                "shows": "Queue emptied, \"Upload complete.\" status, button becomes Done"
+              }
+            ],
+            "rule": "Only a successful upload clears the queue; Home then shows the quiet \"All records uploaded\" row.",
+            "source": "uploadPending()"
+          }
+        ],
+        "controls": [],
+        "copy": [
+          "(raw)"
+        ],
+        "edge": [],
+        "rules": [],
+        "issues": []
+      },
+      "url": "/ux/system/home-astra-prototype.html?section=gestation&connection=online",
+      "steps": [
+        "3 records saved on this device",
+        "Upload 3 records",
+        {
+          "tap": "Uploading…",
+          "hold": 1300
+        }
+      ]
+    },
+    {
+      "id": "data-sync.failed",
+      "name": "Upload failed (no connection)",
+      "zh": "上传失败",
+      "status": "in-design",
+      "url": "/ux/system/home-astra-prototype.html?section=gestation",
+      "steps": [
+        "3 records saved on this device",
+        "Upload 3 records"
+      ],
+      "figma": "https://www.figma.com/design/LhQhJho192tNKCFvf5Drnf?node-id=10541-8073",
+      "notes": {
+        "purpose": "The saved-work drawer after an upload attempt with no connection.",
+        "states": [],
+        "elements": [
+          {
+            "name": "Failure message",
+            "at": "Still no connection.",
+            "shows": "\"Still no connection. All 3 records remain on this device.\" and the button changes to Retry upload",
+            "states": [
+              {
+                "state": "No connection",
+                "when": "Upload pressed while offline",
+                "shows": "Message above, \"Retry upload\""
+              },
+              {
+                "state": "Upload failed",
+                "when": "Connected but the upload does not complete (Connection preview: failed)",
+                "shows": "\"Upload did not complete. Your records are still on this device. Try again.\" with \"Retry upload\""
+              }
+            ],
+            "rule": "A failure keeps every record in the queue and the user can retry at once.",
+            "source": "uploadPending()"
+          }
+        ],
+        "controls": [],
+        "copy": [
+          "(raw)"
+        ],
+        "edge": [],
+        "rules": [],
         "issues": []
       }
+    }
+  ],
+  "flow": [
+    [
+      "data-sync.banner",
+      "data-sync.list",
+      "tap the saved-work card"
+    ],
+    [
+      "data-sync.list",
+      "data-sync.upload",
+      "upload succeeds"
+    ],
+    [
+      "data-sync.list",
+      "data-sync.failed",
+      "upload fails or no connection"
+    ]
+  ],
+  "entryPoints": [
+    {
+      "section": "Home",
+      "label": "via the saved-work card",
+      "from": "workbench.today",
+      "control": "Saved-work card",
+      "lands": "data-sync.list"
     }
   ]
 }

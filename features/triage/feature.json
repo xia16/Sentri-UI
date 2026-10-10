@@ -8,35 +8,102 @@
   "duplicates": "built inside Inspection — see inspection / health-record",
   "groups": [
     [
-      "Old UI",
+      "Triage",
       [
-        "triage.adjust",
-        "triage.confirm"
+        "triage.bulk",
+        "triage.standalone",
+        "triage.marks"
       ]
     ]
   ],
   "screens": [
     {
-      "id": "triage.adjust",
-      "name": "Adjust triage level",
-      "zh": "调整健康分诊等级",
-      "status": "placeholder",
+      "id": "triage.bulk",
+      "name": "Triage · six pigs",
+      "zh": "分诊 · 批量",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-triage&slide=1",
       "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
       "notes": {
-        "purpose": "Choose a pig's health triage level.",
-        "issues": []
+        "purpose": "One choice of level for the whole selection.",
+        "elements": [
+          {
+            "name": "Now marked line",
+            "at": "now marked",
+            "shows": "How many of the selected pigs already carry a mark",
+            "logic": "Printed only when the selection already carries marks, which is exactly when one level for everyone would silently overwrite a judgment."
+          }
+        ],
+        "rules": [
+          "Choice of three with consequence hints; Healthy is cut and Euthanise is the Cull verb."
+        ]
       }
     },
     {
-      "id": "triage.confirm",
-      "name": "Confirmations and result",
-      "zh": "二次确认 / 操作结果",
-      "status": "placeholder",
+      "id": "triage.standalone",
+      "name": "Triage · no case required",
+      "zh": "分诊 · 单只",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-triage&slide=2",
       "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
       "notes": {
-        "purpose": "Second confirmations (leave page, recover or remove) and the result.",
-        "issues": []
+        "purpose": "Triage on a pig with no open condition.",
+        "rules": [
+          "The earlier gate (a triage dot needs an open case) is cut; the mark is its own record.",
+          "No \"now marked\" line when the pig carries none (the zero rule)."
+        ]
+      }
+    },
+    {
+      "id": "triage.marks",
+      "name": "How the mark prints",
+      "zh": "标记显示",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-triage&slide=3",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "How a triage mark reads on the walk list: dot, trail, count.",
+        "elements": [
+          {
+            "name": "What prints",
+            "shows": "How a triage mark reads on the walk list: dot, trail, count.",
+            "states": [
+              {
+                "state": "Dot, no trail",
+                "when": "Flagged and nobody has acted",
+                "shows": "Dot only (001479)"
+              },
+              {
+                "state": "Dot with trail",
+                "when": "Acted on, still watched",
+                "shows": "Dot plus a past-tense trail (001503)"
+              },
+              {
+                "state": "Standalone mark",
+                "when": "Mark with no case",
+                "shows": "Its own line-1 fact, \"Marked · hospital\""
+              },
+              {
+                "state": "Group mark",
+                "when": "Un-identified group",
+                "shows": "Lands on counts (hospital x3); the move list carries \"3 heads · pen D4\""
+              }
+            ]
+          }
+        ]
       }
     }
+  ],
+  "flow": [
+    [
+      "triage.bulk",
+      "triage.marks",
+      "tap the primary"
+    ],
+    [
+      "triage.standalone",
+      "triage.marks",
+      "tap the primary"
+    ]
   ]
 }

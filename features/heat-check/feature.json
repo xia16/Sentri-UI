@@ -8,11 +8,22 @@
   "duplicates": "",
   "groups": [
     [
-      "Old UI",
+      "Earlier design (pre-Astra)",
       [
         "heat-check.list",
-        "heat-check.overview",
+        "heat-check.select",
+        "heat-check.scan",
         "heat-check.mark",
+        "heat-check.filter",
+        "heat-check.filter-applied",
+        "heat-check.picker",
+        "heat-check.peek",
+        "heat-check.overview"
+      ]
+    ],
+    [
+      "Old UI only (Figma, not redesigned)",
+      [
         "heat-check.submit",
         "heat-check.end",
         "heat-check.ended"
@@ -24,32 +35,293 @@
       "id": "heat-check.list",
       "name": "Pig list tab",
       "zh": "查情猪只列表",
-      "status": "placeholder",
+      "status": "earlier",
+      "url": "/ux/archive/screens.html?sec=01&slide=1",
       "figma": "https://www.figma.com/design/psrxDa9LRWLdTL9XMZmWdc?node-id=7561-10830",
       "notes": {
-        "purpose": "Pigs of the task by pen, with filter and data selection (Tab：查情，选择数据+筛选).",
-        "issues": []
+        "purpose": "The heat sweep: sows grouped by pen, with the lens Not in heat / In heat / All. Tick boxes to mark in bulk, tap the row body for one sow.",
+        "elements": [
+          {
+            "name": "Task row",
+            "shows": "one sow (or litter): tag, one fact line, one memory line, rail",
+            "states": [
+              {
+                "state": "Due today",
+                "when": "expected heat date is today",
+                "shows": "Due · today"
+              },
+              {
+                "state": "Expected",
+                "when": "expected heat in N days (dimmed)",
+                "shows": "Expected · in 5 days"
+              },
+              {
+                "state": "No data",
+                "when": "no expected date can be computed",
+                "shows": "No data"
+              },
+              {
+                "state": "Signs",
+                "when": "signs of heat recorded, not yet in heat",
+                "shows": "amber SIGNS chip, \"signs 10h · G.H\" on line 2"
+              },
+              {
+                "state": "In heat",
+                "when": "marked in heat",
+                "shows": "row moves to the In heat lens with the time and who, plus the edit pencil"
+              }
+            ],
+            "logic": "Line 1 is words (state + when), line 2 is tokens (history, stamps). A chip appears only for an escalated measurement or a flagged observation; stamps appear on done rows and on rows that descend from a record. Everything on the row is derived; the worker types nothing here.",
+            "source": "ux/model/unified-task-list.md; ux/archive/screens.html §01; ux/research/tasks/BRIEF.md (row law)"
+          },
+          {
+            "name": "Lens row",
+            "shows": "Not in heat / In heat / All with counts, funnel at the end",
+            "logic": "Pig-state pair, negative first, never a verb. Counts are for the unit.",
+            "source": "ux/model/unified-task-list.md; ux/archive/screens.html §01"
+          },
+          {
+            "name": "Unit KPI and Task overview",
+            "shows": "70% heat rate, target 90 or more; Task overview \"62/100 in heat\" with day n of N",
+            "logic": "Derived by the system, not typed: expected-heat date (from last heat or weaning plus cycle), day n of N, cumulative in-heat against target, heat-rate percentage. The docs name the inputs but not the formula.",
+            "source": "ux/model/unified-task-list.md; ux/archive/screens.html §01"
+          }
+        ],
+        "rules": [
+          "Unmarked sows keep their state; no per-sow or per-pen negative confirmation exists (heat-check research section 3, open question 1).",
+          "No Submit on the room screen: marks commit themselves, rounds are ambient."
+        ],
+        "issues": [
+          "Pre-Astra look: box rows, header and dock predate the Astra task skeleton."
+        ]
       }
     },
     {
       "id": "heat-check.overview",
-      "name": "Task overview and grid",
-      "zh": "任务概览 / Grid",
-      "status": "placeholder",
+      "name": "Task detail",
+      "zh": "任务详情",
+      "status": "earlier",
+      "url": "/ux/archive/screens.html?sec=03&slide=1",
       "figma": "https://www.figma.com/design/psrxDa9LRWLdTL9XMZmWdc?node-id=7561-10830",
       "notes": {
-        "purpose": "Whole-task progress and the pen grid with pen selection (任务概览, Grid, Grid（选择栏位）).",
-        "issues": []
+        "purpose": "The sheet behind the Task overview cell for heat check: whole-task progress, KPI, configuration, SOP link and, where the task has one, End task. What failed the \"does this change what a hand does at the pen right now?\" test lives here, one tap from the room.",
+        "elements": [
+          {
+            "name": "End task",
+            "shows": "Red button at the bottom of the sheet.",
+            "rule": "Heat check is a standing task: End task shows as the supervisor's stop. Ending it removes the sows that did not reach heat from the batch (production: type the head count to arm the button).",
+            "source": "ux/archive/screens.html section 03"
+          },
+          {
+            "name": "Configuration",
+            "shows": "Cadence and window.",
+            "logic": "Per production: duration 7 d, 2 checks a day at set times, target count, heat-rate target, SOP link. Set once per farm or batch.",
+            "source": "ux/research/tasks/heat-check.html"
+          },
+          {
+            "name": "Unit KPI",
+            "shows": "Heat rate against its target.",
+            "logic": "Derived, never typed.",
+            "source": "ux/research/tasks/heat-check.html"
+          }
+        ],
+        "issues": [
+          "Pre-Astra look: header, KPI cells and sheet styling predate the Astra task skeleton."
+        ]
       }
     },
     {
       "id": "heat-check.mark",
       "name": "Mark heat",
-      "zh": "查情（选择单头/多头猪）",
-      "status": "placeholder",
+      "zh": "查情（选择单头猪）",
+      "status": "earlier",
+      "url": "/ux/archive/screens.html?sec=04b&slide=2",
       "figma": "https://www.figma.com/design/psrxDa9LRWLdTL9XMZmWdc?node-id=7561-10830",
       "notes": {
-        "purpose": "Mark one or several pigs, including the last pig and changing a mark (查情（选择单头猪）, 选择多头猪, 修改状态).",
+        "purpose": "Outcome sheet for one sow, opened by tapping the row body: two choices, a note, Confirm and Confirm & next.",
+        "elements": [
+          {
+            "name": "Outcome radios",
+            "shows": "the two heat outcomes with their consequence at the decision",
+            "states": [
+              {
+                "state": "Signs of heat",
+                "when": "watch, stays in the cohort",
+                "shows": "the sow stays here; the row gets the SIGNS chip"
+              },
+              {
+                "state": "In heat",
+                "when": "marked in heat",
+                "shows": "she leaves heat check and joins Breeding"
+              }
+            ],
+            "rule": "Marking commits itself; there is no round submit. A done row is corrected with the pencil, which reopens this sheet pre-filled with an audit line (who, when).",
+            "source": "ux/research/tasks/heat-check.html section 4"
+          },
+          {
+            "name": "Confirm & next",
+            "at": "Confirm & next",
+            "shows": "advances to the next sow needing a hand in this pen",
+            "rule": "Moves to the next row needing a hand in the same pen, then the next pen.",
+            "source": "ux/model/unified-task-list.md section 2"
+          }
+        ],
+        "issues": [
+          "Research deltas D1 to D3 (health line, needs-attention flag, More menu) are not drawn in this earlier sheet."
+        ]
+      }
+    },
+    {
+      "id": "heat-check.select",
+      "name": "Mark in bulk",
+      "zh": "批量查情",
+      "status": "earlier",
+      "url": "/ux/archive/screens.html?sec=04b&slide=1",
+      "figma": "",
+      "notes": {
+        "purpose": "Ticking boxes raises the action bar: Signs or Mark in heat for everyone selected.",
+        "elements": [
+          {
+            "name": "Action bar",
+            "shows": "selected count and the two bulk outcomes",
+            "rule": "On tap the marked rows move lens, the bar clears and the dock returns. The mark is committed per selected sow.",
+            "source": "ux/archive/screens.html section 04b"
+          }
+        ],
+        "edge": [
+          "The original plan's within-one-pen selection limit was dropped as superseded (unified-task-list.md header)."
+        ],
+        "issues": []
+      }
+    },
+    {
+      "id": "heat-check.scan",
+      "name": "Scan into selection",
+      "zh": "扫码选择",
+      "status": "earlier",
+      "url": "/ux/archive/screens.html?sec=04c&slide=1",
+      "figma": "",
+      "notes": {
+        "purpose": "Scanning an ear tag selects the sow exactly as a ticked box would: her pen scrolls into view with the header pinned, her box ticks, the action bar rises.",
+        "elements": [
+          {
+            "name": "Scanned row",
+            "shows": "the sow's row with a brief scanned mark",
+            "rule": "Scanning commits nothing until an action is tapped. Scan, search and checkbox all put a sow into the selection. Tasks without checkboxes open the sow's sheet directly instead.",
+            "source": "ux/archive/screens.html section 04c"
+          }
+        ],
+        "issues": []
+      }
+    },
+    {
+      "id": "heat-check.filter",
+      "name": "Filter sheet",
+      "zh": "筛选",
+      "status": "earlier",
+      "url": "/ux/archive/task-screens-combined.html?sec=01c&slide=1",
+      "figma": "",
+      "notes": {
+        "purpose": "The filter: one time dimension, expected-heat time, single-select.",
+        "elements": [
+          {
+            "name": "Dimensions kept and dropped",
+            "shows": "what survived from production's filter",
+            "logic": "Production had heat status, expected-heat time and pen row. Status is now the lens and pen row is Go to pen; only the time dimension stays. Options with no candidates are hidden.",
+            "source": "ux/archive/task-screens-combined.html section 01c"
+          }
+        ],
+        "rules": [
+          "Footer: Reset, and Show N with the result count."
+        ],
+        "issues": []
+      }
+    },
+    {
+      "id": "heat-check.filter-applied",
+      "name": "Filter applied",
+      "zh": "筛选后",
+      "status": "earlier",
+      "url": "/ux/archive/task-screens-combined.html?sec=01c&slide=2",
+      "figma": "",
+      "notes": {
+        "purpose": "The list with a filter on.",
+        "elements": [
+          {
+            "name": "Applied state",
+            "shows": "funnel outlined with the count, lens counts shrunk, one grey sentence with Clear",
+            "rule": "Lens counts shrink to the filtered set; pen headers read \"n of m shown\"; empty pens collapse to a header rather than vanish.",
+            "source": "ux/archive/task-screens-combined.html section 01c"
+          }
+        ],
+        "issues": []
+      }
+    },
+    {
+      "id": "heat-check.picker",
+      "name": "Pen picker",
+      "zh": "栏位选择",
+      "status": "earlier",
+      "url": "/ux/archive/task-screens-combined.html?sec=02&slide=1",
+      "figma": "",
+      "notes": {
+        "purpose": "The unit as a map: is there work here, how much, how urgent. Tap lands in the pen; it never acts.",
+        "elements": [
+          {
+            "name": "Pen cell",
+            "shows": "pen code and at most one chip",
+            "states": [
+              {
+                "state": "Overdue",
+                "when": "past its window",
+                "shows": "red chip"
+              },
+              {
+                "state": "Attention",
+                "when": "signs, due today, long interval",
+                "shows": "amber chip, e.g. 3 SIGNS"
+              },
+              {
+                "state": "Done",
+                "when": "all handled",
+                "shows": "tick beside the code, outcome in muted text, e.g. 4 in heat"
+              },
+              {
+                "state": "Nothing asked",
+                "when": "waiting or scheduled",
+                "shows": "grey text, e.g. due 5d"
+              },
+              {
+                "state": "No task pigs",
+                "when": "no pigs of this task in the pen",
+                "shows": "dimmed cell"
+              }
+            ],
+            "logic": "Priority is fixed: red, amber, green, neutral, done, grey; one chip per cell, most urgent wins. Counts lead the word and appear only from 2. The picker never inherits the lens or filter: every pen shows its real state.",
+            "rule": "Tap = land (header pinned). Long-press shows the peek. The grid never acts.",
+            "source": "ux/archive/task-screens-combined.html sections 02 and 02b"
+          }
+        ],
+        "issues": []
+      }
+    },
+    {
+      "id": "heat-check.peek",
+      "name": "Peek",
+      "zh": "栏位预览",
+      "status": "earlier",
+      "url": "/ux/archive/task-screens-combined.html?sec=02c&slide=3",
+      "figma": "",
+      "notes": {
+        "purpose": "Long-press a pen cell: a read-only card lists the pen's rows; release and it is gone.",
+        "elements": [
+          {
+            "name": "Peek card",
+            "shows": "the pen's rows as the table renders them",
+            "rule": "About 350 ms hold. Read-only: no checkboxes, no actions. Capped at five rows plus \"+N more\". For heat check it shows signs sows first with their recency.",
+            "source": "ux/archive/task-screens-combined.html section 02c"
+          }
+        ],
         "issues": []
       }
     },
@@ -61,7 +333,9 @@
       "figma": "https://www.figma.com/design/psrxDa9LRWLdTL9XMZmWdc?node-id=7561-10830",
       "notes": {
         "purpose": "Submit the result with a heat time and date (提交结果, 选择发情时间, 选择日期, 已发情猪只列表).",
-        "issues": []
+        "issues": [
+          "Cut in the earlier design: marks commit themselves and rounds are ambient, so the submit page and its three rosters are not drawn; the in-heat roster moves behind the Task overview cell (heat-check research section 3)."
+        ]
       }
     },
     {
@@ -72,7 +346,9 @@
       "figma": "https://www.figma.com/design/psrxDa9LRWLdTL9XMZmWdc?node-id=7561-10830",
       "notes": {
         "purpose": "End the task with a second confirmation, then return home to the pen's tab (结束任务, 二次确认).",
-        "issues": []
+        "issues": [
+          "The earlier design keeps End task only in the task detail sheet and replaces production's typed head count and checkbox with one confirm naming the consequence (research D4, open question 2)."
+        ]
       }
     },
     {
@@ -83,7 +359,9 @@
       "figma": "https://www.figma.com/design/psrxDa9LRWLdTL9XMZmWdc?node-id=7561-10830",
       "notes": {
         "purpose": "Read-only list and task detail after the task ends (Tab：猪只列表, Tab：任务详情, 筛选).",
-        "issues": []
+        "issues": [
+          "Heat-check research open question 4: whether the barn phone needs per-task history at all, or this moves to reports."
+        ]
       }
     }
   ]

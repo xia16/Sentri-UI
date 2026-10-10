@@ -39,7 +39,7 @@ Taken from the research notes and the code:
 Open (recorded on the screens as issues):
 
 - The unit summary card (pig and pen counts, faults, sensors, batch tracker) is in the code and not placed on the walk. Draw it or remove it.
-- Equipment faults have a full report-and-resolve flow but no control reaches it.
+- Equipment faults have a full report-and-resolve flow in the prototype's code but no control reaches it; the pen workflow deck draws the same flow (and Set count) as screens, listed under Equipment faults and Pen head count.
 - "Health" and "Feed" lens counts do not say what they count.
 - The care level shows only by icon and colour on a row.
 - Fixed author "G. Hansen" and times 06:40 and 09:41 stand in for the signed-in worker and real times.

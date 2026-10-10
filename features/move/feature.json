@@ -8,35 +8,174 @@
   "duplicates": "",
   "groups": [
     [
-      "Old UI",
+      "Transfer",
       [
-        "move.place",
-        "move.record"
+        "move.tagged",
+        "move.picker",
+        "move.mixed",
+        "move.after"
+      ]
+    ],
+    [
+      "From a sow record",
+      [
+        "move.transfer-sow"
       ]
     ]
   ],
   "screens": [
     {
-      "id": "move.place",
-      "name": "Choose location",
-      "zh": "选择位置",
-      "status": "placeholder",
+      "id": "move.tagged",
+      "name": "Transfer · tagged pigs",
+      "zh": "转移",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-transfer&slide=1",
       "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
       "notes": {
-        "purpose": "Choose where the pigs move to.",
-        "issues": []
+        "purpose": "Two tagged pigs, one field.",
+        "rules": [
+          "The sheet is the confirmation: production's dialog is cut.",
+          "Triage's hospital set is drained here; the mark's execution needs no screen of its own."
+        ]
       }
     },
     {
-      "id": "move.record",
-      "name": "Record move",
-      "zh": "子功能-记录",
-      "status": "placeholder",
+      "id": "move.picker",
+      "name": "Destination picker",
+      "zh": "选择位置",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-transfer&slide=2",
       "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
       "notes": {
-        "purpose": "The record entry for a move.",
-        "issues": []
+        "purpose": "Choose the destination pen.",
+        "elements": [
+          {
+            "name": "Pen list",
+            "shows": "Units and pens as labels, not navigation",
+            "logic": "The current unit is pinned first and the source cell dimmed (\"where they are now\"); cross-unit groups wear their full path; search results are flat with the path trailing.",
+            "states": [
+              {
+                "state": "Source pen",
+                "when": "Pen the pigs are in",
+                "shows": "Dimmed"
+              },
+              {
+                "state": "Empty pen",
+                "when": "No pigs",
+                "shows": "Dashed (for a hospital drain it is the answer)"
+              }
+            ],
+            "rule": "Tap commits: the sheet closes and the drawer's Picker is filled."
+          }
+        ]
+      }
+    },
+    {
+      "id": "move.mixed",
+      "name": "Transfer · tagged and head",
+      "zh": "转移 · 含无ID",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-transfer&slide=3",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "Three tagged pigs and nine head: both conditionals under one commit.",
+        "elements": [
+          {
+            "name": "Group verdicts",
+            "shows": "Each open group record on the source pen",
+            "states": [
+              {
+                "state": "Stays",
+                "when": "Default",
+                "shows": "Record stays on the source pen"
+              },
+              {
+                "state": "Goes",
+                "when": "Chosen, or when the whole population leaves (n = N)",
+                "shows": "Record moves; the checklist folds to a footnote"
+              },
+              {
+                "state": "Both",
+                "when": "Chosen",
+                "shows": "Record on both pens"
+              }
+            ]
+          },
+          {
+            "name": "Which batches the head leave",
+            "shows": "Per-batch steppers",
+            "logic": "Appears for a multi-batch group only; the steppers must sum to n (4 + 5 = 9). Single-batch groups ride silently. No block prints for an all-tagged selection."
+          }
+        ]
+      }
+    },
+    {
+      "id": "move.after",
+      "name": "After · the cards are the receipt",
+      "zh": "转移 · 完成",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-transfer&slide=4",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "The pen cards after the move.",
+        "rules": [
+          "Counts re-derive from placements for tagged pigs and are set by count for head (one-number law).",
+          "A case arrived with the pig; head arrive under their own batches as a group row with a count trail."
+        ]
+      }
+    },
+    {
+      "id": "move.transfer-sow",
+      "name": "Transfer sow · from a sow record",
+      "zh": "转移母猪",
+      "status": "in-design",
+      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+      "preset": "count",
+      "steps": [
+        "More actions",
+        "Transfer sow"
+      ],
+      "figma": "",
+      "notes": {
+        "purpose": "Moving one sow from her Farrowing record: Actions, then Transfer sow.",
+        "elements": [
+          {
+            "name": "Transfer sow button",
+            "at": "Transfer sow",
+            "shows": "Destination unit and destination pen, with the origin shown above",
+            "rule": "Disabled until a unit and a pen are chosen and the destination differs from her current pen. The pen field stays disabled until a unit is chosen, and the current pen is left out of the list in her own unit. Saving moves her, writes \"Transferred · origin to destination\" to her log and returns to her record.",
+            "source": "inspection-astra-concept.js transferReady / transferPage"
+          }
+        ],
+        "rules": [
+          "Not offered for a sow that has died."
+        ],
+        "issues": [
+          "Two unit and pen select fields, not the destination picker of the Transfer deck (current unit pinned, search, scan); the two designs differ."
+        ]
       }
     }
+  ],
+  "flow": [
+    [
+      "move.tagged",
+      "move.picker",
+      "tap the destination"
+    ],
+    [
+      "move.picker",
+      "move.tagged",
+      "tap a pen"
+    ],
+    [
+      "move.tagged",
+      "move.after",
+      "tap Transfer"
+    ],
+    [
+      "move.mixed",
+      "move.after",
+      "tap Transfer"
+    ]
   ]
 }

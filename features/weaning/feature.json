@@ -8,11 +8,22 @@
   "duplicates": "",
   "groups": [
     [
-      "Old UI",
+      "Current design",
+      [
+        "weaning.handoff"
+      ]
+    ],
+    [
+      "Earlier design (pre-Astra)",
       [
         "weaning.list",
-        "weaning.overview",
         "weaning.check",
+        "weaning.overview"
+      ]
+    ],
+    [
+      "Old UI only (Figma, not redesigned)",
+      [
         "weaning.identity",
         "weaning.end",
         "weaning.ended"
@@ -24,33 +35,130 @@
       "id": "weaning.list",
       "name": "Pig list tab",
       "zh": "断奶检查猪只列表",
-      "status": "placeholder",
+      "status": "earlier",
+      "url": "/ux/archive/screens.html?sec=01&slide=7",
       "figma": "https://www.figma.com/design/psrxDa9LRWLdTL9XMZmWdc?node-id=8023-17019",
       "notes": {
-        "purpose": "Litters and sows to check by pen, with filter.",
-        "issues": []
+        "purpose": "Litters and their sows to check at weaning, by pen; lens To check / Checked / All. A pen-level task: the row is the litter, keyed under its pen and sow. Tap the row.",
+        "elements": [
+          {
+            "name": "Task row",
+            "shows": "one sow (or litter): tag, one fact line, one memory line, rail",
+            "states": [
+              {
+                "state": "To check",
+                "when": "weaning check due",
+                "shows": "20 piglets · day 21, rail CHECK"
+              },
+              {
+                "state": "Checked",
+                "when": "litter record saved",
+                "shows": "Checked · 5 kept, \"20 head · 8.9 kg · 10:20 G.H\", edit pencil"
+              }
+            ],
+            "logic": "Line 1 is words (state + when), line 2 is tokens (history, stamps). A chip appears only for an escalated measurement or a flagged observation; stamps appear on done rows and on rows that descend from a record. Everything on the row is derived; the worker types nothing here.",
+            "source": "ux/model/unified-task-list.md; ux/archive/screens.html §01; ux/research/tasks/BRIEF.md (row law)"
+          },
+          {
+            "name": "Lens row",
+            "shows": "To check / Checked / All",
+            "logic": "Only these states are drawn in the earlier deck.",
+            "source": "ux/model/unified-task-list.md; ux/archive/screens.html §01"
+          },
+          {
+            "name": "Unit KPI and Task overview",
+            "shows": "10 kg average weaning weight, target by day-age; Task overview \"100/200 pens\", day 3 window",
+            "logic": "Weaning is pen-level: its progress counts pens, not sows. The KPI basis is not documented.",
+            "source": "ux/model/unified-task-list.md; ux/archive/screens.html §01"
+          }
+        ],
+        "issues": [
+          "Pre-Astra look: rows, header and dock predate the Astra task skeleton."
+        ]
       }
     },
     {
       "id": "weaning.overview",
-      "name": "Task overview",
-      "zh": "任务概览 / Grid",
-      "status": "placeholder",
+      "name": "Task detail",
+      "zh": "任务详情",
+      "status": "earlier",
+      "url": "/ux/archive/screens.html?sec=03&slide=7",
       "figma": "https://www.figma.com/design/psrxDa9LRWLdTL9XMZmWdc?node-id=8023-17019",
       "notes": {
-        "purpose": "Whole-task progress and the pen grid.",
-        "issues": []
+        "purpose": "The sheet behind the Task overview cell for weaning check: whole-task progress, KPI, configuration, SOP link and, where the task has one, End task. What failed the \"does this change what a hand does at the pen right now?\" test lives here, one tap from the room.",
+        "elements": [
+          {
+            "name": "End task",
+            "shows": "Not documented for this task.",
+            "rule": "The archive deck draws a sheet for weaning; the docs give no End task rule for it beyond the general split (sweep tasks always, event tasks never).",
+            "source": "ux/archive/screens.html section 03"
+          },
+          {
+            "name": "Configuration",
+            "shows": "Start and records.",
+            "logic": "Starts on weaning day, day 21; records the litter and the sow status. No further configuration is documented.",
+            "source": "ux/archive/screens.html section 03"
+          },
+          {
+            "name": "Unit KPI",
+            "shows": "Average weaning weight and survival.",
+            "logic": "Two KPIs: average weight by day-age and percent survival, target 90 or more. The formulas are not documented.",
+            "source": "ux/archive/screens.html section 03"
+          }
+        ],
+        "issues": [
+          "Pre-Astra look: header, KPI cells and sheet styling predate the Astra task skeleton."
+        ]
       }
     },
     {
       "id": "weaning.check",
       "name": "Weaning check",
       "zh": "断奶检查",
-      "status": "placeholder",
+      "status": "earlier",
+      "url": "/ux/archive/screens.html?sec=04b&slide=6",
       "figma": "https://www.figma.com/design/psrxDa9LRWLdTL9XMZmWdc?node-id=8023-17019",
       "notes": {
-        "purpose": "The check: default state, already-submitted state, sow status and piglet information (断奶检查 - 母猪状态, 仔猪信息).",
-        "issues": []
+        "purpose": "The litter record, opened by tapping the row: piglets weaned, kept for breeding and average weight; a sow status form follows on the same sheet.",
+        "elements": [
+          {
+            "name": "Litter record",
+            "shows": "weaned count, kept for breeding, average weight",
+            "rule": "One litter record per save. The sow half is the same assessment as the postpartum check (archive screens section 04b: 'weaning (sow half)'). A done row is corrected with the pencil, audited. The interaction plan also lists a sex split, which this sheet does not show.",
+            "source": "ux/archive/screens.html section 04b; ux/model/unified-task-list.md section 1"
+          }
+        ],
+        "issues": [
+          "The Figma flow also has an already-submitted state and a piglet-information step; neither is drawn in the earlier deck."
+        ]
+      }
+    },
+    {
+      "id": "weaning.handoff",
+      "name": "Handoff to weaning",
+      "zh": "移交断奶",
+      "status": "in-design",
+      "url": "/ux/tasks/piglet-processing/end.html?state=weaning-handoff",
+      "figma": "",
+      "notes": {
+        "purpose": "For weaning: the unit as it stands when piglet processing ends, so weaning starts from a known state. Opened from the ended piglet-processing task.",
+        "elements": [
+          {
+            "name": "Counts",
+            "shows": "alive and identified piglets, litters weighed, unexplained loss",
+            "logic": "Alive and identified count piglets in the unit now; litter weights count litters weighed at the weigh day (day 21), naming litters not yet at that day; unexplained loss counts piglets still open.",
+            "source": "ux/tasks/piglet-processing/end.html (handoffPage)"
+          },
+          {
+            "name": "Not done at end",
+            "shows": "treatments left undone when the task ended, by dose, with the litters and a door to each",
+            "rule": "A dose left undone on several litters opens a list of those litters; on one litter it opens that litter. A line says when a mark was made after End.",
+            "source": "ux/tasks/piglet-processing/end.html (handoffGroups, dosePage)"
+          }
+        ],
+        "issues": [
+          "Overlaps the Wean feature (Breeding and litters), which draws the weaning check too; see the filed decision."
+        ]
       }
     },
     {
