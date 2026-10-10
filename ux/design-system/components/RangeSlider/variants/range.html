@@ -1,0 +1,17 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RangeSlider · range</title><style>
+.sc{box-sizing:border-box;width:100%;max-width:390px;margin:0 auto;padding:var(--space-24) var(--space-gutter-sheet);background:var(--paper);font-family:var(--font-sans);color:var(--ink)}
+</style><body>
+<div class="sc" data-state="Default" data-demo="default"></div>
+<div class="sc" data-state="Narrowed" data-demo="narrowed"></div>
+<div class="sc" data-state="Same value" data-demo="same"></div>
+<div class="sc" data-state="Long / Chinese" data-demo="zh"></div>
+<script>
+const UI=window.SentriUI,icon=window.SentriIcons.icon;
+const en=n=>n===-7?'7+ days ago':n===7?'In 7+ days':n===0?'Today':n===-1?'Yesterday':n===1?'Tomorrow':n<0?(-n)+' days ago':'In '+n+' days';
+const zh=n=>n===-7?'7天以上前':n===7?'7天及以后':n===0?'今天':n===-1?'昨天':n===1?'明天':n<0?(-n)+'天前':n+'天后';
+const line=(f,any)=>(a,b)=>a===-7&&b===7?any:a===b?f(a):f(a)+' – '+f(b);
+const R=(value,o)=>UI.rangeSlider(Object.assign({min:-7,max:7,value,title:'Expected farrowing',icon:icon('calendar'),key:'due',labels:['Earliest expected farrowing','Latest expected farrowing'],format:en,summary:line(en,'Any time'),ends:['7+ days ago','Today','In 7+ days']},o||{}));
+const D={default:()=>R([-7,7]),narrowed:()=>R([0,3]),same:()=>R([2,2]),
+zh:()=>R([-7,7],{title:'预计分娩日期，包括已经逾期的母猪',labels:['最早预计分娩','最晚预计分娩'],format:zh,summary:line(zh,'不限时间，包括所有已录入的母猪记录'),ends:['7天以上前','今天','7天及以后']})};
+document.querySelectorAll('[data-state]').forEach(el=>{const r=D[el.getAttribute('data-demo')];if(r)el.innerHTML=r();});
+</script></body></html>

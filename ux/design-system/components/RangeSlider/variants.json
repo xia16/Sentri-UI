@@ -1,0 +1,17 @@
+[
+  {
+    "id": "range",
+    "name": "Range",
+    "use": "Use for a bounded from-to range inside a filter, where the whole track means any.",
+    "notUse": "Not for one value (use Stepper or Measure) or named options (use Segment)",
+    "states": [
+      "Default",
+      "Narrowed",
+      "Same value",
+      "Long / Chinese"
+    ],
+    "usedBy": [
+      "farrowing.room"
+    ]
+  }
+]

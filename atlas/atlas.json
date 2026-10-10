@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-10T04:36:58.953Z",
- "commit": "148778d",
+ "generated": "2026-10-10T04:47:05.357Z",
+ "commit": "1cba93e",
  "platforms": [
   {
    "id": "mobile",
@@ -14069,6 +14069,31 @@
      }
     },
     {
+     "name": "FilterSheet",
+     "group": "Inputs and filters",
+     "status": "in-design",
+     "gate": null,
+     "files": {
+      "variantsJson": true,
+      "variants": [
+       "fields",
+       "sections"
+      ]
+     }
+    },
+    {
+     "name": "RangeSlider",
+     "group": "Inputs and filters",
+     "status": "in-design",
+     "gate": null,
+     "files": {
+      "variantsJson": true,
+      "variants": [
+       "range"
+      ]
+     }
+    },
+    {
      "name": "Field",
      "group": "Fields",
      "status": "agent-checked",
@@ -16067,24 +16092,6 @@
       "variantsJson": false,
       "variants": []
      }
-    },
-    {
-     "name": "Filter sheet",
-     "group": "Inputs and filters",
-     "status": "placeholder",
-     "seenIn": [
-      "farrowing.room"
-     ],
-     "note": "A sheet that narrows a list by due range and parity, with Back, Reset and a Show-n-sows button."
-    },
-    {
-     "name": "Range slider",
-     "group": "Inputs and filters",
-     "status": "placeholder",
-     "seenIn": [
-      "farrowing.room"
-     ],
-     "note": "A two-handle slider for a due-date range, with its end labels."
     }
    ],
    "copy": {

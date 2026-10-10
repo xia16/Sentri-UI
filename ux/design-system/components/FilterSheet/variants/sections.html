@@ -1,0 +1,24 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>FilterSheet · sections</title><style>
+.ph{position:relative;height:720px;max-width:390px;margin:0 auto;overflow:hidden;background:var(--app-background);font-family:var(--font-sans);color:var(--ink);border:1px solid var(--line);border-radius:var(--radius-device)}
+.ph .bg{padding:0 var(--space-gutter)}
+.ph .bar{display:flex;justify-content:space-between;align-items:center;height:var(--statusbar-height);padding:0 var(--space-24);font:700 var(--type-panel-title-size) var(--font-sans)}
+.ph[data-pressed] .sheet-footer .button.primary{filter:brightness(.96);transform:translateY(1px)}
+</style></head><body>
+<div class="ph" data-state="Default" data-demo="default"><div class="bg"></div><div class="over"></div></div>
+<div class="ph" data-state="Active" data-demo="active"><div class="bg"></div><div class="over"></div></div>
+<div class="ph" data-state="Pressed" data-demo="active" data-pressed=""><div class="bg"></div><div class="over"></div></div>
+<div class="ph" data-state="Long / Chinese" data-demo="zh"><div class="bg"></div><div class="over"></div></div>
+<script>
+const UI=window.SentriUI,icon=window.SentriIcons.icon;
+const en=n=>n===-7?'7+ days ago':n===7?'In 7+ days':n===0?'Today':n===-1?'Yesterday':n===1?'Tomorrow':n<0?(-n)+' days ago':'In '+n+' days';
+const zh=n=>n===-7?'7天以上前':n===7?'7天及以后':n===0?'今天':n===-1?'昨天':n===1?'明天':n<0?(-n)+'天前':n+'天后';
+const line=(f,any)=>(a,b)=>a===-7&&b===7?any:a===b?f(a):f(a)+' – '+f(b);
+const bg=()=>'<div class="bar" aria-hidden="true"><span>9:41</span></div>'+UI.heading({title:'Farrowing',kind:'page'})+UI.panel(UI.row({title:'B1 · 1 sow',description:'000418 · Active'}),{className:'st-row-group'});
+const sheet=(o)=>{const z=o.zh,v=o.value,par=z?['不限','0','1','2–5','6以上']:['Any','0','1','2–5','6+'];
+return UI.filterSheet({title:z?'筛选当前单元的母猪列表':'Filter sows',subtitle:z?'7号单元':'Unit 7',backAction:'back',backLabel:z?'返回':'Back',
+sections:[{content:UI.rangeSlider({min:-7,max:7,value:v,title:z?'预计分娩日期':'Expected farrowing',icon:icon('calendar'),key:'due',labels:z?['最早','最晚']:['Earliest expected farrowing','Latest expected farrowing'],format:z?zh:en,summary:line(z?zh:en,z?'不限时间':'Any time'),ends:z?['7天以上前','今天','7天及以后']:['7+ days ago','Today','In 7+ days']})},
+{title:z?'胎次':'Parity',icon:icon('profile'),content:UI.segment({variant:'facet',options:par.map((x,i)=>[x,x]),active:o.parity||par[0],action:'parity',ariaLabel:z?'胎次':'Parity'}),help:z?'使用母猪档案中记录的胎次，若无记录则不计入。':'Use the parity recorded on the sow’s profile.'}],
+apply:{label:z?'显示 '+o.n+' 头母猪':'Show '+o.n+' sows',action:'apply'},reset:{label:z?'重置':'Reset',action:'reset'}});};
+const R={default:()=>sheet({value:[-7,7],n:12}),active:()=>sheet({value:[0,3],parity:'2–5',n:4}),zh:()=>sheet({zh:true,value:[-7,7],n:12})};
+document.querySelectorAll('[data-state]').forEach(el=>{el.querySelector('.bg').innerHTML=bg();el.querySelector('.over').innerHTML=R[el.getAttribute('data-demo')]();});
+</script></body></html>
