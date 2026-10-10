@@ -299,7 +299,7 @@
       "notes": {
         "purpose": "Change the daily feed of one or many pigs (a pen, ticked pigs, ticked pens) in one move.",
         "states": [
-          "Details panel open or collapsed (toggle \"Adjustment\")."
+          "Adjustment held on the bottom edge above the footer (the pig list scrolls under it); its heading folds it away."
         ],
         "elements": [
           {

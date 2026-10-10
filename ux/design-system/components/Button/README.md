@@ -33,7 +33,7 @@ Container; visible verb label; optional leading icon; optional loading marker; o
 | Pressed | Visible press fill / darkening and movement; static examples use `data-preview="pressed"`. |
 | Disabled | Persistent text reason via `reason` or `describedby`; never colour alone. Prefer omitting unavailable acts. |
 | Long / Chinese | Visible Button labels wrap without ellipsis; icon accessible names remain complete. |
-| Waiting | Focusable `aria-disabled`; one prerequisite reason line stays visible. |
+| Waiting | Focusable `aria-disabled`. In a sheet footer it stands alone: the reason is its screen-reader description, never a drawn line. |
 | Loading | `busy`, `aria-busy`, ellipsis and reason; no duplicate commit. |
 | Hold: Holding / Armed | Progress sweep / second-press instruction and an outline on the armed button. |
 | Hold: Pending / Done / Unknown | Recording / terminal result captions; Unknown never offers the act again. |
@@ -74,7 +74,7 @@ Geometry/type: `tap-min`, `control-height`, `back-width`, `radius-control`, `bor
 | Component | Relationship |
 | --- | --- |
 | [Button](../Button/README.md) / [IconButton](../IconButton/README.md) | Labelled acts / familiar glyph tools. |
-| [Sheet](../Sheet/README.md) | Positions footer actions and one reason line; drawer close is plain IconButton. |
+| [Sheet](../Sheet/README.md) | Positions footer actions (Back + one commit); no reason line, no close. |
 | [ChoiceList](../ChoiceList/README.md) | Select outcomes instead of executing an act. |
 | [Icons](../../assets/Icons/README.md) | Shared glyph registry. |
 

@@ -29,17 +29,17 @@ Group heading (optional); lead control (optional); option label; meta line (opti
 | --- | --- |
 | Default | Label, optional meta, trailing mark; nothing selected is shown as nothing. |
 | Pressed | `choice-press` fill; static `pressed` prop. |
-| Selected | Trailing check, checkbox tick or ring plus stronger label. Never colour alone. |
+| Selected | Trailing ink check, checkbox tick or ring plus stronger label. Selection is ink, never green (green is done). Never colour alone. |
 | Disabled | Prefer omission. Otherwise readable text, `aria-disabled`, and a persistent reason line; no dimming. |
 | Loading | Loading options status in place of rows. |
 | Empty | No options or no search match; never a blank panel. |
 | Long label | Labels and meta wrap, including Chinese; rows grow, never truncate. |
 
-Every state is in `variants/<id>.html`. Rendered proof is in [picker-choice-proof](../picker-choice-proof/verification.md).
+Every state is in `variants/<id>.html`, drawn in its real container: navigate, single and multi in a picker drawer; radio and inline in a record drawer; each in the 390px phone.
 
 ## Behaviour
 
-Show at most eight rows before search. Single rows toggle `aria-pressed` and commit; multi rows are whole-row labels around a native checkbox; navigate rows open the next level and show a chevron. Meta appears only when it distinguishes options: a group count such as "2 selected" appears only above zero, and a plain option count adds nothing. Clear appears only while an optional field has a value and returns the screen reader's focus to the group. Do not duplicate a selected row in a second list.
+Show at most eight rows before search. A single-choice sheet (Care: No action needed / Monitor / Treat in place / Move to hospital pen; a Brand list) is a drawer sized to its rows, on the bottom edge, with Back alone in its footer: a tap on a row commits and closes. A way to add an option ("Add a brand") is the last row, a navigate row that opens a level of the same drawer (‹ Brand) with a labelled field and its own commit ("Add brand"). Single rows toggle `aria-pressed` and commit; multi rows are whole-row labels around a native checkbox; navigate rows open the next level and show a chevron. Meta appears only when it distinguishes options: a group count such as "2 selected" appears only above zero, and a plain option count adds nothing. Clear appears only while an optional field has a value and returns the screen reader's focus to the group. Do not duplicate a selected row in a second list.
 
 ## Content rules
 
@@ -74,6 +74,21 @@ Component: generic and shared across sections. Selection modes are variants of t
 
 [Component standard, sections 4.2 and 4.5](../../../../docs/design-workflow/research/component-standard.md).
 
+## Native
+
+| Variant | iOS | Android |
+|---|---|---|
+| Single (a short choice list in a sheet) | a sheet with a `List` and a checkmark, or a `Menu` for a few short options; a tap commits | `ModalBottomSheet` with a list; a tap commits |
+| Multi | `List` rows with trailing checkmarks in a sheet, Done · n in the toolbar | checkbox list items in a `ModalBottomSheet`, Done · n in the bottom bar |
+| Navigate | `NavigationLink` rows (chevron) inside the sheet's `NavigationStack` | list items with a trailing chevron, navigating inside the sheet |
+| Radio rows (2–4 outcomes) | a `Picker` with `.inline` style in a `Form` section | radio button list items (`RadioButton` + `selectableGroup`) |
+| Inline Choice (2–3 short) | segmented `Picker` | `SegmentedButton` (single-select) |
+
+Wheels (`UIPickerView`, `NumberPicker`) are for long ordered values only (dates, times, numbers), never for named options: they are poor with gloves and hide options a farmer should see at once.
+
 ## Changelog
+
+2026-10-10 (multi-choice family): single-choice sheets have Back alone and sit on the bottom edge; specimens drawn in the phone; Native mapping.
+
 
 2026-10-10 (round 2 fixes): README rewritten for rows; no zero or "1 options" meta; inline demo uses a required outcome and an optional row; ink text in disabled inline options.

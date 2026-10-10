@@ -13,6 +13,7 @@
     chart:'M4 20V10M12 20V4M20 20v-7',
     back:'M15 5l-7 7 7 7M8 12h13',
     chevron:'M9 5l7 7-7 7',
+    up:'M15 5l-7 7 7 7',
     close:'M6 6l12 12M18 6L6 18',
     check:'M5 12l4 4L19 6',
     note:'M5 3h14v18H5zM8 8h8M8 12h8M8 16h5',
@@ -267,12 +268,16 @@
   /* Mobile-standard choice control: a trigger button that opens a picker sheet.
      Replaces native <select>; the host app owns the picker view and state.
      strs: label (raw label wrapped in a span), display or value (the shown value), placeholder. */
-  function pickerField({label='',value='',display='',placeholder='Select',action='open-picker',key='',disabled=false,reason='',error='',loading=false,variant='single',selected=[],names=[],path=[],pressed=false,active=false,ariaLabel='',className='',strs,args}={}){
+  function pickerField({label='',value='',display='',placeholder='Select',action='open-picker',key='',disabled=false,reason='',error='',loading=false,variant='single',selected=[],names=[],path=[],pressed=false,active=false,required=false,ariaLabel='',className='',strs,args}={}){
     const multi=variant.includes('multi'), named=multi&&names.length>0;
-    const text=named?names.slice(0,3).join(' · ')+(names.length>3?' · +'+(names.length-3):''):multi?(selected.length?selected.length+' selected':'None'):path.length?path.join(' › '):display||value;
-    const more=named&&names.length>3?'+'+(names.length-3):'';
+    /* Record forms show the chosen names in up to two lines, then +n: names are kept while they fit a two-line budget
+       (about 30 characters a line at the narrowest phone; CJK counts double), so the line is never clamped mid-name; the first name is always shown. */
+    const w=t=>[...String(t)].reduce((n,ch)=>n+(/[⺀-￿]/.test(ch)?2:1),0);let fit=0;for(let used=0;fit<names.length;fit++){const add=w(names[fit])+(fit?3:0);if(fit&&used+add>60)break;used+=add;}
+    const shownNames=names.slice(0,Math.max(1,fit)),hiddenN=names.length-shownNames.length;
+    const text=named?shownNames.join(' · ')+(hiddenN?' · +'+hiddenN:''):multi?(selected.length?selected.length+' selected':'None'):path.length?path[path.length-1]:display||value;
+    const more=named&&hiddenN?'+'+hiddenN:'';
     const shown=text!==''&&text!=null, id=fieldId('st-picker'), hint=error||reason||(loading?'Loading options…':'');
-    return `<div class="field st-picker-field ${esc(className)}" data-ds="PickerField" data-variant="${esc(variant)}"><span id="${id}-label">${tx(label,{strs,args},'label')}</span><button type="button" class="st-picker-trigger${shown?'':' is-placeholder'}" ${ariaLabel?`aria-label="${esc(ariaLabel)}, ${esc(shown?text:placeholder)}"`:`aria-labelledby="${id}-label ${id}-value"`} aria-haspopup="dialog" aria-expanded="${active}"${hint?` aria-describedby="${id}-hint"`:''}${error?' aria-invalid="true"':''}${disabled||loading?' aria-disabled="true"':''}${loading?' aria-busy="true"':''}${pressed?' data-preview="pressed"':''} data-action="${esc(action)}" data-picker-key="${esc(key)}"><span id="${id}-value" class="st-picker-value${named?' is-names':''}"${named?'':sa(multi?(strs?.display|| (selected.length?'ds.picker.selected':'ds.picker.none')):shown?(strs?.display||strs?.value):(strs?.placeholder||(placeholder==='Select'?'ds.picker.select':undefined)),multi?{n:selected.length,...args?.display}:args?.display||args?.value)}>${named?`<span class="st-picker-names">${esc(names.slice(0,3).join(' · '))}</span>${more?`<span class="st-picker-more">${esc(more)}</span>`:''}`:esc(shown?text:placeholder)}</span>${chevron}</button>${hint?`<span id="${id}-hint" class="st-picker-hint" role="status">${esc(hint)}</span>`:''}</div>`;
+    return `<div class="field st-picker-field ${esc(className)}${error?' error':''}" data-ds="PickerField" data-variant="${esc(variant)}"${required?' data-required=""':''}><span id="${id}-label">${tx(label,{strs,args},'label')}</span><button type="button" class="st-picker-trigger${shown?'':' is-placeholder'}" ${ariaLabel?`aria-label="${esc(ariaLabel)}, ${esc(shown?text:placeholder)}"`:`aria-labelledby="${id}-label ${id}-value"`} aria-haspopup="dialog" aria-expanded="${active}"${hint?` aria-describedby="${id}-hint"`:''}${error?' aria-invalid="true"':''}${disabled||loading?' aria-disabled="true"':''}${loading?' aria-busy="true"':''}${pressed?' data-preview="pressed"':''} data-action="${esc(action)}" data-picker-key="${esc(key)}"><span id="${id}-value" class="st-picker-value${named?' is-names':''}"${named?'':sa(multi?(strs?.display|| (selected.length?'ds.picker.selected':'ds.picker.none')):shown?(strs?.display||strs?.value):(strs?.placeholder||(placeholder==='Select'?'ds.picker.select':undefined)),multi?{n:selected.length,...args?.display}:args?.display||args?.value)}>${named?`<span class="st-picker-names">${esc(shownNames.join(' · '))}</span>${more?`<span class="st-picker-more">${esc(more)}</span>`:''}`:esc(shown?text:placeholder)}</span>${chevron}</button>${hint?`<span id="${id}-hint" class="st-picker-hint" role="status">${esc(hint)}</span>`:''}</div>`;
   }
   // Shared chooser surface: flat catalogue lists or a muted inset for short choices.
   function chooserList(content,{className='',tone='flat',ds='ChoiceList'}={}){
@@ -291,29 +296,44 @@
     const leaves=(nodes,trail=[])=>nodes.flatMap(n=>n.children?leaves(n.children,[...trail,n.label]):[{...n,trail}]);
     let nodes=items;const steps=[];
     for(const value of path){const n=nodes.find(n=>n.value===value);if(!n?.children)break;steps.push(n);nodes=n.children;}
-    const q=query.trim().toLocaleLowerCase();
-    const visible=q?leaves(items).filter(n=>[n.label,n.group||'',...n.trail,...(n.aliases||[])].join(' ').toLocaleLowerCase().includes(q)):cascade?nodes:leaves(items);
+    /* Search covers the level you are on (the whole tree at the root), so a result never sits under a level it is not in.
+       Its meta is the path below this level. */
+    const q=query.trim().toLocaleLowerCase(),scope=cascade&&steps.length?nodes:items,here=steps[steps.length-1];
+    const visible=q?leaves(scope).filter(n=>[n.label,n.group||'',...n.trail,...(n.aliases||[])].join(' ').toLocaleLowerCase().includes(q)):cascade?nodes:leaves(items);
     const count=n=>leaves([n]).filter(x=>selected.includes(x.value)).length;
     const rows=visible.map(n=>{
       const row=choiceRow({label:n.label,meta:n.children?(multi&&count(n)?count(n)+' selected':''):q?n.trail.join(' › '):n.meta||'',mode:n.children?'navigate':multi?'multi':'single',action:n.children||!multi?action:'',value:n.value,selected:selected.includes(n.value),disabled:!!n.disabled,reason:n.reason||'',attrs:n.attrs||{},strs:{...n.strs,...(n.children&&multi&&count(n)?{meta:'ds.picker.selected'}:{})},args:{...n.args,...(n.children&&multi&&count(n)?{meta:{n:count(n)}}:{})}});
       const extra=n.secondaryAction?`<div class="st-choice-extra">${button({label:n.secondaryAction.label,action:n.secondaryAction.action,value:n.value,register:'text',attrs:{'aria-label':n.secondaryAction.label+' '+n.label}})}</div>`:'';
       return row+extra;
     });
-    const search=choiceSearch({label:'Search all options',value:query,attrs:searchAttrs,strs:{label:strs.search||'ds.picker.search',placeholder:strs.search||'ds.picker.search'}});
-    const sep='<span class="st-picker-sep" aria-hidden="true">›</span>';
-    const trail=cascade?`<nav class="st-picker-steps" aria-label="Chosen levels"><button type="button" data-action="${esc(stepAction)}" data-value="0">${tx('All',{strs:{all:strs.all||'ds.picker.all'}},'all')}</button>${steps.map((n,i)=>sep+`<button type="button" data-action="${esc(stepAction)}" data-value="${i+1}"${i===steps.length-1?' aria-current="step"':''}>${tx(n.label,n,'label')}</button>`).join('')}</nav>`:'';
+    const search=here?choiceSearch({label:'Search in '+here.label,value:query,attrs:searchAttrs,strs:{label:'ds.picker.search_in',placeholder:'ds.picker.search_in'},args:{level:here.label}}):choiceSearch({label:'Search all options',value:query,attrs:searchAttrs,strs:{label:strs.search||'ds.picker.search',placeholder:strs.search||'ds.picker.search'}});
+    /* No breadcrumb: the sheet's header carries the level (pickerHead: "‹ Parent" and the level's title). */
     const groups=[];
     visible.forEach((n,i)=>{const title=n.group||n.trail?.join(' › ')||'';let group=groups.find(g=>g.title===title);if(!group){group={title,rows:[]};groups.push(group);}group.rows.push(rows[i]);});
     const list=!cascade&&!q?groups.map(g=>choiceGroup(g.rows,{title:g.title})).join(''):choiceGroup(rows);
     const content=loading||error?choiceEmpty(loading?'Loading options…':error,{strs:{text:loading?strs.loading||'ds.picker.loading':strs.error}}):visible.length?list:choiceEmpty(q?'No options match “'+query+'”.':'No options available.',{strs:{text:q?strs.noMatch||'ds.picker.no_match':strs.empty||'ds.picker.empty'},args:{text:{query}}});
-    return `<div class="st-picker-body" data-ds="PickerField" data-variant="${esc(variant)}">${search}${trail}${content}</div>`;
+    return `<div class="st-picker-body" data-ds="PickerField" data-variant="${esc(variant)}">${search}${content}</div>`;
   }
 
-  /* Back leaves and keeps the draft (pure navigation); Done confirms it. A single pick commits, so single has Back only. */
-  function pickerFooter({selected=[],multi=false,backAction='back',doneAction='picker-done',strs={},args={}}={}){
-    const backBtn=`<button type="button" class="button secondary" data-action="${esc(backAction)}">${tx('Back',{strs:{back:strs.back||'act.back'}},'back')}</button>`;
-    if(!multi)return `<footer class="sheet-footer st-picker-footer">${backBtn}</footer>`;
-    return `<footer class="sheet-footer st-picker-footer">${backBtn}<button type="button" class="button primary" data-action="${esc(doneAction)}">${tx('Done · '+selected.length,{strs:{done:strs.done||'ds.picker.done_count'},args:{done:{n:selected.length,...args.done}}},'done')}</button></footer>`;
+  /* The cascade level in the sheet's header, so the body needs no breadcrumb: at the root the sheet's own title and no up
+     control; one level down, "‹ <rootLabel>" and the level's name; deeper, "‹ <parent level>" and the level's name.
+     Spread the result into sheet(): sheet({...pickerHead({…}), body, footer}). `up.value` is the path length to keep, so the
+     host's stepAction slices the path exactly as before. */
+  function pickerHead({items=[],path=[],title='',rootLabel='',stepAction='picker-step'}={}){
+    let nodes=items;const steps=[];
+    for(const value of path){const n=nodes.find(n=>n.value===value);if(!n?.children)break;steps.push(n);nodes=n.children;}
+    const most=list=>Math.max(list.length,...list.filter(n=>n.children).map(n=>most(n.children)));
+    const rows=most(items);
+    if(!steps.length)return {title,up:null,rows};
+    const here=steps[steps.length-1],parent=steps.length>1?steps[steps.length-2]:null;
+    const name=n=>n.strs?.label?{text:n.label,str:n.strs.label,args:n.args?.label}:n.label;
+    return {title:name(here),up:{label:parent?name(parent):(rootLabel||title),action:stepAction,value:String(steps.length-1)},rows};
+  }
+  /* Back leaves and keeps the draft (pure navigation); Done confirms it. A single pick commits, so single has Back alone. */
+  function pickerFooter({selected=[],multi=false,waiting=false,backAction='back',doneAction='picker-done',strs={},args={}}={}){
+    const backBtn=backButton({action:backAction,label:strs.back?{text:'Back',str:strs.back}:{text:'Back',str:'act.back'}});
+    if(!multi)return sheetFooter({content:backBtn,className:'st-picker-footer'});
+    return sheetFooter({content:backBtn+`<button type="button" class="button primary" data-ds="Button" data-register="primary" data-action="${esc(doneAction)}"${waiting?' aria-disabled="true"':''}>${tx('Done · '+selected.length,{strs:{done:strs.done||'ds.picker.done_count'},args:{done:{n:selected.length,...args.done}}},'done')}</button>`,className:'st-picker-footer'});
   }
   /* Choice chooser primitives. Every chooser shape is composed from these three:
      flat list = one untitled group; sectioned list = several titled groups;
@@ -341,9 +361,12 @@
     const hid=radio&&showTitle?(id||fieldId('st-choice'))+'-title':'';
     return `<section class="st-choice-group ${esc(className)}" data-ds="ChoiceList"${title?` aria-label="${esc(title)}"`:''}>${showTitle?(aside?`<div class="st-choice-heading-row"><h5 class="st-choice-heading"${hid?` id="${esc(hid)}"`:''}>${tx(title,{strs,args},'title')}</h5>${aside}</div>`:`<h5 class="st-choice-heading"${hid?` id="${esc(hid)}"`:''}>${tx(title,{strs,args},'title')}</h5>`):''}${lead?`<div class="st-choice-lead">${lead}</div>`:''}<div class="st-panel st-choice-panel"${radio?` role="radiogroup"${hid?` aria-labelledby="${esc(hid)}"`:''}`:''}>${body}</div></section>`;
   }
-  function choiceSearch({label='Search',placeholder='',value='',attrs={},strs={}}={}){
+  /* Search: the browser's cancel glyph is hidden; while there is text, a Clear text action empties it and fires `input`, so
+     the host's own input handler refreshes the list. */
+  function choiceSearch({label='Search',placeholder='',value='',attrs={},strs={},args}={}){
     const extra=Object.entries(attrs).filter(([k])=>/^(?:data|aria)-[a-z0-9-]+$/.test(k)).map(([k,v])=>` ${k}="${esc(v)}"`).join('');
-    return `<label class="field catalog-search st-choice-search" data-ds="ChoiceList"><input type="search" aria-label="${esc(label)}"${strs.label?` data-str-attr="aria-label:${esc(strs.label)}${strs.placeholder?`;placeholder:${esc(strs.placeholder)}`:''}"`:''} placeholder="${esc(placeholder||label)}" value="${esc(value)}"${extra}></label>`;
+    const clear=value?`<button type="button" class="st-text-action st-search-clear" data-search-clear=""><span data-str="act.clear">Clear</span></button>`:'';
+    return `<label class="field catalog-search st-choice-search" data-ds="ChoiceList"><span class="st-search-box"><input type="search" aria-label="${esc(label)}"${strs.label?` data-str-attr="aria-label:${esc(strs.label)}${strs.placeholder?`;placeholder:${esc(strs.placeholder)}`:''}"${sArgs(args)}`:''} placeholder="${esc(placeholder||label)}" value="${esc(value)}"${extra}>${clear}</span></label>`;
   }
   function choiceEmpty(text,{strs,args}={}){return `<p class="st-choice-empty" data-ds="ChoiceList" role="status">${tx(text,{strs,args},'text')}</p>`;}
   /* options: [value,label,{strs:{label},args:{label}}?]; label is raw HTML, kept as the span's fallback. */
@@ -411,6 +434,11 @@
     hl=hl.replace(/>.*<\/p>$/,`>${hintHtml||messages.join('<span aria-hidden="true"> · </span>')}${textActions(pointers,key)}</p>`);
     return `<div class="st-stepper ${esc(className)}" data-ds="Stepper" data-variant="${esc(variant)}" data-field="${esc(key)}"${loading?' aria-busy="true"':''}${error?' data-error="true"':''} role="group" aria-labelledby="${esc(lid)}"${n===0?' data-zero=""':''}${isChanged?' data-changed=""':''}${isDraft?' data-draft=""':''}${max!=null&&max>=1000?' data-wide=""':''}>${copy}<span class="st-stepper-keys">${key1(-1,floorGray)}${val}${key1(1,ceilGray)}</span>${hl}</div>`;
   }
+  if(typeof document!=='undefined')document.addEventListener('click',e=>{
+    const b=e.target.closest?.('[data-search-clear]');if(!b)return;
+    const i=b.closest('.st-search-box')?.querySelector('input');if(!i)return;
+    e.preventDefault();i.value='';i.dispatchEvent(new Event('input',{bubbles:true}));
+  });
   if(typeof document!=='undefined')document.addEventListener('keydown',e=>{
     const spin=e.target.closest('[data-st-spin]');if(!spin||!['ArrowUp','ArrowDown'].includes(e.key))return;
     e.preventDefault();
@@ -938,16 +966,20 @@
     if(!st&&primary&&typeof primary==='object'&&primary.reason){st=sObj(primary.reason);primary=Object.assign({},primary,{reason:''});}
     if(st){
       const id=st.id||fieldId('st-sheet-status'),waiting=!!((primary&&typeof primary==='object'&&primary.waiting)||(h&&h.waiting));
-      const vis=waiting||!!st.action||!!st.visible,tone=st.tone?` data-tone="${esc(st.tone)}"`:'';
+      /* The footer reason line is gone: a waiting primary stands alone. Its reason stays for the screen reader only (still
+         the primary's aria-describedby). A line that carries its own action is not a reason and is still drawn. */
+      const vis=!!st.action||(!!st.visible&&!waiting),tone=st.tone?` data-tone="${esc(st.tone)}"`:'';
       const act=vis&&st.action?sButton(Object.assign({register:'text'},st.action)):'';
       if(!vis)line=`<p class="sheet-status st-visually-hidden" id="${esc(id)}" role="status" aria-live="polite"${tone}>${sT(st)}</p>`;
       else line=act?`<div class="sheet-status" data-action-slot><p id="${esc(id)}" role="status" aria-live="polite"${tone}>${sT(st)}</p>${act}</div>`:`<p class="sheet-status" id="${esc(id)}" role="status" aria-live="polite"${tone}>${sT(st)}</p>`;
       if(h&&!h.statusId)h=Object.assign({},h,{statusId:id});
       if(primary&&typeof primary==='object'&&!primary.describedby)primary=Object.assign({},primary,{describedby:id});
     }
-    if(content){content=content.replace(/<p class="st-field-hint st-button-reason[^]*?<\/p>/g,reason=>{line+=reason;return '';});}
+    if(content){content=content.replace(/<p class="st-field-hint st-button-reason[^]*?<\/p>/g,reason=>{line+=/<button/.test(reason)?reason.replace('<p class="','<p data-action-slot class="'):reason.replace('st-button-reason','st-button-reason st-visually-hidden');return '';});}
     const inner=content||`${b?backButton(b):''}${h?sHold(h):sButton(primary)}`;
-    return `${line}<div class="sheet-footer${className?' '+esc(className):''}" data-ds="Sheet">${inner}</div>`;
+    /* A hidden reason lives inside the footer (after the two targets), so nothing above the bar is drawn or measured. */
+    const quiet=line&&!/class="sheet-status"|data-action-slot/.test(line);
+    return `${quiet?'':line}<div class="sheet-footer${className?' '+esc(className):''}" data-ds="Sheet">${inner}${quiet?line:''}</div>`;
   }
   /* The overlay layer model: z = base + 10 × layer (scrim 2, drawer 3, page 5, dialog 8). An overlay placed after a sheet in the
      phone rises a layer by itself (CSS); `layer: n` sets it. A drawer is never opened over a drawer (replace its content
@@ -957,20 +989,23 @@
     return `<button type="button" class="scrim" data-ds="Sheet"${sLayer(layer)}${sA(action,value)}${sL(label)}></button>`;
   }
   const SHEET_SIZES=['compact','short','medium','long'];
-  function sheet({variant='drawer',title,subtitle,subtitleTone='',icon='',close={action:'dismiss'},lead='',aside='',above='',body='',bodyClass='',footer:f,size='medium',sizing='content',label,view='',className='',id='',layer=0,inert=false,bar='',scrim:sc={},attrs={}}={}){
+  function sheet({variant='drawer',title,subtitle,subtitleTone='',icon='',close={action:'dismiss'},up=null,holdRows=0,lead='',aside='',above='',body='',bodyClass='',footer:f,size='medium',sizing='content',label,view='',className='',id='',layer=0,inert=false,bar='',scrim:sc={},attrs={}}={}){
     const v=oneOf('Sheet','variant',variant,['drawer','page','dialog'],'drawer'),sz=oneOf('Sheet','size',size,SHEET_SIZES,'medium');
     const foot=f===false?'':(f==null?sheetFooter({}):f),ex=safeAttr(attrs),cls=className?' '+esc(className):'',vw=view?` data-view="${esc(view)}"`:'';
     if(v==='dialog'){
       return `<div class="dialog-backdrop" data-ds="Sheet" data-variant="dialog"${sLayer(layer)}><div class="dialog${cls}" role="dialog" aria-modal="true" tabindex="-1"${id?` id="${esc(id)}"`:''}${vw}${inert?' inert':''}${sL(label??title)}${ex}><div class="dialog-body${bodyClass?' '+esc(bodyClass):''}"><h2 class="dialog-title">${icon?sGlyph(icon):''}${sT(title)}</h2>${subtitle?`<p class="dialog-desc">${sParts(subtitle)}</p>`:''}${body}</div>${foot}</div></div>`;
     }
     const sub=subtitle?`<p class="sheet-subtitle"${subtitleTone?` data-tone="${esc(subtitleTone)}"`:''}>${sParts(subtitle)}</p>`:'';
-    const cl=Object.assign({action:'dismiss'},close||{}),closeLabel=sObj(cl.label||{text:'Close',str:'act.close'}),x=v==='drawer'?iconButton({variant:'plain',action:cl.action,value:cl.value,icon:sGlyph('close'),label:closeLabel.text||'Close',className:'sheet-close',attrs:closeLabel.str?{'data-str-attr':'aria-label:'+closeLabel.str}: {}}):'';
-    const head=`<header class="utility-header">${lead}<div class="sheet-titles"><h2 class="sheet-title">${sT(title)}</h2>${sub}</div>${aside?`<div class="sheet-aside">${aside}</div>`:''}${x}</header>`;
+    /* No ✕ on any sheet: Back in the footer is the way out, and the scrim and a swipe down do what Back does. `close` is kept
+       for old callers and ignored. `up` { label, action, value } is the header's "‹ Parent" control, only in a drawer with
+       levels: it goes up one level and names the parent; it is never labelled Back. */
+    const upHtml=up&&(up.label!=null)?`<button type="button" class="sheet-up" data-ds="Sheet"${sA(up.action||'up',up.value)}>${sGlyph('up')}<span>${sT(up.label)}</span></button>`:'';
+    const head=`<header class="utility-header${upHtml?' has-up':''}">${lead}<div class="sheet-titles">${upHtml}<h2 class="sheet-title">${sT(title)}</h2>${sub}</div>${aside?`<div class="sheet-aside">${aside}</div>`:''}</header>`;
     const common=`data-ds="Sheet" tabindex="-1"${sLayer(layer)}${inert?' inert':''}${id?` id="${esc(id)}"`:''}${vw}${sL(label??title)}${ex}`;
     const main=`${head}${above}<div class="sheet-body${bodyClass?' '+esc(bodyClass):''}">${body}</div>${foot}`;
     if(v==='page')return `<section class="sheet${cls}" ${common} role="region" data-st-context="page" data-presentation="page">${bar}${main}</section>`;
     const scrimHtml=sc===false?'':scrim(Object.assign({layer},sc));
-    return `${scrimHtml}<section class="sheet${cls}" ${common} role="dialog" aria-modal="true" data-st-context="drawer" data-size="${sz}"${sizing==='full'?' data-sizing="full"':' data-sizing="content"'}><div class="grab" aria-hidden="true"></div>${main}</section>`;
+    return `${scrimHtml}<section class="sheet${cls}" ${common} role="dialog" aria-modal="true" data-st-context="drawer" data-size="${sz}"${sizing==='full'?' data-sizing="full"':sizing==='hold'?` data-sizing="hold" style="--hold-rows:${Math.max(1,Number(holdRows)||1)}"`:' data-sizing="content"'}><div class="grab" aria-hidden="true"></div>${main}</section>`;
   }
   if(typeof document!=='undefined')document.addEventListener('keydown',e=>{
     const b=e.target.closest?.('.st-segment button,.st-filter-chips button');if(!b||b.disabled)return;
@@ -1029,7 +1064,7 @@
     const end=()=>{drag=null;};
     document.addEventListener('pointerup',end);document.addEventListener('pointercancel',end);if(typeof globalThis.addEventListener==='function')globalThis.addEventListener('blur',end);
   }
-  const api=Object.freeze({rangeSlider,filterSheet,optionalRow,heading,panel,facts,row,rowGroup,log,logDay,logStamp,logGroups,categoryFooter,field,pickerField,pickerOptions,pickerBody,pickerFooter,filterChips,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowSelectDoor,rowAction,rowSelectChange,status,conditionTag,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
+  const api=Object.freeze({rangeSlider,filterSheet,optionalRow,heading,panel,facts,row,rowGroup,log,logDay,logStamp,logGroups,categoryFooter,field,pickerField,pickerOptions,pickerBody,pickerHead,pickerFooter,filterChips,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowSelectDoor,rowAction,rowSelectChange,status,conditionTag,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
   root.SentriUI=api;
   if(typeof module!=='undefined')module.exports=api;
 })(globalThis);
