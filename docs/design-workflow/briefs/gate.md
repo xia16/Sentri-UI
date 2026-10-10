@@ -17,11 +17,12 @@ Check out CANDIDATE and BASE in two worktrees. Serve each with `node scripts/ser
 
 On CANDIDATE:
 1. `npm test`. All pass. Skips must state a reason.
-2. `npm run check`. It must report the atlas OK. `npm run atlas` must produce no diff in `atlas/atlas.json` beyond its `generated` and `commit` stamps.
-3. `git grep -n '^<<<<<<<\|^>>>>>>>'` finds nothing.
-4. For presentation, component and shared classes: `node scripts/check-states.mjs`. It renders every design-system state the way the atlas draws it and writes `review/state-check.json`; its known-bad fixtures (`scripts/check-states.fixtures/`) are the rejected examples it already catches. If the component has its own check script (e.g. `node scripts/check-button-components.cjs`), run that too, with the server running. Set `SENTRI_PREVIEW_ORIGIN` and `SENTRI_PLAYWRIGHT`. No console errors, no target under 48px, no horizontal overflow.
-5. For behaviour (and presentation that touches a walked screen): `node scripts/run-scenarios.mjs` for each affected feature. Every leaf the change touches passes, in EN and ZH at 360 and 390. A blocked leaf stays blocked; it never becomes a pass.
-6. For copy: every changed string meets the copy budget, uses a verb from `ux/laws/strings.json` with its one meaning, and renders in EN and ZH without clipping.
+2. `npm run check`. It also runs the farm legibility check in report mode. It must report the atlas OK. `npm run atlas` must produce no diff in `atlas/atlas.json` beyond its `generated` and `commit` stamps.
+3. **Farm legibility, blocking for changed screens.** `node scripts/check-legibility.mjs --changed <the SCREENS ids>` on CANDIDATE. It renders each screen bare at 390×844 and fails if a screen in scope has visible text under 13px (the status bar is exempt), text under 4.5:1 (16px+ primary values under 7:1), or a tap target under 48×48 (an invisible hit area counts). Screens outside `--changed` are reported, not blocking: most of the app still fails until the type pass lands, so judge only the screens this change touches. Any failure ends the gate. The 16px body floor and "ink, not pale grey" are judged by eye in step 3. Crowding is fixed by tightening copy and layout, never by shrinking type. Law: `ux/design-system/README.md`.
+4. `git grep -n '^<<<<<<<\|^>>>>>>>'` finds nothing.
+5. For presentation, component and shared classes: `node scripts/check-states.mjs`. It renders every design-system state the way the atlas draws it and writes `review/state-check.json`; its known-bad fixtures (`scripts/check-states.fixtures/`) are the rejected examples it already catches. If the component has its own check script (e.g. `node scripts/check-button-components.cjs`), run that too, with the server running. Set `SENTRI_PREVIEW_ORIGIN` and `SENTRI_PLAYWRIGHT`. No console errors, no target under 48px, no horizontal overflow.
+6. For behaviour (and presentation that touches a walked screen): `node scripts/run-scenarios.mjs` for each affected feature. Every leaf the change touches passes, in EN and ZH at 360 and 390. A blocked leaf stays blocked; it never becomes a pass.
+7. For copy: every changed string meets the copy budget, uses a verb from `ux/laws/strings.json` with its one meaning, and renders in EN and ZH without clipping.
 
 ## 2. Behaviour walk (behaviour and shared component classes)
 
