@@ -14,12 +14,6 @@
   {
     "component": "Banner",
     "variant": "correction",
-    "state": "Focus",
-    "problems": []
-  },
-  {
-    "component": "Banner",
-    "variant": "correction",
     "state": "Disabled",
     "problems": []
   },
@@ -36,7 +30,7 @@
     "problems": [
       {
         "check": "f",
-        "detail": "\"è¯·å…ˆä¿å­˜æ‚¨å¯¹ä¹‹å‰åˆ†å¨©\" overflows its box (730px in 320px, ellipsised)"
+        "detail": "\"请先保存您对之前分娩记录所作的更正然后检查所有修改内容\" overflows its box (378px in 284px, ellipsised)"
       }
     ]
   },
@@ -61,17 +55,11 @@
   {
     "component": "Banner",
     "variant": "danger",
-    "state": "Focus",
-    "problems": []
-  },
-  {
-    "component": "Banner",
-    "variant": "danger",
     "state": "Long label / Chinese",
     "problems": [
       {
         "check": "f",
-        "detail": "\"åˆ é™¤åŽå°†æ— æ³•æ¢å¤è¿™å¤´\" overflows its box (773px in 332px, ellipsised)"
+        "detail": "\"删除后将无法恢复这头母猪本次分娩已经记录的所有仔猪数据\" overflows its box (378px in 296px, ellipsised)"
       }
     ]
   },
@@ -91,12 +79,6 @@
     "component": "Banner",
     "variant": "notice",
     "state": "Pressed",
-    "problems": []
-  },
-  {
-    "component": "Banner",
-    "variant": "notice",
-    "state": "Focus",
     "problems": []
   },
   {
@@ -118,7 +100,7 @@
     "problems": [
       {
         "check": "f",
-        "detail": "\"æœ‰å¤šæ¡åˆ†å¨©è®°å½•å·²ä¿å­˜\" overflows its box (708px in 320px, ellipsised)"
+        "detail": "\"有多条分娩记录已保存在此设备上正在等待网络连接后再上传\" overflows its box (378px in 284px, ellipsised)"
       }
     ]
   },
@@ -138,21 +120,6 @@
     "component": "Button",
     "variant": "destructive",
     "state": "Pressed",
-    "problems": [
-      {
-        "check": "a",
-        "detail": "section.example content 50px is taller than its frame 48px"
-      },
-      {
-        "check": "a",
-        "detail": "div.demo content 50px is taller than its frame 48px"
-      }
-    ]
-  },
-  {
-    "component": "Button",
-    "variant": "destructive",
-    "state": "Focus",
     "problems": []
   },
   {
@@ -189,21 +156,6 @@
     "component": "Button",
     "variant": "hold",
     "state": "Pressed",
-    "problems": [
-      {
-        "check": "a",
-        "detail": "section.example content 58px is taller than its frame 56px"
-      },
-      {
-        "check": "a",
-        "detail": "div.demo content 58px is taller than its frame 56px"
-      }
-    ]
-  },
-  {
-    "component": "Button",
-    "variant": "hold",
-    "state": "Focus",
     "problems": []
   },
   {
@@ -276,21 +228,6 @@
     "component": "Button",
     "variant": "primary",
     "state": "Pressed",
-    "problems": [
-      {
-        "check": "a",
-        "detail": "section.example content 50px is taller than its frame 48px"
-      },
-      {
-        "check": "a",
-        "detail": "div.demo content 50px is taller than its frame 48px"
-      }
-    ]
-  },
-  {
-    "component": "Button",
-    "variant": "primary",
-    "state": "Focus",
     "problems": []
   },
   {
@@ -327,21 +264,6 @@
     "component": "Button",
     "variant": "secondary",
     "state": "Pressed",
-    "problems": [
-      {
-        "check": "a",
-        "detail": "section.example content 50px is taller than its frame 48px"
-      },
-      {
-        "check": "a",
-        "detail": "div.demo content 50px is taller than its frame 48px"
-      }
-    ]
-  },
-  {
-    "component": "Button",
-    "variant": "secondary",
-    "state": "Focus",
     "problems": []
   },
   {
@@ -383,12 +305,6 @@
   {
     "component": "Button",
     "variant": "text",
-    "state": "Focus",
-    "problems": []
-  },
-  {
-    "component": "Button",
-    "variant": "text",
     "state": "Disabled",
     "problems": []
   },
@@ -420,21 +336,6 @@
     "component": "Button",
     "variant": "tool",
     "state": "Pressed",
-    "problems": [
-      {
-        "check": "a",
-        "detail": "section.example content 50px is taller than its frame 48px"
-      },
-      {
-        "check": "a",
-        "detail": "div.demo content 50px is taller than its frame 48px"
-      }
-    ]
-  },
-  {
-    "component": "Button",
-    "variant": "tool",
-    "state": "Focus",
     "problems": []
   },
   {
@@ -450,7 +351,7 @@
     "problems": [
       {
         "check": "f",
-        "detail": "\"è®°å½•è¿™ä¸€æ ä»Šå¤©å·²å®Œæˆ\" overflows its box (620px in 354px, ellipsised)"
+        "detail": "\"记录这一栏今天已完成处理的十二头仔猪并保留记录\" overflows its box (322px in 318px, ellipsised)"
       }
     ]
   },
@@ -487,12 +388,6 @@
   {
     "component": "CategoryFooter",
     "variant": "default",
-    "state": "Focused",
-    "problems": []
-  },
-  {
-    "component": "CategoryFooter",
-    "variant": "default",
     "state": "Empty",
     "problems": []
   },
@@ -500,31 +395,13 @@
     "component": "CategoryFooter",
     "variant": "default",
     "state": "Five categories at 300px",
-    "problems": [
-      {
-        "check": "d",
-        "detail": "value baselines differ across columns by 2px in \"Back\" / \"HealthRoutineP\""
-      },
-      {
-        "check": "f",
-        "detail": "\"Records\" runs past the screen edge"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "CategoryFooter",
     "variant": "default",
     "state": "Long label / Chinese",
-    "problems": [
-      {
-        "check": "f",
-        "detail": "\"æ—¥å¸¸å·¥ä½œ\" runs past the screen edge"
-      },
-      {
-        "check": "f",
-        "detail": "\"ç”Ÿäº§\" runs past the screen edge"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "CategoryFooter",
@@ -536,23 +413,13 @@
     "component": "CategoryFooter",
     "variant": "default",
     "state": "Scrolled",
-    "problems": [
-      {
-        "check": "d",
-        "detail": "value baselines differ across columns by 2px in \"Back\" / \"HealthRoutineP\""
-      }
-    ]
+    "problems": []
   },
   {
     "component": "ChoiceList",
     "variant": "inline",
     "state": "Default",
-    "problems": [
-      {
-        "check": "a",
-        "detail": "span.st-visually-hidden content 20px is taller than its frame 1px"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "ChoiceList",
@@ -570,12 +437,6 @@
     "component": "ChoiceList",
     "variant": "inline",
     "state": "Disabled",
-    "problems": []
-  },
-  {
-    "component": "ChoiceList",
-    "variant": "inline",
-    "state": "Focus",
     "problems": []
   },
   {
@@ -623,12 +484,6 @@
   {
     "component": "ChoiceList",
     "variant": "multi",
-    "state": "Focus",
-    "problems": []
-  },
-  {
-    "component": "ChoiceList",
-    "variant": "multi",
     "state": "Loading",
     "problems": []
   },
@@ -660,12 +515,6 @@
     "component": "ChoiceList",
     "variant": "navigate",
     "state": "Disabled",
-    "problems": []
-  },
-  {
-    "component": "ChoiceList",
-    "variant": "navigate",
-    "state": "Focus",
     "problems": []
   },
   {
@@ -713,12 +562,6 @@
   {
     "component": "ChoiceList",
     "variant": "radio",
-    "state": "Focus",
-    "problems": []
-  },
-  {
-    "component": "ChoiceList",
-    "variant": "radio",
     "state": "Loading",
     "problems": []
   },
@@ -756,12 +599,6 @@
     "component": "ChoiceList",
     "variant": "single",
     "state": "Disabled",
-    "problems": []
-  },
-  {
-    "component": "ChoiceList",
-    "variant": "single",
-    "state": "Focus",
     "problems": []
   },
   {
@@ -858,91 +695,37 @@
     "component": "ConditionTag",
     "variant": "tag",
     "state": "Needs attention · Monitor",
-    "problems": [
-      {
-        "check": "a",
-        "detail": "span.st-visually-hidden content 12px is taller than its frame 1px"
-      },
-      {
-        "check": "f",
-        "detail": "\"· Monitor\" overflows its box (43px in 1px)"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "ConditionTag",
     "variant": "tag",
     "state": "Needs attention · Treat in place",
-    "problems": [
-      {
-        "check": "a",
-        "detail": "span.st-visually-hidden content 12px is taller than its frame 1px"
-      },
-      {
-        "check": "f",
-        "detail": "\"· Treat in place\" overflows its box (68px in 1px)"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "ConditionTag",
     "variant": "tag",
     "state": "Needs attention · Hospital pen",
-    "problems": [
-      {
-        "check": "a",
-        "detail": "span.st-visually-hidden content 12px is taller than its frame 1px"
-      },
-      {
-        "check": "f",
-        "detail": "\"· Hospital pen\" overflows its box (66px in 1px)"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "ConditionTag",
     "variant": "tag",
     "state": "Ongoing",
-    "problems": [
-      {
-        "check": "a",
-        "detail": "span.st-visually-hidden content 12px is taller than its frame 1px"
-      },
-      {
-        "check": "f",
-        "detail": "\"· Ongoing\" overflows its box (48px in 1px)"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "ConditionTag",
     "variant": "tag",
     "state": "Resolved",
-    "problems": [
-      {
-        "check": "a",
-        "detail": "span.st-visually-hidden content 12px is taller than its frame 1px"
-      },
-      {
-        "check": "f",
-        "detail": "\"· Resolved\" overflows its box (50px in 1px)"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "ConditionTag",
     "variant": "tag",
     "state": "Notice (standing instruction)",
-    "problems": [
-      {
-        "check": "a",
-        "detail": "span.st-visually-hidden content 12px is taller than its frame 1px"
-      },
-      {
-        "check": "f",
-        "detail": "\"· 1.8 kg/day Â· fixed amount\" overflows its box (130px in 1px)"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "ConditionTag",
@@ -950,16 +733,8 @@
     "state": "Long name (ellipsis)",
     "problems": [
       {
-        "check": "a",
-        "detail": "span.st-visually-hidden content 12px is taller than its frame 1px"
-      },
-      {
         "check": "f",
         "detail": "\"Respiratory infection with lab\" overflows its box (217px in 57px, ellipsised)"
-      },
-      {
-        "check": "f",
-        "detail": "\"· Treat in place\" overflows its box (68px in 1px)"
       }
     ]
   },
@@ -967,16 +742,7 @@
     "component": "ConditionTag",
     "variant": "tag",
     "state": "Chinese",
-    "problems": [
-      {
-        "check": "a",
-        "detail": "span.st-visually-hidden content 12px is taller than its frame 1px"
-      },
-      {
-        "check": "f",
-        "detail": "\"· è§‚å¯Ÿ\" overflows its box (37px in 1px)"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "Facts",
@@ -994,7 +760,16 @@
     "component": "Facts",
     "variant": "three-column",
     "state": "Long label wraps",
-    "problems": []
+    "problems": [
+      {
+        "check": "d",
+        "detail": "value baselines differ across columns by 16px in \"Alive litter n\" / \"Identified pig\" / \"Without identi\""
+      },
+      {
+        "check": "d",
+        "detail": "label \"Without identity yet\" wraps to 2 lines"
+      }
+    ]
   },
   {
     "component": "Facts",
@@ -1033,7 +808,7 @@
     "problems": [
       {
         "check": "e",
-        "detail": "Facts value \"Gestation 1 Â· restricted Â· t\" wraps to 2 lines"
+        "detail": "Facts value \"Gestation 1 · restricted · two\" wraps to 2 lines"
       }
     ]
   },
@@ -1052,12 +827,6 @@
   {
     "component": "Field",
     "variant": "number",
-    "state": "Focus",
-    "problems": []
-  },
-  {
-    "component": "Field",
-    "variant": "number",
     "state": "Filled",
     "problems": []
   },
@@ -1088,12 +857,6 @@
   {
     "component": "Field",
     "variant": "text",
-    "state": "Focus",
-    "problems": []
-  },
-  {
-    "component": "Field",
-    "variant": "text",
     "state": "Filled",
     "problems": []
   },
@@ -1119,12 +882,6 @@
     "component": "Field",
     "variant": "textarea",
     "state": "Default",
-    "problems": []
-  },
-  {
-    "component": "Field",
-    "variant": "textarea",
-    "state": "Focus",
     "problems": []
   },
   {
@@ -1155,196 +912,25 @@
     "component": "FilterChips",
     "variant": "tags",
     "state": "Default",
-    "problems": [
-      {
-        "check": "f",
-        "detail": "\"Castrate\" runs past the screen edge"
-      },
-      {
-        "check": "f",
-        "detail": "\"5\" runs past the screen edge"
-      },
-      {
-        "check": "f",
-        "detail": "\"Coccidiosis\" runs past the screen edge"
-      },
-      {
-        "check": "f",
-        "detail": "\"6\" runs past the screen edge"
-      },
-      {
-        "check": "f",
-        "detail": "\"Tag\" runs past the screen edge"
-      },
-      {
-        "check": "f",
-        "detail": "\"7\" runs past the screen edge"
-      },
-      {
-        "check": "f",
-        "detail": "\"Weight\" runs past the screen edge"
-      },
-      {
-        "check": "f",
-        "detail": "\"8\" runs past the screen edge"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "FilterChips",
     "variant": "tags",
     "state": "Pressed",
-    "problems": [
-      {
-        "check": "f",
-        "detail": "\"Castrate\" runs past the screen edge"
-      },
-      {
-        "check": "f",
-        "detail": "\"5\" runs past the screen edge"
-      },
-      {
-        "check": "f",
-        "detail": "\"Coccidiosis\" runs past the screen edge"
-      },
-      {
-        "check": "f",
-        "detail": "\"6\" runs past the screen edge"
-      },
-      {
-        "check": "f",
-        "detail": "\"Tag\" runs past the screen edge"
-      },
-      {
-        "check": "f",
-        "detail": "\"7\" runs past the screen edge"
-      },
-      {
-        "check": "f",
-        "detail": "\"Weight\" runs past the screen edge"
-      },
-      {
-        "check": "f",
-        "detail": "\"8\" runs past the screen edge"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "FilterChips",
     "variant": "tags",
     "state": "Selected",
-    "problems": [
-      {
-        "check": "f",
-        "detail": "\"Castrate\" runs past the screen edge"
-      },
-      {
-        "check": "f",
-        "detail": "\"5\" runs past the screen edge"
-      },
-      {
-        "check": "f",
-        "detail": "\"Coccidiosis\" runs past the screen edge"
-      },
-      {
-        "check": "f",
-        "detail": "\"6\" runs past the screen edge"
-      },
-      {
-        "check": "f",
-        "detail": "\"Tag\" runs past the screen edge"
-      },
-      {
-        "check": "f",
-        "detail": "\"7\" runs past the screen edge"
-      },
-      {
-        "check": "f",
-        "detail": "\"Weight\" runs past the screen edge"
-      },
-      {
-        "check": "f",
-        "detail": "\"8\" runs past the screen edge"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "FilterChips",
     "variant": "tags",
     "state": "Disabled",
-    "problems": [
-      {
-        "check": "f",
-        "detail": "\"Castrate\" runs past the screen edge"
-      },
-      {
-        "check": "f",
-        "detail": "\"5\" runs past the screen edge"
-      },
-      {
-        "check": "f",
-        "detail": "\"Coccidiosis\" runs past the screen edge"
-      },
-      {
-        "check": "f",
-        "detail": "\"6\" runs past the screen edge"
-      },
-      {
-        "check": "f",
-        "detail": "\"Tag\" runs past the screen edge"
-      },
-      {
-        "check": "f",
-        "detail": "\"7\" runs past the screen edge"
-      },
-      {
-        "check": "f",
-        "detail": "\"Weight\" runs past the screen edge"
-      },
-      {
-        "check": "f",
-        "detail": "\"8\" runs past the screen edge"
-      }
-    ]
-  },
-  {
-    "component": "FilterChips",
-    "variant": "tags",
-    "state": "Focus",
-    "problems": [
-      {
-        "check": "f",
-        "detail": "\"Castrate\" runs past the screen edge"
-      },
-      {
-        "check": "f",
-        "detail": "\"5\" runs past the screen edge"
-      },
-      {
-        "check": "f",
-        "detail": "\"Coccidiosis\" runs past the screen edge"
-      },
-      {
-        "check": "f",
-        "detail": "\"6\" runs past the screen edge"
-      },
-      {
-        "check": "f",
-        "detail": "\"Tag\" runs past the screen edge"
-      },
-      {
-        "check": "f",
-        "detail": "\"7\" runs past the screen edge"
-      },
-      {
-        "check": "f",
-        "detail": "\"Weight\" runs past the screen edge"
-      },
-      {
-        "check": "f",
-        "detail": "\"8\" runs past the screen edge"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "FilterChips",
@@ -1356,78 +942,43 @@
     "component": "FilterSheet",
     "variant": "list",
     "state": "Default",
-    "problems": [
-      {
-        "check": "a",
-        "detail": "button.st-range-handle content 70px is taller than its frame 46px"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "FilterSheet",
     "variant": "list",
     "state": "Active",
-    "problems": [
-      {
-        "check": "a",
-        "detail": "button.st-range-handle content 70px is taller than its frame 46px"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "FilterSheet",
     "variant": "list",
     "state": "Empty",
-    "problems": [
-      {
-        "check": "a",
-        "detail": "button.st-range-handle content 70px is taller than its frame 46px"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "FilterSheet",
     "variant": "list",
     "state": "Disabled",
-    "problems": [
-      {
-        "check": "a",
-        "detail": "button.st-range-handle content 70px is taller than its frame 46px"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "FilterSheet",
     "variant": "list",
     "state": "Error",
-    "problems": [
-      {
-        "check": "a",
-        "detail": "button.st-range-handle content 70px is taller than its frame 46px"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "FilterSheet",
     "variant": "list",
     "state": "Loading",
-    "problems": [
-      {
-        "check": "a",
-        "detail": "button.st-range-handle content 70px is taller than its frame 46px"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "FilterSheet",
     "variant": "list",
     "state": "Long / Chinese",
-    "problems": [
-      {
-        "check": "a",
-        "detail": "button.st-range-handle content 70px is taller than its frame 46px"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "Heading",
@@ -1505,70 +1056,13 @@
     "component": "Heading",
     "variant": "section",
     "state": "With action",
-    "problems": [
-      {
-        "check": "a",
-        "detail": "div content 34px is taller than its frame 20px"
-      },
-      {
-        "check": "a",
-        "detail": "div.st-heading content 34px is taller than its frame 20px"
-      },
-      {
-        "check": "a",
-        "detail": "div.st-heading-aside content 34px is taller than its frame 20px"
-      },
-      {
-        "check": "a",
-        "detail": "span.st-heading-action content 34px is taller than its frame 20px"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "Heading",
     "variant": "section",
     "state": "Action pressed",
-    "problems": [
-      {
-        "check": "a",
-        "detail": "div content 34px is taller than its frame 20px"
-      },
-      {
-        "check": "a",
-        "detail": "div.st-heading content 34px is taller than its frame 20px"
-      },
-      {
-        "check": "a",
-        "detail": "div.st-heading-aside content 34px is taller than its frame 20px"
-      },
-      {
-        "check": "a",
-        "detail": "span.st-heading-action content 34px is taller than its frame 20px"
-      }
-    ]
-  },
-  {
-    "component": "Heading",
-    "variant": "section",
-    "state": "Action focused",
-    "problems": [
-      {
-        "check": "a",
-        "detail": "div content 34px is taller than its frame 20px"
-      },
-      {
-        "check": "a",
-        "detail": "div.st-heading content 34px is taller than its frame 20px"
-      },
-      {
-        "check": "a",
-        "detail": "div.st-heading-aside content 34px is taller than its frame 20px"
-      },
-      {
-        "check": "a",
-        "detail": "span.st-heading-action content 34px is taller than its frame 20px"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "Heading",
@@ -1580,16 +1074,7 @@
     "component": "Heading",
     "variant": "section",
     "state": "Chinese",
-    "problems": [
-      {
-        "check": "a",
-        "detail": "div.st-heading-aside content 34px is taller than its frame 20px"
-      },
-      {
-        "check": "a",
-        "detail": "span.st-heading-action content 34px is taller than its frame 20px"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "Icon",
@@ -1619,21 +1104,6 @@
     "component": "IconButton",
     "variant": "bordered",
     "state": "Pressed",
-    "problems": [
-      {
-        "check": "a",
-        "detail": "section.example content 50px is taller than its frame 48px"
-      },
-      {
-        "check": "a",
-        "detail": "div.demo content 50px is taller than its frame 48px"
-      }
-    ]
-  },
-  {
-    "component": "IconButton",
-    "variant": "bordered",
-    "state": "Focus",
     "problems": []
   },
   {
@@ -1670,21 +1140,6 @@
     "component": "IconButton",
     "variant": "plain",
     "state": "Pressed",
-    "problems": [
-      {
-        "check": "a",
-        "detail": "section.example content 50px is taller than its frame 48px"
-      },
-      {
-        "check": "a",
-        "detail": "div.demo content 50px is taller than its frame 48px"
-      }
-    ]
-  },
-  {
-    "component": "IconButton",
-    "variant": "plain",
-    "state": "Focus",
     "problems": []
   },
   {
@@ -1793,16 +1248,7 @@
     "component": "Panel",
     "variant": "drawer",
     "state": "Default",
-    "problems": [
-      {
-        "check": "b",
-        "detail": "dl.st-panel draws a surface inside div"
-      },
-      {
-        "check": "b",
-        "detail": "div.st-panel draws a surface inside div"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "Panel",
@@ -1814,16 +1260,7 @@
     "component": "Panel",
     "variant": "drawer",
     "state": "Long label / Chinese",
-    "problems": [
-      {
-        "check": "b",
-        "detail": "dl.st-panel draws a surface inside div"
-      },
-      {
-        "check": "b",
-        "detail": "div.st-panel draws a surface inside div"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "Panel",
@@ -1894,12 +1331,6 @@
   {
     "component": "Photos",
     "variant": "line",
-    "state": "Focus",
-    "problems": []
-  },
-  {
-    "component": "Photos",
-    "variant": "line",
     "state": "Disabled",
     "problems": []
   },
@@ -1948,10 +1379,6 @@
     "state": "Active",
     "problems": [
       {
-        "check": "a",
-        "detail": "span.st-picker-sep content 16px is taller than its frame 14px"
-      },
-      {
         "check": "i",
         "detail": "button.st-picker-trigger \"Low appetite\" and input \"\" are 0px apart"
       },
@@ -1965,12 +1392,6 @@
     "component": "PickerField",
     "variant": "cascade-multi",
     "state": "Disabled",
-    "problems": []
-  },
-  {
-    "component": "PickerField",
-    "variant": "cascade-multi",
-    "state": "Focus",
     "problems": []
   },
   {
@@ -2014,12 +1435,7 @@
     "component": "PickerField",
     "variant": "cascade-multi",
     "state": "Long-label",
-    "problems": [
-      {
-        "check": "k",
-        "detail": "closed trigger div.field stacked with sheet content section.st-choice-group outside a sheet or phone frame"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "PickerField",
@@ -2048,10 +1464,6 @@
     "state": "Active",
     "problems": [
       {
-        "check": "a",
-        "detail": "span.st-picker-sep content 16px is taller than its frame 14px"
-      },
-      {
         "check": "i",
         "detail": "button.st-picker-trigger \"Antibiotics › \" and input \"\" are 0px apart"
       },
@@ -2065,12 +1477,6 @@
     "component": "PickerField",
     "variant": "cascade",
     "state": "Disabled",
-    "problems": []
-  },
-  {
-    "component": "PickerField",
-    "variant": "cascade",
-    "state": "Focus",
     "problems": []
   },
   {
@@ -2117,11 +1523,7 @@
     "problems": [
       {
         "check": "f",
-        "detail": "\"Antibiotics › é’éœ‰ç´ ç±»æŠ—è\" overflows its box (830px in 339px, ellipsised)"
-      },
-      {
-        "check": "k",
-        "detail": "closed trigger div.field stacked with sheet content section.st-choice-group outside a sheet or phone frame"
+        "detail": "\"Antibiotics › 青霉素类抗菌药物 / 阿莫西林可\" overflows its box (471px in 303px, ellipsised)"
       }
     ]
   },
@@ -2170,12 +1572,6 @@
   {
     "component": "PickerField",
     "variant": "multi",
-    "state": "Focus",
-    "problems": []
-  },
-  {
-    "component": "PickerField",
-    "variant": "multi",
     "state": "Error",
     "problems": [
       {
@@ -2214,12 +1610,7 @@
     "component": "PickerField",
     "variant": "multi",
     "state": "Long-label",
-    "problems": [
-      {
-        "check": "k",
-        "detail": "closed trigger div.field stacked with sheet content section.st-choice-group outside a sheet or phone frame"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "PickerField",
@@ -2266,12 +1657,6 @@
   {
     "component": "PickerField",
     "variant": "single",
-    "state": "Focus",
-    "problems": []
-  },
-  {
-    "component": "PickerField",
-    "variant": "single",
     "state": "Error",
     "problems": [
       {
@@ -2313,11 +1698,7 @@
     "problems": [
       {
         "check": "f",
-        "detail": "\"é’éœ‰ç´ ç±»æŠ—èŒè¯ç‰© / é˜¿\" overflows its box (748px in 339px, ellipsised)"
-      },
-      {
-        "check": "k",
-        "detail": "closed trigger div.field stacked with sheet content section.st-choice-group outside a sheet or phone frame"
+        "detail": "\"青霉素类抗菌药物 / 阿莫西林可溶性粉用于仔猪治疗的完整名称\" overflows its box (389px in 303px, ellipsised)"
       }
     ]
   },
@@ -2325,78 +1706,37 @@
     "component": "RangeSlider",
     "variant": "range",
     "state": "Default",
-    "problems": [
-      {
-        "check": "a",
-        "detail": "button.st-range-handle content 70px is taller than its frame 46px"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "RangeSlider",
     "variant": "range",
     "state": "Pressed",
-    "problems": [
-      {
-        "check": "a",
-        "detail": "button.st-range-handle content 70px is taller than its frame 46px"
-      }
-    ]
-  },
-  {
-    "component": "RangeSlider",
-    "variant": "range",
-    "state": "Focus",
-    "problems": [
-      {
-        "check": "a",
-        "detail": "button.st-range-handle content 70px is taller than its frame 46px"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "RangeSlider",
     "variant": "range",
     "state": "At limits",
-    "problems": [
-      {
-        "check": "a",
-        "detail": "button.st-range-handle content 70px is taller than its frame 46px"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "RangeSlider",
     "variant": "range",
     "state": "Disabled",
-    "problems": [
-      {
-        "check": "a",
-        "detail": "button.st-range-handle content 70px is taller than its frame 46px"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "RangeSlider",
     "variant": "range",
     "state": "Error",
-    "problems": [
-      {
-        "check": "a",
-        "detail": "button.st-range-handle content 70px is taller than its frame 46px"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "RangeSlider",
     "variant": "range",
     "state": "Long / Chinese",
-    "problems": [
-      {
-        "check": "a",
-        "detail": "button.st-range-handle content 70px is taller than its frame 46px"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "Row",
@@ -2408,12 +1748,6 @@
     "component": "Row",
     "variant": "animal",
     "state": "Pressed",
-    "problems": []
-  },
-  {
-    "component": "Row",
-    "variant": "animal",
-    "state": "Focus",
     "problems": []
   },
   {
@@ -2438,12 +1772,6 @@
     "component": "Row",
     "variant": "door-act",
     "state": "Pressed",
-    "problems": []
-  },
-  {
-    "component": "Row",
-    "variant": "door-act",
-    "state": "Focus",
     "problems": []
   },
   {
@@ -2479,12 +1807,6 @@
   {
     "component": "Row",
     "variant": "navigation",
-    "state": "Focus",
-    "problems": []
-  },
-  {
-    "component": "Row",
-    "variant": "navigation",
     "state": "Long label / Chinese",
     "problems": []
   },
@@ -2509,12 +1831,6 @@
   {
     "component": "Row",
     "variant": "record",
-    "state": "Focus",
-    "problems": []
-  },
-  {
-    "component": "Row",
-    "variant": "record",
     "state": "Long label / Chinese",
     "problems": []
   },
@@ -2534,12 +1850,6 @@
     "component": "Row",
     "variant": "scope",
     "state": "Pressed",
-    "problems": []
-  },
-  {
-    "component": "Row",
-    "variant": "scope",
-    "state": "Focus",
     "problems": []
   },
   {
@@ -2611,12 +1921,6 @@
   {
     "component": "Row",
     "variant": "summary-count",
-    "state": "Focus",
-    "problems": []
-  },
-  {
-    "component": "Row",
-    "variant": "summary-count",
     "state": "Long label / Chinese",
     "problems": []
   },
@@ -2683,19 +1987,8 @@
   {
     "component": "Segment",
     "variant": "facet",
-    "state": "Focus",
-    "problems": []
-  },
-  {
-    "component": "Segment",
-    "variant": "facet",
     "state": "Long-label",
-    "problems": [
-      {
-        "check": "f",
-        "detail": "\"å·²å®Œæˆçš„æ¯çŒªè®°å½•\" runs past the screen edge"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "Segment",
@@ -2724,19 +2017,8 @@
   {
     "component": "Segment",
     "variant": "lens",
-    "state": "Focus",
-    "problems": []
-  },
-  {
-    "component": "Segment",
-    "variant": "lens",
     "state": "Long-label",
-    "problems": [
-      {
-        "check": "f",
-        "detail": "\"å·²å®Œæˆçš„æ¯çŒªè®°å½•\" runs past the screen edge"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "Segment",
@@ -2765,19 +2047,8 @@
   {
     "component": "Segment",
     "variant": "two-line-lens",
-    "state": "Focus",
-    "problems": []
-  },
-  {
-    "component": "Segment",
-    "variant": "two-line-lens",
     "state": "Long-label",
-    "problems": [
-      {
-        "check": "f",
-        "detail": "\"å·²å®Œæˆçš„æ¯çŒªè®°å½•\" runs past the screen edge"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "Segment",
@@ -2806,168 +2077,68 @@
   {
     "component": "Segment",
     "variant": "view-switch",
-    "state": "Focus",
-    "problems": []
-  },
-  {
-    "component": "Segment",
-    "variant": "view-switch",
     "state": "Long-label",
-    "problems": [
-      {
-        "check": "f",
-        "detail": "\"å·²å®Œæˆçš„æ¯çŒªè®°å½•\" runs past the screen edge"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "Sheet",
     "variant": "dialog",
     "state": "Default (glyph)",
-    "problems": [
-      {
-        "check": "b",
-        "detail": "div.st-panel draws a surface inside div.ph"
-      },
-      {
-        "check": "b",
-        "detail": "div.dialog-backdrop draws a surface inside div.ph"
-      },
-      {
-        "check": "c",
-        "detail": "\"Choose what changed.\" starts -23px from the heading \"Born 14 · correct it\" left edge"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "Sheet",
     "variant": "dialog",
     "state": "Without glyph",
-    "problems": [
-      {
-        "check": "b",
-        "detail": "div.st-panel draws a surface inside div.ph"
-      },
-      {
-        "check": "b",
-        "detail": "div.dialog-backdrop draws a surface inside div.ph"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "Sheet",
     "variant": "dialog",
     "state": "Pressed",
-    "problems": [
-      {
-        "check": "b",
-        "detail": "div.st-panel draws a surface inside div.ph"
-      },
-      {
-        "check": "b",
-        "detail": "div.dialog-backdrop draws a surface inside div.ph"
-      },
-      {
-        "check": "c",
-        "detail": "\"Choose what changed.\" starts -23px from the heading \"Born 14 · correct it\" left edge"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "Sheet",
     "variant": "dialog",
     "state": "Waiting (reason shown)",
-    "problems": [
-      {
-        "check": "b",
-        "detail": "div.st-panel draws a surface inside div.ph"
-      },
-      {
-        "check": "b",
-        "detail": "div.dialog-backdrop draws a surface inside div.ph"
-      },
-      {
-        "check": "c",
-        "detail": "\"Unfinished work stays incomple\" starts -23px from the heading \"End task early?\" left edge"
-      },
-      {
-        "check": "c",
-        "detail": "\"Tick the box to confirm\" starts -23px from the heading \"End task early?\" left edge"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "Sheet",
     "variant": "dialog",
     "state": "Long / Chinese",
-    "problems": [
-      {
-        "check": "b",
-        "detail": "div.st-panel draws a surface inside div.ph"
-      },
-      {
-        "check": "b",
-        "detail": "div.dialog-backdrop draws a surface inside div.ph"
-      },
-      {
-        "check": "c",
-        "detail": "\"已经记录的内容不会丢失，未完成的工作仍然保持未完成状态。\" starts -23px from the heading \"要提前结束这项任务吗？未完成的工作会保留\" left edge"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "Sheet",
     "variant": "drawer",
     "state": "Default",
-    "problems": [
-      {
-        "check": "b",
-        "detail": "div.st-panel draws a surface inside div.ph"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "Sheet",
     "variant": "drawer",
     "state": "Pressed",
-    "problems": [
-      {
-        "check": "b",
-        "detail": "div.st-panel draws a surface inside div.ph"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "Sheet",
     "variant": "drawer",
     "state": "Aside",
-    "problems": [
-      {
-        "check": "b",
-        "detail": "div.st-panel draws a surface inside div.ph"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "Sheet",
     "variant": "drawer",
     "state": "Waiting (reason shown)",
-    "problems": [
-      {
-        "check": "b",
-        "detail": "div.st-panel draws a surface inside div.ph"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "Sheet",
     "variant": "drawer",
     "state": "Error",
     "problems": [
-      {
-        "check": "b",
-        "detail": "div.st-panel draws a surface inside div.ph"
-      },
       {
         "check": "g",
         "detail": "numeric field \"Weight (kg)\" is a textarea"
@@ -2980,10 +2151,6 @@
     "state": "Empty",
     "problems": [
       {
-        "check": "b",
-        "detail": "div.st-panel draws a surface inside div.ph"
-      },
-      {
         "check": "c",
         "detail": "\"Nothing selected yet. Tap a pi\" starts 17px from the heading \"Selected0 pigs\" left edge"
       }
@@ -2993,132 +2160,49 @@
     "component": "Sheet",
     "variant": "drawer",
     "state": "Long / Chinese",
-    "problems": [
-      {
-        "check": "b",
-        "detail": "div.st-panel draws a surface inside div.ph"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "Sheet",
     "variant": "drawer",
     "state": "Held at its size",
-    "problems": [
-      {
-        "check": "b",
-        "detail": "div.st-panel draws a surface inside div.ph"
-      },
-      {
-        "check": "b",
-        "detail": "div.st-panel draws a surface inside section.sheet"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "Sheet",
     "variant": "drawer",
     "state": "Lead + Above (drill-down)",
-    "problems": [
-      {
-        "check": "b",
-        "detail": "div.st-panel draws a surface inside div.ph"
-      },
-      {
-        "check": "b",
-        "detail": "div.st-panel draws a surface inside section.sheet"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "Sheet",
     "variant": "page",
     "state": "Default",
-    "problems": [
-      {
-        "check": "b",
-        "detail": "div.st-panel draws a surface inside div.ph"
-      },
-      {
-        "check": "b",
-        "detail": "div.st-panel draws a surface inside section.sheet"
-      },
-      {
-        "check": "b",
-        "detail": "div.sheet-footer draws a surface inside section.sheet"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "Sheet",
     "variant": "page",
     "state": "Pressed",
-    "problems": [
-      {
-        "check": "b",
-        "detail": "div.st-panel draws a surface inside div.ph"
-      },
-      {
-        "check": "b",
-        "detail": "div.st-panel draws a surface inside section.sheet"
-      },
-      {
-        "check": "b",
-        "detail": "div.sheet-footer draws a surface inside section.sheet"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "Sheet",
     "variant": "page",
     "state": "Aside",
-    "problems": [
-      {
-        "check": "b",
-        "detail": "div.st-panel draws a surface inside div.ph"
-      },
-      {
-        "check": "b",
-        "detail": "div.st-panel draws a surface inside section.sheet"
-      },
-      {
-        "check": "b",
-        "detail": "div.sheet-footer draws a surface inside section.sheet"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "Sheet",
     "variant": "page",
     "state": "Waiting (reason shown)",
-    "problems": [
-      {
-        "check": "b",
-        "detail": "div.st-panel draws a surface inside div.ph"
-      },
-      {
-        "check": "b",
-        "detail": "div.st-panel draws a surface inside section.sheet"
-      },
-      {
-        "check": "b",
-        "detail": "div.sheet-footer draws a surface inside section.sheet"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "Sheet",
     "variant": "page",
     "state": "Empty",
     "problems": [
-      {
-        "check": "b",
-        "detail": "div.st-panel draws a surface inside div.ph"
-      },
-      {
-        "check": "b",
-        "detail": "div.sheet-footer draws a surface inside section.sheet"
-      },
       {
         "check": "c",
         "detail": "\"No activity recorded yet.\" starts 17px from the heading \"Pen logB4 · Sow 0002\" left edge"
@@ -3129,39 +2213,13 @@
     "component": "Sheet",
     "variant": "page",
     "state": "Long / Chinese",
-    "problems": [
-      {
-        "check": "b",
-        "detail": "div.st-panel draws a surface inside div.ph"
-      },
-      {
-        "check": "b",
-        "detail": "div.st-panel draws a surface inside section.sheet"
-      },
-      {
-        "check": "b",
-        "detail": "div.sheet-footer draws a surface inside section.sheet"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "Sheet",
     "variant": "page",
     "state": "Drawer over a page",
-    "problems": [
-      {
-        "check": "b",
-        "detail": "div.st-panel draws a surface inside div.ph"
-      },
-      {
-        "check": "b",
-        "detail": "div.st-panel draws a surface inside section.sheet"
-      },
-      {
-        "check": "b",
-        "detail": "div.sheet-footer draws a surface inside section.sheet"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "Status",
@@ -3299,181 +2357,67 @@
     "component": "Stepper",
     "variant": "count",
     "state": "Default",
-    "problems": [
-      {
-        "check": "a",
-        "detail": "span.st-stepper-keys content 83px is taller than its frame 78px"
-      },
-      {
-        "check": "a",
-        "detail": "span.st-stepper-value content 83px is taller than its frame 78px"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "Stepper",
     "variant": "count",
     "state": "Empty",
-    "problems": [
-      {
-        "check": "a",
-        "detail": "span.st-stepper-keys content 83px is taller than its frame 78px"
-      },
-      {
-        "check": "a",
-        "detail": "span.st-stepper-value content 83px is taller than its frame 78px"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "Stepper",
     "variant": "count",
     "state": "Pressed",
-    "problems": [
-      {
-        "check": "a",
-        "detail": "span.st-stepper-keys content 83px is taller than its frame 78px"
-      },
-      {
-        "check": "a",
-        "detail": "span.st-stepper-value content 83px is taller than its frame 78px"
-      }
-    ]
-  },
-  {
-    "component": "Stepper",
-    "variant": "count",
-    "state": "Focus",
-    "problems": [
-      {
-        "check": "a",
-        "detail": "span.st-stepper-keys content 83px is taller than its frame 78px"
-      },
-      {
-        "check": "a",
-        "detail": "span.st-stepper-value content 83px is taller than its frame 78px"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "Stepper",
     "variant": "count",
     "state": "Floor",
-    "problems": [
-      {
-        "check": "a",
-        "detail": "span.st-stepper-keys content 83px is taller than its frame 78px"
-      },
-      {
-        "check": "a",
-        "detail": "span.st-stepper-value content 83px is taller than its frame 78px"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "Stepper",
     "variant": "count",
     "state": "Ceiling",
-    "problems": [
-      {
-        "check": "a",
-        "detail": "span.st-stepper-keys content 83px is taller than its frame 78px"
-      },
-      {
-        "check": "a",
-        "detail": "span.st-stepper-value content 83px is taller than its frame 78px"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "Stepper",
     "variant": "count",
     "state": "Disabled",
-    "problems": [
-      {
-        "check": "a",
-        "detail": "span.st-stepper-keys content 83px is taller than its frame 78px"
-      },
-      {
-        "check": "a",
-        "detail": "span.st-stepper-value content 83px is taller than its frame 78px"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "Stepper",
     "variant": "count",
     "state": "Error",
-    "problems": [
-      {
-        "check": "a",
-        "detail": "span.st-stepper-keys content 83px is taller than its frame 78px"
-      },
-      {
-        "check": "a",
-        "detail": "span.st-stepper-value content 83px is taller than its frame 78px"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "Stepper",
     "variant": "count",
     "state": "Loading",
-    "problems": [
-      {
-        "check": "a",
-        "detail": "span.st-stepper-keys content 83px is taller than its frame 78px"
-      },
-      {
-        "check": "a",
-        "detail": "span.st-stepper-value content 83px is taller than its frame 78px"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "Stepper",
     "variant": "count",
     "state": "Draft",
-    "problems": [
-      {
-        "check": "a",
-        "detail": "span.st-stepper-keys content 83px is taller than its frame 78px"
-      },
-      {
-        "check": "a",
-        "detail": "span.st-stepper-value content 83px is taller than its frame 78px"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "Stepper",
     "variant": "count",
     "state": "Corrected",
-    "problems": [
-      {
-        "check": "a",
-        "detail": "span.st-stepper-keys content 83px is taller than its frame 78px"
-      },
-      {
-        "check": "a",
-        "detail": "span.st-stepper-value content 83px is taller than its frame 78px"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "Stepper",
     "variant": "count",
     "state": "Long Chinese label",
-    "problems": [
-      {
-        "check": "a",
-        "detail": "span.st-stepper-keys content 83px is taller than its frame 78px"
-      },
-      {
-        "check": "a",
-        "detail": "span.st-stepper-value content 83px is taller than its frame 78px"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "Stepper",
@@ -3491,12 +2435,6 @@
     "component": "Stepper",
     "variant": "row",
     "state": "Pressed",
-    "problems": []
-  },
-  {
-    "component": "Stepper",
-    "variant": "row",
-    "state": "Focus",
     "problems": []
   },
   {
@@ -3563,12 +2501,6 @@
     "component": "Stepper",
     "variant": "well",
     "state": "Pressed",
-    "problems": []
-  },
-  {
-    "component": "Stepper",
-    "variant": "well",
-    "state": "Focus",
     "problems": []
   },
   {

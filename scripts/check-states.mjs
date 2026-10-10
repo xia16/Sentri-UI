@@ -11,9 +11,10 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PW = process.env.PLAYWRIGHT_DIR || 'C:/Users/ying_/.cache/adam-design/playwright-1.63.0/node_modules/playwright';
 const { chromium } = createRequire('C:/Users/ying_/.cache/adam-design/playwright-1.63.0/package.json')(PW);
 const DS = '/ux/design-system';
+const VW = Number(process.env.CHECK_WIDTH) || 354; // the atlas cell at 1440 wide (340 to 400 in practice)
 const TYPES = { '.html': 'text/html', '.css': 'text/css', '.js': 'text/javascript', '.mjs': 'text/javascript', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.md': 'text/plain' };
 
-let server = null, base = process.argv[2];
+let server = null, base = process.argv.slice(2).find((a) => /^https?:/.test(a));
 if (!base) {
   server = http.createServer((req, res) => {
     const f = path.resolve(root, '.' + decodeURIComponent(new URL(req.url, 'http://x').pathname));
@@ -29,7 +30,7 @@ base = base.replace(/\/$/, '');
 /* runs inside the rendered state; returns [{check, detail}] */
 function audit(stateName) {
   const P = [], add = (check, detail) => P.push({ check, detail });
-  const W = 390, st = document.querySelector('[data-state]');
+  const W = innerWidth, st = document.querySelector('[data-state]');
   const cs = (e) => getComputedStyle(e), px = (v) => parseFloat(v) || 0;
   const tag = (e) => e.tagName.toLowerCase() + (e.className && typeof e.className === 'string' ? '.' + e.className.trim().split(/\s+/)[0] : '');
   const txt = (e) => (e.textContent || '').replace(/\s+/g, ' ').trim();
@@ -43,23 +44,26 @@ function audit(stateName) {
   const boxBorder = (c) => ['Top', 'Right', 'Bottom', 'Left'].filter((s) => px(c['border' + s + 'Width']) > 0 && c['border' + s + 'Style'] !== 'none').length >= 3;
   const surface = (e) => { const c = cs(e); return bgOf(c) || boxBorder(c) || (c.boxShadow && c.boxShadow !== 'none'); };
   const effBg = (e) => { for (let x = e; x; x = x.parentElement) { const c = cs(x); if (bgOf(c)) return c.backgroundColor; } return ''; };
+  const scrollerAbove = (e) => { for (let x = e.parentElement; x && x !== document.body; x = x.parentElement) if (/auto|scroll/.test(cs(x).overflowX)) return true; return false; };
   const interactive = (e) => e.matches('button,a,input,select,textarea,label,[role=button],[role=radio],[role=option],[role=tab],summary,[tabindex]') || cs(e).cursor === 'pointer';
 
   // (a) taller than frame / unintended scroll
   const doc = document.documentElement;
   if (doc.scrollWidth > W + 1) add('a', `content is wider than the ${W}px screen (${doc.scrollWidth}px)`);
+  // only real clipping counts: an element whose own overflow is hidden/clip and whose content is taller than it. Visible overflow draws fine and a visually-hidden label is clipped on purpose.
+  const hiddenOnPurpose = (e) => e.closest('.st-visually-hidden,.sr-only,[hidden]') || /rect\(0/.test(cs(e).clip) || cs(e).clipPath !== 'none';
   for (const e of all) {
-    if (e === st && !e.matches('.ph,[data-ds]') && false) continue;
-    if (e.matches('textarea,input,select,svg,svg *,img')) continue;
-    if (e.scrollHeight > e.clientHeight + 1 && !scrolls(e) && e.clientHeight > 0 && cs(e).display !== 'inline') add('a', `${tag(e)} content ${e.scrollHeight}px is taller than its frame ${e.clientHeight}px`);
+    if (e.matches('textarea,input,select,svg,svg *,img') || hiddenOnPurpose(e)) continue;
+    if (/hidden|clip/.test(cs(e).overflowY) && e.scrollHeight > e.clientHeight + 1 && e.clientHeight > 0) add('a', `${tag(e)} clips its content (${e.scrollHeight}px in ${e.clientHeight}px)`);
   }
 
-  // (b) nested surfaces: ground > item > another wide surface
+  // (b) nested surfaces: ground > item > another wide surface. A phone frame and a sheet's own scrim/panel are ground-like layers of the item, not extra surfaces.
+  const GROUND = '.ph,.sheet,.dialog,.dialog-backdrop,.scrim,[data-ds="Sheet"],[data-st-context="drawer"]';
   const wide = (e) => { const r = e.getBoundingClientRect(); return r.width >= W * 0.5 && r.height >= 40; };
   for (const e of all) {
-    if (interactive(e) || !wide(e) || !surface(e) || e.matches('svg,svg *,img')) continue;
+    if (interactive(e) || !wide(e) || !surface(e) || e.matches('svg,svg *,img') || e.matches(GROUND)) continue;
     let anc = e.parentElement, parent = null;
-    while (anc && anc !== document.body) { if (surface(anc) && wide(anc)) { parent = anc; break; } anc = anc.parentElement; }
+    while (anc && anc !== document.body) { if (anc.matches(GROUND)) break; if (surface(anc) && wide(anc)) { parent = anc; break; } anc = anc.parentElement; }
     if (!parent) continue;
     const c = cs(e), differs = boxBorder(c) || (c.boxShadow && c.boxShadow !== 'none') || c.backgroundColor !== effBg(parent);
     if (differs) add('b', `${tag(e)} draws a surface inside ${tag(parent)}`);
@@ -68,7 +72,7 @@ function audit(stateName) {
   // (c) left-edge alignment of body text against the heading, inside a sheet or panel
   for (const box of st.querySelectorAll('[data-ds="Sheet"],.st-sheet,[data-ds="Panel"],.st-panel:not(.st-facts):not(.st-row-group)')) {
     const h = box.querySelector('h1,h2,h3,[class*=sheet-title],[class*=-title]'); if (!h || !vis(h)) continue;
-    const hr = textRect(h); if (!hr) continue;
+    const hr = h.querySelector('svg,img') ? h.getBoundingClientRect() : textRect(h); if (!hr) continue;
     for (const p of box.querySelectorAll('p,[class*=empty],[class*=note],[class*=hint],[class*=subtitle]')) {
       if (p === h || h.contains(p) || !vis(p) || p.closest('li,button,a,label,.st-row,[class*=field],[class*=footer]')) continue;
       if (p.querySelector('svg,img') || (p.previousElementSibling && p.previousElementSibling.matches('svg,img,[class*=icon]'))) continue;
@@ -81,7 +85,7 @@ function audit(stateName) {
     if (g !== st && !g.matches('.st-facts') && cs(g).display !== 'grid') continue;
     const cells = [...g.children].filter(vis); if (cells.length < 2) continue;
     const isFacts = g.matches('.st-facts');
-    if (!isFacts && (cs(g).gridTemplateColumns.split(' ').length < 2 || !cells.every((c) => c.children.length >= 2))) continue;
+    if (!isFacts && (cs(g).gridTemplateColumns.split(' ').length < 2 || !cells.every((c) => c.children.length >= 2) || cells.some((c) => interactive(c) || c.querySelector('button,a,input')))) continue;
     const rows = new Map(); for (const c of cells) { const k = Math.round(c.getBoundingClientRect().top); rows.set(k, [...(rows.get(k) || []), c]); }
     for (const row of rows.values()) {
       const vals = row.map((c) => (isFacts ? c.querySelector('dd') : c.lastElementChild)).filter(Boolean);
@@ -98,12 +102,12 @@ function audit(stateName) {
 
   // (f) clipped / ellipsised / overflowing text
   for (const e of all) {
-    if (e.matches('textarea,input,select,svg,svg *,img') || !vis(e) || cs(e).display === 'inline') continue;
+    if (e.matches('textarea,input,select,svg,svg *,img') || !vis(e) || cs(e).display === 'inline' || hiddenOnPurpose(e)) continue;
     const direct = [...e.childNodes].some((n) => n.nodeType === 3 && n.nodeValue.trim()); if (!direct) continue;
     const c = cs(e);
     if (e.scrollWidth > e.clientWidth + 1 && !/auto|scroll/.test(c.overflowX)) add('f', `"${txt(e).slice(0, 30)}" overflows its box (${e.scrollWidth}px in ${e.clientWidth}px${c.textOverflow === 'ellipsis' ? ', ellipsised' : ''})`);
     else if (c.webkitLineClamp && c.webkitLineClamp !== 'none' && e.scrollHeight > e.clientHeight + 1) add('f', `"${txt(e).slice(0, 30)}" is clamped`);
-    else if (e.getBoundingClientRect().right > W + 1) add('f', `"${txt(e).slice(0, 30)}" runs past the screen edge`);
+    else if (e.getBoundingClientRect().right > W + 1 && !scrollerAbove(e)) add('f', `"${txt(e).slice(0, 30)}" runs past the screen edge`);
   }
 
   // (g) numeric field in a textarea / resize grip
@@ -117,7 +121,7 @@ function audit(stateName) {
   }
 
   // (i) touching controls
-  const ctl = all.filter((e) => vis(e) && e.matches('button,input,select,textarea,[role=button],[aria-haspopup],[class*=search]') && !e.matches('input[type=hidden],input[type=radio],input[type=checkbox]') && (surface(e) || bgOf(cs(e)) || e.matches('input,select,textarea')) && !e.closest('[data-ds="Segment"],[role=radiogroup],[role=tablist]'));
+  const ctl = all.filter((e) => vis(e) && e.matches('button,input,select,textarea,[role=button],[aria-haspopup],[class*=search]') && !e.matches('input[type=hidden],input[type=radio],input[type=checkbox]') && (surface(e) || bgOf(cs(e)) || e.matches('input,select,textarea')) && !e.closest('[data-ds="Segment"],[role=radiogroup],[role=tablist]') && !e.matches('.st-range-handle'));
   const rect = (e) => e.getBoundingClientRect();
   for (let i = 0; i < ctl.length; i++) for (let j = i + 1; j < ctl.length; j++) {
     const a = ctl[i], b = ctl[j]; if (a.contains(b) || b.contains(a)) continue;
@@ -134,7 +138,7 @@ function audit(stateName) {
   // (k) composite stacked: trigger plus its sheet content outside a sheet / phone frame
   const inFrame = (e) => e.closest('.ph,[data-ds="Sheet"],.st-sheet,[role=dialog]');
   const trig = [...st.querySelectorAll('[data-ds="PickerField"],[aria-haspopup]')].filter((e) => vis(e) && !inFrame(e));
-  const body = [...st.querySelectorAll('[class*=search],[data-ds="ChoiceList"],[class*=sheet-footer],[data-ds="FilterSheet"]')].filter((e) => vis(e) && !inFrame(e) && !e.closest('[data-ds="PickerField"]'));
+  const body = [...st.querySelectorAll('input[type=search],[role=searchbox],[class*=search],[class*=sheet-footer],[data-ds="FilterSheet"]')].filter((e) => vis(e) && !inFrame(e) && !e.closest('[data-ds="PickerField"]'));
   if (trig.length && body.length) add('k', `closed trigger ${tag(trig[0])} stacked with sheet content ${tag(body[0])} outside a sheet or phone frame`);
   for (const sh of st.querySelectorAll('[data-ds="Sheet"],.st-sheet')) {
     const g = sh.querySelector('.grab,[class*=handle],[class*=grabber]'); if (!g || !vis(g)) continue;
@@ -145,48 +149,74 @@ function audit(stateName) {
 }
 
 const browser = await chromium.launch();
-const results = [];
-const comps = fs.readdirSync(path.join(root, 'ux/design-system/components'), { withFileTypes: true }).filter((d) => d.isDirectory() && fs.existsSync(path.join(root, 'ux/design-system/components', d.name, 'variants'))).map((d) => d.name).sort();
 const parser = await browser.newPage();
 await parser.goto(base + '/ux/design-system/tokens.css');
 
+/* renders every top-level [data-state] of one variant-style html file; returns [{name, problems}] */
+async function checkHtml(html, dir, vw = VW) {
+  const parts = await parser.evaluate((h) => {
+    const d = new DOMParser().parseFromString(h, 'text/html');
+    const sts = [...d.querySelectorAll('[data-state]')].filter((x) => !x.parentElement.closest('[data-state]'));
+    return {
+      head: [...d.head.querySelectorAll('style, link[rel=stylesheet]')].map((x) => x.outerHTML).join(''),
+      tail: [...d.querySelectorAll('script')].filter((x) => !x.closest('[data-state]')).map((x) => x.outerHTML).join(''),
+      states: sts.map((s) => { const hh = s.querySelector(':scope > h2, :scope > h3'); if (hh && hh.textContent.trim().toLowerCase() === s.getAttribute('data-state').trim().toLowerCase()) hh.remove(); return { name: s.getAttribute('data-state'), html: s.outerHTML }; }),
+    };
+  }, html);
+  const out = [];
+  for (const s of parts.states) {
+    const problems = [];
+    const page = await browser.newPage({ viewport: { width: vw, height: 900 } });
+    page.on('console', (m) => { if (m.type() === 'error') problems.push({ check: 'h', detail: m.text().slice(0, 160) }); });
+    page.on('pageerror', (e) => problems.push({ check: 'h', detail: String(e.message).slice(0, 160) }));
+    const url = `${base}${dir}__check__.html`;
+    const doc = `<!doctype html><html><head><meta charset="utf-8"><base href="${base}${dir}"><link rel="stylesheet" href="${DS}/tokens.css"><link rel="stylesheet" href="${DS}/components/bundle.css"><script src="${DS}/components/bundle.js"></script>${parts.head}<style>html,body{margin:0;overflow:hidden;background:var(--app-background);color:var(--ink);font-family:var(--font-sans)}body{padding:var(--space-16)}</style></head><body>${s.html}${parts.tail}</body></html>`;
+    await page.route(url, (r) => r.fulfill({ status: 200, contentType: 'text/html', body: doc }));
+    try {
+      await page.goto(url, { waitUntil: 'load' });
+      await page.evaluate(() => document.fonts.ready);
+      await page.evaluate(() => { // same own-surface rule as the atlas
+        const d = document, own = [...d.querySelectorAll('[data-state] *')].slice(0, 12).find((x) => { const c = getComputedStyle(x), r = x.getBoundingClientRect(); return parseFloat(c.borderTopWidth) > 0 && c.borderTopStyle !== 'none' && r.width > d.documentElement.clientWidth * 0.8; });
+        if (own) d.body.style.padding = '0';
+      });
+      await page.setViewportSize({ width: vw, height: Math.max(200, await page.evaluate(() => Math.ceil(document.body.getBoundingClientRect().height))) });
+      await page.waitForTimeout(60);
+      problems.push(...(await page.evaluate(audit, s.name)));
+    } catch (e) { problems.push({ check: 'h', detail: 'render failed: ' + String(e.message).slice(0, 120) }); }
+    await page.close();
+    const seen = new Set();
+    out.push({ name: s.name, problems: problems.filter((p) => { const k = p.check + p.detail; if (seen.has(k)) return false; seen.add(k); return true; }) });
+  }
+  return out;
+}
+
+/* --self-test: known-bad fixtures must be flagged by the check named in their <meta name="expect">, known-good ones must pass */
+if (process.argv.includes('--self-test')) {
+
+  const fdir = path.join(root, 'scripts/check-states.fixtures');
+  let fails = 0, n = 0;
+  for (const f of fs.readdirSync(fdir).filter((x) => x.endsWith('.html')).sort()) {
+    const html = fs.readFileSync(path.join(fdir, f), 'utf8'), expect = (html.match(/name="expect" content="([^"]+)"/) || [])[1] || 'pass';
+    const res = await checkHtml(html, '/scripts/check-states.fixtures/', Number((html.match(/name="width" content="(\d+)"/) || [])[1]) || VW), got = new Set(res.flatMap((r) => r.problems.map((p) => p.check)));
+    const ok = expect === 'pass' ? got.size === 0 : expect.split(',').every((c) => got.has(c));
+    n++; if (!ok) fails++;
+    console.log(`${ok ? 'ok  ' : 'FAIL'} ${f}  expected ${expect}  got ${[...got].join(',') || 'nothing'}`);
+    if (!ok) for (const r of res) for (const p of r.problems) console.log(`       ${p.check}: ${p.detail}`);
+  }
+  console.log(`${n - fails}/${n} fixtures behave as expected`);
+  await browser.close(); if (server) server.close();
+  process.exit(fails ? 1 : 0);
+}
+
+const results = [];
+const comps = fs.readdirSync(path.join(root, 'ux/design-system/components'), { withFileTypes: true }).filter((d) => d.isDirectory() && fs.existsSync(path.join(root, 'ux/design-system/components', d.name, 'variants'))).map((d) => d.name).sort();
+const only = (process.argv.find((a) => a.startsWith('--only=')) || '').slice(7).split(',').filter(Boolean);
 for (const comp of comps) {
+  if (only.length && !only.includes(comp)) continue;
   const vdir = path.join(root, 'ux/design-system/components', comp, 'variants');
   for (const file of fs.readdirSync(vdir).filter((f) => f.endsWith('.html')).sort()) {
-    const variant = file.replace(/\.html$/, ''), dir = `${DS}/components/${comp}/variants/`;
-    const html = fs.readFileSync(path.join(vdir, file), 'utf8');
-    const parts = await parser.evaluate((h) => {
-      const d = new DOMParser().parseFromString(h, 'text/html');
-      const sts = [...d.querySelectorAll('[data-state]')].filter((x) => !x.parentElement.closest('[data-state]'));
-      return {
-        head: [...d.head.querySelectorAll('style, link[rel=stylesheet]')].map((x) => x.outerHTML).join(''),
-        tail: [...d.querySelectorAll('script')].filter((x) => !x.closest('[data-state]')).map((x) => x.outerHTML).join(''),
-        states: sts.map((s) => { const hh = s.querySelector(':scope > h2, :scope > h3'); if (hh && hh.textContent.trim().toLowerCase() === s.getAttribute('data-state').trim().toLowerCase()) hh.remove(); return { name: s.getAttribute('data-state'), html: s.outerHTML }; }),
-      };
-    }, html);
-    for (const s of parts.states) {
-      const problems = [];
-      const page = await browser.newPage({ viewport: { width: 390, height: 900 } });
-      page.on('console', (m) => { if (m.type() === 'error') problems.push({ check: 'h', detail: m.text().slice(0, 160) }); });
-      page.on('pageerror', (e) => problems.push({ check: 'h', detail: String(e.message).slice(0, 160) }));
-      const url = `${base}${dir}__check__.html`;
-      const doc = `<!doctype html><html><head><base href="${base}${dir}"><link rel="stylesheet" href="${DS}/tokens.css"><link rel="stylesheet" href="${DS}/components/bundle.css"><script src="${DS}/components/bundle.js"></script>${parts.head}<style>html,body{margin:0;overflow:hidden;background:var(--app-background);color:var(--ink);font-family:var(--font-sans)}body{padding:var(--space-16)}</style></head><body>${s.html}${parts.tail}</body></html>`;
-      await page.route(url, (r) => r.fulfill({ status: 200, contentType: 'text/html', body: doc }));
-      try {
-        await page.goto(url, { waitUntil: 'load' });
-        await page.evaluate(() => document.fonts.ready);
-        await page.evaluate(() => { // same own-surface rule as the atlas
-          const d = document, own = [...d.querySelectorAll('[data-state] *')].slice(0, 12).find((x) => { const c = getComputedStyle(x), r = x.getBoundingClientRect(); return parseFloat(c.borderTopWidth) > 0 && c.borderTopStyle !== 'none' && r.width > d.documentElement.clientWidth * 0.8; });
-          if (own) d.body.style.padding = '0';
-        });
-        await page.setViewportSize({ width: 390, height: Math.max(200, await page.evaluate(() => Math.ceil(document.body.getBoundingClientRect().height))) });
-        await page.waitForTimeout(60);
-        problems.push(...(await page.evaluate(audit, s.name)));
-      } catch (e) { problems.push({ check: 'h', detail: 'render failed: ' + String(e.message).split('\n')[0] }); }
-      await page.close();
-      const seen = new Set(), uniq = problems.filter((p) => { const k = p.check + p.detail; if (seen.has(k)) return false; seen.add(k); return true; });
-      results.push({ component: comp, variant, state: s.name, problems: uniq });
-    }
+    const variant = file.replace(/\.html$/, '');
+    for (const r of await checkHtml(fs.readFileSync(path.join(vdir, file), 'utf8'), `${DS}/components/${comp}/variants/`)) results.push({ component: comp, variant, state: r.name, problems: r.problems });
   }
 }
 await browser.close(); if (server) server.close();

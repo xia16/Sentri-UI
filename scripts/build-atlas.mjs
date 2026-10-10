@@ -116,7 +116,7 @@ for (const p of sections.platforms) for (const s of p.sections) for (const pt of
 const backlog = [];
 const KINDS = ['decision', 'design', 'broken', 'unclear'];
 const reviewDir = join(root, 'review');
-if (existsSync(reviewDir)) for (const fn of readdirSync(reviewDir).filter((n) => n.endsWith('.json'))) {
+if (existsSync(reviewDir)) for (const fn of readdirSync(reviewDir).filter((n) => n.endsWith('.json') && n !== 'state-check.json')) {
   let data; try { data = JSON.parse(readFileSync(join(reviewDir, fn), 'utf8')); } catch (e) { problems.push(`review/${fn}: ${e.message}`); continue; }
   for (const it of Array.isArray(data) ? data : data.items || [data]) {
     if (!it || !it.id || !it.title || !it.target) { problems.push(`review/${fn}: an item needs id, target and title`); continue; }
