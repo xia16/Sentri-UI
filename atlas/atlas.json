@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-10T08:19:26.107Z",
- "commit": "c2e7016",
+ "generated": "2026-10-10T08:34:43.570Z",
+ "commit": "00d1eaa",
  "platforms": [
   {
    "id": "mobile",
@@ -1725,7 +1725,7 @@
            "farrowing.count",
            "farrowing.death",
            "farrowing.finish",
-           "farrowing.blocked",
+           "farrowing.leave-edit",
            "farrowing.edit",
            "farrowing.foster",
            "farrowing.reconcile"
@@ -1869,11 +1869,6 @@
         ],
         [
          "farrowing.count",
-         "farrowing.blocked",
-         "Finish farrowing while an Edit draft waits"
-        ],
-        [
-         "farrowing.count",
          "farrowing.death",
          "Record death"
         ],
@@ -1896,21 +1891,6 @@
          "farrowing.finish",
          "farrowing.locked",
          "Finish farrowing (hold to finish)"
-        ],
-        [
-         "farrowing.blocked",
-         "farrowing.count",
-         "Back"
-        ],
-        [
-         "farrowing.blocked",
-         "farrowing.edit",
-         "Review"
-        ],
-        [
-         "farrowing.blocked",
-         "farrowing.death",
-         "Review (unsaved deaths)"
         ],
         [
          "farrowing.death",
@@ -1941,11 +1921,6 @@
          "farrowing.edit",
          "farrowing.finish",
          "Save, when opened from the blocked Finish"
-        ],
-        [
-         "farrowing.edit",
-         "farrowing.blocked",
-         "Back with the draft kept, when opened from the blocked Finish"
         ],
         [
          "farrowing.locked",
@@ -2121,6 +2096,16 @@
          "farrowing.reconcile",
          "farrowing.count",
          "Save, or Back"
+        ],
+        [
+         "farrowing.edit",
+         "farrowing.leave-edit",
+         "Back with unsaved changes"
+        ],
+        [
+         "farrowing.leave-edit",
+         "farrowing.count",
+         "Discard or Save"
         ]
        ],
        "screens": [
@@ -2900,66 +2885,40 @@
          }
         },
         {
-         "id": "farrowing.blocked",
-         "name": "Lock blocked",
-         "zh": "无法锁定",
+         "id": "farrowing.leave-edit",
+         "name": "Leave edit with changes",
+         "zh": "离开修改页（有未保存的修改）",
          "status": "in-design",
          "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
-         "preset": "blocked",
+         "preset": "leave",
          "figma": "",
          "notes": {
-          "purpose": "The Finish sheet when an unsaved record waits: a banner says what to resolve first and Finish stays disabled.",
-          "states": [],
-          "elements": [
+          "purpose": "Back from Edit record with unsaved changes asks whether to save, so an unsaved correction can never reach Finish.",
+          "states": [
+           "Dialog over the Edit record sheet: Save correction? with Discard and Save"
+          ],
+          "controls": [
            {
-            "name": "Pending banner",
-            "shows": "Warning above the totals with Review ›.",
-            "states": [
-             {
-              "state": "Correction",
-              "when": "An Edit with changes exists",
-              "shows": "\"Save your correction first · Resolve this before finishing.\" Review opens Edit"
-             },
-             {
-              "state": "Piglet deaths",
-              "when": "A death draft exists",
-              "shows": "\"Save piglet deaths first\" (unreachable today because leaving the drawer clears the draft). Review opens the drawer"
-             },
-             {
-              "state": "Sow record",
-              "when": "A sow cause is chosen but unsaved",
-              "shows": "\"Save or clear the sow record\". Review opens the drawer"
-             }
-            ],
-            "logic": "Shown whenever any draft exists; the text names the first applicable one in the order death draft, correction, sow cause.",
-            "source": "farrowing-astra-concept.js hasDraft(), finish()",
-            "at": "Resolve this before finishing."
+            "control": "Save",
+            "does": "saves the correction and returns",
+            "goesTo": "farrowing.count | farrowing.locked"
            },
            {
-            "name": "Finish farrowing",
-            "shows": "Greyed, caption HOLD TO FINISH.",
-            "rule": "A held press does nothing until the draft is saved or cleared; a draft never crosses the lock. Clearing in Edit returns to the plain Finish sheet.",
-            "source": "farrowing-astra-concept.js hold(…, blocked)",
-            "at": "HOLD TO FINISH"
+            "control": "Discard",
+            "does": "drops the changes and returns",
+            "goesTo": "farrowing.count | farrowing.locked"
            }
           ],
-          "controls": [],
           "copy": [
-           "(raw) Save your correction first",
-           "(raw) Save piglet deaths first",
-           "(raw) Save or clear the sow record",
-           "(raw) Resolve this before finishing.",
-           "(raw) Review"
+           "(raw) Save correction? · You changed this record. · Discard · Save"
           ],
-          "edge": [],
+          "edge": [
+           "The same ask appears on the grabber and Escape"
+          ],
           "rules": [
-           "\"A draft never crosses the lock\" and the pointer \"1 death unsaved · Record dead\" above the bar (Starting and ending a session)",
-           "\"this is a guard on the lock, not a gate on recording\" (Starting and ending a session)"
+           "An unsaved correction never reaches Finish"
           ],
-          "issues": [
-           "Banner copy and layout differ from the ruled pointer \"1 death unsaved · Record dead\" above the bar; the disabled button is dimmed.",
-           "Only the Edit-draft route reaches this state; the death-draft variant is unreachable."
-          ]
+          "issues": []
          }
         },
         {
@@ -14932,7 +14891,7 @@
         "why": "Optional values (litter weight, piglet weight) should be one row until opened, like Photos and farrowing's + Litter weight",
         "seenIn": [
          "piglet-processing.give-ids",
-         "farrowing.blocked"
+         "farrowing.leave-edit"
         ]
        }
       ]
@@ -15654,7 +15613,7 @@
        {
         "name": "correction",
         "usedBy": [
-         "farrowing.blocked",
+         "farrowing.leave-edit",
          "farrowing.edit"
         ],
         "status": "agent-checked",
@@ -20871,7 +20830,7 @@
      "kind": "decision",
      "severity": "medium",
      "title": "New variant: Measure · optional row (collapsed)?",
-     "detail": "Optional values (litter weight, piglet weight) should be one row until opened, like Photos and farrowing's + Litter weight\nSeen in: piglet-processing.give-ids, farrowing.blocked",
+     "detail": "Optional values (litter weight, piglet weight) should be one row until opened, like Photos and farrowing's + Litter weight\nSeen in: piglet-processing.give-ids, farrowing.leave-edit",
      "source": "gate"
     },
     {

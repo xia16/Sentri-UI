@@ -862,3 +862,44 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
 .st-banner[data-size="card"] .st-banner-copy{align-self:center}
 .st-banner[data-size="card"] .st-banner-door{align-self:center}
 .st-heading[data-kind="panel"] .st-heading-title{font-size:12px;line-height:1.5}
+/* Glove floor (tap-min 48): where the approved baseline drew a 44px box, the visible box stays 44 and an invisible extender reaches 48. */
+:is(.farrowing-phone,.inspection-phone) :is(.button,.key){min-height:44px}
+.button{min-height:44px}
+:not(.sheet-footer):not(.dialog)>.button{position:relative}
+:not(.sheet-footer):not(.dialog)>.button::after{content:"";position:absolute;inset:-3px 0}
+.icon-button.icon-button{width:44px;min-width:44px;height:44px;min-height:44px}
+.icon-button::after{content:"";position:absolute;inset:-3px}
+.icon-button.room-filter-button,.room-dock>.icon-button.icon-button{width:48px;min-width:48px}
+.icon-button.room-filter-button{height:48px;min-height:48px}
+.room-dock>.icon-button.icon-button{height:auto;min-height:48px}
+/* OptionalRow: a small quiet card, "+ Label"; two sit side by side (the owner's older look, 4cb3d75). "Optional" stays in the accessible name, not on the card. */
+.st-optional-row{display:flex;align-items:center;justify-content:center;gap:8px;width:calc(50% - 5px);min-height:48px;margin:12px 0 0;padding:10px;border:1px solid #e5eadc;border-radius:12px;background:#f8f9f3;color:#68745d;font-size:12px;text-align:center}
+.st-optional-copy{flex:0 1 auto;min-width:0;padding:0;align-items:center}
+.st-optional-head{justify-content:center;gap:0}
+.st-optional-label{font:400 12px/1.4 var(--font-sans);color:inherit}
+.st-optional-word{display:none}
+.st-optional-answer{font:400 11px/1.4 var(--font-sans);color:var(--ink)}
+.st-optional-act{order:-1;width:16px;height:16px;color:inherit}
+.st-optional-act svg{box-sizing:border-box;width:16px;height:16px;padding:0;border:0;border-radius:0;background:none;stroke-width:1.8}
+.st-optional-row[data-filled="true"],.st-optional-row[aria-expanded="true"]{border-color:#aebba3;background:#edf1e7;color:#293525}
+.st-optional-row:active{background:#edf1e7}
+.st-optional-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0 0}
+.st-optional-list>.st-optional{display:contents}
+.st-optional-list .st-optional-row{width:100%;margin:0}
+.st-optional-list .st-optional-body,.st-optional-list>.finish-field,.st-optional-list>.st-choice-inline{grid-column:1/-1;margin:0}
+.st-photos .st-optional-row{margin:0}
+.st-photos-camera{width:calc(50% - 5px)}
+/* hit extenders: invisible, so the visible box stays the approved 44 while the target reaches 48 */
+.st-segment button,.farrowing-phone .key{position:relative}
+.st-segment button::after{content:"";position:absolute;inset:-3px 0}
+.farrowing-phone .key::after{content:"";position:absolute;inset:-2px}
+/* transparent targets grow by padding and a matching negative margin: no pseudo-element, layout unchanged */
+.room-pen-name,.edit-finish-door{min-height:48px;margin-top:-2px;margin-bottom:-2px}
+.st-fact-link{min-height:48px;min-width:48px;margin:-12px 0}
+.dialog .sheet-footer>.button.secondary{background:#fff;border:1px solid var(--back-border)}
+/* a tap leaves no ring: only keyboard focus may draw one */
+:is(.farrowing-phone,.inspection-phone,.phone,.device,.atlas-phone) :focus:not(:focus-visible){outline:none}
+/* stepper keys and value in rows: the target is 48, the face stays 44, the margins give the space back */
+.st-stepper[data-variant="row"] .st-stepper-key.st-stepper-key,.st-stepper[data-variant="bare"] .st-stepper-key.st-stepper-key{width:48px;min-width:48px;min-height:48px;margin:-2px}
+.st-stepper[data-variant="row"] .st-stepper-value{display:grid;place-items:center;min-width:calc(3ch + 12px);width:calc(3ch + 12px);min-height:48px;margin:-12px -6px}
+.st-heading-action{position:relative;z-index:1}

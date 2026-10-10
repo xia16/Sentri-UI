@@ -4,7 +4,7 @@
 .farrowing-phone .sow-detail-frame{position:absolute;inset:0;z-index:5;width:100%;height:100%;border:0;background:transparent}
 .farrowing-phone .section-title{display:flex;align-items:center;justify-content:flex-start;gap:7px;font-weight:600;line-height:1.4}
 .farrowing-phone .section-title>svg{width:15px;height:15px;color:#69765e;stroke-width:1.7}
-.farrowing-phone .sow-title-link{display:inline-flex;align-items:center;gap:8px;background:transparent;min-height:var(--tap-min);padding:8px 4px;margin:-8px -4px;font:inherit;letter-spacing:inherit;line-height:inherit;text-align:left}
+.farrowing-phone .sow-title-link{display:inline-flex;align-items:center;gap:8px;background:transparent;min-height:44px;position:relative;padding:8px 4px;margin:-8px -4px;font:inherit;letter-spacing:inherit;line-height:inherit;text-align:left}
 .farrowing-phone .sow-title-link>svg{width:16px;height:16px;color:var(--muted);stroke-width:1.8}
 
 .farrowing-phone .sheet-body>.segment:first-child{margin-top:0}
@@ -13,7 +13,7 @@
 .farrowing-phone .edit-counts{display:flex;flex-direction:column;flex:1;min-height:420px}
 .farrowing-phone .edit-counts :is(.entry-row,.st-stepper[data-variant="row"]){flex:1;min-height:60px}
 .farrowing-phone .edit-counts :is(.entry-label,.st-stepper-label){font-size:15px}
-.farrowing-phone .edit-finish-door{display:flex;align-items:center;justify-content:space-between;width:100%;min-height:var(--tap-min);margin:4px 0 0;padding:0;background:transparent;font-size:12px;text-align:left}
+.farrowing-phone .edit-finish-door{display:flex;align-items:center;justify-content:space-between;width:100%;min-height:48px;margin:2px 0 -2px;padding:0;background:transparent;font-size:12px;text-align:left}
 .farrowing-phone .edit-finish-door>svg{width:14px;height:14px;color:var(--muted)}
 .farrowing-phone .sheet[data-view="editFinish"] .finish-question{margin-top:12px}
 .farrowing-phone .sheet[data-view="editFinish"] .finish-form-details{margin-bottom:12px}
@@ -101,7 +101,7 @@
 
 .farrowing-phone .finish-field-label{position:relative;min-width:0;display:flex;flex-direction:column}
 .farrowing-phone .finish-clear-answer{background:transparent;color:var(--muted);padding:0;text-align:left;font-size:10px;min-height:26px;text-decoration:underline;text-underline-offset:3px}
-.farrowing-phone .finish-review-link{display:flex;align-items:center;gap:4px;min-height:var(--tap-min);padding:0;background:transparent;font-size:11px;font-weight:600}
+.farrowing-phone .finish-review-link{display:flex;align-items:center;gap:4px;min-height:44px;padding:0;background:transparent;font-size:11px;font-weight:600}
 .farrowing-phone .finish-review-link svg{width:13px;height:13px}
 @media(max-width:370px){
  .farrowing-phone .finish-body{gap:12px;padding-bottom:8px}
@@ -241,3 +241,6 @@
 .farrowing-phone .key{width:46px;min-width:46px;height:46px;min-height:44px;border:1px solid var(--task-key-border);border-radius:12px;background:#fff;display:grid;place-items:center;touch-action:manipulation;flex-shrink:0;font-weight:500}
 .farrowing-phone .key svg{width:17px;height:17px;stroke-width:2.2}
 .farrowing-phone .key:active:not(:disabled){background:var(--ink);color:#fff}
+.farrowing-phone .sow-title-link::after{content:"";position:absolute;inset:-2px 0}
+.farrowing-phone .finish-extras.st-optional-list{margin-top:0}
+.farrowing-phone .entry-was{margin-left:6px;font:400 11px var(--font-sans);color:var(--muted)}
