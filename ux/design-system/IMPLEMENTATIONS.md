@@ -82,10 +82,6 @@ One implementation of the drawer, the page and the dialog: `SentriUI.sheet`, `sh
 
 Button now owns primary, secondary, text action, tool, destructive and hold variants. Farrowing’s hold timer and Piglet’s `.sp-tool` are retired; `SentriTask.holdBind` delegates to the bundle. IconButton owns bordered and plain at `tap-min` square; Sheet Close and prototype toolbar/header tools use it. Host classes position controls; their forked geometry and colours have been removed. Waiting reasons stay visible and are linked to their control.
 
-## FilterSheet / RangeSlider pass (2026-10-10)
-
-`SentriUI.filterSheet` composes Sheet with caller-supplied groups and owns Clear, Back, live counted commit and zero/loading/error reasons. Farrowing and Inspection now call it; their filter drawer markup is retired. `SentriUI.rangeSlider` owns Farrowing’s numeric bounds, keyboard, nearest-handle track taps and captured drag; the prototype’s native range overlay, gesture handlers and slider CSS are deleted. The two 48px handles occupy opposite sides of one track to avoid overlapping targets at equal bounds. Home and Piglet processing contain no hand-built filter sheet; Piglet’s distributable was rebuilt with the bundle. Both proposals are removed and registered in the atlas Inputs and filters group.
-
 ## Stepper + Field pass (2026-10-10)
 
 Stepper owns row, count and well in bundle.js / bundle.css. TaskStepper's markup and CSS face layer is retired; SentriTask.stepper is only a compatibility adapter. Piglet processing calls SentriUI.stepper directly. Farrowing translates its existing delta-in-value event contract through a small adapter and has no row-stepper, hero-stepper or feature-stepper markup or styles. The unused filled-ink face is retired; count keys remain neutral pending an owner colour decision.

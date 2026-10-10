@@ -1090,6 +1090,7 @@ button.st-row[data-variant="tick"]:active:not(:disabled){background:var(--press)
 .st-row[data-variant="select-door"] .st-row-door{padding:var(--space-row-y) 0}
 label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-row-x) var(--space-row-y) 0;gap:0}
 
+<<<<<<< HEAD
 /* FilterSheet and RangeSlider: shared list narrowing. */
 .st-filter-group{margin-bottom:var(--space-24)}
 .st-filter-group h3,.st-range p{font-size:var(--type-input-size);overflow-wrap:break-word}
@@ -1113,6 +1114,8 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
 .st-range-handle[data-handle="1"]{top:var(--tap-min)}
 .st-range-handle::after{content:"";position:absolute;left:50%;top:100%;height:calc(var(--tap-min) / 2);border-left:var(--border-width) solid var(--ink);pointer-events:none}
 .st-range-handle[data-handle="1"]::after{top:auto;bottom:100%}
+=======
+>>>>>>> parent of 56c4ac1 (Component pass: FilterSheet + RangeSlider (new) (#75))
 .field .st-field-message{font:400 var(--type-description-size)/1.5 var(--font-sans);color:var(--muted)}
 .field.error .st-field-message{color:var(--red)}
 .field :is(input,textarea):disabled{background:var(--well);color:var(--muted)}
@@ -2436,7 +2439,7 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
   /* A Button from a { label, action, value, register, waiting, describedby } spec (a string is already HTML). */
   function sButton(b){
     if(!b)return '';if(typeof b==='string')return b;
-    const l=sObj(b.label),props={label:l.text??'',register:b.register||'primary',action:b.action||'',value:b.value||'',waiting:!!b.waiting,disabled:!!b.disabled,busy:!!b.busy,describedby:b.describedby||'',className:b.className||'',attrs:b.attrs||{}};
+    const l=sObj(b.label),props={label:l.text??'',register:b.register||'primary',action:b.action||'',value:b.value||'',waiting:!!b.waiting,busy:!!b.busy,describedby:b.describedby||'',className:b.className||'',attrs:b.attrs||{}};
     if(l.str){props.strs={label:l.str};if(l.args)props.args={label:l.args};}
     return button(props);
   }
@@ -2497,6 +2500,7 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
     e.preventDefault();e.stopImmediatePropagation();const target=buttons.find(x=>x.dataset.value===next);target.click();
     const fresh=Array.from(host.querySelectorAll('[data-ds="Segment"] button,[data-ds="FilterChips"] button')).find(x=>x.dataset.action===b.dataset.action&&x.dataset.value===next);fresh?.focus();fresh?.scrollIntoView({block:'nearest',inline:'nearest'});
   },true);
+<<<<<<< HEAD
   /* format(n) → the label for a value (open ends like "7+ days ago", "Today"). The value text, the end labels and aria-valuetext all use it;
      the drag handler looks it up by key, so two sliders on a page that share a key share a formatter. Without it: "a–b unit". */
   const rangeFormats=new Map();
@@ -2533,6 +2537,9 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
     const end=()=>{if(drag)delete drag.r.dataset.dragging;drag=null;};document.addEventListener('pointerup',end);document.addEventListener('pointercancel',end);globalThis.addEventListener?.('blur',end);
   }
   const api=Object.freeze({rangeSlider,filterSheet,optionalRow,heading,panel,facts,row,rowGroup,log,logDay,logStamp,logGroups,categoryFooter,field,pickerField,pickerOptions,pickerBody,pickerFooter,filterChips,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowSelectDoor,rowAction,rowSelectChange,status,conditionTag,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
+=======
+  const api=Object.freeze({optionalRow,heading,panel,facts,row,rowGroup,log,logDay,logStamp,logGroups,categoryFooter,field,pickerField,pickerOptions,pickerBody,pickerFooter,filterChips,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowSelectDoor,rowAction,rowSelectChange,status,conditionTag,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
+>>>>>>> parent of 56c4ac1 (Component pass: FilterSheet + RangeSlider (new) (#75))
   root.SentriUI=api;
   if(typeof module!=='undefined')module.exports=api;
 })(globalThis);
