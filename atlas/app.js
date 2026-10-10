@@ -5,7 +5,7 @@
 const q = new URLSearchParams(location.search);
 const S = { data: null, view: 'atlas', platformId: 'mobile' };
 const VIEWS = [['atlas', 'Features'], ['components', 'Components'], ['copy', 'Copy'], ['backlog', 'Backlog'], ['old', 'Old UI']];
-const STATUS = { 'in-design': 'In design', 'agent-checked': 'Agent-checked', approved: 'Approved', frozen: 'Frozen', placeholder: 'Placeholder' };
+const STATUS = { 'in-design': 'In design', 'agent-checked': 'Agent-checked', approved: 'Approved', frozen: 'Frozen', placeholder: 'Placeholder', earlier: 'Earlier design' };
 
 const el = (h) => { const t = document.createElement('template'); t.innerHTML = h.trim(); return t.content.firstElementChild; };
 const esc = (x) => String(x ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));

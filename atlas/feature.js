@@ -203,11 +203,12 @@ function openFeature(id, sel) {
   const ownIds = new Set(f.screens.map((s) => s.id)), mine = backlogItems().filter((b) => (b.target.kind === 'feature' && b.target.id === f.id) || (b.target.kind === 'screen' && ownIds.has(b.target.id)));
   const todos = mine.filter((b) => b.kind !== 'decision').length, confirm = mine.length - todos; // the same sets the Backlog opens on
   const planned = f.status === 'placeholder', prd = hasPrd(f), sameName = String(f.name).toLowerCase() === String(f.sectionRef.name).toLowerCase();
-  header(`${sameName ? '' : `<a href="#" id="crumb-back">${esc(f.sectionRef.name)}</a> / `}<b>${esc(f.name)}</b> <span class="zh">${esc(f.zh || '')}</span>
-    <span class="meta">${dot(f.status)}${f.status === 'frozen' ? '<span>Frozen</span> · ' : ''}<span>${plural(n, 'screen')}</span>${planned ? ' · <span>Not designed yet</span>' : ''}${prd ? ' · <a href="#" id="l-prd">PRD</a> · <a href="#" id="l-dec">Decisions</a>' : ''}${todos ? ` · <a href="#" id="l-todo" title="Open to-dos for this feature in the Backlog">To-dos ${todos}</a>` : ''}${confirm ? ` · <a href="#" id="l-conf" title="Questions waiting for the owner, in the Backlog">To confirm ${confirm}</a>` : ''}</span>`);
+  header('');
+  const fcrumb = el(`<nav class="fcrumb" aria-label="Breadcrumb"><a href="#" class="fc-back" data-back>‹ Features</a><span class="fc-sep">/</span>${sameName ? '' : `<a href="#" data-back>${esc(f.sectionRef.name)}</a><span class="fc-sep">/</span>`}<b>${esc(f.name)}</b> <span class="zh">${esc(f.zh || '')}</span>
+    <span class="meta">${dot(f.status)}${f.status === 'frozen' ? '<span>Frozen</span> · ' : ''}<span>${plural(n, 'screen')}</span>${planned ? ' · <span>Not designed yet</span>' : ''}${prd ? ' · <a href="#" id="l-prd">PRD</a> · <a href="#" id="l-dec">Decisions</a>' : ''}${todos ? ` · <a href="#" id="l-todo" title="Open to-dos for this feature in the Backlog">To-dos ${todos}</a>` : ''}${confirm ? ` · <a href="#" id="l-conf" title="Questions waiting for the owner, in the Backlog">To confirm ${confirm}</a>` : ''}</span></nav>`);
   const toBacklog = (kind) => (e) => { e.preventDefault(); Object.assign(bkState, { kind, sec: '', feature: f.id }); S.view = 'backlog'; closeFeature(); render(); };
-  document.getElementById('l-todo')?.addEventListener('click', toBacklog('@todo')); document.getElementById('l-conf')?.addEventListener('click', toBacklog('decision'));
-  const back = document.getElementById('crumb-back'); if (back) back.onclick = (e) => { e.preventDefault(); closeFeature(); };
+  fcrumb.querySelector('#l-todo')?.addEventListener('click', toBacklog('@todo')); fcrumb.querySelector('#l-conf')?.addEventListener('click', toBacklog('decision'));
+  fcrumb.querySelectorAll('[data-back]').forEach((a) => { a.onclick = (e) => { e.preventDefault(); closeFeature(); render(); }; });
   const page = document.getElementById('feature'); page.hidden = false; page.innerHTML = '';
 
   const entries = (f.entryPoints || []).map((e, i) => Object.assign({}, e, { id: 'entry:' + i }));
@@ -397,7 +398,7 @@ function openFeature(id, sel) {
     const sec = (id, label, n, open, inner) => `<section class="sec" id="sec-${id}" data-open="${open}"><h3 class="sh" tabindex="0" role="button" aria-expanded="${open}"><span class="lbl">${label}</span><span class="n">${n}</span><span class="caret">${ICON.caret}</span></h3><div class="sb">${inner}</div></section>`;
     const none = '<p class="none">None written yet.</p>';
     const gate = s.gate ? `<span class="badge">Gate <b>${esc(Array.isArray(s.gate) ? s.gate.join(' ') : s.gate)}</b></span>` : '';
-    const head = `<div class="spechead"><div class="t"><h2>${esc(s.name)}</h2>${s.zh ? `<span class="zh">${esc(s.zh)}</span>` : ''}<span class="pill">${dot(s.status)}${esc(STATUS[s.status] || s.status)}</span>${gate}</div>
+    const head = `<div class="spechead"><div class="t"><h2>${esc(s.name)}</h2>${s.zh ? `<span class="zh">${esc(s.zh)}</span>` : ''}<span class="pill">${dot(s.status)}${esc(STATUS[s.status] || s.status)}</span>${gate}${s.aliasOf && idx[s.aliasOf] ? `<span class="badge">Same screen as <b>${esc(idx[s.aliasOf].name)}</b></span>` : ''}</div>
       ${confirm.length ? `<div class="badges"><span class="badge">To confirm <b>${confirm.length}</b></span></div>` : ''}</div>
       ${nt.purpose ? `<p class="lead">${esc(nt.purpose)}</p>` : ''}`;
     const split = (t) => { const ss = String(t).match(/[^.!?]+(?:[.!?]+(?=\s|$)|$)\s*/g) || [t]; let a = '', i = 0; while (i < ss.length && (!a || a.length + ss[i].length <= 190)) a += ss[i++]; return [a.trim(), ss.slice(i).join('').trim()]; };
@@ -470,7 +471,7 @@ function openFeature(id, sel) {
   const openNotes = (tab, anchor) => { if (tab) notesTab = tab; setNotes(true); fillNotes(); if (anchor) notes.querySelector('#' + anchor)?.scrollIntoView(); };
   notes.querySelectorAll('.tab').forEach((b) => { b.onclick = () => { notesTab = b.dataset.t; fillNotes(); }; });
   notes.querySelector('.x').onclick = () => setNotes(false);
-  const lp = document.getElementById('l-prd'), ld = document.getElementById('l-dec');
+  const lp = fcrumb.querySelector('#l-prd'), ld = fcrumb.querySelector('#l-dec');
   if (lp) lp.onclick = (e) => { e.preventDefault(); openNotes('prd'); };
   if (ld) ld.onclick = (e) => { e.preventDefault(); openNotes('prd', 'h-decisions'); };
 
@@ -495,7 +496,7 @@ function openFeature(id, sel) {
     dock.append(tools); if (notes.classList.contains('open')) fillNotes();
   }
 
-  col.append(wrap, zoomEl, notes); page.append(col, dock);
+  col.append(fcrumb, wrap, zoomEl, notes); page.append(col, dock);
   let pdown = false; const toggleNotes = () => { if (notes.classList.contains('open')) setNotes(false); else openNotes(); };
   dock.addEventListener('pointerdown', (ev) => { if (ev.button === 0 && ev.target.closest('[data-notes]')) { pdown = true; toggleNotes(); } });
   dock.addEventListener('click', (ev) => { if (!ev.target.closest('[data-notes]')) return; if (pdown) { pdown = false; return; } toggleNotes(); });

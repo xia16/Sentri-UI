@@ -1,69 +1,58 @@
 # FilterSheet
 
-Narrow a list with draft filters and a counted commit. Use Sheet instead for a record form.
+The drawer that narrows a list: Farrowing's room filter and Inspection's pig filter. It is a [Sheet](../Sheet/README.md) drawer with a fixed frame, so every list filters the same way.
 
-## When to use
+`SentriUI.filterSheet({ title, subtitle, sections | body, apply, reset, backAction, closeAction })`
 
-List filters in Farrowing and Inspection; Feed plan currently has no separate list filter copy.
+## When to use / when not
 
-## When not to use
-
-Use PickerField for categories with many choices. Use ChoiceList for a short categorical choice. Do not use filtering controls to record farm facts.
+- **Use** to narrow one list by a few facets, with a live count of what will show.
+- **Not** for tags that change by job (use FilterChips) or fixed views (use Segment). A choice that records a fact is a Sheet, not a filter.
 
 ## Anatomy
 
-Sheet drawer, title, optional scope, Clear text action, named filter groups, optional persistent help, Back, live counted primary action, optional result reason.
+1. **Head**: title, one-line subtitle (the unit), **Reset** (text action) and the ✕.
+2. **Sections**: each an icon-led title, the control, and an optional one-line help. A section may hold a [RangeSlider](../RangeSlider/README.md), a facet Segment, or any field. A sheet of plain fields passes `body` instead.
+3. **Footer**: **Back** and the commit, "Show 4 sows".
 
 ## Variants
 
-**List filters** — use for narrowing a list by draft filter groups. Used by farrowing.room, inspection.filters. Units and groups are properties, not separate variants.
+- [Sections](variants/sections.html): titled sections (a range and a parity row).
+- [Fields](variants/fields.html): picker fields passed as the body.
 
 ## States
 
-| State | Treatment |
-| --- | --- |
-| Default | Enabled, current values shown. |
-| Active | Selected choice includes a check and accessible selection state. |
-| Empty | Zero count; commit blocked with the reason (No sows match). The controls stay live so the draft can be widened. |
-| Disabled | The whole sheet is unavailable (e.g. while syncing): every control, Clear and Show are disabled and one persistent reason says why. Not the same as Empty. |
-| Error | Persistent explanation and recovery instruction. |
-| Loading | Counting results; commit blocked. |
-| Long / Chinese | Labels wrap without truncation. |
-
-Every state is rendered in [the variant](variants/list.html).
+| State | Appearance and behaviour |
+|---|---|
+| Default | Every facet on "Any"; the commit shows the unfiltered count. |
+| Active | Facets set; the commit shows the narrowed count. |
+| Pressed | The touched control darkens at once. |
+| Long / Chinese | Titles and help wrap; the footer keeps its size. |
 
 ## Behaviour
 
-The caller owns draft and applied values. Back, Close and scrim preserve the draft; reopening resumes it. Clear changes the draft to defaults. Clear on the list (the summary line) resets the applied filter and the draft together, so reopening never shows filters the list says are off; the caller keeps applied and draft in agreement after any list-level clear. Show commits and closes. Count updates after every draft change; zero results blocks commit with a visible reason. Applied values appear once in the list summary and active group count badges the filter IconButton. No farm data is recorded, so leaving requires no unsaved-record confirmation.
-
-No presets existed in Farrowing; do not invent a preset variant. A caller can put up to four FilterChips presets above a range. Limit short visible choice rows to five; use PickerField beyond five. One drawer at a time; replace its content for nested pickers.
+The sheet edits a draft. **Back** and ✕ return to the list and keep the draft; **Reset** clears the draft to "Any" and stays; the commit applies it. The host rewrites the commit label as the draft changes, so the count is live. A zero count still commits (the list then shows its own empty state). The filter button on the list carries a badge with the number of facets applied.
 
 ## Content rules
 
-Sentence case. Short choice groups wrap (nothing is cut off or hidden behind a scroll). Label budget: 32 English characters / 16 Chinese characters; longer labels wrap, never truncate values or reasons. Always name units. Reasons say what is missing and how to recover. Clear uses registered `act.clear`; Back preserves draft. Every label is a registered string (`act.clear`, `act.back`, `ds.filter.show`, `ds.filter.counting`; a feature passes `showStr:{one,many}` for its own “Show {n} sow(s)”). Where no shell fills them, pass `labels:{clear,back,counting,show(n,noun)}` in the user’s language.
+Sentence-case section titles that name the facet ("Parity"), never the control. Help is one line, only when the facet needs it. The commit is "Show" plus the count and the noun; Reset is one word. Reset resets (Clear in Inspection, where the fields read as a form).
 
 ## Accessibility
 
-Sheet supplies role=dialog and aria-modal, visible Back and Close. FilterChips supplies radio roles; PickerField supplies its documented roles. Result/reason uses polite status. Caller retains Sheet focus lifecycle.
-
-All targets use `--tap-min` (48 CSS pixels). Disabled commit stays understandable through the visible reason.
-
-## Do / don’t
-
-Do show the count only on the Show button. Do preserve drafts on Back, but reset them when the list is cleared. Don’t repeat the count in a second heading. Don’t use colour alone for selection or errors. Don’t stack cards or drawers.
+A Sheet drawer: a dialog with its scrim and ✕. Every control is at least 48px (`tap-min`). The Segment row reads as one group per section.
 
 ## API and tokens
 
-`SentriUI.filterSheet` returns HTML; see [types](../index.d.ts). Tokens: `--tap-min`, `--border-width`, `--space-2`, `--space-3`, `--space-4`, `--space-8`, `--space-16`, `--space-24`, `--ink`, `--paper`, `--well`, `--line`, `--muted`, `--type-input-size`, `--type-description-size`, `--type-sheet-title-size`. No custom theme tokens.
+Spacing and type come from space-10, space-28, type-description-size, muted and the Sheet's own tokens.
 
 ## Related components
 
-[Sheet](../Sheet/README.md), [FilterChips](../FilterChips/README.md), [ChoiceList](../ChoiceList/README.md), [PickerField](../PickerField/README.md), [RangeSlider](../RangeSlider/README.md).
+Sheet is the frame. RangeSlider and Segment fill its sections. IconButton opens it, with the applied count as its badge.
 
 ## Classification
 
-Component: generic composition on Sheet, used by Farrowing and Inspection. No duplicate implementation.
+Component: generic, used across sections.
 
 ## Changelog
 
-2026-10-10: created bundle implementation, state examples and prototype migration. No gate.json existed for either proposal; no prior judge findings could be read.
+2026-10-10: distilled from the Farrowing room filter; both screens now render from it with no visible change.

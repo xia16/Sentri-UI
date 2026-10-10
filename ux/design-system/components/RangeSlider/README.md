@@ -1,74 +1,60 @@
 # RangeSlider
 
-Select two inclusive numeric bounds for a list. Use Measure instead for recording one exact measurement.
+Pick a from–to range of whole steps with two round handles on one track: Farrowing's expected-farrowing range (7+ days ago to in 7+ days). It sits in a [FilterSheet](../FilterSheet/README.md) section and does not record a farm fact.
 
-## When to use
+`SentriUI.rangeSlider({ min, max, step, value: [from, to], title, icon, key, names, labels, format, summary, ends })`
 
-Numeric or day ranges with a useful finite interval.
+## When to use / when not
 
-## When not to use
-
-Use PickerField for categories with many choices. Use ChoiceList for a short categorical choice. Do not use filtering controls to record farm facts.
+- **Use** for a bounded range where "any" is the whole track: a due window, a weight band.
+- **Not** for one value (use Stepper or Measure) or a choice from a few named options (use Segment).
 
 ## Anatomy
 
-Visible label, current bounds, track with the chosen span filled between the handles (green), minimum handle, maximum handle, end labels, optional persistent reason/error.
+1. **Title** (optional): a section Heading with its icon.
+2. **Value line**: the current range in words. The whole track reads "Any time".
+3. **Track**: two round handles centred on a 4px rail; the span between them is filled green.
+4. **End labels**: left, middle and right ("7+ days ago · Today · In 7+ days").
 
 ## Variants
 
-**Range** — use for narrowing a list by two numeric bounds. Used by farrowing.room. Units and groups are properties, not separate variants.
+- [Range](variants/range.html): the one slider.
 
 ## States
 
-| State | Treatment |
-| --- | --- |
-| Default | Enabled, current values shown. |
-| Pressed | Heavier border and inset surface. |
-| At limits | Both bounds remain readable. |
-| Disabled | Blocked with a persistent reason. |
-| Error | Persistent explanation and recovery instruction. |
-| Long / Chinese | Labels wrap without truncation. |
+| State | Appearance and behaviour |
+|---|---|
+| Default | Handles at both ends; the value line says the open phrase. |
+| Narrowed | Handles moved in; the fill sits between them and the value line names both ends. |
+| Same value | Both handles on one step; the value line names it once. |
+| Long / Chinese | The value line wraps; the track keeps its size. |
 
-`format(value)` turns a number into its label, including open ends (“7+ days ago”, “Today”, “In 7+ days”). The value text, both end labels and each handle’s `aria-valuetext` all use it, and a list summary should use the same function so sheet and list say one thing. Without it the slider shows “a–b unit”.
-
-Every state is rendered in [the variant](variants/range.html).
+There is no designed pressed state: the handle follows the finger. Handles never cross; a handle pushed past the other carries it along.
 
 ## Behaviour
 
-Drag either handle, tap the track to move the nearer handle, or adjust it with the screen reader's increment and decrement. Snap to step; bounds never cross. Handles retain stable minimum/maximum order. The caller receives bubbling `sentri-range-change` with `detail.key` and `detail.value` and computes results without replacing a captured pointer.
-
-No presets existed in Farrowing; do not invent a preset variant. A caller can put up to four FilterChips presets above a range.
+A touch anywhere on the 48px-tall rail moves the nearest handle, and a drag keeps hold of it, so the 32px handle is never the target. When both handles share a step, the next touch picks the side it lands on. Each change updates the fill, the value line and the handle's spoken value, then fires `sentri-range-change` with `{ key, values: { from, to } }`; the host reads that and re-counts its list.
 
 ## Content rules
 
-Sentence case. Label budget: 32 English characters / 16 Chinese characters; longer labels wrap, never truncate values or reasons. Always name units (or let `format` do it). The value never wraps mid-number; the label may wrap. Reasons say what is missing and how to recover. The caller supplies localized label and `format`.
+The value line is the range in plain words, never raw numbers alone. End labels are short nouns or phrases; the middle label names the neutral point. `format(n)` supplies one value's words (also each handle's spoken value); `summary(from, to)` supplies the whole line.
 
 ## Accessibility
 
-Two buttons with role=slider, individual accessible labels, aria-valuemin/max/now/text The screen reader's adjust gesture moves one step. Disabled handles are native disabled and linked to the visible reason.
-
-All targets use `--tap-min` (48 CSS pixels). Handles sit on opposite sides of one track so their hit areas never overlap, even at equal bounds.
-
-## Do / don’t
-
-Do snap to the step and keep the bounds from crossing. Do use Measure for one exact value. Don’t use colour alone for selection or errors (the handles and the written value carry it).
+Two native range inputs, each with its own `aria-label` and `aria-valuetext`, so arrow keys, Home and End work with a screen reader. The touch rail is 48px tall (`tap-min`).
 
 ## API and tokens
 
-`SentriUI.rangeSlider` returns HTML; see [types](../index.d.ts). Tokens: `--tap-min`, `--border-width`, `--space-2`, `--space-3`, `--space-4`, `--space-8`, `--space-16`, `--space-24`, `--ink`, `--green`, `--disabled-border`, `--paper`, `--well`, `--line`, `--muted`, `--type-input-size`, `--type-description-size`, `--type-sheet-title-size`. No custom theme tokens.
-
-## Not for
-
-Recording a value. Inspection’s feed adjustment (−50% to +50%) is a hand-built native slider that records a value; it belongs with Stepper/Measure, not here. Proposal noted, not done yet.
+Uses range-fill, range-handle, shadow-handle, line, paper, muted, tap-min, size-4, size-14, size-20, size-22, space-7, space-14, space-16, space-17, space-32, radius-4, border-width, type-choice-meta-size and type-range-end-size.
 
 ## Related components
 
-[Sheet](../Sheet/README.md), [FilterChips](../FilterChips/README.md), [ChoiceList](../ChoiceList/README.md), [PickerField](../PickerField/README.md), [FilterSheet](../FilterSheet/README.md).
+FilterSheet holds it. Stepper and Measure set one value. Segment picks among named options.
 
 ## Classification
 
-Component: generic numeric control independent of farm data. No duplicate implementation.
+Component: generic, used across sections.
 
 ## Changelog
 
-2026-10-10: created bundle implementation, state examples and prototype migration. No gate.json existed for either proposal; no prior judge findings could be read.
+2026-10-10: distilled from the Farrowing room filter; the look is unchanged, the colours are tokens, and the gesture moved from the screen into the bundle.

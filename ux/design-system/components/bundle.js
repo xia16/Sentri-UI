@@ -1,4 +1,4 @@
-/* @ds-bundle: {"format":4,"namespace":"SentriUI","components":[{"name":"Heading"},{"name":"Panel"},{"name":"Facts"},{"name":"Row"},{"name":"Log"},{"name":"Segment"},{"name":"IconButton"},{"name":"Button"},{"name":"Field"},{"name":"PickerField"},{"name":"ChoiceList"},{"name":"CategoryFooter"},{"name":"Sheet"},{"name":"Icon"},{"name":"Stepper"},{"name":"Measure"},{"name":"Numpad"},{"name":"Status"},{"name":"ConditionTag"},{"name":"Banner"},{"name":"Photos"}]} */
+/* @ds-bundle: {"format":4,"namespace":"SentriUI","components":[{"name":"Heading"},{"name":"Panel"},{"name":"Facts"},{"name":"Row"},{"name":"Log"},{"name":"Segment"},{"name":"IconButton"},{"name":"Button"},{"name":"Field"},{"name":"PickerField"},{"name":"ChoiceList"},{"name":"CategoryFooter"},{"name":"Sheet"},{"name":"FilterSheet"},{"name":"RangeSlider"},{"name":"Icon"},{"name":"Stepper"},{"name":"Measure"},{"name":"Numpad"},{"name":"Status"},{"name":"ConditionTag"},{"name":"Banner"},{"name":"Photos"}]} */
 /* SentriIcons (sentri-icons.js) and the SentriUI parts, in one file. */
 /* Shared icon registry for the Sentri prototypes. One path vocabulary so every
    app renders the same glyphs; apps keep a local fallback for source-only checks. */
@@ -395,15 +395,18 @@
     const n=Number(value)||0,hero=variant!=='row',lid=id||fieldId('st-stepper'),hid=lid+'-hint',d=Math.abs(Number(step)||1);
     variant=variant==='hero'?'count':variant;
     const floorGray=disabled||loading||n<=min,ceilGray=disabled||loading||(max!=null&&n>=max);
-    // draft: the value carries an unsaved staged addition (green, the number is the receipt); it wins over changed.
+    // draft: the value carries an unsaved staged addition. The value stays ink (green means approved only); the word "unsaved" carries the state; it wins over changed.
     const isDraft=draft||tone==='draft',isChanged=!isDraft&&(changed||tone==='changed');
-    const key1=(dir,gray)=>{const kid=`${lid}-${dir<0?'dec':'inc'}`;return `<button type="button" class="st-stepper-key" id="${esc(kid)}" data-action="${esc(action)}" data-value="${esc(key)}" data-step="${dir*d}" aria-labelledby="${esc(lid)} ${esc(kid)}" aria-describedby="${esc(hid)}"${pressed&&dir>0?' data-preview="pressed"':''}${gray?' aria-disabled="true"':''}${dir<0?ariaText('Decrease',s.decrease,a.decrease):ariaText('Increase',s.increase,a.increase)}><span class="st-stepper-face">${glyph(dir<0?'minus':'plus')}</span></button>`;};
-    const copy=`<span class="st-stepper-copy"><span class="st-stepper-label" id="${esc(lid)}">${tx(label,o,'label')}</span>${description||has(o,'description')?`<small class="st-stepper-description">${tx(description,o,'description')}</small>`:''}</span>`;
+    // The draft or corrected word: beside the label in a row (no extra line, every row keeps one height); under the number in count and well.
+    const stateWord=isDraft?tx(status||'Unsaved',{strs:{status:s.status||(!status?'ds.stepper.unsaved':undefined)},args:{status:a.status}},'status'):isChanged?tx(status||'Corrected',{strs:{status:s.status||(!status?'ds.stepper.corrected':undefined)},args:{status:a.status}},'status'):'',nid=lid+'-note',inline=variant==='row'&&stateWord;
+    const key1=(dir,gray)=>{const kid=`${lid}-${dir<0?'dec':'inc'}`;return `<button type="button" class="st-stepper-key" id="${esc(kid)}" data-action="${esc(action)}" data-value="${esc(key)}" data-step="${dir*d}" aria-labelledby="${esc(lid)} ${esc(kid)}" aria-describedby="${esc(hid)}${inline?' '+esc(nid):''}"${pressed&&dir>0?' data-preview="pressed"':''}${gray?' aria-disabled="true"':''}${dir<0?ariaText('Decrease',s.decrease,a.decrease):ariaText('Increase',s.increase,a.increase)}><span class="st-stepper-face">${glyph(dir<0?'minus':'plus')}</span></button>`;};
+    const copy=`<span class="st-stepper-copy"><span class="st-stepper-label" id="${esc(lid)}">${tx(label,o,'label')}</span>${inline?`<span class="st-stepper-note" id="${esc(nid)}" role="status" aria-live="polite">${stateWord}</span>`:''}${description||has(o,'description')?`<small class="st-stepper-description">${tx(description,o,'description')}</small>`:''}</span>`;
     const vargs=a.value||(s.value?{n:String(n)}:null);
-    const val=`<span class="st-stepper-value" role="spinbutton" tabindex="0" data-st-spin${disabled||loading?' aria-disabled="true"':''}${error?' aria-invalid="true"':''} aria-labelledby="${esc(lid)}" aria-describedby="${esc(hid)}" aria-valuenow="${n}" aria-valuemin="${esc(min)}"${max!=null?` aria-valuemax="${esc(max)}"`:''} aria-live="polite"${sa(s.value,vargs)}>${esc(n)}</span>`;
+    const val=`<span class="st-stepper-value" role="spinbutton" tabindex="0" data-st-spin${disabled||loading?' aria-disabled="true"':''}${error?' aria-invalid="true"':''} aria-labelledby="${esc(lid)}" aria-describedby="${esc(hid)}${inline?' '+esc(nid):''}" aria-valuenow="${n}" aria-valuemin="${esc(min)}"${max!=null?` aria-valuemax="${esc(max)}"`:''} aria-live="polite"${sa(s.value,vargs)}>${esc(n)}</span>`;
     const canPoint=pointers.length>0;
     const reserve=reserveHint!=null?(reserveHint?(canPoint?'action':'text'):''):'';
-    const messages=[hint||has(o,'hint')?tx(hint,o,'hint'):'',error?esc(error):'',disabled?esc(reason||'This record cannot be edited.'):'',loading?tx('Saving…',{strs:{status:'ds.stepper.saving'}},'status'):'',isDraft?tx(status||'Unsaved',{strs:{status:s.status||(!status?'ds.stepper.unsaved':undefined)},args:{status:a.status}},'status'):isChanged?tx(status||'Corrected',{strs:{status:s.status||(!status?'ds.stepper.corrected':undefined)},args:{status:a.status}},'status'):''].filter(Boolean);
+    const messages=[hint||has(o,'hint')?tx(hint,o,'hint'):'',error?esc(error):'',disabled?esc(reason||'This record cannot be edited.'):'',loading?tx('Saving…',{strs:{status:'ds.stepper.saving'}},'status'):'',''].filter(Boolean);
+    if(stateWord&&!inline)messages.push(stateWord);
     let hl=hintLine('st-stepper-hint',{id:hid,reserve,fieldKey:key});
     hl=hl.replace(/>.*<\/p>$/,`>${hintHtml||messages.join('<span aria-hidden="true"> · </span>')}${textActions(pointers,key)}</p>`);
     return `<div class="st-stepper ${esc(className)}" data-ds="Stepper" data-variant="${esc(variant)}" data-field="${esc(key)}"${loading?' aria-busy="true"':''}${error?' data-error="true"':''} role="group" aria-labelledby="${esc(lid)}"${n===0?' data-zero=""':''}${isChanged?' data-changed=""':''}${isDraft?' data-draft=""':''}${max!=null&&max>=1000?' data-wide=""':''}>${copy}<span class="st-stepper-keys">${key1(-1,floorGray)}${val}${key1(1,ceilGray)}</span>${hl}</div>`;
@@ -916,7 +919,7 @@
   /* A Button from a { label, action, value, register, waiting, describedby } spec (a string is already HTML). */
   function sButton(b){
     if(!b)return '';if(typeof b==='string')return b;
-    const l=sObj(b.label),props={label:l.text??'',register:b.register||'primary',action:b.action||'',value:b.value||'',waiting:!!b.waiting,disabled:!!b.disabled,busy:!!b.busy,describedby:b.describedby||'',className:b.className||'',attrs:b.attrs||{}};
+    const l=sObj(b.label),props={label:l.text??'',register:b.register||'primary',action:b.action||'',value:b.value||'',waiting:!!b.waiting,busy:!!b.busy,describedby:b.describedby||'',className:b.className||'',attrs:b.attrs||{}};
     if(l.str){props.strs={label:l.str};if(l.args)props.args={label:l.args};}
     return button(props);
   }
@@ -977,40 +980,54 @@
     e.preventDefault();e.stopImmediatePropagation();const target=buttons.find(x=>x.dataset.value===next);target.click();
     const fresh=Array.from(host.querySelectorAll('[data-ds="Segment"] button,[data-ds="FilterChips"] button')).find(x=>x.dataset.action===b.dataset.action&&x.dataset.value===next);fresh?.focus();fresh?.scrollIntoView({block:'nearest',inline:'nearest'});
   },true);
-  /* format(n) → the label for a value (open ends like "7+ days ago", "Today"). The value text, the end labels and aria-valuetext all use it;
-     the drag handler looks it up by key, so two sliders on a page that share a key share a formatter. Without it: "a–b unit". */
-  const rangeFormats=new Map();
-  const rangeMid=t=>String(t).replace(/^([A-Z])(?=[a-z])/,c=>c.toLowerCase()),
-  rangeText=(v,fmt,unit)=>fmt?(v[0]===v[1]?rangeMid(fmt(v[0])):rangeMid(fmt(v[0]))+' – '+rangeMid(fmt(v[1]))):v.join('–')+(unit?' '+unit:'');
-  const rangeFill=(v,min,max)=>`left:${(v[0]-min)/(max-min)*100}%;width:${(v[1]-v[0])/(max-min)*100}%`;
-  function rangeSlider({min=0,max=10,step=1,value=[min,max],label='Range',unit='',key='range',state='Default',disabled=false,reason='',error='',format=null}={}){
+  /* RangeSlider: two round handles on one track, for a from-to range of whole steps (a due range, a weight band).
+     rangeSlider({ min, max, step, value:[from,to], title, icon, key, names:['from','to'], labels:[first handle, second handle],
+     format(n) → the word for one value (also each handle's aria-valuetext), summary(from,to) → the line under the title,
+     ends:[left, middle, right] }). The track is two native range inputs, so the keyboard and screen readers come free; the whole
+     48px rail takes the touch (the nearest handle moves), so a glove never has to hit the 32px handle. A change moves the fill,
+     the value line and the aria text, then fires `sentri-range-change` { key, values:{from,to} } for the host to read. */
+  const rangeFormats=new Map(),rangeClamp=(n,lo,hi)=>Math.max(lo,Math.min(hi,n));
+  const rangeLine=(f,a,b)=>f.summary?f.summary(a,b):(a===b?f.format(a):f.format(a)+' – '+f.format(b));
+  const rangeVars=(a,b,min,max)=>`--from:${(a-min)/(max-min)*100}%;--to:${(b-min)/(max-min)*100}%`;
+  function rangeSlider({min=0,max=10,step=1,value=[min,max],title='',icon='',key='range',names=['from','to'],labels=['Lowest','Highest'],format=String,summary=null,ends=[],className=''}={}){
     if(!(max>min&&step>0))throw new RangeError('RangeSlider requires max > min and step > 0');
-    const v=value.map(x=>Math.max(min,Math.min(max,min+Math.round((Number(x)-min)/step)*step))).sort((a,b)=>a-b),id=fieldId('st-range'),fmt=format||(x=>x+(unit?' '+unit:''));
-    if(format)rangeFormats.set(key,format);else rangeFormats.delete(key);
-    return `<div class="st-range" data-ds="RangeSlider" data-state="${esc(state)}" data-key="${esc(key)}" data-min="${min}" data-max="${max}" data-step="${step}" data-unit="${esc(unit)}"><p id="${id}">${esc(label)} <output>${esc(rangeText(v,format,unit))}</output></p><div class="st-range-rail"><span class="st-range-fill" style="${rangeFill(v,min,max)}"></span>${v.map((x,i)=>`<button type="button" class="st-range-handle" role="slider" aria-label="${esc(label)} ${i?'maximum':'minimum'}" aria-valuemin="${min}" aria-valuemax="${max}" aria-valuenow="${x}" aria-valuetext="${esc(fmt(x))}" data-handle="${i}" style="left:${(x-min)/(max-min)*100}%"${disabled?' disabled':''}${reason||error?` aria-describedby="${id}-reason"`:''}>${i?'›':'‹'}</button>`).join('')}</div><div class="st-range-ends"><span>${esc(fmt(min))}</span><span>${esc(fmt(max))}</span></div>${reason||error?`<p id="${id}-reason" role="status">${esc(error||reason)}</p>`:''}</div>`;
+    const v=value.map(x=>rangeClamp(min+Math.round((Number(x)-min)/step)*step,min,max)).sort((a,b)=>a-b),f={format,summary};
+    rangeFormats.set(key,f);
+    return `<div class="st-range${className?' '+esc(className):''}" data-ds="RangeSlider" data-key="${esc(key)}" data-names="${esc(names.join(','))}"><div class="st-range-head">${title?heading({title,icon,kind:'section',level:4,className:'st-range-title'}):''}<output class="st-range-value">${esc(rangeLine(f,v[0],v[1]))}</output></div><div class="st-range-rail" style="${rangeVars(v[0],v[1],min,max)}"><div class="st-range-track"></div>${v.map((x,i)=>`<input type="range" min="${min}" max="${max}" step="${step}" value="${x}" data-range="${esc(names[i])}" aria-label="${esc(labels[i])}" aria-valuetext="${esc(format(x))}">`).join('')}</div>${ends.length?`<div class="st-range-ends">${ends.map(t=>`<span>${esc(t)}</span>`).join('')}</div>`:''}</div>`;
   }
-  /* Labels: strings the caller supplies in its own language (labels.clear / back / show(n, noun) / counting); the registry ids
-     (act.clear, act.back, ds.filter.show, ds.filter.counting) let the screen shell fill them. showStr:{one,many} swaps in the
-     feature's own "Show {n} sow(s)" strings. disabled = the whole sheet is unavailable (e.g. while syncing); reason says why. */
-  function filterSheet({title='Filter',subtitle='',groups=[],count=0,noun='items',emptyReason='No items match',backAction='filter-back',clearAction='filter-clear',applyAction='filter-apply',state='Default',loading=false,error='',disabled=false,reason:why='',labels={},showStr=null,className='',scrim=true}={}){
-    const blocked=count===0||loading||!!error||disabled,reason=disabled?(why||error):(error||(loading?(labels.counting||'Counting results…'):count===0?emptyReason:'')),
-      show=labels.show?labels.show(count,noun):`Show ${count} ${noun}`,quiet=disabled||!!error,
-      showSpec=loading?{text:labels.counting||'Counting results…',str:'ds.filter.counting'}:quiet?{text:labels.showNone||`Show ${noun}`,str:'ds.filter.show.none',args:{noun}}:{text:show,str:showStr?(count===1?showStr.one:showStr.many):'ds.filter.show',args:showStr?{n:count}:{n:count,noun}};
-    return sheet({title,subtitle,className:'st-filter-sheet '+className,close:{action:backAction,label:{text:'Close '+String(title).replace(/^./,c=>c.toLowerCase())}},scrim:scrim?{action:backAction}:false,aside:button({label:labels.clear||'Clear',register:'text',action:clearAction,disabled,strs:{label:'act.clear'}}),body:`<div data-ds="FilterSheet" data-state="${esc(state)}"><fieldset class="st-filter-fields"${disabled?' disabled':''}>${groups.map(g=>`<section class="st-filter-group">${g.label?`<h3>${esc(g.label)}</h3>`:''}${g.content}${g.help?`<p>${esc(g.help)}</p>`:''}</section>`).join('')}</fieldset></div>`,footer:sheetFooter({back:{action:backAction,label:{text:labels.back||'Back',str:'act.back'}},primary:{label:showSpec,action:applyAction,disabled:blocked,attrs:{'aria-live':'polite','aria-atomic':'true'}},status:{text:reason,id:fieldId('st-filter-status'),visible:!!reason}})});
+  function rangeSet(root,input,n){
+    const ins=[...root.querySelectorAll('input[type="range"]')],i=ins.indexOf(input),min=+input.min,max=+input.max,step=+input.step,f=rangeFormats.get(root.dataset.key)||{format:String};
+    n=rangeClamp(min+Math.round((n-min)/step)*step,min,max);input.value=n;
+    if(i===0&&n>+ins[1].value)ins[1].value=n;if(i===1&&n<+ins[0].value)ins[0].value=n;
+    const a=+ins[0].value,b=+ins[1].value;
+    root.querySelector('.st-range-rail').style.cssText=rangeVars(a,b,min,max);
+    ins.forEach(x=>x.setAttribute('aria-valuetext',f.format(+x.value)));
+    root.querySelector('.st-range-value').textContent=rangeLine(f,a,b);
+    const names=root.dataset.names.split(',');
+    root.dispatchEvent(new CustomEvent('sentri-range-change',{bubbles:true,detail:{key:root.dataset.key,values:{[names[0]]:a,[names[1]]:b}}}));
+  }
+  /* FilterSheet: the drawer that narrows a list. It is a Sheet with Reset in the head and, in the footer, Back (keeps the draft)
+     and the one commit, whose label carries the live count ("Show 4 sows"; the host rewrites it as the draft changes).
+     filterSheet({ title, subtitle, sections:[{ title, icon, content, help }] | body, apply:{label, action}, reset:{label, action},
+     backAction, closeAction, className, size }). A section is a titled group; sections come as the host's own controls
+     (a rangeSlider, a segment) so the sheet owns only the frame, the spacing and the exits. Without `sections`, `body` is used as is. */
+  function filterSheet({title='Filter',subtitle='',sections=[],body='',apply={},reset={},backAction='filter-back',backLabel='Back',closeAction='',className='',size='medium',label}={}){
+    const exit=closeAction||backAction,list=sections.map(x=>`<section class="st-filter-section">${x.title?heading({title:x.title,icon:x.icon||'',kind:'section',level:4,className:'st-filter-title'}):''}${x.content||''}${x.help?`<p class="st-filter-help">${esc(x.help)}</p>`:''}</section>`).join('');
+    return sheet({title,subtitle,size,label:label||title,className:'st-filter-sheet'+(className?' '+esc(className):''),aside:button({label:reset.label||'Reset',register:'text',action:reset.action||'filter-reset'}),body:list||body,footer:sheetFooter({content:backButton({action:backAction,label:backLabel})+button({label:apply.label||'Show',register:'primary',action:apply.action||'filter-apply'})}),close:{action:exit,label:'Close '+title},scrim:{action:exit,label:'Dismiss '+title}});
   }
   if(typeof document!=='undefined'){
-    const update=(root,handle,n)=>{
-      const hs=[...root.querySelectorAll('[role="slider"]')],min=+root.dataset.min,max=+root.dataset.max,step=+root.dataset.step,i=+handle.dataset.handle;
-      n=Math.max(min,Math.min(max,min+Math.round((n-min)/step)*step));n=i?Math.max(n,+hs[0].getAttribute('aria-valuenow')):Math.min(n,+hs[1].getAttribute('aria-valuenow'));
-      handle.setAttribute('aria-valuenow',n);const fmt=rangeFormats.get(root.dataset.key)||(x=>x+(root.dataset.unit?' '+root.dataset.unit:''));handle.setAttribute('aria-valuetext',fmt(n));handle.style.left=(n-min)/(max-min)*100+'%';
-      const value=hs.map(h=>+h.getAttribute('aria-valuenow'));root.querySelector('output').textContent=rangeText(value,rangeFormats.get(root.dataset.key),root.dataset.unit);const fill=root.querySelector('.st-range-fill');if(fill)fill.style.cssText=rangeFill(value,min,max);
-      root.dispatchEvent(new CustomEvent('sentri-range-change',{bubbles:true,detail:{key:root.dataset.key,value}}));
-    };
-    document.addEventListener('keydown',e=>{const h=e.target.closest?.('.st-range-handle');if(!h||h.matches(':disabled'))return;const r=h.closest('.st-range'),n=+h.getAttribute('aria-valuenow'),step=+r.dataset.step;const v={ArrowLeft:n-step,ArrowDown:n-step,ArrowRight:n+step,ArrowUp:n+step,Home:+r.dataset.min,End:+r.dataset.max}[e.key];if(v==null)return;e.preventDefault();update(r,h,v);});
-    let drag;
-    document.addEventListener('pointerdown',e=>{const rail=e.target.closest?.('.st-range-rail');if(!rail||e.button!==0)return;const r=rail.closest('.st-range'),hs=[...rail.querySelectorAll('button')];if(hs[0].matches(':disabled'))return;e.preventDefault();const rect=rail.getBoundingClientRect(),n=+r.dataset.min+(e.clientX-rect.left)/rect.width*(r.dataset.max-r.dataset.min),h=e.target.closest('.st-range-handle')||hs.reduce((a,b)=>Math.abs(n-a.getAttribute('aria-valuenow'))<=Math.abs(n-b.getAttribute('aria-valuenow'))?a:b);drag={r,h,rect};rail.setPointerCapture(e.pointerId);r.dataset.dragging='true';h.focus();update(r,h,n);});
-    document.addEventListener('pointermove',e=>{if(drag){const {r,h,rect}=drag;update(r,h,+r.dataset.min+(e.clientX-rect.left)/rect.width*(r.dataset.max-r.dataset.min));}});
-    const end=()=>{if(drag)delete drag.r.dataset.dragging;drag=null;};document.addEventListener('pointerup',end);document.addEventListener('pointercancel',end);globalThis.addEventListener?.('blur',end);
+    let drag=null;
+    const rangeValue=(rail,e)=>{const r=rail.getBoundingClientRect(),a=rail.querySelector('input');return +a.min+rangeClamp((e.clientX-r.left)/r.width,0,1)*(+a.max-+a.min);};
+    document.addEventListener('input',e=>{const i=e.target.closest?.('.st-range input[type="range"]');if(i)rangeSet(i.closest('.st-range'),i,+i.value);});
+    document.addEventListener('pointerdown',e=>{
+      const rail=e.target.closest?.('.st-range-rail');if(!rail||e.button!==0)return;
+      e.preventDefault();const ins=[...rail.querySelectorAll('input')],n=rangeValue(rail,e),lo=+ins[0].value,hi=+ins[1].value;
+      const input=Math.abs(n-lo)<Math.abs(n-hi)||lo===hi&&n<=lo?ins[0]:ins[1];
+      drag={rail,input};rail.setPointerCapture(e.pointerId);input.focus({preventScroll:true});rangeSet(rail.closest('.st-range'),input,n);
+    });
+    document.addEventListener('pointermove',e=>{if(drag)rangeSet(drag.rail.closest('.st-range'),drag.input,rangeValue(drag.rail,e));});
+    const end=()=>{drag=null;};
+    document.addEventListener('pointerup',end);document.addEventListener('pointercancel',end);if(typeof globalThis.addEventListener==='function')globalThis.addEventListener('blur',end);
   }
   const api=Object.freeze({rangeSlider,filterSheet,optionalRow,heading,panel,facts,row,rowGroup,log,logDay,logStamp,logGroups,categoryFooter,field,pickerField,pickerOptions,pickerBody,pickerFooter,filterChips,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowSelectDoor,rowAction,rowSelectChange,status,conditionTag,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
   root.SentriUI=api;

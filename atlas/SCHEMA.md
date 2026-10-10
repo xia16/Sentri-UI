@@ -2,7 +2,7 @@
 
 The atlas (`atlas/index.html`) reads one generated file, `atlas/atlas.json`. Nobody edits it: `node scripts/build-atlas.mjs` writes it from the sources below and refuses to write it when a source is inconsistent.
 
-Words are the design workflow's ([glossary](../docs/design-workflow/GLOSSARY.md)): atlas, platform, section, feature, screen, flow, entry point, adds to, anchor; statuses `placeholder` · `in-design` · `agent-checked` · `approved`.
+Words are the design workflow's ([glossary](../docs/design-workflow/GLOSSARY.md)): atlas, platform, section, feature, screen, flow, entry point, adds to, anchor; statuses `placeholder` · `in-design` · `agent-checked` · `approved` · `earlier`.
 
 ## Sources
 
@@ -65,6 +65,28 @@ Rules the generator checks: ids unique across all features; every id in `anchor`
 ## `steps`: screens only a tap reaches
 
 When no scenario of the prototype opens a screen, give it the `url`/`preset` of the nearest state it can start from, and `steps`: an ordered list of taps `atlas-bare.js` replays inside the phone (after the preset, waiting for the phone to settle between taps) before it renders and posts `{atlasReady}`. A step is the control's visible text, its `aria-label` / `title`, or a CSS selector (starts with `[`, `.` or `#`); `{ "tap": "...", "hold": ms }` presses and holds for hold-to-commit buttons. A screen with `url` may have `steps`; a step that finds nothing logs an error and is skipped. Keep paths short, and use text over selectors so they survive restyling.
+
+## `earlier` and `aliasOf`
+
+- `"status": "earlier"`: a design that was superseded (the archive decks). It needs a `url`, shows as "Earlier design" with its own dot, and is left out of its feature's derived status, so it never counts as "in design" (a feature with only earlier screens is itself `earlier`).
+- `"aliasOf": "<feature.screen>"`: the screen is the same screen as the target, listed here too (e.g. a pig-list entry that is a pig-profile screen). The generator takes the target's `status` and copies its `url`, `preset`, `steps` and `notes` into any the alias leaves unset, so it renders the target; the screen page labels it "Same screen as <target>". Give the alias its own `id`, `name`, `zh` and layout place. The target must exist and not itself be an alias.
+
+## Static decks: `sec` and `slide`
+
+`ux/archive/workflows.html` (all of the flows of `ux/system/workflows/*.html`, which are its source fragments and cannot render alone) and the archive decks `screens.html`, `task-screens-combined.html`, `task-screens-v1-pre-headerC.html` carry `atlas-bare.js`. A screen's `url` names one phone in them with two params, and needs no `preset`:
+
+| Param | Meaning |
+|---|---|
+| `sec` | a section's id (`wf-fault`) or the start of its heading (`03`, `04b`; matched up to the first space) |
+| `slide` | the n-th phone in that section, from 1, in reading order (default 1) |
+
+Examples: `/ux/archive/workflows.html?sec=wf-fault&slide=1` · `/ux/archive/task-screens-v1-pre-headerC.html?sec=03&slide=1`. The atlas adds `screen=<id>` as for any bare screen. A missing section or slide logs an error. The phone shows at 390 x 844 (a deck phone drawn shorter or taller is fitted to that).
+
+The task skeleton demo (`ux/design-system/components/task-skeleton-demo.html`) takes its own screen as `?demo=room|sheet|...`; `screen` is the atlas's.
+
+## `steps` inside an embedded page
+
+Steps are looked for in the phone first, then inside its same-origin iframes, so a host screen can reach an embedded page's controls. Farrowing embeds inspection's sow sheet (`?embed=sow`), so its sow actions are meant to be reachable with `steps` such as a sow row, then Actions, then Remove from batch (the population agent verifies the exact path); the poll waits up to 2 s for the iframe to load. A host-only state that needs data posted by the host over `postMessage` is reached the same way, by tapping the host's control that posts it.
 
 ## Screen notes: what earns a note (owner, 2026-10-09)
 

@@ -744,6 +744,6 @@ declare global {
   interface Window { SentriUI: SentriUI; SentriIcons: SentriIcons }
 }
 
-export interface RangeSliderProps { min?:number; max?:number; step?:number; value?:[number,number]; label?:string; unit?:string; key?:string; state?:string; disabled?:boolean; reason?:string; error?:string; format?:(value:number)=>string }
-export interface FilterSheetProps { title?:string; subtitle?:string; groups?:{label?:string;content:string;help?:string}[]; count?:number; noun?:string; emptyReason?:string; backAction?:string; clearAction?:string; applyAction?:string; state?:string; loading?:boolean; error?:string; disabled?:boolean; reason?:string; labels?:{clear?:string;back?:string;counting?:string;show?:(count:number,noun:string)=>string}; showStr?:{one:string;many:string}; className?:string; scrim?:boolean }
+export interface RangeSliderProps { min?:number; max?:number; step?:number; value?:[number,number]; title?:string; icon?:string; key?:string; names?:[string,string]; labels?:[string,string]; format?:(value:number)=>string; summary?:(from:number,to:number)=>string; ends?:string[]; className?:string }
+export interface FilterSheetProps { title?:string; subtitle?:string; sections?:{title?:string;icon?:string;content?:string;help?:string}[]; body?:string; apply?:{label?:string;action?:string}; reset?:{label?:string;action?:string}; backAction?:string; backLabel?:string; closeAction?:string; className?:string; size?:'compact'|'short'|'medium'|'long'; label?:string }
 export interface SentriUI { rangeSlider(props?:RangeSliderProps):string; filterSheet(props?:FilterSheetProps):string }
