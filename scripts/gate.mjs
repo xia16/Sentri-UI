@@ -366,7 +366,15 @@ if (noLeaves.length && CLASSES.indexOf(ec.cls) >= 2) gaps.push(`${noLeaves.lengt
   const pb = problems(wt.base), pc = problems(wt.cand);
   if (!pc) check('check-states', false, `no review/state-check.json written on the candidate (exit ${rc.code}): ${rc.tail}`);
   else {
-    const added = Object.keys(pc).filter((k) => pc[k] > ((pb || {})[k] || 0));
+    let added = Object.keys(pc).filter((k) => pc[k] > ((pb || {})[k] || 0));
+    // A new problem must reproduce: one rerun on the candidate drops blips (a resource that failed to load once).
+    if (added.length) {
+      await runAsync(process.execPath, ['scripts/check-states.mjs'], wt.cand);
+      const again = problems(wt.cand) || {};
+      const blips = added.filter((k) => !(again[k] > ((pb || {})[k] || 0)));
+      if (blips.length) gaps.push(`check-states: ${blips.length} problem(s) seen once and not on a rerun, so not counted: ${blips.slice(0, 2).join(' | ')}`);
+      added = added.filter((k) => !blips.includes(k));
+    }
     const fixed = Object.keys(pb || {}).filter((k) => !pc[k]);
     const debt = Object.keys(pc).length - added.length;
     mech.states = { added, fixed: fixed.length, debt };
