@@ -100,7 +100,9 @@ function auditInPage(F) {
     out.sizes[px] = (out.sizes[px] || 0) + 1;
     const rec = { sel: sel(el), text: sample, px };
     if (px < F.minText) push(out.small, rec);
-    if (disabled) return; // disabled text is exempt from contrast
+    // Disabled text is NOT exempt (unlike WCAG): a greyed-out pen tile or "Save · 0 pigs" still carries information a farmer reads.
+    // Show "unavailable" with the surface, an icon or a word, never by fading the text. (Owner, 2026-10-10.)
+    void disabled;
     const x = Math.min(Math.max(rect.left + rect.width / 2, 0), W - 1), y = Math.min(Math.max(rect.top + rect.height / 2, 0), H - 1);
     const bd = backdrop(el, x, y);
     if (bd.obscured) return;

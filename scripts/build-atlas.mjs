@@ -87,7 +87,7 @@ for (const f of features) {
     if (!STATUSES.includes(s.status)) problems.push(`${where}: ${s.id} has status "${s.status}"`);
     if (s.status === 'placeholder' && s.url) problems.push(`${where}: ${s.id} is a placeholder with a url`);
     if (s.status !== 'placeholder' && !s.url) problems.push(`${where}: ${s.id} is ${s.status} but has no url`);
-    if (s.steps && (!Array.isArray(s.steps) || !s.steps.every((t) => typeof t === 'string' || (t && typeof t.tap === 'string')))) problems.push(`${where}: ${s.id} steps must be a list of strings or { tap, hold }`);
+    if (s.steps && (!Array.isArray(s.steps) || !s.steps.every((t) => typeof t === 'string' || (t && typeof t.tap === 'string') || (t && typeof t.fill === 'string' && typeof t.text === 'string')))) problems.push(`${where}: ${s.id} steps must be a list of strings, { tap, hold } or { fill, text }`);
     if (s.steps && !s.url) problems.push(`${where}: ${s.id} has steps but no url`);
     if (!s.id.startsWith(f.id + '.')) problems.push(`${where}: ${s.id} does not start with "${f.id}."`);
     for (const e of s.notes?.elements || []) {
@@ -166,7 +166,7 @@ for (const p of sections.platforms) for (const s of p.sections) for (const pt of
 const backlog = [];
 const KINDS = ['decision', 'design', 'broken', 'unclear'];
 const reviewDir = join(root, 'review');
-if (existsSync(reviewDir)) for (const fn of readdirSync(reviewDir).filter((n) => n.endsWith('.json') && !['state-check.json', 'legibility.json'].includes(n) && !n.startsWith('scenarios'))) {
+if (existsSync(reviewDir)) for (const fn of readdirSync(reviewDir).filter((n) => n.endsWith('.json') && !['state-check.json', 'legibility.json'].includes(n) && !n.startsWith('scenarios') && !n.startsWith('compare-'))) {
   let data; try { data = JSON.parse(readFileSync(join(reviewDir, fn), 'utf8')); } catch (e) { problems.push(`review/${fn}: ${e.message}`); continue; }
   for (const it of Array.isArray(data) ? data : data.items || [data]) {
     if (!it || !it.id || !it.title || !it.target) { problems.push(`review/${fn}: an item needs id, target and title`); continue; }

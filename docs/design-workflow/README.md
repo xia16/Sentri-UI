@@ -29,6 +29,14 @@ An agent score is never shown as approval. The approved version of a screen stay
 - **Green means approved or done only.**
 - **No cards on cards; information budget.** One surface, and only items are boxes. Colour only where it means something. Nothing said twice. Rank what the farmer must see first.
 
+## Room to design
+
+The design system and the rules above are a floor, not a ceiling (owner, 2026-10-10). Agents are designers, not copyists. If a better layout, interaction, variant or component would serve the farmer, build it:
+- **When a job is only adequate, look wider.** Before you build, sketch at least one alternative that departs from the current pattern. Then build the one that serves the farmer best.
+- **The gate decides, not familiarity.** The new design must beat what it replaces, side by side. Being different never makes it worse, and matching the system never makes it better.
+- **Prove it in a feature, then share it.** An enhancement starts in the feature that needs it. It reaches other features only as a shared-component change, gated on every feature that uses it, and never by restyling an approved screen to match.
+- **The owner rules still bind.** They are what keeps the product one product. Everything they don't fix is open.
+
 ## The scenario step
 
 New features and the polish loop both use the same scenario step. It has three parts:
@@ -63,6 +71,8 @@ New features and the polish loop both use the same scenario step. It has three p
 | Behaviour | The above, plus the scenario leaves and walks that touch it (390/360, EN/ZH), screen-reader order and keyboard cover |
 | Shared component | All of the above on **every** feature that uses it. A refactor must be identical. Any change to a frozen screen needs the owner's approval. |
 
+**One queue for shared-component changes.** Two sessions changing the bundle at once is how one undoes the other. A change is shared when it touches the bundle, the tokens, the bare-screen harness, a shared stylesheet or any file that pages of two or more features load, or when it changes a screen outside its scope; `gate.mjs` decides that itself. Shared changes merge one at a time, oldest open PR first. The next one merges main forward and is gated against the new main, which re-checks every screen of every feature. Feature-only changes don't queue.
+
 Every rejected owner example is a fixture each gate must fail ([gate.md](briefs/gate.md#rejected-examples)). All evidence records the commit it was taken on.
 
 ## Commands
@@ -74,6 +84,9 @@ Every rejected owner example is a fixture each gate must fail ([gate.md](briefs/
 | `npm run check` | Checks the atlas sources without writing |
 | `npm run ux` | Serves the repo for the atlas and the prototypes (`http://localhost:4317/atlas/`) |
 | `node scripts/run-scenarios.mjs` | Runs a feature's executable leaves (`features/<id>/scenarios.json`) |
+| `node scripts/gate.mjs --candidate <branch> --scope <features>` | The mechanical gate on the exact merge candidate: every check, every screen diffed against main, the before/after pairs for the judge ([gate.md](briefs/gate.md)) |
+| `node scripts/polish-loop.mjs <command> <feature>` | The polish loop's ledger: baseline, rounds, grades, stop conditions and the review packet ([polish-loop.md](briefs/polish-loop.md)) |
+| `node scripts/shoot-screens.mjs <out>` | Screenshots atlas screens bare at any widths and languages, and says where Chinese doesn't render |
 
 ## Briefs
 
@@ -82,7 +95,8 @@ Every rejected owner example is a fixture each gate must fail ([gate.md](briefs/
 | [briefs/build.md](briefs/build.md) | The builder of a screen, feature or component |
 | [briefs/gate.md](briefs/gate.md) | The single gate. It replaces `component-judge` and the checklist judge, which are **retired**. |
 | [briefs/walk.md](briefs/walk.md) | A persona walker or the breaker in a scenario round |
-| [briefs/polish-loop.md](briefs/polish-loop.md) | The polish-loop driver |
+| [briefs/polish-loop.md](briefs/polish-loop.md) | The polish-loop driver, run with the `/polish-loop <feature>` skill |
+| [briefs/grade.md](briefs/grade.md) | The grader at the start of each polish-loop round |
 | [briefs/populate.md](briefs/populate.md) | Atlas population. It maps existing screens and designs nothing. |
 | [briefs/review.md](briefs/review.md) | Screen and atlas reviews that feed the backlog |
 | [freeze-checklist.md](freeze-checklist.md) | Freeze and propagation |

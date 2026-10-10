@@ -1,0 +1,20 @@
+[
+ {
+  "id": "inspection-r2-1",
+  "target": {
+   "kind": "screen",
+   "id": "health-record.treatment"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "Is a dose required for every pig when treatment is recorded for several?",
+  "detail": "Record treatment for several pigs has a \"Same dose for all\" control that fills every pig's Dose box, and each pig keeps its own box. Today Save waits until every ticked pig has a dose above 0. That is a product rule on what is recorded, so the design keeps it as it is. The design only asks whether a pig may be saved without a dose.",
+  "options": [
+   "Keep it: every ticked pig needs a dose above 0",
+   "A pig with no dose is saved as treated without a dose",
+   "A pig with no dose is left out of the record, and the row says so"
+  ],
+  "recommendation": "Keep it: a treatment record without a dose cannot be audited. Owner to rule.",
+  "source": "fix round r2 (inspection)"
+ }
+]

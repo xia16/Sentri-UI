@@ -4,6 +4,11 @@ Use the polish loop for an **in-design feature whose product scope is settled**.
 
 The driver fills in **FEATURE** (`features/<id>/`), **BASELINE** (the commit the loop starts from) and **ROUND CAP** (default 5).
 
+Run it with the `/polish-loop <feature>` skill (`.claude/skills/polish-loop/`). Its tools:
+- `node scripts/polish-loop.mjs`: the round ledger, the grade check, the stop conditions and the review packet;
+- `node scripts/gate.mjs`: the gate on the exact merge candidate;
+- [grade.md](grade.md): the grader's brief.
+
 ## 0. Before round 1
 
 - **Pin the baselines.** Record the BASELINE commit. Screenshot every screen state at 390 and 360, in EN and ZH. The approved version of each screen stays visible in the atlas until the owner promotes the new one.
@@ -66,6 +71,7 @@ Score each dimension **0, 1 or 2**, with evidence (a screenshot and what is wron
 - **Legibility and copy**: copy budget, verbs, EN/ZH fit, real data wraps.
 - **Touch and reach**: 48px targets; one-handed reach; no gesture-only action.
 - **State clarity**: draft, saved, blocked and done are told apart; green only for done.
+- **Native fit**: it looks and behaves like an iOS or Android app; native patterns where they fit, no web conventions.
 
 **Hard failures** fail the screen whatever the score: a wrong fact, a lost draft, a dead end, an unreachable control, a broken ruling, or any rejected example in `gate.md`.
 
@@ -84,13 +90,14 @@ Never invent an expected result to make a leaf pass.
 
 1. Run every leaf (`node scripts/run-scenarios.mjs`) and grade every screen state on the round's start commit.
 2. **Select**: first the hard failures, then the worst usability defect with evidence. A fix must improve its target with no regression elsewhere. A shared component may change only if every other feature using it stays the same or better.
-3. **Build** with `build.md`. Changes are presentation and behaviour restoration only, in the feature.
+   Once no hard failure is left, a round may also take one **enhancement** ([Room to design](../README.md#room-to-design)): a screen state graded only adequate that a different design would make clearly better. The designer sketches alternatives, including one that departs from the current pattern, and builds the best. The gate judges it like any fix.
+3. **Build** with `build.md`. Changes stay inside the product-neutral boundary (§5), in the feature.
 4. **Gate** with `gate.md` on the exact merge candidate. Presentation changes rerun the walks and leaves they touch.
 5. **Merge** automatically when it passes. Record the round: commit, grades, leaf results, and what changed.
 
 ## 7. Stop conditions
 
-- **Done**: two clean rounds in a row (no hard failure, no defect selected) with every required leaf covered or blocked by a filed decision.
+- **Done**: two clean rounds in a row with every required leaf covered or blocked by a filed decision. A clean round has no hard failure, selects no defect and merges no enhancement. An enhancement the gate rejects leaves the round clean.
 - **Stopped incomplete**: after the round cap (5), or after a round that makes no progress (grades and leaf results unchanged).
 
 ## 8. Review packet (for the owner)

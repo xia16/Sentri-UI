@@ -1,0 +1,57 @@
+[
+ {
+  "id": "populate-farrowing-1",
+  "target": { "kind": "feature", "id": "farrowing" },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "Pen tools are drawn in Farrowing and in Inspection",
+  "detail": "Farrowing's room opens a pen page with Feed guidance, Report equipment fault, Add pen note and Pen log (farrowing.pen, pen-log, pen-note, pen-read-note, pen-feed, pen-fault, pen-fault-record). Inspection draws the same flows (inspection.pen, pen-note, pen-log, pen-faults, fault-report, fault-resolve, pen-actions) and feed-plan owns pen feeding. The Farrowing PRD lists the pen tools as present in the prototype but unclear whose feature. Farrowing's feed guidance has no data and only shows its empty state.",
+  "options": [
+   "One pen page owned by Inspection, reused by every task; Farrowing's copies become aliases or are dropped",
+   "Each task keeps its own pen page with the same parts",
+   "Farrowing keeps only Go to pen and the pen header; the pen tools live in Inspection"
+  ],
+  "source": "populate batch 3; features/farrowing/PRD.md Scope (Out); ux/system/farrowing-astra-concept.js penDetails()"
+ },
+ {
+  "id": "populate-farrowing-2",
+  "target": { "kind": "feature", "id": "farrowing" },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "Piglet processing is drawn in Farrowing and as its own feature",
+  "detail": "More actions on a sow opens Piglet processing, Piglet identity and Report piglet mortality inside the Farrowing prototype (farrowing.piglet-care, piglet-identity, piglet-death), plus Foster piglets and Reconcile piglet count. The Farrowing PRD puts piglet processing and its identity work out of scope, and the piglet-processing feature has its own simple prototype. RULINGS (Round 10) says per-piglet work may become universal features, with a proposal before any decision. The mortality form also offers different causes from the Record dead drawer (no Stillborn or Mummified, plus Cause unknown), against the rule 'ONE dead drawer product-wide'.",
+  "options": [
+   "Retire the Farrowing copies; More actions opens the piglet-processing task for that litter",
+   "Keep the Farrowing copies as the sow-level door and align them with piglet-processing",
+   "Wait for the per-piglet-work proposal, keep both for now"
+  ],
+  "source": "populate batch 3; features/farrowing/PRD.md Scope (Out); ux/research/farrowing/RULINGS.md (Surfaces & entrances; Piglet processing Round 10)"
+ },
+ {
+  "id": "populate-farrowing-3",
+  "target": { "kind": "feature", "id": "farrowing" },
+  "kind": "decision",
+  "severity": "low",
+  "title": "Search, scan, filter and Go to pen are drawn once per prototype",
+  "detail": "Farrowing's room has its own Find a sow, Scan ear tag, Filter sows and Go to pen sheets (farrowing.search, scan, filter, pen-map). Inspection draws filters, a pen map and find-or-scan (inspection.filters, go-to-pen, find-pig), and Home draws find-pig.search, scan and results. They look alike but are different markup with different content (Farrowing's filter has a due-date slider and parity; its scan is a non-working preview). Each is limited to its own unit's sows.",
+  "options": [
+   "Keep them per task: each filters its own task's data",
+   "Share one search and scan component, with the task passing its scope",
+   "Make Home's find-pig the only search and scan; tasks keep filter and Go to pen"
+  ],
+  "source": "populate batch 3; features/find-pig, features/inspection"
+ },
+ {
+  "id": "populate-farrowing-4",
+  "target": { "kind": "screen", "id": "farrowing.piglet-identity" },
+  "kind": "unclear",
+  "severity": "low",
+  "title": "Piglet identity saves with only a sex or a weight",
+  "detail": "Save identity is enabled as soon as any of tag, notch, sex or weight has a value, so a piglet can be saved with neither tag nor notch. RULINGS (Piglet processing, Q3) says tag or notch identifies, and sex and weight are optional and never block a row. Recorded only; the design is not changed here.",
+  "options": [
+    "Require a tag or a notch before Save is enabled",
+    "Keep it: the row is a record of what is known, identity or not"
+  ],
+  "source": "populate batch 3; ux/system/farrowing-astra-concept.js savePiglet; RULINGS.md"
+ }
+]

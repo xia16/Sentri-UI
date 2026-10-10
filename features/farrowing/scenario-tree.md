@@ -11,6 +11,8 @@ format as `ux/tasks/piglet-processing/research/scenario-tree.md`. Each branch en
 Every branch is marked **S** (sourced — cite follows) or **I** (inferred — reasoning follows). Where sources disagree,
 RULINGS wins; when RULINGS does not reach the case, or the PRD itself disagrees with the contract, the branch is a `?`.
 
+**Owner decision 2026-10-10.** Four decisions of that date change rows below and are cited as "owner decision 2026-10-10": no ✕ in drawer heads (the footer Back is the exit; swipe down on the handle or the scrim is Back); no green for drafts; leaving Edit with unsaved changes asks "Save correction?" (an unsaved correction can never reach Finish); a changed row shows "was N" and there is no correction banner. Rows marked *retired* keep their ids out of use.
+
 **Executable leaves.** `features/farrowing/scenarios.json` is the machine-readable form of this tree's executable
 rows: each leaf names its row here (`"tree": "D-1"`). `node scripts/run-scenarios.mjs farrowing` runs them (EN, ZH ×
 360, 390) and writes `review/scenarios-farrowing.json`. A row with **leaf** in the last column has one; **pending**
@@ -78,12 +80,12 @@ States: D0 drawer open over C0 with a draft of 1 crushed · D1 C0 with that draf
 
 | # | State | Event | Result | Src | Leaf |
 |---|---|---|---|---|---|
-| D-1 | D0 | Back | → D1: the draft stays on the device; the host's Record dead says `1 unsaved`; posted deaths unchanged | S — RUL Starting and ending ("Back … KEEPS the draft"); contract C1; STR Back | `fa-d1-back-keeps-death-draft` |
-| D-2 | D1 | reopen Record dead | → the draft is there, green, `1 unsaved` | S — RUL Starting and ending | `fa-d2-reopen-restores-draft` |
+| D-1 | D0 | Back | → D1: the draft stays on the device; the host's Record dead tool stacks `1 unsaved`; posted deaths unchanged | S — RUL Starting and ending ("Back … KEEPS the draft"); contract C1; STR Back | `fa-d1-back-keeps-death-draft` |
+| D-2 | D1 | reopen Record dead | → the draft is there, `1 unsaved` in muted ink | S — RUL Starting and ending ("green" is superseded: owner decision 2026-10-10, no green for drafts) | `fa-d2-reopen-restores-draft` |
 | D-3 | D1 → D0 | + again (resume) | → `2 unsaved`; nothing posted | S — RUL Starting and ending | `fa-d3-resume-adds-to-draft` |
 | D-4 | D1 → D0 | Clear | → draft gone, Clear gone; posted unchanged | S — RUL Starting and ending | `fa-d4-clear-discards-draft` |
 | D-5 | D1 → D0 | Save | → one stamped death event; draft empty | S — RUL Surfaces | `fa-d5-save-posts-one-event` |
-| D-6 | D0 | dismiss (close / swipe) | → as Back | S — RUL Surfaces ("Back or the dismiss gesture keeps it") | `fa-d6-dismiss-keeps-death-draft` |
+| D-6 | D0 | dismiss (swipe down or tap the handle, or tap the scrim) | → as Back; there is no ✕ | S — RUL Surfaces ("Back or the dismiss gesture keeps it"); owner decision 2026-10-10 (no ✕) | `fa-d6-dismiss-keeps-death-draft` |
 | D-7 | D0 | app closed and reopened | → the draft survives the restart | S — contract C5 ("persisted across background and restart") | `fa-d7-restart-keeps-death-draft` |
 | D-8 | D0 | add a photo, Save | → the photo rides the death's log line | S — RUL Starting and ending (photos) | — |
 | D-9 | D0 on two phones | both save | → signed deltas merge; a breach holds at the floor with a sync review line | S — RUL Starting and ending (merge contract, draft) | pending `fa-d9-two-phones` |
@@ -91,16 +93,16 @@ States: D0 drawer open over C0 with a draft of 1 crushed · D1 C0 with that draf
 
 ## 5 · Finish and the lock (F)
 
-States: F0 Finish with a death draft waiting (from D1) · F1 Finish with an Edit draft waiting · F2 Finish, nothing waiting.
+States: F0 the record with a death draft waiting (from D1; Finish waits) · F1 *retired* (Finish with an Edit draft: an unsaved correction cannot reach Finish, see X-10) · F2 Finish, nothing waiting.
 
 | # | State | Event | Result | Src | Leaf |
 |---|---|---|---|---|---|
-| F-1 | F0 | open Finish | → opens; lock waits floor-gray; pointer `1 death unsaved · Record dead` | S — RUL Starting and ending ("Finish with a draft waiting") | `fa-f1-finish-blocked-by-death-draft` |
-| F-2 | F0 | hold the lock anyway | → nothing locks; the draft is still there | S — RUL Starting and ending ("A draft never crosses the lock") | `fa-f2-draft-never-crosses-lock` |
-| F-3 | F0 | Back, Record dead, Save, Finish | → F2: the lock is live | S — RUL ("a guard on the lock, not a gate on recording") | `fa-f3-resolved-finish-unblocked` |
+| F-1 | F0 | press Finish farrowing | → Finish waits (floor-gray, no banner, no reason line) and the press brings you to the Record dead tool, which says `1 unsaved` | S — RUL Starting and ending ("Finish with a draft waiting"); owner decision 2026-10-10 (how it is shown) | `fa-f1-finish-blocked-by-death-draft` |
+| F-2 | F0 | press Finish farrowing | → nothing locks (there is no lock to hold while the draft waits); the draft is still there | S — RUL Starting and ending ("A draft never crosses the lock") | `fa-f2-draft-never-crosses-lock` |
+| F-3 | F0 | Save in Record dead, Finish farrowing | → F2: the lock is live | S — RUL ("a guard on the lock, not a gate on recording") | `fa-f3-resolved-finish-unblocked` |
 | F-4 | F2 (after F-3) | hold Finish farrowing | → locked; Born frozen = alive + dead (15); the record face | S — RUL Model; RUL Surfaces | `fa-f4-lock-gives-locked-record` |
-| F-5 | F1 | open Finish | → lock waits; a door to the waiting correction | S — RUL Starting and ending; RUL Surfaces (same triad on Edit) | `fa-f5-finish-blocked-by-edit-draft` |
-| F-6 | F1 | Review, Save correction | → back on Finish, lock live; one correction event | S — flow (edit → finish); RUL Surfaces | `fa-f6-saved-correction-returns-to-finish` |
+| F-5 | F1 | *retired* | an unsaved correction cannot reach Finish (X-10); leaf `fa-f5-finish-blocked-by-edit-draft` retired | owner decision 2026-10-10 | — |
+| F-6 | F1 | *retired* | replaced by X-12; leaf `fa-f6-saved-correction-returns-to-finish` retired | owner decision 2026-10-10 | — |
 | F-7 | F2 | tap (no hold) | → nothing locks | S — RUL Surfaces (hold-to-lock is the second guard) | `fa-f7-tap-does-not-lock` |
 | F-8 | F2 | hold | → locked record: Born 14, Edit · Record dead, no Finish | S — RUL After the lock | `fa-f8-locked-record-face` |
 | F-9 | F2 | weak / deformed steppers | → commit per tap; healthy derived; capped at alive | S — RUL Model (classification at Finish) | — |
@@ -112,14 +114,18 @@ States: X0 Edit open while counting · X1 Edit open on a locked record.
 
 | # | State | Event | Result | Src | Leaf |
 |---|---|---|---|---|---|
-| X-1 | X0 | first change | → amber banner + live change summary; Save live | S — RUL Surfaces | `fa-x1-change-shows-banner-and-summary` |
+| X-1 | X0 | first change | *retired*: the amber banner and change summary are gone; see X-9. Leaf `fa-x1-change-shows-banner-and-summary` retired | owner decision 2026-10-10 | — |
 | X-2 | X0 + change | Save | → one stamped correction; Born heals from its inputs (13) | S — RUL Surfaces | `fa-x2-save-correction` |
-| X-3 | X0 + change | Back, reopen Edit | → the change is still there; nothing posted | S — RUL Surfaces (Back keeps) | `fa-x3-edit-back-keeps-draft` |
+| X-3 | X0 + change | Back | *retired*: Back with unsaved changes now asks (X-10) instead of silently keeping the draft. Leaf `fa-x3-edit-back-keeps-draft` retired | owner decision 2026-10-10 | — |
 | X-4 | X0 + change | Clear | → change discarded | S — RUL Surfaces | `fa-x4-edit-clear-discards` |
 | X-5 | X1 | Correct born ✎ › More born 1 › Apply › Save | → Born 14 → 15, stamped; original kept in the log | S — RUL After the lock (anyone may amend) | `fa-x5-correct-born-after-lock` |
 | X-6 | X1 after X-5 | View log | → the Farrowing record shows the correction and the finish | S — RUL After the lock (one ledger surface) | `fa-x6-log-shows-correction` |
 | X-7 | X1 | a piglet dies after the lock | ? Q4 — which door owns post-lock deaths | S (open) — RUL After the lock vs review tasks-built-24 | blocker `fa-x7-post-lock-death-door` |
 | X-8 | X0 | lower Alive below the counting floor | ? Q7 — how a pre-lock Alive correction restates Born | S (open) — review tasks-built-33 | — |
+| X-9 | X0 | first change | → the changed row shows its new value in ink with a muted `was N` beside the label; no banner, no Corrected tag; Save correction live | owner decision 2026-10-10 | `fa-x9-changed-row-shows-was` |
+| X-10 | X0 + change | Back | → the shared dialog asks `Save correction?` (Save / Discard); the screen stays on Edit until answered; nothing posted | owner decision 2026-10-10 | `fa-x10-back-with-change-asks-save` |
+| X-11 | X-10 | Discard | → the change is dropped, back on the record, nothing posted | owner decision 2026-10-10 | `fa-x11-ask-discard-drops-change` |
+| X-12 | X-10 | Save | → one stamped correction (who and old → new go to the log), back on the record | owner decision 2026-10-10 | `fa-x12-ask-save-posts-correction` |
 
 ## 7 · Sow death (M)
 

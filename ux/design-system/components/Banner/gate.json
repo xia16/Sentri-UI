@@ -32,7 +32,7 @@
   "variants": [
     { "name": "danger", "usedBy": ["farrowing.ended", "farrowing.task-blocked"], "status": "agent-checked",
       "scores": { "clarity": 9, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 9 }, "findings": [] },
-    { "name": "correction", "usedBy": ["farrowing.blocked", "farrowing.edit"], "status": "agent-checked",
+    { "name": "correction", "usedBy": ["farrowing.leave-edit", "farrowing.edit"], "status": "agent-checked",
       "scores": { "clarity": 9, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 9 }, "findings": [] },
     { "name": "notice", "usedBy": ["workbench.today", "workbench.saved-work", "piglet-processing.pen-list"], "status": "agent-checked",
       "scores": { "clarity": 8, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 9 },

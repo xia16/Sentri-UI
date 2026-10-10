@@ -22,8 +22,8 @@
 .farrowing-phone .room-home h2{font-weight:500}
 .farrowing-phone .home-task{display:flex;flex-direction:column;align-items:stretch;gap:8px;width:100%;margin-top:22px;padding:17px 16px;border:1px solid var(--line);border-radius:var(--subpage-radius);background:var(--paper,#fff);text-align:left;box-shadow:0 2px 8px rgba(32,41,31,.04)}
 .farrowing-phone .home-task-title{display:flex;align-items:center;justify-content:space-between;font-size:15px;font-weight:500}
-.farrowing-phone .home-task-states{font-size:11px;color:var(--muted)}
-.farrowing-phone .home-resume{font-size:11px;color:var(--green)}
+.farrowing-phone .home-task-states{font-size:13px;color:var(--muted)}
+.farrowing-phone .home-resume{font-size:13px;color:var(--green)}
 .farrowing-phone .room-search-label input{border-color:#bdc7b6}
 .farrowing-phone .search-result{border-color:var(--line)}
 .farrowing-phone .scanner-demo{background:var(--well);border:1px solid var(--line)}
@@ -37,16 +37,13 @@
 .farrowing-phone .pen-notice{border-color:var(--line);border-radius:12px;background:var(--surface,#f8faf5)}
 .farrowing-phone .pen-notice-fault{background:#fff8ea;border-color:#ead9b8}
 .farrowing-phone .pen-detail-copy{font-size:13px;line-height:1.7}
-.farrowing-phone .pen-detail-meta{font-family:var(--font-mono);font-size:10px}
+.farrowing-phone .pen-detail-meta{font-family:var(--font-mono);font-size:13px}
 .farrowing-phone .sheet[data-view=finish] .finish-body{padding-top:18px}
 .farrowing-phone .sheet[data-view=locked] .completed-record-body{padding-top:6px}
 .farrowing-phone .sheet[data-view=finish] .finish-totals,.farrowing-phone .sheet[data-view=locked] .facts-surface{padding:14px}
 .farrowing-phone .sheet[data-view=finish] :is(.finish-condition,.finish-extras){border-color:var(--line);border-radius:var(--subpage-radius)}
-.farrowing-phone .sheet[data-view=death] .sheet-body,.farrowing-phone .sheet[data-view=edit] .edit-body{padding-top:16px}
+.farrowing-phone .sheet[data-view=death] .sheet-body,.farrowing-phone .sheet[data-view=edit] .edit-body{padding-top:12px}
 .farrowing-phone .sheet[data-view=death] .segment{border:1px solid var(--line)}
-/* Even gaps: the segment to the first row and the last row to Photos are both 18px to the next thing a person sees (12 gap + the row's or Photos' own inner space). */
-.farrowing-phone .sheet[data-view=death] .st-segment{margin-bottom:var(--space-12)}
-.farrowing-phone .sheet[data-view=death] .photo-field{margin:0 0 var(--space-section)}
 .farrowing-phone .sheet[data-view=editFinish] .edit-body{padding-top:16px}
 .farrowing-phone .sheet[data-view=locked] .record-inline-actions{padding-top:4px}
 
@@ -56,12 +53,11 @@
 .farrowing-phone .feature-page>.sheet-body{gap:18px}
 .farrowing-phone :is(.feature-callout,.feature-summary){border:1px solid var(--line);background:var(--surface,#f8faf5)}
 .farrowing-phone .feature-tabs{border:1px solid var(--line)}
-.farrowing-phone .processing-day,.farrowing-phone .piglet-roster,.farrowing-phone .foster-sows{border-color:var(--line)}
+.farrowing-phone .processing-day,.farrowing-phone .piglet-roster{border-color:var(--line)}
 .farrowing-phone .processing-day-head{background:var(--surface,#f8faf5)}
-.farrowing-phone .processing-task,.farrowing-phone .piglet-row,.farrowing-phone .foster-sows button{border-color:var(--line)}
+.farrowing-phone .processing-task,.farrowing-phone .piglet-row{border-color:var(--line)}
 .farrowing-phone .piglet-row-main{font-weight:400}
 .farrowing-phone .feature-tool{border-color:#bdc7b6;color:var(--green)}
-.farrowing-phone .feature-choice button[aria-pressed=true],.farrowing-phone .foster-sows button[aria-pressed=true]{background:var(--green-wash,#eaf2e5);border-color:#8ea88a;color:var(--ink)}
 .farrowing-phone .feature-warning{background:#fff5df;border:1px solid #efdbb0;color:var(--amber)}
 .farrowing-phone .feature-photo{border-color:#9cac99;background:var(--surface,#f8faf5)}
 
@@ -84,7 +80,7 @@
 }
 
 @media(prefers-reduced-motion:reduce){.farrowing-phone .button:active{transform:none}}
-.farrowing-phone :is(.processing-task,.piglet-row-main,.foster-sows button,.task-review-sow) :is(strong,small){min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.farrowing-phone :is(.processing-task,.piglet-row-main,.task-review-sow) :is(strong,small){min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .farrowing-phone .piglet-row-main>span,.farrowing-phone .feature-door :is(strong,small){display:block;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
 /* Optional finish details follow the same add-detail button convention as treatment. */
@@ -96,3 +92,8 @@
 .farrowing-phone .finish-extras>.st-optional-row[aria-expanded="true"] .st-optional-answer{display:none}
 
 .farrowing-phone .processing-task>span:last-child{min-width:0;overflow:hidden}
+/* Reading and form sheets keep their 20px lead-in under the header */
+.farrowing-phone :is(.room-filter-sheet,.picker-sheet,.room-search-sheet) .sheet-body{padding-top:20px}
+.farrowing-phone :is(.pen-detail-sheet,.pen-form-sheet,.pen-feed-page,.pen-log-sheet) .sheet-body{padding:20px var(--subpage-pad) 24px}
+.farrowing-phone .detail-sheet[data-size] .sheet-body{padding:20px var(--subpage-pad) 24px}
+.farrowing-phone .detail-sheet[data-presentation="page"]>.sheet-body{padding:20px var(--subpage-pad) 24px}

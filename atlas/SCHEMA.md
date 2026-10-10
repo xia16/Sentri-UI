@@ -64,7 +64,7 @@ Rules the generator checks: ids unique across all features; every id in `anchor`
 
 ## `steps`: screens only a tap reaches
 
-When no scenario of the prototype opens a screen, give it the `url`/`preset` of the nearest state it can start from, and `steps`: an ordered list of taps `atlas-bare.js` replays inside the phone (after the preset, waiting for the phone to settle between taps) before it renders and posts `{atlasReady}`. A step is the control's visible text, its `aria-label` / `title`, or a CSS selector (starts with `[`, `.` or `#`); `{ "tap": "...", "hold": ms }` presses and holds for hold-to-commit buttons. A screen with `url` may have `steps`; a step that finds nothing logs an error and is skipped. Keep paths short, and use text over selectors so they survive restyling.
+When no scenario of the prototype opens a screen, give it the `url`/`preset` of the nearest state it can start from, and `steps`: an ordered list of taps `atlas-bare.js` replays inside the phone (after the preset, waiting for the phone to settle between taps) before it renders and posts `{atlasReady}`. A step is the control's visible text, its `aria-label` / `title`, or a CSS selector (starts with `[`, `.` or `#`); `{ "tap": "...", "hold": ms }` presses and holds for hold-to-commit buttons. `{ "fill": "<selector>", "text": "..." }` types text into a field (it sets the value and fires `input`), for a screen that only exists once something was typed and saved (a read-only note). When a heading repeats a row's words, the text matches the heading first: use a selector for the row. A screen with `url` may have `steps`; a step that finds nothing logs an error and is skipped. Keep paths short, and use text over selectors so they survive restyling.
 
 ## Approval records
 

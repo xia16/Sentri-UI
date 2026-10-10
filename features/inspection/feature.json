@@ -163,7 +163,7 @@
     [
       "inspection.walk-recorded",
       "inspection.walk",
-      "tap Back to unit"
+      "tap Back"
     ],
     [
       "inspection.sensors",
@@ -284,7 +284,7 @@
               {
                 "state": "Condition needs attention",
                 "when": "Care is Monitor, Treat in place or Move to hospital pen",
-                "shows": "Tag with \"Day N\" (only when day is a number), care icon and colour; sorted first"
+                "shows": "Tag with \"Day N\" (only when day is a number), care icon and colour; the most recent condition leads, then the ones that need attention"
               },
               {
                 "state": "Condition ongoing",
@@ -299,7 +299,7 @@
               {
                 "state": "Tags overflow",
                 "when": "They do not fit one line",
-                "shows": "Last ones collapse into +N; the full list is in the pig record"
+                "shows": "The tags wrap to a second line before any is hidden, so the newest condition is always shown in full; only what still does not fit two lines collapses into \"+N more\" (the full list is in the pig record)"
               }
             ],
             "logic": "Duration never falls back to the animal's lifetime age. The checkbox selects the pig only, never its pen.",
@@ -1077,7 +1077,7 @@
         "elements": [
           {
             "name": "Confirmation",
-            "shows": "Checked in at 09:41 · G. Hansen · Unit 7 · 0 updates recorded",
+            "shows": "Checked in at 09:41 · G. Hansen · Unit 7 · 0 updates recorded; the footer holds Back alone",
             "states": [
               {
                 "state": "One update",
@@ -1085,18 +1085,15 @@
                 "shows": "\"1 update\" (singular)"
               }
             ],
-            "logic": "Time is fixed at 09:41; the count is the walk's event count.",
+            "logic": "Time is fixed at 09:41; the count is the walk's event count. One exit: Back leaves the sheet and lands on the unit's walk list, where the user came from (as the end receipt does).",
             "at": "Checked in at 09:41"
           }
         ],
         "controls": [],
         "copy": [
-          "Walk recorded (raw)",
-          "Back to unit (raw)"
+          "Walk recorded (raw)"
         ],
-        "issues": [
-          "Two back controls (header Back and \"Back to unit\") do the same thing."
-        ]
+        "issues": []
       }
     },
     {

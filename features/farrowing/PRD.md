@@ -40,7 +40,7 @@ From RULINGS.md, quoted short:
 - **Starting and ending a session**: the sow's death lives in the drawer (`Piglets · The sow`), "hold-to-commit"; "She stays in the room".
 - **Starting and ending a session**: "A non-empty ledger is never unreachable"; a draft never crosses the lock.
 - **After the lock**: "The record face IS the record"; "One ledger surface, the Farrowing record page"; "History is the chevron on the fact line"; "The correction mark is the amber value".
-- **After the lock**: Born is amended through the Edit ceremony popup (`More born` / `Count was wrong`); "Anyone may amend born post-lock — open ✎, stamped, no role gate." Fostering is **parked**.
+- **After the lock**: Born is amended through the Edit ceremony, which opens in place under the Born row (`More born` / `Count was wrong`; never a drawer on a drawer); "Anyone may amend born post-lock — open ✎, stamped, no role gate." Fostering is **parked**.
 - **Names and glyphs**: "words carry actions, icons carry objects"; dates speak relative within the week.
 - **Piglet processing, Round 5**: all tasks look the same (farrowing's skeleton); "The exit word is always **Back**."
 - **Owner calls for this atlas**: *Edit record* is editing while she is still farrowing; *Correct born* exists only after farrowing has finished. Home's Farrowing card and Choose unit both land on the room list.
@@ -51,16 +51,16 @@ In:
 
 - Room list: unit card, whole-task card, Awaiting / Active / Done / All tabs, due and parity filter, pen grouping, Go to pen, Scan ear tag, Search.
 - The sow sheet in its faces: Before first count, Counting, Finish (and its blocked form), Locked record, Sow died.
-- Death entry (piglets and the sow), Edit record, Edit of a finished litter and the Correct born popup, the Farrowing log.
-- Whole-task overview, End task reviews (blocked, awaiting, all finished, outcomes) and the task receipt.
+- Death entry (piglets and the sow), Edit record, Edit of a finished litter and the Correct born correction (in place), the Farrowing log.
+- Whole-task overview, End task reviews (blocked, awaiting, all finished, outcomes) and the task receipt. One count everywhere: Done · Active · Awaiting over every sow of the task (a sow that died or has an outcome is Done), the same on the overview, End task, the receipt and the room tabs.
 - Farrowing's rows on the pig's Actions sheet (Edit litter record, Record miscarriage, Mark not in pig).
 
 Out:
 
 - Fostering (parked until the owner reopens it).
-- Piglet processing and its identity work (separate feature; Move opens after the lock).
+- Piglet processing and its identity work (separate feature; Move opens after the lock). The prototype's own Piglet processing, identity and mortality pages are mapped as screens; see the decision "Piglet processing is drawn in Farrowing and as its own feature".
 - The sow page itself and the rest of the Actions sheet (pig-profile).
-- Pen tools reachable from a pen header (feed guidance, equipment fault, pen note, pen log): present in the prototype, unclear whose feature; recorded in the Room list issues.
+- Pen tools reachable from a pen header (feed guidance, equipment fault, pen note, pen log): present in the prototype, unclear whose feature; recorded in the Room list issues. The pen pages are mapped as screens; see the decision "Pen tools are drawn in Farrowing and in Inspection".
 - Console reporting, anomaly queues, per-hand audit views, merge-review UI, notifications.
 - Role gates, batch-close disposition doors beyond what the End task reviews show.
 

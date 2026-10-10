@@ -90,7 +90,7 @@
   function nav(active='home'){return `<nav class="bottom-nav" aria-label="Main navigation">${btn('home',icon('home')+'Home',active==='home'?'active':'')}${btn('scan',icon('scan')+'Scan','scan-button')}${btn('toolbox',icon('toolbox')+'Toolbox',active==='toolbox'?'active':'','',state.unit?'data-entry="environment" data-entry-via="toolbox"':'')}</nav>`;}
   function head(title,sub='',extra='',showBack=true){return `<header class="page-head">${showBack?ib('back','back','Back'):''}<div class="head-copy">${SentriUI.heading({title,description:sub,kind:'page',level:2})}</div>${extra}</header>`;}
   function header(){return `<header class="app-header">${btn('sections',`<span class="farm-label">GREEN VALLEY FARM</span><strong>${section().name}${icon('down')}</strong>`,'section-trigger','','aria-label="Change section, '+section().name+'"')}${btn('assistant',`${icon('spark')}Assistant`,'assistant-door','','aria-label="Assistant"')}</header>`;}
-  function scopeRail(){return `<nav class="scope-switch" aria-label="Work scope">${btn('scope','Overview','scope-overview','',`aria-pressed="${!state.unit}"`)}${btn('units',`<span>${state.unit?'Unit '+state.unit:'Choose unit'}<small>${section().units.length} units</small></span>${icon('down')}`,'scope-unit','',`${state.section==='farrowing'?'data-entry="farrowing" data-entry-via="choose-unit" ':''}aria-haspopup="dialog" aria-label="${state.unit?'Change unit, Unit '+state.unit:'Choose unit'}, ${section().units.length} units" aria-pressed="${!!state.unit}"`)}</nav>`;}
+  function scopeRail(){return `<nav class="scope-switch" aria-label="Work scope">${btn('scope','Overview','scope-overview','',`aria-pressed="${!state.unit}"`)}${btn('units',`<span>${state.unit?'Unit '+state.unit:'Choose unit'}</span>${icon('down')}`,'scope-unit','',`${state.section==='farrowing'?'data-entry="farrowing" data-entry-via="choose-unit" ':''}aria-haspopup="dialog" aria-label="${state.unit?'Change unit, Unit '+state.unit:'Choose unit'}, ${section().units.length} units" aria-pressed="${!!state.unit}"`)}</nav>`;}
   // Illustrative task windows. Unit selection changes counts, not batch time.
   const cardFields = {
     preg31:{context:'First check',day:1,days:3,label:'Checks recorded',verb:'sows ready to check',due:{7:2,8:2,9:1},nextAt:1440},
@@ -103,7 +103,7 @@
     piglet27:{context:'Age-day schedule',day:3,days:7,label:'Pens done',verb:'litters due',due:{6:2,7:2},state:'waiting',nextAt:1440}
   };
   function taskModel(t){
-    const count=Object.keys(t.counts).length,scope={kind:state.unit?'unit':'overview',label:state.unit?'Unit '+state.unit:'Across '+count+' '+(count===1?'unit':'units'),action:state.unit?'Open unit task':'View task'};
+    const count=Object.keys(t.counts).length,scope={kind:state.unit?'unit':'overview',label:state.unit?'Unit '+state.unit:(count===1?'One unit':'All units'),action:state.unit?'Open unit task':'View task'};
     if(t.completedAt||t.terminatedAt)return {id:t.id,state:t.terminatedAt?'terminated':'complete',identity:{title:t.type,context:t.batch},scope,completedAt:t.completedAt||t.terminatedAt};
     const m=metric(t,state.unit),f=cardFields[t.id],rows=taskRecords(t,state.unit);
     let p=f.kind==='observation'?null:{kind:f.kind||'completion',label:f.label,value:m.done,total:m.total,unit:t.measure||'sows'};
@@ -350,5 +350,6 @@
   $('#work-preview').value=workPreview;
   $('#work-preview').addEventListener('change',e=>{workPreview=e.target.value;const url=new URL(location.href);url.searchParams.set('work',workPreview);history.replaceState(null,'',url);goHome();});
   $('#reset-study').addEventListener('click',()=>location.reload());
+  document.querySelectorAll("[data-status-icons]").forEach(e=>{e.innerHTML=icon("signal")+icon("battery");});
   render();
 })();

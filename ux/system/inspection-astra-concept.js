@@ -1,4 +1,4 @@
-import {localizeFeed,recordReason} from './feed-locale.js';
+import {localizeFeed} from './feed-locale.js';
 import './unit-snapshot.js';
 /* Inspection study: in-memory sample farm plans; no production writes. */
 (()=>{
@@ -14,6 +14,8 @@ const stOptionalRow=o=>SentriUI.optionalRow(o);
 const stHeading=o=>globalThis.SentriUI?.heading?globalThis.SentriUI.heading(o):'';
 const stPanel=(content,options={})=>globalThis.SentriUI?.panel?globalThis.SentriUI.panel(content,options):content;
 const stFacts=(items,options={})=>globalThis.SentriUI?.facts?globalThis.SentriUI.facts(items,options):'';
+// A fact the record does not have is left out, not printed as a dash; a section with none is left out too.
+const knownFacts=items=>items.filter(i=>i&&(i.value!==null&&i.value!==undefined&&i.value!==''||i.valueHtml!=null||i.html));
 const stRow=o=>globalThis.SentriUI?.row?globalThis.SentriUI.row(o):button(o.action||'',`<span class="action-symbol">${o.icon||icon('chevron')}</span><span><strong>${esc(o.title)}</strong><small>${esc(o.description||'')}</small></span>${icon('chevron')}`,'action-item',o.value||'');
 const stLog=(groups,options={})=>globalThis.SentriUI?.log?globalThis.SentriUI.log(groups,options):'';
 const stIconButton=o=>SentriUI.iconButton({...o,variant:o.action==='clear'?'plain':o.variant||'bordered'});
@@ -23,31 +25,17 @@ const stPickerOptions=o=>SentriUI.pickerOptions(o);
 // Entry markers (read by the atlas): a control that is a way into another feature says which one; a pig row with a health tag is also a way into Health record.
 const entryOf={feed:'feed-plan','feed-edit-pen':'feed-plan','feed-edit-selected':'feed-plan','pig-feed':'feed-plan',pig:'pig-profile',health:'health-record',finding:'health-record',scan:'inspection',search:'inspection'};
 const entryFor=(a,label='')=>entryOf[a]?(a==='pig'&&/data-ds="ConditionTag"[^>]*data-care="(attention|ongoing)"/.test(label)?'pig-profile health-record':entryOf[a]):'';
-const waitingReasons={
- 'save-health':'Choose a disease or symptom', 'save-record':'Enter a reading', 'save-weight':'Enter a weight',
- 'save-production-task':'Choose an outcome', 'save-miscarriage':'Choose a reason', 'save-batch-membership':'Choose a batch',
- 'save-disposition':'Choose a reason', 'feed-edit-save':'Change the feeding mode or adjustment',
- 'feed-optional-save':'Change the date or note', 'record-optional-save':'Enter a value',
- 'log-date-apply':'Choose a start and end date'
-};
-const button=(a,label,cls='button',v='',disabled=false,reason='')=>{
+const button=(a,label,cls='button',v='',disabled=false)=>{
  if(cls==='dock-search')return SentriUI.iconButton({action:a,value:v,icon:icon('search'),label:'Search ear tag',className:cls});
- if(cls.split(' ').includes('button')||cls.split(' ').includes('text-button')||cls==='task-history')return SentriUI.button({label:'',register:cls.includes('primary')?'primary':cls.includes('text-button')||cls==='task-history'?'text':'secondary',action:a,value:v,waiting:disabled,className:cls==='task-history'?'':cls.split(' ').filter(c=>c!=='button'&&c!=='primary').join(' '),reason:disabled?recordReason(reason||waitingReasons[a]||'Choose an option to continue'):'',attrs:entryFor(a,label)?{'data-entry':entryFor(a,label)}:{}}).replace('<span class="st-button-label"></span>',label);
+ if(cls.split(' ').includes('button')||cls.split(' ').includes('text-button')||cls==='task-history')return SentriUI.button({label:'',register:cls.includes('primary')?'primary':cls.includes('text-button')||cls==='task-history'?'text':'secondary',action:a,value:v,waiting:disabled,className:cls==='task-history'?'':cls.split(' ').filter(c=>c!=='button'&&c!=='primary').join(' '),attrs:entryFor(a,label)?{'data-entry':entryFor(a,label)}:{}}).replace('<span class="st-button-label"></span>',label);
  return `<button type="button" class="${cls}"${entryFor(a,label)?` data-entry="${entryFor(a,label)}"`:''} data-action="${a}" data-value="${esc(v)}"${disabled?' disabled':''}>${label}</button>`;
 };
-let waitingSequence=0;
-function setCommitWaiting(el,waiting,reason){
+function setCommitWaiting(el,waiting){
  if(!el)return;
  el.disabled=false;
- const id=el.getAttribute('aria-describedby'),old=id?el.closest('.sheet')?.querySelector('[id="'+id+'"]'):null;
- if(old?.classList.contains('st-button-reason'))old.remove();
  el.removeAttribute('aria-describedby');
  if(!waiting){el.removeAttribute('aria-disabled');return;}
  el.setAttribute('aria-disabled','true');
- const reasonId='inspection-waiting-'+(++waitingSequence);
- el.setAttribute('aria-describedby',reasonId);
- const text=recordReason(reason||waitingReasons[el.dataset.action]||'Choose an option to continue');
- el.closest('.sheet-footer')?.insertAdjacentHTML('beforebegin',SentriUI.buttonReason({id:reasonId,text}));
 }
 const ib=(a,k,label,v='')=>SentriUI.iconButton({action:a,icon:icon(k),label,value:v});
 const footer=(left,right)=>SentriUI.sheetFooter({content:left+(right||'')});
@@ -264,7 +252,7 @@ function stageSummary(p){
  const label=(p.stage==='Off production'&&p.breedingStatus==='Open'?'Open':null)||({Gestating:'Gestation',Lactating:'Lactation'})[p.stage]||p.stage||'Stage';
  const start=p.stageStartedAt||(p.stage==='Gestating'?p.registry?.serviceDate:p.stage==='Lactating'?p.registry?.farrowingDate:p.stage==='Off production'?p.registry?.offProductionSince:null);
  const days=daysFromWalk(start);
- return label+' · '+(days!==null&&days>=0?days+' '+(days===1?'day':'days'):'—');
+ return days!==null&&days>=0?label+' · '+days+' '+(days===1?'day':'days'):label;
 }
 function penFeedStatus(pe){
  return pe.mode!=='adlib'&&pe.pigs.length&&pe.pigs.every(p=>p.noFeed)?'No feed':pe.switchDue?'Formula due':'';
@@ -278,22 +266,23 @@ function penFeedEntry(pe){
 function pigRow(c,p){
  const cs=cases(p);
  const metadata=stageSummary(p);
- const tags=[...cs.slice().sort((a,b)=>Number(needsHealthAttention(b))-Number(needsHealthAttention(a))).map(k=>({label:k.name,day:Number.isFinite(k.day)?(issueStatus(k)==='ongoing'?k.day+' days':'Day '+k.day):'',...careAppearance(k)})),...pigFeedTags(p)];
+ const tags=[...cs.slice().sort((a,b)=>(Number.isFinite(a.day)?a.day:Infinity)-(Number.isFinite(b.day)?b.day:Infinity)||Number(needsHealthAttention(b))-Number(needsHealthAttention(a))).map(k=>({label:k.name,day:Number.isFinite(k.day)?(issueStatus(k)==='ongoing'?k.day+' days':'Day '+k.day):'',...careAppearance(k)})),...pigFeedTags(p)];
  const labels=tags.map(recordedTag).join('');
  const accessible=[p.id,metadata,...tags.map(tagDescription)].filter(Boolean).join('. ');
  const content='<span class="roster-content"><span class="roster-top"><strong class="roster-id">'+p.id+'</strong><span class="roster-meta" title="'+esc(metadata)+'">'+esc(metadata)+'</span></span>'+(labels?'<span class="roster-second"><span class="recorded-tags">'+labels+'<span class="tag-more" hidden></span></span></span>':'')+'</span>';
  return SentriUI.rowSelectDoor({className:'inspect-pig roster-pig'+(c.selected.has(p.id)?' selected':''),doorClass:'pig-open',action:'',contentHtml:content,checked:c.selected.has(p.id),value:p.id,openAction:'pig',openValue:p.id,label:accessible,inputAttrs:{'data-pig-select':p.id,'aria-label':'Select pig '+p.id}});
 }
 function dockBulkDetails(root){root._detailsObserver?.disconnect();}
+/* The newest condition leads. Tags wrap onto a second line before any is hidden; only what still does not fit in two lines
+   collapses into "+N more". A tag is never cut: one tag may be as wide as the line. */
 function fitRecordedTags(root){
  root.querySelectorAll('.recorded-tags').forEach(line=>{
   const tags=[...line.querySelectorAll('.st-condition')],more=line.querySelector('.tag-more'),width=line.clientWidth;
   if(!width)return;
-  tags.forEach(tag=>{tag.hidden=false;tag.style.maxWidth=Math.min(tags.length>1?160:width,width)+'px';});more.hidden=true;
-  const gap=4;let shown=tags.length;
-  const used=()=>tags.slice(0,shown).reduce((sum,t)=>sum+t.getBoundingClientRect().width,0)+Math.max(0,shown-1)*gap+(more.hidden?0:more.getBoundingClientRect().width+gap);
-  while(shown>1&&used()>width){tags[--shown].hidden=true;more.hidden=false;more.textContent='+'+(tags.length-shown);}
-  if(!more.hidden){if(shown===1)tags[0].style.maxWidth=Math.max(0,width-more.getBoundingClientRect().width-gap)+'px';more.title=(tags.length-shown)+' more · open pig details';}
+  tags.forEach(tag=>{tag.hidden=false;tag.style.maxWidth=width+'px';});more.hidden=true;
+  const lines=()=>new Set([...tags.filter(t=>!t.hidden),...(more.hidden?[]:[more])].map(t=>Math.round(t.offsetTop))).size;
+  let shown=tags.length;
+  while(shown>1&&lines()>2){tags[--shown].hidden=true;more.hidden=false;more.textContent='+'+(tags.length-shown)+' more';}
  });
 }
 function displayPigs(c,pe){return visiblePigs(c,pe);}
@@ -473,7 +462,7 @@ function pigCurrentTasks(c){
  return '<section class="pig-current-tasks" aria-label="Current tasks">'+heading+'<div class="pig-current-task-list" role="region" aria-label="Current task cards" tabindex="0" data-task-count="'+tasks.length+'">'+tasks.map(t=>{const type=t.type||'General',slug=type.toLowerCase().replace(/[^a-z0-9]+/g,'-'),state=/in progress/i.test(t.status||'')?' is-active':/due today|today/i.test(t.status||'')?' is-due':'';return button(t.action||'sow-current-task','<span class="pig-current-task-icon">'+icon(taskIcon(t))+'</span><span class="pig-current-task-copy"><strong>'+esc(t.title)+'</strong><small>'+esc([t.status,t.summary].filter(Boolean).join(' · '))+'</small></span><span class="pig-current-task-type">'+esc(type)+'</span>'+icon('chevron'),'pig-current-task-entry task-'+slug+state,t.value||t.id);}).join('')+'</div></section>';
 }
 function pigFeedFacts(p,pe){
- if(pe.mode==='unknown')return '<section class="detail-section reading-section pig-feeding-facts">'+stHeading({title:'Feeding',icon:icon('feed'),kind:'section',level:4})+'<p class="detail-empty facts-surface">No feeding plan recorded.</p></section>';
+ if(pe.mode==='unknown')return '';
  const amount=pe.mode==='adlib'?'Ad-lib':quantity(pigAllocation(p,pe))+' <small>kg/day</small>';
  const context=pe.mode==='station'?'Station-fed':pe.mode==='trough'?'Included in pen allocation':'No fixed ration';
  const tags=pigFeedTags(p).map(t=>t.kind==='ration'?{...t,label:'Feed '+t.delta,day:feedAdjustmentReason(p)}:t);
@@ -495,11 +484,11 @@ function overviewNextTask(p,c){
 // One fact for Facts: an empty value draws the em dash and no trail.
 function factItem(label,value,unit='',meta='',mono=false){const has=hasRecordValue(value);return {label,value:has?value+(unit?(unit==='%'?'':' ')+unit:''):null,meta:has?meta:'',mono};}
 function overviewDetails(p,c){
- const r=p.registry||{},facts=[factItem('Age',p.age??daysFromWalk(r.birthDate),'days'),factItem('Type',animalType(p)),factItem('Breed',r.breed),factItem('Batch',p.batchId)];
+ const r=p.registry||{},facts=[factItem('Age',p.age??daysFromWalk(r.birthDate),'days'),factItem('Type',animalType(p)),{...factItem('Breed',r.breed),inline:String(r.breed||'').length>12},factItem('Batch',p.batchId)];
  for(const [key,label,unit] of [['weight','Weight','kg'],['temperature','Temperature','°C']])facts.push(factItem(label,p[key],unit,measurementAge(p,key)));
  facts.push(factItem('On farm',r.onFarm===undefined?null:r.onFarm?'Yes':'No'));
  
- return stFacts(facts);
+ const known=knownFacts(facts);return known.length?stFacts(known):'';
 }
 function typeDetails(p,c){
  const r=p.registry||{},type=animalType(p);let title='',items=[];
@@ -512,8 +501,10 @@ function typeDetails(p,c){
  else if(['Grower','Finisher','Weaner'].includes(type)){title='Growth';items=[['Entry weight',r.entryWeight,'kg'],['Entry date',r.growthEntryDate]];}
  if(!title)return '';
  const titleHeading=stHeading({title,icon:icon(type==='Sow'||type==='Gilt'?'clock':type==='Boar'?'profile':'weight'),kind:'section',level:4});
- return '<section class="detail-section reading-section animal-type-section">'+titleHeading+stFacts([...items.map(([label,value,unit,meta,mono])=>factItem(label,value,unit,meta,mono)),overviewNextTask(p,c),...(['Sow','Gilt'].includes(type)?[factItem('Parity',p.parity)]:[])])+'</section>';
+ const known=knownFacts([...items.map(([label,value,unit,meta,mono])=>factItem(label,shortDate(value),unit,meta,mono)),overviewNextTask(p,c),...(['Sow','Gilt'].includes(type)?[factItem('Parity',p.parity)]:[])]);return known.length?'<section class="detail-section reading-section animal-type-section">'+titleHeading+stFacts(known)+'</section>':'';
 }
+/* A date the way the rest of the app writes it: "May 21", with the year only when it is not this one. */
+function shortDate(date){const m=/^([0-9]{4})-([0-9]{2})-([0-9]{2})$/.exec(date||'');if(!m)return date;const name=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+m[2]-1];return name+' '+(+m[3])+(m[1]!==walkDate.slice(0,4)?', '+m[1]:'');}
 function measurementDateAge(date){const days=daysFromWalk(date);return days===null?'':days===0?'Today':days>0?days+' days ago':'';}
 function dueDateLabel(date){const days=daysFromWalk(date);return days===null?'':days===0?'Today':days<0?'In '+(-days)+' days':days+' days past expected';}
 function pigRecordToolbar(p){return SentriUI.sheetFooter({content:back()+button('pig-actions',`${icon('grid')}<span>More actions</span>`,'button primary pig-actions-entry',p.id),className:'pig-detail-footer'});}
@@ -522,7 +513,7 @@ function pigOverview(c){
 
  const general=stHeading({title:'General details',icon:icon('profile'),kind:'section',level:4});
  const record=stHeading({title:'Pig record',icon:icon('note'),kind:'section',level:4});
- return sheet(c,p.id,unitName(c)+' · '+pe.id+' · '+stageSummary(p),pigRecordCards(p)+pigCurrentTasks(c)+'<section class="detail-section reading-section pig-overview-facts">'+general+overviewDetails(p,c)+'</section>'+typeDetails(p,c)+pigFeedFacts(p,pe)+'<section class="detail-section reading-section pig-record-links">'+record+'<div class="compact-actions detail-destinations st-panel st-row-group">'+action('pig-production','chart','Production stats','Averages and batch records',p.id)+action('pig-origin','origin','Origin','Provenance, dates and identities',p.id)+action('pig-log','clock','Log','Production, health and movement',p.id)+'</div></section>',pigRecordToolbar(p));
+ return sheet(c,p.id,unitName(c)+' · '+pe.id+' · '+stageSummary(p),pigRecordCards(p)+pigCurrentTasks(c)+(()=>{const d=overviewDetails(p,c);return d?'<section class="detail-section reading-section pig-overview-facts">'+general+d+'</section>':''})()+typeDetails(p,c)+pigFeedFacts(p,pe)+'<section class="detail-section reading-section pig-record-links">'+record+'<div class="compact-actions detail-destinations st-panel st-row-group">'+action('pig-production','chart','Production stats','Averages and batch records',p.id)+action('pig-origin','origin','Origin','Provenance, dates and identities',p.id)+action('pig-log','clock','Log','Production, health and movement',p.id)+'</div></section>',pigRecordToolbar(p));
 }
 function penOverview(c){const pe=pen(c,c.penId),records=[];if(pe.note)records.push(recordCard({kind:'Pen note',title:pe.note,meta:pe.noteBy,tone:'record-neutral record-note-preview',link:'read-pen-note',value:pe.id}));return sheet(c,'Pen '+pe.id,countLabel(pe.pigs.length)+' · '+unitName(c),
  (records.length?'<div class="record-card-stack" aria-label="Pen notes">'+records.join('')+'</div>':'')+'<section class="detail-section">'+stHeading({title:'Pen information',icon:icon('grid'),kind:'section',level:4})+'<div class="compact-actions st-panel st-row-group">'+action('feed','feed','Feed guidance',pe.formula+' · '+feedLabel(pe),pe.id)+action('pen-note','note',pe.note?'Edit pen note':'Add pen note',pe.note?'Update the note for this pen':'Leave information for the next person',pe.id)+action('pen-log','clock','Pen log','Transfers, health and notes',pe.id)+'</div></section>',footer(back(),''));}
@@ -613,24 +604,26 @@ function bulkSelect(c,label,key,options,error=''){return fieldSelect(c,label,key
    own facts help the choice; a row that will change says nothing, the commit carries the count. */
 const bulkSamePrompt=['Choose conditions','Complete treatment details','No note entered','No reading · unchanged'];
 function bulkRowState(row,view){if(row.change&&row.eligible&&!row.error)return '';if(view==='treatment'&&row.eligible&&!row.error)return '';if(row.eligible&&!row.error&&!row.change&&bulkSamePrompt.includes(row.summary))return '';return !row.eligible||row.error?row.summary:row.change?'Ready to save':row.summary;}
+/* "C1 · Gestation · 40 days" breaks only after a "·", never inside "40 days". */
+function bulkMeta(text){return String(text).split(' · ').map(part=>esc(part).replace(/ /g,'&nbsp;')).join('&nbsp;· ');}
 function bulkRows(c){
  const f=c.form,m=bulkMeasurements[c.view],dose=c.view==='treatment',firstMissing=f.showRequired&&m&&!bulkActionValid(c)?bulkChanges(c).find(r=>r.eligible&&!r.change)?.id:'';
  return bulkChanges(c).map(row=>{
   const p=row.p,blocked=p?.stage==='Sow died'&&c.view!=='note'||c.view==='backfat'&&!['Sow','Gilt'].includes(animalType(p));
   const value=m?f.values[row.id]:Object.hasOwn(f.values,row.id)?f.values[row.id]:f.dose;
   const state=bulkRowState(row,c.view);
-  const change=(m||dose)?'<span class="pig-review-change bulk-pig-change"><span class="feed-pig-values">'+(m?'<span class="feed-reading"><small>Current</small><span>'+esc(p?.[c.view]??'—')+'</span></span><span class="feed-change-arrow" aria-hidden="true">→</span>':'')+'<label class="feed-reading is-new bulk-reading">'+(m?'<small>New</small>':'')+'<input type="number" inputmode="decimal" min="0" step="any" data-bulk-value="'+esc(row.id)+'" value="'+esc(value??'')+'" aria-label="'+(m?m.label:'Dose')+' for '+esc(row.id)+'" placeholder="—"'+(!row.eligible?' disabled':'')+' aria-invalid="'+(row.error||row.id===firstMissing)+'"></label></span><small class="feed-change-state" data-bulk-summary="'+esc(row.id)+'"'+(!state?' hidden':'')+'>'+esc(state)+'</small></span>':'<span class="pig-review-change bulk-pig-change"><small class="feed-change-state" data-bulk-summary="'+esc(row.id)+'"'+(!state?' hidden':'')+'>'+esc(state)+'</small></span>';
+  const change=(m||dose)?'<span class="pig-review-change bulk-pig-change"><span class="feed-pig-values">'+(m?'<span class="feed-reading"><small>Current</small><span>'+esc(p?.[c.view]??'—')+'</span></span><span class="feed-change-arrow" aria-hidden="true">→</span>':'')+'<label class="feed-reading is-new bulk-reading">'+(m?'<small>New</small>':'')+'<input type="number" inputmode="decimal" min="0" step="any" data-bulk-value="'+esc(row.id)+'" value="'+esc(value??'')+'" aria-label="'+(m?m.label:'Dose')+' for '+esc(row.id)+'" placeholder="—"'+(!row.eligible?' disabled':'')+' aria-invalid="'+(row.error||row.id===firstMissing)+'">'+(dose&&f.doseUnit?'<span class="bulk-unit" aria-hidden="true">'+esc(f.doseUnit)+'</span>':'')+'</label></span><small class="feed-change-state" data-bulk-summary="'+esc(row.id)+'"'+(!state?' hidden':'')+'>'+esc(state)+'</small></span>':'<span class="pig-review-change bulk-pig-change"><small class="feed-change-state" data-bulk-summary="'+esc(row.id)+'"'+(!state?' hidden':'')+'>'+esc(state)+'</small></span>';
   const include=f.bulk?'<label class="bulk-pig-check"><input type="checkbox" data-bulk-include="'+esc(row.id)+'" aria-label="Include pig '+esc(row.id)+'"'+(!f.excluded.includes(row.id)&&!blocked?' checked':'')+(blocked?' disabled':'')+'></label>':'';
-  return '<div class="pig-review-row bulk-pig-row'+(!f.bulk?' is-single':'')+(!row.eligible?' is-excluded':row.change?' is-changed':' is-unchanged')+'">'+include+'<span class="pig-review-identity bulk-pig-copy"><strong>'+esc(row.id)+'</strong><small>'+esc(p?penOf(c,row.id).id+' · '+stageSummary(p):'Unavailable')+'</small>'+(c.view==='resolve'&&row.finding?.feedLinked?'<small>Resets linked feed adjustment</small>':'')+'</span>'+change+'</div>';
+  return '<div class="pig-review-row bulk-pig-row'+(!f.bulk?' is-single':'')+(!row.eligible?' is-excluded':row.change?' is-changed':' is-unchanged')+'">'+include+'<span class="pig-review-identity bulk-pig-copy"><strong>'+esc(row.id)+'</strong><small>'+(p?bulkMeta(penOf(c,row.id).id+' · '+stageSummary(p)):'Unavailable')+'</small>'+(c.view==='resolve'&&row.finding?.feedLinked?'<small>Resets linked feed adjustment</small>':'')+'</span>'+change+'</div>';
  }).join('');
 }
 // The bulk action page (one component, every use): the selected pigs as one list of select rows on top, and the details
 // docked on the bottom edge above the footer: one surface with the footer (paper, a rule above, no card, no shadow).
 // The list and the dock share the page: the list takes what the dock leaves and scrolls on its own; the dock is capped and
 // scrolls on its own; neither sits inside the other. The dock's heading folds it away to give the list the room.
-function bulkListOverlay(c,{kind,rowsHtml,heading,sub,column,toggleLabel,controlsHtml,short,listClass='',overlayClass='',layoutClass='',collapsed}){
+function bulkListOverlay(c,{kind,rowsHtml,heading,sub,column,headHtml,summary='',toggleLabel,controlsHtml,short,listClass='',overlayClass='',layoutClass='',collapsed}){
  collapsed=collapsed??!!c.form.controlsCollapsed;
- return '<div class="bulk-action-layout'+(layoutClass?' '+esc(layoutClass):'')+(short?' is-short':'')+'" data-bulk-kind="'+esc(kind)+'"><section class="pig-review-card bulk-pigs'+(short?' is-short':'')+'"><div class="pig-review-heading feed-pigs-heading"><span><h4>'+esc(heading)+'</h4>'+(sub?'<small>'+esc(sub)+'</small>':'')+'</span>'+(column?'<strong>'+column+'</strong>':'')+'</div><div class="pig-review-list bulk-pig-list'+(listClass?' '+esc(listClass):'')+'" role="region" aria-label="'+esc(heading)+'" tabindex="0" data-bulk-rows>'+rowsHtml+'</div></section><section class="bulk-controls bulk-dock'+(overlayClass?' '+esc(overlayClass):'')+(collapsed?' is-collapsed':'')+'" aria-label="'+esc(toggleLabel)+'">'+button('bulk-toggle-controls','<span>'+esc(toggleLabel)+'</span>'+icon('chevron'),'bulk-controls-toggle').replace('<button','<button aria-expanded="'+!collapsed+'"')+(!collapsed?'<div class="bulk-control-fields">'+controlsHtml+'</div>':'')+'</section></div>';
+ return '<div class="bulk-action-layout'+(layoutClass?' '+esc(layoutClass):'')+(short?' is-short':'')+'" data-bulk-kind="'+esc(kind)+'"><section class="pig-review-card bulk-pigs'+(short?' is-short':'')+'">'+(headHtml||'<div class="pig-review-heading feed-pigs-heading"><span><h4>'+esc(heading)+'</h4>'+(sub?'<small>'+esc(sub)+'</small>':'')+'</span>'+(column?'<strong>'+column+'</strong>':'')+'</div>')+'<div class="pig-review-list bulk-pig-list'+(listClass?' '+esc(listClass):'')+'" role="region" aria-label="'+esc(heading)+'" tabindex="0" data-bulk-rows>'+rowsHtml+'</div></section><section class="bulk-controls bulk-dock'+(overlayClass?' '+esc(overlayClass):'')+(collapsed?' is-collapsed':'')+'" aria-label="'+esc(toggleLabel)+'">'+button('bulk-toggle-controls','<span class="bulk-toggle-text"><span>'+esc(toggleLabel)+'</span>'+(collapsed&&summary?'<small>'+esc(summary)+'</small>':'')+'</span>'+icon('chevron'),'bulk-controls-toggle').replace('<button','<button aria-expanded="'+!collapsed+'"')+(!collapsed?'<div class="bulk-control-fields">'+controlsHtml+'</div>':'')+'</section></div>';
 }
 function bulkWaitingReason(c){
  const f=c.form,view=c.view;
@@ -650,22 +643,37 @@ function bulkCommit(c){
 function refreshBulkCommit(root,c){
  const footer=root.querySelector('.phone > .sheet > .sheet-footer');
  if(!footer)return;
- const reason=footer.previousElementSibling;if(reason?.classList.contains('st-button-reason'))reason.remove();
  footer.outerHTML=SentriUI.sheetFooter({content:back()+bulkCommit(c)});
 }
 /* Tapping a waiting Save marks the empty required fields "Required" (f.showRequired) and scrolls to the first; no line is
    drawn above the footer. */
+/* One shortcut, said once: "Same dose for all" fills every pig's dose; each pig's own box stays editable. The unit sits with
+   the dose it measures. */
+function bulkDoseControl(c,{single,label,needDose,needUnit}){
+ const f=c.form;
+ pickerEntry(c,'doseUnit',{items:[['','Choose unit'],['mL','mL'],['mg','mg'],['g','g']],label:'Unit',target:'bulk',value:f.doseUnit||''});
+ const unit='<button type="button" class="bulk-unit-button'+(needUnit?' is-invalid':'')+'" data-action="open-picker" data-picker-key="doseUnit" aria-haspopup="dialog" aria-label="Dose unit, '+esc(f.doseUnit||'not chosen')+'"'+(needUnit?' aria-invalid="true"':'')+'><span>'+esc(f.doseUnit||'Unit')+'</span>'+icon('chevron')+'</button>';
+ const input='<input data-bulk-key="dose" type="number" min="0" step="any" inputmode="decimal" aria-label="'+esc(label)+'" placeholder="—" value="'+esc(f.dose||'')+'"'+(needDose?' aria-invalid="true"':'')+'>';
+ const box='<span class="bulk-reading bulk-same-box'+(needDose?' is-invalid':'')+'">'+input+unit+'</span>';
+ return single?'<div class="field bulk-dose-field"><span>'+esc(label)+(needDose?' <small class="bulk-required">'+needDose+'</small>':'')+'</span>'+box+'</div>':'<div class="bulk-same-dose"><span class="bulk-same-label">'+esc(label)+(needDose?'<small class="bulk-required">'+needDose+'</small>':'')+'</span>'+box+'</div>';
+}
+function bulkDetailsSummary(c){
+ const f=c.form;
+ if(c.view==='treatment')return [f.medicine.trim(),f.method].filter(Boolean).join(' · ');
+ if(c.view==='health')return f.conditions.length?f.conditions.join(' · ')+' · '+careLabel(f.triage):'';
+ return '';
+}
 function bulkActionPage(c){
  const f=c.form,view=c.view,single=!f.bulk,conditions=[...new Set(f.subjects.flatMap(id=>cases(pig(c,id)).map(k=>k.name)))],need=v=>f.showRequired&&!v?'Required':'';
- const target=bulkSelect(c,'Condition','target',[['','Choose condition'],...conditions.map(n=>[n,n])],need(f.target));let controls='';
+ const target=bulkSelect(c,'Condition','target',[['','Choose condition'],...conditions.map(n=>[n,n])],need(f.target));let controls='',sameDose='';
  if(view==='health')controls=SentriUI.pickerField({label:'Conditions',strs:{label:'ds.picker.conditions'},variant:'cascade-multi',selected:f.conditions,names:f.conditions,action:'bulk-pick-health',error:need(f.conditions.length),required:true})+bulkSelect(c,'Care','triage',careOptions);
  if(view==='edit-conditions'||view==='triage')controls=target+bulkSelect(c,'Care','triage',[['keep','Keep current care'],...careOptions],f.target&&f.showRequired&&!bulkActionValid(c)?'Required':'');
  if(view==='resolve')controls=target+bulkSelect(c,'Outcome','outcome',[['','Choose outcome'],['recover','Recovered'],['strike','Entered in error']],need(f.outcome));
  if(view==='treatment'){
   const method=bulkSelect(c,'Method','method',[['','Choose method'],['Injection','Injection'],['Oral','Oral'],['Topical','Topical'],['In feed','In feed'],['In water','In water']],need(f.method));
   const anyDose=String(f.dose||'').trim()!==''||Object.values(f.values||{}).some(v=>String(v).trim()!=='');
-  const dose=SentriUI.field({label:single?'Dose':'Set dose for all',unit:f.doseUnit||'',variant:'number',error:need(anyDose),control:'<input data-bulk-key="dose" type="number" min="0" step="any" inputmode="decimal" value="'+esc(f.dose||'')+'"'+(need(anyDose)?' aria-invalid="true"':'')+'>'}),unit=bulkSelect(c,'Unit','doseUnit',[['','Choose unit'],['mL','mL'],['mg','mg'],['g','g']],need(f.doseUnit));
-  controls=SentriUI.pickerField({label:f.taskId==='vaccination'?'Vaccine':'Medicine',value:f.medicine,path:f.medicinePath||[],action:'medicine-open',variant:'cascade',error:need(f.medicine.trim()),required:true})+method+unit+dose+(f.returnFinding?'<div class="field">Condition<strong>'+esc(f.returnFinding)+'</strong></div>':'');
+  const dose=bulkDoseControl(c,{single,label:single?'Dose':'Same dose for all',needDose:need(anyDose),needUnit:need(f.doseUnit)});
+  controls=SentriUI.pickerField({label:f.taskId==='vaccination'?'Vaccine':'Medicine',value:f.medicine,path:f.medicinePath||[],action:'medicine-open',variant:'cascade',error:need(f.medicine.trim()),required:true})+method+(single?dose:'')+(f.returnFinding?'<div class="field">Condition<strong>'+esc(f.returnFinding)+'</strong></div>':'');sameDose=single?'':dose;
  }
  if(view==='body')controls=bulkSelect(c,'Condition','condition',[['','Choose condition'],['Thin','Thin'],['Over-conditioned','Over-conditioned']],need(f.condition));
  const note=view==='note'?(SentriUI.field({label:"Note",error:need(f.note.trim()),control:"<textarea data-bulk-key=\"note\" rows=\"2\""+(need(f.note.trim())?' aria-invalid="true"':'')+">"+(esc(f.note))+"</textarea>"})):recordOptionalControls(c);
@@ -676,7 +684,7 @@ function bulkActionPage(c){
   const title=f.taskId==='vaccination'?'Record vaccination':m?'Record '+m.label.toLowerCase():bulkTitles[view];
   return sheet(c,title,p.id+' · '+penOf(c,p.id).id,'<section class="bulk-controls single-controls" aria-label="Record details">'+controls+note+'</section>',footer(back(),bulkCommit(c))).replace('class="sheet"','class="sheet single-action-sheet"');
  }
- const body=bulkListOverlay(c,{kind:view,rowsHtml:bulkRows(c),heading:'Pigs',sub:'',column:(bulkMeasurements[view]?'Current → New · '+bulkMeasurements[view].unit:view==='treatment'?'Dose'+(f.doseUnit?' · '+esc(f.doseUnit):''):''),toggleLabel:view==='treatment'?'Treatment details':'Details',controlsHtml:controls+note,short:f.subjects.length<=3});
+ const body=bulkListOverlay(c,{kind:view,rowsHtml:bulkRows(c),heading:'Pigs',sub:'',column:(bulkMeasurements[view]?'Current → New · '+bulkMeasurements[view].unit:''),headHtml:sameDose,summary:bulkDetailsSummary(c),toggleLabel:view==='treatment'?'Treatment details':'Details',controlsHtml:controls+note,short:f.subjects.length<=3});
  return sheet(c,bulkTitles[view],countLabel(f.subjects.length),body,footer(back(),bulkCommit(c))).replace('class="sheet"','class="sheet bulk-action-sheet"');
 }
 // Sample catalogue illustrates browsing and selection; it is not a treatment recommendation.
@@ -689,7 +697,7 @@ const medicineCatalogue=[
  {id:'vaccine-b',category:'Vaccines',name:'Vaccine B',detail:'Oral suspension · Sample product'}
 ];
 function medicineTree(c){return [...new Set(medicineCatalogue.filter(m=>c.form.taskId!=='vaccination'||m.category==='Vaccines').map(m=>m.category))].map(category=>({value:category,label:category,children:medicineCatalogue.filter(m=>m.category===category).map(m=>({value:m.id,label:m.name,meta:m.detail.replace(' · Sample product','')}))}));}
-function medicineResults(c){return SentriUI.pickerBody({variant:'cascade',items:medicineTree(c),path:c.form.medicineCategory?[c.form.medicineCategory]:[],selected:[c.form.medicineId],query:c.form.medicineSearch||'',action:'medicine-select',stepAction:'medicine-step',searchAttrs:{'data-medicine-search':''}});}
+function medicineResults(c){return searchAllBody({variant:'cascade',items:medicineTree(c),path:c.form.medicineCategory?[c.form.medicineCategory]:[],selected:[c.form.medicineId],query:c.form.medicineSearch||'',action:'medicine-select',stepAction:'medicine-step',searchAttrs:{'data-medicine-search':''}});}
 function medicinePicker(c){return sheet(c,c.form.taskId==='vaccination'?'Vaccines':'Medicines','','<div class="medicine-results">'+medicineResults(c)+'</div>',SentriUI.pickerFooter({multi:false})).replace('class="sheet"','class="sheet picker-step medicine-picker-step"');}
 function optionalFieldControls(items,openAction){return '<div class="st-optional-list">'+items.map(({key,label,value})=>stOptionalRow({label:label.replace(/^Add /,'').replace(/^./,m=>m.toUpperCase()),value,icon:icon('plus'),editIcon:icon('edit'),action:openAction,key})).join('')+'</div>';}
 function optNote(label,field,value){return stOptionalRow({label,value,icon:icon('plus'),editIcon:icon('edit'),inline:field});}
@@ -730,31 +738,49 @@ function recordOptionalEditor(c){
   return sheet(c,'Link condition','',(root||f.search?SentriUI.choiceSearch({label:'Search conditions',placeholder:'Search diseases and symptoms',value:f.search||'',attrs:{'data-v2':'search'}}):'')+'<div class="health-catalog st-choice-body">'+linkConditionResults(c)+'</div>',footer(back(),'')).replace('class="sheet"','class="sheet picker-step health-picker-step condition-link-picker-step"');
  }
  const brand=key==='brand',title=brand?'Add a brand':'Note';
- const control=brand?'<input maxlength="80" data-record-optional-input autofocus value="'+esc(value)+'">':'<textarea aria-label="Treatment note" rows="5" data-record-optional-input>'+esc(value)+'</textarea>';
+ const control=brand?'<input maxlength="80" data-record-optional-input autofocus value="'+esc(value)+'">':'<textarea aria-label="Note" rows="5" data-record-optional-input>'+esc(value)+'</textarea>';
  const field=brand?SentriUI.field({label:'Brand name',control,error:f.showRequired&&!value.trim()?'Required':''}):SentriUI.field({label:'Note',labelHidden:true,control});
  return sheet(c,title,'',field,footer(back(),button('record-optional-save',brand?'Add brand':'Done','button primary','',brand?!value.trim():!optionalEditorChanged(c)))).replace('class="sheet"','class="sheet feed-optional-sheet"');
 }
 
 function conditionMeta(c,n){const recorded=c.form.subjects.filter(id=>cases(pig(c,id)).some(k=>k.name===n.name)).length;return [n.custom?'Custom':'',recorded?'Already on '+countLabel(recorded):''].filter(Boolean).join(' · ');}
 function conditionTree(c){return ['Disease','Symptom'].map(kind=>({value:kind,label:kind==='Disease'?'Diseases':'Symptoms',children:[...new Set(healthCatalogue(c.form).filter(n=>n.kind===kind).map(n=>n.group))].map(group=>({value:group,label:group,children:healthCatalogue(c.form).filter(n=>n.kind===kind&&n.group===group).map(n=>({value:n.name,label:n.name,aliases:n.aliases,secondaryAction:n.custom?{label:'Remove custom condition',action:'health-remove-custom'}:undefined,meta:conditionMeta(c,n),attrs:{'data-condition':n.name,'data-condition-kind':kind}}))}))}));}
-function bulkHealthBody(c){if(c.form.customDraft)return customCategoryPicker(c);return SentriUI.pickerBody({variant:'cascade-multi',items:conditionTree(c),selected:c.form.conditions,path:c.form.conditionPath||[],query:c.form.search||'',action:'condition-level',stepAction:'condition-step',searchAttrs:{'data-v2':'search'}})+(c.form.search?.trim()&&!healthCatalogue(c.form).some(n=>normalizedCondition(n.name)===normalizedCondition(c.form.search))?button('health-add-custom','Add “'+esc(c.form.search.trim())+'” · '+c.form.kind.toLowerCase(),'st-text-action',c.form.search.trim()):'');}
+/* Search finds what exists: it always covers the whole catalogue, whatever level is open, and each result says its category
+   ("Coughing" · "Respiratory system"). "Add …" is offered only when nothing matches. Browsing keeps its level; the search
+   box says "Search all options" at every level so it never claims a scope it does not have. */
+function searchAllBody({variant,items,path=[],query='',action,stepAction,searchAttrs,selected}){
+ const q=query.trim().toLocaleLowerCase(),search=SentriUI.choiceSearch({label:'Search all options',value:query,attrs:searchAttrs,strs:{label:'ds.picker.search',placeholder:'ds.picker.search'}});
+ const swap=html=>html.replace(/<label class="field catalog-search st-choice-search"[^]*?<[/]label>/,()=>search);
+ if(!q)return swap(SentriUI.pickerBody({variant,items,path,query:'',selected,action,stepAction,searchAttrs}));
+ const leaves=(nodes,trail=[])=>nodes.flatMap(n=>n.children?leaves(n.children,[...trail,n.label]):[{...n,trail}]);
+ const hits=leaves(items).filter(n=>[n.label,...n.trail,...(n.aliases||[])].join(' ').toLocaleLowerCase().includes(q)).map(n=>({...n,aliases:[...(n.aliases||[]),...n.trail],meta:[n.trail[n.trail.length-1],n.meta].filter(Boolean).join(' · ')}));
+ return hits.length?swap(SentriUI.pickerBody({variant,items:hits,path:[],query:'',selected,action,stepAction,searchAttrs})):'<div class="st-picker-body" data-ds="PickerField" data-variant="'+variant+'">'+search+SentriUI.choiceEmpty('No options match “'+query+'”.',{strs:{text:'ds.picker.no_match'},args:{text:{query}}})+'</div>';
+}
+function bulkHealthBody(c){if(c.form.customDraft)return customCategoryPicker(c);const q=(c.form.search||'').trim(),body=searchAllBody({variant:'cascade-multi',items:conditionTree(c),selected:c.form.conditions,path:c.form.conditionPath||[],query:c.form.search||'',action:'condition-level',stepAction:'condition-step',searchAttrs:{'data-v2':'search'}});return body+(q&&body.includes('st-choice-empty')?button('health-add-custom','Add “'+esc(q)+'” · '+c.form.kind.toLowerCase(),'st-text-action',q):'');}
 /* Back (and the scrim) close the condition picker without applying: the trigger keeps what was applied, and the ticks
    stay as a draft that the next open shows again. Done · n applies them. */
 function leaveConditionPicker(c){const f=c.form,applied=f.conditionsBeforePicker||[],draft=f.conditions||[];if(draft.length!==applied.length||draft.some(n=>!applied.includes(n)))f.conditionsDraft=[...draft];else delete f.conditionsDraft;f.conditions=[...applied];delete f.conditionsBeforePicker;delete f.customDraft;c.view='health';}
+/* Results span every level, so while a search is open the head names the root and the "‹ Parent" steps out of the way. */
+function searchHeader(sheet,searching,rootTitle){
+ const title=sheet?.querySelector('.sheet-title'),up=sheet?.querySelector('.sheet-up');
+ if(title){if(searching){if(title.dataset.level===undefined)title.dataset.level=title.textContent;title.textContent=rootTitle;}else if(title.dataset.level!==undefined){title.textContent=title.dataset.level;delete title.dataset.level;}}
+ if(up)up.style.visibility=searching?'hidden':'';
+}
 function bulkHealthPicker(c){return sheet(c,'Conditions','','<div class="health-catalog">'+bulkHealthBody(c)+'</div>',SentriUI.pickerFooter({selected:c.form.conditions,multi:true,waiting:!c.form.conditions.length&&!(c.form.conditionsBeforePicker||[]).length,doneAction:'bulk-health-done'})).replace('class="sheet"','class="sheet picker-step health-picker-step"');}
 function installBulkInputs(){
- gallery.addEventListener('input',e=>{const el=e.target,root=el.closest('[data-card]');if(!root)return;const c=states[+root.dataset.card];if(el.hasAttribute('data-medicine-search')){e.stopImmediatePropagation();c.form.medicineSearch=el.value;root.querySelector('.medicine-results').innerHTML=medicineResults(c);const input=root.querySelector('[data-medicine-search]');input.focus();input.setSelectionRange(el.value.length,el.value.length);}else if(el.hasAttribute('data-record-optional-input')){e.stopImmediatePropagation();c.form.optionalDraft=el.value;setCommitWaiting(root.querySelector('[data-action=\"record-optional-save\"]'),!optionalEditorChanged(c)||(c.view==='record-optional'&&c.form.optionalKey==='brand'&&!c.form.optionalDraft.trim()));}},true);
+ gallery.addEventListener('input',e=>{const el=e.target,root=el.closest('[data-card]');if(!root)return;const c=states[+root.dataset.card];if(el.hasAttribute('data-medicine-search')){e.stopImmediatePropagation();c.form.medicineSearch=el.value;root.querySelector('.medicine-results').innerHTML=medicineResults(c);searchHeader(root.querySelector('.sheet'),!!el.value.trim(),c.form.taskId==='vaccination'?'Vaccines':'Medicines');const input=root.querySelector('[data-medicine-search]');input.focus();input.setSelectionRange(el.value.length,el.value.length);}else if(el.hasAttribute('data-record-optional-input')){e.stopImmediatePropagation();c.form.optionalDraft=el.value;setCommitWaiting(root.querySelector('[data-action=\"record-optional-save\"]'),!optionalEditorChanged(c)||(c.view==='record-optional'&&c.form.optionalKey==='brand'&&!c.form.optionalDraft.trim()));}},true);
  gallery.addEventListener('change',e=>{if(!e.target.hasAttribute('data-record-optional-input'))return;e.stopImmediatePropagation();const root=e.target.closest('[data-card]');const c=states[+root.dataset.card];c.form.optionalDraft=e.target.value;setCommitWaiting(root.querySelector('[data-action=\"record-optional-save\"]'),!optionalEditorChanged(c)||(c.view==='record-optional'&&c.form.optionalKey==='brand'&&!c.form.optionalDraft.trim()));},true);
 
  const update=(e)=>{
   const el=e.target,root=el.closest('[data-card]');if(!root)return;
   const i=+root.dataset.card,c=states[i];if(!c.form?.recordEditor)return;
   if(!el.hasAttribute('data-bulk-key')&&!el.hasAttribute('data-bulk-value')&&!el.hasAttribute('data-bulk-include'))return;
-  e.stopImmediatePropagation();const f=c.form;
+  e.stopImmediatePropagation();if(e.type==='change'&&!el.hasAttribute('data-bulk-include'))return; /* input already applied it; redrawing the rows on blur would drop the tap that caused the blur */
+  const f=c.form;
   if(el.hasAttribute('data-bulk-include')){f.excluded=el.checked?f.excluded.filter(id=>id!==el.dataset.bulkInclude):[...new Set([...f.excluded,el.dataset.bulkInclude])];}
   else if(el.hasAttribute('data-bulk-value'))f.values[el.dataset.bulkValue]=el.value;
   else {f[el.dataset.bulkKey]=el.value;if(el.dataset.bulkKey==='dose')f.values={};}
-  if(el.value.trim()!==''&&el.getAttribute('aria-invalid')==='true'&&!el.hasAttribute('data-bulk-value')){el.setAttribute('aria-invalid','false');const fd=el.closest('.field');fd?.classList.remove('error');fd?.querySelector('.st-field-message')?.remove();}
+  if(el.value.trim()!==''&&el.getAttribute('aria-invalid')==='true'&&!el.hasAttribute('data-bulk-value')){el.setAttribute('aria-invalid','false');const fd=el.closest('.field');fd?.classList.remove('error');el.closest('.bulk-same-box')?.classList.remove('is-invalid');el.closest('.bulk-same-dose,.bulk-dose-field')?.querySelector('.bulk-required')?.remove();fd?.querySelector('.st-field-message')?.remove();}
   const rail=root.querySelector('[data-bulk-rows]');
   if(el.hasAttribute('data-bulk-value')){
    for(const row of bulkChanges(c)){const text=[...root.querySelectorAll('[data-bulk-summary]')].find(x=>x.dataset.bulkSummary===row.id);if(text){const state=bulkRowState(row,c.view);text.textContent=state;text.hidden=!state;}}
@@ -796,11 +822,12 @@ function productionHostActionEligible(c,p,action){
  if(['remove-batch','move-batch'].includes(action.id))return false;
  const scope=hostProductionScope(action);return scope!=='other'&&eligibleProductionScopes(c,p).has(scope);
 }
+const inSowEmbed=()=>new URLSearchParams(globalThis.location?.search||'').get('embed')==='sow';
 function productionActionsForPig(c,p){
  if(!p||p.stage==='Sow died')return [];
  const rows=[],tasks=currentTasksForPig(c,p).filter(task=>(task.type||'').toLowerCase()==='production');
  for(const task of tasks){
-  if(task.id==='farrowing'||/farrowing/i.test(task.title||''))rows.push({a:'open-farrowing',k:'chart',title:'Open Farrowing',sub:'Continue the active farrowing task',value:'farrowing',section:'farrowing'});
+  if(task.id==='farrowing'||/farrowing/i.test(task.title||''))inSowEmbed()||rows.push({a:'open-farrowing',k:'chart',title:'Open Farrowing',sub:'Continue the active farrowing task',value:'farrowing',section:'farrowing'});
   else if(task.id==='piglet-processing'&&(c.hostActions||[]).some(action=>action.id==='piglets'&&!action.reason))continue;
   else rows.push({a:task.id==='piglet-processing'?'sow-current-task':'production-task',k:'chart',title:task.title,sub:[task.status,task.summary].filter(Boolean).join(' · '),value:task.id,section:productionTaskScope(task,p)});
  }
@@ -825,7 +852,7 @@ function actionCatalogue(c){
  if(!hasCases&&live)unavailable.push({title:'Resolve conditions',group:'health',k:'check',reason:'No open conditions to resolve.'},{title:'Care instructions',group:'health',k:'alert',reason:'Record a health finding first.'});
  
  const hostGeneral=host.filter(x=>x.group==='routine'&&!x.reason),hostRecords=host.filter(x=>x.group==='records'&&!x.reason),hasUnifiedNote=hostGeneral.some(x=>x.id==='marker');
- const measurements=live?[item('measurements-menu','measure','Measurements & condition',single?'Body condition, weight, temperature and backfat':'Body condition and measurements')]:[];
+ const measurements=live?[item('measurements-menu','measure','Measurements & condition',single?'Weight, condition, backfat':'Body condition and measurements')]:[];
  const adjustFeed=live&&rows.some(p=>!feedUnavailableReason(p,penOf(c,p.id)))?[item('feed-edit-selected','feed','Adjust feed','Review the current daily allowance')]:[];
  if(live&&!adjustFeed.length)unavailable.push({title:'Adjust feed',group:'routine',k:'feed',reason:feedUnavailableReason(rows[0],penOf(c,rows[0].id))+'.'});
  add('routine','Routine',[...hostGeneral.map(x=>item('sow-host-action',x.icon||'note',x.title,x.sub,x.id)),...(!hasUnifiedNote?[item('note','note','Add a note',single?'Leave a note for this sow':'The same note for these pigs')]:[]),...hostRecords.map(x=>item('sow-host-action',x.icon||'note',x.title,x.sub,x.id)),...measurements,...adjustFeed]);
@@ -835,12 +862,12 @@ function actionCatalogue(c){
 }
 function sowTaskCard(c){if(picked(c).length!==1||c.selectedPens.size)return '';const tasks=currentTasksForPig(c,picked(c)[0]);if(!tasks.length)return '';const heading=stHeading({title:'Current tasks',meta:String(tasks.length),kind:'section',level:4});return `<section class="sow-task-section" aria-label="Linked tasks">${heading}<div class="sow-task-rail" aria-label="Current tasks">${tasks.map(t=>button(t.action||'sow-current-task',`<span class="sow-task-card-main"><strong>${esc(t.title)}</strong>${icon('chevron')}</span><span class="sow-task-card-meta"><span class="sow-task-status">${esc(t.status)}</span><span class="sow-task-type" data-type="${esc((t.type||'General').toLowerCase())}">${esc(t.type||'General')}</span></span>`,'sow-task-card',t.value||t.id)).join('')}</div></section>`;}
 
-function actionRows(items,disabled=false){return items.map(x=>{const row=action(x.a,x.k,x.title,x.sub,x.value);return disabled?row.replace('<button','<button disabled aria-disabled="true"'):row;}).join('');}
+function actionRows(items,disabled=false){return items.map(x=>action(x.a,x.k,x.title,x.sub,x.value,disabled)).join('');}
 function productionActionGroups(c,items,disabled=false){
  const farrowingIds=new Set(['miscarriage','edit']),processingIds=new Set(['piglets','death','countReconcile','foster']);
  const taskScope=x=>['farrowing','piglet-processing','pregnancy-check','gestation','breeding','lactation','growth','other'].includes(x.section)?x.section:farrowingIds.has(x.value)?'farrowing':processingIds.has(x.value)?'piglet-processing':'other';
  const byScope=scope=>items.filter(x=>taskScope(x)===scope),farrowing=byScope('farrowing'),processing=byScope('piglet-processing'),pregnancy=byScope('pregnancy-check'),gestation=byScope('gestation'),breeding=byScope('breeding'),lactation=byScope('lactation'),growth=byScope('growth'),other=byScope('other');
- const cluster=(title,rows)=>rows.length?'<section class="production-action-cluster" aria-label="'+title+' actions">'+SentriUI.rowGroup(actionRows(rows,disabled),{title,className:'compact-actions st-action-list'})+'</section>':'';
+ const cluster=(title,rows)=>rows.length?'<section class="production-action-cluster" aria-label="'+title+' actions">'+stHeading({title,kind:'group',level:5})+'<div class="compact-actions st-panel st-row-group st-action-list">'+actionRows(rows,disabled)+'</div></section>':'';
  return '<div class="production-action-groups">'+cluster('Farrowing',farrowing)+cluster('Piglet processing',processing)+cluster('Pregnancy check',pregnancy)+cluster('Gestation',gestation)+cluster('Breeding',breeding)+cluster('Lactation',lactation)+cluster('Growth',growth)+cluster('Shared',other)+'</div>';
 }
 function actionSections(c,groups,disabled=false){return groups.map(g=>{const categoryIcon=icon(g.id==='production'?'chart':g.id==='health'?'condition':g.id==='feed'?'feed':'note');const heading=stHeading({title:g.label,icon:categoryIcon,kind:'section',level:4,className:'section-title st-category-heading'});return `<section class="sow-action-group st-action-section${disabled?' unavailable-action-group':''}" data-action-group="${g.id}" aria-label="${g.label}">${heading}${g.id==='production'&&g.items.length?productionActionGroups(c,g.items,disabled):'<div class="compact-actions st-panel st-row-group st-action-list">'+actionRows(g.items,disabled)+'</div>'}${g.empty?'<p class="action-category-empty">'+esc(g.empty)+'</p>':''}</section>`;}).join('');}
@@ -850,7 +877,7 @@ function actionsPage(c){
  const body=actionSections(c,groups)+(unavailable.length?button('unavailable-actions',`Unavailable actions (${unavailable.length}) ${icon('chevron')}`,'unavailable-actions-link'):'');
  return sheet(c,'More actions',single?p.id+' · '+penOf(c,p.id).id:selectionLabel(c),body,'');
 }
-function actionCategoryNav(c){const batch=picked(c).length!==1||c.selectedPens.size>0,groups=actionCatalogue(c).groups.filter(g=>!batch||g.id!=='production'),current=groups.some(g=>g.id===c.actionCategory)?c.actionCategory:groups[0]?.id;return globalThis.SentriUI.categoryFooter({categories:groups.map(g=>({id:g.id,label:g.label})),active:current,backAction:'back',categoryAction:'action-category',label:'Action categories',className:'record-toolbar actions-bottom-bar'});}
+function actionCategoryNav(c){const batch=picked(c).length!==1||c.selectedPens.size>0,groups=actionCatalogue(c).groups.filter(g=>!batch||g.id!=='production'),current=groups.some(g=>g.id===c.actionCategory)?c.actionCategory:groups[0]?.id;return globalThis.SentriUI.categoryFooter({categories:inSowEmbed()?[]:groups.map(g=>({id:g.id,label:g.label})),active:current,backAction:'back',categoryAction:'action-category',label:'Action categories',className:'record-toolbar actions-bottom-bar'});}
 
 function measurementsMenu(c){
  const rows=picked(c),single=rows.length===1,items=[];
@@ -983,7 +1010,7 @@ function installV2(){
  },true);
  gallery.addEventListener('change',e=>{const el=e.target,root=el.closest('[data-card]');if(!root)return;const i=+root.dataset.card,c=states[i];if(el.dataset.logDateField){c.logDateDraft[el.dataset.logDateField]=el.value;e.stopImmediatePropagation();render(i);return;}if(el.dataset.logCategory){handleRecordAction(c,'log-filter',el.dataset.logCategory+'|'+el.value);e.stopImmediatePropagation();render(i);return;}if(el.dataset.condition){const key=el.dataset.condition;c.form.conditionKinds||={};if(el.checked)c.form.conditionKinds[key]=el.dataset.conditionKind||c.form.kind;else delete c.form.conditionKinds[key];c.form.conditions=el.checked?[...c.form.conditions,key]:c.form.conditions.filter(x=>x!==key);e.stopImmediatePropagation();render(i);return;}if(el.dataset.verdict){c.form.verdicts[el.dataset.verdict]=el.value;e.stopImmediatePropagation();render(i);return;}if(el.dataset.v2){const f=c.view==='filters'?c.filterDraft:c.form;f[el.dataset.v2]=el.type==='checkbox'?el.checked:el.value;if(c.view==='fault-form'&&el.dataset.v2==='device'&&el.value!=='Other'){const x=pen(c,c.penId).faults.find(x=>x.open&&x.device===el.value);if(x){c.faultId=x.id;c.form={};c.view='fault-record';}}e.stopImmediatePropagation();if(el.tagName==='SELECT'||el.type==='checkbox')render(i);}
  },true);
- gallery.addEventListener('input',e=>{const el=e.target;if(!el.dataset.v2)return;const i=+el.closest('[data-card]').dataset.card,c=states[i],f=c.view==='filters'?c.filterDraft:c.form;f[el.dataset.v2]=el.value;if(el.dataset.v2==='search'){e.stopImmediatePropagation();const sheet=el.closest('.sheet'),caret=el.selectionStart;sheet.querySelector('.health-catalog').innerHTML=c.view==='bulk-health-picker'?bulkHealthBody(c):healthList(c);const next=sheet.querySelector('input[data-v2=search]');if(next){next.focus({preventScroll:true});next.setSelectionRange(caret,caret);}return;}const save=el.closest('.sheet').querySelector('[data-action="save-fault"],[data-action="save-pen-note"],[data-action="save-measurement"],[data-action="save-treatment"],[data-action="save-selected-note"]');if(save)setCommitWaiting(save,!valid(c));},true);
+ gallery.addEventListener('input',e=>{const el=e.target;if(!el.dataset.v2)return;const i=+el.closest('[data-card]').dataset.card,c=states[i],f=c.view==='filters'?c.filterDraft:c.form;f[el.dataset.v2]=el.value;if(el.dataset.v2==='search'){e.stopImmediatePropagation();const sheet=el.closest('.sheet'),caret=el.selectionStart;sheet.querySelector('.health-catalog').innerHTML=c.view==='bulk-health-picker'?bulkHealthBody(c):healthList(c);if(c.view==='bulk-health-picker')searchHeader(sheet,!!el.value.trim(),'Conditions');const next=sheet.querySelector('input[data-v2=search]');if(next){next.focus({preventScroll:true});next.setSelectionRange(caret,caret);}return;}const save=el.closest('.sheet').querySelector('[data-action="save-fault"],[data-action="save-pen-note"],[data-action="save-measurement"],[data-action="save-treatment"],[data-action="save-selected-note"]');if(save)setCommitWaiting(save,!valid(c));},true);
 }
 
 function scopeTabs(c){return SentriUI.segment({variant:'view-switch',options:[['pigs','Pigs',{disabled:!c.selected.size}],['pens','Pens',{disabled:!c.selectedPens.size}]],active:c.actionScope,action:'action-scope',ariaLabel:'Action subject',reason:!c.selected.size||!c.selectedPens.size?'Select subjects in the list to enable their view.':''});}
@@ -1009,7 +1036,7 @@ function recordValue(value,unit=''){return hasRecordValue(value)?esc(value)+(uni
 function profileFacts(title,items){
  const symbol={'Basic information':'profile','Sow & cycle':'clock','Body & cycle':'weight','Production totals & averages':'chart','Origin & dates':'origin','Identity records':'profile'}[title];
  const heading=stHeading({title,icon:symbol?icon(symbol):'',kind:'section',level:4});
- return '<section class="profile-section">'+heading+stFacts(items.map(([label,value,unit,mono])=>({label,value:hasRecordValue(value)?value+(unit?(unit==='%'?'':' ')+unit:''):null,mono:!!mono})))+'</section>';
+ const known=knownFacts(items.map(([label,value,unit,mono])=>({label,value:hasRecordValue(value)?value+(unit?(unit==='%'?'':' ')+unit:''):null,mono:!!mono})));return known.length?'<section class="profile-section">'+heading+stFacts(known)+'</section>':'';
 }
 function filterLogEntries(events,category){return category==='All'?events:events.filter(e=>eventCategory(e)===category);}
 function pigLogEntries(c){const p=pig(c,c.pigId);return [...c.events.filter(e=>e.subjects.includes(p.id)).map(e=>({...e,time:'Today · '+e.time})),...(p.initialRecords||[])];}
@@ -1388,7 +1415,7 @@ function showMobileScrollIndicator(scroller){
 function sowDetailContext(record,previous){
  const c=previous||seed(),existing=previous&&pig(c,record.id);
  const p=existing||{id:record.id,base:0,factor:1,cases:[],registry:{type:'Sow'},initialRecords:[]};
- Object.assign(p,{id:record.id,parity:record.parity,stage:record.stage});
+ Object.assign(p,{id:record.id,parity:record.parity,stage:record.stage});if(record.batch)p.batchId=record.batch;p.registry=Object.assign({},p.registry,{type:'Sow'},record.breed?{breed:record.breed,onFarm:true}:{},record.serviceDate?{serviceDate:record.serviceDate,expectedFarrowing:record.expectedFarrowing}:{});
  p.initialRecords=(record.events||[]).map(e=>({category:'Production',title:e.text,time:[e.day,e.time].filter(Boolean).join(' · '),who:e.who}));
  const pe=previous&&penOf(c,p.id)||{mode:'unknown',formula:'',faults:[],pigs:[]};
  pe.id=record.pen;pe.pigs=[p];c.pens=[pe];c.batches=[];c.unitLabel=record.unit;
@@ -1463,7 +1490,7 @@ function sheet(c,title,scope,body,actions,aside=''){
 }
 function back(){return SentriUI.backButton({action:'back'});}
 function scope(c){const ids=c.form.subjects||[...c.selected],pens=[...new Set(ids.map(id=>penOf(c,id)?.id))];return `${countLabel(ids.length)} · ${pens.join(' / ')}`;}
-function action(a,k,title,sub,v=''){return stRow({action:a,title,description:sub,icon:icon(k),value:v,className:'action-item',attrs:entryFor(a)?{'data-entry':entryFor(a)}:{}});}
+function action(a,k,title,sub,v='',disabled=false){return stRow({action:a,title,description:sub,icon:icon(k),value:v,disabled,className:'action-item',attrs:entryFor(a)?{'data-entry':entryFor(a)}:{}});}
 function textField(label,key,value='',placeholder=''){return SentriUI.field({label:label||'Note',variant:'textarea',control:`<textarea data-field="${key}" placeholder="${placeholder}">${esc(value)}</textarea>`});}
 
 function choices(items,current,key,group){return SentriUI.choiceRadios({label:'Reason',key,action:'form-choice',selected:current||'',options:items.map(([value,label,meta])=>({value,label,meta}))});}
@@ -1491,7 +1518,7 @@ function legacyOverlay(c){
  if(c.view==='report')return sheet(c,'Report an issue',`Pen ${c.penId}`,`${choices([['Feeder empty','Feeder empty'],['Feed flow blocked','Feed flow blocked'],['Water point issue','Water point issue'],['Other','Other']],c.form.choice,'choice',states.indexOf(c))}${c.form.choice==='Other'?textField('Describe the issue','note',c.form.note,'Where is the problem?'):optNote('Note',textField('','note',c.form.note,'Where is the problem?'),c.form.note)}`,footer(back(),button('save-pen','Save issue','button primary','',!valid(c))));
  if(c.view==='history')return sheet(c,'This walk',unitName(c)+' · G. Hansen',`${c.events.map(e=>`<article class="walk-event"><strong>${esc(e.title)}</strong><p>${esc(e.subjects.join(' · '))}${e.note?'<br>'+esc(e.note):''}</p><small>${e.time} · ${e.who}</small></article>`).join('')||'<div class="empty-inspect"><strong>No updates yet</strong>Health findings, measurements and pen updates will appear here.</div>'}`,footer(back(),''));
  if(c.view==='finish')return sheet(c,'End walk',unitName(c),`<div class="feed-feature"><p class="kicker">Recorded during this walk</p><strong>${c.events.length}</strong><p>Updates already saved to their pigs or pens.</p></div><p class="quiet-note">Check in as G. Hansen to record that you walked this unit. This does not mark every pig as healthy or every instruction as completed.</p>`,footer(back(),button('check-in','Check in to '+unitName(c),'button primary')));
- if(c.view==='complete')return sheet(c,'Walk recorded',unitName(c),`<div class="walk-complete"><span class="complete-mark">${icon('check')}</span><h4>Checked in at 09:41</h4><p>G. Hansen · ${unitName(c)}<br>${c.events.length} ${c.events.length===1?'update':'updates'} recorded</p></div>`,footer(back(),button('back','Back to unit','button primary')));
+ if(c.view==='complete')return sheet(c,'Walk recorded',unitName(c),`<div class="walk-complete"><span class="complete-mark">${icon('check')}</span><h4>Checked in at 09:41</h4><p>G. Hansen · ${unitName(c)}<br>${c.events.length} ${c.events.length===1?'update':'updates'} recorded</p></div>`,footer(back()));
  if(c.view==='home')return sheet(c,'Today','Your work',`<div class="action-list st-panel st-row-group">${action('back','check','Inspection · '+unitName(c),c.checkedIn?'Checked in at 09:41':'Last check-in 06:40')}</div>`,footer(back(),''));
  if(c.view==='grid')return penMapSheet(c);
  if(c.view==='search'||c.view==='scan')return sheet(c,c.view==='scan'?'Scan ear tag':'Find a pig',unitName(c),(c.view==='scan'?`<p class="quiet-note">Camera scanning is not connected in this prototype.</p>${button('sample-scan','Try sample tag 000306','button secondary')}`:'')+(SentriUI.field({label:"Ear tag or pen",control:"<input type=\"search\" data-search placeholder=\"e.g. 000254 or C1\" value=\""+(esc(c.query))+"\">",className:"inspect-search"}))+"<div class=\"search-results\">"+(searchResults(c))+"</div>",footer(back(),''));

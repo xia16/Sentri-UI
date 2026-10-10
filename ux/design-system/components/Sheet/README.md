@@ -50,7 +50,7 @@ This is the owner's rule for every drawer and page (2026-10-10); [the design sys
 - **The commit** ("Done · 2", "Save · 2 pigs") sits in the footer on the right. It applies and closes. A single pick commits by itself, so a single-choice sheet has Back alone.
 - **No ✕ on drawers** (nor on pages and dialogs). Swiping down and tapping the scrim do what Back does. `close` is accepted for old callers and ignored.
 - **Reset** restores defaults (a filter). **Clear** empties what was entered or ticked. Both are head text actions (`aside`), present only when there is something to reset or clear, each with one meaning in `ux/laws/strings.json`.
-- The word in the footer is **Back**, never Close or Cancel. Discarding a draft is its own act (Clear, Reset), never what Back does, so a sheet never loses typed work silently and needs no "discard changes?" question.
+- The word in the footer is **Back**, never Close or Cancel. Discarding a draft is its own act (Clear, Reset), never what Back does, so a sheet never loses typed work silently and needs no "discard changes?" question. The one exception is a correction to a saved record: Back with changes asks "Save correction?" (Save / Discard), so an unsaved correction never travels on.
 - **An empty selection closes.** A review of ticked subjects closes, and selection mode ends, when the last one is unticked; no empty selection sheet is ever shown.
 
 ## Footer

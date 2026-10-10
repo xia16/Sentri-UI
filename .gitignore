@@ -44,5 +44,11 @@ yarn-error.log*
 /.claude/worktrees/
 __pycache__/
 
+# polish-loop run files: screenshots and round evidence (the summary is review/polish-<feature>.json)
+/review/loop/
+
+# screen-compare renders (scripts/compare-screens.mjs): only the diff PNGs and the JSON are kept
+review/compare-*/*.base.png
+review/compare-*/*.branch.png
 # behaviour-gate screenshots (regenerate with scripts/run-scenarios.mjs)
 /review/scenarios/
