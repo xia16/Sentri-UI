@@ -369,7 +369,7 @@ if (noLeaves.length && CLASSES.indexOf(ec.cls) >= 2) gaps.push(`${noLeaves.lengt
     let added = Object.keys(pc).filter((k) => pc[k] > ((pb || {})[k] || 0));
     // A new problem must reproduce: one rerun on the candidate drops blips (a resource that failed to load once).
     if (added.length) {
-      await runAsync(process.execPath, ['scripts/check-states.mjs'], wt.cand);
+      await runAsync(process.execPath, ['scripts/check-states.mjs'], wt.cand, path.join(out, 'check-states-cand-rerun.log'));
       const again = problems(wt.cand) || {};
       const blips = added.filter((k) => !(again[k] > ((pb || {})[k] || 0)));
       if (blips.length) gaps.push(`check-states: ${blips.length} problem(s) seen once and not on a rerun, so not counted: ${blips.slice(0, 2).join(' | ')}`);
