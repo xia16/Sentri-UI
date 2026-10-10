@@ -13,6 +13,16 @@ The driver fills in:
 
 Check out CANDIDATE and BASE in two worktrees. Serve each with `node scripts/serve-ux.cjs <port>`. Every result you record names the commit it ran on. Evidence from any other commit doesn't count, including the builder's own runs.
 
+**`node scripts/gate.mjs` does the mechanical part for you.** The driver runs it from a main checkout:
+- It refuses a candidate that doesn't contain `origin/main`.
+- It makes both worktrees and runs §1 on the candidate.
+- It shoots every screen on both sides. It escalates the class to **shared** when the bundle, the tokens or another feature's screens change.
+- It writes `mechanical.json`, plus `pairs/<screen>/<lang>-<width>.png` (base | candidate) for every changed screen.
+
+Judge from those pairs and write `verdict.json` beside them. `node scripts/gate.mjs --verdict <out>` refuses a verdict that is about another commit, skips a changed screen, or passes with a worse pair.
+
+A shared change that touches too many screens for one judge is split by feature. Each judge writes `verdict-<feature>.json`, and `--verdict` merges them: one failing part fails the change. `check-states` runs on both sides. A problem main already has is reported as main's, and only a new one fails.
+
 ## 1. Mechanical checks (run first; any failure ends the gate)
 
 On CANDIDATE:

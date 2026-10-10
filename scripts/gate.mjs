@@ -16,7 +16,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { CLASSES, effectiveClass, classifyScreens, checkVerdict } from './loop-rules.mjs';
+import { CLASSES, effectiveClass, classifyScreens, checkVerdict, touchesSystem } from './loop-rules.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PW_HOME = 'C:/Users/ying_/.cache/adam-design/playwright-1.63.0';
@@ -30,9 +30,13 @@ const flag = (k) => argv.includes('--' + k);
 if (opt('verdict')) {
   const dir = opt('verdict');
   const mech = JSON.parse(fs.readFileSync(path.join(dir, 'mechanical.json'), 'utf8'));
-  const verdictFile = path.join(dir, 'verdict.json');
-  if (!fs.existsSync(verdictFile)) { console.error(`no ${verdictFile}`); process.exit(2); }
-  const verdict = JSON.parse(fs.readFileSync(verdictFile, 'utf8'));
+  // One judge writes verdict.json; a shared change too big for one judge is split by feature into verdict-<feature>.json.
+  const files = fs.readdirSync(dir).filter((f) => /^verdict(-[\w.-]+)?\.json$/.test(f));
+  if (!files.length) { console.error(`no verdict.json (or verdict-<feature>.json) in ${dir}`); process.exit(2); }
+  const parts = files.map((f) => JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8')));
+  const cat = (k) => parts.flatMap((p) => p[k] || []);
+  const verdict = { ...parts[0], pass: parts.every((p) => p.pass === true), pairs: cat('pairs'), walk: cat('walk'), defects: cat('defects'), rejected: cat('rejected'), contradicted: cat('contradicted') };
+  for (const p of parts) if (p.candidate !== verdict.candidate || p.base !== verdict.base) verdict.candidate = 'mixed verdicts';
   const v = checkVerdict(verdict, mech);
   const head = git(['rev-parse', mech.ref]).out.trim();
   if (head && head !== mech.candidate) v.problems.push(`${mech.ref} moved to ${head.slice(0, 7)} after the gate ran on ${mech.candidate.slice(0, 7)}: gate again`);
@@ -58,9 +62,19 @@ const started = Date.now();
 
 function git(args, cwd = root) { const r = spawnSync('git', args, { cwd, encoding: 'utf8', maxBuffer: 64 << 20 }); return { code: r.status, out: r.stdout || '', err: r.stderr || '' }; }
 function run(cmd, args, cwd, timeout = 20 * 60e3) {
-  const r = spawnSync(cmd, args, { cwd, encoding: 'utf8', shell: process.platform === 'win32' && cmd === 'npm', timeout, maxBuffer: 64 << 20, env: { ...process.env, SENTRI_PLAYWRIGHT: pwPath } });
+  const o = { cwd, encoding: 'utf8', timeout, maxBuffer: 64 << 20, env: { ...process.env, SENTRI_PLAYWRIGHT: pwPath } };
+  // npm is a .cmd on Windows, which only runs through a shell; one command string avoids passing args to a shell
+  const r = cmd === 'npm' ? spawnSync(`npm ${args.join(' ')}`, { ...o, shell: true }) : spawnSync(cmd, args, o);
   const all = ((r.stdout || '') + (r.stderr || '')).trim().split('\n');
   return { code: r.status ?? 1, tail: all.slice(-6).join('\n'), all };
+}
+function runAsync(cmd, args, cwd) {
+  return new Promise((res) => {
+    const p = spawn(cmd, args, { cwd, env: { ...process.env, SENTRI_PLAYWRIGHT: pwPath } });
+    let buf = '';
+    p.stdout.on('data', (d) => (buf += d)); p.stderr.on('data', (d) => (buf += d));
+    p.on('exit', (code) => res({ code: code ?? 1, tail: buf.trim().split('\n').slice(-6).join('\n') }));
+  });
 }
 const checks = [], gaps = [];
 const check = (name, ok, detail = '') => { checks.push({ check: name, result: ok === null ? 'skipped' : ok ? 'pass' : 'fail', detail }); console.log((ok === null ? 'SKIP' : ok ? 'PASS' : 'FAIL').padEnd(5), name, detail ? '— ' + detail.split('\n')[0] : ''); };
@@ -107,7 +121,7 @@ const freePort = () => new Promise((r) => { const s = createServer(); s.listen(0
 async function serve(dir) {
   const port = await freePort();
   servers.push(spawn(process.execPath, [path.join(dir, 'scripts/serve-ux.cjs'), String(port)], { cwd: dir, stdio: 'ignore' }));
-  const url = `http://localhost:${port}`;
+  const url = `http://127.0.0.1:${port}`; // serve-ux listens on IPv4 only; localhost may resolve to ::1 first
   for (let i = 0; i < 50; i++) { try { const r = await fetch(url + '/atlas/atlas.json'); if (r.ok) return url; } catch {} await new Promise((r) => setTimeout(r, 100)); }
   throw new Error('server did not start in ' + dir);
 }
@@ -134,9 +148,27 @@ check('npm run check', r.code === 0, r.all.find((l) => /atlas:/.test(l)) || r.ta
 r = git(['grep', '-n', '-E', '^(<<<<<<<|>>>>>>>)( |$)', mech.candidate]);
 check('no conflict markers', !r.out.trim(), r.out.trim().split('\n').slice(0, 3).join(' | '));
 
+// check-states runs on both sides: a state that already fails on main (e.g. a stress-test label the copy pass hasn't
+// removed yet) is main's debt, reported but not blocking; a problem main doesn't have fails the gate.
 if (CLASSES.indexOf(declared) >= 1 || mode === 'refactor') {
-  r = run(process.execPath, ['scripts/check-states.mjs'], wt.cand);
-  check('check-states', r.code === 0, r.tail);
+  const [rb, rc] = await Promise.all([runAsync(process.execPath, ['scripts/check-states.mjs'], wt.base), runAsync(process.execPath, ['scripts/check-states.mjs'], wt.cand)]);
+  const problems = (dir) => {
+    const f = path.join(dir, 'review/state-check.json');
+    if (!fs.existsSync(f)) return null;
+    const n = {};
+    for (const s of JSON.parse(fs.readFileSync(f, 'utf8'))) for (const p of s.problems || []) { const k = `${s.component}/${s.variant}/${s.state}: (${p.check}) ${String(p.detail).replace(/\d+(\.\d+)?px/g, 'Npx')}`; n[k] = (n[k] || 0) + 1; }
+    return n;
+  };
+  const pb = problems(wt.base), pc = problems(wt.cand);
+  if (!pc) check('check-states', false, `no review/state-check.json written on the candidate (exit ${rc.code}): ${rc.tail}`);
+  else {
+    const added = Object.keys(pc).filter((k) => pc[k] > ((pb || {})[k] || 0));
+    const fixed = Object.keys(pb || {}).filter((k) => !pc[k]);
+    const debt = Object.keys(pc).length - added.length;
+    mech.states = { added, fixed: fixed.length, debt };
+    check('check-states (no new problem)', added.length === 0, added.length ? `${added.length} new: ${added.slice(0, 3).join(' | ')}` : `${debt} problem(s) already on main${fixed.length ? `, ${fixed.length} fixed` : ''}`);
+    if (debt) gaps.push(`check-states: ${debt} problem(s) already on main are not this change's (review/state-check.json)`);
+  }
 }
 
 // ---------- the screen diff: every screen, base vs candidate, bare at 390 ----------
@@ -187,7 +219,23 @@ if (mode === 'refactor') {
   const moved = [...screens.diff, ...screens.new, ...screens.gone];
   check('refactor: every screen identical', !moved.length, moved.map((s) => s.id).slice(0, 5).join(', '));
 }
-if (ec.cls === 'shared') gaps.push('shared-component change: the judge must see every changed screen on every feature, and the queue rule applies (one shared change at a time)');
+// The shared-component queue: one shared change at a time, oldest first. A shared candidate waits while an older open,
+// non-draft PR also touches the shared system; once that merges, this one merges main forward and is gated against it.
+if (ec.cls === 'shared') {
+  const q = queueAhead();
+  check('shared-component queue: first in line', q.ok, q.detail);
+  gaps.push('shared-component change: every changed screen on every feature is judged (split the judges by feature if needed)');
+}
+function queueAhead() {
+  const branch = ref.replace(/^origin\//, '');
+  const r = spawnSync('gh', ['pr', 'list', '--state', 'open', '--limit', '100', '--json', 'number,headRefName,createdAt,isDraft,files'], { cwd: root, encoding: 'utf8', maxBuffer: 64 << 20 });
+  if (r.status) return { ok: false, detail: `cannot read the queue (gh pr list failed): ${(r.stderr || '').trim().split('\n')[0]}` };
+  const prs = JSON.parse(r.stdout);
+  const mine = prs.find((p) => p.headRefName === branch);
+  if (!mine) return { ok: false, detail: `no open PR for ${branch}: open one, the queue orders PRs` };
+  const ahead = prs.filter((p) => p.number !== mine.number && !p.isDraft && p.createdAt < mine.createdAt && touchesSystem((p.files || []).map((f) => f.path)).length);
+  return ahead.length ? { ok: false, detail: `waiting behind ${ahead.map((p) => '#' + p.number).join(', ')}: merge or close those first, then merge main forward and gate again` } : { ok: true, detail: `#${mine.number}` };
+}
 
 // ---------- the pairs the judge decides on: every changed screen, 390 and 360, EN and ZH ----------
 const changed = [...screens.diff, ...screens.new].map((s) => s.id);
