@@ -1,6 +1,6 @@
 /* Task overview is an entrance to units; the numbers support the route choice. */
 .farrowing-phone .task-overview-sheet .task-overview-content{gap:20px}
-.farrowing-phone .task-overview-sheet .task-progress-section{display:flex;flex-direction:column;gap:0}
+.farrowing-phone .task-overview-sheet .task-progress-section{display:flex;flex-direction:column;gap:24px}
 .farrowing-phone .task-overview-sheet .task-overview-content .task-progress{padding:14px 16px;margin:0}
 .farrowing-phone .task-overview-sheet .task-metrics{margin-top:12px;gap:10px}
 .farrowing-phone .task-overview-sheet .task-metrics strong{font-size:23px;font-weight:500;line-height:1.25}

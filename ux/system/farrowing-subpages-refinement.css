@@ -44,7 +44,6 @@
 .farrowing-phone .sheet[data-view=finish] :is(.finish-condition,.finish-extras){border-color:var(--line);border-radius:var(--subpage-radius)}
 .farrowing-phone .sheet[data-view=death] .sheet-body,.farrowing-phone .sheet[data-view=edit] .edit-body{padding-top:16px}
 .farrowing-phone .sheet[data-view=death] .segment{border:1px solid var(--line)}
-.farrowing-phone .sheet[data-view=death] .photo-field{margin:0 0 var(--space-section)}
 .farrowing-phone .sheet[data-view=editFinish] .edit-body{padding-top:16px}
 .farrowing-phone .sheet[data-view=locked] .record-inline-actions{padding-top:4px}
 
@@ -94,3 +93,8 @@
 .farrowing-phone .finish-extras>.st-optional-row[aria-expanded="true"] .st-optional-answer{display:none}
 
 .farrowing-phone .processing-task>span:last-child{min-width:0;overflow:hidden}
+/* Reading and form sheets keep their 20px lead-in under the header */
+.farrowing-phone :is(.room-filter-sheet,.picker-sheet,.room-search-sheet) .sheet-body{padding-top:20px}
+.farrowing-phone :is(.pen-detail-sheet,.pen-form-sheet,.pen-feed-page,.pen-log-sheet) .sheet-body{padding:20px var(--subpage-pad) 24px}
+.farrowing-phone .detail-sheet[data-size] .sheet-body{padding:20px var(--subpage-pad) 24px}
+.farrowing-phone .detail-sheet[data-presentation="page"]>.sheet-body{padding:20px var(--subpage-pad) 24px}
