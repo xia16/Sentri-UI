@@ -123,6 +123,10 @@ A variant's states are drawn in `ux/design-system/components/<Name>/variants/<va
 
 `review/*.json` (an array of items per file) holds what review sweeps found: `{ id, target: { kind: "screen"|"feature"|"component"|"section", id }, kind: "decision"|"design"|"broken"|"unclear", severity: "high"|"medium"|"low", title, detail, options?, recommendation?, source }`. The generator also turns every component `gate.json` finding into an item (`source: "gate"`; `broken` when its text is about overflow, targets, a state not working or errors, else `design`) and every `proposals[]` entry into a `decision`. All of it is `atlas.json`'s `backlog`. Decisions add to a feature's and screen's "To confirm" count; the other kinds add to its "To-dos".
 
+## Scenarios (the behaviour gate)
+
+`features/<id>/scenario-tree.md` and `features/<id>/scenarios.json` hold a feature's scenario tree and its executable leaves; `scripts/run-scenarios.mjs <id>` runs them, reaching each state with the same `url` + `screen` + `preset` + steps as a screen above, and writes `review/scenarios-<id>.json`. The format is in [docs/design-workflow/scenarios.md](../docs/design-workflow/scenarios.md). The generator ignores `review/scenarios*`: run results are not backlog.
+
 ## Generated `atlas/atlas.json`
 
 `{ "generated", "commit", "platforms": [{ id, name, sections: [{ id, name, zh, shared, features: [<feature.json> + "status" derived from its screens + "prd" (the PRD.md text)] }], components: [{ name, group, status (gate.json's, else "in-design"; "placeholder" for proposed ones), gate (the gate.json or null), files, seenIn?, note? }], copy: { "registry": "ux/laws/strings.json" } | null, backlog: [the items above], oldUi: <references/figma/index.json> }] }`
