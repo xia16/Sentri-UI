@@ -759,17 +759,19 @@ button.st-row[aria-current="location"]{background:var(--green-wash);box-shadow:i
 .st-stepper+.st-stepper{border-top:1px solid var(--rule)}
 .st-stepper-copy{display:flex;flex-direction:column;gap:var(--space-2);min-width:0}
 .st-stepper-label{font:600 var(--type-choice-label-size)/1.4 var(--font-sans);color:var(--ink);overflow-wrap:anywhere}
+.st-stepper[data-variant="row"] .st-stepper-copy{flex-direction:row;flex-wrap:wrap;align-items:baseline;column-gap:var(--space-6)}
+.st-stepper[data-variant="row"] .st-stepper-description{flex:0 0 100%}
+.st-stepper-note{font:400 var(--type-description-size)/1.4 var(--font-sans);color:var(--muted)}
 .st-stepper-description{font:400 var(--type-description-size)/1.5 var(--font-sans);color:var(--muted)}
 .st-stepper-keys{display:flex;align-items:center;gap:var(--space-key-gap);align-self:stretch}
 .st-stepper-key.st-stepper-key{display:grid;place-items:center;flex:none;width:var(--field-height);min-height:var(--stepper-row-min);align-self:stretch;border:0;border-radius:0;background:transparent;color:inherit}
 .st-stepper-face{width:var(--field-height);height:var(--field-height)}
 .st-stepper-face svg{width:var(--glyph-key);height:var(--glyph-key);stroke-width:var(--icon-key-stroke)}
-.st-stepper-key[data-step^="-"] .st-stepper-face{color:var(--ink)}
+.st-stepper-key[data-step^="-"]:not([aria-disabled="true"]) .st-stepper-face{color:var(--ink)}
 .st-stepper-value{min-width:3ch;text-align:center;font:500 var(--type-figure-size)/1.2 var(--font-mono);font-variant-numeric:tabular-nums;color:var(--ink);-webkit-user-select:none;user-select:none}
 .st-stepper[data-wide] .st-stepper-value{min-width:4ch}
 .st-stepper[data-zero] .st-stepper-value{color:var(--muted)}
 .st-stepper[data-changed] .st-stepper-value{color:var(--amber)}
-.st-stepper[data-draft] .st-stepper-value{color:var(--green)}
 .st-stepper-hint.st-stepper-hint{grid-column:1/-1}
 .st-stepper[data-variant="row"] .st-stepper-hint[data-reserve="text"]{margin-bottom:var(--space-row-y)}
 /* Stepper · hero */
@@ -783,7 +785,6 @@ button.st-row[aria-current="location"]{background:var(--green-wash);box-shadow:i
 .st-stepper:is([data-variant="count"],[data-variant="well"]) .st-stepper-value{flex:1;font:600 var(--type-hero-count-size)/1.15 var(--font-mono);letter-spacing:var(--tracking-hero);color:var(--count-ink)}
 .st-stepper:is([data-variant="count"],[data-variant="well"])[data-zero] .st-stepper-value{color:var(--muted)}
 .st-stepper:is([data-variant="count"],[data-variant="well"])[data-changed] .st-stepper-value{color:var(--amber)}
-.st-stepper:is([data-variant="count"],[data-variant="well"])[data-draft] .st-stepper-value{color:var(--green)}
 .st-stepper:is([data-variant="count"],[data-variant="well"]) .st-stepper-hint{justify-content:center;text-align:center}
 
 /* Measure: label above, a field-shaped box, value in mono with its unit always written */
@@ -1033,7 +1034,7 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 .st-segment button{flex:1 0 auto;min-width:var(--tap-min);flex-wrap:wrap}
 .st-selection-label{white-space:nowrap;min-width:0}
 .st-selection-count{font:500 var(--type-meta-size)/1.4 var(--font-mono);color:var(--muted)}
-.st-segment button[aria-pressed=true]{background:var(--paper);font-weight:500;box-shadow:inset 0 calc(-1 * var(--space-3)) var(--ink)}
+.st-segment button[aria-pressed=true]{background:var(--paper);font-weight:var(--type-weight-strong)}
 .st-segment[data-variant=two-line-lens] button{flex-direction:column}
 .st-segment[data-variant=two-line-lens] .st-selection-count:empty{min-height:1.4em}
 .st-segment button:not([aria-pressed=true]):not(:disabled):active,.st-filter-chips button:not([aria-checked=true]):not(:disabled):active,[data-state=Pressed].st-segment button:nth-child(2),[data-state=Pressed].st-filter-chips button:nth-child(2){background:var(--handle)}
@@ -1915,15 +1916,18 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
     const n=Number(value)||0,hero=variant!=='row',lid=id||fieldId('st-stepper'),hid=lid+'-hint',d=Math.abs(Number(step)||1);
     variant=variant==='hero'?'count':variant;
     const floorGray=disabled||loading||n<=min,ceilGray=disabled||loading||(max!=null&&n>=max);
-    // draft: the value carries an unsaved staged addition (green, the number is the receipt); it wins over changed.
+    // draft: the value carries an unsaved staged addition. The value stays ink (green means approved only); the word "unsaved" carries the state; it wins over changed.
     const isDraft=draft||tone==='draft',isChanged=!isDraft&&(changed||tone==='changed');
-    const key1=(dir,gray)=>{const kid=`${lid}-${dir<0?'dec':'inc'}`;return `<button type="button" class="st-stepper-key" id="${esc(kid)}" data-action="${esc(action)}" data-value="${esc(key)}" data-step="${dir*d}" aria-labelledby="${esc(lid)} ${esc(kid)}" aria-describedby="${esc(hid)}"${pressed&&dir>0?' data-preview="pressed"':''}${gray?' aria-disabled="true"':''}${dir<0?ariaText('Decrease',s.decrease,a.decrease):ariaText('Increase',s.increase,a.increase)}><span class="st-stepper-face">${glyph(dir<0?'minus':'plus')}</span></button>`;};
-    const copy=`<span class="st-stepper-copy"><span class="st-stepper-label" id="${esc(lid)}">${tx(label,o,'label')}</span>${description||has(o,'description')?`<small class="st-stepper-description">${tx(description,o,'description')}</small>`:''}</span>`;
+    // The draft or corrected word: beside the label in a row (no extra line, every row keeps one height); under the number in count and well.
+    const stateWord=isDraft?tx(status||'Unsaved',{strs:{status:s.status||(!status?'ds.stepper.unsaved':undefined)},args:{status:a.status}},'status'):isChanged?tx(status||'Corrected',{strs:{status:s.status||(!status?'ds.stepper.corrected':undefined)},args:{status:a.status}},'status'):'',nid=lid+'-note',inline=variant==='row'&&stateWord;
+    const key1=(dir,gray)=>{const kid=`${lid}-${dir<0?'dec':'inc'}`;return `<button type="button" class="st-stepper-key" id="${esc(kid)}" data-action="${esc(action)}" data-value="${esc(key)}" data-step="${dir*d}" aria-labelledby="${esc(lid)} ${esc(kid)}" aria-describedby="${esc(hid)}${inline?' '+esc(nid):''}"${pressed&&dir>0?' data-preview="pressed"':''}${gray?' aria-disabled="true"':''}${dir<0?ariaText('Decrease',s.decrease,a.decrease):ariaText('Increase',s.increase,a.increase)}><span class="st-stepper-face">${glyph(dir<0?'minus':'plus')}</span></button>`;};
+    const copy=`<span class="st-stepper-copy"><span class="st-stepper-label" id="${esc(lid)}">${tx(label,o,'label')}</span>${inline?`<span class="st-stepper-note" id="${esc(nid)}" role="status" aria-live="polite">${stateWord}</span>`:''}${description||has(o,'description')?`<small class="st-stepper-description">${tx(description,o,'description')}</small>`:''}</span>`;
     const vargs=a.value||(s.value?{n:String(n)}:null);
-    const val=`<span class="st-stepper-value" role="spinbutton" tabindex="0" data-st-spin${disabled||loading?' aria-disabled="true"':''}${error?' aria-invalid="true"':''} aria-labelledby="${esc(lid)}" aria-describedby="${esc(hid)}" aria-valuenow="${n}" aria-valuemin="${esc(min)}"${max!=null?` aria-valuemax="${esc(max)}"`:''} aria-live="polite"${sa(s.value,vargs)}>${esc(n)}</span>`;
+    const val=`<span class="st-stepper-value" role="spinbutton" tabindex="0" data-st-spin${disabled||loading?' aria-disabled="true"':''}${error?' aria-invalid="true"':''} aria-labelledby="${esc(lid)}" aria-describedby="${esc(hid)}${inline?' '+esc(nid):''}" aria-valuenow="${n}" aria-valuemin="${esc(min)}"${max!=null?` aria-valuemax="${esc(max)}"`:''} aria-live="polite"${sa(s.value,vargs)}>${esc(n)}</span>`;
     const canPoint=pointers.length>0;
     const reserve=reserveHint!=null?(reserveHint?(canPoint?'action':'text'):''):'';
-    const messages=[hint||has(o,'hint')?tx(hint,o,'hint'):'',error?esc(error):'',disabled?esc(reason||'This record cannot be edited.'):'',loading?tx('Saving…',{strs:{status:'ds.stepper.saving'}},'status'):'',isDraft?tx(status||'Unsaved',{strs:{status:s.status||(!status?'ds.stepper.unsaved':undefined)},args:{status:a.status}},'status'):isChanged?tx(status||'Corrected',{strs:{status:s.status||(!status?'ds.stepper.corrected':undefined)},args:{status:a.status}},'status'):''].filter(Boolean);
+    const messages=[hint||has(o,'hint')?tx(hint,o,'hint'):'',error?esc(error):'',disabled?esc(reason||'This record cannot be edited.'):'',loading?tx('Saving…',{strs:{status:'ds.stepper.saving'}},'status'):'',''].filter(Boolean);
+    if(stateWord&&!inline)messages.push(stateWord);
     let hl=hintLine('st-stepper-hint',{id:hid,reserve,fieldKey:key});
     hl=hl.replace(/>.*<\/p>$/,`>${hintHtml||messages.join('<span aria-hidden="true"> · </span>')}${textActions(pointers,key)}</p>`);
     return `<div class="st-stepper ${esc(className)}" data-ds="Stepper" data-variant="${esc(variant)}" data-field="${esc(key)}"${loading?' aria-busy="true"':''}${error?' data-error="true"':''} role="group" aria-labelledby="${esc(lid)}"${n===0?' data-zero=""':''}${isChanged?' data-changed=""':''}${isDraft?' data-draft=""':''}${max!=null&&max>=1000?' data-wide=""':''}>${copy}<span class="st-stepper-keys">${key1(-1,floorGray)}${val}${key1(1,ceilGray)}</span>${hl}</div>`;

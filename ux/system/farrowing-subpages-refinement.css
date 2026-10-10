@@ -44,6 +44,9 @@
 .farrowing-phone .sheet[data-view=finish] :is(.finish-condition,.finish-extras){border-color:var(--line);border-radius:var(--subpage-radius)}
 .farrowing-phone .sheet[data-view=death] .sheet-body,.farrowing-phone .sheet[data-view=edit] .edit-body{padding-top:16px}
 .farrowing-phone .sheet[data-view=death] .segment{border:1px solid var(--line)}
+/* Even gaps: the segment to the first row and the last row to Photos are both 18px to the next thing a person sees (12 gap + the row's or Photos' own inner space). */
+.farrowing-phone .sheet[data-view=death] .st-segment{margin-bottom:var(--space-12)}
+.farrowing-phone .sheet[data-view=death] .photo-field{margin:0 0 var(--space-section)}
 .farrowing-phone .sheet[data-view=editFinish] .edit-body{padding-top:16px}
 .farrowing-phone .sheet[data-view=locked] .record-inline-actions{padding-top:4px}
 

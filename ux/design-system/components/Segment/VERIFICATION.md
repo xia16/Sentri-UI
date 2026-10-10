@@ -11,7 +11,7 @@ The original frontier gate remains historical evidence; this pass addresses ever
 | 5 States | Default, Pressed, Selected, Disabled with reason, Focus, Chinese long-label files. Error/loading belong to content; no asynchronous operation here. Empty option sets omit controls. |
 | 6 Targets | Chromium at 390×844: component buttons at least 48×48; also checked visible phone buttons, links and editable inputs. Hidden upload inputs excluded; checkbox/radio targets are their wrapping rows. Inspection Clear selection corrected to tap-min. |
 | 7 Choice cap | Segment 2–5; view switch 2–3; dynamic tags scroll. Ended sow death view omits its now single-option switch. |
-| 8 Non-colour cues | Segment underline and weight; chip check and weight; disabled dashed outline and reason. |
+| 8 Non-colour cues | Segment paper face and weight; chip check and weight; disabled dashed outline and reason. |
 | 9 Content | Length, casing and wrapping rules; Chinese examples. No status ellipsis. |
 | 10 Accessibility | Named group / radiogroup, selection ARIA, focus, arrows/Home/End, Enter/Space, skipped disabled options. Piglet keyboard walkthrough passed with focus restored after rendering. |
 | 11 Tokens | Added CSS references existing tokens only; prototype selectors removed. |

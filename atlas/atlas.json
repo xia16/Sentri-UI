@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-10T04:14:18.505Z",
- "commit": "5bd4e11",
+ "generated": "2026-10-10T04:30:05.300Z",
+ "commit": "6647863",
  "platforms": [
   {
    "id": "mobile",
@@ -13255,7 +13255,7 @@
        {
         "line": 3,
         "pass": true,
-        "why": "Track, buttons, label, optional count, underline, reason line named and shown."
+        "why": "Track, buttons, label, optional count, reason line named and shown."
        },
        {
         "line": 4,
@@ -13280,7 +13280,7 @@
        {
         "line": 8,
         "pass": true,
-        "why": "Selected = weight + ink underline; disabled = dashed outline + reason line."
+        "why": "Selected = paper face + strong weight (no underline); disabled = dashed outline + reason line."
        },
        {
         "line": 9,
