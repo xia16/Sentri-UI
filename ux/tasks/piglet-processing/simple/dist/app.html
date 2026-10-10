@@ -1844,7 +1844,7 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
   function pickerField({label='',value='',display='',placeholder='Select',action='open-picker',key='',disabled=false,reason='',error='',loading=false,variant='single',selected=[],names=[],path=[],pressed=false,active=false,required=false,ariaLabel='',className='',strs,args}={}){
     const multi=variant.includes('multi'), named=multi&&names.length>0;
     /* Record forms show the chosen names in up to two lines, then +n: names are kept while they fit a two-line budget
-       (CJK counts double), so the line is never clamped mid-name; the first name is always shown. */
+       (about 30 characters a line at the narrowest phone; CJK counts double), so the line is never clamped mid-name; the first name is always shown. */
     const w=t=>[...String(t)].reduce((n,ch)=>n+(/[⺀-￿]/.test(ch)?2:1),0);let fit=0;for(let used=0;fit<names.length;fit++){const add=w(names[fit])+(fit?3:0);if(fit&&used+add>60)break;used+=add;}
     const shownNames=names.slice(0,Math.max(1,fit)),hiddenN=names.length-shownNames.length;
     const text=named?shownNames.join(' · ')+(hiddenN?' · +'+hiddenN:''):multi?(selected.length?selected.length+' selected':'None'):path.length?path[path.length-1]:display||value;
