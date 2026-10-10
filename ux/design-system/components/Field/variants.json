@@ -6,7 +6,6 @@
     "notUse": "not for choices — use PickerField",
     "states": [
       "Default",
-      "Focus",
       "Filled",
       "Error",
       "Disabled",
@@ -23,7 +22,6 @@
     "notUse": "not for animal counts — use Stepper",
     "states": [
       "Default",
-      "Focus",
       "Filled",
       "Error",
       "Disabled",
@@ -40,7 +38,6 @@
     "notUse": "not for an unopened optional note — use OptionalRow",
     "states": [
       "Default",
-      "Focus",
       "Filled",
       "Error",
       "Disabled",

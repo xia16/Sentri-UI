@@ -24,7 +24,6 @@ Visible label, current bounds, track with the chosen span filled between the han
 | --- | --- |
 | Default | Enabled, current values shown. |
 | Pressed | Heavier border and inset surface. |
-| Focus | Visible focus outline. |
 | At limits | Both bounds remain readable. |
 | Disabled | Blocked with a persistent reason. |
 | Error | Persistent explanation and recovery instruction. |
@@ -36,7 +35,7 @@ Every state is rendered in [the variant](variants/range.html).
 
 ## Behaviour
 
-Drag either handle, tap the track to move the nearer handle, or use the keyboard. Snap to step; bounds never cross. Handles retain stable minimum/maximum order. The caller receives bubbling `sentri-range-change` with `detail.key` and `detail.value` and computes results without replacing a captured pointer.
+Drag either handle, tap the track to move the nearer handle, or adjust it with the screen reader's increment and decrement. Snap to step; bounds never cross. Handles retain stable minimum/maximum order. The caller receives bubbling `sentri-range-change` with `detail.key` and `detail.value` and computes results without replacing a captured pointer.
 
 No presets existed in Farrowing; do not invent a preset variant. A caller can put up to four FilterChips presets above a range.
 
@@ -46,7 +45,7 @@ Sentence case. Label budget: 32 English characters / 16 Chinese characters; long
 
 ## Accessibility
 
-Two buttons with role=slider, individual accessible labels, aria-valuemin/max/now/text and a visible focus ring. Tab reaches each handle; arrows move one step; Home/End move to the nearest permitted limit. Disabled handles are native disabled and linked to the visible reason.
+Two buttons with role=slider, individual accessible labels, aria-valuemin/max/now/text The screen reader's adjust gesture moves one step. Disabled handles are native disabled and linked to the visible reason.
 
 All targets use `--tap-min` (48 CSS pixels). Handles sit on opposite sides of one track so their hit areas never overlap, even at equal bounds.
 
@@ -56,7 +55,7 @@ Do snap to the step and keep the bounds from crossing. Do use Measure for one ex
 
 ## API and tokens
 
-`SentriUI.rangeSlider` returns HTML; see [types](../index.d.ts). Tokens: `--tap-min`, `--border-width`, `--space-2`, `--space-3`, `--space-4`, `--space-8`, `--space-16`, `--space-24`, `--ink`, `--green`, `--disabled-border`, `--paper`, `--well`, `--line`, `--muted`, `--focus`, `--type-input-size`, `--type-description-size`, `--type-sheet-title-size`. No custom theme tokens.
+`SentriUI.rangeSlider` returns HTML; see [types](../index.d.ts). Tokens: `--tap-min`, `--border-width`, `--space-2`, `--space-3`, `--space-4`, `--space-8`, `--space-16`, `--space-24`, `--ink`, `--green`, `--disabled-border`, `--paper`, `--well`, `--line`, `--muted`, `--type-input-size`, `--type-description-size`, `--type-sheet-title-size`. No custom theme tokens.
 
 ## Not for
 

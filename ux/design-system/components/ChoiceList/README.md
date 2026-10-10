@@ -31,7 +31,6 @@ Group heading (optional); lead control (optional); option label; meta line (opti
 | Pressed | `choice-press` fill; static `pressed` prop. |
 | Selected | Trailing check, checkbox tick or ring plus stronger label. Never colour alone. |
 | Disabled | Prefer omission. Otherwise readable text, `aria-disabled`, and a persistent reason line; no dimming. |
-| Focus | `focus` ring on one row or option. |
 | Loading | Loading options status in place of rows. |
 | Empty | No options or no search match; never a blank panel. |
 | Long label | Labels and meta wrap, including Chinese; rows grow, never truncate. |
@@ -40,7 +39,7 @@ Every state is in `variants/<id>.html`. Rendered proof is in [picker-choice-proo
 
 ## Behaviour
 
-Show at most eight rows before search. Single rows toggle `aria-pressed` and commit; multi rows are whole-row labels around a native checkbox; navigate rows open the next level and show a chevron. Meta appears only when it distinguishes options: a group count such as "2 selected" appears only above zero, and a plain option count adds nothing. Clear appears only while an optional field has a value and returns focus to the group's tab stop. Radio rows and inline options use a roving tab stop. Do not duplicate a selected row in a second list.
+Show at most eight rows before search. Single rows toggle `aria-pressed` and commit; multi rows are whole-row labels around a native checkbox; navigate rows open the next level and show a chevron. Meta appears only when it distinguishes options: a group count such as "2 selected" appears only above zero, and a plain option count adds nothing. Clear appears only while an optional field has a value and returns the screen reader's focus to the group. Do not duplicate a selected row in a second list.
 
 ## Content rules
 
@@ -48,13 +47,13 @@ Sentence case, farm vocabulary, nouns for options. Aim for labels up to 32 Engli
 
 ## Accessibility
 
-Rows meet `tap-min` (radio and inline rows `radio-row-min`). Single rows expose `aria-pressed`; radio rows use `radio` inside a labelled `radiogroup` with `aria-checked`; `radioBind` supports arrows, Home and End. Search is `type=search` with an accessible label. Reasons persist through meta or `aria-describedby`.
+Rows meet `tap-min` (radio and inline rows `radio-row-min`). Single rows expose `aria-pressed`; radio rows use `radio` inside a labelled `radiogroup` with `aria-checked`. Search is `type=search` with an accessible label. Reasons persist through meta or `aria-describedby`.
 
 ## API and tokens
 
 `choiceRow`, `choiceGroup`, `choiceSearch`, `choiceEmpty`, `choiceRadios`, `radioBind`; `pickerOptions` is a compatibility adapter. `secondaryAction` exposes a separately named removal control. `labelHidden` hides only the field label when an enclosing optional row already names it; the accessible label and Clear remain. Types in `../index.d.ts`.
 
-Tokens: `tap-min`, `choice-row-min`, `radio-row-min`, `rule`, `paper`, `ink`, `muted`, `green`, `choice-press`, `disabled-surface`, `focus`, `font-sans`, `font-size-14`, `type-weight-strong`, `space-8`, `space-12`, `size-20`, `size-24`.
+Tokens: `tap-min`, `choice-row-min`, `radio-row-min`, `rule`, `paper`, `ink`, `muted`, `green`, `choice-press`, `disabled-surface`, `font-sans`, `font-size-14`, `type-weight-strong`, `space-8`, `space-12`, `size-20`, `size-24`.
 
 ## Do / don't
 
@@ -77,4 +76,4 @@ Component: generic and shared across sections. Selection modes are variants of t
 
 ## Changelog
 
-2026-10-10 (round 2 fixes): README rewritten for rows; no zero or "1 options" meta; inline demo uses a required outcome and an optional row; one focus ring and ink text in disabled inline options.
+2026-10-10 (round 2 fixes): README rewritten for rows; no zero or "1 options" meta; inline demo uses a required outcome and an optional row; ink text in disabled inline options.

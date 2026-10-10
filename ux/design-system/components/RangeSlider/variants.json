@@ -7,7 +7,6 @@
     "states": [
       "Default",
       "Pressed",
-      "Focus",
       "At limits",
       "Disabled",
       "Error",

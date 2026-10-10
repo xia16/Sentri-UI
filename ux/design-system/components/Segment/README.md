@@ -34,7 +34,6 @@ See [variants.json](variants.json) for use boundaries and each variant’s rende
 | Pressed | An unselected option darkens to the handle tone at once on touch (visibly different from both unselected and selected); a selected option keeps its paper face. The static demo presses the second option. |
 | Selected | Weight plus underline; never colour alone. |
 | Disabled | Native disabled button, dashed outline; host supplies one visible reason beside the row. Prefer omission unless temporarily unavailable. |
-| Focus | Token focus ring. |
 | Long-label | English and Chinese labels wrap without clipping or ellipsis. |
 
 Error and loading belong to the list/sheet, not this synchronous control. Empty options omit the entire control; an empty result retains the current filters and shows a list-level empty state with a clear-filter action.
@@ -49,7 +48,7 @@ Sentence case; nouns or states, never commit verbs. Aim for 1–2 words, ≤12 E
 
 ## Accessibility
 
-Named role=group; buttons expose aria-pressed. Every target is at least tap-min in both dimensions. Tab reaches the control; arrows select adjacent enabled options, Home/End select the first/last. Enter/Space activate. Disabled options are skipped. The shared bundle dispatches selection through ordinary clicks and restores focus after host rendering. Hosts provide an ariaLabel/label and keep list announcements outside the control.
+Named role=group; buttons expose aria-pressed. Every target is at least tap-min in both dimensions. Disabled options are skipped. The shared bundle dispatches selection through ordinary clicks and keeps the screen reader's place after host rendering. Hosts provide an ariaLabel/label and keep list announcements outside the control.
 
 ## Do / don’t
 
@@ -61,7 +60,7 @@ Named role=group; buttons expose aria-pressed. Every target is at least tap-min 
 
 `SentriUI.segment({ options: [[value, trustedLabelHTML, {count, disabled, strs, args}]], active, action, ariaLabel, variant, state, disabled, reason, className })`. Existing calls remain valid; default variant is two-line-lens.
 
-CSS uses tap-min, well, line, paper, ink, muted, press, focus, control-border, radius-segment, radius-control, radius-8, space-2/3/4/6, space-key-gap, space-row-x, space-gutter, size-16, type-row-title-size, type-description-size, type-meta-size, font-sans and font-mono. No prototype scope is required.
+CSS uses tap-min, well, line, paper, ink, muted, press, control-border, radius-segment, radius-control, radius-8, space-2/3/4/6, space-key-gap, space-row-x, space-gutter, size-16, type-row-title-size, type-description-size, type-meta-size, font-sans and font-mono. No prototype scope is required.
 
 ## Related components
 
@@ -73,6 +72,6 @@ Component: generic, used across sections. Named appearances are variants. Sticky
 
 ## Changelog
 
-2026-10-10: consolidated implementations, self-contained tokens, keyboard and press feedback, documented states and Chinese overflow.
+2026-10-10: consolidated implementations, self-contained tokens, press feedback, documented states and Chinese overflow.
 
 [Gate remediation and checklist verification](VERIFICATION.md).

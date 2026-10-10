@@ -17,7 +17,7 @@ The one card under the last-record line: **left, this unit's figure; right, the 
 - **No clip:** the card does not clip its halves (a clip read as hiding the task half's last pixel on a room too short to scroll); the task half keeps the card's right corners with its own `radius-panel`, so its pressed wash stays inside.
 
 **States**
-- Pressed (task half): `green-wash`. Focus: the global ring. Disabled: not drawn.
+- Pressed (task half): `green-wash`. Disabled: not drawn.
 - Empty: a half with no figure prints the heading and `—`; the card is never absent from a task's first screen.
 
 **Component contract**

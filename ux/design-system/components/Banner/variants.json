@@ -7,7 +7,6 @@
     "states": [
       "Default",
       "Pressed",
-      "Focus",
       "Disabled",
       "Long label / Chinese"
     ]
@@ -21,7 +20,6 @@
       "Default",
       "Changed",
       "Pressed",
-      "Focus",
       "Disabled",
       "Cleared",
       "Long label / Chinese"
@@ -35,7 +33,6 @@
     "states": [
       "Default",
       "Pressed",
-      "Focus",
       "Disabled",
       "Loading",
       "Error",

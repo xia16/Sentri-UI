@@ -28,14 +28,13 @@ See [variants.json](variants.json) for use boundaries and each variant’s rende
 | Pressed | An unselected chip darkens to the handle tone at once on touch; the selected chip keeps its paper face. The static demo presses the second chip. |
 | Selected | Weight plus check mark, shown only on the selected chip; the chip keeps the same width selected or not (padding reserves the check); never colour alone. |
 | Disabled | Native disabled button, dashed outline; host supplies one visible reason beside the row. Prefer omission unless temporarily unavailable. |
-| Focus | Token focus ring. |
 | Long-label | English and Chinese labels wrap without clipping or ellipsis. |
 
 Error and loading belong to the list/sheet, not this synchronous control. Empty options omit the entire control; an empty result retains the current filters and shows a list-level empty state with a clear-filter action.
 
 ## Behaviour
 
-Selection changes the content below immediately through the host’s data-action handler. No record is committed. Counts include zero; missing counts are omitted. Single selection; All clears the tag constraint. There is no total tag cap; show only what fits and scroll the remainder. The track has a visible scrollbar and keyboard navigation, so swipe is not required. A Segment lens may sit above tags when it controls a separate state dimension, as in Piglet processing.
+Selection changes the content below immediately through the host’s data-action handler. No record is committed. Counts include zero; missing counts are omitted. Single selection; All clears the tag constraint. There is no total tag cap; show only what fits and scroll the remainder. The track scrolls sideways; a screen reader reads every chip in order, so swipe is not required. A Segment lens may sit above tags when it controls a separate state dimension, as in Piglet processing.
 
 ## Content rules
 
@@ -43,7 +42,7 @@ Sentence case; the job or category as a noun, never a commit verb. One or two wo
 
 ## Accessibility
 
-Named role=radiogroup; buttons expose role=radio and aria-checked, with a roving tab stop. Every target is at least tap-min in both dimensions. Tab reaches the control; arrows select adjacent enabled options, Home/End select the first/last. Enter/Space activate. Disabled options are skipped. The shared bundle dispatches selection through ordinary clicks and restores focus after host rendering. Hosts provide an ariaLabel/label and keep list announcements outside the control.
+Named role=radiogroup; buttons expose role=radio and aria-checked, read as one choice of the group. Every target is at least tap-min in both dimensions. Disabled options are skipped. The shared bundle dispatches selection through ordinary clicks and keeps the screen reader's place after host rendering. Hosts provide an ariaLabel/label and keep list announcements outside the control.
 
 ## Do / don’t
 
@@ -55,7 +54,7 @@ Named role=radiogroup; buttons expose role=radio and aria-checked, with a roving
 
 `SentriUI.filterChips({ items: [{value, label, count, checked, disabled}], action, key, label, state, reason })`. TaskChips is a compatibility adapter into this implementation.
 
-CSS uses tap-min, well, line, paper, ink, muted, press, focus, control-border, radius-segment, radius-control, radius-8, space-2/3/4/6, space-key-gap, space-row-x, space-gutter, size-16, type-row-title-size, type-description-size, type-meta-size, font-sans and font-mono. No prototype scope is required.
+CSS uses tap-min, well, line, paper, ink, muted, press, control-border, radius-segment, radius-control, radius-8, space-2/3/4/6, space-key-gap, space-row-x, space-gutter, size-16, type-row-title-size, type-description-size, type-meta-size, font-sans and font-mono. No prototype scope is required.
 
 ## Related components
 
@@ -67,4 +66,4 @@ Component: generic, used across sections. Named appearances are variants. Sticky
 
 ## Changelog
 
-2026-10-10: consolidated implementations, self-contained tokens, keyboard and press feedback, documented states and Chinese overflow.
+2026-10-10: consolidated implementations, self-contained tokens, press feedback, documented states and Chinese overflow.

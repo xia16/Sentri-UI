@@ -68,7 +68,6 @@ A **page** has a status bar in place of the grab and scrim, no ✕, and its head
 | Loading | Not drawn. A hold that was sent shows its pending phase; the sheet stays. |
 | Empty | The body holds the empty line of what it contains (`Nothing selected yet. Tap a pig in the list to add it.`). |
 | Long / Chinese | Titles wrap (`overflow-wrap: anywhere`), the subtitle wraps; Back is 86px wide and the primary takes the rest. A primary label longer than about 20 characters (10 Chinese) should be shortened. |
-| Focus | Controls take the global 3px ring; the sheet takes none. |
 
 Every state is drawn in `variants/drawer.html`, `variants/page.html` and `variants/dialog.html`.
 
@@ -77,7 +76,7 @@ Every state is drawn in `variants/drawer.html`, `variants/page.html` and `varian
 - **Never a drawer on a drawer.** A drawer that must lead to a picker or a second step replaces its own content (the lead control returns up one level) or becomes a page. The deepest stack is a page, then a drawer or a dialog over it. The layer model: z = base + 10 × layer (scrim 2, drawer 3, page 5, dialog 8); an overlay placed after a sheet in the phone rises a layer on its own, or set `layer: n`.
 - **Re-entering a session resumes it.** Opening the same record again shows the draft; it never opens a fresh sheet on top.
 - **The page behind is inert** while a sheet is open (`inert` on the screen, or `inert: true` on a page under a drawer).
-- **Focus** moves to the sheet when it opens and returns to the control that opened it when it closes.
+- **The screen reader's focus** moves to the sheet when it opens and returns to the control that opened it when it closes.
 - **Motion:** a drawer rises (`sheet-in`, 240ms), a page slides in from the side, a scrim or dialog backdrop fades (`fade`). The host sets `data-enter` on the render that opens a surface and `data-leave` before it removes it. Reduced motion turns it off.
 - **A sheet is sized by its nearest positioned ancestor.** Give the phone root `position: relative; height: 100dvh; overflow: hidden`. Without it a page fills a far ancestor and percent heights collapse.
 
@@ -93,7 +92,7 @@ Every state is drawn in `variants/drawer.html`, `variants/page.html` and `varian
 
 - A drawer and a dialog are `role="dialog"` with `aria-modal="true"` and an accessible name (the title). A page is `role="region"` with the title as its name. Each takes `tabindex="-1"` for focus hand-off.
 - Every tap target is at least 48px (`tap-min`): ✕, Back, the primary, the aside actions.
-- Keyboard (the host wires it): Tab stays inside a drawer or dialog, Escape does what ✕ does, and Back and the primary answer Enter and Space.
+- Screen reader: the dialog is modal, so the background is not read; ✕ and Back are the ways out.
 - No action depends on a gesture: dragging the grab dismisses, and so do the scrim, ✕ and Back.
 - State is never colour alone: a waiting primary has a status line with words; an error line says what is wrong.
 

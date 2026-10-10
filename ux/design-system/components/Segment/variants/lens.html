@@ -3,7 +3,6 @@
 <section data-state="Pressed"><h2>Pressed</h2><div id="state-Pressed"></div></section>
 <section data-state="Selected"><h2>Selected</h2><div id="state-Selected"></div></section>
 <section data-state="Disabled"><h2>Disabled</h2><div id="state-Disabled"></div></section>
-<section data-state="Focus"><h2>Focus</h2><div id="state-Focus"></div></section>
 <section data-state="Long-label"><h2>Long-label</h2><div id="state-Long-label"></div></section>
 <script>
 // Each state renders in its own iframe in the atlas: draw only the states present.
@@ -13,7 +12,6 @@ var RENDER = {
   "state-Pressed": () => SentriUI.segment({variant:'lens',options:[['today','Today'],['week','7 days']],active:'today',ariaLabel:'Lens',state:'Pressed',disabled:false,reason:''}),
   "state-Selected": () => SentriUI.segment({variant:'lens',options:[['today','Today'],['week','7 days']],active:'week',ariaLabel:'Lens',state:'Selected',disabled:false,reason:''}),
   "state-Disabled": () => SentriUI.segment({variant:'lens',options:[['today','Today'],['week','7 days']],active:'today',ariaLabel:'Lens',state:'Disabled',disabled:true,reason:'Records are unavailable offline.'}),
-  "state-Focus": () => SentriUI.segment({variant:'lens',options:[['today','Today'],['week','7 days']],active:'today',ariaLabel:'Lens',state:'Focus',disabled:false,reason:''}),
   "state-Long-label": () => SentriUI.segment({variant:'lens',options:[['todo','待处理的仔猪记录'],['done','已完成的母猪记录']],active:'today',ariaLabel:'Lens',state:'Long-label',disabled:false,reason:''})
 };
 document.querySelectorAll('[data-state]').forEach(function (s) {

@@ -2,7 +2,6 @@
 <div data-state="Default"></div>
 <div data-state="Pressed"></div>
 <div data-state="Active"></div>
-<div data-state="Focused"></div>
 <div data-state="Empty"></div>
 <div data-state="Five categories at 300px"></div>
 <div data-state="Long label / Chinese"></div>
@@ -16,4 +15,4 @@ if(state.includes('300px')||state==='Scrolled'){el.style.width='var(--size-300)'
 el.innerHTML=SentriUI.categoryFooter({categories,active:state==='Active'?'routine':'health'});
 if(state==='Back pressed')el.querySelector('.surface-back').dataset.preview='pressed';
 if(state==='Scrolled')el.querySelector('.st-category-tabs').scrollLeft=el.querySelector('.st-category-tabs').scrollWidth;
-if(state==='Pressed'||state==='Focused')el.querySelector('.st-category-tabs button').dataset.preview=state==='Pressed'?'pressed':'focus';});</script></body></html>
+if(state==='Pressed')el.querySelector('.st-category-tabs button').dataset.preview='pressed';});</script></body></html>

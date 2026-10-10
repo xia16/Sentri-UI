@@ -13,7 +13,7 @@ The top of a task: **back + the task's name**, then **the last-record line** as 
 - `tap-min` tall, text centred, padded `0 space-gutter 8px`, `description` 11px/1.5 `muted`: `Last record` **`08:41`** `· G. Hansen`. The time is 500 `ink`.
 
 **States**
-- Default only. Back takes the global 3px `focus` ring; pressed and disabled are not drawn.
+- Default only. Pressed and disabled are not drawn.
 - Empty: with no record yet the line is absent (the empty slot stays empty).
 
 **Component contract**

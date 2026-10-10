@@ -250,7 +250,7 @@
   }
   const chevron=root.SentriIcons.icon('chevron');
   const check=root.SentriIcons.icon('check');
-  function field({label='',control='',className='',ds='Field',variant='text',value='',unit='',hint='',error='',disabled=false,reason='',id='',placeholder='',labelHidden=false,focus=false}={}){
+  function field({label='',control='',className='',ds='Field',variant='text',value='',unit='',hint='',error='',disabled=false,reason='',id='',placeholder='',labelHidden=false}={}){
     const fid=id||fieldId('st-field'),hid=fid+'-hint';
     const bad=!!error||className.split(' ').includes('error');
     const message=error|| (bad?'Invalid value. Enter a valid value.':disabled?(reason||'This record cannot be edited.'):hint);
@@ -262,7 +262,7 @@
       if(bad)attrs=attrs.replace(/\saria-invalid=["'][^"']*["']/i,'');
       return `<${tag}${attrs}${label&&!/aria-label(?:ledby)?=/.test(attrs)?` aria-labelledby="${esc(fid)}-label"`:""}${message?` aria-describedby="${esc([previous,hid].filter(Boolean).join(' '))}"`:''}${bad?' aria-invalid="true"':''}${disabled&&!/\bdisabled\b/.test(attrs)?' disabled':''}>`;
     });
-    return `<label class="field ${bad?'error ':''}${esc(className)}" data-ds="${esc(ds||'Field')}" data-variant="${esc(variant)}"${focus?' data-preview="focus"':''}>${label||unit?`<span${labelHidden?' class="visually-hidden"':''} id="${esc(fid)}-label">${label}${unit?` (${esc(unit)})`:''}</span>`: ''}${control}${message?`<span class="st-field-message" id="${esc(hid)}" role="${bad?'alert':'status'}">${esc(message)}</span>`:''}</label>`;
+    return `<label class="field ${bad?'error ':''}${esc(className)}" data-ds="${esc(ds||'Field')}" data-variant="${esc(variant)}">${label||unit?`<span${labelHidden?' class="visually-hidden"':''} id="${esc(fid)}-label">${label}${unit?` (${esc(unit)})`:''}</span>`: ''}${control}${message?`<span class="st-field-message" id="${esc(hid)}" role="${bad?'alert':'status'}">${esc(message)}</span>`:''}</label>`;
   }
   /* Mobile-standard choice control: a trigger button that opens a picker sheet.
      Replaces native <select>; the host app owns the picker view and state.
@@ -390,14 +390,14 @@
   /* Stepper: `− n +`, the one counting shape. variant 'row' (a 60px sheet row) or 'hero' (the count sheet's one number).
      A key emits a requested delta; the host posts it (immediate host) or adds it to a draft (staged host).
      pointers: text actions shown in the status region at the floor. */
-  function stepper({label='',description='',value=0,min=0,max=null,step=1,action='step',key='',variant='row',changed=false,draft=false,tone='',hint='',pointers=[],reserveHint,id='',className='',disabled=false,reason='',error='',loading=false,pressed=false,focus=false,status='',hintHtml='',strs,args}={}){
+  function stepper({label='',description='',value=0,min=0,max=null,step=1,action='step',key='',variant='row',changed=false,draft=false,tone='',hint='',pointers=[],reserveHint,id='',className='',disabled=false,reason='',error='',loading=false,pressed=false,status='',hintHtml='',strs,args}={}){
     const o={strs,args},s=strs||{},a=args||{};
     const n=Number(value)||0,hero=variant!=='row',lid=id||fieldId('st-stepper'),hid=lid+'-hint',d=Math.abs(Number(step)||1);
     variant=variant==='hero'?'count':variant;
     const floorGray=disabled||loading||n<=min,ceilGray=disabled||loading||(max!=null&&n>=max);
     // draft: the value carries an unsaved staged addition (green, the number is the receipt); it wins over changed.
     const isDraft=draft||tone==='draft',isChanged=!isDraft&&(changed||tone==='changed');
-    const key1=(dir,gray)=>{const kid=`${lid}-${dir<0?'dec':'inc'}`;return `<button type="button" class="st-stepper-key" id="${esc(kid)}" data-action="${esc(action)}" data-value="${esc(key)}" data-step="${dir*d}" aria-labelledby="${esc(lid)} ${esc(kid)}" aria-describedby="${esc(hid)}"${pressed&&dir>0?' data-preview="pressed"':focus&&dir>0?' data-preview="focus"':''}${gray?' aria-disabled="true"':''}${dir<0?ariaText('Decrease',s.decrease,a.decrease):ariaText('Increase',s.increase,a.increase)}><span class="st-stepper-face">${glyph(dir<0?'minus':'plus')}</span></button>`;};
+    const key1=(dir,gray)=>{const kid=`${lid}-${dir<0?'dec':'inc'}`;return `<button type="button" class="st-stepper-key" id="${esc(kid)}" data-action="${esc(action)}" data-value="${esc(key)}" data-step="${dir*d}" aria-labelledby="${esc(lid)} ${esc(kid)}" aria-describedby="${esc(hid)}"${pressed&&dir>0?' data-preview="pressed"':''}${gray?' aria-disabled="true"':''}${dir<0?ariaText('Decrease',s.decrease,a.decrease):ariaText('Increase',s.increase,a.increase)}><span class="st-stepper-face">${glyph(dir<0?'minus':'plus')}</span></button>`;};
     const copy=`<span class="st-stepper-copy"><span class="st-stepper-label" id="${esc(lid)}">${tx(label,o,'label')}</span>${description||has(o,'description')?`<small class="st-stepper-description">${tx(description,o,'description')}</small>`:''}</span>`;
     const vargs=a.value||(s.value?{n:String(n)}:null);
     const val=`<span class="st-stepper-value" role="spinbutton" tabindex="0" data-st-spin${disabled||loading?' aria-disabled="true"':''}${error?' aria-invalid="true"':''} aria-labelledby="${esc(lid)}" aria-describedby="${esc(hid)}" aria-valuenow="${n}" aria-valuemin="${esc(min)}"${max!=null?` aria-valuemax="${esc(max)}"`:''} aria-live="polite"${sa(s.value,vargs)}>${esc(n)}</span>`;

@@ -44,7 +44,7 @@ Sentence case. Short choice groups wrap (nothing is cut off or hidden behind a s
 
 ## Accessibility
 
-Sheet supplies role=dialog and aria-modal, visible Back and Close. Tab reaches controls; Enter/Space activates them. FilterChips supplies radio roles and arrow navigation; PickerField supplies its documented keyboard behaviour. Result/reason uses polite status. Caller retains Sheet focus lifecycle.
+Sheet supplies role=dialog and aria-modal, visible Back and Close. FilterChips supplies radio roles; PickerField supplies its documented roles. Result/reason uses polite status. Caller retains Sheet focus lifecycle.
 
 All targets use `--tap-min` (48 CSS pixels). Disabled commit stays understandable through the visible reason.
 
@@ -54,7 +54,7 @@ Do show the count only on the Show button. Do preserve drafts on Back, but reset
 
 ## API and tokens
 
-`SentriUI.filterSheet` returns HTML; see [types](../index.d.ts). Tokens: `--tap-min`, `--border-width`, `--space-2`, `--space-3`, `--space-4`, `--space-8`, `--space-16`, `--space-24`, `--ink`, `--paper`, `--well`, `--line`, `--muted`, `--focus`, `--type-input-size`, `--type-description-size`, `--type-sheet-title-size`. No custom theme tokens.
+`SentriUI.filterSheet` returns HTML; see [types](../index.d.ts). Tokens: `--tap-min`, `--border-width`, `--space-2`, `--space-3`, `--space-4`, `--space-8`, `--space-16`, `--space-24`, `--ink`, `--paper`, `--well`, `--line`, `--muted`, `--type-input-size`, `--type-description-size`, `--type-sheet-title-size`. No custom theme tokens.
 
 ## Related components
 
