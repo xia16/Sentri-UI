@@ -8,23 +8,97 @@
   "duplicates": "",
   "groups": [
     [
-      "Old UI",
+      "Backfat",
       [
-        "backfat.backfat"
+        "backfat.by-eye",
+        "backfat.measured",
+        "backfat.run",
+        "backfat.after"
       ]
     ]
   ],
   "screens": [
     {
-      "id": "backfat.backfat",
-      "name": "Backfat",
-      "zh": "背膘",
-      "status": "placeholder",
+      "id": "backfat.by-eye",
+      "name": "Backfat · by eye",
+      "zh": "背膘 · 目测",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-backfat&slide=1",
       "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
       "notes": {
-        "purpose": "Record backfat for one pig only (a single pig, per the screen name).",
-        "issues": []
+        "purpose": "The default: method By eye with thin, ok, fat.",
+        "rules": [
+          "By eye is preselected; the amber rule alone joins the field to its choice."
+        ]
+      }
+    },
+    {
+      "id": "backfat.measured",
+      "name": "Backfat · measured",
+      "zh": "背膘 · 测量",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-backfat&slide=2",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "The other branch: a millimetre Measure replaces the scale.",
+        "rules": [
+          "Choice(qualitative / quantitative) yields Scale or Measure; two visible fields either way."
+        ]
+      }
+    },
+    {
+      "id": "backfat.run",
+      "name": "Backfat · conveyor",
+      "zh": "背膘 · 逐只",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-backfat&slide=3",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "Six pigs in sequence, method sticky.",
+        "elements": [
+          {
+            "name": "Method",
+            "shows": "Choice carried through the run",
+            "rule": "Prefilled from pig 1 and changeable on any pig (the hand carries a caliper or it does not). Skip records nothing; leaving loses nothing."
+          }
+        ]
+      }
+    },
+    {
+      "id": "backfat.after",
+      "name": "After · her page body key",
+      "zh": "背膘 · 完成",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-backfat&slide=4",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "The reading as a fact line on her page.",
+        "rules": [
+          "Walk row stays quiet: backfat has no threshold, so it never chips."
+        ]
       }
     }
+  ],
+  "flow": [
+    [
+      "backfat.by-eye",
+      "backfat.measured",
+      "choose Measured"
+    ],
+    [
+      "backfat.measured",
+      "backfat.after",
+      "tap Record"
+    ],
+    [
+      "backfat.by-eye",
+      "backfat.after",
+      "tap Record"
+    ],
+    [
+      "backfat.run",
+      "backfat.after",
+      "last confirm"
+    ]
   ]
 }

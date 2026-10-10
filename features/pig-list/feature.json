@@ -16,6 +16,15 @@
         "pig-list.events",
         "pig-list.edit"
       ]
+    ],
+    [
+      "Assign identity",
+      [
+        "pig-list.identity-one",
+        "pig-list.identity-tag",
+        "pig-list.identity-notch",
+        "pig-list.identity-breeding"
+      ]
     ]
   ],
   "screens": [
@@ -41,9 +50,10 @@
       "notes": {
         "purpose": "A pig's Overview, Basic info, Production (marked not to be done yet) and event list tabs.",
         "issues": [
-          "The file's detail and health pages are built elsewhere (pig-profile, health-record)."
+          "The old file's page is built as pig-profile.full; this entry is the same screen."
         ]
-      }
+      },
+      "aliasOf": "pig-profile.full"
     },
     {
       "id": "pig-list.health",
@@ -54,9 +64,10 @@
       "notes": {
         "purpose": "Triage level, add or remove disease or symptom, temperature and notes on one pig.",
         "issues": [
-          "The file's detail and health pages are built elsewhere (pig-profile, health-record)."
+          "The old file's page is built as health-record.record-health; this entry is the same screen."
         ]
-      }
+      },
+      "aliasOf": "health-record.record-health"
     },
     {
       "id": "pig-list.events",
@@ -67,9 +78,10 @@
       "notes": {
         "purpose": "The pig's events, adding an event and choosing an event type.",
         "issues": [
-          "The file's detail and health pages are built elsewhere (pig-profile, health-record)."
+          "The old file's page is built as pig-profile.log; this entry is the same screen."
         ]
-      }
+      },
+      "aliasOf": "pig-profile.log"
     },
     {
       "id": "pig-list.edit",
@@ -80,9 +92,104 @@
       "notes": {
         "purpose": "Edit identity fields, treatment and more actions.",
         "issues": [
-          "The file's detail and health pages are built elsewhere (pig-profile, health-record)."
+          "The old file's page is built as pig-profile.actions; this entry is the same screen."
+        ]
+      },
+      "aliasOf": "pig-profile.actions"
+    },
+    {
+      "id": "pig-list.identity-one",
+      "name": "Assign identity · one pig",
+      "zh": "分配身份 · 单只",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-identity&slide=1",
+      "figma": "",
+      "notes": {
+        "purpose": "Give one no-ID pig its tag and sex; each Confirm saves that pig.",
+        "rules": [
+          "Tag and Sex are required; Notch and Parents are optional.",
+          "Each confirm migrates the pig's batch from the pen's partition to the animal record: one head leaves the pen batch row.",
+          "Skip advances without recording."
+        ],
+        "issues": [
+          "Drawn in the place workflow deck (ux/system/workflows/place.html); no Astra prototype screen opens it."
+        ]
+      }
+    },
+    {
+      "id": "pig-list.identity-tag",
+      "name": "Assign identity · tag keypad",
+      "zh": "分配身份 · 耳标键盘",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-identity&slide=2",
+      "figma": "",
+      "notes": {
+        "purpose": "The tag is pre-filled from the last one plus 1 and the keypad opens to correct it.",
+        "rules": [
+          "Sex is not carried forward: a litter is mixed.",
+          "The list under the tag box is the receipt of pigs already saved."
+        ],
+        "issues": [
+          "Drawn in the place workflow deck (ux/system/workflows/place.html); no Astra prototype screen opens it."
+        ]
+      }
+    },
+    {
+      "id": "pig-list.identity-notch",
+      "name": "Assign identity · from the notch",
+      "zh": "分配身份 · 耳缺",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-identity&slide=3",
+      "figma": "",
+      "notes": {
+        "purpose": "A notch entered pre-fills Sex, and a known litter opens Parents as read-only cards.",
+        "rules": [
+          "The pre-filled sex is editable and names its source (from her notch).",
+          "Parents come from her litter record; an empty Parents field is the only warning."
+        ],
+        "edge": [
+          "Whether the notch-to-sex table is farm config or breed convention is open."
+        ],
+        "issues": [
+          "Drawn in the place workflow deck (ux/system/workflows/place.html); no Astra prototype screen opens it."
+        ]
+      }
+    },
+    {
+      "id": "pig-list.identity-breeding",
+      "name": "Breeding stock · untagged pig",
+      "zh": "留种 · 未标记猪",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-identity&slide=4",
+      "figma": "",
+      "notes": {
+        "purpose": "Marking 3 pigs as breeding stock when 1 has no tag runs identity for that pig first, then the mark sheet opens with all 3.",
+        "rules": [
+          "The verb never greys out or detours: it splices identity in.",
+          "Backing out abandons only this pig's fields; saved identities stand and the mark was never written.",
+          "Only verbs that pin to an individual gate on identity (cycle events and the breeding mark)."
+        ],
+        "issues": [
+          "Drawn in the place workflow deck (ux/system/workflows/place.html); no Astra prototype screen opens it."
         ]
       }
     }
+  ],
+  "flow": [
+    [
+      "pig-list.identity-one",
+      "pig-list.identity-tag",
+      "tap the tag"
+    ],
+    [
+      "pig-list.identity-one",
+      "pig-list.identity-notch",
+      "enter a notch"
+    ],
+    [
+      "pig-list.identity-one",
+      "pig-list.identity-breeding",
+      "mark an untagged pig as breeding stock"
+    ]
   ]
 }

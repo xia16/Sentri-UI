@@ -8,47 +8,147 @@
   "duplicates": "built inside Inspection — see inspection (miscarriage)",
   "groups": [
     [
-      "Old UI",
+      "Record abortion",
       [
-        "abortion.abortion",
-        "abortion.line",
-        "abortion.result"
+        "abortion.entry",
+        "abortion.drawer",
+        "abortion.cause",
+        "abortion.other",
+        "abortion.after"
       ]
     ]
   ],
   "screens": [
     {
-      "id": "abortion.abortion",
-      "name": "Record abortion",
+      "id": "abortion.entry",
+      "name": "Entry · single only",
+      "zh": "流产 · 入口",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-abortion&slide=1",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "The verb sheet for one pregnant sow, Abortion in the Production strip.",
+        "rules": [
+          "Abortion is absent (not greyed) when more than one sow is selected; the not-available line gives the reason."
+        ]
+      }
+    },
+    {
+      "id": "abortion.drawer",
+      "name": "Abortion drawer · cause required",
       "zh": "流产",
-      "status": "placeholder",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-abortion&slide=2",
       "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
       "notes": {
-        "purpose": "Record that a sow aborted.",
-        "issues": []
+        "purpose": "One drawer: required Cause and a footnote that derives the batch consequence.",
+        "elements": [
+          {
+            "name": "Consequence footnote",
+            "at": "marked empty",
+            "shows": "What leaves with her",
+            "states": [
+              {
+                "state": "In a batch",
+                "when": "She belongs to a batch",
+                "shows": "\"out of batch 20 · marked empty\""
+              },
+              {
+                "state": "Loose",
+                "when": "No batch",
+                "shows": "\"marked empty\""
+              }
+            ],
+            "logic": "Derived from her batch membership; never a choice."
+          }
+        ],
+        "rules": [
+          "Record abortion is the primary; the status target is named \"empty\" once."
+        ]
       }
     },
     {
-      "id": "abortion.line",
-      "name": "Choose production line",
-      "zh": "选择生产线",
-      "status": "placeholder",
+      "id": "abortion.cause",
+      "name": "Cause · six rows",
+      "zh": "选择流产原因",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-abortion&slide=3",
       "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
       "notes": {
-        "purpose": "Choose the production line.",
-        "issues": []
+        "purpose": "The cause sub-sheet: a fixed set, one tap, no confirm.",
+        "rules": [
+          "Other shows \"note required\" on its row so the reveal is never a surprise."
+        ],
+        "issues": [
+          "The six cause labels (Disease, Injury, Heat stress, Poor nutrition, Stress · handling, Other) are placeholders until pulled from production."
+        ]
       }
     },
     {
-      "id": "abortion.result",
-      "name": "Result",
-      "zh": "操作结果",
-      "status": "placeholder",
+      "id": "abortion.other",
+      "name": "Cause Other · note required",
+      "zh": "流产 · 其他",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-abortion&slide=4",
       "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
       "notes": {
-        "purpose": "Result of the action.",
-        "issues": []
+        "purpose": "The Note-when-Other conditional.",
+        "elements": [
+          {
+            "name": "Note",
+            "at": "note required",
+            "shows": "Inline required note under Cause",
+            "rule": "Appears only for Other, amber-ruled and required; any other cause folds it away. Never a second step."
+          }
+        ]
+      }
+    },
+    {
+      "id": "abortion.after",
+      "name": "After · what leaves with her",
+      "zh": "流产 · 完成",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-abortion&slide=5",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "The walk list after commit.",
+        "rules": [
+          "She is gone from the batch's pregnancy-check and farrowing streams at commit.",
+          "The rebreed watch claims her before \"no batch\" ever prints."
+        ]
       }
     }
+  ],
+  "flow": [
+    [
+      "abortion.entry",
+      "abortion.drawer",
+      "tap Abortion"
+    ],
+    [
+      "abortion.drawer",
+      "abortion.cause",
+      "tap Cause"
+    ],
+    [
+      "abortion.cause",
+      "abortion.drawer",
+      "tap a cause"
+    ],
+    [
+      "abortion.cause",
+      "abortion.other",
+      "tap Other"
+    ],
+    [
+      "abortion.drawer",
+      "abortion.after",
+      "tap Record abortion"
+    ],
+    [
+      "abortion.other",
+      "abortion.after",
+      "tap Record abortion"
+    ]
   ]
 }

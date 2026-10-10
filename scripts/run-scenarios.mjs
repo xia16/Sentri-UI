@@ -30,7 +30,7 @@ const verbs = JSON.parse(readFileSync(join(root, 'ux/laws/strings.json'), 'utf8'
 const HARD = ['wrong-fact', 'lost-draft', 'dead-end', 'unreachable-control', 'broken-ruling'];
 
 // ---- the tree: walk it into executable leaves ----
-// A leaf's run = the fixture of its nearest `state` ancestor + the taps of every `action` between them + its own taps.
+// A leaf's run = the reset fixture of its nearest `state` ancestor + the taps of every `action` between them + its own taps.
 const leaves = [], nodeCount = {}, problems = [], ids = new Set();
 (function walk(node, path) {
   nodeCount[node.type] = (nodeCount[node.type] || 0) + 1;
@@ -143,9 +143,10 @@ const textOf = (a, lang) => {
   return null;
 };
 
-async function checkOne(page, a, lang, width) {
-  // returns null when it holds, else { got }
+async function checkOne(page, a, lang, width, noLocale = false) {
+  // returns null when it holds, else { got }; copy checks are skipped in a language the page does not render
   await ensureHelpers(page);
+  if (noLocale && (a.verb || a.text)) return { skipped: `page does not render ${lang}` };
   if ('expr' in a) {
     let got; try { got = await page.evaluate((e) => window.__scen.record(e), a.expr); } catch (e) { return { got: 'error: ' + e.message.split('\n')[0] }; }
     return got === true ? null : { got: JSON.stringify(got) };
@@ -203,7 +204,7 @@ async function tap(page, step) {
 const slug = (s) => String(typeof s === 'string' ? s : s.tap || s.fill || s.says || 'check').replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '').toLowerCase().slice(0, 32) || 'step';
 
 async function runLeaf(browser, leaf, lang, width) {
-  const n = leaf.node, st = leaf.state, fx = st.fixture || {};
+  const n = leaf.node, st = leaf.state, fx = st.reset || {};
   const dir = join(root, 'review', 'scenarios', feature, n.id, `${lang}-${width}`);
   rmSync(dir, { recursive: true, force: true }); mkdirSync(dir, { recursive: true });
   const evidence = [], failures = [], skipped = [], notes = [];
@@ -246,7 +247,7 @@ async function runLeaf(browser, leaf, lang, width) {
     await shot('start');
     for (const step of leaf.taps) {
       if (step.expect) {
-        for (const a of [].concat(step.expect)) { const r = await checkOne(page, a, lang, width); if (r?.skipped) skipped.push(describe(a)); else if (r) fail(describe(a), r.got, a.hard, `after step ${i - 1}`); }
+        for (const a of [].concat(step.expect)) { const r = await checkOne(page, a, lang, width, notes.length > 0); if (r?.skipped) skipped.push(describe(a)); else if (r) fail(describe(a), r.got, a.hard, `after step ${i - 1}`); }
         continue;
       }
       if (step.fill) { await ensureHelpers(page); await page.locator(step.fill).last().fill(String(step.value)); await settle(page); await shot('fill-' + step.fill); continue; }
@@ -260,7 +261,7 @@ async function runLeaf(browser, leaf, lang, width) {
       if (e) { fail(`tap ${typeof step === 'string' ? step : step.tap}`, e, step.hard || 'unreachable-control', `step ${i - 1}`); break; }
     }
     if (!failures.some((f) => f.what.startsWith('tap '))) {
-      for (const a of n.visible || []) { const r = await checkOne(page, a, lang, width); if (r?.skipped) skipped.push(describe(a)); else if (r) fail(describe(a), r.got, a.hard); }
+      for (const a of n.visible || []) { const r = await checkOne(page, a, lang, width, notes.length > 0); if (r?.skipped) skipped.push(describe(a)); else if (r) fail(describe(a), r.got, a.hard); }
       for (const a of n.record || []) { const r = await checkOne(page, a, lang, width); if (r) fail(describe(a), r.got, a.hard); }
       if (n.clip !== false && D.clipCheck !== false) { const r = await checkOne(page, { noClip: true }, lang, width); if (r) fail('nothing clipped', r.got, null); }
     }
@@ -296,9 +297,14 @@ if (server) server.kill();
 const count = (r) => out.filter((x) => x.result === r).length;
 const byBranch = {};
 for (const x of out) { const b = byBranch[x.branch] || (byBranch[x.branch] = { pass: 0, fail: 0, blocked: 0, pending: 0 }); b[x.result]++; }
+const byLang = {};   // per language: a leaf passes in a language when every width passed there
+for (const x of out) for (const lang of new Set(x.runs.map((r) => r.lang))) {
+  const rs = x.runs.filter((r) => r.lang === lang), b = byLang[lang] || (byLang[lang] = { pass: 0, fail: 0, blocked: 0 });
+  b[rs.some((r) => r.result === 'fail') ? 'fail' : rs.some((r) => r.result === 'blocked') ? 'blocked' : 'pass']++;
+}
 const report = {
   feature, commit, dirty, ran: new Date().toISOString(), base, langs, widths,
-  nodes: nodeCount, summary: { pass: count('pass'), fail: count('fail'), blocked: count('blocked'), pending: count('pending') }, byBranch,
+  nodes: nodeCount, summary: { pass: count('pass'), fail: count('fail'), blocked: count('blocked'), pending: count('pending') }, byLang, byBranch,
   hardFailures: out.filter((x) => x.hard.length).map((x) => ({ id: x.id, hard: x.hard })),
   leaves: out,
 };

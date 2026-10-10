@@ -4,7 +4,8 @@ A feature's behaviour is specified as a **scenario tree** derived from its rulin
 replays every executable leaf in a real browser. The method is the one piglet processing used from 29 Sep to 6 Oct
 (`ux/tasks/piglet-processing/research/scenario-tree.md`, walks in `research/walks/`); the runner is what makes its
 leaves re-runnable and lets them gate a merge. Persona walks, which find what the tree is missing, are in
-[walks.md](walks.md).
+[briefs/walk.md](briefs/walk.md); the leaf fields as the polish loop names them are in
+[briefs/polish-loop.md](briefs/polish-loop.md#3-executable-leaves).
 
 | File | Holds |
 |---|---|
@@ -39,16 +40,16 @@ A node is `{ "type", "id", "label", "children"? }` plus, by type:
 | type | adds | meaning |
 |---|---|---|
 | `entry` | — | a branch: a way into the feature (Home → room, the death draft, …) |
-| `state` | `fixture`, `clock`?, `tree` (section letter) | a **reset fixture**: every leaf below starts here, from scratch |
+| `state` | `reset`, `clock`?, `tree` (section letter) | a **reset fixture**: every leaf below starts here, from scratch |
 | `action` | `taps` | what the worker does; actions chain, so Back / reopen / resume are just more actions |
-| `outcome` | `tree` (row id), `authority`, `visible`, `record`, `status`?, `why`?, `langs`?, `widths`?, `clip`? | an **executable leaf** |
+| `outcome` | `tree` (row id), `authority`, `visible`, `record`, `status`?, `why`?, `langs`? and `widths`? (the polish loop's `runs`; default all four), `clip`? | an **executable leaf** |
 | `decision-blocker` | `tree`, `question` (Qn), `sources` | a leaf with no authority or conflicting sources: reported `blocked`, never run |
 
-A leaf runs as: the nearest `state` above it (its fixture), then the `taps` of every `action` between them in order.
+A leaf runs as: the nearest `state` above it (its `reset` fixture), then the `taps` of every `action` between them in order.
 
 **Ids** are stable: a leaf id never changes meaning; retire it rather than reuse it.
 
-**`fixture`**: `{ "url"?, "screen"?, "preset"?, "params"?, "taps"? }`. `screen` is an atlas screen id: the page opens
+**`reset`**: `{ "url"?, "screen"?, "preset"?, "params"?, "taps"? }`. `screen` is an atlas screen id: the page opens
 bare (`?screen=`, `ux/system/atlas-bare.js`), with that screen's preset and steps. `preset` then resets the prototype
 to its own deterministic seed for that preset (`select.scenario`). `taps` finish the setup (no screenshot, no checks).
 `clock` fixes `Date` for the run (Playwright's clock, time still flows from there).
@@ -95,6 +96,10 @@ fixture in a fresh browser context, the phone drawn at the run's width. Results 
 - **blocked**: a decision-blocker, or no failures but a language the page cannot render (`?lang=zh` ignored): a
   screenshot of English never counts as covering Chinese;
 - **pending**: not runnable yet.
+
+In a language the page does not render, copy checks (`text`, `verb`) are skipped and listed; behaviour and record
+checks still run, so a Chinese run still catches a lost draft. `summary.byLang` gives each language's pass / fail /
+blocked on its own.
 
 **Hard failures** are tagged on the assertion (`hard`) and summarised per leaf: `wrong-fact`, `lost-draft`,
 `dead-end`, `unreachable-control`, `broken-ruling`. A failed tap is `unreachable-control` unless the step says

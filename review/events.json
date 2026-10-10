@@ -1,0 +1,92 @@
+[
+ {
+  "id": "events-1",
+  "target": { "kind": "feature", "id": "abortion" },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "Abortion vs miscarriage",
+  "detail": "The event deck's Abortion drawer (single sow, required Cause from six rows, a required note when Other, batch exit derived as a footnote) and the Pig profile's 'Record miscarriage' sheet (free-text Reason, a warning that the sow leaves the batch, Save disabled while empty) record the same pregnancy loss in different forms and under two names. The screen is therefore not aliased. The Pig profile sheet is the one built in the prototype; the deck is the designed one.",
+  "options": [
+    "Use the deck's Abortion drawer in the prototype and retire the free-text Reason",
+    "Keep the Pig profile sheet and drop the deck",
+    "Keep both and merge later"
+  ],
+  "recommendation": "One form with the deck's cause list; settle the word (abortion or miscarriage) with the farm first.",
+  "source": "populate-events"
+ },
+ {
+  "id": "events-2",
+  "target": { "kind": "feature", "id": "disease" },
+  "kind": "decision",
+  "severity": "high",
+  "title": "Disease vs health-record",
+  "detail": "Add condition and Resolve in the event deck and the Health record built in Inspection both cover recording and closing a condition. They differ: the deck has one Conditions field with triage inline (Monitor preset), Recover and Strike verbs with silent prints, and no care instructions; the Health record has care levels (No action needed, Monitor, Treat in place, Move to hospital pen) as the editable state, per-pig change preview, and Recovered or Entered in error that keep the case in history. Both are in-design and cannot both be the feature.",
+  "options": [
+    "The Health record is the one design; the deck's Add and Resolve become its history only",
+    "The deck is the design and the Health record is rebuilt to it",
+    "Merge: the deck's verdict page and silent prints with the Health record's care levels"
+  ],
+  "recommendation": "Decide with the vet which of the two models of recovery (closed line vanishes vs kept in history) is right, then keep one.",
+  "source": "populate-events"
+ },
+ {
+  "id": "events-3",
+  "target": { "kind": "feature", "id": "triage" },
+  "kind": "decision",
+  "severity": "high",
+  "title": "Triage level vs care level",
+  "detail": "The deck's Triage is a standalone mark with three levels (Hospital pen, Treat in place, Monitor), no case required, no 'healthy' level, and the marked set is drained by filtering. The Health record (and the Inspection walk) has care on a condition with four levels, including No action needed, and the PRD says hospital pen is a care choice only with no move made. Same words, two models: a mark on the pig versus a state of a condition.",
+  "options": [
+    "Keep the deck's pig-level mark and drop care from the condition",
+    "Keep care on the condition and drop the standalone mark",
+    "Keep both, with the mark as a shortcut that writes the care level"
+  ],
+  "recommendation": "One concept with one set of level names; confirm whether a pig can be flagged before any condition is named.",
+  "source": "populate-events"
+ },
+ {
+  "id": "events-4",
+  "target": { "kind": "feature", "id": "report-death" },
+  "kind": "decision",
+  "severity": "high",
+  "title": "The shared death form",
+  "detail": "The Piglet processing ruling asks for one shared death picker. Today there are four: the deck's Report death (cause from the condition catalogue, roster and conveyor for tagged pigs, 'Cause unknown' as an option), the deck's group count sheet, Farrowing's sow-death entry, and Piglet processing's 'Record death' (count by cause steppers, no tagged piglets, an open issue on that screen). Cause lists, photo handling and tagged-versus-count behaviour differ.",
+  "options": [
+    "One death form for pigs and groups across Inspection, Farrowing and Piglet processing, built from the deck",
+    "Keep Piglet processing's count-by-cause for litters and use the deck for the rest",
+    "Leave each context its own form"
+  ],
+  "recommendation": "One form; the deck's count sheet is already the litter flow generalised.",
+  "source": "populate-events"
+ },
+ {
+  "id": "events-5",
+  "target": { "kind": "feature", "id": "treat" },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "Treat vs the Health record's treatment",
+  "detail": "The deck's Treatment page has six fields with one dose per pig, a union of targets with fractions and an absent target field when nothing is open. The Health record's 'Record treatment' has a shared dose with a per-pig override, optional brand, linked condition and note, and one record per included pig. Dose logic and required fields differ.",
+  "options": [
+    "Use the deck's page",
+    "Use the Health record's sheet",
+    "Merge: one dose with an override and the deck's target fractions"
+  ],
+  "recommendation": "Settle together with the disease decision; treatment should not be designed twice.",
+  "source": "populate-events"
+ },
+ {
+  "id": "events-6",
+  "target": { "kind": "feature", "id": "weight" },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "Measures: one pig at a time vs one list",
+  "detail": "The deck records weight, backfat and temperature one pig at a time on a conveyor (per-confirm commit, skip, running list as receipt). The Pig profile's 'Record weight, temperature or backfat' sheet is a single scrolling list with one field per pig and one Save for the selection. The deck's own reason (a reading belongs to one animal, no draft) conflicts with the list's batch Save and 'blocks the whole save on one invalid row'.",
+  "options": [
+    "Conveyor everywhere, as in the deck",
+    "List form everywhere, as in the Pig profile",
+    "Conveyor for the walk, list for the pig record"
+  ],
+  "recommendation": "Conveyor, as the Synthesis laws state per-confirm commit; retire the list.",
+  "source": "populate-events"
+ }
+]

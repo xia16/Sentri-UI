@@ -26,7 +26,7 @@
      "id": "room.home",
      "label": "Home, Farrowing section, whole-farm overview",
      "tree": "E",
-     "fixture": {
+     "reset": {
       "url": "/ux/system/home-astra-prototype.html?layout=focus&section=farrowing",
       "screen": "workbench.today"
      },
@@ -82,7 +82,7 @@
      "id": "room.choose-unit",
      "label": "Home, Choose unit open",
      "tree": "E",
-     "fixture": {
+     "reset": {
       "url": "/ux/system/home-astra-prototype.html?layout=focus&section=farrowing",
       "screen": "workbench.choose-unit"
      },
@@ -131,7 +131,7 @@
      "id": "room.list",
      "label": "Room list, Unit 7, All",
      "tree": "E",
-     "fixture": {
+     "reset": {
       "screen": "farrowing.room",
       "preset": "room"
      },
@@ -454,7 +454,7 @@
      "id": "counting.awaiting",
      "label": "Sow 000455, Awaiting (nothing recorded)",
      "tree": "A",
-     "fixture": {
+     "reset": {
       "screen": "farrowing.before",
       "preset": "before"
      },
@@ -575,7 +575,7 @@
      "id": "counting.active",
      "label": "Sow 000418, Farrowing: alive 9, dead 1·1·2·0·0·1, +4 this visit",
      "tree": "C",
-     "fixture": {
+     "reset": {
       "screen": "farrowing.count",
       "preset": "count"
      },
@@ -1178,7 +1178,7 @@
      "id": "finish.edit-draft",
      "label": "Finish opened while an Edit draft (crushed +1) waits",
      "tree": "F",
-     "fixture": {
+     "reset": {
       "screen": "farrowing.blocked",
       "preset": "blocked"
      },
@@ -1268,7 +1268,7 @@
      "id": "finish.clean",
      "label": "Finish, nothing waiting",
      "tree": "F",
-     "fixture": {
+     "reset": {
       "screen": "farrowing.finish",
       "preset": "finish"
      },
@@ -1372,7 +1372,7 @@
      "id": "edit.during",
      "label": "Counting, Edit open",
      "tree": "X",
-     "fixture": {
+     "reset": {
       "screen": "farrowing.count",
       "preset": "count",
       "taps": [
@@ -1520,7 +1520,7 @@
      "id": "edit.locked",
      "label": "Locked record (born 14), Edit open",
      "tree": "X",
-     "fixture": {
+     "reset": {
       "screen": "farrowing.locked",
       "preset": "locked",
       "taps": [
@@ -1641,7 +1641,7 @@
      "id": "sow-death.during",
      "label": "Counting, Record dead, The sow",
      "tree": "M",
-     "fixture": {
+     "reset": {
       "screen": "farrowing.count",
       "preset": "count",
       "taps": [
@@ -1759,7 +1759,7 @@
      "id": "sow-death.ended",
      "label": "Sow died record (000418 preset ended)",
      "tree": "M",
-     "fixture": {
+     "reset": {
       "screen": "farrowing.ended",
       "preset": "ended"
      },
@@ -1797,7 +1797,7 @@
      "id": "task.room",
      "label": "Room list with sows still farrowing",
      "tree": "K",
-     "fixture": {
+     "reset": {
       "screen": "farrowing.room",
       "preset": "room"
      },
@@ -1884,7 +1884,7 @@
      "id": "task.complete",
      "label": "End task review, every sow finished",
      "tree": "K",
-     "fixture": {
+     "reset": {
       "screen": "farrowing.task-complete",
       "preset": "task-complete"
      },
@@ -2010,7 +2010,7 @@
      "id": "task.ready",
      "label": "End task early review: some sows still awaiting, none active",
      "tree": "K",
-     "fixture": {
+     "reset": {
       "screen": "farrowing.task-ready",
       "preset": "task-ready"
      },

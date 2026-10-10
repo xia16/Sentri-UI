@@ -1,0 +1,44 @@
+[
+  {
+    "id": "populate-inspection-1",
+    "target": { "kind": "feature", "id": "inspection" },
+    "kind": "decision",
+    "severity": "medium",
+    "title": "Do the pen workflow deck's fault, set-count and feed-switch screens go into the Astra prototype?",
+    "detail": "The pen workflow deck draws report fault, resolve fault, set count (5 screens) and switch formula as designed flows. The Astra prototype has none of them reachable; its own fault views are built but no control opens them. The deck's screens are in the atlas as in-design. Environment's PRD says Inspection no longer carries maintenance, which would move the fault flow out of this feature.",
+    "options": [
+      "Build them into the Astra prototype under the pen sheet and Actions",
+      "Keep them as the reference design and move the fault flow to Environment",
+      "Drop the deck screens and delete the unreachable code"
+    ],
+    "source": "populate"
+  },
+  {
+    "id": "populate-inspection-2",
+    "target": { "kind": "feature", "id": "pig-profile" },
+    "kind": "decision",
+    "severity": "low",
+    "title": "Keep the Remove from batch reason page, or only Batch membership's Remove option?",
+    "detail": "The prototype has two ways to take a sow out of her batch. Batch membership (shown as pig-profile.batch-membership) offers Remove from batch with no reason. A separate page asks for a reason (assigned in error, not due in this window, other) but nothing opens it now: the Actions sheet hides the host action it came from. It is left out of the atlas for that reason.",
+    "options": [
+      "Keep Batch membership only; delete the reason page",
+      "Make Batch membership's Remove option open the reason page",
+      "Show the reason page as a screen and give it a door"
+    ],
+    "source": "populate"
+  },
+  {
+    "id": "populate-inspection-3",
+    "target": { "kind": "feature", "id": "pig-list" },
+    "kind": "decision",
+    "severity": "medium",
+    "title": "Is Assign identity here the same flow as Piglet processing's Give IDs?",
+    "detail": "The place workflow deck draws Assign identity (tag keypad, notch, parents, sex) for any no-ID pig, with a breeding-stock gate. Piglet processing's simple prototype also gives IDs one piglet at a time with weights on the keypad. Both pre-fill the next tag and save per pig. The docs do not say which owns the flow or whether one sheet serves both.",
+    "options": [
+      "One shared identity sheet, owned by Pig list, opened from Piglet processing",
+      "Two flows: piglets in Tasks, other pigs here",
+      "Fold identity into the pig record"
+    ],
+    "source": "populate"
+  }
+]
