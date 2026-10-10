@@ -767,12 +767,17 @@
              "type": "outcome",
              "id": "fa-d2-reopen-restores-draft",
              "tree": "D-2",
-             "label": "Reopening the drawer shows the draft, still green, still 1 unsaved",
+             "label": "Reopening the drawer shows the draft, still 1 unsaved (in muted ink)",
              "authority": [
               {
                "src": "RUL",
                "at": "Starting and ending a session",
                "says": "reopen and it is still there, green"
+              },
+              {
+               "src": "owner",
+               "at": "decision 2026-10-10",
+               "says": "No green for drafts: an unsaved draft is muted ink, never the recorded green."
               }
              ],
              "visible": [
@@ -925,94 +930,109 @@
           {
            "type": "action",
            "id": "counting.active.draft.back.finish",
-           "label": "Finish farrowing",
+           "label": "Finish farrowing (pressed while the draft waits)",
            "taps": [
-            "[data-action='finish']"
+            {
+             "tap": "[data-action='finish']",
+             "hold": 60
+            }
            ],
            "children": [
             {
              "type": "outcome",
+             "id": "fa-f2-draft-never-crosses-lock",
+             "tree": "F-2",
+             "label": "A draft never crosses the lock: with the draft waiting nothing locks",
+             "authority": [
+              {
+               "src": "RUL",
+               "at": "Starting and ending a session",
+               "says": "A draft never crosses the lock"
+              },
+              {
+               "src": "owner",
+               "at": "decision 2026-10-10",
+               "says": "Finish waits while a death draft is open; there is no lock to hold."
+              }
+             ],
+             "record": [
+              {
+               "expr": "s.locked === false",
+               "hard": "broken-ruling"
+              },
+              {
+               "expr": "s.deathDraft[2] === 1",
+               "says": "the draft is still there",
+               "hard": "lost-draft"
+              }
+             ]
+            },
+            {
+             "type": "outcome",
              "id": "fa-f1-finish-blocked-by-death-draft",
              "tree": "F-1",
-             "label": "Finish opens, but the lock waits with the pointer to the unsaved death",
+             "label": "With a death draft waiting, Finish waits; tapping it brings you to the Record dead tool, which says 1 unsaved",
              "authority": [
               {
                "src": "RUL",
                "at": "Starting and ending a session",
                "says": "Lock born N waits in the floor-gray family with the pointer 1 death unsaved · Record dead"
+              },
+              {
+               "src": "owner",
+               "at": "decision 2026-10-10",
+               "says": "A death draft still blocks Finish, shown as the design system now draws it: Finish disabled, its tap leads to Record dead (1 unsaved). No banner, no reason line."
               }
              ],
              "visible": [
               {
-               "screen": "farrowing.blocked",
+               "screen": "farrowing.death",
+               "says": "the tap on the waiting Finish opens the Record dead tool",
+               "hard": "broken-ruling"
+              },
+              {
+               "text": "1 unsaved",
+               "in": "sheet",
+               "says": "the tool says 1 unsaved",
                "hard": "broken-ruling"
               },
               {
                "el": "[data-action='lock']",
-               "is": "disabled",
-               "says": "the lock waits",
+               "is": "absent",
+               "says": "no lock to hold while the draft waits",
+               "hard": "broken-ruling"
+              }
+             ],
+             "record": [
+              {
+               "expr": "s.view === 'death' && s.locked === false",
+               "says": "on the Record dead tool, not locked",
                "hard": "broken-ruling"
               },
               {
-               "text": "1 death unsaved",
-               "in": "sheet",
-               "says": "the ruled pointer"
-              }
-             ]
-            },
-            {
-             "type": "action",
-             "id": "counting.active.draft.back.finish.hold",
-             "label": "hold the lock anyway",
-             "taps": [
-              {
-               "tap": "[data-action='lock']",
-               "hold": 1100
-              }
-             ],
-             "children": [
-              {
-               "type": "outcome",
-               "id": "fa-f2-draft-never-crosses-lock",
-               "tree": "F-2",
-               "label": "Holding the lock with a draft waiting locks nothing",
-               "authority": [
-                {
-                 "src": "RUL",
-                 "at": "Starting and ending a session",
-                 "says": "A draft never crosses the lock"
-                }
-               ],
-               "record": [
-                {
-                 "expr": "s.locked === false",
-                 "hard": "broken-ruling"
-                },
-                {
-                 "expr": "s.deathDraft[2] === 1",
-                 "says": "the draft is still there",
-                 "hard": "lost-draft"
-                }
-               ]
+               "expr": "s.deathDraft[2] === 1",
+               "says": "the draft is still there",
+               "hard": "lost-draft"
               }
              ]
             },
             {
              "type": "action",
              "id": "counting.active.draft.back.finish.resolve",
-             "label": "Back, Record dead, Save, Finish farrowing",
+             "label": "Save the draft in Record dead, then Finish farrowing",
              "taps": [
-              "[data-action='returnCount']",
-              "[data-action='death']",
               "[data-action='saveDeath']",
-              "[data-action='finish']"
+              {
+               "tap": "[data-action='finish']",
+               "hold": 60
+              }
              ],
              "children": [
               {
                "type": "outcome",
                "id": "fa-f3-resolved-finish-unblocked",
                "tree": "F-3",
-               "label": "Once the draft is saved, the lock is live",
+               "label": "Once the draft is saved, Finish is live and the lock can be held",
                "authority": [
                 {
                  "src": "RUL",
@@ -1090,21 +1110,26 @@
         {
          "type": "action",
          "id": "counting.active.draft.dismiss",
-         "label": "the drawer's close (dismiss) control",
+         "label": "dismiss the drawer: tap (or swipe down on) its handle; the scrim does the same",
          "taps": [
-          "[aria-label='Close record dead']"
+          ".grab"
          ],
          "children": [
           {
            "type": "outcome",
            "id": "fa-d6-dismiss-keeps-death-draft",
            "tree": "D-6",
-           "label": "Dismissing the drawer keeps the draft like Back",
+           "label": "Dismissing the drawer (its handle or the scrim) keeps the draft like Back",
            "authority": [
             {
              "src": "RUL",
              "at": "Surfaces & entrances",
              "says": "Back or the dismiss gesture keeps it on the device"
+            },
+            {
+             "src": "owner",
+             "at": "decision 2026-10-10",
+             "says": "Drawers have no ✕: the footer Back is the exit; swiping down on the handle or tapping the scrim is Back."
             }
            ],
            "record": [
@@ -1171,98 +1196,8 @@
   {
    "type": "entry",
    "id": "finish",
-   "label": "Finish blocked by a draft → resolve → Finish → locked record",
+   "label": "Finish → locked record",
    "children": [
-    {
-     "type": "state",
-     "id": "finish.edit-draft",
-     "label": "Finish opened while an Edit draft (crushed +1) waits",
-     "tree": "F",
-     "reset": {
-      "screen": "farrowing.blocked",
-      "preset": "blocked"
-     },
-     "children": [
-      {
-       "type": "outcome",
-       "id": "fa-f5-finish-blocked-by-edit-draft",
-       "tree": "F-5",
-       "label": "An unsaved correction keeps the lock waiting, with a door to it",
-       "authority": [
-        {
-         "src": "RUL",
-         "at": "Starting and ending a session",
-         "says": "A draft never crosses the lock"
-        },
-        {
-         "src": "RUL",
-         "at": "Surfaces & entrances",
-         "says": "Same triad on Edit"
-        }
-       ],
-       "visible": [
-        {
-         "el": "[data-action='lock']",
-         "is": "disabled",
-         "hard": "broken-ruling"
-        },
-        {
-         "el": "[data-action='edit']",
-         "in": "sheet",
-         "says": "a door to the waiting correction",
-         "hard": "dead-end"
-        }
-       ]
-      },
-      {
-       "type": "action",
-       "id": "finish.edit-draft.review-save",
-       "label": "Review, Save correction",
-       "taps": [
-        "[data-action='edit']",
-        "[data-action='saveEdit']"
-       ],
-       "children": [
-        {
-         "type": "outcome",
-         "id": "fa-f6-saved-correction-returns-to-finish",
-         "tree": "F-6",
-         "label": "Saving the correction returns to Finish with the lock live",
-         "authority": [
-          {
-           "src": "atlas",
-           "at": "features/farrowing/feature.json flow",
-           "says": "farrowing.edit → farrowing.finish: Save, when opened from the blocked Finish"
-          },
-          {
-           "src": "RUL",
-           "at": "Surfaces & entrances",
-           "says": "Save commits everything as one stamped correction event"
-          }
-         ],
-         "visible": [
-          {
-           "screen": "farrowing.finish",
-           "hard": "dead-end"
-          },
-          {
-           "el": "[data-action='lock']",
-           "is": "enabled",
-           "hard": "dead-end"
-          }
-         ],
-         "record": [
-          {
-           "expr": "s.dead[2] === 3 && s.events[0].kind === 'correction'",
-           "says": "crushed 3, one correction event",
-           "hard": "wrong-fact"
-          }
-         ]
-        }
-       ]
-      }
-     ]
-    },
     {
      "type": "state",
      "id": "finish.clean",
@@ -1390,24 +1325,40 @@
        "children": [
         {
          "type": "outcome",
-         "id": "fa-x1-change-shows-banner-and-summary",
-         "tree": "X-1",
-         "label": "The first change raises the amber banner and the change summary",
+         "id": "fa-x9-changed-row-shows-was",
+         "tree": "X-9",
+         "label": "A changed row shows its new value in ink with a muted \"was N\"; no banner",
          "authority": [
           {
-           "src": "RUL",
-           "at": "Surfaces & entrances",
-           "says": "The amber banner (Correcting a past record · logged as <who>) and a live change summary appear at the FIRST change"
+           "src": "owner",
+           "at": "decision 2026-10-10",
+           "says": "A changed row shows its new value in normal ink with a small muted \"was 2\" beside the label; no banner, no Corrected tag; one Save correction in the footer."
           }
          ],
          "visible": [
           {
+           "text": "was 2",
+           "in": "sheet",
+           "says": "the row says what it was",
+           "hard": "broken-ruling"
+          },
+          {
            "text": "Correcting a past record",
-           "in": "sheet"
+           "in": "sheet",
+           "absent": true,
+           "says": "no banner",
+           "hard": "broken-ruling"
+          },
+          {
+           "text": "Corrected",
+           "in": "sheet",
+           "absent": true,
+           "says": "no Corrected tag"
           },
           {
            "el": "[data-action='saveEdit']",
-           "is": "enabled"
+           "is": "enabled",
+           "says": "Save correction is live"
           }
          ]
         },
@@ -1453,37 +1404,6 @@
         },
         {
          "type": "action",
-         "id": "edit.during.crushed-down.back",
-         "label": "Back, then Edit again",
-         "taps": [
-          "[data-action='back']",
-          "[data-action='edit']"
-         ],
-         "children": [
-          {
-           "type": "outcome",
-           "id": "fa-x3-edit-back-keeps-draft",
-           "tree": "X-3",
-           "label": "Back keeps the Edit draft; reopening shows the change; nothing posted",
-           "authority": [
-            {
-             "src": "RUL",
-             "at": "Surfaces & entrances",
-             "says": "Exits: Back keeps the draft on the device"
-            }
-           ],
-           "record": [
-            {
-             "expr": "F.changes(s).length === 1 && s.dead[2] === 2",
-             "says": "one change waiting, posted crushed still 2",
-             "hard": "lost-draft"
-            }
-           ]
-          }
-         ]
-        },
-        {
-         "type": "action",
          "id": "edit.during.crushed-down.clear",
          "label": "Clear",
          "taps": [
@@ -1506,6 +1426,131 @@
             {
              "expr": "F.changes(s).length === 0 && s.dead[2] === 2",
              "hard": "wrong-fact"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "type": "action",
+         "id": "edit.during.crushed-down.back",
+         "label": "Back with the change unsaved",
+         "taps": [
+          "[data-action='back']"
+         ],
+         "children": [
+          {
+           "type": "outcome",
+           "id": "fa-x10-back-with-change-asks-save",
+           "tree": "X-10",
+           "label": "Back with unsaved changes asks \"Save correction?\" and stays on Edit until answered",
+           "authority": [
+            {
+             "src": "owner",
+             "at": "decision 2026-10-10",
+             "says": "Leaving Edit with unsaved changes asks \"Save correction?\" (Save / Discard) in the shared dialog, so an unsaved correction can never reach Finish."
+            }
+           ],
+           "visible": [
+            {
+             "text": "Save correction?",
+             "in": "sheet",
+             "says": "the ask is open",
+             "hard": "broken-ruling"
+            },
+            {
+             "el": "[data-action='leaveSave']",
+             "is": "enabled",
+             "hard": "dead-end"
+            },
+            {
+             "el": "[data-action='leaveDiscard']",
+             "is": "enabled",
+             "hard": "dead-end"
+            }
+           ],
+           "record": [
+            {
+             "expr": "s.view === 'edit' && F.changes(s).length === 1 && s.dead[2] === 2",
+             "says": "still on Edit, one change waiting, posted crushed still 2",
+             "hard": "lost-draft"
+            }
+           ]
+          },
+          {
+           "type": "action",
+           "id": "edit.during.crushed-down.back.discard",
+           "label": "Discard",
+           "taps": [
+            "[data-action='leaveDiscard']"
+           ],
+           "children": [
+            {
+             "type": "outcome",
+             "id": "fa-x11-ask-discard-drops-change",
+             "tree": "X-11",
+             "label": "Discard drops the change and returns; nothing is posted",
+             "authority": [
+              {
+               "src": "owner",
+               "at": "decision 2026-10-10",
+               "says": "Discard in the Save correction? ask drops the unsaved change."
+              }
+             ],
+             "visible": [
+              {
+               "screen": "farrowing.count",
+               "hard": "dead-end"
+              }
+             ],
+             "record": [
+              {
+               "expr": "s.edit === null && s.dead[2] === 2 && !s.popup",
+               "says": "no draft left, posted crushed still 2",
+               "hard": "wrong-fact"
+              },
+              {
+               "expr": "s.events.length === 4",
+               "says": "nothing posted (the four log lines it had)",
+               "hard": "wrong-fact"
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "type": "action",
+           "id": "edit.during.crushed-down.back.save",
+           "label": "Save",
+           "taps": [
+            "[data-action='leaveSave']"
+           ],
+           "children": [
+            {
+             "type": "outcome",
+             "id": "fa-x12-ask-save-posts-correction",
+             "tree": "X-12",
+             "label": "Save in the ask posts one stamped correction and returns",
+             "authority": [
+              {
+               "src": "owner",
+               "at": "decision 2026-10-10",
+               "says": "Save in the Save correction? ask commits the correction (who, old → new in the log) and returns."
+              }
+             ],
+             "visible": [
+              {
+               "screen": "farrowing.count",
+               "hard": "dead-end"
+              }
+             ],
+             "record": [
+              {
+               "expr": "s.dead[2] === 1 && s.events.length === 6 && s.events[0].kind === 'correction' && s.events[0].text.includes('Crushed 2 → 1')",
+               "says": "crushed 1, the open visit folded to a line plus one correction line (Crushed 2 → 1)",
+               "hard": "wrong-fact"
+              }
+             ]
             }
            ]
           }

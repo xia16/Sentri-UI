@@ -668,7 +668,7 @@
       "notes": {
         "purpose": "Keep the live count while she farrows: one big Alive number whose + and − save at once, with the litter so far.",
         "states": [
-          "Edit draft waiting (kept with Back): Finish farrowing stays enabled but opens the blocked Finish sheet",
+          "Death draft waiting (kept with Back): Finish farrowing shows its waiting look and takes the worker back to the Record dead draft; no blocked sheet (owner decision 2026-10-10)",
           "Visit with nothing changed: receipt reads just \"Saved\""
         ],
         "elements": [
@@ -761,7 +761,7 @@
               {
                 "state": "Record death with draft",
                 "when": "A piglet death draft exists",
-                "shows": "\"+N unsaved\" muted beside the label while a draft is open (Back keeps the draft)"
+                "shows": "\"N unsaved\" in small text under the label while a draft is open (Back keeps the draft, and a reload keeps it for the session)"
               }
             ],
             "source": "farrowing-astra-concept.js recordActions()",
@@ -779,7 +779,7 @@
               {
                 "state": "Enabled",
                 "when": "Born above zero",
-                "shows": "Opens the Finish sheet; opens the blocked version if an Edit draft is waiting"
+                "shows": "Opens the Finish sheet. While piglet deaths are drafted the button is in its waiting look and tapping it opens the Record dead sheet with the draft, so the deaths are saved first (owner decision 2026-10-10)"
               }
             ],
             "source": "farrowing-astra-concept.js count()",

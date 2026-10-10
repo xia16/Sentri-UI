@@ -151,7 +151,7 @@
 .inspection-phone .roster-second{display:flex;align-items:center;gap:7px;min-width:0;height:26px;overflow:hidden}
 .inspection-phone .recorded-tags{flex:1;min-width:0;display:flex;flex-wrap:nowrap;gap:4px;overflow:hidden;height:24px;align-items:center}
 .inspection-phone .recorded-tags>[hidden]{display:none!important}
-.inspection-phone .tag-more{flex:0 0 auto;padding:3px 5px;border:1px solid #d7dccf;border-radius:6px;font:500 10px/15px var(--font-mono);color:var(--muted);background:#f4f5f0}
+.inspection-phone .tag-more{flex:0 0 auto;padding:3px 5px;border:1px solid #d7dccf;border-radius:6px;font:500 13px/15px var(--font-mono);color:var(--muted);background:#f4f5f0}
 /* Match farrowing's default tools; keep selection context in the bottom bar. */
 .inspection-phone .inspect-dock{gap:9px}
 .inspection-phone .inspect-dock .dock-scan{flex:1;min-width:0}

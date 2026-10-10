@@ -7,21 +7,285 @@
   "tap": 48
  },
  "viewport": "390x844",
- "changed": [],
+ "changed": [
+  "assistant.needs-you",
+  "assistant.finding",
+  "assistant.answered",
+  "assistant.up-to-date",
+  "assistant.conversations",
+  "assistant.conversation",
+  "environment.page",
+  "environment.fan-manual",
+  "environment.maintenance",
+  "environment.maintenance-empty",
+  "environment.report-issue",
+  "environment.issue-detail",
+  "environment.issue-resolved",
+  "environment.sensor-week",
+  "environment.sensor-other",
+  "workbench.today",
+  "workbench.choose-unit",
+  "workbench.sections",
+  "workbench.gestation",
+  "workbench.work-due",
+  "workbench.all-recorded",
+  "workbench.quiet-section",
+  "workbench.unit",
+  "workbench.unit-farrowing",
+  "workbench.end-task-early",
+  "workbench.work-waiting",
+  "workbench.round-complete",
+  "workbench.unit-clear",
+  "workbench.unit-health",
+  "workbench.unit-feed",
+  "workbench.unit-maintenance",
+  "workbench.unit-busy",
+  "workbench.unit-unknown",
+  "workbench.toolbox",
+  "workbench.records",
+  "breeding.list",
+  "breeding.overview",
+  "breeding.record",
+  "breeding.picker",
+  "breeding.filter",
+  "breeding.peek",
+  "farrowing.room",
+  "farrowing.count",
+  "farrowing.before",
+  "farrowing.death",
+  "farrowing.finish",
+  "farrowing.leave-edit",
+  "farrowing.locked",
+  "farrowing.edit",
+  "farrowing.born",
+  "farrowing.history",
+  "farrowing.ended",
+  "farrowing.task-blocked",
+  "farrowing.task-ready",
+  "farrowing.task-complete",
+  "farrowing.task-outcomes",
+  "farrowing.edit-finished",
+  "farrowing.overview",
+  "farrowing.task-receipt",
+  "farrowing.foster",
+  "farrowing.reconcile",
+  "heat-check.list",
+  "heat-check.overview",
+  "heat-check.mark",
+  "heat-check.select",
+  "heat-check.scan",
+  "heat-check.filter",
+  "heat-check.filter-applied",
+  "heat-check.picker",
+  "heat-check.peek",
+  "piglet-processing.pen-list",
+  "piglet-processing.sheet-coming",
+  "piglet-processing.sheet-todo",
+  "piglet-processing.sheet-breeders",
+  "piglet-processing.sheet-late",
+  "piglet-processing.sheet-done",
+  "piglet-processing.adjust-count",
+  "piglet-processing.tagged-list",
+  "piglet-processing.give-ids",
+  "piglet-processing.counts",
+  "piglet-processing.weight",
+  "piglet-processing.more-actions",
+  "piglet-processing.record-death",
+  "piglet-processing.move-piglets",
+  "piglet-processing.set-count",
+  "piglet-processing.pen-log",
+  "piglet-processing.end-task",
+  "piglet-processing.list-ended",
+  "piglet-processing.phone-clash",
+  "piglet-processing.chip-done",
+  "piglet-processing.job-chip-iron",
+  "piglet-processing.job-chip-id",
+  "piglet-processing.list-no-id",
+  "piglet-processing.sheet-notch",
+  "post-farrowing.list",
+  "post-farrowing.overview",
+  "post-farrowing.check",
+  "pregnancy.list",
+  "pregnancy.detail",
+  "pregnancy.picker",
+  "pregnancy.check",
+  "return-heat.list",
+  "return-heat.overview",
+  "return-heat.entry",
+  "return-heat.record",
+  "return-heat.result",
+  "weaning.list",
+  "weaning.overview",
+  "weaning.check",
+  "weaning.handoff",
+  "feed-plan.pen",
+  "feed-plan.adlib",
+  "feed-plan.bulk",
+  "feed-plan.editor",
+  "feed-plan.end-date",
+  "feed-plan.pig",
+  "feed-plan.pen-up",
+  "feed-plan.pen-down",
+  "feed-plan.pen-held",
+  "feed-plan.switch-pen",
+  "feed-plan.switch-pens",
+  "inspection.walk",
+  "inspection.stage-times",
+  "inspection.animal-types",
+  "inspection.pen-signals",
+  "inspection.pen",
+  "inspection.pen-note",
+  "inspection.pen-log",
+  "inspection.filters",
+  "inspection.go-to-pen",
+  "inspection.find-pig",
+  "inspection.actions",
+  "inspection.review-selected",
+  "inspection.walk-log",
+  "inspection.finish",
+  "inspection.walk-recorded",
+  "inspection.no-batches",
+  "inspection.one-batch",
+  "inspection.many-batches",
+  "inspection.batch-farrowing",
+  "inspection.batch-concurrent",
+  "inspection.pen-faults",
+  "inspection.fault-report",
+  "inspection.fault-resolve",
+  "inspection.pen-actions",
+  "inspection.fault-report-other",
+  "inspection.fault-flag",
+  "inspection.fault-resolved",
+  "inspection.set-count",
+  "inspection.set-count-batches",
+  "inspection.set-count-fewer",
+  "inspection.set-count-more",
+  "inspection.count-recorded",
+  "find-pig.search",
+  "find-pig.scan",
+  "find-pig.results",
+  "pig-list.detail",
+  "pig-list.health",
+  "pig-list.events",
+  "pig-list.edit",
+  "pig-list.identity-one",
+  "pig-list.identity-tag",
+  "pig-list.identity-notch",
+  "pig-list.identity-breeding",
+  "pig-profile.full",
+  "pig-profile.partial",
+  "pig-profile.empty",
+  "pig-profile.tasks",
+  "pig-profile.production-batches",
+  "pig-profile.batch-record",
+  "pig-profile.origin",
+  "pig-profile.log",
+  "pig-profile.actions",
+  "pig-profile.production-task",
+  "pig-profile.miscarriage",
+  "pig-profile.batch-membership",
+  "pig-profile.measurements",
+  "pig-profile.measure",
+  "pig-profile.body-condition",
+  "pig-profile.note",
+  "pig-profile.unavailable-actions",
+  "pig-profile.not-in-pig",
+  "disease.add-select",
+  "disease.add-drawer",
+  "disease.catalogue",
+  "disease.add-committed",
+  "disease.resolve-one",
+  "disease.resolve-many",
+  "disease.resolve-in-place",
+  "disease.resolve-committed",
+  "health-record.mixed",
+  "health-record.ongoing",
+  "health-record.many",
+  "health-record.care-states",
+  "health-record.finding",
+  "health-record.edit-finding",
+  "health-record.resolve-finding",
+  "health-record.record-health",
+  "health-record.condition-picker",
+  "health-record.care-instructions",
+  "health-record.resolve-conditions",
+  "health-record.treatment",
+  "health-record.medicine-picker",
+  "report-death.entry",
+  "report-death.one",
+  "report-death.roster",
+  "report-death.conveyor",
+  "report-death.after",
+  "report-death.group",
+  "treat.marked-set",
+  "treat.page",
+  "treat.targets",
+  "treat.next-walk",
+  "triage.bulk",
+  "triage.standalone",
+  "triage.marks",
+  "abortion.entry",
+  "abortion.drawer",
+  "abortion.cause",
+  "abortion.other",
+  "abortion.after",
+  "fostering.type",
+  "fostering.receive",
+  "fostering.piglets",
+  "fostering.result",
+  "heat.entry",
+  "heat.drawer",
+  "heat.join",
+  "heat.joined",
+  "heat.after",
+  "keep-breeding.mark",
+  "keep-breeding.blocked",
+  "keep-breeding.unmark",
+  "keep-breeding.after",
+  "unexpected-pregnancy.entry",
+  "unexpected-pregnancy.drawer",
+  "unexpected-pregnancy.join",
+  "unexpected-pregnancy.unclear",
+  "unexpected-pregnancy.after",
+  "backfat.by-eye",
+  "backfat.measured",
+  "backfat.run",
+  "backfat.after",
+  "missing.drawer",
+  "missing.mixed",
+  "missing.after",
+  "missing.page",
+  "move.tagged",
+  "move.picker",
+  "move.mixed",
+  "move.after",
+  "move.transfer-sow",
+  "temperature.one",
+  "temperature.run",
+  "temperature.after",
+  "weight.one",
+  "weight.run",
+  "weight.group",
+  "weight.after",
+  "data-sync.banner",
+  "data-sync.list",
+  "data-sync.upload",
+  "data-sync.failed"
+ ],
  "totals": {
   "screens": 263,
-  "screensFailing": 260,
+  "screensFailing": 192,
   "errors": 0,
-  "small": 3889,
-  "contrast": 1383,
-  "contrastPrimary": 24,
+  "small": 2426,
+  "contrast": 1380,
+  "contrastPrimary": 11,
   "taps": 86
  },
  "byFeature": {
   "assistant": {
    "screens": 6,
    "failing": 6,
-   "small": 60,
+   "small": 53,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 4,
@@ -29,8 +293,8 @@
   },
   "environment": {
    "screens": 9,
-   "failing": 9,
-   "small": 172,
+   "failing": 8,
+   "small": 163,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 1,
@@ -38,8 +302,8 @@
   },
   "workbench": {
    "screens": 20,
-   "failing": 20,
-   "small": 409,
+   "failing": 19,
+   "small": 374,
    "contrast": 52,
    "contrastPrimary": 0,
    "taps": 0,
@@ -56,10 +320,10 @@
   },
   "farrowing": {
    "screens": 20,
-   "failing": 20,
-   "small": 212,
-   "contrast": 3,
-   "contrastPrimary": 7,
+   "failing": 0,
+   "small": 0,
+   "contrast": 0,
+   "contrastPrimary": 0,
    "taps": 0,
    "errors": 0
   },
@@ -74,10 +338,10 @@
   },
   "piglet-processing": {
    "screens": 24,
-   "failing": 23,
-   "small": 443,
+   "failing": 0,
+   "small": 0,
    "contrast": 0,
-   "contrastPrimary": 6,
+   "contrastPrimary": 0,
    "taps": 0,
    "errors": 0
   },
@@ -92,8 +356,8 @@
   },
   "pregnancy": {
    "screens": 4,
-   "failing": 4,
-   "small": 109,
+   "failing": 3,
+   "small": 103,
    "contrast": 81,
    "contrastPrimary": 0,
    "taps": 3,
@@ -110,8 +374,8 @@
   },
   "weaning": {
    "screens": 4,
-   "failing": 4,
-   "small": 61,
+   "failing": 3,
+   "small": 42,
    "contrast": 39,
    "contrastPrimary": 0,
    "taps": 3,
@@ -119,8 +383,8 @@
   },
   "feed-plan": {
    "screens": 11,
-   "failing": 11,
-   "small": 186,
+   "failing": 9,
+   "small": 111,
    "contrast": 20,
    "contrastPrimary": 0,
    "taps": 0,
@@ -128,8 +392,8 @@
   },
   "inspection": {
    "screens": 32,
-   "failing": 32,
-   "small": 513,
+   "failing": 27,
+   "small": 266,
    "contrast": 159,
    "contrastPrimary": 1,
    "taps": 17,
@@ -137,8 +401,8 @@
   },
   "find-pig": {
    "screens": 3,
-   "failing": 3,
-   "small": 4,
+   "failing": 2,
+   "small": 1,
    "contrast": 2,
    "contrastPrimary": 0,
    "taps": 0,
@@ -146,8 +410,8 @@
   },
   "pig-list": {
    "screens": 8,
-   "failing": 8,
-   "small": 107,
+   "failing": 7,
+   "small": 55,
    "contrast": 42,
    "contrastPrimary": 0,
    "taps": 0,
@@ -155,8 +419,8 @@
   },
   "pig-profile": {
    "screens": 18,
-   "failing": 18,
-   "small": 179,
+   "failing": 12,
+   "small": 34,
    "contrast": 3,
    "contrastPrimary": 0,
    "taps": 0,
@@ -173,8 +437,8 @@
   },
   "health-record": {
    "screens": 13,
-   "failing": 11,
-   "small": 119,
+   "failing": 9,
+   "small": 34,
    "contrast": 2,
    "contrastPrimary": 0,
    "taps": 0,
@@ -218,8 +482,8 @@
   },
   "fostering": {
    "screens": 4,
-   "failing": 4,
-   "small": 121,
+   "failing": 0,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
@@ -273,7 +537,7 @@
   "move": {
    "screens": 5,
    "failing": 5,
-   "small": 72,
+   "small": 69,
    "contrast": 63,
    "contrastPrimary": 0,
    "taps": 5,
@@ -300,7 +564,7 @@
   "data-sync": {
    "screens": 4,
    "failing": 4,
-   "small": 50,
+   "small": 49,
    "contrast": 4,
    "contrastPrimary": 0,
    "taps": 0,
@@ -309,40 +573,20 @@
  },
  "topSmallTextSelectors": [
   {
-   "selector": "span @11px",
-   "n": 319
-  },
-  {
-   "selector": "span @10px",
-   "n": 207
-  },
-  {
-   "selector": "small @10px",
-   "n": 196
-  },
-  {
-   "selector": "span @12px",
-   "n": 156
-  },
-  {
    "selector": "span.pc @12.5px",
    "n": 136
   },
   {
-   "selector": "dt @11px",
+   "selector": "small @10px",
    "n": 134
+  },
+  {
+   "selector": "span @10px",
+   "n": 115
   },
   {
    "selector": "span.l2 @10.5px",
    "n": 107
-  },
-  {
-   "selector": "small @11px",
-   "n": 94
-  },
-  {
-   "selector": "p.sheet-subtitle @11px",
-   "n": 94
   },
   {
    "selector": "span.code @12px",
@@ -353,16 +597,8 @@
    "n": 84
   },
   {
-   "selector": "span.st-sep @11px",
-   "n": 78
-  },
-  {
    "selector": "span.roster-meta @10px",
    "n": 77
-  },
-  {
-   "selector": "span.st-condition-name @10px",
-   "n": 76
   },
   {
    "selector": "span.qt @10px",
@@ -377,24 +613,16 @@
    "n": 62
   },
   {
-   "selector": "small.st-condition-day @10px",
+   "selector": "span @11px",
+   "n": 62
+  },
+  {
+   "selector": "span @12px",
    "n": 56
   },
   {
    "selector": "div.aud @10px",
    "n": 53
-  },
-  {
-   "selector": "p @11px",
-   "n": 52
-  },
-  {
-   "selector": "strong @11px",
-   "n": 52
-  },
-  {
-   "selector": "span.st-selection-count @10px",
-   "n": 50
   },
   {
    "selector": "div @12px",
@@ -405,16 +633,16 @@
    "n": 49
   },
   {
-   "selector": "small @9px",
-   "n": 48
-  },
-  {
    "selector": "div.flbl @10px",
    "n": 43
   },
   {
    "selector": "div.pgk @9.5px",
    "n": 41
+  },
+  {
+   "selector": "strong @11px",
+   "n": 38
   },
   {
    "selector": "span.pc @11px",
@@ -429,12 +657,12 @@
    "n": 34
   },
   {
-   "selector": "span.agg @10.5px",
+   "selector": "small @9px",
    "n": 33
   },
   {
-   "selector": "strong @12px",
-   "n": 32
+   "selector": "span.agg @10.5px",
+   "n": 33
   },
   {
    "selector": "span.n @11px",
@@ -449,12 +677,16 @@
    "n": 30
   },
   {
-   "selector": "small @8px",
-   "n": 30
+   "selector": "strong @12px",
+   "n": 28
   },
   {
    "selector": "span.x @9.5px",
    "n": 28
+  },
+  {
+   "selector": "small @11px",
+   "n": 27
   },
   {
    "selector": "span.ch.ca @9.5px",
@@ -467,80 +699,46 @@
   {
    "selector": "text @9px",
    "n": 24
+  },
+  {
+   "selector": "div.col @10.5px",
+   "n": 24
+  },
+  {
+   "selector": "p @11px",
+   "n": 22
+  },
+  {
+   "selector": "b @12px",
+   "n": 21
+  },
+  {
+   "selector": "b @10px",
+   "n": 20
+  },
+  {
+   "selector": "button @12.5px",
+   "n": 20
+  },
+  {
+   "selector": "div.sk @9.5px",
+   "n": 20
+  },
+  {
+   "selector": "button.scan-button[data-action=scan] @9px",
+   "n": 19
+  },
+  {
+   "selector": "button.active[data-action=home] @10px",
+   "n": 17
   }
  ],
- "tokensUnderFloor": [
-  {
-   "name": "--type-description-size",
-   "px": 11,
-   "usedBy": 4
-  },
-  {
-   "name": "--type-choice-meta-size",
-   "px": 12,
-   "usedBy": 3
-  },
-  {
-   "name": "--type-meta-size",
-   "px": 10,
-   "usedBy": 3
-  },
-  {
-   "name": "--type-group-label-size",
-   "px": 11,
-   "usedBy": 1
-  },
-  {
-   "name": "--type-identifier-size",
-   "px": 12,
-   "usedBy": 1
-  },
-  {
-   "name": "--type-range-end-size",
-   "px": 9,
-   "usedBy": 1
-  },
-  {
-   "name": "--type-panel-title-size",
-   "px": 12,
-   "usedBy": 0
-  },
-  {
-   "name": "--type-chooser-heading-size",
-   "px": 12,
-   "usedBy": 0
-  },
-  {
-   "name": "--type-identifier-strong-size",
-   "px": 12,
-   "usedBy": 0
-  },
-  {
-   "name": "--type-overline-size",
-   "px": 10,
-   "usedBy": 0
-  },
-  {
-   "name": "--type-hold-caption-size",
-   "px": 9,
-   "usedBy": 0
-  },
-  {
-   "name": "--type-table-heading-size",
-   "px": 9,
-   "usedBy": 0
-  },
-  {
-   "name": "--type-dock-caption-size",
-   "px": 9,
-   "usedBy": 0
-  }
- ],
+ "tokensUnderFloor": [],
  "screens": [
   {
    "id": "assistant.needs-you",
    "feature": "assistant",
-   "small": 11,
+   "small": 10,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 1,
@@ -549,19 +747,14 @@
    "sizes": {
     "9": 2,
     "10": 2,
-    "11": 4,
+    "11": 3,
     "12": 3,
+    "13": 1,
     "14": 2,
     "21": 2,
     "22": 1
    },
    "smallText": [
-    {
-     "n": 1,
-     "sel": "p.st-heading-description",
-     "text": "Gestation",
-     "px": 11
-    },
     {
      "n": 1,
      "sel": "span.preview-badge",
@@ -619,7 +812,7 @@
   {
    "id": "assistant.finding",
    "feature": "assistant",
-   "small": 12,
+   "small": 10,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
@@ -627,19 +820,15 @@
    "unverified": 0,
    "sizes": {
     "9": 1,
-    "11": 8,
-    "12": 3,
-    "14": 4,
+    "11": 7,
+    "12": 2,
+    "13": 2,
+    "14": 3,
+    "16": 1,
     "21": 1,
     "22": 1
    },
    "smallText": [
-    {
-     "n": 1,
-     "sel": "p.st-heading-description",
-     "text": "Assistant · overnight review",
-     "px": 11
-    },
     {
      "n": 1,
      "sel": "span.preview-badge",
@@ -672,12 +861,6 @@
     },
     {
      "n": 1,
-     "sel": "span",
-     "text": "Destination or clarification",
-     "px": 12
-    },
-    {
-     "n": 1,
      "sel": "p.work-note",
      "text": "Sample decision for reviewing the Assist",
      "px": 11
@@ -690,7 +873,7 @@
   {
    "id": "assistant.answered",
    "feature": "assistant",
-   "small": 13,
+   "small": 12,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
@@ -698,19 +881,15 @@
    "unverified": 0,
    "sizes": {
     "9": 1,
-    "11": 8,
+    "11": 7,
     "12": 4,
-    "14": 2,
+    "13": 1,
+    "14": 1,
+    "16": 1,
     "21": 1,
     "22": 1
    },
    "smallText": [
-    {
-     "n": 1,
-     "sel": "p.st-heading-description",
-     "text": "Assistant · overnight review",
-     "px": 11
-    },
     {
      "n": 1,
      "sel": "span.preview-badge",
@@ -761,7 +940,7 @@
   {
    "id": "assistant.up-to-date",
    "feature": "assistant",
-   "small": 9,
+   "small": 8,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 1,
@@ -770,20 +949,15 @@
    "sizes": {
     "9": 1,
     "10": 1,
-    "11": 3,
+    "11": 2,
     "12": 4,
+    "13": 1,
     "14": 1,
     "20": 1,
     "21": 2,
     "22": 1
    },
    "smallText": [
-    {
-     "n": 1,
-     "sel": "p.st-heading-description",
-     "text": "Gestation",
-     "px": 11
-    },
     {
      "n": 1,
      "sel": "span.preview-badge",
@@ -835,7 +1009,7 @@
   {
    "id": "assistant.conversations",
    "feature": "assistant",
-   "small": 7,
+   "small": 6,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 1,
@@ -844,20 +1018,14 @@
    "sizes": {
     "9": 1,
     "10": 1,
-    "11": 3,
+    "11": 2,
     "12": 2,
-    "13": 2,
+    "13": 3,
     "14": 1,
     "21": 2,
     "22": 1
    },
    "smallText": [
-    {
-     "n": 1,
-     "sel": "p.st-heading-description",
-     "text": "Gestation",
-     "px": 11
-    },
     {
      "n": 1,
      "sel": "span.preview-badge",
@@ -903,7 +1071,7 @@
   {
    "id": "assistant.conversation",
    "feature": "assistant",
-   "small": 8,
+   "small": 7,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 1,
@@ -912,19 +1080,14 @@
    "sizes": {
     "9": 1,
     "10": 1,
-    "11": 2,
+    "11": 1,
     "12": 4,
+    "13": 1,
     "14": 1,
     "21": 2,
     "22": 1
    },
    "smallText": [
-    {
-     "n": 1,
-     "sel": "p.st-heading-description",
-     "text": "Gestation",
-     "px": 11
-    },
     {
      "n": 1,
      "sel": "span.preview-badge",
@@ -976,7 +1139,7 @@
   {
    "id": "environment.page",
    "feature": "environment",
-   "small": 38,
+   "small": 37,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
@@ -985,20 +1148,14 @@
    "sizes": {
     "9": 7,
     "10": 27,
-    "11": 3,
+    "11": 2,
     "12": 1,
-    "13": 9,
-    "14": 1,
+    "13": 3,
+    "14": 8,
     "22": 1,
     "34": 1
    },
    "smallText": [
-    {
-     "n": 1,
-     "sel": "p.st-heading-description",
-     "text": "Unit 7",
-     "px": 11
-    },
     {
      "n": 1,
      "sel": "span.preview-badge",
@@ -1073,7 +1230,7 @@
   {
    "id": "environment.fan-manual",
    "feature": "environment",
-   "small": 40,
+   "small": 39,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 1,
@@ -1082,19 +1239,14 @@
    "sizes": {
     "9": 7,
     "10": 27,
-    "11": 5,
+    "11": 4,
     "12": 1,
-    "13": 9,
+    "13": 3,
+    "14": 7,
     "22": 1,
     "34": 1
    },
    "smallText": [
-    {
-     "n": 1,
-     "sel": "p.st-heading-description",
-     "text": "Unit 7",
-     "px": 11
-    },
     {
      "n": 1,
      "sel": "span.preview-badge",
@@ -1188,7 +1340,7 @@
   {
    "id": "environment.maintenance",
    "feature": "environment",
-   "small": 8,
+   "small": 7,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
@@ -1197,18 +1349,13 @@
    "sizes": {
     "9": 1,
     "10": 3,
-    "11": 2,
+    "11": 1,
     "12": 2,
     "13": 2,
+    "14": 1,
     "22": 1
    },
    "smallText": [
-    {
-     "n": 1,
-     "sel": "p.st-heading-description",
-     "text": "Unit 7",
-     "px": 11
-    },
     {
      "n": 1,
      "sel": "span.preview-badge",
@@ -1253,7 +1400,7 @@
   {
    "id": "environment.maintenance-empty",
    "feature": "environment",
-   "small": 5,
+   "small": 4,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
@@ -1262,19 +1409,13 @@
    "sizes": {
     "9": 1,
     "10": 1,
-    "11": 1,
     "12": 2,
     "13": 1,
+    "14": 1,
     "20": 1,
     "22": 1
    },
    "smallText": [
-    {
-     "n": 1,
-     "sel": "p.st-heading-description",
-     "text": "Unit 8",
-     "px": 11
-    },
     {
      "n": 1,
      "sel": "span.preview-badge",
@@ -1307,25 +1448,19 @@
   {
    "id": "environment.report-issue",
    "feature": "environment",
-   "small": 3,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "12": 3,
-    "14": 4,
+    "13": 3,
+    "14": 2,
+    "16": 2,
     "20": 1
    },
-   "smallText": [
-    {
-     "n": 3,
-     "sel": "span",
-     "text": "Equipment",
-     "px": 12
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
@@ -1342,7 +1477,8 @@
    "sizes": {
     "11": 1,
     "12": 1,
-    "14": 3,
+    "14": 1,
+    "16": 2,
     "20": 1
    },
    "smallText": [
@@ -1375,7 +1511,8 @@
    "sizes": {
     "11": 1,
     "12": 1,
-    "14": 2,
+    "14": 1,
+    "16": 1,
     "20": 1
    },
    "smallText": [
@@ -1399,7 +1536,7 @@
   {
    "id": "environment.sensor-week",
    "feature": "environment",
-   "small": 36,
+   "small": 35,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
@@ -1408,20 +1545,14 @@
    "sizes": {
     "9": 7,
     "10": 25,
-    "11": 3,
+    "11": 2,
     "12": 1,
-    "13": 9,
-    "14": 1,
+    "13": 3,
+    "14": 8,
     "22": 1,
     "34": 1
    },
    "smallText": [
-    {
-     "n": 1,
-     "sel": "p.st-heading-description",
-     "text": "Unit 7",
-     "px": 11
-    },
     {
      "n": 1,
      "sel": "span.preview-badge",
@@ -1496,7 +1627,7 @@
   {
    "id": "environment.sensor-other",
    "feature": "environment",
-   "small": 38,
+   "small": 37,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
@@ -1505,20 +1636,14 @@
    "sizes": {
     "9": 7,
     "10": 27,
-    "11": 3,
+    "11": 2,
     "12": 1,
-    "13": 9,
-    "14": 1,
+    "13": 3,
+    "14": 8,
     "22": 1,
     "34": 1
    },
    "smallText": [
-    {
-     "n": 1,
-     "sel": "p.st-heading-description",
-     "text": "Unit 7",
-     "px": 11
-    },
     {
      "n": 1,
      "sel": "span.preview-badge",
@@ -1593,7 +1718,7 @@
   {
    "id": "workbench.today",
    "feature": "workbench",
-   "small": 26,
+   "small": 25,
    "contrast": 4,
    "contrastPrimary": 0,
    "taps": 0,
@@ -1603,9 +1728,11 @@
     "9": 1,
     "10": 19,
     "11": 2,
-    "12": 4,
-    "14": 3,
+    "12": 3,
+    "13": 1,
+    "14": 2,
     "15": 3,
+    "16": 1,
     "23": 1,
     "36": 1
    },
@@ -1639,12 +1766,6 @@
      "sel": "small",
      "text": "3 units",
      "px": 10
-    },
-    {
-     "n": 1,
-     "sel": "span.st-banner-consequence",
-     "text": "No connection · waiting to upload",
-     "px": 12
     },
     {
      "n": 10,
@@ -1725,16 +1846,16 @@
   {
    "id": "workbench.choose-unit",
    "feature": "workbench",
-   "small": 7,
+   "small": 1,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
    "fails": true,
    "unverified": 0,
    "sizes": {
-    "11": 7,
-    "13": 3,
-    "14": 1,
+    "11": 1,
+    "13": 9,
+    "16": 1,
     "20": 1
    },
    "smallText": [
@@ -1742,18 +1863,6 @@
      "n": 1,
      "sel": "p.unit-picker-count",
      "text": "All 3 units",
-     "px": 11
-    },
-    {
-     "n": 3,
-     "sel": "small",
-     "text": "8 pigs · 4 pens",
-     "px": 11
-    },
-    {
-     "n": 3,
-     "sel": "span.st-row-trailing",
-     "text": "2 tasks",
      "px": 11
     }
    ],
@@ -1764,7 +1873,7 @@
   {
    "id": "workbench.sections",
    "feature": "workbench",
-   "small": 10,
+   "small": 5,
    "contrast": 1,
    "contrastPrimary": 0,
    "taps": 0,
@@ -1773,29 +1882,17 @@
    "sizes": {
     "9": 1,
     "10": 2,
-    "11": 3,
-    "12": 4,
+    "11": 2,
+    "13": 5,
     "14": 4,
     "22": 1
    },
    "smallText": [
     {
-     "n": 1,
-     "sel": "p.st-heading-description",
-     "text": "Green Valley Farm",
-     "px": 11
-    },
-    {
      "n": 2,
      "sel": "p.work-note",
      "text": "Select where you're working.",
      "px": 11
-    },
-    {
-     "n": 4,
-     "sel": "span.st-choice-meta",
-     "text": "4 units · 184 pigs · 2 task types ready",
-     "px": 12
     },
     {
      "n": 1,
@@ -1831,7 +1928,7 @@
   {
    "id": "workbench.gestation",
    "feature": "workbench",
-   "small": 24,
+   "small": 23,
    "contrast": 4,
    "contrastPrimary": 0,
    "taps": 0,
@@ -1841,9 +1938,11 @@
     "9": 1,
     "10": 16,
     "11": 3,
-    "12": 4,
-    "14": 4,
+    "12": 3,
+    "13": 1,
+    "14": 3,
     "15": 2,
+    "16": 1,
     "23": 1,
     "36": 1
    },
@@ -1877,12 +1976,6 @@
      "sel": "small",
      "text": "3 units",
      "px": 10
-    },
-    {
-     "n": 1,
-     "sel": "span.st-banner-consequence",
-     "text": "No connection · waiting to upload",
-     "px": 12
     },
     {
      "n": 7,
@@ -1963,7 +2056,7 @@
   {
    "id": "workbench.work-due",
    "feature": "workbench",
-   "small": 26,
+   "small": 25,
    "contrast": 4,
    "contrastPrimary": 0,
    "taps": 0,
@@ -1973,9 +2066,11 @@
     "9": 1,
     "10": 19,
     "11": 1,
-    "12": 5,
-    "14": 3,
+    "12": 4,
+    "13": 1,
+    "14": 2,
     "15": 2,
+    "16": 1,
     "23": 1,
     "36": 2
    },
@@ -2009,12 +2104,6 @@
      "sel": "small",
      "text": "3 units",
      "px": 10
-    },
-    {
-     "n": 1,
-     "sel": "span.st-banner-consequence",
-     "text": "No connection · waiting to upload",
-     "px": 12
     },
     {
      "n": 10,
@@ -2089,7 +2178,7 @@
   {
    "id": "workbench.all-recorded",
    "feature": "workbench",
-   "small": 23,
+   "small": 22,
    "contrast": 4,
    "contrastPrimary": 0,
    "taps": 0,
@@ -2099,9 +2188,11 @@
     "9": 1,
     "10": 14,
     "11": 4,
-    "12": 4,
-    "14": 4,
+    "12": 3,
+    "13": 1,
+    "14": 3,
     "15": 1,
+    "16": 1,
     "23": 1,
     "36": 1
    },
@@ -2135,12 +2226,6 @@
      "sel": "small",
      "text": "3 units",
      "px": 10
-    },
-    {
-     "n": 1,
-     "sel": "span.st-banner-consequence",
-     "text": "No connection · waiting to upload",
-     "px": 12
     },
     {
      "n": 5,
@@ -2221,7 +2306,7 @@
   {
    "id": "workbench.quiet-section",
    "feature": "workbench",
-   "small": 13,
+   "small": 12,
    "contrast": 3,
    "contrastPrimary": 0,
    "taps": 0,
@@ -2231,10 +2316,10 @@
     "9": 1,
     "10": 5,
     "11": 3,
-    "12": 4,
-    "13": 1,
-    "14": 1,
+    "12": 3,
+    "13": 2,
     "15": 1,
+    "16": 1,
     "20": 1,
     "23": 1
    },
@@ -2268,12 +2353,6 @@
      "sel": "small",
      "text": "2 units",
      "px": 10
-    },
-    {
-     "n": 1,
-     "sel": "span.st-banner-consequence",
-     "text": "No connection · waiting to upload",
-     "px": 12
     },
     {
      "n": 1,
@@ -2347,7 +2426,7 @@
   {
    "id": "workbench.unit",
    "feature": "workbench",
-   "small": 27,
+   "small": 26,
    "contrast": 3,
    "contrastPrimary": 0,
    "taps": 0,
@@ -2357,9 +2436,11 @@
     "9": 4,
     "10": 13,
     "11": 6,
-    "12": 4,
-    "14": 3,
+    "12": 3,
+    "13": 1,
+    "14": 2,
     "15": 3,
+    "16": 1,
     "23": 1,
     "36": 1
    },
@@ -2393,12 +2474,6 @@
      "sel": "small",
      "text": "3 units",
      "px": 10
-    },
-    {
-     "n": 1,
-     "sel": "span.st-banner-consequence",
-     "text": "No connection · waiting to upload",
-     "px": 12
     },
     {
      "n": 1,
@@ -2490,7 +2565,7 @@
   {
    "id": "workbench.unit-farrowing",
    "feature": "workbench",
-   "small": 23,
+   "small": 22,
    "contrast": 3,
    "contrastPrimary": 0,
    "taps": 0,
@@ -2500,9 +2575,11 @@
     "9": 1,
     "10": 15,
     "11": 3,
-    "12": 4,
-    "14": 3,
+    "12": 3,
+    "13": 1,
+    "14": 2,
     "15": 3,
+    "16": 1,
     "23": 1,
     "36": 1
    },
@@ -2536,12 +2613,6 @@
      "sel": "small",
      "text": "3 units",
      "px": 10
-    },
-    {
-     "n": 1,
-     "sel": "span.st-banner-consequence",
-     "text": "No connection · waiting to upload",
-     "px": 12
     },
     {
      "n": 1,
@@ -2621,32 +2692,18 @@
   {
    "id": "workbench.end-task-early",
    "feature": "workbench",
-   "small": 2,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "9": 1,
-    "11": 1,
-    "14": 2,
+    "13": 2,
+    "16": 2,
     "20": 1
    },
-   "smallText": [
-    {
-     "n": 1,
-     "sel": "p.dialog-desc",
-     "text": "Unfinished work will remain incomplete. ",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "small.st-hold-caption",
-     "text": "HOLD TO END",
-     "px": 9
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
@@ -2654,7 +2711,7 @@
   {
    "id": "workbench.work-waiting",
    "feature": "workbench",
-   "small": 26,
+   "small": 25,
    "contrast": 3,
    "contrastPrimary": 0,
    "taps": 0,
@@ -2664,9 +2721,11 @@
     "9": 1,
     "10": 18,
     "11": 4,
-    "12": 3,
-    "14": 4,
+    "12": 2,
+    "13": 1,
+    "14": 3,
     "15": 2,
+    "16": 1,
     "23": 1
    },
    "smallText": [
@@ -2699,12 +2758,6 @@
      "sel": "small",
      "text": "3 units",
      "px": 10
-    },
-    {
-     "n": 1,
-     "sel": "span.st-banner-consequence",
-     "text": "No connection · waiting to upload",
-     "px": 12
     },
     {
      "n": 9,
@@ -2772,7 +2825,7 @@
   {
    "id": "workbench.round-complete",
    "feature": "workbench",
-   "small": 26,
+   "small": 25,
    "contrast": 3,
    "contrastPrimary": 0,
    "taps": 0,
@@ -2782,9 +2835,11 @@
     "9": 1,
     "10": 18,
     "11": 4,
-    "12": 3,
-    "14": 4,
+    "12": 2,
+    "13": 1,
+    "14": 3,
     "15": 2,
+    "16": 1,
     "23": 1
    },
    "smallText": [
@@ -2817,12 +2872,6 @@
      "sel": "small",
      "text": "3 units",
      "px": 10
-    },
-    {
-     "n": 1,
-     "sel": "span.st-banner-consequence",
-     "text": "No connection · waiting to upload",
-     "px": 12
     },
     {
      "n": 9,
@@ -2890,7 +2939,7 @@
   {
    "id": "workbench.unit-clear",
    "feature": "workbench",
-   "small": 28,
+   "small": 27,
    "contrast": 3,
    "contrastPrimary": 0,
    "taps": 0,
@@ -2900,9 +2949,11 @@
     "9": 4,
     "10": 13,
     "11": 7,
-    "12": 4,
-    "14": 3,
+    "12": 3,
+    "13": 1,
+    "14": 2,
     "15": 3,
+    "16": 1,
     "23": 1,
     "36": 1
    },
@@ -2936,12 +2987,6 @@
      "sel": "small",
      "text": "3 units",
      "px": 10
-    },
-    {
-     "n": 1,
-     "sel": "span.st-banner-consequence",
-     "text": "No connection · waiting to upload",
-     "px": 12
     },
     {
      "n": 1,
@@ -3039,7 +3084,7 @@
   {
    "id": "workbench.unit-health",
    "feature": "workbench",
-   "small": 27,
+   "small": 26,
    "contrast": 3,
    "contrastPrimary": 0,
    "taps": 0,
@@ -3049,9 +3094,11 @@
     "9": 4,
     "10": 13,
     "11": 6,
-    "12": 4,
-    "14": 3,
+    "12": 3,
+    "13": 1,
+    "14": 2,
     "15": 3,
+    "16": 1,
     "23": 1,
     "36": 1
    },
@@ -3085,12 +3132,6 @@
      "sel": "small",
      "text": "3 units",
      "px": 10
-    },
-    {
-     "n": 1,
-     "sel": "span.st-banner-consequence",
-     "text": "No connection · waiting to upload",
-     "px": 12
     },
     {
      "n": 1,
@@ -3182,7 +3223,7 @@
   {
    "id": "workbench.unit-feed",
    "feature": "workbench",
-   "small": 27,
+   "small": 26,
    "contrast": 3,
    "contrastPrimary": 0,
    "taps": 0,
@@ -3192,9 +3233,11 @@
     "9": 4,
     "10": 13,
     "11": 6,
-    "12": 4,
-    "14": 3,
+    "12": 3,
+    "13": 1,
+    "14": 2,
     "15": 3,
+    "16": 1,
     "23": 1,
     "36": 1
    },
@@ -3228,12 +3271,6 @@
      "sel": "small",
      "text": "3 units",
      "px": 10
-    },
-    {
-     "n": 1,
-     "sel": "span.st-banner-consequence",
-     "text": "No connection · waiting to upload",
-     "px": 12
     },
     {
      "n": 1,
@@ -3325,7 +3362,7 @@
   {
    "id": "workbench.unit-maintenance",
    "feature": "workbench",
-   "small": 27,
+   "small": 26,
    "contrast": 3,
    "contrastPrimary": 0,
    "taps": 0,
@@ -3335,9 +3372,11 @@
     "9": 4,
     "10": 13,
     "11": 6,
-    "12": 4,
-    "14": 3,
+    "12": 3,
+    "13": 1,
+    "14": 2,
     "15": 3,
+    "16": 1,
     "23": 1,
     "36": 1
    },
@@ -3371,12 +3410,6 @@
      "sel": "small",
      "text": "3 units",
      "px": 10
-    },
-    {
-     "n": 1,
-     "sel": "span.st-banner-consequence",
-     "text": "No connection · waiting to upload",
-     "px": 12
     },
     {
      "n": 1,
@@ -3468,7 +3501,7 @@
   {
    "id": "workbench.unit-busy",
    "feature": "workbench",
-   "small": 27,
+   "small": 26,
    "contrast": 3,
    "contrastPrimary": 0,
    "taps": 0,
@@ -3478,9 +3511,11 @@
     "9": 4,
     "10": 13,
     "11": 6,
-    "12": 4,
-    "14": 3,
+    "12": 3,
+    "13": 1,
+    "14": 2,
     "15": 3,
+    "16": 1,
     "23": 1,
     "36": 1
    },
@@ -3514,12 +3549,6 @@
      "sel": "small",
      "text": "3 units",
      "px": 10
-    },
-    {
-     "n": 1,
-     "sel": "span.st-banner-consequence",
-     "text": "No connection · waiting to upload",
-     "px": 12
     },
     {
      "n": 1,
@@ -3611,7 +3640,7 @@
   {
    "id": "workbench.unit-unknown",
    "feature": "workbench",
-   "small": 27,
+   "small": 26,
    "contrast": 3,
    "contrastPrimary": 0,
    "taps": 0,
@@ -3621,9 +3650,11 @@
     "9": 4,
     "10": 13,
     "11": 6,
-    "12": 4,
-    "14": 3,
+    "12": 3,
+    "13": 1,
+    "14": 2,
     "15": 3,
+    "16": 1,
     "23": 1,
     "36": 1
    },
@@ -3657,12 +3688,6 @@
      "sel": "small",
      "text": "3 units",
      "px": 10
-    },
-    {
-     "n": 1,
-     "sel": "span.st-banner-consequence",
-     "text": "No connection · waiting to upload",
-     "px": 12
     },
     {
      "n": 1,
@@ -3760,7 +3785,7 @@
   {
    "id": "workbench.toolbox",
    "feature": "workbench",
-   "small": 8,
+   "small": 3,
    "contrast": 1,
    "contrastPrimary": 0,
    "taps": 0,
@@ -3769,24 +3794,11 @@
    "sizes": {
     "9": 1,
     "10": 2,
-    "11": 5,
-    "13": 4,
+    "13": 9,
     "14": 2,
     "22": 1
    },
    "smallText": [
-    {
-     "n": 1,
-     "sel": "p.st-heading-description",
-     "text": "Find records and specific tools",
-     "px": 11
-    },
-    {
-     "n": 4,
-     "sel": "small",
-     "text": "Search by ear tag or pen code",
-     "px": 11
-    },
     {
      "n": 1,
      "sel": "button[data-action=home]",
@@ -3821,7 +3833,7 @@
   {
    "id": "workbench.records",
    "feature": "workbench",
-   "small": 5,
+   "small": 3,
    "contrast": 1,
    "contrastPrimary": 0,
    "taps": 0,
@@ -3830,23 +3842,10 @@
    "sizes": {
     "9": 1,
     "10": 2,
-    "11": 1,
-    "12": 1,
+    "13": 2,
     "22": 1
    },
    "smallText": [
-    {
-     "n": 1,
-     "sel": "p.st-heading-description",
-     "text": "Updates in this prototype",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "p.st-empty",
-     "text": "No new records yet. Answers to overnight",
-     "px": 12
-    },
     {
      "n": 1,
      "sel": "button[data-action=home]",
@@ -4788,429 +4787,127 @@
   {
    "id": "farrowing.room",
    "feature": "farrowing",
-   "small": 32,
-   "contrast": 2,
+   "small": 0,
+   "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "9": 1,
-    "10": 13,
-    "11": 13,
-    "12": 5,
-    "13": 12,
+    "13": 29,
+    "14": 4,
     "15": 1,
+    "16": 8,
     "22": 1,
     "31": 2
    },
-   "smallText": [
-    {
-     "n": 1,
-     "sel": "p.room-latest",
-     "text": "Last record",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "strong",
-     "text": "08:41",
-     "px": 11
-    },
-    {
-     "n": 3,
-     "sel": "span",
-     "text": "· G. Hansen",
-     "px": 11
-    },
-    {
-     "n": 2,
-     "sel": "span.tc-heading",
-     "text": "Unit 7",
-     "px": 11
-    },
-    {
-     "n": 2,
-     "sel": "span.tc-description",
-     "text": "Live / litter",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "span.tc-support.tc-target-attention",
-     "text": "Target 12",
-     "px": 10
-    },
-    {
-     "n": 1,
-     "sel": "span.tc-scope",
-     "text": "· all units",
-     "px": 10
-    },
-    {
-     "n": 1,
-     "sel": "span.tc-support",
-     "text": "2 active · 9 awaiting",
-     "px": 10
-    },
-    {
-     "n": 4,
-     "sel": "span.st-selection-count",
-     "text": "4",
-     "px": 10
-    },
-    {
-     "n": 3,
-     "sel": "small",
-     "text": "· 1 sow",
-     "px": 10
-    },
-    {
-     "n": 4,
-     "sel": "span.st-row-code",
-     "text": "000418",
-     "px": 12
-    },
-    {
-     "n": 3,
-     "sel": "span.st-status.st-row-chip",
-     "text": "Active",
-     "px": 10
-    },
-    {
-     "n": 4,
-     "sel": "small",
-     "text": "born 14 · 1h ago · G.H",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "small",
-     "text": "Go to pen",
-     "px": 9
-    },
-    {
-     "n": 1,
-     "sel": "span",
-     "text": "Scan ear tag",
-     "px": 12
-    }
-   ],
-   "lowContrast": [
-    {
-     "n": 1,
-     "sel": "span.tc-denominator",
-     "text": "/ 18",
-     "px": 15,
-     "ratio": 4.2
-    },
-    {
-     "n": 1,
-     "sel": "span.tc-scope",
-     "text": "· all units",
-     "px": 10,
-     "ratio": 4.2
-    }
-   ],
+   "smallText": [],
+   "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
   },
   {
    "id": "farrowing.count",
    "feature": "farrowing",
-   "small": 16,
-   "contrast": 1,
+   "small": 0,
+   "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "11": 11,
-    "12": 5,
-    "13": 5,
-    "14": 2,
-    "18": 2,
+    "13": 17,
+    "14": 3,
+    "16": 3,
     "20": 1,
+    "23": 2,
     "68": 1
    },
-   "smallText": [
-    {
-     "n": 1,
-     "sel": "span.sow-location",
-     "text": "B1 / Parity 3",
-     "px": 11
-    },
-    {
-     "n": 5,
-     "sel": "span",
-     "text": "Farrowing",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "span.count-save-state",
-     "text": "Saved",
-     "px": 12
-    },
-    {
-     "n": 1,
-     "sel": "span.receipt-separator",
-     "text": "·",
-     "px": 12
-    },
-    {
-     "n": 1,
-     "sel": "strong",
-     "text": "+4 this visit",
-     "px": 12
-    },
-    {
-     "n": 1,
-     "sel": "span.st-button-label",
-     "text": "View log",
-     "px": 11
-    },
-    {
-     "n": 2,
-     "sel": "span",
-     "text": "Born",
-     "px": 12
-    },
-    {
-     "n": 4,
-     "sel": "b",
-     "text": "1",
-     "px": 11
-    }
-   ],
-   "lowContrast": [
-    {
-     "n": 1,
-     "sel": "span.receipt-separator",
-     "text": "·",
-     "px": 12,
-     "ratio": 2.3
-    }
-   ],
+   "smallText": [],
+   "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
   },
   {
    "id": "farrowing.before",
    "feature": "farrowing",
-   "small": 5,
-   "contrast": 0,
-   "contrastPrimary": 1,
-   "taps": 0,
-   "fails": true,
-   "unverified": 0,
-   "sizes": {
-    "11": 2,
-    "12": 3,
-    "13": 5,
-    "14": 2,
-    "18": 2,
-    "20": 1,
-    "68": 1
-   },
-   "smallText": [
-    {
-     "n": 1,
-     "sel": "span.sow-location",
-     "text": "B4 / Parity 2",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "span",
-     "text": "Due today",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "span.count-save-state",
-     "text": "Tap + as piglets are born",
-     "px": 12
-    },
-    {
-     "n": 2,
-     "sel": "span",
-     "text": "Born",
-     "px": 12
-    }
-   ],
-   "lowContrast": [],
-   "lowContrastPrimary": [
-    {
-     "n": 1,
-     "sel": "span.st-stepper-value",
-     "text": "0",
-     "px": 68,
-     "ratio": 4.5
-    }
-   ],
-   "smallTargets": []
-  },
-  {
-   "id": "farrowing.death",
-   "feature": "farrowing",
-   "small": 3,
-   "contrast": 0,
-   "contrastPrimary": 2,
-   "taps": 0,
-   "fails": true,
-   "unverified": 0,
-   "sizes": {
-    "11": 3,
-    "13": 3,
-    "14": 3,
-    "15": 6,
-    "18": 6,
-    "20": 1
-   },
-   "smallText": [
-    {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "Born dead or died",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "span",
-     "text": "+1 unsaved",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "small.st-optional-word",
-     "text": "Optional",
-     "px": 11
-    }
-   ],
-   "lowContrast": [],
-   "lowContrastPrimary": [
-    {
-     "n": 2,
-     "sel": "span.st-stepper-value",
-     "text": "0",
-     "px": 18,
-     "ratio": 5.2
-    }
-   ],
-   "smallTargets": []
-  },
-  {
-   "id": "farrowing.finish",
-   "feature": "farrowing",
-   "small": 8,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "9": 1,
-    "11": 7,
-    "14": 5,
-    "15": 2,
-    "18": 2,
+    "13": 6,
+    "14": 2,
+    "16": 3,
     "20": 1,
-    "23": 3
+    "23": 2,
+    "68": 1
    },
-   "smallText": [
-    {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "000418 · B1 · Parity 3",
-     "px": 11
-    },
-    {
-     "n": 3,
-     "sel": "dt",
-     "text": "Born",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "p",
-     "text": "Among the 9 alive piglets · 0 if none",
-     "px": 11
-    },
-    {
-     "n": 2,
-     "sel": "small.st-optional-word",
-     "text": "Optional",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "small.st-hold-caption",
-     "text": "HOLD TO FINISH",
-     "px": 9
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
   },
   {
-   "id": "farrowing.blocked",
+   "id": "farrowing.death",
    "feature": "farrowing",
-   "small": 9,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "9": 1,
-    "11": 7,
-    "12": 1,
-    "14": 6,
-    "15": 2,
+    "13": 4,
+    "14": 4,
+    "16": 8,
+    "18": 6,
+    "20": 1
+   },
+   "smallText": [],
+   "lowContrast": [],
+   "lowContrastPrimary": [],
+   "smallTargets": []
+  },
+  {
+   "id": "farrowing.finish",
+   "feature": "farrowing",
+   "small": 0,
+   "contrast": 0,
+   "contrastPrimary": 0,
+   "taps": 0,
+   "fails": false,
+   "unverified": 0,
+   "sizes": {
+    "13": 6,
+    "14": 3,
+    "16": 4,
     "18": 2,
     "20": 1,
     "23": 3
    },
-   "smallText": [
-    {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "000418 · B1 · Parity 3",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "span.st-banner-consequence",
-     "text": "Review",
-     "px": 12
-    },
-    {
-     "n": 3,
-     "sel": "dt",
-     "text": "Born",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "p",
-     "text": "Among the 9 alive piglets · 0 if none",
-     "px": 11
-    },
-    {
-     "n": 2,
-     "sel": "small.st-optional-word",
-     "text": "Optional",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "small.st-hold-caption",
-     "text": "HOLD TO FINISH",
-     "px": 9
-    }
-   ],
+   "smallText": [],
+   "lowContrast": [],
+   "lowContrastPrimary": [],
+   "smallTargets": []
+  },
+  {
+   "id": "farrowing.leave-edit",
+   "feature": "farrowing",
+   "small": 0,
+   "contrast": 0,
+   "contrastPrimary": 0,
+   "taps": 0,
+   "fails": false,
+   "unverified": 0,
+   "sizes": {
+    "13": 1,
+    "16": 2,
+    "20": 1
+   },
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
@@ -5218,44 +4915,20 @@
   {
    "id": "farrowing.locked",
    "feature": "farrowing",
-   "small": 10,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "11": 10,
-    "13": 5,
-    "14": 8,
-    "20": 1
+    "13": 10,
+    "14": 7,
+    "16": 2,
+    "20": 1,
+    "23": 3
    },
-   "smallText": [
-    {
-     "n": 1,
-     "sel": "span.sow-location",
-     "text": "B1 / Parity 3",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "span",
-     "text": "Finished Aug 27 at 08:12 by G. Hansen",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "span.st-button-label",
-     "text": "View log",
-     "px": 11
-    },
-    {
-     "n": 7,
-     "sel": "dt",
-     "text": "Born",
-     "px": 11
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
@@ -5263,72 +4936,39 @@
   {
    "id": "farrowing.edit",
    "feature": "farrowing",
-   "small": 1,
+   "small": 0,
    "contrast": 0,
-   "contrastPrimary": 2,
+   "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "11": 1,
     "13": 1,
-    "14": 2,
-    "15": 7,
+    "16": 9,
     "18": 7,
     "20": 1
    },
-   "smallText": [
-    {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "000418 · B1",
-     "px": 11
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
-   "lowContrastPrimary": [
-    {
-     "n": 2,
-     "sel": "span.st-stepper-value",
-     "text": "0",
-     "px": 18,
-     "ratio": 5.2
-    }
-   ],
+   "lowContrastPrimary": [],
    "smallTargets": []
   },
   {
    "id": "farrowing.born",
    "feature": "farrowing",
-   "small": 2,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "11": 1,
-    "12": 1,
-    "13": 2,
-    "14": 4,
-    "15": 1,
+    "14": 2,
+    "16": 5,
     "18": 1,
     "20": 1
    },
-   "smallText": [
-    {
-     "n": 1,
-     "sel": "p.dialog-desc",
-     "text": "Choose what changed.",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "h5.st-choice-heading",
-     "text": "Correction",
-     "px": 12
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
@@ -5336,45 +4976,18 @@
   {
    "id": "farrowing.history",
    "feature": "farrowing",
-   "small": 12,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "10": 8,
-    "11": 4,
-    "13": 7,
-    "14": 1,
+    "13": 12,
+    "16": 8,
     "22": 1
    },
-   "smallText": [
-    {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "B1 · 000418 · born 14 · 8 alive now",
-     "px": 11
-    },
-    {
-     "n": 3,
-     "sel": "span",
-     "text": "Aug 28",
-     "px": 11
-    },
-    {
-     "n": 7,
-     "sel": "small",
-     "text": "14:02 · L.M",
-     "px": 10
-    },
-    {
-     "n": 1,
-     "sel": "span.st-log-category",
-     "text": "Corrected",
-     "px": 10
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
@@ -5382,52 +4995,20 @@
   {
    "id": "farrowing.ended",
    "feature": "farrowing",
-   "small": 10,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "10": 4,
-    "11": 6,
-    "13": 4,
-    "14": 2,
+    "13": 10,
+    "14": 4,
+    "16": 2,
     "20": 1,
-    "25": 3
+    "23": 3
    },
-   "smallText": [
-    {
-     "n": 1,
-     "sel": "span.sow-location",
-     "text": "B1 / Parity 3",
-     "px": 11
-    },
-    {
-     "n": 4,
-     "sel": "span",
-     "text": "Died Aug 25 at 06:20 by L. Madsen",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "span.st-button-label",
-     "text": "View log",
-     "px": 11
-    },
-    {
-     "n": 2,
-     "sel": "span",
-     "text": "Stillborn",
-     "px": 10
-    },
-    {
-     "n": 2,
-     "sel": "b",
-     "text": "2",
-     "px": 10
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
@@ -5435,74 +5016,22 @@
   {
    "id": "farrowing.task-blocked",
    "feature": "farrowing",
-   "small": 16,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "9": 1,
-    "10": 7,
-    "11": 3,
-    "12": 5,
-    "13": 3,
-    "14": 7,
+    "13": 17,
+    "14": 4,
     "15": 1,
+    "16": 4,
     "17": 3,
     "22": 1,
     "24": 2
    },
-   "smallText": [
-    {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "Farrowing · All 3 units",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "span.st-banner-consequence",
-     "text": "Finish these records before ending. 9 so",
-     "px": 12
-    },
-    {
-     "n": 2,
-     "sel": "span.st-heading-meta",
-     "text": "7 finished litters",
-     "px": 10
-    },
-    {
-     "n": 2,
-     "sel": "span",
-     "text": "Born alive / litter",
-     "px": 11
-    },
-    {
-     "n": 2,
-     "sel": "small",
-     "text": "Target 12",
-     "px": 10
-    },
-    {
-     "n": 3,
-     "sel": "dt",
-     "text": "Born",
-     "px": 10
-    },
-    {
-     "n": 4,
-     "sel": "dt",
-     "text": "Finished farrowing",
-     "px": 12
-    },
-    {
-     "n": 1,
-     "sel": "small.st-hold-caption",
-     "text": "HOLD TO END EARLY",
-     "px": 9
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
@@ -5510,74 +5039,22 @@
   {
    "id": "farrowing.task-ready",
    "feature": "farrowing",
-   "small": 15,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "9": 1,
-    "10": 7,
-    "11": 3,
-    "12": 4,
-    "13": 2,
-    "14": 6,
+    "13": 15,
+    "14": 3,
     "15": 1,
+    "16": 4,
     "17": 3,
     "22": 1,
     "24": 2
    },
-   "smallText": [
-    {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "Farrowing · All 3 units",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "span.st-banner-consequence",
-     "text": "These sows have not farrowed.",
-     "px": 12
-    },
-    {
-     "n": 2,
-     "sel": "span.st-heading-meta",
-     "text": "9 finished litters",
-     "px": 10
-    },
-    {
-     "n": 2,
-     "sel": "span",
-     "text": "Born alive / litter",
-     "px": 11
-    },
-    {
-     "n": 2,
-     "sel": "small",
-     "text": "Target 12",
-     "px": 10
-    },
-    {
-     "n": 3,
-     "sel": "dt",
-     "text": "Born",
-     "px": 10
-    },
-    {
-     "n": 3,
-     "sel": "dt",
-     "text": "Finished farrowing",
-     "px": 12
-    },
-    {
-     "n": 1,
-     "sel": "small.st-hold-caption",
-     "text": "HOLD TO END EARLY",
-     "px": 9
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
@@ -5585,68 +5062,22 @@
   {
    "id": "farrowing.task-complete",
    "feature": "farrowing",
-   "small": 14,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "9": 1,
-    "10": 7,
-    "11": 3,
-    "12": 3,
-    "13": 2,
-    "14": 5,
+    "13": 14,
+    "14": 3,
     "15": 1,
+    "16": 4,
     "17": 3,
     "22": 1,
     "24": 2
    },
-   "smallText": [
-    {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "Farrowing · All 3 units",
-     "px": 11
-    },
-    {
-     "n": 2,
-     "sel": "span.st-heading-meta",
-     "text": "18 finished litters",
-     "px": 10
-    },
-    {
-     "n": 2,
-     "sel": "span",
-     "text": "Born alive / litter",
-     "px": 11
-    },
-    {
-     "n": 2,
-     "sel": "small",
-     "text": "Target 12",
-     "px": 10
-    },
-    {
-     "n": 3,
-     "sel": "dt",
-     "text": "Born",
-     "px": 10
-    },
-    {
-     "n": 3,
-     "sel": "dt",
-     "text": "Finished farrowing",
-     "px": 12
-    },
-    {
-     "n": 1,
-     "sel": "small.st-hold-caption",
-     "text": "HOLD TO END",
-     "px": 9
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
@@ -5654,74 +5085,22 @@
   {
    "id": "farrowing.task-outcomes",
    "feature": "farrowing",
-   "small": 16,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "9": 1,
-    "10": 7,
-    "11": 3,
-    "12": 5,
-    "13": 2,
-    "14": 7,
+    "13": 16,
+    "14": 4,
     "15": 1,
+    "16": 4,
     "17": 3,
     "22": 1,
     "24": 2
    },
-   "smallText": [
-    {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "Farrowing · All 3 units",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "span.st-banner-consequence",
-     "text": "These sows have not farrowed.",
-     "px": 12
-    },
-    {
-     "n": 2,
-     "sel": "span.st-heading-meta",
-     "text": "9 finished litters",
-     "px": 10
-    },
-    {
-     "n": 2,
-     "sel": "span",
-     "text": "Born alive / litter",
-     "px": 11
-    },
-    {
-     "n": 2,
-     "sel": "small",
-     "text": "Target 12",
-     "px": 10
-    },
-    {
-     "n": 3,
-     "sel": "dt",
-     "text": "Born",
-     "px": 10
-    },
-    {
-     "n": 4,
-     "sel": "dt",
-     "text": "Finished farrowing",
-     "px": 12
-    },
-    {
-     "n": 1,
-     "sel": "small.st-hold-caption",
-     "text": "HOLD TO END EARLY",
-     "px": 9
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
@@ -5729,105 +5108,43 @@
   {
    "id": "farrowing.edit-finished",
    "feature": "farrowing",
-   "small": 1,
+   "small": 0,
    "contrast": 0,
-   "contrastPrimary": 2,
+   "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "11": 1,
     "13": 2,
-    "14": 2,
-    "15": 7,
+    "16": 9,
     "18": 7,
     "20": 1
    },
-   "smallText": [
-    {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "000418 · B1",
-     "px": 11
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
-   "lowContrastPrimary": [
-    {
-     "n": 2,
-     "sel": "span.st-stepper-value",
-     "text": "0",
-     "px": 18,
-     "ratio": 5.2
-    }
-   ],
+   "lowContrastPrimary": [],
    "smallTargets": []
   },
   {
    "id": "farrowing.overview",
    "feature": "farrowing",
-   "small": 14,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "9": 1,
-    "10": 10,
-    "11": 3,
-    "13": 4,
-    "14": 5,
+    "13": 14,
+    "14": 4,
     "15": 1,
+    "16": 4,
     "17": 3,
     "22": 1,
     "23": 3,
     "24": 2
    },
-   "smallText": [
-    {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "Farrowing · All 3 units",
-     "px": 11
-    },
-    {
-     "n": 2,
-     "sel": "span.st-heading-meta",
-     "text": "18 sows",
-     "px": 10
-    },
-    {
-     "n": 3,
-     "sel": "span",
-     "text": "Farrowed",
-     "px": 10
-    },
-    {
-     "n": 1,
-     "sel": "small",
-     "text": "Current unit",
-     "px": 9
-    },
-    {
-     "n": 2,
-     "sel": "span",
-     "text": "Born alive / litter",
-     "px": 11
-    },
-    {
-     "n": 2,
-     "sel": "small",
-     "text": "Target 12",
-     "px": 10
-    },
-    {
-     "n": 3,
-     "sel": "dt",
-     "text": "Born",
-     "px": 10
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
@@ -5835,67 +5152,22 @@
   {
    "id": "farrowing.task-receipt",
    "feature": "farrowing",
-   "small": 14,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "10": 7,
-    "11": 4,
-    "12": 3,
-    "13": 2,
-    "14": 6,
+    "13": 14,
+    "14": 4,
     "15": 1,
+    "16": 3,
     "17": 3,
     "22": 1,
     "24": 2
    },
-   "smallText": [
-    {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "Farrowing · All 3 units",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "p",
-     "text": "10 Oct, 16:53 · G. Hansen",
-     "px": 11
-    },
-    {
-     "n": 2,
-     "sel": "span.st-heading-meta",
-     "text": "18 finished litters",
-     "px": 10
-    },
-    {
-     "n": 2,
-     "sel": "span",
-     "text": "Born alive / litter",
-     "px": 11
-    },
-    {
-     "n": 2,
-     "sel": "small",
-     "text": "Target 12",
-     "px": 10
-    },
-    {
-     "n": 3,
-     "sel": "dt",
-     "text": "Born",
-     "px": 10
-    },
-    {
-     "n": 3,
-     "sel": "dt",
-     "text": "Finished farrowing",
-     "px": 12
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
@@ -5903,47 +5175,20 @@
   {
    "id": "farrowing.foster",
    "feature": "farrowing",
-   "small": 10,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "10": 5,
-    "11": 1,
-    "12": 4,
-    "13": 2,
-    "14": 4,
+    "13": 10,
+    "14": 2,
+    "16": 4,
     "22": 1,
     "28": 1
    },
-   "smallText": [
-    {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "B1 · sow 000418",
-     "px": 11
-    },
-    {
-     "n": 4,
-     "sel": "strong",
-     "text": "000601",
-     "px": 12
-    },
-    {
-     "n": 4,
-     "sel": "small",
-     "text": "Unit 6 · A1 · 9 alive",
-     "px": 10
-    },
-    {
-     "n": 1,
-     "sel": "p.feature-hint",
-     "text": "The current litter decreases immediately",
-     "px": 10
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
@@ -5951,47 +5196,20 @@
   {
    "id": "farrowing.reconcile",
    "feature": "farrowing",
-   "small": 4,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "10": 2,
-    "11": 1,
-    "12": 1,
-    "13": 2,
-    "14": 3,
+    "13": 4,
+    "14": 1,
+    "16": 3,
     "22": 1,
     "28": 2
    },
-   "smallText": [
-    {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "B1 · sow 000418",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "span",
-     "text": "System count",
-     "px": 10
-    },
-    {
-     "n": 1,
-     "sel": "p.feature-hint",
-     "text": "The count cannot be lower than the 3 ide",
-     "px": 10
-    },
-    {
-     "n": 1,
-     "sel": "span",
-     "text": "Reason for mismatch",
-     "px": 12
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
@@ -7288,53 +6506,21 @@
   {
    "id": "piglet-processing.pen-list",
    "feature": "piglet-processing",
-   "small": 36,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "10": 9,
-    "11": 24,
-    "12": 3,
-    "13": 30,
+    "13": 53,
+    "14": 2,
     "15": 1,
+    "16": 10,
     "22": 1,
     "31": 2
    },
-   "smallText": [
-    {
-     "n": 17,
-     "sel": "span",
-     "text": "Last record",
-     "px": 11
-    },
-    {
-     "n": 8,
-     "sel": "span",
-     "text": "Batch 40",
-     "px": 10
-    },
-    {
-     "n": 1,
-     "sel": "span.st-selection-count",
-     "text": "9",
-     "px": 10
-    },
-    {
-     "n": 3,
-     "sel": "span",
-     "text": "000238",
-     "px": 12
-    },
-    {
-     "n": 7,
-     "sel": "span.st-sep",
-     "text": "·",
-     "px": 11
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
@@ -7342,63 +6528,19 @@
   {
    "id": "piglet-processing.sheet-coming",
    "feature": "piglet-processing",
-   "small": 17,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "10": 2,
-    "11": 15,
-    "13": 7,
-    "14": 9,
+    "13": 18,
+    "14": 3,
+    "16": 10,
     "20": 1
    },
-   "smallText": [
-    {
-     "n": 3,
-     "sel": "p.sheet-subtitle",
-     "text": "B05 · parity 3",
-     "px": 11
-    },
-    {
-     "n": 2,
-     "sel": "span.st-sep",
-     "text": "·",
-     "px": 11
-    },
-    {
-     "n": 2,
-     "sel": "span.st-button-label",
-     "text": "View log",
-     "px": 11
-    },
-    {
-     "n": 4,
-     "sel": "dt",
-     "text": "Boars · gilts",
-     "px": 11
-    },
-    {
-     "n": 2,
-     "sel": "span",
-     "text": "Not due yet · can be done early",
-     "px": 10
-    },
-    {
-     "n": 3,
-     "sel": "span.st-tok",
-     "text": "day 2–4",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "p.sheet-status",
-     "text": "Tick at least one item",
-     "px": 11
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
@@ -7406,63 +6548,19 @@
   {
    "id": "piglet-processing.sheet-todo",
    "feature": "piglet-processing",
-   "small": 21,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "10": 2,
-    "11": 19,
-    "13": 7,
-    "14": 9,
+    "13": 22,
+    "14": 3,
+    "16": 10,
     "20": 1
    },
-   "smallText": [
-    {
-     "n": 3,
-     "sel": "p.sheet-subtitle",
-     "text": "A03 · parity 5",
-     "px": 11
-    },
-    {
-     "n": 4,
-     "sel": "span.st-sep",
-     "text": "·",
-     "px": 11
-    },
-    {
-     "n": 2,
-     "sel": "span.st-button-label",
-     "text": "View log",
-     "px": 11
-    },
-    {
-     "n": 4,
-     "sel": "dt",
-     "text": "Boars · gilts",
-     "px": 11
-    },
-    {
-     "n": 2,
-     "sel": "span",
-     "text": "Planned 10/08",
-     "px": 10
-    },
-    {
-     "n": 5,
-     "sel": "span.st-tok",
-     "text": "10 given",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "p.sheet-status",
-     "text": "Tick at least one item",
-     "px": 11
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
@@ -7470,69 +6568,19 @@
   {
    "id": "piglet-processing.sheet-breeders",
    "feature": "piglet-processing",
-   "small": 18,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "10": 2,
-    "11": 16,
-    "13": 8,
-    "14": 9,
+    "13": 20,
+    "14": 3,
+    "16": 10,
     "20": 1
    },
-   "smallText": [
-    {
-     "n": 3,
-     "sel": "p.sheet-subtitle",
-     "text": "A02 · parity 6",
-     "px": 11
-    },
-    {
-     "n": 3,
-     "sel": "span.st-sep",
-     "text": "·",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "span.st-button-label",
-     "text": "View log",
-     "px": 11
-    },
-    {
-     "n": 4,
-     "sel": "dt",
-     "text": "Boars · gilts",
-     "px": 11
-    },
-    {
-     "n": 2,
-     "sel": "span",
-     "text": "Planned 10/08",
-     "px": 10
-    },
-    {
-     "n": 3,
-     "sel": "span.st-tok",
-     "text": "day 3–7",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "span.st-part",
-     "text": "Not filled",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "p.sheet-status",
-     "text": "Tick at least one item",
-     "px": 11
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
@@ -7540,69 +6588,19 @@
   {
    "id": "piglet-processing.sheet-late",
    "feature": "piglet-processing",
-   "small": 21,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "10": 3,
-    "11": 18,
-    "13": 7,
-    "14": 9,
+    "13": 21,
+    "14": 3,
+    "16": 10,
     "20": 1
    },
-   "smallText": [
-    {
-     "n": 3,
-     "sel": "p.sheet-subtitle",
-     "text": "B01 · parity 1",
-     "px": 11
-    },
-    {
-     "n": 4,
-     "sel": "span.st-sep",
-     "text": "·",
-     "px": 11
-    },
-    {
-     "n": 2,
-     "sel": "span.st-button-label",
-     "text": "View log",
-     "px": 11
-    },
-    {
-     "n": 4,
-     "sel": "dt",
-     "text": "Boars · gilts",
-     "px": 11
-    },
-    {
-     "n": 3,
-     "sel": "span",
-     "text": "Planned 10/06",
-     "px": 10
-    },
-    {
-     "n": 2,
-     "sel": "span.st-tok",
-     "text": "day 2–4",
-     "px": 11
-    },
-    {
-     "n": 2,
-     "sel": "span.st-part",
-     "text": "late",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "p.sheet-status",
-     "text": "Tick at least one item",
-     "px": 11
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
@@ -7610,69 +6608,19 @@
   {
    "id": "piglet-processing.sheet-done",
    "feature": "piglet-processing",
-   "small": 14,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "10": 1,
-    "11": 13,
-    "13": 4,
-    "14": 9,
+    "13": 14,
+    "14": 3,
+    "16": 9,
     "20": 1
    },
-   "smallText": [
-    {
-     "n": 3,
-     "sel": "p.sheet-subtitle",
-     "text": "A01 · parity 1",
-     "px": 11
-    },
-    {
-     "n": 2,
-     "sel": "span.st-sep",
-     "text": "·",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "span.st-button-label",
-     "text": "View log",
-     "px": 11
-    },
-    {
-     "n": 4,
-     "sel": "dt",
-     "text": "Boars · gilts",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "p.sp-quiet",
-     "text": "Nothing left to do in this pen.",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "span",
-     "text": "5 items",
-     "px": 10
-    },
-    {
-     "n": 1,
-     "sel": "span.st-tok",
-     "text": "Iron · Dock tail · Castrate · Coccidiosi",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "p.sheet-status",
-     "text": "Tick at least one item",
-     "px": 11
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
@@ -7680,27 +6628,19 @@
   {
    "id": "piglet-processing.adjust-count",
    "feature": "piglet-processing",
-   "small": 1,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "11": 1,
-    "14": 2,
-    "15": 1,
+    "13": 1,
+    "16": 3,
     "18": 1,
     "20": 1
    },
-   "smallText": [
-    {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "A03 · 2 to do",
-     "px": 11
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
@@ -7708,52 +6648,18 @@
   {
    "id": "piglet-processing.tagged-list",
    "feature": "piglet-processing",
-   "small": 11,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "10": 1,
-    "11": 6,
-    "12": 4,
-    "13": 5,
-    "14": 2,
+    "13": 11,
+    "16": 7,
     "22": 1
    },
-   "smallText": [
-    {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "A02 · Sow 000238",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "p.sp-quiet",
-     "text": "Tap a piglet to fix it. Tap the flag to ",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "small.tk-group-meta",
-     "text": "· 4 of 12 tagged · 1 breeder",
-     "px": 10
-    },
-    {
-     "n": 4,
-     "sel": "span.st-row-code",
-     "text": "001216",
-     "px": 12
-    },
-    {
-     "n": 4,
-     "sel": "small",
-     "text": "07:33 · G.H",
-     "px": 11
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
@@ -7761,65 +6667,20 @@
   {
    "id": "piglet-processing.give-ids",
    "feature": "piglet-processing",
-   "small": 14,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "10": 1,
-    "11": 9,
-    "12": 4,
-    "13": 5,
-    "14": 9,
+    "13": 12,
+    "14": 2,
+    "16": 12,
     "22": 2,
     "28": 1
    },
-   "smallText": [
-    {
-     "n": 2,
-     "sel": "p.sheet-subtitle",
-     "text": "A02 · Sow 000238",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "p.sp-quiet",
-     "text": "Tap a piglet to fix it. Tap the flag to ",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "small.tk-group-meta",
-     "text": "· 4 of 12 tagged · 1 breeder",
-     "px": 10
-    },
-    {
-     "n": 4,
-     "sel": "span.st-row-code",
-     "text": "001216",
-     "px": 12
-    },
-    {
-     "n": 4,
-     "sel": "small",
-     "text": "07:33 · G.H",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "small.st-optional-word",
-     "text": "Optional",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "p.sheet-status",
-     "text": "Add the number and the sex",
-     "px": 11
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
@@ -7827,75 +6688,39 @@
   {
    "id": "piglet-processing.counts",
    "feature": "piglet-processing",
-   "small": 1,
+   "small": 0,
    "contrast": 0,
-   "contrastPrimary": 2,
+   "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "11": 1,
-    "14": 2,
-    "15": 2,
+    "13": 1,
+    "16": 4,
     "18": 2,
     "20": 1
    },
-   "smallText": [
-    {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "A03 · day 4",
-     "px": 11
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
-   "lowContrastPrimary": [
-    {
-     "n": 2,
-     "sel": "span.st-stepper-value",
-     "text": "0",
-     "px": 18,
-     "ratio": 5.2
-    }
-   ],
+   "lowContrastPrimary": [],
    "smallTargets": []
   },
   {
    "id": "piglet-processing.weight",
    "feature": "piglet-processing",
-   "small": 3,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "11": 2,
-    "12": 1,
-    "14": 3,
+    "13": 2,
+    "16": 3,
     "20": 1,
     "21": 11
    },
-   "smallText": [
-    {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "A03 · day 4",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "span.st-measure-unit",
-     "text": "kg",
-     "px": 12
-    },
-    {
-     "n": 1,
-     "sel": "p.sheet-status",
-     "text": "Type the weight",
-     "px": 11
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
@@ -7911,7 +6736,7 @@
    "unverified": 0,
    "sizes": {
     "13": 4,
-    "14": 1,
+    "16": 1,
     "20": 1
    },
    "smallText": [],
@@ -7922,88 +6747,39 @@
   {
    "id": "piglet-processing.record-death",
    "feature": "piglet-processing",
-   "small": 2,
+   "small": 0,
    "contrast": 0,
-   "contrastPrimary": 4,
+   "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "11": 2,
-    "14": 2,
-    "15": 4,
+    "13": 1,
+    "16": 6,
     "18": 4,
     "20": 1
    },
-   "smallText": [
-    {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "A03 · 12 alive",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "p.sheet-status",
-     "text": "Say how many died",
-     "px": 11
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
-   "lowContrastPrimary": [
-    {
-     "n": 4,
-     "sel": "span.st-stepper-value",
-     "text": "0",
-     "px": 18,
-     "ratio": 5.2
-    }
-   ],
+   "lowContrastPrimary": [],
    "smallTargets": []
   },
   {
    "id": "piglet-processing.move-piglets",
    "feature": "piglet-processing",
-   "small": 14,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "10": 1,
-    "11": 2,
-    "12": 11,
-    "13": 1,
-    "14": 13,
+    "13": 13,
+    "14": 11,
+    "16": 3,
     "22": 1
    },
-   "smallText": [
-    {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "From A03 · 12 alive",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "span.st-heading-meta",
-     "text": "Pens in batch 40",
-     "px": 10
-    },
-    {
-     "n": 11,
-     "sel": "span.st-choice-meta",
-     "text": "day 6",
-     "px": 12
-    },
-    {
-     "n": 1,
-     "sel": "p.sheet-status",
-     "text": "Pick a pen first",
-     "px": 11
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
@@ -8011,33 +6787,19 @@
   {
    "id": "piglet-processing.set-count",
    "feature": "piglet-processing",
-   "small": 2,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "11": 2,
-    "13": 1,
-    "14": 2,
+    "13": 2,
+    "16": 2,
     "20": 1,
     "68": 1
    },
-   "smallText": [
-    {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "A03 · was 12",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "p.sheet-status",
-     "text": "Change the count to save",
-     "px": 11
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
@@ -8045,45 +6807,18 @@
   {
    "id": "piglet-processing.pen-log",
    "feature": "piglet-processing",
-   "small": 14,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "10": 8,
-    "11": 6,
-    "13": 8,
-    "14": 1,
+    "13": 14,
+    "16": 9,
     "22": 1
    },
-   "smallText": [
-    {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "A01 · Sow 000231",
-     "px": 11
-    },
-    {
-     "n": 3,
-     "sel": "span",
-     "text": "Thu",
-     "px": 11
-    },
-    {
-     "n": 2,
-     "sel": "p",
-     "text": "001201–001212",
-     "px": 11
-    },
-    {
-     "n": 8,
-     "sel": "small",
-     "text": "10:11 · G.H",
-     "px": 10
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
@@ -8091,71 +6826,18 @@
   {
    "id": "piglet-processing.end-task",
    "feature": "piglet-processing",
-   "small": 34,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "9": 1,
-    "10": 2,
-    "11": 22,
-    "12": 9,
-    "13": 9,
-    "14": 2,
+    "13": 34,
+    "16": 11,
     "22": 1
    },
-   "smallText": [
-    {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "Piglet processing · Batch 40",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "h3.tk-progress-title",
-     "text": "3 of 12 pens done",
-     "px": 12
-    },
-    {
-     "n": 1,
-     "sel": "span.tk-progress-meta",
-     "text": "9 pens not done",
-     "px": 10
-    },
-    {
-     "n": 1,
-     "sel": "small.tk-group-meta",
-     "text": "· 9 pens",
-     "px": 10
-    },
-    {
-     "n": 8,
-     "sel": "span.st-row-code",
-     "text": "A02",
-     "px": 12
-    },
-    {
-     "n": 14,
-     "sel": "span",
-     "text": "due today",
-     "px": 11
-    },
-    {
-     "n": 7,
-     "sel": "span.st-sep",
-     "text": "·",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "small.st-hold-caption",
-     "text": "HOLD TO END",
-     "px": 9
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
@@ -8163,53 +6845,21 @@
   {
    "id": "piglet-processing.list-ended",
    "feature": "piglet-processing",
-   "small": 33,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "10": 6,
-    "11": 24,
-    "12": 3,
-    "13": 9,
+    "13": 33,
+    "14": 2,
     "15": 1,
+    "16": 7,
     "22": 1,
     "31": 2
    },
-   "smallText": [
-    {
-     "n": 17,
-     "sel": "span",
-     "text": "Last record",
-     "px": 11
-    },
-    {
-     "n": 5,
-     "sel": "span",
-     "text": "Batch 40",
-     "px": 10
-    },
-    {
-     "n": 1,
-     "sel": "span.st-selection-count",
-     "text": "9",
-     "px": 10
-    },
-    {
-     "n": 3,
-     "sel": "span",
-     "text": "000238",
-     "px": 12
-    },
-    {
-     "n": 7,
-     "sel": "span.st-sep",
-     "text": "·",
-     "px": 11
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
@@ -8217,53 +6867,21 @@
   {
    "id": "piglet-processing.phone-clash",
    "feature": "piglet-processing",
-   "small": 31,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "10": 9,
-    "11": 18,
-    "12": 4,
-    "13": 22,
+    "13": 40,
+    "14": 3,
     "15": 1,
+    "16": 9,
     "22": 1,
     "31": 2
    },
-   "smallText": [
-    {
-     "n": 4,
-     "sel": "span",
-     "text": "Recorded on another phone first",
-     "px": 12
-    },
-    {
-     "n": 12,
-     "sel": "span",
-     "text": "Iron to do today",
-     "px": 11
-    },
-    {
-     "n": 8,
-     "sel": "span",
-     "text": "Batch 40",
-     "px": 10
-    },
-    {
-     "n": 1,
-     "sel": "span.st-selection-count",
-     "text": "9",
-     "px": 10
-    },
-    {
-     "n": 6,
-     "sel": "span.st-sep",
-     "text": "·",
-     "px": 11
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
@@ -8271,53 +6889,21 @@
   {
    "id": "piglet-processing.chip-done",
    "feature": "piglet-processing",
-   "small": 27,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "10": 6,
-    "11": 18,
-    "12": 3,
-    "13": 8,
+    "13": 27,
+    "14": 2,
     "15": 1,
+    "16": 6,
     "22": 1,
     "31": 2
    },
-   "smallText": [
-    {
-     "n": 14,
-     "sel": "span",
-     "text": "Last record",
-     "px": 11
-    },
-    {
-     "n": 5,
-     "sel": "span",
-     "text": "Batch 40",
-     "px": 10
-    },
-    {
-     "n": 1,
-     "sel": "span.st-selection-count",
-     "text": "9",
-     "px": 10
-    },
-    {
-     "n": 3,
-     "sel": "span",
-     "text": "000231",
-     "px": 12
-    },
-    {
-     "n": 4,
-     "sel": "span.st-sep",
-     "text": "·",
-     "px": 11
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
@@ -8325,53 +6911,21 @@
   {
    "id": "piglet-processing.job-chip-iron",
    "feature": "piglet-processing",
-   "small": 36,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "10": 9,
-    "11": 24,
-    "12": 3,
-    "13": 32,
+    "13": 55,
+    "14": 2,
     "15": 1,
+    "16": 10,
     "22": 1,
     "31": 2
    },
-   "smallText": [
-    {
-     "n": 17,
-     "sel": "span",
-     "text": "Last record",
-     "px": 11
-    },
-    {
-     "n": 8,
-     "sel": "span",
-     "text": "Batch 40",
-     "px": 10
-    },
-    {
-     "n": 1,
-     "sel": "span.st-selection-count",
-     "text": "9",
-     "px": 10
-    },
-    {
-     "n": 3,
-     "sel": "span",
-     "text": "000245",
-     "px": 12
-    },
-    {
-     "n": 7,
-     "sel": "span.st-sep",
-     "text": "·",
-     "px": 11
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
@@ -8379,53 +6933,21 @@
   {
    "id": "piglet-processing.job-chip-id",
    "feature": "piglet-processing",
-   "small": 36,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "10": 9,
-    "11": 24,
-    "12": 3,
-    "13": 30,
+    "13": 53,
+    "14": 2,
     "15": 1,
+    "16": 10,
     "22": 1,
     "31": 2
    },
-   "smallText": [
-    {
-     "n": 17,
-     "sel": "span",
-     "text": "Last record",
-     "px": 11
-    },
-    {
-     "n": 8,
-     "sel": "span",
-     "text": "Batch 40",
-     "px": 10
-    },
-    {
-     "n": 1,
-     "sel": "span.st-selection-count",
-     "text": "9",
-     "px": 10
-    },
-    {
-     "n": 3,
-     "sel": "span",
-     "text": "000238",
-     "px": 12
-    },
-    {
-     "n": 7,
-     "sel": "span.st-sep",
-     "text": "·",
-     "px": 11
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
@@ -8433,53 +6955,21 @@
   {
    "id": "piglet-processing.list-no-id",
    "feature": "piglet-processing",
-   "small": 36,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "10": 9,
-    "11": 24,
-    "12": 3,
-    "13": 24,
+    "13": 47,
+    "14": 2,
     "15": 1,
+    "16": 10,
     "22": 1,
     "31": 2
    },
-   "smallText": [
-    {
-     "n": 17,
-     "sel": "span",
-     "text": "Last record",
-     "px": 11
-    },
-    {
-     "n": 8,
-     "sel": "span",
-     "text": "Batch 40",
-     "px": 10
-    },
-    {
-     "n": 1,
-     "sel": "span.st-selection-count",
-     "text": "9",
-     "px": 10
-    },
-    {
-     "n": 3,
-     "sel": "span",
-     "text": "000238",
-     "px": 12
-    },
-    {
-     "n": 7,
-     "sel": "span.st-sep",
-     "text": "·",
-     "px": 11
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
@@ -8487,63 +6977,19 @@
   {
    "id": "piglet-processing.sheet-notch",
    "feature": "piglet-processing",
-   "small": 21,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "10": 2,
-    "11": 19,
-    "13": 7,
-    "14": 9,
+    "13": 22,
+    "14": 3,
+    "16": 10,
     "20": 1
    },
-   "smallText": [
-    {
-     "n": 3,
-     "sel": "p.sheet-subtitle",
-     "text": "A03 · parity 5",
-     "px": 11
-    },
-    {
-     "n": 4,
-     "sel": "span.st-sep",
-     "text": "·",
-     "px": 11
-    },
-    {
-     "n": 2,
-     "sel": "span.st-button-label",
-     "text": "View log",
-     "px": 11
-    },
-    {
-     "n": 4,
-     "sel": "dt",
-     "text": "Boars · gilts",
-     "px": 11
-    },
-    {
-     "n": 2,
-     "sel": "span",
-     "text": "Planned 10/08",
-     "px": 10
-    },
-    {
-     "n": 5,
-     "sel": "span.st-tok",
-     "text": "10 given",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "p.sheet-status",
-     "text": "Tick at least one item",
-     "px": 11
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
@@ -9399,45 +7845,19 @@
   {
    "id": "pregnancy.check",
    "feature": "pregnancy",
-   "small": 6,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "11": 2,
-    "12": 4,
-    "13": 1,
-    "14": 6,
+    "13": 5,
+    "14": 4,
+    "16": 2,
     "20": 1
    },
-   "smallText": [
-    {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "000254 · Batch 20",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "h5.st-choice-heading",
-     "text": "Record outcome",
-     "px": 12
-    },
-    {
-     "n": 3,
-     "sel": "span.st-choice-meta",
-     "text": "Keep in the current gestation batch",
-     "px": 12
-    },
-    {
-     "n": 1,
-     "sel": "small.st-optional-word",
-     "text": "Optional",
-     "px": 11
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
@@ -10476,40 +8896,18 @@
   {
    "id": "weaning.handoff",
    "feature": "weaning",
-   "small": 19,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "10": 6,
-    "11": 10,
-    "12": 3,
-    "13": 9,
-    "14": 5,
+    "13": 21,
+    "16": 10,
     "22": 1
    },
-   "smallText": [
-    {
-     "n": 10,
-     "sel": "span",
-     "text": "Unit 7 · as it stands now",
-     "px": 11
-    },
-    {
-     "n": 6,
-     "sel": "span",
-     "text": "3 litters not yet at day 21",
-     "px": 10
-    },
-    {
-     "n": 3,
-     "sel": "span",
-     "text": "A05",
-     "px": 12
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
@@ -10517,34 +8915,22 @@
   {
    "id": "feed-plan.pen",
    "feature": "feed-plan",
-   "small": 16,
+   "small": 14,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
    "fails": true,
    "unverified": 0,
    "sizes": {
-    "10": 7,
-    "11": 2,
+    "10": 6,
+    "11": 1,
     "12": 7,
-    "13": 1,
-    "14": 2,
+    "13": 2,
+    "16": 3,
     "22": 1,
     "24": 1
    },
    "smallText": [
-    {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "Pen C1 · 3 pigs",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "span.st-heading-meta",
-     "text": "Shared trough",
-     "px": 10
-    },
     {
      "n": 1,
      "sel": "span",
@@ -10577,34 +8963,20 @@
   {
    "id": "feed-plan.adlib",
    "feature": "feed-plan",
-   "small": 3,
+   "small": 1,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
    "fails": true,
    "unverified": 0,
    "sizes": {
-    "10": 1,
-    "11": 1,
     "12": 1,
-    "13": 1,
-    "14": 2,
+    "13": 2,
+    "16": 3,
     "22": 1,
     "24": 1
    },
    "smallText": [
-    {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "Pen D4 · 2 pigs",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "span.st-heading-meta",
-     "text": "Ad-lib",
-     "px": 10
-    },
     {
      "n": 1,
      "sel": "span",
@@ -10619,32 +8991,19 @@
   {
    "id": "feed-plan.bulk",
    "feature": "feed-plan",
-   "small": 3,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "11": 3,
-    "13": 4,
-    "14": 1,
+    "13": 5,
+    "14": 2,
+    "16": 1,
     "22": 1
    },
-   "smallText": [
-    {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "3 pens · 7 pigs",
-     "px": 11
-    },
-    {
-     "n": 2,
-     "sel": "small",
-     "text": "A note attached to the selected pens",
-     "px": 11
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
@@ -10652,7 +9011,7 @@
   {
    "id": "feed-plan.editor",
    "feature": "feed-plan",
-   "small": 34,
+   "small": 31,
    "contrast": 9,
    "contrastPrimary": 0,
    "taps": 0,
@@ -10661,20 +9020,15 @@
    "sizes": {
     "8": 9,
     "9": 5,
-    "10": 5,
-    "11": 4,
+    "10": 4,
+    "11": 2,
     "12": 11,
     "13": 2,
     "14": 5,
+    "16": 2,
     "22": 1
    },
    "smallText": [
-    {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "3 pigs",
-     "px": 11
-    },
     {
      "n": 1,
      "sel": "h4",
@@ -10718,12 +9072,6 @@
      "px": 8
     },
     {
-     "n": 1,
-     "sel": "span.st-condition-name",
-     "text": "Feed +10%",
-     "px": 10
-    },
-    {
      "n": 2,
      "sel": "span",
      "text": "Feeding mode",
@@ -10740,12 +9088,6 @@
      "sel": "small",
      "text": "Choose one % for all pigs",
      "px": 10
-    },
-    {
-     "n": 1,
-     "sel": "small.st-optional-word",
-     "text": "Optional",
-     "px": 11
     }
    ],
    "lowContrast": [
@@ -10770,33 +9112,18 @@
   {
    "id": "feed-plan.end-date",
    "feature": "feed-plan",
-   "small": 2,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "11": 1,
-    "12": 1,
-    "13": 1,
-    "14": 2,
+    "13": 2,
+    "16": 2,
     "20": 1
    },
-   "smallText": [
-    {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "3 pigs",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "span",
-     "text": "Until",
-     "px": 12
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
@@ -10804,28 +9131,21 @@
   {
    "id": "feed-plan.pig",
    "feature": "feed-plan",
-   "small": 13,
+   "small": 10,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
    "fails": true,
    "unverified": 0,
    "sizes": {
-    "10": 10,
-    "11": 2,
+    "10": 8,
+    "11": 1,
     "12": 1,
-    "13": 2,
-    "14": 1,
-    "16": 1,
+    "13": 3,
+    "16": 4,
     "22": 1
    },
    "smallText": [
-    {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "000267",
-     "px": 11
-    },
     {
      "n": 1,
      "sel": "strong",
@@ -10842,18 +9162,6 @@
      "n": 1,
      "sel": "small",
      "text": "kg/day",
-     "px": 10
-    },
-    {
-     "n": 1,
-     "sel": "span.st-condition-name",
-     "text": "Feed +10%",
-     "px": 10
-    },
-    {
-     "n": 1,
-     "sel": "small.st-condition-day",
-     "text": "Thin · mild",
      "px": 10
     },
     {
@@ -10876,19 +9184,18 @@
   {
    "id": "feed-plan.pen-up",
    "feature": "feed-plan",
-   "small": 35,
+   "small": 15,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
    "fails": true,
    "unverified": 0,
    "sizes": {
-    "9": 3,
-    "10": 24,
-    "11": 7,
-    "12": 1,
-    "13": 14,
-    "14": 1,
+    "9": 2,
+    "10": 9,
+    "11": 4,
+    "13": 29,
+    "14": 5,
     "22": 1
    },
    "smallText": [
@@ -10899,34 +9206,16 @@
      "px": 11
     },
     {
-     "n": 1,
-     "sel": "p",
-     "text": "Last check-in",
-     "px": 11
-    },
-    {
-     "n": 4,
-     "sel": "strong",
-     "text": "06:40",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "span",
-     "text": "· G. Hansen",
-     "px": 11
-    },
-    {
-     "n": 3,
-     "sel": "span.st-selection-count",
-     "text": "3",
-     "px": 10
-    },
-    {
      "n": 3,
      "sel": "small",
      "text": "· 3 pigs",
      "px": 10
+    },
+    {
+     "n": 3,
+     "sel": "strong",
+     "text": "8.1 kg",
+     "px": 11
     },
     {
      "n": 6,
@@ -10935,40 +9224,10 @@
      "px": 10
     },
     {
-     "n": 7,
-     "sel": "span.st-condition-name",
-     "text": "Feed +10%",
-     "px": 10
-    },
-    {
-     "n": 4,
-     "sel": "small.st-condition-day",
-     "text": "Day 12",
-     "px": 10
-    },
-    {
      "n": 2,
      "sel": "small.pen-feed-state",
      "text": "Auto",
      "px": 9
-    },
-    {
-     "n": 1,
-     "sel": "small.st-condition-level-word",
-     "text": "Treat",
-     "px": 10
-    },
-    {
-     "n": 1,
-     "sel": "small",
-     "text": "Go to pen",
-     "px": 9
-    },
-    {
-     "n": 1,
-     "sel": "span",
-     "text": "Scan ear tag",
-     "px": 12
     }
    ],
    "lowContrast": [],
@@ -10978,19 +9237,18 @@
   {
    "id": "feed-plan.pen-down",
    "feature": "feed-plan",
-   "small": 35,
+   "small": 15,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
    "fails": true,
    "unverified": 0,
    "sizes": {
-    "9": 3,
-    "10": 24,
-    "11": 7,
-    "12": 1,
-    "13": 14,
-    "14": 1,
+    "9": 2,
+    "10": 9,
+    "11": 4,
+    "13": 29,
+    "14": 5,
     "22": 1
    },
    "smallText": [
@@ -11001,34 +9259,16 @@
      "px": 11
     },
     {
-     "n": 1,
-     "sel": "p",
-     "text": "Last check-in",
-     "px": 11
-    },
-    {
-     "n": 4,
-     "sel": "strong",
-     "text": "06:40",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "span",
-     "text": "· G. Hansen",
-     "px": 11
-    },
-    {
-     "n": 3,
-     "sel": "span.st-selection-count",
-     "text": "3",
-     "px": 10
-    },
-    {
      "n": 3,
      "sel": "small",
      "text": "· 3 pigs",
      "px": 10
+    },
+    {
+     "n": 3,
+     "sel": "strong",
+     "text": "7.0 kg",
+     "px": 11
     },
     {
      "n": 6,
@@ -11037,40 +9277,10 @@
      "px": 10
     },
     {
-     "n": 7,
-     "sel": "span.st-condition-name",
-     "text": "Feed -5%",
-     "px": 10
-    },
-    {
-     "n": 4,
-     "sel": "small.st-condition-day",
-     "text": "Day 12",
-     "px": 10
-    },
-    {
      "n": 2,
      "sel": "small.pen-feed-state",
      "text": "Auto",
      "px": 9
-    },
-    {
-     "n": 1,
-     "sel": "small.st-condition-level-word",
-     "text": "Treat",
-     "px": 10
-    },
-    {
-     "n": 1,
-     "sel": "small",
-     "text": "Go to pen",
-     "px": 9
-    },
-    {
-     "n": 1,
-     "sel": "span",
-     "text": "Scan ear tag",
-     "px": 12
     }
    ],
    "lowContrast": [],
@@ -11080,19 +9290,18 @@
   {
    "id": "feed-plan.pen-held",
    "feature": "feed-plan",
-   "small": 35,
+   "small": 15,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
    "fails": true,
    "unverified": 0,
    "sizes": {
-    "9": 3,
-    "10": 24,
-    "11": 7,
-    "12": 1,
-    "13": 14,
-    "14": 1,
+    "9": 2,
+    "10": 9,
+    "11": 4,
+    "13": 29,
+    "14": 5,
     "22": 1
    },
    "smallText": [
@@ -11103,34 +9312,16 @@
      "px": 11
     },
     {
-     "n": 1,
-     "sel": "p",
-     "text": "Last check-in",
-     "px": 11
-    },
-    {
-     "n": 4,
-     "sel": "strong",
-     "text": "06:40",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "span",
-     "text": "· G. Hansen",
-     "px": 11
-    },
-    {
-     "n": 3,
-     "sel": "span.st-selection-count",
-     "text": "3",
-     "px": 10
-    },
-    {
      "n": 3,
      "sel": "small",
      "text": "· 3 pigs",
      "px": 10
+    },
+    {
+     "n": 3,
+     "sel": "strong",
+     "text": "7.6 kg",
+     "px": 11
     },
     {
      "n": 6,
@@ -11139,40 +9330,10 @@
      "px": 10
     },
     {
-     "n": 7,
-     "sel": "span.st-condition-name",
-     "text": "Feed held",
-     "px": 10
-    },
-    {
-     "n": 4,
-     "sel": "small.st-condition-day",
-     "text": "Day 12",
-     "px": 10
-    },
-    {
      "n": 2,
      "sel": "small.pen-feed-state",
      "text": "Auto",
      "px": 9
-    },
-    {
-     "n": 1,
-     "sel": "small.st-condition-level-word",
-     "text": "Treat",
-     "px": 10
-    },
-    {
-     "n": 1,
-     "sel": "small",
-     "text": "Go to pen",
-     "px": 9
-    },
-    {
-     "n": 1,
-     "sel": "span",
-     "text": "Scan ear tag",
-     "px": 12
     }
    ],
    "lowContrast": [],
@@ -11361,19 +9522,18 @@
   {
    "id": "inspection.walk",
    "feature": "inspection",
-   "small": 35,
+   "small": 15,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
    "fails": true,
    "unverified": 0,
    "sizes": {
-    "9": 3,
-    "10": 24,
-    "11": 7,
-    "12": 1,
-    "13": 14,
-    "14": 1,
+    "9": 2,
+    "10": 9,
+    "11": 4,
+    "13": 29,
+    "14": 5,
     "22": 1
    },
    "smallText": [
@@ -11384,34 +9544,16 @@
      "px": 11
     },
     {
-     "n": 1,
-     "sel": "p",
-     "text": "Last check-in",
-     "px": 11
-    },
-    {
-     "n": 4,
-     "sel": "strong",
-     "text": "06:40",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "span",
-     "text": "· G. Hansen",
-     "px": 11
-    },
-    {
-     "n": 3,
-     "sel": "span.st-selection-count",
-     "text": "4",
-     "px": 10
-    },
-    {
      "n": 3,
      "sel": "small",
      "text": "· 3 pigs",
      "px": 10
+    },
+    {
+     "n": 3,
+     "sel": "strong",
+     "text": "7.6 kg",
+     "px": 11
     },
     {
      "n": 6,
@@ -11420,40 +9562,10 @@
      "px": 10
     },
     {
-     "n": 6,
-     "sel": "span.st-condition-name",
-     "text": "Thin",
-     "px": 10
-    },
-    {
-     "n": 5,
-     "sel": "small.st-condition-day",
-     "text": "Day 12",
-     "px": 10
-    },
-    {
      "n": 2,
      "sel": "small.pen-feed-state",
      "text": "Auto",
      "px": 9
-    },
-    {
-     "n": 1,
-     "sel": "small.st-condition-level-word",
-     "text": "Treat",
-     "px": 10
-    },
-    {
-     "n": 1,
-     "sel": "small",
-     "text": "Go to pen",
-     "px": 9
-    },
-    {
-     "n": 1,
-     "sel": "span",
-     "text": "Scan ear tag",
-     "px": 12
     }
    ],
    "lowContrast": [],
@@ -11463,19 +9575,18 @@
   {
    "id": "inspection.stage-times",
    "feature": "inspection",
-   "small": 35,
+   "small": 15,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
    "fails": true,
    "unverified": 0,
    "sizes": {
-    "9": 3,
-    "10": 24,
-    "11": 7,
-    "12": 1,
-    "13": 14,
-    "14": 1,
+    "9": 2,
+    "10": 9,
+    "11": 4,
+    "13": 29,
+    "14": 5,
     "22": 1
    },
    "smallText": [
@@ -11486,34 +9597,16 @@
      "px": 11
     },
     {
-     "n": 1,
-     "sel": "p",
-     "text": "Last check-in",
-     "px": 11
-    },
-    {
-     "n": 4,
-     "sel": "strong",
-     "text": "06:40",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "span",
-     "text": "· G. Hansen",
-     "px": 11
-    },
-    {
-     "n": 3,
-     "sel": "span.st-selection-count",
-     "text": "4",
-     "px": 10
-    },
-    {
      "n": 3,
      "sel": "small",
      "text": "· 3 pigs",
      "px": 10
+    },
+    {
+     "n": 3,
+     "sel": "strong",
+     "text": "7.6 kg",
+     "px": 11
     },
     {
      "n": 6,
@@ -11522,40 +9615,10 @@
      "px": 10
     },
     {
-     "n": 6,
-     "sel": "span.st-condition-name",
-     "text": "Thin",
-     "px": 10
-    },
-    {
-     "n": 5,
-     "sel": "small.st-condition-day",
-     "text": "Day 12",
-     "px": 10
-    },
-    {
      "n": 2,
      "sel": "small.pen-feed-state",
      "text": "Auto",
      "px": 9
-    },
-    {
-     "n": 1,
-     "sel": "small.st-condition-level-word",
-     "text": "Treat",
-     "px": 10
-    },
-    {
-     "n": 1,
-     "sel": "small",
-     "text": "Go to pen",
-     "px": 9
-    },
-    {
-     "n": 1,
-     "sel": "span",
-     "text": "Scan ear tag",
-     "px": 12
     }
    ],
    "lowContrast": [],
@@ -11565,19 +9628,18 @@
   {
    "id": "inspection.animal-types",
    "feature": "inspection",
-   "small": 35,
+   "small": 15,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
    "fails": true,
    "unverified": 0,
    "sizes": {
-    "9": 3,
-    "10": 24,
-    "11": 7,
-    "12": 1,
-    "13": 14,
-    "14": 1,
+    "9": 2,
+    "10": 9,
+    "11": 4,
+    "13": 29,
+    "14": 5,
     "22": 1
    },
    "smallText": [
@@ -11588,34 +9650,16 @@
      "px": 11
     },
     {
-     "n": 1,
-     "sel": "p",
-     "text": "Last check-in",
-     "px": 11
-    },
-    {
-     "n": 4,
-     "sel": "strong",
-     "text": "06:40",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "span",
-     "text": "· G. Hansen",
-     "px": 11
-    },
-    {
-     "n": 3,
-     "sel": "span.st-selection-count",
-     "text": "4",
-     "px": 10
-    },
-    {
      "n": 3,
      "sel": "small",
      "text": "· 3 pigs",
      "px": 10
+    },
+    {
+     "n": 3,
+     "sel": "strong",
+     "text": "7.6 kg",
+     "px": 11
     },
     {
      "n": 6,
@@ -11624,40 +9668,10 @@
      "px": 10
     },
     {
-     "n": 6,
-     "sel": "span.st-condition-name",
-     "text": "Thin",
-     "px": 10
-    },
-    {
-     "n": 5,
-     "sel": "small.st-condition-day",
-     "text": "Day 12",
-     "px": 10
-    },
-    {
      "n": 2,
      "sel": "small.pen-feed-state",
      "text": "Auto",
      "px": 9
-    },
-    {
-     "n": 1,
-     "sel": "small.st-condition-level-word",
-     "text": "Treat",
-     "px": 10
-    },
-    {
-     "n": 1,
-     "sel": "small",
-     "text": "Go to pen",
-     "px": 9
-    },
-    {
-     "n": 1,
-     "sel": "span",
-     "text": "Scan ear tag",
-     "px": 12
     }
    ],
    "lowContrast": [],
@@ -11667,19 +9681,18 @@
   {
    "id": "inspection.pen-signals",
    "feature": "inspection",
-   "small": 33,
+   "small": 15,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
    "fails": true,
    "unverified": 0,
    "sizes": {
-    "9": 3,
-    "10": 22,
-    "11": 7,
-    "12": 1,
-    "13": 14,
-    "14": 1,
+    "9": 2,
+    "10": 9,
+    "11": 4,
+    "13": 27,
+    "14": 5,
     "22": 1
    },
    "smallText": [
@@ -11690,34 +9703,16 @@
      "px": 11
     },
     {
-     "n": 1,
-     "sel": "p",
-     "text": "Last check-in",
-     "px": 11
-    },
-    {
-     "n": 4,
-     "sel": "strong",
-     "text": "06:40",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "span",
-     "text": "· G. Hansen",
-     "px": 11
-    },
-    {
-     "n": 3,
-     "sel": "span.st-selection-count",
-     "text": "3",
-     "px": 10
-    },
-    {
      "n": 3,
      "sel": "small",
      "text": "· 3 pigs",
      "px": 10
+    },
+    {
+     "n": 3,
+     "sel": "strong",
+     "text": "7.6 kg",
+     "px": 11
     },
     {
      "n": 6,
@@ -11726,40 +9721,10 @@
      "px": 10
     },
     {
-     "n": 5,
-     "sel": "span.st-condition-name",
-     "text": "Thin",
-     "px": 10
-    },
-    {
-     "n": 4,
-     "sel": "small.st-condition-day",
-     "text": "Day 12",
-     "px": 10
-    },
-    {
      "n": 2,
      "sel": "small.pen-feed-state",
      "text": "Auto",
      "px": 9
-    },
-    {
-     "n": 1,
-     "sel": "small.st-condition-level-word",
-     "text": "Treat",
-     "px": 10
-    },
-    {
-     "n": 1,
-     "sel": "small",
-     "text": "Go to pen",
-     "px": 9
-    },
-    {
-     "n": 1,
-     "sel": "span",
-     "text": "Scan ear tag",
-     "px": 12
     }
    ],
    "lowContrast": [],
@@ -11769,25 +9734,20 @@
   {
    "id": "inspection.pen",
    "feature": "inspection",
-   "small": 6,
+   "small": 2,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
    "fails": true,
    "unverified": 0,
    "sizes": {
-    "11": 6,
-    "13": 4,
-    "14": 2,
+    "11": 2,
+    "13": 7,
+    "14": 1,
+    "16": 2,
     "22": 1
    },
    "smallText": [
-    {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "3 pigs · Unit 7",
-     "px": 11
-    },
     {
      "n": 1,
      "sel": "span.record-type",
@@ -11799,12 +9759,6 @@
      "sel": "span.record-notice-context",
      "text": "G. Hansen · today · 06:40",
      "px": 11
-    },
-    {
-     "n": 3,
-     "sel": "small",
-     "text": "Gestation 1 · 7.6 kg",
-     "px": 11
     }
    ],
    "lowContrast": [],
@@ -11814,32 +9768,19 @@
   {
    "id": "inspection.pen-note",
    "feature": "inspection",
-   "small": 2,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "11": 1,
-    "12": 1,
-    "14": 3,
+    "13": 2,
+    "14": 1,
+    "16": 2,
     "20": 1
    },
-   "smallText": [
-    {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "Pen C1",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "span",
-     "text": "Note",
-     "px": 12
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
@@ -11847,61 +9788,24 @@
   {
    "id": "inspection.pen-log",
    "feature": "inspection",
-   "small": 12,
+   "small": 1,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
    "fails": true,
    "unverified": 0,
    "sizes": {
-    "10": 5,
-    "11": 5,
-    "12": 2,
-    "13": 2,
-    "14": 3,
+    "10": 1,
+    "13": 11,
+    "14": 2,
+    "16": 3,
     "22": 1
    },
    "smallText": [
     {
      "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "Pen C1 · Unit 7",
-     "px": 11
-    },
-    {
-     "n": 2,
-     "sel": "span",
-     "text": "Activity",
-     "px": 12
-    },
-    {
-     "n": 1,
      "sel": "span",
      "text": "2 entries · Newest first",
-     "px": 10
-    },
-    {
-     "n": 2,
-     "sel": "span",
-     "text": "Today",
-     "px": 11
-    },
-    {
-     "n": 2,
-     "sel": "span.st-log-category",
-     "text": "Notes",
-     "px": 10
-    },
-    {
-     "n": 2,
-     "sel": "p",
-     "text": "Close the aisle gate after passing.",
-     "px": 11
-    },
-    {
-     "n": 2,
-     "sel": "small",
-     "text": "06:40 · G.H",
      "px": 10
     }
    ],
@@ -11912,33 +9816,19 @@
   {
    "id": "inspection.filters",
    "feature": "inspection",
-   "small": 4,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "11": 1,
-    "12": 3,
-    "13": 1,
-    "14": 5,
+    "13": 4,
+    "14": 4,
+    "16": 2,
     "20": 1
    },
-   "smallText": [
-    {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "Unit 7",
-     "px": 11
-    },
-    {
-     "n": 3,
-     "sel": "span",
-     "text": "Production stage",
-     "px": 12
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
@@ -11946,59 +9836,18 @@
   {
    "id": "inspection.go-to-pen",
    "feature": "inspection",
-   "small": 37,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "8": 24,
-    "10": 10,
-    "11": 2,
-    "12": 1,
-    "13": 24,
-    "14": 1,
+    "13": 61,
+    "16": 1,
     "20": 1
    },
-   "smallText": [
-    {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "Unit 7",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "p.picker-intro",
-     "text": "Tap a pen to go to its pigs. Hold to pee",
-     "px": 12
-    },
-    {
-     "n": 4,
-     "sel": "span.map-column-label",
-     "text": "A",
-     "px": 10
-    },
-    {
-     "n": 6,
-     "sel": "span.map-row-label",
-     "text": "1",
-     "px": 10
-    },
-    {
-     "n": 24,
-     "sel": "small",
-     "text": "Not in unit",
-     "px": 8
-    },
-    {
-     "n": 1,
-     "sel": "p.picker-note",
-     "text": "Pen layout · only pens matching this vie",
-     "px": 11
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
@@ -12006,42 +9855,24 @@
   {
    "id": "inspection.find-pig",
    "feature": "inspection",
-   "small": 8,
+   "small": 2,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
    "fails": true,
    "unverified": 0,
    "sizes": {
-    "11": 1,
-    "12": 7,
-    "13": 4,
-    "14": 3,
+    "12": 2,
+    "13": 6,
+    "14": 2,
+    "16": 5,
     "20": 1
    },
    "smallText": [
     {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "Unit 7",
-     "px": 11
-    },
-    {
      "n": 2,
      "sel": "p.quiet-note",
      "text": "Camera scanning is not connected in this",
-     "px": 12
-    },
-    {
-     "n": 1,
-     "sel": "span",
-     "text": "Ear tag or pen",
-     "px": 12
-    },
-    {
-     "n": 4,
-     "sel": "span.st-row-code",
-     "text": "000254",
      "px": 12
     }
    ],
@@ -12052,39 +9883,18 @@
   {
    "id": "inspection.actions",
    "feature": "inspection",
-   "small": 11,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "11": 9,
-    "12": 2,
-    "13": 10,
-    "14": 1,
+    "13": 19,
+    "16": 3,
     "22": 1
    },
-   "smallText": [
-    {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "2 pigs",
-     "px": 11
-    },
-    {
-     "n": 8,
-     "sel": "small",
-     "text": "Record a health finding",
-     "px": 11
-    },
-    {
-     "n": 2,
-     "sel": "button[data-action=action-category]",
-     "text": "Health",
-     "px": 12
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
@@ -12092,38 +9902,19 @@
   {
    "id": "inspection.review-selected",
    "feature": "inspection",
-   "small": 3,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "11": 3,
-    "13": 1,
-    "14": 3,
+    "13": 4,
+    "14": 1,
+    "16": 2,
     "20": 1
    },
-   "smallText": [
-    {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "1 pig",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "span",
-     "text": "Pigs",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "small",
-     "text": "C1 · Gestating",
-     "px": 11
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
@@ -12131,25 +9922,20 @@
   {
    "id": "inspection.walk-log",
    "feature": "inspection",
-   "small": 2,
+   "small": 1,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
    "fails": true,
    "unverified": 0,
    "sizes": {
-    "11": 1,
     "12": 1,
-    "14": 2,
+    "13": 1,
+    "14": 1,
+    "16": 1,
     "22": 1
    },
    "smallText": [
-    {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "Unit 7 · G. Hansen",
-     "px": 11
-    },
     {
      "n": 1,
      "sel": "div.empty-inspect",
@@ -12164,26 +9950,21 @@
   {
    "id": "inspection.finish",
    "feature": "inspection",
-   "small": 4,
+   "small": 3,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
    "fails": true,
    "unverified": 0,
    "sizes": {
-    "11": 3,
+    "11": 2,
     "12": 1,
-    "14": 2,
+    "13": 1,
+    "16": 2,
     "20": 1,
     "27": 1
    },
    "smallText": [
-    {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "Unit 7",
-     "px": 11
-    },
     {
      "n": 1,
      "sel": "p.kicker",
@@ -12210,26 +9991,20 @@
   {
    "id": "inspection.walk-recorded",
    "feature": "inspection",
-   "small": 3,
+   "small": 2,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
    "fails": true,
    "unverified": 0,
    "sizes": {
-    "11": 1,
     "12": 2,
-    "14": 2,
+    "13": 1,
+    "16": 2,
     "20": 1,
     "22": 1
    },
    "smallText": [
-    {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "Unit 7",
-     "px": 11
-    },
     {
      "n": 2,
      "sel": "p",
@@ -12244,19 +10019,18 @@
   {
    "id": "inspection.no-batches",
    "feature": "inspection",
-   "small": 33,
+   "small": 15,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
    "fails": true,
    "unverified": 0,
    "sizes": {
-    "9": 3,
-    "10": 22,
-    "11": 7,
-    "12": 1,
-    "13": 14,
-    "14": 1,
+    "9": 2,
+    "10": 9,
+    "11": 4,
+    "13": 27,
+    "14": 5,
     "22": 1
    },
    "smallText": [
@@ -12267,34 +10041,16 @@
      "px": 11
     },
     {
-     "n": 1,
-     "sel": "p",
-     "text": "Last check-in",
-     "px": 11
-    },
-    {
-     "n": 4,
-     "sel": "strong",
-     "text": "06:40",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "span",
-     "text": "· G. Hansen",
-     "px": 11
-    },
-    {
-     "n": 3,
-     "sel": "span.st-selection-count",
-     "text": "3",
-     "px": 10
-    },
-    {
      "n": 3,
      "sel": "small",
      "text": "· 3 pigs",
      "px": 10
+    },
+    {
+     "n": 3,
+     "sel": "strong",
+     "text": "7.6 kg",
+     "px": 11
     },
     {
      "n": 6,
@@ -12303,40 +10059,10 @@
      "px": 10
     },
     {
-     "n": 5,
-     "sel": "span.st-condition-name",
-     "text": "Thin",
-     "px": 10
-    },
-    {
-     "n": 4,
-     "sel": "small.st-condition-day",
-     "text": "Day 12",
-     "px": 10
-    },
-    {
      "n": 2,
      "sel": "small.pen-feed-state",
      "text": "Auto",
      "px": 9
-    },
-    {
-     "n": 1,
-     "sel": "small.st-condition-level-word",
-     "text": "Treat",
-     "px": 10
-    },
-    {
-     "n": 1,
-     "sel": "small",
-     "text": "Go to pen",
-     "px": 9
-    },
-    {
-     "n": 1,
-     "sel": "span",
-     "text": "Scan ear tag",
-     "px": 12
     }
    ],
    "lowContrast": [],
@@ -12346,19 +10072,18 @@
   {
    "id": "inspection.one-batch",
    "feature": "inspection",
-   "small": 27,
+   "small": 11,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
    "fails": true,
    "unverified": 0,
    "sizes": {
-    "9": 2,
-    "10": 18,
-    "11": 6,
-    "12": 1,
-    "13": 12,
-    "14": 1,
+    "9": 1,
+    "10": 7,
+    "11": 3,
+    "13": 23,
+    "14": 5,
     "22": 1
    },
    "smallText": [
@@ -12369,34 +10094,16 @@
      "px": 11
     },
     {
-     "n": 1,
-     "sel": "p",
-     "text": "Last check-in",
-     "px": 11
-    },
-    {
-     "n": 3,
-     "sel": "strong",
-     "text": "06:40",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "span",
-     "text": "· G. Hansen",
-     "px": 11
-    },
-    {
-     "n": 3,
-     "sel": "span.st-selection-count",
-     "text": "2",
-     "px": 10
-    },
-    {
      "n": 2,
      "sel": "small",
      "text": "· 3 pigs",
      "px": 10
+    },
+    {
+     "n": 2,
+     "sel": "strong",
+     "text": "7.6 kg",
+     "px": 11
     },
     {
      "n": 5,
@@ -12405,40 +10112,10 @@
      "px": 10
     },
     {
-     "n": 4,
-     "sel": "span.st-condition-name",
-     "text": "Thin",
-     "px": 10
-    },
-    {
-     "n": 3,
-     "sel": "small.st-condition-day",
-     "text": "Day 12",
-     "px": 10
-    },
-    {
      "n": 1,
      "sel": "small.pen-feed-state",
      "text": "Auto",
      "px": 9
-    },
-    {
-     "n": 1,
-     "sel": "small.st-condition-level-word",
-     "text": "Treat",
-     "px": 10
-    },
-    {
-     "n": 1,
-     "sel": "small",
-     "text": "Go to pen",
-     "px": 9
-    },
-    {
-     "n": 1,
-     "sel": "span",
-     "text": "Scan ear tag",
-     "px": 12
     }
    ],
    "lowContrast": [],
@@ -12448,19 +10125,18 @@
   {
    "id": "inspection.many-batches",
    "feature": "inspection",
-   "small": 33,
+   "small": 15,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
    "fails": true,
    "unverified": 0,
    "sizes": {
-    "9": 3,
-    "10": 22,
-    "11": 7,
-    "12": 1,
-    "13": 14,
-    "14": 1,
+    "9": 2,
+    "10": 9,
+    "11": 4,
+    "13": 27,
+    "14": 5,
     "22": 1
    },
    "smallText": [
@@ -12471,34 +10147,16 @@
      "px": 11
     },
     {
-     "n": 1,
-     "sel": "p",
-     "text": "Last check-in",
-     "px": 11
-    },
-    {
-     "n": 4,
-     "sel": "strong",
-     "text": "06:40",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "span",
-     "text": "· G. Hansen",
-     "px": 11
-    },
-    {
-     "n": 3,
-     "sel": "span.st-selection-count",
-     "text": "3",
-     "px": 10
-    },
-    {
      "n": 3,
      "sel": "small",
      "text": "· 3 pigs",
      "px": 10
+    },
+    {
+     "n": 3,
+     "sel": "strong",
+     "text": "7.6 kg",
+     "px": 11
     },
     {
      "n": 6,
@@ -12507,40 +10165,10 @@
      "px": 10
     },
     {
-     "n": 5,
-     "sel": "span.st-condition-name",
-     "text": "Thin",
-     "px": 10
-    },
-    {
-     "n": 4,
-     "sel": "small.st-condition-day",
-     "text": "Day 12",
-     "px": 10
-    },
-    {
      "n": 2,
      "sel": "small.pen-feed-state",
      "text": "Auto",
      "px": 9
-    },
-    {
-     "n": 1,
-     "sel": "small.st-condition-level-word",
-     "text": "Treat",
-     "px": 10
-    },
-    {
-     "n": 1,
-     "sel": "small",
-     "text": "Go to pen",
-     "px": 9
-    },
-    {
-     "n": 1,
-     "sel": "span",
-     "text": "Scan ear tag",
-     "px": 12
     }
    ],
    "lowContrast": [],
@@ -12550,19 +10178,18 @@
   {
    "id": "inspection.batch-farrowing",
    "feature": "inspection",
-   "small": 33,
+   "small": 15,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
    "fails": true,
    "unverified": 0,
    "sizes": {
-    "9": 3,
-    "10": 22,
-    "11": 7,
-    "12": 1,
-    "13": 14,
-    "14": 1,
+    "9": 2,
+    "10": 9,
+    "11": 4,
+    "13": 27,
+    "14": 5,
     "22": 1
    },
    "smallText": [
@@ -12573,34 +10200,16 @@
      "px": 11
     },
     {
-     "n": 1,
-     "sel": "p",
-     "text": "Last check-in",
-     "px": 11
-    },
-    {
-     "n": 4,
-     "sel": "strong",
-     "text": "06:40",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "span",
-     "text": "· G. Hansen",
-     "px": 11
-    },
-    {
-     "n": 3,
-     "sel": "span.st-selection-count",
-     "text": "3",
-     "px": 10
-    },
-    {
      "n": 3,
      "sel": "small",
      "text": "· 3 pigs",
      "px": 10
+    },
+    {
+     "n": 3,
+     "sel": "strong",
+     "text": "7.6 kg",
+     "px": 11
     },
     {
      "n": 6,
@@ -12609,40 +10218,10 @@
      "px": 10
     },
     {
-     "n": 5,
-     "sel": "span.st-condition-name",
-     "text": "Thin",
-     "px": 10
-    },
-    {
-     "n": 4,
-     "sel": "small.st-condition-day",
-     "text": "Day 12",
-     "px": 10
-    },
-    {
      "n": 2,
      "sel": "small.pen-feed-state",
      "text": "Auto",
      "px": 9
-    },
-    {
-     "n": 1,
-     "sel": "small.st-condition-level-word",
-     "text": "Treat",
-     "px": 10
-    },
-    {
-     "n": 1,
-     "sel": "small",
-     "text": "Go to pen",
-     "px": 9
-    },
-    {
-     "n": 1,
-     "sel": "span",
-     "text": "Scan ear tag",
-     "px": 12
     }
    ],
    "lowContrast": [],
@@ -12652,19 +10231,18 @@
   {
    "id": "inspection.batch-concurrent",
    "feature": "inspection",
-   "small": 33,
+   "small": 15,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
    "fails": true,
    "unverified": 0,
    "sizes": {
-    "9": 3,
-    "10": 22,
-    "11": 7,
-    "12": 1,
-    "13": 14,
-    "14": 1,
+    "9": 2,
+    "10": 9,
+    "11": 4,
+    "13": 27,
+    "14": 5,
     "22": 1
    },
    "smallText": [
@@ -12675,34 +10253,16 @@
      "px": 11
     },
     {
-     "n": 1,
-     "sel": "p",
-     "text": "Last check-in",
-     "px": 11
-    },
-    {
-     "n": 4,
-     "sel": "strong",
-     "text": "06:40",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "span",
-     "text": "· G. Hansen",
-     "px": 11
-    },
-    {
-     "n": 3,
-     "sel": "span.st-selection-count",
-     "text": "3",
-     "px": 10
-    },
-    {
      "n": 3,
      "sel": "small",
      "text": "· 3 pigs",
      "px": 10
+    },
+    {
+     "n": 3,
+     "sel": "strong",
+     "text": "7.6 kg",
+     "px": 11
     },
     {
      "n": 6,
@@ -12711,40 +10271,10 @@
      "px": 10
     },
     {
-     "n": 5,
-     "sel": "span.st-condition-name",
-     "text": "Thin",
-     "px": 10
-    },
-    {
-     "n": 4,
-     "sel": "small.st-condition-day",
-     "text": "Day 12",
-     "px": 10
-    },
-    {
      "n": 2,
      "sel": "small.pen-feed-state",
      "text": "Auto",
      "px": 9
-    },
-    {
-     "n": 1,
-     "sel": "small.st-condition-level-word",
-     "text": "Treat",
-     "px": 10
-    },
-    {
-     "n": 1,
-     "sel": "small",
-     "text": "Go to pen",
-     "px": 9
-    },
-    {
-     "n": 1,
-     "sel": "span",
-     "text": "Scan ear tag",
-     "px": 12
     }
    ],
    "lowContrast": [],
@@ -14439,25 +11969,19 @@
   {
    "id": "find-pig.search",
    "feature": "find-pig",
-   "small": 1,
+   "small": 0,
    "contrast": 1,
    "contrastPrimary": 0,
    "taps": 0,
    "fails": true,
    "unverified": 0,
    "sizes": {
-    "12": 1,
-    "14": 3,
+    "13": 1,
+    "14": 2,
+    "16": 1,
     "20": 1
    },
-   "smallText": [
-    {
-     "n": 1,
-     "sel": "span",
-     "text": "Ear tag or pen code",
-     "px": 12
-    }
-   ],
+   "smallText": [],
    "lowContrast": [
     {
      "n": 1,
@@ -14473,7 +11997,7 @@
   {
    "id": "find-pig.scan",
    "feature": "find-pig",
-   "small": 2,
+   "small": 1,
    "contrast": 1,
    "contrastPrimary": 0,
    "taps": 0,
@@ -14481,17 +12005,12 @@
    "unverified": 0,
    "sizes": {
     "10": 1,
-    "12": 1,
-    "14": 5,
+    "13": 1,
+    "14": 4,
+    "16": 1,
     "20": 1
    },
    "smallText": [
-    {
-     "n": 1,
-     "sel": "span",
-     "text": "Ear tag",
-     "px": 12
-    },
     {
      "n": 1,
      "sel": "p.helper",
@@ -14514,26 +12033,18 @@
   {
    "id": "find-pig.results",
    "feature": "find-pig",
-   "small": 1,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "11": 1,
-    "13": 1,
-    "14": 1,
+    "13": 2,
+    "16": 1,
     "20": 1
    },
-   "smallText": [
-    {
-     "n": 1,
-     "sel": "small",
-     "text": "Unit 7 · Pregnancy check · Batch 31",
-     "px": 11
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
@@ -14541,7 +12052,7 @@
   {
    "id": "pig-list.detail",
    "feature": "pig-list",
-   "small": 22,
+   "small": 4,
    "contrast": 1,
    "contrastPrimary": 0,
    "taps": 0,
@@ -14550,30 +12061,17 @@
    "sizes": {
     "8": 1,
     "9": 1,
-    "10": 7,
-    "11": 12,
+    "10": 1,
     "12": 1,
-    "13": 4,
-    "14": 13,
+    "13": 18,
+    "16": 14,
     "22": 1
    },
    "smallText": [
     {
      "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "Unit 7 · C1 · Gestation · 42 days",
-     "px": 11
-    },
-    {
-     "n": 6,
      "sel": "small",
      "text": "Monitor · Day 12",
-     "px": 10
-    },
-    {
-     "n": 1,
-     "sel": "span.st-heading-meta",
-     "text": "1 task",
      "px": 10
     },
     {
@@ -14593,12 +12091,6 @@
      "sel": "span.pig-current-task-type",
      "text": "Production",
      "px": 8
-    },
-    {
-     "n": 11,
-     "sel": "dt",
-     "text": "Age",
-     "px": 11
     }
    ],
    "lowContrast": [
@@ -14616,35 +12108,24 @@
   {
    "id": "pig-list.health",
    "feature": "pig-list",
-   "small": 4,
+   "small": 2,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
    "fails": true,
    "unverified": 0,
    "sizes": {
-    "11": 4,
+    "11": 2,
     "13": 1,
-    "14": 5,
+    "14": 3,
+    "16": 2,
     "20": 1
    },
    "smallText": [
     {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "000267 · C1",
-     "px": 11
-    },
-    {
      "n": 2,
      "sel": "span",
      "text": "Conditions",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "small.st-optional-word",
-     "text": "Optional",
      "px": 11
     }
    ],
@@ -14655,61 +12136,24 @@
   {
    "id": "pig-list.events",
    "feature": "pig-list",
-   "small": 20,
+   "small": 1,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
    "fails": true,
    "unverified": 0,
    "sizes": {
-    "10": 9,
-    "11": 9,
-    "12": 2,
-    "13": 5,
-    "14": 3,
+    "10": 1,
+    "13": 18,
+    "14": 2,
+    "16": 6,
     "22": 1
    },
    "smallText": [
     {
      "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "000267 · Unit 7 · C1",
-     "px": 11
-    },
-    {
-     "n": 2,
-     "sel": "span",
-     "text": "Activity",
-     "px": 12
-    },
-    {
-     "n": 1,
      "sel": "span",
      "text": "5 entries · Newest first",
-     "px": 10
-    },
-    {
-     "n": 3,
-     "sel": "span",
-     "text": "Thu",
-     "px": 11
-    },
-    {
-     "n": 5,
-     "sel": "span.st-log-category",
-     "text": "Movement",
-     "px": 10
-    },
-    {
-     "n": 5,
-     "sel": "p",
-     "text": "Unit 6 · B2 → Unit 7 · C1",
-     "px": 11
-    },
-    {
-     "n": 3,
-     "sel": "small",
-     "text": "14:20 · M.L",
      "px": 10
     }
    ],
@@ -14720,45 +12164,18 @@
   {
    "id": "pig-list.edit",
    "feature": "pig-list",
-   "small": 13,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "11": 10,
-    "12": 3,
-    "13": 11,
-    "14": 1,
+    "13": 20,
+    "16": 4,
     "22": 1
    },
-   "smallText": [
-    {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "000267 · C1",
-     "px": 11
-    },
-    {
-     "n": 8,
-     "sel": "small",
-     "text": "Record a health finding",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "span",
-     "text": "Pregnancy check",
-     "px": 11
-    },
-    {
-     "n": 3,
-     "sel": "button[data-action=action-category]",
-     "text": "Health",
-     "px": 12
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
@@ -15256,7 +12673,7 @@
   {
    "id": "pig-profile.full",
    "feature": "pig-profile",
-   "small": 22,
+   "small": 4,
    "contrast": 1,
    "contrastPrimary": 0,
    "taps": 0,
@@ -15265,30 +12682,17 @@
    "sizes": {
     "8": 1,
     "9": 1,
-    "10": 7,
-    "11": 12,
+    "10": 1,
     "12": 1,
-    "13": 4,
-    "14": 13,
+    "13": 18,
+    "16": 14,
     "22": 1
    },
    "smallText": [
     {
      "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "Unit 7 · C1 · Gestation · 42 days",
-     "px": 11
-    },
-    {
-     "n": 6,
      "sel": "small",
      "text": "Monitor · Day 12",
-     "px": 10
-    },
-    {
-     "n": 1,
-     "sel": "span.st-heading-meta",
-     "text": "1 task",
      "px": 10
     },
     {
@@ -15308,12 +12712,6 @@
      "sel": "span.pig-current-task-type",
      "text": "Production",
      "px": 8
-    },
-    {
-     "n": 11,
-     "sel": "dt",
-     "text": "Age",
-     "px": 11
     }
    ],
    "lowContrast": [
@@ -15331,7 +12729,7 @@
   {
    "id": "pig-profile.partial",
    "feature": "pig-profile",
-   "small": 20,
+   "small": 3,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
@@ -15340,26 +12738,12 @@
    "sizes": {
     "8": 1,
     "9": 1,
-    "10": 3,
-    "11": 14,
     "12": 1,
-    "13": 3,
-    "14": 15,
+    "13": 14,
+    "16": 15,
     "22": 1
    },
    "smallText": [
-    {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "Unit 7 · C1 · Gestation · 40 days",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "span.st-heading-meta",
-     "text": "1 task",
-     "px": 10
-    },
     {
      "n": 1,
      "sel": "strong",
@@ -15377,18 +12761,6 @@
      "sel": "span.pig-current-task-type",
      "text": "Production",
      "px": 8
-    },
-    {
-     "n": 13,
-     "sel": "dt",
-     "text": "Age",
-     "px": 11
-    },
-    {
-     "n": 2,
-     "sel": "small",
-     "text": "7 days ago",
-     "px": 10
     }
    ],
    "lowContrast": [],
@@ -15398,7 +12770,7 @@
   {
    "id": "pig-profile.empty",
    "feature": "pig-profile",
-   "small": 18,
+   "small": 6,
    "contrast": 2,
    "contrastPrimary": 0,
    "taps": 0,
@@ -15407,20 +12779,13 @@
    "sizes": {
     "8": 1,
     "9": 1,
-    "10": 3,
-    "11": 12,
-    "12": 1,
-    "13": 5,
-    "14": 13,
+    "10": 2,
+    "12": 2,
+    "13": 11,
+    "16": 12,
     "22": 1
    },
    "smallText": [
-    {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "Unit 7 · C2 · Gestation · —",
-     "px": 11
-    },
     {
      "n": 2,
      "sel": "small",
@@ -15428,13 +12793,7 @@
      "px": 10
     },
     {
-     "n": 1,
-     "sel": "span.st-heading-meta",
-     "text": "2 tasks",
-     "px": 10
-    },
-    {
-     "n": 1,
+     "n": 2,
      "sel": "strong",
      "text": "Vaccination",
      "px": 12
@@ -15450,12 +12809,6 @@
      "sel": "span.pig-current-task-type",
      "text": "Health",
      "px": 8
-    },
-    {
-     "n": 11,
-     "sel": "dt",
-     "text": "Age",
-     "px": 11
     }
    ],
    "lowContrast": [
@@ -15473,7 +12826,7 @@
   {
    "id": "pig-profile.tasks",
    "feature": "pig-profile",
-   "small": 20,
+   "small": 3,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
@@ -15482,26 +12835,12 @@
    "sizes": {
     "8": 1,
     "9": 1,
-    "10": 3,
-    "11": 14,
     "12": 1,
-    "13": 3,
-    "14": 15,
+    "13": 14,
+    "16": 15,
     "22": 1
    },
    "smallText": [
-    {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "Unit 7 · C1 · Gestation · 40 days",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "span.st-heading-meta",
-     "text": "2 tasks",
-     "px": 10
-    },
     {
      "n": 1,
      "sel": "strong",
@@ -15519,18 +12858,6 @@
      "sel": "span.pig-current-task-type",
      "text": "Health",
      "px": 8
-    },
-    {
-     "n": 13,
-     "sel": "dt",
-     "text": "Age",
-     "px": 11
-    },
-    {
-     "n": 2,
-     "sel": "small",
-     "text": "7 days ago",
-     "px": 10
     }
    ],
    "lowContrast": [],
@@ -15540,49 +12867,24 @@
   {
    "id": "pig-profile.production-batches",
    "feature": "pig-profile",
-   "small": 9,
+   "small": 3,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
    "fails": true,
    "unverified": 0,
    "sizes": {
-    "10": 4,
-    "11": 5,
-    "13": 5,
-    "14": 1,
+    "10": 3,
+    "13": 9,
+    "16": 3,
     "22": 4
    },
    "smallText": [
-    {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "000281 · Unit 7 · C1",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "span.st-heading-meta",
-     "text": "2 completed batches",
-     "px": 10
-    },
     {
      "n": 3,
      "sel": "span",
      "text": "Born alive",
      "px": 10
-    },
-    {
-     "n": 3,
-     "sel": "small",
-     "text": "Gestation · 46 days",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "span.st-row-trailing",
-     "text": "Current",
-     "px": 11
     }
    ],
    "lowContrast": [],
@@ -15592,35 +12894,23 @@
   {
    "id": "pig-profile.batch-record",
    "feature": "pig-profile",
-   "small": 4,
+   "small": 1,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
    "fails": true,
    "unverified": 0,
    "sizes": {
-    "11": 4,
-    "13": 1,
-    "14": 3,
+    "11": 1,
+    "13": 3,
+    "16": 4,
     "22": 1
    },
    "smallText": [
     {
      "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "000281 · In progress",
-     "px": 11
-    },
-    {
-     "n": 1,
      "sel": "p.batch-current-label",
      "text": "Current batch",
-     "px": 11
-    },
-    {
-     "n": 2,
-     "sel": "dt",
-     "text": "Last service",
      "px": 11
     }
    ],
@@ -15631,7 +12921,7 @@
   {
    "id": "pig-profile.origin",
    "feature": "pig-profile",
-   "small": 18,
+   "small": 6,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
@@ -15639,25 +12929,12 @@
    "unverified": 0,
    "sizes": {
     "10": 1,
-    "11": 12,
     "12": 5,
-    "13": 2,
-    "14": 12,
+    "13": 12,
+    "16": 14,
     "22": 1
    },
    "smallText": [
-    {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "000267 · Unit 7 · C1",
-     "px": 11
-    },
-    {
-     "n": 11,
-     "sel": "dt",
-     "text": "Entry type",
-     "px": 11
-    },
     {
      "n": 1,
      "sel": "span",
@@ -15690,61 +12967,24 @@
   {
    "id": "pig-profile.log",
    "feature": "pig-profile",
-   "small": 20,
+   "small": 1,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
    "fails": true,
    "unverified": 0,
    "sizes": {
-    "10": 9,
-    "11": 9,
-    "12": 2,
-    "13": 5,
-    "14": 3,
+    "10": 1,
+    "13": 18,
+    "14": 2,
+    "16": 6,
     "22": 1
    },
    "smallText": [
     {
      "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "000267 · Unit 7 · C1",
-     "px": 11
-    },
-    {
-     "n": 2,
-     "sel": "span",
-     "text": "Activity",
-     "px": 12
-    },
-    {
-     "n": 1,
      "sel": "span",
      "text": "5 entries · Newest first",
-     "px": 10
-    },
-    {
-     "n": 3,
-     "sel": "span",
-     "text": "Thu",
-     "px": 11
-    },
-    {
-     "n": 5,
-     "sel": "span.st-log-category",
-     "text": "Movement",
-     "px": 10
-    },
-    {
-     "n": 5,
-     "sel": "p",
-     "text": "Unit 6 · B2 → Unit 7 · C1",
-     "px": 11
-    },
-    {
-     "n": 3,
-     "sel": "small",
-     "text": "14:20 · M.L",
      "px": 10
     }
    ],
@@ -15755,45 +12995,18 @@
   {
    "id": "pig-profile.actions",
    "feature": "pig-profile",
-   "small": 13,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "11": 10,
-    "12": 3,
-    "13": 11,
-    "14": 1,
+    "13": 20,
+    "16": 4,
     "22": 1
    },
-   "smallText": [
-    {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "000267 · C1",
-     "px": 11
-    },
-    {
-     "n": 8,
-     "sel": "small",
-     "text": "Record a health finding",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "span",
-     "text": "Pregnancy check",
-     "px": 11
-    },
-    {
-     "n": 3,
-     "sel": "button[data-action=action-category]",
-     "text": "Health",
-     "px": 12
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
@@ -15801,51 +13014,44 @@
   {
    "id": "pig-profile.production-task",
    "feature": "pig-profile",
-   "small": 6,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "11": 2,
-    "12": 4,
-    "13": 1,
-    "14": 6,
+    "13": 5,
+    "14": 4,
+    "16": 2,
     "20": 1
    },
-   "smallText": [
-    {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "000267 · Batch 20",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "h5.st-choice-heading",
-     "text": "Record outcome",
-     "px": 12
-    },
-    {
-     "n": 3,
-     "sel": "span.st-choice-meta",
-     "text": "Keep in the current gestation batch",
-     "px": 12
-    },
-    {
-     "n": 1,
-     "sel": "small.st-optional-word",
-     "text": "Optional",
-     "px": 11
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
   },
   {
    "id": "pig-profile.miscarriage",
+   "feature": "pig-profile",
+   "small": 0,
+   "contrast": 0,
+   "contrastPrimary": 0,
+   "taps": 0,
+   "fails": false,
+   "unverified": 0,
+   "sizes": {
+    "13": 4,
+    "16": 3,
+    "20": 1
+   },
+   "smallText": [],
+   "lowContrast": [],
+   "lowContrastPrimary": [],
+   "smallTargets": []
+  },
+  {
+   "id": "pig-profile.batch-membership",
    "feature": "pig-profile",
    "small": 2,
    "contrast": 0,
@@ -15854,55 +13060,13 @@
    "fails": true,
    "unverified": 0,
    "sizes": {
-    "11": 1,
-    "12": 1,
-    "13": 3,
-    "14": 3,
-    "20": 1
-   },
-   "smallText": [
-    {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "000267 · C1",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "span.st-banner-consequence",
-     "text": "Saved records are kept.",
-     "px": 12
-    }
-   ],
-   "lowContrast": [],
-   "lowContrastPrimary": [],
-   "smallTargets": []
-  },
-  {
-   "id": "pig-profile.batch-membership",
-   "feature": "pig-profile",
-   "small": 5,
-   "contrast": 0,
-   "contrastPrimary": 0,
-   "taps": 0,
-   "fails": true,
-   "unverified": 0,
-   "sizes": {
     "10": 2,
-    "11": 2,
-    "12": 1,
-    "13": 1,
-    "14": 4,
-    "16": 1,
+    "13": 2,
+    "14": 2,
+    "16": 3,
     "20": 1
    },
    "smallText": [
-    {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "000267",
-     "px": 11
-    },
     {
      "n": 1,
      "sel": "span",
@@ -15914,18 +13078,6 @@
      "sel": "small",
      "text": "Gestating · 5 pigs",
      "px": 10
-    },
-    {
-     "n": 1,
-     "sel": "span",
-     "text": "Change membership",
-     "px": 12
-    },
-    {
-     "n": 1,
-     "sel": "small.st-optional-word",
-     "text": "Optional",
-     "px": 11
     }
    ],
    "lowContrast": [],
@@ -15935,32 +13087,18 @@
   {
    "id": "pig-profile.measurements",
    "feature": "pig-profile",
-   "small": 5,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "11": 5,
-    "13": 4,
-    "14": 1,
+    "13": 9,
+    "16": 1,
     "20": 1
    },
-   "smallText": [
-    {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "000267",
-     "px": 11
-    },
-    {
-     "n": 4,
-     "sel": "small",
-     "text": "Condition and linked care",
-     "px": 11
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
@@ -15968,26 +13106,21 @@
   {
    "id": "pig-profile.measure",
    "feature": "pig-profile",
-   "small": 4,
+   "small": 2,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
    "fails": true,
    "unverified": 0,
    "sizes": {
-    "11": 3,
+    "11": 1,
     "12": 1,
     "13": 1,
-    "14": 4,
+    "14": 2,
+    "16": 2,
     "20": 1
    },
    "smallText": [
-    {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "000267 · C1",
-     "px": 11
-    },
     {
      "n": 1,
      "sel": "span",
@@ -15999,12 +13132,6 @@
      "sel": "p.quiet-note",
      "text": "Last recorded: 180 kg · 2 days ago",
      "px": 12
-    },
-    {
-     "n": 1,
-     "sel": "small.st-optional-word",
-     "text": "Optional",
-     "px": 11
     }
    ],
    "lowContrast": [],
@@ -16014,26 +13141,21 @@
   {
    "id": "pig-profile.body-condition",
    "feature": "pig-profile",
-   "small": 4,
+   "small": 2,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
    "fails": true,
    "unverified": 0,
    "sizes": {
-    "11": 3,
+    "11": 1,
     "12": 1,
     "13": 1,
-    "14": 4,
+    "14": 2,
+    "16": 2,
     "20": 1
    },
    "smallText": [
-    {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "000267 · C1",
-     "px": 11
-    },
     {
      "n": 1,
      "sel": "span",
@@ -16045,12 +13167,6 @@
      "sel": "p.quiet-note",
      "text": "Records condition. Feed stays unchanged.",
      "px": 12
-    },
-    {
-     "n": 1,
-     "sel": "small.st-optional-word",
-     "text": "Optional",
-     "px": 11
     }
    ],
    "lowContrast": [],
@@ -16060,25 +13176,19 @@
   {
    "id": "pig-profile.note",
    "feature": "pig-profile",
-   "small": 2,
+   "small": 1,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
    "fails": true,
    "unverified": 0,
    "sizes": {
-    "11": 2,
+    "11": 1,
     "13": 1,
-    "14": 2,
+    "16": 2,
     "20": 1
    },
    "smallText": [
-    {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "000267 · C1",
-     "px": 11
-    },
     {
      "n": 1,
      "sel": "span",
@@ -16093,32 +13203,18 @@
   {
    "id": "pig-profile.unavailable-actions",
    "feature": "pig-profile",
-   "small": 3,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "11": 3,
-    "13": 3,
-    "14": 1,
+    "13": 5,
+    "16": 2,
     "20": 1
    },
-   "smallText": [
-    {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "000254 · C1",
-     "px": 11
-    },
-    {
-     "n": 2,
-     "sel": "small",
-     "text": "No open conditions to resolve.",
-     "px": 11
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
@@ -16126,45 +13222,19 @@
   {
    "id": "pig-profile.not-in-pig",
    "feature": "pig-profile",
-   "small": 4,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "11": 2,
-    "12": 2,
-    "13": 1,
-    "14": 5,
+    "13": 3,
+    "14": 2,
+    "16": 3,
     "20": 1
    },
-   "smallText": [
-    {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "000392 · B2",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "span.st-banner-consequence",
-     "text": "A production outcome is recorded and she",
-     "px": 12
-    },
-    {
-     "n": 1,
-     "sel": "span",
-     "text": "Reason",
-     "px": 12
-    },
-    {
-     "n": 1,
-     "sel": "small.st-optional-word",
-     "text": "Optional",
-     "px": 11
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
@@ -16979,7 +14049,7 @@
   {
    "id": "health-record.mixed",
    "feature": "health-record",
-   "small": 17,
+   "small": 5,
    "contrast": 2,
    "contrastPrimary": 0,
    "taps": 0,
@@ -16988,36 +14058,17 @@
    "sizes": {
     "8": 1,
     "9": 1,
-    "10": 5,
-    "11": 9,
+    "10": 2,
     "12": 1,
-    "13": 6,
-    "14": 9,
+    "13": 14,
+    "16": 11,
     "22": 1
    },
    "smallText": [
     {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "Unit 7 · C2 · Gestation · 40 days",
-     "px": 11
-    },
-    {
-     "n": 4,
+     "n": 2,
      "sel": "small",
      "text": "Treat in place · Day 2",
-     "px": 10
-    },
-    {
-     "n": 1,
-     "sel": "small",
-     "text": "120 days · No action needed",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "span.st-heading-meta",
-     "text": "2 tasks",
      "px": 10
     },
     {
@@ -17037,12 +14088,6 @@
      "sel": "span.pig-current-task-type",
      "text": "Health",
      "px": 8
-    },
-    {
-     "n": 7,
-     "sel": "dt",
-     "text": "Age",
-     "px": 11
     }
    ],
    "lowContrast": [
@@ -17060,7 +14105,7 @@
   {
    "id": "health-record.ongoing",
    "feature": "health-record",
-   "small": 20,
+   "small": 3,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
@@ -17069,32 +14114,12 @@
    "sizes": {
     "8": 1,
     "9": 1,
-    "10": 4,
-    "11": 13,
     "12": 1,
-    "13": 4,
-    "14": 13,
+    "13": 17,
+    "16": 15,
     "22": 1
    },
    "smallText": [
-    {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "Unit 7 · C1 · Gestation · 46 days",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "small",
-     "text": "120 days · No action needed",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "span.st-heading-meta",
-     "text": "1 task",
-     "px": 10
-    },
     {
      "n": 1,
      "sel": "strong",
@@ -17112,18 +14137,6 @@
      "sel": "span.pig-current-task-type",
      "text": "Production",
      "px": 8
-    },
-    {
-     "n": 11,
-     "sel": "dt",
-     "text": "Age",
-     "px": 11
-    },
-    {
-     "n": 3,
-     "sel": "small",
-     "text": "3 days ago",
-     "px": 10
     }
    ],
    "lowContrast": [],
@@ -17133,7 +14146,7 @@
   {
    "id": "health-record.many",
    "feature": "health-record",
-   "small": 16,
+   "small": 3,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
@@ -17142,32 +14155,12 @@
    "sizes": {
     "8": 1,
     "9": 1,
-    "10": 2,
-    "11": 11,
     "12": 1,
-    "13": 6,
-    "14": 9,
+    "13": 17,
+    "16": 11,
     "22": 1
    },
    "smallText": [
-    {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "Unit 7 · C1 · Gestation · 46 days",
-     "px": 11
-    },
-    {
-     "n": 3,
-     "sel": "small",
-     "text": "120 days · No action needed",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "span.st-heading-meta",
-     "text": "1 task",
-     "px": 10
-    },
     {
      "n": 1,
      "sel": "strong",
@@ -17185,18 +14178,6 @@
      "sel": "span.pig-current-task-type",
      "text": "Production",
      "px": 8
-    },
-    {
-     "n": 7,
-     "sel": "dt",
-     "text": "Age",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "small",
-     "text": "3 days ago",
-     "px": 10
     }
    ],
    "lowContrast": [],
@@ -17206,19 +14187,18 @@
   {
    "id": "health-record.care-states",
    "feature": "health-record",
-   "small": 36,
+   "small": 15,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
    "fails": true,
    "unverified": 0,
    "sizes": {
-    "9": 3,
-    "10": 25,
-    "11": 7,
-    "12": 1,
-    "13": 14,
-    "14": 1,
+    "9": 2,
+    "10": 9,
+    "11": 4,
+    "13": 30,
+    "14": 5,
     "22": 1
    },
    "smallText": [
@@ -17229,34 +14209,16 @@
      "px": 11
     },
     {
-     "n": 1,
-     "sel": "p",
-     "text": "Last check-in",
-     "px": 11
-    },
-    {
-     "n": 4,
-     "sel": "strong",
-     "text": "06:40",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "span",
-     "text": "· G. Hansen",
-     "px": 11
-    },
-    {
-     "n": 3,
-     "sel": "span.st-selection-count",
-     "text": "4",
-     "px": 10
-    },
-    {
      "n": 3,
      "sel": "small",
      "text": "· 3 pigs",
      "px": 10
+    },
+    {
+     "n": 3,
+     "sel": "strong",
+     "text": "7.6 kg",
+     "px": 11
     },
     {
      "n": 6,
@@ -17265,40 +14227,10 @@
      "px": 10
     },
     {
-     "n": 6,
-     "sel": "span.st-condition-name",
-     "text": "Thin",
-     "px": 10
-    },
-    {
-     "n": 5,
-     "sel": "small.st-condition-day",
-     "text": "Day 12",
-     "px": 10
-    },
-    {
      "n": 2,
      "sel": "small.pen-feed-state",
      "text": "Auto",
      "px": 9
-    },
-    {
-     "n": 2,
-     "sel": "small.st-condition-level-word",
-     "text": "Treat",
-     "px": 10
-    },
-    {
-     "n": 1,
-     "sel": "small",
-     "text": "Go to pen",
-     "px": 9
-    },
-    {
-     "n": 1,
-     "sel": "span",
-     "text": "Scan ear tag",
-     "px": 12
     }
    ],
    "lowContrast": [],
@@ -17308,43 +14240,24 @@
   {
    "id": "health-record.finding",
    "feature": "health-record",
-   "small": 6,
+   "small": 1,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
    "fails": true,
    "unverified": 0,
    "sizes": {
-    "11": 5,
     "12": 1,
-    "13": 3,
-    "14": 2,
+    "13": 8,
+    "16": 2,
     "20": 1
    },
    "smallText": [
     {
      "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "000306 · Symptom",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "span.st-condition-meta",
-     "text": "Day 2",
-     "px": 11
-    },
-    {
-     "n": 1,
      "sel": "p.quiet-note",
      "text": "Recorded — · —",
      "px": 12
-    },
-    {
-     "n": 3,
-     "sel": "small",
-     "text": "Care and notes",
-     "px": 11
     }
    ],
    "lowContrast": [],
@@ -17354,38 +14267,19 @@
   {
    "id": "health-record.edit-finding",
    "feature": "health-record",
-   "small": 4,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "11": 2,
-    "12": 2,
-    "14": 5,
+    "13": 3,
+    "14": 3,
+    "16": 2,
     "20": 1
    },
-   "smallText": [
-    {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "000306 · Fever",
-     "px": 11
-    },
-    {
-     "n": 2,
-     "sel": "span",
-     "text": "Finding",
-     "px": 12
-    },
-    {
-     "n": 1,
-     "sel": "small.st-optional-word",
-     "text": "Optional",
-     "px": 11
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
@@ -17393,37 +14287,20 @@
   {
    "id": "health-record.resolve-finding",
    "feature": "health-record",
-   "small": 4,
+   "small": 1,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
    "fails": true,
    "unverified": 0,
    "sizes": {
-    "11": 2,
-    "12": 2,
-    "14": 4,
+    "12": 1,
+    "13": 2,
+    "14": 2,
+    "16": 2,
     "20": 1
    },
    "smallText": [
-    {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "000306 · Fever",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "span",
-     "text": "Outcome",
-     "px": 12
-    },
-    {
-     "n": 1,
-     "sel": "small.st-optional-word",
-     "text": "Optional",
-     "px": 11
-    },
     {
      "n": 1,
      "sel": "p.quiet-note",
@@ -17438,35 +14315,24 @@
   {
    "id": "health-record.record-health",
    "feature": "health-record",
-   "small": 4,
+   "small": 2,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
    "fails": true,
    "unverified": 0,
    "sizes": {
-    "11": 4,
+    "11": 2,
     "13": 1,
-    "14": 5,
+    "14": 3,
+    "16": 2,
     "20": 1
    },
    "smallText": [
     {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "000267 · C1",
-     "px": 11
-    },
-    {
      "n": 2,
      "sel": "span",
      "text": "Conditions",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "small.st-optional-word",
-     "text": "Optional",
      "px": 11
     }
    ],
@@ -17484,7 +14350,8 @@
    "fails": false,
    "unverified": 0,
    "sizes": {
-    "14": 6,
+    "14": 4,
+    "16": 2,
     "20": 1
    },
    "smallText": [],
@@ -17495,35 +14362,24 @@
   {
    "id": "health-record.care-instructions",
    "feature": "health-record",
-   "small": 4,
+   "small": 2,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
    "fails": true,
    "unverified": 0,
    "sizes": {
-    "11": 4,
+    "11": 2,
     "13": 1,
-    "14": 5,
+    "14": 3,
+    "16": 2,
     "20": 1
    },
    "smallText": [
     {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "000267 · C1",
-     "px": 11
-    },
-    {
      "n": 2,
      "sel": "span",
      "text": "Condition",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "small.st-optional-word",
-     "text": "Optional",
      "px": 11
     }
    ],
@@ -17534,35 +14390,24 @@
   {
    "id": "health-record.resolve-conditions",
    "feature": "health-record",
-   "small": 4,
+   "small": 2,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
    "fails": true,
    "unverified": 0,
    "sizes": {
-    "11": 4,
+    "11": 2,
     "13": 1,
-    "14": 5,
+    "14": 3,
+    "16": 2,
     "20": 1
    },
    "smallText": [
     {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "000267 · C1",
-     "px": 11
-    },
-    {
      "n": 2,
      "sel": "span",
      "text": "Condition",
-     "px": 11
-    },
-    {
-     "n": 1,
-     "sel": "small.st-optional-word",
-     "text": "Optional",
      "px": 11
     }
    ],
@@ -17573,32 +14418,19 @@
   {
    "id": "health-record.treatment",
    "feature": "health-record",
-   "small": 4,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "11": 4,
     "13": 5,
-    "14": 8,
+    "14": 6,
+    "16": 2,
     "22": 1
    },
-   "smallText": [
-    {
-     "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "000267 · C1",
-     "px": 11
-    },
-    {
-     "n": 3,
-     "sel": "small.st-optional-word",
-     "text": "Optional",
-     "px": 11
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
@@ -17613,7 +14445,8 @@
    "fails": false,
    "unverified": 0,
    "sizes": {
-    "14": 7,
+    "14": 6,
+    "16": 1,
     "20": 1
    },
    "smallText": [],
@@ -19641,46 +16474,19 @@
   {
    "id": "fostering.type",
    "feature": "fostering",
-   "small": 29,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "10": 3,
-    "11": 15,
-    "12": 11,
-    "13": 9,
-    "14": 18,
+    "13": 31,
+    "14": 7,
+    "16": 15,
     "20": 2
    },
-   "smallText": [
-    {
-     "n": 14,
-     "sel": "span",
-     "text": "B06 · 12 alive · day 3",
-     "px": 11
-    },
-    {
-     "n": 11,
-     "sel": "span",
-     "text": "Likely · same age, smaller litters",
-     "px": 12
-    },
-    {
-     "n": 3,
-     "sel": "span",
-     "text": "Due today",
-     "px": 10
-    },
-    {
-     "n": 1,
-     "sel": "span.st-sep",
-     "text": "·",
-     "px": 11
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
@@ -19688,46 +16494,19 @@
   {
    "id": "fostering.receive",
    "feature": "fostering",
-   "small": 30,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "10": 4,
-    "11": 16,
-    "12": 10,
-    "13": 10,
-    "14": 17,
+    "13": 32,
+    "14": 7,
+    "16": 16,
     "20": 2
    },
-   "smallText": [
-    {
-     "n": 15,
-     "sel": "span",
-     "text": "B06 · 12 alive · day 3",
-     "px": 11
-    },
-    {
-     "n": 10,
-     "sel": "span",
-     "text": "Crates matching A0",
-     "px": 12
-    },
-    {
-     "n": 4,
-     "sel": "span",
-     "text": "0 of 12 piglets",
-     "px": 10
-    },
-    {
-     "n": 1,
-     "sel": "span.st-sep",
-     "text": "·",
-     "px": 11
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
@@ -19735,46 +16514,19 @@
   {
    "id": "fostering.piglets",
    "feature": "fostering",
-   "small": 28,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "10": 6,
-    "11": 17,
-    "12": 5,
-    "13": 9,
-    "14": 17,
+    "13": 30,
+    "14": 8,
+    "16": 13,
     "20": 2
    },
-   "smallText": [
-    {
-     "n": 15,
-     "sel": "span",
-     "text": "C03 · 10 alive · day 4",
-     "px": 11
-    },
-    {
-     "n": 5,
-     "sel": "span",
-     "text": "To crate",
-     "px": 12
-    },
-    {
-     "n": 6,
-     "sel": "span",
-     "text": "2 of 10 piglets",
-     "px": 10
-    },
-    {
-     "n": 2,
-     "sel": "span.st-sep",
-     "text": "·",
-     "px": 11
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
@@ -19782,47 +16534,20 @@
   {
    "id": "fostering.result",
    "feature": "fostering",
-   "small": 34,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "10": 5,
-    "11": 24,
-    "12": 5,
-    "13": 9,
-    "14": 14,
+    "13": 33,
+    "14": 2,
+    "16": 17,
     "20": 2,
     "28": 1
    },
-   "smallText": [
-    {
-     "n": 21,
-     "sel": "span",
-     "text": "B08 · 9 alive · day 4",
-     "px": 11
-    },
-    {
-     "n": 5,
-     "sel": "span",
-     "text": "From crate",
-     "px": 12
-    },
-    {
-     "n": 5,
-     "sel": "span",
-     "text": "Recorded",
-     "px": 10
-    },
-    {
-     "n": 3,
-     "sel": "span.st-sep",
-     "text": "·",
-     "px": 11
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
@@ -22428,37 +19153,25 @@
   {
    "id": "move.transfer-sow",
    "feature": "move",
-   "small": 4,
+   "small": 1,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
    "fails": true,
    "unverified": 0,
    "sizes": {
-    "11": 2,
-    "12": 2,
-    "13": 2,
-    "14": 4,
+    "11": 1,
+    "13": 4,
+    "14": 2,
+    "16": 2,
     "22": 1
    },
    "smallText": [
     {
      "n": 1,
-     "sel": "p.sheet-subtitle",
-     "text": "000418 · B1",
-     "px": 11
-    },
-    {
-     "n": 1,
      "sel": "span",
      "text": "From",
      "px": 11
-    },
-    {
-     "n": 2,
-     "sel": "span",
-     "text": "Destination unit",
-     "px": 12
     }
    ],
    "lowContrast": [],
@@ -23198,7 +19911,7 @@
   {
    "id": "data-sync.banner",
    "feature": "data-sync",
-   "small": 24,
+   "small": 23,
    "contrast": 4,
    "contrastPrimary": 0,
    "taps": 0,
@@ -23208,9 +19921,11 @@
     "9": 1,
     "10": 16,
     "11": 3,
-    "12": 4,
-    "14": 4,
+    "12": 3,
+    "13": 1,
+    "14": 3,
     "15": 2,
+    "16": 1,
     "23": 1,
     "36": 1
    },
@@ -23244,12 +19959,6 @@
      "sel": "small",
      "text": "3 units",
      "px": 10
-    },
-    {
-     "n": 1,
-     "sel": "span.st-banner-consequence",
-     "text": "Connection available · tap to upload",
-     "px": 12
     },
     {
      "n": 7,
@@ -23341,7 +20050,7 @@
     "11": 2,
     "12": 3,
     "13": 1,
-    "14": 2,
+    "16": 2,
     "20": 1
    },
    "smallText": [
@@ -23392,7 +20101,7 @@
    "sizes": {
     "11": 3,
     "13": 1,
-    "14": 2,
+    "16": 2,
     "20": 1
    },
    "smallText": [
@@ -23433,7 +20142,7 @@
     "11": 3,
     "12": 3,
     "13": 1,
-    "14": 2,
+    "16": 2,
     "20": 1
    },
    "smallText": [

@@ -36,10 +36,14 @@ The ground is a green-tinted off-white; text is one deep green-black; colour app
 
 ### Type
 
-- **Plus Jakarta Sans** for everything a person reads as language, at 400, 500 and 600. Headings are 500, not bold: `page-title` 22px, `sheet-title` 20px, `section-title` 13px, `group-label` 11px in `muted`. (`panel-title` 12px is retired: a title inside a panel is a group label; Heading has three kinds, page, section and group.)
+- **Plus Jakarta Sans** for everything a person reads as language, at 400, 500 and 600. Headings are 500, not bold: `page-title` 22px, `sheet-title` 20px, `section-title` 16px, `group-label` 13px in `muted`. (`panel-title` is retired: a title inside a panel is a group label; Heading has three kinds, page, section and group.)
 - **IBM Plex Mono** for everything a person reads off the barn: ear tags and pen codes (`identifier`), counts and measurements (`figure`, `figure-lg`, `hero-count`), badge numbers and overlines. Use tabular numerals for counts that tick.
-- Body text in rows is 13px (`row-title`) over 11px (`description`); fields and choices are 14px. `meta` at 10px is the floor.
+- Primary text and values are 16px (`row-title`, `button`, `input`, `choice-label`, `fact-value`, `entry-label`, the lead identifier); secondary text is 13px (`description`, `meta`, `choice-meta`, captions). 13px is the floor: nothing smaller is drawn, except the phone status bar.
 - Headings take slight negative tracking (−0.5px at 22px, −0.4px at 20px); everything at 13px and below tracks at 0.
+
+### The farm legibility law
+
+A barn, glare, gloves, arm's length, two seconds. So: primary values and body text 16px or more; secondary and meta text 13px or more; nothing under 13px. Contrast 4.5:1 for all text and 7:1 for primary values and numbers a farmer acts on: ink, not pale grey, for anything that must be read (a placeholder is read text). Tap targets 48×48 at least: the control, or an invisible hit area (a `::after` extender, or padding with a matching negative margin) when the approved visible box is smaller. Fix crowding by tightening copy and layout, never by shrinking type. `scripts/check-legibility.mjs` measures it on every atlas screen; `docs/design-workflow/README.md` says whether the gate is no-regression or strict.
 
 ### Space, size and layout
 

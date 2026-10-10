@@ -30,7 +30,7 @@
     "problems": [
       {
         "check": "f",
-        "detail": "\"请先保存您对之前分娩记录所作的更正然后检查所有修改内容\" overflows its box (378px in 284px, ellipsised)"
+        "detail": "\"请先保存您对之前分娩记录所作的更正然后检查所有修改内容\" overflows its box (432px in 284px, ellipsised)"
       }
     ]
   },
@@ -59,7 +59,7 @@
     "problems": [
       {
         "check": "f",
-        "detail": "\"删除后将无法恢复这头母猪本次分娩已经记录的所有仔猪数据\" overflows its box (378px in 296px, ellipsised)"
+        "detail": "\"删除后将无法恢复这头母猪本次分娩已经记录的所有仔猪数据\" overflows its box (432px in 296px, ellipsised)"
       }
     ]
   },
@@ -100,7 +100,7 @@
     "problems": [
       {
         "check": "f",
-        "detail": "\"有多条分娩记录已保存在此设备上正在等待网络连接后再上传\" overflows its box (378px in 284px, ellipsised)"
+        "detail": "\"有多条分娩记录已保存在此设备上正在等待网络连接后再上传\" overflows its box (432px in 284px, ellipsised)"
       }
     ]
   },
@@ -348,12 +348,7 @@
     "component": "Button",
     "variant": "tool",
     "state": "Long / Chinese",
-    "problems": [
-      {
-        "check": "f",
-        "detail": "\"记录这一栏今天已完成处理的十二头仔猪并保留记录\" overflows its box (322px in 318px, ellipsised)"
-      }
-    ]
+    "problems": []
   },
   {
     "component": "Button",
@@ -734,7 +729,7 @@
     "problems": [
       {
         "check": "f",
-        "detail": "\"Respiratory infection with lab\" overflows its box (217px in 57px, ellipsised)"
+        "detail": "\"Respiratory infection with lab\" overflows its box (283px in 42px, ellipsised)"
       }
     ]
   },
@@ -763,7 +758,11 @@
     "problems": [
       {
         "check": "d",
-        "detail": "value baselines differ across columns by 16px in \"Alive litter n\" / \"Identified pig\" / \"Without identi\""
+        "detail": "value baselines differ across columns by 19px in \"Alive litter n\" / \"Identified pig\" / \"Without identi\""
+      },
+      {
+        "check": "d",
+        "detail": "label \"Identified piglets\" wraps to 2 lines"
       },
       {
         "check": "d",
@@ -808,7 +807,7 @@
     "problems": [
       {
         "check": "e",
-        "detail": "Facts value \"Gestation 1 · restricted · two\" wraps to 2 lines"
+        "detail": "Facts value \"Gestation 1 · restricted · two\" wraps to 3 lines"
       }
     ]
   },
@@ -940,43 +939,37 @@
   },
   {
     "component": "FilterSheet",
-    "variant": "list",
+    "variant": "fields",
     "state": "Default",
     "problems": []
   },
   {
     "component": "FilterSheet",
-    "variant": "list",
+    "variant": "fields",
     "state": "Active",
     "problems": []
   },
   {
     "component": "FilterSheet",
-    "variant": "list",
-    "state": "Empty",
+    "variant": "sections",
+    "state": "Default",
     "problems": []
   },
   {
     "component": "FilterSheet",
-    "variant": "list",
-    "state": "Disabled",
+    "variant": "sections",
+    "state": "Active",
     "problems": []
   },
   {
     "component": "FilterSheet",
-    "variant": "list",
-    "state": "Error",
+    "variant": "sections",
+    "state": "Pressed",
     "problems": []
   },
   {
     "component": "FilterSheet",
-    "variant": "list",
-    "state": "Loading",
-    "problems": []
-  },
-  {
-    "component": "FilterSheet",
-    "variant": "list",
+    "variant": "sections",
     "state": "Long / Chinese",
     "problems": []
   },
@@ -1711,25 +1704,13 @@
   {
     "component": "RangeSlider",
     "variant": "range",
-    "state": "Pressed",
+    "state": "Narrowed",
     "problems": []
   },
   {
     "component": "RangeSlider",
     "variant": "range",
-    "state": "At limits",
-    "problems": []
-  },
-  {
-    "component": "RangeSlider",
-    "variant": "range",
-    "state": "Disabled",
-    "problems": []
-  },
-  {
-    "component": "RangeSlider",
-    "variant": "range",
-    "state": "Error",
+    "state": "Same value",
     "problems": []
   },
   {
