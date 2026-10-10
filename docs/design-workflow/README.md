@@ -13,6 +13,8 @@ here, beside the designs it makes, so whoever clones the repo has it.
   the workspace trust prompt once.
 - **Why it is shaped this way**: [design-loop.md](design-loop.md), with its
   research in [design-loop-research.md](design-loop-research.md).
+- **Behaviour**: each feature's scenario tree and the runner that gates it, in
+  [scenarios.md](scenarios.md); persona walk rounds in [walks.md](walks.md).
 - **What went wrong when it ran**: the setup retro in
   [pilot-retro.md](pilot-retro.md) and the piglet-processing pilot's 36 entries
   in [`ux/tasks/piglet-processing/retro.md`](../../ux/tasks/piglet-processing/retro.md).

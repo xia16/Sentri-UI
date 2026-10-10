@@ -43,3 +43,6 @@ yarn-error.log*
 /.claude/settings.local.json
 /.claude/worktrees/
 __pycache__/
+
+# behaviour-gate screenshots (regenerate with scripts/run-scenarios.mjs)
+/review/scenarios/

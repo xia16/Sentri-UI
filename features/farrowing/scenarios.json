@@ -1,0 +1,2111 @@
+{
+ "feature": "farrowing",
+ "about": "The executable leaves of features/farrowing/scenario-tree.md (each leaf names its tree row in `tree`). Format: docs/design-workflow/scenarios.md. Run: node scripts/run-scenarios.mjs farrowing",
+ "defaults": {
+  "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+  "clock": "2026-08-27T09:41:00",
+  "langs": [
+   "en",
+   "zh"
+  ],
+  "widths": [
+   360,
+   390
+  ],
+  "height": 844,
+  "clipCheck": true
+ },
+ "tree": [
+  {
+   "type": "entry",
+   "id": "room",
+   "label": "Home or Choose unit → room → search/filter → sow",
+   "children": [
+    {
+     "type": "state",
+     "id": "room.home",
+     "label": "Home, Farrowing section, whole-farm overview",
+     "tree": "E",
+     "fixture": {
+      "url": "/ux/system/home-astra-prototype.html?layout=focus&section=farrowing",
+      "screen": "workbench.today"
+     },
+     "children": [
+      {
+       "type": "action",
+       "id": "room.home.view-task",
+       "label": "tap the Farrowing task card",
+       "taps": [
+        ".home-task-card[data-card='farrow28']"
+       ],
+       "children": [
+        {
+         "type": "outcome",
+         "id": "fa-e1-home-lands-on-room",
+         "tree": "E-1",
+         "label": "Home's Farrowing card lands on the room list, not the Task overview",
+         "authority": [
+          {
+           "src": "PRD",
+           "at": "Rules · Owner calls for this atlas",
+           "says": "Home's Farrowing card and Choose unit both land on the room list."
+          }
+         ],
+         "visible": [
+          {
+           "el": "[data-action='room-lens']",
+           "in": "sheet",
+           "says": "the room list is the top surface (its Awaiting / Active / Done / All tabs are in front)",
+           "hard": "broken-ruling"
+          },
+          {
+           "text": "Whole-task progress",
+           "absent": true,
+           "says": "the Task overview is not drawn over the room",
+           "hard": "broken-ruling"
+          }
+         ],
+         "record": [
+          {
+           "expr": "s.view === 'room'",
+           "says": "the record's view is the room",
+           "hard": "broken-ruling"
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "type": "state",
+     "id": "room.choose-unit",
+     "label": "Home, Choose unit open",
+     "tree": "E",
+     "fixture": {
+      "url": "/ux/system/home-astra-prototype.html?layout=focus&section=farrowing",
+      "screen": "workbench.choose-unit"
+     },
+     "children": [
+      {
+       "type": "action",
+       "id": "room.choose-unit.u7",
+       "label": "pick Unit 7, then the Farrowing task card",
+       "taps": [
+        "[data-action='pick-unit'][data-value='7']",
+        ".home-task-card[data-card='farrow28']"
+       ],
+       "children": [
+        {
+         "type": "outcome",
+         "id": "fa-e2-choose-unit-lands-on-unit-room",
+         "tree": "E-2",
+         "label": "Choose unit → Unit 7's room list",
+         "authority": [
+          {
+           "src": "PRD",
+           "at": "Rules · Owner calls for this atlas",
+           "says": "Home's Farrowing card and Choose unit both land on the room list."
+          }
+         ],
+         "visible": [
+          {
+           "text": "Unit 7",
+           "says": "the unit card names Unit 7"
+          }
+         ],
+         "record": [
+          {
+           "expr": "s.view === 'room' && c.unitId === '7'",
+           "says": "room view, Unit 7",
+           "hard": "broken-ruling"
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "type": "state",
+     "id": "room.list",
+     "label": "Room list, Unit 7, All",
+     "tree": "E",
+     "fixture": {
+      "screen": "farrowing.room",
+      "preset": "room"
+     },
+     "children": [
+      {
+       "type": "action",
+       "id": "room.lens-awaiting",
+       "label": "tap the Awaiting tab",
+       "taps": [
+        "[data-action='room-lens'][data-value='Awaiting']"
+       ],
+       "children": [
+        {
+         "type": "outcome",
+         "id": "fa-e3-awaiting-tab-lists-awaiting-only",
+         "tree": "E-3",
+         "label": "Awaiting lists only sows with nothing recorded",
+         "authority": [
+          {
+           "src": "PRD",
+           "at": "Anchor",
+           "says": "Awaiting (nothing recorded; live total zero)"
+          },
+          {
+           "src": "PRD",
+           "at": "Scope",
+           "says": "Awaiting / Active / Done / All tabs"
+          }
+         ],
+         "visible": [
+          {
+           "el": "[data-action='room-sow'][data-value='000392']",
+           "says": "awaiting 000392 listed"
+          },
+          {
+           "el": "[data-action='room-sow'][data-value='000418']",
+           "is": "absent",
+           "says": "active 000418 not listed",
+           "hard": "wrong-fact"
+          },
+          {
+           "el": "[data-action='room-sow'][data-value='000406']",
+           "is": "absent",
+           "says": "done 000406 not listed",
+           "hard": "wrong-fact"
+          }
+         ],
+         "record": [
+          {
+           "expr": "c.lens === 'Awaiting'"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "action",
+       "id": "room.search-455",
+       "label": "Search, type 455",
+       "taps": [
+        "[data-action='room-search']",
+        {
+         "fill": "[data-room-search]",
+         "value": "455"
+        }
+       ],
+       "children": [
+        {
+         "type": "outcome",
+         "id": "fa-e4-search-finds-sow",
+         "tree": "E-4",
+         "label": "Search by ear tag finds the sow and only her",
+         "authority": [
+          {
+           "src": "PRD",
+           "at": "Scope",
+           "says": "Room list: … Go to pen, Scan ear tag, Search."
+          }
+         ],
+         "visible": [
+          {
+           "text": "000455",
+           "in": "sheet",
+           "says": "000455 is a result"
+          },
+          {
+           "text": "000418",
+           "in": "sheet",
+           "absent": true,
+           "says": "000418 is not a result",
+           "hard": "wrong-fact"
+          }
+         ]
+        },
+        {
+         "type": "action",
+         "id": "room.search-455.open",
+         "label": "tap the result",
+         "taps": [
+          "000455"
+         ],
+         "children": [
+          {
+           "type": "outcome",
+           "id": "fa-e5-search-result-opens-awaiting-face",
+           "tree": "E-5",
+           "label": "The result opens her sheet on its Awaiting face",
+           "authority": [
+            {
+             "src": "RUL",
+             "at": "Surfaces & entrances",
+             "says": "Identity is sheet-first … body opens the sheet"
+            },
+            {
+             "src": "PRD",
+             "at": "Anchor",
+             "says": "Awaiting (nothing recorded; live total zero)"
+            }
+           ],
+           "visible": [
+            {
+             "screen": "farrowing.before",
+             "hard": "dead-end"
+            }
+           ],
+           "record": [
+            {
+             "expr": "s.tag === '000455' && F.born(s) === 0",
+             "hard": "wrong-fact"
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "action",
+       "id": "room.filter-parity",
+       "label": "Filter, parity 6+, apply",
+       "taps": [
+        "[data-action='room-filter']",
+        "[data-action='room-parity'][data-value='6+']",
+        "[data-action='room-apply-filter']"
+       ],
+       "children": [
+        {
+         "type": "outcome",
+         "id": "fa-e6-parity-filter",
+         "tree": "E-6",
+         "label": "Parity 6+ leaves only the parity-6 sow",
+         "authority": [
+          {
+           "src": "PRD",
+           "at": "Scope",
+           "says": "due and parity filter"
+          }
+         ],
+         "visible": [
+          {
+           "el": "[data-action='room-sow'][data-value='000431']",
+           "says": "000431 (parity 6) listed"
+          },
+          {
+           "el": "[data-action='room-sow'][data-value='000392']",
+           "is": "absent",
+           "says": "000392 (parity 5) hidden",
+           "hard": "wrong-fact"
+          }
+         ],
+         "record": [
+          {
+           "expr": "c.filter.parity === '6+'"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "decision-blocker",
+       "id": "fa-e7-due-filter-scope",
+       "tree": "E-7",
+       "question": "Q3",
+       "label": "Does the due-range filter hide Active and Done sows?",
+       "sources": [
+        {
+         "src": "PRD",
+         "says": "due and parity filter (scope does not say which sows it applies to)"
+        },
+        {
+         "src": "review",
+         "at": "tasks-built-3",
+         "says": "the due range hides Active and Done sows by a date that no longer matters; recommendation: Awaiting only (not ruled)"
+        }
+       ]
+      },
+      {
+       "type": "action",
+       "id": "room.open-active",
+       "label": "tap the active row 000418",
+       "taps": [
+        "[data-action='room-sow'][data-value='000418']"
+       ],
+       "children": [
+        {
+         "type": "outcome",
+         "id": "fa-e8-active-row-opens-counting",
+         "tree": "E-8",
+         "label": "An active row opens Counting",
+         "authority": [
+          {
+           "src": "PRD",
+           "at": "Anchor",
+           "says": "Farrowing (live total above zero, not finished)"
+          }
+         ],
+         "visible": [
+          {
+           "screen": "farrowing.count",
+           "hard": "dead-end"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "action",
+       "id": "room.open-done",
+       "label": "tap the done row 000406",
+       "taps": [
+        "[data-action='room-sow'][data-value='000406']"
+       ],
+       "children": [
+        {
+         "type": "outcome",
+         "id": "fa-e9-done-row-opens-record",
+         "tree": "E-9",
+         "label": "A done row opens the locked record",
+         "authority": [
+          {
+           "src": "RUL",
+           "at": "After the lock",
+           "says": "The record face IS the record"
+          }
+         ],
+         "visible": [
+          {
+           "screen": "farrowing.locked",
+           "hard": "dead-end"
+          },
+          {
+           "el": "[data-action='alive']",
+           "is": "absent",
+           "says": "no counting stepper on a locked record",
+           "hard": "wrong-fact"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "action",
+       "id": "room.open-died",
+       "label": "tap the Sow died row 000399",
+       "taps": [
+        "[data-action='room-sow'][data-value='000399']"
+       ],
+       "children": [
+        {
+         "type": "outcome",
+         "id": "fa-e10-died-row-opens-ended-record",
+         "tree": "E-10",
+         "label": "A Sow died row stays in the room and opens her ended record",
+         "authority": [
+          {
+           "src": "RUL",
+           "at": "Starting and ending a session",
+           "says": "She stays in the room … a Done-register row"
+          }
+         ],
+         "visible": [
+          {
+           "screen": "farrowing.ended",
+           "hard": "dead-end"
+          },
+          {
+           "text": "Sow died",
+           "in": "sheet"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "outcome",
+       "id": "fa-e11-scan-ear-tag",
+       "tree": "E-11",
+       "status": "pending",
+       "why": "the prototype's Scan ear tag has no camera; a scan cannot be driven",
+       "label": "Scanning her ear tag opens her sheet",
+       "authority": [
+        {
+         "src": "PRD",
+         "at": "Scope",
+         "says": "Room list: … Scan ear tag"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "entry",
+   "id": "counting",
+   "label": "Awaiting → counting → death draft → Back / resume / Clear / Save",
+   "children": [
+    {
+     "type": "state",
+     "id": "counting.awaiting",
+     "label": "Sow 000455, Awaiting (nothing recorded)",
+     "tree": "A",
+     "fixture": {
+      "screen": "farrowing.before",
+      "preset": "before"
+     },
+     "children": [
+      {
+       "type": "action",
+       "id": "counting.awaiting.plus",
+       "label": "tap + once",
+       "taps": [
+        "[data-action='alive'][data-value='1']"
+       ],
+       "children": [
+        {
+         "type": "outcome",
+         "id": "fa-a1-first-piglet-starts-farrowing",
+         "tree": "A-1",
+         "label": "The first + makes her Farrowing; nothing else to press",
+         "authority": [
+          {
+           "src": "RUL",
+           "at": "Starting and ending a session",
+           "says": "Farrowing starts at the first recorded event — full stop."
+          }
+         ],
+         "visible": [
+          {
+           "screen": "farrowing.count",
+           "hard": "wrong-fact"
+          }
+         ],
+         "record": [
+          {
+           "expr": "s.alive === 1 && F.born(s) === 1",
+           "says": "alive 1, born 1",
+           "hard": "wrong-fact"
+          }
+         ]
+        },
+        {
+         "type": "action",
+         "id": "counting.awaiting.plus-minus",
+         "label": "then − once",
+         "taps": [
+          "[data-action='alive'][data-value='-1']"
+         ],
+         "children": [
+          {
+           "type": "outcome",
+           "id": "fa-a2-recount-to-zero-reads-awaiting",
+           "tree": "A-2",
+           "label": "A stray + undone reads Awaiting again",
+           "authority": [
+            {
+             "src": "RUL",
+             "at": "Starting and ending a session",
+             "says": "registers derive from the live total (posted + open pending)"
+            }
+           ],
+           "visible": [
+            {
+             "screen": "farrowing.before",
+             "hard": "wrong-fact"
+            }
+           ],
+           "record": [
+            {
+             "expr": "F.born(s) === 0",
+             "hard": "wrong-fact"
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "action",
+       "id": "counting.awaiting.stillborn",
+       "label": "Record dead, + Stillborn, Save",
+       "taps": [
+        "[data-action='death']",
+        "[data-action='deadStep'][data-value='0,1']",
+        "[data-action='saveDeath']"
+       ],
+       "children": [
+        {
+         "type": "outcome",
+         "id": "fa-a3-stillborn-first-record",
+         "tree": "A-3",
+         "label": "A stillborn can be the first record; she becomes Farrowing",
+         "authority": [
+          {
+           "src": "RUL",
+           "at": "Surfaces & entrances",
+           "says": "Record dead live (a stillborn can be the first record)"
+          }
+         ],
+         "visible": [
+          {
+           "screen": "farrowing.count",
+           "hard": "wrong-fact"
+          }
+         ],
+         "record": [
+          {
+           "expr": "s.dead[0] === 1 && F.born(s) === 1",
+           "says": "1 stillborn posted, born 1",
+           "hard": "wrong-fact"
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "type": "state",
+     "id": "counting.active",
+     "label": "Sow 000418, Farrowing: alive 9, dead 1·1·2·0·0·1, +4 this visit",
+     "tree": "C",
+     "fixture": {
+      "screen": "farrowing.count",
+      "preset": "count"
+     },
+     "children": [
+      {
+       "type": "outcome",
+       "id": "fa-c1-receipt-says-saved",
+       "tree": "C-1",
+       "label": "The receipt says the visit is saved",
+       "authority": [
+        {
+         "src": "RUL",
+         "at": "After the lock",
+         "says": "Saved · +4 this visit"
+        }
+       ],
+       "visible": [
+        {
+         "text": "+4 this visit",
+         "in": "sheet"
+        },
+        {
+         "text": "Saved",
+         "in": "sheet"
+        }
+       ]
+      },
+      {
+       "type": "outcome",
+       "id": "fa-c2-tool-reads-record-dead",
+       "tree": "C-2",
+       "label": "The death tool reads Record dead",
+       "authority": [
+        {
+         "src": "RUL",
+         "at": "Surfaces & entrances",
+         "says": "ONE dead drawer product-wide, opened by the Record dead button"
+        },
+        {
+         "src": "review",
+         "at": "tasks-built-17",
+         "says": "recommendation: Record dead, as ruled"
+        }
+       ],
+       "visible": [
+        {
+         "text": "Record dead",
+         "in": "sheet",
+         "hard": "broken-ruling"
+        }
+       ]
+      },
+      {
+       "type": "action",
+       "id": "counting.active.minus-4",
+       "label": "tap − four times (pending is 4; the floor is born 10 − 5 dead = 5)",
+       "taps": [
+        "[data-action='alive'][data-value='-1']",
+        "[data-action='alive'][data-value='-1']",
+        "[data-action='alive'][data-value='-1']",
+        "[data-action='alive'][data-value='-1']"
+       ],
+       "children": [
+        {
+         "type": "outcome",
+         "id": "fa-c3-minus-clamps-at-floor",
+         "tree": "C-3",
+         "label": "− drains the visit and stops at the floor; Born never drops silently",
+         "authority": [
+          {
+           "src": "RUL",
+           "at": "Model",
+           "says": "+ is free; − drains pending and clamps at the floor"
+          }
+         ],
+         "visible": [
+          {
+           "el": "[data-action='alive'][data-value='-1']",
+           "is": "disabled",
+           "says": "− greys at the floor (the one ruled greyed control)"
+          }
+         ],
+         "record": [
+          {
+           "expr": "s.alive === 5 && F.born(s) === 10",
+           "says": "alive 5 (the floor), born 10",
+           "hard": "wrong-fact"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "outcome",
+       "id": "fa-c4-idle-fold",
+       "tree": "C-4",
+       "status": "pending",
+       "why": "the prototype has no idle timer; the visit folds only on close",
+       "label": "After ~90 min idle the visit folds into one log line",
+       "authority": [
+        {
+         "src": "RUL",
+         "at": "Surfaces & entrances",
+         "says": "The visit (pending window) ends … after ~90 min idle measured from the last interaction"
+        }
+       ]
+      },
+      {
+       "type": "action",
+       "id": "counting.active.draft",
+       "label": "Record dead, + Crushed once (the draft)",
+       "taps": [
+        "[data-action='death']",
+        "[data-action='deadStep'][data-value='2,1']",
+        {
+         "expect": [
+          {
+           "text": "1 unsaved",
+           "in": "sheet",
+           "says": "the drawer says 1 unsaved"
+          }
+         ]
+        }
+       ],
+       "children": [
+        {
+         "type": "action",
+         "id": "counting.active.draft.back",
+         "label": "Back",
+         "taps": [
+          "[data-action='back']"
+         ],
+         "children": [
+          {
+           "type": "outcome",
+           "id": "fa-d1-back-keeps-death-draft",
+           "tree": "D-1",
+           "label": "Back keeps the draft on the device; the host says 1 unsaved; posted deaths unchanged",
+           "authority": [
+            {
+             "src": "RUL",
+             "at": "Starting and ending a session",
+             "says": "Back navigates away and KEEPS the draft on the device"
+            },
+            {
+             "src": "contract",
+             "at": "C1 dead_tally",
+             "says": "Back/dismiss keeps the draft on the device; Clear discards it."
+            },
+            {
+             "src": "strings",
+             "at": "verbs.Back",
+             "says": "leave a screen and keep any draft on the device"
+            }
+           ],
+           "visible": [
+            {
+             "screen": "farrowing.count"
+            },
+            {
+             "text": "1 unsaved",
+             "in": "sheet",
+             "says": "the Record dead tool stacks 1 unsaved",
+             "hard": "lost-draft"
+            }
+           ],
+           "record": [
+            {
+             "expr": "s.deathDraft[2] === 1",
+             "says": "the draft still holds 1 crushed",
+             "hard": "lost-draft"
+            },
+            {
+             "expr": "s.dead.join() === '1,1,2,0,0,1'",
+             "says": "posted deaths unchanged",
+             "hard": "wrong-fact"
+            }
+           ]
+          },
+          {
+           "type": "action",
+           "id": "counting.active.draft.back.reopen",
+           "label": "reopen Record dead",
+           "taps": [
+            "[data-action='death']"
+           ],
+           "children": [
+            {
+             "type": "outcome",
+             "id": "fa-d2-reopen-restores-draft",
+             "tree": "D-2",
+             "label": "Reopening the drawer shows the draft, still green, still 1 unsaved",
+             "authority": [
+              {
+               "src": "RUL",
+               "at": "Starting and ending a session",
+               "says": "reopen and it is still there, green"
+              }
+             ],
+             "visible": [
+              {
+               "screen": "farrowing.death"
+              },
+              {
+               "text": "1 unsaved",
+               "in": "sheet",
+               "hard": "lost-draft"
+              }
+             ],
+             "record": [
+              {
+               "expr": "s.deathDraft[2] === 1",
+               "hard": "lost-draft"
+              },
+              {
+               "expr": "s.dead.join() === '1,1,2,0,0,1'",
+               "says": "posted deaths unchanged",
+               "hard": "wrong-fact"
+              }
+             ]
+            },
+            {
+             "type": "action",
+             "id": "counting.active.draft.back.reopen.more",
+             "label": "+ Crushed again (resume)",
+             "taps": [
+              "[data-action='deadStep'][data-value='2,1']"
+             ],
+             "children": [
+              {
+               "type": "outcome",
+               "id": "fa-d3-resume-adds-to-draft",
+               "tree": "D-3",
+               "label": "Resuming adds to the kept draft (2 unsaved), nothing posted",
+               "authority": [
+                {
+                 "src": "RUL",
+                 "at": "Starting and ending a session",
+                 "says": "tallies and the cause are a DRAFT until Save"
+                }
+               ],
+               "visible": [
+                {
+                 "text": "2 unsaved",
+                 "in": "sheet",
+                 "hard": "lost-draft"
+                }
+               ],
+               "record": [
+                {
+                 "expr": "s.deathDraft[2] === 2 && s.dead[2] === 2",
+                 "says": "draft 2, posted crushed still 2",
+                 "hard": "lost-draft"
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "type": "action",
+             "id": "counting.active.draft.back.reopen.clear",
+             "label": "Clear",
+             "taps": [
+              "[data-action='clearDeath']"
+             ],
+             "children": [
+              {
+               "type": "outcome",
+               "id": "fa-d4-clear-discards-draft",
+               "tree": "D-4",
+               "label": "Clear discards the draft; posted deaths unchanged; Clear disappears",
+               "authority": [
+                {
+                 "src": "RUL",
+                 "at": "Starting and ending a session",
+                 "says": "Clear discards the draft (a text action on the title row, present only while a draft exists)"
+                }
+               ],
+               "visible": [
+                {
+                 "el": "[data-action='clearDeath']",
+                 "is": "absent",
+                 "says": "Clear gone with the draft"
+                },
+                {
+                 "text": "unsaved",
+                 "in": "sheet",
+                 "absent": true
+                }
+               ],
+               "record": [
+                {
+                 "expr": "sum(s.deathDraft) === 0 && s.dead.join() === '1,1,2,0,0,1'",
+                 "hard": "wrong-fact"
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "type": "action",
+             "id": "counting.active.draft.back.reopen.save",
+             "label": "Save",
+             "taps": [
+              "[data-action='saveDeath']"
+             ],
+             "children": [
+              {
+               "type": "outcome",
+               "id": "fa-d5-save-posts-one-event",
+               "tree": "D-5",
+               "label": "Save posts the kept draft as one stamped event and empties it",
+               "authority": [
+                {
+                 "src": "RUL",
+                 "at": "Surfaces & entrances",
+                 "says": "Save commits the draft as one stamped event"
+                }
+               ],
+               "visible": [
+                {
+                 "screen": "farrowing.count"
+                },
+                {
+                 "text": "unsaved",
+                 "in": "sheet",
+                 "absent": true
+                }
+               ],
+               "record": [
+                {
+                 "expr": "s.dead[2] === 3 && sum(s.deathDraft) === 0",
+                 "says": "crushed 3 posted, draft empty",
+                 "hard": "wrong-fact"
+                },
+                {
+                 "expr": "/crushed/i.test(s.events[0].text) && !!s.events[0].who",
+                 "says": "newest log line is the crushed death, stamped",
+                 "hard": "wrong-fact"
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "type": "action",
+           "id": "counting.active.draft.back.finish",
+           "label": "Finish farrowing",
+           "taps": [
+            "[data-action='finish']"
+           ],
+           "children": [
+            {
+             "type": "outcome",
+             "id": "fa-f1-finish-blocked-by-death-draft",
+             "tree": "F-1",
+             "label": "Finish opens, but the lock waits with the pointer to the unsaved death",
+             "authority": [
+              {
+               "src": "RUL",
+               "at": "Starting and ending a session",
+               "says": "Lock born N waits in the floor-gray family with the pointer 1 death unsaved · Record dead"
+              }
+             ],
+             "visible": [
+              {
+               "screen": "farrowing.blocked",
+               "hard": "broken-ruling"
+              },
+              {
+               "el": "[data-action='lock']",
+               "is": "disabled",
+               "says": "the lock waits",
+               "hard": "broken-ruling"
+              },
+              {
+               "text": "1 death unsaved",
+               "in": "sheet",
+               "says": "the ruled pointer"
+              }
+             ]
+            },
+            {
+             "type": "action",
+             "id": "counting.active.draft.back.finish.hold",
+             "label": "hold the lock anyway",
+             "taps": [
+              {
+               "tap": "[data-action='lock']",
+               "hold": 1100
+              }
+             ],
+             "children": [
+              {
+               "type": "outcome",
+               "id": "fa-f2-draft-never-crosses-lock",
+               "tree": "F-2",
+               "label": "Holding the lock with a draft waiting locks nothing",
+               "authority": [
+                {
+                 "src": "RUL",
+                 "at": "Starting and ending a session",
+                 "says": "A draft never crosses the lock"
+                }
+               ],
+               "record": [
+                {
+                 "expr": "s.locked === false",
+                 "hard": "broken-ruling"
+                },
+                {
+                 "expr": "s.deathDraft[2] === 1",
+                 "says": "the draft is still there",
+                 "hard": "lost-draft"
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "type": "action",
+             "id": "counting.active.draft.back.finish.resolve",
+             "label": "Back, Record dead, Save, Finish farrowing",
+             "taps": [
+              "[data-action='returnCount']",
+              "[data-action='death']",
+              "[data-action='saveDeath']",
+              "[data-action='finish']"
+             ],
+             "children": [
+              {
+               "type": "outcome",
+               "id": "fa-f3-resolved-finish-unblocked",
+               "tree": "F-3",
+               "label": "Once the draft is saved, the lock is live",
+               "authority": [
+                {
+                 "src": "RUL",
+                 "at": "Starting and ending a session",
+                 "says": "this is a guard on the lock, not a gate on recording"
+                }
+               ],
+               "visible": [
+                {
+                 "screen": "farrowing.finish"
+                },
+                {
+                 "el": "[data-action='lock']",
+                 "is": "enabled",
+                 "hard": "dead-end"
+                }
+               ]
+              },
+              {
+               "type": "action",
+               "id": "counting.active.draft.back.finish.resolve.lock",
+               "label": "hold Finish farrowing",
+               "taps": [
+                {
+                 "tap": "[data-action='lock']",
+                 "hold": 1100
+                }
+               ],
+               "children": [
+                {
+                 "type": "outcome",
+                 "id": "fa-f4-lock-gives-locked-record",
+                 "tree": "F-4",
+                 "label": "The hold locks Born (15, with the saved death) and opens the record",
+                 "authority": [
+                  {
+                   "src": "RUL",
+                   "at": "Model",
+                   "says": "Born = Alive + Σ Dead … Derived, never entered, locks at Finish."
+                  },
+                  {
+                   "src": "RUL",
+                   "at": "Surfaces & entrances",
+                   "says": "Lock born N is hold-to-commit"
+                  }
+                 ],
+                 "visible": [
+                  {
+                   "screen": "farrowing.locked",
+                   "hard": "dead-end"
+                  },
+                  {
+                   "el": "[data-action='alive']",
+                   "is": "absent",
+                   "says": "no counting stepper after the lock",
+                   "hard": "wrong-fact"
+                  }
+                 ],
+                 "record": [
+                  {
+                   "expr": "s.locked && s.frozen === s.alive + sum(s.dead) && s.dead[2] === 3",
+                   "says": "locked; frozen Born = alive + dead; crushed 3",
+                   "hard": "wrong-fact"
+                  }
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "type": "action",
+         "id": "counting.active.draft.dismiss",
+         "label": "the drawer's close (dismiss) control",
+         "taps": [
+          "[aria-label='Close record dead']"
+         ],
+         "children": [
+          {
+           "type": "outcome",
+           "id": "fa-d6-dismiss-keeps-death-draft",
+           "tree": "D-6",
+           "label": "Dismissing the drawer keeps the draft like Back",
+           "authority": [
+            {
+             "src": "RUL",
+             "at": "Surfaces & entrances",
+             "says": "Back or the dismiss gesture keeps it on the device"
+            }
+           ],
+           "record": [
+            {
+             "expr": "s.deathDraft[2] === 1",
+             "hard": "lost-draft"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "type": "action",
+         "id": "counting.active.draft.reload",
+         "label": "the app is closed and reopened",
+         "taps": [
+          {
+           "reload": true
+          }
+         ],
+         "children": [
+          {
+           "type": "outcome",
+           "id": "fa-d7-restart-keeps-death-draft",
+           "tree": "D-7",
+           "label": "A restart keeps the draft on the device",
+           "authority": [
+            {
+             "src": "contract",
+             "at": "C5 dead drawer exits",
+             "says": "Back and the dismiss gesture … KEEP the draft on the device (persisted across background and restart)"
+            }
+           ],
+           "record": [
+            {
+             "expr": "s.deathDraft[2] === 1",
+             "hard": "lost-draft"
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "outcome",
+       "id": "fa-d9-two-phones",
+       "tree": "D-9",
+       "status": "pending",
+       "why": "the prototype is one in-memory device; no sync to test",
+       "label": "Two phones saving deaths on one litter merge as signed deltas; a floor breach holds with a sync review line",
+       "authority": [
+        {
+         "src": "RUL",
+         "at": "Starting and ending a session",
+         "says": "Merge contract (DRAFT): count events merge as signed deltas … never silently applied"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "entry",
+   "id": "finish",
+   "label": "Finish blocked by a draft → resolve → Finish → locked record",
+   "children": [
+    {
+     "type": "state",
+     "id": "finish.edit-draft",
+     "label": "Finish opened while an Edit draft (crushed +1) waits",
+     "tree": "F",
+     "fixture": {
+      "screen": "farrowing.blocked",
+      "preset": "blocked"
+     },
+     "children": [
+      {
+       "type": "outcome",
+       "id": "fa-f5-finish-blocked-by-edit-draft",
+       "tree": "F-5",
+       "label": "An unsaved correction keeps the lock waiting, with a door to it",
+       "authority": [
+        {
+         "src": "RUL",
+         "at": "Starting and ending a session",
+         "says": "A draft never crosses the lock"
+        },
+        {
+         "src": "RUL",
+         "at": "Surfaces & entrances",
+         "says": "Same triad on Edit"
+        }
+       ],
+       "visible": [
+        {
+         "el": "[data-action='lock']",
+         "is": "disabled",
+         "hard": "broken-ruling"
+        },
+        {
+         "el": "[data-action='edit']",
+         "in": "sheet",
+         "says": "a door to the waiting correction",
+         "hard": "dead-end"
+        }
+       ]
+      },
+      {
+       "type": "action",
+       "id": "finish.edit-draft.review-save",
+       "label": "Review, Save correction",
+       "taps": [
+        "[data-action='edit']",
+        "[data-action='saveEdit']"
+       ],
+       "children": [
+        {
+         "type": "outcome",
+         "id": "fa-f6-saved-correction-returns-to-finish",
+         "tree": "F-6",
+         "label": "Saving the correction returns to Finish with the lock live",
+         "authority": [
+          {
+           "src": "atlas",
+           "at": "features/farrowing/feature.json flow",
+           "says": "farrowing.edit → farrowing.finish: Save, when opened from the blocked Finish"
+          },
+          {
+           "src": "RUL",
+           "at": "Surfaces & entrances",
+           "says": "Save commits everything as one stamped correction event"
+          }
+         ],
+         "visible": [
+          {
+           "screen": "farrowing.finish",
+           "hard": "dead-end"
+          },
+          {
+           "el": "[data-action='lock']",
+           "is": "enabled",
+           "hard": "dead-end"
+          }
+         ],
+         "record": [
+          {
+           "expr": "s.dead[2] === 3 && s.events[0].kind === 'correction'",
+           "says": "crushed 3, one correction event",
+           "hard": "wrong-fact"
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "type": "state",
+     "id": "finish.clean",
+     "label": "Finish, nothing waiting",
+     "tree": "F",
+     "fixture": {
+      "screen": "farrowing.finish",
+      "preset": "finish"
+     },
+     "children": [
+      {
+       "type": "action",
+       "id": "finish.clean.tap",
+       "label": "tap (no hold) Finish farrowing",
+       "taps": [
+        "[data-action='lock']"
+       ],
+       "children": [
+        {
+         "type": "outcome",
+         "id": "fa-f7-tap-does-not-lock",
+         "tree": "F-7",
+         "label": "A tap alone does not lock; the hold is the second guard",
+         "authority": [
+          {
+           "src": "RUL",
+           "at": "Surfaces & entrances",
+           "says": "the Finish sheet's hold-to-lock stays the second guard"
+          }
+         ],
+         "record": [
+          {
+           "expr": "s.locked === false",
+           "hard": "broken-ruling"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "action",
+       "id": "finish.clean.hold",
+       "label": "hold Finish farrowing",
+       "taps": [
+        {
+         "tap": "[data-action='lock']",
+         "hold": 1100
+        }
+       ],
+       "children": [
+        {
+         "type": "outcome",
+         "id": "fa-f8-locked-record-face",
+         "tree": "F-8",
+         "label": "The locked record: Born 14 frozen, Edit and Record dead, no Finish",
+         "authority": [
+          {
+           "src": "RUL",
+           "at": "After the lock",
+           "says": "Bar Edit · Record dead."
+          },
+          {
+           "src": "RUL",
+           "at": "Model",
+           "says": "locks at Finish"
+          }
+         ],
+         "visible": [
+          {
+           "screen": "farrowing.locked",
+           "hard": "dead-end"
+          },
+          {
+           "el": "[data-action='edit']",
+           "in": "sheet"
+          },
+          {
+           "el": "[data-action='death']",
+           "in": "sheet"
+          },
+          {
+           "el": "[data-action='finish']",
+           "is": "absent",
+           "hard": "wrong-fact"
+          }
+         ],
+         "record": [
+          {
+           "expr": "s.locked && s.frozen === 14",
+           "hard": "wrong-fact"
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "entry",
+   "id": "edit",
+   "label": "Edit / correct born → history",
+   "children": [
+    {
+     "type": "state",
+     "id": "edit.during",
+     "label": "Counting, Edit open",
+     "tree": "X",
+     "fixture": {
+      "screen": "farrowing.count",
+      "preset": "count",
+      "taps": [
+       "[data-action='edit']"
+      ]
+     },
+     "children": [
+      {
+       "type": "action",
+       "id": "edit.during.crushed-down",
+       "label": "Crushed − once",
+       "taps": [
+        "[data-action='editStep'][data-value='dead,2,-1']"
+       ],
+       "children": [
+        {
+         "type": "outcome",
+         "id": "fa-x1-change-shows-banner-and-summary",
+         "tree": "X-1",
+         "label": "The first change raises the amber banner and the change summary",
+         "authority": [
+          {
+           "src": "RUL",
+           "at": "Surfaces & entrances",
+           "says": "The amber banner (Correcting a past record · logged as <who>) and a live change summary appear at the FIRST change"
+          }
+         ],
+         "visible": [
+          {
+           "text": "Correcting a past record",
+           "in": "sheet"
+          },
+          {
+           "el": "[data-action='saveEdit']",
+           "is": "enabled"
+          }
+         ]
+        },
+        {
+         "type": "action",
+         "id": "edit.during.crushed-down.save",
+         "label": "Save correction",
+         "taps": [
+          "[data-action='saveEdit']"
+         ],
+         "children": [
+          {
+           "type": "outcome",
+           "id": "fa-x2-save-correction",
+           "tree": "X-2",
+           "label": "Save writes one stamped correction; Born heals from its inputs",
+           "authority": [
+            {
+             "src": "RUL",
+             "at": "Surfaces & entrances",
+             "says": "Save commits everything as one stamped correction event"
+            },
+            {
+             "src": "RUL",
+             "at": "Surfaces & entrances",
+             "says": "Born has no door pre-lock (it heals when its inputs heal)"
+            }
+           ],
+           "visible": [
+            {
+             "screen": "farrowing.count"
+            }
+           ],
+           "record": [
+            {
+             "expr": "s.dead[2] === 1 && s.events[0].kind === 'correction' && F.born(s) === 13",
+             "says": "crushed 1, correction event, born 13",
+             "hard": "wrong-fact"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "type": "action",
+         "id": "edit.during.crushed-down.back",
+         "label": "Back, then Edit again",
+         "taps": [
+          "[data-action='back']",
+          "[data-action='edit']"
+         ],
+         "children": [
+          {
+           "type": "outcome",
+           "id": "fa-x3-edit-back-keeps-draft",
+           "tree": "X-3",
+           "label": "Back keeps the Edit draft; reopening shows the change; nothing posted",
+           "authority": [
+            {
+             "src": "RUL",
+             "at": "Surfaces & entrances",
+             "says": "Exits: Back keeps the draft on the device"
+            }
+           ],
+           "record": [
+            {
+             "expr": "F.changes(s).length === 1 && s.dead[2] === 2",
+             "says": "one change waiting, posted crushed still 2",
+             "hard": "lost-draft"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "type": "action",
+         "id": "edit.during.crushed-down.clear",
+         "label": "Clear",
+         "taps": [
+          "[data-action='clearEdit']"
+         ],
+         "children": [
+          {
+           "type": "outcome",
+           "id": "fa-x4-edit-clear-discards",
+           "tree": "X-4",
+           "label": "Clear discards the correction draft",
+           "authority": [
+            {
+             "src": "RUL",
+             "at": "Surfaces & entrances",
+             "says": "Clear (text action on the summary row) discards it"
+            }
+           ],
+           "record": [
+            {
+             "expr": "F.changes(s).length === 0 && s.dead[2] === 2",
+             "hard": "wrong-fact"
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "type": "state",
+     "id": "edit.locked",
+     "label": "Locked record (born 14), Edit open",
+     "tree": "X",
+     "fixture": {
+      "screen": "farrowing.locked",
+      "preset": "locked",
+      "taps": [
+       "[data-action='edit']"
+      ]
+     },
+     "children": [
+      {
+       "type": "action",
+       "id": "edit.locked.more-born",
+       "label": "Correct born ✎, More born 1 (alive), Apply, Save correction",
+       "taps": [
+        "[data-action='bornPopup']",
+        "[data-action='applyBorn']",
+        "[data-action='saveEdit']"
+       ],
+       "children": [
+        {
+         "type": "outcome",
+         "id": "fa-x5-correct-born-after-lock",
+         "tree": "X-5",
+         "label": "Anyone corrects Born after the lock: 14 → 15, stamped, original kept in the log",
+         "authority": [
+          {
+           "src": "RUL",
+           "at": "After the lock",
+           "says": "Anyone may amend born post-lock — open ✎, stamped, no role gate."
+          }
+         ],
+         "visible": [
+          {
+           "screen": "farrowing.locked"
+          }
+         ],
+         "record": [
+          {
+           "expr": "s.frozen === 15 && s.events[0].kind === 'correction'",
+           "says": "born 15, a correction event",
+           "hard": "wrong-fact"
+          },
+          {
+           "expr": "s.events.some(e => /finished/i.test(e.text))",
+           "says": "the original finish line is kept",
+           "hard": "wrong-fact"
+          }
+         ]
+        },
+        {
+         "type": "action",
+         "id": "edit.locked.more-born.log",
+         "label": "View log",
+         "taps": [
+          "[data-action='history']"
+         ],
+         "children": [
+          {
+           "type": "outcome",
+           "id": "fa-x6-log-shows-correction",
+           "tree": "X-6",
+           "label": "The Farrowing record shows the correction above the finish",
+           "authority": [
+            {
+             "src": "RUL",
+             "at": "After the lock",
+             "says": "One ledger surface, the Farrowing record page"
+            },
+            {
+             "src": "RUL",
+             "at": "After the lock",
+             "says": "corrections amber with ✎"
+            }
+           ],
+           "visible": [
+            {
+             "screen": "farrowing.history",
+             "hard": "dead-end"
+            },
+            {
+             "text": "Farrowing finished",
+             "in": "sheet"
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "decision-blocker",
+       "id": "fa-x7-post-lock-death-door",
+       "tree": "X-7",
+       "question": "Q4",
+       "label": "After the lock, which door records a piglet death (farrowing's Record dead or piglet processing's)?",
+       "sources": [
+        {
+         "src": "RUL",
+         "at": "After the lock",
+         "says": "Bar Edit · Record dead"
+        },
+        {
+         "src": "review",
+         "at": "tasks-built-24",
+         "says": "processing's pen sheet has its own Record death; no rule says which task owns post-lock deaths"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "entry",
+   "id": "sow-death",
+   "label": "Sow death",
+   "children": [
+    {
+     "type": "state",
+     "id": "sow-death.during",
+     "label": "Counting, Record dead, The sow",
+     "tree": "M",
+     "fixture": {
+      "screen": "farrowing.count",
+      "preset": "count",
+      "taps": [
+       "[data-action='death']",
+       "[data-action='mode'][data-value='sow']"
+      ]
+     },
+     "children": [
+      {
+       "type": "action",
+       "id": "sow-death.during.prolapse",
+       "label": "choose Prolapse, hold Save",
+       "taps": [
+        "Prolapse",
+        {
+         "tap": "[data-action='saveDeath']",
+         "hold": 1100
+        }
+       ],
+       "children": [
+        {
+         "type": "outcome",
+         "id": "fa-m1-sow-death-ends-session",
+         "tree": "M-1",
+         "label": "Her death ends the session without Finish; the record leads with the red band",
+         "authority": [
+          {
+           "src": "RUL",
+           "at": "Starting and ending a session",
+           "says": "Saving the sow's death is hold-to-commit … The event ends the session without Finish"
+          }
+         ],
+         "visible": [
+          {
+           "screen": "farrowing.ended",
+           "hard": "dead-end"
+          },
+          {
+           "text": "Sow died",
+           "in": "sheet"
+          }
+         ],
+         "record": [
+          {
+           "expr": "s.ended === true && s.sowCause === 'Prolapse'",
+           "hard": "wrong-fact"
+          }
+         ]
+        },
+        {
+         "type": "action",
+         "id": "sow-death.during.prolapse.back",
+         "label": "Back to the room",
+         "taps": [
+          "[data-action='close']"
+         ],
+         "children": [
+          {
+           "type": "outcome",
+           "id": "fa-m2-dead-sow-stays-in-room",
+           "tree": "M-2",
+           "label": "She stays in the room as a Done row marked Sow died",
+           "authority": [
+            {
+             "src": "RUL",
+             "at": "Starting and ending a session",
+             "says": "She stays in the room (re-ruled 2026-09-01, replacing exits every lens)"
+            }
+           ],
+           "visible": [
+            {
+             "el": "[data-action='room-sow'][data-value='000418']",
+             "hard": "wrong-fact"
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "action",
+       "id": "sow-death.during.prolapse-tap",
+       "label": "choose Prolapse, tap (no hold) Save",
+       "taps": [
+        "Prolapse",
+        "[data-action='saveDeath']"
+       ],
+       "children": [
+        {
+         "type": "outcome",
+         "id": "fa-m3-sow-death-needs-hold",
+         "tree": "M-3",
+         "label": "A tap does not record her death",
+         "authority": [
+          {
+           "src": "RUL",
+           "at": "Starting and ending a session",
+           "says": "Saving the sow's death is hold-to-commit"
+          }
+         ],
+         "record": [
+          {
+           "expr": "s.ended === false",
+           "hard": "broken-ruling"
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "type": "state",
+     "id": "sow-death.ended",
+     "label": "Sow died record (000418 preset ended)",
+     "tree": "M",
+     "fixture": {
+      "screen": "farrowing.ended",
+      "preset": "ended"
+     },
+     "children": [
+      {
+       "type": "decision-blocker",
+       "id": "fa-m4-piglet-deaths-after-sow-died",
+       "tree": "M-4",
+       "question": "Q5",
+       "label": "May piglet deaths be recorded on a litter whose sow has died?",
+       "sources": [
+        {
+         "src": "contract",
+         "at": "C4 Ended",
+         "says": "bar Edit · Record dead"
+        },
+        {
+         "src": "review",
+         "at": "tasks-built-25",
+         "says": "the ruling is silent; alive piglets move to piglet care, where processing records deaths too"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "entry",
+   "id": "task",
+   "label": "overview → End → receipt",
+   "children": [
+    {
+     "type": "state",
+     "id": "task.room",
+     "label": "Room list with sows still farrowing",
+     "tree": "K",
+     "fixture": {
+      "screen": "farrowing.room",
+      "preset": "room"
+     },
+     "children": [
+      {
+       "type": "action",
+       "id": "task.room.overview",
+       "label": "tap Task overview",
+       "taps": [
+        "[data-action='room-overview']"
+       ],
+       "children": [
+        {
+         "type": "outcome",
+         "id": "fa-k1-overview-adds-up",
+         "tree": "K-1",
+         "label": "The overview's progress adds up: Farrowed + Active + Awaiting = sows",
+         "authority": [
+          {
+           "src": "PRD",
+           "at": "Problem",
+           "says": "how many sows have farrowed, which are still going, which are still waiting"
+          }
+         ],
+         "visible": [
+          {
+           "screen": "farrowing.overview",
+           "hard": "dead-end"
+          }
+         ],
+         "record": [
+          {
+           "expr": "(() => { const r = F.taskClosureReview(c); return r.finished.length + r.active.length + r.awaiting.length + r.ended.length + r.miscarriages.length + r.notInPig.length + r.removed.length === r.rows.length; })()",
+           "says": "every sow is in exactly one outcome",
+           "hard": "wrong-fact"
+          }
+         ]
+        },
+        {
+         "type": "action",
+         "id": "task.room.overview.end",
+         "label": "End task early",
+         "taps": [
+          "[data-action='room-end-review']"
+         ],
+         "children": [
+          {
+           "type": "decision-blocker",
+           "id": "fa-k2-end-while-farrowing",
+           "tree": "K-2",
+           "question": "Q2",
+           "label": "Can the task end while a sow is still farrowing (or a draft waits)?",
+           "sources": [
+            {
+             "src": "PRD",
+             "at": "Decisions",
+             "says": "Task end: manual, hold-to-commit with receipt, blocked while farrowing is open"
+            },
+            {
+             "src": "contract",
+             "at": "C9 remainder honesty",
+             "says": "ACTIVE sows list informationally (still farrowing — finish her ›), close never blocks on them"
+            },
+            {
+             "src": "SYN",
+             "at": "§6 E2",
+             "says": "warn + doors, never hard-block (pending owner confirmation)"
+            },
+            {
+             "src": "RUL",
+             "at": "Piglet processing Round 4",
+             "says": "End is allowed with review items open (piglet processing)"
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "type": "state",
+     "id": "task.complete",
+     "label": "End task review, every sow finished",
+     "tree": "K",
+     "fixture": {
+      "screen": "farrowing.task-complete",
+      "preset": "task-complete"
+     },
+     "children": [
+      {
+       "type": "action",
+       "id": "task.complete.tap",
+       "label": "tap (no hold) End task",
+       "taps": [
+        "[data-action='room-end-confirm']"
+       ],
+       "children": [
+        {
+         "type": "outcome",
+         "id": "fa-k3-end-needs-hold",
+         "tree": "K-3",
+         "label": "A tap does not end the task",
+         "authority": [
+          {
+           "src": "PRD",
+           "at": "Decisions",
+           "says": "Task end: manual, hold-to-commit with receipt"
+          }
+         ],
+         "record": [
+          {
+           "expr": "!c.completion",
+           "hard": "broken-ruling"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "action",
+       "id": "task.complete.hold",
+       "label": "hold End task",
+       "taps": [
+        {
+         "tap": "[data-action='room-end-confirm']",
+         "hold": 1100
+        }
+       ],
+       "children": [
+        {
+         "type": "outcome",
+         "id": "fa-k4-end-gives-receipt",
+         "tree": "K-4",
+         "label": "The hold ends the task and shows the receipt; one exit, Back",
+         "authority": [
+          {
+           "src": "PRD",
+           "at": "Decisions",
+           "says": "Task end: manual, hold-to-commit with receipt"
+          },
+          {
+           "src": "RUL",
+           "at": "Piglet processing Round 5",
+           "says": "The exit word is always Back."
+          }
+         ],
+         "visible": [
+          {
+           "screen": "farrowing.task-receipt",
+           "hard": "dead-end"
+          },
+          {
+           "text": "Task ended",
+           "in": "sheet"
+          },
+          {
+           "text": "09:41",
+           "in": "sheet",
+           "says": "stamped with the closure time (the fixed clock)",
+           "hard": "wrong-fact"
+          },
+          {
+           "verb": "Back",
+           "in": "sheet"
+          }
+         ],
+         "record": [
+          {
+           "expr": "!!c.completion && c.completion.early === false && c.completion.who === 'G. Hansen'",
+           "says": "closure stamped who, not early",
+           "hard": "wrong-fact"
+          }
+         ]
+        },
+        {
+         "type": "outcome",
+         "id": "fa-k5-receipt-one-exit",
+         "tree": "K-5",
+         "label": "The receipt has one exit, Back",
+         "authority": [
+          {
+           "src": "RUL",
+           "at": "Piglet processing Round 5",
+           "says": "The exit word is always Back."
+          },
+          {
+           "src": "review",
+           "at": "screens-a-14",
+           "says": "Footer holds Back and Back to Today; recommendation: one exit Back"
+          }
+         ],
+         "visible": [
+          {
+           "text": "Back to Today",
+           "in": "sheet",
+           "absent": true,
+           "says": "no second exit",
+           "hard": "broken-ruling"
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "type": "state",
+     "id": "task.ready",
+     "label": "End task early review: some sows still awaiting, none active",
+     "tree": "K",
+     "fixture": {
+      "screen": "farrowing.task-ready",
+      "preset": "task-ready"
+     },
+     "children": [
+      {
+       "type": "action",
+       "id": "task.ready.hold",
+       "label": "hold End task early",
+       "taps": [
+        {
+         "tap": "[data-action='room-end-confirm']",
+         "hold": 1100
+        }
+       ],
+       "children": [
+        {
+         "type": "outcome",
+         "id": "fa-k6-end-early-receipt",
+         "tree": "K-6",
+         "label": "Ending early with awaiting sows gives an early receipt",
+         "authority": [
+          {
+           "src": "PRD",
+           "at": "Decisions",
+           "says": "Task end: manual, hold-to-commit with receipt"
+          }
+         ],
+         "visible": [
+          {
+           "screen": "farrowing.task-receipt",
+           "hard": "dead-end"
+          }
+         ],
+         "record": [
+          {
+           "expr": "!!c.completion && c.completion.early === true",
+           "hard": "wrong-fact"
+          }
+         ]
+        },
+        {
+         "type": "decision-blocker",
+         "id": "fa-k7-awaiting-at-early-end",
+         "tree": "K-7",
+         "question": "Q6",
+         "label": "Where do awaiting sows go when the task ends early?",
+         "sources": [
+          {
+           "src": "contract",
+           "at": "C9 closing sheet",
+           "says": "disposition doors (not in pig? · abort? · next batch?) or close anyway → escalation"
+          },
+          {
+           "src": "review",
+           "at": "tasks-built-44",
+           "says": "built: a removed-from-batch marker only; recommendation rebreed watch (not ruled)"
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "entry",
+   "id": "scope",
+   "label": "Scope contradictions",
+   "children": [
+    {
+     "type": "decision-blocker",
+     "id": "fa-z1-fostering-scope",
+     "tree": "Z-1",
+     "question": "Q1",
+     "label": "Is fostering in Farrowing's scope?",
+     "sources": [
+      {
+       "src": "RUL",
+       "at": "After the lock",
+       "says": "Fostering is PARKED … v1 farrowing ships NO foster doors anywhere"
+      },
+      {
+       "src": "PRD",
+       "at": "Scope · Out",
+       "says": "Fostering (parked until the owner reopens it)"
+      },
+      {
+       "src": "atlas",
+       "at": "features/farrowing/feature.json",
+       "says": "screen farrowing.foster exists, reached by More actions → Foster piglets"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
