@@ -138,3 +138,7 @@ _Avoid_: Label, raw text, copy (for a single item)
 
 **Shared vocabulary**:
 The registry's verbs and terms used across sections, each with one meaning (Back, Close, End task).
+
+**Abortion** / **aborted** (流产):
+The one word for a sow losing her pregnancy, in every screen, string and document (owner decision, 2026-10-10). It replaces "miscarriage". A sow with no live piglets leaves the Farrowing room list at once; a sow with a live piglet stays as an **Aborted** row until none is left.
+_Avoid_: Miscarriage

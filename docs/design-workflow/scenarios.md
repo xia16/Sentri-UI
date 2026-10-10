@@ -56,7 +56,7 @@ to its own deterministic seed for that preset (`select.scenario`). `taps` finish
 
 **`taps`**: the atlas step syntax (`atlas/SCHEMA.md`, *steps*): a control's visible text, its `aria-label`/`title`,
 or a CSS selector (starts with `[`, `.` or `#`); `{ "tap": ..., "hold": ms }` for hold-to-commit. Prefer selectors on
-`data-action` where the leaf must run in every language. Also: `{ "fill": "<selector>", "value": "..." }`,
+`data-action` where the leaf must run in every language. Also: `{ "fill": "<selector>", "value": "..." }` (the field may sit in a same-origin iframe of the page),
 `{ "expect": [<assertion>...] }` (a check mid-path), `{ "reload": true }` (the app is closed and reopened),
 `{ "wait": ms }`. A tap is a real pointer click: a control that is covered, disabled or missing fails the leaf as an
 **unreachable control**.

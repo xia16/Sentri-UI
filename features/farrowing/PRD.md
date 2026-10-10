@@ -15,7 +15,7 @@ A sow can farrow for hours, across shifts, with wet gloves, one hand on the crat
 
 ## Anchor
 
-The anchor is the **sow** (her litter session). Statuses: **Awaiting** (nothing recorded; live total zero) → **Farrowing** (live total above zero, not finished) → **Finished** (Born locked). Exit: **Died** (the sow's death ends the session without Finish; she stays in the room as a Done-register row). Reachable in any status: the **Room list** and the **Farrowing log**. Task bands: **Task in progress** (the whole-task overview) and **Ending the task** (the four End task reviews and the receipt).
+The anchor is the **sow** (her litter session). Statuses: **Awaiting** (nothing recorded; live total zero) → **Farrowing** (live total above zero, not finished) → **Finished** (Born locked). Exits: **Sow died** (her death ends the session without Finish; she stays in the room while her piglets still need a place) and **Aborted** (an abortion with a live piglet keeps her row; with none she leaves the list). Both are finished states; sows that have left the list are counted once on the Task overview as "Left the task". Reachable in any status: the **Room list** and the **Farrowing log**. Task bands: **Task in progress** (the whole-task overview) and **Ending the task** (the four End task reviews and the receipt).
 
 Status is derived, never set by a ceremony: "registers derive from the live total (posted + open pending)" (RULINGS *Starting and ending a session*).
 
@@ -53,11 +53,12 @@ In:
 - The sow sheet in its faces: Before first count, Counting, Finish (and its blocked form), Locked record, Sow died.
 - Death entry (piglets and the sow), Edit record, Edit of a finished litter and the Correct born correction (in place), the Farrowing log.
 - Whole-task overview, End task reviews (blocked, awaiting, all finished, outcomes) and the task receipt. One count everywhere: Done · Active · Awaiting over every sow of the task (a sow that died or has an outcome is Done), the same on the overview, End task, the receipt and the room tabs.
-- Farrowing's rows on the pig's Actions sheet (Edit litter record, Record miscarriage, Mark not in pig).
+- Farrowing's rows on the pig's Actions sheet (Edit litter record, Record abortion, Mark not in pig).
+- When a sow dies: the allocation sheet (move her piglets to other sows, hand-rear them in her crate, or move them to a rearing pen), the Move page it opens (`farrowing.foster`), and her row's life on the list until every piglet has a place.
 
 Out:
 
-- Fostering (parked until the owner reopens it).
+- Fostering outside the sow-died case (parked until the owner reopens it; see Decisions, 2026-10-10).
 - Piglet processing and its identity work (separate feature; Move opens after the lock). The prototype's own Piglet processing, identity and mortality pages are mapped as screens; see the decision "Piglet processing is drawn in Farrowing and as its own feature".
 - The sow page itself and the rest of the Actions sheet (pig-profile).
 - Pen tools reachable from a pen header (feed guidance, equipment fault, pen note, pen log): present in the prototype, unclear whose feature; recorded in the Room list issues. The pen pages are mapped as screens; see the decision "Pen tools are drawn in Farrowing and in Inspection".
@@ -91,3 +92,18 @@ Out:
 - Farrowing's skeleton is the model for all tasks; exit word Back — RULINGS *Piglet processing, Round 5*.
 - Task end: manual, hold-to-commit with receipt, blocked while farrowing is open — RULINGS *Piglet processing, Q5*; closure details in `ux/research/farrowing/ASTRA-TASK-CLOSURE.md`.
 - Edit record vs Correct born split by status; Home entries land on the room list — owner calls for this atlas.
+
+### Owner decisions, 2026-10-10
+
+- **Room rows** (the room, Find a sow, Scan results) are one row. **The row's arrangement is provisional, pending the list exploration**; for now it is the "need tile" arrangement (a design-system candidate), drawn by one function so it can be swapped: the ear tag exactly as stored over one muted facts line (state · key fact · when · who), a fixed-width tile at the right (a big number over one small word: `9 / alive`, `3 / days late`, `7 / to allocate`, `✓ / done`), a chevron. Tile colour is meaning only: red solid is work for the worker, green wash is done, neutral is the rest. Only recorded counts show: alive, and `· N dead` only above zero; never *born* when alive and dead are shown, never an expected or carried count. No pencil and no chip: tapping the row opens the record, and Edit is inside it. Awaiting rows (`parity 2 · 12 born last`) keep their facts. In Find a sow the facts line leads with the pen and drops when · who.
+- **Statuses.** In progress: **Awaiting**, **Active**. Finished: **Done** (green), **Sow died** (red), **Aborted** (red; 流产).
+- **Sow died.** Right after the hold records her death the sheet becomes `N piglets to allocate` (subtitle `<ID> · <pen> · sow died <time>`) with three options: **Move to other sows** (opens the move page, sending out of this litter with her piglets pre-selected; several receiving sows may split them), **Hand-rear here** (the piglets stay on her record and piglet care continues) and **Move to a rearing pen** (shown only when the farm config says the farm has one; the prototype flag is on for the demo, `?rearing=off` turns it off). Footer **Back** means later: no ✕, no extra question line.
+- **Her row while piglets remain.** A red tile `N / to allocate`, facts `Sow died · yesterday · L.M`; tapping it opens the same sheet. After Hand-rear: a neutral tile `N / hand-reared`, facts `Sow died · 09:40 · L.M`; the row stays while hand-reared piglets remain. A partial allocation keeps the remaining count; her row never says `5 moved`. A piglet that dies or is put down is recorded through Record dead and the count drops. She **leaves the room list** once every piglet is on another sow, in a rearing pen, or recorded dead.
+- **Aborted.** *Abortion* is the one word (never *miscarriage*). No live piglet: she leaves the room list at once. Any live piglet: the row stays with the tile `1 / alive` and the facts `Aborted · 08:10 · G.H` (recorded counts only).
+- **Task overview** counts the sows that left the list: `Left the task · n aborted · n sow died`. She is then outside Done · Active · Awaiting, so every total still adds up (7 / 18 farrowed once one of 19 has left).
+- **Sheet titles name the job; subtitles name the animal and context.** Record dead is titled `Record dead` (it was `Dead 6` / `The sow`); the pen sheet no longer repeats `Pen` as its only heading.
+- **Fostering is in scope for the sow-died case** (and only there; elsewhere it stays parked).
+- **An orphan litter can stay in the task, hand-reared** on her record.
+- **A rearing pen is a farm-level option.** Its configuration is still open: filed as the To confirm item `farrowing-room-list-1` in `review/farrowing-room-list.json`.
+- **Abortion rule.** No live piglets: she leaves the list. Any live piglet: an Aborted row stays.
+- The glossary words (*abortion / aborted*, *to allocate*, *hand-reared*, *left the task*) are in `ux/laws/glossary.md` and `ux/laws/strings.json`; "Abortion vs miscarriage" (`events-1`) is closed by this decision.

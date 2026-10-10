@@ -44,9 +44,11 @@ States: E0 Home, Farrowing section · E1 Home, Choose unit · E2 room list (Unit
 | E-7 | E2 | Filter, due range | ? Q3 — does it hide Active and Done sows? | S (open) — PRD Scope silent; review tasks-built-3 | blocker `fa-e7-due-filter-scope` |
 | E-8 | E2 | tap an Active row | → Counting | S — PRD Anchor; flow | `fa-e8-active-row-opens-counting` |
 | E-9 | E2 | tap a Done row | → the locked record, no counter | S — RUL After the lock | `fa-e9-done-row-opens-record` |
-| E-10 | E2 | tap a Sow died row | → her ended record; she is still in the room | S — RUL Starting and ending | `fa-e10-died-row-opens-ended-record` |
+| E-10 | E2 | tap a Sow died row with piglets to allocate | → the allocation sheet (the same sheet as right after her death) | S — owner decision 2026-10-10 (was RUL: her ended record) | `fa-e10-died-row-opens-ended-record` |
 | E-11 | E2 | Scan ear tag | → her sheet | S — PRD Scope | pending `fa-e11-scan-ear-tag` |
-| E-12 | E2 | tap a pen header | ? pen tools (feed, fault, note, log) are out of scope by PRD; review tasks-built-2 | S (open) — PRD Scope Out | — |
+| E-12 | E2 | read every row | → recorded counts only: no "born N", no "0 dead", no pencil | owner decision 2026-10-10 | `fa-e12-rows-recorded-counts-only` |
+| E-13 | E3 | Find a sow, empty field | → the same rows, same rules | owner decision 2026-10-10 | `fa-e13-search-rows-recorded-counts-only` |
+| E-14 | E2 | tap a pen header | ? pen tools (feed, fault, note, log) are out of scope by PRD; review tasks-built-2 | S (open) — PRD Scope Out | — |
 
 ## 2 · Sow · Awaiting (A)
 
@@ -133,12 +135,26 @@ States: M0 drawer in The sow mode over C0 · M1 Ended (sow died).
 
 | # | State | Event | Result | Src | Leaf |
 |---|---|---|---|---|---|
-| M-1 | M0 | Prolapse, hold Save | → session ends without Finish; red band with the cause | S — RUL Starting and ending | `fa-m1-sow-death-ends-session` |
-| M-2 | M1 | Back to the room | → she stays as a Done row marked Sow died | S — RUL Starting and ending ("She stays in the room") | `fa-m2-dead-sow-stays-in-room` |
+| M-1 | M0 | Prolapse, hold Save | → session ends without Finish; the sheet becomes the allocation sheet | S — RUL Starting and ending; owner decision 2026-10-10 | `fa-m1-sow-death-ends-session` |
+| M-2 | M1 | Back to the room | → she stays as a Sow died row, "N to allocate" | S — RUL Starting and ending ("She stays in the room"); owner decision 2026-10-10 | `fa-m2-dead-sow-stays-in-room` |
 | M-3 | M0 | Prolapse, tap (no hold) | → nothing recorded | S — RUL Starting and ending (hold-to-commit) | `fa-m3-sow-death-needs-hold` |
-| M-4 | M1 | record a piglet death | ? Q5 | S (open) — contract C4 vs review tasks-built-25 | blocker `fa-m4-piglet-deaths-after-sow-died` |
+| M-4 | M1 | record a piglet death (Record dead) | → recorded; her alive count drops, born unchanged | S — owner decision 2026-10-10 (answers Q5) | `fa-m4-piglet-deaths-after-sow-died` |
 | M-5 | M0 | Other | → an optional free-text line | S — RUL Starting and ending | — |
-| M-6 | M1 | her alive piglets | handoff:piglet processing (`7 alive stay under piglet care`) | S — RUL Starting and ending | — |
+| M-6 | M1 | her alive piglets | handoff:piglet processing when hand-reared (M-12, M-13); otherwise allocated (M-7 on) | S — RUL Starting and ending; owner decision 2026-10-10 | — |
+| M-7 | M0 | right after the hold | → title "N piglets to allocate", subtitle "<ID> · <pen> · sow died <time>", three options, footer Back = later (no ✕) | owner decision 2026-10-10 | `fa-m7-allocation-sheet-after-death` |
+| M-8 | M7 | Move to other sows, send all | → she leaves the room list | owner decision 2026-10-10 | `fa-m8-all-fostered-she-leaves` |
+| M-9 | M8 | Task overview | → "Left the task · 1 sow died"; progress counts 18 (7 / 18 farrowed); every total adds up | owner decision 2026-10-10 | `fa-m9-overview-counts-who-left` |
+| M-11 | M7 | Back | → row: red tile "N / to allocate", facts "Sow died" | owner decision 2026-10-10 | `fa-m11-back-row-says-to-allocate`, `fa-m15-back-leaves-row-to-allocate` |
+| M-12 | M7 | Hand-rear here | → row: neutral tile "N / hand-reared"; the row stays | owner decision 2026-10-10 | `fa-m12-hand-reared-row-stays` |
+| M-13 | M12 | tap the row | → her record, where piglet care continues | owner decision 2026-10-10 | `fa-m13-hand-reared-row-opens-record` |
+| M-14 | M7 | Move to a rearing pen | → she leaves the list | owner decision 2026-10-10 | `fa-m14-rearing-pen-she-leaves` |
+| M-16 | M7 | farm has no rearing pen | → the third option is absent | owner decision 2026-10-10 | `fa-m16-no-rearing-pen-no-option` |
+| M-17 | M11 | tap the row | → the same sheet | owner decision 2026-10-10 | `fa-m17-row-opens-allocation-sheet` |
+| M-18 | M17 | Move some (send 5 of 9) | → the sheet returns with the remaining count; her row never says "5 moved" | owner decision 2026-10-10 | `fa-m18-partial-move-keeps-the-rest` |
+| M-19 | M18 | Hand-rear here (the rest) | → row "4 hand-reared" | owner decision 2026-10-10 | `fa-m19-rest-hand-reared` |
+| M-20 | M-ab | abortion, no live piglet | → she is not listed | owner decision 2026-10-10 | `fa-m20-abortion-no-live-leaves-list` |
+| M-21 | M20 | Task overview | → "Left the task · 1 aborted" | owner decision 2026-10-10 | `fa-m21-overview-counts-aborted` |
+| M-22 | M-ab | abortion, 1 live piglet | → the row stays: tile "1 / alive", facts "Aborted" (recorded counts only) | owner decision 2026-10-10 | `fa-m22-abortion-with-live-row-stays` |
 
 ## 8 · The task: overview → End → receipt (K)
 
@@ -166,7 +182,7 @@ task with laggards and an unsaved draft somewhere (K, Q2) · **s7** interrupted:
 
 ## 9 · Open questions (decision-blockers)
 
-1. **Q1 · Is fostering in Farrowing's scope?** RUL *After the lock* parks it ("v1 farrowing ships NO foster doors");
+1. **Q1 · Is fostering in Farrowing's scope?** *Partly answered 2026-10-10: in scope for the sow-died case (M-7, M-8, M-18); parked elsewhere.* RUL *After the lock* parks it ("v1 farrowing ships NO foster doors");
    the PRD lists it Out; yet `farrowing.foster` exists, reached from More actions. *(C-7, `fa-z1-fostering-scope`)*
 2. **Q2 · Can the task end while a sow is farrowing?** The PRD blocks it ("blocked while farrowing is open", with
    CLOSURE: drafts block too); the contract C9 says "close never blocks on them" (ACTIVE sows list informationally),
@@ -174,7 +190,7 @@ task with laggards and an unsaved draft somewhere (K, Q2) · **s7** interrupted:
    *(K-2, `fa-k2-end-while-farrowing`)*
 3. **Q3 · Does the due-range filter apply to Active and Done sows?** *(E-7)*
 4. **Q4 · After the lock, which door records a piglet death?** *(X-7)*
-5. **Q5 · May piglet deaths be recorded after the sow died?** *(M-4)*
+5. **Q5 · May piglet deaths be recorded after the sow died?** *Answered 2026-10-10: through Record dead; the count drops. (M-4, now a leaf)*
 6. **Q6 · Where do awaiting sows go when the task ends early?** *(K-7)*
 7. **Q7 · How does a pre-lock Alive correction below the floor restate Born?** *(X-8)*
 8. **Q8 · Does a correction after End change the receipt?** *(K-8)*

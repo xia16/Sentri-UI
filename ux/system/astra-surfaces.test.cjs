@@ -219,7 +219,7 @@ test('Production hides actions from conflicting stages and shares only batch mem
 
   const grower = context('actions'); grower.selected = new Set(['000801']); grower.pigId = '000801';
   const growerProduction = model.actionCatalogue(grower).groups.find(group => group.id === 'production').items;
-  assert.equal(growerProduction.some(item => item.title === 'Record miscarriage'), false);
+  assert.equal(growerProduction.some(item => item.title === 'Record abortion'), false);
   assert.equal(growerProduction.some(item => item.title === 'Pregnancy check'), false);
   assert.equal(growerProduction.filter(item => item.a === 'batch-membership').length, 1);
 });

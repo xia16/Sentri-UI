@@ -653,14 +653,14 @@
   },
   "kind": "decision",
   "severity": "high",
-  "title": "Miscarriage built in Pig profile vs Abortion placeholder",
-  "detail": "Pig profile already builds Record miscarriage and Farrowing's outcomes use it; this feature repeats it as three placeholder screens (6 in Figma). Same event, two names.",
+  "title": "Abortion built in Pig profile vs Abortion placeholder",
+  "detail": "Pig profile already builds Record abortion (named Record miscarriage until the owner settled the word on 2026-10-10: abortion, never miscarriage) and Farrowing's outcomes use it; this feature repeats it as three placeholder screens (6 in Figma). Same event; the name is now one, the duplicate screens remain.",
   "source": "sweep",
   "options": [
    "Retire Abortion; miscarriage is the form",
-   "Rename the built form to Abortion"
+   "Keep the built form, now named Abortion (done, owner decision 2026-10-10)"
   ],
-  "recommendation": "Retire Abortion; keep the built Record miscarriage."
+  "recommendation": "Retire the Abortion placeholder; keep the built Record abortion."
  },
  {
   "id": "home-and-placeholders-49",

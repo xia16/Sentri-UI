@@ -132,7 +132,7 @@
     [
       "pig-profile.actions",
       "pig-profile.miscarriage",
-      "tap Record miscarriage"
+      "tap Record abortion"
     ],
     [
       "pig-profile.actions",
@@ -715,7 +715,7 @@
         "elements": [
           {
             "name": "Production group",
-            "shows": "Task cluster, Record miscarriage, Batch membership",
+            "shows": "Task cluster, Record abortion, Batch membership",
             "states": [
               {
                 "state": "Task cluster",
@@ -723,7 +723,7 @@
                 "shows": "Heading and a single row carrying the same word"
               },
               {
-                "state": "Record miscarriage",
+                "state": "Record abortion",
                 "when": "Stage reads gestating, in heat or breeding",
                 "shows": "Offered"
               },
@@ -744,7 +744,7 @@
               }
             ],
             "logic": "Production exists only for one pig. Mark not in pig, Remove from batch and Transfer sow render only inside Farrowing's sow drawer. Farrowing's versions of batch moves are hidden when this sheet's own Batch membership row exists.",
-            "at": "Record miscarriage"
+            "at": "Record abortion"
           },
           {
             "name": "Health group",
@@ -865,7 +865,7 @@
     },
     {
       "id": "pig-profile.miscarriage",
-      "name": "Record miscarriage",
+      "name": "Record abortion",
       "zh": "记录流产",
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
@@ -881,13 +881,13 @@
           {
             "name": "Reason and Save",
             "shows": "Warning \"This sow will be removed from the batch. Saved records are kept.\"; Reason",
-            "rule": "Reason is required; Save is disabled while empty. Save removes her from the batch, sets Off production / Open, adds \"Miscarriage recorded\" (Production) and returns to the pig record. Single-animal action, hidden from bulk.",
+            "rule": "Reason is required; Save is disabled while empty. Save removes her from the batch, sets Off production / Open, adds \"Abortion recorded\" (Production) and returns to the pig record. Single-animal action, hidden from bulk.",
             "at": "Reason"
           }
         ],
         "controls": [],
         "copy": [
-          "Record miscarriage (raw)",
+          "Record abortion (raw)",
           "Enter the reason (raw)"
         ],
         "edge": [
@@ -895,6 +895,9 @@
         ],
         "issues": [
           "Reason is free text; the production-task outcome \"Not in pig\" lists evidence choices: two forms for a similar loss."
+        ],
+        "rules": [
+          "The screen's wording is Abortion (same event, one word; Owner decision 2026-10-10). Its id keeps the old name so links and leaves survive."
         ]
       }
     },

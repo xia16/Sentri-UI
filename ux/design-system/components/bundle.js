@@ -145,7 +145,13 @@
     if(chip&&trailing)warn(card,'chip and trailing together: a row says one thing on the right; the chip wins');
     return chip?status(Object.assign({},chip,{className:'st-row-chip'})):'';
   }
-  function row({title,description='',icon='',action='',value='',className='',disabled=false,trailing='',trail='auto',attrs={},strs,args,code='',mono=false,chip=null,wrap=false,tight=false,id='',variant='',reason='',mark=''}={}){
+  /* Need tile (animal row, candidate): what she needs, as a number over one small word, in one fixed-width column at the right.
+     tone 'red' (solid, white text: work for the worker) · 'green' (done) · '' (neutral). big is text, or icon:'check' for a drawn tick. */
+  function needTile({big='',icon:ic='',small='',tone=''}){
+    const t=oneOf('Row','tile.tone',tone,['red','green'],'');
+    return `<span class="st-row-tile"${t?` data-tone="${t}"`:''}><span class="st-tile-big"${!ic&&/^\D{2,}$/.test(String(big))?' data-word=""':''}>${ic?glyph(ic):esc(big)}</span><span class="st-tile-word">${esc(small)}</span></span>`;
+  }
+  function row({title,description='',icon='',action='',value='',className='',disabled=false,trailing='',trail='auto',attrs={},strs,args,code='',mono=false,chip=null,wrap=false,tight=false,id='',variant='',reason='',mark='',layout='',tile=null}={}){
     const o={strs,args};
     variant=variant||(mark?'tick':code?'animal':trail==='edit'||(chip&&chip.kind==='done')?'record':icon?'navigation':attrs['aria-current']?'scope':'plain');
     if(disabled) description=reason||description||'Unavailable — try again later';
@@ -157,7 +163,7 @@
     const c=rowCopy({title,description,code,mono,tight,o,titleId:id?id+'-title':''});
     const tag=action?'button':'div';
     const railHtml=disabled?'':variant==='tick'&&tr==='auto'?'':tr==='edit'?`<span class="st-row-chevron" data-rail="edit">${glyph('edit')}<span data-str="act.edit">Edit</span></span>`:(tr==='chevron'||(tr==='auto'&&action))?`<span class="st-row-chevron">${arrow}</span>`:'';
-    return `<${tag} class="st-row ${esc(className)}" data-ds="Row" data-variant="${esc(variant)}"${id?` id="${esc(id)}"`:''}${action?` type="button" data-action="${esc(action)}" data-value="${esc(value)}"${disabled?' disabled aria-disabled="true"':''}`:''}${wrap?' data-wrap=""':''}${safeAttr(attrs)}>${rowMark(mark)}${icon&&!code&&variant==='navigation'?`<span class="st-row-icon">${icon}</span>`:''}${code?`<span class="st-row-identity">${c.codeHtml}${rowChip(chip,trailing,'Row')}</span>`:c.codeHtml}<span class="st-row-copy">${c.strong()}${c.small}</span>${code?'':rowChip(chip,trailing,'Row')}${trailHtml}${railHtml}</${tag}>`;
+    return `<${tag} class="st-row ${esc(className)}" data-ds="Row" data-variant="${esc(variant)}"${layout==='need'&&tile?' data-layout="need"':''}${id?` id="${esc(id)}"`:''}${action?` type="button" data-action="${esc(action)}" data-value="${esc(value)}"${disabled?' disabled aria-disabled="true"':''}`:''}${wrap?' data-wrap=""':''}${safeAttr(attrs)}>${rowMark(mark)}${icon&&!code&&variant==='navigation'?`<span class="st-row-icon">${icon}</span>`:''}${code?`<span class="st-row-identity">${c.codeHtml}${rowChip(chip,trailing,'Row')}</span>`:c.codeHtml}<span class="st-row-copy">${c.strong()}${c.small}</span>${code?'':rowChip(chip,trailing,'Row')}${layout==='need'&&tile?needTile(tile):''}${trailHtml}${railHtml}</${tag}>`;
   }
   /* rowSelect: the select + door variant without the door (a select-only list): the whole row is a <label>, leading box. Payload is change-only: rowSelectChange(event) → { value, checked }. */
   function rowSelect({title,description='',code='',mono=false,chip=null,wrap=false,tight=false,checked=false,action='select',value='',id='',className='',attrs={},strs,args,inputAttrs={},disabled=false,reason=''}={}){
@@ -623,10 +629,10 @@
     });
   }
   /* Status: how a state is said. One colour map for every status, here and in the README:
-       awaiting muted · active progress · done green · late amber · overdue red · died red
+       awaiting muted · active progress · done green · late amber · overdue red · died red · aborted red
      `kind` picks a row of the map (tone, and the icon a chip carries); `tone` alone is the old word call and still works.
      variant: 'word' (a 4px dot and the word, inline) · 'chip' (a filled badge in a row). Text is always given: colour never carries a state alone. */
-  const KINDS={awaiting:{tone:'muted',icon:''},active:{tone:'progress',icon:''},done:{tone:'green',icon:'check'},late:{tone:'amber',icon:'clock'},overdue:{tone:'red',icon:'alert'},died:{tone:'red',icon:''}};
+  const KINDS={awaiting:{tone:'muted',icon:''},active:{tone:'progress',icon:''},done:{tone:'green',icon:'check'},late:{tone:'amber',icon:'clock'},overdue:{tone:'red',icon:'alert'},died:{tone:'red',icon:''},aborted:{tone:'red',icon:''}};
   const STATUS_VARIANTS=['word','chip'];
   function status({text='',tone,kind='',variant='word',icon,id='',className='',strs,args}={}){
     const k=kind?oneOf('Status','kind',kind,Object.keys(KINDS),''):'';
