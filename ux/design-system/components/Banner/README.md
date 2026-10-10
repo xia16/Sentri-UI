@@ -22,7 +22,7 @@ Box; leading icon (alert for danger, edit for correction, note for notice; the h
 | State | Rendered behavior |
 | --- | --- |
 | Default | Headline, consequence; optional actions or whole-box door |
-| Pressed / Focus | Press fill or visible focus ring on the action/door |
+| Pressed | Press fill on the action/door |
 | Disabled | Door disabled with a visible reason and dashed border |
 | Error | Upload interrupted; notice door offers retry and keeps local work |
 | Loading | Notice states what is uploading; host retains the review door |
@@ -41,13 +41,13 @@ The host handles review, Clear and Undo events. Clear snapshots the draft, empti
 Sentence case. Aim for at most 42 English characters or 18 Chinese characters in a headline; cap at one visual line, with ellipsis for excess. Keep the full text in the DOM and put necessary consequences in the wrapping line (up to 100 English / 45 Chinese characters). Example: “先保存更正记录” / “Save your correction first”. Action labels are verbs, at most 16 English / 6 Chinese characters. Never rely on colour: every tone has a leading word or icon.
 
 ## Accessibility
-Static box: `role="note"`; dynamic summary: `role="status"`, polite and atomic. Door is a native button; Tab focuses it, Enter/Space activates. Text actions use Button keyboard/focus behavior. Disabled doors have a visible reason and native disabled semantics. No gesture-only action. All targets and summary rows use the 48px glove floor.
+Static box: `role="note"`; dynamic summary: `role="status"`, polite and atomic. Door is a native button (role, name and state are read by the screen reader). Text actions follow Button. Disabled doors have a visible reason and native disabled semantics. No gesture-only action. All targets and summary rows use the 48px glove floor.
 
 ## Do / don't
 Do name the consequence once and place the commit below it. Don't nest buttons in a door, put banners inside cards, or use red for connectivity. Do offer Undo after Clear; don't remove the focused Undo without returning focus.
 
 ## Tokens
-`space-row-y`, `space-row-x`, `space-4`, `space-8`, `tap-min`, `control-height`, `border-width`, `size-2`, `size-3`, `radius-control`, `danger-border`, `red-wash`, `red`, `pending-border`, `amber-wash`, `ink`, `muted`, `press`, `focus`, `glyph-pad`, `type-weight-regular`, `type-weight-medium`, `type-weight-semibold`, `type-weight-strong`, `type-choice-label-size`, `type-choice-meta-size`, `font-sans`, `font-mono`. No local colour or size values.
+`space-row-y`, `space-row-x`, `space-4`, `space-8`, `tap-min`, `control-height`, `border-width`, `size-2`, `size-3`, `radius-control`, `danger-border`, `red-wash`, `red`, `pending-border`, `amber-wash`, `ink`, `muted`, `press`, `glyph-pad`, `type-weight-regular`, `type-weight-medium`, `type-weight-semibold`, `type-weight-strong`, `type-choice-label-size`, `type-choice-meta-size`, `font-sans`, `font-mono`. No local colour or size values.
 
 ## Related and classification
 Generic **component**, shared across sections. [Button](../Button/README.md) owns text-action targets. [Status](../Status/README.md) owns quiet feedback. [TaskWarning](../TaskWarning/README.md) is its retired compatibility alias. Door and size are properties (the icon follows the tone), not copies.

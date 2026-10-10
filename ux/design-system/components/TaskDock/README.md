@@ -12,7 +12,7 @@ The room's bottom bar: **one primary tool (Scan ear tag) and icon tools**. It is
 - **Place control** (`unit`, optional, first): farrowing's `B1 / Go to pen` — no frame, `paper`, at least 50px, padded `0 3px`, 9px between: an 18px icon, then the place in 13px/600 mono over its caption in `dock-caption` 9px `muted` (farrowing's size, below the floor by the owner's ruling). Props: `dock({ unit: { icon = 'grid', label, caption, action, value, aria }, primary, tools })`.
 
 **States**
-- Pressed: the Button press (darken, 1px down) is not drawn yet. Focus: the global ring. Disabled: never.
+- Pressed: the Button press (darken, 1px down) is not drawn yet. Disabled: never.
 
 **Component contract**
 - **Props:** `SentriTask.dock({ primary: { icon, label, action, value }, tools: [{ icon, label, action, value }] })`. `tools.label` names the nav.

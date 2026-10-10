@@ -42,7 +42,7 @@ A correction is shown as the **original and the correction**: the entry's title 
 | Default | entries on the thread, newest first |
 | Corrected | "Corrected" word above the title, `was` line under it |
 | With an attachment | `extraHtml` after the detail (a photo is a 48px control with its own states) |
-| Pressed, selected, disabled, focus | none: entries are text. An `extraHtml` control follows its own component's states |
+| Pressed, selected, disabled | none: entries are text. An `extraHtml` control follows its own component's states |
 | Empty | one `muted` 12px line: `No activity recorded yet`; groups with no entries are dropped |
 | Filter matches nothing (categorised) | `No matching entries`, a different line from the empty log |
 | Loading, error | not drawn |
@@ -64,7 +64,7 @@ Static. The caller sorts newest first (`logGroups` does it for flat entries). A 
 ## Accessibility
 
 - Role: each group is a `section` headed by its day; entries are an ordered list (`ol` / `li`), so a screen reader announces "list, 3 items".
-- No focus stop of its own; no keyboard behaviour. The thread and dot are decoration.
+- Nothing of its own to operate. The thread and dot are decoration.
 - The "Corrected" word and `was` line say a correction in text, not colour.
 
 ## CSS variables

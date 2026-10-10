@@ -12,7 +12,7 @@ The task's list is **grouped by where the animals are**: one card per pen or cra
 - Rows follow the header, a 1px `line` between rows.
 
 **States**
-- Pressed (door): not drawn beyond the focus ring. Focus: the global ring.
+- Pressed (door): not drawn.
 - Empty: a group with no rows in the current lens is absent. A lens with no rows at all shows one line in the list's place (the host's).
 
 **Component contract**

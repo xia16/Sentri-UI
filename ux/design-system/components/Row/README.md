@@ -32,7 +32,6 @@ Leading selection box (select + door only: a 24px box in a 48px hit area, always
 |---|---|
 | Default | Native button, checkbox label, or inert div according to job. |
 | Pressed | `press` on every tappable face; `attrs: {'data-preview':'pressed'}` demonstrates it statically. |
-| Focus | Visible focus ring on row and independent act. Tab moves between targets; Enter/Space activates buttons, Space toggles checkbox. |
 | Selected | Native checked checkbox, never colour alone. Tick: the check disc on green wash. |
 | Ticked | Tick only: disc and wash, no Done chip until saved. |
 | Current | `aria-current="location"`, current marker and explicit current-unit description. |
@@ -56,7 +55,7 @@ Sentence case. Aim for titles ≤32 English characters or 16 Chinese characters,
 
 ## Accessibility
 
-Native button and checkbox semantics; inert rows are divs. Checkbox label covers the row; screen readers announce checked state. Use `attrs` for descriptive ARIA, `inputAttrs` for checkbox ARIA. Scope announces current location. Focus is visible; no gesture is required. Disabled reason remains readable at full contrast. One-handed targets never overlap.
+Native button and checkbox semantics; inert rows are divs. Checkbox label covers the row; screen readers announce checked state. Use `attrs` for descriptive ARIA, `inputAttrs` for checkbox ARIA. Scope announces current location. No gesture is required. Disabled reason remains readable at full contrast. One-handed targets never overlap.
 
 ## Do / don't
 
@@ -68,7 +67,7 @@ Component, absorbing TaskRow's animal/tick/door/door+act faces as variants. The 
 
 ## Tokens
 
-`row-icon-bg`, `row-icon-ink`, `press`, `green-wash`, `current-marker`, `row-min`, `space-row-y`, `space-row-x`, `animal-row-min`, `animal-id-col`, `row-chip-max`, `tap-min`, `control-height`, `focus`, type and space scale tokens. No local palette or component CSS pixel sizes.
+`row-icon-bg`, `row-icon-ink`, `press`, `green-wash`, `current-marker`, `row-min`, `space-row-y`, `space-row-x`, `animal-row-min`, `animal-id-col`, `row-chip-max`, `tap-min`, `control-height`, type and space scale tokens. No local palette or component CSS pixel sizes.
 
 ## References and change log
 

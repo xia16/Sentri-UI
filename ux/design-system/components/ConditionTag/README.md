@@ -38,7 +38,7 @@ The colours follow the Status map: green is done (resolved), amber needs attenti
 | Ongoing | drawn | drawn |
 | Resolved | drawn | drawn |
 | Notice | drawn | not used |
-| Pressed, focus, selected, disabled | none: the Row or Button around it owns them (the tag is never a target) | none |
+| Pressed, selected, disabled | none: the Row or Button around it owns them (the tag is never a target) | none |
 | Error, loading | none | none |
 | Empty | absent: no condition, no tag (the list shows `—`) | absent |
 | Long name | the name ends in an ellipsis; the icon and day stay | wraps |
@@ -58,7 +58,7 @@ The colours follow the Status map: green is done (resolved), amber needs attenti
 ## Accessibility
 - The tag is text: name, day and (visually hidden) care word read in order, `Thin Day 3 · Monitor`. The icon is `aria-hidden`.
 - Colour, icon and word differ for every care level, so no level is colour-only. The row that holds the tags carries an `aria-label` that lists them.
-- Not focusable and not a target; no keyboard behaviour.
+- Not a target; the screen reader reads it as text.
 
 ## Do / Don't
 - Do use the care level to pick the look; never choose a colour per screen.

@@ -45,7 +45,6 @@ Call `SentriUI.numpad({ label, value, unit, placeholder, suggested, decimals, ma
   - a digit when full: `Tag is 6 digits` or `2 decimal places at most`;
   - ⌫ on empty: `Nothing to delete`;
   - `.` after a point.
-- **Focus:** a 3px `focus` ring, offset 2px, on the key.
 - **Warn** (`tone: 'warn'`): an `amber` hint with a dot. **Record stays available**, and the value records.
   - **Duplicate tag.** The check runs on **every accepted value, suggestions included**: typed, suggested or scanned. It shows `000254 is already on crate B04 · records anyway`.
   - **Short tag, on Record:** `5 of 6 digits`.
@@ -75,7 +74,7 @@ Call `SentriUI.numpad({ label, value, unit, placeholder, suggested, decimals, ma
     - a burst is never typed;
     - human keys pass through;
     - the clear and suggestion transitions.
-- **Hardware keyboard.** `SentriUI.numpadKey(event)` maps digits, `.` (and `,`) and Backspace. Enter returns `'enter'`, and **Enter never commits**: outside a burst it is dropped.
+- **Wedge scanner.** `SentriUI.numpadKey(event)` maps digits, `.` (and `,`) and Backspace. Enter returns `'enter'`, and **Enter never commits**: outside a burst it is dropped.
 - **On commit.** `SentriUI.numpadCommit(value, { decimals })` turns `16.` into `16`, strips a weight's leading zeros, and turns empty into `null`.
 - **Drafts and re-renders.** The typed draft belongs to the host and survives interruption. Re-render by patching the pad keyed by `data-field`. Keep the readout and status line mounted so their live regions announce, and keep focus on the key that was pressed.
 - **Announcements are concise.** The value announces as it is typed. The status line announces a warning, a dead-tap answer or a scan failure once. The running list and the label are not live.

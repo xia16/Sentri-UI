@@ -9,7 +9,6 @@
       "Pressed",
       "Selected",
       "Disabled",
-      "Focus",
       "Long-label"
     ]
   },
@@ -23,7 +22,6 @@
       "Pressed",
       "Selected",
       "Disabled",
-      "Focus",
       "Long-label"
     ]
   },
@@ -37,7 +35,6 @@
       "Pressed",
       "Selected",
       "Disabled",
-      "Focus",
       "Long-label"
     ]
   },
@@ -51,7 +48,6 @@
       "Pressed",
       "Selected",
       "Disabled",
-      "Focus",
       "Long-label"
     ]
   }

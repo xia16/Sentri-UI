@@ -30,7 +30,6 @@ Call `SentriUI.measure({ label, optional, value, unit, unitGap, placeholder, key
   - when the field is empty, the caret shows alone before the unit;
   - the range is **not** checked while typing.
 - **Disabled:** none. A value the worker cannot set is left out, or printed as a Facts value.
-- **Focus:** a 3px `focus` ring, offset 2px, on the box.
 - **Out of range (soft)** (`range: [min, max]`, or `tone: 'warn'`):
   - evaluated on commit or pad close, never per keystroke;
   - the value stays `ink`;

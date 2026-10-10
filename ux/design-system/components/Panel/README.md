@@ -28,7 +28,7 @@ The enclosing `data-st-context="page|drawer"` chooses the variant. The default o
 | Default | Bordered surface, no shadow |
 | Empty | Absent; `panel('')` returns an empty string |
 | Long label / Chinese | Content wraps using the consumer's copy rules |
-| Pressed, active, focused, disabled, error, loading | Owned by the contained control; Panel is static |
+| Pressed, active, disabled, error, loading | Owned by the contained control; Panel is static |
 
 ## Behaviour
 
@@ -40,7 +40,7 @@ Panel has no text slots, label length, casing or truncation. Facts, Row and Log 
 
 ## Accessibility
 
-No implicit role, focus stop or keyboard handler. `tag` permits div, section, article, aside or dl; use the consumer to supply correct semantics. Only controls inside the panel are tappable, at tap-min or above. They own focus and keyboard interaction.
+No implicit role or handler. `tag` permits div, section, article, aside or dl; use the consumer to supply correct semantics. Only controls inside the panel are tappable, at tap-min or above. They own their own roles and states.
 
 ## Tokens / API
 
