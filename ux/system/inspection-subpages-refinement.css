@@ -95,16 +95,17 @@
 .inspection-phone :is(.catalog-search input,.stage-legend button,.record-tabs button,.inspection-filter-summary .text-button,.unit-summary-heading .text-button,.profile-details-link,.dock-selection-summary .selection-review,.feed-percent-control input[type="number"],.feed-range-labels .text-button,.feed-amount-fields input[type="range"],.log-results .text-button,.instruction-detail .text-button,.bulk-reading input){min-height:var(--tap-min);}
 .inspection-phone .bulk-controls :is(input,select,textarea){min-height:var(--tap-min);}
 
-/* Bulk action page: the selected pigs on top, the details anchored to the bottom, ending above the footer.
-   The sheet body is the only scroller: a short page pushes the details down onto the footer (margin-top:auto), a long one
-   scrolls as one column. One surface: the details are the footer's paper with one rule above them (no card, no border box,
-   no shadow), and the fields sit straight on it. The details heading folds them away. */
+/* Bulk action page: the selected pigs on top, the details held on the bottom edge above the footer.
+   The sheet body is the only scroller. The details sit last in it and stick to its bottom (position:sticky), so with a
+   short list they rest on the footer and with a long one the pig rows scroll under them: no field is ever under the
+   footer. One surface: the details are the footer's paper with one rule above them (no card, no border box, no shadow),
+   and the fields sit straight on it. The details heading folds them away to give the list the room. */
 .inspection-phone .sheet>.sheet-body:has(>.bulk-action-layout),.inspection-phone .sheet.bulk-action-sheet[data-presentation="page"]>.sheet-body{padding:0;margin:0;display:flex;flex-direction:column;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none}
 .inspection-phone .bulk-action-layout{display:flex;flex-direction:column;flex:1 0 auto;min-height:100%;width:100%;gap:0;height:auto}
 .inspection-phone .bulk-action-layout>.bulk-pigs{display:flex;flex-direction:column;flex:none;min-height:0;margin:16px var(--space-gutter,18px);border:1px solid var(--line,#e2e7dc);border-radius:var(--radius-panel,18px);background:var(--paper,#fff);overflow:hidden}
 .inspection-phone .bulk-pigs .pig-review-heading{padding:12px 18px;flex-shrink:0}
 .inspection-phone .bulk-pigs .bulk-pig-list{flex:none;min-height:0;overflow:visible;padding-bottom:0}
-.inspection-phone .bulk-action-layout>.bulk-dock{position:static;display:flex;flex-direction:column;flex:none;gap:0;margin:auto 0 0;max-height:none;min-height:0;box-sizing:border-box;padding:4px var(--space-gutter,18px) 16px;border:0;border-top:1px solid var(--line,#e2e7dc);border-radius:0;background:var(--paper,#fff);box-shadow:none;overflow:visible}
+.inspection-phone .bulk-action-layout>.bulk-dock{position:sticky;bottom:0;z-index:1;display:flex;flex-direction:column;flex:none;gap:0;margin:auto 0 0;max-height:none;min-height:0;box-sizing:border-box;padding:4px var(--space-gutter,18px) 16px;border:0;border-top:1px solid var(--line,#e2e7dc);border-radius:0;background:var(--paper,#fff);box-shadow:none;overflow:visible}
 .inspection-phone .bulk-action-layout>.bulk-dock.is-collapsed{padding-bottom:4px}
 .inspection-phone .sheet:has(>.sheet-body>.bulk-action-layout)>.sheet-footer{border-top-color:transparent}
 .inspection-phone .bulk-dock .bulk-controls-toggle{flex-shrink:0;min-height:var(--tap-min,48px);color:var(--muted,#5c6b58);font:600 12px/1.4 var(--font-sans)}
@@ -190,3 +191,13 @@
 .inspection-phone .inspect-dock .selection-count>svg{flex:none;width:16px;height:16px;color:var(--muted);fill:none;stroke:currentColor;stroke-width:1.8}
 .inspection-phone .inspect-dock .selection-count:active{background:var(--press)}
 .inspection-phone .inspect-dock .selection-action{min-height:var(--tap-min,48px)}
+
+/* Bulk rows say only the exceptions (Already recorded, Not eligible, an error), in plain muted text: no tag, no green. */
+.inspection-phone .bulk-action-sheet .bulk-pig-row .feed-change-state{min-height:0;padding:0;border-radius:0;background:none;color:var(--muted);font:400 13px/1.35 var(--font-sans);font-weight:400;white-space:normal;max-width:150px;text-align:right}
+/* Selection is ink: the tick is ink and a ticked row takes the neutral well, never green (green is done). */
+.inspection-phone .check-target input,.inspection-phone .bulk-pig-check input{accent-color:var(--ink)}
+.inspection-phone .roster-pig.selected{background:var(--well)}
+.inspection-phone .catalog-item:has(input:checked){background:var(--well)}
+/* Required: the word sits at the end of the field's label line, so marking fields never changes the details' height. */
+.inspection-phone .bulk-controls .field.error{position:relative}
+.inspection-phone .bulk-controls .field.error>:is(.st-field-message,.st-picker-hint){position:absolute;top:0;right:0;margin:0;font:600 12px/1.4 var(--font-sans);color:var(--red)}

@@ -94,7 +94,7 @@ test('single health uses a direct form while bulk keeps the list', () => {
   assert.equal((bulkHtml.match(/data-bulk-include/g) || []).length, 2);
 });
 
-test('condition picker uses the same full-height drawer for single and bulk records', () => {
+test('condition picker holds one height (its tallest level) for single and bulk records', () => {
   const sizes = [];
   for (const subjects of [['000267'], ['000254', '000267']]) {
     const context = model.seed();
@@ -102,8 +102,8 @@ test('condition picker uses the same full-height drawer for single and bulk reco
     model.handleRecordAction(context, 'bulk-pick-health', '');
     const html = model.overlay(context);
     sizes.push(html.match(/health-picker-step"[^>]*data-size="([^"]+)"/)?.[1]);
-    assert.match(html, /aria-label="Select conditions"/);
-    assert.match(html, /health-picker-step"[^>]*data-size="long"/);
+    assert.match(html, /aria-label="Conditions"/);
+    assert.match(html, /health-picker-step"[^>]*data-size="long" data-sizing="hold" style="--hold-rows:\d+"/);
   }
   assert.deepEqual(sizes, ['long', 'long']);
 });

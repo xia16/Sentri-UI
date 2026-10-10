@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-10T09:11:03.504Z",
- "commit": "406ade8",
+ "generated": "2026-10-10T09:36:54.480Z",
+ "commit": "88fcae7",
  "platforms": [
   {
    "id": "mobile",
@@ -8091,7 +8091,7 @@
          "notes": {
           "purpose": "Change the daily feed of one or many pigs (a pen, ticked pigs, ticked pens) in one move.",
           "states": [
-           "Details panel open or collapsed (toggle \"Adjustment\")."
+           "Adjustment held on the bottom edge above the footer (the pig list scrolls under it); its heading folds it away."
           ],
           "elements": [
            {
@@ -9391,12 +9391,12 @@
           "elements": [
            {
             "name": "Selection list",
-            "shows": "Pens group and Pigs group, each row with Remove",
+            "shows": "The ticked pens and pigs as ticked rows; untick one to take it out",
             "states": [
              {
               "state": "Pens ticked",
               "when": "At least one pen selected",
-              "shows": "A Pens group above Pigs"
+              "shows": "The pen row (\"C1 · 3 pigs\") carries its pigs, which are not listed again; Pens and Pigs headings only when both are ticked"
              },
              {
               "state": "Last pig removed",
@@ -9411,7 +9411,7 @@
           "controls": [],
           "copy": [
            "Selected (raw)",
-           "Remove (raw)"
+           "Clear (raw)"
           ],
           "issues": [
            "Stage shown as \"Gestating\" while the list shows \"Gestation\"."
@@ -11496,7 +11496,7 @@
              {
               "state": "Valid change",
               "when": "Value above 0",
-              "shows": "\"180 → 190 kg\", then \"Ready to save\""
+              "shows": "\"180 → 190 kg\" in the row; no state text once it will change"
              }
             ],
             "logic": "Dead sows are excluded; unticked rows stay unchanged.",
@@ -12099,7 +12099,7 @@
         [
          "health-record.treatment",
          "health-record.medicine-picker",
-         "tap Select medicine"
+         "tap Medicine"
         ],
         [
          "health-record.medicine-picker",
@@ -12496,27 +12496,27 @@
          "notes": {
           "purpose": "Add one or more diseases or symptoms to one pig or many in one move.",
           "states": [
-           "Details collapsed or open (toggle)."
+           "Details held on the bottom edge above the footer; with many pigs the list scrolls under them. The Details heading folds them away."
           ],
           "elements": [
            {
             "name": "Pig row",
-            "shows": "Add Fever · No action needed",
+            "shows": "Only the exceptions: Already recorded · unchanged, Excluded, Not eligible",
             "states": [
              {
               "state": "Will change",
               "when": "Condition not yet on the pig",
-              "shows": "\"Add Fever · No action needed\""
+              "shows": "Nothing: the commit carries the count"
              },
              {
               "state": "Already recorded",
               "when": "She already has all chosen conditions",
-              "shows": "\"Already recorded - unchanged\""
+              "shows": "\"Already recorded · unchanged\""
              },
              {
               "state": "Nothing chosen",
               "when": "No conditions chosen",
-              "shows": "\"Choose conditions\""
+              "shows": "Nothing"
              },
              {
               "state": "Excluded",
@@ -12542,14 +12542,14 @@
            {
             "name": "Save",
             "shows": "Save · N pigs",
-            "rule": "Disabled until a condition is chosen and at least one row would change; N = pigs that would change. Writes one finding per pig and name, day 1, recorded 12 Sep 2026 by G. Hansen, plus one \"Health recorded\" log entry. A condition the pig already has is skipped and keeps its original start date. Returns to the walk list.",
+            "rule": "Waits until a condition is chosen and at least one row would change; N = pigs that would change (the ticked pigs while it waits). No line is drawn above it: a tap while it waits marks Conditions \"Required\" and scrolls to it. Writes one finding per pig and name, day 1, recorded 12 Sep 2026 by G. Hansen, plus one \"Health recorded\" log entry. A condition the pig already has is skipped and keeps its original start date. Returns to the walk list.",
             "at": "Save"
            }
           ],
           "controls": [],
           "copy": [
            "Record health (raw)",
-           "Choose conditions (raw)",
+           "Required (raw)",
            "Care (raw)",
            "Add note (raw)",
            "No action needed (raw)"
@@ -12558,8 +12558,7 @@
            "One searchable disease/symptom catalogue for one or many pigs."
           ],
           "issues": [
-           "Default Care \"No action needed\" makes the quickest path (choose Fever, Save) record a fever as a non-alert.",
-           "The Save label reads \"Save · 0 pigs\" while disabled.",
+           "Default Care \"No action needed\" makes the quickest path (choose Fever, Save) record a fever as a non-alert (filed To confirm).",
            "The catalogue needs three levels (tab, door, item) for a gloved worker."
           ]
          }
@@ -12582,22 +12581,22 @@
           "elements": [
            {
             "name": "Catalogue",
-            "shows": "Diseases and Symptoms tabs, category doors, items",
+            "shows": "Conditions › Diseases or Symptoms › category › items, one level at a time",
             "states": [
              {
-              "state": "Diseases tab",
-              "when": "Tab selected",
-              "shows": "9 categories: Respiratory, Gastrointestinal, Reproductive and neonatal, Skin and external, Nervous system, Systemic, Musculoskeletal, Nutritional and metabolic, Other; each with disease count and \"N selected\""
+              "state": "Conditions (root)",
+              "when": "Opened",
+              "shows": "Diseases and Symptoms, each with \"N selected\" once something below is ticked"
              },
              {
-              "state": "Symptoms tab (default)",
-              "when": "Tab selected",
-              "shows": "General appearance, Limbs, Tail, Head and neck, Eyes, Ears, Nose, Mouth, Skin, Body system (one page with Urinary, Respiratory, Digestive, Reproductive)"
+              "state": "A level",
+              "when": "A branch tapped",
+              "shows": "\"‹ <parent>\" in the head and the level as the title (‹ Conditions / Diseases; ‹ Diseases / Respiratory diseases); no breadcrumb"
              },
              {
               "state": "Search",
               "when": "Text typed",
-              "shows": "Results grouped by category; matches name, category, section and aliases (PRRS, pig flu); \"Add “name”\" when nothing matches exactly"
+              "shows": "Searches the level you are on (\"Search in Respiratory diseases\"), the whole catalogue at Conditions; matches name and aliases (PRRS, pig flu); Clear empties it; \"Add “name”\" when nothing matches exactly"
              },
              {
               "state": "Custom item",
@@ -12605,22 +12604,23 @@
               "shows": "Asks for a category; removable with an x; kept for the session"
              }
             ],
-            "logic": "Item row shows how many selected pigs already carry it (\"Already on 1 selected\").",
+            "logic": "Item row shows how many selected pigs already carry it (\"Already on 1 selected\"). The drawer keeps one height from open to close (its tallest level, up to the cap).",
             "at": "General appearance"
            },
            {
             "name": "Done",
-            "shows": "Done · N selected",
-            "rule": "Done keeps the choice; Back discards changes made in the picker.",
+            "shows": "Done · N",
+            "rule": "Done · N applies the ticks to the Conditions field and closes. Back (or the scrim) closes without applying; the ticks stay as a draft and show again on the next open. Done waits while nothing is ticked and nothing was applied.",
             "at": "Done"
            }
           ],
           "controls": [],
           "copy": [
+           "Conditions (raw)",
            "Diseases (raw)",
            "Symptoms (raw)",
-           "Search symptoms (raw)",
-           "Done (raw)"
+           "Search in {level} (raw)",
+           "Done · N (raw)"
           ],
           "edge": [
            "The disease and symptom hierarchy was translated from the Figma file."
@@ -12833,29 +12833,39 @@
              {
               "state": "Incomplete",
               "when": "Medicine, method, unit or dose missing",
-              "shows": "\"Complete treatment details\""
+              "shows": "No text on the rows; a tap on the waiting Save marks the missing fields \"Required\""
              },
              {
               "state": "Ready",
               "when": "All set and dose above 0",
-              "shows": "\"Antibiotic A · 2 mL\""
+              "shows": "No text"
              }
             ],
             "logic": "Method: Injection, Oral, Topical, In feed, In water. Condition chip links only to pigs carrying that condition.",
             "at": "Dose"
            },
            {
+            "name": "Brand",
+            "shows": "Brand drawer: the brands, then Add a brand ›",
+            "logic": "A single choice: a tap sets the brand and closes. Add a brand is a level of the drawer (‹ Brand, a Brand name field, Add brand). Clear in the head removes a set brand. Back leaves the drawer.",
+            "at": "Brand"
+           },
+           {
             "name": "Save",
             "shows": "Save · N pigs / Save",
-            "rule": "Disabled until medicine, method, unit and a dose above 0 are set. One treatment record per included pig; logs \"Treatment recorded\" or \"Vaccination recorded\"; a task completes on Save. Dead sows are excluded. Returns to the list, the finding, or the pig record.",
+            "rule": "Waits until medicine, method, unit and a dose above 0 are set (N = the ticked pigs while it waits). No line above it: a tap while it waits marks the empty fields \"Required\" and scrolls to the first. One treatment record per included pig; logs \"Treatment recorded\" or \"Vaccination recorded\"; a task completes on Save. Dead sows are excluded. Returns to the list, the finding, or the pig record.",
             "at": "Save"
            }
           ],
           "controls": [],
           "copy": [
            "Record treatment (raw)",
-           "Select medicine (raw)",
+           "Medicine (raw)",
            "Method (raw)",
+           "Brand (raw)",
+           "Add a brand (raw)",
+           "Brand name (raw)",
+           "Add brand (raw)",
            "Set dose for all (raw)",
            "Record vaccination (raw)"
           ],
@@ -12895,12 +12905,12 @@
              {
               "state": "Browse",
               "when": "No search text",
-              "shows": "Category doors with counts, then medicines (name and form)"
+              "shows": "Medicines: category doors; a category: \"‹ Medicines\" in the head, its medicines (name and form)"
              },
              {
               "state": "Search",
               "when": "Text typed",
-              "shows": "Matches name, category and detail; the category is added in front of the row"
+              "shows": "Searches the level you are on (\"Search in Antibiotics\"), every medicine at Medicines; matches name and detail"
              },
              {
               "state": "Vaccination task",
@@ -12913,14 +12923,14 @@
               "shows": "\"No medicines found. Try another name or category.\""
              }
             ],
-            "logic": "A changed medicine clears the brand. The catalogue is a sample, not a treatment recommendation.",
+            "logic": "A tap on a medicine commits it and closes; the field shows the medicine only (\"Antibiotic A\"), not its path. A changed medicine clears the brand. One drawer height across levels. The catalogue is a sample, not a treatment recommendation.",
             "at": "Antibiotics"
            }
           ],
           "controls": [],
           "copy": [
-           "Select medicine (raw)",
-           "Search medicines (raw)"
+           "Medicines (raw)",
+           "Search in {level} (raw)"
           ],
           "issues": [
            "Sample names (\"Antibiotic A\", \"Sample brand A\") are placeholders."
@@ -22631,6 +22641,41 @@
      "kind": "unclear",
      "title": "Placeholder screens name no owner or removal plan",
      "detail": "Thirteen placeholder screens render the plain walk, with no note saying who removes or draws them. A developer may build them from the notes."
+    },
+    {
+     "severity": "high",
+     "source": "review r1 (multi-choice)",
+     "id": "multi-choice-1",
+     "target": {
+      "kind": "screen",
+      "id": "health-record.record-health"
+     },
+     "kind": "decision",
+     "title": "Must Care be chosen when health is recorded?",
+     "detail": "Record health defaults Care to \"No action needed\", so the quickest path (choose Fever, Save) records a fever that needs no attention. Care is the only editable condition state and decides whether a condition is an alert. This is a product rule on what is recorded, not a picker detail, so it is left as it is.",
+     "options": [
+      "Keep the default \"No action needed\"",
+      "No default: Care is required and Save waits for it",
+      "Default by condition (a disease defaults to Monitor)"
+     ],
+     "recommendation": "Owner to rule. If Care becomes required, it joins Conditions in the Required marking on a waiting Save."
+    },
+    {
+     "severity": "medium",
+     "source": "review r1 (multi-choice)",
+     "id": "multi-choice-2",
+     "target": {
+      "kind": "feature",
+      "id": "health-record"
+     },
+     "kind": "decision",
+     "title": "Short outcome lists open a picker sheet where the record-sheet law asks for an inline Choice",
+     "detail": "Care (4 outcomes), Outcome on Resolve (2), Body condition (2) and Dose unit (3: mL, mg, g) each open a single-choice sheet. The record-sheet law says 2 to 4 outcomes are a Choice (radio rows or inline), and a fifth makes it a picker; on iOS and Android these are a segmented control or radio rows, not a sheet. Left as approved in this pass.",
+     "options": [
+      "Keep the sheets",
+      "Inline radio rows for Care, Outcome and Body condition; a segmented control for Dose unit"
+     ],
+     "recommendation": "Inline Choice, as the law says; it removes a drawer hop for a gloved hand."
     },
     {
      "severity": "medium",
