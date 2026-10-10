@@ -13,6 +13,19 @@ The driver fills in:
 
 Check out CANDIDATE and BASE in two worktrees. Serve each with `node scripts/serve-ux.cjs <port>`. Every result you record names the commit it ran on. Evidence from any other commit doesn't count, including the builder's own runs.
 
+**`node scripts/gate.mjs` does the mechanical part for you.** The driver runs it from a main checkout:
+- It refuses a candidate that doesn't contain `origin/main`.
+- It makes both worktrees and runs §1 on the candidate.
+- It shoots every screen on both sides at 390 and 360, in EN and ZH; a screen changed if any of those differs. It escalates the class to **shared** when the bundle, the tokens, a file that pages of two or more features load (e.g. `ux/system/astra-surfaces.js`), or another feature's screens change.
+- It fails a candidate that removes behaviour coverage (`scripts/run-scenarios.mjs`, a feature's `scenarios.json`, or an outcome leaf). That is its own workflow PR.
+- It writes `mechanical.json`, plus `pairs/<screen>/<lang>-<width>.png` (base | candidate) for every changed, new or removed screen; a missing side reads "not on this side". Each pair in `mechanical.json` has a `kind` (changed, new, gone) and a `pct` (0 means pixel-identical).
+
+Judge from those pairs and write `verdict.json` beside them. `node scripts/gate.mjs --verdict <out>` refuses a verdict that is about another commit, leaves a pair unjudged, or passes with a worse or failed pair. It also fails when the PR head or `origin/main` has moved since the gate ran, or can't be read. Merge only on `GATE PASS`, pinned to the gated commit: `gh pr merge <n> --squash --match-head-commit <candidate sha>`.
+
+`--verdict` also posts the result as the `sentri/gate` commit status on GitHub. A branch-protection rule on main that requires it makes GitHub refuse an ungated merge however it is attempted. The local merge guard (`scripts/merge-guard.mjs`) only stops our own sessions early and says why; it is not the boundary.
+
+A shared change that touches too many screens for one judge is split by feature. Each judge writes `verdict-<feature>.json`, and `--verdict` merges them: one failing part fails the change. `check-states` runs on both sides for every class. A problem main already has is reported as main's, and only a new one fails.
+
 ## 1. Mechanical checks (run first; any failure ends the gate)
 
 On CANDIDATE:
@@ -20,7 +33,7 @@ On CANDIDATE:
 2. `npm run check`. It also runs the farm legibility check in report mode. It must report the atlas OK. `npm run atlas` must produce no diff in `atlas/atlas.json` beyond its `generated` and `commit` stamps.
 3. **Farm legibility, blocking for changed screens.** Start BASE's server, then `node scripts/check-legibility.mjs --changed <the SCREENS ids> --compare <BASE url>` on CANDIDATE. It renders each screen bare at 390×844. While `docs/design-workflow/README.md` says `Legibility gate: no-regression`, a screen in scope fails only if it has more violations than at BASE in any category (text under 13px, contrast under 4.5:1 or 7:1 for 16px+ primary values, targets under 48×48; an invisible hit area counts), or a violation on an element that had none. When that line says `strict`, a screen in scope fails on any violation and `--compare` is not needed. Screens outside `--changed` are reported, not blocking. Any failure ends the gate. The 16px body floor and "ink, not pale grey" are judged by eye in step 3. Crowding is fixed by tightening copy and layout, never by shrinking type. Law: `ux/design-system/README.md`.
 4. `git grep -n '^<<<<<<<\|^>>>>>>>'` finds nothing.
-5. For presentation, component and shared classes: `node scripts/check-states.mjs`. It renders every design-system state the way the atlas draws it and writes `review/state-check.json`; its known-bad fixtures (`scripts/check-states.fixtures/`) are the rejected examples it already catches. If the component has its own check script (e.g. `node scripts/check-button-components.cjs`), run that too, with the server running. Set `SENTRI_PREVIEW_ORIGIN` and `SENTRI_PLAYWRIGHT`. No console errors, no target under 48px, no horizontal overflow.
+5. For every class: `node scripts/check-states.mjs`. It renders every design-system state the way the atlas draws it and writes `review/state-check.json`; its known-bad fixtures (`scripts/check-states.fixtures/`) are the rejected examples it already catches. If the component has its own check script (e.g. `node scripts/check-button-components.cjs`), run that too, with the server running. Set `SENTRI_PREVIEW_ORIGIN` and `SENTRI_PLAYWRIGHT`. No console errors, no target under 48px, no horizontal overflow.
 6. For behaviour (and presentation that touches a walked screen): `node scripts/run-scenarios.mjs` for each affected feature. Every leaf the change touches passes, in EN and ZH at 360 and 390. A blocked leaf stays blocked; it never becomes a pass.
 7. For copy: every changed string meets the copy budget, uses a verb from `ux/laws/strings.json` with its one meaning, and renders in EN and ZH without clipping.
 
@@ -38,6 +51,8 @@ Presentation changes rerun the walks they touch. A presentation fix once hid the
 
 ## 3. Cold look (before reading anything about the change)
 
+**Judge blind.** For §3 and §4 open only the `pairs/` images. Don't open `mechanical.json`, the PR or the builder's notes until §5: check output anchors judgement. Write down every issue you see before you write any verdict. A listed issue is dismissed only by a measurement, never by argument. Finding nothing is a valid result; there is no quota.
+
 Screenshot each screen on BASE and on CANDIDATE in the same state, at 390×844 and 360×800, in EN and ZH. Look at every pair. List every visible defect on the CANDIDATE side:
 - misalignment, or values off their track;
 - uneven spacing, or rows of uneven height;
@@ -52,13 +67,14 @@ Screenshot each screen on BASE and on CANDIDATE in the same state, at 390×844 a
 - decoration added to satisfy a rule (giant handles, underlines, glyphs);
 - a reason line above a disabled button;
 - an ✕ in a drawer;
-- designed hover or focus rings.
+- designed hover or focus rings;
+- web conventions in a phone app: hover rows, breadcrumbs, dropdown selects, data tables, underlined text links, tooltips, visible scrollbars, pagination, centred web modals. Native patterns (sheets, action sheets, segmented controls, switches, wheel pickers, the system keyboard, a navigation bar) are the norm wherever they fit.
 
 ## 4. Before / after (this decides it)
 
-For each pair, judge **better / same / worse** and give the one reason that decides it. The bar is the screens the owner approved (Farrowing and Inspection): calm, aligned, nothing extra, one surface, ink not colour. A change that meets a rule but looks worse is **worse**. Judge a change that departs from the current pattern by the farmer, not by familiarity: being new never makes it worse, and matching the system never makes it better.
+For each pair, judge **better / same / worse** and give the one reason that decides it, naming its dimension: hierarchy, alignment, legibility, touch, state or native fit. Your verdict follows from your issue list, not the other way round. The bar is the screens the owner approved (Farrowing and Inspection): calm, aligned, nothing extra, one surface, ink not colour. A change that meets a rule but looks worse is **worse**. Judge a change that departs from the current pattern by the farmer, not by familiarity: being new never makes it worse, and matching the system never makes it better.
 
-- **Normal**: it passes only if no pair is worse, at least one is better, and the cold look found no defect.
+- **Normal**: it passes only if no pair is worse, at least one changed pair is better, and the cold look found no defect. A pair with one side (a new screen, or a removed one) is judged **pass** or **fail**, and any fail fails the change. When no screen changed or was added, only a change declared behaviour (or shared) can pass, on a walk where every entry is ok: a behaviour fix may leave every first frame alone.
 - **Refactor**: it passes only if every pair is **same**, pixel-identical where the change claims identity, and the cold look found no defect.
 - **Shared component**: no pair on any feature using it may be worse. Approving one feature doesn't approve the variant for the others.
 - **Frozen screen**: any change to a frozen screen fails unless the owner reopened it.
@@ -94,8 +110,10 @@ Write `OUT/verdict.json`:
 { "pass": false, "candidate": "<hash>", "base": "<hash>", "class": "", "mode": "",
   "mechanical": [{ "check": "npm test", "result": "pass|fail", "detail": "" }],
   "walk": [{ "screen": "", "ok": true, "issue": "" }],
-  "pairs": [{ "screen": "", "lang": "en|zh", "width": 390, "verdict": "better|same|worse", "why": "" }],
+  "pairs": [{ "screen": "", "lang": "en|zh", "width": 390, "verdict": "better|same|worse (both sides) | pass|fail (one side)", "why": "" }],
   "defects": [{ "screen": "", "what": "", "fix": "" }],
+  "gone": [{ "screen": "", "why": "" }],
   "rejected": ["R#"], "contradicted": [""] }
 ```
+`pairs` judges every pair in `mechanical.json`, not only EN 390; a pixel-identical pair is **same**. `gone` accounts for every screen `mechanical.json` lists as removed from the atlas: where its job went, or why it no longer exists.
 Report in 150 words or fewer: pass or fail, the commit, failed checks, the pairs table, and the defects. Don't suggest redesigns; name the smallest fix.

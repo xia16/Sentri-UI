@@ -4,6 +4,11 @@ Use the polish loop for an **in-design feature whose product scope is settled**.
 
 The driver fills in **FEATURE** (`features/<id>/`), **BASELINE** (the commit the loop starts from) and **ROUND CAP** (default 5).
 
+Run it with the `/polish-loop <feature>` skill (`.claude/skills/polish-loop/`). Its tools:
+- `node scripts/polish-loop.mjs`: the round ledger, the grade check, the stop conditions and the review packet;
+- `node scripts/gate.mjs`: the gate on the exact merge candidate;
+- [grade.md](grade.md): the grader's brief.
+
 ## 0. Before round 1
 
 - **Pin the baselines.** Record the BASELINE commit. Screenshot every screen state at 390 and 360, in EN and ZH. The approved version of each screen stays visible in the atlas until the owner promotes the new one.
@@ -66,6 +71,7 @@ Score each dimension **0, 1 or 2**, with evidence (a screenshot and what is wron
 - **Legibility and copy**: copy budget, verbs, EN/ZH fit, real data wraps.
 - **Touch and reach**: 48px targets; one-handed reach; no gesture-only action.
 - **State clarity**: draft, saved, blocked and done are told apart; green only for done.
+- **Native fit**: it looks and behaves like an iOS or Android app; native patterns where they fit, no web conventions.
 
 **Hard failures** fail the screen whatever the score: a wrong fact, a lost draft, a dead end, an unreachable control, a broken ruling, or any rejected example in `gate.md`.
 
