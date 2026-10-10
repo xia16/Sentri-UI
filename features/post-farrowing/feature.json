@@ -8,11 +8,16 @@
   "duplicates": "",
   "groups": [
     [
-      "Old UI",
+      "Earlier design (pre-Astra)",
       [
         "post-farrowing.list",
-        "post-farrowing.overview",
         "post-farrowing.check",
+        "post-farrowing.overview"
+      ]
+    ],
+    [
+      "Old UI only (Figma, not redesigned)",
+      [
         "post-farrowing.end",
         "post-farrowing.ended"
       ]
@@ -23,33 +28,155 @@
       "id": "post-farrowing.list",
       "name": "Pig list tab",
       "zh": "母猪产后检查猪只列表",
-      "status": "placeholder",
+      "status": "earlier",
+      "url": "/ux/archive/screens.html?sec=01&slide=6",
       "figma": "https://www.figma.com/design/psrxDa9LRWLdTL9XMZmWdc?node-id=8006-14820",
       "notes": {
-        "purpose": "Sows to check by pen, with filter.",
-        "issues": []
+        "purpose": "Sows to check after farrowing, by pen; lens To check / Checked / All. A rail task: tap the row.",
+        "elements": [
+          {
+            "name": "Task row",
+            "shows": "one sow (or litter): tag, one fact line, one memory line, rail",
+            "states": [
+              {
+                "state": "To check",
+                "when": "farrowed N days ago, due",
+                "shows": "Farrowed · 2 days ago, rail CHECK"
+              },
+              {
+                "state": "Upcoming",
+                "when": "not yet due (dimmed)",
+                "shows": "rail IN 3D"
+              },
+              {
+                "state": "Recheck",
+                "when": "a flagged item brings her back (research)",
+                "shows": "Recheck · due today with one chip naming the item"
+              },
+              {
+                "state": "Checked",
+                "when": "assessment saved",
+                "shows": "Checked · ok, \"BCS 3 · milk ok · 09:00 G.H\", edit pencil"
+              }
+            ],
+            "logic": "Line 1 is words (state + when), line 2 is tokens (history, stamps). A chip appears only for an escalated measurement or a flagged observation; stamps appear on done rows and on rows that descend from a record. Everything on the row is derived; the worker types nothing here.",
+            "source": "ux/model/unified-task-list.md; ux/archive/screens.html §01; ux/research/tasks/BRIEF.md (row law)"
+          },
+          {
+            "name": "Lens row",
+            "shows": "To check / Checked / All",
+            "logic": "Filter extras (research): farrowed 1d to 5d or more, abnormal item, cull recommended.",
+            "source": "ux/model/unified-task-list.md; ux/archive/screens.html §01"
+          },
+          {
+            "name": "Unit KPI and Task overview",
+            "shows": "90% pass, target 90 or more; Task overview \"100/200 checked\", day n of 3",
+            "logic": "The pass definition is not documented anywhere (research Q2).",
+            "source": "ux/model/unified-task-list.md; ux/archive/screens.html §01"
+          }
+        ],
+        "issues": [
+          "Pre-Astra look: rows, header and dock predate the Astra task skeleton."
+        ]
       }
     },
     {
       "id": "post-farrowing.overview",
-      "name": "Task overview",
-      "zh": "任务概览 / Grid",
-      "status": "placeholder",
+      "name": "Task detail",
+      "zh": "任务详情",
+      "status": "earlier",
+      "url": "/ux/archive/screens.html?sec=03&slide=6",
       "figma": "https://www.figma.com/design/psrxDa9LRWLdTL9XMZmWdc?node-id=8006-14820",
       "notes": {
-        "purpose": "Whole-task progress and the pen grid.",
-        "issues": []
+        "purpose": "The sheet behind the Task overview cell for postpartum check: whole-task progress, KPI, configuration, SOP link and, where the task has one, End task. What failed the \"does this change what a hand does at the pen right now?\" test lives here, one tap from the room.",
+        "elements": [
+          {
+            "name": "End task",
+            "shows": "Red button at the bottom of the sheet.",
+            "rule": "Per the research: End task is disabled with a stated reason while the batch's farrowing task is open. On an early end, the confirm states that unchecked sows keep following the batch; what that means for compliance is open (research Q5).",
+            "source": "ux/archive/screens.html section 03"
+          },
+          {
+            "name": "Configuration",
+            "shows": "Window.",
+            "logic": "Starts day 1 after farrowing, window 3 days.",
+            "source": "ux/research/tasks/postpartum.html"
+          },
+          {
+            "name": "Unit KPI",
+            "shows": "Pass rate against its target.",
+            "logic": "Formula not documented (research Q2).",
+            "source": "ux/research/tasks/postpartum.html"
+          }
+        ],
+        "issues": [
+          "Pre-Astra look: header, KPI cells and sheet styling predate the Astra task skeleton."
+        ]
       }
     },
     {
       "id": "post-farrowing.check",
       "name": "Sow check form",
-      "zh": "母猪产后检查-初始态",
-      "status": "placeholder",
+      "zh": "母猪产后检查",
+      "status": "earlier",
+      "url": "/ux/archive/screens.html?sec=04b&slide=5",
       "figma": "https://www.figma.com/design/psrxDa9LRWLdTL9XMZmWdc?node-id=8006-14820",
       "notes": {
-        "purpose": "Record the sow's post-farrowing check (the initial state of the form).",
-        "issues": []
+        "purpose": "The assessment for one sow, opened by tapping the row. The earlier deck shows a compact form and footnotes the rest.",
+        "elements": [
+          {
+            "name": "Assessment fields",
+            "shows": "the full set of answers the check records",
+            "states": [
+              {
+                "state": "BCS",
+                "when": "1 to 5 scale",
+                "shows": "segmented, with thin, standard, obese anchors"
+              },
+              {
+                "state": "Mastitis",
+                "when": "none, mild, moderate, severe",
+                "shows": "four values; \"none\" is a recorded answer"
+              },
+              {
+                "state": "Milk",
+                "when": "poor, medium, good",
+                "shows": "three grades"
+              },
+              {
+                "state": "Discharge",
+                "when": "normal, abnormal",
+                "shows": "binary"
+              },
+              {
+                "state": "Feeding",
+                "when": "normal, reduced, refusing",
+                "shows": "three states"
+              },
+              {
+                "state": "Mobility",
+                "when": "normal, lame, will not move",
+                "shows": "three states"
+              },
+              {
+                "state": "Backfat",
+                "when": "thin, moderate, thick",
+                "shows": "three states"
+              },
+              {
+                "state": "Cull",
+                "when": "no or recommend",
+                "shows": "a reason field appears only when recommend"
+              }
+            ],
+            "logic": "Which results schedule the recheck, and the interval, are not documented (research Q1). Whether all nine answers are required, or a partial save is legal, is open (research Q4).",
+            "rule": "Save commits the check; there is no round submit. Any abnormal item creates a symptom record and a recheck row; the sheet confirms in one line.",
+            "source": "ux/research/tasks/postpartum.html"
+          }
+        ],
+        "issues": [
+          "The compact sheet in the earlier deck shows only BCS, mastitis, feeding and cull; the research specifies all nine fields."
+        ]
       }
     },
     {

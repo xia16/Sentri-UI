@@ -33,7 +33,18 @@ for (const f of features) for (const s of f.screens || []) {
   owner[s.id] = f.id;
 }
 
-const STATUSES = ['placeholder', 'in-design', 'agent-checked', 'approved'];
+const STATUSES = ['placeholder', 'in-design', 'agent-checked', 'approved', 'earlier'];
+// an alias screen renders its target: it takes the target's page (url, preset, steps, notes) and shows as the same screen
+const byId = {};
+for (const f of features) for (const s of f.screens || []) byId[s.id] = s;
+for (const f of features) for (const s of f.screens || []) {
+  if (!s.aliasOf) continue;
+  const t = byId[s.aliasOf];
+  if (!t) { problems.push(`features/${f.id}: ${s.id} is an alias of ${s.aliasOf}, which no feature has`); continue; }
+  if (t.aliasOf) { problems.push(`features/${f.id}: ${s.id} is an alias of ${s.aliasOf}, which is itself an alias`); continue; }
+  s.status = t.status;   // the same screen has the same status
+  for (const k of ['url', 'preset', 'steps', 'notes']) if (s[k] === undefined && t[k] !== undefined) s[k] = t[k];
+}
 for (const f of features) {
   const own = new Set((f.screens || []).map((s) => s.id));
   const where = `features/${f.id}`;
@@ -74,8 +85,12 @@ for (const f of features) {
 }
 
 const statusOf = (f) => {
-  const st = (f.screens || []).map((s) => s.status);
+  let st = (f.screens || []).map((s) => s.status);
   if (!st.length || st.every((x) => x === 'placeholder')) return 'placeholder';
+  // superseded designs do not hold a feature back; a feature with only those is itself earlier
+  if (st.every((x) => x === 'earlier')) return 'earlier';
+  st = st.filter((x) => x !== 'earlier');
+  if (st.every((x) => x === 'placeholder')) return 'placeholder'; // earlier designs plus placeholders: nothing current yet
   if (st.every((x) => x === 'approved')) return 'frozen';
   if (st.every((x) => x === 'approved' || x === 'agent-checked')) return 'agent-checked';
   return 'in-design';
@@ -116,7 +131,7 @@ for (const p of sections.platforms) for (const s of p.sections) for (const pt of
 const backlog = [];
 const KINDS = ['decision', 'design', 'broken', 'unclear'];
 const reviewDir = join(root, 'review');
-if (existsSync(reviewDir)) for (const fn of readdirSync(reviewDir).filter((n) => n.endsWith('.json') && !n.startsWith('compare-'))) {
+if (existsSync(reviewDir)) for (const fn of readdirSync(reviewDir).filter((n) => n.endsWith('.json') && !['state-check.json', 'legibility.json'].includes(n) && !n.startsWith('compare-') && !n.startsWith('scenarios'))) {
   let data; try { data = JSON.parse(readFileSync(join(reviewDir, fn), 'utf8')); } catch (e) { problems.push(`review/${fn}: ${e.message}`); continue; }
   for (const it of Array.isArray(data) ? data : data.items || [data]) {
     if (!it || !it.id || !it.title || !it.target) { problems.push(`review/${fn}: an item needs id, target and title`); continue; }

@@ -8,47 +8,137 @@
   "duplicates": "built inside Inspection — see inspection / health-record",
   "groups": [
     [
-      "Old UI",
+      "Treat",
       [
-        "treat.treat",
-        "treat.target",
-        "treat.none"
+        "treat.marked-set",
+        "treat.page",
+        "treat.targets",
+        "treat.next-walk"
       ]
     ]
   ],
   "screens": [
     {
-      "id": "treat.treat",
-      "name": "Treatment form",
+      "id": "treat.marked-set",
+      "name": "The marked set · select and treat",
+      "zh": "标记集合",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-treatment&slide=1",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "Filter the walk to marked pigs, tick them all and open Treatment.",
+        "rules": [
+          "The mark made a set; the existing treat and move machinery drains it. No dedicated execution screen anywhere."
+        ]
+      }
+    },
+    {
+      "id": "treat.page",
+      "name": "Treatment page · six fields",
       "zh": "治疗",
-      "status": "placeholder",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-treatment&slide=2",
       "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
       "notes": {
-        "purpose": "Record a treatment for the selected pigs.",
-        "issues": []
+        "purpose": "The treatment form for the selection.",
+        "elements": [
+          {
+            "name": "Dose",
+            "at": "Dose",
+            "shows": "Dose and unit, per pig",
+            "logic": "The total (dose x pigs) shows only as the footnote on the commit, never as a field.",
+            "rule": "Required, with unit. One field, per pig."
+          },
+          {
+            "name": "Treating for",
+            "at": "Treating for",
+            "shows": "The conditions being treated, read back by name",
+            "rule": "Absent (not empty) when nothing is open on the selection: prophylaxis is legal."
+          }
+        ],
+        "edge": [
+          "Treating healthy pigs with no target is allowed."
+        ]
       }
     },
     {
-      "id": "treat.target",
-      "name": "Choose target",
-      "zh": "选择目标疾病 / 选择目标症状",
-      "status": "placeholder",
+      "id": "treat.targets",
+      "name": "Targets · union with fractions",
+      "zh": "选择目标",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-treatment&slide=3",
       "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
       "notes": {
-        "purpose": "Choose the disease or symptom the treatment is for.",
-        "issues": []
+        "purpose": "Choose which of the open conditions this treatment is for.",
+        "elements": [
+          {
+            "name": "Target row",
+            "shows": "A condition carried by some of the selected pigs",
+            "states": [
+              {
+                "state": "Carried by some",
+                "when": "Union of open cases across the selection",
+                "shows": "\"fever · 4 of 6\": the drug goes to all six, the fever link only to its four"
+              }
+            ],
+            "logic": "The list is the union of the selection's open conditions; the fraction says who carries it. No pig gets a case link she does not have."
+          }
+        ],
+        "edge": [
+          "Production's \"no symptom recorded\" empty-state screen is replaced by the absent-field rule."
+        ]
       }
     },
     {
-      "id": "treat.none",
-      "name": "No disease or symptom",
-      "zh": "无疾病/症状",
-      "status": "placeholder",
+      "id": "treat.next-walk",
+      "name": "Next walk · treated trail",
+      "zh": "下次巡检",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-treatment&slide=4",
       "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
       "notes": {
-        "purpose": "What shows when the pig has nothing to treat.",
-        "issues": []
+        "purpose": "The walk the day after: the trail replaces the pending dot.",
+        "elements": [
+          {
+            "name": "What prints",
+            "shows": "The walk the day after: the trail replaces the pending dot.",
+            "states": [
+              {
+                "state": "Treat in place, treated",
+                "when": "Treatment recorded",
+                "shows": "Pending dot replaced by \"treated 1d\"; each case keeps aging on its own"
+              },
+              {
+                "state": "Hospital mark",
+                "when": "Pig not yet moved",
+                "shows": "Red dot stands: discharged by the move, not by the drug; the move list still carries it"
+              }
+            ]
+          }
+        ]
       }
     }
+  ],
+  "flow": [
+    [
+      "treat.marked-set",
+      "treat.page",
+      "tick all, tap Treatment"
+    ],
+    [
+      "treat.page",
+      "treat.targets",
+      "tap Treating for"
+    ],
+    [
+      "treat.targets",
+      "treat.page",
+      "tick a target"
+    ],
+    [
+      "treat.page",
+      "treat.next-walk",
+      "tap the primary"
+    ]
   ]
 }

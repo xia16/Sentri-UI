@@ -25,9 +25,9 @@ None. Home has no lifecycle of its own; each card inherits the lifecycle of its 
 
 ## Scope
 
-In: section chooser, Overview, unit picker, unit hub, card states (due, waiting, round complete, ready, closed), Saved work drawer, task preview, end-early confirmation, closed-task receipt.
+In: section chooser, Overview, unit picker, unit hub, card states (due, waiting, round complete, ready, closed), the Saved work card (its drawer is the Data sync feature), Toolbox and Records, the unit attention states, task preview, end-early confirmation, closed-task receipt.
 
-Out: Assistant, Scan and Toolbox (other pages of the same prototype); task detail pages (their own features); Environment & devices (its own feature). Language and Log out exist in the old design and are not built here (placeholder).
+Out: Assistant (its own feature), Scan and Find a pig (Find a pig), the Saved work drawer (Data sync); task detail pages (their own features); Environment & devices (its own feature). Language and Log out exist in the old design and are not built here (placeholder).
 
 ## Decisions
 

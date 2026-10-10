@@ -31,7 +31,8 @@
         "pig-profile.actions",
         "pig-profile.production-task",
         "pig-profile.miscarriage",
-        "pig-profile.batch-membership"
+        "pig-profile.batch-membership",
+        "pig-profile.not-in-pig"
       ]
     ],
     [
@@ -81,8 +82,8 @@
     },
     {
       "section": "Pigs",
-      "label": "From the pig list (the pig list itself is a placeholder feature written elsewhere, so no source screen exists yet)",
-      "from": null,
+      "label": "From the pig list (drawn only in the old UI; a placeholder here)",
+      "from": "pig-list.list",
       "control": "A pig row in the list",
       "lands": "pig-profile.full"
     }
@@ -162,6 +163,11 @@
       "pig-profile.actions",
       "pig-profile.unavailable-actions",
       "tap Unavailable actions"
+    ],
+    [
+      "pig-profile.actions",
+      "pig-profile.not-in-pig",
+      "tap Mark not in pig (sows only)"
     ]
   ],
   "screens": [
@@ -553,7 +559,9 @@
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
       "preset": "production-batches",
-      "steps": ["[data-action=\"pig-production-batch\"]"],
+      "steps": [
+        "[data-action=\"pig-production-batch\"]"
+      ],
       "figma": "",
       "notes": {
         "purpose": "One finished or current batch of the pig.",
@@ -602,7 +610,9 @@
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
       "preset": "profile-full",
-      "steps": ["[data-action=\"pig-origin\"]"],
+      "steps": [
+        "[data-action=\"pig-origin\"]"
+      ],
       "figma": "",
       "notes": {
         "purpose": "Where the pig came from and the identities it carries.",
@@ -643,7 +653,9 @@
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
       "preset": "profile-full",
-      "steps": ["[data-action=\"pig-log\"]"],
+      "steps": [
+        "[data-action=\"pig-log\"]"
+      ],
       "figma": "",
       "notes": {
         "purpose": "Everything recorded on this pig, filterable.",
@@ -691,7 +703,9 @@
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
       "preset": "profile-full",
-      "steps": ["[data-action=\"pig-actions\"]"],
+      "steps": [
+        "[data-action=\"pig-actions\"]"
+      ],
       "figma": "",
       "notes": {
         "purpose": "Everything a worker can do to one pig, in three groups: Production, Health, General. The same sheet opens for several pigs (inspection.actions).",
@@ -805,7 +819,10 @@
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
       "preset": "profile-full",
-      "steps": ["[data-action=\"pig-actions\"]","[data-action=\"production-task\"]"],
+      "steps": [
+        "[data-action=\"pig-actions\"]",
+        "[data-action=\"production-task\"]"
+      ],
       "figma": "",
       "notes": {
         "purpose": "Finish or defer a production task from the pig.",
@@ -853,7 +870,10 @@
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
       "preset": "profile-full",
-      "steps": ["[data-action=\"pig-actions\"]","[data-action=\"miscarriage\"]"],
+      "steps": [
+        "[data-action=\"pig-actions\"]",
+        "[data-action=\"miscarriage\"]"
+      ],
       "figma": "",
       "notes": {
         "purpose": "Record a pregnancy loss as a production outcome.",
@@ -885,7 +905,10 @@
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
       "preset": "profile-full",
-      "steps": ["[data-action=\"pig-actions\"]","[data-action=\"batch-membership\"]"],
+      "steps": [
+        "[data-action=\"pig-actions\"]",
+        "[data-action=\"batch-membership\"]"
+      ],
       "figma": "",
       "notes": {
         "purpose": "Put the pig into a batch, move her to another, or remove her.",
@@ -931,7 +954,10 @@
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
       "preset": "profile-full",
-      "steps": ["[data-action=\"pig-actions\"]","[data-action=\"measurements-menu\"]"],
+      "steps": [
+        "[data-action=\"pig-actions\"]",
+        "[data-action=\"measurements-menu\"]"
+      ],
       "figma": "",
       "notes": {
         "purpose": "Pick which reading to record.",
@@ -971,7 +997,11 @@
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
       "preset": "profile-full",
-      "steps": ["[data-action=\"pig-actions\"]","[data-action=\"measurements-menu\"]","[data-action=\"weight\"]"],
+      "steps": [
+        "[data-action=\"pig-actions\"]",
+        "[data-action=\"measurements-menu\"]",
+        "[data-action=\"weight\"]"
+      ],
       "figma": "",
       "notes": {
         "purpose": "Enter one reading for one pig, or one per pig for several.",
@@ -1044,7 +1074,11 @@
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
       "preset": "profile-full",
-      "steps": ["[data-action=\"pig-actions\"]","[data-action=\"measurements-menu\"]","[data-action=\"body\"]"],
+      "steps": [
+        "[data-action=\"pig-actions\"]",
+        "[data-action=\"measurements-menu\"]",
+        "[data-action=\"body\"]"
+      ],
       "figma": "",
       "notes": {
         "purpose": "Record a pig as Thin or Over-conditioned.",
@@ -1089,7 +1123,10 @@
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
       "preset": "profile-full",
-      "steps": ["[data-action=\"pig-actions\"]","[data-action=\"note\"]"],
+      "steps": [
+        "[data-action=\"pig-actions\"]",
+        "[data-action=\"note\"]"
+      ],
       "figma": "",
       "notes": {
         "purpose": "Leave a note on a pig (or the same note on several).",
@@ -1117,7 +1154,11 @@
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
       "preset": "walk",
-      "steps": ["[aria-label=\"Select pig 000254\"]","[data-action=\"actions\"]","[data-action=\"unavailable-actions\"]"],
+      "steps": [
+        "[aria-label=\"Select pig 000254\"]",
+        "[data-action=\"actions\"]",
+        "[data-action=\"unavailable-actions\"]"
+      ],
       "figma": "",
       "notes": {
         "purpose": "Show every blocked action with its reason.",
@@ -1169,6 +1210,30 @@
           "The list sits one tap behind Actions and usually holds one or two rows; the reason could sit on the disabled row itself."
         ]
       }
+    },
+    {
+      "id": "pig-profile.not-in-pig",
+      "name": "Mark not in pig",
+      "zh": "标记未孕",
+      "status": "in-design",
+      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+      "figma": "",
+      "notes": {
+        "purpose": "A sow with no litter is marked not in pig: choose the evidence and save. Opened from a Farrowing sow's Actions (the Actions sheet is inspection's, embedded in Farrowing).",
+        "rules": [
+          "Available only before a litter is recorded and while no production outcome is recorded.",
+          "The sow returns to rebreed watch."
+        ],
+        "issues": [
+          "Changes batch and stage with no confirmation or undo (see the backlog item on pig-profile.production-task)."
+        ]
+      },
+      "preset": "room",
+      "steps": [
+        "[data-action=\"room-sow\"][data-value=\"000392\"]",
+        "More actions",
+        "Mark not in pig"
+      ]
     }
   ]
 }

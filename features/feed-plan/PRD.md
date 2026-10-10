@@ -24,7 +24,7 @@ No anchor. A pig's feed is always in one of four states (follow the curve, adjus
 
 ## Scope
 
-In: Pen feeding (reading), ad-lib pen, the several-pens entry, the Adjust feed editor and its end date and note, the pig's feed plan with the base curve, and how a pen-wide increase, decrease or hold reads on the walk list.
+In: Pen feeding (reading), ad-lib pen, the several-pens entry, the Adjust feed editor and its end date and note, the pig's feed plan with the base curve, and how a pen-wide increase, decrease or hold reads on the walk list, and switching a pen's (or a batch's pens') formula on the day it is due (drawn in the pen workflow deck, not in the Astra prototype).
 
 Out: the pen header on the walk (inspection), the Feeding block on the pig record (pig-profile), body-condition findings that used to link to feed (health-record). Feed inventory, purchase, supplier and formula authoring belong to management screens.
 

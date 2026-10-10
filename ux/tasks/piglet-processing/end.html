@@ -799,6 +799,8 @@
     // `end-blocked` (stateName), so coming back from the page that keeps a draft can never plant the design's two (R3-7).
     if (S.drafts && TASK) seedDrafts();
     render();
+    // Atlas only: the phone is drawn after PP.ready, so the bare-screen script loads once it exists (it does nothing without ?screen=).
+    if (qs.get('screen')) { var ab = document.createElement('script'); ab.src = '../../system/atlas-bare.js'; document.head.appendChild(ab); }
   });
   // The one registry exception: when the registry itself failed to load there is nothing to look strings up in.
   boot.catch(function () {
