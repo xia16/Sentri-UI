@@ -22,6 +22,8 @@ Check out CANDIDATE and BASE in two worktrees. Serve each with `node scripts/ser
 
 Judge from those pairs and write `verdict.json` beside them. `node scripts/gate.mjs --verdict <out>` refuses a verdict that is about another commit, leaves a pair unjudged, or passes with a worse or failed pair. It also fails when the PR head or `origin/main` has moved since the gate ran, or can't be read. Merge only on `GATE PASS`, pinned to the gated commit: `gh pr merge <n> --squash --match-head-commit <candidate sha>`.
 
+`--verdict` also posts the result as the `sentri/gate` commit status on GitHub. A branch-protection rule on main that requires it makes GitHub refuse an ungated merge however it is attempted. The local merge guard (`scripts/merge-guard.mjs`) only stops our own sessions early and says why; it is not the boundary.
+
 A shared change that touches too many screens for one judge is split by feature. Each judge writes `verdict-<feature>.json`, and `--verdict` merges them: one failing part fails the change. `check-states` runs on both sides for every class. A problem main already has is reported as main's, and only a new one fails.
 
 ## 1. Mechanical checks (run first; any failure ends the gate)
