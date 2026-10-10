@@ -28,6 +28,7 @@ const opt = (k) => { const i = argv.indexOf('--' + k); return i >= 0 && argv[i +
 const flag = (k) => argv.includes('--' + k);
 const short = (s) => String(s || '?').slice(0, 7);
 const VERDICT_FILE = /^verdict(-[\w.-]+)?\.json$/;
+function passRecord(sha) { return path.join(path.resolve(root, git(['rev-parse', '--git-common-dir']).out.trim()), 'sentri-gate', `${sha}.json`); }
 function git(args, cwd = root) { const r = spawnSync('git', args, { cwd, encoding: 'utf8', maxBuffer: 64 << 20 }); return { code: r.status, out: r.stdout || '', err: r.stderr || '' }; }
 
 // ---------- --verdict <out>: check the judge's verdict against the mechanical result ----------
@@ -58,11 +59,13 @@ if (opt('verdict')) {
   if (verdict.pass !== true) console.log('  - the judge failed it');
   if (verdict.pass !== true && mech.pass !== true) console.log('  - the mechanical gate failed');
   // The merge names the gated commit, so GitHub refuses it if the PR head has moved since.
+  // The pass record the merge guard (scripts/merge-guard.mjs) looks for lives in the git common dir, so every worktree sees it;
+  // a failed verdict removes any earlier pass for the same commit.
+  const passFile = passRecord(mech.candidate);
+  if (!ok) fs.rmSync(passFile, { force: true });
   if (ok) {
-    // The pass record the merge guard (scripts/merge-guard.mjs) looks for: in the git common dir, so every worktree sees it.
-    const common = path.resolve(root, git(['rev-parse', '--git-common-dir']).out.trim());
-    fs.mkdirSync(path.join(common, 'sentri-gate'), { recursive: true });
-    fs.writeFileSync(path.join(common, 'sentri-gate', `${mech.candidate}.json`), JSON.stringify({ candidate: mech.candidate, base: mech.base, ref: mech.ref, out: path.resolve(dir), at: new Date().toISOString() }, null, 2));
+    fs.mkdirSync(path.dirname(passFile), { recursive: true });
+    fs.writeFileSync(passFile, JSON.stringify({ candidate: mech.candidate, base: mech.base, ref: mech.ref, out: path.resolve(dir), at: new Date().toISOString() }, null, 2));
     console.log(`merge: gh pr merge <n> --squash --match-head-commit ${mech.candidate}`);
   }
   process.exit(ok ? 0 : 1);
@@ -120,6 +123,7 @@ git(['fetch', '-q', 'origin']);
 mech.base = git(['rev-parse', 'origin/main']).out.trim();
 mech.candidate = git(['rev-parse', '--verify', ref + '^{commit}']).out.trim();
 if (!mech.candidate) { check('candidate exists', false, `no commit for ${ref}`); finish(1); }
+fs.rmSync(passRecord(mech.candidate), { force: true }); // a new gate run voids any earlier pass for this commit until its verdict
 const contains = git(['merge-base', '--is-ancestor', mech.base, mech.candidate]).code === 0;
 check('candidate contains origin/main', contains, contains ? short(mech.base) : `merge main forward first: git fetch origin && git merge origin/main (R10, R12)`);
 if (!contains) finish(1);
