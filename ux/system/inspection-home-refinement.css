@@ -22,7 +22,7 @@
 .inspection-phone .roster-pig.selected{background:#eaf2e5}
 .inspection-phone .check-target input{accent-color:var(--green);width:var(--size-24);height:var(--size-24)}
 .inspection-phone .inspect-dock{border-color:var(--line);background:#fff}
-.inspection-phone button:focus-visible,.inspection-phone input:focus-visible{outline:3px solid #577fa6;outline-offset:2px}
+
 @media(max-width:370px){
  .inspection-phone .task-header{padding-left:12px;padding-right:12px;gap:8px}
  .inspection-phone .task-header h2{font-size:20px}

@@ -34,7 +34,7 @@
 .device .unit-hub-unified .unit-live-readings small{font-size:9px}
 .device .unit-device-count{font-size:11px}
 .device .unit-hub-unified button:hover{background:#e4f1ca}
-.device .unit-hub-unified button:focus-visible{outline:2px solid var(--focus);outline-offset:-3px}
+
 @media(max-width:370px){.device .unit-attention{padding-left:12px;padding-right:12px}.device .unit-check-row{margin-left:12px;margin-right:12px}.device .unit-hub-unified .unit-live-readings{gap:8px}}
 
 /* Long row copy stays one line on the phone; the full accessible name remains

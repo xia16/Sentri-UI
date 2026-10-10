@@ -20,7 +20,7 @@
 .unit-route>svg{width:18px;height:18px;stroke:var(--green)}
 .unit-route:hover{background:#f3f7ef}
 .unit-route:active{background:#eaf2e5}
-.farrowing-phone .unit-route:focus-visible{outline-offset:-3px;border-radius:9px}
+
 .task-overview-details{padding-top:4px}
 .task-overview-details .task-other-outcomes{margin-top:20px}
 .task-overview-details .task-performance-surface{padding:0}

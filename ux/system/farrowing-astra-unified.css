@@ -70,8 +70,8 @@
 .farrowing-phone .finish-form-details .weight-control{width:152px;max-width:100%;min-height:46px;padding:0 12px;border:1px solid #aebca8;border-radius:10px;gap:10px;background:white}
 .farrowing-phone .finish-form-details .weight-control input{width:100%;min-width:0;padding:8px 0;text-align:left;font:500 14px var(--font-sans);font-variant-numeric:tabular-nums;appearance:textfield;-moz-appearance:textfield}
 .farrowing-phone .finish-form-details .weight-control input::-webkit-inner-spin-button,.farrowing-phone .finish-form-details .weight-control input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
-.farrowing-phone .finish-form-details .weight-control:focus-within{outline:2px solid #398257;outline-offset:2px}
-.farrowing-phone .finish-form-details .weight-control input:focus-visible{outline:none}
+
+
 .farrowing-phone .finish-question{margin:0 0 12px}
 .farrowing-phone .finish-question legend{font-size:16px}
 .farrowing-phone .question-hint{margin:4px 0 6px}
@@ -97,8 +97,8 @@
 .farrowing-phone .finish-weight-control input{min-width:0;width:100%;border:0;padding:8px 0;background:transparent;font:500 16px var(--font-sans);color:var(--ink);appearance:textfield;-moz-appearance:textfield}
 .farrowing-phone .finish-weight-control input::-webkit-inner-spin-button,.farrowing-phone .finish-weight-control input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 .farrowing-phone .finish-weight-control>span{font-size:11px;color:var(--muted)}
-.farrowing-phone .finish-weight-control:focus-within{outline:2px solid #3e6890;outline-offset:2px}
-.farrowing-phone .finish-weight-control input:focus-visible{outline:none}
+
+
 .farrowing-phone .finish-field-label{position:relative;min-width:0;display:flex;flex-direction:column}
 .farrowing-phone .finish-clear-answer{background:transparent;color:var(--muted);padding:0;text-align:left;font-size:10px;min-height:26px;text-decoration:underline;text-underline-offset:3px}
 .farrowing-phone .finish-review-link{display:flex;align-items:center;gap:4px;min-height:var(--tap-min);padding:0;background:transparent;font-size:11px;font-weight:600}
