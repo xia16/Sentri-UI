@@ -8,9 +8,17 @@
   "duplicates": "",
   "groups": [
     [
-      "Old UI",
+      "Current design",
       [
-        "pregnancy.list"
+        "pregnancy.check"
+      ]
+    ],
+    [
+      "Earlier design (pre-Astra)",
+      [
+        "pregnancy.list",
+        "pregnancy.picker",
+        "pregnancy.detail"
       ]
     ]
   ],
@@ -18,13 +26,198 @@
     {
       "id": "pregnancy.list",
       "name": "Pig list tab",
-      "zh": "Tab：孕检（猪只List）",
-      "status": "placeholder",
+      "zh": "孕检猪只列表",
+      "status": "earlier",
+      "url": "/ux/archive/screens.html?sec=01&slide=3",
       "figma": "https://www.figma.com/design/psrxDa9LRWLdTL9XMZmWdc?node-id=7607-10820",
       "notes": {
-        "purpose": "The task's pig list by pen (Tab：孕检（猪只List）).",
+        "purpose": "The pregnancy sweep: sows grouped by pen; lens To check / Checked / All, with an outcome sub-lens under Checked.",
+        "elements": [
+          {
+            "name": "Task row",
+            "shows": "one sow (or litter): tag, one fact line, one memory line, rail",
+            "states": [
+              {
+                "state": "Mated",
+                "when": "first check not yet done",
+                "shows": "Mated · 28 days ago, line 2 \"1st check\""
+              },
+              {
+                "state": "Recheck",
+                "when": "an earlier unclear result is due again",
+                "shows": "Recheck · due today, line 2 \"unclear Jul 5 · G.H\""
+              },
+              {
+                "state": "Pregnant",
+                "when": "checked pregnant",
+                "shows": "Pregnant · Jul 8 with stamp and edit pencil"
+              },
+              {
+                "state": "Not pregnant",
+                "when": "checked not pregnant",
+                "shows": "Not pregnant · Jul 8 with stamp and edit pencil"
+              },
+              {
+                "state": "Upcoming",
+                "when": "second check not yet due (dimmed)",
+                "shows": "Due · in 5 days, \"2nd check Jul 13\""
+              }
+            ],
+            "logic": "Line 1 is words (state + when), line 2 is tokens (history, stamps). A chip appears only for an escalated measurement or a flagged observation; stamps appear on done rows and on rows that descend from a record. Everything on the row is derived; the worker types nothing here.",
+            "source": "ux/model/unified-task-list.md; ux/archive/screens.html §01; ux/research/tasks/BRIEF.md (row law)"
+          },
+          {
+            "name": "Lens row",
+            "shows": "To check / Checked / All, funnel at the end",
+            "logic": "Checked has a sub-lens by outcome: pregnant, unclear, not pregnant. On the map the three outcomes collapse to \"checked\"; the split is the row list's.",
+            "source": "ux/model/unified-task-list.md; ux/archive/screens.html §01"
+          },
+          {
+            "name": "Unit KPI and Task overview",
+            "shows": "95% pregnant, target 90 or more; Task overview \"100/200 checked\", day n of 3",
+            "logic": "Time-boxed task: day n of N under the overview. Pregnancy rate is derived; the docs state no formula.",
+            "source": "ux/model/unified-task-list.md; ux/archive/screens.html §01"
+          }
+        ],
+        "rules": [
+          "Bulk marking on all three outcomes is a confirmed product decision: the checker reads several sows in a row and marks them together (archive screens section 01).",
+          "Unclear schedules a recheck, 3 days by default (research D1)."
+        ],
         "issues": [
-          "Figma has only the list tab: no in-progress or ended screens, no check, no end task."
+          "Pre-Astra look: box rows, header and dock predate the Astra task skeleton."
+        ]
+      }
+    },
+    {
+      "id": "pregnancy.detail",
+      "name": "Task detail",
+      "zh": "任务详情",
+      "status": "earlier",
+      "url": "/ux/archive/screens.html?sec=03&slide=3",
+      "figma": "https://www.figma.com/design/psrxDa9LRWLdTL9XMZmWdc?node-id=7607-10820",
+      "notes": {
+        "purpose": "The sheet behind the Task overview cell for pregnancy check: whole-task progress, KPI, configuration, SOP link and, where the task has one, End task. What failed the \"does this change what a hand does at the pen right now?\" test lives here, one tap from the room.",
+        "elements": [
+          {
+            "name": "End task",
+            "shows": "Red button at the bottom of the sheet.",
+            "rule": "Pregnancy check is a sweep task: End task shows always. The research adds an end summary of consequence tallies: pregnant follows the batch to farrowing, unclear stays as a scheduled recheck, not pregnant leaves the batch for rebreed (research D4).",
+            "source": "ux/archive/screens.html section 03"
+          },
+          {
+            "name": "Configuration",
+            "shows": "Round and window.",
+            "logic": "This sweep is the 2nd check, day 20 after mating, window 3 days. The research config also lists a 1st check at day 10, a 3-day recheck and a target of 90 or more; whether two rounds is fixed or configurable is open (research Q4).",
+            "source": "ux/research/tasks/pregnancy-check.html"
+          },
+          {
+            "name": "Unit KPI",
+            "shows": "Pregnancy rate against its target.",
+            "logic": "Derived, never typed.",
+            "source": "ux/research/tasks/pregnancy-check.html"
+          }
+        ],
+        "issues": [
+          "Pre-Astra look: header, KPI cells and sheet styling predate the Astra task skeleton."
+        ]
+      }
+    },
+    {
+      "id": "pregnancy.picker",
+      "name": "Pen picker",
+      "zh": "栏位选择",
+      "status": "earlier",
+      "url": "/ux/archive/task-screens-combined.html?sec=02&slide=2",
+      "figma": "https://www.figma.com/design/psrxDa9LRWLdTL9XMZmWdc?node-id=7607-10820",
+      "notes": {
+        "purpose": "The unit as a map: is there work here, how much, how urgent. Tap lands in the pen; it never acts.",
+        "elements": [
+          {
+            "name": "Pen cell",
+            "shows": "pen code and at most one chip. For pregnancy check, chips such as \"2 late\" and \"5 check\"; done pens read \"checked\".",
+            "states": [
+              {
+                "state": "Overdue",
+                "when": "past its window",
+                "shows": "red chip"
+              },
+              {
+                "state": "Attention",
+                "when": "signs, due today, long interval, needs check",
+                "shows": "amber chip"
+              },
+              {
+                "state": "Ready",
+                "when": "breeding only: go now",
+                "shows": "green chip"
+              },
+              {
+                "state": "Done",
+                "when": "all handled",
+                "shows": "tick beside the code, outcome in muted text"
+              },
+              {
+                "state": "Nothing asked",
+                "when": "waiting or scheduled",
+                "shows": "grey text"
+              },
+              {
+                "state": "No task pigs",
+                "when": "no pigs of this task in the pen",
+                "shows": "dimmed cell"
+              }
+            ],
+            "logic": "Priority is fixed: red, amber, green, neutral, done, grey; one chip per cell, most urgent wins. Counts lead the word and appear only from 2. The picker never inherits the lens or filter: every pen shows its real state.",
+            "rule": "Tap = land (header pinned). Long-press shows the peek. The grid never acts.",
+            "source": "ux/archive/task-screens-combined.html sections 02 and 02b"
+          }
+        ],
+        "issues": []
+      }
+    },
+    {
+      "id": "pregnancy.check",
+      "name": "Record the check",
+      "zh": "记录孕检",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "figma": "",
+      "preset": "pig-tasks",
+      "steps": [
+        ".pig-current-task-entry.task-production"
+      ],
+      "notes": {
+        "purpose": "The pregnancy check recorded from a sow's own record: tap the Pregnancy check card under Current tasks on her record.",
+        "states": [
+          "Opens with no outcome chosen; Save is disabled and says \"Choose an outcome\"."
+        ],
+        "elements": [
+          {
+            "name": "Outcome options",
+            "shows": "the three results, each with its consequence on the option",
+            "states": [
+              {
+                "state": "Pregnant",
+                "when": "she is in pig",
+                "shows": "Keep in the current gestation batch"
+              },
+              {
+                "state": "Not in pig",
+                "when": "she is not pregnant",
+                "shows": "Close this task and return the sow to rebreed watch"
+              },
+              {
+                "state": "Recheck later",
+                "when": "result unclear",
+                "shows": "Keep the task open for another check"
+              }
+            ],
+            "rule": "One outcome per sow. The note is optional.",
+            "source": "ux/system/inspection-astra-concept.html (the sheet itself)"
+          }
+        ],
+        "issues": [
+          "The earlier list design names the outcomes Pregnant / Unclear / Not pregnant and gives Unclear a default 3-day recheck; this sheet says Recheck later and has no interval."
         ]
       }
     }

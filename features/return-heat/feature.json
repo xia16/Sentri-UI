@@ -8,9 +8,18 @@
   "duplicates": "",
   "groups": [
     [
-      "Old UI",
+      "Current design",
       [
-        "return-heat.list"
+        "return-heat.entry",
+        "return-heat.record",
+        "return-heat.result"
+      ]
+    ],
+    [
+      "Earlier design (pre-Astra)",
+      [
+        "return-heat.list",
+        "return-heat.overview"
       ]
     ]
   ],
@@ -18,14 +27,178 @@
     {
       "id": "return-heat.list",
       "name": "Pig list tab",
-      "zh": "Tab：查返情（猪只List）",
-      "status": "placeholder",
+      "zh": "返情检查猪只列表",
+      "status": "earlier",
+      "url": "/ux/archive/screens.html?sec=01&slide=2",
       "figma": "https://www.figma.com/design/psrxDa9LRWLdTL9XMZmWdc?node-id=7606-10300",
       "notes": {
-        "purpose": "The task's pig list by pen (Tab：查返情（猪只List）).",
+        "purpose": "The return-heat watch: sows bred 18 or more days ago, by pen; lens No return / Returned / All.",
+        "elements": [
+          {
+            "name": "Task row",
+            "shows": "one sow (or litter): tag, one fact line, one memory line, rail",
+            "states": [
+              {
+                "state": "In window",
+                "when": "day n of the return window",
+                "shows": "In window · day 20, line 2 \"2 matings · JY001\""
+              },
+              {
+                "state": "Signs",
+                "when": "signs of return recorded",
+                "shows": "amber SIGNS chip, \"signs 10h · G.H\" on line 2"
+              },
+              {
+                "state": "Expected",
+                "when": "window opens in N days (dimmed)",
+                "shows": "Expected · window in 5 days"
+              },
+              {
+                "state": "No data",
+                "when": "no mating data",
+                "shows": "No data, line 2 \"1 mating · JY001\""
+              },
+              {
+                "state": "Returned",
+                "when": "marked returned",
+                "shows": "row moves to Returned with a stamp; the stamp says out of batch and rebreed (research delta 1)"
+              }
+            ],
+            "logic": "Line 1 is words (state + when), line 2 is tokens (history, stamps). A chip appears only for an escalated measurement or a flagged observation; stamps appear on done rows and on rows that descend from a record. Everything on the row is derived; the worker types nothing here.",
+            "source": "ux/model/unified-task-list.md; ux/archive/screens.html §01; ux/research/tasks/BRIEF.md (row law)"
+          },
+          {
+            "name": "Lens row",
+            "shows": "No return / Returned / All",
+            "logic": "Returned is the unwanted outcome, so the negative-first pair reads No return first.",
+            "source": "ux/model/unified-task-list.md; ux/archive/screens.html §01"
+          },
+          {
+            "name": "Unit KPI and Task overview",
+            "shows": "5% return rate, target 5 or less; progress is days, \"3/7 days\" with a seven-segment gauge and \"2 returned\" as a side fact",
+            "logic": "Return-heat is a watch task: the cohort never shrinks, so its progress is days, not sows (archive screens section 01). Task length N is config-driven; the docs disagree on the default (badge 3, config 7, dots 5; research Q6).",
+            "source": "ux/model/unified-task-list.md; ux/archive/screens.html §01"
+          }
+        ],
+        "rules": [
+          "Unmarked sows are the record of no return: no negative is ever asked or stored."
+        ],
         "issues": [
-          "Figma has only the list tab: no in-progress or ended screens, no check, no end task."
+          "Pre-Astra look: box rows, header and dock predate the Astra task skeleton."
         ]
+      }
+    },
+    {
+      "id": "return-heat.overview",
+      "name": "Task detail",
+      "zh": "任务详情",
+      "status": "earlier",
+      "url": "/ux/archive/screens.html?sec=03&slide=2",
+      "figma": "https://www.figma.com/design/psrxDa9LRWLdTL9XMZmWdc?node-id=7606-10300",
+      "notes": {
+        "purpose": "The sheet behind the Task overview cell for return-heat check: whole-task progress, KPI, configuration, SOP link and, where the task has one, End task. What failed the \"does this change what a hand does at the pen right now?\" test lives here, one tap from the room.",
+        "elements": [
+          {
+            "name": "End task",
+            "shows": "Red button at the bottom of the sheet.",
+            "rule": "Sweep task: End task lives in this sheet only. The research adds a two-group consequence summary: no return and signs stay with the batch and go to pregnancy check, returned moves out of the batch to rebreed (research delta 3).",
+            "source": "ux/archive/screens.html section 03"
+          },
+          {
+            "name": "Configuration",
+            "shows": "Window and cadence.",
+            "logic": "Starts day 18 after mating, 2 checks a day at set times, 7-day window. The research also lists a pass number (1 of 2); whether a second pass runs at all is open (research Q1).",
+            "source": "ux/research/tasks/return-heat.html"
+          },
+          {
+            "name": "Unit KPI",
+            "shows": "Return rate against its target.",
+            "logic": "Derived, never typed.",
+            "source": "ux/research/tasks/return-heat.html"
+          }
+        ],
+        "issues": [
+          "Pre-Astra look: header, KPI cells and sheet styling predate the Astra task skeleton."
+        ]
+      }
+    },
+    {
+      "id": "return-heat.entry",
+      "name": "Returned to heat: entry",
+      "zh": "返情 · 入口",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-return&slide=1",
+      "figma": "",
+      "notes": {
+        "purpose": "On a bred sow the observation is a return, so the verb sheet omits Heat and shows Returned to heat. Same record as the return-heat task mark: one form, two doors.",
+        "rules": [
+          "The gate reads the animal: the verb wears its true name for a bred sow."
+        ],
+        "issues": []
+      }
+    },
+    {
+      "id": "return-heat.record",
+      "name": "Returned to heat: record",
+      "zh": "返情 · 记录",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-return&slide=2",
+      "figma": "",
+      "notes": {
+        "purpose": "The record drawer: two radios, no negative.",
+        "elements": [
+          {
+            "name": "Outcome radios",
+            "shows": "Signs of return or Returned, the consequence on the option",
+            "states": [
+              {
+                "state": "Signs of return",
+                "when": "an observation",
+                "shows": "no consequence; stays in batch"
+              },
+              {
+                "state": "Returned",
+                "when": "she has returned",
+                "shows": "she leaves the batch"
+              }
+            ],
+            "rule": "Production's acknowledgement checkbox is subtracted: the hint states the consequence, the commit is deliberate, the mark is audited and undoable. No third radio: unmarked is the record of no return.",
+            "source": "ux/system/workflows/cycle.html (wf-return); ux/research/ops/cycle-adhoc.md"
+          }
+        ],
+        "issues": []
+      }
+    },
+    {
+      "id": "return-heat.result",
+      "name": "Returned to heat: result",
+      "zh": "返情 · 结果",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-return&slide=3",
+      "figma": "",
+      "notes": {
+        "purpose": "After committing: her row is the receipt.",
+        "elements": [
+          {
+            "name": "Row after Returned",
+            "shows": "out of the batch, with the rebreed service window watching her",
+            "states": [
+              {
+                "state": "Returned",
+                "when": "committed Returned",
+                "shows": "stamp carries the consequence \"out of batch · rebreed\"; the row does not read \"no batch\" while the rebreed window is open"
+              },
+              {
+                "state": "Signs",
+                "when": "committed Signs",
+                "shows": "amber chip on line 1, trail on line 2, stays in batch; the flag rides her trail into pregnancy check"
+              }
+            ],
+            "logic": "The \"no batch\" token prints only if the rebreed service window lapses with nothing claiming her.",
+            "source": "ux/system/workflows/cycle.html (wf-return); ux/research/ops/cycle-adhoc.md"
+          }
+        ],
+        "issues": []
       }
     }
   ]

@@ -1,0 +1,121 @@
+[
+ {
+  "id": "populate-tasks-1",
+  "target": {
+   "kind": "feature",
+   "id": "weaning"
+  },
+  "kind": "decision",
+  "severity": "high",
+  "title": "Wean, Weaning check and Mark as breeder: which feature owns the weaning record?",
+  "detail": "Three features draw overlapping weaning screens. Weaning check (Tasks) has the litter record and the Keep breeders / fill IDs placeholder; Wean (Breeding & litters) has check, piglets, mating, blocked, result; Mark as breeder (keep-breeding) has mark and remove. The Weaning check and Wean Figma sources are different files (task module and the Inspection file 生产-断奶). The Wean and keep-breeding placeholders say they are built inside Inspection; the weaning task is also reached from the piglet-processing handoff.",
+  "options": [
+   "Weaning check (task) owns the litter record; Wean is the same record reached from a pig's actions and becomes an alias",
+   "Wean owns the record; the task only lists litters",
+   "Keep them separate: task for the sweep, Wean for the ad-hoc action, with one shared form"
+  ],
+  "source": "populate batch 5; features/wean, features/keep-breeding, features/weaning"
+ },
+ {
+  "id": "populate-tasks-2",
+  "target": {
+   "kind": "feature",
+   "id": "heat-check"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "Heat check: what do unmarked sows assert, and how is End task guarded?",
+  "detail": "Production defaults every unchecked sow to \"not in heat\" at submit, and arms End task by typing the head count to remove from the batch. The earlier design asserts nothing for unmarked sows (check activity is the evidence) and uses one confirm naming the consequence. The research leaves both as open questions.",
+  "options": [
+   "Evidence model: no negative assertion; one confirm at End task",
+   "Keep a typed head-count guard at End task",
+   "Keep the submit default for unchecked sows"
+  ],
+  "source": "ux/research/tasks/heat-check.html section 6, questions 1 and 2"
+ },
+ {
+  "id": "populate-tasks-3",
+  "target": {
+   "kind": "feature",
+   "id": "breeding"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "Breeding: where does the batch phase close live?",
+  "detail": "The archive deck says event tasks (breeding, farrowing) never show End task on the phone. The breeding research proposes a console-only phase close (un-mated sows leave the batch, blocked until the heat check closes) and asks whether the phone also needs a supervisor path.",
+  "options": [
+   "Console only",
+   "Console plus a supervisor path in the phone's task detail",
+   "Phone only"
+  ],
+  "source": "ux/research/tasks/breeding.html section 6; ux/archive/screens.html section 03"
+ },
+ {
+  "id": "populate-tasks-4",
+  "target": {
+   "kind": "feature",
+   "id": "pregnancy"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "Pregnancy check: when does batch removal commit, and who owns a late recheck?",
+  "detail": "Production removes a not-pregnant sow from the batch at submit or End task; the earlier design commits at mark time with a pencil correction. An unclear result plus 3 days can land after the 3-day sweep ends; the End summary then reports her as follows batch, pending.",
+  "options": [
+   "Remove at mark time (earlier-design default), corrected with the pencil",
+   "Remove at End task",
+   "A standing recheck row that survives End task, or the next scheduled check task"
+  ],
+  "source": "ux/research/tasks/pregnancy-check.html section 6, questions 1 and 2"
+ },
+ {
+  "id": "populate-tasks-5",
+  "target": {
+   "kind": "screen",
+   "id": "pregnancy.check"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "Pregnancy outcome words: Recheck later and Not in pig, or Unclear and Not pregnant?",
+  "detail": "The current sheet (inspection prototype) offers Pregnant / Not in pig / Recheck later with no interval. The earlier list design and research use Pregnant / Unclear / Not pregnant, with Unclear defaulting to a 3-day recheck that can be changed.",
+  "options": [
+   "Keep the current words and add the 3-day default",
+   "Use the earlier-design words",
+   "Keep both vocabularies, one per door"
+  ],
+  "source": "ux/archive/screens.html section 01; ux/research/tasks/pregnancy-check.html D1, D2"
+ },
+ {
+  "id": "populate-tasks-6",
+  "target": {
+   "kind": "feature",
+   "id": "return-heat"
+  },
+  "kind": "decision",
+  "severity": "low",
+  "title": "Return-heat: when does Returned remove the sow from the batch?",
+  "detail": "Production removes her at submit. The earlier design commits at mark time with undo, and the cycle workflow drops the acknowledgement checkbox on the same reasoning. The research asks whether instant removal is acceptable or must wait for a round boundary for compliance. Task length also differs between sources (badge 3, config 7, dots 5).",
+  "options": [
+   "Remove at mark time with undo",
+   "Remove at a round boundary",
+   "Remove at End task"
+  ],
+  "source": "ux/research/tasks/return-heat.html section 6, questions 2 and 6; ux/system/workflows/cycle.html wf-return"
+ },
+ {
+  "id": "populate-tasks-7",
+  "target": {
+   "kind": "feature",
+   "id": "post-farrowing"
+  },
+  "kind": "decision",
+  "severity": "low",
+  "title": "Post-farrowing check: what schedules a recheck and what counts as a pass?",
+  "detail": "The task shows \"recheck in x days\" and a pass-rate KPI on every screen, but no source says which results schedule the recheck, whether the interval is per farm, or how the pass rate is computed. Mastitis also has four values on the blank form and three on the filled and read-only states.",
+  "options": [
+   "Any abnormal item schedules a recheck at a per-farm interval",
+   "Only listed items (for example mastitis moderate or worse)",
+   "Pass = no abnormal items and BCS within a stated range"
+  ],
+  "source": "ux/research/tasks/postpartum.html section 6, questions 1 to 3"
+ }
+]
