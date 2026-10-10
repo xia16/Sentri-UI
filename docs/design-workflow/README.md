@@ -29,6 +29,14 @@ An agent score is never shown as approval. The approved version of a screen stay
 - **Green means approved or done only.**
 - **No cards on cards; information budget.** One surface, and only items are boxes. Colour only where it means something. Nothing said twice. Rank what the farmer must see first.
 
+## Room to design
+
+The design system and the rules above are a floor, not a ceiling (owner, 2026-10-10). Agents are designers, not copyists. If a better layout, interaction, variant or component would serve the farmer, build it:
+- **When a job is only adequate, look wider.** Before you build, sketch at least one alternative that departs from the current pattern. Then build the one that serves the farmer best.
+- **The gate decides, not familiarity.** The new design must beat what it replaces, side by side. Being different never makes it worse, and matching the system never makes it better.
+- **Prove it in a feature, then share it.** An enhancement starts in the feature that needs it. It reaches other features only as a shared-component change, gated on every feature that uses it, and never by restyling an approved screen to match.
+- **The owner rules still bind.** They are what keeps the product one product. Everything they don't fix is open.
+
 ## The scenario step
 
 New features and the polish loop both use the same scenario step. It has three parts:

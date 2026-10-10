@@ -23,7 +23,7 @@ Do this before you draw anything. A new design built without looking at the old 
 5. **Capture baselines**: open each screen bare at 390×844 (`<screen url>&screen=<id>`, see `atlas/SCHEMA.md`) on `origin/main` and save one screenshot per screen. Record the commit.
 6. **Write it into the brief or PR body** as a table: job · where it exists today · status · baseline screenshot · commit. The gate compares against these.
 
-If something approved already does the job, use it. Change it only when that improves a feature.
+If something approved already does the job, start from it. You may improve it ([Room to design](../README.md#room-to-design)). When the job is only adequate, sketch at least one alternative that departs from the current pattern before you pick, and build the one that serves the farmer best. A shared component changes only by improving a feature.
 
 ## 2. Owner rules (binding)
 
