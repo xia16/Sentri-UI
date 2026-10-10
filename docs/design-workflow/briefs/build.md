@@ -27,6 +27,7 @@ If something approved already does the job, start from it. You may improve it ([
 
 ## 2. Owner rules (binding)
 
+- **Farm legibility (binding).** Barn, glare, gloves, arm's length, two seconds. Primary values and body text ≥ 16px; secondary and meta text ≥ 13px; nothing visible under 13px except the phone status bar. Contrast ≥ 4.5:1 for all text and ≥ 7:1 for primary values and numbers a farmer acts on. Tap targets ≥ 48×48 (the control or an invisible hit area). Ink, not pale grey, for anything that must be read. Fix crowding by tightening copy and layout, never by shrinking type. Full law: `ux/design-system/README.md`, "The farm legibility law".
 - **Platform first, touch only.** States: Default, Pressed, Selected/Checked, Disabled, Error, Loading/Waiting, Empty, Long label / Chinese, whichever apply. No designed Hover, Focus or keyboard rows. Accessibility: screen-reader role, name and state; reading order matches visual order; no gesture-only action; targets ≥ 48px (`tap-min`).
 - **Components come from real features.** Start from the approved screen and reproduce it, then improve only where it makes the feature better. A component is generic or used by 2+ sections. The same job with a different look is a **variant**, never a copy. One implementation.
 - **Beat what you replace.** Compare against your baselines at 390px. If yours isn't clearly better, keep the original. In **refactor** mode nothing visible may change.
@@ -59,7 +60,7 @@ For a component, deliver:
 
 ## 5. Verify before you hand to the gate
 
-- Run `npm test` and `npm run check`. Both pass. Change a test only when it asserted the old structure, and say so.
+- Run `npm test` and `npm run check`. Both pass. Run `node scripts/check-legibility.mjs --changed <your screen ids> --compare <a server on origin/main>`: it exits non-zero if a screen you touched is worse than on main (or, once the README says `strict`, breaks the law at all). Never make it worse; aim to meet the floors. Change a test only when it asserted the old structure, and say so.
 - Run `npm run ux` and open every changed screen bare at 390×844 and 360×800, in EN and ZH. Check for no console errors and targets ≥ 48px, and take after-screenshots on the same states as the baselines. Use Playwright if it's installed (`SENTRI_PLAYWRIGHT` may point to it). If it isn't, say so.
 - For a behaviour change, walk the scenario leaves it touches (see `briefs/polish-loop.md`, "Executable leaves").
 - Merge main forward (`git fetch origin && git merge origin/main`), rerun the above, and record the commit your evidence is from. Don't chain commands so that a failure hides.
