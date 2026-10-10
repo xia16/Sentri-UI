@@ -58,9 +58,9 @@ In:
 Out:
 
 - Fostering (parked until the owner reopens it).
-- Piglet processing and its identity work (separate feature; Move opens after the lock).
+- Piglet processing and its identity work (separate feature; Move opens after the lock). The prototype's own Piglet processing, identity and mortality pages are mapped as screens; see the decision "Piglet processing is drawn in Farrowing and as its own feature".
 - The sow page itself and the rest of the Actions sheet (pig-profile).
-- Pen tools reachable from a pen header (feed guidance, equipment fault, pen note, pen log): present in the prototype, unclear whose feature; recorded in the Room list issues.
+- Pen tools reachable from a pen header (feed guidance, equipment fault, pen note, pen log): present in the prototype, unclear whose feature; recorded in the Room list issues. The pen pages are mapped as screens; see the decision "Pen tools are drawn in Farrowing and in Inspection".
 - Console reporting, anomaly queues, per-hand audit views, merge-review UI, notifications.
 - Role gates, batch-close disposition doors beyond what the End task reviews show.
 

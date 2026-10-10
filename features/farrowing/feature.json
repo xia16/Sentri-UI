@@ -26,7 +26,10 @@
           "farrowing.leave-edit",
           "farrowing.edit",
           "farrowing.foster",
-          "farrowing.reconcile"
+          "farrowing.reconcile",
+          "farrowing.piglet-care",
+          "farrowing.piglet-identity",
+          "farrowing.piglet-death"
         ]
       },
       {
@@ -35,7 +38,8 @@
         "screens": [
           "farrowing.locked",
           "farrowing.edit-finished",
-          "farrowing.born"
+          "farrowing.born",
+          "farrowing.death-breakdown"
         ]
       }
     ],
@@ -50,7 +54,21 @@
     ],
     "any": [
       "farrowing.room",
-      "farrowing.history"
+      "farrowing.history",
+      "farrowing.filter",
+      "farrowing.pen-map",
+      "farrowing.pen",
+      "farrowing.pen-log",
+      "farrowing.pen-note",
+      "farrowing.pen-read-note",
+      "farrowing.pen-feed",
+      "farrowing.pen-fault",
+      "farrowing.pen-fault-record",
+      "farrowing.search",
+      "farrowing.scan",
+      "farrowing.today",
+      "farrowing.sow-actions",
+      "farrowing.note"
     ],
     "task": [
       {
@@ -68,7 +86,8 @@
           "farrowing.task-ready",
           "farrowing.task-complete",
           "farrowing.task-outcomes",
-          "farrowing.task-receipt"
+          "farrowing.task-receipt",
+          "farrowing.task-sows"
         ]
       }
     ]
@@ -404,6 +423,166 @@
       "farrowing.leave-edit",
       "farrowing.count",
       "Discard or Save"
+    ],
+    [
+      "farrowing.room",
+      "farrowing.filter",
+      "Filter sows"
+    ],
+    [
+      "farrowing.filter",
+      "farrowing.room",
+      "Show N sows, Reset or Back"
+    ],
+    [
+      "farrowing.room",
+      "farrowing.pen-map",
+      "Go to pen"
+    ],
+    [
+      "farrowing.pen-map",
+      "farrowing.room",
+      "tap a pen"
+    ],
+    [
+      "farrowing.room",
+      "farrowing.search",
+      "Search ear tag"
+    ],
+    [
+      "farrowing.search",
+      "farrowing.count",
+      "tap a result"
+    ],
+    [
+      "farrowing.room",
+      "farrowing.scan",
+      "Scan ear tag"
+    ],
+    [
+      "farrowing.room",
+      "farrowing.today",
+      "Back arrow"
+    ],
+    [
+      "farrowing.today",
+      "farrowing.room",
+      "Continue from pen"
+    ],
+    [
+      "farrowing.room",
+      "farrowing.pen",
+      "tap a pen header"
+    ],
+    [
+      "farrowing.pen",
+      "farrowing.pen-log",
+      "Pen log"
+    ],
+    [
+      "farrowing.pen",
+      "farrowing.pen-note",
+      "Add / Edit pen note"
+    ],
+    [
+      "farrowing.pen",
+      "farrowing.pen-read-note",
+      "tap the Note notice"
+    ],
+    [
+      "farrowing.pen-read-note",
+      "farrowing.pen-note",
+      "Edit note"
+    ],
+    [
+      "farrowing.pen",
+      "farrowing.pen-feed",
+      "Feed guidance"
+    ],
+    [
+      "farrowing.pen",
+      "farrowing.pen-fault",
+      "Report equipment fault"
+    ],
+    [
+      "farrowing.pen",
+      "farrowing.pen-fault-record",
+      "tap an Equipment notice"
+    ],
+    [
+      "farrowing.pen-note",
+      "farrowing.pen",
+      "Save note or Back"
+    ],
+    [
+      "farrowing.pen-fault",
+      "farrowing.pen",
+      "Report fault or Back"
+    ],
+    [
+      "farrowing.task-blocked",
+      "farrowing.task-sows",
+      "tap Still farrowing"
+    ],
+    [
+      "farrowing.task-ready",
+      "farrowing.task-sows",
+      "tap Awaiting farrowing"
+    ],
+    [
+      "farrowing.task-sows",
+      "farrowing.count",
+      "tap a sow"
+    ],
+    [
+      "farrowing.locked",
+      "farrowing.death-breakdown",
+      "tap the death breakdown link"
+    ],
+    [
+      "farrowing.count",
+      "farrowing.sow-actions",
+      "More actions"
+    ],
+    [
+      "farrowing.locked",
+      "farrowing.sow-actions",
+      "More actions"
+    ],
+    [
+      "farrowing.sow-actions",
+      "farrowing.note",
+      "Add / Edit note"
+    ],
+    [
+      "farrowing.sow-actions",
+      "farrowing.piglet-care",
+      "Piglet processing"
+    ],
+    [
+      "farrowing.piglet-care",
+      "farrowing.piglet-identity",
+      "Piglet records, then Add piglet or a piglet row"
+    ],
+    [
+      "farrowing.piglet-care",
+      "farrowing.piglet-death",
+      "Piglet records, tick piglets, Report mortality"
+    ],
+    [
+      "farrowing.piglet-identity",
+      "farrowing.piglet-care",
+      "Save identity or Back"
+    ],
+    [
+      "farrowing.piglet-death",
+      "farrowing.piglet-care",
+      "Save mortality or Back"
+    ],
+    [
+      "farrowing.note",
+      "farrowing.sow-actions",
+      "Save note or Back"
     ]
   ],
   "screens": [
@@ -2242,6 +2421,813 @@
         "copy": [],
         "edge": [],
         "issues": []
+      }
+    },
+    {
+      "id": "farrowing.filter",
+      "name": "Filter sows",
+      "zh": "筛选母猪",
+      "status": "in-design",
+      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+      "preset": "room",
+      "steps": [
+        "Filter sows"
+      ],
+      "figma": "",
+      "notes": {
+        "purpose": "Narrow the room list by expected farrowing date and parity without leaving the room.",
+        "elements": [
+          {
+            "name": "Expected farrowing",
+            "at": "Expected farrowing",
+            "shows": "A two-handle slider over seven days either side of today, with the chosen range written above it.",
+            "states": [
+              {
+                "state": "Any time",
+                "when": "Both handles at the ends (7+ days ago to In 7+ days)",
+                "shows": "\"Any time\"; no date filtering at all, so Active and Done sows stay in"
+              },
+              {
+                "state": "A range",
+                "when": "Either handle moved",
+                "shows": "\"Today – In 2 days\", or one day when both handles meet (\"Tomorrow\")"
+              }
+            ],
+            "logic": "Each sow is matched on her stored due text (\"Due tomorrow\", \"Overdue · 3 days\", \"Due in 2 days\"), not on a date field. The outer stops are open-ended: 7+ days ago and In 7+ days. A sow with no due text (Active, Done) matches only \"Any time\", so any narrowed range hides her.",
+            "source": "farrowing-astra-concept.js dueMatches(), dueRangeLabel(); ASTRA-FARROWING-FILTERS.md"
+          },
+          {
+            "name": "Parity",
+            "at": "Parity",
+            "shows": "Five facets: Any, 0, 1, 2–5, 6+.",
+            "logic": "Matches the parity number stored on the sow (\"Use the parity recorded on the sow's profile\"). The buckets are browsing conveniences, not risk bands.",
+            "source": "farrowing-astra-concept.js matchesRoomFilter(); ASTRA-FARROWING-FILTERS.md"
+          },
+          {
+            "name": "Show N sows",
+            "at": "Show 7 sows",
+            "shows": "The apply button; its label is the live result count.",
+            "rule": "Nothing is applied until Show is tapped. Reset puts the draft back to Any time and Any parity. Back dismisses the draft and keeps the filter already applied. The count follows the draft and the current state tab, so it can read \"Show 0 sows\".",
+            "source": "farrowing-astra-concept.js room-apply-filter, sentri-range-change"
+          }
+        ],
+        "edge": [
+          "Zero matches: the room list shows \"No matching sows\" with \"Adjust the filters to see more task sows\" and no empty pen cards.",
+          "Once applied, every state-tab count shrinks to the filtered sows; the Task overview totals never change."
+        ],
+        "issues": []
+      }
+    },
+    {
+      "id": "farrowing.pen-map",
+      "name": "Go to pen",
+      "zh": "跳转栏位",
+      "status": "in-design",
+      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+      "preset": "room",
+      "steps": [
+        "Go to pen"
+      ],
+      "figma": "",
+      "notes": {
+        "purpose": "Jump to a pen by its place in the room instead of scrolling the list; the map is the room layout, columns A–D by rows 1–6.",
+        "elements": [
+          {
+            "name": "Pen cell",
+            "at": "Tap a pen to go to its sows. Hold to peek.",
+            "shows": "Pen code and one fact line for the sows now visible in that pen.",
+            "states": [
+              {
+                "state": "Active",
+                "when": "Any sow in the pen is Active",
+                "shows": "\"Active\", or \"2 active\""
+              },
+              {
+                "state": "Overdue",
+                "when": "No active sow, and an Awaiting sow is Overdue",
+                "shows": "\"Overdue\" (red), or \"2 overdue\""
+              },
+              {
+                "state": "Born",
+                "when": "Every visible sow is finished",
+                "shows": "\"23 born\" (green)"
+              },
+              {
+                "state": "Due",
+                "when": "Awaiting sows only",
+                "shows": "\"Due today\", or the first sow's due text (\"Due tomorrow\")"
+              },
+              {
+                "state": "No matches",
+                "when": "The pen has task sows but none pass the current tab and filter",
+                "shows": "Greyed, disabled"
+              },
+              {
+                "state": "Not in task",
+                "when": "No task sow in the pen",
+                "shows": "Greyed, disabled"
+              },
+              {
+                "state": "Current",
+                "when": "The pen at the top of the room list (also named on the dock)",
+                "shows": "Quiet filled tile"
+              }
+            ],
+            "logic": "The facts follow the current state tab and filter, so the same pen reads differently under Active and under All. The layout itself is fixed and independent of filters.",
+            "rule": "Tap goes to the room list with that pen pinned just under the sticky tab row; its tint fades within 900 ms. Hold 350 ms shows a read-only peek of the pen's sows in place; moving more than 12 px cancels it, and the tap after a peek only closes the peek. Disabled pens cannot be opened.",
+            "source": "farrowing-astra-concept.js penFact(), room-pen; ASTRA-ROOM-PAGE-AUDIT.md"
+          }
+        ],
+        "edge": [
+          "A pen hidden by the filter stays on the map as \"No matches\" and is not selectable; the room list gives the way back (\"Show sows\")."
+        ],
+        "issues": [
+          "The map is taller than the phone: rows 5 and 6 and the line \"Pen layout · only pens matching this view can be opened.\" sit below the fold."
+        ]
+      }
+    },
+    {
+      "id": "farrowing.pen",
+      "name": "Pen",
+      "zh": "栏位",
+      "status": "in-design",
+      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+      "preset": "room",
+      "steps": [
+        "Pen B1, 1 sow, view details"
+      ],
+      "figma": "",
+      "notes": {
+        "purpose": "One pen's information and tools, reached from a pen header in the room list.",
+        "states": [
+          "No notices: only the four tool rows.",
+          "A note on the pen: a \"Note\" notice above the tools, opening the note.",
+          "An open equipment fault: an amber \"Equipment\" notice (device, description, \"Open · Reported 09:41 · G. Hansen\") opening the fault.",
+          "Both: faults first, then the note."
+        ],
+        "elements": [
+          {
+            "name": "Notices",
+            "at": "Pen information",
+            "shows": "Faults and the note, listed above the tools only when they exist.",
+            "logic": "Only open faults are listed; a resolved fault leaves the page and stays in the pen log. A pen holds one note.",
+            "source": "farrowing-astra-concept.js penDetails(), penInfo()"
+          },
+          {
+            "name": "Tool rows",
+            "at": "Add pen note",
+            "shows": "Feed guidance, Report equipment fault, Add / Edit pen note, Pen log.",
+            "states": [
+              {
+                "state": "No note",
+                "when": "The pen has no note",
+                "shows": "\"Add pen note: Leave information for the next person\""
+              },
+              {
+                "state": "Has a note",
+                "when": "A note was saved",
+                "shows": "\"Edit pen note: Update the note for this pen\""
+              },
+              {
+                "state": "Feed known",
+                "when": "The pen has feed data",
+                "shows": "The feed row reads \"formula · method\"; otherwise \"View feeding information\""
+              }
+            ],
+            "source": "farrowing-astra-concept.js penDetails()"
+          }
+        ],
+        "edge": [
+          "The header counts every task sow in the pen, ignoring the current tab and filter.",
+          "Notes, faults and log entries belong to the pen, not the sow, and are shared by every drawer of that pen within the unit. The prototype starts with none and forgets them on reload."
+        ],
+        "issues": [
+          "Whose feature the pen tools are is unclear: the same pen sheet, note, fault and log flows are drawn in Inspection (see the decision \"Pen tools are drawn in Farrowing and in Inspection\")."
+        ]
+      }
+    },
+    {
+      "id": "farrowing.pen-log",
+      "name": "Pen log",
+      "zh": "栏位记录",
+      "status": "in-design",
+      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+      "preset": "room",
+      "steps": [
+        "Pen B1, 1 sow, view details",
+        "Pen log"
+      ],
+      "figma": "",
+      "notes": {
+        "purpose": "Everything recorded in this pen, newest first.",
+        "states": [
+          "Empty: \"No activity recorded for this pen.\""
+        ],
+        "elements": [
+          {
+            "name": "Entries",
+            "at": "Pen log",
+            "shows": "Entries grouped by day; each has a title, a detail line, time and hand.",
+            "logic": "Merges the pen's own events (note added or updated, fault reported or resolved) with the events of every sow in that pen, sorted by day and time. A sow event carries \"Sow 000418\" as its detail; a pen event carries its note text or \"device · description\". Photos attached to an event show as thumbnails that open a viewer.",
+            "source": "farrowing-astra-concept.js penLogEvents(), penLog()"
+          }
+        ],
+        "edge": [
+          "Days read relative within the week (Today, Yesterday, N days ago), then as dates."
+        ],
+        "issues": []
+      }
+    },
+    {
+      "id": "farrowing.pen-note",
+      "name": "Pen note",
+      "zh": "栏位备注",
+      "status": "in-design",
+      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+      "preset": "room",
+      "steps": [
+        "Pen B1, 1 sow, view details",
+        "Add pen note"
+      ],
+      "figma": "",
+      "notes": {
+        "purpose": "Write or edit the one note for this pen, to leave information for the next person.",
+        "elements": [
+          {
+            "name": "Save note",
+            "at": "Save note",
+            "shows": "Primary action, disabled until the text is not empty.",
+            "rule": "A pen has one note: saving replaces it, and the log records \"Pen note added\" or \"Pen note updated\" with the new text (the old text stays only in the log). Opened from an existing note, the field starts with that text. The stamp is the hand and time of the save.",
+            "source": "farrowing-astra-concept.js room-pen-save-note"
+          }
+        ],
+        "edge": [
+          "Back discards the draft; nothing is kept for the pen until Save."
+        ],
+        "issues": []
+      }
+    },
+    {
+      "id": "farrowing.pen-read-note",
+      "name": "Read pen note",
+      "zh": "查看栏位备注",
+      "status": "in-design",
+      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+      "preset": "room",
+      "steps": [
+        "Pen B1, 1 sow, view details",
+        "Add pen note",
+        {
+          "fill": "[data-pen-field=\"note\"]",
+          "text": "Water line leaks at the back of the pen. Check again after feeding."
+        },
+        "Save note",
+        "[data-action=\"room-pen-read-note\"]"
+      ],
+      "figma": "",
+      "notes": {
+        "purpose": "Read the pen's note as saved: its text, who wrote it and when.",
+        "elements": [
+          {
+            "name": "Edit note",
+            "at": "Edit note",
+            "shows": "Primary action on a read-only page.",
+            "rule": "Opens the pen note editor with the current text; reading never changes the note. The stamp (\"G. Hansen · Today · 09:41\") is fixed sample text in the prototype.",
+            "source": "farrowing-astra-concept.js penSubpage(), room-pen-note"
+          }
+        ],
+        "edge": [
+          "The page exists only while the pen has a note; the pen page shows the \"Note\" notice that opens it."
+        ],
+        "issues": []
+      }
+    },
+    {
+      "id": "farrowing.pen-feed",
+      "name": "Pen feed guidance",
+      "zh": "栏位饲喂",
+      "status": "in-design",
+      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+      "preset": "room",
+      "steps": [
+        "Pen B1, 1 sow, view details",
+        "Feed guidance"
+      ],
+      "figma": "",
+      "notes": {
+        "purpose": "Show what this pen is fed, as guidance for whoever is working in the pen.",
+        "states": [
+          "With feed data: a \"Feeding\" section with Formula and Method, and the guidance text when there is any.",
+          "Without: \"No feed guidance recorded for this pen.\""
+        ],
+        "edge": [
+          "Every pen in the prototype is the empty state: no feed data is ever supplied, so the populated layout cannot be reached in the demo."
+        ],
+        "issues": [
+          "The populated state (Formula, Method, guidance) is built but has no sample data, so it cannot be reviewed. Feed itself is the feed-plan feature in Inspection."
+        ]
+      }
+    },
+    {
+      "id": "farrowing.pen-fault",
+      "name": "Report equipment fault",
+      "zh": "报告设备故障",
+      "status": "in-design",
+      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+      "preset": "room",
+      "steps": [
+        "Pen B1, 1 sow, view details",
+        "Report equipment fault"
+      ],
+      "figma": "",
+      "notes": {
+        "purpose": "Report broken equipment in the pen: which device and what is wrong.",
+        "elements": [
+          {
+            "name": "Device",
+            "at": "Device",
+            "shows": "A picker: Feeding station, Drinking station, Other.",
+            "states": [
+              {
+                "state": "Other chosen",
+                "when": "Device = Other",
+                "shows": "A \"Device name\" field appears and becomes required"
+              }
+            ],
+            "logic": "The fault is stored under the device name (the typed name for Other).",
+            "source": "farrowing-astra-concept.js validPenFault()"
+          },
+          {
+            "name": "Report fault",
+            "at": "Report fault",
+            "shows": "Primary action.",
+            "rule": "Disabled until a device and a description are filled (and a name for Other). Saving adds an open fault to the pen, an \"Equipment\" notice on the pen page and an \"Equipment fault reported\" log entry, then returns to the pen page.",
+            "source": "farrowing-astra-concept.js room-pen-save-fault"
+          }
+        ],
+        "edge": [
+          "Back drops the draft."
+        ],
+        "issues": []
+      }
+    },
+    {
+      "id": "farrowing.pen-fault-record",
+      "name": "Equipment fault",
+      "zh": "设备故障",
+      "status": "in-design",
+      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+      "preset": "room",
+      "steps": [
+        "Pen B1, 1 sow, view details",
+        "Report equipment fault",
+        "Select",
+        "Feeding station",
+        {
+          "fill": "[data-pen-field=\"description\"]",
+          "text": "Feeder is jammed and drops no feed."
+        },
+        "[data-action=\"room-pen-save-fault\"]",
+        "[data-action=\"room-pen-fault-record\"]"
+      ],
+      "figma": "",
+      "notes": {
+        "purpose": "Read one equipment fault and, while it is open, resolve it.",
+        "states": [
+          "Open: description, \"Open · Reported 09:41 · G. Hansen\", an optional Resolution note and \"Resolve fault\".",
+          "Resolved: description, the resolution text and \"Resolved · Reported …\"; no action.",
+          "Not found: \"No fault found.\""
+        ],
+        "elements": [
+          {
+            "name": "Resolve fault",
+            "at": "Resolve fault",
+            "shows": "Primary action on an open fault.",
+            "rule": "Needs no note (the Resolution note is optional). Resolving removes the fault's notice from the pen page and logs \"Equipment fault resolved · device · note\"; it does not delete the fault.",
+            "source": "farrowing-astra-concept.js room-pen-resolve-fault"
+          }
+        ],
+        "edge": [
+          "The Resolved state is built but no door reaches it: a resolved fault leaves the pen page, and pen log entries are not links."
+        ],
+        "issues": []
+      }
+    },
+    {
+      "id": "farrowing.search",
+      "name": "Find a sow",
+      "zh": "查找母猪",
+      "status": "in-design",
+      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+      "preset": "room",
+      "steps": [
+        "Search ear tag"
+      ],
+      "figma": "",
+      "notes": {
+        "purpose": "Find a sow in this unit by ear tag or pen.",
+        "elements": [
+          {
+            "name": "Results",
+            "at": "7 sows in this unit",
+            "shows": "A count line, then one row per sow with her pen on the left.",
+            "states": [
+              {
+                "state": "Empty field",
+                "when": "Nothing typed",
+                "shows": "\"7 sows in this unit\": every sow, in room order"
+              },
+              {
+                "state": "Typed",
+                "when": "Any text",
+                "shows": "\"2 sows found\" for a partial tag or a pen name (\"B4\")"
+              },
+              {
+                "state": "No match",
+                "when": "Nothing matches",
+                "shows": "\"No matching ear tags.\""
+              }
+            ],
+            "logic": "Case-insensitive contains-match on the ear tag or the pen code, over the current unit only: sows in other units are not found. Rows are the room rows (Awaiting, Active, Done, Sow died, outcome).",
+            "rule": "A row opens that sow's record by her status (Awaiting or Active drawer, locked record, or the production log for a recorded outcome) and makes her pen the current one.",
+            "source": "farrowing-astra-concept.js roomSearchResults(), room-sow"
+          }
+        ],
+        "edge": [
+          "Typing updates the results in place; the sheet does not reload."
+        ],
+        "issues": []
+      }
+    },
+    {
+      "id": "farrowing.scan",
+      "name": "Scan ear tag",
+      "zh": "扫描耳标",
+      "status": "in-design",
+      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+      "preset": "room",
+      "steps": [
+        "Scan ear tag"
+      ],
+      "figma": "",
+      "notes": {
+        "purpose": "Open a sow by scanning her ear tag.",
+        "elements": [
+          {
+            "name": "Scanner preview",
+            "at": "Scanner preview",
+            "shows": "A placeholder frame: \"Camera scanning isn't connected in this prototype.\"",
+            "rule": "\"Try sample tag\" opens the unit's first sow (000418). Below the frame, the same field and results as Find a sow take a typed tag or pen.",
+            "source": "farrowing-astra-concept.js roomScan, room-demo-scan; ASTRA-ROOM-PAGE-AUDIT.md"
+          }
+        ],
+        "edge": [
+          "A real scan needs a device integration (camera or tag reader); until then the screen is explicitly a demo."
+        ],
+        "issues": [
+          "Scan ear tag is the primary button in the dock yet opens a non-working preview; the working path is the field below it."
+        ]
+      }
+    },
+    {
+      "id": "farrowing.task-sows",
+      "name": "Task sows list",
+      "zh": "任务母猪列表",
+      "status": "in-design",
+      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+      "preset": "task-blocked",
+      "steps": [
+        "Still farrowing"
+      ],
+      "figma": "",
+      "notes": {
+        "purpose": "List the sows behind one number on the End task review, across all units, so the worker can open each one.",
+        "states": [
+          "Active farrowing (from \"Still farrowing\"): \"Open a sow to review and finish the record.\"; each row ends \"9 alive\".",
+          "Awaiting farrowing: a notice \"N sows will be removed from this batch\"; each row ends with her due text.",
+          "Sow deaths: each sow is a death review block rather than a plain row.",
+          "Miscarriages, Not in pig, Removed from batch: \"Recorded outcomes across all units. Open a sow to view the record.\"; each row ends with the outcome word.",
+          "Empty group: \"No sows to review.\""
+        ],
+        "elements": [
+          {
+            "name": "Sow row",
+            "at": "000418",
+            "shows": "Ear tag, \"Unit 7 · B1\", state text, chevron.",
+            "rule": "A row switches to that sow's unit and opens her record (a recorded outcome opens the production log). Back from the record returns here, not to the room list.",
+            "source": "farrowing-astra-concept.js taskEndSheet(), room-task-sow"
+          }
+        ],
+        "edge": [
+          "Rows come from every unit of the task, not the current one."
+        ],
+        "issues": []
+      }
+    },
+    {
+      "id": "farrowing.death-breakdown",
+      "name": "Death breakdown",
+      "zh": "死亡明细",
+      "status": "in-design",
+      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+      "preset": "locked",
+      "steps": [
+        "View death breakdown"
+      ],
+      "figma": "",
+      "notes": {
+        "purpose": "The dead piglets of one litter by cause.",
+        "elements": [
+          {
+            "name": "Causes",
+            "at": "Total dead",
+            "shows": "One fact per cause that has a count, then \"Total dead\".",
+            "logic": "The six causes are Stillborn, Mummified, Crushed, Scours, Starve-out and Other; a cause with 0 is left out. The total is the same figure as the record's Dead.",
+            "source": "farrowing-astra-concept.js deathBreakdown()"
+          }
+        ],
+        "edge": [
+          "Opened only from the link under the facts of a finished litter, and only while Dead is above zero."
+        ],
+        "issues": []
+      }
+    },
+    {
+      "id": "farrowing.today",
+      "name": "Today",
+      "zh": "今日",
+      "status": "in-design",
+      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+      "preset": "room",
+      "steps": [
+        "Back to Today"
+      ],
+      "figma": "",
+      "notes": {
+        "purpose": "The room's Back lands on a minimal Today page that stands in for Home, with one way back into the room.",
+        "states": [
+          "Task running: \"Unit 7 · Today · Your work in this unit\", a Farrowing card \"1 active · 4 awaiting · 2 done\" and \"Continue from pen B1\".",
+          "Task ended: \"All units · Today · Ended tasks\", a Farrowing card \"Task ended · N finished\" and \"View receipt\"."
+        ],
+        "elements": [
+          {
+            "name": "Farrowing card",
+            "at": "Continue from pen B1",
+            "shows": "The task name, the current unit's counts and a resume line.",
+            "logic": "Counts are this unit's sows by state tab (Active, Awaiting, Done), not the whole task. \"Continue from pen\" names the pen last opened; resuming restores the lens, filter and scroll.",
+            "source": "farrowing-astra-concept.js roomHome(); ASTRA-ROOM-PAGE-AUDIT.md"
+          }
+        ],
+        "edge": [
+          "After the task ends the room cannot be reopened: every way in lands here, and the card opens the receipt."
+        ],
+        "issues": [
+          "A stand-in for Home: the real destination is the workbench feature; this page is not designed to be it."
+        ]
+      }
+    },
+    {
+      "id": "farrowing.sow-actions",
+      "name": "More actions",
+      "zh": "更多操作",
+      "status": "in-design",
+      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+      "preset": "count",
+      "steps": [
+        "More actions"
+      ],
+      "figma": "",
+      "notes": {
+        "purpose": "All other things to do for one sow, grouped Health, Routine, Production, opened from \"More actions\" on her drawer.",
+        "states": [
+          "Awaiting (nothing counted): Record miscarriage, Remove from batch, Mark not in pig, Record sow death, note and transfer are open; the piglet rows and Edit litter record are closed.",
+          "Farrowing: the piglet rows, Edit litter record and Foster piglets open; Remove from batch and Mark not in pig close.",
+          "Finished: Record miscarriage also closes.",
+          "Sow died or outcome recorded: most rows close with the reason."
+        ],
+        "elements": [
+          {
+            "name": "Production rows",
+            "at": "Piglet processing",
+            "shows": "Record miscarriage, Piglet processing, Record piglet deaths, Reconcile piglet count, Edit litter record, Foster piglets, Remove from batch, Mark not in pig, Move to another farrowing batch.",
+            "states": [
+              {
+                "state": "Record the litter first.",
+                "when": "No piglets recorded yet",
+                "shows": "Closes Piglet processing, Record piglet deaths, Reconcile piglet count"
+              },
+              {
+                "state": "No litter has been recorded yet.",
+                "when": "Nothing counted",
+                "shows": "Closes Edit litter record"
+              },
+              {
+                "state": "No live piglets recorded.",
+                "when": "Alive is 0",
+                "shows": "Closes Foster piglets"
+              },
+              {
+                "state": "A litter has already been recorded.",
+                "when": "Born above zero",
+                "shows": "Closes Remove from batch and Mark not in pig"
+              },
+              {
+                "state": "Farrowing is already finished.",
+                "when": "Litter locked",
+                "shows": "Closes Record miscarriage"
+              },
+              {
+                "state": "A production outcome is already recorded.",
+                "when": "Miscarriage, not in pig or removed",
+                "shows": "Closes most production rows"
+              },
+              {
+                "state": "This sow has died.",
+                "when": "Farrowing ended by her death",
+                "shows": "Closes miscarriage, note, transfer, remove, not in pig"
+              },
+              {
+                "state": "No destination farrowing batches are connected in this preview.",
+                "when": "Always, in the prototype",
+                "shows": "Closes Move to another farrowing batch"
+              }
+            ],
+            "logic": "Closed rows are not listed in the working list; they sit behind one \"Unavailable actions (n)\" link with the reason beside each. Farrowing's own rows hand back to the room (the host) to open their screens; Health and the rest run inside the embedded Inspection sheet.",
+            "source": "farrowing-astra-concept.js sowActionCatalogue(); ASTRA-SOW-ACTIONS-MOBBIN.md"
+          }
+        ],
+        "edge": [
+          "The sheet is Inspection's embedded sow page (?embed=sow): its Health and Routine rows are the same as in a pig's Actions; Farrowing adds the Production rows and the note preview.",
+          "Returning from a saved action lands back on this list, not on the room."
+        ],
+        "issues": []
+      }
+    },
+    {
+      "id": "farrowing.note",
+      "name": "Sow note",
+      "zh": "母猪备注",
+      "status": "in-design",
+      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+      "preset": "count",
+      "steps": [
+        "More actions",
+        "Edit note"
+      ],
+      "figma": "",
+      "notes": {
+        "purpose": "Leave the sow a handover note or describe a visible marker (a red line on the shoulder).",
+        "states": [
+          "Add note: no current note; the field is empty.",
+          "Edit note: a \"Current note\" card with the text and its stamp, and the field filled with that text."
+        ],
+        "elements": [
+          {
+            "name": "Save note",
+            "at": "Save note",
+            "shows": "Primary action, disabled while the field is empty.",
+            "rule": "A sow keeps one note: Save replaces it and writes \"Note updated · text\" to her history, so the previous text is only in the log. Closed once the sow has died (\"This sow has died.\").",
+            "source": "farrowing-astra-concept.js saveMarker"
+          }
+        ],
+        "edge": [
+          "Back returns to More actions and keeps the draft on the device."
+        ],
+        "issues": []
+      }
+    },
+    {
+      "id": "farrowing.piglet-care",
+      "name": "Piglet processing",
+      "zh": "仔猪处理",
+      "status": "in-design",
+      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+      "preset": "count",
+      "steps": [
+        "More actions",
+        "[data-action=\"sow-host-action\"][data-value=\"piglets\"]"
+      ],
+      "figma": "",
+      "notes": {
+        "purpose": "Work through the litter's processing items day by day and tick what was done.",
+        "elements": [
+          {
+            "name": "Care items",
+            "at": "Day 3",
+            "shows": "A summary (\"2 of 5 care items done\"), then a card per day with its items.",
+            "states": [
+              {
+                "state": "Recorded",
+                "when": "A day before the sample day",
+                "shows": "Day 1 \"Recorded\"; items ticked with who and when"
+              },
+              {
+                "state": "Due today",
+                "when": "Day 3",
+                "shows": "Open circles, meta \"Due today\" (Iron supplement, Ear tag, notch and weight)"
+              },
+              {
+                "state": "In N days",
+                "when": "Later days",
+                "shows": "\"In 2 days\" (Day 5, Health check)"
+              }
+            ],
+            "logic": "The day labels are computed against a fixed sample \"today = day 3\". Ticking an item sets its meta to \"This visit · G. Hansen\"; un-ticking restores \"Due today\" or \"In 2 days\".",
+            "rule": "Nothing is saved on a tick: \"Save care updates\" is disabled until something changes and writes one history entry, \"Piglet processing updated · n of 5 items done\". Due items stay visible until the litter is saved.",
+            "source": "farrowing-astra-concept.js processingCare(), saveProcessing"
+          }
+        ],
+        "edge": [
+          "Opens only when a litter has been recorded; otherwise the action is closed with \"Record the litter first.\""
+        ],
+        "issues": [
+          "A second design of piglet processing: the Piglet processing task feature has its own (see the decision \"Piglet processing is drawn in Farrowing and as its own feature\")."
+        ]
+      }
+    },
+    {
+      "id": "farrowing.piglet-identity",
+      "name": "Piglet identity",
+      "zh": "仔猪身份",
+      "status": "in-design",
+      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+      "preset": "count",
+      "steps": [
+        "More actions",
+        "[data-action=\"sow-host-action\"][data-value=\"piglets\"]",
+        "Piglet records",
+        "Add piglet"
+      ],
+      "figma": "",
+      "notes": {
+        "purpose": "Give one piglet its identity, or edit one: ear tag, ear notch, sex and weight.",
+        "states": [
+          "Add piglet identity: \"New identity\" card, empty fields.",
+          "Piglet identity: the same form filled from a piglet row."
+        ],
+        "elements": [
+          {
+            "name": "Save identity",
+            "at": "Save identity",
+            "shows": "Primary action, disabled while all four fields are empty.",
+            "rule": "Enabled as soon as any one of tag, notch, sex or weight has a value. A new identity moves one piglet from \"Without identity\" to \"Identified\" and writes \"Piglet identity added · tag\" to the sow's history; the list then shows the Piglet records tab.",
+            "logic": "Scan tag and Ear notch on the Piglet records tab open this form pre-filled with a sample tag (418001 plus the number identified) or a \"Choose notch\" placeholder.",
+            "source": "farrowing-astra-concept.js savePiglet"
+          }
+        ],
+        "edge": [
+          "Dead piglets stay in the list but cannot be selected."
+        ],
+        "issues": [
+          "Save accepts sex or weight alone, so a row can be saved with neither tag nor notch; RULINGS (Piglet processing, Q3) says tag or notch identifies and sex and weight are optional."
+        ]
+      }
+    },
+    {
+      "id": "farrowing.piglet-death",
+      "name": "Report piglet mortality",
+      "zh": "仔猪死亡",
+      "status": "in-design",
+      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+      "preset": "count",
+      "steps": [
+        "More actions",
+        "[data-action=\"sow-host-action\"][data-value=\"piglets\"]",
+        "Piglet records",
+        "Report mortality"
+      ],
+      "figma": "",
+      "notes": {
+        "purpose": "Record piglet deaths in one pass: the identified piglets ticked on the Piglet records tab, plus any without identity.",
+        "elements": [
+          {
+            "name": "Unidentified piglets",
+            "at": "Unidentified piglets",
+            "shows": "A stepper, shown only while the litter has piglets without identity.",
+            "logic": "Maximum = the smaller of piglets without identity and alive piglets minus those already ticked. Total to report = ticked piglets + this stepper.",
+            "source": "farrowing-astra-concept.js mortalityCount"
+          },
+          {
+            "name": "Cause",
+            "at": "Cause",
+            "shows": "A picker: Cause unknown, Crushed, Scours, Starve-out, Other.",
+            "logic": "One cause applies to the whole save (\"Use another pass when the causes differ\"). The litter's counters have six types: Cause unknown is counted under Other, and Stillborn and Mummified are not offered here.",
+            "source": "farrowing-astra-concept.js mortalityCauses, savePigletMortality"
+          },
+          {
+            "name": "Save mortality",
+            "at": "Save mortality",
+            "shows": "Primary action, \"Save mortality · 3\".",
+            "rule": "Disabled until a cause is chosen and the total is above zero. Saving marks the ticked piglets Dead, lowers Alive by the total, adds the total to that cause's dead counter, never lowers Born, and writes \"N piglets died · cause\" (with any photos) to the history.",
+            "source": "farrowing-astra-concept.js savePigletMortality"
+          }
+        ],
+        "edge": [
+          "Reachable with nothing ticked when the litter has piglets without identity (\"0 identified selected\"); Save stays disabled until the stepper or a tick gives a total."
+        ],
+        "issues": [
+          "A third place to record piglet deaths in the same prototype: the sow's Record dead drawer (staged, with Stillborn and Mummified), the Record piglet deaths row on More actions, and this form. RULINGS says \"ONE dead drawer product-wide\"."
+        ]
       }
     }
   ]
