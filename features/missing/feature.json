@@ -8,23 +8,100 @@
   "duplicates": "",
   "groups": [
     [
-      "Old UI",
+      "Report missing",
       [
-        "missing.confirm"
+        "missing.drawer",
+        "missing.mixed",
+        "missing.after",
+        "missing.page"
       ]
     ]
   ],
   "screens": [
     {
-      "id": "missing.confirm",
-      "name": "Confirm",
-      "zh": "上报失踪-二次确认",
-      "status": "placeholder",
+      "id": "missing.drawer",
+      "name": "Report missing · drawer",
+      "zh": "上报失踪",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-missing&slide=1",
       "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
       "notes": {
-        "purpose": "Second confirmation of a missing report.",
-        "issues": []
+        "purpose": "One sentence: a report is a parking.",
+        "rules": [
+          "No reason, date or photo is captured.",
+          "The footnote carries the consequence only; the stamp is already visible on her page."
+        ]
+      }
+    },
+    {
+      "id": "missing.mixed",
+      "name": "Mixed selection · heads cannot go missing",
+      "zh": "上报失踪 · 含无ID",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-missing&slide=2",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "Tagged pigs and un-identified head together.",
+        "elements": [
+          {
+            "name": "No-tag line",
+            "at": "no tags",
+            "shows": "Amber line counting the head that cannot be reported",
+            "rule": "Group-only selection: the verb is absent and the not-available line says \"missing needs a tag\". Mixed: the verb stays and scopes visibly; the chevron goes to the pen Count sheet."
+          }
+        ]
+      }
+    },
+    {
+      "id": "missing.after",
+      "name": "After · rows leave, count re-derives",
+      "zh": "上报失踪 · 完成",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-missing&slide=3",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "The walk after the report.",
+        "rules": [
+          "The pen count re-derives from placements (13 to 11) and the feed sum follows; no discrepancy state."
+        ],
+        "edge": [
+          "Timing of the count drop (on report or on resolution) is an open product decision."
+        ]
+      }
+    },
+    {
+      "id": "missing.page",
+      "name": "Her page · parked",
+      "zh": "失踪猪只页",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-missing&slide=4",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "The record of a pig reported missing.",
+        "rules": [
+          "The state line wears the report, open cases stay open and history is whole; recovery is a one-line reversal."
+        ],
+        "edge": [
+          "Where the missing list lives is unresolved."
+        ]
       }
     }
+  ],
+  "flow": [
+    [
+      "missing.drawer",
+      "missing.after",
+      "tap Report missing"
+    ],
+    [
+      "missing.mixed",
+      "missing.after",
+      "tap Report missing"
+    ],
+    [
+      "missing.after",
+      "missing.page",
+      "scan or open her record"
+    ]
   ]
 }

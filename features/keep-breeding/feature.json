@@ -8,11 +8,12 @@
   "duplicates": "built inside Inspection — see inspection / health-record",
   "groups": [
     [
-      "Old UI",
+      "Mark and unmark",
       [
         "keep-breeding.mark",
-        "keep-breeding.remove",
-        "keep-breeding.confirm"
+        "keep-breeding.blocked",
+        "keep-breeding.unmark",
+        "keep-breeding.after"
       ]
     ]
   ],
@@ -21,34 +22,83 @@
       "id": "keep-breeding.mark",
       "name": "Mark as breeder",
       "zh": "标记留种",
-      "status": "placeholder",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-liuzhong&slide=1",
       "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
       "notes": {
-        "purpose": "Mark a pig to keep: fill the ear notch, fill the parents, check the sow's status.",
-        "issues": []
+        "purpose": "Zero fields: the drawer is the confirmation.",
+        "rules": [
+          "For an all-tagged selection the sheet opens directly: no extra steps.",
+          "The body line states the visible consequence: they appear in the breeding-stock list."
+        ]
       }
     },
     {
-      "id": "keep-breeding.remove",
+      "id": "keep-breeding.blocked",
+      "name": "Blocked pigs named",
+      "zh": "留种 · 无法标记",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-liuzhong&slide=2",
+      "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+      "notes": {
+        "purpose": "The pigs that cannot be marked are listed with the reason.",
+        "elements": [
+          {
+            "name": "Left-out line",
+            "at": "left out",
+            "shows": "Amber line with the count and the reason",
+            "rule": "The primary acts on the remainder, with the count in the verb. The chevron opens the left-out rows; nobody is dropped in silence.",
+            "logic": "Which pigs are blocked depends on the eligibility predicate, which production never states (open); the reason line is where those answers land."
+          }
+        ]
+      }
+    },
+    {
+      "id": "keep-breeding.unmark",
       "name": "Remove breeder mark",
       "zh": "移除留种",
-      "status": "placeholder",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-liuzhong&slide=3",
       "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
       "notes": {
-        "purpose": "Remove the mark: confirm parents, fill ear tag and sex, blocked and all-allowed selections.",
-        "issues": []
+        "purpose": "The second verb, not a toggle.",
+        "rules": [
+          "Same drawer shape as Mark with the count in the primary (\"Remove breeding mark from 6\").",
+          "No identity gate: a marked pig has a tag by definition. The footnote says the pigs leave the list and the trail stays."
+        ]
       }
     },
     {
-      "id": "keep-breeding.confirm",
-      "name": "Confirm and result",
-      "zh": "二次确认 / 操作结果",
-      "status": "placeholder",
+      "id": "keep-breeding.after",
+      "name": "After · a filterable set",
+      "zh": "留种 · 完成",
+      "status": "in-design",
+      "url": "/ux/archive/workflows.html?sec=wf-liuzhong&slide=4",
       "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
       "notes": {
-        "purpose": "Second confirmation, pop-up and result.",
-        "issues": []
+        "purpose": "The marked pigs as a set, not a row token.",
+        "rules": [
+          "The funnel's marked-set filter collects them for a bulk Transfer (for example to gilt development).",
+          "The durable fact sits on her page under Identity; modify and Unmark are reached there at one pig."
+        ]
       }
     }
+  ],
+  "flow": [
+    [
+      "keep-breeding.mark",
+      "keep-breeding.after",
+      "tap Mark"
+    ],
+    [
+      "keep-breeding.blocked",
+      "keep-breeding.after",
+      "tap the primary"
+    ],
+    [
+      "keep-breeding.unmark",
+      "keep-breeding.after",
+      "tap Remove breeding mark"
+    ]
   ]
 }
