@@ -106,6 +106,8 @@ Write `OUT/verdict.json`:
   "walk": [{ "screen": "", "ok": true, "issue": "" }],
   "pairs": [{ "screen": "", "lang": "en|zh", "width": 390, "verdict": "better|same|worse", "why": "" }],
   "defects": [{ "screen": "", "what": "", "fix": "" }],
+  "gone": [{ "screen": "", "why": "" }],
   "rejected": ["R#"], "contradicted": [""] }
 ```
+`gone` accounts for every screen `mechanical.json` lists as removed from the atlas: where its job went, or why it no longer exists.
 Report in 150 words or fewer: pass or fail, the commit, failed checks, the pairs table, and the defects. Don't suggest redesigns; name the smallest fix.

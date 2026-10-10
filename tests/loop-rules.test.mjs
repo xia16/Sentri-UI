@@ -1,7 +1,7 @@
 // The gate's and the polish loop's rules (scripts/loop-rules.mjs).
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { effectiveClass, classifyScreens, checkVerdict, checkGrades, worstFirst, isClean, loopStatus, touchesSystem } from '../scripts/loop-rules.mjs';
+import { effectiveClass, classifyScreens, checkVerdict, checkGrades, worstFirst, isClean, loopStatus, touchesSystem, touchesTools } from '../scripts/loop-rules.mjs';
 
 test('a change to the bundle or tokens is a shared-component change whatever was declared', () => {
   assert.deepEqual(touchesSystem(['ux/design-system/components/bundle.css', 'features/farrowing/feature.json']), ['ux/design-system/components/bundle.css']);
@@ -93,4 +93,23 @@ test('the loop stops incomplete at the cap, or when a round makes no progress', 
   const stuck = { hard: 1, scores: { a: 5 }, leaves: { fail: 1 }, fix: { kind: 'defect', merged: false } };
   assert.match(loopStatus({ cap: 5, rounds: [stuck, stuck] }).why, /no progress/);
   assert.equal(loopStatus({ cap: 5, rounds: [dirty(1)] }).status, 'continue');
+});
+
+test('any changed pixel is a change: a 1px shift of a small element is a few dozen pixels', () => {
+  const runs = [{ screen: 'a', feature: 'f', ok: true }];
+  assert.equal(classifyScreens(runs, runs, () => 0.004).diff.length, 1);
+  assert.equal(classifyScreens(runs, runs, () => 0).same.length, 1);
+});
+
+test('a removed screen must be accounted for, and a quick run never feeds a verdict', () => {
+  const m = { ...mech, screens: { diff: [{ id: 'farrowing.room' }], new: [], gone: [{ id: 'farrowing.old' }] } };
+  const ok = { pass: true, candidate: 'c1', base: 'b1', pairs: [pair('better')] };
+  assert.match(checkVerdict(ok, m).problems.join(), /farrowing.old was removed/);
+  assert.ok(checkVerdict({ ...ok, gone: [{ screen: 'farrowing.old', why: 'merged into the room list' }] }, m).ok);
+  assert.match(checkVerdict(ok, { ...mech, quick: true }).problems.join(), /--quick/);
+});
+
+test("the gate's own tools and the workflow text are told apart from design files", () => {
+  assert.deepEqual(touchesTools(['scripts/check-states.mjs', 'docs/design-workflow/README.md', 'ux/system/farrowing-astra-concept.js', 'tests/row-family.test.mjs']),
+    ['scripts/check-states.mjs', 'docs/design-workflow/README.md']);
 });

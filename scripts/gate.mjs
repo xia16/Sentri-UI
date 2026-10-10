@@ -16,7 +16,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { CLASSES, effectiveClass, classifyScreens, checkVerdict, touchesSystem } from './loop-rules.mjs';
+import { CLASSES, effectiveClass, classifyScreens, checkVerdict, touchesSystem, touchesTools } from './loop-rules.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PW_HOME = 'C:/Users/ying_/.cache/adam-design/playwright-1.63.0';
@@ -38,8 +38,11 @@ if (opt('verdict')) {
   const verdict = { ...parts[0], pass: parts.every((p) => p.pass === true), pairs: cat('pairs'), walk: cat('walk'), defects: cat('defects'), rejected: cat('rejected'), contradicted: cat('contradicted') };
   for (const p of parts) if (p.candidate !== verdict.candidate || p.base !== verdict.base) verdict.candidate = 'mixed verdicts';
   const v = checkVerdict(verdict, mech);
+  git(['fetch', '-q', 'origin']);
   const head = git(['rev-parse', mech.ref]).out.trim();
   if (head && head !== mech.candidate) v.problems.push(`${mech.ref} moved to ${head.slice(0, 7)} after the gate ran on ${mech.candidate.slice(0, 7)}: gate again`);
+  const main = git(['rev-parse', 'origin/main']).out.trim();
+  if (main !== mech.base) v.problems.push(`origin/main moved to ${main.slice(0, 7)} after the gate ran against ${mech.base.slice(0, 7)}: merge main forward and gate again (R10)`);
   const ok = v.problems.length === 0 && verdict.pass === true && mech.pass === true;
   console.log(ok ? `GATE PASS ${mech.candidate.slice(0, 7)}` : `GATE FAIL ${mech.candidate.slice(0, 7)}`);
   for (const p of v.problems) console.log('  -', p);
@@ -173,6 +176,7 @@ if (CLASSES.indexOf(declared) >= 1 || mode === 'refactor') {
 
 // ---------- the screen diff: every screen, base vs candidate, bare at 390 ----------
 const quick = flag('quick');
+mech.quick = quick;
 if (quick) gaps.push('quick run: screens outside the scope were not compared (a builder self-check, not a gate)');
 const shoot = (side, dir, extra) => new Promise((res) => {
   const args = [path.join(root, 'scripts/shoot-screens.mjs'), dir, '--base', url[side], '--commit', side === 'base' ? mech.base : mech.candidate,
@@ -215,10 +219,10 @@ if (screens.bothBroken.length) gaps.push(`${screens.bothBroken.length} screen(s)
 const ec = effectiveClass({ declared, files, diffs: [...screens.diff, ...screens.new, ...screens.gone], scope });
 mech.class = { declared, effective: ec.cls, why: ec.why };
 if (ec.cls !== declared) console.log(`class: ${declared} → ${ec.cls} (${ec.why.join('; ')})`);
-if (mode === 'refactor') {
-  const moved = [...screens.diff, ...screens.new, ...screens.gone];
-  check('refactor: every screen identical', !moved.length, moved.map((s) => s.id).slice(0, 5).join(', '));
-}
+const moved = [...screens.diff, ...screens.new, ...screens.gone];
+if (mode === 'refactor') check('refactor: every screen identical', !moved.length, moved.map((s) => s.id).slice(0, 5).join(', '));
+const tools = touchesTools(files);
+if (tools.length && moved.length) check('workflow changes in their own PR', false, `this change moves ${moved.length} screen(s) and also edits the workflow or the gate's tools (${tools.slice(0, 3).join(', ')}): split it`);
 // The shared-component queue: one shared change at a time, oldest first. A shared candidate waits while an older open,
 // non-draft PR also touches the shared system; once that merges, this one merges main forward and is gated against it.
 if (ec.cls === 'shared') {
@@ -243,6 +247,14 @@ if (changed.length) {
   console.log(`\nshooting ${changed.length} changed screen(s) at 390/360 × en/zh …`);
   const pairArgs = ['--screens', changed.join(','), '--widths', '390,360', '--langs', 'en,zh'];
   const [pb, pc] = await Promise.all([shoot('base', path.join(out, 'pairs-raw/base'), pairArgs), shoot('cand', path.join(out, 'pairs-raw/cand'), pairArgs)]);
+  // Base shot twice (the diff pass and this one): if those two differ, the screen doesn't render the same way twice, and
+  // its diff may be noise. It stays changed (the judge looks), but the judge is told.
+  mech.flaky = [];
+  for (const id of screens.diff.map((d) => d.id)) {
+    const a = path.join(out, 'shots/base', id, 'en-390.png'), b = path.join(out, 'pairs-raw/base', id, 'en-390.png');
+    if (fs.existsSync(a) && fs.existsSync(b) && (await pctDiff(a, b)) > 0) mech.flaky.push(id);
+  }
+  if (mech.flaky.length) gaps.push(`${mech.flaky.length} changed screen(s) render differently twice on base, so their diff may be noise: ${mech.flaky.slice(0, 5).join(', ')}`);
   const zhIgnored = new Set();
   for (const c of pc.runs) {
     const b = pb.runs.find((x) => x.screen === c.screen && x.lang === c.lang && x.width === c.width);

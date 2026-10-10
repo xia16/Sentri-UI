@@ -29,6 +29,16 @@ const SYSTEM = [
 ];
 export const touchesSystem = (files) => files.filter((f) => SYSTEM.some((re) => re.test(f)));
 
+// The gate's own tools and the workflow's text. A design PR that also changes these grades itself with tools it rewrote;
+// the README rule: change the workflow in its own pull request, never inside a design PR.
+const TOOLS = [
+  /^scripts\/(gate|shoot-screens|loop-rules|polish-loop|check-states|check-legibility|run-scenarios|serve-ux|build-atlas)\.(mjs|cjs)$/,
+  /^scripts\/check-(states|legibility)\.fixtures\//,
+  /^docs\/design-workflow\//,
+  /^\.claude\/skills\//,
+];
+export const touchesTools = (files) => files.filter((f) => TOOLS.some((re) => re.test(f)));
+
 // The class the gate runs: never lower than declared; shared when the system changed or screens outside the scope changed.
 export function effectiveClass({ declared, files, diffs, scope }) {
   const why = [];
@@ -51,8 +61,9 @@ export function classifyScreens(baseRuns, candRuns, pctOf) {
     if (!cr.ok && !br.ok) { out.bothBroken.push({ id, feature: cr.feature, error: cr.error }); continue; }
     if (!cr.ok) { out.broken.push({ id, feature: cr.feature, error: cr.error }); continue; }
     if (!br.ok) { out.new.push({ id, feature: cr.feature, note: 'did not render on base' }); continue; }
+    // Any changed pixel counts: rendering is deterministic on one machine, and a 1px shift of a small element is a few dozen pixels.
     const pct = pctOf(id);
-    (pct > 0.01 ? out.diff : out.same).push({ id, feature: cr.feature, pct: Math.round(pct * 100) / 100 });
+    (pct > 0 ? out.diff : out.same).push({ id, feature: cr.feature, pct: Math.round(pct * 1000) / 1000 });
   }
   for (const [id, br] of b) if (!c.has(id)) out.gone.push({ id, feature: br.feature });
   return out;
@@ -65,6 +76,9 @@ export function checkVerdict(verdict, mech) {
   if (verdict.candidate !== mech.candidate) problems.push(`verdict is for ${verdict.candidate}, the candidate is ${mech.candidate}`);
   if (verdict.base !== mech.base) problems.push(`verdict compares against ${verdict.base}, the base is ${mech.base}`);
   if (verdict.pass && !mech.pass) problems.push('verdict passes a candidate whose mechanical gate failed');
+  if (mech.quick) problems.push('the mechanical run was --quick (a builder self-check): gate it in full');
+  const acked = new Set((verdict.gone || []).filter((g) => g.why).map((g) => g.screen));
+  for (const g of mech.screens?.gone || []) if (!acked.has(g.id)) problems.push(`screen ${g.id} was removed from the atlas: the verdict must say why under "gone"`);
   const pairs = verdict.pairs || [];
   const judged = new Set(pairs.filter((p) => p.lang === 'en' && p.width === 390).map((p) => p.screen));
   for (const d of [...(mech.screens?.diff || []), ...(mech.screens?.new || [])]) if (!judged.has(d.id)) problems.push(`no en-390 judgement for changed screen ${d.id}`);

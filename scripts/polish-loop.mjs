@@ -142,6 +142,10 @@ if (cmd === 'record') {
   const ev = JSON.parse(fs.readFileSync(path.join(dir, `r${r.n}`, 'evidence.json'), 'utf8'));
   const merged = opt('merged') === 'yes';
   if (kind !== 'none' && merged && !opt('pr')) { console.error('a merged fix names its PR'); process.exit(2); }
+  if (kind !== 'none' && opt('pr')) { // the ledger takes GitHub's word, not the driver's
+    const st = sh('gh', ['pr', 'view', opt('pr'), '--json', 'state', '--jq', '.state']).stdout.trim();
+    if (merged !== (st === 'MERGED')) { console.error(`PR #${opt('pr')} is ${st || 'not found'} on GitHub, but --merged says ${merged ? 'yes' : 'no'}`); process.exit(2); }
+  }
   Object.assign(r, {
     recorded: true, hard: hardCount(g),
     scores: Object.fromEntries(g.states.map((s) => [`${s.screen}${s.state ? '/' + s.state : ''}`, DIMENSIONS.reduce((n, d) => n + s.scores[d], 0)])),
