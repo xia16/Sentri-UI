@@ -44,5 +44,8 @@ yarn-error.log*
 /.claude/worktrees/
 __pycache__/
 
+# screen-compare renders (scripts/compare-screens.mjs): only the diff PNGs and the JSON are kept
+review/compare-*/*.base.png
+review/compare-*/*.branch.png
 # behaviour-gate screenshots (regenerate with scripts/run-scenarios.mjs)
 /review/scenarios/

@@ -21,11 +21,11 @@ test('facts distinguish zero from unknown, keep markup, and refuse a control in 
   assert.match(result,/st-fact-id/);
   assert.doesNotMatch(result,/<a href|<button/);
 });
-test('heading: page and group carry no icon, meta or action; panel reads as section; the action link is a standard text button', () => {
+test('heading: page and group carry no icon, meta or action; panel is its own kind; the action link is a standard text button', () => {
   const page = ui.heading({title:'Room',kind:'page',icon:'<svg></svg>',meta:'x',action:'<button>y</button>',description:'d'});
   assert.match(page,/data-kind="page"/);
   assert.doesNotMatch(page,/<svg|st-heading-meta|<button/);
-  assert.match(ui.heading({title:'T',kind:'panel'}),/data-kind="section"/);
+  assert.match(ui.heading({title:'T',kind:'panel'}),/data-kind="panel"/);
   const link = ui.heading({title:'Litter',action:{label:'View log',action:'history',ariaLabel:'Open the log'}});
   assert.match(link,/class="st-text-action/);
   assert.match(link,/data-action="history"/);
