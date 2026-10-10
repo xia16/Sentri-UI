@@ -861,3 +861,4 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
 .st-banner[data-size="card"] .st-banner-body{align-items:flex-start;min-height:56px}
 .st-banner[data-size="card"] .st-banner-copy{align-self:center}
 .st-banner[data-size="card"] .st-banner-door{align-self:center}
+.st-heading[data-kind="panel"] .st-heading-title{font-size:12px;line-height:1.5}

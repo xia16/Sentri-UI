@@ -53,7 +53,7 @@
       "diff": "review/compare-farrowing/farrowing.locked.diff.png"
     },
     "farrowing.edit": {
-      "note": "The Clear text action and one-pixel text placement (Text anti-aliasing only (geometry identi...); the Save label is the baseline's.",
+      "note": "The Clear text action and one-pixel text placement: text anti-aliasing only (geometry identical).",
       "pixels": 229,
       "maxDelta": 81,
       "status": "differs",
