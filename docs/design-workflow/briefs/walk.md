@@ -11,7 +11,7 @@ Worked example (Piglet processing): the tree is `ux/tasks/piglet-processing/rese
 3. **A first-time worker.** One persona has never used the app; they find what a daily user has learned to step around.
 4. **Held out.** Keep any eval set closed to walkers.
 5. **Pin the commit.** Every walker records `git log --oneline -1`. Findings are only valid for that commit.
-6. **The matrix ledger.** Before the round, every scenario of the tree is in the ledger as Pending. Each walker owns named rows and moves each to passed, failed or blocked. A blocked row is never quietly re-queued.
+6. **The matrix ledger.** Once per feature, `node scripts/scenario-ledger.mjs <feature> init` puts every branch of the tree in the ledger as pending. Per round, on a clean up-to-date `origin/main`, `node scripts/scenario-ledger.mjs <feature> round` opens the round and pins its commit (`round --fresh` when the walkers weren't given the paths; the last round before settling must be). Give each walker named rows to own. A blocked row is never quietly re-queued: it stays blocked until the question it waits on is ruled.
 7. Give each walker this brief, their persona, the previous rounds' condensed findings (so they say "R2-n still broken" instead of filing it as new), and `RULINGS.md` for the feature's area.
 
 ## Walker: how to walk
@@ -24,6 +24,19 @@ Each walker is two roles. The **driver** performs the taps reliably and records 
 - **Start where a worker starts** (Home or the feature's list), not from a state URL. Use a fixture variant only to set the day's starting situation.
 - Tap, read, tap. Do the job your persona came to do, then the interruptions it would meet.
 - Read the owner's rulings so you know what was ruled, but judge as a worker first.
+
+## Mark your rows
+
+For each row you own, run it as you finish the row, with the commit you walked (`git rev-parse HEAD`):
+
+```
+node scripts/scenario-ledger.mjs <feature> mark <row ids> passed|failed|blocked --by <your persona> --commit <sha> [--finding "<one line>"] [--class handled|defect|missing] [--hard <type>] [--question Qn]
+```
+
+- **passed**: it works. With `--class handled --finding …` when you were confused first and found it on a second look; with `--class missing --finding …` when it works but the tree lacked a branch you needed.
+- **failed**: needs `--finding` (what broke, the fact shown vs expected). `--class defect` is the default; `--class missing` is a branch the tree didn't have. Add `--hard wrong-fact|lost-work|dead-end|unreachable-control|double-write|broken-ruling` for a hard defect.
+- **blocked**: the expected result needs a product rule nobody has ruled. Needs `--question Qn` (or the row already carries one). Never invent an expected result.
+- A row can't go back to pending, you mark each row once per round, and your commit must be the round's.
 
 ## Report format (your final message is the report)
 
@@ -45,9 +58,11 @@ Worked: <what worked, briefly>
 
 ## Driver: close the round
 
+Run `node scripts/scenario-ledger.mjs <feature> close` (with `--reclass m3=handled,m5=defect` for any finding you classify differently from its walker). It classifies the round's findings (handled · design defect · missing branch · product question), counts a confusion only when two or more walkers hit the same row (a hard defect from one), calls the round clean or not, and applies the stop rules below. `status` prints where the walks stand. The merged report and the steps that follow are yours:
+
 1. Merge the reports into one numbered table per round (`R<n>-<m>`), grouped by the fix they need: blockers, wrong facts, dead ends, then the rest. List the walkers who hit each one.
 2. Record which earlier items are confirmed fixed.
 3. Turn every new branch a walker found into a scenario-tree branch, and a walked branch into an executable leaf in `features/<id>/scenarios.json` (run by `node scripts/run-scenarios.mjs`).
 4. File owner items as decision tickets on the feature's map. Keep the affected branch blocked; don't invent an expected result.
 5. **What counts.** A confusion counts as a defect when two or more walkers stumble in the same place; one walker's stumble is noted, not fixed. Hard defects (wrong fact, lost work, dead end, unreachable control, double write, broken ruling) count from one walker. Walk findings are hypotheses that find defects, never proof of real farm behaviour.
-6. **Stopping.** A round is **clean** when no walk finds anything that changes the design. The walks are **settled** after two clean rounds in a row, with every branch walked or blocked; the last round uses fresh walkers who weren't given the paths. They're **capped** after 4 rounds (report what's open), and **stuck** when a round finds only repeats or only product questions, a fix undoes another, or findings grow round on round. Walking never grows scope: an operation that needs a new module or product rule becomes a decision ticket.
+6. **Stopping.** The ledger applies this at `close`; a terminal verdict is written to `review/scenario-ledger-<feature>.json`, to commit in the closing PR. A round is **clean** when no walk finds anything that changes the design. The walks are **settled** after two clean rounds in a row, with every branch walked or blocked; the last round uses fresh walkers who weren't given the paths. They're **capped** after 4 rounds (report what's open), and **stuck** when a round finds only repeats or only product questions, a fix undoes another, or findings grow round on round. Walking never grows scope: an operation that needs a new module or product rule becomes a decision ticket.
