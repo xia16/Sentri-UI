@@ -7,6 +7,7 @@
     "states": [
       "Default",
       "Pressed",
+      "Open",
       "Active",
       "Disabled",
       "Error",
@@ -23,6 +24,7 @@
     "states": [
       "Default",
       "Pressed",
+      "Open",
       "Active",
       "Disabled",
       "Error",
@@ -34,11 +36,13 @@
   {
     "id": "cascade",
     "name": "Cascade",
-    "use": "Use for one leaf from a tree, such as medicine category \u2192 medicine.",
+    "use": "Use for one leaf from a tree, such as medicine category → medicine.",
     "notUse": "Not for single for a flat list.",
     "states": [
       "Default",
       "Pressed",
+      "Open",
+      "Level",
       "Active",
       "Disabled",
       "Error",
@@ -55,6 +59,8 @@
     "states": [
       "Default",
       "Pressed",
+      "Open",
+      "Level",
       "Active",
       "Disabled",
       "Error",

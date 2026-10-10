@@ -1,43 +1,37 @@
-<!doctype html><meta charset="utf-8">
-<section data-state="Default"><h3>Default</h3><div id="state-Default"></div>
-
-</section>
-<section data-state="Pressed"><h3>Pressed</h3><div id="state-Pressed"></div>
-
-</section>
-<section data-state="Active"><h3>Active</h3><div id="state-Active"></div>
-
-</section>
-<section data-state="Disabled"><h3>Disabled</h3><div id="state-Disabled"></div>
-
-</section>
-<section data-state="Error"><h3>Error</h3><div id="state-Error"></div>
-
-</section>
-<section data-state="Loading"><h3>Loading</h3><div id="state-Loading"></div>
-
-</section>
-<section data-state="Empty"><h3>Empty</h3><div id="state-Empty"></div>
-
-</section>
-<section data-state="Long-label"><h3>Long-label</h3><div id="state-Long-label"></div>
-
-</section>
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PickerField · single</title><style>
+.ph{position:relative;width:390px;max-width:100%;height:720px;margin:0 auto;overflow:hidden;background:var(--app-background);border:1px solid var(--line);border-radius:var(--radius-device,28px);font-family:var(--font-sans);color:var(--ink)}
+.ph-page{padding:0 var(--space-gutter)}
+.ph-bar{display:flex;align-items:center;height:var(--statusbar-height);padding:0 var(--space-6);font:600 var(--font-size-13) var(--font-sans)}
+.ph-form{display:flex;flex-direction:column;gap:var(--space-16)}
+</style></head><body>
+<div data-state="Default" id="state-Default"></div>
+<div data-state="Pressed" id="state-Pressed"></div>
+<div data-state="Open" id="state-Open"></div>
+<div data-state="Active" id="state-Active"></div>
+<div data-state="Disabled" id="state-Disabled"></div>
+<div data-state="Error" id="state-Error"></div>
+<div data-state="Loading" id="state-Loading"></div>
+<div data-state="Empty" id="state-Empty"></div>
+<div data-state="Long-label" id="state-Long-label"></div>
 <script>
-// Each state renders in its own iframe in the atlas: draw only the states present.
 var UI = window.SentriUI;
+/* The real container: a 390px phone; a picker or a form is a drawer over the pig's page (never a drawer on a drawer). */
+function page(){return '<div class="ph-page"><div class="ph-bar" aria-hidden="true">9:41</div>'+UI.heading({title:'000267',kind:'page',description:'C1 \u00b7 Gestation \u00b7 42 days'})+UI.panel(UI.row({title:'Thin',description:'Day 12 \u00b7 monitor'}),{className:'st-row-group'})+'</div>';}
+function phone(over){return '<div class="ph" data-st-context="page">'+page()+over+'</div>';}
+function form(title,fields,ready){return phone(UI.sheet({title:title,subtitle:'000267 \u00b7 C1',size:'medium',body:'<div class="ph-form">'+fields+'</div>',footer:UI.sheetFooter({back:{action:'back'},primary:{label:'Save',action:'save',waiting:!ready}})}));}
+function picker(o){var h=o.head||{title:o.title,up:null};return phone(UI.sheet({title:h.title,up:h.up,size:'long',body:o.html||UI.pickerBody(o.body),footer:o.footer||UI.pickerFooter(o.foot||{})}));}
+
 var RENDER = {
-  "state-Default": () => UI.pickerField({"pressed": false, "disabled": false, "reason": "", "label": "Cause", "variant": "single", "selected": [], "value": "", "path": [], "active": false, "error": "", "loading": false}) + UI.pickerBody({"variant": "single", "items": [{"value": "a", "label": "Low appetite"}, {"value": "b", "label": "Fever"}, {"value": "c", "label": "Depression or lethargy"}, {"value": "d", "label": "Poor growth"}, {"value": "e", "label": "Pale mucous membranes"}], "selected": [], "path": [], "loading": false, "error": ""}) + UI.pickerFooter({"multi": false, "selected": []}),
-  "state-Pressed": () => UI.pickerField({"pressed": true, "disabled": false, "reason": "", "label": "Cause", "variant": "single", "selected": [], "value": "", "path": [], "active": false, "error": "", "loading": false}),
-  "state-Active": () => UI.pickerField({"pressed": false, "disabled": false, "reason": "", "label": "Cause", "variant": "single", "selected": ["a"], "value": "Low appetite", "path": [], "active": true, "error": "", "loading": false}) + UI.pickerBody({"variant": "single", "items": [{"value": "a", "label": "Low appetite"}, {"value": "b", "label": "Fever"}, {"value": "c", "label": "Depression or lethargy"}, {"value": "d", "label": "Poor growth"}, {"value": "e", "label": "Pale mucous membranes"}], "selected": ["a"], "path": [], "loading": false, "error": ""}) + UI.pickerFooter({"multi": false, "selected": ["a"]}),
-  "state-Disabled": () => UI.pickerField({"pressed": false, "disabled": true, "reason": "Unavailable offline. Reconnect to select.", "label": "Cause", "variant": "single", "selected": [], "value": "", "path": [], "active": false, "error": "", "loading": false}),
-  "state-Error": () => UI.pickerField({"pressed": false, "disabled": false, "reason": "", "label": "Cause", "variant": "single", "selected": [], "value": "", "path": [], "active": false, "error": "Select an available option to continue.", "loading": false}) + UI.pickerBody({"variant": "single", "items": [{"value": "a", "label": "Low appetite"}, {"value": "b", "label": "Fever"}, {"value": "c", "label": "Depression or lethargy"}, {"value": "d", "label": "Poor growth"}, {"value": "e", "label": "Pale mucous membranes"}], "selected": [], "path": [], "loading": false, "error": "Options could not load. Try again."}) + UI.pickerFooter({"multi": false, "selected": []}),
-  "state-Loading": () => UI.pickerField({"pressed": false, "disabled": false, "reason": "", "label": "Cause", "variant": "single", "selected": [], "value": "", "path": [], "active": false, "error": "", "loading": true}) + UI.pickerBody({"variant": "single", "items": [{"value": "a", "label": "Low appetite"}, {"value": "b", "label": "Fever"}, {"value": "c", "label": "Depression or lethargy"}, {"value": "d", "label": "Poor growth"}, {"value": "e", "label": "Pale mucous membranes"}], "selected": [], "path": [], "loading": true, "error": ""}) + UI.pickerFooter({"multi": false, "selected": []}),
-  "state-Empty": () => UI.pickerField({"pressed": false, "disabled": false, "reason": "", "label": "Cause", "variant": "single", "selected": [], "value": "", "path": [], "active": false, "error": "", "loading": false}) + UI.pickerBody({"variant": "single", "items": [], "selected": [], "path": [], "loading": false, "error": ""}) + UI.pickerFooter({"multi": false, "selected": []}),
-  "state-Long-label": () => UI.pickerField({"pressed": false, "disabled": false, "reason": "", "label": "青霉素类抗菌药物 / 阿莫西林可溶性粉用于仔猪治疗的完整名称", "variant": "single", "selected": ["a"], "value": "青霉素类抗菌药物 / 阿莫西林可溶性粉用于仔猪治疗的完整名称", "path": [], "active": false, "error": "", "loading": false}) + UI.choiceGroup(UI.choiceRow({label:"青霉素类抗菌药物 / 阿莫西林可溶性粉用于仔猪治疗的完整名称",mode:"single",selected:true}))
+  "state-Default": () => form("Record treatment",UI.pickerField({"label": "Method", "variant": "single"})),
+  "state-Pressed": () => form("Record treatment",UI.pickerField({"label": "Method", "variant": "single", "pressed": true})),
+  "state-Open": () => picker({title:"Method",body:{"variant": "single", "items": [{"value": "Injection", "label": "Injection"}, {"value": "Oral", "label": "Oral"}, {"value": "Topical", "label": "Topical"}, {"value": "In feed", "label": "In feed"}, {"value": "In water", "label": "In water"}], "selected": [], "path": []},foot:{"multi": false, "selected": []}}),
+  "state-Active": () => form("Record treatment",UI.pickerField({"label": "Method", "variant": "single", "value": "Oral", "path": []}),true),
+  "state-Disabled": () => form("Record treatment",UI.pickerField({"label": "Method", "variant": "single", "disabled": true, "reason": "Unavailable offline. Reconnect to select."})),
+  "state-Error": () => form("Record treatment",UI.pickerField({"label": "Method", "variant": "single", "error": "Select an available option to continue."})),
+  "state-Loading": () => picker({title:"Method",body:{"variant": "single", "items": [{"value": "Injection", "label": "Injection"}, {"value": "Oral", "label": "Oral"}, {"value": "Topical", "label": "Topical"}, {"value": "In feed", "label": "In feed"}, {"value": "In water", "label": "In water"}], "selected": [], "path": [], "loading": true},foot:{"multi": false, "selected": []}}),
+  "state-Empty": () => picker({title:"Method",body:{"variant": "single", "items": [{"value": "Injection", "label": "Injection"}, {"value": "Oral", "label": "Oral"}, {"value": "Topical", "label": "Topical"}, {"value": "In feed", "label": "In feed"}, {"value": "In water", "label": "In water"}], "selected": [], "path": [], "query": "zz"},foot:{"multi": false, "selected": []}}),
+  "state-Long-label": () => picker({title:"Method",body:{"variant": "single", "items": [{"value": "a", "label": "\u808c\u8089\u6ce8\u5c04\uff08\u9888\u90e8\u8033\u540e\u4e09\u6307\u5904\uff09"}, {"value": "b", "label": "\u53e3\u670d"}, {"value": "c", "label": "\u62cc\u6599\u7ed9\u836f\uff0c\u8fde\u7eed\u4e94\u5929\u6bcf\u5929\u4e00\u6b21"}, {"value": "d", "label": "\u996e\u6c34\u7ed9\u836f"}, {"value": "e", "label": "\u5916\u7528"}], "selected": ["a"]},foot:{"multi": false, "selected": []}})
 };
-document.querySelectorAll('[data-state]').forEach(function (s) {
-  var t = RENDER[s.id] ? s : s.querySelector('[id]');
-  if (t && RENDER[t.id]) t.innerHTML = RENDER[t.id]();
-});
-</script>
+document.querySelectorAll('[data-state]').forEach(function (s) { if (RENDER[s.id]) s.innerHTML = RENDER[s.id](); });
+</script></body></html>

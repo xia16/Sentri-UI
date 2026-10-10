@@ -41,8 +41,12 @@ test("cascade-multi: ticks remain in the leaf catalogue; checkbox changes never 
   assert.equal((html.match(/type="checkbox"/g) || []).length, 2);
   assert.equal((html.match(/ checked/g) || []).length, 1);
   assert.doesNotMatch(html, /<details|type="checkbox"[^>]*data-action/);
-  assert.match(html, /data-action="picker-step" data-value="1"/);
+  assert.doesNotMatch(html, /picker-step|st-picker-steps/);
   assert.match(html, /Weakness/);
+  const head = UI.pickerHead({ items: tree, path: ["symptom", "general"], title: "Select conditions", rootLabel: "Conditions" });
+  assert.equal(head.up.action, "picker-step");
+  assert.equal(head.up.value, "1");
+  assert.equal(UI.pickerHead({ items: tree, path: [], title: "Select conditions" }).up, null);
 });
 test("search spans kinds, groups and aliases while another branch is open", () => {
   const html = UI.pickerBody({

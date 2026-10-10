@@ -1,43 +1,37 @@
-<!doctype html><meta charset="utf-8">
-<section data-state="Default"><h3>Default</h3><div id="state-Default"></div>
-
-</section>
-<section data-state="Pressed"><h3>Pressed</h3><div id="state-Pressed"></div>
-
-</section>
-<section data-state="Active"><h3>Active</h3><div id="state-Active"></div>
-
-</section>
-<section data-state="Disabled"><h3>Disabled</h3><div id="state-Disabled"></div>
-
-</section>
-<section data-state="Error"><h3>Error</h3><div id="state-Error"></div>
-
-</section>
-<section data-state="Loading"><h3>Loading</h3><div id="state-Loading"></div>
-
-</section>
-<section data-state="Empty"><h3>Empty</h3><div id="state-Empty"></div>
-
-</section>
-<section data-state="Long-label"><h3>Long-label</h3><div id="state-Long-label"></div>
-
-</section>
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PickerField · multi</title><style>
+.ph{position:relative;width:390px;max-width:100%;height:720px;margin:0 auto;overflow:hidden;background:var(--app-background);border:1px solid var(--line);border-radius:var(--radius-device,28px);font-family:var(--font-sans);color:var(--ink)}
+.ph-page{padding:0 var(--space-gutter)}
+.ph-bar{display:flex;align-items:center;height:var(--statusbar-height);padding:0 var(--space-6);font:600 var(--font-size-13) var(--font-sans)}
+.ph-form{display:flex;flex-direction:column;gap:var(--space-16)}
+</style></head><body>
+<div data-state="Default" id="state-Default"></div>
+<div data-state="Pressed" id="state-Pressed"></div>
+<div data-state="Open" id="state-Open"></div>
+<div data-state="Active" id="state-Active"></div>
+<div data-state="Disabled" id="state-Disabled"></div>
+<div data-state="Error" id="state-Error"></div>
+<div data-state="Loading" id="state-Loading"></div>
+<div data-state="Empty" id="state-Empty"></div>
+<div data-state="Long-label" id="state-Long-label"></div>
 <script>
-// Each state renders in its own iframe in the atlas: draw only the states present.
 var UI = window.SentriUI;
+/* The real container: a 390px phone; a picker or a form is a drawer over the pig's page (never a drawer on a drawer). */
+function page(){return '<div class="ph-page"><div class="ph-bar" aria-hidden="true">9:41</div>'+UI.heading({title:'000267',kind:'page',description:'C1 \u00b7 Gestation \u00b7 42 days'})+UI.panel(UI.row({title:'Thin',description:'Day 12 \u00b7 monitor'}),{className:'st-row-group'})+'</div>';}
+function phone(over){return '<div class="ph" data-st-context="page">'+page()+over+'</div>';}
+function form(title,fields,ready){return phone(UI.sheet({title:title,subtitle:'000267 \u00b7 C1',size:'medium',body:'<div class="ph-form">'+fields+'</div>',footer:UI.sheetFooter({back:{action:'back'},primary:{label:'Save',action:'save',waiting:!ready}})}));}
+function picker(o){var h=o.head||{title:o.title,up:null};return phone(UI.sheet({title:h.title,up:h.up,size:'long',body:o.html||UI.pickerBody(o.body),footer:o.footer||UI.pickerFooter(o.foot||{})}));}
+
 var RENDER = {
-  "state-Default": () => UI.pickerField({"pressed": false, "disabled": false, "reason": "", "label": "Conditions", "variant": "multi", "selected": [], "value": "", "path": [], "active": false, "error": "", "loading": false}) + UI.pickerBody({"variant": "multi", "items": [{"value": "a", "label": "Low appetite"}, {"value": "b", "label": "Fever"}], "selected": [], "path": [], "loading": false, "error": ""}) + UI.pickerFooter({"multi": true, "selected": []}),
-  "state-Pressed": () => UI.pickerField({"pressed": true, "disabled": false, "reason": "", "label": "Conditions", "variant": "multi", "selected": [], "value": "", "path": [], "active": false, "error": "", "loading": false}),
-  "state-Active": () => UI.pickerField({"pressed": false, "disabled": false, "reason": "", "label": "Conditions", "variant": "multi", "selected": ["a"], "value": "", "path": [], "active": true, "error": "", "loading": false}) + UI.pickerBody({"variant": "multi", "items": [{"value": "a", "label": "Low appetite"}, {"value": "b", "label": "Fever"}], "selected": ["a"], "path": [], "loading": false, "error": ""}) + UI.pickerFooter({"multi": true, "selected": ["a"]}),
-  "state-Disabled": () => UI.pickerField({"pressed": false, "disabled": true, "reason": "Unavailable offline. Reconnect to select.", "label": "Conditions", "variant": "multi", "selected": [], "value": "", "path": [], "active": false, "error": "", "loading": false}),
-  "state-Error": () => UI.pickerField({"pressed": false, "disabled": false, "reason": "", "label": "Conditions", "variant": "multi", "selected": [], "value": "", "path": [], "active": false, "error": "Select an available option to continue.", "loading": false}) + UI.pickerBody({"variant": "multi", "items": [{"value": "a", "label": "Low appetite"}, {"value": "b", "label": "Fever"}], "selected": [], "path": [], "loading": false, "error": "Options could not load. Try again."}) + UI.pickerFooter({"multi": true, "selected": []}),
-  "state-Loading": () => UI.pickerField({"pressed": false, "disabled": false, "reason": "", "label": "Conditions", "variant": "multi", "selected": [], "value": "", "path": [], "active": false, "error": "", "loading": true}) + UI.pickerBody({"variant": "multi", "items": [{"value": "a", "label": "Low appetite"}, {"value": "b", "label": "Fever"}], "selected": [], "path": [], "loading": true, "error": ""}) + UI.pickerFooter({"multi": true, "selected": []}),
-  "state-Empty": () => UI.pickerField({"pressed": false, "disabled": false, "reason": "", "label": "Conditions", "variant": "multi", "selected": [], "value": "", "path": [], "active": false, "error": "", "loading": false}) + UI.pickerBody({"variant": "multi", "items": [], "selected": [], "path": [], "loading": false, "error": ""}) + UI.pickerFooter({"multi": true, "selected": []}),
-  "state-Long-label": () => UI.pickerField({"pressed": false, "disabled": false, "reason": "", "label": "青霉素类抗菌药物 / 阿莫西林可溶性粉用于仔猪治疗的完整名称", "variant": "multi", "selected": ["a"], "value": "青霉素类抗菌药物 / 阿莫西林可溶性粉用于仔猪治疗的完整名称", "path": [], "active": false, "error": "", "loading": false}) + UI.choiceGroup(UI.choiceRow({label:"青霉素类抗菌药物 / 阿莫西林可溶性粉用于仔猪治疗的完整名称",mode:"multi",selected:true}))
+  "state-Default": () => form("Record health",UI.pickerField({"label": "Signs", "variant": "multi"})),
+  "state-Pressed": () => form("Record health",UI.pickerField({"label": "Signs", "variant": "multi", "pressed": true})),
+  "state-Open": () => picker({title:"Select signs",body:{"variant": "multi", "items": [{"value": "Low appetite", "label": "Low appetite"}, {"value": "Fever", "label": "Fever"}, {"value": "Cough", "label": "Cough"}, {"value": "Diarrhoea", "label": "Diarrhoea"}, {"value": "Lameness", "label": "Lameness"}, {"value": "Lethargy", "label": "Lethargy"}], "selected": ["Fever", "Cough"], "path": []},foot:{"multi": true, "selected": ["Fever", "Cough"]}}),
+  "state-Active": () => form("Record health",UI.pickerField({"label": "Signs", "variant": "multi", "selected": ["Fever", "Cough"], "names": ["Fever", "Cough", "Lameness", "Lethargy"]}),true),
+  "state-Disabled": () => form("Record health",UI.pickerField({"label": "Signs", "variant": "multi", "disabled": true, "reason": "Unavailable offline. Reconnect to select."})),
+  "state-Error": () => form("Record health",UI.pickerField({"label": "Signs", "variant": "multi", "error": "Select an available option to continue."})),
+  "state-Loading": () => picker({title:"Select signs",body:{"variant": "multi", "items": [{"value": "Low appetite", "label": "Low appetite"}, {"value": "Fever", "label": "Fever"}, {"value": "Cough", "label": "Cough"}, {"value": "Diarrhoea", "label": "Diarrhoea"}, {"value": "Lameness", "label": "Lameness"}, {"value": "Lethargy", "label": "Lethargy"}], "selected": [], "path": [], "loading": true},foot:{"multi": true, "selected": []}}),
+  "state-Empty": () => picker({title:"Select signs",body:{"variant": "multi", "items": [{"value": "Low appetite", "label": "Low appetite"}, {"value": "Fever", "label": "Fever"}, {"value": "Cough", "label": "Cough"}, {"value": "Diarrhoea", "label": "Diarrhoea"}, {"value": "Lameness", "label": "Lameness"}, {"value": "Lethargy", "label": "Lethargy"}], "selected": [], "path": [], "query": "zz"},foot:{"multi": true, "selected": []}}),
+  "state-Long-label": () => picker({title:"Select signs",body:{"variant": "multi", "items": [{"value": "a", "label": "\u98df\u6b32\u4e0d\u632f\uff0c\u91c7\u98df\u91cf\u4f4e\u4e8e\u524d\u4e09\u5929\u5e73\u5747\u6c34\u5e73"}, {"value": "b", "label": "\u53d1\u70ed"}, {"value": "c", "label": "\u54b3\u55fd\uff0c\u591c\u95f4\u52a0\u91cd"}, {"value": "d", "label": "\u8179\u6cfb"}], "selected": ["a"]},foot:{"multi": true, "selected": ["a"]}})
 };
-document.querySelectorAll('[data-state]').forEach(function (s) {
-  var t = RENDER[s.id] ? s : s.querySelector('[id]');
-  if (t && RENDER[t.id]) t.innerHTML = RENDER[t.id]();
-});
-</script>
+document.querySelectorAll('[data-state]').forEach(function (s) { if (RENDER[s.id]) s.innerHTML = RENDER[s.id](); });
+</script></body></html>
