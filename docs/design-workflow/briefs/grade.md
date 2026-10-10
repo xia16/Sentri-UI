@@ -59,4 +59,6 @@ Write `ROUND FOLDER/grades.json`:
 ```
 `round` and `commit` are the ROUND and COMMIT you were given; grades for another round or commit are rejected. `state` is empty unless one atlas screen shows several states worth grading apart. `gaps` lists what you couldn't judge, and why.
 
+If you couldn't grade as a fresh, separate agent, start your report with DEGRADED and why.
+
 Report in 100 words or fewer: the count graded, the hard failures, the five worst screens with their one-line reason, and your ideas.
