@@ -1,0 +1,37 @@
+[
+ {
+  "id": "multi-choice-1",
+  "target": {
+   "kind": "screen",
+   "id": "health-record.record-health"
+  },
+  "kind": "decision",
+  "severity": "high",
+  "title": "Must Care be chosen when health is recorded?",
+  "detail": "Record health defaults Care to \"No action needed\", so the quickest path (choose Fever, Save) records a fever that needs no attention. Care is the only editable condition state and decides whether a condition is an alert. This is a product rule on what is recorded, not a picker detail, so it is left as it is.",
+  "options": [
+   "Keep the default \"No action needed\"",
+   "No default: Care is required and Save waits for it",
+   "Default by condition (a disease defaults to Monitor)"
+  ],
+  "recommendation": "Owner to rule. If Care becomes required, it joins Conditions in the Required marking on a waiting Save.",
+  "source": "review r1 (multi-choice)"
+ },
+ {
+  "id": "multi-choice-2",
+  "target": {
+   "kind": "feature",
+   "id": "health-record"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "Short outcome lists open a picker sheet where the record-sheet law asks for an inline Choice",
+  "detail": "Care (4 outcomes), Outcome on Resolve (2), Body condition (2) and Dose unit (3: mL, mg, g) each open a single-choice sheet. The record-sheet law says 2 to 4 outcomes are a Choice (radio rows or inline), and a fifth makes it a picker; on iOS and Android these are a segmented control or radio rows, not a sheet. Left as approved in this pass.",
+  "options": [
+   "Keep the sheets",
+   "Inline radio rows for Care, Outcome and Body condition; a segmented control for Dose unit"
+  ],
+  "recommendation": "Inline Choice, as the law says; it removes a drawer hop for a gloved hand.",
+  "source": "review r1 (multi-choice)"
+ }
+]

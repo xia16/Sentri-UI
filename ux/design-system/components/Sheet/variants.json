@@ -8,12 +8,12 @@
       "Default",
       "Pressed",
       "Aside",
-      "Waiting (reason shown)",
+      "Waiting (stands alone)",
       "Error",
       "Empty",
       "Long / Chinese",
       "Held at its size",
-      "Lead + Above (drill-down)"
+      "Up + Above (levels)"
     ]
   },
   {
@@ -25,7 +25,7 @@
       "Default",
       "Pressed",
       "Aside",
-      "Waiting (reason shown)",
+      "Waiting (stands alone)",
       "Empty",
       "Long / Chinese",
       "Drawer over a page"
@@ -40,7 +40,7 @@
       "Default (glyph)",
       "Without glyph",
       "Pressed",
-      "Waiting (reason shown)",
+      "Waiting (stands alone)",
       "Long / Chinese"
     ]
   }

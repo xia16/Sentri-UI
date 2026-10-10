@@ -1,39 +1,33 @@
-<!doctype html><meta charset="utf-8">
-<section data-state="Default"><h3>Default</h3><div id="state-Default"></div>
-
-</section>
-<section data-state="Pressed"><h3>Pressed</h3><div id="state-Pressed"></div>
-
-</section>
-<section data-state="Selected"><h3>Selected</h3><div id="state-Selected"></div>
-
-</section>
-<section data-state="Disabled"><h3>Disabled</h3><div id="state-Disabled"></div>
-
-</section>
-<section data-state="Loading"><h3>Loading</h3><div id="state-Loading"></div>
-
-</section>
-<section data-state="Empty"><h3>Empty</h3><div id="state-Empty"></div>
-
-</section>
-<section data-state="Long-label"><h3>Long-label</h3><div id="state-Long-label"></div>
-
-</section>
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ChoiceList · single</title><style>
+.ph{position:relative;width:390px;max-width:100%;height:720px;margin:0 auto;overflow:hidden;background:var(--app-background);border:1px solid var(--line);border-radius:var(--radius-device,28px);font-family:var(--font-sans);color:var(--ink)}
+.ph-page{padding:0 var(--space-gutter)}
+.ph-bar{display:flex;align-items:center;height:var(--statusbar-height);padding:0 var(--space-6);font:600 var(--font-size-13) var(--font-sans)}
+.ph-form{display:flex;flex-direction:column;gap:var(--space-16)}
+</style></head><body>
+<div data-state="Default" id="state-Default"></div>
+<div data-state="Pressed" id="state-Pressed"></div>
+<div data-state="Selected" id="state-Selected"></div>
+<div data-state="Disabled" id="state-Disabled"></div>
+<div data-state="Loading" id="state-Loading"></div>
+<div data-state="Empty" id="state-Empty"></div>
+<div data-state="Long-label" id="state-Long-label"></div>
 <script>
-// Each state renders in its own iframe in the atlas: draw only the states present.
 var UI = window.SentriUI;
+/* The real container: a 390px phone; a picker or a form is a drawer over the pig's page (never a drawer on a drawer). */
+function page(){return '<div class="ph-page"><div class="ph-bar" aria-hidden="true">9:41</div>'+UI.heading({title:'000267',kind:'page',description:'C1 \u00b7 Gestation \u00b7 42 days'})+UI.panel(UI.row({title:'Thin',description:'Day 12 \u00b7 monitor'}),{className:'st-row-group'})+'</div>';}
+function phone(over){return '<div class="ph" data-st-context="page">'+page()+over+'</div>';}
+function form(title,fields,ready){return phone(UI.sheet({title:title,subtitle:'000267 \u00b7 C1',size:'medium',body:'<div class="ph-form">'+fields+'</div>',footer:UI.sheetFooter({back:{action:'back'},primary:{label:'Save',action:'save',waiting:!ready}})}));}
+function picker(o){var h=o.head||{title:o.title,up:null};return phone(UI.sheet({title:h.title,up:h.up,size:'long',sizing:h.rows?'hold':'content',holdRows:h.rows||0,body:o.html||UI.pickerBody(o.body),footer:o.footer||UI.pickerFooter(o.foot||{})}));}
+
 var RENDER = {
-  "state-Default": () => UI.choiceGroup(UI.choiceRow({"pressed": false, "disabled": false, "reason": "", "label": "Amoxicillin", "mode": "single", "selected": false, "meta": "Antibiotics", "value": "a"}),{title:"Medicine",radio:false}),
-  "state-Pressed": () => UI.choiceGroup(UI.choiceRow({"pressed": true, "disabled": false, "reason": "", "label": "Amoxicillin", "mode": "single", "selected": false, "meta": "Antibiotics", "value": "a"}),{title:"Medicine",radio:false}),
-  "state-Selected": () => UI.choiceGroup(UI.choiceRow({"pressed": false, "disabled": false, "reason": "", "label": "Amoxicillin", "mode": "single", "selected": true, "meta": "Antibiotics", "value": "a"}),{title:"Medicine",radio:false}),
-  "state-Disabled": () => UI.choiceGroup(UI.choiceRow({"pressed": false, "disabled": true, "reason": "Unavailable offline. Reconnect to select.", "label": "Amoxicillin", "mode": "single", "selected": false, "meta": "Antibiotics", "value": "a"}),{title:"Medicine",radio:false}),
-  "state-Loading": () => UI.choiceEmpty("Loading options\u2026"),
-  "state-Empty": () => UI.choiceEmpty("No options available."),
-  "state-Long-label": () => UI.choiceGroup(UI.choiceRow({"pressed": false, "disabled": false, "reason": "", "label": "青霉素类抗菌药物 / 阿莫西林可溶性粉用于仔猪治疗的完整名称", "mode": "single", "selected": false, "meta": "Antibiotics", "value": "a"}),{title:"Medicine",radio:false})
+  "state-Default": () => phone(UI.sheet({title:"Care",up:null,size:'long',body:UI.choiceGroup([UI.choiceRow({"label": "No action needed", "mode": "single", "value": "none", "action": "choose", "selected": false}),UI.choiceRow({"label": "Monitor", "mode": "single", "value": "monitor", "action": "choose", "selected": false}),UI.choiceRow({"label": "Treat in place", "mode": "single", "value": "treat", "action": "choose", "selected": false}),UI.choiceRow({"label": "Move to hospital pen", "mode": "single", "value": "hospital", "action": "choose", "selected": false})]),footer:UI.pickerFooter({multi:false,selected:[]})})),
+  "state-Pressed": () => phone(UI.sheet({title:"Care",up:null,size:'long',body:UI.choiceGroup([UI.choiceRow({"label": "No action needed", "mode": "single", "value": "none", "action": "choose", "selected": false}),UI.choiceRow({"label": "Monitor", "mode": "single", "value": "monitor", "action": "choose", "selected": false, "pressed": true}),UI.choiceRow({"label": "Treat in place", "mode": "single", "value": "treat", "action": "choose", "selected": false}),UI.choiceRow({"label": "Move to hospital pen", "mode": "single", "value": "hospital", "action": "choose", "selected": false})]),footer:UI.pickerFooter({multi:false,selected:[]})})),
+  "state-Selected": () => phone(UI.sheet({title:"Care",up:null,size:'long',body:UI.choiceGroup([UI.choiceRow({"label": "No action needed", "mode": "single", "value": "none", "action": "choose", "selected": false}),UI.choiceRow({"label": "Monitor", "mode": "single", "value": "monitor", "action": "choose", "selected": true}),UI.choiceRow({"label": "Treat in place", "mode": "single", "value": "treat", "action": "choose", "selected": false}),UI.choiceRow({"label": "Move to hospital pen", "mode": "single", "value": "hospital", "action": "choose", "selected": false})]),footer:UI.pickerFooter({multi:false,selected:[]})})),
+  "state-Disabled": () => phone(UI.sheet({title:"Care",up:null,size:'long',body:UI.choiceGroup([UI.choiceRow({"label": "No action needed", "mode": "single", "value": "none", "action": "choose", "selected": false}),UI.choiceRow({"label": "Monitor", "mode": "single", "value": "monitor", "action": "choose", "selected": false}),UI.choiceRow({"label": "Treat in place", "mode": "single", "value": "treat", "action": "choose", "selected": false}),UI.choiceRow({"label": "Move to hospital pen", "mode": "single", "value": "hospital", "action": "choose", "selected": false, "disabled": true, "reason": "Unavailable offline. Reconnect to select."})]),footer:UI.pickerFooter({multi:false,selected:[]})})),
+  "state-Loading": () => phone(UI.sheet({title:"Care",up:null,size:'long',body:UI.choiceEmpty("Loading options\u2026"),footer:UI.pickerFooter({multi:false,selected:[]})})),
+  "state-Empty": () => phone(UI.sheet({title:"Care",up:null,size:'long',body:UI.choiceEmpty("No options available."),footer:UI.pickerFooter({multi:false,selected:[]})})),
+  "state-Long-label": () => phone(UI.sheet({title:"\u62a4\u7406",up:null,size:'long',body:UI.choiceGroup([UI.choiceRow({"label": "\u65e0\u9700\u5904\u7406", "mode": "single", "value": "none", "action": "choose", "selected": false}),UI.choiceRow({"label": "\u89c2\u5bdf", "mode": "single", "value": "monitor", "action": "choose", "selected": false}),UI.choiceRow({"label": "\u539f\u680f\u6cbb\u7597", "mode": "single", "value": "treat", "action": "choose", "selected": false}),UI.choiceRow({"label": "\u8f6c\u5165\u75c5\u732a\u680f\uff0c\u5355\u72ec\u9972\u517b\u5e76\u6bcf\u65e5\u590d\u67e5\u4e24\u6b21", "mode": "single", "value": "hospital", "action": "choose", "selected": true})]),footer:UI.pickerFooter({multi:false,selected:[]})}))
 };
-document.querySelectorAll('[data-state]').forEach(function (s) {
-  var t = RENDER[s.id] ? s : s.querySelector('[id]');
-  if (t && RENDER[t.id]) t.innerHTML = RENDER[t.id]();
-});
-</script>
+document.querySelectorAll('[data-state]').forEach(function (s) { if (RENDER[s.id]) s.innerHTML = RENDER[s.id](); });
+</script></body></html>
