@@ -12,6 +12,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { screensOf } from './loop-rules.mjs';
+import { routeFonts } from './font-route.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PW_HOME = 'C:/Users/ying_/.cache/adam-design/playwright-1.63.0';
@@ -44,6 +45,7 @@ const runs = [];
 const text = {};
 for (const width of widths) {
   const context = await browser.newContext({ viewport: { width, height: 844 }, deviceScaleFactor: 1 });
+  await routeFonts(context, root); // the prototypes' Google Fonts come from vendor/fonts/: no network in a render
   await context.addInitScript((w) => {
     const css = `html.atlas-bare,html.atlas-bare body{width:${w}px!important}html.atlas-bare .atlas-phone{width:${w}px!important}`;
     const add = () => { const s = document.createElement('style'); s.textContent = css; document.head.appendChild(s); };
