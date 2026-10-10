@@ -63,7 +63,7 @@ New features and the polish loop both use the same scenario step. It has three p
 | Behaviour | The above, plus the scenario leaves and walks that touch it (390/360, EN/ZH), screen-reader order and keyboard cover |
 | Shared component | All of the above on **every** feature that uses it. A refactor must be identical. Any change to a frozen screen needs the owner's approval. |
 
-**One queue for shared-component changes.** Two sessions changing the bundle at once is how one undoes the other. A change is shared when it touches the bundle, the tokens, the bare-screen harness or a shared stylesheet, or when it changes a screen outside its scope; `gate.mjs` decides that itself. Shared changes merge one at a time, oldest open PR first. The next one merges main forward and is gated against the new main, which re-checks every screen of every feature. Feature-only changes don't queue.
+**One queue for shared-component changes.** Two sessions changing the bundle at once is how one undoes the other. A change is shared when it touches the bundle, the tokens, the bare-screen harness, a shared stylesheet or any file that pages of two or more features load, or when it changes a screen outside its scope; `gate.mjs` decides that itself. Shared changes merge one at a time, oldest open PR first. The next one merges main forward and is gated against the new main, which re-checks every screen of every feature. Feature-only changes don't queue.
 
 Every rejected owner example is a fixture each gate must fail ([gate.md](briefs/gate.md#rejected-examples)). All evidence records the commit it was taken on.
 

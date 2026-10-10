@@ -26,10 +26,10 @@ This session is the **driver** of the polish loop for one feature. The brief is 
 5. **Gate.** In the ledger checkout, run `node scripts/gate.mjs --candidate origin/<branch> --scope <feature> --class <class> --out review/loop/<feature>/r<n>/gate`.
    - **Mechanical fail.** The failures go back to the builder; allow two tries.
    - **Mechanical pass.** Dispatch the judge: a fresh agent, never the builder (`model: opus`). Give it gate.md, `mechanical.json` and the `pairs/` images. It writes `verdict.json` beside them. Then run `node scripts/gate.mjs --verdict <out>`.
-6. **Merge** only on `GATE PASS`: `gh pr merge <n> --squash`. If main moved since the gate ran, merge it forward and gate again. A failed gate rejects the fix for this round; close the PR with the verdict's reason.
+6. **Merge** only on `GATE PASS`, pinned to the commit the gate ran on: `gh pr merge <n> --squash --match-head-commit <candidate sha>` (`--verdict` prints the sha). If the PR head or main moved since the gate ran, merge main forward and gate again. A failed gate rejects the fix for this round; close the PR with the verdict's reason.
 7. **Record.** `node scripts/polish-loop.mjs record <feature> --fix defect|enhancement|none --pr <n> --merged yes|no --what "<one line>"`. It prints whether the loop goes on.
 
-**Shared components.** A fix that changes the bundle, the tokens or another feature's screens is a shared-component change. The gate escalates it by itself. Don't hide it inside a feature fix: build it as its own PR, gated on every feature that uses the component.
+**Shared components.** A fix that changes the bundle, the tokens, a file that pages of two or more features load (Farrowing's page also draws Move and Pig profile screens), or another feature's screens is a shared-component change. The gate escalates it by itself. Don't hide it inside a feature fix: build it as its own PR, gated on every feature that uses the component.
 
 ## Stop
 

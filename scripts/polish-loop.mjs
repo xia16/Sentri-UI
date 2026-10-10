@@ -29,6 +29,9 @@ const atlas = () => JSON.parse(fs.readFileSync(path.join(root, 'atlas/atlas.json
 const screens = () => screensOf(atlas(), { features: [feature] });
 const load = () => { if (!fs.existsSync(ledgerFile)) { console.error(`no loop for ${feature}: run start first`); process.exit(2); } return JSON.parse(fs.readFileSync(ledgerFile, 'utf8')); };
 const save = (l) => fs.writeFileSync(ledgerFile, JSON.stringify(l, null, 2));
+// Every stop decision reads recorded rounds only: an open round has no grades yet, so it can't count as clean.
+const statusOf = (l) => loopStatus({ ...l, rounds: l.rounds.filter((r) => r.recorded) });
+const hasLeaves = () => fs.existsSync(path.join(root, 'features', feature, 'scenarios.json')) && fs.existsSync(path.join(root, 'scripts/run-scenarios.mjs'));
 
 // Evidence is only good for the commit it was taken on, and a round starts on main as it is now.
 // SENTRI_LOOP_TEST_MAIN=HEAD tests these scripts on a branch; a real loop never sets it.
@@ -53,9 +56,12 @@ function shoot(out) {
   return { shots, zhIgnored, failed: shots.runs.filter((x) => !x.ok), tail: r.stdout.trim().split('\n').pop() };
 }
 
-function leaves(out) {
-  const spec = path.join(root, 'features', feature, 'scenarios.json');
-  if (!fs.existsSync(spec) || !fs.existsSync(path.join(root, 'scripts/run-scenarios.mjs'))) return { none: true };
+function leaves(out, l) {
+  if (!hasLeaves()) {
+    // Coverage the loop had doesn't quietly turn into "none": a scenarios.json or runner gone from main stops the round.
+    const had = l.leavesAtBaseline ? 'at the baseline' : l.rounds.some((r) => r.recorded && r.leaves && !r.leaves.none) ? 'in an earlier round' : '';
+    return had ? { error: `features/${feature}/scenarios.json or scripts/run-scenarios.mjs was there ${had} and is gone from main: restore it (removing behaviour coverage is its own workflow PR)` } : { none: true };
+  }
   const r = sh(process.execPath, ['scripts/run-scenarios.mjs', feature], { stdio: ['ignore', 'pipe', 'pipe'] });
   const report = path.join(root, 'review', `scenarios-${feature}.json`);
   if (fs.existsSync(report)) fs.copyFileSync(report, path.join(out, 'leaves.json'));
@@ -86,7 +92,7 @@ if (cmd === 'start') {
   }
   restoreReview();
   const s = shoot(path.join(dir, 'r0'));
-  save({ feature, job: opt('job') || 'polish', baseline, cap: Number(opt('cap')) || 5, started: new Date().toISOString(), screens: screens().map((x) => x.id), zhIgnored: s.zhIgnored, decisions: [], rounds: [] });
+  save({ feature, job: opt('job') || 'polish', baseline, cap: Number(opt('cap')) || 5, started: new Date().toISOString(), screens: screens().map((x) => x.id), zhIgnored: s.zhIgnored, leavesAtBaseline: hasLeaves(), decisions: [], rounds: [] });
   console.log(`loop ${feature} started on ${baseline.slice(0, 7)}: ${screens().length} screens shot at 390/360 × en/zh (${s.tail})`);
   if (s.zhIgnored.length) console.log(`no Chinese rendering on ${s.zhIgnored.length} screen(s): a declared gap until they render ?lang=zh`);
   process.exit(0);
@@ -94,21 +100,23 @@ if (cmd === 'start') {
 
 if (cmd === 'round') {
   const l = load();
-  const st = loopStatus(l);
-  if (st.status !== 'continue') { console.log(`the loop is ${st.status}: ${st.why}. Next: packet.`); process.exit(0); }
   const open = l.rounds.find((r) => !r.recorded);
-  if (open) { console.error(`round ${open.n} is not recorded yet`); process.exit(2); }
+  if (open) { console.error(`round ${open.n} is not recorded yet: polish-loop record ${feature} first`); process.exit(2); }
+  const st = statusOf(l);
+  if (st.status !== 'continue') { console.log(`the loop is ${st.status}: ${st.why}. Next: packet.`); process.exit(0); }
   const start = onMain();
   const n = l.rounds.length + 1;
   const out = path.join(dir, `r${n}`);
   fs.rmSync(out, { recursive: true, force: true });
   const s = shoot(out);
-  const evidence = { n, start, at: new Date().toISOString(), legibility: legibility(out), leaves: leaves(out), shotFailures: s.failed.map((x) => `${x.screen} ${x.lang}-${x.width}: ${x.error}`) };
+  const inventory = screens().map((x) => x.id); // this round's screens: its grades must cover these, not the baseline's
+  const evidence = { n, start, at: new Date().toISOString(), screens: inventory, legibility: legibility(out), leaves: leaves(out, l), shotFailures: s.failed.map((x) => `${x.screen} ${x.lang}-${x.width}: ${x.error}`) };
   restoreReview();
+  if (evidence.leaves.error) { console.error(evidence.leaves.error); process.exit(1); }
   fs.writeFileSync(path.join(out, 'evidence.json'), JSON.stringify(evidence, null, 2));
-  l.rounds.push({ n, start, recorded: false });
+  l.rounds.push({ n, start, screens: inventory, recorded: false });
   save(l);
-  console.log(`round ${n} on ${start.slice(0, 7)}: shots in ${path.relative(root, out)}`);
+  console.log(`round ${n} on ${start.slice(0, 7)}: ${inventory.length} screens shot in ${path.relative(root, out)}`);
   console.log(`  legibility: ${evidence.legibility.none ? 'not available' : `${evidence.legibility.failing}/${evidence.legibility.of} screens fail (${evidence.legibility.small} small text, ${evidence.legibility.contrast} contrast, ${evidence.legibility.taps} targets)`}`);
   console.log(`  leaves: ${evidence.leaves.none ? 'none (no features/' + feature + '/scenarios.json yet)' : `${evidence.leaves.pass} pass, ${evidence.leaves.fail} fail, ${evidence.leaves.blocked} blocked`}`);
   if (s.failed.length) console.log(`  ${s.failed.length} shot(s) failed: ${evidence.shotFailures.slice(0, 3).join(' | ')}`);
@@ -117,15 +125,19 @@ if (cmd === 'round') {
 }
 
 const current = (l) => { const r = l.rounds[l.rounds.length - 1]; if (!r) { console.error('no round yet: run round first'); process.exit(2); } return r; };
+// The one grade check `grades` and `record` share: complete for the round's own screens, for this round, on its commit.
+function roundGrades(l, r) {
+  const f = path.join(dir, `r${r.n}`, 'grades.json');
+  if (!fs.existsSync(f)) { console.error(`no ${path.relative(root, f)}`); process.exit(2); }
+  let g;
+  try { g = JSON.parse(fs.readFileSync(f, 'utf8')); } catch (e) { return { g: null, problems: [`${path.relative(root, f)} is not JSON: ${e.message.split('\n')[0]}`] }; }
+  return { g, problems: checkGrades(g, r.screens || l.screens, r).problems };
+}
 
 if (cmd === 'grades') {
   const l = load(); const r = current(l);
-  const f = path.join(dir, `r${r.n}`, 'grades.json');
-  if (!fs.existsSync(f)) { console.error(`no ${path.relative(root, f)}`); process.exit(2); }
-  const g = JSON.parse(fs.readFileSync(f, 'utf8'));
-  const c = checkGrades(g, l.screens);
-  if (g.commit && g.commit !== r.start) c.problems.push(`graded on ${g.commit.slice(0, 7)}, the round started on ${r.start.slice(0, 7)}`);
-  if (c.problems.length) { console.log('GRADES REJECTED — send these back to the grader:'); for (const p of c.problems) console.log('  -', p); process.exit(1); }
+  const { g, problems } = roundGrades(l, r);
+  if (problems.length) { console.log('GRADES REJECTED — send these back to the grader:'); for (const p of problems) console.log('  -', p); process.exit(1); }
   const worst = worstFirst(g);
   console.log(`round ${r.n}: ${g.states.length} states graded, ${hardCount(g)} hard failure(s). Worst first:`);
   for (const s of worst.slice(0, 12)) console.log(`  ${(s.hard || []).length ? 'HARD ' + s.hard.map((h) => h.type).join(',') : 'score ' + s.total + '/10'}  ${s.screen}${s.state ? ' / ' + s.state : ''} — ${(s.hard?.[0] || s.lost?.[0] || {}).what || ''}`);
@@ -137,8 +149,8 @@ if (cmd === 'record') {
   const l = load(); const r = current(l);
   const kind = opt('fix');
   if (!['defect', 'enhancement', 'none'].includes(kind)) usage();
-  const g = JSON.parse(fs.readFileSync(path.join(dir, `r${r.n}`, 'grades.json'), 'utf8'));
-  if (!checkGrades(g, l.screens).ok) { console.error('the grades are not accepted yet: polish-loop grades first'); process.exit(2); }
+  const { g, problems } = roundGrades(l, r);
+  if (problems.length) { console.error(`the grades are not accepted (${problems.slice(0, 3).join('; ')}${problems.length > 3 ? ' …' : ''}): polish-loop grades ${feature} first`); process.exit(2); }
   const ev = JSON.parse(fs.readFileSync(path.join(dir, `r${r.n}`, 'evidence.json'), 'utf8'));
   const merged = opt('merged') === 'yes';
   if (kind !== 'none' && merged && !opt('pr')) { console.error('a merged fix names its PR'); process.exit(2); }
@@ -154,7 +166,7 @@ if (cmd === 'record') {
     fix: kind === 'none' ? null : { kind, pr: Number(opt('pr')) || null, merged, what: opt('what') || '' },
   });
   save(l);
-  const st = loopStatus(l);
+  const st = statusOf(l);
   console.log(`round ${r.n} recorded (${isClean(r) ? 'clean' : 'not clean'}). Loop: ${st.status} — ${st.why}`);
   process.exit(0);
 }
@@ -171,7 +183,7 @@ if (cmd === 'decide') {
 }
 
 if (cmd === 'status') {
-  const l = load(); const st = loopStatus({ ...l, rounds: l.rounds.filter((r) => r.recorded) });
+  const l = load(); const st = statusOf(l);
   console.log(`${feature}: ${st.status} — ${st.why}`);
   for (const r of l.rounds) console.log(`  r${r.n} ${r.start.slice(0, 7)} ${r.recorded ? `${isClean(r) ? 'clean' : 'not clean'} · hard ${r.hard} · ${r.fix ? `${r.fix.kind} #${r.fix.pr || '-'} ${r.fix.merged ? 'merged' : 'rejected'}` : 'no fix'}` : 'open'}`);
   process.exit(0);
@@ -183,25 +195,29 @@ if (cmd === 'packet') {
   const out = path.join(dir, 'final');
   fs.rmSync(out, { recursive: true, force: true });
   const s = shoot(out);
-  const st = loopStatus({ ...l, rounds: l.rounds.filter((r) => r.recorded) });
+  const st = statusOf(l);
   const pk = path.join(dir, 'packet');
   fs.rmSync(pk, { recursive: true, force: true });
   fs.mkdirSync(path.join(pk, 'img'), { recursive: true });
   const rows = [];
-  for (const id of l.screens) for (const run of ['en-390', 'en-360', 'zh-390']) {
+  // Every screen of the baseline and of the final commit: one the loop added has no before, one it removed has no after.
+  const finalIds = screens().map((x) => x.id);
+  for (const id of new Set([...l.screens, ...finalIds])) for (const run of ['en-390', 'en-360', 'zh-390']) {
     const [lang] = run.split('-');
-    if (lang === 'zh' && l.zhIgnored.includes(id)) continue;
     const b = path.join(dir, 'r0', id, run + '.png'), a = path.join(out, id, run + '.png');
-    if (!fs.existsSync(b) && !fs.existsSync(a)) continue;
-    const same = fs.existsSync(b) && fs.existsSync(a) && fs.readFileSync(b).equals(fs.readFileSync(a));
+    const before = fs.existsSync(b), after = fs.existsSync(a);
+    if (!before && !after) continue;
+    if (lang === 'zh' && (!before || l.zhIgnored.includes(id)) && (!after || s.zhIgnored.includes(id))) continue;
+    const same = before && after && fs.readFileSync(b).equals(fs.readFileSync(a));
     for (const [side, f] of [['before', b], ['after', a]]) if (fs.existsSync(f)) fs.copyFileSync(f, path.join(pk, 'img', `${id}.${run}.${side}.png`));
-    rows.push({ id, run, same });
+    const missing = { before: before ? '' : l.screens.includes(id) ? 'Did not render' : 'Not in the baseline', after: after ? '' : finalIds.includes(id) ? 'Did not render' : 'Removed by the loop' };
+    rows.push({ id, run, same, missing });
   }
   const leavesLast = [...l.rounds].reverse().find((r) => r.recorded)?.leaves;
   // `items` is what the atlas backlog reads from review/*.json: the loop's open decisions land in the decision queue.
   const summary = { feature, job: l.job, baseline: l.baseline, final, status: st, rounds: l.rounds, decisions: l.decisions, items: l.decisions,
     gaps: [
-      ...(l.zhIgnored.length ? [`No Chinese rendering on ${l.zhIgnored.length} screen(s): ZH fit unverified (${l.zhIgnored.slice(0, 6).join(', ')}${l.zhIgnored.length > 6 ? ' …' : ''}).`] : []),
+      ...(s.zhIgnored.length ? [`No Chinese rendering on ${s.zhIgnored.length} screen(s): ZH fit unverified (${s.zhIgnored.slice(0, 6).join(', ')}${s.zhIgnored.length > 6 ? ' …' : ''}).`] : []),
       ...(leavesLast?.none ? [`No executable leaves (features/${feature}/scenarios.json): behaviour covered by walks only.`] : []),
       ...(s.failed.length ? [`${s.failed.length} final shot(s) failed to render.`] : []),
     ] };
@@ -231,6 +247,7 @@ main{max-width:1100px;margin:0 auto;padding:24px 16px 64px}h1{font-size:26px;mar
 th,td{border-bottom:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}th{color:var(--muted);font-weight:600}
 .status{font-weight:600}.done{color:var(--green)}.stopped{color:var(--amber)}.pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:12px 0 28px}
 .pair figure{margin:0}.pair img{width:100%;max-width:390px;border:1px solid var(--line);display:block}.pair figcaption{font-size:13px;color:var(--muted);margin-top:4px}
+.pair .none{width:100%;max-width:390px;aspect-ratio:390/844;border:1px dashed var(--line);display:grid;place-items:center;color:var(--muted);font-size:14px}
 .wrap{overflow-x:auto}ul{padding-left:20px}
 </style></head><body><main>
 <h1>${esc(s.feature)}: polish loop</h1>
@@ -246,8 +263,8 @@ ${keys.map((k) => `<tr><td><code>${esc(k)}</code></td>${recorded.map((r) => `<td
 </table></div>
 <h2>Before and after (${changed.length} changed)</h2>
 ${changed.map((r) => `<h3 style="font-size:16px;margin:20px 0 0"><code>${esc(r.id)}</code> <span class="meta">${esc(r.run)}</span></h3><div class="pair">
-<figure><img loading="lazy" src="img/${esc(r.id)}.${r.run}.before.png" alt="${esc(r.id)} before"><figcaption>Before · ${s.baseline.slice(0, 7)}</figcaption></figure>
-<figure><img loading="lazy" src="img/${esc(r.id)}.${r.run}.after.png" alt="${esc(r.id)} after"><figcaption>After · ${s.final.slice(0, 7)}</figcaption></figure></div>`).join('')}
+${[['before', 'Before', s.baseline], ['after', 'After', s.final]].map(([side, label, at]) => `<figure>${r.missing[side]
+    ? `<div class="none">${esc(r.missing[side])}</div>` : `<img loading="lazy" src="img/${esc(r.id)}.${r.run}.${side}.png" alt="${esc(r.id)} ${side}">`}<figcaption>${label} · ${at.slice(0, 7)}</figcaption></figure>`).join('\n')}</div>`).join('')}
 ${same.length ? `<p class="meta">Unchanged: ${[...new Set(same.map((r) => r.id))].map(esc).join(', ')}</p>` : ''}
 <h2>Declared gaps</h2>${s.gaps.length ? `<ul>${s.gaps.map((g) => `<li>${esc(g)}</li>`).join('')}</ul>` : '<p class="meta">None.</p>'}
 </main></body></html>`;

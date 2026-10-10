@@ -56,6 +56,6 @@ Write `ROUND FOLDER/grades.json`:
     "idea": "" }],
   "gaps": [""] }
 ```
-`state` is empty unless one atlas screen shows several states worth grading apart. `gaps` lists what you couldn't judge, and why.
+`round` and `commit` are the ROUND and COMMIT you were given; grades for another round or commit are rejected. `state` is empty unless one atlas screen shows several states worth grading apart. `gaps` lists what you couldn't judge, and why.
 
 Report in 100 words or fewer: the count graded, the hard failures, the five worst screens with their one-line reason, and your ideas.
