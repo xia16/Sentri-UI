@@ -23,7 +23,7 @@
           "farrowing.count",
           "farrowing.death",
           "farrowing.finish",
-          "farrowing.blocked",
+          "farrowing.leave-edit",
           "farrowing.edit",
           "farrowing.foster",
           "farrowing.reconcile"
@@ -167,11 +167,6 @@
     ],
     [
       "farrowing.count",
-      "farrowing.blocked",
-      "Finish farrowing while an Edit draft waits"
-    ],
-    [
-      "farrowing.count",
       "farrowing.death",
       "Record death"
     ],
@@ -196,24 +191,9 @@
       "Finish farrowing (hold to finish)"
     ],
     [
-      "farrowing.blocked",
-      "farrowing.count",
-      "Back"
-    ],
-    [
-      "farrowing.blocked",
-      "farrowing.edit",
-      "Review"
-    ],
-    [
-      "farrowing.blocked",
-      "farrowing.death",
-      "Review (unsaved deaths)"
-    ],
-    [
       "farrowing.death",
       "farrowing.count",
-      "Save, or Back (discards the draft)"
+      "Save, or Back (keeps the draft)"
     ],
     [
       "farrowing.death",
@@ -239,11 +219,6 @@
       "farrowing.edit",
       "farrowing.finish",
       "Save, when opened from the blocked Finish"
-    ],
-    [
-      "farrowing.edit",
-      "farrowing.blocked",
-      "Back with the draft kept, when opened from the blocked Finish"
     ],
     [
       "farrowing.locked",
@@ -419,6 +394,16 @@
       "farrowing.reconcile",
       "farrowing.count",
       "Save, or Back"
+    ],
+    [
+      "farrowing.edit",
+      "farrowing.leave-edit",
+      "Back with unsaved changes"
+    ],
+    [
+      "farrowing.leave-edit",
+      "farrowing.count",
+      "Discard or Save"
     ]
   ],
   "screens": [
@@ -683,7 +668,7 @@
       "notes": {
         "purpose": "Keep the live count while she farrows: one big Alive number whose + and − save at once, with the litter so far.",
         "states": [
-          "Edit draft waiting (kept with Back): Finish farrowing stays enabled but opens the blocked Finish sheet",
+          "Death draft waiting (kept with Back): Finish farrowing shows its waiting look and takes the worker back to the Record dead draft; no blocked sheet (owner decision 2026-10-10)",
           "Visit with nothing changed: receipt reads just \"Saved\""
         ],
         "elements": [
@@ -776,7 +761,7 @@
               {
                 "state": "Record death with draft",
                 "when": "A piglet death draft exists",
-                "shows": "Small \"Unsaved\" under the label (cannot occur today because leaving the drawer clears the draft)"
+                "shows": "\"N unsaved\" in small text under the label while a draft is open (Back keeps the draft, and a reload keeps it for the session)"
               }
             ],
             "source": "farrowing-astra-concept.js recordActions()",
@@ -794,7 +779,7 @@
               {
                 "state": "Enabled",
                 "when": "Born above zero",
-                "shows": "Opens the Finish sheet; opens the blocked version if an Edit draft is waiting"
+                "shows": "Opens the Finish sheet. While piglet deaths are drafted the button is in its waiting look and tapping it opens the Record dead sheet with the draft, so the deaths are saved first (owner decision 2026-10-10)"
               }
             ],
             "source": "farrowing-astra-concept.js count()",
@@ -969,12 +954,12 @@
               {
                 "state": "No draft",
                 "when": "Nothing drafted",
-                "shows": "\"Dead 5\" (saved total); no unsaved count; Clear and Save disabled"
+                "shows": "\"Dead 5\" (saved total); no unsaved count; Clear left out; Save disabled"
               },
               {
                 "state": "Draft",
                 "when": "One or more deaths drafted",
-                "shows": "\"Dead 6\" (saved + draft); \"1 unsaved\" in green; Clear live"
+                "shows": "\"Dead 6\" (saved + draft); \"1 unsaved\" in muted ink; Clear live"
               }
             ],
             "source": "farrowing-astra-concept.js identity()",
@@ -1051,7 +1036,7 @@
           {
             "name": "Save and Back",
             "shows": "Bar.",
-            "rule": "Save (piglets) adds the draft to the dead types and writes one log line such as \"+3 crushed · +1 other\". Back, X, handle and backdrop discard the draft (and any sow cause); the ruling says they should keep it.",
+            "rule": "Save (piglets) adds the draft to the dead types and writes one log line such as \"+3 crushed · +1 other\". Back keeps the draft; only Clear discards it (and any sow cause); the ruling says they should keep it.",
             "source": "farrowing-astra-concept.js act(\"saveDeath\"), act(\"back\")",
             "at": "Save"
           }
@@ -1095,8 +1080,8 @@
           "\"No WHEN anywhere, absolutely\" (Model)"
         ],
         "issues": [
-          "Back, X, swipe and backdrop all clear the draft; the ruling keeps it, so \"N unsaved\" and Finish's \"Save piglet deaths first\" never show.",
-          "\"Dead 6\", \"1 unsaved\" and the green row all say the same draft three times.",
+          "Back keeps the draft, as the ruling says; Finish has no banner.",
+          "\"Dead 6\" in the title and \"+1 unsaved\" beside the row say the same draft twice.",
           "No sow id or pen is shown; the worker cannot see which sow is being recorded.",
           "Photo field is a header row with an icon button, not the ruled single card; \"Record death\" mixes with the ruled \"Record dead\"."
         ]
@@ -1198,66 +1183,40 @@
       }
     },
     {
-      "id": "farrowing.blocked",
-      "name": "Lock blocked",
-      "zh": "无法锁定",
+      "id": "farrowing.leave-edit",
+      "name": "Leave edit with changes",
+      "zh": "离开修改页（有未保存的修改）",
       "status": "in-design",
       "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
-      "preset": "blocked",
+      "preset": "leave",
       "figma": "",
       "notes": {
-        "purpose": "The Finish sheet when an unsaved record waits: a banner says what to resolve first and Finish stays disabled.",
-        "states": [],
-        "elements": [
+        "purpose": "Back from Edit record with unsaved changes asks whether to save, so an unsaved correction can never reach Finish.",
+        "states": [
+          "Dialog over the Edit record sheet: Save correction? with Discard and Save"
+        ],
+        "controls": [
           {
-            "name": "Pending banner",
-            "shows": "Warning above the totals with Review ›.",
-            "states": [
-              {
-                "state": "Correction",
-                "when": "An Edit with changes exists",
-                "shows": "\"Save your correction first · Resolve this before finishing.\" Review opens Edit"
-              },
-              {
-                "state": "Piglet deaths",
-                "when": "A death draft exists",
-                "shows": "\"Save piglet deaths first\" (unreachable today because leaving the drawer clears the draft). Review opens the drawer"
-              },
-              {
-                "state": "Sow record",
-                "when": "A sow cause is chosen but unsaved",
-                "shows": "\"Save or clear the sow record\". Review opens the drawer"
-              }
-            ],
-            "logic": "Shown whenever any draft exists; the text names the first applicable one in the order death draft, correction, sow cause.",
-            "source": "farrowing-astra-concept.js hasDraft(), finish()",
-            "at": "Resolve this before finishing."
+            "control": "Save",
+            "does": "saves the correction and returns",
+            "goesTo": "farrowing.count | farrowing.locked"
           },
           {
-            "name": "Finish farrowing",
-            "shows": "Greyed, caption HOLD TO FINISH.",
-            "rule": "A held press does nothing until the draft is saved or cleared; a draft never crosses the lock. Clearing in Edit returns to the plain Finish sheet.",
-            "source": "farrowing-astra-concept.js hold(…, blocked)",
-            "at": "HOLD TO FINISH"
+            "control": "Discard",
+            "does": "drops the changes and returns",
+            "goesTo": "farrowing.count | farrowing.locked"
           }
         ],
-        "controls": [],
         "copy": [
-          "(raw) Save your correction first",
-          "(raw) Save piglet deaths first",
-          "(raw) Save or clear the sow record",
-          "(raw) Resolve this before finishing.",
-          "(raw) Review"
+          "(raw) Save correction? · You changed this record. · Discard · Save"
         ],
-        "edge": [],
+        "edge": [
+          "The same ask appears on the grabber and Escape"
+        ],
         "rules": [
-          "\"A draft never crosses the lock\" and the pointer \"1 death unsaved · Record dead\" above the bar (Starting and ending a session)",
-          "\"this is a guard on the lock, not a gate on recording\" (Starting and ending a session)"
+          "An unsaved correction never reaches Finish"
         ],
-        "issues": [
-          "Banner copy and layout differ from the ruled pointer \"1 death unsaved · Record dead\" above the bar; the disabled button is dimmed.",
-          "Only the Edit-draft route reaches this state; the death-draft variant is unreachable."
-        ]
+        "issues": []
       }
     },
     {
@@ -1347,18 +1306,18 @@
         "states": [],
         "elements": [
           {
-            "name": "Correction banner",
-            "shows": "Amber \"Correcting a past record · logged as G. Hansen\" with one line per change.",
+            "name": "Corrected rows",
+            "shows": "No banner. Back with changes asks \"Save correction?\" (Save / Discard).",
             "states": [
               {
                 "state": "Untouched",
                 "when": "No change yet",
-                "shows": "No banner; Save and Clear disabled"
+                "shows": "No banner; Clear left out; Save correction disabled"
               },
               {
                 "state": "Changed",
                 "when": "From the first change",
-                "shows": "Banner plus a mono line per figure, e.g. \"Crushed 2 → 1\"; changed values turn amber; Save enabled"
+                "shows": "No banner: a changed row shows its new value in ink with a muted \"was 2\" beside the label; Save correction enabled. Who and old → new go to the log after saving."
               }
             ],
             "source": "farrowing-astra-concept.js editSummary(), changes()",
@@ -1388,7 +1347,7 @@
         ],
         "copy": [
           "(raw) Edit record",
-          "(raw) Correcting a past record · logged as G. Hansen",
+          "(raw) was N · Save correction",
           "(raw) Clear · Back · Save"
         ],
         "edge": [
@@ -1775,7 +1734,8 @@
           "(raw) HOLD TO END · HOLD TO END EARLY"
         ],
         "edge": [
-          "Blocking items are listed first; ending is impossible until they are cleared"
+          "Blocking items are listed first; ending is impossible until they are cleared",
+          "The still-farrowing and awaiting warnings are the Task outcomes rows themselves (an amber word and ›); there are no separate warning cards."
         ],
         "rules": [
           "Same grammar as the ruled End task: \"manual only … hold-to-commit with receipt; … cannot end while the batch's farrowing task is open\" (Piglet processing, Q5)",
@@ -1867,7 +1827,8 @@
           "(raw) HOLD TO END · HOLD TO END EARLY"
         ],
         "edge": [
-          "Finished sows stay in the batch; awaiting sows are marked removed-at-close; the receipt says \"Task ended early\""
+          "Finished sows stay in the batch; awaiting sows are marked removed-at-close; the receipt says \"Task ended early\"",
+          "The still-farrowing and awaiting warnings are the Task outcomes rows themselves (an amber word and ›); there are no separate warning cards."
         ],
         "rules": [
           "Same grammar as the ruled End task: \"manual only … hold-to-commit with receipt; … cannot end while the batch's farrowing task is open\" (Piglet processing, Q5)",
@@ -2245,7 +2206,8 @@
         ],
         "controls": [],
         "copy": [],
-        "edge": []
+        "edge": [],
+        "issues": []
       }
     },
     {
@@ -2281,7 +2243,8 @@
         ],
         "controls": [],
         "copy": [],
-        "edge": []
+        "edge": [],
+        "issues": []
       }
     }
   ]

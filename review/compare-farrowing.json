@@ -1,0 +1,140 @@
+{
+  "feature": "farrowing",
+  "baseline": "http://localhost:4386",
+  "branch": "http://localhost:4388",
+  "size": "390x844",
+  "screens": {
+    "farrowing.room": {
+      "note": "Owner-approved delta (farm legibility law, 2026-10-10): every secondary line is at least 13px and every primary value or label at least 16px, in ink or muted-ink for contrast; geometry otherwise as noted. Owner rules: the tile drops its all-units support line; chips use the Status tones. Fix round (owner rules): drawers have no ✕; Back is the outlined exit, alone or beside a primary; the Active chip is the Status tone (blue), Done green; the three-up Born / Alive / Dead metric is one form on count, finish, locked and ended; Clear, Edit and View log are left out until they can act. Allowed: the All tab is weight 700 (#88); the dock Pen glyph is the registry grid with its broken path fixed (#81).",
+      "pixels": 58721,
+      "maxDelta": 224,
+      "status": "differs",
+      "diff": "review/compare-farrowing/farrowing.room.diff.png"
+    },
+    "farrowing.count": {
+      "note": "Owner-approved delta (farm legibility law, 2026-10-10): every secondary line is at least 13px and every primary value or label at least 16px, in ink or muted-ink for contrast; geometry otherwise as noted. Born / Dead is the shared three-up metric. Fix round (owner rules): drawers have no ✕; Back is the outlined exit, alone or beside a primary; the Active chip is the Status tone (blue), Done green; the three-up Born / Alive / Dead metric is one form on count, finish, locked and ended; Clear, Edit and View log are left out until they can act.",
+      "pixels": 73420,
+      "maxDelta": 224,
+      "status": "differs",
+      "diff": "review/compare-farrowing/farrowing.count.diff.png"
+    },
+    "farrowing.before": {
+      "note": "Owner-approved delta (farm legibility law, 2026-10-10): every secondary line is at least 13px and every primary value or label at least 16px, in ink or muted-ink for contrast; geometry otherwise as noted. Edit and View log are left out until there is a litter. Fix round (owner rules): drawers have no ✕; Back is the outlined exit, alone or beside a primary; the Active chip is the Status tone (blue), Done green; the three-up Born / Alive / Dead metric is one form on count, finish, locked and ended; Clear, Edit and View log are left out until they can act.",
+      "pixels": 73505,
+      "maxDelta": 224,
+      "status": "differs",
+      "diff": "review/compare-farrowing/farrowing.before.diff.png"
+    },
+    "farrowing.death": {
+      "note": "Owner-approved delta (farm legibility law, 2026-10-10): every secondary line is at least 13px and every primary value or label at least 16px, in ink or muted-ink for contrast; geometry otherwise as noted. Fix round: Back keeps the draft; \"1 unsaved\" is muted; primary reads \"Record N deaths\"; Clear and Photos appear only when they can act; no reason lines. Allowed: selected segment weight 700 (#88); stepper draft value in ink, \"+1 unsaved\" muted beside the label (#88). Owner-approved delta: the optional inputs are the older quiet \"+ Litter weight\" / \"+ Assistance\" / \"+ Photos\" cards (4cb3d75), side by side, no \"Optional\" word. The rest is Text anti-aliasing only (geometry identical).",
+      "pixels": 38516,
+      "maxDelta": 224,
+      "status": "differs",
+      "diff": "review/compare-farrowing/farrowing.death.diff.png"
+    },
+    "farrowing.finish": {
+      "note": "Owner-approved delta (farm legibility law, 2026-10-10): every secondary line is at least 13px and every primary value or label at least 16px, in ink or muted-ink for contrast; geometry otherwise as noted. Owner-approved delta: the optional inputs are the older quiet \"+ Litter weight\" / \"+ Assistance\" / \"+ Photos\" cards (4cb3d75), side by side, no \"Optional\" word. Everything else on the sheet is identical; the sheet is shorter by the one-row cards.",
+      "pixels": 114240,
+      "maxDelta": 224,
+      "status": "differs",
+      "diff": "review/compare-farrowing/farrowing.finish.diff.png"
+    },
+    "farrowing.locked": {
+      "note": "Owner-approved delta (farm legibility law, 2026-10-10): every secondary line is at least 13px and every primary value or label at least 16px, in ink or muted-ink for contrast; geometry otherwise as noted. The three-up metric with the facts below it; Back is the outlined exit. Fix round (owner rules): drawers have no ✕; Back is the outlined exit, alone or beside a primary; the Active chip is the Status tone (blue), Done green; the three-up Born / Alive / Dead metric is one form on count, finish, locked and ended; Clear, Edit and View log are left out until they can act. Allowed: the All tab of the room underneath is weight 700 (#88). The \"more actions\" dots anti-alias differently.",
+      "pixels": 69441,
+      "maxDelta": 224,
+      "status": "differs",
+      "diff": "review/compare-farrowing/farrowing.locked.diff.png"
+    },
+    "farrowing.edit": {
+      "note": "Owner-approved delta (farm legibility law, 2026-10-10): every secondary line is at least 13px and every primary value or label at least 16px, in ink or muted-ink for contrast; geometry otherwise as noted. Owner-approved delta: the corrections pattern. The footer says \"Save correction\"; a changed row shows its new value in ink with a muted \"was N\" beside the label; no banner, no Corrected tag. Unchanged, the screen is the baseline.",
+      "pixels": 13475,
+      "maxDelta": 224,
+      "status": "differs",
+      "diff": "review/compare-farrowing/farrowing.edit.diff.png"
+    },
+    "farrowing.born": {
+      "note": "Owner-approved delta (farm legibility law, 2026-10-10): every secondary line is at least 13px and every primary value or label at least 16px, in ink or muted-ink for contrast; geometry otherwise as noted. Fix round: title \"Correct born\", no subtitle, the stepper is labelled (More born / Born should be); opening draws no focus ring. Allowed (#84): no designed focus ring.",
+      "pixels": 59953,
+      "maxDelta": 228,
+      "status": "differs",
+      "diff": "review/compare-farrowing/farrowing.born.diff.png"
+    },
+    "farrowing.history": {
+      "note": "Owner-approved delta (farm legibility law, 2026-10-10): every secondary line is at least 13px and every primary value or label at least 16px, in ink or muted-ink for contrast; geometry otherwise as noted. Allowed (#81): the seed event reads \"Aug 28\". Fix round: \"Farrowing finished\" is said once; stamps use initials (G.H).",
+      "pixels": 56892,
+      "maxDelta": 224,
+      "status": "differs",
+      "diff": "review/compare-farrowing/farrowing.history.diff.png"
+    },
+    "farrowing.ended": {
+      "note": "Owner-approved delta (farm legibility law, 2026-10-10): every secondary line is at least 13px and every primary value or label at least 16px, in ink or muted-ink for contrast; geometry otherwise as noted. The shared metric. Fix round (owner rules): drawers have no ✕; Back is the outlined exit, alone or beside a primary; the Active chip is the Status tone (blue), Done green; the three-up Born / Alive / Dead metric is one form on count, finish, locked and ended; Clear, Edit and View log are left out until they can act. Allowed: the All tab of the room underneath is weight 700 (#88). The \"more actions\" dots anti-alias differently.",
+      "pixels": 92680,
+      "maxDelta": 224,
+      "status": "differs",
+      "diff": "review/compare-farrowing/farrowing.ended.diff.png"
+    },
+    "farrowing.task-blocked": {
+      "note": "Owner-approved delta (farm legibility law, 2026-10-10): every secondary line is at least 13px and every primary value or label at least 16px, in ink or muted-ink for contrast; geometry otherwise as noted. The two amber warning cards are gone: the Still farrowing and Awaiting rows of Task outcomes are the warning (amber word, what happens, ›).",
+      "pixels": 158249,
+      "maxDelta": 255,
+      "status": "differs",
+      "diff": "review/compare-farrowing/farrowing.task-blocked.diff.png"
+    },
+    "farrowing.task-ready": {
+      "note": "Owner-approved delta (farm legibility law, 2026-10-10): every secondary line is at least 13px and every primary value or label at least 16px, in ink or muted-ink for contrast; geometry otherwise as noted. The Awaiting row of Task outcomes carries the warning; no separate card.",
+      "pixels": 126028,
+      "maxDelta": 255,
+      "status": "differs",
+      "diff": "review/compare-farrowing/farrowing.task-ready.diff.png"
+    },
+    "farrowing.task-complete": {
+      "note": "Owner-approved delta (farm legibility law, 2026-10-10): every secondary line is at least 13px and every primary value or label at least 16px, in ink or muted-ink for contrast; geometry otherwise as noted. Identical.",
+      "pixels": 51467,
+      "maxDelta": 224,
+      "status": "differs",
+      "diff": "review/compare-farrowing/farrowing.task-complete.diff.png"
+    },
+    "farrowing.task-outcomes": {
+      "note": "Owner-approved delta (farm legibility law, 2026-10-10): every secondary line is at least 13px and every primary value or label at least 16px, in ink or muted-ink for contrast; geometry otherwise as noted. Same as task-ready.",
+      "pixels": 126977,
+      "maxDelta": 255,
+      "status": "differs",
+      "diff": "review/compare-farrowing/farrowing.task-outcomes.diff.png"
+    },
+    "farrowing.edit-finished": {
+      "note": "Owner-approved delta (farm legibility law, 2026-10-10): every secondary line is at least 13px and every primary value or label at least 16px, in ink or muted-ink for contrast; geometry otherwise as noted. Owner-approved delta: the corrections pattern (\"Save correction\", \"was N\"). Unchanged, otherwise the baseline.",
+      "pixels": 13079,
+      "maxDelta": 224,
+      "status": "differs",
+      "diff": "review/compare-farrowing/farrowing.edit-finished.diff.png"
+    },
+    "farrowing.overview": {
+      "note": "Owner-approved delta (farm legibility law, 2026-10-10): every secondary line is at least 13px and every primary value or label at least 16px, in ink or muted-ink for contrast; geometry otherwise as noted. Allowed (#81): the Choose-a-unit glyph is the registry grid with its broken path fixed.",
+      "pixels": 54757,
+      "maxDelta": 224,
+      "status": "differs",
+      "diff": "review/compare-farrowing/farrowing.overview.diff.png"
+    },
+    "farrowing.task-receipt": {
+      "note": "Owner-approved delta (farm legibility law, 2026-10-10): every secondary line is at least 13px and every primary value or label at least 16px, in ink or muted-ink for contrast; geometry otherwise as noted. Identical.",
+      "pixels": 62928,
+      "maxDelta": 224,
+      "status": "differs",
+      "diff": "review/compare-farrowing/farrowing.task-receipt.diff.png"
+    },
+    "farrowing.leave-edit": {
+      "note": "Owner-approved delta (farm legibility law, 2026-10-10): every secondary line is at least 13px and every primary value or label at least 16px, in ink or muted-ink for contrast; geometry otherwise as noted. New and owner-approved: Back from Edit record with unsaved changes asks \"Save correction?\" (Discard / Save) in the shared dialog. Not in the baseline.",
+      "status": "no-baseline"
+    },
+    "farrowing.foster": {
+      "note": "Owner-approved delta (farm legibility law, 2026-10-10): every secondary line is at least 13px and every primary value or label at least 16px, in ink or muted-ink for contrast; geometry otherwise as noted. No baseline: added after the approved baseline.",
+      "status": "no-baseline"
+    },
+    "farrowing.reconcile": {
+      "note": "Owner-approved delta (farm legibility law, 2026-10-10): every secondary line is at least 13px and every primary value or label at least 16px, in ink or muted-ink for contrast; geometry otherwise as noted. No baseline: added after the approved baseline.",
+      "status": "no-baseline"
+    }
+  },
+  "summary": "Every screen with a baseline differs by the owner-approved farm legibility type pass (13px floor, 16px primary), plus the allowed deltas (#84 #88 #70 #81) and owner-approved deltas already listed per screen (quiet optional cards, corrections pattern, leave-edit dialog, Finish waiting on a death draft, Record dead tool with N unsaved, no drawer close). The footer reason line is removed everywhere. Farrowing.blocked is gone."
+}
