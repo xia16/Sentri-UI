@@ -12,6 +12,8 @@ leaves re-runnable and lets them gate a merge. Persona walks, which find what th
 | `features/<id>/scenario-tree.md` | the tree for people: states × events, each row S (sourced, cited) or I (inferred, reasoned), ending in → outcome, handoff:`<task>` or ? Qn; questions stated once at the end |
 | `features/<id>/scenarios.json` | the same tree's executable leaves, for the runner (below); each leaf names its tree row |
 | `scripts/run-scenarios.mjs` | the runner |
+| `scripts/scenario-tree.mjs` | the tree walk and the format checks, shared by the runner and the format test (no browser) |
+| `tests/scenarios-format.test.mjs` | the format check that runs in `npm test` |
 | `review/scenarios-<id>.json` | the last run's results (committed; the atlas build skips it) |
 | `review/scenarios/<id>/<leaf>/<lang>-<width>/` | a screenshot after every step (git-ignored; regenerate with the runner) |
 
@@ -42,7 +44,7 @@ A node is `{ "type", "id", "label", "children"? }` plus, by type:
 | `entry` | — | a branch: a way into the feature (Home → room, the death draft, …) |
 | `state` | `reset`, `clock`?, `tree` (section letter) | a **reset fixture**: every leaf below starts here, from scratch |
 | `action` | `taps` | what the worker does; actions chain, so Back / reopen / resume are just more actions |
-| `outcome` | `tree` (row id), `authority`, `visible`, `record`, `status`?, `why`?, `langs`? and `widths`? (the polish loop's `runs`; default all four), `clip`? | an **executable leaf** |
+| `outcome` | `tree` (row id), `authority`, `gwt`, `visible`, `record`, `status`?, `why`?, `langs`? and `widths`? (the polish loop's `runs`; default all four), `clip`? | an **executable leaf** |
 | `decision-blocker` | `tree`, `question` (Qn), `sources` | a leaf with no authority or conflicting sources: reported `blocked`, never run |
 
 A leaf runs as: the nearest `state` above it (its `reset` fixture), then the `taps` of every `action` between them in order.
@@ -58,8 +60,28 @@ to its own deterministic seed for that preset (`select.scenario`). `taps` finish
 or a CSS selector (starts with `[`, `.` or `#`); `{ "tap": ..., "hold": ms }` for hold-to-commit. Prefer selectors on
 `data-action` where the leaf must run in every language. Also: `{ "fill": "<selector>", "value": "..." }`,
 `{ "expect": [<assertion>...] }` (a check mid-path), `{ "reload": true }` (the app is closed and reopened),
-`{ "wait": ms }`. A tap is a real pointer click: a control that is covered, disabled or missing fails the leaf as an
+`{ "wait": ms }`, and the interruptions below. A tap is a real pointer click: a control that is covered, disabled or missing fails the leaf as an
 **unreachable control**.
+
+**Interruptions** are steps like `reload`, and can come anywhere in a path (not in a state's `reset.taps`). Each shows in
+the screenshots and in a failure under its own name (`offline`, `online`, `advance 2h`, `back`, `device b`).
+
+| step | does |
+|---|---|
+| `{ "offline": true }` / `{ "offline": false }` | the current device loses / regains its network (`context.setOffline`) |
+| `{ "advance": "30m" }` (`s`, `m`, `h`, `d`: `"45s"`, `"2h"`, `"1d"`) | time passes mid-path on every open device, timers due in the gap fire once (`page.clock.fastForward`). A leaf that advances gets a clock even when it fixes none: it starts at its `clock`, else at the real time of the run |
+| `{ "back": true }` | the phone's own Back (system back). If the page has an earlier history entry it goes back in history; otherwise it sends **Escape** to the top sheet (or the phone), which is what the prototypes listen to as "Back / dismiss the top surface". The prototypes only `replaceState`, so today it is always Escape |
+| `{ "device": "b" }` / `{ "device": "a" }` | switch to a second device. "b" opens on first use, in a **separate browser context** (own storage, network and clock) on the same reset fixture; later steps, and the leaf's `visible` and `record` checks, act on the current device. "a" is the phone the leaf starts on |
+
+The prototypes are single in-memory devices, so a second device never sees the first one's records: a leaf about two
+phones merging, or another worker's record arriving, stays `pending` with a `why` until a prototype can share state.
+Write it now all the same: the step is there and the `gwt` is the spec for the live app.
+
+**`gwt`**: `{ "given": "...", "when": "...", "then": "..." }` on every outcome: the leaf in plain language, written from
+its `label`, `authority` and `visible` / `record` checks. An engineer turns it into a test of the live app without
+this file, so it names no selector, no `data-action` and no prototype state (`s.view`), only what the worker sees and
+does. Short: one sentence each. The runner copies it into the report per leaf and warns when an outcome lacks it;
+`npm test` fails. Decision-blockers have none: they have a question, not an expectation.
 
 **`authority`**: `[{ "src": "RUL|PRD|contract|SYN|HANDOVER|STR|review|atlas", "at": "section or item id", "says": "short quote" }]`.
 An outcome without authority is refused by the runner: make it a decision-blocker.
@@ -108,7 +130,17 @@ otherwise; a crashed run is `dead-end`.
 `review/scenarios-<feature>.json`: `{ feature, commit, dirty, ran, langs, widths, nodes (count by type), summary
 { pass, fail, blocked, pending }, byBranch, hardFailures, leaves: [{ id, tree, branch, result, hard, authority,
 runs: [{ lang, width, result, failures: [{ what, got, tag }], skipped, notes, evidence: [png paths] }] }] }`.
-`--only` runs never write it.
+`--only` runs never write it. Each leaf also carries its `gwt`.
+
+## The format check
+
+`tests/scenarios-format.test.mjs` runs in `npm test`, in milliseconds and with no browser. It parses every
+`features/*/scenarios.json` with the runner's own tree walk (`scripts/scenario-tree.mjs`) and fails on: a duplicate id;
+an outcome with no `authority` (it should be a decision-blocker); an outcome that is not `pending` and has no `state`
+above it; an unknown node type, step kind or assertion; a bad step (an `advance` that is not a duration, a `device`
+other than `"a"` / `"b"`, a non-tap step in `reset.taps`); an outcome with no `gwt` or with any of its three parts
+missing; a `gwt` that reads like a selector or prototype state. It also checks that the checker itself refuses each of
+these. Running the leaves stays in the gate: it needs a browser and minutes.
 
 ## Hooks a prototype may need
 
