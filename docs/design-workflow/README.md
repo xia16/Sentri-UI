@@ -35,7 +35,7 @@ New features and the polish loop both use the same scenario step. It has three p
 
 1. **Scenario tree.** In the feature's research folder, write a tree that crosses every entity state with every event that can reach it. Each branch ends in an outcome, a handoff to another feature, or an open question `? Qn`. Mark each branch **S** (sourced, with a citation) or **I** (inferred, with the reasoning). Where sources disagree, RULINGS wins. If no ruling covers the conflict, the branch becomes a `?`. The format example is [`ux/tasks/piglet-processing/research/scenario-tree.md`](../../ux/tasks/piglet-processing/research/scenario-tree.md).
 2. **Persona walks.** Run rounds of walkers, one per persona from the tree, plus a breaker. Subagents walk the live screens in a real browser. See [walk.md](briefs/walk.md). Examples are in `ux/tasks/piglet-processing/research/walks/r1|r2|r3/`, condensed in `ux/tasks/piglet-processing/scenarios.md`.
-3. **Executable leaves.** A walked branch becomes a re-runnable gate: an entry in `features/<id>/scenarios.json`, run by `node scripts/run-scenarios.mjs`. Leaf fields are in [polish-loop.md](briefs/polish-loop.md#executable-leaves).
+3. **Executable leaves.** A walked branch becomes a re-runnable gate: an entry in `features/<id>/scenarios.json`, run by `node scripts/run-scenarios.mjs`. Leaf fields are in [polish-loop.md](briefs/polish-loop.md#executable-leaves); the file format, assertions and runner are in [scenarios.md](scenarios.md).
 
 ## The three modes
 
