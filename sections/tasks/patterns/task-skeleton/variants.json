@@ -1,0 +1,40 @@
+[
+ {
+  "id": "page",
+  "name": "Page",
+  "use": "a full page that owns the whole phone: the task's own list, its overview, a form, a record log, an end review or a receipt",
+  "notUse": "a quick action on one row (use the drawer), or a yes/no question (use the dialog)",
+  "states": [
+   "Room list",
+   "Farrowing log",
+   "Task overview",
+   "Foster piglets",
+   "Pen page",
+   "End task early",
+   "Task ended receipt",
+   "Piglet processing care"
+  ]
+ },
+ {
+  "id": "drawer",
+  "name": "Drawer",
+  "use": "work on one sow or litter over the task list, with Back returning to the list: finish, record dead, count, sow death",
+  "notUse": "a whole-task view or anything that needs the list hidden",
+  "states": [
+   "Finish farrowing",
+   "Finish with assisted farrowing",
+   "Record dead",
+   "Counting",
+   "Sow died"
+  ]
+ },
+ {
+  "id": "dialog",
+  "name": "Dialog",
+  "use": "one question over a drawer: choose what changed, then apply",
+  "notUse": "a form with several fields",
+  "states": [
+   "Correct born"
+  ]
+ }
+]
