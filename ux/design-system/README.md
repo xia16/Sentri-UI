@@ -1,3 +1,7 @@
+**Components are designed and perfected from real features.**
+
+A component's look comes from the approved feature screens that use it, and it improves by improving those screens, judged before/after on them. An approved screen is never restyled to fit a component. The approved baseline for Farrowing, Inspection and Piglet processing is main at 6e6c940 plus the owner-approved deltas, checked with `scripts/compare-screens.mjs`.
+
 Sentri is a phone-first tool for commercial pig farms: what needs doing, where, to which animals, and what has already been recorded. It is used standing in a barn, often gloved, often offline, reading for two seconds at a time. Every rule below serves that reader. Everything in `ux/design-system/` is the mobile app's design system: a native-feel phone app used with touch. A web app, when it exists, gets its own.
 
 The system has one palette (Astra, light only), two type families, one shared component layer (`SentriUI`) and one icon registry (`SentriIcons`). Every screen is these parts, configured — never a fork. An operation that fits no existing container is a design smell, not a reason for a new one.

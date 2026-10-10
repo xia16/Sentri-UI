@@ -226,7 +226,7 @@
 
 /* Record tools belong to the litter summary; only exit/completion stays fixed. */
 .farrowing-phone .record-inline-actions{margin-top:12px}
-.farrowing-phone .record-inline-actions .record-action-group{display:grid;grid-template-columns:repeat(auto-fit,minmax(var(--tap-min),1fr));gap:8px;min-width:0;border:0;padding:0}
+.farrowing-phone .record-inline-actions .record-action-group{display:grid;grid-template-columns:.65fr 1.15fr 1.15fr;gap:8px;min-width:0;border:0;padding:0}
 
 /* Use spare room in the counter, never as a varying gap above the footer. */
 .farrowing-phone .sheet[data-view="count"]>.sheet-body{display:flex;flex-direction:column;padding-bottom:16px}

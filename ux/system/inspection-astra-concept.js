@@ -1,4 +1,4 @@
-import {localizeFeed,recordReason} from './feed-locale.js';
+import {localizeFeed} from './feed-locale.js';
 import './unit-snapshot.js';
 /* Inspection study: in-memory sample farm plans; no production writes. */
 (()=>{
@@ -23,31 +23,17 @@ const stPickerOptions=o=>SentriUI.pickerOptions(o);
 // Entry markers (read by the atlas): a control that is a way into another feature says which one; a pig row with a health tag is also a way into Health record.
 const entryOf={feed:'feed-plan','feed-edit-pen':'feed-plan','feed-edit-selected':'feed-plan','pig-feed':'feed-plan',pig:'pig-profile',health:'health-record',finding:'health-record',scan:'inspection',search:'inspection'};
 const entryFor=(a,label='')=>entryOf[a]?(a==='pig'&&/data-ds="ConditionTag"[^>]*data-care="(attention|ongoing)"/.test(label)?'pig-profile health-record':entryOf[a]):'';
-const waitingReasons={
- 'save-health':'Choose a disease or symptom', 'save-record':'Enter a reading', 'save-weight':'Enter a weight',
- 'save-production-task':'Choose an outcome', 'save-miscarriage':'Choose a reason', 'save-batch-membership':'Choose a batch',
- 'save-disposition':'Choose a reason', 'feed-edit-save':'Change the feeding mode or adjustment',
- 'feed-optional-save':'Change the date or note', 'record-optional-save':'Enter a value',
- 'log-date-apply':'Choose a start and end date'
-};
-const button=(a,label,cls='button',v='',disabled=false,reason='')=>{
+const button=(a,label,cls='button',v='',disabled=false)=>{
  if(cls==='dock-search')return SentriUI.iconButton({action:a,value:v,icon:icon('search'),label:'Search ear tag',className:cls});
- if(cls.split(' ').includes('button')||cls.split(' ').includes('text-button')||cls==='task-history')return SentriUI.button({label:'',register:cls.includes('primary')?'primary':cls.includes('text-button')||cls==='task-history'?'text':'secondary',action:a,value:v,waiting:disabled,className:cls==='task-history'?'':cls.split(' ').filter(c=>c!=='button'&&c!=='primary').join(' '),reason:disabled?recordReason(reason||waitingReasons[a]||'Choose an option to continue'):'',attrs:entryFor(a,label)?{'data-entry':entryFor(a,label)}:{}}).replace('<span class="st-button-label"></span>',label);
+ if(cls.split(' ').includes('button')||cls.split(' ').includes('text-button')||cls==='task-history')return SentriUI.button({label:'',register:cls.includes('primary')?'primary':cls.includes('text-button')||cls==='task-history'?'text':'secondary',action:a,value:v,waiting:disabled,className:cls==='task-history'?'':cls.split(' ').filter(c=>c!=='button'&&c!=='primary').join(' '),attrs:entryFor(a,label)?{'data-entry':entryFor(a,label)}:{}}).replace('<span class="st-button-label"></span>',label);
  return `<button type="button" class="${cls}"${entryFor(a,label)?` data-entry="${entryFor(a,label)}"`:''} data-action="${a}" data-value="${esc(v)}"${disabled?' disabled':''}>${label}</button>`;
 };
-let waitingSequence=0;
-function setCommitWaiting(el,waiting,reason){
+function setCommitWaiting(el,waiting){
  if(!el)return;
  el.disabled=false;
- const id=el.getAttribute('aria-describedby'),old=id?el.closest('.sheet')?.querySelector('[id="'+id+'"]'):null;
- if(old?.classList.contains('st-button-reason'))old.remove();
  el.removeAttribute('aria-describedby');
  if(!waiting){el.removeAttribute('aria-disabled');return;}
  el.setAttribute('aria-disabled','true');
- const reasonId='inspection-waiting-'+(++waitingSequence);
- el.setAttribute('aria-describedby',reasonId);
- const text=recordReason(reason||waitingReasons[el.dataset.action]||'Choose an option to continue');
- el.closest('.sheet-footer')?.insertAdjacentHTML('beforebegin',SentriUI.buttonReason({id:reasonId,text}));
 }
 const ib=(a,k,label,v='')=>SentriUI.iconButton({action:a,icon:icon(k),label,value:v});
 const footer=(left,right)=>SentriUI.sheetFooter({content:left+(right||'')});
@@ -636,23 +622,13 @@ function bulkListOverlay(c,{kind,rowsHtml,heading,sub,column,toggleLabel,control
  collapsed=collapsed??!!c.form.controlsCollapsed;
  return '<div class="bulk-action-layout'+(layoutClass?' '+esc(layoutClass):'')+(short?' is-short':'')+'" data-bulk-kind="'+esc(kind)+'"><section class="pig-review-card bulk-pigs'+(short?' is-short':'')+'"><div class="pig-review-heading feed-pigs-heading"><span><h4>'+esc(heading)+'</h4><small>'+esc(sub)+'</small></span><strong>'+column+'</strong></div><div class="pig-review-list bulk-pig-list'+(listClass?' '+esc(listClass):'')+'" role="region" aria-label="'+esc(heading)+'" tabindex="0" data-bulk-rows>'+rowsHtml+'</div></section><section class="bulk-controls facts-surface'+(overlayClass?' '+esc(overlayClass):'')+' bulk-details-overlay'+(collapsed?' is-collapsed':'')+'" aria-label="'+esc(toggleLabel)+'">'+button('bulk-toggle-controls','<span>'+esc(toggleLabel)+'</span>'+icon('chevron'),'bulk-controls-toggle').replace('<button','<button aria-expanded="'+!collapsed+'"')+(!collapsed?'<div class="bulk-control-fields">'+controlsHtml+'</div>':'')+'</section></div>';
 }
-function bulkWaitingReason(c){
- const f=c.form,view=c.view;
- if(bulkMeasurements[view])return 'Enter a '+bulkMeasurements[view].label.toLowerCase()+' above zero';
- if(view==='health')return f.conditions.length?'Choose a new condition':'Choose a disease or symptom';
- if(['resolve','triage','edit-conditions'].includes(view))return !f.target?'Choose a condition':view==='resolve'&&!f.outcome?'Choose an outcome':'Change the care or add a note';
- if(view==='treatment')return !f.medicine.trim()?'Choose a medicine':!f.method?'Choose a method':!f.doseUnit?'Choose a dose unit':'Enter a dose above zero';
- if(view==='body')return 'Choose a body condition';
- return 'Write a note';
-}
 function bulkCommit(c){
  const f=c.form,count=bulkChanges(c).filter(r=>r.change&&r.eligible).length;
- return button('bulk-save',f.bulk?'Save · '+countLabel(count):'Save','button primary','',!bulkActionValid(c),bulkWaitingReason(c));
+ return button('bulk-save',f.bulk?'Save · '+countLabel(count):'Save','button primary','',!bulkActionValid(c));
 }
 function refreshBulkCommit(root,c){
  const footer=root.querySelector('.phone > .sheet > .sheet-footer');
  if(!footer)return;
- const reason=footer.previousElementSibling;if(reason?.classList.contains('st-button-reason'))reason.remove();
  footer.outerHTML=SentriUI.sheetFooter({content:back()+bulkCommit(c)});
 }
 function bulkActionPage(c){
