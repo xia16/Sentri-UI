@@ -15,7 +15,9 @@
         "workbench.gestation",
         "workbench.work-due",
         "workbench.all-recorded",
-        "workbench.quiet-section"
+        "workbench.quiet-section",
+        "workbench.work-waiting",
+        "workbench.round-complete"
       ]
     ],
     [
@@ -23,17 +25,24 @@
       [
         "workbench.choose-unit",
         "workbench.unit",
-        "workbench.unit-farrowing"
+        "workbench.unit-farrowing",
+        "workbench.unit-clear",
+        "workbench.unit-health",
+        "workbench.unit-feed",
+        "workbench.unit-maintenance",
+        "workbench.unit-busy",
+        "workbench.unit-unknown"
       ]
     ],
     [
-      "Saved work",
+      "Toolbox",
       [
-        "workbench.saved-work"
+        "workbench.toolbox",
+        "workbench.records"
       ]
     ],
     [
-      "Task preview",
+      "Task pages (to come)",
       [
         "workbench.task-preview",
         "workbench.task-ready",
@@ -77,11 +86,6 @@
       "tap Overview"
     ],
     [
-      "workbench.today",
-      "workbench.saved-work",
-      "tap the saved-work card"
-    ],
-    [
       "workbench.gestation",
       "workbench.task-preview",
       "tap a task card that has no detail page (Pregnancy check)"
@@ -100,6 +104,21 @@
       "workbench.gestation",
       "workbench.closed-task",
       "tap a closed task card"
+    ],
+    [
+      "workbench.today",
+      "workbench.toolbox",
+      "tap Toolbox in the bottom bar"
+    ],
+    [
+      "workbench.toolbox",
+      "workbench.records",
+      "tap Records"
+    ],
+    [
+      "workbench.unit",
+      "workbench.unit-clear",
+      "attention preview: all signals zero"
     ]
   ],
   "screens": [
@@ -305,7 +324,9 @@
       "zh": "选择单元",
       "status": "in-design",
       "url": "/ux/system/home-astra-prototype.html?layout=focus&section=farrowing",
-      "steps": ["Choose unit"],
+      "steps": [
+        "Choose unit"
+      ],
       "figma": "",
       "notes": {
         "purpose": "Pick one unit of the section to narrow every count to that unit.",
@@ -775,78 +796,10 @@
       }
     },
     {
-      "id": "workbench.saved-work",
-      "name": "Saved work (offline queue)",
-      "zh": "待上传的记录",
-      "status": "in-design",
-      "url": "/ux/system/home-astra-prototype.html?layout=focus&section=farrowing",
-      "steps": ["3 records saved on this device"],
-      "figma": "",
-      "notes": {
-        "purpose": "Shows what is saved on the phone and not yet sent, and lets the worker upload it.",
-        "states": [],
-        "elements": [
-          {
-            "name": "Upload button and message",
-            "shows": "Upload 3 records · No connection · check Wi-Fi or mobile signal",
-            "states": [
-              {
-                "state": "Offline",
-                "when": "No connection (default; \"Connection preview\" select outside the phone)",
-                "shows": "\"3 records waiting to upload\", button \"Upload 3 records\"; pressing it reports \"Still no connection. All 3 records remain on this device.\""
-              },
-              {
-                "state": "Ready",
-                "when": "Connected, records waiting",
-                "shows": "Upload icon; button uploads"
-              },
-              {
-                "state": "Uploading",
-                "when": "About 0.9 s after pressing",
-                "shows": "Button \"Uploading…\" disabled, \"Uploading saved records…\""
-              },
-              {
-                "state": "Failed",
-                "when": "The simulated upload fails",
-                "shows": "\"Upload did not complete. Your records are still on this device. Try again.\" with \"Retry upload\""
-              },
-              {
-                "state": "Done",
-                "when": "Queue empty",
-                "shows": "\"Everything is uploaded\", \"There are no records waiting on this device.\", button \"Done\""
-              }
-            ],
-            "rule": "Only a successful upload clears the queue; a failure keeps every record. The drawer separates records saved on this device from records uploaded for the team.",
-            "source": "showSync(); sync.connection",
-            "at": "Upload 3 records"
-          },
-          {
-            "name": "Record row",
-            "shows": "Pregnancy check · 000308 · Gestation · Unit 7 · Batch 31 · 09:32",
-            "logic": "Task, animal, place and save time of a queued record. Three fictional samples; nothing the other screens do feeds this queue.",
-            "source": "pendingExamples",
-            "at": "Pregnancy check · 000308"
-          }
-        ],
-        "controls": [],
-        "copy": [
-          "(raw)"
-        ],
-        "edge": [],
-        "rules": [],
-        "issues": [
-          "The offline queue is entirely simulated: records made in the other prototypes never appear here.",
-          "unclear: where the old Figma data-sync list and detail (数据同步) fit relative to this drawer."
-        ]
-      }
-    },
-    {
       "id": "workbench.task-preview",
-      "name": "Task preview (not designed yet)",
+      "name": "Task page (to come)",
       "zh": "任务预览（未设计）",
-      "status": "in-design",
-      "url": "/ux/system/home-astra-prototype.html?section=gestation",
-      "steps": ["[data-card=\"preg31\"]"],
+      "status": "placeholder",
       "figma": "",
       "notes": {
         "purpose": "Placeholder page for every task that has no detail design yet; the task stays open between scheduled work.",
@@ -879,6 +832,7 @@
         "edge": [],
         "rules": [],
         "issues": [
+          "Held as a placeholder: the prototype opens a stand-in page (\"This task page is still to come\"). The stand-in is not shown as a design.",
           "The page does not say what the task is or show any of its work; it is a stand-in.",
           "The wording differs from the research name (\"Not designed yet\")."
         ]
@@ -886,11 +840,9 @@
     },
     {
       "id": "workbench.task-ready",
-      "name": "Task preview · ready to complete",
+      "name": "Task page · ready to complete (to come)",
       "zh": "任务预览 · 可完成",
-      "status": "in-design",
-      "url": "/ux/system/home-astra-prototype.html?section=gestation&work=ready",
-      "steps": ["[data-card=\"preg31\"]"],
+      "status": "placeholder",
       "figma": "",
       "notes": {
         "purpose": "The page behind a ready card: lets the worker complete the whole task.",
@@ -912,17 +864,21 @@
         "edge": [],
         "rules": [],
         "issues": [
+          "Held as a placeholder: the prototype shows a stand-in page with the hold-to-complete button; the review-before-closing step is undecided (see \"Does completing a task show a review first?\").",
           "No review of what is being completed; the rules ask for a review before closing."
         ]
       }
     },
     {
       "id": "workbench.end-task-early",
-      "name": "End task early",
+      "name": "End task early (confirm dialog)",
       "zh": "提前结束任务",
       "status": "in-design",
       "url": "/ux/system/home-astra-prototype.html?section=gestation",
-      "steps": ["[data-card=\"preg31\"]","End task early"],
+      "steps": [
+        "[data-card=\"preg31\"]",
+        "End task early"
+      ],
       "figma": "",
       "notes": {
         "purpose": "Confirms ending a task before its work is complete.",
@@ -944,17 +900,16 @@
         "edge": [],
         "rules": [],
         "issues": [
-          "The drawer states no consequence for the task (the rules say each task must)."
+          "The drawer states no consequence for the task (the rules say each task must).",
+          "The page behind the dialog is the task stand-in; only the confirm dialog is designed."
         ]
       }
     },
     {
       "id": "workbench.closed-task",
-      "name": "Closed task receipt",
+      "name": "Closed task results (to come)",
       "zh": "已结束任务",
-      "status": "in-design",
-      "url": "/ux/system/home-astra-prototype.html?section=gestation",
-      "steps": ["[data-card=\"preg29done\"]"],
+      "status": "placeholder",
       "figma": "",
       "notes": {
         "purpose": "Read-only page for a completed or ended task.",
@@ -987,7 +942,7 @@
         "edge": [],
         "rules": [],
         "issues": [
-          "The results page is a stub (\"Results page not designed yet\")."
+          "Held as a placeholder: the prototype shows \"Results page not designed yet.\" under a check icon."
         ]
       }
     },
@@ -1008,6 +963,340 @@
         "rules": [],
         "issues": [
           "unclear: where the entry lives (header, Toolbox or a profile page); not in the code."
+        ]
+      }
+    },
+    {
+      "id": "workbench.work-waiting",
+      "name": "Overview · everything waiting",
+      "zh": "概览 · 全部等待中",
+      "status": "in-design",
+      "url": "/ux/system/home-astra-prototype.html?section=gestation&work=waiting",
+      "notes": {
+        "purpose": "Shows the Overview when no task has work due: every open card is quiet and lists its next time.",
+        "states": [],
+        "elements": [
+          {
+            "name": "Waiting cards",
+            "at": "Next",
+            "shows": "Each card: identity, \"Next ... · <time>\", cumulative progress kept, no headline count",
+            "states": [
+              {
+                "state": "Waiting",
+                "when": "No work due now and the next event is known (work=waiting)",
+                "shows": "Quiet line with the next time (Tomorrow, 14:30); due and live counts are zero"
+              },
+              {
+                "state": "Waiting, nothing scheduled",
+                "when": "No known next event",
+                "shows": "Task-specific waiting copy (rule 6 of the display rules)"
+              }
+            ],
+            "logic": "Waiting cards sort by earliest next event; \"Next\" is printed once above the first quiet card. In this preview the Work select forces every card to waiting; in the app the state comes from the schedule.",
+            "source": "taskModel(); HOME-TASK-DISPLAY-RULES rule 6"
+          }
+        ],
+        "controls": [],
+        "copy": [
+          "(raw)"
+        ],
+        "edge": [
+          "A quiet card still shows the cumulative progress bar, so a full bar here does not mean the task can close."
+        ],
+        "rules": [],
+        "issues": []
+      }
+    },
+    {
+      "id": "workbench.round-complete",
+      "name": "Overview · rounds complete",
+      "zh": "概览 · 本轮完成",
+      "status": "in-design",
+      "url": "/ux/system/home-astra-prototype.html?section=gestation&work=round-complete",
+      "notes": {
+        "purpose": "Shows the Overview when every observation round has been explicitly closed.",
+        "states": [],
+        "elements": [
+          {
+            "name": "Round-complete card",
+            "at": "Round complete",
+            "shows": "Quiet line with a check and the next check time; no progress bar",
+            "states": [
+              {
+                "state": "Round complete",
+                "when": "The round was explicitly closed (work=round-complete)",
+                "shows": "\"Round complete · Next check · <time>\", due count zero"
+              },
+              {
+                "state": "Due",
+                "when": "Sows in their window still need the observation",
+                "shows": "\"N sows to check\" · \"Current round\""
+              }
+            ],
+            "rule": "Only explicit activity marks a round complete. \"No return\" or a blank mark is not evidence of a completed or negative observation. Heat and Return-heat show no Home progress bar.",
+            "source": "resolveAttention(); roundComplete"
+          }
+        ],
+        "controls": [],
+        "copy": [
+          "(raw)"
+        ],
+        "edge": [],
+        "rules": [],
+        "issues": []
+      }
+    },
+    {
+      "id": "workbench.unit-clear",
+      "name": "Unit · nothing flagged",
+      "zh": "单元 · 无需关注",
+      "status": "in-design",
+      "url": "/ux/system/home-astra-prototype.html?section=gestation&view=unit&unit=7&attention=clear",
+      "notes": {
+        "purpose": "The unit strip when Health, Feed and Maintenance are all zero.",
+        "states": [],
+        "elements": [
+          {
+            "name": "Unit hub · attention chips",
+            "at": "No flagged items",
+            "shows": "\"No flagged items\" with a check",
+            "logic": "Health and Feed are fictional snapshot counts picked by the `attention` preview; Maintenance counts the unit's open maintenance records. The full state table is on \"Unit · Gestation Unit 7\".",
+            "source": "unitStrip()"
+          }
+        ],
+        "controls": [],
+        "copy": [
+          "(raw)"
+        ],
+        "edge": [],
+        "rules": [],
+        "issues": []
+      }
+    },
+    {
+      "id": "workbench.unit-health",
+      "name": "Unit · health flag only",
+      "zh": "单元 · 仅健康",
+      "status": "in-design",
+      "url": "/ux/system/home-astra-prototype.html?section=gestation&view=unit&unit=7&attention=health",
+      "notes": {
+        "purpose": "The unit strip with only the Health chip.",
+        "states": [],
+        "elements": [
+          {
+            "name": "Unit hub · attention chips",
+            "at": "Health",
+            "shows": "Health chip with its count; Feed and Maintenance chips absent",
+            "logic": "Health and Feed are fictional snapshot counts picked by the `attention` preview; Maintenance counts the unit's open maintenance records. The full state table is on \"Unit · Gestation Unit 7\".",
+            "source": "unitStrip()"
+          }
+        ],
+        "controls": [],
+        "copy": [
+          "(raw)"
+        ],
+        "edge": [],
+        "rules": [],
+        "issues": []
+      }
+    },
+    {
+      "id": "workbench.unit-feed",
+      "name": "Unit · feed flag only",
+      "zh": "单元 · 仅饲喂",
+      "status": "in-design",
+      "url": "/ux/system/home-astra-prototype.html?section=gestation&view=unit&unit=7&attention=feed",
+      "notes": {
+        "purpose": "The unit strip with only the Feed chip.",
+        "states": [],
+        "elements": [
+          {
+            "name": "Unit hub · attention chips",
+            "at": "Feed",
+            "shows": "Feed chip with its count",
+            "logic": "Health and Feed are fictional snapshot counts picked by the `attention` preview; Maintenance counts the unit's open maintenance records. The full state table is on \"Unit · Gestation Unit 7\".",
+            "source": "unitStrip()"
+          }
+        ],
+        "controls": [],
+        "copy": [
+          "(raw)"
+        ],
+        "edge": [],
+        "rules": [],
+        "issues": []
+      }
+    },
+    {
+      "id": "workbench.unit-maintenance",
+      "name": "Unit · maintenance issue only",
+      "zh": "单元 · 仅维修",
+      "status": "in-design",
+      "url": "/ux/system/home-astra-prototype.html?section=gestation&view=unit&unit=7&attention=maintenance",
+      "notes": {
+        "purpose": "The unit strip with only the Maintenance chip.",
+        "states": [],
+        "elements": [
+          {
+            "name": "Unit hub · attention chips",
+            "at": "Maintenance",
+            "shows": "Maintenance chip with the open-issue count",
+            "logic": "Health and Feed are fictional snapshot counts picked by the `attention` preview; Maintenance counts the unit's open maintenance records. The full state table is on \"Unit · Gestation Unit 7\".",
+            "source": "unitStrip()"
+          }
+        ],
+        "controls": [],
+        "copy": [
+          "(raw)"
+        ],
+        "edge": [],
+        "rules": [],
+        "issues": []
+      }
+    },
+    {
+      "id": "workbench.unit-busy",
+      "name": "Unit · many flags",
+      "zh": "单元 · 多项关注",
+      "status": "in-design",
+      "url": "/ux/system/home-astra-prototype.html?section=gestation&view=unit&unit=7&attention=busy",
+      "notes": {
+        "purpose": "The unit strip when every signal is high.",
+        "states": [],
+        "elements": [
+          {
+            "name": "Unit hub · attention chips",
+            "at": "Health",
+            "shows": "Health 24 · Feed 13 · Maintenance 1",
+            "logic": "Health and Feed are fictional snapshot counts picked by the `attention` preview; Maintenance counts the unit's open maintenance records. The full state table is on \"Unit · Gestation Unit 7\".",
+            "source": "unitStrip()"
+          }
+        ],
+        "controls": [],
+        "copy": [
+          "(raw)"
+        ],
+        "edge": [],
+        "rules": [],
+        "issues": [
+          "Chips are not ranked: the largest count is not first."
+        ]
+      }
+    },
+    {
+      "id": "workbench.unit-unknown",
+      "name": "Unit · attention summary unavailable",
+      "zh": "单元 · 摘要不可用",
+      "status": "in-design",
+      "url": "/ux/system/home-astra-prototype.html?section=gestation&view=unit&unit=7&attention=unknown",
+      "notes": {
+        "purpose": "The unit strip when the health and feed summary cannot be read.",
+        "states": [],
+        "elements": [
+          {
+            "name": "Unit hub · attention chips",
+            "at": "Health and feed summary unavailable",
+            "shows": "\"Health and feed summary unavailable\"; never shown as zero",
+            "logic": "Health and Feed are fictional snapshot counts picked by the `attention` preview; Maintenance counts the unit's open maintenance records. The full state table is on \"Unit · Gestation Unit 7\".",
+            "source": "unitStrip()"
+          }
+        ],
+        "controls": [],
+        "copy": [
+          "(raw)"
+        ],
+        "edge": [],
+        "rules": [],
+        "issues": []
+      }
+    },
+    {
+      "id": "workbench.toolbox",
+      "name": "Toolbox",
+      "zh": "工具箱",
+      "status": "in-design",
+      "url": "/ux/system/home-astra-prototype.html?section=gestation",
+      "steps": [
+        "Toolbox"
+      ],
+      "notes": {
+        "purpose": "The tools that are not today's work: find a pig, records, the farm's sections, the Assistant.",
+        "states": [],
+        "elements": [
+          {
+            "name": "Maintenance row",
+            "at": "Maintenance",
+            "shows": "Equipment issues of the current unit",
+            "states": [
+              {
+                "state": "In a unit",
+                "when": "Toolbox opened while a unit is selected",
+                "shows": "First row \"Maintenance · Unit N · equipment issues\""
+              },
+              {
+                "state": "Overview",
+                "when": "No unit selected",
+                "shows": "Row absent"
+              }
+            ],
+            "source": "toolbox()"
+          }
+        ],
+        "controls": [],
+        "copy": [
+          "(raw)"
+        ],
+        "edge": [
+          "The two links at the bottom open the design-study galleries (shared components, task cards) and are not part of the app."
+        ],
+        "rules": [],
+        "issues": [
+          "The Maintenance list is reachable only from here (see \"Should the Maintenance chip open the issue list?\")."
+        ]
+      }
+    },
+    {
+      "id": "workbench.records",
+      "name": "Records",
+      "zh": "记录",
+      "status": "in-design",
+      "url": "/ux/system/home-astra-prototype.html?section=gestation",
+      "steps": [
+        "Toolbox",
+        "Records"
+      ],
+      "notes": {
+        "purpose": "A log of the updates made in the prototype session.",
+        "states": [],
+        "elements": [
+          {
+            "name": "Record log",
+            "at": "No new records yet.",
+            "shows": "Grouped list of this session's updates",
+            "states": [
+              {
+                "state": "Empty",
+                "when": "No answer has been saved",
+                "shows": "\"No new records yet. Answers to overnight findings will appear here.\""
+              },
+              {
+                "state": "Populated",
+                "when": "An Assistant clarification was answered",
+                "shows": "Entry \"Movement clarification received\" with unit, pen and answer, by G. Hansen"
+              }
+            ],
+            "logic": "Only the Assistant answer writes to this log; records made in the other prototypes never appear.",
+            "source": "state.log; recordLog()"
+          }
+        ],
+        "controls": [],
+        "copy": [
+          "(raw)"
+        ],
+        "edge": [],
+        "rules": [],
+        "issues": [
+          "The log has one writer today (the Assistant answer); its real source is undecided."
         ]
       }
     }

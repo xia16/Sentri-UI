@@ -1,0 +1,288 @@
+{
+  "id": "assistant",
+  "name": "Assistant",
+  "zh": "助手",
+  "platform": "mobile",
+  "section": "home",
+  "newFeature": true,
+  "duplicates": "",
+  "groups": [
+    [
+      "Findings",
+      [
+        "assistant.needs-you",
+        "assistant.finding",
+        "assistant.answered",
+        "assistant.up-to-date"
+      ]
+    ],
+    [
+      "Questions",
+      [
+        "assistant.conversations",
+        "assistant.conversation"
+      ]
+    ]
+  ],
+  "entryPoints": [
+    {
+      "section": "Home",
+      "label": "via the header",
+      "from": "workbench.today",
+      "control": "Assistant (header)",
+      "lands": "assistant.needs-you"
+    },
+    {
+      "section": "Home",
+      "label": "via Toolbox",
+      "from": "workbench.toolbox",
+      "control": "Assistant row",
+      "lands": "assistant.needs-you"
+    }
+  ],
+  "addsTo": [],
+  "flow": [
+    [
+      "assistant.needs-you",
+      "assistant.finding",
+      "tap the finding"
+    ],
+    [
+      "assistant.finding",
+      "assistant.answered",
+      "send a clarification"
+    ],
+    [
+      "assistant.answered",
+      "assistant.up-to-date",
+      "back"
+    ],
+    [
+      "assistant.needs-you",
+      "assistant.conversations",
+      "tap Conversations"
+    ],
+    [
+      "assistant.conversations",
+      "assistant.conversation",
+      "ask or pick a suggestion"
+    ]
+  ],
+  "screens": [
+    {
+      "id": "assistant.needs-you",
+      "name": "Needs you",
+      "zh": "需要你",
+      "status": "in-design",
+      "url": "/ux/system/home-astra-prototype.html?section=gestation",
+      "steps": [
+        "Assistant"
+      ],
+      "notes": {
+        "purpose": "The Assistant's first tab: decisions an overnight review needs from the worker.",
+        "states": [],
+        "elements": [
+          {
+            "name": "Needs you tab and finding card",
+            "at": "Needs you",
+            "shows": "Tab label with a count and one finding card",
+            "states": [
+              {
+                "state": "Input needed",
+                "when": "A finding is unanswered",
+                "shows": "Tab \"Needs you · 1\"; card \"INPUT NEEDED · OVERNIGHT REVIEW\" with the question, a one-line reason, section and review time"
+              },
+              {
+                "state": "Up to date",
+                "when": "The finding has been answered",
+                "shows": "Check, \"You're up to date\", \"Your answer is saved in this preview. There are no other decisions waiting.\""
+              }
+            ],
+            "logic": "Findings and their counts live only inside the Assistant; Home and the section cards carry no badge. Answering a finding removes it from this tab in the same session.",
+            "rule": "The header entrance is a plain door: no count, no dot.",
+            "source": "ASTRA-HOME-DIRECTION; assistant()"
+          }
+        ],
+        "controls": [],
+        "copy": [
+          "(raw)"
+        ],
+        "edge": [
+          "The sample has one finding; a second, an empty review and a review in progress are not drawn."
+        ],
+        "rules": [],
+        "issues": [
+          "The review is simulated: no background agent is connected."
+        ]
+      }
+    },
+    {
+      "id": "assistant.finding",
+      "name": "Finding · input needed",
+      "zh": "需要澄清",
+      "status": "in-design",
+      "url": "/ux/system/home-astra-prototype.html?section=gestation",
+      "steps": [
+        "Assistant",
+        "[data-action=\"finding\"]"
+      ],
+      "notes": {
+        "purpose": "One finding in full: the evidence, what is missing, and a field for the worker's answer.",
+        "states": [],
+        "elements": [
+          {
+            "name": "Evidence and answer",
+            "at": "What is missing",
+            "shows": "Scope line (section / unit / pen), the source note, what is missing, an answer field and Send clarification",
+            "logic": "The review quotes the source record and names the gap; it states that no movement record has been changed. The answer is free text, required, up to 500 characters.",
+            "rule": "Sending saves the answer in the session and adds \"Movement clarification received\" to Records. No live record is changed.",
+            "source": "finding(); answer-form"
+          }
+        ],
+        "controls": [
+          {
+            "control": "View Unit 7",
+            "does": "Opens Home scoped to Gestation Unit 7",
+            "goesTo": "workbench.unit"
+          }
+        ],
+        "copy": [
+          "(raw)"
+        ],
+        "edge": [],
+        "rules": [],
+        "issues": [
+          "Whether an answer is applied to the record, or only noted for a supervisor, is undecided (preview only).",
+          "\"View Unit 7\" is drawn as bare text, not as a button (see the filed broken item)."
+        ]
+      }
+    },
+    {
+      "id": "assistant.answered",
+      "name": "Finding · answered",
+      "zh": "已回复",
+      "status": "in-design",
+      "url": "/ux/system/home-astra-prototype.html?section=gestation&view=finding&answered=1",
+      "notes": {
+        "purpose": "The finding after the worker answered.",
+        "states": [],
+        "elements": [
+          {
+            "name": "Saved answer",
+            "at": "Your answer",
+            "shows": "\"Your answer: <text>\" with \"Saved in this preview. No live record was changed.\"",
+            "rule": "The Send button and the answer field are removed once an answer is on file; there is no edit or undo.",
+            "source": "state.answered"
+          }
+        ],
+        "controls": [],
+        "copy": [
+          "(raw)"
+        ],
+        "edge": [],
+        "rules": [],
+        "issues": [
+          "No way to edit or withdraw an answer."
+        ]
+      }
+    },
+    {
+      "id": "assistant.up-to-date",
+      "name": "Needs you · up to date",
+      "zh": "已处理",
+      "status": "in-design",
+      "url": "/ux/system/home-astra-prototype.html?section=gestation&answered=1",
+      "steps": [
+        "Assistant"
+      ],
+      "notes": {
+        "purpose": "The Needs-you tab once nothing is waiting.",
+        "states": [],
+        "elements": [
+          {
+            "name": "Up-to-date state",
+            "at": "You're up to date",
+            "shows": "Check and \"You're up to date\"",
+            "logic": "Shown when the single sample finding has been answered; it does not mean no review has run.",
+            "source": "assistant()"
+          }
+        ],
+        "controls": [],
+        "copy": [
+          "(raw)"
+        ],
+        "edge": [],
+        "rules": [],
+        "issues": []
+      }
+    },
+    {
+      "id": "assistant.conversations",
+      "name": "Conversations",
+      "zh": "对话",
+      "status": "in-design",
+      "url": "/ux/system/home-astra-prototype.html?section=gestation",
+      "steps": [
+        "Assistant",
+        "Conversations"
+      ],
+      "notes": {
+        "purpose": "The Assistant's second tab: ask about the work, or start from a suggestion.",
+        "states": [],
+        "elements": [
+          {
+            "name": "Composer",
+            "at": "Ask about your work…",
+            "shows": "Input and send at the foot of the page",
+            "rule": "Required, up to 1000 characters. Nothing is sent to an agent: the reply states that this is a preview.",
+            "source": "ask-form; chat()"
+          }
+        ],
+        "controls": [],
+        "copy": [
+          "(raw)"
+        ],
+        "edge": [
+          "Context follows the scope the Assistant was opened from: the section, or the unit when one is selected."
+        ],
+        "rules": [],
+        "issues": [
+          "Conversations are simulated; the reply is fixed text."
+        ]
+      }
+    },
+    {
+      "id": "assistant.conversation",
+      "name": "Conversation",
+      "zh": "对话",
+      "status": "in-design",
+      "url": "/ux/system/home-astra-prototype.html?section=gestation",
+      "steps": [
+        "Assistant",
+        "Conversations",
+        "Help me plan a move"
+      ],
+      "notes": {
+        "purpose": "A question and the preview reply.",
+        "states": [],
+        "elements": [
+          {
+            "name": "Assistant reply",
+            "at": "This is a preview of the conversation entrance.",
+            "shows": "A fixed reply naming the current scope (the section or Unit N)",
+            "logic": "The reply restates the scope the Assistant was opened from and says no analysis or farm action has been performed.",
+            "rule": "The Assistant never performs a farm action and gives no medical recommendation in the study.",
+            "source": "chat()"
+          }
+        ],
+        "controls": [],
+        "copy": [
+          "(raw)"
+        ],
+        "edge": [],
+        "rules": [],
+        "issues": []
+      }
+    }
+  ]
+}
