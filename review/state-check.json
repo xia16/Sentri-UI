@@ -1629,6 +1629,18 @@
   },
   {
     "component": "Row",
+    "variant": "animal",
+    "state": "Need tile (room row)",
+    "problems": []
+  },
+  {
+    "component": "Row",
+    "variant": "animal",
+    "state": "Need tile · to allocate",
+    "problems": []
+  },
+  {
+    "component": "Row",
     "variant": "door-act",
     "state": "Default",
     "problems": []
@@ -2110,6 +2122,12 @@
   {
     "component": "Status",
     "variant": "chip",
+    "state": "Aborted",
+    "problems": []
+  },
+  {
+    "component": "Status",
+    "variant": "chip",
     "state": "Long label (wraps)",
     "problems": []
   },
@@ -2189,6 +2207,12 @@
     "component": "Status",
     "variant": "word",
     "state": "Sow died",
+    "problems": []
+  },
+  {
+    "component": "Status",
+    "variant": "word",
+    "state": "Aborted",
     "problems": []
   },
   {

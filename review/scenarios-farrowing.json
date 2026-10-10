@@ -1,8 +1,8 @@
 {
  "feature": "farrowing",
- "commit": "5802ae7476d683c21925f55d7ffbec8f086fd706",
+ "commit": "0679ee1cb35940bce999ca208e2ce5f2cb29f42e",
  "dirty": true,
- "ran": "2026-10-10T14:35:10.579Z",
+ "ran": "2026-10-10T15:18:44.894Z",
  "base": "http://localhost:4418",
  "langs": [
   "en",
@@ -3586,7 +3586,7 @@
    "id": "fa-m2-dead-sow-stays-in-room",
    "tree": "M-2",
    "branch": "sow-death",
-   "label": "She stays in the room as a Sow died row, her piglets to allocate",
+   "label": "She stays in the room as a Sow died row with a red \"to allocate\" tile",
    "path": [
     "sow-death",
     "sow-death.during",
@@ -3679,7 +3679,7 @@
    "id": "fa-m11-back-row-says-to-allocate",
    "tree": "M-11",
    "branch": "sow-death",
-   "label": "Back after the death: the row says 9 to allocate, chip Sow died",
+   "label": "Back after the death: a red tile \"9 / to allocate\", facts Sow died",
    "path": [
     "sow-death",
     "sow-death.during",
@@ -3982,7 +3982,7 @@
    "id": "fa-m19-rest-hand-reared",
    "tree": "M-19",
    "branch": "sow-death",
-   "label": "The rest hand-reared: her row reads '4 hand-reared'",
+   "label": "The rest hand-reared: her row shows \"4 / hand-reared\"",
    "path": [
     "sow-death",
     "sow-death.during",
@@ -4522,7 +4522,7 @@
    "id": "fa-m12-hand-reared-row-stays",
    "tree": "M-12",
    "branch": "sow-death",
-   "label": "Her row reads '7 hand-reared' in ink and stays",
+   "label": "Her row shows the neutral tile \"7 / hand-reared\" and stays",
    "path": [
     "sow-death",
     "sow-death.allocate",
@@ -4760,7 +4760,7 @@
    "id": "fa-m15-back-leaves-row-to-allocate",
    "tree": "M-15",
    "branch": "sow-death",
-   "label": "Back leaves her row 'to allocate'; nothing was decided",
+   "label": "Back leaves her row as a red \"to allocate\" tile; nothing was decided",
    "path": [
     "sow-death",
     "sow-death.allocate",
@@ -5118,7 +5118,7 @@
    "id": "fa-m22-abortion-with-live-row-stays",
    "tree": "M-22",
    "branch": "sow-death",
-   "label": "Abortion with 1 live piglet: the row stays, chip Aborted, '1 alive'",
+   "label": "Abortion with 1 live piglet: the row stays, tile \"1 / alive\", facts Aborted",
    "path": [
     "sow-death",
     "sow-death.abortion-live",
