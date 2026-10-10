@@ -23,7 +23,8 @@
           "piglet-processing.sheet-todo",
           "piglet-processing.sheet-breeders",
           "piglet-processing.give-ids",
-          "piglet-processing.adjust-count"
+          "piglet-processing.adjust-count",
+          "piglet-processing.sheet-notch"
         ]
       },
       {
@@ -50,7 +51,12 @@
       "piglet-processing.more-actions",
       "piglet-processing.move-piglets",
       "piglet-processing.set-count",
-      "piglet-processing.pen-log"
+      "piglet-processing.pen-log",
+      "piglet-processing.phone-clash",
+      "piglet-processing.chip-done",
+      "piglet-processing.job-chip-iron",
+      "piglet-processing.job-chip-id",
+      "piglet-processing.list-no-id"
     ],
     "task": [
       {
@@ -61,7 +67,8 @@
         "id": "ending",
         "name": "Ending the task",
         "screens": [
-          "piglet-processing.end-task"
+          "piglet-processing.end-task",
+          "piglet-processing.list-ended"
         ]
       }
     ]
@@ -143,6 +150,26 @@
       "piglet-processing.more-actions",
       "piglet-processing.set-count",
       "tap Set count"
+    ],
+    [
+      "piglet-processing.end-task",
+      "piglet-processing.list-ended",
+      "hold End task"
+    ],
+    [
+      "piglet-processing.pen-list",
+      "piglet-processing.job-chip-iron",
+      "tap a job chip"
+    ],
+    [
+      "piglet-processing.pen-list",
+      "piglet-processing.chip-done",
+      "tap Done"
+    ],
+    [
+      "piglet-processing.pen-list",
+      "piglet-processing.phone-clash",
+      "another phone saved the same item first"
     ]
   ],
   "screens": [
@@ -1392,6 +1419,309 @@
           "Not-yet-started pens are counted done and also listed under \"Not due yet\".",
           "unclear: who may end (the code comment says the supervisor; no role check)."
         ]
+      }
+    },
+    {
+      "id": "piglet-processing.list-ended",
+      "name": "Pen list, task ended",
+      "zh": "任务已结束的栏列表",
+      "status": "in-design",
+      "url": "/ux/tasks/piglet-processing/simple/index.html",
+      "figma": "",
+      "notes": {
+        "purpose": "The pen list after End: the task is closed and nothing more can be recorded.",
+        "states": [
+          "Ended"
+        ],
+        "elements": [
+          {
+            "name": "Pen row",
+            "at": "Task ended",
+            "shows": "What a pen row says once the task has ended.",
+            "states": [
+              {
+                "state": "Not done",
+                "when": "task ended with items still open",
+                "shows": "Headline Task ended in forecast tone; the summary card counts these as Not done"
+              },
+              {
+                "state": "Done",
+                "when": "pen finished before End",
+                "shows": "Same row as before End"
+              }
+            ],
+            "source": "simple/app.js penCard"
+          }
+        ],
+        "controls": [],
+        "copy": [],
+        "edge": [
+          "Opening any pen after End shows its sheet read-only with 'Task ended. Nothing more can be recorded.' and no Submit."
+        ],
+        "rules": [
+          "Cut after-End evidence (simplification 5): no recording after End."
+        ],
+        "issues": []
+      }
+    },
+    {
+      "id": "piglet-processing.phone-clash",
+      "name": "Pen list, recorded on another phone",
+      "zh": "另一部手机已记录",
+      "status": "in-design",
+      "url": "/ux/tasks/piglet-processing/simple/index.html",
+      "figma": "",
+      "notes": {
+        "purpose": "The pen list when another phone recorded the same item first: first record in wins and yours is kept as a note.",
+        "states": [
+          "Note unseen",
+          "Note dismissed (back to the plain list)"
+        ],
+        "elements": [
+          {
+            "name": "Another-phone note",
+            "at": "Recorded on another phone first",
+            "shows": "Amber warning naming the job, pen, who and when.",
+            "states": [
+              {
+                "state": "Unseen",
+                "when": "the other phone recorded the same pen and job first",
+                "shows": "Warning with OK; the Last record line is hidden while it shows"
+              },
+              {
+                "state": "Seen",
+                "when": "worker taps OK",
+                "shows": "Warning gone; the pen item reads 'yours kept as a note' with the time of the worker's own record"
+              }
+            ],
+            "rule": "First record in wins: the other phone's record counts and the worker's own is kept as a note, never added on top. If the worker has no record of their own, the other phone's record simply arrives. After End the other phone's record is not taken.",
+            "source": "simple/state.js otherPhone"
+          }
+        ],
+        "controls": [],
+        "copy": [],
+        "edge": [
+          "Two phones record the same job on the same pen while one is offline."
+        ],
+        "rules": [
+          "First record in wins (simplification 3)."
+        ],
+        "issues": []
+      }
+    },
+    {
+      "id": "piglet-processing.chip-done",
+      "name": "Pen list, Done lens",
+      "zh": "已完成的栏",
+      "status": "in-design",
+      "url": "/ux/tasks/piglet-processing/simple/index.html?chip=done",
+      "figma": "",
+      "notes": {
+        "purpose": "The pen list showing the pens that are done.",
+        "states": [
+          "Some pens done",
+          "No pen done yet"
+        ],
+        "elements": [
+          {
+            "name": "Pen list",
+            "at": "No pen is done yet.",
+            "shows": "The list under the To do / Done switch.",
+            "states": [
+              {
+                "state": "Done lens, pens done",
+                "when": "worker picks Done and at least one pen has nothing left",
+                "shows": "Those pens' cards"
+              },
+              {
+                "state": "Done lens, none",
+                "when": "no pen is finished",
+                "shows": "No pen is done yet."
+              }
+            ],
+            "logic": "A pen counts as done when it has no job left to do today; a pen with nothing due yet counts as done.",
+            "source": "simple/app.js isDone"
+          }
+        ],
+        "controls": [],
+        "copy": [],
+        "edge": [],
+        "rules": [
+          "A pen with nothing due yet counts as done."
+        ],
+        "issues": []
+      }
+    },
+    {
+      "id": "piglet-processing.job-chip-iron",
+      "name": "Pen list, filtered to Iron",
+      "zh": "只看打铁的栏",
+      "status": "in-design",
+      "url": "/ux/tasks/piglet-processing/simple/index.html?chip=iron",
+      "figma": "",
+      "notes": {
+        "purpose": "The To do list narrowed to the pens that need iron now.",
+        "states": [
+          "Pens need iron",
+          "No pen needs iron"
+        ],
+        "elements": [
+          {
+            "name": "Job chip",
+            "at": "Iron",
+            "shows": "One chip per job that some pen needs, with the number of pens.",
+            "states": [
+              {
+                "state": "Shown",
+                "when": "at least one pen needs the job (due, late or part left), or it is the selected chip",
+                "shows": "Name and pen count"
+              },
+              {
+                "state": "Hidden",
+                "when": "no pen needs it",
+                "shows": "Not drawn"
+              },
+              {
+                "state": "Selected, now empty",
+                "when": "selected chip that no pen needs any more",
+                "shows": "Chip stays; list says No pen needs this now."
+              }
+            ],
+            "logic": "Counts pens in To do whose job status is due, late or left. Choosing a chip only filters; it never records.",
+            "source": "simple/app.js chipCounts, needsToday"
+          }
+        ],
+        "controls": [],
+        "copy": [],
+        "edge": [],
+        "rules": [],
+        "issues": []
+      }
+    },
+    {
+      "id": "piglet-processing.job-chip-id",
+      "name": "Pen list, filtered to IDs",
+      "zh": "只看要编号的栏",
+      "status": "in-design",
+      "url": "/ux/tasks/piglet-processing/simple/index.html?chip=id",
+      "figma": "",
+      "notes": {
+        "purpose": "The To do list narrowed to the pens whose piglets still need IDs.",
+        "states": [
+          "Pens need IDs",
+          "No pen needs IDs"
+        ],
+        "elements": [
+          {
+            "name": "ID chip",
+            "at": [
+              "Tag",
+              "Notch",
+              "Breeders"
+            ],
+            "shows": "The ID job's chip, named by the farm's ID setting.",
+            "states": [
+              {
+                "state": "Tag",
+                "when": "farm setting: tag every piglet",
+                "shows": "Tag"
+              },
+              {
+                "state": "Notch",
+                "when": "farm setting: notch every piglet",
+                "shows": "Notch"
+              },
+              {
+                "state": "Breeders",
+                "when": "farm setting: tag breeders only",
+                "shows": "Breeders"
+              },
+              {
+                "state": "No chip",
+                "when": "farm setting: no ID (fatteners)",
+                "shows": "No ID job, no chip"
+              }
+            ],
+            "logic": "The ID job runs in the window day 3-7. The chip only filters; IDs are given one piglet at a time inside a pen.",
+            "source": "simple/app.js chipKey; simple/strings.js"
+          }
+        ],
+        "controls": [],
+        "copy": [],
+        "edge": [],
+        "rules": [
+          "ID window day 3-7; the Tag chip filters only (no bulk tagging)."
+        ],
+        "issues": []
+      }
+    },
+    {
+      "id": "piglet-processing.list-no-id",
+      "name": "Pen list, farm without IDs",
+      "zh": "不编号的栏列表",
+      "status": "in-design",
+      "url": "/ux/tasks/piglet-processing/simple/index.html?scheme=none",
+      "figma": "",
+      "notes": {
+        "purpose": "The pen list for a farm that gives no IDs (fatteners): no ID job anywhere.",
+        "states": [
+          "No-ID farm"
+        ],
+        "elements": [],
+        "controls": [],
+        "copy": [],
+        "edge": [
+          "No ID job and no ID chip; a pen sheet has no ID item."
+        ],
+        "rules": [
+          "Farm ID setting: No ID (fatteners)."
+        ],
+        "issues": []
+      }
+    },
+    {
+      "id": "piglet-processing.sheet-notch",
+      "name": "Pen sheet, notch farm",
+      "zh": "剪耳缺的栏",
+      "status": "in-design",
+      "url": "/ux/tasks/piglet-processing/simple/index.html?scheme=notch&pen=A03",
+      "figma": "",
+      "notes": {
+        "purpose": "A pen sheet on a farm that notches every piglet: the same sheet as Tag, worded Notch.",
+        "states": [
+          "To do (notch)"
+        ],
+        "elements": [
+          {
+            "name": "ID item and count",
+            "at": [
+              "Notched",
+              "Notch piglets"
+            ],
+            "shows": "The Notched count and the ID button use Notch wording; inside, the add button reads Notch a piglet.",
+            "states": [
+              {
+                "state": "Notch",
+                "when": "farm setting: notch every piglet",
+                "shows": "Notched n of m; Notch piglets; the number pad takes up to 2 digits"
+              },
+              {
+                "state": "Tag",
+                "when": "farm setting: tag every piglet",
+                "shows": "Tagged n of m; Tag piglets; the number pad takes up to 6 digits"
+              }
+            ],
+            "logic": "A notch ID is stored as litter number - ear number; the worker types only the ear number, suggested as the next free one.",
+            "source": "simple/app.js giveNo, PADS"
+          }
+        ],
+        "controls": [],
+        "copy": [],
+        "edge": [
+          "A number already used in the pen is refused."
+        ],
+        "rules": [],
+        "issues": []
       }
     }
   ]

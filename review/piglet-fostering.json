@@ -1,0 +1,20 @@
+[
+ {
+  "id": "fostering-overlap-1",
+  "target": {
+   "kind": "feature",
+   "id": "fostering"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "Fostering is drawn three times: which one is the feature?",
+  "detail": "(1) farrowing.foster: a Foster piglets page in the farrowing concept (one stepper, send or receive). RULINGS 'After the lock' says fostering is parked and farrowing ships no foster doors, yet the concept still draws it. (2) fostering.* (this feature): Move piglets in the full piglet-processing task (move.html), a drawer with direction, other crate, which piglets, owed doses; RULINGS Round 2 Q13 says Move opens only after farrowing is locked and 'Farrowing's own foster door stays parked'. (3) piglet-processing.move-piglets: the simple prototype's Move, within the batch. The old UI has one fostering flow (Inspection 记录-寄养, 4 screens). Which one is the fostering feature, and does farrowing.foster stay, become an alias, or go?",
+  "options": [
+   "Keep fostering as its own feature on move.html; mark farrowing.foster as parked/earlier",
+   "Keep fostering.* as aliases of piglet-processing.move-piglets once the simple prototype is chosen",
+   "Keep both: farrowing.foster before the lock, Move after (needs the owner to reopen the farrowing park)"
+  ],
+  "recommendation": "Follow the rulings: Move after the lock is the feature; farrowing.foster stays parked.",
+  "source": "populate-piglet"
+ }
+]
