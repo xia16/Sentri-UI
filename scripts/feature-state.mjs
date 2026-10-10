@@ -6,6 +6,7 @@ import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { scenarioStatus, parseOperations, checkOperations, notSupportedGaps } from './scenario-rules.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const [feature] = process.argv.slice(2).filter((a) => !a.startsWith('--'));
@@ -37,6 +38,26 @@ function findMap() {
 
 const hasNotSupported = /^#+\s*not supported/im.test(prd);
 const hasScenarios = fs.existsSync(path.join(dir, 'scenarios.json'));
+
+// The scenario ledger (scripts/scenario-ledger.mjs): the working ledger when this checkout has one, else the committed summary
+// of the verdict (review/scenario-ledger-<feature>.json). Settled is the only verdict that ends the scenarios step.
+const ledger = (() => {
+  try {
+    const wf = path.join(root, 'review', 'scenarios', feature, 'ledger.json');
+    if (fs.existsSync(wf)) { const l = JSON.parse(read(wf)); const st = scenarioStatus(l); return { status: st.status, why: st.why, rounds: l.rounds.filter((r) => r.closed).length, rows: l.rows.length, counts: st.counts }; }
+    const sf = path.join(root, 'review', `scenario-ledger-${feature}.json`);
+    if (fs.existsSync(sf)) { const s = JSON.parse(read(sf)); return { status: s.status.status, why: s.status.why, rounds: s.rounds.length, counts: s.counts }; }
+  } catch { /* an unreadable ledger is no ledger */ }
+  return null;
+})();
+// The operations inventory, when the feature has one, must be well formed and match the PRD's not-supported list.
+const operations = (() => {
+  const f = path.join(dir, 'operations.md');
+  if (!fs.existsSync(f)) return null;
+  const { rows, problems } = parseOperations(read(f));
+  const gaps = notSupportedGaps(rows, prd);
+  return { rows: rows.length, problems: [...problems, ...checkOperations(rows), ...gaps.missing.map((m) => `the PRD's "Not supported" list does not name "${m}"`)] };
+})();
 const isNew = placeholders.length === screens.length; // nothing designed yet: the new-feature road
 const map = isNew || !prd ? findMap() : null;
 
@@ -48,9 +69,13 @@ if (isNew && (!map || map.none)) {
   mode = 'plan'; why = `map #${map.number} has ${map.open.length} open ticket(s), ${grill.length} of them grilling (the owner's)`; next = 'work the frontier: research, prototype and task tickets now; grilling tickets wait for the owner while independent work goes on';
 } else if (!prd) {
   mode = 'chart'; why = 'no PRD'; next = 'write the PRD from the map or the baseline';
-} else if (!hasNotSupported || !hasScenarios) {
-  mode = 'scenarios'; why = [!hasNotSupported && 'the PRD has no "Not supported" list (the 95% cut)', !hasScenarios && 'no executable leaves (scenarios.json)'].filter(Boolean).join('; ');
-  next = 'run the scenario framework: operations inventory from the baseline, the cut, the tree, walks until settled, leaves';
+} else if (!hasNotSupported || !hasScenarios || ledger?.status !== 'settled' || operations?.problems.length) {
+  mode = 'scenarios';
+  why = [!hasNotSupported && 'the PRD has no "Not supported" list (the 95% cut)', operations?.problems.length && `the operations inventory has ${operations.problems.length} problem(s) (scenario-ledger check)`,
+    !hasScenarios && 'no executable leaves (scenarios.json)',
+    ledger?.status !== 'settled' && (ledger ? `the scenario ledger is ${ledger.status}: ${ledger.why}` : 'no scenario ledger (scenario-ledger init)')].filter(Boolean).join('; ');
+  next = ledger?.status === 'stuck' || ledger?.status === 'capped' ? 'the walks stopped without settling: report what is open, file the product questions, and let the owner rule; do not walk again'
+    : 'run the scenario framework: operations inventory from the baseline, the cut, the tree, the ledger and walks until settled, leaves (docs/design-workflow/briefs/walk.md)';
 } else if (placeholders.length) {
   mode = 'build'; why = `${placeholders.length} of ${screens.length} screens not designed yet`; next = 'build the screens (build.md), then gate each';
 } else if (screens.length && screens.every((s) => approved.has(s.id))) {
@@ -62,6 +87,7 @@ if (isNew && (!map || map.none)) {
 }
 
 const out = { feature, mode, why, next, map: map && map.number ? { number: map.number, state: map.state, open: map.open.length } : map?.unknown ? 'unknown (gh unavailable)' : null,
-  screens: screens.length, placeholders: placeholders.length, approved: approved.size, scenarios: hasScenarios, notSupported: hasNotSupported };
+  screens: screens.length, placeholders: placeholders.length, approved: approved.size, scenarios: hasScenarios, notSupported: hasNotSupported,
+  ledger: ledger ? { status: ledger.status, why: ledger.why, rounds: ledger.rounds } : null, operations: operations ? { rows: operations.rows, problems: operations.problems } : null };
 if (json) console.log(JSON.stringify(out, null, 2));
 else console.log(`${feature}: ${mode} — ${why}\nnext: ${next}`);

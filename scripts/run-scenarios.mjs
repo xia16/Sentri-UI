@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // The behaviour gate: runs a feature's scenario leaves (features/<feature>/scenarios.json) in a real browser.
 // Usage: node scripts/run-scenarios.mjs <feature> [--lang en,zh] [--width 360,390] [--base <url>] [--only <leaf,leaf>]
-// Format: docs/design-workflow/scenarios.md. Writes review/scenarios-<feature>.json and screenshots under
+// Format: docs/design-workflow/scenarios.md (the pure tree walk and format checks: scripts/scenario-tree.mjs). Writes review/scenarios-<feature>.json and screenshots under
 // review/scenarios/<feature>/<leaf>/<lang>-<width>/. Exits 1 when any leaf fails.
 import { spawn, execSync } from 'node:child_process';
 import { createRequire } from 'node:module';
@@ -9,6 +9,7 @@ import { mkdirSync, readFileSync, rmSync, writeFileSync, existsSync } from 'node
 import { join, dirname, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createServer } from 'node:net';
+import { walkTree, parseDuration, stepKind } from './scenario-tree.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const require = createRequire('C:/Users/ying_/.cache/adam-design/playwright-1.63.0/package.json');
@@ -29,25 +30,11 @@ const only = opt('only') ? new Set(opt('only').split(',')) : null;
 const verbs = JSON.parse(readFileSync(join(root, 'ux/laws/strings.json'), 'utf8')).verbs || {};
 const HARD = ['wrong-fact', 'lost-draft', 'dead-end', 'unreachable-control', 'broken-ruling'];
 
-// ---- the tree: walk it into executable leaves ----
-// A leaf's run = the reset fixture of its nearest `state` ancestor + the taps of every `action` between them + its own taps.
-const leaves = [], nodeCount = {}, problems = [], ids = new Set();
-(function walk(node, path) {
-  if (node.type !== 'root') nodeCount[node.type] = (nodeCount[node.type] || 0) + 1;
-  if (node.id) { if (ids.has(node.id)) problems.push(`duplicate id ${node.id}`); ids.add(node.id); }
-  const here = [...path, node];
-  if (node.type === 'outcome' || node.type === 'decision-blocker') {
-    const state = [...here].reverse().find((n) => n.type === 'state');
-    const from = state ? here.slice(here.indexOf(state) + 1) : here;
-    const branch = here.find((n) => n.type === 'entry');
-    const taps = from.flatMap((n) => n.taps || []);
-    if (node.type === 'outcome' && !(node.authority || []).length) problems.push(`${node.id}: an outcome needs authority (else it is a decision-blocker)`);
-    if (node.type === 'outcome' && node.status !== 'pending' && !state) problems.push(`${node.id}: no state (reset fixture) above it`);
-    leaves.push({ node, branch: branch?.id, state, taps, path: here.map((n) => n.id).filter(Boolean) });
-  }
-  for (const c of node.children || []) walk(c, here);
-})({ type: 'root', children: spec.tree }, []);
+// ---- the tree: walk it into executable leaves (scripts/scenario-tree.mjs) ----
+// A leaf's run = the reset fixture of its nearest `state` ancestor + the steps of every `action` between them + its own.
+const { leaves, nodeCount, problems, gwtProblems } = walkTree(spec);
 if (problems.length) { console.error(problems.join('\n')); process.exit(2); }
+for (const w of gwtProblems) console.warn(`warning: ${w}`);   // npm test (tests/scenarios-format.test.mjs) is what fails on these
 
 // ---- server ----
 const freePort = () => new Promise((res) => { const s = createServer(); s.listen(0, () => { const p = s.address().port; s.close(() => res(p)); }); });
@@ -133,7 +120,8 @@ window.__scen = (() => {
     const sum = (a) => a.reduce((x, y) => x + y, 0);
     return new Function('s', 'c', 'F', 'sum', 'return (' + expr + ');')(s, c, F, sum);
   }
-  return { find, hasText, elState, clipped, record, current: () => (window.AtlasBare && window.AtlasBare.current ? window.AtlasBare.current() : null), lang: () => document.documentElement.lang };
+  function backTarget() { return top(phone()); }
+  return { find, hasText, elState, clipped, record, backTarget, current: () => (window.AtlasBare && window.AtlasBare.current ? window.AtlasBare.current() : null), lang: () => document.documentElement.lang };
 })();`;
 
 const textOf = (a, lang) => {
@@ -202,74 +190,118 @@ async function tap(page, step) {
 }
 
 const slug = (s) => String(typeof s === 'string' ? s : s.tap || s.fill || s.says || 'check').replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '').toLowerCase().slice(0, 32) || 'step';
+// how a step reads in screenshots and failures
+const stepName = (s) => { const k = stepKind(s); return k === 'tap' ? (typeof s === 'string' ? s : s.tap) : k === 'offline' ? (s.offline ? 'offline' : 'online') : k === 'advance' ? 'advance ' + s.advance : k === 'device' ? 'device ' + s.device : k || 'step'; };
+
+// The phone's own Back: the browser history back when the page has an earlier entry (the Navigation API's canGoBack;
+// the blank start page does not count), else the Escape key, which is what the prototypes (farrowing-astra-concept.js,
+// home-astra-prototype.js) listen to as "dismiss / Back the top surface". The key is sent to the topmost open sheet
+// (or the phone) so it reaches the prototype's own handler. The prototypes only replaceState, so today this is Escape.
+async function systemBack(page) {
+  if (await page.evaluate(() => typeof navigation !== 'undefined' && navigation.canGoBack).catch(() => false)) {
+    await page.goBack({ waitUntil: 'domcontentloaded', timeout: 3000 }); await settle(page); return 'history';
+  }
+  await ensureHelpers(page);
+  await page.evaluate(() => { const t = window.__scen.backTarget(); (document.activeElement && t.contains(document.activeElement) ? document.activeElement : t).dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', code: 'Escape', keyCode: 27, bubbles: true, cancelable: true })); });
+  await settle(page);
+  return 'escape';
+}
 
 async function runLeaf(browser, leaf, lang, width) {
   const n = leaf.node, st = leaf.state, fx = st.reset || {};
   const dir = join(root, 'review', 'scenarios', feature, n.id, `${lang}-${width}`);
   rmSync(dir, { recursive: true, force: true }); mkdirSync(dir, { recursive: true });
-  const evidence = [], failures = [], skipped = [], notes = [];
-  const context = await browser.newContext({ viewport: { width, height: D.height || 844 }, deviceScaleFactor: 1, locale: lang === 'zh' ? 'zh-CN' : 'en-GB' });
-  // the phone is drawn at the run's width (atlas-bare pins it to 390; the runner overrides that, nothing in the page changes)
-  await context.addInitScript((w) => {
-    const css = `html.atlas-bare,html.atlas-bare body{width:${w}px!important}html.atlas-bare .atlas-phone{width:${w}px!important}`;
-    const add = () => { const s = document.createElement('style'); s.textContent = css; document.head.appendChild(s); };
-    if (document.head) add(); else document.addEventListener('DOMContentLoaded', add);
-  }, width);
-  const page = await context.newPage();
-  const errors = [];
-  page.on('pageerror', (e) => errors.push(e.message));
-  page.on('console', (m) => { if (m.type() === 'error' && /atlas-bare: step not found/.test(m.text())) errors.push(m.text()); });
+  const evidence = [], failures = [], skipped = [], notes = [], errors = [];
   const clock = n.clock || st.clock || D.clock;
-  if (clock) await page.clock.install({ time: new Date(clock) });
-  let i = 0;
+  const needsClock = !!clock || leaf.taps.some((s) => stepKind(s) === 'advance');   // a leaf that lets time pass gets a clock even if it fixes none
+  const startMs = clock ? new Date(clock).getTime() : Date.now();
+  const devices = {}, contexts = [];   // device "a" is the phone the leaf starts on; "b" opens on first use
+  let page = null, cur = null, elapsed = 0, i = 0;
   const shot = async (label) => { const f = join(dir, `${String(i++).padStart(2, '0')}-${slug(label)}.png`); await page.screenshot({ path: f }).catch(() => {}); evidence.push(relative(root, f).replace(/\\/g, '/')); };
   const fail = (what, got, tag, at) => failures.push({ what, got, tag: tag || null, at });
-  try {
+
+  // one device = its own browser context (own storage, own network, own clock) on the leaf's reset fixture
+  async function openDevice(name) {
+    const context = await browser.newContext({ viewport: { width, height: D.height || 844 }, deviceScaleFactor: 1, locale: lang === 'zh' ? 'zh-CN' : 'en-GB' });
+    contexts.push(context);
+    // the phone is drawn at the run's width (atlas-bare pins it to 390; the runner overrides that, nothing in the page changes)
+    await context.addInitScript((w) => {
+      const css = `html.atlas-bare,html.atlas-bare body{width:${w}px!important}html.atlas-bare .atlas-phone{width:${w}px!important}`;
+      const add = () => { const s = document.createElement('style'); s.textContent = css; document.head.appendChild(s); };
+      if (document.head) add(); else document.addEventListener('DOMContentLoaded', add);
+    }, width);
+    const pg = await context.newPage();
+    const tag = name === 'a' ? '' : `device ${name}: `;
+    pg.on('pageerror', (e) => errors.push(tag + e.message));
+    pg.on('console', (m) => { if (m.type() === 'error' && /atlas-bare: step not found/.test(m.text())) errors.push(tag + m.text()); });
+    if (needsClock) await pg.clock.install({ time: new Date(startMs + elapsed) });   // a second device joins at the same moment
     const url = new URL(base + (fx.url || D.url));
     if (fx.screen) url.searchParams.set('screen', fx.screen);
     for (const [k, v] of Object.entries(fx.params || {})) url.searchParams.set(k, v);
     if (lang !== 'en') url.searchParams.set('lang', lang);
-    await page.goto(url.href);
-    if (fx.screen) await page.waitForSelector('html.atlas-ready', { timeout: 8000 });
-    await settle(page);
+    await pg.goto(url.href);
+    if (fx.screen) await pg.waitForSelector('html.atlas-ready', { timeout: 8000 });
+    await settle(pg);
     if (fx.preset) {   // the reset fixture: the prototype's own deterministic seed for this preset
-      const ok = await page.evaluate((p) => { const sel = document.querySelector('select.scenario'); if (!sel || ![...sel.options].some((o) => o.value === p)) return false; if (sel.value !== p) { sel.value = p; sel.dispatchEvent(new Event('change', { bubbles: true })); } return true; }, fx.preset);
+      const ok = await pg.evaluate((p) => { const sel = document.querySelector('select.scenario'); if (!sel || ![...sel.options].some((o) => o.value === p)) return false; if (sel.value !== p) { sel.value = p; sel.dispatchEvent(new Event('change', { bubbles: true })); } return true; }, fx.preset);
       if (!ok) throw new Error(`preset "${fx.preset}" is not in the page`);
-      await settle(page);
+      await settle(pg);
     }
-    for (const t of fx.taps || []) { const e = await tap(page, t); if (e) throw new Error('fixture: ' + e); }
-    await ensureHelpers(page);
-    if (lang !== 'en') {   // the locale probe: does the page render this language at all?
+    for (const t of fx.taps || []) { const e = await tap(pg, t); if (e) throw new Error('fixture: ' + e); }
+    await ensureHelpers(pg);
+    if (lang !== 'en' && name === 'a') {   // the locale probe: does the page render this language at all?
       const back = verbs.Back?.[lang];
-      const ok = back && await page.evaluate((x) => window.__scen.hasText('phone', x), back);
+      const ok = back && await pg.evaluate((x) => window.__scen.hasText('phone', x), back);
       if (!ok) notes.push(`no ${lang} rendering: ?lang=${lang} is ignored (no "${back}")`);
     }
+    return { name, context, page: pg, offline: false };
+  }
+
+  let stepFailed = false;
+  try {
+    cur = devices.a = await openDevice('a'); page = cur.page;
     await shot('start');
     for (const step of leaf.taps) {
-      if (step.expect) {
+      const kind = stepKind(step);
+      if (kind === 'expect') {
         for (const a of [].concat(step.expect)) { const r = await checkOne(page, a, lang, width, notes.length > 0); if (r?.skipped) skipped.push(describe(a)); else if (r) fail(describe(a), r.got, a.hard, `after step ${i - 1}`); }
         continue;
       }
-      if (step.fill) { await ensureHelpers(page); await page.locator(step.fill).last().fill(String(step.value)); await settle(page); await shot('fill-' + step.fill); continue; }
-      if (step.wait) { await page.waitForTimeout(step.wait); continue; }
-      if (step.reload) {   // an interruption: the app is closed and opened again on the same device
+      if (kind === 'fill') { await ensureHelpers(page); await page.locator(step.fill).last().fill(String(step.value)); await settle(page); await shot('fill-' + step.fill); continue; }
+      if (kind === 'wait') { await page.waitForTimeout(step.wait); continue; }
+      if (kind === 'reload') {   // an interruption: the app is closed and opened again on the same device
         await page.reload(); if (fx.screen) await page.waitForSelector('html.atlas-ready', { timeout: 8000 });
         await settle(page); await shot('reload'); continue;
       }
+      if (kind === 'offline' || kind === 'advance' || kind === 'back' || kind === 'device') {   // the other interruptions
+        try {
+          if (kind === 'offline') { await cur.context.setOffline(step.offline); cur.offline = step.offline; await settle(page); }
+          else if (kind === 'advance') {   // time passes for every device at once
+            const ms = parseDuration(step.advance); elapsed += ms;
+            for (const d of Object.values(devices)) await d.page.clock.fastForward(ms);
+            await settle(page);
+          } else if (kind === 'back') await systemBack(page);
+          else {   // a second phone opens on the same reset fixture the first time; later steps act on this one
+            if (!devices[step.device]) devices[step.device] = await openDevice(step.device);
+            cur = devices[step.device]; page = cur.page; await page.bringToFront().catch(() => {}); await settle(page);
+          }
+        } catch (e) { fail(stepName(step), e.message.split('\n')[0], 'dead-end', `step ${i - 1}`); stepFailed = true; await shot(stepName(step)); break; }
+        await shot(stepName(step)); continue;
+      }
       const e = await tap(page, step);
       await shot(step);
-      if (e) { fail(`tap ${typeof step === 'string' ? step : step.tap}`, e, step.hard || 'unreachable-control', `step ${i - 1}`); break; }
+      if (e) { fail(`tap ${stepName(step)}`, e, step.hard || 'unreachable-control', `step ${i - 1}`); stepFailed = true; break; }
     }
-    if (!failures.some((f) => f.what.startsWith('tap '))) {
+    if (!stepFailed) {
       for (const a of n.visible || []) { const r = await checkOne(page, a, lang, width, notes.length > 0); if (r?.skipped) skipped.push(describe(a)); else if (r) fail(describe(a), r.got, a.hard); }
       for (const a of n.record || []) { const r = await checkOne(page, a, lang, width); if (r) fail(describe(a), r.got, a.hard); }
       if (n.clip !== false && D.clipCheck !== false) { const r = await checkOne(page, { noClip: true }, lang, width); if (r) fail('nothing clipped', r.got, null); }
     }
     for (const e of errors) fail('no page errors', e, null);
   } catch (e) {
-    fail('run', e.message.split('\n')[0], 'dead-end'); await shot('error');
+    fail('run', e.message.split('\n')[0], 'dead-end'); if (page) await shot('error');
   }
-  await context.close();
+  for (const c of contexts) await c.close().catch(() => {});
   let result = failures.length ? 'fail' : 'pass';
   if (notes.length && result === 'pass') result = 'blocked';   // the screens can't run in this language: never counted as covered
   return { lang, width, result, failures, skipped, notes, evidence };
@@ -281,7 +313,7 @@ const out = [];
 for (const leaf of leaves) {
   const n = leaf.node;
   if (only && !only.has(n.id)) continue;
-  const row = { id: n.id, tree: n.tree || null, branch: leaf.branch, label: n.label, path: leaf.path, authority: n.authority || [], result: null, hard: [], runs: [] };
+  const row = { id: n.id, tree: n.tree || null, branch: leaf.branch, label: n.label, gwt: n.gwt || null, path: leaf.path, authority: n.authority || [], result: null, hard: [], runs: [] };
   if (n.type === 'decision-blocker') { row.result = 'blocked'; row.question = n.question; row.sources = n.sources; out.push(row); console.log(`blocked  ${n.id}  ${n.question || ''}`); continue; }
   if (n.status === 'pending') { row.result = 'pending'; row.why = n.why || ''; out.push(row); console.log(`pending  ${n.id}`); continue; }
   for (const lang of n.langs || langs) for (const width of n.widths || widths) row.runs.push(await runLeaf(browser, leaf, lang, width));
