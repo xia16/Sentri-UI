@@ -270,10 +270,14 @@
      strs: label (raw label wrapped in a span), display or value (the shown value), placeholder. */
   function pickerField({label='',value='',display='',placeholder='Select',action='open-picker',key='',disabled=false,reason='',error='',loading=false,variant='single',selected=[],names=[],path=[],pressed=false,active=false,ariaLabel='',className='',strs,args}={}){
     const multi=variant.includes('multi'), named=multi&&names.length>0;
-    const text=named?names.slice(0,3).join(' · ')+(names.length>3?' · +'+(names.length-3):''):multi?(selected.length?selected.length+' selected':'None'):path.length?path.join(' › '):display||value;
-    const more=named&&names.length>3?'+'+(names.length-3):'';
+    /* Record forms show the chosen names in up to two lines, then +n: names are kept while they fit a two-line budget
+       (CJK counts double), so the line is never clamped mid-name; the first name is always shown. */
+    const w=t=>[...String(t)].reduce((n,ch)=>n+(/[⺀-￿]/.test(ch)?2:1),0);let fit=0;for(let used=0;fit<names.length;fit++){const add=w(names[fit])+(fit?3:0);if(fit&&used+add>60)break;used+=add;}
+    const shownNames=names.slice(0,Math.max(1,fit)),hiddenN=names.length-shownNames.length;
+    const text=named?shownNames.join(' · ')+(hiddenN?' · +'+hiddenN:''):multi?(selected.length?selected.length+' selected':'None'):path.length?path.join(' › '):display||value;
+    const more=named&&hiddenN?'+'+hiddenN:'';
     const shown=text!==''&&text!=null, id=fieldId('st-picker'), hint=error||reason||(loading?'Loading options…':'');
-    return `<div class="field st-picker-field ${esc(className)}" data-ds="PickerField" data-variant="${esc(variant)}"><span id="${id}-label">${tx(label,{strs,args},'label')}</span><button type="button" class="st-picker-trigger${shown?'':' is-placeholder'}" ${ariaLabel?`aria-label="${esc(ariaLabel)}, ${esc(shown?text:placeholder)}"`:`aria-labelledby="${id}-label ${id}-value"`} aria-haspopup="dialog" aria-expanded="${active}"${hint?` aria-describedby="${id}-hint"`:''}${error?' aria-invalid="true"':''}${disabled||loading?' aria-disabled="true"':''}${loading?' aria-busy="true"':''}${pressed?' data-preview="pressed"':''} data-action="${esc(action)}" data-picker-key="${esc(key)}"><span id="${id}-value" class="st-picker-value${named?' is-names':''}"${named?'':sa(multi?(strs?.display|| (selected.length?'ds.picker.selected':'ds.picker.none')):shown?(strs?.display||strs?.value):(strs?.placeholder||(placeholder==='Select'?'ds.picker.select':undefined)),multi?{n:selected.length,...args?.display}:args?.display||args?.value)}>${named?`<span class="st-picker-names">${esc(names.slice(0,3).join(' · '))}</span>${more?`<span class="st-picker-more">${esc(more)}</span>`:''}`:esc(shown?text:placeholder)}</span>${chevron}</button>${hint?`<span id="${id}-hint" class="st-picker-hint" role="status">${esc(hint)}</span>`:''}</div>`;
+    return `<div class="field st-picker-field ${esc(className)}" data-ds="PickerField" data-variant="${esc(variant)}"><span id="${id}-label">${tx(label,{strs,args},'label')}</span><button type="button" class="st-picker-trigger${shown?'':' is-placeholder'}" ${ariaLabel?`aria-label="${esc(ariaLabel)}, ${esc(shown?text:placeholder)}"`:`aria-labelledby="${id}-label ${id}-value"`} aria-haspopup="dialog" aria-expanded="${active}"${hint?` aria-describedby="${id}-hint"`:''}${error?' aria-invalid="true"':''}${disabled||loading?' aria-disabled="true"':''}${loading?' aria-busy="true"':''}${pressed?' data-preview="pressed"':''} data-action="${esc(action)}" data-picker-key="${esc(key)}"><span id="${id}-value" class="st-picker-value${named?' is-names':''}"${named?'':sa(multi?(strs?.display|| (selected.length?'ds.picker.selected':'ds.picker.none')):shown?(strs?.display||strs?.value):(strs?.placeholder||(placeholder==='Select'?'ds.picker.select':undefined)),multi?{n:selected.length,...args?.display}:args?.display||args?.value)}>${named?`<span class="st-picker-names">${esc(shownNames.join(' · '))}</span>${more?`<span class="st-picker-more">${esc(more)}</span>`:''}`:esc(shown?text:placeholder)}</span>${chevron}</button>${hint?`<span id="${id}-hint" class="st-picker-hint" role="status">${esc(hint)}</span>`:''}</div>`;
   }
   // Shared chooser surface: flat catalogue lists or a muted inset for short choices.
   function chooserList(content,{className='',tone='flat',ds='ChoiceList'}={}){
@@ -959,9 +963,11 @@
       if(h&&!h.statusId)h=Object.assign({},h,{statusId:id});
       if(primary&&typeof primary==='object'&&!primary.describedby)primary=Object.assign({},primary,{describedby:id});
     }
-    if(content){content=content.replace(/<p class="st-field-hint st-button-reason[^]*?<\/p>/g,reason=>{line+=reason.replace('st-button-reason','st-button-reason st-visually-hidden');return '';});}
+    if(content){content=content.replace(/<p class="st-field-hint st-button-reason[^]*?<\/p>/g,reason=>{line+=/<button/.test(reason)?reason.replace('<p class="','<p data-action-slot class="'):reason.replace('st-button-reason','st-button-reason st-visually-hidden');return '';});}
     const inner=content||`${b?backButton(b):''}${h?sHold(h):sButton(primary)}`;
-    return `${line}<div class="sheet-footer${className?' '+esc(className):''}" data-ds="Sheet">${inner}</div>`;
+    /* A hidden reason lives inside the footer (after the two targets), so nothing above the bar is drawn or measured. */
+    const quiet=line&&!/class="sheet-status"|data-action-slot/.test(line);
+    return `${quiet?'':line}<div class="sheet-footer${className?' '+esc(className):''}" data-ds="Sheet">${inner}${quiet?line:''}</div>`;
   }
   /* The overlay layer model: z = base + 10 × layer (scrim 2, drawer 3, page 5, dialog 8). An overlay placed after a sheet in the
      phone rises a layer by itself (CSS); `layer: n` sets it. A drawer is never opened over a drawer (replace its content

@@ -345,6 +345,8 @@ button.st-row[aria-current="location"]{background:var(--green-wash);box-shadow:i
 .st-choice-row[data-mode="navigate"] .st-choice-trail svg{width:var(--size-18);height:var(--size-18)}
 .st-choice-trail input[type="checkbox"]{width:var(--size-20);height:var(--size-20);margin:0;accent-color:var(--st-ink)}
 .st-choice-search.st-choice-search{margin:0 0 var(--space-20)}
+/* An empty or loading line in a sheet body starts on the sheet's gutter, under the title. */
+.sheet-body .st-choice-empty{padding-inline:0}
 /* In a picker sheet every option row is one height: one line and a wrapped two-line label both fit the 56px row. */
 .st-picker-body .st-choice-row.st-choice-row{padding-block:var(--space-8)}
 /* Search stays at the top of the sheet while the one list scrolls under it (sticky in the sheet body, never a second scroller). */

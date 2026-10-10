@@ -15,7 +15,7 @@ test('footer reason is never drawn above a waiting button, stays outside the two
  const html=UI.sheetFooter({primary:{label:'Record items',waiting:true},status:{text:'Tick the completed items first',visible:false}});
  assert.match(html,/sheet-status st-visually-hidden/);
  assert.equal((html.match(/<button /g)||[]).length,2);
- assert.ok(html.indexOf('role="status"')<html.indexOf('class="sheet-footer'));
+ assert.ok(html.indexOf('role="status"')>html.lastIndexOf('</button>'));
  const prop=UI.sheetFooter({primary:{label:'Record items',waiting:true,reason:'Tick the completed items first'}});
  assert.equal((prop.match(/role="status"/g)||[]).length,1);
  assert.match(prop,/aria-describedby=/);
