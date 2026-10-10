@@ -21,12 +21,29 @@ const TYPES = {
   '.svg': 'image/svg+xml',
 };
 
+// /@<commit>/<path> serves the file as it was at that commit, straight from git: the atlas shows a screen's approved
+// version this way (pages load their assets by relative paths, so the whole screen renders from that commit).
+const { execFile } = require('child_process');
+function fromGit(res, sha, rel) {
+  if (rel === '' || rel.endsWith('/')) rel += 'index.html';
+  execFile('git', ['cat-file', 'blob', `${sha}:${rel}`], { cwd: root, encoding: 'buffer', maxBuffer: 64 << 20 }, (err, data) => {
+    if (err) { res.writeHead(404); return res.end('Not at that commit'); }
+    res.writeHead(200, { 'Content-Type': TYPES[path.extname(rel)] || 'application/octet-stream', 'Cache-Control': sha.length === 40 ? 'max-age=86400, immutable' : 'no-store' });
+    res.end(data);
+  });
+}
+
 http
   .createServer((req, res) => {
     const pathname = decodeURIComponent(new URL(req.url, 'http://localhost').pathname);
     if (pathname === '/') {
       res.writeHead(302, { Location: '/atlas/' });
       return res.end();
+    }
+    const at = pathname.match(/^\/@([0-9a-f]{7,40})\/(.*)$/);
+    if (at) {
+      if (at[2].split('/').includes('..')) { res.writeHead(403); return res.end(); }
+      return fromGit(res, at[1], at[2]);
     }
     let file = path.resolve(root, '.' + pathname);
     if (file !== root && !file.startsWith(root + path.sep)) {

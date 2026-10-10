@@ -398,7 +398,7 @@ function openFeature(id, sel) {
     const sec = (id, label, n, open, inner) => `<section class="sec" id="sec-${id}" data-open="${open}"><h3 class="sh" tabindex="0" role="button" aria-expanded="${open}"><span class="lbl">${label}</span><span class="n">${n}</span><span class="caret">${ICON.caret}</span></h3><div class="sb">${inner}</div></section>`;
     const none = '<p class="none">None written yet.</p>';
     const gate = s.gate ? `<span class="badge">Gate <b>${esc(Array.isArray(s.gate) ? s.gate.join(' ') : s.gate)}</b></span>` : '';
-    const head = `<div class="spechead"><div class="t"><h2>${esc(s.name)}</h2>${s.zh ? `<span class="zh">${esc(s.zh)}</span>` : ''}<span class="pill">${dot(s.status)}${esc(STATUS[s.status] || s.status)}</span>${gate}${s.aliasOf && idx[s.aliasOf] ? `<span class="badge">Same screen as <b>${esc(idx[s.aliasOf].name)}</b></span>` : ''}</div>
+    const head = `<div class="spechead"><div class="t"><h2>${esc(s.name)}</h2>${s.zh ? `<span class="zh">${esc(s.zh)}</span>` : ''}<span class="pill">${dot(s.status)}${esc(STATUS[s.status] || s.status)}</span>${gate}${s.approval ? (s.approval.changed ? `<span class="badge amber" title="${esc(s.approval.changed.why)}">Changed since approval</span>` : `<span class="badge">Approved by ${esc(s.approval.by)} · <b>${esc(String(s.approval.commit).slice(0, 7))}</b></span>`) : ''}${s.aliasOf && idx[s.aliasOf] ? `<span class="badge">Same screen as <b>${esc(idx[s.aliasOf].name)}</b></span>` : ''}</div>
       ${confirm.length ? `<div class="badges"><span class="badge">To confirm <b>${confirm.length}</b></span></div>` : ''}</div>
       ${nt.purpose ? `<p class="lead">${esc(nt.purpose)}</p>` : ''}`;
     const split = (t) => { const ss = String(t).match(/[^.!?]+(?:[.!?]+(?=\s|$)|$)\s*/g) || [t]; let a = '', i = 0; while (i < ss.length && (!a || a.length + ss[i].length <= 190)) a += ss[i++]; return [a.trim(), ss.slice(i).join('').trim()]; };
@@ -487,7 +487,18 @@ function openFeature(id, sel) {
       const a = f.addsTo[+nid.split(':')[1]], target = idx[a.screen]; other = allFeatures().find((x) => x.id === a.feature) || { id: a.feature, name: a.feature };
       shown = a.screen;
       dock.append(el('<div class="cap">&nbsp;</div>'), shot(target, { height: H, open: a.open, markAdded: a.added ? a.what : null, addPlaceholder: a.added ? null : { after: a.under, text: `Added by ${f.name} — not designed yet` } }));
-    } else { shown = nid; dock.append(el('<div class="cap">&nbsp;</div>'), shot(idx[nid], { height: H })); }
+    } else {
+      shown = nid;
+      const s = idx[nid], ap = s && s.approval;
+      if (ap && ap.changed) {
+        // changed since approval: the approved version stays in view (rendered from its commit) until the owner promotes the new one
+        const sw = el(`<div class="cap"><div class="seg" role="group" aria-label="Version"><button data-v="approved" aria-pressed="true">Approved · ${esc(ap.date)}</button><button data-v="now" aria-pressed="false">Changed since</button></div></div>`);
+        const slot = el('<div class="vslot"></div>');
+        const show = (v) => { sw.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v === v))); clearPins(); slot.replaceChildren(shot(v === 'approved' ? { ...s, url: `/@${ap.commit}${ap.url}` } : s, { height: H })); };
+        sw.onclick = (ev) => { const b = ev.target.closest('button[data-v]'); if (b) show(b.dataset.v); };
+        dock.append(sw, slot); show('approved');
+      } else dock.append(el(`<div class="cap">${ap ? `Approved · ${esc(ap.date)}` : '&nbsp;'}</div>`), shot(s, { height: H }));
+    }
     const ns = idx[shown] && idx[shown].notes, noteCount = ns ? (ns.elements || []).filter((e) => !CHROME.test(`${e.name} ${e.shows}`)).length : 0;
     const hasNotes = !!(ns && Object.keys(ns).length) && !(idx[shown] && idx[shown].status === 'placeholder');
     const tools = el(`<div class="tools">${hasNotes ? `<button class="notesbtn" data-notes aria-pressed="${notes.classList.contains('open')}"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M3 2.5h10v11H3z M5.5 5.5h5 M5.5 8h5 M5.5 10.5h3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="nc">Notes${noteCount ? ` · ${noteCount}` : ''}</span></button>` : ''}${other ? `<a href="#" data-other>Open ${esc(other.name)}</a>` : ''}</div>`);
