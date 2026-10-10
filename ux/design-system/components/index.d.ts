@@ -649,6 +649,8 @@ export interface SentriUI {
   pickerField(props: PickerFieldProps): string;
   pickerOptions(props: { options: PickerOption[]; selected?: string | string[]; action?: string; className?: string; variant?: 'single' | 'multi'; loading?: boolean; error?: string }): string;
   pickerBody(props: PickerBodyProps): string;
+  /** The cascade level for the sheet head: spread into sheet(). Root: { title, up: null }; below: the level's name and ‹ parent. */
+  pickerHead(props: { items: unknown[]; path?: string[]; title?: string; rootLabel?: string; stepAction?: string }): { title: SheetText; up: { label: SheetText; action: string; value: string } | null };
   pickerFooter(props?: { selected?: string[]; multi?: boolean; backAction?: string; doneAction?: string; strs?: Strs<'back' | 'done'>; args?: StrArgs<'back' | 'done'> }): string;
   chooserList(content: string, options?: { tone?: 'flat' | 'inset'; className?: string; ds?: string }): string;
   choiceRow(props: ChoiceRowProps): string;
@@ -674,11 +676,13 @@ export interface SheetProps {
   subtitleTone?: 'amber' | 'red' | 'green';
   /** A glyph name before a dialog's title. */
   icon?: IconName;
-  /** Drawer only: the ✕. It is always drawn; this renames its action / label. */
+  /** Ignored: no sheet carries a ✕ (drawer convention). Kept for old callers. */
   close?: { action?: string; value?: string; label?: SheetText };
-  /** Raw HTML: an up-one-level control before the title (a drawer that drills into categories). Not a second Back. */
+  /** "‹ Parent" in the head, only in a drawer with levels: goes up one level, names the parent, never labelled Back. */
+  up?: { label: SheetText; action?: string; value?: string } | null;
+  /** Raw HTML before the titles (legacy; use `up`). */
   lead?: string;
-  /** Raw HTML: text actions (Clear, Reset) left of the ✕, never in its place. */
+  /** Raw HTML: the head's text actions (Clear, Reset). */
   aside?: string;
   /** Raw HTML between the head and the body that does not scroll (a filter bar). */
   above?: string;

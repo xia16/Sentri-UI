@@ -78,6 +78,11 @@ svg{width:var(--size-20);height:var(--size-20);display:block;flex-shrink:0;fill:
 .sheet-aside{flex:none;display:flex;align-items:center;align-self:flex-start;gap:var(--space-6)}
 .sheet-close{margin:0}
 .sheet-close svg{width:var(--glyph-pad);height:var(--glyph-pad)}
+/* Up one level (a drawer with levels only): "‹ Parent" above the title. It names the parent; the title names this level. */
+.sheet-up{display:flex;align-items:center;gap:var(--space-2);max-width:100%;min-height:var(--tap-min);margin:calc(-1 * var(--space-12)) 0 calc(-1 * var(--space-6)) calc(-1 * var(--space-8));padding:0 var(--space-8);border:0;border-radius:var(--radius-control);background:transparent;color:var(--ink);font:500 var(--font-size-14)/1.3 var(--font-sans);text-align:left;cursor:pointer}
+.sheet-up>span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sheet-up>svg{flex:none;width:var(--size-18);height:var(--size-18);fill:none;stroke:currentColor;stroke-width:var(--icon-stroke);stroke-linecap:round;stroke-linejoin:round}
+.sheet-up:active{background:var(--press)}
 
 /* Body: the one scroller. */
 .sheet-body{flex:0 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:var(--space-18) var(--space-gutter-sheet) var(--space-panel);scrollbar-width:none;-webkit-overflow-scrolling:touch}
@@ -109,6 +114,10 @@ svg{width:var(--size-20);height:var(--size-20);display:block;flex-shrink:0;fill:
 /* a waiting reason that sheetFooter lifts above the bar: one status line, not a column-sized flex child */
 .sheet>.st-button-reason.st-button-reason{flex:none;margin:0;padding:var(--space-row-y) var(--space-gutter) 0;background:var(--paper);border-top:1px solid var(--line)}
 .sheet>.st-button-reason+.sheet-footer{border-top:0}
+/* No reason line above a waiting button: the button stands alone; the reason is read to the screen reader only.
+   A line that carries its own text action is not a reason and stays. */
+.sheet>.st-button-reason:not(:has(button)){position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}
+.sheet>.st-button-reason:not(:has(button))+.sheet-footer{border-top:1px solid var(--line)}
 /* Dialog: one small decision, rising from the bottom edge (reachable by the thumb), over a dimmed phone. */
 .dialog-backdrop{position:absolute;inset:0;z-index:calc(8 + 10 * var(--sheet-layer,0));display:flex;flex-direction:column;justify-content:flex-end;background:var(--dialog-backdrop)}
 .dialog{display:flex;flex-direction:column;overflow:hidden;max-height:calc(100% - var(--space-24));background:var(--paper);color:var(--ink);border-radius:var(--radius-dialog) var(--radius-dialog) 0 0;box-shadow:var(--shadow-dialog)}
@@ -313,7 +322,7 @@ button.st-row[aria-current="location"]{background:var(--green-wash);box-shadow:i
 
 /* Selection is a check, not an extra rectangle inside the contextual panel. */
 
-.inspection-phone .sheet.record-optional-editor[data-size="short"],.inspection-phone .sheet.brand-picker-step[data-size="short"]{min-height:min(var(--size-360),58%);max-height:58%}
+.inspection-phone .sheet.record-optional-editor[data-size="short"]{min-height:min(var(--size-360),58%);max-height:58%}
 .inspection-phone .sheet.record-optional-editor>.sheet-body{flex:1;display:flex;flex-direction:column;min-height:0}
 
 
@@ -336,6 +345,10 @@ button.st-row[aria-current="location"]{background:var(--green-wash);box-shadow:i
 .st-choice-row[data-mode="navigate"] .st-choice-trail svg{width:var(--size-18);height:var(--size-18)}
 .st-choice-trail input[type="checkbox"]{width:var(--size-20);height:var(--size-20);margin:0;accent-color:var(--st-ink)}
 .st-choice-search.st-choice-search{margin:0 0 var(--space-20)}
+/* In a picker sheet every option row is one height: one line and a wrapped two-line label both fit the 56px row. */
+.st-picker-body .st-choice-row.st-choice-row{padding-block:var(--space-8)}
+/* Search stays at the top of the sheet while the one list scrolls under it (sticky in the sheet body, never a second scroller). */
+.sheet-body>.st-picker-body>.st-choice-search,.sheet-body>*>.st-picker-body>.st-choice-search{position:sticky;top:calc(-1 * var(--space-18));z-index:1;margin:calc(-1 * var(--space-18)) calc(-1 * var(--space-gutter-sheet)) var(--space-12);padding:var(--space-18) var(--space-gutter-sheet) var(--space-8);background:var(--paper)}
 .st-choice-empty{margin:0;padding:var(--space-24) var(--space-17);font:400 var(--font-size-13)/1.5 var(--font-sans);color:var(--st-muted)}
 
 /* 6 · Field cards (candidate, ADR 0001): Stepper, Measure, Numpad.
@@ -606,22 +619,14 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 .st-choice-row[data-mode="single"] .st-choice-trail{color:var(--green)}
 .st-choice-trail input[type="checkbox"]{accent-color:var(--green)}
 .st-choice-row[data-mode="multi"]:has(:checked) .st-choice-label{font-weight:var(--type-weight-strong)}
-.st-picker-steps{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-4)}
-.st-picker-sep{color:var(--muted);font:var(--font-size-14)/1 var(--font-sans)}
 .st-picker-value.is-names{display:flex;align-items:baseline;gap:var(--space-6);white-space:normal;overflow:visible}
 .st-picker-names{min-width:0;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;overflow-wrap:anywhere}
 .st-picker-more{flex:none;color:var(--muted);font-weight:600}
-.st-picker-steps button,.st-picker-footer button{min-height:var(--tap-min);min-width:var(--tap-min);padding:var(--space-8);font:inherit}
-.st-picker-footer{display:flex;justify-content:space-between;gap:var(--space-12);padding-block:var(--space-12)}
 .st-choice-search input{min-height:var(--tap-min)}
 
 .st-choice-inline-opt:is([data-preview="pressed"],:active){background:var(--choice-press)}
 .st-choice-inline-opt[aria-disabled="true"]{background:var(--disabled-surface);color:var(--ink)}
 
-.st-picker-steps button{background:transparent;border:0;border-radius:var(--radius-control);color:var(--ink)}
-.st-picker-steps button:active{background:var(--choice-press)}
-.st-picker-steps button:last-child{font-weight:var(--type-weight-strong)}
-.st-picker-footer .button.primary{min-width:var(--tap-min)}
 .st-picker-field{min-width:0}
 .st-choice-inline{flex-wrap:wrap}
 .st-choice-extra{display:flex;justify-content:flex-end;padding:0 var(--space-16);border-bottom:1px solid var(--rule)}
@@ -737,3 +742,6 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
 .st-range-rail input[type=range]::-moz-range-track{height:var(--size-4);background:transparent}
 .st-range-rail input[type=range]::-moz-range-thumb{width:var(--space-32);height:var(--space-32);background:var(--paper);border:calc(1.5 * var(--border-width)) solid var(--range-handle);border-radius:50%;pointer-events:auto;cursor:ew-resize}
 .st-range-ends{display:flex;justify-content:space-between;font-size:var(--type-range-end-size);color:var(--muted);margin:0 0 var(--space-17)}
+
+/* No tap focus ring. A tap moves focus to the control but draws no ring; keyboard focus (:focus-visible) still does. */
+:is(.phone,.tk-phone,.atlas-phone,.device,.st-phone,.sp-phone,[data-st-context]) :focus:not(:focus-visible){outline:none}

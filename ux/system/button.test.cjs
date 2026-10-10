@@ -11,9 +11,9 @@ test('waiting action links a persistent escaped reason and refuses delegated wri
  assert.match(html,/aria-disabled="true"/);
  assert.equal(UI.guard({getAttribute:k=>k==='aria-disabled'?'true':''},{answer:false}),true);
 });
-test('footer reason stays outside the two targets even when status requests hiding',()=>{
+test('footer reason is never drawn above a waiting button, stays outside the two targets and describes it',()=>{
  const html=UI.sheetFooter({primary:{label:'Record items',waiting:true},status:{text:'Tick the completed items first',visible:false}});
- assert.doesNotMatch(html,/st-visually-hidden/);
+ assert.match(html,/sheet-status st-visually-hidden/);
  assert.equal((html.match(/<button /g)||[]).length,2);
  assert.ok(html.indexOf('role="status"')<html.indexOf('class="sheet-footer'));
  const prop=UI.sheetFooter({primary:{label:'Record items',waiting:true,reason:'Tick the completed items first'}});

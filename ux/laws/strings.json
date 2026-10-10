@@ -1,7 +1,9 @@
 {
   "verbs": {
     "Back": {"meaning": "leave a screen and keep any draft on the device; pure navigation", "zh": "返回"},
-    "Clear": {"meaning": "discard the draft; a text action, present only while a draft exists", "zh": "清除"},
+    "Clear": {"meaning": "empty what was entered or ticked (typed input, picks, a selection); a text action in the sheet head, present only while there is something to empty", "zh": "清除"},
+    "Reset": {"meaning": "restore a filter's defaults; a text action in the filter sheet head; commits nothing until the commit", "zh": "重置"},
+    "Done": {"meaning": "apply a picker's choices and close it, always with its count ('Done · 2'); records nothing", "zh": "完成"},
     "Close": {"meaning": "leave a sheet that saves per tap; names the sheet, not the data", "zh": "关闭"},
     "Delete": {"meaning": "erase an attachment (a photo) for good; destructive, red, asks first", "zh": "删除"},
     "Edit": {"meaning": "correct something already posted; stamped, original kept, corrected value amber", "zh": "修改"},
@@ -46,6 +48,7 @@
     "act.back": {"en": "Back", "zh": "返回", "kind": "action"},
     "act.clear": {"en": "Clear", "zh": "清除", "kind": "action"},
     "act.close": {"en": "Close", "zh": "关闭", "kind": "action"},
+    "act.reset": {"en": "Reset", "zh": "重置", "kind": "action"},
     "act.edit": {"en": "Edit", "zh": "修改", "kind": "action"},
     "act.record_dead": {"en": "Record death", "zh": "记录死亡", "kind": "action"},
     "act.save": {"en": "Save", "zh": "保存", "kind": "action"},
