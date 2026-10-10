@@ -103,15 +103,16 @@
     steps.forEach(function (st) {
       chain = chain.then(function () {
         var key = typeof st === 'string' ? st : st.tap, hold = typeof st === 'object' && st.hold;
-        var el = findStep(phone, key);
-        if (!el) { console.error('atlas-bare: step not found: ' + key); return; }
-        if (hold) {
-          var o = { bubbles: true, cancelable: true, button: 0, pointerId: 1, pointerType: 'mouse', isPrimary: true };
-          var PE = el.ownerDocument.defaultView.PointerEvent;
-          el.dispatchEvent(new PE('pointerdown', o));
-          return wait(hold).then(function () { el.dispatchEvent(new PointerEvent('pointerup', o)); });
-        }
-        el.click();
+        return findWait(phone, key).then(function (el) {
+          if (!el) { console.error('atlas-bare: step not found: ' + key); return; }
+          if (hold) {
+            var o = { bubbles: true, cancelable: true, button: 0, pointerId: 1, pointerType: 'mouse', isPrimary: true };
+            var PE = el.ownerDocument.defaultView.PointerEvent;
+            el.dispatchEvent(new PE('pointerdown', o));
+            return wait(hold).then(function () { el.dispatchEvent(new PE('pointerup', o)); });
+          }
+          el.click();
+        });
       }).then(frames).then(function () { return wait(60); });
     });
     return chain;
