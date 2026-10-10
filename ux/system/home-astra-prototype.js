@@ -66,6 +66,9 @@
   const pendingExamples=[{title:'Pregnancy check · 000308',context:'Gestation · Unit 7 · Batch 31',time:'09:32'},{title:'Pen note · C2',context:'Gestation · Unit 8',time:'09:35'},{title:'Feed adjustment · 000267',context:'Gestation · Unit 7 · Pen C1',time:'09:38'}];
   const sync={connection:params.get('connection')==='online'?'online':'offline',pending:[...pendingExamples],status:'waiting',message:'',attempt:0};
   if(params.get('view')==='sections')state.page='sections';
+  // Atlas-only start states for the screens a tap cannot reach (typing an answer): ?answered=1 (answer on file), ?view=finding.
+  if(params.get('answered')==='1'){state.answered=true;state.answer='Unit 8, pen B3';}
+  if(params.get('view')==='finding')state.page='finding';
   if(params.get('view')==='unit'){const available=sections.find(s=>s.id===initialSection).units;state.unit=available.includes(+params.get('unit'))?+params.get('unit'):available[0];}
   const app = $('#app'), overlay = $('#overlay');
   let returnFocus = null, toastTimer, navStack = [];
@@ -241,11 +244,17 @@
   // The atlas follows the demo (?screen=): the screen whose url holds this scope (view, section, unit, work, attention), else null.
   function atlasScreen(screens){
     const dr=overlay.querySelector('.sheet,.dialog');
-    if(state.page==='environment')return unitDevices()[0]?.draftMode==='manual'?'environment.fan-manual':'environment.page';
+    if(state.page==='environment')return unitDevices()[0]?.draftMode==='manual'?'environment.fan-manual':state.sensorRange==='week'?'environment.sensor-week':(state.sensor||0)>0?'environment.sensor-other':'environment.page';
+    if(state.page==='assistant')return state.assistantTab==='chat'?(state.chat.length?'assistant.conversation':'assistant.conversations'):state.answered?'assistant.up-to-date':'assistant.needs-you';
+    if(state.page==='finding')return state.answered?'assistant.answered':'assistant.finding';
+    if(state.page==='toolbox'&&!dr)return 'workbench.toolbox';
+    if(state.page==='records')return 'workbench.records';
     if(state.page==='maintenance'){if(dr)return dr.querySelector('#fault-form')?'environment.report-issue':maintenanceRecords().find(f=>f.id===state.faultId)?.resolved?'environment.issue-resolved':'environment.issue-detail';return maintenanceRecords().length?'environment.maintenance':'environment.maintenance-empty';}
     if(dr){
       if(dr.classList.contains('unit-picker'))return 'workbench.choose-unit';
-      if(dr.classList.contains('sync-drawer'))return 'workbench.saved-work';
+      if(dr.classList.contains('sync-drawer'))return sync.pending.length?(sync.status==='failed'?'data-sync.failed':'data-sync.list'):'data-sync.upload';
+      if(dr.querySelector('#lookup-form'))return dr.querySelector('#tag')?'find-pig.scan':'find-pig.search';
+      if((dr.querySelector('[data-action="lookup-result"]')||/No matching sample pig/.test(dr.textContent)))return 'find-pig.results';
       return state.page==='placeholder'&&dr.querySelector('[data-action="confirm-end-task"]')?'workbench.end-task-early':null;
     }
     if(state.page==='placeholder'){const t=task();return t.completedAt||t.terminatedAt?'workbench.closed-task':taskModel(t).state==='ready'?'workbench.task-ready':'workbench.task-preview';}

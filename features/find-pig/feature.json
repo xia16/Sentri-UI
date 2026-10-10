@@ -1,0 +1,165 @@
+{
+  "id": "find-pig",
+  "name": "Find a pig",
+  "zh": "查找猪只",
+  "platform": "mobile",
+  "section": "pigs",
+  "newFeature": true,
+  "duplicates": "",
+  "groups": [
+    [
+      "Looking up",
+      [
+        "find-pig.search",
+        "find-pig.scan",
+        "find-pig.results"
+      ]
+    ]
+  ],
+  "entryPoints": [
+    {
+      "section": "Home",
+      "label": "via Toolbox",
+      "from": "workbench.toolbox",
+      "control": "Find a pig or pen",
+      "lands": "find-pig.search"
+    },
+    {
+      "section": "Home",
+      "label": "via the Scan button",
+      "from": "workbench.today",
+      "control": "Scan (bottom bar)",
+      "lands": "find-pig.scan"
+    }
+  ],
+  "addsTo": [],
+  "flow": [
+    [
+      "find-pig.search",
+      "find-pig.results",
+      "search"
+    ],
+    [
+      "find-pig.scan",
+      "find-pig.results",
+      "scan or use a sample tag"
+    ]
+  ],
+  "screens": [
+    {
+      "id": "find-pig.search",
+      "name": "Find a pig or pen",
+      "zh": "查找猪只或猪栏",
+      "status": "in-design",
+      "url": "/ux/system/home-astra-prototype.html?section=gestation",
+      "steps": [
+        "Toolbox",
+        "Find a pig or pen"
+      ],
+      "notes": {
+        "purpose": "A drawer that looks a sample pig or pen up by ear tag or pen code.",
+        "states": [],
+        "elements": [
+          {
+            "name": "Search field",
+            "at": "Ear tag or pen code",
+            "shows": "One field for a tag or a pen code",
+            "rule": "Required, up to 30 characters. Matches a whole ear tag or a whole pen code (case-insensitive); a part of a tag finds nothing.",
+            "logic": "The study searches the sample task records only (every pig of every task, Units 1-13); it does not read the real pig list.",
+            "source": "lookup()"
+          }
+        ],
+        "controls": [],
+        "copy": [
+          "(raw)"
+        ],
+        "edge": [],
+        "rules": [],
+        "issues": [
+          "Ear notch search (named in the Pigs section) is not offered.",
+          "The footer action (Search sample records) has no visible label (see the filed broken item)."
+        ]
+      }
+    },
+    {
+      "id": "find-pig.scan",
+      "name": "Scan an ear tag",
+      "zh": "扫描耳标",
+      "status": "in-design",
+      "url": "/ux/system/home-astra-prototype.html?section=gestation",
+      "steps": [
+        "Scan"
+      ],
+      "notes": {
+        "purpose": "A drawer for reading an ear tag with the camera or tag reader.",
+        "states": [],
+        "elements": [
+          {
+            "name": "Scanner and tag field",
+            "at": "Scanner preview.",
+            "shows": "Camera frame, a tag field and \"Use a sample tag\"",
+            "rule": "Camera and tag-reader hardware are not connected; the sample tag button runs the same lookup with a known tag (000302).",
+            "source": "scan()"
+          }
+        ],
+        "controls": [],
+        "copy": [
+          "(raw)"
+        ],
+        "edge": [
+          "Camera denied, tag unreadable and torn-tag cases are not drawn."
+        ],
+        "rules": [],
+        "issues": [
+          "The footer action and \"Use a sample tag\" are drawn as unstyled buttons (see the filed broken item)."
+        ]
+      }
+    },
+    {
+      "id": "find-pig.results",
+      "name": "Search results",
+      "zh": "搜索结果",
+      "status": "in-design",
+      "url": "/ux/system/home-astra-prototype.html?section=gestation",
+      "steps": [
+        "Scan",
+        "Use a sample tag"
+      ],
+      "notes": {
+        "purpose": "The matching pigs, each opening the work it belongs to.",
+        "states": [],
+        "elements": [
+          {
+            "name": "Result row",
+            "at": "Pen A",
+            "shows": "\"<tag> · Pen <pen>\" with \"Unit N · task · batch\"",
+            "states": [
+              {
+                "state": "Matches",
+                "when": "The tag or pen code matches",
+                "shows": "Up to 12 rows (a pen code can match several pigs in many tasks)"
+              },
+              {
+                "state": "No match",
+                "when": "Nothing matches",
+                "shows": "\"No matching sample pig or pen. Try the suggested sample tag or pen A1.\" and Search again"
+              }
+            ],
+            "logic": "A row opens the task that holds the pig, in its unit: Farrowing and Piglet processing open their prototypes; any other task opens the task stand-in. It does not open the pig's record.",
+            "source": "lookup(); lookup-result"
+          }
+        ],
+        "controls": [],
+        "copy": [
+          "(raw)"
+        ],
+        "edge": [],
+        "rules": [],
+        "issues": [
+          "A result opens the task, not the pig (see Pig profile).",
+          "The no-match state needs typed text and is not reachable in the atlas."
+        ]
+      }
+    }
+  ]
+}

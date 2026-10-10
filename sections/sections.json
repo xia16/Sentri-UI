@@ -75,7 +75,7 @@
           "id": "sync",
           "name": "Data sync",
           "zh": "数据同步",
-          "shared": "Not written yet."
+          "shared": "Records made on the phone wait there until the worker uploads them: Home shows a saved-work card, the Saved work drawer lists what waits, and upload is explicit and never loses a record. Draft from the Home study; the old design's per-pig and per-treatment detail is not built."
         }
       ]
     },
