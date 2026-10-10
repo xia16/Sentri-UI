@@ -56,6 +56,8 @@ Example: draft one death, tap Back, reopen. The draft is still there, the saved 
 
 A leaf the screens can't run is marked **blocked** with the reason. A screenshot alone never counts as covering a leaf.
 
+The file format (the tree of entry, state, action, outcome and decision-blocker nodes), the assertion kinds and the runner's results are in [scenarios.md](../scenarios.md). Farrowing's slice: `features/farrowing/scenario-tree.md` and `features/farrowing/scenarios.json`.
+
 ## 4. Grading per screen state
 
 Score each dimension **0, 1 or 2**, with evidence (a screenshot and what is wrong) for every point lost:
