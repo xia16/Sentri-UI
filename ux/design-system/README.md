@@ -79,7 +79,7 @@ Barn, glare, gloves, arm's length, two seconds. Every screen is read this way, s
 - **Type.** Primary values and body text are at least 16px. Secondary and meta text are at least 13px. Nothing visible is under 13px except the phone's own status bar.
 - **Contrast.** At least 4.5:1 for all text, and at least 7:1 for primary values and the numbers a farmer acts on. Ink, not pale grey, for anything that must be read. `muted` holds 4.5:1 on `paper`, `app-background`, `inset` and `well` only.
 - **Targets.** Every tap target is at least 48 by 48 (the control itself, or an invisible hit area).
-- **A state is never greyed out.** A tile or row that cannot be used says so in a word or an icon on a quiet surface, and its text stays at 4.5:1. Labels never wrap in a tile; shorten the copy or give the tile room.
+- **Disabled is not faded.** A disabled or waiting control (a greyed button, a pen tile, a row) shows that it is unavailable with its surface, its rim, an icon or a word, never with faded text. Its text meets 4.5:1 like any other (`ink` on the disabled surface; 7:1 at 16px and up). The checker measures disabled text too. Labels never wrap in a tile; shorten the copy or give the tile room.
 - **Crowding is fixed by tightening copy and layout, never by shrinking type.**
 
 ### The row

@@ -17,11 +17,11 @@
 body{margin:0;background:var(--ground);color:var(--ink);font:var(--font-size-14) var(--font-sans);-webkit-font-smoothing:antialiased}
 button,input,select{font:inherit}
 button{cursor:pointer;color:inherit;border:0}
-button:disabled,button[aria-disabled=true]{cursor:default;color:var(--disabled-ink);background:var(--disabled-surface);border-color:var(--disabled-border)}
+button:disabled,button[aria-disabled=true]{cursor:default;color:var(--ink);background:var(--disabled-surface);border-color:var(--disabled-border)}
 svg{width:var(--size-20);height:var(--size-20);display:block;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:var(--icon-stroke);stroke-linecap:round;stroke-linejoin:round;pointer-events:none}
 .button{min-height:var(--tap-min);min-width:var(--tap-min);padding:var(--space-10) var(--space-17);display:flex;align-items:center;justify-content:center;gap:var(--space-7);border:var(--border-width) solid var(--control-border);background:var(--paper);border-radius:var(--radius-control);font-weight:var(--type-weight-strong);font-size:var(--type-button-size);text-align:center;line-height:1.3}
 .button.primary{flex:1;background:var(--ink);border-color:var(--ink);color:var(--paper)}
-.button.primary:disabled{background:var(--disabled-fill);border-color:var(--disabled-fill);color:var(--disabled-ink)}
+.button.primary:disabled{background:var(--disabled-fill);border-color:var(--disabled-border);color:var(--ink)}
 .button.secondary{min-width:var(--back-width);font-weight:600}
 .button:active:not(:disabled){transform:translateY(var(--size-2))}
 .button.danger:not(:disabled):not([aria-disabled="true"]){background:var(--red);border-color:var(--red)}
@@ -525,9 +525,9 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 .button:not([aria-disabled="true"])[data-preview~="pressed"]{filter:brightness(.96);transform:translateY(var(--size-2))}
 .st-text-action.st-text-action{justify-content:center;min-width:var(--tap-min)}
 .st-text-action:not([aria-disabled="true"]):is(:active,[data-preview~="pressed"]){color:var(--ink);background:var(--press);border-radius:var(--radius-control)}
-.st-text-action.st-text-action[aria-disabled="true"]{color:var(--disabled-ink);background:transparent;cursor:default}
+.st-text-action.st-text-action[aria-disabled="true"]{color:var(--muted);background:transparent;cursor:default}
 /* waiting: present, quiet, focusable (aria-disabled); outranks every register's fill */
-.button.button[aria-disabled="true"]{background:var(--disabled-fill);border-color:var(--disabled-fill);color:var(--disabled-ink);cursor:default;filter:none;transform:none}
+.button.button[aria-disabled="true"]{background:var(--disabled-fill);border-color:var(--disabled-border);color:var(--ink);cursor:default;filter:none;transform:none}
 .button[data-busy]{cursor:progress}
 /* hold: the sweep fills the button over hold-commit; the caption rides under the verb */
 .button.st-hold{position:relative;overflow:hidden;flex-direction:column;gap:var(--space-4);touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
@@ -961,3 +961,5 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 .st-banner[data-tone="danger"] .st-banner-headline{color:var(--red-ink)}
 /* A landmark focused by script (tabindex=-1: a list, a sheet) is not a control: no ring. */
 :is(.phone,.tk-phone,.atlas-phone,.device,.st-phone,.sp-phone,[data-st-context]) [tabindex="-1"]:focus{outline:none}
+/* A waiting or disabled control says so with its surface and rim; its text stays readable (4.5:1, farm legibility law). */
+.st-hold[aria-disabled="true"] :is(.st-hold-label,.st-hold-caption){color:var(--ink);opacity:1}

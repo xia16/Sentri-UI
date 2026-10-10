@@ -229,7 +229,7 @@ body:has(#detail) #detail .lifecycle-actions [data-confirm-end] {
 .device :is(.farm-label,.assistant-door,.scope-overview,.scope-unit,.scope-unit>span,.scope-switch button,.today-caption,.today-caption>span>span,.today-caption small,.hc-heading small,.hc-action-label,.hc-action-copy>small,.hc-progress-caption,.hc-progress-caption *,.hc-legend,.hc-progress-note,.hc-route,.hc-exception,.hc-footer,.hc-quiet-line,.hc-complete-copy small,.hc-complete-copy strong,.hc-ready-cta,.task-card>.group-heading h3,.unit-population,.unit-population small,.unit-last-check,.unit-facts,.checked,.unit-inspect,.unit-attention-chip>span,.unit-attention-chip>strong,.unit-attention-clear,.unit-attention-unknown,.unit-hub-facts,.unit-hub-facts small,.bottom-nav button,.bottom-nav .scan-button,.unit-picker .unit-picker-count,.sync-summary p){font-size:13px}
 .device .unit-population small{display:block}
 .device .farm-label{letter-spacing:.02em}
-.device :is(.bottom-nav button:not(.active),.hc-action-copy>small,.hc-footer,.hc-route,.hc-quiet-line){color:var(--muted)}
+.device :is(.bottom-nav button:not(.active):not(.scan-button),.hc-action-copy>small,.hc-footer,.hc-route,.hc-quiet-line){color:var(--muted)}
 .device .scope-switch button:not([aria-pressed="true"]){color:var(--ink-2)}
 .device :is(.work-section-heading>span,.uhi-title small,.unit-hub-inspect .unit-check-row>small,.unit-hub-unified .unit-hub-inspect .uhi-title small,.unit-environment-label){font-size:13px}
 .device .bottom-nav .scan-button{color:#fff}

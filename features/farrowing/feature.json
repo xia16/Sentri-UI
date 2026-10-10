@@ -2460,7 +2460,7 @@
             "name": "Parity",
             "at": "Parity",
             "shows": "Five facets: Any, 0, 1, 2–5, 6+.",
-            "logic": "Matches the parity number stored on the sow (\"Use the parity recorded on the sow's profile\"). The buckets are browsing conveniences, not risk bands.",
+            "logic": "Matches the parity number stored on the sow. The buckets are browsing conveniences, not risk bands.",
             "source": "farrowing-astra-concept.js matchesRoomFilter(); ASTRA-FARROWING-FILTERS.md"
           },
           {
@@ -2494,8 +2494,8 @@
         "elements": [
           {
             "name": "Pen cell",
-            "at": "Tap a pen to go to its sows. Hold to peek.",
-            "shows": "Pen code and one fact line for the sows now visible in that pen.",
+            "at": "B1",
+            "shows": "Pen code and one fact line for the sows now visible in that pen. One line, never wrapped.",
             "states": [
               {
                 "state": "Active",
@@ -2515,17 +2515,17 @@
               {
                 "state": "Due",
                 "when": "Awaiting sows only",
-                "shows": "\"Due today\", or the first sow's due text (\"Due tomorrow\")"
+                "shows": "\"Due today\", or the first sow's due text without \"Due\" (\"Tomorrow\", \"In 2 days\")"
               },
               {
-                "state": "No matches",
+                "state": "No match",
                 "when": "The pen has task sows but none pass the current tab and filter",
-                "shows": "Greyed, disabled"
+                "shows": "Disabled, but readable: a quiet surface, the pen name in ink, the word in muted ink"
               },
               {
-                "state": "Not in task",
+                "state": "No sows",
                 "when": "No task sow in the pen",
-                "shows": "Greyed, disabled"
+                "shows": "Disabled, but readable: a quiet surface, the pen name in ink, the word in muted ink"
               },
               {
                 "state": "Current",
@@ -2539,10 +2539,10 @@
           }
         ],
         "edge": [
-          "A pen hidden by the filter stays on the map as \"No matches\" and is not selectable; the room list gives the way back (\"Show sows\")."
+          "A pen hidden by the filter stays on the map as \"No match\" and is not selectable; the room list gives the way back (\"Show sows\")."
         ],
         "issues": [
-          "The map is taller than the phone: rows 5 and 6 and the line \"Pen layout · only pens matching this view can be opened.\" sit below the fold."
+          "The map is taller than the phone: rows 5 and 6 sit below the fold on a small phone."
         ]
       }
     },
@@ -2562,7 +2562,7 @@
         "states": [
           "No notices: only the four tool rows.",
           "A note on the pen: a \"Note\" notice above the tools, opening the note.",
-          "An open equipment fault: an amber \"Equipment\" notice (device, description, \"Open · Reported 09:41 · G. Hansen\") opening the fault.",
+          "An open equipment fault: an amber \"Equipment\" notice (device, description, \"Open · Reported 09:41 · G.H\") opening the fault.",
           "Both: faults first, then the note."
         ],
         "elements": [
@@ -2692,7 +2692,7 @@
             "name": "Edit note",
             "at": "Edit note",
             "shows": "Primary action on a read-only page.",
-            "rule": "Opens the pen note editor with the current text; reading never changes the note. The stamp (\"G. Hansen · Today · 09:41\") is fixed sample text in the prototype.",
+            "rule": "Opens the pen note editor with the current text; reading never changes the note. The stamp (\"G.H · Today · 09:41\") is fixed sample text in the prototype.",
             "source": "farrowing-astra-concept.js penSubpage(), room-pen-note"
           }
         ],
@@ -2794,7 +2794,7 @@
       "notes": {
         "purpose": "Read one equipment fault and, while it is open, resolve it.",
         "states": [
-          "Open: description, \"Open · Reported 09:41 · G. Hansen\", an optional Resolution note and \"Resolve fault\".",
+          "Open: description, \"Open · Reported 09:41 · G.H\", an optional Resolution note and \"Resolve fault\".",
           "Resolved: description, the resolution text and \"Resolved · Reported …\"; no action.",
           "Not found: \"No fault found.\""
         ],
@@ -2876,7 +2876,7 @@
           {
             "name": "Scanner preview",
             "at": "Scanner preview",
-            "shows": "A placeholder frame: \"Camera scanning isn't connected in this prototype.\"",
+            "shows": "A placeholder frame, \"Scanner preview\", with a \"Try sample tag\" button.",
             "rule": "\"Try sample tag\" opens the unit's first sow (000418). Below the frame, the same field and results as Find a sow take a typed tag or pen.",
             "source": "farrowing-astra-concept.js roomScan, room-demo-scan; ASTRA-ROOM-PAGE-AUDIT.md"
           }
@@ -3132,7 +3132,7 @@
                 "shows": "\"In 2 days\" (Day 5, Health check)"
               }
             ],
-            "logic": "The day labels are computed against a fixed sample \"today = day 3\". Ticking an item sets its meta to \"This visit · G. Hansen\"; un-ticking restores \"Due today\" or \"In 2 days\".",
+            "logic": "The day labels are computed against a fixed sample \"today = day 3\". Ticking an item sets its meta to \"This visit · G.H\"; un-ticking restores \"Due today\" or \"In 2 days\".",
             "rule": "Nothing is saved on a tick: \"Save care updates\" is disabled until something changes and writes one history entry, \"Piglet processing updated · n of 5 items done\". Due items stay visible until the litter is saved.",
             "source": "farrowing-astra-concept.js processingCare(), saveProcessing"
           }
