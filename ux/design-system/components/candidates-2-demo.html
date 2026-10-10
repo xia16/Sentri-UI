@@ -41,13 +41,12 @@
   var tools = '<div class="demo-pair">' + b({ id: 'act.record_dead', register: 'tool', action: 'open-dead', value: 'tool-a' }) + b({ id: 'pp.count.title', register: 'tool', action: 'open-count', value: 'tool-b' }) + '</div>';
   var text = '<div class="demo-right">' + b({ id: 'act.clear', register: 'text', action: 'clear', value: 'text-a' }) + '</div>';
   function waiting(key) {
-    return '<div class="demo-bar">' + UI.buttonReason({ id: 'why-' + key, text: '', strs: { text: D + 'reason_cause' } }) +
-      back() + b({ id: 'act.save', register: 'primary', action: 'save', value: key, waiting: true, describedby: 'why-' + key }) + '</div>';
+    return '<div class="demo-bar">' + back() + b({ id: 'act.save', register: 'primary', action: 'save', value: key, waiting: true }) + '</div>';
   }
   // A hold: its progress echoes in a status line above the bar, outside the thumb's footprint.
   function hold(o) {
     var line = 'line-' + o.val;
-    return '<div class="demo-bar">' + UI.buttonReason({ id: line, text: '', strs: o.line ? { text: o.line } : undefined }) + back() +
+    return '<div class="demo-bar">' + back() +
       UI.holdButton({ label: '', caption: '', phase: o.phase || 'idle', value: o.val, tone: o.tone, waiting: o.waiting, describedby: o.waiting ? line : '', statusId: o.waiting ? '' : line,
         strs: { label: o.label || 'pp.end.act.end', caption: o.cap }, args: { label: o.labelArgs } }) + '</div>';
   }

@@ -1,0 +1,140 @@
+{
+  "feature": "farrowing",
+  "baseline": "http://localhost:4386",
+  "branch": "http://localhost:4388",
+  "size": "390x844",
+  "screens": {
+    "farrowing.room": {
+      "note": "Allowed: the All tab is weight 700 (#88); the dock Pen glyph is the registry grid with its broken path fixed (#81).",
+      "pixels": 166,
+      "maxDelta": 224,
+      "status": "differs",
+      "diff": "review/compare-farrowing/farrowing.room.diff.png"
+    },
+    "farrowing.count": {
+      "note": "Anti-aliasing of the \"more actions\" dots (the registry draws them as circles; same size, same place; max channel delta 5).",
+      "pixels": 15,
+      "maxDelta": 5,
+      "status": "differs",
+      "diff": "review/compare-farrowing/farrowing.count.diff.png"
+    },
+    "farrowing.before": {
+      "note": "Same as count: the \"more actions\" dots only (max delta 5).",
+      "pixels": 15,
+      "maxDelta": 5,
+      "status": "differs",
+      "diff": "review/compare-farrowing/farrowing.before.diff.png"
+    },
+    "farrowing.death": {
+      "note": "Allowed: selected segment weight 700 on the paper face (#88); stepper draft value in ink and \"+1 unsaved\" muted beside the label (#88). The rest is Text anti-aliasing only (geometry identical; Chrome rasterises the same glyphs grayscale vs sub-pixel).",
+      "pixels": 1801,
+      "maxDelta": 224,
+      "status": "differs",
+      "diff": "review/compare-farrowing/farrowing.death.diff.png"
+    },
+    "farrowing.finish": {
+      "note": "Identical.",
+      "pixels": 0,
+      "maxDelta": 0,
+      "status": "identical"
+    },
+    "farrowing.blocked": {
+      "note": "Text anti-aliasing only (geometry identical; Chrome rasterises the same glyphs grayscale vs sub-pixel). Banner is the baseline's amber line (11/10px, \"Review ›\").",
+      "pixels": 2227,
+      "maxDelta": 84,
+      "status": "differs",
+      "diff": "review/compare-farrowing/farrowing.blocked.diff.png"
+    },
+    "farrowing.locked": {
+      "note": "Allowed: the All tab of the room underneath is weight 700 (#88). The \"more actions\" dots anti-alias differently.",
+      "pixels": 271,
+      "maxDelta": 41,
+      "status": "differs",
+      "diff": "review/compare-farrowing/farrowing.locked.diff.png"
+    },
+    "farrowing.edit": {
+      "note": "The Clear text action and one-pixel text placement (Text anti-aliasing only (geometry identi...); the Save label is the baseline's.",
+      "pixels": 229,
+      "maxDelta": 81,
+      "status": "differs",
+      "diff": "review/compare-farrowing/farrowing.edit.diff.png"
+    },
+    "farrowing.born": {
+      "note": "Allowed: no designed focus ring (#84) - the dialog opens with the browser default on the first radio row, the baseline drew a blue ring. The rest is Text anti-aliasing only (geometry identical; Chrome rasterises the same glyphs grayscale vs sub-pixel).",
+      "pixels": 5190,
+      "maxDelta": 239,
+      "status": "differs",
+      "diff": "review/compare-farrowing/farrowing.born.diff.png"
+    },
+    "farrowing.history": {
+      "note": "Allowed (#81): the seed event reads \"Aug 28\", the baseline said \"5 days ago\" (a relative date that was wrong in a static preview). The rest is Text anti-aliasing only (geometry identical; Chrome rasterises the same glyphs grayscale vs sub-pixel).",
+      "pixels": 420,
+      "maxDelta": 159,
+      "status": "differs",
+      "diff": "review/compare-farrowing/farrowing.history.diff.png"
+    },
+    "farrowing.ended": {
+      "note": "Allowed: the All tab of the room underneath is weight 700 (#88). The \"more actions\" dots anti-alias differently.",
+      "pixels": 271,
+      "maxDelta": 42,
+      "status": "differs",
+      "diff": "review/compare-farrowing/farrowing.ended.diff.png"
+    },
+    "farrowing.task-blocked": {
+      "note": "One pixel of text anti-aliasing.",
+      "pixels": 1,
+      "maxDelta": 21,
+      "status": "differs",
+      "diff": "review/compare-farrowing/farrowing.task-blocked.diff.png"
+    },
+    "farrowing.task-ready": {
+      "note": "A few pixels of text anti-aliasing.",
+      "pixels": 1,
+      "maxDelta": 21,
+      "status": "differs",
+      "diff": "review/compare-farrowing/farrowing.task-ready.diff.png"
+    },
+    "farrowing.task-complete": {
+      "note": "Identical.",
+      "pixels": 0,
+      "maxDelta": 0,
+      "status": "identical"
+    },
+    "farrowing.task-outcomes": {
+      "note": "One pixel of text anti-aliasing.",
+      "pixels": 1,
+      "maxDelta": 21,
+      "status": "differs",
+      "diff": "review/compare-farrowing/farrowing.task-outcomes.diff.png"
+    },
+    "farrowing.edit-finished": {
+      "note": "Same as edit: the Clear text action, anti-aliasing only.",
+      "pixels": 229,
+      "maxDelta": 81,
+      "status": "differs",
+      "diff": "review/compare-farrowing/farrowing.edit-finished.diff.png"
+    },
+    "farrowing.overview": {
+      "note": "Allowed (#81): the Choose-a-unit glyph is the registry grid with its broken path fixed.",
+      "pixels": 62,
+      "maxDelta": 145,
+      "status": "differs",
+      "diff": "review/compare-farrowing/farrowing.overview.diff.png"
+    },
+    "farrowing.task-receipt": {
+      "note": "Identical.",
+      "pixels": 0,
+      "maxDelta": 0,
+      "status": "identical"
+    },
+    "farrowing.foster": {
+      "note": "No baseline: a screen added after the approved baseline (not in 6e6c940), so nothing to match. Shown only so the list is complete.",
+      "status": "no-baseline"
+    },
+    "farrowing.reconcile": {
+      "note": "No baseline: a screen added after the approved baseline (not in 6e6c940), so nothing to match.",
+      "status": "no-baseline"
+    }
+  },
+  "summary": "Every screen with a baseline is pixel-identical or differs only by an allowed delta (#84 #88 #70 #81) or by text anti-aliasing; the reason line is removed everywhere. See each note."
+}

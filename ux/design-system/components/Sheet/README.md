@@ -63,7 +63,7 @@ A **page** has a status bar in place of the grab and scrim, no ✕, and its head
 | Default | Over its scrim (drawer), on the canvas (page) or over a dimmed phone (dialog). |
 | Pressed | The ✕ takes `press`; Back takes `back-press`; the primary darkens and moves 1px (the Button's own). The sheet itself has none. |
 | Selected / active | Not applicable to a sheet. |
-| Disabled | The primary takes the waiting face (aria-disabled, still focusable), and the status line states the reason: a verb phrase naming what is missing (`Say how many died`, `Pick a pen first`). Never a bare grey button. |
+| Disabled | The primary takes the waiting face (aria-disabled, still focusable) and stands alone: no reason line above the bar. |
 | Error | A `red` status line says what is wrong and how to fix it (`48 kg is over the scale limit · check the number`); the primary waits. |
 | Loading | Not drawn. A hold that was sent shows its pending phase; the sheet stays. |
 | Empty | The body holds the empty line of what it contains (`Nothing selected yet. Tap a pig in the list to add it.`). |

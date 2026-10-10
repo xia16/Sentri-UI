@@ -12,7 +12,7 @@ Use [Button](../Button/README.md) for Record, Move or Set count. Use [ChoiceList
 
 ## Anatomy
 
-48 × 48 container; registry glyph (decorative to assistive technology); accessible label; optional count badge; optional selected check; optional persistent reason line outside the target.
+48 × 48 container; registry glyph (decorative to assistive technology); accessible label; optional count badge; optional selected check; no reason line outside the target.
 
 ## Variants
 
@@ -27,7 +27,7 @@ Use [Button](../Button/README.md) for Record, Move or Set count. Use [ChoiceList
 | --- | --- |
 | Default | Label or glyph at rest. |
 | Pressed | Visible press fill / darkening and movement; static examples use `data-preview="pressed"`. |
-| Disabled | Persistent text reason via `reason` or `describedby`; never colour alone. Prefer omitting unavailable acts. |
+| Disabled | The disabled face stands alone (no reason line); never colour alone. Prefer omitting unavailable acts. |
 | Long / Chinese | The target stays 48 x 48; the accessible name stays complete in both languages. |
 | Selected | Optional `aria-pressed` plus a visible check, for the breeder mark. |
 | Badge | Count is visible and included in the accessible name, e.g. “Filter pigs, 2 applied”. |
@@ -63,7 +63,7 @@ Geometry/type: `tap-min`, `radius-control`, `border-width`, `size-2`, `size-3`, 
 | Component | Relationship |
 | --- | --- |
 | [Button](../Button/README.md) | Labelled acts; IconButton is the glyph-only counterpart. |
-| [Sheet](../Sheet/README.md) | Positions footer actions and one reason line; drawer close is plain IconButton. |
+| [Sheet](../Sheet/README.md) | Positions footer actions; drawer close is plain IconButton. |
 | [ChoiceList](../ChoiceList/README.md) | Select outcomes instead of executing an act. |
 | [Icons](../../assets/Icons/README.md) | Shared glyph registry. |
 

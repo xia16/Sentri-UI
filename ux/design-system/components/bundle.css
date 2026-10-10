@@ -786,7 +786,7 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
 .st-stepper[data-variant="row"] .st-stepper-label{font:500 15px/normal var(--font-sans)}
 .st-stepper[data-variant="row"] .st-stepper-keys{gap:8px;align-self:center}
 .st-stepper[data-variant="row"] .st-stepper-key.st-stepper-key{width:44px;min-width:44px;min-height:44px;align-self:center}
-.st-stepper[data-variant="row"] .st-stepper-face{width:44px;height:44px;min-width:44px;min-height:44px;border-radius:12px;border-color:var(--key)}
+.st-stepper[data-variant="row"] .st-stepper-face{width:44px;height:44px;min-width:44px;min-height:44px;border-radius:12px;border-color:var(--task-key-border)}
 .st-stepper[data-variant="row"] .st-stepper-face svg{width:17px;height:17px;stroke-width:2.2}
 .st-stepper[data-variant="row"] .st-stepper-key[aria-disabled="true"] .st-stepper-face{background:var(--disabled-surface);border-color:var(--disabled-border);color:var(--disabled-ink)}
 .st-stepper[data-variant="row"][data-zero] .st-stepper-value{color:var(--ink)}
@@ -830,7 +830,7 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
 .st-stepper[data-variant="bare"] .st-stepper-copy{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .st-stepper[data-variant="bare"] .st-stepper-keys{gap:8px;align-self:center}
 .st-stepper[data-variant="bare"] .st-stepper-key.st-stepper-key{width:44px;min-width:44px;min-height:44px;align-self:center}
-.st-stepper[data-variant="bare"] .st-stepper-face{width:44px;height:44px;min-width:44px;min-height:44px;border-radius:12px;border-color:var(--key)}
+.st-stepper[data-variant="bare"] .st-stepper-face{width:44px;height:44px;min-width:44px;min-height:44px;border-radius:12px;border-color:var(--task-key-border)}
 .st-stepper[data-variant="bare"] .st-stepper-face svg{width:17px;height:17px;stroke-width:2.2}
 .st-stepper[data-variant="bare"] .st-stepper-key[aria-disabled="true"] .st-stepper-face{background:var(--disabled-surface);border-color:var(--disabled-border);color:var(--disabled-ink)}
 .st-stepper[data-variant="bare"] .st-stepper-value{display:block;min-width:45px;min-height:0;font:600 25px/normal var(--font-mono);color:var(--ink)}

@@ -24,12 +24,13 @@ test('sheet page: no scrim, no grab, no ✕, one Back; dialog: backdrop, no ✕'
   assert.match(dlg, /^<div class="dialog-backdrop"/);
   assert.doesNotMatch(dlg, /sheet-close|class="grab"/);
 });
-test('sheet footer: a waiting primary draws its reason and is described by it; a plain status stays hidden', () => {
+test('sheet footer: a waiting primary has no reason line; a status is drawn only when visible or carrying an action', () => {
   const waiting = UI.sheetFooter({ primary: { label: 'Save', action: 's', waiting: true }, status: { text: 'Say how many died', id: 'why' } });
-  assert.match(waiting, /<p class="sheet-status" id="why" role="status"/);
-  assert.match(waiting, /aria-disabled="true"[^>]*aria-describedby="why"|aria-describedby="why"[^>]*aria-disabled="true"/);
-  const quiet = UI.sheetFooter({ primary: { label: 'Save', action: 's' }, status: { text: 'x', id: 'q' } });
-  assert.match(quiet, /sheet-status st-visually-hidden/);
+  assert.doesNotMatch(waiting, /sheet-status|role="status"|aria-describedby|Say how many died/);
+  assert.match(waiting, /aria-disabled="true"/);
+  const shown = UI.sheetFooter({ primary: { label: 'Save', action: 's' }, status: { text: 'Saving', id: 'q', visible: true } });
+  assert.match(shown, /<p class="sheet-status" id="q" role="status"/);
+  assert.match(shown, /aria-describedby="q"/);
 });
 test('sheet footer: Back alone fills the bar; two controls at most', () => {
   const f = UI.sheetFooter({ back: { action: 'back' }, primary: { label: 'Go', action: 'go' } });

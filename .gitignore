@@ -43,3 +43,7 @@ yarn-error.log*
 /.claude/settings.local.json
 /.claude/worktrees/
 __pycache__/
+
+# screen-compare renders (scripts/compare-screens.mjs): only the diff PNGs and the JSON are kept
+review/compare-*/*.base.png
+review/compare-*/*.branch.png

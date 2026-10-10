@@ -399,9 +399,9 @@ export interface BannerProps {
   /** danger: red wash and border, red 700 headline (an irreversible act, a terminal fact).
    *  correction: amber review; notice: pending state such as offline upload. */
   tone?: 'danger' | 'correction' | 'notice';
-  door?: { action?: string; value?: string; label?: string };
+  door?: { action?: string; value?: string; label?: string; text?: string };
   icon?: string;
-  size?: 'small' | '';
+  size?: 'small' | 'inline' | 'card' | '';
   state?: string;
   reason?: string;
   detail?: string | { html: string };
@@ -451,13 +451,12 @@ export interface PhotosProps {
   strs?: Strs<'label' | 'optional' | 'hint' | 'camera' | 'thumb' | 'thumbPending' | 'index'>;
   args?: StrArgs<'label' | 'optional' | 'hint' | 'camera'>;
 }
-export type ButtonRegister = 'primary' | 'secondary' | 'tool' | 'text' | 'danger';
+export type ButtonRegister = 'primary' | 'secondary' | 'tool' | 'text' | 'danger' | 'caution';
 export interface ButtonProps {
   icon?: IconHtml;
-  reason?: string;
   disabled?: boolean;
   label: string;
-  /** primary: the one commit (ink) · secondary: an exit (outlined) · tool: a mid-sheet act (soft well, no border) ·
+  /** primary: the one commit (ink) · secondary: an exit (outlined) · tool: a mid-sheet act (slim, outlined, with its icon) ·
    *  text: the bare word (13/700 `ink-2`, ≥48px, no container) · danger. Default secondary; unknown values warn in dev. */
   register?: ButtonRegister;
   action?: string;
@@ -466,7 +465,7 @@ export interface ButtonProps {
   waiting?: boolean;
   /** Sent, until the host settles: aria-disabled + aria-busy (a row's one-tap after its first tap). */
   busy?: boolean;
-  /** The id of the buttonReason that says why it waits. */
+  /** The id of a line that describes the button (a hold's visible progress); a waiting button gets no reason line. */
   describedby?: string;
   labelledby?: string;
   id?: string;
@@ -488,7 +487,6 @@ export interface HoldButtonProps {
   phase?: HoldPhase;
   /** Waiting: aria-disabled; a press is answered (guard + onRefused), never held. */
   waiting?: boolean;
-  /** The reason a waiting hold waits. */
   describedby?: string;
   /** A status line outside the thumb's footprint (above the bar) that echoes the progress. */
   statusId?: string;
@@ -596,8 +594,7 @@ export interface SentriUI {
   optionalRow(props: { label: string; value?: string; icon?: string; editIcon?: string; action?: string; key?: string; inline?: string; open?: boolean; optionalWord?: string; editLabel?: string; disabled?: boolean; className?: string; attrs?: Record<string, string> }): string;
   button(props: ButtonProps): string;
   /** The persistent status line (row-title size) that says why a waiting button waits. */
-  buttonReason(props: { text?: string; id?: string; actions?: FieldAction[]; className?: string; strs?: Strs<'text'>; args?: StrArgs<'text'> }): string;
-  /** For delegated clicks: true when the control is aria-disabled; answers it (its reason lines flash and re-announce). */
+  /** For delegated clicks: true when the control is aria-disabled; answers it (its described lines flash and re-announce). */
   guard(el: Element | null, options?: { answer?: boolean; flash?: number }): boolean;
   /** Focus target only if focus is still inside leaving (a banner at its Undo timeout); returns whether it moved focus. */
   handFocus(leaving: Element, target: HTMLElement | null): boolean;
@@ -664,7 +661,7 @@ export interface SentriUI {
 /** Sheet: drawer | page | dialog. A text slot is a string, { text, str, args } (the string registry's twin) or { html } (trusted markup). */
 export type SheetText = string | { text?: string; str?: string; args?: Record<string, unknown>; html?: string };
 /** A Button spec for a footer; `waiting` draws the waiting face (aria-disabled), `describedby` is wired by sheetFooter's status. */
-export interface SheetAction { reason?: SheetText; label: SheetText; action?: string; value?: string; register?: 'primary' | 'secondary' | 'tool' | 'text' | 'danger'; waiting?: boolean; busy?: boolean; describedby?: string; className?: string; attrs?: SafeAttrs }
+export interface SheetAction { label: SheetText; action?: string; value?: string; register?: 'primary' | 'secondary' | 'tool' | 'text' | 'danger'; waiting?: boolean; busy?: boolean; describedby?: string; className?: string; attrs?: SafeAttrs }
 export interface SheetProps {
   /** drawer (default): over the page, sized to its content, a handle and a ✕ · page: the whole canvas, Back in the footer, no ✕ · dialog: one small decision rising from the bottom. */
   variant?: 'drawer' | 'page' | 'dialog';

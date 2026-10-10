@@ -5,6 +5,7 @@
 // <screen url>&screen=<id> (atlas-bare replays the preset and steps), screenshotted, and diffed on a canvas
 // in the page. Writes review/compare-<feature>.json (count, max channel delta, diff PNG) and diff PNGs to
 // review/compare-<feature>/. A "note" already in an existing JSON for a screen is kept (the explanation of an allowed delta).
+// ONLY=id1,id2 re-renders just those screens and keeps the rest of the JSON.
 import { createRequire } from 'node:module';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -62,7 +63,7 @@ async function diff(a, b) {
 }
 const url = (buf) => 'data:image/png;base64,' + buf.toString('base64');
 
-const result = { feature, baseline: baseUrl, branch: branchUrl, size: '390x844', screens: {} };
+const result = { feature, baseline: baseUrl, branch: branchUrl, size: '390x844', screens: only ? { ...(prev.screens || {}) } : {} };
 for (const id of ids) {
   const r = { note: prev.screens?.[id]?.note || '' };
   try {

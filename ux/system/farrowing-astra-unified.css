@@ -238,6 +238,6 @@
 /* Separate location from record context with space rather than repeated punctuation. */
 .farrowing-phone .sheet-subtitle .sow-context{display:flex;flex-wrap:wrap;column-gap:12px;row-gap:2px}
 .farrowing-phone .sow-context .sow-location{white-space:nowrap}/* The Born row's correction key (the one plain key left on the edit sheet) */
-.farrowing-phone .key{width:46px;min-width:46px;height:46px;min-height:44px;border:1px solid var(--key);border-radius:12px;background:#fff;display:grid;place-items:center;touch-action:manipulation;flex-shrink:0;font-weight:500}
+.farrowing-phone .key{width:46px;min-width:46px;height:46px;min-height:44px;border:1px solid var(--task-key-border);border-radius:12px;background:#fff;display:grid;place-items:center;touch-action:manipulation;flex-shrink:0;font-weight:500}
 .farrowing-phone .key svg{width:17px;height:17px;stroke-width:2.2}
 .farrowing-phone .key:active:not(:disabled){background:var(--ink);color:#fff}

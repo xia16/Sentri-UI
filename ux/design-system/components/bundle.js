@@ -359,11 +359,11 @@
     const on=(items.find(i=>i.checked)||items[0]).value;
     return `<div class="st-filter-chips" data-ds="FilterChips" data-field="${esc(key)}" data-state="${esc(state)}"><div class="st-filter-chips-track" role="radiogroup" aria-label="${esc(label)}">${items.map(i=>`<button type="button" role="radio" aria-checked="${i.value===on}" tabindex="${i.value===on?0:-1}" data-action="${esc(action)}" data-value="${esc(i.value)}"${i.aria?` aria-label="${esc(i.aria)}"`:""}${i.disabled?' disabled':''}>${i.value===on?`<span class="st-chip-check" aria-hidden="true">${globalThis.SentriIcons?globalThis.SentriIcons.icon('check'):''}</span>`:''}<span class="st-selection-label">${i.label}</span>${i.count!=null?`<span class="st-selection-count">${i.count}</span>`:''}</button>`).join('')}</div>${reason?`<p class="st-selection-reason">${esc(reason)}</p>`:''}</div>`;
   }
-  function iconButton({action='',icon='',label='',variant='bordered',className='',value='',badge='',disabled=false,pressed=false,selected=null,reason='',describedby='',attrs={},strs,args}={}){
+  function iconButton({action='',icon='',label='',variant='bordered',className='',value='',badge='',disabled=false,pressed=false,selected=null,describedby='',attrs={},strs,args}={}){
     const o={strs,args},hasBadge=(badge!==''&&badge!=null)||has(o,'badge');
     const v=oneOf('IconButton','variant',variant,['bordered','plain'],'bordered');
-    const rid=reason?(describedby||fieldId('st-icon-reason')):describedby;
-    return `<button type="button" class="icon-button ${esc(className)}" data-ds="IconButton" data-variant="${v}" data-action="${esc(action)}" data-value="${esc(value)}" aria-label="${esc(label)}"${disabled?' aria-disabled="true"':''}${pressed?' data-preview="pressed"':''}${selected!=null?` aria-pressed="${!!selected}"`:''}${rid?` aria-describedby="${esc(rid)}"`:''}${safeAttr(attrs)}><span aria-hidden="true">${icon}</span>${selected?`<span class="st-icon-selected" aria-hidden="true">${sGlyph('check')}</span>`:''}${hasBadge?`<span class="filter-badge">${tx(badge,o,'badge')}</span>`:''}</button>${reason?buttonReason({id:rid,text:reason}):''}`;
+    const rid=describedby;
+    return `<button type="button" class="icon-button ${esc(className)}" data-ds="IconButton" data-variant="${v}" data-action="${esc(action)}" data-value="${esc(value)}" aria-label="${esc(label)}"${disabled?' aria-disabled="true"':''}${pressed?' data-preview="pressed"':''}${selected!=null?` aria-pressed="${!!selected}"`:''}${rid?` aria-describedby="${esc(rid)}"`:''}${safeAttr(attrs)}><span aria-hidden="true">${icon}</span>${selected?`<span class="st-icon-selected" aria-hidden="true">${sGlyph('check')}</span>`:''}${hasBadge?`<span class="filter-badge">${tx(badge,o,'badge')}</span>`:''}</button>`;
   }
   /* ---- Field cards (candidate, ADR 0001): Stepper, Measure, Numpad ----
      Event contract: every control is a <button data-action> whose data-value is the caller's field key;
@@ -927,20 +927,18 @@
     props.strs=strs;props.args=args;return holdButton(props);
   }
   /* The footer: at most two controls, the primary on the right: Back + a Button spec / a hold / HTML. Alone, Back fills the bar.
-     status { text, str, args, id, tone, visible, action }: the one line above the bar that says why the primary waits (wired as
-     its aria-describedby) or a hold's progress (its statusId). It is drawn whenever the primary or hold is waiting, or the
-     line carries an action; `visible: false` keeps it read-only (still role=status, visually hidden). `content` is trusted
+     status { text, str, args, id, tone, visible, action }: a line above the bar for a hold's progress (its statusId) or a text
+     action. It is drawn only when `visible` is set or it carries an action; a waiting button gives no reason line: it stands alone. `content` is trusted
      footer markup in place of back/primary/hold (a host's own two controls); className adds a page hook. */
   function sheetFooter({back:b={},primary,hold:h,status:st,content='',className=''}={}){
     let line='';
     if(st){
-      const id=st.id||fieldId('st-sheet-status'),waiting=!!((primary&&typeof primary==='object'&&primary.waiting)||(h&&h.waiting));
+      const id=st.id||fieldId('st-sheet-status');
       const vis=!!st.action||!!st.visible,tone=st.tone?` data-tone="${esc(st.tone)}"`:'';
       const act=vis&&st.action?sButton(Object.assign({register:'text'},st.action)):'';
-      if(!vis)line=`<p class="sheet-status st-visually-hidden" id="${esc(id)}" role="status" aria-live="polite"${tone}>${sT(st)}</p>`;
-      else line=act?`<div class="sheet-status" data-action-slot><p id="${esc(id)}" role="status" aria-live="polite"${tone}>${sT(st)}</p>${act}</div>`:`<p class="sheet-status" id="${esc(id)}" role="status" aria-live="polite"${tone}>${sT(st)}</p>`;
-      if(h&&!h.statusId)h=Object.assign({},h,{statusId:id});
-      if(primary&&typeof primary==='object'&&!primary.describedby)primary=Object.assign({},primary,{describedby:id});
+      if(vis)line=act?`<div class="sheet-status" data-action-slot><p id="${esc(id)}" role="status" aria-live="polite"${tone}>${sT(st)}</p>${act}</div>`:`<p class="sheet-status" id="${esc(id)}" role="status" aria-live="polite"${tone}>${sT(st)}</p>`;
+      if(vis&&h&&!h.statusId)h=Object.assign({},h,{statusId:id});
+      if(vis&&primary&&typeof primary==='object'&&!primary.describedby)primary=Object.assign({},primary,{describedby:id});
     }
     const inner=content||`${b?backButton(b):''}${h?sHold(h):sButton(primary)}`;
     return `${line}<div class="sheet-footer${className?' '+esc(className):''}" data-ds="Sheet">${inner}</div>`;
