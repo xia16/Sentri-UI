@@ -774,6 +774,25 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
 .pen-card .st-row-chevron svg{width:14px;height:14px;stroke-width:1.8}
 .pen-card .st-row-chevron[data-rail="edit"] span{display:none}
 @media(max-width:370px){.pen-card .st-row.st-row{padding-left:11px;padding-right:11px}}
+/* Row, need tile (the animal row: Farrowing room, Find a sow, Scan results; owner decision 2026-10-10).
+   Left, flexible: the ID exactly as stored (it wraps if long, the row grows) over one muted facts line. Right, a fixed-width tile column: a big number over one
+   small word, every tile the same width so they line up down the list. Red solid = work for the worker; green wash = done; neutral = everything else.
+   No border or shadow on a tile, so it does not read as a button: the whole row is the tap target. */
+.st-row.st-row[data-layout="need"]{display:flex;align-items:center;gap:var(--space-14);min-height:80px;padding:var(--space-10) var(--space-10) var(--space-10) var(--space-16)}
+.st-row[data-layout="need"] .st-row-copy{flex:1;min-width:0;gap:3px}
+.st-row.st-row[data-layout="need"] .st-row-copy strong{white-space:normal;overflow:visible;overflow-wrap:anywhere;font-size:18px;line-height:24px;font-weight:700;font-variant-numeric:tabular-nums}
+.st-row.st-row[data-layout="need"] .st-row-copy small{white-space:normal;overflow:visible;font-size:var(--font-size-14);line-height:19px;color:var(--muted)}
+.st-row[data-layout="need"] .st-tok{display:inline-block;white-space:nowrap}
+.st-row-tile{flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;width:var(--row-tile-w);min-height:58px;padding:var(--space-6) var(--space-4);border-radius:var(--radius-control);background:var(--well);color:var(--ink);text-align:center}
+.st-tile-big{display:flex;align-items:center;justify-content:center;font-size:24px;line-height:28px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.3px}
+.st-tile-big[data-word]{font-size:18px;line-height:24px}
+.st-tile-big svg{width:26px;height:26px;stroke-width:2.8}
+.st-tile-word{white-space:nowrap;font-size:13px;line-height:16px;font-weight:600;color:var(--ink-2)}
+.st-row-tile[data-tone="red"]{background:var(--red);color:var(--paper)}
+.st-row-tile[data-tone="red"] .st-tile-word{color:var(--paper)}
+.st-row-tile[data-tone="green"]{background:var(--green-wash);color:var(--green)}
+.st-row-tile[data-tone="green"] .st-tile-word{color:var(--green)}
+.st-row[data-layout="need"] .st-part[data-tone="red"]{color:var(--red-ink)}
 /* Stepper, count (the hero counter) */
 .st-stepper[data-variant="count"]{padding:16px 12px 10px;margin-top:6px;background:var(--green-wash);border-radius:16px;row-gap:0}
 .st-stepper[data-variant="count"] .st-stepper-label{margin-bottom:8px;font-size:13px;font-weight:500;line-height:normal;color:#356547}

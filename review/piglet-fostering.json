@@ -14,7 +14,7 @@
    "Keep fostering.* as aliases of piglet-processing.move-piglets once the simple prototype is chosen",
    "Keep both: farrowing.foster before the lock, Move after (needs the owner to reopen the farrowing park)"
   ],
-  "recommendation": "Follow the rulings: Move after the lock is the feature; farrowing.foster stays parked.",
+  "recommendation": "Follow the rulings: Move after the lock is the feature. Owner decision 2026-10-10 reopens the park for one case only: when a sow dies, farrowing.foster (the move page, sending out of her litter) is how her piglets go to other sows. Elsewhere it stays parked.",
   "source": "populate-piglet"
  }
 ]

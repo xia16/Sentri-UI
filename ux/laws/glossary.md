@@ -181,6 +181,20 @@ One dose for several litters of one unit in one act. Each litter's record is exa
 
 **Commit rule.** The review's contract is re-read against the log at the tap and written with the store's `commitAll` under one stamp: all-or-nothing for the litters that still match, so no half-written set; a litter that moved is left out and named. Per-litter commits would give n stamps and n reflows (scenario M-2 wants one); an all-or-nothing write of every reviewed litter would refuse real treatments because of one litter. A commit the ledger refuses is said with its reason in the review (`Not recorded · the task has ended`).
 
+## Farrowing room list (分娩 · 产房)
+
+Words the room list, the allocation sheet and the Task overview print, defined as **entity · population · time · scope**. Owner decisions of 2026-10-10: `features/farrowing/PRD.md`, Decisions.
+
+| Term (zh) | Entity | Population | Time | Scope |
+|---|---|---|---|---|
+| **Awaiting** 待产 / **Active** 分娩中 | the sow | Awaiting: nothing recorded (live total zero). Active: a live total above zero, not finished | now, from the record | one sow in the room |
+| **Done** 已完成 / **Sow died** 母猪死亡 / **Aborted** 流产 | the sow | Done: the litter is finished. Sow died: her death ended the session. Aborted: an abortion (流产) was recorded. Together they are the finished states | from the record that ended her session | one sow. Aborted is the one word for the event; "miscarriage" is not used |
+| **Alive** 存活 (on a room row) | piglets | the live piglets recorded on her record | now | one sow. A row shows recorded counts only: alive always, dead only above zero, never Born, never an expected or carried count |
+| **To allocate** 待安置 | piglets | the live piglets on a dead sow's record that are not yet hand-reared here, on another sow, in a rearing pen, or recorded dead | from her death until each has a place | one sow. Printed `{n} to allocate` on her row and `{n} piglets to allocate` as the sheet title |
+| **Hand-reared** 人工哺育 | piglets | piglets kept on the dead sow's record and raised by hand in her crate (bottle or milk replacer) | from the choice, while any remain | one sow. Printed `{n} hand-reared`; piglet care continues on her record |
+| **Left the task** 已离开任务 | sows | sows off the room list: Aborted with no live piglet, or Sow died with no piglet left to allocate or hand-rear | from the moment the last piglet has a place or none was alive | one task. Printed once on the Task overview as `Left the task · n aborted · n sow died`; they are no longer in Done · Active · Awaiting, so every total still adds up (`7 / 18` once one of 19 has left) |
+| **Rearing pen** 代养栏 | a farm place | a pen the farm keeps for piglets without a sow (a "rescue deck") | farm configuration | one farm. Whether the farm has one is a farm-level option; its configuration is open |
+
 ## Count grammar
 
 The count leads the word and the unit is written: `{n} piglets`, singular `{n} piglet` (`pp.common.unit.piglet.one` / `.many`, `PP.tn`); zh has one form and no space between numeral and classifier (`14头`, `3日龄`). Ruled anchors that stay as they are: `born {n}` and `day {n}` (en), `Saved · +{n} this visit` and `Saved · {n} died this visit` (farrowing's, under `fr.*`; a processing receipt names its outcome and is registered by the slice that writes it), and label-then-count headers such as `Dead 6` and `Unexplained loss {n}`.

@@ -831,7 +831,7 @@ function productionActionsForPig(c,p){
   else if(task.id==='piglet-processing'&&(c.hostActions||[]).some(action=>action.id==='piglets'&&!action.reason))continue;
   else rows.push({a:task.id==='piglet-processing'?'sow-current-task':'production-task',k:'chart',title:task.title,sub:[task.status,task.summary].filter(Boolean).join(' · '),value:task.id,section:productionTaskScope(task,p)});
  }
- if(/gestat|in heat|breeding/i.test(p.stage||''))rows.push({a:'miscarriage',k:'chart',title:'Record miscarriage',sub:'Record a pregnancy loss',value:'miscarriage',section:'gestation'});
+ if(/gestat|in heat|breeding/i.test(p.stage||''))rows.push({a:'miscarriage',k:'chart',title:'Record abortion',sub:'Record a pregnancy loss',value:'miscarriage',section:'gestation'});
  const hostBatch=(c.hostActions||[]).some(action=>['remove-batch','move-batch'].includes(action.id)&&!action.reason);
  const localBatches=(c.batches||[]).filter(batch=>batch.id!==p.batchId);
  rows.push({a:'batch-membership',k:'transfer',title:'Batch membership',sub:p.batchId?'Batch '+p.batchId+' · move or remove':'Add this pig to a batch',value:p.id,section:'other',reason:!p.batchId&&!localBatches.length&&!hostBatch?'No production batches are available.':''});
@@ -889,7 +889,7 @@ function measurementsMenu(c){
 }
 
 function unavailableActionsPage(c){return sheet(c,'Unavailable actions',picked(c).length===1?picked(c)[0].id+' · '+penOf(c,picked(c)[0].id).id:selectionLabel(c),actionSections(c,unavailableActionGroups(c),true),footer(back(),''));}
-function miscarriagePage(c){return sheet(c,'Record miscarriage',picked(c)[0].id+' · '+penOf(c,picked(c)[0].id).id,`${SentriUI.banner({tone:'danger',headline:'Sow leaves this batch',consequence:'Saved records are kept.',icon:'alert'})}<label class="sow-action-field">Reason<input data-loss-reason value="${esc(c.lossReason||'')}" placeholder="Enter the reason" autocomplete="off"></label>`,footer(back(),button('save-miscarriage','Save','button primary','',!c.lossReason?.trim())));}
+function miscarriagePage(c){return sheet(c,'Record abortion',picked(c)[0].id+' · '+penOf(c,picked(c)[0].id).id,`${SentriUI.banner({tone:'danger',headline:'Sow leaves this batch',consequence:'Saved records are kept.',icon:'alert'})}<label class="sow-action-field">Reason<input data-loss-reason value="${esc(c.lossReason||'')}" placeholder="Enter the reason" autocomplete="off"></label>`,footer(back(),button('save-miscarriage','Save','button primary','',!c.lossReason?.trim())));}
 function productionDispositionPage(c){
  const removing=c.view==='batch-removal',f=c.form||{},options=removing?[['','Choose a reason'],['assignment','Assigned to this batch in error'],['timing','Not due in this farrowing window'],['other','Other production reason']]:[['','Choose evidence'],['pregnancy-check','Pregnancy check result'],['returned-to-heat','Returned to heat'],['other','Other observation']];
  const title=removing?'Remove from batch':'Mark not in pig';
@@ -912,7 +912,7 @@ function saveBatchMembership(c){
 function saveMiscarriage(c){
  const p=picked(c)[0],reason=String(c.lossReason||'').trim();if(!p||!reason)return false;
  const batch=c.batches?.find(batch=>batch.id===p.batchId);if(batch)batch.pigIds=batch.pigIds.filter(id=>id!==p.id);
- p.batchId='';p.stage='Off production';p.breedingStatus='Open';addEvent(c,'Miscarriage recorded',[p.id],reason,'Production');
+ p.batchId='';p.stage='Off production';p.breedingStatus='Open';addEvent(c,'Abortion recorded',[p.id],reason,'Production');
  c.pigId=p.id;c.selected.clear();c.navTrail=[];c.lossReason='';c.form={};c.view='pig';return true;
 }
 function transferReady(c){const d=c.transferDraft||{},p=picked(c)[0],pe=p&&penOf(c,p.id);return !!d.unit&&!!d.pen&&c.transferDestinations?.some(u=>u.id===d.unit&&u.pens.includes(d.pen))&&!(d.unit===c.transferOrigin?.unit&&d.pen===pe?.id);}

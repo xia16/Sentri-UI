@@ -48,7 +48,8 @@
         "id": "died",
         "name": "Died",
         "screens": [
-          "farrowing.ended"
+          "farrowing.ended",
+          "farrowing.allocate"
         ]
       }
     ],
@@ -137,12 +138,12 @@
     [
       "farrowing.room",
       "farrowing.ended",
-      "tap a Sow died row"
+      "tap a Sow died row once nothing is left to allocate (hand-reared)"
     ],
     [
       "farrowing.room",
       "farrowing.history",
-      "tap a miscarriage / not in pig / removed row"
+      "tap an abortion / not in pig / removed row"
     ],
     [
       "farrowing.room",
@@ -223,11 +224,6 @@
       "farrowing.death",
       "farrowing.locked",
       "Save, or Back, when opened from the locked record"
-    ],
-    [
-      "farrowing.death",
-      "farrowing.ended",
-      "Save (hold) in The sow mode"
     ],
     [
       "farrowing.edit",
@@ -372,7 +368,7 @@
     [
       "farrowing.task-outcomes",
       "farrowing.history",
-      "tap an outcome, then a miscarriage sow"
+      "tap an outcome, then an abortion sow"
     ],
     [
       "farrowing.task-outcomes",
@@ -583,6 +579,46 @@
       "farrowing.note",
       "farrowing.sow-actions",
       "Save note or Back"
+    ],
+    [
+      "farrowing.death",
+      "farrowing.allocate",
+      "Save (hold) in The sow mode, when piglets are alive"
+    ],
+    [
+      "farrowing.death",
+      "farrowing.ended",
+      "Save (hold) in The sow mode, when no piglet is alive"
+    ],
+    [
+      "farrowing.room",
+      "farrowing.allocate",
+      "tap a Sow died row while piglets wait"
+    ],
+    [
+      "farrowing.allocate",
+      "farrowing.room",
+      "Back (decide later), or Hand-rear here"
+    ],
+    [
+      "farrowing.allocate",
+      "farrowing.foster",
+      "Move to other sows"
+    ],
+    [
+      "farrowing.foster",
+      "farrowing.allocate",
+      "Save while piglets remain, or Back"
+    ],
+    [
+      "farrowing.foster",
+      "farrowing.room",
+      "Save when the last piglet has moved"
+    ],
+    [
+      "farrowing.room",
+      "farrowing.locked",
+      "tap an Aborted row (a live piglet remains)"
     ]
   ],
   "screens": [
@@ -604,46 +640,61 @@
         "elements": [
           {
             "name": "Sow row",
-            "shows": "One line per task sow, grouped under her pen: ear tag, state word, two text lines, rail icon.",
+            "shows": "One row per task sow, grouped under her pen: the ear tag exactly as stored over one muted facts line (state · key fact · when · who), a fixed-width tile at the right (a big number over one small word), a chevron. The same row in Find a sow (the facts line leads with the pen and drops when · who) and Scan results. The arrangement is provisional, pending the list exploration (a design-system candidate, Row layout need).",
             "states": [
               {
                 "state": "Awaiting · not yet due",
-                "when": "No live total (alive + dead = 0), not finished, no outcome. Due text begins \"Due tomorrow\" or \"Due in N days\"",
-                "shows": "No status word. Line 1 \"Due tomorrow\" / \"Due in 2 days\" (muted). Line 2 \"parity 5 · 11 born last\" (12 when unknown). Chevron."
+                "when": "No live total (alive + dead = 0), not finished, no outcome; due tomorrow or later",
+                "shows": "Neutral tile \"1 / day left\" or \"5 / days left\". Facts \"Parity 5 · 11 born last\"."
               },
               {
                 "state": "Awaiting · due",
-                "when": "Same, due text \"Due today\" or \"Due yesterday\"",
-                "shows": "Line 1 \"Due today\" in ink (not muted). Line 2 as above. Chevron."
+                "when": "Due today",
+                "shows": "Neutral tile \"Today / due\". Facts as above."
               },
               {
-                "state": "Awaiting · overdue",
-                "when": "Due text begins \"Overdue\" (expected date = service + 114 days; overdue from day 116)",
-                "shows": "Line 1 \"Overdue · 3 days\": only \"3 days\" is red, the word stays ink. Line 2 as above."
+                "state": "Awaiting · late",
+                "when": "Due yesterday or Overdue (expected date = service + 114 days)",
+                "shows": "Red tile \"3 / days late\" (work for the worker). Facts as above."
               },
               {
                 "state": "Active",
                 "when": "Live total above zero and not finished",
-                "shows": "Blue \"• Active\" status word (dot and word, as in Go to pen). Line 1 \"9 alive · 5 dead\". Line 2 \"born 14 · 1h ago · G.H\" (\"just now\" after a tap in this session). Chevron. No overdue colour once she has a record."
+                "shows": "Neutral tile \"9 / alive\". Facts \"Farrowing · 5 dead · 1h ago · G.H\": dead only above zero, never \"born N\"."
               },
               {
                 "state": "Done",
                 "when": "Litter finished (locked)",
-                "shows": "Green \"• Done\" status word. Line 1 alive · dead as now (alive falls when later deaths are recorded). Line 2 \"born 14 · final 05:58 · G.H\". Pencil icon: locked but editable."
+                "shows": "Green tile with a tick, \"done\". Facts \"11 alive · 2 dead · 05:58 · G.H\". No pencil: the row opens the record, and Edit is inside it."
               },
               {
-                "state": "Sow died",
-                "when": "Farrowing ended through the sow's death",
-                "shows": "Red \"• Sow died\" status word instead of Done. Same two lines; line 2 \"born 10 · yesterday · L.M\". Pencil. Counts under the Done tab."
+                "state": "Sow died · piglets to allocate",
+                "when": "She died and none of her live piglets is hand-reared, placed elsewhere, in a rearing pen or recorded dead",
+                "shows": "Red tile \"7 / to allocate\". Facts \"Sow died\" (red) · \"yesterday · L.M\". Tapping opens the allocation sheet. Owner decision 2026-10-10."
+              },
+              {
+                "state": "Sow died · hand-reared",
+                "when": "Her piglets were kept hand-reared on her record",
+                "shows": "Neutral tile \"2 / hand-reared\"; facts \"Sow died · 09:40 · L.M\". The row stays while hand-reared piglets remain; a partial allocation keeps the remaining count (never \"5 moved\"). Tapping opens her record. Owner decision 2026-10-10."
+              },
+              {
+                "state": "Aborted",
+                "when": "An abortion with a live piglet",
+                "shows": "Neutral tile \"1 / alive\" (recorded counts only); facts \"Aborted · 08:10 · G.H\". With no live piglet she is not listed. Owner decision 2026-10-10."
               },
               {
                 "state": "Production outcome",
-                "when": "Miscarriage, Not in pig or Removed from batch recorded",
-                "shows": "No status word. Line 1 the outcome name; line 2 \"Recorded · 08:10 · G.H\". Chevron; opens the Production log. Counts under Done."
+                "when": "Not in pig or Removed from batch recorded",
+                "shows": "Neutral tile with a dash and the outcome word; facts \"Not in pig · 08:10 · G.H\". Opens the Production log. Counts under Done."
+              },
+              {
+                "state": "Left the list",
+                "when": "Sow died with nothing left to allocate or hand-rear; or aborted with no live piglet",
+                "shows": "Not drawn in any lens, Find a sow or Go to pen. The Task overview counts her once, under \"Left the task\". Owner decision 2026-10-10."
               }
             ],
-            "logic": "Days are counted from due, never the gestation day. Awaiting vs Active flips on the live total: a sow counted back to zero reads Awaiting again and regains her Due line. Recency (\"1h ago\") and hand (\"G.H\") are fixed sample text, not computed from records. Line 2 is words in the sans face; only the figures are mono.",
-            "source": "farrowing-astra-concept.js roomRow(), roomState(); RULINGS \"Model\"",
+            "logic": "Tile colour is meaning only: red solid (white text) is work for the worker (to allocate, days late), green wash is done, neutral is everything else; no border or shadow, the whole row is the tap target. The ID is shown exactly as stored (never grouped, truncated or styled by part; it wraps and the row grows). Only recorded counts show; never \"born N\" when alive and dead are shown, never an expected or carried count. Pens stay as dividers in aisle order. One function draws the row (sowRow).",
+            "source": "farrowing-astra-concept.js sowRow(), leftTask(); Row layout need; PRD Decisions 2026-10-10",
             "at": "000418"
           },
           {
@@ -681,12 +732,12 @@
                 "shows": "That segment is left out of the bar; the number and support text still print the zero"
               },
               {
-                "state": "Other outcomes",
-                "when": "Sows with miscarriage, not in pig or removed, or that died before or during farrowing",
-                "shows": "Counted as Done: they are sows of the task, so they stay in the number and the denominator (the overview breaks them out under Other outcomes)"
+                "state": "Left the task",
+                "when": "Sows aborted with no live piglet, or died with nothing left to allocate",
+                "shows": "Out of the number and the denominator, so the figure still adds up (7 / 18 once one of 19 has left). The overview counts them under Left the task."
               }
             ],
-            "logic": "Done = every sow of the task with a finished record, in all units: finished litters, sow deaths, miscarriages, not in pig, removed. Denominator = every sow of the task (Done + Active + Awaiting): the same total as Task outcomes on End task and the receipt, and the sum of each unit’s Awaiting, Active and Done tabs. Segment widths are proportional to those counts. Scope is all units and never follows the lens or filter. KPIs still count finished litters only.",
+            "logic": "Done = every sow still on the list with a finished record, in all units: finished litters, sow deaths and abortions that still have piglets, not in pig, removed. Denominator = every sow still on the list (Done + Active + Awaiting). Sows that left the list are counted on the Task overview as Left the task, and on End task and the receipt as Sow deaths and Aborted, so every sow is in exactly one place.",
             "source": "farrowing-astra-concept.js taskOverview(); astra-task-overview.js statusProgress()",
             "at": "Done"
           },
@@ -1254,7 +1305,8 @@
           "\"Stillborn entry stays in the drawer — no sheet shortcut\" (Surfaces & entrances)",
           "\"Sow dies mid-farrowing … Piglets · The sow\" and \"Saving the sow's death is hold-to-commit\" (Starting and ending a session)",
           "\"Photos are optional on both drawer modes\" (Starting and ending a session)",
-          "\"No WHEN anywhere, absolutely\" (Model)"
+          "\"No WHEN anywhere, absolutely\" (Model)",
+          "Sheet title names the job (\"Record dead\"), subtitle the animal (\"<ID> · <pen>\") (Owner decision 2026-10-10)."
         ],
         "issues": [
           "Back keeps the draft, as the ruling says; Finish has no banner.",
@@ -1714,6 +1766,76 @@
       }
     },
     {
+      "id": "farrowing.allocate",
+      "name": "Sow died · piglets to allocate",
+      "zh": "母猪死亡·仔猪安置",
+      "status": "in-design",
+      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+      "preset": "allocate",
+      "figma": "",
+      "notes": {
+        "purpose": "Right after the hold records her death, or from her row while piglets wait: where do her live piglets go? Footer Back means later.",
+        "states": [
+          "Title \"N piglets to allocate\", subtitle \"<ID> · <pen> · sow died <time>\". After a partial move the sheet returns with the remaining count.",
+          "On a farm with no rearing pen the third option is absent."
+        ],
+        "elements": [
+          {
+            "name": "Options",
+            "at": "Move to other sows",
+            "shows": "Three rows with a chevron: Move to other sows (\"Foster or nurse sow\"), Hand-rear here (\"Bottle or milk replacer in her crate\"), Move to a rearing pen (\"Rescue deck\").",
+            "states": [
+              {
+                "state": "Move to other sows",
+                "when": "Tap",
+                "shows": "Opens the Move page (Foster piglets, sending out of this litter) with all her piglets pre-selected; the stepper lowers the count so several receiving sows can split them. Saving returns here with the remaining count, or to the room when none is left."
+              },
+              {
+                "state": "Hand-rear here",
+                "when": "Tap",
+                "shows": "The piglets stay on her record and piglet care continues. Back to the room; her row reads \"N hand-reared\"."
+              },
+              {
+                "state": "Move to a rearing pen",
+                "when": "Tap, only when farm config says the farm has a rearing pen (prototype flag, on for the demo; ?rearing=off)",
+                "shows": "Every remaining piglet leaves her record. Back to the room; she leaves the list."
+              }
+            ],
+            "logic": "Back is the only exit and means later: nothing is decided, her row reads \"N to allocate\" and tapping it reopens this sheet. No ✕, no extra question line.",
+            "source": "farrowing-astra-concept.js allocate(), act(allocMove | allocHand | allocRear)"
+          }
+        ],
+        "controls": [
+          {
+            "control": "Back",
+            "does": "leaves; nothing is decided",
+            "goesTo": "farrowing.room"
+          },
+          {
+            "control": "Move to other sows",
+            "does": "opens the move page",
+            "goesTo": "farrowing.foster"
+          }
+        ],
+        "copy": [
+          "N piglets to allocate · <ID> · <pen> · sow died <time>",
+          "Move to other sows · Foster or nurse sow",
+          "Hand-rear here · Bottle or milk replacer in her crate",
+          "Move to a rearing pen · Rescue deck"
+        ],
+        "edge": [
+          "A sow who died with no live piglet gets no sheet: she leaves the list at once.",
+          "The receiving sows' own litters are not changed in this prototype."
+        ],
+        "issues": [
+          "Rearing pen: how a farm declares it is open (To confirm farrowing-room-list-1)."
+        ],
+        "rules": [
+          "Owner decision 2026-10-10: fostering is in scope for the sow-died case; an orphan litter can stay in the task, hand-reared; a rearing pen is a farm-level option (configuration open, To confirm farrowing-room-list-1)."
+        ]
+      }
+    },
+    {
       "id": "farrowing.ended",
       "name": "Sow died",
       "zh": "母猪死亡",
@@ -1766,16 +1888,17 @@
           "(raw) Born · Alive · Dead"
         ],
         "edge": [
-          "She stays in the room until the task ends"
+          "She stays in the room while her piglets are unallocated or hand-reared; she leaves once none is left",
+          "Piglet deaths are recorded through Record dead on this record and her count drops (Owner decision 2026-10-10)"
         ],
         "rules": [
           "\"She stays in the room … a Done-register row — red chip sow died\" (Starting and ending a session)",
           "\"Ended keeps its red band and omits the Finished row\" (After the lock)",
-          "\"Sow dies mid-farrowing … Born derives from what stands, classification skipped\" (Starting and ending a session)"
+          "\"Sow dies mid-farrowing … Born derives from what stands, classification skipped\" (Starting and ending a session)",
+          "\"A piglet that dies or is put down is recorded through Record dead, and the count drops\" (Owner decision 2026-10-10)"
         ],
         "issues": [
-          "The ruled \"Farrowing record\" row and the stamp inside the band are missing; the face is the generic summary.",
-          "Piglet deaths after the sow died are recordable; the ruling says nothing about them."
+          "The ruled \"Farrowing record\" row and the stamp inside the band are missing; the face is the generic summary."
         ]
       }
     },
@@ -1872,7 +1995,7 @@
           {
             "name": "Task outcomes",
             "shows": "Sow count per outcome across all units; title meta is all sows in the task.",
-            "logic": "Finished farrowing and Awaiting always print; Still farrowing, Removed earlier, Miscarriages, Not in pig and Sow deaths appear only when above zero. After the task ends the Awaiting row reads \"Removed · not farrowed\".",
+            "logic": "Finished farrowing and Awaiting always print; Still farrowing, Removed earlier, Aborted, Not in pig and Sow deaths appear only when above zero. After the task ends the Awaiting row reads \"Removed · not farrowed\".",
             "source": "farrowing-astra-concept.js taskOutcomeSummary()",
             "at": "Task outcomes"
           },
@@ -1965,7 +2088,7 @@
           {
             "name": "Task outcomes",
             "shows": "Sow count per outcome across all units; title meta is all sows in the task.",
-            "logic": "Finished farrowing and Awaiting always print; Still farrowing, Removed earlier, Miscarriages, Not in pig and Sow deaths appear only when above zero. After the task ends the Awaiting row reads \"Removed · not farrowed\".",
+            "logic": "Finished farrowing and Awaiting always print; Still farrowing, Removed earlier, Aborted, Not in pig and Sow deaths appear only when above zero. After the task ends the Awaiting row reads \"Removed · not farrowed\".",
             "source": "farrowing-astra-concept.js taskOutcomeSummary()",
             "at": "Task outcomes"
           },
@@ -2056,7 +2179,7 @@
           {
             "name": "Task outcomes",
             "shows": "Sow count per outcome across all units; title meta is all sows in the task.",
-            "logic": "Finished farrowing and Awaiting always print; Still farrowing, Removed earlier, Miscarriages, Not in pig and Sow deaths appear only when above zero. After the task ends the Awaiting row reads \"Removed · not farrowed\".",
+            "logic": "Finished farrowing and Awaiting always print; Still farrowing, Removed earlier, Aborted, Not in pig and Sow deaths appear only when above zero. After the task ends the Awaiting row reads \"Removed · not farrowed\".",
             "source": "farrowing-astra-concept.js taskOutcomeSummary()",
             "at": "Task outcomes"
           }
@@ -2088,15 +2211,15 @@
       "preset": "task-outcomes",
       "figma": "",
       "notes": {
-        "purpose": "Review the task when sows have recorded production outcomes such as a miscarriage.",
+        "purpose": "Review the task when sows have recorded production outcomes such as an abortion.",
         "states": [],
         "elements": [
           {
             "name": "Outcome rows",
-            "shows": "Miscarriages · Not in pig · Removed earlier · Sow deaths in Task outcomes.",
+            "shows": "Aborted · Not in pig · Removed earlier · Sow deaths in Task outcomes.",
             "logic": "Each row appears only when above zero. These sows are Done and part of the task total; they sit outside the KPIs. Here the rows are plain; on the Task overview nonzero rows open a sow list.",
             "source": "farrowing-astra-concept.js taskOutcomeSummary()",
-            "at": "Miscarriages"
+            "at": "Aborted"
           },
           {
             "name": "Title",
@@ -2120,7 +2243,7 @@
           "Task closure doc: active farrowing and unsaved drafts block; awaiting sows are removed from the batch (ux/research/farrowing/ASTRA-TASK-CLOSURE.md)"
         ],
         "issues": [
-          "Outcome counts appear on the Task overview, here and on the receipt; the miscarriage entry form is not in this prototype."
+          "Outcome counts appear on the Task overview, here and on the receipt; the abortion entry form is not in this prototype."
         ]
       }
     },
@@ -2208,7 +2331,7 @@
           {
             "name": "Whole-task progress",
             "shows": "Sow total, stacked bar and Done · Active · Awaiting counts.",
-            "logic": "Same numbers and rules as the room's Task overview card; zero segments are left out of the bar.",
+            "logic": "Counts the sows still on the room list. Sows that left it (aborted with no live piglet; died with no piglet left to place) are counted under Left the task, so the total adds up.",
             "source": "farrowing-astra-concept.js roomOverview, taskOverview()",
             "at": "Whole-task progress"
           },
@@ -2232,12 +2355,12 @@
           },
           {
             "name": "Other outcomes",
-            "shows": "Miscarriages · Sow deaths · Not in pig · Removed from batch.",
+            "shows": "Left the task · n aborted · n sow died; then Not in pig and Removed from batch when recorded.",
             "states": [
               {
-                "state": "Always listed",
-                "when": "Miscarriages and Sow deaths",
-                "shows": "Shown even at 0"
+                "state": "Left the task",
+                "when": "At least one sow has left the room list",
+                "shows": "One row, line 2 \"1 aborted · 1 sow died\" (a zero part is left out). Opens the list of those sows."
               },
               {
                 "state": "When recorded",
@@ -2245,9 +2368,9 @@
                 "shows": "Row appears only above zero"
               },
               {
-                "state": "Tappable",
-                "when": "Count above zero",
-                "shows": "Opens a grouped sow list; zero rows do nothing"
+                "state": "Nothing to show",
+                "when": "No sow has left and none has an outcome",
+                "shows": "The section is not drawn"
               }
             ],
             "source": "farrowing-astra-concept.js taskOtherOutcomes()",
@@ -2358,7 +2481,7 @@
       "preset": "foster",
       "figma": "",
       "notes": {
-        "purpose": "Send or receive piglets between this litter and another, counted on one Well stepper.",
+        "purpose": "Send or receive piglets between this litter and another, counted on one Well stepper. From a dead sow's allocation sheet it opens sending out, with all her piglets selected.",
         "states": [],
         "elements": [
           {
@@ -2568,7 +2691,7 @@
         "elements": [
           {
             "name": "Notices",
-            "at": "Pen information",
+            "at": "Pen B1",
             "shows": "Faults and the note, listed above the tools only when they exist.",
             "logic": "Only open faults are listed; a resolved fault leaves the page and stays in the pen log. A pen holds one note.",
             "source": "farrowing-astra-concept.js penDetails(), penInfo()"
@@ -2603,6 +2726,9 @@
         ],
         "issues": [
           "Whose feature the pen tools are is unclear: the same pen sheet, note, fault and log flows are drawn in Inspection (see the decision \"Pen tools are drawn in Farrowing and in Inspection\")."
+        ],
+        "rules": [
+          "The sheet's title is the job, so it has no second heading \"Pen information\" over the tool rows (Owner decision 2026-10-10)."
         ]
       }
     },
@@ -2848,7 +2974,7 @@
                 "shows": "\"No matching ear tags.\""
               }
             ],
-            "logic": "Case-insensitive contains-match on the ear tag or the pen code, over the current unit only: sows in other units are not found. Rows are the room rows (Awaiting, Active, Done, Sow died, outcome).",
+            "logic": "Case-insensitive contains-match on the ear tag or the pen code, over the sows on the current unit's list: sows that left the list are not found. Rows are the same room rows, drawn by one function (sowRow).",
             "rule": "A row opens that sow's record by her status (Awaiting or Active drawer, locked record, or the production log for a recorded outcome) and makes her pen the current one.",
             "source": "farrowing-astra-concept.js roomSearchResults(), room-sow"
           }
@@ -2877,7 +3003,7 @@
             "name": "Scanner preview",
             "at": "Scanner preview",
             "shows": "A placeholder frame, \"Scanner preview\", with a \"Try sample tag\" button.",
-            "rule": "\"Try sample tag\" opens the unit's first sow (000418). Below the frame, the same field and results as Find a sow take a typed tag or pen.",
+            "rule": "\"Try sample tag\" opens the unit's first sow (000418). Below the frame, the same field and results as Find a sow take a typed tag or pen. Results are the same room rows.",
             "source": "farrowing-astra-concept.js roomScan, room-demo-scan; ASTRA-ROOM-PAGE-AUDIT.md"
           }
         ],
@@ -2906,7 +3032,7 @@
           "Active farrowing (from \"Still farrowing\"): \"Open a sow to review and finish the record.\"; each row ends \"9 alive\".",
           "Awaiting farrowing: a notice \"N sows will be removed from this batch\"; each row ends with her due text.",
           "Sow deaths: each sow is a death review block rather than a plain row.",
-          "Miscarriages, Not in pig, Removed from batch: \"Recorded outcomes across all units. Open a sow to view the record.\"; each row ends with the outcome word.",
+          "Aborted, Not in pig, Removed from batch: \"Recorded outcomes across all units. Open a sow to view the record.\"; each row ends with the outcome word.",
           "Empty group: \"No sows to review.\""
         ],
         "elements": [
@@ -3000,16 +3126,16 @@
       "notes": {
         "purpose": "All other things to do for one sow, grouped Health, Routine, Production, opened from \"More actions\" on her drawer.",
         "states": [
-          "Awaiting (nothing counted): Record miscarriage, Remove from batch, Mark not in pig, Record sow death, note and transfer are open; the piglet rows and Edit litter record are closed.",
+          "Awaiting (nothing counted): Record abortion, Remove from batch, Mark not in pig, Record sow death, note and transfer are open; the piglet rows and Edit litter record are closed.",
           "Farrowing: the piglet rows, Edit litter record and Foster piglets open; Remove from batch and Mark not in pig close.",
-          "Finished: Record miscarriage also closes.",
+          "Finished: Record abortion also closes.",
           "Sow died or outcome recorded: most rows close with the reason."
         ],
         "elements": [
           {
             "name": "Production rows",
             "at": "Piglet processing",
-            "shows": "Record miscarriage, Piglet processing, Record piglet deaths, Reconcile piglet count, Edit litter record, Foster piglets, Remove from batch, Mark not in pig, Move to another farrowing batch.",
+            "shows": "Record abortion, Piglet processing, Record piglet deaths, Reconcile piglet count, Edit litter record, Foster piglets, Remove from batch, Mark not in pig, Move to another farrowing batch.",
             "states": [
               {
                 "state": "Record the litter first.",
@@ -3034,17 +3160,17 @@
               {
                 "state": "Farrowing is already finished.",
                 "when": "Litter locked",
-                "shows": "Closes Record miscarriage"
+                "shows": "Closes Record abortion"
               },
               {
                 "state": "A production outcome is already recorded.",
-                "when": "Miscarriage, not in pig or removed",
+                "when": "Abortion, not in pig or removed",
                 "shows": "Closes most production rows"
               },
               {
                 "state": "This sow has died.",
                 "when": "Farrowing ended by her death",
-                "shows": "Closes miscarriage, note, transfer, remove, not in pig"
+                "shows": "Closes abortion, note, transfer, remove, not in pig"
               },
               {
                 "state": "No destination farrowing batches are connected in this preview.",

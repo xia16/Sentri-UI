@@ -250,7 +250,12 @@ async function runLeaf(browser, leaf, lang, width) {
         for (const a of [].concat(step.expect)) { const r = await checkOne(page, a, lang, width, notes.length > 0); if (r?.skipped) skipped.push(describe(a)); else if (r) fail(describe(a), r.got, a.hard, `after step ${i - 1}`); }
         continue;
       }
-      if (step.fill) { await ensureHelpers(page); await page.locator(step.fill).last().fill(String(step.value)); await settle(page); await shot('fill-' + step.fill); continue; }
+      if (step.fill) {   // the field is on the page, or in a same-origin iframe of it (the embedded pig profile)
+        await ensureHelpers(page);
+        let loc = page.locator(step.fill);
+        if (!(await loc.count())) for (const fr of page.frames()) if (fr !== page.mainFrame() && (await fr.locator(step.fill).count())) { loc = fr.locator(step.fill); break; }
+        await loc.last().fill(String(step.value)); await settle(page); await shot('fill-' + step.fill); continue;
+      }
       if (step.wait) { await page.waitForTimeout(step.wait); continue; }
       if (step.reload) {   // an interruption: the app is closed and opened again on the same device
         await page.reload(); if (fx.screen) await page.waitForSelector('html.atlas-ready', { timeout: 8000 });

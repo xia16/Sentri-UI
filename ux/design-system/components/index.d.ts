@@ -86,6 +86,10 @@ export interface RowProps {
   wrap?: boolean;
   /** Token parts join without spaces (zh strings that carry none). */
   tight?: boolean;
+  /** `need` (with `tile`): the need-tile animal row (candidate, provisional, owner decision 2026-10-10). The title is the ID as stored (18px/700, wraps), the description one muted facts line, then a fixed-width tile column and the chevron. The whole row is the tap target. */
+  layout?: 'need';
+  /** need only: the tile. A big number (or a word, or `icon: 'check'`) over one small word. tone `red`: solid, white text, work for the worker; `green`: done; none: neutral. No border, no shadow. */
+  tile?: { big?: string; icon?: string; small: string; tone?: 'red' | 'green' };
   id?: string;
   strs?: Strs<'title' | 'description' | 'trailing' | 'code'>;
   args?: StrArgs<'title' | 'description' | 'trailing' | 'code'>;
@@ -364,8 +368,8 @@ export type Tone = 'amber' | 'progress' | 'green' | 'red' | 'muted';
 export type Part = string | { text: string; tone?: Tone; mono?: boolean; strs?: Strs<'text'>; args?: StrArgs<'text'> };
 /** A token: one part, or a word and its value as a list of parts. Tokens with sep 'dot' are joined by a real `·` text node. */
 export type Token = Part | Part[];
-/** The status kinds: one colour map (awaiting muted, active progress, done green, late amber, overdue red, died red). */
-export type StatusKind = 'awaiting' | 'active' | 'done' | 'late' | 'overdue' | 'died';
+/** The status kinds: one colour map (awaiting muted, active progress, done green, late amber, overdue red, died red, aborted red). */
+export type StatusKind = 'awaiting' | 'active' | 'done' | 'late' | 'overdue' | 'died' | 'aborted';
 /** Status: `word` (dot and word, inline), or `chip` (filled badge in a row). `kind` picks tone and icon; `tone` alone still works. */
 export interface StatusProps { text: string; kind?: StatusKind; tone?: Tone; variant?: 'word' | 'chip'; /** chip only: a registry icon name, default from kind */ icon?: string; id?: string; className?: string; strs?: Strs<'text'>; args?: StrArgs<'text'> }
 /** ConditionTag: a recorded health condition with its care level. */

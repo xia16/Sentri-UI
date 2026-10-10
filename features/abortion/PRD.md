@@ -30,10 +30,12 @@ Out: see the neighbouring features of the same section for what the same sheet d
 
 ## Decisions
 
+- **One word: abortion / aborted (流产), never miscarriage** — owner decision 2026-10-10. The Pig profile's "Record miscarriage" screen is now "Record abortion" (same event). Farrowing's room list shows an **Aborted** row only while a live piglet remains; with none she leaves the list and the Task overview counts her under "Left the task" (`features/farrowing/PRD.md`, Decisions). Closes backlog item `events-1` ("Abortion vs miscarriage") on the word; the one-form question (deck drawer vs Pig profile sheet) stays open in the screens above.
+
 Open questions and items to confirm:
 
 - The six cause labels are placeholders; they are enumerated only in production node 2572:19676 and must be pulled before build.
-- How the Pig profile "Record miscarriage" sheet relates to this design (filed as a decision).
+- How the Pig profile "Record abortion" sheet (named "Record miscarriage" until 2026-10-10) relates to this design (filed as a decision).
 
 Sources:
 

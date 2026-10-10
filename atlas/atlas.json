@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-10T13:18:35.809Z",
- "commit": "2a1d8a0",
+ "generated": "2026-10-10T14:25:35.974Z",
+ "commit": "5802ae7",
  "platforms": [
   {
    "id": "mobile",
@@ -2601,7 +2601,8 @@
           "id": "died",
           "name": "Died",
           "screens": [
-           "farrowing.ended"
+           "farrowing.ended",
+           "farrowing.allocate"
           ]
          }
         ],
@@ -2690,12 +2691,12 @@
         [
          "farrowing.room",
          "farrowing.ended",
-         "tap a Sow died row"
+         "tap a Sow died row once nothing is left to allocate (hand-reared)"
         ],
         [
          "farrowing.room",
          "farrowing.history",
-         "tap a miscarriage / not in pig / removed row"
+         "tap an abortion / not in pig / removed row"
         ],
         [
          "farrowing.room",
@@ -2776,11 +2777,6 @@
          "farrowing.death",
          "farrowing.locked",
          "Save, or Back, when opened from the locked record"
-        ],
-        [
-         "farrowing.death",
-         "farrowing.ended",
-         "Save (hold) in The sow mode"
         ],
         [
          "farrowing.edit",
@@ -2925,7 +2921,7 @@
         [
          "farrowing.task-outcomes",
          "farrowing.history",
-         "tap an outcome, then a miscarriage sow"
+         "tap an outcome, then an abortion sow"
         ],
         [
          "farrowing.task-outcomes",
@@ -3136,6 +3132,46 @@
          "farrowing.note",
          "farrowing.sow-actions",
          "Save note or Back"
+        ],
+        [
+         "farrowing.death",
+         "farrowing.allocate",
+         "Save (hold) in The sow mode, when piglets are alive"
+        ],
+        [
+         "farrowing.death",
+         "farrowing.ended",
+         "Save (hold) in The sow mode, when no piglet is alive"
+        ],
+        [
+         "farrowing.room",
+         "farrowing.allocate",
+         "tap a Sow died row while piglets wait"
+        ],
+        [
+         "farrowing.allocate",
+         "farrowing.room",
+         "Back (decide later), or Hand-rear here"
+        ],
+        [
+         "farrowing.allocate",
+         "farrowing.foster",
+         "Move to other sows"
+        ],
+        [
+         "farrowing.foster",
+         "farrowing.allocate",
+         "Save while piglets remain, or Back"
+        ],
+        [
+         "farrowing.foster",
+         "farrowing.room",
+         "Save when the last piglet has moved"
+        ],
+        [
+         "farrowing.room",
+         "farrowing.locked",
+         "tap an Aborted row (a live piglet remains)"
         ]
        ],
        "screens": [
@@ -3157,46 +3193,61 @@
           "elements": [
            {
             "name": "Sow row",
-            "shows": "One line per task sow, grouped under her pen: ear tag, state word, two text lines, rail icon.",
+            "shows": "One row per task sow, grouped under her pen: the ear tag exactly as stored over one muted facts line (state · key fact · when · who), a fixed-width tile at the right (a big number over one small word), a chevron. The same row in Find a sow (the facts line leads with the pen and drops when · who) and Scan results. The app-wide animal row, a design-system candidate (Row layout need).",
             "states": [
              {
               "state": "Awaiting · not yet due",
-              "when": "No live total (alive + dead = 0), not finished, no outcome. Due text begins \"Due tomorrow\" or \"Due in N days\"",
-              "shows": "No status word. Line 1 \"Due tomorrow\" / \"Due in 2 days\" (muted). Line 2 \"parity 5 · 11 born last\" (12 when unknown). Chevron."
+              "when": "No live total (alive + dead = 0), not finished, no outcome; due tomorrow or later",
+              "shows": "Neutral tile \"1 / day left\" or \"5 / days left\". Facts \"Parity 5 · 11 born last\"."
              },
              {
               "state": "Awaiting · due",
-              "when": "Same, due text \"Due today\" or \"Due yesterday\"",
-              "shows": "Line 1 \"Due today\" in ink (not muted). Line 2 as above. Chevron."
+              "when": "Due today",
+              "shows": "Neutral tile \"Today / due\". Facts as above."
              },
              {
-              "state": "Awaiting · overdue",
-              "when": "Due text begins \"Overdue\" (expected date = service + 114 days; overdue from day 116)",
-              "shows": "Line 1 \"Overdue · 3 days\": only \"3 days\" is red, the word stays ink. Line 2 as above."
+              "state": "Awaiting · late",
+              "when": "Due yesterday or Overdue (expected date = service + 114 days)",
+              "shows": "Red tile \"3 / days late\" (work for the worker). Facts as above."
              },
              {
               "state": "Active",
               "when": "Live total above zero and not finished",
-              "shows": "Blue \"• Active\" status word (dot and word, as in Go to pen). Line 1 \"9 alive · 5 dead\". Line 2 \"born 14 · 1h ago · G.H\" (\"just now\" after a tap in this session). Chevron. No overdue colour once she has a record."
+              "shows": "Neutral tile \"9 / alive\". Facts \"Farrowing · 5 dead · 1h ago · G.H\": dead only above zero, never \"born N\"."
              },
              {
               "state": "Done",
               "when": "Litter finished (locked)",
-              "shows": "Green \"• Done\" status word. Line 1 alive · dead as now (alive falls when later deaths are recorded). Line 2 \"born 14 · final 05:58 · G.H\". Pencil icon: locked but editable."
+              "shows": "Green tile with a tick, \"done\". Facts \"11 alive · 2 dead · 05:58 · G.H\". No pencil: the row opens the record, and Edit is inside it."
              },
              {
-              "state": "Sow died",
-              "when": "Farrowing ended through the sow's death",
-              "shows": "Red \"• Sow died\" status word instead of Done. Same two lines; line 2 \"born 10 · yesterday · L.M\". Pencil. Counts under the Done tab."
+              "state": "Sow died · piglets to allocate",
+              "when": "She died and none of her live piglets is hand-reared, placed elsewhere, in a rearing pen or recorded dead",
+              "shows": "Red tile \"7 / to allocate\". Facts \"Sow died\" (red) · \"yesterday · L.M\". Tapping opens the allocation sheet. Owner decision 2026-10-10."
+             },
+             {
+              "state": "Sow died · hand-reared",
+              "when": "Her piglets were kept hand-reared on her record",
+              "shows": "Neutral tile \"2 / hand-reared\"; facts \"Sow died · 09:40 · L.M\". The row stays while hand-reared piglets remain; a partial allocation keeps the remaining count (never \"5 moved\"). Tapping opens her record. Owner decision 2026-10-10."
+             },
+             {
+              "state": "Aborted",
+              "when": "An abortion with a live piglet",
+              "shows": "Neutral tile \"1 / alive\" (recorded counts only); facts \"Aborted · 08:10 · G.H\". With no live piglet she is not listed. Owner decision 2026-10-10."
              },
              {
               "state": "Production outcome",
-              "when": "Miscarriage, Not in pig or Removed from batch recorded",
-              "shows": "No status word. Line 1 the outcome name; line 2 \"Recorded · 08:10 · G.H\". Chevron; opens the Production log. Counts under Done."
+              "when": "Not in pig or Removed from batch recorded",
+              "shows": "Neutral tile with a dash and the outcome word; facts \"Not in pig · 08:10 · G.H\". Opens the Production log. Counts under Done."
+             },
+             {
+              "state": "Left the list",
+              "when": "Sow died with nothing left to allocate or hand-rear; or aborted with no live piglet",
+              "shows": "Not drawn in any lens, Find a sow or Go to pen. The Task overview counts her once, under \"Left the task\". Owner decision 2026-10-10."
              }
             ],
-            "logic": "Days are counted from due, never the gestation day. Awaiting vs Active flips on the live total: a sow counted back to zero reads Awaiting again and regains her Due line. Recency (\"1h ago\") and hand (\"G.H\") are fixed sample text, not computed from records. Line 2 is words in the sans face; only the figures are mono.",
-            "source": "farrowing-astra-concept.js roomRow(), roomState(); RULINGS \"Model\"",
+            "logic": "Tile colour is meaning only: red solid (white text) is work for the worker (to allocate, days late), green wash is done, neutral is everything else; no border or shadow, the whole row is the tap target. The ID is shown exactly as stored (never grouped, truncated or styled by part; it wraps and the row grows). Only recorded counts show; never \"born N\" when alive and dead are shown, never an expected or carried count. Pens stay as dividers in aisle order. One function draws the row (sowRow).",
+            "source": "farrowing-astra-concept.js sowRow(), leftTask(); Row layout need; PRD Decisions 2026-10-10",
             "at": "000418"
            },
            {
@@ -3234,12 +3285,12 @@
               "shows": "That segment is left out of the bar; the number and support text still print the zero"
              },
              {
-              "state": "Other outcomes",
-              "when": "Sows with miscarriage, not in pig or removed, or that died before or during farrowing",
-              "shows": "Counted as Done: they are sows of the task, so they stay in the number and the denominator (the overview breaks them out under Other outcomes)"
+              "state": "Left the task",
+              "when": "Sows aborted with no live piglet, or died with nothing left to allocate",
+              "shows": "Out of the number and the denominator, so the figure still adds up (7 / 18 once one of 19 has left). The overview counts them under Left the task."
              }
             ],
-            "logic": "Done = every sow of the task with a finished record, in all units: finished litters, sow deaths, miscarriages, not in pig, removed. Denominator = every sow of the task (Done + Active + Awaiting): the same total as Task outcomes on End task and the receipt, and the sum of each unit’s Awaiting, Active and Done tabs. Segment widths are proportional to those counts. Scope is all units and never follows the lens or filter. KPIs still count finished litters only.",
+            "logic": "Done = every sow still on the list with a finished record, in all units: finished litters, sow deaths and abortions that still have piglets, not in pig, removed. Denominator = every sow still on the list (Done + Active + Awaiting). Sows that left the list are counted on the Task overview as Left the task, and on End task and the receipt as Sow deaths and Aborted, so every sow is in exactly one place.",
             "source": "farrowing-astra-concept.js taskOverview(); astra-task-overview.js statusProgress()",
             "at": "Done"
            },
@@ -3807,7 +3858,8 @@
            "\"Stillborn entry stays in the drawer — no sheet shortcut\" (Surfaces & entrances)",
            "\"Sow dies mid-farrowing … Piglets · The sow\" and \"Saving the sow's death is hold-to-commit\" (Starting and ending a session)",
            "\"Photos are optional on both drawer modes\" (Starting and ending a session)",
-           "\"No WHEN anywhere, absolutely\" (Model)"
+           "\"No WHEN anywhere, absolutely\" (Model)",
+           "Sheet title names the job (\"Record dead\"), subtitle the animal (\"<ID> · <pen>\") (Owner decision 2026-10-10)."
           ],
           "issues": [
            "Back keeps the draft, as the ruling says; Finish has no banner.",
@@ -4267,6 +4319,76 @@
          }
         },
         {
+         "id": "farrowing.allocate",
+         "name": "Sow died · piglets to allocate",
+         "zh": "母猪死亡·仔猪安置",
+         "status": "in-design",
+         "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+         "preset": "allocate",
+         "figma": "",
+         "notes": {
+          "purpose": "Right after the hold records her death, or from her row while piglets wait: where do her live piglets go? Footer Back means later.",
+          "states": [
+           "Title \"N piglets to allocate\", subtitle \"<ID> · <pen> · sow died <time>\". After a partial move the sheet returns with the remaining count.",
+           "On a farm with no rearing pen the third option is absent."
+          ],
+          "elements": [
+           {
+            "name": "Options",
+            "at": "Move to other sows",
+            "shows": "Three rows with a chevron: Move to other sows (\"Foster or nurse sow\"), Hand-rear here (\"Bottle or milk replacer in her crate\"), Move to a rearing pen (\"Rescue deck\").",
+            "states": [
+             {
+              "state": "Move to other sows",
+              "when": "Tap",
+              "shows": "Opens the Move page (Foster piglets, sending out of this litter) with all her piglets pre-selected; the stepper lowers the count so several receiving sows can split them. Saving returns here with the remaining count, or to the room when none is left."
+             },
+             {
+              "state": "Hand-rear here",
+              "when": "Tap",
+              "shows": "The piglets stay on her record and piglet care continues. Back to the room; her row reads \"N hand-reared\"."
+             },
+             {
+              "state": "Move to a rearing pen",
+              "when": "Tap, only when farm config says the farm has a rearing pen (prototype flag, on for the demo; ?rearing=off)",
+              "shows": "Every remaining piglet leaves her record. Back to the room; she leaves the list."
+             }
+            ],
+            "logic": "Back is the only exit and means later: nothing is decided, her row reads \"N to allocate\" and tapping it reopens this sheet. No ✕, no extra question line.",
+            "source": "farrowing-astra-concept.js allocate(), act(allocMove | allocHand | allocRear)"
+           }
+          ],
+          "controls": [
+           {
+            "control": "Back",
+            "does": "leaves; nothing is decided",
+            "goesTo": "farrowing.room"
+           },
+           {
+            "control": "Move to other sows",
+            "does": "opens the move page",
+            "goesTo": "farrowing.foster"
+           }
+          ],
+          "copy": [
+           "N piglets to allocate · <ID> · <pen> · sow died <time>",
+           "Move to other sows · Foster or nurse sow",
+           "Hand-rear here · Bottle or milk replacer in her crate",
+           "Move to a rearing pen · Rescue deck"
+          ],
+          "edge": [
+           "A sow who died with no live piglet gets no sheet: she leaves the list at once.",
+           "The receiving sows' own litters are not changed in this prototype."
+          ],
+          "issues": [
+           "Rearing pen: how a farm declares it is open (To confirm farrowing-room-list-1)."
+          ],
+          "rules": [
+           "Owner decision 2026-10-10: fostering is in scope for the sow-died case; an orphan litter can stay in the task, hand-reared; a rearing pen is a farm-level option (configuration open, To confirm farrowing-room-list-1)."
+          ]
+         }
+        },
+        {
          "id": "farrowing.ended",
          "name": "Sow died",
          "zh": "母猪死亡",
@@ -4319,16 +4441,17 @@
            "(raw) Born · Alive · Dead"
           ],
           "edge": [
-           "She stays in the room until the task ends"
+           "She stays in the room while her piglets are unallocated or hand-reared; she leaves once none is left",
+           "Piglet deaths are recorded through Record dead on this record and her count drops (Owner decision 2026-10-10)"
           ],
           "rules": [
            "\"She stays in the room … a Done-register row — red chip sow died\" (Starting and ending a session)",
            "\"Ended keeps its red band and omits the Finished row\" (After the lock)",
-           "\"Sow dies mid-farrowing … Born derives from what stands, classification skipped\" (Starting and ending a session)"
+           "\"Sow dies mid-farrowing … Born derives from what stands, classification skipped\" (Starting and ending a session)",
+           "\"A piglet that dies or is put down is recorded through Record dead, and the count drops\" (Owner decision 2026-10-10)"
           ],
           "issues": [
-           "The ruled \"Farrowing record\" row and the stamp inside the band are missing; the face is the generic summary.",
-           "Piglet deaths after the sow died are recordable; the ruling says nothing about them."
+           "The ruled \"Farrowing record\" row and the stamp inside the band are missing; the face is the generic summary."
           ]
          }
         },
@@ -4425,7 +4548,7 @@
            {
             "name": "Task outcomes",
             "shows": "Sow count per outcome across all units; title meta is all sows in the task.",
-            "logic": "Finished farrowing and Awaiting always print; Still farrowing, Removed earlier, Miscarriages, Not in pig and Sow deaths appear only when above zero. After the task ends the Awaiting row reads \"Removed · not farrowed\".",
+            "logic": "Finished farrowing and Awaiting always print; Still farrowing, Removed earlier, Aborted, Not in pig and Sow deaths appear only when above zero. After the task ends the Awaiting row reads \"Removed · not farrowed\".",
             "source": "farrowing-astra-concept.js taskOutcomeSummary()",
             "at": "Task outcomes"
            },
@@ -4518,7 +4641,7 @@
            {
             "name": "Task outcomes",
             "shows": "Sow count per outcome across all units; title meta is all sows in the task.",
-            "logic": "Finished farrowing and Awaiting always print; Still farrowing, Removed earlier, Miscarriages, Not in pig and Sow deaths appear only when above zero. After the task ends the Awaiting row reads \"Removed · not farrowed\".",
+            "logic": "Finished farrowing and Awaiting always print; Still farrowing, Removed earlier, Aborted, Not in pig and Sow deaths appear only when above zero. After the task ends the Awaiting row reads \"Removed · not farrowed\".",
             "source": "farrowing-astra-concept.js taskOutcomeSummary()",
             "at": "Task outcomes"
            },
@@ -4609,7 +4732,7 @@
            {
             "name": "Task outcomes",
             "shows": "Sow count per outcome across all units; title meta is all sows in the task.",
-            "logic": "Finished farrowing and Awaiting always print; Still farrowing, Removed earlier, Miscarriages, Not in pig and Sow deaths appear only when above zero. After the task ends the Awaiting row reads \"Removed · not farrowed\".",
+            "logic": "Finished farrowing and Awaiting always print; Still farrowing, Removed earlier, Aborted, Not in pig and Sow deaths appear only when above zero. After the task ends the Awaiting row reads \"Removed · not farrowed\".",
             "source": "farrowing-astra-concept.js taskOutcomeSummary()",
             "at": "Task outcomes"
            }
@@ -4641,15 +4764,15 @@
          "preset": "task-outcomes",
          "figma": "",
          "notes": {
-          "purpose": "Review the task when sows have recorded production outcomes such as a miscarriage.",
+          "purpose": "Review the task when sows have recorded production outcomes such as an abortion.",
           "states": [],
           "elements": [
            {
             "name": "Outcome rows",
-            "shows": "Miscarriages · Not in pig · Removed earlier · Sow deaths in Task outcomes.",
+            "shows": "Aborted · Not in pig · Removed earlier · Sow deaths in Task outcomes.",
             "logic": "Each row appears only when above zero. These sows are Done and part of the task total; they sit outside the KPIs. Here the rows are plain; on the Task overview nonzero rows open a sow list.",
             "source": "farrowing-astra-concept.js taskOutcomeSummary()",
-            "at": "Miscarriages"
+            "at": "Aborted"
            },
            {
             "name": "Title",
@@ -4673,7 +4796,7 @@
            "Task closure doc: active farrowing and unsaved drafts block; awaiting sows are removed from the batch (ux/research/farrowing/ASTRA-TASK-CLOSURE.md)"
           ],
           "issues": [
-           "Outcome counts appear on the Task overview, here and on the receipt; the miscarriage entry form is not in this prototype."
+           "Outcome counts appear on the Task overview, here and on the receipt; the abortion entry form is not in this prototype."
           ]
          }
         },
@@ -4761,7 +4884,7 @@
            {
             "name": "Whole-task progress",
             "shows": "Sow total, stacked bar and Done · Active · Awaiting counts.",
-            "logic": "Same numbers and rules as the room's Task overview card; zero segments are left out of the bar.",
+            "logic": "Counts the sows still on the room list. Sows that left it (aborted with no live piglet; died with no piglet left to place) are counted under Left the task, so the total adds up.",
             "source": "farrowing-astra-concept.js roomOverview, taskOverview()",
             "at": "Whole-task progress"
            },
@@ -4785,12 +4908,12 @@
            },
            {
             "name": "Other outcomes",
-            "shows": "Miscarriages · Sow deaths · Not in pig · Removed from batch.",
+            "shows": "Left the task · n aborted · n sow died; then Not in pig and Removed from batch when recorded.",
             "states": [
              {
-              "state": "Always listed",
-              "when": "Miscarriages and Sow deaths",
-              "shows": "Shown even at 0"
+              "state": "Left the task",
+              "when": "At least one sow has left the room list",
+              "shows": "One row, line 2 \"1 aborted · 1 sow died\" (a zero part is left out). Opens the list of those sows."
              },
              {
               "state": "When recorded",
@@ -4798,9 +4921,9 @@
               "shows": "Row appears only above zero"
              },
              {
-              "state": "Tappable",
-              "when": "Count above zero",
-              "shows": "Opens a grouped sow list; zero rows do nothing"
+              "state": "Nothing to show",
+              "when": "No sow has left and none has an outcome",
+              "shows": "The section is not drawn"
              }
             ],
             "source": "farrowing-astra-concept.js taskOtherOutcomes()",
@@ -4911,7 +5034,7 @@
          "preset": "foster",
          "figma": "",
          "notes": {
-          "purpose": "Send or receive piglets between this litter and another, counted on one Well stepper.",
+          "purpose": "Send or receive piglets between this litter and another, counted on one Well stepper. From a dead sow's allocation sheet it opens sending out, with all her piglets selected.",
           "states": [],
           "elements": [
            {
@@ -5121,7 +5244,7 @@
           "elements": [
            {
             "name": "Notices",
-            "at": "Pen information",
+            "at": "Pen B1",
             "shows": "Faults and the note, listed above the tools only when they exist.",
             "logic": "Only open faults are listed; a resolved fault leaves the page and stays in the pen log. A pen holds one note.",
             "source": "farrowing-astra-concept.js penDetails(), penInfo()"
@@ -5156,6 +5279,9 @@
           ],
           "issues": [
            "Whose feature the pen tools are is unclear: the same pen sheet, note, fault and log flows are drawn in Inspection (see the decision \"Pen tools are drawn in Farrowing and in Inspection\")."
+          ],
+          "rules": [
+           "The sheet's title is the job, so it has no second heading \"Pen information\" over the tool rows (Owner decision 2026-10-10)."
           ]
          }
         },
@@ -5401,7 +5527,7 @@
               "shows": "\"No matching ear tags.\""
              }
             ],
-            "logic": "Case-insensitive contains-match on the ear tag or the pen code, over the current unit only: sows in other units are not found. Rows are the room rows (Awaiting, Active, Done, Sow died, outcome).",
+            "logic": "Case-insensitive contains-match on the ear tag or the pen code, over the sows on the current unit's list: sows that left the list are not found. Rows are the same room rows, drawn by one function (sowRow).",
             "rule": "A row opens that sow's record by her status (Awaiting or Active drawer, locked record, or the production log for a recorded outcome) and makes her pen the current one.",
             "source": "farrowing-astra-concept.js roomSearchResults(), room-sow"
            }
@@ -5430,7 +5556,7 @@
             "name": "Scanner preview",
             "at": "Scanner preview",
             "shows": "A placeholder frame, \"Scanner preview\", with a \"Try sample tag\" button.",
-            "rule": "\"Try sample tag\" opens the unit's first sow (000418). Below the frame, the same field and results as Find a sow take a typed tag or pen.",
+            "rule": "\"Try sample tag\" opens the unit's first sow (000418). Below the frame, the same field and results as Find a sow take a typed tag or pen. Results are the same room rows.",
             "source": "farrowing-astra-concept.js roomScan, room-demo-scan; ASTRA-ROOM-PAGE-AUDIT.md"
            }
           ],
@@ -5459,7 +5585,7 @@
            "Active farrowing (from \"Still farrowing\"): \"Open a sow to review and finish the record.\"; each row ends \"9 alive\".",
            "Awaiting farrowing: a notice \"N sows will be removed from this batch\"; each row ends with her due text.",
            "Sow deaths: each sow is a death review block rather than a plain row.",
-           "Miscarriages, Not in pig, Removed from batch: \"Recorded outcomes across all units. Open a sow to view the record.\"; each row ends with the outcome word.",
+           "Aborted, Not in pig, Removed from batch: \"Recorded outcomes across all units. Open a sow to view the record.\"; each row ends with the outcome word.",
            "Empty group: \"No sows to review.\""
           ],
           "elements": [
@@ -5553,16 +5679,16 @@
          "notes": {
           "purpose": "All other things to do for one sow, grouped Health, Routine, Production, opened from \"More actions\" on her drawer.",
           "states": [
-           "Awaiting (nothing counted): Record miscarriage, Remove from batch, Mark not in pig, Record sow death, note and transfer are open; the piglet rows and Edit litter record are closed.",
+           "Awaiting (nothing counted): Record abortion, Remove from batch, Mark not in pig, Record sow death, note and transfer are open; the piglet rows and Edit litter record are closed.",
            "Farrowing: the piglet rows, Edit litter record and Foster piglets open; Remove from batch and Mark not in pig close.",
-           "Finished: Record miscarriage also closes.",
+           "Finished: Record abortion also closes.",
            "Sow died or outcome recorded: most rows close with the reason."
           ],
           "elements": [
            {
             "name": "Production rows",
             "at": "Piglet processing",
-            "shows": "Record miscarriage, Piglet processing, Record piglet deaths, Reconcile piglet count, Edit litter record, Foster piglets, Remove from batch, Mark not in pig, Move to another farrowing batch.",
+            "shows": "Record abortion, Piglet processing, Record piglet deaths, Reconcile piglet count, Edit litter record, Foster piglets, Remove from batch, Mark not in pig, Move to another farrowing batch.",
             "states": [
              {
               "state": "Record the litter first.",
@@ -5587,17 +5713,17 @@
              {
               "state": "Farrowing is already finished.",
               "when": "Litter locked",
-              "shows": "Closes Record miscarriage"
+              "shows": "Closes Record abortion"
              },
              {
               "state": "A production outcome is already recorded.",
-              "when": "Miscarriage, not in pig or removed",
+              "when": "Abortion, not in pig or removed",
               "shows": "Closes most production rows"
              },
              {
               "state": "This sow has died.",
               "when": "Farrowing ended by her death",
-              "shows": "Closes miscarriage, note, transfer, remove, not in pig"
+              "shows": "Closes abortion, note, transfer, remove, not in pig"
              },
              {
               "state": "No destination farrowing batches are connected in this preview.",
@@ -5784,7 +5910,7 @@
          }
         }
        ],
-       "prd": "# Farrowing (分娩)\r\n\r\nSection: Tasks · Platform: mobile · Prototype: `ux/system/farrowing-astra-concept.html?layout=focus` · Rulings: `ux/research/farrowing/RULINGS.md` (headings quoted below) · State contract: `ux/system/farrowing-contract.html`\r\n\r\n## Problem\r\n\r\nA sow can farrow for hours, across shifts, with wet gloves, one hand on the crate and no signal guarantee. The worker needs to count the piglets as they arrive without ever feeling the count is unsaved, record the dead by cause, fix a wrong figure without erasing the first one, and close the litter with a few deliberate facts. The supervisor needs the same records to roll up into one task: how many sows have farrowed, which are still going, which are still waiting, and a clean way to end the batch's farrowing task. The old UI scattered these over several screens and corrections had many doors; this feature keeps one familiar flow with a clearer place for every number.\r\n\r\n## Who\r\n\r\n- Farrowing-house worker (gloved, one-handed, often at night): counts, records deaths, finishes litters.\r\n- Next-shift worker: reads the room list to see who is farrowing and who was last touched, then continues from the same record.\r\n- Unit lead / supervisor: reads the unit and task progress, corrects posted figures, ends the task.\r\n- Anyone may amend a finished record; provenance (stamp, original kept) replaces permissions.\r\n\r\n## Anchor\r\n\r\nThe anchor is the **sow** (her litter session). Statuses: **Awaiting** (nothing recorded; live total zero) → **Farrowing** (live total above zero, not finished) → **Finished** (Born locked). Exit: **Died** (the sow's death ends the session without Finish; she stays in the room as a Done-register row). Reachable in any status: the **Room list** and the **Farrowing log**. Task bands: **Task in progress** (the whole-task overview) and **Ending the task** (the four End task reviews and the receipt).\r\n\r\nStatus is derived, never set by a ceremony: \"registers derive from the live total (posted + open pending)\" (RULINGS *Starting and ending a session*).\r\n\r\n## Rules\r\n\r\nFrom RULINGS.md, quoted short:\r\n\r\n- **Model**: \"Born = Alive + Σ Dead + fostered out − fostered in. Derived, never entered, locks at Finish.\"\r\n- **Model**: Alive is one classless number; \"+ is free; − drains pending and clamps at the floor\" (B\\* minus the dead recorded). Born can never drop silently.\r\n- **Model**: five default dead types plus Other (stillborn, mummified, crushed, scours, starve-out).\r\n- **Model**: \"No WHEN anywhere, absolutely … The stamp is the date.\"\r\n- **Model**: \"Classification (weak/deformed) happens at Finish, commits per tap\"; \"Healthy has no form row\"; litter weight and assisted are optional.\r\n- **Model**: Active row line 2 is \"born 14 · 1h ago · G.H\"; \"No staleness tracking on Active sows\"; the interval chip is retired. \"Every litter row carries its three numbers\" (alive · dead, born).\r\n- **Model**: \"The overdue signal ends at the first record\"; rows speak in days from due (due = service + 114), never gestation day; \"Overdue · 3 days\" colours only the number.\r\n- **Model**: \"The hero owns the total; the receipt owns the change\" (`Saved · +4 this visit`).\r\n- **Surfaces & entrances**: \"ONE dead drawer product-wide\", opened by Record dead; staged: Save commits, Back keeps the draft, Clear discards.\r\n- **Surfaces & entrances**: \"ONE correction door: Edit … ONE SCREEN\"; \"What Edit adjusts: the observations, never the derivation\"; a missed fact is a recording, never an Edit.\r\n- **Surfaces & entrances**: \"Type-to-set is retired on count figures\"; one stepper shape, − n +, everywhere.\r\n- **Surfaces & entrances**: \"Identity is sheet-first … the room row offers no sow-page target.\"\r\n- **Surfaces & entrances**: \"`Finish` is `Finish farrowing`\"; the hold-to-lock is \"the second guard\".\r\n- **Starting and ending a session**: \"Farrowing starts at the first recorded event — full stop.\"\r\n- **Starting and ending a session**: the sow's death lives in the drawer (`Piglets · The sow`), \"hold-to-commit\"; \"She stays in the room\".\r\n- **Starting and ending a session**: \"A non-empty ledger is never unreachable\"; a draft never crosses the lock.\r\n- **After the lock**: \"The record face IS the record\"; \"One ledger surface, the Farrowing record page\"; \"History is the chevron on the fact line\"; \"The correction mark is the amber value\".\r\n- **After the lock**: Born is amended through the Edit ceremony, which opens in place under the Born row (`More born` / `Count was wrong`; never a drawer on a drawer); \"Anyone may amend born post-lock — open ✎, stamped, no role gate.\" Fostering is **parked**.\r\n- **Names and glyphs**: \"words carry actions, icons carry objects\"; dates speak relative within the week.\r\n- **Piglet processing, Round 5**: all tasks look the same (farrowing's skeleton); \"The exit word is always **Back**.\"\r\n- **Owner calls for this atlas**: *Edit record* is editing while she is still farrowing; *Correct born* exists only after farrowing has finished. Home's Farrowing card and Choose unit both land on the room list.\r\n\r\n## Scope\r\n\r\nIn:\r\n\r\n- Room list: unit card, whole-task card, Awaiting / Active / Done / All tabs, due and parity filter, pen grouping, Go to pen, Scan ear tag, Search.\r\n- The sow sheet in its faces: Before first count, Counting, Finish (and its blocked form), Locked record, Sow died.\r\n- Death entry (piglets and the sow), Edit record, Edit of a finished litter and the Correct born correction (in place), the Farrowing log.\r\n- Whole-task overview, End task reviews (blocked, awaiting, all finished, outcomes) and the task receipt. One count everywhere: Done · Active · Awaiting over every sow of the task (a sow that died or has an outcome is Done), the same on the overview, End task, the receipt and the room tabs.\r\n- Farrowing's rows on the pig's Actions sheet (Edit litter record, Record miscarriage, Mark not in pig).\r\n\r\nOut:\r\n\r\n- Fostering (parked until the owner reopens it).\r\n- Piglet processing and its identity work (separate feature; Move opens after the lock). The prototype's own Piglet processing, identity and mortality pages are mapped as screens; see the decision \"Piglet processing is drawn in Farrowing and as its own feature\".\r\n- The sow page itself and the rest of the Actions sheet (pig-profile).\r\n- Pen tools reachable from a pen header (feed guidance, equipment fault, pen note, pen log): present in the prototype, unclear whose feature; recorded in the Room list issues. The pen pages are mapped as screens; see the decision \"Pen tools are drawn in Farrowing and in Inspection\".\r\n- Console reporting, anomaly queues, per-hand audit views, merge-review UI, notifications.\r\n- Role gates, batch-close disposition doors beyond what the End task reviews show.\r\n\r\n## Decisions\r\n\r\n- Born is derived and frozen at Finish; Alive and the dead types are the observations — RULINGS *Model*.\r\n- Born floor: \"+\" free, \"−\" clamps at B\\* minus current dead — RULINGS *Model*.\r\n- Five dead types plus Other; no WHEN chips — RULINGS *Model*.\r\n- Weak and deformed asked at Finish only; Healthy derived — RULINGS *Model*.\r\n- Row line 2 carries recency in words; interval chip retired — RULINGS *Model*.\r\n- Overdue signal stops at the first record — RULINGS *Model*.\r\n- Days from due on rows, gestation day on the sheet header only — RULINGS *Model*.\r\n- Receipt `Saved · +4 this visit`; hero numeral plain, no typing — RULINGS *Model*.\r\n- Edit folds weak, deformed, weight and assisted into one `At finish` row — RULINGS *Model*.\r\n- Dead drawer is the only dead entrance, staged (Back/Clear/Save) — RULINGS *Surfaces & entrances*.\r\n- Edit is the only correction door and one screen — RULINGS *Surfaces & entrances*.\r\n- Count figures are stepper-only — RULINGS *Surfaces & entrances*.\r\n- Sheet-first identity: only the sheet header opens the sow page — RULINGS *Surfaces & entrances*.\r\n- Exit grammar: bars hold exits only; Finish farrowing is a hold — RULINGS *Surfaces & entrances*.\r\n- Farrowing starts at the first record; no started mark — RULINGS *Starting and ending a session*.\r\n- The sow's death is a hold-to-commit mode of the drawer; she stays in the room — RULINGS *Starting and ending a session*.\r\n- Merge contract: signed deltas, flag instead of silently applying a breach — RULINGS *Starting and ending a session*.\r\n- Fostering parked — RULINGS *After the lock*.\r\n- The locked record is designed as a record, with one ledger page — RULINGS *After the lock*.\r\n- Anyone may amend Born after the lock — RULINGS *After the lock*.\r\n- Words for actions, icons for objects — RULINGS *Names and glyphs*.\r\n- Relative dates inside a week — RULINGS *Names and glyphs*.\r\n- Farrowing's skeleton is the model for all tasks; exit word Back — RULINGS *Piglet processing, Round 5*.\r\n- Task end: manual, hold-to-commit with receipt, blocked while farrowing is open — RULINGS *Piglet processing, Q5*; closure details in `ux/research/farrowing/ASTRA-TASK-CLOSURE.md`.\r\n- Edit record vs Correct born split by status; Home entries land on the room list — owner calls for this atlas.\r\n",
+       "prd": "# Farrowing (分娩)\r\n\r\nSection: Tasks · Platform: mobile · Prototype: `ux/system/farrowing-astra-concept.html?layout=focus` · Rulings: `ux/research/farrowing/RULINGS.md` (headings quoted below) · State contract: `ux/system/farrowing-contract.html`\r\n\r\n## Problem\r\n\r\nA sow can farrow for hours, across shifts, with wet gloves, one hand on the crate and no signal guarantee. The worker needs to count the piglets as they arrive without ever feeling the count is unsaved, record the dead by cause, fix a wrong figure without erasing the first one, and close the litter with a few deliberate facts. The supervisor needs the same records to roll up into one task: how many sows have farrowed, which are still going, which are still waiting, and a clean way to end the batch's farrowing task. The old UI scattered these over several screens and corrections had many doors; this feature keeps one familiar flow with a clearer place for every number.\r\n\r\n## Who\r\n\r\n- Farrowing-house worker (gloved, one-handed, often at night): counts, records deaths, finishes litters.\r\n- Next-shift worker: reads the room list to see who is farrowing and who was last touched, then continues from the same record.\r\n- Unit lead / supervisor: reads the unit and task progress, corrects posted figures, ends the task.\r\n- Anyone may amend a finished record; provenance (stamp, original kept) replaces permissions.\r\n\r\n## Anchor\r\n\r\nThe anchor is the **sow** (her litter session). Statuses: **Awaiting** (nothing recorded; live total zero) → **Farrowing** (live total above zero, not finished) → **Finished** (Born locked). Exits: **Sow died** (her death ends the session without Finish; she stays in the room while her piglets still need a place) and **Aborted** (an abortion with a live piglet keeps her row; with none she leaves the list). Both are finished states; sows that have left the list are counted once on the Task overview as \"Left the task\". Reachable in any status: the **Room list** and the **Farrowing log**. Task bands: **Task in progress** (the whole-task overview) and **Ending the task** (the four End task reviews and the receipt).\r\n\r\nStatus is derived, never set by a ceremony: \"registers derive from the live total (posted + open pending)\" (RULINGS *Starting and ending a session*).\r\n\r\n## Rules\r\n\r\nFrom RULINGS.md, quoted short:\r\n\r\n- **Model**: \"Born = Alive + Σ Dead + fostered out − fostered in. Derived, never entered, locks at Finish.\"\r\n- **Model**: Alive is one classless number; \"+ is free; − drains pending and clamps at the floor\" (B\\* minus the dead recorded). Born can never drop silently.\r\n- **Model**: five default dead types plus Other (stillborn, mummified, crushed, scours, starve-out).\r\n- **Model**: \"No WHEN anywhere, absolutely … The stamp is the date.\"\r\n- **Model**: \"Classification (weak/deformed) happens at Finish, commits per tap\"; \"Healthy has no form row\"; litter weight and assisted are optional.\r\n- **Model**: Active row line 2 is \"born 14 · 1h ago · G.H\"; \"No staleness tracking on Active sows\"; the interval chip is retired. \"Every litter row carries its three numbers\" (alive · dead, born).\r\n- **Model**: \"The overdue signal ends at the first record\"; rows speak in days from due (due = service + 114), never gestation day; \"Overdue · 3 days\" colours only the number.\r\n- **Model**: \"The hero owns the total; the receipt owns the change\" (`Saved · +4 this visit`).\r\n- **Surfaces & entrances**: \"ONE dead drawer product-wide\", opened by Record dead; staged: Save commits, Back keeps the draft, Clear discards.\r\n- **Surfaces & entrances**: \"ONE correction door: Edit … ONE SCREEN\"; \"What Edit adjusts: the observations, never the derivation\"; a missed fact is a recording, never an Edit.\r\n- **Surfaces & entrances**: \"Type-to-set is retired on count figures\"; one stepper shape, − n +, everywhere.\r\n- **Surfaces & entrances**: \"Identity is sheet-first … the room row offers no sow-page target.\"\r\n- **Surfaces & entrances**: \"`Finish` is `Finish farrowing`\"; the hold-to-lock is \"the second guard\".\r\n- **Starting and ending a session**: \"Farrowing starts at the first recorded event — full stop.\"\r\n- **Starting and ending a session**: the sow's death lives in the drawer (`Piglets · The sow`), \"hold-to-commit\"; \"She stays in the room\".\r\n- **Starting and ending a session**: \"A non-empty ledger is never unreachable\"; a draft never crosses the lock.\r\n- **After the lock**: \"The record face IS the record\"; \"One ledger surface, the Farrowing record page\"; \"History is the chevron on the fact line\"; \"The correction mark is the amber value\".\r\n- **After the lock**: Born is amended through the Edit ceremony, which opens in place under the Born row (`More born` / `Count was wrong`; never a drawer on a drawer); \"Anyone may amend born post-lock — open ✎, stamped, no role gate.\" Fostering is **parked**.\r\n- **Names and glyphs**: \"words carry actions, icons carry objects\"; dates speak relative within the week.\r\n- **Piglet processing, Round 5**: all tasks look the same (farrowing's skeleton); \"The exit word is always **Back**.\"\r\n- **Owner calls for this atlas**: *Edit record* is editing while she is still farrowing; *Correct born* exists only after farrowing has finished. Home's Farrowing card and Choose unit both land on the room list.\r\n\r\n## Scope\r\n\r\nIn:\r\n\r\n- Room list: unit card, whole-task card, Awaiting / Active / Done / All tabs, due and parity filter, pen grouping, Go to pen, Scan ear tag, Search.\r\n- The sow sheet in its faces: Before first count, Counting, Finish (and its blocked form), Locked record, Sow died.\r\n- Death entry (piglets and the sow), Edit record, Edit of a finished litter and the Correct born correction (in place), the Farrowing log.\r\n- Whole-task overview, End task reviews (blocked, awaiting, all finished, outcomes) and the task receipt. One count everywhere: Done · Active · Awaiting over every sow of the task (a sow that died or has an outcome is Done), the same on the overview, End task, the receipt and the room tabs.\r\n- Farrowing's rows on the pig's Actions sheet (Edit litter record, Record abortion, Mark not in pig).\n- When a sow dies: the allocation sheet (move her piglets to other sows, hand-rear them in her crate, or move them to a rearing pen), the Move page it opens (`farrowing.foster`), and her row's life on the list until every piglet has a place.\r\n\r\nOut:\r\n\r\n- Fostering outside the sow-died case (parked until the owner reopens it; see Decisions, 2026-10-10).\r\n- Piglet processing and its identity work (separate feature; Move opens after the lock). The prototype's own Piglet processing, identity and mortality pages are mapped as screens; see the decision \"Piglet processing is drawn in Farrowing and as its own feature\".\r\n- The sow page itself and the rest of the Actions sheet (pig-profile).\r\n- Pen tools reachable from a pen header (feed guidance, equipment fault, pen note, pen log): present in the prototype, unclear whose feature; recorded in the Room list issues. The pen pages are mapped as screens; see the decision \"Pen tools are drawn in Farrowing and in Inspection\".\r\n- Console reporting, anomaly queues, per-hand audit views, merge-review UI, notifications.\r\n- Role gates, batch-close disposition doors beyond what the End task reviews show.\r\n\r\n## Decisions\r\n\r\n- Born is derived and frozen at Finish; Alive and the dead types are the observations — RULINGS *Model*.\r\n- Born floor: \"+\" free, \"−\" clamps at B\\* minus current dead — RULINGS *Model*.\r\n- Five dead types plus Other; no WHEN chips — RULINGS *Model*.\r\n- Weak and deformed asked at Finish only; Healthy derived — RULINGS *Model*.\r\n- Row line 2 carries recency in words; interval chip retired — RULINGS *Model*.\r\n- Overdue signal stops at the first record — RULINGS *Model*.\r\n- Days from due on rows, gestation day on the sheet header only — RULINGS *Model*.\r\n- Receipt `Saved · +4 this visit`; hero numeral plain, no typing — RULINGS *Model*.\r\n- Edit folds weak, deformed, weight and assisted into one `At finish` row — RULINGS *Model*.\r\n- Dead drawer is the only dead entrance, staged (Back/Clear/Save) — RULINGS *Surfaces & entrances*.\r\n- Edit is the only correction door and one screen — RULINGS *Surfaces & entrances*.\r\n- Count figures are stepper-only — RULINGS *Surfaces & entrances*.\r\n- Sheet-first identity: only the sheet header opens the sow page — RULINGS *Surfaces & entrances*.\r\n- Exit grammar: bars hold exits only; Finish farrowing is a hold — RULINGS *Surfaces & entrances*.\r\n- Farrowing starts at the first record; no started mark — RULINGS *Starting and ending a session*.\r\n- The sow's death is a hold-to-commit mode of the drawer; she stays in the room — RULINGS *Starting and ending a session*.\r\n- Merge contract: signed deltas, flag instead of silently applying a breach — RULINGS *Starting and ending a session*.\r\n- Fostering parked — RULINGS *After the lock*.\r\n- The locked record is designed as a record, with one ledger page — RULINGS *After the lock*.\r\n- Anyone may amend Born after the lock — RULINGS *After the lock*.\r\n- Words for actions, icons for objects — RULINGS *Names and glyphs*.\r\n- Relative dates inside a week — RULINGS *Names and glyphs*.\r\n- Farrowing's skeleton is the model for all tasks; exit word Back — RULINGS *Piglet processing, Round 5*.\r\n- Task end: manual, hold-to-commit with receipt, blocked while farrowing is open — RULINGS *Piglet processing, Q5*; closure details in `ux/research/farrowing/ASTRA-TASK-CLOSURE.md`.\r\n- Edit record vs Correct born split by status; Home entries land on the room list — owner calls for this atlas.\r\n\r\n### Owner decisions, 2026-10-10\r\n\r\n- **Room rows** (the room, Find a sow, Scan results) are one row, the app-wide animal row (a design-system candidate, the \"need tile\" row): the ear tag exactly as stored over one muted facts line (state · key fact · when · who), a fixed-width tile at the right (a big number over one small word: `9 / alive`, `3 / days late`, `7 / to allocate`, `✓ / done`), a chevron. Tile colour is meaning only: red solid is work for the worker, green wash is done, neutral is the rest. Only recorded counts show: alive, and `· N dead` only above zero; never *born* when alive and dead are shown, never an expected or carried count. No pencil and no chip: tapping the row opens the record, and Edit is inside it. Awaiting rows (`parity 2 · 12 born last`) keep their facts. In Find a sow the facts line leads with the pen and drops when · who.\n- **Statuses.** In progress: **Awaiting**, **Active**. Finished: **Done** (green), **Sow died** (red), **Aborted** (red; 流产).\r\n- **Sow died.** Right after the hold records her death the sheet becomes `N piglets to allocate` (subtitle `<ID> · <pen> · sow died <time>`) with three options: **Move to other sows** (opens the move page, sending out of this litter with her piglets pre-selected; several receiving sows may split them), **Hand-rear here** (the piglets stay on her record and piglet care continues) and **Move to a rearing pen** (shown only when the farm config says the farm has one; the prototype flag is on for the demo, `?rearing=off` turns it off). Footer **Back** means later: no ✕, no extra question line.\r\n- **Her row while piglets remain.** A red tile `N / to allocate`, facts `Sow died · yesterday · L.M`; tapping it opens the same sheet. After Hand-rear: a neutral tile `N / hand-reared`, facts `Sow died · 09:40 · L.M`; the row stays while hand-reared piglets remain. A partial allocation keeps the remaining count; her row never says `5 moved`. A piglet that dies or is put down is recorded through Record dead and the count drops. She **leaves the room list** once every piglet is on another sow, in a rearing pen, or recorded dead.\r\n- **Aborted.** *Abortion* is the one word (never *miscarriage*). No live piglet: she leaves the room list at once. Any live piglet: the row stays with the tile `1 / alive` and the facts `Aborted · 08:10 · G.H` (recorded counts only).\r\n- **Task overview** counts the sows that left the list: `Left the task · n aborted · n sow died`. She is then outside Done · Active · Awaiting, so every total still adds up (7 / 18 farrowed once one of 19 has left).\r\n- **Sheet titles name the job; subtitles name the animal and context.** Record dead is titled `Record dead` (it was `Dead 6` / `The sow`); the pen sheet no longer repeats `Pen` as its only heading.\r\n- **Fostering is in scope for the sow-died case** (and only there; elsewhere it stays parked).\r\n- **An orphan litter can stay in the task, hand-reared** on her record.\r\n- **A rearing pen is a farm-level option.** Its configuration is still open: filed as the To confirm item `farrowing-room-list-1` in `review/farrowing-room-list.json`.\r\n- **Abortion rule.** No live piglets: she leaves the list. Any live piglet: an Aborted row stays.\r\n- The glossary words (*abortion / aborted*, *to allocate*, *hand-reared*, *left the task*) are in `ux/laws/glossary.md` and `ux/laws/strings.json`; \"Abortion vs miscarriage\" (`events-1`) is closed by this decision.\r\n",
        "status": "in-design"
       },
       {
@@ -11528,7 +11654,7 @@
         [
          "pig-profile.actions",
          "pig-profile.miscarriage",
-         "tap Record miscarriage"
+         "tap Record abortion"
         ],
         [
          "pig-profile.actions",
@@ -12111,7 +12237,7 @@
           "elements": [
            {
             "name": "Production group",
-            "shows": "Task cluster, Record miscarriage, Batch membership",
+            "shows": "Task cluster, Record abortion, Batch membership",
             "states": [
              {
               "state": "Task cluster",
@@ -12119,7 +12245,7 @@
               "shows": "Heading and a single row carrying the same word"
              },
              {
-              "state": "Record miscarriage",
+              "state": "Record abortion",
               "when": "Stage reads gestating, in heat or breeding",
               "shows": "Offered"
              },
@@ -12140,7 +12266,7 @@
              }
             ],
             "logic": "Production exists only for one pig. Mark not in pig, Remove from batch and Transfer sow render only inside Farrowing's sow drawer. Farrowing's versions of batch moves are hidden when this sheet's own Batch membership row exists.",
-            "at": "Record miscarriage"
+            "at": "Record abortion"
            },
            {
             "name": "Health group",
@@ -12261,7 +12387,7 @@
         },
         {
          "id": "pig-profile.miscarriage",
-         "name": "Record miscarriage",
+         "name": "Record abortion",
          "zh": "记录流产",
          "status": "in-design",
          "url": "/ux/system/inspection-astra-concept.html?layout=focus",
@@ -12277,13 +12403,13 @@
            {
             "name": "Reason and Save",
             "shows": "Warning \"This sow will be removed from the batch. Saved records are kept.\"; Reason",
-            "rule": "Reason is required; Save is disabled while empty. Save removes her from the batch, sets Off production / Open, adds \"Miscarriage recorded\" (Production) and returns to the pig record. Single-animal action, hidden from bulk.",
+            "rule": "Reason is required; Save is disabled while empty. Save removes her from the batch, sets Off production / Open, adds \"Abortion recorded\" (Production) and returns to the pig record. Single-animal action, hidden from bulk.",
             "at": "Reason"
            }
           ],
           "controls": [],
           "copy": [
-           "Record miscarriage (raw)",
+           "Record abortion (raw)",
            "Enter the reason (raw)"
           ],
           "edge": [
@@ -12291,6 +12417,9 @@
           ],
           "issues": [
            "Reason is free text; the production-task outcome \"Not in pig\" lists evidence choices: two forms for a similar loss."
+          ],
+          "rules": [
+           "The screen's wording is Abortion (same event, one word; Owner decision 2026-10-10). Its id keeps the old name so links and leaves survive."
           ]
          }
         },
@@ -12632,7 +12761,7 @@
          ]
         }
        ],
-       "prd": "# Pig profile 猪只详情\r\n\r\n## Problem\r\n\r\nWhen a worker taps a pig they need, in this order: what needs attention, what to do next, who she is, how she is fed, where to read more, and the actions they can take. The old Figma draws pig detail twice: inside Inspection and in the pig list (猪只列表) file. The built version (inside the Inspection prototype) is one sheet with six blocks and many repeated facts.\r\n\r\n## Who\r\n\r\nA worker on the walk or in a task who reaches a single pig; the same sheet opens inside Farrowing's sow drawer. A supervisor reading history uses Production stats, Origin and Log.\r\n\r\n## Anchor\r\n\r\nNo anchor. The record is the same for a pig at any stage; what changes is which blocks and which actions apply. Screens are grouped as The record, Read more, Actions - Production, Actions - General and Actions - Unavailable.\r\n\r\n## Rules\r\n\r\n- Human-entered records lead; derived plans and stable facts sit in reading sections.\r\n- The blocks follow the animal type (Sow cycle, Gilt breeding, Boar breeding, Piglet growth, Growth).\r\n- An empty production-average section is absent; facts missing from the registry show a dash.\r\n- The Actions sheet has three groups, Production, Health and General. Production is for one pig only and holds only the rows that fit her stage and tasks; blocked rows are listed with the reason in \"Unavailable actions\".\r\n- Farrowing opens the shared health and measurement flows rather than copying them; it adds its own Production rows when embedded (piglet processing, piglet deaths, count reconciliation, fostering, litter edit, remove from batch, not in pig, transfer).\r\n- Not in pig, miscarriage and batch removal take a sow out of her batch and return her to rebreed watch; saved records are kept.\r\n- Weight, temperature and backfat take one value per pig.\r\n- A dead sow offers a note only.\r\n\r\n## Scope\r\n\r\nIn: the record (full, partial, empty, with tasks), Production stats and a batch record, Origin, the pig Log, the Actions sheet for one pig, the task outcome form, miscarriage, batch membership, the measurement menu and forms, body condition, notes and the unavailable list.\r\n\r\nEntry points: Inspection (a pig row, search or scan), Tasks (a sow in the Farrowing room list), Pigs (the pig list; that feature is a placeholder written elsewhere, so this entry has no source screen yet).\r\n\r\nOut: health forms and findings (health-record), feed editing and the pig's feed plan (feed-plan), the unit walk (inspection). Transfer sow, Mark not in pig and Remove from batch render only inside Farrowing's drawer. Mark not in pig is shown as a screen, opened through Farrowing's sow sheet. Remove from batch has a built page but no control opens it (Batch membership's Remove option replaced it); it is not shown.\r\n\r\n## Decisions\r\n\r\n- One Actions sheet for one pig or twenty; the Production group appears only for one.\r\n- Tasks are shown as cards on the record and as rows in Actions; Farrowing and Piglet processing open the Farrowing task.\r\n- Body condition is recorded from Measurements & condition and creates a health finding with Monitor care.\r\n\r\nOpen (recorded on the screens as issues):\r\n\r\n- Next task and Batch are repeated in the task card, the grid and the type block; stage and days appear in the header, the grid and the type block.\r\n- Age is in days for a sow.\r\n- Saving a reading or a note returns to the walk list, not to the pig record; the task, miscarriage and batch forms return to the record.\r\n- The pig's lifetime figures (litters, born total, rates) are in the data but not shown.\r\n- Mark-not-in-pig, remove-from-batch and transfer cannot be reviewed outside Farrowing.\r\n",
+       "prd": "# Pig profile 猪只详情\r\n\r\n## Problem\r\n\r\nWhen a worker taps a pig they need, in this order: what needs attention, what to do next, who she is, how she is fed, where to read more, and the actions they can take. The old Figma draws pig detail twice: inside Inspection and in the pig list (猪只列表) file. The built version (inside the Inspection prototype) is one sheet with six blocks and many repeated facts.\r\n\r\n## Who\r\n\r\nA worker on the walk or in a task who reaches a single pig; the same sheet opens inside Farrowing's sow drawer. A supervisor reading history uses Production stats, Origin and Log.\r\n\r\n## Anchor\r\n\r\nNo anchor. The record is the same for a pig at any stage; what changes is which blocks and which actions apply. Screens are grouped as The record, Read more, Actions - Production, Actions - General and Actions - Unavailable.\r\n\r\n## Rules\r\n\r\n- Human-entered records lead; derived plans and stable facts sit in reading sections.\r\n- The blocks follow the animal type (Sow cycle, Gilt breeding, Boar breeding, Piglet growth, Growth).\r\n- An empty production-average section is absent; facts missing from the registry show a dash.\r\n- The Actions sheet has three groups, Production, Health and General. Production is for one pig only and holds only the rows that fit her stage and tasks; blocked rows are listed with the reason in \"Unavailable actions\".\r\n- Farrowing opens the shared health and measurement flows rather than copying them; it adds its own Production rows when embedded (piglet processing, piglet deaths, count reconciliation, fostering, litter edit, remove from batch, not in pig, transfer).\r\n- Not in pig, abortion and batch removal take a sow out of her batch and return her to rebreed watch; saved records are kept.\r\n- Weight, temperature and backfat take one value per pig.\r\n- A dead sow offers a note only.\r\n\r\n## Scope\r\n\r\nIn: the record (full, partial, empty, with tasks), Production stats and a batch record, Origin, the pig Log, the Actions sheet for one pig, the task outcome form, abortion, batch membership, the measurement menu and forms, body condition, notes and the unavailable list.\r\n\r\nEntry points: Inspection (a pig row, search or scan), Tasks (a sow in the Farrowing room list), Pigs (the pig list; that feature is a placeholder written elsewhere, so this entry has no source screen yet).\r\n\r\nOut: health forms and findings (health-record), feed editing and the pig's feed plan (feed-plan), the unit walk (inspection). Transfer sow, Mark not in pig and Remove from batch render only inside Farrowing's drawer. Mark not in pig is shown as a screen, opened through Farrowing's sow sheet. Remove from batch has a built page but no control opens it (Batch membership's Remove option replaced it); it is not shown.\r\n\r\n## Decisions\r\n\r\n- One Actions sheet for one pig or twenty; the Production group appears only for one.\r\n- Tasks are shown as cards on the record and as rows in Actions; Farrowing and Piglet processing open the Farrowing task.\r\n- Body condition is recorded from Measurements & condition and creates a health finding with Monitor care.\r\n\r\nOpen (recorded on the screens as issues):\r\n\r\n- Next task and Batch are repeated in the task card, the grid and the type block; stage and days appear in the header, the grid and the type block.\r\n- Age is in days for a sow.\r\n- Saving a reading or a note returns to the walk list, not to the pig record; the task, abortion and batch forms return to the record.\r\n- The pig's lifetime figures (litters, born total, rates) are in the data but not shown.\r\n- Mark-not-in-pig, remove-from-batch and transfer cannot be reviewed outside Farrowing.\r\n",
        "status": "in-design"
       }
      ]
@@ -14613,7 +14742,7 @@
          "tap Record abortion"
         ]
        ],
-       "prd": "# Abortion 流产\r\n\r\n> Draft — compiled from existing docs, not yet confirmed.\r\n\r\n## Problem\r\n\r\nProduction had two acknowledgement-gated abortion variants that captured no date, cause or count. A farmer needs one short record of the cause and its effect on the batch.\r\n\r\n## Who\r\n\r\nThe stockperson who finds an aborted sow; the breeding manager who reads the cause and the batch change.\r\n\r\n## Anchor\r\n\r\nAnchor: The sow (bred or pregnant, not yet farrowed).\r\n\r\n## Rules\r\n\r\n- Single only, structurally: each abortion has its own cause and restructures a batch. At more than one sow the verb is absent from the sheet and the not-available line counts it (\"abortion — one at a time\").\r\n- Available only to a bred or pregnant sow that has not farrowed.\r\n- Cause is required and a Picker of six (the Choice law caps a choice at four); tap selects and returns, no search row. Other reveals a required note inline under the field and folds away if another cause is picked.\r\n- The consequence is a derived footnote, never a fork: in a batch it reads \"out of batch 20 · marked empty\"; loose it reads \"marked empty\". Both production acknowledgement checkboxes are gone.\r\n- On commit she leaves the batch's pregnancy-check and farrowing streams, her pregnancy state and farrowing forecast; the abortion, its cause and the batch exit stay on her page trail, and the row reads \"Empty · day 0\".\r\n\r\n## Scope\r\n\r\nIn: Entry · single only; Abortion drawer · cause required; Cause · six rows; Cause Other · note required; After · what leaves with her.\r\n\r\nOut: see the neighbouring features of the same section for what the same sheet does elsewhere; nothing outside the screens above is designed here.\r\n\r\n## Decisions\r\n\r\nOpen questions and items to confirm:\r\n\r\n- The six cause labels are placeholders; they are enumerated only in production node 2572:19676 and must be pulled before build.\r\n- How the Pig profile \"Record miscarriage\" sheet relates to this design (filed as a decision).\r\n\r\nSources:\r\n\r\n- The event workflow deck: `ux/system/workflows/cycle.html` (all decks render in `ux/archive/workflows.html`).\r\n- The ops requirements: `ux/research/ops/cycle-adhoc.md` and `ux/research/ops/SYNTHESIS.md`.\r\n",
+       "prd": "# Abortion 流产\r\n\r\n> Draft — compiled from existing docs, not yet confirmed.\r\n\r\n## Problem\r\n\r\nProduction had two acknowledgement-gated abortion variants that captured no date, cause or count. A farmer needs one short record of the cause and its effect on the batch.\r\n\r\n## Who\r\n\r\nThe stockperson who finds an aborted sow; the breeding manager who reads the cause and the batch change.\r\n\r\n## Anchor\r\n\r\nAnchor: The sow (bred or pregnant, not yet farrowed).\r\n\r\n## Rules\r\n\r\n- Single only, structurally: each abortion has its own cause and restructures a batch. At more than one sow the verb is absent from the sheet and the not-available line counts it (\"abortion — one at a time\").\r\n- Available only to a bred or pregnant sow that has not farrowed.\r\n- Cause is required and a Picker of six (the Choice law caps a choice at four); tap selects and returns, no search row. Other reveals a required note inline under the field and folds away if another cause is picked.\r\n- The consequence is a derived footnote, never a fork: in a batch it reads \"out of batch 20 · marked empty\"; loose it reads \"marked empty\". Both production acknowledgement checkboxes are gone.\r\n- On commit she leaves the batch's pregnancy-check and farrowing streams, her pregnancy state and farrowing forecast; the abortion, its cause and the batch exit stay on her page trail, and the row reads \"Empty · day 0\".\r\n\r\n## Scope\r\n\r\nIn: Entry · single only; Abortion drawer · cause required; Cause · six rows; Cause Other · note required; After · what leaves with her.\r\n\r\nOut: see the neighbouring features of the same section for what the same sheet does elsewhere; nothing outside the screens above is designed here.\r\n\r\n## Decisions\r\n\r\n- **One word: abortion / aborted (流产), never miscarriage** — owner decision 2026-10-10. The Pig profile's \"Record miscarriage\" screen is now \"Record abortion\" (same event). Farrowing's room list shows an **Aborted** row only while a live piglet remains; with none she leaves the list and the Task overview counts her under \"Left the task\" (`features/farrowing/PRD.md`, Decisions). Closes backlog item `events-1` (\"Abortion vs miscarriage\") on the word; the one-form question (deck drawer vs Pig profile sheet) stays open in the screens above.\r\n\r\nOpen questions and items to confirm:\r\n\r\n- The six cause labels are placeholders; they are enumerated only in production node 2572:19676 and must be pulled before build.\r\n- How the Pig profile \"Record abortion\" sheet (named \"Record miscarriage\" until 2026-10-10) relates to this design (filed as a decision).\r\n\r\nSources:\r\n\r\n- The event workflow deck: `ux/system/workflows/cycle.html` (all decks render in `ux/archive/workflows.html`).\r\n- The ops requirements: `ux/research/ops/cycle-adhoc.md` and `ux/research/ops/SYNTHESIS.md`.\r\n",
        "status": "in-design"
       },
       {
@@ -21275,24 +21404,6 @@
    },
    "backlog": [
     {
-     "severity": "medium",
-     "source": "populate-events",
-     "id": "events-1",
-     "target": {
-      "kind": "feature",
-      "id": "abortion"
-     },
-     "kind": "decision",
-     "title": "Abortion vs miscarriage",
-     "detail": "The event deck's Abortion drawer (single sow, required Cause from six rows, a required note when Other, batch exit derived as a footnote) and the Pig profile's 'Record miscarriage' sheet (free-text Reason, a warning that the sow leaves the batch, Save disabled while empty) record the same pregnancy loss in different forms and under two names. The screen is therefore not aliased. The Pig profile sheet is the one built in the prototype; the deck is the designed one.",
-     "options": [
-      "Use the deck's Abortion drawer in the prototype and retire the free-text Reason",
-      "Keep the Pig profile sheet and drop the deck",
-      "Keep both and merge later"
-     ],
-     "recommendation": "One form with the deck's cause list; settle the word (abortion or miscarriage) with the farm first."
-    },
-    {
      "severity": "high",
      "source": "populate-events",
      "id": "events-2",
@@ -21381,6 +21492,42 @@
       "Conveyor for the walk, list for the pig record"
      ],
      "recommendation": "Conveyor, as the Synthesis laws state per-confirm commit; retire the list."
+    },
+    {
+     "severity": "medium",
+     "source": "owner-decision-2026-10-10",
+     "id": "farrowing-room-list-1",
+     "target": {
+      "kind": "feature",
+      "id": "farrowing"
+     },
+     "kind": "decision",
+     "title": "Rearing pen: how does a farm configure it?",
+     "detail": "Owner decision 2026-10-10: a rearing pen (\"rescue deck\") is a farm-level option. When the farm has one, a dead sow's allocation sheet offers \"Move to a rearing pen\"; otherwise the option is absent. The prototype has a flag (on for the demo, ?rearing=off turns it off) and the option moves every remaining piglet in one tap. Still open: where the farm declares the pen (a console setting, a pen type), whether the move names the pen when the farm has several, and whether the piglets then get a record there.",
+     "options": [
+      "The farm marks one pen as its rearing pen in the console; the option moves the piglets there",
+      "Any pen of a rearing type can be picked on a second step",
+      "Keep the demo flag until the console is designed"
+     ],
+     "recommendation": "One rearing pen per unit, marked in the console; the option names it and moves the piglets in one tap."
+    },
+    {
+     "severity": "high",
+     "source": "owner, 2026-10-10",
+     "id": "farrowing-room-list-2",
+     "target": {
+      "kind": "feature",
+      "id": "farrowing"
+     },
+     "kind": "decision",
+     "title": "Animal ID format: what do real ear tags look like?",
+     "detail": "Length, characters, visual tag vs electronic (15-digit) tag, and whether a farm short ID exists. Today's 6-digit IDs are placeholders, and list and search design depend on the answer (how the ID is set in a row, what Find a sow matches, whether a pen is a grouping unit with many sows). Status: open, owner to confirm.",
+     "options": [
+      "One ID per animal as printed on the visual tag, set in full",
+      "A farm short ID (the last digits, or a farm number) shown first, the full tag one tap away",
+      "Both: electronic 15-digit tag for scanning, a short visual ID for reading"
+     ],
+     "recommendation": "Ask the owner for real tags from two farms before the room list's ID treatment is designed."
     },
     {
      "severity": "high",
@@ -22037,13 +22184,13 @@
       "id": "abortion"
      },
      "kind": "decision",
-     "title": "Miscarriage built in Pig profile vs Abortion placeholder",
-     "detail": "Pig profile already builds Record miscarriage and Farrowing's outcomes use it; this feature repeats it as three placeholder screens (6 in Figma). Same event, two names.",
+     "title": "Abortion built in Pig profile vs Abortion placeholder",
+     "detail": "Pig profile already builds Record abortion (named Record miscarriage until the owner settled the word on 2026-10-10: abortion, never miscarriage) and Farrowing's outcomes use it; this feature repeats it as three placeholder screens (6 in Figma). Same event; the name is now one, the duplicate screens remain.",
      "options": [
       "Retire Abortion; miscarriage is the form",
-      "Rename the built form to Abortion"
+      "Keep the built form, now named Abortion (done, owner decision 2026-10-10)"
      ],
-     "recommendation": "Retire Abortion; keep the built Record miscarriage."
+     "recommendation": "Retire the Abortion placeholder; keep the built Record abortion."
     },
     {
      "severity": "medium",
@@ -23654,7 +23801,7 @@
       "Keep fostering.* as aliases of piglet-processing.move-piglets once the simple prototype is chosen",
       "Keep both: farrowing.foster before the lock, Move after (needs the owner to reopen the farrowing park)"
      ],
-     "recommendation": "Follow the rulings: Move after the lock is the feature; farrowing.foster stays parked."
+     "recommendation": "Follow the rulings: Move after the lock is the feature. Owner decision 2026-10-10 reopens the park for one case only: when a sow dies, farrowing.foster (the move page, sending out of her litter) is how her piglets go to other sows. Elsewhere it stays parked."
     },
     {
      "severity": "medium",

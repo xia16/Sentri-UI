@@ -2,7 +2,7 @@
 
 # Status
 
-Status says the **workflow state** of one item on one line: Awaiting, Active, Done, Late, Overdue, Sow died. Use [ConditionTag](../ConditionTag/README.md) instead for a recorded health condition with a care level, [Banner](../Banner/README.md) for a message that needs the worker's attention, and plain row text for a forecast (`Due tomorrow`, `Expected in 5 days`): a forecast is not a state.
+Status says the **workflow state** of one item on one line: Awaiting, Active, Done, Late, Overdue, Sow died, Aborted. Use [ConditionTag](../ConditionTag/README.md) instead for a recorded health condition with a care level, [Banner](../Banner/README.md) for a message that needs the worker's attention, and plain row text for a forecast (`Due tomorrow`, `Expected in 5 days`): a forecast is not a state.
 
 ## When to use / when not
 - **Use** when a row, a heading or a line must say where an item stands in the task.
@@ -20,6 +20,7 @@ Every status, in every variant and every screen, takes its colour from this tabl
 | `late` | past its time, still records (`Late`) | `amber` | `amber` on `amber-wash`, `pending-border` | clock |
 | `overdue` | past its due date by days (`Overdue`) | `red` | `red` on `red-wash`, `chip-red-border` | alert |
 | `died` | a terminal fact (`Sow died`) | `red` | `red` on `red-wash`, `chip-red-border` | none |
+| `aborted` | a terminal fact (`Aborted`, 流产; the one word for the event, never "miscarriage") | `red` | `red` on `red-wash`, `chip-red-border` | none |
 
 Green means done and nothing else: a pending item is never green. `To do` is `awaiting`.
 

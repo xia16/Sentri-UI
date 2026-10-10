@@ -18,13 +18,15 @@
   {
     "id": "animal",
     "name": "Animal",
-    "use": "Use for one animal or litter",
+    "use": "Use for one animal or litter. `layout: 'need'` is the Farrowing room row (candidate and provisional, pending the list exploration; owner decision 2026-10-10): the ID as stored over one facts line, a fixed-width need tile, a chevron.",
     "notUse": "Not for navigation — use navigation",
     "states": [
       "Default",
       "Pressed",
       "Long label / Chinese",
-      "Disabled"
+      "Disabled",
+      "Need tile (room row)",
+      "Need tile · to allocate"
     ],
     "usedBy": [
       "farrowing.room",
@@ -91,7 +93,6 @@
       "Disabled"
     ],
     "usedBy": [
-      "farrowing.room",
       "piglet-processing.sheet-todo"
     ]
   },
