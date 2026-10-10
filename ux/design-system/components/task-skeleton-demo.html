@@ -34,6 +34,7 @@
   .tk-pair-col > h3 { padding: 0; }
 }
 </style>
+<script src="/ux/system/atlas-bare.js"></script>
 </head>
 <body>
 <div id="root"></div>
@@ -43,7 +44,7 @@
 (function () {
   'use strict';
   var K = window.SentriTask, UI = window.SentriUI;
-  var q = new URLSearchParams(location.search), only = q.get('screen') || '';
+  var q = new URLSearchParams(location.search), only = q.get('demo') || '';
   var s = function (str, text, args) { return { text: text, str: str, args: args }; };
   var n = function (v) { return s('tk.demo.n', String(v), { n: v }); };
 
