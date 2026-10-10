@@ -12,7 +12,7 @@ const UI=window.SentriUI;
 for(const el of document.querySelectorAll('[data-state]')){
  const state=el.dataset.state;
  const label=state==='Long / Chinese'?'关闭当前仔猪处理记录窗口':"Filter pigs";
- el.querySelector('.demo').innerHTML=UI.iconButton({variant:'bordered',icon:window.SentriIcons.icon('filter'),label:state==='Badge'?'Filter pigs, 2 applied':label,pressed:state==='Pressed',disabled:state==='Disabled',reason:state==='Disabled'?'This sheet is recording. Wait for the result.':'',selected:state==='Selected'?true:null,badge:state==='Badge'?2:''});
+ el.querySelector('.demo').innerHTML=UI.iconButton({variant:'bordered',icon:window.SentriIcons.icon('filter'),label:state==='Badge'?'Filter pigs, 2 applied':label,pressed:state==='Pressed',disabled:state==='Disabled',selected:state==='Selected'?true:null,badge:state==='Badge'?2:''});
 }
 })();
 </script>

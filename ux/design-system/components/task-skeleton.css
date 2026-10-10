@@ -132,7 +132,7 @@
 .tk-choice { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 .tk-choice[data-count="3"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .tk-choice-tile { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; min-height: var(--choice-tile-min); margin: 0; padding: var(--space-row-y);
-  border: 1px solid var(--task-key-border); border-radius: var(--radius-inset); background: var(--paper); color: var(--muted); font: 600 var(--type-button-size)/1.3 var(--font-sans); text-align: center; }
+  border: 1px solid var(--task-key-border); border-radius: var(--radius-inset); background: var(--paper); color: var(--ink-2); font: 600 var(--type-button-size)/1.3 var(--font-sans); text-align: center; }
 .tk-choice-tile svg { width: 24px; height: 24px; }
 .tk-choice-tile[aria-pressed="true"] { background: var(--green-wash); border-color: var(--choice-pressed-border); color: var(--ink); }
 .tk-choice-tile:active { background: var(--press); }

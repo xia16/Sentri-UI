@@ -12,9 +12,8 @@ const UI=window.SentriUI;
 for(const el of document.querySelectorAll('[data-state]')){
  const state=el.dataset.state,id='reason-'+state.replace(/[^a-z]/gi,'');
  const label=state==='Long / Chinese'?'记录这一栏今天已完成处理的十二头仔猪并保留记录':"Clear";
- const reason=state==='Loading'?'Recording; wait for the result.':state==='Failed'?'Nothing was recorded. Check the connection, then try again.':state==='Unknown'?'Result unknown. Check the record before continuing.':state==='Done'?'Task ended.':state==='Waiting'||state==='Disabled'?'Choose the piglets first.':'';
  let control;
- control=UI.button({label,register:'text',icon:'',waiting:state==='Waiting',disabled:state==='Disabled',busy:state==='Loading',reason});
+ control=UI.button({label,register:'text',icon:'',waiting:state==='Waiting',disabled:state==='Disabled',busy:state==='Loading'});
  if(state==='Pressed')control=control.replace('<button','<button data-preview="'+state.toLowerCase()+'"');
  el.querySelector('.demo').innerHTML=control;
 }

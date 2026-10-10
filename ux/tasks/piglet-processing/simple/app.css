@@ -37,7 +37,7 @@
 .sheet-body > .tk-day + .tk-day { margin-top: var(--space-key-gap); }
 .st-row[data-ticked] .st-row-copy > strong { color: var(--ink); }
 .st-row[data-ticked] .st-row-mark, .st-row[data-fresh] .st-row-chip { animation: sp-tick-in 200ms ease-out; }
-.tk-day[data-when="future"] .tk-day-head > strong, .tk-day[data-when="future"] .st-row-copy > strong { color: var(--muted); }
+.tk-day[data-when="future"] .tk-day-head > strong, .tk-day[data-when="future"] .st-row-copy > strong { color: var(--ink-2); }
 @media (prefers-reduced-motion: reduce) { .st-row[data-ticked] .st-row-mark, .st-row[data-fresh] .st-row-chip { animation: none !important; } }
 
 /* Piglets: Scan tag · Choose notch · Add manually — three tool Buttons in a line */
@@ -106,6 +106,6 @@
 .sp-pigrow > .st-row { flex: 1; min-width: 0; }
 /* Processing: a section title like the Piglets card's; the Done section sits last */
 .sp-proc > .tk-day + .tk-day { margin-top: var(--space-key-gap); }
-.tk-day[data-when="done"] .tk-day-head > strong { color: var(--muted); }
+.tk-day[data-when="done"] .tk-day-head > strong { color: var(--ink-2); }
 
 .sp-list-lens{margin:0 var(--space-panel)}

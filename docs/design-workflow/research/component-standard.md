@@ -1,5 +1,9 @@
 # What a finished component of the mobile app looks like in mature design systems
 
+**Components are designed and perfected from real features.**
+
+A component's look comes from the approved feature screens that use it, and it improves by improving those screens, judged before/after on them. An approved screen is never restyled to fit a component. The approved baseline for Farrowing, Inspection and Piglet processing is main at 6e6c940 plus the owner-approved deltas, checked with `scripts/compare-screens.mjs`.
+
 Research for Sentri: the standard every **mobile app** component page and component gate is judged against. It is the standard for the mobile app only (a native-feel phone app used with touch): web-only rules such as hover, focus rings and keyboard navigation are not adopted. A web app, when it exists, gets its own standard.
 Date: 2026-10-09. Method: primary docs and the libraries' own source docs only.
 

@@ -169,7 +169,7 @@
       "why": "Optional values (litter weight, piglet weight) should be one row until opened, like Photos and farrowing's + Litter weight",
       "seenIn": [
         "piglet-processing.give-ids",
-        "farrowing.blocked"
+        "farrowing.leave-edit"
       ]
     }
   ]
