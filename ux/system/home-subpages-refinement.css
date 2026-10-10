@@ -224,3 +224,22 @@ body:has(#detail) #detail .lifecycle-actions [data-confirm-end] {
   .device .device-control { padding: 14px; }
   body:has(#detail) #detail { width: min(440px, calc(100% - 20px)); }
 }
+
+/* Farm type floors on Home: nothing under 13px, ink or muted for anything that must be read (4.5:1 on its surface). */
+.device :is(.farm-label,.assistant-door,.scope-overview,.scope-unit,.scope-unit>span,.scope-switch button,.today-caption,.today-caption>span>span,.today-caption small,.hc-heading small,.hc-action-label,.hc-action-copy>small,.hc-progress-caption,.hc-progress-caption *,.hc-legend,.hc-progress-note,.hc-route,.hc-exception,.hc-footer,.hc-quiet-line,.hc-complete-copy small,.hc-complete-copy strong,.hc-ready-cta,.task-card>.group-heading h3,.unit-population,.unit-population small,.unit-last-check,.unit-facts,.checked,.unit-inspect,.unit-attention-chip>span,.unit-attention-chip>strong,.unit-attention-clear,.unit-attention-unknown,.unit-hub-facts,.unit-hub-facts small,.bottom-nav button,.bottom-nav .scan-button,.unit-picker .unit-picker-count,.sync-summary p){font-size:13px}
+.device .unit-population small{display:block}
+.device .farm-label{letter-spacing:.02em}
+.device :is(.bottom-nav button:not(.active),.hc-action-copy>small,.hc-footer,.hc-route,.hc-quiet-line){color:var(--muted)}
+.device .scope-switch button:not([aria-pressed="true"]){color:var(--ink-2)}
+.device :is(.work-section-heading>span,.uhi-title small,.unit-hub-inspect .unit-check-row>small,.unit-hub-unified .unit-hub-inspect .uhi-title small,.unit-environment-label){font-size:13px}
+.device .bottom-nav .scan-button{color:#fff}
+/* Inspect unit is not a done state: neutral surface, ink title, the same icon tile as every row. */
+.device .unit-hub-unified{background:var(--paper);border-color:var(--line)}
+.device .unit-hub-unified .unit-hub-inspect .uhi-title{color:var(--ink)}
+.device .unit-hub-unified .unit-hub-inspect .uhi-head>svg:first-child{background:var(--row-icon-bg);color:var(--row-icon-ink)}
+.device .unit-hub-unified .unit-hub-inspect .uhi-head>svg:last-child{color:var(--muted)}
+.device .unit-attention-chip{background:var(--well);border-color:transparent;color:var(--ink)}
+.device .unit-attention-chip>svg{color:var(--row-icon-ink)}
+/* Status bar: the same signal and battery glyphs as the other screens. */
+.device .device-status{display:flex;align-items:center;gap:6px}
+.device .device-status svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}

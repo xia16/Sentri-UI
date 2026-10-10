@@ -29,8 +29,8 @@ Green means done and nothing else: a pending item is never green. `To do` is `aw
 - **Line:** a body line (13px, `ink`) whose values carry the colour at 600; the words around them stay `ink`. Tokens join with a real `·` text node.
 
 ## Variants
-- **Chip** (`variant: 'chip'`): a state on a list row, one per row, under the ID. Used by TaskRow (Piglet processing), Farrowing's room list and Home's task card (`Overdue` only: a count of days is meta text, not a status).
-- **Word** (`variant: 'word'`, the default): a state in a heading, a meta line or a map cell. Used by Farrowing's Go-to-pen map (`Active`, `Overdue`) and the Row's `chip` slot.
+- **Chip** (`variant: 'chip'`): a state on a list row, one per row, under the ID. Used by TaskRow (Piglet processing) and Home's task card (`Overdue` only: a count of days is meta text, not a status).
+- **Word** (`variant: 'word'`, the default): a state in a heading, a meta line or a map cell. Used by Farrowing's Go-to-pen map (`Active`, `Overdue`), Farrowing's room list (`Active`, `Done`, `Sow died` under the ear tag) and the Row's `chip` slot there. One status looks one way in one feature.
 - A **dot** variant was built and removed: a bare shape tells Done, Late and Overdue apart by colour alone. Add it back when a screen needs it, with a shape per kind.
 - **Line** (`statusLine`): coloured values in a body line: the receipt `Saved · +4 this visit`, `Overdue · 3 days`, a row's mono line 2.
 

@@ -425,12 +425,12 @@
         "elements": [
           {
             "name": "Sow row",
-            "shows": "One line per task sow, grouped under her pen: ear tag, state chip, two text lines, rail icon.",
+            "shows": "One line per task sow, grouped under her pen: ear tag, state word, two text lines, rail icon.",
             "states": [
               {
                 "state": "Awaiting · not yet due",
                 "when": "No live total (alive + dead = 0), not finished, no outcome. Due text begins \"Due tomorrow\" or \"Due in N days\"",
-                "shows": "No chip. Line 1 \"Due tomorrow\" / \"Due in 2 days\" (muted). Line 2 \"parity 5 · 11 born last\" (12 when unknown). Chevron."
+                "shows": "No status word. Line 1 \"Due tomorrow\" / \"Due in 2 days\" (muted). Line 2 \"parity 5 · 11 born last\" (12 when unknown). Chevron."
               },
               {
                 "state": "Awaiting · due",
@@ -445,25 +445,25 @@
               {
                 "state": "Active",
                 "when": "Live total above zero and not finished",
-                "shows": "Green \"Active\" chip. Line 1 \"9 alive · 5 dead\". Line 2 \"born 14 · 1h ago · G.H\" (\"just now\" after a tap in this session). Chevron. No overdue colour once she has a record."
+                "shows": "Blue \"• Active\" status word (dot and word, as in Go to pen). Line 1 \"9 alive · 5 dead\". Line 2 \"born 14 · 1h ago · G.H\" (\"just now\" after a tap in this session). Chevron. No overdue colour once she has a record."
               },
               {
                 "state": "Done",
                 "when": "Litter finished (locked)",
-                "shows": "Grey \"Done\" chip. Line 1 alive · dead as now (alive falls when later deaths are recorded). Line 2 \"born 14 · final 05:58 · G.H\". Pencil icon: locked but editable."
+                "shows": "Green \"• Done\" status word. Line 1 alive · dead as now (alive falls when later deaths are recorded). Line 2 \"born 14 · final 05:58 · G.H\". Pencil icon: locked but editable."
               },
               {
                 "state": "Sow died",
                 "when": "Farrowing ended through the sow's death",
-                "shows": "Red \"Sow died\" chip instead of Done. Same two lines; line 2 \"born 10 · yesterday · L.M\". Pencil. Counts under the Done tab."
+                "shows": "Red \"• Sow died\" status word instead of Done. Same two lines; line 2 \"born 10 · yesterday · L.M\". Pencil. Counts under the Done tab."
               },
               {
                 "state": "Production outcome",
                 "when": "Miscarriage, Not in pig or Removed from batch recorded",
-                "shows": "No chip. Line 1 the outcome name; line 2 \"Recorded · 08:10 · G.H\". Chevron; opens the Production log. Counts under Done."
+                "shows": "No status word. Line 1 the outcome name; line 2 \"Recorded · 08:10 · G.H\". Chevron; opens the Production log. Counts under Done."
               }
             ],
-            "logic": "Days are counted from due, never the gestation day. Awaiting vs Active flips on the live total: a sow counted back to zero reads Awaiting again and regains her Due line. Recency (\"1h ago\") and hand (\"G.H\") are fixed sample text, not computed from records.",
+            "logic": "Days are counted from due, never the gestation day. Awaiting vs Active flips on the live total: a sow counted back to zero reads Awaiting again and regains her Due line. Recency (\"1h ago\") and hand (\"G.H\") are fixed sample text, not computed from records. Line 2 is words in the sans face; only the figures are mono.",
             "source": "farrowing-astra-concept.js roomRow(), roomState(); RULINGS \"Model\"",
             "at": "000418"
           },
@@ -494,27 +494,27 @@
               {
                 "state": "Counts",
                 "when": "Always",
-                "shows": "\"7 / 18 · Farrowed · all units\" with support \"2 active · 9 awaiting\""
+                "shows": "\"8 / 19 · Done · all units\" over a stacked bar"
               },
               {
                 "state": "Zero segment",
-                "when": "Farrowed, Active or Awaiting is 0",
+                "when": "Done, Active or Awaiting is 0",
                 "shows": "That segment is left out of the bar; the number and support text still print the zero"
               },
               {
                 "state": "Other outcomes",
                 "when": "Sows with miscarriage, not in pig or removed, or that died before or during farrowing",
-                "shows": "Counted in neither the number nor the denominator, so they leave the bar entirely"
+                "shows": "Counted as Done: they are sows of the task, so they stay in the number and the denominator (the overview breaks them out under Other outcomes)"
               }
             ],
-            "logic": "Numerator Farrowed = finished litters in all units, excluding outcomes and sows that died before or during farrowing (a sow that died after finishing stays counted). Denominator = Farrowed + Active + Awaiting. Segment widths are proportional to those counts. Scope is all units and never follows the lens or filter.",
+            "logic": "Done = every sow of the task with a finished record, in all units: finished litters, sow deaths, miscarriages, not in pig, removed. Denominator = every sow of the task (Done + Active + Awaiting): the same total as Task outcomes on End task and the receipt, and the sum of each unit’s Awaiting, Active and Done tabs. Segment widths are proportional to those counts. Scope is all units and never follows the lens or filter. KPIs still count finished litters only.",
             "source": "farrowing-astra-concept.js taskOverview(); astra-task-overview.js statusProgress()",
-            "at": "Farrowed"
+            "at": "Done"
           },
           {
             "name": "Last record line",
-            "shows": "\"Last record 08:41 · G. Hansen\" under the app bar.",
-            "logic": "Meant to be the newest record time and hand in the unit. In the prototype it is fixed text: 08:41, or 09:41 once any sow carries the 09:41 stamp a live tap writes; the hand is always G. Hansen.",
+            "shows": "\"Last record 08:41 · G.H\" under the app bar.",
+            "logic": "Meant to be the newest record time and hand in the unit. In the prototype it is fixed text: 08:41, or 09:41 once any sow carries the 09:41 stamp a live tap writes; the hand is always G.H.",
             "source": "farrowing-astra-concept.js room() \"latest\"",
             "at": "Last record"
           },
@@ -592,12 +592,12 @@
               {
                 "state": "Pen code",
                 "when": "Always",
-                "shows": "Shows the pen at the top of the list under the sticky bar; follows scroll live and updates after a jump or after opening a sow. \"Pens\" when none."
+                "shows": "Shows the pen at the top of the list at the top of the visible list; follows scroll live and updates after a jump or after opening a sow. \"Pens\" when none."
               },
               {
                 "state": "Pen map tile",
                 "when": "Each A–D × 1–6 pen in the Go to pen sheet",
-                "shows": "One-word fact: \"Active\" / \"2 active\"; else \"Overdue\" / \"2 overdue\"; else \"N born ✓\" when all finished; else \"Due today\" or the first due text; \"No matches\" (pen has sows, none pass the view, disabled); \"Not in task\" (disabled)"
+                "shows": "One-word fact: \"Active\" / \"2 active\"; else \"Overdue\" / \"2 overdue\"; else \"N born\" when all finished; else \"Due today\" or the due text without \"Due\" (\"Tomorrow\", \"In 2 days\"); \"No match\" (the pen has sows, none pass the view, disabled); \"No sows\" (not in the task, disabled). One line, never wraps. A disabled tile stays readable: ink name, muted word, quiet surface."
               }
             ],
             "rule": "Pen map: tap jumps to the pen and highlights it for 0.9 s; hold 0.35 s peeks at its sows. The tab bar and filter line stay stuck at the top while the list scrolls. Scan ear tag has no camera in the prototype (\"Try sample tag\" opens the first sow) and also holds the ear-tag text search.",
@@ -619,7 +619,7 @@
           "(raw) Farrowing",
           "(raw) Last record",
           "(raw) Unit 7 · 10 · Live / litter · Target 12",
-          "(raw) Task overview · 7 / 18 · Farrowed · all units · 2 active · 9 awaiting",
+          "(raw) Task overview · 8 / 19 · Done · all units",
           "(raw) Awaiting · Active · Done · All",
           "(raw) Due today · Due tomorrow · Due in N days · Due yesterday · Overdue · N days",
           "(raw) parity n · m born last",
@@ -630,7 +630,6 @@
         ],
         "edge": [
           "A sow with an unsaved Edit draft blocks ending the task, but her row shows nothing about the draft",
-          "Done tab can exceed Farrowed on the card (Done 8 across units vs Farrowed 7) because Done includes sow deaths and outcome rows",
           "Filter that hides every sow: empty state with the filter hint; Clear or Reset recovers"
         ],
         "rules": [
@@ -647,7 +646,6 @@
         "issues": [
           "Unit card and tabs are Unit 7 only; the Task overview card is all units. Only the card names its scope.",
           "Active and Awaiting appear three times at two scopes: bar segments, support text and tabs.",
-          "\"Done 2\" and \"Farrowed 7\" look like one measure but count differently; neither label explains it.",
           "Prototype hard-codes amber (belowTarget = true); never shows the neutral state.",
           "Row recency and hand are hard-coded; \"1h ago\" never ticks. Overdue rows lack the ruled \"induced yesterday · L.M\" second line.",
           "Last record line repeats each row's recency; the ruled one-sentence task copy under it is missing.",
@@ -949,7 +947,7 @@
         "elements": [
           {
             "name": "Dead header",
-            "shows": "\"Dead 6\" with \"Born dead or died · 1 unsaved\" and Clear.",
+            "shows": "\"Dead 6\" with \"Born dead or died\" and Clear. A draft is counted once, as \"+1 unsaved\" on its row.",
             "states": [
               {
                 "state": "No draft",
@@ -959,7 +957,7 @@
               {
                 "state": "Draft",
                 "when": "One or more deaths drafted",
-                "shows": "\"Dead 6\" (saved + draft); \"1 unsaved\" in muted ink; Clear live"
+                "shows": "\"Dead 6\" (saved + draft); Clear live"
               }
             ],
             "source": "farrowing-astra-concept.js identity()",
@@ -980,7 +978,7 @@
                 "shows": "+ stops when drafted deaths equal Alive now; saving lowers Alive now"
               }
             ],
-            "logic": "Value = saved total + this draft (draft in green). − only undoes the draft and is disabled at 0 draft.",
+            "logic": "Value = saved total + this draft (\"+1 unsaved\" in muted ink beside the label). − only undoes the draft and is disabled at 0 draft.",
             "source": "farrowing-astra-concept.js death(), act(\"deadStep\")",
             "at": "Crushed"
           },
@@ -1059,7 +1057,7 @@
           }
         ],
         "copy": [
-          "(raw) Dead N · Born dead or died · N unsaved",
+          "(raw) Dead N · Born dead or died",
           "(raw) Piglets · The sow",
           "(raw) Stillborn · Mummified · Crushed · Scours · Starve-out · Other",
           "(raw) Photos · Optional",
@@ -1081,7 +1079,6 @@
         ],
         "issues": [
           "Back keeps the draft, as the ruling says; Finish has no banner.",
-          "\"Dead 6\" in the title and \"+1 unsaved\" beside the row say the same draft twice.",
           "No sow id or pen is shown; the worker cannot see which sow is being recorded.",
           "Photo field is a header row with an icon button, not the ruled single card; \"Record death\" mixes with the ruled \"Record dead\"."
         ]
@@ -1108,7 +1105,7 @@
           },
           {
             "name": "Optional facts",
-            "shows": "Two buttons, + Litter weight and + Assistance, each expanding a field.",
+            "shows": "Two quiet \"+ Label\" cards, Litter weight and Assistance, each expanding a field. A filled one becomes a full-width row (label, then the value on two lines at most).",
             "states": [
               {
                 "state": "Not given",
@@ -1118,7 +1115,7 @@
               {
                 "state": "Given",
                 "when": "Value entered",
-                "shows": "Label carries the answer: \"Litter weight · 12.6 kg\", \"Assistance · Yes\""
+                "shows": "A full-width row: label over the answer (\"12.6 kg\", \"Yes\") with an edit pencil"
               },
               {
                 "state": "Cleared",
@@ -1208,7 +1205,7 @@
           }
         ],
         "copy": [
-          "(raw) Save correction? · You changed this record. · Discard · Save"
+          "(raw) Save correction? · Discard · Save"
         ],
         "edge": [
           "The same ask appears on the grabber and Escape"
@@ -1233,7 +1230,7 @@
         "elements": [
           {
             "name": "Header stamp",
-            "shows": "\"Finished Aug 27 at 08:12 by G. Hansen\" in place of the status word.",
+            "shows": "\"Finished Aug 27 at 08:12 by G.H\" in place of the status word.",
             "logic": "Date, time and hand come from the \"Farrowing finished\" event. This is the only place the finish date appears.",
             "source": "farrowing-astra-concept.js recordStamp()",
             "at": "Finished"
@@ -1374,12 +1371,12 @@
       "preset": "born",
       "figma": "",
       "notes": {
-        "purpose": "After farrowing has finished, someone finds Born was wrong: a popup adds born piglets or sets the total again.",
+        "purpose": "After farrowing has finished, someone finds Born was wrong: a correction opens in place under the Born row and adds born piglets or sets the total again.",
         "states": [],
         "elements": [
           {
             "name": "Correction mode",
-            "shows": "Radios More born / Count was wrong with a stepper.",
+            "shows": "A two-way segment More born / Count was wrong with a stepper (\"Extra piglets\" or \"Born should be\").",
             "states": [
               {
                 "state": "More born",
@@ -1411,7 +1408,7 @@
                 "shows": "Cause list of the six types appears (Other preselected) and the piglets add to that dead type"
               }
             ],
-            "source": "farrowing-astra-concept.js act(\"bornSplit\"), popup()",
+            "source": "farrowing-astra-concept.js act(\"bornSplit\"), bornPanel()",
             "at": "Alive"
           },
           {
@@ -1440,8 +1437,8 @@
           "\"Extra live piglet found later routes through … More born\" (After the lock)"
         ],
         "issues": [
-          "More born → Died shows the full type list inline, a long popup on a small phone.",
-          "The Edit screen behind the popup is not shown on its own anywhere (see Edit record (finished litter))."
+          "More born → Died shows the full type list inline under the Born row, a long panel on a small phone.",
+          "No drawer on a drawer: the correction opens in the Edit drawer itself and its footer becomes Back · Apply. RULINGS calls it a popup; the drawer law rules out a drawer on a drawer."
         ]
       }
     },
@@ -1480,7 +1477,7 @@
           },
           {
             "name": "Log entry",
-            "shows": "Event text, a detail line and \"08:12 · G. Hansen\".",
+            "shows": "Event text, a detail line and \"08:12 · G.H\".",
             "states": [
               {
                 "state": "Count or death",
@@ -1515,7 +1512,7 @@
             ],
             "logic": "Group label is the event's day text; the sample mixes relative (\"5 days ago\") and absolute (\"Aug 26\") labels and is not newest-first.",
             "source": "farrowing-astra-concept.js history()",
-            "at": "G. Hansen"
+            "at": "G.H"
           }
         ],
         "controls": [],
@@ -1550,10 +1547,10 @@
         "states": [],
         "elements": [
           {
-            "name": "Header stamp and band",
-            "shows": "\"Died Aug 25 at 06:20 by L. Madsen\" and a red band \"Sow died · prolapse\".",
-            "logic": "Stamp from the Sow died event; the band carries the chosen cause (Other prints its details). The death is thus told in the stamp, the band and the room chip.",
-            "source": "farrowing-astra-concept.js recordStamp(), locked()",
+            "name": "Death band",
+            "shows": "\"Sow died · prolapse · Aug 25 06:20 · L.M\" in one red band.",
+            "logic": "The death is said once, in the band: cause (Other prints its details), date, time and hand, from the Sow died event. The header keeps only pen and parity; the room row carries the word.",
+            "source": "farrowing-astra-concept.js diedStamp(), locked()",
             "at": "Sow died"
           },
           {
@@ -1570,12 +1567,12 @@
               {
                 "state": "Before or during farrowing",
                 "when": "Sow died before the first count or mid-farrowing",
-                "shows": "Litter excluded from finished-litter KPIs and from Farrowed"
+                "shows": "Litter excluded from finished-litter KPIs (she still counts as Done)"
               },
               {
                 "state": "After farrowing",
                 "when": "Sow died once the litter was finished",
-                "shows": "Litter included in KPIs and in Farrowed"
+                "shows": "Litter included in KPIs"
               }
             ],
             "logic": "Timing is stored when the death is saved (before = Born was 0).",
@@ -1918,7 +1915,7 @@
           {
             "name": "Outcome rows",
             "shows": "Miscarriages · Not in pig · Removed earlier · Sow deaths in Task outcomes.",
-            "logic": "Each row appears only when above zero. These sows sit outside Farrowed, Active, Awaiting and the progress denominator, and outside the KPIs. Here the rows are plain; on the Task overview nonzero rows open a sow list.",
+            "logic": "Each row appears only when above zero. These sows are Done and part of the task total; they sit outside the KPIs. Here the rows are plain; on the Task overview nonzero rows open a sow list.",
             "source": "farrowing-astra-concept.js taskOutcomeSummary()",
             "at": "Miscarriages"
           },
@@ -1966,7 +1963,7 @@
           {
             "name": "Born row",
             "shows": "Born 14 with an amber pencil key.",
-            "logic": "Value is not steppable; the pencil opens the Correct born popup. Turns amber when changed. Before the lock Edit has no Born row.",
+            "logic": "Value is not steppable; the pencil opens Correct born in place under the row. Turns amber when changed. Before the lock Edit has no Born row.",
             "source": "farrowing-astra-concept.js edit() bornRow",
             "at": "Born"
           },
@@ -2031,14 +2028,14 @@
         "elements": [
           {
             "name": "Whole-task progress",
-            "shows": "Sow total, stacked bar and Farrowed · Active · Awaiting counts.",
+            "shows": "Sow total, stacked bar and Done · Active · Awaiting counts.",
             "logic": "Same numbers and rules as the room's Task overview card; zero segments are left out of the bar.",
             "source": "farrowing-astra-concept.js roomOverview, taskOverview()",
             "at": "Whole-task progress"
           },
           {
             "name": "Choose a unit",
-            "shows": "Unit · Farrowed · Active · Awaiting table.",
+            "shows": "Unit · Done · Active · Awaiting table.",
             "states": [
               {
                 "state": "Current unit",
@@ -2129,17 +2126,17 @@
         "elements": [
           {
             "name": "Status",
-            "shows": "Check mark, heading, date and hand.",
+            "shows": "The title and, in the subtitle, the date, time and hand (said once).",
             "states": [
               {
                 "state": "Ended",
                 "when": "No sow was awaiting",
-                "shows": "\"Task ended\" / \"Farrowing task ended\""
+                "shows": "Title \"Task ended\"; subtitle \"Farrowing · Oct 10 · 19:57 · G.H\""
               },
               {
                 "state": "Ended early",
                 "when": "Sows were awaiting",
-                "shows": "\"Task ended early\" / \"Ended with 9 sows awaiting\""
+                "shows": "Title \"Task ended early\"; same subtitle; the awaiting sows are the \"Removed · not farrowed\" row"
               }
             ],
             "source": "farrowing-astra-concept.js taskEndSheet()",

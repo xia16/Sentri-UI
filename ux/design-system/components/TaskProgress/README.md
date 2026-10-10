@@ -2,7 +2,7 @@
 
 # TaskProgress (the whole-task progress card)
 
-The task's progress as one card: a head (`Whole-task progress` · `18 sows`), the segmented bar, then one count per segment (`7 Farrowed · 2 Active · 9 Awaiting`). It opens a task overview [page](../Sheet/README.md); the room's [summary card](../TaskSummary/README.md) carries the same bar small.
+The task's progress as one card: a head (`Whole-task progress` · `19 sows`), the segmented bar, then one count per segment (`8 Done · 2 Active · 9 Awaiting`; one count everywhere: the overview, End task and the room tabs). It opens a task overview [page](../Sheet/README.md); the room's [summary card](../TaskSummary/README.md) carries the same bar small.
 
 **Anatomy** (`section.st-panel.tk-progress-card`, `data-ds="TaskProgress"`)
 - The Panel (`paper` on a page, 1px `line`, `radius-panel`), padded `space-row-x space-panel` (14 × 16).

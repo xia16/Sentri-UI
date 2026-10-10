@@ -897,11 +897,20 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
 .st-optional-answer{font:400 13px/1.4 var(--font-sans);color:var(--ink)}
 .st-optional-act{order:-1;width:16px;height:16px;color:inherit}
 .st-optional-act svg{box-sizing:border-box;width:16px;height:16px;padding:0;border:0;border-radius:0;background:none;stroke-width:1.8}
-.st-optional-row[data-filled="true"],.st-optional-row[aria-expanded="true"]{border-color:#aebba3;background:#edf1e7;color:#293525}
+.st-optional-row[data-filled="true"]{border-color:var(--control-border);background:var(--well);color:var(--ink)}
+.st-optional-row[aria-expanded="true"]{border-color:var(--ink);color:var(--ink)}
+/* Filled: a full-width row, label over its value (two lines at most), the edit icon on the right. Empty stays the small "+ Label" card. */
+.st-optional-row[data-filled="true"]{width:100%;justify-content:flex-start;padding:6px 4px 6px 14px;text-align:left}
+.st-optional-row[data-filled="true"] .st-optional-copy{flex:1 1 0;align-items:flex-start;min-width:0}
+.st-optional-row[data-filled="true"] .st-optional-head{justify-content:flex-start;gap:var(--space-8)}
+.st-optional-row[data-filled="true"] .st-optional-act{order:0;flex:none;display:grid;place-items:center;width:44px;height:44px}
+.st-optional-answer{min-width:0;max-width:100%;white-space:normal;overflow-wrap:anywhere;text-align:left;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
 .st-optional-row:active{background:#edf1e7}
 .st-optional-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0 0}
 .st-optional-list>.st-optional{display:contents}
 .st-optional-list .st-optional-row{width:100%;margin:0}
+.st-optional-list .st-optional-row[data-filled="true"]{grid-column:1/-1}
+.st-optional-list>.st-choice-inline,.st-optional-body>.st-choice-inline{display:flex;justify-content:flex-start;min-height:48px;padding:0 var(--space-6);border:1px solid #e5eadc;border-radius:12px;background:#f8f9f3}
 .st-optional-list .st-optional-body,.st-optional-list>.finish-field,.st-optional-list>.st-choice-inline{grid-column:1/-1;margin:0}
 .st-photos .st-optional-row{margin:0}
 .st-photos-camera{width:calc(50% - 5px)}
