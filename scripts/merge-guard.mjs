@@ -14,15 +14,20 @@ if (!/\bgh\s+pr\s+merge\b/.test(cmd)) process.exit(0);
 const block = (why) => { console.error(`merge guard: ${why}\nMerges run only behind GATE PASS (docs/design-workflow/briefs/gate.md): node scripts/gate.mjs --verdict <out>, then gh pr merge <n> --squash --match-head-commit <sha>.`); process.exit(2); };
 const git = (args) => spawnSync('git', args, { encoding: 'utf8' });
 
-const sha = (cmd.match(/--match-head-commit[ =]([0-9a-f]{40})\b/) || [])[1];
-if (!sha) block('the merge must be pinned to the gated commit with --match-head-commit <full sha>');
+// Every gh pr merge on the line is checked on its own: a pin elsewhere on the line (another merge, an echo) never covers it.
+if (/`|\$\(/.test(cmd)) block('a merge command may not build its arguments with command substitution');
+const merges = cmd.split(/;|&&|\|\||\||\r?\n/).filter((seg) => /\bgh\s+pr\s+merge\b/.test(seg));
 const common = git(['rev-parse', '--git-common-dir']).stdout.trim();
 if (!common) block('not inside the repository');
-const file = path.join(path.resolve(common), 'sentri-gate', `${sha}.json`);
-if (!fs.existsSync(file)) block(`no gate pass for ${sha.slice(0, 7)}`);
-let pass;
-try { pass = JSON.parse(fs.readFileSync(file, 'utf8')); } catch { block(`the gate pass for ${sha.slice(0, 7)} can't be read`); }
-if (git(['fetch', '-q', 'origin']).status !== 0) block("git fetch failed, so main can't be checked");
-const main = git(['rev-parse', 'origin/main']).stdout.trim();
-if (main !== pass.base) block(`main moved to ${main.slice(0, 7)} since ${sha.slice(0, 7)} was gated against ${String(pass.base).slice(0, 7)}: merge main forward and gate again`);
+let main = '';
+for (const seg of merges) {
+  const sha = (seg.match(/--match-head-commit[ =]([0-9a-f]{40})\b/) || [])[1];
+  if (!sha) block(`each merge must be pinned to its gated commit with --match-head-commit <full sha>: "${seg.trim()}"`);
+  const file = path.join(path.resolve(common), 'sentri-gate', `${sha}.json`);
+  if (!fs.existsSync(file)) block(`no gate pass for ${sha.slice(0, 7)}`);
+  let pass;
+  try { pass = JSON.parse(fs.readFileSync(file, 'utf8')); } catch { block(`the gate pass for ${sha.slice(0, 7)} can't be read`); }
+  if (!main) { if (git(['fetch', '-q', 'origin']).status !== 0) block("git fetch failed, so main can't be checked"); main = git(['rev-parse', 'origin/main']).stdout.trim(); }
+  if (main !== pass.base) block(`main moved to ${main.slice(0, 7)} since ${sha.slice(0, 7)} was gated against ${String(pass.base).slice(0, 7)}: merge main forward and gate again`);
+}
 process.exit(0);
