@@ -4257,7 +4257,7 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
   function atlasScreen(screens) {
     var b = 'piglet-processing.';
     if (V.end) return b + 'end-task';
-    if (!V.pen) return P.s.ended ? b + 'list-ended' : V.lens === 'done' ? b + 'chip-done' : V.chip ? b + 'job-chip' : scheme() === 'none' ? b + 'list-no-id' : b + 'pen-list';
+    if (!V.pen) return P.s.ended ? b + 'list-ended' : P.s.notes.some(function (n) { return !n.seen; }) ? b + 'phone-clash' : V.lens === 'done' ? b + 'chip-done' : V.chip ? b + 'job-chip-' + V.chip : scheme() === 'none' ? b + 'list-no-id' : b + 'pen-list';
     if (V.sub === 'give') return b + 'give-ids';
     var by = { tagged: 'tagged-list', log: 'pen-log', adjust: 'adjust-count', counts: 'counts', weight: 'weight', more: 'more-actions', death: 'record-death', move: 'move-piglets', count: 'set-count' };
     if (V.over) return by[V.over] ? b + by[V.over] : null;

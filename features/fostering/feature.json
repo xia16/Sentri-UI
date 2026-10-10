@@ -5,7 +5,7 @@
   "platform": "mobile",
   "section": "breeding",
   "newFeature": false,
-  "duplicates": "built inside Inspection — see inspection / health-record",
+  "duplicates": "Built inside Inspection in the old UI. The same move is also drawn in Farrowing as 'Foster piglets' (farrowing.foster, a one-stepper sheet); Piglet processing's Move piglets (piglet-processing.move-piglets, simple prototype) is a third version.",
   "groups": [
     [
       "Old UI",
@@ -22,45 +22,166 @@
       "id": "fostering.type",
       "name": "Choose fostering type",
       "zh": "选择寄养类型",
-      "status": "placeholder",
+      "status": "in-design",
       "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
       "notes": {
-        "purpose": "Choose the kind of fostering.",
+        "purpose": "Choose the kind of move: out of this litter, or into it, then the other crate.",
+        "states": [
+          "Out of this crate (default), 'Likely - same age, smaller litters' suggestions",
+          "Into this crate: the other crate is the source"
+        ],
+        "elements": [],
+        "controls": [],
+        "copy": [],
+        "edge": [
+          "A crate whose sow died may still receive: it is the only way to close its gain."
+        ],
+        "rules": [
+          "Direction stays In whatever the litter's state."
+        ],
         "issues": []
-      }
+      },
+      "url": "/ux/tasks/piglet-processing/move.html?state=move"
     },
     {
       "id": "fostering.receive",
       "name": "Choose receiving sow",
       "zh": "选择接收的母猪",
-      "status": "placeholder",
+      "status": "in-design",
       "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
       "notes": {
-        "purpose": "Choose the sow that takes piglets, in the piglet-processing stage or the farrowing stage.",
+        "purpose": "Choose the other crate by typing or scanning its code.",
+        "states": [
+          "Typed code: 'Crates matching' list across units",
+          "This crate's own code: says why it cannot be chosen",
+          "Scan fills the code"
+        ],
+        "elements": [
+          {
+            "name": "Crate in the picker",
+            "at": "A0",
+            "shows": "One row per crate matching the code.",
+            "states": [
+              {
+                "state": "Other crate in the unit",
+                "when": "match is a different litter in the same unit",
+                "shows": "Unit, alive count and crate state"
+              },
+              {
+                "state": "Another unit's crate",
+                "when": "match is in another unit",
+                "shows": "Unit shown; its state reads in the review below"
+              },
+              {
+                "state": "This crate",
+                "when": "the code typed is the current litter",
+                "shows": "Says why it cannot be chosen"
+              }
+            ],
+            "source": "ux/tasks/piglet-processing/move.html"
+          }
+        ],
+        "controls": [],
+        "copy": [],
+        "edge": [],
+        "rules": [],
         "issues": []
-      }
+      },
+      "url": "/ux/tasks/piglet-processing/move.html?state=move-search"
     },
     {
       "id": "fostering.piglets",
       "name": "Choose piglets to move",
       "zh": "选择要转出的仔猪",
-      "status": "placeholder",
+      "status": "in-design",
       "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
       "notes": {
-        "purpose": "Choose the piglets that move out, and optionally fill their identity.",
+        "purpose": "Choose the piglets that move, by count or, for tagged piglets, row by row.",
+        "states": [
+          "Which piglets: tagged piglets picked row by row (n of total, All), plus a count for the ones with no tag or notch",
+          "Questions per dose the source carries: 'did all n piglets have it?' Yes / No / Don't know"
+        ],
+        "elements": [
+          {
+            "name": "Dose question",
+            "at": "Don't know",
+            "shows": "Asked per treatment the source litter carries, so Move records what the piglets had.",
+            "states": [
+              {
+                "state": "Yes",
+                "when": "all moved piglets had it",
+                "shows": "Answer saved with the move"
+              },
+              {
+                "state": "No",
+                "when": "not all of them had it",
+                "shows": "Answer saved with the move"
+              },
+              {
+                "state": "Don't know",
+                "when": "worker is not sure",
+                "shows": "The receiver shows it to check against the spray mark"
+              }
+            ],
+            "source": "ux/laws/strings.json pp.move.ask.*"
+          }
+        ],
+        "controls": [],
+        "copy": [],
+        "edge": [
+          "A count past a sane litter size shows a warning (move-crowded).",
+          "The receiver's own piglets join too, and Move says so before Save (move-own).",
+          "Arrivals keep their own age (move-young)."
+        ],
+        "rules": [],
         "issues": []
-      }
+      },
+      "url": "/ux/tasks/piglet-processing/move.html?state=move-tagged"
     },
     {
       "id": "fostering.result",
       "name": "Confirm result",
       "zh": "寄养结果确认",
-      "status": "placeholder",
+      "status": "in-design",
       "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
       "notes": {
-        "purpose": "Check the outcome of the fostering.",
+        "purpose": "Check the outcome before Save: both litters' counts before and after, what the receiver still owes and what arrives done.",
+        "states": [
+          "Into this crate (shown)",
+          "Out of this crate: same blocks",
+          "Save writes one move and returns to the litter drawer with a receipt"
+        ],
+        "elements": [
+          {
+            "name": "Before and after",
+            "at": [
+              "From B10",
+              "To B08"
+            ],
+            "shows": "Each litter's alive count before and after the move.",
+            "source": "ux/tasks/piglet-processing/move.html; ledger.js",
+            "rule": "Figures come from the ledger's draft of the move, so what is shown is what Save writes."
+          },
+          {
+            "name": "Owed and Arrive done",
+            "at": [
+              "Owed",
+              "Arrive done"
+            ],
+            "shows": "The doses the receiver still owes the arrivals, and those they bring already done.",
+            "source": "ux/tasks/piglet-processing/move.html; ledger.js",
+            "rule": "Figures come from the ledger's draft of the move, so what is shown is what Save writes."
+          }
+        ],
+        "controls": [],
+        "copy": [],
+        "edge": [],
+        "rules": [
+          "Receipt, then one Back to the drawer; there is no Moves page (R2-22)."
+        ],
         "issues": []
-      }
+      },
+      "url": "/ux/tasks/piglet-processing/move.html?state=move-into"
     }
   ]
 }

@@ -165,7 +165,7 @@
   "id": "home-and-placeholders-12",
   "target": {
    "kind": "screen",
-   "id": "workbench.saved-work"
+   "id": "data-sync.list"
   },
   "kind": "decision",
   "severity": "high",
@@ -183,7 +183,7 @@
   "id": "home-and-placeholders-13",
   "target": {
    "kind": "screen",
-   "id": "workbench.saved-work"
+   "id": "data-sync.list"
   },
   "kind": "unclear",
   "severity": "medium",
