@@ -1,0 +1,74 @@
+[
+  {
+    "id": "home-batch-1",
+    "target": {
+      "kind": "screen",
+      "id": "find-pig.search"
+    },
+    "kind": "broken",
+    "severity": "medium",
+    "title": "Search drawer: primary action has no visible label",
+    "detail": "The footer action (\"Search sample records\") shows as a dark, square block with no readable text. It is a raw button.primary moved into the sheet footer, not a SentriUI.button.",
+    "source": "population"
+  },
+  {
+    "id": "home-batch-2",
+    "target": {
+      "kind": "screen",
+      "id": "find-pig.scan"
+    },
+    "kind": "broken",
+    "severity": "medium",
+    "title": "Scan drawer: footer action and sample-tag button are unstyled",
+    "detail": "\"Find sample pig\" is a dark, square block with no readable text, and \"Use a sample tag\" looks like plain text instead of a button. Both are raw buttons, not SentriUI.button.",
+    "source": "population"
+  },
+  {
+    "id": "home-batch-3",
+    "target": {
+      "kind": "screen",
+      "id": "assistant.finding"
+    },
+    "kind": "broken",
+    "severity": "low",
+    "title": "Finding: \"View Unit 7\" looks like text, not a button",
+    "detail": "The secondary action is a raw button with no border or fill, so it does not read as tappable for a gloved user.",
+    "source": "population"
+  },
+  {
+    "id": "home-batch-4",
+    "target": {
+      "kind": "feature",
+      "id": "find-pig"
+    },
+    "kind": "decision",
+    "severity": "medium",
+    "title": "Where does Find a pig live: Home's Toolbox and Scan, or Pig list?",
+    "detail": "The Pigs section text says search takes an ear tag or ear notch and scan reads the tag, and Pig list is a placeholder (old Figma: list, filter, detail). Home's prototype offers search and scan as its own drawers that open a task, not a pig record. Which one owns it, and does a result open the pig's record?",
+    "source": "population",
+    "options": [
+      "Home keeps Scan and Find; results open the pig record (Pig profile)",
+      "Pig list owns search; Home's Scan and Find open it",
+      "Both stay, Home as a shortcut into Pig list"
+    ],
+    "recommendation": "Home keeps the entrances; results open the Pig profile."
+  },
+  {
+    "id": "home-batch-5",
+    "target": {
+      "kind": "feature",
+      "id": "assistant"
+    },
+    "kind": "decision",
+    "severity": "low",
+    "title": "Is an Assistant answer applied to the record?",
+    "detail": "The preview says \"No live record was changed\" and writes only to Records. The docs do not say whether a clarification updates the movement note, goes to a supervisor, or only closes the finding.",
+    "source": "population",
+    "options": [
+      "Applied to the record by the worker",
+      "Sent to a supervisor to apply",
+      "Closes the finding only"
+    ],
+    "recommendation": "Decide with the real agent design."
+  }
+]

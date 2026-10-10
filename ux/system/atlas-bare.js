@@ -103,7 +103,7 @@
     steps.forEach(function (st) {
       chain = chain.then(function () {
         var key = typeof st === 'string' ? st : st.tap, hold = typeof st === 'object' && st.hold;
-        return findWait(phone, key).then(function (el) {
+        return findWait(phone, key).then(function (el) {   // in the phone, else in its same-origin iframes
           if (!el) { console.error('atlas-bare: step not found: ' + key); return; }
           if (hold) {
             var o = { bubbles: true, cancelable: true, button: 0, pointerId: 1, pointerType: 'mouse', isPrimary: true };
