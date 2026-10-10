@@ -1,9 +1,9 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"></head><body>
-<section data-state="Default"><h2>Default</h2><div id="state-Default"></div></section>
-<section data-state="Pressed"><h2>Pressed</h2><div id="state-Pressed"></div></section>
-<section data-state="Selected"><h2>Selected</h2><div id="state-Selected"></div></section>
-<section data-state="Disabled"><h2>Disabled</h2><div id="state-Disabled"></div></section>
-<section data-state="Long-label"><h2>Long-label</h2><div id="state-Long-label"></div></section>
+<section data-state="Default" data-bleed><h2>Default</h2><div id="state-Default"></div></section>
+<section data-state="Pressed" data-bleed><h2>Pressed</h2><div id="state-Pressed"></div></section>
+<section data-state="Selected" data-bleed><h2>Selected</h2><div id="state-Selected"></div></section>
+<section data-state="Disabled" data-bleed><h2>Disabled</h2><div id="state-Disabled"></div></section>
+<section data-state="Longest label · 中文" data-bleed><h2>Long-label</h2><div id="state-Long-label"></div></section>
 <script>
 // Each state renders in its own iframe in the atlas: draw only the states present.
 var UI = window.SentriUI;
@@ -12,7 +12,7 @@ var RENDER = {
   "state-Pressed": () => SentriUI.filterChips({"items": [{"value": "0", "label": "All", "checked": true, "disabled": false}, {"value": "1", "label": "Iron", "count": 3, "checked": false, "disabled": false}, {"value": "2", "label": "Dock tail", "count": 4, "checked": false, "disabled": false}, {"value": "3", "label": "Castrate", "count": 5, "checked": false, "disabled": false}, {"value": "4", "label": "Coccidiosis", "count": 6, "checked": false, "disabled": false}, {"value": "5", "label": "Tag", "count": 7, "checked": false, "disabled": false}, {"value": "6", "label": "Weight", "count": 8, "checked": false, "disabled": false}], "label": "Jobs", "state": "Pressed", "reason": ""}),
   "state-Selected": () => SentriUI.filterChips({"items": [{"value": "0", "label": "All", "count": 2, "checked": false, "disabled": false}, {"value": "1", "label": "Iron", "count": 3, "checked": true, "disabled": false}, {"value": "2", "label": "Dock tail", "count": 4, "checked": false, "disabled": false}, {"value": "3", "label": "Castrate", "count": 5, "checked": false, "disabled": false}, {"value": "4", "label": "Coccidiosis", "count": 6, "checked": false, "disabled": false}, {"value": "5", "label": "Tag", "count": 7, "checked": false, "disabled": false}, {"value": "6", "label": "Weight", "count": 8, "checked": false, "disabled": false}], "label": "Jobs", "state": "Selected", "reason": ""}),
   "state-Disabled": () => SentriUI.filterChips({"items": [{"value": "0", "label": "All", "checked": true, "disabled": true}, {"value": "1", "label": "Iron", "count": 3, "checked": false, "disabled": true}, {"value": "2", "label": "Dock tail", "count": 4, "checked": false, "disabled": true}, {"value": "3", "label": "Castrate", "count": 5, "checked": false, "disabled": true}, {"value": "4", "label": "Coccidiosis", "count": 6, "checked": false, "disabled": true}, {"value": "5", "label": "Tag", "count": 7, "checked": false, "disabled": true}, {"value": "6", "label": "Weight", "count": 8, "checked": false, "disabled": true}], "label": "Jobs", "state": "Disabled", "reason": "Records are unavailable offline."}),
-  "state-Long-label": () => SentriUI.filterChips({"items": [{"value": "0", "label": "\u6240\u6709\u5f85\u5904\u7406\u7684\u4ed4\u732a\u8bb0\u5f55", "checked": true, "disabled": false}, {"value": "1", "label": "\u9700\u8981\u8865\u94c1\u7684\u4ed4\u732a", "count": 3, "checked": false, "disabled": false}], "label": "Jobs", "state": "Long-label", "reason": ""})
+  "state-Long-label": () => SentriUI.filterChips({"items": [{"value": "0", "label": "\u5168\u90e8", "checked": true, "disabled": false}, {"value": "1", "label": "\u8865\u94c1", "count": 3, "checked": false, "disabled": false}, {"value": "2", "label": "\u65ad\u5c3e", "count": 4, "checked": false, "disabled": false}, {"value": "3", "label": "\u7403\u866b\u75c5\u9884\u9632", "count": 6, "checked": false, "disabled": false}], "label": "Jobs", "state": "Longest label · 中文", "reason": ""})
 };
 document.querySelectorAll('[data-state]').forEach(function (s) {
   var t = RENDER[s.id] ? s : s.querySelector('[id]');

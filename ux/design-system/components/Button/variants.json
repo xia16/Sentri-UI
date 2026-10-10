@@ -8,9 +8,10 @@
       "Default",
       "Pressed",
       "Disabled",
-      "Long / Chinese",
       "Waiting",
-      "Loading"
+      "Loading",
+      "Longest label",
+      "Longest label · 中文"
     ]
   },
   {
@@ -22,9 +23,10 @@
       "Default",
       "Pressed",
       "Disabled",
-      "Long / Chinese",
       "Waiting",
-      "Loading"
+      "Loading",
+      "Longest label",
+      "Longest label · 中文"
     ]
   },
   {
@@ -36,9 +38,10 @@
       "Default",
       "Pressed",
       "Disabled",
-      "Long / Chinese",
       "Waiting",
-      "Loading"
+      "Loading",
+      "Longest label",
+      "Longest label · 中文"
     ]
   },
   {
@@ -50,9 +53,9 @@
       "Default",
       "Pressed",
       "Disabled",
-      "Long / Chinese",
       "Waiting",
-      "Loading",
+      "Longest label",
+      "Longest label · 中文",
       "Holding",
       "Armed",
       "Pending",
@@ -70,9 +73,10 @@
       "Default",
       "Pressed",
       "Disabled",
-      "Long / Chinese",
       "Waiting",
-      "Loading"
+      "Loading",
+      "Longest label",
+      "Longest label · 中文"
     ]
   },
   {
@@ -84,9 +88,10 @@
       "Default",
       "Pressed",
       "Disabled",
-      "Long / Chinese",
       "Waiting",
-      "Loading"
+      "Loading",
+      "Longest label",
+      "Longest label · 中文"
     ]
   }
 ]

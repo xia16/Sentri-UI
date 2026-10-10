@@ -24,7 +24,7 @@ Call `SentriUI.facts(items, { columns })`. Each item is `{ label, value | valueH
 - **Two-column** (default) — label over value, two to a row. [variants/two-column.html](variants/two-column.html)
 - **Three-column** (`columns: 3`) — three short counts side by side. [variants/three-column.html](variants/three-column.html)
 
-A `columns: 1` form exists for a single long value on the full width; no Sentri screen uses it, so it has no variant page. Prefer two-column and let the value wrap.
+A `columns: 1` form exists for a single long value on the full width; no Sentri screen uses it, so it has no variant page. Prefer two-column; a long value is rewritten to its budget.
 
 ## States
 
@@ -36,8 +36,7 @@ Facts are static text.
 | Pressed, selected, disabled, error, loading | none: facts hold no controls |
 | Empty value | `null` or blank renders an em dash `—`. `0` is a value and renders `0` |
 | Empty set | the whole panel is absent when every fact is missing |
-| Long value | wraps at word breaks; an ID (`mono: true`) never breaks mid-ID |
-| Chinese | same layout; labels wrap in the column |
+| Longest label (and Longest label · 中文) | Real copy at the Copy budget, in the real container at 390px: one line, nothing wrapped or cut. Longer copy is rewritten. |
 
 ## Behaviour
 
@@ -45,8 +44,22 @@ None. Facts have no click handler.
 
 ## Content rules
 
+### Copy budget
+
+| Text | English | 中文 | Lines |
+| --- | --- | --- | --- |
+| Label, two columns | 24 | 10 | 1 |
+| Value, two columns | 20 | 9 | 1 |
+| Label, three columns | 14 | 6 | 1 |
+| Value, three columns | 12 | 5 | 1 |
+| Meta trail | 24 | 10 | 1 |
+
+Over-budget copy is rewritten to the shortest copy that still names the act; it is never wrapped, shrunk or ellipsised to fit. The “Longest label” state shows real copy at this limit in the real container at 390px. Budgets come from what fits at 390px inside the screen gutters; a `{n}` or `{name}` slot counts as 3 characters.
+
+### Writing rules
+
 - Values are formatted by the caller, with units: `182 kg`, `Parity 4`, `0 of 12`.
-- Labels: sentence case, a noun, 24 characters or fewer, wrapping to a second line rather than truncating.
+- Labels: sentence case, a noun.
 - A missing value is an em dash only when the record really lacks that fact. Leave out a fact that cannot exist for this animal.
 - Trails (when · who) go in `meta`, with initials: `G.H`.
 - IDs (ear tags, pens, batches) use `mono: true`: set in `IBM Plex Mono`, never broken.

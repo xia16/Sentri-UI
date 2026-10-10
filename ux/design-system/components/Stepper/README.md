@@ -31,7 +31,7 @@ Label; optional description; decrease key; spinbutton value; increase key; persi
 | Loading | Saving…; keys are aria-disabled until the host settles. |
 | Draft | +1 unsaved beside the draft value. |
 | Corrected | Corrected beside the revised value. |
-| Long Chinese label | Wraps in full without ellipsis. |
+| Longest label (and Longest label · 中文) | Real copy at the Copy budget, in the real container at 390px: one line, nothing wrapped or cut. Longer copy is rewritten. |
 
 ## Behaviour
 Keys emit data-action, data-value (field key), and data-step (requested delta). The host owns bounds, persistence and receipts; the component never commits. ArrowUp / ArrowDown on the spinbutton request the same delta as the visible keys. Floor and ceiling keys remain focusable and aria-disabled: the host answers refused taps in the status line. Loading and disabled hosts must reject deltas. Draft and corrected receipts include words. Pass localized status with the actual draft delta (for example +1 unsaved); the fallback says Unsaved. Keep roots and status regions mounted when patching.
@@ -39,7 +39,20 @@ Keys emit data-action, data-value (field key), and data-step (requested delta). 
 Show at most seven row steppers in a drawer (six death causes plus one live-count correction); use a page for more, and keep the body scrollable. One count or well per sheet. Reserve hint space once per sheet with reserveHint:true on the row that can show pointers; all other rows use reserveHint:false. No selection state: these are counting actions.
 
 ## Content rules
-Sentence case, labels normally ≤14 English characters or 8 Chinese characters. Longer labels wrap without truncation; descriptions ≤60 characters. Status lines state a single consequence; never repeat the label or count in a receipt. A pointer is a verb plus destination.
+
+### Copy budget
+
+| Text | English | 中文 | Lines |
+| --- | --- | --- | --- |
+| Label | 20 | 9 | 1 |
+| Description | 40 | 20 | 1 |
+| Status or hint line | 48 | 24 | 1 |
+
+Over-budget copy is rewritten to the shortest copy that still names the act; it is never wrapped, shrunk or ellipsised to fit. The “Longest label” state shows real copy at this limit in the real container at 390px. Budgets come from what fits at 390px inside the screen gutters; a `{n}` or `{name}` slot counts as 3 characters.
+
+### Writing rules
+
+Sentence case. Status lines state a single consequence; never repeat the label or count in a receipt. A pointer is a verb plus destination.
 
 ## Accessibility
 Group is labelled by the visible label; value is a spinbutton with aria-valuenow/min/max; the screen reader's increment and decrement (sent as ArrowUp / ArrowDown) change it through the host. Every key has a Decrease/Increase accessible name and describes the status region. Keys act on activation. Keys, spinbuttons and text actions are at least tap-min in both dimensions.

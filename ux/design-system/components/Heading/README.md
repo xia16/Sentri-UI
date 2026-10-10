@@ -47,8 +47,7 @@ A heading is static text. Only its action has states.
 | Pressed | the action link: `press` fill, ink text (static: `data-preview="pressed"`) |
 | Selected, disabled, error, loading | none. A heading is not selectable; a blocked action is left out, not greyed; a heading never loads or errs |
 | Empty | absent: a heading is never drawn over an empty block |
-| Long title | wraps; the aside stays top-aligned and holds at most 46% of the width |
-| Chinese | same layout; the title is not truncated |
+| Longest label (and Longest label · 中文) | Real copy at the Copy budget, in the real container at 390px: one line, nothing wrapped or cut. Longer copy is rewritten. |
 
 ## Behaviour
 
@@ -56,11 +55,25 @@ The title is not interactive. `action` is `{ label, action, value, ariaLabel, di
 
 ## Content rules
 
-- Title: sentence case, a noun or noun phrase, one line at 390px where it can ("Litter summary", "Whole-task progress"); a longer one wraps, never truncates.
-- Description: one line, at most one short sentence, sentence case, no full stop.
-- Meta: 12 characters or fewer, never a sentence ("3 tasks", "48 sows").
-- Action label: a verb phrase of one to three words ("View log", "View plan"); the › is drawn by the component.
-- `ariaLabel` on the action when the visible label is not enough alone ("Open farrowing log").
+### Copy budget
+
+| Text | English | 中文 | Lines |
+| --- | --- | --- | --- |
+| Page title | 32 | 14 | 1 |
+| Section title (with or without action) | 40 | 18 | 1 |
+| Group label | 24 | 12 | 1 |
+| Description | 48 | 24 | 1 |
+| Meta | 12 | 6 | 1 |
+| Action label | 12 | 6 | 1 |
+
+Over-budget copy is rewritten to the shortest copy that still names the act; it is never wrapped, shrunk or ellipsised to fit. The “Longest label” state shows real copy at this limit in the real container at 390px. Budgets come from what fits at 390px inside the screen gutters; a `{n}` or `{name}` slot counts as 3 characters.
+
+### Writing rules
+
+- Title: sentence case, a noun or noun phrase (“Litter summary”, “Whole-task progress”).
+- Description: at most one short sentence, sentence case, no full stop.
+- Meta: never a sentence (“3 tasks”, “48 sows”).
+- Action label: a verb phrase of one to three words (“View log”, “View plan”); the › is drawn by the component. `ariaLabel` on the action when the visible label is not enough alone.
 
 ## Accessibility
 

@@ -11,7 +11,7 @@
       "Waiting (reason shown)",
       "Error",
       "Empty",
-      "Long / Chinese",
+      "Longest label · 中文",
       "Held at its size",
       "Lead + Above (drill-down)"
     ]
@@ -27,7 +27,7 @@
       "Aside",
       "Waiting (reason shown)",
       "Empty",
-      "Long / Chinese",
+      "Longest label · 中文",
       "Drawer over a page"
     ]
   },
@@ -41,7 +41,7 @@
       "Without glyph",
       "Pressed",
       "Waiting (reason shown)",
-      "Long / Chinese"
+      "Longest label · 中文"
     ]
   }
 ]

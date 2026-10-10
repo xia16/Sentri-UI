@@ -20,7 +20,7 @@
 <section data-state="Empty"><h3>Empty</h3><div id="state-Empty"></div>
 
 </section>
-<section data-state="Long-label"><h3>Long-label</h3><div id="state-Long-label"></div>
+<section data-state="Longest label · 中文"><h3>Long-label</h3><div id="state-Long-label"></div>
 
 </section>
 <script>
@@ -34,7 +34,7 @@ var RENDER = {
   "state-Error": () => UI.pickerField({"pressed": false, "disabled": false, "reason": "", "label": "Conditions", "variant": "multi", "selected": [], "value": "", "path": [], "active": false, "error": "Select an available option to continue.", "loading": false}) + UI.pickerBody({"variant": "multi", "items": [{"value": "a", "label": "Low appetite"}, {"value": "b", "label": "Fever"}], "selected": [], "path": [], "loading": false, "error": "Options could not load. Try again."}) + UI.pickerFooter({"multi": true, "selected": []}),
   "state-Loading": () => UI.pickerField({"pressed": false, "disabled": false, "reason": "", "label": "Conditions", "variant": "multi", "selected": [], "value": "", "path": [], "active": false, "error": "", "loading": true}) + UI.pickerBody({"variant": "multi", "items": [{"value": "a", "label": "Low appetite"}, {"value": "b", "label": "Fever"}], "selected": [], "path": [], "loading": true, "error": ""}) + UI.pickerFooter({"multi": true, "selected": []}),
   "state-Empty": () => UI.pickerField({"pressed": false, "disabled": false, "reason": "", "label": "Conditions", "variant": "multi", "selected": [], "value": "", "path": [], "active": false, "error": "", "loading": false}) + UI.pickerBody({"variant": "multi", "items": [], "selected": [], "path": [], "loading": false, "error": ""}) + UI.pickerFooter({"multi": true, "selected": []}),
-  "state-Long-label": () => UI.pickerField({"pressed": false, "disabled": false, "reason": "", "label": "青霉素类抗菌药物 / 阿莫西林可溶性粉用于仔猪治疗的完整名称", "variant": "multi", "selected": ["a"], "value": "青霉素类抗菌药物 / 阿莫西林可溶性粉用于仔猪治疗的完整名称", "path": [], "active": false, "error": "", "loading": false}) + UI.choiceGroup(UI.choiceRow({label:"青霉素类抗菌药物 / 阿莫西林可溶性粉用于仔猪治疗的完整名称",mode:"multi",selected:true}))
+  "state-Long-label": () => UI.pickerField({"pressed": false, "disabled": false, "reason": "", "label": "药品", "variant": "multi", "selected": ["a"], "value": "阿莫西林可溶性粉（仔猪治疗用）", "path": [], "active": false, "error": "", "loading": false}) + UI.choiceGroup(UI.choiceRow({label:"阿莫西林可溶性粉（仔猪治疗用）",mode:"multi",selected:true}))
 };
 document.querySelectorAll('[data-state]').forEach(function (s) {
   var t = RENDER[s.id] ? s : s.querySelector('[id]');

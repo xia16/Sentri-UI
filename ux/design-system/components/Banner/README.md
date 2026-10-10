@@ -28,7 +28,7 @@ Box; leading icon (alert for danger, edit for correction, note for notice; the h
 | Loading | Notice states what is uploading; host retains the review door |
 | Changed | Live change summary with Clear; appears at the first correction |
 | Cleared | Correction summary says Cleared; Undo remains for 5 seconds |
-| Long label / Chinese | Headline ellipsizes on one line; consequence wraps |
+| Longest label (and Longest label · 中文) | Real copy at the Copy budget, in the real container at 390px: one line, nothing wrapped or cut. Longer copy is rewritten. |
 
 No selected state: a banner is not a choice. Input validation belongs in Field; a failed upload uses notice with a retry door. An empty correction is omitted. [State documents](variants.json) render every applicable state.
 
@@ -38,7 +38,21 @@ No selected state: a banner is not a choice. Input validation belongs in Field; 
 The host handles review, Clear and Undo events. Clear snapshots the draft, empties it, renders `summary: 'Cleared'` and an `undo-clear` action, focuses Undo and starts a 5-second timer. Undo restores the snapshot and returns focus to Clear. On expiry call `SentriUI.handFocus(banner, firstField)` before removing it; do not steal focus from elsewhere. Summary is the only live region when present. Call `SentriUI.liveFill` after mounting. The state demo keeps Cleared visible for inspection; the host owns its timer.
 
 ## Content rules
-Sentence case. Aim for at most 42 English characters or 18 Chinese characters in a headline; cap at one visual line, with ellipsis for excess. Keep the full text in the DOM and put necessary consequences in the wrapping line (up to 100 English / 45 Chinese characters). Example: “先保存更正记录” / “Save your correction first”. Action labels are verbs, at most 16 English / 6 Chinese characters. Never rely on colour: every tone has a leading word or icon.
+
+### Copy budget
+
+| Text | English | 中文 | Lines |
+| --- | --- | --- | --- |
+| Headline | 36 | 18 | 1 |
+| Consequence line | 60 | 30 | 1 |
+| Detail | 24 | 12 | 1 |
+| Action label | 12 | 6 | 1 |
+
+Over-budget copy is rewritten to the shortest copy that still names the act; it is never wrapped, shrunk or ellipsised to fit. The “Longest label” state shows real copy at this limit in the real container at 390px. Budgets come from what fits at 390px inside the screen gutters; a `{n}` or `{name}` slot counts as 3 characters. Example: “先保存更正记录” / “Save your correction first”.
+
+### Writing rules
+
+Sentence case. Keep the full text in the DOM. Action labels are verbs. Never rely on colour: every tone has a leading word or icon.
 
 ## Accessibility
 Static box: `role="note"`; dynamic summary: `role="status"`, polite and atomic. Door is a native button (role, name and state are read by the screen reader). Text actions follow Button. Disabled doors have a visible reason and native disabled semantics. No gesture-only action. All targets and summary rows use the 48px glove floor.

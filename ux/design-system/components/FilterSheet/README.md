@@ -28,7 +28,7 @@ Sheet drawer, title, optional scope, Clear text action, named filter groups, opt
 | Disabled | The whole sheet is unavailable (e.g. while syncing): every control, Clear and Show are disabled and one persistent reason says why. Not the same as Empty. |
 | Error | Persistent explanation and recovery instruction. |
 | Loading | Counting results; commit blocked. |
-| Long / Chinese | Labels wrap without truncation. |
+| Longest label (and Longest label · 中文) | Real copy at the Copy budget, in the real container at 390px: one line, nothing wrapped or cut. Longer copy is rewritten. |
 
 Every state is rendered in [the variant](variants/list.html).
 
@@ -40,7 +40,21 @@ No presets existed in Farrowing; do not invent a preset variant. A caller can pu
 
 ## Content rules
 
-Sentence case. Short choice groups wrap (nothing is cut off or hidden behind a scroll). Label budget: 32 English characters / 16 Chinese characters; longer labels wrap, never truncate values or reasons. Always name units. Reasons say what is missing and how to recover. Clear uses registered `act.clear`; Back preserves draft. Every label is a registered string (`act.clear`, `act.back`, `ds.filter.show`, `ds.filter.counting`; a feature passes `showStr:{one,many}` for its own “Show {n} sow(s)”). Where no shell fills them, pass `labels:{clear,back,counting,show(n,noun)}` in the user’s language.
+### Copy budget
+
+| Text | English | 中文 | Lines |
+| --- | --- | --- | --- |
+| Sheet title | 24 | 12 | 1 |
+| Group heading | 24 | 12 | 1 |
+| Option label | 36 | 18 | 1 |
+| Show button (“Show 12 litters”) | 24 | 12 | 1 |
+| Reason | 60 | 30 | 2 |
+
+Over-budget copy is rewritten to the shortest copy that still names the act; it is never wrapped, shrunk or ellipsised to fit. The “Longest label” state shows real copy at this limit in the real container at 390px. Budgets come from what fits at 390px inside the screen gutters; a `{n}` or `{name}` slot counts as 3 characters.
+
+### Writing rules
+
+Sentence case. Always name units. Reasons say what is missing and how to recover. Clear uses registered `act.clear`; Back preserves draft. Every label is a registered string (`act.clear`, `act.back`, `ds.filter.show`, `ds.filter.counting`; a feature passes `showStr:{one,many}` for its own “Show {n} sow(s)”). Where no shell fills them, pass `labels:{clear,back,counting,show(n,noun)}` in the user’s language.
 
 ## Accessibility
 

@@ -1,36 +1,36 @@
 <!doctype html><meta charset="utf-8">
-<section data-state="Default"><h3>Default</h3><div id="state-Default"></div>
+<section data-state="Default" data-bleed><h3>Default</h3><div id="state-Default"></div>
 
 </section>
-<section data-state="Pressed"><h3>Pressed</h3><div id="state-Pressed"></div>
+<section data-state="Pressed" data-bleed><h3>Pressed</h3><div id="state-Pressed"></div>
 
 </section>
-<section data-state="Selected"><h3>Selected</h3><div id="state-Selected"></div>
+<section data-state="Selected" data-bleed><h3>Selected</h3><div id="state-Selected"></div>
 
 </section>
-<section data-state="Disabled"><h3>Disabled</h3><div id="state-Disabled"></div>
+<section data-state="Disabled" data-bleed><h3>Disabled</h3><div id="state-Disabled"></div>
 
 </section>
-<section data-state="Loading"><h3>Loading</h3><div id="state-Loading"></div>
+<section data-state="Loading" data-bleed><h3>Loading</h3><div id="state-Loading"></div>
 
 </section>
-<section data-state="Empty"><h3>Empty</h3><div id="state-Empty"></div>
+<section data-state="Empty" data-bleed><h3>Empty</h3><div id="state-Empty"></div>
 
 </section>
-<section data-state="Long-label"><h3>Long-label</h3><div id="state-Long-label"></div>
+<section data-state="Longest label · 中文" data-bleed><h3>Long-label</h3><div id="state-Long-label"></div>
 
 </section>
 <script>
 // Each state renders in its own iframe in the atlas: draw only the states present.
 var UI = window.SentriUI;
 var RENDER = {
-  "state-Default": () => UI.choiceGroup(UI.choiceRow({"pressed": false, "disabled": false, "reason": "", "label": "Recovered", "mode": "radio", "selected": false, "meta": "Ends this case", "value": "a"}),{title:"Outcome",radio:true}),
-  "state-Pressed": () => UI.choiceGroup(UI.choiceRow({"pressed": true, "disabled": false, "reason": "", "label": "Recovered", "mode": "radio", "selected": false, "meta": "Ends this case", "value": "a"}),{title:"Outcome",radio:true}),
-  "state-Selected": () => UI.choiceGroup(UI.choiceRow({"pressed": false, "disabled": false, "reason": "", "label": "Recovered", "mode": "radio", "selected": true, "meta": "Ends this case", "value": "a"}),{title:"Outcome",radio:true}),
-  "state-Disabled": () => UI.choiceGroup(UI.choiceRow({"pressed": false, "disabled": true, "reason": "Unavailable offline. Reconnect to select.", "label": "Recovered", "mode": "radio", "selected": false, "meta": "Ends this case", "value": "a"}),{title:"Outcome",radio:true}),
+  "state-Default": () => UI.choiceGroup(UI.choiceRow({"pressed": false, "disabled": false, "reason": "", "label": "Recovered", "mode": "radio", "selected": false, "meta": "结束本病例", "value": "a"}),{title:"结果",radio:true}),
+  "state-Pressed": () => UI.choiceGroup(UI.choiceRow({"pressed": true, "disabled": false, "reason": "", "label": "Recovered", "mode": "radio", "selected": false, "meta": "结束本病例", "value": "a"}),{title:"结果",radio:true}),
+  "state-Selected": () => UI.choiceGroup(UI.choiceRow({"pressed": false, "disabled": false, "reason": "", "label": "Recovered", "mode": "radio", "selected": true, "meta": "结束本病例", "value": "a"}),{title:"结果",radio:true}),
+  "state-Disabled": () => UI.choiceGroup(UI.choiceRow({"pressed": false, "disabled": true, "reason": "Unavailable offline. Reconnect to select.", "label": "Recovered", "mode": "radio", "selected": false, "meta": "结束本病例", "value": "a"}),{title:"结果",radio:true}),
   "state-Loading": () => UI.choiceEmpty("Loading options\u2026"),
   "state-Empty": () => UI.choiceEmpty("No options available."),
-  "state-Long-label": () => UI.choiceGroup(UI.choiceRow({"pressed": false, "disabled": false, "reason": "", "label": "青霉素类抗菌药物 / 阿莫西林可溶性粉用于仔猪治疗的完整名称", "mode": "radio", "selected": false, "meta": "Ends this case", "value": "a"}),{title:"Outcome",radio:true})
+  "state-Long-label": () => UI.choiceGroup(UI.choiceRow({"pressed": false, "disabled": false, "reason": "", "label": "阿莫西林可溶性粉（仔猪治疗用）", "mode": "radio", "selected": false, "meta": "结束本病例", "value": "a"}),{title:"结果",radio:true})
 };
 document.querySelectorAll('[data-state]').forEach(function (s) {
   var t = RENDER[s.id] ? s : s.querySelector('[id]');

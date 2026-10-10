@@ -4,7 +4,7 @@
 <section data-state="Pressed" id="correction-1"></section>
 <section data-state="Disabled" id="correction-3"></section>
 <section data-state="Cleared" id="correction-4"></section>
-<section data-state="Long label / Chinese" id="correction-5"></section>
+<section data-state="Longest label · 中文" id="correction-5"></section>
 <section data-state="Changed" id="correction-changed"></section>
 <script>
 const put=(id,html)=>document.querySelectorAll('[data-state]').forEach(el=>{if(el.id===id)el.innerHTML=html});
@@ -12,7 +12,7 @@ put("correction-0",SentriUI.banner({"tone": "correction", "headline": "Save your
 put("correction-1",SentriUI.banner({"tone": "correction", "headline": "Save your correction first", "consequence": "Review the changed figures before recording", "state": "Pressed", "id": "correction-1-banner", "door": {"action": "review", "label": "Review correction"}}));
 put("correction-3",SentriUI.banner({"tone": "correction", "headline": "Save your correction first", "consequence": "Review the changed figures before recording", "state": "Disabled", "id": "correction-3-banner", "door": {"action": "review", "label": "Review correction"}, "reason": "Waiting for the current review to finish"}));
 put("correction-4",SentriUI.banner({"tone": "correction", "headline": "Correcting a past record", "consequence": "Undo is available for 5 seconds", "state": "Cleared", "id": "correction-4-banner", "door": null, "summary": "Cleared", "actions": [{"label": "Undo", "action": "undo-clear"}]}));
-put("correction-5",SentriUI.banner({"tone": "correction", "headline": "请先保存您对之前分娩记录所作的更正然后检查所有修改内容", "consequence": "先检查更正记录 · 再重新记录", "state": "Long label / Chinese", "id": "correction-5-banner", "door": {"action": "review", "label": "Review correction"}}));
+put("correction-5",SentriUI.banner({"tone": "correction", "headline": "请先保存对上一窝分娩记录的更正", "consequence": "先检查更正记录 · 再重新记录", "state": "Longest label · 中文", "id": "correction-5-banner", "door": {"action": "review", "label": "查看更正"}}));
 put('correction-changed',SentriUI.banner({tone:'correction',headline:'Correcting a past record',consequence:'Logged as G. Hansen',icon:'edit',summary:['Crushed 3 → 2','Alive 8 → 9'],actions:[{label:'Clear',action:'clear'}]}));
 SentriUI.liveFill(document.body,{delay:0});
 </script>

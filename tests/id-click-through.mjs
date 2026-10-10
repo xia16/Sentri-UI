@@ -120,7 +120,7 @@ try {
   await toTable(page);
   await leave(page);
   await drawerIdentity(page, 'A02');
-  assert.match(await text(page, '[data-action="open-run"]'), /Record identity · 1 unsaved/);
+  assert.match(await text(page, '[data-action="open-run"]'), /Record · 1 unsaved/);
   await tap(page, '[data-action="open-run"]');
   assert.match(await status(page), /004305 kept on this phone · not recorded yet/);
   assert.equal(await page.getAttribute('#id-sex [data-value="g"]', 'aria-checked'), 'true');

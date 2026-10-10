@@ -44,8 +44,7 @@ Status is text and holds no action, so most interaction states do not apply.
 | Selected, disabled | none: a state is a fact, not a control | same | same |
 | Error, loading | none: a pending upload is the amber word `waiting to upload` | same | same |
 | Empty | absent: a row with nothing to flag has no chip | same | same |
-| Long label | wraps within `row-chip-max` | wraps | wraps |
-| Chinese | `母猪死了` fits one line | fits | fits |
+| Longest label | at the Copy budget: one line | same | same |
 | Live | n/a | n/a | a `live` line is a persistent `role="status"` region (below) |
 
 ## Behaviour
@@ -56,8 +55,20 @@ Status is text and holds no action, so most interaction states do not apply.
 - **Port note (Vue / React Native):** a live line is a view with `accessibilityLiveRegion="polite"` (Android) or an `announceForAccessibility` call (iOS) that fires after mount; the separator is a text child.
 
 ## Content rules
-- Sentence case, one to two words: `Active`, `Done`, `Late`, `Overdue`, `Sow died`, `To do`. At most **12 characters** in English and **6** in Chinese; a longer state is a sentence in a Banner or a line.
-- Never an ellipsis on a status word; a chip wraps instead. Never "Unchecked", exclamation marks or emoji.
+
+### Copy budget
+
+| Text | English | 中文 | Lines |
+| --- | --- | --- | --- |
+| Chip or word | 12 | 6 | 1 |
+| Status line (whole line) | 48 | 24 | 1 |
+
+Over-budget copy is rewritten to the shortest copy that still names the act; it is never wrapped, shrunk or ellipsised to fit. The “Longest label” state shows real copy at this limit in the real container at 390px. Budgets come from what fits at 390px inside the screen gutters; a `{n}` or `{name}` slot counts as 3 characters. A longer state is a sentence in a Banner or a line, not a longer chip.
+
+### Writing rules
+
+- Sentence case, one to two words: `Active`, `Done`, `Late`, `Overdue`, `Sow died`, `To do`.
+- Never “Unchecked”, exclamation marks or emoji.
 - One chip per row. If two things are true, the more urgent state wins (`Late` over `To do`; `Sow died` over everything).
 - Colour lives on the value: `Overdue` stays `ink` in a line and `3 days` is red.
 

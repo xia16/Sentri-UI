@@ -8,11 +8,11 @@
 .ph[data-pressed] .sheet-footer .button.primary{filter:brightness(.96);transform:translateY(1px)}
 .ph[data-pressed] .sheet-footer .surface-back:only-child{background:var(--ink)}
 </style></head><body>
-<div class="ph" data-state="Default (glyph)" data-demo="dialog-default"><div class="bg"></div><div class="over"></div></div>
-<div class="ph" data-state="Without glyph" data-demo="dialog-plain"><div class="bg"></div><div class="over"></div></div>
-<div class="ph" data-state="Pressed" data-demo="dialog-pressed" data-pressed=""><div class="bg"></div><div class="over"></div></div>
-<div class="ph" data-state="Waiting (reason shown)" data-demo="dialog-waiting"><div class="bg"></div><div class="over"></div></div>
-<div class="ph" data-state="Long / Chinese" data-demo="dialog-zh"><div class="bg"></div><div class="over"></div></div>
+<div class="ph" data-state="Default (glyph)" data-bleed data-demo="dialog-default"><div class="bg"></div><div class="over"></div></div>
+<div class="ph" data-state="Without glyph" data-bleed data-demo="dialog-plain"><div class="bg"></div><div class="over"></div></div>
+<div class="ph" data-state="Pressed" data-bleed data-demo="dialog-pressed" data-pressed=""><div class="bg"></div><div class="over"></div></div>
+<div class="ph" data-state="Waiting (reason shown)" data-bleed data-demo="dialog-waiting"><div class="bg"></div><div class="over"></div></div>
+<div class="ph" data-state="Longest label · 中文" data-bleed data-demo="dialog-zh"><div class="bg"></div><div class="over"></div></div>
 <script>
 const UI=window.SentriUI,esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const bg=()=>'<div class="bar" aria-hidden="true"><span>9:41</span></div>'+UI.heading({title:'Pen B4',kind:'page',description:'Sow 000254 \u00b7 11 piglets'})+UI.panel(UI.row({title:'Litter',description:'11 alive \u00b7 day 2'}),{className:'st-row-group'});
@@ -25,7 +25,7 @@ const R={
 "dialog-plain":()=>UI.sheet({variant:'dialog',title:'Discard the count?',subtitle:'The numbers you set are not recorded.',body:'',footer:foot({primary:{label:'Discard',action:'discard'}})}),
 "dialog-pressed":()=>UI.sheet({variant:'dialog',title:'Born 14 \u00b7 correct it',icon:'edit',subtitle:'Choose what changed.',body:'<div style="height:var(--space-12)"></div>',footer:foot({primary:{label:'Apply',action:'apply'}})}),
 "dialog-waiting":()=>UI.sheet({variant:'dialog',title:'End task early?',icon:'alert',subtitle:'Unfinished work stays incomplete. Records are kept.',body:UI.rowSelect({title:'I want to end the task',action:'ack',value:'ack'}),footer:foot({primary:{label:'End task early',action:'end',register:'danger',waiting:true},status:{text:'Tick the box to confirm'}})}),
-"dialog-zh":()=>UI.sheet({variant:'dialog',title:'\u8981\u63d0\u524d\u7ed3\u675f\u8fd9\u9879\u4efb\u52a1\u5417\uff1f\u672a\u5b8c\u6210\u7684\u5de5\u4f5c\u4f1a\u4fdd\u7559',icon:'alert',subtitle:'\u5df2\u7ecf\u8bb0\u5f55\u7684\u5185\u5bb9\u4e0d\u4f1a\u4e22\u5931\uff0c\u672a\u5b8c\u6210\u7684\u5de5\u4f5c\u4ecd\u7136\u4fdd\u6301\u672a\u5b8c\u6210\u72b6\u6001\u3002',body:'',footer:UI.sheetFooter({back:{action:'back',label:'\u8fd4\u56de'},primary:{label:'\u63d0\u524d\u7ed3\u675f\u4efb\u52a1',action:'end',register:'danger'}})})
+"dialog-zh":()=>UI.sheet({variant:'dialog',title:'\u63d0\u524d\u7ed3\u675f\u8fd9\u9879\u4efb\u52a1\u5417\uff1f',icon:'alert',subtitle:'\u5df2\u7ecf\u8bb0\u5f55\u7684\u5185\u5bb9\u4e0d\u4f1a\u4e22\u5931\uff0c\u672a\u5b8c\u6210\u7684\u5de5\u4f5c\u4ecd\u7136\u4fdd\u6301\u672a\u5b8c\u6210\u72b6\u6001\u3002',body:'',footer:UI.sheetFooter({back:{action:'back',label:'\u8fd4\u56de'},primary:{label:'\u63d0\u524d\u7ed3\u675f\u4efb\u52a1',action:'end',register:'danger'}})})
 };
 document.querySelectorAll('[data-state]').forEach(el=>{const k=el.getAttribute('data-demo'),r=R[k];el.querySelector('.bg').innerHTML=bg();if(r)el.querySelector('.over').innerHTML=r();});
 </script></body></html>

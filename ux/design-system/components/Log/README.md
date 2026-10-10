@@ -46,8 +46,7 @@ A correction is shown as the **original and the correction**: the entry's title 
 | Empty | one `muted` 12px line: `No activity recorded yet`; groups with no entries are dropped |
 | Filter matches nothing (categorised) | `No matching entries`, a different line from the empty log |
 | Loading, error | not drawn |
-| Long entry | the title and detail wrap; the stamp stays under them |
-| Chinese | same layout |
+| Longest label | Title and detail at their budgets: one line each; the stamp stays under them. |
 
 ## Behaviour
 
@@ -55,7 +54,21 @@ Static. The caller sorts newest first (`logGroups` does it for flat entries). A 
 
 ## Content rules
 
-- Title: sentence case, the act in the fewest words (`Fostered 3 piglets`, `Count set to 11`); 60 characters, wrapping rather than truncating.
+### Copy budget
+
+| Text | English | 中文 | Lines |
+| --- | --- | --- | --- |
+| Entry title | 40 | 20 | 1 |
+| Entry detail | 44 | 22 | 1 |
+| Category | 12 | 6 | 1 |
+| Group label | 16 | 8 | 1 |
+
+Over-budget copy is rewritten, never wrapped, shrunk or ellipsised. The “Longest label” state shows real copy at this limit in the real container at 390px; budgets come from what fits at 390px inside the screen gutters.
+
+### Writing rules
+
+
+- Title: sentence case, the act in the fewest words (`Fostered 3 piglets`, `Count set to 11`).
 - Detail: one line that adds something the title does not (a route `B4 → B6`, a reason); never the title again.
 - Category (categorised only): one word, sentence case.
 - Group label: the day, per above; never a sentence.

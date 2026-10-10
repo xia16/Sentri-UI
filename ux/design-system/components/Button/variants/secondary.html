@@ -1,22 +1,24 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Button · Secondary</title><style>html,body{margin:0;background:var(--app-background);color:var(--ink);font-family:var(--font-sans)}.example{padding:var(--space-16);border-bottom:var(--border-width) solid var(--line)}.example h2{font-size:var(--type-description-size);margin:0 0 var(--space-8)}.demo{display:flex;flex-direction:column;gap:var(--space-8);min-width:0}.demo>.button{width:100%}.demo>.st-button-reason{margin:0}</style></head><body>
-<section class="example" data-state="Default"><h2>Default</h2><div class="demo"></div></section>
-<section class="example" data-state="Pressed"><h2>Pressed</h2><div class="demo"></div></section>
-<section class="example" data-state="Disabled"><h2>Disabled</h2><div class="demo"></div></section>
-<section class="example" data-state="Long / Chinese"><h2>Long / Chinese</h2><div class="demo"></div></section>
-<section class="example" data-state="Waiting"><h2>Waiting</h2><div class="demo"></div></section>
-<section class="example" data-state="Loading"><h2>Loading</h2><div class="demo"></div></section>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Button · Secondary</title></head><body>
+<section data-state="Default" data-bleed><h2>Default</h2><div class="demo"></div></section>
+<section data-state="Pressed" data-bleed><h2>Pressed</h2><div class="demo"></div></section>
+<section data-state="Disabled" data-bleed><h2>Disabled</h2><div class="demo"></div></section>
+<section data-state="Waiting" data-bleed><h2>Waiting</h2><div class="demo"></div></section>
+<section data-state="Loading" data-bleed><h2>Loading</h2><div class="demo"></div></section>
+<section data-state="Longest label" data-bleed><h2>Longest label</h2><div class="demo"></div></section>
+<section data-state="Longest label · 中文" data-bleed><h2>Longest label · 中文</h2><div class="demo"></div></section>
 <script>
 (()=>{
 const UI=window.SentriUI;
+const REASON={Disabled:'Choose the piglets first.',Waiting:'Choose the piglets first.',Loading:'Recording; wait for the result.'};
+const pressed=h=>h.replace(/<button(?![^]*<button)/,'<button data-preview="pressed"');
+const LONG={'Longest label':"View all piglets in B4",'Longest label · 中文':"查看B4栏全部仔猪记录"};
 for(const el of document.querySelectorAll('[data-state]')){
- const state=el.dataset.state,id='reason-'+state.replace(/[^a-z]/gi,'');
- const label=state==='Long / Chinese'?'记录这一栏今天已完成处理的十二头仔猪并保留记录':"Back";
- const reason=state==='Loading'?'Recording; wait for the result.':state==='Failed'?'Nothing was recorded. Check the connection, then try again.':state==='Unknown'?'Result unknown. Check the record before continuing.':state==='Done'?'Task ended.':state==='Waiting'||state==='Disabled'?'Choose the piglets first.':'';
- let control;
- control=UI.button({label,register:'secondary',icon:'',waiting:state==='Waiting',disabled:state==='Disabled',busy:state==='Loading',reason});
- if(state==='Pressed')control=control.replace('<button','<button data-preview="'+state.toLowerCase()+'"');
- el.querySelector('.demo').innerHTML=control;
+ const state=el.dataset.state,label=LONG[state]||"View the pen log",reason=REASON[state]||'';
+ const spec={label,register:"secondary",action:'act',waiting:state==='Waiting',disabled:state==='Disabled',busy:state==='Loading'};
+ let html=UI.sheetFooter({content:UI.button(Object.assign({},spec,{reason}))});
+ if(state==='Pressed')html=pressed(html);
+ el.querySelector('.demo').innerHTML=html;
 }
 UI.holdBind(document.body);
 })();

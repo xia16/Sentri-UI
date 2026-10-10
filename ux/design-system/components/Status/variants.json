@@ -11,7 +11,7 @@
       "Late",
       "Overdue",
       "Sow died",
-      "Long label (wraps)",
+      "Longest label",
       "Chinese"
     ]
   },
@@ -27,7 +27,7 @@
       "Late",
       "Overdue",
       "Sow died",
-      "Long label (wraps)",
+      "Longest label",
       "Chinese"
     ]
   },
@@ -41,7 +41,7 @@
       "Receipt (dot separator)",
       "Mono line 2",
       "Live (announced)",
-      "Long (wraps)",
+      "Longest label",
       "Chinese"
     ]
   }

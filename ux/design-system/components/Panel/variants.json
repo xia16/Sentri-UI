@@ -7,7 +7,7 @@
     "states": [
       "Default",
       "Empty",
-      "Long label / Chinese"
+      "Longest label · 中文"
     ],
     "usedBy": [
       "farrowing.finish",
@@ -22,7 +22,7 @@
     "states": [
       "Default",
       "Empty",
-      "Long label / Chinese"
+      "Longest label · 中文"
     ],
     "usedBy": [
       "piglet-processing.sheet-todo",

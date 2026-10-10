@@ -39,7 +39,7 @@ Leading selection box (select + door only: a 24px box in a 48px hit area, always
 | Loading | `act.busy` prevents repeated act while the host settles; label says Recording. |
 | Error | Host supplies actionable reason in line 2 and Retry act; no colour-only error. |
 | Empty | Summary count zero is inert and says No sows due today. Empty groups are omitted with a separate reason. |
-| Long label / Chinese | Wrap evidence and animal content; no clipping of identifiers or status chips. |
+| Longest label (and Longest label · 中文) | Real copy at the Copy budget, in the real container at 390px: one line, nothing wrapped or cut. Longer copy is rewritten. |
 
 Every applicable state appears in [variants.json](variants.json) and `variants/<id>.html`.
 
@@ -51,7 +51,21 @@ No hard choice cap for a scrollable list; show only relevant rows and provide se
 
 ## Content rules
 
-Sentence case. Aim for titles ≤32 English characters or 16 Chinese characters, descriptions ≤64 English characters or 32 Chinese characters, codes ≤12 characters, acts ≤12 English characters or 6 Chinese characters. These are authoring limits, not destructive truncation limits. Navigation may ellipsize secondary copy (`wrap:false`); evidence, animal and record rows use `wrap:true`. Never truncate a record. Pass trailing `{text,tone}`, never injected HTML; legacy strings are escaped. One chip or trailing word, not both. Do not repeat status in title, chip and line 2. Line 2 orders time, counts, codes; colours belong on meaningful token values only.
+### Copy budget
+
+| Text | English | 中文 | Lines |
+| --- | --- | --- | --- |
+| Title | 32 | 16 | 1 |
+| Description (line 2) | 44 | 20 | 1 |
+| Code | 12 | 12 | 1 |
+| Act or trailing word | 12 | 6 | 1 |
+| Chip | 12 | 6 | 1 |
+
+Over-budget copy is rewritten to the shortest copy that still names the act; it is never wrapped, shrunk or ellipsised to fit. The “Longest label” state shows real copy at this limit in the real container at 390px. Budgets come from what fits at 390px inside the screen gutters; a `{n}` or `{name}` slot counts as 3 characters. Record, animal and evidence rows may keep `wrap:true` for a second description line only when the data cannot be shortened (a list of names); a title never wraps.
+
+### Writing rules
+
+Sentence case. Pass trailing `{text,tone}`, never injected HTML; legacy strings are escaped. One chip or trailing word, not both. Do not repeat status in title, chip and line 2. Line 2 orders time, counts, codes; colours belong on meaningful token values only.
 
 ## Accessibility
 
@@ -59,7 +73,7 @@ Native button and checkbox semantics; inert rows are divs. Checkbox label covers
 
 ## Do / don't
 
-Do use a code column and shared Status chip for animals; don't give them navigation icon tiles. Do wrap evidence; don't clip Chinese text. Do provide one independent act beside the door; don't nest buttons or add multiple chips. Do omit unavailable actions or explain why; don't fade the row. Do use flat rows in one group; don't put cards on cards.
+Do use a code column and shared Status chip for animals; don't give them navigation icon tiles. Do provide one independent act beside the door; don't nest buttons or add multiple chips. Do omit unavailable actions or explain why; don't fade the row. Do use flat rows in one group; don't put cards on cards.
 
 ## Related and classification
 

@@ -28,7 +28,7 @@ See [variants.json](variants.json) for use boundaries and each variant’s rende
 | Pressed | An unselected chip darkens to the handle tone at once on touch; the selected chip keeps its paper face. The static demo presses the second chip. |
 | Selected | Weight plus check mark, shown only on the selected chip; the chip keeps the same width selected or not (padding reserves the check); never colour alone. |
 | Disabled | Native disabled button, dashed outline; host supplies one visible reason beside the row. Prefer omission unless temporarily unavailable. |
-| Long-label | English and Chinese labels wrap without clipping or ellipsis. |
+| Longest label (and Longest label · 中文) | Real copy at the Copy budget, in the real container at 390px: one line, nothing wrapped or cut. Longer copy is rewritten. |
 
 Error and loading belong to the list/sheet, not this synchronous control. Empty options omit the entire control; an empty result retains the current filters and shows a list-level empty state with a clear-filter action.
 
@@ -38,7 +38,18 @@ Selection changes the content below immediately through the host’s data-action
 
 ## Content rules
 
-Sentence case; the job or category as a noun, never a commit verb. One or two words, at most 12 English characters or 6 Chinese characters per chip; no abbreviations. A chip that is too long wraps rather than truncating, but prefer a shorter name. One optional count per chip, never in the label; zero is shown. All comes first and has no count when a lens above already carries the total. The set is dynamic and scrolls sideways; there is no cap on chips. Legacy labels may contain trusted HTML; never pass unsanitized user content.
+### Copy budget
+
+| Text | English | 中文 | Lines |
+| --- | --- | --- | --- |
+| Chip label | 12 | 6 | 1 |
+| Chip count (separate from the label) | 4 digits | 4 digits | 1 |
+
+Over-budget copy is rewritten to the shortest copy that still names the act; it is never wrapped, shrunk or ellipsised to fit. The “Longest label” state shows real copy at this limit in the real container at 390px. Budgets come from what fits at 390px inside the screen gutters; a `{n}` or `{name}` slot counts as 3 characters. Chips scroll sideways, so the budget is about reading: at least two whole chips are visible at 390px.
+
+### Writing rules
+
+Sentence case; the job or category as a noun, never a commit verb. One or two words; no abbreviations. One optional count per chip, never in the label; zero is shown. All comes first and has no count when a lens above already carries the total. The set is dynamic and scrolls sideways; there is no cap on chips. Legacy labels may contain trusted HTML; never pass unsanitized user content.
 
 ## Accessibility
 

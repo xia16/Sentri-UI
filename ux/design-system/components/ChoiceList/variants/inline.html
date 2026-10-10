@@ -1,23 +1,23 @@
 <!doctype html><meta charset="utf-8">
-<section data-state="Default"><h3>Default</h3><div id="state-Default"></div>
+<section data-state="Default" data-bleed><h3>Default</h3><div id="state-Default"></div>
 
 </section>
-<section data-state="Pressed"><h3>Pressed</h3><div id="state-Pressed"></div>
+<section data-state="Pressed" data-bleed><h3>Pressed</h3><div id="state-Pressed"></div>
 
 </section>
-<section data-state="Selected"><h3>Selected</h3><div id="state-Selected"></div>
+<section data-state="Selected" data-bleed><h3>Selected</h3><div id="state-Selected"></div>
 
 </section>
-<section data-state="Disabled"><h3>Disabled</h3><div id="state-Disabled"></div>
+<section data-state="Disabled" data-bleed><h3>Disabled</h3><div id="state-Disabled"></div>
 
 </section>
-<section data-state="Loading"><h3>Loading</h3><div id="state-Loading"></div>
+<section data-state="Loading" data-bleed><h3>Loading</h3><div id="state-Loading"></div>
 
 </section>
-<section data-state="Empty"><h3>Empty</h3><div id="state-Empty"></div>
+<section data-state="Empty" data-bleed><h3>Empty</h3><div id="state-Empty"></div>
 
 </section>
-<section data-state="Long-label"><h3>Long-label</h3><div id="state-Long-label"></div>
+<section data-state="Longest label · 中文" data-bleed><h3>Long-label</h3><div id="state-Long-label"></div>
 
 </section>
 <script>
@@ -30,7 +30,7 @@ var RENDER = {
   "state-Disabled": () => UI.choiceRadios({"label": "Outcome", "layout": "inline", "options": [{"value": "a", "label": "Kept"}, {"value": "b", "label": "Sold"}], "selected": "", "disabled":true,"reason":"Unavailable offline. Reconnect to select."}),
   "state-Loading": () => UI.choiceEmpty("Loading options\u2026"),
   "state-Empty": () => UI.choiceEmpty("No options available."),
-  "state-Long-label": () => UI.choiceRadios({"label":"仔猪是否已经完成当天所需的处理", "layout":"inline", "options":[{"value":"a","label":"尚未处理"},{"value":"b","label":"已经处理"}]})
+  "state-Long-label": () => UI.choiceRadios({"label":"今天的处理", "layout":"inline", "options":[{"value":"a","label":"尚未处理"},{"value":"b","label":"已经处理"}]})
 };
 document.querySelectorAll('[data-state]').forEach(function (s) {
   var t = RENDER[s.id] ? s : s.querySelector('[id]');

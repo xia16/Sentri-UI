@@ -28,8 +28,8 @@ Back button, labelled navigation region, category buttons, active underline and 
 | Back pressed | Shared Button press fill and transform |
 | Scrolled | Last categories reached in the scroll region |
 | Empty | Only Back; no empty categories |
-| Five categories at 300px | Stress example scrolls horizontally; every target retains tap-min |
-| Long label / Chinese | Full label stays on one line in the scroll region; no truncation |
+| Five categories | Four to five categories at their budget (8 / 4); the tabs scroll sideways if they still do not fit, and every target keeps tap-min |
+| Longest label (and Longest label · 中文) | Real copy at the Copy budget, in the real container at 390px: one line, nothing wrapped or cut. Longer copy is rewritten. |
 | Disabled | Unsupported: omit an unavailable or empty category; give its reason in page content if needed |
 | Error / loading | Not applicable; synchronous navigation, no input |
 
@@ -41,7 +41,18 @@ The verb-sheet order is **Health · Routine · Production**; omit an empty strip
 
 ## Content rules
 
-One noun, sentence case; prefer at most 12 English characters or 6 Chinese characters. Exceptional longer labels remain complete, never ellipsised. No counts, facts or duplicated page titles. Back is always Back (localized via strs.back).
+### Copy budget
+
+| Text | English | 中文 | Lines |
+| --- | --- | --- | --- |
+| Category label, up to 3 categories | 12 | 6 | 1 |
+| Category label, 4–5 categories | 8 | 4 | 1 |
+
+Over-budget copy is rewritten to the shortest copy that still names the act; it is never wrapped, shrunk or ellipsised to fit. The “Longest label” state shows real copy at this limit in the real container at 390px. Budgets come from what fits at 390px inside the screen gutters; a `{n}` or `{name}` slot counts as 3 characters.
+
+### Writing rules
+
+One noun, sentence case. No counts, facts or duplicated page titles. Back is always Back (localized via strs.back).
 
 ## Accessibility
 

@@ -27,7 +27,7 @@ The enclosing `data-st-context="page|drawer"` chooses the variant. The default o
 | --- | --- |
 | Default | Bordered surface, no shadow |
 | Empty | Absent; `panel('')` returns an empty string |
-| Long label / Chinese | Content wraps using the consumer's copy rules |
+| Longest label (and Longest label · 中文) | Real copy at the Copy budget, in the real container at 390px: one line, nothing wrapped or cut. Longer copy is rewritten. |
 | Pressed, active, disabled, error, loading | Owned by the contained control; Panel is static |
 
 ## Behaviour

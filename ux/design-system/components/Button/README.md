@@ -32,7 +32,7 @@ Container; visible verb label; optional leading icon; optional loading marker; o
 | Default | Label or glyph at rest. |
 | Pressed | Visible press fill / darkening and movement; static examples use `data-preview="pressed"`. |
 | Disabled | Persistent text reason via `reason` or `describedby`; never colour alone. Prefer omitting unavailable acts. |
-| Long / Chinese | Visible Button labels wrap without ellipsis; icon accessible names remain complete. |
+| Longest label (and Longest label · 中文) | Real copy at the Copy budget, in the real container at 390px: one line, nothing wrapped or cut. Longer copy is rewritten. |
 | Waiting | Focusable `aria-disabled`; one prerequisite reason line stays visible. |
 | Loading | `busy`, `aria-busy`, ellipsis and reason; no duplicate commit. |
 | Hold: Holding / Armed | Progress sweep / second-press instruction and an outline on the armed button. |
@@ -49,9 +49,21 @@ Hold: `holdBind(root,{onCommit})` uses the token hold duration (850ms). Release,
 
 ## Content rules
 
-One label rule: verbs come from [strings.json](../../../laws/strings.json), and each verb has exactly its registered meaning. Back keeps a draft; Close exits a per-tap sheet; Clear discards a draft; Edit corrects a posted record; Record commits an act; End task ends the batch task. Name the act and subject/count; never “Submit”. Save is reserved by the registry for a staged event, not a substitute for Record.
+### Copy budget
 
-Aim for 24 English characters or 12 Chinese characters in a visible label; hold captions aim for 16 English / 8 Chinese. These are writing budgets, not validation limits. Sentence case; only hold captions use uppercase English. Never truncate an act or accessible name: long Button labels wrap and grow the target. Icon names may be longer but must name the action and subject; include badge counts once.
+| Text | English | 中文 | Lines |
+| --- | --- | --- | --- |
+| Footer primary, secondary, destructive, tool in a footer | 24 | 12 | 1 |
+| Text action | 12 | 6 | 1 |
+| Tool, three in a row | 13 | 6 | 1 |
+| Hold label | 24 | 12 | 1 |
+| Hold caption (uppercase) | 20 | 10 | 1 |
+
+Over-budget copy is rewritten to the shortest copy that still names the act; it is never wrapped, shrunk or ellipsised to fit. The “Longest label” state shows real copy at this limit in the real container at 390px. Budgets come from what fits at 390px inside the screen gutters; a `{n}` or `{name}` slot counts as 3 characters. Measured with Back beside the primary, the narrowest footer: 34 English and 15 Chinese characters fit on one line, so 24 / 12 leaves room for a longer name in the other language.
+
+### Writing rules
+
+One label rule: verbs come from [strings.json](../../../laws/strings.json), and each verb has exactly its registered meaning. Back keeps a draft; Close exits a per-tap sheet; Clear discards a draft; Edit corrects a posted record; Record commits an act; End task ends the batch task. Name the act and subject/count; never “Submit”. Save is reserved by the registry for a staged event, not a substitute for Record. Sentence case; only hold captions use uppercase English. Icon names (aria-label) are complete sentences within the [IconButton](../IconButton/README.md) budget, and include badge counts once.
 
 ## Accessibility
 

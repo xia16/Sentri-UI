@@ -27,7 +27,7 @@ Visible label, current bounds, track with the chosen span filled between the han
 | At limits | Both bounds remain readable. |
 | Disabled | Blocked with a persistent reason. |
 | Error | Persistent explanation and recovery instruction. |
-| Long / Chinese | Labels wrap without truncation. |
+| Longest label (and Longest label · 中文) | Real copy at the Copy budget, in the real container at 390px: one line, nothing wrapped or cut. Longer copy is rewritten. |
 
 `format(value)` turns a number into its label, including open ends (“7+ days ago”, “Today”, “In 7+ days”). The value text, both end labels and each handle’s `aria-valuetext` all use it, and a list summary should use the same function so sheet and list say one thing. Without it the slider shows “a–b unit”.
 
@@ -41,7 +41,19 @@ No presets existed in Farrowing; do not invent a preset variant. A caller can pu
 
 ## Content rules
 
-Sentence case. Label budget: 32 English characters / 16 Chinese characters; longer labels wrap, never truncate values or reasons. Always name units (or let `format` do it). The value never wraps mid-number; the label may wrap. Reasons say what is missing and how to recover. The caller supplies localized label and `format`.
+### Copy budget
+
+| Text | English | 中文 | Lines |
+| --- | --- | --- | --- |
+| Label | 24 | 12 | 1 |
+| Value with unit (from `format`) | 16 | 10 | 1 |
+| Reason | 60 | 30 | 2 |
+
+Over-budget copy is rewritten to the shortest copy that still names the act; it is never wrapped, shrunk or ellipsised to fit. The “Longest label” state shows real copy at this limit in the real container at 390px. Budgets come from what fits at 390px inside the screen gutters; a `{n}` or `{name}` slot counts as 3 characters.
+
+### Writing rules
+
+Sentence case. Always name units (or let `format` do it). The caller supplies localized label and `format`. Reasons say what is missing and how to recover.
 
 ## Accessibility
 

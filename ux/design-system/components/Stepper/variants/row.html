@@ -10,7 +10,7 @@
 <section data-state="Loading" data-args="{&quot;variant&quot;: &quot;row&quot;, &quot;label&quot;: &quot;Piglets&quot;, &quot;value&quot;: 3, &quot;key&quot;: &quot;row-Loading&quot;, &quot;min&quot;: 0, &quot;max&quot;: 12, &quot;reserveHint&quot;: false, &quot;loading&quot;: true}"></section>
 <section data-state="Draft" data-args="{&quot;variant&quot;: &quot;row&quot;, &quot;label&quot;: &quot;Piglets&quot;, &quot;value&quot;: 3, &quot;key&quot;: &quot;row-Draft&quot;, &quot;min&quot;: 0, &quot;max&quot;: 12, &quot;reserveHint&quot;: false, &quot;draft&quot;: true, &quot;status&quot;: &quot;+1 unsaved&quot;}"></section>
 <section data-state="Corrected" data-args="{&quot;variant&quot;: &quot;row&quot;, &quot;label&quot;: &quot;Piglets&quot;, &quot;value&quot;: 3, &quot;key&quot;: &quot;row-Corrected&quot;, &quot;min&quot;: 0, &quot;max&quot;: 12, &quot;reserveHint&quot;: false, &quot;changed&quot;: true}"></section>
-<section data-state="Long Chinese label" data-args="{&quot;variant&quot;: &quot;row&quot;, &quot;label&quot;: &quot;本窝需要记录并核对的仔猪数量，包括转入和转出的所有仔猪&quot;, &quot;value&quot;: 3, &quot;key&quot;: &quot;row-Long Chinese label&quot;, &quot;min&quot;: 0, &quot;max&quot;: 12, &quot;reserveHint&quot;: false}"></section>
+<section data-state="Longest label · 中文" data-args="{&quot;variant&quot;: &quot;row&quot;, &quot;label&quot;: &quot;本窝待核对仔猪数量&quot;, &quot;value&quot;: 3, &quot;key&quot;: &quot;row-Long Chinese label&quot;, &quot;min&quot;: 0, &quot;max&quot;: 12, &quot;reserveHint&quot;: false}"></section>
 <script>
 document.querySelectorAll("[data-state]").forEach(function(s){s.innerHTML=SentriUI.stepper(JSON.parse(s.getAttribute("data-args")));});
 </script>
