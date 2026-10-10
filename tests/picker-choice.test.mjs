@@ -48,17 +48,29 @@ test("cascade-multi: ticks remain in the leaf catalogue; checkbox changes never 
   assert.equal(head.up.value, "1");
   assert.equal(UI.pickerHead({ items: tree, path: [], title: "Select conditions" }).up, null);
 });
-test("search spans kinds, groups and aliases while another branch is open", () => {
+test("search at the root spans kinds, groups and aliases; inside a level it searches that level only", () => {
   const html = UI.pickerBody({
     variant: "cascade-multi",
     items: tree,
-    path: ["symptom", "general"],
+    path: [],
     query: "pig flu",
     selected: ["fever"],
   });
   assert.match(html, /Influenza/);
   assert.match(html, /Diseases › Respiratory/);
   assert.doesNotMatch(html, /No options match/);
+  const scoped = UI.pickerBody({
+    variant: "cascade-multi",
+    items: tree,
+    path: ["symptom", "general"],
+    query: "pig flu",
+  });
+  assert.match(scoped, /No options match/);
+  assert.match(scoped, /data-str-attr="aria-label:ds.picker.search_in;placeholder:ds.picker.search_in" data-args="[^"]*General appearance/);
+  const inLevel = UI.pickerBody({ variant: "cascade-multi", items: tree, path: ["symptom"], query: "fev" });
+  assert.match(inLevel, /Fever/);
+  assert.match(inLevel, />General appearance</);
+  assert.doesNotMatch(inLevel, /Symptoms › General appearance/);
 });
 test("descendant counts persist across branches, with one exit pair", () => {
   const html = UI.pickerBody({
@@ -72,7 +84,7 @@ test("descendant counts persist across branches, with one exit pair", () => {
   assert.match(footer, /Done · 2/);
   assert.doesNotMatch(footer, /close|dismiss/);
 });
-test("trigger uses count or complete path, preserves labels and describes errors", () => {
+test("trigger uses count or the chosen leaf, preserves labels and describes errors", () => {
   const multi = UI.pickerField({
     label: "Conditions",
     variant: "multi",
@@ -87,7 +99,8 @@ test("trigger uses count or complete path, preserves labels and describes errors
     path: ["Antibiotics", "Amoxicillin"],
     error: "Select an available medicine.",
   });
-  assert.match(single, /Antibiotics › Amoxicillin/);
+  assert.match(single, />Amoxicillin</);
+  assert.doesNotMatch(single, /Antibiotics › Amoxicillin/);
   assert.match(single, /aria-invalid="true"/);
   assert.match(single, /aria-describedby/);
 });
@@ -181,7 +194,8 @@ test("medicine path is display metadata; the recorded medicine value keeps its o
   assert.equal(c.form.medicine, "Antibiotic A");
   assert.deepEqual(c.form.medicinePath, ["Antibiotics", "Antibiotic A"]);
   const html = M.overlay(c);
-  assert.match(html, /Antibiotics › Antibiotic A/);
+  assert.match(html, /st-picker-value[^>]*>Antibiotic A</);
+  assert.doesNotMatch(html, /Antibiotics › Antibiotic A/);
   c.form.conditionPath = ["Symptom", "General appearance"];
   c.form.search = "fever";
   c.form.conditions = ["Fever"];

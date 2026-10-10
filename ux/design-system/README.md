@@ -8,7 +8,7 @@ Sentri copy says what to do, where, and how much. It is operational, not friendl
 
 - **Sentence case** for titles, rows, buttons and headings: "Record a death", "Farrowing room 3". Uppercase is reserved for mono chips and section keys (`LAST 45M`, `SIGNS`, `CYCLE`).
 - **Verbs on buttons, states in segments.** Buttons name the act and its count: "Record for 12 pigs", "Confirm & next", "Foster 3 · B4 → B6", "Final · 10 total". Segments name the animal's state, never an action: "Open / Mated", "Not in heat / In heat". "To check / Checked" is the one licensed exception.
-- **Never "Submit", "Save" or "Complete".** Every action commits itself; rooms are never completed. The unit commit is "Check-in", not "Inspection".
+- **Never "Submit" or "Complete", and never a bare "Save".** Every action commits itself; rooms are never completed. The unit commit is "Check-in", not "Inspection". "Save" appears only as the commit of a staged draft with its count ("Save · 2 pigs"), the one meaning `ux/laws/strings.json` gives it.
 - **The count leads the word, and only from 2:** "3 SIGNS", "6 mated", "11 born" — but "SIGNS", never "1 SIGNS". Units are always written: `182 kg`, `3.8 kg/head × 12`, `40.6°`, `backfat 15 mm`. Deltas read `11 → 8`.
 - **Time: working judgments stay elapsed, records stay absolute.** Past events read elapsed ("Mated 21 days ago", "Signs · 10h ago"); scheduled ones read until ("Due in 5 days"). Open rows carry relative times only, never clock stamps. Done rows and records carry the stamp: `Jul 8 · 07:14 · G.H`. Durations always carry a unit: `45m`, `9h`, `3d`.
 - **A forecast admits it is one.** A state the task asks about prints at full weight ("Due · today"); a prediction prints lighter with a word that says so ("Expected · in 5 days").
@@ -24,7 +24,7 @@ The ground is a green-tinted off-white; text is one deep green-black; colour app
 
 - Put the app on `app-background`; put page panels on `paper`. Inside a drawer the drawer is `paper` and its panels are `inset` — context belongs to the container, not the panel (`data-st-context="page" | "drawer"`).
 - Set all primary text in `ink` and all secondary text (descriptions, meta, fact labels, group headings, chevrons) in `muted`. `muted` holds 4.5:1 on `paper`, `app-background` and `well` only.
-- **Every primary button is `ink` with a white label.** Green is never a button fill: `green` means done, recorded, synced, selected.
+- **Every primary button is `ink` with a white label.** Green is never a button fill: `green` means done, recorded, synced; never selected. Selection is `ink`: an ink tick or checkbox, and a ticked row on the neutral `well`.
 - Status words are coloured text with a 4px dot, never filled badges: `amber` due now / waiting to upload, `progress` in progress, `green` done, `muted` waiting. A pending block may sit on `pending-surface` with a `pending-border`.
 - `red` is for destructive and ending acts only — "Delete photo", "End task" (filled, white label) and "End early" (`red-wash` fill, `red` border and label). Destructive controls never inherit the green treatment.
 - Borders: `line` between surfaces, `rule` between rows inside a panel (never above the first row), `control-border` on fields and secondary buttons, `back-border` on Back.
@@ -92,12 +92,12 @@ Every drawer and page leaves, goes up and commits the same way.
 
 - **Back** sits in the footer of every drawer and page. It leaves and returns to where you came from, keeping the draft.
 - **‹ Parent name** sits in the header, only in a drawer with levels (a cascade picker, a catalogue). It goes up one level and is never labelled "Back". The header back label names the parent; the title names the current level. No breadcrumbs.
-- **The commit** ("Done · 2", "Save · 2 pigs") sits in the footer, on the right of Back. It applies and closes. A single pick commits by itself, so a single-choice sheet has Back alone.
+- **The commit** ("Done · 2", "Save · 2 pigs") sits in the footer, on the right of Back. It applies and closes. A single pick commits by itself, so a single-choice sheet has Back alone. In a multi picker Back closes without applying, and the ticks wait as a draft for the next open.
 - **No ✕ on drawers.** Swiping down or tapping the scrim does what Back does.
 - **Reset** restores defaults (a filter). **Clear** empties what was entered or ticked. Both are text actions in the head, present only when there is something to reset or clear; each has one meaning (`ux/laws/strings.json`).
-- **No reason line** above a waiting commit: the disabled button stands alone.
+- **No reason line** above a waiting commit: the disabled button stands alone. Tapping it marks each empty required field "Required" (on the field's own label line) and scrolls to the first.
 - **An empty selection is no selection.** Unticking the last subject closes the review and ends selection mode; no empty selection sheet is ever shown.
-- **Sized to content, on the bottom edge.** A drawer sits on the bottom edge, as tall as its content up to its cap, its footer on its bottom edge. It never floats and never holds dead space under its content (except `sizing: 'full'` for content that grows as the worker taps).
+- **Sized to content, on the bottom edge.** A drawer sits on the bottom edge, as tall as its content up to its cap, its footer on its bottom edge. It never floats and never holds dead space under its content, with two exceptions: `sizing: 'full'` for content that grows as the worker taps, and `sizing: 'hold'` for a drawer with levels, which keeps one height (its tallest level) from open to close so nothing moves under the thumb.
 
 ### Containers
 
@@ -114,7 +114,7 @@ It reads; it never acts. The fact line puts words left and the trail (when · wh
 ## Iconography
 
 - One registry, `SentriIcons` (in `components/bundle.js`): canonical glyph count from `Object.keys(SentriIcons.paths).length`, with paths on a 24×24 grid, drawn as open strokes. `SentriIcons.icon(name)` returns the `<svg>`; the stylesheet supplies `fill:none; stroke:currentColor; stroke-linecap:round; stroke-linejoin:round`.
-- Stroke 1.6 at 14–18px (headings 16px, rows 18px, chevrons 15px); 1.8–2 for checks and choice trails at 16–20px. Icons take the colour of their text — `muted` beside secondary text, `row-icon-ink` in row tiles, `green` for a selected check.
+- Stroke 1.6 at 14–18px (headings 16px, rows 18px, chevrons 15px); 1.8–2 for checks and choice trails at 16–20px. Icons take the colour of their text — `muted` beside secondary text, `row-icon-ink` in row tiles, `ink` for a selected check (selection is never green).
 - Every icon keeps its word. Glyphs are for recognition, never meaning on their own: verb tiles, rows and buttons always carry a label; icon-only buttons carry an `aria-label`.
 - Never hand-draw an inline SVG in a screen: add the path to the registry so every app renders the same glyph. No emoji; the only glyph characters in copy are `·` (separator), `→` (movement and deltas), `›` (more) and `×` (multiples).
 - The `Icons` asset group holds each glyph as a standalone SVG drawn in `ink` at stroke 1.6.

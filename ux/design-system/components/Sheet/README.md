@@ -25,7 +25,7 @@ A sheet is the one surface presented over a task: it holds a step the worker fin
 | **page** | A full sub-page: a record, a log, an overview, a form of more than five fields. The whole canvas; Back in the footer. | One question (drawer or dialog). |
 | **dialog** | One small decision over a sheet or page: confirm, correct one value. Rises from the bottom edge, where the thumb is. | A form (drawer). A message with no choice (Banner). |
 
-Drawer sizes cap the height: `compact` 42%, `short` 58%, `medium` 76% (default), `long` 85%. The drawer is as tall as its content up to the cap (`sizing: 'content'`). `sizing: 'full'` holds it at the cap for content that grows as the worker taps (a count, a draft); the body then takes the spare height and the footer still sits on the bottom edge. A drawer is never taller than its content otherwise: no dead space, and the footer never floats.
+Drawer sizes cap the height: `compact` 42%, `short` 58%, `medium` 76% (default), `long` 85%. The drawer is as tall as its content up to the cap (`sizing: 'content'`). A drawer with levels (a cascade picker) uses `sizing: 'hold'` with `holdRows` (from `pickerHead`): one height from open to close, the rows its tallest level needs, never above the cap, so the title and list do not jump between levels or while a search is typed. `sizing: 'full'` holds it at the cap for content that grows as the worker taps (a count, a draft); the body then takes the spare height and the footer still sits on the bottom edge. A drawer is never taller than its content otherwise: no dead space, and the footer never floats.
 
 ## Anatomy
 
@@ -57,7 +57,7 @@ This is the owner's rule for every drawer and page (2026-10-10); [the design sys
 
 - **At most two controls, the primary on the right.** A third action moves to the aside (Reset on a filter drawer) or leaves the sheet.
 - The primary is a [Button](../Button/README.md) (`primary` ink; `danger` for destructive verbs) or a hold-to-commit for an irreversible act.
-- **No reason line.** A waiting primary or hold stands alone: `status.text` is never drawn above it; it stays in the markup visually hidden, as the primary's `aria-describedby` (the hold's `statusId`). A Button `reason` placed in `content` is hoisted and hidden the same way. A status with an `action` (one text action at its end, `42 is right`) is not a reason and is drawn.
+- **No reason line.** A waiting primary or hold stands alone; a tap on it marks each empty required field "Required" (the host's field `error`, shown on the field's label line) and scrolls to the first: `status.text` is never drawn above it; it stays in the markup visually hidden, as the primary's `aria-describedby` (the hold's `statusId`). A Button `reason` placed in `content` is hoisted and hidden the same way. A status with an `action` (one text action at its end, `42 is right`) is not a reason and is drawn.
 - Geometry: padded 14 / 21 / 28 (`space-row-x`, `space-gutter-sheet`, `space-footer-bottom`), 14px apart. The buttons end 28px above the sheet's bottom; the 4px handle bar sits in the 8px below that, so a button never touches it.
 
 ## States
@@ -116,10 +116,10 @@ Every state is drawn in `variants/drawer.html`, `variants/page.html` and `varian
 The page for one act on several subjects (Record health · 2 pigs). One composition, every use:
 
 1. **Subjects:** the ticked pigs as one Panel of select rows (checkbox left, ID and pen · stage, a per-row state only where rows differ: `Ready to save`, `Already recorded · unchanged`, or a dose or reading field). A column key appears only when the column has values (`Dose · mL`, `Current → New · kg`). The header subtitle carries the count once.
-2. **Details:** the fields for the act, anchored on the bottom edge above the footer: the footer's `paper` with one `line` rule above, no card, no shadow, fields straight on it. Its heading folds it away (`aria-expanded`).
-3. **Footer:** Back + `Save · n pigs` (`Save` alone while nothing would change; no reason line).
+2. **Details:** the fields for the act, held on the bottom edge above the footer (`position: sticky; bottom: 0` in the one scroller): the footer's `paper` with one `line` rule above, no card, no shadow, fields straight on it. With many subjects the rows scroll under it; no field is ever under the footer. Its heading folds it away (`aria-expanded`). Fields stack in capture order, never in columns.
+3. **Footer:** Back + `Save · n pigs` (n = the pigs it will write; the ticked pigs while it waits). No reason line: a tap on the waiting Save marks the empty required fields "Required" and scrolls to the first.
 
-The sheet body is the only scroller: a short list leaves empty page between the list and the details; a long one scrolls as one column, and the details end above the footer. Never a card in a card, never a floating details card.
+The sheet body is the only scroller: a short list leaves empty page between the list and the details; a long one scrolls under the held details. Rows say only their exceptions (`Already recorded · unchanged`, `Not eligible`) in muted text; a row that will change says nothing. Never a card in a card, never a floating details card.
 
 Used by Inspection: Record health, Edit conditions, Care instructions, Resolve conditions, Record weights, Record temperatures, Record backfat, Record treatment, Record vaccination, Add a note and Body condition (`bulkActionPage`), and Adjust feed (`feedEditorPage`), all through `bulkListOverlay`. With one subject the same act is a drawer of fields (no list, no card).
 

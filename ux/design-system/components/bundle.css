@@ -47,6 +47,10 @@ svg{width:var(--size-20);height:var(--size-20);display:block;flex-shrink:0;fill:
 .sheet[data-sizing="full"][data-size="short"]{height:var(--drawer-short-max)}
 .sheet[data-sizing="full"][data-size="medium"]{height:var(--drawer-medium-max)}
 .sheet[data-sizing="full"][data-size="long"]{height:var(--drawer-long-max)}
+/* Hold: a drawer with levels keeps one height from open to close (across levels and while typing a search): the rows its
+   tallest level needs plus its chrome, never above its size's max. */
+.sheet[data-sizing="hold"]{--sheet-hold-chrome:305px;height:calc(var(--sheet-hold-chrome) + var(--hold-rows,4) * var(--size-56))} /* chrome: grab 24 + head with up 79 + search 111 + footer 91 */
+.sheet[data-sizing="hold"]>.sheet-body{flex:1 1 auto}
 /* Page: the whole canvas, square, no scrim; Back is in its footer. */
 .sheet[data-presentation="page"]{inset:0;height:100%;max-height:100%;border-radius:0;box-shadow:none;background:var(--app-background);z-index:calc(5 + 10 * var(--sheet-layer,0))}
 .sheet[data-presentation="page"]>.statusbar{flex:none;height:var(--statusbar-height);min-height:var(--statusbar-height)}
@@ -344,7 +348,12 @@ button.st-row[aria-current="location"]{background:var(--green-wash);box-shadow:i
 .st-choice-row[data-mode="navigate"] .st-choice-trail{color:var(--st-muted)}
 .st-choice-row[data-mode="navigate"] .st-choice-trail svg{width:var(--size-18);height:var(--size-18)}
 .st-choice-trail input[type="checkbox"]{width:var(--size-20);height:var(--size-20);margin:0;accent-color:var(--st-ink)}
-.st-choice-search.st-choice-search{margin:0 0 var(--space-20)}
+.st-choice-search.st-choice-search{position:relative;margin:0 0 var(--space-20)}
+.st-choice-search input::-webkit-search-cancel-button,.st-choice-search input::-webkit-search-decoration{-webkit-appearance:none;appearance:none;display:none}
+.st-search-box{position:relative;display:block}
+.st-search-box>input{width:100%;box-sizing:border-box}
+.st-search-box>.st-search-clear{position:absolute;top:0;right:0;bottom:0;min-height:var(--tap-min);min-width:var(--tap-min);margin:0;padding:0 var(--space-12)}
+.st-search-box:has(.st-search-clear)>input{padding-right:calc(var(--tap-min) + var(--space-24))}
 /* An empty or loading line in a sheet body starts on the sheet's gutter, under the title. */
 .sheet-body .st-choice-empty{padding-inline:0}
 /* In a picker sheet every option row is one height: one line and a wrapped two-line label both fit the 56px row. */
@@ -617,9 +626,10 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 .st-picker-trigger[aria-disabled="true"],.st-choice-row[aria-disabled="true"]{opacity:1;background:var(--disabled-surface);color:var(--disabled-ink)}
 .st-picker-trigger[aria-invalid="true"]{border-color:var(--red)}
 .st-picker-hint{font:var(--font-size-13)/1.4 var(--font-sans);color:var(--muted)}
+.st-picker-field.error .st-picker-hint{color:var(--red)}
 .st-choice-label,.st-choice-meta{overflow-wrap:anywhere;white-space:normal}
-.st-choice-row[data-mode="single"] .st-choice-trail{color:var(--green)}
-.st-choice-trail input[type="checkbox"]{accent-color:var(--green)}
+.st-choice-row[data-mode="single"] .st-choice-trail{color:var(--ink)}
+.st-choice-trail input[type="checkbox"]{accent-color:var(--ink)}
 .st-choice-row[data-mode="multi"]:has(:checked) .st-choice-label{font-weight:var(--type-weight-strong)}
 .st-picker-value.is-names{display:flex;align-items:baseline;gap:var(--space-6);white-space:normal;overflow:visible}
 .st-picker-names{min-width:0;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;overflow-wrap:anywhere}
@@ -695,7 +705,7 @@ button.st-row[data-variant="tick"]:active:not(:disabled){background:var(--press)
 .st-row-chevron[data-rail="edit"]{align-items:center;gap:var(--space-4);font-size:var(--type-description-size)}
 
 .st-row[data-variant="select-door"]{padding:0 var(--space-row-x) 0 0;gap:0}
-.st-row[data-variant="select-door"][data-ticked],.st-row[data-variant="select-door"]:has(input:checked){background:var(--green-wash)}
+.st-row[data-variant="select-door"][data-ticked],.st-row[data-variant="select-door"]:has(input:checked){background:var(--well)}
 .st-row[data-variant="select-door"] .st-row-door{padding:var(--space-row-y) 0}
 label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-row-x) var(--space-row-y) 0;gap:0}
 
@@ -747,3 +757,5 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
 
 /* No tap focus ring. A tap moves focus to the control but draws no ring; keyboard focus (:focus-visible) still does. */
 :is(.phone,.tk-phone,.atlas-phone,.device,.st-phone,.sp-phone,[data-st-context]) :focus:not(:focus-visible){outline:none}
+/* A landmark focused by script (tabindex=-1: a list, a sheet) is not a control: no ring. */
+:is(.phone,.tk-phone,.atlas-phone,.device,.st-phone,.sp-phone,[data-st-context]) [tabindex="-1"]:focus{outline:none}

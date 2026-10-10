@@ -29,7 +29,7 @@ Group heading (optional); lead control (optional); option label; meta line (opti
 | --- | --- |
 | Default | Label, optional meta, trailing mark; nothing selected is shown as nothing. |
 | Pressed | `choice-press` fill; static `pressed` prop. |
-| Selected | Trailing check, checkbox tick or ring plus stronger label. Never colour alone. |
+| Selected | Trailing ink check, checkbox tick or ring plus stronger label. Selection is ink, never green (green is done). Never colour alone. |
 | Disabled | Prefer omission. Otherwise readable text, `aria-disabled`, and a persistent reason line; no dimming. |
 | Loading | Loading options status in place of rows. |
 | Empty | No options or no search match; never a blank panel. |
@@ -39,7 +39,7 @@ Every state is in `variants/<id>.html`, drawn in its real container: navigate, s
 
 ## Behaviour
 
-Show at most eight rows before search. A single-choice sheet (Care: No action needed / Monitor / Treat in place / Move to hospital pen) is a drawer sized to its rows, on the bottom edge, with Back alone in its footer: a tap on a row commits and closes. Single rows toggle `aria-pressed` and commit; multi rows are whole-row labels around a native checkbox; navigate rows open the next level and show a chevron. Meta appears only when it distinguishes options: a group count such as "2 selected" appears only above zero, and a plain option count adds nothing. Clear appears only while an optional field has a value and returns the screen reader's focus to the group. Do not duplicate a selected row in a second list.
+Show at most eight rows before search. A single-choice sheet (Care: No action needed / Monitor / Treat in place / Move to hospital pen; a Brand list) is a drawer sized to its rows, on the bottom edge, with Back alone in its footer: a tap on a row commits and closes. A way to add an option ("Add a brand") is the last row, a navigate row that opens a level of the same drawer (‹ Brand) with a labelled field and its own commit ("Add brand"). Single rows toggle `aria-pressed` and commit; multi rows are whole-row labels around a native checkbox; navigate rows open the next level and show a chevron. Meta appears only when it distinguishes options: a group count such as "2 selected" appears only above zero, and a plain option count adds nothing. Clear appears only while an optional field has a value and returns the screen reader's focus to the group. Do not duplicate a selected row in a second list.
 
 ## Content rules
 

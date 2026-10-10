@@ -18,7 +18,7 @@ var UI = window.SentriUI;
 function page(){return '<div class="ph-page"><div class="ph-bar" aria-hidden="true">9:41</div>'+UI.heading({title:'000267',kind:'page',description:'C1 \u00b7 Gestation \u00b7 42 days'})+UI.panel(UI.row({title:'Thin',description:'Day 12 \u00b7 monitor'}),{className:'st-row-group'})+'</div>';}
 function phone(over){return '<div class="ph" data-st-context="page">'+page()+over+'</div>';}
 function form(title,fields,ready){return phone(UI.sheet({title:title,subtitle:'000267 \u00b7 C1',size:'medium',body:'<div class="ph-form">'+fields+'</div>',footer:UI.sheetFooter({back:{action:'back'},primary:{label:'Save',action:'save',waiting:!ready}})}));}
-function picker(o){var h=o.head||{title:o.title,up:null};return phone(UI.sheet({title:h.title,up:h.up,size:'long',body:o.html||UI.pickerBody(o.body),footer:o.footer||UI.pickerFooter(o.foot||{})}));}
+function picker(o){var h=o.head||{title:o.title,up:null};return phone(UI.sheet({title:h.title,up:h.up,size:'long',sizing:h.rows?'hold':'content',holdRows:h.rows||0,body:o.html||UI.pickerBody(o.body),footer:o.footer||UI.pickerFooter(o.foot||{})}));}
 
 var RENDER = {
   "state-Default": () => form('Record piglet',UI.choiceRadios({"label": "Outcome", "layout": "inline", "options": [{"value": "a", "label": "Kept"}, {"value": "b", "label": "Sold"}], "selected": ""})+UI.optionalRow({label:"Note",icon:window.SentriIcons.icon("plus"),action:"note"}),false),
