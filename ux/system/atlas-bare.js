@@ -8,6 +8,7 @@
    - Ready: parent.postMessage({ atlasReady: id }).
    - Screens only a tap reaches: the screen's `steps` (ordered; each a string or { tap, hold }) are replayed after the preset.
      A step is visible text, an aria-label / title, or a CSS selector (starts with [ . #), matched inside the phone,
+     (a step { fill: <selector>, text } types text into that field),
      then inside its same-origin iframes (so a host screen can reach an embedded page's controls, e.g. farrowing's Actions →
      Remove from batch inside the embedded inspection).
    - The flow follows the demo: a page calls AtlasBare.watch(fn) after every render, fn() returns the screen id of the
@@ -102,9 +103,15 @@
     var chain = Promise.resolve();
     steps.forEach(function (st) {
       chain = chain.then(function () {
-        var key = typeof st === 'string' ? st : st.tap, hold = typeof st === 'object' && st.hold;
+        var key = typeof st === 'string' ? st : (st.tap || st.fill), hold = typeof st === 'object' && st.hold;
         return findWait(phone, key).then(function (el) {   // in the phone, else in its same-origin iframes
           if (!el) { console.error('atlas-bare: step not found: ' + key); return; }
+          if (typeof st === 'object' && st.fill !== undefined) {   // { fill: <selector or label>, text }: type into a field (the input event the page listens for)
+            var proto = el.ownerDocument.defaultView[el.tagName === 'TEXTAREA' ? 'HTMLTextAreaElement' : 'HTMLInputElement'].prototype;
+            Object.getOwnPropertyDescriptor(proto, 'value').set.call(el, String(st.text == null ? '' : st.text));
+            el.dispatchEvent(new Event('input', { bubbles: true }));
+            return;
+          }
           if (hold) {
             var o = { bubbles: true, cancelable: true, button: 0, pointerId: 1, pointerType: 'mouse', isPrimary: true };
             var PE = el.ownerDocument.defaultView.PointerEvent;

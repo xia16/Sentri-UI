@@ -49,7 +49,11 @@ for (const width of widths) {
     const add = () => { const s = document.createElement('style'); s.textContent = css; document.head.appendChild(s); };
     if (document.head) add(); else document.addEventListener('DOMContentLoaded', add);
   }, width);
+  // External fonts load over the network. A font that fails to load renders in the fallback face and shows as a pixel change on
+  // every screen that uses it, so a failed font request retries the screen (3 tries) and is reported, never shot silently.
+  const fontFailures = new Set();
   const page = await context.newPage();
+  page.on('requestfailed', (r) => { if (/^https:\/\/fonts\.(googleapis|gstatic)\.com\//.test(r.url())) fontFailures.add(r.url()); });
   for (const c of todo) for (const lang of langs) {
     const file = path.join(out, c.id, `${lang}-${width}.png`);
     const run = { screen: c.id, feature: c.feature, lang, width, file: path.relative(out, file).replace(/\\/g, '/'), ok: false };
@@ -57,9 +61,15 @@ for (const width of widths) {
       const url = new URL(base + c.url);
       url.searchParams.set('screen', c.id);
       if (lang !== 'en') url.searchParams.set('lang', lang);
-      await page.goto(url.href);
-      await page.waitForSelector('html.atlas-ready', { timeout: 10000 });
-      await page.waitForTimeout(250);
+      for (let attempt = 1; ; attempt++) {
+        fontFailures.clear();
+        await page.goto(url.href);
+        await page.waitForSelector('html.atlas-ready', { timeout: 10000 });
+        await page.evaluate(() => document.fonts.ready.then(() => true));
+        await page.waitForTimeout(250);
+        if (!fontFailures.size) break;
+        if (attempt === 3) throw new Error(`an external font failed to load 3 times (${[...fontFailures][0]})`);
+      }
       fs.mkdirSync(path.dirname(file), { recursive: true });
       await page.screenshot({ path: file, clip: { x: 0, y: 0, width, height: 844 } });
       const words = await page.evaluate(() => (document.querySelector('.atlas-phone') || document.body).innerText.replace(/\s+/g, ' ').trim());
