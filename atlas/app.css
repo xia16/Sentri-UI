@@ -19,6 +19,7 @@ main { position:fixed; inset:56px 0 0 0 }
 .dot { display:inline-block; width:9px; height:9px; border-radius:50%; flex:none }
 .st-in-design { background:transparent; border:1.5px solid var(--muted) } .st-agent-checked { background:#2f6fb0 } .st-approved { background:var(--green) }
 .st-frozen { background:var(--green) }
+.st-earlier { background:#c9cfc2; border:1.5px solid #9aa394 }
 .st-placeholder { background:transparent; border:1.5px dashed #9aa394 }
 
 .empty { position:absolute; inset:40px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; padding:30px; text-align:center; color:var(--muted); border:1.5px dashed #c9cfc2; border-radius:22px }

@@ -398,7 +398,7 @@ function openFeature(id, sel) {
     const sec = (id, label, n, open, inner) => `<section class="sec" id="sec-${id}" data-open="${open}"><h3 class="sh" tabindex="0" role="button" aria-expanded="${open}"><span class="lbl">${label}</span><span class="n">${n}</span><span class="caret">${ICON.caret}</span></h3><div class="sb">${inner}</div></section>`;
     const none = '<p class="none">None written yet.</p>';
     const gate = s.gate ? `<span class="badge">Gate <b>${esc(Array.isArray(s.gate) ? s.gate.join(' ') : s.gate)}</b></span>` : '';
-    const head = `<div class="spechead"><div class="t"><h2>${esc(s.name)}</h2>${s.zh ? `<span class="zh">${esc(s.zh)}</span>` : ''}<span class="pill">${dot(s.status)}${esc(STATUS[s.status] || s.status)}</span>${gate}</div>
+    const head = `<div class="spechead"><div class="t"><h2>${esc(s.name)}</h2>${s.zh ? `<span class="zh">${esc(s.zh)}</span>` : ''}<span class="pill">${dot(s.status)}${esc(STATUS[s.status] || s.status)}</span>${gate}${s.aliasOf && idx[s.aliasOf] ? `<span class="badge">Same screen as <b>${esc(idx[s.aliasOf].name)}</b></span>` : ''}</div>
       ${confirm.length ? `<div class="badges"><span class="badge">To confirm <b>${confirm.length}</b></span></div>` : ''}</div>
       ${nt.purpose ? `<p class="lead">${esc(nt.purpose)}</p>` : ''}`;
     const split = (t) => { const ss = String(t).match(/[^.!?]+(?:[.!?]+(?=\s|$)|$)\s*/g) || [t]; let a = '', i = 0; while (i < ss.length && (!a || a.length + ss[i].length <= 190)) a += ss[i++]; return [a.trim(), ss.slice(i).join('').trim()]; };
