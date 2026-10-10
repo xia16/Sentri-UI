@@ -1,7 +1,7 @@
 // The gate's and the polish loop's rules (scripts/loop-rules.mjs).
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { effectiveClass, classifyScreens, checkVerdict, checkGrades, worstFirst, isClean, loopStatus, touchesSystem, touchesTools,
+import { effectiveClass, classifyScreens, checkVerdict, checkGrades, worstFirst, isClean, loopStatus, touchesSystem, touchesTools, regressions,
   pageOf, pageAssets, sharedFiles, outcomeLeaves, coverageLost } from '../scripts/loop-rules.mjs';
 
 test('a change to the bundle or tokens is a shared-component change whatever was declared', () => {
@@ -93,7 +93,7 @@ test('a refactor verdict passes only when every pair is the same', () => {
 });
 
 const state = (screen, scores, extra = {}) => ({ screen, scores, lost: [], hard: [], ...extra });
-const full = { hierarchy: 2, alignment: 2, legibility: 2, touch: 2, state: 2 };
+const full = { hierarchy: 2, alignment: 2, legibility: 2, touch: 2, state: 2, native: 2 };
 
 test('grades cover every screen, score 0-2, and give evidence for every lost point and hard failure', () => {
   assert.ok(checkGrades({ states: [state('f.a', full)] }, ['f.a']).ok);
@@ -209,4 +209,17 @@ test('a candidate that removes behaviour coverage is caught: the runner, a scena
 test("the gate's own tools and the workflow text are told apart from design files", () => {
   assert.deepEqual(touchesTools(['scripts/check-states.mjs', 'docs/design-workflow/README.md', 'ux/system/farrowing-astra-concept.js', 'tests/row-family.test.mjs']),
     ['scripts/check-states.mjs', 'docs/design-workflow/README.md']);
+});
+
+test('keep the best version: a screen that fell since the last round is reported', () => {
+  assert.deepEqual(regressions({ a: 10, b: 8 }, { a: 9, b: 9, c: 4 }), [{ screen: 'a', from: 10, to: 9 }]);
+});
+
+test('the loop stops when the risk budget is spent, a screen oscillates, or hard failures keep growing', () => {
+  const fix = (outcome) => ({ hard: 0, scores: { a: 8 }, leaves: { fail: 1 }, fix: { kind: 'defect', merged: true, outcome } });
+  assert.match(loopStatus({ cap: 9, rounds: [fix('verified'), fix('reverted'), fix('verified')] }).why, /risk budget/);
+  assert.equal(loopStatus({ cap: 9, rounds: [fix('verified'), fix('verified'), fix('best-effort')] }).status, 'continue');
+  const sc = (a, hard = 1) => ({ hard, scores: { a }, leaves: { fail: 1 }, fix: { kind: 'defect', merged: true, outcome: 'verified' } });
+  assert.match(loopStatus({ cap: 9, rounds: [sc(6), sc(8), sc(6)] }).why, /oscillating: a/);
+  assert.match(loopStatus({ cap: 9, rounds: [sc(6, 1), sc(7, 2), sc(8, 3)] }).why, /growing/);
 });

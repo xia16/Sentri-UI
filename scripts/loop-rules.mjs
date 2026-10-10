@@ -4,7 +4,7 @@
 import path from 'node:path';
 
 export const CLASSES = ['copy', 'presentation', 'behaviour', 'shared'];
-export const DIMENSIONS = ['hierarchy', 'alignment', 'legibility', 'touch', 'state'];
+export const DIMENSIONS = ['hierarchy', 'alignment', 'legibility', 'touch', 'state', 'native'];
 export const HARD = ['wrong-fact', 'lost-draft', 'dead-end', 'unreachable-control', 'broken-ruling', 'rejected-example'];
 
 // Every atlas screen that renders, with its feature.
@@ -230,6 +230,32 @@ export function isClean(round) {
   return true;
 }
 
+// Keep the best version, not the last: a screen whose total fell since the round before points at the fix merged between them.
+export function regressions(prev, cur) {
+  return Object.keys(cur || {}).filter((k) => prev && k in prev && cur[k] < prev[k]).map((k) => ({ screen: k, from: prev[k], to: cur[k] }));
+}
+
+// Risk budget: reverted fixes count 1, best-effort ones 0.5, over all merged fixes (gstack design-review's stop-and-ask).
+export const RISK_BUDGET = 0.2;
+export function riskOf(rounds) {
+  const f = rounds.map((r) => r.fix).filter((x) => x && x.merged);
+  if (!f.length) return 0;
+  return f.reduce((n, x) => n + (x.outcome === 'reverted' ? 1 : x.outcome === 'best-effort' ? 0.5 : 0), 0) / f.length;
+}
+
+// Oscillation: over the last three recorded rounds a screen went up then down, or down then up.
+export function oscillating(rounds) {
+  const s = rounds.filter((r) => r.scores).slice(-3).map((r) => r.scores);
+  if (s.length < 3) return [];
+  return Object.keys(s[2]).filter((k) => k in s[0] && k in s[1] && Math.sign(s[1][k] - s[0][k]) * Math.sign(s[2][k] - s[1][k]) < 0);
+}
+
+// Growth: hard failures rising two rounds in a row (the Piglet processing walks grew until the owner stopped them).
+export function growing(rounds) {
+  const h = rounds.filter((r) => typeof r.hard === 'number').slice(-3).map((r) => r.hard);
+  return h.length === 3 && h[0] < h[1] && h[1] < h[2];
+}
+
 const sameResult = (a, b) => a && b && JSON.stringify(a.scores) === JSON.stringify(b.scores) && JSON.stringify(a.leaves) === JSON.stringify(b.leaves);
 
 // done · stopped (cap or no progress) · continue
@@ -243,6 +269,11 @@ export function loopStatus(ledger) {
     return { status: 'continue', why: `two clean rounds but ${open} leaf/leaves failing or uncovered` };
   }
   if (r.length >= cap) return { status: 'stopped', why: `round cap (${cap}) reached` };
+  const risk = riskOf(r);
+  if (risk > RISK_BUDGET) return { status: 'stopped', why: `risk budget spent: ${Math.round(risk * 100)}% of merged fixes were reverted or best-effort (budget ${RISK_BUDGET * 100}%)` };
+  const osc = oscillating(r);
+  if (osc.length) return { status: 'stopped', why: `oscillating: ${osc.slice(0, 3).join(', ')} went up and down again; a fix is undoing another` };
+  if (growing(r)) return { status: 'stopped', why: 'growing: hard failures rose two rounds in a row; more rounds make it worse' };
   if (r.length >= 2 && !last.fix?.merged && sameResult(last, prev)) return { status: 'stopped', why: 'no progress: grades and leaf results unchanged and nothing merged' };
   return { status: 'continue', why: r.length ? `round ${r.length} of at most ${cap}` : 'not started' };
 }

@@ -71,6 +71,7 @@ Score each dimension **0, 1 or 2**, with evidence (a screenshot and what is wron
 - **Legibility and copy**: copy budget, verbs, EN/ZH fit, real data wraps.
 - **Touch and reach**: 48px targets; one-handed reach; no gesture-only action.
 - **State clarity**: draft, saved, blocked and done are told apart; green only for done.
+- **Native fit**: it looks and behaves like an iOS or Android app; native patterns where they fit, no web conventions.
 
 **Hard failures** fail the screen whatever the score: a wrong fact, a lost draft, a dead end, an unreachable control, a broken ruling, or any rejected example in `gate.md`.
 

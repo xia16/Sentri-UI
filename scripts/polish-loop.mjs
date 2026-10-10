@@ -5,7 +5,7 @@
 //   node scripts/polish-loop.mjs start  <feature> [--cap 5] [--job "<what this loop is for>"]
 //   node scripts/polish-loop.mjs round  <feature>          shoot every screen, run legibility and leaves: the round's evidence
 //   node scripts/polish-loop.mjs grades <feature>          check r<n>/grades.json and print the worst first
-//   node scripts/polish-loop.mjs record <feature> --fix defect|enhancement|none [--pr <n>] [--merged yes|no] [--what "<one line>"]
+//   node scripts/polish-loop.mjs record <feature> --fix defect|enhancement|none [--pr <n>] [--merged yes|no] [--outcome verified|best-effort] [--reverts <pr>] [--what "<one line>"]
 //   node scripts/polish-loop.mjs decide <feature> --title "<product question>" --options "a | b" --recommend "<option and why>" [--blocks "<leaf ids>"]
 //   node scripts/polish-loop.mjs status <feature>
 //   node scripts/polish-loop.mjs packet <feature>          shoot the final screens; write the packet and review/polish-<feature>.json
@@ -13,7 +13,7 @@ import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { screensOf, checkGrades, worstFirst, hardCount, loopStatus, isClean, DIMENSIONS } from './loop-rules.mjs';
+import { screensOf, checkGrades, worstFirst, hardCount, loopStatus, isClean, regressions, DIMENSIONS } from './loop-rules.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const [cmd, feature, ...rest] = process.argv.slice(2);
@@ -140,8 +140,16 @@ if (cmd === 'grades') {
   if (problems.length) { console.log('GRADES REJECTED — send these back to the grader:'); for (const p of problems) console.log('  -', p); process.exit(1); }
   const worst = worstFirst(g);
   console.log(`round ${r.n}: ${g.states.length} states graded, ${hardCount(g)} hard failure(s). Worst first:`);
-  for (const s of worst.slice(0, 12)) console.log(`  ${(s.hard || []).length ? 'HARD ' + s.hard.map((h) => h.type).join(',') : 'score ' + s.total + '/10'}  ${s.screen}${s.state ? ' / ' + s.state : ''} — ${(s.hard?.[0] || s.lost?.[0] || {}).what || ''}`);
+  for (const s of worst.slice(0, 12)) console.log(`  ${(s.hard || []).length ? 'HARD ' + s.hard.map((h) => h.type).join(',') : 'score ' + s.total + '/' + DIMENSIONS.length * 2}  ${s.screen}${s.state ? ' / ' + s.state : ''} — ${(s.hard?.[0] || s.lost?.[0] || {}).what || ''}`);
   if (!worst.length) console.log('  nothing below full marks: no defect to select');
+  // Keep the best version: a screen that got worse since the last recorded round is the first thing to fix, by reverting.
+  const prev = [...l.rounds].reverse().find((x) => x.recorded && x.n < r.n);
+  const now = Object.fromEntries(g.states.map((s) => [`${s.screen}${s.state ? '/' + s.state : ''}`, DIMENSIONS.reduce((n, d) => n + s.scores[d], 0)]));
+  const worse = prev ? regressions(prev.scores, now) : [];
+  if (worse.length) {
+    console.log(`REGRESSED since round ${prev.n}${prev.fix?.merged ? ` (after #${prev.fix.pr})` : ''}: revert that fix first, unless the drop has another cause:`);
+    for (const w of worse.slice(0, 8)) console.log(`  ${w.screen} ${w.from} -> ${w.to}`);
+  }
   process.exit(0);
 }
 
@@ -153,6 +161,12 @@ if (cmd === 'record') {
   if (problems.length) { console.error(`the grades are not accepted (${problems.slice(0, 3).join('; ')}${problems.length > 3 ? ' …' : ''}): polish-loop grades ${feature} first`); process.exit(2); }
   const ev = JSON.parse(fs.readFileSync(path.join(dir, `r${r.n}`, 'evidence.json'), 'utf8'));
   const merged = opt('merged') === 'yes';
+  if (opt('outcome') && !['verified', 'best-effort', 'reverted'].includes(opt('outcome'))) { console.error('--outcome is verified, best-effort or reverted'); process.exit(2); }
+  if (opt('reverts')) { // keep the best version: the earlier fix this round reverted is marked so; it spends the risk budget
+    const was = l.rounds.find((x) => x.fix?.pr === Number(opt('reverts')));
+    if (!was) { console.error(`no recorded round merged #${opt('reverts')}`); process.exit(2); }
+    was.fix.outcome = 'reverted';
+  }
   if (kind !== 'none' && merged && !opt('pr')) { console.error('a merged fix names its PR'); process.exit(2); }
   if (kind !== 'none' && opt('pr')) { // the ledger takes GitHub's word, not the driver's
     const st = sh('gh', ['pr', 'view', opt('pr'), '--json', 'state', '--jq', '.state']).stdout.trim();
@@ -163,7 +177,7 @@ if (cmd === 'record') {
     scores: Object.fromEntries(g.states.map((s) => [`${s.screen}${s.state ? '/' + s.state : ''}`, DIMENSIONS.reduce((n, d) => n + s.scores[d], 0)])),
     leaves: ev.leaves.none ? { uncovered: 0, none: true } : { pass: ev.leaves.pass, fail: ev.leaves.fail, blocked: ev.leaves.blocked, uncovered: ev.leaves.pending || 0 },
     legibility: ev.legibility.none ? null : { failing: ev.legibility.failing, of: ev.legibility.of },
-    fix: kind === 'none' ? null : { kind, pr: Number(opt('pr')) || null, merged, what: opt('what') || '' },
+    fix: kind === 'none' ? null : { kind, pr: Number(opt('pr')) || null, merged, outcome: merged ? (opt('outcome') || 'verified') : null, what: opt('what') || '' },
   });
   save(l);
   const st = statusOf(l);

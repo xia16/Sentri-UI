@@ -49,6 +49,8 @@ Presentation changes rerun the walks they touch. A presentation fix once hid the
 
 ## 3. Cold look (before reading anything about the change)
 
+**Judge blind.** For §3 and §4 open only the `pairs/` images. Don't open `mechanical.json`, the PR or the builder's notes until §5: check output anchors judgement. Write down every issue you see before you write any verdict. A listed issue is dismissed only by a measurement, never by argument. Finding nothing is a valid result; there is no quota.
+
 Screenshot each screen on BASE and on CANDIDATE in the same state, at 390×844 and 360×800, in EN and ZH. Look at every pair. List every visible defect on the CANDIDATE side:
 - misalignment, or values off their track;
 - uneven spacing, or rows of uneven height;
@@ -63,11 +65,12 @@ Screenshot each screen on BASE and on CANDIDATE in the same state, at 390×844 a
 - decoration added to satisfy a rule (giant handles, underlines, glyphs);
 - a reason line above a disabled button;
 - an ✕ in a drawer;
-- designed hover or focus rings.
+- designed hover or focus rings;
+- web conventions in a phone app: hover rows, breadcrumbs, dropdown selects, data tables, underlined text links, tooltips, visible scrollbars, pagination, centred web modals. Native patterns (sheets, action sheets, segmented controls, switches, wheel pickers, the system keyboard, a navigation bar) are the norm wherever they fit.
 
 ## 4. Before / after (this decides it)
 
-For each pair, judge **better / same / worse** and give the one reason that decides it. The bar is the screens the owner approved (Farrowing and Inspection): calm, aligned, nothing extra, one surface, ink not colour. A change that meets a rule but looks worse is **worse**.
+For each pair, judge **better / same / worse** and give the one reason that decides it, naming its dimension: hierarchy, alignment, legibility, touch, state or native fit. Your verdict follows from your issue list, not the other way round. The bar is the screens the owner approved (Farrowing and Inspection): calm, aligned, nothing extra, one surface, ink not colour. A change that meets a rule but looks worse is **worse**.
 
 - **Normal**: it passes only if no pair is worse, at least one changed pair is better, and the cold look found no defect. A pair with one side (a new screen, or a removed one) is judged **pass** or **fail**, and any fail fails the change. When no screen changed or was added, only a change declared behaviour (or shared) can pass, on a walk where every entry is ok: a behaviour fix may leave every first frame alone.
 - **Refactor**: it passes only if every pair is **same**, pixel-identical where the change claims identity, and the cold look found no defect.

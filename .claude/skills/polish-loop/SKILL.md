@@ -22,18 +22,20 @@ This session is the **driver** of the polish loop for one feature. The brief is 
 3. **Select.** Take the top hard failure; with none, the worst defect with evidence. A round's fix is **one PR** for the selected defect, plus any defect that shares its cause.
    - **Enhancement.** With no hard failure left, you may take one enhancement as well or instead: a grader's idea or your own, for a screen graded 1 ([Room to design](../../../docs/design-workflow/README.md#room-to-design)). Ask the designer for two or three sketches, at least one breaking from the current pattern, and pick one.
    - **Product questions.** If the fix needs a product change, file it with `node scripts/polish-loop.mjs decide <feature> --title … --options "a | b" --recommend …` and select the next item.
-4. **Build.** Dispatch one builder with [build.md](../../../docs/design-workflow/briefs/build.md) and the selected evidence (screens, `what`, shots). Use `model: sonnet` for a fix and `opus` for an enhancement's design. Give it SCOPE = the feature, MODE = polish and its CHANGE CLASS. It works in its own worktree off `origin/main`, merges main forward before handing over, and opens a PR. It never merges.
+4. **Build.** Dispatch one builder with [build.md](../../../docs/design-workflow/briefs/build.md) and the selected evidence (screens, `what`, shots). Use `model: sonnet` for a fix and `opus` for an enhancement's design. Give it SCOPE = the feature, MODE = polish and its CHANGE CLASS. It works in its own worktree off `origin/main`, makes one commit per finding (so one can be reverted alone), merges main forward before handing over, and opens a PR. It never merges. Minor findings (one point lost on one dimension, no hard failure) are listed in the round record, not fixed one by one.
 5. **Gate.** In the ledger checkout, run `node scripts/gate.mjs --candidate origin/<branch> --scope <feature> --class <class> --out review/loop/<feature>/r<n>/gate`.
-   - **Mechanical fail.** The failures go back to the builder; allow two tries.
-   - **Mechanical pass.** Dispatch the judge: a fresh agent, never the builder (`model: opus`). Give it gate.md, `mechanical.json` and the `pairs/` images. It writes `verdict.json` beside them. Then run `node scripts/gate.mjs --verdict <out>`.
+   - **Mechanical or judge fail: the fix ladder.** The failures go back to the same builder, up to 3 tries. Then a fresh builder on `opus` gets one try. After that you rule: drop the fix this round, file a decision, or declare a gap.
+   - **Mechanical pass.** Dispatch the judge: a fresh agent, never the builder (`model: opus`). Give it gate.md and the `pairs/` folder; it reads `mechanical.json` and the PR only after judging the pairs (gate.md §3, blind). It writes `verdict.json` beside them. Then run `node scripts/gate.mjs --verdict <out>`.
 6. **Merge** only on `GATE PASS`, pinned to the commit the gate ran on: `gh pr merge <n> --squash --match-head-commit <candidate sha>` (`--verdict` prints the sha). If the PR head or main moved since the gate ran, merge main forward and gate again. A failed gate rejects the fix for this round; close the PR with the verdict's reason.
-7. **Record.** `node scripts/polish-loop.mjs record <feature> --fix defect|enhancement|none --pr <n> --merged yes|no --what "<one line>"`. It prints whether the loop goes on.
+7. **Record.** `node scripts/polish-loop.mjs record <feature> --fix defect|enhancement|none --pr <n> --merged yes|no --outcome verified|best-effort --what "<one line>"`. It prints whether the loop goes on.
+
+**Keep the best version.** When `grades` reports REGRESSED, the round's fix is reverting the PR that caused it (a revert PR, gated like any change), recorded with `--reverts <pr>`. Reverts and best-effort fixes spend the risk budget.
 
 **Shared components.** A fix that changes the bundle, the tokens, a file that pages of two or more features load (Farrowing's page also draws Move and Pig profile screens), or another feature's screens is a shared-component change. The gate escalates it by itself. Don't hide it inside a feature fix: build it as its own PR, gated on every feature that uses the component.
 
 ## Stop
 
-`node scripts/polish-loop.mjs status <feature>` says **done** (two clean rounds, every leaf covered or blocked) or **stopped** (the cap, or a round with no progress). Then:
+`node scripts/polish-loop.mjs status <feature>` says **done** (two clean rounds, every leaf covered or blocked) or **stopped**: the cap, a round with no progress, the risk budget spent (over 20% of merged fixes reverted or best-effort), a screen oscillating, or hard failures growing two rounds in a row. Then:
 1. `node scripts/polish-loop.mjs packet <feature>`.
 2. Publish `review/loop/<feature>/packet/` as a private artifact for the owner. Use the `index.html` page with `img/` as its files.
 3. Commit `review/polish-<feature>.json` in a small PR. Its `items` are the loop's decisions, and they enter the atlas decision queue.

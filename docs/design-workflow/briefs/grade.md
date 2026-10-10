@@ -27,6 +27,7 @@ Score each dimension **0, 1 or 2**. A 2 means nothing to fix: as calm, aligned a
 | **legibility** | Floors met: text ≥ 13px everywhere, ≥ 16px for primary content, contrast ≥ 4.5:1 (≥ 7:1 for numbers acted on). Copy is in budget with registry verbs, EN and ZH fit, and real data wraps safely. Use `legibility.txt`. |
 | **touch** | Targets ≥ 48px, the primary action within one-handed reach, no gesture-only action. |
 | **state** | Draft, saved, blocked and done are told apart; green only for done or approved. |
+| **native** | It looks and behaves like an iOS or Android app: native patterns where they exist (sheets, action sheets, segmented controls, switches, wheel pickers, the system keyboard, a navigation bar) and no web conventions (hover rows, breadcrumbs, dropdown selects, data tables, underlined links, tooltips, scrollbars, pagination, centred modals). |
 
 For every point lost, write one `lost` entry. Give the dimension, then `what`: the element as it reads on screen and what's wrong ("Sow row meta 'parity 3 · 6h' at 11px, under the 13px floor"). Give `shot`: the file that shows it. A point lost without evidence is rejected, and the round waits on you.
 
@@ -50,7 +51,7 @@ Write `ROUND FOLDER/grades.json`:
 ```json
 { "round": 1, "commit": "<COMMIT>",
   "states": [{ "screen": "farrowing.room", "state": "",
-    "scores": { "hierarchy": 2, "alignment": 1, "legibility": 0, "touch": 2, "state": 2 },
+    "scores": { "hierarchy": 2, "alignment": 1, "legibility": 0, "touch": 2, "state": 2, "native": 2 },
     "lost": [{ "dimension": "alignment", "what": "", "shot": "farrowing.room/en-390.png" }],
     "hard": [{ "type": "dead-end", "what": "", "shot": "" }],
     "idea": "" }],
