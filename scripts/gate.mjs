@@ -339,6 +339,8 @@ if (steady.length) {
   check('information budget before layout', !bp.length, bp.length ? bp.join('; ') + ' (write it first: briefs/build.md §1b)' : '');
   const ps = pageStyling(addedLines(git(['diff', '-U0', mech.base, mech.candidate, '--', 'ux']).out));
   mech.pageStyling = ps;
+  const proposed = files.includes('ux/design-system/components/_proposed.json') && /^\+\s*[\[{"]/m.test(git(['diff', '-U0', mech.base, mech.candidate, '--', 'ux/design-system/components/_proposed.json']).out);
+  check('no workaround beside a component proposal', !proposed, proposed ? 'this change proposes a component and changes screens: build the component in the design system in this change (briefs/build.md §2), never a workaround' : '');
   check('design-system components only', !ps.length, ps.length ? `${ps.length} visual declaration(s) added outside ux/design-system (${ps.slice(0, 3).map((p) => p.file.split('/').pop() + ' ' + p.prop).join(', ')}): use a SentriUI component or propose one in ux/design-system/components/_proposed.json` : '');
 }
 if (tools.length && steady.length) check('workflow changes in their own PR', false, `this change moves ${steady.length} screen(s) and also edits the workflow or the gate's tools (${tools.slice(0, 3).join(', ')}): split it`);
