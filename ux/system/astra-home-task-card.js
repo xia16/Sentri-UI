@@ -4,8 +4,9 @@
  */
 (() => {
   const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const icons={stop:'M5 12h14',check:'m5 12 4 4L19 6',care:'M9 3h6v6h6v6h-6v6H9v-6H3V9h6z',transfer:'M3 7h17m-5-5 5 5-5 5M21 17H4m5-5-5 5 5 5',production:'M6 19V9m6 10V4m6 15v-6',location:'M20 10c0 6-8 11-8 11S4 16 4 10a8 8 0 1 1 16 0ZM15 10a3 3 0 1 1-6 0 3 3 0 0 1 6 0',clock:'M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0M12 7v5l3 2',arrow:'m9 5 7 7-7 7'};
-  const icon=name=>`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${icons[name]||icons.production}"/></svg>`;
+  // Home card glyphs come from the same registry as the rest of the design system.
+  const iconNames=Object.freeze({stop:'minus',location:'place',arrow:'chevron'});
+  const icon=name=>window.SentriIcons.icon(iconNames[name]||name);
   function render(model,{annotated=false}={}){
     const m=model,unit=m.scope.kind==='unit',p=m.progress||{},t=m.timing||{},pct=p.total>0?Math.max(0,Math.min(100,p.value/p.total*100)):0;
     const marker=n=>annotated?`<i class="slot-marker" aria-hidden="true">${n}</i>`:'';

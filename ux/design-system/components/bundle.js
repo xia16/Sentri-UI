@@ -11,6 +11,8 @@
     hospital:'M13 3h8v18h-8M17 3v18M13 7h8M13 17h8M2 12h12M9 8l5 4-5 4',
     profile:'M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0M4 21v-2a8 8 0 0 1 16 0v2',
     chart:'M4 20V10M12 20V4M20 20v-7',
+    production:'M6 19V9m6 10V4m6 15v-6',
+    care:'M9 3h6v6h6v6h-6v6H9v-6H3V9h6z',
     back:'M15 5l-7 7 7 7M8 12h13',
     chevron:'M9 5l7 7-7 7',
     up:'M15 5l-7 7 7 7',
