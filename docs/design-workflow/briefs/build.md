@@ -46,6 +46,8 @@ Do this for every new or changed list, card or screen, before you draw. That inc
    - no zeros;
    - no derived figure beside its parts (born = alive + dead).
 5. **The cut list.** Write down what was removed and why, in the PR body. It is the proof this step happened.
+6. **Rebuild the hierarchy.** Cutting facts never cuts structure. Sections keep their native headings. Each attention level gets its own visual weight, and a screen has one heavy control at most: the one the worker acts on. Then do the **squint test**: blur the screenshot, or step back, and write the first three things the eye lands on. They must be the answers to the worker's first three questions, in order. Calmer but flat is rejected (R15). Put the three in the PR body.
+7. **Design it, don't rearrange it.** After the budget, compose the screen in the approved screens' language: grouped sections with native headers, every row inside a group, the page ending on a group. Information stacked on a page is rejected (R16). A narrow pass that turns into a redesign is fine; make it a good one.
 6. **Prove it.** Build it in the real components and put it beside the current screen at the same size. The cold question: at a glance, can I tell what needs me and what to do? If it isn't clearly better than the current screen, it doesn't ship. Comparing candidates with each other doesn't count.
 
 Worked example, the Farrowing room row:
