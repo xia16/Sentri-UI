@@ -8,15 +8,14 @@
 //   --strict    the absolute floors: exit 1 when any screen fails, or with --changed when a changed screen does. The gate runs strict, not compare, once
 //               docs/design-workflow/README.md says "Legibility gate: strict".
 // Writes review/legibility.json. Floors: ux/design-system/README.md, "The farm legibility law".
-import { createRequire } from 'node:module';
+import { playwright } from './playwright-path.mjs';
 import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const PW = process.env.PLAYWRIGHT_DIR || 'C:/Users/ying_/.cache/adam-design/playwright-1.63.0/node_modules/playwright';
-const { chromium } = createRequire('C:/Users/ying_/.cache/adam-design/playwright-1.63.0/package.json')(PW);
+const { chromium } = playwright();
 const TYPES = { '.html': 'text/html', '.css': 'text/css', '.js': 'text/javascript', '.mjs': 'text/javascript', '.cjs': 'text/javascript', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.webp': 'image/webp', '.gif': 'image/gif', '.woff': 'font/woff', '.woff2': 'font/woff2', '.ttf': 'font/ttf', '.otf': 'font/otf', '.md': 'text/plain' };
 
 // minText: quiet descriptive text; actText: text inside a control (what a worker reads to act on). Owner, 2026-10-11.

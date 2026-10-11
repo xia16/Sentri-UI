@@ -11,7 +11,7 @@
 // Exit 0 when every mechanical check passes; the judge (gate.md) then writes <out>/verdict.json, and
 // `node scripts/gate.mjs --verdict <out>` checks it against mechanical.json, the PR head and origin/main.
 import { spawn, spawnSync } from 'node:child_process';
-import { createRequire } from 'node:module';
+import { pwPath, playwright } from './playwright-path.mjs';
 import { createServer } from 'node:net';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -20,8 +20,7 @@ import { fileURLToPath } from 'node:url';
 import { CLASSES, screensOf, pageOf, pageAssets, sharedFiles, coverageLost, effectiveClass, classifyScreens, checkVerdict, touchesSystem, touchesTools, queueAhead as queueOf, budgetProblems, pageStyling, addedLines, calibrationProblems } from './loop-rules.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const PW_HOME = 'C:/Users/ying_/.cache/adam-design/playwright-1.63.0';
-const pwPath = process.env.SENTRI_PLAYWRIGHT || PW_HOME + '/node_modules/playwright';
+
 
 const argv = process.argv.slice(2);
 const opt = (k) => { const i = argv.indexOf('--' + k); return i >= 0 && argv[i + 1] && !argv[i + 1].startsWith('--') ? argv[i + 1] : null; };
@@ -257,7 +256,7 @@ check('npm run check', r.code === 0, r.all.find((l) => /atlas:/.test(l)) || r.ta
 const [shotsBase, shotsCand] = await capture;
 if (!shotsBase || !shotsCand) { check('every screen shot on both sides', false, 'shoot-screens wrote no shots.json (its errors are above)'); finish(1); }
 
-const { chromium } = createRequire(PW_HOME + '/package.json')(pwPath);
+const { chromium } = playwright();
 const browser = await chromium.launch();
 const page = await browser.newPage();
 // Exact: a pixel counts when any of its channels differs. An image that doesn't decode counts as all different.

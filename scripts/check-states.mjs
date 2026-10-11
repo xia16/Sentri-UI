@@ -1,15 +1,14 @@
 // Mechanical check of every design-system state, rendered the way the atlas draws it.
 // Usage: node scripts/check-states.mjs [baseUrl]     (no argument: serves this repo itself)
 // Writes review/state-check.json; exits 1 when any state has a problem.
-import { createRequire } from 'node:module';
+import { playwright } from './playwright-path.mjs';
 import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const PW = process.env.PLAYWRIGHT_DIR || 'C:/Users/ying_/.cache/adam-design/playwright-1.63.0/node_modules/playwright';
-const { chromium } = createRequire('C:/Users/ying_/.cache/adam-design/playwright-1.63.0/package.json')(PW);
+const { chromium } = playwright();
 const DS = '/ux/design-system';
 const VW = Number(process.env.CHECK_WIDTH) || 354; // the atlas cell at 1440 wide (340 to 400 in practice)
 const TYPES = { '.html': 'text/html', '.css': 'text/css', '.js': 'text/javascript', '.mjs': 'text/javascript', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.md': 'text/plain' };
