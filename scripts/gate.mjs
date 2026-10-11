@@ -17,7 +17,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { CLASSES, screensOf, pageOf, pageAssets, sharedFiles, coverageLost, effectiveClass, classifyScreens, checkVerdict, touchesSystem, touchesTools } from './loop-rules.mjs';
+import { CLASSES, screensOf, pageOf, pageAssets, sharedFiles, coverageLost, effectiveClass, classifyScreens, checkVerdict, touchesSystem, touchesTools, queueAhead as queueOf } from './loop-rules.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PW_HOME = 'C:/Users/ying_/.cache/adam-design/playwright-1.63.0';
@@ -327,8 +327,8 @@ if (mode === 'refactor') check('refactor: every screen identical', !steady.lengt
 const tools = touchesTools(files);
 if (tools.length && steady.length) check('workflow changes in their own PR', false, `this change moves ${steady.length} screen(s) and also edits the workflow or the gate's tools (${tools.slice(0, 3).join(', ')}): split it`);
 // The shared-component queue: one shared change at a time, oldest first. A shared candidate waits while an older open,
-// non-draft PR also touches the shared system (the same shared set); once that merges, this one merges main forward and is
-// gated against it.
+// non-draft PR that has passed the gate also touches the shared system (queueAhead in loop-rules.mjs); once that merges, this
+// one merges main forward and is gated against it. An older PR that hasn't passed doesn't block.
 if (ec.cls === 'shared') {
   const q = queueAhead();
   check('shared-component queue: first in line', q.ok, q.detail);
@@ -336,12 +336,12 @@ if (ec.cls === 'shared') {
 }
 function queueAhead() {
   const branch = ref.replace(/^origin\//, '');
-  const res = spawnSync('gh', ['pr', 'list', '--state', 'open', '--limit', '100', '--json', 'number,headRefName,createdAt,isDraft,files'], { cwd: root, encoding: 'utf8', maxBuffer: 64 << 20 });
+  const res = spawnSync('gh', ['pr', 'list', '--state', 'open', '--limit', '100', '--json', 'number,headRefName,headRefOid,createdAt,isDraft,files,statusCheckRollup'], { cwd: root, encoding: 'utf8', maxBuffer: 64 << 20 });
   if (res.status) return { ok: false, detail: `cannot read the queue (gh pr list failed): ${(res.stderr || '').trim().split('\n')[0]}` };
   const prs = JSON.parse(res.stdout);
   const mine = prs.find((p) => p.headRefName === branch);
   if (!mine) return { ok: false, detail: `no open PR for ${branch}: open one, the queue orders PRs` };
-  const ahead = prs.filter((p) => p.number !== mine.number && !p.isDraft && p.createdAt < mine.createdAt && touchesSystem((p.files || []).map((f) => f.path), shared).length);
+  const ahead = queueOf(prs, mine, shared, (sha) => !!sha && fs.existsSync(passRecord(sha)));
   return ahead.length ? { ok: false, detail: `waiting behind ${ahead.map((p) => '#' + p.number).join(', ')}: merge or close those first, then merge main forward and gate again` } : { ok: true, detail: `#${mine.number}` };
 }
 
