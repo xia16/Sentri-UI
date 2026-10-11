@@ -363,7 +363,9 @@ function queueAhead() {
 // The open PRs in the shape `gh pr list --json number,headRefName,headRefOid,createdAt,isDraft,files,statusCheckRollup` gives,
 // read over REST: GraphQL (which gh pr list uses) is blocked in cloud sessions.
 function openPrs() {
-  const api = (p, jq) => { const r = spawnSync('gh', ['api', '--paginate', p, '--jq', jq], { cwd: root, encoding: 'utf8', maxBuffer: 64 << 20 }); if (r.status) throw new Error(`gh api ${p} failed: ${(r.stderr || '').trim().split('\n')[0]}`); return r.stdout.trim().split('\n').filter(Boolean).map((l) => JSON.parse(l)); };
+  // Pages by number: --paginate follows Link headers with numeric-ID paths, which the cloud proxy refuses.
+  const page = (p, jq) => { const r = spawnSync('gh', ['api', p, '--jq', jq], { cwd: root, encoding: 'utf8', maxBuffer: 64 << 20 }); if (r.status) throw new Error(`gh api ${p} failed: ${(r.stderr || '').trim().split('\n')[0]}`); return r.stdout.trim().split('\n').filter(Boolean).map((l) => JSON.parse(l)); };
+  const api = (p, jq) => { const all = []; for (let n = 1; n <= 30; n++) { const got = page(`${p}&page=${n}`, jq); all.push(...got); if (got.length < 100) break; } return all; };
   try {
     return api('repos/{owner}/{repo}/pulls?state=open&per_page=100', '.[] | {number, headRefName: .head.ref, headRefOid: .head.sha, createdAt: .created_at, isDraft: .draft}').map((p) => ({
       ...p,
