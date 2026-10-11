@@ -4,8 +4,8 @@
 //   --feature   only the screens of one feature (does not write review/legibility.json)
 //   --changed   the screen ids a PR touches (comma or space separated); the exit code is 1 only when one of them fails
 //   --compare   with --changed: the base server. A changed screen then fails only when it has MORE violations than the same
-//               screen at the base (per category), or a violation on an element that had none there. Use until the type pass lands.
-//   --strict    exit 1 when any screen fails (the absolute floors). The gate runs strict, not compare, once
+//               screen at the base (per category), or a violation on an element that had none there. Used while the gate line says no-regression.
+//   --strict    the absolute floors: exit 1 when any screen fails, or with --changed when a changed screen does. The gate runs strict, not compare, once
 //               docs/design-workflow/README.md says "Legibility gate: strict".
 // Writes review/legibility.json. Floors: ux/design-system/README.md, "The farm legibility law".
 import { createRequire } from 'node:module';
@@ -329,5 +329,5 @@ if (changed.length && !gateStrict && !flag('--strict')) {
   await b2.close();
 } else blocked = results.filter((r) => changed.includes(r.id) && (r.fails || r.error));
 if (blocked.length) { console.error('\nblocked: ' + blocked.length + ' changed screen(s) ' + (gateStrict || flag('--strict') ? 'break the farm legibility law' : 'got worse than the base') + ': ' + blocked.map((r) => r.id).join(', ')); process.exit(1); }
-if (flag('--strict') && (t.screensFailing || t.errors)) { console.error('\nstrict: screens fail the farm legibility law'); process.exit(1); }
+if (flag('--strict') && !changed.length && (t.screensFailing || t.errors)) { console.error('\nstrict: screens fail the farm legibility law'); process.exit(1); }
 process.exit(0);
