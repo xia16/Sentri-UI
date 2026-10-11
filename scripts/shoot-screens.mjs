@@ -6,7 +6,7 @@
 // instead of passing off an English screenshot as Chinese. Bare screens are pinned to 390; other widths override that the way
 // scripts/run-scenarios.mjs does (nothing in the page changes, only the phone's width).
 import { spawn, execSync } from 'node:child_process';
-import { createRequire } from 'node:module';
+import { playwright } from './playwright-path.mjs';
 import { createServer } from 'node:net';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -15,8 +15,7 @@ import { screensOf } from './loop-rules.mjs';
 import { routeFonts } from './font-route.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const PW_HOME = 'C:/Users/ying_/.cache/adam-design/playwright-1.63.0';
-const { chromium } = createRequire(PW_HOME + '/package.json')(process.env.SENTRI_PLAYWRIGHT || PW_HOME + '/node_modules/playwright');
+const { chromium } = playwright();
 
 const argv = process.argv.slice(2);
 const opt = (k) => { const i = argv.indexOf('--' + k); return i >= 0 ? argv[i + 1] : null; };
