@@ -61,9 +61,12 @@ for (const width of widths) {
   // External fonts load over the network. A font that fails to load renders in the fallback face and shows as a pixel change on
   // every screen that uses it, so a failed font request retries the screen (3 tries) and is reported, never shot silently.
   const fontFailures = new Set();
-  const page = await context.newPage();
-  page.on('requestfailed', (r) => { if (/^https:\/\/fonts\.(googleapis|gstatic)\.com\//.test(r.url())) fontFailures.add(r.url()); });
   for (const c of todo) for (const lang of langs) {
+    // A fresh tab per shot: a screen that goes back in history would otherwise land on the screen shot before it.
+    const page = await context.newPage();
+    // A fixed clock: a screen that prints "now" (a receipt's time) would otherwise differ from minute to minute.
+    await page.clock.setFixedTime(new Date('2026-10-11T09:41:00'));
+    page.on('requestfailed', (r) => { if (/^https:\/\/fonts\.(googleapis|gstatic)\.com\//.test(r.url())) fontFailures.add(r.url()); });
     const file = path.join(out, c.id, `${lang}-${width}.png`);
     const run = { screen: c.id, feature: c.feature, lang, width, file: path.relative(out, file).replace(/\\/g, '/'), ok: false };
     try {
@@ -90,6 +93,7 @@ for (const width of widths) {
       }
       run.ok = true;
     } catch (e) { run.error = e.message.split('\n')[0]; }
+    await page.close();
     runs.push(run);
     console.log(run.ok ? 'OK  ' : 'FAIL', `${lang}-${width}`, c.id, run.zh === 'ignored' ? '(no zh rendering)' : '', run.error || '');
   }
