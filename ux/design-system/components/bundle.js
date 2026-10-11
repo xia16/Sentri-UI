@@ -1,4 +1,4 @@
-/* @ds-bundle: {"format":4,"namespace":"SentriUI","components":[{"name":"Heading"},{"name":"Panel"},{"name":"Facts"},{"name":"Row"},{"name":"Log"},{"name":"Segment"},{"name":"IconButton"},{"name":"Button"},{"name":"Field"},{"name":"PickerField"},{"name":"ChoiceList"},{"name":"CategoryFooter"},{"name":"Sheet"},{"name":"FilterSheet"},{"name":"RangeSlider"},{"name":"Icon"},{"name":"Stepper"},{"name":"Measure"},{"name":"Numpad"},{"name":"Status"},{"name":"ConditionTag"},{"name":"Banner"},{"name":"Photos"}]} */
+/* @ds-bundle: {"format":4,"namespace":"SentriUI","components":[{"name":"Heading"},{"name":"Panel"},{"name":"Facts"},{"name":"Row"},{"name":"Log"},{"name":"Segment"},{"name":"IconButton"},{"name":"Button"},{"name":"Field"},{"name":"PickerField"},{"name":"ChoiceList"},{"name":"CategoryFooter"},{"name":"Sheet"},{"name":"FilterSheet"},{"name":"RangeSlider"},{"name":"Icon"},{"name":"Stepper"},{"name":"Measure"},{"name":"Trend"},{"name":"Device"},{"name":"Numpad"},{"name":"Status"},{"name":"ConditionTag"},{"name":"Banner"},{"name":"Photos"}]} */
 /* SentriIcons (sentri-icons.js) and the SentriUI parts, in one file. */
 /* Shared icon registry for the Sentri prototypes. One path vocabulary so every
    app renders the same glyphs; apps keep a local fallback for source-only checks. */
@@ -475,6 +475,31 @@
     const hl=hintLine('st-measure-hint',{id:hid,text:hint,tone:t,o});
     const nl=hasNote?`<p class="st-field-hint st-measure-note" id="${esc(nid)}" data-tone="muted">${tx(note,o,'note')}</p>`:'';
     return `<div class="st-measure ${esc(className)}" data-ds="Measure" data-field="${esc(key)}"${v===''?' data-empty=""':''}${active?' data-active=""':''}${t?` data-tone="${t}"`:''}${isChanged?' data-changed=""':''}>${lab}${box}${hl}${nl}</div>`;
+  }
+
+  /* Trend: one sensor's reading now, with its recent shape. The hero figure, the last-reading stamp, a slot for the
+     period toggle (a Segment the caller draws), the line chart, Low / High and the readings behind a disclosure.
+     rows: [{time, value}], oldest first (two or more). decimals: y labels. pad: headroom above and below, in the unit. */
+  function trend({label='',value='',unit='',updatedLabel='Last reading',updated='',period='',rows=[],decimals=0,pad=1,lowLabel='Low',highLabel='High',historyLabel='Reading history',timeLabel='Time',chartLabel='',note='',id='',className='',strs,args}={}){
+    const o={strs,args},tid=id||fieldId('st-trend'),list=(rows||[]).filter(r=>r&&Number.isFinite(+r.value));
+    const head=`<div class="st-trend-head"><div><p class="st-trend-label">${tx(label,o,'label')}</p><strong class="st-trend-value">${esc(value)}<small>${esc(unit)}</small></strong></div>${updated?`<span class="st-trend-updated">${tx(updatedLabel,o,'updatedLabel')}<br>${esc(updated)}</span>`:''}</div>`;
+    let body='';
+    if(list.length>1){
+      const vals=list.map(r=>+r.value),min=Math.min(...vals),max=Math.max(...vals),lo=min-pad,hi=max+pad;
+      const pts=list.map((r,i)=>[38+i*254/(list.length-1),148-(r.value-lo)/(hi-lo)*118]),line=pts.map(p=>p.join(',')).join(' ');
+      const grid=[0,1,2].map(i=>{const y=30+i*59;return `<line x1="38" x2="292" y1="${y}" y2="${y}" class="st-trend-grid"/><text x="1" y="${y+3}">${(hi-i*(hi-lo)/2).toFixed(decimals)}</text>`;}).join('');
+      const svg=`<svg viewBox="0 0 316 184" aria-hidden="true"><defs><linearGradient id="${esc(tid)}-fill" x1="0" y1="0" x2="0" y2="1"><stop class="st-trend-stop" offset="0" stop-opacity=".25"/><stop class="st-trend-stop" offset="1" stop-opacity="0"/></linearGradient></defs>${grid}<path d="M${pts.map(p=>p.join(',')).join(' L')} L292,148 L38,148 Z" fill="url(#${esc(tid)}-fill)" stroke="none"/><polyline points="${line}" class="st-trend-line"/>${pts.map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="3" class="st-trend-dot"/>`).join('')}<text x="38" y="173">${esc(list[0].time)}</text><text x="166" y="173" text-anchor="middle">${esc(list[Math.floor(list.length/2)].time)}</text><text x="292" y="173" text-anchor="end">${esc(list[list.length-1].time)}</text></svg>`;
+      body=`<div class="st-trend-chart" role="img" aria-label="${esc(chartLabel)}">${svg}</div><div class="st-trend-range"><span>${tx(lowLabel,o,'lowLabel')} <strong>${min} ${esc(unit)}</strong></span><span>${tx(highLabel,o,'highLabel')} <strong>${max} ${esc(unit)}</strong></span></div><details class="st-trend-history"><summary>${tx(historyLabel,o,'historyLabel')}</summary><table><caption class="st-visually-hidden">${esc(label)}</caption><thead><tr><th>${tx(timeLabel,o,'timeLabel')}</th><th>${esc(unit)}</th></tr></thead><tbody>${list.map(r=>`<tr><td>${esc(r.time)}</td><td>${esc(r.value)}</td></tr>`).join('')}</tbody></table></details>`;
+    }
+    return panel(`${head}${period}${body}${note?`<p class="st-trend-note">${tx(note,o,'note')}</p>`:''}`,{className:`st-trend ${className}`,tag:'section',ds:'Trend'});
+  }
+  /* Device: the controls of one piece of equipment. Heading (icon, name, what it is doing), the mode Segment, an optional
+     speed slider, the save Button and two quiet lines. The caller draws mode and save; the slider is the page's `input` event
+     target (id `speed.id`, its value in `<id>-value`). */
+  function device({icon='air',name='',state='',mode='',speed=null,save='',note='',updated='',className='',strs,args}={}){
+    const o={strs,args};
+    const slider=speed?`<label class="st-device-speed" for="${esc(speed.id)}"><span>${tx(speed.label||'Speed',{strs:speed.strs,args:speed.args},'label')}</span><output id="${esc(speed.id)}-value">${esc(speed.value)}%</output></label><input id="${esc(speed.id)}" class="st-device-range" type="range" min="${speed.min??0}" max="${speed.max??100}" step="${speed.step??5}" value="${esc(speed.value)}"${speed.disabled?' disabled':''}>`:'';
+    return panel(`<div class="st-device-head">${glyph(icon)}<div><h3>${esc(name)}</h3><p>${tx(state,o,'state')}</p></div></div>${mode}${slider}${save}${note?`<p class="st-device-note">${tx(note,o,'note')}</p>`:''}${updated?`<p class="st-device-updated">${esc(updated)}</p>`:''}`,{className:`st-device ${className}`,tag:'section',ds:'Device'});
   }
   /* Numpad: the one type-to-set pad, for real typed input only (ear tags, weights), docked above the bar.
      1–9 · [. or a gap] 0 ⌫. No commit key: the bar's primary commits. Keys never move: the feedback region
@@ -1066,7 +1091,7 @@
     const end=()=>{drag=null;};
     document.addEventListener('pointerup',end);document.addEventListener('pointercancel',end);if(typeof globalThis.addEventListener==='function')globalThis.addEventListener('blur',end);
   }
-  const api=Object.freeze({rangeSlider,filterSheet,optionalRow,heading,panel,facts,row,rowGroup,log,logDay,logStamp,logGroups,categoryFooter,field,pickerField,pickerOptions,pickerBody,pickerHead,pickerFooter,filterChips,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowSelectDoor,rowAction,rowSelectChange,status,conditionTag,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
+  const api=Object.freeze({rangeSlider,filterSheet,optionalRow,heading,panel,facts,row,rowGroup,log,logDay,logStamp,logGroups,categoryFooter,field,pickerField,pickerOptions,pickerBody,pickerHead,pickerFooter,filterChips,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,segment,iconButton,stepper,measure,trend,device,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowSelectDoor,rowAction,rowSelectChange,status,conditionTag,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
   root.SentriUI=api;
   if(typeof module!=='undefined')module.exports=api;
 })(globalThis);

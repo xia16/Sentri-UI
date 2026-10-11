@@ -963,3 +963,36 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 :is(.phone,.tk-phone,.atlas-phone,.device,.st-phone,.sp-phone,[data-st-context]) [tabindex="-1"]:focus{outline:none}
 /* A waiting or disabled control says so with its surface and rim; its text stays readable (4.5:1, farm legibility law). */
 .st-hold[aria-disabled="true"] :is(.st-hold-label,.st-hold-caption){color:var(--ink);opacity:1}
+
+/* Trend and Device: Environment's sensor card and equipment card, extracted as drawn (sizes in --tr-* / --dv-* vars). */
+.st-trend{--tr-axis:9px;--tr-updated:10px;--tr-range:10px;--tr-summary:11px;--tr-table:10px;--tr-note:10px;margin-bottom:var(--space-16)}
+.st-trend-head{display:flex;align-items:center;justify-content:space-between;gap:var(--space-12)}
+.st-trend-label{font-size:12px;color:var(--muted);margin:0}
+.st-trend-value{display:block;font:400 34px var(--font-mono);margin-top:var(--space-7);letter-spacing:-1.5px;color:var(--ink)}
+.st-trend-value small{font:11px var(--font-sans);letter-spacing:0;margin-left:var(--space-5);color:var(--muted)}
+.st-trend-updated{font-size:var(--tr-updated);line-height:1.7;color:var(--muted);text-align:right}
+.st-trend-chart svg{width:100%;height:auto;display:block;stroke:none;fill:none}
+.st-trend-chart svg text{fill:var(--muted);font:var(--tr-axis) var(--font-sans);stroke:none}
+.st-trend-grid{stroke:var(--line)}
+.st-trend-stop{stop-color:var(--log-dot)}
+.st-trend-line{stroke:var(--range-fill);stroke-width:2.5;fill:none}
+.st-trend-dot{fill:var(--range-fill);stroke:var(--paper)}
+.st-trend-range{display:flex;gap:20px;padding:var(--space-8) 0 15px;font-size:var(--tr-range);color:var(--muted)}
+.st-trend-range strong{font-weight:500;color:var(--ink);margin-left:var(--space-4)}
+.st-trend-history{border-top:1px solid var(--line);font-size:var(--tr-summary)}
+.st-trend-history summary{min-height:var(--tap-min);display:flex;align-items:center;color:var(--ink);cursor:pointer}
+.st-trend-history table{width:100%;border-collapse:collapse;text-align:left;font-size:var(--tr-table)}
+.st-trend-history :is(th,td){padding:var(--space-8) 0;border-bottom:1px solid var(--line);font-weight:400}
+.st-trend-history :is(th,td):last-child{text-align:right}
+.st-trend-note{font-size:var(--tr-note);line-height:1.7;margin:var(--space-12) 0 0;color:var(--muted)}
+.st-device{--dv-state:10px;--dv-speed:11px;--dv-note:10px;margin-bottom:var(--space-16)}
+.st-device-head{display:flex;align-items:center;gap:var(--space-10)}
+.st-device-head svg{width:var(--size-20);height:var(--size-20);flex:none;fill:none;stroke:currentColor;stroke-width:var(--icon-stroke);stroke-linecap:round;stroke-linejoin:round}
+.st-device-head h3{font-size:13px;font-weight:500;margin:0}
+.st-device-head p{font-size:var(--dv-state);color:var(--muted);margin:var(--space-5) 0 0}
+.st-device>.st-selection{margin:var(--space-12) 0}
+.st-device-speed{display:flex;justify-content:space-between;font-size:var(--dv-speed);margin:13px 0 var(--space-4)}
+.st-device-range{display:block;width:100%;padding:0;min-height:var(--tap-min);border:0;accent-color:var(--green)}
+.st-device>.st-button,.st-device>button{width:100%;margin-top:var(--space-12)}
+.st-device-note{font-size:var(--dv-note);line-height:1.7;margin:var(--space-12) 0 0;color:var(--muted)}
+.st-device-updated{font-size:10px;color:var(--green);margin:var(--space-10) 0 0}
