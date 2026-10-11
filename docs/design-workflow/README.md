@@ -13,7 +13,7 @@ The farm legibility check (`scripts/check-legibility.mjs`, law in `ux/design-sys
 | Who | Decides |
 |---|---|
 | **Agents** | Every design call: layout, hierarchy, copy within the rules, components and variants. They make the call, build it well and ship it behind the gates. They don't ask first. |
-| **Gates** | Whether a change merges. Merges are automatic once every gate for the change class passes. |
+| **Gates** | Whether a change merges. Merges are automatic once every gate for the change class passes. A change that moves any screen merges only on `GATE PASS`: the mechanical checks AND the blind judge. A mechanical pass alone merges only a change that moves no screen. |
 | **Owner** | Product rules (behaviour, scope, what is saved, permissions) and approval of screens. The owner reacts to built work afterwards. Only **product rules** go to the backlog as decision items; design calls never do. |
 
 An agent score is never shown as approval. The approved version of a screen stays visible until the owner promotes the new one.
