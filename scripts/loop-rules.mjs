@@ -59,6 +59,14 @@ const SYSTEM = [
 // The shared system: SYSTEM, plus `shared` (sharedFiles on the base checkout). The gate's escalation and its queue both use it.
 export const touchesSystem = (files, shared = {}) => files.filter((f) => SYSTEM.some((re) => re.test(f)) || Object.hasOwn(shared, f));
 
+// The shared-component queue: the older open, non-draft PRs that also touch the shared system AND whose current head has passed
+// the gate (a sentri/gate success status, or a local pass record). A PR still being built or fixed does not hold the line; it is
+// gated against main again when its turn comes. prs: gh pr list --json number,headRefName,headRefOid,createdAt,isDraft,files,statusCheckRollup
+export function queueAhead(prs, mine, shared = {}, passedLocally = () => false) {
+  const gated = (p) => passedLocally(p.headRefOid) || (p.statusCheckRollup || []).some((c) => c.context === 'sentri/gate' && c.state === 'SUCCESS');
+  return prs.filter((p) => p.number !== mine.number && !p.isDraft && p.createdAt < mine.createdAt && gated(p) && touchesSystem((p.files || []).map((f) => f.path), shared).length);
+}
+
 // The outcome leaves of a features/<id>/scenarios.json tree.
 export function outcomeLeaves(spec) {
   let n = 0;

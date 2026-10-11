@@ -108,6 +108,7 @@ Each of these was rejected by the owner. The gate must fail a change that shows 
 | R11 | "Passing" badge from an agent score | score never reads as approval |
 | R12 | Conflict markers committed; old wording back after a rebase | merge forward; checks on merged result |
 | R13 | An ✕ in a drawer, or Clear on a filter | drawer convention |
+| R14 | A type pass that met the floors by enlarging everything: a history label and a sample/offline disclaimer kept prime space on the sensor card (2026-10-11) | hierarchy: the attention budget; cluttered fails even when every rule is met |
 
 ## Output
 

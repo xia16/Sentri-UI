@@ -2,7 +2,7 @@
 
 You design and build a screen, a feature or a component family for **Sentri-UI**. Sentri is a native-feel mobile app for gloved, one-handed pig-farm workers, in English and Chinese. You make the design calls yourself and build them well; the owner reacts afterwards. Work on your own branch in a worktree off `origin/main`. Never commit to `main`.
 
-The driver fills in: **TITLE**, **SCOPE**, **CHANGE CLASS** (copy · presentation · behaviour · shared component) and **MODE** (new · polish · refactor).
+The driver fills in: **TITLE**, **SCOPE**, **CHANGE CLASS** (copy · presentation · behaviour · shared component) and **MODE** (new · polish · refactor). Every build gets this whole brief, including a narrow pass (type sizes, legibility, copy). A one-off instruction is added to it and never replaces it.
 
 ## Read first
 
@@ -27,7 +27,7 @@ If something approved already does the job, start from it. You may improve it ([
 
 ## 1b. Attention budget (before any layout)
 
-Do this for every new or changed list, card or screen, before you draw. Attention is scarcer than pixels: every fact you show takes attention from the others, and a list where every row looks busy teaches the worker to stop looking. The budget decides what *not* to show.
+Do this for every new or changed list, card or screen, before you draw. That includes a pass that only raises sizes: bigger type leaves room for fewer facts, so **cut first, then enlarge**. A screen that meets the floors by enlarging everything it had is rejected (R14). Attention is scarcer than pixels: every fact you show takes attention from the others, and a list where every row looks busy teaches the worker to stop looking. The budget decides what *not* to show.
 
 1. **Inventory.** List every fact the screen could show, for each item and each state, and for every feature that reuses the pattern. Be exhaustive; cut nothing yet.
 2. **The worker's questions.** Write the questions the worker asks at that moment of the job, in the order they ask them. For a barn list: where am I? Does anything here need me? What do I do? Is this the right animal? Does anything change how I do it? Who did it, and when?

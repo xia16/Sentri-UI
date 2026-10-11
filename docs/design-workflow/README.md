@@ -13,7 +13,7 @@ The farm legibility check (`scripts/check-legibility.mjs`, law in `ux/design-sys
 | Who | Decides |
 |---|---|
 | **Agents** | Every design call: layout, hierarchy, copy within the rules, components and variants. They make the call, build it well and ship it behind the gates. They don't ask first. |
-| **Gates** | Whether a change merges. Merges are automatic once every gate for the change class passes. |
+| **Gates** | Whether a change merges. Merges are automatic once every gate for the change class passes. A change that moves any screen merges only on `GATE PASS`: the mechanical checks AND the blind judge. A mechanical pass alone merges only a change that moves no screen. |
 | **Owner** | Product rules (behaviour, scope, what is saved, permissions) and approval of screens. The owner reacts to built work afterwards. Only **product rules** go to the backlog as decision items; design calls never do. |
 
 An agent score is never shown as approval. The approved version of a screen stays visible until the owner promotes the new one.
@@ -91,7 +91,7 @@ One entry point drives them all: `/design <feature>` ([.claude/skills/design/](.
 | Behaviour | The above, plus the scenario leaves and walks that touch it (390/360, EN/ZH), screen-reader order and keyboard cover |
 | Shared component | All of the above on **every** feature that uses it. A refactor must be identical. Any change to a frozen screen needs the owner's approval. |
 
-**One queue for shared-component changes.** Two sessions changing the bundle at once is how one undoes the other. A change is shared when it touches the bundle, the tokens, the bare-screen harness, a shared stylesheet or any file that pages of two or more features load, or when it changes a screen outside its scope; `gate.mjs` decides that itself. Shared changes merge one at a time, oldest open PR first. The next one merges main forward and is gated against the new main, which re-checks every screen of every feature. Feature-only changes don't queue.
+**One queue for shared-component changes.** Two sessions changing the bundle at once is how one undoes the other. A change is shared when it touches the bundle, the tokens, the bare-screen harness, a shared stylesheet or any file that pages of two or more features load, or when it changes a screen outside its scope; `gate.mjs` decides that itself. Shared changes merge one at a time, oldest open PR first. Only a PR that has passed the gate holds its place: an older one still being built or fixed doesn't block the line. The next one merges main forward and is gated against the new main, which re-checks every screen of every feature. Feature-only changes don't queue.
 
 Every rejected owner example is a fixture each gate must fail ([gate.md](briefs/gate.md#rejected-examples)). All evidence records the commit it was taken on.
 
