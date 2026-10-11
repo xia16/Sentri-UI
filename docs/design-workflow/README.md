@@ -2,6 +2,10 @@
 
 Sentri-UI is the design source of truth for a native-feel mobile app used by gloved, one-handed farm workers in English and Chinese. AI agents run its design work. This page is the workflow. Every session and every engineer runs this one. Words are defined in the [glossary](GLOSSARY.md).
 
+When a designed feature is implemented in the native Android app, use the
+[implementation and feedback workflow](../implementation-workflow.md) to trace
+the feature, design version, native behavior and findings in both repositories.
+
 ## Legibility gate
 
 Legibility gate: no-regression
