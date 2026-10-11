@@ -43,3 +43,22 @@ Not changed (product, not presentation): the bare "Save setting" verb, the sampl
 | Fan card (title, status, segment, slider, Save) | page-built (`.device-control*`) | extract to SentriUI `deviceControl`, then fix (2, 6) |
 | Auto / Manual | SentriUI Segment | keep |
 | Save setting | SentriUI Button | keep the verb and position; give the waiting face a surface (8) |
+
+## Self-crit
+
+### Round 1, direction A1 (rejected)
+Token sizes everywhere (device name 16px, status 13px, note 13px) and the header badge swapped for a Status chip. Not better: the chip was wider than the PREVIEW badge and wrapped the page title onto two lines at 390, pushing Save back under the fold; the device card grew (c1, everything bigger). Dropped.
+
+### Round 2, direction A2 (handed over)
+- Problems: 1 axes 9 to 11px, fixed. 2 stamp, Low / High, history, note at 11px or 13px ink/muted, fixed. 3 the period control now has 14px above it, fixed. 4 trend 44 units shorter, name and stamp on one line: Save setting is on screen at 844 in Auto and offline (in Manual the slider sits in view and Save is one scroll down), fixed. 5 history has a chevron, note sits inside the card, fixed. 6 slider is ink, fixed. 7 card, chart and device card live in SensorTrend and DeviceControl, page CSS for them deleted, fixed. 8 waiting Save has the grey face, fixed. Also the 9px PREVIEW badge became "Unit 7 . Preview" in the subtitle (on this page only): the title now fits on one line at 360 too.
+- Keep: hero reading same size and place; sensor tabs, period toggle, line, Low / High, history, Auto / Manual and slider all kept; the card surface moved to the Panel (radius 16 to 18).
+- Squint: reading, trend line, Auto / Manual with Save: the three questions, in order.
+- Owner's eye: not c1 (quiet text stays 11px, only the device name rose 13 to 14); not c2 (cards and headings kept); not c3 (no new boxes, no bold). One hero, quiet support.
+- Same product as Farrowing: Panel surface, Heading section title, ink control.
+- Rejected examples: none shown.
+- Better because the chart can be read in the barn, the fan control is no longer pushed off screen, and the page uses design-system parts only.
+
+Not changed, for the driver: the bare "Save setting" verb (copy law); the DS tokens map every `font-size-9..13` to 13px, so the 11px quiet size is one local `--st-quiet` in the new CSS; Maintenance still has the old PREVIEW badge (out of scope).
+
+### Final look
+Rendered from code head 6526841 (merged with origin/main, up to date) at 390 and 360, EN and ZH (page copy is English-only, as before), beside the baselines from ccaa3f2. Nothing wrapped, no console errors, legibility check clean for all four screens, `npm test` 664 pass, atlas check ok. This note is the only commit after that head.
