@@ -11,7 +11,7 @@
 // Exit 0 when every mechanical check passes; the judge (gate.md) then writes <out>/verdict.json, and
 // `node scripts/gate.mjs --verdict <out>` checks it against mechanical.json, the PR head and origin/main.
 import { spawn, spawnSync } from 'node:child_process';
-import { createRequire } from 'node:module';
+import { pwPath, playwright } from './playwright-path.mjs';
 import { createServer } from 'node:net';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -20,8 +20,7 @@ import { fileURLToPath } from 'node:url';
 import { CLASSES, screensOf, pageOf, pageAssets, sharedFiles, coverageLost, effectiveClass, classifyScreens, checkVerdict, touchesSystem, touchesTools, queueAhead as queueOf, budgetProblems, pageStyling, addedLines, calibrationProblems } from './loop-rules.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const PW_HOME = 'C:/Users/ying_/.cache/adam-design/playwright-1.63.0';
-const pwPath = process.env.SENTRI_PLAYWRIGHT || PW_HOME + '/node_modules/playwright';
+
 
 const argv = process.argv.slice(2);
 const opt = (k) => { const i = argv.indexOf('--' + k); return i >= 0 && argv[i + 1] && !argv[i + 1].startsWith('--') ? argv[i + 1] : null; };
@@ -257,7 +256,7 @@ check('npm run check', r.code === 0, r.all.find((l) => /atlas:/.test(l)) || r.ta
 const [shotsBase, shotsCand] = await capture;
 if (!shotsBase || !shotsCand) { check('every screen shot on both sides', false, 'shoot-screens wrote no shots.json (its errors are above)'); finish(1); }
 
-const { chromium } = createRequire(PW_HOME + '/package.json')(pwPath);
+const { chromium } = playwright();
 const browser = await chromium.launch();
 const page = await browser.newPage();
 // Exact: a pixel counts when any of its channels differs. An image that doesn't decode counts as all different.
@@ -355,13 +354,27 @@ if (ec.cls === 'shared') {
 }
 function queueAhead() {
   const branch = ref.replace(/^origin\//, '');
-  const res = spawnSync('gh', ['pr', 'list', '--state', 'open', '--limit', '100', '--json', 'number,headRefName,headRefOid,createdAt,isDraft,files,statusCheckRollup'], { cwd: root, encoding: 'utf8', maxBuffer: 64 << 20 });
-  if (res.status) return { ok: false, detail: `cannot read the queue (gh pr list failed): ${(res.stderr || '').trim().split('\n')[0]}` };
-  const prs = JSON.parse(res.stdout);
+  const prs = openPrs();
+  if (prs.error) return { ok: false, detail: `cannot read the queue: ${prs.error}` };
   const mine = prs.find((p) => p.headRefName === branch);
   if (!mine) return { ok: false, detail: `no open PR for ${branch}: open one, the queue orders PRs` };
   const ahead = queueOf(prs, mine, shared, (sha) => !!sha && fs.existsSync(passRecord(sha)));
   return ahead.length ? { ok: false, detail: `waiting behind ${ahead.map((p) => '#' + p.number).join(', ')}: merge or close those first, then merge main forward and gate again` } : { ok: true, detail: `#${mine.number}` };
+}
+
+// The open PRs in the shape `gh pr list --json number,headRefName,headRefOid,createdAt,isDraft,files,statusCheckRollup` gives,
+// read over REST: GraphQL (which gh pr list uses) is blocked in cloud sessions.
+function openPrs() {
+  // Pages by number: --paginate follows Link headers with numeric-ID paths, which the cloud proxy refuses.
+  const page = (p, jq) => { const r = spawnSync('gh', ['api', p, '--jq', jq], { cwd: root, encoding: 'utf8', maxBuffer: 64 << 20 }); if (r.status) throw new Error(`gh api ${p} failed: ${(r.stderr || '').trim().split('\n')[0]}`); return r.stdout.trim().split('\n').filter(Boolean).map((l) => JSON.parse(l)); };
+  const api = (p, jq) => { const all = []; for (let n = 1; n <= 30; n++) { const got = page(`${p}&page=${n}`, jq); all.push(...got); if (got.length < 100) break; } return all; };
+  try {
+    return api('repos/{owner}/{repo}/pulls?state=open&per_page=100', '.[] | {number, headRefName: .head.ref, headRefOid: .head.sha, createdAt: .created_at, isDraft: .draft}').map((p) => ({
+      ...p,
+      files: api(`repos/{owner}/{repo}/pulls/${p.number}/files?per_page=100`, '.[] | {path: .filename}'),
+      statusCheckRollup: api(`repos/{owner}/{repo}/commits/${p.headRefOid}/statuses?per_page=100`, '.[] | {context, state: (.state | ascii_upcase)}'),
+    }));
+  } catch (e) { return { error: e.message }; }
 }
 
 // ---------- legibility on the changed screens ----------
