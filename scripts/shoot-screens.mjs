@@ -64,8 +64,10 @@ for (const width of widths) {
   for (const c of todo) for (const lang of langs) {
     // A fresh tab per shot: a screen that goes back in history would otherwise land on the screen shot before it.
     const page = await context.newPage();
-    // A fixed clock: a screen that prints "now" (a receipt's time) would otherwise differ from minute to minute.
-    await page.clock.setFixedTime(new Date('2026-10-11T09:41:00'));
+    // The clock starts at a fixed moment and then runs: a screen that prints "now" (a receipt's time) would otherwise differ
+    // from minute to minute, and a frozen clock would stall the screens' own tap guards and timers.
+    await page.clock.install({ time: new Date('2026-10-11T09:41:00') });
+    await page.clock.resume();
     page.on('requestfailed', (r) => { if (/^https:\/\/fonts\.(googleapis|gstatic)\.com\//.test(r.url())) fontFailures.add(r.url()); });
     const file = path.join(out, c.id, `${lang}-${width}.png`);
     const run = { screen: c.id, feature: c.feature, lang, width, file: path.relative(out, file).replace(/\\/g, '/'), ok: false };
