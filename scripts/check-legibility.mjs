@@ -49,7 +49,7 @@ function auditInPage(F) {
 
   // is a box really on screen: inside the frame, not clipped by an overflow:hidden ancestor, not faded or hidden
   const shown = (el, r) => {
-    if (r.right <= 0 || r.left >= W || r.bottom <= 0) return false;
+    if (r.right <= 0 || r.left >= W || r.bottom <= 0 || r.top >= H) return false; // below the fold: audited when auditUrl scrolls it into view
     if (r.width < 2 && r.height < 2) return false;
     for (let e = el; e && e.nodeType === 1; e = e.parentElement) {
       const s = cs(e);
@@ -92,10 +92,12 @@ function auditInPage(F) {
   }
 
   const out = { small: [], c45: [], c7: [], taps: [], unverified: 0, sizes: {} };
+  const seen = window.__legSeen || (window.__legSeen = new WeakSet()); // one count per node across scroll positions
   const push = (arr, o) => { const f = arr.find((a) => a.sel === o.sel && a.px === o.px && a.ratio === o.ratio && a.size === o.size); if (f) f.n++; else arr.push({ n: 1, ...o }); };
 
-  const checkText = (el, rect, text, color, px) => {
-    if (!px || !text.trim() || !shown(el, rect) || chrome(el)) return;
+  const checkText = (el, rect, text, color, px, key = el) => {
+    if (seen.has(key) || !px || !text.trim() || !shown(el, rect) || chrome(el)) return;
+    seen.add(key);
     const sample = text.trim().replace(/\s+/g, ' ').slice(0, 40), disabled = !!el.closest(':disabled, [aria-disabled="true"]');
     out.sizes[px] = (out.sizes[px] || 0) + 1;
     const rec = { sel: sel(el), text: sample, px };
@@ -122,7 +124,7 @@ function auditInPage(F) {
     const rect = [...range.getClientRects()].find((r) => r.width > 0 && r.height > 0);
     if (!rect) continue;
     const s = cs(el);
-    checkText(el, rect, n.nodeValue, parse(s.color), parseFloat(s.fontSize));
+    checkText(el, rect, n.nodeValue, parse(s.color), parseFloat(s.fontSize), n);
   }
   for (const el of document.querySelectorAll('input:not([type=hidden]):not([type=checkbox]):not([type=radio]):not([type=range]), textarea')) {
     const rect = el.getBoundingClientRect(), s = cs(el), px = parseFloat(s.fontSize);
@@ -138,7 +140,8 @@ function auditInPage(F) {
     if (el.tagName === 'INPUT' && el.labels && el.labels.length) continue; // its label is the hit area
     if (el.tagName !== 'INPUT' && el.parentElement && el.parentElement.closest(NATIVE)) continue;
     const r = el.getBoundingClientRect();
-    if (!shown(el, r) || chrome(el)) continue;
+    if (seen.has(el) || !shown(el, r) || chrome(el)) continue;
+    seen.add(el);
     const top = document.elementFromPoint(Math.min(Math.max(r.left + r.width / 2, 0), W - 1), Math.min(Math.max(r.top + r.height / 2, 0), H - 1));
     if (top && !related(top, el)) { const t = top.closest(TAP); if (!t || !related(t, el)) continue; } // covered by something else
     let L = r.left, T = r.top, R = r.right, B = r.bottom;
@@ -211,7 +214,22 @@ async function auditUrl(browser, url, bare) {
     await page.waitForTimeout(600);
     await page.evaluate(() => document.fonts.ready);
     const parts = [];
-    for (const fr of page.frames()) { try { if (await fr.evaluate(() => innerWidth > 0 && innerHeight > 0)) parts.push(await fr.evaluate(auditInPage, FLOORS)); } catch (e) { /* detached frame */ } }
+    for (const fr of page.frames()) {
+      try {
+        if (!(await fr.evaluate(() => innerWidth > 0 && innerHeight > 0))) continue;
+        parts.push(await fr.evaluate(auditInPage, FLOORS));
+        // Below the fold counts too: scroll every scroll area a screen at a time and audit what comes into view (each node once).
+        const steps = await fr.evaluate(() => [document.scrollingElement, ...document.querySelectorAll('*')].filter((e) => e && e.scrollHeight > e.clientHeight + 8 && (e === document.scrollingElement || /auto|scroll/.test(getComputedStyle(e).overflowY)) && e.clientHeight > 0).length);
+        for (let i = 0; i < steps; i++) {
+          for (let k = 0; k < 40; k++) {
+            const moved = await fr.evaluate((i) => { const sc = [document.scrollingElement, ...document.querySelectorAll('*')].filter((e) => e && e.scrollHeight > e.clientHeight + 8 && (e === document.scrollingElement || /auto|scroll/.test(getComputedStyle(e).overflowY)) && e.clientHeight > 0)[i]; if (!sc) return false; const before = sc.scrollTop; sc.scrollTop = before + Math.max(200, Math.round(sc.clientHeight * 0.8)); return sc.scrollTop > before; }, i);
+            if (!moved) break;
+            await page.waitForTimeout(80);
+            parts.push(await fr.evaluate(auditInPage, FLOORS));
+          }
+        }
+      } catch (e) { /* detached frame */ }
+    }
     const tokens = await page.evaluate(tokensInPage, FLOORS);
     return { audit: merge(parts), tokens };
   } finally { await ctx.close(); }
