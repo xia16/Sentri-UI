@@ -22,7 +22,7 @@ An agent score is never shown as approval. The approved version of a screen stay
 
 - **Platform first.** Under Mobile everything is the mobile app: touch-only states (Default, Pressed, Selected, Disabled, Error, Loading, Empty, Long label / Chinese). No designed hover, focus rings or keyboard rows. Screen-reader order and the keyboard covering Done are real and are checked.
 - **Components come from real features.** Approved screens are the baseline. A component reproduces them and improves only by improving a feature.
-- **A change must beat what it replaces**, side by side at 390px. Same or worse fails. A refactor must be identical.
+- **A change must beat what it replaces**, side by side at 390px. Same or worse fails. A refactor must be identical. **The driver looks first:** before any judge or the owner sees a change, the driver opens the before/after pairs and writes one line, better or not and why. A change the driver can't call better goes back, not forward.
 - **Copy fits the component; real data wraps safely.** Labels we write meet the copy budget. Medicine names, ear tags and farm names can't be shortened, so each component states how it wraps and shows the full value.
 - **Drawer convention.** Footer **Back** leaves and keeps the draft. **‹ Parent** goes up a level. No ✕. **Done** applies. **Reset** for filters, **Clear** for input.
 - **No reason line above a disabled button.**

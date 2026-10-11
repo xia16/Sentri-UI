@@ -19,7 +19,8 @@ const PW = process.env.PLAYWRIGHT_DIR || 'C:/Users/ying_/.cache/adam-design/play
 const { chromium } = createRequire('C:/Users/ying_/.cache/adam-design/playwright-1.63.0/package.json')(PW);
 const TYPES = { '.html': 'text/html', '.css': 'text/css', '.js': 'text/javascript', '.mjs': 'text/javascript', '.cjs': 'text/javascript', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.webp': 'image/webp', '.gif': 'image/gif', '.woff': 'font/woff', '.woff2': 'font/woff2', '.ttf': 'font/ttf', '.otf': 'font/otf', '.md': 'text/plain' };
 
-const FLOORS = { minText: 13, bodyText: 16, contrast: 4.5, contrastPrimary: 7, tap: 48 };
+// minText: quiet descriptive text; actText: text inside a control (what a worker reads to act on). Owner, 2026-10-11.
+const FLOORS = { minText: 11, actText: 13, bodyText: 16, contrast: 4.5, contrastPrimary: 7, tap: 48 };
 
 const argv = process.argv.slice(2);
 const flag = (n) => argv.includes(n);
@@ -95,13 +96,14 @@ function auditInPage(F) {
   const seen = window.__legSeen || (window.__legSeen = new WeakSet()); // one count per node across scroll positions
   const push = (arr, o) => { const f = arr.find((a) => a.sel === o.sel && a.px === o.px && a.ratio === o.ratio && a.size === o.size); if (f) f.n++; else arr.push({ n: 1, ...o }); };
 
+  const ACT = 'button, a[href], input, select, textarea, summary, label, [role=button], [role=tab], [role=link], [role=checkbox], [role=radio], [role=switch], [role=menuitem], [role=option], [data-action]';
   const checkText = (el, rect, text, color, px, key = el) => {
     if (seen.has(key) || !px || !text.trim() || !shown(el, rect) || chrome(el)) return;
     seen.add(key);
     const sample = text.trim().replace(/\s+/g, ' ').slice(0, 40), disabled = !!el.closest(':disabled, [aria-disabled="true"]');
     out.sizes[px] = (out.sizes[px] || 0) + 1;
     const rec = { sel: sel(el), text: sample, px };
-    if (px < F.minText) push(out.small, rec);
+    if (px < (el.closest(ACT) ? F.actText : F.minText)) push(out.small, rec);
     // Disabled text is NOT exempt (unlike WCAG): a greyed-out pen tile or "Save · 0 pigs" still carries information a farmer reads.
     // Show "unavailable" with the surface, an icon or a word, never by fading the text. (Owner, 2026-10-10.)
     void disabled;
@@ -304,7 +306,7 @@ const doc = {
 if (!only && !flag('--no-write')) { fs.mkdirSync(path.join(root, 'review'), { recursive: true }); fs.writeFileSync(path.join(root, 'review/legibility.json'), JSON.stringify(doc, null, 1) + '\n'); }
 
 const t = doc.totals;
-console.log('legibility: ' + t.screens + ' screens, ' + t.screensFailing + ' fail (text <' + FLOORS.minText + 'px: ' + t.small + ' nodes, contrast <' + FLOORS.contrast + ': ' + t.contrast + ', 16px+ text <' + FLOORS.contrastPrimary + ': ' + t.contrastPrimary + ', targets <' + FLOORS.tap + 'px: ' + t.taps + ')' + (t.errors ? ', ' + t.errors + ' could not render' : ''));
+console.log('legibility: ' + t.screens + ' screens, ' + t.screensFailing + ' fail (text <' + FLOORS.minText + 'px or <' + FLOORS.actText + 'px in a control: ' + t.small + ' nodes, contrast <' + FLOORS.contrast + ': ' + t.contrast + ', 16px+ text <' + FLOORS.contrastPrimary + ': ' + t.contrastPrimary + ', targets <' + FLOORS.tap + 'px: ' + t.taps + ')' + (t.errors ? ', ' + t.errors + ' could not render' : ''));
 const show = changed.length ? ok.filter((r) => changed.includes(r.id) && r.fails) : ok.filter((r) => r.fails).sort((a, b) => b.small + b.taps + b.contrast - (a.small + a.taps + a.contrast)).slice(0, 8);
 for (const r of show) {
   console.log('  ' + r.id + ': ' + r.small + ' small, ' + (r.contrast + r.contrastPrimary) + ' contrast, ' + r.taps + ' targets');

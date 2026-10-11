@@ -1,0 +1,8 @@
+{
+  "about": "Pairs the owner has ruled on. Every judge rates each one (BASE left, CANDIDATE right) before its own scope; a judge that rates any of them against the owner is not used. Add each new owner ruling here.",
+  "pairs": {
+    "c1": { "owner": "not-better", "said": "better now, but a lot more cluttered; I would not call this passing", "date": "2026-10-11" },
+    "c2": { "owner": "not-better", "said": "calmer but no visual hierarchy; just a bunch of information put on a screen, no UI", "date": "2026-10-11" },
+    "c3": { "owner": "not-better", "said": "the left one is still better; yours looks like a bulky brute", "date": "2026-10-11" }
+  }
+}

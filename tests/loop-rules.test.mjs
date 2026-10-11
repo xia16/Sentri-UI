@@ -1,7 +1,7 @@
 // The gate's and the polish loop's rules (scripts/loop-rules.mjs).
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { queueAhead, effectiveClass, classifyScreens, checkVerdict, checkGrades, worstFirst, isClean, loopStatus, touchesSystem, touchesTools, regressions,
+import { queueAhead, calibrationProblems, budgetProblems, pageStyling, addedLines, effectiveClass, classifyScreens, checkVerdict, checkGrades, worstFirst, isClean, loopStatus, touchesSystem, touchesTools, regressions,
   pageOf, pageAssets, sharedFiles, outcomeLeaves, coverageLost } from '../scripts/loop-rules.mjs';
 
 test('a change to the bundle or tokens is a shared-component change whatever was declared', () => {
@@ -240,4 +240,24 @@ test('the shared queue holds only older shared PRs whose head has passed the gat
     pr(110, '2026-10-07', { statusCheckRollup: ok, isDraft: true }), pr(109, '2026-10-06', { statusCheckRollup: ok, files: [{ path: 'features/x/PRD.md' }] }), pr(121, '2026-10-12', { statusCheckRollup: ok })];
   assert.deepEqual(queueAhead(prs, mine).map((p) => p.number), [112]);
   assert.deepEqual(queueAhead(prs, mine, {}, (sha) => sha === 'sha113').map((p) => p.number), [113, 112]);
+});
+
+test('a feature whose screens change needs its information budget, with inventory, questions and levels', () => {
+  const files = { 'features/a/budget.md': '## Inventory\n## Questions\n## Levels\n', 'features/b/budget.md': '## Inventory\n' };
+  assert.deepEqual(budgetProblems(['a', 'a', 'b', 'c'], (p) => files[p] ?? null), ['b: budget.md lacks ## Questions, ## Levels', 'c: no features/c/budget.md']);
+});
+
+test('visual styling added in a page is an improvised component; layout and the design system are fine', () => {
+  const diff = ['+++ b/ux/system/home.css', '+.tile{padding:12px;gap:8px}', '+.tile.on{border-bottom:3px solid var(--ink)}', '+.x{font-size:11px} /* ds-exception: chart axis */',
+    '+++ b/ux/system/home.js', "+  return `<div class=\"t\" style=\"display:grid;color:red\">`;", '+  el.style.marginTop = "4px";', '+  el.style.backgroundColor = "#fff";',
+    '+++ b/ux/design-system/components/bundle.css', '+.st-tile{border:1px solid var(--line)}'].join('\n');
+  assert.deepEqual(pageStyling(addedLines(diff)).map((p) => p.file.split('/').pop() + ' ' + p.prop), ['home.css border-bottom', 'home.js color', 'home.js background-color']);
+});
+
+test('a judge that rates an owner-rejected calibration pair better, or skips one, is not used', () => {
+  const answers = { c1: { owner: 'not-better', said: 'cluttered' }, c2: { owner: 'not-better', said: 'flat' } };
+  assert.deepEqual(calibrationProblems([{ calibration: [{ pair: 'c1', verdict: 'worse' }, { pair: 'c2', verdict: 'same' }] }], answers), []);
+  const bad = calibrationProblems([{ calibration: [{ pair: 'c1', verdict: 'better' }] }], answers);
+  assert.equal(bad.length, 2);
+  assert.match(bad[0], /c1 better/); assert.match(bad[1], /c2 not rated/);
 });
