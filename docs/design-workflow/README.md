@@ -123,6 +123,8 @@ Every rejected owner example is a fixture each gate must fail ([gate.md](briefs/
 | [briefs/review.md](briefs/review.md) | Screen and atlas reviews that feed the backlog |
 | [freeze-checklist.md](freeze-checklist.md) | Freeze and propagation |
 
+The owner's taste, drawn from their rulings, is [taste.md](taste.md): builders aim at it and judges stand in for it.
+
 Standards these briefs point to: `ux/design-system/README.md` (laws), `docs/design-workflow/research/component-standard.md` (component page anatomy and checklist), and `atlas/SCHEMA.md` (atlas data and backlog item format).
 
 ## Background

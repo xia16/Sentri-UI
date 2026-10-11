@@ -22,6 +22,7 @@ The size of the change follows the problems. A screen with two broken things get
 ## Read first
 
 - `docs/design-workflow/README.md`: owner rules, gates, who decides.
+- `docs/design-workflow/taste.md`: the owner's eye, what good looks like here and what was rejected.
 - `ux/design-system/README.md`: the laws (copy, colour, type, space, record-sheet law, optional inputs are optional rows). Also `tokens.json`/`tokens.css` and `IMPLEMENTATIONS.md`: one implementation in `components/bundle.js` + `bundle.css`, namespace `SentriUI`. Never edit the retired `ux/system/sentri-components.*`.
 - `docs/design-workflow/research/component-standard.md`: page anatomy, the component/variant/pattern rule and per-type states.
 - `docs/design-workflow/GLOSSARY.md` and `atlas/SCHEMA.md`.
@@ -42,7 +43,7 @@ If something approved already does the job, start from it. You may improve it ([
 
 ## 1a. Critique the original (before the budget)
 
-Do this before the budget and before you draw. Look at your baselines at 390px, beside an approved screen (Farrowing), and at the owner's calibration pairs in `docs/design-workflow/calibration/` (`answers.json` says why each was rejected: cluttered, flat, bulky). Write **`features/<id>/critique.md`** and commit it before any screen change; the gate refuses screen changes without it. It has `## Keep`, `## Problems` and `## Parts`, written now, and `## Self-crit`, written in §1d:
+Do this before the budget and before you draw. Read [the owner's eye](../taste.md) first: what good looks like here and the three ways earlier passes lost (cluttered, flat, bulky). Then look at your baselines at 390px, beside an approved screen (Farrowing), and at the calibration pairs in `docs/design-workflow/calibration/`. Write **`features/<id>/critique.md`** and commit it before any screen change; the gate refuses screen changes without it. It has `## Keep`, `## Problems` and `## Parts`, written now, and `## Self-crit`, written in §1d:
 
 - **`## Keep`**: what the original does well, named element by element, with why it works (e.g. "the 34px reading is the first thing the eye lands on: it answers 'is the room OK?'"). A designer keeps what works. A kept element survives at least as strong as it was: same or more weight, same position in the order. It changes only when a problem below names it.
 - **`## Problems`**: what is broken, each with its evidence: a check's output (`check-legibility`, `check-states`), an owner rule or rejected example it breaks, or a worker question it fails to answer, with the element named. Mark each **major** (the worker misreads, can't act, or can't read it in the barn) or **minor**. Taste without evidence is not a problem.
@@ -109,7 +110,7 @@ A part a component already draws stays on that component; improve the component 
    - each problem: fixed or not;
    - each keep item: as strong as before or not;
    - the squint test: the first three things the eye lands on, and the worker's first three questions;
-   - the calibration failures: is it more cluttered (c1), flatter (c2) or bulkier (c3) than the original?
+   - [the owner's eye](../taste.md): is it more cluttered (c1: everything bigger), flatter (c2: structure removed) or bulkier (c3: more boxes, bold and size) than the original? Is there one light hero per group with small quiet support?
    - does it look like the same product as the approved screens, at their level of finish?
    - the rejected examples (gate.md, R1–R16) it could show;
    - one line: **better because …** or **not better because …**.
