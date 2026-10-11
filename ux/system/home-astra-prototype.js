@@ -335,8 +335,8 @@
     if(a==='sensor-range'){state.sensorRange=v;renderSync();return;}
     if(a==='sensor-history'){const s=availableSensors().find(s=>s.id===state.sensor)||availableSensors()[0];if(s)drawer(s.name+' · '+(state.sensorRange==='week'?'7 days':'today'),SentriUI.facts(sensorHistory(s).map(r=>({label:r.time,value:r.value+' '+s.unit,mono:true}))));return;}
     if(a==='fan-edit'){if(sync.connection==='offline')return;fanSheet();return;}
-    if(a==='fan-mode'){unitDevices()[0].draftMode=v;fanSheet();overlay.querySelector('[data-action="fan-mode"][aria-pressed="true"]')?.focus({preventScroll:true});return;}
-    if(a==='fan-speed'){const d=unitDevices()[0],step=+el.dataset.step||0;d.draftSpeed=Math.max(0,Math.min(100,d.draftSpeed+step));fanSheet();overlay.querySelector('[data-action="fan-speed"][data-step="'+step+'"]')?.focus({preventScroll:true});return;}
+    if(a==='fan-mode'){unitDevices()[0].draftMode=v;fanSheet();return;}
+    if(a==='fan-speed'){const d=unitDevices()[0],step=+el.dataset.step||0;d.draftSpeed=Math.max(0,Math.min(100,d.draftSpeed+step));fanSheet();return;}
     if(a==='apply-device'){const d=unitDevices()[0];if(sync.connection==='offline'||!fanDirty(d))return;d.mode=d.draftMode;d.speed=d.draftSpeed;closeDrawer();renderSync();toast('Sample setting saved · no equipment command sent');return;}
     if(a==='report-fault'){reportFault();return;}
     if(a==='fault-detail'){faultDetail(v);return;}

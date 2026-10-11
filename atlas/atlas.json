@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-11T15:41:34.501Z",
- "commit": "bcb84e4",
+ "generated": "2026-10-11T15:49:07.727Z",
+ "commit": "bd98f4d",
  "platforms": [
   {
    "id": "mobile",
@@ -23098,12 +23098,59 @@
       "environment.sensor-other"
      ],
      "note": "A line over time for one reading (temperature, humidity, ammonia), with its low and high marked where they happen and the last point filled. Today draws 8 points, 7 days draws 7. The Environment page draws it as hand-built SVG, styled in home-astra-prototype.css under ds-exception markers; it should move into the bundle with tokens (line ink, area well, marks ink, axis muted at 11px, drawn at 288 wide so a 360px phone never scales its labels below 11px). Likely reuse: weight and feed curves."
+    },
+    {
+     "name": "Reading tile",
+     "group": "Data display",
+     "status": "placeholder",
+     "seenIn": [
+      "environment.page",
+      "environment.sensor-week",
+      "environment.sensor-other"
+     ],
+     "note": "A sensor readout where the value leads: a large mono figure with its unit, a quiet label, selectable among two or three. The Environment page uses the two-line Segment (name over a 13px mono value), so the number is smaller than its label; a worker reading a room at arm's length wants the figure first. Likely reuse: unit summary on Home, pen climate."
     }
    ],
    "copy": {
     "registry": "ux/laws/strings.json"
    },
    "backlog": [
+    {
+     "severity": "medium",
+     "source": "build",
+     "id": "environment-sensor-offline-fan",
+     "target": {
+      "kind": "screen",
+      "id": "environment.page"
+     },
+     "kind": "decision",
+     "title": "Offline: is the fan disabled, or read-only with nothing to tap?",
+     "detail": "The PRD says everything is disabled offline with \"Reconnect to change device settings.\" The design system prefers omission over greyed controls, and its disabled Segment measures 2.7:1 (the legibility floor is 4.5:1). The built screen shows one Offline notice carrying that sentence, and the fan row is read-only (no chevron, no sheet).",
+     "options": [
+      "Read-only fan row plus the Offline notice (built)",
+      "Keep Auto, Manual and Save visible but disabled, with the PRD sentence beside them (needs a Segment disabled face that meets 4.5:1)"
+     ],
+     "recommendation": "Read-only fan row plus the notice: nothing is greyed, the reason is said once."
+    },
+    {
+     "severity": "low",
+     "source": "build",
+     "id": "environment-sensor-fan-input",
+     "target": {
+      "kind": "screen",
+      "id": "environment.fan-manual"
+     },
+     "kind": "decision",
+     "title": "How does a gloved worker set the fan speed?",
+     "detail": "The PRD fixes the range (0-100 in steps of 5) and an explicit Save, not the control. A slider is hard to land on a value with gloves, so the built sheet uses a stepper (5 % a tap). Moving from 45 to 100 takes 11 taps. Changing the fan now takes a row tap and a sheet instead of controls inline.",
+     "options": [
+      "Stepper in a sheet, 5 % a tap (built)",
+      "Stepper with hold-to-repeat",
+      "Presets (Off, 25, 50, 75, 100) plus the stepper",
+      "Inline slider (the previous design)"
+     ],
+     "recommendation": "Keep the stepper; add presets only if the owner reports long runs of taps in practice."
+    },
     {
      "severity": "medium",
      "source": "populate-events",

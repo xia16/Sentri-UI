@@ -1,0 +1,32 @@
+[
+  {
+    "id": "environment-sensor-offline-fan",
+    "target": { "kind": "screen", "id": "environment.page" },
+    "kind": "decision",
+    "severity": "medium",
+    "title": "Offline: is the fan disabled, or read-only with nothing to tap?",
+    "detail": "The PRD says everything is disabled offline with \"Reconnect to change device settings.\" The design system prefers omission over greyed controls, and its disabled Segment measures 2.7:1 (the legibility floor is 4.5:1). The built screen shows one Offline notice carrying that sentence, and the fan row is read-only (no chevron, no sheet).",
+    "options": [
+      "Read-only fan row plus the Offline notice (built)",
+      "Keep Auto, Manual and Save visible but disabled, with the PRD sentence beside them (needs a Segment disabled face that meets 4.5:1)"
+    ],
+    "recommendation": "Read-only fan row plus the notice: nothing is greyed, the reason is said once.",
+    "source": "build"
+  },
+  {
+    "id": "environment-sensor-fan-input",
+    "target": { "kind": "screen", "id": "environment.fan-manual" },
+    "kind": "decision",
+    "severity": "low",
+    "title": "How does a gloved worker set the fan speed?",
+    "detail": "The PRD fixes the range (0-100 in steps of 5) and an explicit Save, not the control. A slider is hard to land on a value with gloves, so the built sheet uses a stepper (5 % a tap). Moving from 45 to 100 takes 11 taps. Changing the fan now takes a row tap and a sheet instead of controls inline.",
+    "options": [
+      "Stepper in a sheet, 5 % a tap (built)",
+      "Stepper with hold-to-repeat",
+      "Presets (Off, 25, 50, 75, 100) plus the stepper",
+      "Inline slider (the previous design)"
+    ],
+    "recommendation": "Keep the stepper; add presets only if the owner reports long runs of taps in practice.",
+    "source": "build"
+  }
+]
