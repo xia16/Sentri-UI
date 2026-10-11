@@ -49,6 +49,8 @@ Do this before the budget and before you draw. Read [the owner's eye](../taste.m
 - **`## Problems`**: what is broken, each with its evidence: a check's output (`check-legibility`, `check-states`), an owner rule or rejected example it breaks, or a worker question it fails to answer, with the element named. Mark each **major** (the worker misreads, can't act, or can't read it in the barn) or **minor**. Taste without evidence is not a problem.
 - **`## Parts`**: every visible part of the screen, what draws it (a SentriUI component by name, or "page-built" with its file) and whether you keep it, fix it or cut it.
 
+**A check never redesigns a kept part.** When a mechanical check fails a part on your keep-list (often right after you extract it, since checks now see it), don't change the part to satisfy the check: the owner kept it, so the check is what to question. Stop, say which check and which part in your final message, and leave the part as it was; the driver fixes or narrows the check in a workflow PR. A segmented control's track inside a card was once turned into two pill buttons this way.
+
 **Scope follows the critique.** In **polish** mode you change only the parts a problem names; everything else stays as it is. In **new** mode the critique is of the old UI and its closest live screens, and the keep-list says what the new design must carry over. If the problems are all minor, make the minor fixes and stop.
 
 ## 1b. Attention budget (before any layout)
@@ -161,6 +163,10 @@ Two tiers: run the mechanical checks after each edit (`node scripts/check-states
 - Run `npm run ux` and open every changed screen bare at 390×844 and 360×800, in EN and ZH. Check for no console errors and targets ≥ 48px, and take after-screenshots on the same states as the baselines. Use Playwright if it's installed (`SENTRI_PLAYWRIGHT` may point to it). If it isn't, say so.
 - For a behaviour change, walk the scenario leaves it touches (see `briefs/polish-loop.md`, "Executable leaves").
 - Merge main forward (`git fetch origin && git merge origin/main`), rerun the above, and record the commit your evidence is from. Don't chain commands so that a failure hides.
+
+## Crit rounds
+
+The driver looks at your before/after pairs before anyone else. If they can't call it better, they send it back with the one reason that decided it. Fix that reason and anything else it points at, without touching what was already right, redo the final look (§1d) and hand over again. A reason that asks you to change a kept part, or that you disagree with, gets a one-line answer, not a silent change.
 
 ## Final message
 
