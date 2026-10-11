@@ -26,7 +26,8 @@ const polish = (() => { try { return JSON.parse(read(path.join(root, 'review', `
 
 // The feature's map: an open or closed wayfinder:map issue whose title names the feature. gh may be unavailable; then unknown.
 function findMap() {
-  const r = spawnSync('gh', ['issue', 'list', '--label', 'wayfinder:map', '--state', 'all', '--limit', '100', '--json', 'number,title,state'], { cwd: root, encoding: 'utf8' });
+  // REST, not `gh issue list`: GraphQL is blocked in cloud sessions
+  const r = spawnSync('gh', ['api', 'repos/{owner}/{repo}/issues?labels=wayfinder:map&state=all&per_page=100', '--jq', '[.[] | select(.pull_request | not) | {number, title, state: (.state | ascii_upcase)}]'], { cwd: root, encoding: 'utf8' });
   if (r.status !== 0) return { unknown: true };
   const names = [f.name, f.zh, feature].filter(Boolean).map((n) => n.toLowerCase());
   const map = JSON.parse(r.stdout).find((m) => names.some((n) => m.title.toLowerCase().includes(n)));

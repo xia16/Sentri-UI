@@ -352,13 +352,25 @@ if (ec.cls === 'shared') {
 }
 function queueAhead() {
   const branch = ref.replace(/^origin\//, '');
-  const res = spawnSync('gh', ['pr', 'list', '--state', 'open', '--limit', '100', '--json', 'number,headRefName,headRefOid,createdAt,isDraft,files,statusCheckRollup'], { cwd: root, encoding: 'utf8', maxBuffer: 64 << 20 });
-  if (res.status) return { ok: false, detail: `cannot read the queue (gh pr list failed): ${(res.stderr || '').trim().split('\n')[0]}` };
-  const prs = JSON.parse(res.stdout);
+  const prs = openPrs();
+  if (prs.error) return { ok: false, detail: `cannot read the queue: ${prs.error}` };
   const mine = prs.find((p) => p.headRefName === branch);
   if (!mine) return { ok: false, detail: `no open PR for ${branch}: open one, the queue orders PRs` };
   const ahead = queueOf(prs, mine, shared, (sha) => !!sha && fs.existsSync(passRecord(sha)));
   return ahead.length ? { ok: false, detail: `waiting behind ${ahead.map((p) => '#' + p.number).join(', ')}: merge or close those first, then merge main forward and gate again` } : { ok: true, detail: `#${mine.number}` };
+}
+
+// The open PRs in the shape `gh pr list --json number,headRefName,headRefOid,createdAt,isDraft,files,statusCheckRollup` gives,
+// read over REST: GraphQL (which gh pr list uses) is blocked in cloud sessions.
+function openPrs() {
+  const api = (p, jq) => { const r = spawnSync('gh', ['api', '--paginate', p, '--jq', jq], { cwd: root, encoding: 'utf8', maxBuffer: 64 << 20 }); if (r.status) throw new Error(`gh api ${p} failed: ${(r.stderr || '').trim().split('\n')[0]}`); return r.stdout.trim().split('\n').filter(Boolean).map((l) => JSON.parse(l)); };
+  try {
+    return api('repos/{owner}/{repo}/pulls?state=open&per_page=100', '.[] | {number, headRefName: .head.ref, headRefOid: .head.sha, createdAt: .created_at, isDraft: .draft}').map((p) => ({
+      ...p,
+      files: api(`repos/{owner}/{repo}/pulls/${p.number}/files?per_page=100`, '.[] | {path: .filename}'),
+      statusCheckRollup: api(`repos/{owner}/{repo}/commits/${p.headRefOid}/statuses?per_page=100`, '.[] | {context, state: (.state | ascii_upcase)}'),
+    }));
+  } catch (e) { return { error: e.message }; }
 }
 
 // ---------- legibility on the changed screens ----------
