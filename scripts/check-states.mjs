@@ -57,10 +57,12 @@ function audit(stateName) {
   }
 
   // (b) nested surfaces: ground > item > another wide surface. A phone frame and a sheet's own scrim/panel are ground-like layers of the item, not extra surfaces.
+  // A segmented control's track is a control, not a card: the native pattern (iOS, Android) draws it inside a grouped card.
   const GROUND = '.ph,.sheet,.dialog,.dialog-backdrop,.scrim,[data-ds="Sheet"],[data-st-context="drawer"]';
+  const CONTROL_TRACK = '[data-ds="Segment"],[data-ds="Segment"] *,.st-selection,[data-ds="FilterChips"] *,[role="radiogroup"]';
   const wide = (e) => { const r = e.getBoundingClientRect(); return r.width >= W * 0.5 && r.height >= 40; };
   for (const e of all) {
-    if (interactive(e) || !wide(e) || !surface(e) || e.matches('svg,svg *,img') || e.matches(GROUND)) continue;
+    if (interactive(e) || !wide(e) || !surface(e) || e.matches('svg,svg *,img') || e.matches(GROUND) || e.matches(CONTROL_TRACK)) continue;
     let anc = e.parentElement, parent = null;
     while (anc && anc !== document.body) { if (anc.matches(GROUND)) break; if (surface(anc) && wide(anc)) { parent = anc; break; } anc = anc.parentElement; }
     if (!parent) continue;
