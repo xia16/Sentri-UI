@@ -633,6 +633,12 @@ export interface SentriUI {
   numpadScanner(options: { onKey?: (key: NumpadKey) => void; onScan?: (digits: string) => void; gap?: number; minKeys?: number; now?: () => number; later?: (f: () => void, ms: number) => unknown; cancel?: (handle: unknown) => void }): { handle(event: Pick<KeyboardEvent, 'key'>): boolean; flush(): void };
   heading(props: HeadingProps): string;
   panel(content: string, options?: PanelOptions & { ds?: string }): string;
+  /** One sensor reading with its trend, Low / High and a collapsed history (the Sensor component). rows: oldest first. */
+  sensor(props: { name: string; value: string | number; unit: string; updated: string; periodHtml?: string; rows?: { time: string; value: number }[]; decimals?: number; pad?: number; note?: string; className?: string }): string;
+  /** The unit's equipment under a "Devices" title with its connection; items are deviceControl() strings. */
+  devices(items: string[], options?: { status?: string; className?: string }): string;
+  /** One device card: mode Segment, speed slider (Manual only: pass speed), Save button and one helper line. */
+  deviceControl(props: { name: string; summary?: string; modeHtml?: string; speed?: number | null; speedId?: string; offline?: boolean; saveHtml?: string; helper?: string; updated?: string; className?: string }): string;
   facts(items: Fact[], options?: { columns?: 1 | 2 | 3; className?: string }): string;
   row(props: RowProps): string;
   rowGroup(content: string, options?: { title?: string; level?: number; className?: string; strs?: Strs<'title'>; args?: StrArgs<'title'> }): string;

@@ -50,5 +50,18 @@
       "Disabled",
       "Long-label"
     ]
+  },
+  {
+    "id": "pills",
+    "name": "Pills",
+    "use": "Use for a choice of two or three inside a panel (the period of a Sensor, a device's Auto / Manual) where a well would be a surface in a surface.",
+    "notUse": "Not at the top of a page or sheet (use View switch), and not for dynamic tags (use FilterChips)",
+    "states": [
+      "Default",
+      "Pressed",
+      "Selected",
+      "Disabled",
+      "Long-label"
+    ]
   }
 ]

@@ -1,0 +1,22 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"></head><body>
+<section data-state="Default"><h2>Default</h2><div id="state-Default"></div></section>
+<section data-state="Pressed"><h2>Pressed</h2><div id="state-Pressed"></div></section>
+<section data-state="Selected"><h2>Selected</h2><div id="state-Selected"></div></section>
+<section data-state="Disabled"><h2>Disabled</h2><div id="state-Disabled"></div></section>
+<section data-state="Long-label"><h2>Long-label</h2><div id="state-Long-label"></div></section>
+<script>
+// Each state renders in its own iframe in the atlas: draw only the states present.
+var UI = window.SentriUI;
+var RENDER = {
+  "state-Default": () => SentriUI.segment({variant:'pills',options:[['todo','Piglets'],['done','The sow']],active:'todo',ariaLabel:'View switch',state:'Default',disabled:false,reason:''}),
+  "state-Pressed": () => SentriUI.segment({variant:'pills',options:[['todo','Piglets'],['done','The sow']],active:'todo',ariaLabel:'View switch',state:'Pressed',disabled:false,reason:''}),
+  "state-Selected": () => SentriUI.segment({variant:'pills',options:[['todo','Piglets'],['done','The sow']],active:'done',ariaLabel:'View switch',state:'Selected',disabled:false,reason:''}),
+  "state-Disabled": () => SentriUI.segment({variant:'pills',options:[['todo','Piglets'],['done','The sow']],active:'todo',ariaLabel:'View switch',state:'Disabled',disabled:true,reason:'Records are unavailable offline.'}),
+  "state-Long-label": () => SentriUI.segment({variant:'pills',options:[['todo','待处理的仔猪记录'],['done','已完成的母猪记录']],active:'todo',ariaLabel:'View switch',state:'Long-label',disabled:false,reason:''})
+};
+document.querySelectorAll('[data-state]').forEach(function (s) {
+  var t = RENDER[s.id] ? s : s.querySelector('[id]');
+  if (t && RENDER[t.id]) t.innerHTML = RENDER[t.id]();
+});
+</script>
+</body></html>

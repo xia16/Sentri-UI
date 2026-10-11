@@ -1,0 +1,14 @@
+[
+  {
+    "id": "reading",
+    "name": "Reading",
+    "use": "one sensor's current value with its trend over a period (a unit's temperature, humidity, ammonia)",
+    "notUse": "a figure the worker sets (use Measure) or counts (use Facts); a sensor with no reading is left out, never drawn as 0",
+    "states": [
+      "Today",
+      "7 days",
+      "Whole number",
+      "Offline"
+    ]
+  }
+]

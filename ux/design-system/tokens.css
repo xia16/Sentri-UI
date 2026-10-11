@@ -61,6 +61,9 @@
   --focus-strong: #3e6890;
   --range-fill: #53694a;
   --range-handle: #74846a;
+  --chart-line: #57784a;
+  --chart-fill: #91ab7c;
+  --chart-grid: #e2e6db;
   --space-gutter: 18px;
   --space-gutter-sheet: 21px;
   --space-gutter-narrow: 12px;
@@ -234,6 +237,7 @@
   --type-entry-label-size: 16px;
   --type-hero-count-size: 68px;
   --type-figure-lg-size: 27px;
+  --type-figure-reading-size: 34px;
   --type-figure-size: 21px;
   --type-identifier-size: 13px;
   --type-identifier-strong-size: 16px;
@@ -244,6 +248,8 @@
   --type-hold-caption-size: 13px;
   --type-table-heading-size: 13px;
   --type-range-end-size: 13px;
+  --type-note-size: 11px;
+  --type-chart-axis-size: 12px;
   --type-dock-caption-size: 13px;
   --type-table-figure-size: 15px;
   --type-metric-size: 28px;

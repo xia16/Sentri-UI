@@ -143,30 +143,8 @@
 .unit-hub-maintenance small{margin-left:auto;font-size:10px}
 .unit-hub-maintenance.has-issues small{color:var(--amber)}
 .environment-page,.maintenance-page{padding-top:14px}
-.device-control>.st-selection{margin:var(--space-12) 0}
 .environment-page>.st-selection{margin-bottom:var(--space-12)}
-.sensor-detail,.device-control{background:white;border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:16px}
-.sensor-detail-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.sensor-detail-heading p{font-size:12px;color:var(--muted)}
-.sensor-detail-heading strong{font:400 34px var(--font-mono);display:block;margin-top:7px;letter-spacing:-1.5px}
-.sensor-detail-heading strong small{font:11px var(--font-sans);letter-spacing:0;margin-left:5px;color:var(--muted)}
-.sensor-detail-heading>span{font-size:10px;line-height:1.7;color:var(--muted);text-align:right}
-.sensor-chart svg{width:100%;height:auto;display:block;stroke:none;fill:none}
-.sensor-chart svg text{fill:#78826f;font:9px var(--font-sans);stroke:none}
-.sensor-range-stats{display:flex;gap:20px;padding:8px 0 15px;font-size:10px;color:var(--muted)}
-.sensor-range-stats strong{font-weight:500;color:var(--ink);margin-left:4px}
-.sensor-history{border-top:1px solid var(--line);font-size:11px}
-.sensor-history summary{min-height:44px;padding:13px 0;cursor:pointer}
-.sensor-history table{width:100%;border-collapse:collapse;text-align:left;font-size:10px}
-.sensor-history th,.sensor-history td{padding:8px 0;border-bottom:1px solid var(--line);font-weight:400}
-.sensor-history th:last-child,.sensor-history td:last-child{text-align:right}
-.device-section-heading,.maintenance-heading{display:flex;align-items:center;justify-content:space-between;margin:8px 2px 12px}
-.device-section-heading h3{font-size:13px;font-weight:500}.device-section-heading>span{font-size:10px;color:var(--muted)}
-.device-control-heading{display:flex;align-items:center;gap:10px}.device-control-heading h3{font-size:13px;font-weight:500}
-.device-control-heading p{font-size:10px;color:var(--muted);margin-top:5px}
-.fan-speed-label{display:flex;justify-content:space-between;font-size:11px;margin:13px 0 4px}
-#fan-speed{display:block;width:100%;padding:0;min-height:var(--tap-min);border:0;accent-color:var(--green)}
-.device-control .secondary{width:100%;margin-top:12px}.device-updated{font-size:10px;color:var(--green);margin-top:10px}
+.maintenance-heading{display:flex;align-items:center;justify-content:space-between;margin:8px 2px 12px}
 .maintenance-heading{font-size:12px}.maintenance-heading button{min-height:44px;font-size:12px;color:var(--green)}
 .maintenance-card{position:relative;display:block;width:100%;border:1px solid #e5dcc5;background:#fcf8ee;border-radius:14px;text-align:left;padding:15px 34px 15px 15px;margin:0 0 10px}
 .maintenance-card.resolved{background:#f7f9f3;border-color:var(--line)}
@@ -185,4 +163,4 @@
 
 
 
-.sensor-history summary{min-height:var(--tap-min);display:flex;align-items:center}
+

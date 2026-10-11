@@ -1,4 +1,4 @@
-/* @ds-bundle: {"format":4,"namespace":"SentriUI","components":[{"name":"Heading"},{"name":"Panel"},{"name":"Facts"},{"name":"Row"},{"name":"Log"},{"name":"Segment"},{"name":"IconButton"},{"name":"Button"},{"name":"Field"},{"name":"PickerField"},{"name":"ChoiceList"},{"name":"CategoryFooter"},{"name":"Sheet"},{"name":"FilterSheet"},{"name":"RangeSlider"},{"name":"Icon"},{"name":"Stepper"},{"name":"Measure"},{"name":"Numpad"},{"name":"Status"},{"name":"ConditionTag"},{"name":"Banner"},{"name":"Photos"}]} */
+/* @ds-bundle: {"format":4,"namespace":"SentriUI","components":[{"name":"Heading"},{"name":"Panel"},{"name":"Facts"},{"name":"Row"},{"name":"Log"},{"name":"Segment"},{"name":"IconButton"},{"name":"Button"},{"name":"Field"},{"name":"PickerField"},{"name":"ChoiceList"},{"name":"CategoryFooter"},{"name":"Sheet"},{"name":"FilterSheet"},{"name":"RangeSlider"},{"name":"Icon"},{"name":"Stepper"},{"name":"Measure"},{"name":"Numpad"},{"name":"Status"},{"name":"ConditionTag"},{"name":"Banner"},{"name":"Photos"},{"name":"Sensor"},{"name":"Devices"}]} */
 /* SentriIcons (sentri-icons.js) and the SentriUI parts, in one file. */
 /* Shared icon registry for the Sentri prototypes. One path vocabulary so every
    app renders the same glyphs; apps keep a local fallback for source-only checks. */
@@ -1066,7 +1066,31 @@
     const end=()=>{drag=null;};
     document.addEventListener('pointerup',end);document.addEventListener('pointercancel',end);if(typeof globalThis.addEventListener==='function')globalThis.addEventListener('blur',end);
   }
-  const api=Object.freeze({rangeSlider,filterSheet,optionalRow,heading,panel,facts,row,rowGroup,log,logDay,logStamp,logGroups,categoryFooter,field,pickerField,pickerOptions,pickerBody,pickerHead,pickerFooter,filterChips,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowSelectDoor,rowAction,rowSelectChange,status,conditionTag,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
+
+  /* Sensor: one reading, its trend and its history, in one panel. The page passes the reading, the history rows and the period
+     Segment; the part draws the 34px mono figure, the "last reading" time, the line chart (three hairlines, dots, three time
+     labels), Low / High, the collapsed history and one muted data note. Missing is not zero: the page leaves a sensor out. */
+  function sensor({name,value,unit,updated,periodHtml='',rows=[],decimals=0,pad=1,note='',className='',strs,args}={}){
+    const values=rows.map(r=>r.value),min=Math.min(...values),max=Math.max(...values),low=min-pad,high=max+pad,n=Math.max(rows.length-1,1);
+    const pts=rows.map((r,i)=>[38+i*254/n,148-(r.value-low)/(high-low)*118]);
+    const line=pts.map(p=>p.join(',')).join(' '),path='M'+pts.map(p=>p.join(',')).join(' L');
+    const grid=[0,1,2].map(i=>{const y=30+i*59;return `<line x1="38" x2="292" y1="${y}" y2="${y}"/><text x="1" y="${y+4}">${(high-i*(high-low)/2).toFixed(decimals)}</text>`;}).join('');
+    const label=rows.length?[[38,'',rows[0].time],[166,'middle',rows[Math.floor(rows.length/2)].time],[292,'end',rows[rows.length-1].time]].map(([x,a,t])=>`<text x="${x}" y="176"${a?` text-anchor="${a}"`:''}>${esc(t)}</text>`).join(''):'';
+    const chart=rows.length?`<div class="st-sensor-chart" role="img" aria-label="${esc(name)} sample trend. Minimum ${min}, maximum ${max} ${esc(unit)}. Reading history below."><svg viewBox="0 0 316 184" aria-hidden="true"><defs><linearGradient id="st-sensor-fill" x1="0" y1="0" x2="0" y2="1"><stop class="st-sensor-fill-top" offset="0"/><stop class="st-sensor-fill-end" offset="1"/></linearGradient></defs><g class="st-sensor-grid">${grid}</g><path class="st-sensor-area" d="${path} L292,148 L38,148 Z"/><polyline class="st-sensor-line" points="${line}"/>${pts.map(p=>`<circle class="st-sensor-dot" cx="${p[0]}" cy="${p[1]}" r="3"/>`).join('')}<g class="st-sensor-times">${label}</g></svg></div><div class="st-sensor-range"><span>Low <strong>${min} ${esc(unit)}</strong></span><span>High <strong>${max} ${esc(unit)}</strong></span></div><details class="st-sensor-history"><summary>Reading history</summary><table><caption class="st-sensor-hidden">${esc(name)} sample readings</caption><thead><tr><th>Time</th><th>${esc(unit)}</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${esc(r.time)}</td><td>${r.value}</td></tr>`).join('')}</tbody></table></details>`:'';
+    return `<section class="st-panel st-sensor ${esc(className)}" data-ds="Sensor"><div class="st-sensor-head"><div><p class="st-sensor-name">${esc(name)}</p><strong class="st-sensor-value">${esc(value)}<small>${esc(unit)}</small></strong></div><span class="st-sensor-updated">Last reading<br>${esc(updated)}</span></div>${periodHtml}${chart}${note?`<p class="st-sensor-note">${esc(note)}</p>`:''}</section>`;
+  }
+  /* Devices: the equipment of a unit under a section title with its connection ("Connected" / "Offline"). deviceControl is one
+     device: name, one summary line, the mode Segment, an optional speed slider, the Save button and one helper line.
+     The page builds modeHtml (a Segment) and saveHtml (a Button) and keeps the slider's id for its input handler. */
+  function devices(items,{status='',className=''}={}){
+    if(!items||!items.length)return '';
+    return `<div class="st-devices ${esc(className)}" data-ds="Devices"><div class="st-devices-head"><h3>Devices</h3>${status?`<span>${esc(status)}</span>`:''}</div>${items.join('')}</div>`;
+  }
+  function deviceControl({name,summary='',modeHtml='',speed=null,speedId='device-speed',offline=false,saveHtml='',helper='',updated='',className=''}={}){
+    const slider=speed==null?'':`<div class="st-device-speed-label" id="${esc(speedId)}-label">Fan speed <output id="${esc(speedId)}-value">${esc(speed)}%</output></div><input class="st-device-speed" id="${esc(speedId)}" aria-labelledby="${esc(speedId)}-label" type="range" min="0" max="100" step="5" value="${esc(speed)}"${offline?' disabled':''}>`;
+    return `<section class="st-panel st-device ${esc(className)}" data-ds="Devices"><div class="st-device-head"><div><h3>${esc(name)}</h3><p>${esc(summary)}</p></div></div>${modeHtml}${slider}${saveHtml}${helper?`<p class="st-device-note">${esc(helper)}</p>`:''}${updated?`<p class="st-device-updated">${esc(updated)}</p>`:''}</section>`;
+  }
+  const api=Object.freeze({sensor,devices,deviceControl,rangeSlider,filterSheet,optionalRow,heading,panel,facts,row,rowGroup,log,logDay,logStamp,logGroups,categoryFooter,field,pickerField,pickerOptions,pickerBody,pickerHead,pickerFooter,filterChips,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowSelectDoor,rowAction,rowSelectChange,status,conditionTag,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
   root.SentriUI=api;
   if(typeof module!=='undefined')module.exports=api;
 })(globalThis);

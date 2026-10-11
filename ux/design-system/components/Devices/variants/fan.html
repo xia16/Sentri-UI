@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Devices: fan</title>
+</head>
+<body>
+<!-- A unit's equipment under one section title with its connection. Each top-level element is one state; the atlas draws one cell per element. -->
+<div data-state="Auto" data-st-context="page"><script>document.currentScript.parentElement.insertAdjacentHTML('beforeend', SentriUI.devices([SentriUI.deviceControl({name:'Ventilation fan',summary:'Auto · following unit schedule',modeHtml:SentriUI.segment({variant:'pills',options:[['auto','Auto'],['manual','Manual']],active:'auto',action:'x',ariaLabel:'Fan mode'}),saveHtml:SentriUI.button({action:'x',register:'primary',label:'Save setting'}).replace('<button','<button disabled'),helper:'Preview controls only · no command is sent to equipment.'})],{status:'Connected'}));</script></div>
+<div data-state="Manual" data-st-context="page"><script>document.currentScript.parentElement.insertAdjacentHTML('beforeend', SentriUI.devices([SentriUI.deviceControl({name:'Ventilation fan',summary:'Manual · 45% speed',modeHtml:SentriUI.segment({variant:'pills',options:[['auto','Auto'],['manual','Manual']],active:'manual',action:'x',ariaLabel:'Fan mode'}),speed:45,speedId:'v-speed',saveHtml:SentriUI.button({action:'x',register:'primary',label:'Save setting'}).replace('<button','<button '),helper:'Preview controls only · no command is sent to equipment.'})],{status:'Connected'}));</script></div>
+<div data-state="Offline" data-st-context="page"><script>document.currentScript.parentElement.insertAdjacentHTML('beforeend', SentriUI.devices([SentriUI.deviceControl({name:'Ventilation fan',summary:'Auto · following unit schedule',modeHtml:SentriUI.segment({variant:'pills',options:[['auto','Auto'],['manual','Manual']],active:'auto',action:'x',ariaLabel:'Fan mode',disabled:true}),offline:true,saveHtml:SentriUI.button({action:'x',register:'primary',label:'Save setting'}).replace('<button','<button disabled'),helper:'Reconnect to change device settings.'})],{status:'Offline'}));</script></div>
+</body>
+</html>

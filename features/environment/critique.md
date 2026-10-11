@@ -43,4 +43,17 @@ Not a problem: the Auto / Manual Segment and Save setting looking washed out whe
 
 ## Self-crit
 
-(written after the directions are rendered)
+
+### Direction A, round 1: same screen, text raised by hierarchy, parts moved into the design system
+
+Built in real components (new `Sensor` and `Devices`, new Segment variant `pills`), rendered at 390 beside the baseline.
+
+- **Problems.** 1 Low / High: fixed (13px, value in ink). 2 axis labels: fixed (12 chart units, about 11px at 360, muted for 5.2:1). 3 Last reading: fixed (13px). 4 supporting lines: fixed (summary, speed, history at 13px; notes at 11px). 5 connection said twice: fixed ("connected" cut; the PREVIEW badge is cut from this header, the helper line already says "Preview controls only"). 6 contrast and target: fixed (axis text uses `muted`; the disabled Auto / Manual and Save setting keep their text at 5:1; the speed label is no longer a 16px label target). 7 page-built styling: fixed (all of it is in the design system now).
+- **Keep.** Sensor tabs unchanged. The 34px reading is unchanged and still the largest thing. Period toggle, chart geometry, collapsed history, Devices card and one Save button are all in the same order and place. Today / 7 days and Auto / Manual changed from a white pill on a well to two 48px pills with the chosen one filled (they sit inside a card, so a well is a surface inside a surface, which `check-states` rule b flags); they are as strong (filled, bold) and as big (48px).
+- **Squint test.** First: the 34px reading. Second: the chart line. Third: the fan card and its Save button. The worker's questions are: what is it, is it going the wrong way, is the fan right. Same order as the original.
+- **Owner's eye.** c1 (everything bigger): no. Only text that was under the floor moved, and the support text stayed at 13px or 11px under a 34px hero; the page is 20px taller in the sensor card, and at 360 it is shorter overall because the title no longer wraps. c2 (flatter): no, the cards and the Devices heading are as they were. c3 (bulkier): no new boxes; one well was removed; the Save button is now a full-width pill (it was a text-only disabled button before).
+- **Same product.** Same cards, hairlines and radius as Farrowing; the pills follow the Segment's own tokens.
+- **Rejected examples.** R14 (enlarging everything to clear the floors): the budget cut first; R15 (calm but flat): hierarchy kept; R16: the page ends on a group.
+- **Better because** every figure the worker reads is now at or above the farm floors with the reading still leading, the title no longer wraps at 360, and nothing else moved.
+
+Not done: the Segment well on the sensor tabs at the top of the page is kept (it is outside the card). The gate's Chinese check cannot be run on this page (it does not render Chinese).

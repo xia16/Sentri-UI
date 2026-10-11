@@ -1,0 +1,13 @@
+[
+  {
+    "id": "fan",
+    "name": "Fan",
+    "use": "the equipment of one unit: the ventilation fan's mode, speed and Save setting",
+    "notUse": "a record the worker writes (use Field / Stepper) or a fault report (maintenance)",
+    "states": [
+      "Auto",
+      "Manual",
+      "Offline"
+    ]
+  }
+]

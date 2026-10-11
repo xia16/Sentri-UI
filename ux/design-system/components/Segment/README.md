@@ -7,6 +7,7 @@ Switch a fixed set of 2–5 views or choices of the same list or sheet. Use [Fil
 - **Two-line lens (the default lens):** use for the To do / Done (or Active / Done / All) states of a task list, count beneath each label. Farrowing, Inspection and Piglet processing all use it, so the same job looks the same everywhere. Sits beside the filter IconButton when the list has one.
 - **Lens (inline count):** use only for a 2-state split inside a card or sheet header where a second text line would not fit, and no filter button sits beside it. Not for the main list of a task: use the two-line lens.
 - **View switch:** use for 2–3 subjects of one sheet.
+- **Pills:** use for a choice of two or three inside a panel (a Sensor's period, a device's Auto / Manual): no well of its own, so no surface sits inside the panel's surface.
 - **Facet:** use for one fixed single-choice filter in a filter sheet.
 
 ## When not to use
@@ -24,6 +25,7 @@ See [variants.json](variants.json) for use boundaries and each variant’s rende
 - [Lens](variants/lens.html): states of one list with inline counts.
 - [Two-line lens](variants/two-line-lens.html): states of one list with counts beneath labels.
 - [View switch](variants/view-switch.html): 2–3 subjects of one sheet.
+- [Pills](variants/pills.html): a choice of two or three inside a panel.
 - [Facet](variants/facet.html): one fixed single-choice filter in a filter sheet.
 
 ## States

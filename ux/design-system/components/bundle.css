@@ -963,3 +963,50 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 :is(.phone,.tk-phone,.atlas-phone,.device,.st-phone,.sp-phone,[data-st-context]) [tabindex="-1"]:focus{outline:none}
 /* A waiting or disabled control says so with its surface and rim; its text stays readable (4.5:1, farm legibility law). */
 .st-hold[aria-disabled="true"] :is(.st-hold-label,.st-hold-caption){color:var(--ink);opacity:1}
+
+/* Sensor: one reading with its trend, Low / High and a collapsed history; Devices: the unit's equipment. */
+.st-sensor{padding:var(--space-14);margin-bottom:var(--space-16)}
+.st-sensor-head{display:flex;align-items:center;justify-content:space-between;gap:var(--space-12)}
+.st-sensor-name{margin:0;font:var(--type-weight-regular) var(--type-meta-size)/1.4 var(--font-sans);color:var(--muted)}
+.st-sensor-value{display:block;margin-top:var(--space-7);font:var(--type-weight-regular) var(--type-figure-reading-size)/1.1 var(--font-mono);letter-spacing:-1.5px;color:var(--ink)}
+.st-sensor-value small{margin-left:var(--space-5);font:var(--type-weight-regular) var(--type-meta-size) var(--font-sans);letter-spacing:0;color:var(--muted)}
+.st-sensor-updated{font:var(--type-weight-regular) var(--type-meta-size)/1.5 var(--font-sans);color:var(--muted);text-align:right}
+.st-sensor-chart svg{display:block;width:100%;height:auto;stroke:none;fill:none}
+.st-sensor-chart text{fill:var(--muted);stroke:none;font:var(--type-weight-regular) var(--type-chart-axis-size) var(--font-sans)}
+.st-sensor-grid line{stroke:var(--chart-grid)}
+.st-sensor-fill-top{stop-color:var(--chart-fill);stop-opacity:.25}
+.st-sensor-fill-end{stop-color:var(--chart-fill);stop-opacity:0}
+.st-sensor-area{fill:url(#st-sensor-fill);stroke:none}
+.st-sensor-line{stroke:var(--chart-line);stroke-width:2.5;fill:none}
+.st-sensor-dot{fill:var(--chart-line);stroke:var(--paper)}
+.st-sensor-range{display:flex;gap:var(--space-20);padding:var(--space-6) 0 var(--space-12);font:var(--type-weight-regular) var(--type-meta-size) var(--font-sans);color:var(--muted)}
+.st-sensor-range strong{margin-left:var(--space-4);font-weight:var(--type-weight-medium);color:var(--ink)}
+.st-sensor-history{border-top:var(--border-width) solid var(--line);font:var(--type-weight-regular) var(--type-meta-size) var(--font-sans);color:var(--ink)}
+.st-sensor-history summary{display:flex;align-items:center;min-height:var(--tap-min);cursor:pointer}
+.st-sensor-history table{width:100%;border-collapse:collapse;text-align:left;font-size:var(--type-meta-size)}
+.st-sensor-history th,.st-sensor-history td{padding:var(--space-8) 0;border-bottom:var(--border-width) solid var(--line);font-weight:var(--type-weight-regular)}
+.st-sensor-history th:last-child,.st-sensor-history td:last-child{text-align:right}
+.st-sensor-hidden{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.st-sensor-note{margin:var(--space-8) 0 0;font:var(--type-weight-regular) var(--type-note-size)/1.5 var(--font-sans);color:var(--muted)}
+.st-devices-head{display:flex;align-items:center;justify-content:space-between;margin:var(--space-8) var(--space-2) var(--space-12)}
+.st-devices-head h3{margin:0;font:var(--type-weight-medium) var(--type-panel-title-size) var(--font-sans);color:var(--ink)}
+.st-devices-head span{font:var(--type-weight-regular) var(--type-meta-size) var(--font-sans);color:var(--muted)}
+.st-device{padding:var(--space-14);margin-bottom:var(--space-16)}
+.st-device>.st-selection{margin:var(--space-12) 0}
+.st-device-head{display:flex;align-items:center;gap:var(--space-10)}
+.st-device-head h3{margin:0;font:var(--type-weight-medium) var(--type-panel-title-size) var(--font-sans);color:var(--ink)}
+.st-device-head p{margin:var(--space-5) 0 0;font:var(--type-weight-regular) var(--type-meta-size)/1.4 var(--font-sans);color:var(--muted)}
+.st-device-speed-label{display:flex;justify-content:space-between;margin:var(--space-12) 0 var(--space-4);font:var(--type-weight-regular) var(--type-meta-size) var(--font-sans);color:var(--ink)}
+.st-device-speed{display:block;width:100%;min-height:var(--tap-min);padding:0;border:0;accent-color:var(--green)}
+.st-device-note{margin:var(--space-12) 0 0;font:var(--type-weight-regular) var(--type-note-size)/1.5 var(--font-sans);color:var(--muted)}
+.st-device-updated{margin:var(--space-10) 0 0;font:var(--type-weight-regular) var(--type-note-size) var(--font-sans);color:var(--green)}
+/* Segment, pills: a choice of two sitting inside a panel. It draws no well of its own (no surface inside a surface); each option is a 48px pill and the chosen one fills. */
+.st-segment[data-variant=pills]{padding:0;gap:var(--space-8);border:0;border-radius:0;background:transparent}
+.st-segment[data-variant=pills] button{min-height:var(--tap-min);border:var(--border-width) solid var(--line);border-radius:var(--radius-segment);background:var(--paper)}
+.st-segment[data-variant=pills] button[aria-pressed=true]{border-color:var(--control-border);background:var(--well)}
+.st-segment[data-variant=pills] button:disabled{border:var(--border-width) dashed var(--control-border)}
+.st-sensor>.st-selection{margin:var(--space-9) 0 var(--space-4)}
+.st-device>.button{width:100%;margin-top:var(--space-12)}
+.st-device .button.primary:not(:disabled){background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.st-device .button.primary:disabled{opacity:1;background:var(--disabled-surface);border:var(--border-width) solid var(--disabled-border);color:var(--muted)}
+.st-device .st-segment[data-variant=pills] button:disabled{opacity:1;color:var(--muted)}
