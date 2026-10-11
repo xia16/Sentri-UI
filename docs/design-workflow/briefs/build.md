@@ -32,7 +32,7 @@ Do this for every new or changed list, card or screen, before you draw, and **wr
 1. **Inventory.** List every fact the screen could show, for each item and each state, and for every feature that reuses the pattern. Be exhaustive; cut nothing yet.
 2. **The worker's questions.** Write the questions the worker asks at that moment of the job, in the order they ask them. For a barn list: where am I? Does anything here need me? What do I do? Is this the right animal? Does anything change how I do it? Who did it, and when?
 3. **Attention levels.** Give each fact one level:
-   - **Act now:** the only thing allowed to be loud.
+   - **Act now:** something the worker must *do* now; the only thing allowed to be loud. A state that changes how facts read (offline, stale, sample data) is not act-now: it sits quietly beside the facts it qualifies.
    - **Watch:** in progress.
    - **Coming up:** plan for it.
    - **Settled:** reference only, visually quiet.
@@ -45,6 +45,9 @@ Do this for every new or changed list, card or screen, before you draw, and **wr
    - nothing the header already says;
    - no zeros;
    - no derived figure beside its parts (born = alive + dead).
+
+   **Weight follows the questions.** The answer to the worker's first question about the job is the largest, heaviest thing on the screen; the next answers are progressively quieter. The levels never override that order.
+
 5. **The cut list.** Write down what was removed and why, in the PR body. It is the proof this step happened.
 6. **Rebuild the hierarchy.** Cutting facts never cuts structure. Sections keep their native headings. Each attention level gets its own visual weight, and a screen has one heavy control at most: the one the worker acts on. Then do the **squint test**: blur the screenshot, or step back, and write the first three things the eye lands on. They must be the answers to the worker's first three questions, in order. Calmer but flat is rejected (R15). Put the three in the PR body.
 7. **Design it, don't rearrange it.** After the budget, compose the screen in the approved screens' language: grouped sections with native headers, every row inside a group, the page ending on a group. Information stacked on a page is rejected (R16). A narrow pass that turns into a redesign is fine; make it a good one.
@@ -62,7 +65,7 @@ Worked example, the Farrowing room row:
 
 ## 2. Owner rules (binding)
 
-- **Design-system components only.** Build the screen from the SentriUI components in `ux/design-system/components/` (bundle.js / bundle.css; their READMEs say when to use each). The page's own CSS sets layout only: margin, padding, gap, grid, flex, size, position. Never colour, borders, radius, shadow, type or a selection mark: the gate fails any such declaration added outside `ux/design-system`. When no component fits, stop: add a proposal to `ux/design-system/components/_proposed.json` (what, why, which screens) and report it. Never improvise a component on the page.
+- **Design-system components only.** Build the screen from the SentriUI components in `ux/design-system/components/` (bundle.js / bundle.css; their READMEs say when to use each). The page's own CSS sets layout only: margin, padding, gap, grid, flex, size, position. Never colour, borders, radius, shadow, type or a selection mark: the gate fails any such declaration added outside `ux/design-system`. When no component fits, build it in the design system as part of this change, from this feature's need: `bundle.js` / `bundle.css`, a README and its variants, in the language of the approved screens. Never press another component into a job it isn't for (a control is not a display), never style one on the page, and never ship a workaround beside a proposal: the gate fails a screen change that adds to `_proposed.json`.
 - **A narrow pass changes only what's broken.** A type, legibility or defect pass fixes the defects it names on the existing screen and nothing else. A redesign happens only when the task asks for one.
 - **Farm legibility (binding).** Barn, glare, gloves, arm's length, two seconds. Text a worker reads to act on (control labels, acted-on values, row titles, warnings) ≥ 13px; quiet descriptive text (labels, units, timestamps, axes, who/when) may be 11px; nothing under 11px except the phone status bar. Size follows hierarchy; never enlarge text just to clear a floor. Contrast ≥ 4.5:1 for all text and ≥ 7:1 for primary values and numbers a farmer acts on. Tap targets ≥ 48×48 (the control or an invisible hit area). Ink, not pale grey, for anything that must be read. Fix crowding by tightening copy and layout, never by shrinking type. Full law: `ux/design-system/README.md`, "The farm legibility law".
 - **Platform first, touch only.** States: Default, Pressed, Selected/Checked, Disabled, Error, Loading/Waiting, Empty, Long label / Chinese, whichever apply. No designed Hover, Focus or keyboard rows. Accessibility: screen-reader role, name and state; reading order matches visual order; no gesture-only action; targets ≥ 48px (`tap-min`).
