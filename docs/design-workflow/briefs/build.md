@@ -104,7 +104,7 @@ A part a component already draws stays on that component; improve the component 
 ## 1d. Directions and self-crit (before you hand over)
 
 1. **Directions.** Build two or three directions in real components, each answering the problem list. In polish mode they differ only in the problem parts. Keep them cheap: a direction is a render, not a finished build.
-2. **Put each beside the original.** Render it at 390×844 in EN next to the baseline, the same size, the same state. Look at the pair as the owner will: the whole screen, at a glance, before reading any text.
+2. **Put each beside the original.** Render it at 390×844 in EN next to the baseline, the same size, the same state: `node scripts/shoot-screens.mjs <scratch>/<direction> --screens <ids> --widths 390 --langs en` on your branch, and the same on an `origin/main` worktree for the baseline. Open both images and look at them; a design you haven't seen rendered isn't criticised. Look at the pair as the owner will: the whole screen, at a glance, before reading any text.
 3. **Criticise it in writing**, in `## Self-crit` in `critique.md`, one block per direction and round:
    - each problem: fixed or not;
    - each keep item: as strong as before or not;
