@@ -290,21 +290,28 @@ export function loopStatus(ledger) {
 // Information before layout (owner, 2026-10-11): a feature's screens change only after its information budget is written down
 // (briefs/build.md §1b) in features/<id>/budget.md with an Inventory, the worker's Questions and the attention Levels.
 export const BUDGET_HEADINGS = ['## Inventory', '## Questions', '## Levels'];
-export function budgetProblems(features, read) {
-  const out = [];
-  for (const f of [...new Set(features)].filter(Boolean)) {
-    const text = read(`features/${f}/budget.md`);
-    if (text == null) { out.push(`${f}: no features/${f}/budget.md`); continue; }
-    const lines = text.split(/\r?\n/).map((l) => l.trim());
-    const miss = BUDGET_HEADINGS.filter((h) => !lines.some((l) => l === h || l.startsWith(h + ' ')));
-    if (miss.length) out.push(`${f}: budget.md lacks ${miss.join(', ')}`);
-  }
-  return out;
+// The critique of the original (briefs/build.md §1a, §1d) in features/<id>/critique.md: what to keep, what is broken, what draws
+// each part, and the self-crit of the directions against the original.
+export const CRITIQUE_HEADINGS = ['## Keep', '## Problems', '## Parts', '## Self-crit'];
+function notesProblems(file, headings) {
+  return (features, read) => {
+    const out = [];
+    for (const f of [...new Set(features)].filter(Boolean)) {
+      const text = read(`features/${f}/${file}`);
+      if (text == null) { out.push(`${f}: no features/${f}/${file}`); continue; }
+      const lines = text.split(/\r?\n/).map((l) => l.trim());
+      const miss = headings.filter((h) => !lines.some((l) => l === h || l.startsWith(h + ' ')));
+      if (miss.length) out.push(`${f}: ${file} lacks ${miss.join(', ')}`);
+    }
+    return out;
+  };
 }
+export const budgetProblems = notesProblems('budget.md', BUDGET_HEADINGS);
+export const critiqueProblems = notesProblems('critique.md', CRITIQUE_HEADINGS);
 
 // Design-system components only (owner, 2026-10-11): visual styling added in a page's own CSS, markup or scripts is an improvised
 // component. Layout (margin, padding, gap, grid, flex, size, position) is the page's; looks belong to ux/design-system. A line
-// carrying `ds-exception: <reason>` is allowed and shown to the judge.
+// marked `ds-exception` is a workaround and counts too: the part is built in the design system instead (briefs/build.md §1c).
 const VISUAL = /^(color|background(-color|-image)?|border(-(top|right|bottom|left))?(-(color|width|style))?|border(-[a-z]+)?-radius|box-shadow|outline(-[a-z]+)?|font(-(size|weight|family|style))?|text-decoration(-[a-z]+)?|text-transform|letter-spacing|opacity|fill|stroke(-width)?|filter|backdrop-filter)$/;
 export const isPageFile = (f) => /^ux\//.test(f) && !/^ux\/(design-system|archive)\//.test(f) && /\.(css|html|js|mjs)$/.test(f);
 export function pageStyling(addedByFile) {
@@ -312,7 +319,6 @@ export function pageStyling(addedByFile) {
   for (const [file, lines] of Object.entries(addedByFile)) {
     if (!isPageFile(file)) continue;
     for (const line of lines) {
-      if (/ds-exception:/.test(line)) continue;
       const chunks = /\.css$/.test(file) ? [line]
         : [...line.matchAll(/style\s*=\s*["'`]([^"'`]*)/g)].map((m) => m[1])
           .concat([...line.matchAll(/\.style\.([a-zA-Z]+)\s*=/g)].map((m) => ' ' + m[1].replace(/[A-Z]/g, (c) => '-' + c.toLowerCase()) + ':x'));

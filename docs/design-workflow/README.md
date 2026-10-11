@@ -28,6 +28,7 @@ An agent score is never shown as approval. The approved version of a screen stay
 - **No reason line above a disabled button.**
 - **Green means approved or done only.**
 - **No cards on cards; information budget.** One surface, and only items are boxes. Colour only where it means something. Nothing said twice. Rank what the farmer must see first.
+- **Critique before you change; extract, don't replace.** Every change to an existing screen starts from a written critique of the original: what works (keep), what is broken (problems, with evidence) and what draws each part. The change follows the problems; what works stays at least as strong. A part the page hand-builds moves into the design system looking exactly as it does before anyone improves it, never redrawn from a generic component that looks different. A run hands over its best direction only when its own crit says it is clearly better than the original; otherwise it hands over no change ([build.md §1a–1d](briefs/build.md#1a-critique-the-original-before-the-budget)).
 - **Attention budget before layout.** Showing too much is like showing nothing: when every fact gets equal weight, nothing stands out and workers stop reading. Every new or changed list, card or screen starts from an attention budget: the facts it could show, the worker's questions in order, an attention level for each fact, and a written cut list. Only then comes layout. Passing the legibility floors is not the same as being focused ([build.md §1b](briefs/build.md#1b-attention-budget-before-any-layout)).
 - **Design for the medium.** The atlas is a web page; the designs in it are a native phone app. Use the iOS or Android native component wherever one fits: sheets, action sheets, segmented controls, switches, wheel pickers for dates and numbers, the system keyboard, a navigation bar. Build a custom one only where none fits, and say why. No web conventions: hover rows, breadcrumbs, dropdown selects, data tables, underlined text links, tooltips, visible scrollbars, pagination, centred web modals.
 - **Simple beats complete.** Design for the 95% of real cases. Leave out what would add noise for farmers or need heavy infrastructure, and list it as not supported. Easy to act and to record matters more than feature count: a frustrated farmer stops using the app.
@@ -121,6 +122,8 @@ Every rejected owner example is a fixture each gate must fail ([gate.md](briefs/
 | [briefs/populate.md](briefs/populate.md) | Atlas population. It maps existing screens and designs nothing. |
 | [briefs/review.md](briefs/review.md) | Screen and atlas reviews that feed the backlog |
 | [freeze-checklist.md](freeze-checklist.md) | Freeze and propagation |
+
+The owner's taste, drawn from their rulings, is [taste.md](taste.md): builders aim at it and judges stand in for it.
 
 Standards these briefs point to: `ux/design-system/README.md` (laws), `docs/design-workflow/research/component-standard.md` (component page anatomy and checklist), and `atlas/SCHEMA.md` (atlas data and backlog item format).
 

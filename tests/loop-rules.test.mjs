@@ -1,7 +1,7 @@
 // The gate's and the polish loop's rules (scripts/loop-rules.mjs).
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { queueAhead, calibrationProblems, budgetProblems, pageStyling, addedLines, effectiveClass, classifyScreens, checkVerdict, checkGrades, worstFirst, isClean, loopStatus, touchesSystem, touchesTools, regressions,
+import { queueAhead, calibrationProblems, budgetProblems, critiqueProblems, pageStyling, addedLines, effectiveClass, classifyScreens, checkVerdict, checkGrades, worstFirst, isClean, loopStatus, touchesSystem, touchesTools, regressions,
   pageOf, pageAssets, sharedFiles, outcomeLeaves, coverageLost } from '../scripts/loop-rules.mjs';
 
 test('a change to the bundle or tokens is a shared-component change whatever was declared', () => {
@@ -247,11 +247,16 @@ test('a feature whose screens change needs its information budget, with inventor
   assert.deepEqual(budgetProblems(['a', 'a', 'b', 'c'], (p) => files[p] ?? null), ['b: budget.md lacks ## Questions, ## Levels', 'c: no features/c/budget.md']);
 });
 
+test('a feature whose screens change needs its critique: keep, problems, parts and self-crit', () => {
+  const files = { 'features/a/critique.md': '## Keep\n## Problems\n## Parts\n## Self-crit — round 2\n', 'features/b/critique.md': '## Keep\n## Problems\n' };
+  assert.deepEqual(critiqueProblems(['a', 'b', 'c'], (p) => files[p] ?? null), ['b: critique.md lacks ## Parts, ## Self-crit', 'c: no features/c/critique.md']);
+});
+
 test('visual styling added in a page is an improvised component; layout and the design system are fine', () => {
   const diff = ['+++ b/ux/system/home.css', '+.tile{padding:12px;gap:8px}', '+.tile.on{border-bottom:3px solid var(--ink)}', '+.x{font-size:11px} /* ds-exception: chart axis */',
     '+++ b/ux/system/home.js', "+  return `<div class=\"t\" style=\"display:grid;color:red\">`;", '+  el.style.marginTop = "4px";', '+  el.style.backgroundColor = "#fff";',
     '+++ b/ux/design-system/components/bundle.css', '+.st-tile{border:1px solid var(--line)}'].join('\n');
-  assert.deepEqual(pageStyling(addedLines(diff)).map((p) => p.file.split('/').pop() + ' ' + p.prop), ['home.css border-bottom', 'home.js color', 'home.js background-color']);
+  assert.deepEqual(pageStyling(addedLines(diff)).map((p) => p.file.split('/').pop() + ' ' + p.prop), ['home.css border-bottom', 'home.css font-size', 'home.js color', 'home.js background-color']);
 });
 
 test('a judge that rates an owner-rejected calibration pair better, or skips one, is not used', () => {
