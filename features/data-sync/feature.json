@@ -93,12 +93,12 @@
         "elements": [
           {
             "name": "Upload button and message",
-            "shows": "Upload 3 records · No connection · check Wi-Fi or mobile signal",
+            "shows": "Upload all · No connection · check Wi-Fi or mobile signal",
             "states": [
               {
                 "state": "Offline",
                 "when": "No connection (default; \"Connection preview\" select outside the phone)",
-                "shows": "\"3 records waiting to upload\", button \"Upload 3 records\"; pressing it reports \"Still no connection. All 3 records remain on this device.\""
+                "shows": "\"3 records waiting to upload\", button \"Upload all\"; pressing it reports \"Still no connection. All 3 records remain on this device.\""
               },
               {
                 "state": "Ready",
@@ -123,7 +123,7 @@
             ],
             "rule": "Only a successful upload clears the queue; a failure keeps every record. The drawer separates records saved on this device from records uploaded for the team.",
             "source": "showSync(); sync.connection",
-            "at": "Upload 3 records"
+            "at": "Upload all"
           },
           {
             "name": "Record row",
@@ -203,7 +203,7 @@
       "url": "/ux/system/home-astra-prototype.html?section=gestation&connection=online",
       "steps": [
         "3 records saved on this device",
-        "Upload 3 records",
+        "Upload all",
         {
           "tap": "Uploading…",
           "hold": 1300
@@ -218,7 +218,7 @@
       "url": "/ux/system/home-astra-prototype.html?section=gestation",
       "steps": [
         "3 records saved on this device",
-        "Upload 3 records"
+        "Upload all"
       ],
       "figma": "https://www.figma.com/design/LhQhJho192tNKCFvf5Drnf?node-id=10541-8073",
       "notes": {

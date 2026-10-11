@@ -121,7 +121,6 @@
 .device .sync-summary.pending { background: #fff8ec; }
 .device .sync-summary:not(.pending) { background: #eaf2e5; }
 .device .sync-drawer .primary { background: var(--ink); }
-.device .sheet-body .primary:disabled { background: #7c8979; }
 .device .sheet-body .primary[data-action="close"] {
   background: #fff;
   color: var(--ink);
@@ -243,3 +242,67 @@ body:has(#detail) #detail .lifecycle-actions [data-confirm-end] {
 /* Status bar: the same signal and battery glyphs as the other screens. */
 .device .device-status{display:flex;align-items:center;gap:6px}
 .device .device-status svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* Farm type floors on the Home sub-pages (Assistant, Environment & devices, Maintenance, Find a pig, Saved work, the section list).
+   Body 16px in ink (7:1), meta 13px in muted (4.5:1), tap 48px. Crowding is fixed by shorter copy, never by smaller type. */
+.device .preview-badge{font:13px/1 var(--font-mono);padding:5px 7px;color:var(--ink-2);flex:none}
+.device .helper{font-size:13px!important;line-height:1.5;margin-top:12px!important}
+.device .page-footer .helper{margin:8px 0 0!important;text-align:center}
+.device .overline,.device .finding .overline{font-size:13px;line-height:1.5}
+.device .scope-label{font-size:13px}
+.device .work-note{font-size:13px;line-height:1.5}
+.device .work-note.lead{font-size:16px;color:var(--ink);line-height:1.5}
+.device :is(.maintenance-page,.screen-enter) .empty-state p{font-size:16px;line-height:1.5;color:var(--ink-2)}
+.device .tomorrow strong{font-size:16px}
+.device .tomorrow p{font-size:13px;line-height:1.5}
+/* Assistant */
+.device .assistant-hero p{font-size:16px;line-height:1.5;color:var(--ink-2)}
+.device .assistant-hero p.overline{font-size:13px;color:var(--amber)}
+.device .assistant-tabs{gap:24px}
+.device .assistant-tabs button{font-size:16px}
+.device .assistant-tabs button[aria-pressed="false"]{color:var(--ink-2)}
+.device .evidence strong{font-size:16px}
+.device .evidence p{font-size:16px;line-height:1.5;color:var(--ink-2)}
+.device .evidence small{font-size:13px}
+.device .message{font-size:16px;line-height:1.5}
+.device .composer input{height:48px;min-height:48px;padding:0 14px;font-size:16px;color:var(--ink);background:var(--paper);border:1px solid var(--field-border);border-radius:var(--radius-control,12px)}
+.device .composer button{height:48px}
+/* Environment & devices */
+.device .sensor-detail-heading strong small{font-size:16px;color:var(--ink)}
+.device .sensor-detail-heading>span{font-size:13px;line-height:1.5}
+.device .sensor-chart svg text{font-size:15px;fill:var(--ink-2)}
+.device .sensor-range-stats{font-size:13px;gap:20px}
+.device .sensor-range-stats strong{font-size:16px;font-weight:500}
+.device .sensor-history summary{font-size:16px}
+.device .sensor-history table{font-size:16px}
+.device .sensor-history th{font-size:13px;color:var(--muted)}
+.device .sensor-history td{font-size:16px;padding:10px 0}
+.device .device-section-heading h3,.device .device-control-heading h3{font-size:16px;font-weight:600}
+.device .device-section-heading>span,.device .device-control-heading p,.device .device-updated{font-size:13px}
+.device .device-control-heading p{line-height:1.5}
+.device .fan-speed-label{font-size:16px;min-height:48px;align-items:center;margin:0}
+.device .fan-speed-label output{font-size:16px;color:var(--ink)}
+/* Maintenance */
+.device .maintenance-heading{font-size:16px;color:var(--ink)}
+.device .maintenance-heading button{font-size:16px}
+.device .maintenance-card-top{font-size:16px;font-weight:600}
+.device .maintenance-card-top small{font-size:13px;font-weight:600;padding:3px 10px;border-radius:999px;background:var(--amber-wash-strong);color:var(--amber)}
+.device .maintenance-card.resolved .maintenance-card-top small{background:var(--well);color:var(--ink-2)}
+.device .maintenance-location{font-size:13px}
+.device .maintenance-card p{font-size:16px;line-height:1.5;color:var(--ink)}
+.device .maintenance-card>small{font-size:13px}
+/* Unit hub readings, Saved work */
+.device .unit-hub-unified .unit-live-readings>span,.device .unit-device-count{font-size:13px}
+.device .unit-hub-unified .unit-live-readings small{font-size:13px}
+.device .sync-drawer .sync-connection,.device .sync-drawer .sync-message{font-size:13px}
+.device .sync-record span{font-size:16px;color:var(--ink)}
+.device .sync-record small,.device .sync-record time{font-size:13px}
+.device .finding h3{font-size:18px;line-height:1.35;color:var(--ink)}
+.device .finding p{font-size:16px;line-height:1.5;color:var(--ink-2)}
+.device .finding footer{font-size:13px}
+.device .evidence.sample p{font-size:13px;color:var(--muted)}
+.device .choice{font-size:16px;color:var(--ink)}
+/* A secondary act inside a page or a drawer body (the page-level button reset outranks the shared base layer): a real, 48px button. */
+.device :is(.app-scroll,.sheet-body)>.button.secondary{width:100%;min-height:48px;margin-top:12px;padding:0 17px;font-size:16px;font-weight:600;color:var(--ink);background:var(--paper);border:1px solid var(--control-border);border-radius:var(--radius-control,12px)}
+.device .device-control>.button.primary{width:100%;margin-top:12px}
+.device .sync-summary strong{font-size:16px;font-weight:600;color:var(--ink)}

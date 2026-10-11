@@ -133,7 +133,7 @@
           {
             "name": "Evidence and answer",
             "at": "What is missing",
-            "shows": "Scope line (section / unit / pen), the source note, what is missing, an answer field and Send clarification",
+            "shows": "Scope line (section / unit / pen), the source note, what is missing, an answer field and Send answer",
             "logic": "The review quotes the source record and names the gap; it states that no movement record has been changed. The answer is free text, required, up to 500 characters.",
             "rule": "Sending saves the answer in the session and adds \"Movement clarification received\" to Records. No live record is changed.",
             "source": "finding(); answer-form"
@@ -152,8 +152,7 @@
         "edge": [],
         "rules": [],
         "issues": [
-          "Whether an answer is applied to the record, or only noted for a supervisor, is undecided (preview only).",
-          "\"View Unit 7\" is drawn as bare text, not as a button (see the filed broken item)."
+          "Whether an answer is applied to the record, or only noted for a supervisor, is undecided (preview only)."
         ]
       }
     },

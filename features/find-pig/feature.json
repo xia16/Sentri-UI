@@ -76,8 +76,7 @@
         "edge": [],
         "rules": [],
         "issues": [
-          "Ear notch search (named in the Pigs section) is not offered.",
-          "The footer action (Search sample records) has no visible label (see the filed broken item)."
+          "Ear notch search (named in the Pigs section) is not offered."
         ]
       }
     },
@@ -110,9 +109,7 @@
           "Camera denied, tag unreadable and torn-tag cases are not drawn."
         ],
         "rules": [],
-        "issues": [
-          "The footer action and \"Use a sample tag\" are drawn as unstyled buttons (see the filed broken item)."
-        ]
+        "issues": []
       }
     },
     {

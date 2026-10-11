@@ -400,7 +400,7 @@
               {
                 "state": "Quiet",
                 "when": "No task type has unrecorded rows (Nursery)",
-                "shows": "\"No scheduled work today\""
+                "shows": "\"No work today\""
               }
             ],
             "logic": "Units = units in the section; pigs = a fixed population per section; task types = distinct task types with unrecorded rows (pendingTypes), not work due now.",

@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-10T17:01:37.765Z",
- "commit": "71fde18",
+ "generated": "2026-10-11T13:18:02.141Z",
+ "commit": "45dece5",
  "platforms": [
   {
    "id": "mobile",
@@ -156,7 +156,7 @@
            {
             "name": "Evidence and answer",
             "at": "What is missing",
-            "shows": "Scope line (section / unit / pen), the source note, what is missing, an answer field and Send clarification",
+            "shows": "Scope line (section / unit / pen), the source note, what is missing, an answer field and Send answer",
             "logic": "The review quotes the source record and names the gap; it states that no movement record has been changed. The answer is free text, required, up to 500 characters.",
             "rule": "Sending saves the answer in the session and adds \"Movement clarification received\" to Records. No live record is changed.",
             "source": "finding(); answer-form"
@@ -175,8 +175,7 @@
           "edge": [],
           "rules": [],
           "issues": [
-           "Whether an answer is applied to the record, or only noted for a supervisor, is undecided (preview only).",
-           "\"View Unit 7\" is drawn as bare text, not as a button (see the filed broken item)."
+           "Whether an answer is applied to the record, or only noted for a supervisor, is undecided (preview only)."
           ]
          }
         },
@@ -1284,7 +1283,7 @@
              {
               "state": "Quiet",
               "when": "No task type has unrecorded rows (Nursery)",
-              "shows": "\"No scheduled work today\""
+              "shows": "\"No work today\""
              }
             ],
             "logic": "Units = units in the section; pigs = a fixed population per section; task types = distinct task types with unrecorded rows (pendingTypes), not work due now.",
@@ -12757,8 +12756,7 @@
           "edge": [],
           "rules": [],
           "issues": [
-           "Ear notch search (named in the Pigs section) is not offered.",
-           "The footer action (Search sample records) has no visible label (see the filed broken item)."
+           "Ear notch search (named in the Pigs section) is not offered."
           ]
          }
         },
@@ -12791,9 +12789,7 @@
            "Camera denied, tag unreadable and torn-tag cases are not drawn."
           ],
           "rules": [],
-          "issues": [
-           "The footer action and \"Use a sample tag\" are drawn as unstyled buttons (see the filed broken item)."
-          ]
+          "issues": []
          }
         },
         {
@@ -18007,12 +18003,12 @@
           "elements": [
            {
             "name": "Upload button and message",
-            "shows": "Upload 3 records · No connection · check Wi-Fi or mobile signal",
+            "shows": "Upload all · No connection · check Wi-Fi or mobile signal",
             "states": [
              {
               "state": "Offline",
               "when": "No connection (default; \"Connection preview\" select outside the phone)",
-              "shows": "\"3 records waiting to upload\", button \"Upload 3 records\"; pressing it reports \"Still no connection. All 3 records remain on this device.\""
+              "shows": "\"3 records waiting to upload\", button \"Upload all\"; pressing it reports \"Still no connection. All 3 records remain on this device.\""
              },
              {
               "state": "Ready",
@@ -18037,7 +18033,7 @@
             ],
             "rule": "Only a successful upload clears the queue; a failure keeps every record. The drawer separates records saved on this device from records uploaded for the team.",
             "source": "showSync(); sync.connection",
-            "at": "Upload 3 records"
+            "at": "Upload all"
            },
            {
             "name": "Record row",
@@ -18117,7 +18113,7 @@
          "url": "/ux/system/home-astra-prototype.html?section=gestation&connection=online",
          "steps": [
           "3 records saved on this device",
-          "Upload 3 records",
+          "Upload all",
           {
            "tap": "Uploading…",
            "hold": 1300
@@ -18132,7 +18128,7 @@
          "url": "/ux/system/home-astra-prototype.html?section=gestation",
          "steps": [
           "3 records saved on this device",
-          "Upload 3 records"
+          "Upload all"
          ],
          "figma": "https://www.figma.com/design/LhQhJho192tNKCFvf5Drnf?node-id=10541-8073",
          "notes": {
