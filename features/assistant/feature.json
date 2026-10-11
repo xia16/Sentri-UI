@@ -90,12 +90,12 @@
               {
                 "state": "Input needed",
                 "when": "A finding is unanswered",
-                "shows": "Tab \"Needs you · 1\"; card \"INPUT NEEDED · OVERNIGHT REVIEW\" with the question, a one-line reason, section and review time"
+                "shows": "Tab \"Needs you · 1\"; one amber card with the question, a one-line reason and the review time"
               },
               {
                 "state": "Up to date",
                 "when": "The finding has been answered",
-                "shows": "Check, \"You're up to date\", \"Your answer is saved in this preview. There are no other decisions waiting.\""
+                "shows": "Check, \"You're up to date\", \"Nothing needs you.\""
               }
             ],
             "logic": "Findings and their counts live only inside the Assistant; Home and the section cards carry no badge. Answering a finding removes it from this tab in the same session.",
@@ -127,14 +127,14 @@
         "[data-action=\"finding\"]"
       ],
       "notes": {
-        "purpose": "One finding in full: the evidence, what is missing, and a field for the worker's answer.",
+        "purpose": "One finding in full: the question, the source note, and a field for the worker's answer.",
         "states": [],
         "elements": [
           {
             "name": "Evidence and answer",
-            "at": "What is missing",
-            "shows": "Scope line (section / unit / pen), the source note, what is missing, an answer field and Send answer",
-            "logic": "The review quotes the source record and names the gap; it states that no movement record has been changed. The answer is free text, required, up to 500 characters.",
+            "at": "Where did these pigs go?",
+            "shows": "Header \"Pen A2 movement\" with section and unit, the question, the source note with who and when, an answer field and Send answer",
+            "logic": "The review quotes the source record; the question is the gap, so there is no separate \"what is missing\" box. The answer is free text, required, up to 500 characters.",
             "rule": "Sending saves the answer in the session and adds \"Movement clarification received\" to Records. No live record is changed.",
             "source": "finding(); answer-form"
           }
@@ -169,7 +169,7 @@
           {
             "name": "Saved answer",
             "at": "Your answer",
-            "shows": "\"Your answer: <text>\" with \"Saved in this preview. No live record was changed.\"",
+            "shows": "\"Your answer: <text>\" and \"Saved.\"",
             "rule": "The Send button and the answer field are removed once an answer is on file; there is no edit or undo.",
             "source": "state.answered"
           }
@@ -233,7 +233,7 @@
             "name": "Composer",
             "at": "Ask about your work…",
             "shows": "Input and send at the foot of the page",
-            "rule": "Required, up to 1000 characters. Nothing is sent to an agent: the reply states that this is a preview.",
+            "rule": "Required, up to 1000 characters. Nothing is sent to an agent: the reply says this is a preview.",
             "source": "ask-form; chat()"
           }
         ],
@@ -267,7 +267,7 @@
         "elements": [
           {
             "name": "Assistant reply",
-            "at": "This is a preview of the conversation entrance.",
+            "at": "This is a preview.",
             "shows": "A fixed reply naming the current scope (the section or Unit N)",
             "logic": "The reply restates the scope the Assistant was opened from and says no analysis or farm action has been performed.",
             "rule": "The Assistant never performs a farm action and gives no medical recommendation in the study.",

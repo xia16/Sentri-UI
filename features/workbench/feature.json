@@ -385,7 +385,7 @@
         "elements": [
           {
             "name": "Section card",
-            "shows": "Gestation · 3 units · 246 pigs · 2 task types ready",
+            "shows": "Gestation · 3 units · 2 task types ready",
             "states": [
               {
                 "state": "Current",
@@ -403,9 +403,9 @@
                 "shows": "\"No work today\""
               }
             ],
-            "logic": "Units = units in the section; pigs = a fixed population per section; task types = distinct task types with unrecorded rows (pendingTypes), not work due now.",
+            "logic": "Units = units in the section; the section's pig count is not shown (settled, not a decision); task types = distinct task types with unrecorded rows (pendingTypes), not work due now.",
             "rule": "Selecting a section clears the unit, remembers the section on the device and opens its Overview.",
-            "source": "sections[].units, sections[].population, pendingTypes()",
+            "source": "sections[].units, pendingTypes()",
             "at": "2 task types ready"
           }
         ],
@@ -418,8 +418,7 @@
         ],
         "rules": [],
         "issues": [
-          "\"task types ready\" counts waiting tasks as ready; it says nothing about work due now.",
-          "The footer note and intro repeat the choice the cards already make."
+          "\"task types ready\" counts waiting tasks as ready; it says nothing about work due now."
         ]
       }
     },
@@ -624,12 +623,12 @@
               {
                 "state": "Overview, no tasks",
                 "when": "The scoped task list is empty (Nursery)",
-                "shows": "\"No scheduled tasks today\", \"Select a unit to inspect pens or record anything you find.\" and a Tomorrow card"
+                "shows": "\"No scheduled tasks today\" and a Tomorrow card"
               },
               {
                 "state": "Unit, no tasks",
                 "when": "A unit is chosen and carries no task",
-                "shows": "\"You can still inspect this unit and record anything you find.\"; the Tomorrow card is hidden"
+                "shows": "\"No scheduled tasks today\" alone; the Tomorrow card is hidden"
               }
             ],
             "logic": "The Tomorrow card (Growth check · Batch 26 · Units 12-13) is fixed sample text, not derived from any task.",
@@ -664,7 +663,7 @@
         "elements": [
           {
             "name": "Unit hub · attention chips",
-            "shows": "Health 3 · Feed 3 · Maintenance 1",
+            "shows": "Health 3 · Feed 3 · Maintenance 1 (words only, no icons, one row)",
             "states": [
               {
                 "state": "Flagged",
@@ -674,7 +673,7 @@
               {
                 "state": "Clear",
                 "when": "All signals are zero",
-                "shows": "\"No flagged items\""
+                "shows": "No chips and no line: nothing is drawn for zero"
               },
               {
                 "state": "Unknown",
@@ -688,14 +687,14 @@
           },
           {
             "name": "Unit hub · Checked",
-            "shows": "Checked Yesterday",
+            "shows": "86 pigs · 8 pens · checked 06:40 (one line under Inspect unit)",
             "logic": "First segment of units[N].checked (the part before the name). Date and checker are sample data; who checked is dropped.",
             "source": "units{}",
-            "at": "Checked Yesterday"
+            "at": "checked"
           },
           {
             "name": "Unit hub · Environment & devices",
-            "shows": "Environment & devices · 22.4 °C · 64 % · 8 ppm NH₃",
+            "shows": "Environment & devices · 22.4 °C · 64 % · 8 ppm",
             "states": [
               {
                 "state": "Readings",
@@ -714,7 +713,7 @@
               }
             ],
             "source": "availableSensors(), unitDevices()",
-            "at": "ppm NH₃"
+            "at": "ppm"
           },
           {
             "name": "Task cards in a unit",
@@ -725,7 +724,7 @@
           },
           {
             "name": "Coming up",
-            "shows": "Coming up · 2 batches",
+            "shows": "Coming up · 2 batches (16px rows when opened)",
             "logic": "Collapsed list of the unit's next batches or rounds (Batch 31 Pregnancy check · tomorrow; Batch 30 Return-heat · 14:30). Not shown in the Farrowing section, which has no unit context.",
             "source": "unitContext[7].next; comingUp()",
             "at": "Coming up"
@@ -742,7 +741,7 @@
         "issues": [
           "The same Health 3 / Feed 3 snapshot appears in every unit.",
           "The Maintenance chip sits inside the Inspect card but opens Inspection, not Maintenance; the list is only reachable via Toolbox.",
-          "\"Checked Yesterday\" drops who checked and when; the direction doc says the strip shows last-check time."
+          "\"checked 06:40\" drops who checked; the direction doc says the strip shows last-check time."
         ]
       }
     },
@@ -1058,8 +1057,8 @@
         "elements": [
           {
             "name": "Unit hub · attention chips",
-            "at": "No flagged items",
-            "shows": "\"No flagged items\" with a check",
+            "at": "Inspect unit",
+            "shows": "Inspect unit and its one-line facts; no chips and no \"No flagged items\" line, because zero draws nothing",
             "logic": "Health and Feed are fictional snapshot counts picked by the `attention` preview; Maintenance counts the unit's open maintenance records. The full state table is on \"Unit · Gestation Unit 7\".",
             "source": "unitStrip()"
           }

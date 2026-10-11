@@ -96,12 +96,12 @@
         "elements": [
           {
             "name": "Sensor tabs and reading",
-            "shows": "Temperature · Humidity · Ammonia · 22.4 °C · Last reading 09:40",
+            "shows": "Temperature · Humidity · Ammonia · 22.4 °C · Offline · 09:40",
             "states": [
               {
                 "state": "Sensor present",
                 "when": "The unit has a finite numeric reading for it",
-                "shows": "A tab with the value and unit (°C, %, ppm NH₃); the first tab is selected on entry"
+                "shows": "A tab with the sensor name; the first is selected on entry. The reading is the large value with its unit (°C, %, ppm NH₃)"
               },
               {
                 "state": "Sensor missing",
@@ -111,74 +111,74 @@
               {
                 "state": "No readings",
                 "when": "None of the three has a value",
-                "shows": "No tabs, chart or history; only the Devices section, if any"
+                "shows": "No tabs, chart or history; only the fan, if any"
               }
             ],
-            "logic": "Sample figures per unit (Unit 7: 22.4 °C, 64 %, 8 ppm). \"Last reading\" is unitContext[N].updated, one fixed sample time for every sensor.",
+            "logic": "Sample figures per unit (Unit 7: 22.4 °C, 64 %, 8 ppm). The time beside the value is unitContext[N].updated, one fixed sample time for every sensor: \"Offline · 09:40\" when offline, \"09:40\" when connected. The value carries no in-range or out-of-range mark because no thresholds exist yet.",
             "source": "availableSensors(); unitContext[N].readings, .updated",
-            "at": "Last reading"
+            "at": "Offline · 09:40"
           },
           {
-            "name": "Chart, Low / High and history",
-            "shows": "Today · 7 days · Low 21.9 °C · High 22.8 °C",
+            "name": "Chart, Low / High and period",
+            "shows": "Low 21.9 · High 22.8 · Today | 7 days",
             "states": [
               {
                 "state": "Today",
                 "when": "Period toggle on Today",
-                "shows": "8 points from 00:00 to the last reading time"
+                "shows": "8 points; the x labels are the first and last time (00:00 and the reading time)"
               },
               {
                 "state": "7 days",
                 "when": "Period toggle on 7 days",
-                "shows": "7 daily points (6d ago … Today)"
+                "shows": "7 daily points; the x labels are \"6d ago\" and \"Today\""
               }
             ],
-            "logic": "Not real history: series = current value plus fixed offsets scaled by sensor (temperature ×1, humidity ×6, ammonia ×2); y range = min/max ± padding. Low and High are the min and max of the plotted points; \"Reading history\" lists the same points as Time and value.",
+            "logic": "Not real history: series = current value plus fixed offsets scaled by sensor (temperature ×1, humidity ×6, ammonia ×2); y range = min/max ± padding, drawn without y-axis labels because Low and High say it. Low and High are the min and max of the plotted points; only the last point carries a dot. The period control is one compact Lens on the chart's header line.",
             "source": "sensorHistory(), sensorChart()",
-            "at": "Low 21.9 °C"
+            "at": "Low"
           },
           {
             "name": "Connection",
-            "shows": "Sample readings · offline, showing last available values · Devices · Offline",
+            "shows": "Offline · 09:40 beside the value; the fan says \"Reconnect to change.\"",
             "states": [
               {
                 "state": "Offline",
                 "when": "Page default (the \"Connection preview\" select outside the phone)",
-                "shows": "Readings are the last available values; Devices tag \"Offline\"; Auto/Manual and Apply disabled; helper \"Reconnect to change device settings.\""
+                "shows": "\"Offline · 09:40\" beside the value (the readings are the last available values); the fan's Auto/Manual disabled and one line \"Reconnect to change.\"; no Save button"
               },
               {
                 "state": "Connected",
                 "when": "Connection preview set to Connected",
-                "shows": "Note reads \"connected\"; tag \"Connected\"; controls enabled; helper \"Preview controls only · no command is sent to equipment.\""
+                "shows": "Just \"09:40\" beside the value; fan controls enabled"
               }
             ],
             "source": "environment(); sync.connection",
-            "at": "Sample readings · offline, showing last available values"
+            "at": "Offline · 09:40"
           },
           {
             "name": "Ventilation fan card",
-            "shows": "Ventilation fan · Auto · following unit schedule",
+            "shows": "Ventilation fan · Auto · unit schedule",
             "states": [
               {
                 "state": "Auto",
                 "when": "Applied mode is Auto",
-                "shows": "\"Auto · following unit schedule\""
+                "shows": "\"Auto · unit schedule\""
               },
               {
                 "state": "Manual",
                 "when": "Applied mode is Manual",
-                "shows": "\"Manual · N% speed\" (initial speed 45)"
+                "shows": "\"Manual · N%\" (initial speed 45)"
               },
               {
                 "state": "No device",
                 "when": "The unit has no controllable device (devices lacks \"fan\")",
-                "shows": "The whole Devices section is absent; only sensors show"
+                "shows": "The fan section is absent; only sensors show"
               }
             ],
             "logic": "Controllable devices are independent of readings: a unit can have devices with no readings (the unit card then says \"N devices\") or readings with no device.",
-            "rule": "Apply is disabled offline and whenever the draft mode and speed equal the applied ones. Nothing is sent to equipment; the setting lives in memory only.",
+            "rule": "Save setting appears only in Manual or with a pending change, and is disabled until the draft differs from the saved setting; offline it is absent. Nothing is sent to equipment (the PREVIEW badge says so); the setting lives in memory only.",
             "source": "unitDevices(); fan-mode and apply-device handlers",
-            "at": "Auto · following unit schedule"
+            "at": "Auto · unit schedule"
           }
         ],
         "controls": [],
@@ -190,8 +190,7 @@
         ],
         "rules": [],
         "issues": [
-          "The \"Last reading\" time is a fixed 09:40 on all sensors while the status bar reads 9:41.",
-          "The offline note appears three times: the chart helper, the Devices tag and the fan helper.",
+          "The time beside the value is a fixed 09:40 on all sensors while the status bar reads 9:41.",
           "Only a ventilation fan exists; the concept names \"devices\" in general.",
           "unclear: alert thresholds, who is told when a reading is out of range, and where real data comes from; none are in the code."
         ]
@@ -213,27 +212,27 @@
         "states": [],
         "elements": [
           {
-            "name": "Fan speed and Apply",
-            "shows": "Fan speed 45% · Apply preview setting",
+            "name": "Fan speed and Save",
+            "shows": "Fan speed 45% · Save setting",
             "states": [
               {
                 "state": "Draft",
                 "when": "Manual pressed, speed moved, not applied",
-                "shows": "Slider 0-100 in steps of 5 with a live value; Apply enabled once the draft differs from the applied setting"
+                "shows": "Slider 0-100 in steps of 5 with a live value; Save setting enabled once the draft differs from the saved setting"
               },
               {
                 "state": "Applied",
                 "when": "After Apply",
-                "shows": "Status \"Manual · 70% speed\", note \"Preview setting applied · just now\", toast \"Sample setting saved · no equipment command sent\""
+                "shows": "Status \"Manual · 70%\" and the toast \"Fan setting saved\""
               },
               {
                 "state": "Back to Auto",
                 "when": "Auto pressed",
-                "shows": "The slider goes away; a draft equal to the applied state keeps Apply disabled"
+                "shows": "The slider goes away; a draft equal to the saved state keeps Save disabled"
               }
             ],
-            "rule": "The draft is not applied until Apply; everything is disabled offline. Preview only: no command is sent to equipment.",
-            "source": "fan-speed input, apply-device handler, d.updated",
+            "rule": "The draft is not applied until Save; everything is disabled offline. The PREVIEW badge says no command is sent to equipment.",
+            "source": "fan-speed input, apply-device handler",
             "at": "Fan speed"
           }
         ],
@@ -271,7 +270,7 @@
               {
                 "state": "Open",
                 "when": "Not yet resolved",
-                "shows": "Equipment name, \"Open\", location, note, reporter and time"
+                "shows": "Equipment name, \"Open\", the note, then one line: location · reporter · time"
               },
               {
                 "state": "Resolved",
@@ -289,12 +288,12 @@
             "at": "Leaking valve at the east end."
           },
           {
-            "name": "Open count",
-            "shows": "1 open issue",
-            "logic": "Records not resolved, singular or plural. The same count feeds the Maintenance chip on the unit screen. Unit 7 starts with one open issue; the `attention` param hides it (clear, health, feed) or adds a default one in other units (maintenance, busy).",
+            "name": "Open issues",
+            "shows": "One card per issue; no count line",
+            "logic": "The list is the count; the count line was cut. The unit screen's Maintenance chip carries the number of records not resolved. Unit 7 starts with one open issue; the `attention` param hides it (clear, health, feed) or adds a default one in other units (maintenance, busy).",
             "rule": "Only reachable once a unit is chosen: the Toolbox row exists only in a unit scope. Issues are unit-scoped.",
             "source": "maintenanceRecords()",
-            "at": "1 open issue"
+            "at": "Drinking station"
           }
         ],
         "controls": [],
@@ -328,18 +327,18 @@
         "states": [],
         "elements": [
           {
-            "name": "Empty state and count",
-            "shows": "No open issues · 0 open issues",
+            "name": "Empty state",
+            "shows": "No open issues",
             "states": [
               {
                 "state": "Empty",
                 "when": "The unit has no records at all (Unit 8)",
-                "shows": "\"No open issues — Report equipment that needs attention in this unit.\" and \"0 open issues\""
+                "shows": "\"No open issues\" and the Report issue button"
               },
               {
                 "state": "Only resolved",
                 "when": "Every record is resolved",
-                "shows": "Not this state: the resolved cards stay listed with \"0 open issues\""
+                "shows": "Not this state: the resolved cards stay listed"
               }
             ],
             "source": "maintenance()",
@@ -493,9 +492,9 @@
         "elements": [
           {
             "name": "Chart and low/high",
-            "at": "Reading history",
-            "shows": "Seven daily points (6d ago to Today) with low and high",
-            "logic": "The week series is sample data derived from the current reading; the Today series has eight points up to the last-reading time. Low and High are the minimum and maximum of the plotted points; the history table lists the same points.",
+            "at": "Low",
+            "shows": "Seven daily points (6d ago to Today) with low and high; Reading history is one plain row with a chevron at the end of the page",
+            "logic": "The week series is sample data derived from the current reading; the Today series has eight points up to the reading time. Low and High are the minimum and maximum of the plotted points; the Reading history row opens a table of the same points.",
             "source": "sensorHistory(); sensorChart()"
           }
         ],
@@ -506,7 +505,7 @@
         "edge": [],
         "rules": [],
         "issues": [
-          "The chart switch does not change \"Last reading\" (still 09:40)."
+          "The chart switch does not change the time beside the value (still 09:40)."
         ]
       }
     },

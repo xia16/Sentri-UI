@@ -93,12 +93,12 @@
         "elements": [
           {
             "name": "Upload button and message",
-            "shows": "Upload all · No connection · check Wi-Fi or mobile signal",
+            "shows": "3 records waiting to upload · No connection · check Wi-Fi or signal · Upload all",
             "states": [
               {
                 "state": "Offline",
                 "when": "No connection (default; \"Connection preview\" select outside the phone)",
-                "shows": "\"3 records waiting to upload\", button \"Upload all\"; pressing it reports \"Still no connection. All 3 records remain on this device.\""
+                "shows": "\"3 records waiting to upload\", button \"Upload all\"; pressing it changes the line under the count to \"Still no connection\""
               },
               {
                 "state": "Ready",
@@ -108,17 +108,17 @@
               {
                 "state": "Uploading",
                 "when": "About 0.9 s after pressing",
-                "shows": "Button \"Uploading…\" disabled, \"Uploading saved records…\""
+                "shows": "Button \"Uploading…\" disabled, \"Sending…\" under the count"
               },
               {
                 "state": "Failed",
                 "when": "The simulated upload fails",
-                "shows": "\"Upload did not complete. Your records are still on this device. Try again.\" with \"Retry upload\""
+                "shows": "\"Upload did not finish\" under the count, with \"Retry upload\""
               },
               {
                 "state": "Done",
                 "when": "Queue empty",
-                "shows": "\"Everything is uploaded\", \"There are no records waiting on this device.\", button \"Done\""
+                "shows": "\"Everything is uploaded\" alone, button \"Done\""
               }
             ],
             "rule": "Only a successful upload clears the queue; a failure keeps every record. The drawer separates records saved on this device from records uploaded for the team.",
@@ -180,12 +180,12 @@
               {
                 "state": "Uploading",
                 "when": "About 0.9 s after Upload is pressed",
-                "shows": "Button \"Uploading…\" disabled; \"Uploading saved records…\""
+                "shows": "Button \"Uploading…\" disabled; \"Sending…\" under the count"
               },
               {
                 "state": "Done",
                 "when": "The upload succeeds",
-                "shows": "Queue emptied, \"Upload complete.\" status, button becomes Done"
+                "shows": "Queue emptied, \"Everything is uploaded\" and nothing else, button becomes Done"
               }
             ],
             "rule": "Only a successful upload clears the queue; Home then shows the quiet \"All records uploaded\" row.",
@@ -227,8 +227,8 @@
         "elements": [
           {
             "name": "Failure message",
-            "at": "Still no connection.",
-            "shows": "\"Still no connection. All 3 records remain on this device.\" and the button changes to Retry upload",
+            "at": "Still no connection",
+            "shows": "\"Still no connection\" under the count and the button changes to Retry upload",
             "states": [
               {
                 "state": "No connection",
@@ -238,7 +238,7 @@
               {
                 "state": "Upload failed",
                 "when": "Connected but the upload does not complete (Connection preview: failed)",
-                "shows": "\"Upload did not complete. Your records are still on this device. Try again.\" with \"Retry upload\""
+                "shows": "\"Upload did not finish\" under the count, with \"Retry upload\""
               }
             ],
             "rule": "A failure keeps every record in the queue and the user can retry at once.",

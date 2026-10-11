@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-11T13:21:19.966Z",
- "commit": "f0db88b",
+ "generated": "2026-10-11T14:02:50.998Z",
+ "commit": "dd368fc",
  "platforms": [
   {
    "id": "mobile",
@@ -113,12 +113,12 @@
              {
               "state": "Input needed",
               "when": "A finding is unanswered",
-              "shows": "Tab \"Needs you · 1\"; card \"INPUT NEEDED · OVERNIGHT REVIEW\" with the question, a one-line reason, section and review time"
+              "shows": "Tab \"Needs you · 1\"; one amber card with the question, a one-line reason and the review time"
              },
              {
               "state": "Up to date",
               "when": "The finding has been answered",
-              "shows": "Check, \"You're up to date\", \"Your answer is saved in this preview. There are no other decisions waiting.\""
+              "shows": "Check, \"You're up to date\", \"Nothing needs you.\""
              }
             ],
             "logic": "Findings and their counts live only inside the Assistant; Home and the section cards carry no badge. Answering a finding removes it from this tab in the same session.",
@@ -150,14 +150,14 @@
           "[data-action=\"finding\"]"
          ],
          "notes": {
-          "purpose": "One finding in full: the evidence, what is missing, and a field for the worker's answer.",
+          "purpose": "One finding in full: the question, the source note, and a field for the worker's answer.",
           "states": [],
           "elements": [
            {
             "name": "Evidence and answer",
-            "at": "What is missing",
-            "shows": "Scope line (section / unit / pen), the source note, what is missing, an answer field and Send answer",
-            "logic": "The review quotes the source record and names the gap; it states that no movement record has been changed. The answer is free text, required, up to 500 characters.",
+            "at": "Where did these pigs go?",
+            "shows": "Header \"Pen A2 movement\" with section and unit, the question, the source note with who and when, an answer field and Send answer",
+            "logic": "The review quotes the source record; the question is the gap, so there is no separate \"what is missing\" box. The answer is free text, required, up to 500 characters.",
             "rule": "Sending saves the answer in the session and adds \"Movement clarification received\" to Records. No live record is changed.",
             "source": "finding(); answer-form"
            }
@@ -192,7 +192,7 @@
            {
             "name": "Saved answer",
             "at": "Your answer",
-            "shows": "\"Your answer: <text>\" with \"Saved in this preview. No live record was changed.\"",
+            "shows": "\"Your answer: <text>\" and \"Saved.\"",
             "rule": "The Send button and the answer field are removed once an answer is on file; there is no edit or undo.",
             "source": "state.answered"
            }
@@ -256,7 +256,7 @@
             "name": "Composer",
             "at": "Ask about your work…",
             "shows": "Input and send at the foot of the page",
-            "rule": "Required, up to 1000 characters. Nothing is sent to an agent: the reply states that this is a preview.",
+            "rule": "Required, up to 1000 characters. Nothing is sent to an agent: the reply says this is a preview.",
             "source": "ask-form; chat()"
            }
           ],
@@ -290,7 +290,7 @@
           "elements": [
            {
             "name": "Assistant reply",
-            "at": "This is a preview of the conversation entrance.",
+            "at": "This is a preview.",
             "shows": "A fixed reply naming the current scope (the section or Unit N)",
             "logic": "The reply restates the scope the Assistant was opened from and says no analysis or farm action has been performed.",
             "rule": "The Assistant never performs a farm action and gives no medical recommendation in the study.",
@@ -414,12 +414,12 @@
           "elements": [
            {
             "name": "Sensor tabs and reading",
-            "shows": "Temperature · Humidity · Ammonia · 22.4 °C · Last reading 09:40",
+            "shows": "Temperature · Humidity · Ammonia · 22.4 °C · Offline · 09:40",
             "states": [
              {
               "state": "Sensor present",
               "when": "The unit has a finite numeric reading for it",
-              "shows": "A tab with the value and unit (°C, %, ppm NH₃); the first tab is selected on entry"
+              "shows": "A tab with the sensor name; the first is selected on entry. The reading is the large value with its unit (°C, %, ppm NH₃)"
              },
              {
               "state": "Sensor missing",
@@ -429,74 +429,74 @@
              {
               "state": "No readings",
               "when": "None of the three has a value",
-              "shows": "No tabs, chart or history; only the Devices section, if any"
+              "shows": "No tabs, chart or history; only the fan, if any"
              }
             ],
-            "logic": "Sample figures per unit (Unit 7: 22.4 °C, 64 %, 8 ppm). \"Last reading\" is unitContext[N].updated, one fixed sample time for every sensor.",
+            "logic": "Sample figures per unit (Unit 7: 22.4 °C, 64 %, 8 ppm). The time beside the value is unitContext[N].updated, one fixed sample time for every sensor: \"Offline · 09:40\" when offline, \"09:40\" when connected. The value carries no in-range or out-of-range mark because no thresholds exist yet.",
             "source": "availableSensors(); unitContext[N].readings, .updated",
-            "at": "Last reading"
+            "at": "Offline · 09:40"
            },
            {
-            "name": "Chart, Low / High and history",
-            "shows": "Today · 7 days · Low 21.9 °C · High 22.8 °C",
+            "name": "Chart, Low / High and period",
+            "shows": "Low 21.9 · High 22.8 · Today | 7 days",
             "states": [
              {
               "state": "Today",
               "when": "Period toggle on Today",
-              "shows": "8 points from 00:00 to the last reading time"
+              "shows": "8 points; the x labels are the first and last time (00:00 and the reading time)"
              },
              {
               "state": "7 days",
               "when": "Period toggle on 7 days",
-              "shows": "7 daily points (6d ago … Today)"
+              "shows": "7 daily points; the x labels are \"6d ago\" and \"Today\""
              }
             ],
-            "logic": "Not real history: series = current value plus fixed offsets scaled by sensor (temperature ×1, humidity ×6, ammonia ×2); y range = min/max ± padding. Low and High are the min and max of the plotted points; \"Reading history\" lists the same points as Time and value.",
+            "logic": "Not real history: series = current value plus fixed offsets scaled by sensor (temperature ×1, humidity ×6, ammonia ×2); y range = min/max ± padding, drawn without y-axis labels because Low and High say it. Low and High are the min and max of the plotted points; only the last point carries a dot. The period control is one compact Lens on the chart's header line.",
             "source": "sensorHistory(), sensorChart()",
-            "at": "Low 21.9 °C"
+            "at": "Low"
            },
            {
             "name": "Connection",
-            "shows": "Sample readings · offline, showing last available values · Devices · Offline",
+            "shows": "Offline · 09:40 beside the value; the fan says \"Reconnect to change.\"",
             "states": [
              {
               "state": "Offline",
               "when": "Page default (the \"Connection preview\" select outside the phone)",
-              "shows": "Readings are the last available values; Devices tag \"Offline\"; Auto/Manual and Apply disabled; helper \"Reconnect to change device settings.\""
+              "shows": "\"Offline · 09:40\" beside the value (the readings are the last available values); the fan's Auto/Manual disabled and one line \"Reconnect to change.\"; no Save button"
              },
              {
               "state": "Connected",
               "when": "Connection preview set to Connected",
-              "shows": "Note reads \"connected\"; tag \"Connected\"; controls enabled; helper \"Preview controls only · no command is sent to equipment.\""
+              "shows": "Just \"09:40\" beside the value; fan controls enabled"
              }
             ],
             "source": "environment(); sync.connection",
-            "at": "Sample readings · offline, showing last available values"
+            "at": "Offline · 09:40"
            },
            {
             "name": "Ventilation fan card",
-            "shows": "Ventilation fan · Auto · following unit schedule",
+            "shows": "Ventilation fan · Auto · unit schedule",
             "states": [
              {
               "state": "Auto",
               "when": "Applied mode is Auto",
-              "shows": "\"Auto · following unit schedule\""
+              "shows": "\"Auto · unit schedule\""
              },
              {
               "state": "Manual",
               "when": "Applied mode is Manual",
-              "shows": "\"Manual · N% speed\" (initial speed 45)"
+              "shows": "\"Manual · N%\" (initial speed 45)"
              },
              {
               "state": "No device",
               "when": "The unit has no controllable device (devices lacks \"fan\")",
-              "shows": "The whole Devices section is absent; only sensors show"
+              "shows": "The fan section is absent; only sensors show"
              }
             ],
             "logic": "Controllable devices are independent of readings: a unit can have devices with no readings (the unit card then says \"N devices\") or readings with no device.",
-            "rule": "Apply is disabled offline and whenever the draft mode and speed equal the applied ones. Nothing is sent to equipment; the setting lives in memory only.",
+            "rule": "Save setting appears only in Manual or with a pending change, and is disabled until the draft differs from the saved setting; offline it is absent. Nothing is sent to equipment (the PREVIEW badge says so); the setting lives in memory only.",
             "source": "unitDevices(); fan-mode and apply-device handlers",
-            "at": "Auto · following unit schedule"
+            "at": "Auto · unit schedule"
            }
           ],
           "controls": [],
@@ -508,8 +508,7 @@
           ],
           "rules": [],
           "issues": [
-           "The \"Last reading\" time is a fixed 09:40 on all sensors while the status bar reads 9:41.",
-           "The offline note appears three times: the chart helper, the Devices tag and the fan helper.",
+           "The time beside the value is a fixed 09:40 on all sensors while the status bar reads 9:41.",
            "Only a ventilation fan exists; the concept names \"devices\" in general.",
            "unclear: alert thresholds, who is told when a reading is out of range, and where real data comes from; none are in the code."
           ]
@@ -531,27 +530,27 @@
           "states": [],
           "elements": [
            {
-            "name": "Fan speed and Apply",
-            "shows": "Fan speed 45% · Apply preview setting",
+            "name": "Fan speed and Save",
+            "shows": "Fan speed 45% · Save setting",
             "states": [
              {
               "state": "Draft",
               "when": "Manual pressed, speed moved, not applied",
-              "shows": "Slider 0-100 in steps of 5 with a live value; Apply enabled once the draft differs from the applied setting"
+              "shows": "Slider 0-100 in steps of 5 with a live value; Save setting enabled once the draft differs from the saved setting"
              },
              {
               "state": "Applied",
               "when": "After Apply",
-              "shows": "Status \"Manual · 70% speed\", note \"Preview setting applied · just now\", toast \"Sample setting saved · no equipment command sent\""
+              "shows": "Status \"Manual · 70%\" and the toast \"Fan setting saved\""
              },
              {
               "state": "Back to Auto",
               "when": "Auto pressed",
-              "shows": "The slider goes away; a draft equal to the applied state keeps Apply disabled"
+              "shows": "The slider goes away; a draft equal to the saved state keeps Save disabled"
              }
             ],
-            "rule": "The draft is not applied until Apply; everything is disabled offline. Preview only: no command is sent to equipment.",
-            "source": "fan-speed input, apply-device handler, d.updated",
+            "rule": "The draft is not applied until Save; everything is disabled offline. The PREVIEW badge says no command is sent to equipment.",
+            "source": "fan-speed input, apply-device handler",
             "at": "Fan speed"
            }
           ],
@@ -589,7 +588,7 @@
              {
               "state": "Open",
               "when": "Not yet resolved",
-              "shows": "Equipment name, \"Open\", location, note, reporter and time"
+              "shows": "Equipment name, \"Open\", the note, then one line: location · reporter · time"
              },
              {
               "state": "Resolved",
@@ -607,12 +606,12 @@
             "at": "Leaking valve at the east end."
            },
            {
-            "name": "Open count",
-            "shows": "1 open issue",
-            "logic": "Records not resolved, singular or plural. The same count feeds the Maintenance chip on the unit screen. Unit 7 starts with one open issue; the `attention` param hides it (clear, health, feed) or adds a default one in other units (maintenance, busy).",
+            "name": "Open issues",
+            "shows": "One card per issue; no count line",
+            "logic": "The list is the count; the count line was cut. The unit screen's Maintenance chip carries the number of records not resolved. Unit 7 starts with one open issue; the `attention` param hides it (clear, health, feed) or adds a default one in other units (maintenance, busy).",
             "rule": "Only reachable once a unit is chosen: the Toolbox row exists only in a unit scope. Issues are unit-scoped.",
             "source": "maintenanceRecords()",
-            "at": "1 open issue"
+            "at": "Drinking station"
            }
           ],
           "controls": [],
@@ -646,18 +645,18 @@
           "states": [],
           "elements": [
            {
-            "name": "Empty state and count",
-            "shows": "No open issues · 0 open issues",
+            "name": "Empty state",
+            "shows": "No open issues",
             "states": [
              {
               "state": "Empty",
               "when": "The unit has no records at all (Unit 8)",
-              "shows": "\"No open issues — Report equipment that needs attention in this unit.\" and \"0 open issues\""
+              "shows": "\"No open issues\" and the Report issue button"
              },
              {
               "state": "Only resolved",
               "when": "Every record is resolved",
-              "shows": "Not this state: the resolved cards stay listed with \"0 open issues\""
+              "shows": "Not this state: the resolved cards stay listed"
              }
             ],
             "source": "maintenance()",
@@ -811,9 +810,9 @@
           "elements": [
            {
             "name": "Chart and low/high",
-            "at": "Reading history",
-            "shows": "Seven daily points (6d ago to Today) with low and high",
-            "logic": "The week series is sample data derived from the current reading; the Today series has eight points up to the last-reading time. Low and High are the minimum and maximum of the plotted points; the history table lists the same points.",
+            "at": "Low",
+            "shows": "Seven daily points (6d ago to Today) with low and high; Reading history is one plain row with a chevron at the end of the page",
+            "logic": "The week series is sample data derived from the current reading; the Today series has eight points up to the reading time. Low and High are the minimum and maximum of the plotted points; the Reading history row opens a table of the same points.",
             "source": "sensorHistory(); sensorChart()"
            }
           ],
@@ -824,7 +823,7 @@
           "edge": [],
           "rules": [],
           "issues": [
-           "The chart switch does not change \"Last reading\" (still 09:40)."
+           "The chart switch does not change the time beside the value (still 09:40)."
           ]
          }
         },
@@ -1268,7 +1267,7 @@
           "elements": [
            {
             "name": "Section card",
-            "shows": "Gestation · 3 units · 246 pigs · 2 task types ready",
+            "shows": "Gestation · 3 units · 2 task types ready",
             "states": [
              {
               "state": "Current",
@@ -1286,9 +1285,9 @@
               "shows": "\"No work today\""
              }
             ],
-            "logic": "Units = units in the section; pigs = a fixed population per section; task types = distinct task types with unrecorded rows (pendingTypes), not work due now.",
+            "logic": "Units = units in the section; the section's pig count is not shown (settled, not a decision); task types = distinct task types with unrecorded rows (pendingTypes), not work due now.",
             "rule": "Selecting a section clears the unit, remembers the section on the device and opens its Overview.",
-            "source": "sections[].units, sections[].population, pendingTypes()",
+            "source": "sections[].units, pendingTypes()",
             "at": "2 task types ready"
            }
           ],
@@ -1301,8 +1300,7 @@
           ],
           "rules": [],
           "issues": [
-           "\"task types ready\" counts waiting tasks as ready; it says nothing about work due now.",
-           "The footer note and intro repeat the choice the cards already make."
+           "\"task types ready\" counts waiting tasks as ready; it says nothing about work due now."
           ]
          }
         },
@@ -1507,12 +1505,12 @@
              {
               "state": "Overview, no tasks",
               "when": "The scoped task list is empty (Nursery)",
-              "shows": "\"No scheduled tasks today\", \"Select a unit to inspect pens or record anything you find.\" and a Tomorrow card"
+              "shows": "\"No scheduled tasks today\" and a Tomorrow card"
              },
              {
               "state": "Unit, no tasks",
               "when": "A unit is chosen and carries no task",
-              "shows": "\"You can still inspect this unit and record anything you find.\"; the Tomorrow card is hidden"
+              "shows": "\"No scheduled tasks today\" alone; the Tomorrow card is hidden"
              }
             ],
             "logic": "The Tomorrow card (Growth check · Batch 26 · Units 12-13) is fixed sample text, not derived from any task.",
@@ -1547,7 +1545,7 @@
           "elements": [
            {
             "name": "Unit hub · attention chips",
-            "shows": "Health 3 · Feed 3 · Maintenance 1",
+            "shows": "Health 3 · Feed 3 · Maintenance 1 (words only, no icons, one row)",
             "states": [
              {
               "state": "Flagged",
@@ -1557,7 +1555,7 @@
              {
               "state": "Clear",
               "when": "All signals are zero",
-              "shows": "\"No flagged items\""
+              "shows": "No chips and no line: nothing is drawn for zero"
              },
              {
               "state": "Unknown",
@@ -1571,14 +1569,14 @@
            },
            {
             "name": "Unit hub · Checked",
-            "shows": "Checked Yesterday",
+            "shows": "86 pigs · 8 pens · checked 06:40 (one line under Inspect unit)",
             "logic": "First segment of units[N].checked (the part before the name). Date and checker are sample data; who checked is dropped.",
             "source": "units{}",
-            "at": "Checked Yesterday"
+            "at": "checked"
            },
            {
             "name": "Unit hub · Environment & devices",
-            "shows": "Environment & devices · 22.4 °C · 64 % · 8 ppm NH₃",
+            "shows": "Environment & devices · 22.4 °C · 64 % · 8 ppm",
             "states": [
              {
               "state": "Readings",
@@ -1597,7 +1595,7 @@
              }
             ],
             "source": "availableSensors(), unitDevices()",
-            "at": "ppm NH₃"
+            "at": "ppm"
            },
            {
             "name": "Task cards in a unit",
@@ -1608,7 +1606,7 @@
            },
            {
             "name": "Coming up",
-            "shows": "Coming up · 2 batches",
+            "shows": "Coming up · 2 batches (16px rows when opened)",
             "logic": "Collapsed list of the unit's next batches or rounds (Batch 31 Pregnancy check · tomorrow; Batch 30 Return-heat · 14:30). Not shown in the Farrowing section, which has no unit context.",
             "source": "unitContext[7].next; comingUp()",
             "at": "Coming up"
@@ -1625,7 +1623,7 @@
           "issues": [
            "The same Health 3 / Feed 3 snapshot appears in every unit.",
            "The Maintenance chip sits inside the Inspect card but opens Inspection, not Maintenance; the list is only reachable via Toolbox.",
-           "\"Checked Yesterday\" drops who checked and when; the direction doc says the strip shows last-check time."
+           "\"checked 06:40\" drops who checked; the direction doc says the strip shows last-check time."
           ]
          }
         },
@@ -1941,8 +1939,8 @@
           "elements": [
            {
             "name": "Unit hub · attention chips",
-            "at": "No flagged items",
-            "shows": "\"No flagged items\" with a check",
+            "at": "Inspect unit",
+            "shows": "Inspect unit and its one-line facts; no chips and no \"No flagged items\" line, because zero draws nothing",
             "logic": "Health and Feed are fictional snapshot counts picked by the `attention` preview; Maintenance counts the unit's open maintenance records. The full state table is on \"Unit · Gestation Unit 7\".",
             "source": "unitStrip()"
            }
@@ -12775,9 +12773,9 @@
           "elements": [
            {
             "name": "Scanner and tag field",
-            "at": "Scanner preview.",
+            "at": "Ear tag",
             "shows": "Camera frame, a tag field and \"Use a sample tag\"",
-            "rule": "Camera and tag-reader hardware are not connected; the sample tag button runs the same lookup with a known tag (000302).",
+            "rule": "Camera and tag-reader hardware are not connected (the PREVIEW badge of the app says so; the sheet carries no note); the sample tag button runs the same lookup with a known tag (000302).",
             "source": "scan()"
            }
           ],
@@ -12819,7 +12817,7 @@
              {
               "state": "No match",
               "when": "Nothing matches",
-              "shows": "\"No matching sample pig or pen. Try the suggested sample tag or pen A1.\" and Search again"
+              "shows": "\"No pig or pen matches.\" and Search again"
              }
             ],
             "logic": "A row opens the task that holds the pig, in its unit: Farrowing and Piglet processing open their prototypes; any other task opens the task stand-in. It does not open the pig's record.",
@@ -18003,12 +18001,12 @@
           "elements": [
            {
             "name": "Upload button and message",
-            "shows": "Upload all · No connection · check Wi-Fi or mobile signal",
+            "shows": "3 records waiting to upload · No connection · check Wi-Fi or signal · Upload all",
             "states": [
              {
               "state": "Offline",
               "when": "No connection (default; \"Connection preview\" select outside the phone)",
-              "shows": "\"3 records waiting to upload\", button \"Upload all\"; pressing it reports \"Still no connection. All 3 records remain on this device.\""
+              "shows": "\"3 records waiting to upload\", button \"Upload all\"; pressing it changes the line under the count to \"Still no connection\""
              },
              {
               "state": "Ready",
@@ -18018,17 +18016,17 @@
              {
               "state": "Uploading",
               "when": "About 0.9 s after pressing",
-              "shows": "Button \"Uploading…\" disabled, \"Uploading saved records…\""
+              "shows": "Button \"Uploading…\" disabled, \"Sending…\" under the count"
              },
              {
               "state": "Failed",
               "when": "The simulated upload fails",
-              "shows": "\"Upload did not complete. Your records are still on this device. Try again.\" with \"Retry upload\""
+              "shows": "\"Upload did not finish\" under the count, with \"Retry upload\""
              },
              {
               "state": "Done",
               "when": "Queue empty",
-              "shows": "\"Everything is uploaded\", \"There are no records waiting on this device.\", button \"Done\""
+              "shows": "\"Everything is uploaded\" alone, button \"Done\""
              }
             ],
             "rule": "Only a successful upload clears the queue; a failure keeps every record. The drawer separates records saved on this device from records uploaded for the team.",
@@ -18090,12 +18088,12 @@
              {
               "state": "Uploading",
               "when": "About 0.9 s after Upload is pressed",
-              "shows": "Button \"Uploading…\" disabled; \"Uploading saved records…\""
+              "shows": "Button \"Uploading…\" disabled; \"Sending…\" under the count"
              },
              {
               "state": "Done",
               "when": "The upload succeeds",
-              "shows": "Queue emptied, \"Upload complete.\" status, button becomes Done"
+              "shows": "Queue emptied, \"Everything is uploaded\" and nothing else, button becomes Done"
              }
             ],
             "rule": "Only a successful upload clears the queue; Home then shows the quiet \"All records uploaded\" row.",
@@ -18137,8 +18135,8 @@
           "elements": [
            {
             "name": "Failure message",
-            "at": "Still no connection.",
-            "shows": "\"Still no connection. All 3 records remain on this device.\" and the button changes to Retry upload",
+            "at": "Still no connection",
+            "shows": "\"Still no connection\" under the count and the button changes to Retry upload",
             "states": [
              {
               "state": "No connection",
@@ -18148,7 +18146,7 @@
              {
               "state": "Upload failed",
               "when": "Connected but the upload does not complete (Connection preview: failed)",
-              "shows": "\"Upload did not complete. Your records are still on this device. Try again.\" with \"Retry upload\""
+              "shows": "\"Upload did not finish\" under the count, with \"Retry upload\""
              }
             ],
             "rule": "A failure keeps every record in the queue and the user can retry at once.",

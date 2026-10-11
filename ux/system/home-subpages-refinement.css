@@ -97,14 +97,10 @@
 .device .section-card-top strong { font-weight: 500; }
 .device .section-work { margin-top: 14px; }
 
-.device .sensor-detail,
-.device .device-control,
 .device .maintenance-card {
   box-shadow: 0 1px 2px #20291f08;
 }
 
-.device .sensor-detail-heading strong { font-weight: 400; }
-.device .sensor-history summary { color: var(--ink); }
 
 .device .maintenance-card {
   min-height: 90px;
@@ -219,8 +215,6 @@ body:has(#detail) #detail .lifecycle-actions [data-confirm-end] {
 
 @media (max-width: 430px) {
   .device .page-head h2 { font-size: 19px; }
-  .device .sensor-detail,
-  .device .device-control { padding: 14px; }
   body:has(#detail) #detail { width: min(440px, calc(100% - 20px)); }
 }
 
@@ -253,56 +247,79 @@ body:has(#detail) #detail .lifecycle-actions [data-confirm-end] {
 .device .work-note{font-size:13px;line-height:1.5}
 .device .work-note.lead{font-size:16px;color:var(--ink);line-height:1.5}
 .device :is(.maintenance-page,.screen-enter) .empty-state p{font-size:16px;line-height:1.5;color:var(--ink-2)}
+.device .tomorrow{margin-top:16px}
 .device .tomorrow strong{font-size:16px}
 .device .tomorrow p{font-size:13px;line-height:1.5}
 /* Assistant */
-.device .assistant-hero p{font-size:16px;line-height:1.5;color:var(--ink-2)}
-.device .assistant-hero p.overline{font-size:13px;color:var(--amber)}
 .device .assistant-tabs{gap:24px}
 .device .assistant-tabs button{font-size:16px}
 .device .assistant-tabs button[aria-pressed="false"]{color:var(--ink-2)}
 .device .evidence strong{font-size:16px}
 .device .evidence p{font-size:16px;line-height:1.5;color:var(--ink-2)}
-.device .evidence small{font-size:13px}
+.device .evidence small{font-size:13px;display:block;margin-top:6px;color:var(--muted)}
+.device .finding-question{font-size:18px;line-height:1.35;font-weight:600;color:var(--ink);margin:4px 0 12px}
 .device .message{font-size:16px;line-height:1.5}
 .device .composer input{height:48px;min-height:48px;padding:0 14px;font-size:16px;color:var(--ink);background:var(--paper);border:1px solid var(--field-border);border-radius:var(--radius-control,12px)}
 .device .composer button{height:48px}
-/* Environment & devices */
+/* Environment: one surface. The reading and its chart sit on the page; the fan and history sit on it as sections. Crowding is cut, never shrunk. */
+.device .environment-page{padding-top:12px}
+.device .sensor-detail{background:none;border:0;border-radius:0;box-shadow:none;padding:0;margin:0}
+.device .sensor-detail-heading{align-items:baseline;margin-top:20px}
+.device .sensor-detail-heading strong{margin:0;font-weight:400}
 .device .sensor-detail-heading strong small{font-size:16px;color:var(--ink)}
-.device .sensor-detail-heading>span{font-size:13px;line-height:1.5}
-.device .sensor-chart svg text{font-size:15px;fill:var(--ink-2)}
-.device .sensor-range-stats{font-size:13px;gap:20px}
+.device .sensor-detail-heading>span{font-size:13px;line-height:1.5;white-space:nowrap}
+.device .sensor-chart-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:8px}
+.device .sensor-range-stats{padding:0;font-size:13px;gap:14px;flex:none}
 .device .sensor-range-stats strong{font-size:16px;font-weight:500}
-.device .sensor-history summary{font-size:16px}
+.device .sensor-period{flex:none}
+.device .sensor-period .st-selection{width:auto}
+.device .sensor-period .st-segment button{flex:0 0 auto;min-width:64px;padding:1px 10px}
+.device .sensor-chart{margin-top:4px}
+.device .sensor-chart svg text{font-size:14px;fill:var(--ink-2)}
+.device .device-control{margin:20px 0 0;padding:20px 0 0;background:none;border:0;border-top:1px solid var(--line);border-radius:0;box-shadow:none}
+.device .device-control-heading h3{font-size:16px;font-weight:600}
+.device .device-control-heading p{font-size:13px;line-height:1.5}
+.device .fan-speed-label{font-size:16px;min-height:48px;align-items:center;margin:0}
+.device .fan-speed-label output{font-size:16px;color:var(--ink)}
+.device .device-control .helper{margin:12px 0 0!important}
+.device .sensor-history{margin-top:20px;border-top:1px solid var(--line);font-size:16px}
+.device .sensor-history:not([open]){margin-top:12px}
+.device .sensor-history summary{min-height:48px;display:flex;align-items:center;justify-content:space-between;padding:0;color:var(--ink);list-style:none;cursor:pointer}
+.device .sensor-history summary::-webkit-details-marker{display:none}
+.device .sensor-history summary svg{color:var(--muted);transition:none}
+.device .sensor-history[open] summary svg{transform:rotate(90deg)}
 .device .sensor-history table{font-size:16px}
 .device .sensor-history th{font-size:13px;color:var(--muted)}
 .device .sensor-history td{font-size:16px;padding:10px 0}
-.device .device-section-heading h3,.device .device-control-heading h3{font-size:16px;font-weight:600}
-.device .device-section-heading>span,.device .device-control-heading p,.device .device-updated{font-size:13px}
-.device .device-control-heading p{line-height:1.5}
-.device .fan-speed-label{font-size:16px;min-height:48px;align-items:center;margin:0}
-.device .fan-speed-label output{font-size:16px;color:var(--ink)}
 /* Maintenance */
-.device .maintenance-heading{font-size:16px;color:var(--ink)}
-.device .maintenance-heading button{font-size:16px}
 .device .maintenance-card-top{font-size:16px;font-weight:600}
 .device .maintenance-card-top small{font-size:13px;font-weight:600;padding:3px 10px;border-radius:999px;background:var(--amber-wash-strong);color:var(--amber)}
 .device .maintenance-card.resolved .maintenance-card-top small{background:var(--well);color:var(--ink-2)}
-.device .maintenance-location{font-size:13px}
 .device .maintenance-card p{font-size:16px;line-height:1.5;color:var(--ink)}
 .device .maintenance-card>small{font-size:13px}
 /* Unit hub readings, Saved work */
 .device .unit-hub-unified .unit-live-readings>span,.device .unit-device-count{font-size:13px}
 .device .unit-hub-unified .unit-live-readings small{font-size:13px}
-.device .sync-drawer .sync-connection,.device .sync-drawer .sync-message{font-size:13px}
 .device .sync-record span{font-size:16px;color:var(--ink)}
 .device .sync-record small,.device .sync-record time{font-size:13px}
 .device .finding h3{font-size:18px;line-height:1.35;color:var(--ink)}
 .device .finding p{font-size:16px;line-height:1.5;color:var(--ink-2)}
 .device .finding footer{font-size:13px}
-.device .evidence.sample p{font-size:13px;color:var(--muted)}
 .device .choice{font-size:16px;color:var(--ink)}
 /* A secondary act inside a page or a drawer body (the page-level button reset outranks the shared base layer): a real, 48px button. */
 .device :is(.app-scroll,.sheet-body)>.button.secondary{width:100%;min-height:48px;margin-top:12px;padding:0 17px;font-size:16px;font-weight:600;color:var(--ink);background:var(--paper);border:1px solid var(--control-border);border-radius:var(--radius-control,12px)}
 .device .device-control>.button.primary{width:100%;margin-top:12px}
 .device .sync-summary strong{font-size:16px;font-weight:600;color:var(--ink)}
+/* A task card never grows past the list: at 360 its widest line used to push it 14px off the screen. */
+.device .home-task-list{grid-template-columns:minmax(0,1fr)}
+.device .hc-heading small{white-space:normal;overflow:visible;text-overflow:clip}
+.device .hc-heading small{text-wrap:balance}
+/* The words name the flag; an icon on each chip only pushed Maintenance onto a second row. */
+.device .unit-attention-chip>svg{display:none}
+.device .app-scroll .empty-state p{font-size:16px;line-height:1.5;color:var(--ink-2)}
+/* Coming up: a row to open, then plain rows, at the same floors as everything else. */
+.device .upcoming-work summary{font-size:16px;color:var(--ink)}
+.device .upcoming-work summary small{font-size:13px}
+.device .upcoming-row{grid-template-columns:96px 1fr;font-size:16px;line-height:1.5;color:var(--ink)}
+.device .upcoming-row>span{font-size:13px;line-height:1.5;padding-top:2px}
+.device .upcoming-row small{font-size:13px}

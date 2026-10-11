@@ -95,9 +95,9 @@
         "elements": [
           {
             "name": "Scanner and tag field",
-            "at": "Scanner preview.",
+            "at": "Ear tag",
             "shows": "Camera frame, a tag field and \"Use a sample tag\"",
-            "rule": "Camera and tag-reader hardware are not connected; the sample tag button runs the same lookup with a known tag (000302).",
+            "rule": "Camera and tag-reader hardware are not connected (the PREVIEW badge of the app says so; the sheet carries no note); the sample tag button runs the same lookup with a known tag (000302).",
             "source": "scan()"
           }
         ],
@@ -139,7 +139,7 @@
               {
                 "state": "No match",
                 "when": "Nothing matches",
-                "shows": "\"No matching sample pig or pen. Try the suggested sample tag or pen A1.\" and Search again"
+                "shows": "\"No pig or pen matches.\" and Search again"
               }
             ],
             "logic": "A row opens the task that holds the pig, in its unit: Farrowing and Piglet processing open their prototypes; any other task opens the task stand-in. It does not open the pig's record.",
