@@ -116,6 +116,7 @@ A part a component already draws stays on that component; improve the component 
    - one line: **better because …** or **not better because …**.
 4. **Iterate.** Fix what the crit found, re-render and criticise again. Keep going while each round gets closer; drop a direction that doesn't.
 5. **Decide.** Hand over the direction whose crit is clean on every point. If none is clearly better than the original, reset the screens to `origin/main`, keep `critique.md`, and report **no change** with the reason. Never hand over a direction you called "not better", and never compare directions only with each other.
+6. **The final look.** Any edit after a crit voids it, however small: a badge raised from 9 to 11px once wrapped the page title onto two lines, and nobody saw it. The last thing you do, after the last commit and the merge of main, is render every screen in scope from the pushed head at 390 **and** 360, open each beside its baseline, and look at the whole screen: header, wrapping, what moved down the page. Write it as the last `## Self-crit` block, headed `Final look` and naming the commit it rendered. If anything got worse, fix it and look again.
 
 ## 2. Owner rules (binding)
 
@@ -163,4 +164,4 @@ Two tiers: run the mechanical checks after each edit (`node scripts/check-states
 
 ## Final message
 
-Keep it to 250 words or fewer: the outcome (**a design** or **no change**), the keep-list and the problems you fixed (or a link to `critique.md`), the last self-crit line, the references table (or a link to it), what you built (variants, screens), what you migrated and retired, test results with the commit, before/after pairs you expect to be better, and any product decision you filed (with its recommendation). Don't claim a pass; the gate measures it.
+Keep it to 250 words or fewer: the commit of your final look (it must be the pushed head), the outcome (**a design** or **no change**), the keep-list and the problems you fixed (or a link to `critique.md`), the last self-crit line, the references table (or a link to it), what you built (variants, screens), what you migrated and retired, test results with the commit, before/after pairs you expect to be better, and any product decision you filed (with its recommendation). Don't claim a pass; the gate measures it.
