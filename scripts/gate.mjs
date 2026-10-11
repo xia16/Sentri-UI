@@ -125,6 +125,12 @@ const finish = (code) => {
 // ---------- 0. the exact candidate ----------
 git(['fetch', '-q', 'origin']);
 mech.base = git(['rev-parse', 'origin/main']).out.trim();
+// The gate judges with main's own rules: a checkout whose tools or briefs differ from origin/main (a stale gate, or local edits)
+// fails closed. A builder's --quick self-check is exempt.
+if (!argv.includes('--quick')) {
+  const stale = git(['diff', '--name-only', 'origin/main', '--', 'scripts', 'docs/design-workflow', 'package.json']).out.trim().split(/\r?\n/).filter(Boolean);
+  if (stale.length) { check("the gate runs main's own tools", false, `this checkout's ${stale.slice(0, 3).join(', ')} differ from origin/main: run the gate from a checkout of origin/main (git checkout --detach origin/main)`); finish(1); }
+}
 mech.candidate = git(['rev-parse', '--verify', ref + '^{commit}']).out.trim();
 if (!mech.candidate) { check('candidate exists', false, `no commit for ${ref}`); finish(1); }
 fs.rmSync(passRecord(mech.candidate), { force: true }); // a new gate run voids any earlier pass for this commit until its verdict
