@@ -963,3 +963,29 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 :is(.phone,.tk-phone,.atlas-phone,.device,.st-phone,.sp-phone,[data-st-context]) [tabindex="-1"]:focus{outline:none}
 /* A waiting or disabled control says so with its surface and rim; its text stays readable (4.5:1, farm legibility law). */
 .st-hold[aria-disabled="true"] :is(.st-hold-label,.st-hold-caption){color:var(--ink);opacity:1}
+
+/* SensorTrend and DeviceControl: the Environment page's reading card and equipment card, extracted as they were drawn. */
+.st-trend,.st-device{background:white;border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:16px;box-shadow:0 1px 2px #20291f08;color:var(--ink)}
+@media(max-width:430px){.st-trend,.st-device{padding:14px}}
+.st-trend-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.st-trend-name{margin:0;font-size:12px;color:var(--muted)}
+.st-trend-value{font:400 34px var(--font-mono);display:block;margin-top:7px;letter-spacing:-1.5px}
+.st-trend-value small{font:11px var(--font-sans);letter-spacing:0;margin-left:5px;color:var(--muted)}
+.st-trend-stamp{font-size:10px;line-height:1.7;color:var(--muted);text-align:right}
+.st-trend-chart svg{width:100%;height:auto;display:block;stroke:none;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.st-trend-chart svg text{fill:#78826f;font:9px var(--font-sans);stroke:none}
+.st-trend-range{display:flex;gap:20px;padding:8px 0 15px;font-size:10px;color:var(--muted)}
+.st-trend-range strong{font-weight:500;color:var(--ink);margin-left:4px}
+.st-trend-history{border-top:1px solid var(--line);font-size:11px}
+.st-trend-history summary{min-height:var(--tap-min);padding:13px 0;cursor:pointer;display:flex;align-items:center;color:var(--ink)}
+.st-trend-history table{width:100%;border-collapse:collapse;text-align:left;font-size:10px}
+.st-trend-history th,.st-trend-history td{padding:8px 0;border-bottom:1px solid var(--line);font-weight:400}
+.st-trend-history th:last-child,.st-trend-history td:last-child{text-align:right}
+.st-trend-note,.st-device-note{margin:12px 0 0;font-size:10px;line-height:1.7;color:#657060}
+.st-device-head{display:flex;align-items:center;gap:10px}
+.st-device-head h3{margin:0;font-size:13px;font-weight:500}
+.st-device-head p{margin:5px 0 0;font-size:10px;color:var(--muted)}
+.st-device>.st-selection{margin:var(--space-12) 0}
+.st-device-speed{display:flex;justify-content:space-between;font-size:11px;margin:13px 0 4px}
+.st-device input[type=range]{display:block;width:100%;padding:0;min-height:var(--tap-min);border:0;accent-color:var(--green)}
+.st-device-updated{margin:10px 0 0;font-size:10px;color:var(--green)}
