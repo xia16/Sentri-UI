@@ -24,7 +24,7 @@ Score each dimension **0, 1 or 2**. A 2 means nothing to fix: as calm, aligned a
 |---|---|
 | **hierarchy** | The first thing seen is what the farmer needs first, and only the act-now fact is loud. The attention budget holds: one coloured element per row at most, a second line only when it changes what the worker does, nothing the header says, no zeros, no derived figure beside its parts. Everything at one weight is a 0. |
 | **alignment** | One track, even rows, one surface; nothing said twice; the information budget holds. |
-| **legibility** | Floors met: text ≥ 13px everywhere, ≥ 16px for primary content, contrast ≥ 4.5:1 (≥ 7:1 for numbers acted on). Copy is in budget with registry verbs, EN and ZH fit, and real data wraps safely. Use `legibility.txt`. |
+| **legibility** | Floors met: acted-on text ≥ 13px, quiet descriptive text ≥ 11px, size following hierarchy (not everything big), contrast ≥ 4.5:1 (≥ 7:1 for numbers acted on). Copy is in budget with registry verbs, EN and ZH fit, and real data wraps safely. Use `legibility.txt`. |
 | **touch** | Targets ≥ 48px, the primary action within one-handed reach, no gesture-only action. |
 | **state** | Draft, saved, blocked and done are told apart; green only for done or approved. |
 | **native** | It looks and behaves like an iOS or Android app: native patterns where they exist (sheets, action sheets, segmented controls, switches, wheel pickers, the system keyboard, a navigation bar) and no web conventions (hover rows, breadcrumbs, dropdown selects, data tables, underlined links, tooltips, scrollbars, pagination, centred modals). |

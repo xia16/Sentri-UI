@@ -17,7 +17,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { CLASSES, screensOf, pageOf, pageAssets, sharedFiles, coverageLost, effectiveClass, classifyScreens, checkVerdict, touchesSystem, touchesTools, queueAhead as queueOf } from './loop-rules.mjs';
+import { CLASSES, screensOf, pageOf, pageAssets, sharedFiles, coverageLost, effectiveClass, classifyScreens, checkVerdict, touchesSystem, touchesTools, queueAhead as queueOf, budgetProblems, pageStyling, addedLines, calibrationProblems } from './loop-rules.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PW_HOME = 'C:/Users/ying_/.cache/adam-design/playwright-1.63.0';
@@ -44,6 +44,8 @@ if (opt('verdict')) {
   const verdict = { ...parts[0], pass: parts.every((p) => p.pass === true), pairs: cat('pairs'), walk: cat('walk'), defects: cat('defects'), gone: cat('gone'), rejected: cat('rejected'), contradicted: cat('contradicted') };
   for (const p of parts) if (p.candidate !== verdict.candidate || p.base !== verdict.base) verdict.candidate = 'mixed verdicts';
   const v = checkVerdict(verdict, mech);
+  const calFile = path.join(root, 'docs/design-workflow/calibration/answers.json');
+  if (fs.existsSync(calFile)) v.problems.push(...calibrationProblems(parts, JSON.parse(fs.readFileSync(calFile, 'utf8')).pairs));
   // Fail closed: the PR head and origin/main are read fresh, and a ref that doesn't resolve fails the gate, never passes it.
   const fetched = git(['fetch', '-q', 'origin']);
   if (fetched.code !== 0) v.problems.push(`git fetch origin failed, so the PR head and origin/main can't be checked: ${fetched.err.trim().split('\n')[0]}`);
@@ -331,6 +333,15 @@ mech.class = { declared, effective: ec.cls, why: ec.why };
 if (ec.cls !== byFiles.cls) console.log(`class: ${declared} → ${ec.cls} (${ec.why.join('; ')})`);
 if (mode === 'refactor') check('refactor: every screen identical', !steady.length, steady.length ? steady.map((s) => s.id).slice(0, 5).join(', ') : mech.flaky.length ? `${mech.flaky.length} unstable on base, not counted` : '');
 const tools = touchesTools(files);
+// Information before layout, and design-system components only (owner, 2026-10-11), for any change that moves a screen.
+if (steady.length) {
+  const feats = [...screens.diff, ...screens.new].map((s) => s.feature);
+  const bp = budgetProblems(feats, (p) => { const f = path.join(wt.cand, p); return fs.existsSync(f) ? fs.readFileSync(f, 'utf8') : null; });
+  check('information budget before layout', !bp.length, bp.length ? bp.join('; ') + ' (write it first: briefs/build.md §1b)' : '');
+  const ps = pageStyling(addedLines(git(['diff', '-U0', mech.base, mech.candidate, '--', 'ux']).out));
+  mech.pageStyling = ps;
+  check('design-system components only', !ps.length, ps.length ? `${ps.length} visual declaration(s) added outside ux/design-system (${ps.slice(0, 3).map((p) => p.file.split('/').pop() + ' ' + p.prop).join(', ')}): use a SentriUI component or propose one in ux/design-system/components/_proposed.json` : '');
+}
 if (tools.length && steady.length) check('workflow changes in their own PR', false, `this change moves ${steady.length} screen(s) and also edits the workflow or the gate's tools (${tools.slice(0, 3).join(', ')}): split it`);
 // The shared-component queue: one shared change at a time, oldest first. A shared candidate waits while an older open,
 // non-draft PR that has passed the gate also touches the shared system (queueAhead in loop-rules.mjs); once that merges, this

@@ -286,3 +286,61 @@ export function loopStatus(ledger) {
   if (r.length >= 2 && !last.fix?.merged && sameResult(last, prev)) return { status: 'stopped', why: 'no progress: grades and leaf results unchanged and nothing merged' };
   return { status: 'continue', why: r.length ? `round ${r.length} of at most ${cap}` : 'not started' };
 }
+
+// Information before layout (owner, 2026-10-11): a feature's screens change only after its information budget is written down
+// (briefs/build.md §1b) in features/<id>/budget.md with an Inventory, the worker's Questions and the attention Levels.
+export const BUDGET_HEADINGS = ['## Inventory', '## Questions', '## Levels'];
+export function budgetProblems(features, read) {
+  const out = [];
+  for (const f of [...new Set(features)].filter(Boolean)) {
+    const text = read(`features/${f}/budget.md`);
+    if (text == null) { out.push(`${f}: no features/${f}/budget.md`); continue; }
+    const lines = text.split(/\r?\n/).map((l) => l.trim());
+    const miss = BUDGET_HEADINGS.filter((h) => !lines.some((l) => l === h || l.startsWith(h + ' ')));
+    if (miss.length) out.push(`${f}: budget.md lacks ${miss.join(', ')}`);
+  }
+  return out;
+}
+
+// Design-system components only (owner, 2026-10-11): visual styling added in a page's own CSS, markup or scripts is an improvised
+// component. Layout (margin, padding, gap, grid, flex, size, position) is the page's; looks belong to ux/design-system. A line
+// carrying `ds-exception: <reason>` is allowed and shown to the judge.
+const VISUAL = /^(color|background(-color|-image)?|border(-(top|right|bottom|left))?(-(color|width|style))?|border(-[a-z]+)?-radius|box-shadow|outline(-[a-z]+)?|font(-(size|weight|family|style))?|text-decoration(-[a-z]+)?|text-transform|letter-spacing|opacity|fill|stroke(-width)?|filter|backdrop-filter)$/;
+export const isPageFile = (f) => /^ux\//.test(f) && !/^ux\/(design-system|archive)\//.test(f) && /\.(css|html|js|mjs)$/.test(f);
+export function pageStyling(addedByFile) {
+  const out = [];
+  for (const [file, lines] of Object.entries(addedByFile)) {
+    if (!isPageFile(file)) continue;
+    for (const line of lines) {
+      if (/ds-exception:/.test(line)) continue;
+      const chunks = /\.css$/.test(file) ? [line]
+        : [...line.matchAll(/style\s*=\s*["'`]([^"'`]*)/g)].map((m) => m[1])
+          .concat([...line.matchAll(/\.style\.([a-zA-Z]+)\s*=/g)].map((m) => ' ' + m[1].replace(/[A-Z]/g, (c) => '-' + c.toLowerCase()) + ':x'));
+      for (const c of chunks) for (const m of c.matchAll(/(?:^|[{;\s])([a-z-]+)\s*:\s*[^;{}]+/g)) if (VISUAL.test(m[1])) { out.push({ file, prop: m[1], line: line.trim().slice(0, 120) }); break; }
+    }
+  }
+  return out;
+}
+// The added lines of a unified diff, by file.
+export function addedLines(diff) {
+  const out = {}; let file = null;
+  for (const l of diff.split(/\r?\n/)) {
+    if (l.startsWith('+++ ')) { file = l.slice(4).replace(/^b\//, ''); continue; }
+    if (file && l.startsWith('+') && !l.startsWith('+++')) (out[file] ||= []).push(l.slice(1));
+  }
+  return out;
+}
+
+// Judge calibration (owner, 2026-10-11): every judge rates the owner-ruled pairs in docs/design-workflow/calibration/ first.
+// A judge that misses one, or rates a "not-better" pair better, is not used: its verdict can't pass the gate.
+export function calibrationProblems(parts, answers) {
+  const out = [];
+  for (const [i, p] of parts.entries()) {
+    const got = Object.fromEntries((p.calibration || []).map((c) => [c.pair, c.verdict]));
+    for (const [id, a] of Object.entries(answers || {})) {
+      if (!got[id]) out.push(`judge ${i + 1}: calibration pair ${id} not rated`);
+      else if (a.owner === 'not-better' && got[id] === 'better') out.push(`judge ${i + 1}: rated calibration pair ${id} better; the owner ruled it not better ("${a.said}"), so this judge is not used`);
+    }
+  }
+  return out;
+}
