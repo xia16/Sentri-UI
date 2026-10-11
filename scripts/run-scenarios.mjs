@@ -4,7 +4,7 @@
 // Format: docs/design-workflow/scenarios.md (the pure tree walk and format checks: scripts/scenario-tree.mjs). Writes review/scenarios-<feature>.json and screenshots under
 // review/scenarios/<feature>/<leaf>/<lang>-<width>/. Exits 1 when any leaf fails.
 import { spawn, execSync } from 'node:child_process';
-import { createRequire } from 'node:module';
+import { playwright } from './playwright-path.mjs';
 import { mkdirSync, readFileSync, rmSync, writeFileSync, existsSync } from 'node:fs';
 import { join, dirname, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -12,8 +12,7 @@ import { createServer } from 'node:net';
 import { walkTree, parseDuration, stepKind } from './scenario-tree.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const require = createRequire('C:/Users/ying_/.cache/adam-design/playwright-1.63.0/package.json');
-const { chromium } = require('C:/Users/ying_/.cache/adam-design/playwright-1.63.0/node_modules/playwright');
+const { chromium } = playwright();
 
 // ---- arguments ----
 const argv = process.argv.slice(2);

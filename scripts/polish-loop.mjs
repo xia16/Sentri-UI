@@ -170,7 +170,8 @@ if (cmd === 'record') {
   }
   if (kind !== 'none' && merged && !opt('pr')) { console.error('a merged fix names its PR'); process.exit(2); }
   if (kind !== 'none' && opt('pr')) { // the ledger takes GitHub's word, not the driver's
-    const st = sh('gh', ['pr', 'view', opt('pr'), '--json', 'state', '--jq', '.state']).stdout.trim();
+    // REST, not `gh pr view`: GraphQL is blocked in cloud sessions
+    const st = sh('gh', ['api', `repos/{owner}/{repo}/pulls/${opt('pr')}`, '--jq', 'if .merged then "MERGED" else (.state | ascii_upcase) end']).stdout.trim();
     if (merged !== (st === 'MERGED')) { console.error(`PR #${opt('pr')} is ${st || 'not found'} on GitHub, but --merged says ${merged ? 'yes' : 'no'}`); process.exit(2); }
   }
   Object.assign(r, {
