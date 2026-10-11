@@ -95,32 +95,32 @@
         "states": [],
         "elements": [
           {
-            "name": "Sensor tabs and reading",
-            "shows": "Temperature · Humidity · Ammonia · 22.4 °C · Offline · 09:40",
+            "name": "Reading tiles",
+            "shows": "Temperature 22.4 °C · Humidity 64 % · Ammonia 8 ppm, with \"Offline · last reading 09:40\" above them",
             "states": [
               {
                 "state": "Sensor present",
                 "when": "The unit has a finite numeric reading for it",
-                "shows": "A tab with the sensor name; the first is selected on entry. The reading is the large value with its unit (°C, %, ppm NH₃)"
+                "shows": "A tile with the sensor name, the large value and its unit (°C, %, ppm); the first tile is selected on entry (well fill, bold label, ink bar); tapping a tile switches the trend below"
               },
               {
                 "state": "Sensor missing",
                 "when": "Reading missing or not a finite number",
-                "shows": "The tab is omitted, never shown as 0"
+                "shows": "The tile is omitted, never shown as 0"
               },
               {
                 "state": "No readings",
                 "when": "None of the three has a value",
-                "shows": "No tabs, chart or history; only the fan, if any"
+                "shows": "No tiles or trend; only the fan, if any"
               }
             ],
-            "logic": "Sample figures per unit (Unit 7: 22.4 °C, 64 %, 8 ppm). The time beside the value is unitContext[N].updated, one fixed sample time for every sensor: \"Offline · 09:40\" when offline, \"09:40\" when connected. The value carries no in-range or out-of-range mark because no thresholds exist yet.",
+            "logic": "Sample figures per unit (Unit 7: 22.4 °C, 64 %, 8 ppm). The caption above the tiles is unitContext[N].updated, one fixed sample time for every sensor: \"Offline · last reading 09:40\" when offline, \"Updated 09:40\" when connected. The value carries no in-range or out-of-range mark because no thresholds exist yet.",
             "source": "availableSensors(); unitContext[N].readings, .updated",
-            "at": "Offline · 09:40"
+            "at": "Offline · last reading 09:40"
           },
           {
-            "name": "Chart, Low / High and period",
-            "shows": "Low 21.9 · High 22.8 · Today | 7 days",
+            "name": "Trend group",
+            "shows": "Section header \"Temperature\" with a Today | 7 days toggle; the chart; Low 21.9 · High 22.8; Reading history ›",
             "states": [
               {
                 "state": "Today",
@@ -133,31 +133,31 @@
                 "shows": "7 daily points; the x labels are \"6d ago\" and \"Today\""
               }
             ],
-            "logic": "Not real history: series = current value plus fixed offsets scaled by sensor (temperature ×1, humidity ×6, ammonia ×2); y range = min/max ± padding, drawn without y-axis labels because Low and High say it. Low and High are the min and max of the plotted points; only the last point carries a dot. The period control is one compact Lens on the chart's header line.",
+            "logic": "Not real history: series = current value plus fixed offsets scaled by sensor (temperature ×1, humidity ×6, ammonia ×2); y range = min/max ± padding, drawn without y-axis labels because Low and High say it. Low and High are the min and max of the plotted points; only the last point carries a dot. The period control is a quiet Lens on the section header line. Reading history is the last row of the same group and opens a table of the same points.",
             "source": "sensorHistory(), sensorChart()",
             "at": "Low"
           },
           {
             "name": "Connection",
-            "shows": "Offline · 09:40 beside the value; the fan says \"Reconnect to change.\"",
+            "shows": "Offline · last reading 09:40 above the tiles; the fan control in its disabled state",
             "states": [
               {
                 "state": "Offline",
                 "when": "Page default (the \"Connection preview\" select outside the phone)",
-                "shows": "\"Offline · 09:40\" beside the value (the readings are the last available values); the fan's Auto/Manual disabled and one line \"Reconnect to change.\"; no Save button"
+                "shows": "\"Offline · last reading 09:40\" above the tiles (the readings are the last available values); the fan's Auto/Manual in its disabled state (dashed rim); no Save button and no extra line"
               },
               {
                 "state": "Connected",
                 "when": "Connection preview set to Connected",
-                "shows": "Just \"09:40\" beside the value; fan controls enabled"
+                "shows": "\"Updated 09:40\" above the tiles; fan controls enabled"
               }
             ],
             "source": "environment(); sync.connection",
-            "at": "Offline · 09:40"
+            "at": "Offline · last reading 09:40"
           },
           {
             "name": "Ventilation fan card",
-            "shows": "Ventilation fan · Auto · unit schedule",
+            "shows": "Section \"Ventilation fan\" · Auto · unit schedule · Auto/Manual",
             "states": [
               {
                 "state": "Auto",
@@ -190,7 +190,7 @@
         ],
         "rules": [],
         "issues": [
-          "The time beside the value is a fixed 09:40 on all sensors while the status bar reads 9:41.",
+          "The time in the caption above the tiles is a fixed 09:40 on all sensors while the status bar reads 9:41.",
           "Only a ventilation fan exists; the concept names \"devices\" in general.",
           "unclear: alert thresholds, who is told when a reading is out of range, and where real data comes from; none are in the code."
         ]
@@ -289,7 +289,7 @@
           },
           {
             "name": "Open issues",
-            "shows": "One card per issue; no count line",
+            "shows": "Section \"Issues\": one row per issue, and \"Report issue\" as the last row of the same group; no count line",
             "logic": "The list is the count; the count line was cut. The unit screen's Maintenance chip carries the number of records not resolved. Unit 7 starts with one open issue; the `attention` param hides it (clear, health, feed) or adds a default one in other units (maintenance, busy).",
             "rule": "Only reachable once a unit is chosen: the Toolbox row exists only in a unit scope. Issues are unit-scoped.",
             "source": "maintenanceRecords()",
@@ -333,7 +333,7 @@
               {
                 "state": "Empty",
                 "when": "The unit has no records at all (Unit 8)",
-                "shows": "\"No open issues\" and the Report issue button"
+                "shows": "Section \"Issues\" with the row \"No open issues\" and the Report issue row"
               },
               {
                 "state": "Only resolved",
@@ -493,7 +493,7 @@
           {
             "name": "Chart and low/high",
             "at": "Low",
-            "shows": "Seven daily points (6d ago to Today) with low and high; Reading history is one plain row with a chevron at the end of the page",
+            "shows": "Seven daily points (6d ago to Today) with low and high; Reading history is the last row of the trend group",
             "logic": "The week series is sample data derived from the current reading; the Today series has eight points up to the reading time. Low and High are the minimum and maximum of the plotted points; the Reading history row opens a table of the same points.",
             "source": "sensorHistory(); sensorChart()"
           }
@@ -505,7 +505,7 @@
         "edge": [],
         "rules": [],
         "issues": [
-          "The chart switch does not change the time beside the value (still 09:40)."
+          "The chart switch does not change the caption time (still 09:40)."
         ]
       }
     },

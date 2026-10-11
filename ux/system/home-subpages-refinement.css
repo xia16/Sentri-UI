@@ -261,34 +261,44 @@ body:has(#detail) #detail .lifecycle-actions [data-confirm-end] {
 .device .message{font-size:16px;line-height:1.5}
 .device .composer input{height:48px;min-height:48px;padding:0 14px;font-size:16px;color:var(--ink);background:var(--paper);border:1px solid var(--field-border);border-radius:var(--radius-control,12px)}
 .device .composer button{height:48px}
-/* Environment: one surface. The reading and its chart sit on the page; the fan and history sit on it as sections. Crowding is cut, never shrunk. */
-.device .environment-page{padding-top:12px}
-.device .sensor-detail{background:none;border:0;border-radius:0;box-shadow:none;padding:0;margin:0}
-.device .sensor-detail-heading{align-items:baseline;margin-top:20px}
-.device .sensor-detail-heading strong{margin:0;font-weight:400}
-.device .sensor-detail-heading strong small{font-size:16px;color:var(--ink)}
-.device .sensor-detail-heading>span{font-size:13px;line-height:1.5;white-space:nowrap}
-.device .sensor-chart-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:8px}
-.device .sensor-range-stats{padding:0;font-size:13px;gap:14px;flex:none}
-.device .sensor-range-stats strong{font-size:16px;font-weight:500}
-.device .sensor-period{flex:none}
-.device .sensor-period .st-selection{width:auto}
-.device .sensor-period .st-segment button{flex:0 0 auto;min-width:64px;padding:1px 10px}
-.device .sensor-chart{margin-top:4px}
+/* Environment: the Farrowing language. Three readings first (one card, three tiles), then grouped sections with native headers
+   (trend, fan). One surface per group; hairlines divide its rows; nothing floats outside a group. */
+.device .environment-page{padding-top:12px;padding-bottom:24px}
+.device .reading-caption{margin:0 2px 8px;font-size:13px;line-height:1.5;color:var(--muted)}
+.device .st-panel.reading-card,.device .st-panel.env-panel{padding:0;overflow:hidden}
+.device .reading-tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
+.device .reading-tile{position:relative;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:6px;min-height:88px;padding:12px;text-align:left;background:transparent;border:0;border-left:1px solid var(--line);border-radius:0;color:var(--ink)}
+.device .reading-tile:first-child{border-left:0}
+.device .reading-tile[aria-pressed=true]{background:var(--well);box-shadow:inset 0 -3px 0 var(--ink)}
+.device .reading-label{font-size:13px;line-height:1.3;color:var(--ink-2);white-space:nowrap}
+.device .reading-tile[aria-pressed=true] .reading-label{color:var(--ink);font-weight:600}
+.device .reading-value{font:500 28px/1.1 var(--font-mono);letter-spacing:-1px;color:var(--ink);white-space:nowrap}
+.device .reading-value small{font:400 13px var(--font-sans);letter-spacing:0;margin-left:3px;color:var(--ink-2)}
+.device .env-group{margin-top:24px}
+.device .env-group>.st-heading{margin-bottom:8px;align-items:center}
+.device .env-group>.st-heading .st-heading-title{font-weight:600}
+.device .sensor-period .st-selection{width:auto;margin:0}
+.device .sensor-period .st-segment{padding:0;gap:4px;border:0;background:transparent}
+.device .sensor-period .st-segment button{flex:0 0 auto;min-width:0;min-height:32px;margin:0;padding:0 10px;border-radius:8px;font-size:13px;color:var(--ink-2)}
+.device .sensor-period .st-segment button[aria-pressed=true]{background:var(--well);color:var(--ink);font-weight:600}
+.device .sensor-period .st-segment button::after{inset:-8px -2px}
+.device .sensor-chart{padding:12px 12px 0}
 .device .sensor-chart svg text{font-size:14px;fill:var(--ink-2)}
-.device .device-control{margin:20px 0 0;padding:20px 0 0;background:none;border:0;border-top:1px solid var(--line);border-radius:0;box-shadow:none}
-.device .device-control-heading h3{font-size:16px;font-weight:600}
-.device .device-control-heading p{font-size:13px;line-height:1.5}
-.device .fan-speed-label{font-size:16px;min-height:48px;align-items:center;margin:0}
+.device .env-row{padding:12px 16px;border-top:1px solid var(--line)}
+.device .env-row:first-child{border-top:0}
+.device .sensor-range-stats{display:flex;gap:24px;font-size:13px;color:var(--muted);min-height:48px;align-items:center}
+.device .sensor-range-stats strong{font-size:16px;font-weight:500;color:var(--ink);margin-left:6px}
+.device .fan-status{font-size:16px;font-weight:500;color:var(--ink);min-height:48px;display:flex;align-items:center}
+.device .fan-mode .st-selection{margin:0}
+.device .env-row .fan-speed-label{font-size:16px;min-height:48px;align-items:center;margin:0}
 .device .fan-speed-label output{font-size:16px;color:var(--ink)}
-.device .device-control .helper{margin:12px 0 0!important}
-.device .sensor-history{margin-top:20px;border-top:1px solid var(--line);font-size:16px}
-.device .sensor-history:not([open]){margin-top:12px}
-.device .sensor-history summary{min-height:48px;display:flex;align-items:center;justify-content:space-between;padding:0;color:var(--ink);list-style:none;cursor:pointer}
+.device .env-row>.button.primary{width:100%;margin:0}
+.device .sensor-history{border-top:1px solid var(--line);font-size:16px}
+.device .sensor-history summary{min-height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;color:var(--ink);list-style:none;cursor:pointer}
 .device .sensor-history summary::-webkit-details-marker{display:none}
 .device .sensor-history summary svg{color:var(--muted);transition:none}
 .device .sensor-history[open] summary svg{transform:rotate(90deg)}
-.device .sensor-history table{font-size:16px}
+.device .sensor-history table{width:calc(100% - 32px);margin:0 16px 8px;font-size:16px}
 .device .sensor-history th{font-size:13px;color:var(--muted)}
 .device .sensor-history td{font-size:16px;padding:10px 0}
 /* Maintenance */
@@ -323,3 +333,22 @@ body:has(#detail) #detail .lifecycle-actions [data-confirm-end] {
 .device .upcoming-row{grid-template-columns:96px 1fr;font-size:16px;line-height:1.5;color:var(--ink)}
 .device .upcoming-row>span{font-size:13px;line-height:1.5;padding-top:2px}
 .device .upcoming-row small{font-size:13px}
+/* Page spacing: content starts 16px under the header rule. */
+.device :is(.finding-page,.section-page){padding-top:16px}
+/* Saved work: the last record's rule and the footer's rule were two lines in a row; keep the footer's. */
+.device .sync-record:last-child{border-bottom:0}
+/* The fan's Auto/Manual while offline: the component's disabled state (native disabled, dashed rim) on a flat surface, so no white pill invites a tap. Label stays ink (7:1). */
+.device .st-segment:has(button:disabled){background:transparent;border-color:var(--control-border);border-style:dashed}
+.device .st-segment button:disabled[aria-pressed=true]{background:var(--well);color:var(--ink)}
+.device .st-segment button:disabled:not([aria-pressed=true]){color:var(--ink-2)}
+/* Maintenance: one group, issues as rows, "Report issue" the last row of the same group. */
+.device .maintenance-page{padding-top:16px}
+.device .env-panel .maintenance-card{width:100%;min-height:0;margin:0;border:0;border-radius:0;border-top:1px solid var(--line);box-shadow:none;background:var(--paper);padding:14px 40px 14px 16px}
+.device .env-panel .maintenance-card:first-child{border-top:0}
+.device .env-panel .maintenance-card:not(.resolved){background:#fffaf0}
+.device .maintenance-none{font-size:16px;color:var(--ink-2);min-height:48px;display:flex;align-items:center}
+.device .maintenance-report{display:flex;align-items:center;justify-content:space-between;width:100%;min-height:56px;padding:0 16px;border:0;border-top:1px solid var(--line);border-radius:0;background:transparent;font-size:16px;font-weight:600;color:var(--ink);text-align:left}
+.device .maintenance-report svg{color:var(--muted)}
+/* The section name in Home's header is a 214 x 40 control: an invisible hit area brings it to 48 without changing how it looks. */
+.device .section-trigger{position:relative}
+.device .section-trigger::before{content:"";position:absolute;inset:-6px -4px}
