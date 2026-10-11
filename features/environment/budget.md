@@ -47,15 +47,15 @@ In the order a worker asks them, standing at the unit:
 
 | Level | Facts |
 |---|---|
-| Act now | Offline: the one loud element, a notice that says readings are the last ones and the fan cannot change. Absent when connected. When connected and in Manual: the speed stepper and Save, the only heavy control. |
-| Watch | The three current readings, together, with the selected one marked. The fan's applied state (Auto or Manual 45%). |
+| Act now | Offline: the one loud element, a notice that says readings are the last ones and the fan cannot change. Absent when connected. Nothing else shouts: the page reads, and the fan is changed in a sheet. |
+| Watch | The three current readings, together, with the selected one marked. The fan's applied state (Auto or Manual 45%) as a row. |
 | Coming up | none (no thresholds, no schedule on this page) |
 | Settled | The trend chart with its Low and High, marked where they happened. |
-| Audit | Last reading time. Sample-data note in the header. The reading history, behind one row. |
+| Audit | Last reading time. Sample-data note in the header. The reading history, behind the Trend heading's link. |
 
 ## Budget against real space
 
-Real volume: 3 sensors, 8 chart points, 1 fan, the real header, no bottom bar (the page has a Back in the header). At 390 wide the first screen holds: header, the sensors control, the chart panel; the fan starts below it. At most one coloured element per row: the offline notice is the only amber; the chart line is `ink`, not green (green means done). Nothing the header already says: the unit stays in the header only.
+Real volume: 3 sensors, 8 chart points, 1 fan, the real header, no bottom bar (the page has a Back in the header). At 390 wide the first screen holds the header, the notice (offline only), the sensors control, the Trend panel and the Devices row. One section per question: Sensors, Trend, Devices, each under its native heading, the page ending on a group. At most one coloured element per row: the offline notice is the only amber; the chart line is `ink`, not green (green means done). Nothing the header already says: the unit stays in the header only.
 
 ## Cut list
 
@@ -64,11 +64,13 @@ Real volume: 3 sensors, 8 chart points, 1 fan, the real header, no bottom bar (t
 - Offline said three times (chart helper, Devices tag, fan helper): now once, in the notice, only when offline. When connected, nothing says "connected".
 - "Preview controls only, no command is sent" helper and the "Sample readings" helper: the header says "sample data"; the save toast still says no command was sent.
 - The PREVIEW badge (9 px, below the type floor): replaced by the header description.
-- The "Devices" section heading with its Offline/Connected tag: the fan has its own title.
+- The Offline / Connected tag on the Devices heading: the notice says it once.
 - The 3 y-axis labels and the Low / High line: the chart marks its own low and high on the line, so the range is read where it happened.
 - The applied receipt line "Preview setting applied, just now": the fan's status line already becomes "Manual, 70% speed" and the toast confirms; it was a third statement.
-- The always-open reading table: behind one row ("Reading history"), because it repeats the chart points.
+- The always-open reading table: behind a "View history" link in the Trend heading, which opens a sheet, because it repeats the chart points.
+- The fan's inline controls (Auto, Manual, speed, Save, with their greyed offline faces; the disabled segment measured 2.7:1): the page only reads. One row, "Ventilation fan · Auto · following unit schedule", opens a sheet with the controls and Back / Save. Offline the row is read-only, so nothing is greyed. Save appears only once the draft differs from the applied setting.
+- The range slider: replaced by a stepper (5 % a tap), which a gloved thumb can hit; the 0-100 in steps of 5 rule is unchanged.
 
 ## Hierarchy
 
-Squint test, after the build, in the PR body: the three things the eye lands on must be (1) the three readings, (2) the chart, (3) the fan.
+Squint test on the built screen, connected: the eye lands on (1) the three readings in the segmented control, with the selected one raised, (2) the chart line with its High marked, (3) the Ventilation fan row at the end. Offline, the amber notice comes first, which is right: it is the one thing that changes what the worker can do. The three are the answers to "is the room right", "which way is it going" and "what is the fan doing", in that order.

@@ -1,1 +1,22 @@
-[]
+[
+  {
+    "name": "Trend chart",
+    "group": "Data display",
+    "seenIn": [
+      "environment.page",
+      "environment.sensor-week",
+      "environment.sensor-other"
+    ],
+    "note": "A line over time for one reading (temperature, humidity, ammonia), with its low and high marked where they happen and the last point filled. Today draws 8 points, 7 days draws 7. The Environment page draws it as hand-built SVG, styled in home-astra-prototype.css under ds-exception markers; it should move into the bundle with tokens (line ink, area well, marks ink, axis muted at 11px, drawn at 288 wide so a 360px phone never scales its labels below 11px). Likely reuse: weight and feed curves."
+  },
+  {
+    "name": "Reading tile",
+    "group": "Data display",
+    "seenIn": [
+      "environment.page",
+      "environment.sensor-week",
+      "environment.sensor-other"
+    ],
+    "note": "A sensor readout where the value leads: a large mono figure with its unit, a quiet label, selectable among two or three. The Environment page uses the two-line Segment (name over a 13px mono value), so the number is smaller than its label; a worker reading a room at arm's length wants the figure first. Likely reuse: unit summary on Home, pen climate."
+  }
+]

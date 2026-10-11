@@ -95,32 +95,33 @@
         "states": [],
         "elements": [
           {
-            "name": "Sensor tabs and reading",
-            "shows": "Temperature · Humidity · Ammonia · 22.4 °C · Last reading 09:40",
+            "name": "Sensors control",
+            "at": "Last reading",
+            "shows": "Sensors · Last reading 09:40 · Temperature 22.4 °C · Humidity 64 % · Ammonia 8 ppm NH₃",
             "states": [
               {
                 "state": "Sensor present",
                 "when": "The unit has a finite numeric reading for it",
-                "shows": "A tab with the value and unit (°C, %, ppm NH₃); the first tab is selected on entry"
+                "shows": "A segment with the sensor name over its value and unit (°C, %, ppm NH₃); the first is selected on entry. All present sensors show their value at once."
               },
               {
                 "state": "Sensor missing",
                 "when": "Reading missing or not a finite number",
-                "shows": "The tab is omitted, never shown as 0"
+                "shows": "The segment is omitted, never shown as 0"
               },
               {
                 "state": "No readings",
                 "when": "None of the three has a value",
-                "shows": "No tabs, chart or history; only the Devices section, if any"
+                "shows": "No sensors section, chart or history; only the fan, if any"
               }
             ],
             "logic": "Sample figures per unit (Unit 7: 22.4 °C, 64 %, 8 ppm). \"Last reading\" is unitContext[N].updated, one fixed sample time for every sensor.",
-            "source": "availableSensors(); unitContext[N].readings, .updated",
-            "at": "Last reading"
+            "source": "availableSensors(); unitContext[N].readings, .updated"
           },
           {
-            "name": "Chart, Low / High and history",
-            "shows": "Today · 7 days · Low 21.9 °C · High 22.8 °C",
+            "name": "Trend chart",
+            "at": "Low 21.9 °C",
+            "shows": "Today · 7 days · a line with its High and Low marked where they happen",
             "states": [
               {
                 "state": "Today",
@@ -133,31 +134,38 @@
                 "shows": "7 daily points (6d ago … Today)"
               }
             ],
-            "logic": "Not real history: series = current value plus fixed offsets scaled by sensor (temperature ×1, humidity ×6, ammonia ×2); y range = min/max ± padding. Low and High are the min and max of the plotted points; \"Reading history\" lists the same points as Time and value.",
-            "source": "sensorHistory(), sensorChart()",
-            "at": "Low 21.9 °C"
+            "logic": "Not real history: series = current value plus fixed offsets scaled by sensor (temperature ×1, humidity ×6, ammonia ×2). Low and High are the min and max of the plotted points; the last point (filled) is the last reading. There is no y axis. The chart is hand-drawn SVG; no design-system chart exists yet (proposed as \"Trend chart\").",
+            "source": "sensorHistory(), sensorChart()"
           },
           {
-            "name": "Connection",
-            "shows": "Sample readings · offline, showing last available values · Devices · Offline",
+            "name": "View history",
+            "at": "View history",
+            "shows": "A link in the Trend heading that opens a sheet listing the plotted points (time, value and unit)",
+            "rule": "The sheet lists exactly the plotted points for the selected sensor and period; Back returns to the page.",
+            "source": "sensor-history handler"
+          },
+          {
+            "name": "Offline notice",
+            "at": "Offline",
+            "shows": "Offline · Showing the last readings. Reconnect to change device settings.",
             "states": [
               {
                 "state": "Offline",
                 "when": "Page default (the \"Connection preview\" select outside the phone)",
-                "shows": "Readings are the last available values; Devices tag \"Offline\"; Auto/Manual and Apply disabled; helper \"Reconnect to change device settings.\""
+                "shows": "The notice at the top, once. The fan shows its state only: Auto/Manual and Save are left out, not greyed."
               },
               {
                 "state": "Connected",
                 "when": "Connection preview set to Connected",
-                "shows": "Note reads \"connected\"; tag \"Connected\"; controls enabled; helper \"Preview controls only · no command is sent to equipment.\""
+                "shows": "No notice; the fan shows Auto/Manual, and Save once the draft differs from the applied setting"
               }
             ],
-            "source": "environment(); sync.connection",
-            "at": "Sample readings · offline, showing last available values"
+            "source": "environment(); sync.connection"
           },
           {
-            "name": "Ventilation fan card",
-            "shows": "Ventilation fan · Auto · following unit schedule",
+            "name": "Ventilation fan row",
+            "at": "Auto · following unit schedule",
+            "shows": "Devices · Ventilation fan · Auto · following unit schedule ›",
             "states": [
               {
                 "state": "Auto",
@@ -170,15 +178,19 @@
                 "shows": "\"Manual · N% speed\" (initial speed 45)"
               },
               {
+                "state": "Offline",
+                "when": "Connection preview is not Connected",
+                "shows": "The row is read-only: no ›, no tap. The notice at the top says why."
+              },
+              {
                 "state": "No device",
                 "when": "The unit has no controllable device (devices lacks \"fan\")",
-                "shows": "The whole Devices section is absent; only sensors show"
+                "shows": "The Devices section is absent; only sensors show"
               }
             ],
             "logic": "Controllable devices are independent of readings: a unit can have devices with no readings (the unit card then says \"N devices\") or readings with no device.",
-            "rule": "Apply is disabled offline and whenever the draft mode and speed equal the applied ones. Nothing is sent to equipment; the setting lives in memory only.",
-            "source": "unitDevices(); fan-mode and apply-device handlers",
-            "at": "Auto · following unit schedule"
+            "rule": "Tapping the row (connected only) opens the fan sheet. The setting lives in memory only; nothing is sent to equipment.",
+            "source": "unitDevices(); fan-edit handler"
           }
         ],
         "controls": [],
@@ -191,8 +203,8 @@
         "rules": [],
         "issues": [
           "The \"Last reading\" time is a fixed 09:40 on all sensors while the status bar reads 9:41.",
-          "The offline note appears three times: the chart helper, the Devices tag and the fan helper.",
           "Only a ventilation fan exists; the concept names \"devices\" in general.",
+          "The PRD says the fan is disabled offline; the screen makes the fan row read-only instead and shows no controls (the design system prefers omission). Filed for the owner.",
           "unclear: alert thresholds, who is told when a reading is out of range, and where real data comes from; none are in the code."
         ]
       },
@@ -213,28 +225,28 @@
         "states": [],
         "elements": [
           {
-            "name": "Fan speed and Apply",
-            "shows": "Fan speed 45% · Apply preview setting",
+            "name": "Fan sheet",
+            "at": "Fan speed",
+            "shows": "Ventilation fan · Auto | Manual · Fan speed (%) 45 · Unsaved · Back | Save setting",
             "states": [
               {
                 "state": "Draft",
-                "when": "Manual pressed, speed moved, not applied",
-                "shows": "Slider 0-100 in steps of 5 with a live value; Apply enabled once the draft differs from the applied setting"
+                "when": "Manual pressed, speed stepped, not applied",
+                "shows": "A stepper with − and + (5 % a tap, 0-100) and the number large; \"Unsaved\" under it; Save setting appears beside Back"
               },
               {
                 "state": "Applied",
-                "when": "After Apply",
-                "shows": "Status \"Manual · 70% speed\", note \"Preview setting applied · just now\", toast \"Sample setting saved · no equipment command sent\""
+                "when": "After Save",
+                "shows": "The sheet closes; the fan row reads \"Manual · 70% speed\"; toast \"Sample setting saved · no equipment command sent\""
               },
               {
                 "state": "Back to Auto",
                 "when": "Auto pressed",
-                "shows": "The slider goes away; a draft equal to the applied state keeps Apply disabled"
+                "shows": "The stepper goes away; Save leaves when the draft equals the applied setting"
               }
             ],
-            "rule": "The draft is not applied until Apply; everything is disabled offline. Preview only: no command is sent to equipment.",
-            "source": "fan-speed input, apply-device handler, d.updated",
-            "at": "Fan speed"
+            "rule": "The draft is not applied until Save. Back leaves and keeps the draft: reopening the sheet shows it. The sheet only opens when connected. Preview only: no command is sent to equipment.",
+            "source": "fan-edit, fan-mode, fan-speed and apply-device handlers"
           }
         ],
         "controls": [],
@@ -244,11 +256,13 @@
         "edge": [],
         "rules": [],
         "issues": [
-          "No confirmation or safety limit for speed 0; unclear whether 0% is allowed on a real fan."
+          "No confirmation or safety limit for speed 0; unclear whether 0% is allowed on a real fan.",
+          "Moving a long way takes many taps (5 % each); a slider was dropped because it is hard to set with gloves."
         ]
       },
       "steps": [
         "[data-action=\"environment\"]",
+        "[data-action=\"fan-edit\"]",
         "[data-action=\"fan-mode\"][data-value=\"manual\"]"
       ]
     },
@@ -492,10 +506,10 @@
         "states": [],
         "elements": [
           {
-            "name": "Chart and low/high",
-            "at": "Reading history",
-            "shows": "Seven daily points (6d ago to Today) with low and high",
-            "logic": "The week series is sample data derived from the current reading; the Today series has eight points up to the last-reading time. Low and High are the minimum and maximum of the plotted points; the history table lists the same points.",
+            "name": "Chart and history",
+            "at": "View history",
+            "shows": "Seven daily points (6d ago to Today) with High and Low marked; View history lists the same points",
+            "logic": "The week series is sample data derived from the current reading; the Today series has eight points up to the last-reading time. Low and High are the minimum and maximum of the plotted points.",
             "source": "sensorHistory(); sensorChart()"
           }
         ],
@@ -527,7 +541,7 @@
           {
             "name": "Sensor switch",
             "at": "Humidity",
-            "shows": "Segment of the sensors the unit has: Temperature, Humidity, Ammonia",
+            "shows": "Segment of the sensors the unit has, each with its current value: Temperature, Humidity, Ammonia",
             "states": [
               {
                 "state": "Sensor missing",
@@ -540,7 +554,7 @@
                 "shows": "The switch lists only it; the page opens on it"
               }
             ],
-            "logic": "Unit and chart scale differ per sensor (°C, %, ppm NH₃); the plotted range is padded by 0.5 for temperature and 1 for the others.",
+            "logic": "Unit and chart scale differ per sensor (°C, %, ppm NH₃). The chart is scaled to the plotted points of the selected sensor.",
             "source": "availableSensors(); sensorKinds"
           }
         ],

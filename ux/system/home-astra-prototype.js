@@ -160,14 +160,32 @@
     return factors.map((n,i)=>({time:labels[i],value:+(sensor.value+n*scale).toFixed(sensor.id===0?1:0)}));
   }
   function sensorChart(sensor){
-    const rows=sensorHistory(sensor),values=rows.map(r=>r.value),min=Math.min(...values),max=Math.max(...values),pad=sensor.id===0?0.5:1,low=min-pad,high=max+pad;
-    const points=rows.map((r,i)=>[38+i*254/(rows.length-1),148-(r.value-low)/(high-low)*118]);
-    const line=points.map(p=>p.join(',')).join(' '),path='M'+points.map(p=>p.join(',')).join(' L');
-    return `<div class="sensor-chart" role="img" aria-label="${sensor.name} sample trend. Minimum ${min}, maximum ${max} ${sensor.unit}. Reading history below."><svg viewBox="0 0 316 184"><defs><linearGradient id="sensor-fill" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#91ab7c" stop-opacity=".25"/><stop offset="1" stop-color="#91ab7c" stop-opacity="0"/></linearGradient></defs>${[0,1,2].map(i=>{const y=30+i*59;return `<line x1="38" x2="292" y1="${y}" y2="${y}" stroke="#e2e6db"/><text x="1" y="${y+3}">${(high-i*(high-low)/2).toFixed(sensor.id===0?1:0)}</text>`;}).join('')}<path d="${path} L292,148 L38,148 Z" fill="url(#sensor-fill)" stroke="none"/><polyline points="${line}" stroke="#57784a" stroke-width="2.5" fill="none"/>${points.map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="3" fill="#57784a" stroke="white"/>`).join('')}<text x="38" y="173">${rows[0].time}</text><text x="166" y="173" text-anchor="middle">${rows[Math.floor(rows.length/2)].time}</text><text x="292" y="173" text-anchor="end">${rows.at(-1).time}</text></svg></div><div class="sensor-range-stats"><span>Low <strong>${min} ${sensor.unit}</strong></span><span>High <strong>${max} ${sensor.unit}</strong></span></div><details class="sensor-history"><summary>Reading history</summary><table><caption class="visually-hidden">${sensor.name} sample readings</caption><thead><tr><th>Time</th><th>${sensor.unit}</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${r.time}</td><td>${r.value}</td></tr>`).join('')}</tbody></table></details>`;
+    // A trend line with its own low and high marked where they happened; the last point is "now".
+    // Drawn at 288 wide so a 360px phone never scales the 11px labels below 11px. No design-system chart exists yet (_proposed.json: Trend chart).
+    const rows=sensorHistory(sensor),values=rows.map(r=>r.value),min=Math.min(...values),max=Math.max(...values),span=(max-min)||1;
+    const x0=10,x1=278,top=38,bottom=104,last=rows.length-1;
+    const pts=rows.map((r,i)=>[+(x0+i*(x1-x0)/last).toFixed(1),+(bottom-(r.value-min)/span*(bottom-top)).toFixed(1)]);
+    const hi=values.indexOf(max),lo=values.indexOf(min),week=state.sensorRange==='week';
+    const mark=(i,text,dy)=>{const [x,y]=pts[i];return `<text class="sensor-chart-mark" x="${x}" y="${y+dy}" text-anchor="${x<70?'start':x>218?'end':'middle'}">${text}</text>`;};
+    const dot=(i,cls)=>`<circle class="${cls}" cx="${pts[i][0]}" cy="${pts[i][1]}" r="${cls==='sensor-chart-now'?4.5:3.5}"/>`;
+    const line=pts.map(p=>p.join(',')).join(' ');
+    return `<div class="sensor-chart" role="img" aria-label="${sensor.name} sample trend, ${week?'7 days':'today'}. Low ${min}, high ${max} ${sensor.unit}. The readings are listed under Reading history."><svg viewBox="0 0 288 148" aria-hidden="true"><path class="sensor-chart-area" d="M${line.replace(/ /g,' L')} L${x1},120 L${x0},120 Z"/><line class="sensor-chart-rule" x1="0" x2="288" y1="120" y2="120"/><polyline class="sensor-chart-line" points="${line}"/>${hi!==last?dot(hi,'sensor-chart-end'):''}${lo!==last?dot(lo,'sensor-chart-end'):''}${dot(last,'sensor-chart-now')}${mark(hi,`High ${max} ${sensor.unit}`,-10)}${mark(lo,`Low ${min} ${sensor.unit}`,19)}<text class="sensor-chart-axis" x="2" y="142" text-anchor="start">${rows[0].time}</text><text class="sensor-chart-axis" x="144" y="142" text-anchor="middle">${rows[Math.floor(rows.length/2)].time}</text><text class="sensor-chart-axis" x="286" y="142" text-anchor="end">${rows[last].time}</text></svg></div>`;
+  }
+  // Environment and devices: a page that reads (the three readings, the trend, the fan's state) and a sheet that changes the fan.
+  // Offline is said once, in the notice; the fan row then has no tap.
+  const fanState=d=>d.mode==='auto'?'Auto · following unit schedule':'Manual · '+d.speed+'% speed';
+  const fanDirty=d=>!(d.draftMode===d.mode&&(d.draftMode==='auto'||d.draftSpeed===d.speed));
+  function fanSheet(){
+    const d=unitDevices()[0],keep=returnFocus;
+    drawer(d.name,SentriUI.segment({variant:'view-switch',options:[['auto','Auto'],['manual','Manual']],active:d.draftMode,action:'fan-mode',ariaLabel:'Fan mode'})+(d.draftMode==='manual'?SentriUI.stepper({label:'Fan speed (%)',value:d.draftSpeed,min:0,max:100,step:5,action:'fan-speed',key:d.id,variant:'count',draft:fanDirty(d)}):'')+(fanDirty(d)?SentriUI.button({label:'Save setting',register:'primary',action:'apply-device'}):''));
+    returnFocus=keep;
   }
   function environment(){
-    const sensors=availableSensors(),selected=sensors.find(s=>s.id===state.sensor)||sensors[0],offline=sync.connection==='offline';
-    return head('Environment & devices','Unit '+state.unit,'<span class="preview-badge">PREVIEW</span>')+`<div class="app-scroll environment-page">${selected?`${SentriUI.segment({variant:'view-switch',options:sensors.map(s=>[s.id,s.name]),active:selected.id,action:'sensor',ariaLabel:'Sensor'})}<section class="sensor-detail"><div class="sensor-detail-heading"><div><p>${selected.name}</p><strong>${selected.value}<small>${selected.unit}</small></strong></div><span>Last reading<br>${currentUnitContext().updated}</span></div>${SentriUI.segment({variant:'view-switch',options:[['today','Today'],['week','7 days']],active:state.sensorRange==='week'?'week':'today',action:'sensor-range',ariaLabel:'Chart period'})}${sensorChart(selected)}<p class="helper">Sample readings · ${offline?'offline, showing last available values':'connected'}</p></section>`:''}${unitDevices().length?`<div class="device-section-heading"><h3>Devices</h3><span>${offline?'Offline':'Connected'}</span></div>${unitDevices().map(d=>`<section class="device-control"><div class="device-control-heading">${icon('air')}<div><h3>${d.name}</h3><p>${d.mode==='auto'?'Auto · following unit schedule':'Manual · '+d.speed+'% speed'}</p></div></div>${SentriUI.segment({variant:'view-switch',options:[['auto','Auto'],['manual','Manual']],active:d.draftMode,action:'fan-mode',ariaLabel:'Fan mode',disabled:offline})}${d.draftMode==='manual'?`<label class="fan-speed-label" for="fan-speed">Fan speed <output id="fan-speed-value">${d.draftSpeed}%</output></label><input id="fan-speed" type="range" min="0" max="100" step="5" value="${d.draftSpeed}" ${offline?'disabled':''}>`:''}${btn('apply-device','Save setting','primary','',offline||d.draftMode===d.mode&&(d.draftMode==='auto'||d.draftSpeed===d.speed)?'disabled':'')}<p class="helper">${offline?'Reconnect to change device settings.':'Preview controls only · no command is sent to equipment.'}</p>${d.updated?`<p class="device-updated">${d.updated}</p>`:''}</section>`).join('')}`:''}</div>`;
+    const sensors=availableSensors(),selected=sensors.find(s=>s.id===state.sensor)||sensors[0],offline=sync.connection==='offline',devices=unitDevices(),week=state.sensorRange==='week';
+    const notice=offline?SentriUI.banner({tone:'notice',headline:'Offline',consequence:'Showing the last readings.'+(devices.length?' Reconnect to change device settings.':'')}):'';
+    const readings=selected?`<section class="environment-section">${SentriUI.heading({title:'Sensors',description:'Last reading '+currentUnitContext().updated,kind:'section',level:3})}${SentriUI.segment({variant:'two-line-lens',options:sensors.map(s=>[s.id,s.name,{count:s.value+' '+s.unit}]),active:selected.id,action:'sensor',ariaLabel:'Sensor'})}</section><section class="environment-section">${SentriUI.heading({title:'Trend',kind:'section',level:3,action:{label:'View history',action:'sensor-history',ariaLabel:'View reading history'}})}${SentriUI.panel(`<div class="sensor-detail">${SentriUI.segment({variant:'lens',options:[['today','Today'],['week','7 days']],active:week?'week':'today',action:'sensor-range',ariaLabel:'Chart period'})}${sensorChart(selected)}</div>`)}</section>`:'';
+    const fans=devices.length?`<section class="environment-section">${SentriUI.heading({title:'Devices',kind:'section',level:3})}${SentriUI.rowGroup(devices.map(d=>SentriUI.row({title:d.name,description:fanState(d),action:offline?'':'fan-edit',trail:offline?'none':'chevron'})).join(''))}</section>`:'';
+    return head('Environment & devices','Unit '+state.unit+' · sample data')+`<div class="app-scroll environment-page">${notice}${readings}${fans}</div>`;
   }
   function maintenance(){
     const rows=maintenanceRecords(),open=rows.filter(f=>!f.resolved);
@@ -244,7 +262,7 @@
   // The atlas follows the demo (?screen=): the screen whose url holds this scope (view, section, unit, work, attention), else null.
   function atlasScreen(screens){
     const dr=overlay.querySelector('.sheet,.dialog');
-    if(state.page==='environment')return unitDevices()[0]?.draftMode==='manual'?'environment.fan-manual':state.sensorRange==='week'?'environment.sensor-week':(state.sensor||0)>0?'environment.sensor-other':'environment.page';
+    if(state.page==='environment')return dr&&unitDevices()[0]?.draftMode==='manual'?'environment.fan-manual':state.sensorRange==='week'?'environment.sensor-week':(state.sensor||0)>0?'environment.sensor-other':'environment.page';
     if(state.page==='assistant')return state.assistantTab==='chat'?(state.chat.length?'assistant.conversation':'assistant.conversations'):state.answered?'assistant.up-to-date':'assistant.needs-you';
     if(state.page==='finding')return state.answered?'assistant.answered':'assistant.finding';
     if(state.page==='toolbox'&&!dr)return 'workbench.toolbox';
@@ -313,10 +331,13 @@
     if(a==='inspect'){openDesigned('inspection-astra-concept.html',state.unit,'unit',v);return;}
     if(a==='environment'){push('environment',{sensor:0,sensorRange:'today'});return;}
     if(a==='maintenance'||a==='unit-fault'){push('maintenance');return;}
-    if(a==='sensor'){state.sensor=+v;render();return;}
-    if(a==='sensor-range'){state.sensorRange=v;render();return;}
-    if(a==='fan-mode'){if(sync.connection==='offline')return;unitDevices()[0].draftMode=v;render();return;}
-    if(a==='apply-device'){if(sync.connection==='offline')return;const d=unitDevices()[0];d.mode=d.draftMode;d.speed=d.draftSpeed;d.updated='Preview setting applied · just now';render();toast('Sample setting saved · no equipment command sent');return;}
+    if(a==='sensor'){state.sensor=+v;renderSync();return;}
+    if(a==='sensor-range'){state.sensorRange=v;renderSync();return;}
+    if(a==='sensor-history'){const s=availableSensors().find(s=>s.id===state.sensor)||availableSensors()[0];if(s)drawer(s.name+' · '+(state.sensorRange==='week'?'7 days':'today'),SentriUI.facts(sensorHistory(s).map(r=>({label:r.time,value:r.value+' '+s.unit,mono:true}))));return;}
+    if(a==='fan-edit'){if(sync.connection==='offline')return;fanSheet();return;}
+    if(a==='fan-mode'){unitDevices()[0].draftMode=v;fanSheet();overlay.querySelector('[data-action="fan-mode"][aria-pressed="true"]')?.focus({preventScroll:true});return;}
+    if(a==='fan-speed'){const d=unitDevices()[0],step=+el.dataset.step||0;d.draftSpeed=Math.max(0,Math.min(100,d.draftSpeed+step));fanSheet();overlay.querySelector('[data-action="fan-speed"][data-step="'+step+'"]')?.focus({preventScroll:true});return;}
+    if(a==='apply-device'){const d=unitDevices()[0];if(sync.connection==='offline'||!fanDirty(d))return;d.mode=d.draftMode;d.speed=d.draftSpeed;closeDrawer();renderSync();toast('Sample setting saved · no equipment command sent');return;}
     if(a==='report-fault'){reportFault();return;}
     if(a==='fault-detail'){faultDetail(v);return;}
     if(a==='resolve-fault'){const f=maintenanceRecords().find(f=>f.id===state.faultId);if(f)f.resolved=true;closeDrawer();render();faultDetail(state.faultId);return;}
@@ -332,7 +353,6 @@
     if(a==='search'){drawer('Find a pig or pen',`<form id="lookup-form">${SentriUI.field({label:'Ear tag or pen code',control:`<input id="query" name="tag" placeholder="${taskRecords(taskBy('preg31'),7)[2].id} or A1" required maxlength="30">`})}<button type="submit" class="primary">Search sample records</button></form>`,{size:'short'});return;}
     if(a==='lookup-result'){const [tid,u]=v.split(':');closeDrawer();state.section=taskBy(tid).section;openTask(tid,+u);return;}
   });
-  document.addEventListener('input',e=>{if(e.target.id!=='fan-speed')return;const d=unitDevices()[0];d.draftSpeed=+e.target.value;document.getElementById('fan-speed-value').textContent=d.draftSpeed+'%';app.querySelector('[data-action="apply-device"]').disabled=sync.connection==='offline'||d.mode===d.draftMode&&d.speed===d.draftSpeed;});
   document.addEventListener('submit',e=>{
     if(!['ask-form','answer-form','note-form','lookup-form','fault-form'].includes(e.target.id))return;e.preventDefault();const data=new FormData(e.target);
     if(e.target.id==='fault-form'){const device=String(data.get('device')).trim(),pen=String(data.get('location')).trim(),note=String(data.get('note')).trim();if(!device||!pen||!note)return;maintenanceRecords().unshift({id:'fault-'+Date.now(),device,pen,note,by:'G. Hansen · just now',resolved:false});closeDrawer();render();toast('Issue saved in this preview');}
