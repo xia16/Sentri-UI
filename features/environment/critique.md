@@ -57,3 +57,9 @@ Built in real components (new `Sensor` and `Devices`, new Segment variant `pills
 - **Better because** every figure the worker reads is now at or above the farm floors with the reading still leading, the title no longer wraps at 360, and nothing else moved.
 
 Not done: the Segment well on the sensor tabs at the top of the page is kept (it is outside the card). The gate's Chinese check cannot be run on this page (it does not render Chinese).
+
+### Final look (rendered from commit 0f3a282, merged with origin/main e1aa956, which was already up to date)
+
+All four screens at 390 and 360 beside their `origin/main` baselines: header, wrapping and what moved. The title is one line at 360 (it wrapped before); the reading is still the largest thing and the first thing the eye lands on; the chart, Low / High and the fan card follow in that order. The sensor card is a little taller at 390 (about 20px) and the fan card starts about the same place; the Manual slider is visible at 360 and its thumb row is cut by the fold at 390 as it was before. Nothing got worse. Later commits touch this file only.
+
+**Better because** every text a worker reads is now at the floors (35 small-text nodes per screen down to none, 3 contrast failures to none, the target failure gone), the hierarchy is the original's, and the title no longer wraps.
