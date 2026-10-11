@@ -15,6 +15,14 @@ import { screensOf } from './loop-rules.mjs';
 import { routeFonts } from './font-route.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+// A sheet that slides in, or a backdrop that blurs, is still moving 250ms after load on a slow machine: wait for every finite
+// animation and transition to finish (at most 3s), then two frames, so a shot never catches a screen mid-motion.
+async function settle(page) {
+  await page.evaluate(() => Promise.race([
+    Promise.all(document.getAnimations().filter((a) => a.effect?.getComputedTiming().endTime !== Infinity).map((a) => a.finished.catch(() => {}))),
+    new Promise((r) => setTimeout(r, 3000)),
+  ]).then(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)))));
+}
 const { chromium } = playwright();
 
 const argv = process.argv.slice(2);
@@ -68,6 +76,7 @@ for (const width of widths) {
         await page.waitForSelector('html.atlas-ready', { timeout: 10000 });
         await page.evaluate(() => document.fonts.ready.then(() => true));
         await page.waitForTimeout(250);
+        await settle(page);
         if (!fontFailures.size) break;
         if (attempt === 3) throw new Error(`an external font failed to load 3 times (${[...fontFailures][0]})`);
       }
