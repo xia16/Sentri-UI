@@ -308,10 +308,11 @@
         ],
         "rules": [],
         "issues": [
-          "The date \"Thu, 8 Jul\" is fixed sample text, while the piglet-processing prototype uses the real clock.",
+          "The visible date \"Sample · Thu, 8 Jul\" is a fixed fixture, not the device clock or a real task schedule. The connected Home date source remains open.",
           "\"Across 3 units\" counts units that carry the task, not units with work due, and repeats on every card.",
           "The Piglet card mixes litters (\"4 litters with care due\") and pens (\"1 / 8 pens\"). A pen is a litter in the prototype.",
-          "The Piglet card says Batch 27, 8 pens, care due tomorrow; the prototype it opens starts on Batch 40, 12 pens, 6 due today.",
+          "The Piglet card is an independent Batch 27 / 8-pen fixture; the linked piglet-processing page is a Batch 40 / 12-pen fixture. The click-through shows a destination, not the same task instance. Align fixtures before connected-data acceptance.",
+          "Assistant, Scan and Toolbox are visible prototype entrances to separate sample pages. A Home-only native preview explains that they are not connected; production navigation belongs to their owning features.",
           "The saved-work card sits first while offline and pushes the day's work down; its queue is fictional.",
           "`layout=focus` has no effect on Home; it is only forwarded to detail pages.",
           "No way to reach language or log out (the old Figma has both)."

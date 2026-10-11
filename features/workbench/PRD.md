@@ -30,8 +30,11 @@ In: section chooser, Overview, unit picker, unit hub, card states (due, waiting,
 
 Out: Assistant (its own feature), Scan and Find a pig (Find a pig), the Saved work drawer (Data sync); task detail pages (their own features); Environment & devices (its own feature). Language and Log out exist in the old design and are not built here (placeholder).
 
+The Assistant, Scan and Toolbox controls are visible prototype navigation to separate sample pages, not part of the Home delivery. A Home-only native preview may open an explicit "UI preview · not connected" explanation for these controls; it must not imply that an agent, camera, search or record action ran. Production navigation waits for the owning feature's design and implementation.
+
 ## Decisions
 
 - Decided: one Overview plus unit scope; Assistant has no badge on Home; the last section is remembered; the unit picker has no search (about 15 units at most); completion stays inside the task.
 - Open: where language and log out live; what the real "Not designed yet" page shows per task; whether ready-to-complete shows a review before closing; how the real queue feeds Saved work; what "Day N of N" means for tasks with no batch window.
-- Open (data): the Home sample batches (Piglet processing Batch 27, 8 pens, 2 units) do not match the piglet-processing prototype it opens (Batch 40, 12 pens).
+- Open (data): the Home card uses Piglet processing Batch 27 (8 pens, 2 units), while its linked piglet-processing prototype uses Batch 40 (12 pens). These are independent design fixtures; the click-through demonstrates the intended destination, not continuity of one task instance. Align the fixtures before using this flow for connected-data acceptance.
+- Open (date): `Sample · Thu, 8 Jul` is a fixed prototype date, not the device clock or a real work schedule. The connected Home date source and formatting still need definition.
