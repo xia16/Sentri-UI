@@ -1,0 +1,19 @@
+[
+  {
+    "id": "fan",
+    "name": "Fan",
+    "use": "The controls of one piece of equipment: what it is doing, its mode, an optional speed, and Save. The ventilation fan on Environment & devices.",
+    "notUse": "Not a read-only status (Row or Facts) and not a setting that applies at once: this one has a Save.",
+    "states": [
+      "Auto (nothing to save)",
+      "Manual with speed",
+      "Saved",
+      "Offline",
+      "Chinese"
+    ],
+    "usedBy": [
+      "environment.page",
+      "environment.fan-manual"
+    ]
+  }
+]

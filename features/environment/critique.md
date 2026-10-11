@@ -25,6 +25,8 @@ Mode polish, class presentation. Baselines: origin/main 716d761, `environment.*`
 | 7 | The page says "connected" twice: "Sample readings · connected" under the chart, "Connected" beside Devices. And "09:40" twice: "Last reading 09:40" and the chart's last label. | owner rule: nothing said twice | minor |
 | 8 | Both cards, the chart, the readout and the fan block are page-built with page CSS colour, border, radius and type (`.sensor-detail`, `.device-control`, `.sensor-chart`, `#fan-speed`), not SentriUI parts. | `ux/system/home-astra-prototype.css` 148-167; owner rule: design-system components only | structural, fixed by extraction (section 1c) |
 
+The PREVIEW badge in the header is 9px mono (check-legibility, the one small-text node left on all four screens); raised to 11px (minor, fixed).
+
 fan-manual also has one target under 48px (check-legibility, 1 target) which the extraction checks.
 
 ## Parts
@@ -49,4 +51,34 @@ fan-manual also has one target under 48px (check-legibility, 1 target) which the
 
 ## Self-crit
 
-(written in the directions step)
+Compared at 390 and 360, EN, same states (Today, 7 days, Humidity, fan Manual, offline). The prototype ignores `?lang=zh`, so ZH is shown only in the component variants.
+
+### Direction A: fix in place (chosen)
+
+The card stays as drawn; only the problem parts change. Extraction came first and was rendered against main (Panel surface: radius 16 to 18, padding 14 to 16, colours moved to tokens; otherwise identical).
+
+- **Problem 1 fixed.** Fan speed: label 11 to 16px, value 11px to 21px mono (the number being set is now the card's hero). Slider unchanged.
+- **Problem 2 fixed.** Fan state line 10 to 13px.
+- **Problem 3 fixed.** Low / High values 10 to 13px ink (500), labels 11px.
+- **Problem 4 fixed.** Axis labels 9 to 11px-equivalent at 390 and 360 (drawn at 1.1x the caption size so the scaled chart stays at or above 11px), fill `muted` (5.4:1).
+- **Problem 5 fixed.** Last reading 10 to 11px.
+- **Problem 6 fixed.** History summary 13px in a 48px target; table 13px; "Sample readings" 11px; Devices is a Heading (16px, meta 13px) instead of a 13px title with a 10px word.
+- **Problem 7 fixed.** "Sample readings · connected" is now "Sample readings"; the repeated "Temperature" label above the figure is not drawn (the selected tab says it; it stays for screen readers).
+- **Problem 8 fixed.** The page CSS for both cards, chart, fan block and the Devices heading is deleted; `Trend` and `Device` (new, candidates) draw them on `Panel`.
+- **Found while rendering, same screen:** the page-wide `button:disabled{opacity:.45}` faded the offline Auto / Manual / Save to 2.6-2.7:1 against the "disabled is not faded" law, and the disabled Save lost its surface (the layered base rule loses to the page's `button{background:transparent}`). Scoped fix: `.environment-page button:disabled{opacity:1}` and the disabled face on `.st-device .button.primary`. The offline page now fits 844px, so its "Reconnect to change device settings." line is visible without scrolling (it was cut).
+
+Keep items: reading hero 34px mono, same place, same weight and still the largest thing; tabs, period toggle, chart shape, one card per topic, one dark control, speed only when Manual: all as strong as before.
+
+Squint test (390, Temperature): the eye lands on 22.4, then the chart line, then the fan card (Manual segment, 45%, Save). The worker's questions: what is it now (1), has it moved (2), what is the fan doing and can I change it (3). Match.
+
+Owner's eye: c1 (everything bigger)? No: quiet text stays at 11px (stamp, axis, note); only values read or set grew (Low / High, fan speed, state line, Devices heading). c2 (flatter)? No: same cards and headings, one more native Heading. c3 (bulkier)? No: no box or bold added; the Save button is the same width as before (content-width). Same product as Farrowing: light panel, one hero, quiet support.
+
+Rejected examples it could show: R14 (enlarging to clear a floor) is avoided by the cut (label, "connected") and by keeping quiet text at 11px; R15 (flat) not applicable; R16 not applicable (no new stack).
+
+**better because** the numbers a worker reads and sets (speed, Low / High, fan state) are now legible in the barn, the offline state is readable and fits on one screen, and the page no longer hand-builds colour, type or borders.
+
+### Direction B: full-width Save and Low / High as a chart caption (tried, dropped)
+
+Full-width Save at the foot of the fan card made the card heavier than the sensor card (c3) and widened the one dark control; Low / High at 16px bold-ish read as a heading row under the chart. Dropped: **not better** than A.
+
+Hand-over: A.

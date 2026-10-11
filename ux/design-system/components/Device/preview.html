@@ -1,0 +1,19 @@
+<!-- @dsCard group="Structure" height=420 subtitle="fan" -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><style>html,body{margin:0;background:var(--app-background)}</style></head>
+<body>
+<div data-st-context="page" style="max-width:390px;padding:var(--space-16);background:var(--app-background);font-family:var(--font-sans);color:var(--ink)"><div id="root"></div></div>
+<script>
+/* The previews expect a host that preloads tokens.css, bundle.css and bundle.js (the atlas does). */
+(function () {
+  var UI = window.SentriUI, root = document.getElementById('root');
+  if (!UI) { root.textContent = 'Load tokens.css, bundle.css and bundle.js before this preview.'; return; }
+  root.innerHTML = UI.device({ name: 'Ventilation fan', state: 'Auto · following unit schedule',
+    mode: UI.segment({ variant: 'view-switch', options: [['auto', 'Auto'], ['manual', 'Manual']], active: 'manual', action: 'fan-mode', ariaLabel: 'Fan mode' }),
+    speed: { id: 'fan-speed', label: 'Fan speed', value: 45 }, save: UI.button({ action: 'apply-device', register: 'primary', label: 'Save setting' }),
+    note: 'Preview controls only · no command is sent to equipment.' });
+})();
+</script>
+</body>
+</html>

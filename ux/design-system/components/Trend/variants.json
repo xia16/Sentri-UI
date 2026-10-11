@@ -1,0 +1,20 @@
+[
+  {
+    "id": "reading",
+    "name": "Reading",
+    "use": "One sensor's value now with its recent shape: the Environment screen's Temperature, Humidity and Ammonia.",
+    "notUse": "Not a value the worker types (Measure), not read-only record pairs (Facts), not a list of animals' weights.",
+    "states": [
+      "Today",
+      "7 days",
+      "Offline (last available values)",
+      "Chinese"
+    ],
+    "usedBy": [
+      "environment.page",
+      "environment.sensor-week",
+      "environment.sensor-other",
+      "environment.fan-manual"
+    ]
+  }
+]

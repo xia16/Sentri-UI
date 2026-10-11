@@ -482,7 +482,7 @@
      rows: [{time, value}], oldest first (two or more). decimals: y labels. pad: headroom above and below, in the unit. */
   function trend({label='',value='',unit='',updatedLabel='Last reading',updated='',period='',rows=[],decimals=0,pad=1,lowLabel='Low',highLabel='High',historyLabel='Reading history',timeLabel='Time',chartLabel='',note='',id='',className='',strs,args}={}){
     const o={strs,args},tid=id||fieldId('st-trend'),list=(rows||[]).filter(r=>r&&Number.isFinite(+r.value));
-    const head=`<div class="st-trend-head"><div><p class="st-trend-label">${tx(label,o,'label')}</p><strong class="st-trend-value">${esc(value)}<small>${esc(unit)}</small></strong></div>${updated?`<span class="st-trend-updated">${tx(updatedLabel,o,'updatedLabel')}<br>${esc(updated)}</span>`:''}</div>`;
+    const head=`<div class="st-trend-head"><div><p class="st-trend-label st-visually-hidden">${tx(label,o,'label')}</p><strong class="st-trend-value">${esc(value)}<small>${esc(unit)}</small></strong></div>${updated?`<span class="st-trend-updated">${tx(updatedLabel,o,'updatedLabel')}<br>${esc(updated)}</span>`:''}</div>`;
     let body='';
     if(list.length>1){
       const vals=list.map(r=>+r.value),min=Math.min(...vals),max=Math.max(...vals),lo=min-pad,hi=max+pad;
@@ -498,8 +498,8 @@
      target (id `speed.id`, its value in `<id>-value`). */
   function device({icon='air',name='',state='',mode='',speed=null,save='',note='',updated='',className='',strs,args}={}){
     const o={strs,args};
-    const slider=speed?`<label class="st-device-speed" for="${esc(speed.id)}"><span>${tx(speed.label||'Speed',{strs:speed.strs,args:speed.args},'label')}</span><output id="${esc(speed.id)}-value">${esc(speed.value)}%</output></label><input id="${esc(speed.id)}" class="st-device-range" type="range" min="${speed.min??0}" max="${speed.max??100}" step="${speed.step??5}" value="${esc(speed.value)}"${speed.disabled?' disabled':''}>`:'';
-    return panel(`<div class="st-device-head">${glyph(icon)}<div><h3>${esc(name)}</h3><p>${tx(state,o,'state')}</p></div></div>${mode}${slider}${save}${note?`<p class="st-device-note">${tx(note,o,'note')}</p>`:''}${updated?`<p class="st-device-updated">${esc(updated)}</p>`:''}`,{className:`st-device ${className}`,tag:'section',ds:'Device'});
+    const slider=speed?`<div class="st-device-speed"><span id="${esc(speed.id)}-label">${tx(speed.label||'Speed',{strs:speed.strs,args:speed.args},'label')}</span><output id="${esc(speed.id)}-value" for="${esc(speed.id)}">${esc(speed.value)}%</output></div><input id="${esc(speed.id)}" class="st-device-range" type="range" min="${speed.min??0}" max="${speed.max??100}" step="${speed.step??5}" value="${esc(speed.value)}" aria-labelledby="${esc(speed.id)}-label"${speed.disabled?' disabled':''}>`:'';
+    return panel(`<div class="st-device-head">${glyph(icon)}<div><h3>${esc(name)}</h3><p class="st-device-state">${tx(state,o,'state')}</p></div></div>${mode}${slider}${save}${note?`<p class="st-device-note">${tx(note,o,'note')}</p>`:''}${updated?`<p class="st-device-updated">${esc(updated)}</p>`:''}`,{className:`st-device ${className}`,tag:'section',ds:'Device'});
   }
   /* Numpad: the one type-to-set pad, for real typed input only (ear tags, weights), docked above the bar.
      1–9 · [. or a gap] 0 ⌫. No commit key: the bar's primary commits. Keys never move: the feedback region

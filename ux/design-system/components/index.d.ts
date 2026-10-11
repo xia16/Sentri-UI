@@ -365,6 +365,12 @@ export type Part = string | { text: string; tone?: Tone; mono?: boolean; strs?: 
 /** A token: one part, or a word and its value as a list of parts. Tokens with sep 'dot' are joined by a real `·` text node. */
 export type Token = Part | Part[];
 /** The status kinds: one colour map (awaiting muted, active progress, done green, late amber, overdue red, died red). */
+export interface TrendRow { time: string; value: number }
+/** Candidate. One sensor's reading with its recent shape (hero figure, chart, Low / High, history table). Draws on a Panel. */
+export interface TrendProps { label?: string; value?: string | number; unit?: string; updatedLabel?: string; updated?: string; /** the caller's period Segment */ period?: string; rows?: TrendRow[]; decimals?: number; pad?: number; lowLabel?: string; highLabel?: string; historyLabel?: string; timeLabel?: string; chartLabel?: string; note?: string; id?: string; className?: string; strs?: Strs<'label' | 'updatedLabel' | 'lowLabel' | 'highLabel' | 'historyLabel' | 'timeLabel' | 'note'>; args?: StrArgs<'label' | 'updatedLabel' | 'lowLabel' | 'highLabel' | 'historyLabel' | 'timeLabel' | 'note'> }
+/** Candidate. The controls of one piece of equipment: state, mode, optional speed slider, Save. Draws on a Panel. */
+export interface DeviceProps { icon?: string; name?: string; state?: string; /** the caller's mode Segment */ mode?: string; speed?: { id: string; label?: string; value: number; min?: number; max?: number; step?: number; disabled?: boolean } | null; /** the caller's Save Button */ save?: string; note?: string; updated?: string; className?: string; strs?: Strs<'state' | 'note'>; args?: StrArgs<'state' | 'note'> }
+
 export type StatusKind = 'awaiting' | 'active' | 'done' | 'late' | 'overdue' | 'died';
 /** Status: `word` (dot and word, inline), or `chip` (filled badge in a row). `kind` picks tone and icon; `tone` alone still works. */
 export interface StatusProps { text: string; kind?: StatusKind; tone?: Tone; variant?: 'word' | 'chip'; /** chip only: a registry icon name, default from kind */ icon?: string; id?: string; className?: string; strs?: Strs<'text'>; args?: StrArgs<'text'> }
@@ -620,6 +626,8 @@ export interface SentriUI {
   rowSelectChange(event: Event | { target: unknown }): { value: string; checked: boolean; action: string } | null;
   stepper(props: StepperProps): string;
   measure(props: MeasureProps): string;
+  trend(props: TrendProps): string;
+  device(props: DeviceProps): string;
   numpad(props: NumpadProps): string;
   /** Apply one key; `dead` says which dead tap to answer in the hint line. */
   numpadInput(state: NumpadState, key: NumpadInputKey, limits?: NumpadLimits): Required<NumpadState> & { dead: null | 'full' | 'point' | 'empty' };
