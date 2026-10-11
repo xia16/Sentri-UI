@@ -4,9 +4,9 @@ Sentri-UI is the design source of truth for a native-feel mobile app used by glo
 
 ## Legibility gate
 
-Legibility gate: no-regression
+Legibility gate: strict
 
-The farm legibility check (`scripts/check-legibility.mjs`, law in `ux/design-system/README.md`) blocks a changed screen only if it is worse than at the base. When the type pass has merged, change the line above to `Legibility gate: strict`; the same check then holds changed screens to the absolute floors.
+The farm legibility check (`scripts/check-legibility.mjs`, law in `ux/design-system/README.md`) holds every screen a change moves to the absolute floors. Screens a change doesn't move are reported, not blocking. Screens still drawn from the pre-workflow prototypes in `ux/archive/` and `ux/research/` fail the floors today; each meets them when its feature is redesigned through `/design`, and any change that moves one must bring it up to the floors.
 
 ## Who decides what
 
