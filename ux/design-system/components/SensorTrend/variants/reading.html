@@ -1,0 +1,16 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SensorTrend · reading</title><style>
+.sc{box-sizing:border-box;width:100%;max-width:390px;margin:0 auto;padding:var(--space-16) var(--space-gutter-sheet);background:var(--app-background);font-family:var(--font-sans);color:var(--ink)}
+</style><body data-st-context="page">
+<div class="sc" data-state="Default" data-demo="default"></div>
+<div class="sc" data-state="History open" data-demo="open"></div>
+<div class="sc" data-state="Humidity" data-demo="humidity"></div>
+<div class="sc" data-state="Offline" data-demo="offline"></div>
+<script>
+const UI=window.SentriUI;
+const day=[-.5,-.3,-.4,.2,.4,.1,-.1,0],times=['00:00','02:00','04:00','06:00','07:00','08:00','09:00','09:40'];
+const rows=(v,s,d)=>day.map((n,i)=>({time:times[i],value:+(v+n*s).toFixed(d)}));
+const period=UI.segment({variant:'view-switch',options:[['today','Today'],['week','7 days']],active:'today',action:'period',ariaLabel:'Chart period'});
+const T=o=>UI.sensorTrend(Object.assign({name:'Temperature',unit:'°C',value:22.4,stamp:'09:40',rows:rows(22.4,1,1),decimals:1,pad:.5,period,note:'Sample readings · connected'},o||{}));
+const D={default:()=>T(),open:()=>T(),humidity:()=>T({name:'Humidity',unit:'%',value:64,rows:rows(64,6,0),decimals:0,pad:1}),offline:()=>T({note:'Sample readings · offline, showing last available values'})};
+document.querySelectorAll('[data-state]').forEach(el=>{el.innerHTML=D[el.getAttribute('data-demo')]();if(el.getAttribute('data-demo')==='open')el.querySelector('details').open=true;});
+</script></body></html>

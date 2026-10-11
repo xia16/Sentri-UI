@@ -1,0 +1,10 @@
+[
+  {
+    "id": "equipment",
+    "name": "Equipment",
+    "use": "Use for one device with an Auto / Manual mode and, in Manual, a single level.",
+    "notUse": "Not for a record of what happened, or a list of devices (use Row group)",
+    "states": ["Auto", "Manual", "Offline"],
+    "usedBy": ["environment.page", "environment.fan-manual"]
+  }
+]

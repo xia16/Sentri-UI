@@ -228,6 +228,7 @@ const GROUPS = [
   ['Inputs and filters', ['FilterSheet', 'RangeSlider']],
   ['Fields', ['Field', 'PickerField', 'Stepper', 'Measure', 'Numpad']],
   ['Status and feedback', ['Status', 'ConditionTag', 'Banner', 'Photos']],
+  ['Readings and devices', ['SensorTrend', 'DeviceControl']],
   ['Task skeleton', ['TaskPhone', 'TaskHeader', 'TaskSummary', 'TaskLens', 'TaskGroup', 'TaskDock', 'TaskHold', 'TaskTotals', 'TaskProgress', 'TaskStepper', 'TaskPhotos', 'TaskChoice', 'TaskRadios', 'TaskWarning', 'TaskTable', 'TaskMetrics', 'TaskSection', 'TaskReceipt', 'TaskDay', 'TaskChips']],
 ];
 const components = [];

@@ -24,7 +24,7 @@ Scope: `environment.page`, `environment.sensor-week`, `environment.sensor-other`
 | 5 | "Reading history" is a bare line with no sign that it opens (no chevron), and the helper line sits below it, so the card ends on two grey lines | 390 shot | minor |
 | 6 | The fan slider is filled green. Green means done / approved only | `accent-color:var(--green)` on `#fan-speed` | minor |
 | 7 | The page hand-builds its card, chart, device card and sensor styles in `home-astra-prototype.css` with its own colours, borders, radii and type (`.sensor-detail`, `.sensor-chart`, `.device-control`...), against the design-system-only rule | CSS lines 145-168 | major (process) |
-| 8 | "Offline" is said twice: in the helper under the chart and as the tag beside "Devices" | 390 shot | minor |
+| 8 | The waiting Save setting (offline, or draft equals applied) is the page's one action, drawn as 45%-faded text with no surface and so reads as a stray label; "Disabled is not faded" | 390 shot, `button:disabled{opacity:.45}`, no fill | major |
 
 Not changed (product, not presentation): the bare "Save setting" verb, the sample-data model, the 0% fan question already filed in the notes.
 
@@ -38,8 +38,8 @@ Not changed (product, not presentation): the bare "Save setting" verb, the sampl
 | Period toggle | SentriUI Segment (view-switch) | keep, inside the extracted card |
 | Chart, Low / High | page-built SVG (`sensorChart`, `.sensor-chart`, `.sensor-range-stats`) | extract as-is, then fix labels and height (1, 2, 4) |
 | Reading history | page-built `<details>` | extract, add the chevron (5) |
-| Connection helper line | page-built `.helper` | keep once, quiet, drop the duplicate (8) |
+| Connection helper line | page-built `.helper` | keep, quiet, move into the card as its note |
 | "Devices" heading and tag | page-built | use SentriUI Heading section with meta |
 | Fan card (title, status, segment, slider, Save) | page-built (`.device-control*`) | extract to SentriUI `deviceControl`, then fix (2, 6) |
 | Auto / Manual | SentriUI Segment | keep |
-| Save setting | SentriUI Button | keep |
+| Save setting | SentriUI Button | keep the verb and position; give the waiting face a surface (8) |

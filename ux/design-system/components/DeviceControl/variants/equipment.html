@@ -1,0 +1,13 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>DeviceControl · equipment</title><style>
+.sc{box-sizing:border-box;width:100%;max-width:390px;margin:0 auto;padding:var(--space-16) var(--space-gutter-sheet);background:var(--app-background);font-family:var(--font-sans);color:var(--ink)}
+</style><body data-st-context="page">
+<div class="sc" data-state="Auto" data-demo="auto"></div>
+<div class="sc" data-state="Manual" data-demo="manual"></div>
+<div class="sc" data-state="Offline" data-demo="offline"></div>
+<script>
+const UI=window.SentriUI,icon=window.SentriIcons.icon('air');
+const modes=(a,off)=>UI.segment({variant:'view-switch',options:[['auto','Auto'],['manual','Manual']],active:a,action:'fan-mode',ariaLabel:'Fan mode',disabled:off});
+const F=o=>UI.deviceControl(Object.assign({name:'Ventilation fan',icon,status:'Auto · following unit schedule',modes:modes('auto'),save:{action:'apply-device',label:'Save setting',disabled:true},note:'Preview controls only · no command is sent to equipment.'},o||{}));
+const D={auto:()=>F(),manual:()=>F({modes:modes('manual'),speed:{id:'fan-speed',label:'Fan speed',value:45},save:{action:'apply-device',label:'Save setting',disabled:false}}),offline:()=>F({modes:modes('auto',true),note:'Reconnect to change device settings.'})};
+document.querySelectorAll('[data-state]').forEach(el=>{el.innerHTML=D[el.getAttribute('data-demo')]();});
+</script></body></html>

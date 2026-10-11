@@ -1,0 +1,10 @@
+[
+  {
+    "id": "reading",
+    "name": "Reading",
+    "use": "Use for one numeric sensor with a short history: the value is the hero and the line shows where it is going.",
+    "notUse": "Not for animal counts (use TaskMetrics) or a value the worker sets (use Measure or Stepper)",
+    "states": ["Default", "History open", "Humidity", "Offline"],
+    "usedBy": ["environment.page", "environment.sensor-week", "environment.sensor-other"]
+  }
+]

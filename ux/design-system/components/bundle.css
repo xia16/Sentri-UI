@@ -236,9 +236,9 @@ body{background:var(--ground);color:var(--ink)}
 .st-row-icon svg{width:var(--size-18);height:var(--size-18);fill:none;stroke:currentColor;stroke-width:var(--icon-stroke);stroke-linecap:round;stroke-linejoin:round}
 .st-row.st-row .st-row-copy{display:flex;flex:1;min-width:0;flex-direction:column;gap:var(--space-4)}
 .st-row.st-row .st-row-copy strong{font-size:var(--font-size-13);line-height:1.5;font-weight:500;letter-spacing:0;color:inherit}
-.st-row.st-row .st-row-copy small{font-size:var(--font-size-11);line-height:1.5;font-weight:400;color:var(--st-muted);margin:0}
+.st-row.st-row .st-row-copy small{font-size:var(--st-quiet);line-height:1.5;font-weight:400;color:var(--st-muted);margin:0}
 .st-row.st-row .st-row-copy :is(strong,small){display:block;min-width:0;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.st-row-trailing{font-size:var(--font-size-11);color:var(--st-muted)}
+.st-row-trailing{font-size:var(--st-quiet);color:var(--st-muted)}
 .st-row-chevron{display:flex;color:var(--st-muted);flex:none}
 .st-row-chevron svg{width:var(--size-15);height:var(--size-15);fill:none;stroke:currentColor;stroke-width:var(--icon-stroke);stroke-linecap:round;stroke-linejoin:round}
 button.st-row{cursor:pointer}
@@ -294,7 +294,7 @@ button.st-row[aria-current="location"]{background:var(--green-wash);box-shadow:i
 .st-category-footer .st-category-tabs button[aria-current="location"]{background:transparent;color:var(--tab-ink-active);font-weight:700}
 .st-category-tabs button[aria-current="location"]:after{content:"";position:absolute;bottom:var(--border-width);left:var(--space-8);right:var(--space-8);height:var(--size-3);border-radius:var(--radius-2);background:var(--current-marker)}
 .st-category-footer .st-category-tabs button:is(:active,[data-preview="pressed"]){background:var(--press)}
-@container(max-width:310px){.st-category-footer .st-category-tabs button{padding-left:var(--space-4);padding-right:var(--space-4);font-size:var(--font-size-11)}}
+@container(max-width:310px){.st-category-footer .st-category-tabs button{padding-left:var(--space-4);padding-right:var(--space-4);font-size:var(--st-quiet)}}
 
 /* Picker field: the mobile-standard choice control that replaces native selects.
    The trigger echoes text-input geometry; the sheet lists options as tappable rows. */
@@ -964,28 +964,45 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 /* A waiting or disabled control says so with its surface and rim; its text stays readable (4.5:1, farm legibility law). */
 .st-hold[aria-disabled="true"] :is(.st-hold-label,.st-hold-caption){color:var(--ink);opacity:1}
 
-/* SensorTrend and DeviceControl: the Environment page's reading card and equipment card, extracted as they were drawn. */
-.st-trend,.st-device{background:white;border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:16px;box-shadow:0 1px 2px #20291f08;color:var(--ink)}
-@media(max-width:430px){.st-trend,.st-device{padding:14px}}
-.st-trend-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.st-trend-name{margin:0;font-size:12px;color:var(--muted)}
-.st-trend-value{font:400 34px var(--font-mono);display:block;margin-top:7px;letter-spacing:-1.5px}
-.st-trend-value small{font:11px var(--font-sans);letter-spacing:0;margin-left:5px;color:var(--muted)}
-.st-trend-stamp{font-size:10px;line-height:1.7;color:var(--muted);text-align:right}
-.st-trend-chart svg{width:100%;height:auto;display:block;stroke:none;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
-.st-trend-chart svg text{fill:#78826f;font:9px var(--font-sans);stroke:none}
-.st-trend-range{display:flex;gap:20px;padding:8px 0 15px;font-size:10px;color:var(--muted)}
-.st-trend-range strong{font-weight:500;color:var(--ink);margin-left:4px}
-.st-trend-history{border-top:1px solid var(--line);font-size:11px}
-.st-trend-history summary{min-height:var(--tap-min);padding:13px 0;cursor:pointer;display:flex;align-items:center;color:var(--ink)}
-.st-trend-history table{width:100%;border-collapse:collapse;text-align:left;font-size:10px}
-.st-trend-history th,.st-trend-history td{padding:8px 0;border-bottom:1px solid var(--line);font-weight:400}
-.st-trend-history th:last-child,.st-trend-history td:last-child{text-align:right}
-.st-trend-note,.st-device-note{margin:12px 0 0;font-size:10px;line-height:1.7;color:#657060}
-.st-device-head{display:flex;align-items:center;gap:10px}
-.st-device-head h3{margin:0;font-size:13px;font-weight:500}
-.st-device-head p{margin:5px 0 0;font-size:10px;color:var(--muted)}
+/* SensorTrend and DeviceControl: the Environment page's reading card and equipment card. Both sit on the Panel surface. */
+.st-trend,.st-device{--st-quiet:11px;margin-bottom:var(--space-16)}
+.st-trend p,.st-trend h3,.st-device p,.st-device h3{margin:0}
+.st-trend-head{display:flex;align-items:baseline;justify-content:space-between;gap:var(--space-12)}
+.st-trend-name{font-size:var(--type-description-size);color:var(--muted)}
+.st-trend-value{display:block;margin-top:var(--space-4);font:400 var(--size-34) var(--font-mono);letter-spacing:-1.5px;color:var(--ink)}
+.st-trend-value small{margin-left:var(--space-5);font:var(--st-quiet) var(--font-sans);letter-spacing:0;color:var(--muted)}
+.st-trend-stamp{font-size:var(--st-quiet);color:var(--muted);text-align:right}
+.st-trend>.st-selection{margin:var(--space-14) 0 var(--space-6)}
+.st-trend-chart svg{width:100%;height:auto;display:block;overflow:visible;fill:none;stroke:none}
+.st-trend-chart text{fill:var(--muted);font:var(--st-quiet) var(--font-sans);stroke:none}
+.st-trend-grid{stroke:var(--line);stroke-width:1}
+.st-trend-fill{fill:url(#st-trend-fill);stroke:none}
+.st-trend-fill-top{stop-color:var(--range-fill);stop-opacity:.22}
+.st-trend-fill-end{stop-color:var(--range-fill);stop-opacity:0}
+.st-trend-line{stroke:var(--range-fill);stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round;fill:none}
+.st-trend-dot{fill:var(--range-fill);stroke:var(--paper);stroke-width:1.5}
+.st-trend-range{display:flex;gap:var(--space-20);padding:var(--space-6) 0 var(--space-12);font-size:var(--st-quiet);color:var(--muted)}
+.st-trend-range strong{margin-left:var(--space-4);font-size:var(--type-description-size);font-weight:500;color:var(--ink)}
+.st-trend-history{border-top:var(--border-width) solid var(--rule)}
+.st-trend-history summary{min-height:var(--tap-min);display:flex;align-items:center;justify-content:space-between;gap:var(--space-12);cursor:pointer;font-size:var(--type-description-size);color:var(--ink)}
+.st-trend-history summary::-webkit-details-marker{display:none}
+.st-trend-history summary svg{width:var(--size-16);height:var(--size-16);flex:none;fill:none;stroke:currentColor;stroke-width:var(--icon-stroke);stroke-linecap:round;stroke-linejoin:round;color:var(--muted);transition:transform var(--fade)}
+.st-trend-history[open] summary svg{transform:rotate(180deg)}
+.st-trend-history table{width:100%;border-collapse:collapse;text-align:left;font-size:var(--st-quiet)}
+.st-trend-history th,.st-trend-history td{padding:var(--space-8) 0;border-bottom:var(--border-width) solid var(--rule);font-weight:400}
+.st-trend-history th{color:var(--muted)}
+.st-trend-history td{color:var(--ink)}
+.st-trend-history th:last-child,.st-trend-history td:last-child{text-align:right;font-family:var(--font-mono)}
+.st-trend-note{margin-top:var(--space-8);font-size:var(--st-quiet);line-height:1.5;color:var(--muted)}
+.st-device-head{display:flex;align-items:center;gap:var(--space-12)}
+.st-device-head svg{width:var(--size-20);height:var(--size-20);color:var(--muted)}
+.st-device-head h3{font-size:var(--font-size-14);font-weight:500;color:var(--ink)}
+.st-device-head p{margin-top:var(--space-2);font-size:var(--st-quiet);color:var(--muted)}
 .st-device>.st-selection{margin:var(--space-12) 0}
-.st-device-speed{display:flex;justify-content:space-between;font-size:11px;margin:13px 0 4px}
-.st-device input[type=range]{display:block;width:100%;padding:0;min-height:var(--tap-min);border:0;accent-color:var(--green)}
-.st-device-updated{margin:10px 0 0;font-size:10px;color:var(--green)}
+.st-device-speed{display:flex;align-items:baseline;justify-content:space-between;margin:var(--space-14) 0 var(--space-2);font-size:var(--type-description-size);color:var(--muted)}
+.st-device-speed output{font:var(--type-weight-regular) var(--type-row-title-size) var(--font-mono);color:var(--ink)}
+.st-device input[type=range]{display:block;width:100%;padding:0;margin:0 0 var(--space-6);min-height:var(--tap-min);border:0;accent-color:var(--ink)}
+.st-device .st-segment button:disabled{opacity:1;color:var(--ink)}
+.st-device .button:disabled{opacity:1;background:var(--disabled-fill);border-color:var(--disabled-fill);color:var(--ink)}
+.st-device-note{margin-top:var(--space-14);font-size:var(--st-quiet);line-height:1.5;color:var(--muted)}
+.st-device-updated{margin-top:var(--space-8);font-size:var(--st-quiet);color:var(--muted)}

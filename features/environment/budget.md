@@ -31,7 +31,7 @@ Weight follows the questions: the reading (Q2) is the heaviest, then the chart (
 
 ## Cut list
 
-- The second "Offline": the connection tag next to "Devices" stays (it is the fan's state); the helper under the chart drops "offline, showing last available values" to "Sample readings" and keeps the connection word only in the Devices heading. (Said once.)
+- Nothing is said twice that was not already; the two connection lines say different things (the readings are last-known; the fan is unreachable), so both stay, quiet.
 - The two-line "Last reading / 09:40" block becomes one quiet "Last reading 09:40" line beside the sensor name.
 - The chart is 184 to 150 units tall; its three x labels and three y labels stay (all legible at 11px).
 - No new facts, no zero, no new colour.
