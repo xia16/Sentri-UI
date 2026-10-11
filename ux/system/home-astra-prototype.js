@@ -84,9 +84,37 @@
   const pendingTypes = s => new Set(tasks.filter(t=>!t.completedAt&&!t.terminatedAt&&t.section===s&&metric(t).left>0).map(t=>t.type)).size;
   const nouns = (t,n) => t.measure==='pens'?`${n===1?'pen':'pens'}`:`${n===1?'sow':'sows'}`;
   function toast(text){clearTimeout(toastTimer);$('#notice').textContent=text;toastTimer=setTimeout(()=>$('#notice').textContent='',3500);}
-  function push(page,patch={}) {navStack.push({page:state.page,unit:state.unit,task:state.task,workUnit:state.workUnit,section:state.section,scroll:app.querySelector('.app-scroll')?.scrollTop||0});Object.assign(state,patch,{page});render();}
-  function back(){const prior=navStack.pop();if(prior){Object.assign(state,prior);render();const scroll=app.querySelector('.app-scroll');if(scroll)scroll.scrollTop=prior.scroll||0;}else{state.page='home';render();}}
-  function goHome(){state.page='home';navStack=[];render();}
+  function sectionMotion(direction,update){
+    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){update();return;}
+    if(!document.startViewTransition){
+      document.documentElement.dataset.sectionMotion=direction;
+      update();
+      const entering=[...app.children].filter(child=>!child.classList.contains('bottom-nav')).map(child=>child.animate([{opacity:0,transform:`translateX(${direction==='forward'?'33.333%':'-16.667%'})`},{opacity:1,transform:'translateX(0)'}],{duration:260,easing:'ease-out'}));
+      Promise.allSettled(entering.map(animation=>animation.finished)).then(()=>delete document.documentElement.dataset.sectionMotion);
+      return;
+    }
+    document.documentElement.dataset.sectionMotion=direction;
+    const transition=document.startViewTransition(update);
+    transition.finished.then(()=>delete document.documentElement.dataset.sectionMotion,()=>delete document.documentElement.dataset.sectionMotion);
+  }
+  function push(page,patch={}) {
+    const fromHome=state.page==='home'&&page==='sections';
+    const update=()=>{navStack.push({page:state.page,unit:state.unit,task:state.task,workUnit:state.workUnit,section:state.section,scroll:app.querySelector('.app-scroll')?.scrollTop||0});Object.assign(state,patch,{page});render();};
+    if(fromHome)sectionMotion('forward',update);else update();
+  }
+  function back(){
+    const prior=navStack.pop();
+    if(prior){
+      const toHome=state.page==='sections'&&prior.page==='home';
+      const update=()=>{Object.assign(state,prior);render();const scroll=app.querySelector('.app-scroll');if(scroll)scroll.scrollTop=prior.scroll||0;};
+      if(toHome)sectionMotion('back',update);else update();
+    }else{state.page='home';render();}
+  }
+  function goHome(){
+    const fromSections=state.page==='sections';
+    const update=()=>{state.page='home';navStack=[];render();};
+    if(fromSections)sectionMotion('back',update);else update();
+  }
   function nav(active='home'){return `<nav class="bottom-nav" aria-label="Main navigation">${btn('home',icon('home')+'Home',active==='home'?'active':'')}${btn('scan',icon('scan')+'Scan','scan-button')}${btn('toolbox',icon('toolbox')+'Toolbox',active==='toolbox'?'active':'','',state.unit?'data-entry="environment" data-entry-via="toolbox"':'')}</nav>`;}
   function head(title,sub='',extra='',showBack=true){return `<header class="page-head">${showBack?ib('back','back','Back'):''}<div class="head-copy">${SentriUI.heading({title,description:sub,kind:'page',level:2})}</div>${extra}</header>`;}
   function header(){return `<header class="app-header">${btn('sections',`<span class="farm-label">GREEN VALLEY FARM</span><strong>${section().name}${icon('down')}</strong>`,'section-trigger','','aria-label="Change section, '+section().name+'"')}${btn('assistant',`${icon('spark')}Assistant`,'assistant-door','','aria-label="Assistant"')}</header>`;}

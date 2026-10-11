@@ -22,6 +22,7 @@ None. Home has no lifecycle of its own; each card inherits the lifecycle of its 
 - Unit scope: inspection, attention, environment and devices entrances sit at the unit; Inspection owns the pen walk.
 - Offline: records saved on the device are shown with a count and the connection state; upload is explicit.
 - Closed tasks never revive due counts.
+- Tapping the section name in the Home header opens the section chooser with a 260 ms horizontal slide and fade: the chooser enters from the right by about one third of the page width while Home exits left by about one sixth. Back or choosing a section reverses the motion. The bottom navigation stays fixed; reduced-motion preference removes the animation.
 
 ## Scope
 

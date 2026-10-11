@@ -186,3 +186,18 @@
 
 
 .sensor-history summary{min-height:var(--tap-min);display:flex;align-items:center}
+
+/* Home header ↔ section chooser: mirror the native page transition. */
+#app{view-transition-name:workbench-section-page}
+#app>.bottom-nav{view-transition-name:workbench-bottom-nav}
+html[data-section-motion] .screen-enter{animation:none}
+html[data-section-motion]::view-transition-old(workbench-bottom-nav),
+html[data-section-motion]::view-transition-new(workbench-bottom-nav){animation:none}
+html[data-section-motion="forward"]::view-transition-old(workbench-section-page){animation:section-forward-out 260ms cubic-bezier(.4,0,.2,1) both}
+html[data-section-motion="forward"]::view-transition-new(workbench-section-page){animation:section-forward-in 260ms cubic-bezier(.4,0,.2,1) both}
+html[data-section-motion="back"]::view-transition-old(workbench-section-page){animation:section-back-out 260ms cubic-bezier(.4,0,.2,1) both}
+html[data-section-motion="back"]::view-transition-new(workbench-section-page){animation:section-back-in 260ms cubic-bezier(.4,0,.2,1) both}
+@keyframes section-forward-out{0%{opacity:1;transform:translateX(0)}69%{opacity:0}100%{opacity:0;transform:translateX(-16.667%)}}
+@keyframes section-forward-in{0%{opacity:0;transform:translateX(33.333%)}85%{opacity:1}100%{opacity:1;transform:translateX(0)}}
+@keyframes section-back-out{0%{opacity:1;transform:translateX(0)}69%{opacity:0}100%{opacity:0;transform:translateX(33.333%)}}
+@keyframes section-back-in{0%{opacity:0;transform:translateX(-16.667%)}85%{opacity:1}100%{opacity:1;transform:translateX(0)}}

@@ -416,7 +416,9 @@
         "edge": [
           "A section with no scheduled work still opens, to a quiet empty state."
         ],
-        "rules": [],
+        "rules": [
+          "From the Home header, the chooser enters from the right (~1/3 width) as Home exits left (~1/6 width), with a 260 ms slide and fade. Back and section selection reverse this motion; the bottom navigation stays fixed and reduced-motion preference skips it."
+        ],
         "issues": [
           "\"task types ready\" counts waiting tasks as ready; it says nothing about work due now.",
           "The footer note and intro repeat the choice the cards already make."
