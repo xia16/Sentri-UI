@@ -33,7 +33,7 @@ Sentri-UI 保存产品意图、交互状态和视觉规则；`../Sentri-Android-
 
 ## 4. 验证与交付
 
-- Sentri-UI：对改过的原型走通相关 URL 状态和中英文；对改过的共享组件检查受影响页面，运行适用的 design lint、doctor 与交互测试。文档改动检查链接和状态即可。脚本入口见 [设计配置](agents/design.md) 与原型目录。
+- Sentri-UI：对改过的原型走通相关 URL 状态和中英文；对改过的共享组件检查受影响页面。运行 `npm test`、`npm run check`，并按[设计流程](design-workflow/README.md)执行适用的场景、状态和共享组件 gate。文档改动检查链接和状态即可；未运行或受环境限制的检查要如实记录。
 - Android：运行 `scripts/verify.sh`；涉及 UI、会话存储或 WebView 时执行适用设备测试与运行验证。Fake、模拟器、真机、真实登录及真实后端分别标注，未执行不能写成通过。
 - 交付说明同时列出两个仓库的修改路径和 commit/工作树状态、采用的 Sentri-UI 版本、已覆盖的 screen/状态、设计反馈、仍待产品决定的点及验证证据。未获授权时不推送、不发布。
 
