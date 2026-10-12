@@ -42,5 +42,21 @@
       "Ongoing",
       "Resolved"
     ]
+  },
+  {
+    "id": "compact",
+    "name": "Compact",
+    "use": "use inside an animal Row when an animal can carry several conditions and one line must show them: the name only, with the level in its look (act: red wash with the \"!\" icon; watch: outlined; ongoing: plain muted).",
+    "notUse": "not where the day or the care word must be read — use the tag; not as a button.",
+    "states": [
+      "Act now",
+      "Watch",
+      "Watch with a type icon",
+      "Ongoing",
+      "Chinese"
+    ],
+    "usedBy": [
+      "inspection.walk"
+    ]
   }
 ]

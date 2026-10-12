@@ -18,18 +18,33 @@
   {
     "id": "animal",
     "name": "Animal",
-    "use": "Use for one animal or litter. `layout: 'need'` is the Farrowing room row (candidate and provisional, pending the list exploration; owner decision 2026-10-10): the ID as stored over one facts line, a fixed-width need tile, a chevron.",
-    "notUse": "Not for navigation — use navigation",
+    "use": "Use for one animal in a list: the ID over a 13px context line, and on the right either its state (figure over word, weighted by level) or one line of condition tags. Designed from Farrowing room + Inspection walk, owner-approved 2026-10-11/12.",
+    "notUse": "Not for navigation — use navigation; not for a record with an Edit rail — use record.",
     "states": [
-      "Default",
+      "Default · live",
       "Pressed",
-      "Long label / Chinese",
       "Disabled",
-      "Need tile (room row)",
-      "Need tile · to allocate"
+      "Act now · overdue",
+      "Act now · sow died, piglets to allocate",
+      "Coming up · due tomorrow",
+      "Settled · done",
+      "Settled · due in 2 days",
+      "Flat result (pen leads the context)",
+      "Long ID (wraps)",
+      "Chinese",
+      "Tags · act, watch, ongoing",
+      "Tags · type icon",
+      "Tags · none",
+      "Tags · too many for the line (+N)",
+      "Tags · long tag name",
+      "Tags · Chinese"
     ],
     "usedBy": [
       "farrowing.room",
+      "farrowing.search",
+      "farrowing.scan",
+      "farrowing.task-sows",
+      "inspection.walk",
       "piglet-processing.pen-list"
     ]
   },

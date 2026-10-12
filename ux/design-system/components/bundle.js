@@ -41,6 +41,7 @@
     bookmark:'M6 3h12v18l-6-4-6 4z',
     transfer:'M7 7h11l-3-3M18 7l-3 3M17 17H6l3-3M6 17l3 3',
     down:'m6 9 6 6 6-6',
+    'trend-down':'M3 6l7 7 4-4 7 7M21 11v5h-5',
     place:'M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0M15 10a3 3 0 1 1-6 0 3 3 0 0 1 6 0',
     home:'m3 10 9-7 9 7v11h-6v-7H9v7H3z',
     toolbox:'M3 8h18v12H3zM8 8V4h8v4M3 13h18M10 12v3h4v-3',
@@ -145,13 +146,7 @@
     if(chip&&trailing)warn(card,'chip and trailing together: a row says one thing on the right; the chip wins');
     return chip?status(Object.assign({},chip,{className:'st-row-chip'})):'';
   }
-  /* Need tile (animal row, candidate): what she needs, as a number over one small word, in one fixed-width column at the right.
-     tone 'red' (solid, white text: work for the worker) · 'green' (done) · '' (neutral). big is text, or icon:'check' for a drawn tick. */
-  function needTile({big='',icon:ic='',small='',tone=''}){
-    const t=oneOf('Row','tile.tone',tone,['red','green'],'');
-    return `<span class="st-row-tile"${t?` data-tone="${t}"`:''}><span class="st-tile-big"${!ic&&/^\D{2,}$/.test(String(big))?' data-word=""':''}>${ic?glyph(ic):esc(big)}</span><span class="st-tile-word">${esc(small)}</span></span>`;
-  }
-  function row({title,description='',icon='',action='',value='',className='',disabled=false,trailing='',trail='auto',attrs={},strs,args,code='',mono=false,chip=null,wrap=false,tight=false,id='',variant='',reason='',mark='',layout='',tile=null}={}){
+  function row({title,description='',icon='',action='',value='',className='',disabled=false,trailing='',trail='auto',attrs={},strs,args,code='',mono=false,chip=null,wrap=false,tight=false,id='',variant='',reason='',mark='',right=null,contextWidth=''}={}){
     const o={strs,args};
     variant=variant||(mark?'tick':code?'animal':trail==='edit'||(chip&&chip.kind==='done')?'record':icon?'navigation':attrs['aria-current']?'scope':'plain');
     if(disabled) description=reason||description||'Unavailable — try again later';
@@ -160,10 +155,14 @@
     const typed=trailing&&typeof trailing==='object';
     // Typed trailing words support tone and localization; legacy strings are escaped.
     const trailHtml=chip?'':typed?`<span class="st-row-trailing">${part(trailing)}</span>`:has(o,'trailing')?`<span class="st-row-trailing">${tx(trailing,o,'trailing')}</span>`:trailing?`<span class="st-row-trailing">${esc(trailing)}</span>`:'';
-    const c=rowCopy({title,description,code,mono,tight,o,titleId:id?id+'-title':''});
     const tag=action?'button':'div';
     const railHtml=disabled?'':variant==='tick'&&tr==='auto'?'':tr==='edit'?`<span class="st-row-chevron" data-rail="edit">${glyph('edit')}<span data-str="act.edit">Edit</span></span>`:(tr==='chevron'||(tr==='auto'&&action))?`<span class="st-row-chevron">${arrow}</span>`:'';
-    return `<${tag} class="st-row ${esc(className)}" data-ds="Row" data-variant="${esc(variant)}"${layout==='need'&&tile?' data-layout="need"':''}${id?` id="${esc(id)}"`:''}${action?` type="button" data-action="${esc(action)}" data-value="${esc(value)}"${disabled?' disabled aria-disabled="true"':''}`:''}${wrap?' data-wrap=""':''}${safeAttr(attrs)}>${rowMark(mark)}${icon&&!code&&variant==='navigation'?`<span class="st-row-icon">${icon}</span>`:''}${code?`<span class="st-row-identity">${c.codeHtml}${rowChip(chip,trailing,'Row')}</span>`:c.codeHtml}<span class="st-row-copy">${c.strong()}${c.small}</span>${code?'':rowChip(chip,trailing,'Row')}${layout==='need'&&tile?needTile(tile):''}${trailHtml}${railHtml}</${tag}>`;
+    if(variant==='animal'){
+      const a=animalBody({code,description,title,chip,right,contextWidth,tight,attrs,o});
+      return `<${tag} class="st-row ${esc(className)}" data-ds="Row" data-variant="animal" data-animal="${a.kind}"${id?` id="${esc(id)}"`:''}${action?` type="button" data-action="${esc(action)}" data-value="${esc(value)}"${disabled?' disabled aria-disabled="true"':''}`:''}${safeAttr(attrs)}>${a.html}${railHtml}</${tag}>`;
+    }
+    const c=rowCopy({title,description,code,mono,tight,o,titleId:id?id+'-title':''});
+    return `<${tag} class="st-row ${esc(className)}" data-ds="Row" data-variant="${esc(variant)}"${id?` id="${esc(id)}"`:''}${action?` type="button" data-action="${esc(action)}" data-value="${esc(value)}"${disabled?' disabled aria-disabled="true"':''}`:''}${wrap?' data-wrap=""':''}${safeAttr(attrs)}>${rowMark(mark)}${icon&&!code&&variant==='navigation'?`<span class="st-row-icon">${icon}</span>`:''}${code?`<span class="st-row-identity">${c.codeHtml}${rowChip(chip,trailing,'Row')}</span>`:c.codeHtml}<span class="st-row-copy">${c.strong()}${c.small}</span>${code?'':rowChip(chip,trailing,'Row')}${trailHtml}${railHtml}</${tag}>`;
   }
   /* rowSelect: the select + door variant without the door (a select-only list): the whole row is a <label>, leading box. Payload is change-only: rowSelectChange(event) → { value, checked }. */
   function rowSelect({title,description='',code='',mono=false,chip=null,wrap=false,tight=false,checked=false,action='select',value='',id='',className='',attrs={},strs,args,inputAttrs={},disabled=false,reason=''}={}){
@@ -173,10 +172,11 @@
   }
   /* rowSelectDoor: a list that both selects (a bulk act) and opens. Two sibling targets, none nested: the checkbox (48px hit area,
      the same box as rowSelect) toggles; the door (copy + ›) opens. contentHtml: trusted markup in place of the title/description copy. */
-  function rowSelectDoor({title='',description='',code='',mono=false,wrap=false,tight=false,checked=false,action='select',value='',openAction='open',openValue='',label='',id='',className='',doorClass='',attrs={},strs,args,inputAttrs={},contentHtml=''}={}){
+  function rowSelectDoor({title='',description='',code='',mono=false,wrap=false,tight=false,checked=false,action='select',value='',openAction='open',openValue='',label='',id='',className='',doorClass='',attrs={},strs,args,inputAttrs={},contentHtml='',right=null,contextWidth=''}={}){
     const o={strs,args},c=rowCopy({title,description,code,mono,tight,o});
-    const copy=contentHtml||`${c.codeHtml}<span class="st-row-copy">${c.strong()}${c.small}</span>`;
-    return `<div class="st-row ${esc(className)}" data-ds="Row" data-variant="select-door" data-select=""${id?` id="${esc(id)}"`:''}${wrap?' data-wrap=""':''}${safeAttr(attrs)}><label class="st-choice-trail"><input type="checkbox"${action?` data-action="${esc(action)}"`:''} value="${esc(value)}"${checked?' checked':''}${safeAttr(inputAttrs)}></label><button type="button" class="st-row-door ${esc(doorClass)}" data-action="${esc(openAction)}" data-value="${esc(openValue)}"${label?` aria-label="${esc(label)}"`:''}>${copy}<span class="st-row-chevron">${arrow}</span></button></div>`;
+    const an=right?animalBody({code,description,title,chip:null,right,contextWidth,tight,attrs,o}):null;
+    const copy=contentHtml||(an?an.html:'')||`${c.codeHtml}<span class="st-row-copy">${c.strong()}${c.small}</span>`;
+    return `<div class="st-row ${esc(className)}" data-ds="Row" data-variant="select-door"${an?` data-animal="${an.kind}"`:''} data-select=""${id?` id="${esc(id)}"`:''}${wrap?' data-wrap=""':''}${safeAttr(attrs)}><label class="st-choice-trail"><input type="checkbox"${action?` data-action="${esc(action)}"`:''} value="${esc(value)}"${checked?' checked':''}${safeAttr(inputAttrs)}></label><button type="button" class="st-row-door ${esc(doorClass)}" data-action="${esc(openAction)}" data-value="${esc(openValue)}"${label?` aria-label="${esc(label)}"`:''}>${copy}<span class="st-row-chevron">${arrow}</span></button></div>`;
   }
   function rowSelectChange(ev){
     const t=ev&&ev.target;
@@ -653,6 +653,7 @@
   const CARE_ICON={ongoing:'note',resolved:'check',notice:'note'};
   const CARE_TEXT={attention:'Needs attention',ongoing:'Ongoing',resolved:'Resolved',notice:''};
   function conditionTag({name='',day='',care='ongoing',level='',careText,levelText,note='',pending=false,icon,variant='tag',id='',className='',strs,args}={}){
+    if(variant==='compact')return conditionTagCompact({name,level,care,careText,icon,id,className,strs,args});
     const c=oneOf('ConditionTag','care',care,CARES,'ongoing');
     const lv=c==='attention'?oneOf('ConditionTag','level',level||'monitor',Object.keys(LEVELS),'monitor'):'';
     const v=oneOf('ConditionTag','variant',variant,['tag','detail','mark'],'tag');
@@ -667,6 +668,68 @@
     }
     const title=[name,day,word].filter(Boolean).join(' · ');
     return `<span ${attrs} title="${esc(title)}">${g?glyph(g):''}<span class="st-condition-name">${tx(name,o,'name')}</span>${dayHtml}${lv&&(levelText!=null?levelText:LEVELS[lv].short)?`<small class="st-condition-level-word">${tx(levelText!=null?levelText:LEVELS[lv].short,o,'levelText')}</small>`:''}${word?`<span class="st-visually-hidden"> · ${tx(word,o,'careText')}</span>`:''}</span>`;
+  }
+  /* ConditionTag · compact: the tag a crowded row can carry several of, one line. Name only: no day and no care word (the level says it, the record has
+     the day). level 'act' (red wash, bold, the "!" icon in place of a type icon) · 'watch' (outlined, ink) · 'ongoing' (plain muted, no box).
+     The existing care levels map in: hospital and treat are act, monitor is watch; care other than attention is ongoing. Short names and the optional
+     type icon (a glyph name, e.g. 'trend-down') are the caller's. careText is the care-level word for assistive tech. */
+  const ALERT_DOT='<svg class="st-alert-dot" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="8" cy="8" r="7.25"/><rect x="7.1" y="3.6" width="1.8" height="5.6" rx=".9"/><circle cx="8" cy="11.6" r="1.05"/></svg>';
+  const COMPACT_LEVEL={act:'act',watch:'watch',ongoing:'ongoing',hospital:'act',treat:'act',monitor:'watch'};
+  const COMPACT_WORD={act:'Needs action',watch:'Monitor',ongoing:'No action needed'};
+  function conditionTagCompact({name='',level='',care='ongoing',careText,icon='',id='',className='',strs,args}={}){
+    const lv=COMPACT_LEVEL[level]||(care==='attention'?'watch':'ongoing');
+    const o={strs,args},word=careText!=null?careText:COMPACT_WORD[lv];
+    return `<span class="st-condition ${esc(className)}" data-ds="ConditionTag" data-variant="compact" data-level="${lv}"${id?` id="${esc(id)}"`:''}>${lv==='act'?ALERT_DOT:icon?glyph(icon):''}<span class="st-condition-name">${tx(name,o,'name')}</span>${word?`<span class="st-visually-hidden"> · ${tx(word,o,'careText')}</span>`:''}</span>`;
+  }
+  /* Row · animal: THE row for an animal in a list (Farrowing room, Find a sow, Scan results, task sows; Inspection's walk). Two lines.
+     Left, always the same: the ID (code; 16px/600 mono, ink) over one 13px muted context line (description). contextWidth ('112px') fixes the left column,
+     and the context then ends in an ellipsis; without it the left takes what the right leaves. Right, one of two, right-aligned:
+       right:{kind:'state',figure,word,level}  the figure (16px) over the state word (13px). level 'act' (red; the word carries the one "!" icon) · 'live' (bold) ·
+                                               'soon' (ink figure, muted word) · 'settled' (muted).
+       right:{kind:'tags',tags:[{name,icon,level}]}  one line of compact ConditionTags, most urgent first (act, watch, ongoing; stable inside a level). Screens call
+                                               rowFitTags(root) after render, fonts and resize: tags show in that order until the line is full, the rest fold into "+N", and the
+                                               first (most urgent) tag never hides.
+     Without right, the old props still draw the state side: title is the figure, chip the word (its kind sets the level), so every list of animals gets one look.
+     No chip under the ID, no headline beside it, no mono meta line. One chevron (the row's own). */
+  const ANIMAL_STATE_LEVELS=['act','live','soon','settled'],TAG_RANK={act:0,watch:1,ongoing:2};
+  const CHIP_LEVEL={overdue:'act',died:'act',active:'live',late:'soon',awaiting:'settled',done:'settled',aborted:'settled'};
+  function animalBody({code,description,title,chip,right,contextWidth,tight,attrs,o}){
+    const dList=Array.isArray(description),show=dList?description.length>0:(description||has(o,'description'));
+    const ctx=show?`<span class="st-animal-context">${dList?toks(description,{tight,dot:true}):tx(description,o,'description')}</span>`:'';
+    const left=`<span class="st-animal-left"><strong class="st-animal-id">${tx(code,o,'code')}</strong>${ctx}</span>`;
+    let kind,rightHtml='',wrap=false;
+    if(right&&right.kind==='tags'){
+      kind='tags';
+      const tags=(right.tags||[]).map((t,i)=>({t,i,r:TAG_RANK[COMPACT_LEVEL[t.level]]??2})).sort((a,b)=>a.r-b.r||a.i-b.i).map(x=>conditionTagCompact(x.t)).join('');
+      rightHtml=tags?`<span class="st-animal-tags">${tags}<span class="st-animal-more" hidden></span></span>`:'';
+    }else{
+      kind='state';
+      let figure,word,lv;
+      if(right){
+        const r={strs:right.strs,args:right.args};
+        figure=right.figure?tx(right.figure,r,'figure'):'';word=tx(right.word||'',r,'word');lv=oneOf('Row','right.level',right.level,ANIMAL_STATE_LEVELS,'settled');
+      }else{
+        wrap=true;
+        figure=Array.isArray(title)?toks(title,{tight}):title||has(o,'title')?tx(title,o,'title'):'';
+        word=chip?tx(chip.text||'',{strs:chip.strs,args:chip.args},'text'):'';
+        lv=chip&&chip.kind?(CHIP_LEVEL[chip.kind]||'soon'):(attrs&&attrs['data-tone']==='forecast'?'settled':'soon');
+      }
+      rightHtml=figure||word?`<span class="st-animal-state" data-level="${lv}">${figure?`<span class="st-animal-figure">${figure}</span>`:''}${word||lv==='act'?`<span class="st-animal-word">${lv==='act'?ALERT_DOT:''}${word}</span>`:''}</span>`:'';
+    }
+    const width=/^\d+(?:\.\d+)?(?:px|rem|em|%)$/.test(contextWidth||'')?` style="--st-animal-left:${contextWidth}"`:'';
+    return {kind,html:`<span class="st-animal-body" data-kind="${kind}"${wrap?' data-wrap=""':''}${width}>${left}${rightHtml}</span>`};
+  }
+  /* Fit the tag line of every animal row under root (an element or the document): call it after the rows render, after fonts load and on resize. */
+  function rowFitTags(rootEl){
+    (rootEl||document).querySelectorAll('.st-animal-tags').forEach(area=>{
+      const tags=[...area.querySelectorAll('.st-condition')],more=area.querySelector('.st-animal-more');
+      if(!area.clientWidth)return;
+      tags.forEach(t=>{t.hidden=false;t.classList.remove('st-shrink');});more.hidden=true;
+      let shown=tags.length;
+      while(shown>1&&area.scrollWidth>area.clientWidth+1){tags[--shown].hidden=true;more.hidden=false;more.textContent='+'+(tags.length-shown);}
+      /* One tag left and still too wide: the urgent tag shortens its name with an ellipsis so the +N stays in view. */
+      if(tags.length&&area.scrollWidth>area.clientWidth+1)tags[0].classList.add('st-shrink');
+    });
   }
   /* The tokens as HTML, for announce() into a region the host already holds. */
   function statusText(tokens,{sep='',tight=false}={}){return toks(tokens,{tight,dot:sep==='dot'});}
@@ -1072,7 +1135,7 @@
     const end=()=>{drag=null;};
     document.addEventListener('pointerup',end);document.addEventListener('pointercancel',end);if(typeof globalThis.addEventListener==='function')globalThis.addEventListener('blur',end);
   }
-  const api=Object.freeze({rangeSlider,filterSheet,optionalRow,heading,panel,facts,row,rowGroup,log,logDay,logStamp,logGroups,categoryFooter,field,pickerField,pickerOptions,pickerBody,pickerHead,pickerFooter,filterChips,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowSelectDoor,rowAction,rowSelectChange,status,conditionTag,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
+  const api=Object.freeze({rangeSlider,filterSheet,optionalRow,heading,panel,facts,row,rowGroup,log,logDay,logStamp,logGroups,categoryFooter,field,pickerField,pickerOptions,pickerBody,pickerHead,pickerFooter,filterChips,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowSelectDoor,rowAction,rowSelectChange,status,conditionTag,rowFitTags,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
   root.SentriUI=api;
   if(typeof module!=='undefined')module.exports=api;
 })(globalThis);

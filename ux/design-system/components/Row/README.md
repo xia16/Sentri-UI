@@ -17,7 +17,10 @@ Leading selection box (select + door only: a 24px box in a 48px hit area, always
 ## Variants
 
 - **Navigation**: places or actions, icon tile, title, line 2 and chevron inside `rowGroup`; Inspection actions and Piglet more actions.
-- **Animal**: code column, chip and token lines; Farrowing room and Piglet pen/sow lists. With `layout: 'need'` and a `tile` (candidate and provisional, pending the list exploration; owner decision 2026-10-10) it is the Farrowing room row in the room, Find a sow and Scan results: the ID exactly as stored (18px/700, never grouped, truncated or styled by part; it wraps and the row grows) over one muted facts line (state · key fact · when · who), a fixed-width tile column (`row-tile-w`; a 24px number over one 13px word: `9 / alive`, `3 / days late`, `7 / to allocate`, `✓ / done`), then the chevron. Tile colour is meaning only: red solid with white text is work for the worker, green wash is done, neutral is everything else; no border or shadow, so a tile never reads as a button and the whole row is the tap target. No chip, no pencil. In flat results the facts line leads with the pen and drops when · who. Farrowing draws it from one function, `sowRow()`.
+- **Animal**: one animal in a list. Designed from Farrowing room + Inspection walk, owner-approved 2026-10-11/12. Used by the Farrowing room list, Find a sow, Scan results and the task's sow list, by the Inspection walk (a select + door row), and by Piglet processing's pen list. Left, always the same: the ID (`code`, 16px/600 mono, ink) over one 13px muted context line (`description`); `contextWidth` (`112px` on the walk) fixes the left column and the context then ends in an ellipsis. Right, one of two (`right`), right-aligned:
+  - **State** (`right: { kind: 'state', figure, word, level }`): the figure (16px) over the state word (13px). `level`: **act** (figure 700 and word in `red-ink`, the word led by the 15px solid "!" circle: overdue, a sow died with piglets to allocate; the only icon in a row), **live** (figure 700 ink: farrowing), **soon** (figure 500 ink, word muted: due today or tomorrow), **settled** (both muted: done, due in 2+ days, aborted).
+  - **Tags** (`right: { kind: 'tags', tags: [{ name, icon?, level }] }`): one line of compact [ConditionTags](../ConditionTag/README.md) (`level` act, watch, ongoing), drawn in that order. The screen calls `SentriUI.rowFitTags(root)` after render, fonts and resize: tags show in order until the line is full, the rest fold into `+N`, and the first (urgent) tag never hides. The screen owns short names (Poor appetite becomes `Appetite` with the `trend-down` glyph) and passes no day or care word.
+  Without `right`, the older props still draw the state side: `title` is the figure and `chip` the word (its kind sets the level), so every list of animals has one look. There is no status chip under the ID, no headline beside the ID and no mono meta line. The row's own chevron ends it; no pencil.
 - **Tick in place**: an item ticked before saving (`mark: 'due' | 'ticked'`). A due item shows the ring, a ticked one the check disc on green wash; a ticked item is a draft and never shows a Done chip. Done is said only for a saved item (see Done / record). No chevron. Piglet day list.
 - **Select + door** (`rowSelectDoor`): a list that selects for a bulk act and opens items. The leading box toggles selection; the door (text column, then a small fixed chevron) opens the item. They are sibling targets, never nested. Without a door (`rowSelect`) the whole row is a label that only selects, the same box on the same side. Inspection pig rows use the door; the Inspection and Feed plan pen header box is the no-door case (box only, with the pen door beside it).
 - **Plain**: a row with no icon, code, mark or trail (a Show/Hide toggle) reports `data-variant="plain"`, not navigation.
@@ -39,7 +42,7 @@ Leading selection box (select + door only: a 24px box in a 48px hit area, always
 | Loading | `act.busy` prevents repeated act while the host settles; label says Recording. |
 | Error | Host supplies actionable reason in line 2 and Retry act; no colour-only error. |
 | Empty | Summary count zero is inert and says No sows due today. Empty groups are omitted with a separate reason. |
-| Long label / Chinese | Wrap evidence and animal content; no clipping of identifiers or status chips. |
+| Long label / Chinese | Wrap evidence and animal content; no clipping of identifiers or status chips. Animal: the ID wraps and the row grows; the figure never wraps (a value long enough to wrap needs another component); on the tags side the context ends in an ellipsis and a tag is never cut: it folds into `+N`. |
 
 Every applicable state appears in [variants.json](variants.json) and `variants/<id>.html`.
 
@@ -59,7 +62,7 @@ Native button and checkbox semantics; inert rows are divs. Checkbox label covers
 
 ## Do / don't
 
-Do use a code column and shared Status chip for animals; don't give them navigation icon tiles. Do wrap evidence; don't clip Chinese text. Do provide one independent act beside the door; don't nest buttons or add multiple chips. Do omit unavailable actions or explain why; don't fade the row. Do use flat rows in one group; don't put cards on cards.
+Do use the animal row for animals (ID over context, state or tags on the right); don't give them navigation icon tiles, a chip under the ID or a second icon beside the "!". Do wrap evidence; don't clip Chinese text. Do provide one independent act beside the door; don't nest buttons or add multiple chips. Do omit unavailable actions or explain why; don't fade the row. Do use flat rows in one group; don't put cards on cards.
 
 ## Related and classification
 

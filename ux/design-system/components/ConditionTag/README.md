@@ -29,6 +29,7 @@ The colours follow the Status map: green is done (resolved), amber needs attenti
 ## Variants
 - **Tag** (`variant: 'tag'`, default): in a row, several per line. Used by Inspection's pig list and the profile's health list.
 - **Detail** (`variant: 'detail'`): at the head of a condition's record page. Used by Inspection's finding page.
+- **Compact** (`variant: 'compact'`): the name only, one line, for an [Row · animal](../Row/README.md) that must show several conditions. No day and no care word; the level is the look: **act** (hospital or treat: red wash, bold, the "!" icon in place of a type icon), **watch** (monitor: outlined, ink) and **ongoing** (plain muted, no box). `level` is `act | watch | ongoing` (the care levels map in); the caller owns the short name and an optional type glyph such as `trend-down`. Used by the Inspection walk. Designed from Farrowing room + Inspection walk, owner-approved 2026-10-11/12.
 - **Mark** (`variant: 'mark'`): just the care icon tile, for the icon slot of a Row (Inspection's attention list). It replaces the hand-built care-tinted row.
 
 ## States
@@ -44,7 +45,7 @@ The colours follow the Status map: green is done (resolved), amber needs attenti
 | Long name | the name ends in an ellipsis; the icon and day stay | wraps |
 | Chinese | `食欲差 · 第3天` fits | fits |
 | Pending removal (`pending`) | muted, struck name, drawn inside the component | n/a |
-| Overflow in a line | the host folds the extra tags into `+N` (Inspection's `fitRecordedTags`) | n/a |
+| Overflow in a line | the host folds the extra tags into `+N` (Row · animal's `rowFitTags` for compact tags) | n/a |
 
 ## Behaviour
 - `conditionTag({ name, day, care, level, careText, note, icon, variant, id, className, strs, args })`. `care` defaults to `ongoing`; `level` defaults to `monitor` when `care` is `attention`. `careText` is the care-level word, localized by the caller (default English: Monitor, Treat in place, Hospital pen, Ongoing, Resolved).

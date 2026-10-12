@@ -774,25 +774,44 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
 .pen-card .st-row-chevron svg{width:14px;height:14px;stroke-width:1.8}
 .pen-card .st-row-chevron[data-rail="edit"] span{display:none}
 @media(max-width:370px){.pen-card .st-row.st-row{padding-left:11px;padding-right:11px}}
-/* Row, need tile (the animal row: Farrowing room, Find a sow, Scan results; owner decision 2026-10-10).
-   Left, flexible: the ID exactly as stored (it wraps if long, the row grows) over one muted facts line. Right, a fixed-width tile column: a big number over one
-   small word, every tile the same width so they line up down the list. Red solid = work for the worker; green wash = done; neutral = everything else.
-   No border or shadow on a tile, so it does not read as a button: the whole row is the tap target. */
-.st-row.st-row[data-layout="need"]{display:flex;align-items:center;gap:var(--space-14);min-height:80px;padding:var(--space-10) var(--space-10) var(--space-10) var(--space-16)}
-.st-row[data-layout="need"] .st-row-copy{flex:1;min-width:0;gap:3px}
-.st-row.st-row[data-layout="need"] .st-row-copy strong{white-space:normal;overflow:visible;overflow-wrap:anywhere;font-size:18px;line-height:24px;font-weight:700;font-variant-numeric:tabular-nums}
-.st-row.st-row[data-layout="need"] .st-row-copy small{white-space:normal;overflow:visible;font-size:var(--font-size-14);line-height:19px;color:var(--muted)}
-.st-row[data-layout="need"] .st-tok{display:inline-block;white-space:nowrap}
-.st-row-tile{flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;width:var(--row-tile-w);min-height:58px;padding:var(--space-6) var(--space-4);border-radius:var(--radius-control);background:var(--well);color:var(--ink);text-align:center}
-.st-tile-big{display:flex;align-items:center;justify-content:center;font-size:24px;line-height:28px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.3px}
-.st-tile-big[data-word]{font-size:18px;line-height:24px}
-.st-tile-big svg{width:26px;height:26px;stroke-width:2.8}
-.st-tile-word{white-space:nowrap;font-size:13px;line-height:16px;font-weight:600;color:var(--ink-2)}
-.st-row-tile[data-tone="red"]{background:var(--red);color:var(--paper)}
-.st-row-tile[data-tone="red"] .st-tile-word{color:var(--paper)}
-.st-row-tile[data-tone="green"]{background:var(--green-wash);color:var(--green)}
-.st-row-tile[data-tone="green"] .st-tile-word{color:var(--green)}
-.st-row[data-layout="need"] .st-part[data-tone="red"]{color:var(--red-ink)}
+/* Row · animal: the animal row (Farrowing room, Find a sow, Scan results, task sows, Inspection's walk). Designed from Farrowing room + Inspection walk, owner-approved 2026-10-11/12.
+   Two lines. Left: the ID over a 13px muted context line. Right: the state (figure over word, right-aligned) or one line of compact ConditionTags. The row's own chevron. */
+.st-row.st-row[data-animal]{gap:var(--space-14);min-height:var(--row-min);padding:var(--space-row-y) var(--space-12) var(--space-row-y) var(--space-16);text-align:left}
+.st-row.st-row[data-animal][data-variant="select-door"]{gap:0;padding:0 var(--space-12) 0 0}
+.st-row[data-animal] .st-row-door.st-row-door{gap:var(--space-14);padding:var(--space-row-y) 0}
+.st-row[data-animal] .st-row-door.st-row-door strong{display:block}
+.st-animal-body{flex:1;display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:var(--space-14);align-items:center;min-width:0}
+.st-animal-body[data-kind="tags"]{grid-template-columns:var(--st-animal-left,minmax(0,1fr)) minmax(0,1fr);column-gap:var(--space-10)}
+.st-animal-body[data-wrap]{grid-template-columns:minmax(0,1fr) minmax(0,1.1fr)}
+.st-animal-body[data-wrap] .st-animal-figure{white-space:normal;overflow-wrap:anywhere}
+.st-animal-left,.st-animal-state{display:flex;flex-direction:column;gap:var(--space-3);min-width:0}
+.st-animal-state{align-items:flex-end;text-align:right}
+.st-animal-id{display:block;font:var(--type-weight-semibold) var(--type-identifier-strong-size)/22px var(--font-mono);letter-spacing:-.2px;color:var(--ink);overflow-wrap:anywhere}
+.st-animal-context{display:block;max-width:100%;font:var(--type-weight-regular) var(--type-description-size)/18px var(--font-sans);color:var(--muted)}
+.st-animal-body[data-kind="tags"] .st-animal-context{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.st-animal-figure{font:var(--type-weight-medium) var(--type-row-title-size)/22px var(--font-sans);color:var(--ink);white-space:nowrap}
+.st-animal-figure .st-part[data-tone]{color:inherit;font-weight:inherit}
+.st-animal-word{display:flex;align-items:center;gap:var(--space-5);font:var(--type-weight-regular) var(--type-description-size)/18px var(--font-sans);color:var(--muted);white-space:nowrap}
+.st-animal-state[data-level="act"] .st-animal-figure{color:var(--red-ink);font-weight:var(--type-weight-strong)}
+.st-animal-state[data-level="act"] .st-animal-word{color:var(--red-ink);font-weight:var(--type-weight-semibold)}
+.st-animal-state[data-level="live"] .st-animal-figure{font-weight:var(--type-weight-strong)}
+.st-animal-state[data-level="settled"] .st-animal-figure{color:var(--muted)}
+.st-row[data-animal][disabled] .st-animal-id,.st-row[data-animal][disabled] .st-animal-figure{color:var(--muted)}
+.st-alert-dot{flex:none;width:var(--size-15);height:var(--size-15);color:var(--red-ink)}
+.st-alert-dot circle:first-child{fill:currentColor;stroke:none}
+.st-alert-dot rect,.st-alert-dot circle:last-child{fill:var(--paper);stroke:none}
+.st-animal-tags{display:flex;flex-wrap:nowrap;align-items:center;justify-self:end;gap:var(--space-5);max-width:100%;min-width:0;overflow:hidden}
+.st-animal-more{flex:none;font:var(--type-weight-medium) var(--type-description-size)/26px var(--font-sans);color:var(--muted);white-space:nowrap}
+.st-animal-more[hidden]{display:none}
+/* ConditionTag · compact */
+.st-condition[data-variant="compact"]{display:inline-flex;align-items:center;gap:var(--space-4);flex:none;max-width:100%;padding:var(--space-4) var(--space-8);border:1px solid var(--line);border-radius:var(--radius-chip);background:var(--paper);color:var(--ink);font:var(--type-weight-semibold) var(--type-meta-size)/17px var(--font-sans);white-space:nowrap}
+.st-condition[data-variant="compact"] svg{width:var(--size-14);height:var(--size-14)}
+.st-condition[data-variant="compact"] svg.st-alert-dot{width:var(--size-14);height:var(--size-14)}
+.st-condition[data-variant="compact"] svg:not(.st-alert-dot){fill:none;stroke:currentColor;stroke-width:var(--icon-stroke);stroke-linecap:round;stroke-linejoin:round}
+.st-condition[data-variant="compact"][data-level="act"]{background:var(--red-wash);border-color:transparent;color:var(--red-ink);font-weight:var(--type-weight-strong)}
+.st-condition[data-variant="compact"][data-level="ongoing"]{padding-left:var(--space-2);padding-right:var(--space-2);border-color:transparent;background:transparent;color:var(--muted);font-weight:var(--type-weight-medium)}
+.st-condition[data-variant="compact"][hidden]{display:none}
+.st-condition[data-variant="compact"].st-shrink{flex:0 1 auto;min-width:0}
 /* Stepper, count (the hero counter) */
 .st-stepper[data-variant="count"]{padding:16px 12px 10px;margin-top:6px;background:var(--green-wash);border-radius:16px;row-gap:0}
 .st-stepper[data-variant="count"] .st-stepper-label{margin-bottom:8px;font-size:13px;font-weight:500;line-height:normal;color:#356547}

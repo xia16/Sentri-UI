@@ -1,22 +1,45 @@
-<div data-state="Default" id="animal-state-0"></div>
+<div data-state="Default · live" id="animal-state-0"></div>
 <div data-state="Pressed" id="animal-state-1"></div>
-<div data-state="Long label / Chinese" id="animal-state-3"></div>
-<div data-state="Disabled" id="animal-state-4"></div>
-<div data-state="Need tile (room row)" id="animal-state-5"></div>
-<div data-state="Need tile · to allocate" id="animal-state-6"></div>
+<div data-state="Disabled" id="animal-state-2"></div>
+<div data-state="Act now · overdue" id="animal-state-3"></div>
+<div data-state="Act now · sow died, piglets to allocate" id="animal-state-4"></div>
+<div data-state="Coming up · due tomorrow" id="animal-state-5"></div>
+<div data-state="Settled · done" id="animal-state-6"></div>
+<div data-state="Settled · due in 2 days" id="animal-state-7"></div>
+<div data-state="Flat result (pen leads the context)" id="animal-state-8"></div>
+<div data-state="Long ID (wraps)" id="animal-state-9"></div>
+<div data-state="Chinese" id="animal-state-10"></div>
+<div data-state="Tags · act, watch, ongoing" id="animal-state-11"></div>
+<div data-state="Tags · type icon" id="animal-state-12"></div>
+<div data-state="Tags · none" id="animal-state-13"></div>
+<div data-state="Tags · too many for the line (+N)" id="animal-state-14"></div>
+<div data-state="Tags · long tag name" id="animal-state-15"></div>
+<div data-state="Tags · Chinese" id="animal-state-16"></div>
 <script>
 // Each state renders in its own iframe in the atlas: draw only the states present.
 var UI = window.SentriUI;
 var RENDER = {
-  "animal-state-0": () => SentriUI.row({"title": "12 alive · 1 dead", "description": "2h ago · parity 3", "action": "open", "value": "A02", "variant": "animal", "wrap": true, "attrs": {}, "code": "000418", "mono": true, "chip": {"variant": "chip", "kind": "active", "text": "Active"}}),
-  "animal-state-1": () => SentriUI.row({"title": "12 alive · 1 dead", "description": "2h ago · parity 3", "action": "open", "value": "A02", "variant": "animal", "wrap": true, "attrs": {"data-preview": "pressed"}, "code": "000418", "mono": true, "chip": {"variant": "chip", "kind": "active", "text": "Active"}}),
-  "animal-state-3": () => SentriUI.row({"title": "检查待处理的母猪与仔猪记录", "description": "记录时间 09:41 · 饲养员张伟 · 长文字完整换行", "action": "open", "value": "A02", "variant": "animal", "wrap": true, "attrs": {}, "code": "000418", "mono": true, "chip": {"variant": "chip", "kind": "active", "text": "Active"}}),
-  "animal-state-5": () => SentriUI.row({"title": "000418", "description": ["Farrowing", "5 dead", "1h ago · G.H"], "action": "open", "value": "000418", "variant": "animal", "layout": "need", "wrap": true, "tile": {"big": "9", "small": "alive"}}),
-  "animal-state-6": () => SentriUI.row({"title": "B7-0406", "description": [[{"text": "Sow died", "tone": "red"}], "yesterday · L.M"], "action": "open", "value": "B7-0406", "variant": "animal", "layout": "need", "wrap": true, "tile": {"big": "7", "small": "to allocate", "tone": "red"}}),
-  "animal-state-4": () => SentriUI.row({"title": "12 alive · 1 dead", "description": "2h ago · parity 3", "action": "open", "value": "A02", "variant": "animal", "wrap": true, "attrs": {}, "code": "000418", "mono": true, "chip": {"variant": "chip", "kind": "active", "text": "Active"}, "disabled": true, "reason": "Unavailable — unit is closed"})
+  "animal-state-0": () => SentriUI.row({"variant":"animal","code":"000418","description":"1h ago · G.H","right":{"kind":"state","figure":"9 alive · 5 dead","word":"Farrowing","level":"live"},"action":"open","value":"000418"}),
+  "animal-state-1": () => SentriUI.row({"variant":"animal","code":"000418","description":"1h ago · G.H","right":{"kind":"state","figure":"9 alive · 5 dead","word":"Farrowing","level":"live"},"action":"open","value":"000418","attrs":{"data-preview":"pressed"}}),
+  "animal-state-2": () => SentriUI.row({"variant":"animal","code":"000418","description":"1h ago · G.H","right":{"kind":"state","figure":"9 alive · 5 dead","word":"Farrowing","level":"live"},"action":"open","value":"000418","disabled":true,"reason":"Unavailable — unit is closed"}),
+  "animal-state-3": () => SentriUI.row({"variant":"animal","code":"000431","description":"Parity 6","right":{"kind":"state","figure":"3 days","word":"Overdue","level":"act"},"action":"open","value":"000431"}),
+  "animal-state-4": () => SentriUI.row({"variant":"animal","code":"000399","description":"yesterday · L.M","right":{"kind":"state","figure":"7 to allocate","word":"Sow died","level":"act"},"action":"open","value":"000399"}),
+  "animal-state-5": () => SentriUI.row({"variant":"animal","code":"000392","description":"Parity 5","right":{"kind":"state","figure":"Tomorrow","word":"Due","level":"soon"},"action":"open","value":"000392"}),
+  "animal-state-6": () => SentriUI.row({"variant":"animal","code":"000406","description":"05:58 · G.H","right":{"kind":"state","figure":"11 alive · 2 dead","word":"Done","level":"settled"},"action":"open","value":"000406"}),
+  "animal-state-7": () => SentriUI.row({"variant":"animal","code":"000467","description":"Parity 5","right":{"kind":"state","figure":"In 2 days","word":"Due","level":"settled"},"action":"open","value":"000467"}),
+  "animal-state-8": () => SentriUI.row({"variant":"animal","code":"000455","description":"Pen B4 · Parity 2","right":{"kind":"state","figure":"Today","word":"Due","level":"soon"},"action":"open","value":"000455"}),
+  "animal-state-9": () => SentriUI.row({"variant":"animal","code":"B7-0406-RFID-5521-3380","description":"Parity 4","right":{"kind":"state","figure":"In 3 days","word":"Due","level":"settled"},"action":"open","value":"B7-0406-RFID-5521-3380"}),
+  "animal-state-10": () => SentriUI.row({"variant":"animal","code":"000431","description":"胎次6","right":{"kind":"state","figure":"3天","word":"逾期","level":"act"},"action":"open","value":"000431"}),
+  "animal-state-11": () => SentriUI.row({"variant":"animal","code":"000306","description":"Gestation · 42d","contextWidth":"112px","right":{"kind":"tags","tags":[{"name":"Arthritis","level":"ongoing"},{"name":"Lame","level":"watch"},{"name":"Fever","level":"act"}]},"action":"open","value":"000306"}),
+  "animal-state-12": () => SentriUI.row({"variant":"animal","code":"000267","description":"Grower · 63d","contextWidth":"112px","right":{"kind":"tags","tags":[{"name":"Appetite","icon":"trend-down","level":"watch"}]},"action":"open","value":"000267"}),
+  "animal-state-13": () => SentriUI.row({"variant":"animal","code":"000254","description":"Gestation · 40d","contextWidth":"112px","right":{"kind":"tags","tags":[]},"action":"open","value":"000254"}),
+  "animal-state-14": () => SentriUI.row({"variant":"animal","code":"000510","description":"Gestation · 120d","contextWidth":"112px","right":{"kind":"tags","tags":[{"name":"Fever","level":"act"},{"name":"Cough","level":"watch"},{"name":"Lame","level":"watch"},{"name":"Scours","level":"watch"},{"name":"Arthritis","level":"ongoing"}]},"action":"open","value":"000510"}),
+  "animal-state-15": () => SentriUI.row({"variant":"animal","code":"000511","description":"Gestation","contextWidth":"112px","right":{"kind":"tags","tags":[{"name":"Respiratory infection","level":"act"},{"name":"Lame","level":"watch"}]},"action":"open","value":"000511"}),
+  "animal-state-16": () => SentriUI.row({"variant":"animal","code":"000513","description":"妊娠 · 42天","contextWidth":"112px","right":{"kind":"tags","tags":[{"name":"发烧","level":"act"},{"name":"跛行","level":"watch"}]},"action":"open","value":"000513"})
 };
 document.querySelectorAll('[data-state]').forEach(function (s) {
   var t = RENDER[s.id] ? s : s.querySelector('[id]');
   if (t && RENDER[t.id]) t.innerHTML = RENDER[t.id]();
 });
+UI.rowFitTags(document);
 </script>
