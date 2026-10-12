@@ -60,4 +60,4 @@ Directions B (move the fan card above the chart) and C (cut the "Sample readings
 
 ### Final look
 
-Commit d8aefa8 (merged with origin/main 0d49608 forward; all four screens at 390 and 360, EN; the page renders no Chinese strings, so ZH matches EN). Looked at the whole screen of each: toggle spaced, axis and Low / High legible at 360, chevron row clean, Humidity and 7-day variants hold. Fan in Manual (online) shows a 45% mono value above the slider with Save setting below. Better.
+Commit faf1717 (after merging origin/main forward; all four screens at 390 and 360, EN; the page renders no Chinese strings, so ZH matches EN). Looked at the whole screen of each: toggle spaced, axis and Low / High legible at 360, chevron row clean, Humidity and 7-day variants hold. Fan in Manual (online) shows a 45% mono value above the slider with Save setting below. Better.
