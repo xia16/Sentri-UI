@@ -259,12 +259,12 @@
         "elements": [
           {
             "name": "Pig row",
-            "shows": "Ear tag, stage and days, health tags, feed tag, checkbox",
+            "shows": "Checkbox, ear tag over the stage line (112px column), one line of condition tags",
             "states": [
               {
                 "state": "Sow in a stage",
                 "when": "Stage set; days = walk date minus start (stageStartedAt, else service date for Gestating, farrowing date for Lactating, offProductionSince for Off production)",
-                "shows": "Gestation · 42 days (Gestating reads Gestation, Lactating reads Lactation, other stages by name)"
+                "shows": "Gestation · 42d (Gestating reads Gestation, Lactating reads Lactation, other stages by name)"
               },
               {
                 "state": "Sow, start unusable",
@@ -274,37 +274,32 @@
               {
                 "state": "Sow off production, open",
                 "when": "Stage Off production and breedingStatus Open",
-                "shows": "Open · 8 days"
+                "shows": "Open · 8d"
               },
               {
                 "state": "Boar, piglet, grower",
                 "when": "Not a sow",
-                "shows": "Type + \"N days old\" from age, else birth date; \"Age —\" when neither"
+                "shows": "Type · Nd from age, else birth date; \"Age —\" when neither"
               },
               {
                 "state": "Condition needs attention",
                 "when": "Care is Monitor, Treat in place or Move to hospital pen",
-                "shows": "Tag with \"Day N\" (only when day is a number), care icon and colour; the most recent condition leads, then the ones that need attention"
+                "shows": "Compact tag, name only (no day, no care word): act now (Treat in place, Hospital pen) is a red wash with the \"!\" icon and bold text, monitor is outlined; ordered by urgency, then day"
               },
               {
                 "state": "Condition ongoing",
                 "when": "Care is No action needed",
-                "shows": "Tag with \"N days\" (Arthritis · 120 days)"
-              },
-              {
-                "state": "Feed changed",
-                "when": "One tag only, first match: stopped, then held amount, then factor not 100%",
-                "shows": "No feed / Feed held / Feed +10% (one decimal), after the health tags"
+                "shows": "Plain muted name, no box (Arthritis)"
               },
               {
                 "state": "Tags overflow",
                 "when": "They do not fit one line",
-                "shows": "The tags wrap to a second line before any is hidden, so the newest condition is always shown in full; only what still does not fit two lines collapses into \"+N more\" (the full list is in the pig record)"
+                "shows": "One line only. Tags are added in priority order until the line is full, then \"+N\"; the urgent tag is never the hidden one (the full list is in the pig record). No feed tag on a pig: feed is read and changed at the pen"
               }
             ],
             "logic": "Duration never falls back to the animal's lifetime age. The checkbox selects the pig only, never its pen.",
-            "source": "stageSummary(p) · cases(p) · careAppearance(k) · pigFeedTags(p) · fitRecordedTags()",
-            "at": "Gestation · 42 days"
+            "source": "stageSummary(p) · cases(p) · careAppearance(k) · rowFitTags()",
+            "at": "Gestation · 42d"
           },
           {
             "name": "Pen header",

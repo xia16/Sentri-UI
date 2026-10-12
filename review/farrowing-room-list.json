@@ -1,0 +1,38 @@
+[
+ {
+  "id": "farrowing-room-list-1",
+  "target": {
+   "kind": "feature",
+   "id": "farrowing"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "Rearing pen: how does a farm configure it?",
+  "detail": "Owner decision 2026-10-10: a rearing pen (\"rescue deck\") is a farm-level option. When the farm has one, a dead sow's allocation sheet offers \"Move to a rearing pen\"; otherwise the option is absent. The prototype has a flag (on for the demo, ?rearing=off turns it off) and the option moves every remaining piglet in one tap. Still open: where the farm declares the pen (a console setting, a pen type), whether the move names the pen when the farm has several, and whether the piglets then get a record there.",
+  "options": [
+   "The farm marks one pen as its rearing pen in the console; the option moves the piglets there",
+   "Any pen of a rearing type can be picked on a second step",
+   "Keep the demo flag until the console is designed"
+  ],
+  "recommendation": "One rearing pen per unit, marked in the console; the option names it and moves the piglets in one tap.",
+  "source": "owner-decision-2026-10-10"
+ },
+ {
+  "id": "farrowing-room-list-2",
+  "target": {
+   "kind": "feature",
+   "id": "farrowing"
+  },
+  "kind": "decision",
+  "severity": "high",
+  "title": "Animal ID format: what do real ear tags look like?",
+  "detail": "Length, characters, visual tag vs electronic (15-digit) tag, and whether a farm short ID exists. Today's 6-digit IDs are placeholders, and list and search design depend on the answer (how the ID is set in a row, what Find a sow matches, whether a pen is a grouping unit with many sows). Status: open, owner to confirm.",
+  "options": [
+   "One ID per animal as printed on the visual tag, set in full",
+   "A farm short ID (the last digits, or a farm number) shown first, the full tag one tap away",
+   "Both: electronic 15-digit tag for scanning, a short visual ID for reading"
+  ],
+  "recommendation": "Ask the owner for real tags from two farms before the room list's ID treatment is designed.",
+  "source": "owner, 2026-10-10"
+ }
+]

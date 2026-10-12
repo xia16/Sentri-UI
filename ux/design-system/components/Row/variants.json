@@ -18,8 +18,40 @@
   {
     "id": "animal",
     "name": "Animal",
-    "use": "Use for one animal or litter",
-    "notUse": "Not for navigation — use navigation",
+    "use": "Use for one animal in a list: the ID over a 13px context line, and on the right either its state (figure over word, weighted by level) or one line of condition tags. Designed from Farrowing room + Inspection walk, owner-approved 2026-10-11/12.",
+    "notUse": "Not for navigation — use navigation; not for a record with an Edit rail — use record.",
+    "states": [
+      "Default · live",
+      "Pressed",
+      "Disabled",
+      "Act now · overdue",
+      "Act now · sow died, piglets to allocate",
+      "Coming up · due tomorrow",
+      "Settled · done",
+      "Settled · due in 2 days",
+      "Flat result (pen leads the context)",
+      "Long ID (wraps)",
+      "Chinese",
+      "Tags · act, watch, ongoing",
+      "Tags · type icon",
+      "Tags · none",
+      "Tags · too many for the line (+N)",
+      "Tags · long tag name folds into +N",
+      "Tags · Chinese"
+    ],
+    "usedBy": [
+      "farrowing.room",
+      "farrowing.search",
+      "farrowing.scan",
+      "farrowing.task-sows",
+      "inspection.walk"
+    ]
+  },
+  {
+    "id": "animal-classic",
+    "name": "Animal (classic)",
+    "use": "Until migrated: the older animal row for lists whose rows carry several items (a code column, a status chip, a headline and a meta line). Piglet processing lists, Weaning handoff, Pig profile. Not for new lists: use Animal.",
+    "notUse": "Not for a list of one-state animals or a walk with conditions — use Animal (the approved row).",
     "states": [
       "Default",
       "Pressed",
@@ -27,8 +59,8 @@
       "Disabled"
     ],
     "usedBy": [
-      "farrowing.room",
-      "piglet-processing.pen-list"
+      "piglet-processing.pen-list",
+      "weaning.handoff"
     ]
   },
   {
@@ -91,7 +123,6 @@
       "Disabled"
     ],
     "usedBy": [
-      "farrowing.room",
       "piglet-processing.sheet-todo"
     ]
   },

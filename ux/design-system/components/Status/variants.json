@@ -2,7 +2,7 @@
   {
     "id": "chip",
     "name": "Chip",
-    "use": "use for a workflow state on a list row: Awaiting, Active, Done, Late, Overdue, Sow died (one per row, under the ID).",
+    "use": "use for a workflow state on a list row: Awaiting, Active, Done, Late, Overdue, Sow died, Aborted (one per row).",
     "notUse": "not for a recorded health condition — use ConditionTag; not for a forecast like \"Due tomorrow\" — that is row text.",
     "states": [
       "Awaiting",
@@ -11,6 +11,7 @@
       "Late",
       "Overdue",
       "Sow died",
+      "Aborted",
       "Long label (wraps)",
       "Chinese"
     ]
@@ -27,6 +28,7 @@
       "Late",
       "Overdue",
       "Sow died",
+      "Aborted",
       "Long label (wraps)",
       "Chinese"
     ]

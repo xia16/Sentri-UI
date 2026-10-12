@@ -1,0 +1,19 @@
+[
+ {
+  "id": "inspection-walk-roster-1",
+  "target": {
+   "kind": "feature",
+   "id": "feed-plan"
+  },
+  "kind": "decision",
+  "severity": "medium",
+  "title": "Per-pig feed plans: only stall and ESF pens?",
+  "detail": "Per-pig feed plans only in stall and ESF pens; group-fed (trough/floor/trickle) pens adjust at pen level. The Feed plan PRD currently allows per-pig changes in trough pens. The Inspection walk no longer shows a feed tag on a pig row, on this basis. Status: open, owner to confirm.",
+  "options": [
+   "Per-pig feed plans only where each pig is fed alone (stall, ESF); group-fed pens adjust at pen level",
+   "Keep per-pig changes in trough pens as the Feed plan PRD says"
+  ],
+  "recommendation": "Per-pig plans only in stall and ESF pens; trough, floor and trickle pens adjust at pen level, and the Feed plan PRD changes to match.",
+  "source": "owner, 2026-10-12"
+ }
+]
