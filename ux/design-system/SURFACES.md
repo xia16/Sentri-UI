@@ -8,8 +8,7 @@ Owner ruling, 2026-10-12. **Read this before you build or change any screen, she
 2. **A card is always the opposite of its base, with a 1px `line` border.** Nothing is flat (white on white), nothing is tint on tint, and no row list sits on a base without a card. **Docks and footers are white.**
 3. **Icon tiles are `row-icon-bg`. Pressed is one step deeper than its surface:** `press` on white, `choice-press` on the tint.
 4. **Current or selected is ink:** a ✓, a checkbox, or an ink ring. No green fill and no inset marker bar, anywhere.
-5. **One tint.** `inset`, `surface` and `ground` are aliases of `app-background`; there is no second or third near-white. A stray hex tint (`#f6f7f2`, `#fbfcf8`, `#f8f9f3`…) is a bug.
-
+5. **One tint.** `inset`, `surface` and `ground` are aliases of `app-background`; there is no second or third near-white. A stray hex tint (`#f6f7f2`, `#fbfcf8`, `#f8f9f3`, `#f8faf5`…) is a bug.
 6. **Tint is for reading, white is for tapping.** Inside a white content drawer, a card you only read (facts, evidence, a batch) is the tint. A card that holds items you tap (a day's checklist) keeps a **white body** with a 1px `line` border and a **tinted head band** for its title, so the label and the work sit on two levels (owner, 2026-10-12, after an all-tint Day card read as dull). Never make a card of tappable items all tint.
 
 Open question (owner to decide): lists of tappable rows in input drawers (Find a sow results, picker lists, the allocation choices) are a tinted card today. Rule 6 suggests white; both versions will be mocked before this changes.
@@ -45,39 +44,53 @@ Screens choose a context and never paint a panel colour. The context sets `--st-
 | Footer, dock, bottom nav | `paper`, `line` top border | `paper`, `line` top border |
 | Status wash (amber, red) | only for a status, never a card's resting colour | the same |
 
-### Cards, and nothing flat
+## Examples
 
-![Pages are the tint with white cards; drawers are white with tinted cards](surfaces/1-cards.png)
+An example is good only when the whole screen is approved, not just its colours. Good examples come from screens with an owner approval record (`features/*/approvals.json`) or from parts the owner endorsed: More actions, Your sections, Home's Today task card, Choose a unit, the piglet-processing pen sheet's Day card, the Farrowing room list and its dock, and the Inspection walk roster. Bad examples are `main` before #142 (`dd78778`), where the defect was real. Each board has at most three crops; the outline marks the part the caption is about: green is good, red is bad.
 
-Each pair is before (red) and after (green), cropped on the part that changed. The invisible cards that were fixed: the quiet Home task card, the Assistant bubble, the feeding card and its pig rows, the note card, the "Other identities" disclosure.
+### 1. Pages and menu drawers are the tint with white cards
 
-### Menu drawers
+![Rule 1: More actions on the tint with a white card; the old piglet More actions, white with a tinted card](surfaces/1-bases.png)
 
-![Menu drawers are the tint with a white card; the footer stays white](surfaces/2-menu-drawers.png)
+Green: More actions, a menu on the tint with a white card. Red: the same menu in piglet processing before #142, white with a tinted card (inverted).
 
-### Content drawers: the card is the tint, and a day card is a card
+### 2. A card is the opposite of its base
 
-![Content drawers: tinted facts card and tinted day cards on white, never white on white](surfaces/3-content-drawers.png)
+![Rule 2: Home's Today task card is white on the tint; the old Next card was near-white on the tint; the old evidence card was white on white](surfaces/2-cards.png)
 
-The pen sheet's Day card is the example for rule 6: a tinted band you read over a white body of items you tick, with a 1px border. An all-tint version was tried and rejected by the owner (2026-10-12): it flattened the label and the work into one level. Read-only cards on a white drawer (evidence, batch membership) are the tint.
+Green: Home's Today task card, white with a line border on the tint. Red: the old Next card, `#fbfcf8` on the tint, and the old evidence card, white on a white drawer; neither reads as a card.
 
-### Current, selected and pressed
+### 3. Pressed is one step deeper
 
-![A current row is an ink check, a chosen tile is an ink ring, pressed is one step deeper](surfaces/4-current-selected-pressed.png)
+![Rule 3: a held row in Choose a unit is press on its white card](surfaces/3-pressed.png)
 
-The old current row was a `green-wash` fill with a 3px inset bar, and the bar was cut by the card's rounded corner. The old chosen tile was green. Both were green for something that is not done.
+Green: Unit 7 held in Choose a unit: `press` on a white card, with the icon tile on `row-icon-bg`. On a tinted card the press is `choice-press`.
+
+### 4. Current is ink
+
+![Rule 4: the current unit is an ink check; before #142 it was a green fill](surfaces/4-current.png)
+
+Green: the current unit is an ink ✓ and a 600 title, no fill. Red: the same picker before #142 filled the current unit `green-wash`, green for something that is not done.
+
+### 5. One tint
+
+![Rule 5: the room list's pen band is app-background; the old pen note card was a stray near-white](surfaces/5-one-tint.png)
+
+Green: the room list's pen band is `app-background`, the page's own tint. Red: the old pen note card, a stray `#f8faf5` on the tint, a second near-white nobody can see.
+
+### 6. Tint is for reading, white is for tapping
+
+![Rule 6: the pen sheet Day card has a tinted band over a white body](surfaces/6-read-tap.png)
+
+Green: the pen sheet's Day card, a tinted band you read over a white body of items you tick, with a 1px border. An all-tint version was tried and rejected (owner, 2026-10-12): it flattened the label and the work into one level.
 
 ### Footers and docks are 56px
 
-![Footers and docks are 56px](surfaces/5-footers.png)
+![Footers: the room dock is 56px; before #142 it mixed 50, 44 and 50px, and the pen sheet footer was 48px](surfaces/7-footers.png)
+
+Green: the Farrowing room dock, all three buttons 56px. Red: the same dock before #142 (50, 44 and 50px) and the old pen sheet footer (48px).
 
 Footer and dock buttons (sheet footers, task docks, the room dock, bottom bars) are `--footer-height` (56px). Every other button and target is at least 44px. Do not raise `--control-height` for this: steppers, banner actions and row buttons read it.
-
-## Component defaults
-
-![Component defaults: current row, pressed on the tint and on white](surfaces/6-component-states.png)
-
-Rendered from the bundle with no screen CSS. The left side is the old default, the right the new one.
 
 ## How to build with it
 
@@ -86,16 +99,3 @@ Rendered from the bundle with no screen CSS. The left side is the old default, t
 - Show the current row with `attrs: { 'aria-current': 'location' }`; Row draws the ✓. Do not add a fill, a bar or a green colour.
 - Read `var(--st-panel-bg)` for a card's colour and `var(--st-press)` for a press in screen CSS. Never write a tint hex.
 - A dock or footer button uses `var(--footer-height)`.
-
-## Examples that failed (before this change)
-
-The audit that produced this rule, `surfaces/audit/`, has the original boards. Their "Bad" sides are the state of `main` before this change and are now fixed; their "Good" sides are still the references. The pen sheet's Day-card pair on that board cropped the changed cards out, so it showed no difference; use `surfaces/3-content-drawers.png` instead.
-
-| Audit board | Shows |
-|---|---|
-| `audit/1-white-base-tinted-card.png` | Good: white drawers with tinted cards. Bad: the same pairing in menu drawers |
-| `audit/2-tinted-base-white-card.png` | Good: pages with white cards. Bad: naked rows, quiet cards, a transparent card |
-| `audit/3-flat-same-colour.png` | Flat cards (the Day-card crop on this board hides the change) |
-| `audit/4-invisible-or-inverted.png` | Invisible tint-on-tint cards and the inverted menu drawer |
-| `audit/5-current-selected-pressed.png` | Ink current and selected against green current and a green tile |
-| `audit/5b-component-states-specimen.png` | The component defaults |
