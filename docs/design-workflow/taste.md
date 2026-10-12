@@ -2,6 +2,10 @@
 
 Rules say what a screen may not do. This page says what the owner sees as good, so a builder can aim at it and a judge can stand in for it. It is drawn from the owner's rulings (`calibration/answers.json`, the rejected examples in `briefs/gate.md`) and the approved screens (Farrowing, Inspection). Every builder reads it before the critique, and every judge reads it before calibrating. Add to it whenever the owner rules on a pair.
 
+## The house references
+
+The owner points to four live screens as the product's taste: Home · Today, Unit, More actions and the Farrowing room, rendered in [references/](references/README.md) with what each teaches. They are the first thing to look at and the last thing to compare against. Base designs on what the product already does well, not on outside apps.
+
 ## What good looks like here
 
 The approved screens (Farrowing room, Task overview) share one quiet language:
