@@ -640,7 +640,7 @@
         "elements": [
           {
             "name": "Sow row",
-            "shows": "One row per task sow, grouped under her pen: the ear tag exactly as stored over one muted facts line (state · key fact · when · who), a fixed-width tile at the right (a big number over one small word), a chevron. The same row in Find a sow (the facts line leads with the pen and drops when · who) and Scan results. The arrangement is provisional, pending the list exploration (a design-system candidate, Row layout need).",
+            "shows": "One row per task sow, grouped under her pen (owner-approved 2026-10-12): the ear tag over 13px muted context on the left, the figure over the state word on the right, weighted by level (act now red with the one \"!\" icon, live bold, coming up ink, settled muted), one chevron. The same row in Find a sow (the context leads with the pen) and Scan results. It is the design system's Row, animal variant.",
             "states": [
               {
                 "state": "Awaiting · not yet due",
