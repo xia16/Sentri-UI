@@ -283,45 +283,40 @@ function taskOverview(c){
  const units=c.units.map(u=>{const counts=roomCounts(u.records.filter(onList));return {id:u.id,name:u.name,...counts,ProgressTotal:counts.All,current:u.id===c.unitId};});
  const totals=Object.fromEntries(['Awaiting','Active','Done','ProgressTotal','All'].map(k=>[k,sum(units.map(u=>u[k]))]));return {units,totals};
 }
-// THE sow row: the room list, Find a sow and Scan results all draw it here, and nowhere else (owner decision 2026-10-10: the "need tile" row, the
-// app-wide animal row, a design-system candidate as Row `layout:'need'`). Left the ear tag exactly as stored over one muted facts line (state · key fact ·
-// when · who); right a fixed-width tile: a big number over one small word. Red tile = work for the worker (to allocate, days late), green = done, else neutral.
-// Recorded counts only: alive always, dead only above zero, never born, never an expected or carried count. No chip, no pencil: the row opens the record.
+// THE sow row (owner approved 2026-10-12): the room list, Find a sow and Scan results all draw it here, and nowhere else. Two lines each side.
+// Left: the ear tag exactly as stored (16px/600 mono, always ink, even for a sow that died) over 13px muted context: Parity on a waiting sow,
+// when · who on a recorded one, "Pen B3 · …" in a flat result. Right, right-aligned: the figure (16px) over the state word (13px).
+// The level sets the weight and colour. Act now (overdue; sow died with piglets to allocate): red figure, red word, the one "!" icon in a row.
+// Live (farrowing): bold figure. Coming up (due today or tomorrow): ink figure, muted word. Settled (done, due in 2+ days, aborted, hand-reared
+// piglets): muted. Recorded counts only: alive always, dead only above zero, never born. One quiet chevron, no pencil: the row opens the record.
 // Row strings are in the registry (ux/laws/strings.json, fr.*); ?lang=zh draws these rows in Chinese (the rest of the page is English).
 const ZH=/[?&]lang=zh(&|$)/.test(globalThis.location?.search||'');
 const rowText={
  sowDied:ZH?'母猪死亡':'Sow died',farrowing:ZH?'分娩中':'Farrowing',aborted:ZH?'流产':'Aborted',yesterday:ZH?'昨天':'yesterday',
- dead:n=>ZH?`死亡${n}头`:`${n} dead`,alive:n=>ZH?`存活${n}头`:`${n} alive`,aliveWord:ZH?'头':'alive',
- parity:n=>ZH?`胎次${n}`:`Parity ${n}`,bornLast:n=>ZH?`上胎出生${n}头`:`${n} born last`,ago:ZH?'1小时前':'1h ago',justNow:ZH?'刚刚':'just now',
- pen:p=>ZH?`${p}栏`:`Pen ${p}`,doneWord:ZH?'完成':'done',allocWord:ZH?'待分配':'to allocate',handWord:ZH?'人工哺育':'hand-reared',
- daysLeft:n=>ZH?'天后':n===1?'day left':'days left',daysLate:n=>ZH?'天逾期':n===1?'day late':'days late',today:ZH?'今天':'Today',dueWord:ZH?'预产':'due',
- outcome:o=>ZH?{'not-in-pig':'未怀孕',removed:'已移出批次'}[o]:{'not-in-pig':'Not in pig',removed:'Removed from batch'}[o],
- outcomeTile:o=>ZH?{'not-in-pig':'未怀孕',removed:'已移出'}[o]:{'not-in-pig':'not in pig',removed:'removed'}[o]
+ dead:n=>ZH?`死亡${n}头`:`${n} dead`,alive:n=>ZH?`存活${n}头`:`${n} alive`,
+ parity:n=>ZH?`胎次${n}`:`Parity ${n}`,ago:ZH?'1小时前':'1h ago',justNow:ZH?'刚刚':'just now',
+ pen:p=>ZH?`${p}栏`:`Pen ${p}`,allocWord:ZH?'待分配':'to allocate',handWord:ZH?'人工哺育':'hand-reared',
+ outcome:o=>ZH?{'not-in-pig':'未怀孕',removed:'已移出批次'}[o]:{'not-in-pig':'Not in pig',removed:'Removed from batch'}[o]
 };
 // Days to due from her due text: negative when late.
 function dueDays(d){const n=Number((d.match(/(\d+)/)||[])[1]);return d.startsWith('Overdue')?-n:d.startsWith('Due yesterday')?-1:d.startsWith('Due tomorrow')?1:d.startsWith('Due today')?0:n;}
-function sowRow(r,{flat=false}={}){
- const state=roomState(r),dead=sum(r.dead);
- const at=(time,who)=>flat?'':[time,who].filter(Boolean).join(' · ');
- const stamp=e=>at(e?.time,initials(e?.who||'G. Hansen'));
+function sowRow(r,{flat=false,where='',action='room-sow',value=r.tag}={}){
+ const state=roomState(r),dead=sum(r.dead),counts=n=>[rowText.alive(n),dead?rowText.dead(dead):''].filter(Boolean).join(' · ');
+ const at=(time,who)=>[time,who].filter(Boolean).join(' · ');
  const diedAt=r.events.find(e=>e.text.startsWith('Sow died')),abortAt=r.events.find(e=>e.text.startsWith('Abortion'));
- const red=text=>({text,tone:'red'});
- let facts,tile;
- if(r.ended){
-  const handed=!!r.handReared;
-  tile=handed?{big:String(r.alive),small:rowText.handWord}:{big:String(r.alive),small:rowText.allocWord,tone:'red'};
-  facts=[[red(rowText.sowDied)],handed?at(r.handReared.at,r.handReared.who):at(diedAt?.day==='Today'?diedAt.time:rowText.yesterday,initials(diedAt?.who))];
- }else if(r.productionOutcome==='abortion'){tile={big:String(r.alive),small:rowText.aliveWord};facts=[rowText.aborted,dead?rowText.dead(dead):'',stamp(abortAt)];}
- else if(r.productionOutcome){tile={big:'–',small:rowText.outcomeTile(r.productionOutcome)};facts=[rowText.outcome(r.productionOutcome),stamp(r.events[0])];}
- else if(state==='Awaiting'){
-  const n=dueDays(r.due||'Due today');
-  tile=n<0?{big:String(-n),small:rowText.daysLate(-n),tone:'red'}:n===0?{big:rowText.today,small:rowText.dueWord}:{big:String(n),small:rowText.daysLeft(n)};
-  facts=[rowText.parity(r.parity),rowText.bornLast(r.lastBorn||12)];
- }
- else if(state==='Active'){tile={big:String(r.alive),small:rowText.aliveWord};facts=[rowText.farrowing,dead?rowText.dead(dead):'',at(r.stamp==='09:41'?rowText.justNow:rowText.ago,'G.H')];}
- else{tile={icon:'check',small:rowText.doneWord,tone:'green'};facts=[rowText.alive(r.alive),dead?rowText.dead(dead):'',at(r.finished.split(' · ').at(-1),'G.H')];}
- // In flat results the pen leads the line and when · who are left to the record, so the line stays on one row.
- return SentriUI.row({variant:'animal',layout:'need',tile,attrs:state==='Awaiting'&&dueDays(r.due||'')>0?{'data-tone':'forecast'}:{},title:r.tag,description:(flat?[rowText.pen(r.pen),facts[0]]:facts).filter(x=>x!==''&&x!==undefined),wrap:true,action:'room-sow',value:r.tag,trail:'chevron'});
+ let word,figure,level,context='';
+ if(r.ended){word=rowText.sowDied;
+  if(r.handReared){figure=`${r.alive} ${rowText.handWord}`;level='soon';context=at(r.handReared.at,r.handReared.who);}
+  else{figure=`${r.alive} ${rowText.allocWord}`;level='act';context=at(diedAt?.day==='Today'?diedAt.time:rowText.yesterday,initials(diedAt?.who));}}
+ else if(r.productionOutcome==='abortion'){word=rowText.aborted;figure=counts(r.alive);level='settled';context=at(abortAt?.time,initials(abortAt?.who||'G. Hansen'));}
+ else if(r.productionOutcome){word=rowText.outcome(r.productionOutcome);figure='';level='settled';}
+ else if(state==='Awaiting'){const n=dueDays(r.due||'Due today');context=rowText.parity(r.parity);
+  if(n<0){word=ZH?'逾期':'Overdue';figure=ZH?`${-n}天`:`${-n} ${-n===1?'day':'days'}`;level='act';}
+  else{word=ZH?'待产':'Due';figure=n===0?(ZH?'今天':'Today'):n===1?(ZH?'明天':'Tomorrow'):(ZH?`${n}天后`:`In ${n} days`);level=n<=1?'soon':'settled';}}
+ else if(state==='Active'){word=rowText.farrowing;figure=counts(r.alive);level='live';context=at(r.stamp==='09:41'?rowText.justNow:rowText.ago,'G.H');}
+ else{word=ZH?'完成':'Done';figure=counts(r.alive);level='settled';context=at(r.finished.split(' · ').at(-1),'G.H');}
+ if(flat||where)context=[where||rowText.pen(r.pen),context].filter(Boolean).join(' · ');
+ return SentriUI.row({variant:'animal',code:r.tag,description:context,right:{kind:'state',figure,word,level},action,value});
 }
 function room(s){
  const c=roomContext(s),filtered=c.listed.filter(r=>matchesRoomFilter(r,c.filter)),counts=roomCounts(filtered),allCounts=taskOverview(c).totals,avg=c.unit.livePerLitter;
@@ -416,7 +411,7 @@ function taskEndSheet(s,c){
  if(s.view==='roomTaskSows'){
   const key=['active','awaiting','ended','abortions','left','notInPig','removed'].includes(c.taskReviewGroup)?c.taskReviewGroup:'active';
   const title={active:'Active farrowing',awaiting:'Awaiting farrowing',ended:'Sow deaths',abortions:'Aborted',left:'Left the task',notInPig:'Not in pig',removed:'Removed from batch'}[key];
-  return sheet(title,`<div class="${key==='awaiting'?'task-removal-notice':'task-list-hint'}">${key==='awaiting'?`${icon('alert')}<div><strong>${r.awaiting.length} ${r.awaiting.length===1?'sow will':'sows will'} be removed from this batch</strong><p>These sows have not farrowed. Ending the task removes them from the batch.</p></div>`:key==='drafts'?'Open a sow to save or clear its changes.':['ended','abortions','left','notInPig','removed'].includes(key)?'Recorded outcomes across all units. Open a sow to view the record.':'Open a sow to review and finish the record.'}</div><div class="task-review-sows">${r[key].map(({record,unit,unitId})=>key==='ended'?taskDeathReview({record,unit,unitId}):btn('room-task-sow',`<span><strong>${record.tag}</strong><small>${esc(unit)} · ${record.pen}</small></span><span class="task-review-state">${key==='awaiting'?esc(record.due.split(' · ')[0]):key==='drafts'?'Unsaved':key==='abortions'?'Aborted':key==='left'?(record.productionOutcome==='abortion'?'Aborted':'Sow died'):key==='notInPig'?'Not in pig':key==='removed'?'Removed':record.alive+' alive'}</span>${icon('chevron')}`,'task-review-sow',unitId+':'+record.tag)).join('')||'<p>No sows to review.</p>'}</div>`,footer(SentriUI.backButton({action:'room-back'})),'task-sows-sheet');
+  return sheet(title,`<div class="${key==='awaiting'?'task-removal-notice':'task-list-hint'}">${key==='awaiting'?`${icon('alert')}<div><strong>${r.awaiting.length} ${r.awaiting.length===1?'sow will':'sows will'} be removed from this batch</strong><p>These sows have not farrowed. Ending the task removes them from the batch.</p></div>`:key==='drafts'?'Open a sow to save or clear its changes.':['ended','abortions','left','notInPig','removed'].includes(key)?'Recorded outcomes across all units. Open a sow to view the record.':'Open a sow to review and finish the record.'}</div><div class="task-review-sows">${r[key].map(({record,unit,unitId})=>key==='ended'?taskDeathReview({record,unit,unitId}):sowRow(record,{where:unit+' · '+record.pen,action:'room-task-sow',value:unitId+':'+record.tag})).join('')||'<p>No sows to review.</p>'}</div>`,footer(SentriUI.backButton({action:'room-back'})),'task-sows-sheet');
  }
  const closureLabel=r.awaiting.length||r.blocked?'End task early':'End task';
  return sheet(closureLabel,`${taskPerformance(r.performance)}${taskOutcomeSummary({total:r.rows.length,finished:r.finished.length,active:r.active.length,awaiting:r.awaiting.length,removed:r.removed.length,ended:r.ended.length,abortions:r.abortions.length,notInPig:r.notInPig.length})}`,footer(SentriUI.backButton({action:'room-back'}),hold('room-end-confirm',closureLabel,r.blocked,closureLabel==='End task early').replace('button primary hold','button primary hold '+(closureLabel==='End task'?'task-complete':'task-end-confirm'))),'task-end-expanded');
@@ -697,3 +692,5 @@ if(window.SentriHomeLink){
 }
 })();
 
+
+{const m=(globalThis.location?.search||'').match(/[?&]desc=(\d+)/);if(m&&globalThis.document){const st=document.createElement('style');st.textContent='.tw-info{font-size:'+m[1]+'px!important;line-height:'+(+m[1]+5)+'px!important}';document.head.appendChild(st);}}
