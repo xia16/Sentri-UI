@@ -58,6 +58,13 @@ Directions B (move the fan card above the chart) and C (cut the "Sample readings
 - Rejected examples: R14 history label and sample note no longer take prime space (history one row, note 11px); R15 no segment weight change; R16 no floating "Reading history": it is a labelled row with a chevron inside the card.
 - **Better because** the toggle no longer collides with the reading, every figure is legible at the floor with the hero unchanged, and history reads as a row that opens.
 
+### Round 2 (driver crit): styling moved to the design system, PREVIEW badge removed
+
+- Every visual declaration I had added to the page CSS (font sizes, the speed figure, chevron colour and turn, helper size) now lives in `ux/design-system/components/bundle.css` as SensorTrend (`st-sensor-trend`) and DeviceControl (`st-device-control`, `st-device-section`); the page keeps margin, padding, flex, size and the `!important` margin that beats the global `.helper` rule. `pageStyling` on the diff returns nothing.
+- Renders identical before and after the move: at 390 the only pixels that differ are the removed badge (318,55 to 372,78); at 360 the title now fits one line, so the body shifts up by one title line, unchanged otherwise.
+- PREVIEW badge removed from the four headers that drew it (prototype chrome).
+- Still better, for the same reasons as round 1; the 360 header no longer wraps.
+
 ### Final look
 
-Commit faf1717 (after merging origin/main forward; all four screens at 390 and 360, EN; the page renders no Chinese strings, so ZH matches EN). Looked at the whole screen of each: toggle spaced, axis and Low / High legible at 360, chevron row clean, Humidity and 7-day variants hold. Fan in Manual (online) shows a 45% mono value above the slider with Save setting below. Better.
+Commit FINAL (see the pushed head). All four screens at 390 and 360, EN, from the pushed head after merging origin/main; the page renders no Chinese strings. Whole screens checked: toggle spaced, axis and Low / High legible, chevron row clean, fan speed figure, one-line title at 360. Better.

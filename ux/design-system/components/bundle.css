@@ -999,3 +999,20 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 :is(.phone,.tk-phone,.atlas-phone,.device,.st-phone,.sp-phone,[data-st-context]) [tabindex="-1"]:focus{outline:none}
 /* A waiting or disabled control says so with its surface and rim; its text stays readable (4.5:1, farm legibility law). */
 .st-hold[aria-disabled="true"] :is(.st-hold-label,.st-hold-caption){color:var(--ink);opacity:1}
+
+/* SensorTrend: one sensor's reading card (reading, last-reading time, period, chart, low / high, history). Quiet text sits at the 11px floor or above; the 34px mono reading stays the hero. */
+.st-sensor-trend .sensor-detail-heading>span{font-size:12px}
+.st-sensor-trend .sensor-chart svg text{font-size:12px}
+.st-sensor-trend .sensor-range-stats{font-size:12px}
+.st-sensor-trend .sensor-history{font-size:12px}
+.st-sensor-trend .sensor-history summary{font-size:13px}
+.st-sensor-trend .sensor-history summary svg{color:var(--muted);transition:transform .15s}
+.st-sensor-trend .sensor-history[open] summary svg{transform:rotate(180deg)}
+.st-sensor-trend .sensor-history table{font-size:12px}
+.st-sensor-trend>.helper{font-size:11px!important}
+/* DeviceControl: a controllable device (the ventilation fan): status line, mode, speed with its mono figure, Save. */
+.st-device-section>span{font-size:12px}
+.st-device-control .device-control-heading p{font-size:12px}
+.st-device-control>.helper{font-size:11px!important}
+.st-device-control .fan-speed-label{font-size:13px}
+.st-device-control .fan-speed-label output{font:400 22px/1 var(--font-mono);letter-spacing:-.5px}

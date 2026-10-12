@@ -193,20 +193,12 @@
 
 .sensor-history summary{min-height:var(--tap-min);display:flex;align-items:center}
 
-/* Environment sensor screen: spacing and type floors for the reading card and the fan card (layout and size only). */
+/* Environment sensor screen: layout only; the looks are SensorTrend and DeviceControl in ux/design-system. */
 .sensor-detail>.st-selection{margin:var(--space-12) 0}
-.sensor-detail-heading>span{font-size:12px;line-height:1.5}
-.sensor-chart svg text{font-size:12px}
-.sensor-range-stats{font-size:12px;padding:8px 0 12px}
-.sensor-history{font-size:12px}
-.sensor-history summary{font-size:13px;display:flex;align-items:center;justify-content:space-between;min-height:var(--tap-min);padding:0;list-style:none}
+.sensor-detail-heading>span{line-height:1.5}
+.sensor-range-stats{padding:8px 0 12px}
+.sensor-history summary{display:flex;align-items:center;justify-content:space-between;min-height:var(--tap-min);padding:0;list-style:none}
 .sensor-history summary::-webkit-details-marker{display:none}
-.sensor-history summary svg{width:16px;height:16px;color:var(--muted);transition:transform .15s}
-.sensor-history[open] summary svg{transform:rotate(180deg)}
-.sensor-history table{font-size:12px}
-.sensor-detail>.helper{font-size:11px!important;margin-top:0!important}
-.device-section-heading>span{font-size:12px}
-.device-control-heading p{font-size:12px}
-.device-control>.helper{font-size:11px!important}
-.fan-speed-label{align-items:baseline;font-size:13px;margin:var(--space-16) 0 0}
-.fan-speed-label output{font:400 22px/1 var(--font-mono);letter-spacing:-.5px}
+.sensor-history summary svg{width:16px;height:16px}
+.sensor-detail>.helper{margin-top:0!important}
+.fan-speed-label{align-items:baseline;margin:var(--space-16) 0 0}
