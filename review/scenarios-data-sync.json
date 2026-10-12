@@ -1,0 +1,1128 @@
+{
+ "feature": "data-sync",
+ "commit": "886600619dee87754e9ecf8b734dcc80a8526116",
+ "dirty": false,
+ "ran": "2026-10-12T08:55:28.293Z",
+ "base": "http://localhost:60193",
+ "langs": [
+  "en",
+  "zh"
+ ],
+ "widths": [
+  360,
+  390
+ ],
+ "nodes": {
+  "entry": 14,
+  "state": 14,
+  "outcome": 13,
+  "action": 7,
+  "decision-blocker": 1
+ },
+ "summary": {
+  "pass": 12,
+  "fail": 0,
+  "blocked": 1,
+  "pending": 1
+ },
+ "byLang": {
+  "en": {
+   "pass": 12,
+   "fail": 0,
+   "blocked": 0
+  },
+  "zh": {
+   "pass": 12,
+   "fail": 0,
+   "blocked": 0
+  }
+ },
+ "byBranch": {
+  "ds-a3-offline-entry.entry": {
+   "pass": 1,
+   "fail": 0,
+   "blocked": 0,
+   "pending": 0
+  },
+  "ds-a5-empty.entry": {
+   "pass": 1,
+   "fail": 0,
+   "blocked": 0,
+   "pending": 0
+  },
+  "ds-b1-reconnected.entry": {
+   "pass": 0,
+   "fail": 0,
+   "blocked": 0,
+   "pending": 1
+  },
+  "ds-b4-partial.entry": {
+   "pass": 1,
+   "fail": 0,
+   "blocked": 0,
+   "pending": 0
+  },
+  "ds-c1-failed-detail.entry": {
+   "pass": 1,
+   "fail": 0,
+   "blocked": 0,
+   "pending": 0
+  },
+  "ds-c5-cancel-delete.entry": {
+   "pass": 1,
+   "fail": 0,
+   "blocked": 0,
+   "pending": 0
+  },
+  "ds-c6-confirm-delete.entry": {
+   "pass": 1,
+   "fail": 0,
+   "blocked": 0,
+   "pending": 0
+  },
+  "ds-c7-blocked.entry": {
+   "pass": 1,
+   "fail": 0,
+   "blocked": 0,
+   "pending": 0
+  },
+  "ds-d1-switch-blocked.entry": {
+   "pass": 1,
+   "fail": 0,
+   "blocked": 0,
+   "pending": 0
+  },
+  "ds-c9-manual-conflict-contract.entry": {
+   "pass": 1,
+   "fail": 0,
+   "blocked": 0,
+   "pending": 0
+  },
+  "ds-c10-deleted-predecessor.entry": {
+   "pass": 1,
+   "fail": 0,
+   "blocked": 0,
+   "pending": 0
+  },
+  "ds-c11-delete-blocked-dependent.entry": {
+   "pass": 1,
+   "fail": 0,
+   "blocked": 0,
+   "pending": 0
+  },
+  "ds-d3-expired-login.entry": {
+   "pass": 1,
+   "fail": 0,
+   "blocked": 0,
+   "pending": 0
+  },
+  "ds-b7-uncertain-receipt.entry": {
+   "pass": 0,
+   "fail": 0,
+   "blocked": 1,
+   "pending": 0
+  }
+ },
+ "hardFailures": [],
+ "leaves": [
+  {
+   "id": "ds-a3-offline-entry",
+   "tree": "A-3",
+   "branch": "ds-a3-offline-entry.entry",
+   "label": "Offline queue remains on this phone",
+   "gwt": {
+    "given": "A worker has three records saved on this phone and no connection.",
+    "when": "They open Saved work.",
+    "then": "Three records remain waiting, and the screen says they will upload automatically when connected."
+   },
+   "path": [
+    "ds-a3-offline-entry.entry",
+    "ds-a3-offline-entry.state",
+    "ds-a3-offline-entry"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Rules and Decisions 2026-10-12",
+     "says": "Three records remain waiting, and the screen says they will upload automatically when connected."
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-a3-offline-entry/en-360/00-start.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-a3-offline-entry/en-390/00-start.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-a3-offline-entry/zh-360/00-start.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-a3-offline-entry/zh-390/00-start.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "ds-a5-empty",
+   "tree": "A-5",
+   "branch": "ds-a5-empty.entry",
+   "label": "Empty local queue is stated narrowly",
+   "gwt": {
+    "given": "This phone has no waiting or abnormal records.",
+    "when": "The worker opens Saved work.",
+    "then": "The screen says this phone has no records waiting; it makes no farm-wide completion claim."
+   },
+   "path": [
+    "ds-a5-empty.entry",
+    "ds-a5-empty.state",
+    "ds-a5-empty"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Rules and Decisions 2026-10-12",
+     "says": "The screen says this phone has no records waiting; it makes no farm-wide completion claim."
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-a5-empty/en-360/00-start.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-a5-empty/en-390/00-start.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-a5-empty/zh-360/00-start.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-a5-empty/zh-390/00-start.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "ds-b1-reconnected",
+   "tree": "B-1",
+   "branch": "ds-b1-reconnected.entry",
+   "label": "Reconnect starts upload without a tap",
+   "gwt": {
+    "given": "This phone has waiting records and its connection returns.",
+    "when": "The network becomes usable.",
+    "then": "The records start uploading without an Upload button press."
+   },
+   "path": [
+    "ds-b1-reconnected.entry",
+    "ds-b1-reconnected.state",
+    "ds-b1-reconnected"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Rules and Decisions 2026-10-12",
+     "says": "The records start uploading without an Upload button press."
+    }
+   ],
+   "result": "pending",
+   "hard": [],
+   "runs": [],
+   "why": "The study has a fixed sample state but no durable queue or automatic network transition."
+  },
+  {
+   "id": "ds-b4-partial",
+   "tree": "B-4",
+   "branch": "ds-b4-partial.entry",
+   "label": "Partial success stays split",
+   "gwt": {
+    "given": "Three local records are being sent.",
+    "when": "Two succeed and one fails.",
+    "then": "Two are shown as uploaded and one is still marked for attention."
+   },
+   "path": [
+    "ds-b4-partial.entry",
+    "ds-b4-partial.state",
+    "ds-b4-partial"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Rules and Decisions 2026-10-12",
+     "says": "Two are shown as uploaded and one is still marked for attention."
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-b4-partial/en-360/00-start.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-b4-partial/en-390/00-start.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-b4-partial/zh-360/00-start.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-b4-partial/zh-390/00-start.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "ds-c1-failed-detail",
+   "tree": "C-1",
+   "branch": "ds-c1-failed-detail.entry",
+   "label": "Failed record keeps a reason and retry",
+   "gwt": {
+    "given": "One record failed to upload while two succeeded.",
+    "when": "The worker opens the failed record.",
+    "then": "The original record and failure reason remain visible with a Retry action."
+   },
+   "path": [
+    "ds-c1-failed-detail.entry",
+    "ds-c1-failed-detail.state",
+    "ds-c1-failed-detail.act",
+    "ds-c1-failed-detail"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Rules and Decisions 2026-10-12",
+     "says": "The original record and failure reason remain visible with a Retry action."
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-c1-failed-detail/en-360/00-start.png",
+      "review/scenarios/data-sync/ds-c1-failed-detail/en-360/01-data-action-open-record-data-val.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-c1-failed-detail/en-390/00-start.png",
+      "review/scenarios/data-sync/ds-c1-failed-detail/en-390/01-data-action-open-record-data-val.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-c1-failed-detail/zh-360/00-start.png",
+      "review/scenarios/data-sync/ds-c1-failed-detail/zh-360/01-data-action-open-record-data-val.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-c1-failed-detail/zh-390/00-start.png",
+      "review/scenarios/data-sync/ds-c1-failed-detail/zh-390/01-data-action-open-record-data-val.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "ds-c5-cancel-delete",
+   "tree": "C-5",
+   "branch": "ds-c5-cancel-delete.entry",
+   "label": "Cancelling conflict deletion keeps record",
+   "gwt": {
+    "given": "A conflict is saved on this phone.",
+    "when": "The worker opens it, asks to delete, then backs out.",
+    "then": "The conflicted record remains on this phone."
+   },
+   "path": [
+    "ds-c5-cancel-delete.entry",
+    "ds-c5-cancel-delete.state",
+    "ds-c5-cancel-delete.act",
+    "ds-c5-cancel-delete"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Rules and Decisions 2026-10-12",
+     "says": "The conflicted record remains on this phone."
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-c5-cancel-delete/en-360/00-start.png",
+      "review/scenarios/data-sync/ds-c5-cancel-delete/en-360/01-data-action-open-record-data-val.png",
+      "review/scenarios/data-sync/ds-c5-cancel-delete/en-360/02-data-action-ask-delete.png",
+      "review/scenarios/data-sync/ds-c5-cancel-delete/en-360/03-data-action-cancel-delete.png",
+      "review/scenarios/data-sync/ds-c5-cancel-delete/en-360/04-data-action-back-to-list.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-c5-cancel-delete/en-390/00-start.png",
+      "review/scenarios/data-sync/ds-c5-cancel-delete/en-390/01-data-action-open-record-data-val.png",
+      "review/scenarios/data-sync/ds-c5-cancel-delete/en-390/02-data-action-ask-delete.png",
+      "review/scenarios/data-sync/ds-c5-cancel-delete/en-390/03-data-action-cancel-delete.png",
+      "review/scenarios/data-sync/ds-c5-cancel-delete/en-390/04-data-action-back-to-list.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-c5-cancel-delete/zh-360/00-start.png",
+      "review/scenarios/data-sync/ds-c5-cancel-delete/zh-360/01-data-action-open-record-data-val.png",
+      "review/scenarios/data-sync/ds-c5-cancel-delete/zh-360/02-data-action-ask-delete.png",
+      "review/scenarios/data-sync/ds-c5-cancel-delete/zh-360/03-data-action-cancel-delete.png",
+      "review/scenarios/data-sync/ds-c5-cancel-delete/zh-360/04-data-action-back-to-list.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-c5-cancel-delete/zh-390/00-start.png",
+      "review/scenarios/data-sync/ds-c5-cancel-delete/zh-390/01-data-action-open-record-data-val.png",
+      "review/scenarios/data-sync/ds-c5-cancel-delete/zh-390/02-data-action-ask-delete.png",
+      "review/scenarios/data-sync/ds-c5-cancel-delete/zh-390/03-data-action-cancel-delete.png",
+      "review/scenarios/data-sync/ds-c5-cancel-delete/zh-390/04-data-action-back-to-list.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "ds-c6-confirm-delete",
+   "tree": "C-6",
+   "branch": "ds-c6-confirm-delete.entry",
+   "label": "Confirmed conflict deletion removes one local record",
+   "gwt": {
+    "given": "A conflict and other records are saved on this phone.",
+    "when": "The worker opens the conflict and confirms deletion.",
+    "then": "Only the conflicted record leaves the local queue; the other records remain."
+   },
+   "path": [
+    "ds-c6-confirm-delete.entry",
+    "ds-c6-confirm-delete.state",
+    "ds-c6-confirm-delete.act",
+    "ds-c6-confirm-delete"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Rules and Decisions 2026-10-12",
+     "says": "Only the conflicted record leaves the local queue; the other records remain."
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-c6-confirm-delete/en-360/00-start.png",
+      "review/scenarios/data-sync/ds-c6-confirm-delete/en-360/01-data-action-open-record-data-val.png",
+      "review/scenarios/data-sync/ds-c6-confirm-delete/en-360/02-data-action-ask-delete.png",
+      "review/scenarios/data-sync/ds-c6-confirm-delete/en-360/03-data-action-confirm-delete.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-c6-confirm-delete/en-390/00-start.png",
+      "review/scenarios/data-sync/ds-c6-confirm-delete/en-390/01-data-action-open-record-data-val.png",
+      "review/scenarios/data-sync/ds-c6-confirm-delete/en-390/02-data-action-ask-delete.png",
+      "review/scenarios/data-sync/ds-c6-confirm-delete/en-390/03-data-action-confirm-delete.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-c6-confirm-delete/zh-360/00-start.png",
+      "review/scenarios/data-sync/ds-c6-confirm-delete/zh-360/01-data-action-open-record-data-val.png",
+      "review/scenarios/data-sync/ds-c6-confirm-delete/zh-360/02-data-action-ask-delete.png",
+      "review/scenarios/data-sync/ds-c6-confirm-delete/zh-360/03-data-action-confirm-delete.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-c6-confirm-delete/zh-390/00-start.png",
+      "review/scenarios/data-sync/ds-c6-confirm-delete/zh-390/01-data-action-open-record-data-val.png",
+      "review/scenarios/data-sync/ds-c6-confirm-delete/zh-390/02-data-action-ask-delete.png",
+      "review/scenarios/data-sync/ds-c6-confirm-delete/zh-390/03-data-action-confirm-delete.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "ds-c7-blocked",
+   "tree": "C-7",
+   "branch": "ds-c7-blocked.entry",
+   "label": "Later operation names its unresolved predecessor",
+   "gwt": {
+    "given": "An earlier operation for the same object failed.",
+    "when": "The worker reviews the waiting records.",
+    "then": "The later operation is marked blocked and is still on the phone."
+   },
+   "path": [
+    "ds-c7-blocked.entry",
+    "ds-c7-blocked.state",
+    "ds-c7-blocked"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Rules and Decisions 2026-10-12",
+     "says": "The later operation is marked blocked and is still on the phone."
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-c7-blocked/en-360/00-start.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-c7-blocked/en-390/00-start.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-c7-blocked/zh-360/00-start.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-c7-blocked/zh-390/00-start.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "ds-d1-switch-blocked",
+   "tree": "D-1",
+   "branch": "ds-d1-switch-blocked.entry",
+   "label": "Unsent work blocks an account or farm switch",
+   "gwt": {
+    "given": "There are records on this phone that have not uploaded.",
+    "when": "The worker tries to change account or farm.",
+    "then": "The switch is stopped and the worker is directed to the saved records."
+   },
+   "path": [
+    "ds-d1-switch-blocked.entry",
+    "ds-d1-switch-blocked.state",
+    "ds-d1-switch-blocked"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Rules and Decisions 2026-10-12",
+     "says": "The switch is stopped and the worker is directed to the saved records."
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-d1-switch-blocked/en-360/00-start.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-d1-switch-blocked/en-390/00-start.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-d1-switch-blocked/zh-360/00-start.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-d1-switch-blocked/zh-390/00-start.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "ds-c9-manual-conflict-contract",
+   "tree": "C-9",
+   "branch": "ds-c9-manual-conflict-contract.entry",
+   "label": "Conflict retry never overwrites the server",
+   "gwt": {
+    "given": "The saved result differs from the current team record.",
+    "when": "The worker compares both values and manually retries.",
+    "then": "The server record is not overwritten and this record remains in conflict."
+   },
+   "path": [
+    "ds-c9-manual-conflict-contract.entry",
+    "ds-c9-manual-conflict-contract.state",
+    "ds-c9-manual-conflict-contract.act",
+    "ds-c9-manual-conflict-contract"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Decisions 2026-10-12",
+     "says": "Show both values before retry; retry cannot overwrite the server."
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-c9-manual-conflict-contract/en-360/00-start.png",
+      "review/scenarios/data-sync/ds-c9-manual-conflict-contract/en-360/01-data-action-open-record-data-val.png",
+      "review/scenarios/data-sync/ds-c9-manual-conflict-contract/en-360/02-data-action-retry.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-c9-manual-conflict-contract/en-390/00-start.png",
+      "review/scenarios/data-sync/ds-c9-manual-conflict-contract/en-390/01-data-action-open-record-data-val.png",
+      "review/scenarios/data-sync/ds-c9-manual-conflict-contract/en-390/02-data-action-retry.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-c9-manual-conflict-contract/zh-360/00-start.png",
+      "review/scenarios/data-sync/ds-c9-manual-conflict-contract/zh-360/01-data-action-open-record-data-val.png",
+      "review/scenarios/data-sync/ds-c9-manual-conflict-contract/zh-360/02-data-action-retry.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-c9-manual-conflict-contract/zh-390/00-start.png",
+      "review/scenarios/data-sync/ds-c9-manual-conflict-contract/zh-390/01-data-action-open-record-data-val.png",
+      "review/scenarios/data-sync/ds-c9-manual-conflict-contract/zh-390/02-data-action-retry.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "ds-c10-deleted-predecessor",
+   "tree": "C-10",
+   "branch": "ds-c10-deleted-predecessor.entry",
+   "label": "Dependent record stays blocked after deletion",
+   "gwt": {
+    "given": "A later local record depends on a conflicted record.",
+    "when": "The conflicted predecessor is deleted.",
+    "then": "The later record remains blocked on this phone; it can only be viewed or deleted, and does not upload."
+   },
+   "path": [
+    "ds-c10-deleted-predecessor.entry",
+    "ds-c10-deleted-predecessor.state",
+    "ds-c10-deleted-predecessor.act",
+    "ds-c10-deleted-predecessor"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Decisions 2026-10-12",
+     "says": "After deleting a conflicted predecessor, dependent records remain blocked and can only be viewed or deleted."
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-c10-deleted-predecessor/en-360/00-start.png",
+      "review/scenarios/data-sync/ds-c10-deleted-predecessor/en-360/01-data-action-open-record-data-val.png",
+      "review/scenarios/data-sync/ds-c10-deleted-predecessor/en-360/02-data-action-ask-delete.png",
+      "review/scenarios/data-sync/ds-c10-deleted-predecessor/en-360/03-data-action-confirm-delete.png",
+      "review/scenarios/data-sync/ds-c10-deleted-predecessor/en-360/04-data-action-open-record-data-val.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-c10-deleted-predecessor/en-390/00-start.png",
+      "review/scenarios/data-sync/ds-c10-deleted-predecessor/en-390/01-data-action-open-record-data-val.png",
+      "review/scenarios/data-sync/ds-c10-deleted-predecessor/en-390/02-data-action-ask-delete.png",
+      "review/scenarios/data-sync/ds-c10-deleted-predecessor/en-390/03-data-action-confirm-delete.png",
+      "review/scenarios/data-sync/ds-c10-deleted-predecessor/en-390/04-data-action-open-record-data-val.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-c10-deleted-predecessor/zh-360/00-start.png",
+      "review/scenarios/data-sync/ds-c10-deleted-predecessor/zh-360/01-data-action-open-record-data-val.png",
+      "review/scenarios/data-sync/ds-c10-deleted-predecessor/zh-360/02-data-action-ask-delete.png",
+      "review/scenarios/data-sync/ds-c10-deleted-predecessor/zh-360/03-data-action-confirm-delete.png",
+      "review/scenarios/data-sync/ds-c10-deleted-predecessor/zh-360/04-data-action-open-record-data-val.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-c10-deleted-predecessor/zh-390/00-start.png",
+      "review/scenarios/data-sync/ds-c10-deleted-predecessor/zh-390/01-data-action-open-record-data-val.png",
+      "review/scenarios/data-sync/ds-c10-deleted-predecessor/zh-390/02-data-action-ask-delete.png",
+      "review/scenarios/data-sync/ds-c10-deleted-predecessor/zh-390/03-data-action-confirm-delete.png",
+      "review/scenarios/data-sync/ds-c10-deleted-predecessor/zh-390/04-data-action-open-record-data-val.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "ds-c11-delete-blocked-dependent",
+   "tree": "C-11",
+   "branch": "ds-c11-delete-blocked-dependent.entry",
+   "label": "A blocked dependent can be deleted after review",
+   "gwt": {
+    "given": "A conflicted predecessor was deleted and the later record is blocked.",
+    "when": "The worker reviews the later record and confirms its deletion.",
+    "then": "Only that local record is deleted; uploaded history remains, and this phone has no unsent records."
+   },
+   "path": [
+    "ds-c11-delete-blocked-dependent.entry",
+    "ds-c11-delete-blocked-dependent.state",
+    "ds-c11-delete-blocked-dependent.act",
+    "ds-c11-delete-blocked-dependent"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Decisions 2026-10-12",
+     "says": "A dependent blocked by a deleted conflict can only be viewed or deleted individually with confirmation."
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-c11-delete-blocked-dependent/en-360/00-start.png",
+      "review/scenarios/data-sync/ds-c11-delete-blocked-dependent/en-360/01-data-action-open-record-data-val.png",
+      "review/scenarios/data-sync/ds-c11-delete-blocked-dependent/en-360/02-data-action-ask-delete.png",
+      "review/scenarios/data-sync/ds-c11-delete-blocked-dependent/en-360/03-data-action-confirm-delete.png",
+      "review/scenarios/data-sync/ds-c11-delete-blocked-dependent/en-360/04-data-action-open-record-data-val.png",
+      "review/scenarios/data-sync/ds-c11-delete-blocked-dependent/en-360/05-data-action-ask-delete.png",
+      "review/scenarios/data-sync/ds-c11-delete-blocked-dependent/en-360/06-data-action-confirm-delete.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-c11-delete-blocked-dependent/en-390/00-start.png",
+      "review/scenarios/data-sync/ds-c11-delete-blocked-dependent/en-390/01-data-action-open-record-data-val.png",
+      "review/scenarios/data-sync/ds-c11-delete-blocked-dependent/en-390/02-data-action-ask-delete.png",
+      "review/scenarios/data-sync/ds-c11-delete-blocked-dependent/en-390/03-data-action-confirm-delete.png",
+      "review/scenarios/data-sync/ds-c11-delete-blocked-dependent/en-390/04-data-action-open-record-data-val.png",
+      "review/scenarios/data-sync/ds-c11-delete-blocked-dependent/en-390/05-data-action-ask-delete.png",
+      "review/scenarios/data-sync/ds-c11-delete-blocked-dependent/en-390/06-data-action-confirm-delete.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-c11-delete-blocked-dependent/zh-360/00-start.png",
+      "review/scenarios/data-sync/ds-c11-delete-blocked-dependent/zh-360/01-data-action-open-record-data-val.png",
+      "review/scenarios/data-sync/ds-c11-delete-blocked-dependent/zh-360/02-data-action-ask-delete.png",
+      "review/scenarios/data-sync/ds-c11-delete-blocked-dependent/zh-360/03-data-action-confirm-delete.png",
+      "review/scenarios/data-sync/ds-c11-delete-blocked-dependent/zh-360/04-data-action-open-record-data-val.png",
+      "review/scenarios/data-sync/ds-c11-delete-blocked-dependent/zh-360/05-data-action-ask-delete.png",
+      "review/scenarios/data-sync/ds-c11-delete-blocked-dependent/zh-360/06-data-action-confirm-delete.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-c11-delete-blocked-dependent/zh-390/00-start.png",
+      "review/scenarios/data-sync/ds-c11-delete-blocked-dependent/zh-390/01-data-action-open-record-data-val.png",
+      "review/scenarios/data-sync/ds-c11-delete-blocked-dependent/zh-390/02-data-action-ask-delete.png",
+      "review/scenarios/data-sync/ds-c11-delete-blocked-dependent/zh-390/03-data-action-confirm-delete.png",
+      "review/scenarios/data-sync/ds-c11-delete-blocked-dependent/zh-390/04-data-action-open-record-data-val.png",
+      "review/scenarios/data-sync/ds-c11-delete-blocked-dependent/zh-390/05-data-action-ask-delete.png",
+      "review/scenarios/data-sync/ds-c11-delete-blocked-dependent/zh-390/06-data-action-confirm-delete.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "ds-d3-expired-login",
+   "tree": "D-3",
+   "branch": "ds-d3-expired-login.entry",
+   "label": "Original-account sign-in resumes upload",
+   "gwt": {
+    "given": "Upload stopped because the original account session expired, while three records remain on this phone.",
+    "when": "The worker signs in again with the original account.",
+    "then": "The records remain tied to that account and automatic upload resumes after verification."
+   },
+   "path": [
+    "ds-d3-expired-login.entry",
+    "ds-d3-expired-login.state",
+    "ds-d3-expired-login.act",
+    "ds-d3-expired-login"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Decisions 2026-10-12",
+     "says": "Reauthenticate the original account, then resume automatic upload without changing queue ownership."
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-d3-expired-login/en-360/00-start.png",
+      "review/scenarios/data-sync/ds-d3-expired-login/en-360/01-data-action-open-reauth.png",
+      "review/scenarios/data-sync/ds-d3-expired-login/en-360/02-data-action-complete-reauth.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-d3-expired-login/en-390/00-start.png",
+      "review/scenarios/data-sync/ds-d3-expired-login/en-390/01-data-action-open-reauth.png",
+      "review/scenarios/data-sync/ds-d3-expired-login/en-390/02-data-action-complete-reauth.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [
+      "\"G. Hansen\" shown"
+     ],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-d3-expired-login/zh-360/00-start.png",
+      "review/scenarios/data-sync/ds-d3-expired-login/zh-360/01-data-action-open-reauth.png",
+      "review/scenarios/data-sync/ds-d3-expired-login/zh-360/02-data-action-complete-reauth.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [
+      "\"G. Hansen\" shown"
+     ],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-d3-expired-login/zh-390/00-start.png",
+      "review/scenarios/data-sync/ds-d3-expired-login/zh-390/01-data-action-open-reauth.png",
+      "review/scenarios/data-sync/ds-d3-expired-login/zh-390/02-data-action-complete-reauth.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "ds-b7-uncertain-receipt",
+   "tree": "B-7",
+   "branch": "ds-b7-uncertain-receipt.entry",
+   "label": "Q3 — Request accepted without local receipt",
+   "gwt": null,
+   "path": [
+    "ds-b7-uncertain-receipt.entry",
+    "ds-b7-uncertain-receipt.state",
+    "ds-b7-uncertain-receipt"
+   ],
+   "authority": [],
+   "result": "blocked",
+   "hard": [],
+   "runs": [],
+   "question": "Q3",
+   "sources": [
+    "Old code retries transient errors",
+    "Backend idempotency contract is not available"
+   ]
+  }
+ ]
+}
