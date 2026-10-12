@@ -219,9 +219,10 @@
 .tk-receipt-title { margin: 0; font: 600 var(--type-button-size)/1.5 var(--font-sans); color: var(--ink); }
 .tk-receipt-meta { margin: 5px 0 0; font: var(--type-description-size)/1.2 var(--font-sans); color: var(--muted); }
 
-/* TaskDay: the day card — a head (bold day, mono status) on the card's own colour, rows that are doors (mark, title, mono meta), an act. */
-.tk-day { overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius-inset); background: var(--st-panel-bg); }
-.tk-day-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-row-y); padding: var(--space-row-y) var(--space-row-x); background: transparent; }
+/* TaskDay: the day card — a tinted band (bold day, mono status) you read, over a white body of rows you tap (doors: mark, title, mono meta), an act.
+   It keeps this look in every context: a card of tappable items is white with a tinted head band (SURFACES.md, "tint is for reading, white is for tapping"). */
+.tk-day { overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius-inset); background: var(--paper); }
+.tk-day-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-row-y); padding: var(--space-row-y) var(--space-row-x); background: var(--app-background); }
 .tk-day-head > strong { font: 700 var(--type-row-title-size)/1.25 var(--font-sans); color: var(--ink); }
 .tk-day-head > span { font: var(--type-meta-size)/1.3 var(--font-mono); color: var(--muted); }
 

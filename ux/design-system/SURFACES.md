@@ -10,6 +10,10 @@ Owner ruling, 2026-10-12. **Read this before you build or change any screen, she
 4. **Current or selected is ink:** a ✓, a checkbox, or an ink ring. No green fill and no inset marker bar, anywhere.
 5. **One tint.** `inset`, `surface` and `ground` are aliases of `app-background`; there is no second or third near-white. A stray hex tint (`#f6f7f2`, `#fbfcf8`, `#f8f9f3`…) is a bug.
 
+6. **Tint is for reading, white is for tapping.** Inside a white content drawer, a card you only read (facts, evidence, a batch) is the tint. A card that holds items you tap (a day's checklist) keeps a **white body** with a 1px `line` border and a **tinted head band** for its title, so the label and the work sit on two levels (owner, 2026-10-12, after an all-tint Day card read as dull). Never make a card of tappable items all tint.
+
+Open question (owner to decide): lists of tappable rows in input drawers (Find a sow results, picker lists, the allocation choices) are a tinted card today. Rule 6 suggests white; both versions will be mocked before this changes.
+
 Green means done, recorded or synced, nothing else. Amber and red washes mean status and are never a card's resting colour.
 
 ### Which context is my screen?
@@ -30,7 +34,7 @@ Screens choose a context and never paint a panel colour. The context sets `--st-
 | Part | Page and menu drawer (tint base) | Content or input drawer (white base) |
 |---|---|---|
 | Card | `paper`, 1px `line`, `radius-panel` | `app-background`, 1px `line`, `radius-panel` |
-| Group head band (inside a card) | the card's own colour, no tint of its own (TaskDay head) | the card's own colour |
+| Group head band (inside a card) | the card's own colour | a card of tappable items (TaskDay): tinted band (`app-background`) over a white body; a read-only card: its own colour |
 | Row divider | `rule` | `rule` |
 | Icon tile | `row-icon-bg` | `row-icon-bg` |
 | Pressed row | `press` (`#f1f5eb`) | `choice-press` (`#eaf0e2`) |
@@ -55,7 +59,7 @@ Each pair is before (red) and after (green), cropped on the part that changed. T
 
 ![Content drawers: tinted facts card and tinted day cards on white, never white on white](surfaces/3-content-drawers.png)
 
-The pen sheet's Day cards were white on white (TaskDay was hard-coded `paper`). They now follow the context: tinted in a content drawer, white on a page. The cropped pairs here are on the Day cards, the part that changed.
+The pen sheet's Day card is the example for rule 6: a tinted band you read over a white body of items you tick, with a 1px border. An all-tint version was tried and rejected by the owner (2026-10-12): it flattened the label and the work into one level. Read-only cards on a white drawer (evidence, batch membership) are the tint.
 
 ### Current, selected and pressed
 
