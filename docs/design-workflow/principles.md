@@ -27,13 +27,13 @@ Each principle has the same four parts and nothing else: **the principle**, **wh
 
 ## P2 · Every change has a known reach
 
-**The principle.** Scope is the problem list: change what a problem names and nothing else, and keep every Keep item at least as strong. Everything the change should reach, it reaches (every screen, pattern and demo that uses a changed component, updated or marked "until migrated"); everything else stays exactly as it was. A part the page hand-builds moves into the design system unchanged, proven by renders, before it improves; a part a component already does moves onto that component. A check that fails a kept part is questioned, not obeyed. A deliberate shared change is its own task.
+**The principle.** Scope is the problem list, and it binds everyone who touches the change, the driver's crit rounds included: change what a problem names and nothing else, and keep every Keep item at least as strong. Everything the change should reach, it reaches (every screen, pattern and demo that uses a changed component, updated or marked "until migrated"); everything else stays exactly as it was. A part the page hand-builds moves into the design system unchanged, proven by renders, before it improves; a part a component already does moves onto that component. A check that fails a kept part is questioned, not obeyed. A deliberate shared change is its own task.
 
-**Why.** Trial 3 turned segmented controls into pill buttons to satisfy a check. Trial 4 changed a shared token for its own screen and moved 60 screens in ten features, the house references among them. An audit of the approved animal row (#113, #138) found it reached 7 places and missed 7.
+**Why.** Trial 3 turned segmented controls into pill buttons to satisfy a check. In trial 6 the driver's own crit round asked for a header change across two features and moved screens outside SCOPE. Trial 4 changed a shared token for its own screen and moved 60 screens in ten features, the house references among them. An audit of the approved animal row (#113, #138) found it reached 7 places and missed 7.
 
 **Show it.** `## Problems` (each with evidence, major or minor), the extraction commit with identical renders, and the full screen diff of the pushed branch showing only the intended screens moved.
 
-**Checked by.** The gate's screen diff on every screen, its class escalation and the shared-component queue; the judge's keep-list check (gate.md §5). To automate (ledger): the reach list of every component change, and failing, not escalating, a feature change that moves other features' screens.
+**Checked by.** The gate's screen diff on every screen and its "known reach" check, which fails a change declared for its own features that moves another feature's screen; the shared-component queue; the judge's keep-list check (gate.md §5). To automate (ledger): the reach list of every component change.
 
 ## P3 · Information before layout
 
