@@ -202,10 +202,12 @@ function openFeature(id, sel) {
   const n = f.screens.length;
   const ownIds = new Set(f.screens.map((s) => s.id)), mine = backlogItems().filter((b) => (b.target.kind === 'feature' && b.target.id === f.id) || (b.target.kind === 'screen' && ownIds.has(b.target.id)));
   const todos = mine.filter((b) => b.kind !== 'decision').length, confirm = mine.length - todos; // the same sets the Backlog opens on
+  const scnFails = ((f.scenarios && f.scenarios.tree) || []).flatMap(scnLeaves).filter((x) => scnKind(x) === 'fail').length;
   const planned = f.status === 'placeholder', prd = hasPrd(f), sameName = String(f.name).toLowerCase() === String(f.sectionRef.name).toLowerCase();
   header('');
   const fcrumb = el(`<nav class="fcrumb" aria-label="Breadcrumb"><a href="#" class="fc-back" data-back>‹ Features</a><span class="fc-sep">/</span>${sameName ? '' : `<a href="#" data-back>${esc(f.sectionRef.name)}</a><span class="fc-sep">/</span>`}<b>${esc(f.name)}</b> <span class="zh">${esc(f.zh || '')}</span>
-    <span class="meta">${dot(f.status)}${f.status === 'frozen' ? '<span>Frozen</span> · ' : ''}<span>${plural(n, 'screen')}</span>${planned ? ' · <span>Not designed yet</span>' : ''}${prd ? ' · <a href="#" id="l-prd">PRD</a> · <a href="#" id="l-dec">Decisions</a>' : ''}${todos ? ` · <a href="#" id="l-todo" title="Open to-dos for this feature in the Backlog">To-dos ${todos}</a>` : ''}${confirm ? ` · <a href="#" id="l-conf" title="Questions waiting for the owner, in the Backlog">To confirm ${confirm}</a>` : ''}</span></nav>`);
+    <span class="meta">${dot(f.status)}${f.status === 'frozen' ? '<span>Frozen</span> · ' : ''}<span>${plural(n, 'screen')}</span>${planned ? ' · <span>Not designed yet</span>' : ''}${prd ? ' · <a href="#" id="l-prd">PRD</a> · <a href="#" id="l-dec">Decisions</a>' : ''}${todos ? ` · <a href="#" id="l-todo" title="Open to-dos for this feature in the Backlog">To-dos ${todos}</a>` : ''}${confirm ? ` · <a href="#" id="l-conf" title="Questions waiting for the owner, in the Backlog">To confirm ${confirm}</a>` : ''}</span>
+    <div class="seg fview" role="group" aria-label="View"><button data-fv="flow" aria-pressed="true">Flow</button><button data-fv="scenarios" aria-pressed="false">Scenarios${scnFails ? ` <span class="fvbad" title="${scnFails} failing on the last run">${scnFails}</span>` : ''}</button></div></nav>`);
   const toBacklog = (kind) => (e) => { e.preventDefault(); Object.assign(bkState, { kind, sec: '', feature: f.id }); S.view = 'backlog'; closeFeature(); render(); };
   fcrumb.querySelector('#l-todo')?.addEventListener('click', toBacklog('@todo')); fcrumb.querySelector('#l-conf')?.addEventListener('click', toBacklog('decision'));
   fcrumb.querySelectorAll('[data-back]').forEach((a) => { a.onclick = (e) => { e.preventDefault(); closeFeature(); render(); }; });
@@ -521,10 +523,33 @@ function openFeature(id, sel) {
   chip.onclick = (ev) => { ev.stopPropagation(); pz.pan(-Math.min(300, cutBy() + 24), 0); };
   const iv = setInterval(() => { if (!wrap.isConnected) return clearInterval(iv); const cut = cutBy() > 6; chip.hidden = !cut; wrap.classList.toggle('cut', cut); wrap.classList.toggle('cutb', belowBy() > 8); }, 200);
   const firstOf = () => { const a = f.anchor; const own = new Set(f.screens.map((s) => s.id)); const pick = (ids) => (ids || []).find((i) => own.has(i)); return (a && pick((a.statuses || []).flatMap((s) => s.screens || []))) || pick((f.groups || []).flatMap((g) => g[1])) || f.screens[0]?.id; };
-  select(sel && nodes[sel] ? sel : (nodes[firstOf()] ? firstOf() : Object.keys(nodes)[0]));
+
+  /* the Scenarios view (scenarios.js) takes the flow's place; the phone stays docked and shows the screen a state starts on */
+  let scn = null; const scnPane = el('<div class="scnwrap" hidden></div>'); col.insertBefore(scnPane, notes);
+  const showStart = (n) => {
+    const s = idx[n.screen]; if (!s) return;
+    if (nodes[n.screen]) { select(n.screen); return; }
+    selected = null; shown = n.screen; mark(null); clearPins(); dock.innerHTML = ''; // a screen of another feature (Home): shown, not selectable in this flow
+    dock.append(el('<div class="cap">&nbsp;</div>'), shot(s, { height: Math.max(420, Math.min(760, innerHeight - 56 - 130)) }));
+    const tl = el(`<div class="tools"><a href="#">Open ${esc(s.feature.name)}</a></div>`); tl.querySelector('a').onclick = (ev) => { ev.preventDefault(); setParam('tab', null); openFeature(s.feature.id, s.id); };
+    dock.append(tl); if (notes.classList.contains('open')) fillNotes();
+  };
+  const setFv = (v) => {
+    const on = v === 'scenarios';
+    fcrumb.querySelectorAll('[data-fv]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.fv === v)));
+    wrap.hidden = on; zoomEl.hidden = on; scnPane.hidden = !on; setParam('tab', on ? 'scenarios' : null);
+    if (on && !scn) {
+      scn = scenariosView(f, { onState: showStart, screenName: (sid) => (idx[sid] ? (idx[sid].feature.id === f.id ? idx[sid].name : `${idx[sid].feature.name} · ${idx[sid].name}`) : '') });
+      scnPane.append(scn.el); const first = scn.firstState(); if (first) scn.pickState(first);
+    }
+    if (!on) { if (!selected || !nodes[selected]) select(nodes[firstOf()] ? firstOf() : Object.keys(nodes)[0]); requestAnimationFrame(() => { relayout(); pz.fit(); }); }
+  };
+  fcrumb.querySelectorAll('[data-fv]').forEach((b) => { b.onclick = () => setFv(b.dataset.fv); });
+  const first = () => select(sel && nodes[sel] ? sel : (nodes[firstOf()] ? firstOf() : Object.keys(nodes)[0]));
+  if (new URLSearchParams(location.search).get('tab') === 'scenarios') { setFv('scenarios'); if (!shown) first(); } else first();
 }
 
 function closeFeature() {
   CURRENT = null; const p = document.getElementById('feature'); p.hidden = true; p.innerHTML = '';
-  setParam('feature', null); setParam('screen', null); header('');
+  setParam('feature', null); setParam('screen', null); setParam('tab', null); header('');
 }

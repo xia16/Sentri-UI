@@ -89,7 +89,7 @@ Never invent an expected result to make a leaf pass.
 ## 6. Each round
 
 1. Run every leaf (`node scripts/run-scenarios.mjs`) and grade every screen state on the round's start commit.
-2. **Select**: first the hard failures, then the worst usability defect with evidence. A fix must improve its target with no regression elsewhere. A shared component may change only if every other feature using it stays the same or better.
+2. **Select**: first the hard failures, then the worst usability defect with evidence. A broken attention budget (everything at one weight, a busy row) ranks above visual polish: fix what deserves attention before how it looks. A fix must improve its target with no regression elsewhere. A shared component may change only if every other feature using it stays the same or better.
    Once no hard failure is left, a round may also take one **enhancement** ([Room to design](../README.md#room-to-design)): a screen state graded only adequate that a different design would make clearly better. The designer sketches alternatives, including one that departs from the current pattern, and builds the best. The gate judges it like any fix.
 3. **Build** with `build.md`. Changes stay inside the product-neutral boundary (§5), in the feature.
 4. **Gate** with `gate.md` on the exact merge candidate. Presentation changes rerun the walks and leaves they touch.

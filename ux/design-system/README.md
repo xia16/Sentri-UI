@@ -34,7 +34,7 @@ The ground is a green-tinted off-white; text is one deep green-black; colour app
 
 - **Plus Jakarta Sans** for everything a person reads as language, at 400, 500 and 600. Headings are 500, not bold: `page-title` 22px, `sheet-title` 20px, `section-title` 16px, `group-label` 13px in `muted`. (`panel-title` 12px is retired: a title inside a panel is a group label; Heading has three kinds, page, section and group.)
 - **IBM Plex Mono** for everything a person reads off the barn: ear tags and pen codes (`identifier`), counts and measurements (`figure`, `figure-lg`, `hero-count`), badge numbers and overlines. Use tabular numerals for counts that tick.
-- Body text in rows is 16px (`row-title`) over 13px (`description`); fields, choices and buttons are 16px. `meta` is 13px, the floor of the farm legibility law below; nothing a person reads is smaller.
+- Body text in rows is 16px (`row-title`) over 13px (`description`); fields, choices and buttons are 16px. `meta` is 13px. Quiet descriptive text (labels, units, timestamps, chart axes, who/when) may be 11px, the floor of the farm legibility law below.
 - Headings take slight negative tracking (−0.5px at 22px, −0.4px at 20px); everything at 13px and below tracks at 0.
 
 ### Space, size and layout
@@ -76,11 +76,11 @@ State changes in place instantly; position changes only when the hand is done.
 
 Barn, glare, gloves, arm's length, two seconds. Every screen is read this way, so these floors are binding. `node scripts/check-legibility.mjs` measures them on every atlas screen (the gate level is set in `docs/design-workflow/README.md`).
 
-- **Type.** Primary values and body text are at least 16px. Secondary and meta text are at least 13px. Nothing visible is under 13px except the phone's own status bar.
+- **Type** (owner, 2026-10-11). Anything a worker reads to act on (a control's label, a value they act on, a row title, a warning) is at least 13px. Quiet descriptive text (labels, units, timestamps, chart axes, who/when) may be as small as 11px. Nothing visible is under 11px except the phone's own status bar. Size follows hierarchy: one large value, quiet small labels. Never enlarge text just to clear a floor; a screen where everything is big has no hierarchy.
 - **Contrast.** At least 4.5:1 for all text, and at least 7:1 for primary values and the numbers a farmer acts on. Ink, not pale grey, for anything that must be read. `muted` holds 4.5:1 on `paper`, `app-background`, `inset` and `well` only.
 - **Targets.** Every tap target is at least 48 by 48 (the control itself, or an invisible hit area).
 - **Disabled is not faded.** A disabled or waiting control (a greyed button, a pen tile, a row) shows that it is unavailable with its surface, its rim, an icon or a word, never with faded text. Its text meets 4.5:1 like any other (`ink` on the disabled surface; 7:1 at 16px and up). The checker measures disabled text too. Labels never wrap in a tile; shorten the copy or give the tile room.
-- **Crowding is fixed by tightening copy and layout, never by shrinking type.**
+- **Crowding is fixed by cutting and tightening copy and layout, never by shrinking type below these floors.**
 
 ### The row
 

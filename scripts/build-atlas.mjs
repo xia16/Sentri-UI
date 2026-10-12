@@ -118,6 +118,93 @@ for (const f of features) {
     problems.push(`${where}: platform/section ${f.platform}/${f.section} is not in sections.json`);
 }
 
+// scenarios: the feature's scenario tree as the runner reads it (features/<id>/scenarios.json), each leaf with its last
+// result (review/scenarios-<id>.json), and the not-supported list (PRD "## Not supported", else operations.md rows
+// marked not supported). The atlas draws the Scenarios view from this, so the picture and the tests can't disagree.
+const NODE_TYPES = ['entry', 'state', 'action', 'outcome', 'decision-blocker'];
+const mdPlain = (t) => String(t || '').replace(/\*\*([^*]+)\*\*/g, '$1').replace(/`([^`]+)`/g, '$1').trim();
+const mdCells = (l) => l.trim().replace(/^\||\|$/g, '').split('|').map((c) => c.trim());
+const isTable = (ls, i) => /^\s*\|/.test(ls[i]) && /^\s*\|?\s*:?-{2,}/.test(ls[i + 1] || '');
+function notSupportedOf(f) {
+  const fromLines = (lines) => { // bullets or a table under a "## Not supported" heading
+    const items = [];
+    for (let i = 0; i < lines.length; i++) {
+      const b = lines[i].match(/^[-*]\s+(.*)$/);
+      if (b) {
+        let t = b[1]; while (i + 1 < lines.length && /^\s{2,}\S/.test(lines[i + 1]) && !/^\s*[-*]\s/.test(lines[i + 1])) t += ' ' + lines[++i].trim();
+        const bold = t.match(/^\*\*([^*]+)\*\*[\s.:—–-]*(.*)$/), dash = t.split(/\s[—–]\s/);
+        items.push(bold ? { what: bold[1].replace(/[.:]$/, ''), why: mdPlain(bold[2]) } : dash.length > 1 ? { what: mdPlain(dash[0]), why: mdPlain(dash.slice(1).join(' — ')) } : { what: mdPlain(t), why: '' });
+      } else if (isTable(lines, i)) {
+        for (i += 2; i < lines.length && /^\s*\|/.test(lines[i]); i++) { const c = mdCells(lines[i]); items.push({ what: mdPlain(c[0]), why: mdPlain(c.slice(1).join(' · ')) }); }
+        i--;
+      }
+    }
+    return items.filter((x) => x.what);
+  };
+  const section = (src) => { const ls = String(src).replace(/\r/g, '').split('\n'), i = ls.findIndex((l) => /^#{2,3}\s+Not supported\b/i.test(l)); if (i < 0) return []; let j = i + 1; while (j < ls.length && !/^#{1,3}\s/.test(ls[j])) j++; return fromLines(ls.slice(i + 1, j)); };
+  const prd = section(f.prd);
+  if (prd.length) return { source: `features/${f.id}/PRD.md`, items: prd };
+  const op = join(root, 'features', f.id, 'operations.md');
+  if (!existsSync(op)) return null;
+  const src = readFileSync(op, 'utf8'), own = section(src);
+  if (own.length) return { source: `features/${f.id}/operations.md`, items: own };
+  const ls = src.replace(/\r/g, '').split('\n'), items = []; // a table of operations: the rows whose cut says "not supported"
+  for (let i = 0; i < ls.length; i++) {
+    if (!isTable(ls, i)) continue;
+    const why = mdCells(ls[i]).findIndex((h) => /why|reason/i.test(h));
+    for (i += 2; i < ls.length && /^\s*\|/.test(ls[i]); i++) { const c = mdCells(ls[i]); if (c.some((x) => /not supported/i.test(x))) items.push({ what: mdPlain(c[0]), why: why > 0 ? mdPlain(c[why] || '') : '' }); }
+  }
+  return items.length ? { source: `features/${f.id}/operations.md`, items } : null;
+}
+for (const f of features) {
+  const dir = join(root, 'features', f.id), file = join(dir, 'scenarios.json'), where = `features/${f.id}/scenarios.json`;
+  const sc = { treeDoc: existsSync(join(dir, 'scenario-tree.md')), tree: null, run: null, notSupported: notSupportedOf(f) };
+  f.scenarios = sc;
+  if (!existsSync(file)) continue;
+  let spec; try { spec = JSON.parse(readFileSync(file, 'utf8')); } catch (e) { problems.push(`${where}: ${e.message}`); continue; }
+  if (!Array.isArray(spec.tree)) { problems.push(`${where}: needs a "tree" list of entry nodes`); continue; }
+  let report = null; const rp = join(root, 'review', `scenarios-${f.id}.json`);
+  if (existsSync(rp)) { try { report = JSON.parse(readFileSync(rp, 'utf8')); } catch (e) { problems.push(`review/scenarios-${f.id}.json: ${e.message}`); } }
+  const results = Object.fromEntries((report?.leaves || []).map((l) => [l.id, l]));
+  if (report) sc.run = { commit: String(report.commit || '').slice(0, 7), dirty: !!report.dirty, ran: report.ran || '', langs: report.langs || [], widths: report.widths || [] };
+  const ids = new Set();
+  const norm = (n) => {
+    if (!n || !n.id || !n.type) { problems.push(`${where}: a node needs type and id`); return null; }
+    if (ids.has(n.id)) problems.push(`${where}: id ${n.id} is used twice`);
+    ids.add(n.id);
+    if (!NODE_TYPES.includes(n.type)) problems.push(`${where}: ${n.id} has type "${n.type}"`);
+    const o = { type: n.type, id: n.id, label: n.label || n.id };
+    if (n.tree) o.tree = n.tree;
+    if (n.type === 'state') {
+      const s = n.reset && n.reset.screen;
+      if (s && !owner[s]) problems.push(`${where}: state ${n.id} resets to ${s}, which no feature has`);
+      if (s) o.screen = s;
+    }
+    if (n.gwt) o.gwt = n.gwt;
+    if (n.type === 'decision-blocker') { o.question = n.question || ''; o.sources = n.sources || []; o.result = 'blocked'; }
+    if (n.type === 'outcome') {
+      o.authority = n.authority || [];
+      const r = results[n.id];
+      o.result = r ? r.result : n.status === 'pending' ? 'pending' : 'not-run';
+      if (n.status === 'pending' && n.why) o.why = n.why;
+      if (r && (r.hard || []).length) o.hard = r.hard;
+      if (r && r.result !== 'pass') { // the reasons, once each, with the runs that hit them
+        const fails = {}, notes = new Set();
+        for (const run of r.runs || []) {
+          for (const x of run.failures || []) { const k = `${x.what}\u0000${x.got ?? ''}`; (fails[k] = fails[k] || { what: x.what, got: x.got ?? '', tag: x.tag || '', runs: [] }).runs.push(`${run.lang} ${run.width}`); }
+          for (const t of run.notes || []) notes.add(t);
+        }
+        if (Object.keys(fails).length) o.failures = Object.values(fails);
+        if (notes.size) o.notes = [...notes];
+      }
+    }
+    const kids = (n.children || []).map(norm).filter(Boolean);
+    if (kids.length) o.children = kids;
+    return o;
+  };
+  sc.tree = spec.tree.map(norm).filter(Boolean);
+}
+
 const statusOf = (f) => {
   let st = (f.screens || []).map((s) => s.status);
   if (!st.length || st.every((x) => x === 'placeholder')) return 'placeholder';

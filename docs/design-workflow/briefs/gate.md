@@ -31,7 +31,7 @@ A shared change that touches too many screens for one judge is split by feature.
 On CANDIDATE:
 1. `npm test`. All pass. Skips must state a reason.
 2. `npm run check`. It also runs the farm legibility check in report mode. It must report the atlas OK. `npm run atlas` must produce no diff in `atlas/atlas.json` beyond its `generated` and `commit` stamps.
-3. **Farm legibility, blocking for changed screens.** Start BASE's server, then `node scripts/check-legibility.mjs --changed <the SCREENS ids> --compare <BASE url>` on CANDIDATE. It renders each screen bare at 390×844. While `docs/design-workflow/README.md` says `Legibility gate: no-regression`, a screen in scope fails only if it has more violations than at BASE in any category (text under 13px, contrast under 4.5:1 or 7:1 for 16px+ primary values, targets under 48×48; an invisible hit area counts), or a violation on an element that had none. When that line says `strict`, a screen in scope fails on any violation and `--compare` is not needed. Screens outside `--changed` are reported, not blocking. Any failure ends the gate. The 16px body floor and "ink, not pale grey" are judged by eye in step 3. Crowding is fixed by tightening copy and layout, never by shrinking type. Law: `ux/design-system/README.md`.
+3. **Farm legibility, blocking for changed screens.** Run `node scripts/check-legibility.mjs --changed <the SCREENS ids> --strict` on CANDIDATE. It renders each screen bare at 390×844. While `docs/design-workflow/README.md` says `Legibility gate: strict`, a screen in scope fails on any violation: text under 11px, or under 13px inside a control, contrast under 4.5:1 (7:1 for 16px+ primary values), or a target under 48×48 (an invisible hit area counts). If that line ever says `no-regression`, pass `--compare <BASE url>` instead of `--strict`; a screen in scope then fails only if it has more violations than at BASE in any category, or a violation on an element that had none. Screens outside `--changed` are reported, not blocking. Any failure ends the gate. The 16px body floor and "ink, not pale grey" are judged by eye in step 3. Crowding is fixed by tightening copy and layout, never by shrinking type. Law: `ux/design-system/README.md`.
 4. `git grep -n '^<<<<<<<\|^>>>>>>>'` finds nothing.
 5. For every class: `node scripts/check-states.mjs`. It renders every design-system state the way the atlas draws it and writes `review/state-check.json`; its known-bad fixtures (`scripts/check-states.fixtures/`) are the rejected examples it already catches. If the component has its own check script (e.g. `node scripts/check-button-components.cjs`), run that too, with the server running. Set `SENTRI_PREVIEW_ORIGIN` and `SENTRI_PLAYWRIGHT`. No console errors, no target under 48px, no horizontal overflow.
 6. For behaviour (and presentation that touches a walked screen): `node scripts/run-scenarios.mjs` for each affected feature. Every leaf the change touches passes, in EN and ZH at 360 and 390. A blocked leaf stays blocked; it never becomes a pass.
@@ -51,7 +51,7 @@ Presentation changes rerun the walks they touch. A presentation fix once hid the
 
 ## 3. Cold look (before reading anything about the change)
 
-**Calibrate first.** The bar is the owner's approved screens and the rejected examples below. Where a screen has an approval record, look at its approved version before you judge.
+**Calibrate first.** Read [the owner's eye](../taste.md) and open the [house references](../references/README.md): you stand in for the owner, so judge with their eye, not a generic one. Before your scope, rate every pair in `docs/design-workflow/calibration/` (`c1.png`…, BASE left, CANDIDATE right) better / same / worse, blind, and record each in `calibration` in your verdict. These are pairs the owner has ruled on; `--verdict` refuses a judge that rates any of them against the owner. The bar is the owner's approved screens and the rejected examples below. Where a screen has an approval record, look at its approved version before you judge.
 
 **Judge blind.** For §3 and §4 open only the `pairs/` images. Don't open `mechanical.json`, the PR or the builder's notes until §5: check output anchors judgement. Write down every issue you see before you write any verdict. A listed issue is dismissed only by a measurement, never by argument. Finding nothing is a valid result; there is no quota.
 
@@ -63,6 +63,7 @@ Screenshot each screen on BASE and on CANDIDATE in the same state, at 390×844 a
 - inner scrollbars;
 - nested frames (a card on a card);
 - text said twice;
+- the attention budget broken: more than one coloured element in a row, a second line that doesn't change what the worker does, something the header already says, a zero, a derived figure beside its parts (born beside alive and dead), or everything at one weight so nothing stands out;
 - controls glued together;
 - floating elements;
 - colour that means nothing (green means approved or done only);
@@ -74,6 +75,13 @@ Screenshot each screen on BASE and on CANDIDATE in the same state, at 390×844 a
 
 ## 4. Before / after (this decides it)
 
+A new or changed list, card or screen must carry its attention budget and cut list in the PR body ([build.md §1b](build.md#1b-attention-budget-before-any-layout)); without them it fails. Judge it with the cold question first: at a glance, can I tell what needs me and what to do? Compare against the current screen only, never against other candidates.
+
+
+Before judging a changed screen, do the **squint test**: write the first three things your eye lands on in the candidate, in order, and ask whether they are what the worker needs first. A screen where nothing leads, or where a control outweighs the information, fails on hierarchy however calm it looks. Fewer things is not better by itself.
+
+**The absolute bar.** Better than the base is not enough when the base was weak. Every changed screen must also look like it belongs beside the [house references](../references/README.md) (Home, Unit, More actions, Farrowing room): grouped sections with native headers, rows inside groups, a clear rhythm, and no orphan row or dead space at the end. A screen that reads as information stacked on a page fails (R16), even when it is better than its base.
+
 For each pair, judge **better / same / worse** and give the one reason that decides it, naming its dimension: hierarchy, alignment, legibility, touch, state or native fit. Your verdict follows from your issue list, not the other way round. The bar is the screens the owner approved (Farrowing and Inspection): calm, aligned, nothing extra, one surface, ink not colour. A change that meets a rule but looks worse is **worse**. Judge a change that departs from the current pattern by the farmer, not by familiarity: being new never makes it worse, and matching the system never makes it better.
 
 - **Normal**: it passes only if no pair is worse, at least one changed pair is better, and the cold look found no defect. A pair with one side (a new screen, or a removed one) is judged **pass** or **fail**, and any fail fails the change. When no screen changed or was added, only a change declared behaviour (or shared) can pass, on a walk where every entry is ok: a behaviour fix may leave every first frame alone.
@@ -83,7 +91,9 @@ For each pair, judge **better / same / worse** and give the one reason that deci
 
 ## 5. Re-measure the builder's claims
 
-Only now, read the PR body, the README and the references table. Re-measure every numeric or visual claim yourself on CANDIDATE: targets, "0 px different", test counts and "identical". A claim measured on another commit, or not reproducible, is **contradicted**, and a contradicted claim fails the gate.
+Only now, read the PR body, the README, the references table and `features/<id>/critique.md`. Re-measure every numeric or visual claim yourself on CANDIDATE: targets, "0 px different", test counts and "identical". A claim measured on another commit, or not reproducible, is **contradicted**, and a contradicted claim fails the gate.
+
+Then check the critique against the pairs: every **Keep** item is at least as strong on CANDIDATE as on BASE (same or more weight, same place in the order), and every part that changed is named by a **Problem**. A kept element that got weaker, or a part changed with no problem behind it, fails the change: that is how a pass throws away what the original did well.
 
 ## Rejected examples
 
@@ -104,6 +114,9 @@ Each of these was rejected by the owner. The gate must fail a change that shows 
 | R11 | "Passing" badge from an agent score | score never reads as approval |
 | R12 | Conflict markers committed; old wording back after a rebase | merge forward; checks on merged result |
 | R13 | An ✕ in a drawer, or Clear on a filter | drawer convention |
+| R14 | A type pass that met the floors by enlarging everything: a history label and a sample/offline disclaimer kept prime space on the sensor card (2026-10-11) | hierarchy: the attention budget; cluttered fails even when every rule is met |
+| R15 | Calmer but flat: after the cuts, three segmented controls at one weight, the switcher outweighing the reading, and a section with its heading cut (2026-10-11) | hierarchy: cutting facts never cuts structure; one heavy control |
+| R16 | Information stacked on a page: no grouping, "Reading history" floating alone at the end with dead space under it (2026-10-11) | looks undesigned; the absolute bar is the approved screens, not the base |
 
 ## Output
 
@@ -115,6 +128,7 @@ Write `OUT/verdict.json`:
   "pairs": [{ "screen": "", "lang": "en|zh", "width": 390, "verdict": "better|same|worse (both sides) | pass|fail (one side)", "why": "" }],
   "defects": [{ "screen": "", "what": "", "fix": "" }],
   "gone": [{ "screen": "", "why": "" }],
+  "calibration": [{ "pair": "c1", "verdict": "better|same|worse" }],
   "rejected": ["R#"], "contradicted": [""], "notes": "" }
 ```
 `pairs` judges every pair in `mechanical.json`, not only EN 390; a pixel-identical pair is **same**. `gone` accounts for every screen `mechanical.json` lists as removed from the atlas: where its job went, or why it no longer exists.

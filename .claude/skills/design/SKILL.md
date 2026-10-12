@@ -28,12 +28,14 @@ Drive continuously. Don't wait for the owner between steps, and don't ask design
 **plan.** The map has open tickets. Work the frontier as Wayfinder's "Work through the map" says. Research runs in parallel subagents, and tasks the agent can do alone run back to back. Grilling tickets are the owner's: grill them with the grilling skill when the owner is in the session; otherwise leave them and carry on with independent work. When the frontier is empty, write `features/<id>/PRD.md`: Problem · Who · Anchor · Rules · Scope · Not supported · Decisions.
 
 **scenarios.** Run the scenario framework from the README:
-1. The operations inventory from the baseline.
-2. The 95% cut, written into the PRD's "Not supported" section.
+1. The operations inventory from the baseline, in `features/<id>/operations.md` ([template](../../../docs/design-workflow/operations-template.md)).
+2. The 95% cut, written into the PRD's "Not supported" section. `node scripts/scenario-ledger.mjs <feature> check` must pass: the PRD names every not-supported row.
 3. The tree in `features/<id>/scenario-tree.md`.
-4. The matrix ledger.
-5. Walk rounds with [walk.md](../../../docs/design-workflow/briefs/walk.md) until settled, capped or stuck.
+4. The matrix ledger: `node scripts/scenario-ledger.mjs <feature> init`.
+5. Walk rounds with [walk.md](../../../docs/design-workflow/briefs/walk.md) until settled, capped or stuck. Each round: you open it (`scenario-ledger round`, `--fresh` for walkers who weren't given the paths), the walkers `mark` their rows, you `close` it. The ledger applies the stop rules; `status` reads them.
 6. Leaves in `features/<id>/scenarios.json`, each with its given / when / then.
+
+This mode is done only when the ledger says **settled**. On capped or stuck, commit `review/scenario-ledger-<feature>.json`, report what is open, and stop; the owner rules the questions.
 
 A product question becomes a grilling ticket on the feature's map. For a feature with no map, open a small one, with the question as its first ticket.
 

@@ -463,3 +463,80 @@ a { color:var(--ink); text-decoration:underline; text-underline-offset:2px }
 .fcrumb .meta { margin-left:12px; font-size:12px; display:inline-flex; gap:6px; align-items:center; overflow:hidden; text-overflow:ellipsis }
 .fcrumb .meta a { text-decoration:underline }
 .flowcol > .flowwrap { top:52px } .flowcol > .notes { top:52px }
+
+/* Feature page: Scenarios view (scenarios.js). One surface: rows, hairline connectors, no boxes. Colour only where it
+   means something: a failure is red, an open question amber; a pass stays plain ink (a test result, never approval). */
+.fcrumb .fview { margin-left:auto; flex:none } .fcrumb .fview button { padding:4px 13px; font-size:12.5px }
+.fvbad { display:inline-block; margin-left:4px; padding:0 6px; border-radius:999px; background:#c0502a; color:#fff; font:600 10.5px/16px var(--mono) }
+.flowwrap[hidden], .zoom[hidden], .scnwrap[hidden] { display:none }
+.scnwrap { position:absolute; top:52px; left:0; right:0; bottom:0; overflow:auto; background:var(--ground); z-index:1 }
+.flowcol.notes-open .scnwrap { left:440px }
+.scn { max-width:980px; padding:0 28px 80px }
+.scn-bar { position:sticky; top:0; z-index:3; background:var(--ground); padding:14px 0 10px; border-bottom:1px solid var(--line) }
+.scn-bar .bkbar { margin:0 0 8px; flex-wrap:nowrap }
+.scn-bar .bkc { align-items:center; white-space:nowrap } .scn-bar .bkc .rg { margin-right:1px }
+.scn-bar .bkc[disabled] { opacity:.55; cursor:default }
+.scn-bar .bkc[aria-pressed=true] .rg { box-shadow:0 0 0 1.5px var(--paper) }
+.scn-bar .search { margin:0 0 0 auto; width:190px; flex:none; padding:5px 11px; font-size:12.5px; border-radius:999px }
+.scn-all { flex:none; font-size:12.5px; font-weight:600; text-decoration:underline; text-underline-offset:2px; white-space:nowrap }
+.scn-run { margin:0; font-size:12px; color:var(--muted) } .scn-run code { font:11.5px var(--mono); color:var(--ink) }
+.rg { display:inline-flex; align-items:center; justify-content:center; flex:none; width:16px; height:16px; border-radius:50%; font:700 10px/1 var(--sans); font-style:normal; box-sizing:border-box }
+.r-pass { background:var(--wash); border:1px solid #cfd6c7; color:var(--ink) }
+.r-fail { background:#c0502a; color:#fff }
+.r-question, .r-blocked { background:var(--amber-wash); border:1px solid #e3d2a2; color:var(--amber) }
+.r-pending { border:1.5px dashed #9aa394 }
+.r-not-run { border:1.5px solid #c9cfc2; color:var(--muted) }
+.scn-branch { border-bottom:1px solid var(--line) }
+.scn-branch .bh { display:flex; align-items:center; gap:10px; width:100%; padding:13px 4px; text-align:left }
+.scn-branch .bh:hover .bn { text-decoration:underline; text-underline-offset:2px }
+.scn-branch .caret { width:12px; flex:none; color:var(--muted); font-weight:700; transition:transform .12s; text-align:center }
+.scn-branch[data-open=true] > .bh .caret { transform:rotate(90deg) }
+.scn-branch .bn { flex:none; font-weight:700; font-size:14.5px }
+.scn-branch .bl { flex:1; min-width:0; color:var(--muted); font-size:12.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
+.scn-branch .tally { flex:none; display:flex; gap:12px; font:600 12px var(--mono) } .scn-branch .tp { display:inline-flex; align-items:center; gap:5px }
+.scn-branch .tally .tn { color:var(--muted) }
+.scn-tree ul { list-style:none; margin:0; padding:0 0 0 24px }
+.scn-tree ul.tr { margin:0 0 16px; padding-left:26px }
+.scn-tree li.state, .scn-tree li.act, .scn-tree li.leaf { position:relative }
+.scn-tree li.state::before, .scn-tree li.act::before, .scn-tree li.leaf::before { content:''; position:absolute; left:-15px; top:0; bottom:0; border-left:1px solid #d3d9cc }
+.scn-tree li.state:last-child::before, .scn-tree li.act:last-child::before, .scn-tree li.leaf:last-child::before { bottom:auto; height:17px }
+.scn-tree li.state::after, .scn-tree li.act::after, .scn-tree li.leaf::after { content:''; position:absolute; left:-15px; top:17px; width:11px; border-top:1px solid #d3d9cc }
+.scn-tree .sr { display:flex; align-items:center; gap:10px; width:100%; min-height:34px; padding:6px 10px; border-radius:9px; text-align:left; font-weight:700; font-size:13px }
+.scn-tree .sr:not([disabled]):hover { background:var(--paper) } .scn-tree .sr[disabled] { cursor:default }
+.scn-tree li.state.cur > .sr { background:var(--paper); box-shadow:inset 0 0 0 1.5px var(--ink) }
+.scn-tree .sr .sl { flex:1; min-width:0 }
+.scn-tree .sr .ss { flex:none; display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:500; color:var(--muted) }
+.scn-tree .sr .ss svg { flex:none }
+.scn-tree .ar { display:block; min-height:34px; padding:7px 10px; font-size:13px; color:var(--muted) }
+.scn-tree .lr { display:flex; align-items:center; gap:9px; width:100%; min-height:34px; padding:6px 10px; border-radius:9px; text-align:left; font-size:13px; line-height:1.4 }
+.scn-tree .lr:hover, .scn-tree .leaf.open > .lr { background:var(--paper) }
+.scn-tree .lt { flex:1; min-width:0 }
+.scn-tree .leaf.k-fail .lt { font-weight:600 }
+.scn-tree .tid { flex:none; font:500 11px var(--mono); color:var(--muted) }
+.scn-tree .qtag { flex:none; font:600 11px var(--mono); color:var(--amber) }
+.scn-tree .htag { flex:none; padding:0 6px; border-radius:5px; background:#f8e7df; border:1px solid #e2b9a6; color:#a8431f; font-size:10.5px; font-weight:700; white-space:nowrap }
+.scn-tree .ld { margin:2px 0 10px 35px; padding:6px 0 4px 14px; border-left:2px solid var(--line); font-size:12.5px; line-height:1.5; display:grid; gap:10px }
+.scn-tree .ld[hidden] { display:none }
+.scn-tree .ld b { display:block; margin-bottom:2px; font-size:10.5px; font-weight:700; letter-spacing:.07em; text-transform:uppercase; color:var(--muted) }
+.scn-tree .ld ul { list-style:none; margin:0; padding:0 } .scn-tree .ld li { margin:2px 0 }
+.scn-tree .ld code { font:11.5px var(--mono); background:var(--wash); padding:0 4px; border-radius:4px }
+.scn-tree .why.fail b { color:#a8431f }
+.scn-tree .gwt { display:grid; grid-template-columns:48px 1fr; gap:3px 12px }
+.scn-tree .gwt .gk { padding-top:2px; font-size:10.5px; font-weight:700; letter-spacing:.07em; text-transform:uppercase; color:var(--muted) }
+.scn-tree .srcs .sk { font-weight:600 } .scn-tree .srcs q { color:var(--muted) }
+.scn-tree .lid { font:11px var(--mono); color:var(--muted) }
+.scn-branch.ns { margin-top:22px; border-top:1.5px dashed #c9cfc2; border-bottom:0 }
+.scn-branch.ns[data-open=false] .nslist { display:none }
+.nslist { list-style:none; margin:0 0 16px; padding:0 0 0 26px }
+.nslist li { display:grid; grid-template-columns:minmax(160px, 280px) 1fr; gap:18px; padding:8px 0; border-top:1px solid var(--line); font-size:13px }
+.nslist li:first-child { border-top:0 } .nslist li b { font-weight:600 } .nslist li span { color:var(--muted) }
+.scn-foot { margin:22px 4px 0; font-size:12.5px; color:var(--muted) } .scn-foot b { color:var(--ink); font-weight:600 }
+.scn .none { margin:22px 4px }
+.scn-empty { margin:56px auto 0; max-width:640px; padding:26px 32px; display:flex; flex-direction:column; gap:6px; align-items:center; text-align:center; color:var(--muted); border:1.5px dashed #c9cfc2; border-radius:18px }
+.scn-empty b { color:var(--ink); font-size:15px } .scn-empty code { font:12px var(--mono); color:var(--ink) }
+.scn-branch .tally { display:grid; grid-auto-flow:column; grid-auto-columns:44px; gap:0 }
+.scn-bar .bkc[disabled] .rg { filter:grayscale(1); opacity:.7 }
+.scn-empty { margin:22px 0 0; max-width:none; padding:14px 18px; display:block; text-align:left; font-size:13px; border-radius:12px }
+.scn-empty b { font-size:13px; font-weight:700 }
+.scn-branch.ns .tally { display:block; font:600 12px var(--mono); color:var(--muted) }
+.scn-bar .bkbar { flex-wrap:wrap; row-gap:8px }

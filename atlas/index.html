@@ -15,6 +15,9 @@
        flow is plain shapes until you ask.
      - Feature page, right: the live phone for the selected node, docked so the flow stays visible.
      - Notes: behind a button under the phone and closed by default; they are reference, not the first read.
+     - Scenarios: the other half of the Flow | Scenarios switch at the right of the breadcrumb. The feature's scenario
+       tree, drawn from its scenario files, takes the flow's place; branches fold to one line with their tally, so a
+       53-leaf tree reads as seven lines first. The phone stays docked and shows the screen a state starts on.
      - Components / Copy: a left list and a pane, one nav each; a component's usage and status sit on
        its own page, not in the list.
      - Old UI: the only place Figma appears. -->
@@ -37,6 +40,7 @@
 <section class="feature" id="feature" hidden></section>
 <script src="app.js"></script>
 <script src="feature.js"></script>
+<script src="scenarios.js"></script>
 <script src="library.js"></script>
 <script src="boot.js"></script>
 </body>
