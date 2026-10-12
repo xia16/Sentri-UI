@@ -88,7 +88,9 @@
 .scope-unit small{font-size:10px;color:var(--muted);font-weight:400}
 .scope-unit svg{width:15px;height:15px}
 
-.unit-picker .unit-picker-count{flex:none;font-size:11px;margin:0 0 8px;color:var(--muted)}
+/* Choose a unit: the More actions pattern, the whole sheet on the tinted background and the list one white card. */
+.sheet.unit-picker,.unit-picker .sheet-body,.unit-picker .sheet-footer{background:var(--app-background)}
+.unit-picker .st-panel.st-choice-panel{background:var(--paper)}
 .visually-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 /* One work heading, with task names belonging to their cards. */
 .work-section-heading{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:5px 2px 12px}

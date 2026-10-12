@@ -334,7 +334,7 @@
         "elements": [
           {
             "name": "Unit row",
-            "shows": "Unit 6 · 8 pigs · 4 pens · 2 tasks",
+            "shows": "Unit 6 · 8 pigs · 4 pens · 2 tasks: the unit's own overview, not one task's state. One white grouped card on the tinted sheet (the More actions and Your sections pattern).",
             "states": [
               {
                 "state": "Has work",
@@ -349,7 +349,7 @@
               {
                 "state": "Current",
                 "when": "A unit is already chosen",
-                "shows": "aria-current on its row; the direction doc asks for a tint and check, the code sets only the attribute"
+                "shows": "A tick on its row (and aria-current), as on Your sections"
               }
             ],
             "logic": "The count is open tasks in the section with unrecorded rows in this unit, so a waiting task counts and can disagree with the cards the unit screen shows. Pigs and pens come from units{}; in the Farrowing section they are overridden (Unit 6: 8 pigs, 4 pens; Unit 7: 7, 4; Unit 8: 4, 2) to match the Farrowing prototype.",
@@ -360,12 +360,14 @@
         ],
         "controls": [],
         "copy": [
-          "(raw) Farrowing units · All 3 units · Unit 6 · 8 pigs · 4 pens · 2 tasks · Back"
+          "(raw) Choose a unit · Farrowing · 3 units · Unit 6 · 8 pigs · 4 pens · 2 tasks · Back"
         ],
         "edge": [
           "Units with no tasks still appear."
         ],
-        "rules": [],
+        "rules": [
+          "Choosing a unit is about the unit, not a task: the rows never show one task's state (owner, 2026-10-12). It is a Home screen; Farrowing is reached from the unit view's Farrowing card, not from here."
+        ],
         "issues": [
           "\"2 tasks\" counts tasks with unrecorded rows, waiting ones included; the label does not say what it counts."
         ]
