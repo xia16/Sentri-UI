@@ -3692,7 +3692,7 @@
         },
         {
          "text": "Scanning",
-         "in": ".scan-head"
+         "in": ".scan-page .utility-header"
         },
         {
          "text": "Stop scanning"
@@ -3814,7 +3814,7 @@
          "visible": [
           {
            "text": "Stopped",
-           "in": ".scan-head"
+           "in": ".scan-page .utility-header"
           },
           {
            "text": "Resume scanning"
@@ -3856,7 +3856,7 @@
            "visible": [
             {
              "text": "Scanning",
-             "in": ".scan-head"
+             "in": ".scan-page .utility-header"
             },
             {
              "text": "Stop scanning"
@@ -3947,13 +3947,13 @@
            "text": "1 sow selected"
           },
           {
-           "el": ".scan-dock .scan-selected",
+           "el": ".scan-foot .scan-selected",
            "is": "present"
           }
          ],
          "record": [
           {
-           "expr": "!document.querySelector('.scan-dock .scan-selected').closest('button') && !document.querySelector('.scan-dock .scan-selected svg')",
+           "expr": "!document.querySelector('.scan-foot .scan-selected').closest('button') && !document.querySelector('.scan-foot .scan-selected svg')",
            "says": "the count is not a button and has no chevron",
            "hard": "broken-ruling"
           }

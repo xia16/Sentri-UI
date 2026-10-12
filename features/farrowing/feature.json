@@ -3241,7 +3241,8 @@
           "A real scan comes from a Bluetooth tag reader. The prototype has no reader: a \"Simulate scan\" control above the phone (outside the frame, hidden in the atlas) adds the next sample sow, and the sample sows repeat, which shows the repeat-scan highlight. ?scanner=off opens the page as if no reader were paired."
         ],
         "rules": [
-          "Owner decision 2026-10-12: the scanner always listens; each scan adds the sow to a list; a repeat scan highlights her row; ticks are for bulk."
+          "Owner decision 2026-10-12: the scanner always listens; each scan adds the sow to a list; a repeat scan highlights her row; ticks are for bulk.",
+          "A sub-page of the room, drawn as a Sheet page (like the Farrowing log): the head is the title, the subtitle \"Farrowing · <unit>\" and the Scanning/Stopped status, with no back button in the head; Back sits in the footer beside Stop or Resume scanning. With sows ticked the footer is the plain count and Actions; with no scanner connected it is Back alone (owner, 2026-10-12)."
         ],
         "issues": []
       }

@@ -418,9 +418,12 @@ function scanPage(c){
  const body=!sc.connected?scanEmpty('Scanner not connected',"Turn on the tag reader and pair it in your phone's Bluetooth settings. Scanning starts as soon as it connects."):
   !items.length?(sc.listening?scanEmpty('Hold the reader to an ear tag','Each sow you scan appears here.'):scanEmpty('Scanning is stopped','Resume scanning to add sows.')):
   `<div class="scan-body">${group('In '+c.unit.name,items.filter(h=>h.unit.id===c.unitId),true)}${group('Other units',items.filter(h=>h.unit.id!==c.unitId),false)}</div>`;
- const dock=!sc.connected?'':n?`<nav class="room-dock scan-dock" aria-label="Selected sows"><p class="scan-selected">${n} ${n===1?'sow':'sows'} selected</p>${SentriUI.button({label:'Actions',icon:icon('more'),register:'primary',action:'room-scan-actions'})}</nav>`:
-  `<nav class="room-dock scan-dock" aria-label="Scanner">${SentriUI.button({label:sc.listening?'Stop scanning':'Resume scanning',icon:icon(sc.listening?'stop':'scan'),register:sc.listening?'secondary':'primary',className:'scan-toggle',action:'room-scan-toggle'})}</nav>`;
- return `${status()}<div class="find-page scan-page"><header class="scan-head">${SentriUI.iconButton({action:'room-back',icon:icon('back-chevron'),label:'Back'})}<div class="scan-title">${SentriUI.heading({title:'Scan ear tags',description:'Farrowing · '+c.unit.name,kind:'page',level:2})}</div>${pill}</header>${body}${dock}</div>`;
+ // A sub-page of the room, so the Sheet page pattern (the Farrowing log, Piglets): a head with title and subtitle, no back in the head,
+ // Back in the footer beside the act. Ticked sows swap the footer for the count and Actions, as Inspection's selection footer does.
+ const back=SentriUI.backButton({action:'room-back'});
+ const foot=!sc.connected?footer(back):n?footer(`<p class="scan-selected">${n} ${n===1?'sow':'sows'} selected</p>`,SentriUI.button({label:'Actions',icon:icon('more'),register:'primary',action:'room-scan-actions'}),'scan-foot'):
+  footer(back,SentriUI.button({label:sc.listening?'Stop scanning':'Resume scanning',icon:icon(sc.listening?'stop':'scan'),register:sc.listening?'secondary':'primary',className:'scan-toggle',action:'room-scan-toggle'}),'scan-foot');
+ return SentriUI.sheet({variant:'page',title:'Scan ear tags',subtitle:'Farrowing · '+c.unit.name,aside:pill,body,footer:foot,className:'feature-page scan-page',label:'Scan ear tags',bar:status()});
 }
 const pageUnder=(s,c)=>s.view==='roomScanActions'?'roomScan':s.view;
 function findPage(s){const c=roomContext(s),under=pageUnder(s,c);return under==='roomSearch'?searchPage(c):under==='roomScan'?scanPage(c):'';}
