@@ -43,11 +43,11 @@ If something approved already does the job, start from it. You may improve it ([
 
 ## 1a. Critique the original (before the budget)
 
-Do this before the budget and before you draw. Read [the owner's eye](../taste.md) first: what good looks like here and the three ways earlier passes lost (cluttered, flat, bulky). Then look at your baselines at 390px, beside an approved screen (Farrowing), and at the calibration pairs in `docs/design-workflow/calibration/`. Write **`features/<id>/critique.md`** and commit it before any screen change; the gate refuses screen changes without it. It has `## Keep`, `## Problems` and `## Parts`, written now, and `## Self-crit`, written in §1d:
+Do this before the budget and before you draw. Read [the owner's eye](../taste.md) first: what good looks like here and the three ways earlier passes lost (cluttered, flat, bulky). Then open the [house references](../references/README.md) (Home, Unit, More actions, Farrowing room: the screens the owner holds up as the product's taste) and look at your baselines at 390px beside them, and at the calibration pairs in `docs/design-workflow/calibration/`. Write **`features/<id>/critique.md`** and commit it before any screen change; the gate refuses screen changes without it. It has `## Keep`, `## Problems` and `## Parts`, written now, and `## Self-crit`, written in §1d:
 
 - **`## Keep`**: what the original does well, named element by element, with why it works (e.g. "the 34px reading is the first thing the eye lands on: it answers 'is the room OK?'"). A designer keeps what works. A kept element survives at least as strong as it was: same or more weight, same position in the order. It changes only when a problem below names it.
 - **`## Problems`**: what is broken, each with its evidence: a check's output (`check-legibility`, `check-states`), an owner rule or rejected example it breaks, or a worker question it fails to answer, with the element named. Mark each **major** (the worker misreads, can't act, or can't read it in the barn) or **minor**. Taste without evidence is not a problem.
-- **`## Parts`**: every visible part of the screen, what draws it (a SentriUI component by name, or "page-built" with its file) and whether you keep it, fix it or cut it.
+- **`## Parts`**: every visible part of the screen, what draws it today (a SentriUI component by name, or "page-built" with its file), **the existing component whose job it is**, and whether you keep it, fix it or cut it. Run `node scripts/component-jobs.mjs` (or `… <word>`, e.g. `history`, `facts`, `progress`) and read the one-line job of every component before you fill that column. A part drawn by hand, or by the wrong component, when an existing one does its job is a problem in its own right: reading history in a web `<table>` is Log's job; label and value pairs are Facts; a list of destinations is Row. Build a new component only when the list has nothing for the job, and say which ones you ruled out.
 
 **A check never redesigns a kept part.** When a mechanical check fails a part on your keep-list (often right after you extract it, since checks now see it), don't change the part to satisfy the check: the owner kept it, so the check is what to question. Stop, say which check and which part in your final message, and leave the part as it was; the driver fixes or narrows the check in a workflow PR. A segmented control's track inside a card was once turned into two pill buttons this way.
 
@@ -98,6 +98,7 @@ Do this after the budget, so you don't extract what you are about to cut. The ow
 
 For each page-built part on the keep-list, or one a problem asks you to change:
 
+0. **Is it already a component?** If `component-jobs` names one for this job, move the part onto that component (a variant if it needs one) instead of extracting a new one; prove the screen still reads the same, then improve it.
 1. **Extract it as it is.** Build it in the design system (`bundle.js` / `bundle.css`, a README and its variants) from the page's current markup and look, in tokens. Point the page at it and delete the page's styling for it.
 2. **Prove identity.** Render the screen before and after the extraction (`node scripts/shoot-screens.mjs`, or Playwright at 390×844). They must match; commit the extraction on its own.
 3. **Then improve it**, in the component, and only where a problem names it.
@@ -113,7 +114,7 @@ A part a component already draws stays on that component; improve the component 
    - each keep item: as strong as before or not;
    - the squint test: the first three things the eye lands on, and the worker's first three questions;
    - [the owner's eye](../taste.md): is it more cluttered (c1: everything bigger), flatter (c2: structure removed) or bulkier (c3: more boxes, bold and size) than the original? Is there one light hero per group with small quiet support?
-   - does it look like the same product as the approved screens, at their level of finish?
+   - does it look like it belongs beside the [house references](../references/README.md) (rows not boxes, small headings outside the cards, one hero per card, colour only for state, one dark control)? Name the reference you held it against.
    - the rejected examples (gate.md, R1–R16) it could show;
    - one line: **better because …** or **not better because …**.
 4. **Iterate.** Fix what the crit found, re-render and criticise again. Keep going while each round gets closer; drop a direction that doesn't.

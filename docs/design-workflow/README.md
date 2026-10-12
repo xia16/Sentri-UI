@@ -108,6 +108,7 @@ Every rejected owner example is a fixture each gate must fail ([gate.md](briefs/
 | `node scripts/gate.mjs --candidate <branch> --scope <features>` | The mechanical gate on the exact merge candidate: every check, every screen diffed against main, the before/after pairs for the judge ([gate.md](briefs/gate.md)) |
 | `node scripts/polish-loop.mjs <command> <feature>` | The polish loop's ledger: baseline, rounds, grades, stop conditions and the review packet ([polish-loop.md](briefs/polish-loop.md)) |
 | `node scripts/feature-state.mjs <feature>` | Where a feature stands and what `/design` drives next: chart, plan, scenarios, build, polish, review or freeze |
+| `node scripts/component-jobs.mjs [word]` | One line per design-system component saying what job it does, so a builder names the existing component before building a new one |
 | `node scripts/shoot-screens.mjs <out>` | Screenshots atlas screens bare at any widths and languages, and says where Chinese doesn't render |
 
 ## Briefs
