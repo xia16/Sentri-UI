@@ -239,3 +239,13 @@ A component page and its HTML/CSS/JS pass if:
 - TDesign Mobile Vue: <https://tdesign.tencent.com/mobile-vue>, source <https://github.com/Tencent/tdesign-mobile-vue/tree/develop/src>
 - Polaris: <https://shopify.dev/docs/api/polaris>
 - Atlassian Design System: <https://atlassian.design/components>, <https://atlassian.design/contribution>
+
+## Delivering a component
+
+(Moved here from the build brief, 2026-10-12.)
+
+1. `components/<Name>/variants.json`: `[{ "id", "name", "use", "notUse", "states": [...] }]`. Keep it to the smallest set that covers real Sentri screens.
+2. `components/<Name>/variants/<id>.html` per variant, with every state that applies (atlas authoring rules: `atlas/SCHEMA.md`).
+3. A `README.md` in this standard's anatomy: purpose, when / when not, anatomy, variants, states, behaviour, content and wrapping rules, accessibility, do / don't, related, classification. Its first sentence states the job: `scripts/component-jobs.mjs` lists it.
+4. The implementation in `bundle.js` + `bundle.css` (+ `index.d.ts`). Keep call signatures working or update every caller.
+5. Migrate every prototype that hand-builds this job onto the component, and delete the copies. Rebuild any generated prototype (e.g. `ux/tasks/piglet-processing/simple/build.mjs`).
