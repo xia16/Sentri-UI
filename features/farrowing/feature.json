@@ -103,9 +103,9 @@
     },
     {
       "section": "Home",
-      "label": "via Choose unit",
-      "from": "workbench.choose-unit",
-      "control": "Choose unit",
+      "label": "via a unit",
+      "from": "workbench.unit-farrowing",
+      "control": "Farrowing",
       "lands": "farrowing.room"
     }
   ],

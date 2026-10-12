@@ -268,17 +268,20 @@
   if(window.AtlasBare&&AtlasBare.bare)new MutationObserver(()=>AtlasBare.watch(atlasScreen)).observe(overlay,{childList:true,subtree:true,attributes:true,attributeFilter:['class']});
   function closeDrawer(){overlay.innerHTML='';state.overlay=null;app.inert=false;if(returnFocus?.isConnected)returnFocus.focus();}
   function dialog(title,description,primary){returnFocus=document.activeElement;app.inert=true;overlay.innerHTML=SentriUI.sheet({variant:'dialog',title,icon:'alert',subtitle:description,label:title,footer:SentriUI.sheetFooter({back:{action:'close'},hold:{label:primary.label,caption:'HOLD TO END',action:primary.action,tone:'danger'}})});overlay.querySelector('.dialog')?.focus({preventScroll:true});}
-  function drawer(title,body,{size='medium',sizing='content'}={}){returnFocus=document.activeElement;app.inert=true;overlay.innerHTML=SentriUI.sheet({title,body,size,sizing,label:title,close:{action:'close',label:'Close dialog'},scrim:{action:'close',label:'Close dialog'},footer:SentriUI.sheetFooter({back:{action:'close'}})});const primary=overlay.querySelector('.sheet-body .primary, .sheet-body [data-drawer-primary]');if(primary){const form=primary.closest('form');if(form)primary.setAttribute('form',form.id);overlay.querySelector('.sheet-footer').append(primary);}overlay.querySelector('.sheet,.dialog')?.focus({preventScroll:true});}
+  function drawer(title,body,{size='medium',sizing='content',subtitle=''}={}){returnFocus=document.activeElement;app.inert=true;overlay.innerHTML=SentriUI.sheet({title,subtitle,body,size,sizing,label:title,close:{action:'close',label:'Close dialog'},scrim:{action:'close',label:'Close dialog'},footer:SentriUI.sheetFooter({back:{action:'close'}})});const primary=overlay.querySelector('.sheet-body .primary, .sheet-body [data-drawer-primary]');if(primary){const form=primary.closest('form');if(form)primary.setAttribute('form',form.id);overlay.querySelector('.sheet-footer').append(primary);}overlay.querySelector('.sheet,.dialog')?.focus({preventScroll:true});}
+  // Choose a unit: the unit's own overview (pigs, pens, open tasks), not any one task's state. The list follows Your sections and
+  // More actions: one white grouped card on the tinted sheet, the current unit ticked.
   function unitChoices(){
     const all=section().units;
     const list=overlay.querySelector('#unit-options');
-    list.innerHTML=all.map(u=>{
-      const info=unitInfo(u),count=remaining(u).length;
-      return SentriUI.row({variant:'scope',title:'Unit '+u,description:(state.unit===u?'Current unit · ':'')+info.pigs+' pigs · '+info.pens+' pens',trailing:{text:count?count+' '+(count===1?'task':'tasks'):'No tasks'},attrs:state.unit===u?{'aria-current':'location'}:{},wrap:true,action:'pick-unit',value:u});
-    }).join('');
+    // Rows as on More actions: a unit tile (the Inspect unit card's grid icon), the unit name over its overview; the current unit is the highlighted row.
+    list.innerHTML='<div class="st-panel st-row-group unit-group">'+all.map(u=>{
+      const info=unitInfo(u),count=remaining(u).length,current=state.unit===u;
+      return SentriUI.row({variant:'navigation',icon:icon('grid'),title:'Unit '+u,description:info.pigs+' pigs · '+info.pens+' pens · '+(count?count+' '+(count===1?'task':'tasks'):'No tasks'),trail:'none',attrs:current?{'aria-current':'location'}:{},action:'pick-unit',value:u});
+    }).join('')+'</div>';
   }
   function showUnits(){
-    drawer(section().name+' units',`<p class="unit-picker-count">All ${section().units.length} units</p><div id="unit-options" class="unit-options st-choice-panel" role="group" aria-label="Units"></div>`);
+    drawer('Choose a unit',`<div id="unit-options" class="unit-options"></div>`,{subtitle:section().name});
     overlay.querySelector('.sheet,.dialog').classList.add('unit-picker');unitChoices();
   }
   function selectScope(unit){
