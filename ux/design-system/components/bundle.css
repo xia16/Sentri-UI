@@ -993,3 +993,6 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 /* A device that cannot change says so with its surface and rim, never with faded text (farm legibility law). */
 .st-device :is(button,input):disabled{opacity:1}
 .st-device input[type=range]:disabled{accent-color:var(--control-border)}
+/* Controls in a device card sit a clear step apart (check-states: at least 8px). */
+.st-device input[type=range]{margin-bottom:var(--space-12)}
+.st-device>.button,.st-device>[data-ds="Button"]{margin-top:var(--space-12)}

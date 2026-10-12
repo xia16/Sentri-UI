@@ -57,3 +57,7 @@ Extraction first: `SensorTrend` and `DeviceControl` drawn exactly as the page dr
 ### Final look
 
 Rendered at 390 and 360 from `35ead5d` (code identical to the pushed head; later commits only touch this file), after merging origin/main (already up to date). Opened each of the four screens beside its baseline: header unchanged (the 360 title wraps on main too), nothing new wraps, the fan card sits about 16px lower, no console errors. Nothing got worse.
+
+### Final look (crit round 1)
+
+Crit round 1: check-states flagged the slider and Save as glued together in DeviceControl (Manual, Applied). Fixed in the component (12px between slider and Save); `check-states` now has no problem on DeviceControl or SensorTrend. Re-rendered the four screens at 390 and 360 from the pushed head after merging origin/main and looked at each beside its baseline: only the gap above Save grew, nothing wraps, no other change. Nothing got worse.
