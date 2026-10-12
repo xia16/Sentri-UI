@@ -1,0 +1,7 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=390">
+<meta name="expect" content="small">
+<style>body{margin:0;font:16px/1.4 sans-serif;color:#1c2418;background:#fff}.frame{height:844px;overflow:hidden}.scroll{height:100%;overflow-y:auto;padding:16px;box-sizing:border-box}.tall{height:1400px}</style>
+<!-- A phone frame that clips, a scroll area inside it, and 10px text only reachable by scrolling: the check must scroll to it. -->
+<div class="frame"><div class="scroll"><p>Top of the screen, 16px.</p><div class="tall"></div><p style="font-size:10px">coming up · 10px meta below the fold</p></div></div>

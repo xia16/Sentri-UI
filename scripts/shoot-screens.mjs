@@ -6,7 +6,7 @@
 // instead of passing off an English screenshot as Chinese. Bare screens are pinned to 390; other widths override that the way
 // scripts/run-scenarios.mjs does (nothing in the page changes, only the phone's width).
 import { spawn, execSync } from 'node:child_process';
-import { createRequire } from 'node:module';
+import { playwright } from './playwright-path.mjs';
 import { createServer } from 'node:net';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -15,8 +15,15 @@ import { screensOf } from './loop-rules.mjs';
 import { routeFonts } from './font-route.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const PW_HOME = 'C:/Users/ying_/.cache/adam-design/playwright-1.63.0';
-const { chromium } = createRequire(PW_HOME + '/package.json')(process.env.SENTRI_PLAYWRIGHT || PW_HOME + '/node_modules/playwright');
+// A sheet that slides in, or a backdrop that blurs, is still moving 250ms after load on a slow machine: wait for every finite
+// animation and transition to finish (at most 3s), then two frames, so a shot never catches a screen mid-motion.
+async function settle(page) {
+  await page.evaluate(() => Promise.race([
+    Promise.all(document.getAnimations().filter((a) => a.effect?.getComputedTiming().endTime !== Infinity).map((a) => a.finished.catch(() => {}))),
+    new Promise((r) => setTimeout(r, 3000)),
+  ]).then(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)))));
+}
+const { chromium } = playwright();
 
 const argv = process.argv.slice(2);
 const opt = (k) => { const i = argv.indexOf('--' + k); return i >= 0 ? argv[i + 1] : null; };
@@ -54,9 +61,14 @@ for (const width of widths) {
   // External fonts load over the network. A font that fails to load renders in the fallback face and shows as a pixel change on
   // every screen that uses it, so a failed font request retries the screen (3 tries) and is reported, never shot silently.
   const fontFailures = new Set();
-  const page = await context.newPage();
-  page.on('requestfailed', (r) => { if (/^https:\/\/fonts\.(googleapis|gstatic)\.com\//.test(r.url())) fontFailures.add(r.url()); });
   for (const c of todo) for (const lang of langs) {
+    // A fresh tab per shot: a screen that goes back in history would otherwise land on the screen shot before it.
+    const page = await context.newPage();
+    // The clock starts at a fixed moment and then runs: a screen that prints "now" (a receipt's time) would otherwise differ
+    // from minute to minute, and a frozen clock would stall the screens' own tap guards and timers.
+    await page.clock.install({ time: new Date('2026-10-11T09:41:00') });
+    await page.clock.resume();
+    page.on('requestfailed', (r) => { if (/^https:\/\/fonts\.(googleapis|gstatic)\.com\//.test(r.url())) fontFailures.add(r.url()); });
     const file = path.join(out, c.id, `${lang}-${width}.png`);
     const run = { screen: c.id, feature: c.feature, lang, width, file: path.relative(out, file).replace(/\\/g, '/'), ok: false };
     try {
@@ -69,6 +81,7 @@ for (const width of widths) {
         await page.waitForSelector('html.atlas-ready', { timeout: 10000 });
         await page.evaluate(() => document.fonts.ready.then(() => true));
         await page.waitForTimeout(250);
+        await settle(page);
         if (!fontFailures.size) break;
         if (attempt === 3) throw new Error(`an external font failed to load 3 times (${[...fontFailures][0]})`);
       }
@@ -82,6 +95,7 @@ for (const width of widths) {
       }
       run.ok = true;
     } catch (e) { run.error = e.message.split('\n')[0]; }
+    await page.close();
     runs.push(run);
     console.log(run.ok ? 'OK  ' : 'FAIL', `${lang}-${width}`, c.id, run.zh === 'ignored' ? '(no zh rendering)' : '', run.error || '');
   }

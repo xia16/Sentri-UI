@@ -4,22 +4,22 @@
 //   --feature   only the screens of one feature (does not write review/legibility.json)
 //   --changed   the screen ids a PR touches (comma or space separated); the exit code is 1 only when one of them fails
 //   --compare   with --changed: the base server. A changed screen then fails only when it has MORE violations than the same
-//               screen at the base (per category), or a violation on an element that had none there. Use until the type pass lands.
-//   --strict    exit 1 when any screen fails (the absolute floors). The gate runs strict, not compare, once
+//               screen at the base (per category), or a violation on an element that had none there. Used while the gate line says no-regression.
+//   --strict    the absolute floors: exit 1 when any screen fails, or with --changed when a changed screen does. The gate runs strict, not compare, once
 //               docs/design-workflow/README.md says "Legibility gate: strict".
 // Writes review/legibility.json. Floors: ux/design-system/README.md, "The farm legibility law".
-import { createRequire } from 'node:module';
+import { playwright } from './playwright-path.mjs';
 import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const PW = process.env.PLAYWRIGHT_DIR || 'C:/Users/ying_/.cache/adam-design/playwright-1.63.0/node_modules/playwright';
-const { chromium } = createRequire('C:/Users/ying_/.cache/adam-design/playwright-1.63.0/package.json')(PW);
+const { chromium } = playwright();
 const TYPES = { '.html': 'text/html', '.css': 'text/css', '.js': 'text/javascript', '.mjs': 'text/javascript', '.cjs': 'text/javascript', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.webp': 'image/webp', '.gif': 'image/gif', '.woff': 'font/woff', '.woff2': 'font/woff2', '.ttf': 'font/ttf', '.otf': 'font/otf', '.md': 'text/plain' };
 
-const FLOORS = { minText: 13, bodyText: 16, contrast: 4.5, contrastPrimary: 7, tap: 48 };
+// minText: quiet descriptive text; actText: text inside a control (what a worker reads to act on). Owner, 2026-10-11.
+const FLOORS = { minText: 11, actText: 13, bodyText: 16, contrast: 4.5, contrastPrimary: 7, tap: 48 };
 
 const argv = process.argv.slice(2);
 const flag = (n) => argv.includes(n);
@@ -49,7 +49,7 @@ function auditInPage(F) {
 
   // is a box really on screen: inside the frame, not clipped by an overflow:hidden ancestor, not faded or hidden
   const shown = (el, r) => {
-    if (r.right <= 0 || r.left >= W || r.bottom <= 0) return false;
+    if (r.right <= 0 || r.left >= W || r.bottom <= 0 || r.top >= H) return false; // below the fold: audited when auditUrl scrolls it into view
     if (r.width < 2 && r.height < 2) return false;
     for (let e = el; e && e.nodeType === 1; e = e.parentElement) {
       const s = cs(e);
@@ -92,14 +92,17 @@ function auditInPage(F) {
   }
 
   const out = { small: [], c45: [], c7: [], taps: [], unverified: 0, sizes: {} };
+  const seen = window.__legSeen || (window.__legSeen = new WeakSet()); // one count per node across scroll positions
   const push = (arr, o) => { const f = arr.find((a) => a.sel === o.sel && a.px === o.px && a.ratio === o.ratio && a.size === o.size); if (f) f.n++; else arr.push({ n: 1, ...o }); };
 
-  const checkText = (el, rect, text, color, px) => {
-    if (!px || !text.trim() || !shown(el, rect) || chrome(el)) return;
+  const ACT = 'button, a[href], input, select, textarea, summary, label, [role=button], [role=tab], [role=link], [role=checkbox], [role=radio], [role=switch], [role=menuitem], [role=option], [data-action]';
+  const checkText = (el, rect, text, color, px, key = el) => {
+    if (seen.has(key) || !px || !text.trim() || !shown(el, rect) || chrome(el)) return;
+    seen.add(key);
     const sample = text.trim().replace(/\s+/g, ' ').slice(0, 40), disabled = !!el.closest(':disabled, [aria-disabled="true"]');
     out.sizes[px] = (out.sizes[px] || 0) + 1;
     const rec = { sel: sel(el), text: sample, px };
-    if (px < F.minText) push(out.small, rec);
+    if (px < (el.closest(ACT) ? F.actText : F.minText)) push(out.small, rec);
     // Disabled text is NOT exempt (unlike WCAG): a greyed-out pen tile or "Save · 0 pigs" still carries information a farmer reads.
     // Show "unavailable" with the surface, an icon or a word, never by fading the text. (Owner, 2026-10-10.)
     void disabled;
@@ -122,7 +125,7 @@ function auditInPage(F) {
     const rect = [...range.getClientRects()].find((r) => r.width > 0 && r.height > 0);
     if (!rect) continue;
     const s = cs(el);
-    checkText(el, rect, n.nodeValue, parse(s.color), parseFloat(s.fontSize));
+    checkText(el, rect, n.nodeValue, parse(s.color), parseFloat(s.fontSize), n);
   }
   for (const el of document.querySelectorAll('input:not([type=hidden]):not([type=checkbox]):not([type=radio]):not([type=range]), textarea')) {
     const rect = el.getBoundingClientRect(), s = cs(el), px = parseFloat(s.fontSize);
@@ -138,7 +141,8 @@ function auditInPage(F) {
     if (el.tagName === 'INPUT' && el.labels && el.labels.length) continue; // its label is the hit area
     if (el.tagName !== 'INPUT' && el.parentElement && el.parentElement.closest(NATIVE)) continue;
     const r = el.getBoundingClientRect();
-    if (!shown(el, r) || chrome(el)) continue;
+    if (seen.has(el) || !shown(el, r) || chrome(el)) continue;
+    seen.add(el);
     const top = document.elementFromPoint(Math.min(Math.max(r.left + r.width / 2, 0), W - 1), Math.min(Math.max(r.top + r.height / 2, 0), H - 1));
     if (top && !related(top, el)) { const t = top.closest(TAP); if (!t || !related(t, el)) continue; } // covered by something else
     let L = r.left, T = r.top, R = r.right, B = r.bottom;
@@ -211,7 +215,22 @@ async function auditUrl(browser, url, bare) {
     await page.waitForTimeout(600);
     await page.evaluate(() => document.fonts.ready);
     const parts = [];
-    for (const fr of page.frames()) { try { if (await fr.evaluate(() => innerWidth > 0 && innerHeight > 0)) parts.push(await fr.evaluate(auditInPage, FLOORS)); } catch (e) { /* detached frame */ } }
+    for (const fr of page.frames()) {
+      try {
+        if (!(await fr.evaluate(() => innerWidth > 0 && innerHeight > 0))) continue;
+        parts.push(await fr.evaluate(auditInPage, FLOORS));
+        // Below the fold counts too: scroll every scroll area a screen at a time and audit what comes into view (each node once).
+        const steps = await fr.evaluate(() => [document.scrollingElement, ...document.querySelectorAll('*')].filter((e) => e && e.scrollHeight > e.clientHeight + 8 && (e === document.scrollingElement || /auto|scroll/.test(getComputedStyle(e).overflowY)) && e.clientHeight > 0).length);
+        for (let i = 0; i < steps; i++) {
+          for (let k = 0; k < 40; k++) {
+            const moved = await fr.evaluate((i) => { const sc = [document.scrollingElement, ...document.querySelectorAll('*')].filter((e) => e && e.scrollHeight > e.clientHeight + 8 && (e === document.scrollingElement || /auto|scroll/.test(getComputedStyle(e).overflowY)) && e.clientHeight > 0)[i]; if (!sc) return false; const before = sc.scrollTop; sc.scrollTop = before + Math.max(200, Math.round(sc.clientHeight * 0.8)); return sc.scrollTop > before; }, i);
+            if (!moved) break;
+            await page.waitForTimeout(80);
+            parts.push(await fr.evaluate(auditInPage, FLOORS));
+          }
+        }
+      } catch (e) { /* detached frame */ }
+    }
     const tokens = await page.evaluate(tokensInPage, FLOORS);
     return { audit: merge(parts), tokens };
   } finally { await ctx.close(); }
@@ -286,7 +305,7 @@ const doc = {
 if (!only && !flag('--no-write')) { fs.mkdirSync(path.join(root, 'review'), { recursive: true }); fs.writeFileSync(path.join(root, 'review/legibility.json'), JSON.stringify(doc, null, 1) + '\n'); }
 
 const t = doc.totals;
-console.log('legibility: ' + t.screens + ' screens, ' + t.screensFailing + ' fail (text <' + FLOORS.minText + 'px: ' + t.small + ' nodes, contrast <' + FLOORS.contrast + ': ' + t.contrast + ', 16px+ text <' + FLOORS.contrastPrimary + ': ' + t.contrastPrimary + ', targets <' + FLOORS.tap + 'px: ' + t.taps + ')' + (t.errors ? ', ' + t.errors + ' could not render' : ''));
+console.log('legibility: ' + t.screens + ' screens, ' + t.screensFailing + ' fail (text <' + FLOORS.minText + 'px or <' + FLOORS.actText + 'px in a control: ' + t.small + ' nodes, contrast <' + FLOORS.contrast + ': ' + t.contrast + ', 16px+ text <' + FLOORS.contrastPrimary + ': ' + t.contrastPrimary + ', targets <' + FLOORS.tap + 'px: ' + t.taps + ')' + (t.errors ? ', ' + t.errors + ' could not render' : ''));
 const show = changed.length ? ok.filter((r) => changed.includes(r.id) && r.fails) : ok.filter((r) => r.fails).sort((a, b) => b.small + b.taps + b.contrast - (a.small + a.taps + a.contrast)).slice(0, 8);
 for (const r of show) {
   console.log('  ' + r.id + ': ' + r.small + ' small, ' + (r.contrast + r.contrastPrimary) + ' contrast, ' + r.taps + ' targets');
@@ -329,5 +348,5 @@ if (changed.length && !gateStrict && !flag('--strict')) {
   await b2.close();
 } else blocked = results.filter((r) => changed.includes(r.id) && (r.fails || r.error));
 if (blocked.length) { console.error('\nblocked: ' + blocked.length + ' changed screen(s) ' + (gateStrict || flag('--strict') ? 'break the farm legibility law' : 'got worse than the base') + ': ' + blocked.map((r) => r.id).join(', ')); process.exit(1); }
-if (flag('--strict') && (t.screensFailing || t.errors)) { console.error('\nstrict: screens fail the farm legibility law'); process.exit(1); }
+if (flag('--strict') && !changed.length && (t.screensFailing || t.errors)) { console.error('\nstrict: screens fail the farm legibility law'); process.exit(1); }
 process.exit(0);

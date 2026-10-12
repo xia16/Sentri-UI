@@ -8,16 +8,16 @@ the feature, design version, native behavior and findings in both repositories.
 
 ## Legibility gate
 
-Legibility gate: no-regression
+Legibility gate: strict
 
-The farm legibility check (`scripts/check-legibility.mjs`, law in `ux/design-system/README.md`) blocks a changed screen only if it is worse than at the base. When the type pass has merged, change the line above to `Legibility gate: strict`; the same check then holds changed screens to the absolute floors.
+The farm legibility check (`scripts/check-legibility.mjs`, law in `ux/design-system/README.md`) holds every screen a change moves to the absolute floors. Screens a change doesn't move are reported, not blocking. Screens still drawn from the pre-workflow prototypes in `ux/archive/` and `ux/research/` fail the floors today; each meets them when its feature is redesigned through `/design`, and any change that moves one must bring it up to the floors.
 
 ## Who decides what
 
 | Who | Decides |
 |---|---|
 | **Agents** | Every design call: layout, hierarchy, copy within the rules, components and variants. They make the call, build it well and ship it behind the gates. They don't ask first. |
-| **Gates** | Whether a change merges. Merges are automatic once every gate for the change class passes. |
+| **Gates** | Whether a change merges. Merges are automatic once every gate for the change class passes. A change that moves any screen merges only on `GATE PASS`: the mechanical checks AND the blind judge. A mechanical pass alone merges only a change that moves no screen. |
 | **Owner** | Product rules (behaviour, scope, what is saved, permissions) and approval of screens. The owner reacts to built work afterwards. Only **product rules** go to the backlog as decision items; design calls never do. |
 
 An agent score is never shown as approval. The approved version of a screen stays visible until the owner promotes the new one.
@@ -26,12 +26,13 @@ An agent score is never shown as approval. The approved version of a screen stay
 
 - **Platform first.** Under Mobile everything is the mobile app: touch-only states (Default, Pressed, Selected, Disabled, Error, Loading, Empty, Long label / Chinese). No designed hover, focus rings or keyboard rows. Screen-reader order and the keyboard covering Done are real and are checked.
 - **Components come from real features.** Approved screens are the baseline. A component reproduces them and improves only by improving a feature.
-- **A change must beat what it replaces**, side by side at 390px. Same or worse fails. A refactor must be identical.
+- **A change must beat what it replaces**, side by side at 390px. Same or worse fails. A refactor must be identical. **The driver looks first:** before any judge or the owner sees a change, the driver opens the before/after pairs and writes one line, better or not and why. A change the driver can't call better goes back, not forward: to the same builder, with the one reason that decided it (a crit round), at most twice. The builder fixes that and anything like it, reruns its final look and hands over again. After two rounds that still aren't better, the driver files a workflow retro for the step that let it through, and a fresh builder starts from main. The owner sees only what the driver, the gate and the judge all call better.
 - **Copy fits the component; real data wraps safely.** Labels we write meet the copy budget. Medicine names, ear tags and farm names can't be shortened, so each component states how it wraps and shows the full value.
 - **Drawer convention.** Footer **Back** leaves and keeps the draft. **‹ Parent** goes up a level. No ✕. **Done** applies. **Reset** for filters, **Clear** for input.
 - **No reason line above a disabled button.**
 - **Green means approved or done only.**
 - **No cards on cards; information budget.** One surface, and only items are boxes. Colour only where it means something. Nothing said twice. Rank what the farmer must see first.
+- **Critique before you change; extract, don't replace.** Every change to an existing screen starts from a written critique of the original: what works (keep), what is broken (problems, with evidence) and what draws each part. The change follows the problems; what works stays at least as strong. A part the page hand-builds moves into the design system looking exactly as it does before anyone improves it, never redrawn from a generic component that looks different. A run hands over its best direction only when its own crit says it is clearly better than the original; otherwise it hands over no change ([build.md §1a–1d](briefs/build.md#1a-critique-the-original-before-the-budget)).
 - **Attention budget before layout.** Showing too much is like showing nothing: when every fact gets equal weight, nothing stands out and workers stop reading. Every new or changed list, card or screen starts from an attention budget: the facts it could show, the worker's questions in order, an attention level for each fact, and a written cut list. Only then comes layout. Passing the legibility floors is not the same as being focused ([build.md §1b](briefs/build.md#1b-attention-budget-before-any-layout)).
 - **Design for the medium.** The atlas is a web page; the designs in it are a native phone app. Use the iOS or Android native component wherever one fits: sheets, action sheets, segmented controls, switches, wheel pickers for dates and numbers, the system keyboard, a navigation bar. Build a custom one only where none fits, and say why. No web conventions: hover rows, breadcrumbs, dropdown selects, data tables, underlined text links, tooltips, visible scrollbars, pagination, centred web modals.
 - **Simple beats complete.** Design for the 95% of real cases. Leave out what would add noise for farmers or need heavy infrastructure, and list it as not supported. Easy to act and to record matters more than feature count: a frustrated farmer stops using the app.
@@ -95,7 +96,7 @@ One entry point drives them all: `/design <feature>` ([.claude/skills/design/](.
 | Behaviour | The above, plus the scenario leaves and walks that touch it (390/360, EN/ZH), screen-reader order and keyboard cover |
 | Shared component | All of the above on **every** feature that uses it. A refactor must be identical. Any change to a frozen screen needs the owner's approval. |
 
-**One queue for shared-component changes.** Two sessions changing the bundle at once is how one undoes the other. A change is shared when it touches the bundle, the tokens, the bare-screen harness, a shared stylesheet or any file that pages of two or more features load, or when it changes a screen outside its scope; `gate.mjs` decides that itself. Shared changes merge one at a time, oldest open PR first. The next one merges main forward and is gated against the new main, which re-checks every screen of every feature. Feature-only changes don't queue.
+**One queue for shared-component changes.** Two sessions changing the bundle at once is how one undoes the other. A change is shared when it touches the bundle, the tokens, the bare-screen harness, a shared stylesheet or any file that pages of two or more features load, or when it changes a screen outside its scope; `gate.mjs` decides that itself. Shared changes merge one at a time, oldest open PR first. Only a PR that has passed the gate holds its place: an older one still being built or fixed doesn't block the line. The next one merges main forward and is gated against the new main, which re-checks every screen of every feature. Feature-only changes don't queue.
 
 Every rejected owner example is a fixture each gate must fail ([gate.md](briefs/gate.md#rejected-examples)). All evidence records the commit it was taken on.
 
@@ -125,6 +126,8 @@ Every rejected owner example is a fixture each gate must fail ([gate.md](briefs/
 | [briefs/populate.md](briefs/populate.md) | Atlas population. It maps existing screens and designs nothing. |
 | [briefs/review.md](briefs/review.md) | Screen and atlas reviews that feed the backlog |
 | [freeze-checklist.md](freeze-checklist.md) | Freeze and propagation |
+
+The owner's taste, drawn from their rulings, is [taste.md](taste.md): builders aim at it and judges stand in for it.
 
 Standards these briefs point to: `ux/design-system/README.md` (laws), `docs/design-workflow/research/component-standard.md` (component page anatomy and checklist), and `atlas/SCHEMA.md` (atlas data and backlog item format).
 

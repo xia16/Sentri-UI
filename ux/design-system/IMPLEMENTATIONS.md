@@ -111,4 +111,4 @@ See [verification and rendered proof](components/pass-proof/README.md).
 ## State check
 
 `node scripts/check-states.mjs [baseUrl]` renders every `[data-state]` of every component variant as the atlas does (390px, tokens + bundle) and writes `review/state-check.json`; it exits non-zero on any problem.
-It needs Playwright from `C:/Users/ying_/.cache/adam-design/playwright-1.63.0` (override with `PLAYWRIGHT_DIR`); with no argument it serves the repo itself.
+It finds Playwright through `scripts/playwright-path.mjs` (`SENTRI_PLAYWRIGHT` or `PLAYWRIGHT_DIR`, else the owner's cache, else a project or global install); with no argument it serves the repo itself.
