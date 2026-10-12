@@ -77,7 +77,6 @@
 .device .page-head p,
 .device .work-note,
 .device .helper { color: #657060; }
-.device .preview-badge { background: #fff; }
 
 /* Section and unit pickers: whole rows are the target and selected state is
    carried by surface/border contrast rather than a green action treatment. */
