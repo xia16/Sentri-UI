@@ -16,6 +16,10 @@ The farm legibility check (`scripts/check-legibility.mjs`, law in `ux/design-sys
 | **Gates** | Whether a change merges. Merges are automatic once every gate for the change class passes. A change that moves any screen merges only on `GATE PASS`: the mechanical checks AND the blind judge. A mechanical pass alone merges only a change that moves no screen. |
 | **Owner** | Product rules (behaviour, scope, what is saved, permissions) and approval of screens. The owner reacts to built work afterwards. Only **product rules** go to the backlog as decision items; design calls never do. |
 
+**The owner decides by looking.** Anything that needs the owner's call (a product rule, a choice between designs, a ruling on a pair) reaches them as a rendered board: the options side by side at 390, each labelled with a letter, the current screen among them. Never a text question with options described in words (owner, 2026-10-12).
+
+**Prototype chrome is not product.** Marks that only exist because these are prototypes (a PREVIEW badge, "sample data" or "no command is sent" disclaimers, the study links around the phone) are never shown to workers. Builders don't design around them or spend the attention budget on them, and a problem in them is not a design problem.
+
 An agent score is never shown as approval. The approved version of a screen stays visible until the owner promotes the new one.
 
 ## Owner rules (binding on every brief)
