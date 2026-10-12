@@ -26,6 +26,6 @@ The approved screens (Farrowing room, Task overview) share one quiet language:
 
 ## How to use it
 
-- **Builders**: in the critique (`briefs/build.md` §1a) and every self-crit (§1d), hold your direction against these three lessons by name. A direction that adds boxes, bold or size to "organise" the screen is c3 until proven otherwise.
+- **Builders**: in the critique (`briefs/build.md` §1) and every self-crit (§4), hold your direction against these three lessons by name. A direction that adds boxes, bold or size to "organise" the screen is c3 until proven otherwise.
 - **Judges**: before calibrating, read this page. Then judge as the owner would: prefer the lighter screen with one clear hero over the one with more structure, more weight or bigger type, unless the heavier one fixes a real problem the lighter one can't.
 - A polish pass should look like the same screen, improved. If someone who knows the original wouldn't recognise it, it wasn't a polish.
