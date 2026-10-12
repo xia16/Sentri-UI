@@ -45,9 +45,9 @@ States: E0 Home, Farrowing section · E1 Home, Choose unit · E2 room list (Unit
 | E-8 | E2 | tap an Active row | → Counting | S — PRD Anchor; flow | `fa-e8-active-row-opens-counting` |
 | E-9 | E2 | tap a Done row | → the locked record, no counter | S — RUL After the lock | `fa-e9-done-row-opens-record` |
 | E-10 | E2 | tap a Sow died row with piglets to allocate | → the allocation sheet (the same sheet as right after her death) | S — owner decision 2026-10-10 (was RUL: her ended record) | `fa-e10-died-row-opens-ended-record` |
-| E-11 | E2 | Scan ear tag | → her sheet | S — PRD Scope | pending `fa-e11-scan-ear-tag` |
+| E-11 | E2 | Scan ear tag | → ~~her sheet~~ superseded 2026-10-12: Scan ear tags lists each scanned sow; see §8b | S — PRD Scope, then owner decision 2026-10-12 | pending `fa-e11-scan-ear-tag` (superseded by S-21) |
 | E-12 | E2 | read every row | → recorded counts only: no "born N", no "0 dead", no pencil | owner decision 2026-10-10 | `fa-e12-rows-recorded-counts-only` |
-| E-13 | E3 | Find a sow, empty field | → the same rows, same rules | owner decision 2026-10-10 | `fa-e13-search-rows-recorded-counts-only` |
+| E-13 | E3 | Find a sow, type 4 | → the same rows, same rules | owner decision 2026-10-10 | `fa-e13-search-rows-recorded-counts-only` |
 | E-14 | E2 | tap a pen header | ? pen tools (feed, fault, note, log) are out of scope by PRD; review tasks-built-2 | S (open) — PRD Scope Out | — |
 
 ## 2 · Sow · Awaiting (A)
@@ -170,6 +170,40 @@ States: K0 room with sows still farrowing · K1 End review, all finished · K2 E
 | K-6 | K2 | hold End task early | → early receipt | S — PRD Decisions | `fa-k6-end-early-receipt` |
 | K-7 | K2 | the awaiting sows at End | ? Q6 — where they go | S (open) — contract C9 vs review tasks-built-44 | blocker `fa-k7-awaiting-at-early-end` |
 | K-8 | K3 | a later correction to a sow | ? Q8 — does the receipt change | S (open) — review tasks-built-50 | — |
+
+## 8b · Find a sow and Scan ear tags (S)
+
+States: S1 Find a sow, empty field · S2 Scan, no reader paired · S3 Scan, reader connected, nothing scanned · S4 Scan, sows scanned · S5 Scan, a sow scanned again. All S — owner decision 2026-10-12 (PRD, *Owner decisions, 2026-10-12 · Find a sow and Scan ear tags*).
+
+| # | State | Event | Result | Src | Leaf |
+|---|---|---|---|---|---|
+| S-1 | S1 | open, before typing | → only the hint; nothing listed; no unit in the header; field focused | S — owner decision 2026-10-12 | `fa-s1-search-lists-nothing-until-typed` |
+| S-2 | S1 | type 43 | → "In Unit 7" (000431), then "Other units" (000437, 000943, 004318) | S — owner decision 2026-10-12 | `fa-s2-search-groups-this-unit-first` |
+| S-3 | S1 | type 004 | → a tag that starts with it ranks before a tag that contains it | S — owner decision 2026-10-12 | `fa-s3-tags-starting-with-the-text-rank-first` |
+| S-4 | S1 | type B4 | → the sows of pen B4; pen codes match | S — owner decision 2026-10-12 | `fa-s4-pen-codes-match` |
+| S-5 | S1 | type 909 | → "No sow matching “909” in any unit." | S — owner decision 2026-10-12 | `fa-s5-no-match-says-so` |
+| S-6 | S1 | tap a result in another unit | → her record, read-only, with Go to Unit 6; the room stays Unit 7 | S — owner decision 2026-10-12 | `fa-s6-other-unit-result-opens-read-only-record` |
+| S-7 | S1 | Go to Unit 6 | → Unit 6's room list | S — owner decision 2026-10-12 | `fa-s7-go-to-unit-switches-the-room` |
+| S-8 | S1 | tap the scan icon in the field | → Scan ear tags | S — owner decision 2026-10-12 | `fa-s8-search-scan-icon-opens-scan` |
+| S-9 | S1 | Cancel | → the room list | S — owner decision 2026-10-12 | `fa-s9-cancel-returns-to-the-room` |
+| S-10 | S2 | open | → "Scanner not connected" and the pairing instruction; no pill, no list, no button | S — owner decision 2026-10-12 | `fa-s10-no-reader-says-so-with-no-buttons` |
+| S-11 | S2 | back arrow | → the room list | S — owner decision 2026-10-12 | `fa-s11-back-arrow-leaves-scan` |
+| S-12 | S3 | open | → "Hold the reader to an ear tag"; Scanning; Stop scanning; no banner, no "Not found" | S — owner decision 2026-10-12 | `fa-s12-connected-empty-says-hold-the-reader` |
+| S-13 | S4 | read the list | → two groups, newest first | S — owner decision 2026-10-12 | `fa-s13-scans-listed-newest-first-in-two-groups` |
+| S-14 | S4 | read a row | → tick box + the animal row with her Farrowing state | S — owner decision 2026-10-12 | `fa-s14-scan-rows-are-select-and-door` |
+| S-15 | S4 | Stop scanning | → Stopped; Resume scanning; the list is kept | S — owner decision 2026-10-12 | `fa-s15-stop-scanning-pauses-and-keeps-the-list` |
+| S-16 | S4 | Resume scanning | → Scanning; Stop scanning | S — owner decision 2026-10-12 | `fa-s16-resume-scanning-listens-again` |
+| S-17 | S4 | tick one sow | → "1 sow selected" + Actions (never "More actions") | S — owner decision 2026-10-12 | `fa-s17-one-ticked-shows-the-selection-bar` |
+| S-18 | S4 | Actions with two ticked | → Transfer, Disease or symptom, Record treatment, Add a note; no Farrowing action | S — owner decision 2026-10-12 | `fa-s18-actions-offer-the-generic-actions-only` |
+| S-19 | S4 | tap "N sows selected" | → Selected: the ticked sows | I — the › on the bar needs a destination; Inspection's Selected review is the model | `fa-s19-selection-count-opens-the-selected-list` |
+| S-20 | S4 | untick the last sow in Selected | → it closes; Stop scanning returns | S — Sheet README, "an empty selection closes" | `fa-s20-unticking-the-last-sow-closes-the-list` |
+| S-21 | S4 | tap a row in this unit | → her farrowing drawer | S — owner decision 2026-10-12 | `fa-s21-scan-row-opens-her-drawer` |
+| S-22 | S4 | Back from her drawer | → the scan list, unchanged | I — a scan visit is work in progress | `fa-s22-back-returns-to-the-scan-list` |
+| S-23 | S4 | tick, open another sow, Back | → the tick is kept | I — as S-22 | `fa-s23-ticks-survive-opening-a-sow` |
+| S-24 | S4 | tap a row in another unit | → her record, read-only; the room stays | S — owner decision 2026-10-12 | `fa-s24-scan-row-in-another-unit-opens-read-only` |
+| S-25 | S5 | the reader reads a listed sow again | → still one row (highlighted briefly) | S — owner decision 2026-10-12 | `fa-s25-repeat-scan-does-not-duplicate` |
+
+E-11 is superseded: a scan no longer opens her sheet by itself; it adds her to the list (S-13) and her sheet opens from her row (S-21).
 
 ## Walk personas (for `docs/design-workflow/briefs/walk.md`)
 

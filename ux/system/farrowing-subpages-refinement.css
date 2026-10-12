@@ -24,9 +24,7 @@
 .farrowing-phone .home-task-title{display:flex;align-items:center;justify-content:space-between;font-size:15px;font-weight:500}
 .farrowing-phone .home-task-states{font-size:13px;color:var(--muted)}
 .farrowing-phone .home-resume{font-size:13px;color:var(--green)}
-.farrowing-phone .room-search-label input{border-color:#bdc7b6}
 .farrowing-phone .search-result{border-color:var(--line)}
-.farrowing-phone .scanner-demo{background:var(--well);border:1px solid var(--line)}
 
 /* Pen detail, feed guidance, notes, equipment faults, and pen log. */
 .farrowing-phone .pen-detail-sheet .sheet-body{display:flex;flex-direction:column;gap:22px}
