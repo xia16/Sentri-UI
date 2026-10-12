@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-12T08:26:43.518Z",
- "commit": "d277196",
+ "generated": "2026-10-12T08:40:42.040Z",
+ "commit": "29f90fb",
  "platforms": [
   {
    "id": "mobile",
@@ -1218,7 +1218,7 @@
           "elements": [
            {
             "name": "Unit row",
-            "shows": "Unit 6 · 8 pigs · 4 pens · 2 tasks: the unit's own overview, not one task's state. One white grouped card on the tinted sheet (the More actions and Your sections pattern).",
+            "shows": "Unit 6 · 8 pigs · 4 pens · 2 tasks: the unit's own overview, not one task's state. Rows as on More actions: a unit tile (the Inspect unit card's grid icon), the unit name over its overview, in one white grouped card on the tinted sheet.",
             "states": [
              {
               "state": "Has work",
@@ -1233,7 +1233,7 @@
              {
               "state": "Current",
               "when": "A unit is already chosen",
-              "shows": "A tick on its row (and aria-current), as on Your sections"
+              "shows": "The highlighted row (Row scope highlight, aria-current); no extra words or tick"
              }
             ],
             "logic": "The count is open tasks in the section with unrecorded rows in this unit, so a waiting task counts and can disagree with the cards the unit screen shows. Pigs and pens come from units{}; in the Farrowing section they are overridden (Unit 6: 8 pigs, 4 pens; Unit 7: 7, 4; Unit 8: 4, 2) to match the Farrowing prototype.",

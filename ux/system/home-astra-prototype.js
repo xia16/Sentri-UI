@@ -274,10 +274,11 @@
   function unitChoices(){
     const all=section().units;
     const list=overlay.querySelector('#unit-options');
-    list.innerHTML=SentriUI.choiceGroup(all.map(u=>{
-      const info=unitInfo(u),count=remaining(u).length;
-      return SentriUI.choiceRow({label:'Unit '+u,meta:info.pigs+' pigs · '+info.pens+' pens · '+(count?count+' '+(count===1?'task':'tasks'):'No tasks'),mode:'single',selected:state.unit===u,action:'pick-unit',value:u,attrs:state.unit===u?{'aria-current':'location'}:{}});
-    }));
+    // Rows as on More actions: a unit tile (the Inspect unit card's grid icon), the unit name over its overview; the current unit is the highlighted row.
+    list.innerHTML='<div class="st-panel st-row-group unit-group">'+all.map(u=>{
+      const info=unitInfo(u),count=remaining(u).length,current=state.unit===u;
+      return SentriUI.row({variant:'navigation',icon:icon('grid'),title:'Unit '+u,description:info.pigs+' pigs · '+info.pens+' pens · '+(count?count+' '+(count===1?'task':'tasks'):'No tasks'),trail:'none',attrs:current?{'aria-current':'location'}:{},action:'pick-unit',value:u});
+    }).join('')+'</div>';
   }
   function showUnits(){
     drawer('Choose a unit',`<div id="unit-options" class="unit-options"></div>`,{subtitle:section().name});
