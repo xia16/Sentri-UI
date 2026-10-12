@@ -118,39 +118,52 @@
         {
           "type": "state",
           "id": "ds-b1-reconnected.state",
-          "label": "Study fixture: syncing",
+          "label": "Study fixture: offline, then usable connection",
           "tree": "B",
           "reset": {
-            "url": "/ux/system/data-sync-astra-prototype.html?scenario=syncing"
+            "url": "/ux/system/data-sync-astra-prototype.html?scenario=offline"
           },
           "children": [
             {
-              "type": "outcome",
-              "id": "ds-b1-reconnected",
-              "tree": "B-1",
-              "label": "Reconnect starts upload without a tap",
-              "gwt": {
-                "given": "This phone has waiting records and its connection returns.",
-                "when": "The network becomes usable.",
-                "then": "The records start uploading without an Upload button press."
-              },
-              "authority": [
+              "type": "action",
+              "id": "ds-b1-reconnected.act",
+              "label": "The network is lost, then restored without tapping Upload.",
+              "taps": [
                 {
-                  "src": "PRD",
-                  "at": "Rules and Decisions 2026-10-12",
-                  "says": "The records start uploading without an Upload button press."
+                  "offline": true
+                },
+                {
+                  "offline": false
                 }
               ],
-              "visible": [
+              "children": [
                 {
-                  "text": {
-                    "en": "uploading automatically",
-                    "zh": "正在自动上传"
-                  }
+                  "type": "outcome",
+                  "id": "ds-b1-reconnected",
+                  "tree": "B-1",
+                  "label": "Reconnect starts upload without a tap",
+                  "gwt": {
+                    "given": "This phone has waiting records and its connection returns.",
+                    "when": "The network becomes usable.",
+                    "then": "The records start uploading without an Upload button press."
+                  },
+                  "authority": [
+                    {
+                      "src": "PRD",
+                      "at": "Rules and Decisions 2026-10-12",
+                      "says": "The records start uploading without an Upload button press."
+                    }
+                  ],
+                  "visible": [
+                    {
+                      "text": {
+                        "en": "uploading automatically",
+                        "zh": "正在自动上传"
+                      }
+                    }
+                  ]
                 }
-              ],
-              "status": "pending",
-              "why": "The study has a fixed sample state but no durable queue or automatic network transition."
+              ]
             }
           ]
         }
@@ -854,8 +867,9 @@
               "label": "Q3 — Request accepted without local receipt",
               "question": "Q3",
               "sources": [
-                "Old code retries transient errors",
-                "Backend idempotency contract is not available"
+                "Old mobile_webapp handlers send Idempotency-Key based on command ID",
+                "Old errorClassifier treats already processed / 已处理 message text as success",
+                "Server deduplication and result lookup contract is not available in this repository"
               ]
             }
           ]

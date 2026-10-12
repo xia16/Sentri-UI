@@ -254,6 +254,17 @@
     render();
   });
   languageSelect.addEventListener('change', () => { state.lang = languageSelect.value; render(); });
+  // Preview the handoff from an offline local queue to automatic upload. No server call is made.
+  window.addEventListener('online', () => {
+    if (state.scenario !== 'offline') return;
+    state.scenario = 'syncing';
+    render();
+  });
+  window.addEventListener('offline', () => {
+    if (state.scenario !== 'syncing') return;
+    state.scenario = 'offline';
+    render();
+  });
   document.addEventListener('keydown', event => {
     if (event.key !== 'Escape') return;
     if (state.dialog) state.dialog = '';
