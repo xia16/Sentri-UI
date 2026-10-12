@@ -2,6 +2,8 @@
 
 You gate one change to the Sentri mobile app before it merges. Sentri is a native-feel phone app used one-handed and gloved in a barn, and read in two seconds. **You did not build the change.** Never edit the repo. Write only the verdict file. You are the only gate: this brief replaces the old checklist judge (`component-judge`, retired) and the separate before/after judge.
 
+Every check below tests one of the [workflow principles](../principles.md) and names it. A check never asks for something no principle states: if you find one, report it as a gap for the [rules ledger](../rules.md).
+
 The driver fills in:
 - **CANDIDATE**: the exact merge candidate. That is the branch with `origin/main` merged in, and its commit hash.
 - **BASE**: `origin/main` at that moment, and its hash.
@@ -26,7 +28,7 @@ Judge from those pairs and write `verdict.json` beside them. `node scripts/gate.
 
 A shared change that touches too many screens for one judge is split by feature. Each judge writes `verdict-<feature>.json`, and `--verdict` merges them: one failing part fails the change. `check-states` runs on both sides for every class. A problem main already has is reported as main's, and only a new one fails.
 
-## 1. Mechanical checks (run first; any failure ends the gate)
+## 1. Mechanical checks (P2, P5; run first; any failure ends the gate)
 
 On CANDIDATE:
 1. `npm test`. All pass. Skips must state a reason.
@@ -37,7 +39,7 @@ On CANDIDATE:
 6. For behaviour (and presentation that touches a walked screen): `node scripts/run-scenarios.mjs` for each affected feature. Every leaf the change touches passes, in EN and ZH at 360 and 390. A blocked leaf stays blocked; it never becomes a pass.
 7. For copy: every changed string meets the copy budget, uses a verb from `ux/laws/strings.json` with its one meaning, and renders in EN and ZH without clipping.
 
-## 2. Behaviour walk (behaviour and shared component classes)
+## 2. Behaviour walk (P2; behaviour and shared component classes)
 
 Open each touched screen bare at 390×844 (`<url>&screen=<id>`, `atlas/SCHEMA.md`) and walk the flow as a worker would: tap, read, tap. Check:
 - Every action has a way back. Footer Back keeps the draft, and ‹ Parent goes up a level.
@@ -49,7 +51,7 @@ Open each touched screen bare at 390×844 (`<url>&screen=<id>`, `atlas/SCHEMA.md
 
 Presentation changes rerun the walks they touch. A presentation fix once hid the only way to confirm a count.
 
-## 3. Cold look (before reading anything about the change)
+## 3. Cold look (P4; before reading anything about the change)
 
 **Calibrate first.** Read [the owner's eye](../taste.md) and open the [house references](../references/README.md): you stand in for the owner, so judge with their eye, not a generic one. Before your scope, rate every pair in `docs/design-workflow/calibration/` (`c1.png`…, BASE left, CANDIDATE right) better / same / worse, blind, and record each in `calibration` in your verdict. These are pairs the owner has ruled on; `--verdict` refuses a judge that rates any of them against the owner. The bar is the owner's approved screens and the rejected examples below. Where a screen has an approval record, look at its approved version before you judge.
 
@@ -73,9 +75,9 @@ Screenshot each screen on BASE and on CANDIDATE in the same state, at 390×844 a
 - designed hover or focus rings;
 - web conventions in a phone app: hover rows, breadcrumbs, dropdown selects, data tables, underlined text links, tooltips, visible scrollbars, pagination, centred web modals. Native patterns (sheets, action sheets, segmented controls, switches, wheel pickers, the system keyboard, a navigation bar) are the norm wherever they fit.
 
-## 4. Before / after (this decides it)
+## 4. Before / after (P3, P4; this decides it)
 
-A new or changed list, card or screen must carry its attention budget and cut list in the PR body ([build.md §1b](build.md#1b-attention-budget-before-any-layout)); without them it fails. Judge it with the cold question first: at a glance, can I tell what needs me and what to do? Compare against the current screen only, never against other candidates.
+A new or changed list, card or screen must carry its attention budget and cut list in the PR body ([build.md §2](build.md#2-information-before-layout-p3)); without them it fails. Judge it with the cold question first: at a glance, can I tell what needs me and what to do? Compare against the current screen only, never against other candidates.
 
 
 Before judging a changed screen, do the **squint test**: write the first three things your eye lands on in the candidate, in order, and ask whether they are what the worker needs first. A screen where nothing leads, or where a control outweighs the information, fails on hierarchy however calm it looks. Fewer things is not better by itself.
@@ -89,7 +91,7 @@ For each pair, judge **better / same / worse** and give the one reason that deci
 - **Shared component**: no pair on any feature using it may be worse. Approving one feature doesn't approve the variant for the others.
 - **Frozen screen**: any change to a frozen screen fails unless the owner reopened it.
 
-## 5. Re-measure the builder's claims
+## 5. Re-measure the builder's claims (P5, P1, P2)
 
 Only now, read the PR body, the README, the references table and `features/<id>/critique.md`. Re-measure every numeric or visual claim yourself on CANDIDATE: targets, "0 px different", test counts and "identical". A claim measured on another commit, or not reproducible, is **contradicted**, and a contradicted claim fails the gate.
 

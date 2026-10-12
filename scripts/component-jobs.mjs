@@ -1,5 +1,5 @@
 // What each design-system component is for, one line each, so a builder names the existing component for a job before
-// building a new one (briefs/build.md §1a, Parts). Reads the first sentence of each ux/design-system/components/<Name>/README.md.
+// building a new one (P1, briefs/build.md §1, Parts). Reads the first sentence of each ux/design-system/components/<Name>/README.md.
 // Usage: node scripts/component-jobs.mjs [word]   (a word filters to components whose line mentions it, e.g. history)
 import fs from 'node:fs';
 import path from 'node:path';
