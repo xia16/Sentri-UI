@@ -62,9 +62,10 @@ Directions B (move the fan card above the chart) and C (cut the "Sample readings
 
 - Every visual declaration I had added to the page CSS (font sizes, the speed figure, chevron colour and turn, helper size) now lives in `ux/design-system/components/bundle.css` as SensorTrend (`st-sensor-trend`) and DeviceControl (`st-device-control`, `st-device-section`); the page keeps margin, padding, flex, size and the `!important` margin that beats the global `.helper` rule. `pageStyling` on the diff returns nothing.
 - Renders identical before and after the move: at 390 the only pixels that differ are the removed badge (318,55 to 372,78); at 360 the title now fits one line, so the body shifts up by one title line, unchanged otherwise.
-- PREVIEW badge removed from the four headers that drew it (prototype chrome).
+- PREVIEW badge removed from the Environment and Maintenance headers only (Assistant is outside scope and keeps it).
+- Offline contrast (problem 5, reopened by the driver): `.st-device-control :is(button,input):disabled{opacity:1}` in bundle.css; the disabled Auto / Manual and Save setting now read ink on the disabled surface with the dashed rim, no faded text. Scoped to DeviceControl, Segment and Button untouched.
 - Still better, for the same reasons as round 1; the 360 header no longer wraps.
 
 ### Final look
 
-Commit FINAL (see the pushed head). All four screens at 390 and 360, EN, from the pushed head after merging origin/main; the page renders no Chinese strings. Whole screens checked: toggle spaced, axis and Low / High legible, chevron row clean, fan speed figure, one-line title at 360. Better.
+Commit HEAD. All four screens at 390 and 360, EN, from the pushed head after merging origin/main; the page renders no Chinese strings. Whole screens checked: toggle spaced, axis and Low / High legible, chevron row clean, fan speed figure, one-line title at 360. Better.

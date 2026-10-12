@@ -1016,3 +1016,5 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 .st-device-control>.helper{font-size:11px!important}
 .st-device-control .fan-speed-label{font-size:13px}
 .st-device-control .fan-speed-label output{font:400 22px/1 var(--font-mono);letter-spacing:-.5px}
+/* DeviceControl offline: unavailable is shown by the surface and the dashed rim, never by faded text (4.5:1). */
+.st-device-control :is(button,input):disabled{opacity:1}
