@@ -1,0 +1,866 @@
+{
+  "feature": "data-sync",
+  "about": "Executable and pending leaves of features/data-sync/scenario-tree.md. Fictional study fixtures; source contracts remain open.",
+  "defaults": {
+    "url": "/ux/system/data-sync-astra-prototype.html?scenario=offline",
+    "clock": "2026-10-12T09:41:00",
+    "langs": [
+      "en",
+      "zh"
+    ],
+    "widths": [
+      360,
+      390
+    ],
+    "height": 844,
+    "clipCheck": true
+  },
+  "tree": [
+    {
+      "type": "entry",
+      "id": "ds-a3-offline-entry.entry",
+      "label": "Offline queue remains on this phone",
+      "children": [
+        {
+          "type": "state",
+          "id": "ds-a3-offline-entry.state",
+          "label": "Study fixture: offline",
+          "tree": "A",
+          "reset": {
+            "url": "/ux/system/data-sync-astra-prototype.html?scenario=offline"
+          },
+          "children": [
+            {
+              "type": "outcome",
+              "id": "ds-a3-offline-entry",
+              "tree": "A-3",
+              "label": "Offline queue remains on this phone",
+              "gwt": {
+                "given": "A worker has three records saved on this phone and no connection.",
+                "when": "They open Saved work.",
+                "then": "Three records remain waiting, and the screen says they will upload automatically when connected."
+              },
+              "authority": [
+                {
+                  "src": "PRD",
+                  "at": "Rules and Decisions 2026-10-12",
+                  "says": "Three records remain waiting, and the screen says they will upload automatically when connected."
+                }
+              ],
+              "visible": [
+                {
+                  "text": {
+                    "en": "No connection",
+                    "zh": "无网络"
+                  }
+                },
+                {
+                  "text": {
+                    "en": "Waiting to upload",
+                    "zh": "待上传"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "entry",
+      "id": "ds-a5-empty.entry",
+      "label": "Empty local queue is stated narrowly",
+      "children": [
+        {
+          "type": "state",
+          "id": "ds-a5-empty.state",
+          "label": "Study fixture: done",
+          "tree": "A",
+          "reset": {
+            "url": "/ux/system/data-sync-astra-prototype.html?scenario=done"
+          },
+          "children": [
+            {
+              "type": "outcome",
+              "id": "ds-a5-empty",
+              "tree": "A-5",
+              "label": "Empty local queue is stated narrowly",
+              "gwt": {
+                "given": "This phone has no waiting or abnormal records.",
+                "when": "The worker opens Saved work.",
+                "then": "The screen says this phone has no records waiting; it makes no farm-wide completion claim."
+              },
+              "authority": [
+                {
+                  "src": "PRD",
+                  "at": "Rules and Decisions 2026-10-12",
+                  "says": "The screen says this phone has no records waiting; it makes no farm-wide completion claim."
+                }
+              ],
+              "visible": [
+                {
+                  "text": {
+                    "en": "No records waiting on this phone",
+                    "zh": "本机暂无待上传记录"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "entry",
+      "id": "ds-b1-reconnected.entry",
+      "label": "Reconnect starts upload without a tap",
+      "children": [
+        {
+          "type": "state",
+          "id": "ds-b1-reconnected.state",
+          "label": "Study fixture: syncing",
+          "tree": "B",
+          "reset": {
+            "url": "/ux/system/data-sync-astra-prototype.html?scenario=syncing"
+          },
+          "children": [
+            {
+              "type": "outcome",
+              "id": "ds-b1-reconnected",
+              "tree": "B-1",
+              "label": "Reconnect starts upload without a tap",
+              "gwt": {
+                "given": "This phone has waiting records and its connection returns.",
+                "when": "The network becomes usable.",
+                "then": "The records start uploading without an Upload button press."
+              },
+              "authority": [
+                {
+                  "src": "PRD",
+                  "at": "Rules and Decisions 2026-10-12",
+                  "says": "The records start uploading without an Upload button press."
+                }
+              ],
+              "visible": [
+                {
+                  "text": {
+                    "en": "uploading automatically",
+                    "zh": "正在自动上传"
+                  }
+                }
+              ],
+              "status": "pending",
+              "why": "The study has a fixed sample state but no durable queue or automatic network transition."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "entry",
+      "id": "ds-b4-partial.entry",
+      "label": "Partial success stays split",
+      "children": [
+        {
+          "type": "state",
+          "id": "ds-b4-partial.state",
+          "label": "Study fixture: partial",
+          "tree": "B",
+          "reset": {
+            "url": "/ux/system/data-sync-astra-prototype.html?scenario=partial"
+          },
+          "children": [
+            {
+              "type": "outcome",
+              "id": "ds-b4-partial",
+              "tree": "B-4",
+              "label": "Partial success stays split",
+              "gwt": {
+                "given": "Three local records are being sent.",
+                "when": "Two succeed and one fails.",
+                "then": "Two are shown as uploaded and one is still marked for attention."
+              },
+              "authority": [
+                {
+                  "src": "PRD",
+                  "at": "Rules and Decisions 2026-10-12",
+                  "says": "Two are shown as uploaded and one is still marked for attention."
+                }
+              ],
+              "visible": [
+                {
+                  "text": {
+                    "en": "Needs you",
+                    "zh": "需要处理"
+                  }
+                },
+                {
+                  "text": {
+                    "en": "Uploaded · 2",
+                    "zh": "已上传 · 2"
+                  }
+                },
+                {
+                  "text": {
+                    "en": "Failed",
+                    "zh": "失败"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "entry",
+      "id": "ds-c1-failed-detail.entry",
+      "label": "Failed record keeps a reason and retry",
+      "children": [
+        {
+          "type": "state",
+          "id": "ds-c1-failed-detail.state",
+          "label": "Study fixture: partial",
+          "tree": "C",
+          "reset": {
+            "url": "/ux/system/data-sync-astra-prototype.html?scenario=partial"
+          },
+          "children": [
+            {
+              "type": "action",
+              "id": "ds-c1-failed-detail.act",
+              "label": "The worker opens the failed record.",
+              "taps": [
+                "[data-action=\"open-record\"][data-value=\"third\"]"
+              ],
+              "children": [
+                {
+                  "type": "outcome",
+                  "id": "ds-c1-failed-detail",
+                  "tree": "C-1",
+                  "label": "Failed record keeps a reason and retry",
+                  "gwt": {
+                    "given": "One record failed to upload while two succeeded.",
+                    "when": "The worker opens the failed record.",
+                    "then": "The original record and failure reason remain visible with a Retry action."
+                  },
+                  "authority": [
+                    {
+                      "src": "PRD",
+                      "at": "Rules and Decisions 2026-10-12",
+                      "says": "The original record and failure reason remain visible with a Retry action."
+                    }
+                  ],
+                  "visible": [
+                    {
+                      "text": {
+                        "en": "The server could not process",
+                        "zh": "服务端未能处理"
+                      }
+                    },
+                    {
+                      "text": {
+                        "en": "Retry now",
+                        "zh": "立即重试"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "entry",
+      "id": "ds-c5-cancel-delete.entry",
+      "label": "Cancelling conflict deletion keeps record",
+      "children": [
+        {
+          "type": "state",
+          "id": "ds-c5-cancel-delete.state",
+          "label": "Study fixture: conflict",
+          "tree": "C",
+          "reset": {
+            "url": "/ux/system/data-sync-astra-prototype.html?scenario=conflict"
+          },
+          "children": [
+            {
+              "type": "action",
+              "id": "ds-c5-cancel-delete.act",
+              "label": "The worker opens it, asks to delete, then backs out.",
+              "taps": [
+                "[data-action=\"open-record\"][data-value=\"first\"]",
+                "[data-action=\"ask-delete\"]",
+                "[data-action=\"cancel-delete\"]",
+                "[data-action=\"back-to-list\"]"
+              ],
+              "children": [
+                {
+                  "type": "outcome",
+                  "id": "ds-c5-cancel-delete",
+                  "tree": "C-5",
+                  "label": "Cancelling conflict deletion keeps record",
+                  "gwt": {
+                    "given": "A conflict is saved on this phone.",
+                    "when": "The worker opens it, asks to delete, then backs out.",
+                    "then": "The conflicted record remains on this phone."
+                  },
+                  "authority": [
+                    {
+                      "src": "PRD",
+                      "at": "Rules and Decisions 2026-10-12",
+                      "says": "The conflicted record remains on this phone."
+                    }
+                  ],
+                  "visible": [
+                    {
+                      "text": {
+                        "en": "Pregnancy check",
+                        "zh": "孕检"
+                      }
+                    },
+                    {
+                      "text": {
+                        "en": "Conflict",
+                        "zh": "冲突"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "entry",
+      "id": "ds-c6-confirm-delete.entry",
+      "label": "Confirmed conflict deletion removes one local record",
+      "children": [
+        {
+          "type": "state",
+          "id": "ds-c6-confirm-delete.state",
+          "label": "Study fixture: conflict",
+          "tree": "C",
+          "reset": {
+            "url": "/ux/system/data-sync-astra-prototype.html?scenario=conflict"
+          },
+          "children": [
+            {
+              "type": "action",
+              "id": "ds-c6-confirm-delete.act",
+              "label": "The worker opens the conflict and confirms deletion.",
+              "taps": [
+                "[data-action=\"open-record\"][data-value=\"first\"]",
+                "[data-action=\"ask-delete\"]",
+                "[data-action=\"confirm-delete\"]"
+              ],
+              "children": [
+                {
+                  "type": "outcome",
+                  "id": "ds-c6-confirm-delete",
+                  "tree": "C-6",
+                  "label": "Confirmed conflict deletion removes one local record",
+                  "gwt": {
+                    "given": "A conflict and other records are saved on this phone.",
+                    "when": "The worker opens the conflict and confirms deletion.",
+                    "then": "Only the conflicted record leaves the local queue; the other records remain."
+                  },
+                  "authority": [
+                    {
+                      "src": "PRD",
+                      "at": "Rules and Decisions 2026-10-12",
+                      "says": "Only the conflicted record leaves the local queue; the other records remain."
+                    }
+                  ],
+                  "visible": [
+                    {
+                      "text": {
+                        "en": "Pregnancy check",
+                        "zh": "孕检"
+                      },
+                      "absent": true
+                    },
+                    {
+                      "text": {
+                        "en": "Pen note",
+                        "zh": "栏位备注"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "entry",
+      "id": "ds-c7-blocked.entry",
+      "label": "Later operation names its unresolved predecessor",
+      "children": [
+        {
+          "type": "state",
+          "id": "ds-c7-blocked.state",
+          "label": "Study fixture: blocked",
+          "tree": "C",
+          "reset": {
+            "url": "/ux/system/data-sync-astra-prototype.html?scenario=blocked"
+          },
+          "children": [
+            {
+              "type": "outcome",
+              "id": "ds-c7-blocked",
+              "tree": "C-7",
+              "label": "Later operation names its unresolved predecessor",
+              "gwt": {
+                "given": "An earlier operation for the same object failed.",
+                "when": "The worker reviews the waiting records.",
+                "then": "The later operation is marked blocked and is still on the phone."
+              },
+              "authority": [
+                {
+                  "src": "PRD",
+                  "at": "Rules and Decisions 2026-10-12",
+                  "says": "The later operation is marked blocked and is still on the phone."
+                }
+              ],
+              "visible": [
+                {
+                  "text": {
+                    "en": "Blocked",
+                    "zh": "受阻"
+                  }
+                },
+                {
+                  "text": {
+                    "en": "Failed",
+                    "zh": "失败"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "entry",
+      "id": "ds-d1-switch-blocked.entry",
+      "label": "Unsent work blocks an account or farm switch",
+      "children": [
+        {
+          "type": "state",
+          "id": "ds-d1-switch-blocked.state",
+          "label": "Study fixture: switch",
+          "tree": "D",
+          "reset": {
+            "url": "/ux/system/data-sync-astra-prototype.html?scenario=switch"
+          },
+          "children": [
+            {
+              "type": "outcome",
+              "id": "ds-d1-switch-blocked",
+              "tree": "D-1",
+              "label": "Unsent work blocks an account or farm switch",
+              "gwt": {
+                "given": "There are records on this phone that have not uploaded.",
+                "when": "The worker tries to change account or farm.",
+                "then": "The switch is stopped and the worker is directed to the saved records."
+              },
+              "authority": [
+                {
+                  "src": "PRD",
+                  "at": "Rules and Decisions 2026-10-12",
+                  "says": "The switch is stopped and the worker is directed to the saved records."
+                }
+              ],
+              "visible": [
+                {
+                  "text": {
+                    "en": "Finish saved work first",
+                    "zh": "请先处理本机记录"
+                  }
+                },
+                {
+                  "text": {
+                    "en": "View saved work",
+                    "zh": "查看本机记录"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "entry",
+      "id": "ds-c9-manual-conflict-contract.entry",
+      "label": "Conflict retry never overwrites the server",
+      "children": [
+        {
+          "type": "state",
+          "id": "ds-c9-manual-conflict-contract.state",
+          "label": "Study fixture: conflict",
+          "tree": "C",
+          "reset": {
+            "url": "/ux/system/data-sync-astra-prototype.html?scenario=conflict"
+          },
+          "children": [
+            {
+              "type": "action",
+              "id": "ds-c9-manual-conflict-contract.act",
+              "label": "The worker compares both values and retries the conflict.",
+              "taps": [
+                "[data-action=\"open-record\"][data-value=\"first\"]",
+                {
+                  "expect": [
+                    {
+                      "text": {
+                        "en": "Compare before retrying",
+                        "zh": "重试前核对差异"
+                      }
+                    },
+                    {
+                      "text": {
+                        "en": "Pregnancy result: Pregnant",
+                        "zh": "孕检结果：已怀孕"
+                      }
+                    },
+                    {
+                      "text": {
+                        "en": "Pregnancy result: Not pregnant",
+                        "zh": "孕检结果：未怀孕"
+                      }
+                    }
+                  ]
+                },
+                "[data-action=\"retry\"]",
+                {
+                  "wait": 800
+                }
+              ],
+              "children": [
+                {
+                  "type": "outcome",
+                  "id": "ds-c9-manual-conflict-contract",
+                  "tree": "C-9",
+                  "label": "Conflict retry never overwrites the server",
+                  "gwt": {
+                    "given": "The saved result differs from the current team record.",
+                    "when": "The worker compares both values and manually retries.",
+                    "then": "The server record is not overwritten and this record remains in conflict."
+                  },
+                  "authority": [
+                    {
+                      "src": "PRD",
+                      "at": "Decisions 2026-10-12",
+                      "says": "Show both values before retry; retry cannot overwrite the server."
+                    }
+                  ],
+                  "visible": [
+                    {
+                      "text": {
+                        "en": "The server still reports a conflict",
+                        "zh": "服务端仍报告冲突"
+                      }
+                    },
+                    {
+                      "text": {
+                        "en": "On the server now",
+                        "zh": "服务端现值"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "entry",
+      "id": "ds-c10-deleted-predecessor.entry",
+      "label": "Dependent record stays blocked after deletion",
+      "children": [
+        {
+          "type": "state",
+          "id": "ds-c10-deleted-predecessor.state",
+          "label": "Study fixture: blocked",
+          "tree": "C",
+          "reset": {
+            "url": "/ux/system/data-sync-astra-prototype.html?scenario=conflict"
+          },
+          "children": [
+            {
+              "type": "action",
+              "id": "ds-c10-deleted-predecessor.act",
+              "label": "The worker deletes the conflict and opens the dependent record.",
+              "taps": [
+                "[data-action=\"open-record\"][data-value=\"first\"]",
+                "[data-action=\"ask-delete\"]",
+                "[data-action=\"confirm-delete\"]",
+                "[data-action=\"open-record\"][data-value=\"second\"]"
+              ],
+              "children": [
+                {
+                  "type": "outcome",
+                  "id": "ds-c10-deleted-predecessor",
+                  "tree": "C-10",
+                  "label": "Dependent record stays blocked after deletion",
+                  "gwt": {
+                    "given": "A later local record depends on a conflicted record.",
+                    "when": "The conflicted predecessor is deleted.",
+                    "then": "The later record remains blocked on this phone; it can only be viewed or deleted, and does not upload."
+                  },
+                  "authority": [
+                    {
+                      "src": "PRD",
+                      "at": "Decisions 2026-10-12",
+                      "says": "After deleting a conflicted predecessor, dependent records remain blocked and can only be viewed or deleted."
+                    }
+                  ],
+                  "visible": [
+                    {
+                      "text": {
+                        "en": "The earlier record was deleted",
+                        "zh": "前置记录已删除"
+                      }
+                    },
+                    {
+                      "text": {
+                        "en": "will not upload",
+                        "zh": "不会上传"
+                      }
+                    },
+                    {
+                      "text": {
+                        "en": "Blocked",
+                        "zh": "受阻"
+                      }
+                    },
+                    {
+                      "el": "[data-action=\"ask-delete\"]",
+                      "is": "enabled"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "entry",
+      "id": "ds-c11-delete-blocked-dependent.entry",
+      "label": "A blocked dependent can be deleted after review",
+      "children": [
+        {
+          "type": "state",
+          "id": "ds-c11-delete-blocked-dependent.state",
+          "label": "Study fixture: conflict with dependent",
+          "tree": "C",
+          "reset": {
+            "url": "/ux/system/data-sync-astra-prototype.html?scenario=conflict"
+          },
+          "children": [
+            {
+              "type": "action",
+              "id": "ds-c11-delete-blocked-dependent.act",
+              "label": "The worker deletes the conflicted predecessor, reviews the blocked dependent, then confirms its deletion.",
+              "taps": [
+                "[data-action=\"open-record\"][data-value=\"first\"]",
+                "[data-action=\"ask-delete\"]",
+                "[data-action=\"confirm-delete\"]",
+                "[data-action=\"open-record\"][data-value=\"second\"]",
+                {
+                  "expect": [
+                    {
+                      "text": {
+                        "en": "The earlier record was deleted",
+                        "zh": "前置记录已删除"
+                      }
+                    }
+                  ]
+                },
+                "[data-action=\"ask-delete\"]",
+                {
+                  "expect": [
+                    {
+                      "text": {
+                        "en": "Delete this blocked record?",
+                        "zh": "删除这条受阻记录？"
+                      }
+                    }
+                  ]
+                },
+                "[data-action=\"confirm-delete\"]"
+              ],
+              "children": [
+                {
+                  "type": "outcome",
+                  "id": "ds-c11-delete-blocked-dependent",
+                  "tree": "C-11",
+                  "label": "A blocked dependent can be deleted after review",
+                  "gwt": {
+                    "given": "A conflicted predecessor was deleted and the later record is blocked.",
+                    "when": "The worker reviews the later record and confirms its deletion.",
+                    "then": "Only that local record is deleted; uploaded history remains, and this phone has no unsent records."
+                  },
+                  "authority": [
+                    {
+                      "src": "PRD",
+                      "at": "Decisions 2026-10-12",
+                      "says": "A dependent blocked by a deleted conflict can only be viewed or deleted individually with confirmation."
+                    }
+                  ],
+                  "visible": [
+                    {
+                      "text": {
+                        "en": "No records are waiting on this phone",
+                        "zh": "本机暂无待上传记录"
+                      }
+                    },
+                    {
+                      "text": {
+                        "en": "Uploaded · 1",
+                        "zh": "已上传 · 1"
+                      }
+                    },
+                    {
+                      "text": {
+                        "en": "Pen note",
+                        "zh": "栏位备注"
+                      },
+                      "absent": true
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "entry",
+      "id": "ds-d3-expired-login.entry",
+      "label": "Original-account sign-in resumes upload",
+      "children": [
+        {
+          "type": "state",
+          "id": "ds-d3-expired-login.state",
+          "label": "Study fixture: offline",
+          "tree": "D",
+          "reset": {
+            "url": "/ux/system/data-sync-astra-prototype.html?scenario=expired"
+          },
+          "children": [
+            {
+              "type": "action",
+              "id": "ds-d3-expired-login.act",
+              "label": "The worker signs in again to the original account.",
+              "taps": [
+                {
+                  "expect": [
+                    {
+                      "text": {
+                        "en": "Sign in to the original account",
+                        "zh": "请重新登录原账号"
+                      }
+                    },
+                    {
+                      "text": "G. Hansen"
+                    }
+                  ]
+                },
+                "[data-action=\"open-reauth\"]",
+                {
+                  "expect": [
+                    {
+                      "text": {
+                        "en": "Continue as G. Hansen",
+                        "zh": "以 G. Hansen 继续"
+                      }
+                    }
+                  ]
+                },
+                "[data-action=\"complete-reauth\"]"
+              ],
+              "children": [
+                {
+                  "type": "outcome",
+                  "id": "ds-d3-expired-login",
+                  "tree": "D-3",
+                  "label": "Original-account sign-in resumes upload",
+                  "gwt": {
+                    "given": "Upload stopped because the original account session expired, while three records remain on this phone.",
+                    "when": "The worker signs in again with the original account.",
+                    "then": "The records remain tied to that account and automatic upload resumes after verification."
+                  },
+                  "authority": [
+                    {
+                      "src": "PRD",
+                      "at": "Decisions 2026-10-12",
+                      "says": "Reauthenticate the original account, then resume automatic upload without changing queue ownership."
+                    }
+                  ],
+                  "visible": [
+                    {
+                      "text": {
+                        "en": "Uploading automatically",
+                        "zh": "正在自动上传"
+                      }
+                    },
+                    {
+                      "text": {
+                        "en": "Uploading",
+                        "zh": "上传中"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "entry",
+      "id": "ds-b7-uncertain-receipt.entry",
+      "label": "Q3 — Request accepted without local receipt",
+      "children": [
+        {
+          "type": "state",
+          "id": "ds-b7-uncertain-receipt.state",
+          "label": "Study fixture: syncing",
+          "tree": "B",
+          "reset": {
+            "url": "/ux/system/data-sync-astra-prototype.html?scenario=syncing"
+          },
+          "children": [
+            {
+              "type": "decision-blocker",
+              "id": "ds-b7-uncertain-receipt",
+              "tree": "B-7",
+              "label": "Q3 — Request accepted without local receipt",
+              "question": "Q3",
+              "sources": [
+                "Old code retries transient errors",
+                "Backend idempotency contract is not available"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

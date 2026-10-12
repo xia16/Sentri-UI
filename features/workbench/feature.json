@@ -239,36 +239,31 @@
           },
           {
             "name": "Saved-work card",
-            "shows": "3 records saved on this device · No connection · waiting to upload",
+            "shows": "3 records saved on this device · No connection · uploads when online",
             "states": [
               {
                 "state": "Waiting, offline",
-                "when": "Records are queued and there is no connection (the page starts here with 3 sample records)",
-                "shows": "Top card: \"N records saved on this device\" · \"No connection · waiting to upload\""
+                "when": "Records are queued and there is no connection",
+                "shows": "A compact entry after the first work card: N records saved on this device · No connection · uploads when online"
               },
               {
                 "state": "Waiting, online",
                 "when": "Queued and a connection is available",
-                "shows": "\"Connection available · tap to upload\""
+                "shows": "Uploads automatically when connected; no Upload button"
               },
               {
                 "state": "Interrupted",
-                "when": "An upload started and failed",
-                "shows": "\"Upload interrupted · tap to retry\""
-              },
-              {
-                "state": "Uploading",
-                "when": "An upload is running",
-                "shows": "\"Uploading N records\" · \"Sending saved work…\""
+                "when": "A record fails or conflicts",
+                "shows": "An attention entry precedes the work cards and opens the Data sync flow"
               },
               {
                 "state": "Clear",
                 "when": "Nothing is waiting",
-                "shows": "Moves to the bottom of the list: \"All records uploaded · No records waiting on this device\""
+                "shows": "A quiet row says No records waiting on this device"
               }
             ],
-            "logic": "The queue is fictional (three samples). Nothing the other prototypes record feeds it.",
-            "source": "sync{} and pendingExamples in home-astra-prototype.js",
+            "logic": "The queue is fictional in this prototype. Tapping the entry opens the Data sync study; real queue and per-record outcomes are not shared between prototypes.",
+            "source": "syncCard() and features/data-sync/PRD.md",
             "at": "3 records saved on this device"
           },
           {

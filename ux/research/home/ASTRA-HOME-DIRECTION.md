@@ -53,6 +53,8 @@ The single agreed direction is intentional: this pass tests the settled navigati
 - The Connection preview selector outside the phone demonstrates no signal, connection restored, failed upload and all uploaded. This is an in-memory UI demonstration, not durable offline storage, connectivity detection or a live upload service; reload resets its sample queue. Existing detail pages do not feed this queue.
 - Browser walkthrough verified offline retry retained three records, a failed upload retained all three, and reconnect/upload reached the empty-queue success state. JavaScript syntax validation passed.
 
+**2026-10-12 update:** The preceding bullets document the original Home study. The owner subsequently chose automatic upload on reconnection, manual handling of exceptions, and per-record conflict review. The current Data sync design is in features/data-sync/PRD.md and flow.md; Home now opens that single flow instead of the old Saved work drawer.
+
 ### Unit navigation refinement
 
 Replaced the horizontal unit tabs and icon-only browse button with a stable two-part scope control: Overview and Choose unit / selected unit. The owner clarified a maximum of around 15 units, so the picker has no search. It opens at medium height (460 px on the desktop phone, capped at 60% on smaller screens), with a fixed header and count above a vertically scrolling list of all units, including units with no tasks.

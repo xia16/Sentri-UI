@@ -1,42 +1,60 @@
 # Data sync 数据同步
 
-Draft: compiled from existing docs, not yet confirmed.
+状态：设计草案。2026-10-12 的产品答复已记录；未裁决项留在场景树，不能从旧版代码直接推定为新产品规则。
 
 ## Problem
 
-Workers often have no signal. Records made on the phone are saved there and must reach the team later. The worker needs to see what is waiting, whether there is a connection, and to upload on purpose, without risk of losing anything.
+猪场断网时，工人仍要完成可离线的记录。记录保存在这台设备上，与团队已收到的记录不是同一状态。网络恢复后系统自动发送；若某条失败、冲突或被前置操作挡住，工人需要知道哪条仍在本机、原因及下一步。不能把整批记录描绘成一次成功或失败。
 
 ## Who
 
-Floor workers, often offline, and the supervisors who wait for their records.
+执行生产、巡检、健康和转群等任务的一线工人；需要协助处理异常的主管。
 
 ## Anchor
 
-None. The only lifecycle is a record: saved on the phone, then uploaded.
+每条离线操作是独立的本机记录，主状态为待同步、已同步、失败、冲突；同一对象或显式依赖的一串操作形成顺序链。网络状态（无网络、不稳定、可同步）与记录状态分开表达。
 
 ## Rules
 
-- The queue is device-wide, not scoped to a section or unit.
-- Home shows a saved-work card first while records wait (with the connection state); when the queue is empty, a quiet "All records uploaded" row sits at the bottom.
-- The card opens a Saved work drawer: how many records wait, the connection, each record (task and animal, place, time), and Upload.
-- Upload is explicit. The button is disabled while uploading. A failure or no connection keeps every record and offers Retry. Only a successful upload clears the queue.
-- The drawer separates records saved on this device from records the team already has.
-- The queue is simulated in the study; nothing the other prototypes record feeds it.
+- 离线提交先落本机队列，成功落库才反馈“已保存在本机”；不能写成“已同步”或“团队已收到”。本机保存失败不能给成功反馈。来源：旧版 commandQueue、submitOfflineCommand。
+- 网络恢复并达到可同步质量后自动发送待同步记录；临时网络错误保留记录并自动重试。允许对失败记录手动重试。依据：用户 2026-10-12 答复；旧版 syncCoordinator。
+- 每条记录分别结算：成功的可变为已同步，失败的留在本机。关联对象的较早操作或显式前置依赖未解决时，后续操作显示“等待前置操作”，不暗示它已发送。来源：旧版 syncCoordinator、commandDependencies。
+- 冲突记录停止自动同步；可查看冲突、手动重试或删除。删除必须明确告知“本机这条记录将无法恢复，且不会再上传”，二次确认后执行。不得提供跳过前置操作的“直接同步”。依据：用户 2026-10-12 答复。
+- 冲突详情先对照本机值与服务端现值。人工重试必须重新核对服务端；仍有差异时继续保留冲突，不能覆盖团队已有记录。删除冲突前置记录后，依赖它的后续记录仍留在本机并受阻，只允许逐条查看或经二次确认删除；不自动解锁、发送或提供重试。依据：用户 2026-10-12 补充答复。
+- 有未上传记录时阻止切换账号或猪场，提示先处理记录并提供进入数据同步的入口。依据：用户 2026-10-12 答复。
+- 登录失效时暂停发送，保留原账号与猪场绑定的本机记录。只能重新登录该原账号；验证成功后继续自动上传，期间不得把队列归到新账号或新猪场。依据：用户 2026-10-12 补充答复。原型的“重新登录”只模拟验证成功后的状态转换，真正凭证验证由账号流程负责。
+- 首页承担本机待处理数、同步中和异常的入口；详情由数据同步流程负责。空队列只表示“本机暂无待同步记录”，不证明团队所有记录都齐全。
+- 与任务有关的本机记录可从该任务进入同一数据同步详情。任务能否结束由任务所属功能的规则决定，本页不重新定义。
+- 原型用可重复的本机样例演示状态，不与其他功能原型联动；原生实现需验证真实队列、重启持久化和服务端回执。
 
 ## Scope
 
-In: the Home entry card, the Saved work drawer (waiting, offline, uploading, failed, done).
+本轮设计：本机保存反馈；首页入口；数据同步总览；待同步、同步中、部分成功、失败、冲突、受前置操作阻断、全部已同步状态；单条详情；安全重试、冲突删除和已删除前置记录的受阻后续删除；账号/猪场切换拦截与原账号重新登录提示。中英双语及 360/390 宽度均需覆盖。
 
-Out (old UI, not built): the per-pig and per-treatment detail with conflict and empty states; the all-treatments list entry. The old design has 17 screens (2025.4): entry banner, list, detail, upload.
+原型入口以首页为主；旧版“工具箱 > 离线数据”可作为辅助入口，但两处指向同一详情，不能复制状态逻辑。
+
+## Not supported
+
+- **人工强制跳过前置操作**：可能造成错误顺序或重复写入；本轮不提供该入口。
+- **放弃、删除或清空其他非冲突的未同步记录**：仅冲突记录和“前置冲突已删除”的受阻后续记录允许逐条删除；其他记录不得删除或清空。
+- **在同步页编辑业务记录内容**：更正应回到拥有该记录的功能，不能在队列中改业务语义。
+- **跨设备合并本机队列**：旧版队列在本机 IndexedDB，跨设备汇总需要服务端能力。
+- **手动选择批量上传顺序**：顺序由对象分组和显式依赖决定，人工排序增加错误风险。
+- **用网络测试页模拟生产网络**：旧版网络覆盖器只服务调试，不是工人入口。
 
 ## Decisions
 
-- Decided (ASTRA-HOME-DIRECTION): a Saved work entrance replaces the unconditional "All records synced" footer; upload is explicit.
-- Open: whether Data sync is a page or part of the drawer, and which owns conflicts and detail (both filed under To confirm); how the real queue is fed; how treatment sync relates to Prescriptions.
+- 已裁决（用户，2026-10-12）：网络恢复后自动上传，异常时由人处理。此项覆盖旧数据同步草案及 Home 研究中的“只手动上传”示意。Home 与数据同步原型已按此重画，但仍使用各自的本机样例，不能作为真实队列验收。
+- 已裁决（用户，2026-10-12）：先设计查看与重试；冲突记录可手动重试或删除，且不会自动同步。其他非冲突记录的放弃、删除、清空与跳过前置操作未获批准，例外仅为前置冲突已删除的受阻后续记录。
+- 已裁决（用户，2026-10-12）：有未上传记录时阻止切换账号或猪场，提示先处理。
+- 已裁决（用户，2026-10-12）：冲突重试前展示本机与服务端的差异，绝不覆盖服务端已有记录；删除前置冲突后，后续记录继续受阻，只支持查看和逐条删除。原型演示核对和冲突保留，真实重试仍需服务端条件写入与回执支持。
+- 已裁决（用户，2026-10-12）：登录失效后重新登录原账号，验证通过后继续自动上传。
+- 待落实 Q3：服务端收到请求但本机没有回执时如何按操作 ID 查询结果、保证重试幂等。旧版靠错误文本识别“已处理”，原生后端契约需核实。具体哪些业务操作可离线，由拥有该操作的功能定义。
 
 ## Sources
 
-- ux/research/home/ASTRA-HOME-DIRECTION.md (Saved work status)
-- ux/research/home/SENTRI-DRAWER-INVENTORY.md
-- Old UI Figma: https://www.figma.com/design/LhQhJho192tNKCFvf5Drnf?node-id=10541-8073
-- Prototype: ux/system/home-astra-prototype.html
+- 本功能的流程图、界面职责与实现验证点：flow.md。
+- 本次用户答复（2026-10-12）：自动上传、异常人工处理；冲突手动重试或删除、不自动同步；冲突重试先展示差异且不覆盖服务端；删除前置冲突后依赖记录继续受阻，只能查看或删除；有未上传记录时阻止切换账号或猪场；登录失效后由原账号重新登录并续传。
+- 旧版 Sentri/mobile_webapp：src/lib/offline 的 commandQueue、syncCoordinator、commandDependencies、errorClassifier、networkQuality；src/components/offlineRecords；src/components/offlinePendingBadge；src/providers/OfflineProvider；src/lang/zh-CN/offline.ts。
+- 旧版说明：Sentri/mobile_webapp/spec/offline_inspection_logic_document.md。代码与说明有出入时，以代码实际分支为参考；它不自动成为新产品规则。
+- 当前 feature.json、ux/system/home-astra-prototype.js、ux/research/home/ASTRA-HOME-DIRECTION.md；旧 Figma 索引 references/figma/index.md。

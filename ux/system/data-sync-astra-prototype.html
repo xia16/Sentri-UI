@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <script src="atlas-bare.js"></script>
+  <title>Sentri · Saved work</title>
+  <link rel="stylesheet" href="home-astra-prototype.css">
+  <link rel="stylesheet" href="../design-system/tokens.css">
+  <link rel="stylesheet" href="../design-system/components/bundle.css">
+  <link rel="stylesheet" href="data-sync-astra-prototype.css">
+  <script src="../design-system/components/bundle.js"></script>
+</head>
+<body data-st-context="page">
+  <main class="studio">
+    <header class="studio-header"><a class="wordmark" href="home-astra-prototype.html">sentri<span>•</span></a><span>DATA SYNC / DESIGN STUDY</span></header>
+    <div class="stage">
+      <aside class="design-notes">
+        <p class="eyebrow">SAVED ON THIS PHONE</p>
+        <h1>Keep work safe.<br>Make status clear.</h1>
+        <p class="intro">Records upload automatically when the connection is usable. A failed or conflicted record remains visible for review.</p>
+        <div class="sync-demo">
+          <label for="scenario">Scenario preview</label>
+          <select id="scenario" class="scenario">
+            <option value="offline">Offline · waiting on this phone</option>
+            <option value="syncing">Connection restored · syncing</option>
+            <option value="partial">Partial success · one failed</option>
+            <option value="conflict">Conflict · manual action</option>
+            <option value="blocked">Later operation blocked</option>
+            <option value="done">All uploaded</option>
+            <option value="switch">Account change blocked</option>
+            <option value="expired">Original account sign-in needed</option>
+          </select>
+          <p>Illustrative local records. No server request is sent.</p>
+        </div>
+        <div class="sync-demo"><label for="language">Language preview</label><select id="language"><option value="en">English</option><option value="zh">中文</option></select></div>
+      </aside>
+      <section class="device" aria-label="Sentri saved work prototype">
+        <div class="statusbar"><span>9:41</span><span class="device-status" aria-hidden="true">▴ ▰</span></div>
+        <div id="app"></div>
+        <div id="overlay"></div>
+      </section>
+    </div>
+  </main>
+  <script src="data-sync-astra-prototype.js"></script>
+</body>
+</html>

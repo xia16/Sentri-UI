@@ -64,7 +64,7 @@
   let state = {page:'home',section:initialSection,unit:null,task:null,workUnit:null,assistantTab:'findings',chat:[],answered:false,notes:[],log:[],overlay:null};
   // UI-only queue: no device database or upload service is connected to this study.
   const pendingExamples=[{title:'Pregnancy check · 000308',context:'Gestation · Unit 7 · Batch 31',time:'09:32'},{title:'Pen note · C2',context:'Gestation · Unit 8',time:'09:35'},{title:'Feed adjustment · 000267',context:'Gestation · Unit 7 · Pen C1',time:'09:38'}];
-  const sync={connection:params.get('connection')==='online'?'online':'offline',pending:[...pendingExamples],status:'waiting',message:'',attempt:0};
+  const sync={connection:params.get('connection')==='online'?'online':'offline',pending:[...pendingExamples],status:params.get('connection')==='online'?'uploading':'waiting'};
   if(params.get('view')==='sections')state.page='sections';
   // Atlas-only start states for the screens a tap cannot reach (typing an answer): ?answered=1 (answer on file), ?view=finding.
   if(params.get('answered')==='1'){state.answered=true;state.answer='Unit 8, pen B3';}
@@ -180,36 +180,29 @@
     const models=window.SentriHomeTaskCard.order(scopedTasks().map(taskModel));
     const cards=models.filter(m=>!['complete','terminated'].includes(m.state)).map((m,i,list)=>{
       const quiet=['waiting','round-complete','upcoming'].includes(m.state),firstQuiet=quiet&&(i===0||!['waiting','round-complete','upcoming'].includes(list[i-1].state));
-      return (firstQuiet?'<div class="work-section-heading next-work-heading"><h2>Next</h2></div>':'')+window.SentriHomeTaskCard.render(m);
+      return (firstQuiet?'<div class="work-section-heading next-work-heading"><h2>Next</h2></div>':'')+window.SentriHomeTaskCard.render(m)+(i===0&&!['failed','conflict'].includes(sync.status)?syncCard():'');
     }).join('');
     const completed=models.filter(m=>['complete','terminated'].includes(m.state));
     const completedHTML=completed.length?'<section class="completed-work"><div class="work-section-heading"><h2>Closed tasks</h2><span>'+completed.length+'</span></div><div class="home-task-list">'+completed.map(m=>window.SentriHomeTaskCard.render(m)).join('')+'</div></section>':'';
-    return header()+scopeRail()+`<div class="app-scroll screen-enter"><div class="home-attention">${sync.pending.length?syncCard():''}</div>${state.unit?unitStrip():''}<div class="work-section-heading"><h2>Today’s work</h2><span>Thu, 8 Jul</span></div>${cards?`<div class="home-task-list">${cards}</div>`:`<div class="empty-state"><div class="complete-mark">${icon('check')}</div><h3>No scheduled tasks today</h3><p>${state.unit?'You can still inspect this unit and record anything you find.':'Select a unit to inspect pens or record anything you find.'}</p>${state.unit?'':'<div class="tomorrow"><p class="overline">Tomorrow</p><strong>Growth check · Batch 26</strong><p>Units 12–13 · sample weights</p></div>'}</div>`}${state.unit?comingUp():''}${completedHTML}${sync.pending.length?'':syncCard()}</div>`+nav();
+    return header()+scopeRail()+`<div class="app-scroll screen-enter"><div class="home-attention">${['failed','conflict'].includes(sync.status)?syncCard():''}</div>${state.unit?unitStrip():''}<div class="work-section-heading"><h2>Today’s work</h2><span>Thu, 8 Jul</span></div>${cards?`<div class="home-task-list">${cards}</div>`:`<div class="empty-state"><div class="complete-mark">${icon('check')}</div><h3>No scheduled tasks today</h3><p>${state.unit?'You can still inspect this unit and record anything you find.':'Select a unit to inspect pens or record anything you find.'}</p>${state.unit?'':'<div class="tomorrow"><p class="overline">Tomorrow</p><strong>Growth check · Batch 26</strong><p>Units 12–13 · sample weights</p></div>'}</div>`}${state.unit?comingUp():''}${completedHTML}${cards||['failed','conflict'].includes(sync.status)?'':syncCard()}</div>`+nav();
   }
   function syncCard(){
-    const n=sync.pending.length,busy=sync.status==='uploading';
-    const title=n?(busy?'Uploading '+n+' records':n+' records saved on this device'):'All records uploaded';
-    const subtitle=n?(busy?'Sending saved work…':sync.connection==='offline'?'No connection · waiting to upload':sync.status==='failed'?'Upload interrupted · tap to retry':'Connection available · tap to upload'):'No records waiting on this device';
+    const n=sync.pending.length,busy=sync.status==='uploading',zh=new URLSearchParams(location.search).get('lang')==='zh';
+    const title=n?(zh?(busy?'正在上传 '+n+' 条记录':'本机保存 '+n+' 条记录'):(busy?'Uploading '+n+' records':n+' record'+(n===1?'':'s')+' saved on this device')):(zh?'本机暂无待上传记录':'No records waiting on this device');
+    const subtitle=n?(zh?(busy?'正在自动上传…':sync.connection==='offline'?'无网络 · 联网后自动上传':sync.status==='failed'?'上传失败 · 查看记录':sync.status==='conflict'?'存在冲突 · 查看记录':'联网后自动上传'):(busy?'Sending saved work…':sync.connection==='offline'?'No connection · uploads when online':sync.status==='failed'?'Upload failed · review records':sync.status==='conflict'?'Conflict · review records':'Uploads automatically when connected')):(zh?'这里只统计本机保存的记录':'Only this phone’s saved records are counted');
     if(!n)return SentriUI.row({title,description:subtitle,action:'sync',icon:icon('check')});
-    return SentriUI.banner({tone:'notice',headline:title,consequence:subtitle,icon:n?'offline':'check',door:{action:'sync',label:title+'. '+subtitle},state:busy?'Loading':'Default'});
+    if(['failed','conflict'].includes(sync.status))return SentriUI.banner({tone:'notice',headline:title,consequence:subtitle,door:{action:'sync',label:title+'. '+subtitle},state:'Error'});
+    return SentriUI.rowGroup(SentriUI.row({title,description:subtitle,action:'sync',wrap:true}),{});
   }
   function showSync(){
-    const n=sync.pending.length,busy=sync.status==='uploading',offline=sync.connection==='offline';
-    drawer('Saved work',`<div class="sync-summary ${n?'pending':''}">${icon(n?(offline?'offline':'upload'):'check')}<div><strong>${n?n+' records waiting to upload':'Everything is uploaded'}</strong><p>${n?'Saved on this device. Your team will see these changes after upload.':'There are no records waiting on this device.'}</p></div></div><p class="sync-connection">${offline?'No connection · check Wi-Fi or mobile signal':'Connection available'}</p><div class="sync-records">${sync.pending.map(r=>`<div class="sync-record"><div><span>${r.title}</span><small>${r.context}</small></div><time>${r.time}</time></div>`).join('')}</div><p class="sync-message" role="status" aria-live="polite">${busy?'Uploading saved records…':esc(sync.message)}</p>${n?btn('upload',busy?'Uploading…':sync.status==='failed'?'Retry upload':'Upload '+n+' records','primary','',busy?'disabled':''):btn('close','Done','primary')}`);
-    overlay.querySelector('.sheet,.dialog').classList.add('sync-drawer');
+    const scenario=sync.pending.length===0?'done':sync.status==='uploading'?'syncing':sync.status==='failed'?'partial':sync.status==='conflict'?'conflict':sync.connection==='offline'?'offline':'syncing';
+    const url=new URL('data-sync-astra-prototype.html',location.href);
+    url.searchParams.set('scenario',scenario);
+    url.searchParams.set('from','home');
+    if(new URLSearchParams(location.search).get('lang')==='zh')url.searchParams.set('lang','zh');
+    location.assign(url.href);
   }
   function renderSync(){const top=app.querySelector('.app-scroll')?.scrollTop||0;render();const scroller=app.querySelector('.app-scroll');if(scroller)scroller.scrollTop=top;}
-  function uploadPending(){
-    if(sync.status==='uploading'||!sync.pending.length)return;
-    if(sync.connection==='offline'){sync.status='failed';sync.message='Still no connection. All '+sync.pending.length+' records remain on this device.';showSync();return;}
-    sync.status='uploading';sync.message='';const attempt=++sync.attempt;renderSync();showSync();
-    setTimeout(()=>{
-      if(attempt!==sync.attempt)return;
-      if(sync.connection==='failed'){sync.status='failed';sync.message='Upload did not complete. Your records are still on this device. Try again.';}
-      else{sync.pending=[];sync.status='synced';sync.message='Upload complete.';}
-      renderSync();if(overlay.querySelector('.sync-drawer'))showSync();
-    },900);
-  }
   function sectionChooser(){return head('Your sections','Green Valley Farm')+`<div class="app-scroll screen-enter"><p class="work-note">Select where you're working.</p>${SentriUI.choiceGroup(sections.map(s=>{const count=pendingTypes(s.id);return SentriUI.choiceRow({label:s.name,meta:s.units.length+' units · '+s.population+' pigs · '+(count?count+' task types ready':'No scheduled work today'),mode:'single',selected:s.id===state.section,action:'section',value:s.id});}))}<p class="work-note">Work is shared with your team. Your section selection changes the view for you.</p></div>`+nav();}
   function openDesigned(file,unit,entry,lens=null){
     const url=new URL(file,location.href);
@@ -297,7 +290,6 @@
     const el=e.target.closest('[data-action]');if(!el||el.disabled||el.matches('.st-hold')||SentriUI.guard(el))return;const a=el.dataset.action,v=el.dataset.value;
     if(a==='close'){closeDrawer();return;}
     if(a==='sync'){showSync();return;}
-    if(a==='upload'){uploadPending();return;}
     if(a==='complete-task'){if(taskModel(task()).state!=='ready')return;task().completedAt='Today · just now';goHome();return;}
     if(a==='end-task-early'){dialog('End task early?','Unfinished work will remain incomplete. Existing records are kept.',{label:'End task early',action:'confirm-end-task'});return;}
     if(a==='confirm-end-task'){task().terminatedAt='Today · just now';closeDrawer();goHome();return;}
@@ -342,7 +334,7 @@
   });
   document.addEventListener('keydown',e=>{if(!overlay.children.length)return;if(e.key==='Escape'){closeDrawer();return;}if(e.key==='Tab'){const focusable=[...overlay.querySelectorAll('.sheet button,.sheet input,.sheet textarea,.sheet a[href],.dialog button')].filter(el=>!el.disabled);const first=focusable[0],last=focusable.at(-1);if(e.shiftKey&&(document.activeElement===first||document.activeElement===overlay.querySelector('.sheet,.dialog'))){e.preventDefault();last?.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first?.focus();}}});
   $('#sync-demo').addEventListener('change',e=>{
-    sync.attempt++;sync.connection=e.target.value;sync.pending=e.target.value==='synced'?[]:[...pendingExamples];sync.status=e.target.value==='synced'?'synced':'waiting';sync.message='';
+    sync.connection=e.target.value;sync.pending=e.target.value==='synced'?[]:e.target.value==='failed'?[pendingExamples[2]]:e.target.value==='conflict'?pendingExamples.slice(0,2):[...pendingExamples];sync.status=e.target.value==='synced'?'synced':e.target.value==='failed'?'failed':e.target.value==='conflict'?'conflict':e.target.value==='online'?'uploading':'waiting';
     const open=!!overlay.querySelector('.sync-drawer');renderSync();if(open)showSync();
   });
   $('#attention-preview').value=attentionPreview;

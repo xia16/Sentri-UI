@@ -20,7 +20,7 @@ None. Home has no lifecycle of its own; each card inherits the lifecycle of its 
 - Counts are unique animals or litters in the selected scope. A unit narrows the counts, never the batch time.
 - Task-specific rules: Farrowing = underway, past expected date, due today, next expected; Piglet processing = litters with care due, next care, waiting; Pregnancy = open windows, then next check; Heat and Return-heat show no completion bar for observation.
 - Unit scope: inspection, attention, environment and devices entrances sit at the unit; Inspection owns the pen walk.
-- Offline: records saved on the device are shown with a count and the connection state; upload is explicit.
+- Offline: records saved on this device are shown with a count and connection state; a usable connection triggers automatic upload. Failed or conflicted records open the Data sync flow for manual handling (owner decision, 2026-10-12).
 - Closed tasks never revive due counts.
 
 ## Scope
