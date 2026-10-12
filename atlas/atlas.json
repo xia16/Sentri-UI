@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-12T07:49:16.173Z",
- "commit": "c88430b",
+ "generated": "2026-10-12T07:51:48.201Z",
+ "commit": "fc98e36",
  "platforms": [
   {
    "id": "mobile",
@@ -3215,7 +3215,7 @@
          "id": "farrowing.room",
          "name": "Room list",
          "zh": "产房列表",
-         "status": "in-design",
+         "status": "approved",
          "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
          "preset": "room",
          "figma": "",
@@ -3472,6 +3472,14 @@
            "Two search doors: the magnifier and the text search inside Scan ear tag.",
            "Entry mismatch: Home's whole-farm card is meant to land here but opens the Task overview sheet over it first."
           ]
+         },
+         "approval": {
+          "commit": "fc98e360417f0ba10b86bc3249f0258ee4a53949",
+          "date": "2026-10-12",
+          "by": "owner",
+          "note": "Owner approved the animal row (Farrowing) and the compact-tag roster row (Inspection), 2026-10-12",
+          "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+          "changed": null
          }
         },
         {
@@ -5532,7 +5540,7 @@
          "id": "farrowing.search",
          "name": "Find a sow",
          "zh": "查找母猪",
-         "status": "in-design",
+         "status": "approved",
          "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
          "preset": "room",
          "steps": [
@@ -5572,13 +5580,21 @@
            "Typing updates the results in place; the sheet does not reload."
           ],
           "issues": []
+         },
+         "approval": {
+          "commit": "fc98e360417f0ba10b86bc3249f0258ee4a53949",
+          "date": "2026-10-12",
+          "by": "owner",
+          "note": "Owner approved the animal row (Farrowing) and the compact-tag roster row (Inspection), 2026-10-12",
+          "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+          "changed": null
          }
         },
         {
          "id": "farrowing.scan",
          "name": "Scan ear tag",
          "zh": "扫描耳标",
-         "status": "in-design",
+         "status": "approved",
          "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
          "preset": "room",
          "steps": [
@@ -5602,13 +5618,21 @@
           "issues": [
            "Scan ear tag is the primary button in the dock yet opens a non-working preview; the working path is the field below it."
           ]
+         },
+         "approval": {
+          "commit": "fc98e360417f0ba10b86bc3249f0258ee4a53949",
+          "date": "2026-10-12",
+          "by": "owner",
+          "note": "Owner approved the animal row (Farrowing) and the compact-tag roster row (Inspection), 2026-10-12",
+          "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+          "changed": null
          }
         },
         {
          "id": "farrowing.task-sows",
          "name": "Task sows list",
          "zh": "任务母猪列表",
-         "status": "in-design",
+         "status": "approved",
          "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
          "preset": "task-blocked",
          "steps": [
@@ -5637,6 +5661,14 @@
            "Rows come from every unit of the task, not the current one."
           ],
           "issues": []
+         },
+         "approval": {
+          "commit": "fc98e360417f0ba10b86bc3249f0258ee4a53949",
+          "date": "2026-10-12",
+          "by": "owner",
+          "note": "Owner approved the animal row (Farrowing) and the compact-tag roster row (Inspection), 2026-10-12",
+          "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+          "changed": null
          }
         },
         {
@@ -11884,7 +11916,7 @@
          "id": "inspection.walk",
          "name": "Unit walk",
          "zh": "巡检列表",
-         "status": "in-design",
+         "status": "approved",
          "url": "/ux/system/inspection-astra-concept.html?layout=focus",
          "preset": "walk",
          "figma": "",
@@ -12060,6 +12092,14 @@
            "Search, review and the Scan list show the raw stage \"Gestating\" while the row shows \"Gestation · 40 days\".",
            "An ongoing condition on day 1 reads \"1 days\"; plural is not handled."
           ]
+         },
+         "approval": {
+          "commit": "fc98e360417f0ba10b86bc3249f0258ee4a53949",
+          "date": "2026-10-12",
+          "by": "owner",
+          "note": "Owner approved the animal row (Farrowing) and the compact-tag roster row (Inspection), 2026-10-12",
+          "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+          "changed": null
          }
         },
         {
@@ -12432,7 +12472,7 @@
          "id": "inspection.find-pig",
          "name": "Find or scan a pig",
          "zh": "搜索 / 扫码",
-         "status": "in-design",
+         "status": "approved",
          "url": "/ux/system/inspection-astra-concept.html?layout=focus",
          "preset": "walk",
          "steps": [
@@ -12481,6 +12521,14 @@
            "Ear-notch search (named in the identity notes) is not here.",
            "Scan and Search open nearly the same sheet."
           ]
+         },
+         "approval": {
+          "commit": "fc98e360417f0ba10b86bc3249f0258ee4a53949",
+          "date": "2026-10-12",
+          "by": "owner",
+          "note": "Owner approved the animal row (Farrowing) and the compact-tag roster row (Inspection), 2026-10-12",
+          "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+          "changed": null
          }
         },
         {
