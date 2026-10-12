@@ -1,5 +1,5 @@
 <!-- @dsCard group="Lists" height=1100 -->
 <div id="row-preview"></div>
 <script>
-(async()=>{const root=document.getElementById('row-preview');for(const id of ['navigation','animal','door-act','scope','summary-count','record','tick','select-door']){const html=await fetch('variants/'+id+'.html').then(r=>r.text());const section=document.createElement('section');section.innerHTML=html;root.append(section);for(const old of section.querySelectorAll('script')){const script=document.createElement('script');script.textContent=old.textContent;old.replaceWith(script);}}})();
+(async()=>{const root=document.getElementById('row-preview');for(const id of ['navigation','animal','animal-classic','door-act','scope','summary-count','record','tick','select-door']){const html=await fetch('variants/'+id+'.html').then(r=>r.text());const section=document.createElement('section');section.innerHTML=html;root.append(section);for(const old of section.querySelectorAll('script')){const script=document.createElement('script');script.textContent=old.textContent;old.replaceWith(script);}}})();
 </script>
