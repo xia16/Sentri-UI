@@ -1,0 +1,19 @@
+<!-- @dsCard group="Structure" height=640 subtitle="trend" -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><style>html,body{margin:0;background:var(--app-background)}</style></head>
+<body>
+<div data-st-context="page" style="max-width:390px;padding:var(--space-16);background:var(--app-background);font-family:var(--font-sans);color:var(--ink)"><div id="root"></div></div>
+<script>
+/* The previews expect a host that preloads tokens.css, bundle.css and bundle.js (the atlas does). */
+(function () {
+  var UI = window.SentriUI, I = window.SentriIcons && window.SentriIcons.icon, root = document.getElementById('root');
+  if (!UI) { root.textContent = 'Load tokens.css, bundle.css and bundle.js before this preview.'; return; }
+  var parts = [];
+  parts.push(UI.sensorTrend({name:'Temperature',value:'22.4',unit:'°C',updated:'09:40',period:{options:[['today','Today'],['week','7 days']],active:'today',action:'sensor-range',ariaLabel:'Chart period'},rows:[{time:'00:00',value:21.9},{time:'02:00',value:22.1},{time:'04:00',value:22.0},{time:'06:00',value:22.6},{time:'07:00',value:22.8},{time:'08:00',value:22.5},{time:'09:00',value:22.3},{time:'09:40',value:22.4}],pad:0.5,decimals:1,chartLabel:'Temperature sample trend. Minimum {min}, maximum {max} °C.',note:'Sample readings · connected'}));
+  parts.push(UI.sensorTrend({name:'Temperature',value:'22.4',unit:'°C',updated:'09:40',period:{options:[['today','Today'],['week','7 days']],active:'week',action:'sensor-range',ariaLabel:'Chart period'},rows:[{time:'6d ago',value:21.8},{time:'5d ago',value:22.2},{time:'4d ago',value:22.8},{time:'3d ago',value:22.5},{time:'2d ago',value:22.1},{time:'Yesterday',value:22.6},{time:'Today',value:22.4}],pad:0.5,decimals:1,chartLabel:'Temperature sample trend. Minimum {min}, maximum {max} °C.',note:'Sample readings · connected'}));
+  root.innerHTML = parts.join('');
+})();
+</script>
+</body>
+</html>

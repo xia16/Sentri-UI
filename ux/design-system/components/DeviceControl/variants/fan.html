@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>DeviceControl: fan</title>
+</head>
+<body>
+<!-- One controllable device: name and mode line, Auto / Manual, speed in Manual, one save, and why it cannot change. Each top-level element is one state; the atlas draws one cell per element. -->
+<div data-state="Auto" data-st-context="page"><script>document.currentScript.parentElement.insertAdjacentHTML('beforeend', SentriUI.deviceControl({icon:SentriIcons.icon('air'),name:'Ventilation fan',status:'Auto · following unit schedule',mode:{options:[['auto','Auto'],['manual','Manual']],active:'auto',action:'fan-mode',ariaLabel:'Fan mode',disabled:false},speed:null,save:{action:'apply-device',label:'Save setting',disabled:true},helper:'Preview controls only · no command is sent to equipment.'}));</script></div>
+<div data-state="Manual" data-st-context="page"><script>document.currentScript.parentElement.insertAdjacentHTML('beforeend', SentriUI.deviceControl({icon:SentriIcons.icon('air'),name:'Ventilation fan',status:'Auto · following unit schedule',mode:{options:[['auto','Auto'],['manual','Manual']],active:'manual',action:'fan-mode',ariaLabel:'Fan mode',disabled:false},speed:{id:'fan-speed',label:'Fan speed',value:45,disabled:false},save:{action:'apply-device',label:'Save setting',disabled:false},helper:'Preview controls only · no command is sent to equipment.'}));</script></div>
+<div data-state="Applied" data-st-context="page"><script>document.currentScript.parentElement.insertAdjacentHTML('beforeend', SentriUI.deviceControl({icon:SentriIcons.icon('air'),name:'Ventilation fan',status:'Manual · 45% speed',mode:{options:[['auto','Auto'],['manual','Manual']],active:'manual',action:'fan-mode',ariaLabel:'Fan mode',disabled:false},speed:{id:'fan-speed',label:'Fan speed',value:45,disabled:false},save:{action:'apply-device',label:'Save setting',disabled:true},helper:'Preview controls only · no command is sent to equipment.',updated:'Preview setting applied · just now'}));</script></div>
+<div data-state="Offline" data-st-context="page"><script>document.currentScript.parentElement.insertAdjacentHTML('beforeend', SentriUI.deviceControl({icon:SentriIcons.icon('air'),name:'Ventilation fan',status:'Auto · following unit schedule',mode:{options:[['auto','Auto'],['manual','Manual']],active:'auto',action:'fan-mode',ariaLabel:'Fan mode',disabled:true},speed:null,save:{action:'apply-device',label:'Save setting',disabled:true},helper:'Reconnect to change device settings.'}));</script></div>
+</body>
+</html>

@@ -1,0 +1,15 @@
+[
+  {
+    "id": "trend",
+    "name": "Trend",
+    "use": "read one sensor of one unit: the live value, how fresh it is, whether it moved today or this week, and the exact readings behind one disclosure",
+    "notUse": "an input (use Measure), two headline figures with totals (use TaskMetrics), or label and value facts (use Facts); never an alert or a threshold",
+    "states": [
+      "Today",
+      "7 days",
+      "Offline",
+      "Ammonia (whole numbers)",
+      "No history"
+    ]
+  }
+]

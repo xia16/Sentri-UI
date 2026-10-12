@@ -633,6 +633,10 @@ export interface SentriUI {
   numpadScanner(options: { onKey?: (key: NumpadKey) => void; onScan?: (digits: string) => void; gap?: number; minKeys?: number; now?: () => number; later?: (f: () => void, ms: number) => unknown; cancel?: (handle: unknown) => void }): { handle(event: Pick<KeyboardEvent, 'key'>): boolean; flush(): void };
   heading(props: HeadingProps): string;
   panel(content: string, options?: PanelOptions & { ds?: string }): string;
+  /** One sensor's reading, last reading time, trend chart, low and high, and readings history (SensorTrend). */
+  sensorTrend(props: { name: string; value: string | number; unit: string; updated?: string; updatedLabel?: string; period?: { options: [string, string][]; active: string; action: string; ariaLabel?: string }; rows?: { time: string; value: number }[]; pad?: number; decimals?: number; lowLabel?: string; highLabel?: string; historyLabel?: string; timeLabel?: string; note?: string; chartLabel?: string }): string;
+  /** One controllable device: mode, speed, save, and why it cannot change (DeviceControl). */
+  deviceControl(props: { icon?: string; name: string; status?: string; mode?: { options: [string, string][]; active: string; action: string; ariaLabel?: string; disabled?: boolean }; speed?: { id: string; label: string; value: number; disabled?: boolean } | null; save?: { action: string; label: string; disabled?: boolean }; helper?: string; updated?: string }): string;
   facts(items: Fact[], options?: { columns?: 1 | 2 | 3; className?: string }): string;
   row(props: RowProps): string;
   rowGroup(content: string, options?: { title?: string; level?: number; className?: string; strs?: Strs<'title'>; args?: StrArgs<'title'> }): string;

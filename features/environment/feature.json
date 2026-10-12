@@ -139,17 +139,17 @@
           },
           {
             "name": "Connection",
-            "shows": "Sample readings · offline, showing last available values · Devices · Offline",
+            "shows": "Sample readings · offline, showing last available values",
             "states": [
               {
                 "state": "Offline",
                 "when": "Page default (the \"Connection preview\" select outside the phone)",
-                "shows": "Readings are the last available values; Devices tag \"Offline\"; Auto/Manual and Apply disabled; helper \"Reconnect to change device settings.\""
+                "shows": "Readings are the last available values; Auto/Manual and Apply disabled; helper \"Reconnect to change device settings.\""
               },
               {
                 "state": "Connected",
                 "when": "Connection preview set to Connected",
-                "shows": "Note reads \"connected\"; tag \"Connected\"; controls enabled; helper \"Preview controls only · no command is sent to equipment.\""
+                "shows": "Note reads \"connected\"; controls enabled; helper \"Preview controls only · no command is sent to equipment.\""
               }
             ],
             "source": "environment(); sync.connection",
@@ -191,7 +191,7 @@
         "rules": [],
         "issues": [
           "The \"Last reading\" time is a fixed 09:40 on all sensors while the status bar reads 9:41.",
-          "The offline note appears three times: the chart helper, the Devices tag and the fan helper.",
+          "The offline fact is said twice, each beside what it qualifies: the readings note and the fan helper (the Devices tag was cut).",
           "Only a ventilation fan exists; the concept names \"devices\" in general.",
           "unclear: alert thresholds, who is told when a reading is out of range, and where real data comes from; none are in the code."
         ]

@@ -1,0 +1,14 @@
+[
+  {
+    "id": "fan",
+    "name": "Fan",
+    "use": "see and set one unit's ventilation fan: Auto follows the unit schedule, Manual sets a speed",
+    "notUse": "a list of devices to open (use Row) or a device with no setting; the control never sends a command from a preview",
+    "states": [
+      "Auto",
+      "Manual",
+      "Applied",
+      "Offline"
+    ]
+  }
+]

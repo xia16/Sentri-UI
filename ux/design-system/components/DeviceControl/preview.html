@@ -1,0 +1,19 @@
+<!-- @dsCard group="Structure" height=640 subtitle="fan" -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><style>html,body{margin:0;background:var(--app-background)}</style></head>
+<body>
+<div data-st-context="page" style="max-width:390px;padding:var(--space-16);background:var(--app-background);font-family:var(--font-sans);color:var(--ink)"><div id="root"></div></div>
+<script>
+/* The previews expect a host that preloads tokens.css, bundle.css and bundle.js (the atlas does). */
+(function () {
+  var UI = window.SentriUI, I = window.SentriIcons && window.SentriIcons.icon, root = document.getElementById('root');
+  if (!UI) { root.textContent = 'Load tokens.css, bundle.css and bundle.js before this preview.'; return; }
+  var parts = [];
+  parts.push(UI.deviceControl({icon:I('air'),name:'Ventilation fan',status:'Auto · following unit schedule',mode:{options:[['auto','Auto'],['manual','Manual']],active:'auto',action:'fan-mode',ariaLabel:'Fan mode',disabled:false},speed:null,save:{action:'apply-device',label:'Save setting',disabled:true},helper:'Preview controls only · no command is sent to equipment.'}));
+  parts.push(UI.deviceControl({icon:I('air'),name:'Ventilation fan',status:'Auto · following unit schedule',mode:{options:[['auto','Auto'],['manual','Manual']],active:'manual',action:'fan-mode',ariaLabel:'Fan mode',disabled:false},speed:{id:'fan-speed',label:'Fan speed',value:45,disabled:false},save:{action:'apply-device',label:'Save setting',disabled:false},helper:'Preview controls only · no command is sent to equipment.'}));
+  root.innerHTML = parts.join('');
+})();
+</script>
+</body>
+</html>
