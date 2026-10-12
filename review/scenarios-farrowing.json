@@ -1,8 +1,8 @@
 {
  "feature": "farrowing",
- "commit": "f69d92742832ad927c9ef84c3182b5e76c11554c",
- "dirty": false,
- "ran": "2026-10-12T07:25:14.607Z",
+ "commit": "c88430b94d6d6cd8b982e01e9ff140f3fd96ab67",
+ "dirty": true,
+ "ran": "2026-10-12T07:41:51.724Z",
  "base": "http://localhost:4418",
  "langs": [
   "en"

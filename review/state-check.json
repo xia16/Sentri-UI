@@ -1635,6 +1635,30 @@
   },
   {
     "component": "Row",
+    "variant": "animal-classic",
+    "state": "Default",
+    "problems": []
+  },
+  {
+    "component": "Row",
+    "variant": "animal-classic",
+    "state": "Pressed",
+    "problems": []
+  },
+  {
+    "component": "Row",
+    "variant": "animal-classic",
+    "state": "Long label / Chinese",
+    "problems": []
+  },
+  {
+    "component": "Row",
+    "variant": "animal-classic",
+    "state": "Disabled",
+    "problems": []
+  },
+  {
+    "component": "Row",
     "variant": "animal",
     "state": "Default · live",
     "problems": []

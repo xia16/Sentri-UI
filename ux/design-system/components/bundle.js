@@ -157,8 +157,8 @@
     const trailHtml=chip?'':typed?`<span class="st-row-trailing">${part(trailing)}</span>`:has(o,'trailing')?`<span class="st-row-trailing">${tx(trailing,o,'trailing')}</span>`:trailing?`<span class="st-row-trailing">${esc(trailing)}</span>`:'';
     const tag=action?'button':'div';
     const railHtml=disabled?'':variant==='tick'&&tr==='auto'?'':tr==='edit'?`<span class="st-row-chevron" data-rail="edit">${glyph('edit')}<span data-str="act.edit">Edit</span></span>`:(tr==='chevron'||(tr==='auto'&&action))?`<span class="st-row-chevron">${arrow}</span>`:'';
-    if(variant==='animal'){
-      const a=animalBody({code,description,title,chip,right,contextWidth,tight,attrs,o});
+    if(variant==='animal'&&right){
+      const a=animalBody({code,description,right,contextWidth,tight,o});
       return `<${tag} class="st-row ${esc(className)}" data-ds="Row" data-variant="animal" data-animal="${a.kind}"${id?` id="${esc(id)}"`:''}${action?` type="button" data-action="${esc(action)}" data-value="${esc(value)}"${disabled?' disabled aria-disabled="true"':''}`:''}${safeAttr(attrs)}>${a.html}${railHtml}</${tag}>`;
     }
     const c=rowCopy({title,description,code,mono,tight,o,titleId:id?id+'-title':''});
@@ -174,7 +174,7 @@
      the same box as rowSelect) toggles; the door (copy + ›) opens. contentHtml: trusted markup in place of the title/description copy. */
   function rowSelectDoor({title='',description='',code='',mono=false,wrap=false,tight=false,checked=false,action='select',value='',openAction='open',openValue='',label='',id='',className='',doorClass='',attrs={},strs,args,inputAttrs={},contentHtml='',right=null,contextWidth=''}={}){
     const o={strs,args},c=rowCopy({title,description,code,mono,tight,o});
-    const an=right?animalBody({code,description,title,chip:null,right,contextWidth,tight,attrs,o}):null;
+    const an=right?animalBody({code,description,right,contextWidth,tight,o}):null;
     const copy=contentHtml||(an?an.html:'')||`${c.codeHtml}<span class="st-row-copy">${c.strong()}${c.small}</span>`;
     return `<div class="st-row ${esc(className)}" data-ds="Row" data-variant="select-door"${an?` data-animal="${an.kind}"`:''} data-select=""${id?` id="${esc(id)}"`:''}${wrap?' data-wrap=""':''}${safeAttr(attrs)}><label class="st-choice-trail"><input type="checkbox"${action?` data-action="${esc(action)}"`:''} value="${esc(value)}"${checked?' checked':''}${safeAttr(inputAttrs)}></label><button type="button" class="st-row-door ${esc(doorClass)}" data-action="${esc(openAction)}" data-value="${esc(openValue)}"${label?` aria-label="${esc(label)}"`:''}>${copy}<span class="st-row-chevron">${arrow}</span></button></div>`;
   }
@@ -689,35 +689,26 @@
        right:{kind:'tags',tags:[{name,icon,level}]}  one line of compact ConditionTags, most urgent first (act, watch, ongoing; stable inside a level). Screens call
                                                rowFitTags(root) after render, fonts and resize: tags show in that order until the line is full, the rest fold into "+N", and the
                                                first (most urgent) tag never hides.
-     Without right, the old props still draw the state side: title is the figure, chip the word (its kind sets the level), so every list of animals gets one look.
-     No chip under the ID, no headline beside it, no mono meta line. One chevron (the row's own). */
+     Without right the row is the classic animal row (code column, chip, headline, meta), unchanged, until its list is migrated.
+     The new layout has no chip under the ID, no headline beside it and no mono meta line. One chevron (the row's own). */
   const ANIMAL_STATE_LEVELS=['act','live','soon','settled'],TAG_RANK={act:0,watch:1,ongoing:2};
-  const CHIP_LEVEL={overdue:'act',died:'act',active:'live',late:'soon',awaiting:'settled',done:'settled',aborted:'settled'};
-  function animalBody({code,description,title,chip,right,contextWidth,tight,attrs,o}){
+  function animalBody({code,description,right,contextWidth,tight,o}){
     const dList=Array.isArray(description),show=dList?description.length>0:(description||has(o,'description'));
     const ctx=show?`<span class="st-animal-context">${dList?toks(description,{tight,dot:true}):tx(description,o,'description')}</span>`:'';
     const left=`<span class="st-animal-left"><strong class="st-animal-id">${tx(code,o,'code')}</strong>${ctx}</span>`;
-    let kind,rightHtml='',wrap=false;
+    let kind,rightHtml='';
     if(right&&right.kind==='tags'){
       kind='tags';
       const tags=(right.tags||[]).map((t,i)=>({t,i,r:TAG_RANK[COMPACT_LEVEL[t.level]]??2})).sort((a,b)=>a.r-b.r||a.i-b.i).map(x=>conditionTagCompact(x.t)).join('');
       rightHtml=tags?`<span class="st-animal-tags">${tags}<span class="st-animal-more" hidden></span></span>`:'';
     }else{
       kind='state';
-      let figure,word,lv;
-      if(right){
-        const r={strs:right.strs,args:right.args};
-        figure=right.figure?tx(right.figure,r,'figure'):'';word=tx(right.word||'',r,'word');lv=oneOf('Row','right.level',right.level,ANIMAL_STATE_LEVELS,'settled');
-      }else{
-        wrap=true;
-        figure=Array.isArray(title)?toks(title,{tight}):title||has(o,'title')?tx(title,o,'title'):'';
-        word=chip?tx(chip.text||'',{strs:chip.strs,args:chip.args},'text'):'';
-        lv=chip&&chip.kind?(CHIP_LEVEL[chip.kind]||'soon'):(attrs&&attrs['data-tone']==='forecast'?'settled':'soon');
-      }
+      const r={strs:right.strs,args:right.args};
+      const figure=right.figure?tx(right.figure,r,'figure'):'',word=tx(right.word||'',r,'word'),lv=oneOf('Row','right.level',right.level,ANIMAL_STATE_LEVELS,'settled');
       rightHtml=figure||word?`<span class="st-animal-state" data-level="${lv}">${figure?`<span class="st-animal-figure">${figure}</span>`:''}${word||lv==='act'?`<span class="st-animal-word">${lv==='act'?ALERT_DOT:''}${word}</span>`:''}</span>`:'';
     }
     const width=/^\d+(?:\.\d+)?(?:px|rem|em|%)$/.test(contextWidth||'')?` style="--st-animal-left:${contextWidth}"`:'';
-    return {kind,html:`<span class="st-animal-body" data-kind="${kind}"${wrap?' data-wrap=""':''}${width}>${left}${rightHtml}</span>`};
+    return {kind,html:`<span class="st-animal-body" data-kind="${kind}"${width}>${left}${rightHtml}</span>`};
   }
   /* Fit the tag line of every animal row under root (an element or the document): call it after the rows render, after fonts load and on resize. */
   function rowFitTags(rootEl){

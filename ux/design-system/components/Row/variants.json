@@ -44,8 +44,23 @@
       "farrowing.search",
       "farrowing.scan",
       "farrowing.task-sows",
-      "inspection.walk",
-      "piglet-processing.pen-list"
+      "inspection.walk"
+    ]
+  },
+  {
+    "id": "animal-classic",
+    "name": "Animal (classic)",
+    "use": "Until migrated: the older animal row for lists whose rows carry several items (a code column, a status chip, a headline and a meta line). Piglet processing lists, Weaning handoff, Pig profile. Not for new lists: use Animal.",
+    "notUse": "Not for a list of one-state animals or a walk with conditions — use Animal (the approved row).",
+    "states": [
+      "Default",
+      "Pressed",
+      "Long label / Chinese",
+      "Disabled"
+    ],
+    "usedBy": [
+      "piglet-processing.pen-list",
+      "weaning.handoff"
     ]
   },
   {

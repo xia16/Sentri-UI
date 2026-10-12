@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-12T07:19:59.236Z",
- "commit": "b1c7dd3",
+ "generated": "2026-10-12T07:49:16.173Z",
+ "commit": "c88430b",
  "platforms": [
   {
    "id": "mobile",
@@ -7988,9 +7988,9 @@
          }
         ],
         "run": {
-         "commit": "b1c7dd3",
+         "commit": "c88430b",
          "dirty": true,
-         "ran": "2026-10-12T07:19:58.668Z",
+         "ran": "2026-10-12T07:41:51.724Z",
          "langs": [
           "en"
          ],
@@ -19922,6 +19922,7 @@
       "variantsJson": true,
       "variants": [
        "animal",
+       "animal-classic",
        "door-act",
        "navigation",
        "record",
