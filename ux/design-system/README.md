@@ -22,7 +22,7 @@ Sentri copy says what to do, where, and how much. It is operational, not friendl
 
 The ground is a green-tinted off-white; text is one deep green-black; colour appears only when it means something.
 
-- Put the app on `app-background`; put page panels on `paper`. Inside a drawer the drawer is `paper` and its panels are `inset` — context belongs to the container, not the panel (`data-st-context="page" | "drawer"`).
+- **Two surfaces, paper and the tint (owner, 2026-10-12).** Pages and menu drawers (every row an option or a verb) are `app-background` with `paper` cards; content and input drawers (search, forms, records, pen sheets, Today) are `paper` with tinted cards. A card is always the opposite of its base. Read [SURFACES.md](SURFACES.md) before building any screen: it has the full rule and good and bad examples as images. Context belongs to the container, not the panel (`data-st-context="page" | "drawer" | "menu"`).
 - Set all primary text in `ink` and all secondary text (descriptions, meta, fact labels, group headings, chevrons) in `muted`. `muted` holds 4.5:1 on `paper`, `app-background` and `well` only.
 - **Every primary button is `ink` with a white label.** Green is never a button fill: `green` means done, recorded, synced; never selected. Selection is `ink`: an ink tick or checkbox, and a ticked row on the neutral `well`.
 - Status words are coloured text with a 4px dot, never filled badges: `amber` due now / waiting to upload, `progress` in progress, `green` done, `muted` waiting. A pending block may sit on `pending-surface` with a `pending-border`.
@@ -41,7 +41,7 @@ The ground is a green-tinted off-white; text is one deep green-black; colour app
 
 - Single column, 390px phone canvas. Gutters: `space-gutter` (18px) for headers and drawer footers, `space-gutter-sheet` (21px) for full-page bodies; at 370px and below every gutter and panel padding drops to `space-gutter-narrow` (12px).
 - Panels pad `space-panel` (16px). Rows pad `space-row-y` × `space-row-x` (12 × 14) with a `row-min` of 68px. Sections sit `space-section` (24px) apart; action categories `space-action-section` (32px).
-- **Touch:** nothing tappable is smaller than `tap-min` (48px). Footer buttons, Back and icon buttons are `control-height` (48px); fields are `field-height` (48px); chooser rows `choice-row-min` (56px).
+- **Touch:** every other button and target is at least 44px (a hit area that reaches 44 counts). The farm legibility check below still measures a 48×48 hit area; that stricter floor is unchanged. Footer and dock buttons (sheet footers, task docks, the room dock, bottom bars) are `footer-height` (56px, owner 2026-10-12). Filter and icon buttons and stepper keys are `control-height` (48px) and must not grow; fields are `field-height` (48px); chooser rows `choice-row-min` (56px).
 - Footers pad `14px 18px 28px`; the bottom 28px leaves room for the 92×4px `handle` bar.
 
 ### Surfaces, borders, radii and elevation
@@ -50,16 +50,16 @@ The ground is a green-tinted off-white; text is one deep green-black; colour app
 - **The task skeleton (candidate, ADR 0003).** Every task is built on farrowing's anatomy, with only its information changed: [TaskPhone](components/TaskPhone/README.md) (the 390×844 frame on a wide screen, full-bleed on a phone), [TaskHeader](components/TaskHeader/README.md) with the last-record line, [TaskSummary](components/TaskSummary/README.md), [TaskLens](components/TaskLens/README.md), [TaskGroup](components/TaskGroup/README.md) of [TaskRow](components/Row/README.md)s, [TaskDock](components/TaskDock/README.md), [Sheet](components/Sheet/README.md) (drawer · page · dialog) (sized to its content; the footer always on its bottom edge), [Button hold](components/Button/README.md), [TaskTotals](components/TaskTotals/README.md), [TaskProgress](components/TaskProgress/README.md), [TaskStepper](components/TaskStepper/README.md), [TaskPhotos](components/TaskPhotos/README.md), [TaskChoice](components/TaskChoice/README.md), [TaskRadios](components/TaskRadios/README.md), [TaskWarning](components/TaskWarning/README.md), [TaskTable](components/TaskTable/README.md), [TaskMetrics](components/TaskMetrics/README.md), [TaskSection](components/TaskSection/README.md), [TaskReceipt](components/TaskReceipt/README.md), [TaskDay](components/TaskDay/README.md), [Sheet](components/Sheet/README.md) variants page and dialog. The exit in every footer is **Back**.
 - **Panels are bordered, not shadowed:** 1px `line`, `radius-panel` (18px), no shadow. No card is shadowed.
 - Radii: `radius-panel` 18 for panels, `radius-inset` 14 for insets, `radius-control` 12 for buttons, fields and icon buttons, `radius-segment` 10 for segment tracks and row icon tiles (8 for the segment's buttons), `radius-dialog` 22.
-- No left-border accent stripes on cards. The one inset bar is the 3px `current-marker` on the row you are standing in.
+- No left-border accent stripes and no inset bars on cards: a bar is cut by the card's corner. The active category tab keeps its underline; that is a tab, not a row.
 
 ### States
 
-- **Press:** rows and options fill `press` (choosers `choice-press`); buttons darken (`brightness(.96)`) and move down 1px. Stepper keys scale to .96.
+- **Press:** one step deeper than the surface pressed: `press` on paper (a white card), `choice-press` on the tint (a tinted card). Components read `--st-press`; screens never paint it. Buttons darken (`brightness(.96)`) and move down 1px. Stepper keys scale to .96.
 - **Disabled:** primary buttons go `disabled-fill` with `disabled-ink`. But prefer omission: blocked verbs are left out, not greyed, with one line saying why ("4 not available for a gilt ›"). Done rows differ by ✓, stamp and ✎ — never by grey.
 - **The floor-gray (the one scoped exception to "no dim-as-disabled"; owner, 2026-08-30).** A field key with nothing to do — a stepper's − at its floor or + at its ceiling, a Numpad's ⌫ on an empty value, `.` after a point, digits when the value is full — fills `disabled-fill` with a `disabled-ink` glyph. It is `aria-disabled`, never `disabled`: the tap still reaches the host, which answers it in the field's reserved hint line (pointers such as `Found dead? Record dead` · `Wrong count? Edit` at a floor, a sentence at a ceiling, `Tag is 6 digits` on a full pad). Nothing else is ever greyed. Used by [Stepper](components/Stepper/README.md) and [Numpad](components/Numpad/README.md).
 - **Waiting (candidate, ADR 0002).** A button that one visible step will make live stays present and quiet: `aria-disabled` with the `disabled-fill` face, focusable ([Button](components/Button/README.md)). It stands alone: no reason line is drawn above it (the reason is read to the screen reader only, as its description). Prefer omission otherwise.
 - **No designed focus, hover or keyboard state.** Sentri is a touch app; the OS screen reader draws its own focus outline. A tap draws no focus ring: inside a phone `:focus:not(:focus-visible)` has no outline, while keyboard focus (`:focus-visible`) keeps the browser's.
-- **Current location:** `green-wash` background plus the `current-marker` inset bar (`aria-current="location"`).
+- **Current or selected is ink, never green and never a bar.** A single current row (`aria-current="location"`) shows an ink ✓ in the right rail and a 600 title, with no fill. Multi-select is an ink checkbox with the row at most `well`. A selected tile gets a 2px ink ring. A guard (`ux/system/surfaces.test.cjs`) fails a green current or selected fill.
 
 ### Motion
 

@@ -292,7 +292,7 @@
 
   /* ---- More: Move piglets · Set count · Litter weight · Boars and gilts (the figures the Piglets card only reads) ---- */
   function moreSheet() {
-    return K.drawer({ title: T('more.title'), size: 'medium', view: 'more',
+    return K.drawer({ title: T('more.title'), size: 'medium', view: 'more', surface: 'menu',
       body: K.doors({ card: true, items: [{ title: T('move.title'), icon: 'transfer', action: 'tool', value: 'move' }, { title: T('tool.count'), icon: 'edit', action: 'tool', value: 'count' },
         { title: T('w.title'), icon: 'weight', action: 'weight-open', value: '' }, { title: T('cnt.title'), icon: 'profile', action: 'counts-open', value: '' }] }),
       footer: K.footer({ back: { action: 'back', label: T('back') } }) });

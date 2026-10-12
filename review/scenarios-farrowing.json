@@ -1,9 +1,9 @@
 {
  "feature": "farrowing",
- "commit": "476ea14592a10ef21df9b5563d7f0ec18abe8333",
+ "commit": "e32a0a05622372b44f19a37703156c14138d8b19",
  "dirty": true,
- "ran": "2026-10-12T12:38:05.517Z",
- "base": "http://localhost:64717",
+ "ran": "2026-10-12T12:59:24.123Z",
+ "base": "http://localhost:58340",
  "langs": [
   "en"
  ],
@@ -19,15 +19,15 @@
   "decision-blocker": 5
  },
  "summary": {
-  "pass": 87,
-  "fail": 0,
+  "pass": 13,
+  "fail": 74,
   "blocked": 5,
   "pending": 3
  },
  "byLang": {
   "en": {
-   "pass": 87,
-   "fail": 0,
+   "pass": 13,
+   "fail": 74,
    "blocked": 0
   }
  },
@@ -39,32 +39,32 @@
    "pending": 1
   },
   "counting": {
-   "pass": 17,
-   "fail": 0,
+   "pass": 2,
+   "fail": 15,
    "blocked": 0,
    "pending": 2
   },
   "finish": {
-   "pass": 2,
-   "fail": 0,
+   "pass": 0,
+   "fail": 2,
    "blocked": 0,
    "pending": 0
   },
   "edit": {
-   "pass": 8,
-   "fail": 0,
+   "pass": 0,
+   "fail": 8,
    "blocked": 1,
    "pending": 0
   },
   "sow-death": {
-   "pass": 19,
-   "fail": 0,
+   "pass": 0,
+   "fail": 19,
    "blocked": 0,
    "pending": 0
   },
   "task": {
-   "pass": 5,
-   "fail": 0,
+   "pass": 0,
+   "fail": 5,
    "blocked": 2,
    "pending": 0
   },
@@ -75,13 +75,458 @@
    "pending": 0
   },
   "search-scan": {
-   "pass": 25,
-   "fail": 0,
+   "pass": 0,
+   "fail": 25,
    "blocked": 0,
    "pending": 0
   }
  },
- "hardFailures": [],
+ "hardFailures": [
+  {
+   "id": "fa-a3-stillborn-first-record",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-c1-receipt-says-saved",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-c2-tool-reads-record-dead",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-c3-minus-clamps-at-floor",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-d1-back-keeps-death-draft",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-d2-reopen-restores-draft",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-d3-resume-adds-to-draft",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-d4-clear-discards-draft",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-d5-save-posts-one-event",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-f2-draft-never-crosses-lock",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-f1-finish-blocked-by-death-draft",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-f3-resolved-finish-unblocked",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-f4-lock-gives-locked-record",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-d6-dismiss-keeps-death-draft",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-d7-restart-keeps-death-draft",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-f7-tap-does-not-lock",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-f8-locked-record-face",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-x9-changed-row-shows-was",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-x2-save-correction",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-x4-edit-clear-discards",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-x10-back-with-change-asks-save",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-x11-ask-discard-drops-change",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-x12-ask-save-posts-correction",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-x5-correct-born-after-lock",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-x6-log-shows-correction",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-m1-sow-death-ends-session",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-m2-dead-sow-stays-in-room",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-m11-back-row-says-to-allocate",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-m17-row-opens-allocation-sheet",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-m18-partial-move-keeps-the-rest",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-m19-rest-hand-reared",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-m3-sow-death-needs-hold",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-m4-piglet-deaths-after-sow-died",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-m7-allocation-sheet-after-death",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-m8-all-fostered-she-leaves",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-m9-overview-counts-who-left",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-m12-hand-reared-row-stays",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-m13-hand-reared-row-opens-record",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-m14-rearing-pen-she-leaves",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-m15-back-leaves-row-to-allocate",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-m16-no-rearing-pen-no-option",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-m20-abortion-no-live-leaves-list",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-m21-overview-counts-aborted",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-m22-abortion-with-live-row-stays",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-k1-overview-adds-up",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-k3-end-needs-hold",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-k4-end-gives-receipt",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-k5-receipt-one-exit",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-k6-end-early-receipt",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-s1-search-lists-nothing-until-typed",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-s2-search-groups-this-unit-first",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-s6-other-unit-result-opens-her-farrowing-drawer",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-s3-tags-starting-with-the-text-rank-first",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-s4-pen-codes-match",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-s5-no-match-says-so",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-s8-search-scan-icon-opens-scan",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-s9-cancel-returns-to-the-room",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-s10-no-reader-says-so-with-no-buttons",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-s11-back-arrow-leaves-scan",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-s12-connected-empty-says-hold-the-reader",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-s13-scans-listed-newest-first-in-two-groups",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-s14-scan-rows-are-select-and-door",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-s15-stop-scanning-pauses-and-keeps-the-list",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-s16-resume-scanning-listens-again",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-s17-one-ticked-shows-the-selection-bar",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-s19-selection-count-is-plain-text",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-s18-actions-offer-the-generic-actions-only",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-s26-actions-note-opens-the-note-for-the-first-sow",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-s20-unticking-the-last-sow-brings-stop-scanning-back",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-s21-scan-row-opens-her-drawer",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-s22-back-returns-to-the-scan-list",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-s23-ticks-survive-opening-a-sow",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-s24-scan-row-in-another-unit-opens-her-drawer",
+   "hard": [
+    "dead-end"
+   ]
+  },
+  {
+   "id": "fa-s25-repeat-scan-does-not-duplicate",
+   "hard": [
+    "dead-end"
+   ]
+  }
+ ],
  "leaves": [
   {
    "id": "fa-e1-home-lands-on-room",
@@ -867,36 +1312,40 @@
      "says": "Record dead live (a stillborn can be the first record)"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-a3-stillborn-first-record/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-a3-stillborn-first-record/en-390/01-data-action-death.png",
-      "review/scenarios/farrowing/fa-a3-stillborn-first-record/en-390/02-data-action-deadstep-data-value-.png",
-      "review/scenarios/farrowing/fa-a3-stillborn-first-record/en-390/03-data-action-savedeath.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-a3-stillborn-first-record/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-a3-stillborn-first-record/en-360/01-data-action-death.png",
-      "review/scenarios/farrowing/fa-a3-stillborn-first-record/en-360/02-data-action-deadstep-data-value-.png",
-      "review/scenarios/farrowing/fa-a3-stillborn-first-record/en-360/03-data-action-savedeath.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -922,30 +1371,40 @@
      "says": "Saved · +4 this visit"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-c1-receipt-says-saved/en-390/00-start.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-c1-receipt-says-saved/en-360/00-start.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -976,30 +1435,40 @@
      "says": "recommendation: Record dead, as ruled"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-c2-tool-reads-record-dead/en-390/00-start.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-c2-tool-reads-record-dead/en-360/00-start.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -1026,38 +1495,40 @@
      "says": "+ is free; − drains pending and clamps at the floor"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-c3-minus-clamps-at-floor/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-c3-minus-clamps-at-floor/en-390/01-data-action-alive-data-value-1.png",
-      "review/scenarios/farrowing/fa-c3-minus-clamps-at-floor/en-390/02-data-action-alive-data-value-1.png",
-      "review/scenarios/farrowing/fa-c3-minus-clamps-at-floor/en-390/03-data-action-alive-data-value-1.png",
-      "review/scenarios/farrowing/fa-c3-minus-clamps-at-floor/en-390/04-data-action-alive-data-value-1.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-c3-minus-clamps-at-floor/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-c3-minus-clamps-at-floor/en-360/01-data-action-alive-data-value-1.png",
-      "review/scenarios/farrowing/fa-c3-minus-clamps-at-floor/en-360/02-data-action-alive-data-value-1.png",
-      "review/scenarios/farrowing/fa-c3-minus-clamps-at-floor/en-360/03-data-action-alive-data-value-1.png",
-      "review/scenarios/farrowing/fa-c3-minus-clamps-at-floor/en-360/04-data-action-alive-data-value-1.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -1122,36 +1593,40 @@
      "says": "leave a screen and keep any draft on the device"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-d1-back-keeps-death-draft/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-d1-back-keeps-death-draft/en-390/01-data-action-death.png",
-      "review/scenarios/farrowing/fa-d1-back-keeps-death-draft/en-390/02-data-action-deadstep-data-value-.png",
-      "review/scenarios/farrowing/fa-d1-back-keeps-death-draft/en-390/03-data-action-back.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-d1-back-keeps-death-draft/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-d1-back-keeps-death-draft/en-360/01-data-action-death.png",
-      "review/scenarios/farrowing/fa-d1-back-keeps-death-draft/en-360/02-data-action-deadstep-data-value-.png",
-      "review/scenarios/farrowing/fa-d1-back-keeps-death-draft/en-360/03-data-action-back.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -1185,38 +1660,40 @@
      "says": "No green for drafts: an unsaved draft is muted ink, never the recorded green."
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-d2-reopen-restores-draft/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-d2-reopen-restores-draft/en-390/01-data-action-death.png",
-      "review/scenarios/farrowing/fa-d2-reopen-restores-draft/en-390/02-data-action-deadstep-data-value-.png",
-      "review/scenarios/farrowing/fa-d2-reopen-restores-draft/en-390/03-data-action-back.png",
-      "review/scenarios/farrowing/fa-d2-reopen-restores-draft/en-390/04-data-action-death.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-d2-reopen-restores-draft/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-d2-reopen-restores-draft/en-360/01-data-action-death.png",
-      "review/scenarios/farrowing/fa-d2-reopen-restores-draft/en-360/02-data-action-deadstep-data-value-.png",
-      "review/scenarios/farrowing/fa-d2-reopen-restores-draft/en-360/03-data-action-back.png",
-      "review/scenarios/farrowing/fa-d2-reopen-restores-draft/en-360/04-data-action-death.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -1246,40 +1723,40 @@
      "says": "tallies and the cause are a DRAFT until Save"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-d3-resume-adds-to-draft/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-d3-resume-adds-to-draft/en-390/01-data-action-death.png",
-      "review/scenarios/farrowing/fa-d3-resume-adds-to-draft/en-390/02-data-action-deadstep-data-value-.png",
-      "review/scenarios/farrowing/fa-d3-resume-adds-to-draft/en-390/03-data-action-back.png",
-      "review/scenarios/farrowing/fa-d3-resume-adds-to-draft/en-390/04-data-action-death.png",
-      "review/scenarios/farrowing/fa-d3-resume-adds-to-draft/en-390/05-data-action-deadstep-data-value-.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-d3-resume-adds-to-draft/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-d3-resume-adds-to-draft/en-360/01-data-action-death.png",
-      "review/scenarios/farrowing/fa-d3-resume-adds-to-draft/en-360/02-data-action-deadstep-data-value-.png",
-      "review/scenarios/farrowing/fa-d3-resume-adds-to-draft/en-360/03-data-action-back.png",
-      "review/scenarios/farrowing/fa-d3-resume-adds-to-draft/en-360/04-data-action-death.png",
-      "review/scenarios/farrowing/fa-d3-resume-adds-to-draft/en-360/05-data-action-deadstep-data-value-.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -1309,40 +1786,40 @@
      "says": "Clear discards the draft (a text action on the title row, present only while a draft exists)"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-d4-clear-discards-draft/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-d4-clear-discards-draft/en-390/01-data-action-death.png",
-      "review/scenarios/farrowing/fa-d4-clear-discards-draft/en-390/02-data-action-deadstep-data-value-.png",
-      "review/scenarios/farrowing/fa-d4-clear-discards-draft/en-390/03-data-action-back.png",
-      "review/scenarios/farrowing/fa-d4-clear-discards-draft/en-390/04-data-action-death.png",
-      "review/scenarios/farrowing/fa-d4-clear-discards-draft/en-390/05-data-action-cleardeath.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-d4-clear-discards-draft/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-d4-clear-discards-draft/en-360/01-data-action-death.png",
-      "review/scenarios/farrowing/fa-d4-clear-discards-draft/en-360/02-data-action-deadstep-data-value-.png",
-      "review/scenarios/farrowing/fa-d4-clear-discards-draft/en-360/03-data-action-back.png",
-      "review/scenarios/farrowing/fa-d4-clear-discards-draft/en-360/04-data-action-death.png",
-      "review/scenarios/farrowing/fa-d4-clear-discards-draft/en-360/05-data-action-cleardeath.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -1372,40 +1849,40 @@
      "says": "Save commits the draft as one stamped event"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-d5-save-posts-one-event/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-d5-save-posts-one-event/en-390/01-data-action-death.png",
-      "review/scenarios/farrowing/fa-d5-save-posts-one-event/en-390/02-data-action-deadstep-data-value-.png",
-      "review/scenarios/farrowing/fa-d5-save-posts-one-event/en-390/03-data-action-back.png",
-      "review/scenarios/farrowing/fa-d5-save-posts-one-event/en-390/04-data-action-death.png",
-      "review/scenarios/farrowing/fa-d5-save-posts-one-event/en-390/05-data-action-savedeath.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-d5-save-posts-one-event/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-d5-save-posts-one-event/en-360/01-data-action-death.png",
-      "review/scenarios/farrowing/fa-d5-save-posts-one-event/en-360/02-data-action-deadstep-data-value-.png",
-      "review/scenarios/farrowing/fa-d5-save-posts-one-event/en-360/03-data-action-back.png",
-      "review/scenarios/farrowing/fa-d5-save-posts-one-event/en-360/04-data-action-death.png",
-      "review/scenarios/farrowing/fa-d5-save-posts-one-event/en-360/05-data-action-savedeath.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -1439,38 +1916,40 @@
      "says": "Finish waits while a death draft is open; there is no lock to hold."
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-f2-draft-never-crosses-lock/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-f2-draft-never-crosses-lock/en-390/01-data-action-death.png",
-      "review/scenarios/farrowing/fa-f2-draft-never-crosses-lock/en-390/02-data-action-deadstep-data-value-.png",
-      "review/scenarios/farrowing/fa-f2-draft-never-crosses-lock/en-390/03-data-action-back.png",
-      "review/scenarios/farrowing/fa-f2-draft-never-crosses-lock/en-390/04-data-action-finish.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-f2-draft-never-crosses-lock/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-f2-draft-never-crosses-lock/en-360/01-data-action-death.png",
-      "review/scenarios/farrowing/fa-f2-draft-never-crosses-lock/en-360/02-data-action-deadstep-data-value-.png",
-      "review/scenarios/farrowing/fa-f2-draft-never-crosses-lock/en-360/03-data-action-back.png",
-      "review/scenarios/farrowing/fa-f2-draft-never-crosses-lock/en-360/04-data-action-finish.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -1504,38 +1983,40 @@
      "says": "A death draft still blocks Finish, shown as the design system now draws it: Finish disabled, its tap leads to Record dead (1 unsaved). No banner, no reason line."
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-f1-finish-blocked-by-death-draft/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-f1-finish-blocked-by-death-draft/en-390/01-data-action-death.png",
-      "review/scenarios/farrowing/fa-f1-finish-blocked-by-death-draft/en-390/02-data-action-deadstep-data-value-.png",
-      "review/scenarios/farrowing/fa-f1-finish-blocked-by-death-draft/en-390/03-data-action-back.png",
-      "review/scenarios/farrowing/fa-f1-finish-blocked-by-death-draft/en-390/04-data-action-finish.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-f1-finish-blocked-by-death-draft/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-f1-finish-blocked-by-death-draft/en-360/01-data-action-death.png",
-      "review/scenarios/farrowing/fa-f1-finish-blocked-by-death-draft/en-360/02-data-action-deadstep-data-value-.png",
-      "review/scenarios/farrowing/fa-f1-finish-blocked-by-death-draft/en-360/03-data-action-back.png",
-      "review/scenarios/farrowing/fa-f1-finish-blocked-by-death-draft/en-360/04-data-action-finish.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -1565,42 +2046,40 @@
      "says": "this is a guard on the lock, not a gate on recording"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-f3-resolved-finish-unblocked/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-f3-resolved-finish-unblocked/en-390/01-data-action-death.png",
-      "review/scenarios/farrowing/fa-f3-resolved-finish-unblocked/en-390/02-data-action-deadstep-data-value-.png",
-      "review/scenarios/farrowing/fa-f3-resolved-finish-unblocked/en-390/03-data-action-back.png",
-      "review/scenarios/farrowing/fa-f3-resolved-finish-unblocked/en-390/04-data-action-finish.png",
-      "review/scenarios/farrowing/fa-f3-resolved-finish-unblocked/en-390/05-data-action-savedeath.png",
-      "review/scenarios/farrowing/fa-f3-resolved-finish-unblocked/en-390/06-data-action-finish.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-f3-resolved-finish-unblocked/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-f3-resolved-finish-unblocked/en-360/01-data-action-death.png",
-      "review/scenarios/farrowing/fa-f3-resolved-finish-unblocked/en-360/02-data-action-deadstep-data-value-.png",
-      "review/scenarios/farrowing/fa-f3-resolved-finish-unblocked/en-360/03-data-action-back.png",
-      "review/scenarios/farrowing/fa-f3-resolved-finish-unblocked/en-360/04-data-action-finish.png",
-      "review/scenarios/farrowing/fa-f3-resolved-finish-unblocked/en-360/05-data-action-savedeath.png",
-      "review/scenarios/farrowing/fa-f3-resolved-finish-unblocked/en-360/06-data-action-finish.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -1636,44 +2115,40 @@
      "says": "Lock born N is hold-to-commit"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-f4-lock-gives-locked-record/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-f4-lock-gives-locked-record/en-390/01-data-action-death.png",
-      "review/scenarios/farrowing/fa-f4-lock-gives-locked-record/en-390/02-data-action-deadstep-data-value-.png",
-      "review/scenarios/farrowing/fa-f4-lock-gives-locked-record/en-390/03-data-action-back.png",
-      "review/scenarios/farrowing/fa-f4-lock-gives-locked-record/en-390/04-data-action-finish.png",
-      "review/scenarios/farrowing/fa-f4-lock-gives-locked-record/en-390/05-data-action-savedeath.png",
-      "review/scenarios/farrowing/fa-f4-lock-gives-locked-record/en-390/06-data-action-finish.png",
-      "review/scenarios/farrowing/fa-f4-lock-gives-locked-record/en-390/07-data-action-lock.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-f4-lock-gives-locked-record/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-f4-lock-gives-locked-record/en-360/01-data-action-death.png",
-      "review/scenarios/farrowing/fa-f4-lock-gives-locked-record/en-360/02-data-action-deadstep-data-value-.png",
-      "review/scenarios/farrowing/fa-f4-lock-gives-locked-record/en-360/03-data-action-back.png",
-      "review/scenarios/farrowing/fa-f4-lock-gives-locked-record/en-360/04-data-action-finish.png",
-      "review/scenarios/farrowing/fa-f4-lock-gives-locked-record/en-360/05-data-action-savedeath.png",
-      "review/scenarios/farrowing/fa-f4-lock-gives-locked-record/en-360/06-data-action-finish.png",
-      "review/scenarios/farrowing/fa-f4-lock-gives-locked-record/en-360/07-data-action-lock.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -1706,36 +2181,40 @@
      "says": "Drawers have no ✕: the footer Back is the exit; swiping down on the handle or tapping the scrim is Back."
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-d6-dismiss-keeps-death-draft/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-d6-dismiss-keeps-death-draft/en-390/01-data-action-death.png",
-      "review/scenarios/farrowing/fa-d6-dismiss-keeps-death-draft/en-390/02-data-action-deadstep-data-value-.png",
-      "review/scenarios/farrowing/fa-d6-dismiss-keeps-death-draft/en-390/03-grab.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-d6-dismiss-keeps-death-draft/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-d6-dismiss-keeps-death-draft/en-360/01-data-action-death.png",
-      "review/scenarios/farrowing/fa-d6-dismiss-keeps-death-draft/en-360/02-data-action-deadstep-data-value-.png",
-      "review/scenarios/farrowing/fa-d6-dismiss-keeps-death-draft/en-360/03-grab.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -1763,36 +2242,40 @@
      "says": "Back and the dismiss gesture … KEEP the draft on the device (persisted across background and restart)"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-d7-restart-keeps-death-draft/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-d7-restart-keeps-death-draft/en-390/01-data-action-death.png",
-      "review/scenarios/farrowing/fa-d7-restart-keeps-death-draft/en-390/02-data-action-deadstep-data-value-.png",
-      "review/scenarios/farrowing/fa-d7-restart-keeps-death-draft/en-390/03-reload.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-d7-restart-keeps-death-draft/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-d7-restart-keeps-death-draft/en-360/01-data-action-death.png",
-      "review/scenarios/farrowing/fa-d7-restart-keeps-death-draft/en-360/02-data-action-deadstep-data-value-.png",
-      "review/scenarios/farrowing/fa-d7-restart-keeps-death-draft/en-360/03-reload.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -1846,32 +2329,40 @@
      "says": "the Finish sheet's hold-to-lock stays the second guard"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-f7-tap-does-not-lock/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-f7-tap-does-not-lock/en-390/01-data-action-lock.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-f7-tap-does-not-lock/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-f7-tap-does-not-lock/en-360/01-data-action-lock.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -1903,32 +2394,40 @@
      "says": "locks at Finish"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-f8-locked-record-face/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-f8-locked-record-face/en-390/01-data-action-lock.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-f8-locked-record-face/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-f8-locked-record-face/en-360/01-data-action-lock.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -1955,32 +2454,40 @@
      "says": "A changed row shows its new value in normal ink with a small muted \"was 2\" beside the label; no banner, no Corrected tag; one Save correction in the footer."
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-x9-changed-row-shows-was/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-x9-changed-row-shows-was/en-390/01-data-action-editstep-data-value-.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-x9-changed-row-shows-was/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-x9-changed-row-shows-was/en-360/01-data-action-editstep-data-value-.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -2013,34 +2520,40 @@
      "says": "Born has no door pre-lock (it heals when its inputs heal)"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-x2-save-correction/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-x2-save-correction/en-390/01-data-action-editstep-data-value-.png",
-      "review/scenarios/farrowing/fa-x2-save-correction/en-390/02-data-action-saveedit.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-x2-save-correction/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-x2-save-correction/en-360/01-data-action-editstep-data-value-.png",
-      "review/scenarios/farrowing/fa-x2-save-correction/en-360/02-data-action-saveedit.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -2068,34 +2581,40 @@
      "says": "Clear (text action on the summary row) discards it"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-x4-edit-clear-discards/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-x4-edit-clear-discards/en-390/01-data-action-editstep-data-value-.png",
-      "review/scenarios/farrowing/fa-x4-edit-clear-discards/en-390/02-data-action-clearedit.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-x4-edit-clear-discards/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-x4-edit-clear-discards/en-360/01-data-action-editstep-data-value-.png",
-      "review/scenarios/farrowing/fa-x4-edit-clear-discards/en-360/02-data-action-clearedit.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -2123,34 +2642,40 @@
      "says": "Leaving Edit with unsaved changes asks \"Save correction?\" (Save / Discard) in the shared dialog, so an unsaved correction can never reach Finish."
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-x10-back-with-change-asks-save/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-x10-back-with-change-asks-save/en-390/01-data-action-editstep-data-value-.png",
-      "review/scenarios/farrowing/fa-x10-back-with-change-asks-save/en-390/02-data-action-back.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-x10-back-with-change-asks-save/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-x10-back-with-change-asks-save/en-360/01-data-action-editstep-data-value-.png",
-      "review/scenarios/farrowing/fa-x10-back-with-change-asks-save/en-360/02-data-action-back.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -2179,36 +2704,40 @@
      "says": "Discard in the Save correction? ask drops the unsaved change."
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-x11-ask-discard-drops-change/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-x11-ask-discard-drops-change/en-390/01-data-action-editstep-data-value-.png",
-      "review/scenarios/farrowing/fa-x11-ask-discard-drops-change/en-390/02-data-action-back.png",
-      "review/scenarios/farrowing/fa-x11-ask-discard-drops-change/en-390/03-data-action-leavediscard.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-x11-ask-discard-drops-change/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-x11-ask-discard-drops-change/en-360/01-data-action-editstep-data-value-.png",
-      "review/scenarios/farrowing/fa-x11-ask-discard-drops-change/en-360/02-data-action-back.png",
-      "review/scenarios/farrowing/fa-x11-ask-discard-drops-change/en-360/03-data-action-leavediscard.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -2237,36 +2766,40 @@
      "says": "Save in the Save correction? ask commits the correction (who, old → new in the log) and returns."
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-x12-ask-save-posts-correction/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-x12-ask-save-posts-correction/en-390/01-data-action-editstep-data-value-.png",
-      "review/scenarios/farrowing/fa-x12-ask-save-posts-correction/en-390/02-data-action-back.png",
-      "review/scenarios/farrowing/fa-x12-ask-save-posts-correction/en-390/03-data-action-leavesave.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-x12-ask-save-posts-correction/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-x12-ask-save-posts-correction/en-360/01-data-action-editstep-data-value-.png",
-      "review/scenarios/farrowing/fa-x12-ask-save-posts-correction/en-360/02-data-action-back.png",
-      "review/scenarios/farrowing/fa-x12-ask-save-posts-correction/en-360/03-data-action-leavesave.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -2293,36 +2826,40 @@
      "says": "Anyone may amend born post-lock — open ✎, stamped, no role gate."
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-x5-correct-born-after-lock/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-x5-correct-born-after-lock/en-390/01-data-action-bornpopup.png",
-      "review/scenarios/farrowing/fa-x5-correct-born-after-lock/en-390/02-data-action-applyborn.png",
-      "review/scenarios/farrowing/fa-x5-correct-born-after-lock/en-390/03-data-action-saveedit.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-x5-correct-born-after-lock/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-x5-correct-born-after-lock/en-360/01-data-action-bornpopup.png",
-      "review/scenarios/farrowing/fa-x5-correct-born-after-lock/en-360/02-data-action-applyborn.png",
-      "review/scenarios/farrowing/fa-x5-correct-born-after-lock/en-360/03-data-action-saveedit.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -2355,38 +2892,40 @@
      "says": "corrections amber with ✎"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-x6-log-shows-correction/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-x6-log-shows-correction/en-390/01-data-action-bornpopup.png",
-      "review/scenarios/farrowing/fa-x6-log-shows-correction/en-390/02-data-action-applyborn.png",
-      "review/scenarios/farrowing/fa-x6-log-shows-correction/en-390/03-data-action-saveedit.png",
-      "review/scenarios/farrowing/fa-x6-log-shows-correction/en-390/04-data-action-history.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-x6-log-shows-correction/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-x6-log-shows-correction/en-360/01-data-action-bornpopup.png",
-      "review/scenarios/farrowing/fa-x6-log-shows-correction/en-360/02-data-action-applyborn.png",
-      "review/scenarios/farrowing/fa-x6-log-shows-correction/en-360/03-data-action-saveedit.png",
-      "review/scenarios/farrowing/fa-x6-log-shows-correction/en-360/04-data-action-history.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -2447,34 +2986,40 @@
      "says": "Right after the hold records the death, the sheet becomes 'N piglets to allocate'"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m1-sow-death-ends-session/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-m1-sow-death-ends-session/en-390/01-prolapse.png",
-      "review/scenarios/farrowing/fa-m1-sow-death-ends-session/en-390/02-data-action-savedeath.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m1-sow-death-ends-session/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-m1-sow-death-ends-session/en-360/01-prolapse.png",
-      "review/scenarios/farrowing/fa-m1-sow-death-ends-session/en-360/02-data-action-savedeath.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -2507,36 +3052,40 @@
      "says": "Room row while piglets remain unallocated: chip Sow died, headline 'N to allocate'"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m2-dead-sow-stays-in-room/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-m2-dead-sow-stays-in-room/en-390/01-prolapse.png",
-      "review/scenarios/farrowing/fa-m2-dead-sow-stays-in-room/en-390/02-data-action-savedeath.png",
-      "review/scenarios/farrowing/fa-m2-dead-sow-stays-in-room/en-390/03-data-action-close.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m2-dead-sow-stays-in-room/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-m2-dead-sow-stays-in-room/en-360/01-prolapse.png",
-      "review/scenarios/farrowing/fa-m2-dead-sow-stays-in-room/en-360/02-data-action-savedeath.png",
-      "review/scenarios/farrowing/fa-m2-dead-sow-stays-in-room/en-360/03-data-action-close.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -2564,36 +3113,40 @@
      "says": "Room row while piglets remain unallocated: her ID muted grey, chip Sow died, headline 'N to allocate' in the to-do colour"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m11-back-row-says-to-allocate/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-m11-back-row-says-to-allocate/en-390/01-prolapse.png",
-      "review/scenarios/farrowing/fa-m11-back-row-says-to-allocate/en-390/02-data-action-savedeath.png",
-      "review/scenarios/farrowing/fa-m11-back-row-says-to-allocate/en-390/03-data-action-close.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m11-back-row-says-to-allocate/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-m11-back-row-says-to-allocate/en-360/01-prolapse.png",
-      "review/scenarios/farrowing/fa-m11-back-row-says-to-allocate/en-360/02-data-action-savedeath.png",
-      "review/scenarios/farrowing/fa-m11-back-row-says-to-allocate/en-360/03-data-action-close.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -2622,38 +3175,40 @@
      "says": "Tapping the row opens the same sheet"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m17-row-opens-allocation-sheet/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-m17-row-opens-allocation-sheet/en-390/01-prolapse.png",
-      "review/scenarios/farrowing/fa-m17-row-opens-allocation-sheet/en-390/02-data-action-savedeath.png",
-      "review/scenarios/farrowing/fa-m17-row-opens-allocation-sheet/en-390/03-data-action-close.png",
-      "review/scenarios/farrowing/fa-m17-row-opens-allocation-sheet/en-390/04-data-action-room-sow-data-value-.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m17-row-opens-allocation-sheet/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-m17-row-opens-allocation-sheet/en-360/01-prolapse.png",
-      "review/scenarios/farrowing/fa-m17-row-opens-allocation-sheet/en-360/02-data-action-savedeath.png",
-      "review/scenarios/farrowing/fa-m17-row-opens-allocation-sheet/en-360/03-data-action-close.png",
-      "review/scenarios/farrowing/fa-m17-row-opens-allocation-sheet/en-360/04-data-action-room-sow-data-value-.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -2683,50 +3238,40 @@
      "says": "Partial allocation: the remaining count stays; never show '5 moved' on her row"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m18-partial-move-keeps-the-rest/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-m18-partial-move-keeps-the-rest/en-390/01-prolapse.png",
-      "review/scenarios/farrowing/fa-m18-partial-move-keeps-the-rest/en-390/02-data-action-savedeath.png",
-      "review/scenarios/farrowing/fa-m18-partial-move-keeps-the-rest/en-390/03-data-action-close.png",
-      "review/scenarios/farrowing/fa-m18-partial-move-keeps-the-rest/en-390/04-data-action-room-sow-data-value-.png",
-      "review/scenarios/farrowing/fa-m18-partial-move-keeps-the-rest/en-390/05-data-action-allocmove.png",
-      "review/scenarios/farrowing/fa-m18-partial-move-keeps-the-rest/en-390/06-data-action-fostercount-data-val.png",
-      "review/scenarios/farrowing/fa-m18-partial-move-keeps-the-rest/en-390/07-data-action-fostercount-data-val.png",
-      "review/scenarios/farrowing/fa-m18-partial-move-keeps-the-rest/en-390/08-data-action-fostercount-data-val.png",
-      "review/scenarios/farrowing/fa-m18-partial-move-keeps-the-rest/en-390/09-data-action-fostercount-data-val.png",
-      "review/scenarios/farrowing/fa-m18-partial-move-keeps-the-rest/en-390/10-data-action-savefoster.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m18-partial-move-keeps-the-rest/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-m18-partial-move-keeps-the-rest/en-360/01-prolapse.png",
-      "review/scenarios/farrowing/fa-m18-partial-move-keeps-the-rest/en-360/02-data-action-savedeath.png",
-      "review/scenarios/farrowing/fa-m18-partial-move-keeps-the-rest/en-360/03-data-action-close.png",
-      "review/scenarios/farrowing/fa-m18-partial-move-keeps-the-rest/en-360/04-data-action-room-sow-data-value-.png",
-      "review/scenarios/farrowing/fa-m18-partial-move-keeps-the-rest/en-360/05-data-action-allocmove.png",
-      "review/scenarios/farrowing/fa-m18-partial-move-keeps-the-rest/en-360/06-data-action-fostercount-data-val.png",
-      "review/scenarios/farrowing/fa-m18-partial-move-keeps-the-rest/en-360/07-data-action-fostercount-data-val.png",
-      "review/scenarios/farrowing/fa-m18-partial-move-keeps-the-rest/en-360/08-data-action-fostercount-data-val.png",
-      "review/scenarios/farrowing/fa-m18-partial-move-keeps-the-rest/en-360/09-data-action-fostercount-data-val.png",
-      "review/scenarios/farrowing/fa-m18-partial-move-keeps-the-rest/en-360/10-data-action-savefoster.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -2757,52 +3302,40 @@
      "says": "After hand-rear: headline 'N hand-reared'; the remaining count stays after a partial move"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m19-rest-hand-reared/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-m19-rest-hand-reared/en-390/01-prolapse.png",
-      "review/scenarios/farrowing/fa-m19-rest-hand-reared/en-390/02-data-action-savedeath.png",
-      "review/scenarios/farrowing/fa-m19-rest-hand-reared/en-390/03-data-action-close.png",
-      "review/scenarios/farrowing/fa-m19-rest-hand-reared/en-390/04-data-action-room-sow-data-value-.png",
-      "review/scenarios/farrowing/fa-m19-rest-hand-reared/en-390/05-data-action-allocmove.png",
-      "review/scenarios/farrowing/fa-m19-rest-hand-reared/en-390/06-data-action-fostercount-data-val.png",
-      "review/scenarios/farrowing/fa-m19-rest-hand-reared/en-390/07-data-action-fostercount-data-val.png",
-      "review/scenarios/farrowing/fa-m19-rest-hand-reared/en-390/08-data-action-fostercount-data-val.png",
-      "review/scenarios/farrowing/fa-m19-rest-hand-reared/en-390/09-data-action-fostercount-data-val.png",
-      "review/scenarios/farrowing/fa-m19-rest-hand-reared/en-390/10-data-action-savefoster.png",
-      "review/scenarios/farrowing/fa-m19-rest-hand-reared/en-390/11-data-action-allochand.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m19-rest-hand-reared/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-m19-rest-hand-reared/en-360/01-prolapse.png",
-      "review/scenarios/farrowing/fa-m19-rest-hand-reared/en-360/02-data-action-savedeath.png",
-      "review/scenarios/farrowing/fa-m19-rest-hand-reared/en-360/03-data-action-close.png",
-      "review/scenarios/farrowing/fa-m19-rest-hand-reared/en-360/04-data-action-room-sow-data-value-.png",
-      "review/scenarios/farrowing/fa-m19-rest-hand-reared/en-360/05-data-action-allocmove.png",
-      "review/scenarios/farrowing/fa-m19-rest-hand-reared/en-360/06-data-action-fostercount-data-val.png",
-      "review/scenarios/farrowing/fa-m19-rest-hand-reared/en-360/07-data-action-fostercount-data-val.png",
-      "review/scenarios/farrowing/fa-m19-rest-hand-reared/en-360/08-data-action-fostercount-data-val.png",
-      "review/scenarios/farrowing/fa-m19-rest-hand-reared/en-360/09-data-action-fostercount-data-val.png",
-      "review/scenarios/farrowing/fa-m19-rest-hand-reared/en-360/10-data-action-savefoster.png",
-      "review/scenarios/farrowing/fa-m19-rest-hand-reared/en-360/11-data-action-allochand.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -2829,34 +3362,40 @@
      "says": "Saving the sow's death is hold-to-commit"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m3-sow-death-needs-hold/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-m3-sow-death-needs-hold/en-390/01-prolapse.png",
-      "review/scenarios/farrowing/fa-m3-sow-death-needs-hold/en-390/02-data-action-savedeath.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m3-sow-death-needs-hold/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-m3-sow-death-needs-hold/en-360/01-prolapse.png",
-      "review/scenarios/farrowing/fa-m3-sow-death-needs-hold/en-360/02-data-action-savedeath.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -2883,36 +3422,40 @@
      "says": "A piglet that dies or is put down is recorded through Record dead, and the count drops"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m4-piglet-deaths-after-sow-died/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-m4-piglet-deaths-after-sow-died/en-390/01-data-action-death.png",
-      "review/scenarios/farrowing/fa-m4-piglet-deaths-after-sow-died/en-390/02-data-action-deadstep-data-value-.png",
-      "review/scenarios/farrowing/fa-m4-piglet-deaths-after-sow-died/en-390/03-data-action-savedeath.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m4-piglet-deaths-after-sow-died/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-m4-piglet-deaths-after-sow-died/en-360/01-data-action-death.png",
-      "review/scenarios/farrowing/fa-m4-piglet-deaths-after-sow-died/en-360/02-data-action-deadstep-data-value-.png",
-      "review/scenarios/farrowing/fa-m4-piglet-deaths-after-sow-died/en-360/03-data-action-savedeath.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -2938,30 +3481,40 @@
      "says": "Right after the hold records the death, the sheet becomes: title 'N piglets to allocate', subtitle '<ID> · <pen> · sow died <time>', three options; footer Back = later"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m7-allocation-sheet-after-death/en-390/00-start.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m7-allocation-sheet-after-death/en-360/00-start.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -2988,34 +3541,40 @@
      "says": "She leaves the room list once every piglet is on another sow, in a rearing pen, or recorded dead"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m8-all-fostered-she-leaves/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-m8-all-fostered-she-leaves/en-390/01-data-action-allocmove.png",
-      "review/scenarios/farrowing/fa-m8-all-fostered-she-leaves/en-390/02-data-action-savefoster.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m8-all-fostered-she-leaves/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-m8-all-fostered-she-leaves/en-360/01-data-action-allocmove.png",
-      "review/scenarios/farrowing/fa-m8-all-fostered-she-leaves/en-360/02-data-action-savefoster.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -3043,36 +3602,40 @@
      "says": "Task overview counts sows that left the list: 'Left the task · n aborted · n sow died'; every total must still add up"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m9-overview-counts-who-left/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-m9-overview-counts-who-left/en-390/01-data-action-allocmove.png",
-      "review/scenarios/farrowing/fa-m9-overview-counts-who-left/en-390/02-data-action-savefoster.png",
-      "review/scenarios/farrowing/fa-m9-overview-counts-who-left/en-390/03-data-action-room-overview.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m9-overview-counts-who-left/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-m9-overview-counts-who-left/en-360/01-data-action-allocmove.png",
-      "review/scenarios/farrowing/fa-m9-overview-counts-who-left/en-360/02-data-action-savefoster.png",
-      "review/scenarios/farrowing/fa-m9-overview-counts-who-left/en-360/03-data-action-room-overview.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -3099,32 +3662,40 @@
      "says": "After hand-rear: headline 'N hand-reared' in ink; the row stays while hand-reared piglets remain"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m12-hand-reared-row-stays/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-m12-hand-reared-row-stays/en-390/01-data-action-allochand.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m12-hand-reared-row-stays/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-m12-hand-reared-row-stays/en-360/01-data-action-allochand.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -3152,34 +3723,40 @@
      "says": "After hand-rear the piglets stay on her record; piglet care continues"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m13-hand-reared-row-opens-record/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-m13-hand-reared-row-opens-record/en-390/01-data-action-allochand.png",
-      "review/scenarios/farrowing/fa-m13-hand-reared-row-opens-record/en-390/02-data-action-room-sow-data-value-.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m13-hand-reared-row-opens-record/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-m13-hand-reared-row-opens-record/en-360/01-data-action-allochand.png",
-      "review/scenarios/farrowing/fa-m13-hand-reared-row-opens-record/en-360/02-data-action-room-sow-data-value-.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -3206,32 +3783,40 @@
      "says": "Move to a rearing pen: shown when the farm has one; the piglets leave her record"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m14-rearing-pen-she-leaves/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-m14-rearing-pen-she-leaves/en-390/01-data-action-allocrear.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m14-rearing-pen-she-leaves/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-m14-rearing-pen-she-leaves/en-360/01-data-action-allocrear.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -3258,32 +3843,40 @@
      "says": "Footer Back = later: the room row reads 'N to allocate' in the to-do colour"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m15-back-leaves-row-to-allocate/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-m15-back-leaves-row-to-allocate/en-390/01-data-action-close.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m15-back-leaves-row-to-allocate/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-m15-back-leaves-row-to-allocate/en-360/01-data-action-close.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -3309,30 +3902,40 @@
      "says": "Move to a rearing pen: show only when farm config says the farm has one"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m16-no-rearing-pen-no-option/en-390/00-start.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m16-no-rearing-pen-no-option/en-360/00-start.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -3359,42 +3962,40 @@
      "says": "Abortion: no live piglets, she leaves the room list immediately"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m20-abortion-no-live-leaves-list/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-m20-abortion-no-live-leaves-list/en-390/01-data-action-room-sow-data-value-.png",
-      "review/scenarios/farrowing/fa-m20-abortion-no-live-leaves-list/en-390/02-data-action-sowactions.png",
-      "review/scenarios/farrowing/fa-m20-abortion-no-live-leaves-list/en-390/03-record-abortion.png",
-      "review/scenarios/farrowing/fa-m20-abortion-no-live-leaves-list/en-390/04-fill-data-loss-reason.png",
-      "review/scenarios/farrowing/fa-m20-abortion-no-live-leaves-list/en-390/05-data-action-save-miscarriage.png",
-      "review/scenarios/farrowing/fa-m20-abortion-no-live-leaves-list/en-390/06-back.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m20-abortion-no-live-leaves-list/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-m20-abortion-no-live-leaves-list/en-360/01-data-action-room-sow-data-value-.png",
-      "review/scenarios/farrowing/fa-m20-abortion-no-live-leaves-list/en-360/02-data-action-sowactions.png",
-      "review/scenarios/farrowing/fa-m20-abortion-no-live-leaves-list/en-360/03-record-abortion.png",
-      "review/scenarios/farrowing/fa-m20-abortion-no-live-leaves-list/en-360/04-fill-data-loss-reason.png",
-      "review/scenarios/farrowing/fa-m20-abortion-no-live-leaves-list/en-360/05-data-action-save-miscarriage.png",
-      "review/scenarios/farrowing/fa-m20-abortion-no-live-leaves-list/en-360/06-back.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -3422,44 +4023,40 @@
      "says": "Task overview counts sows that left the list: 'Left the task · n aborted · n sow died'"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m21-overview-counts-aborted/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-m21-overview-counts-aborted/en-390/01-data-action-room-sow-data-value-.png",
-      "review/scenarios/farrowing/fa-m21-overview-counts-aborted/en-390/02-data-action-sowactions.png",
-      "review/scenarios/farrowing/fa-m21-overview-counts-aborted/en-390/03-record-abortion.png",
-      "review/scenarios/farrowing/fa-m21-overview-counts-aborted/en-390/04-fill-data-loss-reason.png",
-      "review/scenarios/farrowing/fa-m21-overview-counts-aborted/en-390/05-data-action-save-miscarriage.png",
-      "review/scenarios/farrowing/fa-m21-overview-counts-aborted/en-390/06-back.png",
-      "review/scenarios/farrowing/fa-m21-overview-counts-aborted/en-390/07-data-action-room-overview.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m21-overview-counts-aborted/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-m21-overview-counts-aborted/en-360/01-data-action-room-sow-data-value-.png",
-      "review/scenarios/farrowing/fa-m21-overview-counts-aborted/en-360/02-data-action-sowactions.png",
-      "review/scenarios/farrowing/fa-m21-overview-counts-aborted/en-360/03-record-abortion.png",
-      "review/scenarios/farrowing/fa-m21-overview-counts-aborted/en-360/04-fill-data-loss-reason.png",
-      "review/scenarios/farrowing/fa-m21-overview-counts-aborted/en-360/05-data-action-save-miscarriage.png",
-      "review/scenarios/farrowing/fa-m21-overview-counts-aborted/en-360/06-back.png",
-      "review/scenarios/farrowing/fa-m21-overview-counts-aborted/en-360/07-data-action-room-overview.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -3486,42 +4083,40 @@
      "says": "Abortion: any live piglet, the row stays, chip Aborted, headline '1 alive' (recorded counts only)"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m22-abortion-with-live-row-stays/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-m22-abortion-with-live-row-stays/en-390/01-data-action-alive-data-value-1.png",
-      "review/scenarios/farrowing/fa-m22-abortion-with-live-row-stays/en-390/02-data-action-sowactions.png",
-      "review/scenarios/farrowing/fa-m22-abortion-with-live-row-stays/en-390/03-record-abortion.png",
-      "review/scenarios/farrowing/fa-m22-abortion-with-live-row-stays/en-390/04-fill-data-loss-reason.png",
-      "review/scenarios/farrowing/fa-m22-abortion-with-live-row-stays/en-390/05-data-action-save-miscarriage.png",
-      "review/scenarios/farrowing/fa-m22-abortion-with-live-row-stays/en-390/06-back.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m22-abortion-with-live-row-stays/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-m22-abortion-with-live-row-stays/en-360/01-data-action-alive-data-value-1.png",
-      "review/scenarios/farrowing/fa-m22-abortion-with-live-row-stays/en-360/02-data-action-sowactions.png",
-      "review/scenarios/farrowing/fa-m22-abortion-with-live-row-stays/en-360/03-record-abortion.png",
-      "review/scenarios/farrowing/fa-m22-abortion-with-live-row-stays/en-360/04-fill-data-loss-reason.png",
-      "review/scenarios/farrowing/fa-m22-abortion-with-live-row-stays/en-360/05-data-action-save-miscarriage.png",
-      "review/scenarios/farrowing/fa-m22-abortion-with-live-row-stays/en-360/06-back.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -3548,32 +4143,40 @@
      "says": "how many sows have farrowed, which are still going, which are still waiting"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-k1-overview-adds-up/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-k1-overview-adds-up/en-390/01-data-action-room-overview.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-k1-overview-adds-up/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-k1-overview-adds-up/en-360/01-data-action-room-overview.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -3641,32 +4244,40 @@
      "says": "Task end: manual, hold-to-commit with receipt"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-k3-end-needs-hold/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-k3-end-needs-hold/en-390/01-data-action-room-end-confirm.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-k3-end-needs-hold/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-k3-end-needs-hold/en-360/01-data-action-room-end-confirm.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -3698,32 +4309,40 @@
      "says": "The exit word is always Back."
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-k4-end-gives-receipt/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-k4-end-gives-receipt/en-390/01-data-action-room-end-confirm.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-k4-end-gives-receipt/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-k4-end-gives-receipt/en-360/01-data-action-room-end-confirm.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -3755,32 +4374,40 @@
      "says": "Footer holds Back and Back to Today; recommendation: one exit Back"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-k5-receipt-one-exit/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-k5-receipt-one-exit/en-390/01-data-action-room-end-confirm.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-k5-receipt-one-exit/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-k5-receipt-one-exit/en-360/01-data-action-room-end-confirm.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -3807,32 +4434,40 @@
      "says": "Task end: manual, hold-to-commit with receipt"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-k6-end-early-receipt/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-k6-end-early-receipt/en-390/01-data-action-room-end-confirm.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-k6-end-early-receipt/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-k6-end-early-receipt/en-360/01-data-action-room-end-confirm.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -3921,30 +4556,40 @@
      "says": "Nothing is listed before typing; no \"Unit 7\" in the header"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-s1-search-lists-nothing-until-typed/en-390/00-start.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-s1-search-lists-nothing-until-typed/en-360/00-start.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -3971,32 +4616,40 @@
      "says": "Results are grouped \"In Unit 7\" then \"Other units\""
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-s2-search-groups-this-unit-first/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-s2-search-groups-this-unit-first/en-390/01-fill-data-room-search.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-s2-search-groups-this-unit-first/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-s2-search-groups-this-unit-first/en-360/01-fill-data-room-search.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -4024,34 +4677,40 @@
      "says": "A sow in another unit opens her farrowing drawer: Farrowing is one task across its units"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-s6-other-unit-result-opens-her-farrowing-drawer/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-s6-other-unit-result-opens-her-farrowing-drawer/en-390/01-fill-data-room-search.png",
-      "review/scenarios/farrowing/fa-s6-other-unit-result-opens-her-farrowing-drawer/en-390/02-004318.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-s6-other-unit-result-opens-her-farrowing-drawer/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-s6-other-unit-result-opens-her-farrowing-drawer/en-360/01-fill-data-room-search.png",
-      "review/scenarios/farrowing/fa-s6-other-unit-result-opens-her-farrowing-drawer/en-360/02-004318.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -4078,32 +4737,40 @@
      "says": "Tags that start with the typed text rank before tags that only contain it"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-s3-tags-starting-with-the-text-rank-first/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-s3-tags-starting-with-the-text-rank-first/en-390/01-fill-data-room-search.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-s3-tags-starting-with-the-text-rank-first/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-s3-tags-starting-with-the-text-rank-first/en-360/01-fill-data-room-search.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -4130,32 +4797,40 @@
      "says": "Pen codes match too"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-s4-pen-codes-match/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-s4-pen-codes-match/en-390/01-fill-data-room-search.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-s4-pen-codes-match/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-s4-pen-codes-match/en-360/01-fill-data-room-search.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -4182,32 +4857,40 @@
      "says": "No match reads \"No sow matching “43” in any unit.\""
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-s5-no-match-says-so/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-s5-no-match-says-so/en-390/01-fill-data-room-search.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-s5-no-match-says-so/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-s5-no-match-says-so/en-360/01-fill-data-room-search.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -4234,32 +4917,40 @@
      "says": "A scan icon button inside the field opens Scan"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-s8-search-scan-icon-opens-scan/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-s8-search-scan-icon-opens-scan/en-390/01-data-action-room-scan.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-s8-search-scan-icon-opens-scan/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-s8-search-scan-icon-opens-scan/en-360/01-data-action-room-scan.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -4286,32 +4977,40 @@
      "says": "The field has Cancel beside it"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-s9-cancel-returns-to-the-room/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-s9-cancel-returns-to-the-room/en-390/01-cancel.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-s9-cancel-returns-to-the-room/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-s9-cancel-returns-to-the-room/en-360/01-cancel.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -4337,30 +5036,40 @@
      "says": "Scanner not connected: the pairing instruction, no buttons"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-s10-no-reader-says-so-with-no-buttons/en-390/00-start.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-s10-no-reader-says-so-with-no-buttons/en-360/00-start.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -4387,32 +5096,40 @@
      "says": "The back arrow leaves"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-s11-back-arrow-leaves-scan/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-s11-back-arrow-leaves-scan/en-390/01-data-action-room-back.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-s11-back-arrow-leaves-scan/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-s11-back-arrow-leaves-scan/en-360/01-data-action-room-back.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -4438,30 +5155,40 @@
      "says": "The scanner is always listening: no banner and no Not found row"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-s12-connected-empty-says-hold-the-reader/en-390/00-start.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-s12-connected-empty-says-hold-the-reader/en-360/00-start.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -4487,30 +5214,40 @@
      "says": "Groups \"In Unit 7 · n\" and \"Other units · n\", newest first"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-s13-scans-listed-newest-first-in-two-groups/en-390/00-start.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-s13-scans-listed-newest-first-in-two-groups/en-360/00-start.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -4536,30 +5273,40 @@
      "says": "Rows are the animal row with state, as a select + door"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-s14-scan-rows-are-select-and-door/en-390/00-start.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-s14-scan-rows-are-select-and-door/en-360/00-start.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -4586,32 +5333,40 @@
      "says": "Stop scanning becomes Resume scanning when stopped"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-s15-stop-scanning-pauses-and-keeps-the-list/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-s15-stop-scanning-pauses-and-keeps-the-list/en-390/01-stop-scanning.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-s15-stop-scanning-pauses-and-keeps-the-list/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-s15-stop-scanning-pauses-and-keeps-the-list/en-360/01-stop-scanning.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -4639,34 +5394,40 @@
      "says": "Stop scanning becomes Resume scanning when stopped"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-s16-resume-scanning-listens-again/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-s16-resume-scanning-listens-again/en-390/01-stop-scanning.png",
-      "review/scenarios/farrowing/fa-s16-resume-scanning-listens-again/en-390/02-resume-scanning.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-s16-resume-scanning-listens-again/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-s16-resume-scanning-listens-again/en-360/01-stop-scanning.png",
-      "review/scenarios/farrowing/fa-s16-resume-scanning-listens-again/en-360/02-resume-scanning.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -4693,32 +5454,40 @@
      "says": "N sows selected and the primary Actions; the button says Actions, not More actions"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-s17-one-ticked-shows-the-selection-bar/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-s17-one-ticked-shows-the-selection-bar/en-390/01-data-scan-tag-000431-st-choice-t.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-s17-one-ticked-shows-the-selection-bar/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-s17-one-ticked-shows-the-selection-bar/en-360/01-data-scan-tag-000431-st-choice-t.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -4745,32 +5514,40 @@
      "says": "N sows selected is a plain count, not a button"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-s19-selection-count-is-plain-text/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-s19-selection-count-is-plain-text/en-390/01-data-scan-tag-000431-st-choice-t.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-s19-selection-count-is-plain-text/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-s19-selection-count-is-plain-text/en-360/01-data-scan-tag-000431-st-choice-t.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -4799,36 +5576,40 @@
      "says": "Actions opens the shared generic actions for the selection only; no Farrowing-specific actions"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-s18-actions-offer-the-generic-actions-only/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-s18-actions-offer-the-generic-actions-only/en-390/01-data-scan-tag-000431-st-choice-t.png",
-      "review/scenarios/farrowing/fa-s18-actions-offer-the-generic-actions-only/en-390/02-data-scan-tag-000418-st-choice-t.png",
-      "review/scenarios/farrowing/fa-s18-actions-offer-the-generic-actions-only/en-390/03-actions.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-s18-actions-offer-the-generic-actions-only/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-s18-actions-offer-the-generic-actions-only/en-360/01-data-scan-tag-000431-st-choice-t.png",
-      "review/scenarios/farrowing/fa-s18-actions-offer-the-generic-actions-only/en-360/02-data-scan-tag-000418-st-choice-t.png",
-      "review/scenarios/farrowing/fa-s18-actions-offer-the-generic-actions-only/en-360/03-actions.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -4857,38 +5638,40 @@
      "says": "Actions opens the shared generic actions for the selection"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-s26-actions-note-opens-the-note-for-the-first-sow/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-s26-actions-note-opens-the-note-for-the-first-sow/en-390/01-data-scan-tag-000431-st-choice-t.png",
-      "review/scenarios/farrowing/fa-s26-actions-note-opens-the-note-for-the-first-sow/en-390/02-data-scan-tag-000418-st-choice-t.png",
-      "review/scenarios/farrowing/fa-s26-actions-note-opens-the-note-for-the-first-sow/en-390/03-actions.png",
-      "review/scenarios/farrowing/fa-s26-actions-note-opens-the-note-for-the-first-sow/en-390/04-add-a-note.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-s26-actions-note-opens-the-note-for-the-first-sow/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-s26-actions-note-opens-the-note-for-the-first-sow/en-360/01-data-scan-tag-000431-st-choice-t.png",
-      "review/scenarios/farrowing/fa-s26-actions-note-opens-the-note-for-the-first-sow/en-360/02-data-scan-tag-000418-st-choice-t.png",
-      "review/scenarios/farrowing/fa-s26-actions-note-opens-the-note-for-the-first-sow/en-360/03-actions.png",
-      "review/scenarios/farrowing/fa-s26-actions-note-opens-the-note-for-the-first-sow/en-360/04-add-a-note.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -4916,34 +5699,40 @@
      "says": "To untick, tap the box; nothing ticked: Stop scanning"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-s20-unticking-the-last-sow-brings-stop-scanning-back/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-s20-unticking-the-last-sow-brings-stop-scanning-back/en-390/01-data-scan-tag-000431-st-choice-t.png",
-      "review/scenarios/farrowing/fa-s20-unticking-the-last-sow-brings-stop-scanning-back/en-390/02-data-scan-tag-000431-st-choice-t.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-s20-unticking-the-last-sow-brings-stop-scanning-back/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-s20-unticking-the-last-sow-brings-stop-scanning-back/en-360/01-data-scan-tag-000431-st-choice-t.png",
-      "review/scenarios/farrowing/fa-s20-unticking-the-last-sow-brings-stop-scanning-back/en-360/02-data-scan-tag-000431-st-choice-t.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -4970,32 +5759,40 @@
      "says": "The rest of the row opens her farrowing drawer"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-s21-scan-row-opens-her-drawer/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-s21-scan-row-opens-her-drawer/en-390/01-data-scan-tag-000418-st-row-door.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-s21-scan-row-opens-her-drawer/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-s21-scan-row-opens-her-drawer/en-360/01-data-scan-tag-000418-st-row-door.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -5023,34 +5820,40 @@
      "says": "The list stays while the worker opens a sow and comes back"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-s22-back-returns-to-the-scan-list/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-s22-back-returns-to-the-scan-list/en-390/01-data-scan-tag-000418-st-row-door.png",
-      "review/scenarios/farrowing/fa-s22-back-returns-to-the-scan-list/en-390/02-sheet-surface-back.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-s22-back-returns-to-the-scan-list/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-s22-back-returns-to-the-scan-list/en-360/01-data-scan-tag-000418-st-row-door.png",
-      "review/scenarios/farrowing/fa-s22-back-returns-to-the-scan-list/en-360/02-sheet-surface-back.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -5078,36 +5881,40 @@
      "says": "The list stays while the worker opens a sow and comes back"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-s23-ticks-survive-opening-a-sow/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-s23-ticks-survive-opening-a-sow/en-390/01-data-scan-tag-000431-st-choice-t.png",
-      "review/scenarios/farrowing/fa-s23-ticks-survive-opening-a-sow/en-390/02-data-scan-tag-000418-st-row-door.png",
-      "review/scenarios/farrowing/fa-s23-ticks-survive-opening-a-sow/en-390/03-sheet-surface-back.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-s23-ticks-survive-opening-a-sow/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-s23-ticks-survive-opening-a-sow/en-360/01-data-scan-tag-000431-st-choice-t.png",
-      "review/scenarios/farrowing/fa-s23-ticks-survive-opening-a-sow/en-360/02-data-scan-tag-000418-st-row-door.png",
-      "review/scenarios/farrowing/fa-s23-ticks-survive-opening-a-sow/en-360/03-sheet-surface-back.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -5134,32 +5941,40 @@
      "says": "A sow in another unit opens her farrowing drawer: Farrowing is one task across its units"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-s24-scan-row-in-another-unit-opens-her-drawer/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-s24-scan-row-in-another-unit-opens-her-drawer/en-390/01-data-scan-tag-004318-st-row-door.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-s24-scan-row-in-another-unit-opens-her-drawer/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-s24-scan-row-in-another-unit-opens-her-drawer/en-360/01-data-scan-tag-004318-st-row-door.png"
-     ]
+     "evidence": []
     }
    ]
   },
@@ -5185,30 +6000,40 @@
      "says": "A repeat scan doesn't duplicate; it briefly highlights her existing row"
     }
    ],
-   "result": "pass",
-   "hard": [],
+   "result": "fail",
+   "hard": [
+    "dead-end"
+   ],
    "runs": [
     {
      "lang": "en",
      "width": 390,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-s25-repeat-scan-does-not-duplicate/en-390/00-start.png"
-     ]
+     "evidence": []
     },
     {
      "lang": "en",
      "width": 360,
-     "result": "pass",
-     "failures": [],
+     "result": "fail",
+     "failures": [
+      {
+       "what": "run",
+       "got": "browserContext.newPage: Target crashed ",
+       "tag": "dead-end"
+      }
+     ],
      "skipped": [],
      "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-s25-repeat-scan-does-not-duplicate/en-360/00-start.png"
-     ]
+     "evidence": []
     }
    ]
   }

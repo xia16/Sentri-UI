@@ -33,7 +33,7 @@
 /* Completed facts follow one grid; the drawer fits its content. */
 .farrowing-phone .sheet[data-view="locked"] .completed-record-body{padding-bottom:16px}
 .farrowing-phone .sheet[data-view="locked"] .finish-record{margin:0}
-.farrowing-phone .finish-record .facts-surface{padding:16px;background:#f6f7f2;border-radius:10px}
+.farrowing-phone .finish-record .facts-surface{padding:16px;background:var(--st-panel-bg);border-radius:10px}
 @media(max-width:370px){
  .farrowing-phone .finish-record .facts-surface{padding:14px}}
 .farrowing-phone .optional{background:transparent;padding:0;margin:24px 0}
@@ -82,7 +82,7 @@
 /* Finish: a task header, quiet totals, and one aligned column of controls. */
 .farrowing-phone .finish-body{display:flex;flex-direction:column;gap:20px;padding-bottom:16px}
 .farrowing-phone .finish-body>*{flex-shrink:0}
-.farrowing-phone .finish-totals{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;background:#f6f7f2;border-radius:12px;padding:13px 16px;margin:0}
+.farrowing-phone .finish-totals{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;background:var(--st-panel-bg);border-radius:12px;padding:13px 16px;margin:0}
 .farrowing-phone .finish-totals dt{font-size:13px;line-height:1.5;color:var(--muted)}
 .farrowing-phone .finish-totals dd{font:600 23px/1.3 var(--font-sans);font-variant-numeric:tabular-nums;margin:4px 0 0}
 .farrowing-phone .finish-condition{border:0;padding:0;margin:0;min-width:0}
@@ -119,7 +119,7 @@
 .farrowing-phone .sheet[data-view="count"] .tools .tool:disabled{color:#98a198;border-color:#e7ebe5;background:#fcfdfb}
 .farrowing-phone .sheet[data-view="count"] .tools .tool:disabled>svg{color:inherit}
 .farrowing-phone .count-record{padding:0 0 10px}
-.farrowing-phone .count-record-surface{background:#f6f7f2;border-radius:12px;padding:10px 12px}
+.farrowing-phone .count-record-surface{background:var(--st-panel-bg);border-radius:12px;padding:10px 12px}
 .farrowing-phone .count-record-facts{display:flex;align-items:baseline;gap:24px;margin-bottom:6px}
 .farrowing-phone .count-record-facts:only-child{margin-bottom:0}
 .farrowing-phone .count-record-facts>div{display:flex;align-items:baseline;gap:8px;padding:2px 0}
@@ -133,9 +133,9 @@
  .farrowing-phone .sheet[data-view="count"] .receipt{min-height:28px}
  .farrowing-phone .sheet[data-view="count"] .tools{margin:10px 0 6px}}@media(prefers-reduced-motion:reduce){}@media(max-width:370px){
 }
-.task-progress-section .task-progress{background:#f6f7f2}
+.task-progress-section .task-progress{background:var(--st-panel-bg)}
 .task-status-dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:5px;vertical-align:1px}
-.task-death-review{padding:0 14px 14px;background:#f6f7f2;border-radius:12px;margin-bottom:12px}
+.task-death-review{padding:0 14px 14px;background:var(--st-panel-bg);border-radius:12px;margin-bottom:12px}
 .task-death-review .task-review-sow{border:0}
 .task-death-review .task-review-state{max-width:110px}
 .task-death-litter{border-top:1px solid var(--line);padding-top:12px}
@@ -151,7 +151,7 @@
 .task-end-sheet h4,.task-end-sheet p{margin:0}
 .task-outcome-section{flex-shrink:0}
 .task-performance{flex-shrink:0}
-.task-performance-surface{background:#f6f7f2;border-radius:12px;padding:14px 15px}
+.task-performance-surface{background:var(--st-panel-bg);border-radius:12px;padding:14px 15px}
 .task-kpi-pair{display:grid;grid-template-columns:1fr 1fr;gap:18px}
 .task-kpi-pair>div{display:flex;flex-direction:column;gap:4px}
 .task-kpi-pair>div>span{font-size:13px;color:var(--muted);line-height:1.5}
@@ -162,7 +162,7 @@
 .task-performance-totals{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0 0;padding-top:11px;border-top:1px solid #e3e6dc}
 .task-performance-totals dt{font-size:13px;color:var(--muted);line-height:1.5}
 .task-performance-totals dd{font:500 17px/1.5 var(--font-mono);margin:2px 0 0}
-.task-outcomes-list{background:#f6f7f2;border-radius:12px;padding:9px 15px;margin:0}
+.task-outcomes-list{background:var(--st-panel-bg);border-radius:12px;padding:9px 15px;margin:0}
 .task-outcomes-list>div{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:27px}
 .task-outcomes-list dt{font-size:13px;line-height:1.5}
 .task-outcomes-list dd{font:500 14px var(--font-mono);margin:0}
@@ -195,7 +195,7 @@
 .task-overview-sheet .task-overview-content .task-progress{padding:16px;border-radius:12px}
 .task-overview-sheet .task-overview-content .task-performance-surface{padding:16px}
 .task-overview-sheet .task-overview-content .task-performance-totals{margin-top:16px;padding-top:14px}
-.task-other-surface{padding:6px 16px;background:#f6f7f2;border-radius:12px}@media(max-width:420px){
+.task-other-surface{padding:6px 16px;background:var(--st-panel-bg);border-radius:12px}@media(max-width:420px){
  .task-warning-card{padding:9px 10px;gap:8px;min-height:76px}
  .farrowing-phone .task-end-sheet.task-end-expanded[data-presentation="page"]{height:100%;max-height:100%;bottom:0}
  .farrowing-phone .task-end-sheet[data-size="medium"]{height:var(--drawer-long)}

@@ -89,11 +89,6 @@
   box-shadow: 0 1px 2px #20291f08;
 }
 
-.device .section-card.selected {
-  background: #eaf2e5;
-  border-color: #a9bda0;
-}
-
 .device .section-card-top strong { font-weight: 500; }
 .device .section-work { margin-top: 14px; }
 
@@ -145,8 +140,8 @@
 .device .finding { background: #fffaf0; border-color: #e5dcc5; }
 .device .finding .overline,
 .device .assistant-hero .overline { color: #896017; }
-.device .message:not(.user) { background: #f8faf5; }
-.device .message.user { background: #eaf2e5; }
+.device .message:not(.user) { background: var(--paper); }
+.device .message.user { background: var(--well); }
 .device .composer button,
 .device #answer-form .primary,
 .device .sheet-body #fault-form .primary { background: #20291f; }

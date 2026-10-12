@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-12T12:38:15.622Z",
- "commit": "476ea14",
+ "generated": "2026-10-12T12:58:17.171Z",
+ "commit": "e32a0a0",
  "platforms": [
   {
    "id": "mobile",
@@ -908,6 +908,7 @@
          "By unit",
          [
           "workbench.choose-unit",
+          "workbench.choose-unit-current",
           "workbench.unit",
           "workbench.unit-farrowing",
           "workbench.unit-clear",
@@ -1233,7 +1234,62 @@
              {
               "state": "Current",
               "when": "A unit is already chosen",
-              "shows": "The highlighted row (Row scope highlight, aria-current); no extra words or tick"
+              "shows": "An ink check at the right and a 600 title, no fill and no bar (a menu drawer: the tint with one white card)"
+             }
+            ],
+            "logic": "The count is open tasks in the section with unrecorded rows in this unit, so a waiting task counts and can disagree with the cards the unit screen shows. Pigs and pens come from units{}; in the Farrowing section they are overridden (Unit 6: 8 pigs, 4 pens; Unit 7: 7, 4; Unit 8: 4, 2) to match the Farrowing prototype.",
+            "rule": "All units of the section are listed with no search (about 15 at most). Choosing a unit narrows counts, not batch time.",
+            "source": "remaining(unit), unitChoices(), units{}, farrowingUnits{}",
+            "at": "2 tasks"
+           }
+          ],
+          "controls": [],
+          "copy": [
+           "(raw) Choose a unit · Farrowing · Unit 6 · 8 pigs · 4 pens · 2 tasks · Back"
+          ],
+          "edge": [
+           "Units with no tasks still appear."
+          ],
+          "rules": [
+           "Choosing a unit is about the unit, not a task: the rows never show one task's state (owner, 2026-10-12). It is a Home screen; Farrowing is reached from the unit view's Farrowing card, not from here."
+          ],
+          "issues": [
+           "\"2 tasks\" counts tasks with unrecorded rows, waiting ones included; the label does not say what it counts."
+          ]
+         }
+        },
+        {
+         "id": "workbench.choose-unit-current",
+         "name": "Choose unit · current unit",
+         "zh": "选择单元 · 当前单元",
+         "status": "in-design",
+         "url": "/ux/system/home-astra-prototype.html?layout=focus&section=farrowing&view=unit&unit=6",
+         "steps": [
+          "Unit 6"
+         ],
+         "figma": "",
+         "notes": {
+          "purpose": "Choose unit with a unit already chosen: the current unit shows an ink check.",
+          "states": [],
+          "elements": [
+           {
+            "name": "Unit row",
+            "shows": "Unit 6 · 8 pigs · 4 pens · 2 tasks: the unit's own overview, not one task's state. Rows as on More actions: a unit tile (the Inspect unit card's grid icon), the unit name over its overview, in one white grouped card on the tinted sheet.",
+            "states": [
+             {
+              "state": "Has work",
+              "when": "The unit has unrecorded rows in at least one open task",
+              "shows": "\"N tasks\" (singular \"1 task\")"
+             },
+             {
+              "state": "No work",
+              "when": "No open task has unrecorded rows in the unit",
+              "shows": "\"No tasks\"; the unit is still listed"
+             },
+             {
+              "state": "Current",
+              "when": "A unit is already chosen",
+              "shows": "An ink check at the right and a 600 title, no fill and no bar (a menu drawer: the tint with one white card)"
              }
             ],
             "logic": "The count is open tasks in the section with unrecorded rows in this unit, so a waiting task counts and can disagree with the cards the unit screen shows. Pigs and pens come from units{}; in the Farrowing section they are overridden (Unit 6: 8 pigs, 4 pens; Unit 7: 7, 4; Unit 8: 4, 2) to match the Farrowing prototype.",
