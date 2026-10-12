@@ -128,30 +128,12 @@
 .inspection-phone .environment-empty{font-size:15px}
 .inspection-phone .roster-pig{min-height:60px;padding:0 9px 0 3px;align-items:center}
 .inspection-phone .roster-pig .check-target{width:var(--tap-min);min-width:var(--tap-min);min-height:var(--tap-min)}
-.inspection-phone .roster-pig .pig-open{display:flex;align-items:center;gap:8px;min-height:60px;padding:10px 0;min-width:0}
-.inspection-phone .roster-pig .pig-open>.roster-content{flex:1;display:flex;flex-direction:column;gap:5px;min-width:0}
-.inspection-phone .roster-top{display:flex;align-items:flex-start;gap:10px;min-width:0}
-.inspection-phone .roster-id{font:600 var(--type-identifier-strong-size)/24px var(--font-mono);letter-spacing:-.3px;flex-shrink:0}
-.inspection-phone .recorded-tags{display:flex;align-items:center;flex-wrap:wrap;gap:4px;min-width:0}
-.inspection-phone .roster-meta{font-size:var(--type-meta-size);line-height:1.5;color:var(--muted)}
-.inspection-phone .roster-note{font-size:var(--type-meta-size);line-height:1.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--ink);display:block}
-.inspection-phone .roster-pig .pig-open>svg{width:12px;height:12px;flex:0 0 12px;color:var(--muted)}
 .inspection-phone .pen-note-indicator{display:flex;align-items:center;justify-content:center;gap:3px;padding:0 4px;min-height:44px;background:transparent;color:#536847;flex-shrink:0}
 .inspection-phone .pen-note-indicator svg{width:14px;height:14px}
 .inspection-phone .pen-note-indicator span{font-size:var(--type-meta-size)}
 .inspection-phone .pen-note-body{margin:0;font-size:var(--type-row-title-size);line-height:1.7;white-space:pre-wrap;overflow-wrap:anywhere}
-@media(max-width:370px){.inspection-phone .roster-top{gap:7px}.inspection-phone .roster-meta{font-size:var(--type-meta-size)}.inspection-phone .roster-pig .check-target{width:var(--tap-min);min-width:var(--tap-min)}}
-/* Two-line roster: permanent identity/context, then one bounded status line. */
-.inspection-phone .roster-top{align-items:center;gap:8px;min-width:0;white-space:nowrap}
-.inspection-phone .roster-top .roster-meta{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:var(--type-meta-size)}
-.inspection-phone .roster-id{font-size:var(--type-row-title-size);line-height:20px}
-.inspection-phone .roster-pig,.inspection-phone .roster-pig .pig-open{min-height:74px}
-.inspection-phone .roster-pig .pig-open{padding:12px 0}
-.inspection-phone .roster-pig .pig-open>.roster-content{gap:6px}
-.inspection-phone .roster-second{display:flex;align-items:center;gap:7px;min-width:0}
-.inspection-phone .recorded-tags{flex:1;min-width:0;display:flex;flex-wrap:wrap;gap:6px 4px;align-items:center}
-.inspection-phone .recorded-tags>[hidden]{display:none!important}
-.inspection-phone .tag-more{flex:0 0 auto;padding:3px 8px;border:1px solid #d7dccf;border-radius:6px;font:500 var(--type-meta-size)/20px var(--font-sans);color:var(--ink);background:#f4f5f0}
+@media(max-width:370px){.inspection-phone .roster-pig .check-target{width:var(--tap-min);min-width:var(--tap-min)}}
+/* The walk roster row is Row · animal via rowSelectDoor (select + door, tags on the right); the screen only adds the selected tint. */
 /* Match farrowing's default tools; keep selection context in the bottom bar. */
 .inspection-phone .inspect-dock{gap:9px}
 .inspection-phone .inspect-dock .dock-scan{flex:1;min-width:0}
@@ -790,8 +772,6 @@
 .inspection-page-title{flex:1;min-width:0}
 .inspection-page-title small{display:block;font-size:var(--type-meta-size);color:var(--muted);margin-top:4px}
 .inspection-page-title h2{margin:0}
-/* ConditionTag in the pig list: the line lays the tags out (and fitRecordedTags folds the overflow into +N); the tag itself is SentriUI's. */
-.inspection-phone .recorded-tags .st-condition{flex:0 0 auto}
 
 .inspection-phone .attention-row>.st-condition[data-variant="mark"]{flex:none}
 

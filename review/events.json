@@ -1,20 +1,5 @@
 [
  {
-  "id": "events-1",
-  "target": { "kind": "feature", "id": "abortion" },
-  "kind": "decision",
-  "severity": "medium",
-  "title": "Abortion vs miscarriage",
-  "detail": "The event deck's Abortion drawer (single sow, required Cause from six rows, a required note when Other, batch exit derived as a footnote) and the Pig profile's 'Record miscarriage' sheet (free-text Reason, a warning that the sow leaves the batch, Save disabled while empty) record the same pregnancy loss in different forms and under two names. The screen is therefore not aliased. The Pig profile sheet is the one built in the prototype; the deck is the designed one.",
-  "options": [
-    "Use the deck's Abortion drawer in the prototype and retire the free-text Reason",
-    "Keep the Pig profile sheet and drop the deck",
-    "Keep both and merge later"
-  ],
-  "recommendation": "One form with the deck's cause list; settle the word (abortion or miscarriage) with the farm first.",
-  "source": "populate-events"
- },
- {
   "id": "events-2",
   "target": { "kind": "feature", "id": "disease" },
   "kind": "decision",
