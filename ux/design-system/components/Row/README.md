@@ -22,7 +22,7 @@ Leading selection box (select + door only: a 24px box in a 48px hit area, always
   - **Tags** (`right: { kind: 'tags', tags: [{ name, icon?, level }] }`): one line of compact [ConditionTags](../ConditionTag/README.md) (`level` act, watch, ongoing), drawn in that order. The screen calls `SentriUI.rowFitTags(root)` after render, fonts and resize: tags show in order until the line is full, the rest fold into `+N`, and the first (urgent) tag never hides. The screen owns short names (Poor appetite becomes `Appetite` with the `trend-down` glyph) and passes no day or care word.
   The new layout has no status chip under the ID, no headline beside the ID and no mono meta line. The row's own chevron ends it; no pencil.
 - **Animal (classic)**, until migrated: without `right`, the row is the older animal row (code column, status chip, headline, meta line), unchanged. Piglet processing's lists (several items per animal), Weaning handoff and Pig profile still use it. Not for new lists.
-- **Tick in place**: an item ticked before saving (`mark: 'due' | 'ticked'`). A due item shows the ring, a ticked one the check disc on green wash; a ticked item is a draft and never shows a Done chip. Done is said only for a saved item (see Done / record). No chevron. Piglet day list.
+- **Tick in place**: an item ticked before saving (`mark: 'due' | 'ticked'`). A due item shows the ring, a ticked one an ink disc with a white check, and the row takes `well`; a ticked item is a draft and never shows a Done chip. Done is said only for a saved item (see Done / record). No chevron. Piglet day list.
 - **Select + door** (`rowSelectDoor`): a list that selects for a bulk act and opens items. The leading box toggles selection; the door (text column, then a small fixed chevron) opens the item. They are sibling targets, never nested. Without a door (`rowSelect`) the whole row is a label that only selects, the same box on the same side. Inspection pig rows use the door; the Inspection and Feed plan pen header box is the no-door case (box only, with the pen door beside it).
 - **Plain**: a row with no icon, code, mark or trail (a Show/Hide toggle) reports `data-variant="plain"`, not navigation.
 - **Door + act**: details opens a sheet; a sibling act records or removes in one tap. Piglet task sheets and Inspection review.
@@ -35,10 +35,10 @@ Leading selection box (select + door only: a 24px box in a 48px hit area, always
 | State | Rendering and behaviour |
 |---|---|
 | Default | Native button, checkbox label, or inert div according to job. |
-| Pressed | `press` on every tappable face; `attrs: {'data-preview':'pressed'}` demonstrates it statically. |
-| Selected | Native checked checkbox, never colour alone. Tick: the check disc on green wash. |
-| Ticked | Tick only: disc and wash, no Done chip until saved. |
-| Current | `aria-current="location"`, current marker and explicit current-unit description. |
+| Pressed | One step deeper than the surface (`--st-press`: `press` on a white card, `choice-press` on a tinted one) on every tappable face; `attrs: {'data-preview':'pressed'}` demonstrates it statically. |
+| Selected | Native checked checkbox, never colour alone. Tick: the ink check disc. |
+| Ticked | Tick only: ink disc and a `well` row, no Done chip until saved. |
+| Current | `aria-current="location"`: an ink ✓ in the right rail and a 600 title, no fill and no bar. |
 | Disabled | Prefer omission. If retained, pass `disabled` and `reason`: a visible reason line replaces line 2 and the chevron is dropped; no opacity face. |
 | Loading | `act.busy` prevents repeated act while the host settles; label says Recording. |
 | Error | Host supplies actionable reason in line 2 and Retry act; no colour-only error. |
@@ -71,7 +71,7 @@ Component, absorbing TaskRow's animal/tick/door/door+act faces as variants. The 
 
 ## Tokens
 
-`row-icon-bg`, `row-icon-ink`, `press`, `green-wash`, `current-marker`, `row-min`, `space-row-y`, `space-row-x`, `animal-row-min`, `animal-id-col`, `row-chip-max`, `tap-min`, `control-height`, type and space scale tokens. No local palette or component CSS pixel sizes.
+`row-icon-bg`, `row-icon-ink`, `press`, `choice-press`, `row-min`, `space-row-y`, `space-row-x`, `animal-row-min`, `animal-id-col`, `row-chip-max`, `tap-min`, `control-height`, type and space scale tokens. No local palette or component CSS pixel sizes.
 
 ## References and change log
 

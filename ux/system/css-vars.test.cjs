@@ -18,6 +18,8 @@ const INLINE_SET = [
   /^--from$/, /^--to$/,  // sheet and motion transitions: the start and end offsets are written per animation
   /^--status-count$/,    // Farrowing metrics: the number of columns, written into style="" by the screen
   /^--st-context-bg$/,   // set by bundle.css on [data-st-context]; a page stylesheet only reads it inside such a context
+  /^--st-panel-bg$/,     // set by bundle.css on :root and on [data-st-context] (SURFACES.md): a card's colour is the opposite of its base
+  /^--st-press$/,        // set by bundle.css the same way: one step deeper than the surface pressed
 ];
 
 const files = [

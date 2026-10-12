@@ -347,7 +347,8 @@
   function door(action, titleId, titleArgs, descId, descArgs, value) {
     return K.door({ title: P(titleId, titleArgs), description: descId ? P(descId, descArgs) : '', action: action, value: value || '' });
   }
-  function doors(list) { return '<div class="en-doors">' + list.join('') + '</div>'; }
+  /* Doors are rows, and rows sit in a card: a white one on the page's tint (SURFACES.md). */
+  function doors(list) { return '<div class="st-panel st-row-group en-doors">' + list.join('') + '</div>'; }
   function sec(o) { return h(Object.assign({ kind: 'section', level: 3 }, o)); }
 
   /* ---- farrowing's task-overview parts: the whole-task progress card, the metrics ---- */

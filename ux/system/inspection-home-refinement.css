@@ -15,7 +15,6 @@
 .inspection-phone .pen-name strong{font-weight:500}
 .inspection-phone .pen-feed strong{font-family:var(--font-sans);font-weight:500;font-size:var(--type-row-title-size)}
 .inspection-phone .roster-pig{border-bottom-color:#e8eddf;padding-right:12px}
-.inspection-phone .roster-pig.selected{background:#eaf2e5}
 .inspection-phone .check-target input{accent-color:var(--green);width:var(--size-24);height:var(--size-24)}
 .inspection-phone .inspect-dock{border-color:var(--line);background:#fff}
 

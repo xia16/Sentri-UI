@@ -156,7 +156,7 @@
     // Typed trailing words support tone and localization; legacy strings are escaped.
     const trailHtml=chip?'':typed?`<span class="st-row-trailing">${part(trailing)}</span>`:has(o,'trailing')?`<span class="st-row-trailing">${tx(trailing,o,'trailing')}</span>`:trailing?`<span class="st-row-trailing">${esc(trailing)}</span>`:'';
     const tag=action?'button':'div';
-    const railHtml=disabled?'':variant==='tick'&&tr==='auto'?'':tr==='edit'?`<span class="st-row-chevron" data-rail="edit">${glyph('edit')}<span data-str="act.edit">Edit</span></span>`:(tr==='chevron'||(tr==='auto'&&action))?`<span class="st-row-chevron">${arrow}</span>`:'';
+    const railHtml=disabled?'':attrs['aria-current']&&attrs['aria-current']!=='false'?`<span class="st-row-chevron" data-rail="current" aria-hidden="true">${check}</span>`:variant==='tick'&&tr==='auto'?'':tr==='edit'?`<span class="st-row-chevron" data-rail="edit">${glyph('edit')}<span data-str="act.edit">Edit</span></span>`:(tr==='chevron'||(tr==='auto'&&action))?`<span class="st-row-chevron">${arrow}</span>`:'';
     if(variant==='animal'&&right){
       const a=animalBody({code,description,right,contextWidth,tight,o});
       return `<${tag} class="st-row ${esc(className)}" data-ds="Row" data-variant="animal" data-animal="${a.kind}"${id?` id="${esc(id)}"`:''}${action?` type="button" data-action="${esc(action)}" data-value="${esc(value)}"${disabled?' disabled aria-disabled="true"':''}`:''}${safeAttr(attrs)}>${a.html}${railHtml}</${tag}>`;
@@ -1051,8 +1051,11 @@
     return `<button type="button" class="scrim" data-ds="Sheet"${sLayer(layer)}${sA(action,value)}${sL(label)}></button>`;
   }
   const SHEET_SIZES=['compact','short','medium','long'];
-  function sheet({variant='drawer',headClass='',title,subtitle,subtitleTone='',icon='',close={action:'dismiss'},up=null,holdRows=0,lead='',aside='',above='',body='',bodyClass='',footer:f,size='medium',sizing='content',label,view='',className='',id='',layer=0,inert=false,bar='',scrim:sc={},attrs={}}={}){
+  function sheet({variant='drawer',surface='',headClass='',title,subtitle,subtitleTone='',icon='',close={action:'dismiss'},up=null,holdRows=0,lead='',aside='',above='',body='',bodyClass='',footer:f,size='medium',sizing='content',label,view='',className='',id='',layer=0,inert=false,bar='',scrim:sc={},attrs={}}={}){
     const v=oneOf('Sheet','variant',variant,['drawer','page','dialog'],'drawer'),sz=oneOf('Sheet','size',size,SHEET_SIZES,'medium');
+    /* surface (drawer only): '' is a content or input drawer (white, tinted cards). 'menu' is a drawer whose every row is an option or a verb
+       (Choose a unit, More actions, Go to pen): the tint with white cards, like a page. See SURFACES.md. */
+    const ctx=oneOf('Sheet','surface',surface||'drawer',['drawer','menu'],'drawer');
     const foot=f===false?'':(f==null?sheetFooter({}):f),ex=safeAttr(attrs),cls=className?' '+esc(className):'',vw=view?` data-view="${esc(view)}"`:'';
     if(v==='dialog'){
       return `<div class="dialog-backdrop" data-ds="Sheet" data-variant="dialog"${sLayer(layer)}><div class="dialog${cls}" role="dialog" aria-modal="true" tabindex="-1"${id?` id="${esc(id)}"`:''}${vw}${inert?' inert':''}${sL(label??title)}${ex}><div class="dialog-body${bodyClass?' '+esc(bodyClass):''}"><h2 class="dialog-title">${icon?sGlyph(icon):''}${sT(title)}</h2>${subtitle?`<p class="dialog-desc">${sParts(subtitle)}</p>`:''}${body}</div>${foot}</div></div>`;
@@ -1067,7 +1070,7 @@
     const main=`${head}${above}<div class="sheet-body${bodyClass?' '+esc(bodyClass):''}">${body}</div>${foot}`;
     if(v==='page')return `<section class="sheet${cls}" ${common} role="region" data-st-context="page" data-presentation="page">${bar}${main}</section>`;
     const scrimHtml=sc===false?'':scrim(Object.assign({layer},sc));
-    return `${scrimHtml}<section class="sheet${cls}" ${common} role="dialog" aria-modal="true" data-st-context="drawer" data-size="${sz}"${sizing==='full'?' data-sizing="full"':sizing==='hold'?` data-sizing="hold" style="--hold-rows:${Math.max(1,Number(holdRows)||1)}"`:' data-sizing="content"'}><div class="grab" aria-hidden="true"></div>${main}</section>`;
+    return `${scrimHtml}<section class="sheet${cls}" ${common} role="dialog" aria-modal="true" data-st-context="${ctx}" data-size="${sz}"${sizing==='full'?' data-sizing="full"':sizing==='hold'?` data-sizing="hold" style="--hold-rows:${Math.max(1,Number(holdRows)||1)}"`:' data-sizing="content"'}><div class="grab" aria-hidden="true"></div>${main}</section>`;
   }
   if(typeof document!=='undefined')document.addEventListener('keydown',e=>{
     const b=e.target.closest?.('.st-segment button,.st-filter-chips button');if(!b||b.disabled)return;

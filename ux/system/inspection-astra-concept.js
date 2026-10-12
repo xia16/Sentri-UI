@@ -881,10 +881,10 @@ function measurementsMenu(c){
  items.push({a:'weight',k:'weight',title:'Record weight',sub:single?'Weight in kg':'A separate value for each pig'});
  if(single)items.push({a:'temperature',k:'temperature',title:'Record temperature',sub:'Body temperature in °C'});
  if(rows.some(p=>['Sow','Gilt'].includes(animalType(p))))items.push({a:'backfat',k:'measure',title:'Record backfat',sub:single?'Backfat depth in mm':'Sows and gilts · separate readings'});
- return sheet(c,'Measurements & condition',single?rows[0].id:selectionLabel(c),'<div class="compact-actions st-panel st-row-group st-action-list">'+actionRows(items)+'</div>',footer(back(),''));
+ return sheet(c,'Measurements & condition',single?rows[0].id:selectionLabel(c),'<div class="compact-actions st-panel st-row-group st-action-list">'+actionRows(items)+'</div>',footer(back(),''),'','menu');
 }
 
-function unavailableActionsPage(c){return sheet(c,'Unavailable actions',picked(c).length===1?picked(c)[0].id+' · '+penOf(c,picked(c)[0].id).id:selectionLabel(c),actionSections(c,unavailableActionGroups(c),true),footer(back(),''));}
+function unavailableActionsPage(c){return sheet(c,'Unavailable actions',picked(c).length===1?picked(c)[0].id+' · '+penOf(c,picked(c)[0].id).id:selectionLabel(c),actionSections(c,unavailableActionGroups(c),true),footer(back(),''),'','menu');}
 function miscarriagePage(c){return sheet(c,'Record abortion',picked(c)[0].id+' · '+penOf(c,picked(c)[0].id).id,`${SentriUI.banner({tone:'danger',headline:'Sow leaves this batch',consequence:'Saved records are kept.',icon:'alert'})}<label class="sow-action-field">Reason<input data-loss-reason value="${esc(c.lossReason||'')}" placeholder="Enter the reason" autocomplete="off"></label>`,footer(back(),button('save-miscarriage','Save','button primary','',!c.lossReason?.trim())));}
 function productionDispositionPage(c){
  const removing=c.view==='batch-removal',f=c.form||{},options=removing?[['','Choose a reason'],['assignment','Assigned to this batch in error'],['timing','Not due in this farrowing window'],['other','Other production reason']]:[['','Choose evidence'],['pregnancy-check','Pregnancy check result'],['returned-to-heat','Returned to heat'],['other','Other observation']];
@@ -1185,7 +1185,7 @@ function pigFeedPage(c){
 function feedBody(c,pe){
  const plans=pe.mode==='adlib'?'':pe.pigs.map(p=>button('pig-feed','<span><strong>'+p.id+'</strong><small>'+esc(pigFeedTags(p).map(t=>t.label).join(' · ')||'Follow curve')+'</small></span><strong>'+quantity(pigAllocation(p,pe))+' <small>kg/day</small></strong>'+icon('chevron'),'feeding-pig-row',p.id)).join('');
  const heading=stHeading({title:pe.formula,meta:({trough:'Shared trough',station:'Station-fed',adlib:'Ad-lib'})[pe.mode]||'',kind:'section',level:4,className:'feeding-card-heading'});
- return '<section class="feeding-today">'+heading+'<div class="feeding-main-amount"><span>Daily feed</span><strong>'+(pe.mode==='adlib'?'Ad-lib':quantity(allocation(pe))+' <small>kg/day</small>')+'</strong></div></section>'+plans;
+ return '<section class="feeding-today">'+heading+'<div class="feeding-main-amount"><span>Daily feed</span><strong>'+(pe.mode==='adlib'?'Ad-lib':quantity(allocation(pe))+' <small>kg/day</small>')+'</strong></div></section>'+(plans?'<div class="feeding-pig-list">'+plans+'</div>':'');
 }
 
 function currentFinding(c){return cases(pig(c,c.pigId)).find(k=>k.name===c.findingName);}
@@ -1470,7 +1470,7 @@ function drawerSize(view,c){
  return sizes[view]||'medium';
 }
 
-function sheet(c,title,scope,body,actions,aside=''){
+function sheet(c,title,scope,body,actions,aside='',surface=''){
  /* Drawers with levels carry "‹ Parent" in the header (Sheet up); the title names the level. No breadcrumb, no ✕. */
  let up=null,holdRows=0;
  if(c.view==='bulk-health-picker'&&c.form.customDraft){const h=SentriUI.pickerHead({items:conditionTree(c),path:[],title});title='Choose a category';up={label:'Conditions',action:'health-catalog-back'};holdRows=h.rows;}
@@ -1482,7 +1482,7 @@ function sheet(c,title,scope,body,actions,aside=''){
  const wantBack=!(c.view==='record-optional'&&['brand','target'].includes(c.form.optionalKey)&&!c.form.creatingBrand);
  const nav=(c.view==='actions'&&c.actionScope!=='pens'?actionCategoryNav(c):'')+(actions||'');
  const above=(c.view==='actions'&&c.selectedPens.size?'<div class="actions-subjects">'+scopeTabs(c)+'</div>':'')+(c.view==='pig-log'?logFilterBar(c,pigLogEntries(c),'pig'):c.view==='pen-log'?logFilterBar(c,penLogEntries(c,c.penId),'pen'):'');
- return SentriUI.sheet({variant:page?'page':'drawer',title,subtitle:scope,up,aside,above,body,footer:nav||(wantBack||page?SentriUI.sheetFooter({back:{action:'back'}}):false),className:c.view==='actions'?'actions-sheet':'',size:drawerSize(c.view,c),sizing:['search','scan','grid'].includes(c.view)||c.view==='record-optional'&&c.form.optionalKey==='target'?'full':holdRows?'hold':'content',holdRows,label:title,scrim:{action:'dismiss',label:'Dismiss '+title},bar:page?status():''});
+ return SentriUI.sheet({variant:page?'page':'drawer',surface,title,subtitle:scope,up,aside,above,body,footer:nav||(wantBack||page?SentriUI.sheetFooter({back:{action:'back'}}):false),className:c.view==='actions'?'actions-sheet':'',size:drawerSize(c.view,c),sizing:['search','scan','grid'].includes(c.view)||c.view==='record-optional'&&c.form.optionalKey==='target'?'full':holdRows?'hold':'content',holdRows,label:title,scrim:{action:'dismiss',label:'Dismiss '+title},bar:page?status():''});
 }
 function back(){return SentriUI.backButton({action:'back'});}
 function scope(c){const ids=c.form.subjects||[...c.selected],pens=[...new Set(ids.map(id=>penOf(c,id)?.id))];return `${countLabel(ids.length)} · ${pens.join(' / ')}`;}
@@ -1531,7 +1531,7 @@ function penMapSheet(c){
   const id=col+(row+1),f=inspectionPenFact(c,pen(c,id));
   return button('jump','<strong>'+id+'</strong><small>'+esc(f.text)+'</small>','pen-cell '+f.kind+(c.currentPen===id?' current':''),id,!f.rows.length).replace('<button','<button aria-label="Pen '+id+', '+esc(f.text)+'"'+(c.currentPen===id?' aria-current="location"':''));
  }).join('')).join('');
- return sheet(c,'Go to pen',unitName(c),'<p class="picker-intro">Tap a pen to go to its pigs. Hold to peek.</p><div class="pen-map"><span></span>'+['A','B','C','D'].map(x=>'<span class="map-column-label">'+x+'</span>').join('')+cells+'</div><p class="picker-note">Pen layout · only pens matching this view can be opened.</p><div class="pen-peek" role="status" hidden></div>','').replace('class="sheet"','class="sheet room-utility picker-sheet"');
+ return sheet(c,'Go to pen',unitName(c),'<p class="picker-intro">Tap a pen to go to its pigs. Hold to peek.</p><div class="pen-map"><span></span>'+['A','B','C','D'].map(x=>'<span class="map-column-label">'+x+'</span>').join('')+cells+'</div><p class="picker-note">Pen layout · only pens matching this view can be opened.</p><div class="pen-peek" role="status" hidden></div>','','','menu').replace('class="sheet"','class="sheet room-utility picker-sheet"');
 }
 function inspectionPenPreview(c,id){
  const pe=pen(c,id),rows=visiblePigs(c,pe),health=rows.filter(p=>cases(p).length),guides=rows.filter(manual),faults=[];

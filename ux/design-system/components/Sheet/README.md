@@ -6,6 +6,8 @@ A sheet is the one surface presented over a task: it holds a step the worker fin
 
 `SentriUI.sheet({ variant, title, subtitle, body, footer, … })` returns the markup; `SentriUI.sheetFooter({ back, primary, hold, status })` builds the footer; `SentriUI.backButton()` and `SentriUI.scrim()` are the parts a host may place itself. Types are in `index.d.ts`.
 
+**Surface (drawers).** `surface: 'menu'` marks a drawer whose every row is an option or a verb (Choose a unit, More actions, Allocate piglets, Go to pen, Measurements & condition). It writes `data-st-context="menu"`: the sheet and header are the tint, the cards are white, the footer stays white. Any other drawer (search, forms, records, pen sheets, Today) is white with tinted cards. The test is whether each row is a thing with live state (content) or an option or verb (menu). Rule and examples: [SURFACES.md](../../SURFACES.md).
+
 ## When to use / when not
 
 **Use a sheet when**

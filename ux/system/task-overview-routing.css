@@ -19,7 +19,7 @@
 .unit-route-number{font:400 15px var(--font-mono);text-align:center}
 .unit-route>svg{width:18px;height:18px;stroke:var(--green)}
 
-.unit-route:active{background:#eaf2e5}
+.unit-route:active{background:var(--press)}
 
 .task-overview-details{padding-top:4px}
 .task-overview-details .task-other-outcomes{margin-top:20px}
