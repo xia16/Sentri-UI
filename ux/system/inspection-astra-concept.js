@@ -1418,7 +1418,7 @@ globalThis.InspectionStudy={catalog,healthList,conditionDefinition,batchTaskForP
 if(typeof document==='undefined')return;
 const embeddedSow=window.parent!==window&&new URLSearchParams(location.search).get('embed')==='sow';
 let embeddedSowReady=false;
-if(embeddedSow)document.documentElement.classList.add('inspection-embedded');
+if(embeddedSow){document.documentElement.classList.add('inspection-embedded');document.documentElement.setAttribute('data-atlas-pending','');}   // the atlas waits until the host has sent the sow
 function sendSowDetail(type,c){window.parent.postMessage({type,context:{...c,toastTimer:undefined}},location.origin);}
 
 const examples=[{title:'Walk & select',initial:'walk',caption:'Individual checkboxes name the pigs. Pen feeding stays in the pen header.'},{title:'Act on a finding',initial:'selected',caption:'One payload for a group; a separate entry per pig when the values differ.'},{title:'Read the feed plan',initial:'adlib',caption:'Feed is guidance: formula, timing and individual plans, with no completion record.'}];
@@ -1644,7 +1644,7 @@ document.querySelectorAll('[data-layout]').forEach(b=>b.onclick=()=>{gallery.cla
 if(embeddedSow)window.addEventListener('message',e=>{
  if(e.origin!==location.origin||e.source!==window.parent||e.data?.type!=='open-sow-detail')return;
  const r=e.data.record;if(!r||typeof r.id!=='string'||typeof r.pen!=='string')return;
- states[0]=sowDetailContext(r,e.data.context);states[0].hostActions=e.data.actions||[];states[0].transferDestinations=e.data.destinations||[];const origin=states[0].transferDestinations.find(u=>u.name===r.unit);states[0].transferOrigin=origin?{unit:origin.id,name:origin.name}:null;states[0].hostTasks=(e.data.tasks||[]).filter(t=>!states[0].completedHostTasks?.includes(t.id));if(e.data.entry==='actions'){states[0].selected=new Set([r.id]);states[0].actionScope='pigs';states[0].view='actions';states[0].actionEntry=r.id;states[0].restoreSheetScroll=states[0].actionMenuScroll||0;}else delete states[0].actionEntry;embeddedSowReady=true;document.documentElement.classList.add('inspection-embedded-ready');render(0);
+ states[0]=sowDetailContext(r,e.data.context);states[0].hostActions=e.data.actions||[];states[0].transferDestinations=e.data.destinations||[];const origin=states[0].transferDestinations.find(u=>u.name===r.unit);states[0].transferOrigin=origin?{unit:origin.id,name:origin.name}:null;states[0].hostTasks=(e.data.tasks||[]).filter(t=>!states[0].completedHostTasks?.includes(t.id));if(e.data.entry==='actions'){states[0].selected=new Set([r.id]);states[0].actionScope='pigs';states[0].view='actions';states[0].actionEntry=r.id;states[0].restoreSheetScroll=states[0].actionMenuScroll||0;}else delete states[0].actionEntry;embeddedSowReady=true;document.documentElement.classList.add('inspection-embedded-ready');document.documentElement.removeAttribute('data-atlas-pending');render(0);
 });
 states.forEach((_,i)=>render(i));if(new URLSearchParams(location.search).get('layout')==='overview')document.querySelector('[data-layout="overview"]').click();
 })();

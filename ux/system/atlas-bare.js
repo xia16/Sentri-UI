@@ -11,6 +11,9 @@
      (a step { fill: <selector>, text } types text into that field),
      then inside its same-origin iframes (so a host screen can reach an embedded page's controls, e.g. farrowing's Actions →
      Remove from batch inside the embedded inspection).
+   - Embedded pages: steps and Ready wait (up to 5 s) for every iframe in the phone to finish loading and for its page to drop
+     data-atlas-pending from its <html> (an embedded page sets it while it waits for its host's state), so a shot never catches
+     an iframe still showing its own page before the host's state arrives.
    - The flow follows the demo: a page calls AtlasBare.watch(fn) after every render, fn() returns the screen id of the
      state it is in (or null); when that changes, parent.postMessage({ atlasScreen: id }).
    One convention for every prototype: new pages include this script in <head> and call AtlasBare.watch where they can.
@@ -86,11 +89,25 @@
     for (i = 0; i < all.length; i++) if (norm(all[i].getAttribute('aria-label')) === want || norm(all[i].getAttribute('title')) === want) return all[i];
     return null;
   }
+  function frameDoc(f) { try { return f.contentDocument; } catch (e) { return null; } }
+  function frameReady(f) {   // loaded (not the initial about:blank) and not waiting for its host
+    var d = frameDoc(f); if (!d) return true;   // cross-origin: nothing to wait for
+    return d.readyState === 'complete' && !(f.getAttribute('src') && d.URL === 'about:blank') && !d.documentElement.hasAttribute('data-atlas-pending');
+  }
+  function framesReady(phone) {   // every iframe in the phone ready, then two frames for it to paint
+    var t0 = Date.now();
+    return new Promise(function (res) { (function poll() {
+      var late = [].filter.call(phone.querySelectorAll('iframe'), function (f) { return !frameReady(f); });
+      if (!late.length) res(frames());
+      else if (Date.now() - t0 > 5000) { console.warn('atlas-bare: iframe not ready after 5 s: ' + late[0].src); res(); }
+      else setTimeout(poll, 50);
+    })(); });
+  }
   function findDeep(phone, key) {   // in the phone, else inside its same-origin iframes (farrowing embeds inspection's sow sheet that way)
     var el = findStep(phone, key); if (el) return el;
     var fr = phone.querySelectorAll('iframe');
     for (var i = 0; i < fr.length; i++) {
-      var d; try { d = fr[i].contentDocument; } catch (e) { d = null; }
+      var d = frameReady(fr[i]) ? frameDoc(fr[i]) : null;   // a page still loading is not searched: its own index could match a step
       if (d && d.body && (el = findStep(d.body, key))) return el;
     }
     return null;
@@ -104,7 +121,7 @@
     steps.forEach(function (st) {
       chain = chain.then(function () {
         var key = typeof st === 'string' ? st : (st.tap || st.fill), hold = typeof st === 'object' && st.hold;
-        return findWait(phone, key).then(function (el) {   // in the phone, else in its same-origin iframes
+        return framesReady(phone).then(function () { return findWait(phone, key); }).then(function (el) {   // in the phone, else in its same-origin iframes
           if (!el) { console.error('atlas-bare: step not found: ' + key); return; }
           if (typeof st === 'object' && st.fill !== undefined) {   // { fill: <selector or label>, text }: type into a field (the input event the page listens for)
             var proto = el.ownerDocument.defaultView[el.tagName === 'TEXTAREA' ? 'HTMLTextAreaElement' : 'HTMLInputElement'].prototype;
@@ -159,7 +176,7 @@
       }
       if (!AB.screen) console.warn('atlas-bare: unknown screen ' + id);
       var steps = (AB.screen && AB.screen.steps) || [];
-      (steps.length ? frames().then(function () { return replay(phone, steps); }) : Promise.resolve()).then(function () {
+      (steps.length ? frames().then(function () { return replay(phone, steps); }) : Promise.resolve()).then(function () { return framesReady(phone); }).then(function () {
       hideAround(phone);
       var fonts = document.fonts && document.fonts.ready ? Promise.race([document.fonts.ready, new Promise(function (r) { setTimeout(r, 250); })]) : Promise.resolve();
       fonts.then(function () { requestAnimationFrame(function () { requestAnimationFrame(function () {
