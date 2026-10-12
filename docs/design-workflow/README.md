@@ -126,7 +126,7 @@ Every rejected owner example is a fixture each gate must fail ([gate.md](briefs/
 
 The owner's taste, drawn from their rulings, is [taste.md](taste.md): builders aim at it and judges stand in for it.
 
-Standards these briefs point to: `ux/design-system/README.md` (laws), `docs/design-workflow/research/component-standard.md` (component page anatomy and checklist), and `atlas/SCHEMA.md` (atlas data and backlog item format).
+Standards these briefs point to: `ux/design-system/README.md` (laws), `ux/design-system/SURFACES.md` (bases, cards and the colour of current, selected and pressed: read it before building a screen), `docs/design-workflow/research/component-standard.md` (component page anatomy and checklist), and `atlas/SCHEMA.md` (atlas data and backlog item format).
 
 ## Background
 

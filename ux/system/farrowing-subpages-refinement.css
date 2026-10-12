@@ -10,7 +10,7 @@
 .farrowing-phone .pen-card{border-color:var(--line);border-radius:var(--subpage-radius);box-shadow:0 2px 8px rgba(32,41,31,.04)}
 .farrowing-phone .room-list .pen-top{background:var(--surface,#f8faf5);border-color:var(--line);padding-left:14px;padding-right:14px}
 .farrowing-phone .room-sow-row{min-height:76px;padding:13px 14px;border-color:var(--line)}
-.farrowing-phone .room-sow-row:active{background:var(--green-wash,#eaf2e5)}
+.farrowing-phone .room-sow-row:active{background:var(--press)}
 .farrowing-phone .room-sow-row .row-main{font-weight:500}
 .farrowing-phone .room-sow-row .row-detail{min-width:0}
 .farrowing-phone .room-sow-row :is(.row-main,.row-sub){display:block;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -54,6 +54,7 @@
 .farrowing-phone :is(.feature-callout,.feature-summary){border:1px solid var(--line);background:var(--surface,#f8faf5)}
 .farrowing-phone .feature-tabs{border:1px solid var(--line)}
 .farrowing-phone .processing-day,.farrowing-phone .piglet-roster{border-color:var(--line)}
+.farrowing-phone .processing-day{background:var(--paper)}
 .farrowing-phone .processing-day-head{background:var(--surface,#f8faf5)}
 .farrowing-phone .processing-task,.farrowing-phone .piglet-row{border-color:var(--line)}
 .farrowing-phone .piglet-row-main{font-weight:400}
@@ -63,7 +64,7 @@
 
 /* Task closure review and receipt; overview selectors stay with the parent. */
 .farrowing-phone .task-end-sheet .sheet-body{gap:16px}
-.farrowing-phone .task-end-sheet .task-review-sows{border-top:1px solid var(--line)}
+.farrowing-phone .task-end-sheet .task-review-sows:not(.st-panel){border-top:1px solid var(--line)}
 .farrowing-phone .task-end-sheet .task-review-sow{min-height:68px;border-color:var(--line)}
 .farrowing-phone .task-end-sheet .task-review-sow strong{font-weight:500}
 .farrowing-phone .task-end-sheet .task-review-sow span:first-child{min-width:0;overflow:hidden}

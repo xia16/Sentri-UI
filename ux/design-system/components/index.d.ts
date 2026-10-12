@@ -683,6 +683,8 @@ export interface SheetAction { label: SheetText; action?: string; value?: string
 export interface SheetProps {
   /** drawer (default): over the page, sized to its content, a handle and a ✕ · page: the whole canvas, Back in the footer, no ✕ · dialog: one small decision rising from the bottom. */
   variant?: 'drawer' | 'page' | 'dialog';
+  /** Drawer only: '' (default) is a content or input drawer, white with tinted cards; 'menu' is a drawer whose every row is an option or a verb (Choose a unit, More actions, Go to pen), the tint with white cards. See SURFACES.md. */
+  surface?: '' | 'drawer' | 'menu';
   title: SheetText;
   /** One line under the title; an array of text slots joined by { sep: true } (parts may carry tone). For a dialog it is the description. */
   subtitle?: SheetText | Array<SheetText | { sep: true } | { text: string; tone: 'amber' | 'red' | 'green' }>;
