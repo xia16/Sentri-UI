@@ -40,3 +40,24 @@ Prototype chrome (PREVIEW badge, "Sample readings" line) is not designed; the ba
 | Fan card, mode | Segment | Segment | keep |
 | Fan speed | native range + label | none | fix label target and value size |
 | Save setting | `btn` primary | Button | keep |
+
+## Self-crit
+
+### Direction A (the only one that held), round 1: spacing, floors, disclosure, speed value
+
+Directions B (move the fan card above the chart) and C (cut the "Sample readings" note) were considered and not built: B changes layout order, which no problem names; C removes a fact and the note is prototype chrome that the gate does not ask to cut.
+
+- P1 toggle touching the reading: fixed (12px above and below; the toggle now belongs to the card).
+- P2 floors: fixed for every fact (Last reading, axis, Low / High, table, fan status, Devices tag, helpers now 11-12px). Remaining at `check-legibility --strict`: the PREVIEW badge (prototype chrome, 9px) and the offline contrast of the disabled Segment and Button (P5, component rule, questioned).
+- P3 history: now a row with a chevron (turns when open) and no dead space under it.
+- P4 fan speed: label is no longer a 13px-high target; the value is a 22px mono figure at the right of the label.
+- Keep: sensor switcher, one card per topic, 34px mono hero, chart form, toggle, Low / High, one dark Save setting, collapsed history: all as strong; the hero stays the heaviest element (34px against 12px support).
+- Squint test: (1) the reading 22.4, (2) the chart line, (3) the fan Auto / Manual segment, matching "is the room right / is it moving / what is the fan doing".
+- Cluttered, flat or bulky against the original: not cluttered (support text only moved to 12px, hero unchanged: c1 avoided); not flat (cards, headings and the hero kept: c2 avoided); no new boxes or bold (c3 avoided). The sensor card is about 20px taller at 390 (Offline: Auto / Manual segment still above the fold).
+- Held against: Unit reference (calm card, quiet grey support) and the farrowing room (mono hero, one dark control).
+- Rejected examples: R14 history label and sample note no longer take prime space (history one row, note 11px); R15 no segment weight change; R16 no floating "Reading history": it is a labelled row with a chevron inside the card.
+- **Better because** the toggle no longer collides with the reading, every figure is legible at the floor with the hero unchanged, and history reads as a row that opens.
+
+### Final look
+
+Commit d8aefa8 (merged with origin/main 0d49608 forward; all four screens at 390 and 360, EN; the page renders no Chinese strings, so ZH matches EN). Looked at the whole screen of each: toggle spaced, axis and Low / High legible at 360, chevron row clean, Humidity and 7-day variants hold. Fan in Manual (online) shows a 45% mono value above the slider with Save setting below. Better.
