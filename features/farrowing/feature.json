@@ -3316,7 +3316,7 @@
           {
             "name": "Scan list",
             "at": "Other units",
-            "shows": "The sows scanned in this visit, in two white cards: \"In Unit 7 · n\" and \"Other units · n\", newest scan first. Every row is the design system's Row, animal variant with the sow's Farrowing state on the right (the room's row; in another unit the line under the ear tag says only \"Unit 6 · Pen A2\"), drawn as a select + door.",
+            "shows": "The sows scanned in this visit, in two white cards: \"In Unit 7 · n\" and \"Other units · n\", newest scan first. Every row is the design system's Row, animal variant with the sow's Farrowing state on the right (the room's row, without the initials so the line under the ear tag stays on one line (\"Pen B1 · 1h ago\"); in another unit it says only \"Unit 6 · Pen A2\"), drawn as a select + door.",
             "logic": "A sow is added the first time she is scanned. Scanning her again adds nothing: her existing row is highlighted briefly and scrolled into view. The list stays while the worker opens a sow and comes back.",
             "rule": "The tick box selects; the rest of the row opens her. A sow in this unit opens her farrowing drawer, and Back returns to this list; a sow in another unit opens her record read-only (Sow in another unit). The scanner is always listening: there is no \"ready for the next tag\" banner and no \"not found\" row.",
             "source": "farrowing-astra-concept.js scanPage(), scanAdd(), sowRow()"
@@ -3416,20 +3416,22 @@
           {
             "name": "Action rows",
             "at": "Transfer",
-            "shows": "The rows are the existing ones, worded for a selection: Transfer from the sow actions, and the health and note rows from Inspection's More actions (the note row says \"these sows\"). No Farrowing action is offered here.",
-            "rule": "The prototype stops at the list: a row returns to the Scan page with the sows still ticked, because the shared flows are drawn in Inspection and pig-profile, not here.",
-            "source": "farrowing-astra-concept.js scanActionsSheet(); sowActionCatalogue(); inspection-astra-concept.js actionCatalogue()"
+            "shows": "Transfer, Disease or symptom, Record treatment and Add a note: the shared generic actions, for the ticked sows only. They are the existing More actions rows (Transfer sow, Record health and Record treatment from Inspection's actions, Add a note from the sow's note page). No Farrowing action is offered here.",
+            "rule": "Each row opens its real flow, in the existing sow actions page, for the first ticked sow only: the prototype has no flow that takes several sows at once, so a selection of two or more is a gap (the shared flow should take the whole selection). Back from the flow returns to the Scan list with the ticks kept. If the first ticked sow is in another unit, the room switches to her unit first.",
+            "source": "farrowing-astra-concept.js scanActionsSheet(), room-scan-act, deepLinkInto(); inspection-astra-concept.js actionCatalogue()"
           }
         ],
         "copy": [
           "(raw) Actions · N sows · Transfer · Disease or symptom · Record treatment · Add a note"
         ],
-        "edge": [],
+        "edge": [
+          "With more than one sow ticked, the flow that opens is for the first one ticked."
+        ],
         "rules": [
           "Owner decision 2026-10-12: Scan offers the generic Actions only; no Farrowing-specific action."
         ],
         "issues": [
-          "The four rows lead nowhere in the prototype: the shared Transfer, health and note flows for a selection are not built into this page."
+          "The Transfer, health and note flows run for the first ticked sow only; a flow for the whole selection is not built in the prototype."
         ]
       }
     },

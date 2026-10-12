@@ -72,15 +72,12 @@
 .find-field>svg{flex:none;width:18px;height:18px;color:var(--muted)}
 .find-field input{flex:1;min-width:0;padding:0;border:0;outline:0;background:transparent;color:var(--ink);font:500 17px var(--font-sans)}
 .find-field input::placeholder{color:var(--ink-2);opacity:1;font-size:15px;font-weight:400}
-.find-clear{flex:none;display:grid;place-items:center;width:48px;min-height:48px;padding:0;border:0;background:transparent;color:var(--muted)}
 .find-clear[hidden]{display:none}
-.find-clear svg{width:18px;height:18px}
-.find-scan{flex:none;display:grid;place-items:center;width:48px;min-height:48px;padding:0;border:0;background:transparent;color:var(--ink)}
-.find-scan span{display:grid;place-items:center;width:40px;height:40px;border-radius:var(--radius-10);background:var(--well)}
-.find-scan svg{width:20px;height:20px}
-.find-cancel{flex:none;min-height:48px;padding:0 4px;border:0;background:transparent;color:var(--ink);font:600 16px var(--font-sans)}
+.find-clear,.find-scan{flex:none}
+.find-cancel{flex:none}
+.scan-selected{margin-right:auto}
 .find-results{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:14px 16px 24px}
-.find-group{margin:0 0 6px 2px;color:var(--muted);font:600 13px var(--font-sans);letter-spacing:.01em}
+.find-results .st-heading.st-heading,.scan-body .st-heading.st-heading{margin:16px 2px 8px}
 .find-list{--st-panel-bg:var(--app-background);margin-bottom:16px}
 .find-hint{margin:4px 2px;color:var(--muted);font:400 14px/20px var(--font-sans)}
 /* The typed part is bold ink; the rest of the tag is muted. */
@@ -88,16 +85,12 @@
 .find-row .st-animal-id b,.find-row .st-animal-state b{color:var(--ink);font-weight:700}
 .scan-head{flex:none;display:flex;align-items:center;gap:14px;padding:6px 16px 12px}
 .scan-title{min-width:0}
-.scan-title h2{margin:0;font:500 22px/1.2 var(--font-sans)}
-.scan-title small{display:block;margin-top:2px;color:var(--muted);font:400 13px var(--font-sans)}
 /* The scanner's state, in ink: a filled dot while it listens, a ring when it is stopped. Never green. */
 .scan-live{flex:none;display:inline-flex;align-items:center;gap:7px;min-height:32px;margin-left:auto;padding:0 12px;border:1px solid var(--line);border-radius:16px;background:var(--paper);font:600 13px var(--font-sans)}
 .scan-live i{width:8px;height:8px;border-radius:50%;background:var(--ink)}
 .scan-live.is-off{color:var(--muted)}
 .scan-live.is-off i{border:1.5px solid var(--muted);background:transparent}
 .scan-body{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:4px 16px 24px}
-.scan-group{display:flex;align-items:center;gap:8px;margin:12px 2px 8px;font:500 16px var(--font-sans)}
-.scan-group span{color:var(--muted);font:400 13px var(--font-sans)}
 .scan-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 36px 40px;text-align:center}
 .scan-empty svg{width:44px;height:44px;margin-bottom:14px;color:var(--muted)}
 .scan-empty strong{font:600 17px var(--font-sans)}
@@ -106,8 +99,6 @@
 .scan-dock [data-ds=Button]{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:50px}
 .scan-dock [data-ds=Button] svg{width:18px;height:18px}
 .scan-dock .scan-toggle{flex:1}
-.scan-selected{display:inline-flex;align-items:center;gap:6px;min-height:48px;margin-right:auto;padding:0;border:0;background:transparent;color:var(--ink);font:600 15px var(--font-sans)}
-.scan-selected svg{width:14px;height:14px}
 .scan-arrival{animation:scan-arrival .9s cubic-bezier(.22,1,.36,1) both}
 @keyframes scan-arrival{0%,100%{background:transparent}16%{background:var(--well)}}
 @media(prefers-reduced-motion:reduce){.scan-arrival{animation:none;background:var(--well)}}

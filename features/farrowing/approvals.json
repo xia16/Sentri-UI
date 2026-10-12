@@ -11,14 +11,22 @@
     "commit": "fc98e360417f0ba10b86bc3249f0258ee4a53949",
     "date": "2026-10-12",
     "by": "owner",
-    "note": "Owner approved the animal row (Farrowing) and the compact-tag roster row (Inspection), 2026-10-12"
+    "note": "Owner approved the animal row (Farrowing) and the compact-tag roster row (Inspection), 2026-10-12",
+    "changed": {
+      "since": "4af133c",
+      "why": "Find a sow is global and a full page; Scan ear tags is an always-listening list (owner decision 2026-10-12, built from the approved mockups)"
+    }
   },
   {
     "screen": "farrowing.scan",
     "commit": "fc98e360417f0ba10b86bc3249f0258ee4a53949",
     "date": "2026-10-12",
     "by": "owner",
-    "note": "Owner approved the animal row (Farrowing) and the compact-tag roster row (Inspection), 2026-10-12"
+    "note": "Owner approved the animal row (Farrowing) and the compact-tag roster row (Inspection), 2026-10-12",
+    "changed": {
+      "since": "4af133c",
+      "why": "Find a sow is global and a full page; Scan ear tags is an always-listening list (owner decision 2026-10-12, built from the approved mockups)"
+    }
   },
   {
     "screen": "farrowing.task-sows",

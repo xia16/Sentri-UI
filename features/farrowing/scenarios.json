@@ -4049,6 +4049,48 @@
              ]
             }
            ]
+          },
+          {
+           "type": "action",
+           "id": "scan.list.actions.note",
+           "label": "tap Actions, then Add a note",
+           "taps": [
+            "Actions",
+            "Add a note"
+           ],
+           "children": [
+            {
+             "type": "outcome",
+             "id": "fa-s26-actions-note-opens-the-note-for-the-first-sow",
+             "tree": "S-26",
+             "label": "Add a note opens the note page for the first ticked sow",
+             "gwt": {
+              "given": "Two scanned sows are ticked and the Actions sheet is open.",
+              "when": "The worker taps Add a note.",
+              "then": "The note page opens for the first sow ticked, 000431, not the list."
+             },
+             "authority": [
+              {
+               "src": "PRD",
+               "at": "Decisions · owner decision 2026-10-12",
+               "says": "Actions opens the shared generic actions for the selection"
+              }
+             ],
+             "visible": [
+              {
+               "screen": "farrowing.note",
+               "hard": "dead-end"
+              }
+             ],
+             "record": [
+              {
+               "expr": "s.tag === '000431'",
+               "says": "the note is for the first ticked sow",
+               "hard": "wrong-fact"
+              }
+             ]
+            }
+           ]
           }
          ]
         },
