@@ -53,3 +53,7 @@ Extraction first: `SensorTrend` and `DeviceControl` drawn exactly as the page dr
 - Not changed, with reason: the PREVIEW badge size (page-built, shared with other screens); ZH (the prototype's copy is literal English); the period toggle sits close under the hero, as before.
 
 **better because** the same screen reads in the barn: no text under 11px, the values you compare with the hero are 13px, the disabled fan no longer fades, and the offline note stops repeating.
+
+### Final look
+
+Rendered at 390 and 360 from `35ead5d` (code identical to the pushed head; later commits only touch this file), after merging origin/main (already up to date). Opened each of the four screens beside its baseline: header unchanged (the 360 title wraps on main too), nothing new wraps, the fan card sits about 16px lower, no console errors. Nothing got worse.
