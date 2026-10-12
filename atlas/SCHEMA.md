@@ -162,3 +162,14 @@ The generator refuses a `scenarios.json` that isn't JSON, has no `tree`, repeats
 **The platform is the top level.** Components, copy, backlog and the Old UI catalogue are each a platform's own; the atlas draws every view for the selected platform. Everything that exists today is `mobile`: the components and strings are the mobile app's (touch, no hover or focus rings), and the Figma catalogue is the old mobile app. `web` has `components: []`, `copy: null`, `backlog: []`, `oldUi: []` until it has any: its views show a one-line empty state, no invented content. A backlog item sits under the platform of the feature or screen it targets; items that target a component, a section or nothing known are mobile.
 
 Feature status: `placeholder` when every screen is a placeholder; `in-design` when any screen is below agent-checked; `agent-checked` when all are agent-checked or approved; `frozen` when all are approved (and there is at least one).
+
+## Authoring rules for anything the atlas renders
+
+(Moved here from the build brief, 2026-10-12.)
+
+- **Previews render directly.** `preview.html` and `variants/*.html` call `SentriUI.*` directly. Don't link tokens, bundle or fonts (the atlas injects them). Don't use `new URL(relative)` (the atlas runs them in a srcdoc iframe), and don't nest your own iframe.
+- **Variant scripts iterate `[data-state]`.** Each top-level element carries `data-state="<State>"` and renders one state. Scripts draw by `document.querySelectorAll('[data-state]')` or from `document.currentScript.parentElement`, never by looking up one named state.
+- **Tokens only.** No raw hex or px in component CSS.
+- **Specimens sit in their real container.** A picker trigger sits in its form row, and a sheet's search sits in a sheet. Never stack a specimen loose beside unrelated parts.
+- **No stress-test copy.** Specimens use real Sentri words and data. Show long data the way real data is long, not invented long labels.
+- **`atlas/atlas.json` is generated.** Edit the sources, then run `npm run atlas`.
