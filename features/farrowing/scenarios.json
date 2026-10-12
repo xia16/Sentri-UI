@@ -3317,81 +3317,38 @@
          "children": [
           {
            "type": "outcome",
-           "id": "fa-s6-other-unit-result-opens-read-only-record",
+           "id": "fa-s6-other-unit-result-opens-her-farrowing-drawer",
            "tree": "S-6",
-           "label": "A result in another unit opens her record read-only and does not switch unit",
+           "label": "A result in another unit opens her farrowing drawer, which names her unit",
            "gwt": {
             "given": "The worker has searched for 43 and 004318, a sow in Unit 6, is a result.",
             "when": "They tap her.",
-            "then": "Her record opens read-only with a Go to Unit 6 action inside it, and the room is still Unit 7."
+            "then": "Her farrowing drawer opens on her Awaiting face, the same drawer a sow in this unit opens, and its subtitle names her unit and pen."
            },
            "authority": [
             {
              "src": "PRD",
              "at": "Decisions · owner decision 2026-10-12",
-             "says": "A sow in another unit opens her record read-only, with Go to Unit N inside it. Search never switches unit by itself"
+             "says": "A sow in another unit opens her farrowing drawer: Farrowing is one task across its units"
             }
            ],
            "visible": [
             {
-             "text": "Read-only",
-             "in": "sheet",
-             "hard": "broken-ruling"
+             "screen": "farrowing.before",
+             "hard": "dead-end"
             },
             {
-             "text": "Go to Unit 6",
+             "text": "Unit 6 · A2",
              "in": "sheet",
-             "hard": "dead-end"
+             "says": "the subtitle names her unit and pen",
+             "hard": "wrong-fact"
             }
            ],
            "record": [
             {
-             "expr": "c.unitId === '7'",
-             "says": "the search did not switch unit",
-             "hard": "broken-ruling"
-            }
-           ]
-          },
-          {
-           "type": "action",
-           "id": "search.empty.43.other.go",
-           "label": "tap Go to Unit 6",
-           "taps": [
-            "Go to Unit 6"
-           ],
-           "children": [
-            {
-             "type": "outcome",
-             "id": "fa-s7-go-to-unit-switches-the-room",
-             "tree": "S-7",
-             "label": "Go to Unit 6 opens Unit 6's room list",
-             "gwt": {
-              "given": "A sow in Unit 6 is open read-only from Find a sow.",
-              "when": "The worker taps Go to Unit 6.",
-              "then": "Unit 6's room list opens at her pen, and it is the only way the unit changed."
-             },
-             "authority": [
-              {
-               "src": "PRD",
-               "at": "Decisions · owner decision 2026-10-12",
-               "says": "Go to Unit N inside the record is the only way to change unit"
-              }
-             ],
-             "visible": [
-              {
-               "el": "[data-action='room-lens']",
-               "is": "enabled",
-               "hard": "dead-end",
-               "says": "the room list is in front"
-              }
-             ],
-             "record": [
-              {
-               "expr": "c.unitId === '6' && s.view === 'room'",
-               "says": "the room is Unit 6's list",
-               "hard": "wrong-fact"
-              }
-             ]
+             "expr": "s.tag === '004318' && c.unitId === '7'",
+             "says": "her record is open and the room is still Unit 7",
+             "hard": "wrong-fact"
             }
            ]
           }
@@ -3969,6 +3926,40 @@
          ]
         },
         {
+         "type": "outcome",
+         "id": "fa-s19-selection-count-is-plain-text",
+         "tree": "S-19",
+         "label": "The selection count is plain text: nothing to tap",
+         "gwt": {
+          "given": "One scanned sow is ticked.",
+          "when": "The worker looks at the footer.",
+          "then": "It reads \"1 sow selected\" as plain text, without a chevron or a button, next to the Actions button."
+         },
+         "authority": [
+          {
+           "src": "PRD",
+           "at": "Decisions · owner decision 2026-10-12",
+           "says": "N sows selected is a plain count, not a button"
+          }
+         ],
+         "visible": [
+          {
+           "text": "1 sow selected"
+          },
+          {
+           "el": ".scan-dock .scan-selected",
+           "is": "present"
+          }
+         ],
+         "record": [
+          {
+           "expr": "!document.querySelector('.scan-dock .scan-selected').closest('button') && !document.querySelector('.scan-dock .scan-selected svg')",
+           "says": "the count is not a button and has no chevron",
+           "hard": "broken-ruling"
+          }
+         ]
+        },
+        {
          "type": "action",
          "id": "scan.list.tick2",
          "label": "tick 000418 too",
@@ -4096,82 +4087,44 @@
         },
         {
          "type": "action",
-         "id": "scan.list.review",
-         "label": "tap the selection count",
+         "id": "scan.list.untick",
+         "label": "tap her box again",
          "taps": [
-          "1 sow selected"
+          "[data-scan-tag='000431'] .st-choice-trail"
          ],
          "children": [
           {
            "type": "outcome",
-           "id": "fa-s19-selection-count-opens-the-selected-list",
-           "tree": "S-19",
-           "label": "The selection count opens the list of ticked sows",
+           "id": "fa-s20-unticking-the-last-sow-brings-stop-scanning-back",
+           "tree": "S-20",
+           "label": "Tapping the box again unticks her; with none ticked Stop scanning returns",
            "gwt": {
             "given": "One scanned sow is ticked.",
-            "when": "The worker taps \"1 sow selected\".",
-            "then": "A sheet titled Selected lists the ticked sow with a ticked box."
+            "when": "The worker taps her box again.",
+            "then": "She is no longer ticked and the footer offers Stop scanning again, with no selection count."
            },
            "authority": [
             {
              "src": "PRD",
              "at": "Decisions · owner decision 2026-10-12",
-             "says": "N sows selected opens the ticked sows"
+             "says": "To untick, tap the box; nothing ticked: Stop scanning"
             }
            ],
            "visible": [
             {
-             "text": "Selected",
-             "in": "sheet"
+             "text": "Stop scanning"
             },
             {
-             "text": "000431",
-             "in": "sheet"
+             "text": "sow selected",
+             "absent": true,
+             "hard": "wrong-fact"
             }
-           ]
-          },
-          {
-           "type": "action",
-           "id": "scan.list.review.untick",
-           "label": "untick her",
-           "taps": [
-            "[data-action='room-scan-unpick']"
            ],
-           "children": [
+           "record": [
             {
-             "type": "outcome",
-             "id": "fa-s20-unticking-the-last-sow-closes-the-list",
-             "tree": "S-20",
-             "label": "Unticking the last sow closes the list and brings Stop scanning back",
-             "gwt": {
-              "given": "The list of ticked sows is open with one sow.",
-              "when": "The worker unticks her.",
-              "then": "The sheet closes and the footer offers Stop scanning again."
-             },
-             "authority": [
-              {
-               "src": "PRD",
-               "at": "Decisions · owner decision 2026-10-12",
-               "says": "An empty selection is no selection"
-              }
-             ],
-             "visible": [
-              {
-               "text": "Stop scanning"
-              },
-              {
-               "text": "sow selected",
-               "absent": true,
-               "hard": "wrong-fact"
-              }
-             ],
-             "record": [
-              {
-               "expr": "c.scan.picked.length === 0",
-               "says": "nothing is ticked",
-               "hard": "wrong-fact"
-              }
-             ]
+             "expr": "c.scan.picked.length === 0",
+             "says": "nothing is ticked",
+             "hard": "wrong-fact"
             }
            ]
           }
@@ -4322,32 +4275,37 @@
        "children": [
         {
          "type": "outcome",
-         "id": "fa-s24-scan-row-in-another-unit-opens-read-only",
+         "id": "fa-s24-scan-row-in-another-unit-opens-her-drawer",
          "tree": "S-24",
-         "label": "A scanned sow in another unit opens her record read-only",
+         "label": "A scanned sow in another unit opens her farrowing drawer",
          "gwt": {
           "given": "Scan ear tags is open with 004318, in Unit 6, scanned.",
           "when": "The worker taps her row.",
-          "then": "Her record opens read-only with Go to Unit 6 inside it, and the room is still Unit 7."
+          "then": "Her farrowing drawer opens, the same drawer a sow in this unit opens, and its subtitle names her unit and pen."
          },
          "authority": [
           {
            "src": "PRD",
            "at": "Decisions · owner decision 2026-10-12",
-           "says": "A sow in another unit opens her record read-only, with Go to Unit N inside it"
+           "says": "A sow in another unit opens her farrowing drawer: Farrowing is one task across its units"
           }
          ],
          "visible": [
           {
-           "screen": "farrowing.sow-other-unit",
+           "screen": "farrowing.before",
            "hard": "dead-end"
+          },
+          {
+           "text": "Unit 6 · A2",
+           "in": "sheet",
+           "hard": "wrong-fact"
           }
          ],
          "record": [
           {
-           "expr": "c.unitId === '7'",
-           "says": "the unit did not change",
-           "hard": "broken-ruling"
+           "expr": "s.tag === '004318'",
+           "says": "her record is open",
+           "hard": "wrong-fact"
           }
          ]
         }

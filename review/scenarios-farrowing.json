@@ -1,9 +1,9 @@
 {
  "feature": "farrowing",
- "commit": "4af133c9f0b0a6c664aec9abddeda4f011f724d2",
+ "commit": "476ea14592a10ef21df9b5563d7f0ec18abe8333",
  "dirty": true,
- "ran": "2026-10-12T12:11:13.510Z",
- "base": "http://localhost:56687",
+ "ran": "2026-10-12T12:38:05.517Z",
+ "base": "http://localhost:64717",
  "langs": [
   "en"
  ],
@@ -14,19 +14,19 @@
  "nodes": {
   "entry": 8,
   "state": 22,
-  "action": 78,
-  "outcome": 91,
+  "action": 76,
+  "outcome": 90,
   "decision-blocker": 5
  },
  "summary": {
-  "pass": 88,
+  "pass": 87,
   "fail": 0,
   "blocked": 5,
   "pending": 3
  },
  "byLang": {
   "en": {
-   "pass": 88,
+   "pass": 87,
    "fail": 0,
    "blocked": 0
   }
@@ -75,7 +75,7 @@
    "pending": 0
   },
   "search-scan": {
-   "pass": 26,
+   "pass": 25,
    "fail": 0,
    "blocked": 0,
    "pending": 0
@@ -4001,27 +4001,27 @@
    ]
   },
   {
-   "id": "fa-s6-other-unit-result-opens-read-only-record",
+   "id": "fa-s6-other-unit-result-opens-her-farrowing-drawer",
    "tree": "S-6",
    "branch": "search-scan",
-   "label": "A result in another unit opens her record read-only and does not switch unit",
+   "label": "A result in another unit opens her farrowing drawer, which names her unit",
    "gwt": {
     "given": "The worker has searched for 43 and 004318, a sow in Unit 6, is a result.",
     "when": "They tap her.",
-    "then": "Her record opens read-only with a Go to Unit 6 action inside it, and the room is still Unit 7."
+    "then": "Her farrowing drawer opens on her Awaiting face, the same drawer a sow in this unit opens, and its subtitle names her unit and pen."
    },
    "path": [
     "search-scan",
     "search.empty",
     "search.empty.43",
     "search.empty.43.other",
-    "fa-s6-other-unit-result-opens-read-only-record"
+    "fa-s6-other-unit-result-opens-her-farrowing-drawer"
    ],
    "authority": [
     {
      "src": "PRD",
      "at": "Decisions · owner decision 2026-10-12",
-     "says": "A sow in another unit opens her record read-only, with Go to Unit N inside it. Search never switches unit by itself"
+     "says": "A sow in another unit opens her farrowing drawer: Farrowing is one task across its units"
     }
    ],
    "result": "pass",
@@ -4035,9 +4035,9 @@
      "skipped": [],
      "notes": [],
      "evidence": [
-      "review/scenarios/farrowing/fa-s6-other-unit-result-opens-read-only-record/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-s6-other-unit-result-opens-read-only-record/en-390/01-fill-data-room-search.png",
-      "review/scenarios/farrowing/fa-s6-other-unit-result-opens-read-only-record/en-390/02-004318.png"
+      "review/scenarios/farrowing/fa-s6-other-unit-result-opens-her-farrowing-drawer/en-390/00-start.png",
+      "review/scenarios/farrowing/fa-s6-other-unit-result-opens-her-farrowing-drawer/en-390/01-fill-data-room-search.png",
+      "review/scenarios/farrowing/fa-s6-other-unit-result-opens-her-farrowing-drawer/en-390/02-004318.png"
      ]
     },
     {
@@ -4048,67 +4048,9 @@
      "skipped": [],
      "notes": [],
      "evidence": [
-      "review/scenarios/farrowing/fa-s6-other-unit-result-opens-read-only-record/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-s6-other-unit-result-opens-read-only-record/en-360/01-fill-data-room-search.png",
-      "review/scenarios/farrowing/fa-s6-other-unit-result-opens-read-only-record/en-360/02-004318.png"
-     ]
-    }
-   ]
-  },
-  {
-   "id": "fa-s7-go-to-unit-switches-the-room",
-   "tree": "S-7",
-   "branch": "search-scan",
-   "label": "Go to Unit 6 opens Unit 6's room list",
-   "gwt": {
-    "given": "A sow in Unit 6 is open read-only from Find a sow.",
-    "when": "The worker taps Go to Unit 6.",
-    "then": "Unit 6's room list opens at her pen, and it is the only way the unit changed."
-   },
-   "path": [
-    "search-scan",
-    "search.empty",
-    "search.empty.43",
-    "search.empty.43.other",
-    "search.empty.43.other.go",
-    "fa-s7-go-to-unit-switches-the-room"
-   ],
-   "authority": [
-    {
-     "src": "PRD",
-     "at": "Decisions · owner decision 2026-10-12",
-     "says": "Go to Unit N inside the record is the only way to change unit"
-    }
-   ],
-   "result": "pass",
-   "hard": [],
-   "runs": [
-    {
-     "lang": "en",
-     "width": 390,
-     "result": "pass",
-     "failures": [],
-     "skipped": [],
-     "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-s7-go-to-unit-switches-the-room/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-s7-go-to-unit-switches-the-room/en-390/01-fill-data-room-search.png",
-      "review/scenarios/farrowing/fa-s7-go-to-unit-switches-the-room/en-390/02-004318.png",
-      "review/scenarios/farrowing/fa-s7-go-to-unit-switches-the-room/en-390/03-go-to-unit-6.png"
-     ]
-    },
-    {
-     "lang": "en",
-     "width": 360,
-     "result": "pass",
-     "failures": [],
-     "skipped": [],
-     "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-s7-go-to-unit-switches-the-room/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-s7-go-to-unit-switches-the-room/en-360/01-fill-data-room-search.png",
-      "review/scenarios/farrowing/fa-s7-go-to-unit-switches-the-room/en-360/02-004318.png",
-      "review/scenarios/farrowing/fa-s7-go-to-unit-switches-the-room/en-360/03-go-to-unit-6.png"
+      "review/scenarios/farrowing/fa-s6-other-unit-result-opens-her-farrowing-drawer/en-360/00-start.png",
+      "review/scenarios/farrowing/fa-s6-other-unit-result-opens-her-farrowing-drawer/en-360/01-fill-data-room-search.png",
+      "review/scenarios/farrowing/fa-s6-other-unit-result-opens-her-farrowing-drawer/en-360/02-004318.png"
      ]
     }
    ]
@@ -4781,6 +4723,58 @@
    ]
   },
   {
+   "id": "fa-s19-selection-count-is-plain-text",
+   "tree": "S-19",
+   "branch": "search-scan",
+   "label": "The selection count is plain text: nothing to tap",
+   "gwt": {
+    "given": "One scanned sow is ticked.",
+    "when": "The worker looks at the footer.",
+    "then": "It reads \"1 sow selected\" as plain text, without a chevron or a button, next to the Actions button."
+   },
+   "path": [
+    "search-scan",
+    "scan.list",
+    "scan.list.tick1",
+    "fa-s19-selection-count-is-plain-text"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Decisions · owner decision 2026-10-12",
+     "says": "N sows selected is a plain count, not a button"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-s19-selection-count-is-plain-text/en-390/00-start.png",
+      "review/scenarios/farrowing/fa-s19-selection-count-is-plain-text/en-390/01-data-scan-tag-000431-st-choice-t.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-s19-selection-count-is-plain-text/en-360/00-start.png",
+      "review/scenarios/farrowing/fa-s19-selection-count-is-plain-text/en-360/01-data-scan-tag-000431-st-choice-t.png"
+     ]
+    }
+   ]
+  },
+  {
    "id": "fa-s18-actions-offer-the-generic-actions-only",
    "tree": "S-18",
    "branch": "search-scan",
@@ -4899,83 +4893,27 @@
    ]
   },
   {
-   "id": "fa-s19-selection-count-opens-the-selected-list",
-   "tree": "S-19",
-   "branch": "search-scan",
-   "label": "The selection count opens the list of ticked sows",
-   "gwt": {
-    "given": "One scanned sow is ticked.",
-    "when": "The worker taps \"1 sow selected\".",
-    "then": "A sheet titled Selected lists the ticked sow with a ticked box."
-   },
-   "path": [
-    "search-scan",
-    "scan.list",
-    "scan.list.tick1",
-    "scan.list.review",
-    "fa-s19-selection-count-opens-the-selected-list"
-   ],
-   "authority": [
-    {
-     "src": "PRD",
-     "at": "Decisions · owner decision 2026-10-12",
-     "says": "N sows selected opens the ticked sows"
-    }
-   ],
-   "result": "pass",
-   "hard": [],
-   "runs": [
-    {
-     "lang": "en",
-     "width": 390,
-     "result": "pass",
-     "failures": [],
-     "skipped": [],
-     "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-s19-selection-count-opens-the-selected-list/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-s19-selection-count-opens-the-selected-list/en-390/01-data-scan-tag-000431-st-choice-t.png",
-      "review/scenarios/farrowing/fa-s19-selection-count-opens-the-selected-list/en-390/02-1-sow-selected.png"
-     ]
-    },
-    {
-     "lang": "en",
-     "width": 360,
-     "result": "pass",
-     "failures": [],
-     "skipped": [],
-     "notes": [],
-     "evidence": [
-      "review/scenarios/farrowing/fa-s19-selection-count-opens-the-selected-list/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-s19-selection-count-opens-the-selected-list/en-360/01-data-scan-tag-000431-st-choice-t.png",
-      "review/scenarios/farrowing/fa-s19-selection-count-opens-the-selected-list/en-360/02-1-sow-selected.png"
-     ]
-    }
-   ]
-  },
-  {
-   "id": "fa-s20-unticking-the-last-sow-closes-the-list",
+   "id": "fa-s20-unticking-the-last-sow-brings-stop-scanning-back",
    "tree": "S-20",
    "branch": "search-scan",
-   "label": "Unticking the last sow closes the list and brings Stop scanning back",
+   "label": "Tapping the box again unticks her; with none ticked Stop scanning returns",
    "gwt": {
-    "given": "The list of ticked sows is open with one sow.",
-    "when": "The worker unticks her.",
-    "then": "The sheet closes and the footer offers Stop scanning again."
+    "given": "One scanned sow is ticked.",
+    "when": "The worker taps her box again.",
+    "then": "She is no longer ticked and the footer offers Stop scanning again, with no selection count."
    },
    "path": [
     "search-scan",
     "scan.list",
     "scan.list.tick1",
-    "scan.list.review",
-    "scan.list.review.untick",
-    "fa-s20-unticking-the-last-sow-closes-the-list"
+    "scan.list.untick",
+    "fa-s20-unticking-the-last-sow-brings-stop-scanning-back"
    ],
    "authority": [
     {
      "src": "PRD",
      "at": "Decisions · owner decision 2026-10-12",
-     "says": "An empty selection is no selection"
+     "says": "To untick, tap the box; nothing ticked: Stop scanning"
     }
    ],
    "result": "pass",
@@ -4989,10 +4927,9 @@
      "skipped": [],
      "notes": [],
      "evidence": [
-      "review/scenarios/farrowing/fa-s20-unticking-the-last-sow-closes-the-list/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-s20-unticking-the-last-sow-closes-the-list/en-390/01-data-scan-tag-000431-st-choice-t.png",
-      "review/scenarios/farrowing/fa-s20-unticking-the-last-sow-closes-the-list/en-390/02-1-sow-selected.png",
-      "review/scenarios/farrowing/fa-s20-unticking-the-last-sow-closes-the-list/en-390/03-data-action-room-scan-unpick.png"
+      "review/scenarios/farrowing/fa-s20-unticking-the-last-sow-brings-stop-scanning-back/en-390/00-start.png",
+      "review/scenarios/farrowing/fa-s20-unticking-the-last-sow-brings-stop-scanning-back/en-390/01-data-scan-tag-000431-st-choice-t.png",
+      "review/scenarios/farrowing/fa-s20-unticking-the-last-sow-brings-stop-scanning-back/en-390/02-data-scan-tag-000431-st-choice-t.png"
      ]
     },
     {
@@ -5003,10 +4940,9 @@
      "skipped": [],
      "notes": [],
      "evidence": [
-      "review/scenarios/farrowing/fa-s20-unticking-the-last-sow-closes-the-list/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-s20-unticking-the-last-sow-closes-the-list/en-360/01-data-scan-tag-000431-st-choice-t.png",
-      "review/scenarios/farrowing/fa-s20-unticking-the-last-sow-closes-the-list/en-360/02-1-sow-selected.png",
-      "review/scenarios/farrowing/fa-s20-unticking-the-last-sow-closes-the-list/en-360/03-data-action-room-scan-unpick.png"
+      "review/scenarios/farrowing/fa-s20-unticking-the-last-sow-brings-stop-scanning-back/en-360/00-start.png",
+      "review/scenarios/farrowing/fa-s20-unticking-the-last-sow-brings-stop-scanning-back/en-360/01-data-scan-tag-000431-st-choice-t.png",
+      "review/scenarios/farrowing/fa-s20-unticking-the-last-sow-brings-stop-scanning-back/en-360/02-data-scan-tag-000431-st-choice-t.png"
      ]
     }
    ]
@@ -5176,26 +5112,26 @@
    ]
   },
   {
-   "id": "fa-s24-scan-row-in-another-unit-opens-read-only",
+   "id": "fa-s24-scan-row-in-another-unit-opens-her-drawer",
    "tree": "S-24",
    "branch": "search-scan",
-   "label": "A scanned sow in another unit opens her record read-only",
+   "label": "A scanned sow in another unit opens her farrowing drawer",
    "gwt": {
     "given": "Scan ear tags is open with 004318, in Unit 6, scanned.",
     "when": "The worker taps her row.",
-    "then": "Her record opens read-only with Go to Unit 6 inside it, and the room is still Unit 7."
+    "then": "Her farrowing drawer opens, the same drawer a sow in this unit opens, and its subtitle names her unit and pen."
    },
    "path": [
     "search-scan",
     "scan.list",
     "scan.list.other",
-    "fa-s24-scan-row-in-another-unit-opens-read-only"
+    "fa-s24-scan-row-in-another-unit-opens-her-drawer"
    ],
    "authority": [
     {
      "src": "PRD",
      "at": "Decisions · owner decision 2026-10-12",
-     "says": "A sow in another unit opens her record read-only, with Go to Unit N inside it"
+     "says": "A sow in another unit opens her farrowing drawer: Farrowing is one task across its units"
     }
    ],
    "result": "pass",
@@ -5209,8 +5145,8 @@
      "skipped": [],
      "notes": [],
      "evidence": [
-      "review/scenarios/farrowing/fa-s24-scan-row-in-another-unit-opens-read-only/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-s24-scan-row-in-another-unit-opens-read-only/en-390/01-data-scan-tag-004318-st-row-door.png"
+      "review/scenarios/farrowing/fa-s24-scan-row-in-another-unit-opens-her-drawer/en-390/00-start.png",
+      "review/scenarios/farrowing/fa-s24-scan-row-in-another-unit-opens-her-drawer/en-390/01-data-scan-tag-004318-st-row-door.png"
      ]
     },
     {
@@ -5221,8 +5157,8 @@
      "skipped": [],
      "notes": [],
      "evidence": [
-      "review/scenarios/farrowing/fa-s24-scan-row-in-another-unit-opens-read-only/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-s24-scan-row-in-another-unit-opens-read-only/en-360/01-data-scan-tag-004318-st-row-door.png"
+      "review/scenarios/farrowing/fa-s24-scan-row-in-another-unit-opens-her-drawer/en-360/00-start.png",
+      "review/scenarios/farrowing/fa-s24-scan-row-in-another-unit-opens-her-drawer/en-360/01-data-scan-tag-004318-st-row-door.png"
      ]
     }
    ]

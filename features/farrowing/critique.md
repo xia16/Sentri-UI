@@ -31,7 +31,7 @@ Scope of this change: `farrowing.search` and `farrowing.scan` (and the screens a
 | Scan rows | none (one sow only) | Row · animal as select + door (`rowSelectDoor`) | **fix**: component |
 | Empty messages | page-built | none | page-built |
 | Selection bar | none | the Room dock (`.room-dock`) + Button | **fix**: the room's dock |
-| Actions sheet | none | Sheet drawer + Row navigation (Inspection's More actions rows) | **fix**: component |
+| Actions sheet | none | Sheet drawer + Row navigation (the existing More actions rows) | **fix**: component |
 | Stop glyph | none in the registry | Icon | added once, in `farrowing-icons.js`, until the registry takes it |
 
 ## Self-crit

@@ -15,8 +15,7 @@ function seed(preset='count'){
  const s={preset,view:'count',back:'count',finishAlive:9,due:'Due today · day 114',alive:9,dead:[1,1,2,0,0,1],anchor:10,pending:4,weak:1,deformed:1,weight:'',assisted:null,locked:false,ended:false,frozen:14,tag:'000418',pen:'B1',parity:3,deathDraft:[0,0,0,0,0,0],moved:0,handReared:null,mode:'piglets',sowCause:'',sowNote:'',photos:[],edit:null,expanded:false,popup:null,pointers:false,lens:'All',stamp:'08:41',finished:'Aug 27 · 08:12',markers:[{text:'Red line on left shoulder · monitor overnight',meta:'Today · 06:20 · G.H'}],markerDraft:'',pigletTab:'care',processingDirty:false,processingTasks:[{id:'dry',day:1,title:'Dry and warm',done:true,meta:'Aug 26 · 07:18 · G.H'},{id:'navel',day:1,title:'Disinfect navel',done:true,meta:'Aug 26 · 07:24 · G.H'},{id:'iron',day:3,title:'Iron supplement',done:false,meta:'Due today'},{id:'identity',day:3,title:'Ear tag, notch and weight',done:false,meta:'3 identified · 6 without identity'},{id:'health',day:5,title:'Health check',done:false,meta:'In 2 days'}],piglets:[{tag:'418001',notch:'36-38',sex:'Female',weight:'1.4',state:'Alive'},{tag:'418002',notch:'36-41',sex:'Male',weight:'1.5',state:'Alive'},{tag:'418003',notch:'',sex:'Female',weight:'',state:'Alive'}],unidentified:6,pigletQuery:'',pigletSelected:[],pigletDraft:null,pigletEditIndex:-1,fosterDraft:{direction:'out',target:'000392',count:1},mortalityDraft:{cause:'',unidentified:0,photos:[]},countDraft:9,countReason:'',events:[{text:'Crushed 3 → 2',day:'Aug 26',time:'08:20',who:'G. Hansen',kind:'correction'},{text:'+3 crushed · +1 other',day:'Aug 26',time:'08:12',who:'G. Hansen'},{text:'+5 alive',day:'Aug 26',time:'07:52',who:'G. Hansen'},{text:'+1 stillborn · +1 mummified',day:'Aug 26',time:'07:30',who:'G. Hansen'}]};
  if(preset==='room')s.view='room';
  if(/^search-/.test(preset))s.view='roomSearch';
- if(/^scan-/.test(preset))s.view=preset==='scan-actions'?'roomScanActions':preset==='scan-selected'?'roomScanSelected':'roomScan';
- if(preset==='sow-other')s.view='roomOtherSow';
+ if(/^scan-/.test(preset))s.view=preset==='scan-actions'?'roomScanActions':'roomScan';
  if(preset.startsWith('task-'))s.view='roomEndTask';
  if(preset==='before'){Object.assign(s,{alive:0,dead:[0,0,0,0,0,0],anchor:0,pending:0,weak:0,deformed:0,tag:'000455',pen:'B4',events:[],stamp:'',parity:2});}
  if(preset==='finish')s.view='finish';
@@ -173,14 +172,12 @@ function atlasScreen(s,c){
  if(v==='roomSearch'){const f=findHits(c);return !f?'farrowing.search':f.count?'farrowing.search-results':'farrowing.search-none';}
  if(v==='roomScan'){const sc=c.scan;return !sc.connected?'farrowing.scan-no-reader':!sc.items.length?'farrowing.scan':sc.picked.length?'farrowing.scan-ticked':!sc.listening?'farrowing.scan-stopped':'farrowing.scan-list';}
  if(v==='roomScanActions')return 'farrowing.scan-actions';
- if(v==='roomScanSelected')return 'farrowing.scan-selected';
- if(v==='roomOtherSow')return 'farrowing.sow-other-unit';
  const more={roomFilter:'filter',roomGrid:'pen-map',roomPenDetail:'pen',roomPenLog:'pen-log',roomPenNote:'pen-note',roomPenReadNote:'pen-read-note',roomPenFeed:'pen-feed',roomPenFault:'pen-fault',roomPenFaultRecord:'pen-fault-record',roomTaskSows:'task-sows',roomHome:'today',deathBreakdown:'death-breakdown',marker:'note',pigletCare:'piglet-care',pigletEdit:'piglet-identity',pigletDeath:'piglet-death'};
  if(more[v])return 'farrowing.'+more[v];
  if(v==='profile'&&s.actionsEntry)return 'farrowing.sow-actions';
  return null;
 }
-const presets=[['room','Room list'],['count','Counting'],['before','Before first count'],['draft','Death entry'],['finish','Finish'],['leave','Leave edit with changes'],['locked','Locked record'],['edit','Edit counts'],['born','Correct born'],['history','Farrowing log'],['ended','Sow died'],['allocate','Sow died · allocate piglets'],['task-blocked','End task · active sows'],['task-ready','End task · awaiting sows'],['task-complete','End task · all finished'],['task-outcomes','End task · production outcomes'],['foster','Foster piglets'],['reconcile','Reconcile piglet count'],['search-empty','Find a sow'],['search-results','Find a sow · results'],['search-none','Find a sow · no match'],['sow-other','Sow in another unit'],['scan-none','Scan · reader not connected'],['scan-empty','Scan · nothing scanned'],['scan-list','Scan · sows scanned'],['scan-ticked','Scan · sows ticked'],['scan-repeat','Scan · repeat scan'],['scan-stopped','Scan · stopped'],['scan-actions','Scan · Actions'],['scan-selected','Scan · ticked sows']];
+const presets=[['room','Room list'],['count','Counting'],['before','Before first count'],['draft','Death entry'],['finish','Finish'],['leave','Leave edit with changes'],['locked','Locked record'],['edit','Edit counts'],['born','Correct born'],['history','Farrowing log'],['ended','Sow died'],['allocate','Sow died · allocate piglets'],['task-blocked','End task · active sows'],['task-ready','End task · awaiting sows'],['task-complete','End task · all finished'],['task-outcomes','End task · production outcomes'],['foster','Foster piglets'],['reconcile','Reconcile piglet count'],['search-empty','Find a sow'],['search-results','Find a sow · results'],['search-none','Find a sow · no match'],['scan-none','Scan · reader not connected'],['scan-empty','Scan · nothing scanned'],['scan-list','Scan · sows scanned'],['scan-ticked','Scan · sows ticked'],['scan-repeat','Scan · repeat scan'],['scan-stopped','Scan · stopped'],['scan-actions','Scan · Actions']];
 const cards=[{title:'Find the next sow',caption:'<strong>The room, in context.</strong> Filter by state, jump to a pen, and open each sow’s live record.',initial:'room'},{title:'Finish with confidence',caption:'<strong>Two observations, then the lock.</strong> Clear rows, optional details and a deliberate final action.',initial:'finish'},{title:'Read the whole litter',caption:'<strong>Current facts, with their context.</strong> Finish details stay readable; the history opens on its own page.',initial:'locked'}];
 const states=cards.map(c=>{const r=seed(c.initial);restoreDraft(r);return r;});
 // Scenario gate hook (scripts/run-scenarios.mjs): read-only access to the live records for record assertions. Draws nothing.
@@ -205,6 +202,8 @@ function recordStamp(s){
 }
 // When and who, said once on the ended record: "Aug 25 06:20 · L.M".
 function diedStamp(s){const e=s.events.find(e=>e.text.startsWith('Sow died'));return e?[[e.day,e.time].filter(Boolean).join(' '),initials(e.who)].filter(Boolean):[];}
+// Her pen; "Unit 6 · A2" when she is in another unit than the room's, so it is clear she is elsewhere.
+function sowPlace(s){const c=roomContext(s),own=c.units.find(u=>u.records.includes(s));return own&&own!==c.unit?own.name+' · '+s.pen:s.pen;}
 function identity(s){
  if(s.view==='allocate'){const e=s.events.find(e=>e.text.startsWith('Sow died'));return {title:`${s.alive} piglet${s.alive===1?'':'s'} to allocate`,subtitle:`${s.tag} · ${s.pen} · sow died ${[e?.day&&e.day!=='Today'?e.day:'',e?.time].filter(Boolean).join(' ')}`,close:false,label:'Piglets to allocate'};}
  if(s.view==='finish')return {title:'Finish farrowing',subtitle:`${s.tag} · ${s.pen} · Parity ${s.parity}`,close:{action:'dismiss',label:'Close finish drawer'}};
@@ -212,7 +211,7 @@ function identity(s){
  return {title:'Record dead',subtitle:`${s.tag} · ${s.pen}`,aside:n||s.sowCause?SentriUI.button({label:'Clear',register:'text',action:'clearDeath',strs:{label:'act.clear'}}):'',close:false,headClass:'edit-header'};}
  if(['edit','editFinish'].includes(s.view))return {title:s.view==='editFinish'?'Edit finish details':'Edit record',subtitle:`${s.tag} · ${s.pen}`,aside:changes(s).length?SentriUI.button({label:'Clear',register:'text',action:'clearEdit',strs:{label:'act.clear'}}):'',close:false,headClass:'edit-header'};
  const state=s.ended?'':s.locked?'Finished':s.view==='finish'?'Finishing':born(s)?'Farrowing':s.due.split(' · day')[0];
- return {title:{html:btn('profile',esc(s.tag)+icon('chevron'),'sow-title-link').replace('<button',`<button aria-label="View sow ${s.tag} details"`)},subtitle:{html:`<span class="sow-context"><span class="sow-location">${esc(s.pen)} / Parity ${s.parity}</span> <span>${esc((s.ended?'':recordStamp(s))||state)}</span></span>`},close:{action:'dismiss',label:'Close sow drawer'},label:'Sow '+s.tag,headClass:'sow-header'};
+ return {title:{html:btn('profile',esc(s.tag)+icon('chevron'),'sow-title-link').replace('<button',`<button aria-label="View sow ${s.tag} details"`)},subtitle:{html:`<span class="sow-context"><span class="sow-location">${esc(sowPlace(s))} / Parity ${s.parity}</span> <span>${esc((s.ended?'':recordStamp(s))||state)}</span></span>`},close:{action:'dismiss',label:'Close sow drawer'},label:'Sow '+s.tag,headClass:'sow-header'};
 }
 function farmStepper(props,prefix=''){return SentriUI.stepper(props).replace(/data-value="[^"]*" data-step="(-?\d+)"/g,(_,d)=>`data-value="${prefix}${d}" data-step="${d}"`);}
 function row(label,val,action,value,min=false,max=false,cls='',draftStatus='',was){const isWas=was!==undefined&&was!==null&&was!==val;return farmStepper({label,value:val,action,key:value,min:typeof min==='number'?min:min?val:0,max:typeof max==='number'?max:max?val:null,draft:cls.includes('draft')||isWas,status:isWas?'was '+was:draftStatus,strs:!isWas&&draftStatus?{status:'ds.stepper.draft'}:undefined,args:!isWas&&draftStatus?{status:{n:draftStatus.match(/\d+/)?.[0]||'1'}}:undefined,reserveHint:false},value);}
@@ -372,7 +371,7 @@ function findHits(c){
 const markHit=(text,q)=>{const i=q?String(text).toLowerCase().indexOf(q):-1;return i<0?esc(text):esc(text.slice(0,i))+'<b>'+esc(text.slice(i,i+q.length))+'</b>'+esc(text.slice(i+q.length));};
 function findRow({record:r,unit},q,here){
  const pen=rowText.pen(r.pen);
- let html=SentriUI.row({variant:'animal',code:r.tag,right:{kind:'state',figure:here?pen:unit.name,word:here?'':pen,level:'settled'},action:here?'room-sow':'room-sow-other',value:here?r.tag:unit.id+':'+r.tag,className:'find-row'});
+ let html=SentriUI.row({variant:'animal',code:r.tag,right:{kind:'state',figure:here?pen:unit.name,word:here?'':pen,level:'settled'},action:'room-sow',value:r.tag,className:'find-row'});
  html=html.replace(`<strong class="st-animal-id">${esc(r.tag)}</strong>`,`<strong class="st-animal-id">${markHit(r.tag,q)}</strong>`);
  if(r.pen.toLowerCase().includes(q))html=html.replace(`>${esc(pen)}<`,`>${markHit(pen,q)}<`);
  return html;
@@ -391,11 +390,10 @@ function searchPage(c){
  return `${status()}<div class="find-page find-search"><div class="find-top"><div class="find-field">${icon('search')}<input data-room-search type="text" inputmode="text" enterkeyhint="search" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" placeholder="Ear tag or pen" aria-label="Ear tag or pen" value="${esc(q)}">${SentriUI.iconButton({variant:'plain',action:'room-search-clear',icon:icon('close'),label:'Clear',className:'find-clear'}).replace('<button',`<button${q?'':' hidden'}`)}${SentriUI.iconButton({action:'room-scan',icon:icon('scan'),label:'Scan ear tag',className:'find-scan'})}</div>${SentriUI.button({label:'Cancel',register:'text',action:'room-back',className:'find-cancel'})}</div><div class="room-search-results find-results" role="region" aria-label="Search results" aria-live="polite">${searchBody(c)}</div></div>`;
 }
 function scanSetup(c,preset=''){
- const scanning=/^scan-/.test(preset),scanned=['scan-list','scan-repeat','scan-ticked','scan-stopped','scan-actions','scan-selected'].includes(preset),ticked=['scan-ticked','scan-actions','scan-selected'].includes(preset);
+ const scanning=/^scan-/.test(preset),scanned=['scan-list','scan-repeat','scan-ticked','scan-stopped','scan-actions'].includes(preset),ticked=['scan-ticked','scan-actions'].includes(preset);
  const items=scanned?['004318','000431','000418']:[];   // newest first
  c.scan={connected:preset==='scan-none'?false:scanning?true:!scannerOff,listening:preset!=='scan-stopped',items,picked:ticked?['000431','000418']:[],seq:items.length,flash:'',flashUntil:0,scroll:0};
  if(/^search-/.test(preset))c.query=preset==='search-results'?'43':preset==='search-none'?'909':'';
- if(preset==='sow-other'){c.query='43';c.otherSow={unitId:'6',tag:'004318'};c.otherBack='roomSearch';}
  if(preset==='scan-repeat'){c.scan.seq=1;scanAdd(c);}   // the reader reads 000431 again: still one row, highlighted
 }
 // "Simulate scan": the reader reads the next sample sow. A sow already on the list is not added twice; her row is highlighted instead.
@@ -409,46 +407,28 @@ function scanAction(s,c,a,v){
  const sc=c.scan;
  if(a==='room-scan-toggle'&&sc.connected)sc.listening=!sc.listening;
  else if(a==='room-scan-pick'){const k=sc.picked.indexOf(v);if(k<0)sc.picked.push(v);else sc.picked.splice(k,1);}
- else if(a==='room-scan-unpick'){sc.picked=sc.picked.filter(x=>x!==v);if(!sc.picked.length)s.view='roomScan';}
- else if(a==='room-scan-clear'){sc.picked=[];s.view='roomScan';}
  else if(a==='room-scan-actions')s.view='roomScanActions';
- else if(a==='room-scan-review')s.view='roomScanSelected';
 
 }
 const scanEmpty=(title,text)=>`<div class="scan-empty">${icon('scan')}<strong>${title}</strong><p>${text}</p></div>`;
 function scanPage(c){
  const sc=c.scan,items=sc.items.map(t=>findSow(c,t)).filter(Boolean),n=sc.picked.length;
- const group=(title,list,here)=>list.length?SentriUI.heading({title,meta:String(list.length),kind:'section',level:3})+SentriUI.panel(list.map(h=>sowRow(h.record,{select:{checked:sc.picked.includes(h.record.tag)},...(here?{flat:true}:{place:h.unit.name+' · '+rowText.pen(h.record.pen),action:'room-sow-other',value:h.unit.id+':'+h.record.tag})})).join(''),{className:'st-row-group scan-card'}):'';
+ const group=(title,list,here)=>list.length?SentriUI.heading({title,meta:String(list.length),kind:'section',level:3})+SentriUI.panel(list.map(h=>sowRow(h.record,{select:{checked:sc.picked.includes(h.record.tag)},...(here?{flat:true}:{place:h.unit.name+' · '+rowText.pen(h.record.pen)})})).join(''),{className:'st-row-group scan-card'}):'';
  const pill=sc.connected?`<span class="scan-live${sc.listening?'':' is-off'}"><i aria-hidden="true"></i>${sc.listening?'Scanning':'Stopped'}</span>`:'';
  const body=!sc.connected?scanEmpty('Scanner not connected',"Turn on the tag reader and pair it in your phone's Bluetooth settings. Scanning starts as soon as it connects."):
   !items.length?(sc.listening?scanEmpty('Hold the reader to an ear tag','Each sow you scan appears here.'):scanEmpty('Scanning is stopped','Resume scanning to add sows.')):
   `<div class="scan-body">${group('In '+c.unit.name,items.filter(h=>h.unit.id===c.unitId),true)}${group('Other units',items.filter(h=>h.unit.id!==c.unitId),false)}</div>`;
- const dock=!sc.connected?'':n?`<nav class="room-dock scan-dock" aria-label="Selected sows">${SentriUI.button({label:`${n} ${n===1?'sow':'sows'} selected`,register:'text',action:'room-scan-review',className:'scan-selected'}).replace(/<\/button>$/,icon('chevron')+'</button>')}${SentriUI.button({label:'Actions',icon:icon('more'),register:'primary',action:'room-scan-actions'})}</nav>`:
+ const dock=!sc.connected?'':n?`<nav class="room-dock scan-dock" aria-label="Selected sows"><p class="scan-selected">${n} ${n===1?'sow':'sows'} selected</p>${SentriUI.button({label:'Actions',icon:icon('more'),register:'primary',action:'room-scan-actions'})}</nav>`:
   `<nav class="room-dock scan-dock" aria-label="Scanner">${SentriUI.button({label:sc.listening?'Stop scanning':'Resume scanning',icon:icon(sc.listening?'stop':'scan'),register:sc.listening?'secondary':'primary',className:'scan-toggle',action:'room-scan-toggle'})}</nav>`;
  return `${status()}<div class="find-page scan-page"><header class="scan-head">${SentriUI.iconButton({action:'room-back',icon:icon('back-chevron'),label:'Back'})}<div class="scan-title">${SentriUI.heading({title:'Scan ear tags',description:'Farrowing · '+c.unit.name,kind:'page',level:2})}</div>${pill}</header>${body}${dock}</div>`;
 }
-const pageUnder=(s,c)=>s.view==='roomOtherSow'?(c.otherBack||'room'):s.view==='roomScanActions'||s.view==='roomScanSelected'?'roomScan':s.view;
+const pageUnder=(s,c)=>s.view==='roomScanActions'?'roomScan':s.view;
 function findPage(s){const c=roomContext(s),under=pageUnder(s,c);return under==='roomSearch'?searchPage(c):under==='roomScan'?scanPage(c):'';}
 // The shared generic actions, for the ticked sows only: no farrowing action here (the owner, 2026-10-12). The rows are Inspection's More actions rows.
 function scanActionsSheet(c){
  const n=c.scan.picked.length;
  const rows=penActionRow('room-scan-act','transfer','Transfer','Move to another unit or pen','transfer')+penActionRow('room-scan-act','condition','Disease or symptom','Record a health finding','health')+penActionRow('room-scan-act','treat','Record treatment','Medicine, dose and method','treatment')+penActionRow('room-scan-act','note','Add a note','Leave a note for this sow','marker');
  return roomSheet('Actions',`<div class="compact-actions st-panel st-row-group">${rows}</div>`,footer(SentriUI.backButton({action:'room-back'})),'scan-actions-sheet',`${n} ${n===1?'sow':'sows'}`);
-}
-// The ticked sows, to untick one. Unticking the last closes it.
-function scanSelectedSheet(c){
- const rows=c.scan.picked.map(t=>findSow(c,t)).filter(Boolean),n=rows.length;
- const list=rows.map(h=>SentriUI.rowSelect({title:h.record.tag,description:(h.unit.id===c.unitId?'':h.unit.name+' · ')+rowText.pen(h.record.pen),checked:true,action:'room-scan-unpick',value:h.record.tag,inputAttrs:{'data-value':h.record.tag,'aria-label':'Selected '+h.record.tag}})).join('');
- return roomSheet('Selected',SentriUI.panel(list,{className:'st-row-group'}),footer(SentriUI.backButton({action:'room-back'}),SentriUI.button({label:'Actions',icon:icon('more'),register:'primary',action:'room-scan-actions'})),'scan-selected-sheet',`${n} ${n===1?'sow':'sows'}`,SentriUI.button({label:'Clear',register:'text',action:'room-scan-clear',strs:{label:'act.clear'}}));
-}
-// A sow in another unit, read only: where she is and how she stands. Go to that unit is the one way on; search never switches unit by itself.
-function otherSowSheet(c){
- const hit=findSow(c,c.otherSow?.tag);if(!hit)return '';
- const {record:r,unit}=hit,f=sowFacts(r),dead=sum(r.dead),out=r.ended||r.productionOutcome;
- const facts=out?[{label:'Status',value:f.word},{label:'Parity',value:r.parity}]:r.locked?[{label:'Born',value:born(r)},{label:'Alive',value:r.alive},{label:'Dead',value:dead}]:born(r)?[{label:'Alive',value:r.alive},{label:'Dead',value:dead},{label:'Parity',value:r.parity}]:[{label:f.word,value:f.figure},{label:'Parity',value:r.parity}];
- const groups=[];for(const e of r.events){if(groups.at(-1)?.label!==e.day)groups.push({label:e.day,entries:[]});groups.at(-1).entries.push({title:e.text,detail:e.kind==='correction'?'Correction':'',at:e.time,by:e.who});}
- const body=SentriUI.facts(facts,{columns:facts.length===3?3:2})+(groups.length?`<section class="other-sow-log">${SentriUI.heading({title:'Farrowing log',kind:'section',level:4})}${SentriUI.log(groups)}</section>`:'');
- return roomSheet(r.tag,body,footer(SentriUI.backButton({action:'room-back'}),SentriUI.button({label:'Go to '+unit.name,register:'primary',action:'room-go-unit',value:unit.id})),'other-sow-sheet',[unit.name,rowText.pen(r.pen),'Read-only'].join(' · '));
 }
 // Pen context is shared by its drawers within the unit; task rows stay sow-focused.
 function penInfo(c){const pens=c.unit.penDetails||(c.unit.penDetails={});return pens[c.detailPen]||(pens[c.detailPen]={note:'',noteBy:'',faults:[],events:[],feed:null});}
@@ -539,8 +519,6 @@ function roomOverlay(s){const c=roomContext(s),unitSheet=(title,body,actions,cls
  if(s.view==='roomPenLog')return penLog(c);
  if(s.view==='roomGrid'){const cells=Array.from({length:6},(_,row)=>`<span class="map-row-label">${row+1}</span>${['A','B','C','D'].map(col=>{const p=col+(row+1),all=c.listed.filter(r=>r.pen===p),rows=visibleRoomRecords(c).filter(r=>r.pen===p),f=rows.length?penFact(rows):{text:all.length?'No match':'No sows',kind:'empty'};return btn('room-pen',`<strong>${p}</strong><small>${f.kind==='active'||f.kind==='overdue'||f.kind==='done'?SentriUI.status({variant:'word',kind:f.kind,text:f.text}):esc(f.text)}</small>`,`pen-cell ${f.kind}${c.currentPen===p?' current':''}`,p,!rows.length).replace('<button',`<button aria-label="Pen ${p}, ${f.kind==='done'?'Done, ':''}${esc(f.text)}"`);}).join('')}`).join('');return unitSheet('Go to pen',`<div class="pen-map"><span></span>${['A','B','C','D'].map(x=>`<span class="map-column-label">${x}</span>`).join('')}${cells}</div><div class="pen-peek" hidden></div>`,'','picker-sheet');}
  if(s.view==='roomScanActions')return scanActionsSheet(c);
- if(s.view==='roomScanSelected')return scanSelectedSheet(c);
- if(s.view==='roomOtherSow')return otherSowSheet(c);
  if(s.view==='roomOverview'){
   const {units,totals:t}=taskOverview(c),review=taskClosureReview(c);
   const columns=['Done','Active','Awaiting'],dotClass={Done:'farrowed',Active:'active',Awaiting:'awaiting'};
@@ -552,8 +530,8 @@ function roomOverlay(s){const c=roomContext(s),unitSheet=(title,body,actions,cls
  return '';
 }
 function roomAction(i,a,v){if(!a.startsWith('room-'))return false;const s=states[i],c=roomContext(s);const list=document.querySelector(`[data-card="${i}"] .room-scroll`);if(list)c.scroll=list.scrollTop;const intro=list?list.querySelector('.room-intro').offsetHeight+list.querySelector('.room-context-strip').offsetHeight+10:0;const nextScroll=c.scroll>=intro?intro:0;
-  if(a==='room-sow'){const r=c.records.find(r=>r.tag===v);if(r){if(s.view==='roomScan')c.returnToTaskReview='roomScan';states[i]=r;r.view=recordView(r);if(r.view==='history')r.pageBack='room';c.currentPen=r.pen;c.query='';}}
- if(a==='room-back'||a==='room-return'){c.returnToTaskReview=false;if(s.view==='roomPenDetail')c.returnFocusPen=c.detailPen;const from=s.view;s.view=from==='roomOtherSow'?c.otherBack||'room':from==='roomScanActions'||from==='roomScanSelected'?'roomScan':from==='roomPicker'&&c.picker?c.picker.returnView:from==='roomEndTask'?'roomOverview':from==='roomTaskSows'?c.taskListBack||'roomEndTask':from==='roomTaskReceipt'?'roomHome':penParent(from);if(from==='roomPicker')c.picker=null;}
+  if(a==='room-sow'){const hit=findSow(c,v),r=hit?.record;if(r){if(s.view==='roomScan')c.returnToTaskReview='roomScan';states[i]=r;r.view=recordView(r);if(r.view==='history')r.pageBack='room';if(hit.unit.id===c.unitId)c.currentPen=r.pen;c.query='';}}   // Farrowing is one task across its units: a sow in another unit opens the same drawer
+ if(a==='room-back'||a==='room-return'){c.returnToTaskReview=false;if(s.view==='roomPenDetail')c.returnFocusPen=c.detailPen;const from=s.view;s.view=from==='roomScanActions'?'roomScan':from==='roomPicker'&&c.picker?c.picker.returnView:from==='roomEndTask'?'roomOverview':from==='roomTaskSows'?c.taskListBack||'roomEndTask':from==='roomTaskReceipt'?'roomHome':penParent(from);if(from==='roomPicker')c.picker=null;}
  handlePenAction(s,c,a,v);
  if(a==='room-pen-log')s.view='roomPenLog';
  if(a==='room-pen-detail'&&c.records.some(r=>r.pen===v)){c.detailPen=v;c.currentPen=v;s.view='roomPenDetail';}
@@ -569,9 +547,7 @@ function roomAction(i,a,v){if(!a.startsWith('room-'))return false;const s=states
 
  if(a==='room-search'||a==='room-scan'){c.query='';s.view=a==='room-search'?'roomSearch':'roomScan';}
  if(a==='room-search-clear')c.query='';
- if(a==='room-sow-other'){const [unitId,tag]=v.split(':');if(findSow(c,tag)){c.otherSow={unitId,tag};c.otherBack=s.view;s.view='roomOtherSow';}}
- if(a==='room-go-unit'){const hit=findSow(c,c.otherSow?.tag);if(hit){const record=switchRoomUnit(c,hit.unit.id);if(record){states[i]=record;record.view='room';c.lens='All';c.filter=defaultRoomFilter();c.currentPen=hit.record.pen;c.jump=hit.record.pen;c.highlightPen=hit.record.pen;c.highlightUntil=Date.now()+900;c.focusUnit=true;}}}
- if(a==='room-scan-act'){const hit=findSow(c,c.scan.picked[0]);if(hit){if(hit.unit.id!==c.unitId)switchRoomUnit(c,hit.unit.id);const r=hit.record;states[i]=r;r.view='roomScan';r.deepLink=v;act(r,'sowActions');}}
+ if(a==='room-scan-act'){const hit=findSow(c,c.scan.picked[0]);if(hit){const r=hit.record;states[i]=r;r.view='roomScan';r.deepLink=v;act(r,'sowActions');}}
  else if(a.startsWith('room-scan-'))scanAction(s,c,a,v);
  if(a==='room-overview')s.view=c.completion?'roomTaskReceipt':'roomOverview';
  if(a==='room-end-review')s.view=c.completion?'roomTaskReceipt':'roomEndTask';
@@ -675,7 +651,7 @@ function connectSowDetail(root,s){
   const events=s.pending?[{text:(s.pending>0?'+':'')+s.pending+' alive · this visit',day:'Today',time:s.stamp,who:'G. Hansen'},...s.events]:s.events;
   const tasks=!s.productionOutcome&&!s.ended?[{id:'farrowing',title:'Farrowing',type:'Production',status:s.locked?'Finished':born(s)?'In progress':'Awaiting',summary:born(s)?s.alive+' alive · '+sum(s.dead)+' dead':'Record this sow’s litter'},...(born(s)?[{id:'piglet-processing',title:'Piglet processing',type:'Production',status:s.processingTasks.some(t=>!t.done)?'Due today':'Up to date',summary:s.processingTasks.filter(t=>t.done).length+' of '+s.processingTasks.length+' care steps done'}]:[]),...(s.tag==='000418'?[{id:'vaccination',title:'Vaccination',type:'Health',status:'Due today',summary:'Scheduled vaccination'},{id:'treatment-task',title:'Treatment',type:'Health',status:'Due today',summary:'Scheduled treatment'}]:[])]:[];
   if(s.deepLink){const key=s.deepLink;s.deepLink='';deepLinkInto(frame,key);}
-  frame.contentWindow.postMessage({type:'open-sow-detail',record:{id:s.tag,pen:s.pen,unit:roomContext(s).unit.name,parity:s.parity,batch:'28',breed:'Landrace × Large White',serviceDate:'2026-05-21',expectedFarrowing:'2026-09-12',stage:s.ended?'Sow died':s.locked?'Lactating':born(s)?'Farrowing':'Gestating',events},tasks,destinations:roomContext(s).units.map(u=>({id:u.id,name:u.name,pens:[...new Set(u.records.map(r=>r.pen))]})),context:sowDetailContexts.get(s),entry:s.actionsEntry?'actions':'pig',actions:sowActionCatalogue(s).filter(x=>!x.inDrawer)},location.origin);
+  frame.contentWindow.postMessage({type:'open-sow-detail',record:{id:s.tag,pen:s.pen,unit:(roomContext(s).units.find(u=>u.records.includes(s))||roomContext(s).unit).name,parity:s.parity,batch:'28',breed:'Landrace × Large White',serviceDate:'2026-05-21',expectedFarrowing:'2026-09-12',stage:s.ended?'Sow died':s.locked?'Lactating':born(s)?'Farrowing':'Gestating',events},tasks,destinations:roomContext(s).units.map(u=>({id:u.id,name:u.name,pens:[...new Set(u.records.map(r=>r.pen))]})),context:sowDetailContexts.get(s),entry:s.actionsEntry?'actions':'pig',actions:sowActionCatalogue(s).filter(x=>!x.inDrawer)},location.origin);
  },{once:true});
 }
 window.addEventListener('message',e=>{

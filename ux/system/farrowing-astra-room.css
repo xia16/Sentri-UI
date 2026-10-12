@@ -75,7 +75,7 @@
 .find-clear[hidden]{display:none}
 .find-clear,.find-scan{flex:none}
 .find-cancel{flex:none}
-.scan-selected{margin-right:auto}
+.scan-selected{display:flex;align-items:center;min-height:48px;margin:0 auto 0 0;font:600 15px var(--font-sans)}
 .find-results{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:14px 16px 24px}
 .find-results .st-heading.st-heading,.scan-body .st-heading.st-heading{margin:16px 2px 8px}
 .find-list{--st-panel-bg:var(--app-background);margin-bottom:16px}

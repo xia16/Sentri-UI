@@ -182,8 +182,7 @@ States: S1 Find a sow, empty field · S2 Scan, no reader paired · S3 Scan, read
 | S-3 | S1 | type 004 | → a tag that starts with it ranks before a tag that contains it | S — owner decision 2026-10-12 | `fa-s3-tags-starting-with-the-text-rank-first` |
 | S-4 | S1 | type B4 | → the sows of pen B4; pen codes match | S — owner decision 2026-10-12 | `fa-s4-pen-codes-match` |
 | S-5 | S1 | type 909 | → "No sow matching “909” in any unit." | S — owner decision 2026-10-12 | `fa-s5-no-match-says-so` |
-| S-6 | S1 | tap a result in another unit | → her record, read-only, with Go to Unit 6; the room stays Unit 7 | S — owner decision 2026-10-12 | `fa-s6-other-unit-result-opens-read-only-record` |
-| S-7 | S1 | Go to Unit 6 | → Unit 6's room list | S — owner decision 2026-10-12 | `fa-s7-go-to-unit-switches-the-room` |
+| S-6 | S1 | tap a result in another unit | → her farrowing drawer (the same drawer), subtitle "Unit 6 · A2"; the room stays Unit 7 | S — owner decision 2026-10-12 | `fa-s6-other-unit-result-opens-her-farrowing-drawer` |
 | S-8 | S1 | tap the scan icon in the field | → Scan ear tags | S — owner decision 2026-10-12 | `fa-s8-search-scan-icon-opens-scan` |
 | S-9 | S1 | Cancel | → the room list | S — owner decision 2026-10-12 | `fa-s9-cancel-returns-to-the-room` |
 | S-10 | S2 | open | → "Scanner not connected" and the pairing instruction; no pill, no list, no button | S — owner decision 2026-10-12 | `fa-s10-no-reader-says-so-with-no-buttons` |
@@ -195,12 +194,12 @@ States: S1 Find a sow, empty field · S2 Scan, no reader paired · S3 Scan, read
 | S-16 | S4 | Resume scanning | → Scanning; Stop scanning | S — owner decision 2026-10-12 | `fa-s16-resume-scanning-listens-again` |
 | S-17 | S4 | tick one sow | → "1 sow selected" + Actions (never "More actions") | S — owner decision 2026-10-12 | `fa-s17-one-ticked-shows-the-selection-bar` |
 | S-18 | S4 | Actions with two ticked | → Transfer, Disease or symptom, Record treatment, Add a note; no Farrowing action | S — owner decision 2026-10-12 | `fa-s18-actions-offer-the-generic-actions-only` |
-| S-19 | S4 | tap "N sows selected" | → Selected: the ticked sows | I — the › on the bar needs a destination; Inspection's Selected review is the model | `fa-s19-selection-count-opens-the-selected-list` |
-| S-20 | S4 | untick the last sow in Selected | → it closes; Stop scanning returns | S — Sheet README, "an empty selection closes" | `fa-s20-unticking-the-last-sow-closes-the-list` |
+| S-19 | S4 | read the footer with a sow ticked | → "N sows selected" as plain text, no chevron, nothing to tap | S — owner decision 2026-10-12 | `fa-s19-selection-count-is-plain-text` |
+| S-20 | S4 | tap the box of the last ticked sow again | → unticked; Stop scanning returns | S — owner decision 2026-10-12 | `fa-s20-unticking-the-last-sow-brings-stop-scanning-back` |
 | S-21 | S4 | tap a row in this unit | → her farrowing drawer | S — owner decision 2026-10-12 | `fa-s21-scan-row-opens-her-drawer` |
 | S-22 | S4 | Back from her drawer | → the scan list, unchanged | I — a scan visit is work in progress | `fa-s22-back-returns-to-the-scan-list` |
 | S-23 | S4 | tick, open another sow, Back | → the tick is kept | I — as S-22 | `fa-s23-ticks-survive-opening-a-sow` |
-| S-24 | S4 | tap a row in another unit | → her record, read-only; the room stays | S — owner decision 2026-10-12 | `fa-s24-scan-row-in-another-unit-opens-read-only` |
+| S-24 | S4 | tap a row in another unit | → her farrowing drawer (the same drawer), subtitle "Unit 6 · A2" | S — owner decision 2026-10-12 | `fa-s24-scan-row-in-another-unit-opens-her-drawer` |
 | S-25 | S5 | the reader reads a listed sow again | → still one row (highlighted briefly) | S — owner decision 2026-10-12 | `fa-s25-repeat-scan-does-not-duplicate` |
 | S-26 | S4 | Actions with two ticked, then Add a note | → the note page for the first ticked sow (no flow takes several sows yet) | S — owner decision 2026-10-12 | `fa-s26-actions-note-opens-the-note-for-the-first-sow` |
 
