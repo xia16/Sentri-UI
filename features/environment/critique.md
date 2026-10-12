@@ -37,3 +37,19 @@ Held against: Unit (the Environment card it opens from), More actions (small hea
 | Auto / Manual | `SentriUI.segment` | Segment | keep |
 | Fan speed slider | page-built `<input type=range>` | RangeSlider is a from-to range of two handles; not a single value | keep the input inside `DeviceControl` |
 | Save setting | `btn()` primary | Button | keep |
+
+## Self-crit
+
+### Round 1 (extraction, then the fixes)
+
+Extraction first: `SensorTrend` and `DeviceControl` drawn exactly as the page drew them; all 8 renders (4 screens x 390, 360) were pixel-identical to origin/main (`15db35c`). Committed alone. Then the fixes, in the component.
+
+- Problems: 1 fixed (9 and 10px text now 11px; 35 small nodes per screen down to 1, the shared header `PREVIEW` badge, which is page-built, shared with Maintenance and Assistant, and left for a workflow fix). 2 fixed (Low and High values, fan speed label and value, Reading history disclosure at 13px). 3 fixed (axis labels `muted`, 12 viewBox units so they stay at 11px or more at 360). 4 fixed (Devices tag cut; offline is said twice, each beside what it qualifies). 5 fixed (table tokenised and 11px, values 13px; stays a table, reasons in Parts). 6 fixed for these two cards (they now live in the design system; no shadow, panel radius). 7 fixed (the slider's label is no longer a 16px tap target). Offline disabled controls were 2.6:1 because Home's global `button:disabled{opacity:.45}` faded them; DeviceControl now shows disabled with surface and rim, text in ink (contrast 3 to 0).
+- Keep list: hero reading, sensor tabs, single card, chart, one dark control, Devices heading outside the card: all unchanged in position and weight. The hero is untouched at 34px; support text moved from 9-10px to 11px and values read against it to 13px, so the ratio hero to support is still large.
+- Squint test: 1 the 22.4 reading, 2 the chart line, 3 the Devices card with its segment. Worker questions: reading, how it moved, fan state. Matches in order.
+- Owner's eye: c1 (everything bigger)? No: only 11px for quiet, 13px for values read or acted on; the screen is 16px longer. c2 (structure removed)? No: same cards and headings. c3 (bulkier)? One risk: Devices is now the system's 16px section heading (it was 13px); it is lighter than the hero and stays regular-ish weight (500), accepted. Held against Unit and More actions: small headings outside white cards, one dark control, colour only for state (the green line is the data).
+- Rejected examples: none of R1-R16 shown that I can see; nothing added is coloured.
+- Risk noted: the offline Auto / Manual segment no longer looks faded, so it reads as live; the dashed rim and the helper beneath ("Reconnect to change device settings.") carry the state, as the law requires.
+- Not changed, with reason: the PREVIEW badge size (page-built, shared with other screens); ZH (the prototype's copy is literal English); the period toggle sits close under the hero, as before.
+
+**better because** the same screen reads in the barn: no text under 11px, the values you compare with the hero are 13px, the disabled fan no longer fades, and the offline note stops repeating.
