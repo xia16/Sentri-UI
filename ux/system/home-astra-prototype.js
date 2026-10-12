@@ -280,7 +280,7 @@
     }));
   }
   function showUnits(){
-    drawer('Choose a unit',`<div id="unit-options" class="unit-options"></div>`,{subtitle:section().name+' · '+section().units.length+' units'});
+    drawer('Choose a unit',`<div id="unit-options" class="unit-options"></div>`,{subtitle:section().name});
     overlay.querySelector('.sheet,.dialog').classList.add('unit-picker');unitChoices();
   }
   function selectScope(unit){
