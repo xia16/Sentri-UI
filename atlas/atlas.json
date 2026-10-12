@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-12T12:57:13.679Z",
- "commit": "7e73fe2",
+ "generated": "2026-10-12T13:44:10.004Z",
+ "commit": "45a855c",
  "platforms": [
   {
    "id": "mobile",
@@ -2713,7 +2713,14 @@
          "farrowing.pen-fault",
          "farrowing.pen-fault-record",
          "farrowing.search",
+         "farrowing.search-results",
+         "farrowing.search-none",
          "farrowing.scan",
+         "farrowing.scan-no-reader",
+         "farrowing.scan-list",
+         "farrowing.scan-ticked",
+         "farrowing.scan-stopped",
+         "farrowing.scan-actions",
          "farrowing.today",
          "farrowing.sow-actions",
          "farrowing.note"
@@ -3094,13 +3101,103 @@
         ],
         [
          "farrowing.search",
+         "farrowing.search-results",
+         "type part of an ear tag or a pen"
+        ],
+        [
+         "farrowing.search-results",
+         "farrowing.search-none",
+         "type something no sow matches"
+        ],
+        [
+         "farrowing.search-results",
          "farrowing.count",
-         "tap a result"
+         "tap a result in this unit"
+        ],
+        [
+         "farrowing.search-results",
+         "farrowing.before",
+         "tap a result in another unit: her farrowing drawer, whose subtitle names her unit"
+        ],
+        [
+         "farrowing.search",
+         "farrowing.room",
+         "Cancel"
+        ],
+        [
+         "farrowing.search",
+         "farrowing.scan",
+         "scan icon in the field"
+        ],
+        [
+         "farrowing.search",
+         "farrowing.scan-no-reader",
+         "scan icon in the field, no reader paired"
         ],
         [
          "farrowing.room",
          "farrowing.scan",
          "Scan ear tag"
+        ],
+        [
+         "farrowing.room",
+         "farrowing.scan-no-reader",
+         "Scan ear tag, no reader paired"
+        ],
+        [
+         "farrowing.scan",
+         "farrowing.scan-list",
+         "scan an ear tag"
+        ],
+        [
+         "farrowing.scan",
+         "farrowing.room",
+         "Back arrow"
+        ],
+        [
+         "farrowing.scan-no-reader",
+         "farrowing.room",
+         "Back arrow"
+        ],
+        [
+         "farrowing.scan-list",
+         "farrowing.scan-ticked",
+         "tick a sow"
+        ],
+        [
+         "farrowing.scan-list",
+         "farrowing.scan-stopped",
+         "Stop scanning"
+        ],
+        [
+         "farrowing.scan-stopped",
+         "farrowing.scan-list",
+         "Resume scanning"
+        ],
+        [
+         "farrowing.scan-list",
+         "farrowing.count",
+         "tap a sow in this unit (Back returns to the list)"
+        ],
+        [
+         "farrowing.scan-list",
+         "farrowing.before",
+         "tap a sow in another unit: her farrowing drawer, whose subtitle names her unit"
+        ],
+        [
+         "farrowing.scan-list",
+         "farrowing.room",
+         "Back arrow"
+        ],
+        [
+         "farrowing.scan-ticked",
+         "farrowing.scan-actions",
+         "Actions"
+        ],
+        [
+         "farrowing.scan-actions",
+         "farrowing.scan-ticked",
+         "Back, or a row"
         ],
         [
          "farrowing.room",
@@ -3287,7 +3384,7 @@
           "elements": [
            {
             "name": "Sow row",
-            "shows": "One row per task sow, grouped under her pen (owner-approved 2026-10-12): the ear tag over 13px muted context on the left, the figure over the state word on the right, weighted by level (act now red with the one \"!\" icon, live bold, coming up ink, settled muted), one chevron. The same row in Find a sow (the context leads with the pen) and Scan results. It is the design system's Row, animal variant.",
+            "shows": "One row per task sow, grouped under her pen (owner-approved 2026-10-12): the ear tag over 13px muted context on the left, the figure over the state word on the right, weighted by level (act now red with the one \"!\" icon, live bold, coming up ink, settled muted), one chevron. The same row in Scan results (the context leads with the pen, and says only \"Unit 6 · Pen A2\" for a sow in another unit); Find a sow's rows use the same Row with her place on the right instead of her state. It is the design system's Row, animal variant.",
             "states": [
              {
               "state": "Awaiting · not yet due",
@@ -3477,7 +3574,7 @@
               "shows": "One-word fact: \"Active\" / \"2 active\"; else \"Overdue\" / \"2 overdue\"; else \"N born\" when all finished; else \"Due today\" or the due text without \"Due\" (\"Tomorrow\", \"In 2 days\"); \"No match\" (the pen has sows, none pass the view, disabled); \"No sows\" (not in the task, disabled). One line, never wraps. A disabled tile stays readable: ink name, muted word, quiet surface."
              }
             ],
-            "rule": "Pen map: tap jumps to the pen and highlights it for 0.9 s; hold 0.35 s peeks at its sows. The tab bar and filter line stay stuck at the top while the list scrolls. Scan ear tag has no camera in the prototype (\"Try sample tag\" opens the first sow) and also holds the ear-tag text search.",
+            "rule": "Pen map: tap jumps to the pen and highlights it for 0.9 s; hold 0.35 s peeks at its sows. The tab bar and filter line stay stuck at the top while the list scrolls. Scan ear tag opens Scan ear tags, a full page where the reader is always listening; the Search icon opens Find a sow, a full page that searches every unit.",
             "source": "farrowing-astra-concept.js room() dock, penFact(), roomAfterRender(), scroll handler",
             "at": "Go to pen"
            }
@@ -3489,7 +3586,8 @@
            },
            {
             "control": "Search",
-            "does": "opens \"Find a sow\": ear tag or pen text with live \"N sows found\"; a result opens like a row"
+            "does": "opens \"Find a sow\": a full page across every unit, nothing listed until something is typed; every result opens her farrowing drawer, in this unit or another",
+            "goesTo": "farrowing.search"
            }
           ],
           "copy": [
@@ -3527,7 +3625,6 @@
            "Row recency and hand are hard-coded; \"1h ago\" never ticks. Overdue rows lack the ruled \"induced yesterday · L.M\" second line.",
            "Last record line repeats each row's recency; the ruled one-sentence task copy under it is missing.",
            "Pen headers open pen tools (feed, fault, note, log) although the rulings call them census-only dead zones; unclear whose feature that is.",
-           "Two search doors: the magnifier and the text search inside Scan ear tag.",
            "Entry mismatch: Home's whole-farm card is meant to land here but opens the Task overview sheet over it first."
           ]
          },
@@ -5598,7 +5695,7 @@
          "id": "farrowing.search",
          "name": "Find a sow",
          "zh": "查找母猪",
-         "status": "approved",
+         "status": "in-design",
          "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
          "preset": "room",
          "steps": [
@@ -5606,36 +5703,38 @@
          ],
          "figma": "",
          "notes": {
-          "purpose": "Find a sow in this unit by ear tag or pen.",
+          "purpose": "Find a sow in any unit by part of her ear tag or her pen, or open Scan from the field.",
+          "states": [
+           "Empty field: nothing is listed, only the hint \"Type part of an ear tag or a pen, or scan a tag. Searches every unit.\"",
+           "Typed: results grouped by unit (Find a sow · results)",
+           "Nothing matches (Find a sow · no match)"
+          ],
           "elements": [
            {
-            "name": "Results",
-            "at": "7 sows in this unit",
-            "shows": "A count line, then one row per sow with her pen on the left.",
-            "states": [
-             {
-              "state": "Empty field",
-              "when": "Nothing typed",
-              "shows": "\"7 sows in this unit\": every sow, in room order"
-             },
-             {
-              "state": "Typed",
-              "when": "Any text",
-              "shows": "\"2 sows found\" for a partial tag or a pen name (\"B4\")"
-             },
-             {
-              "state": "No match",
-              "when": "Nothing matches",
-              "shows": "\"No matching ear tags.\""
-             }
-            ],
-            "logic": "Case-insensitive contains-match on the ear tag or the pen code, over the sows on the current unit's list: sows that left the list are not found. Rows are the same room rows, drawn by one function (sowRow).",
-            "rule": "A row opens that sow's record by her status (Awaiting or Active drawer, locked record, or the production log for a recorded outcome) and makes her pen the current one.",
-            "source": "farrowing-astra-concept.js roomSearchResults(), room-sow"
+            "name": "Search field",
+            "at": "Ear tag or pen",
+            "shows": "A full-height page, not a drawer. The field is pinned at the top and focused when the page opens: a search icon, the typed text, a clear ✕ (only once something is typed), a scan icon button inside the field and Cancel beside it. No unit is named in the header: the search covers every unit.",
+            "rule": "Cancel returns to the room list; the clear ✕ empties the field and keeps the page; the scan icon opens Scan ear tags. The prototype's field asks for plain text with no auto-capital and no suggestions, because a web page cannot ask for a number-first keyboard. Natively the keyboard is number-first with an ABC switch: iOS numbersAndPunctuation, and on Android a number-first keyboard with a 123/ABC toggle.",
+            "source": "farrowing-astra-concept.js searchPage()"
            }
           ],
+          "controls": [
+           {
+            "control": "Scan icon in the field",
+            "does": "opens Scan ear tags (or Scan · reader not connected when no tag reader is paired)",
+            "goesTo": "farrowing.scan"
+           }
+          ],
+          "copy": [
+           "(raw) Ear tag or pen",
+           "(raw) Cancel",
+           "(raw) Type part of an ear tag or a pen, or scan a tag. Searches every unit."
+          ],
           "edge": [
-           "Typing updates the results in place; the sheet does not reload."
+           "Nothing is listed before the worker types: an empty field never shows every sow."
+          ],
+          "rules": [
+           "Owner decision 2026-10-12: search is global (every unit), nothing is listed until something is typed, and the header names no unit."
           ],
           "issues": []
          },
@@ -5645,14 +5744,84 @@
           "by": "owner",
           "note": "Owner approved the animal row (Farrowing) and the compact-tag roster row (Inspection), 2026-10-12",
           "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
-          "changed": null
+          "changed": {
+           "since": "4af133c",
+           "why": "Find a sow is global and a full page; Scan ear tags is an always-listening list (owner decision 2026-10-12, built from the approved mockups)"
+          }
+         }
+        },
+        {
+         "id": "farrowing.search-results",
+         "name": "Find a sow · results",
+         "zh": "查找结果",
+         "status": "in-design",
+         "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+         "preset": "search-results",
+         "figma": "",
+         "notes": {
+          "purpose": "Show every sow that matches what is typed, her own unit first.",
+          "states": [
+           "Matches in this unit and in other units: both groups",
+           "Matches in only one place: the other group is left out"
+          ],
+          "elements": [
+           {
+            "name": "Results",
+            "at": "Other units",
+            "shows": "The results update as the worker types, in two groups, each in one tinted card: \"In Unit 7\" first (the ear tag, then \"Pen B4\" and a chevron), then \"Other units\" (the ear tag, then \"Unit 6\" over \"Pen A2\" and a chevron). The typed part of the ear tag is bold ink and the rest of the tag is muted. Each row is the design system's Row, animal variant.",
+            "logic": "Case-insensitive contains-match on the ear tag or the pen code (\"B4\"), over every sow still on a task list in every unit; a sow that left the list is not found. Order: tags that start with the typed text, then tags that only contain it, then pen matches; ties by ear tag. Where a pen matched, the matching part of the pen is bold too.",
+            "rule": "Every result opens her farrowing drawer, a sow in another unit exactly as a sow in this unit (Farrowing is one task across its units). Her drawer's subtitle says where she is (\"Unit 6 · A2 / Parity 4\") when she is in another unit than the room's, so it is clear she is elsewhere. Search never switches the room's unit by itself.",
+            "source": "farrowing-astra-concept.js findHits(), findRow(), searchBody()"
+           }
+          ],
+          "copy": [
+           "(raw) In Unit 7 · Other units",
+           "(raw) Pen B4 · Unit 6 · Pen A2"
+          ],
+          "edge": [
+           "Typing updates the results in place: the page does not reload and the field keeps focus."
+          ],
+          "rules": [
+           "Owner decision 2026-10-12: results are grouped \"In Unit 7\" then \"Other units\"; pen codes match too."
+          ],
+          "issues": []
+         }
+        },
+        {
+         "id": "farrowing.search-none",
+         "name": "Find a sow · no match",
+         "zh": "无匹配",
+         "status": "in-design",
+         "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+         "preset": "search-none",
+         "figma": "",
+         "notes": {
+          "purpose": "Say that nothing matches, in every unit.",
+          "states": [
+           "Nothing matches: \"No sow matching “909” in any unit.\" with the typed text quoted"
+          ],
+          "elements": [
+           {
+            "name": "No-match line",
+            "at": "No sow matching",
+            "shows": "One quiet line in place of both groups. It quotes what was typed and says every unit was searched.",
+            "rule": "The field keeps focus and the clear ✕ is shown, so the worker corrects the number in place.",
+            "source": "farrowing-astra-concept.js searchBody()"
+           }
+          ],
+          "copy": [
+           "(raw) No sow matching “…” in any unit."
+          ],
+          "edge": [],
+          "rules": [],
+          "issues": []
          }
         },
         {
          "id": "farrowing.scan",
-         "name": "Scan ear tag",
+         "name": "Scan ear tags",
          "zh": "扫描耳标",
-         "status": "approved",
+         "status": "in-design",
          "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
          "preset": "room",
          "steps": [
@@ -5660,22 +5829,88 @@
          ],
          "figma": "",
          "notes": {
-          "purpose": "Open a sow by scanning her ear tag.",
+          "purpose": "Scan ear tags one after another and collect the sows; open one, or tick several for the shared Actions. This is the page as it opens: the reader is connected and nothing has been scanned yet.",
+          "states": [
+           "Reader not connected (Scan · reader not connected)",
+           "Connected, nothing scanned yet (this screen)",
+           "Sows scanned, none ticked (Scan · sows scanned)",
+           "One or more ticked (Scan · sows ticked)",
+           "Stopped (Scan · stopped)"
+          ],
           "elements": [
            {
-            "name": "Scanner preview",
-            "at": "Scanner preview",
-            "shows": "A placeholder frame, \"Scanner preview\", with a \"Try sample tag\" button.",
-            "rule": "\"Try sample tag\" opens the unit's first sow (000418). Below the frame, the same field and results as Find a sow take a typed tag or pen. Results are the same room rows.",
-            "source": "farrowing-astra-concept.js roomScan, room-demo-scan; ASTRA-ROOM-PAGE-AUDIT.md"
+            "name": "Empty line",
+            "at": "Hold the reader to an ear tag",
+            "shows": "A scan icon, \"Hold the reader to an ear tag\" and \"Each sow you scan appears here.\" Nothing else on the page but the header, the Scanning pill and the footer's Stop scanning.",
+            "rule": "The first scan replaces this with the list. If the worker stops scanning before any scan, the line reads \"Scanning is stopped\" / \"Resume scanning to add sows.\"",
+            "source": "farrowing-astra-concept.js scanPage()"
+           },
+           {
+            "name": "Scanner status",
+            "at": "Scanning",
+            "shows": "A small pill at the right of the header: a filled ink dot and \"Scanning\", or a ring and \"Stopped\". The dot is ink, never green. Not drawn when the reader is not connected.",
+            "states": [
+             {
+              "state": "Scanning",
+              "when": "The reader is connected and listening",
+              "shows": "Filled dot, \"Scanning\""
+             },
+             {
+              "state": "Stopped",
+              "when": "The worker tapped Stop scanning",
+              "shows": "Ring, \"Stopped\", muted"
+             }
+            ],
+            "source": "farrowing-astra-concept.js scanPage()"
+           },
+           {
+            "name": "Footer",
+            "at": "Stop scanning",
+            "shows": "Nothing ticked: one full-width button, \"Stop scanning\" (secondary, with a stop-square glyph).",
+            "states": [
+             {
+              "state": "Listening",
+              "when": "Connected and not stopped, nothing ticked",
+              "shows": "\"Stop scanning\" (secondary, stop glyph)"
+             },
+             {
+              "state": "Stopped",
+              "when": "The worker stopped scanning, nothing ticked",
+              "shows": "\"Resume scanning\" (primary, scan glyph)"
+             },
+             {
+              "state": "Ticked",
+              "when": "One or more sows ticked",
+              "shows": "The plain count \"N sows selected\" and the primary \"Actions\""
+             }
+            ],
+            "rule": "Stop scanning only pauses listening: the list stays. The stop glyph is not in the shared icon registry yet; the Farrowing page adds it from ux/system/farrowing-icons.js.",
+            "source": "farrowing-astra-concept.js scanPage(), farrowing-icons.js"
            }
           ],
-          "edge": [
-           "A real scan needs a device integration (camera or tag reader); until then the screen is explicitly a demo."
+          "controls": [
+           {
+            "control": "Back arrow",
+            "does": "leaves Scan ear tags for the room list; the scanned list is kept for the next visit",
+            "goesTo": "farrowing.room"
+           }
           ],
-          "issues": [
-           "Scan ear tag is the primary button in the dock yet opens a non-working preview; the working path is the field below it."
-          ]
+          "copy": [
+           "(raw) Scan ear tags · Farrowing · Unit 7",
+           "(raw) Hold the reader to an ear tag",
+           "(raw) Each sow you scan appears here.",
+           "(raw) Scanning · Stopped",
+           "(raw) Stop scanning · Resume scanning",
+           "(raw) Scanning is stopped · Resume scanning to add sows."
+          ],
+          "edge": [
+           "A real scan comes from a Bluetooth tag reader. The prototype has no reader: a \"Simulate scan\" control above the phone (outside the frame, hidden in the atlas) adds the next sample sow, and the sample sows repeat, which shows the repeat-scan highlight. ?scanner=off opens the page as if no reader were paired."
+          ],
+          "rules": [
+           "Owner decision 2026-10-12: the scanner always listens; each scan adds the sow to a list; a repeat scan highlights her row; ticks are for bulk.",
+           "A sub-page of the room, drawn as a Sheet page (like the Farrowing log): the head is the title, the subtitle \"Farrowing · <unit>\" and the Scanning/Stopped status, with no back button in the head; Back sits in the footer beside Stop or Resume scanning. With sows ticked the footer is the plain count and Actions; with no scanner connected it is Back alone (owner, 2026-10-12)."
+          ],
+          "issues": []
          },
          "approval": {
           "commit": "fc98e360417f0ba10b86bc3249f0258ee4a53949",
@@ -5683,7 +5918,182 @@
           "by": "owner",
           "note": "Owner approved the animal row (Farrowing) and the compact-tag roster row (Inspection), 2026-10-12",
           "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
-          "changed": null
+          "changed": {
+           "since": "4af133c",
+           "why": "Find a sow is global and a full page; Scan ear tags is an always-listening list (owner decision 2026-10-12, built from the approved mockups)"
+          }
+         }
+        },
+        {
+         "id": "farrowing.scan-no-reader",
+         "name": "Scan · reader not connected",
+         "zh": "读取器未连接",
+         "status": "in-design",
+         "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+         "preset": "scan-none",
+         "figma": "",
+         "notes": {
+          "purpose": "Say that no tag reader is paired, and what to do about it.",
+          "states": [
+           "No reader paired: the scan icon, \"Scanner not connected\" and the instruction; no status pill, no list, no footer"
+          ],
+          "elements": [
+           {
+            "name": "Not-connected message",
+            "at": "Scanner not connected",
+            "shows": "A scan icon, \"Scanner not connected\" and \"Turn on the tag reader and pair it in your phone's Bluetooth settings. Scanning starts as soon as it connects.\" There are no buttons: the back arrow leaves.",
+            "rule": "The page changes to \"Hold the reader to an ear tag\" by itself once a reader connects.",
+            "source": "farrowing-astra-concept.js scanPage()"
+           }
+          ],
+          "copy": [
+           "(raw) Scanner not connected",
+           "(raw) Turn on the tag reader and pair it in your phone's Bluetooth settings. Scanning starts as soon as it connects."
+          ],
+          "edge": [
+           "Opened in the prototype with ?scanner=off, or from Scan · reader not connected in the example list."
+          ],
+          "rules": [
+           "Owner decision 2026-10-12: the not-connected state has no buttons."
+          ],
+          "issues": []
+         }
+        },
+        {
+         "id": "farrowing.scan-list",
+         "name": "Scan · sows scanned",
+         "zh": "已扫描母猪",
+         "status": "in-design",
+         "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+         "preset": "scan-list",
+         "figma": "",
+         "notes": {
+          "purpose": "Show the sows scanned in this visit, newest first, and let the worker open one or tick several.",
+          "states": [
+           "Sows in this unit and in other units: both groups",
+           "Sows in only one place: the other group is left out"
+          ],
+          "elements": [
+           {
+            "name": "Scan list",
+            "at": "Other units",
+            "shows": "The sows scanned in this visit, in two white cards: \"In Unit 7 · n\" and \"Other units · n\", newest scan first. Every row is the design system's Row, animal variant with the sow's Farrowing state on the right (the room's row, without the initials so the line under the ear tag stays on one line (\"Pen B1 · 1h ago\"); in another unit it says only \"Unit 6 · Pen A2\"), drawn as a select + door.",
+            "logic": "A sow is added the first time she is scanned. Scanning her again adds nothing: her existing row is highlighted briefly and scrolled into view. The list stays while the worker opens a sow and comes back.",
+            "rule": "The tick box selects; the rest of the row opens her. A sow in this unit opens her farrowing drawer, and Back returns to this list; a sow in another unit opens the same drawer (its subtitle names her unit, \"Unit 6 · A2 / Parity 4\"), and Back returns here too. The scanner is always listening: there is no \"ready for the next tag\" banner and no \"not found\" row.",
+            "source": "farrowing-astra-concept.js scanPage(), scanAdd(), sowRow()"
+           }
+          ],
+          "controls": [],
+          "copy": [
+           "(raw) In Unit 7 · n · Other units · n"
+          ],
+          "edge": [
+           "The prototype has no reader: \"Simulate scan\", above the phone and outside the frame, adds the next sample sow; the sample sows repeat, which shows the repeat-scan highlight."
+          ],
+          "rules": [
+           "Owner decision 2026-10-12: each scan adds the sow to a list; a repeat scan highlights her row."
+          ],
+          "issues": []
+         }
+        },
+        {
+         "id": "farrowing.scan-ticked",
+         "name": "Scan · sows ticked",
+         "zh": "已勾选",
+         "status": "in-design",
+         "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+         "preset": "scan-ticked",
+         "figma": "",
+         "notes": {
+          "purpose": "Select several scanned sows for the shared Actions.",
+          "states": [
+           "One or more rows ticked: the ticked rows take the selected tint and a check, and the footer becomes the plain count \"N sows selected\" and the primary \"Actions\""
+          ],
+          "elements": [
+           {
+            "name": "Selection bar",
+            "at": "Actions",
+            "shows": "The count \"2 sows selected\" on the left, as plain text with nothing to tap, and the primary \"Actions\" (the word Actions, with the more glyph) on the right, in place of Stop scanning.",
+            "rule": "To untick a sow, tap her box in the list; there is no separate review of the selection. Actions opens the Actions sheet. Scanning goes on while sows are ticked, and a new scan arrives unticked. Unticking the last sow brings Stop scanning back.",
+            "source": "farrowing-astra-concept.js scanPage(), scanAction()"
+           }
+          ],
+          "copy": [
+           "(raw) N sows selected · Actions"
+          ],
+          "edge": [],
+          "rules": [
+           "Owner decision 2026-10-12: the selection bar's button says \"Actions\", not \"More actions\"."
+          ],
+          "issues": []
+         }
+        },
+        {
+         "id": "farrowing.scan-stopped",
+         "name": "Scan · stopped",
+         "zh": "已停止",
+         "status": "in-design",
+         "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+         "preset": "scan-stopped",
+         "figma": "",
+         "notes": {
+          "purpose": "Show that scanning is paused, with the list kept, and how to resume.",
+          "states": [
+           "Stopped, nothing ticked: the pill reads \"Stopped\" with a ring; the footer's primary is \"Resume scanning\" (scan glyph)"
+          ],
+          "elements": [
+           {
+            "name": "Resume scanning",
+            "at": "Resume scanning",
+            "shows": "The footer's one full-width button, now primary with the scan glyph.",
+            "rule": "While stopped the reader adds nothing (a scan is ignored). The list and any ticks stay, and ticking still works. Resume scanning listens again.",
+            "source": "farrowing-astra-concept.js scanPage(), scanAction()"
+           }
+          ],
+          "copy": [
+           "(raw) Stopped · Resume scanning"
+          ],
+          "edge": [
+           "While sows are ticked the footer is the selection bar, so Resume scanning comes back when the last sow is unticked."
+          ],
+          "rules": [],
+          "issues": []
+         }
+        },
+        {
+         "id": "farrowing.scan-actions",
+         "name": "Scan · Actions",
+         "zh": "操作",
+         "status": "in-design",
+         "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+         "preset": "scan-actions",
+         "figma": "",
+         "notes": {
+          "purpose": "Offer the shared generic actions for the ticked sows.",
+          "states": [
+           "Actions over the Scan page: title \"Actions\", subtitle \"2 sows\", four rows, Back"
+          ],
+          "elements": [
+           {
+            "name": "Action rows",
+            "at": "Transfer",
+            "shows": "Transfer, Disease or symptom, Record treatment and Add a note: the shared generic actions, for the ticked sows only. They are the existing More actions rows (Transfer sow, Record health and Record treatment from Inspection's actions, Add a note from the sow's note page). No Farrowing action is offered here.",
+            "rule": "Each row opens its real flow, in the existing sow actions page, for the first ticked sow only: the prototype has no flow that takes several sows at once, so a selection of two or more is a gap (the shared flow should take the whole selection). Back from the flow returns to the Scan list with the ticks kept.",
+            "source": "farrowing-astra-concept.js scanActionsSheet(), room-scan-act, deepLinkInto(); inspection-astra-concept.js actionCatalogue()"
+           }
+          ],
+          "copy": [
+           "(raw) Actions · N sows · Transfer · Disease or symptom · Record treatment · Add a note"
+          ],
+          "edge": [
+           "With more than one sow ticked, the flow that opens is for the first one ticked."
+          ],
+          "rules": [
+           "Owner decision 2026-10-12: Scan offers the generic Actions only; no Farrowing-specific action."
+          ],
+          "issues": [
+           "The Transfer, health and note flows run for the first ticked sow only; a flow for the whole selection is not built in the prototype."
+          ]
          }
         },
         {
@@ -6036,7 +6446,7 @@
          }
         }
        ],
-       "prd": "# Farrowing (分娩)\n\nSection: Tasks · Platform: mobile · Prototype: `ux/system/farrowing-astra-concept.html?layout=focus` · Rulings: `ux/research/farrowing/RULINGS.md` (headings quoted below) · State contract: `ux/system/farrowing-contract.html`\n\n## Problem\n\nA sow can farrow for hours, across shifts, with wet gloves, one hand on the crate and no signal guarantee. The worker needs to count the piglets as they arrive without ever feeling the count is unsaved, record the dead by cause, fix a wrong figure without erasing the first one, and close the litter with a few deliberate facts. The supervisor needs the same records to roll up into one task: how many sows have farrowed, which are still going, which are still waiting, and a clean way to end the batch's farrowing task. The old UI scattered these over several screens and corrections had many doors; this feature keeps one familiar flow with a clearer place for every number.\n\n## Who\n\n- Farrowing-house worker (gloved, one-handed, often at night): counts, records deaths, finishes litters.\n- Next-shift worker: reads the room list to see who is farrowing and who was last touched, then continues from the same record.\n- Unit lead / supervisor: reads the unit and task progress, corrects posted figures, ends the task.\n- Anyone may amend a finished record; provenance (stamp, original kept) replaces permissions.\n\n## Anchor\n\nThe anchor is the **sow** (her litter session). Statuses: **Awaiting** (nothing recorded; live total zero) → **Farrowing** (live total above zero, not finished) → **Finished** (Born locked). Exits: **Sow died** (her death ends the session without Finish; she stays in the room while her piglets still need a place) and **Aborted** (an abortion with a live piglet keeps her row; with none she leaves the list). Both are finished states; sows that have left the list are counted once on the Task overview as \"Left the task\". Reachable in any status: the **Room list** and the **Farrowing log**. Task bands: **Task in progress** (the whole-task overview) and **Ending the task** (the four End task reviews and the receipt).\n\nStatus is derived, never set by a ceremony: \"registers derive from the live total (posted + open pending)\" (RULINGS *Starting and ending a session*).\n\n## Rules\n\nFrom RULINGS.md, quoted short:\n\n- **Model**: \"Born = Alive + Σ Dead + fostered out − fostered in. Derived, never entered, locks at Finish.\"\n- **Model**: Alive is one classless number; \"+ is free; − drains pending and clamps at the floor\" (B\\* minus the dead recorded). Born can never drop silently.\n- **Model**: five default dead types plus Other (stillborn, mummified, crushed, scours, starve-out).\n- **Model**: \"No WHEN anywhere, absolutely … The stamp is the date.\"\n- **Model**: \"Classification (weak/deformed) happens at Finish, commits per tap\"; \"Healthy has no form row\"; litter weight and assisted are optional.\n- **Model**: Active row line 2 is \"born 14 · 1h ago · G.H\"; \"No staleness tracking on Active sows\"; the interval chip is retired. \"Every litter row carries its three numbers\" (alive · dead, born).\n- **Model**: \"The overdue signal ends at the first record\"; rows speak in days from due (due = service + 114), never gestation day; \"Overdue · 3 days\" colours only the number.\n- **Model**: \"The hero owns the total; the receipt owns the change\" (`Saved · +4 this visit`).\n- **Surfaces & entrances**: \"ONE dead drawer product-wide\", opened by Record dead; staged: Save commits, Back keeps the draft, Clear discards.\n- **Surfaces & entrances**: \"ONE correction door: Edit … ONE SCREEN\"; \"What Edit adjusts: the observations, never the derivation\"; a missed fact is a recording, never an Edit.\n- **Surfaces & entrances**: \"Type-to-set is retired on count figures\"; one stepper shape, − n +, everywhere.\n- **Surfaces & entrances**: \"Identity is sheet-first … the room row offers no sow-page target.\"\n- **Surfaces & entrances**: \"`Finish` is `Finish farrowing`\"; the hold-to-lock is \"the second guard\".\n- **Starting and ending a session**: \"Farrowing starts at the first recorded event — full stop.\"\n- **Starting and ending a session**: the sow's death lives in the drawer (`Piglets · The sow`), \"hold-to-commit\"; \"She stays in the room\".\n- **Starting and ending a session**: \"A non-empty ledger is never unreachable\"; a draft never crosses the lock.\n- **After the lock**: \"The record face IS the record\"; \"One ledger surface, the Farrowing record page\"; \"History is the chevron on the fact line\"; \"The correction mark is the amber value\".\n- **After the lock**: Born is amended through the Edit ceremony, which opens in place under the Born row (`More born` / `Count was wrong`; never a drawer on a drawer); \"Anyone may amend born post-lock — open ✎, stamped, no role gate.\" Fostering is **parked**.\n- **Names and glyphs**: \"words carry actions, icons carry objects\"; dates speak relative within the week.\n- **Piglet processing, Round 5**: all tasks look the same (farrowing's skeleton); \"The exit word is always **Back**.\"\n- **Owner calls for this atlas**: *Edit record* is editing while she is still farrowing; *Correct born* exists only after farrowing has finished. Home's Farrowing card and Choose unit both land on the room list.\n\n## Scope\n\nIn:\n\n- Room list: unit card, whole-task card, Awaiting / Active / Done / All tabs, due and parity filter, pen grouping, Go to pen, Scan ear tag, Search.\n- The sow sheet in its faces: Before first count, Counting, Finish (and its blocked form), Locked record, Sow died.\n- Death entry (piglets and the sow), Edit record, Edit of a finished litter and the Correct born correction (in place), the Farrowing log.\n- Whole-task overview, End task reviews (blocked, awaiting, all finished, outcomes) and the task receipt. One count everywhere: Done · Active · Awaiting over every sow of the task (a sow that died or has an outcome is Done), the same on the overview, End task, the receipt and the room tabs.\n- Farrowing's rows on the pig's Actions sheet (Edit litter record, Record abortion, Mark not in pig).\n- When a sow dies: the allocation sheet (move her piglets to other sows, hand-rear them in her crate, or move them to a rearing pen), the Move page it opens (`farrowing.foster`), and her row's life on the list until every piglet has a place.\n\nOut:\n\n- Fostering outside the sow-died case (parked until the owner reopens it; see Decisions, 2026-10-10).\n- Piglet processing and its identity work (separate feature; Move opens after the lock). The prototype's own Piglet processing, identity and mortality pages are mapped as screens; see the decision \"Piglet processing is drawn in Farrowing and as its own feature\".\n- The sow page itself and the rest of the Actions sheet (pig-profile).\n- Pen tools reachable from a pen header (feed guidance, equipment fault, pen note, pen log): present in the prototype, unclear whose feature; recorded in the Room list issues. The pen pages are mapped as screens; see the decision \"Pen tools are drawn in Farrowing and in Inspection\".\n- Console reporting, anomaly queues, per-hand audit views, merge-review UI, notifications.\n- Role gates, batch-close disposition doors beyond what the End task reviews show.\n\n## Decisions\n\n- Born is derived and frozen at Finish; Alive and the dead types are the observations — RULINGS *Model*.\n- Born floor: \"+\" free, \"−\" clamps at B\\* minus current dead — RULINGS *Model*.\n- Five dead types plus Other; no WHEN chips — RULINGS *Model*.\n- Weak and deformed asked at Finish only; Healthy derived — RULINGS *Model*.\n- Row line 2 carries recency in words; interval chip retired — RULINGS *Model*.\n- Overdue signal stops at the first record — RULINGS *Model*.\n- Days from due on rows, gestation day on the sheet header only — RULINGS *Model*.\n- Receipt `Saved · +4 this visit`; hero numeral plain, no typing — RULINGS *Model*.\n- Edit folds weak, deformed, weight and assisted into one `At finish` row — RULINGS *Model*.\n- Dead drawer is the only dead entrance, staged (Back/Clear/Save) — RULINGS *Surfaces & entrances*.\n- Edit is the only correction door and one screen — RULINGS *Surfaces & entrances*.\n- Count figures are stepper-only — RULINGS *Surfaces & entrances*.\n- Sheet-first identity: only the sheet header opens the sow page — RULINGS *Surfaces & entrances*.\n- Exit grammar: bars hold exits only; Finish farrowing is a hold — RULINGS *Surfaces & entrances*.\n- Farrowing starts at the first record; no started mark — RULINGS *Starting and ending a session*.\n- The sow's death is a hold-to-commit mode of the drawer; she stays in the room — RULINGS *Starting and ending a session*.\n- Merge contract: signed deltas, flag instead of silently applying a breach — RULINGS *Starting and ending a session*.\n- Fostering parked — RULINGS *After the lock*.\n- The locked record is designed as a record, with one ledger page — RULINGS *After the lock*.\n- Anyone may amend Born after the lock — RULINGS *After the lock*.\n- Words for actions, icons for objects — RULINGS *Names and glyphs*.\n- Relative dates inside a week — RULINGS *Names and glyphs*.\n- Farrowing's skeleton is the model for all tasks; exit word Back — RULINGS *Piglet processing, Round 5*.\n- Task end: manual, hold-to-commit with receipt, blocked while farrowing is open — RULINGS *Piglet processing, Q5*; closure details in `ux/research/farrowing/ASTRA-TASK-CLOSURE.md`.\n- Edit record vs Correct born split by status; Home entries land on the room list — owner calls for this atlas.\n\n### Owner decisions, 2026-10-10\n\n- **Room rows** (the room, Find a sow, Scan results, the task's sow list) are one row, owner-approved 2026-10-12 (the design system's Row · animal, state side). Left, two lines: the ear tag exactly as stored (16px/600 mono, always ink, even for a sow that died) over 13px muted context (`Parity 5` on a waiting sow; `when · who` on a recorded one, such as `05:58 · G.H`, `1h ago · G.H`, `yesterday · L.M`; `Pen B3 · …` in a flat result). Right, two lines, right-aligned: the figure over the state word. Farrowing: `9 alive · 5 dead` / Farrowing. Due: `Tomorrow`, `Today` or `In 2 days` / Due. Overdue: `3 days` / Overdue. Done: `11 alive · 2 dead` / Done. Sow died: `7 to allocate` / Sow died, or `2 hand-reared` / Sow died. Aborted: `1 alive` / Aborted. Levels set weight and colour: act now (overdue; a sow died with piglets to allocate) is red with the one \"!\" icon in a row; live (farrowing) is bold; coming up (due today or tomorrow) has an ink figure and a muted word; settled (done, due in 2+ days, aborted) is muted (the 16px figure in ink-2, so it keeps 7:1 contrast). Only recorded counts show: alive, and `· N dead` only above zero; never *born*, never an expected or carried count. One quiet chevron, no pencil and no chip: tapping the row opens the record, and Edit is inside it. Pen headers say the pen and the count only: no need counts or dots.\n- **Statuses.** In progress: **Awaiting**, **Active**. Finished: **Done** (green), **Sow died** (red), **Aborted** (red; 流产).\n- **Sow died.** Right after the hold records her death the sheet becomes `N piglets to allocate` (subtitle `<ID> · <pen> · sow died <time>`) with three options: **Move to other sows** (opens the move page, sending out of this litter with her piglets pre-selected; several receiving sows may split them), **Hand-rear here** (the piglets stay on her record and piglet care continues) and **Move to a rearing pen** (shown only when the farm config says the farm has one; the prototype flag is on for the demo, `?rearing=off` turns it off). Footer **Back** means later: no ✕, no extra question line.\n- **Her row while piglets remain.** A red tile `N / to allocate`, facts `Sow died · yesterday · L.M`; tapping it opens the same sheet. After Hand-rear: a neutral tile `N / hand-reared`, facts `Sow died · 09:40 · L.M`; the row stays while hand-reared piglets remain. A partial allocation keeps the remaining count; her row never says `5 moved`. A piglet that dies or is put down is recorded through Record dead and the count drops. She **leaves the room list** once every piglet is on another sow, in a rearing pen, or recorded dead.\n- **Aborted.** *Abortion* is the one word (never *miscarriage*). No live piglet: she leaves the room list at once. Any live piglet: the row stays with the tile `1 / alive` and the facts `Aborted · 08:10 · G.H` (recorded counts only).\n- **Task overview** counts the sows that left the list: `Left the task · n aborted · n sow died`. She is then outside Done · Active · Awaiting, so every total still adds up (7 / 18 farrowed once one of 19 has left).\n- **Sheet titles name the job; subtitles name the animal and context.** Record dead is titled `Record dead` (it was `Dead 6` / `The sow`); the pen sheet no longer repeats `Pen` as its only heading.\n- **Fostering is in scope for the sow-died case** (and only there; elsewhere it stays parked).\n- **An orphan litter can stay in the task, hand-reared** on her record.\n- **A rearing pen is a farm-level option.** Its configuration is still open: filed as the To confirm item `farrowing-room-list-1` in `review/farrowing-room-list.json`.\n- **Abortion rule.** No live piglets: she leaves the list. Any live piglet: an Aborted row stays.\n- The glossary words (*abortion / aborted*, *to allocate*, *hand-reared*, *left the task*) are in `ux/laws/glossary.md` and `ux/laws/strings.json`; \"Abortion vs miscarriage\" (`events-1`) is closed by this decision.\n",
+       "prd": "# Farrowing (分娩)\n\nSection: Tasks · Platform: mobile · Prototype: `ux/system/farrowing-astra-concept.html?layout=focus` · Rulings: `ux/research/farrowing/RULINGS.md` (headings quoted below) · State contract: `ux/system/farrowing-contract.html`\n\n## Problem\n\nA sow can farrow for hours, across shifts, with wet gloves, one hand on the crate and no signal guarantee. The worker needs to count the piglets as they arrive without ever feeling the count is unsaved, record the dead by cause, fix a wrong figure without erasing the first one, and close the litter with a few deliberate facts. The supervisor needs the same records to roll up into one task: how many sows have farrowed, which are still going, which are still waiting, and a clean way to end the batch's farrowing task. The old UI scattered these over several screens and corrections had many doors; this feature keeps one familiar flow with a clearer place for every number.\n\n## Who\n\n- Farrowing-house worker (gloved, one-handed, often at night): counts, records deaths, finishes litters.\n- Next-shift worker: reads the room list to see who is farrowing and who was last touched, then continues from the same record.\n- Unit lead / supervisor: reads the unit and task progress, corrects posted figures, ends the task.\n- Anyone may amend a finished record; provenance (stamp, original kept) replaces permissions.\n\n## Anchor\n\nThe anchor is the **sow** (her litter session). Statuses: **Awaiting** (nothing recorded; live total zero) → **Farrowing** (live total above zero, not finished) → **Finished** (Born locked). Exits: **Sow died** (her death ends the session without Finish; she stays in the room while her piglets still need a place) and **Aborted** (an abortion with a live piglet keeps her row; with none she leaves the list). Both are finished states; sows that have left the list are counted once on the Task overview as \"Left the task\". Reachable in any status: the **Room list** and the **Farrowing log**. Task bands: **Task in progress** (the whole-task overview) and **Ending the task** (the four End task reviews and the receipt).\n\nStatus is derived, never set by a ceremony: \"registers derive from the live total (posted + open pending)\" (RULINGS *Starting and ending a session*).\n\n## Rules\n\nFrom RULINGS.md, quoted short:\n\n- **Model**: \"Born = Alive + Σ Dead + fostered out − fostered in. Derived, never entered, locks at Finish.\"\n- **Model**: Alive is one classless number; \"+ is free; − drains pending and clamps at the floor\" (B\\* minus the dead recorded). Born can never drop silently.\n- **Model**: five default dead types plus Other (stillborn, mummified, crushed, scours, starve-out).\n- **Model**: \"No WHEN anywhere, absolutely … The stamp is the date.\"\n- **Model**: \"Classification (weak/deformed) happens at Finish, commits per tap\"; \"Healthy has no form row\"; litter weight and assisted are optional.\n- **Model**: Active row line 2 is \"born 14 · 1h ago · G.H\"; \"No staleness tracking on Active sows\"; the interval chip is retired. \"Every litter row carries its three numbers\" (alive · dead, born).\n- **Model**: \"The overdue signal ends at the first record\"; rows speak in days from due (due = service + 114), never gestation day; \"Overdue · 3 days\" colours only the number.\n- **Model**: \"The hero owns the total; the receipt owns the change\" (`Saved · +4 this visit`).\n- **Surfaces & entrances**: \"ONE dead drawer product-wide\", opened by Record dead; staged: Save commits, Back keeps the draft, Clear discards.\n- **Surfaces & entrances**: \"ONE correction door: Edit … ONE SCREEN\"; \"What Edit adjusts: the observations, never the derivation\"; a missed fact is a recording, never an Edit.\n- **Surfaces & entrances**: \"Type-to-set is retired on count figures\"; one stepper shape, − n +, everywhere.\n- **Surfaces & entrances**: \"Identity is sheet-first … the room row offers no sow-page target.\"\n- **Surfaces & entrances**: \"`Finish` is `Finish farrowing`\"; the hold-to-lock is \"the second guard\".\n- **Starting and ending a session**: \"Farrowing starts at the first recorded event — full stop.\"\n- **Starting and ending a session**: the sow's death lives in the drawer (`Piglets · The sow`), \"hold-to-commit\"; \"She stays in the room\".\n- **Starting and ending a session**: \"A non-empty ledger is never unreachable\"; a draft never crosses the lock.\n- **After the lock**: \"The record face IS the record\"; \"One ledger surface, the Farrowing record page\"; \"History is the chevron on the fact line\"; \"The correction mark is the amber value\".\n- **After the lock**: Born is amended through the Edit ceremony, which opens in place under the Born row (`More born` / `Count was wrong`; never a drawer on a drawer); \"Anyone may amend born post-lock — open ✎, stamped, no role gate.\" Fostering is **parked**.\n- **Names and glyphs**: \"words carry actions, icons carry objects\"; dates speak relative within the week.\n- **Piglet processing, Round 5**: all tasks look the same (farrowing's skeleton); \"The exit word is always **Back**.\"\n- **Owner calls for this atlas**: *Edit record* is editing while she is still farrowing; *Correct born* exists only after farrowing has finished. Home's Farrowing card and Choose unit both land on the room list.\n\n## Scope\n\nIn:\n\n- Room list: unit card, whole-task card, Awaiting / Active / Done / All tabs, due and parity filter, pen grouping, Go to pen, Scan ear tag, Search.\n- Find a sow (a full page that searches every unit) and Scan ear tags (a full page, always listening, that collects scanned sows). A sow in any unit opens her farrowing drawer.\n- The sow sheet in its faces: Before first count, Counting, Finish (and its blocked form), Locked record, Sow died.\n- Death entry (piglets and the sow), Edit record, Edit of a finished litter and the Correct born correction (in place), the Farrowing log.\n- Whole-task overview, End task reviews (blocked, awaiting, all finished, outcomes) and the task receipt. One count everywhere: Done · Active · Awaiting over every sow of the task (a sow that died or has an outcome is Done), the same on the overview, End task, the receipt and the room tabs.\n- Farrowing's rows on the pig's Actions sheet (Edit litter record, Record abortion, Mark not in pig).\n- When a sow dies: the allocation sheet (move her piglets to other sows, hand-rear them in her crate, or move them to a rearing pen), the Move page it opens (`farrowing.foster`), and her row's life on the list until every piglet has a place.\n\nOut:\n\n- Fostering outside the sow-died case (parked until the owner reopens it; see Decisions, 2026-10-10).\n- Piglet processing and its identity work (separate feature; Move opens after the lock). The prototype's own Piglet processing, identity and mortality pages are mapped as screens; see the decision \"Piglet processing is drawn in Farrowing and as its own feature\".\n- The sow page itself and the rest of the Actions sheet (pig-profile).\n- Pen tools reachable from a pen header (feed guidance, equipment fault, pen note, pen log): present in the prototype, unclear whose feature; recorded in the Room list issues. The pen pages are mapped as screens; see the decision \"Pen tools are drawn in Farrowing and in Inspection\".\n- Console reporting, anomaly queues, per-hand audit views, merge-review UI, notifications.\n- Role gates, batch-close disposition doors beyond what the End task reviews show.\n\n## Decisions\n\n- Born is derived and frozen at Finish; Alive and the dead types are the observations — RULINGS *Model*.\n- Born floor: \"+\" free, \"−\" clamps at B\\* minus current dead — RULINGS *Model*.\n- Five dead types plus Other; no WHEN chips — RULINGS *Model*.\n- Weak and deformed asked at Finish only; Healthy derived — RULINGS *Model*.\n- Row line 2 carries recency in words; interval chip retired — RULINGS *Model*.\n- Overdue signal stops at the first record — RULINGS *Model*.\n- Days from due on rows, gestation day on the sheet header only — RULINGS *Model*.\n- Receipt `Saved · +4 this visit`; hero numeral plain, no typing — RULINGS *Model*.\n- Edit folds weak, deformed, weight and assisted into one `At finish` row — RULINGS *Model*.\n- Dead drawer is the only dead entrance, staged (Back/Clear/Save) — RULINGS *Surfaces & entrances*.\n- Edit is the only correction door and one screen — RULINGS *Surfaces & entrances*.\n- Count figures are stepper-only — RULINGS *Surfaces & entrances*.\n- Sheet-first identity: only the sheet header opens the sow page — RULINGS *Surfaces & entrances*.\n- Exit grammar: bars hold exits only; Finish farrowing is a hold — RULINGS *Surfaces & entrances*.\n- Farrowing starts at the first record; no started mark — RULINGS *Starting and ending a session*.\n- The sow's death is a hold-to-commit mode of the drawer; she stays in the room — RULINGS *Starting and ending a session*.\n- Merge contract: signed deltas, flag instead of silently applying a breach — RULINGS *Starting and ending a session*.\n- Fostering parked — RULINGS *After the lock*.\n- The locked record is designed as a record, with one ledger page — RULINGS *After the lock*.\n- Anyone may amend Born after the lock — RULINGS *After the lock*.\n- Words for actions, icons for objects — RULINGS *Names and glyphs*.\n- Relative dates inside a week — RULINGS *Names and glyphs*.\n- Farrowing's skeleton is the model for all tasks; exit word Back — RULINGS *Piglet processing, Round 5*.\n- Task end: manual, hold-to-commit with receipt, blocked while farrowing is open — RULINGS *Piglet processing, Q5*; closure details in `ux/research/farrowing/ASTRA-TASK-CLOSURE.md`.\n- Edit record vs Correct born split by status; Home entries land on the room list — owner calls for this atlas.\n\n### Owner decisions, 2026-10-10\n\n- **Room rows** (the room, Find a sow, Scan results, the task's sow list) are one row, owner-approved 2026-10-12 (the design system's Row · animal, state side). Left, two lines: the ear tag exactly as stored (16px/600 mono, always ink, even for a sow that died) over 13px muted context (`Parity 5` on a waiting sow; `when · who` on a recorded one, such as `05:58 · G.H`, `1h ago · G.H`, `yesterday · L.M`; `Pen B3 · …` in a flat result; `Unit 6 · Pen A2` for a sow in another unit in Scan; Find a sow's rows carry her place on the right, `Pen B4` or `Unit 6` over `Pen A2`, instead of her state). Right, two lines, right-aligned: the figure over the state word. Farrowing: `9 alive · 5 dead` / Farrowing. Due: `Tomorrow`, `Today` or `In 2 days` / Due. Overdue: `3 days` / Overdue. Done: `11 alive · 2 dead` / Done. Sow died: `7 to allocate` / Sow died, or `2 hand-reared` / Sow died. Aborted: `1 alive` / Aborted. Levels set weight and colour: act now (overdue; a sow died with piglets to allocate) is red with the one \"!\" icon in a row; live (farrowing) is bold; coming up (due today or tomorrow) has an ink figure and a muted word; settled (done, due in 2+ days, aborted) is muted (the 16px figure in ink-2, so it keeps 7:1 contrast). Only recorded counts show: alive, and `· N dead` only above zero; never *born*, never an expected or carried count. One quiet chevron, no pencil and no chip: tapping the row opens the record, and Edit is inside it. Pen headers say the pen and the count only: no need counts or dots.\n- **Statuses.** In progress: **Awaiting**, **Active**. Finished: **Done** (green), **Sow died** (red), **Aborted** (red; 流产).\n- **Sow died.** Right after the hold records her death the sheet becomes `N piglets to allocate` (subtitle `<ID> · <pen> · sow died <time>`) with three options: **Move to other sows** (opens the move page, sending out of this litter with her piglets pre-selected; several receiving sows may split them), **Hand-rear here** (the piglets stay on her record and piglet care continues) and **Move to a rearing pen** (shown only when the farm config says the farm has one; the prototype flag is on for the demo, `?rearing=off` turns it off). Footer **Back** means later: no ✕, no extra question line.\n- **Her row while piglets remain.** A red tile `N / to allocate`, facts `Sow died · yesterday · L.M`; tapping it opens the same sheet. After Hand-rear: a neutral tile `N / hand-reared`, facts `Sow died · 09:40 · L.M`; the row stays while hand-reared piglets remain. A partial allocation keeps the remaining count; her row never says `5 moved`. A piglet that dies or is put down is recorded through Record dead and the count drops. She **leaves the room list** once every piglet is on another sow, in a rearing pen, or recorded dead.\n- **Aborted.** *Abortion* is the one word (never *miscarriage*). No live piglet: she leaves the room list at once. Any live piglet: the row stays with the tile `1 / alive` and the facts `Aborted · 08:10 · G.H` (recorded counts only).\n- **Task overview** counts the sows that left the list: `Left the task · n aborted · n sow died`. She is then outside Done · Active · Awaiting, so every total still adds up (7 / 18 farrowed once one of 19 has left).\n- **Sheet titles name the job; subtitles name the animal and context.** Record dead is titled `Record dead` (it was `Dead 6` / `The sow`); the pen sheet no longer repeats `Pen` as its only heading.\n- **Fostering is in scope for the sow-died case** (and only there; elsewhere it stays parked).\n- **An orphan litter can stay in the task, hand-reared** on her record.\n- **A rearing pen is a farm-level option.** Its configuration is still open: filed as the To confirm item `farrowing-room-list-1` in `review/farrowing-room-list.json`.\n- **Abortion rule.** No live piglets: she leaves the list. Any live piglet: an Aborted row stays.\n- The glossary words (*abortion / aborted*, *to allocate*, *hand-reared*, *left the task*) are in `ux/laws/glossary.md` and `ux/laws/strings.json`; \"Abortion vs miscarriage\" (`events-1`) is closed by this decision.\n\n### Owner decisions, 2026-10-12 · Find a sow and Scan ear tags\n\n- **Find a sow is global.** The dock's Search button opens a full-height page (no drawer): the field is pinned at the top and focused, with a search icon, a clear ✕, a scan icon button that opens Scan, and Cancel. It searches every unit and the header names no unit. Nothing is listed until something is typed; the page says \"Type part of an ear tag or a pen, or scan a tag. Searches every unit.\" Results update as the worker types, grouped **In Unit 7** first (tag, `Pen B4`, chevron) and **Other units** second (tag, `Unit 6` over `Pen A2`, chevron). Tags that start with the typed text rank before tags that only contain it; the typed part is bold and the rest of the tag muted; pen codes match too. No match reads \"No sow matching “43” in any unit.\" Natively the keyboard is number-first with an ABC switch (iOS `numbersAndPunctuation`; on Android a number-first keyboard with a 123/ABC toggle).\n- **Opening a result.** Every result opens her farrowing drawer, a sow in another unit exactly as a sow in this unit: Farrowing is one task across all its units. The drawer's subtitle names where she is (`Unit 6 · A2 / Parity 4`) when she is in another unit. Search never switches the room's unit by itself.\n- **Scan always listens.** The dock's Scan ear tag button, and the scan icon in Find a sow, open **Scan ear tags**, a full page. The reader is always listening: there is no \"ready for the next tag\" banner and no \"Not found\" row. A small status pill in the header says `● Scanning` or `○ Stopped` (the dot is ink, never green). Not connected: a scan icon, \"Scanner not connected\" and the pairing instruction, with no buttons (the back arrow leaves). Connected and nothing scanned: \"Hold the reader to an ear tag\". Each scan adds the sow to a list, grouped **In Unit 7 · n** and **Other units · n**, newest first; a repeat scan adds nothing and briefly highlights her existing row. Each row is the Row · animal variant with her Farrowing state, as a select + door: the tick box selects, the rest of the row opens her farrowing drawer, in this unit or another.\n- **Ticks are for bulk, with generic Actions only.** Nothing ticked: one full-width button, **Stop scanning** (it becomes **Resume scanning** while stopped). One or more ticked: **N sows selected** (a plain count: no chevron, nothing to tap; to untick, tap the box) and the primary **Actions**, which opens the shared generic actions for the selection only: Transfer, Health finding or treatment, Note. Scan offers no Farrowing action. In the prototype each Action opens its existing single-sow flow for the first ticked sow, because no shared flow takes a whole selection yet (a gap for the shared Actions).\n- **The selection bar's button says \"Actions\"**, not \"More actions\".\n- Prototype only: `?scanner=off` opens Scan as if no reader were paired, and a \"Simulate scan\" control outside the phone frame adds the next sample sow. The `stop` glyph is added from `ux/system/farrowing-icons.js` until it joins the shared icon registry.\n",
        "scenarios": {
         "treeDoc": true,
         "tree": [
@@ -6356,7 +6766,7 @@
                }
               ],
               "result": "pending",
-              "why": "the prototype's Scan ear tag has no camera; a scan cannot be driven"
+              "why": "superseded by owner decision 2026-10-12: a scan adds the sow to the Scan list, and her sheet opens from her row there (fa-s21)"
              },
              {
               "type": "outcome",
@@ -6380,7 +6790,7 @@
              {
               "type": "action",
               "id": "room.search-all",
-              "label": "Find a sow, empty field",
+              "label": "Find a sow, type 4",
               "children": [
                {
                 "type": "outcome",
@@ -8075,12 +8485,678 @@
             "result": "blocked"
            }
           ]
+         },
+         {
+          "type": "entry",
+          "id": "search-scan",
+          "label": "Find a sow and Scan ear tags (owner decision 2026-10-12)",
+          "children": [
+           {
+            "type": "state",
+            "id": "search.empty",
+            "label": "Find a sow, empty field",
+            "tree": "S1",
+            "screen": "farrowing.search",
+            "children": [
+             {
+              "type": "outcome",
+              "id": "fa-s1-search-lists-nothing-until-typed",
+              "label": "Nothing is listed before the worker types; the header names no unit",
+              "tree": "S-1",
+              "gwt": {
+               "given": "The worker has just opened Find a sow.",
+               "when": "They look at the page before typing.",
+               "then": "Only the hint \"Type part of an ear tag or a pen, or scan a tag. Searches every unit.\" is shown, no sow is listed, the header names no unit, and the field is ready for typing."
+              },
+              "authority": [
+               {
+                "src": "PRD",
+                "at": "Decisions · owner decision 2026-10-12",
+                "says": "Nothing is listed before typing; no \"Unit 7\" in the header"
+               }
+              ],
+              "result": "pass"
+             },
+             {
+              "type": "action",
+              "id": "search.empty.43",
+              "label": "type 43",
+              "children": [
+               {
+                "type": "outcome",
+                "id": "fa-s2-search-groups-this-unit-first",
+                "label": "Results are grouped: this unit first, then other units",
+                "tree": "S-2",
+                "gwt": {
+                 "given": "Find a sow is open and the worker has typed 43.",
+                 "when": "They read the results.",
+                 "then": "The results are in two groups: \"In Unit 7\" lists 000431, then \"Other units\" lists 000437, 000943 and 004318 with their units."
+                },
+                "authority": [
+                 {
+                  "src": "PRD",
+                  "at": "Decisions · owner decision 2026-10-12",
+                  "says": "Results are grouped \"In Unit 7\" then \"Other units\""
+                 }
+                ],
+                "result": "pass"
+               },
+               {
+                "type": "action",
+                "id": "search.empty.43.other",
+                "label": "tap 004318 (Unit 6)",
+                "children": [
+                 {
+                  "type": "outcome",
+                  "id": "fa-s6-other-unit-result-opens-her-farrowing-drawer",
+                  "label": "A result in another unit opens her farrowing drawer, which names her unit",
+                  "tree": "S-6",
+                  "gwt": {
+                   "given": "The worker has searched for 43 and 004318, a sow in Unit 6, is a result.",
+                   "when": "They tap her.",
+                   "then": "Her farrowing drawer opens on her Awaiting face, the same drawer a sow in this unit opens, and its subtitle names her unit and pen."
+                  },
+                  "authority": [
+                   {
+                    "src": "PRD",
+                    "at": "Decisions · owner decision 2026-10-12",
+                    "says": "A sow in another unit opens her farrowing drawer: Farrowing is one task across its units"
+                   }
+                  ],
+                  "result": "pass"
+                 }
+                ]
+               }
+              ]
+             },
+             {
+              "type": "action",
+              "id": "search.empty.004",
+              "label": "type 004",
+              "children": [
+               {
+                "type": "outcome",
+                "id": "fa-s3-tags-starting-with-the-text-rank-first",
+                "label": "Tags that start with the typed text rank before tags that only contain it",
+                "tree": "S-3",
+                "gwt": {
+                 "given": "Find a sow is open and the worker has typed 004.",
+                 "when": "They read the Other units group.",
+                 "then": "004318, whose tag starts with 004, is listed before 000437, whose tag only contains it."
+                },
+                "authority": [
+                 {
+                  "src": "PRD",
+                  "at": "Decisions · owner decision 2026-10-12",
+                  "says": "Tags that start with the typed text rank before tags that only contain it"
+                 }
+                ],
+                "result": "pass"
+               }
+              ]
+             },
+             {
+              "type": "action",
+              "id": "search.empty.b4",
+              "label": "type B4",
+              "children": [
+               {
+                "type": "outcome",
+                "id": "fa-s4-pen-codes-match",
+                "label": "A pen code matches too",
+                "tree": "S-4",
+                "gwt": {
+                 "given": "Find a sow is open and the worker has typed B4.",
+                 "when": "They read the results.",
+                 "then": "The two sows in pen B4, 000431 and 000455, are listed under \"In Unit 7\", and there is no \"Other units\" group."
+                },
+                "authority": [
+                 {
+                  "src": "PRD",
+                  "at": "Decisions · owner decision 2026-10-12",
+                  "says": "Pen codes match too"
+                 }
+                ],
+                "result": "pass"
+               }
+              ]
+             },
+             {
+              "type": "action",
+              "id": "search.empty.none",
+              "label": "type 909",
+              "children": [
+               {
+                "type": "outcome",
+                "id": "fa-s5-no-match-says-so",
+                "label": "Nothing matches: the page says so",
+                "tree": "S-5",
+                "gwt": {
+                 "given": "Find a sow is open and the worker has typed 909, which no sow in any unit has.",
+                 "when": "They read the page.",
+                 "then": "The page says there is no sow matching 909 in any unit, and lists nothing."
+                },
+                "authority": [
+                 {
+                  "src": "PRD",
+                  "at": "Decisions · owner decision 2026-10-12",
+                  "says": "No match reads \"No sow matching “43” in any unit.\""
+                 }
+                ],
+                "result": "pass"
+               }
+              ]
+             },
+             {
+              "type": "action",
+              "id": "search.empty.scan",
+              "label": "tap the scan icon in the field",
+              "children": [
+               {
+                "type": "outcome",
+                "id": "fa-s8-search-scan-icon-opens-scan",
+                "label": "The scan icon in the field opens Scan ear tags",
+                "tree": "S-8",
+                "gwt": {
+                 "given": "Find a sow is open.",
+                 "when": "The worker taps the scan icon in the field.",
+                 "then": "Scan ear tags opens, with the reader connected and nothing scanned yet."
+                },
+                "authority": [
+                 {
+                  "src": "PRD",
+                  "at": "Decisions · owner decision 2026-10-12",
+                  "says": "A scan icon button inside the field opens Scan"
+                 }
+                ],
+                "result": "pass"
+               }
+              ]
+             },
+             {
+              "type": "action",
+              "id": "search.empty.cancel",
+              "label": "tap Cancel",
+              "children": [
+               {
+                "type": "outcome",
+                "id": "fa-s9-cancel-returns-to-the-room",
+                "label": "Cancel closes Find a sow",
+                "tree": "S-9",
+                "gwt": {
+                 "given": "Find a sow is open.",
+                 "when": "The worker taps Cancel.",
+                 "then": "The room list is in front again."
+                },
+                "authority": [
+                 {
+                  "src": "PRD",
+                  "at": "Decisions · owner decision 2026-10-12",
+                  "says": "The field has Cancel beside it"
+                 }
+                ],
+                "result": "pass"
+               }
+              ]
+             }
+            ]
+           },
+           {
+            "type": "state",
+            "id": "scan.none",
+            "label": "Scan ear tags, no tag reader paired",
+            "tree": "S2",
+            "screen": "farrowing.scan-no-reader",
+            "children": [
+             {
+              "type": "outcome",
+              "id": "fa-s10-no-reader-says-so-with-no-buttons",
+              "label": "Scanner not connected: the page says what to do and offers no button",
+              "tree": "S-10",
+              "gwt": {
+               "given": "Scan ear tags is open and no tag reader is paired.",
+               "when": "The worker looks at the page.",
+               "then": "The page says \"Scanner not connected\" and how to pair the reader. There is no status pill, no list and no button: only the back arrow leaves."
+              },
+              "authority": [
+               {
+                "src": "PRD",
+                "at": "Decisions · owner decision 2026-10-12",
+                "says": "Scanner not connected: the pairing instruction, no buttons"
+               }
+              ],
+              "result": "pass"
+             },
+             {
+              "type": "action",
+              "id": "scan.none.back",
+              "label": "tap the back arrow",
+              "children": [
+               {
+                "type": "outcome",
+                "id": "fa-s11-back-arrow-leaves-scan",
+                "label": "The back arrow leaves Scan ear tags",
+                "tree": "S-11",
+                "gwt": {
+                 "given": "Scan ear tags is open.",
+                 "when": "The worker taps the back arrow.",
+                 "then": "The room list is in front again."
+                },
+                "authority": [
+                 {
+                  "src": "PRD",
+                  "at": "Decisions · owner decision 2026-10-12",
+                  "says": "The back arrow leaves"
+                 }
+                ],
+                "result": "pass"
+               }
+              ]
+             }
+            ]
+           },
+           {
+            "type": "state",
+            "id": "scan.empty",
+            "label": "Scan ear tags, reader connected, nothing scanned",
+            "tree": "S3",
+            "screen": "farrowing.scan",
+            "children": [
+             {
+              "type": "outcome",
+              "id": "fa-s12-connected-empty-says-hold-the-reader",
+              "label": "Connected and nothing scanned: the page invites the first scan, with no banner",
+              "tree": "S-12",
+              "gwt": {
+               "given": "Scan ear tags is open, the reader is connected and nothing has been scanned.",
+               "when": "The worker looks at the page.",
+               "then": "The page says \"Hold the reader to an ear tag\" and \"Each sow you scan appears here.\", the status says Scanning and the footer offers Stop scanning. There is no \"ready for the next tag\" banner and no \"Not found\" row."
+              },
+              "authority": [
+               {
+                "src": "PRD",
+                "at": "Decisions · owner decision 2026-10-12",
+                "says": "The scanner is always listening: no banner and no Not found row"
+               }
+              ],
+              "result": "pass"
+             }
+            ]
+           },
+           {
+            "type": "state",
+            "id": "scan.list",
+            "label": "Scan ear tags, three sows scanned",
+            "tree": "S4",
+            "screen": "farrowing.scan-list",
+            "children": [
+             {
+              "type": "outcome",
+              "id": "fa-s13-scans-listed-newest-first-in-two-groups",
+              "label": "Scanned sows are listed in two groups, newest first",
+              "tree": "S-13",
+              "gwt": {
+               "given": "Scan ear tags is open and three sows have been scanned: 000418, then 000431 (both in Unit 7), then 004318 (Unit 6).",
+               "when": "The worker reads the list.",
+               "then": "The list has \"In Unit 7\" with 000431 above 000418, then \"Other units\" with 004318: the newest scan first within each group."
+              },
+              "authority": [
+               {
+                "src": "PRD",
+                "at": "Decisions · owner decision 2026-10-12",
+                "says": "Groups \"In Unit 7 · n\" and \"Other units · n\", newest first"
+               }
+              ],
+              "result": "pass"
+             },
+             {
+              "type": "outcome",
+              "id": "fa-s14-scan-rows-are-select-and-door",
+              "label": "Each scan row has a tick box and opens her",
+              "tree": "S-14",
+              "gwt": {
+               "given": "Scan ear tags is open with scanned sows.",
+               "when": "The worker looks at a row.",
+               "then": "Each row has a tick box and, beside it, the sow's ear tag, where she is and her Farrowing state, with a chevron."
+              },
+              "authority": [
+               {
+                "src": "PRD",
+                "at": "Decisions · owner decision 2026-10-12",
+                "says": "Rows are the animal row with state, as a select + door"
+               }
+              ],
+              "result": "pass"
+             },
+             {
+              "type": "action",
+              "id": "scan.list.stop",
+              "label": "tap Stop scanning",
+              "children": [
+               {
+                "type": "outcome",
+                "id": "fa-s15-stop-scanning-pauses-and-keeps-the-list",
+                "label": "Stop scanning pauses the reader and keeps the list",
+                "tree": "S-15",
+                "gwt": {
+                 "given": "Scan ear tags is open with scanned sows and nothing ticked.",
+                 "when": "The worker taps Stop scanning.",
+                 "then": "The status reads Stopped, the footer offers Resume scanning, and the three sows stay in the list."
+                },
+                "authority": [
+                 {
+                  "src": "PRD",
+                  "at": "Decisions · owner decision 2026-10-12",
+                  "says": "Stop scanning becomes Resume scanning when stopped"
+                 }
+                ],
+                "result": "pass"
+               },
+               {
+                "type": "action",
+                "id": "scan.list.resume",
+                "label": "tap Resume scanning",
+                "children": [
+                 {
+                  "type": "outcome",
+                  "id": "fa-s16-resume-scanning-listens-again",
+                  "label": "Resume scanning listens again",
+                  "tree": "S-16",
+                  "gwt": {
+                   "given": "Scanning is stopped.",
+                   "when": "The worker taps Resume scanning.",
+                   "then": "The status reads Scanning and the footer offers Stop scanning."
+                  },
+                  "authority": [
+                   {
+                    "src": "PRD",
+                    "at": "Decisions · owner decision 2026-10-12",
+                    "says": "Stop scanning becomes Resume scanning when stopped"
+                   }
+                  ],
+                  "result": "pass"
+                 }
+                ]
+               }
+              ]
+             },
+             {
+              "type": "action",
+              "id": "scan.list.tick1",
+              "label": "tick 000431",
+              "children": [
+               {
+                "type": "outcome",
+                "id": "fa-s17-one-ticked-shows-the-selection-bar",
+                "label": "One sow ticked: the selection bar says Actions",
+                "tree": "S-17",
+                "gwt": {
+                 "given": "Scan ear tags is open with scanned sows.",
+                 "when": "The worker ticks one sow.",
+                 "then": "The footer reads \"1 sow selected\" with a primary \"Actions\" button; Stop scanning is gone, and nothing says \"More actions\"."
+                },
+                "authority": [
+                 {
+                  "src": "PRD",
+                  "at": "Decisions · owner decision 2026-10-12",
+                  "says": "N sows selected and the primary Actions; the button says Actions, not More actions"
+                 }
+                ],
+                "result": "pass"
+               },
+               {
+                "type": "outcome",
+                "id": "fa-s19-selection-count-is-plain-text",
+                "label": "The selection count is plain text: nothing to tap",
+                "tree": "S-19",
+                "gwt": {
+                 "given": "One scanned sow is ticked.",
+                 "when": "The worker looks at the footer.",
+                 "then": "It reads \"1 sow selected\" as plain text, without a chevron or a button, next to the Actions button."
+                },
+                "authority": [
+                 {
+                  "src": "PRD",
+                  "at": "Decisions · owner decision 2026-10-12",
+                  "says": "N sows selected is a plain count, not a button"
+                 }
+                ],
+                "result": "pass"
+               },
+               {
+                "type": "action",
+                "id": "scan.list.tick2",
+                "label": "tick 000418 too",
+                "children": [
+                 {
+                  "type": "action",
+                  "id": "scan.list.actions",
+                  "label": "tap Actions",
+                  "children": [
+                   {
+                    "type": "outcome",
+                    "id": "fa-s18-actions-offer-the-generic-actions-only",
+                    "label": "Actions offers the shared generic actions for the ticked sows and no Farrowing action",
+                    "tree": "S-18",
+                    "gwt": {
+                     "given": "Two scanned sows are ticked.",
+                     "when": "The worker taps Actions.",
+                     "then": "A sheet titled Actions for 2 sows offers Transfer, Disease or symptom, Record treatment and Add a note, and none of Farrowing's own actions."
+                    },
+                    "authority": [
+                     {
+                      "src": "PRD",
+                      "at": "Decisions · owner decision 2026-10-12",
+                      "says": "Actions opens the shared generic actions for the selection only; no Farrowing-specific actions"
+                     }
+                    ],
+                    "result": "pass"
+                   }
+                  ]
+                 },
+                 {
+                  "type": "action",
+                  "id": "scan.list.actions.note",
+                  "label": "tap Actions, then Add a note",
+                  "children": [
+                   {
+                    "type": "outcome",
+                    "id": "fa-s26-actions-note-opens-the-note-for-the-first-sow",
+                    "label": "Add a note opens the note page for the first ticked sow",
+                    "tree": "S-26",
+                    "gwt": {
+                     "given": "Two scanned sows are ticked and the Actions sheet is open.",
+                     "when": "The worker taps Add a note.",
+                     "then": "The note page opens for the first sow ticked, 000431, not the list."
+                    },
+                    "authority": [
+                     {
+                      "src": "PRD",
+                      "at": "Decisions · owner decision 2026-10-12",
+                      "says": "Actions opens the shared generic actions for the selection"
+                     }
+                    ],
+                    "result": "pass"
+                   }
+                  ]
+                 }
+                ]
+               },
+               {
+                "type": "action",
+                "id": "scan.list.untick",
+                "label": "tap her box again",
+                "children": [
+                 {
+                  "type": "outcome",
+                  "id": "fa-s20-unticking-the-last-sow-brings-stop-scanning-back",
+                  "label": "Tapping the box again unticks her; with none ticked Stop scanning returns",
+                  "tree": "S-20",
+                  "gwt": {
+                   "given": "One scanned sow is ticked.",
+                   "when": "The worker taps her box again.",
+                   "then": "She is no longer ticked and the footer offers Stop scanning again, with no selection count."
+                  },
+                  "authority": [
+                   {
+                    "src": "PRD",
+                    "at": "Decisions · owner decision 2026-10-12",
+                    "says": "To untick, tap the box; nothing ticked: Stop scanning"
+                   }
+                  ],
+                  "result": "pass"
+                 }
+                ]
+               }
+              ]
+             },
+             {
+              "type": "action",
+              "id": "scan.list.open",
+              "label": "tap 000418's row (this unit)",
+              "children": [
+               {
+                "type": "outcome",
+                "id": "fa-s21-scan-row-opens-her-drawer",
+                "label": "A scanned sow in this unit opens her farrowing drawer",
+                "tree": "S-21",
+                "gwt": {
+                 "given": "Scan ear tags is open with 000418, in Unit 7, scanned.",
+                 "when": "The worker taps her row.",
+                 "then": "Her farrowing drawer opens on Counting."
+                },
+                "authority": [
+                 {
+                  "src": "PRD",
+                  "at": "Decisions · owner decision 2026-10-12",
+                  "says": "The rest of the row opens her farrowing drawer"
+                 }
+                ],
+                "result": "pass"
+               },
+               {
+                "type": "action",
+                "id": "scan.list.open.back",
+                "label": "tap Back",
+                "children": [
+                 {
+                  "type": "outcome",
+                  "id": "fa-s22-back-returns-to-the-scan-list",
+                  "label": "Back from her drawer returns to the scan list",
+                  "tree": "S-22",
+                  "gwt": {
+                   "given": "A scanned sow's drawer is open, opened from the Scan list.",
+                   "when": "The worker taps Back.",
+                   "then": "Scan ear tags is in front again with the same three sows."
+                  },
+                  "authority": [
+                   {
+                    "src": "PRD",
+                    "at": "Decisions · owner decision 2026-10-12",
+                    "says": "The list stays while the worker opens a sow and comes back"
+                   }
+                  ],
+                  "result": "pass"
+                 }
+                ]
+               }
+              ]
+             },
+             {
+              "type": "action",
+              "id": "scan.list.tickopen",
+              "label": "tick 000431, then open 000418",
+              "children": [
+               {
+                "type": "action",
+                "id": "scan.list.tickopen.back",
+                "label": "tap Back",
+                "children": [
+                 {
+                  "type": "outcome",
+                  "id": "fa-s23-ticks-survive-opening-a-sow",
+                  "label": "A tick survives opening a sow and coming back",
+                  "tree": "S-23",
+                  "gwt": {
+                   "given": "One scanned sow is ticked and the worker has opened another from the list.",
+                   "when": "They tap Back.",
+                   "then": "Scan ear tags is in front with the first sow still ticked."
+                  },
+                  "authority": [
+                   {
+                    "src": "PRD",
+                    "at": "Decisions · owner decision 2026-10-12",
+                    "says": "The list stays while the worker opens a sow and comes back"
+                   }
+                  ],
+                  "result": "pass"
+                 }
+                ]
+               }
+              ]
+             },
+             {
+              "type": "action",
+              "id": "scan.list.other",
+              "label": "tap 004318's row (Unit 6)",
+              "children": [
+               {
+                "type": "outcome",
+                "id": "fa-s24-scan-row-in-another-unit-opens-her-drawer",
+                "label": "A scanned sow in another unit opens her farrowing drawer",
+                "tree": "S-24",
+                "gwt": {
+                 "given": "Scan ear tags is open with 004318, in Unit 6, scanned.",
+                 "when": "The worker taps her row.",
+                 "then": "Her farrowing drawer opens, the same drawer a sow in this unit opens, and its subtitle names her unit and pen."
+                },
+                "authority": [
+                 {
+                  "src": "PRD",
+                  "at": "Decisions · owner decision 2026-10-12",
+                  "says": "A sow in another unit opens her farrowing drawer: Farrowing is one task across its units"
+                 }
+                ],
+                "result": "pass"
+               }
+              ]
+             }
+            ]
+           },
+           {
+            "type": "state",
+            "id": "scan.repeat",
+            "label": "Scan ear tags, a sow scanned again",
+            "tree": "S5",
+            "children": [
+             {
+              "type": "outcome",
+              "id": "fa-s25-repeat-scan-does-not-duplicate",
+              "label": "A repeat scan does not add her twice",
+              "tree": "S-25",
+              "gwt": {
+               "given": "Three sows are listed and the reader reads 000431 a second time.",
+               "when": "The worker looks at the list.",
+               "then": "000431 is still listed once, among the same three sows."
+              },
+              "authority": [
+               {
+                "src": "PRD",
+                "at": "Decisions · owner decision 2026-10-12",
+                "says": "A repeat scan doesn't duplicate; it briefly highlights her existing row"
+               }
+              ],
+              "result": "pass"
+             }
+            ]
+           }
+          ]
          }
         ],
         "run": {
-         "commit": "c88430b",
+         "commit": "45a855c",
          "dirty": true,
-         "ran": "2026-10-12T07:41:51.724Z",
+         "ran": "2026-10-12T13:43:44.822Z",
          "langs": [
           "en"
          ],
