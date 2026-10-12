@@ -52,3 +52,6 @@ review/compare-*/*.base.png
 review/compare-*/*.branch.png
 # behaviour-gate screenshots (regenerate with scripts/run-scenarios.mjs)
 /review/scenarios/
+
+# GitHub Pages build output (scripts/build-pages.mjs)
+_site/
