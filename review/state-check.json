@@ -622,6 +622,36 @@
   },
   {
     "component": "ConditionTag",
+    "variant": "compact",
+    "state": "Act now",
+    "problems": []
+  },
+  {
+    "component": "ConditionTag",
+    "variant": "compact",
+    "state": "Watch",
+    "problems": []
+  },
+  {
+    "component": "ConditionTag",
+    "variant": "compact",
+    "state": "Watch with a type icon",
+    "problems": []
+  },
+  {
+    "component": "ConditionTag",
+    "variant": "compact",
+    "state": "Ongoing",
+    "problems": []
+  },
+  {
+    "component": "ConditionTag",
+    "variant": "compact",
+    "state": "Chinese",
+    "problems": []
+  },
+  {
+    "component": "ConditionTag",
     "variant": "detail",
     "state": "Needs attention · Monitor",
     "problems": []
@@ -1606,7 +1636,7 @@
   {
     "component": "Row",
     "variant": "animal",
-    "state": "Default",
+    "state": "Default · live",
     "problems": []
   },
   {
@@ -1618,25 +1648,91 @@
   {
     "component": "Row",
     "variant": "animal",
-    "state": "Long label / Chinese",
-    "problems": []
-  },
-  {
-    "component": "Row",
-    "variant": "animal",
     "state": "Disabled",
     "problems": []
   },
   {
     "component": "Row",
     "variant": "animal",
-    "state": "Need tile (room row)",
+    "state": "Act now · overdue",
     "problems": []
   },
   {
     "component": "Row",
     "variant": "animal",
-    "state": "Need tile · to allocate",
+    "state": "Act now · sow died, piglets to allocate",
+    "problems": []
+  },
+  {
+    "component": "Row",
+    "variant": "animal",
+    "state": "Coming up · due tomorrow",
+    "problems": []
+  },
+  {
+    "component": "Row",
+    "variant": "animal",
+    "state": "Settled · done",
+    "problems": []
+  },
+  {
+    "component": "Row",
+    "variant": "animal",
+    "state": "Settled · due in 2 days",
+    "problems": []
+  },
+  {
+    "component": "Row",
+    "variant": "animal",
+    "state": "Flat result (pen leads the context)",
+    "problems": []
+  },
+  {
+    "component": "Row",
+    "variant": "animal",
+    "state": "Long ID (wraps)",
+    "problems": []
+  },
+  {
+    "component": "Row",
+    "variant": "animal",
+    "state": "Chinese",
+    "problems": []
+  },
+  {
+    "component": "Row",
+    "variant": "animal",
+    "state": "Tags · act, watch, ongoing",
+    "problems": []
+  },
+  {
+    "component": "Row",
+    "variant": "animal",
+    "state": "Tags · type icon",
+    "problems": []
+  },
+  {
+    "component": "Row",
+    "variant": "animal",
+    "state": "Tags · none",
+    "problems": []
+  },
+  {
+    "component": "Row",
+    "variant": "animal",
+    "state": "Tags · too many for the line (+N)",
+    "problems": []
+  },
+  {
+    "component": "Row",
+    "variant": "animal",
+    "state": "Tags · long tag name folds into +N",
+    "problems": []
+  },
+  {
+    "component": "Row",
+    "variant": "animal",
+    "state": "Tags · Chinese",
     "problems": []
   },
   {

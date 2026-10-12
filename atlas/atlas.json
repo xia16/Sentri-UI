@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-12T06:47:34.897Z",
- "commit": "bf55082",
+ "generated": "2026-10-12T07:19:59.236Z",
+ "commit": "b1c7dd3",
  "platforms": [
   {
    "id": "mobile",
@@ -5946,7 +5946,7 @@
          }
         }
        ],
-       "prd": "# Farrowing (分娩)\r\n\r\nSection: Tasks · Platform: mobile · Prototype: `ux/system/farrowing-astra-concept.html?layout=focus` · Rulings: `ux/research/farrowing/RULINGS.md` (headings quoted below) · State contract: `ux/system/farrowing-contract.html`\r\n\r\n## Problem\r\n\r\nA sow can farrow for hours, across shifts, with wet gloves, one hand on the crate and no signal guarantee. The worker needs to count the piglets as they arrive without ever feeling the count is unsaved, record the dead by cause, fix a wrong figure without erasing the first one, and close the litter with a few deliberate facts. The supervisor needs the same records to roll up into one task: how many sows have farrowed, which are still going, which are still waiting, and a clean way to end the batch's farrowing task. The old UI scattered these over several screens and corrections had many doors; this feature keeps one familiar flow with a clearer place for every number.\r\n\r\n## Who\r\n\r\n- Farrowing-house worker (gloved, one-handed, often at night): counts, records deaths, finishes litters.\r\n- Next-shift worker: reads the room list to see who is farrowing and who was last touched, then continues from the same record.\r\n- Unit lead / supervisor: reads the unit and task progress, corrects posted figures, ends the task.\r\n- Anyone may amend a finished record; provenance (stamp, original kept) replaces permissions.\r\n\r\n## Anchor\r\n\r\nThe anchor is the **sow** (her litter session). Statuses: **Awaiting** (nothing recorded; live total zero) → **Farrowing** (live total above zero, not finished) → **Finished** (Born locked). Exits: **Sow died** (her death ends the session without Finish; she stays in the room while her piglets still need a place) and **Aborted** (an abortion with a live piglet keeps her row; with none she leaves the list). Both are finished states; sows that have left the list are counted once on the Task overview as \"Left the task\". Reachable in any status: the **Room list** and the **Farrowing log**. Task bands: **Task in progress** (the whole-task overview) and **Ending the task** (the four End task reviews and the receipt).\r\n\r\nStatus is derived, never set by a ceremony: \"registers derive from the live total (posted + open pending)\" (RULINGS *Starting and ending a session*).\r\n\r\n## Rules\r\n\r\nFrom RULINGS.md, quoted short:\r\n\r\n- **Model**: \"Born = Alive + Σ Dead + fostered out − fostered in. Derived, never entered, locks at Finish.\"\r\n- **Model**: Alive is one classless number; \"+ is free; − drains pending and clamps at the floor\" (B\\* minus the dead recorded). Born can never drop silently.\r\n- **Model**: five default dead types plus Other (stillborn, mummified, crushed, scours, starve-out).\r\n- **Model**: \"No WHEN anywhere, absolutely … The stamp is the date.\"\r\n- **Model**: \"Classification (weak/deformed) happens at Finish, commits per tap\"; \"Healthy has no form row\"; litter weight and assisted are optional.\r\n- **Model**: Active row line 2 is \"born 14 · 1h ago · G.H\"; \"No staleness tracking on Active sows\"; the interval chip is retired. \"Every litter row carries its three numbers\" (alive · dead, born).\r\n- **Model**: \"The overdue signal ends at the first record\"; rows speak in days from due (due = service + 114), never gestation day; \"Overdue · 3 days\" colours only the number.\r\n- **Model**: \"The hero owns the total; the receipt owns the change\" (`Saved · +4 this visit`).\r\n- **Surfaces & entrances**: \"ONE dead drawer product-wide\", opened by Record dead; staged: Save commits, Back keeps the draft, Clear discards.\r\n- **Surfaces & entrances**: \"ONE correction door: Edit … ONE SCREEN\"; \"What Edit adjusts: the observations, never the derivation\"; a missed fact is a recording, never an Edit.\r\n- **Surfaces & entrances**: \"Type-to-set is retired on count figures\"; one stepper shape, − n +, everywhere.\r\n- **Surfaces & entrances**: \"Identity is sheet-first … the room row offers no sow-page target.\"\r\n- **Surfaces & entrances**: \"`Finish` is `Finish farrowing`\"; the hold-to-lock is \"the second guard\".\r\n- **Starting and ending a session**: \"Farrowing starts at the first recorded event — full stop.\"\r\n- **Starting and ending a session**: the sow's death lives in the drawer (`Piglets · The sow`), \"hold-to-commit\"; \"She stays in the room\".\r\n- **Starting and ending a session**: \"A non-empty ledger is never unreachable\"; a draft never crosses the lock.\r\n- **After the lock**: \"The record face IS the record\"; \"One ledger surface, the Farrowing record page\"; \"History is the chevron on the fact line\"; \"The correction mark is the amber value\".\r\n- **After the lock**: Born is amended through the Edit ceremony, which opens in place under the Born row (`More born` / `Count was wrong`; never a drawer on a drawer); \"Anyone may amend born post-lock — open ✎, stamped, no role gate.\" Fostering is **parked**.\r\n- **Names and glyphs**: \"words carry actions, icons carry objects\"; dates speak relative within the week.\r\n- **Piglet processing, Round 5**: all tasks look the same (farrowing's skeleton); \"The exit word is always **Back**.\"\r\n- **Owner calls for this atlas**: *Edit record* is editing while she is still farrowing; *Correct born* exists only after farrowing has finished. Home's Farrowing card and Choose unit both land on the room list.\r\n\r\n## Scope\r\n\r\nIn:\r\n\r\n- Room list: unit card, whole-task card, Awaiting / Active / Done / All tabs, due and parity filter, pen grouping, Go to pen, Scan ear tag, Search.\r\n- The sow sheet in its faces: Before first count, Counting, Finish (and its blocked form), Locked record, Sow died.\r\n- Death entry (piglets and the sow), Edit record, Edit of a finished litter and the Correct born correction (in place), the Farrowing log.\r\n- Whole-task overview, End task reviews (blocked, awaiting, all finished, outcomes) and the task receipt. One count everywhere: Done · Active · Awaiting over every sow of the task (a sow that died or has an outcome is Done), the same on the overview, End task, the receipt and the room tabs.\r\n- Farrowing's rows on the pig's Actions sheet (Edit litter record, Record abortion, Mark not in pig).\r\n- When a sow dies: the allocation sheet (move her piglets to other sows, hand-rear them in her crate, or move them to a rearing pen), the Move page it opens (`farrowing.foster`), and her row's life on the list until every piglet has a place.\r\n\r\nOut:\r\n\r\n- Fostering outside the sow-died case (parked until the owner reopens it; see Decisions, 2026-10-10).\r\n- Piglet processing and its identity work (separate feature; Move opens after the lock). The prototype's own Piglet processing, identity and mortality pages are mapped as screens; see the decision \"Piglet processing is drawn in Farrowing and as its own feature\".\r\n- The sow page itself and the rest of the Actions sheet (pig-profile).\r\n- Pen tools reachable from a pen header (feed guidance, equipment fault, pen note, pen log): present in the prototype, unclear whose feature; recorded in the Room list issues. The pen pages are mapped as screens; see the decision \"Pen tools are drawn in Farrowing and in Inspection\".\r\n- Console reporting, anomaly queues, per-hand audit views, merge-review UI, notifications.\r\n- Role gates, batch-close disposition doors beyond what the End task reviews show.\r\n\r\n## Decisions\r\n\r\n- Born is derived and frozen at Finish; Alive and the dead types are the observations — RULINGS *Model*.\r\n- Born floor: \"+\" free, \"−\" clamps at B\\* minus current dead — RULINGS *Model*.\r\n- Five dead types plus Other; no WHEN chips — RULINGS *Model*.\r\n- Weak and deformed asked at Finish only; Healthy derived — RULINGS *Model*.\r\n- Row line 2 carries recency in words; interval chip retired — RULINGS *Model*.\r\n- Overdue signal stops at the first record — RULINGS *Model*.\r\n- Days from due on rows, gestation day on the sheet header only — RULINGS *Model*.\r\n- Receipt `Saved · +4 this visit`; hero numeral plain, no typing — RULINGS *Model*.\r\n- Edit folds weak, deformed, weight and assisted into one `At finish` row — RULINGS *Model*.\r\n- Dead drawer is the only dead entrance, staged (Back/Clear/Save) — RULINGS *Surfaces & entrances*.\r\n- Edit is the only correction door and one screen — RULINGS *Surfaces & entrances*.\r\n- Count figures are stepper-only — RULINGS *Surfaces & entrances*.\r\n- Sheet-first identity: only the sheet header opens the sow page — RULINGS *Surfaces & entrances*.\r\n- Exit grammar: bars hold exits only; Finish farrowing is a hold — RULINGS *Surfaces & entrances*.\r\n- Farrowing starts at the first record; no started mark — RULINGS *Starting and ending a session*.\r\n- The sow's death is a hold-to-commit mode of the drawer; she stays in the room — RULINGS *Starting and ending a session*.\r\n- Merge contract: signed deltas, flag instead of silently applying a breach — RULINGS *Starting and ending a session*.\r\n- Fostering parked — RULINGS *After the lock*.\r\n- The locked record is designed as a record, with one ledger page — RULINGS *After the lock*.\r\n- Anyone may amend Born after the lock — RULINGS *After the lock*.\r\n- Words for actions, icons for objects — RULINGS *Names and glyphs*.\r\n- Relative dates inside a week — RULINGS *Names and glyphs*.\r\n- Farrowing's skeleton is the model for all tasks; exit word Back — RULINGS *Piglet processing, Round 5*.\r\n- Task end: manual, hold-to-commit with receipt, blocked while farrowing is open — RULINGS *Piglet processing, Q5*; closure details in `ux/research/farrowing/ASTRA-TASK-CLOSURE.md`.\r\n- Edit record vs Correct born split by status; Home entries land on the room list — owner calls for this atlas.\r\n\r\n### Owner decisions, 2026-10-10\r\n\r\n- **Room rows** (the room, Find a sow, Scan results, the task's sow list) are one row, owner-approved 2026-10-12 (the design system's Row · animal, state side). Left, two lines: the ear tag exactly as stored (16px/600 mono, always ink, even for a sow that died) over 13px muted context (`Parity 5` on a waiting sow; `when · who` on a recorded one, such as `05:58 · G.H`, `1h ago · G.H`, `yesterday · L.M`; `Pen B3 · …` in a flat result). Right, two lines, right-aligned: the figure over the state word. Farrowing: `9 alive · 5 dead` / Farrowing. Due: `Tomorrow`, `Today` or `In 2 days` / Due. Overdue: `3 days` / Overdue. Done: `11 alive · 2 dead` / Done. Sow died: `7 to allocate` / Sow died, or `2 hand-reared` / Sow died. Aborted: `1 alive` / Aborted. Levels set weight and colour: act now (overdue; a sow died with piglets to allocate) is red with the one \"!\" icon in a row; live (farrowing) is bold; coming up (due today or tomorrow) has an ink figure and a muted word; settled (done, due in 2+ days, aborted) is muted. Only recorded counts show: alive, and `· N dead` only above zero; never *born*, never an expected or carried count. One quiet chevron, no pencil and no chip: tapping the row opens the record, and Edit is inside it. Pen headers say the pen and the count only: no need counts or dots.\r\n- **Statuses.** In progress: **Awaiting**, **Active**. Finished: **Done** (green), **Sow died** (red), **Aborted** (red; 流产).\r\n- **Sow died.** Right after the hold records her death the sheet becomes `N piglets to allocate` (subtitle `<ID> · <pen> · sow died <time>`) with three options: **Move to other sows** (opens the move page, sending out of this litter with her piglets pre-selected; several receiving sows may split them), **Hand-rear here** (the piglets stay on her record and piglet care continues) and **Move to a rearing pen** (shown only when the farm config says the farm has one; the prototype flag is on for the demo, `?rearing=off` turns it off). Footer **Back** means later: no ✕, no extra question line.\r\n- **Her row while piglets remain.** A red tile `N / to allocate`, facts `Sow died · yesterday · L.M`; tapping it opens the same sheet. After Hand-rear: a neutral tile `N / hand-reared`, facts `Sow died · 09:40 · L.M`; the row stays while hand-reared piglets remain. A partial allocation keeps the remaining count; her row never says `5 moved`. A piglet that dies or is put down is recorded through Record dead and the count drops. She **leaves the room list** once every piglet is on another sow, in a rearing pen, or recorded dead.\r\n- **Aborted.** *Abortion* is the one word (never *miscarriage*). No live piglet: she leaves the room list at once. Any live piglet: the row stays with the tile `1 / alive` and the facts `Aborted · 08:10 · G.H` (recorded counts only).\r\n- **Task overview** counts the sows that left the list: `Left the task · n aborted · n sow died`. She is then outside Done · Active · Awaiting, so every total still adds up (7 / 18 farrowed once one of 19 has left).\r\n- **Sheet titles name the job; subtitles name the animal and context.** Record dead is titled `Record dead` (it was `Dead 6` / `The sow`); the pen sheet no longer repeats `Pen` as its only heading.\r\n- **Fostering is in scope for the sow-died case** (and only there; elsewhere it stays parked).\r\n- **An orphan litter can stay in the task, hand-reared** on her record.\r\n- **A rearing pen is a farm-level option.** Its configuration is still open: filed as the To confirm item `farrowing-room-list-1` in `review/farrowing-room-list.json`.\r\n- **Abortion rule.** No live piglets: she leaves the list. Any live piglet: an Aborted row stays.\r\n- The glossary words (*abortion / aborted*, *to allocate*, *hand-reared*, *left the task*) are in `ux/laws/glossary.md` and `ux/laws/strings.json`; \"Abortion vs miscarriage\" (`events-1`) is closed by this decision.\r\n",
+       "prd": "# Farrowing (分娩)\r\n\r\nSection: Tasks · Platform: mobile · Prototype: `ux/system/farrowing-astra-concept.html?layout=focus` · Rulings: `ux/research/farrowing/RULINGS.md` (headings quoted below) · State contract: `ux/system/farrowing-contract.html`\r\n\r\n## Problem\r\n\r\nA sow can farrow for hours, across shifts, with wet gloves, one hand on the crate and no signal guarantee. The worker needs to count the piglets as they arrive without ever feeling the count is unsaved, record the dead by cause, fix a wrong figure without erasing the first one, and close the litter with a few deliberate facts. The supervisor needs the same records to roll up into one task: how many sows have farrowed, which are still going, which are still waiting, and a clean way to end the batch's farrowing task. The old UI scattered these over several screens and corrections had many doors; this feature keeps one familiar flow with a clearer place for every number.\r\n\r\n## Who\r\n\r\n- Farrowing-house worker (gloved, one-handed, often at night): counts, records deaths, finishes litters.\r\n- Next-shift worker: reads the room list to see who is farrowing and who was last touched, then continues from the same record.\r\n- Unit lead / supervisor: reads the unit and task progress, corrects posted figures, ends the task.\r\n- Anyone may amend a finished record; provenance (stamp, original kept) replaces permissions.\r\n\r\n## Anchor\r\n\r\nThe anchor is the **sow** (her litter session). Statuses: **Awaiting** (nothing recorded; live total zero) → **Farrowing** (live total above zero, not finished) → **Finished** (Born locked). Exits: **Sow died** (her death ends the session without Finish; she stays in the room while her piglets still need a place) and **Aborted** (an abortion with a live piglet keeps her row; with none she leaves the list). Both are finished states; sows that have left the list are counted once on the Task overview as \"Left the task\". Reachable in any status: the **Room list** and the **Farrowing log**. Task bands: **Task in progress** (the whole-task overview) and **Ending the task** (the four End task reviews and the receipt).\r\n\r\nStatus is derived, never set by a ceremony: \"registers derive from the live total (posted + open pending)\" (RULINGS *Starting and ending a session*).\r\n\r\n## Rules\r\n\r\nFrom RULINGS.md, quoted short:\r\n\r\n- **Model**: \"Born = Alive + Σ Dead + fostered out − fostered in. Derived, never entered, locks at Finish.\"\r\n- **Model**: Alive is one classless number; \"+ is free; − drains pending and clamps at the floor\" (B\\* minus the dead recorded). Born can never drop silently.\r\n- **Model**: five default dead types plus Other (stillborn, mummified, crushed, scours, starve-out).\r\n- **Model**: \"No WHEN anywhere, absolutely … The stamp is the date.\"\r\n- **Model**: \"Classification (weak/deformed) happens at Finish, commits per tap\"; \"Healthy has no form row\"; litter weight and assisted are optional.\r\n- **Model**: Active row line 2 is \"born 14 · 1h ago · G.H\"; \"No staleness tracking on Active sows\"; the interval chip is retired. \"Every litter row carries its three numbers\" (alive · dead, born).\r\n- **Model**: \"The overdue signal ends at the first record\"; rows speak in days from due (due = service + 114), never gestation day; \"Overdue · 3 days\" colours only the number.\r\n- **Model**: \"The hero owns the total; the receipt owns the change\" (`Saved · +4 this visit`).\r\n- **Surfaces & entrances**: \"ONE dead drawer product-wide\", opened by Record dead; staged: Save commits, Back keeps the draft, Clear discards.\r\n- **Surfaces & entrances**: \"ONE correction door: Edit … ONE SCREEN\"; \"What Edit adjusts: the observations, never the derivation\"; a missed fact is a recording, never an Edit.\r\n- **Surfaces & entrances**: \"Type-to-set is retired on count figures\"; one stepper shape, − n +, everywhere.\r\n- **Surfaces & entrances**: \"Identity is sheet-first … the room row offers no sow-page target.\"\r\n- **Surfaces & entrances**: \"`Finish` is `Finish farrowing`\"; the hold-to-lock is \"the second guard\".\r\n- **Starting and ending a session**: \"Farrowing starts at the first recorded event — full stop.\"\r\n- **Starting and ending a session**: the sow's death lives in the drawer (`Piglets · The sow`), \"hold-to-commit\"; \"She stays in the room\".\r\n- **Starting and ending a session**: \"A non-empty ledger is never unreachable\"; a draft never crosses the lock.\r\n- **After the lock**: \"The record face IS the record\"; \"One ledger surface, the Farrowing record page\"; \"History is the chevron on the fact line\"; \"The correction mark is the amber value\".\r\n- **After the lock**: Born is amended through the Edit ceremony, which opens in place under the Born row (`More born` / `Count was wrong`; never a drawer on a drawer); \"Anyone may amend born post-lock — open ✎, stamped, no role gate.\" Fostering is **parked**.\r\n- **Names and glyphs**: \"words carry actions, icons carry objects\"; dates speak relative within the week.\r\n- **Piglet processing, Round 5**: all tasks look the same (farrowing's skeleton); \"The exit word is always **Back**.\"\r\n- **Owner calls for this atlas**: *Edit record* is editing while she is still farrowing; *Correct born* exists only after farrowing has finished. Home's Farrowing card and Choose unit both land on the room list.\r\n\r\n## Scope\r\n\r\nIn:\r\n\r\n- Room list: unit card, whole-task card, Awaiting / Active / Done / All tabs, due and parity filter, pen grouping, Go to pen, Scan ear tag, Search.\r\n- The sow sheet in its faces: Before first count, Counting, Finish (and its blocked form), Locked record, Sow died.\r\n- Death entry (piglets and the sow), Edit record, Edit of a finished litter and the Correct born correction (in place), the Farrowing log.\r\n- Whole-task overview, End task reviews (blocked, awaiting, all finished, outcomes) and the task receipt. One count everywhere: Done · Active · Awaiting over every sow of the task (a sow that died or has an outcome is Done), the same on the overview, End task, the receipt and the room tabs.\r\n- Farrowing's rows on the pig's Actions sheet (Edit litter record, Record abortion, Mark not in pig).\r\n- When a sow dies: the allocation sheet (move her piglets to other sows, hand-rear them in her crate, or move them to a rearing pen), the Move page it opens (`farrowing.foster`), and her row's life on the list until every piglet has a place.\r\n\r\nOut:\r\n\r\n- Fostering outside the sow-died case (parked until the owner reopens it; see Decisions, 2026-10-10).\r\n- Piglet processing and its identity work (separate feature; Move opens after the lock). The prototype's own Piglet processing, identity and mortality pages are mapped as screens; see the decision \"Piglet processing is drawn in Farrowing and as its own feature\".\r\n- The sow page itself and the rest of the Actions sheet (pig-profile).\r\n- Pen tools reachable from a pen header (feed guidance, equipment fault, pen note, pen log): present in the prototype, unclear whose feature; recorded in the Room list issues. The pen pages are mapped as screens; see the decision \"Pen tools are drawn in Farrowing and in Inspection\".\r\n- Console reporting, anomaly queues, per-hand audit views, merge-review UI, notifications.\r\n- Role gates, batch-close disposition doors beyond what the End task reviews show.\r\n\r\n## Decisions\r\n\r\n- Born is derived and frozen at Finish; Alive and the dead types are the observations — RULINGS *Model*.\r\n- Born floor: \"+\" free, \"−\" clamps at B\\* minus current dead — RULINGS *Model*.\r\n- Five dead types plus Other; no WHEN chips — RULINGS *Model*.\r\n- Weak and deformed asked at Finish only; Healthy derived — RULINGS *Model*.\r\n- Row line 2 carries recency in words; interval chip retired — RULINGS *Model*.\r\n- Overdue signal stops at the first record — RULINGS *Model*.\r\n- Days from due on rows, gestation day on the sheet header only — RULINGS *Model*.\r\n- Receipt `Saved · +4 this visit`; hero numeral plain, no typing — RULINGS *Model*.\r\n- Edit folds weak, deformed, weight and assisted into one `At finish` row — RULINGS *Model*.\r\n- Dead drawer is the only dead entrance, staged (Back/Clear/Save) — RULINGS *Surfaces & entrances*.\r\n- Edit is the only correction door and one screen — RULINGS *Surfaces & entrances*.\r\n- Count figures are stepper-only — RULINGS *Surfaces & entrances*.\r\n- Sheet-first identity: only the sheet header opens the sow page — RULINGS *Surfaces & entrances*.\r\n- Exit grammar: bars hold exits only; Finish farrowing is a hold — RULINGS *Surfaces & entrances*.\r\n- Farrowing starts at the first record; no started mark — RULINGS *Starting and ending a session*.\r\n- The sow's death is a hold-to-commit mode of the drawer; she stays in the room — RULINGS *Starting and ending a session*.\r\n- Merge contract: signed deltas, flag instead of silently applying a breach — RULINGS *Starting and ending a session*.\r\n- Fostering parked — RULINGS *After the lock*.\r\n- The locked record is designed as a record, with one ledger page — RULINGS *After the lock*.\r\n- Anyone may amend Born after the lock — RULINGS *After the lock*.\r\n- Words for actions, icons for objects — RULINGS *Names and glyphs*.\r\n- Relative dates inside a week — RULINGS *Names and glyphs*.\r\n- Farrowing's skeleton is the model for all tasks; exit word Back — RULINGS *Piglet processing, Round 5*.\r\n- Task end: manual, hold-to-commit with receipt, blocked while farrowing is open — RULINGS *Piglet processing, Q5*; closure details in `ux/research/farrowing/ASTRA-TASK-CLOSURE.md`.\r\n- Edit record vs Correct born split by status; Home entries land on the room list — owner calls for this atlas.\r\n\r\n### Owner decisions, 2026-10-10\r\n\r\n- **Room rows** (the room, Find a sow, Scan results, the task's sow list) are one row, owner-approved 2026-10-12 (the design system's Row · animal, state side). Left, two lines: the ear tag exactly as stored (16px/600 mono, always ink, even for a sow that died) over 13px muted context (`Parity 5` on a waiting sow; `when · who` on a recorded one, such as `05:58 · G.H`, `1h ago · G.H`, `yesterday · L.M`; `Pen B3 · …` in a flat result). Right, two lines, right-aligned: the figure over the state word. Farrowing: `9 alive · 5 dead` / Farrowing. Due: `Tomorrow`, `Today` or `In 2 days` / Due. Overdue: `3 days` / Overdue. Done: `11 alive · 2 dead` / Done. Sow died: `7 to allocate` / Sow died, or `2 hand-reared` / Sow died. Aborted: `1 alive` / Aborted. Levels set weight and colour: act now (overdue; a sow died with piglets to allocate) is red with the one \"!\" icon in a row; live (farrowing) is bold; coming up (due today or tomorrow) has an ink figure and a muted word; settled (done, due in 2+ days, aborted) is muted (the 16px figure in ink-2, so it keeps 7:1 contrast). Only recorded counts show: alive, and `· N dead` only above zero; never *born*, never an expected or carried count. One quiet chevron, no pencil and no chip: tapping the row opens the record, and Edit is inside it. Pen headers say the pen and the count only: no need counts or dots.\r\n- **Statuses.** In progress: **Awaiting**, **Active**. Finished: **Done** (green), **Sow died** (red), **Aborted** (red; 流产).\r\n- **Sow died.** Right after the hold records her death the sheet becomes `N piglets to allocate` (subtitle `<ID> · <pen> · sow died <time>`) with three options: **Move to other sows** (opens the move page, sending out of this litter with her piglets pre-selected; several receiving sows may split them), **Hand-rear here** (the piglets stay on her record and piglet care continues) and **Move to a rearing pen** (shown only when the farm config says the farm has one; the prototype flag is on for the demo, `?rearing=off` turns it off). Footer **Back** means later: no ✕, no extra question line.\r\n- **Her row while piglets remain.** A red tile `N / to allocate`, facts `Sow died · yesterday · L.M`; tapping it opens the same sheet. After Hand-rear: a neutral tile `N / hand-reared`, facts `Sow died · 09:40 · L.M`; the row stays while hand-reared piglets remain. A partial allocation keeps the remaining count; her row never says `5 moved`. A piglet that dies or is put down is recorded through Record dead and the count drops. She **leaves the room list** once every piglet is on another sow, in a rearing pen, or recorded dead.\r\n- **Aborted.** *Abortion* is the one word (never *miscarriage*). No live piglet: she leaves the room list at once. Any live piglet: the row stays with the tile `1 / alive` and the facts `Aborted · 08:10 · G.H` (recorded counts only).\r\n- **Task overview** counts the sows that left the list: `Left the task · n aborted · n sow died`. She is then outside Done · Active · Awaiting, so every total still adds up (7 / 18 farrowed once one of 19 has left).\r\n- **Sheet titles name the job; subtitles name the animal and context.** Record dead is titled `Record dead` (it was `Dead 6` / `The sow`); the pen sheet no longer repeats `Pen` as its only heading.\r\n- **Fostering is in scope for the sow-died case** (and only there; elsewhere it stays parked).\r\n- **An orphan litter can stay in the task, hand-reared** on her record.\r\n- **A rearing pen is a farm-level option.** Its configuration is still open: filed as the To confirm item `farrowing-room-list-1` in `review/farrowing-room-list.json`.\r\n- **Abortion rule.** No live piglets: she leaves the list. Any live piglet: an Aborted row stays.\r\n- The glossary words (*abortion / aborted*, *to allocate*, *hand-reared*, *left the task*) are in `ux/laws/glossary.md` and `ux/laws/strings.json`; \"Abortion vs miscarriage\" (`events-1`) is closed by this decision.\r\n",
        "scenarios": {
         "treeDoc": true,
         "tree": [
@@ -5984,10 +5984,7 @@
                   "says": "Home's Farrowing card and Choose unit both land on the room list."
                  }
                 ],
-                "result": "blocked",
-                "notes": [
-                 "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-                ]
+                "result": "pass"
                }
               ]
              }
@@ -6022,10 +6019,7 @@
                   "says": "Home's Farrowing card and Choose unit both land on the room list."
                  }
                 ],
-                "result": "blocked",
-                "notes": [
-                 "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-                ]
+                "result": "pass"
                }
               ]
              }
@@ -6065,10 +6059,7 @@
                   "says": "Awaiting / Active / Done / All tabs"
                  }
                 ],
-                "result": "blocked",
-                "notes": [
-                 "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-                ]
+                "result": "pass"
                }
               ]
              },
@@ -6094,10 +6085,7 @@
                   "says": "Room list: … Go to pen, Scan ear tag, Search."
                  }
                 ],
-                "result": "blocked",
-                "notes": [
-                 "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-                ]
+                "result": "pass"
                },
                {
                 "type": "action",
@@ -6126,10 +6114,7 @@
                     "says": "Awaiting (nothing recorded; live total zero)"
                    }
                   ],
-                  "result": "blocked",
-                  "notes": [
-                   "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-                  ]
+                  "result": "pass"
                  }
                 ]
                }
@@ -6157,10 +6142,7 @@
                   "says": "due and parity filter"
                  }
                 ],
-                "result": "blocked",
-                "notes": [
-                 "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-                ]
+                "result": "pass"
                }
               ]
              },
@@ -6205,10 +6187,7 @@
                   "says": "Farrowing (live total above zero, not finished)"
                  }
                 ],
-                "result": "blocked",
-                "notes": [
-                 "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-                ]
+                "result": "pass"
                }
               ]
              },
@@ -6234,10 +6213,7 @@
                   "says": "The record face IS the record"
                  }
                 ],
-                "result": "blocked",
-                "notes": [
-                 "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-                ]
+                "result": "pass"
                }
               ]
              },
@@ -6268,10 +6244,7 @@
                   "says": "Tapping the row opens the same sheet"
                  }
                 ],
-                "result": "blocked",
-                "notes": [
-                 "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-                ]
+                "result": "pass"
                }
               ]
              },
@@ -6300,6 +6273,11 @@
               "id": "fa-e12-rows-recorded-counts-only",
               "label": "Rows show recorded counts only: no born, no zero dead, no pencil",
               "tree": "E-12",
+              "gwt": {
+               "given": "The room list is open.",
+               "when": "The worker looks at the rows.",
+               "then": "Rows show recorded counts only: no \"born N\", no \"0 dead\" and no pencil."
+              },
               "authority": [
                {
                 "src": "PRD",
@@ -6307,10 +6285,7 @@
                 "says": "Rows show no born and no zero dead; no pencil on rows; tapping the row opens the record"
                }
               ],
-              "result": "blocked",
-              "notes": [
-               "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-              ]
+              "result": "pass"
              },
              {
               "type": "action",
@@ -6322,6 +6297,11 @@
                 "id": "fa-e13-search-rows-recorded-counts-only",
                 "label": "Find a sow rows follow the same rules",
                 "tree": "E-13",
+                "gwt": {
+                 "given": "Find a sow is open.",
+                 "when": "The worker looks at the results.",
+                 "then": "The result rows follow the same rules: no \"born N\", no \"0 dead\" and no pencil."
+                },
                 "authority": [
                  {
                   "src": "PRD",
@@ -6329,10 +6309,7 @@
                   "says": "The same rows in Find a sow and Scan results"
                  }
                 ],
-                "result": "blocked",
-                "notes": [
-                 "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-                ]
+                "result": "pass"
                }
               ]
              }
@@ -6374,10 +6351,7 @@
                   "says": "Farrowing starts at the first recorded event — full stop."
                  }
                 ],
-                "result": "blocked",
-                "notes": [
-                 "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-                ]
+                "result": "pass"
                },
                {
                 "type": "action",
@@ -6401,10 +6375,7 @@
                     "says": "registers derive from the live total (posted + open pending)"
                    }
                   ],
-                  "result": "blocked",
-                  "notes": [
-                   "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-                  ]
+                  "result": "pass"
                  }
                 ]
                }
@@ -6432,10 +6403,7 @@
                   "says": "Record dead live (a stillborn can be the first record)"
                  }
                 ],
-                "result": "blocked",
-                "notes": [
-                 "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-                ]
+                "result": "pass"
                }
               ]
              }
@@ -6465,10 +6433,7 @@
                 "says": "Saved · +4 this visit"
                }
               ],
-              "result": "blocked",
-              "notes": [
-               "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-              ]
+              "result": "pass"
              },
              {
               "type": "outcome",
@@ -6492,10 +6457,7 @@
                 "says": "recommendation: Record dead, as ruled"
                }
               ],
-              "result": "blocked",
-              "notes": [
-               "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-              ]
+              "result": "pass"
              },
              {
               "type": "action",
@@ -6519,10 +6481,7 @@
                   "says": "+ is free; − drains pending and clamps at the floor"
                  }
                 ],
-                "result": "blocked",
-                "notes": [
-                 "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-                ]
+                "result": "pass"
                }
               ]
              },
@@ -6583,10 +6542,7 @@
                     "says": "leave a screen and keep any draft on the device"
                    }
                   ],
-                  "result": "blocked",
-                  "notes": [
-                   "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-                  ]
+                  "result": "pass"
                  },
                  {
                   "type": "action",
@@ -6615,10 +6571,7 @@
                       "says": "No green for drafts: an unsaved draft is muted ink, never the recorded green."
                      }
                     ],
-                    "result": "blocked",
-                    "notes": [
-                     "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-                    ]
+                    "result": "pass"
                    },
                    {
                     "type": "action",
@@ -6642,10 +6595,7 @@
                         "says": "tallies and the cause are a DRAFT until Save"
                        }
                       ],
-                      "result": "blocked",
-                      "notes": [
-                       "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-                      ]
+                      "result": "pass"
                      }
                     ]
                    },
@@ -6671,10 +6621,7 @@
                         "says": "Clear discards the draft (a text action on the title row, present only while a draft exists)"
                        }
                       ],
-                      "result": "blocked",
-                      "notes": [
-                       "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-                      ]
+                      "result": "pass"
                      }
                     ]
                    },
@@ -6700,10 +6647,7 @@
                         "says": "Save commits the draft as one stamped event"
                        }
                       ],
-                      "result": "blocked",
-                      "notes": [
-                       "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-                      ]
+                      "result": "pass"
                      }
                     ]
                    }
@@ -6736,10 +6680,7 @@
                       "says": "Finish waits while a death draft is open; there is no lock to hold."
                      }
                     ],
-                    "result": "blocked",
-                    "notes": [
-                     "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-                    ]
+                    "result": "pass"
                    },
                    {
                     "type": "outcome",
@@ -6763,10 +6704,7 @@
                       "says": "A death draft still blocks Finish, shown as the design system now draws it: Finish disabled, its tap leads to Record dead (1 unsaved). No banner, no reason line."
                      }
                     ],
-                    "result": "blocked",
-                    "notes": [
-                     "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-                    ]
+                    "result": "pass"
                    },
                    {
                     "type": "action",
@@ -6790,10 +6728,7 @@
                         "says": "this is a guard on the lock, not a gate on recording"
                        }
                       ],
-                      "result": "blocked",
-                      "notes": [
-                       "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-                      ]
+                      "result": "pass"
                      },
                      {
                       "type": "action",
@@ -6822,10 +6757,7 @@
                           "says": "Lock born N is hold-to-commit"
                          }
                         ],
-                        "result": "blocked",
-                        "notes": [
-                         "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-                        ]
+                        "result": "pass"
                        }
                       ]
                      }
@@ -6862,10 +6794,7 @@
                     "says": "Drawers have no ✕: the footer Back is the exit; swiping down on the handle or tapping the scrim is Back."
                    }
                   ],
-                  "result": "blocked",
-                  "notes": [
-                   "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-                  ]
+                  "result": "pass"
                  }
                 ]
                },
@@ -6891,10 +6820,7 @@
                     "says": "Back and the dismiss gesture … KEEP the draft on the device (persisted across background and restart)"
                    }
                   ],
-                  "result": "blocked",
-                  "notes": [
-                   "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-                  ]
+                  "result": "pass"
                  }
                 ]
                }
@@ -6958,10 +6884,7 @@
                   "says": "the Finish sheet's hold-to-lock stays the second guard"
                  }
                 ],
-                "result": "blocked",
-                "notes": [
-                 "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-                ]
+                "result": "pass"
                }
               ]
              },
@@ -6992,10 +6915,7 @@
                   "says": "locks at Finish"
                  }
                 ],
-                "result": "blocked",
-                "notes": [
-                 "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-                ]
+                "result": "pass"
                }
               ]
              }
@@ -7037,10 +6957,7 @@
                   "says": "A changed row shows its new value in normal ink with a small muted \"was 2\" beside the label; no banner, no Corrected tag; one Save correction in the footer."
                  }
                 ],
-                "result": "blocked",
-                "notes": [
-                 "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-                ]
+                "result": "pass"
                },
                {
                 "type": "action",
@@ -7069,10 +6986,7 @@
                     "says": "Born has no door pre-lock (it heals when its inputs heal)"
                    }
                   ],
-                  "result": "blocked",
-                  "notes": [
-                   "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-                  ]
+                  "result": "pass"
                  }
                 ]
                },
@@ -7098,10 +7012,7 @@
                     "says": "Clear (text action on the summary row) discards it"
                    }
                   ],
-                  "result": "blocked",
-                  "notes": [
-                   "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-                  ]
+                  "result": "pass"
                  }
                 ]
                },
@@ -7127,10 +7038,7 @@
                     "says": "Leaving Edit with unsaved changes asks \"Save correction?\" (Save / Discard) in the shared dialog, so an unsaved correction can never reach Finish."
                    }
                   ],
-                  "result": "blocked",
-                  "notes": [
-                   "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-                  ]
+                  "result": "pass"
                  },
                  {
                   "type": "action",
@@ -7154,10 +7062,7 @@
                       "says": "Discard in the Save correction? ask drops the unsaved change."
                      }
                     ],
-                    "result": "blocked",
-                    "notes": [
-                     "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-                    ]
+                    "result": "pass"
                    }
                   ]
                  },
@@ -7183,10 +7088,7 @@
                       "says": "Save in the Save correction? ask commits the correction (who, old → new in the log) and returns."
                      }
                     ],
-                    "result": "blocked",
-                    "notes": [
-                     "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-                    ]
+                    "result": "pass"
                    }
                   ]
                  }
@@ -7225,10 +7127,7 @@
                   "says": "Anyone may amend born post-lock — open ✎, stamped, no role gate."
                  }
                 ],
-                "result": "blocked",
-                "notes": [
-                 "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-                ]
+                "result": "pass"
                },
                {
                 "type": "action",
@@ -7257,10 +7156,7 @@
                     "says": "corrections amber with ✎"
                    }
                   ],
-                  "result": "blocked",
-                  "notes": [
-                   "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-                  ]
+                  "result": "pass"
                  }
                 ]
                }
@@ -7329,10 +7225,7 @@
                   "says": "Right after the hold records the death, the sheet becomes 'N piglets to allocate'"
                  }
                 ],
-                "result": "blocked",
-                "notes": [
-                 "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-                ]
+                "result": "pass"
                },
                {
                 "type": "action",
@@ -7361,16 +7254,18 @@
                     "says": "Room row while piglets remain unallocated: chip Sow died, headline 'N to allocate'"
                    }
                   ],
-                  "result": "blocked",
-                  "notes": [
-                   "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-                  ]
+                  "result": "pass"
                  },
                  {
                   "type": "outcome",
                   "id": "fa-m11-back-row-says-to-allocate",
-                  "label": "Back after the death: a red tile \"9 / to allocate\", facts Sow died",
+                  "label": "Back after the death: her row says \"9 to allocate\" over Sow died, in red",
                   "tree": "M-11",
+                  "gwt": {
+                   "given": "A sow's death was just recorded and the allocation sheet is open.",
+                   "when": "The worker goes Back to the room.",
+                   "then": "Her row stays in the room and says 9 to allocate over Sow died."
+                  },
                   "authority": [
                    {
                     "src": "PRD",
@@ -7378,10 +7273,7 @@
                     "says": "Room row while piglets remain unallocated: her ID muted grey, chip Sow died, headline 'N to allocate' in the to-do colour"
                    }
                   ],
-                  "result": "blocked",
-                  "notes": [
-                   "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-                  ]
+                  "result": "pass"
                  },
                  {
                   "type": "action",
@@ -7393,6 +7285,11 @@
                     "id": "fa-m17-row-opens-allocation-sheet",
                     "label": "Tapping the row opens the same sheet",
                     "tree": "M-17",
+                    "gwt": {
+                     "given": "A sow died with piglets still to allocate and her row is in the room list.",
+                     "when": "The worker taps her row.",
+                     "then": "The allocation sheet opens and says 9 piglets to allocate."
+                    },
                     "authority": [
                      {
                       "src": "PRD",
@@ -7400,10 +7297,7 @@
                       "says": "Tapping the row opens the same sheet"
                      }
                     ],
-                    "result": "blocked",
-                    "notes": [
-                     "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-                    ]
+                    "result": "pass"
                    },
                    {
                     "type": "action",
@@ -7415,6 +7309,11 @@
                       "id": "fa-m18-partial-move-keeps-the-rest",
                       "label": "Some moved: the sheet returns with the remaining count",
                       "tree": "M-18",
+                      "gwt": {
+                       "given": "The allocation sheet is open for a dead sow with 9 piglets.",
+                       "when": "The worker moves some piglets to other sows.",
+                       "then": "The sheet returns and says 4 piglets to allocate; nothing is marked moved on the room list."
+                      },
                       "authority": [
                        {
                         "src": "PRD",
@@ -7422,10 +7321,7 @@
                         "says": "Partial allocation: the remaining count stays; never show '5 moved' on her row"
                        }
                       ],
-                      "result": "blocked",
-                      "notes": [
-                       "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-                      ]
+                      "result": "pass"
                      },
                      {
                       "type": "action",
@@ -7435,8 +7331,13 @@
                        {
                         "type": "outcome",
                         "id": "fa-m19-rest-hand-reared",
-                        "label": "The rest hand-reared: her row shows \"4 / hand-reared\"",
+                        "label": "The rest hand-reared: her row says \"4 hand-reared\"",
                         "tree": "M-19",
+                        "gwt": {
+                         "given": "A dead sow has 4 piglets left to allocate.",
+                         "when": "The worker chooses Hand-rear here.",
+                         "then": "Her row says 4 hand-reared."
+                        },
                         "authority": [
                          {
                           "src": "PRD",
@@ -7444,10 +7345,7 @@
                           "says": "After hand-rear: headline 'N hand-reared'; the remaining count stays after a partial move"
                          }
                         ],
-                        "result": "blocked",
-                        "notes": [
-                         "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-                        ]
+                        "result": "pass"
                        }
                       ]
                      }
@@ -7481,10 +7379,7 @@
                   "says": "Saving the sow's death is hold-to-commit"
                  }
                 ],
-                "result": "blocked",
-                "notes": [
-                 "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-                ]
+                "result": "pass"
                }
               ]
              }
@@ -7507,6 +7402,11 @@
                 "id": "fa-m4-piglet-deaths-after-sow-died",
                 "label": "A piglet that dies is recorded through Record dead, and her count drops",
                 "tree": "M-4",
+                "gwt": {
+                 "given": "A sow died and her piglets are hand-reared on her record.",
+                 "when": "The worker records a piglet death through Record dead.",
+                 "then": "Alive drops from 7 to 6 and crushed rises from 1 to 2; born stays 10."
+                },
                 "authority": [
                  {
                   "src": "PRD",
@@ -7514,10 +7414,7 @@
                   "says": "A piglet that dies or is put down is recorded through Record dead, and the count drops"
                  }
                 ],
-                "result": "blocked",
-                "notes": [
-                 "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-                ]
+                "result": "pass"
                }
               ]
              }
@@ -7535,6 +7432,11 @@
               "id": "fa-m7-allocation-sheet-after-death",
               "label": "The sheet reads 'N piglets to allocate' with three options and Back (later)",
               "tree": "M-7",
+              "gwt": {
+               "given": "A sow's death was just recorded.",
+               "when": "The sheet changes after the hold.",
+               "then": "It reads 7 piglets to allocate with Move to other sows, Hand-rear here and Move to a rearing pen, and Back means later."
+              },
               "authority": [
                {
                 "src": "PRD",
@@ -7542,10 +7444,7 @@
                 "says": "Right after the hold records the death, the sheet becomes: title 'N piglets to allocate', subtitle '<ID> · <pen> · sow died <time>', three options; footer Back = later"
                }
               ],
-              "result": "blocked",
-              "notes": [
-               "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-              ]
+              "result": "pass"
              },
              {
               "type": "action",
@@ -7557,6 +7456,11 @@
                 "id": "fa-m8-all-fostered-she-leaves",
                 "label": "Every piglet fostered: she leaves the room list",
                 "tree": "M-8",
+                "gwt": {
+                 "given": "A dead sow has piglets to allocate.",
+                 "when": "The worker moves every piglet to other sows.",
+                 "then": "She leaves the room list."
+                },
                 "authority": [
                  {
                   "src": "PRD",
@@ -7564,10 +7468,7 @@
                   "says": "She leaves the room list once every piglet is on another sow, in a rearing pen, or recorded dead"
                  }
                 ],
-                "result": "blocked",
-                "notes": [
-                 "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-                ]
+                "result": "pass"
                },
                {
                 "type": "action",
@@ -7579,6 +7480,11 @@
                   "id": "fa-m9-overview-counts-who-left",
                   "label": "Task overview counts her under Left the task and the totals still add up",
                   "tree": "M-9",
+                  "gwt": {
+                   "given": "A dead sow has no piglets left to allocate.",
+                   "when": "The worker opens the Task overview.",
+                   "then": "It counts her under Left the task as 1 sow died, and the whole-task progress counts 18 sows."
+                  },
                   "authority": [
                    {
                     "src": "PRD",
@@ -7586,10 +7492,7 @@
                     "says": "Task overview counts sows that left the list: 'Left the task · n aborted · n sow died'; every total must still add up"
                    }
                   ],
-                  "result": "blocked",
-                  "notes": [
-                   "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-                  ]
+                  "result": "pass"
                  }
                 ]
                }
@@ -7603,8 +7506,13 @@
                {
                 "type": "outcome",
                 "id": "fa-m12-hand-reared-row-stays",
-                "label": "Her row shows the neutral tile \"7 / hand-reared\" and stays",
+                "label": "Her row says \"7 hand-reared\" over Sow died and stays",
                 "tree": "M-12",
+                "gwt": {
+                 "given": "A dead sow's piglets are chosen to be hand-reared.",
+                 "when": "The worker looks at the room list.",
+                 "then": "Her row says 7 hand-reared over Sow died and does not say to allocate."
+                },
                 "authority": [
                  {
                   "src": "PRD",
@@ -7612,10 +7520,7 @@
                   "says": "After hand-rear: headline 'N hand-reared' in ink; the row stays while hand-reared piglets remain"
                  }
                 ],
-                "result": "blocked",
-                "notes": [
-                 "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-                ]
+                "result": "pass"
                },
                {
                 "type": "action",
@@ -7627,6 +7532,11 @@
                   "id": "fa-m13-hand-reared-row-opens-record",
                   "label": "A hand-reared row opens her record, where piglet care continues",
                   "tree": "M-13",
+                  "gwt": {
+                   "given": "A dead sow's row says hand-reared.",
+                   "when": "The worker taps the row.",
+                   "then": "Her ended record opens, where piglet care continues."
+                  },
                   "authority": [
                    {
                     "src": "PRD",
@@ -7634,10 +7544,7 @@
                     "says": "After hand-rear the piglets stay on her record; piglet care continues"
                    }
                   ],
-                  "result": "blocked",
-                  "notes": [
-                   "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-                  ]
+                  "result": "pass"
                  }
                 ]
                }
@@ -7653,6 +7560,11 @@
                 "id": "fa-m14-rearing-pen-she-leaves",
                 "label": "All piglets in the rearing pen: she leaves the list",
                 "tree": "M-14",
+                "gwt": {
+                 "given": "A dead sow has piglets to allocate and the farm has a rearing pen.",
+                 "when": "The worker moves all piglets to the rearing pen.",
+                 "then": "She leaves the room list."
+                },
                 "authority": [
                  {
                   "src": "PRD",
@@ -7660,10 +7572,7 @@
                   "says": "Move to a rearing pen: shown when the farm has one; the piglets leave her record"
                  }
                 ],
-                "result": "blocked",
-                "notes": [
-                 "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-                ]
+                "result": "pass"
                }
               ]
              },
@@ -7675,8 +7584,13 @@
                {
                 "type": "outcome",
                 "id": "fa-m15-back-leaves-row-to-allocate",
-                "label": "Back leaves her row as a red \"to allocate\" tile; nothing was decided",
+                "label": "Back leaves her row saying \"7 to allocate\"; nothing was decided",
                 "tree": "M-15",
+                "gwt": {
+                 "given": "The allocation sheet is open for a dead sow with 7 piglets.",
+                 "when": "The worker goes Back without choosing.",
+                 "then": "Her row stays and says 7 to allocate."
+                },
                 "authority": [
                  {
                   "src": "PRD",
@@ -7684,10 +7598,7 @@
                   "says": "Footer Back = later: the room row reads 'N to allocate' in the to-do colour"
                  }
                 ],
-                "result": "blocked",
-                "notes": [
-                 "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-                ]
+                "result": "pass"
                }
               ]
              }
@@ -7705,6 +7616,11 @@
               "id": "fa-m16-no-rearing-pen-no-option",
               "label": "No rearing pen on the farm: the third option is absent",
               "tree": "M-16",
+              "gwt": {
+               "given": "The farm has no rearing pen.",
+               "when": "The allocation sheet opens.",
+               "then": "It offers Hand-rear here and Move to other sows, and no Move to a rearing pen."
+              },
               "authority": [
                {
                 "src": "PRD",
@@ -7712,10 +7628,7 @@
                 "says": "Move to a rearing pen: show only when farm config says the farm has one"
                }
               ],
-              "result": "blocked",
-              "notes": [
-               "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-              ]
+              "result": "pass"
              }
             ]
            },
@@ -7736,6 +7649,11 @@
                 "id": "fa-m20-abortion-no-live-leaves-list",
                 "label": "Abortion with no live piglets: she is not listed",
                 "tree": "M-20",
+                "gwt": {
+                 "given": "A sow in the room has no live piglets recorded.",
+                 "when": "The worker records an abortion.",
+                 "then": "She is not listed any more."
+                },
                 "authority": [
                  {
                   "src": "PRD",
@@ -7743,10 +7661,7 @@
                   "says": "Abortion: no live piglets, she leaves the room list immediately"
                  }
                 ],
-                "result": "blocked",
-                "notes": [
-                 "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-                ]
+                "result": "pass"
                },
                {
                 "type": "action",
@@ -7758,6 +7673,11 @@
                   "id": "fa-m21-overview-counts-aborted",
                   "label": "Task overview counts her: Left the task · 1 aborted",
                   "tree": "M-21",
+                  "gwt": {
+                   "given": "A sow with no live piglets has had an abortion recorded.",
+                   "when": "The worker opens the Task overview.",
+                   "then": "It counts her under Left the task as 1 aborted, and the whole-task progress counts 18 sows."
+                  },
                   "authority": [
                    {
                     "src": "PRD",
@@ -7765,10 +7685,7 @@
                     "says": "Task overview counts sows that left the list: 'Left the task · n aborted · n sow died'"
                    }
                   ],
-                  "result": "blocked",
-                  "notes": [
-                   "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-                  ]
+                  "result": "pass"
                  }
                 ]
                }
@@ -7791,8 +7708,13 @@
                {
                 "type": "outcome",
                 "id": "fa-m22-abortion-with-live-row-stays",
-                "label": "Abortion with 1 live piglet: the row stays, tile \"1 / alive\", facts Aborted",
+                "label": "Abortion with 1 live piglet: the row stays and says \"1 alive\" over Aborted",
                 "tree": "M-22",
+                "gwt": {
+                 "given": "A sow in the room has 1 live piglet recorded.",
+                 "when": "The worker records an abortion.",
+                 "then": "Her row stays and says 1 alive over Aborted, with no \"0 dead\"."
+                },
                 "authority": [
                  {
                   "src": "PRD",
@@ -7800,10 +7722,7 @@
                   "says": "Abortion: any live piglet, the row stays, chip Aborted, headline '1 alive' (recorded counts only)"
                  }
                 ],
-                "result": "blocked",
-                "notes": [
-                 "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-                ]
+                "result": "pass"
                }
               ]
              }
@@ -7845,10 +7764,7 @@
                   "says": "how many sows have farrowed, which are still going, which are still waiting"
                  }
                 ],
-                "result": "blocked",
-                "notes": [
-                 "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-                ]
+                "result": "pass"
                },
                {
                 "type": "action",
@@ -7920,10 +7836,7 @@
                   "says": "Task end: manual, hold-to-commit with receipt"
                  }
                 ],
-                "result": "blocked",
-                "notes": [
-                 "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-                ]
+                "result": "pass"
                }
               ]
              },
@@ -7954,10 +7867,7 @@
                   "says": "The exit word is always Back."
                  }
                 ],
-                "result": "blocked",
-                "notes": [
-                 "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-                ]
+                "result": "pass"
                },
                {
                 "type": "outcome",
@@ -7981,10 +7891,7 @@
                   "says": "Footer holds Back and Back to Today; recommendation: one exit Back"
                  }
                 ],
-                "result": "blocked",
-                "notes": [
-                 "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-                ]
+                "result": "pass"
                }
               ]
              }
@@ -8019,10 +7926,7 @@
                   "says": "Task end: manual, hold-to-commit with receipt"
                  }
                 ],
-                "result": "blocked",
-                "notes": [
-                 "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-                ]
+                "result": "pass"
                },
                {
                 "type": "decision-blocker",
@@ -8084,12 +7988,11 @@
          }
         ],
         "run": {
-         "commit": "0679ee1",
+         "commit": "b1c7dd3",
          "dirty": true,
-         "ran": "2026-10-10T15:18:44.894Z",
+         "ran": "2026-10-12T07:19:58.668Z",
          "langs": [
-          "en",
-          "zh"
+          "en"
          ],
          "widths": [
           390,

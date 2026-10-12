@@ -795,8 +795,8 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
 .st-animal-state[data-level="act"] .st-animal-figure{color:var(--red-ink);font-weight:var(--type-weight-strong)}
 .st-animal-state[data-level="act"] .st-animal-word{color:var(--red-ink);font-weight:var(--type-weight-semibold)}
 .st-animal-state[data-level="live"] .st-animal-figure{font-weight:var(--type-weight-strong)}
-.st-animal-state[data-level="settled"] .st-animal-figure{color:var(--muted)}
-.st-row[data-animal][disabled] .st-animal-id,.st-row[data-animal][disabled] .st-animal-figure{color:var(--muted)}
+.st-animal-state[data-level="settled"] .st-animal-figure{color:var(--ink-2);font-weight:var(--type-weight-regular)}
+.st-row[data-animal][disabled] .st-animal-id,.st-row[data-animal][disabled] .st-animal-figure{color:var(--ink-2)}
 .st-alert-dot{flex:none;width:var(--size-15);height:var(--size-15);color:var(--red-ink)}
 .st-alert-dot circle:first-child{fill:currentColor;stroke:none}
 .st-alert-dot rect,.st-alert-dot circle:last-child{fill:var(--paper);stroke:none}

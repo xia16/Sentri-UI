@@ -1,12 +1,11 @@
 {
  "feature": "farrowing",
- "commit": "0679ee1cb35940bce999ca208e2ce5f2cb29f42e",
+ "commit": "b1c7dd361fc2dcc3a3bf61f7e0d6ed71cab03d52",
  "dirty": true,
- "ran": "2026-10-10T15:18:44.894Z",
+ "ran": "2026-10-12T07:19:58.668Z",
  "base": "http://localhost:4418",
  "langs": [
-  "en",
-  "zh"
+  "en"
  ],
  "widths": [
   390,
@@ -20,9 +19,9 @@
   "decision-blocker": 5
  },
  "summary": {
-  "pass": 0,
+  "pass": 62,
   "fail": 0,
-  "blocked": 67,
+  "blocked": 5,
   "pending": 3
  },
  "byLang": {
@@ -30,48 +29,43 @@
    "pass": 62,
    "fail": 0,
    "blocked": 0
-  },
-  "zh": {
-   "pass": 0,
-   "fail": 0,
-   "blocked": 62
   }
  },
  "byBranch": {
   "room": {
-   "pass": 0,
+   "pass": 11,
    "fail": 0,
-   "blocked": 12,
+   "blocked": 1,
    "pending": 1
   },
   "counting": {
-   "pass": 0,
+   "pass": 17,
    "fail": 0,
-   "blocked": 17,
+   "blocked": 0,
    "pending": 2
   },
   "finish": {
-   "pass": 0,
+   "pass": 2,
    "fail": 0,
-   "blocked": 2,
+   "blocked": 0,
    "pending": 0
   },
   "edit": {
-   "pass": 0,
+   "pass": 8,
    "fail": 0,
-   "blocked": 9,
+   "blocked": 1,
    "pending": 0
   },
   "sow-death": {
-   "pass": 0,
+   "pass": 19,
    "fail": 0,
-   "blocked": 19,
+   "blocked": 0,
    "pending": 0
   },
   "task": {
-   "pass": 0,
+   "pass": 5,
    "fail": 0,
-   "blocked": 7,
+   "blocked": 2,
    "pending": 0
   },
   "scope": {
@@ -88,6 +82,11 @@
    "tree": "E-1",
    "branch": "room",
    "label": "Home's Farrowing card lands on the room list, not the Task overview",
+   "gwt": {
+    "given": "A worker is on Home, in the Farrowing section, looking at the whole-farm overview.",
+    "when": "They tap the Farrowing task card.",
+    "then": "The room list opens on top, with its Awaiting, Active, Done and All tabs in front. The Task overview is not shown over it."
+   },
    "path": [
     "room",
     "room.home",
@@ -101,7 +100,7 @@
      "says": "Home's Farrowing card and Choose unit both land on the room list."
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -127,38 +126,6 @@
       "review/scenarios/farrowing/fa-e1-home-lands-on-room/en-360/00-start.png",
       "review/scenarios/farrowing/fa-e1-home-lands-on-room/en-360/01-home-task-card-data-card-farrow2.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "the Task overview is not drawn over the room"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-e1-home-lands-on-room/zh-390/00-start.png",
-      "review/scenarios/farrowing/fa-e1-home-lands-on-room/zh-390/01-home-task-card-data-card-farrow2.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "the Task overview is not drawn over the room"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-e1-home-lands-on-room/zh-360/00-start.png",
-      "review/scenarios/farrowing/fa-e1-home-lands-on-room/zh-360/01-home-task-card-data-card-farrow2.png"
-     ]
     }
    ]
   },
@@ -167,6 +134,11 @@
    "tree": "E-2",
    "branch": "room",
    "label": "Choose unit → Unit 7's room list",
+   "gwt": {
+    "given": "A worker is on Home with the Choose unit list open.",
+    "when": "They pick Unit 7, then tap the Farrowing task card.",
+    "then": "Unit 7's room list opens, and the unit card names Unit 7."
+   },
    "path": [
     "room",
     "room.choose-unit",
@@ -180,7 +152,7 @@
      "says": "Home's Farrowing card and Choose unit both land on the room list."
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -208,40 +180,6 @@
       "review/scenarios/farrowing/fa-e2-choose-unit-lands-on-unit-room/en-360/01-data-action-pick-unit-data-value.png",
       "review/scenarios/farrowing/fa-e2-choose-unit-lands-on-unit-room/en-360/02-home-task-card-data-card-farrow2.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "the unit card names Unit 7"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-e2-choose-unit-lands-on-unit-room/zh-390/00-start.png",
-      "review/scenarios/farrowing/fa-e2-choose-unit-lands-on-unit-room/zh-390/01-data-action-pick-unit-data-value.png",
-      "review/scenarios/farrowing/fa-e2-choose-unit-lands-on-unit-room/zh-390/02-home-task-card-data-card-farrow2.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "the unit card names Unit 7"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-e2-choose-unit-lands-on-unit-room/zh-360/00-start.png",
-      "review/scenarios/farrowing/fa-e2-choose-unit-lands-on-unit-room/zh-360/01-data-action-pick-unit-data-value.png",
-      "review/scenarios/farrowing/fa-e2-choose-unit-lands-on-unit-room/zh-360/02-home-task-card-data-card-farrow2.png"
-     ]
     }
    ]
   },
@@ -250,6 +188,11 @@
    "tree": "E-3",
    "branch": "room",
    "label": "Awaiting lists only sows with nothing recorded",
+   "gwt": {
+    "given": "The room list for Unit 7 is open on All, with one sow awaiting, one farrowing and one done.",
+    "when": "The worker taps the Awaiting tab.",
+    "then": "Only sows with nothing recorded are listed. The awaiting sow (000392) is shown. The farrowing sow (000418) and the done sow (000406) are not."
+   },
    "path": [
     "room",
     "room.list",
@@ -268,7 +211,7 @@
      "says": "Awaiting / Active / Done / All tabs"
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -294,34 +237,6 @@
       "review/scenarios/farrowing/fa-e3-awaiting-tab-lists-awaiting-only/en-360/00-start.png",
       "review/scenarios/farrowing/fa-e3-awaiting-tab-lists-awaiting-only/en-360/01-data-action-room-lens-data-value.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-e3-awaiting-tab-lists-awaiting-only/zh-390/00-start.png",
-      "review/scenarios/farrowing/fa-e3-awaiting-tab-lists-awaiting-only/zh-390/01-data-action-room-lens-data-value.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-e3-awaiting-tab-lists-awaiting-only/zh-360/00-start.png",
-      "review/scenarios/farrowing/fa-e3-awaiting-tab-lists-awaiting-only/zh-360/01-data-action-room-lens-data-value.png"
-     ]
     }
    ]
   },
@@ -330,6 +245,11 @@
    "tree": "E-4",
    "branch": "room",
    "label": "Search by ear tag finds the sow and only her",
+   "gwt": {
+    "given": "The room list for Unit 7 is open with several sows.",
+    "when": "The worker opens Search and types 455.",
+    "then": "Sow 000455 is a result and she is the only one. Sow 000418 is not listed."
+   },
    "path": [
     "room",
     "room.list",
@@ -343,7 +263,7 @@
      "says": "Room list: … Go to pen, Scan ear tag, Search."
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -371,42 +291,6 @@
       "review/scenarios/farrowing/fa-e4-search-finds-sow/en-360/01-data-action-room-search.png",
       "review/scenarios/farrowing/fa-e4-search-finds-sow/en-360/02-fill-data-room-search.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "000455 is a result",
-      "000418 is not a result"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-e4-search-finds-sow/zh-390/00-start.png",
-      "review/scenarios/farrowing/fa-e4-search-finds-sow/zh-390/01-data-action-room-search.png",
-      "review/scenarios/farrowing/fa-e4-search-finds-sow/zh-390/02-fill-data-room-search.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "000455 is a result",
-      "000418 is not a result"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-e4-search-finds-sow/zh-360/00-start.png",
-      "review/scenarios/farrowing/fa-e4-search-finds-sow/zh-360/01-data-action-room-search.png",
-      "review/scenarios/farrowing/fa-e4-search-finds-sow/zh-360/02-fill-data-room-search.png"
-     ]
     }
    ]
   },
@@ -415,6 +299,11 @@
    "tree": "E-5",
    "branch": "room",
    "label": "The result opens her sheet on its Awaiting face",
+   "gwt": {
+    "given": "The worker has searched the room list for 455 and sow 000455 is the result.",
+    "when": "They tap the result.",
+    "then": "Her sheet opens on its Awaiting face: nothing recorded, born zero. It does not open on Counting."
+   },
    "path": [
     "room",
     "room.list",
@@ -434,7 +323,7 @@
      "says": "Awaiting (nothing recorded; live total zero)"
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -464,38 +353,6 @@
       "review/scenarios/farrowing/fa-e5-search-result-opens-awaiting-face/en-360/02-fill-data-room-search.png",
       "review/scenarios/farrowing/fa-e5-search-result-opens-awaiting-face/en-360/03-000455.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-e5-search-result-opens-awaiting-face/zh-390/00-start.png",
-      "review/scenarios/farrowing/fa-e5-search-result-opens-awaiting-face/zh-390/01-data-action-room-search.png",
-      "review/scenarios/farrowing/fa-e5-search-result-opens-awaiting-face/zh-390/02-fill-data-room-search.png",
-      "review/scenarios/farrowing/fa-e5-search-result-opens-awaiting-face/zh-390/03-000455.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-e5-search-result-opens-awaiting-face/zh-360/00-start.png",
-      "review/scenarios/farrowing/fa-e5-search-result-opens-awaiting-face/zh-360/01-data-action-room-search.png",
-      "review/scenarios/farrowing/fa-e5-search-result-opens-awaiting-face/zh-360/02-fill-data-room-search.png",
-      "review/scenarios/farrowing/fa-e5-search-result-opens-awaiting-face/zh-360/03-000455.png"
-     ]
     }
    ]
   },
@@ -504,6 +361,11 @@
    "tree": "E-6",
    "branch": "room",
    "label": "Parity 6+ leaves only the parity-6 sow",
+   "gwt": {
+    "given": "The room list for Unit 7 is open on All, with sows of different parities.",
+    "when": "The worker opens Filter, picks parity 6+ and applies it.",
+    "then": "Only the parity 6 sow (000431) stays in the list. The parity 5 sow (000392) is hidden."
+   },
    "path": [
     "room",
     "room.list",
@@ -517,7 +379,7 @@
      "says": "due and parity filter"
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -547,38 +409,6 @@
       "review/scenarios/farrowing/fa-e6-parity-filter/en-360/02-data-action-room-parity-data-val.png",
       "review/scenarios/farrowing/fa-e6-parity-filter/en-360/03-data-action-room-apply-filter.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-e6-parity-filter/zh-390/00-start.png",
-      "review/scenarios/farrowing/fa-e6-parity-filter/zh-390/01-data-action-room-filter.png",
-      "review/scenarios/farrowing/fa-e6-parity-filter/zh-390/02-data-action-room-parity-data-val.png",
-      "review/scenarios/farrowing/fa-e6-parity-filter/zh-390/03-data-action-room-apply-filter.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-e6-parity-filter/zh-360/00-start.png",
-      "review/scenarios/farrowing/fa-e6-parity-filter/zh-360/01-data-action-room-filter.png",
-      "review/scenarios/farrowing/fa-e6-parity-filter/zh-360/02-data-action-room-parity-data-val.png",
-      "review/scenarios/farrowing/fa-e6-parity-filter/zh-360/03-data-action-room-apply-filter.png"
-     ]
     }
    ]
   },
@@ -587,6 +417,7 @@
    "tree": "E-7",
    "branch": "room",
    "label": "Does the due-range filter hide Active and Done sows?",
+   "gwt": null,
    "path": [
     "room",
     "room.list",
@@ -614,6 +445,11 @@
    "tree": "E-8",
    "branch": "room",
    "label": "An active row opens Counting",
+   "gwt": {
+    "given": "The room list has a sow that is farrowing: something is recorded and she is not finished.",
+    "when": "The worker taps her row.",
+    "then": "Her sheet opens on Counting."
+   },
    "path": [
     "room",
     "room.list",
@@ -627,7 +463,7 @@
      "says": "Farrowing (live total above zero, not finished)"
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -653,34 +489,6 @@
       "review/scenarios/farrowing/fa-e8-active-row-opens-counting/en-360/00-start.png",
       "review/scenarios/farrowing/fa-e8-active-row-opens-counting/en-360/01-data-action-room-sow-data-value-.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-e8-active-row-opens-counting/zh-390/00-start.png",
-      "review/scenarios/farrowing/fa-e8-active-row-opens-counting/zh-390/01-data-action-room-sow-data-value-.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-e8-active-row-opens-counting/zh-360/00-start.png",
-      "review/scenarios/farrowing/fa-e8-active-row-opens-counting/zh-360/01-data-action-room-sow-data-value-.png"
-     ]
     }
    ]
   },
@@ -689,6 +497,11 @@
    "tree": "E-9",
    "branch": "room",
    "label": "A done row opens the locked record",
+   "gwt": {
+    "given": "The room list has a sow who has finished farrowing and is locked.",
+    "when": "The worker taps her row.",
+    "then": "Her locked record opens. It has no counting stepper."
+   },
    "path": [
     "room",
     "room.list",
@@ -702,7 +515,7 @@
      "says": "The record face IS the record"
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -728,34 +541,6 @@
       "review/scenarios/farrowing/fa-e9-done-row-opens-record/en-360/00-start.png",
       "review/scenarios/farrowing/fa-e9-done-row-opens-record/en-360/01-data-action-room-sow-data-value-.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-e9-done-row-opens-record/zh-390/00-start.png",
-      "review/scenarios/farrowing/fa-e9-done-row-opens-record/zh-390/01-data-action-room-sow-data-value-.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-e9-done-row-opens-record/zh-360/00-start.png",
-      "review/scenarios/farrowing/fa-e9-done-row-opens-record/zh-360/01-data-action-room-sow-data-value-.png"
-     ]
     }
    ]
   },
@@ -764,6 +549,11 @@
    "tree": "E-10",
    "branch": "room",
    "label": "A Sow died row with piglets to allocate opens the allocation sheet",
+   "gwt": {
+    "given": "The room list has a sow who died during farrowing, with piglets still to allocate. She stays in the room as a Sow died row.",
+    "when": "The worker taps her row.",
+    "then": "The allocation sheet opens and says how many piglets to allocate."
+   },
    "path": [
     "room",
     "room.list",
@@ -782,7 +572,7 @@
      "says": "Tapping the row opens the same sheet"
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -808,38 +598,6 @@
       "review/scenarios/farrowing/fa-e10-died-row-opens-ended-record/en-360/00-start.png",
       "review/scenarios/farrowing/fa-e10-died-row-opens-ended-record/en-360/01-data-action-room-sow-data-value-.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "\"piglets to allocate\" shown"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-e10-died-row-opens-ended-record/zh-390/00-start.png",
-      "review/scenarios/farrowing/fa-e10-died-row-opens-ended-record/zh-390/01-data-action-room-sow-data-value-.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "\"piglets to allocate\" shown"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-e10-died-row-opens-ended-record/zh-360/00-start.png",
-      "review/scenarios/farrowing/fa-e10-died-row-opens-ended-record/zh-360/01-data-action-room-sow-data-value-.png"
-     ]
     }
    ]
   },
@@ -848,6 +606,11 @@
    "tree": "E-11",
    "branch": "room",
    "label": "Scanning her ear tag opens her sheet",
+   "gwt": {
+    "given": "The room list is open and a sow in the room has an ear tag.",
+    "when": "The worker scans the ear tag.",
+    "then": "That sow's sheet opens."
+   },
    "path": [
     "room",
     "room.list",
@@ -870,6 +633,11 @@
    "tree": "E-12",
    "branch": "room",
    "label": "Rows show recorded counts only: no born, no zero dead, no pencil",
+   "gwt": {
+    "given": "The room list is open.",
+    "when": "The worker looks at the rows.",
+    "then": "Rows show recorded counts only: no \"born N\", no \"0 dead\" and no pencil."
+   },
    "path": [
     "room",
     "room.list",
@@ -882,7 +650,7 @@
      "says": "Rows show no born and no zero dead; no pencil on rows; tapping the row opens the record"
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -906,32 +674,6 @@
      "evidence": [
       "review/scenarios/farrowing/fa-e12-rows-recorded-counts-only/en-360/00-start.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-e12-rows-recorded-counts-only/zh-390/00-start.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-e12-rows-recorded-counts-only/zh-360/00-start.png"
-     ]
     }
    ]
   },
@@ -940,6 +682,11 @@
    "tree": "E-13",
    "branch": "room",
    "label": "Find a sow rows follow the same rules",
+   "gwt": {
+    "given": "Find a sow is open.",
+    "when": "The worker looks at the results.",
+    "then": "The result rows follow the same rules: no \"born N\", no \"0 dead\" and no pencil."
+   },
    "path": [
     "room",
     "room.list",
@@ -953,7 +700,7 @@
      "says": "The same rows in Find a sow and Scan results"
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -979,34 +726,6 @@
       "review/scenarios/farrowing/fa-e13-search-rows-recorded-counts-only/en-360/00-start.png",
       "review/scenarios/farrowing/fa-e13-search-rows-recorded-counts-only/en-360/01-data-action-room-search.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-e13-search-rows-recorded-counts-only/zh-390/00-start.png",
-      "review/scenarios/farrowing/fa-e13-search-rows-recorded-counts-only/zh-390/01-data-action-room-search.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-e13-search-rows-recorded-counts-only/zh-360/00-start.png",
-      "review/scenarios/farrowing/fa-e13-search-rows-recorded-counts-only/zh-360/01-data-action-room-search.png"
-     ]
     }
    ]
   },
@@ -1015,6 +734,11 @@
    "tree": "A-1",
    "branch": "counting",
    "label": "The first + makes her Farrowing; nothing else to press",
+   "gwt": {
+    "given": "Sow 000455 is open on her Awaiting face, with nothing recorded.",
+    "when": "The worker taps + once.",
+    "then": "She is now Farrowing and the count shows 1 alive and 1 born. There is nothing else to press to start."
+   },
    "path": [
     "counting",
     "counting.awaiting",
@@ -1028,7 +752,7 @@
      "says": "Farrowing starts at the first recorded event — full stop."
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -1054,34 +778,6 @@
       "review/scenarios/farrowing/fa-a1-first-piglet-starts-farrowing/en-360/00-start.png",
       "review/scenarios/farrowing/fa-a1-first-piglet-starts-farrowing/en-360/01-data-action-alive-data-value-1.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-a1-first-piglet-starts-farrowing/zh-390/00-start.png",
-      "review/scenarios/farrowing/fa-a1-first-piglet-starts-farrowing/zh-390/01-data-action-alive-data-value-1.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-a1-first-piglet-starts-farrowing/zh-360/00-start.png",
-      "review/scenarios/farrowing/fa-a1-first-piglet-starts-farrowing/zh-360/01-data-action-alive-data-value-1.png"
-     ]
     }
    ]
   },
@@ -1090,6 +786,11 @@
    "tree": "A-2",
    "branch": "counting",
    "label": "A stray + undone reads Awaiting again",
+   "gwt": {
+    "given": "Sow 000455 is Awaiting, with nothing recorded.",
+    "when": "The worker taps + once, then taps − once.",
+    "then": "She reads Awaiting again, with born back at zero."
+   },
    "path": [
     "counting",
     "counting.awaiting",
@@ -1104,7 +805,7 @@
      "says": "registers derive from the live total (posted + open pending)"
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -1132,36 +833,6 @@
       "review/scenarios/farrowing/fa-a2-recount-to-zero-reads-awaiting/en-360/01-data-action-alive-data-value-1.png",
       "review/scenarios/farrowing/fa-a2-recount-to-zero-reads-awaiting/en-360/02-data-action-alive-data-value-1.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-a2-recount-to-zero-reads-awaiting/zh-390/00-start.png",
-      "review/scenarios/farrowing/fa-a2-recount-to-zero-reads-awaiting/zh-390/01-data-action-alive-data-value-1.png",
-      "review/scenarios/farrowing/fa-a2-recount-to-zero-reads-awaiting/zh-390/02-data-action-alive-data-value-1.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-a2-recount-to-zero-reads-awaiting/zh-360/00-start.png",
-      "review/scenarios/farrowing/fa-a2-recount-to-zero-reads-awaiting/zh-360/01-data-action-alive-data-value-1.png",
-      "review/scenarios/farrowing/fa-a2-recount-to-zero-reads-awaiting/zh-360/02-data-action-alive-data-value-1.png"
-     ]
     }
    ]
   },
@@ -1170,6 +841,11 @@
    "tree": "A-3",
    "branch": "counting",
    "label": "A stillborn can be the first record; she becomes Farrowing",
+   "gwt": {
+    "given": "Sow 000455 is Awaiting, with nothing recorded.",
+    "when": "The worker opens Record dead, adds one stillborn and saves.",
+    "then": "She becomes Farrowing. One stillborn is posted and born is 1."
+   },
    "path": [
     "counting",
     "counting.awaiting",
@@ -1183,7 +859,7 @@
      "says": "Record dead live (a stillborn can be the first record)"
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -1213,38 +889,6 @@
       "review/scenarios/farrowing/fa-a3-stillborn-first-record/en-360/02-data-action-deadstep-data-value-.png",
       "review/scenarios/farrowing/fa-a3-stillborn-first-record/en-360/03-data-action-savedeath.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-a3-stillborn-first-record/zh-390/00-start.png",
-      "review/scenarios/farrowing/fa-a3-stillborn-first-record/zh-390/01-data-action-death.png",
-      "review/scenarios/farrowing/fa-a3-stillborn-first-record/zh-390/02-data-action-deadstep-data-value-.png",
-      "review/scenarios/farrowing/fa-a3-stillborn-first-record/zh-390/03-data-action-savedeath.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-a3-stillborn-first-record/zh-360/00-start.png",
-      "review/scenarios/farrowing/fa-a3-stillborn-first-record/zh-360/01-data-action-death.png",
-      "review/scenarios/farrowing/fa-a3-stillborn-first-record/zh-360/02-data-action-deadstep-data-value-.png",
-      "review/scenarios/farrowing/fa-a3-stillborn-first-record/zh-360/03-data-action-savedeath.png"
-     ]
     }
    ]
   },
@@ -1253,6 +897,11 @@
    "tree": "C-1",
    "branch": "counting",
    "label": "The receipt says the visit is saved",
+   "gwt": {
+    "given": "Sow 000418 is Farrowing with 9 alive and 5 dead, and 4 piglets were added in this visit.",
+    "when": "The worker looks at the counting sheet.",
+    "then": "The receipt says the visit is saved: +4 this visit, Saved."
+   },
    "path": [
     "counting",
     "counting.active",
@@ -1265,7 +914,7 @@
      "says": "Saved · +4 this visit"
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -1289,38 +938,6 @@
      "evidence": [
       "review/scenarios/farrowing/fa-c1-receipt-says-saved/en-360/00-start.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "\"+4 this visit\" shown",
-      "\"Saved\" shown"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-c1-receipt-says-saved/zh-390/00-start.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "\"+4 this visit\" shown",
-      "\"Saved\" shown"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-c1-receipt-says-saved/zh-360/00-start.png"
-     ]
     }
    ]
   },
@@ -1329,6 +946,11 @@
    "tree": "C-2",
    "branch": "counting",
    "label": "The death tool reads Record dead",
+   "gwt": {
+    "given": "Sow 000418 is Farrowing and her counting sheet is open.",
+    "when": "The worker looks for the tool that records deaths.",
+    "then": "It is called Record dead."
+   },
    "path": [
     "counting",
     "counting.active",
@@ -1346,7 +968,7 @@
      "says": "recommendation: Record dead, as ruled"
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -1370,36 +992,6 @@
      "evidence": [
       "review/scenarios/farrowing/fa-c2-tool-reads-record-dead/en-360/00-start.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "\"Record dead\" shown"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-c2-tool-reads-record-dead/zh-390/00-start.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "\"Record dead\" shown"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-c2-tool-reads-record-dead/zh-360/00-start.png"
-     ]
     }
    ]
   },
@@ -1408,6 +1000,11 @@
    "tree": "C-3",
    "branch": "counting",
    "label": "− drains the visit and stops at the floor; Born never drops silently",
+   "gwt": {
+    "given": "Sow 000418 is Farrowing with 9 alive and 5 dead, and 4 piglets were added in this visit. Born was 10 before the visit.",
+    "when": "The worker taps − four times.",
+    "then": "The visit's four piglets come off and − stops there. Alive is 5 and born stays at 10. − is greyed. Born never drops silently."
+   },
    "path": [
     "counting",
     "counting.active",
@@ -1421,7 +1018,7 @@
      "says": "+ is free; − drains pending and clamps at the floor"
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -1453,40 +1050,6 @@
       "review/scenarios/farrowing/fa-c3-minus-clamps-at-floor/en-360/03-data-action-alive-data-value-1.png",
       "review/scenarios/farrowing/fa-c3-minus-clamps-at-floor/en-360/04-data-action-alive-data-value-1.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-c3-minus-clamps-at-floor/zh-390/00-start.png",
-      "review/scenarios/farrowing/fa-c3-minus-clamps-at-floor/zh-390/01-data-action-alive-data-value-1.png",
-      "review/scenarios/farrowing/fa-c3-minus-clamps-at-floor/zh-390/02-data-action-alive-data-value-1.png",
-      "review/scenarios/farrowing/fa-c3-minus-clamps-at-floor/zh-390/03-data-action-alive-data-value-1.png",
-      "review/scenarios/farrowing/fa-c3-minus-clamps-at-floor/zh-390/04-data-action-alive-data-value-1.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-c3-minus-clamps-at-floor/zh-360/00-start.png",
-      "review/scenarios/farrowing/fa-c3-minus-clamps-at-floor/zh-360/01-data-action-alive-data-value-1.png",
-      "review/scenarios/farrowing/fa-c3-minus-clamps-at-floor/zh-360/02-data-action-alive-data-value-1.png",
-      "review/scenarios/farrowing/fa-c3-minus-clamps-at-floor/zh-360/03-data-action-alive-data-value-1.png",
-      "review/scenarios/farrowing/fa-c3-minus-clamps-at-floor/zh-360/04-data-action-alive-data-value-1.png"
-     ]
     }
    ]
   },
@@ -1495,6 +1058,11 @@
    "tree": "C-4",
    "branch": "counting",
    "label": "After ~90 min idle the visit folds into one log line",
+   "gwt": {
+    "given": "Sow 000418 is Farrowing and has an open visit with piglets added in it.",
+    "when": "About 90 minutes pass with no one touching the sow.",
+    "then": "The visit folds into one log line."
+   },
    "path": [
     "counting",
     "counting.active",
@@ -1517,6 +1085,11 @@
    "tree": "D-1",
    "branch": "counting",
    "label": "Back keeps the draft on the device; the host says 1 unsaved; posted deaths unchanged",
+   "gwt": {
+    "given": "Sow 000418 is Farrowing and the Record dead drawer is open with 1 crushed piglet added but not saved.",
+    "when": "The worker taps Back.",
+    "then": "Counting is shown again. The draft stays on the device and the Record dead tool says 1 unsaved. Posted deaths are unchanged."
+   },
    "path": [
     "counting",
     "counting.active",
@@ -1541,7 +1114,7 @@
      "says": "leave a screen and keep any draft on the device"
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -1571,44 +1144,6 @@
       "review/scenarios/farrowing/fa-d1-back-keeps-death-draft/en-360/02-data-action-deadstep-data-value-.png",
       "review/scenarios/farrowing/fa-d1-back-keeps-death-draft/en-360/03-data-action-back.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "the drawer says 1 unsaved",
-      "the Record dead tool stacks 1 unsaved"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-d1-back-keeps-death-draft/zh-390/00-start.png",
-      "review/scenarios/farrowing/fa-d1-back-keeps-death-draft/zh-390/01-data-action-death.png",
-      "review/scenarios/farrowing/fa-d1-back-keeps-death-draft/zh-390/02-data-action-deadstep-data-value-.png",
-      "review/scenarios/farrowing/fa-d1-back-keeps-death-draft/zh-390/03-data-action-back.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "the drawer says 1 unsaved",
-      "the Record dead tool stacks 1 unsaved"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-d1-back-keeps-death-draft/zh-360/00-start.png",
-      "review/scenarios/farrowing/fa-d1-back-keeps-death-draft/zh-360/01-data-action-death.png",
-      "review/scenarios/farrowing/fa-d1-back-keeps-death-draft/zh-360/02-data-action-deadstep-data-value-.png",
-      "review/scenarios/farrowing/fa-d1-back-keeps-death-draft/zh-360/03-data-action-back.png"
-     ]
     }
    ]
   },
@@ -1617,6 +1152,11 @@
    "tree": "D-2",
    "branch": "counting",
    "label": "Reopening the drawer shows the draft, still 1 unsaved (in muted ink)",
+   "gwt": {
+    "given": "The worker left the Record dead drawer with Back while 1 crushed piglet was unsaved.",
+    "when": "They open Record dead again.",
+    "then": "The draft is still there and the drawer says 1 unsaved, in muted ink and not in the green used for recorded counts. Posted deaths are unchanged."
+   },
    "path": [
     "counting",
     "counting.active",
@@ -1637,7 +1177,7 @@
      "says": "No green for drafts: an unsaved draft is muted ink, never the recorded green."
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -1669,46 +1209,6 @@
       "review/scenarios/farrowing/fa-d2-reopen-restores-draft/en-360/03-data-action-back.png",
       "review/scenarios/farrowing/fa-d2-reopen-restores-draft/en-360/04-data-action-death.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "the drawer says 1 unsaved",
-      "\"1 unsaved\" shown"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-d2-reopen-restores-draft/zh-390/00-start.png",
-      "review/scenarios/farrowing/fa-d2-reopen-restores-draft/zh-390/01-data-action-death.png",
-      "review/scenarios/farrowing/fa-d2-reopen-restores-draft/zh-390/02-data-action-deadstep-data-value-.png",
-      "review/scenarios/farrowing/fa-d2-reopen-restores-draft/zh-390/03-data-action-back.png",
-      "review/scenarios/farrowing/fa-d2-reopen-restores-draft/zh-390/04-data-action-death.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "the drawer says 1 unsaved",
-      "\"1 unsaved\" shown"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-d2-reopen-restores-draft/zh-360/00-start.png",
-      "review/scenarios/farrowing/fa-d2-reopen-restores-draft/zh-360/01-data-action-death.png",
-      "review/scenarios/farrowing/fa-d2-reopen-restores-draft/zh-360/02-data-action-deadstep-data-value-.png",
-      "review/scenarios/farrowing/fa-d2-reopen-restores-draft/zh-360/03-data-action-back.png",
-      "review/scenarios/farrowing/fa-d2-reopen-restores-draft/zh-360/04-data-action-death.png"
-     ]
     }
    ]
   },
@@ -1717,6 +1217,11 @@
    "tree": "D-3",
    "branch": "counting",
    "label": "Resuming adds to the kept draft (2 unsaved), nothing posted",
+   "gwt": {
+    "given": "The worker reopened Record dead and the kept draft holds 1 crushed piglet.",
+    "when": "They add one more crushed piglet.",
+    "then": "The drawer says 2 unsaved. Nothing is posted, and posted crushed deaths stay at 2."
+   },
    "path": [
     "counting",
     "counting.active",
@@ -1733,7 +1238,7 @@
      "says": "tallies and the cause are a DRAFT until Save"
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -1767,48 +1272,6 @@
       "review/scenarios/farrowing/fa-d3-resume-adds-to-draft/en-360/04-data-action-death.png",
       "review/scenarios/farrowing/fa-d3-resume-adds-to-draft/en-360/05-data-action-deadstep-data-value-.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "the drawer says 1 unsaved",
-      "\"2 unsaved\" shown"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-d3-resume-adds-to-draft/zh-390/00-start.png",
-      "review/scenarios/farrowing/fa-d3-resume-adds-to-draft/zh-390/01-data-action-death.png",
-      "review/scenarios/farrowing/fa-d3-resume-adds-to-draft/zh-390/02-data-action-deadstep-data-value-.png",
-      "review/scenarios/farrowing/fa-d3-resume-adds-to-draft/zh-390/03-data-action-back.png",
-      "review/scenarios/farrowing/fa-d3-resume-adds-to-draft/zh-390/04-data-action-death.png",
-      "review/scenarios/farrowing/fa-d3-resume-adds-to-draft/zh-390/05-data-action-deadstep-data-value-.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "the drawer says 1 unsaved",
-      "\"2 unsaved\" shown"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-d3-resume-adds-to-draft/zh-360/00-start.png",
-      "review/scenarios/farrowing/fa-d3-resume-adds-to-draft/zh-360/01-data-action-death.png",
-      "review/scenarios/farrowing/fa-d3-resume-adds-to-draft/zh-360/02-data-action-deadstep-data-value-.png",
-      "review/scenarios/farrowing/fa-d3-resume-adds-to-draft/zh-360/03-data-action-back.png",
-      "review/scenarios/farrowing/fa-d3-resume-adds-to-draft/zh-360/04-data-action-death.png",
-      "review/scenarios/farrowing/fa-d3-resume-adds-to-draft/zh-360/05-data-action-deadstep-data-value-.png"
-     ]
     }
    ]
   },
@@ -1817,6 +1280,11 @@
    "tree": "D-4",
    "branch": "counting",
    "label": "Clear discards the draft; posted deaths unchanged; Clear disappears",
+   "gwt": {
+    "given": "The worker reopened Record dead and the kept draft holds 1 crushed piglet.",
+    "when": "They tap Clear.",
+    "then": "The draft is gone and the drawer no longer says unsaved. Clear disappears with it. Posted deaths are unchanged."
+   },
    "path": [
     "counting",
     "counting.active",
@@ -1833,7 +1301,7 @@
      "says": "Clear discards the draft (a text action on the title row, present only while a draft exists)"
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -1867,48 +1335,6 @@
       "review/scenarios/farrowing/fa-d4-clear-discards-draft/en-360/04-data-action-death.png",
       "review/scenarios/farrowing/fa-d4-clear-discards-draft/en-360/05-data-action-cleardeath.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "the drawer says 1 unsaved",
-      "\"unsaved\" absent"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-d4-clear-discards-draft/zh-390/00-start.png",
-      "review/scenarios/farrowing/fa-d4-clear-discards-draft/zh-390/01-data-action-death.png",
-      "review/scenarios/farrowing/fa-d4-clear-discards-draft/zh-390/02-data-action-deadstep-data-value-.png",
-      "review/scenarios/farrowing/fa-d4-clear-discards-draft/zh-390/03-data-action-back.png",
-      "review/scenarios/farrowing/fa-d4-clear-discards-draft/zh-390/04-data-action-death.png",
-      "review/scenarios/farrowing/fa-d4-clear-discards-draft/zh-390/05-data-action-cleardeath.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "the drawer says 1 unsaved",
-      "\"unsaved\" absent"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-d4-clear-discards-draft/zh-360/00-start.png",
-      "review/scenarios/farrowing/fa-d4-clear-discards-draft/zh-360/01-data-action-death.png",
-      "review/scenarios/farrowing/fa-d4-clear-discards-draft/zh-360/02-data-action-deadstep-data-value-.png",
-      "review/scenarios/farrowing/fa-d4-clear-discards-draft/zh-360/03-data-action-back.png",
-      "review/scenarios/farrowing/fa-d4-clear-discards-draft/zh-360/04-data-action-death.png",
-      "review/scenarios/farrowing/fa-d4-clear-discards-draft/zh-360/05-data-action-cleardeath.png"
-     ]
     }
    ]
   },
@@ -1917,6 +1343,11 @@
    "tree": "D-5",
    "branch": "counting",
    "label": "Save posts the kept draft as one stamped event and empties it",
+   "gwt": {
+    "given": "The worker reopened Record dead and the kept draft holds 1 crushed piglet.",
+    "when": "They tap Save.",
+    "then": "The draft is posted as one stamped event, so crushed deaths go from 2 to 3. The draft is empty, the sheet returns to Counting, and the newest log line is the crushed death with its time and who."
+   },
    "path": [
     "counting",
     "counting.active",
@@ -1933,7 +1364,7 @@
      "says": "Save commits the draft as one stamped event"
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -1967,48 +1398,6 @@
       "review/scenarios/farrowing/fa-d5-save-posts-one-event/en-360/04-data-action-death.png",
       "review/scenarios/farrowing/fa-d5-save-posts-one-event/en-360/05-data-action-savedeath.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "the drawer says 1 unsaved",
-      "\"unsaved\" absent"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-d5-save-posts-one-event/zh-390/00-start.png",
-      "review/scenarios/farrowing/fa-d5-save-posts-one-event/zh-390/01-data-action-death.png",
-      "review/scenarios/farrowing/fa-d5-save-posts-one-event/zh-390/02-data-action-deadstep-data-value-.png",
-      "review/scenarios/farrowing/fa-d5-save-posts-one-event/zh-390/03-data-action-back.png",
-      "review/scenarios/farrowing/fa-d5-save-posts-one-event/zh-390/04-data-action-death.png",
-      "review/scenarios/farrowing/fa-d5-save-posts-one-event/zh-390/05-data-action-savedeath.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "the drawer says 1 unsaved",
-      "\"unsaved\" absent"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-d5-save-posts-one-event/zh-360/00-start.png",
-      "review/scenarios/farrowing/fa-d5-save-posts-one-event/zh-360/01-data-action-death.png",
-      "review/scenarios/farrowing/fa-d5-save-posts-one-event/zh-360/02-data-action-deadstep-data-value-.png",
-      "review/scenarios/farrowing/fa-d5-save-posts-one-event/zh-360/03-data-action-back.png",
-      "review/scenarios/farrowing/fa-d5-save-posts-one-event/zh-360/04-data-action-death.png",
-      "review/scenarios/farrowing/fa-d5-save-posts-one-event/zh-360/05-data-action-savedeath.png"
-     ]
     }
    ]
   },
@@ -2017,6 +1406,11 @@
    "tree": "F-2",
    "branch": "counting",
    "label": "A draft never crosses the lock: with the draft waiting nothing locks",
+   "gwt": {
+    "given": "Sow 000418 is Farrowing and a death draft is waiting on the device.",
+    "when": "The worker holds Finish farrowing.",
+    "then": "Nothing locks. The sow is not finished and the draft is still there."
+   },
    "path": [
     "counting",
     "counting.active",
@@ -2037,7 +1431,7 @@
      "says": "Finish waits while a death draft is open; there is no lock to hold."
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -2069,44 +1463,6 @@
       "review/scenarios/farrowing/fa-f2-draft-never-crosses-lock/en-360/03-data-action-back.png",
       "review/scenarios/farrowing/fa-f2-draft-never-crosses-lock/en-360/04-data-action-finish.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "the drawer says 1 unsaved"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-f2-draft-never-crosses-lock/zh-390/00-start.png",
-      "review/scenarios/farrowing/fa-f2-draft-never-crosses-lock/zh-390/01-data-action-death.png",
-      "review/scenarios/farrowing/fa-f2-draft-never-crosses-lock/zh-390/02-data-action-deadstep-data-value-.png",
-      "review/scenarios/farrowing/fa-f2-draft-never-crosses-lock/zh-390/03-data-action-back.png",
-      "review/scenarios/farrowing/fa-f2-draft-never-crosses-lock/zh-390/04-data-action-finish.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "the drawer says 1 unsaved"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-f2-draft-never-crosses-lock/zh-360/00-start.png",
-      "review/scenarios/farrowing/fa-f2-draft-never-crosses-lock/zh-360/01-data-action-death.png",
-      "review/scenarios/farrowing/fa-f2-draft-never-crosses-lock/zh-360/02-data-action-deadstep-data-value-.png",
-      "review/scenarios/farrowing/fa-f2-draft-never-crosses-lock/zh-360/03-data-action-back.png",
-      "review/scenarios/farrowing/fa-f2-draft-never-crosses-lock/zh-360/04-data-action-finish.png"
-     ]
     }
    ]
   },
@@ -2115,6 +1471,11 @@
    "tree": "F-1",
    "branch": "counting",
    "label": "With a death draft waiting, Finish waits; tapping it brings you to the Record dead tool, which says 1 unsaved",
+   "gwt": {
+    "given": "Sow 000418 is Farrowing and a death draft of 1 is waiting on the device.",
+    "when": "The worker taps Finish farrowing.",
+    "then": "Finish waits and takes them to the Record dead tool, which says 1 unsaved. The sow is not locked, there is no lock to hold, and the draft is still there."
+   },
    "path": [
     "counting",
     "counting.active",
@@ -2135,7 +1496,7 @@
      "says": "A death draft still blocks Finish, shown as the design system now draws it: Finish disabled, its tap leads to Record dead (1 unsaved). No banner, no reason line."
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -2167,46 +1528,6 @@
       "review/scenarios/farrowing/fa-f1-finish-blocked-by-death-draft/en-360/03-data-action-back.png",
       "review/scenarios/farrowing/fa-f1-finish-blocked-by-death-draft/en-360/04-data-action-finish.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "the drawer says 1 unsaved",
-      "the tool says 1 unsaved"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-f1-finish-blocked-by-death-draft/zh-390/00-start.png",
-      "review/scenarios/farrowing/fa-f1-finish-blocked-by-death-draft/zh-390/01-data-action-death.png",
-      "review/scenarios/farrowing/fa-f1-finish-blocked-by-death-draft/zh-390/02-data-action-deadstep-data-value-.png",
-      "review/scenarios/farrowing/fa-f1-finish-blocked-by-death-draft/zh-390/03-data-action-back.png",
-      "review/scenarios/farrowing/fa-f1-finish-blocked-by-death-draft/zh-390/04-data-action-finish.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "the drawer says 1 unsaved",
-      "the tool says 1 unsaved"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-f1-finish-blocked-by-death-draft/zh-360/00-start.png",
-      "review/scenarios/farrowing/fa-f1-finish-blocked-by-death-draft/zh-360/01-data-action-death.png",
-      "review/scenarios/farrowing/fa-f1-finish-blocked-by-death-draft/zh-360/02-data-action-deadstep-data-value-.png",
-      "review/scenarios/farrowing/fa-f1-finish-blocked-by-death-draft/zh-360/03-data-action-back.png",
-      "review/scenarios/farrowing/fa-f1-finish-blocked-by-death-draft/zh-360/04-data-action-finish.png"
-     ]
     }
    ]
   },
@@ -2215,6 +1536,11 @@
    "tree": "F-3",
    "branch": "counting",
    "label": "Once the draft is saved, Finish is live and the lock can be held",
+   "gwt": {
+    "given": "A death draft blocked Finish, and the worker saved it in Record dead.",
+    "when": "They open Finish farrowing.",
+    "then": "The Finish sheet opens and its lock control is live, so the lock can be held."
+   },
    "path": [
     "counting",
     "counting.active",
@@ -2231,7 +1557,7 @@
      "says": "this is a guard on the lock, not a gate on recording"
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -2267,48 +1593,6 @@
       "review/scenarios/farrowing/fa-f3-resolved-finish-unblocked/en-360/05-data-action-savedeath.png",
       "review/scenarios/farrowing/fa-f3-resolved-finish-unblocked/en-360/06-data-action-finish.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "the drawer says 1 unsaved"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-f3-resolved-finish-unblocked/zh-390/00-start.png",
-      "review/scenarios/farrowing/fa-f3-resolved-finish-unblocked/zh-390/01-data-action-death.png",
-      "review/scenarios/farrowing/fa-f3-resolved-finish-unblocked/zh-390/02-data-action-deadstep-data-value-.png",
-      "review/scenarios/farrowing/fa-f3-resolved-finish-unblocked/zh-390/03-data-action-back.png",
-      "review/scenarios/farrowing/fa-f3-resolved-finish-unblocked/zh-390/04-data-action-finish.png",
-      "review/scenarios/farrowing/fa-f3-resolved-finish-unblocked/zh-390/05-data-action-savedeath.png",
-      "review/scenarios/farrowing/fa-f3-resolved-finish-unblocked/zh-390/06-data-action-finish.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "the drawer says 1 unsaved"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-f3-resolved-finish-unblocked/zh-360/00-start.png",
-      "review/scenarios/farrowing/fa-f3-resolved-finish-unblocked/zh-360/01-data-action-death.png",
-      "review/scenarios/farrowing/fa-f3-resolved-finish-unblocked/zh-360/02-data-action-deadstep-data-value-.png",
-      "review/scenarios/farrowing/fa-f3-resolved-finish-unblocked/zh-360/03-data-action-back.png",
-      "review/scenarios/farrowing/fa-f3-resolved-finish-unblocked/zh-360/04-data-action-finish.png",
-      "review/scenarios/farrowing/fa-f3-resolved-finish-unblocked/zh-360/05-data-action-savedeath.png",
-      "review/scenarios/farrowing/fa-f3-resolved-finish-unblocked/zh-360/06-data-action-finish.png"
-     ]
     }
    ]
   },
@@ -2317,6 +1601,11 @@
    "tree": "F-4",
    "branch": "counting",
    "label": "The hold locks Born (15, with the saved death) and opens the record",
+   "gwt": {
+    "given": "The worker saved the death draft and the Finish sheet is open with its lock live.",
+    "when": "They hold Finish farrowing until it commits.",
+    "then": "Born locks at 15, counting the saved death. The locked record opens and has no counting stepper."
+   },
    "path": [
     "counting",
     "counting.active",
@@ -2339,7 +1628,7 @@
      "says": "Lock born N is hold-to-commit"
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -2377,50 +1666,6 @@
       "review/scenarios/farrowing/fa-f4-lock-gives-locked-record/en-360/06-data-action-finish.png",
       "review/scenarios/farrowing/fa-f4-lock-gives-locked-record/en-360/07-data-action-lock.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "the drawer says 1 unsaved"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-f4-lock-gives-locked-record/zh-390/00-start.png",
-      "review/scenarios/farrowing/fa-f4-lock-gives-locked-record/zh-390/01-data-action-death.png",
-      "review/scenarios/farrowing/fa-f4-lock-gives-locked-record/zh-390/02-data-action-deadstep-data-value-.png",
-      "review/scenarios/farrowing/fa-f4-lock-gives-locked-record/zh-390/03-data-action-back.png",
-      "review/scenarios/farrowing/fa-f4-lock-gives-locked-record/zh-390/04-data-action-finish.png",
-      "review/scenarios/farrowing/fa-f4-lock-gives-locked-record/zh-390/05-data-action-savedeath.png",
-      "review/scenarios/farrowing/fa-f4-lock-gives-locked-record/zh-390/06-data-action-finish.png",
-      "review/scenarios/farrowing/fa-f4-lock-gives-locked-record/zh-390/07-data-action-lock.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "the drawer says 1 unsaved"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-f4-lock-gives-locked-record/zh-360/00-start.png",
-      "review/scenarios/farrowing/fa-f4-lock-gives-locked-record/zh-360/01-data-action-death.png",
-      "review/scenarios/farrowing/fa-f4-lock-gives-locked-record/zh-360/02-data-action-deadstep-data-value-.png",
-      "review/scenarios/farrowing/fa-f4-lock-gives-locked-record/zh-360/03-data-action-back.png",
-      "review/scenarios/farrowing/fa-f4-lock-gives-locked-record/zh-360/04-data-action-finish.png",
-      "review/scenarios/farrowing/fa-f4-lock-gives-locked-record/zh-360/05-data-action-savedeath.png",
-      "review/scenarios/farrowing/fa-f4-lock-gives-locked-record/zh-360/06-data-action-finish.png",
-      "review/scenarios/farrowing/fa-f4-lock-gives-locked-record/zh-360/07-data-action-lock.png"
-     ]
     }
    ]
   },
@@ -2429,6 +1674,11 @@
    "tree": "D-6",
    "branch": "counting",
    "label": "Dismissing the drawer (its handle or the scrim) keeps the draft like Back",
+   "gwt": {
+    "given": "The Record dead drawer is open with 1 crushed piglet added but not saved.",
+    "when": "The worker dismisses the drawer by its handle (the scrim does the same).",
+    "then": "The draft is kept, exactly as with Back: 1 crushed piglet is still unsaved."
+   },
    "path": [
     "counting",
     "counting.active",
@@ -2448,7 +1698,7 @@
      "says": "Drawers have no ✕: the footer Back is the exit; swiping down on the handle or tapping the scrim is Back."
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -2478,42 +1728,6 @@
       "review/scenarios/farrowing/fa-d6-dismiss-keeps-death-draft/en-360/02-data-action-deadstep-data-value-.png",
       "review/scenarios/farrowing/fa-d6-dismiss-keeps-death-draft/en-360/03-grab.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "the drawer says 1 unsaved"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-d6-dismiss-keeps-death-draft/zh-390/00-start.png",
-      "review/scenarios/farrowing/fa-d6-dismiss-keeps-death-draft/zh-390/01-data-action-death.png",
-      "review/scenarios/farrowing/fa-d6-dismiss-keeps-death-draft/zh-390/02-data-action-deadstep-data-value-.png",
-      "review/scenarios/farrowing/fa-d6-dismiss-keeps-death-draft/zh-390/03-grab.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "the drawer says 1 unsaved"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-d6-dismiss-keeps-death-draft/zh-360/00-start.png",
-      "review/scenarios/farrowing/fa-d6-dismiss-keeps-death-draft/zh-360/01-data-action-death.png",
-      "review/scenarios/farrowing/fa-d6-dismiss-keeps-death-draft/zh-360/02-data-action-deadstep-data-value-.png",
-      "review/scenarios/farrowing/fa-d6-dismiss-keeps-death-draft/zh-360/03-grab.png"
-     ]
     }
    ]
   },
@@ -2522,6 +1736,11 @@
    "tree": "D-7",
    "branch": "counting",
    "label": "A restart keeps the draft on the device",
+   "gwt": {
+    "given": "The worker left the Record dead drawer with 1 crushed piglet unsaved.",
+    "when": "The app is closed and opened again on the same device.",
+    "then": "The draft is still on the device with 1 crushed piglet."
+   },
    "path": [
     "counting",
     "counting.active",
@@ -2536,7 +1755,7 @@
      "says": "Back and the dismiss gesture … KEEP the draft on the device (persisted across background and restart)"
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -2566,42 +1785,6 @@
       "review/scenarios/farrowing/fa-d7-restart-keeps-death-draft/en-360/02-data-action-deadstep-data-value-.png",
       "review/scenarios/farrowing/fa-d7-restart-keeps-death-draft/en-360/03-reload.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "the drawer says 1 unsaved"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-d7-restart-keeps-death-draft/zh-390/00-start.png",
-      "review/scenarios/farrowing/fa-d7-restart-keeps-death-draft/zh-390/01-data-action-death.png",
-      "review/scenarios/farrowing/fa-d7-restart-keeps-death-draft/zh-390/02-data-action-deadstep-data-value-.png",
-      "review/scenarios/farrowing/fa-d7-restart-keeps-death-draft/zh-390/03-reload.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "the drawer says 1 unsaved"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-d7-restart-keeps-death-draft/zh-360/00-start.png",
-      "review/scenarios/farrowing/fa-d7-restart-keeps-death-draft/zh-360/01-data-action-death.png",
-      "review/scenarios/farrowing/fa-d7-restart-keeps-death-draft/zh-360/02-data-action-deadstep-data-value-.png",
-      "review/scenarios/farrowing/fa-d7-restart-keeps-death-draft/zh-360/03-reload.png"
-     ]
     }
    ]
   },
@@ -2610,6 +1793,11 @@
    "tree": "D-9",
    "branch": "counting",
    "label": "Two phones saving deaths on one litter merge as signed deltas; a floor breach holds with a sync review line",
+   "gwt": {
+    "given": "Two phones have the same litter open and each is saving deaths.",
+    "when": "Both phones sync.",
+    "then": "The deaths merge as signed changes. If the result would breach the floor, it is held with a sync review line and is never silently applied."
+   },
    "path": [
     "counting",
     "counting.active",
@@ -2632,6 +1820,11 @@
    "tree": "F-7",
    "branch": "finish",
    "label": "A tap alone does not lock; the hold is the second guard",
+   "gwt": {
+    "given": "The Finish sheet is open for a sow, with nothing waiting.",
+    "when": "The worker taps Finish farrowing without holding.",
+    "then": "The sow does not lock. The hold is the second guard."
+   },
    "path": [
     "finish",
     "finish.clean",
@@ -2645,7 +1838,7 @@
      "says": "the Finish sheet's hold-to-lock stays the second guard"
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -2671,34 +1864,6 @@
       "review/scenarios/farrowing/fa-f7-tap-does-not-lock/en-360/00-start.png",
       "review/scenarios/farrowing/fa-f7-tap-does-not-lock/en-360/01-data-action-lock.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-f7-tap-does-not-lock/zh-390/00-start.png",
-      "review/scenarios/farrowing/fa-f7-tap-does-not-lock/zh-390/01-data-action-lock.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-f7-tap-does-not-lock/zh-360/00-start.png",
-      "review/scenarios/farrowing/fa-f7-tap-does-not-lock/zh-360/01-data-action-lock.png"
-     ]
     }
    ]
   },
@@ -2707,6 +1872,11 @@
    "tree": "F-8",
    "branch": "finish",
    "label": "The locked record: Born 14 frozen, Edit and Record dead, no Finish",
+   "gwt": {
+    "given": "The Finish sheet is open for a sow whose born count is 14, with nothing waiting.",
+    "when": "The worker holds Finish farrowing until it commits.",
+    "then": "The locked record opens with born frozen at 14. Edit and Record dead are offered and Finish is gone."
+   },
    "path": [
     "finish",
     "finish.clean",
@@ -2725,7 +1895,7 @@
      "says": "locks at Finish"
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -2751,34 +1921,6 @@
       "review/scenarios/farrowing/fa-f8-locked-record-face/en-360/00-start.png",
       "review/scenarios/farrowing/fa-f8-locked-record-face/en-360/01-data-action-lock.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-f8-locked-record-face/zh-390/00-start.png",
-      "review/scenarios/farrowing/fa-f8-locked-record-face/zh-390/01-data-action-lock.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-f8-locked-record-face/zh-360/00-start.png",
-      "review/scenarios/farrowing/fa-f8-locked-record-face/zh-360/01-data-action-lock.png"
-     ]
     }
    ]
   },
@@ -2787,6 +1929,11 @@
    "tree": "X-9",
    "branch": "edit",
    "label": "A changed row shows its new value in ink with a muted \"was N\"; no banner",
+   "gwt": {
+    "given": "Sow 000418 is Farrowing and Edit is open, with 2 crushed deaths.",
+    "when": "The worker lowers Crushed by one.",
+    "then": "The changed row shows its new value in normal ink with a small muted note of what it was (was 2). There is no banner and no Corrected tag. Save correction is live."
+   },
    "path": [
     "edit",
     "edit.during",
@@ -2800,7 +1947,7 @@
      "says": "A changed row shows its new value in normal ink with a small muted \"was 2\" beside the label; no banner, no Corrected tag; one Save correction in the footer."
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -2826,42 +1973,6 @@
       "review/scenarios/farrowing/fa-x9-changed-row-shows-was/en-360/00-start.png",
       "review/scenarios/farrowing/fa-x9-changed-row-shows-was/en-360/01-data-action-editstep-data-value-.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "the row says what it was",
-      "no banner",
-      "no Corrected tag"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-x9-changed-row-shows-was/zh-390/00-start.png",
-      "review/scenarios/farrowing/fa-x9-changed-row-shows-was/zh-390/01-data-action-editstep-data-value-.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "the row says what it was",
-      "no banner",
-      "no Corrected tag"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-x9-changed-row-shows-was/zh-360/00-start.png",
-      "review/scenarios/farrowing/fa-x9-changed-row-shows-was/zh-360/01-data-action-editstep-data-value-.png"
-     ]
     }
    ]
   },
@@ -2870,6 +1981,11 @@
    "tree": "X-2",
    "branch": "edit",
    "label": "Save writes one stamped correction; Born heals from its inputs",
+   "gwt": {
+    "given": "Edit is open on Sow 000418 and Crushed has been lowered from 2 to 1.",
+    "when": "The worker taps Save correction.",
+    "then": "One stamped correction is posted and Counting is shown. Crushed is 1 and born heals to 13."
+   },
    "path": [
     "edit",
     "edit.during",
@@ -2889,7 +2005,7 @@
      "says": "Born has no door pre-lock (it heals when its inputs heal)"
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -2917,36 +2033,6 @@
       "review/scenarios/farrowing/fa-x2-save-correction/en-360/01-data-action-editstep-data-value-.png",
       "review/scenarios/farrowing/fa-x2-save-correction/en-360/02-data-action-saveedit.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-x2-save-correction/zh-390/00-start.png",
-      "review/scenarios/farrowing/fa-x2-save-correction/zh-390/01-data-action-editstep-data-value-.png",
-      "review/scenarios/farrowing/fa-x2-save-correction/zh-390/02-data-action-saveedit.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-x2-save-correction/zh-360/00-start.png",
-      "review/scenarios/farrowing/fa-x2-save-correction/zh-360/01-data-action-editstep-data-value-.png",
-      "review/scenarios/farrowing/fa-x2-save-correction/zh-360/02-data-action-saveedit.png"
-     ]
     }
    ]
   },
@@ -2955,6 +2041,11 @@
    "tree": "X-4",
    "branch": "edit",
    "label": "Clear discards the correction draft",
+   "gwt": {
+    "given": "Edit is open on Sow 000418 and Crushed has been lowered from 2 to 1.",
+    "when": "The worker taps Clear.",
+    "then": "The correction draft is discarded. No change is waiting and crushed is still 2."
+   },
    "path": [
     "edit",
     "edit.during",
@@ -2969,7 +2060,7 @@
      "says": "Clear (text action on the summary row) discards it"
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -2997,36 +2088,6 @@
       "review/scenarios/farrowing/fa-x4-edit-clear-discards/en-360/01-data-action-editstep-data-value-.png",
       "review/scenarios/farrowing/fa-x4-edit-clear-discards/en-360/02-data-action-clearedit.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-x4-edit-clear-discards/zh-390/00-start.png",
-      "review/scenarios/farrowing/fa-x4-edit-clear-discards/zh-390/01-data-action-editstep-data-value-.png",
-      "review/scenarios/farrowing/fa-x4-edit-clear-discards/zh-390/02-data-action-clearedit.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-x4-edit-clear-discards/zh-360/00-start.png",
-      "review/scenarios/farrowing/fa-x4-edit-clear-discards/zh-360/01-data-action-editstep-data-value-.png",
-      "review/scenarios/farrowing/fa-x4-edit-clear-discards/zh-360/02-data-action-clearedit.png"
-     ]
     }
    ]
   },
@@ -3035,6 +2096,11 @@
    "tree": "X-10",
    "branch": "edit",
    "label": "Back with unsaved changes asks \"Save correction?\" and stays on Edit until answered",
+   "gwt": {
+    "given": "Edit is open on Sow 000418 with one change not yet saved.",
+    "when": "The worker taps Back.",
+    "then": "A Save correction? question opens with Save and Discard both available. Edit stays open until it is answered, the change is still waiting, and posted crushed deaths are still 2."
+   },
    "path": [
     "edit",
     "edit.during",
@@ -3049,7 +2115,7 @@
      "says": "Leaving Edit with unsaved changes asks \"Save correction?\" (Save / Discard) in the shared dialog, so an unsaved correction can never reach Finish."
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -3077,40 +2143,6 @@
       "review/scenarios/farrowing/fa-x10-back-with-change-asks-save/en-360/01-data-action-editstep-data-value-.png",
       "review/scenarios/farrowing/fa-x10-back-with-change-asks-save/en-360/02-data-action-back.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "the ask is open"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-x10-back-with-change-asks-save/zh-390/00-start.png",
-      "review/scenarios/farrowing/fa-x10-back-with-change-asks-save/zh-390/01-data-action-editstep-data-value-.png",
-      "review/scenarios/farrowing/fa-x10-back-with-change-asks-save/zh-390/02-data-action-back.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "the ask is open"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-x10-back-with-change-asks-save/zh-360/00-start.png",
-      "review/scenarios/farrowing/fa-x10-back-with-change-asks-save/zh-360/01-data-action-editstep-data-value-.png",
-      "review/scenarios/farrowing/fa-x10-back-with-change-asks-save/zh-360/02-data-action-back.png"
-     ]
     }
    ]
   },
@@ -3119,6 +2151,11 @@
    "tree": "X-11",
    "branch": "edit",
    "label": "Discard drops the change and returns; nothing is posted",
+   "gwt": {
+    "given": "The Save correction? question is open over Edit, with one unsaved change.",
+    "when": "The worker taps Discard.",
+    "then": "Counting is shown again. The change is dropped, nothing is posted, and the log still has the same four lines."
+   },
    "path": [
     "edit",
     "edit.during",
@@ -3134,7 +2171,7 @@
      "says": "Discard in the Save correction? ask drops the unsaved change."
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -3164,38 +2201,6 @@
       "review/scenarios/farrowing/fa-x11-ask-discard-drops-change/en-360/02-data-action-back.png",
       "review/scenarios/farrowing/fa-x11-ask-discard-drops-change/en-360/03-data-action-leavediscard.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-x11-ask-discard-drops-change/zh-390/00-start.png",
-      "review/scenarios/farrowing/fa-x11-ask-discard-drops-change/zh-390/01-data-action-editstep-data-value-.png",
-      "review/scenarios/farrowing/fa-x11-ask-discard-drops-change/zh-390/02-data-action-back.png",
-      "review/scenarios/farrowing/fa-x11-ask-discard-drops-change/zh-390/03-data-action-leavediscard.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-x11-ask-discard-drops-change/zh-360/00-start.png",
-      "review/scenarios/farrowing/fa-x11-ask-discard-drops-change/zh-360/01-data-action-editstep-data-value-.png",
-      "review/scenarios/farrowing/fa-x11-ask-discard-drops-change/zh-360/02-data-action-back.png",
-      "review/scenarios/farrowing/fa-x11-ask-discard-drops-change/zh-360/03-data-action-leavediscard.png"
-     ]
     }
    ]
   },
@@ -3204,6 +2209,11 @@
    "tree": "X-12",
    "branch": "edit",
    "label": "Save in the ask posts one stamped correction and returns",
+   "gwt": {
+    "given": "The Save correction? question is open over Edit, with one unsaved change lowering Crushed from 2 to 1.",
+    "when": "The worker taps Save.",
+    "then": "One stamped correction is posted and Counting is shown. Crushed is 1. The open visit is folded into a line, followed by one correction line saying Crushed 2 to 1."
+   },
    "path": [
     "edit",
     "edit.during",
@@ -3219,7 +2229,7 @@
      "says": "Save in the Save correction? ask commits the correction (who, old → new in the log) and returns."
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -3249,38 +2259,6 @@
       "review/scenarios/farrowing/fa-x12-ask-save-posts-correction/en-360/02-data-action-back.png",
       "review/scenarios/farrowing/fa-x12-ask-save-posts-correction/en-360/03-data-action-leavesave.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-x12-ask-save-posts-correction/zh-390/00-start.png",
-      "review/scenarios/farrowing/fa-x12-ask-save-posts-correction/zh-390/01-data-action-editstep-data-value-.png",
-      "review/scenarios/farrowing/fa-x12-ask-save-posts-correction/zh-390/02-data-action-back.png",
-      "review/scenarios/farrowing/fa-x12-ask-save-posts-correction/zh-390/03-data-action-leavesave.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-x12-ask-save-posts-correction/zh-360/00-start.png",
-      "review/scenarios/farrowing/fa-x12-ask-save-posts-correction/zh-360/01-data-action-editstep-data-value-.png",
-      "review/scenarios/farrowing/fa-x12-ask-save-posts-correction/zh-360/02-data-action-back.png",
-      "review/scenarios/farrowing/fa-x12-ask-save-posts-correction/zh-360/03-data-action-leavesave.png"
-     ]
     }
    ]
   },
@@ -3289,6 +2267,11 @@
    "tree": "X-5",
    "branch": "edit",
    "label": "Anyone corrects Born after the lock: 14 → 15, stamped, original kept in the log",
+   "gwt": {
+    "given": "A sow's record is locked with born 14 and Edit is open.",
+    "when": "The worker opens the born correction, adds 1 more born, applies it and saves the correction.",
+    "then": "Born is now 15, recorded as a stamped correction. The original finish line is kept in the log. No role is needed to do this."
+   },
    "path": [
     "edit",
     "edit.locked",
@@ -3302,7 +2285,7 @@
      "says": "Anyone may amend born post-lock — open ✎, stamped, no role gate."
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -3332,38 +2315,6 @@
       "review/scenarios/farrowing/fa-x5-correct-born-after-lock/en-360/02-data-action-applyborn.png",
       "review/scenarios/farrowing/fa-x5-correct-born-after-lock/en-360/03-data-action-saveedit.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-x5-correct-born-after-lock/zh-390/00-start.png",
-      "review/scenarios/farrowing/fa-x5-correct-born-after-lock/zh-390/01-data-action-bornpopup.png",
-      "review/scenarios/farrowing/fa-x5-correct-born-after-lock/zh-390/02-data-action-applyborn.png",
-      "review/scenarios/farrowing/fa-x5-correct-born-after-lock/zh-390/03-data-action-saveedit.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-x5-correct-born-after-lock/zh-360/00-start.png",
-      "review/scenarios/farrowing/fa-x5-correct-born-after-lock/zh-360/01-data-action-bornpopup.png",
-      "review/scenarios/farrowing/fa-x5-correct-born-after-lock/zh-360/02-data-action-applyborn.png",
-      "review/scenarios/farrowing/fa-x5-correct-born-after-lock/zh-360/03-data-action-saveedit.png"
-     ]
     }
    ]
   },
@@ -3372,6 +2323,11 @@
    "tree": "X-6",
    "branch": "edit",
    "label": "The Farrowing record shows the correction above the finish",
+   "gwt": {
+    "given": "A locked record's born count has just been corrected from 14 to 15.",
+    "when": "The worker opens the log from the record.",
+    "then": "The Farrowing record page shows the correction above the Farrowing finished line."
+   },
    "path": [
     "edit",
     "edit.locked",
@@ -3391,7 +2347,7 @@
      "says": "corrections amber with ✎"
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -3423,44 +2379,6 @@
       "review/scenarios/farrowing/fa-x6-log-shows-correction/en-360/03-data-action-saveedit.png",
       "review/scenarios/farrowing/fa-x6-log-shows-correction/en-360/04-data-action-history.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "\"Farrowing finished\" shown"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-x6-log-shows-correction/zh-390/00-start.png",
-      "review/scenarios/farrowing/fa-x6-log-shows-correction/zh-390/01-data-action-bornpopup.png",
-      "review/scenarios/farrowing/fa-x6-log-shows-correction/zh-390/02-data-action-applyborn.png",
-      "review/scenarios/farrowing/fa-x6-log-shows-correction/zh-390/03-data-action-saveedit.png",
-      "review/scenarios/farrowing/fa-x6-log-shows-correction/zh-390/04-data-action-history.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "\"Farrowing finished\" shown"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-x6-log-shows-correction/zh-360/00-start.png",
-      "review/scenarios/farrowing/fa-x6-log-shows-correction/zh-360/01-data-action-bornpopup.png",
-      "review/scenarios/farrowing/fa-x6-log-shows-correction/zh-360/02-data-action-applyborn.png",
-      "review/scenarios/farrowing/fa-x6-log-shows-correction/zh-360/03-data-action-saveedit.png",
-      "review/scenarios/farrowing/fa-x6-log-shows-correction/zh-360/04-data-action-history.png"
-     ]
     }
    ]
   },
@@ -3469,6 +2387,7 @@
    "tree": "X-7",
    "branch": "edit",
    "label": "After the lock, which door records a piglet death (farrowing's Record dead or piglet processing's)?",
+   "gwt": null,
    "path": [
     "edit",
     "edit.locked",
@@ -3497,6 +2416,11 @@
    "tree": "M-1",
    "branch": "sow-death",
    "label": "Her death ends the session without Finish; the sheet becomes the allocation sheet",
+   "gwt": {
+    "given": "Sow 000418 is Farrowing and the worker has Record dead open on The sow.",
+    "when": "They choose Prolapse and hold Save until it commits.",
+    "then": "The session ends without a Finish and the sheet becomes the allocation sheet. Her cause is Prolapse."
+   },
    "path": [
     "sow-death",
     "sow-death.during",
@@ -3515,7 +2439,7 @@
      "says": "Right after the hold records the death, the sheet becomes 'N piglets to allocate'"
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -3543,42 +2467,6 @@
       "review/scenarios/farrowing/fa-m1-sow-death-ends-session/en-360/01-prolapse.png",
       "review/scenarios/farrowing/fa-m1-sow-death-ends-session/en-360/02-data-action-savedeath.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "\"sow died\" shown",
-      "\"piglets to allocate\" shown"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m1-sow-death-ends-session/zh-390/00-start.png",
-      "review/scenarios/farrowing/fa-m1-sow-death-ends-session/zh-390/01-prolapse.png",
-      "review/scenarios/farrowing/fa-m1-sow-death-ends-session/zh-390/02-data-action-savedeath.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "\"sow died\" shown",
-      "\"piglets to allocate\" shown"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m1-sow-death-ends-session/zh-360/00-start.png",
-      "review/scenarios/farrowing/fa-m1-sow-death-ends-session/zh-360/01-prolapse.png",
-      "review/scenarios/farrowing/fa-m1-sow-death-ends-session/zh-360/02-data-action-savedeath.png"
-     ]
     }
    ]
   },
@@ -3586,7 +2474,12 @@
    "id": "fa-m2-dead-sow-stays-in-room",
    "tree": "M-2",
    "branch": "sow-death",
-   "label": "She stays in the room as a Sow died row with a red \"to allocate\" tile",
+   "label": "She stays in the room as a Sow died row with her piglets to allocate",
+   "gwt": {
+    "given": "A sow's death was just recorded and the allocation sheet is open.",
+    "when": "The worker goes Back to the room.",
+    "then": "She stays in the room list as a Sow died row with her piglets to allocate."
+   },
    "path": [
     "sow-death",
     "sow-death.during",
@@ -3606,7 +2499,7 @@
      "says": "Room row while piglets remain unallocated: chip Sow died, headline 'N to allocate'"
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -3636,42 +2529,6 @@
       "review/scenarios/farrowing/fa-m2-dead-sow-stays-in-room/en-360/02-data-action-savedeath.png",
       "review/scenarios/farrowing/fa-m2-dead-sow-stays-in-room/en-360/03-data-action-close.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "\"9 to allocate\" shown"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m2-dead-sow-stays-in-room/zh-390/00-start.png",
-      "review/scenarios/farrowing/fa-m2-dead-sow-stays-in-room/zh-390/01-prolapse.png",
-      "review/scenarios/farrowing/fa-m2-dead-sow-stays-in-room/zh-390/02-data-action-savedeath.png",
-      "review/scenarios/farrowing/fa-m2-dead-sow-stays-in-room/zh-390/03-data-action-close.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "\"9 to allocate\" shown"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m2-dead-sow-stays-in-room/zh-360/00-start.png",
-      "review/scenarios/farrowing/fa-m2-dead-sow-stays-in-room/zh-360/01-prolapse.png",
-      "review/scenarios/farrowing/fa-m2-dead-sow-stays-in-room/zh-360/02-data-action-savedeath.png",
-      "review/scenarios/farrowing/fa-m2-dead-sow-stays-in-room/zh-360/03-data-action-close.png"
-     ]
     }
    ]
   },
@@ -3679,7 +2536,12 @@
    "id": "fa-m11-back-row-says-to-allocate",
    "tree": "M-11",
    "branch": "sow-death",
-   "label": "Back after the death: a red tile \"9 / to allocate\", facts Sow died",
+   "label": "Back after the death: her row says \"9 to allocate\" over Sow died, in red",
+   "gwt": {
+    "given": "A sow's death was just recorded and the allocation sheet is open.",
+    "when": "The worker goes Back to the room.",
+    "then": "Her row stays in the room and says 9 to allocate over Sow died."
+   },
    "path": [
     "sow-death",
     "sow-death.during",
@@ -3694,7 +2556,7 @@
      "says": "Room row while piglets remain unallocated: her ID muted grey, chip Sow died, headline 'N to allocate' in the to-do colour"
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -3724,44 +2586,6 @@
       "review/scenarios/farrowing/fa-m11-back-row-says-to-allocate/en-360/02-data-action-savedeath.png",
       "review/scenarios/farrowing/fa-m11-back-row-says-to-allocate/en-360/03-data-action-close.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "\"9 to allocate\" shown",
-      "\"Sow died\" shown"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m11-back-row-says-to-allocate/zh-390/00-start.png",
-      "review/scenarios/farrowing/fa-m11-back-row-says-to-allocate/zh-390/01-prolapse.png",
-      "review/scenarios/farrowing/fa-m11-back-row-says-to-allocate/zh-390/02-data-action-savedeath.png",
-      "review/scenarios/farrowing/fa-m11-back-row-says-to-allocate/zh-390/03-data-action-close.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "\"9 to allocate\" shown",
-      "\"Sow died\" shown"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m11-back-row-says-to-allocate/zh-360/00-start.png",
-      "review/scenarios/farrowing/fa-m11-back-row-says-to-allocate/zh-360/01-prolapse.png",
-      "review/scenarios/farrowing/fa-m11-back-row-says-to-allocate/zh-360/02-data-action-savedeath.png",
-      "review/scenarios/farrowing/fa-m11-back-row-says-to-allocate/zh-360/03-data-action-close.png"
-     ]
     }
    ]
   },
@@ -3770,6 +2594,11 @@
    "tree": "M-17",
    "branch": "sow-death",
    "label": "Tapping the row opens the same sheet",
+   "gwt": {
+    "given": "A sow died with piglets still to allocate and her row is in the room list.",
+    "when": "The worker taps her row.",
+    "then": "The allocation sheet opens and says 9 piglets to allocate."
+   },
    "path": [
     "sow-death",
     "sow-death.during",
@@ -3785,7 +2614,7 @@
      "says": "Tapping the row opens the same sheet"
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -3817,44 +2646,6 @@
       "review/scenarios/farrowing/fa-m17-row-opens-allocation-sheet/en-360/03-data-action-close.png",
       "review/scenarios/farrowing/fa-m17-row-opens-allocation-sheet/en-360/04-data-action-room-sow-data-value-.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "\"9 piglets to allocate\" shown"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m17-row-opens-allocation-sheet/zh-390/00-start.png",
-      "review/scenarios/farrowing/fa-m17-row-opens-allocation-sheet/zh-390/01-prolapse.png",
-      "review/scenarios/farrowing/fa-m17-row-opens-allocation-sheet/zh-390/02-data-action-savedeath.png",
-      "review/scenarios/farrowing/fa-m17-row-opens-allocation-sheet/zh-390/03-data-action-close.png",
-      "review/scenarios/farrowing/fa-m17-row-opens-allocation-sheet/zh-390/04-data-action-room-sow-data-value-.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "\"9 piglets to allocate\" shown"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m17-row-opens-allocation-sheet/zh-360/00-start.png",
-      "review/scenarios/farrowing/fa-m17-row-opens-allocation-sheet/zh-360/01-prolapse.png",
-      "review/scenarios/farrowing/fa-m17-row-opens-allocation-sheet/zh-360/02-data-action-savedeath.png",
-      "review/scenarios/farrowing/fa-m17-row-opens-allocation-sheet/zh-360/03-data-action-close.png",
-      "review/scenarios/farrowing/fa-m17-row-opens-allocation-sheet/zh-360/04-data-action-room-sow-data-value-.png"
-     ]
     }
    ]
   },
@@ -3863,6 +2654,11 @@
    "tree": "M-18",
    "branch": "sow-death",
    "label": "Some moved: the sheet returns with the remaining count",
+   "gwt": {
+    "given": "The allocation sheet is open for a dead sow with 9 piglets.",
+    "when": "The worker moves some piglets to other sows.",
+    "then": "The sheet returns and says 4 piglets to allocate; nothing is marked moved on the room list."
+   },
    "path": [
     "sow-death",
     "sow-death.during",
@@ -3879,7 +2675,7 @@
      "says": "Partial allocation: the remaining count stays; never show '5 moved' on her row"
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -3923,58 +2719,6 @@
       "review/scenarios/farrowing/fa-m18-partial-move-keeps-the-rest/en-360/09-data-action-fostercount-data-val.png",
       "review/scenarios/farrowing/fa-m18-partial-move-keeps-the-rest/en-360/10-data-action-savefoster.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "\"4 piglets to allocate\" shown",
-      "\"moved\" absent"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m18-partial-move-keeps-the-rest/zh-390/00-start.png",
-      "review/scenarios/farrowing/fa-m18-partial-move-keeps-the-rest/zh-390/01-prolapse.png",
-      "review/scenarios/farrowing/fa-m18-partial-move-keeps-the-rest/zh-390/02-data-action-savedeath.png",
-      "review/scenarios/farrowing/fa-m18-partial-move-keeps-the-rest/zh-390/03-data-action-close.png",
-      "review/scenarios/farrowing/fa-m18-partial-move-keeps-the-rest/zh-390/04-data-action-room-sow-data-value-.png",
-      "review/scenarios/farrowing/fa-m18-partial-move-keeps-the-rest/zh-390/05-data-action-allocmove.png",
-      "review/scenarios/farrowing/fa-m18-partial-move-keeps-the-rest/zh-390/06-data-action-fostercount-data-val.png",
-      "review/scenarios/farrowing/fa-m18-partial-move-keeps-the-rest/zh-390/07-data-action-fostercount-data-val.png",
-      "review/scenarios/farrowing/fa-m18-partial-move-keeps-the-rest/zh-390/08-data-action-fostercount-data-val.png",
-      "review/scenarios/farrowing/fa-m18-partial-move-keeps-the-rest/zh-390/09-data-action-fostercount-data-val.png",
-      "review/scenarios/farrowing/fa-m18-partial-move-keeps-the-rest/zh-390/10-data-action-savefoster.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "\"4 piglets to allocate\" shown",
-      "\"moved\" absent"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m18-partial-move-keeps-the-rest/zh-360/00-start.png",
-      "review/scenarios/farrowing/fa-m18-partial-move-keeps-the-rest/zh-360/01-prolapse.png",
-      "review/scenarios/farrowing/fa-m18-partial-move-keeps-the-rest/zh-360/02-data-action-savedeath.png",
-      "review/scenarios/farrowing/fa-m18-partial-move-keeps-the-rest/zh-360/03-data-action-close.png",
-      "review/scenarios/farrowing/fa-m18-partial-move-keeps-the-rest/zh-360/04-data-action-room-sow-data-value-.png",
-      "review/scenarios/farrowing/fa-m18-partial-move-keeps-the-rest/zh-360/05-data-action-allocmove.png",
-      "review/scenarios/farrowing/fa-m18-partial-move-keeps-the-rest/zh-360/06-data-action-fostercount-data-val.png",
-      "review/scenarios/farrowing/fa-m18-partial-move-keeps-the-rest/zh-360/07-data-action-fostercount-data-val.png",
-      "review/scenarios/farrowing/fa-m18-partial-move-keeps-the-rest/zh-360/08-data-action-fostercount-data-val.png",
-      "review/scenarios/farrowing/fa-m18-partial-move-keeps-the-rest/zh-360/09-data-action-fostercount-data-val.png",
-      "review/scenarios/farrowing/fa-m18-partial-move-keeps-the-rest/zh-360/10-data-action-savefoster.png"
-     ]
     }
    ]
   },
@@ -3982,7 +2726,12 @@
    "id": "fa-m19-rest-hand-reared",
    "tree": "M-19",
    "branch": "sow-death",
-   "label": "The rest hand-reared: her row shows \"4 / hand-reared\"",
+   "label": "The rest hand-reared: her row says \"4 hand-reared\"",
+   "gwt": {
+    "given": "A dead sow has 4 piglets left to allocate.",
+    "when": "The worker chooses Hand-rear here.",
+    "then": "Her row says 4 hand-reared."
+   },
    "path": [
     "sow-death",
     "sow-death.during",
@@ -4000,7 +2749,7 @@
      "says": "After hand-rear: headline 'N hand-reared'; the remaining count stays after a partial move"
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -4046,58 +2795,6 @@
       "review/scenarios/farrowing/fa-m19-rest-hand-reared/en-360/10-data-action-savefoster.png",
       "review/scenarios/farrowing/fa-m19-rest-hand-reared/en-360/11-data-action-allochand.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "\"4 hand-reared\" shown"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m19-rest-hand-reared/zh-390/00-start.png",
-      "review/scenarios/farrowing/fa-m19-rest-hand-reared/zh-390/01-prolapse.png",
-      "review/scenarios/farrowing/fa-m19-rest-hand-reared/zh-390/02-data-action-savedeath.png",
-      "review/scenarios/farrowing/fa-m19-rest-hand-reared/zh-390/03-data-action-close.png",
-      "review/scenarios/farrowing/fa-m19-rest-hand-reared/zh-390/04-data-action-room-sow-data-value-.png",
-      "review/scenarios/farrowing/fa-m19-rest-hand-reared/zh-390/05-data-action-allocmove.png",
-      "review/scenarios/farrowing/fa-m19-rest-hand-reared/zh-390/06-data-action-fostercount-data-val.png",
-      "review/scenarios/farrowing/fa-m19-rest-hand-reared/zh-390/07-data-action-fostercount-data-val.png",
-      "review/scenarios/farrowing/fa-m19-rest-hand-reared/zh-390/08-data-action-fostercount-data-val.png",
-      "review/scenarios/farrowing/fa-m19-rest-hand-reared/zh-390/09-data-action-fostercount-data-val.png",
-      "review/scenarios/farrowing/fa-m19-rest-hand-reared/zh-390/10-data-action-savefoster.png",
-      "review/scenarios/farrowing/fa-m19-rest-hand-reared/zh-390/11-data-action-allochand.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "\"4 hand-reared\" shown"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m19-rest-hand-reared/zh-360/00-start.png",
-      "review/scenarios/farrowing/fa-m19-rest-hand-reared/zh-360/01-prolapse.png",
-      "review/scenarios/farrowing/fa-m19-rest-hand-reared/zh-360/02-data-action-savedeath.png",
-      "review/scenarios/farrowing/fa-m19-rest-hand-reared/zh-360/03-data-action-close.png",
-      "review/scenarios/farrowing/fa-m19-rest-hand-reared/zh-360/04-data-action-room-sow-data-value-.png",
-      "review/scenarios/farrowing/fa-m19-rest-hand-reared/zh-360/05-data-action-allocmove.png",
-      "review/scenarios/farrowing/fa-m19-rest-hand-reared/zh-360/06-data-action-fostercount-data-val.png",
-      "review/scenarios/farrowing/fa-m19-rest-hand-reared/zh-360/07-data-action-fostercount-data-val.png",
-      "review/scenarios/farrowing/fa-m19-rest-hand-reared/zh-360/08-data-action-fostercount-data-val.png",
-      "review/scenarios/farrowing/fa-m19-rest-hand-reared/zh-360/09-data-action-fostercount-data-val.png",
-      "review/scenarios/farrowing/fa-m19-rest-hand-reared/zh-360/10-data-action-savefoster.png",
-      "review/scenarios/farrowing/fa-m19-rest-hand-reared/zh-360/11-data-action-allochand.png"
-     ]
     }
    ]
   },
@@ -4106,6 +2803,11 @@
    "tree": "M-3",
    "branch": "sow-death",
    "label": "A tap does not record her death",
+   "gwt": {
+    "given": "Sow 000418 is Farrowing and the worker has Record dead open on The sow, with Prolapse chosen.",
+    "when": "They tap Save without holding.",
+    "then": "Her death is not recorded and the session has not ended."
+   },
    "path": [
     "sow-death",
     "sow-death.during",
@@ -4119,7 +2821,7 @@
      "says": "Saving the sow's death is hold-to-commit"
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -4147,36 +2849,6 @@
       "review/scenarios/farrowing/fa-m3-sow-death-needs-hold/en-360/01-prolapse.png",
       "review/scenarios/farrowing/fa-m3-sow-death-needs-hold/en-360/02-data-action-savedeath.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m3-sow-death-needs-hold/zh-390/00-start.png",
-      "review/scenarios/farrowing/fa-m3-sow-death-needs-hold/zh-390/01-prolapse.png",
-      "review/scenarios/farrowing/fa-m3-sow-death-needs-hold/zh-390/02-data-action-savedeath.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m3-sow-death-needs-hold/zh-360/00-start.png",
-      "review/scenarios/farrowing/fa-m3-sow-death-needs-hold/zh-360/01-prolapse.png",
-      "review/scenarios/farrowing/fa-m3-sow-death-needs-hold/zh-360/02-data-action-savedeath.png"
-     ]
     }
    ]
   },
@@ -4185,6 +2857,11 @@
    "tree": "M-4",
    "branch": "sow-death",
    "label": "A piglet that dies is recorded through Record dead, and her count drops",
+   "gwt": {
+    "given": "A sow died and her piglets are hand-reared on her record.",
+    "when": "The worker records a piglet death through Record dead.",
+    "then": "Alive drops from 7 to 6 and crushed rises from 1 to 2; born stays 10."
+   },
    "path": [
     "sow-death",
     "sow-death.ended",
@@ -4198,7 +2875,7 @@
      "says": "A piglet that dies or is put down is recorded through Record dead, and the count drops"
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -4228,38 +2905,6 @@
       "review/scenarios/farrowing/fa-m4-piglet-deaths-after-sow-died/en-360/02-data-action-deadstep-data-value-.png",
       "review/scenarios/farrowing/fa-m4-piglet-deaths-after-sow-died/en-360/03-data-action-savedeath.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m4-piglet-deaths-after-sow-died/zh-390/00-start.png",
-      "review/scenarios/farrowing/fa-m4-piglet-deaths-after-sow-died/zh-390/01-data-action-death.png",
-      "review/scenarios/farrowing/fa-m4-piglet-deaths-after-sow-died/zh-390/02-data-action-deadstep-data-value-.png",
-      "review/scenarios/farrowing/fa-m4-piglet-deaths-after-sow-died/zh-390/03-data-action-savedeath.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m4-piglet-deaths-after-sow-died/zh-360/00-start.png",
-      "review/scenarios/farrowing/fa-m4-piglet-deaths-after-sow-died/zh-360/01-data-action-death.png",
-      "review/scenarios/farrowing/fa-m4-piglet-deaths-after-sow-died/zh-360/02-data-action-deadstep-data-value-.png",
-      "review/scenarios/farrowing/fa-m4-piglet-deaths-after-sow-died/zh-360/03-data-action-savedeath.png"
-     ]
     }
    ]
   },
@@ -4268,6 +2913,11 @@
    "tree": "M-7",
    "branch": "sow-death",
    "label": "The sheet reads 'N piglets to allocate' with three options and Back (later)",
+   "gwt": {
+    "given": "A sow's death was just recorded.",
+    "when": "The sheet changes after the hold.",
+    "then": "It reads 7 piglets to allocate with Move to other sows, Hand-rear here and Move to a rearing pen, and Back means later."
+   },
    "path": [
     "sow-death",
     "sow-death.allocate",
@@ -4280,7 +2930,7 @@
      "says": "Right after the hold records the death, the sheet becomes: title 'N piglets to allocate', subtitle '<ID> · <pen> · sow died <time>', three options; footer Back = later"
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -4304,46 +2954,6 @@
      "evidence": [
       "review/scenarios/farrowing/fa-m7-allocation-sheet-after-death/en-360/00-start.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "\"7 piglets to allocate\" shown",
-      "\"000399 · B3 · sow died\" shown",
-      "\"Move to other sows\" shown",
-      "\"Hand-rear here\" shown",
-      "\"Move to a rearing pen\" shown",
-      "\"Back\" shown"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m7-allocation-sheet-after-death/zh-390/00-start.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "\"7 piglets to allocate\" shown",
-      "\"000399 · B3 · sow died\" shown",
-      "\"Move to other sows\" shown",
-      "\"Hand-rear here\" shown",
-      "\"Move to a rearing pen\" shown",
-      "\"Back\" shown"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m7-allocation-sheet-after-death/zh-360/00-start.png"
-     ]
     }
    ]
   },
@@ -4352,6 +2962,11 @@
    "tree": "M-8",
    "branch": "sow-death",
    "label": "Every piglet fostered: she leaves the room list",
+   "gwt": {
+    "given": "A dead sow has piglets to allocate.",
+    "when": "The worker moves every piglet to other sows.",
+    "then": "She leaves the room list."
+   },
    "path": [
     "sow-death",
     "sow-death.allocate",
@@ -4365,7 +2980,7 @@
      "says": "She leaves the room list once every piglet is on another sow, in a rearing pen, or recorded dead"
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -4393,36 +3008,6 @@
       "review/scenarios/farrowing/fa-m8-all-fostered-she-leaves/en-360/01-data-action-allocmove.png",
       "review/scenarios/farrowing/fa-m8-all-fostered-she-leaves/en-360/02-data-action-savefoster.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m8-all-fostered-she-leaves/zh-390/00-start.png",
-      "review/scenarios/farrowing/fa-m8-all-fostered-she-leaves/zh-390/01-data-action-allocmove.png",
-      "review/scenarios/farrowing/fa-m8-all-fostered-she-leaves/zh-390/02-data-action-savefoster.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m8-all-fostered-she-leaves/zh-360/00-start.png",
-      "review/scenarios/farrowing/fa-m8-all-fostered-she-leaves/zh-360/01-data-action-allocmove.png",
-      "review/scenarios/farrowing/fa-m8-all-fostered-she-leaves/zh-360/02-data-action-savefoster.png"
-     ]
     }
    ]
   },
@@ -4431,6 +3016,11 @@
    "tree": "M-9",
    "branch": "sow-death",
    "label": "Task overview counts her under Left the task and the totals still add up",
+   "gwt": {
+    "given": "A dead sow has no piglets left to allocate.",
+    "when": "The worker opens the Task overview.",
+    "then": "It counts her under Left the task as 1 sow died, and the whole-task progress counts 18 sows."
+   },
    "path": [
     "sow-death",
     "sow-death.allocate",
@@ -4445,7 +3035,7 @@
      "says": "Task overview counts sows that left the list: 'Left the task · n aborted · n sow died'; every total must still add up"
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -4475,46 +3065,6 @@
       "review/scenarios/farrowing/fa-m9-overview-counts-who-left/en-360/02-data-action-savefoster.png",
       "review/scenarios/farrowing/fa-m9-overview-counts-who-left/en-360/03-data-action-room-overview.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "\"Left the task\" shown",
-      "\"1 sow died\" shown",
-      "whole-task progress counts 18 sows (19 less the one who left)"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m9-overview-counts-who-left/zh-390/00-start.png",
-      "review/scenarios/farrowing/fa-m9-overview-counts-who-left/zh-390/01-data-action-allocmove.png",
-      "review/scenarios/farrowing/fa-m9-overview-counts-who-left/zh-390/02-data-action-savefoster.png",
-      "review/scenarios/farrowing/fa-m9-overview-counts-who-left/zh-390/03-data-action-room-overview.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "\"Left the task\" shown",
-      "\"1 sow died\" shown",
-      "whole-task progress counts 18 sows (19 less the one who left)"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m9-overview-counts-who-left/zh-360/00-start.png",
-      "review/scenarios/farrowing/fa-m9-overview-counts-who-left/zh-360/01-data-action-allocmove.png",
-      "review/scenarios/farrowing/fa-m9-overview-counts-who-left/zh-360/02-data-action-savefoster.png",
-      "review/scenarios/farrowing/fa-m9-overview-counts-who-left/zh-360/03-data-action-room-overview.png"
-     ]
     }
    ]
   },
@@ -4522,7 +3072,12 @@
    "id": "fa-m12-hand-reared-row-stays",
    "tree": "M-12",
    "branch": "sow-death",
-   "label": "Her row shows the neutral tile \"7 / hand-reared\" and stays",
+   "label": "Her row says \"7 hand-reared\" over Sow died and stays",
+   "gwt": {
+    "given": "A dead sow's piglets are chosen to be hand-reared.",
+    "when": "The worker looks at the room list.",
+    "then": "Her row says 7 hand-reared over Sow died and does not say to allocate."
+   },
    "path": [
     "sow-death",
     "sow-death.allocate",
@@ -4536,7 +3091,7 @@
      "says": "After hand-rear: headline 'N hand-reared' in ink; the row stays while hand-reared piglets remain"
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -4562,42 +3117,6 @@
       "review/scenarios/farrowing/fa-m12-hand-reared-row-stays/en-360/00-start.png",
       "review/scenarios/farrowing/fa-m12-hand-reared-row-stays/en-360/01-data-action-allochand.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "\"7 hand-reared\" shown",
-      "\"Sow died\" shown",
-      "\"to allocate\" absent"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m12-hand-reared-row-stays/zh-390/00-start.png",
-      "review/scenarios/farrowing/fa-m12-hand-reared-row-stays/zh-390/01-data-action-allochand.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "\"7 hand-reared\" shown",
-      "\"Sow died\" shown",
-      "\"to allocate\" absent"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m12-hand-reared-row-stays/zh-360/00-start.png",
-      "review/scenarios/farrowing/fa-m12-hand-reared-row-stays/zh-360/01-data-action-allochand.png"
-     ]
     }
    ]
   },
@@ -4606,6 +3125,11 @@
    "tree": "M-13",
    "branch": "sow-death",
    "label": "A hand-reared row opens her record, where piglet care continues",
+   "gwt": {
+    "given": "A dead sow's row says hand-reared.",
+    "when": "The worker taps the row.",
+    "then": "Her ended record opens, where piglet care continues."
+   },
    "path": [
     "sow-death",
     "sow-death.allocate",
@@ -4620,7 +3144,7 @@
      "says": "After hand-rear the piglets stay on her record; piglet care continues"
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -4648,36 +3172,6 @@
       "review/scenarios/farrowing/fa-m13-hand-reared-row-opens-record/en-360/01-data-action-allochand.png",
       "review/scenarios/farrowing/fa-m13-hand-reared-row-opens-record/en-360/02-data-action-room-sow-data-value-.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m13-hand-reared-row-opens-record/zh-390/00-start.png",
-      "review/scenarios/farrowing/fa-m13-hand-reared-row-opens-record/zh-390/01-data-action-allochand.png",
-      "review/scenarios/farrowing/fa-m13-hand-reared-row-opens-record/zh-390/02-data-action-room-sow-data-value-.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m13-hand-reared-row-opens-record/zh-360/00-start.png",
-      "review/scenarios/farrowing/fa-m13-hand-reared-row-opens-record/zh-360/01-data-action-allochand.png",
-      "review/scenarios/farrowing/fa-m13-hand-reared-row-opens-record/zh-360/02-data-action-room-sow-data-value-.png"
-     ]
     }
    ]
   },
@@ -4686,6 +3180,11 @@
    "tree": "M-14",
    "branch": "sow-death",
    "label": "All piglets in the rearing pen: she leaves the list",
+   "gwt": {
+    "given": "A dead sow has piglets to allocate and the farm has a rearing pen.",
+    "when": "The worker moves all piglets to the rearing pen.",
+    "then": "She leaves the room list."
+   },
    "path": [
     "sow-death",
     "sow-death.allocate",
@@ -4699,7 +3198,7 @@
      "says": "Move to a rearing pen: shown when the farm has one; the piglets leave her record"
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -4725,34 +3224,6 @@
       "review/scenarios/farrowing/fa-m14-rearing-pen-she-leaves/en-360/00-start.png",
       "review/scenarios/farrowing/fa-m14-rearing-pen-she-leaves/en-360/01-data-action-allocrear.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m14-rearing-pen-she-leaves/zh-390/00-start.png",
-      "review/scenarios/farrowing/fa-m14-rearing-pen-she-leaves/zh-390/01-data-action-allocrear.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m14-rearing-pen-she-leaves/zh-360/00-start.png",
-      "review/scenarios/farrowing/fa-m14-rearing-pen-she-leaves/zh-360/01-data-action-allocrear.png"
-     ]
     }
    ]
   },
@@ -4760,7 +3231,12 @@
    "id": "fa-m15-back-leaves-row-to-allocate",
    "tree": "M-15",
    "branch": "sow-death",
-   "label": "Back leaves her row as a red \"to allocate\" tile; nothing was decided",
+   "label": "Back leaves her row saying \"7 to allocate\"; nothing was decided",
+   "gwt": {
+    "given": "The allocation sheet is open for a dead sow with 7 piglets.",
+    "when": "The worker goes Back without choosing.",
+    "then": "Her row stays and says 7 to allocate."
+   },
    "path": [
     "sow-death",
     "sow-death.allocate",
@@ -4774,7 +3250,7 @@
      "says": "Footer Back = later: the room row reads 'N to allocate' in the to-do colour"
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -4800,38 +3276,6 @@
       "review/scenarios/farrowing/fa-m15-back-leaves-row-to-allocate/en-360/00-start.png",
       "review/scenarios/farrowing/fa-m15-back-leaves-row-to-allocate/en-360/01-data-action-close.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "\"7 to allocate\" shown"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m15-back-leaves-row-to-allocate/zh-390/00-start.png",
-      "review/scenarios/farrowing/fa-m15-back-leaves-row-to-allocate/zh-390/01-data-action-close.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "\"7 to allocate\" shown"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m15-back-leaves-row-to-allocate/zh-360/00-start.png",
-      "review/scenarios/farrowing/fa-m15-back-leaves-row-to-allocate/zh-360/01-data-action-close.png"
-     ]
     }
    ]
   },
@@ -4840,6 +3284,11 @@
    "tree": "M-16",
    "branch": "sow-death",
    "label": "No rearing pen on the farm: the third option is absent",
+   "gwt": {
+    "given": "The farm has no rearing pen.",
+    "when": "The allocation sheet opens.",
+    "then": "It offers Hand-rear here and Move to other sows, and no Move to a rearing pen."
+   },
    "path": [
     "sow-death",
     "sow-death.rearing-off",
@@ -4852,7 +3301,7 @@
      "says": "Move to a rearing pen: show only when farm config says the farm has one"
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -4876,38 +3325,6 @@
      "evidence": [
       "review/scenarios/farrowing/fa-m16-no-rearing-pen-no-option/en-360/00-start.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "\"Move to a rearing pen\" absent",
-      "\"Hand-rear here\" shown"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m16-no-rearing-pen-no-option/zh-390/00-start.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "\"Move to a rearing pen\" absent",
-      "\"Hand-rear here\" shown"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m16-no-rearing-pen-no-option/zh-360/00-start.png"
-     ]
     }
    ]
   },
@@ -4916,6 +3333,11 @@
    "tree": "M-20",
    "branch": "sow-death",
    "label": "Abortion with no live piglets: she is not listed",
+   "gwt": {
+    "given": "A sow in the room has no live piglets recorded.",
+    "when": "The worker records an abortion.",
+    "then": "She is not listed any more."
+   },
    "path": [
     "sow-death",
     "sow-death.abortion-none",
@@ -4929,7 +3351,7 @@
      "says": "Abortion: no live piglets, she leaves the room list immediately"
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -4965,44 +3387,6 @@
       "review/scenarios/farrowing/fa-m20-abortion-no-live-leaves-list/en-360/05-data-action-save-miscarriage.png",
       "review/scenarios/farrowing/fa-m20-abortion-no-live-leaves-list/en-360/06-back.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m20-abortion-no-live-leaves-list/zh-390/00-start.png",
-      "review/scenarios/farrowing/fa-m20-abortion-no-live-leaves-list/zh-390/01-data-action-room-sow-data-value-.png",
-      "review/scenarios/farrowing/fa-m20-abortion-no-live-leaves-list/zh-390/02-data-action-sowactions.png",
-      "review/scenarios/farrowing/fa-m20-abortion-no-live-leaves-list/zh-390/03-record-abortion.png",
-      "review/scenarios/farrowing/fa-m20-abortion-no-live-leaves-list/zh-390/04-fill-data-loss-reason.png",
-      "review/scenarios/farrowing/fa-m20-abortion-no-live-leaves-list/zh-390/05-data-action-save-miscarriage.png",
-      "review/scenarios/farrowing/fa-m20-abortion-no-live-leaves-list/zh-390/06-back.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m20-abortion-no-live-leaves-list/zh-360/00-start.png",
-      "review/scenarios/farrowing/fa-m20-abortion-no-live-leaves-list/zh-360/01-data-action-room-sow-data-value-.png",
-      "review/scenarios/farrowing/fa-m20-abortion-no-live-leaves-list/zh-360/02-data-action-sowactions.png",
-      "review/scenarios/farrowing/fa-m20-abortion-no-live-leaves-list/zh-360/03-record-abortion.png",
-      "review/scenarios/farrowing/fa-m20-abortion-no-live-leaves-list/zh-360/04-fill-data-loss-reason.png",
-      "review/scenarios/farrowing/fa-m20-abortion-no-live-leaves-list/zh-360/05-data-action-save-miscarriage.png",
-      "review/scenarios/farrowing/fa-m20-abortion-no-live-leaves-list/zh-360/06-back.png"
-     ]
     }
    ]
   },
@@ -5011,6 +3395,11 @@
    "tree": "M-21",
    "branch": "sow-death",
    "label": "Task overview counts her: Left the task · 1 aborted",
+   "gwt": {
+    "given": "A sow with no live piglets has had an abortion recorded.",
+    "when": "The worker opens the Task overview.",
+    "then": "It counts her under Left the task as 1 aborted, and the whole-task progress counts 18 sows."
+   },
    "path": [
     "sow-death",
     "sow-death.abortion-none",
@@ -5025,7 +3414,7 @@
      "says": "Task overview counts sows that left the list: 'Left the task · n aborted · n sow died'"
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -5063,54 +3452,6 @@
       "review/scenarios/farrowing/fa-m21-overview-counts-aborted/en-360/06-back.png",
       "review/scenarios/farrowing/fa-m21-overview-counts-aborted/en-360/07-data-action-room-overview.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "\"Left the task\" shown",
-      "\"1 aborted\" shown",
-      "\"18 sows\" shown"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m21-overview-counts-aborted/zh-390/00-start.png",
-      "review/scenarios/farrowing/fa-m21-overview-counts-aborted/zh-390/01-data-action-room-sow-data-value-.png",
-      "review/scenarios/farrowing/fa-m21-overview-counts-aborted/zh-390/02-data-action-sowactions.png",
-      "review/scenarios/farrowing/fa-m21-overview-counts-aborted/zh-390/03-record-abortion.png",
-      "review/scenarios/farrowing/fa-m21-overview-counts-aborted/zh-390/04-fill-data-loss-reason.png",
-      "review/scenarios/farrowing/fa-m21-overview-counts-aborted/zh-390/05-data-action-save-miscarriage.png",
-      "review/scenarios/farrowing/fa-m21-overview-counts-aborted/zh-390/06-back.png",
-      "review/scenarios/farrowing/fa-m21-overview-counts-aborted/zh-390/07-data-action-room-overview.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "\"Left the task\" shown",
-      "\"1 aborted\" shown",
-      "\"18 sows\" shown"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m21-overview-counts-aborted/zh-360/00-start.png",
-      "review/scenarios/farrowing/fa-m21-overview-counts-aborted/zh-360/01-data-action-room-sow-data-value-.png",
-      "review/scenarios/farrowing/fa-m21-overview-counts-aborted/zh-360/02-data-action-sowactions.png",
-      "review/scenarios/farrowing/fa-m21-overview-counts-aborted/zh-360/03-record-abortion.png",
-      "review/scenarios/farrowing/fa-m21-overview-counts-aborted/zh-360/04-fill-data-loss-reason.png",
-      "review/scenarios/farrowing/fa-m21-overview-counts-aborted/zh-360/05-data-action-save-miscarriage.png",
-      "review/scenarios/farrowing/fa-m21-overview-counts-aborted/zh-360/06-back.png",
-      "review/scenarios/farrowing/fa-m21-overview-counts-aborted/zh-360/07-data-action-room-overview.png"
-     ]
     }
    ]
   },
@@ -5118,7 +3459,12 @@
    "id": "fa-m22-abortion-with-live-row-stays",
    "tree": "M-22",
    "branch": "sow-death",
-   "label": "Abortion with 1 live piglet: the row stays, tile \"1 / alive\", facts Aborted",
+   "label": "Abortion with 1 live piglet: the row stays and says \"1 alive\" over Aborted",
+   "gwt": {
+    "given": "A sow in the room has 1 live piglet recorded.",
+    "when": "The worker records an abortion.",
+    "then": "Her row stays and says 1 alive over Aborted, with no \"0 dead\"."
+   },
    "path": [
     "sow-death",
     "sow-death.abortion-live",
@@ -5132,7 +3478,7 @@
      "says": "Abortion: any live piglet, the row stays, chip Aborted, headline '1 alive' (recorded counts only)"
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -5168,52 +3514,6 @@
       "review/scenarios/farrowing/fa-m22-abortion-with-live-row-stays/en-360/05-data-action-save-miscarriage.png",
       "review/scenarios/farrowing/fa-m22-abortion-with-live-row-stays/en-360/06-back.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "\"Aborted\" shown",
-      "\"1 alive\" shown",
-      "\"0 dead\" absent"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m22-abortion-with-live-row-stays/zh-390/00-start.png",
-      "review/scenarios/farrowing/fa-m22-abortion-with-live-row-stays/zh-390/01-data-action-alive-data-value-1.png",
-      "review/scenarios/farrowing/fa-m22-abortion-with-live-row-stays/zh-390/02-data-action-sowactions.png",
-      "review/scenarios/farrowing/fa-m22-abortion-with-live-row-stays/zh-390/03-record-abortion.png",
-      "review/scenarios/farrowing/fa-m22-abortion-with-live-row-stays/zh-390/04-fill-data-loss-reason.png",
-      "review/scenarios/farrowing/fa-m22-abortion-with-live-row-stays/zh-390/05-data-action-save-miscarriage.png",
-      "review/scenarios/farrowing/fa-m22-abortion-with-live-row-stays/zh-390/06-back.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "\"Aborted\" shown",
-      "\"1 alive\" shown",
-      "\"0 dead\" absent"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-m22-abortion-with-live-row-stays/zh-360/00-start.png",
-      "review/scenarios/farrowing/fa-m22-abortion-with-live-row-stays/zh-360/01-data-action-alive-data-value-1.png",
-      "review/scenarios/farrowing/fa-m22-abortion-with-live-row-stays/zh-360/02-data-action-sowactions.png",
-      "review/scenarios/farrowing/fa-m22-abortion-with-live-row-stays/zh-360/03-record-abortion.png",
-      "review/scenarios/farrowing/fa-m22-abortion-with-live-row-stays/zh-360/04-fill-data-loss-reason.png",
-      "review/scenarios/farrowing/fa-m22-abortion-with-live-row-stays/zh-360/05-data-action-save-miscarriage.png",
-      "review/scenarios/farrowing/fa-m22-abortion-with-live-row-stays/zh-360/06-back.png"
-     ]
     }
    ]
   },
@@ -5222,6 +3522,11 @@
    "tree": "K-1",
    "branch": "task",
    "label": "The overview's progress adds up: Done + Active + Awaiting = sows, the same total as End task and the room tabs",
+   "gwt": {
+    "given": "The room list has sows still farrowing.",
+    "when": "The worker opens the Task overview.",
+    "then": "The progress adds up. Every sow falls in exactly one outcome (finished, still farrowing, awaiting, or ended another way), and the total is the same as End task and the room tabs show."
+   },
    "path": [
     "task",
     "task.room",
@@ -5235,7 +3540,7 @@
      "says": "how many sows have farrowed, which are still going, which are still waiting"
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -5261,34 +3566,6 @@
       "review/scenarios/farrowing/fa-k1-overview-adds-up/en-360/00-start.png",
       "review/scenarios/farrowing/fa-k1-overview-adds-up/en-360/01-data-action-room-overview.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-k1-overview-adds-up/zh-390/00-start.png",
-      "review/scenarios/farrowing/fa-k1-overview-adds-up/zh-390/01-data-action-room-overview.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-k1-overview-adds-up/zh-360/00-start.png",
-      "review/scenarios/farrowing/fa-k1-overview-adds-up/zh-360/01-data-action-room-overview.png"
-     ]
     }
    ]
   },
@@ -5297,6 +3574,7 @@
    "tree": "K-2",
    "branch": "task",
    "label": "Can the task end while a sow is still farrowing (or a draft waits)?",
+   "gwt": null,
    "path": [
     "task",
     "task.room",
@@ -5337,6 +3615,11 @@
    "tree": "K-3",
    "branch": "task",
    "label": "A tap does not end the task",
+   "gwt": {
+    "given": "The End task review is open and every sow has finished.",
+    "when": "The worker taps End task without holding.",
+    "then": "The task does not end."
+   },
    "path": [
     "task",
     "task.complete",
@@ -5350,7 +3633,7 @@
      "says": "Task end: manual, hold-to-commit with receipt"
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -5376,34 +3659,6 @@
       "review/scenarios/farrowing/fa-k3-end-needs-hold/en-360/00-start.png",
       "review/scenarios/farrowing/fa-k3-end-needs-hold/en-360/01-data-action-room-end-confirm.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-k3-end-needs-hold/zh-390/00-start.png",
-      "review/scenarios/farrowing/fa-k3-end-needs-hold/zh-390/01-data-action-room-end-confirm.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-k3-end-needs-hold/zh-360/00-start.png",
-      "review/scenarios/farrowing/fa-k3-end-needs-hold/zh-360/01-data-action-room-end-confirm.png"
-     ]
     }
    ]
   },
@@ -5412,6 +3667,11 @@
    "tree": "K-4",
    "branch": "task",
    "label": "The hold ends the task and shows the receipt; one exit, Back",
+   "gwt": {
+    "given": "The End task review is open and every sow has finished.",
+    "when": "The worker holds End task until it commits.",
+    "then": "The task ends and a Task ended receipt is shown, stamped with who and the closing time, and not marked early. Its one exit is Back."
+   },
    "path": [
     "task",
     "task.complete",
@@ -5430,7 +3690,7 @@
      "says": "The exit word is always Back."
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -5456,42 +3716,6 @@
       "review/scenarios/farrowing/fa-k4-end-gives-receipt/en-360/00-start.png",
       "review/scenarios/farrowing/fa-k4-end-gives-receipt/en-360/01-data-action-room-end-confirm.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "\"Task ended\" shown",
-      "stamped with the closure time (the fixed clock)",
-      "\"Back\" shown"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-k4-end-gives-receipt/zh-390/00-start.png",
-      "review/scenarios/farrowing/fa-k4-end-gives-receipt/zh-390/01-data-action-room-end-confirm.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "\"Task ended\" shown",
-      "stamped with the closure time (the fixed clock)",
-      "\"Back\" shown"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-k4-end-gives-receipt/zh-360/00-start.png",
-      "review/scenarios/farrowing/fa-k4-end-gives-receipt/zh-360/01-data-action-room-end-confirm.png"
-     ]
     }
    ]
   },
@@ -5500,6 +3724,11 @@
    "tree": "K-5",
    "branch": "task",
    "label": "The receipt has one exit, Back",
+   "gwt": {
+    "given": "The End task review is open and every sow has finished.",
+    "when": "The worker holds End task and the receipt opens.",
+    "then": "The receipt has one exit, Back, and no second exit."
+   },
    "path": [
     "task",
     "task.complete",
@@ -5518,7 +3747,7 @@
      "says": "Footer holds Back and Back to Today; recommendation: one exit Back"
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -5544,38 +3773,6 @@
       "review/scenarios/farrowing/fa-k5-receipt-one-exit/en-360/00-start.png",
       "review/scenarios/farrowing/fa-k5-receipt-one-exit/en-360/01-data-action-room-end-confirm.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "no second exit"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-k5-receipt-one-exit/zh-390/00-start.png",
-      "review/scenarios/farrowing/fa-k5-receipt-one-exit/zh-390/01-data-action-room-end-confirm.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [
-      "no second exit"
-     ],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-k5-receipt-one-exit/zh-360/00-start.png",
-      "review/scenarios/farrowing/fa-k5-receipt-one-exit/zh-360/01-data-action-room-end-confirm.png"
-     ]
     }
    ]
   },
@@ -5584,6 +3781,11 @@
    "tree": "K-6",
    "branch": "task",
    "label": "Ending early with awaiting sows gives an early receipt",
+   "gwt": {
+    "given": "The End task early review is open. Some sows are still awaiting and none are farrowing.",
+    "when": "The worker holds End task early until it commits.",
+    "then": "The task ends and an early receipt is shown. The task is recorded as ended early."
+   },
    "path": [
     "task",
     "task.ready",
@@ -5597,7 +3799,7 @@
      "says": "Task end: manual, hold-to-commit with receipt"
     }
    ],
-   "result": "blocked",
+   "result": "pass",
    "hard": [],
    "runs": [
     {
@@ -5623,34 +3825,6 @@
       "review/scenarios/farrowing/fa-k6-end-early-receipt/en-360/00-start.png",
       "review/scenarios/farrowing/fa-k6-end-early-receipt/en-360/01-data-action-room-end-confirm.png"
      ]
-    },
-    {
-     "lang": "zh",
-     "width": 390,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-k6-end-early-receipt/zh-390/00-start.png",
-      "review/scenarios/farrowing/fa-k6-end-early-receipt/zh-390/01-data-action-room-end-confirm.png"
-     ]
-    },
-    {
-     "lang": "zh",
-     "width": 360,
-     "result": "blocked",
-     "failures": [],
-     "skipped": [],
-     "notes": [
-      "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-     ],
-     "evidence": [
-      "review/scenarios/farrowing/fa-k6-end-early-receipt/zh-360/00-start.png",
-      "review/scenarios/farrowing/fa-k6-end-early-receipt/zh-360/01-data-action-room-end-confirm.png"
-     ]
     }
    ]
   },
@@ -5659,6 +3833,7 @@
    "tree": "K-7",
    "branch": "task",
    "label": "Where do awaiting sows go when the task ends early?",
+   "gwt": null,
    "path": [
     "task",
     "task.ready",
@@ -5688,6 +3863,7 @@
    "tree": "Z-1",
    "branch": "scope",
    "label": "Is fostering in Farrowing's scope?",
+   "gwt": null,
    "path": [
     "scope",
     "fa-z1-fostering-scope"

@@ -13,7 +13,7 @@
 <div data-state="Tags · type icon" id="animal-state-12"></div>
 <div data-state="Tags · none" id="animal-state-13"></div>
 <div data-state="Tags · too many for the line (+N)" id="animal-state-14"></div>
-<div data-state="Tags · long tag name" id="animal-state-15"></div>
+<div data-state="Tags · long tag name folds into +N" id="animal-state-15"></div>
 <div data-state="Tags · Chinese" id="animal-state-16"></div>
 <script>
 // Each state renders in its own iframe in the atlas: draw only the states present.
@@ -34,7 +34,7 @@ var RENDER = {
   "animal-state-12": () => SentriUI.row({"variant":"animal","code":"000267","description":"Grower · 63d","contextWidth":"112px","right":{"kind":"tags","tags":[{"name":"Appetite","icon":"trend-down","level":"watch"}]},"action":"open","value":"000267"}),
   "animal-state-13": () => SentriUI.row({"variant":"animal","code":"000254","description":"Gestation · 40d","contextWidth":"112px","right":{"kind":"tags","tags":[]},"action":"open","value":"000254"}),
   "animal-state-14": () => SentriUI.row({"variant":"animal","code":"000510","description":"Gestation · 120d","contextWidth":"112px","right":{"kind":"tags","tags":[{"name":"Fever","level":"act"},{"name":"Cough","level":"watch"},{"name":"Lame","level":"watch"},{"name":"Scours","level":"watch"},{"name":"Arthritis","level":"ongoing"}]},"action":"open","value":"000510"}),
-  "animal-state-15": () => SentriUI.row({"variant":"animal","code":"000511","description":"Gestation","contextWidth":"112px","right":{"kind":"tags","tags":[{"name":"Respiratory infection","level":"act"},{"name":"Lame","level":"watch"}]},"action":"open","value":"000511"}),
+  "animal-state-15": () => SentriUI.row({"variant":"animal","code":"000511","description":"Gestation","contextWidth":"112px","right":{"kind":"tags","tags":[{"name":"Fever","level":"act"},{"name":"Respiratory infection","level":"watch"}]},"action":"open","value":"000511"}),
   "animal-state-16": () => SentriUI.row({"variant":"animal","code":"000513","description":"妊娠 · 42天","contextWidth":"112px","right":{"kind":"tags","tags":[{"name":"发烧","level":"act"},{"name":"跛行","level":"watch"}]},"action":"open","value":"000513"})
 };
 document.querySelectorAll('[data-state]').forEach(function (s) {
