@@ -13,6 +13,7 @@ Consolidate a principle when it has three open rules or the same failure twice, 
 | L9 | P5 | Changing a component variant resets its score to "in design" until it is judged again. | Same audit: scores survived changes to the component | Automate: a source-hash guard test per variant. |
 | L10 | P5 | "Used by" is derived, not kept by hand. | Same audit: hand-kept "used by" lists missed users | Automate: derive it at atlas build from the screens that actually render the component. |
 | L11 | P2 | A component change lists every screen, pattern (e.g. the task skeleton) and demo that uses it; each is updated or marked "until migrated", and repropagation runs on every change, not only at freeze. | Same audit: patterns weren't counted as users; the approved row reached 7 places and missed 7 | Automate: the gate prints the reach list from L10 and fails a user that is neither updated nor marked. |
+| L18 | P3 | Every fact a changed screen displays traces to `budget.md` with its question; nothing is shown by default or filled in by a shared component. | Owner, 2026-10-13, on header identity facts: "each display needs a clear decision, not made randomly"; absorbed into P3 and build.md §2 the same day | Automate: the gate reads the rendered text of the changed screens and lists every fact `budget.md` doesn't name. |
 
 ## Closed
 

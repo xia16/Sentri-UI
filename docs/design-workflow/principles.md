@@ -37,13 +37,13 @@ Each principle has the same four parts and nothing else: **the principle**, **wh
 
 ## P3 · Information before layout
 
-**The principle.** Decide what the worker needs, in what order, and what to cut, before any layout. The answer to the worker's first question is the heaviest thing on the screen; only what the worker must do now is loud; cut before you enlarge; cutting facts never cuts structure.
+**The principle.** Decide what the worker needs, in what order, and what to cut, before any layout, on every new screen, every redesign and every component variant that shows facts. Every fact a screen displays, in the header, a row, a chip or a footer, is a decision recorded in the budget with the worker's question it answers there; nothing is shown by default, carried over unexamined, or filled in by a shared component. The answer to the worker's first question is the heaviest thing on the screen; only what the worker must do now is loud; cut before you enlarge; cutting facts never cuts structure.
 
-**Why.** Passes that met the type floors by enlarging everything (c1, R14), that went calm but flat (c2, R15) or stacked facts on a page (R16) all skipped the budget.
+**Why.** Passes that met the type floors by enlarging everything (c1, R14), that went calm but flat (c2, R15) or stacked facts on a page (R16) all skipped the budget. Drawer headers repeated the pen, unit and parity the page behind already showed, and a header spec nearly made `#ID › pen · parity` a default for every task when parity matters at farrowing only (owner, 2026-10-13: "each display needs a clear decision, not made randomly").
 
 **Show it.** `features/<id>/budget.md` with `## Inventory`, `## Questions` and `## Levels`, then the cut list, and the squint test's first three things in the PR body.
 
-**Checked by.** The gate refuses a screen change without `budget.md`; the judge's squint test and cold question (gate.md §3–4).
+**Checked by.** The gate refuses a screen change without `budget.md`; the judge's squint test and cold question (gate.md §3–4). To automate (ledger): every fact the changed screens render traced to the budget; the header line and its identity facts named in it (L17).
 
 ## P4 · Judge it by eye, as the owner would
 
