@@ -38,7 +38,7 @@ function shot(screen, opts = {}) {
     if (ok || !f.isConnected) return;
     console.warn(`atlas: no ready message from ${screen.url} for ${screen.id} within ${READY_MS / 1000}s: falling back to the crop shim`);
     removeEventListener('message', onMsg); f.remove(); wait.remove(); cropShot(box, W, screen, opts);
-  }, READY_MS);
+  }, screen.url.includes('/@') ? READY_MS * 3 : READY_MS);
   return frame;
 }
 
@@ -192,13 +192,45 @@ function layoutFlow(f, entries, avail, open = new Set()) {
   return { pos, boxes, folds, width: x0 + cw + 20, height: y + 100, NW, NH };
 }
 
+/* ---------- layers: an unmerged branch drawn over a feature (atlas/layers.json, scripts/build-layers.mjs) ----------
+   Main is the base layer. A branch layer shows the feature as that branch has it: its screens rendered from the branch's
+   commit, each tagged New, Changed or Removed against where the branch started. Unchanged screens step back. */
+const LTAG = { new: 'New', changed: 'Changed', removed: 'Removed' };
+const layersOf = (fid) => ((S.layers && S.layers.layers) || []).filter((l) => l.features[fid]);
+const layerName = (l) => `${l.author} · ${l.branch.replace(/^[^/]+\//, '')}`;
+function layerFeature(f, l) {
+  const b = l.features[f.id], at = (s) => (s.url ? Object.assign({}, s, { url: atCommit(l.sha, s.url) }) : s);
+  const removed = b.removed.map((s) => Object.assign({}, s));
+  const groups = removed.length && (b.feature.groups || []).length ? [...b.feature.groups, ['Removed in this branch', removed.map((s) => s.id)]] : b.feature.groups;
+  return Object.assign({}, b.feature, { sectionRef: f.sectionRef, screens: [...b.feature.screens.map(at), ...removed], groups });
+}
+function layerBar(f, l, all, onPick) {
+  const counts = l ? Object.values(l.features[f.id].screens).reduce((m, k) => (m[k] = (m[k] || 0) + 1, m), {}) : {};
+  const also = l ? Object.keys(l.features).filter((id) => id !== f.id) : [];
+  const fname = (id) => (allFeatures().find((x) => x.id === id) || { name: id }).name;
+  const meta = !l ? '<span>Main is what is merged. Pick a branch to see its changes on this feature.</span>' : [
+    ['new', 'changed', 'removed'].filter((k) => counts[k]).map((k) => `<span class="ltag ltag-${k}">${counts[k]} ${LTAG[k].toLowerCase()}</span>`).join('') + (l.features[f.id].prd ? '<span class="ltag">PRD</span>' : ''),
+    also.length ? `<span class="also">Also on ${also.map((id) => `<a href="#" data-also="${esc(id)}">${esc(fname(id))} ${Object.keys(l.features[id].screens).length}</a>`).join(' ')}</span>` : '',
+  ].filter(Boolean).join('<i class="sep">·</i>');
+  const gate = !l ? '' : [l.pr ? `<a href="${esc(l.pr.url)}" target="_blank" rel="noopener">PR #${l.pr.number}</a>` : `<span class="warn" title="Nothing merges without a PR and the owner's approval">No PR yet</span>`,
+    l.behind ? `<span class="warn" title="Main has moved on since this branch started; it must take main's changes before it can merge">${l.behind} behind main</span>` : ''].filter(Boolean).join('<i class="sep">·</i>');
+  const bar = el(`<div class="layerbar"><span class="lk">Layer</span><div class="seg" role="group" aria-label="Layer"><button data-layer="" aria-pressed="${!l}">Main</button>${all.map((x) => `<button data-layer="${esc(x.branch)}" aria-pressed="${l === x}" title="${esc(x.branch)} · ${plural(x.commits, 'commit')} · ${esc(x.updated)}">${esc(x.author)} <b>${Object.keys(x.features[f.id].screens).length}</b></button>`).join('')}</div><div class="lmeta">${meta}</div>${gate ? `<div class="lgate">${gate}</div>` : ''}</div>`);
+  bar.querySelectorAll('[data-layer]').forEach((b) => { b.onclick = () => onPick(b.dataset.layer, f.id); });
+  bar.querySelectorAll('[data-also]').forEach((a) => { a.onclick = (e) => { e.preventDefault(); onPick(l.branch, a.dataset.also); }; });
+  return bar;
+}
+
 /* ---------- the page ---------- */
 function openFeature(id, sel) {
-  const f = allFeatures().find((x) => x.id === id); if (!f) return;
+  let f = allFeatures().find((x) => x.id === id); if (!f) return;
+  const layers = layersOf(id), lay = layers.find((l) => l.branch === S.layer) || null, mainF = f;
+  if (lay) f = layerFeature(f, lay);
+  const lch = (sid) => (lay ? lay.features[id].screens[sid] : null);
   const plat = S.data.platforms.find((p) => p.sections.some((s) => s.id === f.sectionRef.id && s.features.some((x) => x.id === id)));
   if (plat) S.platformId = plat.id;
   S.view = 'atlas';
-  const idx = screenIndex(); setParam('feature', id);
+  const idx = screenIndex(), mainIdx = Object.assign({}, idx); setParam('feature', id); setParam('layer', lay ? lay.branch : null);
+  if (lay) f.screens.forEach((s) => { idx[s.id] = Object.assign({}, s, { feature: f }); });
   const n = f.screens.length;
   const ownIds = new Set(f.screens.map((s) => s.id)), mine = backlogItems().filter((b) => (b.target.kind === 'feature' && b.target.id === f.id) || (b.target.kind === 'screen' && ownIds.has(b.target.id)));
   const todos = mine.filter((b) => b.kind !== 'decision').length, confirm = mine.length - todos; // the same sets the Backlog opens on
@@ -239,7 +271,7 @@ function openFeature(id, sel) {
   const dock = el('<div class="dock"></div>'), nodes = {};
   const place = (nid, html, cls, title, onclick) => { if (!pos[nid]) return; const b = el(`<button class="node ${cls}" title="${esc(title)}">${html}</button>`); b.style.left = pos[nid].x + 'px'; b.style.top = pos[nid].y + 'px'; b.onclick = onclick; plane.append(b); nodes[nid] = b; };
   entries.forEach((e) => place(e.id, `<span><b>${esc(e.section)}</b> · ${esc(e.label)}</span>`, 'entry', `${e.section} · ${e.label}`, () => select(e.id)));
-  f.screens.forEach((s) => place(s.id, `${dot(s.status)}<span>${esc(s.name)}</span>`, s.status === 'placeholder' ? 'placeholder' : '', s.status === 'placeholder' ? 'Placeholder — not designed yet' : (s.zh ? `${s.name} · ${s.zh}` : s.name), () => select(s.id)));
+  f.screens.forEach((s) => place(s.id, `${dot(s.status)}<span>${esc(s.name)}</span>${lch(s.id) ? `<i class="ltag ltag-${lch(s.id)}">${LTAG[lch(s.id)]}</i>` : ''}`, [s.status === 'placeholder' ? 'placeholder' : '', lay ? (lch(s.id) ? 'l-' + lch(s.id) : 'lsame') : ''].join(' '), s.status === 'placeholder' ? 'Placeholder — not designed yet' : (s.zh ? `${s.name} · ${s.zh}` : s.name), () => select(s.id)));
   (f.addsTo || []).forEach((a, i) => place('adds:' + i, `<span>${esc(a.what)}</span>`, 'adds', `Adds to ${a.feature}`, () => select('adds:' + i)));
 
   const showNode = (id) => { const x = L.folds.find((g) => !g.open && g.ids.includes(id)); if (x) { unfolded.add(x.name); relayout(); } };
@@ -491,15 +523,21 @@ function openFeature(id, sel) {
       dock.append(el('<div class="cap">&nbsp;</div>'), shot(target, { height: H, open: a.open, markAdded: a.added ? a.what : null, addPlaceholder: a.added ? null : { after: a.under, text: `Added by ${f.name} — not designed yet` } }));
     } else {
       shown = nid;
-      const s = idx[nid], ap = s && s.approval;
-      if (ap && ap.changed) {
-        // changed since approval: the approved version stays in view (rendered from its commit) until the owner promotes the new one
-        const sw = el(`<div class="cap"><div class="seg" role="group" aria-label="Version"><button data-v="approved" aria-pressed="true">Approved · ${esc(ap.date)}</button><button data-v="now" aria-pressed="false">Changed since</button></div></div>`);
+      const s = idx[nid], ms = mainIdx[nid], ap = (ms || s) && (ms || s).approval, ch = lch(nid);
+      // the versions this screen has: approved (when changed since), main, and the branch's when its layer changed it
+      const vs = [];
+      if (ap && ap.changed) vs.push(['approved', `Approved · ${ap.date}`, { ...(ms || s), url: atCommit(ap.commit, ap.url) }], ['main', ch === 'changed' ? 'Main' : 'Changed since', ms || s]);
+      else if (ch === 'changed') vs.push(['main', ap ? `Main · approved ${ap.date}` : 'Main', ms]);
+      if (ch === 'changed') vs.push(['branch', lay.author, s]);
+      if (vs.length) {
+        // the approved version stays in view (rendered from its commit) until the owner promotes the new one; on a layer the branch's version opens
+        const sw = el(`<div class="cap"><div class="seg" role="group" aria-label="Version">${vs.map(([k, label]) => `<button data-v="${k}" aria-pressed="false">${esc(label)}</button>`).join('')}</div></div>`);
         const slot = el('<div class="vslot"></div>');
-        const show = (v) => { sw.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v === v))); clearPins(); slot.replaceChildren(shot(v === 'approved' ? { ...s, url: `/@${ap.commit}${ap.url}` } : s, { height: H })); };
-        sw.onclick = (ev) => { const b = ev.target.closest('button[data-v]'); if (b) show(b.dataset.v); };
-        dock.append(sw, slot); show('approved');
-      } else dock.append(el(`<div class="cap">${ap ? `Approved · ${esc(ap.date)}` : '&nbsp;'}</div>`), shot(s, { height: H }));
+        const show = (v) => { sw.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.v === v))); clearPins(); slot.replaceChildren(shot(vs.find((x) => x[0] === v)[2], { height: H })); };
+        sw.onclick = (ev) => { const x = ev.target.closest('button[data-v]'); if (x) show(x.dataset.v); };
+        dock.append(sw, slot); show(ch === 'changed' ? 'branch' : 'approved');
+      } else if (ch) dock.append(el(`<div class="cap"><span class="ltag ltag-${ch}">${LTAG[ch]}</span> ${ch === 'new' ? `in ${esc(layerName(lay))}` : `in ${esc(layerName(lay))} · showing main`}</div>`), shot(s, { height: H }));
+      else dock.append(el(`<div class="cap">${ap ? `Approved · ${esc(ap.date)}` : (lay ? 'Unchanged in this branch' : '&nbsp;')}</div>`), shot(s, { height: H }));
     }
     const ns = idx[shown] && idx[shown].notes, noteCount = ns ? (ns.elements || []).filter((e) => !CHROME.test(`${e.name} ${e.shows}`)).length : 0;
     const hasNotes = !!(ns && Object.keys(ns).length) && !(idx[shown] && idx[shown].status === 'placeholder');
@@ -510,6 +548,7 @@ function openFeature(id, sel) {
   }
 
   col.append(fcrumb, wrap, zoomEl, notes); page.append(col, dock);
+  if (layers.length) { col.classList.add('layered'); col.insertBefore(layerBar(mainF, lay, layers, (br, fid) => { S.layer = br; openFeature(fid, fid === id ? selected : null); }), wrap); }
   let pdown = false; const toggleNotes = () => { if (notes.classList.contains('open')) setNotes(false); else openNotes(); };
   dock.addEventListener('pointerdown', (ev) => { if (ev.button === 0 && ev.target.closest('[data-notes]')) { pdown = true; toggleNotes(); } });
   dock.addEventListener('click', (ev) => { if (!ev.target.closest('[data-notes]')) return; if (pdown) { pdown = false; return; } toggleNotes(); });
