@@ -1,6 +1,6 @@
 # Offline processing · provisional design review
 
-Date: 2026-10-13. Baseline: `origin/main` at `ccaa3f2`. Design candidate: `codex/offline-flow-design`; the exact tested commit is recorded in the scenario report after this iteration. All screens remain `in-design`.
+Date: 2026-10-13. Baseline: `origin/main` at `ccaa3f2`. Design candidate: `codex/offline-flow-design` at `963f341`. All screens remain `in-design`.
 
 ## Product rules agreed with the owner
 
@@ -32,7 +32,7 @@ Date: 2026-10-13. Baseline: `origin/main` at `ccaa3f2`. Design candidate: `codex
 
 ## Verification and remaining work
 
-- [Scenario report](scenarios-data-sync.json): pending full rerun after the 2026-10-13 badge and retention change. The changed-state leaves passed in English and Chinese at 360 and 390 px.
-- `npm test`: 661 passed, 0 failed, 2 skipped. Data-sync strict legibility: 16 screens, 0 failures. Workbench strict legibility still reports seven pre-existing `unit*` screen failures; the badge adds no reported contrast or touch-target failure. Global `npm run check` remains to be rerun on this candidate.
+- [Scenario report](scenarios-data-sync.json): candidate `963f341`; 19 passed, 0 failed, 0 blocked, 0 pending. All leaves passed in English and Chinese at 360 and 390 px.
+- `npm test`: 661 passed, 0 failed, 2 skipped. Data-sync strict legibility: 16 screens, 0 failures. Workbench strict legibility still reports seven pre-existing `unit*` screen failures; the badge adds no reported contrast or touch-target failure. Global `npm run check` exited 0: atlas passed, 294 screens scanned, 127 existing legibility failures (the same count as the prior baseline). Its generated repository-wide report was not included in this design candidate.
 - The scenario ledger remains **continue** because no persona walk rounds have run. The independent judge gate, formal per-screen grades and owner screen approval have not run. The repository instructions prohibit automatically starting a multi-agent design process; therefore this is a reviewable design candidate, not an approved or merged feature.
 - The HTML prototypes communicate native Android interaction and use separate fictional local queues. The badge study does not yet share live state with the data-sync prototype or other business screens. Android and backend handoff must verify the persistent global queue and count across pages and identities, 30-day cleanup with dependency protection, operation-ID lookup fields, structured receipt statuses, conditional conflict retry, account binding and real offline-capable business operations.

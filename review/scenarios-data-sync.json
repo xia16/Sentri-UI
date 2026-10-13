@@ -1,9 +1,9 @@
 {
  "feature": "data-sync",
- "commit": "915967c3eafa1e49aa0ea28884afbdc5f1ae5f99",
+ "commit": "963f3415b5449d2cea553ed7d697a38315ed8235",
  "dirty": false,
- "ran": "2026-10-13T02:33:58.436Z",
- "base": "http://localhost:50754",
+ "ran": "2026-10-13T03:46:25.850Z",
+ "base": "http://localhost:55691",
  "langs": [
   "en",
   "zh"
@@ -13,25 +13,25 @@
   390
  ],
  "nodes": {
-  "entry": 18,
-  "state": 18,
-  "outcome": 18,
+  "entry": 19,
+  "state": 19,
+  "outcome": 19,
   "action": 13
  },
  "summary": {
-  "pass": 18,
+  "pass": 19,
   "fail": 0,
   "blocked": 0,
   "pending": 0
  },
  "byLang": {
   "en": {
-   "pass": 18,
+   "pass": 19,
    "fail": 0,
    "blocked": 0
   },
   "zh": {
-   "pass": 18,
+   "pass": 19,
    "fail": 0,
    "blocked": 0
   }
@@ -140,6 +140,12 @@
    "pending": 0
   },
   "ds-a8-grouped-records.entry": {
+   "pass": 1,
+   "fail": 0,
+   "blocked": 0,
+   "pending": 0
+  },
+  "ds-b8-recent-upload-total.entry": {
    "pass": 1,
    "fail": 0,
    "blocked": 0,
@@ -1263,7 +1269,7 @@
    "gwt": {
     "given": "Three operations are saved on this phone while it is offline.",
     "when": "The worker checks the toolbox page.",
-    "then": "The app still shows three records saved locally and says they will upload when connected."
+    "then": "A compact global badge still shows three unsent local records, and opening it provides the automatic-upload explanation."
    },
    "path": [
     "ds-a7-global-wait.entry",
@@ -1289,7 +1295,8 @@
      "skipped": [],
      "notes": [],
      "evidence": [
-      "review/scenarios/data-sync/ds-a7-global-wait/en-360/00-start.png"
+      "review/scenarios/data-sync/ds-a7-global-wait/en-360/00-start.png",
+      "review/scenarios/data-sync/ds-a7-global-wait/en-360/01-data-action-sync.png"
      ]
     },
     {
@@ -1300,7 +1307,8 @@
      "skipped": [],
      "notes": [],
      "evidence": [
-      "review/scenarios/data-sync/ds-a7-global-wait/en-390/00-start.png"
+      "review/scenarios/data-sync/ds-a7-global-wait/en-390/00-start.png",
+      "review/scenarios/data-sync/ds-a7-global-wait/en-390/01-data-action-sync.png"
      ]
     },
     {
@@ -1311,7 +1319,8 @@
      "skipped": [],
      "notes": [],
      "evidence": [
-      "review/scenarios/data-sync/ds-a7-global-wait/zh-360/00-start.png"
+      "review/scenarios/data-sync/ds-a7-global-wait/zh-360/00-start.png",
+      "review/scenarios/data-sync/ds-a7-global-wait/zh-360/01-data-action-sync.png"
      ]
     },
     {
@@ -1322,7 +1331,8 @@
      "skipped": [],
      "notes": [],
      "evidence": [
-      "review/scenarios/data-sync/ds-a7-global-wait/zh-390/00-start.png"
+      "review/scenarios/data-sync/ds-a7-global-wait/zh-390/00-start.png",
+      "review/scenarios/data-sync/ds-a7-global-wait/zh-390/01-data-action-sync.png"
      ]
     }
    ]
@@ -1547,6 +1557,77 @@
      "evidence": [
       "review/scenarios/data-sync/ds-a8-grouped-records/zh-390/00-start.png",
       "review/scenarios/data-sync/ds-a8-grouped-records/zh-390/01-data-action-open-category-data-v.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "ds-b8-recent-upload-total",
+   "tree": "B-8",
+   "branch": "ds-b8-recent-upload-total.entry",
+   "label": "Only recent confirmed uploads count locally",
+   "gwt": {
+    "given": "The phone has two confirmed uploads within 30 days and one older uploaded fixture.",
+    "when": "The worker opens Saved work.",
+    "then": "Only the last-30-days total is shown; the older unreferenced uploaded fixture is pruned locally and individual uploaded history does not fill the work list."
+   },
+   "path": [
+    "ds-b8-recent-upload-total.entry",
+    "ds-b8-recent-upload-total.state",
+    "ds-b8-recent-upload-total"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Decisions 2026-10-13",
+     "says": "Show only a recent uploaded total and keep confirmed local upload history for 30 days."
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-b8-recent-upload-total/en-360/00-start.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-b8-recent-upload-total/en-390/00-start.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-b8-recent-upload-total/zh-360/00-start.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-b8-recent-upload-total/zh-390/00-start.png"
      ]
     }
    ]
