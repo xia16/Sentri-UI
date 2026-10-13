@@ -101,14 +101,39 @@ Fields stack in capture order, never in columns. The bar holds at most two actio
 
 Every drawer and page leaves, goes up and commits the same way.
 
-- **Back** sits in the footer of every drawer and page. It leaves and returns to where you came from, keeping the draft.
+- **Back** sits in the footer of every drawer, and at the top left of every page (in the page header; amended 2026-10-13, see Headers). It leaves and returns to where you came from, keeping the draft. Every top page of a task has it.
 - **‹ Parent name** sits in the header, only in a drawer with levels (a cascade picker, a catalogue). It goes up one level and is never labelled "Back". The header back label names the parent; the title names the current level. No breadcrumbs.
 - **The commit** ("Done · 2", "Save · 2 pigs") sits in the footer, on the right of Back. It applies and closes. A single pick commits by itself, so a single-choice sheet has Back alone. In a multi picker Back closes without applying, and the ticks wait as a draft for the next open.
 - **No ✕ on drawers.** Swiping down or tapping the scrim does what Back does.
-- **Reset** restores defaults (a filter). **Clear** empties what was entered or ticked. Both are text actions in the head, present only when there is something to reset or clear; each has one meaning (`ux/laws/strings.json`).
+- **Reset** restores defaults (a filter). **Clear** empties what was entered or ticked. Both are quiet text actions in the footer, left of the primary (amended 2026-10-13: nothing acts in a header), present only when there is something to reset or clear; each has one meaning (`ux/laws/strings.json`).
 - **No reason line** above a waiting commit: the disabled button stands alone. Tapping it marks each empty required field "Required" (on the field's own label line) and scrolls to the first.
 - **An empty selection is no selection.** Unticking the last subject closes the review and ends selection mode; no empty selection sheet is ever shown.
 - **Sized to content, on the bottom edge.** A drawer sits on the bottom edge, as tall as its content up to its cap, its footer on its bottom edge. It never floats and never holds dead space under its content, with two exceptions: `sizing: 'full'` for content that grows as the worker taps, and `sizing: 'hold'` for a drawer with levels, which keeps one height (its tallest level) from open to close so nothing moves under the thumb.
+
+### Headers (law; owner, 2026-10-13)
+
+There are two headers and no others. A new kind of header goes through the rules ledger, never straight into a screen.
+
+| | **Page header** | **Sheet header** |
+|---|---|---|
+| Where | A surface that fills the screen: a task page, a log, a scan, ending a task | A drawer that leaves the page visible above it |
+| Parts | Back (48px, left) · title (left) · optional header line under the title | Centred title · optional header line under it · a 1px `line` hairline that belongs to the header |
+| Gap to the body | `space-section` (24px) from the last header line | `space-section` (24px) from the hairline |
+| Back | Top left; the footer has no Back | In the footer (the drawer convention) |
+
+Which one: whether the surface covers the page, not which feature it belongs to. A drawer that fills the screen is a page and takes the page header.
+
+**The header holds** the title and, at most, one quiet **header line**. Nothing in a header acts except Back and the subject chip: no counts, no status, no Reset or Clear, no buttons. Status is the first thing in the body; Reset and Clear sit in the footer. Section titles under a header keep their own style; the hairline and the gap separate them, never a weaker title.
+
+**The header line is absent by default.** It has one of two jobs, and each fact on it passes three tests:
+
+1. **A route or a fact.** A route is where the worker goes next from here (the subject chip: tag icon, `#ID`, `›`, the only tappable part, opening the animal). A fact is something the worker needs now to decide or to trust the screen (`Last record 08:41 · G.H` on a shared task page). True is not enough.
+2. **Not on screen, and not one Back away.** A fact the body shows, or that Back reaches, is out. So **hubs** (the surface a worker returns to for one subject: the farrowing record drawer, a pen sheet, a task page) carry the line, and **actions** launched from a hub (record dead, foster, allocate, a log) carry none: the hub is one Back away.
+3. **It fits.** One line, never wrapped or truncated, at 360px in English and Chinese (about 32 English or 16 Chinese characters beside Back, fewer beside a chip). Copy that does not fit belongs in the body.
+
+**A chip carries its identity.** On a hub, the subject chip is followed by up to two short `muted` facts that tell the animal apart in the barn: `#000418 › B1 · Parity 3`. Never counts, status or dates.
+
+The header line is part of the information budget (`budget.md`, Levels): the builder names its job, the Back test and its string; a line the budget does not name is not drawn. Evidence: [header boards](evidence/2026-10-13-headers.png), [where the pen goes](evidence/2026-10-13-header-pen.png), [page header](evidence/2026-10-13-page-header.png).
 
 ### Containers
 
