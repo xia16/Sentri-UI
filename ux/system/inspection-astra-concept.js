@@ -506,7 +506,7 @@ function pigOverview(c){
 
  const general=stHeading({title:'General details',icon:icon('profile'),kind:'section',level:4});
  const record=stHeading({title:'Pig record',icon:icon('note'),kind:'section',level:4});
- return sheet(c,p.id,unitName(c)+' · '+pe.id+' · '+stageSummary(p),pigRecordCards(p)+pigCurrentTasks(c)+(()=>{const d=overviewDetails(p,c);return d?'<section class="detail-section reading-section pig-overview-facts">'+general+d+'</section>':''})()+typeDetails(p,c)+pigFeedFacts(p,pe)+'<section class="detail-section reading-section pig-record-links">'+record+'<div class="compact-actions detail-destinations st-panel st-row-group">'+action('pig-production','chart','Production stats','Averages and batch records',p.id)+action('pig-origin','origin','Origin','Provenance, dates and identities',p.id)+action('pig-log','clock','Log','Production, health and movement',p.id)+'</div></section>',pigRecordToolbar(p));
+ return sheet(c,p.id,unitName(c)+' · '+pe.id+' · '+stageSummary(p),pigRecordCards(p)+pigCurrentTasks(c)+(()=>{const d=overviewDetails(p,c);return d?'<section class="detail-section reading-section pig-overview-facts">'+general+d+'</section>':''})()+typeDetails(p,c)+pigFeedFacts(p,pe)+'<section class="detail-section reading-section pig-record-links">'+record+'<div class="compact-actions detail-destinations st-panel st-row-group">'+action('pig-production','chart','Production stats','Averages and batch records',p.id)+action('pig-origin','origin','Origin','Provenance, dates and identities',p.id)+action('pig-log','clock','Log','Production, health and movement',p.id)+'</div></section>',pigRecordToolbar(p),'',pigFacts(c,p));
 }
 function penOverview(c){const pe=pen(c,c.penId),records=[];if(pe.note)records.push(recordCard({kind:'Pen note',title:pe.note,meta:pe.noteBy,tone:'record-neutral record-note-preview',link:'read-pen-note',value:pe.id}));return sheet(c,'Pen '+pe.id,countLabel(pe.pigs.length)+' · '+unitName(c),
  (records.length?'<div class="record-card-stack" aria-label="Pen notes">'+records.join('')+'</div>':'')+'<section class="detail-section">'+stHeading({title:'Pen information',icon:icon('grid'),kind:'section',level:4})+'<div class="compact-actions st-panel st-row-group">'+action('feed','feed','Feed guidance',pe.formula+' · '+feedLabel(pe),pe.id)+action('pen-note','note',pe.note?'Edit pen note':'Add pen note',pe.note?'Update the note for this pen':'Leave information for the next person',pe.id)+action('pen-log','clock','Pen log','Transfers, health and notes',pe.id)+'</div></section>',footer(back(),''));}
@@ -873,7 +873,7 @@ function unavailableActionGroups(c){const rows=actionCatalogue(c).unavailable;re
 function actionsPage(c){
  const {groups,unavailable}=actionCatalogue(c),single=picked(c).length===1,p=single?picked(c)[0]:null;
  const body=actionSections(c,groups)+(unavailable.length?button('unavailable-actions',`Unavailable actions (${unavailable.length}) ${icon('chevron')}`,'unavailable-actions-link'):'');
- return sheet(c,'More actions',single?p.id+' · '+penOf(c,p.id).id:selectionLabel(c),body,'');
+ return sheet(c,'More actions',single?p.id+' · '+penOf(c,p.id).id:selectionLabel(c),body,'','',single?pigRoute(c,p):null);
 }
 function actionCategoryNav(c){const batch=picked(c).length!==1||c.selectedPens.size>0,groups=actionCatalogue(c).groups.filter(g=>!batch||g.id!=='production'),current=groups.some(g=>g.id===c.actionCategory)?c.actionCategory:groups[0]?.id;return globalThis.SentriUI.categoryFooter({categories:inSowEmbed()?[]:groups.map(g=>({id:g.id,label:g.label})),active:current,backAction:false,categoryAction:'action-category',label:'Action categories',className:'record-toolbar actions-bottom-bar'});}
 
@@ -883,7 +883,7 @@ function measurementsMenu(c){
  items.push({a:'weight',k:'weight',title:'Record weight',sub:single?'Weight in kg':'A separate value for each pig'});
  if(single)items.push({a:'temperature',k:'temperature',title:'Record temperature',sub:'Body temperature in °C'});
  if(rows.some(p=>['Sow','Gilt'].includes(animalType(p))))items.push({a:'backfat',k:'measure',title:'Record backfat',sub:single?'Backfat depth in mm':'Sows and gilts · separate readings'});
- return sheet(c,'Measurements & condition',single?rows[0].id:selectionLabel(c),'<div class="compact-actions st-panel st-row-group st-action-list">'+actionRows(items)+'</div>',footer(back(),''),'menu');
+ return sheet(c,'Measurements & condition',single?rows[0].id:selectionLabel(c),'<div class="compact-actions st-panel st-row-group st-action-list">'+actionRows(items)+'</div>',footer(back(),''),'menu',single?pigRoute(c,rows[0]):null);
 }
 
 function unavailableActionsPage(c){return sheet(c,'Unavailable actions',picked(c).length===1?picked(c)[0].id+' · '+penOf(c,picked(c)[0].id).id:selectionLabel(c),actionSections(c,unavailableActionGroups(c),true),footer(back(),''),'menu');}
@@ -942,7 +942,7 @@ function overlay(c){if(c.logDatePicker)return '<div class="drawer-background" in
  if(c.view==='temperature'||c.view==='backfat')return sheet(c,c.view==='temperature'?'Record temperature':'Record backfat',scope(c),(SentriUI.field({label:(c.view==='temperature'?'Temperature · °C':'Backfat · mm'),control:"<input type=\"number\" inputmode=\"decimal\" step=\"0.1\" data-v2=\"measurement\" value=\""+(esc(f.measurement||''))+"\">"})),footer(back(),button('save-measurement','Save reading','button primary','',!valid(c))));
  if(c.view==='pig')return pigOverview(c);
  
- if(c.view==='feed'){const pe=pen(c,c.penId);return sheet(c,'Pen feeding','Pen '+pe.id+' · '+countLabel(pe.pigs.length),feedBody(c,pe),footer(back(),button('feed-edit-pen',icon('feed')+'Adjust feed','button primary',pe.id)));}
+ if(c.view==='feed'){const pe=pen(c,c.penId);return sheet(c,'Pen feeding','Pen '+pe.id+' · '+countLabel(pe.pigs.length),feedBody(c,pe),footer(back(),button('feed-edit-pen',icon('feed')+'Adjust feed','button primary',pe.id)),'',{text:'Pen '+pe.id});}
  return legacyOverlay(c);}
 function valid(c){const f=c.form;if(c.view==='treatment')return !!f.medicine?.trim()&&!!f.method&&Number.isFinite(+f.dose)&&+f.dose>0&&!!f.doseUnit;if(c.view==='fault-form')return !!f.device&&!!f.description?.trim()&&(f.device!=='Other'||!!f.name?.trim());if(c.view==='pen-note'||c.view==='selected-pen-note')return !!f.note?.trim();if(c.view==='temperature'||c.view==='backfat')return Number.isFinite(+f.measurement)&&+f.measurement>0;return legacyValid(c);}
 function installV2(){
@@ -1144,7 +1144,7 @@ function pigRecordPage(c){
   ])+
   (r.identities?.length?'<details class="detail-disclosure profile-identities"><summary><span>Other identities <small>'+r.identities.length+'</small></span>'+icon('chevron')+'</summary><dl class="identity-list">'+r.identities.map(x=>'<div><dt>'+esc(x.type)+'</dt><dd>'+esc(x.value)+'</dd></div>').join('')+'</dl></details>':'<div class="profile-empty-row"><span>Other identities</span><span>—</span></div>');
  if(tab==='log')body=categorizedLog(c,pigLogEntries(c),'pig');
- return sheet(c,({details:'General details',production:'Production stats',provenance:'Origin',log:'Pig log'}[tab]),p.id+' · '+unitName(c)+' · '+pe.id,body,footer(back(),''));
+ return sheet(c,({details:'General details',production:'Production stats',provenance:'Origin',log:'Pig log'}[tab]),p.id+' · '+unitName(c)+' · '+pe.id,body,footer(back(),''),'',tab==='production'?pigRoute(c,p):null);
 }
 // Deliberate populated / partial / missing examples; all remain sample farm data.
 function seedProfileExamples(c){
@@ -1182,7 +1182,7 @@ function pigFeedPage(c){
  const p=pig(c,c.pigId),pe=penOf(c,p.id);
  const feeding='<section class="detail-section reading-section pig-feeding-facts">'+stHeading({title:'Feeding',icon:icon('feed'),kind:'section',level:4})+pigFeedingToday(p,pe)+'</section>';
  const curve=pe.mode==='adlib'?'':'<section class="detail-section pig-plan-curve">'+stHeading({title:'Base curve',icon:icon('chart'),kind:'section',level:4})+stPanel(feedCurve(p),{className:'facts-surface pig-plan-curve-panel'})+'</section>';
- return sheet(c,'Feed plan',p.id,feeding+curve,footer(back(),''));
+ return sheet(c,'Feed plan',p.id,feeding+curve,footer(back(),''),'',pigRoute(c,p));
 }
 function feedBody(c,pe){
  const plans=pe.mode==='adlib'?'':pe.pigs.map(p=>button('pig-feed','<span><strong>'+p.id+'</strong><small>'+esc(pigFeedTags(p).map(t=>t.label).join(' · ')||'Follow curve')+'</small></span><strong>'+quantity(pigAllocation(p,pe))+' <small>kg/day</small></strong>'+icon('chevron'),'feeding-pig-row',p.id)).join('');
@@ -1200,7 +1200,7 @@ function recordFlowOverlay(c){
  const k=currentFinding(c);if(!k)return sheet(c,'Finding closed',c.pigId,'<p class="quiet-note">The record is retained in this pig’s log.</p>',footer(back(),''));
  if(c.view==='finding')return sheet(c,k.name,p.id+' · '+k.kind,
   '<div class="finding-summary">'+SentriUI.conditionTag({variant:'detail',day:'Day '+k.day,careText:careLabel(k.triage),note:k.note||'',...(a=>({care:a.care,level:a.level,icon:a.symbol}))(careAppearance(k))})+'</div>'+'<p class="quiet-note">Recorded '+esc(k.recordedDate||'—')+' · '+esc(k.recordedBy||'—')+'</p>'+(k.feedLinked?'<p class="quiet-note">Linked feed adjustment: '+(p.factor>=1?'+':'')+Math.round((p.factor-1)*100)+'%. Resolving this finding restores the base plan.</p>':'')+
-  (p.treatment?.target===k.name?'<p class="quiet-note">Latest treatment: '+esc(p.treatment.medicine)+' · '+esc(p.treatment.dose)+' '+esc(p.treatment.unit)+' · '+esc(p.treatment.method)+'</p>':'')+'<div class="compact-actions st-panel st-row-group st-action-list">'+action('finding-edit','note','Edit finding','Care and notes')+action('finding-treat','condition','Record treatment','For '+k.name+' on this pig')+(k.feedLinked?action('pig-adjustment','feed','Review feed adjustment','Condition band and end date',p.id):'')+action('finding-close','check','Resolve or remove','Recovered, or entered in error')+'</div>',footer(back(),''));
+  (p.treatment?.target===k.name?'<p class="quiet-note">Latest treatment: '+esc(p.treatment.medicine)+' · '+esc(p.treatment.dose)+' '+esc(p.treatment.unit)+' · '+esc(p.treatment.method)+'</p>':'')+'<div class="compact-actions st-panel st-row-group st-action-list">'+action('finding-edit','note','Edit finding','Care and notes')+action('finding-treat','condition','Record treatment','For '+k.name+' on this pig')+(k.feedLinked?action('pig-adjustment','feed','Review feed adjustment','Condition band and end date',p.id):'')+action('finding-close','check','Resolve or remove','Recovered, or entered in error')+'</div>',footer(back(),''),'',pigRoute(c,p));
  if(c.view==='finding-edit')return sheet(c,'Edit finding',p.id+' · '+k.name,
   (k.feedLinked?'<p class="quiet-note">'+esc(k.name)+' · Body condition. Use Review feed adjustment to change the condition band.</p>':fieldSelect(c,'Finding','findingLabel',[[k.name,k.name],...catalog.filter(x=>x.name!==k.name&&!cases(p).some(y=>y.name===x.name)).map(x=>[x.name,x.name])],f.findingLabel))+
   healthStateFields(c)+optNote('Note',SentriUI.field({label:'Note',labelHidden:true,variant:'textarea',control:'<textarea aria-label="Note" data-v2="caseNote">'+esc(f.caseNote||'')+'</textarea>'}),f.caseNote),footer(back(),button('save-finding','Save changes','button primary')));
@@ -1476,7 +1476,7 @@ function drawerSize(view,c){
    reached from the walk list, the pen sheet or the pig's page, each one Back away, so none carries a header line: `scope` (the
    old subtitle: counts, pens, the unit) is no longer drawn. A page takes the page header, Back at its top left, and its footer
    drops Back; a footer left with nothing is removed. */
-function sheet(c,title,scope,body,actions,surface=''){
+function sheet(c,title,scope,body,actions,surface='',line=null){
  /* Drawers with levels carry "‹ Parent" in the header (Sheet up); the title names the level. No breadcrumb, no ✕. */
  let up=null,holdRows=0;
  if(c.view==='bulk-health-picker'&&c.form.customDraft){const h=SentriUI.pickerHead({items:conditionTree(c),path:[],title});title='Choose a category';up={label:'Conditions',action:'health-catalog-back'};holdRows=h.rows;}
@@ -1490,9 +1490,15 @@ function sheet(c,title,scope,body,actions,surface=''){
  const above=(c.view==='actions'&&c.selectedPens.size?'<div class="actions-subjects">'+scopeTabs(c)+'</div>':'')+(c.view==='pig-log'?logFilterBar(c,pigLogEntries(c),'pig'):c.view==='pen-log'?logFilterBar(c,penLogEntries(c,c.penId),'pen'):'');
  let foot=nav||(wantBack&&!page?SentriUI.sheetFooter({back:{action:'back'}}):false);
  if(page&&foot){foot=foot.replace(back(),'');if(!/<button/.test(foot))foot=false;}
- return SentriUI.sheet({variant:page?'page':'drawer',surface,title,back:{action:'back'},up,above,body,footer:foot,className:c.view==='actions'?'actions-sheet':'',size:drawerSize(c.view,c),sizing:['search','scan','grid'].includes(c.view)||c.view==='record-optional'&&c.form.optionalKey==='target'?'full':holdRows?'hold':'content',holdRows,label:title,scrim:{action:'dismiss',label:'Dismiss '+title},bar:page?status():''});
+ return SentriUI.sheet({variant:page?'page':'drawer',surface,title,line,back:{action:'back'},up,above,body,footer:foot,className:c.view==='actions'?'actions-sheet':'',size:drawerSize(c.view,c),sizing:['search','scan','grid'].includes(c.view)||c.view==='record-optional'&&c.form.optionalKey==='target'?'full':holdRows?'hold':'content',holdRows,label:title,scrim:{action:'dismiss',label:'Dismiss '+title},bar:page?status():''});
 }
 function back(){return SentriUI.backButton({action:'back'});}
+/* Header lines (features/pig-profile/budget.md ## Headers): a surface that writes to or is about one pig shows that pig on screen
+   or exactly one Back away. Her own page carries her identity facts (where she is, what she is); a surface that the record forms
+   come back to (More actions, Measurements & condition, a finding) carries the route: her chip, then her pen. */
+function pigWhat(p){const type=animalType(p);return type!=='Sow'?type:(p.stage==='Off production'&&p.breedingStatus==='Open'?'Open':null)||({Gestating:'Gestation',Lactating:'Lactation'})[p.stage]||p.stage||'';}
+function pigFacts(c,p){return {text:[{text:unitName(c)+' · '+penOf(c,p.id).id},...(pigWhat(p)?[{sep:true},{text:pigWhat(p)}]:[])]};}
+function pigRoute(c,p){return {chip:{id:p.id,action:'pig',value:p.id,label:'Open pig '+p.id},facts:[penOf(c,p.id).id]};}
 function scope(c){const ids=c.form.subjects||[...c.selected],pens=[...new Set(ids.map(id=>penOf(c,id)?.id))];return `${countLabel(ids.length)} · ${pens.join(' / ')}`;}
 function action(a,k,title,sub,v='',disabled=false){return stRow({action:a,title,description:sub,icon:icon(k),value:v,disabled,className:'action-item',attrs:entryFor(a)?{'data-entry':entryFor(a)}:{}});}
 function textField(label,key,value='',placeholder=''){return SentriUI.field({label:label||'Note',variant:'textarea',control:`<textarea data-field="${key}" placeholder="${placeholder}">${esc(value)}</textarea>`});}

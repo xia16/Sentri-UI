@@ -290,7 +290,8 @@
       K.list([K.group({ title: T(scheme() === 'notch' ? 'pc.notched' : 'pc.tagged'), face: 'word', meta: '· ' + idWhat(p) + ' · ' + T('breeders.n', { n: P.breeders(p) }),
         rows: rows.length ? rows : '<p class="sp-empty">' + esc(T('id.none.yet')) + '</p>' })]);
     if (scheme() === 'breeders' && !p.picked && !ended) body += UI.button({ label: T('id.done.pick', { n: P.breeders(p) }), register: 'secondary', action: 'pick-done', className: 'sp-wide' });
-    return K.page({ title: T('pl.title'), back: { action: 'back', label: T('back') }, view: 'tagged', body: body,
+    // Give IDs comes back here, so this page carries the route (the sow's chip, the pen): the litter is on screen or one Back away.
+    return K.page({ title: T('pl.title'), back: { action: 'back', label: T('back') }, line: { chip: { id: p.sow, action: 'sow', value: p.sow, label: T('sow.open', { tag: p.sow }) }, facts: [p.code] }, view: 'tagged', body: body,
       footer: ended ? false : K.footer({ back: false, primary: { label: T('add.' + scheme()), action: 'give-new', register: 'primary' } }) });
   }
 

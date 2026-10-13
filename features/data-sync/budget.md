@@ -23,3 +23,5 @@ The header line of every surface of this feature, decided by the Headers law (`u
 | Every page and drawer of this feature | action or destination off Home | none | | Back reaches Home, which shows the section and unit |
 
 Ambiguous, quieter option taken: The PREVIEW badges (prototype chrome) are dropped with the old page heads.
+
+Chains walked on the real Back path after this change (crit round 1): no surface here writes to or is about one animal without showing it on screen or one Back away; no line changed.

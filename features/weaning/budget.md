@@ -21,3 +21,5 @@ The header line of every surface of this feature, decided by the Headers law (`u
 | Surface | Hub or action | Header line | The worker's question it answers there | Back test |
 |---|---|---|---|---|
 | For weaning (end of the task) | action | none | | Back reaches the hub, which shows the subject |
+
+Chains walked on the real Back path after this change (crit round 1): no surface here writes to or is about one animal without showing it on screen or one Back away; no line changed.

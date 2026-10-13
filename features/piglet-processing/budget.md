@@ -24,8 +24,10 @@ The header line of every surface of this feature, decided by the Headers law (`u
 | Pen list (task page) | hub | fact: `Last record 08:20 · G. Hansen` (none while a phone-clash note shows: the note is the newer fact) | Can I trust this list? | Back (new) reaches Today, as the Farrowing room's does |
 | Pen sheet | hub | route: `#000245 ›` · `A03` | chip: open the sow; pen: is this the pen in front of me | Back reaches the list, which does not say which pen I opened |
 | Boars and gilts, Litter weight, Record death, Set count, Fewer piglets, More actions | action | none | | Back reaches the pen sheet |
-| Piglets, Give IDs, Move piglets, Pen log | action (pages) | none | | Back reaches the pen sheet |
+| Piglets (identified piglets) | hub for Give IDs | route: `#000238 ›` · `A02` | Whose litter am I identifying? | the pen sheet (chip) | on screen |
+| Give IDs | action (page) | none | | Piglets (chip), walked in crit round 1 | one Back away |
+| Move piglets, Pen log | action (pages) | none | | Back reaches the pen sheet (chip) | one Back away |
 | End task, Task ended | action (page) | none | the receipt in the body says who and when | Back reaches the list |
 | Round pages outside the atlas (room, litter, count, dead, edit, id, bulk, move, end) | room: hub; the rest actions | room: fact (last record); others none; their status and instructions are the body's first line | | |
 
-Ambiguous, quieter option taken: Give IDs: `Fixing 001216` is cut, not moved (the tag field shows the number being fixed). The litter drawer of the round pages has no route line (that round has no sow page for a chip to open).
+Ambiguous, quieter option taken: Give IDs: `Fixing 001216` is cut, not moved (the tag field shows the number being fixed); the litter is one Back away on Piglets. The litter drawer of the round pages has no route line (that round has no sow page for a chip to open).

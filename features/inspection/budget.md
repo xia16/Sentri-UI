@@ -21,6 +21,9 @@ The header line of every surface of this feature, decided by the Headers law (`u
 | Surface | Hub or action | Header line | The worker's question it answers there | Back test |
 |---|---|---|---|---|
 | Walk (task page) | hub | fact: `Last check-in 06:40 · G. Hansen` | Can I trust what this list shows? | Back reaches Today |
-| Pen sheet, Pen log, Pen note, Filter pigs, Go to pen, Find or scan, More actions, Selected, This walk, End walk, Walk recorded | action | none | | Back reaches the walk |
+| Pen sheet (title `Pen C1`), Pen log, Pen note, Filter pigs, Go to pen, Find or scan, Selected, This walk, End walk, Walk recorded | action | none | | Back reaches the walk, or the pen sheet that names the pen |
+| More actions for one pig, and the pig's surfaces | see `features/pig-profile/budget.md` | route on the hubs her forms come back to | | walked on the real chain (crit round 1) |
 
 Ambiguous, quieter option taken: The unit (`Unit 7`) moved from under the title to the body's first row, beside Log and End walk.
+
+Chains walked on the real Back path after this change (crit round 1): no surface here writes to or is about one animal without showing it on screen or one Back away; no line changed.

@@ -20,4 +20,4 @@ The header line of every surface of this feature, decided by the Headers law (`u
 
 | Surface | Hub or action | Header line | The worker's question it answers there | Back test |
 |---|---|---|---|---|
-| Transfer sow (from More actions) | action | none | | Back reaches the hub, which shows the subject |
+| Transfer sow (from More actions) | action | none | | Back reaches More actions, which now carries her chip and pen (walked in crit round 1) |

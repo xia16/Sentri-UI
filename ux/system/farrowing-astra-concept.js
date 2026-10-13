@@ -677,9 +677,11 @@ window.addEventListener('message',e=>{
  if(e.data.type==='sow-detail-close'){s.actionsEntry=false;act(s,'back');render(i);document.querySelector(`[data-card="${i}"] [data-action="profile"]`)?.focus({preventScroll:true,focusVisible:false});}
 });
 
-// Actions launched from the sow's record (More actions): pages with the page header and no line; the record is one Back away.
-function featurePage(s,title,body,primary='',cls=''){
- return SentriUI.sheet({variant:'page',title,back:{action:'featureBack'},body,footer:pageFooter(primary),className:('feature-page '+cls).trim(),label:title,bar:status()});
+// Actions launched from the sow's record (More actions): pages with the page header and no line; More actions (her chip) is one Back away.
+// Piglet processing is the page the piglet identity, mortality and foster pages come back to, so it carries the route (her chip,
+// her pen): every surface about her shows her on screen or one Back away.
+function featurePage(s,title,body,primary='',cls='',line=null){
+ return SentriUI.sheet({variant:'page',title,line,back:{action:'featureBack'},body,footer:pageFooter(primary),className:('feature-page '+cls).trim(),label:title,bar:status()});
 }
 function markerPage(s){
  const existing=s.markers[0];
@@ -699,7 +701,7 @@ function pigletCarePage(s){
  const care=s.pigletTab==='care';
  const tabs=SentriUI.segment({variant:'view-switch',options:[['care','Care'],['records','Piglet records']],active:s.pigletTab,action:'pigletTab',className:'feature-tabs',ariaLabel:'Piglet processing sections'});
  const primary=care?btn('saveProcessing','Save care updates','button primary','',!s.processingDirty):btn('openMortality',`Report mortality${s.pigletSelected.length?' · '+s.pigletSelected.length:''}`,'button primary','',!s.pigletSelected.length&&!s.unidentified);
- return featurePage(s,'Piglet processing',tabs+(care?processingCare(s):processingRecords(s)),primary,'piglet-care-page');
+ return featurePage(s,'Piglet processing',tabs+(care?processingCare(s):processingRecords(s)),primary,'piglet-care-page',{chip:{id:s.tag,action:'profile',label:'View sow '+s.tag+' details'},facts:[sowPlace(s)]});
 }
 function pigletEditPage(s){
  const p=s.pigletDraft||{tag:'',notch:'',sex:'',weight:''},valid=[p.tag,p.notch,p.sex,p.weight].some(x=>String(x||'').trim()&&x!=='Choose notch');

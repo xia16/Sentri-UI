@@ -39,7 +39,10 @@ The header line of every surface of this feature, decided by the Headers law (`u
 | N piglets to allocate (sow died) | hub (her row opens it) | route: chip · pen | pen: where her piglets are now | Back reaches the room |
 | Finish farrowing, Record dead, Edit record, Edit finish details, Correct born | action | none | (the record is one Back away) | Back reaches the record, which has the chip |
 | Farrowing log, Death breakdown | action (read) | none | | Back reaches the record |
-| More actions and its pages (note, piglet processing, identity, mortality, foster, reconcile, transfer, not in pig) | action | none | | Back reaches the record |
+| More actions (her sow page's actions, shown in the drawer) | hub for her action pages | route: chip · pen (Pig profile's More actions) | Which sow will these write to? | the record (chip) | on screen |
+| Piglet processing (her piglets' care and records) | hub for identity, mortality and foster | route: chip · pen | Whose piglets are these? | More actions (chip) | on screen |
+| Note, reconcile, transfer, not in pig | action | none | | More actions (chip) | one Back away |
+| Piglet identity, Report piglet mortality, Foster piglets (from Piglet processing) | action | none | | Piglet processing (chip), walked in crit round 1 | one Back away |
 | Task overview, End task (early), Task ended, task sows lists | action (from the room's summary card) | none | the scope is in the body (Choose a unit, the outcomes) | Back reaches the room |
 | Filter sows, Go to pen, Scan actions | action | none | Reset in the footer | Back reaches the room |
 | Pen page, Pen log, Pen note, Feed guidance, Report fault, Equipment fault | action | none | | Back reaches the room or the pen page |
@@ -47,3 +50,5 @@ The header line of every surface of this feature, decided by the Headers law (`u
 | Find a sow | search page | not a title header: its pinned field is its head (owner, 2026-10-12) | | |
 
 Ambiguous, quieter option taken: Task ended: the end stamp (`Oct 11 · 09:41 · G.H`) is cut, not moved (an audit fact; the quieter option).
+
+Chains walked (crit round 1): the room, the record drawer, the logs and the pen pages read as before; More actions and Piglet processing now carry the route, so every action page about her is one Back from her chip.
