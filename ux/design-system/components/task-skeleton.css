@@ -139,8 +139,8 @@
 .tk-choice-tile:active { background: var(--press); }
 
 /* One left edge per surface: a ChoiceList's group title inside a page or sheet sits on the body's edge, not 17px in. */
-.sheet-body .st-choice-heading.st-choice-heading { padding-left: 0; padding-right: 0; }
-.sheet-body .st-choice-heading-row { padding-right: 0; }
+.tk-phone .sheet-body .st-choice-heading.st-choice-heading { padding-left: 0; padding-right: 0; }
+.tk-phone .sheet-body .st-choice-heading-row { padding-right: 0; }
 
 /* ---- Skeleton 3 ---- */
 

@@ -1,6 +1,5 @@
 /* Piglet processing shared UI: what two or more pages draw (ticket #19). Built from the design system's
    factories plus four compositions (CSS in shell.css, tokens only):
-     litterHeader  the litter's identity header: `A02 · 000231 ›` (the door to the sow), parity, day
      tools         `Record dead · Set count`: Button's tool register (adopted, ADR 0002)
      recordGroup   the Record group: Move, identity, birth litter weight (and why, outside a task)
      weightRow     the birth-litter-weight row, missing or set
@@ -42,18 +41,6 @@
     if (days === 1) return PP.t('time.yesterday');
     if (days < 7) return PP.t('time.days_ago', { n: days });
     return U.date(iso);
-  };
-
-  /* ---- the litter header: crate first (the first fact), the one door to the sow page ----
-     o: { crate, sow, parity, day?, sub? (html replacing the parity line), action? } */
-  U.litterHeader = function (o) {
-    var a = { crate: o.crate, tag: o.sow };
-    var ctx = o.sub ? '<p>' + o.sub + '</p>' : o.day != null
-      ? '<p class="pp-hdr-context">' + U.span('pp.common.hdr.parity', { n: o.parity }) + U.span('pp.common.unit.day', { n: o.day }) + '</p>'
-      : '<p>' + U.span('pp.common.hdr.parity', { n: o.parity }) + '</p>';
-    return '<header class="utility-header"' + (o.attrs || '') + '><div class="pp-hdr-title"><h3><button type="button" class="pp-door" data-action="open-sow" data-value="' + esc(o.sow) +
-      '" data-str-attr="aria-label:pp.common.hdr.sow_aria" data-args=\'' + esc(JSON.stringify(a)) + '\' aria-label="' + esc(PP.t('pp.common.hdr.sow_aria', a)) + '">' +
-      U.span('pp.common.hdr.door', a, { cls: 'pp-mono' }) + ICON.icon('chevron') + '</button></h3>' + ctx + '</div>' + (o.action || '') + '</header>';
   };
 
   /* ---- tools: the two quick acts on the litter's numbers, in the tool register ---- */

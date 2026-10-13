@@ -43,7 +43,7 @@
 
   /* ---- TaskHeader ---- */
   function header({ title, back = { action: 'back' }, backLabel } = {}) {
-    const b = back ? `<button type="button" class="tk-header-back"${A(back.action, back.value)}${L(backLabel, { text: 'Back', str: 'act.back' })}>${glyph('back-chevron')}</button>` : '';
+    const b = back ? `<button type="button" class="tk-header-back"${A(back.action, back.value)}${L(backLabel, { text: 'Back', str: 'act.back' })}>${root.SentriIcons.icon('back-chevron')}</button>` : '';
     return `<header class="tk-header" data-ds="TaskHeader">${b}<h1 class="tk-header-title">${T(title)}</h1></header>`;
   }
   /* ---- TaskLatest: `Last record 08:41 · G. Hansen` ---- */
