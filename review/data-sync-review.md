@@ -15,7 +15,7 @@ Date: 2026-10-13. Baseline: `origin/main` at `ccaa3f2`. Design candidate: `codex
 
 - The app shell shows a tappable status row just below the system safe area on Home and internal pages. Waiting shows the local count and automatic upload expectation; uploading shows that sending is active; failure or conflict shows that action is needed. Empty queues hide the row. Home adds a content prompt only for an exception.
 - The 390 px compact capsule study truncated the count and upload meaning. A floating badge would overlap page controls. Android system status chips are an optional later investigation for qualifying activity, not the basis of continuous waiting and exception awareness.
-- For a small queue, keep direct record rows. With at least nine ordinary waiting records spanning more than one business category, group those rows by category and show counts. Keep exceptional records directly accessible above the groups. Category → record is the navigation depth in this candidate; the four labels in the 30-record fixture are examples, not a final business taxonomy.
+- For a small queue, keep direct record rows. With at least nine ordinary waiting records spanning more than one business category, group those rows by category and show counts. Keep exceptional records directly accessible above the groups. Category → record is the navigation depth in this candidate; the four labels in the 30-record fixture are examples, not a final business taxonomy. Newly added or unmapped types must remain visible under Other work until mapped.
 
 ## Review paths
 
