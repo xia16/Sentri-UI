@@ -33,11 +33,6 @@
 .tk-scroll { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; background: var(--app-background); }
 
 /* ---- TaskHeader: the page header (SentriUI.pageHeader, bundle.css .st-page-header) ---- */
-/* ---- TaskLatest (retiring into TaskHeader's line) ---- */
-.tk-latest { display: flex; align-items: center; min-height: var(--tap-min); margin: 0; padding: 0 var(--space-gutter) 8px;
-  font: var(--type-description-size)/1.5 var(--font-sans); color: var(--muted); }
-.tk-latest > p { margin: 0; }
-.tk-latest strong { font-weight: 500; color: var(--ink); }
 
 /* ---- TaskSummary: the unit figure | the task-overview progress ---- */
 .tk-summary { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.12fr); margin: 0 var(--space-panel) 10px;

@@ -52,11 +52,6 @@
     return root.SentriUI.pageHeader({ title, back: b, line, level: 1, ds: 'TaskHeader', className: 'tk-header' });
   }
 
-  /* ---- TaskLatest (retiring into TaskHeader's `line`; removed once its callers move) ---- */
-  function latest({ lead, value, rest } = {}) {
-    return `<div class="tk-latest" data-ds="TaskLatest"><p><span>${T(lead)}</span> <strong>${T(value)}</strong>${rest ? ` <span>${T(rest)}</span>` : ''}</p></div>`;
-  }
-
   /* ---- TaskSummary ---- */
   function summary({ unit = {}, task = {} } = {}) {
     const seg = (task.segments || []).map(s => `<i data-tone="${esc(s.tone)}" style="width:${Math.max(0, Math.min(100, +s.share || 0))}%"></i>`).join('');
@@ -278,7 +273,7 @@
     return window.SentriUI.filterChips({items:items.map(i=>({...i,label:T(i.label),count:i.count==null?null:T(i.count)})),action,key,label});
   }
 
-  const api = { T, statusbar, phone, screen, header, latest, summary, progress, lens, chips, list, group, row, door, doors, radios, warning, section, receipt, day, holdBind, table, metrics, stepper, photos, choice, totals, dock, back, footer, scrim, sheet, drawer, page, dialog, glyph };
+  const api = { T, statusbar, phone, screen, header, summary, progress, lens, chips, list, group, row, door, doors, radios, warning, section, receipt, day, holdBind, table, metrics, stepper, photos, choice, totals, dock, back, footer, scrim, sheet, drawer, page, dialog, glyph };
   root.SentriTask = api;
   if (typeof module !== 'undefined') module.exports = api;
 })(globalThis);

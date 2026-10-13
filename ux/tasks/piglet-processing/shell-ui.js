@@ -6,7 +6,7 @@
      litterRow     Candidate:LitterRow — the room's row law (room, End)
      receipt       Candidate:Receipt — one body line, colour on the value only
      toolRow       Candidate:ToolRow — farrowing's in-sheet tools (Edit · Record dead · Set count · Move), skeleton pages
-   Plus the words every page stamps with: span, stamp, date, ago. Needs window.SentriUI and PP. */
+   Plus the words every page stamps with: span, stamp, date, ago; and note, a status line at the top of a body. Needs window.SentriUI and PP. */
 (function () {
   var UI = window.SentriUI, ICON = window.SentriIcons;
   var U = (window.PPUI = {});
@@ -41,6 +41,18 @@
     if (days === 1) return PP.t('time.yesterday');
     if (days < 7) return PP.t('time.days_ago', { n: days });
     return U.date(iso);
+  };
+
+  /* ---- note: a status or instruction line, the first thing in a body (Headers law, 2026-10-13: a header holds no status, counts
+     or instructions). parts: [{ text, str, args, tone }, { sep: true }, …], the old subtitle's parts; drawn as the Status line. ---- */
+  U.note = function (parts) {
+    var list = (Array.isArray(parts) ? parts : [parts]).filter(Boolean), tokens = [[]];
+    list.forEach(function (p) {
+      if (p.sep) { tokens.push([]); return; }
+      tokens[tokens.length - 1].push({ text: p.text, tone: p.tone, strs: p.str ? { text: p.str } : undefined, args: p.args ? { text: p.args } : undefined });
+    });
+    tokens = tokens.filter(function (t) { return t.length; });
+    return tokens.length ? UI.statusLine(tokens, { sep: 'dot', className: 'pp-note' }) : '';
   };
 
   /* ---- tools: the two quick acts on the litter's numbers, in the tool register ---- */

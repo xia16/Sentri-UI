@@ -422,10 +422,14 @@
 
   /* ---- the pages (TaskPage): each a full page over the room, head, body, footer ---- */
   function behind() { return K.screen({ inert: true, header: K.header({ title: P('pp.common.task'), back: { action: 'noop' } }) }); }
-  function page(titleId, titleArgs, descId, descArgs, body, footer) {
-    return K.page({ view: S.sheet || (S.ended ? 'ended' : 'overview'), title: P(titleId, titleArgs), description: descId ? P(descId, descArgs) : '', body: '<div class="en-body">' + body + '</div>', footer: footer });
+  /* A page takes the page header (Headers law, 2026-10-13): Back at the top left, the title, no line here (scope, counts and stamps never
+     sit in a header); its footer has no Back, and a footer left with nothing is removed. descId is kept only where it is the page's
+     empty line, which belongs to the body. back: the header's Back action ('close-sheet' returns to the page under it). */
+  function page(titleId, titleArgs, descId, descArgs, body, footer, back) {
+    var only = footer && footer.pageBack, empty = descId === 'pp.end.none.desc' ? '<p class="st-choice-empty">' + U.span(descId, descArgs || {}) + '</p>' : '';
+    return K.page({ view: S.sheet || (S.ended ? 'ended' : 'overview'), title: P(titleId, titleArgs), back: { action: only || back || 'close-sheet' }, body: '<div class="en-body">' + empty + body + '</div>', footer: only ? false : footer });
   }
-  function backOnly(action) { return K.footer({ back: { action: action || 'close-sheet' } }); }
+  function backOnly(action) { return { pageBack: action || 'close-sheet' }; }
 
   // farrowing's Task overview: progress card, choose a crate row, performance metrics; Back + End task.
   function overviewPage() {
@@ -434,8 +438,8 @@
     var body = (en ? alreadyBlock(en) : '') + progressCard(t) + '<div class="en-block">' + cratesCard(ls) + '</div>' +
       '<div class="en-block">' + metrics(t, false) + '</div>' +
       (day.n ? K.section({ title: P('pp.end.day.title'), icon: 'details', rows: true, items: [{ label: P(one('pp.end.day.d', day.n), { n: day.n, who: day.order.join(' · ') }), action: 'day' }] }) : '');
-    var foot = en ? backOnly('back') : K.footer({ back: { action: 'back' }, primary: UI.button({ label: PP.t('pp.end.act.end'), register: 'secondary', action: 'review', strs: { label: 'pp.end.act.end' } }) });
-    return page('pp.end.ov.title', null, 'pp.end.scope.short', { n: UNIT }, body, foot);
+    var foot = en ? backOnly('back') : K.footer({ back: false, primary: UI.button({ label: PP.t('pp.end.act.end'), register: 'secondary', action: 'review', strs: { label: 'pp.end.act.end' } }) });
+    return page('pp.end.ov.title', null, '', null, body, foot, 'back');
   }
   // farrowing's End task early: one warning (what ending drops), the door to the unfinished litters, what is open for
   // review, today's records by hand (a door), the metrics; Back + the hold.
@@ -462,7 +466,7 @@
       // R1-21: doses not yet due are not unfinished work; they are said apart
       body += rows(UI.row({ title: '', description: '', wrap: true, strs: { title: one('pp.end.rv.work', t.work), description: 'pp.end.rv.collapsed.split' }, args: { title: { n: t.work }, description: { o: t.owed, a: t.ahead } } }));
       // the farrowing door is a host stub in the prototype: it says where it would go, where the worker looks (the footer)
-      foot = S.stub ? K.footer({ back: { action: 'close-sheet' }, status: Object.assign({ id: 'pp-stub', visible: true }, P('pp.end.rv.opens_farrowing', { code: S.stub })) }) : backOnly();
+      foot = S.stub ? K.footer({ back: false, status: Object.assign({ id: 'pp-stub', visible: true }, P('pp.end.rv.opens_farrowing', { code: S.stub })) }) : backOnly();
     } else {
       if (S.unconfirmed) body += K.warning({ text: P('pp.end.rv.unconfirmed'), detail: P('pp.end.rv.unconfirmed.why') }) +
         doors([door('check-ended', 'pp.end.rv.check')]);
@@ -488,11 +492,11 @@
       var phase = S.unconfirmed ? 'unknown' : S.pending ? 'pending' : S.holding ? 'holding' : 'idle';
       // the hold's progress line is the footer's status: hidden by default (farrowing shows only the caption), still heard
       // the visible caption is HOLD TO END in every phase (farrowing keeps it steady); the progress words (keep holding, ending…) are the hidden status
-      foot = K.footer({ back: { action: 'close-sheet' }, status: Object.assign({ id: 'pp-hold-status', text: '' }, phase === 'holding' ? P('pp.end.hold.keep') : phase === 'pending' ? P('pp.end.hold.pending') : {}),
+      foot = K.footer({ back: false, status: Object.assign({ id: 'pp-hold-status', text: '' }, phase === 'holding' ? P('pp.end.hold.keep') : phase === 'pending' ? P('pp.end.hold.pending') : {}),
         hold: { label: P('pp.end.act.end'), caption: P(capId(phase)), action: 'hold', tone: 'danger', phase: phase } })
         .replace('data-phase="holding"', S.holding === 'static' ? 'data-phase="holding" data-preview="still"' : 'data-phase="holding"');
     }
-    return page('pp.end.title', null, 'pp.end.rv.scope', { n: UNIT, k: t.litters }, body, foot);
+    return page('pp.end.title', null, '', null, body, foot);
   }
   function capId(phase) { return phase === 'unknown' ? 'pp.end.hold.unknown' : 'pp.end.hold.caption'; }
   // A treatment physically done after End (from an offline phone): kept, stamped, flagged; the frozen figures do not change.
@@ -516,7 +520,7 @@
     var since = (late.length ? UI.panel(h({ strs: { title: one('pp.end.rc.late', late.length), description: 'pp.end.rc.late.why' }, args: { title: { n: late.length }, description: { code: late.map(function (e) { return e.code; }).join(' ') } } })) : '') +
       afterEndFlag() + sinceLog(true) + doors([door('handoff', 'pp.end.w.title', null, 'pp.end.w.row_now')]);
     body += '<div class="en-block">' + sec({ strs: { title: 'pp.end.since.title', description: 'pp.end.since.desc' } }) + since + '</div>';
-    return page('pp.end.rc.title', null, 'pp.end.scope.short', { n: UNIT }, body, backOnly());
+    return page('pp.end.rc.title', null, '', null, body, backOnly());
   }
   // The ended task (the room's Back after End): what still writes, the receipt, the handoff, what End froze, since End.
   function endedPage() {
@@ -525,7 +529,7 @@
       doors([door('receipt', 'pp.end.ended.receipt', null, one('pp.end.ended.receipt.desc', atEnd), { n: atEnd }),
         door('handoff', 'pp.end.w.title', null, 'pp.end.w.row', { n: totals(false).alive })].concat(unf.length ? [door('litters', 'pp.end.nd.title', null, one('pp.end.v.litters', unf.length), { n: unf.length })] : [])) +
       reviewsBlock(frozenReviews(), true) + sinceLog();
-    return page('pp.end.rc.title', null, 'pp.end.ended.stamp', stamp(en.at, en.who), body, backOnly('back'));
+    return page('pp.end.rc.title', null, '', null, body, backOnly('back'));
   }
   // One level down from the review (unfinished now) or the ended task (not done at End): the litters, by crate row.
   // Litters whose only open doses are not yet due: not unfinished, listed apart (R2-26)
@@ -548,10 +552,10 @@
     if (S.ended) {
       var ls = endedLitters();
       var ny = notYetDueLitters();
-      return page('pp.end.nd.title', null, 'pp.end.nd.frozen', null, groupsOf(byRow(ls, endedRow)) + notYetBlock(ny, endedRow), backOnly());
+      return page('pp.end.nd.title', null, '', null, groupsOf(byRow(ls, endedRow)) + notYetBlock(ny, endedRow), backOnly());
     }
     var t = totals(false), ahead = litters(false).filter(function (l) { return fig(false).notYetDueOnly.indexOf(l.code) >= 0; });
-    return page('pp.end.rv.list', null, 'pp.end.lit.sub', { n: t.unf.length, o: t.owed, a: t.ahead }, groupsOf(byRow(t.unf, unfinishedRow)) + notYetBlock(ahead, unfinishedRow), backOnly());
+    return page('pp.end.rv.list', null, '', null, groupsOf(byRow(t.unf, unfinishedRow)) + notYetBlock(ahead, unfinishedRow), backOnly());
   }
   /* N5: the day's records by hand, so a mark on the wrong litter is findable before End: each opens its litter's log. */
   function dayRecords() {
@@ -584,7 +588,7 @@
       return '<div class="en-block">' + h({ kind: 'section', strs: { title: 'pp.end.day.who', meta: one('pp.end.day.n', list.length) }, args: { title: { who: who }, meta: { n: list.length } } }) +
         doors(list.map(function (e) { var w = words(e); return door('open-record', w[0], w[1], e.corrected ? 'pp.end.day.at_corrected' : 'pp.end.day.at', { t: time(e.at) }, e.litterCode || e.litter || e.from); })) + '</div>';
     }).join('');
-    return page('pp.end.day.title', null, 'pp.end.day.desc', null, body, backOnly());
+    return page('pp.end.day.title', null, '', null, body, backOnly());
   }
   /* The handoff to weaning: as it stands now. Every row opens its litter; weights say their day; doses not reached are
      "not given in this task", owed ones "not done at End" (R1-21); the review items End froze are listed. */
@@ -614,10 +618,10 @@
   // One level down from the handoff (R2-26): a treatment not done on several crates opens the list of them, each its litter.
   function dosePage() {
     var k = qs.get('dose') || S.dose, g = handoffGroups().filter(function (x) { return x.k === k; })[0] || handoffGroups().filter(function (x) { return x.codes.length > 1; })[0];
-    if (!g) return page('pp.end.w.title', null, 'pp.end.w.desc', { n: UNIT }, '', backOnly());
+    if (!g) return page('pp.end.w.title', null, '', null, '', backOnly());
     var ls = g.codes.map(function (c) { return litter(c, false); });
     var row = function (l) { return litterRow(l, [P('pp.end.w.u.owed', { name: name(g.k), n: g.by[l.code] })], null); };
-    return page('pp.end.w.u.dose', { name: name(g.k) }, 'pp.end.w.u.dose.d', { n: g.n, k: g.codes.length }, groupsOf(byRow(ls, row)), backOnly());
+    return page('pp.end.w.u.dose', { name: name(g.k) }, '', null, groupsOf(byRow(ls, row)), backOnly());
   }
   function handoffPage() {
     var now = totals(false), loss = outcomes(false);
@@ -644,7 +648,7 @@
       (nd ? '<div class="en-block">' + sec({ strs: { title: 'pp.end.nd.title', meta: pd(ndTotal) }, args: { meta: { n: ndTotal } } }) + doors(nd) + '</div>' : '') +
       reviewsBlock(frozenReviews(), true) + orphansBlock() +
       '<div class="en-block">' + sec({ strs: { title: 'pp.end.w.litters', meta: one('pp.end.v.litters', now.litters) }, args: { meta: { n: now.litters } } }) + groupsOf(byRow(litters(false), perLitter)) + '</div>';
-    return page('pp.end.w.title', null, 'pp.end.w.desc', { n: UNIT }, body, backOnly());
+    return page('pp.end.w.title', null, '', null, body, backOnly());
   }
 
   /* ---- render: the active page over the room (one page at a time) ---- */
