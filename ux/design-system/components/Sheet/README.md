@@ -35,29 +35,29 @@ Parts, in order. Optional parts are marked.
 
 1. **Scrim** (drawer): the dimmed page; a tap dismisses and keeps the draft.
 2. **Grab** (drawer): the 42×4 bar. It is decoration; every gesture has a visible control.
-3. **Head** (`utility-header`): **up** (optional, a drawer with levels only: "‹ Parent name", `up: { label, action, value }`), **title** (the current level), **subtitle** (optional, one line; parts may carry a tone), **aside** (optional: the text actions Clear or Reset). No ✕.
+3. **Head** (`utility-header`): **up** (optional, a drawer with levels only: "‹ Parent name", `up: { label, action, value }`), **title** (centred; the current level), **header line** (optional, absent by default: the subject chip with the identity facts its task's budget names, or one fact; see [Headers](../../README.md#headers-law-owner-2026-10-13)), then a 1px `line` hairline and `space-section` (24px) to the body. Nothing else: no ✕, no counts, no Reset or Clear. *(Migrating: `subtitle` and `aside` are the old head parts and are being retired.)*
 4. **Above** (optional): a bar that does not scroll (a filter bar).
 5. **Body** (`sheet-body`): the one scroller.
 6. **Status** (`sheet-status`, optional): a line above the footer only when it carries its own text action. A waiting primary's reason is never drawn: it is the primary's screen-reader description only.
 7. **Footer** (`sheet-footer`): Back, then the primary or a hold, with the handle bar under them.
 
-A **page** has a status bar in place of the grab and scrim, and its head, body and footer sit on the page gutter (18px). A **dialog** has a title (with an optional glyph), one description line, the body, and the footer inset to the body's edges; it has no grab and no ✕.
+A **page** has a status bar in place of the grab and scrim, and its head, body and footer sit on the page gutter (18px). Its head is the page header: Back (48px) at the top left, the title left-aligned, an optional header line under it, then 24px to the body; its footer has no Back. A drawer that fills the screen is a page. A **dialog** has a title (with an optional glyph), one description line, the body, and the footer inset to the body's edges; it has no grab and no ✕.
 
 ## The drawer convention (law)
 
 This is the owner's rule for every drawer and page (2026-10-10); [the design system README](../../README.md) carries the same text.
 
-- **Back** sits in the footer of every drawer and page. It means leave and return to where you came from, keeping the draft. Alone in a footer it fills the bar.
+- **Back** sits in the footer of every drawer, and at the top left of every page. It means leave and return to where you came from, keeping the draft. Alone in a footer it fills the bar.
 - **‹ Parent name** (`up`) sits in the header, only in a drawer with levels. It goes up one level and is never labelled "Back". The header back label names the parent; the title names the current level. **No breadcrumbs** in a drawer.
 - **The commit** ("Done · 2", "Save · 2 pigs") sits in the footer on the right. It applies and closes. A single pick commits by itself, so a single-choice sheet has Back alone.
 - **No ✕ on drawers** (nor on pages and dialogs). Swiping down and tapping the scrim do what Back does. `close` is accepted for old callers and ignored.
-- **Reset** restores defaults (a filter). **Clear** empties what was entered or ticked. Both are head text actions (`aside`), present only when there is something to reset or clear, each with one meaning in `ux/laws/strings.json`.
+- **Reset** restores defaults (a filter). **Clear** empties what was entered or ticked. Both are quiet text actions in the footer, left of the primary, present only when there is something to reset or clear, each with one meaning in `ux/laws/strings.json`.
 - The word in the footer is **Back**, never Close or Cancel. Discarding a draft is its own act (Clear, Reset), never what Back does, so a sheet never loses typed work silently and needs no "discard changes?" question. The one exception is a correction to a saved record: Back with changes asks "Save correction?" (Save / Discard), so an unsaved correction never travels on.
 - **An empty selection closes.** A review of ticked subjects closes, and selection mode ends, when the last one is unticked; no empty selection sheet is ever shown.
 
 ## Footer
 
-- **At most two controls, the primary on the right.** A third action moves to the aside (Reset on a filter drawer) or leaves the sheet.
+- **At most two controls, the primary on the right,** plus Reset or Clear as quiet text between them when there is something to reset or clear. Any other third action leaves the sheet.
 - The primary is a [Button](../Button/README.md) (`primary` ink; `danger` for destructive verbs) or a hold-to-commit for an irreversible act.
 - **No reason line.** A waiting primary or hold stands alone; a tap on it marks each empty required field "Required" (the host's field `error`, shown on the field's label line) and scrolls to the first: `status.text` is never drawn above it; it stays in the markup visually hidden, as the primary's `aria-describedby` (the hold's `statusId`). A Button `reason` placed in `content` is hoisted and hidden the same way. A status with an `action` (one text action at its end, `42 is right`) is not a reason and is drawn.
 - Geometry: padded 14 / 21 / 28 (`space-row-x`, `space-gutter-sheet`, `space-footer-bottom`), 14px apart. The buttons end 28px above the sheet's bottom; the 4px handle bar sits in the 8px below that, so a button never touches it.
@@ -89,7 +89,7 @@ Every state is drawn in `variants/drawer.html`, `variants/page.html` and `varian
 ## Content rules
 
 - **Title:** a noun or verb phrase, sentence case, up to 28 characters in English (about 14 Chinese). It names the step (`Record a death`), not the screen under it.
-- **Subtitle:** one line of context in the form `place · amount · day` (`B4 · 11 alive`); `muted`; no full stops.
+- **Header line:** absent by default; a route (the subject chip, with up to two identity facts the task's `budget.md` chooses, e.g. `#000418 › B1 · Parity 3` at farrowing; the component never picks them) or one fact (`Last record 08:41 · G.H`) that passes the three tests in [Headers](../../README.md#headers-law-owner-2026-10-13); one line at 360px in EN and ZH; `muted`; no full stops.
 - **Primary label:** a verb with its count and place (`Record 12 piglets`, `Move 3 to B6`), not Save, Submit or Done (see Button).
 - **Status line:** a short instruction, no colon, no full stop.
 - Chinese strings are shorter than the English; nothing is clipped, titles wrap to two lines.
@@ -106,7 +106,7 @@ Every state is drawn in `variants/drawer.html`, `variants/page.html` and `varian
 
 - Do put one idea in a sheet and end it with one primary.
 - Do give a drawer a size cap that matches its content, and let it shrink to fit.
-- Do put Reset or Clear in the aside, and keep the footer to Back and the primary.
+- Do put Reset or Clear in the footer as quiet text, left of the primary.
 - Don't put a second drawer on a drawer, or a dialog on a dialog.
 - Don't say Close or Cancel in the footer; it is Back.
 - Don't fix a drawer's height when the content does not grow: the dead space puts the footer far from the thumb.
@@ -117,7 +117,7 @@ Every state is drawn in `variants/drawer.html`, `variants/page.html` and `varian
 
 The page for one act on several subjects (Record health · 2 pigs). One composition, every use:
 
-1. **Subjects:** the ticked pigs as one Panel of select rows (checkbox left, ID and pen · stage, a per-row state only where rows differ: `Ready to save`, `Already recorded · unchanged`, or a dose or reading field). A column key appears only when the column has values (`Dose · mL`, `Current → New · kg`). The header subtitle carries the count once.
+1. **Subjects:** the ticked pigs as one Panel of select rows (checkbox left, ID and pen · stage, a per-row state only where rows differ: `Ready to save`, `Already recorded · unchanged`, or a dose or reading field). A column key appears only when the column has values (`Dose · mL`, `Current → New · kg`). The count is in the primary (`Save · n pigs`); the header carries none.
 2. **Details:** the fields for the act, held on the bottom edge above the footer (`position: sticky; bottom: 0` in the one scroller): the footer's `paper` with one `line` rule above, no card, no shadow, fields straight on it. With many subjects the rows scroll under it; no field is ever under the footer. Its heading folds it away (`aria-expanded`). Fields stack in capture order, never in columns.
 3. **Footer:** Back + `Save · n pigs` (n = the pigs it will write; the ticked pigs while it waits). No reason line: a tap on the waiting Save marks the empty required fields "Required" and scrolls to the first.
 
