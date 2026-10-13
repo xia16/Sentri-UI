@@ -27,3 +27,5 @@ Ambiguous, quieter option taken: The PREVIEW badges (prototype chrome) stay wher
 Chains walked on the real Back path after this change (crit round 1): no surface here writes to or is about one animal without showing it on screen or one Back away; no line changed.
 
 Until migrated (crit round 1): the Assistant, Environment & devices and Maintenance pages keep their page-built head, PREVIEW badge and subtitle. Their bodies are below the farm legibility floors (10px text, 9px chart labels) and a change that moves a screen must bring it to the floors; that body work is its own task. Their drawers (report issue, issue detail) take the sheet header.
+
+The finding page (Movement needs clarification) stays with them: its PREVIEW badge is below the floors, so it is not moved either.
