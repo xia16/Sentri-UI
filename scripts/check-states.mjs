@@ -74,6 +74,7 @@ function audit(stateName) {
   for (const box of st.querySelectorAll('[data-ds="Sheet"],.st-sheet,[data-ds="Panel"],.st-panel:not(.st-facts):not(.st-row-group)')) {
     const h = box.querySelector('h1,h2,h3,[class*=sheet-title],[class*=-title]'); if (!h || !vis(h)) continue;
     if (cs(h).textAlign === 'center') continue; // a centred sheet title (Headers law) has no left edge to align to
+    { const hd = h.closest('header'); if (hd && [...hd.querySelectorAll('button,a')].some((x) => vis(x) && !h.contains(x) && x.getBoundingClientRect().right <= h.getBoundingClientRect().left + 1)) continue; } // a page title beside Back: the body aligns to Back, not the title
     const hr = h.querySelector('svg,img') ? h.getBoundingClientRect() : textRect(h); if (!hr) continue;
     for (const p of box.querySelectorAll('p,[class*=empty],[class*=note],[class*=hint],[class*=subtitle]')) {
       if (p === h || h.contains(p) || !vis(p) || p.closest('li,button,a,label,.st-row,[class*=field],[class*=footer]')) continue;
