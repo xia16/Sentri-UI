@@ -25,7 +25,7 @@
   const copy = {
     en: {
       title: 'Saved work', detail: 'Record detail', back: 'Back', waiting: 'Waiting to upload',
-      production: 'Production work', inspection: 'Inspections', vaccination: 'Vaccinations', transfer: 'Transfers',
+      production: 'Production work', inspection: 'Inspections', vaccination: 'Vaccinations', transfer: 'Transfers', other: 'Other work',
       categoryHint: 'Select a work category to find a saved record.', categoryWaiting: 'Records in this category upload automatically when connected.',
       categoryCount: 'waiting records',
       needs: 'Needs you', uploaded: 'Uploaded', syncing: 'Uploading automatically',
@@ -56,7 +56,7 @@
       compare: 'Compare before retrying', phoneValue: 'On this phone', serverValue: 'On the server now',
       localChange: 'Pregnancy result: Pregnant · saved at 09:32', serverChange: 'Pregnancy result: Not pregnant · changed by M. Li at 09:36',
       safeRetry: 'Retry checks the server again. If these values still differ, the record stays in conflict; it never overwrites the team record.',
-      work: 'Work', place: 'Place', status: 'Status', time: 'Saved time',
+      work: 'Work', place: 'Place', status: 'Status', time: 'Saved time', account: 'Account', farm: 'Farm',
       first: 'Pregnancy check · 000308', second: 'Pen note · C2', third: 'Feed adjustment · 000267',
       p1: 'Gestation · Unit 7 · Batch 31', p2: 'Gestation · Unit 8', p3: 'Gestation · Unit 7 · Pen C1',
       waitingShort: 'Waiting', syncingShort: 'Uploading', failedShort: 'Failed',
@@ -72,7 +72,7 @@
     },
     zh: {
       title: '本机记录', detail: '记录详情', back: '返回', waiting: '待上传',
-      production: '生产操作', inspection: '巡检', vaccination: '免疫', transfer: '转群',
+      production: '生产操作', inspection: '巡检', vaccination: '免疫', transfer: '转群', other: '其他操作',
       categoryHint: '按业务类别查看本机记录。', categoryWaiting: '本类别记录联网后会自动上传。',
       categoryCount: '条待上传记录',
       needs: '需要处理', uploaded: '已上传', syncing: '正在自动上传',
@@ -103,7 +103,7 @@
       compare: '重试前核对差异', phoneValue: '本机记录', serverValue: '服务端现值',
       localChange: '孕检结果：已怀孕 · 09:32 保存', serverChange: '孕检结果：未怀孕 · 李某 09:36 修改',
       safeRetry: '重试会再次核对服务端。若差异仍在，记录继续保留为冲突，不会覆盖团队记录。',
-      work: '操作', place: '位置', status: '状态', time: '保存时间',
+      work: '操作', place: '位置', status: '状态', time: '保存时间', account: '账号', farm: '猪场',
       first: '孕检 · 000308', second: '栏位备注 · C2', third: '饲喂调整 · 000267',
       p1: '妊娠区 · 7 单元 · 31 批', p2: '妊娠区 · 8 单元', p3: '妊娠区 · 7 单元 · C1 栏',
       waitingShort: '待上传', syncingShort: '上传中', failedShort: '失败',
@@ -168,10 +168,11 @@
   });
   const group = (title, items) => items.length
     ? S.rowGroup(items.map(row).join(''), {title: title + ' · ' + items.length, level: 3}) : '';
+  const categoryFor = item => ['production','inspection','vaccination','transfer'].includes(item.category) ? item.category : 'other';
   const categoryGroups = items => {
-    const keys = ['production','inspection','vaccination','transfer'].filter(category => items.some(item => item.category === category));
+    const keys = ['production','inspection','vaccination','transfer','other'].filter(category => items.some(item => categoryFor(item) === category));
     return S.rowGroup(keys.map(category => {
-      const count = items.filter(item => item.category === category).length;
+      const count = items.filter(item => categoryFor(item) === category).length;
       return S.row({title:t(category), description:count + ' ' + t('categoryCount'),
         action:'open-category', value:category, wrap:true});
     }).join(''), {title:t('waiting')+' · '+items.length, level:3});
@@ -184,7 +185,7 @@
     const waiting = items.filter(x => x.status === 'waiting' || x.status === 'syncing' || x.status === 'blocked');
     const uploaded = items.filter(x => x.status === 'uploaded');
     if (state.category) {
-      const categoryItems = waiting.filter(item => item.category === state.category);
+      const categoryItems = waiting.filter(item => categoryFor(item) === state.category);
       const body = '<div class="sync-content"><div class="sync-intro">' +
         S.statusLine([{text:t('categoryWaiting')}]) + '</div><div class="sync-groups">' +
         group(t('waiting'), categoryItems) + '</div></div>';
@@ -201,7 +202,7 @@
     const reauth = mode === 'expired' ? S.button({label:t('reauth'),register:'primary',action:'open-reauth'}) : '';
     const body = '<div class="sync-content"><div class="sync-intro">' + lead + reauth + '</div>' +
       '<div class="sync-groups">' + group(t('needs'), needs) + group(t('checkingReceipt'), checking) +
-      (waiting.length >= 9 && new Set(waiting.map(item => item.category)).size >= 2 ? categoryGroups(waiting) : group(t('waiting'), waiting)) +
+      (waiting.length >= 9 && new Set(waiting.map(categoryFor)).size >= 2 ? categoryGroups(waiting) : group(t('waiting'), waiting)) +
       group(t('uploaded'), uploaded) + '</div></div>';
     app.innerHTML = S.sheet({
       variant:'page', title:t('title'), body,
@@ -222,6 +223,8 @@
       {label:t('work'), value:itemTitle(item)},
       {label:t('status'), value:humanStatus(item.status)},
       {label:t('place'), value:itemPlace(item)},
+      {label:t('account'), value:'G. Hansen'},
+      {label:t('farm'), value:'Green Valley Farm'},
       {label:t('time'), value:item.at}
     ], {columns:1});
     const alert = reason ? S.banner({tone: conflict || failed ? 'danger' : 'notice', headline: t('reason'), consequence:reason}) : '';
