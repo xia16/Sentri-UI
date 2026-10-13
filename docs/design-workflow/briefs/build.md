@@ -23,7 +23,7 @@ The driver fills in **TITLE**, **SCOPE**, **CHANGE CLASS** (copy · presentation
 
 ## 2. Information before layout (P3)
 
-Write `features/<id>/budget.md` and commit it before any layout. On an existing screen it decides what the problem parts show and what to cut; it never overrides Keep without a problem behind it.
+Write `features/<id>/budget.md` and commit it before any layout, for every new screen, redesign and component variant that shows facts. **Every fact the finished screen displays is in it with the question it answers there**, including the header line, the identity facts beside a subject chip (chosen per task: parity matters at farrowing, not everywhere) and whatever a shared component draws by default. A fact not in the budget is not drawn. On an existing screen, kept facts are listed as kept with their question; the budget decides what the problem parts show and what to cut, and never overrides Keep without a problem behind it.
 
 1. `## Inventory`: every fact the screen could show, per item and state.
 2. `## Questions`: the worker's questions at that moment, in order (where am I? does anything need me? what do I do? is this the right animal? who did it, when?).
