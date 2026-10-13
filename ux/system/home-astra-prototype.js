@@ -195,7 +195,7 @@
     const island=params.get('indicator')==='island';
     const title=zh?(error?`${n} 条记录需要处理`:busy?`正在上传 ${n} 条记录`:`${n} 条记录保存在本机`):(error?`${n} record${n===1?'':'s'} ${n===1?'needs':'need'} attention`:busy?`Uploading ${n} saved records`:`${n} records saved on this phone`);
     const detail=zh?(error?'查看原因':busy?'自动上传中':'联网后自动上传'):(error?'Review records':busy?'Automatic upload':'Uploads when connected');
-    const short=zh?(error?'异常':busy?'上传':'待传'):(error?'Review':busy?'Sending':'Saved');
+    const short=zh?(error?'异常':busy?'上传':'待传'):(error?'Fix':busy?'Sending':'Saved');
     return `<div class="global-sync ${error?'needs-attention':busy?'uploading':'waiting'}">${btn('sync',`<span class="global-sync-mark" aria-hidden="true">${busy?'↻':error?'!':'↑'}</span>${island||error?`<span class="global-sync-short">${short}</span>`:''}<strong class="global-sync-count">${n}</strong>`,'global-sync-control','','aria-label="'+esc(title+'. '+detail)+'"'+(busy?' aria-busy="true"':''))}</div>`;
   }
   function showSync(){
@@ -261,7 +261,15 @@
       return (u.get('view')||'')===view&&(view==='sections'||(u.get('section')||'gestation')===state.section)&&(view!=='unit'||u.get('unit')===String(state.unit))&&(u.get('work')||'mixed')===workPreview&&(u.get('attention')||'current')===attentionPreview;});
     return hit?hit.id:null;
   }
-  function render(){app.classList.toggle('has-global-sync',sync.pending.length>0);app.classList.toggle('island-sync',params.get('indicator')==='island');app.innerHTML=globalSync()+(pages[state.page]||home)();window.AtlasBare&&AtlasBare.watch(atlasScreen);document.querySelectorAll('[data-demo]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.demo===(state.page==='sections'?'sections':state.unit?'unit':'overview'))));}
+  function render(){
+    const island=params.get('indicator')==='island',badge=globalSync();
+    app.classList.toggle('has-global-sync',!!badge);
+    app.classList.toggle('island-sync',island);
+    app.innerHTML=(island?badge:'')+(pages[state.page]||home)();
+    if(badge&&!island)(app.querySelector('.app-header,.page-head')||app).insertAdjacentHTML('beforeend',badge);
+    window.AtlasBare&&AtlasBare.watch(atlasScreen);
+    document.querySelectorAll('[data-demo]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.demo===(state.page==='sections'?'sections':state.unit?'unit':'overview'))));
+  }
   if(window.AtlasBare&&AtlasBare.bare)new MutationObserver(()=>AtlasBare.watch(atlasScreen)).observe(overlay,{childList:true,subtree:true,attributes:true,attributeFilter:['class']});
   function closeDrawer(){overlay.innerHTML='';state.overlay=null;app.inert=false;if(returnFocus?.isConnected)returnFocus.focus();}
   function dialog(title,description,primary){returnFocus=document.activeElement;app.inert=true;overlay.innerHTML=SentriUI.sheet({variant:'dialog',title,icon:'alert',subtitle:description,label:title,footer:SentriUI.sheetFooter({back:{action:'close'},hold:{label:primary.label,caption:'HOLD TO END',action:primary.action,tone:'danger'}})});overlay.querySelector('.dialog')?.focus({preventScroll:true});}

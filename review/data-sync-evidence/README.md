@@ -7,7 +7,7 @@ Baseline: `origin/main` at `ccaa3f2`. After: the provisional `codex/offline-flow
 | Home, English 390 × 844 | [Old full-width upload card](home-before-en-390.png) | [Compact saved-work entry after first task](home-after-en-390.png) |
 | Saved work, English 390 × 844 | [Old batch upload drawer](list-before-en-390.png) | [Per-record list](list-after-en-390.png) |
 
-The 2026-10-12 compact Home entry and the first 2026-10-13 full-width app-shell row were revised after further owner feedback. Current native Android candidate: [compact badge on Home](badge-home-wait-zh-390.png), [expanded exception badge](badge-home-error-zh-390.png), and [uploading badge in Toolbox at 360px](badge-toolbox-upload-en-360.png). The [centered app-drawn island](island-home-wait-zh-390.png) is an interactive comparison: it states “待传 3” but moves the work cards down about 40px. The earlier [full-width status row](global-home-wait-zh-390.png) and [narrow capsule exploration](compact-pill-exploration-en-390.png) remain baseline evidence.
+The 2026-10-12 compact Home entry and the first 2026-10-13 full-width app-shell row were revised after further owner feedback. The selected native Android direction is the header badge. Its current aligned states are [waiting on Home at 390px](badge-aligned-home-offline-zh-390.png), [exception on Home at 390px](badge-aligned-home-failed-zh-390.png), [English exception at 360px](badge-aligned-home-error-en-360.png), and [uploading in Toolbox at 360px](badge-aligned-toolbox-upload-en-360.png). The [centered app-drawn island](island-home-wait-zh-390.png) remains an earlier interactive comparison: it states “待传 3” but moves the work cards down about 40px. The [full-width status row](global-home-wait-zh-390.png) and [narrow capsule exploration](compact-pill-exploration-en-390.png) remain baseline evidence.
 
 For 30 mixed records: [English overview](grouped-en-360.png) → [production category](category-en-360.png); [Chinese overview](grouped-zh-360.png) → [production category](category-zh-360.png). Exceptions remain directly accessible before the category summaries.
 
@@ -17,6 +17,6 @@ Additional Chinese 360 × 844 states: [conflict differences](conflict-detail-zh-
 
 Missing-receipt reconciliation at 360 × 844: [checking in English](receipt-check-en-360.png) → [server-confirmed in English](receipt-confirmed-en-360.png), and [checking in Chinese](receipt-check-zh-360.png) → [server-confirmed in Chinese](receipt-confirmed-zh-360.png). The transition is a local fixture showing the product rule; no server request occurs.
 
-[Earlier Home conflict entry at 390px](home-conflict-en-390.png) shows the prior exception placement; the current Home keeps a content prompt for exceptions in addition to the global app-shell status.
+[Earlier Home conflict entry at 390px](home-conflict-en-390.png) shows the prior exception placement; the selected Home uses the header badge as its single global sync entry.
 
 `features/data-sync/critique.md` records the driver's first look and the reason for choosing this direction. The screenshots show design behavior only. The real Android queue, result lookup by operation ID, server comparison, conditional retry and sign-in still require implementation validation.

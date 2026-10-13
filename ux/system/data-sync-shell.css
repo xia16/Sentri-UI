@@ -1,22 +1,18 @@
-/* Feature-owned app-shell study: the badge floats beside the current page header. */
+/* Feature-owned app-shell study: the trailing header badge shares the header's alignment. */
 #app{position:relative}
-#app.has-global-sync .app-header,#app.has-global-sync .page-head{padding-right:76px}
-#app.has-global-sync:has(.global-sync.needs-attention) .app-header,#app.has-global-sync:has(.global-sync.needs-attention) .page-head{padding-right:109px}
-.global-sync{position:absolute;z-index:12;right:16px;top:10px}
+.global-sync{flex:none;z-index:12}
 .global-sync-control{min-width:48px;min-height:48px;display:flex;align-items:center;justify-content:center;gap:3px;padding:0 7px;background:#fff9ec;border:1px solid #decca9;border-radius:16px;box-shadow:0 3px 12px #23301c1c;color:#70542c}
-.global-sync.needs-attention .global-sync-control{background:#fff2ef;border-color:#dfb7af;color:#893d32}
+.global-sync.needs-attention .global-sync-control{padding-inline:4px;background:#fff2ef;border-color:#dfb7af;color:#893d32}
+.global-sync.needs-attention .global-sync-mark{display:none}
 .global-sync.uploading .global-sync-control{background:#edf4f7;border-color:#bed0d8;color:#31596a}
 .global-sync-mark{font-size:17px;font-weight:700;line-height:1}
 .global-sync-count{font-size:14px;font-weight:700;line-height:1}
 .global-sync-short{font-size:13px;font-weight:600;line-height:1}
 .global-sync.uploading .global-sync-mark{animation:global-sync-turn 1.8s linear infinite}
 @keyframes global-sync-turn{to{transform:rotate(360deg)}}
-#app.island-sync .global-sync{top:3px;right:auto;left:50%;transform:translateX(-50%)}
+#app.island-sync .global-sync{position:absolute;top:3px;left:50%;transform:translateX(-50%)}
 #app.island-sync .global-sync-control{min-height:40px;border-radius:999px;padding:0 13px;white-space:nowrap}
 #app.island-sync.has-global-sync .app-header{padding-top:48px;padding-right:20px}
 #app.island-sync.has-global-sync .page-head{padding-top:48px;padding-right:18px}
-#app.island-sync.has-global-sync:has(.global-sync.needs-attention) .app-header{padding-right:20px}
-#app.island-sync.has-global-sync:has(.global-sync.needs-attention) .page-head{padding-right:18px}
 .page-head .page-back{min-width:54px;min-height:48px;padding:0 4px;flex:none;text-align:left;color:#27351f;font-size:13px;font-weight:500}
-@media(max-width:480px){.global-sync{right:14px;top:7px}#app.has-global-sync .app-header,#app.has-global-sync .page-head{padding-right:72px}#app.has-global-sync:has(.global-sync.needs-attention) .app-header,#app.has-global-sync:has(.global-sync.needs-attention) .page-head{padding-right:104px}}
 @media(prefers-reduced-motion:reduce){.global-sync.uploading .global-sync-mark{animation:none}}
