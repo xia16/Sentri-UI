@@ -4,12 +4,14 @@ Scope: the headers of this feature's surfaces (the shared Headers change, the He
 
 ## Keep
 
-- The sheet's anatomy (grab, body as the one scroller, the footer with Back and the primary on drawers): every body, row and colour stays as it is; only the header and the footer's Back/Clear move.
+- The sheet's anatomy (grab, body as the one scroller, the footer with Back and the primary on drawers): bodies, rows and colours stay as they are, except where a Problem below names the change (a fact moved out of a header opens the body; a screen moved by this change is brought to the legibility floors); only the header and the footer's Back/Clear move.
 - The titles: they name the job (`Record dead`, `Edit record`, `Pen log`); they stay, and stay the heaviest thing in the header.
 - The house reference's look (the Farrowing room): Back as a 48px bordered icon button, the 22px title, the last-record line in muted text with the time in ink.
 - Home's own header (farm, section chooser, Assistant door) is the app's home, not a page or sheet header: unchanged.
 
 ## Problems
+
+- **major** · Saved work's record lines were 10px (the context and the time), under the farm legibility floor (11px); a change that moves the screen brings it to the floors. The records move onto the design system's Row in a card (crit round 1).
 
 - **major** · Nothing in a header acts but Back and the subject chip (law): Clear, Reset, a Scanning pill, an End walk button or a Log link sat in a header.
 - **major** · The default is no header line (law): almost every drawer and page carried a subtitle that repeated the subject, the pen, the unit, a count or a date, facts the hub one Back away already shows (P3: nothing the header says twice).

@@ -36,3 +36,5 @@ The header line of every surface of this feature, decided by the Headers law (`u
 | Pen feeding (from the walk's pen row) | about one pen | fact: `Pen C1` | Which pen am I adjusting? (the title does not say) | the walk list, which does not say which pen I opened | on screen |
 | Adjust feed, End date and note | action | none | | the pens or pigs are listed on the editor | on screen |
 
+
+Crit round 2: More actions for several pens keeps 18px between its Pigs / Pens tabs and the actions card (the `above` bar is the page's, the gap is restored as a layout rule).

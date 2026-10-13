@@ -782,3 +782,6 @@
 .inspection-phone .feed-editor-sheet .bulk-controls-toggle{min-height:var(--tap-min)}
 .inspection-phone .feed-editor-sheet .bulk-controls.facts-surface{max-height:none;overflow:visible}
 .inspect-intro-actions{display:flex;align-items:center;gap:8px;flex:none}
+/* The pen/pig scope tabs sit above the actions page body (Sheet `above`): the body keeps its gap under them (layout only). */
+.inspection-phone .sheet .actions-subjects+.sheet-body{padding-top:18px}
+.inspection-phone .sheet-body>.empty-inspect:first-child{padding-top:0}

@@ -50,7 +50,7 @@ Built to the owner's approved mockups (`mock2.html`, `scan3.html`), so there are
 
 ### Keep
 
-- The sheet's anatomy (grab, body as the one scroller, the footer with Back and the primary on drawers): every body, row and colour stays as it is; only the header and the footer's Back/Clear move.
+- The sheet's anatomy (grab, body as the one scroller, the footer with Back and the primary on drawers): bodies, rows and colours stay as they are, except where a Problem below names the change (a fact moved out of a header opens the body; a screen moved by this change is brought to the legibility floors); only the header and the footer's Back/Clear move.
 - The titles: they name the job (`Record dead`, `Edit record`, `Pen log`); they stay, and stay the heaviest thing in the header.
 - The house reference's look (the Farrowing room): Back as a 48px bordered icon button, the 22px title, the last-record line in muted text with the time in ink.
 - The room's last-record line (`Last record 08:41 · G.H`): the one fact the next shift needs to trust the list; it stays, now under the title.

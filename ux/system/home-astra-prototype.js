@@ -338,7 +338,7 @@
     if(a==='records'){push('records');return;}
     if(a==='scan'){scan();return;}
     if(a==='sample-scan'){lookup(taskRecords(taskBy('preg31'),7)[2].id);return;}
-    if(a==='search'){drawer('Find a pig or pen',`<form id="lookup-form">${SentriUI.field({label:'Ear tag or pen code',control:`<input id="query" name="tag" placeholder="${taskRecords(taskBy('preg31'),7)[2].id} or A1" required maxlength="30">`})}<button type="submit" class="button primary">Search sample records</button></form>`,{size:'short'});return;}
+    if(a==='search'){drawer('Find a pig or pen',`<form id="lookup-form">${SentriUI.field({label:'Ear tag or pen code',control:`<input id="query" name="tag" placeholder="${taskRecords(taskBy('preg31'),7)[2].id} or A1" required maxlength="30">`})}<button type="submit" class="button primary">Search</button></form>`,{size:'short'});return;}
     if(a==='lookup-result'){const [tid,u]=v.split(':');closeDrawer();state.section=taskBy(tid).section;openTask(tid,+u);return;}
   });
   document.addEventListener('input',e=>{if(e.target.id!=='fan-speed')return;const d=unitDevices()[0];d.draftSpeed=+e.target.value;document.getElementById('fan-speed-value').textContent=d.draftSpeed+'%';app.querySelector('[data-action="apply-device"]').disabled=sync.connection==='offline'||d.mode===d.draftMode&&d.speed===d.draftSpeed;});

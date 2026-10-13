@@ -36,7 +36,7 @@ The header line of every surface of this feature, decided by the Headers law (`u
 |---|---|---|---|---|
 | Room list (task page) | hub | fact: `Last record 08:41 · G.H` | Can I trust this list; who was here last? | Back reaches Today, which does not show it |
 | Farrowing record (before, counting, finished, sow died) | hub | route: `#000418 ›` · `B1` · `Parity 3` (`Unit 6 · A2` when she is in another unit) | chip: open her page; pen: is this the crate in front of me; parity: what to expect of this litter (first or a later one) | Back reaches the room, which lists many sows: it is the hub |
-| N piglets to allocate (sow died) | hub (her row opens it) | none; her tag, pen and the time she died are the body's first line (`000399 · B3 · sow died Aug 25 06:20`): status, never a header fact | Which sow died, and when? (body) | Back reaches the room; she is on screen |
+| N piglets to allocate (sow died) | hub (her row opens it) | none; her tag, pen and the time she died label the options (`000399 · B3 · sow died Aug 25 06:20`, settled: the 13px muted group label over the card) | Which sow died, and when? (body) | Back reaches the room; she is on screen |
 | Finish farrowing, Record dead, Edit record, Edit finish details, Correct born | action | none | (the record is one Back away) | Back reaches the record, which has the chip |
 | Farrowing log, Death breakdown | action (read) | none | | Back reaches the record |
 | More actions (her sow page's actions, shown in the drawer) | hub for her action pages | route: chip · pen (Pig profile's More actions) | Which sow will these write to? | the record (chip) | on screen |
@@ -49,6 +49,6 @@ The header line of every surface of this feature, decided by the Headers law (`u
 | Scan ear tags | action (page) | none; Scanning / Stopped is the body's first line | | Back reaches the room |
 | Find a sow | search page | not a title header: its pinned field is its head (owner, 2026-10-12) | | |
 
-Moved, not cut (crit round 1): the task receipt's closure stamp (`Farrowing · Oct 11 · 09:41 · G.H`), Scan's Scanning / Stopped, and Scan actions' count (`2 sows`) are each the first line of their body.
+Moved, not cut (crit rounds 1 and 2): the task receipt's closure stamp (`Farrowing · Oct 11 · 09:41 · G.H`), Scan actions' count (`2 sows`), the allocation's sow-died line and the finished record's stamp (`Finished Aug 27 at 08:12 by G.H`, Audit) each open their body as the quiet group label (13px muted, 8px over their card); Scan's Scanning / Stopped is the body's first line.
 
 Chains walked (crit round 1): the room, the record drawer, the logs and the pen pages read as before; More actions and Piglet processing now carry the route, so every action page about her is one Back from her chip.

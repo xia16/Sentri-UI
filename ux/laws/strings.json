@@ -1423,7 +1423,7 @@
     "pp.litter.why.kept": {"en": "kept boar", "zh": "留种公猪", "kind": "body"},
     "pp.litter.why.sick": {"en": "sick", "zh": "生病", "kind": "body"},
     "pp.litter.why.weak": {"en": "weak", "zh": "弱仔", "kind": "body"},
-    "pp.move.act.move": {"en": "Move {n} · {from} → {to}", "zh": "转移{n}头 · {from} → {to}", "kind": "action"},
+    "pp.move.act.move": {"en": "Move {n} · {from} → {to}", "zh": "转移{n}头 {from}→{to}", "kind": "action"},
     "pp.move.act.move_bare": {"en": "Move", "zh": "转移", "kind": "action"},
     "pp.move.aria.scan": {"en": "Scan crate card or ear tag", "zh": "扫描栏位卡或耳标", "kind": "label"},
     "pp.move.ask.checks": {"en": "{txs}: checked on the pig, no question", "zh": "{txs}：看猪确认，不用回答", "kind": "body"},

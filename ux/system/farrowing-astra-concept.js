@@ -230,6 +230,9 @@ const footer=(left,right,className='')=>SentriUI.sheetFooter({content:left+(righ
 const quietClear=(action,label='Clear')=>SentriUI.button({label,register:'text',action,className:'st-footer-quiet',strs:{label:label==='Reset'?'act.reset':'act.clear'}});
 // A page's footer has no Back (Back is in its page header); a footer left with nothing is removed.
 const pageFooter=(right,className='')=>right?footer('',right,className):false;
+// What a header no longer carries and the worker still needs (a status, a stamp, a count) opens the body as its quiet group label:
+// 13px muted, over the card it belongs to (the Heading's group kind), never a louder line than the subtitle it replaced.
+const bodyLead=text=>SentriUI.heading({title:text,kind:'group',level:4,className:'body-lead'});
 function hold(action,label,off=false,danger=false){
  return SentriUI.holdButton({action,label,tone:danger?'danger':'primary',waiting:off,className:action==='room-end-confirm'&&danger?'task-end-confirm':'',caption:'HOLD TO '+(action==='lock'?'FINISH':action==='room-end-confirm'?(label==='End task'?'END':'END EARLY'):'RECORD')});
 }
@@ -437,7 +440,7 @@ function scanActionsSheet(c){
  const n=c.scan.picked.length;
  const rows=penActionRow('room-scan-act','transfer','Transfer','Move to another unit or pen','transfer')+penActionRow('room-scan-act','condition','Disease or symptom','Record a health finding','health')+penActionRow('room-scan-act','treat','Record treatment','Medicine, dose and method','treatment')+penActionRow('room-scan-act','note','Add a note',n===1?'Leave a note for this sow':'Leave a note for these sows','marker');
  // The ticked count is what the actions apply to: the body's first line.
- return roomSheet('Actions',`${SentriUI.statusLine([[{text:`${n} ${n===1?'sow':'sows'}`}]])}<div class="compact-actions st-panel st-row-group">${rows}</div>`,footer(SentriUI.backButton({action:'room-back'})),'scan-actions-sheet','menu');
+ return roomSheet('Actions',`${bodyLead(`${n} ${n===1?'sow':'sows'}`)}<div class="compact-actions st-panel st-row-group">${rows}</div>`,footer(SentriUI.backButton({action:'room-back'})),'scan-actions-sheet','menu');
 }
 // Pen context is shared by its drawers within the unit; task rows stay sow-focused.
 function penInfo(c){const pens=c.unit.penDetails||(c.unit.penDetails={});return pens[c.detailPen]||(pens[c.detailPen]={note:'',noteBy:'',faults:[],events:[],feed:null});}
@@ -508,7 +511,7 @@ function taskEndSheet(s,c){
   const end=c.completion;if(!end)return '';
   const at=new Date(end.at),when=at.toLocaleString('en-US',{month:'short'})+' '+at.getDate()+' · '+at.toLocaleString('en-GB',{hour:'2-digit',minute:'2-digit'});
   // Who closed the task and when is the receipt's own fact: the first line of its body (never the header).
-  return sheet(end.early?'Task ended early':'Task ended',`${SentriUI.statusLine([[{text:`Farrowing · ${when} · ${initials(end.who)}`}]])}${taskPerformance(end.performance)}${taskOutcomeSummary({...end,awaiting:end.removed},true)}`,false,'task-end-expanded task-receipt-sheet');
+  return sheet(end.early?'Task ended early':'Task ended',`${bodyLead(`Farrowing · ${when} · ${initials(end.who)}`)}${taskPerformance(end.performance)}${taskOutcomeSummary({...end,awaiting:end.removed},true)}`,false,'task-end-expanded task-receipt-sheet');
  }
  const r=taskClosureReview(c);
  if(s.view==='roomTaskSows'){
@@ -596,13 +599,13 @@ function allocate(s){
  const rows=[SentriUI.choiceRow({mode:'navigate',label:'Move to other sows',meta:'Foster or nurse sow',action:'allocMove'}),SentriUI.choiceRow({mode:'navigate',label:'Hand-rear here',meta:'Bottle or milk replacer in her crate',action:'allocHand'}),...(farmConfig.rearingPen?[SentriUI.choiceRow({mode:'navigate',label:'Move to a rearing pen',meta:'Rescue deck',action:'allocRear'})]:[])];
  // Her death is status, so it is the body's first line, with her tag and pen (she is on screen; no header line repeats her).
  const e=s.events.find(e=>e.text.startsWith('Sow died'));
- const died=SentriUI.statusLine([[{text:`${s.tag} · ${s.pen} · sow died ${[e?.day&&e.day!=='Today'?e.day:'',e?.time].filter(Boolean).join(' ')}`.trim()}]]);
+ const died=bodyLead(`${s.tag} · ${s.pen} · sow died ${[e?.day&&e.day!=='Today'?e.day:'',e?.time].filter(Boolean).join(' ')}`.trim());
  return {cls:'allocate-body',body:died+SentriUI.choiceGroup(rows),footer:footer(SentriUI.backButton({action:'close'}))};
 }
 function locked(s){
  const e=s.events[0];
  const ab=s.productionOutcome==='abortion'?s.events.find(e=>e.text.startsWith('Abortion')):null;
- const body=ab?` ${SentriUI.banner({tone:'danger',size:'inline',headline:['Aborted',ab.text.replace(/^Abortion · ?/,''),[ab.day,ab.time].filter(Boolean).join(' '),initials(ab.who)].filter(Boolean).join(' · ')})}<section class="read-section reading-section">${litterHeading()}${summary(s)}</section>`:s.ended?` ${SentriUI.banner({tone:'danger',size:'inline',headline:['Sow died',s.sowCause.toLowerCase(),...diedStamp(s)].join(' · ')})}<section class="read-section reading-section">${litterHeading()}${summary(s)}</section>`:`<section class="read-section reading-section finish-record">${litterHeading()}${finishFacts(s)}</section>`;
+ const body=ab?` ${SentriUI.banner({tone:'danger',size:'inline',headline:['Aborted',ab.text.replace(/^Abortion · ?/,''),[ab.day,ab.time].filter(Boolean).join(' '),initials(ab.who)].filter(Boolean).join(' · ')})}<section class="read-section reading-section">${litterHeading()}${summary(s)}</section>`:s.ended?` ${SentriUI.banner({tone:'danger',size:'inline',headline:['Sow died',s.sowCause.toLowerCase(),...diedStamp(s)].join(' · ')})}<section class="read-section reading-section">${litterHeading()}${summary(s)}</section>`:`${recordStamp(s)?bodyLead(recordStamp(s)):''}<section class="read-section reading-section finish-record">${litterHeading()}${finishFacts(s)}</section>`;
  return {cls:'completed-record-body',body:`${body}${recordActions(s)}`,footer:recordNavigation()};
 }
 function death(s){const n=sum(s.deathDraft),sow=s.mode==='sow';return {cls:'',body:`${s.ended?'':SentriUI.segment({variant:'view-switch',options:s.ended?[['piglets','Piglets']]:[['piglets','Piglets'],['sow','The sow']],active:s.mode,action:'mode',ariaLabel:'Record death for'})}${sow?SentriUI.choiceRadios({label:'Cause',key:'sowCause',action:'sowCause',options:['Farrowing','Prolapse','Found dead','Other'].map(label=>({value:label,label})),selected:s.sowCause||''})+(s.sowCause==='Other'?SentriUI.optionalRow({label:'Details',value:s.sowNote||'',icon:icon('note'),inline:SentriUI.field({label:'Details',labelHidden:true,control:`<input aria-label="Details" data-field="sowNote" value="${esc(s.sowNote)}">`})}):''):types.map((t,i)=>row(t,s.dead[i]+s.deathDraft[i],'deadStep',i+',',s.dead[i],s.locked?s.dead[i]+s.alive-n+s.deathDraft[i]:null,s.deathDraft[i]?'draft-value':'',s.deathDraft[i]?`+${s.deathDraft[i]} unsaved`:'')).join('')}<div class="photo-field">${(sow?!!s.sowCause:!!n)?SentriUI.photos({items:s.photos.map((src,i)=>({id:String(i),src})),action:'addPhoto',viewAction:'photo',active:true}):''}<input type="file" data-field="photo" accept="image/*" capture="environment" class="visually-hidden" tabindex="-1"></div>${sow?SentriUI.banner({tone:'danger',headline:'Saving ends farrowing',consequence:`${s.alive} alive stay under piglet care`}):''}`,footer:footer(SentriUI.backButton({action:'back'})+(n||s.sowCause?quietClear('clearDeath'):''),sow?hold('saveDeath','Record sow death',!s.sowCause||!!sum(s.deathDraft)||!!changes(s).length,true):btn('saveDeath',n?`Record ${n} ${n===1?'death':'deaths'}`:'Record deaths','button primary','',!n),'death-footer')};
