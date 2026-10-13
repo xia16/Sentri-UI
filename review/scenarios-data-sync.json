@@ -1,9 +1,9 @@
 {
  "feature": "data-sync",
- "commit": "eadadd734f0aef29ee26b8d6cc07737cb6632656",
+ "commit": "42da8165acc3c042aa807bae4372cb31185a08af",
  "dirty": false,
- "ran": "2026-10-13T01:05:28.840Z",
- "base": "http://localhost:50707",
+ "ran": "2026-10-13T02:24:43.857Z",
+ "base": "http://localhost:63051",
  "langs": [
   "en",
   "zh"
@@ -13,25 +13,25 @@
   390
  ],
  "nodes": {
-  "entry": 14,
-  "state": 14,
-  "outcome": 14,
-  "action": 9
+  "entry": 18,
+  "state": 18,
+  "outcome": 18,
+  "action": 13
  },
  "summary": {
-  "pass": 14,
+  "pass": 18,
   "fail": 0,
   "blocked": 0,
   "pending": 0
  },
  "byLang": {
   "en": {
-   "pass": 14,
+   "pass": 18,
    "fail": 0,
    "blocked": 0
   },
   "zh": {
-   "pass": 14,
+   "pass": 18,
    "fail": 0,
    "blocked": 0
   }
@@ -116,6 +116,30 @@
    "pending": 0
   },
   "ds-b7-uncertain-receipt.entry": {
+   "pass": 1,
+   "fail": 0,
+   "blocked": 0,
+   "pending": 0
+  },
+  "ds-a7-global-wait.entry": {
+   "pass": 1,
+   "fail": 0,
+   "blocked": 0,
+   "pending": 0
+  },
+  "ds-a7-global-upload.entry": {
+   "pass": 1,
+   "fail": 0,
+   "blocked": 0,
+   "pending": 0
+  },
+  "ds-a7-global-error.entry": {
+   "pass": 1,
+   "fail": 0,
+   "blocked": 0,
+   "pending": 0
+  },
+  "ds-a8-grouped-records.entry": {
    "pass": 1,
    "fail": 0,
    "blocked": 0,
@@ -1227,6 +1251,302 @@
      "evidence": [
       "review/scenarios/data-sync/ds-b7-uncertain-receipt/zh-390/00-start.png",
       "review/scenarios/data-sync/ds-b7-uncertain-receipt/zh-390/01-advance-11s.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "ds-a7-global-wait",
+   "tree": "A-7",
+   "branch": "ds-a7-global-wait.entry",
+   "label": "Saved work remains visible outside Home",
+   "gwt": {
+    "given": "Three operations are saved on this phone while it is offline.",
+    "when": "The worker checks the toolbox page.",
+    "then": "The app still shows three records saved locally and says they will upload when connected."
+   },
+   "path": [
+    "ds-a7-global-wait.entry",
+    "ds-a7-global-wait.state",
+    "ds-a7-global-wait.act",
+    "ds-a7-global-wait"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Design feedback 2026-10-13",
+     "says": "Show global saved-work status outside Home."
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-a7-global-wait/en-360/00-start.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-a7-global-wait/en-390/00-start.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-a7-global-wait/zh-360/00-start.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-a7-global-wait/zh-390/00-start.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "ds-a7-global-upload",
+   "tree": "A-7",
+   "branch": "ds-a7-global-upload.entry",
+   "label": "Automatic upload stays visible outside Home",
+   "gwt": {
+    "given": "Three records are being uploaded automatically.",
+    "when": "The worker checks the toolbox page.",
+    "then": "The app still shows the upload state and provides a path to saved work."
+   },
+   "path": [
+    "ds-a7-global-upload.entry",
+    "ds-a7-global-upload.state",
+    "ds-a7-global-upload.act",
+    "ds-a7-global-upload"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Design feedback 2026-10-13",
+     "says": "Show the global local-record state on Home and other app pages."
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-a7-global-upload/en-360/00-start.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-a7-global-upload/en-390/00-start.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-a7-global-upload/zh-360/00-start.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-a7-global-upload/zh-390/00-start.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "ds-a7-global-error",
+   "tree": "A-7",
+   "branch": "ds-a7-global-error.entry",
+   "label": "An exception outside Home opens saved work",
+   "gwt": {
+    "given": "A saved operation failed to upload while the worker has another page open.",
+    "when": "They use the global saved-work status.",
+    "then": "The same saved-work view opens with the failed operation available for review."
+   },
+   "path": [
+    "ds-a7-global-error.entry",
+    "ds-a7-global-error.state",
+    "ds-a7-global-error.act",
+    "ds-a7-global-error"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Design feedback 2026-10-13",
+     "says": "A global exception entry remains available outside Home."
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-a7-global-error/en-360/00-start.png",
+      "review/scenarios/data-sync/ds-a7-global-error/en-360/01-data-action-sync.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-a7-global-error/en-390/00-start.png",
+      "review/scenarios/data-sync/ds-a7-global-error/en-390/01-data-action-sync.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-a7-global-error/zh-360/00-start.png",
+      "review/scenarios/data-sync/ds-a7-global-error/zh-360/01-data-action-sync.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-a7-global-error/zh-390/00-start.png",
+      "review/scenarios/data-sync/ds-a7-global-error/zh-390/01-data-action-sync.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "ds-a8-grouped-records",
+   "tree": "A-8",
+   "branch": "ds-a8-grouped-records.entry",
+   "label": "Many record kinds remain findable",
+   "gwt": {
+    "given": "This phone has thirty saved records across several kinds of work.",
+    "when": "The worker opens the production category after seeing the direct exception rows.",
+    "then": "The category shows its waiting records directly and can return to the status overview."
+   },
+   "path": [
+    "ds-a8-grouped-records.entry",
+    "ds-a8-grouped-records.state",
+    "ds-a8-grouped-records.act",
+    "ds-a8-grouped-records"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Design feedback 2026-10-13",
+     "says": "Show exceptions directly and group many ordinary waiting records by work category."
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-a8-grouped-records/en-360/00-start.png",
+      "review/scenarios/data-sync/ds-a8-grouped-records/en-360/01-data-action-open-category-data-v.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-a8-grouped-records/en-390/00-start.png",
+      "review/scenarios/data-sync/ds-a8-grouped-records/en-390/01-data-action-open-category-data-v.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-a8-grouped-records/zh-360/00-start.png",
+      "review/scenarios/data-sync/ds-a8-grouped-records/zh-360/01-data-action-open-category-data-v.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-a8-grouped-records/zh-390/00-start.png",
+      "review/scenarios/data-sync/ds-a8-grouped-records/zh-390/01-data-action-open-category-data-v.png"
      ]
     }
    ]

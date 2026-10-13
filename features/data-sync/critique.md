@@ -60,4 +60,4 @@ Baseline: origin/main ccaa3f2, 390×844, review/data-sync-evidence/home-before-e
 
 列表采用“异常记录直达 → 普通待传按业务类别收起 → 近期已上传”的顺序。少量记录继续直接列出；普通待传达到 9 条且涉及多个类别才收起为类别行。类别页直接展示记录，必要时在同一页按任务类型筛选，不复制旧版四层导航。用户已裁决全局入口统计这台手机的全部未上传记录，不按任务或当前身份缩小；详情仍展示账号、猪场归属，上传遵守原账号认证规则。
 
-Android 系统级胶囊仅可能作为额外通道：符合条件的系统 Live Update 可显示状态栏 chip，系统与用户决定是否提升；持续待网、失败和冲突不属于活跃上传，不能把它当唯一入口。应用内入口留在系统安全区下方，原生实现用 WindowInsets 避开开孔。
+Android 系统级胶囊仅可能作为额外通道：[官方 Live Update 指南](https://developer.android.com/develop/ui/compose/notifications/live-update)说明系统可能将符合条件的通知提升为状态栏 chip，用户也可取消；它面向活跃、用户发起且时间敏感的活动。持续待网、失败和冲突不属于活跃上传；自动后台上传是否符合系统条件也需原生验证，不能把它当唯一入口。应用内入口留在系统安全区下方，原生实现按[官方 WindowInsets 指南](https://developer.android.com/develop/ui/compose/system/insets)避开状态栏和开孔。
