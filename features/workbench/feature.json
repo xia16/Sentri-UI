@@ -238,13 +238,13 @@
             "at": "Next"
           },
           {
-            "name": "Saved-work card",
-            "shows": "3 records saved on this device · No connection · uploads when online",
+            "name": "App-shell Saved work status",
+            "shows": "3 records saved on this phone · Uploads when connected",
             "states": [
               {
                 "state": "Waiting, offline",
                 "when": "Records are queued and there is no connection",
-                "shows": "A compact entry after the first work card: N records saved on this device · No connection · uploads when online"
+                "shows": "A global status entry below the system safe area: N records saved on this phone · Uploads when connected. Home does not repeat a normal waiting row."
               },
               {
                 "state": "Waiting, online",
@@ -259,12 +259,12 @@
               {
                 "state": "Clear",
                 "when": "Nothing is waiting",
-                "shows": "A quiet row says No records waiting on this device"
+                "shows": "The global status entry disappears; the Data sync page can still state that this phone has no waiting records"
               }
             ],
-            "logic": "The queue is fictional in this prototype. Tapping the entry opens the Data sync study; real queue and per-record outcomes are not shared between prototypes.",
-            "source": "syncCard() and features/data-sync/PRD.md",
-            "at": "3 records saved on this device"
+            "logic": "The app-shell entry appears on Home and internal subpages; its count includes all unsent records on this phone, regardless of current task, page or identity. The queue is fictional in this prototype. Tapping the entry opens the Data sync study; real queue and per-record outcomes are not shared between prototypes.",
+            "source": "globalSync(), syncCard() and features/data-sync/PRD.md",
+            "at": "3 records saved on this phone"
           },
           {
             "name": "Section and unit scope",
@@ -307,7 +307,7 @@
           "\"Across 3 units\" counts units that carry the task, not units with work due, and repeats on every card.",
           "The Piglet card mixes litters (\"4 litters with care due\") and pens (\"1 / 8 pens\"). A pen is a litter in the prototype.",
           "The Piglet card says Batch 27, 8 pens, care due tomorrow; the prototype it opens starts on Batch 40, 12 pens, 6 due today.",
-          "The saved-work card sits first while offline and pushes the day's work down; its queue is fictional.",
+          "The app-shell saved-work entry still uses a fictional queue; other task prototypes do not yet share this shell.",
           "`layout=focus` has no effect on Home; it is only forwarded to detail pages.",
           "No way to reach language or log out (the old Figma has both)."
         ]

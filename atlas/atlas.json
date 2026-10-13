@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-12T09:11:47.290Z",
- "commit": "db030dd",
+ "generated": "2026-10-13T02:10:33.312Z",
+ "commit": "0768103",
  "platforms": [
   {
    "id": "mobile",
@@ -1122,13 +1122,13 @@
             "at": "Next"
            },
            {
-            "name": "Saved-work card",
-            "shows": "3 records saved on this device · No connection · uploads when online",
+            "name": "App-shell Saved work status",
+            "shows": "3 records saved on this phone · Uploads when connected",
             "states": [
              {
               "state": "Waiting, offline",
               "when": "Records are queued and there is no connection",
-              "shows": "A compact entry after the first work card: N records saved on this device · No connection · uploads when online"
+              "shows": "A global status entry below the system safe area: N records saved on this phone · Uploads when connected. Home does not repeat a normal waiting row."
              },
              {
               "state": "Waiting, online",
@@ -1143,12 +1143,12 @@
              {
               "state": "Clear",
               "when": "Nothing is waiting",
-              "shows": "A quiet row says No records waiting on this device"
+              "shows": "The global status entry disappears; the Data sync page can still state that this phone has no waiting records"
              }
             ],
-            "logic": "The queue is fictional in this prototype. Tapping the entry opens the Data sync study; real queue and per-record outcomes are not shared between prototypes.",
-            "source": "syncCard() and features/data-sync/PRD.md",
-            "at": "3 records saved on this device"
+            "logic": "The app-shell entry appears on Home and internal subpages; its count is global to the current account, farm and phone. The queue is fictional in this prototype. Tapping the entry opens the Data sync study; real queue and per-record outcomes are not shared between prototypes.",
+            "source": "globalSync(), syncCard() and features/data-sync/PRD.md",
+            "at": "3 records saved on this phone"
            },
            {
             "name": "Section and unit scope",
@@ -1191,7 +1191,7 @@
            "\"Across 3 units\" counts units that carry the task, not units with work due, and repeats on every card.",
            "The Piglet card mixes litters (\"4 litters with care due\") and pens (\"1 / 8 pens\"). A pen is a litter in the prototype.",
            "The Piglet card says Batch 27, 8 pens, care due tomorrow; the prototype it opens starts on Batch 40, 12 pens, 6 due today.",
-           "The saved-work card sits first while offline and pushes the day's work down; its queue is fictional.",
+           "The app-shell saved-work entry still uses a fictional queue; other task prototypes do not yet share this shell.",
            "`layout=focus` has no effect on Home; it is only forwarded to detail pages.",
            "No way to reach language or log out (the old Figma has both)."
           ]
@@ -2180,7 +2180,7 @@
          }
         }
        ],
-       "prd": "# Workbench 工作台\n\n## Problem\n\nA worker opens the app to know what to do now, not how the farm is doing. Home must answer \"what is ready, where\" at a glance, let the worker work either by task across units or by place inside one unit, and show what is saved on the phone when there is no signal. The old Figma (首页 › 工作台) says the same: a workbench, not a data page.\n\n## Who\n\nDaily floor workers in a section (Breeding, Gestation, Farrowing, Nursery): gloved, one-handed, often offline. A supervisor completes or ends tasks from the same cards.\n\n## Anchor\n\nNone. Home has no lifecycle of its own; each card inherits the lifecycle of its task. Screens are grouped by scope: section Overview, unit, drawers, task preview, settings.\n\n## Rules\n\n- The screen is \"Today's work\": one card per task instance in the chosen section, ordered by attention rank (live exception, overdue, due, ready to complete, waiting by earliest next event, closed last). Equal ranks keep their order so cards do not jump.\n- Evaluation order per card (HOME-TASK-DISPLAY-RULES): closed receipt; confirmed exception; task-specific work due; all required work recorded (only a permitted whole-task closure gets \"Review & complete task\"); unit work finished while others remain; next scheduled action.\n- A card has identity (task, batch, context), timing (\"Day N of N\", contextual, never a completion measure), one headline count (what is actionable now), at most one supporting line, a named aggregate progress bar, and in the Overview a footer \"Across N units · View task\". The main count is never total minus done.\n- Counts are unique animals or litters in the selected scope. A unit narrows the counts, never the batch time.\n- Task-specific rules: Farrowing = underway, past expected date, due today, next expected; Piglet processing = litters with care due, next care, waiting; Pregnancy = open windows, then next check; Heat and Return-heat show no completion bar for observation.\n- Unit scope: inspection, attention, environment and devices entrances sit at the unit; Inspection owns the pen walk.\n- Offline: records saved on this device are shown with a count and connection state; a usable connection triggers automatic upload. Failed or conflicted records open the Data sync flow for manual handling (owner decision, 2026-10-12).\n- Closed tasks never revive due counts.\n\n## Scope\n\nIn: section chooser, Overview, unit picker, unit hub, card states (due, waiting, round complete, ready, closed), the Saved work card (its drawer is the Data sync feature), Toolbox and Records, the unit attention states, task preview, end-early confirmation, closed-task receipt.\n\nOut: Assistant (its own feature), Scan and Find a pig (Find a pig), the Saved work drawer (Data sync); task detail pages (their own features); Environment & devices (its own feature). Language and Log out exist in the old design and are not built here (placeholder).\n\n## Decisions\n\n- Decided: one Overview plus unit scope; Assistant has no badge on Home; the last section is remembered; the unit picker has no search (about 15 units at most); completion stays inside the task.\n- Open: where language and log out live; what the real \"Not designed yet\" page shows per task; whether ready-to-complete shows a review before closing; how the real queue feeds Saved work; what \"Day N of N\" means for tasks with no batch window.\n- Open (data): the Home sample batches (Piglet processing Batch 27, 8 pens, 2 units) do not match the piglet-processing prototype it opens (Batch 40, 12 pens).\n",
+       "prd": "# Workbench 工作台\n\n## Problem\n\nA worker opens the app to know what to do now, not how the farm is doing. Home must answer \"what is ready, where\" at a glance, let the worker work either by task across units or by place inside one unit, and show what is saved on the phone when there is no signal. The old Figma (首页 › 工作台) says the same: a workbench, not a data page.\n\n## Who\n\nDaily floor workers in a section (Breeding, Gestation, Farrowing, Nursery): gloved, one-handed, often offline. A supervisor completes or ends tasks from the same cards.\n\n## Anchor\n\nNone. Home has no lifecycle of its own; each card inherits the lifecycle of its task. Screens are grouped by scope: section Overview, unit, drawers, task preview, settings.\n\n## Rules\n\n- The screen is \"Today's work\": one card per task instance in the chosen section, ordered by attention rank (live exception, overdue, due, ready to complete, waiting by earliest next event, closed last). Equal ranks keep their order so cards do not jump.\n- Evaluation order per card (HOME-TASK-DISPLAY-RULES): closed receipt; confirmed exception; task-specific work due; all required work recorded (only a permitted whole-task closure gets \"Review & complete task\"); unit work finished while others remain; next scheduled action.\n- A card has identity (task, batch, context), timing (\"Day N of N\", contextual, never a completion measure), one headline count (what is actionable now), at most one supporting line, a named aggregate progress bar, and in the Overview a footer \"Across N units · View task\". The main count is never total minus done.\n- Counts are unique animals or litters in the selected scope. A unit narrows the counts, never the batch time.\n- Task-specific rules: Farrowing = underway, past expected date, due today, next expected; Piglet processing = litters with care due, next care, waiting; Pregnancy = open windows, then next check; Heat and Return-heat show no completion bar for observation.\n- Unit scope: inspection, attention, environment and devices entrances sit at the unit; Inspection owns the pen walk.\n- Offline: an app-shell status entry below the system safe area reports this phone's unsent count, automatic upload and exceptions on Home and other internal pages. Home adds a content alert only for exceptions. A usable connection triggers automatic upload; failed or conflicted records open the Data sync flow for manual handling (owner decisions and feedback, 2026-10-12–13).\n- Closed tasks never revive due counts.\n\n## Scope\n\nIn: section chooser, Overview, unit picker, unit hub, card states (due, waiting, round complete, ready, closed), the app-shell Saved work status and Home exception prompt (details are the Data sync feature), Toolbox and Records, the unit attention states, task preview, end-early confirmation, closed-task receipt.\n\nOut: Assistant (its own feature), Scan and Find a pig (Find a pig), the Saved work drawer (Data sync); task detail pages (their own features); Environment & devices (its own feature). Language and Log out exist in the old design and are not built here (placeholder).\n\n## Decisions\n\n- Decided: one Overview plus unit scope; Assistant has no badge on Home; the last section is remembered; the unit picker has no search (about 15 units at most); completion stays inside the task.\n- Open: where language and log out live; what the real \"Not designed yet\" page shows per task; whether ready-to-complete shows a review before closing; how the real queue feeds Saved work; what \"Day N of N\" means for tasks with no batch window.\n- Open (data): the Home sample batches (Piglet processing Batch 27, 8 pens, 2 units) do not match the piglet-processing prototype it opens (Batch 40, 12 pens).\n",
        "scenarios": {
         "treeDoc": false,
         "tree": null,
@@ -17920,7 +17920,11 @@
          "本机记录",
          [
           "data-sync.banner",
+          "data-sync.global-upload",
+          "data-sync.global-error",
           "data-sync.list",
+          "data-sync.grouped",
+          "data-sync.category",
           "data-sync.detail"
          ]
         ],
@@ -17946,12 +17950,12 @@
          "zh": "首页本机记录入口",
          "status": "in-design",
          "notes": {
-          "purpose": "Home 的本机记录入口。普通待上传状态在工作卡之后，异常状态才提前；点击进入同一数据同步页。",
+          "purpose": "应用壳在状态栏安全区下显示全局本机记录入口，首页仅对异常另作提示；点击进入同一数据同步页。",
           "states": [
            {
             "state": "Waiting",
             "when": "本机有待上传记录",
-            "shows": "本机数量与网络状态；恢复网络后自动上传，不提示点击上传"
+            "shows": "应用壳报这台手机待上传数；恢复网络后自动上传，首页不重复普通状态行"
            },
            {
             "state": "Needs attention",
@@ -17961,7 +17965,7 @@
            {
             "state": "Empty",
             "when": "本机无待上传记录",
-            "shows": "本机暂无待上传记录，不能称团队全部记录已齐"
+            "shows": "全局入口隐藏；总览仍可说明本机暂无待上传记录，不能称团队全部记录已齐"
            }
           ],
           "issues": [
@@ -17969,6 +17973,42 @@
           ]
          },
          "url": "/ux/system/home-astra-prototype.html?section=gestation&connection=offline"
+        },
+        {
+         "id": "data-sync.global-upload",
+         "name": "Uploading outside Home",
+         "zh": "其他页面感知正在上传",
+         "status": "in-design",
+         "url": "/ux/system/home-astra-prototype.html?section=gestation&connection=online",
+         "steps": [
+          {
+           "tap": "[data-action=\"toolbox\"]"
+          }
+         ],
+         "notes": {
+          "purpose": "工人进入工具箱后仍可看见应用壳的自动上传状态，并能点入同一同步总览。",
+          "issues": [
+           "Home 样例只证明应用壳布局；其他功能原型尚未接入同一壳。"
+          ]
+         }
+        },
+        {
+         "id": "data-sync.global-error",
+         "name": "Exception outside Home",
+         "zh": "其他页面感知同步异常",
+         "status": "in-design",
+         "url": "/ux/system/home-astra-prototype.html?section=gestation&sync=failed",
+         "steps": [
+          {
+           "tap": "[data-action=\"toolbox\"]"
+          }
+         ],
+         "notes": {
+          "purpose": "离开首页后仍显示需要处理的本机记录数；点击进入异常详情。",
+          "issues": [
+           "真实队列与其他功能页面需要 Android 实现时连接。"
+          ]
+         }
         },
         {
          "id": "data-sync.list",
@@ -18034,6 +18074,34 @@
            "tap": "[data-action=\"open-record\"]"
           }
          ]
+        },
+        {
+         "id": "data-sync.grouped",
+         "name": "Many saved records by work category",
+         "zh": "大量本机记录按类别汇总",
+         "status": "in-design",
+         "url": "/ux/system/data-sync-astra-prototype.html?scenario=busy",
+         "notes": {
+          "purpose": "30 条样例中需要处理的记录直接可见，普通待传按业务类别汇总。",
+          "issues": [
+           "样例仅覆盖分散在四类中的记录；真实类别和任务类型由业务数据提供。"
+          ]
+         }
+        },
+        {
+         "id": "data-sync.category",
+         "name": "Saved records within a category",
+         "zh": "类别内查看本机记录",
+         "status": "in-design",
+         "url": "/ux/system/data-sync-astra-prototype.html?scenario=busy",
+         "steps": [
+          {
+           "tap": "[data-action=\"open-category\"][data-value=\"production\"]"
+          }
+         ],
+         "notes": {
+          "purpose": "点入业务类别后直接看到本机记录，可逐条打开并返回；不强制再走任务类型和任务两级。"
+         }
         },
         {
          "id": "data-sync.upload",
@@ -18182,6 +18250,21 @@
          "tap local records"
         ],
         [
+         "data-sync.global-upload",
+         "data-sync.list",
+         "tap app-shell upload status"
+        ],
+        [
+         "data-sync.global-error",
+         "data-sync.failed",
+         "tap app-shell exception status"
+        ],
+        [
+         "data-sync.grouped",
+         "data-sync.category",
+         "open work category"
+        ],
+        [
          "data-sync.list",
          "data-sync.detail",
          "open a record"
@@ -18241,7 +18324,7 @@
          "lands": "data-sync.list"
         }
        ],
-       "prd": "# Data sync 数据同步\n\n状态：设计草案。2026-10-12 的产品答复已记录；未裁决项留在场景树，不能从旧版代码直接推定为新产品规则。\n\n## Problem\n\n猪场断网时，工人仍要完成可离线的记录。记录保存在这台设备上，与团队已收到的记录不是同一状态。网络恢复后系统自动发送；若某条失败、冲突或被前置操作挡住，工人需要知道哪条仍在本机、原因及下一步。不能把整批记录描绘成一次成功或失败。\n\n## Who\n\n执行生产、巡检、健康和转群等任务的一线工人；需要协助处理异常的主管。\n\n## Anchor\n\n每条离线操作是独立的本机记录，主状态为待同步、已同步、失败、冲突；同一对象或显式依赖的一串操作形成顺序链。网络状态（无网络、不稳定、可同步）与记录状态分开表达。\n\n## Rules\n\n- 离线提交先落本机队列，成功落库才反馈“已保存在本机”；不能写成“已同步”或“团队已收到”。本机保存失败不能给成功反馈。来源：旧版 commandQueue、submitOfflineCommand。\n- 网络恢复并达到可同步质量后自动发送待同步记录；临时网络错误保留记录并自动重试。允许对失败记录手动重试。依据：用户 2026-10-12 答复；旧版 syncCoordinator。\n- 每条记录分别结算：成功的可变为已同步，失败的留在本机。关联对象的较早操作或显式前置依赖未解决时，后续操作显示“等待前置操作”，不暗示它已发送。来源：旧版 syncCoordinator、commandDependencies。\n- 每条本机操作有稳定的操作 ID，所有重试沿用它。请求可能已到服务端但本机没有回执时，先按操作 ID 查询最终结果：查到已处理才标为已上传；确认未处理才用同一 ID 重试；查询仍无法确定时继续保留本机并显示“核对回执中”，不能报告成功或换一个 ID 重发。依据：用户 2026-10-12 确认服务端保证去重并可查结果。\n- 冲突记录停止自动同步；可查看冲突、手动重试或删除。删除必须明确告知“本机这条记录将无法恢复，且不会再上传”，二次确认后执行。不得提供跳过前置操作的“直接同步”。依据：用户 2026-10-12 答复。\n- 冲突详情先对照本机值与服务端现值。人工重试必须重新核对服务端；仍有差异时继续保留冲突，不能覆盖团队已有记录。删除冲突前置记录后，依赖它的后续记录仍留在本机并受阻，只允许逐条查看或经二次确认删除；不自动解锁、发送或提供重试。依据：用户 2026-10-12 补充答复。\n- 有未上传记录时阻止切换账号或猪场，提示先处理记录并提供进入数据同步的入口。依据：用户 2026-10-12 答复。\n- 登录失效时暂停发送，保留原账号与猪场绑定的本机记录。只能重新登录该原账号；验证成功后继续自动上传，期间不得把队列归到新账号或新猪场。依据：用户 2026-10-12 补充答复。原型的“重新登录”只模拟验证成功后的状态转换，真正凭证验证由账号流程负责。\n- 首页承担本机待处理数、同步中和异常的入口；详情由数据同步流程负责。空队列只表示“本机暂无待同步记录”，不证明团队所有记录都齐全。\n- 与任务有关的本机记录可从该任务进入同一数据同步详情。任务能否结束由任务所属功能的规则决定，本页不重新定义。\n- 原型用可重复的本机样例演示状态，浏览器断网后恢复可触发“自动上传中”的状态转换，但不发送服务器请求，也不与其他功能原型联动；原生实现需验证真实队列、网络质量、重启持久化和服务端回执。\n\n## Scope\n\n本轮设计：本机保存反馈；首页入口；数据同步总览；待同步、同步中、回执核对中、部分成功、失败、冲突、受前置操作阻断、全部已同步状态；单条详情；安全重试、冲突删除和已删除前置记录的受阻后续删除；账号/猪场切换拦截与原账号重新登录提示。中英双语及 360/390 宽度均需覆盖。\n\n原型入口以首页为主；旧版“工具箱 > 离线数据”可作为辅助入口，但两处指向同一详情，不能复制状态逻辑。\n\n## Not supported\n\n- **人工强制跳过前置操作**：可能造成错误顺序或重复写入；本轮不提供该入口。\n- **放弃、删除或清空其他非冲突的未同步记录**：仅冲突记录和“前置冲突已删除”的受阻后续记录允许逐条删除；其他记录不得删除或清空。\n- **在同步页编辑业务记录内容**：更正应回到拥有该记录的功能，不能在队列中改业务语义。\n- **跨设备合并本机队列**：旧版队列在本机 IndexedDB，跨设备汇总需要服务端能力。\n- **手动选择批量上传顺序**：顺序由对象分组和显式依赖决定，人工排序增加错误风险。\n- **用网络测试页模拟生产网络**：旧版网络覆盖器只服务调试，不是工人入口。\n\n## Decisions\n\n- 已裁决（用户，2026-10-12）：网络恢复后自动上传，异常时由人处理。此项覆盖旧数据同步草案及 Home 研究中的“只手动上传”示意。Home 与数据同步原型已按此重画，但仍使用各自的本机样例，不能作为真实队列验收。\n- 已裁决（用户，2026-10-12）：先设计查看与重试；冲突记录可手动重试或删除，且不会自动同步。其他非冲突记录的放弃、删除、清空与跳过前置操作未获批准，例外仅为前置冲突已删除的受阻后续记录。\n- 已裁决（用户，2026-10-12）：有未上传记录时阻止切换账号或猪场，提示先处理。\n- 已裁决（用户，2026-10-12）：冲突重试前展示本机与服务端的差异，绝不覆盖服务端已有记录；删除前置冲突后，后续记录继续受阻，只支持查看和逐条删除。原型演示核对和冲突保留，真实重试仍需服务端条件写入与回执支持。\n- 已裁决（用户，2026-10-12）：登录失效后重新登录原账号，验证通过后继续自动上传。\n- 已裁决（用户，2026-10-12）：服务端保证同一离线操作去重，且可按操作 ID 查询最终结果。旧版多个 handler 已发送稳定的 `Idempotency-Key`，但 `errorClassifier.ts` 仍靠“already processed / 已处理”等错误文本推断成功；原生端要用结构化查询结果，不能把错误文案当成功依据。具体接口字段与返回码须在 Android/后端交接时核对。具体哪些业务操作可离线，由拥有该操作的功能定义。\n\n## Sources\n\n- 本功能的流程图、界面职责与实现验证点：flow.md。\n- 本次用户答复（2026-10-12）：自动上传、异常人工处理；冲突手动重试或删除、不自动同步；冲突重试先展示差异且不覆盖服务端；删除前置冲突后依赖记录继续受阻，只能查看或删除；有未上传记录时阻止切换账号或猪场；登录失效后由原账号重新登录并续传；服务端保证操作 ID 去重和最终结果查询。\n- 旧版 Sentri/mobile_webapp：src/lib/offline 的 commandQueue、syncCoordinator、commandDependencies、errorClassifier、networkQuality；src/components/offlineRecords；src/components/offlinePendingBadge；src/providers/OfflineProvider；src/lang/zh-CN/offline.ts。\n- 旧版说明：Sentri/mobile_webapp/spec/offline_inspection_logic_document.md。代码与说明有出入时，以代码实际分支为参考；它不自动成为新产品规则。\n- 当前 feature.json、ux/system/home-astra-prototype.js、ux/research/home/ASTRA-HOME-DIRECTION.md；旧 Figma 索引 references/figma/index.md。\n",
+       "prd": "# Data sync 数据同步\n\n状态：设计草案。2026-10-12 的产品答复已记录；未裁决项留在场景树，不能从旧版代码直接推定为新产品规则。\n\n## Problem\n\n猪场断网时，工人仍要完成可离线的记录。记录保存在这台设备上，与团队已收到的记录不是同一状态。网络恢复后系统自动发送；若某条失败、冲突或被前置操作挡住，工人需要知道哪条仍在本机、原因及下一步。不能把整批记录描绘成一次成功或失败。\n\n## Who\n\n执行生产、巡检、健康和转群等任务的一线工人；需要协助处理异常的主管。\n\n## Anchor\n\n每条离线操作是独立的本机记录，主状态为待同步、已同步、失败、冲突；同一对象或显式依赖的一串操作形成顺序链。网络状态（无网络、不稳定、可同步）与记录状态分开表达。\n\n## Rules\n\n- 离线提交先落本机队列，成功落库才反馈“已保存在本机”；不能写成“已同步”或“团队已收到”。本机保存失败不能给成功反馈。来源：旧版 commandQueue、submitOfflineCommand。\n- 网络恢复并达到可同步质量后自动发送待同步记录；临时网络错误保留记录并自动重试。允许对失败记录手动重试。依据：用户 2026-10-12 答复；旧版 syncCoordinator。\n- 每条记录分别结算：成功的可变为已同步，失败的留在本机。关联对象的较早操作或显式前置依赖未解决时，后续操作显示“等待前置操作”，不暗示它已发送。来源：旧版 syncCoordinator、commandDependencies。\n- 每条本机操作有稳定的操作 ID，所有重试沿用它。请求可能已到服务端但本机没有回执时，先按操作 ID 查询最终结果：查到已处理才标为已上传；确认未处理才用同一 ID 重试；查询仍无法确定时继续保留本机并显示“核对回执中”，不能报告成功或换一个 ID 重发。依据：用户 2026-10-12 确认服务端保证去重并可查结果。\n- 冲突记录停止自动同步；可查看冲突、手动重试或删除。删除必须明确告知“本机这条记录将无法恢复，且不会再上传”，二次确认后执行。不得提供跳过前置操作的“直接同步”。依据：用户 2026-10-12 答复。\n- 冲突详情先对照本机值与服务端现值。人工重试必须重新核对服务端；仍有差异时继续保留冲突，不能覆盖团队已有记录。删除冲突前置记录后，依赖它的后续记录仍留在本机并受阻，只允许逐条查看或经二次确认删除；不自动解锁、发送或提供重试。依据：用户 2026-10-12 补充答复。\n- 有未上传记录时阻止切换账号或猪场，提示先处理记录并提供进入数据同步的入口。依据：用户 2026-10-12 答复。\n- 登录失效时暂停发送，保留原账号与猪场绑定的本机记录。只能重新登录该原账号；验证成功后继续自动上传，期间不得把队列归到新账号或新猪场。依据：用户 2026-10-12 补充答复。原型的“重新登录”只模拟验证成功后的状态转换，真正凭证验证由账号流程负责。\n- 应用壳在系统状态栏安全区下方显示同一全局本机记录入口，覆盖首页与应用内任务页：待网报本机数、上传中报正在上传、失败/冲突报需要处理；点入同一同步总览。它按当前账号、猪场、这台手机的全部未上传记录计数，不随任务页筛选而缩小。空队列隐藏入口；“本机暂无待同步记录”不证明团队所有记录都齐全。首页只有异常才另加处理提示，正常待网不重复一张卡。此为 2026-10-13 用户反馈后形成的设计候选，待屏幕评审。\n- 本机记录总览先按状态区分需要处理、待上传和已上传；少量记录直接列出。普通待上传达到 9 条且跨多个业务类别时，显示带计数的业务类别行，点入类别直接看记录；异常记录仍直接可见。避免旧版类别→任务类型→任务→记录四层路径。此为 2026-10-13 的设计候选。\n- 与任务有关的本机记录可从该任务进入同一数据同步详情。任务能否结束由任务所属功能的规则决定，本页不重新定义。\n- 原型用可重复的本机样例演示状态，浏览器断网后恢复可触发“自动上传中”的状态转换，但不发送服务器请求，也不与其他功能原型联动；原生实现需验证真实队列、网络质量、重启持久化和服务端回执。\n\n## Scope\n\n本轮设计：本机保存反馈；应用内全局状态入口和首页异常提示；大量记录的类别入口；数据同步总览；待同步、同步中、回执核对中、部分成功、失败、冲突、受前置操作阻断、全部已同步状态；单条详情；安全重试、冲突删除和已删除前置记录的受阻后续删除；账号/猪场切换拦截与原账号重新登录提示。中英双语及 360/390 宽度均需覆盖。\n\n原型入口以首页为主；旧版“工具箱 > 离线数据”可作为辅助入口，但两处指向同一详情，不能复制状态逻辑。\n\n## Not supported\n\n- **人工强制跳过前置操作**：可能造成错误顺序或重复写入；本轮不提供该入口。\n- **放弃、删除或清空其他非冲突的未同步记录**：仅冲突记录和“前置冲突已删除”的受阻后续记录允许逐条删除；其他记录不得删除或清空。\n- **在同步页编辑业务记录内容**：更正应回到拥有该记录的功能，不能在队列中改业务语义。\n- **跨设备合并本机队列**：旧版队列在本机 IndexedDB，跨设备汇总需要服务端能力。\n- **手动选择批量上传顺序**：顺序由对象分组和显式依赖决定，人工排序增加错误风险。\n- **用网络测试页模拟生产网络**：旧版网络覆盖器只服务调试，不是工人入口。\n\n## Decisions\n\n- 已裁决（用户，2026-10-12）：网络恢复后自动上传，异常时由人处理。此项覆盖旧数据同步草案及 Home 研究中的“只手动上传”示意。Home 与数据同步原型已按此重画，但仍使用各自的本机样例，不能作为真实队列验收。\n- 已裁决（用户，2026-10-12）：先设计查看与重试；冲突记录可手动重试或删除，且不会自动同步。其他非冲突记录的放弃、删除、清空与跳过前置操作未获批准，例外仅为前置冲突已删除的受阻后续记录。\n- 已裁决（用户，2026-10-12）：有未上传记录时阻止切换账号或猪场，提示先处理。\n- 已裁决（用户，2026-10-12）：冲突重试前展示本机与服务端的差异，绝不覆盖服务端已有记录；删除前置冲突后，后续记录继续受阻，只支持查看和逐条删除。原型演示核对和冲突保留，真实重试仍需服务端条件写入与回执支持。\n- 已裁决（用户，2026-10-12）：登录失效后重新登录原账号，验证通过后继续自动上传。\n- 已裁决（用户，2026-10-12）：服务端保证同一离线操作去重，且可按操作 ID 查询最终结果。旧版多个 handler 已发送稳定的 `Idempotency-Key`，但 `errorClassifier.ts` 仍靠“already processed / 已处理”等错误文本推断成功；原生端要用结构化查询结果，不能把错误文案当成功依据。具体接口字段与返回码须在 Android/后端交接时核对。具体哪些业务操作可离线，由拥有该操作的功能定义。\n- 设计反馈（用户，2026-10-13）：需处理任务种类过多时的分类，以及首页之外对待传、上传中和异常的持续感知；提出探索开孔附近的位置。候选设计选择应用内安全区下的全局入口和按需类别汇总。Android 的状态栏由系统管理，Live Update 仅在符合活跃、用户发起、时间敏感条件时可能由系统提升，不能承诺所有设备或持续待网/异常都显示为系统胶囊。\n\n## Sources\n\n- 本功能的流程图、界面职责与实现验证点：flow.md。\n- 本次用户答复（2026-10-12）：自动上传、异常人工处理；冲突手动重试或删除、不自动同步；冲突重试先展示差异且不覆盖服务端；删除前置冲突后依赖记录继续受阻，只能查看或删除；有未上传记录时阻止切换账号或猪场；登录失效后由原账号重新登录并续传；服务端保证操作 ID 去重和最终结果查询。\n- 旧版 Sentri/mobile_webapp：src/lib/offline 的 commandQueue、syncCoordinator、commandDependencies、errorClassifier、networkQuality；src/components/offlineRecords；src/components/offlinePendingBadge；src/providers/OfflineProvider；src/lang/zh-CN/offline.ts。\n- 旧版说明：Sentri/mobile_webapp/spec/offline_inspection_logic_document.md。代码与说明有出入时，以代码实际分支为参考；它不自动成为新产品规则。\n- 当前 feature.json、ux/system/home-astra-prototype.js、ux/research/home/ASTRA-HOME-DIRECTION.md；旧 Figma 索引 references/figma/index.md。\n- Android 官方说明：Live Updates https://developer.android.com/develop/ui/compose/notifications/live-update；WindowInsets 与系统栏 https://developer.android.com/develop/ui/compose/system/insets。\n",
        "scenarios": {
         "treeDoc": true,
         "tree": [
@@ -18776,7 +18859,171 @@
                   "says": "The server guarantees deduplication and final-result lookup by stable operation ID; confirm the result before marking the local record uploaded."
                  }
                 ],
-                "result": "blocked"
+                "result": "pass"
+               }
+              ]
+             }
+            ]
+           }
+          ]
+         },
+         {
+          "type": "entry",
+          "id": "ds-a7-global-wait.entry",
+          "label": "Saved work remains visible outside Home",
+          "children": [
+           {
+            "type": "state",
+            "id": "ds-a7-global-wait.state",
+            "label": "Home fixture: offline",
+            "tree": "A",
+            "children": [
+             {
+              "type": "action",
+              "id": "ds-a7-global-wait.act",
+              "label": "The worker checks saved work while using the toolbox.",
+              "children": [
+               {
+                "type": "outcome",
+                "id": "ds-a7-global-wait",
+                "label": "Saved work remains visible outside Home",
+                "tree": "A-7",
+                "gwt": {
+                 "given": "Three operations are saved on this phone while it is offline.",
+                 "when": "The worker checks the toolbox page.",
+                 "then": "The app still shows three records saved locally and says they will upload when connected."
+                },
+                "authority": [
+                 {
+                  "src": "PRD",
+                  "at": "Design feedback 2026-10-13",
+                  "says": "Show global saved-work status outside Home."
+                 }
+                ],
+                "result": "not-run"
+               }
+              ]
+             }
+            ]
+           }
+          ]
+         },
+         {
+          "type": "entry",
+          "id": "ds-a7-global-upload.entry",
+          "label": "Automatic upload stays visible outside Home",
+          "children": [
+           {
+            "type": "state",
+            "id": "ds-a7-global-upload.state",
+            "label": "Home fixture: connection restored",
+            "tree": "A",
+            "children": [
+             {
+              "type": "action",
+              "id": "ds-a7-global-upload.act",
+              "label": "The worker checks the toolbox while upload is active.",
+              "children": [
+               {
+                "type": "outcome",
+                "id": "ds-a7-global-upload",
+                "label": "Automatic upload stays visible outside Home",
+                "tree": "A-7",
+                "gwt": {
+                 "given": "Three records are being uploaded automatically.",
+                 "when": "The worker checks the toolbox page.",
+                 "then": "The app still shows the upload state and provides a path to saved work."
+                },
+                "authority": [
+                 {
+                  "src": "PRD",
+                  "at": "Design feedback 2026-10-13",
+                  "says": "Show the global local-record state on Home and other app pages."
+                 }
+                ],
+                "result": "not-run"
+               }
+              ]
+             }
+            ]
+           }
+          ]
+         },
+         {
+          "type": "entry",
+          "id": "ds-a7-global-error.entry",
+          "label": "A sync exception stays visible outside Home",
+          "children": [
+           {
+            "type": "state",
+            "id": "ds-a7-global-error.state",
+            "label": "Home fixture: upload failed",
+            "tree": "A",
+            "children": [
+             {
+              "type": "action",
+              "id": "ds-a7-global-error.act",
+              "label": "The worker opens another page, then checks the exception.",
+              "children": [
+               {
+                "type": "outcome",
+                "id": "ds-a7-global-error",
+                "label": "An exception outside Home opens saved work",
+                "tree": "A-7",
+                "gwt": {
+                 "given": "A saved operation failed to upload while the worker has another page open.",
+                 "when": "They use the global saved-work status.",
+                 "then": "The same saved-work view opens with the failed operation available for review."
+                },
+                "authority": [
+                 {
+                  "src": "PRD",
+                  "at": "Design feedback 2026-10-13",
+                  "says": "A global exception entry remains available outside Home."
+                 }
+                ],
+                "result": "not-run"
+               }
+              ]
+             }
+            ]
+           }
+          ]
+         },
+         {
+          "type": "entry",
+          "id": "ds-a8-grouped-records.entry",
+          "label": "Many record kinds remain findable",
+          "children": [
+           {
+            "type": "state",
+            "id": "ds-a8-grouped-records.state",
+            "label": "Study fixture: 30 records in four categories",
+            "tree": "A",
+            "children": [
+             {
+              "type": "action",
+              "id": "ds-a8-grouped-records.act",
+              "label": "The worker opens the production category after seeing direct exceptions.",
+              "children": [
+               {
+                "type": "outcome",
+                "id": "ds-a8-grouped-records",
+                "label": "Many record kinds remain findable",
+                "tree": "A-8",
+                "gwt": {
+                 "given": "This phone has thirty saved records across several kinds of work.",
+                 "when": "The worker opens the production category after seeing the direct exception rows.",
+                 "then": "The category shows its waiting records directly and can return to the status overview."
+                },
+                "authority": [
+                 {
+                  "src": "PRD",
+                  "at": "Design feedback 2026-10-13",
+                  "says": "Show exceptions directly and group many ordinary waiting records by work category."
+                 }
+                ],
+                "result": "not-run"
                }
               ]
              }
@@ -18786,9 +19033,9 @@
          }
         ],
         "run": {
-         "commit": "db030dd",
+         "commit": "eadadd7",
          "dirty": false,
-         "ran": "2026-10-12T09:07:24.430Z",
+         "ran": "2026-10-13T01:05:28.840Z",
          "langs": [
           "en",
           "zh"

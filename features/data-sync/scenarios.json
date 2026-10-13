@@ -903,6 +903,174 @@
           ]
         }
       ]
+    },
+    {
+      "type": "entry",
+      "id": "ds-a7-global-wait.entry",
+      "label": "Saved work remains visible outside Home",
+      "children": [
+        {
+          "type": "state",
+          "id": "ds-a7-global-wait.state",
+          "label": "Home fixture: offline",
+          "tree": "A",
+          "reset": { "url": "/ux/system/home-astra-prototype.html?section=gestation&connection=offline&view=toolbox" },
+          "children": [
+            {
+              "type": "action",
+              "id": "ds-a7-global-wait.act",
+              "label": "The worker checks saved work while using the toolbox.",
+              "taps": [{ "expect": [{ "text": { "en": "Toolbox", "zh": "工具箱" } }] }],
+              "children": [
+                {
+                  "type": "outcome",
+                  "id": "ds-a7-global-wait",
+                  "tree": "A-7",
+                  "label": "Saved work remains visible outside Home",
+                  "gwt": {
+                    "given": "Three operations are saved on this phone while it is offline.",
+                    "when": "The worker checks the toolbox page.",
+                    "then": "The app still shows three records saved locally and says they will upload when connected."
+                  },
+                  "authority": [{ "src": "PRD", "at": "Design feedback 2026-10-13", "says": "Show global saved-work status outside Home." }],
+                  "visible": [
+                    { "text": { "en": "3 records saved on this phone", "zh": "3 条记录保存在本机" } },
+                    { "text": { "en": "Uploads when connected", "zh": "联网后自动上传" } }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "entry",
+      "id": "ds-a7-global-upload.entry",
+      "label": "Automatic upload stays visible outside Home",
+      "children": [
+        {
+          "type": "state",
+          "id": "ds-a7-global-upload.state",
+          "label": "Home fixture: connection restored",
+          "tree": "A",
+          "reset": { "url": "/ux/system/home-astra-prototype.html?section=gestation&connection=online&view=toolbox" },
+          "children": [
+            {
+              "type": "action",
+              "id": "ds-a7-global-upload.act",
+              "label": "The worker checks the toolbox while upload is active.",
+              "taps": [{ "expect": [{ "text": { "en": "Toolbox", "zh": "工具箱" } }] }],
+              "children": [
+                {
+                  "type": "outcome",
+                  "id": "ds-a7-global-upload",
+                  "tree": "A-7",
+                  "label": "Automatic upload stays visible outside Home",
+                  "gwt": {
+                    "given": "Three records are being uploaded automatically.",
+                    "when": "The worker checks the toolbox page.",
+                    "then": "The app still shows the upload state and provides a path to saved work."
+                  },
+                  "authority": [{ "src": "PRD", "at": "Design feedback 2026-10-13", "says": "Show the global local-record state on Home and other app pages." }],
+                  "visible": [
+                    { "text": { "en": "Uploading 3 saved records", "zh": "正在上传 3 条记录" } },
+                    { "text": { "en": "Automatic upload", "zh": "自动上传中" } }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "entry",
+      "id": "ds-a7-global-error.entry",
+      "label": "A sync exception stays visible outside Home",
+      "children": [
+        {
+          "type": "state",
+          "id": "ds-a7-global-error.state",
+          "label": "Home fixture: upload failed",
+          "tree": "A",
+          "reset": { "url": "/ux/system/home-astra-prototype.html?section=gestation&sync=failed&view=toolbox" },
+          "children": [
+            {
+              "type": "action",
+              "id": "ds-a7-global-error.act",
+              "label": "The worker opens another page, then checks the exception.",
+              "taps": [{ "expect": [{ "text": { "en": "1 record needs attention", "zh": "1 条记录需要处理" } }] }, "[data-action=\"sync\"]"],
+              "children": [
+                {
+                  "type": "outcome",
+                  "id": "ds-a7-global-error",
+                  "tree": "A-7",
+                  "label": "An exception outside Home opens saved work",
+                  "gwt": {
+                    "given": "A saved operation failed to upload while the worker has another page open.",
+                    "when": "They use the global saved-work status.",
+                    "then": "The same saved-work view opens with the failed operation available for review."
+                  },
+                  "authority": [{ "src": "PRD", "at": "Design feedback 2026-10-13", "says": "A global exception entry remains available outside Home." }],
+                  "visible": [
+                    { "text": { "en": "Needs you · 1", "zh": "需要处理 · 1" } },
+                    { "text": { "en": "Failed", "zh": "失败" } }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "entry",
+      "id": "ds-a8-grouped-records.entry",
+      "label": "Many record kinds remain findable",
+      "children": [
+        {
+          "type": "state",
+          "id": "ds-a8-grouped-records.state",
+          "label": "Study fixture: 30 records in four categories",
+          "tree": "A",
+          "reset": { "url": "/ux/system/data-sync-astra-prototype.html?scenario=busy" },
+          "children": [
+            {
+              "type": "action",
+              "id": "ds-a8-grouped-records.act",
+              "label": "The worker opens the production category after seeing direct exceptions.",
+              "taps": [
+                { "expect": [
+                  { "text": { "en": "Needs you · 2", "zh": "需要处理 · 2" } },
+                  { "text": { "en": "Waiting to upload · 24", "zh": "待上传 · 24" } },
+                  { "text": { "en": "Production work", "zh": "生产操作" } }
+                ] },
+                "[data-action=\"open-category\"][data-value=\"production\"]"
+              ],
+              "children": [
+                {
+                  "type": "outcome",
+                  "id": "ds-a8-grouped-records",
+                  "tree": "A-8",
+                  "label": "Many record kinds remain findable",
+                  "gwt": {
+                    "given": "This phone has thirty saved records across several kinds of work.",
+                    "when": "The worker opens the production category after seeing the direct exception rows.",
+                    "then": "The category shows its waiting records directly and can return to the status overview."
+                  },
+                  "authority": [{ "src": "PRD", "at": "Design feedback 2026-10-13", "says": "Show exceptions directly and group many ordinary waiting records by work category." }],
+                  "visible": [
+                    { "text": { "en": "Waiting to upload · 6", "zh": "待上传 · 6" } },
+                    { "text": { "en": "Pregnancy check", "zh": "孕检" } },
+                    { "text": { "en": "Unit inspection", "zh": "单元巡检" }, "absent": true }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
     }
   ]
 }

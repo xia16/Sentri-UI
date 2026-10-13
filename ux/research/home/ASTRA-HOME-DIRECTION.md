@@ -55,6 +55,8 @@ The single agreed direction is intentional: this pass tests the settled navigati
 
 **2026-10-12 update:** The preceding bullets document the original Home study. The owner subsequently chose automatic upload on reconnection, manual handling of exceptions, and per-record conflict review. The current Data sync design is in features/data-sync/PRD.md and flow.md; Home now opens that single flow instead of the old Saved work drawer.
 
+**2026-10-13 update:** The owner pointed out that Home alone is insufficient for awareness while working elsewhere, and a flat queue does not scale across many work kinds. The current Data sync candidate moves the normal pending/uploading/exception status to an app-shell entry below the system safe area; Home keeps a content prompt only for exceptions. The 30-record study shows exceptions directly and groups ordinary waiting records by business category. This replaces the 2026-10-12 compact after-task entry in the current Home prototype; the earlier bullets and screenshot remain historical baseline evidence.
+
 ### Unit navigation refinement
 
 Replaced the horizontal unit tabs and icon-only browse button with a stable two-part scope control: Overview and Choose unit / selected unit. The owner clarified a maximum of around 15 units, so the picker has no search. It opens at medium height (460 px on the desktop phone, capped at 60% on smaller screens), with a fixed header and count above a vertically scrolling list of all units, including units with no tasks.

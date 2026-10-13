@@ -10,6 +10,7 @@
     scenario: params.get('scenario') || 'offline',
     lang: params.get('lang') === 'zh' ? 'zh' : 'en',
     detail: '',
+    category: '',
     dialog: '',
     switchPromptShown: false,
     deleted: false,
@@ -24,6 +25,9 @@
   const copy = {
     en: {
       title: 'Saved work', detail: 'Record detail', back: 'Back', waiting: 'Waiting to upload',
+      production: 'Production work', inspection: 'Inspections', vaccination: 'Vaccinations', transfer: 'Transfers',
+      categoryHint: 'Select a work category to find a saved record.', categoryWaiting: 'Records in this category upload automatically when connected.',
+      categoryCount: 'waiting records',
       needs: 'Needs you', uploaded: 'Uploaded', syncing: 'Uploading automatically',
       offline: 'No connection · saved on this phone', online: 'Connection restored · uploading automatically',
       poor: 'Waiting for a usable connection', connected: 'Connection available', failed: 'Upload failed', conflict: 'Conflict',
@@ -68,6 +72,9 @@
     },
     zh: {
       title: '本机记录', detail: '记录详情', back: '返回', waiting: '待上传',
+      production: '生产操作', inspection: '巡检', vaccination: '免疫', transfer: '转群',
+      categoryHint: '按业务类别查看本机记录。', categoryWaiting: '本类别记录联网后会自动上传。',
+      categoryCount: '条待上传记录',
       needs: '需要处理', uploaded: '已上传', syncing: '正在自动上传',
       offline: '无网络 · 已保存在本机', online: '网络已恢复 · 正在自动上传',
       poor: '等待可用网络', connected: '网络可用', failed: '上传失败', conflict: '冲突',
@@ -115,10 +122,25 @@
   let dialogReturnAction = '';
   const records = () => {
     const base = [
-      { id: 'first', at: '09:32', place: 'p1' },
-      { id: 'second', at: '09:35', place: 'p2' },
-      { id: 'third', at: '09:38', place: 'p3' }
+      { id: 'first', at: '09:32', place: 'p1', category: 'production' },
+      { id: 'second', at: '09:35', place: 'p2', category: 'inspection' },
+      { id: 'third', at: '09:38', place: 'p3', category: 'production' }
     ];
+    if (state.scenario === 'busy') {
+      const types = [
+        {category:'production', en:'Pregnancy check', zh:'孕检', type:'pregnancy'},
+        {category:'inspection', en:'Unit inspection', zh:'单元巡检', type:'unit-inspection'},
+        {category:'vaccination', en:'Vaccination', zh:'免疫', type:'vaccination'},
+        {category:'transfer', en:'Transfer', zh:'转群', type:'transfer'}
+      ];
+      return Array.from({length:30}, (_, index) => {
+        const kind = types[index === 1 ? 0 : index % types.length];
+        const tag = String(300 + index).padStart(6, '0');
+        return {id:'busy-'+index, category:kind.category, type:kind.type, titleEn:kind.en+' · '+tag,
+          titleZh:kind.zh+' · '+tag, placeEn:'Unit '+(7 + index % 3), placeZh:(7 + index % 3)+' 单元',
+          at:'09:'+String(10 + index).padStart(2,'0'), status:index===0?'failed':index===1?'conflict':index>=26?'uploaded':'waiting'};
+      });
+    }
     const modes = {
       offline: ['waiting','waiting','waiting'],
       syncing: ['syncing','waiting','waiting'],
@@ -135,15 +157,25 @@
   };
   const humanStatus = status => status === 'blocked' && state.deleted ? t('blockedDeletedStatus') : t(status);
   const shortStatus = status => t(status + 'Short');
+  const itemTitle = item => item[state.lang === 'zh' ? 'titleZh' : 'titleEn'] || t(item.id);
+  const itemPlace = item => item[state.lang === 'zh' ? 'placeZh' : 'placeEn'] || t(item.place);
   const row = item => S.row({
-    title: t(item.id),
-    description: t(item.place) + ' · ' + item.at,
+    title: itemTitle(item),
+    description: itemPlace(item) + ' · ' + item.at,
     trailing: {text: shortStatus(item.status), tone: item.status === 'failed' || item.status === 'conflict' ? 'red' : item.status === 'uploaded' ? 'green' : 'muted'},
     action: 'open-record', value: item.id, wrap: true,
-    attrs: {'aria-label': t(item.id) + ' · ' + humanStatus(item.status)}
+    attrs: {'aria-label': itemTitle(item) + ' · ' + humanStatus(item.status)}
   });
   const group = (title, items) => items.length
     ? S.rowGroup(items.map(row).join(''), {title: title + ' · ' + items.length, level: 3}) : '';
+  const categoryGroups = items => {
+    const keys = ['production','inspection','vaccination','transfer'].filter(category => items.some(item => item.category === category));
+    return S.rowGroup(keys.map(category => {
+      const count = items.filter(item => item.category === category).length;
+      return S.row({title:t(category), description:count + ' ' + t('categoryCount'),
+        action:'open-category', value:category, wrap:true});
+    }).join(''), {title:t('waiting')+' · '+items.length, level:3});
+  };
 
   function listView() {
     const items = records();
@@ -151,14 +183,25 @@
     const checking = items.filter(x => x.status === 'checking');
     const waiting = items.filter(x => x.status === 'waiting' || x.status === 'syncing' || x.status === 'blocked');
     const uploaded = items.filter(x => x.status === 'uploaded');
+    if (state.category) {
+      const categoryItems = waiting.filter(item => item.category === state.category);
+      const body = '<div class="sync-content"><div class="sync-intro">' +
+        S.statusLine([{text:t('categoryWaiting')}]) + '</div><div class="sync-groups">' +
+        group(t('waiting'), categoryItems) + '</div></div>';
+      app.innerHTML = S.sheet({variant:'page',title:t(state.category),body,
+        footer:S.sheetFooter({back:{action:'back-to-all',label:t('back')}})});
+      renderDialog();
+      return;
+    }
     const mode = state.scenario;
-    const line = mode === 'offline' || mode === 'switch' ? t('offline') : mode === 'expired' ? t('expiredTitle') : mode === 'syncing' ? t('online') : mode === 'uncertain' ? t(state.receiptResolved ? 'done' : 'checkingReceipt') : mode === 'done' ? t('done') : t('connected');
-    const hint = mode === 'offline' || mode === 'switch' ? t('pendingHint') : mode === 'expired' ? t('expiredHint') : mode === 'syncing' ? t('syncingHint') : mode === 'uncertain' ? t(state.receiptResolved ? 'reconciledHint' : 'checkingReceiptHint') : mode === 'partial' ? t('partialHint') : mode === 'conflict' ? t(state.deletedDependent ? 'allResolvedHint' : state.deleted ? 'deletedHint' : 'conflictHint') : mode === 'blocked' ? t('blockedHint') : t('doneHint');
+    const line = mode === 'offline' || mode === 'switch' || mode === 'busy' ? t('offline') : mode === 'expired' ? t('expiredTitle') : mode === 'syncing' ? t('online') : mode === 'uncertain' ? t(state.receiptResolved ? 'done' : 'checkingReceipt') : mode === 'done' ? t('done') : t('connected');
+    const hint = mode === 'busy' ? t('categoryHint') : mode === 'offline' || mode === 'switch' ? t('pendingHint') : mode === 'expired' ? t('expiredHint') : mode === 'syncing' ? t('syncingHint') : mode === 'uncertain' ? t(state.receiptResolved ? 'reconciledHint' : 'checkingReceiptHint') : mode === 'partial' ? t('partialHint') : mode === 'conflict' ? t(state.deletedDependent ? 'allResolvedHint' : state.deleted ? 'deletedHint' : 'conflictHint') : mode === 'blocked' ? t('blockedHint') : t('doneHint');
     const lead = S.statusLine([{text: line}], {className:'sync-summary-line'}) +
       S.statusLine([{text: hint}], {className:'sync-summary-line'});
     const reauth = mode === 'expired' ? S.button({label:t('reauth'),register:'primary',action:'open-reauth'}) : '';
     const body = '<div class="sync-content"><div class="sync-intro">' + lead + reauth + '</div>' +
-      '<div class="sync-groups">' + group(t('needs'), needs) + group(t('checkingReceipt'), checking) + group(t('waiting'), waiting) +
+      '<div class="sync-groups">' + group(t('needs'), needs) + group(t('checkingReceipt'), checking) +
+      (waiting.length >= 9 && new Set(waiting.map(item => item.category)).size >= 2 ? categoryGroups(waiting) : group(t('waiting'), waiting)) +
       group(t('uploaded'), uploaded) + '</div></div>';
     app.innerHTML = S.sheet({
       variant:'page', title:t('title'), body,
@@ -176,9 +219,9 @@
     const failed = item.status === 'failed', conflict = item.status === 'conflict';
     const reason = failed ? t('reasonFailed') : conflict ? t('reasonConflict') : item.status === 'blocked' ? t(state.deleted ? 'reasonBlockedDeleted' : 'reasonBlocked') : '';
     const facts = S.facts([
-      {label:t('work'), value:t(item.id)},
+      {label:t('work'), value:itemTitle(item)},
       {label:t('status'), value:humanStatus(item.status)},
-      {label:t('place'), value:t(item.place)},
+      {label:t('place'), value:itemPlace(item)},
       {label:t('time'), value:item.at}
     ], {columns:1});
     const alert = reason ? S.banner({tone: conflict || failed ? 'danger' : 'notice', headline: t('reason'), consequence:reason}) : '';
@@ -232,6 +275,8 @@
     if (!button || S.guard(button)) return;
     const action = button.dataset.action;
     if (action === 'open-record') { state.detail = button.dataset.value; state.retryResult = false; }
+    else if (action === 'open-category') state.category = button.dataset.value;
+    else if (action === 'back-to-all') state.category = '';
     else if (action === 'back-to-list') state.detail = '';
     else if (action === 'go-home') {
       if (params.get('from') === 'home') history.back();
@@ -256,7 +301,7 @@
   });
   scenarioSelect.addEventListener('change', () => {
     state.scenario = scenarioSelect.value;
-    state.detail = ''; state.dialog = ''; state.switchPromptShown = false;
+    state.detail = ''; state.category = ''; state.dialog = ''; state.switchPromptShown = false;
     state.deleted = false; state.deletedDependent = false; state.retrying = false; state.retryResult = false;
     state.receiptResolved = false;
     render();

@@ -11,7 +11,11 @@
       "本机记录",
       [
         "data-sync.banner",
+        "data-sync.global-upload",
+        "data-sync.global-error",
         "data-sync.list",
+        "data-sync.grouped",
+        "data-sync.category",
         "data-sync.detail"
       ]
     ],
@@ -37,12 +41,12 @@
       "zh": "首页本机记录入口",
       "status": "in-design",
       "notes": {
-        "purpose": "Home 的本机记录入口。普通待上传状态在工作卡之后，异常状态才提前；点击进入同一数据同步页。",
+        "purpose": "应用壳在状态栏安全区下显示全局本机记录入口，首页仅对异常另作提示；点击进入同一数据同步页。",
         "states": [
           {
             "state": "Waiting",
             "when": "本机有待上传记录",
-            "shows": "本机数量与网络状态；恢复网络后自动上传，不提示点击上传"
+            "shows": "应用壳报这台手机待上传数；恢复网络后自动上传，首页不重复普通状态行"
           },
           {
             "state": "Needs attention",
@@ -52,7 +56,7 @@
           {
             "state": "Empty",
             "when": "本机无待上传记录",
-            "shows": "本机暂无待上传记录，不能称团队全部记录已齐"
+            "shows": "全局入口隐藏；总览仍可说明本机暂无待上传记录，不能称团队全部记录已齐"
           }
         ],
         "issues": [
@@ -60,6 +64,30 @@
         ]
       },
       "url": "/ux/system/home-astra-prototype.html?section=gestation&connection=offline"
+    },
+    {
+      "id": "data-sync.global-upload",
+      "name": "Uploading outside Home",
+      "zh": "其他页面感知正在上传",
+      "status": "in-design",
+      "url": "/ux/system/home-astra-prototype.html?section=gestation&connection=online",
+      "steps": [{ "tap": "[data-action=\"toolbox\"]" }],
+      "notes": {
+        "purpose": "工人进入工具箱后仍可看见应用壳的自动上传状态，并能点入同一同步总览。",
+        "issues": ["Home 样例只证明应用壳布局；其他功能原型尚未接入同一壳。"]
+      }
+    },
+    {
+      "id": "data-sync.global-error",
+      "name": "Exception outside Home",
+      "zh": "其他页面感知同步异常",
+      "status": "in-design",
+      "url": "/ux/system/home-astra-prototype.html?section=gestation&sync=failed",
+      "steps": [{ "tap": "[data-action=\"toolbox\"]" }],
+      "notes": {
+        "purpose": "离开首页后仍显示需要处理的本机记录数；点击进入异常详情。",
+        "issues": ["真实队列与其他功能页面需要 Android 实现时连接。"]
+      }
     },
     {
       "id": "data-sync.list",
@@ -125,6 +153,28 @@
           "tap": "[data-action=\"open-record\"]"
         }
       ]
+    },
+    {
+      "id": "data-sync.grouped",
+      "name": "Many saved records by work category",
+      "zh": "大量本机记录按类别汇总",
+      "status": "in-design",
+      "url": "/ux/system/data-sync-astra-prototype.html?scenario=busy",
+      "notes": {
+        "purpose": "30 条样例中需要处理的记录直接可见，普通待传按业务类别汇总。",
+        "issues": ["样例仅覆盖分散在四类中的记录；真实类别和任务类型由业务数据提供。"]
+      }
+    },
+    {
+      "id": "data-sync.category",
+      "name": "Saved records within a category",
+      "zh": "类别内查看本机记录",
+      "status": "in-design",
+      "url": "/ux/system/data-sync-astra-prototype.html?scenario=busy",
+      "steps": [{ "tap": "[data-action=\"open-category\"][data-value=\"production\"]" }],
+      "notes": {
+        "purpose": "点入业务类别后直接看到本机记录，可逐条打开并返回；不强制再走任务类型和任务两级。"
+      }
     },
     {
       "id": "data-sync.upload",
@@ -267,6 +317,21 @@
       "data-sync.banner",
       "data-sync.list",
       "tap local records"
+    ],
+    [
+      "data-sync.global-upload",
+      "data-sync.list",
+      "tap app-shell upload status"
+    ],
+    [
+      "data-sync.global-error",
+      "data-sync.failed",
+      "tap app-shell exception status"
+    ],
+    [
+      "data-sync.grouped",
+      "data-sync.category",
+      "open work category"
     ],
     [
       "data-sync.list",
