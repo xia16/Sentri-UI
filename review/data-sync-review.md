@@ -1,6 +1,6 @@
 # Offline processing · provisional design review
 
-Date: 2026-10-13. Baseline: `origin/main` at `ccaa3f2`. Design candidate: `codex/offline-flow-design` at `963f341`. All screens remain `in-design`.
+Date: 2026-10-13. Baseline: `origin/main` at `ccaa3f2`. Tested screen candidate: `codex/offline-flow-design` at `b04313d`. The owner selected the header badge form; all screens remain `in-design`.
 
 ## Product rules agreed with the owner
 
@@ -14,15 +14,17 @@ Date: 2026-10-13. Baseline: `origin/main` at `ccaa3f2`. Design candidate: `codex
 
 ## Follow-up design direction
 
-- The native Android app shell now shows a 48dp minimum tappable floating badge beside the existing header, inside the system safe area. It uses the phone-wide count in waiting, uploading and exception states, expands to an action label for an exception, and disappears for an empty queue. Home has no separate sync card. The header reserves horizontal space to prevent overlap with its other controls.
-- The app-drawn centered island is included as an interactive comparison. It makes the short state word visible but moves the work cards down about 40px; the badge preserves the first work card's position and is the candidate. Android Live Update chips can be investigated for qualifying active uploads, while waiting and exception awareness remains in the app. The system controls promotion and the user can dismiss or demote the notification.
+- The native Android app shell shows a 48dp minimum tappable badge as the header's trailing control, inside the system safe area. It uses the phone-wide count in waiting, uploading and exception states, expands to an action label for an exception, and disappears for an empty queue. Home has no separate sync card. The badge and adjacent control now share a vertical center and 10px gap, with the header's 20px right inset on Home. The 360px English exception uses `Fix N` to keep the farm and section names on one line; the full reason remains in the accessible label and detail.
+- The app-drawn centered island remains an interactive comparison. It makes the short state word visible but moves the work cards down about 40px; the owner chose the right header badge. Android Live Update chips can be investigated for qualifying active uploads, while waiting and exception awareness remains in the app. The system controls promotion and the user can dismiss or demote the notification.
 - For a small queue, keep direct record rows. With at least nine ordinary waiting records spanning more than one business category, group those rows by category and show counts. Keep exceptional records directly accessible above the groups. Category → record is the navigation depth in this candidate; the four labels in the 30-record fixture are examples, not a final business taxonomy. Newly added or unmapped types must remain visible under Other work until mapped. Uploaded records no longer occupy individual rows; the overview shows the last-30-days total.
+- A fresh interaction review found that the most useful enhancement is at the moment of saving: confirm once that the operation is stored on this phone and will upload automatically, then let the selected badge carry the persistent state. Repeated per-record upload popups would interrupt the work. This connection is specified for native Android validation in the first offline business operation; the Home sample has no real local-write event. The comparison with bottom navigation and a permanent bottom status strip is recorded in [the critique](../features/data-sync/critique.md).
 
 ## Review paths
 
 | Path | Evidence |
 |---|---|
 | Home entry and list | [Before/after pairs](data-sync-evidence/README.md) |
+| Aligned selected badge in waiting, exception and uploading states | [Current 390/360 px captures](data-sync-evidence/README.md) |
 | Compact badge versus centered island; waiting, uploading and exception | [Current comparison captures](data-sync-evidence/README.md) |
 | 30 records, category overview and category detail | [English and Chinese captures](data-sync-evidence/README.md) |
 | Recent upload total and 30-day boundary | [Chinese 390 px captures](data-sync-evidence/README.md) |
@@ -32,7 +34,7 @@ Date: 2026-10-13. Baseline: `origin/main` at `ccaa3f2`. Design candidate: `codex
 
 ## Verification and remaining work
 
-- [Scenario report](scenarios-data-sync.json): candidate `963f341`; 19 passed, 0 failed, 0 blocked, 0 pending. All leaves passed in English and Chinese at 360 and 390 px.
+- [Scenario report](scenarios-data-sync.json): candidate `b04313d`; 19 passed, 0 failed, 0 blocked, 0 pending. All leaves passed in English and Chinese at 360 and 390 px. A separate alignment probe checked 12 Home combinations of 360/390px, English/Chinese and waiting/uploading/exception states; all 12 held the same header center, 10px gap and 20px Home right inset.
 - `npm test`: 661 passed, 0 failed, 2 skipped. Data-sync strict legibility: 16 screens, 0 failures. Workbench strict legibility still reports seven pre-existing `unit*` screen failures; the badge adds no reported contrast or touch-target failure. Global `npm run check` exited 0: atlas passed, 294 screens scanned, 127 existing legibility failures (the same count as the prior baseline). Its generated repository-wide report was not included in this design candidate.
 - The scenario ledger remains **continue** because no persona walk rounds have run. The independent judge gate, formal per-screen grades and owner screen approval have not run. The repository instructions prohibit automatically starting a multi-agent design process; therefore this is a reviewable design candidate, not an approved or merged feature.
 - The HTML prototypes communicate native Android interaction and use separate fictional local queues. The badge study does not yet share live state with the data-sync prototype or other business screens. Android and backend handoff must verify the persistent global queue and count across pages and identities, 30-day cleanup with dependency protection, operation-ID lookup fields, structured receipt statuses, conditional conflict retry, account binding and real offline-capable business operations.
