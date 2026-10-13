@@ -1,0 +1,33 @@
+# inspection: headers, critique
+
+Scope: the headers of this feature's surfaces (the shared Headers change, the Headers law (`ux/design-system/README.md#headers-law-owner-2026-10-13`, owner 2026-10-13)).
+
+## Keep
+
+- The sheet's anatomy (grab, body as the one scroller, the footer with Back and the primary on drawers): every body, row and colour stays as it is; only the header and the footer's Back/Clear move.
+- The titles: they name the job (`Record dead`, `Edit record`, `Pen log`); they stay, and stay the heaviest thing in the header.
+- The house reference's look (the Farrowing room): Back as a 48px bordered icon button, the 22px title, the last-record line in muted text with the time in ink.
+- The walk's last check-in line: kept as the page header's fact.
+- The lens, filter and list: unchanged.
+
+## Problems
+
+- **major** · Nothing in a header acts but Back and the subject chip (law): Clear, Reset, a Scanning pill, an End walk button or a Log link sat in a header.
+- **major** · The default is no header line (law): almost every drawer and page carried a subtitle that repeated the subject, the pen, the unit, a count or a date, facts the hub one Back away already shows (P3: nothing the header says twice).
+- **major** · Two headers and no others (law): drawers had a left-aligned title with no 24px gap owned by the header; pages had Back in the footer and a title with no Back beside it; a task page had a hand-built app bar (`room-appbar`, `task-header`, `page-head`).
+- **minor** · Pages set their own top padding under the header (18px, 20px, 12px, 16px), so the gap to the body differed screen to screen.
+- **major** · The walk header held a primary button (End walk) and the unit under the title; the Log link sat in the activity row.
+- **major** · Every drawer and page repeated a count, pens or the unit (`2 pigs · C1 / C2`, `Pen C1 · Unit 7`).
+
+## Parts
+
+| Part | Drawn by today | The component whose job it is | Keep / fix / cut |
+|---|---|---|---|
+| Walk header | page-built `task-header` + `inspection-page-title` | page header (TaskHeader) with its line | **fix** |
+| End walk, Log | in the header / activity row | the body's first row, with the unit | **fix** |
+| Selected: Clear | Sheet `aside` | footer `quiet` | **fix** |
+| Filter pigs: Clear | FilterSheet head | FilterSheet footer | **fix** |
+
+## Self-crit
+
+The law and its boards fix the design (two headers, the line's three tests); there are no competing directions, so each screen is judged against its baseline and the Farrowing room. Rounds and the final look are below.
