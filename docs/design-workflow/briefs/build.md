@@ -51,7 +51,7 @@ Worked example, the Farrowing room row: Act now "3 days overdue" in dark red; Wa
 
 ## 5. Prove it (P5)
 
-- Run `npm test` and `npm run check`; both pass. Run `node scripts/check-states.mjs` and `node scripts/check-legibility.mjs --changed <your screen ids> --strict`; fix what they report on your screens. Change a test only when it asserted the old structure, and say so.
+- Run `npm test` and `npm run check`; both pass. Run `node scripts/check-states.mjs`, `node scripts/check-legibility.mjs --changed <your screen ids> --strict` and `node scripts/check-spacing.mjs --changed <your screen ids>`; fix what they report on your screens. Change a test only when it asserted the old structure, and say so.
 - Open every changed screen at 390 and 360 in EN and ZH: no console errors, targets ≥ 48px. For a behaviour change, run the scenario leaves it touches (`node scripts/run-scenarios.mjs`).
 - Merge main forward (`git fetch origin && git merge origin/main`), rerun, and name the commit every result comes from.
 
