@@ -5,6 +5,8 @@
   try { S.data = await read('atlas.json'); } catch (_) {
     try { S.data = await read('fixture.json'); } catch (e) { document.getElementById('main').innerHTML = '<div class="empty"><b>No atlas data</b><span>atlas.json and fixture.json are both missing.</span></div>'; return; }
   }
+  try { S.layers = await read('layers.json'); } catch (_) { S.layers = null; } // unmerged branches, drawn as layers on feature pages
+  S.layer = q.get('layer') || '';
   document.getElementById('brand').title = `Generated ${S.data.generated || ''}${S.data.commit ? ' · ' + S.data.commit : ''}`;
   const v = q.get('view'); S.view = VIEWS.some(([id]) => id === v) ? v : 'atlas';
   S.platformId = (S.data.platforms.find((p) => p.id === q.get('platform')) || S.data.platforms[0]).id;
