@@ -41,12 +41,18 @@
     return `<div class="tk-screen"${inert ? ' inert' : ''}>${header}<div class="tk-scroll" role="region" tabindex="-1"${L(label)}>${body}</div>${dock}</div>`;
   }
 
-  /* ---- TaskHeader ---- */
-  function header({ title, back = { action: 'back' }, backLabel } = {}) {
-    const b = back ? `<button type="button" class="tk-header-back"${A(back.action, back.value)}${L(backLabel, { text: 'Back', str: 'act.back' })}>${root.SentriIcons.icon('back-chevron')}</button>` : '';
-    return `<header class="tk-header" data-ds="TaskHeader">${b}<h1 class="tk-header-title">${T(title)}</h1></header>`;
+  /* ---- TaskHeader: the page header of a task screen (Headers law, 2026-10-13) ----
+     Back (always: every top page of a task has it; it goes where the task came from, Today), the task's name left-aligned,
+     the optional header line under it (`Last record 08:41 · G.H`: a fact; or a route), then 24px to the body. It is
+     SentriUI.pageHeader, the same header a sheet page draws. line: { text } | { chip, facts } (see SentriUI.headerLine);
+     a fact line may be parts: [{ text }, { text, strong: true }, …]. TaskLatest is retired into `line`. */
+  function header({ title, back, backLabel, line = null } = {}) {
+    const b = Object.assign({ action: 'back' }, back || {});
+    if (backLabel != null && b.label == null) b.label = backLabel;
+    return root.SentriUI.pageHeader({ title, back: b, line, level: 1, ds: 'TaskHeader', className: 'tk-header' });
   }
-  /* ---- TaskLatest: `Last record 08:41 · G. Hansen` ---- */
+
+  /* ---- TaskLatest (retiring into TaskHeader's `line`; removed once its callers move) ---- */
   function latest({ lead, value, rest } = {}) {
     return `<div class="tk-latest" data-ds="TaskLatest"><p><span>${T(lead)}</span> <strong>${T(value)}</strong>${rest ? ` <span>${T(rest)}</span>` : ''}</p></div>`;
   }
@@ -256,12 +262,12 @@
      sizing 'full'. The ✕ is always drawn (close only renames its action); aside sits left of it. */
   function sheet(o = {}) { return root.SentriUI.sheet(Object.assign({}, o, { variant: 'drawer', sizing: o.height === 'full' ? 'full' : 'content', scrim: false })); }
   function drawer(o = {}) { return root.SentriUI.sheet(Object.assign({}, o, { variant: 'drawer', sizing: o.height === 'full' ? 'full' : 'content', scrim: Object.assign({ layer: o.layer || 0 }, o.scrim) })); }
-  /* page: description -> subtitle; bar draws the skeleton's status bar. */
+  /* page: the Sheet page (the page header: Back top left, title, optional line); bar draws the skeleton's status bar. */
   function page(o = {}) {
-    const { description, descriptionTone, bar = true, ...rest } = o;
-    return root.SentriUI.sheet(Object.assign({}, rest, { variant: 'page', subtitle: description, subtitleTone: descriptionTone, bar: bar ? statusbar() : '' }));
+    const { bar = true, ...rest } = o;
+    return root.SentriUI.sheet(Object.assign({}, rest, { variant: 'page', bar: bar ? statusbar() : '' }));
   }
-  function dialog(o = {}) { const { description, ...rest } = o; return root.SentriUI.sheet(Object.assign({}, rest, { variant: 'dialog', subtitle: description })); }
+  function dialog(o = {}) { return root.SentriUI.sheet(Object.assign({}, o, { variant: 'dialog' })); }
 
   /* ---- TaskChips (candidate): one row of filter chips over a task list — `All · Iron 4 · Castrate 6 · Done 3`. One is
      chosen at a time (a radio group: role=radiogroup, each chip role=radio with aria-checked and a roving tab stop; wire the

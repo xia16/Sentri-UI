@@ -12,7 +12,7 @@ Use Segment to switch a fixed working lens, FilterChips for dynamic filters, and
 
 ## Anatomy
 
-Back button, labelled navigation region, category buttons, active underline and the footer's decorative handle. Categories are optional; Back remains when none exist.
+Back button, labelled navigation region, category buttons, active underline and the footer's decorative handle. Categories are optional; Back remains when none exist. On a page (the More actions page) Back is in the page header, so the footer is the tabs alone (`backAction: false`); with no categories either, there is no footer.
 
 ## Variants
 
@@ -35,7 +35,7 @@ Back button, labelled navigation region, category buttons, active underline and 
 
 ## Behaviour / API
 
-`SentriUI.categoryFooter({categories: [{id, label}], active, backAction, categoryAction, label, className, strs, args})` returns the footer. The caller handles category data-action events, scrolls its content and updates active as the viewed section changes. An unknown active id falls back to the first category. There is no disabled option.
+`SentriUI.categoryFooter({categories: [{id, label}], active, backAction, categoryAction, label, className, strs, args})` returns the footer; `backAction: false` leaves Back out (a page's Back is in its header). The caller handles category data-action events, scrolls its content and updates active as the viewed section changes. An unknown active id falls back to the first category. There is no disabled option.
 
 The verb-sheet order is **Health · Routine · Production**; omit an empty strip. Production supports single-subject work and is omitted for bulk work where unavailable. Real verb sheets have at most three categories. The five-category fixture tests future overflow resilience; it does not change that law. Labels stay readable via horizontal scrolling.
 

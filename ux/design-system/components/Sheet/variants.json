@@ -2,12 +2,14 @@
   {
     "id": "drawer",
     "name": "Drawer",
-    "use": "use for one task step on top of the page: a form of about five fields, a count, a picker, a short read (sized to its content, a handle, a close).",
+    "use": "use for one task step on top of the page: a form of about five fields, a count, a picker, a short read (sized to its content, a handle, the sheet header: centred title, optional line, hairline).",
     "notUse": "not for a long record or a sub-page with its own back-stack — use page; not for a yes/no decision — use dialog; never a drawer on a drawer — replace its content",
     "states": [
       "Default",
       "Pressed",
-      "Aside",
+      "Route line (a hub)",
+      "Fact line",
+      "Clear in the footer",
       "Waiting (stands alone)",
       "Error",
       "Empty",
@@ -19,12 +21,12 @@
   {
     "id": "page",
     "name": "Page",
-    "use": "use for a full sub-page the worker works in: a record, a log, an overview, a form with more than five fields (the whole canvas, Back in the footer).",
+    "use": "use for a full sub-page the worker works in, and any surface that fills the screen: a record, a log, a scan, an overview, a form with more than five fields (the page header: Back top left, the title, an optional line; no Back in the footer).",
     "notUse": "not for a single question — use drawer or dialog; not for a top-level destination — that is a screen of the task, not a sheet",
     "states": [
       "Default",
       "Pressed",
-      "Aside",
+      "Fact line (a task page)",
       "Waiting (stands alone)",
       "Empty",
       "Long / Chinese",

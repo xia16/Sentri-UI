@@ -38,7 +38,7 @@
     wrench:'M14 3a6 6 0 0 0-7 8L2 16a3 3 0 0 0 4 4l5-5a6 6 0 0 0 8-7l-4 4-3-3 4-4z',
     details:'M4 6h16M4 12h16M4 18h16M8 3v6M16 9v6M10 15v6',
     calendar:'M4 5h16v16H4zM8 3v4M16 3v4M4 10h16',
-    bookmark:'M6 3h12v18l-6-4-6 4z',
+    bookmark:'M6 3h12v18l-6-4-6 4z',tag:'M3.5 4.5v6.3a1 1 0 0 0 .3.7l8.7 8.7a1.5 1.5 0 0 0 2.1 0l5.6-5.6a1.5 1.5 0 0 0 0-2.1L11.5 3.8a1 1 0 0 0-.7-.3H4.5a1 1 0 0 0-1 1zM8 8h.01',
     transfer:'M7 7h11l-3-3M18 7l-3 3M17 17H6l3-3M6 17l3 3',
     down:'m6 9 6 6 6-6',
     'trend-down':'M3 6l7 7 4-4 7 7M21 11v5h-5',
@@ -253,10 +253,12 @@
     };
     return mark(panel(nonempty.map(g=>`<section class="st-log-group">${g.label||has(g,'label')?heading({title:g.label,kind:'group',description:g.description||'',strs:has(g,'label')||has(g,'description')?{title:g.strs.label,description:g.strs.description}:undefined,args:g.args&&(g.args.label||g.args.description)?{title:g.args.label,description:g.args.description}:undefined}):''}<ol class="st-log-entries">${g.entries.map(entry).join('')}</ol></section>`).join(''),{className:'st-log '+className,ds:'Log'}));
   }
-  /* strs.back = the Back text; categories[i].strs.label = each tab. The nav aria-label stays plain text. */
+  /* strs.back = the Back text; categories[i].strs.label = each tab. The nav aria-label stays plain text. backAction false: no Back
+     (on a page, whose Back is in its page header; Headers law, 2026-10-13); with no categories either, it returns ''. */
   function categoryFooter({categories=[],active='',backAction='back',categoryAction='action-category',label='Action categories',className='',strs,args}={}){
     const current=categories.some(c=>c.id===active)?active:categories[0]?.id;
-    return `<footer class="sheet-footer st-category-footer ${esc(className)}" data-ds="CategoryFooter">${backButton({action:backAction,label:strs&&strs.back?{text:'Back',str:strs.back,args:args&&args.back}:'Back'})}<nav class="st-category-tabs action-category-nav" aria-label="${esc(label)}">${categories.map(c=>`<button type="button" data-action="${esc(categoryAction)}" data-value="${esc(c.id)}" aria-current="${c.id===current?'location':'false'}">${tx(c.label,c,'label')}</button>`).join('')}</nav></footer>`;
+    if(backAction===false&&!categories.length)return '';
+    return `<footer class="sheet-footer st-category-footer ${esc(className)}" data-ds="CategoryFooter"${backAction===false?' data-back="none"':''}>${backAction===false?'':backButton({action:backAction,label:strs&&strs.back?{text:'Back',str:strs.back,args:args&&args.back}:'Back'})}<nav class="st-category-tabs action-category-nav" aria-label="${esc(label)}">${categories.map(c=>`<button type="button" data-action="${esc(categoryAction)}" data-value="${esc(c.id)}" aria-current="${c.id===current?'location':'false'}">${tx(c.label,c,'label')}</button>`).join('')}</nav></footer>`;
   }
   const chevron=root.SentriIcons.icon('chevron');
   const check=root.SentriIcons.icon('check');
@@ -990,8 +992,9 @@
       box.dataset.open=String(open);row.setAttribute('aria-expanded',String(open));box.querySelector('.st-optional-body').hidden=!open;sync(box);if(open)box.querySelector('.st-optional-body :is(input,textarea,select)')?.focus();},true);
   }
 
-  /* Sheet: the one surface presented over a task. variant 'drawer' (default; content-sized, a grab strip, a ✕) |
-     'page' (a full sub-page; Back in the footer, never a ✕) | 'dialog' (one small decision). Returns the surface's HTML:
+  /* Sheet: the one surface presented over a task. variant 'drawer' (default; content-sized, a grab strip, the sheet header:
+     centred title, optional `line`, hairline) | 'page' (a full sub-page: the page header, Back top left via `back`, no Back in
+     the footer) | 'dialog' (one small decision, its `description` line). Returns the surface's HTML:
      a drawer is its scrim + the sheet, a page the sheet, a dialog its backdrop + the dialog. Footers come from
      sheetFooter(); the Back control from backButton(). Text slots take a string, { text, str, args } (with `str` the text
      is wrapped for the screen shell's string registry) or { html } (trusted markup, e.g. a title that is a link). */
@@ -1002,7 +1005,30 @@
   const sA=(action,value)=>action?` data-action="${esc(action)}" data-value="${esc(value??'')}"`:'';
   const sGlyph=k=>root.SentriIcons.icon(k);
   /* A line of parts, each a text slot with an optional tone: [{ text, str, args, tone }]; { sep: true } is the shared separator. */
-  const sParts=v=>Array.isArray(v)?v.map(p=>{const o=sObj(p);if(o.sep)return SEP;return o.tone?`<span class="st-part" data-tone="${esc(o.tone)}">${sT(o)}</span>`:sT(o);}).join(''):sT(v);
+  const sParts=v=>Array.isArray(v)?v.map(p=>{const o=sObj(p);if(o.sep)return SEP;if(o.strong)return `<strong>${sT(o)}</strong>`;return o.tone?`<span class="st-part" data-tone="${esc(o.tone)}">${sT(o)}</span>`:sT(o);}).join(''):sT(v);
+  /* The header line (Headers law, owner 2026-10-13): the one optional quiet line under a header's title, absent by default.
+     line { chip: { id, action, value, label }, facts: [slot, slot] } is a route: the subject chip (tag icon, #ID, ›; the only
+     tappable part, opening the animal), then up to two muted identity facts the task's budget.md names. line { text } is one
+     fact (a text slot or parts; { text, strong: true } is the figure in ink, `Last record **08:41** · G.H`). The component
+     never fills a fact in; it draws what the host passes, on one line. */
+  function headerLine(line){
+    if(!line)return '';
+    if(line.chip){
+      const c=line.chip,id=sObj(c.id),facts=(line.facts||[]).filter(f=>f!=null&&f!=='').slice(0,2);
+      const chip=`<button type="button" class="st-subject-chip"${sA(c.action||'open-subject',c.value??id.text)}${sL(c.label,{text:'Open '+(id.text??'')})}>${sGlyph('tag')}<span class="st-subject-chip-id">#${sT(id)}</span>${sGlyph('chevron')}</button>`;
+      return `<p class="st-header-line" data-line="route">${chip}${facts.length?`<span class="st-header-facts">${facts.map(sParts).join(SEP)}</span>`:''}</p>`;
+    }
+    const t=line.text??line;
+    return t==null||t===''?'':`<p class="st-header-line" data-line="fact">${sParts(t)}</p>`;
+  }
+  /* The page header: Back (48px, the bordered icon button) at the top left, the title left-aligned, the optional header line
+     under it, then space-section (24px) to the body. Every page and every top page of a task has it; its footer has no Back.
+     ds names the part for the atlas (Sheet for a sheet page, TaskHeader for a task screen). */
+  function pageHeader({title,back={action:'back'},line=null,level=2,ds='Sheet',className=''}={}){
+    const b=back||{action:'back'},h=level===1?'h1':'h2';
+    const backHtml=`<button type="button" class="st-page-back"${sA(b.action||'back',b.value)}${sL(b.label,{text:'Back',str:'act.back'})}>${sGlyph('back-chevron')}</button>`;
+    return `<header class="st-page-header${className?' '+esc(className):''}" data-ds="${esc(ds)}">${backHtml}<div class="st-page-titles"><${h} class="st-page-title">${sT(title)}</${h}>${headerLine(line)}</div></header>`;
+  }
   /* Back: the footer's exit, the same on every sheet (a 16px chevron + the word). Alone in a footer it fills the bar. */
   function backButton({action='back',value='',label={text:'Back',str:'act.back'},className=''}={}){
     return button({register:'secondary',action,value,label:'',className:'surface-back'+(className?' '+className:'')}).replace('<span class="st-button-label"></span>',sGlyph('back-chevron')+'<span>'+sT(label)+'</span>');
@@ -1023,7 +1049,7 @@
      status { text, str, args, id, tone, visible, action }: a line above the bar for a hold's progress (its statusId) or a text
      action. It is drawn only when `visible` is set or it carries an action; a waiting button gives no reason line: it stands alone. `content` is trusted
      footer markup in place of back/primary/hold (a host's own two controls); className adds a page hook. */
-  function sheetFooter({back:b={},primary,hold:h,status:st,content='',className=''}={}){
+  function sheetFooter({back:b={},quiet:qa=null,primary,hold:h,status:st,content='',className=''}={}){
     let line='';
     if(!st&&primary&&typeof primary==='object'&&primary.reason){st=sObj(primary.reason);primary=Object.assign({},primary,{reason:''});}
     if(st){
@@ -1038,7 +1064,9 @@
       if(primary&&typeof primary==='object'&&!primary.describedby)primary=Object.assign({},primary,{describedby:id});
     }
     if(content){content=content.replace(/<p class="st-field-hint st-button-reason[^]*?<\/p>/g,reason=>{line+=/<button/.test(reason)?reason.replace('<p class="','<p data-action-slot class="'):reason.replace('st-button-reason','st-button-reason st-visually-hidden');return '';});}
-    const inner=content||`${b?backButton(b):''}${h?sHold(h):sButton(primary)}`;
+    /* quiet { label, action, value }: Reset or Clear, a quiet text action left of the primary (never in a header). */
+    const q=qa?sButton(Object.assign({register:'text'},qa,{className:'st-footer-quiet'+(qa.className?' '+qa.className:'')})):'';
+    const inner=content||`${b?backButton(b):''}${q}${h?sHold(h):sButton(primary)}`;
     /* A hidden reason lives inside the footer (after the two targets), so nothing above the bar is drawn or measured. */
     const quiet=line&&!/class="sheet-status"|data-action-slot/.test(line);
     return `${quiet?'':line}<div class="sheet-footer${className?' '+esc(className):''}" data-ds="Sheet">${inner}${quiet?line:''}</div>`;
@@ -1051,21 +1079,24 @@
     return `<button type="button" class="scrim" data-ds="Sheet"${sLayer(layer)}${sA(action,value)}${sL(label)}></button>`;
   }
   const SHEET_SIZES=['compact','short','medium','long'];
-  function sheet({variant='drawer',surface='',headClass='',title,subtitle,subtitleTone='',icon='',close={action:'dismiss'},up=null,holdRows=0,lead='',aside='',above='',body='',bodyClass='',footer:f,size='medium',sizing='content',label,view='',className='',id='',layer=0,inert=false,bar='',scrim:sc={},attrs={}}={}){
+  function sheet({variant='drawer',surface='',headClass='',title,line=null,back=null,description,icon='',close={action:'dismiss'},up=null,holdRows=0,lead='',above='',body='',bodyClass='',footer:f,size='medium',sizing='content',label,view='',className='',id='',layer=0,inert=false,bar='',scrim:sc={},attrs={}}={}){
     const v=oneOf('Sheet','variant',variant,['drawer','page','dialog'],'drawer'),sz=oneOf('Sheet','size',size,SHEET_SIZES,'medium');
     /* surface (drawer only): '' is a content or input drawer (white, tinted cards). 'menu' is a drawer whose every row is an option or a verb
        (Choose a unit, More actions, Go to pen): the tint with white cards, like a page. See SURFACES.md. */
     const ctx=oneOf('Sheet','surface',surface||'drawer',['drawer','menu'],'drawer');
     const foot=f===false?'':(f==null?sheetFooter({}):f),ex=safeAttr(attrs),cls=className?' '+esc(className):'',vw=view?` data-view="${esc(view)}"`:'';
     if(v==='dialog'){
-      return `<div class="dialog-backdrop" data-ds="Sheet" data-variant="dialog"${sLayer(layer)}><div class="dialog${cls}" role="dialog" aria-modal="true" tabindex="-1"${id?` id="${esc(id)}"`:''}${vw}${inert?' inert':''}${sL(label??title)}${ex}><div class="dialog-body${bodyClass?' '+esc(bodyClass):''}"><h2 class="dialog-title">${icon?sGlyph(icon):''}${sT(title)}</h2>${subtitle?`<p class="dialog-desc">${sParts(subtitle)}</p>`:''}${body}</div>${foot}</div></div>`;
+      return `<div class="dialog-backdrop" data-ds="Sheet" data-variant="dialog"${sLayer(layer)}><div class="dialog${cls}" role="dialog" aria-modal="true" tabindex="-1"${id?` id="${esc(id)}"`:''}${vw}${inert?' inert':''}${sL(label??title)}${ex}><div class="dialog-body${bodyClass?' '+esc(bodyClass):''}"><h2 class="dialog-title">${icon?sGlyph(icon):''}${sT(title)}</h2>${description?`<p class="dialog-desc">${sParts(description)}</p>`:''}${body}</div>${foot}</div></div>`;
     }
-    const sub=subtitle?`<p class="sheet-subtitle"${subtitleTone?` data-tone="${esc(subtitleTone)}"`:''}>${sParts(subtitle)}</p>`:'';
     /* No ✕ on any sheet: Back in the footer is the way out, and the scrim and a swipe down do what Back does. `close` is kept
        for old callers and ignored. `up` { label, action, value } is the header's "‹ Parent" control, only in a drawer with
        levels: it goes up one level and names the parent; it is never labelled Back. */
     const upHtml=up&&(up.label!=null)?`<button type="button" class="sheet-up" data-ds="Sheet"${sA(up.action||'up',up.value)}>${sGlyph('up')}<span>${sT(up.label)}</span></button>`:'';
-    const head=`<header class="utility-header${headClass?' '+esc(headClass):''}${upHtml?' has-up':''}">${lead}<div class="sheet-titles">${upHtml}<h2 class="sheet-title">${sT(title)}</h2>${sub}</div>${aside?`<div class="sheet-aside">${aside}</div>`:''}</header>`;
+    /* The sheet header (a drawer): the centred title, the optional header line, the 1px hairline; the body starts 24px below.
+       A page takes the page header instead (pageHeader: Back top left, the title left-aligned). */
+    const head=v==='page'
+      ?pageHeader({title,back,line,className:headClass})
+      :`<header class="utility-header${headClass?' '+esc(headClass):''}${upHtml?' has-up':''}">${lead}<div class="sheet-titles">${upHtml}<h2 class="sheet-title">${sT(title)}</h2>${headerLine(line)}</div></header>`;
     const common=`data-ds="Sheet" tabindex="-1"${sLayer(layer)}${inert?' inert':''}${id?` id="${esc(id)}"`:''}${vw}${sL(label??title)}${ex}`;
     const main=`${head}${above}<div class="sheet-body${bodyClass?' '+esc(bodyClass):''}">${body}</div>${foot}`;
     if(v==='page')return `<section class="sheet${cls}" ${common} role="region" data-st-context="page" data-presentation="page">${bar}${main}</section>`;
@@ -1106,14 +1137,16 @@
     const names=root.dataset.names.split(',');
     root.dispatchEvent(new CustomEvent('sentri-range-change',{bubbles:true,detail:{key:root.dataset.key,values:{[names[0]]:a,[names[1]]:b}}}));
   }
-  /* FilterSheet: the drawer that narrows a list. It is a Sheet with Reset in the head and, in the footer, Back (keeps the draft)
+  /* FilterSheet: the drawer that narrows a list. It is a Sheet whose footer holds Back (keeps the draft), Reset (quiet text)
      and the one commit, whose label carries the live count ("Show 4 sows"; the host rewrites it as the draft changes).
-     filterSheet({ title, subtitle, sections:[{ title, icon, content, help }] | body, apply:{label, action}, reset:{label, action},
+     filterSheet({ title, sections:[{ title, icon, content, help }] | body, apply:{label, action}, reset:{label, action} | false,
      backAction, closeAction, className, size }). A section is a titled group; sections come as the host's own controls
      (a rangeSlider, a segment) so the sheet owns only the frame, the spacing and the exits. Without `sections`, `body` is used as is. */
-  function filterSheet({title='Filter',subtitle='',sections=[],body='',apply={},reset={},backAction='filter-back',backLabel='Back',closeAction='',className='',size='medium',label}={}){
+  function filterSheet({title='Filter',sections=[],body='',apply={},reset={},backAction='filter-back',backLabel='Back',closeAction='',className='',size='medium',label}={}){
     const exit=closeAction||backAction,list=sections.map(x=>`<section class="st-filter-section">${x.title?heading({title:x.title,icon:x.icon||'',kind:'section',level:4,className:'st-filter-title'}):''}${x.content||''}${x.help?`<p class="st-filter-help">${esc(x.help)}</p>`:''}</section>`).join('');
-    return sheet({title,subtitle,size,label:label||title,className:'st-filter-sheet'+(className?' '+esc(className):''),aside:button({label:reset.label||'Reset',register:'text',action:reset.action||'filter-reset'}),body:list||body,footer:sheetFooter({content:backButton({action:backAction,label:backLabel})+button({label:apply.label||'Show',register:'primary',action:apply.action||'filter-apply'})}),close:{action:exit,label:'Close '+title},scrim:{action:exit,label:'Dismiss '+title}});
+    /* Reset is quiet text in the footer, left of the commit (Headers law: nothing in a header acts); reset:false leaves it out. */
+    const resetHtml=reset===false?'':button({label:reset.label||'Reset',register:'text',action:reset.action||'filter-reset',className:'st-footer-quiet'});
+    return sheet({title,size,label:label||title,className:'st-filter-sheet'+(className?' '+esc(className):''),body:list||body,footer:sheetFooter({content:backButton({action:backAction,label:backLabel})+resetHtml+button({label:apply.label||'Show',register:'primary',action:apply.action||'filter-apply'})}),close:{action:exit,label:'Close '+title},scrim:{action:exit,label:'Dismiss '+title}});
   }
   if(typeof document!=='undefined'){
     let drag=null;
@@ -1129,7 +1162,7 @@
     const end=()=>{drag=null;};
     document.addEventListener('pointerup',end);document.addEventListener('pointercancel',end);if(typeof globalThis.addEventListener==='function')globalThis.addEventListener('blur',end);
   }
-  const api=Object.freeze({rangeSlider,filterSheet,optionalRow,heading,panel,facts,row,rowGroup,log,logDay,logStamp,logGroups,categoryFooter,field,pickerField,pickerOptions,pickerBody,pickerHead,pickerFooter,filterChips,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowSelectDoor,rowAction,rowSelectChange,status,conditionTag,rowFitTags,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
+  const api=Object.freeze({headerLine,pageHeader,rangeSlider,filterSheet,optionalRow,heading,panel,facts,row,rowGroup,log,logDay,logStamp,logGroups,categoryFooter,field,pickerField,pickerOptions,pickerBody,pickerHead,pickerFooter,filterChips,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowSelectDoor,rowAction,rowSelectChange,status,conditionTag,rowFitTags,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
   root.SentriUI=api;
   if(typeof module!=='undefined')module.exports=api;
 })(globalThis);

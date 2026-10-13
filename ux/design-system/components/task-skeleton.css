@@ -1,7 +1,7 @@
 /* Task skeleton (candidate, ADR 0003): farrowing's task anatomy as shared parts.
    Every value is measured from ux/system/farrowing-astra-concept.html at 390×844 and read from tokens.css.
    Load after tokens.css and bundle.css. Classes are tk-*.
-   Parts: TaskPhone (frame + status bar), TaskHeader, TaskLatest, TaskSummary, TaskLens, TaskGroup, TaskRow,
+   Parts: TaskPhone (frame + status bar), TaskHeader, TaskSummary, TaskLens, TaskGroup, TaskRow,
    TaskDock. The sheet, page, dialog, footer and Back are the Sheet card (bundle.css). */
 
 /* ---- TaskPhone: the phone frame harness ----
@@ -32,14 +32,8 @@
 .tk-screen { flex: 1; min-height: 0; display: flex; flex-direction: column; }
 .tk-scroll { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; background: var(--app-background); }
 
-/* ---- TaskHeader: back + the task's name ---- */
-.tk-header { flex: none; min-height: 60px; display: flex; align-items: center; gap: var(--space-heading); padding: 4px var(--space-gutter) 10px; background: var(--app-background); }
-.tk-header-back { flex: none; display: grid; place-items: center; width: var(--tap-min); height: var(--tap-min); padding: 0;
-  background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-control); color: var(--ink); }
-.tk-header-back svg { width: 18px; height: 18px; }
-.tk-header-title { flex: 1; min-width: 0; margin: 0; font: 500 var(--type-page-title-size)/1.25 var(--font-sans); letter-spacing: -0.6px; color: var(--ink); }
-
-/* ---- TaskLatest: the last-record line ---- */
+/* ---- TaskHeader: the page header (SentriUI.pageHeader, bundle.css .st-page-header) ---- */
+/* ---- TaskLatest (retiring into TaskHeader's line) ---- */
 .tk-latest { display: flex; align-items: center; min-height: var(--tap-min); margin: 0; padding: 0 var(--space-gutter) 8px;
   font: var(--type-description-size)/1.5 var(--font-sans); color: var(--muted); }
 .tk-latest > p { margin: 0; }
