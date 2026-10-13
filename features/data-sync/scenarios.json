@@ -1,6 +1,6 @@
 {
   "feature": "data-sync",
-  "about": "Executable and pending leaves of features/data-sync/scenario-tree.md. Fictional study fixtures; source contracts remain open.",
+  "about": "Executable leaves of features/data-sync/scenario-tree.md. Fictional study fixtures; Android and backend interface details remain to be verified.",
   "defaults": {
     "url": "/ux/system/data-sync-astra-prototype.html?scenario=offline",
     "clock": "2026-10-12T09:41:00",
@@ -854,22 +854,50 @@
         {
           "type": "state",
           "id": "ds-b7-uncertain-receipt.state",
-          "label": "Study fixture: syncing",
+          "label": "Study fixture: receipt unknown",
           "tree": "B",
           "reset": {
-            "url": "/ux/system/data-sync-astra-prototype.html?scenario=syncing"
+            "url": "/ux/system/data-sync-astra-prototype.html?scenario=uncertain&receipt=delayed"
           },
           "children": [
             {
-              "type": "decision-blocker",
-              "id": "ds-b7-uncertain-receipt",
-              "tree": "B-7",
-              "label": "Q3 — Request accepted without local receipt",
-              "question": "Q3",
-              "sources": [
-                "Old mobile_webapp handlers send Idempotency-Key based on command ID",
-                "Old errorClassifier treats already processed / 已处理 message text as success",
-                "Server deduplication and result lookup contract is not available in this repository"
+              "type": "action",
+              "id": "ds-b7-uncertain-receipt.act",
+              "label": "The app queries the server by operation ID before any resend.",
+              "taps": [
+                {
+                  "expect": [
+                    { "text": { "en": "Checking server result", "zh": "正在核对服务端结果" } },
+                    { "text": { "en": "Checking result", "zh": "核对结果中" } }
+                  ]
+                },
+                { "advance": "11s" }
+              ],
+              "children": [
+                {
+                  "type": "outcome",
+                  "id": "ds-b7-uncertain-receipt",
+                  "tree": "B-7",
+                  "label": "Q3 — Request accepted without local receipt",
+                  "gwt": {
+                    "given": "The server accepted an operation but its receipt did not reach the phone.",
+                    "when": "The app checks the final result using the original operation ID.",
+                    "then": "The server-confirmed record becomes Uploaded without a duplicate send; no record remains waiting on this phone."
+                  },
+                  "authority": [
+                    {
+                      "src": "PRD",
+                      "at": "Decisions 2026-10-12",
+                      "says": "The server guarantees deduplication and final-result lookup by stable operation ID; confirm the result before marking the local record uploaded."
+                    }
+                  ],
+                  "visible": [
+                    { "text": { "en": "No records waiting on this phone", "zh": "本机暂无待上传记录" } },
+                    { "text": { "en": "Uploaded · 3", "zh": "已上传 · 3" } },
+                    { "text": { "en": "The server confirmed this operation was already received", "zh": "服务端确认已收到这条操作" } },
+                    { "text": { "en": "Checking result", "zh": "核对结果中" }, "absent": true }
+                  ]
+                }
               ]
             }
           ]

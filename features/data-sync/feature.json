@@ -23,6 +23,8 @@
         "data-sync.blocked",
         "data-sync.dependent-delete",
         "data-sync.upload",
+        "data-sync.receipt",
+        "data-sync.reconciled",
         "data-sync.switch",
         "data-sync.auth"
       ]
@@ -159,6 +161,28 @@
       }
     },
     {
+      "id": "data-sync.receipt",
+      "name": "Checking a missing receipt",
+      "zh": "核对丢失回执",
+      "status": "in-design",
+      "url": "/ux/system/data-sync-astra-prototype.html?scenario=uncertain&receipt=hold",
+      "notes": {
+        "purpose": "请求可能已由服务端处理但本机未收到回执时，按原操作 ID 查询；查询期间保留本机记录，暂不重发。",
+        "issues": ["原型使用本地定时结果；Android/后端交接时核对查询接口与回执结构。"]
+      }
+    },
+    {
+      "id": "data-sync.reconciled",
+      "name": "Receipt confirmed by server",
+      "zh": "服务端确认已处理",
+      "status": "in-design",
+      "url": "/ux/system/data-sync-astra-prototype.html?scenario=uncertain&receipt=resolved",
+      "notes": {
+        "purpose": "按操作 ID 查到服务端已处理后才将本机记录标为已上传，不再次发送。",
+        "issues": ["原型为本地样例，不代表真实查询接口已接入。"]
+      }
+    },
+    {
       "id": "data-sync.conflict",
       "name": "Conflict awaiting manual action",
       "zh": "冲突待人工处理",
@@ -268,6 +292,16 @@
       "data-sync.list",
       "data-sync.upload",
       "all local work uploaded"
+    ],
+    [
+      "data-sync.list",
+      "data-sync.receipt",
+      "local response missing"
+    ],
+    [
+      "data-sync.receipt",
+      "data-sync.reconciled",
+      "query by operation ID confirms the original request"
     ],
     [
       "data-sync.list",

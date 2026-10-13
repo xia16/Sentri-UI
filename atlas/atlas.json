@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-12T08:39:56.758Z",
- "commit": "ccaa3f2",
+ "generated": "2026-10-12T09:11:47.290Z",
+ "commit": "db030dd",
  "platforms": [
   {
    "id": "mobile",
@@ -17932,6 +17932,8 @@
           "data-sync.blocked",
           "data-sync.dependent-delete",
           "data-sync.upload",
+          "data-sync.receipt",
+          "data-sync.reconciled",
           "data-sync.switch",
           "data-sync.auth"
          ]
@@ -18068,6 +18070,32 @@
          }
         },
         {
+         "id": "data-sync.receipt",
+         "name": "Checking a missing receipt",
+         "zh": "核对丢失回执",
+         "status": "in-design",
+         "url": "/ux/system/data-sync-astra-prototype.html?scenario=uncertain&receipt=hold",
+         "notes": {
+          "purpose": "请求可能已由服务端处理但本机未收到回执时，按原操作 ID 查询；查询期间保留本机记录，暂不重发。",
+          "issues": [
+           "原型使用本地定时结果；Android/后端交接时核对查询接口与回执结构。"
+          ]
+         }
+        },
+        {
+         "id": "data-sync.reconciled",
+         "name": "Receipt confirmed by server",
+         "zh": "服务端确认已处理",
+         "status": "in-design",
+         "url": "/ux/system/data-sync-astra-prototype.html?scenario=uncertain&receipt=resolved",
+         "notes": {
+          "purpose": "按操作 ID 查到服务端已处理后才将本机记录标为已上传，不再次发送。",
+          "issues": [
+           "原型为本地样例，不代表真实查询接口已接入。"
+          ]
+         }
+        },
+        {
          "id": "data-sync.conflict",
          "name": "Conflict awaiting manual action",
          "zh": "冲突待人工处理",
@@ -18180,6 +18208,16 @@
         ],
         [
          "data-sync.list",
+         "data-sync.receipt",
+         "local response missing"
+        ],
+        [
+         "data-sync.receipt",
+         "data-sync.reconciled",
+         "query by operation ID confirms the original request"
+        ],
+        [
+         "data-sync.list",
          "data-sync.switch",
          "request account or farm switch with unsent work"
         ],
@@ -18203,7 +18241,7 @@
          "lands": "data-sync.list"
         }
        ],
-       "prd": "# Data sync 数据同步\n\n状态：设计草案。2026-10-12 的产品答复已记录；未裁决项留在场景树，不能从旧版代码直接推定为新产品规则。\n\n## Problem\n\n猪场断网时，工人仍要完成可离线的记录。记录保存在这台设备上，与团队已收到的记录不是同一状态。网络恢复后系统自动发送；若某条失败、冲突或被前置操作挡住，工人需要知道哪条仍在本机、原因及下一步。不能把整批记录描绘成一次成功或失败。\n\n## Who\n\n执行生产、巡检、健康和转群等任务的一线工人；需要协助处理异常的主管。\n\n## Anchor\n\n每条离线操作是独立的本机记录，主状态为待同步、已同步、失败、冲突；同一对象或显式依赖的一串操作形成顺序链。网络状态（无网络、不稳定、可同步）与记录状态分开表达。\n\n## Rules\n\n- 离线提交先落本机队列，成功落库才反馈“已保存在本机”；不能写成“已同步”或“团队已收到”。本机保存失败不能给成功反馈。来源：旧版 commandQueue、submitOfflineCommand。\n- 网络恢复并达到可同步质量后自动发送待同步记录；临时网络错误保留记录并自动重试。允许对失败记录手动重试。依据：用户 2026-10-12 答复；旧版 syncCoordinator。\n- 每条记录分别结算：成功的可变为已同步，失败的留在本机。关联对象的较早操作或显式前置依赖未解决时，后续操作显示“等待前置操作”，不暗示它已发送。来源：旧版 syncCoordinator、commandDependencies。\n- 冲突记录停止自动同步；可查看冲突、手动重试或删除。删除必须明确告知“本机这条记录将无法恢复，且不会再上传”，二次确认后执行。不得提供跳过前置操作的“直接同步”。依据：用户 2026-10-12 答复。\n- 冲突详情先对照本机值与服务端现值。人工重试必须重新核对服务端；仍有差异时继续保留冲突，不能覆盖团队已有记录。删除冲突前置记录后，依赖它的后续记录仍留在本机并受阻，只允许逐条查看或经二次确认删除；不自动解锁、发送或提供重试。依据：用户 2026-10-12 补充答复。\n- 有未上传记录时阻止切换账号或猪场，提示先处理记录并提供进入数据同步的入口。依据：用户 2026-10-12 答复。\n- 登录失效时暂停发送，保留原账号与猪场绑定的本机记录。只能重新登录该原账号；验证成功后继续自动上传，期间不得把队列归到新账号或新猪场。依据：用户 2026-10-12 补充答复。原型的“重新登录”只模拟验证成功后的状态转换，真正凭证验证由账号流程负责。\n- 首页承担本机待处理数、同步中和异常的入口；详情由数据同步流程负责。空队列只表示“本机暂无待同步记录”，不证明团队所有记录都齐全。\n- 与任务有关的本机记录可从该任务进入同一数据同步详情。任务能否结束由任务所属功能的规则决定，本页不重新定义。\n- 原型用可重复的本机样例演示状态，不与其他功能原型联动；原生实现需验证真实队列、重启持久化和服务端回执。\n\n## Scope\n\n本轮设计：本机保存反馈；首页入口；数据同步总览；待同步、同步中、部分成功、失败、冲突、受前置操作阻断、全部已同步状态；单条详情；安全重试、冲突删除和已删除前置记录的受阻后续删除；账号/猪场切换拦截与原账号重新登录提示。中英双语及 360/390 宽度均需覆盖。\n\n原型入口以首页为主；旧版“工具箱 > 离线数据”可作为辅助入口，但两处指向同一详情，不能复制状态逻辑。\n\n## Not supported\n\n- **人工强制跳过前置操作**：可能造成错误顺序或重复写入；本轮不提供该入口。\n- **放弃、删除或清空其他非冲突的未同步记录**：仅冲突记录和“前置冲突已删除”的受阻后续记录允许逐条删除；其他记录不得删除或清空。\n- **在同步页编辑业务记录内容**：更正应回到拥有该记录的功能，不能在队列中改业务语义。\n- **跨设备合并本机队列**：旧版队列在本机 IndexedDB，跨设备汇总需要服务端能力。\n- **手动选择批量上传顺序**：顺序由对象分组和显式依赖决定，人工排序增加错误风险。\n- **用网络测试页模拟生产网络**：旧版网络覆盖器只服务调试，不是工人入口。\n\n## Decisions\n\n- 已裁决（用户，2026-10-12）：网络恢复后自动上传，异常时由人处理。此项覆盖旧数据同步草案及 Home 研究中的“只手动上传”示意。Home 与数据同步原型已按此重画，但仍使用各自的本机样例，不能作为真实队列验收。\n- 已裁决（用户，2026-10-12）：先设计查看与重试；冲突记录可手动重试或删除，且不会自动同步。其他非冲突记录的放弃、删除、清空与跳过前置操作未获批准，例外仅为前置冲突已删除的受阻后续记录。\n- 已裁决（用户，2026-10-12）：有未上传记录时阻止切换账号或猪场，提示先处理。\n- 已裁决（用户，2026-10-12）：冲突重试前展示本机与服务端的差异，绝不覆盖服务端已有记录；删除前置冲突后，后续记录继续受阻，只支持查看和逐条删除。原型演示核对和冲突保留，真实重试仍需服务端条件写入与回执支持。\n- 已裁决（用户，2026-10-12）：登录失效后重新登录原账号，验证通过后继续自动上传。\n- 待落实 Q3：服务端收到请求但本机没有回执时如何按操作 ID 查询结果、保证重试幂等。旧版靠错误文本识别“已处理”，原生后端契约需核实。具体哪些业务操作可离线，由拥有该操作的功能定义。\n\n## Sources\n\n- 本功能的流程图、界面职责与实现验证点：flow.md。\n- 本次用户答复（2026-10-12）：自动上传、异常人工处理；冲突手动重试或删除、不自动同步；冲突重试先展示差异且不覆盖服务端；删除前置冲突后依赖记录继续受阻，只能查看或删除；有未上传记录时阻止切换账号或猪场；登录失效后由原账号重新登录并续传。\n- 旧版 Sentri/mobile_webapp：src/lib/offline 的 commandQueue、syncCoordinator、commandDependencies、errorClassifier、networkQuality；src/components/offlineRecords；src/components/offlinePendingBadge；src/providers/OfflineProvider；src/lang/zh-CN/offline.ts。\n- 旧版说明：Sentri/mobile_webapp/spec/offline_inspection_logic_document.md。代码与说明有出入时，以代码实际分支为参考；它不自动成为新产品规则。\n- 当前 feature.json、ux/system/home-astra-prototype.js、ux/research/home/ASTRA-HOME-DIRECTION.md；旧 Figma 索引 references/figma/index.md。\n",
+       "prd": "# Data sync 数据同步\n\n状态：设计草案。2026-10-12 的产品答复已记录；未裁决项留在场景树，不能从旧版代码直接推定为新产品规则。\n\n## Problem\n\n猪场断网时，工人仍要完成可离线的记录。记录保存在这台设备上，与团队已收到的记录不是同一状态。网络恢复后系统自动发送；若某条失败、冲突或被前置操作挡住，工人需要知道哪条仍在本机、原因及下一步。不能把整批记录描绘成一次成功或失败。\n\n## Who\n\n执行生产、巡检、健康和转群等任务的一线工人；需要协助处理异常的主管。\n\n## Anchor\n\n每条离线操作是独立的本机记录，主状态为待同步、已同步、失败、冲突；同一对象或显式依赖的一串操作形成顺序链。网络状态（无网络、不稳定、可同步）与记录状态分开表达。\n\n## Rules\n\n- 离线提交先落本机队列，成功落库才反馈“已保存在本机”；不能写成“已同步”或“团队已收到”。本机保存失败不能给成功反馈。来源：旧版 commandQueue、submitOfflineCommand。\n- 网络恢复并达到可同步质量后自动发送待同步记录；临时网络错误保留记录并自动重试。允许对失败记录手动重试。依据：用户 2026-10-12 答复；旧版 syncCoordinator。\n- 每条记录分别结算：成功的可变为已同步，失败的留在本机。关联对象的较早操作或显式前置依赖未解决时，后续操作显示“等待前置操作”，不暗示它已发送。来源：旧版 syncCoordinator、commandDependencies。\n- 每条本机操作有稳定的操作 ID，所有重试沿用它。请求可能已到服务端但本机没有回执时，先按操作 ID 查询最终结果：查到已处理才标为已上传；确认未处理才用同一 ID 重试；查询仍无法确定时继续保留本机并显示“核对回执中”，不能报告成功或换一个 ID 重发。依据：用户 2026-10-12 确认服务端保证去重并可查结果。\n- 冲突记录停止自动同步；可查看冲突、手动重试或删除。删除必须明确告知“本机这条记录将无法恢复，且不会再上传”，二次确认后执行。不得提供跳过前置操作的“直接同步”。依据：用户 2026-10-12 答复。\n- 冲突详情先对照本机值与服务端现值。人工重试必须重新核对服务端；仍有差异时继续保留冲突，不能覆盖团队已有记录。删除冲突前置记录后，依赖它的后续记录仍留在本机并受阻，只允许逐条查看或经二次确认删除；不自动解锁、发送或提供重试。依据：用户 2026-10-12 补充答复。\n- 有未上传记录时阻止切换账号或猪场，提示先处理记录并提供进入数据同步的入口。依据：用户 2026-10-12 答复。\n- 登录失效时暂停发送，保留原账号与猪场绑定的本机记录。只能重新登录该原账号；验证成功后继续自动上传，期间不得把队列归到新账号或新猪场。依据：用户 2026-10-12 补充答复。原型的“重新登录”只模拟验证成功后的状态转换，真正凭证验证由账号流程负责。\n- 首页承担本机待处理数、同步中和异常的入口；详情由数据同步流程负责。空队列只表示“本机暂无待同步记录”，不证明团队所有记录都齐全。\n- 与任务有关的本机记录可从该任务进入同一数据同步详情。任务能否结束由任务所属功能的规则决定，本页不重新定义。\n- 原型用可重复的本机样例演示状态，浏览器断网后恢复可触发“自动上传中”的状态转换，但不发送服务器请求，也不与其他功能原型联动；原生实现需验证真实队列、网络质量、重启持久化和服务端回执。\n\n## Scope\n\n本轮设计：本机保存反馈；首页入口；数据同步总览；待同步、同步中、回执核对中、部分成功、失败、冲突、受前置操作阻断、全部已同步状态；单条详情；安全重试、冲突删除和已删除前置记录的受阻后续删除；账号/猪场切换拦截与原账号重新登录提示。中英双语及 360/390 宽度均需覆盖。\n\n原型入口以首页为主；旧版“工具箱 > 离线数据”可作为辅助入口，但两处指向同一详情，不能复制状态逻辑。\n\n## Not supported\n\n- **人工强制跳过前置操作**：可能造成错误顺序或重复写入；本轮不提供该入口。\n- **放弃、删除或清空其他非冲突的未同步记录**：仅冲突记录和“前置冲突已删除”的受阻后续记录允许逐条删除；其他记录不得删除或清空。\n- **在同步页编辑业务记录内容**：更正应回到拥有该记录的功能，不能在队列中改业务语义。\n- **跨设备合并本机队列**：旧版队列在本机 IndexedDB，跨设备汇总需要服务端能力。\n- **手动选择批量上传顺序**：顺序由对象分组和显式依赖决定，人工排序增加错误风险。\n- **用网络测试页模拟生产网络**：旧版网络覆盖器只服务调试，不是工人入口。\n\n## Decisions\n\n- 已裁决（用户，2026-10-12）：网络恢复后自动上传，异常时由人处理。此项覆盖旧数据同步草案及 Home 研究中的“只手动上传”示意。Home 与数据同步原型已按此重画，但仍使用各自的本机样例，不能作为真实队列验收。\n- 已裁决（用户，2026-10-12）：先设计查看与重试；冲突记录可手动重试或删除，且不会自动同步。其他非冲突记录的放弃、删除、清空与跳过前置操作未获批准，例外仅为前置冲突已删除的受阻后续记录。\n- 已裁决（用户，2026-10-12）：有未上传记录时阻止切换账号或猪场，提示先处理。\n- 已裁决（用户，2026-10-12）：冲突重试前展示本机与服务端的差异，绝不覆盖服务端已有记录；删除前置冲突后，后续记录继续受阻，只支持查看和逐条删除。原型演示核对和冲突保留，真实重试仍需服务端条件写入与回执支持。\n- 已裁决（用户，2026-10-12）：登录失效后重新登录原账号，验证通过后继续自动上传。\n- 已裁决（用户，2026-10-12）：服务端保证同一离线操作去重，且可按操作 ID 查询最终结果。旧版多个 handler 已发送稳定的 `Idempotency-Key`，但 `errorClassifier.ts` 仍靠“already processed / 已处理”等错误文本推断成功；原生端要用结构化查询结果，不能把错误文案当成功依据。具体接口字段与返回码须在 Android/后端交接时核对。具体哪些业务操作可离线，由拥有该操作的功能定义。\n\n## Sources\n\n- 本功能的流程图、界面职责与实现验证点：flow.md。\n- 本次用户答复（2026-10-12）：自动上传、异常人工处理；冲突手动重试或删除、不自动同步；冲突重试先展示差异且不覆盖服务端；删除前置冲突后依赖记录继续受阻，只能查看或删除；有未上传记录时阻止切换账号或猪场；登录失效后由原账号重新登录并续传；服务端保证操作 ID 去重和最终结果查询。\n- 旧版 Sentri/mobile_webapp：src/lib/offline 的 commandQueue、syncCoordinator、commandDependencies、errorClassifier、networkQuality；src/components/offlineRecords；src/components/offlinePendingBadge；src/providers/OfflineProvider；src/lang/zh-CN/offline.ts。\n- 旧版说明：Sentri/mobile_webapp/spec/offline_inspection_logic_document.md。代码与说明有出入时，以代码实际分支为参考；它不自动成为新产品规则。\n- 当前 feature.json、ux/system/home-astra-prototype.js、ux/research/home/ASTRA-HOME-DIRECTION.md；旧 Figma 索引 references/figma/index.md。\n",
        "scenarios": {
         "treeDoc": true,
         "tree": [
@@ -18283,28 +18321,34 @@
            {
             "type": "state",
             "id": "ds-b1-reconnected.state",
-            "label": "Study fixture: syncing",
+            "label": "Study fixture: offline, then usable connection",
             "tree": "B",
             "children": [
              {
-              "type": "outcome",
-              "id": "ds-b1-reconnected",
-              "label": "Reconnect starts upload without a tap",
-              "tree": "B-1",
-              "gwt": {
-               "given": "This phone has waiting records and its connection returns.",
-               "when": "The network becomes usable.",
-               "then": "The records start uploading without an Upload button press."
-              },
-              "authority": [
+              "type": "action",
+              "id": "ds-b1-reconnected.act",
+              "label": "The network is lost, then restored without tapping Upload.",
+              "children": [
                {
-                "src": "PRD",
-                "at": "Rules and Decisions 2026-10-12",
-                "says": "The records start uploading without an Upload button press."
+                "type": "outcome",
+                "id": "ds-b1-reconnected",
+                "label": "Reconnect starts upload without a tap",
+                "tree": "B-1",
+                "gwt": {
+                 "given": "This phone has waiting records and its connection returns.",
+                 "when": "The network becomes usable.",
+                 "then": "The records start uploading without an Upload button press."
+                },
+                "authority": [
+                 {
+                  "src": "PRD",
+                  "at": "Rules and Decisions 2026-10-12",
+                  "says": "The records start uploading without an Upload button press."
+                 }
+                ],
+                "result": "pass"
                }
-              ],
-              "result": "pending",
-              "why": "The study has a fixed sample state but no durable queue or automatic network transition."
+              ]
              }
             ]
            }
@@ -18650,7 +18694,7 @@
                   "says": "A dependent blocked by a deleted conflict can only be viewed or deleted individually with confirmation."
                  }
                 ],
-                "result": "not-run"
+                "result": "pass"
                }
               ]
              }
@@ -18707,20 +18751,34 @@
            {
             "type": "state",
             "id": "ds-b7-uncertain-receipt.state",
-            "label": "Study fixture: syncing",
+            "label": "Study fixture: receipt unknown",
             "tree": "B",
             "children": [
              {
-              "type": "decision-blocker",
-              "id": "ds-b7-uncertain-receipt",
-              "label": "Q3 — Request accepted without local receipt",
-              "tree": "B-7",
-              "question": "Q3",
-              "sources": [
-               "Old code retries transient errors",
-               "Backend idempotency contract is not available"
-              ],
-              "result": "blocked"
+              "type": "action",
+              "id": "ds-b7-uncertain-receipt.act",
+              "label": "The app queries the server by operation ID before any resend.",
+              "children": [
+               {
+                "type": "outcome",
+                "id": "ds-b7-uncertain-receipt",
+                "label": "Q3 — Request accepted without local receipt",
+                "tree": "B-7",
+                "gwt": {
+                 "given": "The server accepted an operation but its receipt did not reach the phone.",
+                 "when": "The app checks the final result using the original operation ID.",
+                 "then": "The server-confirmed record becomes Uploaded without a duplicate send; no record remains waiting on this phone."
+                },
+                "authority": [
+                 {
+                  "src": "PRD",
+                  "at": "Decisions 2026-10-12",
+                  "says": "The server guarantees deduplication and final-result lookup by stable operation ID; confirm the result before marking the local record uploaded."
+                 }
+                ],
+                "result": "blocked"
+               }
+              ]
              }
             ]
            }
@@ -18728,9 +18786,9 @@
          }
         ],
         "run": {
-         "commit": "ccaa3f2",
-         "dirty": true,
-         "ran": "2026-10-12T08:26:37.160Z",
+         "commit": "db030dd",
+         "dirty": false,
+         "ran": "2026-10-12T09:07:24.430Z",
          "langs": [
           "en",
           "zh"

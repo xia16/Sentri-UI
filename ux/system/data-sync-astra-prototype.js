@@ -15,7 +15,8 @@
     deleted: false,
     deletedDependent: false,
     retrying: false,
-    retryResult: false
+    retryResult: false,
+    receiptResolved: params.get('receipt') === 'resolved'
   };
   scenarioSelect.value = state.scenario;
   languageSelect.value = state.lang;
@@ -27,6 +28,8 @@
       offline: 'No connection · saved on this phone', online: 'Connection restored · uploading automatically',
       poor: 'Waiting for a usable connection', connected: 'Connection available', failed: 'Upload failed', conflict: 'Conflict',
       blocked: 'Waiting for an earlier operation', done: 'No records waiting on this phone',
+      checkingReceipt: 'Checking server result', checking: 'Checking server result', checkingShort: 'Checking result', checkingReceiptHint: 'This record stays on this phone while its final result is checked. It will not be sent again yet.',
+      reconciledHint: 'The server confirmed this operation was already received. The same operation was not sent again.',
       local: 'Saved on this phone', team: 'Received by the team', retry: 'Retry now',
       delete: 'Delete local record', deleteTitle: 'Delete this conflicted record?',
       deleteBody: 'This record cannot be restored and will never upload. Dependent records stay blocked; review and delete each one separately.',
@@ -69,6 +72,8 @@
       offline: '无网络 · 已保存在本机', online: '网络已恢复 · 正在自动上传',
       poor: '等待可用网络', connected: '网络可用', failed: '上传失败', conflict: '冲突',
       blocked: '等待前置操作', done: '本机暂无待上传记录',
+      checkingReceipt: '正在核对服务端结果', checking: '正在核对服务端结果', checkingShort: '核对结果中', checkingReceiptHint: '核对最终结果期间，记录仍保留在本机，暂不再次发送。',
+      reconciledHint: '服务端确认已收到这条操作；本机没有再次发送同一操作。',
       local: '已保存在本机', team: '团队已收到', retry: '立即重试',
       delete: '删除本机记录', deleteTitle: '删除这条冲突记录？',
       deleteBody: '删除后无法恢复，也不会再上传。依赖它的后续记录仍受阻，需逐条查看并删除。',
@@ -124,6 +129,7 @@
       switch: ['waiting','waiting','uploaded'],
       expired: ['waiting','waiting','waiting']
     };
+    modes.uncertain = state.receiptResolved ? ['uploaded','uploaded','uploaded'] : ['checking','uploaded','uploaded'];
     return base.map((item, index) => ({...item, status: modes[state.scenario][index]}))
       .filter(item => !(state.deleted && item.id === 'first') && !(state.deletedDependent && item.id === 'second'));
   };
@@ -142,16 +148,17 @@
   function listView() {
     const items = records();
     const needs = items.filter(x => x.status === 'failed' || x.status === 'conflict');
+    const checking = items.filter(x => x.status === 'checking');
     const waiting = items.filter(x => x.status === 'waiting' || x.status === 'syncing' || x.status === 'blocked');
     const uploaded = items.filter(x => x.status === 'uploaded');
     const mode = state.scenario;
-    const line = mode === 'offline' || mode === 'switch' ? t('offline') : mode === 'expired' ? t('expiredTitle') : mode === 'syncing' ? t('online') : mode === 'done' ? t('done') : t('connected');
-    const hint = mode === 'offline' || mode === 'switch' ? t('pendingHint') : mode === 'expired' ? t('expiredHint') : mode === 'syncing' ? t('syncingHint') : mode === 'partial' ? t('partialHint') : mode === 'conflict' ? t(state.deletedDependent ? 'allResolvedHint' : state.deleted ? 'deletedHint' : 'conflictHint') : mode === 'blocked' ? t('blockedHint') : t('doneHint');
+    const line = mode === 'offline' || mode === 'switch' ? t('offline') : mode === 'expired' ? t('expiredTitle') : mode === 'syncing' ? t('online') : mode === 'uncertain' ? t(state.receiptResolved ? 'done' : 'checkingReceipt') : mode === 'done' ? t('done') : t('connected');
+    const hint = mode === 'offline' || mode === 'switch' ? t('pendingHint') : mode === 'expired' ? t('expiredHint') : mode === 'syncing' ? t('syncingHint') : mode === 'uncertain' ? t(state.receiptResolved ? 'reconciledHint' : 'checkingReceiptHint') : mode === 'partial' ? t('partialHint') : mode === 'conflict' ? t(state.deletedDependent ? 'allResolvedHint' : state.deleted ? 'deletedHint' : 'conflictHint') : mode === 'blocked' ? t('blockedHint') : t('doneHint');
     const lead = S.statusLine([{text: line}], {className:'sync-summary-line'}) +
       S.statusLine([{text: hint}], {className:'sync-summary-line'});
     const reauth = mode === 'expired' ? S.button({label:t('reauth'),register:'primary',action:'open-reauth'}) : '';
     const body = '<div class="sync-content"><div class="sync-intro">' + lead + reauth + '</div>' +
-      '<div class="sync-groups">' + group(t('needs'), needs) + group(t('waiting'), waiting) +
+      '<div class="sync-groups">' + group(t('needs'), needs) + group(t('checkingReceipt'), checking) + group(t('waiting'), waiting) +
       group(t('uploaded'), uploaded) + '</div></div>';
     app.innerHTML = S.sheet({
       variant:'page', title:t('title'), body,
@@ -251,7 +258,9 @@
     state.scenario = scenarioSelect.value;
     state.detail = ''; state.dialog = ''; state.switchPromptShown = false;
     state.deleted = false; state.deletedDependent = false; state.retrying = false; state.retryResult = false;
+    state.receiptResolved = false;
     render();
+    scheduleReceiptResolution();
   });
   languageSelect.addEventListener('change', () => { state.lang = languageSelect.value; render(); });
   // Preview the handoff from an offline local queue to automatic upload. No server call is made.
@@ -272,5 +281,14 @@
     else return;
     render();
   });
+  function scheduleReceiptResolution() {
+    if (state.scenario !== 'uncertain' || params.get('receipt') === 'hold' || state.receiptResolved) return;
+    window.setTimeout(() => {
+      if (state.scenario !== 'uncertain') return;
+      state.receiptResolved = true;
+      render();
+    }, params.get('receipt') === 'delayed' ? 10000 : 850);
+  }
   render();
+  scheduleReceiptResolution();
 })();
