@@ -1,9 +1,9 @@
 {
  "feature": "data-sync",
- "commit": "886600619dee87754e9ecf8b734dcc80a8526116",
+ "commit": "eadadd734f0aef29ee26b8d6cc07737cb6632656",
  "dirty": false,
- "ran": "2026-10-12T08:55:28.293Z",
- "base": "http://localhost:60193",
+ "ran": "2026-10-13T01:05:28.840Z",
+ "base": "http://localhost:50707",
  "langs": [
   "en",
   "zh"
@@ -15,24 +15,23 @@
  "nodes": {
   "entry": 14,
   "state": 14,
-  "outcome": 13,
-  "action": 7,
-  "decision-blocker": 1
+  "outcome": 14,
+  "action": 9
  },
  "summary": {
-  "pass": 12,
+  "pass": 14,
   "fail": 0,
-  "blocked": 1,
-  "pending": 1
+  "blocked": 0,
+  "pending": 0
  },
  "byLang": {
   "en": {
-   "pass": 12,
+   "pass": 14,
    "fail": 0,
    "blocked": 0
   },
   "zh": {
-   "pass": 12,
+   "pass": 14,
    "fail": 0,
    "blocked": 0
   }
@@ -51,10 +50,10 @@
    "pending": 0
   },
   "ds-b1-reconnected.entry": {
-   "pass": 0,
+   "pass": 1,
    "fail": 0,
    "blocked": 0,
-   "pending": 1
+   "pending": 0
   },
   "ds-b4-partial.entry": {
    "pass": 1,
@@ -117,9 +116,9 @@
    "pending": 0
   },
   "ds-b7-uncertain-receipt.entry": {
-   "pass": 0,
+   "pass": 1,
    "fail": 0,
-   "blocked": 1,
+   "blocked": 0,
    "pending": 0
   }
  },
@@ -280,6 +279,7 @@
    "path": [
     "ds-b1-reconnected.entry",
     "ds-b1-reconnected.state",
+    "ds-b1-reconnected.act",
     "ds-b1-reconnected"
    ],
    "authority": [
@@ -289,10 +289,62 @@
      "says": "The records start uploading without an Upload button press."
     }
    ],
-   "result": "pending",
+   "result": "pass",
    "hard": [],
-   "runs": [],
-   "why": "The study has a fixed sample state but no durable queue or automatic network transition."
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-b1-reconnected/en-360/00-start.png",
+      "review/scenarios/data-sync/ds-b1-reconnected/en-360/01-offline.png",
+      "review/scenarios/data-sync/ds-b1-reconnected/en-360/02-online.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-b1-reconnected/en-390/00-start.png",
+      "review/scenarios/data-sync/ds-b1-reconnected/en-390/01-offline.png",
+      "review/scenarios/data-sync/ds-b1-reconnected/en-390/02-online.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-b1-reconnected/zh-360/00-start.png",
+      "review/scenarios/data-sync/ds-b1-reconnected/zh-360/01-offline.png",
+      "review/scenarios/data-sync/ds-b1-reconnected/zh-360/02-online.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-b1-reconnected/zh-390/00-start.png",
+      "review/scenarios/data-sync/ds-b1-reconnected/zh-390/01-offline.png",
+      "review/scenarios/data-sync/ds-b1-reconnected/zh-390/02-online.png"
+     ]
+    }
+   ]
   },
   {
    "id": "ds-b4-partial",
@@ -1108,20 +1160,75 @@
    "tree": "B-7",
    "branch": "ds-b7-uncertain-receipt.entry",
    "label": "Q3 — Request accepted without local receipt",
-   "gwt": null,
+   "gwt": {
+    "given": "The server accepted an operation but its receipt did not reach the phone.",
+    "when": "The app checks the final result using the original operation ID.",
+    "then": "The server-confirmed record becomes Uploaded without a duplicate send; no record remains waiting on this phone."
+   },
    "path": [
     "ds-b7-uncertain-receipt.entry",
     "ds-b7-uncertain-receipt.state",
+    "ds-b7-uncertain-receipt.act",
     "ds-b7-uncertain-receipt"
    ],
-   "authority": [],
-   "result": "blocked",
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Decisions 2026-10-12",
+     "says": "The server guarantees deduplication and final-result lookup by stable operation ID; confirm the result before marking the local record uploaded."
+    }
+   ],
+   "result": "pass",
    "hard": [],
-   "runs": [],
-   "question": "Q3",
-   "sources": [
-    "Old code retries transient errors",
-    "Backend idempotency contract is not available"
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-b7-uncertain-receipt/en-360/00-start.png",
+      "review/scenarios/data-sync/ds-b7-uncertain-receipt/en-360/01-advance-11s.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-b7-uncertain-receipt/en-390/00-start.png",
+      "review/scenarios/data-sync/ds-b7-uncertain-receipt/en-390/01-advance-11s.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-b7-uncertain-receipt/zh-360/00-start.png",
+      "review/scenarios/data-sync/ds-b7-uncertain-receipt/zh-360/01-advance-11s.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-b7-uncertain-receipt/zh-390/00-start.png",
+      "review/scenarios/data-sync/ds-b7-uncertain-receipt/zh-390/01-advance-11s.png"
+     ]
+    }
    ]
   }
  ]
