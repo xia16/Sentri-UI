@@ -131,9 +131,9 @@ Which one: whether the surface covers the page, not which feature it belongs to.
 2. **Not on screen, and not one Back away.** A fact the body shows, or that Back reaches, is out. So **hubs** (the surface a worker returns to for one subject: the farrowing record drawer, a pen sheet, a task page) carry the line, and **actions** launched from a hub (record dead, foster, allocate, a log) carry none: the hub is one Back away.
 3. **It fits.** One line, never wrapped or truncated, at 360px in English and Chinese (about 32 English or 16 Chinese characters beside Back, fewer beside a chip). Copy that does not fit belongs in the body.
 
-**A chip carries its identity.** On a hub, the subject chip is followed by up to two short `muted` facts that tell the animal apart in the barn: `#000418 › B1 · Parity 3`. Never counts, status or dates.
+**Identity facts are a decision per task, never a default.** On a hub, the subject chip may be followed by up to two short `muted` facts that tell the animal apart *in that task*. Which ones is decided in the task's `budget.md`, each with the worker's question it answers there: parity matters at farrowing (`#000418 › B1 · Parity 3`) and may answer nothing in another task, where the chip stands with the pen alone or with nothing. A fact the budget doesn't name is not drawn, and a shared component never fills one in. Never counts, status or dates.
 
-The header line is part of the information budget (`budget.md`, Levels): the builder names its job, the Back test and its string; a line the budget does not name is not drawn. Evidence: [header boards](evidence/2026-10-13-headers.png), [where the pen goes](evidence/2026-10-13-header-pen.png), [page header](evidence/2026-10-13-page-header.png).
+The header line is part of the information budget (`budget.md`, Levels): the builder names its job, the Back test, each identity fact with its question, and the string; a line or fact the budget does not name is not drawn. Evidence: [header boards](evidence/2026-10-13-headers.png), [where the pen goes](evidence/2026-10-13-header-pen.png), [page header](evidence/2026-10-13-page-header.png).
 
 ### Containers
 

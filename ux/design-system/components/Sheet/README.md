@@ -35,7 +35,7 @@ Parts, in order. Optional parts are marked.
 
 1. **Scrim** (drawer): the dimmed page; a tap dismisses and keeps the draft.
 2. **Grab** (drawer): the 42×4 bar. It is decoration; every gesture has a visible control.
-3. **Head** (`utility-header`): **up** (optional, a drawer with levels only: "‹ Parent name", `up: { label, action, value }`), **title** (centred; the current level), **header line** (optional, absent by default: the subject chip with up to two identity facts, or one fact; see [Headers](../../README.md#headers-law-owner-2026-10-13)), then a 1px `line` hairline and `space-section` (24px) to the body. Nothing else: no ✕, no counts, no Reset or Clear. *(Migrating: `subtitle` and `aside` are the old head parts and are being retired.)*
+3. **Head** (`utility-header`): **up** (optional, a drawer with levels only: "‹ Parent name", `up: { label, action, value }`), **title** (centred; the current level), **header line** (optional, absent by default: the subject chip with the identity facts its task's budget names, or one fact; see [Headers](../../README.md#headers-law-owner-2026-10-13)), then a 1px `line` hairline and `space-section` (24px) to the body. Nothing else: no ✕, no counts, no Reset or Clear. *(Migrating: `subtitle` and `aside` are the old head parts and are being retired.)*
 4. **Above** (optional): a bar that does not scroll (a filter bar).
 5. **Body** (`sheet-body`): the one scroller.
 6. **Status** (`sheet-status`, optional): a line above the footer only when it carries its own text action. A waiting primary's reason is never drawn: it is the primary's screen-reader description only.
@@ -89,7 +89,7 @@ Every state is drawn in `variants/drawer.html`, `variants/page.html` and `varian
 ## Content rules
 
 - **Title:** a noun or verb phrase, sentence case, up to 28 characters in English (about 14 Chinese). It names the step (`Record a death`), not the screen under it.
-- **Header line:** absent by default; a route (the subject chip and up to two identity facts, `#000418 › B1 · Parity 3`) or one fact (`Last record 08:41 · G.H`) that passes the three tests in [Headers](../../README.md#headers-law-owner-2026-10-13); one line at 360px in EN and ZH; `muted`; no full stops.
+- **Header line:** absent by default; a route (the subject chip, with up to two identity facts the task's `budget.md` chooses, e.g. `#000418 › B1 · Parity 3` at farrowing; the component never picks them) or one fact (`Last record 08:41 · G.H`) that passes the three tests in [Headers](../../README.md#headers-law-owner-2026-10-13); one line at 360px in EN and ZH; `muted`; no full stops.
 - **Primary label:** a verb with its count and place (`Record 12 piglets`, `Move 3 to B6`), not Save, Submit or Done (see Button).
 - **Status line:** a short instruction, no colon, no full stop.
 - Chinese strings are shorter than the English; nothing is clipped, titles wrap to two lines.
