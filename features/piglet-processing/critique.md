@@ -32,3 +32,17 @@ Scope: the headers of this feature's surfaces (the shared Headers change, the He
 ## Self-crit
 
 The law and its boards fix the design (two headers, the line's three tests); there are no competing directions, so each screen is judged against its baseline and the Farrowing room. Rounds and the final look are below.
+
+#### Round 1 (efbef80, renders at 390 EN beside origin/main)
+- Scan ear tags: the Scanning pill, moved into the body, still sat at the right edge (its old head rule): fixed to start the body (9a7b72e).
+- Page CSS: lines that only lost a dead header rule read as new visual CSS to the gate; restored as they were (9a7b72e).
+- Everything else matched the boards: the room keeps "Last record" under the title and 24px to the cards; the record drawer reads "Farrowing record" over its chip and facts.
+
+#### Final look (9a7b72e, pushed head; the gate's pairs at 390 and 360, EN and ZH, base bea53d3)
+- Reach: 165 screens moved, all in this change's 16 features; 126 identical; none broken.
+- Problems fixed: nothing acts in a header (Clear and Reset in footers, Scanning and End walk in bodies); one line at most, only on the hubs the budgets name; every page has Back top left and no footer Back; the 24px is the header's on every surface.
+- Keep as strong: titles, bodies, rows and primaries unchanged; the room still looks like itself.
+- Squint: the room, the title, the summary card, the lens; a drawer, its title, then its first card (the chip is quiet).
+- Against the original: less, not flatter: one muted line where there were two, no text action beside a title.
+- **Better because** each header now says one thing, the same way everywhere, and the 360 Chinese lines fit on one line.
+- Known gaps: the pig page lost its pen and unit line (one Back away); Inspection's End walk and Log now sit in the body row with the unit; Home pages lost their PREVIEW badges.
