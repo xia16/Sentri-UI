@@ -3692,7 +3692,7 @@
         },
         {
          "text": "Scanning",
-         "in": ".scan-page .utility-header"
+         "in": ".scan-page .sheet-body .scan-live"
         },
         {
          "text": "Stop scanning"
@@ -3814,7 +3814,7 @@
          "visible": [
           {
            "text": "Stopped",
-           "in": ".scan-page .utility-header"
+           "in": ".scan-page .sheet-body .scan-live"
           },
           {
            "text": "Resume scanning"
@@ -3856,7 +3856,7 @@
            "visible": [
             {
              "text": "Scanning",
-             "in": ".scan-page .utility-header"
+             "in": ".scan-page .sheet-body .scan-live"
             },
             {
              "text": "Stop scanning"
