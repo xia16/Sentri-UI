@@ -96,3 +96,10 @@ The law and its boards fix the design (two headers, the line's three tests); the
 - Against the original: less, not flatter: one muted line where there were two, no text action beside a title.
 - **Better because** each header now says one thing, the same way everywhere, and the 360 Chinese lines fit on one line.
 - Known gaps: the pig page lost its pen and unit line (one Back away); Inspection's End walk and Log now sit in the body row with the unit; Home pages lost their PREVIEW badges.
+
+#### Crit round 1 (driver), then Final look (75e92ea, pushed head; the gate's pairs at 390 and 360, EN and ZH, base af23efc)
+- The Back test walked on the real chain: the pig page carries her identity facts; More actions (one pig), Measurements & condition, a finding, Production stats, Feed plan, Piglets and farrowing's Piglet processing carry the route; Pen feeding names its pen. Every surface about one animal now shows it on screen or one Back away.
+- Facts a header cut moved into bodies, never dropped: sow died (tag, pen, time), the receipt's closure stamp, Scan actions' count, Scanning / Stopped.
+- Floors: the Assistant, Environment and Maintenance pages stay unmoved until their bodies reach the floors; Saved work and Find a pig are brought to them. Legibility and spacing pass on every moved screen.
+- Reach: 153 screens moved, all in this change's features; 138 identical; none broken.
+- **Better because** each header says one thing the same way everywhere, and no fact the worker needs was lost: it is in the header line or the body's first line.
