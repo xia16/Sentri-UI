@@ -9,7 +9,7 @@ The bottom of the taste ladder. [principles.md](../principles.md) and the [rules
 | **Lesson** | `<quality>/lesson.md`: what the examples share, in a few lines (what it looks like, why it fails, what instead) | A distiller agent at consolidation | Lessons from different qualities share a cause |
 | **Taste** | A statement in [taste.md](../taste.md) | Consolidation | — |
 
-Where a lesson can be measured it is also automated as a check (`scripts/check-spacing.mjs` came from the first `messy` ruling). A check is accepted only when it fails its examples and passes the [house references](../references/README.md).
+Only **judgement** rulings climb this ladder: the ones that can't yet be stated exactly (cluttered, bulky, heavy). A **concrete** ruling, one that can be stated or measured (a spacing rule, a component's tap target), goes straight to a design-system law or component spec, with a check where it can be measured; its pair is kept in `ux/design-system/evidence/` as the evidence and the check's test case ([rulings.md](rulings.md)). A lesson that becomes statable leaves the ladder the same way. A check is accepted only when it fails its evidence and passes the [house references](../references/README.md).
 
 ## Qualities (fixed)
 
