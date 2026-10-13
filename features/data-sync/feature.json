@@ -13,6 +13,8 @@
         "data-sync.banner",
         "data-sync.global-upload",
         "data-sync.global-error",
+        "data-sync.task-badge",
+        "data-sync.task-list",
         "data-sync.list",
         "data-sync.grouped",
         "data-sync.category",
@@ -71,10 +73,16 @@
       "zh": "其他页面感知正在上传",
       "status": "in-design",
       "url": "/ux/system/home-astra-prototype.html?section=gestation&connection=online",
-      "steps": [{ "tap": "[data-action=\"toolbox\"]" }],
+      "steps": [
+        {
+          "tap": "[data-action=\"toolbox\"]"
+        }
+      ],
       "notes": {
         "purpose": "工人进入工具箱后仍可看见应用壳的自动上传状态，并能点入同一同步总览。",
-        "issues": ["Home 样例只证明应用壳布局；其他功能原型尚未接入同一壳。"]
+        "issues": [
+          "Home 样例只证明应用壳布局；其他功能原型尚未接入同一壳。"
+        ]
       }
     },
     {
@@ -83,10 +91,64 @@
       "zh": "其他页面感知同步异常",
       "status": "in-design",
       "url": "/ux/system/home-astra-prototype.html?section=gestation&sync=failed",
-      "steps": [{ "tap": "[data-action=\"toolbox\"]" }],
+      "steps": [
+        {
+          "tap": "[data-action=\"toolbox\"]"
+        }
+      ],
       "notes": {
         "purpose": "离开首页后仍显示需要处理的本机记录数；点击进入异常详情。",
-        "issues": ["真实队列与其他功能页面需要 Android 实现时连接。"]
+        "issues": [
+          "真实队列与其他功能页面需要 Android 实现时连接。"
+        ]
+      }
+    },
+    {
+      "id": "data-sync.task-badge",
+      "name": "Task-owned saved work in Farrowing",
+      "zh": "分娩任务页眉本任务记录入口",
+      "status": "in-design",
+      "url": "/ux/system/farrowing-astra-concept.html?layout=focus&taskSync=offline",
+      "notes": {
+        "purpose": "分娩任务页眉尾部显示本任务实例未上传数；任务总览与下级作业页共用范围，点开任务记录。",
+        "states": [
+          {
+            "state": "Waiting",
+            "when": "本次任务有待上传记录",
+            "shows": "Task 2；读屏解释保存在本机并等待上传"
+          },
+          {
+            "state": "Uploading",
+            "when": "本次任务正在自动上传",
+            "shows": "Task 2 与上传中状态"
+          },
+          {
+            "state": "Needs attention",
+            "when": "本次任务有失败记录",
+            "shows": "Task 2 与异常状态"
+          },
+          {
+            "state": "Other-task records only",
+            "when": "本任务无待传，但本机其他任务仍有记录",
+            "shows": "明确标 All 3，点击进入全机列表；不误报为本任务 3 条"
+          }
+        ],
+        "issues": [
+          "本机样例不与 Home 或真实 Android 队列共享；其他任务原型的页眉尚未接入。"
+        ]
+      }
+    },
+    {
+      "id": "data-sync.task-list",
+      "name": "Records from this task",
+      "zh": "本任务记录列表",
+      "status": "in-design",
+      "url": "/ux/system/data-sync-astra-prototype.html?scenario=offline&taskId=farrow28&from=task",
+      "notes": {
+        "purpose": "只显示稳定任务实例 farrow28 下跨单元/栏位的未上传记录，提供本机全部记录入口。",
+        "issues": [
+          "真实 taskId 和每条离线操作的归属需在 Android 业务功能与队列交接时接通。"
+        ]
       }
     },
     {
@@ -167,7 +229,16 @@
       "url": "/ux/system/data-sync-astra-prototype.html?scenario=busy",
       "notes": {
         "purpose": "30 条样例中需要处理的记录直接可见，普通待传按业务类别汇总。",
-        "issues": ["样例仅覆盖分散在四类中的记录；真实类别和任务类型由业务数据提供。"]
+        "issues": [
+          "样例仅覆盖分散在四类中的记录；真实类别和任务类型由业务数据提供。"
+        ],
+        "states": [
+          {
+            "state": "Threshold",
+            "when": "九条待传跨两类，浏览中自动确认一条",
+            "shows": "分类入口保留、待传数更新为八；重新进入才重判布局。可用 scenario=threshold 验证。"
+          }
+        ]
       }
     },
     {
@@ -176,7 +247,11 @@
       "zh": "类别内查看本机记录",
       "status": "in-design",
       "url": "/ux/system/data-sync-astra-prototype.html?scenario=busy",
-      "steps": [{ "tap": "[data-action=\"open-category\"][data-value=\"production\"]" }],
+      "steps": [
+        {
+          "tap": "[data-action=\"open-category\"][data-value=\"production\"]"
+        }
+      ],
       "notes": {
         "purpose": "点入业务类别后直接看到本机记录，可逐条打开并返回；不强制再走任务类型和任务两级。"
       }
@@ -223,7 +298,9 @@
       "url": "/ux/system/data-sync-astra-prototype.html?scenario=uncertain&receipt=hold",
       "notes": {
         "purpose": "请求可能已由服务端处理但本机未收到回执时，按原操作 ID 查询；查询期间保留本机记录，暂不重发。",
-        "issues": ["原型使用本地定时结果；Android/后端交接时核对查询接口与回执结构。"]
+        "issues": [
+          "原型使用本地定时结果；Android/后端交接时核对查询接口与回执结构。"
+        ]
       }
     },
     {
@@ -234,7 +311,9 @@
       "url": "/ux/system/data-sync-astra-prototype.html?scenario=uncertain&receipt=resolved",
       "notes": {
         "purpose": "按操作 ID 查到服务端已处理后才将本机记录标为已上传，不再次发送。",
-        "issues": ["原型为本地样例，不代表真实查询接口已接入。"]
+        "issues": [
+          "原型为本地样例，不代表真实查询接口已接入。"
+        ]
       }
     },
     {
@@ -334,6 +413,16 @@
       "tap app-shell exception status"
     ],
     [
+      "data-sync.task-badge",
+      "data-sync.task-list",
+      "open task-owned records"
+    ],
+    [
+      "data-sync.task-list",
+      "data-sync.list",
+      "view all records on this phone"
+    ],
+    [
       "data-sync.grouped",
       "data-sync.category",
       "open work category"
@@ -396,6 +485,13 @@
       "from": "workbench.today",
       "control": "Saved-work card",
       "lands": "data-sync.list"
+    },
+    {
+      "section": "Farrowing task",
+      "label": "via this-task header badge",
+      "from": "farrowing.room",
+      "control": "Task 2",
+      "lands": "data-sync.task-list"
     }
   ]
 }

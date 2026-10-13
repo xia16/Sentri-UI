@@ -1,9 +1,9 @@
 {
  "feature": "data-sync",
- "commit": "b04313db567921df76802f049140b6bcfd77671d",
- "dirty": false,
- "ran": "2026-10-13T06:51:14.991Z",
- "base": "http://localhost:64091",
+ "commit": "d928a002a7c1cfbc03256901653e5f40fe0254ad",
+ "dirty": true,
+ "ran": "2026-10-13T09:16:30.207Z",
+ "base": "http://localhost:54685",
  "langs": [
   "en",
   "zh"
@@ -13,25 +13,25 @@
   390
  ],
  "nodes": {
-  "entry": 19,
-  "state": 19,
-  "outcome": 19,
-  "action": 13
+  "entry": 25,
+  "state": 25,
+  "outcome": 25,
+  "action": 19
  },
  "summary": {
-  "pass": 19,
+  "pass": 25,
   "fail": 0,
   "blocked": 0,
   "pending": 0
  },
  "byLang": {
   "en": {
-   "pass": 19,
+   "pass": 25,
    "fail": 0,
    "blocked": 0
   },
   "zh": {
-   "pass": 19,
+   "pass": 21,
    "fail": 0,
    "blocked": 0
   }
@@ -146,6 +146,42 @@
    "pending": 0
   },
   "ds-b8-recent-upload-total.entry": {
+   "pass": 1,
+   "fail": 0,
+   "blocked": 0,
+   "pending": 0
+  },
+  "ds-a9-task-scope.entry": {
+   "pass": 1,
+   "fail": 0,
+   "blocked": 0,
+   "pending": 0
+  },
+  "ds-a9-task-all.entry": {
+   "pass": 1,
+   "fail": 0,
+   "blocked": 0,
+   "pending": 0
+  },
+  "ds-a11-task-layer.entry": {
+   "pass": 1,
+   "fail": 0,
+   "blocked": 0,
+   "pending": 0
+  },
+  "ds-a12-other-task.entry": {
+   "pass": 1,
+   "fail": 0,
+   "blocked": 0,
+   "pending": 0
+  },
+  "ds-a13-home-to-task.entry": {
+   "pass": 1,
+   "fail": 0,
+   "blocked": 0,
+   "pending": 0
+  },
+  "ds-a10-grouping-stable.entry": {
    "pass": 1,
    "fail": 0,
    "blocked": 0,
@@ -1628,6 +1664,370 @@
      "notes": [],
      "evidence": [
       "review/scenarios/data-sync/ds-b8-recent-upload-total/zh-390/00-start.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "ds-a9-task-scope",
+   "tree": "A-9",
+   "branch": "ds-a9-task-scope.entry",
+   "label": "Task scope stays explicit",
+   "gwt": {
+    "given": "Two unsent records belong to Farrowing task 28 and one belongs to a different task.",
+    "when": "The worker opens the task header badge.",
+    "then": "Only the two Farrowing records appear first, with an explicit path to all three unsent phone records."
+   },
+   "path": [
+    "ds-a9-task-scope.entry",
+    "ds-a9-task-scope.state",
+    "ds-a9-task-scope.act",
+    "ds-a9-task-scope"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Decisions 2026-10-13",
+     "says": "Task pages show this task first, with a path to all records on this phone."
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-a9-task-scope/en-360/00-start.png",
+      "review/scenarios/data-sync/ds-a9-task-scope/en-360/01-data-action-open-task-sync.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-a9-task-scope/en-390/00-start.png",
+      "review/scenarios/data-sync/ds-a9-task-scope/en-390/01-data-action-open-task-sync.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "ds-a9-task-all",
+   "tree": "A-9",
+   "branch": "ds-a9-task-all.entry",
+   "label": "Task scope stays explicit",
+   "gwt": {
+    "given": "Two unsent records belong to Farrowing task 28 and one belongs to a different task.",
+    "when": "The worker taps All records on this phone from the task list.",
+    "then": "The phone-wide list shows three unsent records, including the different task."
+   },
+   "path": [
+    "ds-a9-task-all.entry",
+    "ds-a9-task-all.state",
+    "ds-a9-task-all.act",
+    "ds-a9-task-all"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Decisions 2026-10-13",
+     "says": "Task pages show this task first, with a path to all records on this phone."
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-a9-task-all/en-360/00-start.png",
+      "review/scenarios/data-sync/ds-a9-task-all/en-360/01-data-action-show-all.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-a9-task-all/en-390/00-start.png",
+      "review/scenarios/data-sync/ds-a9-task-all/en-390/01-data-action-show-all.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-a9-task-all/zh-360/00-start.png",
+      "review/scenarios/data-sync/ds-a9-task-all/zh-360/01-data-action-show-all.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-a9-task-all/zh-390/00-start.png",
+      "review/scenarios/data-sync/ds-a9-task-all/zh-390/01-data-action-show-all.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "ds-a11-task-layer",
+   "tree": "A-11",
+   "branch": "ds-a11-task-layer.entry",
+   "label": "Current task count remains available in the sow drawer",
+   "gwt": {
+    "given": "Farrowing task 28 has two unsent records across its pens.",
+    "when": "The worker opens a sow count drawer.",
+    "then": "The same task-owned status remains visible in the drawer header and still opens the task record list."
+   },
+   "path": [
+    "ds-a11-task-layer.entry",
+    "ds-a11-task-layer.state",
+    "ds-a11-task-layer.act",
+    "ds-a11-task-layer"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Rules and Decisions 2026-10-13",
+     "says": "The task header keeps one task-instance scope through the task hierarchy."
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-a11-task-layer/en-360/00-start.png",
+      "review/scenarios/data-sync/ds-a11-task-layer/en-360/01-data-action-room-sow.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-a11-task-layer/en-390/00-start.png",
+      "review/scenarios/data-sync/ds-a11-task-layer/en-390/01-data-action-room-sow.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "ds-a12-other-task",
+   "tree": "A-12",
+   "branch": "ds-a12-other-task.entry",
+   "label": "Other tasks do not masquerade as this task",
+   "gwt": {
+    "given": "This Farrowing task has no unsent work, while three records from other tasks remain on this phone.",
+    "when": "The worker opens the header status.",
+    "then": "The header says All 3 and opens the phone-wide list of three waiting records."
+   },
+   "path": [
+    "ds-a12-other-task.entry",
+    "ds-a12-other-task.state",
+    "ds-a12-other-task.act",
+    "ds-a12-other-task"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Rules 2026-10-13",
+     "says": "The task header marks task and phone scopes explicitly."
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-a12-other-task/en-360/00-start.png",
+      "review/scenarios/data-sync/ds-a12-other-task/en-360/01-data-action-open-task-sync.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-a12-other-task/en-390/00-start.png",
+      "review/scenarios/data-sync/ds-a12-other-task/en-390/01-data-action-open-task-sync.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "ds-a13-home-to-task",
+   "tree": "A-13",
+   "branch": "ds-a13-home-to-task.entry",
+   "label": "Task page retains explicit phone-wide access",
+   "gwt": {
+    "given": "Home reports three unsent records from other work and the Farrowing task has none.",
+    "when": "The worker enters the Farrowing task.",
+    "then": "The task page still has an All 3 status that opens all records on this phone."
+   },
+   "path": [
+    "ds-a13-home-to-task.entry",
+    "ds-a13-home-to-task.state",
+    "ds-a13-home-to-task.act",
+    "ds-a13-home-to-task"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Rules 2026-10-13",
+     "says": "The task page keeps phone-wide access when only other tasks have unsent work."
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-a13-home-to-task/en-360/00-start.png",
+      "review/scenarios/data-sync/ds-a13-home-to-task/en-360/01-data-card-farrow28.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-a13-home-to-task/en-390/00-start.png",
+      "review/scenarios/data-sync/ds-a13-home-to-task/en-390/01-data-card-farrow28.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "ds-a10-grouping-stable",
+   "tree": "A-10",
+   "branch": "ds-a10-grouping-stable.entry",
+   "label": "Nine-to-eight transition does not rearrange the list",
+   "gwt": {
+    "given": "The worker opened a grouped view of nine waiting records from two categories.",
+    "when": "The connection returns and one record is confirmed uploaded.",
+    "then": "The count becomes eight, the category entry remains in place, and the uploaded total rises to one."
+   },
+   "path": [
+    "ds-a10-grouping-stable.entry",
+    "ds-a10-grouping-stable.state",
+    "ds-a10-grouping-stable.act",
+    "ds-a10-grouping-stable"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Rules 2026-10-13",
+     "says": "Choose grouping on entry and keep that layout stable while automatic uploads update counts."
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-a10-grouping-stable/en-360/00-start.png",
+      "review/scenarios/data-sync/ds-a10-grouping-stable/en-360/01-offline.png",
+      "review/scenarios/data-sync/ds-a10-grouping-stable/en-360/02-online.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-a10-grouping-stable/en-390/00-start.png",
+      "review/scenarios/data-sync/ds-a10-grouping-stable/en-390/01-offline.png",
+      "review/scenarios/data-sync/ds-a10-grouping-stable/en-390/02-online.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-a10-grouping-stable/zh-360/00-start.png",
+      "review/scenarios/data-sync/ds-a10-grouping-stable/zh-360/01-offline.png",
+      "review/scenarios/data-sync/ds-a10-grouping-stable/zh-360/02-online.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/data-sync/ds-a10-grouping-stable/zh-390/00-start.png",
+      "review/scenarios/data-sync/ds-a10-grouping-stable/zh-390/01-offline.png",
+      "review/scenarios/data-sync/ds-a10-grouping-stable/zh-390/02-online.png"
      ]
     }
    ]

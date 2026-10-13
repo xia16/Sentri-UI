@@ -11,6 +11,8 @@ The 2026-10-12 compact Home entry and the first 2026-10-13 full-width app-shell 
 
 For 30 mixed records: [English overview](grouped-en-360.png) → [production category](category-en-360.png); [Chinese overview](grouped-zh-360.png) → [production category](category-zh-360.png). Exceptions remain directly accessible before the category summaries.
 
+The dynamic threshold has a separate 390px Chinese pair: [nine waiting records in two categories](grouping-nine-zh-390.png) → [eight waiting and one confirmed upload](grouping-eight-stable-zh-390.png). Category rows remain in place during the same visit, and the total changes without the list switching to a flat layout.
+
 Confirmed uploads now appear only as a [recent 30-day total](uploaded-summary-zh-390.png), with a [boundary fixture](retention-30d-zh-390.png) showing that one older upload no longer counts. The prototype does not delete a real local database; the 30-day cleanup rule is specified in the PRD for Android implementation.
 
 Additional Chinese 360 × 844 states: [conflict differences](conflict-detail-zh-360.png), [conflict deletion confirmation](delete-confirm-zh-360.png), [dependent after deletion](dependent-after-delete-zh-360.png), [dependent deletion confirmation](dependent-delete-confirm-zh-360.png), [queue after both deletions](after-dependent-delete-zh-360.png), [original-account sign-in](expired-login-zh-360.png).
@@ -18,5 +20,9 @@ Additional Chinese 360 × 844 states: [conflict differences](conflict-detail-zh-
 Missing-receipt reconciliation at 360 × 844: [checking in English](receipt-check-en-360.png) → [server-confirmed in English](receipt-confirmed-en-360.png), and [checking in Chinese](receipt-check-zh-360.png) → [server-confirmed in Chinese](receipt-confirmed-zh-360.png). The transition is a local fixture showing the product rule; no server request occurs.
 
 [Earlier Home conflict entry at 390px](home-conflict-en-390.png) shows the prior exception placement; the selected Home uses the header badge as its single global sync entry.
+
+Task-owned status study: the [Farrowing task before](task-header-before-farrowing-390.png) and [after](task-header-after-farrowing-390.png) at 390px keep the same first work row height while adding “Task 2” to the right header slot. The [sow count drawer](task-sow-layer-en-390.png) keeps that same task count while the worker records a litter. Tapping it opens [two records from this task](task-list-farrowing-en-390.png); the [360px Chinese task list](task-list-farrowing-zh-360.png) exposes “本机全部 · 3”, which opens the [phone-wide list](task-to-all-zh-360.png). These task and phone counts are independent fixed fixtures, not a shared queue.
+
+When this task has zero unsent records but other tasks still have three, the header [explicitly says “All 3”](task-fallback-all-en-390.png) and opens the phone-wide list. This keeps the global entry available without mislabelling the number as this task's count.
 
 `features/data-sync/critique.md` records the driver's first look and the reason for choosing this direction. The screenshots show design behavior only. The real Android queue, result lookup by operation ID, server comparison, conditional retry and sign-in still require implementation validation.

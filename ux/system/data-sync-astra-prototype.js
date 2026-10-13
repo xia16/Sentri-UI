@@ -8,6 +8,9 @@
   const params = new URLSearchParams(location.search);
   const state = {
     scenario: params.get('scenario') || 'offline',
+    taskScope: params.get('taskId') === 'farrow28' ? 'farrow28' : '',
+    groupingMode: null,
+    uploadedOne: false,
     lang: params.get('lang') === 'zh' ? 'zh' : 'en',
     detail: '',
     category: '',
@@ -25,11 +28,13 @@
   const copy = {
     en: {
       title: 'Saved work', detail: 'Record detail', back: 'Back', waiting: 'Waiting to upload',
+      taskTitle: 'Farrowing · saved work', taskScopeHint: 'Only records from this Farrowing task, across its units and pens.', allPhone: 'All records on this phone', taskSaved: 'Farrowing count · sow 000418', taskNote: 'Pen note · B2', taskOther: 'Pregnancy check · sow 000308', taskPlace: 'Farrowing · Unit 7 · Pen B1', taskNotePlace: 'Farrowing · Unit 8 · Pen B2',
       production: 'Production work', inspection: 'Inspections', vaccination: 'Vaccinations', transfer: 'Transfers', other: 'Other work',
       categoryHint: 'Select a work category to find a saved record.', categoryWaiting: 'Records in this category upload automatically when connected.',
       categoryCount: 'waiting records',
       needs: 'Needs you', uploaded: 'Uploaded', uploadedRecent: 'Uploaded in last 30 days', syncing: 'Uploading automatically',
       offline: 'No connection · saved on this phone', online: 'Connection restored · uploading automatically',
+      thresholdOffline: 'Connection unstable · work saved on this phone', thresholdOnline: 'Connection restored · one record confirmed',
       poor: 'Waiting for a usable connection', connected: 'Connection available', failed: 'Upload failed', conflict: 'Conflict',
       blocked: 'Waiting for an earlier operation', done: 'No records waiting on this phone',
       checkingReceipt: 'Checking server result', checking: 'Checking server result', checkingShort: 'Checking result', checkingReceiptHint: 'This record stays on this phone while its final result is checked. It will not be sent again yet.',
@@ -72,11 +77,13 @@
     },
     zh: {
       title: '本机记录', detail: '记录详情', back: '返回', waiting: '待上传',
+      taskTitle: '分娩任务 · 本机记录', taskScopeHint: '仅展示本次分娩任务在各单元、栏位保存的记录。', allPhone: '查看本机全部记录', taskSaved: '分娩计数 · 母猪 000418', taskNote: '栏位备注 · B2', taskOther: '孕检 · 母猪 000308', taskPlace: '分娩 · 7 单元 · B1 栏', taskNotePlace: '分娩 · 8 单元 · B2 栏',
       production: '生产操作', inspection: '巡检', vaccination: '免疫', transfer: '转群', other: '其他操作',
       categoryHint: '按业务类别查看本机记录。', categoryWaiting: '本类别记录联网后会自动上传。',
       categoryCount: '条待上传记录',
       needs: '需要处理', uploaded: '已上传', uploadedRecent: '近30天已上传', syncing: '正在自动上传',
       offline: '无网络 · 已保存在本机', online: '网络已恢复 · 正在自动上传',
+      thresholdOffline: '网络不稳定 · 记录已保存在本机', thresholdOnline: '网络已恢复 · 1 条已确认上传',
       poor: '等待可用网络', connected: '网络可用', failed: '上传失败', conflict: '冲突',
       blocked: '等待前置操作', done: '本机暂无待上传记录',
       checkingReceipt: '正在核对服务端结果', checking: '正在核对服务端结果', checkingShort: '核对结果中', checkingReceiptHint: '核对最终结果期间，记录仍保留在本机，暂不再次发送。',
@@ -121,6 +128,22 @@
   const t = key => copy[state.lang][key] || key;
   let dialogReturnAction = '';
   const records = () => {
+    if (params.get('taskId') === 'farrow28') {
+      const statuses = state.scenario === 'syncing' ? ['syncing','waiting','waiting','uploaded'] : state.scenario === 'partial' ? ['failed','waiting','waiting','uploaded'] : ['waiting','waiting','waiting','uploaded'];
+      return [
+        {id:'task-count',taskId:'farrow28',category:'production',titleEn:copy.en.taskSaved,titleZh:copy.zh.taskSaved,placeEn:copy.en.taskPlace,placeZh:copy.zh.taskPlace,at:'09:32',status:statuses[0]},
+        {id:'task-note',taskId:'farrow28',category:'production',titleEn:copy.en.taskNote,titleZh:copy.zh.taskNote,placeEn:copy.en.taskNotePlace,placeZh:copy.zh.taskNotePlace,at:'09:35',status:statuses[1]},
+        {id:'other-task',taskId:'preg31',category:'production',titleEn:copy.en.taskOther,titleZh:copy.zh.taskOther,placeEn:'Gestation · Unit 8',placeZh:'妊娠区 · 8 单元',at:'09:38',status:statuses[2]},
+        {id:'inspection-task',taskId:'inspect7',category:'inspection',titleEn:'Unit inspection · 7',titleZh:'单元巡检 · 7',placeEn:'Unit 7',placeZh:'7 单元',at:'09:39',status:statuses[3]}
+      ].map(item=>({...item,syncedAt:new Date(Date.now()-86400000).toISOString()}));
+    }
+    if (state.scenario === 'threshold') return Array.from({length:9}, (_,index)=>({
+      id:'threshold-'+index, category:index%2?'inspection':'production',
+      titleEn:(index%2?'Unit inspection':'Pregnancy check')+' · '+String(300+index).padStart(6,'0'),
+      titleZh:(index%2?'单元巡检':'孕检')+' · '+String(300+index).padStart(6,'0'),
+      placeEn:'Unit '+(7+index%2),placeZh:(7+index%2)+' 单元',at:'09:'+String(10+index).padStart(2,'0'),
+      status:index===0&&state.uploadedOne?'uploaded':'waiting',syncedAt:new Date().toISOString()
+    }));
     const base = [
       { id: 'first', at: '09:32', place: 'p1', category: 'production' },
       { id: 'second', at: '09:35', place: 'p2', category: 'inspection' },
@@ -190,7 +213,7 @@
   };
 
   function listView() {
-    const items = records();
+    const items = records().filter(item => !state.taskScope || item.taskId === state.taskScope && item.status !== 'uploaded');
     const needs = items.filter(x => x.status === 'failed' || x.status === 'conflict');
     const checking = items.filter(x => x.status === 'checking');
     const waiting = items.filter(x => x.status === 'waiting' || x.status === 'syncing' || x.status === 'blocked');
@@ -205,17 +228,19 @@
       return;
     }
     const mode = state.scenario;
-    const line = mode === 'offline' || mode === 'switch' || mode === 'busy' ? t('offline') : mode === 'expired' ? t('expiredTitle') : mode === 'syncing' ? t('online') : mode === 'uncertain' ? t(state.receiptResolved ? 'done' : 'checkingReceipt') : mode === 'done' || mode === 'history' ? t('done') : t('connected');
-    const hint = mode === 'busy' ? t('categoryHint') : mode === 'offline' || mode === 'switch' ? t('pendingHint') : mode === 'expired' ? t('expiredHint') : mode === 'syncing' ? t('syncingHint') : mode === 'uncertain' ? t(state.receiptResolved ? 'reconciledHint' : 'checkingReceiptHint') : mode === 'partial' ? t('partialHint') : mode === 'conflict' ? t(state.deletedDependent ? 'allResolvedHint' : state.deleted ? 'deletedHint' : 'conflictHint') : mode === 'blocked' ? t('blockedHint') : t('doneHint');
+    const line = mode === 'threshold' ? t(state.uploadedOne ? 'thresholdOnline' : 'thresholdOffline') : mode === 'offline' || mode === 'switch' || mode === 'busy' ? t('offline') : mode === 'expired' ? t('expiredTitle') : mode === 'syncing' ? t('online') : mode === 'uncertain' ? t(state.receiptResolved ? 'done' : 'checkingReceipt') : mode === 'done' || mode === 'history' ? t('done') : t('connected');
+    const hint = mode === 'busy' ? t('categoryHint') : mode === 'threshold' || mode === 'offline' || mode === 'switch' ? t('pendingHint') : mode === 'expired' ? t('expiredHint') : mode === 'syncing' ? t('syncingHint') : mode === 'uncertain' ? t(state.receiptResolved ? 'reconciledHint' : 'checkingReceiptHint') : mode === 'partial' ? t('partialHint') : mode === 'conflict' ? t(state.deletedDependent ? 'allResolvedHint' : state.deleted ? 'deletedHint' : 'conflictHint') : mode === 'blocked' ? t('blockedHint') : t('doneHint');
     const lead = S.statusLine([{text: line}], {className:'sync-summary-line'}) +
-      S.statusLine([{text: hint}], {className:'sync-summary-line'});
+      S.statusLine([{text: state.taskScope ? t('taskScopeHint') : hint}], {className:'sync-summary-line'});
     const reauth = mode === 'expired' ? S.button({label:t('reauth'),register:'primary',action:'open-reauth'}) : '';
-    const body = '<div class="sync-content"><div class="sync-intro">' + lead + reauth + '</div>' +
+    const allPhone = state.taskScope ? `<button type="button" class="sync-all-phone" data-action="show-all">${t('allPhone')} · ${records().filter(item=>item.status!=='uploaded').length} →</button>` : '';
+    if (state.groupingMode === null) state.groupingMode = waiting.length >= 9 && new Set(waiting.map(categoryFor)).size >= 2;
+    const body = '<div class="sync-content"><div class="sync-intro">' + lead + reauth + allPhone + '</div>' +
       '<div class="sync-groups">' + group(t('needs'), needs) + group(t('checkingReceipt'), checking) +
-      (waiting.length >= 9 && new Set(waiting.map(categoryFor)).size >= 2 ? categoryGroups(waiting) : group(t('waiting'), waiting)) +
+      (state.groupingMode && !state.taskScope ? categoryGroups(waiting) : group(t('waiting'), waiting)) +
       recentUploadSummary(items) + '</div></div>';
     app.innerHTML = S.sheet({
-      variant:'page', title:t('title'), body,
+      variant:'page', title:t(state.taskScope ? 'taskTitle' : 'title'), body,
       footer:S.sheetFooter({back:{action:'go-home',label:t('back')}})
     });
     if (state.scenario === 'switch' && !state.switchPromptShown) {
@@ -225,7 +250,7 @@
     renderDialog();
   }
   function detailView() {
-    const item = records().find(x => x.id === state.detail);
+    const item = records().filter(x => !state.taskScope || x.taskId === state.taskScope).find(x => x.id === state.detail);
     if (!item) { state.detail = ''; listView(); return; }
     const failed = item.status === 'failed', conflict = item.status === 'conflict';
     const reason = failed ? t('reasonFailed') : conflict ? t('reasonConflict') : item.status === 'blocked' ? t(state.deleted ? 'reasonBlockedDeleted' : 'reasonBlocked') : '';
@@ -291,8 +316,9 @@
     else if (action === 'open-category') state.category = button.dataset.value;
     else if (action === 'back-to-all') state.category = '';
     else if (action === 'back-to-list') state.detail = '';
+    else if (action === 'show-all') { state.taskScope = ''; state.groupingMode = null; }
     else if (action === 'go-home') {
-      if (params.get('from') === 'home') history.back();
+      if (params.get('from') === 'home' || params.get('from') === 'task') history.back();
       else location.href = 'home-astra-prototype.html?layout=focus';
     }
     else if (action === 'ask-delete') { dialogReturnAction = 'ask-delete'; state.dialog = 'delete'; }
@@ -314,15 +340,18 @@
   });
   scenarioSelect.addEventListener('change', () => {
     state.scenario = scenarioSelect.value;
+    state.groupingMode = null;
     state.detail = ''; state.category = ''; state.dialog = ''; state.switchPromptShown = false;
     state.deleted = false; state.deletedDependent = false; state.retrying = false; state.retryResult = false;
     state.receiptResolved = false;
+    state.uploadedOne = false;
     render();
     scheduleReceiptResolution();
   });
   languageSelect.addEventListener('change', () => { state.lang = languageSelect.value; render(); });
   // Preview the handoff from an offline local queue to automatic upload. No server call is made.
   window.addEventListener('online', () => {
+    if (state.scenario === 'threshold') { state.uploadedOne = true; render(); return; }
     if (state.scenario !== 'offline') return;
     state.scenario = 'syncing';
     render();

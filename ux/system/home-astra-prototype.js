@@ -208,12 +208,13 @@
   }
   function renderSync(){const top=app.querySelector('.app-scroll')?.scrollTop||0;render();const scroller=app.querySelector('.app-scroll');if(scroller)scroller.scrollTop=top;}
   function sectionChooser(){return head('Your sections','Green Valley Farm')+`<div class="app-scroll screen-enter"><p class="work-note">Select where you're working.</p>${SentriUI.choiceGroup(sections.map(s=>{const count=pendingTypes(s.id);return SentriUI.choiceRow({label:s.name,meta:s.units.length+' units · '+s.population+' pigs · '+(count?count+' task types ready':'No scheduled work today'),mode:'single',selected:s.id===state.section,action:'section',value:s.id});}))}<p class="work-note">Work is shared with your team. Your section selection changes the view for you.</p></div>`+nav();}
-  function openDesigned(file,unit,entry,lens=null){
+  function openDesigned(file,unit,entry,lens=null,taskSync=''){
     const url=new URL(file,location.href);
     url.searchParams.set('layout','focus');url.searchParams.set('from','home');
     url.searchParams.set('section',state.section);url.searchParams.set('entry',entry);
     if(unit)url.searchParams.set('unit',unit);
     if(['Health','Feed'].includes(lens))url.searchParams.set('lens',lens);
+    if(taskSync)url.searchParams.set('taskSync',taskSync);
     if(state.unit)url.searchParams.set('returnUnit',state.unit);
     // Save the exact Home scope for the browser's Back button too.
     const homeURL=new URL(location.href);homeURL.searchParams.set('section',state.section);
@@ -222,7 +223,7 @@
     history.replaceState(null,'',homeURL);location.assign(url.href);
   }
   function openTask(id,unit=null){
-    if(id==='farrow28'){openDesigned('farrowing-astra-concept.html',unit,unit?'unit':'overview');return;}
+    if(id==='farrow28'){openDesigned('farrowing-astra-concept.html',unit,unit?'unit':'overview',null,sync.pending.length?'other':'done');return;}
     if(id==='piglet27'){openDesigned('../tasks/piglet-processing/simple/index.html',unit,unit?'unit':'overview');return;}
     push('placeholder',{task:id,workUnit:unit});
   }
