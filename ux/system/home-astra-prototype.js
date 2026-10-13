@@ -186,23 +186,17 @@
     }).join('');
     const completed=models.filter(m=>['complete','terminated'].includes(m.state));
     const completedHTML=completed.length?'<section class="completed-work"><div class="work-section-heading"><h2>Closed tasks</h2><span>'+completed.length+'</span></div><div class="home-task-list">'+completed.map(m=>window.SentriHomeTaskCard.render(m)).join('')+'</div></section>':'';
-    return header()+scopeRail()+`<div class="app-scroll screen-enter"><div class="home-attention">${['failed','conflict'].includes(sync.status)?syncCard():''}</div>${state.unit?unitStrip():''}<div class="work-section-heading"><h2>Today’s work</h2><span>Thu, 8 Jul</span></div>${cards?`<div class="home-task-list">${cards}</div>`:`<div class="empty-state"><div class="complete-mark">${icon('check')}</div><h3>No scheduled tasks today</h3><p>${state.unit?'You can still inspect this unit and record anything you find.':'Select a unit to inspect pens or record anything you find.'}</p>${state.unit?'':'<div class="tomorrow"><p class="overline">Tomorrow</p><strong>Growth check · Batch 26</strong><p>Units 12–13 · sample weights</p></div>'}</div>`}${state.unit?comingUp():''}${completedHTML}</div>`+nav();
+    return header()+scopeRail()+`<div class="app-scroll screen-enter">${state.unit?unitStrip():''}<div class="work-section-heading"><h2>Today’s work</h2><span>Thu, 8 Jul</span></div>${cards?`<div class="home-task-list">${cards}</div>`:`<div class="empty-state"><div class="complete-mark">${icon('check')}</div><h3>No scheduled tasks today</h3><p>${state.unit?'You can still inspect this unit and record anything you find.':'Select a unit to inspect pens or record anything you find.'}</p>${state.unit?'':'<div class="tomorrow"><p class="overline">Tomorrow</p><strong>Growth check · Batch 26</strong><p>Units 12–13 · sample weights</p></div>'}</div>`}${state.unit?comingUp():''}${completedHTML}</div>`+nav();
   }
   function globalSync(){
     const n=sync.pending.length;
     if(!n)return '';
     const zh=params.get('lang')==='zh',error=['failed','conflict'].includes(sync.status),busy=sync.status==='uploading';
+    const island=params.get('indicator')==='island';
     const title=zh?(error?`${n} 条记录需要处理`:busy?`正在上传 ${n} 条记录`:`${n} 条记录保存在本机`):(error?`${n} record${n===1?'':'s'} ${n===1?'needs':'need'} attention`:busy?`Uploading ${n} saved records`:`${n} records saved on this phone`);
     const detail=zh?(error?'查看原因':busy?'自动上传中':'联网后自动上传'):(error?'Review records':busy?'Automatic upload':'Uploads when connected');
-    return `<div class="global-sync ${error?'needs-attention':busy?'uploading':'waiting'}">${btn('sync',`<span class="global-sync-mark" aria-hidden="true">${busy?'↻':error?'!':'↑'}</span><span class="global-sync-copy"><strong>${title}</strong><small>${detail}</small></span><span class="global-sync-arrow" aria-hidden="true">›</span>`,'global-sync-control','','aria-label="'+esc(title+'. '+detail)+'"'+(busy?' aria-busy="true"':''))}</div>`;
-  }
-  function syncCard(){
-    const n=sync.pending.length,busy=sync.status==='uploading',zh=new URLSearchParams(location.search).get('lang')==='zh';
-    const title=n?(zh?(busy?'正在上传 '+n+' 条记录':'本机保存 '+n+' 条记录'):(busy?'Uploading '+n+' records':n+' record'+(n===1?'':'s')+' saved on this device')):(zh?'本机暂无待上传记录':'No records waiting on this device');
-    const subtitle=n?(zh?(busy?'正在自动上传…':sync.connection==='offline'?'无网络 · 联网后自动上传':sync.status==='failed'?'上传失败 · 查看记录':sync.status==='conflict'?'存在冲突 · 查看记录':'联网后自动上传'):(busy?'Sending saved work…':sync.connection==='offline'?'No connection · uploads when online':sync.status==='failed'?'Upload failed · review records':sync.status==='conflict'?'Conflict · review records':'Uploads automatically when connected')):(zh?'这里只统计本机保存的记录':'Only this phone’s saved records are counted');
-    if(!n)return SentriUI.row({title,description:subtitle,action:'sync',icon:icon('check')});
-    if(['failed','conflict'].includes(sync.status))return SentriUI.banner({tone:'notice',headline:title,consequence:subtitle,door:{action:'sync',label:title+'. '+subtitle},state:'Error'});
-    return SentriUI.rowGroup(SentriUI.row({title,description:subtitle,action:'sync',wrap:true}),{});
+    const short=zh?(error?'异常':busy?'上传':'待传'):(error?'Review':busy?'Sending':'Saved');
+    return `<div class="global-sync ${error?'needs-attention':busy?'uploading':'waiting'}">${btn('sync',`<span class="global-sync-mark" aria-hidden="true">${busy?'↻':error?'!':'↑'}</span>${island||error?`<span class="global-sync-short">${short}</span>`:''}<strong class="global-sync-count">${n}</strong>`,'global-sync-control','','aria-label="'+esc(title+'. '+detail)+'"'+(busy?' aria-busy="true"':''))}</div>`;
   }
   function showSync(){
     const scenario=sync.pending.length===0?'done':sync.status==='uploading'?'syncing':sync.status==='failed'?'partial':sync.status==='conflict'?'conflict':sync.connection==='offline'?'offline':'syncing';
@@ -267,7 +261,7 @@
       return (u.get('view')||'')===view&&(view==='sections'||(u.get('section')||'gestation')===state.section)&&(view!=='unit'||u.get('unit')===String(state.unit))&&(u.get('work')||'mixed')===workPreview&&(u.get('attention')||'current')===attentionPreview;});
     return hit?hit.id:null;
   }
-  function render(){app.innerHTML=globalSync()+(pages[state.page]||home)();window.AtlasBare&&AtlasBare.watch(atlasScreen);document.querySelectorAll('[data-demo]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.demo===(state.page==='sections'?'sections':state.unit?'unit':'overview'))));}
+  function render(){app.classList.toggle('has-global-sync',sync.pending.length>0);app.classList.toggle('island-sync',params.get('indicator')==='island');app.innerHTML=globalSync()+(pages[state.page]||home)();window.AtlasBare&&AtlasBare.watch(atlasScreen);document.querySelectorAll('[data-demo]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.demo===(state.page==='sections'?'sections':state.unit?'unit':'overview'))));}
   if(window.AtlasBare&&AtlasBare.bare)new MutationObserver(()=>AtlasBare.watch(atlasScreen)).observe(overlay,{childList:true,subtree:true,attributes:true,attributeFilter:['class']});
   function closeDrawer(){overlay.innerHTML='';state.overlay=null;app.inert=false;if(returnFocus?.isConnected)returnFocus.focus();}
   function dialog(title,description,primary){returnFocus=document.activeElement;app.inert=true;overlay.innerHTML=SentriUI.sheet({variant:'dialog',title,icon:'alert',subtitle:description,label:title,footer:SentriUI.sheetFooter({back:{action:'close'},hold:{label:primary.label,caption:'HOLD TO END',action:primary.action,tone:'danger'}})});overlay.querySelector('.dialog')?.focus({preventScroll:true});}

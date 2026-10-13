@@ -209,8 +209,8 @@
                 },
                 {
                   "text": {
-                    "en": "Uploaded · 2",
-                    "zh": "已上传 · 2"
+                    "en": "Uploaded in last 30 days · 2",
+                    "zh": "近30天已上传 · 2"
                   }
                 },
                 {
@@ -755,8 +755,8 @@
                     },
                     {
                       "text": {
-                        "en": "Uploaded · 1",
-                        "zh": "已上传 · 1"
+                        "en": "Uploaded in last 30 days · 1",
+                        "zh": "近30天已上传 · 1"
                       }
                     },
                     {
@@ -905,7 +905,7 @@
                   ],
                   "visible": [
                     { "text": { "en": "No records waiting on this phone", "zh": "本机暂无待上传记录" } },
-                    { "text": { "en": "Uploaded · 3", "zh": "已上传 · 3" } },
+                    { "text": { "en": "Uploaded in last 30 days · 3", "zh": "近30天已上传 · 3" } },
                     { "text": { "en": "The server confirmed this operation was already received", "zh": "服务端确认已收到这条操作" } },
                     { "text": { "en": "Checking result", "zh": "核对结果中" }, "absent": true }
                   ]
@@ -932,7 +932,11 @@
               "type": "action",
               "id": "ds-a7-global-wait.act",
               "label": "The worker checks saved work while using the toolbox.",
-              "taps": [{ "expect": [{ "text": { "en": "Toolbox", "zh": "工具箱" } }] }],
+              "taps": [{ "expect": [
+                { "text": { "en": "Toolbox", "zh": "工具箱" } },
+                { "el": ".global-sync.waiting .global-sync-control" },
+                { "text": { "en": "3", "zh": "3" }, "in": ".global-sync" }
+              ] }, "[data-action=\"sync\"]"],
               "children": [
                 {
                   "type": "outcome",
@@ -942,12 +946,12 @@
                   "gwt": {
                     "given": "Three operations are saved on this phone while it is offline.",
                     "when": "The worker checks the toolbox page.",
-                    "then": "The app still shows three records saved locally and says they will upload when connected."
+                    "then": "A compact global badge still shows three unsent local records, and opening it provides the automatic-upload explanation."
                   },
                   "authority": [{ "src": "PRD", "at": "Design feedback 2026-10-13", "says": "Show global saved-work status outside Home." }],
                   "visible": [
-                    { "text": { "en": "3 records saved on this phone", "zh": "3 条记录保存在本机" } },
-                    { "text": { "en": "Uploads when connected", "zh": "联网后自动上传" } }
+                    { "text": { "en": "Waiting to upload · 3", "zh": "待上传 · 3" } },
+                    { "text": { "en": "These records upload automatically when connected", "zh": "网络恢复后会自动上传这些记录" } }
                   ]
                 }
               ]
@@ -986,8 +990,8 @@
                   },
                   "authority": [{ "src": "PRD", "at": "Design feedback 2026-10-13", "says": "Show the global local-record state on Home and other app pages." }],
                   "visible": [
-                    { "text": { "en": "Uploading 3 saved records", "zh": "正在上传 3 条记录" } },
-                    { "text": { "en": "Automatic upload", "zh": "自动上传中" } }
+                    { "el": ".global-sync.uploading .global-sync-control" },
+                    { "text": { "en": "3", "zh": "3" }, "in": ".global-sync" }
                   ]
                 }
               ]
@@ -1012,7 +1016,7 @@
               "type": "action",
               "id": "ds-a7-global-error.act",
               "label": "The worker opens another page, then checks the exception.",
-              "taps": [{ "expect": [{ "text": { "en": "1 record needs attention", "zh": "1 条记录需要处理" } }] }, "[data-action=\"sync\"]"],
+              "taps": [{ "expect": [{ "el": ".global-sync.needs-attention .global-sync-control" }, { "text": { "en": "1", "zh": "1" }, "in": ".global-sync" }] }, "[data-action=\"sync\"]"],
               "children": [
                 {
                   "type": "outcome",
@@ -1078,6 +1082,38 @@
                     { "text": { "en": "Unit inspection", "zh": "单元巡检" }, "absent": true }
                   ]
                 }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "entry",
+      "id": "ds-b8-recent-upload-total.entry",
+      "label": "Only recent confirmed uploads count locally",
+      "children": [
+        {
+          "type": "state",
+          "id": "ds-b8-recent-upload-total.state",
+          "label": "Study fixture: two recent uploads and one older than 30 days",
+          "tree": "B",
+          "reset": { "url": "/ux/system/data-sync-astra-prototype.html?scenario=history" },
+          "children": [
+            {
+              "type": "outcome",
+              "id": "ds-b8-recent-upload-total",
+              "tree": "B-8",
+              "label": "Only recent confirmed uploads count locally",
+              "gwt": {
+                "given": "The phone has two confirmed uploads within 30 days and one older uploaded fixture.",
+                "when": "The worker opens Saved work.",
+                "then": "Only the last-30-days total is shown; the older unreferenced uploaded fixture is pruned locally and individual uploaded history does not fill the work list."
+              },
+              "authority": [{ "src": "PRD", "at": "Decisions 2026-10-13", "says": "Show only a recent uploaded total and keep confirmed local upload history for 30 days." }],
+              "visible": [
+                { "text": { "en": "Uploaded in last 30 days · 2", "zh": "近30天已上传 · 2" } },
+                { "text": { "en": "Pregnancy check", "zh": "孕检" }, "absent": true }
               ]
             }
           ]

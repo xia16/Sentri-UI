@@ -20,12 +20,12 @@ None. Home has no lifecycle of its own; each card inherits the lifecycle of its 
 - Counts are unique animals or litters in the selected scope. A unit narrows the counts, never the batch time.
 - Task-specific rules: Farrowing = underway, past expected date, due today, next expected; Piglet processing = litters with care due, next care, waiting; Pregnancy = open windows, then next check; Heat and Return-heat show no completion bar for observation.
 - Unit scope: inspection, attention, environment and devices entrances sit at the unit; Inspection owns the pen walk.
-- Offline: an app-shell status entry below the system safe area reports this phone's unsent count, automatic upload and exceptions on Home and other internal pages. Home adds a content alert only for exceptions. A usable connection triggers automatic upload; failed or conflicted records open the Data sync flow for manual handling (owner decisions and feedback, 2026-10-12–13).
+- Offline: a 48dp or larger floating badge beside the existing native app header reports this phone's unsent count on Home and other internal pages without taking a separate card row. It distinguishes waiting, automatic uploading and exceptions; an exception expands to an action label. A usable connection triggers automatic upload; failed or conflicted records open the Data sync flow for manual handling (owner decisions and feedback, 2026-10-12–13).
 - Closed tasks never revive due counts.
 
 ## Scope
 
-In: section chooser, Overview, unit picker, unit hub, card states (due, waiting, round complete, ready, closed), the app-shell Saved work status and Home exception prompt (details are the Data sync feature), Toolbox and Records, the unit attention states, task preview, end-early confirmation, closed-task receipt.
+In: section chooser, Overview, unit picker, unit hub, card states (due, waiting, round complete, ready, closed), the app-shell Saved work badge (details are the Data sync feature), Toolbox and Records, the unit attention states, task preview, end-early confirmation, closed-task receipt.
 
 Out: Assistant (its own feature), Scan and Find a pig (Find a pig), the Saved work drawer (Data sync); task detail pages (their own features); Environment & devices (its own feature). Language and Log out exist in the old design and are not built here (placeholder).
 

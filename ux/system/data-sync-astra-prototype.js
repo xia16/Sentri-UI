@@ -28,7 +28,7 @@
       production: 'Production work', inspection: 'Inspections', vaccination: 'Vaccinations', transfer: 'Transfers', other: 'Other work',
       categoryHint: 'Select a work category to find a saved record.', categoryWaiting: 'Records in this category upload automatically when connected.',
       categoryCount: 'waiting records',
-      needs: 'Needs you', uploaded: 'Uploaded', syncing: 'Uploading automatically',
+      needs: 'Needs you', uploaded: 'Uploaded', uploadedRecent: 'Uploaded in last 30 days', syncing: 'Uploading automatically',
       offline: 'No connection · saved on this phone', online: 'Connection restored · uploading automatically',
       poor: 'Waiting for a usable connection', connected: 'Connection available', failed: 'Upload failed', conflict: 'Conflict',
       blocked: 'Waiting for an earlier operation', done: 'No records waiting on this phone',
@@ -66,7 +66,7 @@
       partialHint: 'Two records arrived. One still needs attention.',
       conflictHint: 'This record will not upload again unless you retry it.',
       deletedHint: 'The dependent record remains blocked. Review and delete it separately.',
-      allResolvedHint: 'No records are waiting on this phone. Uploaded history remains below.',
+      allResolvedHint: 'No records are waiting on this phone. The recent upload total is below.',
       blockedHint: 'Resolve the earlier operation before this one can upload.',
       doneHint: 'Only records saved on this phone are counted here.'
     },
@@ -75,7 +75,7 @@
       production: '生产操作', inspection: '巡检', vaccination: '免疫', transfer: '转群', other: '其他操作',
       categoryHint: '按业务类别查看本机记录。', categoryWaiting: '本类别记录联网后会自动上传。',
       categoryCount: '条待上传记录',
-      needs: '需要处理', uploaded: '已上传', syncing: '正在自动上传',
+      needs: '需要处理', uploaded: '已上传', uploadedRecent: '近30天已上传', syncing: '正在自动上传',
       offline: '无网络 · 已保存在本机', online: '网络已恢复 · 正在自动上传',
       poor: '等待可用网络', connected: '网络可用', failed: '上传失败', conflict: '冲突',
       blocked: '等待前置操作', done: '本机暂无待上传记录',
@@ -113,7 +113,7 @@
       partialHint: '2 条已上传，1 条仍需处理。',
       conflictHint: '这条记录不会自动重试，需由你手动处理。',
       deletedHint: '依赖它的后续记录仍受阻，需逐条查看并删除。',
-      allResolvedHint: '本机暂无待上传记录；已上传记录仍可在下方查看。',
+      allResolvedHint: '本机暂无待上传记录；下方显示近期已上传总数。',
       blockedHint: '先处理前置操作，后续记录才会上传。',
       doneHint: '这里只统计这台手机保存的记录。'
     }
@@ -148,12 +148,18 @@
       conflict: ['conflict','blocked','uploaded'],
       blocked: ['failed','blocked','waiting'],
       done: ['uploaded','uploaded','uploaded'],
+      history: ['uploaded','uploaded','uploaded'],
       switch: ['waiting','waiting','uploaded'],
       expired: ['waiting','waiting','waiting']
     };
     modes.uncertain = state.receiptResolved ? ['uploaded','uploaded','uploaded'] : ['checking','uploaded','uploaded'];
-    return base.map((item, index) => ({...item, status: modes[state.scenario][index]}))
+    const candidates = base.map((item, index) => ({...item, status: modes[state.scenario][index],
+      dependsOn: item.id === 'second' ? ['first'] : [],
+      syncedAt: state.scenario === 'history' ? new Date(Date.now() - [2,12,45][index] * 86400000).toISOString() : new Date(Date.now() - 86400000).toISOString()}))
       .filter(item => !(state.deleted && item.id === 'first') && !(state.deletedDependent && item.id === 'second'));
+    const stillReferenced = new Set(candidates.filter(item => item.status !== 'uploaded').flatMap(item => item.dependsOn));
+    const cutoff = Date.now() - 30 * 86400000;
+    return candidates.filter(item => item.status !== 'uploaded' || Date.parse(item.syncedAt) >= cutoff || stillReferenced.has(item.id));
   };
   const humanStatus = status => status === 'blocked' && state.deleted ? t('blockedDeletedStatus') : t(status);
   const shortStatus = status => t(status + 'Short');
@@ -177,13 +183,17 @@
         action:'open-category', value:category, wrap:true});
     }).join(''), {title:t('waiting')+' · '+items.length, level:3});
   };
+  const recentUploadSummary = items => {
+    const cutoff = Date.now() - 30 * 86400000;
+    const count = items.filter(item => item.status === 'uploaded' && Date.parse(item.syncedAt) >= cutoff).length;
+    return count ? `<p class="sync-uploaded-summary">${t('uploadedRecent')} · ${count}</p>` : '';
+  };
 
   function listView() {
     const items = records();
     const needs = items.filter(x => x.status === 'failed' || x.status === 'conflict');
     const checking = items.filter(x => x.status === 'checking');
     const waiting = items.filter(x => x.status === 'waiting' || x.status === 'syncing' || x.status === 'blocked');
-    const uploaded = items.filter(x => x.status === 'uploaded');
     if (state.category) {
       const categoryItems = waiting.filter(item => categoryFor(item) === state.category);
       const body = '<div class="sync-content"><div class="sync-intro">' +
@@ -195,7 +205,7 @@
       return;
     }
     const mode = state.scenario;
-    const line = mode === 'offline' || mode === 'switch' || mode === 'busy' ? t('offline') : mode === 'expired' ? t('expiredTitle') : mode === 'syncing' ? t('online') : mode === 'uncertain' ? t(state.receiptResolved ? 'done' : 'checkingReceipt') : mode === 'done' ? t('done') : t('connected');
+    const line = mode === 'offline' || mode === 'switch' || mode === 'busy' ? t('offline') : mode === 'expired' ? t('expiredTitle') : mode === 'syncing' ? t('online') : mode === 'uncertain' ? t(state.receiptResolved ? 'done' : 'checkingReceipt') : mode === 'done' || mode === 'history' ? t('done') : t('connected');
     const hint = mode === 'busy' ? t('categoryHint') : mode === 'offline' || mode === 'switch' ? t('pendingHint') : mode === 'expired' ? t('expiredHint') : mode === 'syncing' ? t('syncingHint') : mode === 'uncertain' ? t(state.receiptResolved ? 'reconciledHint' : 'checkingReceiptHint') : mode === 'partial' ? t('partialHint') : mode === 'conflict' ? t(state.deletedDependent ? 'allResolvedHint' : state.deleted ? 'deletedHint' : 'conflictHint') : mode === 'blocked' ? t('blockedHint') : t('doneHint');
     const lead = S.statusLine([{text: line}], {className:'sync-summary-line'}) +
       S.statusLine([{text: hint}], {className:'sync-summary-line'});
@@ -203,7 +213,7 @@
     const body = '<div class="sync-content"><div class="sync-intro">' + lead + reauth + '</div>' +
       '<div class="sync-groups">' + group(t('needs'), needs) + group(t('checkingReceipt'), checking) +
       (waiting.length >= 9 && new Set(waiting.map(categoryFor)).size >= 2 ? categoryGroups(waiting) : group(t('waiting'), waiting)) +
-      group(t('uploaded'), uploaded) + '</div></div>';
+      recentUploadSummary(items) + '</div></div>';
     app.innerHTML = S.sheet({
       variant:'page', title:t('title'), body,
       footer:S.sheetFooter({back:{action:'go-home',label:t('back')}})

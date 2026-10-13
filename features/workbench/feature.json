@@ -239,12 +239,12 @@
           },
           {
             "name": "App-shell Saved work status",
-            "shows": "3 records saved on this phone · Uploads when connected",
+            "shows": "↑ 3 in a compact floating app-header badge",
             "states": [
               {
                 "state": "Waiting, offline",
                 "when": "Records are queued and there is no connection",
-                "shows": "A global status entry below the system safe area: N records saved on this phone · Uploads when connected. Home does not repeat a normal waiting row."
+                "shows": "A compact app-header badge shows the phone-wide count. Home does not repeat a saved-work card."
               },
               {
                 "state": "Waiting, online",
@@ -254,7 +254,7 @@
               {
                 "state": "Interrupted",
                 "when": "A record fails or conflicts",
-                "shows": "An attention entry precedes the work cards and opens the Data sync flow"
+                "shows": "The header badge expands to Action N and opens the Data sync flow; no separate Home card"
               },
               {
                 "state": "Clear",
@@ -263,8 +263,8 @@
               }
             ],
             "logic": "The app-shell entry appears on Home and internal subpages; its count includes all unsent records on this phone, regardless of current task, page or identity. The queue is fictional in this prototype. Tapping the entry opens the Data sync study; real queue and per-record outcomes are not shared between prototypes.",
-            "source": "globalSync(), syncCard() and features/data-sync/PRD.md",
-            "at": "3 records saved on this phone"
+            "source": "globalSync() and features/data-sync/PRD.md",
+            "at": "↑ 3"
           },
           {
             "name": "Section and unit scope",

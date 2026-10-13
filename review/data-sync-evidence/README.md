@@ -7,9 +7,11 @@ Baseline: `origin/main` at `ccaa3f2`. After: the provisional `codex/offline-flow
 | Home, English 390 × 844 | [Old full-width upload card](home-before-en-390.png) | [Compact saved-work entry after first task](home-after-en-390.png) |
 | Saved work, English 390 × 844 | [Old batch upload drawer](list-before-en-390.png) | [Per-record list](list-after-en-390.png) |
 
-The 2026-10-12 compact Home entry was revised after owner feedback. Current candidate: [global waiting status on Home](global-home-wait-en-390.png) and [Chinese variant](global-home-wait-zh-390.png); [uploading](global-toolbox-upload-en-390.png) and [exception](global-toolbox-error-en-390.png) remain visible in Toolbox. The [compact capsule exploration](compact-pill-exploration-en-390.png) truncates the critical count/meaning at 390px, so the safe-area status row is the selected direction.
+The 2026-10-12 compact Home entry and the first 2026-10-13 full-width app-shell row were revised after further owner feedback. Current native Android candidate: [compact badge on Home](badge-home-wait-zh-390.png), [expanded exception badge](badge-home-error-zh-390.png), and [uploading badge in Toolbox at 360px](badge-toolbox-upload-en-360.png). The [centered app-drawn island](island-home-wait-zh-390.png) is an interactive comparison: it states “待传 3” but moves the work cards down about 40px. The earlier [full-width status row](global-home-wait-zh-390.png) and [narrow capsule exploration](compact-pill-exploration-en-390.png) remain baseline evidence.
 
 For 30 mixed records: [English overview](grouped-en-360.png) → [production category](category-en-360.png); [Chinese overview](grouped-zh-360.png) → [production category](category-zh-360.png). Exceptions remain directly accessible before the category summaries.
+
+Confirmed uploads now appear only as a [recent 30-day total](uploaded-summary-zh-390.png), with a [boundary fixture](retention-30d-zh-390.png) showing that one older upload no longer counts. The prototype does not delete a real local database; the 30-day cleanup rule is specified in the PRD for Android implementation.
 
 Additional Chinese 360 × 844 states: [conflict differences](conflict-detail-zh-360.png), [conflict deletion confirmation](delete-confirm-zh-360.png), [dependent after deletion](dependent-after-delete-zh-360.png), [dependent deletion confirmation](dependent-delete-confirm-zh-360.png), [queue after both deletions](after-dependent-delete-zh-360.png), [original-account sign-in](expired-login-zh-360.png).
 
