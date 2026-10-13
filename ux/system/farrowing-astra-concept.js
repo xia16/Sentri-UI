@@ -208,7 +208,7 @@ function identity(s){
  // Headers (owner, 2026-10-13; features/farrowing/budget.md ## Headers): the sow's record drawer is the hub and carries the route line, her
  // chip and the two facts that tell her apart at farrowing (her pen, her parity). Actions launched from it carry no line: it is one Back away.
  const route=(facts)=>({chip:{id:s.tag,action:'profile',label:'View sow '+s.tag+' details'},facts});
- if(s.view==='allocate')return {surface:'menu',title:`${s.alive} piglet${s.alive===1?'':'s'} to allocate`,line:route([sowPlace(s)]),close:false,label:'Piglets to allocate'};
+ if(s.view==='allocate')return {surface:'menu',title:`${s.alive} piglet${s.alive===1?'':'s'} to allocate`,close:false,label:'Piglets to allocate'};
  if(s.view==='finish')return {title:'Finish farrowing',close:{action:'dismiss',label:'Close finish drawer'}};
  if(s.view==='death')return {title:'Record dead',close:false};
  if(['edit','editFinish'].includes(s.view))return {title:s.view==='editFinish'?'Edit finish details':'Edit record',close:false};
@@ -436,7 +436,8 @@ function findPage(s){const c=roomContext(s),under=pageUnder(s,c);return under===
 function scanActionsSheet(c){
  const n=c.scan.picked.length;
  const rows=penActionRow('room-scan-act','transfer','Transfer','Move to another unit or pen','transfer')+penActionRow('room-scan-act','condition','Disease or symptom','Record a health finding','health')+penActionRow('room-scan-act','treat','Record treatment','Medicine, dose and method','treatment')+penActionRow('room-scan-act','note','Add a note',n===1?'Leave a note for this sow':'Leave a note for these sows','marker');
- return roomSheet('Actions',`<div class="compact-actions st-panel st-row-group">${rows}</div>`,footer(SentriUI.backButton({action:'room-back'})),'scan-actions-sheet','menu');
+ // The ticked count is what the actions apply to: the body's first line.
+ return roomSheet('Actions',`${SentriUI.statusLine([[{text:`${n} ${n===1?'sow':'sows'}`}]])}<div class="compact-actions st-panel st-row-group">${rows}</div>`,footer(SentriUI.backButton({action:'room-back'})),'scan-actions-sheet','menu');
 }
 // Pen context is shared by its drawers within the unit; task rows stay sow-focused.
 function penInfo(c){const pens=c.unit.penDetails||(c.unit.penDetails={});return pens[c.detailPen]||(pens[c.detailPen]={note:'',noteBy:'',faults:[],events:[],feed:null});}
@@ -506,7 +507,8 @@ function taskEndSheet(s,c){
  if(s.view==='roomTaskReceipt'){
   const end=c.completion;if(!end)return '';
   const at=new Date(end.at),when=at.toLocaleString('en-US',{month:'short'})+' '+at.getDate()+' · '+at.toLocaleString('en-GB',{hour:'2-digit',minute:'2-digit'});
-  return sheet(end.early?'Task ended early':'Task ended',`${taskPerformance(end.performance)}${taskOutcomeSummary({...end,awaiting:end.removed},true)}`,false,'task-end-expanded task-receipt-sheet');
+  // Who closed the task and when is the receipt's own fact: the first line of its body (never the header).
+  return sheet(end.early?'Task ended early':'Task ended',`${SentriUI.statusLine([[{text:`Farrowing · ${when} · ${initials(end.who)}`}]])}${taskPerformance(end.performance)}${taskOutcomeSummary({...end,awaiting:end.removed},true)}`,false,'task-end-expanded task-receipt-sheet');
  }
  const r=taskClosureReview(c);
  if(s.view==='roomTaskSows'){
@@ -592,7 +594,10 @@ function recordNavigation(primary=''){return footer(SentriUI.backButton({action:
 // Right after the hold records her death (or from her row while piglets wait): where do her piglets go? Back = later.
 function allocate(s){
  const rows=[SentriUI.choiceRow({mode:'navigate',label:'Move to other sows',meta:'Foster or nurse sow',action:'allocMove'}),SentriUI.choiceRow({mode:'navigate',label:'Hand-rear here',meta:'Bottle or milk replacer in her crate',action:'allocHand'}),...(farmConfig.rearingPen?[SentriUI.choiceRow({mode:'navigate',label:'Move to a rearing pen',meta:'Rescue deck',action:'allocRear'})]:[])];
- return {cls:'allocate-body',body:SentriUI.choiceGroup(rows),footer:footer(SentriUI.backButton({action:'close'}))};
+ // Her death is status, so it is the body's first line, with her tag and pen (she is on screen; no header line repeats her).
+ const e=s.events.find(e=>e.text.startsWith('Sow died'));
+ const died=SentriUI.statusLine([[{text:`${s.tag} · ${s.pen} · sow died ${[e?.day&&e.day!=='Today'?e.day:'',e?.time].filter(Boolean).join(' ')}`.trim()}]]);
+ return {cls:'allocate-body',body:died+SentriUI.choiceGroup(rows),footer:footer(SentriUI.backButton({action:'close'}))};
 }
 function locked(s){
  const e=s.events[0];

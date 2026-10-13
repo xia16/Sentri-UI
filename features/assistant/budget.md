@@ -22,6 +22,8 @@ The header line of every surface of this feature, decided by the Headers law (`u
 |---|---|---|---|---|
 | Every page and drawer of this feature | action or destination off Home | none | | Back reaches Home, which shows the section and unit |
 
-Ambiguous, quieter option taken: The PREVIEW badges (prototype chrome) are dropped with the old page heads.
+Ambiguous, quieter option taken: The PREVIEW badges (prototype chrome) stay where they were.
 
 Chains walked on the real Back path after this change (crit round 1): no surface here writes to or is about one animal without showing it on screen or one Back away; no line changed.
+
+Until migrated (crit round 1): the Assistant, Environment & devices and Maintenance pages keep their page-built head, PREVIEW badge and subtitle. Their bodies are below the farm legibility floors (10px text, 9px chart labels) and a change that moves a screen must bring it to the floors; that body work is its own task. Their drawers (report issue, issue detail) take the sheet header.

@@ -299,7 +299,7 @@
 .inspection-phone .profile-next-card{display:flex;flex-direction:column;gap:5px;background:#f1f4eb;border-radius:10px;padding:12px;margin-bottom:22px}
 .inspection-phone .profile-next-card>span,.inspection-phone .profile-next-card>small{font-size:var(--type-meta-size);line-height:1.5;color:#5c6c50}
 .inspection-phone .profile-next-card>strong{font-size:15px;line-height:1.4;font-weight:600}
-.inspection-phone .pig-current-tasks{margin:0 0 24px}
+.inspection-phone .pig-current-tasks{margin:0 0 28px}
 .inspection-phone .pig-current-tasks-heading{display:flex;align-items:center;justify-content:space-between;gap:7px;min-height:44px;margin-bottom:8px;padding:0}
 .inspection-phone .pig-current-tasks-heading h4{margin:0;font-size:var(--type-meta-size);font-weight:600}
 .inspection-phone .pig-current-tasks-heading>span{font-size:var(--type-meta-size);line-height:1.4;color:var(--muted)}
