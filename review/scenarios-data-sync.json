@@ -1,9 +1,9 @@
 {
  "feature": "data-sync",
- "commit": "42da8165acc3c042aa807bae4372cb31185a08af",
+ "commit": "915967c3eafa1e49aa0ea28884afbdc5f1ae5f99",
  "dirty": false,
- "ran": "2026-10-13T02:24:43.857Z",
- "base": "http://localhost:63051",
+ "ran": "2026-10-13T02:33:58.436Z",
+ "base": "http://localhost:50754",
  "langs": [
   "en",
   "zh"
