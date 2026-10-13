@@ -15,7 +15,7 @@ import { playwright } from './playwright-path.mjs';
 const args = process.argv.slice(2), at = args.indexOf('--previous');
 const prevSrc = at >= 0 ? args.splice(at, 2)[1] : null;
 const git = (...a) => execFileSync('git', a, { encoding: 'utf8', maxBuffer: 1 << 28 }).trim();
-const show = (rev, file) => { try { return git('show', `${rev}:${file}`); } catch { return null; } };
+const show = (rev, file) => { try { return execFileSync('git', ['show', `${rev}:${file}`], { encoding: 'utf8', maxBuffer: 1 << 28, stdio: ['ignore', 'pipe', 'ignore'] }); } catch { return null; } }; // null when the file isn't there
 const features = (text) => { try { return Object.fromEntries(JSON.parse(text).platforms.flatMap((p) => p.sections.flatMap((s) => s.features.map((f) => [f.id, f])))); } catch { return null; } };
 // how a branch's author is named on its layer; anyone not listed shows as their git name
 const PEOPLE = { zhangzhaoxu: 'Zhaoxu', xia16: 'Adam', Claude: 'Agent' };
