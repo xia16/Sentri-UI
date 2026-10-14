@@ -1,19 +1,22 @@
-// Where the tooling finds Playwright: SENTRI_PLAYWRIGHT or PLAYWRIGHT_DIR if set, else the design lint's cache on the owner's
-// machine, else a project or global install (a cloud container has one globally).
+// Where the tooling finds Playwright: SENTRI_PLAYWRIGHT or PLAYWRIGHT_DIR if set, else the project's own install
+// (`playwright` is a pinned devDependency, so `npm install` provides it), else a global install (a cloud container has one).
+// Nothing here depends on one person's machine. The browser itself comes from `npx playwright install chromium`.
 import { execSync } from 'node:child_process';
 import { createRequire } from 'node:module';
 import fs from 'node:fs';
 import path from 'node:path';
 
-const CACHE = 'C:/Users/ying_/.cache/adam-design/playwright-1.63.0/node_modules/playwright';
+const HELP = 'Playwright not found. Run `npm install` and `npx playwright install chromium` in the repo, or set SENTRI_PLAYWRIGHT to a Playwright install.';
 function find() {
   const set = process.env.SENTRI_PLAYWRIGHT || process.env.PLAYWRIGHT_DIR;
   if (set) return set;
-  if (fs.existsSync(CACHE)) return CACHE;
   const req = createRequire(import.meta.url);
   try { return path.dirname(req.resolve('playwright/package.json')); } catch {}
-  try { const g = path.join(execSync('npm root -g', { encoding: 'utf8' }).trim(), 'playwright'); if (fs.existsSync(g)) return g; } catch {}
-  return CACHE;
+  try { const g = path.join(execSync('npm root -g', { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim(), 'playwright'); if (fs.existsSync(g)) return g; } catch {}
+  return null;
 }
 export const pwPath = find();
-export const playwright = () => createRequire(import.meta.url)(pwPath);
+export const playwright = () => {
+  if (!pwPath) throw new Error(HELP);
+  return createRequire(import.meta.url)(pwPath);
+};
