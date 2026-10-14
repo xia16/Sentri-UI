@@ -4,11 +4,9 @@
 .farrowing-phone .sow-detail-frame{position:absolute;inset:0;z-index:5;width:100%;height:100%;border:0;background:transparent}
 .farrowing-phone .section-title{display:flex;align-items:center;justify-content:flex-start;gap:7px;font-weight:600;line-height:1.4}
 .farrowing-phone .section-title>svg{width:15px;height:15px;color:#69765e;stroke-width:1.7}
-.farrowing-phone .sow-title-link{display:inline-flex;align-items:center;gap:8px;background:transparent;min-height:44px;position:relative;padding:8px 4px;margin:-8px -4px;font:inherit;letter-spacing:inherit;line-height:inherit;text-align:left}
-.farrowing-phone .sow-title-link>svg{width:16px;height:16px;color:var(--muted);stroke-width:1.8}
 
 .farrowing-phone .sheet-body>.segment:first-child{margin-top:0}
-.farrowing-phone .sheet[data-view="edit"] .edit-body{display:flex;flex-direction:column;padding:12px 21px 16px}
+.farrowing-phone .sheet[data-view="edit"] .edit-body{display:flex;flex-direction:column;padding-right:21px;padding-bottom:16px;padding-left:21px}
 .farrowing-phone .edit-review,.farrowing-phone .edit-finish-door{flex-shrink:0}
 .farrowing-phone .edit-counts{display:flex;flex-direction:column;flex:1;min-height:420px}
 .farrowing-phone .edit-counts :is(.entry-row,.st-stepper[data-variant="row"]){flex:1;min-height:60px}
@@ -237,12 +235,10 @@
 /* Record provenance belongs to the identity header in every completed state. */
 
 /* Separate location from record context with space rather than repeated punctuation. */
-.farrowing-phone .sheet-subtitle .sow-context{display:flex;flex-wrap:wrap;column-gap:12px;row-gap:2px}
-.farrowing-phone .sow-context .sow-location{white-space:nowrap}/* The Born row's correction key (the one plain key left on the edit sheet) */
+/* The Born row's correction key (the one plain key left on the edit sheet) */
 .farrowing-phone .key{width:46px;min-width:46px;height:46px;min-height:44px;border:1px solid var(--task-key-border);border-radius:12px;background:#fff;display:grid;place-items:center;touch-action:manipulation;flex-shrink:0;font-weight:500}
 .farrowing-phone .key svg{width:17px;height:17px;stroke-width:2.2}
 .farrowing-phone .key:active:not(:disabled){background:var(--ink);color:#fff}
-.farrowing-phone .sow-title-link::after{content:"";position:absolute;inset:-2px 0}
 .farrowing-phone .finish-extras.st-optional-list{margin-top:0}
 .farrowing-phone .entry-was{margin-left:6px;font:400 13px var(--font-sans);color:var(--muted)}
 /* The task outcome rows that carry a warning are the door: an amber word, what happens, a chevron */

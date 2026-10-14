@@ -15,10 +15,10 @@ function context(view) {
 function checkPage(html) {
   assert.match(html, /data-presentation="page"/);
   assert.match(html, /class="[^"]*\bsheet\b[^"]*"[^>]*data-st-context="page"/);
-  assert.equal((html.match(/class="[^"]*\bsurface-back\b[^"]*"/g) || []).length, 1);
+  // Headers law (2026-10-13): a page's one Back is at the top left of its page header; its footer has no Back.
+  assert.equal((html.match(/class="st-page-back" data-action="(?:back|returnCount|room-back)"/g) || []).length, 1);
+  assert.doesNotMatch(html, /class="[^"]*\bsurface-back\b[^"]*"/);
   assert.doesNotMatch(html, /class="scrim"|class="grab"|aria-modal="true"/);
-  const footer = html.match(/<(?:footer|div) class="[^"]*\bsheet-footer\b[^"]*"[^>]*>([\s\S]*?)<\/(?:footer|div)>/)?.[1] || '';
-  assert.equal((footer.match(/data-action="(?:back|returnCount|room-back)"/g) || []).length, 1);
 }
 
 for (const view of ['pig', 'pig-profile', 'pig-production', 'pig-origin', 'pig-log', 'pig-feed', 'pig-feed-curve', 'pig-feed-changes', 'history', 'pen-detail', 'pen-log', 'feed', 'unit-detail', 'environment', 'equipment', 'batch-detail']) {

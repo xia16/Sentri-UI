@@ -1,14 +1,9 @@
 /* Same Sentri surfaces and type, with explicit pig and pen scopes. */
 .inspection-phone .actions-sheet>.sheet-body{flex:1;padding-top:0}
-.inspection-phone .actions-sheet>.utility-header+.sheet-body{padding-top:12px}
 .inspection-phone .actions-subjects{flex-shrink:0;padding:18px 21px 16px}
 @media(max-width:370px){.inspection-phone .actions-subjects{padding-left:17px;padding-right:17px}}
 .inspection-phone{display:flex;flex-direction:column}
 .inspection-phone>.statusbar{flex-shrink:0}
-.inspect-header{display:flex;align-items:center;gap:8px;padding:0 18px 7px;min-height:56px;flex-shrink:0}
-.inspect-header h2{font-size:24px;letter-spacing:-.8px;margin:0;flex:1}
-.inspect-header>.icon-button{margin-left:-8px}
-.inspect-header>.text-button{font-size:var(--type-row-title-size);font-weight:600}
 .inspect-scroll{flex:1;min-height:0;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#cbd2c1 transparent;overscroll-behavior:contain;scroll-padding-top:68px}
 
 .inspect-intro{padding:0 18px 13px;color:var(--muted);font-size:var(--type-meta-size);line-height:1.7;margin:0}
@@ -304,7 +299,7 @@
 .inspection-phone .profile-next-card{display:flex;flex-direction:column;gap:5px;background:#f1f4eb;border-radius:10px;padding:12px;margin-bottom:22px}
 .inspection-phone .profile-next-card>span,.inspection-phone .profile-next-card>small{font-size:var(--type-meta-size);line-height:1.5;color:#5c6c50}
 .inspection-phone .profile-next-card>strong{font-size:15px;line-height:1.4;font-weight:600}
-.inspection-phone .pig-current-tasks{margin:0 0 24px}
+.inspection-phone .pig-current-tasks{margin:0 0 28px}
 .inspection-phone .pig-current-tasks-heading{display:flex;align-items:center;justify-content:space-between;gap:7px;min-height:44px;margin-bottom:8px;padding:0}
 .inspection-phone .pig-current-tasks-heading h4{margin:0;font-size:var(--type-meta-size);font-weight:600}
 .inspection-phone .pig-current-tasks-heading>span{font-size:var(--type-meta-size);line-height:1.4;color:var(--muted)}
@@ -472,7 +467,7 @@
 .feed-range-labels .text-button{font:var(--type-row-title-size) var(--font-sans);min-height:30px;padding:3px 12px}
 .feed-percent-control input:disabled{opacity:.45}
 .feed-unavailable{font:var(--type-meta-size)/1.6 var(--font-sans)}
-.inspection-phone .feed-editor-sheet>.sheet-body{display:flex;min-height:0;overflow:hidden;padding:14px 21px 8px;scrollbar-gutter:auto}
+.inspection-phone .feed-editor-sheet>.sheet-body{display:flex;min-height:0;overflow:hidden;padding:0 21px 8px;scrollbar-gutter:auto}
 .feed-fixed-form{flex:1;min-height:0;gap:10px}
 .feed-adjustment-line{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .feed-adjustment-line .field{flex-direction:row;align-items:center;gap:12px;flex:1}
@@ -513,7 +508,7 @@
 .feed-adjustment-heading .feed-reset{min-height:28px;padding:0 2px;font:600 var(--type-meta-size) var(--font-sans);color:#526847}
 .feed-control-caption>small{max-width:100%}
 .feed-optional-remove{margin-top:16px;min-height:44px}
-.inspection-phone .feed-optional-sheet>.sheet-body{padding:16px 21px 12px}
+.inspection-phone .feed-optional-sheet>.sheet-body{padding-right:21px;padding-bottom:12px;padding-left:21px}
 .feed-optional-sheet .field{margin-top:0;gap:8px}
 .feed-optional-sheet .feed-optional-remove{margin-top:4px}
 .feed-editor-sheet .feed-pig-rows{container-type:inline-size}
@@ -642,7 +637,7 @@
 
 
 /* Bulk record drafts share the feed editor's list-over-controls layout. */
-.inspection-phone .bulk-action-sheet>.sheet-body{display:flex;min-height:0;overflow:hidden;padding:14px 21px 8px;scrollbar-gutter:auto}
+.inspection-phone .bulk-action-sheet>.sheet-body{display:flex;min-height:0;overflow:hidden;padding:0 21px 8px;scrollbar-gutter:auto}
 .bulk-action-layout{display:flex;flex-direction:column;flex:1;min-height:0;gap:14px}
 .bulk-pigs{display:flex;flex-direction:column;flex:1;min-height:120px}
 .bulk-pig-list{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain}
@@ -676,7 +671,7 @@
 .bulk-pig-copy{overflow:hidden}
 .bulk-reading{min-width:0;justify-content:flex-end}
 
-.inspection-phone .single-action-sheet>.sheet-body{padding:16px 21px}
+.inspection-phone .single-action-sheet>.sheet-body{padding-right:21px;padding-bottom:16px;padding-left:21px}
 .inspection-phone .single-action-sheet .bulk-controls{max-height:none;overflow:visible}
 
 /* Catalogue selections and optional records reuse the feed editor controls. */
@@ -711,7 +706,7 @@
 /* Every drawer uses the same leading back control. */
 
 /* Keep the short form card clear of the fixed action bar, even when scrolling. */
-.inspection-phone .single-action-sheet[data-size="short"]>.sheet-body{padding-top:12px;padding-bottom:0;margin-bottom:16px}
+.inspection-phone .single-action-sheet[data-size="short"]>.sheet-body{padding-bottom:0;margin-bottom:16px}
 .inspection-phone .single-action-sheet[data-size="short"] .bulk-controls{gap:8px}
 .inspection-phone .single-action-sheet[data-size="short"] .bulk-controls>.quiet-note{margin:0}
 
@@ -771,9 +766,6 @@
 .unit-fault-action svg{width:14px;height:14px}
 .unit-empty-state{display:flex;align-items:center;gap:8px;padding:18px 14px;margin:0;background:#f5f6f0;border-radius:12px;font-size:var(--type-meta-size);color:var(--muted)}
 .unit-empty-state svg{width:16px;height:16px}
-.inspection-page-title{flex:1;min-width:0}
-.inspection-page-title small{display:block;font-size:var(--type-meta-size);color:var(--muted);margin-top:4px}
-.inspection-page-title h2{margin:0}
 
 .inspection-phone .attention-row>.st-condition[data-variant="mark"]{flex:none}
 
@@ -789,3 +781,10 @@
 .inspection-phone .ongoing-findings{margin-bottom:var(--space-section)}
 .inspection-phone .feed-editor-sheet .bulk-controls-toggle{min-height:var(--tap-min)}
 .inspection-phone .feed-editor-sheet .bulk-controls.facts-surface{max-height:none;overflow:visible}
+.inspect-intro-actions{display:flex;align-items:center;gap:8px;flex:none}
+/* The pen/pig scope tabs sit above the actions page body (Sheet `above`): the body keeps its gap under them (layout only). */
+.inspection-phone .sheet .actions-subjects+.sheet-body{padding-top:18px}
+.inspection-phone .sheet-body>.empty-inspect:first-child{padding-top:0}
+/* The check-in line is one line beside Log and End walk (or Check in again): the hand is written as initials (the house convention,
+   `Last record 08:41 · G.H`), so it fits; nowrap and the ellipsis are only a safety net (layout only). */
+.inspection-phone .inspect-intro>p{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}

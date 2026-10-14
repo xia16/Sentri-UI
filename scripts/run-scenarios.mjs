@@ -80,6 +80,12 @@ window.__scen = (() => {
     for (const fr of ph.querySelectorAll('iframe')) { let d = null; try { d = fr.contentDocument; } catch (e) {} if (d && d.body && (el = findStep(d.body, key))) return el; }
     return null;
   }
+  // An exit verb may be an icon button named by its aria-label (the page header's Back, Headers law 2026-10-13).
+  function hasName(where, text) {
+    const s = scope(where); if (!s) return false;
+    const want = norm(text);
+    return [...s.querySelectorAll('button[aria-label],a[aria-label],[role="button"][aria-label]')].some((n) => shown(n) && norm(n.getAttribute('aria-label')) === want);
+  }
   function hasText(where, text) {
     const s = scope(where); if (!s) return false;
     const want = norm(text);
@@ -120,7 +126,7 @@ window.__scen = (() => {
     return new Function('s', 'c', 'F', 'sum', 'return (' + expr + ');')(s, c, F, sum);
   }
   function backTarget() { return top(phone()); }
-  return { find, hasText, elState, clipped, record, backTarget, current: () => (window.AtlasBare && window.AtlasBare.current ? window.AtlasBare.current() : null), lang: () => document.documentElement.lang };
+  return { find, hasText, hasName, elState, clipped, record, backTarget, current: () => (window.AtlasBare && window.AtlasBare.current ? window.AtlasBare.current() : null), lang: () => document.documentElement.lang };
 })();`;
 
 const textOf = (a, lang) => {
@@ -150,7 +156,7 @@ async function checkOne(page, a, lang, width, noLocale = false) {
   if (t?.err) return { got: t.err };
   if (t?.skip) return { skipped: t.skip };
   if (t) {
-    const has = await page.evaluate(([w, x]) => window.__scen.hasText(w, x), [a.in || 'phone', t.text]);
+    const has = await page.evaluate(([w, x, v]) => window.__scen.hasText(w, x) || (v && window.__scen.hasName(w, x)), [a.in || 'phone', t.text, !!a.verb]);
     return has === !a.absent ? null : { got: has ? 'present' : 'absent', want: t.text };
   }
   return { got: 'unknown assertion ' + JSON.stringify(a) };
@@ -250,7 +256,7 @@ async function runLeaf(browser, leaf, lang, width) {
     await ensureHelpers(pg);
     if (lang !== 'en' && name === 'a') {   // the locale probe: does the page render this language at all?
       const back = verbs.Back?.[lang];
-      const ok = back && await pg.evaluate((x) => window.__scen.hasText('phone', x), back);
+      const ok = back && await pg.evaluate((x) => window.__scen.hasText('phone', x) || window.__scen.hasName('phone', x), back);
       if (!ok) notes.push(`no ${lang} rendering: ?lang=${lang} is ignored (no "${back}")`);
     }
     return { name, context, page: pg, offline: false };

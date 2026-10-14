@@ -19,6 +19,10 @@ const backlogItems = () => platform().backlog || [];
 function emptyView(what) { const pl = platform(), main = document.getElementById('main'); main.innerHTML = ''; main.append(el(`<div class="empty"><b>No ${esc(pl.name)} ${esc(what)} yet</b><span>${esc(pl.name)} ${esc(what)} will appear here when the ${esc(pl.name)} app has them.</span></div>`)); }
 const allFeatures = () => S.data.platforms.flatMap((p) => p.sections.flatMap((s) => s.features.map((f) => Object.assign({}, f, { sectionRef: s }))));
 const screenIndex = () => Object.fromEntries(allFeatures().flatMap((f) => f.screens.map((s) => [s.id, Object.assign({}, s, { feature: f })])));
+/* a page as it was at a commit: serve-ux answers /@<commit>/<path> from git; the Pages build writes those folders out.
+   On Pages the site sits under /<repo>, and atlas.json's urls already carry that prefix. */
+const BASE = location.pathname.replace(/\/atlas\/.*$/, '');
+const atCommit = (sha, url) => `${BASE}/@${sha}${BASE && url.startsWith(BASE + '/') ? url.slice(BASE.length) : url}`;
 const setParam = (k, v) => { const u = new URLSearchParams(location.search); v == null || v === '' ? u.delete(k) : u.set(k, v); history.replaceState(null, '', u.toString() ? '?' + u : location.pathname); };
 
 /* ---------- header ---------- */
@@ -170,7 +174,7 @@ function renderBoard() {
     r.querySelector('.cards').style.gridTemplateColumns = `repeat(${Math.min(3, s.features.length)}, 200px)`;
     s.features.forEach((f) => {
       const n = f.screens.length;
-      const c = el(`<button class="card ${f.status === 'placeholder' ? 'placeholder' : ''}"><div class="name">${dot(f.status)}<span class="ico" data-i="${esc(FEATURE_ICON[f.id] || '')}"></span>${esc(f.name)}</div><div class="zh">${esc(f.zh || '')}</div><div class="size">${plural(n, 'screen')}${hasPrd(f) ? '<span class="prdtag">PRD</span>' : ''}</div></button>`);
+      const c = el(`<button class="card ${f.status === 'placeholder' ? 'placeholder' : ''}"><div class="name">${dot(f.status)}<span class="ico" data-i="${esc(FEATURE_ICON[f.id] || '')}"></span>${esc(f.name)}</div><div class="zh">${esc(f.zh || '')}</div><div class="size">${plural(n, 'screen')}${hasPrd(f) ? '<span class="prdtag">PRD</span>' : ''}${layersOf(f.id).length ? `<span class="prdtag layertag" title="Unmerged changes: ${esc(layersOf(f.id).map((l) => l.author).join(', '))}">${esc(layersOf(f.id).map((l) => l.author).join(' · '))}</span>` : ''}</div></button>`);
       c.onclick = () => openFeature(f.id); r.querySelector('.cards').append(c);
     });
     plane.append(r);

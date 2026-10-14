@@ -21,9 +21,9 @@ const note = l => UI.field({ label: l, control: '<textarea rows="3"></textarea>'
 const rows = n => UI.panel(Array.from({ length: n }, (_, i) => UI.row({ title: 'Entry ' + (i + 1), description: 'Day 2 · B4', action: 'x' })).join(''), { className: 'st-row-group' });
 const footer = UI.sheetFooter({ back: { action: 'back' }, primary: { label: 'Record death', action: 'save', waiting: true }, status: { text: 'Say how many died' } });
 const set = (id, html, withBg) => { const el = document.getElementById(id); if (withBg) el.querySelector('.bg').innerHTML = bg(); el.querySelector('.over').innerHTML = html; };
-set('drawer', UI.sheet({ title: 'Record a death', subtitle: 'B4 · 11 alive', size: 'short', body: note('Cause'), footer }), true);
-set('page', UI.sheet({ variant: 'page', bar: '<div class="bar" aria-hidden="true">9:41</div>', title: 'Pen log', subtitle: 'B4 · Sow 000254', body: rows(4), footer: UI.sheetFooter({ back: { action: 'back' } }) }), false);
-set('dialog', UI.sheet({ variant: 'dialog', title: 'End task early?', icon: 'alert', subtitle: 'Unfinished work stays incomplete. Records are kept.', body: '', footer: UI.sheetFooter({ back: { action: 'back' }, primary: { label: 'End task early', action: 'end', register: 'danger' } }) }), true);
+set('drawer', UI.sheet({ title: 'Record a death', size: 'short', body: note('Cause'), footer }), true);
+set('page', UI.sheet({ variant: 'page', bar: '<div class="bar" aria-hidden="true">9:41</div>', title: 'Pen log', back: { action: 'back' }, body: rows(4), footer: false }), false);
+set('dialog', UI.sheet({ variant: 'dialog', title: 'End task early?', icon: 'alert', description: 'Unfinished work stays incomplete. Records are kept.', body: '', footer: UI.sheetFooter({ back: { action: 'back' }, primary: { label: 'End task early', action: 'end', register: 'danger' } }) }), true);
 </script>
 </body>
 </html>
