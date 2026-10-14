@@ -319,7 +319,8 @@ for (const r of results.filter((r) => r.error)) console.log('  ' + r.id + ': cou
 const gateStrict = /^Legibility gate: *strict/mi.test(fs.existsSync(path.join(root, 'docs/design-workflow/README.md')) ? fs.readFileSync(path.join(root, 'docs/design-workflow/README.md'), 'utf8') : '');
 const compare = val('--compare');
 let blocked = [];
-if (changed.length && !gateStrict && !flag('--strict')) {
+// An explicit --compare wins over the README's strict line: the gate passes it for a shared-component change (README, Legibility gate).
+if (changed.length && (compare || (!gateStrict && !flag('--strict')))) {
   if (!compare) { console.error('--changed needs --compare <base url> while the gate is no-regression (docs/design-workflow/README.md); or pass --strict'); process.exit(2); }
   const baseUrl = compare.replace(/[/]$/, '');
   const baseIds = new Set(); try { const ba = await (await fetch(baseUrl + '/atlas/atlas.json')).json(); for (const p of ba.platforms) for (const sc of p.sections) for (const f of sc.features || []) for (const x of f.screens || []) baseIds.add(x.id); } catch (e) { console.warn('warning: could not read the base atlas: ' + e.message); }
