@@ -16,6 +16,7 @@
    over the page (TaskTotals, then each litter), closed by a TaskHold. Stacking and motion only, tokens only. */
 .bk-body { display: flex; flex-direction: column; gap: var(--space-heading); }
 .bk-body > * { margin: 0; }
+.bk-ticks { display: flex; justify-content: space-between; }
 .bk-receipt { display: flex; flex-direction: column; gap: var(--space-key-gap); }
 /* The review: totals, each litter, one line per litter that differs, then the rule. */
 .bk-review { display: flex; flex-direction: column; gap: var(--space-heading); }
@@ -187,10 +188,13 @@
     return UI.panel('<div class="bk-receipt" id="bk-receipt">' + head + outcomeLines(R.outcomes.filter(function (x) { return x.outcome !== 'record'; }), false) + dbl + '</div>');
   }
   /* The text actions on the ticks, the page head's aside (farrowing's Clear): untick all, tick every litter one tap records. */
-  /* Tick all acts on the list, so it sits with the list (nothing in a header acts); Clear is quiet text in the footer. */
+  /* Tick all and Clear act on the list, so they sit with the list: a page header has no corner actions and its footer keeps Back
+     and the primary only (owner, 2026-10-14). Clear shows only while something is ticked. */
   function tickAll(b) {
     var free = b.rows.filter(function (r) { return tickable(r) && S.sel.indexOf(r.litter) < 0; }).length;
-    return free ? UI.button({ label: PP.t('pp.bulk.act.tick_all'), register: 'text', action: 'tick-all', strs: { label: 'pp.bulk.act.tick_all' } }) : '';
+    var all = free ? UI.button({ label: PP.t('pp.bulk.act.tick_all'), register: 'text', action: 'tick-all', strs: { label: 'pp.bulk.act.tick_all' } }) : '';
+    var clear = S.sel.length ? UI.button({ label: PP.t('act.clear'), register: 'text', action: 'clear', strs: { label: 'act.clear' } }) : '';
+    return all && clear ? '<div class="bk-ticks">' + all + clear + '</div>' : all + clear;
   }
   function page(opts) {
     var b = bulk();
@@ -203,7 +207,7 @@
     } else {
       body = (b.ended ? '' : tickAll(b)) + receiptPanel() + groups(b.rows);
       var p = b.plan;
-      foot = K.footer({ back: false, quiet: S.sel.length && !b.ended ? { label: { text: PP.t('act.clear'), str: 'act.clear' }, action: 'clear' } : null, primary: S.sel.length && p.litters
+      foot = K.footer({ back: false, primary: S.sel.length && p.litters
         ? { label: s(one('pp.bulk.act.review', p.litters), { k: p.litters }), action: 'review' }
         : { label: s('pp.bulk.act.review_none'), action: 'review', waiting: true } });
     }

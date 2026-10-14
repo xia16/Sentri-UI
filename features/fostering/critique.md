@@ -91,3 +91,46 @@ Final look: screens of a2990df (this block's commit adds no pixel), every inspec
 - Known, not fixed: the End walk sheet's body copy (`Recorded during this walk`, the check-in note) is still English in ZH.
 - **Better because** the Move sheet fits 360 with a one-line primary that says verb, count and place, and every Inspection sheet named opens and speaks Chinese in ZH.
 - Final look after the merge of main (851dcba, docs and gate only): the screens of 3b81324, rendered by the gate at 390 and 360 in EN and ZH against base 851dcba, mechanical pass; only SCOPE moved (health-record.care-states en-360, 0.03%, renders differently twice on base: noise). This line's commit adds no pixel.
+
+# Header corners (2026-10-14)
+
+Scope: the sheet header's corner actions and title room, by the Headers law → Corner actions and Title length (`ux/design-system/README.md`, owner ruling C, 2026-10-14; PR #165). Baselines: `origin/main` at `39637ff`, shot with `node scripts/shoot-screens.mjs` at 390 and 360, EN and ZH; titles measured at a true 360 (the phone width forced after load, so a bare page pinned to 390 cannot hide an overflow).
+
+### Keep
+
+- Every title that already fits names its job (`Record dead`, `Edit record`, `Filter sows`, `Move piglets`): unchanged, still the heaviest thing in the header.
+- Clear and Reset keep their one meaning (`ux/laws/strings.json`), their quiet text register, their words and their presence rule (only while there is something to clear or reset).
+- Bodies, rows, footers' Back and primary, the hairline and the 24px to the body: untouched.
+
+### Problems
+
+- **major** · Clear sat in the footer between Back and `Move 2 · C03 → C05` (law 2026-10-14); at a true 360 it squeezed the primary.
+
+### Parts
+
+| Part | Drawn by today | The component whose job it is | Keep / fix / cut |
+|---|---|---|---|
+| Clear on Move piglets | sheetFooter `quiet` | Sheet `corner` | **fix** |
+
+### Self-crit
+
+The ruling fixes the design (the boards `evidence/2026-10-14-header-corners.png` and `-header-room.png`, direction C): no competing directions. Each screen is held against its baseline and the Farrowing room.
+
+#### Round 1 (renders at 390 and 360, EN and ZH, beside `39637ff`)
+- Clear / Reset sit at the top right, 48px targets (Clear 52px, 清除 48px), vertically centred on the title block: measured 0px off its centre on every changed drawer, with and without a header line (`Farrowing record` + route line: the corner sits between the two lines, as board C).
+- The footer is Back and the primary alone: the primary gains the width the quiet word took.
+- Squint: the title, then the first card; the corner word is quiet and does not compete with the title.
+- Cluttered, flat or bulky against the original: less in the footer, nothing added to the body; the header gains one quiet word only while there is something to clear.
+- **Better because** the destructive-but-safe act (empty the draft) leaves the thumb zone beside the commit, and every drawer clears and resets in one place.
+
+#### Final look (61bc01e, pushed head; renders at 390 and 360, EN and ZH, beside 39637ff; the gate's pairs at 4571e5e)
+- Reach: 19 screens moved (gate, base 39637ff), all in this change's scope (farrowing, inspection, pig-list, pig-profile, health-record, environment, fostering); `assistant.up-to-date` is the gate's known flaky screen. 272 identical, none broken.
+- Problems fixed: Clear and Reset sit at the top right, 0px off the title block's centre (with and without a line), present only while there is something to clear; the footers are Back and the primary; every drawer title fits 204px and every page title 216px at a true 360 (header check: 0 defects on the changed screens); the 24px under each header is the header's alone.
+- Keep as strong: titles that fit, bodies, rows and primaries unchanged; Filter sows and Filter pigs at their defaults now show no Reset.
+- Squint: the title, then the first card; the corner word stays quiet.
+- **Better because** the act that empties a draft leaves the thumb's commit zone, every drawer clears in the same place, and no title can collide with a corner at 360.
+
+#### Final look after crit round 1 (2449cb7, origin/main merged; renders at 390 and 360, EN and ZH, beside 39637ff)
+- Screens with changed titles, and fostering after the merge: `pig-profile.measurements` (`Measurements`), `environment.report-issue`, `farrowing.allocate`, `farrowing.reconcile`, `farrowing.piglet-death`, `fostering.piglets`, `fostering.result`. Header check: 0 defects (room, corner, gap, contents, wrap).
+- Fostering keeps main's primary (`Move 2 to C05`, #159) beside Back; Clear stays at the top right, now at a true 360.
+- **Better because** each title is a name that fits its room, and nothing else moved.
