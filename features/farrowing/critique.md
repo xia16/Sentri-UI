@@ -161,3 +161,9 @@ Held against its baseline (`7f5b627`) and the house reference the Farrowing room
 - The switch stands apart from the list at 390 and 360; the six rows, the footer and the header are unchanged pixel for pixel in shape.
 - Photos is on screen from the start under Other, the quiet card's top edge peeking above the footer at 844 (the long drawer is full); scrolling or a tap on the waiting camera shows it whole with its hint.
 - **Better because** the first cause no longer reads as part of the switch, and the optional photo is always there, waiting visibly instead of appearing from nowhere.
+
+#### Crit round 1 (driver, on bc996b1): "the photo still looks exactly as it did, a lone half-width card, and the footer now cuts it in half"
+- Photos draws its own documented face again (README `line`): full width, `Photos` with the muted `Optional`, the outlined camera at the right (dashed while it waits). The shared quiet-card restyle of OptionalRow had reached Photos; the fix is in the component (`bundle.css`, `.st-photos-camera`), so Report piglet mortality shows the same row (farrowing, in scope).
+- The drawer: Record dead is held at the Sheet's outer cap (`100% - size-80`, top at 80px) instead of the long 85%. Measured on every state at 390 and 360, EN and ZH: the body no longer scrolls in Piglets (draft or not, with the hint) or The sow (with or without a cause), so the Photos row and the sow's danger banner are whole on the first frame; only thumbnails a worker adds scroll.
+- Kept: the 24px under the switch, the steppers and the header, untouched.
+- **Better because** the photo now reads as one optional row of the form, whole on screen, waiting visibly, and nothing sits under the footer.

@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-14T07:44:11.713Z",
- "commit": "456cc45",
+ "generated": "2026-10-14T10:21:04.314Z",
+ "commit": "bc996b1",
  "platforms": [
   {
    "id": "mobile",
@@ -3990,14 +3990,14 @@
            },
            {
             "name": "Photos",
-            "shows": "Optional photos, always shown last in capture order: empty, a small quiet \"Photos\" card with a camera; with photos, a full-width row \"Photos · N attached\" and the thumbnails under it.",
+            "shows": "The optional photo row, always shown last in capture order and whole on the first frame: full width, \"Photos\" with the muted \"Optional\" and an outlined camera at the right; with photos, \"N attached\" under the label and the thumbnails below.",
             "source": "farrowing-astra-concept.js death() photo-field",
             "at": "Photos",
             "states": [
              {
               "state": "Waiting",
               "when": "No death drafted (Piglets) or no cause chosen (The sow)",
-              "shows": "The card is inactive and its hint line reads \"Record a death first · photos ride that record\"; a tap re-announces the hint and scrolls it above the footer, and opens no camera"
+              "shows": "The camera's outline is dashed and the hint line reads \"Record a death first · photos ride that record\"; a tap re-announces the hint (scrolling it into view on a short phone) and opens no camera"
              },
              {
               "state": "Ready",
@@ -4007,7 +4007,7 @@
              {
               "state": "With photos",
               "when": "One or more photos taken (12 at most)",
-              "shows": "Full-width row with \"N attached\", thumbnails below; a thumbnail opens the photo with Back and Delete"
+              "shows": "\"N attached\" under the label, thumbnails below (the body scrolls); a thumbnail opens the photo with Back and Delete"
              }
             ],
             "rule": "Photos ride the save; Clear drops them with the draft."
@@ -4047,7 +4047,8 @@
           ],
           "edge": [
            "Sow cannot be saved dead twice: sow mode disappears once ended",
-           "A piglet draft or an Edit draft blocks saving the sow's death"
+           "A piglet draft or an Edit draft blocks saving the sow's death",
+           "The drawer is held at the Sheet's outer cap (80px under the top) so the causes and the Photos row fit on the first frame in both modes; thumbnails scroll."
           ],
           "rules": [
            "\"ONE dead drawer product-wide\" (Surfaces & entrances)",
