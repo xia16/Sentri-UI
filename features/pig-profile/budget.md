@@ -41,4 +41,4 @@ By the Headers law → Corner actions and Title length (`ux/design-system/README
 
 | Surface | Corner action (top right) | Present while | Title | Fits at 360 (EN · ZH) |
 |---|---|---|---|---|
-| Measure & condition (one pig) | none | | **`Measure & condition`** (was `Measurements & condition`, 247px): the two jobs of the menu, measure (weight, temperature, backfat) and record condition; ZH stays `测量与体况` (98px). The More actions row that opens it keeps its longer label (rows have room) | 188px · 98px |
+| Measurements (one pig) | none | | **`Measurements`** (was `Measurements & condition`, 247px; crit round 1 rejected `Measure & condition`, a verb mashed with a noun): a noun phrase naming what the sheet holds. Every row is a reading taken off the pig: body condition (a score), weight, temperature, backfat; condition does not lead (one row of four), so it needs no place in the name. ZH `测量` when this surface is translated (the concept renders EN only). The More actions row that opens it keeps its longer label (rows have room) | 137px · 39px |

@@ -121,3 +121,6 @@ Scope: the header-to-body gap (Headers law: `space-section`, 24px, the header's)
 - Keep as strong: titles that fit, bodies, rows and primaries unchanged; Filter sows and Filter pigs at their defaults now show no Reset.
 - Squint: the title, then the first card; the corner word stays quiet.
 - **Better because** the act that empties a draft leaves the thumb's commit zone, every drawer clears in the same place, and no title can collide with a corner at 360.
+
+#### Crit round 1 (driver, on 50e04b7)
+- Reason: `Measure & condition` is not a name (a verb mashed with a noun). Fixed: the sheet is `Measurements` (137px), a noun phrase for what it holds; recorded in `budget.md`. The other rewrites were checked against the same test: `Report fault`, `Allocate piglets`, `Correct piglet count`, `Record piglet deaths` name a task as every task title here does (`Record dead`); `Feed adjustment` and `Feeding exception` are nouns. Nothing else changed.

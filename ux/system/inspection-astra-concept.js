@@ -884,7 +884,7 @@ function measurementsMenu(c){
  items.push({a:'weight',k:'weight',title:'Record weight',sub:single?'Weight in kg':'A separate value for each pig'});
  if(single)items.push({a:'temperature',k:'temperature',title:'Record temperature',sub:'Body temperature in °C'});
  if(rows.some(p=>['Sow','Gilt'].includes(animalType(p))))items.push({a:'backfat',k:'measure',title:'Record backfat',sub:single?'Backfat depth in mm':'Sows and gilts · separate readings'});
- return sheet(c,'Measure & condition',single?rows[0].id:selectionLabel(c),'<div class="compact-actions st-panel st-row-group st-action-list">'+actionRows(items)+'</div>',footer(back(),''),'menu',single?pigRoute(c,rows[0]):null);
+ return sheet(c,'Measurements',single?rows[0].id:selectionLabel(c),'<div class="compact-actions st-panel st-row-group st-action-list">'+actionRows(items)+'</div>',footer(back(),''),'menu',single?pigRoute(c,rows[0]):null);
 }
 
 function unavailableActionsPage(c){return sheet(c,'Unavailable actions',picked(c).length===1?picked(c)[0].id+' · '+penOf(c,picked(c)[0].id).id:selectionLabel(c),actionSections(c,unavailableActionGroups(c),true),footer(back(),''),'menu');}
