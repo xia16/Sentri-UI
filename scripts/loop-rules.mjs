@@ -424,3 +424,30 @@ export function lockState(lock, alive) {
   if (!lock) return 'free';
   return Number.isInteger(lock.pid) && alive(lock.pid) ? 'held' : 'stale';
 }
+
+// Carrying a GATE PASS over main moving on (gate.mjs --carry). The gate passed C on base M1; the PR head is now C2, main is M2.
+// It carries only when C2 is C merged with main and nothing else, and main's own change since M1 reaches no screen.
+//   pass: the pass record for C · mech: C's mechanical.json · head, main: C2, M2 · containsC / containsMain: C2 contains C / M2
+//   ownCommits: commits in C2 that are in neither C nor M2 and aren't merges · cand: path -> blob on C, for every path M1..C changed
+//   carried: the same for M2..C2 on C2 · mainFiles: the paths M1..M2 changed · reach: reachOf(mainFiles)
+export function carryDecision({ pass, mech, head, main, containsC, containsMain, ownCommits = [], cand = {}, carried = {}, mainFiles = [], reach }) {
+  const s = (x) => String(x || '?').slice(0, 7);
+  const no = (why) => ({ ok: false, why: [why] });
+  if (!pass) return no(`no GATE PASS is recorded for ${s(mech.candidate)}: run the gate`);
+  if (pass.carried) return no(`the pass for ${s(mech.candidate)} was itself carried: carry from the gated run's folder`);
+  if (pass.base !== mech.base) return no(`the pass for ${s(mech.candidate)} is against ${s(pass.base)}, the gate ran against ${s(mech.base)}`);
+  if (!head) return no(`${mech.ref || 'the candidate ref'} does not resolve`);
+  if (!main) return no('origin/main does not resolve');
+  if (main === mech.base) return no(head === mech.candidate ? 'main has not moved: the pass stands as it is' : `${mech.ref} moved to ${s(head)} while main did not: run the gate again`);
+  if (!containsC) return no(`${s(head)} does not contain the gated commit ${s(mech.candidate)}: run the gate again`);
+  if (!containsMain) return no(`${s(head)} does not contain origin/main ${s(main)}: merge main forward first`);
+  const why = [];
+  if (ownCommits.length) why.push(`${ownCommits.length} commit(s) on the PR since the gate besides the merge of main (${ownCommits.slice(0, 3).map(s).join(', ')}): run the gate again`);
+  const both = mainFiles.filter((f) => Object.hasOwn(cand, f));
+  if (both.length) why.push(`main and the candidate both changed ${both.slice(0, 3).join(', ')}: run the gate again`);
+  const paths = [...new Set([...Object.keys(cand), ...Object.keys(carried)])];
+  const edited = paths.filter((p) => cand[p] !== carried[p] && !both.includes(p));
+  if (edited.length) why.push(`the merge is not just main: ${edited.slice(0, 3).join(', ')} differ from the gated commit (a conflict resolved or an edit): run the gate again`);
+  if (!reach || reach.all || reach.features.length) why.push(`main's change since ${s(mech.base)} can reach ${!reach || reach.all ? 'every screen' : `screens of ${reach.features.join(', ')}`}${reach?.why.length ? ` (${reach.why.join('; ')})` : ''}: run the gate again`);
+  return why.length ? { ok: false, why } : { ok: true, why: [`main moved ${s(mech.base)} → ${s(main)} by ${mainFiles.length} file(s) that draw no pixel, and ${s(head)} is ${s(mech.candidate)} merged with it and nothing else`] };
+}

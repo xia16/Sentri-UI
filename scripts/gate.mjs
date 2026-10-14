@@ -1,15 +1,19 @@
 // The mechanical gate on the exact merge candidate: docs/design-workflow/briefs/gate.md §1, plus the screen diff and the
 // before/after pairs the judge decides on (§3-4).
 // Usage: node scripts/gate.mjs --candidate <ref> --scope <feature,...> [--class copy|presentation|behaviour|shared]
-//                              [--mode normal|refactor] [--out <dir>] [--quick] [--keep]
+//                              [--mode normal|refactor] [--out <dir>] [--quick] [--all] [--keep]
 //   --candidate  the branch (or commit) to merge; it must already contain origin/main (merge main forward first)
 //   --scope      the features the change means to touch; a changed screen elsewhere makes it a shared-component change
 //   --quick      compare only the scope's screens (a builder's self-check; the gate itself never runs quick)
+//   --all        shoot every screen in full, whatever the change's reach (by default: its reach in full, a tripwire elsewhere)
+// One gate runs at a time on a machine (a lock in the git common dir); base shots are cached per main commit.
 // Run it from an up-to-date main checkout, never from the candidate: a candidate does not grade itself with its own gate.
 // Writes <out>/mechanical.json and, for every changed, new or removed screen, <out>/pairs/<screen>/<lang>-<width>.png
 // (base | candidate) at 390 and 360 in EN and ZH.
 // Exit 0 when every mechanical check passes; the judge (gate.md) then writes <out>/verdict.json, and
 // `node scripts/gate.mjs --verdict <out>` checks it against mechanical.json, the PR head and origin/main.
+// When main has moved on since a GATE PASS by files that draw no pixel and the PR merged it in and nothing else,
+// `node scripts/gate.mjs --carry <out>` records the pass for the new head without shooting a screen.
 import { spawn, spawnSync } from 'node:child_process';
 import { pwPath, playwright } from './playwright-path.mjs';
 import { createServer } from 'node:net';
@@ -18,7 +22,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { CLASSES, screensOf, pageOf, pageAssets, sharedFiles, coverageLost, effectiveClass, classifyScreens, checkVerdict, touchesSystem, touchesTools, queueAhead as queueOf, budgetProblems, critiqueProblems, pageStyling, addedLines, calibrationProblems, lockState, shotsToTake, reachOf, reachLine } from './loop-rules.mjs';
+import { CLASSES, screensOf, pageOf, pageAssets, sharedFiles, coverageLost, effectiveClass, classifyScreens, checkVerdict, touchesSystem, touchesTools, queueAhead as queueOf, budgetProblems, critiqueProblems, pageStyling, addedLines, calibrationProblems, lockState, shotsToTake, reachOf, reachLine, carryDecision } from './loop-rules.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -79,6 +83,66 @@ if (opt('verdict')) {
   process.exit(ok ? 0 : 1);
 }
 
+// ---------- --carry <out>: a GATE PASS carried over main moving on by files that draw no pixel ----------
+// The gate passed C against main M1 (<out>/mechanical.json and its pass record). Main is now M2 and the PR head C2. The pass is
+// recorded for C2 without shooting a screen only when C2 is C merged with M2 and nothing else (every path the candidate changed is
+// as it was on C, no other path differs from M2, no commit of its own since C) and main's change M1..M2 reaches no screen (reachOf).
+// Anything else: run the gate again. A stricter gate landing on main does not void a pass by itself (README, Approvals).
+if (opt('carry')) {
+  const dir = opt('carry');
+  const refuse = (why) => { console.log('NOT CARRIED: run the gate again'); for (const w of [].concat(why)) console.log('  -', w); process.exit(1); };
+  let mech;
+  try { mech = JSON.parse(fs.readFileSync(path.join(dir, 'mechanical.json'), 'utf8')); } catch (e) { refuse(`${path.join(dir, 'mechanical.json')}: ${e.message.split('\n')[0]}`); }
+  if (!mech.candidate || !mech.base || mech.quick) refuse('mechanical.json is not a full gate run on a candidate');
+  const fetched = git(['fetch', '-q', 'origin']);
+  if (fetched.code !== 0) refuse(`git fetch origin failed, so the PR head and origin/main can't be checked: ${fetched.err.trim().split('\n')[0]}`);
+  const stale = git(['diff', '--name-only', 'origin/main', '--', 'scripts', 'docs/design-workflow', 'package.json']).out.trim().split(/\r?\n/).filter(Boolean);
+  if (stale.length) refuse(`this checkout's ${stale.slice(0, 3).join(', ')} differ from origin/main: carry from a checkout of origin/main`);
+  const sha = (r) => (r ? git(['rev-parse', '--verify', '--quiet', `${r}^{commit}`]).out.trim() : '');
+  const C = mech.candidate, M1 = mech.base, head = sha(mech.ref), main = sha('origin/main');
+  let pass = null;
+  try { pass = JSON.parse(fs.readFileSync(passRecord(C), 'utf8')); } catch {}
+  const changed = (a, b) => git(['diff', '--name-only', '--no-renames', a, b]).out.split(/\r?\n/).filter(Boolean);
+  const blobs = (a, b, at) => Object.fromEntries(changed(a, b).map((f) => [f, git(['rev-parse', '--verify', '--quiet', `${at}:${f}`]).out.trim() || null]));
+  // An atlas commit's screens and what their pages load, read straight from git.
+  const pagesAt = (rev) => {
+    const tree = new Set(git(['ls-tree', '-r', '--name-only', rev]).out.split(/\r?\n/).filter(Boolean));
+    const show = (p) => (tree.has(p) ? git(['show', `${rev}:${p}`]).out : null);
+    let screens = [];
+    try { screens = screensOf(JSON.parse(show('atlas/atlas.json'))); } catch {}
+    const assets = {};
+    for (const p of new Set(screens.map((s) => pageOf(s.url)))) { const html = show(p); assets[p] = html == null ? [] : pageAssets(html, p).filter((a) => tree.has(a)); }
+    return { screens, assets };
+  };
+  const ready = head && main && main !== M1;
+  const mainFiles = ready ? changed(M1, main) : [];
+  let reach = null;
+  if (ready) {
+    const [a, b] = [pagesAt(M1), pagesAt(main)];
+    const screens = [...a.screens, ...b.screens], assets = { ...a.assets };
+    for (const [p, l] of Object.entries(b.assets)) assets[p] = [...new Set([...(assets[p] || []), ...l])];
+    reach = reachOf({ files: mainFiles, screens, assets, shared: sharedFiles(screens, assets), scope: [] });
+  }
+  const d = carryDecision({
+    pass, mech, head, main, reach, mainFiles,
+    containsC: ready && git(['merge-base', '--is-ancestor', C, head]).code === 0,
+    containsMain: ready && git(['merge-base', '--is-ancestor', main, head]).code === 0,
+    ownCommits: ready ? git(['rev-list', '--no-merges', head, `^${C}`, `^${main}`]).out.split(/\s+/).filter(Boolean) : [],
+    cand: ready ? blobs(M1, C, C) : {},
+    carried: ready ? blobs(main, head, head) : {},
+  });
+  if (!d.ok) refuse(d.why);
+  const desc = `GATE PASS carried from ${short(C)}: main ${short(M1)}..${short(main)} draws no pixel`;
+  spawnSync('gh', ['api', '--method', 'POST', `repos/{owner}/{repo}/statuses/${head}`, '-f', 'state=success', '-f', 'context=sentri/gate', '-f', `description=${desc}`], { cwd: root, encoding: 'utf8' });
+  fs.mkdirSync(path.dirname(passRecord(head)), { recursive: true });
+  fs.writeFileSync(passRecord(head), JSON.stringify({ candidate: head, base: main, ref: mech.ref, out: path.resolve(dir), at: new Date().toISOString(), carried: { from: C, base: M1, verdict: 'GATE PASS', mainFiles } }, null, 2));
+  console.log(`GATE PASS ${short(head)} (carried)`);
+  console.log(`  - the gated pass: ${short(C)} against main ${short(M1)}`);
+  for (const w of d.why) console.log('  -', w);
+  console.log(`merge: gh pr merge <n> --squash --match-head-commit ${head}`);
+  process.exit(0);
+}
+
 const ref = opt('candidate');
 const declared = opt('class') || 'presentation';
 const mode = opt('mode') || 'normal';
@@ -86,6 +150,7 @@ const scope = (opt('scope') || '').split(',').map((s) => s.trim()).filter(Boolea
 if (!ref || !CLASSES.includes(declared) || !['normal', 'refactor'].includes(mode) || (mode === 'normal' && !scope.length)) {
   console.error('usage: node scripts/gate.mjs --candidate <ref> --scope <feature,...> [--class copy|presentation|behaviour|shared] [--mode normal|refactor] [--out <dir>] [--quick] [--all] [--keep]');
   console.error('       node scripts/gate.mjs --verdict <out dir>');
+  console.error('       node scripts/gate.mjs --carry <out dir>');
   process.exit(2);
 }
 const out = path.resolve(opt('out') || path.join(os.tmpdir(), `sentri-gate-${Date.now()}`));

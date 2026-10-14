@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { queueAhead, calibrationProblems, budgetProblems, critiqueProblems, pageStyling, addedLines, effectiveClass, classifyScreens, checkVerdict, checkGrades, worstFirst, isClean, loopStatus, touchesSystem, touchesTools, regressions,
-  pageOf, pageAssets, sharedFiles, outcomeLeaves, coverageLost, reachOf, reachLine, shotsToTake, timedOutOnly, lockState } from '../scripts/loop-rules.mjs';
+  pageOf, pageAssets, sharedFiles, outcomeLeaves, coverageLost, reachOf, reachLine, shotsToTake, timedOutOnly, lockState, carryDecision } from '../scripts/loop-rules.mjs';
 
 test('a change to the bundle or tokens is a shared-component change whatever was declared', () => {
   assert.deepEqual(touchesSystem(['ux/design-system/components/bundle.css', 'features/farrowing/feature.json']), ['ux/design-system/components/bundle.css']);
@@ -368,4 +368,30 @@ test('reach: a file nothing classes falls back to every screen, and a page that 
   const w = reachWorld();
   w.assets['ux/system/inspection-astra-concept.html'].push('scripts/inspection-data.js');
   assert.deepEqual(reachOf({ ...w, shared: sharedFiles(w.screens, w.assets), files: ['scripts/inspection-data.js'] }).features, ['inspection']);
+});
+
+test('carry: a pass carries over main moving on only by files that draw no pixel, merged in and nothing else', () => {
+  const mech = { candidate: 'c1', base: 'm1', ref: 'origin/ds/x' };
+  const ok = { pass: { candidate: 'c1', base: 'm1' }, mech, head: 'c2', main: 'm2', containsC: true, containsMain: true, ownCommits: [],
+    cand: { 'ux/system/inspection-astra-concept.js': 'blob1' }, carried: { 'ux/system/inspection-astra-concept.js': 'blob1' },
+    mainFiles: ['docs/design-workflow/README.md'], reach: reach(['docs/design-workflow/README.md']) };
+  const r = carryDecision(ok);
+  assert.ok(r.ok, r.why.join());
+  assert.match(r.why[0], /main moved m1 → m2 by 1 file\(s\) that draw no pixel/);
+  const no = (x, re) => { const d = carryDecision({ ...ok, ...x }); assert.ok(!d.ok, JSON.stringify(x)); assert.match(d.why.join(' | '), re); };
+  no({ pass: null }, /no GATE PASS is recorded for c1/);
+  no({ pass: { candidate: 'c1', base: 'm0' } }, /is against m0/);
+  no({ pass: { candidate: 'c1', base: 'm1', carried: { from: 'c0' } } }, /itself carried/);
+  no({ main: 'm1', head: 'c1' }, /main has not moved/);
+  no({ main: 'm1' }, /moved to c2 while main did not/);
+  no({ containsC: false }, /does not contain the gated commit c1/);
+  no({ containsMain: false }, /merge main forward first/);
+  no({ ownCommits: ['e1'] }, /1 commit\(s\) on the PR since the gate/);
+  no({ carried: { 'ux/system/inspection-astra-concept.js': 'blob2' } }, /the merge is not just main: ux\/system\/inspection-astra-concept\.js/);
+  no({ carried: { ...ok.carried, 'ux/system/home.js': 'blob3' } }, /the merge is not just main: ux\/system\/home\.js/);
+  no({ carried: {} }, /the merge is not just main/);
+  no({ mainFiles: ['ux/system/inspection-astra-concept.js'], reach: reach(['ux/system/inspection-astra-concept.js']) }, /both changed ux\/system\/inspection-astra-concept\.js.*screens of inspection/);
+  no({ mainFiles: ['ux/system/home.css'], reach: reach(['ux/system/home.css']) }, /can reach every screen/);
+  no({ mainFiles: ['features/weaning/budget.md'], reach: reach(['features/weaning/budget.md']) }, /can reach screens of weaning/);
+  no({ reach: null }, /can reach every screen/);
 });
