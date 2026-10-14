@@ -429,8 +429,8 @@
          "id": "weight.enter",
          "label": "type 18 kg",
          "taps": [
-          "[data-action='pad'][data-value='1']",
-          "[data-action='pad'][data-value='8']"
+          "[data-action='pad'][data-key='1']",
+          "[data-action='pad'][data-key='8']"
          ],
          "children": [
           {
