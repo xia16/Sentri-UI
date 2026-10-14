@@ -1,0 +1,3207 @@
+{
+ "tolerances": {
+  "gap": 24,
+  "slack": 2
+ },
+ "screens": [
+  {
+   "screen": "assistant.needs-you",
+   "feature": "assistant",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "assistant.finding",
+   "feature": "assistant",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "assistant.answered",
+   "feature": "assistant",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "assistant.up-to-date",
+   "feature": "assistant",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "assistant.conversations",
+   "feature": "assistant",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "assistant.conversation",
+   "feature": "assistant",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "environment.page",
+   "feature": "environment",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "environment.fan-manual",
+   "feature": "environment",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "environment.maintenance",
+   "feature": "environment",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "environment.maintenance-empty",
+   "feature": "environment",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "environment.report-issue",
+   "feature": "environment",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Report equipment issue",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "environment.issue-detail",
+   "feature": "environment",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Drinking station",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "environment.issue-resolved",
+   "feature": "environment",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Drinking station",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "environment.sensor-week",
+   "feature": "environment",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "environment.sensor-other",
+   "feature": "environment",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "workbench.today",
+   "feature": "workbench",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "workbench.choose-unit",
+   "feature": "workbench",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Choose a unit",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "workbench.choose-unit-current",
+   "feature": "workbench",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Choose a unit",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "workbench.sections",
+   "feature": "workbench",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "Your sections",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "workbench.gestation",
+   "feature": "workbench",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "workbench.work-due",
+   "feature": "workbench",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "workbench.all-recorded",
+   "feature": "workbench",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "workbench.quiet-section",
+   "feature": "workbench",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "workbench.unit",
+   "feature": "workbench",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "workbench.unit-farrowing",
+   "feature": "workbench",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "workbench.end-task-early",
+   "feature": "workbench",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "workbench.work-waiting",
+   "feature": "workbench",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "workbench.round-complete",
+   "feature": "workbench",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "workbench.unit-clear",
+   "feature": "workbench",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "workbench.unit-health",
+   "feature": "workbench",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "workbench.unit-feed",
+   "feature": "workbench",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "workbench.unit-maintenance",
+   "feature": "workbench",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "workbench.unit-busy",
+   "feature": "workbench",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "workbench.unit-unknown",
+   "feature": "workbench",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "workbench.toolbox",
+   "feature": "workbench",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "Toolbox",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "workbench.records",
+   "feature": "workbench",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "Records",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "breeding.list",
+   "feature": "breeding",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "breeding.overview",
+   "feature": "breeding",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "breeding.record",
+   "feature": "breeding",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "breeding.picker",
+   "feature": "breeding",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "breeding.filter",
+   "feature": "breeding",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "breeding.peek",
+   "feature": "breeding",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "farrowing.room",
+   "feature": "farrowing",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "Farrowing",
+     "lines": 1,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "farrowing.count",
+   "feature": "farrowing",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Farrowing record",
+     "lines": 1,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "farrowing.before",
+   "feature": "farrowing",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Farrowing record",
+     "lines": 1,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "farrowing.death",
+   "feature": "farrowing",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Record dead",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "farrowing.finish",
+   "feature": "farrowing",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Finish farrowing",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "farrowing.leave-edit",
+   "feature": "farrowing",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "farrowing.locked",
+   "feature": "farrowing",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Farrowing record",
+     "lines": 1,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "farrowing.edit",
+   "feature": "farrowing",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Edit record",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "farrowing.born",
+   "feature": "farrowing",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Edit record",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "farrowing.history",
+   "feature": "farrowing",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "Farrowing log",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "farrowing.allocate",
+   "feature": "farrowing",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "7 piglets to allocate",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": [
+    {
+     "check": "contents",
+     "at": 466,
+     "detail": "sheet header \"7 piglets to allocate\" shows a count \"7 piglets\" in its title: counts go in the body",
+     "lang": "en",
+     "width": 390
+    },
+    {
+     "check": "contents",
+     "at": 466,
+     "detail": "sheet header \"7 piglets to allocate\" shows a count \"7 piglets\" in its title: counts go in the body",
+     "lang": "zh",
+     "width": 360
+    }
+   ]
+  },
+  {
+   "screen": "farrowing.ended",
+   "feature": "farrowing",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Farrowing record",
+     "lines": 1,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "farrowing.task-blocked",
+   "feature": "farrowing",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "End task early",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "farrowing.task-ready",
+   "feature": "farrowing",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "End task early",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "farrowing.task-complete",
+   "feature": "farrowing",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "End task",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "farrowing.task-outcomes",
+   "feature": "farrowing",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "End task early",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "farrowing.edit-finished",
+   "feature": "farrowing",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Edit record",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "farrowing.overview",
+   "feature": "farrowing",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "Task overview",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "farrowing.task-receipt",
+   "feature": "farrowing",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "Task ended",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "farrowing.foster",
+   "feature": "farrowing",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "Foster piglets",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "farrowing.reconcile",
+   "feature": "farrowing",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "Reconcile piglet count",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "farrowing.filter",
+   "feature": "farrowing",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Filter sows",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "farrowing.pen-map",
+   "feature": "farrowing",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Go to pen",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "farrowing.pen",
+   "feature": "farrowing",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "Pen B1",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "farrowing.pen-log",
+   "feature": "farrowing",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "Pen log",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "farrowing.pen-note",
+   "feature": "farrowing",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Pen note",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "farrowing.pen-read-note",
+   "feature": "farrowing",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Pen note",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "farrowing.pen-feed",
+   "feature": "farrowing",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "Feed guidance",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "farrowing.pen-fault",
+   "feature": "farrowing",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Report fault",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "farrowing.pen-fault-record",
+   "feature": "farrowing",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Feeding station",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "farrowing.search",
+   "feature": "farrowing",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "farrowing.search-results",
+   "feature": "farrowing",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "farrowing.search-none",
+   "feature": "farrowing",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "farrowing.scan",
+   "feature": "farrowing",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "Scan ear tags",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "farrowing.scan-no-reader",
+   "feature": "farrowing",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "Scan ear tags",
+     "lines": 0,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "farrowing.scan-list",
+   "feature": "farrowing",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "Scan ear tags",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "farrowing.scan-ticked",
+   "feature": "farrowing",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "Scan ear tags",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "farrowing.scan-stopped",
+   "feature": "farrowing",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "Scan ear tags",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "farrowing.scan-actions",
+   "feature": "farrowing",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Actions",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "farrowing.task-sows",
+   "feature": "farrowing",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "Active farrowing",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "farrowing.death-breakdown",
+   "feature": "farrowing",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Death breakdown",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "farrowing.today",
+   "feature": "farrowing",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "farrowing.sow-actions",
+   "feature": "farrowing",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "More actions",
+     "lines": 1,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "farrowing.note",
+   "feature": "farrowing",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "Edit note",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "farrowing.piglet-care",
+   "feature": "farrowing",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "Piglet processing",
+     "lines": 1,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "farrowing.piglet-identity",
+   "feature": "farrowing",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "Add piglet identity",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "farrowing.piglet-death",
+   "feature": "farrowing",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "Report piglet mortality",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "heat-check.list",
+   "feature": "heat-check",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "heat-check.overview",
+   "feature": "heat-check",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "heat-check.mark",
+   "feature": "heat-check",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "heat-check.select",
+   "feature": "heat-check",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "heat-check.scan",
+   "feature": "heat-check",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "heat-check.filter",
+   "feature": "heat-check",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "heat-check.filter-applied",
+   "feature": "heat-check",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "heat-check.picker",
+   "feature": "heat-check",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "heat-check.peek",
+   "feature": "heat-check",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "piglet-processing.pen-list",
+   "feature": "piglet-processing",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "Piglet processing",
+     "lines": 1,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "piglet-processing.sheet-coming",
+   "feature": "piglet-processing",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Piglet processing",
+     "lines": 1,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "piglet-processing.sheet-todo",
+   "feature": "piglet-processing",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Piglet processing",
+     "lines": 1,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "piglet-processing.sheet-breeders",
+   "feature": "piglet-processing",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Piglet processing",
+     "lines": 1,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "piglet-processing.sheet-late",
+   "feature": "piglet-processing",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Piglet processing",
+     "lines": 1,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "piglet-processing.sheet-done",
+   "feature": "piglet-processing",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Piglet processing",
+     "lines": 1,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "piglet-processing.adjust-count",
+   "feature": "piglet-processing",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Iron",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "piglet-processing.tagged-list",
+   "feature": "piglet-processing",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "Piglets",
+     "lines": 1,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "piglet-processing.give-ids",
+   "feature": "piglet-processing",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "Piglets",
+     "lines": 1,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    },
+    {
+     "kind": "page",
+     "title": "Give IDs",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "piglet-processing.counts",
+   "feature": "piglet-processing",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Boars and gilts",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "piglet-processing.weight",
+   "feature": "piglet-processing",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Litter weight",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "piglet-processing.more-actions",
+   "feature": "piglet-processing",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "More actions",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "piglet-processing.record-death",
+   "feature": "piglet-processing",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Record death",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "piglet-processing.move-piglets",
+   "feature": "piglet-processing",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "Move piglets",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "piglet-processing.set-count",
+   "feature": "piglet-processing",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Set count",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "piglet-processing.pen-log",
+   "feature": "piglet-processing",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "Pen log",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "piglet-processing.end-task",
+   "feature": "piglet-processing",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "End task",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "piglet-processing.list-ended",
+   "feature": "piglet-processing",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "Piglet processing",
+     "lines": 1,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "piglet-processing.phone-clash",
+   "feature": "piglet-processing",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "Piglet processing",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "piglet-processing.chip-done",
+   "feature": "piglet-processing",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "Piglet processing",
+     "lines": 1,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "piglet-processing.job-chip-iron",
+   "feature": "piglet-processing",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "Piglet processing",
+     "lines": 1,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "piglet-processing.job-chip-id",
+   "feature": "piglet-processing",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "Piglet processing",
+     "lines": 1,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "piglet-processing.list-no-id",
+   "feature": "piglet-processing",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "Piglet processing",
+     "lines": 1,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "piglet-processing.sheet-notch",
+   "feature": "piglet-processing",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Piglet processing",
+     "lines": 1,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "post-farrowing.list",
+   "feature": "post-farrowing",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "post-farrowing.overview",
+   "feature": "post-farrowing",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "post-farrowing.check",
+   "feature": "post-farrowing",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "pregnancy.list",
+   "feature": "pregnancy",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "pregnancy.detail",
+   "feature": "pregnancy",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "pregnancy.picker",
+   "feature": "pregnancy",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "pregnancy.check",
+   "feature": "pregnancy",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Pregnancy check",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "return-heat.list",
+   "feature": "return-heat",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "return-heat.overview",
+   "feature": "return-heat",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "return-heat.entry",
+   "feature": "return-heat",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "return-heat.record",
+   "feature": "return-heat",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "return-heat.result",
+   "feature": "return-heat",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "weaning.list",
+   "feature": "weaning",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "weaning.overview",
+   "feature": "weaning",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "weaning.check",
+   "feature": "weaning",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "weaning.handoff",
+   "feature": "weaning",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "For weaning",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "feed-plan.pen",
+   "feature": "feed-plan",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "Pen feeding",
+     "lines": 1,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "feed-plan.adlib",
+   "feature": "feed-plan",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "Pen feeding",
+     "lines": 1,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "feed-plan.bulk",
+   "feature": "feed-plan",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "More actions",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "feed-plan.editor",
+   "feature": "feed-plan",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "Adjust feed",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "feed-plan.end-date",
+   "feature": "feed-plan",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "End date",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "feed-plan.pig",
+   "feature": "feed-plan",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "Feed plan",
+     "lines": 1,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "feed-plan.pen-up",
+   "feature": "feed-plan",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "Inspection",
+     "lines": 1,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "feed-plan.pen-down",
+   "feature": "feed-plan",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "Inspection",
+     "lines": 1,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "feed-plan.pen-held",
+   "feature": "feed-plan",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "Inspection",
+     "lines": 1,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "feed-plan.switch-pen",
+   "feature": "feed-plan",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "feed-plan.switch-pens",
+   "feature": "feed-plan",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "inspection.walk",
+   "feature": "inspection",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "Inspection",
+     "lines": 1,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "inspection.stage-times",
+   "feature": "inspection",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "Inspection",
+     "lines": 1,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "inspection.animal-types",
+   "feature": "inspection",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "Inspection",
+     "lines": 1,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "inspection.pen-signals",
+   "feature": "inspection",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "Inspection",
+     "lines": 1,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "inspection.pen",
+   "feature": "inspection",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "Pen C1",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "inspection.pen-note",
+   "feature": "inspection",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Pen note",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "inspection.pen-log",
+   "feature": "inspection",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "Pen log",
+     "lines": 0,
+     "gap": 34,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": [
+    {
+     "check": "gap",
+     "at": 94,
+     "detail": "page header \"Pen log\" is 34px from its last line to the body (div.field): it should be 24px (space-section)",
+     "lang": "en",
+     "width": 390
+    }
+   ]
+  },
+  {
+   "screen": "inspection.filters",
+   "feature": "inspection",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Filter pigs",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "inspection.go-to-pen",
+   "feature": "inspection",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Go to pen",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "inspection.find-pig",
+   "feature": "inspection",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Scan ear tag",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "inspection.actions",
+   "feature": "inspection",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "More actions",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "inspection.review-selected",
+   "feature": "inspection",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Selected",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "inspection.walk-log",
+   "feature": "inspection",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "This walk",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "inspection.finish",
+   "feature": "inspection",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "End walk",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "inspection.walk-recorded",
+   "feature": "inspection",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Walk recorded",
+     "lines": 0,
+     "gap": 42,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": [
+    {
+     "check": "gap",
+     "at": 499,
+     "detail": "sheet header \"Walk recorded\" is 42px from its hairline to the body (span.complete-mark): it should be 24px (space-section)",
+     "lang": "en",
+     "width": 390
+    }
+   ]
+  },
+  {
+   "screen": "inspection.no-batches",
+   "feature": "inspection",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "Inspection",
+     "lines": 1,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "inspection.one-batch",
+   "feature": "inspection",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "Inspection",
+     "lines": 1,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "inspection.many-batches",
+   "feature": "inspection",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "Inspection",
+     "lines": 1,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "inspection.batch-farrowing",
+   "feature": "inspection",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "Inspection",
+     "lines": 1,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "inspection.batch-concurrent",
+   "feature": "inspection",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "Inspection",
+     "lines": 1,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "inspection.pen-faults",
+   "feature": "inspection",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "inspection.fault-report",
+   "feature": "inspection",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "inspection.fault-resolve",
+   "feature": "inspection",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "inspection.pen-actions",
+   "feature": "inspection",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "inspection.fault-report-other",
+   "feature": "inspection",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "inspection.fault-flag",
+   "feature": "inspection",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "inspection.fault-resolved",
+   "feature": "inspection",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "inspection.set-count",
+   "feature": "inspection",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "inspection.set-count-batches",
+   "feature": "inspection",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "inspection.set-count-fewer",
+   "feature": "inspection",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "inspection.set-count-more",
+   "feature": "inspection",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "inspection.count-recorded",
+   "feature": "inspection",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "find-pig.search",
+   "feature": "find-pig",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Find a pig or pen",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "find-pig.scan",
+   "feature": "find-pig",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Scan an ear tag",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "find-pig.results",
+   "feature": "find-pig",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Search results",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "pig-list.detail",
+   "feature": "pig-list",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "000267",
+     "lines": 1,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "pig-list.health",
+   "feature": "pig-list",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Record health",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "pig-list.events",
+   "feature": "pig-list",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "Pig log",
+     "lines": 0,
+     "gap": 34,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": [
+    {
+     "check": "gap",
+     "at": 94,
+     "detail": "page header \"Pig log\" is 34px from its last line to the body (div.field): it should be 24px (space-section)",
+     "lang": "en",
+     "width": 390
+    }
+   ]
+  },
+  {
+   "screen": "pig-list.edit",
+   "feature": "pig-list",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "More actions",
+     "lines": 1,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "pig-list.identity-one",
+   "feature": "pig-list",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "pig-list.identity-tag",
+   "feature": "pig-list",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "pig-list.identity-notch",
+   "feature": "pig-list",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "pig-list.identity-breeding",
+   "feature": "pig-list",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "pig-profile.full",
+   "feature": "pig-profile",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "000267",
+     "lines": 1,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "pig-profile.partial",
+   "feature": "pig-profile",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "000254",
+     "lines": 1,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "pig-profile.empty",
+   "feature": "pig-profile",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "000306",
+     "lines": 1,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "pig-profile.tasks",
+   "feature": "pig-profile",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "000254",
+     "lines": 1,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "pig-profile.production-batches",
+   "feature": "pig-profile",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "Production stats",
+     "lines": 1,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "pig-profile.batch-record",
+   "feature": "pig-profile",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "Batch 20",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "pig-profile.origin",
+   "feature": "pig-profile",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "Origin",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "pig-profile.log",
+   "feature": "pig-profile",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "Pig log",
+     "lines": 0,
+     "gap": 34,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": [
+    {
+     "check": "gap",
+     "at": 94,
+     "detail": "page header \"Pig log\" is 34px from its last line to the body (div.field): it should be 24px (space-section)",
+     "lang": "en",
+     "width": 390
+    }
+   ]
+  },
+  {
+   "screen": "pig-profile.actions",
+   "feature": "pig-profile",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "More actions",
+     "lines": 1,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "pig-profile.production-task",
+   "feature": "pig-profile",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Pregnancy check",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "pig-profile.miscarriage",
+   "feature": "pig-profile",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Record abortion",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "pig-profile.batch-membership",
+   "feature": "pig-profile",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Batch membership",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "pig-profile.measurements",
+   "feature": "pig-profile",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Measurements & condition",
+     "lines": 1,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "pig-profile.measure",
+   "feature": "pig-profile",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Record weight",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "pig-profile.body-condition",
+   "feature": "pig-profile",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Body condition",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "pig-profile.note",
+   "feature": "pig-profile",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Add a note",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "pig-profile.unavailable-actions",
+   "feature": "pig-profile",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Unavailable actions",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "pig-profile.not-in-pig",
+   "feature": "pig-profile",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Mark not in pig",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "disease.add-select",
+   "feature": "disease",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "disease.add-drawer",
+   "feature": "disease",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "disease.catalogue",
+   "feature": "disease",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "disease.add-committed",
+   "feature": "disease",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "disease.resolve-one",
+   "feature": "disease",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "disease.resolve-many",
+   "feature": "disease",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "disease.resolve-in-place",
+   "feature": "disease",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "disease.resolve-committed",
+   "feature": "disease",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "health-record.mixed",
+   "feature": "health-record",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "000306",
+     "lines": 1,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "health-record.ongoing",
+   "feature": "health-record",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "000281",
+     "lines": 1,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "health-record.many",
+   "feature": "health-record",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "000281",
+     "lines": 1,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "health-record.care-states",
+   "feature": "health-record",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "Inspection",
+     "lines": 1,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "health-record.finding",
+   "feature": "health-record",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Fever",
+     "lines": 1,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "health-record.edit-finding",
+   "feature": "health-record",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Edit finding",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "health-record.resolve-finding",
+   "feature": "health-record",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Resolve or remove",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "health-record.record-health",
+   "feature": "health-record",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Record health",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "health-record.condition-picker",
+   "feature": "health-record",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Conditions",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "health-record.care-instructions",
+   "feature": "health-record",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Care instructions",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "health-record.resolve-conditions",
+   "feature": "health-record",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Resolve conditions",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "health-record.treatment",
+   "feature": "health-record",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "Record treatment",
+     "lines": 0,
+     "gap": 40,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": [
+    {
+     "check": "gap",
+     "at": 94,
+     "detail": "page header \"Record treatment\" is 40px from its last line to the body (div.field): it should be 24px (space-section)",
+     "lang": "en",
+     "width": 390
+    }
+   ]
+  },
+  {
+   "screen": "health-record.medicine-picker",
+   "feature": "health-record",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Medicines",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "report-death.entry",
+   "feature": "report-death",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "report-death.one",
+   "feature": "report-death",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "report-death.roster",
+   "feature": "report-death",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "report-death.conveyor",
+   "feature": "report-death",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "report-death.after",
+   "feature": "report-death",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "report-death.group",
+   "feature": "report-death",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "treat.marked-set",
+   "feature": "treat",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "treat.page",
+   "feature": "treat",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "treat.targets",
+   "feature": "treat",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "treat.next-walk",
+   "feature": "treat",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "triage.bulk",
+   "feature": "triage",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "triage.standalone",
+   "feature": "triage",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "triage.marks",
+   "feature": "triage",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "abortion.entry",
+   "feature": "abortion",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "abortion.drawer",
+   "feature": "abortion",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "abortion.cause",
+   "feature": "abortion",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "abortion.other",
+   "feature": "abortion",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "abortion.after",
+   "feature": "abortion",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "fostering.type",
+   "feature": "fostering",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Move piglets",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    },
+    {
+     "kind": "sheet",
+     "title": "B06",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "fostering.receive",
+   "feature": "fostering",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Move piglets",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    },
+    {
+     "kind": "sheet",
+     "title": "B06",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "fostering.piglets",
+   "feature": "fostering",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Move piglets",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    },
+    {
+     "kind": "sheet",
+     "title": "C03",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "fostering.result",
+   "feature": "fostering",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Move piglets",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    },
+    {
+     "kind": "sheet",
+     "title": "B08",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "heat.entry",
+   "feature": "heat",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "heat.drawer",
+   "feature": "heat",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "heat.join",
+   "feature": "heat",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "heat.joined",
+   "feature": "heat",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "heat.after",
+   "feature": "heat",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "keep-breeding.mark",
+   "feature": "keep-breeding",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "keep-breeding.blocked",
+   "feature": "keep-breeding",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "keep-breeding.unmark",
+   "feature": "keep-breeding",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "keep-breeding.after",
+   "feature": "keep-breeding",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "unexpected-pregnancy.entry",
+   "feature": "unexpected-pregnancy",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "unexpected-pregnancy.drawer",
+   "feature": "unexpected-pregnancy",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "unexpected-pregnancy.join",
+   "feature": "unexpected-pregnancy",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "unexpected-pregnancy.unclear",
+   "feature": "unexpected-pregnancy",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "unexpected-pregnancy.after",
+   "feature": "unexpected-pregnancy",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "backfat.by-eye",
+   "feature": "backfat",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "backfat.measured",
+   "feature": "backfat",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "backfat.run",
+   "feature": "backfat",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "backfat.after",
+   "feature": "backfat",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "missing.drawer",
+   "feature": "missing",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "missing.mixed",
+   "feature": "missing",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "missing.after",
+   "feature": "missing",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "missing.page",
+   "feature": "missing",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "move.tagged",
+   "feature": "move",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "move.picker",
+   "feature": "move",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "move.mixed",
+   "feature": "move",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "move.after",
+   "feature": "move",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "move.transfer-sow",
+   "feature": "move",
+   "headers": [
+    {
+     "kind": "page",
+     "title": "Transfer sow",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "temperature.one",
+   "feature": "temperature",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "temperature.run",
+   "feature": "temperature",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "temperature.after",
+   "feature": "temperature",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "weight.one",
+   "feature": "weight",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "weight.run",
+   "feature": "weight",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "weight.group",
+   "feature": "weight",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "weight.after",
+   "feature": "weight",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "data-sync.banner",
+   "feature": "data-sync",
+   "headers": [],
+   "defects": []
+  },
+  {
+   "screen": "data-sync.list",
+   "feature": "data-sync",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Saved work",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "data-sync.upload",
+   "feature": "data-sync",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Saved work",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  },
+  {
+   "screen": "data-sync.failed",
+   "feature": "data-sync",
+   "headers": [
+    {
+     "kind": "sheet",
+     "title": "Saved work",
+     "lines": 0,
+     "gap": 24,
+     "lang": "en",
+     "width": 390
+    }
+   ],
+   "defects": []
+  }
+ ]
+}
