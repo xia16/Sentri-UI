@@ -968,15 +968,21 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
 .st-optional-list>.st-choice-inline,.st-optional-body>.st-choice-inline{display:flex;justify-content:flex-start;min-height:48px;padding:0 var(--space-6);border:1px solid var(--line);border-radius:12px;background:var(--st-panel-bg)}
 .st-optional-list .st-optional-body,.st-optional-list>.finish-field,.st-optional-list>.st-choice-inline{grid-column:1/-1;margin:0}
 .st-photos .st-optional-row{margin:0}
-/* Photos keeps its own face, the optional photo row (README "line"): full width, the label and the muted Optional word on the
-   left, the outlined camera at the right, empty or filled. The quiet "+ Label" card above is for the other optionals. */
-.st-photos-camera.st-optional-row{width:100%;justify-content:flex-start;gap:var(--space-12);padding:var(--space-4) var(--space-4) var(--space-4) var(--space-row-x);text-align:left;color:var(--ink)}
-.st-photos-camera .st-optional-copy{flex:1 1 0;align-items:flex-start}
-.st-photos-camera .st-optional-head{justify-content:flex-start;gap:var(--space-8)}
-.st-photos-camera .st-optional-label{font:400 14px/1.4 var(--font-sans);color:var(--ink)}
-.st-photos-camera .st-optional-word{display:inline;font:400 13px/1.4 var(--font-sans);color:var(--muted)}
-.st-photos-camera .st-optional-act{order:0;flex:none;display:grid;place-items:center;width:44px;height:44px;color:var(--ink)}
-.st-photos-camera .st-optional-act svg{box-sizing:content-box;width:var(--size-16);height:var(--size-16);padding:var(--space-6);border:var(--ring-width-fine) solid var(--muted);border-radius:50%;background:var(--paper)}
+/* OptionalRow face "row" (face:'row'): the full-width optional row, empty or filled: the label and the muted Optional word
+   on the left, the outlined action at the right. Photos always draws it (README "line", the one face for optional evidence);
+   a sheet whose optionals sit beside Photos gives them the same face, so one sheet has one optional face on one track. */
+.st-optional-row[data-face="row"]{width:100%;justify-content:flex-start;gap:var(--space-12);padding:var(--space-4) var(--space-4) var(--space-4) var(--space-row-x);text-align:left;color:var(--ink)}
+.st-optional-row[data-face="row"] .st-optional-copy{flex:1 1 0;align-items:flex-start}
+.st-optional-row[data-face="row"] .st-optional-head{justify-content:flex-start;gap:var(--space-8)}
+.st-optional-row[data-face="row"] .st-optional-label{font:400 14px/1.4 var(--font-sans);color:var(--ink)}
+.st-optional-row[data-face="row"] .st-optional-word{display:inline;font:400 13px/1.4 var(--font-sans);color:var(--muted)}
+.st-optional-row[data-face="row"] .st-optional-act{order:0;flex:none;display:grid;place-items:center;width:44px;height:44px;color:var(--ink)}
+.st-optional-row[data-face="row"] .st-optional-act svg{box-sizing:content-box;width:var(--size-16);height:var(--size-16);padding:var(--space-6);border:var(--ring-width-fine) solid var(--muted);border-radius:50%;background:var(--paper)}
+.st-optional-row[data-face="row"][aria-disabled="true"] .st-optional-act{color:var(--disabled-ink)}
+.st-optional-row[data-face="row"][aria-disabled="true"] .st-optional-act svg{border-style:dashed}
+/* Photos waiting (inactive): the floor-gray. The row stays, its camera dashed; the reason is the row's description for a
+   screen reader and shows in the hint line only while a tap is answered (guard's data-answer), never as a standing line. */
+.st-photos[data-inactive]>.st-photos-hint:not([data-answer]){position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 /* hit extenders: invisible, so the visible box stays the approved 44 while the target reaches 48 */
 .st-segment button,.farrowing-phone .key{position:relative}
 .st-segment button::after{content:"";position:absolute;inset:-3px 0}
