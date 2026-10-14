@@ -106,11 +106,11 @@
     var causes = [['stillborn', 'tk.demo.c.stillborn', 'Stillborn', 1], ['mummified', 'tk.demo.c.mummified', 'Mummified', 1], ['crushed', 'tk.demo.c.crushed', 'Crushed', 3],
       ['scours', 'tk.demo.c.scours', 'Scours', 0], ['starve', 'tk.demo.c.starve', 'Starve-out', 0], ['other', 'tk.demo.c.other', 'Other', 1]];
     return K.drawer({ size: 'long', height: 'full', view: 'dead',
-      title: s('tk.demo.dead.title', 'Record dead'),
+      title: s('tk.demo.dead.title', 'Record dead'), corner: { label: s('act.clear', 'Clear'), action: 'clear' },
       body: UI.segment({ action: 'dead-mode', active: 'piglets', ariaLabel: 'Who died', options: [['piglets', '', { strs: { label: 'tk.demo.piglets' } }], ['sow', '', { strs: { label: 'tk.demo.sow' } }]] }) +
         causes.map(function (c) { return stepper(c[0], c[1], c[2], c[3], c[0] === 'crushed' ? { draft: true, min: 2 } : { min: c[3] }); }).join('') +
         K.photos({ label: 'Photos', optional: 'Optional', key: 'photos', strs: { label: 'ds.c2.photos.label', optional: 'ds.field.optional', camera: 'ds.c2.aria.camera' } }),
-      footer: K.footer({ back: { action: 'back' }, quiet: { label: s('act.clear', 'Clear'), action: 'clear' }, primary: { label: s('act.save', 'Save'), action: 'save' } }) });
+      footer: K.footer({ back: { action: 'back' }, primary: { label: s('act.save', 'Save'), action: 'save' } }) });
   }
 
   // ---- Foster piglets: a page with the choice tiles, the other litter as door rows, a stepper on a well ----
@@ -187,11 +187,11 @@
     var band = K.warning({ text: s('tk.demo.sow.warn', 'Save or clear the pending piglet deaths before ending.'),
       actions: UI.button({ label: 'Review piglet deaths', register: 'text', action: 'review', strs: { label: 'tk.demo.sow.review' } }) + '<strong data-str="tk.demo.sow.ends">Saving ends farrowing</strong>',
       detail: s('tk.demo.sow.detail', '9 alive stay under piglet care') });
-    return K.drawer({ size: 'long', height: 'full', view: 'sow', title: s('tk.demo.sow.title', 'Sow died'),
+    return K.drawer({ size: 'long', height: 'full', view: 'sow', title: s('tk.demo.sow.title', 'Sow died'), corner: { label: s('act.clear', 'Clear'), action: 'clear' },
       body: '<div class="tk-demo-stack">' + UI.segment({ action: 'dead-mode', active: 'sow', ariaLabel: 'Who died', options: [['piglets', '', { strs: { label: 'tk.demo.piglets' } }], ['sow', '', { strs: { label: 'tk.demo.sow' } }]] }) +
         K.radios({ label: '', action: 'cause', key: 'cause', options: causes.map(function (c) { return { value: c[0], label: c[2], strs: { label: c[1] } }; }) }) +
         K.photos({ label: 'Photos', optional: 'Optional', key: 'photos', strs: { label: 'ds.c2.photos.label', optional: 'ds.field.optional', camera: 'ds.c2.aria.camera' } }) + band + '</div>',
-      footer: K.footer({ back: { action: 'back' }, quiet: { label: s('act.clear', 'Clear'), action: 'clear' }, hold: { label: s('act.save', 'Save'), caption: s('tk.demo.sow.hold', 'HOLD TO SAVE'), action: 'save', tone: 'primary', waiting: true } }) });
+      footer: K.footer({ back: { action: 'back' }, hold: { label: s('act.save', 'Save'), caption: s('tk.demo.sow.hold', 'HOLD TO SAVE'), action: 'save', tone: 'primary', waiting: true } }) });
   }
 
   // ---- The pen page: a section title with its icon over one card of icon doors; Back alone ----

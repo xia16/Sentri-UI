@@ -38,3 +38,13 @@ The header line of every surface of this feature, decided by the Headers law (`u
 
 
 Crit round 2: More actions for several pens keeps 18px between its Pigs / Pens tabs and the actions card (the `above` bar is the page's, the gap is restored as a layout rule).
+
+
+### Corner actions and titles (2026-10-14)
+
+By the Headers law → Corner actions and Title length (`ux/design-system/README.md`, owner ruling C, 2026-10-14; PR #165). Room at a true 360, as `scripts/check-headers.mjs` (workflow/header-checks) measures it: a drawer title has 360 − 2 × (18 + 48 + 12) = 204px (a missing corner counts as the room it would take); a page title has 216px beside Back. Titles measured at their own face (sheet 500 20px, page 500 22px), EN and ZH.
+
+| Surface | Corner action (top right) | Present while | Title | Fits at 360 (EN · ZH) |
+|---|---|---|---|---|
+| Feed adjustment (one pig) | none | | **`Feed adjustment`** (was `Individual feed adjustment`): one pig is on screen in the chip and the form, so `individual` says nothing the worker needs | 156px |
+| Feeding exception (pen) | none | | **`Feeding exception`** (was `Record feed exception`): the same name as its station-fed sibling; the primary says Save | 172px |

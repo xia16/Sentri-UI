@@ -111,3 +111,53 @@ The law and its boards fix the design (two headers, the line's three tests); the
 - Footers: fostering's primary stays on one line at 56px in Chinese at 390; Find a pig's primary is "Search".
 - Reach: 153 screens move, all in this change's features; 138 identical; none broken. npm test 674 pass; legibility and spacing pass on every moved screen; farrowing scenarios 87 of 87 in EN (ZH blocked on main as well).
 - **Better because** each header says one thing the same way everywhere, and every fact it no longer carries has a designed place in the body.
+
+
+# Header corners (2026-10-14)
+
+Scope: the sheet header's corner actions and title room, by the Headers law → Corner actions and Title length (`ux/design-system/README.md`, owner ruling C, 2026-10-14; PR #165). Baselines: `origin/main` at `39637ff`, shot with `node scripts/shoot-screens.mjs` at 390 and 360, EN and ZH; titles measured at a true 360 (the phone width forced after load, so a bare page pinned to 390 cannot hide an overflow).
+
+### Keep
+
+- Every title that already fits names its job (`Record dead`, `Edit record`, `Filter sows`, `Move piglets`): unchanged, still the heaviest thing in the header.
+- Clear and Reset keep their one meaning (`ux/laws/strings.json`), their quiet text register, their words and their presence rule (only while there is something to clear or reset).
+- Bodies, rows, footers' Back and primary, the hairline and the 24px to the body: untouched.
+
+### Problems
+
+- **major** · Clear (Record dead, Edit record, Edit finish details) and Reset (Filter sows) sat in the footer between Back and the primary (law 2026-10-14: they are the sheet header's corner action; the footer keeps Back and the primary).
+- **major** · `7 piglets to allocate` puts a count in the title (law: no counts in a title) and is the job named by its leftovers, not the job.
+- **minor** · Filter sows showed Reset with every facet at its default (law: present only when there is something to reset).
+- **major** · Two page titles overrun the room beside Back at a true 360 (216px): `Reconcile piglet count` and `Report piglet mortality` (223px each; header check, workflow/header-checks).
+
+### Parts
+
+| Part | Drawn by today | The component whose job it is | Keep / fix / cut |
+|---|---|---|---|
+| Clear on Record dead, Edit record, Edit finish details | sheetFooter `quiet` (via `quietClear`) | Sheet `corner` | **fix** |
+| Reset on Filter sows | FilterSheet footer | FilterSheet → Sheet `corner` | **fix** |
+| Allocation title | identity() title with the count | Sheet title (the job) + the body's first line (the count) | **fix** |
+| `Reconcile piglet count`, `Report piglet mortality` page titles | featurePage() title | Sheet page header title | **fix** (copy) |
+
+### Self-crit
+
+The ruling fixes the design (the boards `evidence/2026-10-14-header-corners.png` and `-header-room.png`, direction C): no competing directions. Each screen is held against its baseline and the Farrowing room.
+
+#### Round 1 (renders at 390 and 360, EN and ZH, beside `39637ff`)
+- Clear / Reset sit at the top right, 48px targets (Clear 52px, 清除 48px), vertically centred on the title block: measured 0px off its centre on every changed drawer, with and without a header line (`Farrowing record` + route line: the corner sits between the two lines, as board C).
+- The footer is Back and the primary alone: the primary gains the width the quiet word took.
+- Squint: the title, then the first card; the corner word is quiet and does not compete with the title.
+- Cluttered, flat or bulky against the original: less in the footer, nothing added to the body; the header gains one quiet word only while there is something to clear.
+- **Better because** the destructive-but-safe act (empty the draft) leaves the thumb zone beside the commit, and every drawer clears and resets in one place.
+
+#### Final look (61bc01e, pushed head; renders at 390 and 360, EN and ZH, beside 39637ff; the gate's pairs at 4571e5e)
+- Reach: 19 screens moved (gate, base 39637ff), all in this change's scope (farrowing, inspection, pig-list, pig-profile, health-record, environment, fostering); `assistant.up-to-date` is the gate's known flaky screen. 272 identical, none broken.
+- Problems fixed: Clear and Reset sit at the top right, 0px off the title block's centre (with and without a line), present only while there is something to clear; the footers are Back and the primary; every drawer title fits 204px and every page title 216px at a true 360 (header check: 0 defects on the changed screens); the 24px under each header is the header's alone.
+- Keep as strong: titles that fit, bodies, rows and primaries unchanged; Filter sows and Filter pigs at their defaults now show no Reset.
+- Squint: the title, then the first card; the corner word stays quiet.
+- **Better because** the act that empties a draft leaves the thumb's commit zone, every drawer clears in the same place, and no title can collide with a corner at 360.
+
+#### Final look after crit round 1 (2449cb7, origin/main merged; renders at 390 and 360, EN and ZH, beside 39637ff)
+- Screens with changed titles, and fostering after the merge: `pig-profile.measurements` (`Measurements`), `environment.report-issue`, `farrowing.allocate`, `farrowing.reconcile`, `farrowing.piglet-death`, `fostering.piglets`, `fostering.result`. Header check: 0 defects (room, corner, gap, contents, wrap).
+- Fostering keeps main's primary (`Move 2 to C05`, #159) beside Back; Clear stays at the top right, now at a true 360.
+- **Better because** each title is a name that fits its room, and nothing else moved.

@@ -11,9 +11,9 @@ The drawer that narrows a list: Farrowing's room filter and Inspection's pig fil
 
 ## Anatomy
 
-1. **Head**: the sheet header, the title alone (a filter acts on the list under it, one Back away: no header line). Nothing in it acts (Headers law, 2026-10-13).
+1. **Head**: the sheet header, the title (a filter acts on the list under it, one Back away: no header line) and **Reset**, the corner action at the top right (quiet text, centred on the title; `reset: false` leaves it out, as the host does while every facet is at its default).
 2. **Sections**: each an icon-led title, the control, and an optional one-line help. A section may hold a [RangeSlider](../RangeSlider/README.md), a facet Segment, or any field. A sheet of plain fields passes `body` instead.
-3. **Footer**: **Back**, **Reset** (quiet text, left of the commit; `reset: false` leaves it out) and the commit, "Show 4 sows".
+3. **Footer**: **Back** and the commit, "Show 4 sows".
 
 ## Variants
 
@@ -27,7 +27,7 @@ The drawer that narrows a list: Farrowing's room filter and Inspection's pig fil
 | Default | Every facet on "Any"; the commit shows the unfiltered count. |
 | Active | Facets set; the commit shows the narrowed count. |
 | Pressed | The touched control darkens at once. |
-| Long / Chinese | Titles and help wrap; the footer keeps its size. |
+| Long / Chinese | The title fits one line between the corners (`筛选母猪`, about 10 Chinese characters); help wraps; the footer keeps its size. |
 
 ## Behaviour
 

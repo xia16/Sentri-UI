@@ -35,3 +35,13 @@ Chains walked on the real Back path after this change (crit round 1): no surface
 |---|---|---|---|
 | `Check in again` (EN) / `再次签到` (ZH), the check-in row's action once the unit is checked in | action, quiet text | Can I record another check-in for this unit? | kept; Chinese copy added, nothing else drawn |
 | `Check in to Unit 7` / `7单元签到`, the End walk sheet's primary | Act now (the primary) | What does this tap record, and for which unit? | kept; Chinese copy added |
+
+### Corner actions and titles (2026-10-14)
+
+By the Headers law → Corner actions and Title length (`ux/design-system/README.md`, owner ruling C, 2026-10-14; PR #165). Room at a true 360, as `scripts/check-headers.mjs` (workflow/header-checks) measures it: a drawer title has 360 − 2 × (18 + 48 + 12) = 204px (a missing corner counts as the room it would take); a page title has 216px beside Back. Titles measured at their own face (sheet 500 20px, page 500 22px), EN and ZH.
+
+| Surface | Corner action (top right) | Present while | Title | Fits at 360 (EN · ZH) |
+|---|---|---|---|---|
+| Filter pigs | Reset | a facet is off its default | unchanged | 89px |
+| Selected | Clear | always (an empty selection closes) | unchanged | 84px |
+| Report fault (choose one pen) | none | | **`Report fault`** (was `Report equipment fault`, 213px): the pen sheet's own row and Farrowing's drawer already call it a fault; `equipment` is what every fault is here | 108px |
