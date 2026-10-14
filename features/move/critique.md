@@ -94,3 +94,23 @@ Scope: the disabled and waiting states of the design-system components (Button i
 | Disabled picker trigger / choice row | PickerField, ChoiceList | PickerField | **fix**: ink value, dashed rim on the trigger |
 | Disabled text action, OptionalRow | Button (text), Field (OptionalRow) | Button, Field | **fix**: `muted` word at full opacity (4.8:1); OptionalRow on `disabled-surface` with the dashed rim |
 | Disabled IconButton glyph | IconButton (`disabled-ink`) | IconButton | keep (an icon, no text; out of this brief: noted for the owner) |
+
+## Self-crit
+
+Held against the Farrowing room (its dock: one dark primary, Back outlined) and More actions (Back alone in the footer). Every state is shown before / after in its component's variants (Button primary, secondary, tool, text, hold; Segment four variants; Stepper count, row, well; PickerField) and on the screens below.
+
+#### Direction A (surface only: opacity pinned, ink text, the existing solid `disabled-border` rim), renders at 390 EN on 7f5b627
+- Fixed the contrast (every disabled text 4.5:1 or more) but not the look: a waiting primary is a grey button with a bold ink label, next to a live outlined Back it reads as a second live button; a floor − with an ink glyph on a near-white key reads as live. Trial 6 was rejected for exactly this. **Not better because** legible but live-looking.
+
+#### Direction B (surface and a dashed rim, one face for every unavailable control), round 1 on 8ba7e17, round 2 on 4d59150
+- Problems: Segment `Auto` / `Manual` 2.6 → 13.1:1 and the whole segment one flat dashed track with no raised pill (it can no longer pass for a live lens); `Save setting` 2.7 → 12.6:1 on a dashed grey face (was bare faded text); tool 2.7 → 12.6; hold Pending / Done 2.1 → paper on red; floor-gray glyph 2.45 → 7.4 (`ink-2`); picker value 2.6 → 13.4; text action 2.0 → 4.8. All fixed: the probe finds 0 disabled-text failures on 291 screens (was 9) and in every variant state (was 8).
+- Round 2: the waiting `End task early` (farrowing task-blocked) still wore the page's red wash and red rim, a live destructive button; the component's face now outranks that page paint (4d59150).
+- Keep: the waiting button stays present, quiet, alone; labels, sizes, layout and live faces unchanged; the dashed rim was already Segment's, Banner's and Photos' word for unavailable.
+- Squint (a record sheet): the title, the count, then the footer; the dashed Save is quieter than the live Back beside it, as it should be. On Environment: the reading, the chart, then the fan; the dashed fan controls recede.
+- Cluttered / flat / bulky: no box, weight or size added; one hairline style changes. A column of floor keys in Record death shows four dashed − keys: busier than four pale keys, but each reads as "not now" and its glyph is legible. Rejected examples (gate.md): none of c1 (nothing enlarged), c2 (no structure removed), c3 (no box or bold added).
+- **Better because** every unavailable control now reads as unavailable by its face and rim while its words stay readable, the same way everywhere, and nothing looks live that is not.
+
+#### Final look (the pushed head of ds/disabled-not-faded, the commit that adds this block; its screens are 5f0884a's, which the gate rendered at 390 and 360 in EN and ZH against base 851dcba, and shoot-screens rendered beside 7f5b627)
+- Reach: 50 screens move, all of them rendering a disabled or waiting control: environment (page, sensor-week, sensor-other), farrowing 14 (before, death, leave-edit, edit, born, task-blocked, edit-finished, foster, reconcile, pen-note, pen-fault, piglet-care, piglet-identity, piglet-death), piglet-processing 13 (sheet-coming, sheet-todo, sheet-breeders, sheet-late, sheet-done, sheet-notch, adjust-count, give-ids, counts, weight, record-death, move-piglets, set-count), pregnancy.check, feed-plan (editor, end-date), pig-list.health, pig-profile 7 (production-task, miscarriage, batch-membership, measure, body-condition, note, not-in-pig), health-record 5 (record-health, condition-picker, care-instructions, resolve-conditions, treatment), fostering (type, receive, result), move.transfer-sow. 4 more differ in one shot only by under 0.04% (assistant.finding and farrowing.search-results, which the gate marks unstable on base; farrowing.search-none, piglet-processing.more-actions): identical by eye, render noise. 237 identical; none broken.
+- Every moved screen: only the waiting footer button (dashed rim), a floor key (dashed, `ink-2` glyph) or the Environment fan controls changed; layout, copy and the 360 Chinese footers are unchanged.
+- **Better because** unavailable is now said by the face and the rim, never by faded words, and no waiting control looks live.
