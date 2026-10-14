@@ -55,3 +55,4 @@ Generic **component**, using the optional-row arrangement documented in [Field](
 
 ## Changelog
 2026-10-10: one line face, merged TaskPhotos, migrated Farrowing, padded 48px camera, derived counts, adding/error/Chinese examples. See [verification](verification.md).
+2026-10-14: the row face is drawn again, empty or filled: the shared optional-row restyle (the quiet half-width "+ Label" card) had reached Photos, so Photos showed a lone half-width card. `.st-photos-camera` now restores full width, label · muted Optional, trailing outlined camera (dashed while inactive). Reach: farrowing Record dead and Report piglet mortality, piglet-processing's dead tally, the task-skeleton demo.
