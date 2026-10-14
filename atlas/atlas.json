@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-13T05:50:50.413Z",
- "commit": "191f889",
+ "generated": "2026-10-14T09:03:50.468Z",
+ "commit": "e14bead",
  "platforms": [
   {
    "id": "mobile",
@@ -11275,8 +11275,932 @@
        "prd": "# Piglet processing 仔猪处理\n\n## Problem\n\nAfter farrowing, each litter owes a schedule by age-day (iron, dock tail, castrate, coccidiosis, and the identification step the farm requires). The worker records it pen by pen, with paper habits and dirty gloves. The task must show what each pen still needs today, record a pen with one tick per item and one Submit, and keep the litter's count honest through deaths, moves and counts, all looking exactly like Farrowing.\n\n## Who\n\nPiglet-care workers walking the pens (farmers, not tech-savvy; Round 8). A supervisor ends the task.\n\n## Anchor\n\nPen (a sow with her litter). Its status is derived, not stored: Coming (every step still ahead), To do (anything due or partly given), Late (a step past its window; shown over To do), Done (nothing left, nothing ahead). A dead sow adds a red chip but the litter stays on its schedule. The task has its own band: in progress, then ended (End task by hold).\n\n## Rules\n\n- Windows in pen age days: Iron 2-4, Dock tail 2-4, Castrate 3-7, Coccidiosis 3-5, ID 3-7. Outside the window a record is stamped early or late automatically; early counts on time (Round 1 Q6).\n- One tick per item, one Submit. Fewer piglets than alive asks one reason (weak or sick); the rest stay on the list.\n- Identity follows the farm: tag every piglet, notch every piglet, breeders only, or no ID (then no ID step at all). ID is always available on a pen and is also a step on the ID day. One piglet at a time, tag or notch; sex required here; weight optional (Rounds 1, 7, 10).\n- Alive = born, minus dead, minus moved out, plus moved in. Set count only adjusts the record; the difference goes to the batch-level \"N piglets unaccounted\", not to the pen (Round 9). Move offers only the pens of the batch and asks what the piglets already had.\n- Same look as Farrowing: list row = id + one chip + one headline + one meta line; the pen opens as a sheet; Back, not Close (Round 5). End task is a hold and reviews in numbers (Round 1 Q5).\n- Two phones recording the same item: first record wins, the second is kept as a note (simplification, not yet confirmed).\n- In the rulings but not in this prototype: End blocked while the batch's farrowing is open; corrections after End; the shared dead picker; Edit; bulk recording with a Finish hold.\n\n## Scope\n\nIn: pen list with job chips, pen sheet, Piglets list, Give IDs, boars and gilts, litter weight, death, move, set count, pen log, End task.\n\nOut: recording several pens at once (Round 9 keeps bulk as chips, but the prototype has only the filter), farrowing's Born figure, the weaning handoff, breeder ranking (placeholder only), multi-sow pens, fostering outside the batch.\n\n## Decisions\n\nDecided:\n- Same look as Farrowing, pruned to its density; farmers first; restrict rather than add mechanisms (Rounds 5, 8).\n- Set count just adjusts; no nurse sows outside the task; Move only within the batch (Round 9).\n- Tagging per farm scheme; per-piglet work and breeder selection may become universal; ranking is a placeholder (Rounds 7, 10).\n- Verbs Record, Edit, Set count, End task (Q11, provisional).\n\nOpen (HANDOFF, needs the owner):\n1. The seven simplifications: moves within the batch with Yes/No; count = reason or \"count was wrong\"; first-in-wins sync; cut nurse sow outside the task; cut after-End evidence; cut fine-grained corrections; keep bulk. The prototype implements 1, 2, 3 and 5 and keeps bulk only as a filter.\n2. Rules the builder interpreted: ID window day 3-7; the Tag chip filters only (no bulk tagging); Move asks \"Have tags?\"; \"Done picking\" may close with no breeders; a pen with nothing due yet counts as done; losses come off untreated piglets first; a higher count just corrects; sheet records past the window are marked late automatically; bulk pre-ticks only pens fully inside the window.\n3. Candidate approvals at close: task skeleton parts (ADR 0003, with Chips) and candidates 2 (ADR 0002) with four nods (keyboard two-step hold, one 35% sweep, Row code 600, 64 px optional radio row).\n4. Build path: carry the simplified flows into the full task, or promote simple/ to be the task.\n5. Where per-piglet work (ID, weigh, sex, breeder) lives as a universal feature (Round 10 direction only; proposal first).\n6. How a farm's ID scheme is configured (Round 1 Q3); in the prototype it is a Demo switch outside the phone.\n",
        "scenarios": {
         "treeDoc": false,
-        "tree": null,
-        "run": null,
+        "tree": [
+         {
+          "type": "entry",
+          "id": "drafts",
+          "label": "A staged drawer (record death, give IDs, litter weight, set count) → Back → reopen → Clear",
+          "children": [
+           {
+            "type": "state",
+            "id": "drafts.a03",
+            "label": "Pen A03 open (12 alive, 1 dead, not weighed)",
+            "tree": "T-23",
+            "screen": "piglet-processing.sheet-todo",
+            "children": [
+             {
+              "type": "action",
+              "id": "death.open",
+              "label": "open Record death",
+              "children": [
+               {
+                "type": "outcome",
+                "id": "pp-dd0-death-opens-without-clear",
+                "label": "Record death opens untouched: no Clear",
+                "tree": "T-23",
+                "gwt": {
+                 "given": "A worker has pen A03 open: 12 piglets alive.",
+                 "when": "They open Record death.",
+                 "then": "Record death opens as before, with no Clear, because nothing has been entered."
+                },
+                "authority": [
+                 {
+                  "src": "STR",
+                  "at": "ux/laws/strings.json · verbs.Clear",
+                  "says": "empty what was entered or ticked …; present only while there is something to empty"
+                 }
+                ],
+                "result": "pass"
+               },
+               {
+                "type": "action",
+                "id": "death.enter",
+                "label": "add two crushed piglets",
+                "children": [
+                 {
+                  "type": "outcome",
+                  "id": "pp-dd1-death-entry-shows-clear",
+                  "label": "an entry shows Clear in the footer",
+                  "tree": "T-23",
+                  "gwt": {
+                   "given": "Record death is open and untouched.",
+                   "when": "They add two crushed piglets.",
+                   "then": "Clear appears in the footer, left of the commit."
+                  },
+                  "authority": [
+                   {
+                    "src": "STR",
+                    "at": "ux/laws/strings.json · verbs.Clear",
+                    "says": "empty what was entered or ticked …; present only while there is something to empty"
+                   }
+                  ],
+                  "result": "pass"
+                 },
+                 {
+                  "type": "action",
+                  "id": "death.enter.back",
+                  "label": "Back",
+                  "children": [
+                   {
+                    "type": "outcome",
+                    "id": "pp-dd2-death-back-saves-nothing",
+                    "label": "Back leaves Record death; nothing is recorded",
+                    "tree": "T-23",
+                    "gwt": {
+                     "given": "Record death holds an entry that is not recorded.",
+                     "when": "They tap Back.",
+                     "then": "They are back where they came from and nothing is recorded."
+                    },
+                    "authority": [
+                     {
+                      "src": "owner",
+                      "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+                      "says": "Back … leaves and returns to where you came from, keeping the draft."
+                     },
+                     {
+                      "src": "RUL",
+                      "at": "ux/research/farrowing/RULINGS.md · The exit grammar",
+                      "says": "The drawer and Edit are staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save` commits"
+                     }
+                    ],
+                    "result": "pass"
+                   },
+                   {
+                    "type": "action",
+                    "id": "death.enter.back.reopen",
+                    "label": "reopen Record death",
+                    "children": [
+                     {
+                      "type": "outcome",
+                      "id": "pp-dd3-death-reopen-shows-draft",
+                      "label": "reopening Record death shows the draft, with Clear",
+                      "tree": "T-23",
+                      "gwt": {
+                       "given": "They left Record death with Back after they add two crushed piglets.",
+                       "when": "They open Record death again.",
+                       "then": "The entry is still there and Clear is in the footer."
+                      },
+                      "authority": [
+                       {
+                        "src": "owner",
+                        "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+                        "says": "Back … leaves and returns to where you came from, keeping the draft."
+                       },
+                       {
+                        "src": "RUL",
+                        "at": "ux/research/farrowing/RULINGS.md · The exit grammar",
+                        "says": "The drawer and Edit are staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save` commits"
+                       }
+                      ],
+                      "result": "pass"
+                     },
+                     {
+                      "type": "action",
+                      "id": "death.enter.back.reopen.clear",
+                      "label": "Clear",
+                      "children": [
+                       {
+                        "type": "outcome",
+                        "id": "pp-dd4-death-clear-empties",
+                        "label": "Clear empties Record death and goes; nothing recorded",
+                        "tree": "T-23",
+                        "gwt": {
+                         "given": "Record death was reopened holding the kept draft.",
+                         "when": "They tap Clear.",
+                         "then": "Record death is back as it opened, Clear disappears and nothing is recorded."
+                        },
+                        "authority": [
+                         {
+                          "src": "RUL",
+                          "at": "ux/research/farrowing/RULINGS.md · The exit grammar",
+                          "says": "The drawer and Edit are staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save` commits"
+                         },
+                         {
+                          "src": "STR",
+                          "at": "ux/laws/strings.json · verbs.Clear",
+                          "says": "empty what was entered or ticked …; present only while there is something to empty"
+                         }
+                        ],
+                        "result": "pass"
+                       },
+                       {
+                        "type": "action",
+                        "id": "death.enter.back.reopen.clear.back",
+                        "label": "Back, then reopen",
+                        "children": [
+                         {
+                          "type": "outcome",
+                          "id": "pp-dd5-death-cleared-stays-cleared",
+                          "label": "after Clear, Back and reopen show Record death as it opened",
+                          "tree": "T-23",
+                          "gwt": {
+                           "given": "They cleared the draft on Record death.",
+                           "when": "They go Back and open it again.",
+                           "then": "It opens as it did the first time, with no Clear."
+                          },
+                          "authority": [
+                           {
+                            "src": "RUL",
+                            "at": "ux/research/farrowing/RULINGS.md · The exit grammar",
+                            "says": "The drawer and Edit are staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save` commits"
+                           },
+                           {
+                            "src": "STR",
+                            "at": "ux/laws/strings.json · verbs.Clear",
+                            "says": "empty what was entered or ticked …; present only while there is something to empty"
+                           }
+                          ],
+                          "result": "pass"
+                         }
+                        ]
+                       }
+                      ]
+                     }
+                    ]
+                   }
+                  ]
+                 },
+                 {
+                  "type": "action",
+                  "id": "death.enter.sysback",
+                  "label": "the phone's Back, then reopen",
+                  "children": [
+                   {
+                    "type": "outcome",
+                    "id": "pp-dd6-death-phone-back-keeps-draft",
+                    "label": "the phone's Back keeps the draft like the footer Back",
+                    "tree": "T-23",
+                    "gwt": {
+                     "given": "Record death holds an entry that is not recorded.",
+                     "when": "They press the phone's own Back and open it again.",
+                     "then": "The entry is still there and nothing is recorded."
+                    },
+                    "authority": [
+                     {
+                      "src": "owner",
+                      "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+                      "says": "Back … leaves and returns to where you came from, keeping the draft."
+                     },
+                     {
+                      "src": "RUL",
+                      "at": "ux/research/farrowing/RULINGS.md · The exit grammar",
+                      "says": "The drawer and Edit are staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save` commits"
+                     }
+                    ],
+                    "result": "pass"
+                   }
+                  ]
+                 }
+                ]
+               }
+              ]
+             },
+             {
+              "type": "action",
+              "id": "weight.open",
+              "label": "open Litter weight",
+              "children": [
+               {
+                "type": "outcome",
+                "id": "pp-dw0-weight-opens-without-clear",
+                "label": "Litter weight opens untouched: no Clear",
+                "tree": "T-23",
+                "gwt": {
+                 "given": "A worker has pen A03 open; the litter is not weighed.",
+                 "when": "They open Litter weight.",
+                 "then": "Litter weight opens as before, with no Clear, because nothing has been entered."
+                },
+                "authority": [
+                 {
+                  "src": "STR",
+                  "at": "ux/laws/strings.json · verbs.Clear",
+                  "says": "empty what was entered or ticked …; present only while there is something to empty"
+                 }
+                ],
+                "result": "pass"
+               },
+               {
+                "type": "action",
+                "id": "weight.enter",
+                "label": "type 18 kg",
+                "children": [
+                 {
+                  "type": "outcome",
+                  "id": "pp-dw1-weight-entry-shows-clear",
+                  "label": "an entry shows Clear in the footer",
+                  "tree": "T-23",
+                  "gwt": {
+                   "given": "Litter weight is open and untouched.",
+                   "when": "They type 18 kg.",
+                   "then": "Clear appears in the footer, left of the commit."
+                  },
+                  "authority": [
+                   {
+                    "src": "STR",
+                    "at": "ux/laws/strings.json · verbs.Clear",
+                    "says": "empty what was entered or ticked …; present only while there is something to empty"
+                   }
+                  ],
+                  "result": "fail",
+                  "hard": [
+                   "unreachable-control"
+                  ],
+                  "failures": [
+                   {
+                    "what": "tap [data-action='pad'][data-value='1']",
+                    "got": "control not found: [data-action='pad'][data-value='1']",
+                    "tag": "unreachable-control",
+                    "runs": [
+                     "en 360",
+                     "en 390",
+                     "zh 360",
+                     "zh 390"
+                    ]
+                   }
+                  ]
+                 },
+                 {
+                  "type": "action",
+                  "id": "weight.enter.back",
+                  "label": "Back",
+                  "children": [
+                   {
+                    "type": "outcome",
+                    "id": "pp-dw2-weight-back-saves-nothing",
+                    "label": "Back leaves Litter weight; nothing is recorded",
+                    "tree": "T-23",
+                    "gwt": {
+                     "given": "Litter weight holds an entry that is not recorded.",
+                     "when": "They tap Back.",
+                     "then": "They are back where they came from and nothing is recorded."
+                    },
+                    "authority": [
+                     {
+                      "src": "owner",
+                      "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+                      "says": "Back … leaves and returns to where you came from, keeping the draft."
+                     },
+                     {
+                      "src": "RUL",
+                      "at": "ux/research/farrowing/RULINGS.md · The exit grammar",
+                      "says": "The drawer and Edit are staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save` commits"
+                     }
+                    ],
+                    "result": "fail",
+                    "hard": [
+                     "unreachable-control"
+                    ],
+                    "failures": [
+                     {
+                      "what": "tap [data-action='pad'][data-value='1']",
+                      "got": "control not found: [data-action='pad'][data-value='1']",
+                      "tag": "unreachable-control",
+                      "runs": [
+                       "en 360",
+                       "en 390",
+                       "zh 360",
+                       "zh 390"
+                      ]
+                     }
+                    ]
+                   },
+                   {
+                    "type": "action",
+                    "id": "weight.enter.back.reopen",
+                    "label": "reopen Litter weight",
+                    "children": [
+                     {
+                      "type": "outcome",
+                      "id": "pp-dw3-weight-reopen-shows-draft",
+                      "label": "reopening Litter weight shows the draft, with Clear",
+                      "tree": "T-23",
+                      "gwt": {
+                       "given": "They left Litter weight with Back after they type 18 kg.",
+                       "when": "They open Litter weight again.",
+                       "then": "The entry is still there and Clear is in the footer."
+                      },
+                      "authority": [
+                       {
+                        "src": "owner",
+                        "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+                        "says": "Back … leaves and returns to where you came from, keeping the draft."
+                       },
+                       {
+                        "src": "RUL",
+                        "at": "ux/research/farrowing/RULINGS.md · The exit grammar",
+                        "says": "The drawer and Edit are staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save` commits"
+                       }
+                      ],
+                      "result": "fail",
+                      "hard": [
+                       "unreachable-control"
+                      ],
+                      "failures": [
+                       {
+                        "what": "tap [data-action='pad'][data-value='1']",
+                        "got": "control not found: [data-action='pad'][data-value='1']",
+                        "tag": "unreachable-control",
+                        "runs": [
+                         "en 360",
+                         "en 390",
+                         "zh 360",
+                         "zh 390"
+                        ]
+                       }
+                      ]
+                     },
+                     {
+                      "type": "action",
+                      "id": "weight.enter.back.reopen.clear",
+                      "label": "Clear",
+                      "children": [
+                       {
+                        "type": "outcome",
+                        "id": "pp-dw4-weight-clear-empties",
+                        "label": "Clear empties Litter weight and goes; nothing recorded",
+                        "tree": "T-23",
+                        "gwt": {
+                         "given": "Litter weight was reopened holding the kept draft.",
+                         "when": "They tap Clear.",
+                         "then": "Litter weight is back as it opened, Clear disappears and nothing is recorded."
+                        },
+                        "authority": [
+                         {
+                          "src": "RUL",
+                          "at": "ux/research/farrowing/RULINGS.md · The exit grammar",
+                          "says": "The drawer and Edit are staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save` commits"
+                         },
+                         {
+                          "src": "STR",
+                          "at": "ux/laws/strings.json · verbs.Clear",
+                          "says": "empty what was entered or ticked …; present only while there is something to empty"
+                         }
+                        ],
+                        "result": "fail",
+                        "hard": [
+                         "unreachable-control"
+                        ],
+                        "failures": [
+                         {
+                          "what": "tap [data-action='pad'][data-value='1']",
+                          "got": "control not found: [data-action='pad'][data-value='1']",
+                          "tag": "unreachable-control",
+                          "runs": [
+                           "en 360",
+                           "en 390",
+                           "zh 360",
+                           "zh 390"
+                          ]
+                         }
+                        ]
+                       },
+                       {
+                        "type": "action",
+                        "id": "weight.enter.back.reopen.clear.back",
+                        "label": "Back, then reopen",
+                        "children": [
+                         {
+                          "type": "outcome",
+                          "id": "pp-dw5-weight-cleared-stays-cleared",
+                          "label": "after Clear, Back and reopen show Litter weight as it opened",
+                          "tree": "T-23",
+                          "gwt": {
+                           "given": "They cleared the draft on Litter weight.",
+                           "when": "They go Back and open it again.",
+                           "then": "It opens as it did the first time, with no Clear."
+                          },
+                          "authority": [
+                           {
+                            "src": "RUL",
+                            "at": "ux/research/farrowing/RULINGS.md · The exit grammar",
+                            "says": "The drawer and Edit are staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save` commits"
+                           },
+                           {
+                            "src": "STR",
+                            "at": "ux/laws/strings.json · verbs.Clear",
+                            "says": "empty what was entered or ticked …; present only while there is something to empty"
+                           }
+                          ],
+                          "result": "fail",
+                          "hard": [
+                           "unreachable-control"
+                          ],
+                          "failures": [
+                           {
+                            "what": "tap [data-action='pad'][data-value='1']",
+                            "got": "control not found: [data-action='pad'][data-value='1']",
+                            "tag": "unreachable-control",
+                            "runs": [
+                             "en 360",
+                             "en 390",
+                             "zh 360",
+                             "zh 390"
+                            ]
+                           }
+                          ]
+                         }
+                        ]
+                       }
+                      ]
+                     }
+                    ]
+                   }
+                  ]
+                 },
+                 {
+                  "type": "action",
+                  "id": "weight.enter.sysback",
+                  "label": "the phone's Back, then reopen",
+                  "children": [
+                   {
+                    "type": "outcome",
+                    "id": "pp-dw6-weight-phone-back-keeps-draft",
+                    "label": "the phone's Back keeps the draft like the footer Back",
+                    "tree": "T-23",
+                    "gwt": {
+                     "given": "Litter weight holds an entry that is not recorded.",
+                     "when": "They press the phone's own Back and open it again.",
+                     "then": "The entry is still there and nothing is recorded."
+                    },
+                    "authority": [
+                     {
+                      "src": "owner",
+                      "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+                      "says": "Back … leaves and returns to where you came from, keeping the draft."
+                     },
+                     {
+                      "src": "RUL",
+                      "at": "ux/research/farrowing/RULINGS.md · The exit grammar",
+                      "says": "The drawer and Edit are staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save` commits"
+                     }
+                    ],
+                    "result": "fail",
+                    "hard": [
+                     "unreachable-control"
+                    ],
+                    "failures": [
+                     {
+                      "what": "tap [data-action='pad'][data-value='1']",
+                      "got": "control not found: [data-action='pad'][data-value='1']",
+                      "tag": "unreachable-control",
+                      "runs": [
+                       "en 360",
+                       "en 390",
+                       "zh 360",
+                       "zh 390"
+                      ]
+                     }
+                    ]
+                   }
+                  ]
+                 }
+                ]
+               }
+              ]
+             },
+             {
+              "type": "action",
+              "id": "count.open",
+              "label": "open Set count",
+              "children": [
+               {
+                "type": "outcome",
+                "id": "pp-dc0-count-opens-without-clear",
+                "label": "Set count opens untouched: no Clear",
+                "tree": "C-15",
+                "gwt": {
+                 "given": "A worker has pen A03 open: 12 piglets alive.",
+                 "when": "They open Set count.",
+                 "then": "Set count opens as before, with no Clear, because nothing has been entered."
+                },
+                "authority": [
+                 {
+                  "src": "STR",
+                  "at": "ux/laws/strings.json · verbs.Clear",
+                  "says": "empty what was entered or ticked …; present only while there is something to empty"
+                 }
+                ],
+                "result": "pass"
+               },
+               {
+                "type": "action",
+                "id": "count.enter",
+                "label": "count one fewer (11)",
+                "children": [
+                 {
+                  "type": "outcome",
+                  "id": "pp-dc1-count-entry-shows-clear",
+                  "label": "an entry shows Clear in the footer",
+                  "tree": "C-15",
+                  "gwt": {
+                   "given": "Set count is open and untouched.",
+                   "when": "They count one fewer (11).",
+                   "then": "Clear appears in the footer, left of the commit."
+                  },
+                  "authority": [
+                   {
+                    "src": "STR",
+                    "at": "ux/laws/strings.json · verbs.Clear",
+                    "says": "empty what was entered or ticked …; present only while there is something to empty"
+                   }
+                  ],
+                  "result": "pass"
+                 },
+                 {
+                  "type": "action",
+                  "id": "count.enter.back",
+                  "label": "Back",
+                  "children": [
+                   {
+                    "type": "outcome",
+                    "id": "pp-dc2-count-back-saves-nothing",
+                    "label": "Back leaves Set count; nothing is recorded",
+                    "tree": "C-15",
+                    "gwt": {
+                     "given": "Set count holds an entry that is not recorded.",
+                     "when": "They tap Back.",
+                     "then": "They are back where they came from and nothing is recorded."
+                    },
+                    "authority": [
+                     {
+                      "src": "owner",
+                      "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+                      "says": "Back … leaves and returns to where you came from, keeping the draft."
+                     },
+                     {
+                      "src": "RUL",
+                      "at": "ux/research/farrowing/RULINGS.md · The exit grammar",
+                      "says": "The drawer and Edit are staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save` commits"
+                     }
+                    ],
+                    "result": "pass"
+                   },
+                   {
+                    "type": "action",
+                    "id": "count.enter.back.reopen",
+                    "label": "reopen Set count",
+                    "children": [
+                     {
+                      "type": "outcome",
+                      "id": "pp-dc3-count-reopen-shows-draft",
+                      "label": "reopening Set count shows the draft, with Clear",
+                      "tree": "C-15",
+                      "gwt": {
+                       "given": "They left Set count with Back after they count one fewer (11).",
+                       "when": "They open Set count again.",
+                       "then": "The entry is still there and Clear is in the footer."
+                      },
+                      "authority": [
+                       {
+                        "src": "owner",
+                        "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+                        "says": "Back … leaves and returns to where you came from, keeping the draft."
+                       },
+                       {
+                        "src": "RUL",
+                        "at": "ux/research/farrowing/RULINGS.md · The exit grammar",
+                        "says": "The drawer and Edit are staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save` commits"
+                       }
+                      ],
+                      "result": "pass"
+                     },
+                     {
+                      "type": "action",
+                      "id": "count.enter.back.reopen.clear",
+                      "label": "Clear",
+                      "children": [
+                       {
+                        "type": "outcome",
+                        "id": "pp-dc4-count-clear-empties",
+                        "label": "Clear empties Set count and goes; nothing recorded",
+                        "tree": "C-15",
+                        "gwt": {
+                         "given": "Set count was reopened holding the kept draft.",
+                         "when": "They tap Clear.",
+                         "then": "Set count is back as it opened, Clear disappears and nothing is recorded."
+                        },
+                        "authority": [
+                         {
+                          "src": "RUL",
+                          "at": "ux/research/farrowing/RULINGS.md · The exit grammar",
+                          "says": "The drawer and Edit are staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save` commits"
+                         },
+                         {
+                          "src": "STR",
+                          "at": "ux/laws/strings.json · verbs.Clear",
+                          "says": "empty what was entered or ticked …; present only while there is something to empty"
+                         }
+                        ],
+                        "result": "pass"
+                       },
+                       {
+                        "type": "action",
+                        "id": "count.enter.back.reopen.clear.back",
+                        "label": "Back, then reopen",
+                        "children": [
+                         {
+                          "type": "outcome",
+                          "id": "pp-dc5-count-cleared-stays-cleared",
+                          "label": "after Clear, Back and reopen show Set count as it opened",
+                          "tree": "C-15",
+                          "gwt": {
+                           "given": "They cleared the draft on Set count.",
+                           "when": "They go Back and open it again.",
+                           "then": "It opens as it did the first time, with no Clear."
+                          },
+                          "authority": [
+                           {
+                            "src": "RUL",
+                            "at": "ux/research/farrowing/RULINGS.md · The exit grammar",
+                            "says": "The drawer and Edit are staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save` commits"
+                           },
+                           {
+                            "src": "STR",
+                            "at": "ux/laws/strings.json · verbs.Clear",
+                            "says": "empty what was entered or ticked …; present only while there is something to empty"
+                           }
+                          ],
+                          "result": "pass"
+                         }
+                        ]
+                       }
+                      ]
+                     }
+                    ]
+                   }
+                  ]
+                 },
+                 {
+                  "type": "action",
+                  "id": "count.enter.sysback",
+                  "label": "the phone's Back, then reopen",
+                  "children": [
+                   {
+                    "type": "outcome",
+                    "id": "pp-dc6-count-phone-back-keeps-draft",
+                    "label": "the phone's Back keeps the draft like the footer Back",
+                    "tree": "C-15",
+                    "gwt": {
+                     "given": "Set count holds an entry that is not recorded.",
+                     "when": "They press the phone's own Back and open it again.",
+                     "then": "The entry is still there and nothing is recorded."
+                    },
+                    "authority": [
+                     {
+                      "src": "owner",
+                      "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+                      "says": "Back … leaves and returns to where you came from, keeping the draft."
+                     },
+                     {
+                      "src": "RUL",
+                      "at": "ux/research/farrowing/RULINGS.md · The exit grammar",
+                      "says": "The drawer and Edit are staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save` commits"
+                     }
+                    ],
+                    "result": "pass"
+                   }
+                  ]
+                 }
+                ]
+               }
+              ]
+             }
+            ]
+           },
+           {
+            "type": "state",
+            "id": "drafts.give-a02",
+            "label": "Pen A02, Give IDs open (4 of 12 tagged)",
+            "tree": "X-5",
+            "screen": "piglet-processing.give-ids",
+            "children": [
+             {
+              "type": "outcome",
+              "id": "pp-dg0-give-opens-without-clear",
+              "label": "Give IDs opens untouched: no Clear",
+              "tree": "X-5",
+              "gwt": {
+               "given": "A worker has pen A02 open with 4 of 12 piglets tagged.",
+               "when": "They open Give IDs.",
+               "then": "Give IDs opens as before, with the next tag suggested and no Clear."
+              },
+              "authority": [
+               {
+                "src": "STR",
+                "at": "ux/laws/strings.json · verbs.Clear",
+                "says": "empty what was entered or ticked …; present only while there is something to empty"
+               }
+              ],
+              "result": "pass"
+             },
+             {
+              "type": "action",
+              "id": "give.enter",
+              "label": "pick Gilt",
+              "children": [
+               {
+                "type": "outcome",
+                "id": "pp-dg1-give-entry-shows-clear",
+                "label": "an entry shows Clear in the footer",
+                "tree": "X-5",
+                "gwt": {
+                 "given": "Give IDs is open and untouched.",
+                 "when": "They pick Gilt.",
+                 "then": "Clear appears in the footer, left of the commit."
+                },
+                "authority": [
+                 {
+                  "src": "STR",
+                  "at": "ux/laws/strings.json · verbs.Clear",
+                  "says": "empty what was entered or ticked …; present only while there is something to empty"
+                 }
+                ],
+                "result": "pass"
+               },
+               {
+                "type": "action",
+                "id": "give.enter.back",
+                "label": "Back",
+                "children": [
+                 {
+                  "type": "outcome",
+                  "id": "pp-dg2-give-back-saves-nothing",
+                  "label": "Back returns to the Piglets list; nothing is recorded",
+                  "tree": "X-5",
+                  "gwt": {
+                   "given": "Give IDs holds Gilt for the next piglet, not recorded.",
+                   "when": "They tap Back.",
+                   "then": "The Piglets list shows again, still 4 tagged; nothing is recorded."
+                  },
+                  "authority": [
+                   {
+                    "src": "owner",
+                    "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+                    "says": "Back … leaves and returns to where you came from, keeping the draft."
+                   },
+                   {
+                    "src": "RUL",
+                    "at": "ux/research/farrowing/RULINGS.md · The exit grammar",
+                    "says": "The drawer and Edit are staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save` commits"
+                   }
+                  ],
+                  "result": "pass"
+                 },
+                 {
+                  "type": "action",
+                  "id": "give.enter.back.reopen",
+                  "label": "reopen Give IDs",
+                  "children": [
+                   {
+                    "type": "outcome",
+                    "id": "pp-dg3-give-reopen-shows-draft",
+                    "label": "reopening Give IDs shows Gilt still picked, with Clear",
+                    "tree": "X-5",
+                    "gwt": {
+                     "given": "They left Give IDs with Back after picking Gilt.",
+                     "when": "They open Give IDs again.",
+                     "then": "Gilt is still picked and Clear is in the footer."
+                    },
+                    "authority": [
+                     {
+                      "src": "owner",
+                      "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+                      "says": "Back … leaves and returns to where you came from, keeping the draft."
+                     },
+                     {
+                      "src": "RUL",
+                      "at": "ux/research/farrowing/RULINGS.md · The exit grammar",
+                      "says": "The drawer and Edit are staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save` commits"
+                     }
+                    ],
+                    "result": "pass"
+                   },
+                   {
+                    "type": "action",
+                    "id": "give.enter.back.reopen.clear",
+                    "label": "Clear",
+                    "children": [
+                     {
+                      "type": "outcome",
+                      "id": "pp-dg4-give-clear-empties",
+                      "label": "Clear empties Give IDs and goes; nothing recorded",
+                      "tree": "X-5",
+                      "gwt": {
+                       "given": "Give IDs was reopened with Gilt still picked.",
+                       "when": "They tap Clear.",
+                       "then": "No sex is picked, Clear disappears and nothing is recorded."
+                      },
+                      "authority": [
+                       {
+                        "src": "RUL",
+                        "at": "ux/research/farrowing/RULINGS.md · The exit grammar",
+                        "says": "The drawer and Edit are staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save` commits"
+                       },
+                       {
+                        "src": "STR",
+                        "at": "ux/laws/strings.json · verbs.Clear",
+                        "says": "empty what was entered or ticked …; present only while there is something to empty"
+                       }
+                      ],
+                      "result": "pass"
+                     }
+                    ]
+                   }
+                  ]
+                 }
+                ]
+               },
+               {
+                "type": "action",
+                "id": "give.enter.sysback",
+                "label": "the phone's Back, then reopen",
+                "children": [
+                 {
+                  "type": "outcome",
+                  "id": "pp-dg6-give-phone-back-keeps-draft",
+                  "label": "the phone's Back keeps the draft like the header Back",
+                  "tree": "X-5",
+                  "gwt": {
+                   "given": "Give IDs holds Gilt for the next piglet, not recorded.",
+                   "when": "They press the phone's own Back and open Give IDs again.",
+                   "then": "Gilt is still picked and nothing is recorded."
+                  },
+                  "authority": [
+                   {
+                    "src": "owner",
+                    "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+                    "says": "Back … leaves and returns to where you came from, keeping the draft."
+                   },
+                   {
+                    "src": "RUL",
+                    "at": "ux/research/farrowing/RULINGS.md · The exit grammar",
+                    "says": "The drawer and Edit are staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save` commits"
+                   }
+                  ],
+                  "result": "pass"
+                 }
+                ]
+               }
+              ]
+             }
+            ]
+           }
+          ]
+         }
+        ],
+        "run": {
+         "commit": "d821fee",
+         "dirty": false,
+         "ran": "2026-10-14T08:33:30.809Z",
+         "langs": [
+          "en",
+          "zh"
+         ],
+         "widths": [
+          360,
+          390
+         ]
+        },
         "notSupported": null
        },
        "status": "in-design"
@@ -14439,8 +15363,1261 @@
        "prd": "# Inspection 巡检\n\n## Problem\n\nA worker walks one unit and has to see every pig, spot the ones that need care or feed attention, and record what they find without leaving the place they are standing. Today's old UI spreads this over many screens in the Inspection Figma file. The built prototype (`ux/system/inspection-astra-concept.html`) puts it in one list with a dock, but several parts of it are built and never reachable (unit summary, sensors, batch tracker, equipment faults), and the list repeats facts that the pig record also shows.\n\n## Who\n\nThe barn worker doing the morning or evening walk, often wearing gloves, one hand free. The supervisor reads the same list to see what was recorded (\"Log\", \"Check in\"). The unit is the scope: there is no cohort.\n\n## Anchor\n\nNo anchor. The walk has no lifecycle that changes what work is available: it can be checked in again at any time (\"Check in again\"), and nothing is blocked before or after. The screens are therefore grouped by what the worker is doing: walk the list, open a pen, select and act, unit batches, unit environment and equipment (built, not reachable), finish.\n\n## Rules\n\n- Selection is not an inspection result. A pig checkbox never selects its pen; a pen checkbox selects the pen and the pigs shown (ROUND-3).\n- Notes belong to the pen, not to its pigs. A pen has one note; closing it moves it into the pen log.\n- Feed is guidance, not a completion checklist: nothing on the walk can be \"done\" for feed.\n- The stage on a row is days in the stage, never lifetime age; the walk date is fixed in the sample (12 Sep 2026).\n- Care is the only editable condition state; attention is derived from it (ASTRA-BULK-ACTIONS).\n- One Actions sheet for one pig or many; Production actions exist only for one pig.\n- Finishing a walk records that the unit was walked; it does not mark pigs healthy or tasks done.\n\n## Scope\n\nIn: the unit walk list (lens All / Health / Feed, filter, pen map, find and scan), the pen sheet with note and log, the selection and Actions sheet, the walk log and check-in, the unit batches that change the stage text, and the built-but-unreachable unit summary, sensors, batch sheet and equipment fault flow.\n\nOut (owned by other features): the pig record and its actions (pig-profile), feed reading and editing (feed-plan), conditions, care and treatment (health-record). The Farrowing task is opened from here but belongs to Tasks.\n\n## Decisions\n\nTaken from the research notes and the code:\n\n- The roster shows every pig (the earlier \"quiet pigs collapsed\" idea was dropped). Owner-approved 2026-10-12: a pig is a two-line row. Left, a fixed 112px column: the pig ID over the stage line (\"Gestation · 42d\"; \"d\" is the one allowed abbreviation; no stage date, the stage alone; the stage ends in an ellipsis rather than widening the column). Right, one line of compact condition tags that fills the space up to the chevron: the name only (no day, no care word; Poor appetite is the trend-down icon and \"Appetite\", Diarrhoea is \"Scours\"), ordered by urgency then day (Treat in place and Hospital pen, then Monitor, then ongoing). Act now is a red wash with the \"!\" icon and bold red text; monitor is white with a thin border; ongoing is muted text with no box.\n- The tag line is one line only. Tags are added in priority order until the line is full, then \"+N\" says how many are left; the urgent tag is never the hidden one.\n- There is no feed tag on a pig row. A trough pen can't feed one pig, so feed is read and changed at the pen (the pen header keeps its feed summary).\n- The row is the design system's Row · animal (select + door), with the compact ConditionTag.\n- Home opens this page through the \"Inspect unit\" card with the unit kept in the link; Back returns to Home with the unit.\n- Pen map copies Farrowing's four-column, six-row map and 350 ms hold-to-peek.\n\nOpen (recorded on the screens as issues):\n\n- The unit summary card (pig and pen counts, faults, sensors, batch tracker) is in the code and not placed on the walk. Draw it or remove it.\n- Equipment faults have a full report-and-resolve flow in the prototype's code but no control reaches it; the pen workflow deck draws the same flow (and Set count) as screens, listed under Equipment faults and Pen head count.\n- \"Health\" and \"Feed\" lens counts do not say what they count.\n- The care level shows on a row only by the tag's look (red wash with \"!\", outlined, plain); the care word and the day are on the record.\n- Fixed author \"G. Hansen\" and times 06:40 and 09:41 stand in for the signed-in worker and real times.\n",
        "scenarios": {
         "treeDoc": false,
-        "tree": null,
-        "run": null,
+        "tree": [
+         {
+          "type": "entry",
+          "id": "drafts",
+          "label": "A typed sheet (pen note, report fault, resolve fault, selected pens note, filters) → Back → reopen → Clear",
+          "children": [
+           {
+            "type": "state",
+            "id": "drafts.pen-c2",
+            "label": "Unit walk, pen C2 open (no pen note)",
+            "tree": "DC",
+            "screen": "inspection.walk",
+            "children": [
+             {
+              "type": "action",
+              "id": "pen-note.open",
+              "label": "open Pen note",
+              "children": [
+               {
+                "type": "outcome",
+                "id": "in-dc0-pen-note-opens-without-clear",
+                "label": "Pen note opens untouched: no Clear",
+                "tree": "DC-0",
+                "gwt": {
+                 "given": "A worker on the unit walk has pen C2 open; C2 has no pen note.",
+                 "when": "They open Pen note.",
+                 "then": "Pen note opens as before, with Back and its commit in the footer and no Clear, because nothing has been entered."
+                },
+                "authority": [
+                 {
+                  "src": "STR",
+                  "at": "ux/laws/strings.json · verbs.Clear",
+                  "says": "empty what was entered or ticked …; present only while there is something to empty"
+                 }
+                ],
+                "result": "fail",
+                "failures": [
+                 {
+                  "what": "on inspection.pen-note",
+                  "got": "null",
+                  "tag": "",
+                  "runs": [
+                   "en 360",
+                   "en 390",
+                   "zh 360",
+                   "zh 390"
+                  ]
+                 }
+                ]
+               },
+               {
+                "type": "action",
+                "id": "pen-note.type",
+                "label": "type \"Gate latch loose\"",
+                "children": [
+                 {
+                  "type": "outcome",
+                  "id": "in-dc1-pen-note-typing-shows-clear",
+                  "label": "typing shows Clear in the footer",
+                  "tree": "DC-1",
+                  "gwt": {
+                   "given": "Pen note is open and empty of edits.",
+                   "when": "They type \"Gate latch loose\".",
+                   "then": "Clear appears in the footer, left of the commit."
+                  },
+                  "authority": [
+                   {
+                    "src": "owner",
+                    "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+                    "says": "Clear empties what was entered or ticked … present only when there is something to reset or clear"
+                   }
+                  ],
+                  "result": "fail",
+                  "failures": [
+                   {
+                    "what": "Clear is shown",
+                    "got": "absent",
+                    "tag": "",
+                    "runs": [
+                     "zh 360",
+                     "zh 390"
+                    ]
+                   }
+                  ]
+                 },
+                 {
+                  "type": "action",
+                  "id": "pen-note.type.back",
+                  "label": "Back (footer)",
+                  "children": [
+                   {
+                    "type": "outcome",
+                    "id": "in-dc2-pen-note-back-keeps-draft",
+                    "label": "Back leaves Pen note and keeps the typed draft; nothing saved",
+                    "tree": "DC-2",
+                    "gwt": {
+                     "given": "Pen note holds \"Gate latch loose\", not saved.",
+                     "when": "They tap Back.",
+                     "then": "They are back where they came from, the typed text is kept as a draft and nothing is saved."
+                    },
+                    "authority": [
+                     {
+                      "src": "owner",
+                      "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+                      "says": "Back … leaves and returns to where you came from, keeping the draft."
+                     }
+                    ],
+                    "result": "fail",
+                    "failures": [
+                     {
+                      "what": "on inspection.pen",
+                      "got": "null",
+                      "tag": "",
+                      "runs": [
+                       "en 360",
+                       "en 390",
+                       "zh 360",
+                       "zh 390"
+                      ]
+                     }
+                    ]
+                   },
+                   {
+                    "type": "action",
+                    "id": "pen-note.type.back.reopen",
+                    "label": "reopen Pen note",
+                    "children": [
+                     {
+                      "type": "outcome",
+                      "id": "in-dc3-pen-note-reopen-shows-draft",
+                      "label": "reopening Pen note shows the draft, with Clear",
+                      "tree": "DC-3",
+                      "gwt": {
+                       "given": "They left Pen note with Back while it held \"Gate latch loose\".",
+                       "when": "They open Pen note again.",
+                       "then": "The field still holds \"Gate latch loose\" and Clear is in the footer."
+                      },
+                      "authority": [
+                       {
+                        "src": "owner",
+                        "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+                        "says": "Back … leaves and returns to where you came from, keeping the draft."
+                       }
+                      ],
+                      "result": "fail",
+                      "failures": [
+                       {
+                        "what": "on inspection.pen-note",
+                        "got": "null",
+                        "tag": "",
+                        "runs": [
+                         "en 360",
+                         "en 390",
+                         "zh 360",
+                         "zh 390"
+                        ]
+                       }
+                      ]
+                     },
+                     {
+                      "type": "action",
+                      "id": "pen-note.type.back.reopen.clear",
+                      "label": "Clear",
+                      "children": [
+                       {
+                        "type": "outcome",
+                        "id": "in-dc4-pen-note-clear-empties",
+                        "label": "Clear empties Pen note and goes; nothing saved",
+                        "tree": "DC-4",
+                        "gwt": {
+                         "given": "Pen note was reopened holding the kept draft \"Gate latch loose\".",
+                         "when": "They tap Clear.",
+                         "then": "The field is back as it opened, Clear disappears and nothing is saved."
+                        },
+                        "authority": [
+                         {
+                          "src": "owner",
+                          "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+                          "says": "Clear empties what was entered or ticked … present only when there is something to reset or clear"
+                         }
+                        ],
+                        "result": "pass"
+                       },
+                       {
+                        "type": "action",
+                        "id": "pen-note.type.back.reopen.clear.back",
+                        "label": "Back, then reopen",
+                        "children": [
+                         {
+                          "type": "outcome",
+                          "id": "in-dc5-pen-note-cleared-stays-cleared",
+                          "label": "after Clear, Back and reopen show Pen note as it opened",
+                          "tree": "DC-4",
+                          "gwt": {
+                           "given": "They cleared the draft on Pen note.",
+                           "when": "They go Back and open it again.",
+                           "then": "It opens as it did the first time, with no Clear."
+                          },
+                          "authority": [
+                           {
+                            "src": "owner",
+                            "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+                            "says": "Clear empties what was entered or ticked … present only when there is something to reset or clear"
+                           }
+                          ],
+                          "result": "fail",
+                          "failures": [
+                           {
+                            "what": "on inspection.pen-note",
+                            "got": "null",
+                            "tag": "",
+                            "runs": [
+                             "en 360",
+                             "en 390",
+                             "zh 360",
+                             "zh 390"
+                            ]
+                           }
+                          ]
+                         }
+                        ]
+                       }
+                      ]
+                     }
+                    ]
+                   }
+                  ]
+                 },
+                 {
+                  "type": "action",
+                  "id": "pen-note.type.sysback",
+                  "label": "the phone's Back",
+                  "children": [
+                   {
+                    "type": "outcome",
+                    "id": "in-dc6-pen-note-phone-back-keeps-draft",
+                    "label": "the phone's Back keeps the draft like the footer Back",
+                    "tree": "DC-2",
+                    "gwt": {
+                     "given": "Pen note holds \"Gate latch loose\", not saved.",
+                     "when": "They press the phone's own Back.",
+                     "then": "They are back where they came from and the typed text is kept as a draft."
+                    },
+                    "authority": [
+                     {
+                      "src": "owner",
+                      "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+                      "says": "Back … leaves and returns to where you came from, keeping the draft."
+                     },
+                     {
+                      "src": "owner",
+                      "at": "ux/design-system/README.md · The drawer convention",
+                      "says": "Swiping down or tapping the scrim does what Back does."
+                     }
+                    ],
+                    "result": "fail",
+                    "failures": [
+                     {
+                      "what": "on inspection.pen",
+                      "got": "null",
+                      "tag": "",
+                      "runs": [
+                       "en 360",
+                       "en 390",
+                       "zh 360",
+                       "zh 390"
+                      ]
+                     }
+                    ]
+                   }
+                  ]
+                 }
+                ]
+               }
+              ]
+             }
+            ]
+           },
+           {
+            "type": "state",
+            "id": "drafts.faults-c2",
+            "label": "Pen C2's Equipment faults (one open fault: Drinking station)",
+            "tree": "DC",
+            "screen": "inspection.walk",
+            "children": [
+             {
+              "type": "action",
+              "id": "fault-report.open",
+              "label": "open Report fault",
+              "children": [
+               {
+                "type": "outcome",
+                "id": "in-df0-fault-report-opens-without-clear",
+                "label": "Report fault opens untouched: no Clear",
+                "tree": "DC-0",
+                "gwt": {
+                 "given": "A worker has pen C2's Equipment faults open; C2 has one open fault.",
+                 "when": "They open Report fault.",
+                 "then": "Report fault opens as before, with Back and its commit in the footer and no Clear, because nothing has been entered."
+                },
+                "authority": [
+                 {
+                  "src": "STR",
+                  "at": "ux/laws/strings.json · verbs.Clear",
+                  "says": "empty what was entered or ticked …; present only while there is something to empty"
+                 }
+                ],
+                "result": "fail",
+                "failures": [
+                 {
+                  "what": "on inspection.fault-report",
+                  "got": "null",
+                  "tag": "",
+                  "runs": [
+                   "en 360",
+                   "en 390",
+                   "zh 360",
+                   "zh 390"
+                  ]
+                 }
+                ]
+               },
+               {
+                "type": "action",
+                "id": "fault-report.type",
+                "label": "type \"Feeder auger jammed\"",
+                "children": [
+                 {
+                  "type": "outcome",
+                  "id": "in-df1-fault-report-typing-shows-clear",
+                  "label": "typing shows Clear in the footer",
+                  "tree": "DC-1",
+                  "gwt": {
+                   "given": "Report fault is open and empty of edits.",
+                   "when": "They type \"Feeder auger jammed\".",
+                   "then": "Clear appears in the footer, left of the commit."
+                  },
+                  "authority": [
+                   {
+                    "src": "owner",
+                    "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+                    "says": "Clear empties what was entered or ticked … present only when there is something to reset or clear"
+                   }
+                  ],
+                  "result": "fail",
+                  "failures": [
+                   {
+                    "what": "Clear is shown",
+                    "got": "absent",
+                    "tag": "",
+                    "runs": [
+                     "zh 360",
+                     "zh 390"
+                    ]
+                   }
+                  ]
+                 },
+                 {
+                  "type": "action",
+                  "id": "fault-report.type.back",
+                  "label": "Back (footer)",
+                  "children": [
+                   {
+                    "type": "outcome",
+                    "id": "in-df2-fault-report-back-keeps-draft",
+                    "label": "Back leaves Report fault and keeps the typed draft; nothing saved",
+                    "tree": "DC-2",
+                    "gwt": {
+                     "given": "Report fault holds \"Feeder auger jammed\", not saved.",
+                     "when": "They tap Back.",
+                     "then": "They are back where they came from, the typed text is kept as a draft and nothing is saved."
+                    },
+                    "authority": [
+                     {
+                      "src": "owner",
+                      "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+                      "says": "Back … leaves and returns to where you came from, keeping the draft."
+                     }
+                    ],
+                    "result": "fail",
+                    "failures": [
+                     {
+                      "what": "on inspection.pen-faults",
+                      "got": "null",
+                      "tag": "",
+                      "runs": [
+                       "en 360",
+                       "en 390",
+                       "zh 360",
+                       "zh 390"
+                      ]
+                     }
+                    ]
+                   },
+                   {
+                    "type": "action",
+                    "id": "fault-report.type.back.reopen",
+                    "label": "reopen Report fault",
+                    "children": [
+                     {
+                      "type": "outcome",
+                      "id": "in-df3-fault-report-reopen-shows-draft",
+                      "label": "reopening Report fault shows the draft, with Clear",
+                      "tree": "DC-3",
+                      "gwt": {
+                       "given": "They left Report fault with Back while it held \"Feeder auger jammed\".",
+                       "when": "They open Report fault again.",
+                       "then": "The field still holds \"Feeder auger jammed\" and Clear is in the footer."
+                      },
+                      "authority": [
+                       {
+                        "src": "owner",
+                        "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+                        "says": "Back … leaves and returns to where you came from, keeping the draft."
+                       }
+                      ],
+                      "result": "fail",
+                      "failures": [
+                       {
+                        "what": "on inspection.fault-report",
+                        "got": "null",
+                        "tag": "",
+                        "runs": [
+                         "en 360",
+                         "en 390",
+                         "zh 360",
+                         "zh 390"
+                        ]
+                       }
+                      ]
+                     },
+                     {
+                      "type": "action",
+                      "id": "fault-report.type.back.reopen.clear",
+                      "label": "Clear",
+                      "children": [
+                       {
+                        "type": "outcome",
+                        "id": "in-df4-fault-report-clear-empties",
+                        "label": "Clear empties Report fault and goes; nothing saved",
+                        "tree": "DC-4",
+                        "gwt": {
+                         "given": "Report fault was reopened holding the kept draft \"Feeder auger jammed\".",
+                         "when": "They tap Clear.",
+                         "then": "The field is back as it opened, Clear disappears and nothing is saved."
+                        },
+                        "authority": [
+                         {
+                          "src": "owner",
+                          "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+                          "says": "Clear empties what was entered or ticked … present only when there is something to reset or clear"
+                         }
+                        ],
+                        "result": "pass"
+                       },
+                       {
+                        "type": "action",
+                        "id": "fault-report.type.back.reopen.clear.back",
+                        "label": "Back, then reopen",
+                        "children": [
+                         {
+                          "type": "outcome",
+                          "id": "in-df5-fault-report-cleared-stays-cleared",
+                          "label": "after Clear, Back and reopen show Report fault as it opened",
+                          "tree": "DC-4",
+                          "gwt": {
+                           "given": "They cleared the draft on Report fault.",
+                           "when": "They go Back and open it again.",
+                           "then": "It opens as it did the first time, with no Clear."
+                          },
+                          "authority": [
+                           {
+                            "src": "owner",
+                            "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+                            "says": "Clear empties what was entered or ticked … present only when there is something to reset or clear"
+                           }
+                          ],
+                          "result": "fail",
+                          "failures": [
+                           {
+                            "what": "on inspection.fault-report",
+                            "got": "null",
+                            "tag": "",
+                            "runs": [
+                             "en 360",
+                             "en 390",
+                             "zh 360",
+                             "zh 390"
+                            ]
+                           }
+                          ]
+                         }
+                        ]
+                       }
+                      ]
+                     }
+                    ]
+                   }
+                  ]
+                 },
+                 {
+                  "type": "action",
+                  "id": "fault-report.type.sysback",
+                  "label": "the phone's Back",
+                  "children": [
+                   {
+                    "type": "outcome",
+                    "id": "in-df6-fault-report-phone-back-keeps-draft",
+                    "label": "the phone's Back keeps the draft like the footer Back",
+                    "tree": "DC-2",
+                    "gwt": {
+                     "given": "Report fault holds \"Feeder auger jammed\", not saved.",
+                     "when": "They press the phone's own Back.",
+                     "then": "They are back where they came from and the typed text is kept as a draft."
+                    },
+                    "authority": [
+                     {
+                      "src": "owner",
+                      "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+                      "says": "Back … leaves and returns to where you came from, keeping the draft."
+                     },
+                     {
+                      "src": "owner",
+                      "at": "ux/design-system/README.md · The drawer convention",
+                      "says": "Swiping down or tapping the scrim does what Back does."
+                     }
+                    ],
+                    "result": "fail",
+                    "failures": [
+                     {
+                      "what": "on inspection.pen-faults",
+                      "got": "null",
+                      "tag": "",
+                      "runs": [
+                       "en 360",
+                       "en 390",
+                       "zh 360",
+                       "zh 390"
+                      ]
+                     }
+                    ]
+                   }
+                  ]
+                 }
+                ]
+               }
+              ]
+             },
+             {
+              "type": "action",
+              "id": "fault-resolve.open",
+              "label": "open the open fault",
+              "children": [
+               {
+                "type": "outcome",
+                "id": "in-dr0-fault-resolve-opens-without-clear",
+                "label": "the open fault opens untouched: no Clear",
+                "tree": "DC-0",
+                "gwt": {
+                 "given": "A worker has pen C2's Equipment faults open; C2 has one open fault.",
+                 "when": "They open the open fault.",
+                 "then": "the open fault opens as before, with Back and its commit in the footer and no Clear, because nothing has been entered."
+                },
+                "authority": [
+                 {
+                  "src": "STR",
+                  "at": "ux/laws/strings.json · verbs.Clear",
+                  "says": "empty what was entered or ticked …; present only while there is something to empty"
+                 }
+                ],
+                "result": "fail",
+                "failures": [
+                 {
+                  "what": "on inspection.fault-resolve",
+                  "got": "null",
+                  "tag": "",
+                  "runs": [
+                   "en 360",
+                   "en 390",
+                   "zh 360",
+                   "zh 390"
+                  ]
+                 }
+                ]
+               },
+               {
+                "type": "action",
+                "id": "fault-resolve.type",
+                "label": "type \"Valve replaced\"",
+                "children": [
+                 {
+                  "type": "outcome",
+                  "id": "in-dr1-fault-resolve-typing-shows-clear",
+                  "label": "typing shows Clear in the footer",
+                  "tree": "DC-1",
+                  "gwt": {
+                   "given": "the open fault is open and empty of edits.",
+                   "when": "They type \"Valve replaced\".",
+                   "then": "Clear appears in the footer, left of the commit."
+                  },
+                  "authority": [
+                   {
+                    "src": "owner",
+                    "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+                    "says": "Clear empties what was entered or ticked … present only when there is something to reset or clear"
+                   }
+                  ],
+                  "result": "fail",
+                  "failures": [
+                   {
+                    "what": "Clear is shown",
+                    "got": "absent",
+                    "tag": "",
+                    "runs": [
+                     "zh 360",
+                     "zh 390"
+                    ]
+                   }
+                  ]
+                 },
+                 {
+                  "type": "action",
+                  "id": "fault-resolve.type.back",
+                  "label": "Back (footer)",
+                  "children": [
+                   {
+                    "type": "outcome",
+                    "id": "in-dr2-fault-resolve-back-keeps-draft",
+                    "label": "Back leaves the open fault and keeps the typed draft; nothing saved",
+                    "tree": "DC-2",
+                    "gwt": {
+                     "given": "the open fault holds \"Valve replaced\", not saved.",
+                     "when": "They tap Back.",
+                     "then": "They are back where they came from, the typed text is kept as a draft and nothing is saved."
+                    },
+                    "authority": [
+                     {
+                      "src": "owner",
+                      "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+                      "says": "Back … leaves and returns to where you came from, keeping the draft."
+                     }
+                    ],
+                    "result": "fail",
+                    "failures": [
+                     {
+                      "what": "on inspection.pen-faults",
+                      "got": "null",
+                      "tag": "",
+                      "runs": [
+                       "en 360",
+                       "en 390",
+                       "zh 360",
+                       "zh 390"
+                      ]
+                     }
+                    ]
+                   },
+                   {
+                    "type": "action",
+                    "id": "fault-resolve.type.back.reopen",
+                    "label": "reopen the open fault",
+                    "children": [
+                     {
+                      "type": "outcome",
+                      "id": "in-dr3-fault-resolve-reopen-shows-draft",
+                      "label": "reopening the open fault shows the draft, with Clear",
+                      "tree": "DC-3",
+                      "gwt": {
+                       "given": "They left the open fault with Back while it held \"Valve replaced\".",
+                       "when": "They open the open fault again.",
+                       "then": "The field still holds \"Valve replaced\" and Clear is in the footer."
+                      },
+                      "authority": [
+                       {
+                        "src": "owner",
+                        "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+                        "says": "Back … leaves and returns to where you came from, keeping the draft."
+                       }
+                      ],
+                      "result": "fail",
+                      "failures": [
+                       {
+                        "what": "on inspection.fault-resolve",
+                        "got": "null",
+                        "tag": "",
+                        "runs": [
+                         "en 360",
+                         "en 390",
+                         "zh 360",
+                         "zh 390"
+                        ]
+                       }
+                      ]
+                     },
+                     {
+                      "type": "action",
+                      "id": "fault-resolve.type.back.reopen.clear",
+                      "label": "Clear",
+                      "children": [
+                       {
+                        "type": "outcome",
+                        "id": "in-dr4-fault-resolve-clear-empties",
+                        "label": "Clear empties the open fault and goes; nothing saved",
+                        "tree": "DC-4",
+                        "gwt": {
+                         "given": "the open fault was reopened holding the kept draft \"Valve replaced\".",
+                         "when": "They tap Clear.",
+                         "then": "The field is back as it opened, Clear disappears and nothing is saved."
+                        },
+                        "authority": [
+                         {
+                          "src": "owner",
+                          "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+                          "says": "Clear empties what was entered or ticked … present only when there is something to reset or clear"
+                         }
+                        ],
+                        "result": "pass"
+                       },
+                       {
+                        "type": "action",
+                        "id": "fault-resolve.type.back.reopen.clear.back",
+                        "label": "Back, then reopen",
+                        "children": [
+                         {
+                          "type": "outcome",
+                          "id": "in-dr5-fault-resolve-cleared-stays-cleared",
+                          "label": "after Clear, Back and reopen show the open fault as it opened",
+                          "tree": "DC-4",
+                          "gwt": {
+                           "given": "They cleared the draft on the open fault.",
+                           "when": "They go Back and open it again.",
+                           "then": "It opens as it did the first time, with no Clear."
+                          },
+                          "authority": [
+                           {
+                            "src": "owner",
+                            "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+                            "says": "Clear empties what was entered or ticked … present only when there is something to reset or clear"
+                           }
+                          ],
+                          "result": "fail",
+                          "failures": [
+                           {
+                            "what": "on inspection.fault-resolve",
+                            "got": "null",
+                            "tag": "",
+                            "runs": [
+                             "en 360",
+                             "en 390",
+                             "zh 360",
+                             "zh 390"
+                            ]
+                           }
+                          ]
+                         }
+                        ]
+                       }
+                      ]
+                     }
+                    ]
+                   }
+                  ]
+                 },
+                 {
+                  "type": "action",
+                  "id": "fault-resolve.type.sysback",
+                  "label": "the phone's Back",
+                  "children": [
+                   {
+                    "type": "outcome",
+                    "id": "in-dr6-fault-resolve-phone-back-keeps-draft",
+                    "label": "the phone's Back keeps the draft like the footer Back",
+                    "tree": "DC-2",
+                    "gwt": {
+                     "given": "the open fault holds \"Valve replaced\", not saved.",
+                     "when": "They press the phone's own Back.",
+                     "then": "They are back where they came from and the typed text is kept as a draft."
+                    },
+                    "authority": [
+                     {
+                      "src": "owner",
+                      "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+                      "says": "Back … leaves and returns to where you came from, keeping the draft."
+                     },
+                     {
+                      "src": "owner",
+                      "at": "ux/design-system/README.md · The drawer convention",
+                      "says": "Swiping down or tapping the scrim does what Back does."
+                     }
+                    ],
+                    "result": "fail",
+                    "failures": [
+                     {
+                      "what": "on inspection.pen-faults",
+                      "got": "null",
+                      "tag": "",
+                      "runs": [
+                       "en 360",
+                       "en 390",
+                       "zh 360",
+                       "zh 390"
+                      ]
+                     }
+                    ]
+                   }
+                  ]
+                 }
+                ]
+               }
+              ]
+             }
+            ]
+           },
+           {
+            "type": "state",
+            "id": "drafts.pens-selected",
+            "label": "Unit walk, pen C2 ticked, More actions open",
+            "tree": "DC",
+            "screen": "inspection.walk",
+            "children": [
+             {
+              "type": "action",
+              "id": "selected-note.open",
+              "label": "open Pen note for the ticked pens",
+              "children": [
+               {
+                "type": "outcome",
+                "id": "in-ds0-selected-note-opens-without-clear",
+                "label": "Pen note for the ticked pens opens untouched: no Clear",
+                "tree": "DC-0",
+                "gwt": {
+                 "given": "A worker on the unit walk has ticked pen C2 and opened More actions.",
+                 "when": "They open Pen note for the ticked pens.",
+                 "then": "Pen note for the ticked pens opens as before, with Back and its commit in the footer and no Clear, because nothing has been entered."
+                },
+                "authority": [
+                 {
+                  "src": "STR",
+                  "at": "ux/laws/strings.json · verbs.Clear",
+                  "says": "empty what was entered or ticked …; present only while there is something to empty"
+                 }
+                ],
+                "result": "fail",
+                "hard": [
+                 "unreachable-control"
+                ],
+                "failures": [
+                 {
+                  "what": "tap [data-action='selected-pen-note']",
+                  "got": "control not found: [data-action='selected-pen-note']",
+                  "tag": "unreachable-control",
+                  "runs": [
+                   "en 360",
+                   "en 390",
+                   "zh 360",
+                   "zh 390"
+                  ]
+                 }
+                ]
+               },
+               {
+                "type": "action",
+                "id": "selected-note.type",
+                "label": "type \"Lights left on\"",
+                "children": [
+                 {
+                  "type": "outcome",
+                  "id": "in-ds1-selected-note-typing-shows-clear",
+                  "label": "typing shows Clear in the footer",
+                  "tree": "DC-1",
+                  "gwt": {
+                   "given": "Pen note for the ticked pens is open and empty of edits.",
+                   "when": "They type \"Lights left on\".",
+                   "then": "Clear appears in the footer, left of the commit."
+                  },
+                  "authority": [
+                   {
+                    "src": "owner",
+                    "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+                    "says": "Clear empties what was entered or ticked … present only when there is something to reset or clear"
+                   }
+                  ],
+                  "result": "fail",
+                  "hard": [
+                   "unreachable-control"
+                  ],
+                  "failures": [
+                   {
+                    "what": "tap [data-action='selected-pen-note']",
+                    "got": "control not found: [data-action='selected-pen-note']",
+                    "tag": "unreachable-control",
+                    "runs": [
+                     "en 360",
+                     "en 390",
+                     "zh 360",
+                     "zh 390"
+                    ]
+                   }
+                  ]
+                 },
+                 {
+                  "type": "action",
+                  "id": "selected-note.type.back",
+                  "label": "Back (footer)",
+                  "children": [
+                   {
+                    "type": "outcome",
+                    "id": "in-ds2-selected-note-back-keeps-draft",
+                    "label": "Back leaves Pen note for the ticked pens and keeps the typed draft; nothing saved",
+                    "tree": "DC-2",
+                    "gwt": {
+                     "given": "Pen note for the ticked pens holds \"Lights left on\", not saved.",
+                     "when": "They tap Back.",
+                     "then": "They are back where they came from, the typed text is kept as a draft and nothing is saved."
+                    },
+                    "authority": [
+                     {
+                      "src": "owner",
+                      "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+                      "says": "Back … leaves and returns to where you came from, keeping the draft."
+                     }
+                    ],
+                    "result": "fail",
+                    "hard": [
+                     "unreachable-control"
+                    ],
+                    "failures": [
+                     {
+                      "what": "tap [data-action='selected-pen-note']",
+                      "got": "control not found: [data-action='selected-pen-note']",
+                      "tag": "unreachable-control",
+                      "runs": [
+                       "en 360",
+                       "en 390",
+                       "zh 360",
+                       "zh 390"
+                      ]
+                     }
+                    ]
+                   },
+                   {
+                    "type": "action",
+                    "id": "selected-note.type.back.reopen",
+                    "label": "reopen Pen note for the ticked pens",
+                    "children": [
+                     {
+                      "type": "outcome",
+                      "id": "in-ds3-selected-note-reopen-shows-draft",
+                      "label": "reopening Pen note for the ticked pens shows the draft, with Clear",
+                      "tree": "DC-3",
+                      "gwt": {
+                       "given": "They left Pen note for the ticked pens with Back while it held \"Lights left on\".",
+                       "when": "They open Pen note for the ticked pens again.",
+                       "then": "The field still holds \"Lights left on\" and Clear is in the footer."
+                      },
+                      "authority": [
+                       {
+                        "src": "owner",
+                        "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+                        "says": "Back … leaves and returns to where you came from, keeping the draft."
+                       }
+                      ],
+                      "result": "fail",
+                      "hard": [
+                       "unreachable-control"
+                      ],
+                      "failures": [
+                       {
+                        "what": "tap [data-action='selected-pen-note']",
+                        "got": "control not found: [data-action='selected-pen-note']",
+                        "tag": "unreachable-control",
+                        "runs": [
+                         "en 360",
+                         "en 390",
+                         "zh 360",
+                         "zh 390"
+                        ]
+                       }
+                      ]
+                     },
+                     {
+                      "type": "action",
+                      "id": "selected-note.type.back.reopen.clear",
+                      "label": "Clear",
+                      "children": [
+                       {
+                        "type": "outcome",
+                        "id": "in-ds4-selected-note-clear-empties",
+                        "label": "Clear empties Pen note for the ticked pens and goes; nothing saved",
+                        "tree": "DC-4",
+                        "gwt": {
+                         "given": "Pen note for the ticked pens was reopened holding the kept draft \"Lights left on\".",
+                         "when": "They tap Clear.",
+                         "then": "The field is back as it opened, Clear disappears and nothing is saved."
+                        },
+                        "authority": [
+                         {
+                          "src": "owner",
+                          "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+                          "says": "Clear empties what was entered or ticked … present only when there is something to reset or clear"
+                         }
+                        ],
+                        "result": "fail",
+                        "hard": [
+                         "unreachable-control"
+                        ],
+                        "failures": [
+                         {
+                          "what": "tap [data-action='selected-pen-note']",
+                          "got": "control not found: [data-action='selected-pen-note']",
+                          "tag": "unreachable-control",
+                          "runs": [
+                           "en 360",
+                           "en 390",
+                           "zh 360",
+                           "zh 390"
+                          ]
+                         }
+                        ]
+                       },
+                       {
+                        "type": "action",
+                        "id": "selected-note.type.back.reopen.clear.back",
+                        "label": "Back, then reopen",
+                        "children": [
+                         {
+                          "type": "outcome",
+                          "id": "in-ds5-selected-note-cleared-stays-cleared",
+                          "label": "after Clear, Back and reopen show Pen note for the ticked pens as it opened",
+                          "tree": "DC-4",
+                          "gwt": {
+                           "given": "They cleared the draft on Pen note for the ticked pens.",
+                           "when": "They go Back and open it again.",
+                           "then": "It opens as it did the first time, with no Clear."
+                          },
+                          "authority": [
+                           {
+                            "src": "owner",
+                            "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+                            "says": "Clear empties what was entered or ticked … present only when there is something to reset or clear"
+                           }
+                          ],
+                          "result": "fail",
+                          "hard": [
+                           "unreachable-control"
+                          ],
+                          "failures": [
+                           {
+                            "what": "tap [data-action='selected-pen-note']",
+                            "got": "control not found: [data-action='selected-pen-note']",
+                            "tag": "unreachable-control",
+                            "runs": [
+                             "en 360",
+                             "en 390",
+                             "zh 360",
+                             "zh 390"
+                            ]
+                           }
+                          ]
+                         }
+                        ]
+                       }
+                      ]
+                     }
+                    ]
+                   }
+                  ]
+                 },
+                 {
+                  "type": "action",
+                  "id": "selected-note.type.sysback",
+                  "label": "the phone's Back",
+                  "children": [
+                   {
+                    "type": "outcome",
+                    "id": "in-ds6-selected-note-phone-back-keeps-draft",
+                    "label": "the phone's Back keeps the draft like the footer Back",
+                    "tree": "DC-2",
+                    "gwt": {
+                     "given": "Pen note for the ticked pens holds \"Lights left on\", not saved.",
+                     "when": "They press the phone's own Back.",
+                     "then": "They are back where they came from and the typed text is kept as a draft."
+                    },
+                    "authority": [
+                     {
+                      "src": "owner",
+                      "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+                      "says": "Back … leaves and returns to where you came from, keeping the draft."
+                     },
+                     {
+                      "src": "owner",
+                      "at": "ux/design-system/README.md · The drawer convention",
+                      "says": "Swiping down or tapping the scrim does what Back does."
+                     }
+                    ],
+                    "result": "fail",
+                    "hard": [
+                     "unreachable-control"
+                    ],
+                    "failures": [
+                     {
+                      "what": "tap [data-action='selected-pen-note']",
+                      "got": "control not found: [data-action='selected-pen-note']",
+                      "tag": "unreachable-control",
+                      "runs": [
+                       "en 360",
+                       "en 390",
+                       "zh 360",
+                       "zh 390"
+                      ]
+                     }
+                    ]
+                   }
+                  ]
+                 }
+                ]
+               }
+              ]
+             }
+            ]
+           },
+           {
+            "type": "state",
+            "id": "drafts.filters",
+            "label": "Unit walk, no filter applied, Filter pigs open",
+            "tree": "DC",
+            "screen": "inspection.walk",
+            "children": [
+             {
+              "type": "action",
+              "id": "filters.pick",
+              "label": "pick Care · Monitor, Back",
+              "children": [
+               {
+                "type": "outcome",
+                "id": "in-dq1-filters-back-applies-nothing",
+                "label": "Back from Filter pigs applies nothing and keeps the pick as a draft",
+                "tree": "DC-2",
+                "gwt": {
+                 "given": "A worker on an unfiltered walk opened Filter pigs and picked Care · Monitor without showing pigs.",
+                 "when": "They tap Back.",
+                 "then": "The walk list is unfiltered, and the pick is kept as a draft."
+                },
+                "authority": [
+                 {
+                  "src": "owner",
+                  "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+                  "says": "Back … leaves and returns to where you came from, keeping the draft."
+                 },
+                 {
+                  "src": "owner",
+                  "at": "ux/design-system/README.md · The drawer convention",
+                  "says": "In a multi picker Back closes without applying, and the ticks wait as a draft for the next open."
+                 }
+                ],
+                "result": "fail",
+                "hard": [
+                 "unreachable-control"
+                ],
+                "failures": [
+                 {
+                  "what": "on inspection.walk",
+                  "got": "null",
+                  "tag": "",
+                  "runs": [
+                   "en 360",
+                   "en 390"
+                  ]
+                 },
+                 {
+                  "what": "tap [aria-label='Filter pigs']",
+                  "got": "control not found: [aria-label='Filter pigs']",
+                  "tag": "unreachable-control",
+                  "runs": [
+                   "zh 360",
+                   "zh 390"
+                  ]
+                 }
+                ],
+                "notes": [
+                 "no zh rendering: ?lang=zh is ignored (no \"返回\")"
+                ]
+               },
+               {
+                "type": "action",
+                "id": "filters.pick.reopen",
+                "label": "reopen Filter pigs",
+                "children": [
+                 {
+                  "type": "outcome",
+                  "id": "in-dq2-filters-reopen-shows-draft",
+                  "label": "reopening Filter pigs shows the kept pick; Reset still restores the defaults",
+                  "tree": "DC-3",
+                  "gwt": {
+                   "given": "The worker left Filter pigs with Back after picking Care · Monitor.",
+                   "when": "They open Filter pigs again.",
+                   "then": "Care still reads Monitor, waiting to be shown."
+                  },
+                  "authority": [
+                   {
+                    "src": "owner",
+                    "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+                    "says": "Back … leaves and returns to where you came from, keeping the draft."
+                   }
+                  ],
+                  "result": "fail",
+                  "hard": [
+                   "unreachable-control"
+                  ],
+                  "failures": [
+                   {
+                    "what": "on inspection.filters",
+                    "got": "null",
+                    "tag": "",
+                    "runs": [
+                     "en 360",
+                     "en 390"
+                    ]
+                   },
+                   {
+                    "what": "tap [aria-label='Filter pigs']",
+                    "got": "control not found: [aria-label='Filter pigs']",
+                    "tag": "unreachable-control",
+                    "runs": [
+                     "zh 360",
+                     "zh 390"
+                    ]
+                   }
+                  ],
+                  "notes": [
+                   "no zh rendering: ?lang=zh is ignored (no \"返回\")"
+                  ]
+                 }
+                ]
+               }
+              ]
+             }
+            ]
+           }
+          ]
+         }
+        ],
+        "run": {
+         "commit": "7f5b627",
+         "dirty": true,
+         "ran": "2026-10-14T08:00:13.824Z",
+         "langs": [
+          "en",
+          "zh"
+         ],
+         "widths": [
+          360,
+          390
+         ]
+        },
         "notSupported": null
        },
        "status": "in-design"
