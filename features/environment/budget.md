@@ -27,3 +27,12 @@ Ambiguous, quieter option taken: The PREVIEW badges (prototype chrome) are dropp
 Chains walked on the real Back path after this change (crit round 1): no surface here writes to or is about one animal without showing it on screen or one Back away; no line changed.
 
 Until migrated (crit round 1): the Assistant, Environment & devices and Maintenance pages keep their page-built head, PREVIEW badge and subtitle. Their bodies are below the farm legibility floors (10px text, 9px chart labels) and a change that moves a screen must bring it to the floors; that body work is its own task. Their drawers (report issue, issue detail) take the sheet header.
+
+
+### Corner actions and titles (2026-10-14)
+
+By the Headers law → Corner actions and Title length (`ux/design-system/README.md`, owner ruling C, 2026-10-14; PR #165). Room at a true 360, as `scripts/check-headers.mjs` (workflow/header-checks) measures it: a drawer title has 360 − 2 × (18 + 48 + 12) = 204px (a missing corner counts as the room it would take); a page title has 216px beside Back. Titles measured at their own face (sheet 500 20px, page 500 22px), EN and ZH.
+
+| Surface | Corner action (top right) | Present while | Title | Fits at 360 (EN · ZH) |
+|---|---|---|---|---|
+| Report fault | none | | **`Report fault`** (was `Report equipment issue`): Farrowing and Inspection name the same job `Report fault`; the Equipment field says what broke; the primary keeps `Record issue` | 108px |
