@@ -91,3 +91,5 @@
 .farrowing-phone :is(.pen-detail-sheet,.pen-form-sheet,.pen-feed-page,.pen-log-sheet) .sheet-body{padding-right:var(--subpage-pad);padding-bottom:24px;padding-left:var(--subpage-pad)}
 .farrowing-phone .detail-sheet[data-size] .sheet-body{padding-right:var(--subpage-pad);padding-bottom:24px;padding-left:var(--subpage-pad)}
 .farrowing-phone .detail-sheet[data-presentation="page"]>.sheet-body{padding-right:var(--subpage-pad);padding-bottom:24px;padding-left:var(--subpage-pad)}
+/* Record dead: the Piglets / The sow switch is its own block, 24px above the first cause row (owner, 2026-10-13, option B). */
+.farrowing-phone .sheet[data-view=death] .sheet-body>.st-selection{margin-bottom:var(--space-24)}
