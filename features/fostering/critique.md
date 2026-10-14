@@ -56,3 +56,17 @@ The law and its boards fix the design (two headers, the line's three tests); the
 - Footers: fostering's primary stays on one line at 56px in Chinese at 390; Find a pig's primary is "Search".
 - Reach: 153 screens move, all in this change's features; 138 identical; none broken. npm test 674 pass; legibility and spacing pass on every moved screen; farrowing scenarios 87 of 87 in EN (ZH blocked on main as well).
 - **Better because** each header says one thing the same way everywhere, and every fact it no longer carries has a designed place in the body.
+
+## Small fixes (2026-10-14): the Move sheet at 360
+
+Scope: the bare screens' width at 360 and the "All 10" target; the sheet's design stays as Keep above says.
+
+### Problems
+- **major** · At 360 every `fostering.*` screen is 390px wide and cropped (the 360 shots end mid-tile, mid-checkbox, mid-primary): `atlas-bare.js` pins a bare screen to 390px and, because `move.html` loads it after the phone is drawn, its pin lands after a 360 phone's width and wins. On a real 360 phone (no `?screen=`) the sheet fits.
+- **minor** (questioned) · "All 10" measures 48×20: the Heading component already gives its action an invisible `::after` hit area (`inset: -16px -8px`, 64×52), which `elementFromPoint` and `check-legibility` both count. No change.
+
+### Parts
+| Part | Drawn by today | The component whose job it is | Keep / fix / cut |
+|---|---|---|---|
+| The bare screen's width | `atlas-bare.js` (390px) over the page | the page's layout CSS (`move.html`) | **fix**: the bare screen is the window's width |
+| All 10 | Heading action (Button, text register) with its 48px hit area | Heading | **keep** |

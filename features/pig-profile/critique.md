@@ -57,3 +57,13 @@ The law and its boards fix the design (two headers, the line's three tests); the
 - Footers: fostering's primary stays on one line at 56px in Chinese at 390; Find a pig's primary is "Search".
 - Reach: 153 screens move, all in this change's features; 138 identical; none broken. npm test 674 pass; legibility and spacing pass on every moved screen; farrowing scenarios 87 of 87 in EN (ZH blocked on main as well).
 - **Better because** each header says one thing the same way everywhere, and every fact it no longer carries has a designed place in the body.
+
+## Small fixes (2026-10-14): Unavailable actions in Chinese
+
+### Problems
+- **major** · `pig-profile.unavailable-actions` ZH shows the walk list, not the sheet: its first step taps `[aria-label="Select pig 000254"]`, and the Chinese page's label is `选择猪只000254`, so the step finds nothing and the screen stops on the list.
+
+### Parts
+| Part | Drawn by today | The component whose job it is | Keep / fix / cut |
+|---|---|---|---|
+| The screen's setup | atlas entry steps (`features/pig-profile/feature.json`), English aria-label | a language-free step: the row's `data-pig-select` | **fix** |

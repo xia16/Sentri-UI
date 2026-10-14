@@ -60,3 +60,18 @@ The law and its boards fix the design (two headers, the line's three tests); the
 - Footers: fostering's primary stays on one line at 56px in Chinese at 390; Find a pig's primary is "Search".
 - Reach: 153 screens move, all in this change's features; 138 identical; none broken. npm test 674 pass; legibility and spacing pass on every moved screen; farrowing scenarios 87 of 87 in EN (ZH blocked on main as well).
 - **Better because** each header says one thing the same way everywhere, and every fact it no longer carries has a designed place in the body.
+
+## Small fixes (2026-10-14): Check in again in Chinese
+
+Scope: one label in the walk's check-in row; everything else in Keep above stands.
+
+### Keep
+- The check-in row (Last check-in · Log · End walk / Check in again, quiet text actions): its place, register and order stay.
+
+### Problems
+- **major** · After a check-in the row's action reads `Check in again` in English on the Chinese screen (`inspection.walk-recorded` ZH, the gate's judges on PR #150): the label was never registered in `ux/laws/strings.json`, while `End walk` in the same slot is (copy law: every label in both languages).
+
+### Parts
+| Part | Drawn by today | The component whose job it is | Keep / fix / cut |
+|---|---|---|---|
+| Check in again | Button (text register), `ux/system/inspection-astra-concept.js`, English only | Button + the strings registry (a verb with one meaning, and its feed copy) | **fix** |
