@@ -1,9 +1,9 @@
 {
  "feature": "farrowing",
- "commit": "29ba016d2737d257e0dcfb128f865d16c05c1732",
+ "commit": "a3ce0edc81f49ca79c17c5ea6cef36d2054227cc",
  "dirty": false,
- "ran": "2026-10-14T10:22:49.568Z",
- "base": "http://localhost:59359",
+ "ran": "2026-10-14T11:18:33.160Z",
+ "base": "http://localhost:56504",
  "langs": [
   "en"
  ],
@@ -5430,11 +5430,11 @@
    "id": "fa-p5-a-pen-the-tab-hides-is-disabled",
    "tree": "P-5",
    "branch": "pen-map",
-   "label": "A pen whose sows the tab hides is disabled, and the legend follows the tab",
+   "label": "A pen whose sows the tab hides is disabled, and the colour key follows the tab",
    "gwt": {
     "given": "The worker is on the Active tab, where only pen B1 has a farrowing sow.",
     "when": "They open Go to pen.",
-    "then": "Pens B3 and B4, whose sows the tab hides, are disabled; pen B1 can be tapped; the legend counts one farrowing pen and none that need her."
+    "then": "Pens B3 and B4, whose sows the tab hides, are disabled; pen B1 can be tapped; the colour key counts one farrowing pen and none that need her."
    },
    "path": [
     "pen-map",

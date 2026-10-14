@@ -2188,7 +2188,25 @@
   {
     "component": "Sheet",
     "variant": "drawer",
-    "state": "Aside",
+    "state": "Route line (a hub)",
+    "problems": []
+  },
+  {
+    "component": "Sheet",
+    "variant": "drawer",
+    "state": "Colour key (a colour-coded body)",
+    "problems": []
+  },
+  {
+    "component": "Sheet",
+    "variant": "drawer",
+    "state": "Fact line",
+    "problems": []
+  },
+  {
+    "component": "Sheet",
+    "variant": "drawer",
+    "state": "Clear in the footer",
     "problems": []
   },
   {
@@ -2242,7 +2260,7 @@
   {
     "component": "Sheet",
     "variant": "page",
-    "state": "Aside",
+    "state": "Fact line (a task page)",
     "problems": []
   },
   {
