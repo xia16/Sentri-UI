@@ -187,6 +187,13 @@ Held against its baseline (`7f5b627`) and the house reference the Farrowing room
 - The sow's banner is whole in every state at both widths (body overflow 0); only added thumbnails and an opened Details scroll, and opening Details brings the banner back into view.
 - **Better because** the photo is one quiet optional row that waits without explaining itself, the sow's optionals match it, and nothing sits under the footer.
 
+#### Crit round 4 (judge on 0bbd5a0: 8 pairs better, 0 worse; failed on the drawer's height and two stale claims)
+- **The drawer sat 56px from the top**, 24px past the Sheet's own 80px limit, so the 14px strip above it showed the parent's blurred "Farrowing" title and Back cut in half. It now opens at the Sheet's limit (`100% - size-80`), like every other drawer.
+- **That cost the sow's banner 1px** with cause Other (the body overflowed by 1px at 390 and 360, EN and ZH). Fixed by spacing, not size: on Record dead, the banner follows Photos at the rows' own 8px step instead of the photo strip's 12px trailing margin. The banner now has 3px to spare.
+- **Stale claims, corrected in the PR body:** the drawer is at 80px (not "as the task overview sheet does"). The waiting Photos row's hint shows only once the camera is tapped. It is not a standing line.
+- Measured at a true 390 and 360 (the phone forced to width), 844 tall, EN and ZH: Piglets first frame, The sow, The sow with Other, and The sow with Other after a camera tap. Each opens at top 80 with body overflow 0. `farrowing.piglet-death` is unchanged.
+- **Better because** the drawer is the Sheet's own drawer again (no half-cut page behind it), and every state is still whole.
+
 
 # Header corners (2026-10-14)
 

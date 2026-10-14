@@ -93,8 +93,11 @@
 .farrowing-phone .detail-sheet[data-presentation="page"]>.sheet-body{padding-right:var(--subpage-pad);padding-bottom:24px;padding-left:var(--subpage-pad)}
 /* Record dead: the Piglets / The sow switch is its own block, 24px above the first cause row (owner, 2026-10-13, option B). */
 .farrowing-phone .sheet[data-view=death] .sheet-body>.st-selection{margin-bottom:var(--space-24)}
-/* Record dead is held 56px under the phone's top (just under the status bar), not the long 85%: the six causes, the switch's
+/* Record dead opens at the Sheet's outer limit (80px under the phone's top), not the long 85%: the six causes, the switch's
    space, the optional rows and the sow's banner are whole on the first frame in every state at 390 and 360 (crit rounds 1-2). */
-.farrowing-phone .sheet[data-st-context="drawer"][data-view="death"][data-size]{height:calc(100% - var(--size-56));max-height:calc(100% - var(--size-56))}
+.farrowing-phone .sheet[data-st-context="drawer"][data-view="death"][data-size]{height:calc(100% - var(--size-80));max-height:calc(100% - var(--size-80))}
 /* The sow's Details (cause Other) sits 12px under the causes it depends on, the same step as its rows' stack. */
 .farrowing-phone .sheet[data-view=death] .sheet-body>.st-choice-group{margin-bottom:var(--space-12)}
+/* Record dead: the sow's banner follows Photos at the rows' own 8px step (Photos' 12px trailing margin would push the banner
+   1px under the footer when the cause is Other, at the Sheet's 80px limit). */
+.farrowing-phone .sheet[data-view=death] .st-photos{margin-bottom:var(--space-8)}
