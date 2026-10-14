@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-14T15:47:07.419Z",
- "commit": "f8b5994",
+ "generated": "2026-10-14T16:29:55.451Z",
+ "commit": "3423d63",
  "platforms": [
   {
    "id": "mobile",
@@ -3981,7 +3981,7 @@
              {
               "state": "Ready",
               "when": "Cause chosen, no draft",
-              "shows": "Save enabled; \"Other\" adds an optional details line"
+              "shows": "Save enabled; \"Other\" adds an optional Details row (the same full-width face as Photos)"
              }
             ],
             "rule": "Saving is a 0.85 s hold: ends farrowing, freezes Born, writes \"Sow died · cause\". Band always reads \"Saving ends farrowing · 7 alive stay under piglet care\" (current Alive).",
@@ -3997,7 +3997,7 @@
              {
               "state": "Waiting",
               "when": "No death drafted (Piglets) or no cause chosen (The sow)",
-              "shows": "The camera's outline is dashed and the hint line reads \"Record a death first · photos ride that record\"; a tap re-announces the hint (scrolling it into view on a short phone) and opens no camera"
+              "shows": "The camera's outline is dashed; no line under the row. A tap shows \"Record a death first · photos ride that record\" in the row's hint line for a few seconds (the screen reader hears it as the row's description) and opens no camera"
              },
              {
               "state": "Ready",
@@ -4048,7 +4048,7 @@
           "edge": [
            "Sow cannot be saved dead twice: sow mode disappears once ended",
            "A piglet draft or an Edit draft blocks saving the sow's death",
-           "The drawer is held at the Sheet's outer cap (80px under the top) so the causes and the Photos row fit on the first frame in both modes; thumbnails scroll."
+           "The drawer is held 56px under the phone's top so the causes, the optional rows and the sow's banner are whole on the first frame in every state at 390 and 360; opening Details scrolls the banner back into view; thumbnails scroll."
           ],
           "rules": [
            "\"ONE dead drawer product-wide\" (Surfaces & entrances)",

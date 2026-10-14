@@ -62,7 +62,9 @@ Facts this pass touches:
 | Fact | State | Question it answers there | Level |
 |---|---|---|---|
 | `Photos` (the optional row's label, camera glyph) | always, last in capture order | Can I attach a photo to this record? | Settled (quiet card) |
-| `Record a death first · photos ride that record` (the hint line, the Photos component's registered `ds.c2.photos.inactive`) | no death drafted (piglets) or no cause chosen (the sow) | Why can't I take a photo yet? | Settled (muted hint; the tap re-announces it) |
+| `Record a death first · photos ride that record` (the hint line, the Photos component's registered `ds.c2.photos.inactive`) | no death drafted (piglets) or no cause chosen (the sow), **only after a tap on the waiting camera** (crit round 2: the floor-gray; otherwise it is the row's screen-reader description, never a standing line) | Why can't I take a photo yet? | Settled (muted hint line, shown while the tap is answered) |
 | `N attached` (the row's answer) and thumbnails | after a photo | Did my photo go on this record? | Settled |
 
 Cut: nothing new. Hiding the Photos row until a death is drafted is cut (the row waits visibly instead). Nothing is added to the header.
+
+Crit round 2: the sow's `Details` (cause Other) keeps its fact (what else about her death?) and takes the same full-width optional row as Photos.
