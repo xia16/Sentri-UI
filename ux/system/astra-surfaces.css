@@ -28,7 +28,7 @@
 :is(.farrowing-phone,.inspection-phone) .page-background>.sheet{z-index:1}
 .inspection-phone .sheet[data-presentation="page"].single-action-sheet>.sheet-body{display:block}
 .inspection-phone .sheet[data-presentation="page"].single-action-sheet .bulk-controls{max-width:100%}
-.inspection-phone .sheet[data-presentation="page"].single-action-sheet .bulk-controls{padding:16px;gap:20px}
+.inspection-phone .sheet[data-presentation="page"].single-action-sheet .bulk-controls{padding:0 16px 16px;gap:20px}
 .inspection-phone .sheet[data-presentation="page"].single-action-sheet .field{font-size:13px;gap:8px}
 .inspection-phone .sheet[data-presentation="page"].single-action-sheet :is(.field input,.field select,.bulk-condition-button){min-height:48px;font-size:14px;padding:12px}
 

@@ -262,7 +262,7 @@
     "fr.row.hand_reared": {"en": "{n} hand-reared", "zh": "{n}头人工哺育", "kind": "status"},
     "fr.row.alive": {"en": "{n} alive", "zh": "存活{n}头", "kind": "status"},
     "fr.row.dead": {"en": "{n} dead", "zh": "死亡{n}头", "kind": "status"},
-    "fr.alloc.title": {"en": "{n} piglets to allocate", "zh": "{n}头仔猪待安置", "kind": "title"},
+    "fr.alloc.title": {"en": "Allocate piglets", "zh": "安置仔猪", "kind": "title"},
     "fr.alloc.sub": {"en": "{code} · {pen} · sow died {time}", "zh": "{code} · {pen} · 母猪死亡 {time}", "kind": "body"},
     "fr.alloc.move": {"en": "Move to other sows", "zh": "转给其他母猪", "kind": "label"},
     "fr.alloc.move.meta": {"en": "Foster or nurse sow", "zh": "寄养或奶母猪", "kind": "body"},

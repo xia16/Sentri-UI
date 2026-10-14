@@ -483,12 +483,12 @@
     // why Move waits is said only when the worker taps it (a disabled primary stands alone above the footer, as farrowing's)
     var reason = p ? Object.assign({ id: 'mv-reason', visible: !!S.why }, s(p.id, p.args)) : null;
     var body = explain + directionSection() + crateSection() + pairSection() + own + ask + countSection() + closesSection(dr) + review(dr, own);
-    // Move is an action launched from the litter: no header line (Headers law, 2026-10-13). Clear is quiet text in the footer, left of
-    // the primary, present only when there is a draft (or an explaining link) to drop.
+    // Move is an action launched from the litter: no header line (Headers law, 2026-10-13). Clear is the header's corner action, top
+    // right (owner, 2026-10-14), present only when there is a draft (or an explaining link) to drop.
     var clear = draftExists() || S.explains ? { label: { text: PP.t('act.clear'), str: 'act.clear' }, action: 'clear' } : null;
-    return K.drawer({ view: 'move', size: 'long', title: s('pp.move.sheet.title'), close: { action: 'dismiss' }, scrim: { action: 'dismiss' },
+    return K.drawer({ view: 'move', size: 'long', title: s('pp.move.sheet.title'), corner: clear, close: { action: 'dismiss' }, scrim: { action: 'dismiss' },
       body: '<div class="mv-stack">' + body + '</div>',
-      footer: K.footer({ back: { action: 'back' }, quiet: clear, primary: primarySpec(dr, ready), status: reason }) });
+      footer: K.footer({ back: { action: 'back' }, primary: primarySpec(dr, ready), status: reason }) });
   }
 
   /* ---- move-prelock: the door to the farrowing sheet ---- */

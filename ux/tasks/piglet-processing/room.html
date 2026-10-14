@@ -591,11 +591,11 @@
         strs: { label: txId(tx), meta: PP.one('pp.room.filter.n', n) }, args: { meta: { n: n } } });
     });
     var shown = lensOf(lens).length;
-    // farrowing's Filter sows: Back · Reset (quiet text) · Show N in the footer
+    // farrowing's Filter sows: Reset is the header's corner action (top right, owner 2026-10-14); Back · Show N in the footer
     var show = UI.button({ label: PP.t(PP.one('pp.room.filter.show', shown), { n: shown }), register: 'primary', action: 'close-sheet', strs: { label: PP.one('pp.room.filter.show', shown) }, args: { label: { n: shown } } });
-    return sheet({ title: P('pp.room.filter.title'), view: 'filter',
+    return sheet({ title: P('pp.room.filter.title'), view: 'filter', corner: S.filter.length ? { label: P('pp.room.filter.reset'), action: 'clear-filter' } : null,
       body: UI.choiceGroup(rowsH.join(''), {}),
-      footer: K.footer({ back: { action: 'close-sheet' }, quiet: S.filter.length ? { label: P('pp.room.filter.reset'), action: 'clear-filter' } : null, primary: show }) });
+      footer: K.footer({ back: { action: 'close-sheet' }, primary: show }) });
   }
   // The review list (N4, R1-22) and the unit's unexplained drift: each a door to where it is answered.
   var REV_ID = { double: 'pp.room.rev.double', count: 'pp.room.rev.count', held: 'pp.room.rev.held', correction: 'pp.room.rev.correction' };

@@ -661,18 +661,18 @@
       if (!why) return null;
       return [why === 'task_ended' ? 'pp.litter.pointer.ended' : why === 'no_task' ? 'pp.litter.pointer.no_task' : 'pp.litter.pointer.check', null];
     }
-    // Clear: quiet text in the footer, left of Save, only while there is something to clear.
+    // Clear: the header's corner action, top right (owner, 2026-10-14), only while there is something to clear.
     function clearQuiet(show) { return show ? { label: S('act.clear'), action: 'clear' } : null; }
     /* A treatment in the drawer: its title, then the body (what is owed is its first line), and Back, Clear and Save. The
        reason Save waits for is the footer's status line (TaskSheet's status slot); a tap on the waiting Save flashes it. */
     /* No hint line stands above the footer (parity review 2, item 11): a waiting Save stands alone, and a tap on it says
        why — the reason line appears then (answered), and goes with the next change to the draft. */
     var whyShown = false;
-    function doseSheet(titleSlot, sub, body, quiet) {
+    function doseSheet(titleSlot, sub, body, corner) {
       var w = waiting();
-      var html = K.sheet({ title: titleSlot, close: null, size: 'long', view: 'dose',
+      var html = K.sheet({ title: titleSlot, corner: corner, close: null, size: 'long', view: 'dose',
         body: '<div class="lt-stack">' + U.note(sub) + body + '</div>',
-        footer: K.footer({ back: { action: 'back' }, quiet: quiet, status: w ? Object.assign(S(w[0], w[1]), { id: 'lt-why', visible: whyShown }) : null,
+        footer: K.footer({ back: { action: 'back' }, status: w ? Object.assign(S(w[0], w[1]), { id: 'lt-why', visible: whyShown }) : null,
           primary: { label: S('act.save'), register: 'primary', action: 'save', waiting: !!w, describedby: w && whyShown ? 'lt-why' : '' } }) });
       return w && whyShown ? html.replace('id="lt-why"', 'id="lt-why" data-answer=""') : html;
     }
@@ -824,10 +824,10 @@
       if (W.pad) body += UI.numpad({ decimals: 1, intLength: 2, value: draft, key: 'bw', id: 'bw-pad', hint: '',
         strs: Object.assign({ digit: 'ds.field.figure', decimal: 'ds.field.decimal', back: 'ds.field.aria.backspace', pad: 'ds.field.aria.pad' }) });   // the keypad reserves no hint line (the field sits on its keys); a dead key's answer is the footer's status
       var ok = has && num > 0 && !refused && !conflict;
-      // Clear is quiet text in the footer (never in the head), present only while there is a draft to clear
-      return K.sheet({ title: S('pp.common.weight.title'), close: null, size: 'long', view: 'weight',
+      // Clear is the header's corner action, top right (owner, 2026-10-14), present only while there is a draft to clear
+      return K.sheet({ title: S('pp.common.weight.title'), corner: draft && !conflict ? { label: S('act.clear'), action: 'clear-weight' } : null, close: null, size: 'long', view: 'weight',
         body: '<div class="lt-stack">' + U.note([S('pp.edge.weight.pop', { n: n })]) + body + '</div>',
-        footer: K.footer({ back: { action: 'back' }, quiet: draft && !conflict ? { label: S('act.clear'), action: 'clear-weight' } : null, status: W.hint ? { text: PP.t(W.hint), str: W.hint, id: 'bw-why', tone: 'amber' } : null, primary: btn({ id: 'act.save', register: 'primary', action: 'save-weight', waiting: !ok }) }) });
+        footer: K.footer({ back: { action: 'back' }, status: W.hint ? { text: PP.t(W.hint), str: W.hint, id: 'bw-why', tone: 'amber' } : null, primary: btn({ id: 'act.save', register: 'primary', action: 'save-weight', waiting: !ok }) }) });
     }
     function padKey(k) {
       var r = UI.numpadInput({ value: weightView.draft }, k, { decimals: 1, intLength: 2 });
