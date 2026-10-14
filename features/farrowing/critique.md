@@ -111,3 +111,53 @@ The law and its boards fix the design (two headers, the line's three tests); the
 - Footers: fostering's primary stays on one line at 56px in Chinese at 390; Find a pig's primary is "Search".
 - Reach: 153 screens move, all in this change's features; 138 identical; none broken. npm test 674 pass; legibility and spacing pass on every moved screen; farrowing scenarios 87 of 87 in EN (ZH blocked on main as well).
 - **Better because** each header says one thing the same way everywhere, and every fact it no longer carries has a designed place in the body.
+
+# Go to pen (2026-10-14)
+
+Scope: `farrowing.pen-map` and the new PenMap component page. The owner chose the design over mockup rounds on 2026-10-13 and 2026-10-14, so this critique is of the screen it replaces. Baseline: `origin/main` at `7f5b627` (`node scripts/shoot-screens.mjs <out> --screens farrowing.pen-map --widths 390,360 --langs en,zh`).
+
+| Job | Where it exists | Status | Baseline | Commit |
+|---|---|---|---|---|
+| Go to a pen from the room | `farrowing.pen-map` (this screen) | in-design | `farrowing.pen-map/en-390.png`, `zh-390.png`, `en-360.png`, `zh-360.png` | `7f5b627` |
+| Go to a pen on the walk | `inspection.go-to-pen` (its own hand-built map) | in-design | not in scope; listed "until migrated" in the PenMap README | `7f5b627` |
+| A menu drawer of places | Choose a unit, More actions (house references) | approved | the surfaces rule's boards | `7f5b627` |
+| The animal's levels and words | the room list's Row · animal (`sowFacts`) | approved | `farrowing.room` | `7f5b627` |
+
+The old Figma has no pen map. No existing component draws a spatial map of places (`node scripts/component-jobs.mjs`): the nearest, Row and ChoiceList, are lists.
+
+## Keep
+
+- **The menu drawer.** `Go to pen` on the tint, a centred title, a hairline, Back in the footer. SURFACES.md names it as a menu drawer.
+- **The map is the room.** Pens are places, so they are a map and not a list: the worker finds the pen in front of her by where it is, not by reading. Stays, with the layout independent of the filter.
+- **Tap goes to the pen.** The room list opens with that pen pinned under the sticky tab row, its tint fading within 900ms (`room-pen`).
+- **Hold to peek.** 350ms shows the sows of a pen read-only; moving more than 12px cancels; the tap after a peek only closes it.
+- **The map follows the tab and filter.** A pen shows what the list shows in it. Stays, and now says so by colour.
+- **Pen codes in mono, tiles you can hit.** The code is the tile's identity; tiles are larger than today's.
+- **Empty pens cannot be opened.**
+
+## Problems
+
+- **major** The map only fits a 4 × 6 room. The grid is hard-coded to letters A–D and six rows, with no scrolling, so a barn of 2 × 100 pens, 8 lanes or 160 rows cannot be shown; the old issue says rows 5 and 6 already sit below the fold on a small phone. Evidence: `farrowing-astra-concept.js` builds `Array.from({length:6})` and `['A','B','C','D']`; `feature.json` issues.
+- **major** The one thing to find is read, not seen. Which pens need her is a word in 13px text ("Overdue", "Active", "Tomorrow", "23 born") on a 24-tile grid, with no key. Evidence: baseline render; owner, 2026-10-13: the map must show where to focus.
+- **major** Nothing said 19 times. Every empty pen prints "No sows", so 19 of 24 tiles repeat one fact and the four that matter read as equals (P3: empty is absent). Evidence: baseline render at 390.
+- **major** A second vocabulary for the same animals. `penFact` names pens Active, Overdue, Born and Due, but the room list says sows are overdue, farrowing or settled through `sowFacts().level`; the same sow is described two ways within one tap. Evidence: `penFact()` against `sowFacts()`.
+- **minor** Stray colours and a shadow. The tiles use `#d5dccd`, `#f3f4ee` and `#a2a99a`, and the peek is a shadowed card; SURFACES.md rule 5 allows no stray tints and "no card is shadowed". Evidence: `farrowing-astra-room.css` (`.pen-cell`, `.pen-peek`).
+- **minor** The current pen is a 2px ink ring, which in this system means selected, on a screen where nothing is selected. Evidence: SURFACES.md, "Selected tile".
+- **minor** The peek opens below the map, behind the footer on a phone and in words the room does not use (`Awaiting`, `11 alive · 2 dead`). Evidence: `.pen-peek{bottom:50px}`.
+- **minor** The map does not say where the door is, so "pen 1 at the top" is a guess.
+
+## Parts
+
+| Part | Drawn by today | Component whose job it is | Call |
+|---|---|---|---|
+| Drawer, title, hairline, Back | `roomSheet` → Sheet drawer, `surface:'menu'` | Sheet | **keep** |
+| Map grid, letters and numbers | page-built `.pen-map` (`farrowing-astra-room.css`) | none: PenMap is the new component | **fix**: PenMap |
+| Pen tile | page-built `.pen-cell` with a fact line | none: part of PenMap | **fix**: PenMap, pen code only, colour = level |
+| Per-tile fact line and `penFact` | page-built (JS) | none | **cut** |
+| Status word in a tile | `SentriUI.status` word | Status is the workflow state of one item on one line, not a map | **cut** |
+| Legend | none | none: part of PenMap | **add**: first line of the body |
+| Entrance band | none | none: part of PenMap | **add** |
+| Range control | none | Segment is 2–5 fixed views; this is 1–N ranges that scroll sideways | **add** in PenMap, the footer control |
+| Current pen ring | page-built | (selected tile) | **cut**: the map opens scrolled to her |
+| Peek | page-built `.pen-peek`, gesture in the page script | none: part of PenMap | **fix**: PenMap holds the gesture; the card holds Row · animal rows |
+| Footer | `roomSheet` default Back | Sheet footer | **keep**, plus the range control when a row is longer than 20 |
