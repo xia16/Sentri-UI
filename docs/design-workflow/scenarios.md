@@ -149,6 +149,10 @@ a data attribute, a preset, read-only state access) that draws nothing, and list
 
 - Farrowing: `FarrowingStudy.states` and `FarrowingStudy.room(i)` (read-only access to the live records, for record
   assertions), in `ux/system/farrowing-astra-concept.js`.
+- Inspection: `InspectionStudy.states` (read-only access to the live walk, its form and its parked drafts, for record
+  assertions) and `?faults=<pen>` (opens that pen's Equipment faults sheet, which no control on the walk reaches yet), in
+  `ux/system/inspection-astra-concept.js`.
+- Piglet processing: `PPS.s` (the records, read-only for record assertions), in `ux/tasks/piglet-processing/simple/state.js`.
 
 ## When it runs
 
