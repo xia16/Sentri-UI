@@ -17,7 +17,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { CLASSES, screensOf, pageOf, pageAssets, sharedFiles, coverageLost, effectiveClass, classifyScreens, checkVerdict, touchesSystem, touchesTools, queueAhead as queueOf, budgetProblems, critiqueProblems, pageStyling, addedLines, calibrationProblems } from './loop-rules.mjs';
+import { CLASSES, screensOf, pageOf, pageAssets, sharedFiles, coverageLost, effectiveClass, classifyScreens, checkVerdict, touchesSystem, touchesTools, queueAhead as queueOf, budgetProblems, critiqueProblems, pageStyling, addedLines, calibrationProblems, lockState } from './loop-rules.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -27,7 +27,9 @@ const opt = (k) => { const i = argv.indexOf('--' + k); return i >= 0 && argv[i +
 const flag = (k) => argv.includes('--' + k);
 const short = (s) => String(s || '?').slice(0, 7);
 const VERDICT_FILE = /^verdict(-[\w.-]+)?\.json$/;
-function passRecord(sha) { return path.join(path.resolve(root, git(['rev-parse', '--git-common-dir']).out.trim()), 'sentri-gate', `${sha}.json`); }
+// The gate's own files live in the git common dir, so every worktree on this machine sees them: pass records, the lock, base shots.
+const gateDir = () => path.join(path.resolve(root, git(['rev-parse', '--git-common-dir']).out.trim()), 'sentri-gate');
+function passRecord(sha) { return path.join(gateDir(), `${sha}.json`); }
 function git(args, cwd = root) { const r = spawnSync('git', args, { cwd, encoding: 'utf8', maxBuffer: 64 << 20 }); return { code: r.status, out: r.stdout || '', err: r.stderr || '' }; }
 
 // ---------- --verdict <out>: check the judge's verdict against the mechanical result ----------
@@ -89,6 +91,39 @@ const out = path.resolve(opt('out') || path.join(os.tmpdir(), `sentri-gate-${Dat
 fs.mkdirSync(out, { recursive: true });
 // A rerun into the same folder starts clean: old shots, pairs and verdicts are about a mechanical run that no longer exists.
 for (const f of ['shots', 'pairs', 'mechanical.json', ...fs.readdirSync(out).filter((f) => VERDICT_FILE.test(f))]) fs.rmSync(path.join(out, f), { recursive: true, force: true });
+
+// ---------- one gate at a time ----------
+// Two gates on one machine starve each other's browsers into timeouts (#164), so every gate run, a builder's --quick included,
+// holds one lock beside the pass records for its whole run. A second gate waits; a lock whose process is gone is stale and is
+// taken over. The lock goes on every exit: finish, a signal, a crash (the exit handler below).
+const lockFile = path.join(gateDir(), 'gate.lock');
+const alive = (pid) => { try { process.kill(pid, 0); return true; } catch (e) { return e.code === 'EPERM'; } };
+const lockAs = (sha) => JSON.stringify({ pid: process.pid, sha, ref, at: new Date().toISOString() });
+function releaseLock() { try { if (JSON.parse(fs.readFileSync(lockFile, 'utf8')).pid === process.pid) fs.rmSync(lockFile, { force: true }); } catch {} }
+for (const sig of ['SIGINT', 'SIGTERM', 'SIGHUP', 'SIGBREAK']) process.on(sig, () => { console.log(`\n${sig}: the gate stops`); process.exit(130); });
+const waited = await (async () => {
+  fs.mkdirSync(path.dirname(lockFile), { recursive: true });
+  const t0 = Date.now(), tmp = `${lockFile}.${process.pid}`;
+  let said = '';
+  for (;;) {
+    // Created whole or not at all: a hard link to a finished file, so a reader never sees half a lock.
+    fs.writeFileSync(tmp, lockAs(git(['rev-parse', '--verify', '--quiet', ref + '^{commit}']).out.trim()));
+    try { fs.linkSync(tmp, lockFile); fs.rmSync(tmp, { force: true }); break; } catch (e) { fs.rmSync(tmp, { force: true }); if (e.code !== 'EEXIST') throw e; }
+    let raw, lock = null;
+    try { raw = fs.readFileSync(lockFile, 'utf8'); } catch { continue; } // released between the two calls
+    try { lock = JSON.parse(raw); } catch {}
+    if (!lock || lock.pid === process.pid || lockState(lock, alive) === 'stale') {
+      // Only the stale lock read above is removed, never one another gate has taken since.
+      try { if (fs.readFileSync(lockFile, 'utf8') === raw) { fs.rmSync(lockFile); console.log(`taking over a stale gate lock: pid ${lock?.pid ?? '?'} (the gate on ${short(lock?.sha)}) is gone`); } } catch {}
+      continue;
+    }
+    const line = `waiting for the gate on ${short(lock.sha)} (pid ${lock.pid}) …`;
+    if (line !== said) { console.log(line); said = line; }
+    await new Promise((res) => setTimeout(res, 5000));
+  }
+  process.on('exit', releaseLock);
+  return Math.round((Date.now() - t0) / 1000);
+})();
 const started = Date.now();
 const env = { ...process.env, ...(pwPath ? { SENTRI_PLAYWRIGHT: pwPath } : {}) };
 const kids = [];
@@ -114,7 +149,7 @@ function runAsync(cmd, args, cwd, log) {
 const checks = [], gaps = [];
 const check = (name, ok, detail = '') => { checks.push({ check: name, result: ok === null ? 'skipped' : ok ? 'pass' : 'fail', detail }); console.log((ok === null ? 'SKIP' : ok ? 'PASS' : 'FAIL').padEnd(5), name, detail ? '— ' + detail.split('\n')[0] : ''); };
 
-const mech = { pass: false, candidate: '', base: '', ref, mode, scope, quick: flag('quick'), class: { declared }, checks, gaps, screens: null, pairs: [] };
+const mech = { pass: false, candidate: '', base: '', ref, mode, scope, quick: flag('quick'), class: { declared }, checks, gaps, screens: null, pairs: [], waited: waited + 's' };
 const finish = (code) => {
   mech.pass = code === 0 && checks.every((c) => c.result !== 'fail');
   mech.took = Math.round((Date.now() - started) / 1000) + 's';
@@ -134,6 +169,7 @@ if (!argv.includes('--quick')) {
 }
 mech.candidate = git(['rev-parse', '--verify', ref + '^{commit}']).out.trim();
 if (!mech.candidate) { check('candidate exists', false, `no commit for ${ref}`); finish(1); }
+{ const tmp = `${lockFile}.${process.pid}`; fs.writeFileSync(tmp, lockAs(mech.candidate)); try { fs.renameSync(tmp, lockFile); } catch { fs.rmSync(tmp, { force: true }); } } // the lock names what it gates
 fs.rmSync(passRecord(mech.candidate), { force: true }); // a new gate run voids any earlier pass for this commit until its verdict
 const contains = git(['merge-base', '--is-ancestor', mech.base, mech.candidate]).code === 0;
 check('candidate contains origin/main', contains, contains ? short(mech.base) : `merge main forward first: git fetch origin && git merge origin/main (R10, R12)`);

@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { queueAhead, calibrationProblems, budgetProblems, critiqueProblems, pageStyling, addedLines, effectiveClass, classifyScreens, checkVerdict, checkGrades, worstFirst, isClean, loopStatus, touchesSystem, touchesTools, regressions,
-  pageOf, pageAssets, sharedFiles, outcomeLeaves, coverageLost, timedOutOnly } from '../scripts/loop-rules.mjs';
+  pageOf, pageAssets, sharedFiles, outcomeLeaves, coverageLost, timedOutOnly, lockState } from '../scripts/loop-rules.mjs';
 
 test('a change to the bundle or tokens is a shared-component change whatever was declared', () => {
   assert.deepEqual(touchesSystem(['ux/design-system/components/bundle.css', 'features/farrowing/feature.json']), ['ux/design-system/components/bundle.css']);
@@ -286,4 +286,11 @@ test('a scenario run retries only when every failure is a navigation timeout', (
   assert.ok(!timedOutOnly([{ what: 'run', got: 'page.goto: Timeout 30000ms exceeded.' }, { what: '"Done" shown', got: 'absent' }]), 'an assertion failure never retries');
   assert.ok(!timedOutOnly([{ what: 'run', got: 'page.waitForSelector: Timeout 8000ms exceeded.' }]), 'a page that never gets ready is the design');
   assert.ok(!timedOutOnly([{ what: 'tap Done', got: 'control not tappable: Done (locator.click: Timeout 2500ms exceeded.)' }]));
+});
+
+test('a gate lock is free, held by a live gate, or stale when its process is gone', () => {
+  assert.equal(lockState(null, () => true), 'free');
+  assert.equal(lockState({ pid: 42, sha: 'abc' }, (p) => p === 42), 'held');
+  assert.equal(lockState({ pid: 42, sha: 'abc' }, () => false), 'stale');
+  assert.equal(lockState({ sha: 'abc' }, () => true), 'stale');
 });

@@ -357,3 +357,9 @@ export function calibrationProblems(parts, answers) {
 // the design: it is run once more. An assertion failure, a missing control or a page error never retries.
 const NAV_TIMEOUT = /\b(page|frame)\.(goto|reload|goBack|goForward|waitForLoadState|waitForURL|waitForNavigation): Timeout \d+ms exceeded/;
 export const timedOutOnly = (failures) => failures.length > 0 && failures.every((f) => NAV_TIMEOUT.test(String(f.got)));
+
+// The gate's lock (one gate per machine): free, held by a live gate, or stale (its process is gone).
+export function lockState(lock, alive) {
+  if (!lock) return 'free';
+  return Number.isInteger(lock.pid) && alive(lock.pid) ? 'held' : 'stale';
+}
