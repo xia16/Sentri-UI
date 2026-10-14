@@ -386,7 +386,8 @@ function openPrs() {
 }
 
 // ---------- legibility on the changed screens ----------
-const changed = [...screens.diff, ...screens.new].map((s) => s.id);
+// A screen base renders differently twice (mech.flaky) didn't move by this change: it isn't held to the floors here.
+const changed = [...screens.diff.filter((s) => !mech.flaky.includes(s.id)), ...screens.new].map((s) => s.id);
 if (changed.length) {
   if (fs.existsSync(path.join(wt.cand, 'scripts/check-legibility.mjs'))) {
     // the README's own line, not a sentence that mentions it ("change the line above to `Legibility gate: strict`")
