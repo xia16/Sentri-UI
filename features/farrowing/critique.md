@@ -155,3 +155,9 @@ Held against its baseline (`7f5b627`) and the house reference the Farrowing room
 - Against the original: the same screen with more air under the switch and one quiet card that no longer appears from nowhere; not cluttered, not bulkier.
 - Known gaps: in The sow before a cause, Photos and its hint push the danger banner's lower edge under the footer at 844 (its headline and consequence stay visible). The empty card shows the Photos component's camera glyph, not a "+": that is the component's face (shared with Report piglet mortality), not restyled on the page.
 - **Better because** the first cause no longer reads as part of the switch and the worker can see from the start that a photo can ride the record, and why it waits.
+
+#### Final look (the pushed head of farrowing/record-dead-spacing, the commit that adds this block; its screens are fed5e07's, which the gate rendered at 390 and 360 in EN and ZH against base 7f5b627)
+- Reach: 4 screens changed, 287 same, none broken. `farrowing.death` moved in all four renders (10.3%); `assistant.up-to-date` (0.015%), `farrowing.search` (0.004%) and `fostering.result` (0.0003%) are render noise: the first and last pages load none of the changed files, and the death rule is scoped to `.sheet[data-view=death]`.
+- The switch stands apart from the list at 390 and 360; the six rows, the footer and the header are unchanged pixel for pixel in shape.
+- Photos is on screen from the start under Other, the quiet card's top edge peeking above the footer at 844 (the long drawer is full); scrolling or a tap on the waiting camera shows it whole with its hint.
+- **Better because** the first cause no longer reads as part of the switch, and the optional photo is always there, waiting visibly instead of appearing from nowhere.
