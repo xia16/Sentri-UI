@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { queueAhead, calibrationProblems, budgetProblems, critiqueProblems, pageStyling, addedLines, effectiveClass, classifyScreens, checkVerdict, checkGrades, worstFirst, isClean, loopStatus, touchesSystem, touchesTools, regressions,
-  pageOf, pageAssets, sharedFiles, outcomeLeaves, coverageLost } from '../scripts/loop-rules.mjs';
+  pageOf, pageAssets, sharedFiles, outcomeLeaves, coverageLost, timedOutOnly } from '../scripts/loop-rules.mjs';
 
 test('a change to the bundle or tokens is a shared-component change whatever was declared', () => {
   assert.deepEqual(touchesSystem(['ux/design-system/components/bundle.css', 'features/farrowing/feature.json']), ['ux/design-system/components/bundle.css']);
@@ -275,4 +275,15 @@ test('a judge that rates an owner-rejected calibration pair better, or skips one
   const bad = calibrationProblems([{ calibration: [{ pair: 'c1', verdict: 'better' }] }], answers);
   assert.equal(bad.length, 2);
   assert.match(bad[0], /c1 better/); assert.match(bad[1], /c2 not rated/);
+});
+
+// ---------- the lighter gate ----------
+
+test('a scenario run retries only when every failure is a navigation timeout', () => {
+  assert.ok(timedOutOnly([{ what: 'run', got: 'page.goto: Timeout 30000ms exceeded.' }]));
+  assert.ok(timedOutOnly([{ what: 'back', got: 'page.goBack: Timeout 3000ms exceeded.' }, { what: 'run', got: 'page.waitForLoadState: Timeout 30000ms exceeded.' }]));
+  assert.ok(!timedOutOnly([]), 'a pass never retries');
+  assert.ok(!timedOutOnly([{ what: 'run', got: 'page.goto: Timeout 30000ms exceeded.' }, { what: '"Done" shown', got: 'absent' }]), 'an assertion failure never retries');
+  assert.ok(!timedOutOnly([{ what: 'run', got: 'page.waitForSelector: Timeout 8000ms exceeded.' }]), 'a page that never gets ready is the design');
+  assert.ok(!timedOutOnly([{ what: 'tap Done', got: 'control not tappable: Done (locator.click: Timeout 2500ms exceeded.)' }]));
 });

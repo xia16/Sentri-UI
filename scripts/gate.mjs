@@ -210,7 +210,8 @@ check('no conflict markers', !r.out.trim(), r.out.trim().split('\n').slice(0, 3)
   check('behaviour coverage kept', !lost.length, lost.length ? `removes behaviour coverage (${lost.slice(0, 3).join('; ')}): do it in its own workflow PR` : `${withLeaves.length} feature(s) with leaves`);
 }
 
-// check-states runs on both sides for every class, beside everything below (it takes minutes). A state that already fails on
+// check-states runs on both sides for every class, beside the shots and the checks below (it takes minutes), and is done before
+// the scenario leaves start. A state that already fails on
 // main (e.g. a stress-test label the copy pass hasn't removed yet) is main's debt, reported but not blocking; a problem main
 // doesn't have fails the gate. The committed report goes first, so a run that writes none can't pass on an old one.
 const statesRun = Promise.all(['base', 'cand'].map((k) => {
@@ -416,6 +417,9 @@ if (changed.length) {
 }
 
 // ---------- scenario leaves: the scope's features, every feature whose screens changed, every feature a touched shared file reaches ----------
+// They run alone: a gate's own check-states (both sides) running beside them starved their page loads into timeouts (#164).
+// The shots finished above; check-states is awaited here.
+const statesDone = await statesRun;
 const runner = fs.existsSync(path.join(wt.cand, 'scripts/run-scenarios.mjs'));
 const noLeaves = [];
 for (const f of new Set([...scope, ...[...screens.diff, ...screens.new].map((s) => s.feature), ...touched.flatMap((t) => shared[t] || [])])) {
@@ -428,7 +432,7 @@ if (noLeaves.length && CLASSES.indexOf(ec.cls) >= 2) gaps.push(`${noLeaves.lengt
 
 // ---------- check-states, both sides (started at the top) ----------
 {
-  const [, rc] = await statesRun;
+  const [, rc] = statesDone;
   const problems = (dir) => {
     const f = path.join(dir, 'review/state-check.json');
     if (!fs.existsSync(f)) return null;

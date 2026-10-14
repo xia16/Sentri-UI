@@ -350,3 +350,10 @@ export function calibrationProblems(parts, answers) {
   }
   return out;
 }
+
+// ---------- the lighter gate: reach, the base cache, the lock, the timeout retry, carrying a pass ----------
+
+// A scenario run that failed only because a navigation timed out (page.goto, a reload, Back, waitForLoadState) says nothing about
+// the design: it is run once more. An assertion failure, a missing control or a page error never retries.
+const NAV_TIMEOUT = /\b(page|frame)\.(goto|reload|goBack|goForward|waitForLoadState|waitForURL|waitForNavigation): Timeout \d+ms exceeded/;
+export const timedOutOnly = (failures) => failures.length > 0 && failures.every((f) => NAV_TIMEOUT.test(String(f.got)));
