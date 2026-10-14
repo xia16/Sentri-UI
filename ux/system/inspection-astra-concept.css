@@ -785,5 +785,6 @@
 /* The pen/pig scope tabs sit above the actions page body (Sheet `above`): the body keeps its gap under them (layout only). */
 .inspection-phone .sheet .actions-subjects+.sheet-body{padding-top:18px}
 .inspection-phone .sheet-body>.empty-inspect:first-child{padding-top:0}
-/* The check-in line stays one line beside Log and End walk (or Check in again): at narrow widths the name ends in an ellipsis rather than wrapping (layout only). */
+/* The check-in line is one line beside Log and End walk (or Check in again): the hand is written as initials (the house convention,
+   `Last record 08:41 · G.H`), so it fits; nowrap and the ellipsis are only a safety net (layout only). */
 .inspection-phone .inspect-intro>p{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
