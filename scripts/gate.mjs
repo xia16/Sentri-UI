@@ -13,11 +13,12 @@
 import { spawn, spawnSync } from 'node:child_process';
 import { pwPath, playwright } from './playwright-path.mjs';
 import { createServer } from 'node:net';
+import { createHash } from 'node:crypto';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { CLASSES, screensOf, pageOf, pageAssets, sharedFiles, coverageLost, effectiveClass, classifyScreens, checkVerdict, touchesSystem, touchesTools, queueAhead as queueOf, budgetProblems, critiqueProblems, pageStyling, addedLines, calibrationProblems, lockState } from './loop-rules.mjs';
+import { CLASSES, screensOf, pageOf, pageAssets, sharedFiles, coverageLost, effectiveClass, classifyScreens, checkVerdict, touchesSystem, touchesTools, queueAhead as queueOf, budgetProblems, critiqueProblems, pageStyling, addedLines, calibrationProblems, lockState, shotsToTake } from './loop-rules.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -275,12 +276,64 @@ const shoot = (side, dir, extra) => new Promise((res) => {
   kids.push(p);
   p.on('exit', () => { try { res(JSON.parse(fs.readFileSync(path.join(dir, 'shots.json'), 'utf8')).runs.map((x) => ({ ...x, png: path.join(dir, x.file) }))); } catch { res(null); } });
 });
-// One shoot-screens per width: each width gets its own browser context either way, so this changes no pixel and halves the wait.
-const shootAll = (side, dir, extra) => Promise.all(WIDTHS.map((w) => shoot(side, path.join(dir, `w${w}`), [...extra, '--widths', String(w), '--langs', LANGS.join(',')])))
-  .then((parts) => (parts.includes(null) ? null : parts.flat()));
-console.log(`\nshooting every screen on base and candidate at ${WIDTHS.join('/')} × ${LANGS.join('/')} …`);
-const scopeArgs = mech.quick ? ['--feature', scope.join(',')] : [];
-const capture = Promise.all([shootAll('base', path.join(out, 'shots/base'), scopeArgs), shootAll('cand', path.join(out, 'shots/cand'), scopeArgs)]);
+// One shoot-screens per group of runs (a width and its languages, from shotsToTake): each width gets its own browser context
+// either way, so this changes no pixel and halves the wait. The screen ids go in a file: a list of hundreds is too long for a command line.
+const shootGroups = (side, dir, groups) => Promise.all(groups.map((g) => {
+  const sub = path.join(dir, `${g.width}-${g.langs.join('-')}`), list = path.join(dir, `${g.width}-${g.langs.join('-')}.json`);
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(list, JSON.stringify(g.screens));
+  return shoot(side, sub, ['--screens-file', list, '--widths', String(g.width), '--langs', g.langs.join(',')]);
+})).then((parts) => (parts.includes(null) ? null : parts.flat()));
+// The runs each side needs: { screen, width, langs }.
+const needsOf = (list) => list.filter((s) => !mech.quick || scope.includes(s.feature)).flatMap((s) => WIDTHS.map((width) => ({ screen: s.id, width, langs: LANGS })));
+const candScreens = screensOf(JSON.parse(fs.readFileSync(path.join(wt.cand, 'atlas/atlas.json'), 'utf8')));
+
+// ---------- base shots, once per main commit ----------
+// Base is the same main commit gate after gate, so its shots are kept in <git common dir>/sentri-gate/base-shots/<base>/<key>/,
+// where the key hashes everything else that decides a base pixel: the shooter and its font routing, the vendored fonts, the base
+// side's harness and server, the Playwright version and browser build, the widths and languages. Only runs that rendered are kept;
+// a missing or failed run is shot again and added. Caches for bases older than main's last 10 commits are removed.
+const baseCache = (() => {
+  const h = createHash('sha256');
+  const add = (label, f) => h.update(`${label}\0`).update(fs.existsSync(f) ? fs.readFileSync(f) : 'missing').update('\0');
+  add('shoot', path.join(root, 'scripts/shoot-screens.mjs'));
+  add('fonts', path.join(root, 'scripts/font-route.mjs'));
+  const vendor = path.join(root, 'vendor/fonts');
+  for (const f of (fs.existsSync(vendor) ? fs.readdirSync(vendor, { recursive: true }) : []).map(String).sort()) if (fs.statSync(path.join(vendor, f)).isFile()) add(`vendor/${f}`, path.join(vendor, f));
+  add('bare', path.join(wt.base, 'ux/system/atlas-bare.js'));
+  add('serve', path.join(wt.base, 'scripts/serve-ux.cjs'));
+  const pw = JSON.parse(fs.readFileSync(path.join(pwPath, 'package.json'), 'utf8')).version;
+  const browser = (playwright().chromium.executablePath().match(/chromium[^\\/]*/) || ['?'])[0];
+  h.update(`playwright ${pw} ${browser} ${process.platform} widths ${WIDTHS} langs ${LANGS}`);
+  return path.join(gateDir(), 'base-shots', mech.base, h.digest('hex').slice(0, 16));
+})();
+{
+  const dir = path.join(gateDir(), 'base-shots'), keep = new Set(git(['rev-list', '--first-parent', '-n', '10', mech.base]).out.split(/\s+/).filter(Boolean));
+  for (const d of fs.existsSync(dir) ? fs.readdirSync(dir) : []) if (!keep.has(d)) fs.rmSync(path.join(dir, d), { recursive: true, force: true });
+}
+async function shootBase(needs) {
+  let cached = [];
+  try { cached = JSON.parse(fs.readFileSync(path.join(baseCache, 'shots.json'), 'utf8')).runs || []; } catch {}
+  const plan = shotsToTake(needs, cached, (f) => fs.existsSync(path.join(baseCache, f)));
+  const taken = plan.take.length ? await shootGroups('base', path.join(out, 'shots/base'), plan.take) : [];
+  if (!taken) return null;
+  const runs = new Map(cached.map((x) => [`${x.screen} ${x.lang}-${x.width}`, x]));
+  for (const { png, ...x } of taken.filter((t) => t.ok)) {
+    fs.mkdirSync(path.dirname(path.join(baseCache, x.file)), { recursive: true });
+    fs.copyFileSync(png, path.join(baseCache, x.file));
+    runs.set(`${x.screen} ${x.lang}-${x.width}`, x);
+  }
+  if (taken.some((t) => t.ok)) { const tmp = path.join(baseCache, `shots.json.${process.pid}`); fs.writeFileSync(tmp, JSON.stringify({ commit: mech.base, runs: [...runs.values()] })); fs.renameSync(tmp, path.join(baseCache, 'shots.json')); }
+  mech.baseShots = { cache: path.relative(gateDir(), baseCache).replace(/\\/g, '/'), reused: plan.reuse.length, taken: taken.length };
+  console.log(`base ${short(mech.base)}: ${plan.reuse.length} shot(s) from the cache, ${taken.length} taken`);
+  return [...plan.reuse.map((x) => ({ ...x, png: path.join(baseCache, x.file) })), ...taken.map((x) => (x.ok ? { ...x, png: path.join(baseCache, x.file) } : x))];
+}
+
+const needs = { base: needsOf(baseScreens), cand: needsOf(candScreens) };
+const runsOf = (n) => n.reduce((k, x) => k + x.langs.length, 0);
+console.log(`\nshooting ${runsOf(needs.cand)} run(s) on the candidate and ${runsOf(needs.base)} on base (cached base runs reused) at ${WIDTHS.join('/')} × ${LANGS.join('/')} …`);
+const shotsStarted = Date.now();
+const capture = Promise.all([shootBase(needs.base), shootGroups('cand', path.join(out, 'shots/cand'), shotsToTake(needs.cand).take)]);
 
 // The tests run while the screens are shot (each in its own process; this loop just waits).
 r = run('npm', ['test'], wt.cand);
@@ -291,6 +344,7 @@ r = run('npm', ['run', 'check'], wt.cand);
 check('npm run check', r.code === 0, r.all.find((l) => /atlas:/.test(l)) || r.tail);
 
 const [shotsBase, shotsCand] = await capture;
+mech.timings = { shots: Math.round((Date.now() - shotsStarted) / 1000) + 's' };
 if (!shotsBase || !shotsCand) { check('every screen shot on both sides', false, 'shoot-screens wrote no shots.json (its errors are above)'); finish(1); }
 
 const { chromium } = playwright();
@@ -455,7 +509,10 @@ if (changed.length) {
 // ---------- scenario leaves: the scope's features, every feature whose screens changed, every feature a touched shared file reaches ----------
 // They run alone: a gate's own check-states (both sides) running beside them starved their page loads into timeouts (#164).
 // The shots finished above; check-states is awaited here.
+let t0 = Date.now();
 const statesDone = await statesRun;
+mech.timings.statesWait = Math.round((Date.now() - t0) / 1000) + 's';
+t0 = Date.now();
 const runner = fs.existsSync(path.join(wt.cand, 'scripts/run-scenarios.mjs'));
 const noLeaves = [];
 for (const f of new Set([...scope, ...[...screens.diff, ...screens.new].map((s) => s.feature), ...touched.flatMap((t) => shared[t] || [])])) {
@@ -464,6 +521,7 @@ for (const f of new Set([...scope, ...[...screens.diff, ...screens.new].map((s) 
   r = run(process.execPath, ['scripts/run-scenarios.mjs', f, '--base', url.cand], wt.cand);
   check(`scenarios ${f}`, r.code === 0, r.tail);
 }
+mech.timings.scenarios = Math.round((Date.now() - t0) / 1000) + 's';
 if (noLeaves.length && CLASSES.indexOf(ec.cls) >= 2) gaps.push(`${noLeaves.length} affected feature(s) have no executable leaves (features/<id>/scenarios.json): ${noLeaves.slice(0, 6).join(', ')}${noLeaves.length > 6 ? ' …' : ''}. Behaviour there is covered by the walk only.`);
 
 // ---------- check-states, both sides (started at the top) ----------

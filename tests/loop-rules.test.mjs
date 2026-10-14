@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { queueAhead, calibrationProblems, budgetProblems, critiqueProblems, pageStyling, addedLines, effectiveClass, classifyScreens, checkVerdict, checkGrades, worstFirst, isClean, loopStatus, touchesSystem, touchesTools, regressions,
-  pageOf, pageAssets, sharedFiles, outcomeLeaves, coverageLost, timedOutOnly, lockState } from '../scripts/loop-rules.mjs';
+  pageOf, pageAssets, sharedFiles, outcomeLeaves, coverageLost, shotsToTake, timedOutOnly, lockState } from '../scripts/loop-rules.mjs';
 
 test('a change to the bundle or tokens is a shared-component change whatever was declared', () => {
   assert.deepEqual(touchesSystem(['ux/design-system/components/bundle.css', 'features/farrowing/feature.json']), ['ux/design-system/components/bundle.css']);
@@ -293,4 +293,21 @@ test('a gate lock is free, held by a live gate, or stale when its process is gon
   assert.equal(lockState({ pid: 42, sha: 'abc' }, (p) => p === 42), 'held');
   assert.equal(lockState({ pid: 42, sha: 'abc' }, () => false), 'stale');
   assert.equal(lockState({ sha: 'abc' }, () => true), 'stale');
+});
+
+test('base shots: reuse a screen at a width only when every language it needs is cached', () => {
+  const run = (screen, lang, width) => ({ screen, lang, width, file: `${screen}/${lang}-${width}.png`, ok: true });
+  const cached = [run('a', 'en', 390), run('a', 'zh', 390), run('b', 'en', 390), { ...run('c', 'en', 390), ok: false }, run('d', 'en', 390)];
+  const needs = [
+    { screen: 'a', width: 390, langs: ['en', 'zh'] }, // cached in full
+    { screen: 'b', width: 390, langs: ['en', 'zh'] }, // zh missing: shot again in both
+    { screen: 'b', width: 360, langs: ['en', 'zh'] },
+    { screen: 'c', width: 390, langs: ['en'] }, // a failed run is never reused
+    { screen: 'd', width: 390, langs: ['en'] }, // its png is gone
+    { screen: 'e', width: 390, langs: ['en'] },
+  ];
+  const r = shotsToTake(needs, cached, (f) => !f.startsWith('d/'));
+  assert.deepEqual(r.reuse.map((x) => x.file), ['a/en-390.png', 'a/zh-390.png']);
+  assert.deepEqual(r.take, [{ width: 390, langs: ['en', 'zh'], screens: ['b'] }, { width: 360, langs: ['en', 'zh'], screens: ['b'] }, { width: 390, langs: ['en'], screens: ['c', 'd', 'e'] }]);
+  assert.deepEqual(shotsToTake(needs.slice(0, 1), [run('a', 'en', 390), run('a', 'zh', 390)]).take, [], 'a complete cache shoots nothing');
 });

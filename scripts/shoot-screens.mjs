@@ -1,5 +1,6 @@
 // Screenshots atlas screens bare, at each width and language, from a running server (or one it starts on this checkout).
-// Usage: node scripts/shoot-screens.mjs <out dir> [--base <url> --commit <hash>] [--atlas <atlas.json>] [--feature id,id] [--screens id,id] [--widths 390,360] [--langs en,zh]
+// Usage: node scripts/shoot-screens.mjs <out dir> [--base <url> --commit <hash>] [--atlas <atlas.json>] [--feature id,id] [--screens id,id]
+//                                       [--screens-file <ids.json>] [--widths 390,360] [--langs en,zh]
 // Writes <out>/<screen id>/<lang>-<width>.png and <out>/shots.json:
 //   { base, commit, runs: [{ screen, feature, lang, width, file, ok, error?, zh? }] }
 // zh is "rendered" or "ignored": a page that shows the same text with ?lang=zh does not render Chinese, and the run says so
@@ -32,7 +33,9 @@ const out = argv.find((a, i) => !a.startsWith('--') && !(argv[i - 1] || '').star
 if (!out) { console.error('usage: node scripts/shoot-screens.mjs <out dir> [--base <url>] [--feature a,b] [--screens a,b] [--widths 390,360] [--langs en,zh]'); process.exit(2); }
 
 const atlas = JSON.parse(fs.readFileSync(opt('atlas') || path.join(root, 'atlas/atlas.json'), 'utf8')); // --atlas: another checkout's screens
-const todo = screensOf(atlas, { features: csv('feature', ''), screens: csv('screens', '') });
+// --screens-file: a JSON list of screen ids, for a list too long for a command line (the gate's). An empty list shoots nothing.
+const listed = opt('screens-file') ? JSON.parse(fs.readFileSync(opt('screens-file'), 'utf8')) : null;
+const todo = listed && !listed.length ? [] : screensOf(atlas, { features: csv('feature', ''), screens: [...csv('screens', ''), ...(listed || [])] });
 const widths = csv('widths', '390').map(Number);
 const langs = csv('langs', 'en').sort((a, b) => (a === 'en' ? -1 : b === 'en' ? 1 : 0)); // en first: the zh probe compares against it
 

@@ -353,6 +353,22 @@ export function calibrationProblems(parts, answers) {
 
 // ---------- the lighter gate: reach, the base cache, the lock, the timeout retry, carrying a pass ----------
 
+// The base shots to take: needs [{ screen, width, langs }] against the cached runs [{ screen, lang, width, file, ok }] (has(file):
+// the png is still there). A screen is reused at a width only when every language it needs is cached, since the Chinese probe
+// compares against English shot in the same run; otherwise it is shot again in all of them. take: [{ width, langs, screens }].
+export function shotsToTake(needs, cached = [], has = () => true) {
+  const at = new Map(cached.filter((r) => r.ok && has(r.file)).map((r) => [`${r.screen} ${r.lang}-${r.width}`, r]));
+  const reuse = [], take = new Map();
+  for (const n of needs) {
+    const hit = n.langs.map((l) => at.get(`${n.screen} ${l}-${n.width}`));
+    if (hit.every(Boolean)) { reuse.push(...hit); continue; }
+    const k = `${n.width}|${n.langs.join(',')}`;
+    if (!take.has(k)) take.set(k, { width: n.width, langs: n.langs, screens: [] });
+    take.get(k).screens.push(n.screen);
+  }
+  return { reuse, take: [...take.values()] };
+}
+
 // A scenario run that failed only because a navigation timed out (page.goto, a reload, Back, waitForLoadState) says nothing about
 // the design: it is run once more. An assertion failure, a missing control or a page error never retries.
 const NAV_TIMEOUT = /\b(page|frame)\.(goto|reload|goBack|goForward|waitForLoadState|waitForURL|waitForNavigation): Timeout \d+ms exceeded/;
