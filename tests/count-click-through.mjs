@@ -1,16 +1,13 @@
 // Count and explain click-through (ticket #10): room → litter Set count → count lower → the room shows the open loss →
 // the drift strip → explain via the move suggestion → both lines close. One ledger, one fixture (variant gain-b08:
 // L.M found 10 in B08 at 09:55, 9 by the record). Run: node tests/count-click-through.mjs [port]
-// Uses the Playwright the design lint installs (~/.cache/adam-design/playwright-<v>).
+// Uses the project's Playwright (scripts/playwright-path.mjs).
 import { spawn } from 'node:child_process';
-import { createRequire } from 'node:module';
-import { homedir } from 'node:os';
-import { join } from 'node:path';
 import assert from 'node:assert/strict';
+import { playwright } from '../scripts/playwright-path.mjs';
 
 const port = Number(process.argv[2]) || 4631;
-const require = createRequire(join(homedir(), '.cache', 'adam-design', 'playwright-1.63.0', 'package.json'));
-const { chromium } = require('playwright');
+const { chromium } = playwright();
 const server = spawn(process.execPath, ['scripts/serve-ux.cjs', String(port)], { stdio: 'ignore' });
 const base = `http://localhost:${port}/ux/tasks/piglet-processing/`;
 const ready = (p) => p.waitForSelector('html[data-ready]');

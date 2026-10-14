@@ -90,7 +90,7 @@ fs.mkdirSync(out, { recursive: true });
 // A rerun into the same folder starts clean: old shots, pairs and verdicts are about a mechanical run that no longer exists.
 for (const f of ['shots', 'pairs', 'mechanical.json', ...fs.readdirSync(out).filter((f) => VERDICT_FILE.test(f))]) fs.rmSync(path.join(out, f), { recursive: true, force: true });
 const started = Date.now();
-const env = { ...process.env, SENTRI_PLAYWRIGHT: pwPath };
+const env = { ...process.env, ...(pwPath ? { SENTRI_PLAYWRIGHT: pwPath } : {}) };
 const kids = [];
 
 function run(cmd, args, cwd, timeout = 20 * 60e3) {
