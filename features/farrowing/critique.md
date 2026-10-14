@@ -141,3 +141,17 @@ Scope: `farrowing.death` (the one Record dead drawer). `farrowing.death-breakdow
 | Photos | `SentriUI.photos`, rendered only once a death is drafted | Photos (the optional row, Field's optional-row law) | **fix**: always rendered, last in capture order; inactive until a death, its reason in the component's hint line |
 | Danger banner (the sow) | `SentriUI.banner` | Banner | **keep** |
 | Footer | `footer()` + Button / hold | Sheet footer | **keep** |
+
+## Self-crit
+
+Held against its baseline (`7f5b627`) and the house reference the Farrowing room; the owner's board fixed the direction (B), so the directions differ only in the space under the switch.
+
+#### Round 1 (renders at 390 EN of the screen and its states: draft, no draft, a waiting tap, a photo, The sow with and without a cause)
+- **Direction A** (24px under the switch, `--space-24`; Photos always rendered): the switch now reads as its own block, the first `−` is 34px under it against 22px between rows; `check-spacing` passes (inversion and crowding gone). Photos sits under Other from the start, inactive until a death, its reason in the component's hint line. At 844px the long drawer (85%) is full, so the Photos card meets the footer's edge and its hint is below it: a tap on the waiting camera did not show its answer. Fixed in the host: the guarded tap scrolls the hint line above the footer, then `SentriUI.guard` re-announces it.
+- **Direction B** (16px): the first `−` 26px under the switch against 22px between rows, still close to reading as one list, and Photos is still cut by the footer. Not better than A.
+- Problems: the inversion is fixed; the hidden Photos is fixed (always visible, waits visibly, answers in its hint line); the notes are rewritten to what the screen shows.
+- Keep as strong: the switch, the six stepper rows (unchanged, option C not taken), the sow's causes, banner, footer and header are untouched. With a photo the row turns full width with its count and thumbnail (the Photos component's own face).
+- Squint: the title, the switch, the counts (the drafted row's dark `−`); Photos is a quiet card last. These answer whose death, how many, what will save.
+- Against the original: the same screen with more air under the switch and one quiet card that no longer appears from nowhere; not cluttered, not bulkier.
+- Known gaps: in The sow before a cause, Photos and its hint push the danger banner's lower edge under the footer at 844 (its headline and consequence stay visible). The empty card shows the Photos component's camera glyph, not a "+": that is the component's face (shared with Report piglet mortality), not restyled on the page.
+- **Better because** the first cause no longer reads as part of the switch and the worker can see from the start that a photo can ride the record, and why it waits.
