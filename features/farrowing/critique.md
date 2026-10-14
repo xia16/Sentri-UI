@@ -192,7 +192,8 @@ Held against its baseline (`7f5b627`) and the house reference the Farrowing room
 - **That cost the sow's banner 1px** with cause Other (the body overflowed by 1px at 390 and 360, EN and ZH). Fixed by spacing, not size: on Record dead, the banner follows Photos at the rows' own 8px step instead of the photo strip's 12px trailing margin. The banner now has 3px to spare.
 - **Stale claims, corrected in the PR body:** the drawer is at 80px (not "as the task overview sheet does"). The waiting Photos row's hint shows only once the camera is tapped. It is not a standing line.
 - Measured at a true 390 and 360 (the phone forced to width), 844 tall, EN and ZH: Piglets first frame, The sow, The sow with Other, and The sow with Other after a camera tap. Each opens at top 80 with body overflow 0. `farrowing.piglet-death` is unchanged.
-- **Better because** the drawer is the Sheet's own drawer again (no half-cut page behind it), and every state is still whole.
+- **A shorter phone still scrolls.** At a true 360×800 (the phone forced to 800 tall after load; the judge's measure on cb4366b), the body scrolls: Piglets by 13px (the Photos row under the footer edge), The sow with Other by 41px (the banner's second line under the footer). Main scrolls more in both (35px and 73px). Making both fit at 800 tall would need a change to the causes list or the banner, which is a design decision outside this PR. So the claim is scoped to what was measured: whole at 844 tall (the gate's frame) at 390 and 360, and less cut than main at 800 tall.
+- **Better because** the drawer is the Sheet's own drawer again (no half-cut page behind it), every state is whole in the gate's frame, and a short phone hides less than on main.
 
 
 # Header corners (2026-10-14)
@@ -246,7 +247,7 @@ The ruling fixes the design (the boards `evidence/2026-10-14-header-corners.png`
 
 #### Final look after merging #167 (the pushed head of farrowing/record-dead-spacing, the commit that adds this block; screens of ac662ad, the merge of origin/main with the corner Clear; no design change)
 - Both hold: main's header (Clear at the top right only while something is drafted or a cause is chosen; the footer is Back and the primary) and this branch's switch spacing, Photos/Details row face, floor-gray hint and drawer height.
-- Measured every state at 390×844 and 360×800, EN and ZH (Piglets draft / none / waiting tap / photo, The sow no cause / waiting tap / a cause / Other / Details open): body overflow 0 everywhere except added thumbnails (29px) and Details opened for typing (34px), which scroll by design; the Photos row and the sow's banner are whole. At 360 the narrower footer now keeps "Record sow death" on one line.
+- (Corrected in round 4: the 360×800 measures here were taken with the atlas phone still 844 tall, not a true 360×800.) Measured every state at 390×844 and 360×800, EN and ZH (Piglets draft / none / waiting tap / photo, The sow no cause / waiting tap / a cause / Other / Details open): body overflow 0 everywhere except added thumbnails (29px) and Details opened for typing (34px), which scroll by design; the Photos row and the sow's banner are whole. At 360 the narrower footer now keeps "Record sow death" on one line.
 - `farrowing.death` and `farrowing.piglet-death` rendered at 390 and 360, EN and ZH: the switch's 24px, the full-width optional rows, nothing under the footer. check-headers: 0 defects on both; spacing and strict legibility pass.
 
 ---
