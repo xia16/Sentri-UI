@@ -60,3 +60,110 @@ The law and its boards fix the design (two headers, the line's three tests); the
 - Footers: fostering's primary stays on one line at 56px in Chinese at 390; Find a pig's primary is "Search".
 - Reach: 153 screens move, all in this change's features; 138 identical; none broken. npm test 674 pass; legibility and spacing pass on every moved screen; farrowing scenarios 87 of 87 in EN (ZH blocked on main as well).
 - **Better because** each header says one thing the same way everywhere, and every fact it no longer carries has a designed place in the body.
+
+## Small fixes (2026-10-14): Check in again in Chinese
+
+Scope: one label in the walk's check-in row; everything else in Keep above stands.
+
+### Keep
+- The check-in row (Last check-in · Log · End walk / Check in again, quiet text actions): its place, register and order stay.
+
+### Problems
+- **major** · After a check-in the row's action reads `Check in again` in English on the Chinese screen (`inspection.walk-recorded` ZH, the gate's judges on PR #150): the label was never registered in `ux/laws/strings.json`, while `End walk` in the same slot is (copy law: every label in both languages).
+
+### Parts
+| Part | Drawn by today | The component whose job it is | Keep / fix / cut |
+|---|---|---|---|
+| Check in again | Button (text register), `ux/system/inspection-astra-concept.js`, English only | Button + the strings registry (a verb with one meaning, and its feed copy) | **fix** |
+
+### Self-crit (small fixes, 2026-10-14)
+No competing directions: each problem has one fix that changes only the named part. Final look: screens of d658bce (this block's commit adds no pixel), rendered at 390 and 360 in EN and ZH beside base 7f5b627. The gate's diff moves exactly six screens: inspection.walk-recorded ZH (再次签到 in the check-in row), pig-profile.unavailable-actions ZH (the sheet, as in EN), and the four fostering.* at 360 (the sheet now fits the screen: both choice tiles, checkboxes and the footer whole); 285 screens identical.
+- Known, not fixed: at 360 the Move sheet's primary (`Move 2 · C03 → C05`, `转移1头 B10→B08`) wraps to two lines; the crop used to hide it. It is the footer component's fit, not this page's layout.
+- **Better because** each screen now shows what it claims: Chinese copy in the check-in row, the sheet in ZH, and the whole Move sheet at 360.
+
+## Crit round 1 (driver, c65d58b): the same faults next door
+
+### Problems
+- **major** · `inspection.review-selected` ZH stops on the list: its tap step is `[aria-label="Select pig 000254"]`, which the Chinese page labels `选择猪只000254`.
+- **major** · The End walk sheet's primary `Check in to Unit 7` stays English on the Chinese screen (`inspection.finish` ZH): not in `ux/laws/strings.json`.
+
+### Parts
+| Part | Drawn by today | The component whose job it is | Keep / fix / cut |
+|---|---|---|---|
+| review-selected setup | atlas steps (`features/inspection/feature.json`) | the row's `data-pig-select` | **fix** |
+| Check in to Unit 7 | footer primary, English only | Button + strings registry (verb `Check in`, feed copy) | **fix** |
+
+### Self-crit, crit round 1 (2026-10-14), then Final look
+Final look: screens of a2990df (this block's commit adds no pixel), every inspection and fostering screen plus pig-profile.unavailable-actions rendered at 390 and 360 in EN and ZH beside base 7f5b627. Moved: inspection.walk-recorded, inspection.finish (`7单元签到`), inspection.review-selected (the Selected sheet, as in EN) and pig-profile.unavailable-actions in ZH; the four fostering.* at 360, and fostering.piglets and fostering.result at 390 for the label. The Move primary is one line at 360 in EN (`Move 2 to C05`) and ZH (`转移1头至B08`), 56px, type unchanged; the source crate stays in the selected tile and the crate field.
+- Known, not fixed: the End walk sheet's body copy (`Recorded during this walk`, the check-in note) is still English in ZH.
+- **Better because** the Move sheet fits 360 with a one-line primary that says verb, count and place, and every Inspection sheet named opens and speaks Chinese in ZH.
+- Final look after the merge of main (851dcba, docs and gate only): the screens of 3b81324, rendered by the gate at 390 and 360 in EN and ZH against base 851dcba, mechanical pass; only SCOPE moved (health-record.care-states en-360, 0.03%, renders differently twice on base: noise). This line's commit adds no pixel.
+
+# Header corners (2026-10-14)
+
+Scope: the sheet header's corner actions and title room, by the Headers law → Corner actions and Title length (`ux/design-system/README.md`, owner ruling C, 2026-10-14; PR #165). Baselines: `origin/main` at `39637ff`, shot with `node scripts/shoot-screens.mjs` at 390 and 360, EN and ZH; titles measured at a true 360 (the phone width forced after load, so a bare page pinned to 390 cannot hide an overflow).
+
+### Keep
+
+- Every title that already fits names its job (`Record dead`, `Edit record`, `Filter sows`, `Move piglets`): unchanged, still the heaviest thing in the header.
+- Clear and Reset keep their one meaning (`ux/laws/strings.json`), their quiet text register, their words and their presence rule (only while there is something to clear or reset).
+- Bodies, rows, footers' Back and primary, the hairline and the 24px to the body: untouched.
+
+### Problems
+
+- **major** · Reset (Filter pigs) and Clear (Selected) sat in the footer between Back and the primary (law 2026-10-14).
+- **minor** · Filter pigs showed Reset with every facet at its default.
+- **major** · `Report equipment fault` (213px) does not fit the title room at 360 (204px).
+
+### Parts
+
+| Part | Drawn by today | The component whose job it is | Keep / fix / cut |
+|---|---|---|---|
+| Reset on Filter pigs | FilterSheet footer | FilterSheet → Sheet `corner` | **fix** |
+| Clear on Selected | page-built `quiet()` button in the footer content | Sheet `corner` | **fix** |
+| `Report equipment fault` title (choose a pen) | sheet() title | Sheet title | **fix** (copy) |
+
+### Self-crit
+
+The ruling fixes the design (the boards `evidence/2026-10-14-header-corners.png` and `-header-room.png`, direction C): no competing directions. Each screen is held against its baseline and the Farrowing room.
+
+#### Round 1 (renders at 390 and 360, EN and ZH, beside `39637ff`)
+- Clear / Reset sit at the top right, 48px targets (Clear 52px, 清除 48px), vertically centred on the title block: measured 0px off its centre on every changed drawer, with and without a header line (`Farrowing record` + route line: the corner sits between the two lines, as board C).
+- The footer is Back and the primary alone: the primary gains the width the quiet word took.
+- Squint: the title, then the first card; the corner word is quiet and does not compete with the title.
+- Cluttered, flat or bulky against the original: less in the footer, nothing added to the body; the header gains one quiet word only while there is something to clear.
+- **Better because** the destructive-but-safe act (empty the draft) leaves the thumb zone beside the commit, and every drawer clears and resets in one place.
+
+
+# Header gaps (2026-10-14)
+
+Scope: the header-to-body gap (Headers law: `space-section`, 24px, the header's), flagged on `origin/main` by the header check (`scripts/check-headers.mjs`, workflow/header-checks). Layout only: nothing in the body changes but where it starts.
+
+### Keep
+
+- The bodies themselves (the log filter, the treatment form, the walk receipt): unchanged.
+
+### Problems
+
+- **minor** · Pen log (a page): the log filter bar's 10px top padding stacked on the page header's 24px (34px).
+- **minor** · Walk recorded (a drawer): the receipt's 18px top padding stacked on the body's 24px (42px).
+
+### Parts
+
+| Part | Drawn by today | The component whose job it is | Keep / fix / cut |
+|---|---|---|---|
+| Log filter bar under a page header | `.sheet-filterbar` padding (inspection-astra-concept.css) | Sheet page header (owns the 24px) | **fix**: no top padding under a page header |
+| Walk receipt | `.walk-complete` padding (inspection-subpages-refinement.css) | Sheet body (owns the 24px) | **fix**: no top padding |
+
+### Self-crit
+
+#### Round 1
+- The header check now reads 24px on these screens (0 defects at the candidate); the body rises by the stacked padding and nothing else moves.
+- **Better because** the gap under every header is the header's alone, as on every other page.
+
+#### Final look (61bc01e, pushed head; renders at 390 and 360, EN and ZH, beside 39637ff; the gate's pairs at 4571e5e)
+- Reach: 19 screens moved (gate, base 39637ff), all in this change's scope (farrowing, inspection, pig-list, pig-profile, health-record, environment, fostering); `assistant.up-to-date` is the gate's known flaky screen. 272 identical, none broken.
+- Problems fixed: Clear and Reset sit at the top right, 0px off the title block's centre (with and without a line), present only while there is something to clear; the footers are Back and the primary; every drawer title fits 204px and every page title 216px at a true 360 (header check: 0 defects on the changed screens); the 24px under each header is the header's alone.
+- Keep as strong: titles that fit, bodies, rows and primaries unchanged; Filter sows and Filter pigs at their defaults now show no Reset.
+- Squint: the title, then the first card; the corner word stays quiet.
+- **Better because** the act that empties a draft leaves the thumb's commit zone, every drawer clears in the same place, and no title can collide with a corner at 360.

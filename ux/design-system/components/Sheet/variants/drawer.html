@@ -13,7 +13,8 @@
 <div class="ph" data-state="Route line (a hub)" data-demo="drawer-route"><div class="bg"></div><div class="over"></div></div>
 <div class="ph" data-state="Colour key (a colour-coded body)" data-demo="drawer-key"><div class="bg"></div><div class="over"></div></div>
 <div class="ph" data-state="Fact line" data-demo="drawer-fact"><div class="bg"></div><div class="over"></div></div>
-<div class="ph" data-state="Clear in the footer" data-demo="drawer-clear"><div class="bg"></div><div class="over"></div></div>
+<div class="ph" data-state="Clear at the top right" data-demo="drawer-clear"><div class="bg"></div><div class="over"></div></div>
+<div class="ph" data-state="Clear with a route line" data-demo="drawer-clear-line"><div class="bg"></div><div class="over"></div></div>
 <div class="ph" data-state="Waiting (stands alone)" data-demo="drawer-waiting"><div class="bg"></div><div class="over"></div></div>
 <div class="ph" data-state="Error" data-demo="drawer-error"><div class="bg"></div><div class="over"></div></div>
 <div class="ph" data-state="Empty" data-demo="drawer-empty"><div class="bg"></div><div class="over"></div></div>
@@ -33,11 +34,12 @@ const R={
 "drawer-route":()=>UI.sheet({title:'Farrowing record',line:{chip:{id:'000418',action:'open-sow',label:'Open sow 000418'},facts:['B1','Parity 3']},size:'short',body:note('Note'),footer:foot({primary:{label:'Finish farrowing',action:'finish'}})}),
 "drawer-key":()=>UI.sheet({title:'Go to pen',surface:'menu',line:{key:[{fill:'--amber-fill',count:2,label:'need you'},{fill:'--progress-fill',count:1,label:'farrowing'}]},size:'short',body:UI.panel(UI.row({title:'B3',description:'2 sows'}),{className:'st-row-group'}),footer:foot({primary:null})}),
 "drawer-fact":()=>UI.sheet({title:'Pen note',line:{text:[{text:'Last note '},{text:'08:41',strong:true},{text:' · G.H'}]},size:'short',body:note('Note'),footer:foot({primary:{label:'Save note',action:'save'}})}),
-"drawer-clear":()=>UI.sheet({title:'Record dead',size:'short',body:UI.stepper({label:'Crushed',value:3,key:'crushed',action:'step'}),footer:foot({quiet:{label:'Clear',action:'clear'},primary:{label:'Record 3 deaths',action:'save'}})}),
+"drawer-clear":()=>UI.sheet({title:'Record dead',corner:{label:{text:'Clear',str:'act.clear'},action:'clear'},size:'short',body:UI.stepper({label:'Crushed',value:3,key:'crushed',action:'step'}),footer:foot({primary:{label:'Record 3 deaths',action:'save'}})}),
+"drawer-clear-line":()=>UI.sheet({title:'Farrowing record',line:{chip:{id:'000418',action:'open-sow',label:'Open sow 000418'},facts:['B1','Parity 3']},corner:{label:{text:'Clear',str:'act.clear'},action:'clear'},size:'short',body:note('Note'),footer:foot({primary:{label:'Finish farrowing',action:'finish'}})}),
 "drawer-waiting":()=>UI.sheet({title:'Record a death',size:'short',body:UI.stepper({label:'Died',value:0,key:'died',action:'step'}),footer:foot({primary:{label:'Record death',action:'save',waiting:true},status:{text:'Say how many died'}})}),
 "drawer-error":()=>UI.sheet({title:'Litter weight',size:'short',body:UI.field({label:'Weight (kg)',variant:'number',error:'48 kg is over the scale limit · check the number',control:'<input type="number" inputmode="decimal" value="48" aria-invalid="true">'}),footer:foot({primary:{label:'Record weight',action:'save',waiting:true},status:{text:'48 kg is over the scale limit'}})}),
 "drawer-empty":()=>UI.sheet({title:'Pen log',size:'short',body:'<p class="st-choice-empty">No activity recorded yet</p>',footer:foot()}),
-"drawer-zh":()=>UI.sheet({title:'记录死亡，请先选择原因并确认数量再保存这条记录',line:{chip:{id:'000254',action:'open-sow'},facts:['B4','胎次 3']},size:'medium',body:note('原因'),footer:UI.sheetFooter({back:{action:'back',label:'返回'},primary:{label:'记录死亡 · 3 头',action:'save'}})}),
+"drawer-zh":()=>UI.sheet({title:'记录死亡',line:{chip:{id:'000254',action:'open-sow'},facts:['B4','胎次 3']},corner:{label:'清除',action:'clear'},size:'medium',body:note('原因'),footer:UI.sheetFooter({back:{action:'back',label:'返回'},primary:{label:'记录死亡 · 3 头',action:'save'}})}),
 "drawer-lead":()=>UI.sheet({title:'Skin',up:{label:'Symptoms',action:'up',value:'1'},size:'long',above:'<div style="padding:var(--space-12) var(--space-gutter-sheet) 0">'+UI.choiceSearch({label:'Search symptoms',placeholder:'Search symptoms'})+'</div>',body:rows(4,'Symptom'),footer:foot({primary:{label:'Done · 2',action:'done'}})}),
 "drawer-full":()=>UI.sheet({title:'Count piglets',size:'medium',sizing:'full',body:rows(5),footer:foot({primary:{label:'Record count',action:'save'}})})
 };

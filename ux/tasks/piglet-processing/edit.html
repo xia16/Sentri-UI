@@ -921,12 +921,12 @@
   function dirty() { return !!(Object.keys(draft.marks).length || Object.keys(draft.moves).length || Object.keys(draft.rows).length || Object.keys(draft.counts || {}).length || Object.keys(draft.deaths || {}).length || draft.sow || draft.reopen); }
   // The footer: Back and Save; Save waits (present, quiet) with its reason in one status line right above the footer
   // (ADR 0002), on the drawer's bottom edge. The footer is the drawer's last child (TaskSheet).
-  // clear: Clear, quiet text left of Save, only while there is a change to clear.
-  function bar(w, can, saveId, quiet, clear) {
+  // Clear is the header's corner action, top right (owner, 2026-10-14), only while there is a change to clear.
+  function bar(w, can, saveId, quiet) {
     // why Save waits: the footer's status. Nothing is shown before the worker has changed something (no hint line above the
     // footer, as farrowing); once they have, the reason is the thing to act on, so it is visible where they look (R2-25).
     var status = w ? { id: 'ed-why', text: PP.t(w[0], w[1]), str: w[0], args: w[1] || undefined, visible: !quiet } : { id: 'ed-why', text: '' };
-    return K.footer({ back: { action: 'back' }, quiet: clear ? { label: S_('act.clear'), action: 'clear' } : null, status: status, primary: button('primary', 'save', saveId || 'act.save', { waiting: !can, describedby: 'ed-why' }) });
+    return K.footer({ back: { action: 'back' }, status: status, primary: button('primary', 'save', saveId || 'act.save', { waiting: !can, describedby: 'ed-why' }) });
   }
   /* R1-28: a correction says what it did. The receipt of a saved correction: every figure it moved, on every litter it
      touched (the ledger replayed without it, against the ledger with it). */
@@ -991,9 +991,9 @@
         strs: Object.assign({ digit: 'ds.field.figure', decimal: 'ds.field.decimal', back: 'ds.field.aria.backspace', pad: 'ds.field.aria.pad' }),
         args: { value: { n: typed[pad] || '' } } }) + '</div>';
     }
-    return K.drawer({ view: 'edit', size: 'long', height: 'full', title: S_('pp.edit.title'), close: false,
+    return K.drawer({ view: 'edit', size: 'long', height: 'full', title: S_('pp.edit.title'), corner: dirty() ? { label: S_('act.clear'), action: 'clear' } : null, close: false,
       body: '<div class="ed-body">' + (dirty() || cleared ? '' : savedLine()) + restored + banner(e) + sections(e) + '</div>',
-      footer: padHtml + bar(w, can, null, false, dirty()) });
+      footer: padHtml + bar(w, can, null, false) });
   }
 
   /* =====================================================================================================

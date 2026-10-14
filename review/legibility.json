@@ -8,21 +8,25 @@
   "tap": 48
  },
  "viewport": "390x844",
- "changed": [],
+ "changed": [
+  "environment.page",
+  "environment.sensor-week",
+  "environment.sensor-other"
+ ],
  "totals": {
   "screens": 291,
-  "screensFailing": 127,
+  "screensFailing": 125,
   "errors": 0,
-  "small": 1130,
-  "contrast": 1318,
+  "small": 1129,
+  "contrast": 1307,
   "contrastPrimary": 11,
   "taps": 82
  },
  "byFeature": {
   "assistant": {
    "screens": 6,
-   "failing": 4,
-   "small": 15,
+   "failing": 6,
+   "small": 21,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
@@ -31,8 +35,8 @@
   "environment": {
    "screens": 9,
    "failing": 6,
-   "small": 142,
-   "contrast": 9,
+   "small": 148,
+   "contrast": 0,
    "contrastPrimary": 0,
    "taps": 1,
    "errors": 0
@@ -138,9 +142,9 @@
   },
   "find-pig": {
    "screens": 3,
-   "failing": 2,
-   "small": 1,
-   "contrast": 2,
+   "failing": 0,
+   "small": 0,
+   "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
    "errors": 0
@@ -300,8 +304,8 @@
   },
   "data-sync": {
    "screens": 4,
-   "failing": 2,
-   "small": 12,
+   "failing": 0,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
@@ -426,12 +430,16 @@
    "n": 13
   },
   {
-   "selector": "p.helper @10px",
-   "n": 11
+   "selector": "span.preview-badge @9px",
+   "n": 12
   },
   {
    "selector": "span.tw @10.5px",
    "n": 11
+  },
+  {
+   "selector": "p.helper @10px",
+   "n": 10
   },
   {
    "selector": "button.on @12.5px",
@@ -454,10 +462,6 @@
    "n": 8
   },
   {
-   "selector": "small @10px",
-   "n": 8
-  },
-  {
    "selector": "span.b.b-amber @9.5px",
    "n": 8
   },
@@ -475,22 +479,29 @@
   {
    "id": "assistant.needs-you",
    "feature": "assistant",
-   "small": 6,
+   "small": 7,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
    "fails": true,
    "unverified": 0,
    "sizes": {
-    "9": 1,
+    "9": 2,
     "10": 2,
     "11": 3,
     "12": 3,
+    "13": 1,
     "14": 2,
     "21": 2,
     "22": 1
    },
    "smallText": [
+    {
+     "n": 1,
+     "sel": "span.preview-badge",
+     "text": "PREVIEW",
+     "px": 9
+    },
     {
      "n": 2,
      "sel": "button[data-action=assistant-tab]",
@@ -529,21 +540,30 @@
   {
    "id": "assistant.finding",
    "feature": "assistant",
-   "small": 0,
+   "small": 1,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": false,
+   "fails": true,
    "unverified": 0,
    "sizes": {
+    "9": 1,
     "11": 7,
     "12": 2,
-    "13": 1,
+    "13": 2,
     "14": 3,
+    "16": 1,
     "21": 1,
     "22": 1
    },
-   "smallText": [],
+   "smallText": [
+    {
+     "n": 1,
+     "sel": "span.preview-badge",
+     "text": "PREVIEW",
+     "px": 9
+    }
+   ],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
@@ -551,20 +571,30 @@
   {
    "id": "assistant.answered",
    "feature": "assistant",
-   "small": 0,
+   "small": 1,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": false,
+   "fails": true,
    "unverified": 0,
    "sizes": {
+    "9": 1,
     "11": 7,
     "12": 4,
+    "13": 1,
     "14": 1,
+    "16": 1,
     "21": 1,
     "22": 1
    },
-   "smallText": [],
+   "smallText": [
+    {
+     "n": 1,
+     "sel": "span.preview-badge",
+     "text": "PREVIEW",
+     "px": 9
+    }
+   ],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
@@ -572,22 +602,30 @@
   {
    "id": "assistant.up-to-date",
    "feature": "assistant",
-   "small": 3,
+   "small": 4,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
    "fails": true,
    "unverified": 0,
    "sizes": {
+    "9": 1,
     "10": 1,
     "11": 2,
     "12": 4,
+    "13": 1,
     "14": 1,
     "20": 1,
     "21": 2,
     "22": 1
    },
    "smallText": [
+    {
+     "n": 1,
+     "sel": "span.preview-badge",
+     "text": "PREVIEW",
+     "px": 9
+    },
     {
      "n": 2,
      "sel": "button[data-action=assistant-tab]",
@@ -608,22 +646,29 @@
   {
    "id": "assistant.conversations",
    "feature": "assistant",
-   "small": 3,
+   "small": 4,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
    "fails": true,
    "unverified": 0,
    "sizes": {
+    "9": 1,
     "10": 1,
     "11": 2,
     "12": 2,
-    "13": 2,
+    "13": 3,
     "14": 1,
     "21": 2,
     "22": 1
    },
    "smallText": [
+    {
+     "n": 1,
+     "sel": "span.preview-badge",
+     "text": "PREVIEW",
+     "px": 9
+    },
     {
      "n": 2,
      "sel": "button[data-action=assistant-tab]",
@@ -644,21 +689,29 @@
   {
    "id": "assistant.conversation",
    "feature": "assistant",
-   "small": 3,
+   "small": 4,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
    "fails": true,
    "unverified": 0,
    "sizes": {
+    "9": 1,
     "10": 1,
     "11": 1,
     "12": 4,
+    "13": 1,
     "14": 1,
     "21": 2,
     "22": 1
    },
    "smallText": [
+    {
+     "n": 1,
+     "sel": "span.preview-badge",
+     "text": "PREVIEW",
+     "px": 9
+    },
     {
      "n": 2,
      "sel": "button[data-action=assistant-tab]",
@@ -679,23 +732,29 @@
   {
    "id": "environment.page",
    "feature": "environment",
-   "small": 34,
-   "contrast": 3,
+   "small": 35,
+   "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
    "fails": true,
    "unverified": 0,
    "sizes": {
-    "9": 6,
+    "9": 7,
     "10": 27,
     "11": 2,
     "12": 1,
-    "13": 2,
+    "13": 3,
     "14": 8,
     "22": 1,
     "34": 1
    },
    "smallText": [
+    {
+     "n": 1,
+     "sel": "span.preview-badge",
+     "text": "PREVIEW",
+     "px": 9
+    },
     {
      "n": 5,
      "sel": "span",
@@ -745,52 +804,36 @@
      "px": 10
     }
    ],
-   "lowContrast": [
-    {
-     "n": 1,
-     "sel": "span.st-selection-label",
-     "text": "Auto",
-     "px": 14,
-     "ratio": 2.7
-    },
-    {
-     "n": 1,
-     "sel": "span.st-selection-label",
-     "text": "Manual",
-     "px": 14,
-     "ratio": 2.6
-    },
-    {
-     "n": 1,
-     "sel": "span.st-button-label",
-     "text": "Save setting",
-     "px": 14,
-     "ratio": 2.7
-    }
-   ],
+   "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
   },
   {
    "id": "environment.fan-manual",
    "feature": "environment",
-   "small": 36,
+   "small": 37,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 1,
    "fails": true,
    "unverified": 0,
    "sizes": {
-    "9": 6,
+    "9": 7,
     "10": 27,
     "11": 4,
     "12": 1,
-    "13": 2,
+    "13": 3,
     "14": 7,
     "22": 1,
     "34": 1
    },
    "smallText": [
+    {
+     "n": 1,
+     "sel": "span.preview-badge",
+     "text": "PREVIEW",
+     "px": 9
+    },
     {
      "n": 5,
      "sel": "span",
@@ -866,21 +909,28 @@
   {
    "id": "environment.maintenance",
    "feature": "environment",
-   "small": 5,
+   "small": 6,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
    "fails": true,
    "unverified": 0,
    "sizes": {
+    "9": 1,
     "10": 3,
     "11": 1,
     "12": 2,
-    "13": 1,
+    "13": 2,
     "14": 1,
     "22": 1
    },
    "smallText": [
+    {
+     "n": 1,
+     "sel": "span.preview-badge",
+     "text": "PREVIEW",
+     "px": 9
+    },
     {
      "n": 2,
      "sel": "small",
@@ -913,20 +963,28 @@
   {
    "id": "environment.maintenance-empty",
    "feature": "environment",
-   "small": 1,
+   "small": 2,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
    "fails": true,
    "unverified": 0,
    "sizes": {
+    "9": 1,
     "10": 1,
     "12": 2,
+    "13": 1,
     "14": 1,
     "20": 1,
     "22": 1
    },
    "smallText": [
+    {
+     "n": 1,
+     "sel": "span.preview-badge",
+     "text": "PREVIEW",
+     "px": 9
+    },
     {
      "n": 1,
      "sel": "p.helper",
@@ -1003,23 +1061,29 @@
   {
    "id": "environment.sensor-week",
    "feature": "environment",
-   "small": 32,
-   "contrast": 3,
+   "small": 33,
+   "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
    "fails": true,
    "unverified": 0,
    "sizes": {
-    "9": 6,
+    "9": 7,
     "10": 25,
     "11": 2,
     "12": 1,
-    "13": 2,
+    "13": 3,
     "14": 8,
     "22": 1,
     "34": 1
    },
    "smallText": [
+    {
+     "n": 1,
+     "sel": "span.preview-badge",
+     "text": "PREVIEW",
+     "px": 9
+    },
     {
      "n": 5,
      "sel": "span",
@@ -1069,52 +1133,36 @@
      "px": 10
     }
    ],
-   "lowContrast": [
-    {
-     "n": 1,
-     "sel": "span.st-selection-label",
-     "text": "Auto",
-     "px": 14,
-     "ratio": 2.7
-    },
-    {
-     "n": 1,
-     "sel": "span.st-selection-label",
-     "text": "Manual",
-     "px": 14,
-     "ratio": 2.6
-    },
-    {
-     "n": 1,
-     "sel": "span.st-button-label",
-     "text": "Save setting",
-     "px": 14,
-     "ratio": 2.7
-    }
-   ],
+   "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
   },
   {
    "id": "environment.sensor-other",
    "feature": "environment",
-   "small": 34,
-   "contrast": 3,
+   "small": 35,
+   "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
    "fails": true,
    "unverified": 0,
    "sizes": {
-    "9": 6,
+    "9": 7,
     "10": 27,
     "11": 2,
     "12": 1,
-    "13": 2,
+    "13": 3,
     "14": 8,
     "22": 1,
     "34": 1
    },
    "smallText": [
+    {
+     "n": 1,
+     "sel": "span.preview-badge",
+     "text": "PREVIEW",
+     "px": 9
+    },
     {
      "n": 5,
      "sel": "span",
@@ -1164,29 +1212,7 @@
      "px": 10
     }
    ],
-   "lowContrast": [
-    {
-     "n": 1,
-     "sel": "span.st-selection-label",
-     "text": "Auto",
-     "px": 14,
-     "ratio": 2.7
-    },
-    {
-     "n": 1,
-     "sel": "span.st-selection-label",
-     "text": "Manual",
-     "px": 14,
-     "ratio": 2.6
-    },
-    {
-     "n": 1,
-     "sel": "span.st-button-label",
-     "text": "Save setting",
-     "px": 14,
-     "ratio": 2.7
-    }
-   ],
+   "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
   },
@@ -2667,7 +2693,7 @@
    "fails": false,
    "unverified": 0,
    "sizes": {
-    "13": 12,
+    "13": 13,
     "14": 7,
     "16": 2,
     "20": 1,
@@ -2747,7 +2773,7 @@
    "fails": false,
    "unverified": 0,
    "sizes": {
-    "13": 5,
+    "13": 4,
     "14": 3,
     "16": 1,
     "20": 1
@@ -2924,7 +2950,7 @@
    "fails": false,
    "unverified": 0,
    "sizes": {
-    "13": 12,
+    "13": 13,
     "14": 3,
     "15": 1,
     "16": 2,
@@ -2990,7 +3016,7 @@
    "unverified": 0,
    "sizes": {
     "13": 4,
-    "14": 6,
+    "14": 5,
     "16": 4,
     "20": 1
    },
@@ -3316,7 +3342,7 @@
    "fails": false,
    "unverified": 0,
    "sizes": {
-    "13": 8,
+    "13": 9,
     "16": 1,
     "20": 1
    },
@@ -3392,7 +3418,7 @@
    "fails": false,
    "unverified": 0,
    "sizes": {
-    "13": 24,
+    "13": 26,
     "16": 3,
     "22": 1
    },
@@ -3431,7 +3457,7 @@
    "fails": false,
    "unverified": 0,
    "sizes": {
-    "13": 18,
+    "13": 20,
     "14": 2,
     "16": 1,
     "22": 1
@@ -4736,7 +4762,7 @@
    "fails": false,
    "unverified": 0,
    "sizes": {
-    "13": 10,
+    "13": 12,
     "16": 6,
     "22": 1
    },
@@ -4755,7 +4781,7 @@
    "fails": false,
    "unverified": 0,
    "sizes": {
-    "13": 10,
+    "13": 12,
     "14": 2,
     "16": 10,
     "22": 2,
@@ -6780,7 +6806,7 @@
    "fails": false,
    "unverified": 0,
    "sizes": {
-    "13": 9,
+    "13": 10,
     "16": 8,
     "22": 1,
     "24": 1
@@ -6800,7 +6826,7 @@
    "fails": false,
    "unverified": 0,
    "sizes": {
-    "13": 2,
+    "13": 3,
     "16": 2,
     "22": 1,
     "24": 1
@@ -6878,7 +6904,7 @@
    "fails": false,
    "unverified": 0,
    "sizes": {
-    "13": 11,
+    "13": 13,
     "16": 4,
     "22": 1
    },
@@ -7258,7 +7284,7 @@
    "unverified": 0,
    "sizes": {
     "13": 3,
-    "14": 4,
+    "14": 3,
     "16": 2,
     "20": 1
    },
@@ -9018,63 +9044,39 @@
    "id": "find-pig.search",
    "feature": "find-pig",
    "small": 0,
-   "contrast": 1,
+   "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
     "13": 1,
-    "14": 2,
-    "16": 1,
+    "14": 1,
+    "16": 2,
     "20": 1
    },
    "smallText": [],
-   "lowContrast": [
-    {
-     "n": 1,
-     "sel": "button.primary",
-     "text": "Search sample records",
-     "px": 14,
-     "ratio": 1
-    }
-   ],
+   "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
   },
   {
    "id": "find-pig.scan",
    "feature": "find-pig",
-   "small": 1,
-   "contrast": 1,
+   "small": 0,
+   "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "10": 1,
     "13": 1,
-    "14": 4,
-    "16": 1,
+    "14": 3,
+    "16": 2,
     "20": 1
    },
-   "smallText": [
-    {
-     "n": 1,
-     "sel": "p.helper",
-     "text": "Camera and tag-reader hardware are not c",
-     "px": 10
-    }
-   ],
-   "lowContrast": [
-    {
-     "n": 1,
-     "sel": "button.primary",
-     "text": "Find sample pig",
-     "px": 14,
-     "ratio": 1
-    }
-   ],
+   "smallText": [],
+   "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
   },
@@ -9107,7 +9109,7 @@
    "fails": false,
    "unverified": 0,
    "sizes": {
-    "13": 34,
+    "13": 37,
     "16": 23,
     "22": 1
    },
@@ -9166,7 +9168,7 @@
    "fails": false,
    "unverified": 0,
    "sizes": {
-    "13": 26,
+    "13": 28,
     "16": 3,
     "22": 1
    },
@@ -9609,7 +9611,7 @@
    "fails": false,
    "unverified": 0,
    "sizes": {
-    "13": 34,
+    "13": 37,
     "16": 23,
     "22": 1
    },
@@ -9628,7 +9630,7 @@
    "fails": false,
    "unverified": 0,
    "sizes": {
-    "13": 23,
+    "13": 26,
     "16": 18,
     "22": 1
    },
@@ -9647,7 +9649,7 @@
    "fails": false,
    "unverified": 0,
    "sizes": {
-    "13": 22,
+    "13": 25,
     "16": 17,
     "22": 1
    },
@@ -9666,7 +9668,7 @@
    "fails": false,
    "unverified": 0,
    "sizes": {
-    "13": 25,
+    "13": 28,
     "16": 19,
     "22": 1
    },
@@ -9685,7 +9687,7 @@
    "fails": false,
    "unverified": 0,
    "sizes": {
-    "13": 11,
+    "13": 13,
     "16": 2,
     "22": 4
    },
@@ -9762,7 +9764,7 @@
    "fails": false,
    "unverified": 0,
    "sizes": {
-    "13": 26,
+    "13": 28,
     "16": 3,
     "22": 1
    },
@@ -9840,7 +9842,7 @@
    "fails": false,
    "unverified": 0,
    "sizes": {
-    "13": 8,
+    "13": 10,
     "16": 1,
     "20": 1
    },
@@ -10698,7 +10700,7 @@
    "fails": false,
    "unverified": 0,
    "sizes": {
-    "13": 35,
+    "13": 38,
     "16": 23,
     "22": 1
    },
@@ -10717,7 +10719,7 @@
    "fails": false,
    "unverified": 0,
    "sizes": {
-    "13": 31,
+    "13": 34,
     "16": 21,
     "22": 1
    },
@@ -10736,7 +10738,7 @@
    "fails": false,
    "unverified": 0,
    "sizes": {
-    "13": 35,
+    "13": 38,
     "16": 21,
     "22": 1
    },
@@ -10775,7 +10777,7 @@
    "fails": false,
    "unverified": 0,
    "sizes": {
-    "13": 8,
+    "13": 10,
     "16": 2,
     "20": 1
    },
@@ -15821,34 +15823,19 @@
   {
    "id": "data-sync.list",
    "feature": "data-sync",
-   "small": 6,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "10": 6,
     "11": 1,
-    "12": 3,
-    "13": 2,
+    "13": 11,
     "16": 2,
     "20": 1
    },
-   "smallText": [
-    {
-     "n": 3,
-     "sel": "small",
-     "text": "Gestation · Unit 7 · Batch 31",
-     "px": 10
-    },
-    {
-     "n": 3,
-     "sel": "time",
-     "text": "09:32",
-     "px": 10
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
@@ -15876,34 +15863,19 @@
   {
    "id": "data-sync.failed",
    "feature": "data-sync",
-   "small": 6,
+   "small": 0,
    "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
-   "fails": true,
+   "fails": false,
    "unverified": 0,
    "sizes": {
-    "10": 6,
     "11": 2,
-    "12": 3,
-    "13": 2,
+    "13": 11,
     "16": 2,
     "20": 1
    },
-   "smallText": [
-    {
-     "n": 3,
-     "sel": "small",
-     "text": "Gestation · Unit 7 · Batch 31",
-     "px": 10
-    },
-    {
-     "n": 3,
-     "sel": "time",
-     "text": "09:32",
-     "px": 10
-    }
-   ],
+   "smallText": [],
    "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []

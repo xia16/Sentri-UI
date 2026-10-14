@@ -102,3 +102,19 @@ The fact line in every tile (and with it the second status vocabulary `penFact`:
 ## Header
 
 The title, centred, then the colour key as the one header line, then the hairline (owner exception, 2026-10-14). The body starts with the Entrance band, 24px under the hairline.
+
+### Corner actions and titles (2026-10-14)
+
+By the Headers law → Corner actions and Title length (`ux/design-system/README.md`, owner ruling C, 2026-10-14; PR #165). Room at a true 360, as `scripts/check-headers.mjs` (workflow/header-checks) measures it: a drawer title has 360 − 2 × (18 + 48 + 12) = 204px (a missing corner counts as the room it would take); a page title has 216px beside Back. Titles measured at their own face (sheet 500 20px, page 500 22px), EN and ZH.
+
+| Surface | Corner action (top right) | Present while | Title | Fits at 360 (EN · ZH) |
+|---|---|---|---|---|
+| Record dead | Clear | the draft has a death or a sow cause | `Record dead` (unchanged) | 120px · — |
+| Edit record, Edit finish details | Clear | a correction is pending (not while Correct born is open) | unchanged | ≤ 153px |
+| Filter sows | Reset | a facet is off its default (`roomFilterCount`) | unchanged | 97px |
+| Allocate piglets (sow died) | none | | **`Allocate piglets`** (was `N piglets to allocate`): the job, not its leftovers; the count is status and opens the body's first line, `7 piglets · 000399 · B3 · sow died Aug 25 06:20` (Act now: how many still need a home; it was the title, so the worker loses nothing). ZH `安置仔猪` (`fr.alloc.title`, was `{n}头仔猪待安置`) | 143px · 78px |
+| Correct piglet count (page) | none (a page has no corners) | | **`Correct piglet count`** (was `Reconcile piglet count`, 223px > 216px beside Back): the job is to save a corrected count, as its primary says (`Save corrected count`); `reconcile` was the accountant's word for it | 202px (page title, 22px) |
+| Record piglet deaths (page) | none | | **`Record piglet deaths`** (was `Report piglet mortality`, 223px): the verb every other death record uses (`Record dead`), and `deaths` is the worker's word for `mortality` | 208px (page title) |
+| Every other drawer title | none | | unchanged; all measured under 204px (the header check's room: 360 − 2 × (18 + 48 + 12)) | |
+
+The PRD's owner decision of 2026-10-10 ("the sheet becomes `N piglets to allocate`") is kept in substance: the sheet says how many, in its first body line; the scenarios' visible text for the allocation sheet now reads `Allocate piglets`, and their count facts read `N piglets ·` (the first body line).

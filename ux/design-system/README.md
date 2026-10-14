@@ -41,7 +41,7 @@ The ground is a green-tinted off-white; text is one deep green-black; colour app
 ### Space, size and layout
 
 - Single column, 390px phone canvas. Gutters: `space-gutter` (18px) for headers and drawer footers, `space-gutter-sheet` (21px) for full-page bodies; at 370px and below every gutter and panel padding drops to `space-gutter-narrow` (12px).
-- **Space groups (owner, 2026-10-13).** Space says what belongs together, so it is wrong only when it says the wrong thing; a few pixels either way is fine. Three things are clearly wrong: a block closer to a list than the list's rows are to each other (it reads as part of the list; leave at least the list's own row gap, or a rule); two different boxed blocks under 8px apart with nothing between; two lines within 6px of each other at one boundary (a divider on a box edge: one of them goes). `node scripts/check-spacing.mjs` measures all three.
+- **Space groups (owner, 2026-10-13).** Space says what belongs together, so it is wrong only when it says the wrong thing; a few pixels either way is fine. Three things are clearly wrong: a block closer to a list than the list's rows are to each other (it reads as part of the list; leave at least the list's own row gap, or a rule); two different boxed blocks under 8px apart with nothing between; two lines within 6px of each other at one boundary (a divider on a box edge: one of them goes). `node scripts/check-spacing.mjs` measures all three. Evidence: [Record dead, 2026-10-13](evidence/2026-10-13-space-groups-record-dead.png).
 - Panels pad `space-panel` (16px). Rows pad `space-row-y` × `space-row-x` (12 × 14) with a `row-min` of 68px. Sections sit `space-section` (24px) apart; action categories `space-action-section` (32px).
 - **Touch:** every other button and target is at least 44px (a hit area that reaches 44 counts). The farm legibility check below still measures a 48×48 hit area; that stricter floor is unchanged. Footer and dock buttons (sheet footers, task docks, the room dock, bottom bars) are `footer-height` (56px, owner 2026-10-12). Filter and icon buttons and stepper keys are `control-height` (48px) and must not grow; fields are `field-height` (48px); chooser rows `choice-row-min` (56px).
 - Footers pad `14px 18px 28px`; the bottom 28px leaves room for the 92×4px `handle` bar.
@@ -106,7 +106,7 @@ Every drawer and page leaves, goes up and commits the same way.
 - **‹ Parent name** sits in the header, only in a drawer with levels (a cascade picker, a catalogue). It goes up one level and is never labelled "Back". The header back label names the parent; the title names the current level. No breadcrumbs.
 - **The commit** ("Done · 2", "Save · 2 pigs") sits in the footer, on the right of Back. It applies and closes. A single pick commits by itself, so a single-choice sheet has Back alone. In a multi picker Back closes without applying, and the ticks wait as a draft for the next open.
 - **No ✕ on drawers.** Swiping down or tapping the scrim does what Back does.
-- **Reset** restores defaults (a filter). **Clear** empties what was entered or ticked. Both are quiet text actions in the footer, left of the primary (amended 2026-10-13: nothing acts in a header), present only when there is something to reset or clear; each has one meaning (`ux/laws/strings.json`).
+- **Reset** restores defaults (a filter). **Clear** empties what was entered or ticked. Both are quiet text actions at the **top right of the sheet header** (amended 2026-10-14, owner ruling C), present only when there is something to reset or clear; each has one meaning (`ux/laws/strings.json`).
 - **No reason line** above a waiting commit: the disabled button stands alone. Tapping it marks each empty required field "Required" (on the field's own label line) and scrolls to the first.
 - **An empty selection is no selection.** Unticking the last subject closes the review and ends selection mode; no empty selection sheet is ever shown.
 - **Sized to content, on the bottom edge.** A drawer sits on the bottom edge, as tall as its content up to its cap, its footer on its bottom edge. It never floats and never holds dead space under its content, with two exceptions: `sizing: 'full'` for content that grows as the worker taps, and `sizing: 'hold'` for a drawer with levels, which keeps one height (its tallest level) from open to close so nothing moves under the thumb.
@@ -118,13 +118,17 @@ There are two headers and no others. A new kind of header goes through the rules
 | | **Page header** | **Sheet header** |
 |---|---|---|
 | Where | A surface that fills the screen: a task page, a log, a scan, ending a task | A drawer that leaves the page visible above it |
-| Parts | Back (48px, left) · title (left) · optional header line under the title | Centred title · optional header line under it · a 1px `line` hairline that belongs to the header |
+| Parts | Back (48px, left) · title (left) · optional header line under the title | Centred title · optional header line under it · optional corner actions · a 1px `line` hairline that belongs to the header |
 | Gap to the body | `space-section` (24px) from the last header line | `space-section` (24px) from the hairline |
 | Back | Top left; the footer has no Back | In the footer (the drawer convention) |
 
 Which one: whether the surface covers the page, not which feature it belongs to. A drawer that fills the screen is a page and takes the page header.
 
-**The header holds** the title and, at most, one quiet **header line**. Nothing in a header acts except Back and the subject chip: no counts, no status, no Reset or Clear, no buttons. Status is the first thing in the body; Reset and Clear sit in the footer. Section titles under a header keep their own style; the hairline and the gap separate them, never a weaker title.
+**The header holds** the title and, at most, one quiet **header line**. Nothing in a header acts except Back, the subject chip and the sheet header's **corner actions**: no counts, no status, no other buttons. Status is the first thing in the body.
+
+**Corner actions (sheet header; owner, 2026-10-14).** **Clear** or **Reset** sits at the top right as quiet text, present only when there is something to clear or reset. A **✕**, if a sheet ever has one, sits at the top left; drawers have none today (Back, swipe and the scrim close them). Each is a 48px target, **vertically centred on the header's text block**: the title, plus its header line when there is one (ruling C: never the title alone, never the header box). The footer keeps Back and the primary only.
+
+**Title length.** A header title fits on one line between the corner targets at 360px in English and Chinese, with at least 12px clear on each side: about 20 English or 10 Chinese characters. Copy is written to fit (a shorter name, decided in the feature's budget), never truncated, wrapped or shrunk. Section titles under a header keep their own style; the hairline and the gap separate them, never a weaker title.
 
 **The header line is absent by default.** It has one of two jobs, and each fact on it passes three tests. There is one owner exception, below the tests:
 
@@ -136,7 +140,7 @@ Which one: whether the surface covers the page, not which feature it belongs to.
 
 **Identity facts are a decision per task, never a default.** On a hub, the subject chip may be followed by up to two short `muted` facts that tell the animal apart *in that task*. Which ones is decided in the task's `budget.md`, each with the worker's question it answers there: parity matters at farrowing (`#000418 › B1 · Parity 3`) and may answer nothing in another task, where the chip stands with the pen alone or with nothing. A fact the budget doesn't name is not drawn, and a shared component never fills one in. Never counts, status or dates.
 
-The header line is part of the information budget (`budget.md`, Levels): the builder names its job, the Back test, each identity fact with its question, and the string; a line or fact the budget does not name is not drawn. Evidence: [header boards](evidence/2026-10-13-headers.png), [where the pen goes](evidence/2026-10-13-header-pen.png), [page header](evidence/2026-10-13-page-header.png).
+The header line is part of the information budget (`budget.md`, Levels): the builder names its job, the Back test, each identity fact with its question, and the string; a line or fact the budget does not name is not drawn. Evidence: [corner actions and alignment](evidence/2026-10-14-header-corners.png), [title room](evidence/2026-10-14-header-room.png), [header boards](evidence/2026-10-13-headers.png), [where the pen goes](evidence/2026-10-13-header-pen.png), [page header](evidence/2026-10-13-page-header.png).
 
 ### Containers
 

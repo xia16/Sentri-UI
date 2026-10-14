@@ -695,6 +695,10 @@ export interface SheetProps {
   title: SheetText;
   /** The header line (Headers law): absent by default. A route (the subject chip, then up to two identity facts the task's budget.md names) or one fact. */
   line?: HeaderLine | null;
+  /** Drawer only, the header's corner action (owner, 2026-10-14): Clear or Reset as quiet text at the top right, a 48px target vertically centred on the title + line. Pass it only while there is something to clear or reset. */
+  corner?: { label: SheetText; action?: string; value?: string; attrs?: SafeAttrs } | null;
+  /** Drawer only: a ✕ at the top left, centred like `corner`. No drawer has one today (Back, a swipe and the scrim close a drawer). */
+  cross?: { action?: string; value?: string; label?: SheetText } | null;
   /** Page only: the header's Back (top left). Default { action: 'back' }. */
   back?: { action?: string; value?: string; label?: SheetText } | null;
   /** Dialog only: its one description line. */
@@ -737,8 +741,6 @@ export interface SheetProps {
 export interface SheetFooterProps {
   /** Back, the footer's exit; `false` for none. Default { action: 'back' }. */
   back?: { action?: string; value?: string; label?: SheetText } | false;
-  /** Reset or Clear: a quiet text action left of the primary, present only when there is something to reset or clear. */
-  quiet?: { label: SheetText; action?: string; value?: string } | null;
   /** The primary on the right: a Button spec, or trusted HTML. */
   primary?: SheetAction | string;
   /** A hold-to-commit in place of the primary. */

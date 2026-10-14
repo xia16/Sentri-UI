@@ -624,8 +624,8 @@
     var status = ask ? { visible: true, str: 'pp.id.lw.replace', text: PP.t('pp.id.lw.replace', { w: ask.w }), args: { w: ask.w }, tone: 'amber', id: 'id-lw-replace' } : null;
     if (ask) save = { label: s('pp.id.lw.replace_act'), action: 'save' };
     return K.drawer({ view: 'weigh', size: 'long', scrim: { action: 'back' }, close: { action: 'back' },
-      title: s('pp.id.sec.weigh'),
-      body: '<div class="id-group">' + body + '</div>', footer: dock + K.footer({ back: { action: 'back' }, quiet: dirty ? { label: s('act.clear'), action: 'clear' } : null, primary: save, status: status }) });
+      title: s('pp.id.sec.weigh'), corner: dirty ? { label: s('act.clear'), action: 'clear' } : null,
+      body: '<div class="id-group">' + body + '</div>', footer: dock + K.footer({ back: { action: 'back' }, primary: save, status: status }) });
   }
   /* ---- closing the candidate set: one question (stamped; Edit reopens it) ---- */
   function confirmDialog() {
