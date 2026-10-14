@@ -72,3 +72,8 @@ The law and its boards fix the design (two headers, the line's three tests); the
 - Not changed: the walk's search (a search, not a draft) and the log filters (they apply at once).
 - **Better because** a worker who steps back to check the pen keeps what they typed, as every other drawer in the app already does.
 
+#### Final look (the pushed head of behaviour/back-keeps-draft, the commit that adds this block; code as of 89f58f3, main merged at 3854322)
+- First frames: Pen note, Filter pigs, Report fault and the scope's other screens rendered at 390 and 360, EN and ZH, beside origin/main: byte-identical. The gate's first diff (at d821fee) flagged 8 screens by under 0.06%, single language and width each; re-shot, all identical (render noise).
+- The reopened sheets (scenario evidence in `review/scenarios/inspection/`): the typed note or description is back in its field; the footer reads Back · Clear · the commit, Clear quiet text left of the primary as in Selected; after Clear the commit waits again.
+- Scenarios: 30 of 30 pass in EN and ZH at 360 and 390 (89f58f3); on origin/main 28 of 30 fail (only the two "opens without Clear" leaves pass).
+- **Better because** what a worker typed survives Back, the scrim and the phone's Back, and only Clear or Save ends it.

@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-14T09:03:50.468Z",
- "commit": "e14bead",
+ "generated": "2026-10-14T09:50:17.528Z",
+ "commit": "3854322",
  "platforms": [
   {
    "id": "mobile",
@@ -11541,23 +11541,7 @@
                     "says": "empty what was entered or ticked …; present only while there is something to empty"
                    }
                   ],
-                  "result": "fail",
-                  "hard": [
-                   "unreachable-control"
-                  ],
-                  "failures": [
-                   {
-                    "what": "tap [data-action='pad'][data-value='1']",
-                    "got": "control not found: [data-action='pad'][data-value='1']",
-                    "tag": "unreachable-control",
-                    "runs": [
-                     "en 360",
-                     "en 390",
-                     "zh 360",
-                     "zh 390"
-                    ]
-                   }
-                  ]
+                  "result": "pass"
                  },
                  {
                   "type": "action",
@@ -11586,23 +11570,7 @@
                       "says": "The drawer and Edit are staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save` commits"
                      }
                     ],
-                    "result": "fail",
-                    "hard": [
-                     "unreachable-control"
-                    ],
-                    "failures": [
-                     {
-                      "what": "tap [data-action='pad'][data-value='1']",
-                      "got": "control not found: [data-action='pad'][data-value='1']",
-                      "tag": "unreachable-control",
-                      "runs": [
-                       "en 360",
-                       "en 390",
-                       "zh 360",
-                       "zh 390"
-                      ]
-                     }
-                    ]
+                    "result": "pass"
                    },
                    {
                     "type": "action",
@@ -11631,23 +11599,7 @@
                         "says": "The drawer and Edit are staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save` commits"
                        }
                       ],
-                      "result": "fail",
-                      "hard": [
-                       "unreachable-control"
-                      ],
-                      "failures": [
-                       {
-                        "what": "tap [data-action='pad'][data-value='1']",
-                        "got": "control not found: [data-action='pad'][data-value='1']",
-                        "tag": "unreachable-control",
-                        "runs": [
-                         "en 360",
-                         "en 390",
-                         "zh 360",
-                         "zh 390"
-                        ]
-                       }
-                      ]
+                      "result": "pass"
                      },
                      {
                       "type": "action",
@@ -11676,23 +11628,7 @@
                           "says": "empty what was entered or ticked …; present only while there is something to empty"
                          }
                         ],
-                        "result": "fail",
-                        "hard": [
-                         "unreachable-control"
-                        ],
-                        "failures": [
-                         {
-                          "what": "tap [data-action='pad'][data-value='1']",
-                          "got": "control not found: [data-action='pad'][data-value='1']",
-                          "tag": "unreachable-control",
-                          "runs": [
-                           "en 360",
-                           "en 390",
-                           "zh 360",
-                           "zh 390"
-                          ]
-                         }
-                        ]
+                        "result": "pass"
                        },
                        {
                         "type": "action",
@@ -11721,23 +11657,7 @@
                             "says": "empty what was entered or ticked …; present only while there is something to empty"
                            }
                           ],
-                          "result": "fail",
-                          "hard": [
-                           "unreachable-control"
-                          ],
-                          "failures": [
-                           {
-                            "what": "tap [data-action='pad'][data-value='1']",
-                            "got": "control not found: [data-action='pad'][data-value='1']",
-                            "tag": "unreachable-control",
-                            "runs": [
-                             "en 360",
-                             "en 390",
-                             "zh 360",
-                             "zh 390"
-                            ]
-                           }
-                          ]
+                          "result": "pass"
                          }
                         ]
                        }
@@ -11774,23 +11694,7 @@
                       "says": "The drawer and Edit are staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save` commits"
                      }
                     ],
-                    "result": "fail",
-                    "hard": [
-                     "unreachable-control"
-                    ],
-                    "failures": [
-                     {
-                      "what": "tap [data-action='pad'][data-value='1']",
-                      "got": "control not found: [data-action='pad'][data-value='1']",
-                      "tag": "unreachable-control",
-                      "runs": [
-                       "en 360",
-                       "en 390",
-                       "zh 360",
-                       "zh 390"
-                      ]
-                     }
-                    ]
+                    "result": "pass"
                    }
                   ]
                  }
@@ -12189,9 +12093,9 @@
          }
         ],
         "run": {
-         "commit": "d821fee",
+         "commit": "89f58f3",
          "dirty": false,
-         "ran": "2026-10-14T08:33:30.809Z",
+         "ran": "2026-10-14T09:37:04.317Z",
          "langs": [
           "en",
           "zh"
@@ -15398,20 +15302,7 @@
                   "says": "empty what was entered or ticked …; present only while there is something to empty"
                  }
                 ],
-                "result": "fail",
-                "failures": [
-                 {
-                  "what": "on inspection.pen-note",
-                  "got": "null",
-                  "tag": "",
-                  "runs": [
-                   "en 360",
-                   "en 390",
-                   "zh 360",
-                   "zh 390"
-                  ]
-                 }
-                ]
+                "result": "pass"
                },
                {
                 "type": "action",
@@ -15435,18 +15326,7 @@
                     "says": "Clear empties what was entered or ticked … present only when there is something to reset or clear"
                    }
                   ],
-                  "result": "fail",
-                  "failures": [
-                   {
-                    "what": "Clear is shown",
-                    "got": "absent",
-                    "tag": "",
-                    "runs": [
-                     "zh 360",
-                     "zh 390"
-                    ]
-                   }
-                  ]
+                  "result": "pass"
                  },
                  {
                   "type": "action",
@@ -15470,20 +15350,7 @@
                       "says": "Back … leaves and returns to where you came from, keeping the draft."
                      }
                     ],
-                    "result": "fail",
-                    "failures": [
-                     {
-                      "what": "on inspection.pen",
-                      "got": "null",
-                      "tag": "",
-                      "runs": [
-                       "en 360",
-                       "en 390",
-                       "zh 360",
-                       "zh 390"
-                      ]
-                     }
-                    ]
+                    "result": "pass"
                    },
                    {
                     "type": "action",
@@ -15507,20 +15374,7 @@
                         "says": "Back … leaves and returns to where you came from, keeping the draft."
                        }
                       ],
-                      "result": "fail",
-                      "failures": [
-                       {
-                        "what": "on inspection.pen-note",
-                        "got": "null",
-                        "tag": "",
-                        "runs": [
-                         "en 360",
-                         "en 390",
-                         "zh 360",
-                         "zh 390"
-                        ]
-                       }
-                      ]
+                      "result": "pass"
                      },
                      {
                       "type": "action",
@@ -15568,20 +15422,7 @@
                             "says": "Clear empties what was entered or ticked … present only when there is something to reset or clear"
                            }
                           ],
-                          "result": "fail",
-                          "failures": [
-                           {
-                            "what": "on inspection.pen-note",
-                            "got": "null",
-                            "tag": "",
-                            "runs": [
-                             "en 360",
-                             "en 390",
-                             "zh 360",
-                             "zh 390"
-                            ]
-                           }
-                          ]
+                          "result": "pass"
                          }
                         ]
                        }
@@ -15618,20 +15459,7 @@
                       "says": "Swiping down or tapping the scrim does what Back does."
                      }
                     ],
-                    "result": "fail",
-                    "failures": [
-                     {
-                      "what": "on inspection.pen",
-                      "got": "null",
-                      "tag": "",
-                      "runs": [
-                       "en 360",
-                       "en 390",
-                       "zh 360",
-                       "zh 390"
-                      ]
-                     }
-                    ]
+                    "result": "pass"
                    }
                   ]
                  }
@@ -15670,20 +15498,7 @@
                   "says": "empty what was entered or ticked …; present only while there is something to empty"
                  }
                 ],
-                "result": "fail",
-                "failures": [
-                 {
-                  "what": "on inspection.fault-report",
-                  "got": "null",
-                  "tag": "",
-                  "runs": [
-                   "en 360",
-                   "en 390",
-                   "zh 360",
-                   "zh 390"
-                  ]
-                 }
-                ]
+                "result": "pass"
                },
                {
                 "type": "action",
@@ -15707,18 +15522,7 @@
                     "says": "Clear empties what was entered or ticked … present only when there is something to reset or clear"
                    }
                   ],
-                  "result": "fail",
-                  "failures": [
-                   {
-                    "what": "Clear is shown",
-                    "got": "absent",
-                    "tag": "",
-                    "runs": [
-                     "zh 360",
-                     "zh 390"
-                    ]
-                   }
-                  ]
+                  "result": "pass"
                  },
                  {
                   "type": "action",
@@ -15742,20 +15546,7 @@
                       "says": "Back … leaves and returns to where you came from, keeping the draft."
                      }
                     ],
-                    "result": "fail",
-                    "failures": [
-                     {
-                      "what": "on inspection.pen-faults",
-                      "got": "null",
-                      "tag": "",
-                      "runs": [
-                       "en 360",
-                       "en 390",
-                       "zh 360",
-                       "zh 390"
-                      ]
-                     }
-                    ]
+                    "result": "pass"
                    },
                    {
                     "type": "action",
@@ -15779,20 +15570,7 @@
                         "says": "Back … leaves and returns to where you came from, keeping the draft."
                        }
                       ],
-                      "result": "fail",
-                      "failures": [
-                       {
-                        "what": "on inspection.fault-report",
-                        "got": "null",
-                        "tag": "",
-                        "runs": [
-                         "en 360",
-                         "en 390",
-                         "zh 360",
-                         "zh 390"
-                        ]
-                       }
-                      ]
+                      "result": "pass"
                      },
                      {
                       "type": "action",
@@ -15840,20 +15618,7 @@
                             "says": "Clear empties what was entered or ticked … present only when there is something to reset or clear"
                            }
                           ],
-                          "result": "fail",
-                          "failures": [
-                           {
-                            "what": "on inspection.fault-report",
-                            "got": "null",
-                            "tag": "",
-                            "runs": [
-                             "en 360",
-                             "en 390",
-                             "zh 360",
-                             "zh 390"
-                            ]
-                           }
-                          ]
+                          "result": "pass"
                          }
                         ]
                        }
@@ -15890,20 +15655,7 @@
                       "says": "Swiping down or tapping the scrim does what Back does."
                      }
                     ],
-                    "result": "fail",
-                    "failures": [
-                     {
-                      "what": "on inspection.pen-faults",
-                      "got": "null",
-                      "tag": "",
-                      "runs": [
-                       "en 360",
-                       "en 390",
-                       "zh 360",
-                       "zh 390"
-                      ]
-                     }
-                    ]
+                    "result": "pass"
                    }
                   ]
                  }
@@ -15933,20 +15685,7 @@
                   "says": "empty what was entered or ticked …; present only while there is something to empty"
                  }
                 ],
-                "result": "fail",
-                "failures": [
-                 {
-                  "what": "on inspection.fault-resolve",
-                  "got": "null",
-                  "tag": "",
-                  "runs": [
-                   "en 360",
-                   "en 390",
-                   "zh 360",
-                   "zh 390"
-                  ]
-                 }
-                ]
+                "result": "pass"
                },
                {
                 "type": "action",
@@ -15970,18 +15709,7 @@
                     "says": "Clear empties what was entered or ticked … present only when there is something to reset or clear"
                    }
                   ],
-                  "result": "fail",
-                  "failures": [
-                   {
-                    "what": "Clear is shown",
-                    "got": "absent",
-                    "tag": "",
-                    "runs": [
-                     "zh 360",
-                     "zh 390"
-                    ]
-                   }
-                  ]
+                  "result": "pass"
                  },
                  {
                   "type": "action",
@@ -16005,20 +15733,7 @@
                       "says": "Back … leaves and returns to where you came from, keeping the draft."
                      }
                     ],
-                    "result": "fail",
-                    "failures": [
-                     {
-                      "what": "on inspection.pen-faults",
-                      "got": "null",
-                      "tag": "",
-                      "runs": [
-                       "en 360",
-                       "en 390",
-                       "zh 360",
-                       "zh 390"
-                      ]
-                     }
-                    ]
+                    "result": "pass"
                    },
                    {
                     "type": "action",
@@ -16042,20 +15757,7 @@
                         "says": "Back … leaves and returns to where you came from, keeping the draft."
                        }
                       ],
-                      "result": "fail",
-                      "failures": [
-                       {
-                        "what": "on inspection.fault-resolve",
-                        "got": "null",
-                        "tag": "",
-                        "runs": [
-                         "en 360",
-                         "en 390",
-                         "zh 360",
-                         "zh 390"
-                        ]
-                       }
-                      ]
+                      "result": "pass"
                      },
                      {
                       "type": "action",
@@ -16103,20 +15805,7 @@
                             "says": "Clear empties what was entered or ticked … present only when there is something to reset or clear"
                            }
                           ],
-                          "result": "fail",
-                          "failures": [
-                           {
-                            "what": "on inspection.fault-resolve",
-                            "got": "null",
-                            "tag": "",
-                            "runs": [
-                             "en 360",
-                             "en 390",
-                             "zh 360",
-                             "zh 390"
-                            ]
-                           }
-                          ]
+                          "result": "pass"
                          }
                         ]
                        }
@@ -16153,20 +15842,7 @@
                       "says": "Swiping down or tapping the scrim does what Back does."
                      }
                     ],
-                    "result": "fail",
-                    "failures": [
-                     {
-                      "what": "on inspection.pen-faults",
-                      "got": "null",
-                      "tag": "",
-                      "runs": [
-                       "en 360",
-                       "en 390",
-                       "zh 360",
-                       "zh 390"
-                      ]
-                     }
-                    ]
+                    "result": "pass"
                    }
                   ]
                  }
@@ -16205,23 +15881,7 @@
                   "says": "empty what was entered or ticked …; present only while there is something to empty"
                  }
                 ],
-                "result": "fail",
-                "hard": [
-                 "unreachable-control"
-                ],
-                "failures": [
-                 {
-                  "what": "tap [data-action='selected-pen-note']",
-                  "got": "control not found: [data-action='selected-pen-note']",
-                  "tag": "unreachable-control",
-                  "runs": [
-                   "en 360",
-                   "en 390",
-                   "zh 360",
-                   "zh 390"
-                  ]
-                 }
-                ]
+                "result": "pass"
                },
                {
                 "type": "action",
@@ -16245,23 +15905,7 @@
                     "says": "Clear empties what was entered or ticked … present only when there is something to reset or clear"
                    }
                   ],
-                  "result": "fail",
-                  "hard": [
-                   "unreachable-control"
-                  ],
-                  "failures": [
-                   {
-                    "what": "tap [data-action='selected-pen-note']",
-                    "got": "control not found: [data-action='selected-pen-note']",
-                    "tag": "unreachable-control",
-                    "runs": [
-                     "en 360",
-                     "en 390",
-                     "zh 360",
-                     "zh 390"
-                    ]
-                   }
-                  ]
+                  "result": "pass"
                  },
                  {
                   "type": "action",
@@ -16285,23 +15929,7 @@
                       "says": "Back … leaves and returns to where you came from, keeping the draft."
                      }
                     ],
-                    "result": "fail",
-                    "hard": [
-                     "unreachable-control"
-                    ],
-                    "failures": [
-                     {
-                      "what": "tap [data-action='selected-pen-note']",
-                      "got": "control not found: [data-action='selected-pen-note']",
-                      "tag": "unreachable-control",
-                      "runs": [
-                       "en 360",
-                       "en 390",
-                       "zh 360",
-                       "zh 390"
-                      ]
-                     }
-                    ]
+                    "result": "pass"
                    },
                    {
                     "type": "action",
@@ -16325,23 +15953,7 @@
                         "says": "Back … leaves and returns to where you came from, keeping the draft."
                        }
                       ],
-                      "result": "fail",
-                      "hard": [
-                       "unreachable-control"
-                      ],
-                      "failures": [
-                       {
-                        "what": "tap [data-action='selected-pen-note']",
-                        "got": "control not found: [data-action='selected-pen-note']",
-                        "tag": "unreachable-control",
-                        "runs": [
-                         "en 360",
-                         "en 390",
-                         "zh 360",
-                         "zh 390"
-                        ]
-                       }
-                      ]
+                      "result": "pass"
                      },
                      {
                       "type": "action",
@@ -16365,23 +15977,7 @@
                           "says": "Clear empties what was entered or ticked … present only when there is something to reset or clear"
                          }
                         ],
-                        "result": "fail",
-                        "hard": [
-                         "unreachable-control"
-                        ],
-                        "failures": [
-                         {
-                          "what": "tap [data-action='selected-pen-note']",
-                          "got": "control not found: [data-action='selected-pen-note']",
-                          "tag": "unreachable-control",
-                          "runs": [
-                           "en 360",
-                           "en 390",
-                           "zh 360",
-                           "zh 390"
-                          ]
-                         }
-                        ]
+                        "result": "pass"
                        },
                        {
                         "type": "action",
@@ -16405,23 +16001,7 @@
                             "says": "Clear empties what was entered or ticked … present only when there is something to reset or clear"
                            }
                           ],
-                          "result": "fail",
-                          "hard": [
-                           "unreachable-control"
-                          ],
-                          "failures": [
-                           {
-                            "what": "tap [data-action='selected-pen-note']",
-                            "got": "control not found: [data-action='selected-pen-note']",
-                            "tag": "unreachable-control",
-                            "runs": [
-                             "en 360",
-                             "en 390",
-                             "zh 360",
-                             "zh 390"
-                            ]
-                           }
-                          ]
+                          "result": "pass"
                          }
                         ]
                        }
@@ -16458,23 +16038,7 @@
                       "says": "Swiping down or tapping the scrim does what Back does."
                      }
                     ],
-                    "result": "fail",
-                    "hard": [
-                     "unreachable-control"
-                    ],
-                    "failures": [
-                     {
-                      "what": "tap [data-action='selected-pen-note']",
-                      "got": "control not found: [data-action='selected-pen-note']",
-                      "tag": "unreachable-control",
-                      "runs": [
-                       "en 360",
-                       "en 390",
-                       "zh 360",
-                       "zh 390"
-                      ]
-                     }
-                    ]
+                    "result": "pass"
                    }
                   ]
                  }
@@ -16518,33 +16082,7 @@
                   "says": "In a multi picker Back closes without applying, and the ticks wait as a draft for the next open."
                  }
                 ],
-                "result": "fail",
-                "hard": [
-                 "unreachable-control"
-                ],
-                "failures": [
-                 {
-                  "what": "on inspection.walk",
-                  "got": "null",
-                  "tag": "",
-                  "runs": [
-                   "en 360",
-                   "en 390"
-                  ]
-                 },
-                 {
-                  "what": "tap [aria-label='Filter pigs']",
-                  "got": "control not found: [aria-label='Filter pigs']",
-                  "tag": "unreachable-control",
-                  "runs": [
-                   "zh 360",
-                   "zh 390"
-                  ]
-                 }
-                ],
-                "notes": [
-                 "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-                ]
+                "result": "pass"
                },
                {
                 "type": "action",
@@ -16568,33 +16106,7 @@
                     "says": "Back … leaves and returns to where you came from, keeping the draft."
                    }
                   ],
-                  "result": "fail",
-                  "hard": [
-                   "unreachable-control"
-                  ],
-                  "failures": [
-                   {
-                    "what": "on inspection.filters",
-                    "got": "null",
-                    "tag": "",
-                    "runs": [
-                     "en 360",
-                     "en 390"
-                    ]
-                   },
-                   {
-                    "what": "tap [aria-label='Filter pigs']",
-                    "got": "control not found: [aria-label='Filter pigs']",
-                    "tag": "unreachable-control",
-                    "runs": [
-                     "zh 360",
-                     "zh 390"
-                    ]
-                   }
-                  ],
-                  "notes": [
-                   "no zh rendering: ?lang=zh is ignored (no \"返回\")"
-                  ]
+                  "result": "pass"
                  }
                 ]
                }
@@ -16606,9 +16118,9 @@
          }
         ],
         "run": {
-         "commit": "7f5b627",
-         "dirty": true,
-         "ran": "2026-10-14T08:00:13.824Z",
+         "commit": "89f58f3",
+         "dirty": false,
+         "ran": "2026-10-14T09:44:24.264Z",
          "langs": [
           "en",
           "zh"

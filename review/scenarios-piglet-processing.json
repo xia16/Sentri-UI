@@ -1,0 +1,2606 @@
+{
+ "feature": "piglet-processing",
+ "commit": "89f58f350efe8187d18dabea4d192cb4a79c565d",
+ "dirty": false,
+ "ran": "2026-10-14T09:37:04.317Z",
+ "base": "http://localhost:33371",
+ "langs": [
+  "en",
+  "zh"
+ ],
+ "widths": [
+  360,
+  390
+ ],
+ "nodes": {
+  "entry": 1,
+  "state": 2,
+  "action": 26,
+  "outcome": 27
+ },
+ "summary": {
+  "pass": 27,
+  "fail": 0,
+  "blocked": 0,
+  "pending": 0
+ },
+ "byLang": {
+  "en": {
+   "pass": 27,
+   "fail": 0,
+   "blocked": 0
+  },
+  "zh": {
+   "pass": 27,
+   "fail": 0,
+   "blocked": 0
+  }
+ },
+ "byBranch": {
+  "drafts": {
+   "pass": 27,
+   "fail": 0,
+   "blocked": 0,
+   "pending": 0
+  }
+ },
+ "hardFailures": [],
+ "leaves": [
+  {
+   "id": "pp-dd0-death-opens-without-clear",
+   "tree": "T-23",
+   "branch": "drafts",
+   "label": "Record death opens untouched: no Clear",
+   "gwt": {
+    "given": "A worker has pen A03 open: 12 piglets alive.",
+    "when": "They open Record death.",
+    "then": "Record death opens as before, with no Clear, because nothing has been entered."
+   },
+   "path": [
+    "drafts",
+    "drafts.a03",
+    "death.open",
+    "pp-dd0-death-opens-without-clear"
+   ],
+   "authority": [
+    {
+     "src": "STR",
+     "at": "ux/laws/strings.json · verbs.Clear",
+     "says": "empty what was entered or ticked …; present only while there is something to empty"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dd0-death-opens-without-clear/en-360/00-start.png",
+      "review/scenarios/piglet-processing/pp-dd0-death-opens-without-clear/en-360/01-data-action-tool-death.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dd0-death-opens-without-clear/en-390/00-start.png",
+      "review/scenarios/piglet-processing/pp-dd0-death-opens-without-clear/en-390/01-data-action-tool-death.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dd0-death-opens-without-clear/zh-360/00-start.png",
+      "review/scenarios/piglet-processing/pp-dd0-death-opens-without-clear/zh-360/01-data-action-tool-death.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dd0-death-opens-without-clear/zh-390/00-start.png",
+      "review/scenarios/piglet-processing/pp-dd0-death-opens-without-clear/zh-390/01-data-action-tool-death.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "pp-dd1-death-entry-shows-clear",
+   "tree": "T-23",
+   "branch": "drafts",
+   "label": "an entry shows Clear in the footer",
+   "gwt": {
+    "given": "Record death is open and untouched.",
+    "when": "They add two crushed piglets.",
+    "then": "Clear appears in the footer, left of the commit."
+   },
+   "path": [
+    "drafts",
+    "drafts.a03",
+    "death.open",
+    "death.enter",
+    "pp-dd1-death-entry-shows-clear"
+   ],
+   "authority": [
+    {
+     "src": "STR",
+     "at": "ux/laws/strings.json · verbs.Clear",
+     "says": "empty what was entered or ticked …; present only while there is something to empty"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dd1-death-entry-shows-clear/en-360/00-start.png",
+      "review/scenarios/piglet-processing/pp-dd1-death-entry-shows-clear/en-360/01-data-action-tool-death.png",
+      "review/scenarios/piglet-processing/pp-dd1-death-entry-shows-clear/en-360/02-data-action-step-data-value-crus.png",
+      "review/scenarios/piglet-processing/pp-dd1-death-entry-shows-clear/en-360/03-data-action-step-data-value-crus.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dd1-death-entry-shows-clear/en-390/00-start.png",
+      "review/scenarios/piglet-processing/pp-dd1-death-entry-shows-clear/en-390/01-data-action-tool-death.png",
+      "review/scenarios/piglet-processing/pp-dd1-death-entry-shows-clear/en-390/02-data-action-step-data-value-crus.png",
+      "review/scenarios/piglet-processing/pp-dd1-death-entry-shows-clear/en-390/03-data-action-step-data-value-crus.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dd1-death-entry-shows-clear/zh-360/00-start.png",
+      "review/scenarios/piglet-processing/pp-dd1-death-entry-shows-clear/zh-360/01-data-action-tool-death.png",
+      "review/scenarios/piglet-processing/pp-dd1-death-entry-shows-clear/zh-360/02-data-action-step-data-value-crus.png",
+      "review/scenarios/piglet-processing/pp-dd1-death-entry-shows-clear/zh-360/03-data-action-step-data-value-crus.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dd1-death-entry-shows-clear/zh-390/00-start.png",
+      "review/scenarios/piglet-processing/pp-dd1-death-entry-shows-clear/zh-390/01-data-action-tool-death.png",
+      "review/scenarios/piglet-processing/pp-dd1-death-entry-shows-clear/zh-390/02-data-action-step-data-value-crus.png",
+      "review/scenarios/piglet-processing/pp-dd1-death-entry-shows-clear/zh-390/03-data-action-step-data-value-crus.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "pp-dd2-death-back-saves-nothing",
+   "tree": "T-23",
+   "branch": "drafts",
+   "label": "Back leaves Record death; nothing is recorded",
+   "gwt": {
+    "given": "Record death holds an entry that is not recorded.",
+    "when": "They tap Back.",
+    "then": "They are back where they came from and nothing is recorded."
+   },
+   "path": [
+    "drafts",
+    "drafts.a03",
+    "death.open",
+    "death.enter",
+    "death.enter.back",
+    "pp-dd2-death-back-saves-nothing"
+   ],
+   "authority": [
+    {
+     "src": "owner",
+     "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+     "says": "Back … leaves and returns to where you came from, keeping the draft."
+    },
+    {
+     "src": "RUL",
+     "at": "ux/research/farrowing/RULINGS.md · The exit grammar",
+     "says": "The drawer and Edit are staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save` commits"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dd2-death-back-saves-nothing/en-360/00-start.png",
+      "review/scenarios/piglet-processing/pp-dd2-death-back-saves-nothing/en-360/01-data-action-tool-death.png",
+      "review/scenarios/piglet-processing/pp-dd2-death-back-saves-nothing/en-360/02-data-action-step-data-value-crus.png",
+      "review/scenarios/piglet-processing/pp-dd2-death-back-saves-nothing/en-360/03-data-action-step-data-value-crus.png",
+      "review/scenarios/piglet-processing/pp-dd2-death-back-saves-nothing/en-360/04-data-action-back.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dd2-death-back-saves-nothing/en-390/00-start.png",
+      "review/scenarios/piglet-processing/pp-dd2-death-back-saves-nothing/en-390/01-data-action-tool-death.png",
+      "review/scenarios/piglet-processing/pp-dd2-death-back-saves-nothing/en-390/02-data-action-step-data-value-crus.png",
+      "review/scenarios/piglet-processing/pp-dd2-death-back-saves-nothing/en-390/03-data-action-step-data-value-crus.png",
+      "review/scenarios/piglet-processing/pp-dd2-death-back-saves-nothing/en-390/04-data-action-back.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dd2-death-back-saves-nothing/zh-360/00-start.png",
+      "review/scenarios/piglet-processing/pp-dd2-death-back-saves-nothing/zh-360/01-data-action-tool-death.png",
+      "review/scenarios/piglet-processing/pp-dd2-death-back-saves-nothing/zh-360/02-data-action-step-data-value-crus.png",
+      "review/scenarios/piglet-processing/pp-dd2-death-back-saves-nothing/zh-360/03-data-action-step-data-value-crus.png",
+      "review/scenarios/piglet-processing/pp-dd2-death-back-saves-nothing/zh-360/04-data-action-back.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dd2-death-back-saves-nothing/zh-390/00-start.png",
+      "review/scenarios/piglet-processing/pp-dd2-death-back-saves-nothing/zh-390/01-data-action-tool-death.png",
+      "review/scenarios/piglet-processing/pp-dd2-death-back-saves-nothing/zh-390/02-data-action-step-data-value-crus.png",
+      "review/scenarios/piglet-processing/pp-dd2-death-back-saves-nothing/zh-390/03-data-action-step-data-value-crus.png",
+      "review/scenarios/piglet-processing/pp-dd2-death-back-saves-nothing/zh-390/04-data-action-back.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "pp-dd3-death-reopen-shows-draft",
+   "tree": "T-23",
+   "branch": "drafts",
+   "label": "reopening Record death shows the draft, with Clear",
+   "gwt": {
+    "given": "They left Record death with Back after they add two crushed piglets.",
+    "when": "They open Record death again.",
+    "then": "The entry is still there and Clear is in the footer."
+   },
+   "path": [
+    "drafts",
+    "drafts.a03",
+    "death.open",
+    "death.enter",
+    "death.enter.back",
+    "death.enter.back.reopen",
+    "pp-dd3-death-reopen-shows-draft"
+   ],
+   "authority": [
+    {
+     "src": "owner",
+     "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+     "says": "Back … leaves and returns to where you came from, keeping the draft."
+    },
+    {
+     "src": "RUL",
+     "at": "ux/research/farrowing/RULINGS.md · The exit grammar",
+     "says": "The drawer and Edit are staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save` commits"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dd3-death-reopen-shows-draft/en-360/00-start.png",
+      "review/scenarios/piglet-processing/pp-dd3-death-reopen-shows-draft/en-360/01-data-action-tool-death.png",
+      "review/scenarios/piglet-processing/pp-dd3-death-reopen-shows-draft/en-360/02-data-action-step-data-value-crus.png",
+      "review/scenarios/piglet-processing/pp-dd3-death-reopen-shows-draft/en-360/03-data-action-step-data-value-crus.png",
+      "review/scenarios/piglet-processing/pp-dd3-death-reopen-shows-draft/en-360/04-data-action-back.png",
+      "review/scenarios/piglet-processing/pp-dd3-death-reopen-shows-draft/en-360/05-data-action-tool-death.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dd3-death-reopen-shows-draft/en-390/00-start.png",
+      "review/scenarios/piglet-processing/pp-dd3-death-reopen-shows-draft/en-390/01-data-action-tool-death.png",
+      "review/scenarios/piglet-processing/pp-dd3-death-reopen-shows-draft/en-390/02-data-action-step-data-value-crus.png",
+      "review/scenarios/piglet-processing/pp-dd3-death-reopen-shows-draft/en-390/03-data-action-step-data-value-crus.png",
+      "review/scenarios/piglet-processing/pp-dd3-death-reopen-shows-draft/en-390/04-data-action-back.png",
+      "review/scenarios/piglet-processing/pp-dd3-death-reopen-shows-draft/en-390/05-data-action-tool-death.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dd3-death-reopen-shows-draft/zh-360/00-start.png",
+      "review/scenarios/piglet-processing/pp-dd3-death-reopen-shows-draft/zh-360/01-data-action-tool-death.png",
+      "review/scenarios/piglet-processing/pp-dd3-death-reopen-shows-draft/zh-360/02-data-action-step-data-value-crus.png",
+      "review/scenarios/piglet-processing/pp-dd3-death-reopen-shows-draft/zh-360/03-data-action-step-data-value-crus.png",
+      "review/scenarios/piglet-processing/pp-dd3-death-reopen-shows-draft/zh-360/04-data-action-back.png",
+      "review/scenarios/piglet-processing/pp-dd3-death-reopen-shows-draft/zh-360/05-data-action-tool-death.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dd3-death-reopen-shows-draft/zh-390/00-start.png",
+      "review/scenarios/piglet-processing/pp-dd3-death-reopen-shows-draft/zh-390/01-data-action-tool-death.png",
+      "review/scenarios/piglet-processing/pp-dd3-death-reopen-shows-draft/zh-390/02-data-action-step-data-value-crus.png",
+      "review/scenarios/piglet-processing/pp-dd3-death-reopen-shows-draft/zh-390/03-data-action-step-data-value-crus.png",
+      "review/scenarios/piglet-processing/pp-dd3-death-reopen-shows-draft/zh-390/04-data-action-back.png",
+      "review/scenarios/piglet-processing/pp-dd3-death-reopen-shows-draft/zh-390/05-data-action-tool-death.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "pp-dd4-death-clear-empties",
+   "tree": "T-23",
+   "branch": "drafts",
+   "label": "Clear empties Record death and goes; nothing recorded",
+   "gwt": {
+    "given": "Record death was reopened holding the kept draft.",
+    "when": "They tap Clear.",
+    "then": "Record death is back as it opened, Clear disappears and nothing is recorded."
+   },
+   "path": [
+    "drafts",
+    "drafts.a03",
+    "death.open",
+    "death.enter",
+    "death.enter.back",
+    "death.enter.back.reopen",
+    "death.enter.back.reopen.clear",
+    "pp-dd4-death-clear-empties"
+   ],
+   "authority": [
+    {
+     "src": "RUL",
+     "at": "ux/research/farrowing/RULINGS.md · The exit grammar",
+     "says": "The drawer and Edit are staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save` commits"
+    },
+    {
+     "src": "STR",
+     "at": "ux/laws/strings.json · verbs.Clear",
+     "says": "empty what was entered or ticked …; present only while there is something to empty"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dd4-death-clear-empties/en-360/00-start.png",
+      "review/scenarios/piglet-processing/pp-dd4-death-clear-empties/en-360/01-data-action-tool-death.png",
+      "review/scenarios/piglet-processing/pp-dd4-death-clear-empties/en-360/02-data-action-step-data-value-crus.png",
+      "review/scenarios/piglet-processing/pp-dd4-death-clear-empties/en-360/03-data-action-step-data-value-crus.png",
+      "review/scenarios/piglet-processing/pp-dd4-death-clear-empties/en-360/04-data-action-back.png",
+      "review/scenarios/piglet-processing/pp-dd4-death-clear-empties/en-360/05-data-action-tool-death.png",
+      "review/scenarios/piglet-processing/pp-dd4-death-clear-empties/en-360/06-data-action-draft-clear.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dd4-death-clear-empties/en-390/00-start.png",
+      "review/scenarios/piglet-processing/pp-dd4-death-clear-empties/en-390/01-data-action-tool-death.png",
+      "review/scenarios/piglet-processing/pp-dd4-death-clear-empties/en-390/02-data-action-step-data-value-crus.png",
+      "review/scenarios/piglet-processing/pp-dd4-death-clear-empties/en-390/03-data-action-step-data-value-crus.png",
+      "review/scenarios/piglet-processing/pp-dd4-death-clear-empties/en-390/04-data-action-back.png",
+      "review/scenarios/piglet-processing/pp-dd4-death-clear-empties/en-390/05-data-action-tool-death.png",
+      "review/scenarios/piglet-processing/pp-dd4-death-clear-empties/en-390/06-data-action-draft-clear.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dd4-death-clear-empties/zh-360/00-start.png",
+      "review/scenarios/piglet-processing/pp-dd4-death-clear-empties/zh-360/01-data-action-tool-death.png",
+      "review/scenarios/piglet-processing/pp-dd4-death-clear-empties/zh-360/02-data-action-step-data-value-crus.png",
+      "review/scenarios/piglet-processing/pp-dd4-death-clear-empties/zh-360/03-data-action-step-data-value-crus.png",
+      "review/scenarios/piglet-processing/pp-dd4-death-clear-empties/zh-360/04-data-action-back.png",
+      "review/scenarios/piglet-processing/pp-dd4-death-clear-empties/zh-360/05-data-action-tool-death.png",
+      "review/scenarios/piglet-processing/pp-dd4-death-clear-empties/zh-360/06-data-action-draft-clear.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dd4-death-clear-empties/zh-390/00-start.png",
+      "review/scenarios/piglet-processing/pp-dd4-death-clear-empties/zh-390/01-data-action-tool-death.png",
+      "review/scenarios/piglet-processing/pp-dd4-death-clear-empties/zh-390/02-data-action-step-data-value-crus.png",
+      "review/scenarios/piglet-processing/pp-dd4-death-clear-empties/zh-390/03-data-action-step-data-value-crus.png",
+      "review/scenarios/piglet-processing/pp-dd4-death-clear-empties/zh-390/04-data-action-back.png",
+      "review/scenarios/piglet-processing/pp-dd4-death-clear-empties/zh-390/05-data-action-tool-death.png",
+      "review/scenarios/piglet-processing/pp-dd4-death-clear-empties/zh-390/06-data-action-draft-clear.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "pp-dd5-death-cleared-stays-cleared",
+   "tree": "T-23",
+   "branch": "drafts",
+   "label": "after Clear, Back and reopen show Record death as it opened",
+   "gwt": {
+    "given": "They cleared the draft on Record death.",
+    "when": "They go Back and open it again.",
+    "then": "It opens as it did the first time, with no Clear."
+   },
+   "path": [
+    "drafts",
+    "drafts.a03",
+    "death.open",
+    "death.enter",
+    "death.enter.back",
+    "death.enter.back.reopen",
+    "death.enter.back.reopen.clear",
+    "death.enter.back.reopen.clear.back",
+    "pp-dd5-death-cleared-stays-cleared"
+   ],
+   "authority": [
+    {
+     "src": "RUL",
+     "at": "ux/research/farrowing/RULINGS.md · The exit grammar",
+     "says": "The drawer and Edit are staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save` commits"
+    },
+    {
+     "src": "STR",
+     "at": "ux/laws/strings.json · verbs.Clear",
+     "says": "empty what was entered or ticked …; present only while there is something to empty"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dd5-death-cleared-stays-cleared/en-360/00-start.png",
+      "review/scenarios/piglet-processing/pp-dd5-death-cleared-stays-cleared/en-360/01-data-action-tool-death.png",
+      "review/scenarios/piglet-processing/pp-dd5-death-cleared-stays-cleared/en-360/02-data-action-step-data-value-crus.png",
+      "review/scenarios/piglet-processing/pp-dd5-death-cleared-stays-cleared/en-360/03-data-action-step-data-value-crus.png",
+      "review/scenarios/piglet-processing/pp-dd5-death-cleared-stays-cleared/en-360/04-data-action-back.png",
+      "review/scenarios/piglet-processing/pp-dd5-death-cleared-stays-cleared/en-360/05-data-action-tool-death.png",
+      "review/scenarios/piglet-processing/pp-dd5-death-cleared-stays-cleared/en-360/06-data-action-draft-clear.png",
+      "review/scenarios/piglet-processing/pp-dd5-death-cleared-stays-cleared/en-360/07-data-action-back.png",
+      "review/scenarios/piglet-processing/pp-dd5-death-cleared-stays-cleared/en-360/08-data-action-tool-death.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dd5-death-cleared-stays-cleared/en-390/00-start.png",
+      "review/scenarios/piglet-processing/pp-dd5-death-cleared-stays-cleared/en-390/01-data-action-tool-death.png",
+      "review/scenarios/piglet-processing/pp-dd5-death-cleared-stays-cleared/en-390/02-data-action-step-data-value-crus.png",
+      "review/scenarios/piglet-processing/pp-dd5-death-cleared-stays-cleared/en-390/03-data-action-step-data-value-crus.png",
+      "review/scenarios/piglet-processing/pp-dd5-death-cleared-stays-cleared/en-390/04-data-action-back.png",
+      "review/scenarios/piglet-processing/pp-dd5-death-cleared-stays-cleared/en-390/05-data-action-tool-death.png",
+      "review/scenarios/piglet-processing/pp-dd5-death-cleared-stays-cleared/en-390/06-data-action-draft-clear.png",
+      "review/scenarios/piglet-processing/pp-dd5-death-cleared-stays-cleared/en-390/07-data-action-back.png",
+      "review/scenarios/piglet-processing/pp-dd5-death-cleared-stays-cleared/en-390/08-data-action-tool-death.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dd5-death-cleared-stays-cleared/zh-360/00-start.png",
+      "review/scenarios/piglet-processing/pp-dd5-death-cleared-stays-cleared/zh-360/01-data-action-tool-death.png",
+      "review/scenarios/piglet-processing/pp-dd5-death-cleared-stays-cleared/zh-360/02-data-action-step-data-value-crus.png",
+      "review/scenarios/piglet-processing/pp-dd5-death-cleared-stays-cleared/zh-360/03-data-action-step-data-value-crus.png",
+      "review/scenarios/piglet-processing/pp-dd5-death-cleared-stays-cleared/zh-360/04-data-action-back.png",
+      "review/scenarios/piglet-processing/pp-dd5-death-cleared-stays-cleared/zh-360/05-data-action-tool-death.png",
+      "review/scenarios/piglet-processing/pp-dd5-death-cleared-stays-cleared/zh-360/06-data-action-draft-clear.png",
+      "review/scenarios/piglet-processing/pp-dd5-death-cleared-stays-cleared/zh-360/07-data-action-back.png",
+      "review/scenarios/piglet-processing/pp-dd5-death-cleared-stays-cleared/zh-360/08-data-action-tool-death.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dd5-death-cleared-stays-cleared/zh-390/00-start.png",
+      "review/scenarios/piglet-processing/pp-dd5-death-cleared-stays-cleared/zh-390/01-data-action-tool-death.png",
+      "review/scenarios/piglet-processing/pp-dd5-death-cleared-stays-cleared/zh-390/02-data-action-step-data-value-crus.png",
+      "review/scenarios/piglet-processing/pp-dd5-death-cleared-stays-cleared/zh-390/03-data-action-step-data-value-crus.png",
+      "review/scenarios/piglet-processing/pp-dd5-death-cleared-stays-cleared/zh-390/04-data-action-back.png",
+      "review/scenarios/piglet-processing/pp-dd5-death-cleared-stays-cleared/zh-390/05-data-action-tool-death.png",
+      "review/scenarios/piglet-processing/pp-dd5-death-cleared-stays-cleared/zh-390/06-data-action-draft-clear.png",
+      "review/scenarios/piglet-processing/pp-dd5-death-cleared-stays-cleared/zh-390/07-data-action-back.png",
+      "review/scenarios/piglet-processing/pp-dd5-death-cleared-stays-cleared/zh-390/08-data-action-tool-death.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "pp-dd6-death-phone-back-keeps-draft",
+   "tree": "T-23",
+   "branch": "drafts",
+   "label": "the phone's Back keeps the draft like the footer Back",
+   "gwt": {
+    "given": "Record death holds an entry that is not recorded.",
+    "when": "They press the phone's own Back and open it again.",
+    "then": "The entry is still there and nothing is recorded."
+   },
+   "path": [
+    "drafts",
+    "drafts.a03",
+    "death.open",
+    "death.enter",
+    "death.enter.sysback",
+    "pp-dd6-death-phone-back-keeps-draft"
+   ],
+   "authority": [
+    {
+     "src": "owner",
+     "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+     "says": "Back … leaves and returns to where you came from, keeping the draft."
+    },
+    {
+     "src": "RUL",
+     "at": "ux/research/farrowing/RULINGS.md · The exit grammar",
+     "says": "The drawer and Edit are staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save` commits"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dd6-death-phone-back-keeps-draft/en-360/00-start.png",
+      "review/scenarios/piglet-processing/pp-dd6-death-phone-back-keeps-draft/en-360/01-data-action-tool-death.png",
+      "review/scenarios/piglet-processing/pp-dd6-death-phone-back-keeps-draft/en-360/02-data-action-step-data-value-crus.png",
+      "review/scenarios/piglet-processing/pp-dd6-death-phone-back-keeps-draft/en-360/03-data-action-step-data-value-crus.png",
+      "review/scenarios/piglet-processing/pp-dd6-death-phone-back-keeps-draft/en-360/04-back.png",
+      "review/scenarios/piglet-processing/pp-dd6-death-phone-back-keeps-draft/en-360/05-data-action-tool-death.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dd6-death-phone-back-keeps-draft/en-390/00-start.png",
+      "review/scenarios/piglet-processing/pp-dd6-death-phone-back-keeps-draft/en-390/01-data-action-tool-death.png",
+      "review/scenarios/piglet-processing/pp-dd6-death-phone-back-keeps-draft/en-390/02-data-action-step-data-value-crus.png",
+      "review/scenarios/piglet-processing/pp-dd6-death-phone-back-keeps-draft/en-390/03-data-action-step-data-value-crus.png",
+      "review/scenarios/piglet-processing/pp-dd6-death-phone-back-keeps-draft/en-390/04-back.png",
+      "review/scenarios/piglet-processing/pp-dd6-death-phone-back-keeps-draft/en-390/05-data-action-tool-death.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dd6-death-phone-back-keeps-draft/zh-360/00-start.png",
+      "review/scenarios/piglet-processing/pp-dd6-death-phone-back-keeps-draft/zh-360/01-data-action-tool-death.png",
+      "review/scenarios/piglet-processing/pp-dd6-death-phone-back-keeps-draft/zh-360/02-data-action-step-data-value-crus.png",
+      "review/scenarios/piglet-processing/pp-dd6-death-phone-back-keeps-draft/zh-360/03-data-action-step-data-value-crus.png",
+      "review/scenarios/piglet-processing/pp-dd6-death-phone-back-keeps-draft/zh-360/04-back.png",
+      "review/scenarios/piglet-processing/pp-dd6-death-phone-back-keeps-draft/zh-360/05-data-action-tool-death.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dd6-death-phone-back-keeps-draft/zh-390/00-start.png",
+      "review/scenarios/piglet-processing/pp-dd6-death-phone-back-keeps-draft/zh-390/01-data-action-tool-death.png",
+      "review/scenarios/piglet-processing/pp-dd6-death-phone-back-keeps-draft/zh-390/02-data-action-step-data-value-crus.png",
+      "review/scenarios/piglet-processing/pp-dd6-death-phone-back-keeps-draft/zh-390/03-data-action-step-data-value-crus.png",
+      "review/scenarios/piglet-processing/pp-dd6-death-phone-back-keeps-draft/zh-390/04-back.png",
+      "review/scenarios/piglet-processing/pp-dd6-death-phone-back-keeps-draft/zh-390/05-data-action-tool-death.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "pp-dw0-weight-opens-without-clear",
+   "tree": "T-23",
+   "branch": "drafts",
+   "label": "Litter weight opens untouched: no Clear",
+   "gwt": {
+    "given": "A worker has pen A03 open; the litter is not weighed.",
+    "when": "They open Litter weight.",
+    "then": "Litter weight opens as before, with no Clear, because nothing has been entered."
+   },
+   "path": [
+    "drafts",
+    "drafts.a03",
+    "weight.open",
+    "pp-dw0-weight-opens-without-clear"
+   ],
+   "authority": [
+    {
+     "src": "STR",
+     "at": "ux/laws/strings.json · verbs.Clear",
+     "says": "empty what was entered or ticked …; present only while there is something to empty"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dw0-weight-opens-without-clear/en-360/00-start.png",
+      "review/scenarios/piglet-processing/pp-dw0-weight-opens-without-clear/en-360/01-data-action-weight-open.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dw0-weight-opens-without-clear/en-390/00-start.png",
+      "review/scenarios/piglet-processing/pp-dw0-weight-opens-without-clear/en-390/01-data-action-weight-open.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dw0-weight-opens-without-clear/zh-360/00-start.png",
+      "review/scenarios/piglet-processing/pp-dw0-weight-opens-without-clear/zh-360/01-data-action-weight-open.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dw0-weight-opens-without-clear/zh-390/00-start.png",
+      "review/scenarios/piglet-processing/pp-dw0-weight-opens-without-clear/zh-390/01-data-action-weight-open.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "pp-dw1-weight-entry-shows-clear",
+   "tree": "T-23",
+   "branch": "drafts",
+   "label": "an entry shows Clear in the footer",
+   "gwt": {
+    "given": "Litter weight is open and untouched.",
+    "when": "They type 18 kg.",
+    "then": "Clear appears in the footer, left of the commit."
+   },
+   "path": [
+    "drafts",
+    "drafts.a03",
+    "weight.open",
+    "weight.enter",
+    "pp-dw1-weight-entry-shows-clear"
+   ],
+   "authority": [
+    {
+     "src": "STR",
+     "at": "ux/laws/strings.json · verbs.Clear",
+     "says": "empty what was entered or ticked …; present only while there is something to empty"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dw1-weight-entry-shows-clear/en-360/00-start.png",
+      "review/scenarios/piglet-processing/pp-dw1-weight-entry-shows-clear/en-360/01-data-action-weight-open.png",
+      "review/scenarios/piglet-processing/pp-dw1-weight-entry-shows-clear/en-360/02-data-action-pad-data-key-1.png",
+      "review/scenarios/piglet-processing/pp-dw1-weight-entry-shows-clear/en-360/03-data-action-pad-data-key-8.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dw1-weight-entry-shows-clear/en-390/00-start.png",
+      "review/scenarios/piglet-processing/pp-dw1-weight-entry-shows-clear/en-390/01-data-action-weight-open.png",
+      "review/scenarios/piglet-processing/pp-dw1-weight-entry-shows-clear/en-390/02-data-action-pad-data-key-1.png",
+      "review/scenarios/piglet-processing/pp-dw1-weight-entry-shows-clear/en-390/03-data-action-pad-data-key-8.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dw1-weight-entry-shows-clear/zh-360/00-start.png",
+      "review/scenarios/piglet-processing/pp-dw1-weight-entry-shows-clear/zh-360/01-data-action-weight-open.png",
+      "review/scenarios/piglet-processing/pp-dw1-weight-entry-shows-clear/zh-360/02-data-action-pad-data-key-1.png",
+      "review/scenarios/piglet-processing/pp-dw1-weight-entry-shows-clear/zh-360/03-data-action-pad-data-key-8.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dw1-weight-entry-shows-clear/zh-390/00-start.png",
+      "review/scenarios/piglet-processing/pp-dw1-weight-entry-shows-clear/zh-390/01-data-action-weight-open.png",
+      "review/scenarios/piglet-processing/pp-dw1-weight-entry-shows-clear/zh-390/02-data-action-pad-data-key-1.png",
+      "review/scenarios/piglet-processing/pp-dw1-weight-entry-shows-clear/zh-390/03-data-action-pad-data-key-8.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "pp-dw2-weight-back-saves-nothing",
+   "tree": "T-23",
+   "branch": "drafts",
+   "label": "Back leaves Litter weight; nothing is recorded",
+   "gwt": {
+    "given": "Litter weight holds an entry that is not recorded.",
+    "when": "They tap Back.",
+    "then": "They are back where they came from and nothing is recorded."
+   },
+   "path": [
+    "drafts",
+    "drafts.a03",
+    "weight.open",
+    "weight.enter",
+    "weight.enter.back",
+    "pp-dw2-weight-back-saves-nothing"
+   ],
+   "authority": [
+    {
+     "src": "owner",
+     "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+     "says": "Back … leaves and returns to where you came from, keeping the draft."
+    },
+    {
+     "src": "RUL",
+     "at": "ux/research/farrowing/RULINGS.md · The exit grammar",
+     "says": "The drawer and Edit are staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save` commits"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dw2-weight-back-saves-nothing/en-360/00-start.png",
+      "review/scenarios/piglet-processing/pp-dw2-weight-back-saves-nothing/en-360/01-data-action-weight-open.png",
+      "review/scenarios/piglet-processing/pp-dw2-weight-back-saves-nothing/en-360/02-data-action-pad-data-key-1.png",
+      "review/scenarios/piglet-processing/pp-dw2-weight-back-saves-nothing/en-360/03-data-action-pad-data-key-8.png",
+      "review/scenarios/piglet-processing/pp-dw2-weight-back-saves-nothing/en-360/04-data-action-back.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dw2-weight-back-saves-nothing/en-390/00-start.png",
+      "review/scenarios/piglet-processing/pp-dw2-weight-back-saves-nothing/en-390/01-data-action-weight-open.png",
+      "review/scenarios/piglet-processing/pp-dw2-weight-back-saves-nothing/en-390/02-data-action-pad-data-key-1.png",
+      "review/scenarios/piglet-processing/pp-dw2-weight-back-saves-nothing/en-390/03-data-action-pad-data-key-8.png",
+      "review/scenarios/piglet-processing/pp-dw2-weight-back-saves-nothing/en-390/04-data-action-back.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dw2-weight-back-saves-nothing/zh-360/00-start.png",
+      "review/scenarios/piglet-processing/pp-dw2-weight-back-saves-nothing/zh-360/01-data-action-weight-open.png",
+      "review/scenarios/piglet-processing/pp-dw2-weight-back-saves-nothing/zh-360/02-data-action-pad-data-key-1.png",
+      "review/scenarios/piglet-processing/pp-dw2-weight-back-saves-nothing/zh-360/03-data-action-pad-data-key-8.png",
+      "review/scenarios/piglet-processing/pp-dw2-weight-back-saves-nothing/zh-360/04-data-action-back.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dw2-weight-back-saves-nothing/zh-390/00-start.png",
+      "review/scenarios/piglet-processing/pp-dw2-weight-back-saves-nothing/zh-390/01-data-action-weight-open.png",
+      "review/scenarios/piglet-processing/pp-dw2-weight-back-saves-nothing/zh-390/02-data-action-pad-data-key-1.png",
+      "review/scenarios/piglet-processing/pp-dw2-weight-back-saves-nothing/zh-390/03-data-action-pad-data-key-8.png",
+      "review/scenarios/piglet-processing/pp-dw2-weight-back-saves-nothing/zh-390/04-data-action-back.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "pp-dw3-weight-reopen-shows-draft",
+   "tree": "T-23",
+   "branch": "drafts",
+   "label": "reopening Litter weight shows the draft, with Clear",
+   "gwt": {
+    "given": "They left Litter weight with Back after they type 18 kg.",
+    "when": "They open Litter weight again.",
+    "then": "The entry is still there and Clear is in the footer."
+   },
+   "path": [
+    "drafts",
+    "drafts.a03",
+    "weight.open",
+    "weight.enter",
+    "weight.enter.back",
+    "weight.enter.back.reopen",
+    "pp-dw3-weight-reopen-shows-draft"
+   ],
+   "authority": [
+    {
+     "src": "owner",
+     "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+     "says": "Back … leaves and returns to where you came from, keeping the draft."
+    },
+    {
+     "src": "RUL",
+     "at": "ux/research/farrowing/RULINGS.md · The exit grammar",
+     "says": "The drawer and Edit are staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save` commits"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dw3-weight-reopen-shows-draft/en-360/00-start.png",
+      "review/scenarios/piglet-processing/pp-dw3-weight-reopen-shows-draft/en-360/01-data-action-weight-open.png",
+      "review/scenarios/piglet-processing/pp-dw3-weight-reopen-shows-draft/en-360/02-data-action-pad-data-key-1.png",
+      "review/scenarios/piglet-processing/pp-dw3-weight-reopen-shows-draft/en-360/03-data-action-pad-data-key-8.png",
+      "review/scenarios/piglet-processing/pp-dw3-weight-reopen-shows-draft/en-360/04-data-action-back.png",
+      "review/scenarios/piglet-processing/pp-dw3-weight-reopen-shows-draft/en-360/05-data-action-weight-open.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dw3-weight-reopen-shows-draft/en-390/00-start.png",
+      "review/scenarios/piglet-processing/pp-dw3-weight-reopen-shows-draft/en-390/01-data-action-weight-open.png",
+      "review/scenarios/piglet-processing/pp-dw3-weight-reopen-shows-draft/en-390/02-data-action-pad-data-key-1.png",
+      "review/scenarios/piglet-processing/pp-dw3-weight-reopen-shows-draft/en-390/03-data-action-pad-data-key-8.png",
+      "review/scenarios/piglet-processing/pp-dw3-weight-reopen-shows-draft/en-390/04-data-action-back.png",
+      "review/scenarios/piglet-processing/pp-dw3-weight-reopen-shows-draft/en-390/05-data-action-weight-open.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dw3-weight-reopen-shows-draft/zh-360/00-start.png",
+      "review/scenarios/piglet-processing/pp-dw3-weight-reopen-shows-draft/zh-360/01-data-action-weight-open.png",
+      "review/scenarios/piglet-processing/pp-dw3-weight-reopen-shows-draft/zh-360/02-data-action-pad-data-key-1.png",
+      "review/scenarios/piglet-processing/pp-dw3-weight-reopen-shows-draft/zh-360/03-data-action-pad-data-key-8.png",
+      "review/scenarios/piglet-processing/pp-dw3-weight-reopen-shows-draft/zh-360/04-data-action-back.png",
+      "review/scenarios/piglet-processing/pp-dw3-weight-reopen-shows-draft/zh-360/05-data-action-weight-open.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dw3-weight-reopen-shows-draft/zh-390/00-start.png",
+      "review/scenarios/piglet-processing/pp-dw3-weight-reopen-shows-draft/zh-390/01-data-action-weight-open.png",
+      "review/scenarios/piglet-processing/pp-dw3-weight-reopen-shows-draft/zh-390/02-data-action-pad-data-key-1.png",
+      "review/scenarios/piglet-processing/pp-dw3-weight-reopen-shows-draft/zh-390/03-data-action-pad-data-key-8.png",
+      "review/scenarios/piglet-processing/pp-dw3-weight-reopen-shows-draft/zh-390/04-data-action-back.png",
+      "review/scenarios/piglet-processing/pp-dw3-weight-reopen-shows-draft/zh-390/05-data-action-weight-open.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "pp-dw4-weight-clear-empties",
+   "tree": "T-23",
+   "branch": "drafts",
+   "label": "Clear empties Litter weight and goes; nothing recorded",
+   "gwt": {
+    "given": "Litter weight was reopened holding the kept draft.",
+    "when": "They tap Clear.",
+    "then": "Litter weight is back as it opened, Clear disappears and nothing is recorded."
+   },
+   "path": [
+    "drafts",
+    "drafts.a03",
+    "weight.open",
+    "weight.enter",
+    "weight.enter.back",
+    "weight.enter.back.reopen",
+    "weight.enter.back.reopen.clear",
+    "pp-dw4-weight-clear-empties"
+   ],
+   "authority": [
+    {
+     "src": "RUL",
+     "at": "ux/research/farrowing/RULINGS.md · The exit grammar",
+     "says": "The drawer and Edit are staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save` commits"
+    },
+    {
+     "src": "STR",
+     "at": "ux/laws/strings.json · verbs.Clear",
+     "says": "empty what was entered or ticked …; present only while there is something to empty"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dw4-weight-clear-empties/en-360/00-start.png",
+      "review/scenarios/piglet-processing/pp-dw4-weight-clear-empties/en-360/01-data-action-weight-open.png",
+      "review/scenarios/piglet-processing/pp-dw4-weight-clear-empties/en-360/02-data-action-pad-data-key-1.png",
+      "review/scenarios/piglet-processing/pp-dw4-weight-clear-empties/en-360/03-data-action-pad-data-key-8.png",
+      "review/scenarios/piglet-processing/pp-dw4-weight-clear-empties/en-360/04-data-action-back.png",
+      "review/scenarios/piglet-processing/pp-dw4-weight-clear-empties/en-360/05-data-action-weight-open.png",
+      "review/scenarios/piglet-processing/pp-dw4-weight-clear-empties/en-360/06-data-action-draft-clear.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dw4-weight-clear-empties/en-390/00-start.png",
+      "review/scenarios/piglet-processing/pp-dw4-weight-clear-empties/en-390/01-data-action-weight-open.png",
+      "review/scenarios/piglet-processing/pp-dw4-weight-clear-empties/en-390/02-data-action-pad-data-key-1.png",
+      "review/scenarios/piglet-processing/pp-dw4-weight-clear-empties/en-390/03-data-action-pad-data-key-8.png",
+      "review/scenarios/piglet-processing/pp-dw4-weight-clear-empties/en-390/04-data-action-back.png",
+      "review/scenarios/piglet-processing/pp-dw4-weight-clear-empties/en-390/05-data-action-weight-open.png",
+      "review/scenarios/piglet-processing/pp-dw4-weight-clear-empties/en-390/06-data-action-draft-clear.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dw4-weight-clear-empties/zh-360/00-start.png",
+      "review/scenarios/piglet-processing/pp-dw4-weight-clear-empties/zh-360/01-data-action-weight-open.png",
+      "review/scenarios/piglet-processing/pp-dw4-weight-clear-empties/zh-360/02-data-action-pad-data-key-1.png",
+      "review/scenarios/piglet-processing/pp-dw4-weight-clear-empties/zh-360/03-data-action-pad-data-key-8.png",
+      "review/scenarios/piglet-processing/pp-dw4-weight-clear-empties/zh-360/04-data-action-back.png",
+      "review/scenarios/piglet-processing/pp-dw4-weight-clear-empties/zh-360/05-data-action-weight-open.png",
+      "review/scenarios/piglet-processing/pp-dw4-weight-clear-empties/zh-360/06-data-action-draft-clear.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dw4-weight-clear-empties/zh-390/00-start.png",
+      "review/scenarios/piglet-processing/pp-dw4-weight-clear-empties/zh-390/01-data-action-weight-open.png",
+      "review/scenarios/piglet-processing/pp-dw4-weight-clear-empties/zh-390/02-data-action-pad-data-key-1.png",
+      "review/scenarios/piglet-processing/pp-dw4-weight-clear-empties/zh-390/03-data-action-pad-data-key-8.png",
+      "review/scenarios/piglet-processing/pp-dw4-weight-clear-empties/zh-390/04-data-action-back.png",
+      "review/scenarios/piglet-processing/pp-dw4-weight-clear-empties/zh-390/05-data-action-weight-open.png",
+      "review/scenarios/piglet-processing/pp-dw4-weight-clear-empties/zh-390/06-data-action-draft-clear.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "pp-dw5-weight-cleared-stays-cleared",
+   "tree": "T-23",
+   "branch": "drafts",
+   "label": "after Clear, Back and reopen show Litter weight as it opened",
+   "gwt": {
+    "given": "They cleared the draft on Litter weight.",
+    "when": "They go Back and open it again.",
+    "then": "It opens as it did the first time, with no Clear."
+   },
+   "path": [
+    "drafts",
+    "drafts.a03",
+    "weight.open",
+    "weight.enter",
+    "weight.enter.back",
+    "weight.enter.back.reopen",
+    "weight.enter.back.reopen.clear",
+    "weight.enter.back.reopen.clear.back",
+    "pp-dw5-weight-cleared-stays-cleared"
+   ],
+   "authority": [
+    {
+     "src": "RUL",
+     "at": "ux/research/farrowing/RULINGS.md · The exit grammar",
+     "says": "The drawer and Edit are staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save` commits"
+    },
+    {
+     "src": "STR",
+     "at": "ux/laws/strings.json · verbs.Clear",
+     "says": "empty what was entered or ticked …; present only while there is something to empty"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dw5-weight-cleared-stays-cleared/en-360/00-start.png",
+      "review/scenarios/piglet-processing/pp-dw5-weight-cleared-stays-cleared/en-360/01-data-action-weight-open.png",
+      "review/scenarios/piglet-processing/pp-dw5-weight-cleared-stays-cleared/en-360/02-data-action-pad-data-key-1.png",
+      "review/scenarios/piglet-processing/pp-dw5-weight-cleared-stays-cleared/en-360/03-data-action-pad-data-key-8.png",
+      "review/scenarios/piglet-processing/pp-dw5-weight-cleared-stays-cleared/en-360/04-data-action-back.png",
+      "review/scenarios/piglet-processing/pp-dw5-weight-cleared-stays-cleared/en-360/05-data-action-weight-open.png",
+      "review/scenarios/piglet-processing/pp-dw5-weight-cleared-stays-cleared/en-360/06-data-action-draft-clear.png",
+      "review/scenarios/piglet-processing/pp-dw5-weight-cleared-stays-cleared/en-360/07-data-action-back.png",
+      "review/scenarios/piglet-processing/pp-dw5-weight-cleared-stays-cleared/en-360/08-data-action-weight-open.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dw5-weight-cleared-stays-cleared/en-390/00-start.png",
+      "review/scenarios/piglet-processing/pp-dw5-weight-cleared-stays-cleared/en-390/01-data-action-weight-open.png",
+      "review/scenarios/piglet-processing/pp-dw5-weight-cleared-stays-cleared/en-390/02-data-action-pad-data-key-1.png",
+      "review/scenarios/piglet-processing/pp-dw5-weight-cleared-stays-cleared/en-390/03-data-action-pad-data-key-8.png",
+      "review/scenarios/piglet-processing/pp-dw5-weight-cleared-stays-cleared/en-390/04-data-action-back.png",
+      "review/scenarios/piglet-processing/pp-dw5-weight-cleared-stays-cleared/en-390/05-data-action-weight-open.png",
+      "review/scenarios/piglet-processing/pp-dw5-weight-cleared-stays-cleared/en-390/06-data-action-draft-clear.png",
+      "review/scenarios/piglet-processing/pp-dw5-weight-cleared-stays-cleared/en-390/07-data-action-back.png",
+      "review/scenarios/piglet-processing/pp-dw5-weight-cleared-stays-cleared/en-390/08-data-action-weight-open.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dw5-weight-cleared-stays-cleared/zh-360/00-start.png",
+      "review/scenarios/piglet-processing/pp-dw5-weight-cleared-stays-cleared/zh-360/01-data-action-weight-open.png",
+      "review/scenarios/piglet-processing/pp-dw5-weight-cleared-stays-cleared/zh-360/02-data-action-pad-data-key-1.png",
+      "review/scenarios/piglet-processing/pp-dw5-weight-cleared-stays-cleared/zh-360/03-data-action-pad-data-key-8.png",
+      "review/scenarios/piglet-processing/pp-dw5-weight-cleared-stays-cleared/zh-360/04-data-action-back.png",
+      "review/scenarios/piglet-processing/pp-dw5-weight-cleared-stays-cleared/zh-360/05-data-action-weight-open.png",
+      "review/scenarios/piglet-processing/pp-dw5-weight-cleared-stays-cleared/zh-360/06-data-action-draft-clear.png",
+      "review/scenarios/piglet-processing/pp-dw5-weight-cleared-stays-cleared/zh-360/07-data-action-back.png",
+      "review/scenarios/piglet-processing/pp-dw5-weight-cleared-stays-cleared/zh-360/08-data-action-weight-open.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dw5-weight-cleared-stays-cleared/zh-390/00-start.png",
+      "review/scenarios/piglet-processing/pp-dw5-weight-cleared-stays-cleared/zh-390/01-data-action-weight-open.png",
+      "review/scenarios/piglet-processing/pp-dw5-weight-cleared-stays-cleared/zh-390/02-data-action-pad-data-key-1.png",
+      "review/scenarios/piglet-processing/pp-dw5-weight-cleared-stays-cleared/zh-390/03-data-action-pad-data-key-8.png",
+      "review/scenarios/piglet-processing/pp-dw5-weight-cleared-stays-cleared/zh-390/04-data-action-back.png",
+      "review/scenarios/piglet-processing/pp-dw5-weight-cleared-stays-cleared/zh-390/05-data-action-weight-open.png",
+      "review/scenarios/piglet-processing/pp-dw5-weight-cleared-stays-cleared/zh-390/06-data-action-draft-clear.png",
+      "review/scenarios/piglet-processing/pp-dw5-weight-cleared-stays-cleared/zh-390/07-data-action-back.png",
+      "review/scenarios/piglet-processing/pp-dw5-weight-cleared-stays-cleared/zh-390/08-data-action-weight-open.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "pp-dw6-weight-phone-back-keeps-draft",
+   "tree": "T-23",
+   "branch": "drafts",
+   "label": "the phone's Back keeps the draft like the footer Back",
+   "gwt": {
+    "given": "Litter weight holds an entry that is not recorded.",
+    "when": "They press the phone's own Back and open it again.",
+    "then": "The entry is still there and nothing is recorded."
+   },
+   "path": [
+    "drafts",
+    "drafts.a03",
+    "weight.open",
+    "weight.enter",
+    "weight.enter.sysback",
+    "pp-dw6-weight-phone-back-keeps-draft"
+   ],
+   "authority": [
+    {
+     "src": "owner",
+     "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+     "says": "Back … leaves and returns to where you came from, keeping the draft."
+    },
+    {
+     "src": "RUL",
+     "at": "ux/research/farrowing/RULINGS.md · The exit grammar",
+     "says": "The drawer and Edit are staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save` commits"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dw6-weight-phone-back-keeps-draft/en-360/00-start.png",
+      "review/scenarios/piglet-processing/pp-dw6-weight-phone-back-keeps-draft/en-360/01-data-action-weight-open.png",
+      "review/scenarios/piglet-processing/pp-dw6-weight-phone-back-keeps-draft/en-360/02-data-action-pad-data-key-1.png",
+      "review/scenarios/piglet-processing/pp-dw6-weight-phone-back-keeps-draft/en-360/03-data-action-pad-data-key-8.png",
+      "review/scenarios/piglet-processing/pp-dw6-weight-phone-back-keeps-draft/en-360/04-back.png",
+      "review/scenarios/piglet-processing/pp-dw6-weight-phone-back-keeps-draft/en-360/05-data-action-weight-open.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dw6-weight-phone-back-keeps-draft/en-390/00-start.png",
+      "review/scenarios/piglet-processing/pp-dw6-weight-phone-back-keeps-draft/en-390/01-data-action-weight-open.png",
+      "review/scenarios/piglet-processing/pp-dw6-weight-phone-back-keeps-draft/en-390/02-data-action-pad-data-key-1.png",
+      "review/scenarios/piglet-processing/pp-dw6-weight-phone-back-keeps-draft/en-390/03-data-action-pad-data-key-8.png",
+      "review/scenarios/piglet-processing/pp-dw6-weight-phone-back-keeps-draft/en-390/04-back.png",
+      "review/scenarios/piglet-processing/pp-dw6-weight-phone-back-keeps-draft/en-390/05-data-action-weight-open.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dw6-weight-phone-back-keeps-draft/zh-360/00-start.png",
+      "review/scenarios/piglet-processing/pp-dw6-weight-phone-back-keeps-draft/zh-360/01-data-action-weight-open.png",
+      "review/scenarios/piglet-processing/pp-dw6-weight-phone-back-keeps-draft/zh-360/02-data-action-pad-data-key-1.png",
+      "review/scenarios/piglet-processing/pp-dw6-weight-phone-back-keeps-draft/zh-360/03-data-action-pad-data-key-8.png",
+      "review/scenarios/piglet-processing/pp-dw6-weight-phone-back-keeps-draft/zh-360/04-back.png",
+      "review/scenarios/piglet-processing/pp-dw6-weight-phone-back-keeps-draft/zh-360/05-data-action-weight-open.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dw6-weight-phone-back-keeps-draft/zh-390/00-start.png",
+      "review/scenarios/piglet-processing/pp-dw6-weight-phone-back-keeps-draft/zh-390/01-data-action-weight-open.png",
+      "review/scenarios/piglet-processing/pp-dw6-weight-phone-back-keeps-draft/zh-390/02-data-action-pad-data-key-1.png",
+      "review/scenarios/piglet-processing/pp-dw6-weight-phone-back-keeps-draft/zh-390/03-data-action-pad-data-key-8.png",
+      "review/scenarios/piglet-processing/pp-dw6-weight-phone-back-keeps-draft/zh-390/04-back.png",
+      "review/scenarios/piglet-processing/pp-dw6-weight-phone-back-keeps-draft/zh-390/05-data-action-weight-open.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "pp-dc0-count-opens-without-clear",
+   "tree": "C-15",
+   "branch": "drafts",
+   "label": "Set count opens untouched: no Clear",
+   "gwt": {
+    "given": "A worker has pen A03 open: 12 piglets alive.",
+    "when": "They open Set count.",
+    "then": "Set count opens as before, with no Clear, because nothing has been entered."
+   },
+   "path": [
+    "drafts",
+    "drafts.a03",
+    "count.open",
+    "pp-dc0-count-opens-without-clear"
+   ],
+   "authority": [
+    {
+     "src": "STR",
+     "at": "ux/laws/strings.json · verbs.Clear",
+     "says": "empty what was entered or ticked …; present only while there is something to empty"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dc0-count-opens-without-clear/en-360/00-start.png",
+      "review/scenarios/piglet-processing/pp-dc0-count-opens-without-clear/en-360/01-data-action-more.png",
+      "review/scenarios/piglet-processing/pp-dc0-count-opens-without-clear/en-360/02-data-action-tool-data-value-coun.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dc0-count-opens-without-clear/en-390/00-start.png",
+      "review/scenarios/piglet-processing/pp-dc0-count-opens-without-clear/en-390/01-data-action-more.png",
+      "review/scenarios/piglet-processing/pp-dc0-count-opens-without-clear/en-390/02-data-action-tool-data-value-coun.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dc0-count-opens-without-clear/zh-360/00-start.png",
+      "review/scenarios/piglet-processing/pp-dc0-count-opens-without-clear/zh-360/01-data-action-more.png",
+      "review/scenarios/piglet-processing/pp-dc0-count-opens-without-clear/zh-360/02-data-action-tool-data-value-coun.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dc0-count-opens-without-clear/zh-390/00-start.png",
+      "review/scenarios/piglet-processing/pp-dc0-count-opens-without-clear/zh-390/01-data-action-more.png",
+      "review/scenarios/piglet-processing/pp-dc0-count-opens-without-clear/zh-390/02-data-action-tool-data-value-coun.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "pp-dc1-count-entry-shows-clear",
+   "tree": "C-15",
+   "branch": "drafts",
+   "label": "an entry shows Clear in the footer",
+   "gwt": {
+    "given": "Set count is open and untouched.",
+    "when": "They count one fewer (11).",
+    "then": "Clear appears in the footer, left of the commit."
+   },
+   "path": [
+    "drafts",
+    "drafts.a03",
+    "count.open",
+    "count.enter",
+    "pp-dc1-count-entry-shows-clear"
+   ],
+   "authority": [
+    {
+     "src": "STR",
+     "at": "ux/laws/strings.json · verbs.Clear",
+     "says": "empty what was entered or ticked …; present only while there is something to empty"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dc1-count-entry-shows-clear/en-360/00-start.png",
+      "review/scenarios/piglet-processing/pp-dc1-count-entry-shows-clear/en-360/01-data-action-more.png",
+      "review/scenarios/piglet-processing/pp-dc1-count-entry-shows-clear/en-360/02-data-action-tool-data-value-coun.png",
+      "review/scenarios/piglet-processing/pp-dc1-count-entry-shows-clear/en-360/03-data-action-step-data-value-coun.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dc1-count-entry-shows-clear/en-390/00-start.png",
+      "review/scenarios/piglet-processing/pp-dc1-count-entry-shows-clear/en-390/01-data-action-more.png",
+      "review/scenarios/piglet-processing/pp-dc1-count-entry-shows-clear/en-390/02-data-action-tool-data-value-coun.png",
+      "review/scenarios/piglet-processing/pp-dc1-count-entry-shows-clear/en-390/03-data-action-step-data-value-coun.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dc1-count-entry-shows-clear/zh-360/00-start.png",
+      "review/scenarios/piglet-processing/pp-dc1-count-entry-shows-clear/zh-360/01-data-action-more.png",
+      "review/scenarios/piglet-processing/pp-dc1-count-entry-shows-clear/zh-360/02-data-action-tool-data-value-coun.png",
+      "review/scenarios/piglet-processing/pp-dc1-count-entry-shows-clear/zh-360/03-data-action-step-data-value-coun.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dc1-count-entry-shows-clear/zh-390/00-start.png",
+      "review/scenarios/piglet-processing/pp-dc1-count-entry-shows-clear/zh-390/01-data-action-more.png",
+      "review/scenarios/piglet-processing/pp-dc1-count-entry-shows-clear/zh-390/02-data-action-tool-data-value-coun.png",
+      "review/scenarios/piglet-processing/pp-dc1-count-entry-shows-clear/zh-390/03-data-action-step-data-value-coun.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "pp-dc2-count-back-saves-nothing",
+   "tree": "C-15",
+   "branch": "drafts",
+   "label": "Back leaves Set count; nothing is recorded",
+   "gwt": {
+    "given": "Set count holds an entry that is not recorded.",
+    "when": "They tap Back.",
+    "then": "They are back where they came from and nothing is recorded."
+   },
+   "path": [
+    "drafts",
+    "drafts.a03",
+    "count.open",
+    "count.enter",
+    "count.enter.back",
+    "pp-dc2-count-back-saves-nothing"
+   ],
+   "authority": [
+    {
+     "src": "owner",
+     "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+     "says": "Back … leaves and returns to where you came from, keeping the draft."
+    },
+    {
+     "src": "RUL",
+     "at": "ux/research/farrowing/RULINGS.md · The exit grammar",
+     "says": "The drawer and Edit are staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save` commits"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dc2-count-back-saves-nothing/en-360/00-start.png",
+      "review/scenarios/piglet-processing/pp-dc2-count-back-saves-nothing/en-360/01-data-action-more.png",
+      "review/scenarios/piglet-processing/pp-dc2-count-back-saves-nothing/en-360/02-data-action-tool-data-value-coun.png",
+      "review/scenarios/piglet-processing/pp-dc2-count-back-saves-nothing/en-360/03-data-action-step-data-value-coun.png",
+      "review/scenarios/piglet-processing/pp-dc2-count-back-saves-nothing/en-360/04-data-action-back.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dc2-count-back-saves-nothing/en-390/00-start.png",
+      "review/scenarios/piglet-processing/pp-dc2-count-back-saves-nothing/en-390/01-data-action-more.png",
+      "review/scenarios/piglet-processing/pp-dc2-count-back-saves-nothing/en-390/02-data-action-tool-data-value-coun.png",
+      "review/scenarios/piglet-processing/pp-dc2-count-back-saves-nothing/en-390/03-data-action-step-data-value-coun.png",
+      "review/scenarios/piglet-processing/pp-dc2-count-back-saves-nothing/en-390/04-data-action-back.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dc2-count-back-saves-nothing/zh-360/00-start.png",
+      "review/scenarios/piglet-processing/pp-dc2-count-back-saves-nothing/zh-360/01-data-action-more.png",
+      "review/scenarios/piglet-processing/pp-dc2-count-back-saves-nothing/zh-360/02-data-action-tool-data-value-coun.png",
+      "review/scenarios/piglet-processing/pp-dc2-count-back-saves-nothing/zh-360/03-data-action-step-data-value-coun.png",
+      "review/scenarios/piglet-processing/pp-dc2-count-back-saves-nothing/zh-360/04-data-action-back.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dc2-count-back-saves-nothing/zh-390/00-start.png",
+      "review/scenarios/piglet-processing/pp-dc2-count-back-saves-nothing/zh-390/01-data-action-more.png",
+      "review/scenarios/piglet-processing/pp-dc2-count-back-saves-nothing/zh-390/02-data-action-tool-data-value-coun.png",
+      "review/scenarios/piglet-processing/pp-dc2-count-back-saves-nothing/zh-390/03-data-action-step-data-value-coun.png",
+      "review/scenarios/piglet-processing/pp-dc2-count-back-saves-nothing/zh-390/04-data-action-back.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "pp-dc3-count-reopen-shows-draft",
+   "tree": "C-15",
+   "branch": "drafts",
+   "label": "reopening Set count shows the draft, with Clear",
+   "gwt": {
+    "given": "They left Set count with Back after they count one fewer (11).",
+    "when": "They open Set count again.",
+    "then": "The entry is still there and Clear is in the footer."
+   },
+   "path": [
+    "drafts",
+    "drafts.a03",
+    "count.open",
+    "count.enter",
+    "count.enter.back",
+    "count.enter.back.reopen",
+    "pp-dc3-count-reopen-shows-draft"
+   ],
+   "authority": [
+    {
+     "src": "owner",
+     "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+     "says": "Back … leaves and returns to where you came from, keeping the draft."
+    },
+    {
+     "src": "RUL",
+     "at": "ux/research/farrowing/RULINGS.md · The exit grammar",
+     "says": "The drawer and Edit are staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save` commits"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dc3-count-reopen-shows-draft/en-360/00-start.png",
+      "review/scenarios/piglet-processing/pp-dc3-count-reopen-shows-draft/en-360/01-data-action-more.png",
+      "review/scenarios/piglet-processing/pp-dc3-count-reopen-shows-draft/en-360/02-data-action-tool-data-value-coun.png",
+      "review/scenarios/piglet-processing/pp-dc3-count-reopen-shows-draft/en-360/03-data-action-step-data-value-coun.png",
+      "review/scenarios/piglet-processing/pp-dc3-count-reopen-shows-draft/en-360/04-data-action-back.png",
+      "review/scenarios/piglet-processing/pp-dc3-count-reopen-shows-draft/en-360/05-data-action-more.png",
+      "review/scenarios/piglet-processing/pp-dc3-count-reopen-shows-draft/en-360/06-data-action-tool-data-value-coun.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dc3-count-reopen-shows-draft/en-390/00-start.png",
+      "review/scenarios/piglet-processing/pp-dc3-count-reopen-shows-draft/en-390/01-data-action-more.png",
+      "review/scenarios/piglet-processing/pp-dc3-count-reopen-shows-draft/en-390/02-data-action-tool-data-value-coun.png",
+      "review/scenarios/piglet-processing/pp-dc3-count-reopen-shows-draft/en-390/03-data-action-step-data-value-coun.png",
+      "review/scenarios/piglet-processing/pp-dc3-count-reopen-shows-draft/en-390/04-data-action-back.png",
+      "review/scenarios/piglet-processing/pp-dc3-count-reopen-shows-draft/en-390/05-data-action-more.png",
+      "review/scenarios/piglet-processing/pp-dc3-count-reopen-shows-draft/en-390/06-data-action-tool-data-value-coun.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dc3-count-reopen-shows-draft/zh-360/00-start.png",
+      "review/scenarios/piglet-processing/pp-dc3-count-reopen-shows-draft/zh-360/01-data-action-more.png",
+      "review/scenarios/piglet-processing/pp-dc3-count-reopen-shows-draft/zh-360/02-data-action-tool-data-value-coun.png",
+      "review/scenarios/piglet-processing/pp-dc3-count-reopen-shows-draft/zh-360/03-data-action-step-data-value-coun.png",
+      "review/scenarios/piglet-processing/pp-dc3-count-reopen-shows-draft/zh-360/04-data-action-back.png",
+      "review/scenarios/piglet-processing/pp-dc3-count-reopen-shows-draft/zh-360/05-data-action-more.png",
+      "review/scenarios/piglet-processing/pp-dc3-count-reopen-shows-draft/zh-360/06-data-action-tool-data-value-coun.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dc3-count-reopen-shows-draft/zh-390/00-start.png",
+      "review/scenarios/piglet-processing/pp-dc3-count-reopen-shows-draft/zh-390/01-data-action-more.png",
+      "review/scenarios/piglet-processing/pp-dc3-count-reopen-shows-draft/zh-390/02-data-action-tool-data-value-coun.png",
+      "review/scenarios/piglet-processing/pp-dc3-count-reopen-shows-draft/zh-390/03-data-action-step-data-value-coun.png",
+      "review/scenarios/piglet-processing/pp-dc3-count-reopen-shows-draft/zh-390/04-data-action-back.png",
+      "review/scenarios/piglet-processing/pp-dc3-count-reopen-shows-draft/zh-390/05-data-action-more.png",
+      "review/scenarios/piglet-processing/pp-dc3-count-reopen-shows-draft/zh-390/06-data-action-tool-data-value-coun.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "pp-dc4-count-clear-empties",
+   "tree": "C-15",
+   "branch": "drafts",
+   "label": "Clear empties Set count and goes; nothing recorded",
+   "gwt": {
+    "given": "Set count was reopened holding the kept draft.",
+    "when": "They tap Clear.",
+    "then": "Set count is back as it opened, Clear disappears and nothing is recorded."
+   },
+   "path": [
+    "drafts",
+    "drafts.a03",
+    "count.open",
+    "count.enter",
+    "count.enter.back",
+    "count.enter.back.reopen",
+    "count.enter.back.reopen.clear",
+    "pp-dc4-count-clear-empties"
+   ],
+   "authority": [
+    {
+     "src": "RUL",
+     "at": "ux/research/farrowing/RULINGS.md · The exit grammar",
+     "says": "The drawer and Edit are staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save` commits"
+    },
+    {
+     "src": "STR",
+     "at": "ux/laws/strings.json · verbs.Clear",
+     "says": "empty what was entered or ticked …; present only while there is something to empty"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dc4-count-clear-empties/en-360/00-start.png",
+      "review/scenarios/piglet-processing/pp-dc4-count-clear-empties/en-360/01-data-action-more.png",
+      "review/scenarios/piglet-processing/pp-dc4-count-clear-empties/en-360/02-data-action-tool-data-value-coun.png",
+      "review/scenarios/piglet-processing/pp-dc4-count-clear-empties/en-360/03-data-action-step-data-value-coun.png",
+      "review/scenarios/piglet-processing/pp-dc4-count-clear-empties/en-360/04-data-action-back.png",
+      "review/scenarios/piglet-processing/pp-dc4-count-clear-empties/en-360/05-data-action-more.png",
+      "review/scenarios/piglet-processing/pp-dc4-count-clear-empties/en-360/06-data-action-tool-data-value-coun.png",
+      "review/scenarios/piglet-processing/pp-dc4-count-clear-empties/en-360/07-data-action-draft-clear.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dc4-count-clear-empties/en-390/00-start.png",
+      "review/scenarios/piglet-processing/pp-dc4-count-clear-empties/en-390/01-data-action-more.png",
+      "review/scenarios/piglet-processing/pp-dc4-count-clear-empties/en-390/02-data-action-tool-data-value-coun.png",
+      "review/scenarios/piglet-processing/pp-dc4-count-clear-empties/en-390/03-data-action-step-data-value-coun.png",
+      "review/scenarios/piglet-processing/pp-dc4-count-clear-empties/en-390/04-data-action-back.png",
+      "review/scenarios/piglet-processing/pp-dc4-count-clear-empties/en-390/05-data-action-more.png",
+      "review/scenarios/piglet-processing/pp-dc4-count-clear-empties/en-390/06-data-action-tool-data-value-coun.png",
+      "review/scenarios/piglet-processing/pp-dc4-count-clear-empties/en-390/07-data-action-draft-clear.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dc4-count-clear-empties/zh-360/00-start.png",
+      "review/scenarios/piglet-processing/pp-dc4-count-clear-empties/zh-360/01-data-action-more.png",
+      "review/scenarios/piglet-processing/pp-dc4-count-clear-empties/zh-360/02-data-action-tool-data-value-coun.png",
+      "review/scenarios/piglet-processing/pp-dc4-count-clear-empties/zh-360/03-data-action-step-data-value-coun.png",
+      "review/scenarios/piglet-processing/pp-dc4-count-clear-empties/zh-360/04-data-action-back.png",
+      "review/scenarios/piglet-processing/pp-dc4-count-clear-empties/zh-360/05-data-action-more.png",
+      "review/scenarios/piglet-processing/pp-dc4-count-clear-empties/zh-360/06-data-action-tool-data-value-coun.png",
+      "review/scenarios/piglet-processing/pp-dc4-count-clear-empties/zh-360/07-data-action-draft-clear.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dc4-count-clear-empties/zh-390/00-start.png",
+      "review/scenarios/piglet-processing/pp-dc4-count-clear-empties/zh-390/01-data-action-more.png",
+      "review/scenarios/piglet-processing/pp-dc4-count-clear-empties/zh-390/02-data-action-tool-data-value-coun.png",
+      "review/scenarios/piglet-processing/pp-dc4-count-clear-empties/zh-390/03-data-action-step-data-value-coun.png",
+      "review/scenarios/piglet-processing/pp-dc4-count-clear-empties/zh-390/04-data-action-back.png",
+      "review/scenarios/piglet-processing/pp-dc4-count-clear-empties/zh-390/05-data-action-more.png",
+      "review/scenarios/piglet-processing/pp-dc4-count-clear-empties/zh-390/06-data-action-tool-data-value-coun.png",
+      "review/scenarios/piglet-processing/pp-dc4-count-clear-empties/zh-390/07-data-action-draft-clear.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "pp-dc5-count-cleared-stays-cleared",
+   "tree": "C-15",
+   "branch": "drafts",
+   "label": "after Clear, Back and reopen show Set count as it opened",
+   "gwt": {
+    "given": "They cleared the draft on Set count.",
+    "when": "They go Back and open it again.",
+    "then": "It opens as it did the first time, with no Clear."
+   },
+   "path": [
+    "drafts",
+    "drafts.a03",
+    "count.open",
+    "count.enter",
+    "count.enter.back",
+    "count.enter.back.reopen",
+    "count.enter.back.reopen.clear",
+    "count.enter.back.reopen.clear.back",
+    "pp-dc5-count-cleared-stays-cleared"
+   ],
+   "authority": [
+    {
+     "src": "RUL",
+     "at": "ux/research/farrowing/RULINGS.md · The exit grammar",
+     "says": "The drawer and Edit are staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save` commits"
+    },
+    {
+     "src": "STR",
+     "at": "ux/laws/strings.json · verbs.Clear",
+     "says": "empty what was entered or ticked …; present only while there is something to empty"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dc5-count-cleared-stays-cleared/en-360/00-start.png",
+      "review/scenarios/piglet-processing/pp-dc5-count-cleared-stays-cleared/en-360/01-data-action-more.png",
+      "review/scenarios/piglet-processing/pp-dc5-count-cleared-stays-cleared/en-360/02-data-action-tool-data-value-coun.png",
+      "review/scenarios/piglet-processing/pp-dc5-count-cleared-stays-cleared/en-360/03-data-action-step-data-value-coun.png",
+      "review/scenarios/piglet-processing/pp-dc5-count-cleared-stays-cleared/en-360/04-data-action-back.png",
+      "review/scenarios/piglet-processing/pp-dc5-count-cleared-stays-cleared/en-360/05-data-action-more.png",
+      "review/scenarios/piglet-processing/pp-dc5-count-cleared-stays-cleared/en-360/06-data-action-tool-data-value-coun.png",
+      "review/scenarios/piglet-processing/pp-dc5-count-cleared-stays-cleared/en-360/07-data-action-draft-clear.png",
+      "review/scenarios/piglet-processing/pp-dc5-count-cleared-stays-cleared/en-360/08-data-action-back.png",
+      "review/scenarios/piglet-processing/pp-dc5-count-cleared-stays-cleared/en-360/09-data-action-more.png",
+      "review/scenarios/piglet-processing/pp-dc5-count-cleared-stays-cleared/en-360/10-data-action-tool-data-value-coun.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dc5-count-cleared-stays-cleared/en-390/00-start.png",
+      "review/scenarios/piglet-processing/pp-dc5-count-cleared-stays-cleared/en-390/01-data-action-more.png",
+      "review/scenarios/piglet-processing/pp-dc5-count-cleared-stays-cleared/en-390/02-data-action-tool-data-value-coun.png",
+      "review/scenarios/piglet-processing/pp-dc5-count-cleared-stays-cleared/en-390/03-data-action-step-data-value-coun.png",
+      "review/scenarios/piglet-processing/pp-dc5-count-cleared-stays-cleared/en-390/04-data-action-back.png",
+      "review/scenarios/piglet-processing/pp-dc5-count-cleared-stays-cleared/en-390/05-data-action-more.png",
+      "review/scenarios/piglet-processing/pp-dc5-count-cleared-stays-cleared/en-390/06-data-action-tool-data-value-coun.png",
+      "review/scenarios/piglet-processing/pp-dc5-count-cleared-stays-cleared/en-390/07-data-action-draft-clear.png",
+      "review/scenarios/piglet-processing/pp-dc5-count-cleared-stays-cleared/en-390/08-data-action-back.png",
+      "review/scenarios/piglet-processing/pp-dc5-count-cleared-stays-cleared/en-390/09-data-action-more.png",
+      "review/scenarios/piglet-processing/pp-dc5-count-cleared-stays-cleared/en-390/10-data-action-tool-data-value-coun.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dc5-count-cleared-stays-cleared/zh-360/00-start.png",
+      "review/scenarios/piglet-processing/pp-dc5-count-cleared-stays-cleared/zh-360/01-data-action-more.png",
+      "review/scenarios/piglet-processing/pp-dc5-count-cleared-stays-cleared/zh-360/02-data-action-tool-data-value-coun.png",
+      "review/scenarios/piglet-processing/pp-dc5-count-cleared-stays-cleared/zh-360/03-data-action-step-data-value-coun.png",
+      "review/scenarios/piglet-processing/pp-dc5-count-cleared-stays-cleared/zh-360/04-data-action-back.png",
+      "review/scenarios/piglet-processing/pp-dc5-count-cleared-stays-cleared/zh-360/05-data-action-more.png",
+      "review/scenarios/piglet-processing/pp-dc5-count-cleared-stays-cleared/zh-360/06-data-action-tool-data-value-coun.png",
+      "review/scenarios/piglet-processing/pp-dc5-count-cleared-stays-cleared/zh-360/07-data-action-draft-clear.png",
+      "review/scenarios/piglet-processing/pp-dc5-count-cleared-stays-cleared/zh-360/08-data-action-back.png",
+      "review/scenarios/piglet-processing/pp-dc5-count-cleared-stays-cleared/zh-360/09-data-action-more.png",
+      "review/scenarios/piglet-processing/pp-dc5-count-cleared-stays-cleared/zh-360/10-data-action-tool-data-value-coun.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dc5-count-cleared-stays-cleared/zh-390/00-start.png",
+      "review/scenarios/piglet-processing/pp-dc5-count-cleared-stays-cleared/zh-390/01-data-action-more.png",
+      "review/scenarios/piglet-processing/pp-dc5-count-cleared-stays-cleared/zh-390/02-data-action-tool-data-value-coun.png",
+      "review/scenarios/piglet-processing/pp-dc5-count-cleared-stays-cleared/zh-390/03-data-action-step-data-value-coun.png",
+      "review/scenarios/piglet-processing/pp-dc5-count-cleared-stays-cleared/zh-390/04-data-action-back.png",
+      "review/scenarios/piglet-processing/pp-dc5-count-cleared-stays-cleared/zh-390/05-data-action-more.png",
+      "review/scenarios/piglet-processing/pp-dc5-count-cleared-stays-cleared/zh-390/06-data-action-tool-data-value-coun.png",
+      "review/scenarios/piglet-processing/pp-dc5-count-cleared-stays-cleared/zh-390/07-data-action-draft-clear.png",
+      "review/scenarios/piglet-processing/pp-dc5-count-cleared-stays-cleared/zh-390/08-data-action-back.png",
+      "review/scenarios/piglet-processing/pp-dc5-count-cleared-stays-cleared/zh-390/09-data-action-more.png",
+      "review/scenarios/piglet-processing/pp-dc5-count-cleared-stays-cleared/zh-390/10-data-action-tool-data-value-coun.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "pp-dc6-count-phone-back-keeps-draft",
+   "tree": "C-15",
+   "branch": "drafts",
+   "label": "the phone's Back keeps the draft like the footer Back",
+   "gwt": {
+    "given": "Set count holds an entry that is not recorded.",
+    "when": "They press the phone's own Back and open it again.",
+    "then": "The entry is still there and nothing is recorded."
+   },
+   "path": [
+    "drafts",
+    "drafts.a03",
+    "count.open",
+    "count.enter",
+    "count.enter.sysback",
+    "pp-dc6-count-phone-back-keeps-draft"
+   ],
+   "authority": [
+    {
+     "src": "owner",
+     "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+     "says": "Back … leaves and returns to where you came from, keeping the draft."
+    },
+    {
+     "src": "RUL",
+     "at": "ux/research/farrowing/RULINGS.md · The exit grammar",
+     "says": "The drawer and Edit are staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save` commits"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dc6-count-phone-back-keeps-draft/en-360/00-start.png",
+      "review/scenarios/piglet-processing/pp-dc6-count-phone-back-keeps-draft/en-360/01-data-action-more.png",
+      "review/scenarios/piglet-processing/pp-dc6-count-phone-back-keeps-draft/en-360/02-data-action-tool-data-value-coun.png",
+      "review/scenarios/piglet-processing/pp-dc6-count-phone-back-keeps-draft/en-360/03-data-action-step-data-value-coun.png",
+      "review/scenarios/piglet-processing/pp-dc6-count-phone-back-keeps-draft/en-360/04-back.png",
+      "review/scenarios/piglet-processing/pp-dc6-count-phone-back-keeps-draft/en-360/05-data-action-more.png",
+      "review/scenarios/piglet-processing/pp-dc6-count-phone-back-keeps-draft/en-360/06-data-action-tool-data-value-coun.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dc6-count-phone-back-keeps-draft/en-390/00-start.png",
+      "review/scenarios/piglet-processing/pp-dc6-count-phone-back-keeps-draft/en-390/01-data-action-more.png",
+      "review/scenarios/piglet-processing/pp-dc6-count-phone-back-keeps-draft/en-390/02-data-action-tool-data-value-coun.png",
+      "review/scenarios/piglet-processing/pp-dc6-count-phone-back-keeps-draft/en-390/03-data-action-step-data-value-coun.png",
+      "review/scenarios/piglet-processing/pp-dc6-count-phone-back-keeps-draft/en-390/04-back.png",
+      "review/scenarios/piglet-processing/pp-dc6-count-phone-back-keeps-draft/en-390/05-data-action-more.png",
+      "review/scenarios/piglet-processing/pp-dc6-count-phone-back-keeps-draft/en-390/06-data-action-tool-data-value-coun.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dc6-count-phone-back-keeps-draft/zh-360/00-start.png",
+      "review/scenarios/piglet-processing/pp-dc6-count-phone-back-keeps-draft/zh-360/01-data-action-more.png",
+      "review/scenarios/piglet-processing/pp-dc6-count-phone-back-keeps-draft/zh-360/02-data-action-tool-data-value-coun.png",
+      "review/scenarios/piglet-processing/pp-dc6-count-phone-back-keeps-draft/zh-360/03-data-action-step-data-value-coun.png",
+      "review/scenarios/piglet-processing/pp-dc6-count-phone-back-keeps-draft/zh-360/04-back.png",
+      "review/scenarios/piglet-processing/pp-dc6-count-phone-back-keeps-draft/zh-360/05-data-action-more.png",
+      "review/scenarios/piglet-processing/pp-dc6-count-phone-back-keeps-draft/zh-360/06-data-action-tool-data-value-coun.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dc6-count-phone-back-keeps-draft/zh-390/00-start.png",
+      "review/scenarios/piglet-processing/pp-dc6-count-phone-back-keeps-draft/zh-390/01-data-action-more.png",
+      "review/scenarios/piglet-processing/pp-dc6-count-phone-back-keeps-draft/zh-390/02-data-action-tool-data-value-coun.png",
+      "review/scenarios/piglet-processing/pp-dc6-count-phone-back-keeps-draft/zh-390/03-data-action-step-data-value-coun.png",
+      "review/scenarios/piglet-processing/pp-dc6-count-phone-back-keeps-draft/zh-390/04-back.png",
+      "review/scenarios/piglet-processing/pp-dc6-count-phone-back-keeps-draft/zh-390/05-data-action-more.png",
+      "review/scenarios/piglet-processing/pp-dc6-count-phone-back-keeps-draft/zh-390/06-data-action-tool-data-value-coun.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "pp-dg0-give-opens-without-clear",
+   "tree": "X-5",
+   "branch": "drafts",
+   "label": "Give IDs opens untouched: no Clear",
+   "gwt": {
+    "given": "A worker has pen A02 open with 4 of 12 piglets tagged.",
+    "when": "They open Give IDs.",
+    "then": "Give IDs opens as before, with the next tag suggested and no Clear."
+   },
+   "path": [
+    "drafts",
+    "drafts.give-a02",
+    "pp-dg0-give-opens-without-clear"
+   ],
+   "authority": [
+    {
+     "src": "STR",
+     "at": "ux/laws/strings.json · verbs.Clear",
+     "says": "empty what was entered or ticked …; present only while there is something to empty"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dg0-give-opens-without-clear/en-360/00-start.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dg0-give-opens-without-clear/en-390/00-start.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dg0-give-opens-without-clear/zh-360/00-start.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dg0-give-opens-without-clear/zh-390/00-start.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "pp-dg1-give-entry-shows-clear",
+   "tree": "X-5",
+   "branch": "drafts",
+   "label": "an entry shows Clear in the footer",
+   "gwt": {
+    "given": "Give IDs is open and untouched.",
+    "when": "They pick Gilt.",
+    "then": "Clear appears in the footer, left of the commit."
+   },
+   "path": [
+    "drafts",
+    "drafts.give-a02",
+    "give.enter",
+    "pp-dg1-give-entry-shows-clear"
+   ],
+   "authority": [
+    {
+     "src": "STR",
+     "at": "ux/laws/strings.json · verbs.Clear",
+     "says": "empty what was entered or ticked …; present only while there is something to empty"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dg1-give-entry-shows-clear/en-360/00-start.png",
+      "review/scenarios/piglet-processing/pp-dg1-give-entry-shows-clear/en-360/01-data-action-give-sex-data-value-.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dg1-give-entry-shows-clear/en-390/00-start.png",
+      "review/scenarios/piglet-processing/pp-dg1-give-entry-shows-clear/en-390/01-data-action-give-sex-data-value-.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dg1-give-entry-shows-clear/zh-360/00-start.png",
+      "review/scenarios/piglet-processing/pp-dg1-give-entry-shows-clear/zh-360/01-data-action-give-sex-data-value-.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dg1-give-entry-shows-clear/zh-390/00-start.png",
+      "review/scenarios/piglet-processing/pp-dg1-give-entry-shows-clear/zh-390/01-data-action-give-sex-data-value-.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "pp-dg2-give-back-saves-nothing",
+   "tree": "X-5",
+   "branch": "drafts",
+   "label": "Back returns to the Piglets list; nothing is recorded",
+   "gwt": {
+    "given": "Give IDs holds Gilt for the next piglet, not recorded.",
+    "when": "They tap Back.",
+    "then": "The Piglets list shows again, still 4 tagged; nothing is recorded."
+   },
+   "path": [
+    "drafts",
+    "drafts.give-a02",
+    "give.enter",
+    "give.enter.back",
+    "pp-dg2-give-back-saves-nothing"
+   ],
+   "authority": [
+    {
+     "src": "owner",
+     "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+     "says": "Back … leaves and returns to where you came from, keeping the draft."
+    },
+    {
+     "src": "RUL",
+     "at": "ux/research/farrowing/RULINGS.md · The exit grammar",
+     "says": "The drawer and Edit are staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save` commits"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dg2-give-back-saves-nothing/en-360/00-start.png",
+      "review/scenarios/piglet-processing/pp-dg2-give-back-saves-nothing/en-360/01-data-action-give-sex-data-value-.png",
+      "review/scenarios/piglet-processing/pp-dg2-give-back-saves-nothing/en-360/02-data-action-back.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dg2-give-back-saves-nothing/en-390/00-start.png",
+      "review/scenarios/piglet-processing/pp-dg2-give-back-saves-nothing/en-390/01-data-action-give-sex-data-value-.png",
+      "review/scenarios/piglet-processing/pp-dg2-give-back-saves-nothing/en-390/02-data-action-back.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dg2-give-back-saves-nothing/zh-360/00-start.png",
+      "review/scenarios/piglet-processing/pp-dg2-give-back-saves-nothing/zh-360/01-data-action-give-sex-data-value-.png",
+      "review/scenarios/piglet-processing/pp-dg2-give-back-saves-nothing/zh-360/02-data-action-back.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dg2-give-back-saves-nothing/zh-390/00-start.png",
+      "review/scenarios/piglet-processing/pp-dg2-give-back-saves-nothing/zh-390/01-data-action-give-sex-data-value-.png",
+      "review/scenarios/piglet-processing/pp-dg2-give-back-saves-nothing/zh-390/02-data-action-back.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "pp-dg3-give-reopen-shows-draft",
+   "tree": "X-5",
+   "branch": "drafts",
+   "label": "reopening Give IDs shows Gilt still picked, with Clear",
+   "gwt": {
+    "given": "They left Give IDs with Back after picking Gilt.",
+    "when": "They open Give IDs again.",
+    "then": "Gilt is still picked and Clear is in the footer."
+   },
+   "path": [
+    "drafts",
+    "drafts.give-a02",
+    "give.enter",
+    "give.enter.back",
+    "give.enter.back.reopen",
+    "pp-dg3-give-reopen-shows-draft"
+   ],
+   "authority": [
+    {
+     "src": "owner",
+     "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+     "says": "Back … leaves and returns to where you came from, keeping the draft."
+    },
+    {
+     "src": "RUL",
+     "at": "ux/research/farrowing/RULINGS.md · The exit grammar",
+     "says": "The drawer and Edit are staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save` commits"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dg3-give-reopen-shows-draft/en-360/00-start.png",
+      "review/scenarios/piglet-processing/pp-dg3-give-reopen-shows-draft/en-360/01-data-action-give-sex-data-value-.png",
+      "review/scenarios/piglet-processing/pp-dg3-give-reopen-shows-draft/en-360/02-data-action-back.png",
+      "review/scenarios/piglet-processing/pp-dg3-give-reopen-shows-draft/en-360/03-data-action-give-new.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dg3-give-reopen-shows-draft/en-390/00-start.png",
+      "review/scenarios/piglet-processing/pp-dg3-give-reopen-shows-draft/en-390/01-data-action-give-sex-data-value-.png",
+      "review/scenarios/piglet-processing/pp-dg3-give-reopen-shows-draft/en-390/02-data-action-back.png",
+      "review/scenarios/piglet-processing/pp-dg3-give-reopen-shows-draft/en-390/03-data-action-give-new.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dg3-give-reopen-shows-draft/zh-360/00-start.png",
+      "review/scenarios/piglet-processing/pp-dg3-give-reopen-shows-draft/zh-360/01-data-action-give-sex-data-value-.png",
+      "review/scenarios/piglet-processing/pp-dg3-give-reopen-shows-draft/zh-360/02-data-action-back.png",
+      "review/scenarios/piglet-processing/pp-dg3-give-reopen-shows-draft/zh-360/03-data-action-give-new.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dg3-give-reopen-shows-draft/zh-390/00-start.png",
+      "review/scenarios/piglet-processing/pp-dg3-give-reopen-shows-draft/zh-390/01-data-action-give-sex-data-value-.png",
+      "review/scenarios/piglet-processing/pp-dg3-give-reopen-shows-draft/zh-390/02-data-action-back.png",
+      "review/scenarios/piglet-processing/pp-dg3-give-reopen-shows-draft/zh-390/03-data-action-give-new.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "pp-dg4-give-clear-empties",
+   "tree": "X-5",
+   "branch": "drafts",
+   "label": "Clear empties Give IDs and goes; nothing recorded",
+   "gwt": {
+    "given": "Give IDs was reopened with Gilt still picked.",
+    "when": "They tap Clear.",
+    "then": "No sex is picked, Clear disappears and nothing is recorded."
+   },
+   "path": [
+    "drafts",
+    "drafts.give-a02",
+    "give.enter",
+    "give.enter.back",
+    "give.enter.back.reopen",
+    "give.enter.back.reopen.clear",
+    "pp-dg4-give-clear-empties"
+   ],
+   "authority": [
+    {
+     "src": "RUL",
+     "at": "ux/research/farrowing/RULINGS.md · The exit grammar",
+     "says": "The drawer and Edit are staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save` commits"
+    },
+    {
+     "src": "STR",
+     "at": "ux/laws/strings.json · verbs.Clear",
+     "says": "empty what was entered or ticked …; present only while there is something to empty"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dg4-give-clear-empties/en-360/00-start.png",
+      "review/scenarios/piglet-processing/pp-dg4-give-clear-empties/en-360/01-data-action-give-sex-data-value-.png",
+      "review/scenarios/piglet-processing/pp-dg4-give-clear-empties/en-360/02-data-action-back.png",
+      "review/scenarios/piglet-processing/pp-dg4-give-clear-empties/en-360/03-data-action-give-new.png",
+      "review/scenarios/piglet-processing/pp-dg4-give-clear-empties/en-360/04-data-action-draft-clear.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dg4-give-clear-empties/en-390/00-start.png",
+      "review/scenarios/piglet-processing/pp-dg4-give-clear-empties/en-390/01-data-action-give-sex-data-value-.png",
+      "review/scenarios/piglet-processing/pp-dg4-give-clear-empties/en-390/02-data-action-back.png",
+      "review/scenarios/piglet-processing/pp-dg4-give-clear-empties/en-390/03-data-action-give-new.png",
+      "review/scenarios/piglet-processing/pp-dg4-give-clear-empties/en-390/04-data-action-draft-clear.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dg4-give-clear-empties/zh-360/00-start.png",
+      "review/scenarios/piglet-processing/pp-dg4-give-clear-empties/zh-360/01-data-action-give-sex-data-value-.png",
+      "review/scenarios/piglet-processing/pp-dg4-give-clear-empties/zh-360/02-data-action-back.png",
+      "review/scenarios/piglet-processing/pp-dg4-give-clear-empties/zh-360/03-data-action-give-new.png",
+      "review/scenarios/piglet-processing/pp-dg4-give-clear-empties/zh-360/04-data-action-draft-clear.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dg4-give-clear-empties/zh-390/00-start.png",
+      "review/scenarios/piglet-processing/pp-dg4-give-clear-empties/zh-390/01-data-action-give-sex-data-value-.png",
+      "review/scenarios/piglet-processing/pp-dg4-give-clear-empties/zh-390/02-data-action-back.png",
+      "review/scenarios/piglet-processing/pp-dg4-give-clear-empties/zh-390/03-data-action-give-new.png",
+      "review/scenarios/piglet-processing/pp-dg4-give-clear-empties/zh-390/04-data-action-draft-clear.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "pp-dg6-give-phone-back-keeps-draft",
+   "tree": "X-5",
+   "branch": "drafts",
+   "label": "the phone's Back keeps the draft like the header Back",
+   "gwt": {
+    "given": "Give IDs holds Gilt for the next piglet, not recorded.",
+    "when": "They press the phone's own Back and open Give IDs again.",
+    "then": "Gilt is still picked and nothing is recorded."
+   },
+   "path": [
+    "drafts",
+    "drafts.give-a02",
+    "give.enter",
+    "give.enter.sysback",
+    "pp-dg6-give-phone-back-keeps-draft"
+   ],
+   "authority": [
+    {
+     "src": "owner",
+     "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+     "says": "Back … leaves and returns to where you came from, keeping the draft."
+    },
+    {
+     "src": "RUL",
+     "at": "ux/research/farrowing/RULINGS.md · The exit grammar",
+     "says": "The drawer and Edit are staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save` commits"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dg6-give-phone-back-keeps-draft/en-360/00-start.png",
+      "review/scenarios/piglet-processing/pp-dg6-give-phone-back-keeps-draft/en-360/01-data-action-give-sex-data-value-.png",
+      "review/scenarios/piglet-processing/pp-dg6-give-phone-back-keeps-draft/en-360/02-back.png",
+      "review/scenarios/piglet-processing/pp-dg6-give-phone-back-keeps-draft/en-360/03-data-action-give-new.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dg6-give-phone-back-keeps-draft/en-390/00-start.png",
+      "review/scenarios/piglet-processing/pp-dg6-give-phone-back-keeps-draft/en-390/01-data-action-give-sex-data-value-.png",
+      "review/scenarios/piglet-processing/pp-dg6-give-phone-back-keeps-draft/en-390/02-back.png",
+      "review/scenarios/piglet-processing/pp-dg6-give-phone-back-keeps-draft/en-390/03-data-action-give-new.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dg6-give-phone-back-keeps-draft/zh-360/00-start.png",
+      "review/scenarios/piglet-processing/pp-dg6-give-phone-back-keeps-draft/zh-360/01-data-action-give-sex-data-value-.png",
+      "review/scenarios/piglet-processing/pp-dg6-give-phone-back-keeps-draft/zh-360/02-back.png",
+      "review/scenarios/piglet-processing/pp-dg6-give-phone-back-keeps-draft/zh-360/03-data-action-give-new.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/piglet-processing/pp-dg6-give-phone-back-keeps-draft/zh-390/00-start.png",
+      "review/scenarios/piglet-processing/pp-dg6-give-phone-back-keeps-draft/zh-390/01-data-action-give-sex-data-value-.png",
+      "review/scenarios/piglet-processing/pp-dg6-give-phone-back-keeps-draft/zh-390/02-back.png",
+      "review/scenarios/piglet-processing/pp-dg6-give-phone-back-keeps-draft/zh-390/03-data-action-give-new.png"
+     ]
+    }
+   ]
+  }
+ ]
+}

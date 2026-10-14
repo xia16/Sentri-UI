@@ -73,3 +73,8 @@ The law and its boards fix the design (two headers, the line's three tests); the
 - Not changed, filed for the owner: the pen sheet's ticked items (its atlas note says "Back drops unsaved ticks", the drawer convention says ticks wait as a draft).
 - **Better because** a worker who steps back mid-entry (to check the pen, or after a call) finds the deaths, the tag and the sex they entered, as Farrowing's Record dead already does.
 
+#### Final look (the pushed head of behaviour/back-keeps-draft, the commit that adds this block; code as of 89f58f3, main merged at 3854322)
+- First frames: Record death, Give IDs, Litter weight, the pen list and the scope's other screens rendered at 390 and 360, EN and ZH, beside origin/main: byte-identical.
+- The reopened drawers (scenario evidence in `review/scenarios/piglet-processing/`): Record death reads Back · Clear · Record 2 deaths with Crushed at 2; Give IDs keeps Gilt picked; after Clear the commit waits again.
+- Scenarios: 27 of 27 pass in EN and ZH at 360 and 390 (89f58f3); on origin/main 20 of 27 fail (the leaves that pass there are "opens without Clear" and "Back records nothing").
+- **Better because** a worker who steps back mid-entry finds the deaths, the tag and the sex they entered, and only Clear or Save ends it.
