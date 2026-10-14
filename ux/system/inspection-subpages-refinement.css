@@ -9,7 +9,6 @@
 
 /* Action menus and review rows are quiet navigation surfaces, not clinical cards. */
 .inspection-phone .actions-sheet .sheet-body,
-.inspection-phone .review-sheet .sheet-body{padding-top:0;}
 .inspection-phone .actions-subjects{background:var(--surface);border-bottom:1px solid var(--line);}
 .inspection-phone .action-group-label{margin-top:18px;color:var(--muted);}
 .inspection-phone .review-list li:not(.st-row){min-height:56px;padding:8px 0;border-bottom:1px solid #e8eddf;}
@@ -68,7 +67,6 @@
 .inspection-phone .bulk-condition-button{border-radius:12px;background:#fff;}
 
 /* Pickers and narrow dialogs are stable next steps in the same task flow. */
-.inspection-phone .picker-step>.sheet-body{padding-top:12px;}
 .inspection-phone .picker-step .health-catalog,
 .inspection-phone .picker-step .medicine-results{border-top:1px solid #e8eddf;}
 .inspection-phone .medicine-option{min-height:64px;border-bottom:1px solid #e8eddf;}
@@ -148,7 +146,7 @@
 /* One chooser language: grouped navigation, distinct selection, quiet category headers. */
 .inspection-phone .chooser-background .bulk-dock{visibility:hidden;pointer-events:none}
 .inspection-phone .chooser-background .scrim{display:none}
-.inspection-phone .picker-step .sheet-body{gap:12px;padding:16px 18px}
+.inspection-phone .picker-step .sheet-body{gap:12px;padding-right:18px;padding-bottom:16px;padding-left:18px}
 .inspection-phone .picker-step .catalog-search{margin:0}
 .inspection-phone .picker-step .catalog-search input{min-height:48px;font-size:var(--type-row-title-size);font-weight:400}
 .inspection-phone .picker-step :is(.health-catalog,.medicine-results,.st-picker-options){scrollbar-width:none;overscroll-behavior:contain}
@@ -175,7 +173,7 @@
 
 /* Short, immediate choices: the sheet itself is the only container. */
 .inspection-phone .sheet.option-picker-step[data-st-context="drawer"]{height:auto;max-height:calc(100% - 32px)}
-.inspection-phone .sheet.option-picker-step>.sheet-body{flex:0 1 auto;padding:8px 18px 24px;gap:0;overflow-y:auto}
+.inspection-phone .sheet.option-picker-step>.sheet-body{flex:0 1 auto;padding-right:18px;padding-bottom:24px;padding-left:18px;gap:0;overflow-y:auto}
 .inspection-phone .option-picker-step .st-picker-options{border:0;border-radius:0;background:transparent;overflow:visible}
 .inspection-phone .option-picker-step .st-picker-option{min-height:52px;padding:12px 4px;border:0;border-radius:0;background:transparent}
 .inspection-phone .option-picker-step .st-picker-option[aria-selected="true"]{background:transparent;color:#486141}

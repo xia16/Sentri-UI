@@ -80,7 +80,8 @@ test('single health uses a direct form while bulk keeps the list', () => {
   model.openBulkAction(single, 'health', ['000267']);
   const singleHtml = model.overlay(single);
   assert.match(singleHtml, /sheet single-action-sheet/);
-  assert.match(singleHtml, /000267/);
+  // an action launched from the pig's page: no header line (Headers law, 2026-10-13); the pig is one Back away
+  assert.doesNotMatch(singleHtml.match(/<header[^]*?<\/header>/)[0], /000267|st-header-line/);
   assert.match(singleHtml, /data-action="bulk-pick-health"/);
   assert.doesNotMatch(singleHtml, /bulk-pigs|bulk-pig-row|bulk-toggle-controls|1 selected/);
 

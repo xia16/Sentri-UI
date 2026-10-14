@@ -2,8 +2,6 @@
 :root{--ground:#f3f4ee;--ink:#20291f;--muted:#657060;--line:#dfe4d8;--well:#eef1e7;--green:#276640;--amber:#896017;--red:#a13a2d}
 .inspection-phone{background:#f6f7f1;border-color:#c7d0bd}
 .inspection-phone .statusbar{background:#f6f7f1}
-.inspection-phone .task-header{padding:4px 18px 10px;gap:12px}
-.inspection-phone .inspection-page-title small{font-size:var(--type-meta-size);margin-top:5px}
 .inspection-phone .task-activity{padding:0 18px 6px;min-height:42px}
 .inspection-phone .task-activity strong{font-weight:500}
 .inspection-phone .task-history{color:var(--muted);min-height:var(--tap-min);padding-right:2px}
@@ -19,8 +17,6 @@
 .inspection-phone .inspect-dock{border-color:var(--line);background:#fff}
 
 @media(max-width:370px){
- .inspection-phone .task-header{padding-left:12px;padding-right:12px;gap:8px}
- .inspection-phone .task-header h2{font-size:20px}
  .inspection-phone .inspect-controls,.inspection-phone .inspect-list{padding-left:12px;padding-right:12px}
  .inspection-phone .task-activity{padding-left:12px;padding-right:12px}
 }

@@ -10,8 +10,8 @@
 <script type="module" src="ledger.js"></script>
 <script type="module" src="fixtures.js"></script>
 <style>
-/* Layout only, tokens from tokens.css. The page is the task skeleton (ADR 0003): TaskPhone, TaskSheet (grab, title,
-   subtitle, ✕ or Clear, divider, body, footer with Back + Save), TaskGroup/TaskRow for crates, TaskDialog for one
+/* Layout only, tokens from tokens.css. The page is the task skeleton (ADR 0003): TaskPhone, TaskSheet (grab, the sheet
+   header, body, footer with Back, Clear and Save), TaskGroup/TaskRow for crates, TaskDialog for one
    question. The body is cards: Segment, Stepper, ChoiceList, Row, TaskRadios, TaskPhotos, TaskWarning. */
 /* The room behind the drawer: the page the worker returns to, drawn by its own page (inert, never focusable). */
 .dd-over { display: contents; }
@@ -326,30 +326,32 @@
     return out.join('');
   }
   function footer(back) {
-    var w = why(), gray = !!w, st = status();
+    var w = why(), gray = !!w, st = status(), dirty = S.mode === 'sow' ? sowDirty() : pigDirty();
+    // Clear is quiet text in the footer, left of Save, present only when there is something to clear (Headers law, 2026-10-13)
+    var quiet = dirty ? { label: s('act.clear'), action: 'clear' } : null;
     if (S.mode === 'sow') {
       // the hold's progress line is the same status slot (empty until a cue or a reason)
-      return K.footer({ back: { action: 'back' }, status: st, hold: { label: s('act.save'), caption: s('pp.dead.hold'), action: 'hold-save', tone: 'primary', waiting: gray, describedby: gray ? 'dd-why' : '' } });
+      return K.footer({ back: { action: 'back' }, quiet: quiet, status: st, hold: { label: s('act.save'), caption: s('pp.dead.hold'), action: 'hold-save', tone: 'primary', waiting: gray, describedby: gray ? 'dd-why' : '' } });
     }
-    return K.footer({ back: { action: back || 'back' }, status: st, primary: { label: s('act.save'), action: 'save', waiting: gray } });
+    return K.footer({ back: { action: back || 'back' }, quiet: quiet, status: st, primary: { label: s('act.save'), action: 'save', waiting: gray } });
   }
   function head() {
-    var sow = S.mode === 'sow', n = pigN(), dirty = sow ? sowDirty() : pigDirty();
-    // this entry leads; the litter's running total is said apart (`1 dead so far`), never prefilled into the steppers
+    var sow = S.mode === 'sow', n = pigN();
+    // this entry leads; the litter's running total is said apart (`1 dead so far`), never prefilled into the steppers. It is status, so
+    // it is the first line of the body; the header is the title alone (an action launched from the litter: no line).
     var sub = sow ? [s('ds.dead.sub.sow')] : [s(locked() ? 'pp.dead.sub.locked' : 'pp.dead.sub.open', { pen: tgt(), alive: alive(), d: Lx().dead.total })];
     if (n && !sow) sub.push({ sep: true }, { text: PP.t('pp.dead.unsaved', { n: n }), str: 'pp.dead.unsaved', args: { n: n }, tone: 'green' });
     if (S.trim) sub.push({ sep: true }, s(S.trim.id, S.trim.args));
-    // farrowing's head: `Dead 2` (this entry's count; `Dead` at 0) or `Sow died`, and Clear, greyed while there is nothing to clear
-    var title = sow ? s('ds.dead.title.sow') : n ? s('ds.dead.title.total', { n: n }) : s('pp.dead.title');
-    var clear = UI.button({ label: PP.t('act.clear'), register: 'text', action: 'clear', waiting: !dirty, strs: { label: 'act.clear' } });
-    return { title: title, subtitle: sub, aside: clear };
+    // farrowing's head: the job, never a count (`Record dead`, or `Sow died`)
+    var title = sow ? s('ds.dead.title.sow') : s('pp.dead.title');
+    return { title: title, note: U.note(sub) };
   }
   function drawer() {
     var h = head();
     var segs = modes().length > 1 ? UI.segment({ options: [['piglets', 'Piglets', { strs: { label: 'label.piglets' } }], ['sow', 'The sow', { strs: { label: 'ds.dead.seg.sow' } }]],
       active: S.mode, action: 'mode', ariaLabel: PP.lang === 'zh' ? '记录死亡对象' : 'Record death for' }) : '';
-    return K.drawer({ size: 'long', view: 'dead', title: h.title, subtitle: h.subtitle, aside: h.aside, close: { action: 'dismiss' },
-      body: '<div class="dd-body" data-phase="' + (locked() ? 'locked' : 'open') + '" data-surface="' + surface + '">' + segs + (S.mode === 'sow' ? sowMode() : piglets()) + '</div>',
+    return K.drawer({ size: 'long', view: 'dead', title: h.title, close: { action: 'dismiss' },
+      body: '<div class="dd-body" data-phase="' + (locked() ? 'locked' : 'open') + '" data-surface="' + surface + '">' + h.note + segs + (S.mode === 'sow' ? sowMode() : piglets()) + '</div>',
       footer: footer(), scrim: { action: 'dismiss' } });
   }
 
@@ -384,8 +386,8 @@
     });
     var n = pigN(), sub = [s('pp.dead.tagged.sub', { pen: tgt(), n: rs.length })];
     if (n) sub.push({ sep: true }, { text: PP.t('pp.dead.unsaved', { n: n }), str: 'pp.dead.unsaved', args: { n: n }, tone: 'green' });
-    return K.drawer({ size: 'long', view: 'tagged', title: s('pp.dead.tagged.title'), subtitle: sub, close: { action: 'sub-dismiss' },
-      body: '<div class="dd-body">' + out + '</div>', footer: footer('sub-back'),
+    return K.drawer({ size: 'long', view: 'tagged', title: s('pp.dead.tagged.title'), close: { action: 'sub-dismiss' },
+      body: '<div class="dd-body">' + U.note(sub) + out + '</div>', footer: footer('sub-back'),
       scrim: { action: 'sub-dismiss' } });
   }
   // Several neighbours with a piglet missing: the list (the same crate rows as the room).
@@ -393,8 +395,8 @@
     var rs = neighbours().map(function (x) {
       return K.row({ id: s('pp.count.sg.side', { code: x.id }), headline: s(pl('pp.dead.found.missing', x.m), { np: np(x.m) }), meta: s('pp.dead.found.row_desc', { stamp: U.stamp(x.loss.at, x.loss.who, store.today) }), action: 'route', value: x.id });
     });
-    return K.drawer({ size: 'medium', view: 'nb', title: s('pp.dead.nb.title'), subtitle: [s('pp.dead.nb.sub', { code: crate })], close: { action: 'sub-dismiss' },
-      body: K.group({ face: 'word', title: s('pp.dead.nb.group', { u: Hx().room }), meta: s(pl('pp.dead.nb.crates', rs.length), { n: rs.length }), rows: rs }), footer: K.footer({ back: { action: 'sub-back' } }), scrim: { action: 'sub-dismiss' } });
+    return K.drawer({ size: 'medium', view: 'nb', title: s('pp.dead.nb.title'), close: { action: 'sub-dismiss' },
+      body: U.note([s('pp.dead.nb.sub', { code: crate })]) + K.group({ face: 'word', title: s('pp.dead.nb.group', { u: Hx().room }), meta: s(pl('pp.dead.nb.crates', rs.length), { n: rs.length }), rows: rs }), footer: K.footer({ back: { action: 'sub-back' } }), scrim: { action: 'sub-dismiss' } });
   }
   // The held body: one question over the drawer (farrowing's dialog anatomy), two answers.
   function heldDialog() {
@@ -417,15 +419,15 @@
     var body = lines.length ? K.group({ face: 'word', title: s('pp.dead.nb.group', { u: S.unit }), meta: s(pl('pp.dead.nb.crates', lines.length), { n: lines.length }), rows: lines.map(function (l) {
       return K.row({ id: s('pp.count.sg.side', { code: l.litter }), headline: s(pl('pp.dead.found.missing', l.open), { np: np(l.open) }), meta: s('pp.dead.found.row_desc', { stamp: U.stamp(l.at, l.who, store.today) }), action: 'found-pick', value: l.litter });
     }) }) : UI.heading({ title: '', kind: 'panel', level: 4, strs: { title: 'pp.dead.found.empty' }, args: { title: { u: S.unit } } });
-    return K.drawer({ size: 'medium', view: 'found', title: s('pp.dead.found.title'), subtitle: [s('pp.dead.found.sub', { u: S.unit })], close: { action: 'dismiss' },
-      body: body, footer: K.footer({ back: { action: 'back' } }), scrim: { action: 'dismiss' } });
+    return K.drawer({ size: 'medium', view: 'found', title: s('pp.dead.found.title'), close: { action: 'dismiss' },
+      body: U.note([s('pp.dead.found.sub', { u: S.unit })]) + body, footer: K.footer({ back: { action: 'back' } }), scrim: { action: 'dismiss' } });
   }
   // The photo viewer: one photo; Delete only while drafting (always, here: nothing saved is shown on this page).
   function viewer() {
     var v = S.viewer, list = S[v.key].photos, i = list.map(function (p) { return p.id; }).indexOf(v.id);
     var ph = '<div class="dd-photo" role="img" data-str-attr="aria-label:ds.c2.aria.thumb" data-args=\'{"n":' + (i + 1) + '}\' aria-label="' + U.esc(PP.t('ds.c2.aria.thumb', { n: i + 1 })) + '">' + span('ds.c2.photos.index', { n: i + 1 }) + '</div>';
-    return K.drawer({ size: 'long', view: 'photo', title: s('pp.dead.photo.title', { n: i + 1, m: list.length }), subtitle: [s('pp.dead.photo.sub')], close: { action: 'viewer-dismiss' },
-      body: ph, footer: K.footer({ back: { action: 'viewer-back' }, primary: { label: s('pp.dead.photo.delete'), action: 'photo-delete', register: 'danger' } }), scrim: { action: 'viewer-dismiss' }, layer: 1 });
+    return K.drawer({ size: 'long', view: 'photo', title: s('pp.dead.photo.title', { n: i + 1, m: list.length }), close: { action: 'viewer-dismiss' },
+      body: U.note([s('pp.dead.photo.sub')]) + ph, footer: K.footer({ back: { action: 'viewer-back' }, primary: { label: s('pp.dead.photo.delete'), action: 'photo-delete', register: 'danger' } }), scrim: { action: 'viewer-dismiss' }, layer: 1 });
   }
   // Re-render keeps the body's scroll and the focused control (a requirement of the shared component).
   function render() {
