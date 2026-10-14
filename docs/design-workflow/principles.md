@@ -43,7 +43,7 @@ Each principle has the same four parts and nothing else: **the principle**, **wh
 
 **Show it.** `features/<id>/budget.md` with `## Inventory`, `## Questions` and `## Levels`, then the cut list, and the squint test's first three things in the PR body.
 
-**Checked by.** The gate refuses a screen change without `budget.md`; `scripts/check-headers.mjs` on the changed screens (the Headers law: 24px to the body, nothing acting but Back and the subject chip, no count in a header, one line at 360 in EN and ZH); the judge's squint test and cold question (gate.md §3–4). To automate (ledger): every fact the changed screens render traced to the budget, the header line and its identity facts among them (L18).
+**Checked by.** The gate refuses a screen change without `budget.md`; `scripts/check-headers.mjs` on the changed screens (the Headers law: 24px to the body; nothing acting but Back, the subject chip and a sheet's corner actions, each centred on the title and its line; no count in a header; the title and its line each on one line at 360 in EN and ZH, the title 12px clear of the corners); the judge's squint test and cold question (gate.md §3–4). To automate (ledger): every fact the changed screens render traced to the budget, the header line and its identity facts among them (L18).
 
 ## P4 · Judge it by eye, as the owner would
 

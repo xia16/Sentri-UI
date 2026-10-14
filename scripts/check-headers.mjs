@@ -1,18 +1,25 @@
-// The header check: the Headers law (ux/design-system/README.md, "Headers") made measurable. Three defects:
+// The header check: the Headers law (ux/design-system/README.md, "Headers") made measurable. Five defects:
 //   gap       the header-to-body gap is not space-section (24px ±2): a drawer from its hairline, a page from its last line
 //             (the bottom of its title block or Back, whichever is lower) to the first body content (text, a control, a box)
-//   contents  a header holds a control other than Back (‹ Parent in a drawer with levels) and the subject chip, or a
-//             number-with-unit count ("2 sows", "3 unsaved", "7 / 18", "11 头") in its title or header line
+//   contents  a header holds a control other than Back (‹ Parent in a drawer with levels), the subject chip and a sheet
+//             header's corner actions (Clear or Reset at the top right, a ✕ at the top left), an aside, or a number-with-unit
+//             count ("2 sows", "3 unsaved", "7 / 18", "11 头") in its title or header line
+//   corner    a corner action whose vertical centre is more than 2px off the centre of the header's text block (the title's
+//             top to its header line's bottom; the title alone only when there is no line), or that is not a 48px target
+//   room      a header title that does not fit on one line with 12px clear of each corner target at 360, in English or
+//             Chinese; a missing corner is measured as the room it would take (gutter + 48px); a page's left corner is Back.
+//             Computed from the title's unwrapped width against 360, so a screen the atlas pins to 390 is judged at 360 too
 //   wrap      the header line takes more than one line, or runs past its header, at 360 in English or Chinese
 // Headers are the two the law allows (.st-page-header, a sheet's header.utility-header) and any other header that sits on top
 // of a sheet (the old .sheet-head): a header behind an open drawer (inert) is not judged on that screen.
-// Renders every atlas screen bare at 390 (EN: gap, contents) and 360 (EN and ZH: contents, wrap). Writes review/headers.json.
+// Renders every atlas screen bare at 390 (EN: gap, contents, corner) and 360 (EN and ZH: contents, corner, room, wrap).
+// Writes review/headers.json.
 // Usage: node scripts/check-headers.mjs [--base <url>] [--feature <id>] [--screens id,id] [--changed <ids>] [--strict]
 //                                       [--out <file.json>] [--self-test]
 //   --changed    exit 1 only when one of these screens has a defect; --strict: exit 1 on any defect.
 //   --self-test  the known-bad fixtures in scripts/check-headers.fixtures/ must fail the check named in their
 //                <meta name="expect">, the known-good ones must pass.
-// Principle: P3 (information before layout); rules ledger L17. The gate runs it on changed screens, base against candidate.
+// Principle: P3 (information before layout); rules ledger L17; owner ruling C (2026-10-14) for corners and title room. The gate runs it on changed screens, base against candidate.
 import { spawn } from 'node:child_process';
 import { createServer } from 'node:net';
 import fs from 'node:fs';
@@ -26,7 +33,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const argv = process.argv.slice(2);
 const val = (n) => { const i = argv.indexOf(n); return i >= 0 && argv[i + 1] && !argv[i + 1].startsWith('--') ? argv[i + 1] : null; };
 const list = (n) => (val(n) || '').split(',').map((s) => s.trim()).filter(Boolean);
-export const TOL = { gap: 24, slack: 2 };
+export const TOL = { gap: 24, slack: 2, corner: 2, clear: 12, phone: 360 };
 
 /* ---------- runs inside every frame ---------- */
 function auditHeaders({ TOL, checks }) {
@@ -46,16 +53,53 @@ function auditHeaders({ TOL, checks }) {
   const where = (h) => (isPage(h) ? 'page header' : 'sheet header') + ` "${txt(titleOf(h)).slice(0, 40)}"`;
   // Back (top left of a page, a lead "Back to …" icon button) and ‹ Parent act; the subject chip acts; nothing else does.
   const allowed = (el) => el.matches('.st-page-back, .st-subject-chip, .sheet-up') || /(^|[-_\s])back($|[-_\s])/i.test(typeof el.className === 'string' ? el.className : '') || /^(back|返回)\b/i.test((el.getAttribute('aria-label') || txt(el)).trim());
+  // A corner action (sheet header only; owner ruling C, 2026-10-14): Clear or Reset as quiet text at the top right, a ✕ at the
+  // top left. Which corner is told by where the control sits in its header.
+  const cornerOf = (h, el) => {
+    if (isPage(h)) return null;
+    const hr = h.getBoundingClientRect(), r = el.getBoundingClientRect(), mid = (r.left + r.right) / 2, centre = (hr.left + hr.right) / 2;
+    const label = (el.getAttribute('aria-label') || txt(el)).trim();
+    if (/^(clear|reset|清除|重置)$/i.test(label) && mid > centre) return 'right';
+    if ((/^(close|dismiss|关闭)$/i.test(el.getAttribute('aria-label') || '') || /^[✕×]$/.test(txt(el))) && mid < centre) return 'left';
+    return null;
+  };
   // a count: a number followed by what it counts (or "of N", "/ N"); an ID (#000254, B4, P2), a time (08:41) or a weight is not
   const COUNT = /(^|[^\w#.:\/-])(\d+(?:[.,]\d+)?)\s*((?:sows?|gilts?|boars?|piglets?|pigs?|litters?|pens?|crates?|rooms?|units?|animals?|head|alive|dead|born|weaned|fostered|unsaved|saved|selected|left|done|due|overdue|checked|pending|missing|items?|records?|tasks?|issues?|alerts?|of\s+\d+)\b|\/\s*\d+|头|只|窝|栏|个|条|项|未保存|已选|待)/i;
 
   for (const h of headers) {
     const title = titleOf(h), lines = linesOf(h), note = { kind: isPage(h) ? 'page' : 'sheet', title: txt(title).slice(0, 40), lines: lines.length };
     seen.push(note);
+    const controls = [...h.querySelectorAll('button, a[href], [role="button"], [role="link"], input, select, textarea, [contenteditable="true"]')].filter((el) => vis(el) && !el.parentElement.closest('.st-page-back, .st-subject-chip, .sheet-up, button, a[href]'));
+    const corners = controls.map((el) => ({ el, side: cornerOf(h, el) })).filter((c) => c.side);
+    note.corners = corners.map((c) => c.side);
+    // ---- corner: each corner action a 48px target, vertically centred (±2px) on the text block: the title's top to the
+    //      header line's bottom, or the title alone when there is no line (never the title alone beside a line, never the box)
+    if (checks.includes('corner') && title) {
+      const tr = title.getBoundingClientRect(), bottom = lines.length ? lines[lines.length - 1].getBoundingClientRect().bottom : tr.bottom, block = (tr.top + bottom) / 2;
+      for (const c of corners) {
+        const r = c.el.getBoundingClientRect(), mid = (r.top + r.bottom) / 2, label = (c.el.getAttribute('aria-label') || txt(c.el)).slice(0, 20);
+        if (Math.abs(mid - block) > TOL.corner) out.push({ check: 'corner', at: Math.round(r.top), detail: `${where(h)}: "${label}" (${c.side}) is centred ${Math.round(Math.abs(mid - block) * 10) / 10}px ${mid > block ? 'below' : 'above'} the centre of the ${lines.length ? 'title and its line' : 'title'}: it should be within ${TOL.corner}px` });
+        const hit = (pe) => { const p = getComputedStyle(c.el, pe); return p.content !== 'none' && p.content !== 'normal' && p.position === 'absolute'; };
+        if (Math.min(r.width, r.height) < 47.5 && !hit('::before') && !hit('::after')) out.push({ check: 'corner', at: Math.round(r.top), detail: `${where(h)}: "${label}" is a ${Math.round(r.width)}×${Math.round(r.height)} target: a corner action is 48px` });
+      }
+    }
+    // ---- room: the title on one line with 12px clear of each corner target at 360, computed: its unwrapped width against 360
+    //      less, on each side, the corner target (or the room one takes, gutter + 48px, where there is none) and 12px. A sheet
+    //      title is centred, so its deeper side counts twice; a page title starts after Back, its left corner. Computed, so a
+    //      screen the atlas pins to 390 is judged at 360 all the same.
+    if (checks.includes('room') && title) {
+      const hr = h.getBoundingClientRect(), hc = cs(h), back = h.querySelector('.st-page-back');
+      const reach = (side) => { const c = corners.find((x) => x.side === side); if (c) { const r = c.el.getBoundingClientRect(); return side === 'left' ? r.right - hr.left : hr.right - r.left; } if (side === 'left' && isPage(h) && back) return back.getBoundingClientRect().right - hr.left; return parseFloat(side === 'left' ? hc.paddingLeft : hc.paddingRight) + 48; };
+      const probe = title.cloneNode(true); probe.removeAttribute('id');
+      Object.assign(probe.style, { position: 'absolute', visibility: 'hidden', whiteSpace: 'nowrap', width: 'auto', maxWidth: 'none', left: '0', top: '0' });
+      title.parentElement.appendChild(probe); const natural = probe.getBoundingClientRect().width; probe.remove();
+      const room = isPage(h) ? TOL.phone - reach('left') - reach('right') - 2 * TOL.clear : TOL.phone - 2 * Math.max(reach('left'), reach('right')) - 2 * TOL.clear;
+      if (natural > room + 0.5) out.push({ check: 'room', at: Math.round(title.getBoundingClientRect().top), detail: `${where(h)}: the title is ${Math.round(natural)}px on one line; at ${TOL.phone} there is ${Math.round(room)}px between the corner targets${corners.length ? '' : ' (where they would sit)'} with ${TOL.clear}px clear: shorten it` });
+    }
     // ---- contents ----
     if (checks.includes('contents')) {
-      const acts = [...h.querySelectorAll('button, a[href], [role="button"], [role="link"], input, select, textarea, [contenteditable="true"]')].filter((el) => vis(el) && !allowed(el) && !el.parentElement.closest('.st-page-back, .st-subject-chip, .sheet-up'));
-      for (const a of acts) out.push({ check: 'contents', at: Math.round(a.getBoundingClientRect().top), detail: `${where(h)} holds a control "${(a.getAttribute('aria-label') || txt(a)).slice(0, 30)}": nothing in a header acts but Back and the subject chip` });
+      const acts = controls.filter((el) => !allowed(el) && !cornerOf(h, el));
+      for (const a of acts) out.push({ check: 'contents', at: Math.round(a.getBoundingClientRect().top), detail: `${where(h)} holds a control "${(a.getAttribute('aria-label') || txt(a)).slice(0, 30)}": nothing in a header acts but Back, the subject chip and a sheet's corner actions (Clear or Reset top right, ✕ top left)` });
       if (h.querySelector('.sheet-aside')) out.push({ check: 'contents', at: Math.round(h.getBoundingClientRect().top), detail: `${where(h)} has an aside: nothing sits beside the title` });
       for (const el of [title, ...lines].filter(Boolean)) {
         const m = txt(el).match(COUNT);
@@ -143,7 +187,7 @@ async function ctx(width) {
   await c.addInitScript((w) => { const css = `html.atlas-bare,html.atlas-bare body{width:${w}px!important}html.atlas-bare .atlas-phone{width:${w}px!important}`; const add = () => { const s = document.createElement('style'); s.textContent = css; document.head.appendChild(s); }; if (document.head) add(); else document.addEventListener('DOMContentLoaded', add); }, width);
   return (contexts[width] = c);
 }
-const RUNS = [{ width: 390, lang: 'en', checks: ['gap', 'contents'] }, { width: 360, lang: 'en', checks: ['contents', 'wrap'] }, { width: 360, lang: 'zh', checks: ['contents', 'wrap'] }];
+const RUNS = [{ width: 390, lang: 'en', checks: ['gap', 'contents', 'corner'] }, { width: 360, lang: 'en', checks: ['contents', 'wrap', 'corner', 'room'] }, { width: 360, lang: 'zh', checks: ['contents', 'wrap', 'corner', 'room'] }];
 async function audit(href, run, ready) {
   const page = await (await ctx(run.width)).newPage();
   await page.clock.install({ time: new Date('2026-10-11T09:41:00') }); await page.clock.resume();
@@ -204,6 +248,6 @@ await browser.close(); if (server) server.kill();
 if (!only.length && !val('--feature')) { fs.mkdirSync(path.join(root, 'review'), { recursive: true }); fs.writeFileSync(path.join(root, 'review/headers.json'), JSON.stringify({ tolerances: TOL, screens: results }, null, 1)); }
 if (val('--out')) fs.writeFileSync(val('--out'), JSON.stringify(results));
 const bad = results.filter((r) => r.defects.length), all = bad.flatMap((r) => r.defects), errs = results.filter((r) => r.error);
-console.log(`headers: ${results.length} screens (${results.filter((r) => r.headers.length).length} with a header, ${results.reduce((n, r) => n + r.headers.length, 0)} headers), ${bad.length} with a defect (gap ${all.filter((d) => d.check === 'gap').length}, contents ${all.filter((d) => d.check === 'contents').length}, wrap ${all.filter((d) => d.check === 'wrap').length})${errs.length ? `, ${errs.length} failed to render` : ''}`);
+console.log(`headers: ${results.length} screens (${results.filter((r) => r.headers.length).length} with a header, ${results.reduce((n, r) => n + r.headers.length, 0)} headers), ${bad.length} with a defect (${['gap', 'contents', 'corner', 'room', 'wrap'].map((k) => `${k} ${all.filter((d) => d.check === k).length}`).join(', ')})${errs.length ? `, ${errs.length} failed to render` : ''}`);
 const failing = list('--changed').length ? results.filter((r) => list('--changed').includes(r.screen) && (r.defects.length || r.error)) : argv.includes('--strict') ? [...bad, ...errs] : [];
 process.exit(failing.length ? 1 : 0);
