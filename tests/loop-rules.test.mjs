@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { queueAhead, calibrationProblems, budgetProblems, critiqueProblems, pageStyling, addedLines, effectiveClass, classifyScreens, checkVerdict, checkGrades, worstFirst, isClean, loopStatus, touchesSystem, touchesTools, regressions,
-  pageOf, pageAssets, sharedFiles, outcomeLeaves, coverageLost, reachOf, reachLine, shotsToTake, timedOutOnly, lockState, carryDecision } from '../scripts/loop-rules.mjs';
+  pageOf, pageAssets, sharedFiles, outcomeLeaves, coverageLost, reachOf, reachLine, shotsToTake, timedOutOnly, lockState, carryDecision, ghNetworkError } from '../scripts/loop-rules.mjs';
 
 test('a change to the bundle or tokens is a shared-component change whatever was declared', () => {
   assert.deepEqual(touchesSystem(['ux/design-system/components/bundle.css', 'features/farrowing/feature.json']), ['ux/design-system/components/bundle.css']);
@@ -286,6 +286,13 @@ test('a scenario run retries only when every failure is a navigation timeout', (
   assert.ok(!timedOutOnly([{ what: 'run', got: 'page.goto: Timeout 30000ms exceeded.' }, { what: '"Done" shown', got: 'absent' }]), 'an assertion failure never retries');
   assert.ok(!timedOutOnly([{ what: 'run', got: 'page.waitForSelector: Timeout 8000ms exceeded.' }]), 'a page that never gets ready is the design');
   assert.ok(!timedOutOnly([{ what: 'tap Done', got: 'control not tappable: Done (locator.click: Timeout 2500ms exceeded.)' }]));
+});
+
+test('a GitHub call that failed on the network retries; an answer GitHub gave never does', () => {
+  for (const e of ['Post "https://api.github.com/graphql": EOF', 'gh api repos/x/y/pulls/166/files failed: unexpected EOF', 'net/http: TLS handshake timeout',
+    'dial tcp: lookup api.github.com: no such host', 'proxyconnect tcp: dial tcp 127.0.0.1:9: connectex: No connection could be made because the target machine actively refused it.', 'wsarecv: An existing connection was forcibly closed by the remote host (connection reset)',
+    'HTTP 502: Bad Gateway (https://api.github.com/...)', 'HTTP 503', 'context deadline exceeded (Client.Timeout exceeded while awaiting headers)']) assert.ok(ghNetworkError(e), e);
+  for (const e of ['HTTP 404: Not Found (https://api.github.com/repos/x/y/pulls/9)', 'HTTP 422: No commit found for SHA: abc', 'HTTP 401: Bad credentials', '', null]) assert.ok(!ghNetworkError(e), String(e));
 });
 
 test('a gate lock is free, held by a live gate, or stale when its process is gone', () => {

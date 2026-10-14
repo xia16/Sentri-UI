@@ -22,7 +22,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { CLASSES, screensOf, pageOf, pageAssets, sharedFiles, coverageLost, effectiveClass, classifyScreens, checkVerdict, touchesSystem, touchesTools, queueAhead as queueOf, budgetProblems, critiqueProblems, pageStyling, addedLines, calibrationProblems, lockState, shotsToTake, reachOf, reachLine, carryDecision } from './loop-rules.mjs';
+import { CLASSES, screensOf, pageOf, pageAssets, sharedFiles, coverageLost, effectiveClass, classifyScreens, checkVerdict, touchesSystem, touchesTools, queueAhead as queueOf, budgetProblems, critiqueProblems, pageStyling, addedLines, calibrationProblems, lockState, shotsToTake, reachOf, reachLine, carryDecision, ghNetworkError } from './loop-rules.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -35,6 +35,20 @@ const VERDICT_FILE = /^verdict(-[\w.-]+)?\.json$/;
 // The gate's own files live in the git common dir, so every worktree on this machine sees them: pass records, the lock, base shots.
 const gateDir = () => path.join(path.resolve(root, git(['rev-parse', '--git-common-dir']).out.trim()), 'sentri-gate');
 function passRecord(sha) { return path.join(gateDir(), `${sha}.json`); }
+// Every GitHub call the gate makes (the queue, PR files, statuses): a network error (EOF, TLS, a timeout, a 5xx) is tried twice more
+// after a short wait, and then reported as "GitHub could not be reached", never read as an answer. An answer is never retried.
+function gh(args) {
+  for (let n = 1; ; n++) {
+    const r = spawnSync('gh', args, { cwd: root, encoding: 'utf8', maxBuffer: 64 << 20, timeout: 60e3 });
+    if (r.status === 0) return { ok: true, out: r.stdout || '' };
+    const err = `${r.stderr || ''} ${r.error?.code || ''} ${r.error?.message || ''}`.trim();
+    const line = (err.split('\n').find((l) => l.trim()) || `exit ${r.status}`).trim();
+    if (!ghNetworkError(err)) return { ok: false, why: `GitHub answered: ${line}` };
+    if (n === 3) return { ok: false, why: `GitHub could not be reached (3 tries): ${line}` };
+    Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 3000 * n);
+  }
+}
+const postStatus = (sha, state, description) => gh(['api', '--method', 'POST', `repos/{owner}/{repo}/statuses/${sha}`, '-f', `state=${state}`, '-f', 'context=sentri/gate', '-f', `description=${description}`]);
 function git(args, cwd = root) { const r = spawnSync('git', args, { cwd, encoding: 'utf8', maxBuffer: 64 << 20 }); return { code: r.status, out: r.stdout || '', err: r.stderr || '' }; }
 
 // ---------- --verdict <out>: check the judge's verdict against the mechanical result ----------
@@ -72,8 +86,8 @@ if (opt('verdict')) {
   const passFile = passRecord(mech.candidate);
   // The same result as a commit status on GitHub: branch protection on main can require "sentri/gate", which makes GitHub itself
   // refuse an ungated merge however it is attempted (the local merge guard is only a convenience).
-  spawnSync('gh', ['api', '--method', 'POST', `repos/{owner}/{repo}/statuses/${mech.candidate}`, '-f', `state=${ok ? 'success' : 'failure'}`,
-    '-f', 'context=sentri/gate', '-f', `description=${ok ? 'GATE PASS' : 'GATE FAIL'} against ${short(mech.base)}`], { cwd: root, encoding: 'utf8' });
+  const posted = postStatus(mech.candidate, ok ? 'success' : 'failure', `${ok ? 'GATE PASS' : 'GATE FAIL'} against ${short(mech.base)}`);
+  if (!posted.ok) console.log(`  - the sentri/gate status was not posted (${posted.why}): run --verdict again; until then GitHub ${ok ? 'refuses the merge' : 'may still show an earlier status'}`);
   if (!ok) fs.rmSync(passFile, { force: true });
   if (ok) {
     fs.mkdirSync(path.dirname(passFile), { recursive: true });
@@ -133,12 +147,13 @@ if (opt('carry')) {
   });
   if (!d.ok) refuse(d.why);
   const desc = `GATE PASS carried from ${short(C)}: main ${short(M1)}..${short(main)} draws no pixel`;
-  spawnSync('gh', ['api', '--method', 'POST', `repos/{owner}/{repo}/statuses/${head}`, '-f', 'state=success', '-f', 'context=sentri/gate', '-f', `description=${desc}`], { cwd: root, encoding: 'utf8' });
+  const posted = postStatus(head, 'success', desc);
   fs.mkdirSync(path.dirname(passRecord(head)), { recursive: true });
   fs.writeFileSync(passRecord(head), JSON.stringify({ candidate: head, base: main, ref: mech.ref, out: path.resolve(dir), at: new Date().toISOString(), carried: { from: C, base: M1, verdict: 'GATE PASS', mainFiles } }, null, 2));
   console.log(`GATE PASS ${short(head)} (carried)`);
   console.log(`  - the gated pass: ${short(C)} against main ${short(M1)}`);
   for (const w of d.why) console.log('  -', w);
+  if (!posted.ok) console.log(`  - the sentri/gate status was not posted (${posted.why}): run --carry again; until then GitHub refuses the merge`);
   console.log(`merge: gh pr merge <n> --squash --match-head-commit ${head}`);
   process.exit(0);
 }
@@ -188,6 +203,22 @@ const waited = await (async () => {
     await new Promise((res) => setTimeout(res, 5000));
   }
   process.on('exit', releaseLock);
+  // The gate's own checks open browsers without waiting on it (scripts/playwright-path.mjs); every other browser run from this
+  // repo registered in sentri-gate/runs/ is waited for, and a new one waits for the gate.
+  process.env.SENTRI_GATE_PID = String(process.pid);
+  const runs = path.join(gateDir(), 'runs');
+  for (said = ''; ;) {
+    const live = [];
+    for (const f of (fs.existsSync(runs) ? fs.readdirSync(runs) : []).filter((x) => x.endsWith('.json'))) {
+      let r = null;
+      try { r = JSON.parse(fs.readFileSync(path.join(runs, f), 'utf8')); } catch {}
+      if (r && lockState(r, alive) === 'held' && r.pid !== process.pid) live.push(r); else fs.rmSync(path.join(runs, f), { force: true });
+    }
+    if (!live.length) break;
+    const line = `waiting for ${live.length} other browser run(s) from this repo: ${live.slice(0, 3).map((r) => `pid ${r.pid} ${r.what || ''}`.trim()).join('; ')} …`;
+    if (line !== said) { console.log(line); said = line; }
+    await new Promise((res) => setTimeout(res, 5000));
+  }
   return Math.round((Date.now() - t0) / 1000);
 })();
 const started = Date.now();
@@ -561,7 +592,7 @@ function queueAhead() {
 // read over REST: GraphQL (which gh pr list uses) is blocked in cloud sessions.
 function openPrs() {
   // Pages by number: --paginate follows Link headers with numeric-ID paths, which the cloud proxy refuses.
-  const page = (p, jq) => { const r = spawnSync('gh', ['api', p, '--jq', jq], { cwd: root, encoding: 'utf8', maxBuffer: 64 << 20 }); if (r.status) throw new Error(`gh api ${p} failed: ${(r.stderr || '').trim().split('\n')[0]}`); return r.stdout.trim().split('\n').filter(Boolean).map((l) => JSON.parse(l)); };
+  const page = (p, jq) => { const r = gh(['api', p, '--jq', jq]); if (!r.ok) throw new Error(`gh api ${p}: ${r.why}`); return r.out.trim().split('\n').filter(Boolean).map((l) => JSON.parse(l)); };
   const api = (p, jq) => { const all = []; for (let n = 1; n <= 30; n++) { const got = page(`${p}&page=${n}`, jq); all.push(...got); if (got.length < 100) break; } return all; };
   try {
     return api('repos/{owner}/{repo}/pulls?state=open&per_page=100', '.[] | {number, headRefName: .head.ref, headRefOid: .head.sha, createdAt: .created_at, isDraft: .draft}').map((p) => ({
