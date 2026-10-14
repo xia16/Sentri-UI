@@ -4,7 +4,7 @@
 
 A sheet is the one surface presented over a task: it holds a step the worker finishes and then leaves. Use **Banner** for a message that needs no answer, **Status** for a quiet line, and a screen of the task (not a sheet) for a destination the worker returns to often.
 
-`SentriUI.sheet({ variant, title, line, back, body, footer, … })` returns the markup; `SentriUI.sheetFooter({ back, quiet, primary, hold, status })` builds the footer; `SentriUI.pageHeader({ title, back, line })` is the page header alone (the task skeleton's TaskHeader draws it); `SentriUI.headerLine(line)`, `SentriUI.backButton()` and `SentriUI.scrim()` are the parts a host may place itself. Types are in `index.d.ts`.
+`SentriUI.sheet({ variant, title, line, corner, back, body, footer, … })` returns the markup; `corner: { label, action, value }` is the drawer header's Clear or Reset (top right) and `cross: { action, label }` its ✕ slot (top left, used by no drawer today); `SentriUI.sheetFooter({ back, primary, hold, status })` builds the footer; `SentriUI.pageHeader({ title, back, line })` is the page header alone (the task skeleton's TaskHeader draws it); `SentriUI.headerLine(line)`, `SentriUI.backButton()` and `SentriUI.scrim()` are the parts a host may place itself. Types are in `index.d.ts`.
 
 **Surface (drawers).** `surface: 'menu'` marks a drawer whose every row is an option or a verb (Choose a unit, More actions, Allocate piglets, Go to pen, Measurements & condition). It writes `data-st-context="menu"`: the sheet and header are the tint, the cards are white, the footer stays white. Any other drawer (search, forms, records, pen sheets, Today) is white with tinted cards. The test is whether each row is a thing with live state (content) or an option or verb (menu). Rule and examples: [SURFACES.md](../../SURFACES.md).
 
@@ -73,9 +73,9 @@ This is the owner's rule for every drawer and page (2026-10-10); [the design sys
 | Error | The field says what is wrong and how to fix it (`48 kg is over the scale limit · check the number`), next to the value; the primary waits. |
 | Loading | Not drawn. A hold that was sent shows its pending phase; the sheet stays. |
 | Empty | The body holds the empty line of what it contains (`No activity recorded yet`). A selection review is never empty: it closes instead. |
-| Long / Chinese | Titles wrap (`overflow-wrap: anywhere`); the header line never wraps or truncates (copy that does not fit belongs in the body); Back is 86px wide and the primary takes the rest. A primary label longer than about 20 characters (10 Chinese) should be shortened. |
+| Long / Chinese | A title is written to fit one line between the corner targets at 360 (about 20 English or 10 Chinese characters, 12px clear of each 48px target; a rewritten title is decided in the feature's `budget.md`); with corners it is held to that room, never truncated or shrunk. The header line never wraps or truncates (copy that does not fit belongs in the body); Back is 86px wide and the primary takes the rest. A primary label longer than about 20 characters (10 Chinese) should be shortened. |
 
-Every state is drawn in `variants/drawer.html` (with the route line, a fact line and Clear in the footer), `variants/page.html` and `variants/dialog.html`.
+Every state is drawn in `variants/drawer.html` (with the route line, a fact line, and Clear at the top right with and without a line), `variants/page.html` and `variants/dialog.html`.
 
 ## Behaviour
 
@@ -146,6 +146,8 @@ Used by Inspection: Record health, Edit conditions, Care instructions, Resolve c
 `paper` · `app-background` · `ink` · `muted` · `line` · `scrim` · `dialog-backdrop` · `handle` · `back-border` · `back-press` · `press` · `radius-sheet` · `radius-dialog` · `radius-control` · `radius-segment` · `shadow-sheet` · `shadow-dialog` · `blur-scrim` · `grab-height` · `grab-width` · `handle-width` · `tap-min` · `control-height` · `back-width` · `space-gutter` · `space-gutter-sheet` · `space-row-x` · `space-footer-bottom` · `drawer-compact-max` / `short` / `medium` / `long` · `sheet-in` · `sheet-out` · `fade` · `ease-arrive` · `type-sheet-title-size` · `type-page-title-size` · `type-description-size` · `tracking-sheet` · `tracking-page`.
 
 ## Changelog
+
+2026-10-14 (corner actions, owner ruling C): the drawer header takes `corner` (Clear or Reset, quiet text at the top right) and `cross` (a ✕ at the top left, built but used by no drawer), each a 48px target vertically centred on the header's text block (the title + its line; `.sheet-text`), the title kept 12px clear of each. `sheetFooter({ quiet })` is retired: the footer keeps Back and the primary. FilterSheet's Reset moves to the corner. Every caller's footer Clear/Reset moved to the corner, and every drawer title was checked to fit at 360 in EN and ZH.
 
 2026-10-13 (headers): the two headers are built. The sheet header centres the title, takes `line` (a route: the subject chip + up to two identity facts; or one fact) and owns the hairline and the 24px to the body. The page variant draws the page header (`pageHeader`: Back top left, title, line, 24px) and takes `back`; its footer has no Back. `sheetFooter({ quiet })` draws Reset or Clear as quiet text left of the primary. `subtitle`, `subtitleTone` and `aside` are retired; a dialog's line is `description`. TaskHeader draws the page header and takes `line`; TaskLatest is retired into it.
 
