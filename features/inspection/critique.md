@@ -92,3 +92,8 @@ No competing directions: each problem has one fix that changes only the named pa
 |---|---|---|---|
 | review-selected setup | atlas steps (`features/inspection/feature.json`) | the row's `data-pig-select` | **fix** |
 | Check in to Unit 7 | footer primary, English only | Button + strings registry (verb `Check in`, feed copy) | **fix** |
+
+### Self-crit, crit round 1 (2026-10-14), then Final look
+Final look: screens of a2990df (this block's commit adds no pixel), every inspection and fostering screen plus pig-profile.unavailable-actions rendered at 390 and 360 in EN and ZH beside base 7f5b627. Moved: inspection.walk-recorded, inspection.finish (`7单元签到`), inspection.review-selected (the Selected sheet, as in EN) and pig-profile.unavailable-actions in ZH; the four fostering.* at 360, and fostering.piglets and fostering.result at 390 for the label. The Move primary is one line at 360 in EN (`Move 2 to C05`) and ZH (`转移1头至B08`), 56px, type unchanged; the source crate stays in the selected tile and the crate field.
+- Known, not fixed: the End walk sheet's body copy (`Recorded during this walk`, the check-in note) is still English in ZH.
+- **Better because** the Move sheet fits 360 with a one-line primary that says verb, count and place, and every Inspection sheet named opens and speaks Chinese in ZH.
