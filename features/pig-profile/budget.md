@@ -35,6 +35,14 @@ The header line of every surface of this feature, decided by the Headers law (`u
 | Several pigs (More actions, bulk records) | action | none | | the walk with the pigs ticked; bulk pages list them | on screen |
 
 
+### Corner actions and titles (2026-10-14)
+
+By the Headers law → Corner actions and Title length (`ux/design-system/README.md`, owner ruling C, 2026-10-14; PR #165). Room at a true 360, as `scripts/check-headers.mjs` (workflow/header-checks) measures it: a drawer title has 360 − 2 × (18 + 48 + 12) = 204px (a missing corner counts as the room it would take); a page title has 216px beside Back. Titles measured at their own face (sheet 500 20px, page 500 22px), EN and ZH.
+
+| Surface | Corner action (top right) | Present while | Title | Fits at 360 (EN · ZH) |
+|---|---|---|---|---|
+| Measurements (one pig) | none | | **`Measurements`** (was `Measurements & condition`, 247px; crit round 1 rejected `Measure & condition`, a verb mashed with a noun): a noun phrase naming what the sheet holds. Every row is a reading taken off the pig: body condition (a score), weight, temperature, backfat; condition does not lead (one row of four), so it needs no place in the name. ZH `测量` when this surface is translated (the concept renders EN only). The More actions row that opens it keeps its longer label (rows have room) | 137px · 39px |
+
 ---
 
 # Disabled is not faded (shared change, ds/disabled-not-faded), information budget

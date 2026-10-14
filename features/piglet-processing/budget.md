@@ -32,6 +32,18 @@ The header line of every surface of this feature, decided by the Headers law (`u
 
 Ambiguous, quieter option taken: Give IDs: `Fixing 001216` is cut, not moved (the tag field shows the number being fixed); the litter is one Back away on Piglets. The litter drawer of the round pages has no route line (that round has no sow page for a chip to open).
 
+
+### Corner actions and titles (2026-10-14)
+
+By the Headers law → Corner actions and Title length (`ux/design-system/README.md`, owner ruling C, 2026-10-14; PR #165). Room at a true 360, as `scripts/check-headers.mjs` (workflow/header-checks) measures it: a drawer title has 360 − 2 × (18 + 48 + 12) = 204px (a missing corner counts as the room it would take); a page title has 216px beside Back. Titles measured at their own face (sheet 500 20px, page 500 22px), EN and ZH.
+
+| Surface | Corner action (top right) | Present while | Title | Fits at 360 (EN · ZH) |
+|---|---|---|---|---|
+| Round pages' drawers (dead, tagged, count, edit, weigh, litter weight, dose, room filter) | Clear / Reset | as before: a draft, a change or a filter | unchanged | |
+| Bulk record (a page) | Clear moves to the list, beside Tick all (a page header has no corners; the footer keeps the primary) | something is ticked | unchanged | |
+
+Known, not changed here: the round pages outside the atlas carry question titles that overrun 204px (`Which tagged piglets are missing?`, `Same body recorded twice?`, `Found outside its crate?`); they are not atlas screens, so they are listed for the feature's own pass. The simplified prototype's titles (the atlas screens) all fit.
+
 ---
 
 # Disabled is not faded (shared change, ds/disabled-not-faded), information budget

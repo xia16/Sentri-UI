@@ -90,7 +90,7 @@ fs.mkdirSync(out, { recursive: true });
 // A rerun into the same folder starts clean: old shots, pairs and verdicts are about a mechanical run that no longer exists.
 for (const f of ['shots', 'pairs', 'mechanical.json', ...fs.readdirSync(out).filter((f) => VERDICT_FILE.test(f))]) fs.rmSync(path.join(out, f), { recursive: true, force: true });
 const started = Date.now();
-const env = { ...process.env, SENTRI_PLAYWRIGHT: pwPath };
+const env = { ...process.env, ...(pwPath ? { SENTRI_PLAYWRIGHT: pwPath } : {}) };
 const kids = [];
 
 function run(cmd, args, cwd, timeout = 20 * 60e3) {
@@ -286,15 +286,18 @@ for (const d of screens.diff) console.log(`  DIFF ${String(d.pct).padStart(7)}% 
 check('no screen broken by the change', !screens.broken.length, screens.broken.map((s) => `${s.id} ${s.error}`).slice(0, 3).join(' | '));
 if (screens.bothBroken.length) gaps.push(`${screens.bothBroken.length} screen(s) have a run that renders on neither base nor candidate: ${screens.bothBroken.map((s) => `${s.id} (${s.error})`).slice(0, 5).join(', ')}`);
 
-// A changed screen is shot once more on base, at a run that differed: if base doesn't render the same way twice, its diff
+// A changed screen is shot once more on base and on candidate, at a run that differed: if either side doesn't render the same way twice, its diff
 // may be noise. It stays changed (the judge looks), and the judge is told.
 mech.flaky = [];
 const again = {};
 for (const d of screens.diff) { const t = d.runs.find((x) => pct[`${d.id} ${x}`] > 0); if (t) (again[t] ||= []).push(d.id); }
-const reshot = await Promise.all(Object.entries(again).map(([t, ids]) => { const [lang, w] = t.split('-'); return shoot('base', path.join(out, 'shots/again', t), ['--screens', ids.join(','), '--widths', w, '--langs', lang]); }));
-for (const x of reshot.flat()) if (x?.ok && (await pctDiff(baseAt.get(key(x)).png, x.png)) > 0) mech.flaky.push(x.screen);
+// The candidate is shot once more too: a screen that renders differently twice on either side is noise, not a change.
+const reshotOn = (side, at) => Promise.all(Object.entries(again).map(([t, ids]) => { const [lang, w] = t.split('-'); return shoot(side, path.join(out, `shots/again-${side}`, t), ['--screens', ids.join(','), '--widths', w, '--langs', lang]); }));
+const [reshot, reshotCand] = await Promise.all([reshotOn('base'), reshotOn('cand')]);
+for (const [list, at] of [[reshot, baseAt], [reshotCand, candAt]])
+  for (const x of list.flat()) if (x?.ok && at.get(key(x)) && (await pctDiff(at.get(key(x)).png, x.png)) > 0 && !mech.flaky.includes(x.screen)) mech.flaky.push(x.screen);
 if (reshot.includes(null)) gaps.push('the second base shot failed for some changed screens: their diff is not double-checked');
-if (mech.flaky.length) gaps.push(`${mech.flaky.length} changed screen(s) render differently twice on base, so their diff may be noise: ${mech.flaky.slice(0, 5).join(', ')}`);
+if (mech.flaky.length) gaps.push(`${mech.flaky.length} changed screen(s) render differently twice on base or candidate, so their diff may be noise: ${mech.flaky.slice(0, 5).join(', ')}`);
 
 // ---------- the pairs the judge decides on: every changed, new or removed screen at each run, from the shots above ----------
 const moved = [...screens.diff, ...screens.new, ...screens.gone];
@@ -386,11 +389,13 @@ function openPrs() {
 }
 
 // ---------- legibility on the changed screens ----------
-const changed = [...screens.diff, ...screens.new].map((s) => s.id);
+// A screen base renders differently twice (mech.flaky) didn't move by this change: it isn't held to the floors here.
+const changed = [...screens.diff.filter((s) => !mech.flaky.includes(s.id)), ...screens.new].map((s) => s.id);
 if (changed.length) {
   if (fs.existsSync(path.join(wt.cand, 'scripts/check-legibility.mjs'))) {
     // the README's own line, not a sentence that mentions it ("change the line above to `Legibility gate: strict`")
-    const strict = /^Legibility gate: strict\s*$/m.test(fs.readFileSync(path.join(wt.cand, 'docs/design-workflow/README.md'), 'utf8'));
+    // A shared-component change is held to no worse than main (README, Legibility gate): pages' own debt is each feature's.
+    const strict = declared !== 'shared' && /^Legibility gate: strict\s*$/m.test(fs.readFileSync(path.join(wt.cand, 'docs/design-workflow/README.md'), 'utf8'));
     r = run(process.execPath, ['scripts/check-legibility.mjs', '--base', url.cand, '--changed', changed.join(','), ...(strict ? ['--strict'] : ['--compare', url.base])], wt.cand);
     check(`farm legibility (${strict ? 'strict' : 'no worse than base'}) on changed screens`, r.code === 0, r.tail);
   } else check('farm legibility on changed screens', false, 'scripts/check-legibility.mjs is not on this candidate (it lands with #101): the gate fails closed');
@@ -409,6 +414,25 @@ if (changed.length) {
       const debt = C.reduce((n, s) => n + s.defects.length, 0) - added.length;
       check('clear spacing on changed screens (P4)', !added.length, added.length ? `${added.length} new: ${added.slice(0, 2).join(' | ')}` : debt ? `${debt} defect(s) already on main` : '');
       if (debt) gaps.push(`spacing: ${debt} defect(s) on changed screens are already on main (review/spacing.json)`);
+    }
+  }
+  // P3, the Headers law (scripts/check-headers.mjs, ledger L17): the 24px gap, nothing acting but Back and the subject chip, no
+  // count, one line at 360 in EN and ZH. The candidate's check runs on both sides; a defect main already has there is main's debt.
+  if (fs.existsSync(path.join(wt.cand, 'scripts/check-headers.mjs'))) {
+    const outC = path.join(out, 'headers-cand.json'), outB = path.join(out, 'headers-base.json');
+    run(process.execPath, ['scripts/check-headers.mjs', '--base', url.cand, '--screens', changed.join(','), '--out', outC], wt.cand);
+    run(process.execPath, [path.join(wt.cand, 'scripts/check-headers.mjs'), '--base', url.base, '--screens', changed.join(','), '--out', outB], wt.cand);
+    const read = (f) => { try { return JSON.parse(fs.readFileSync(f, 'utf8')); } catch { return null; } };
+    const C = read(outC), B = read(outB) || [];
+    if (!C) check('headers on changed screens (P3)', false, 'check-headers wrote no result on the candidate');
+    else {
+      const key = (d) => d.check + ' ' + d.lang + ' ' + d.detail.replace(/\d+px/g, 'Npx');
+      const was = new Set(B.flatMap((s) => s.defects.map((d) => s.screen + '|' + key(d))));
+      const added = C.flatMap((s) => s.defects.filter((d) => !was.has(s.screen + '|' + key(d))).map((d) => `${s.screen}: ${d.check} (${d.lang}-${d.width}) — ${d.detail}`));
+      const unrendered = C.filter((s) => s.error).map((s) => `${s.screen}: did not render (${s.error})`);
+      const debt = C.reduce((n, s) => n + s.defects.length, 0) - added.length;
+      check('headers on changed screens (P3)', !added.length && !unrendered.length, added.length || unrendered.length ? `${added.length + unrendered.length} new: ${[...added, ...unrendered].slice(0, 2).join(' | ')}` : debt ? `${debt} defect(s) already on main` : '');
+      if (debt) gaps.push(`headers: ${debt} defect(s) on changed screens are already on main (review/headers.json)`);
     }
   }
 }

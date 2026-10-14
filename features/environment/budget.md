@@ -28,6 +28,15 @@ Chains walked on the real Back path after this change (crit round 1): no surface
 
 Until migrated (crit round 1): the Assistant, Environment & devices and Maintenance pages keep their page-built head, PREVIEW badge and subtitle. Their bodies are below the farm legibility floors (10px text, 9px chart labels) and a change that moves a screen must bring it to the floors; that body work is its own task. Their drawers (report issue, issue detail) take the sheet header.
 
+
+### Corner actions and titles (2026-10-14)
+
+By the Headers law → Corner actions and Title length (`ux/design-system/README.md`, owner ruling C, 2026-10-14; PR #165). Room at a true 360, as `scripts/check-headers.mjs` (workflow/header-checks) measures it: a drawer title has 360 − 2 × (18 + 48 + 12) = 204px (a missing corner counts as the room it would take); a page title has 216px beside Back. Titles measured at their own face (sheet 500 20px, page 500 22px), EN and ZH.
+
+| Surface | Corner action (top right) | Present while | Title | Fits at 360 (EN · ZH) |
+|---|---|---|---|---|
+| Report issue | none | | **`Report issue`** (was `Report equipment issue`, 219px; `Report fault` in round 1, crit round 2 rejected it): the title matches the action that opens it (`Report issue` on Maintenance) and the sheet's primary (`Record issue`), so the worker reads the same word from the tap to the save; Maintenance calls these issues, so `equipment` adds nothing (the Equipment field says what broke) | 114px |
+
 ---
 
 # Disabled is not faded (shared change, ds/disabled-not-faded), information budget

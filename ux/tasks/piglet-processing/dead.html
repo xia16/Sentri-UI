@@ -326,14 +326,17 @@
     return out.join('');
   }
   function footer(back) {
-    var w = why(), gray = !!w, st = status(), dirty = S.mode === 'sow' ? sowDirty() : pigDirty();
-    // Clear is quiet text in the footer, left of Save, present only when there is something to clear (Headers law, 2026-10-13)
-    var quiet = dirty ? { label: s('act.clear'), action: 'clear' } : null;
+    var w = why(), gray = !!w, st = status();
     if (S.mode === 'sow') {
       // the hold's progress line is the same status slot (empty until a cue or a reason)
-      return K.footer({ back: { action: 'back' }, quiet: quiet, status: st, hold: { label: s('act.save'), caption: s('pp.dead.hold'), action: 'hold-save', tone: 'primary', waiting: gray, describedby: gray ? 'dd-why' : '' } });
+      return K.footer({ back: { action: 'back' }, status: st, hold: { label: s('act.save'), caption: s('pp.dead.hold'), action: 'hold-save', tone: 'primary', waiting: gray, describedby: gray ? 'dd-why' : '' } });
     }
-    return K.footer({ back: { action: back || 'back' }, quiet: quiet, status: st, primary: { label: s('act.save'), action: 'save', waiting: gray } });
+    return K.footer({ back: { action: back || 'back' }, status: st, primary: { label: s('act.save'), action: 'save', waiting: gray } });
+  }
+  // Clear is the header's corner action, top right (owner, 2026-10-14), present only when there is something to clear
+  function corner() {
+    var dirty = S.mode === 'sow' ? sowDirty() : pigDirty();
+    return dirty ? { label: s('act.clear'), action: 'clear' } : null;
   }
   function head() {
     var sow = S.mode === 'sow', n = pigN();
@@ -350,7 +353,7 @@
     var h = head();
     var segs = modes().length > 1 ? UI.segment({ options: [['piglets', 'Piglets', { strs: { label: 'label.piglets' } }], ['sow', 'The sow', { strs: { label: 'ds.dead.seg.sow' } }]],
       active: S.mode, action: 'mode', ariaLabel: PP.lang === 'zh' ? '记录死亡对象' : 'Record death for' }) : '';
-    return K.drawer({ size: 'long', view: 'dead', title: h.title, close: { action: 'dismiss' },
+    return K.drawer({ size: 'long', view: 'dead', title: h.title, corner: corner(), close: { action: 'dismiss' },
       body: '<div class="dd-body" data-phase="' + (locked() ? 'locked' : 'open') + '" data-surface="' + surface + '">' + h.note + segs + (S.mode === 'sow' ? sowMode() : piglets()) + '</div>',
       footer: footer(), scrim: { action: 'dismiss' } });
   }
@@ -386,7 +389,7 @@
     });
     var n = pigN(), sub = [s('pp.dead.tagged.sub', { pen: tgt(), n: rs.length })];
     if (n) sub.push({ sep: true }, { text: PP.t('pp.dead.unsaved', { n: n }), str: 'pp.dead.unsaved', args: { n: n }, tone: 'green' });
-    return K.drawer({ size: 'long', view: 'tagged', title: s('pp.dead.tagged.title'), close: { action: 'sub-dismiss' },
+    return K.drawer({ size: 'long', view: 'tagged', title: s('pp.dead.tagged.title'), corner: corner(), close: { action: 'sub-dismiss' },
       body: '<div class="dd-body">' + U.note(sub) + out + '</div>', footer: footer('sub-back'),
       scrim: { action: 'sub-dismiss' } });
   }

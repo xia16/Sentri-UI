@@ -11,7 +11,7 @@ const bg=()=>'<div class="bar" aria-hidden="true"><span>9:41</span></div>'+UI.he
 const pick=(label,value)=>UI.pickerField({label,value,action:'pick'});
 const sheet=(a)=>UI.filterSheet({title:'Filter pigs',backAction:'back',closeAction:'dismiss',
 body:pick('Production stage',a?'Gestating':'All production stages')+pick('Disease or symptom',a?'Lameness':'Any condition')+pick('Care',a?'Monitor':'Any care'),
-apply:{label:'Show pigs',action:'apply'},reset:{label:'Clear',action:'reset'}});
+apply:{label:'Show pigs',action:'apply'},reset:a?{label:'Clear',action:'reset'}:false});
 const R={default:()=>sheet(false),active:()=>sheet(true)};
 document.querySelectorAll('[data-state]').forEach(el=>{el.querySelector('.bg').innerHTML=bg();el.querySelector('.over').innerHTML=R[el.getAttribute('data-demo')]();});
 </script></body></html>
