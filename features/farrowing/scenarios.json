@@ -480,7 +480,7 @@
        "id": "fa-e11-scan-ear-tag",
        "tree": "E-11",
        "status": "pending",
-       "why": "the prototype's Scan ear tag has no camera; a scan cannot be driven",
+       "why": "superseded by owner decision 2026-10-12: a scan adds the sow to the Scan list, and her sheet opens from her row there (fa-s21)",
        "label": "Scanning her ear tag opens her sheet",
        "gwt": {
         "given": "The room list is open and a sow in the room has an ear tag.",
@@ -523,9 +523,13 @@
       {
        "type": "action",
        "id": "room.search-all",
-       "label": "Find a sow, empty field",
+       "label": "Find a sow, type 4",
        "taps": [
-        "[data-action='room-search']"
+        "[data-action='room-search']",
+        {
+         "fill": "[data-room-search]",
+         "value": "4"
+        }
        ],
        "children": [
         {
@@ -3197,6 +3201,1151 @@
        "src": "atlas",
        "at": "features/farrowing/feature.json",
        "says": "screen farrowing.foster exists, reached by More actions → Foster piglets"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "entry",
+   "id": "search-scan",
+   "label": "Find a sow and Scan ear tags (owner decision 2026-10-12)",
+   "children": [
+    {
+     "type": "state",
+     "id": "search.empty",
+     "label": "Find a sow, empty field",
+     "tree": "S1",
+     "reset": {
+      "screen": "farrowing.search"
+     },
+     "children": [
+      {
+       "type": "outcome",
+       "id": "fa-s1-search-lists-nothing-until-typed",
+       "tree": "S-1",
+       "label": "Nothing is listed before the worker types; the header names no unit",
+       "gwt": {
+        "given": "The worker has just opened Find a sow.",
+        "when": "They look at the page before typing.",
+        "then": "Only the hint \"Type part of an ear tag or a pen, or scan a tag. Searches every unit.\" is shown, no sow is listed, the header names no unit, and the field is ready for typing."
+       },
+       "authority": [
+        {
+         "src": "PRD",
+         "at": "Decisions · owner decision 2026-10-12",
+         "says": "Nothing is listed before typing; no \"Unit 7\" in the header"
+        }
+       ],
+       "visible": [
+        {
+         "text": "Type part of an ear tag or a pen, or scan a tag. Searches every unit."
+        },
+        {
+         "el": ".find-row",
+         "is": "absent",
+         "hard": "wrong-fact",
+         "says": "no sow is listed before typing"
+        },
+        {
+         "text": "Unit 7",
+         "in": ".find-top",
+         "absent": true,
+         "hard": "broken-ruling",
+         "says": "the search header names no unit"
+        }
+       ],
+       "record": [
+        {
+         "expr": "document.activeElement === document.querySelector('[data-room-search]')",
+         "says": "the field is focused when the page opens",
+         "hard": "broken-ruling"
+        }
+       ]
+      },
+      {
+       "type": "action",
+       "id": "search.empty.43",
+       "label": "type 43",
+       "taps": [
+        {
+         "fill": "[data-room-search]",
+         "value": "43"
+        }
+       ],
+       "children": [
+        {
+         "type": "outcome",
+         "id": "fa-s2-search-groups-this-unit-first",
+         "tree": "S-2",
+         "label": "Results are grouped: this unit first, then other units",
+         "gwt": {
+          "given": "Find a sow is open and the worker has typed 43.",
+          "when": "They read the results.",
+          "then": "The results are in two groups: \"In Unit 7\" lists 000431, then \"Other units\" lists 000437, 000943 and 004318 with their units."
+         },
+         "authority": [
+          {
+           "src": "PRD",
+           "at": "Decisions · owner decision 2026-10-12",
+           "says": "Results are grouped \"In Unit 7\" then \"Other units\""
+          }
+         ],
+         "visible": [
+          {
+           "text": "In Unit 7"
+          },
+          {
+           "text": "Other units"
+          }
+         ],
+         "record": [
+          {
+           "expr": "JSON.stringify([...document.querySelectorAll('.room-search-results .find-list')].map(l=>[...l.querySelectorAll('.st-animal-id')].map(e=>e.textContent).join())) === JSON.stringify(['000431','000437,000943,004318'])",
+           "says": "the lists are In Unit 7: 000431, then Other units: 000437, 000943, 004318",
+           "hard": "wrong-fact"
+          }
+         ]
+        },
+        {
+         "type": "action",
+         "id": "search.empty.43.other",
+         "label": "tap 004318 (Unit 6)",
+         "taps": [
+          "004318"
+         ],
+         "children": [
+          {
+           "type": "outcome",
+           "id": "fa-s6-other-unit-result-opens-her-farrowing-drawer",
+           "tree": "S-6",
+           "label": "A result in another unit opens her farrowing drawer, which names her unit",
+           "gwt": {
+            "given": "The worker has searched for 43 and 004318, a sow in Unit 6, is a result.",
+            "when": "They tap her.",
+            "then": "Her farrowing drawer opens on her Awaiting face, the same drawer a sow in this unit opens, and its subtitle names her unit and pen."
+           },
+           "authority": [
+            {
+             "src": "PRD",
+             "at": "Decisions · owner decision 2026-10-12",
+             "says": "A sow in another unit opens her farrowing drawer: Farrowing is one task across its units"
+            }
+           ],
+           "visible": [
+            {
+             "screen": "farrowing.before",
+             "hard": "dead-end"
+            },
+            {
+             "text": "Unit 6 · A2",
+             "in": "sheet",
+             "says": "the subtitle names her unit and pen",
+             "hard": "wrong-fact"
+            }
+           ],
+           "record": [
+            {
+             "expr": "s.tag === '004318' && c.unitId === '7'",
+             "says": "her record is open and the room is still Unit 7",
+             "hard": "wrong-fact"
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "action",
+       "id": "search.empty.004",
+       "label": "type 004",
+       "taps": [
+        {
+         "fill": "[data-room-search]",
+         "value": "004"
+        }
+       ],
+       "children": [
+        {
+         "type": "outcome",
+         "id": "fa-s3-tags-starting-with-the-text-rank-first",
+         "tree": "S-3",
+         "label": "Tags that start with the typed text rank before tags that only contain it",
+         "gwt": {
+          "given": "Find a sow is open and the worker has typed 004.",
+          "when": "They read the Other units group.",
+          "then": "004318, whose tag starts with 004, is listed before 000437, whose tag only contains it."
+         },
+         "authority": [
+          {
+           "src": "PRD",
+           "at": "Decisions · owner decision 2026-10-12",
+           "says": "Tags that start with the typed text rank before tags that only contain it"
+          }
+         ],
+         "record": [
+          {
+           "expr": "JSON.stringify([...document.querySelectorAll('.room-search-results .find-list')].map(l=>[...l.querySelectorAll('.st-animal-id')].map(e=>e.textContent).join())[1]) === JSON.stringify('004318,000437')",
+           "says": "004318 is listed before 000437",
+           "hard": "wrong-fact"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "action",
+       "id": "search.empty.b4",
+       "label": "type B4",
+       "taps": [
+        {
+         "fill": "[data-room-search]",
+         "value": "B4"
+        }
+       ],
+       "children": [
+        {
+         "type": "outcome",
+         "id": "fa-s4-pen-codes-match",
+         "tree": "S-4",
+         "label": "A pen code matches too",
+         "gwt": {
+          "given": "Find a sow is open and the worker has typed B4.",
+          "when": "They read the results.",
+          "then": "The two sows in pen B4, 000431 and 000455, are listed under \"In Unit 7\", and there is no \"Other units\" group."
+         },
+         "authority": [
+          {
+           "src": "PRD",
+           "at": "Decisions · owner decision 2026-10-12",
+           "says": "Pen codes match too"
+          }
+         ],
+         "visible": [
+          {
+           "text": "000431"
+          },
+          {
+           "text": "000455"
+          },
+          {
+           "text": "Other units",
+           "absent": true,
+           "hard": "wrong-fact",
+           "says": "no sow in another unit has pen B4"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "action",
+       "id": "search.empty.none",
+       "label": "type 909",
+       "taps": [
+        {
+         "fill": "[data-room-search]",
+         "value": "909"
+        }
+       ],
+       "children": [
+        {
+         "type": "outcome",
+         "id": "fa-s5-no-match-says-so",
+         "tree": "S-5",
+         "label": "Nothing matches: the page says so",
+         "gwt": {
+          "given": "Find a sow is open and the worker has typed 909, which no sow in any unit has.",
+          "when": "They read the page.",
+          "then": "The page says there is no sow matching 909 in any unit, and lists nothing."
+         },
+         "authority": [
+          {
+           "src": "PRD",
+           "at": "Decisions · owner decision 2026-10-12",
+           "says": "No match reads \"No sow matching “43” in any unit.\""
+          }
+         ],
+         "visible": [
+          {
+           "text": "No sow matching “909” in any unit."
+          },
+          {
+           "el": ".find-row",
+           "is": "absent",
+           "hard": "wrong-fact"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "action",
+       "id": "search.empty.scan",
+       "label": "tap the scan icon in the field",
+       "taps": [
+        "[data-action='room-scan']"
+       ],
+       "children": [
+        {
+         "type": "outcome",
+         "id": "fa-s8-search-scan-icon-opens-scan",
+         "tree": "S-8",
+         "label": "The scan icon in the field opens Scan ear tags",
+         "gwt": {
+          "given": "Find a sow is open.",
+          "when": "The worker taps the scan icon in the field.",
+          "then": "Scan ear tags opens, with the reader connected and nothing scanned yet."
+         },
+         "authority": [
+          {
+           "src": "PRD",
+           "at": "Decisions · owner decision 2026-10-12",
+           "says": "A scan icon button inside the field opens Scan"
+          }
+         ],
+         "visible": [
+          {
+           "screen": "farrowing.scan",
+           "hard": "dead-end"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "action",
+       "id": "search.empty.cancel",
+       "label": "tap Cancel",
+       "taps": [
+        "Cancel"
+       ],
+       "children": [
+        {
+         "type": "outcome",
+         "id": "fa-s9-cancel-returns-to-the-room",
+         "tree": "S-9",
+         "label": "Cancel closes Find a sow",
+         "gwt": {
+          "given": "Find a sow is open.",
+          "when": "The worker taps Cancel.",
+          "then": "The room list is in front again."
+         },
+         "authority": [
+          {
+           "src": "PRD",
+           "at": "Decisions · owner decision 2026-10-12",
+           "says": "The field has Cancel beside it"
+          }
+         ],
+         "visible": [
+          {
+           "el": "[data-action='room-lens']",
+           "is": "enabled",
+           "hard": "dead-end",
+           "says": "the room list is in front"
+          }
+         ],
+         "record": [
+          {
+           "expr": "s.view === 'room'",
+           "says": "the record's view is the room",
+           "hard": "dead-end"
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "type": "state",
+     "id": "scan.none",
+     "label": "Scan ear tags, no tag reader paired",
+     "tree": "S2",
+     "reset": {
+      "screen": "farrowing.scan-no-reader"
+     },
+     "children": [
+      {
+       "type": "outcome",
+       "id": "fa-s10-no-reader-says-so-with-no-buttons",
+       "tree": "S-10",
+       "label": "Scanner not connected: the page says what to do and offers no button",
+       "gwt": {
+        "given": "Scan ear tags is open and no tag reader is paired.",
+        "when": "The worker looks at the page.",
+        "then": "The page says \"Scanner not connected\" and how to pair the reader. There is no status pill, no list and no button: only the back arrow leaves."
+       },
+       "authority": [
+        {
+         "src": "PRD",
+         "at": "Decisions · owner decision 2026-10-12",
+         "says": "Scanner not connected: the pairing instruction, no buttons"
+        }
+       ],
+       "visible": [
+        {
+         "text": "Scanner not connected"
+        },
+        {
+         "text": "Turn on the tag reader and pair it in your phone's Bluetooth settings. Scanning starts as soon as it connects."
+        },
+        {
+         "el": ".scan-live",
+         "is": "absent",
+         "hard": "broken-ruling",
+         "says": "no status pill when no reader is paired"
+        },
+        {
+         "el": ".scan-empty button",
+         "is": "absent",
+         "hard": "broken-ruling",
+         "says": "no button in the message"
+        },
+        {
+         "el": ".room-dock",
+         "is": "absent",
+         "hard": "broken-ruling",
+         "says": "no footer"
+        }
+       ]
+      },
+      {
+       "type": "action",
+       "id": "scan.none.back",
+       "label": "tap the back arrow",
+       "taps": [
+        "[data-action='room-back']"
+       ],
+       "children": [
+        {
+         "type": "outcome",
+         "id": "fa-s11-back-arrow-leaves-scan",
+         "tree": "S-11",
+         "label": "The back arrow leaves Scan ear tags",
+         "gwt": {
+          "given": "Scan ear tags is open.",
+          "when": "The worker taps the back arrow.",
+          "then": "The room list is in front again."
+         },
+         "authority": [
+          {
+           "src": "PRD",
+           "at": "Decisions · owner decision 2026-10-12",
+           "says": "The back arrow leaves"
+          }
+         ],
+         "visible": [
+          {
+           "el": "[data-action='room-lens']",
+           "is": "enabled",
+           "hard": "dead-end",
+           "says": "the room list is in front"
+          }
+         ],
+         "record": [
+          {
+           "expr": "s.view === 'room'",
+           "says": "the record's view is the room",
+           "hard": "dead-end"
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "type": "state",
+     "id": "scan.empty",
+     "label": "Scan ear tags, reader connected, nothing scanned",
+     "tree": "S3",
+     "reset": {
+      "screen": "farrowing.scan"
+     },
+     "children": [
+      {
+       "type": "outcome",
+       "id": "fa-s12-connected-empty-says-hold-the-reader",
+       "tree": "S-12",
+       "label": "Connected and nothing scanned: the page invites the first scan, with no banner",
+       "gwt": {
+        "given": "Scan ear tags is open, the reader is connected and nothing has been scanned.",
+        "when": "The worker looks at the page.",
+        "then": "The page says \"Hold the reader to an ear tag\" and \"Each sow you scan appears here.\", the status says Scanning and the footer offers Stop scanning. There is no \"ready for the next tag\" banner and no \"Not found\" row."
+       },
+       "authority": [
+        {
+         "src": "PRD",
+         "at": "Decisions · owner decision 2026-10-12",
+         "says": "The scanner is always listening: no banner and no Not found row"
+        }
+       ],
+       "visible": [
+        {
+         "text": "Hold the reader to an ear tag"
+        },
+        {
+         "text": "Each sow you scan appears here."
+        },
+        {
+         "text": "Scanning",
+         "in": ".scan-page .sheet-body .scan-live"
+        },
+        {
+         "text": "Stop scanning"
+        },
+        {
+         "text": "ready for the next tag",
+         "absent": true,
+         "hard": "broken-ruling"
+        },
+        {
+         "text": "Not found",
+         "absent": true,
+         "hard": "broken-ruling"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "type": "state",
+     "id": "scan.list",
+     "label": "Scan ear tags, three sows scanned",
+     "tree": "S4",
+     "reset": {
+      "screen": "farrowing.scan-list"
+     },
+     "children": [
+      {
+       "type": "outcome",
+       "id": "fa-s13-scans-listed-newest-first-in-two-groups",
+       "tree": "S-13",
+       "label": "Scanned sows are listed in two groups, newest first",
+       "gwt": {
+        "given": "Scan ear tags is open and three sows have been scanned: 000418, then 000431 (both in Unit 7), then 004318 (Unit 6).",
+        "when": "The worker reads the list.",
+        "then": "The list has \"In Unit 7\" with 000431 above 000418, then \"Other units\" with 004318: the newest scan first within each group."
+       },
+       "authority": [
+        {
+         "src": "PRD",
+         "at": "Decisions · owner decision 2026-10-12",
+         "says": "Groups \"In Unit 7 · n\" and \"Other units · n\", newest first"
+        }
+       ],
+       "visible": [
+        {
+         "text": "In Unit 7"
+        },
+        {
+         "text": "Other units"
+        }
+       ],
+       "record": [
+        {
+         "expr": "[...document.querySelectorAll('.scan-page [data-scan-tag]')].map(e=>e.dataset.scanTag).join() === '000431,000418,004318'",
+         "says": "the rows are 000431, 000418, 004318",
+         "hard": "wrong-fact"
+        }
+       ]
+      },
+      {
+       "type": "outcome",
+       "id": "fa-s14-scan-rows-are-select-and-door",
+       "tree": "S-14",
+       "label": "Each scan row has a tick box and opens her",
+       "gwt": {
+        "given": "Scan ear tags is open with scanned sows.",
+        "when": "The worker looks at a row.",
+        "then": "Each row has a tick box and, beside it, the sow's ear tag, where she is and her Farrowing state, with a chevron."
+       },
+       "authority": [
+        {
+         "src": "PRD",
+         "at": "Decisions · owner decision 2026-10-12",
+         "says": "Rows are the animal row with state, as a select + door"
+        }
+       ],
+       "visible": [
+        {
+         "text": "9 alive · 5 dead"
+        },
+        {
+         "text": "Overdue"
+        }
+       ],
+       "record": [
+        {
+         "expr": "[...document.querySelectorAll('.scan-page [data-scan-tag]')].every(r => r.querySelector('input[type=checkbox]') && r.querySelector('.st-row-door'))",
+         "says": "every row has a tick box and a door",
+         "hard": "broken-ruling"
+        }
+       ]
+      },
+      {
+       "type": "action",
+       "id": "scan.list.stop",
+       "label": "tap Stop scanning",
+       "taps": [
+        "Stop scanning"
+       ],
+       "children": [
+        {
+         "type": "outcome",
+         "id": "fa-s15-stop-scanning-pauses-and-keeps-the-list",
+         "tree": "S-15",
+         "label": "Stop scanning pauses the reader and keeps the list",
+         "gwt": {
+          "given": "Scan ear tags is open with scanned sows and nothing ticked.",
+          "when": "The worker taps Stop scanning.",
+          "then": "The status reads Stopped, the footer offers Resume scanning, and the three sows stay in the list."
+         },
+         "authority": [
+          {
+           "src": "PRD",
+           "at": "Decisions · owner decision 2026-10-12",
+           "says": "Stop scanning becomes Resume scanning when stopped"
+          }
+         ],
+         "visible": [
+          {
+           "text": "Stopped",
+           "in": ".scan-page .sheet-body .scan-live"
+          },
+          {
+           "text": "Resume scanning"
+          }
+         ],
+         "record": [
+          {
+           "expr": "c.scan.listening === false && c.scan.items.length === 3",
+           "says": "scanning is paused and the list is kept",
+           "hard": "wrong-fact"
+          }
+         ]
+        },
+        {
+         "type": "action",
+         "id": "scan.list.resume",
+         "label": "tap Resume scanning",
+         "taps": [
+          "Resume scanning"
+         ],
+         "children": [
+          {
+           "type": "outcome",
+           "id": "fa-s16-resume-scanning-listens-again",
+           "tree": "S-16",
+           "label": "Resume scanning listens again",
+           "gwt": {
+            "given": "Scanning is stopped.",
+            "when": "The worker taps Resume scanning.",
+            "then": "The status reads Scanning and the footer offers Stop scanning."
+           },
+           "authority": [
+            {
+             "src": "PRD",
+             "at": "Decisions · owner decision 2026-10-12",
+             "says": "Stop scanning becomes Resume scanning when stopped"
+            }
+           ],
+           "visible": [
+            {
+             "text": "Scanning",
+             "in": ".scan-page .sheet-body .scan-live"
+            },
+            {
+             "text": "Stop scanning"
+            }
+           ],
+           "record": [
+            {
+             "expr": "c.scan.listening === true",
+             "says": "the reader is listening",
+             "hard": "wrong-fact"
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "action",
+       "id": "scan.list.tick1",
+       "label": "tick 000431",
+       "taps": [
+        "[data-scan-tag='000431'] .st-choice-trail"
+       ],
+       "children": [
+        {
+         "type": "outcome",
+         "id": "fa-s17-one-ticked-shows-the-selection-bar",
+         "tree": "S-17",
+         "label": "One sow ticked: the selection bar says Actions",
+         "gwt": {
+          "given": "Scan ear tags is open with scanned sows.",
+          "when": "The worker ticks one sow.",
+          "then": "The footer reads \"1 sow selected\" with a primary \"Actions\" button; Stop scanning is gone, and nothing says \"More actions\"."
+         },
+         "authority": [
+          {
+           "src": "PRD",
+           "at": "Decisions · owner decision 2026-10-12",
+           "says": "N sows selected and the primary Actions; the button says Actions, not More actions"
+          }
+         ],
+         "visible": [
+          {
+           "text": "1 sow selected"
+          },
+          {
+           "text": "Actions"
+          },
+          {
+           "text": "More actions",
+           "absent": true,
+           "hard": "broken-ruling"
+          },
+          {
+           "text": "Stop scanning",
+           "absent": true,
+           "hard": "wrong-fact"
+          }
+         ],
+         "record": [
+          {
+           "expr": "c.scan.picked.join() === '000431'",
+           "says": "only 000431 is ticked",
+           "hard": "wrong-fact"
+          }
+         ]
+        },
+        {
+         "type": "outcome",
+         "id": "fa-s19-selection-count-is-plain-text",
+         "tree": "S-19",
+         "label": "The selection count is plain text: nothing to tap",
+         "gwt": {
+          "given": "One scanned sow is ticked.",
+          "when": "The worker looks at the footer.",
+          "then": "It reads \"1 sow selected\" as plain text, without a chevron or a button, next to the Actions button."
+         },
+         "authority": [
+          {
+           "src": "PRD",
+           "at": "Decisions · owner decision 2026-10-12",
+           "says": "N sows selected is a plain count, not a button"
+          }
+         ],
+         "visible": [
+          {
+           "text": "1 sow selected"
+          },
+          {
+           "el": ".scan-foot .scan-selected",
+           "is": "present"
+          }
+         ],
+         "record": [
+          {
+           "expr": "!document.querySelector('.scan-foot .scan-selected').closest('button') && !document.querySelector('.scan-foot .scan-selected svg')",
+           "says": "the count is not a button and has no chevron",
+           "hard": "broken-ruling"
+          }
+         ]
+        },
+        {
+         "type": "action",
+         "id": "scan.list.tick2",
+         "label": "tick 000418 too",
+         "taps": [
+          "[data-scan-tag='000418'] .st-choice-trail"
+         ],
+         "children": [
+          {
+           "type": "action",
+           "id": "scan.list.actions",
+           "label": "tap Actions",
+           "taps": [
+            "Actions"
+           ],
+           "children": [
+            {
+             "type": "outcome",
+             "id": "fa-s18-actions-offer-the-generic-actions-only",
+             "tree": "S-18",
+             "label": "Actions offers the shared generic actions for the ticked sows and no Farrowing action",
+             "gwt": {
+              "given": "Two scanned sows are ticked.",
+              "when": "The worker taps Actions.",
+              "then": "A sheet titled Actions for 2 sows offers Transfer, Disease or symptom, Record treatment and Add a note, and none of Farrowing's own actions."
+             },
+             "authority": [
+              {
+               "src": "PRD",
+               "at": "Decisions · owner decision 2026-10-12",
+               "says": "Actions opens the shared generic actions for the selection only; no Farrowing-specific actions"
+              }
+             ],
+             "visible": [
+              {
+               "text": "2 sows",
+               "in": "sheet"
+              },
+              {
+               "text": "Transfer",
+               "in": "sheet"
+              },
+              {
+               "text": "Disease or symptom",
+               "in": "sheet"
+              },
+              {
+               "text": "Record treatment",
+               "in": "sheet"
+              },
+              {
+               "text": "Add a note",
+               "in": "sheet"
+              },
+              {
+               "text": "Record abortion",
+               "in": "sheet",
+               "absent": true,
+               "hard": "broken-ruling"
+              },
+              {
+               "text": "Edit litter record",
+               "in": "sheet",
+               "absent": true,
+               "hard": "broken-ruling"
+              },
+              {
+               "text": "Foster piglets",
+               "in": "sheet",
+               "absent": true,
+               "hard": "broken-ruling"
+              },
+              {
+               "text": "Piglet processing",
+               "in": "sheet",
+               "absent": true,
+               "hard": "broken-ruling"
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "type": "action",
+           "id": "scan.list.actions.note",
+           "label": "tap Actions, then Add a note",
+           "taps": [
+            "Actions",
+            "Add a note"
+           ],
+           "children": [
+            {
+             "type": "outcome",
+             "id": "fa-s26-actions-note-opens-the-note-for-the-first-sow",
+             "tree": "S-26",
+             "label": "Add a note opens the note page for the first ticked sow",
+             "gwt": {
+              "given": "Two scanned sows are ticked and the Actions sheet is open.",
+              "when": "The worker taps Add a note.",
+              "then": "The note page opens for the first sow ticked, 000431, not the list."
+             },
+             "authority": [
+              {
+               "src": "PRD",
+               "at": "Decisions · owner decision 2026-10-12",
+               "says": "Actions opens the shared generic actions for the selection"
+              }
+             ],
+             "visible": [
+              {
+               "screen": "farrowing.note",
+               "hard": "dead-end"
+              }
+             ],
+             "record": [
+              {
+               "expr": "s.tag === '000431'",
+               "says": "the note is for the first ticked sow",
+               "hard": "wrong-fact"
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "type": "action",
+         "id": "scan.list.untick",
+         "label": "tap her box again",
+         "taps": [
+          "[data-scan-tag='000431'] .st-choice-trail"
+         ],
+         "children": [
+          {
+           "type": "outcome",
+           "id": "fa-s20-unticking-the-last-sow-brings-stop-scanning-back",
+           "tree": "S-20",
+           "label": "Tapping the box again unticks her; with none ticked Stop scanning returns",
+           "gwt": {
+            "given": "One scanned sow is ticked.",
+            "when": "The worker taps her box again.",
+            "then": "She is no longer ticked and the footer offers Stop scanning again, with no selection count."
+           },
+           "authority": [
+            {
+             "src": "PRD",
+             "at": "Decisions · owner decision 2026-10-12",
+             "says": "To untick, tap the box; nothing ticked: Stop scanning"
+            }
+           ],
+           "visible": [
+            {
+             "text": "Stop scanning"
+            },
+            {
+             "text": "sow selected",
+             "absent": true,
+             "hard": "wrong-fact"
+            }
+           ],
+           "record": [
+            {
+             "expr": "c.scan.picked.length === 0",
+             "says": "nothing is ticked",
+             "hard": "wrong-fact"
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "action",
+       "id": "scan.list.open",
+       "label": "tap 000418's row (this unit)",
+       "taps": [
+        "[data-scan-tag='000418'] .st-row-door"
+       ],
+       "children": [
+        {
+         "type": "outcome",
+         "id": "fa-s21-scan-row-opens-her-drawer",
+         "tree": "S-21",
+         "label": "A scanned sow in this unit opens her farrowing drawer",
+         "gwt": {
+          "given": "Scan ear tags is open with 000418, in Unit 7, scanned.",
+          "when": "The worker taps her row.",
+          "then": "Her farrowing drawer opens on Counting."
+         },
+         "authority": [
+          {
+           "src": "PRD",
+           "at": "Decisions · owner decision 2026-10-12",
+           "says": "The rest of the row opens her farrowing drawer"
+          }
+         ],
+         "visible": [
+          {
+           "screen": "farrowing.count",
+           "hard": "dead-end"
+          }
+         ],
+         "record": [
+          {
+           "expr": "s.tag === '000418'",
+           "says": "her record is open",
+           "hard": "wrong-fact"
+          }
+         ]
+        },
+        {
+         "type": "action",
+         "id": "scan.list.open.back",
+         "label": "tap Back",
+         "taps": [
+          ".sheet .surface-back"
+         ],
+         "children": [
+          {
+           "type": "outcome",
+           "id": "fa-s22-back-returns-to-the-scan-list",
+           "tree": "S-22",
+           "label": "Back from her drawer returns to the scan list",
+           "gwt": {
+            "given": "A scanned sow's drawer is open, opened from the Scan list.",
+            "when": "The worker taps Back.",
+            "then": "Scan ear tags is in front again with the same three sows."
+           },
+           "authority": [
+            {
+             "src": "PRD",
+             "at": "Decisions · owner decision 2026-10-12",
+             "says": "The list stays while the worker opens a sow and comes back"
+            }
+           ],
+           "visible": [
+            {
+             "screen": "farrowing.scan-list",
+             "hard": "dead-end"
+            }
+           ],
+           "record": [
+            {
+             "expr": "c.scan.items.length === 3",
+             "says": "the list is kept",
+             "hard": "lost-draft"
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "action",
+       "id": "scan.list.tickopen",
+       "label": "tick 000431, then open 000418",
+       "taps": [
+        "[data-scan-tag='000431'] .st-choice-trail",
+        "[data-scan-tag='000418'] .st-row-door"
+       ],
+       "children": [
+        {
+         "type": "action",
+         "id": "scan.list.tickopen.back",
+         "label": "tap Back",
+         "taps": [
+          ".sheet .surface-back"
+         ],
+         "children": [
+          {
+           "type": "outcome",
+           "id": "fa-s23-ticks-survive-opening-a-sow",
+           "tree": "S-23",
+           "label": "A tick survives opening a sow and coming back",
+           "gwt": {
+            "given": "One scanned sow is ticked and the worker has opened another from the list.",
+            "when": "They tap Back.",
+            "then": "Scan ear tags is in front with the first sow still ticked."
+           },
+           "authority": [
+            {
+             "src": "PRD",
+             "at": "Decisions · owner decision 2026-10-12",
+             "says": "The list stays while the worker opens a sow and comes back"
+            }
+           ],
+           "visible": [
+            {
+             "text": "1 sow selected"
+            }
+           ],
+           "record": [
+            {
+             "expr": "c.scan.picked.join() === '000431'",
+             "says": "the tick is kept",
+             "hard": "lost-draft"
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "action",
+       "id": "scan.list.other",
+       "label": "tap 004318's row (Unit 6)",
+       "taps": [
+        "[data-scan-tag='004318'] .st-row-door"
+       ],
+       "children": [
+        {
+         "type": "outcome",
+         "id": "fa-s24-scan-row-in-another-unit-opens-her-drawer",
+         "tree": "S-24",
+         "label": "A scanned sow in another unit opens her farrowing drawer",
+         "gwt": {
+          "given": "Scan ear tags is open with 004318, in Unit 6, scanned.",
+          "when": "The worker taps her row.",
+          "then": "Her farrowing drawer opens, the same drawer a sow in this unit opens, and its subtitle names her unit and pen."
+         },
+         "authority": [
+          {
+           "src": "PRD",
+           "at": "Decisions · owner decision 2026-10-12",
+           "says": "A sow in another unit opens her farrowing drawer: Farrowing is one task across its units"
+          }
+         ],
+         "visible": [
+          {
+           "screen": "farrowing.before",
+           "hard": "dead-end"
+          },
+          {
+           "text": "Unit 6 · A2",
+           "in": "sheet",
+           "hard": "wrong-fact"
+          }
+         ],
+         "record": [
+          {
+           "expr": "s.tag === '004318'",
+           "says": "her record is open",
+           "hard": "wrong-fact"
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "type": "state",
+     "id": "scan.repeat",
+     "label": "Scan ear tags, a sow scanned again",
+     "tree": "S5",
+     "reset": {
+      "preset": "scan-repeat"
+     },
+     "children": [
+      {
+       "type": "outcome",
+       "id": "fa-s25-repeat-scan-does-not-duplicate",
+       "tree": "S-25",
+       "label": "A repeat scan does not add her twice",
+       "gwt": {
+        "given": "Three sows are listed and the reader reads 000431 a second time.",
+        "when": "The worker looks at the list.",
+        "then": "000431 is still listed once, among the same three sows."
+       },
+       "authority": [
+        {
+         "src": "PRD",
+         "at": "Decisions · owner decision 2026-10-12",
+         "says": "A repeat scan doesn't duplicate; it briefly highlights her existing row"
+        }
+       ],
+       "record": [
+        {
+         "expr": "[...document.querySelectorAll('.scan-page [data-scan-tag]')].map(e=>e.dataset.scanTag).join() === '000431,000418,004318' && c.scan.items.length === 3",
+         "says": "each sow is listed once",
+         "hard": "wrong-fact"
+        }
+       ]
       }
      ]
     }

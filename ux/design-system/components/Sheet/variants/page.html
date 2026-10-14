@@ -10,7 +10,7 @@
 </style></head><body>
 <div class="ph" data-state="Default" data-demo="page-default"><div class="bg"></div><div class="over"></div></div>
 <div class="ph" data-state="Pressed" data-demo="page-pressed" data-pressed=""><div class="bg"></div><div class="over"></div></div>
-<div class="ph" data-state="Aside" data-demo="page-aside"><div class="bg"></div><div class="over"></div></div>
+<div class="ph" data-state="Fact line (a task page)" data-demo="page-fact"><div class="bg"></div><div class="over"></div></div>
 <div class="ph" data-state="Waiting (stands alone)" data-demo="page-waiting"><div class="bg"></div><div class="over"></div></div>
 <div class="ph" data-state="Empty" data-demo="page-empty"><div class="bg"></div><div class="over"></div></div>
 <div class="ph" data-state="Long / Chinese" data-demo="page-zh"><div class="bg"></div><div class="over"></div></div>
@@ -22,14 +22,15 @@ const bar='<div class="bar" aria-hidden="true"><span>9:41</span></div>';
 const note=(l,v)=>UI.field({label:l,control:'<textarea rows="3" placeholder="'+esc(v||'')+'"></textarea>'});
 const rows=(n,t)=>UI.panel(Array.from({length:n},(_,i)=>UI.row({title:(t||'Piglet')+' '+(i+1),description:'Day 2 \u00b7 B4',action:'x'})).join(''),{className:'st-row-group'});
 const foot=(p,extra)=>UI.sheetFooter(Object.assign({back:{action:'back'},primary:{label:'Record death',action:'save'}},p||{}));
+const pf=(x)=>UI.sheetFooter(Object.assign({back:false,primary:{label:'Record death',action:'save'}},x||{}));
 const R={
-"page-default":()=>UI.sheet({variant:'page',bar:bar,title:'Pen log',subtitle:'B4 \u00b7 Sow 000254',body:rows(4,'Entry'),footer:UI.sheetFooter({back:{action:'back'}})}),
-"page-pressed":()=>UI.sheet({variant:'page',bar:bar,title:'Pen log',subtitle:'B4 \u00b7 Sow 000254',body:rows(4,'Entry'),footer:UI.sheetFooter({back:{action:'back'}})}),
-"page-aside":()=>UI.sheet({variant:'page',bar:bar,title:'Give IDs',subtitle:'B4 \u00b7 4 without ID',aside:'<button type="button" class="st-text-action" data-action="clear">Clear</button>',body:rows(3),footer:foot({primary:{label:'Record \u00b7 next piglet',action:'save'}})}),
-"page-waiting":()=>UI.sheet({variant:'page',bar:bar,title:'Move piglets',subtitle:'B4 \u00b7 11 alive',body:rows(2,'Pen'),footer:foot({primary:{label:'Move 3',action:'save',waiting:true},status:{text:'Pick a pen first'}})}),
-"page-empty":()=>UI.sheet({variant:'page',bar:bar,title:'Pen log',subtitle:'B4 \u00b7 Sow 000254',body:'<p class="st-choice-empty">No activity recorded yet.</p>',footer:UI.sheetFooter({back:{action:'back'}})}),
-"page-zh":()=>UI.sheet({variant:'page',bar:bar,title:'\u732a\u6ce8\u8bb0\u5f55\u548c\u4e8b\u4ef6\u6e05\u5355\uff0c\u5305\u62ec\u51fa\u751f\u3001\u6b7b\u4ea1\u3001\u8f6c\u680f\u548c\u8ba1\u6570',subtitle:'B4 \u00b7 \u6bcd\u732a 000254 \u00b7 \u7b2c 2 \u5929',body:rows(3,'\u8bb0\u5f55'),footer:UI.sheetFooter({back:{action:'back',label:'\u8fd4\u56de'}})}),
-"page-over":()=>UI.sheet({variant:'page',bar:bar,title:'Treatment',subtitle:'B4 \u00b7 11 alive',body:rows(2),footer:foot({primary:{label:'Record treatment',action:'save'}})})+UI.sheet({title:'Medicine',subtitle:'Pick one',size:'short',body:rows(2,'Medicine'),footer:UI.sheetFooter({back:{action:'back'}})})
+"page-default":()=>UI.sheet({variant:'page',bar:bar,title:'Pen log',back:{action:'back'},body:rows(4,'Entry'),footer:false}),
+"page-pressed":()=>UI.sheet({variant:'page',bar:bar,title:'Pen log',back:{action:'back'},body:rows(4,'Entry'),footer:false}),
+"page-fact":()=>UI.sheet({variant:'page',bar:bar,title:'Farrowing',back:{action:'today',label:'Back to Today'},line:{text:[{text:'Last record '},{text:'08:41',strong:true},{text:' · G.H'}]},body:rows(3,'Sow'),footer:false}),
+"page-waiting":()=>UI.sheet({variant:'page',bar:bar,title:'Move piglets',back:{action:'back'},body:rows(2,'Pen'),footer:pf({primary:{label:'Move 3',action:'save',waiting:true},status:{text:'Pick a pen first'}})}),
+"page-empty":()=>UI.sheet({variant:'page',bar:bar,title:'Pen log',back:{action:'back'},body:'<p class="st-choice-empty">No activity recorded yet.</p>',footer:false}),
+"page-zh":()=>UI.sheet({variant:'page',bar:bar,title:'猪注记录和事件清单，包括出生、死亡、转栏和计数',back:{action:'back',label:'返回'},line:{text:[{text:'最近记录 '},{text:'08:41',strong:true},{text:' · G.H'}]},body:rows(3,'记录'),footer:false}),
+"page-over":()=>UI.sheet({variant:'page',bar:bar,title:'Treatment',back:{action:'back'},body:rows(2),footer:pf({primary:{label:'Record treatment',action:'save'}})})+UI.sheet({title:'Medicine',size:'short',body:rows(2,'Medicine'),footer:UI.sheetFooter({back:{action:'back'}})})
 };
 document.querySelectorAll('[data-state]').forEach(el=>{const k=el.getAttribute('data-demo'),r=R[k];el.querySelector('.bg').innerHTML=bg();if(r)el.querySelector('.over').innerHTML=r();});
 </script></body></html>

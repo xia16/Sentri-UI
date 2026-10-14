@@ -1,7 +1,5 @@
-/* Shared task identity: navigation, title, then a quiet activity summary. */
-:is(.inspection-phone,.farrowing-phone) .task-header{display:flex;align-items:center;gap:12px;min-height:60px;padding:4px 16px 8px;flex:none}
-:is(.inspection-phone,.farrowing-phone) .task-header h2{flex:1;min-width:0;margin:0;font-size:22px;line-height:1.2;font-weight:700;letter-spacing:-.6px}
-.task-header>.task-return svg{width:18px;height:18px;transform:rotate(180deg)}
+/* Shared task identity: the page header (SentriUI.pageHeader) and the activity row under it. At phone widths under 370px the
+   pages use a 12px gutter, so the page header takes the same edge (layout only). */
 :is(.inspection-phone,.farrowing-phone) .task-activity{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:44px;margin:0;padding:0 18px 8px;color:var(--muted);font-size:13px;line-height:1.5}
 :is(.inspection-phone,.farrowing-phone) .task-activity>p{min-width:0;margin:0;font-size:13px;line-height:1.5}
 .task-activity strong{font-weight:600;color:var(--ink)}
@@ -10,7 +8,6 @@
 
 
 @media(max-width:370px){
- :is(.inspection-phone,.farrowing-phone) .task-header{gap:8px;padding-left:12px;padding-right:12px}
- :is(.inspection-phone,.farrowing-phone) .task-header h2{font-size:21px}
  :is(.inspection-phone,.farrowing-phone) .task-activity{padding-left:14px;padding-right:14px}
+ :is(.inspection-phone,.farrowing-phone) .st-page-header{padding-left:12px;padding-right:12px}
 }

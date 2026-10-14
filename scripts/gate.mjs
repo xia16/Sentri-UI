@@ -394,6 +394,23 @@ if (changed.length) {
     r = run(process.execPath, ['scripts/check-legibility.mjs', '--base', url.cand, '--changed', changed.join(','), ...(strict ? ['--strict'] : ['--compare', url.base])], wt.cand);
     check(`farm legibility (${strict ? 'strict' : 'no worse than base'}) on changed screens`, r.code === 0, r.tail);
   } else check('farm legibility on changed screens', false, 'scripts/check-legibility.mjs is not on this candidate (it lands with #101): the gate fails closed');
+  // P4: clearly wrong spacing (scripts/check-spacing.mjs). A defect main already has on that screen is main's debt, not this change's.
+  if (fs.existsSync(path.join(wt.cand, 'scripts/check-spacing.mjs'))) {
+    const outC = path.join(out, 'spacing-cand.json'), outB = path.join(out, 'spacing-base.json');
+    run(process.execPath, ['scripts/check-spacing.mjs', '--base', url.cand, '--screens', changed.join(','), '--out', outC], wt.cand);
+    run(process.execPath, [path.join(wt.cand, 'scripts/check-spacing.mjs'), '--base', url.base, '--screens', changed.join(','), '--out', outB], wt.cand);
+    const read = (f) => { try { return JSON.parse(fs.readFileSync(f, 'utf8')); } catch { return null; } };
+    const C = read(outC), B = read(outB) || [];
+    if (!C) check('clear spacing on changed screens (P4)', false, 'check-spacing wrote no result on the candidate');
+    else {
+      const key = (d) => d.check + ' ' + d.detail.replace(/\d+px/g, 'Npx');
+      const was = new Set(B.flatMap((s) => s.defects.map((d) => s.screen + '|' + key(d))));
+      const added = C.flatMap((s) => s.defects.filter((d) => !was.has(s.screen + '|' + key(d))).map((d) => `${s.screen}: ${d.check} — ${d.detail}`));
+      const debt = C.reduce((n, s) => n + s.defects.length, 0) - added.length;
+      check('clear spacing on changed screens (P4)', !added.length, added.length ? `${added.length} new: ${added.slice(0, 2).join(' | ')}` : debt ? `${debt} defect(s) already on main` : '');
+      if (debt) gaps.push(`spacing: ${debt} defect(s) on changed screens are already on main (review/spacing.json)`);
+    }
+  }
 }
 
 // ---------- scenario leaves: the scope's features, every feature whose screens changed, every feature a touched shared file reaches ----------

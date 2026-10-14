@@ -7,7 +7,7 @@ Each principle has the same four parts and nothing else: **the principle**, **wh
 ## The ladder: rules become principles
 
 1. **A problem is a rule first.** When a trial, an audit or the owner finds a defect, it goes into the [rules ledger](rules.md) under the principle it broke, with the incident it came from. It is never written into a brief.
-2. **A rule leaves the ledger one of two ways.** **Absorbed**: the principle's wording is sharpened so it plainly covers the case, and the rule is closed. **Automated**: a check or tool enforces it (the gate, a test, the atlas build), the principle's "checked by" names it, and the rule is closed. Prefer automated: a check never gets skimmed.
+2. **A rule leaves the ledger one of two ways.** **Absorbed**: the principle's wording is sharpened so it plainly covers the case, and the rule is closed. **Automated**: a check or tool enforces it (the gate, a test, the atlas build), the principle's "checked by" names it, and the rule is closed. Prefer automated: a check never gets skimmed. A check is accepted only when it fails the case it came from and passes the [house references](references/README.md): a check that flags what the owner holds up as good is measuring the wrong thing.
 3. **Consolidation is triggered.** A principle with three open rules, or the same failure twice, is consolidated before the next trial; every map close sweeps the ledger. A rule open across two consolidations is absorbed, automated or dropped.
 4. **The framework doesn't grow.** Six principles, four parts each. A lesson that fits none of them means a principle is worded too narrowly (rewrite it) or the lesson is a check (automate it). Adding a principle means merging or retiring one.
 
@@ -37,13 +37,13 @@ Each principle has the same four parts and nothing else: **the principle**, **wh
 
 ## P3 · Information before layout
 
-**The principle.** Decide what the worker needs, in what order, and what to cut, before any layout. The answer to the worker's first question is the heaviest thing on the screen; only what the worker must do now is loud; cut before you enlarge; cutting facts never cuts structure.
+**The principle.** Decide what the worker needs, in what order, and what to cut, before any layout, on every new screen, every redesign and every component variant that shows facts. Every fact a screen displays, in the header, a row, a chip or a footer, is a decision recorded in the budget with the worker's question it answers there; nothing is shown by default, carried over unexamined, or filled in by a shared component. The answer to the worker's first question is the heaviest thing on the screen; only what the worker must do now is loud; cut before you enlarge; cutting facts never cuts structure.
 
-**Why.** Passes that met the type floors by enlarging everything (c1, R14), that went calm but flat (c2, R15) or stacked facts on a page (R16) all skipped the budget.
+**Why.** Passes that met the type floors by enlarging everything (c1, R14), that went calm but flat (c2, R15) or stacked facts on a page (R16) all skipped the budget. Drawer headers repeated the pen, unit and parity the page behind already showed, and a header spec nearly made `#ID › pen · parity` a default for every task when parity matters at farrowing only (owner, 2026-10-13: "each display needs a clear decision, not made randomly").
 
 **Show it.** `features/<id>/budget.md` with `## Inventory`, `## Questions` and `## Levels`, then the cut list, and the squint test's first three things in the PR body.
 
-**Checked by.** The gate refuses a screen change without `budget.md`; the judge's squint test and cold question (gate.md §3–4).
+**Checked by.** The gate refuses a screen change without `budget.md`; the judge's squint test and cold question (gate.md §3–4). To automate (ledger): every fact the changed screens render traced to the budget; the header line and its identity facts named in it (L17).
 
 ## P4 · Judge it by eye, as the owner would
 
@@ -53,7 +53,7 @@ Each principle has the same four parts and nothing else: **the principle**, **wh
 
 **Show it.** `## Self-crit` in `critique.md`: per direction and round, each problem fixed or not, each Keep item as strong or not, the squint test, cluttered / flat / bulky against the original, the reference it was held against, and **better because** or **not better because**; last, a `Final look` block naming the commit it rendered.
 
-**Checked by.** The driver's look; the judge's calibration on the owner's rulings, cold look and before/after (gate.md §3–4).
+**Checked by.** The driver's look; the judge's calibration on the owner's rulings, cold look and before/after (gate.md §3–4); `scripts/check-spacing.mjs` for the clearly wrong spacing the eye reads as clutter (a block closer to a list than its rows, crowded boxes, doubled lines).
 
 ## P5 · Prove it, don't claim it
 

@@ -1,0 +1,1476 @@
+{
+ "tolerances": {
+  "inversion": 0.6,
+  "rhythmMin": 20,
+  "crowd": 8,
+  "double": 6
+ },
+ "screens": [
+  {
+   "screen": "assistant.needs-you",
+   "feature": "assistant",
+   "defects": []
+  },
+  {
+   "screen": "assistant.finding",
+   "feature": "assistant",
+   "defects": []
+  },
+  {
+   "screen": "assistant.answered",
+   "feature": "assistant",
+   "defects": []
+  },
+  {
+   "screen": "assistant.up-to-date",
+   "feature": "assistant",
+   "defects": []
+  },
+  {
+   "screen": "assistant.conversations",
+   "feature": "assistant",
+   "defects": []
+  },
+  {
+   "screen": "assistant.conversation",
+   "feature": "assistant",
+   "defects": []
+  },
+  {
+   "screen": "environment.page",
+   "feature": "environment",
+   "defects": []
+  },
+  {
+   "screen": "environment.fan-manual",
+   "feature": "environment",
+   "defects": []
+  },
+  {
+   "screen": "environment.maintenance",
+   "feature": "environment",
+   "defects": []
+  },
+  {
+   "screen": "environment.maintenance-empty",
+   "feature": "environment",
+   "defects": []
+  },
+  {
+   "screen": "environment.report-issue",
+   "feature": "environment",
+   "defects": []
+  },
+  {
+   "screen": "environment.issue-detail",
+   "feature": "environment",
+   "defects": []
+  },
+  {
+   "screen": "environment.issue-resolved",
+   "feature": "environment",
+   "defects": []
+  },
+  {
+   "screen": "environment.sensor-week",
+   "feature": "environment",
+   "defects": []
+  },
+  {
+   "screen": "environment.sensor-other",
+   "feature": "environment",
+   "defects": []
+  },
+  {
+   "screen": "workbench.today",
+   "feature": "workbench",
+   "defects": []
+  },
+  {
+   "screen": "workbench.choose-unit",
+   "feature": "workbench",
+   "defects": []
+  },
+  {
+   "screen": "workbench.choose-unit-current",
+   "feature": "workbench",
+   "defects": []
+  },
+  {
+   "screen": "workbench.sections",
+   "feature": "workbench",
+   "defects": []
+  },
+  {
+   "screen": "workbench.gestation",
+   "feature": "workbench",
+   "defects": []
+  },
+  {
+   "screen": "workbench.work-due",
+   "feature": "workbench",
+   "defects": []
+  },
+  {
+   "screen": "workbench.all-recorded",
+   "feature": "workbench",
+   "defects": []
+  },
+  {
+   "screen": "workbench.quiet-section",
+   "feature": "workbench",
+   "defects": []
+  },
+  {
+   "screen": "workbench.unit",
+   "feature": "workbench",
+   "defects": []
+  },
+  {
+   "screen": "workbench.unit-farrowing",
+   "feature": "workbench",
+   "defects": []
+  },
+  {
+   "screen": "workbench.end-task-early",
+   "feature": "workbench",
+   "defects": []
+  },
+  {
+   "screen": "workbench.work-waiting",
+   "feature": "workbench",
+   "defects": []
+  },
+  {
+   "screen": "workbench.round-complete",
+   "feature": "workbench",
+   "defects": []
+  },
+  {
+   "screen": "workbench.unit-clear",
+   "feature": "workbench",
+   "defects": []
+  },
+  {
+   "screen": "workbench.unit-health",
+   "feature": "workbench",
+   "defects": []
+  },
+  {
+   "screen": "workbench.unit-feed",
+   "feature": "workbench",
+   "defects": []
+  },
+  {
+   "screen": "workbench.unit-maintenance",
+   "feature": "workbench",
+   "defects": []
+  },
+  {
+   "screen": "workbench.unit-busy",
+   "feature": "workbench",
+   "defects": []
+  },
+  {
+   "screen": "workbench.unit-unknown",
+   "feature": "workbench",
+   "defects": []
+  },
+  {
+   "screen": "workbench.toolbox",
+   "feature": "workbench",
+   "defects": []
+  },
+  {
+   "screen": "workbench.records",
+   "feature": "workbench",
+   "defects": []
+  },
+  {
+   "screen": "breeding.list",
+   "feature": "breeding",
+   "defects": []
+  },
+  {
+   "screen": "breeding.overview",
+   "feature": "breeding",
+   "defects": []
+  },
+  {
+   "screen": "breeding.record",
+   "feature": "breeding",
+   "defects": []
+  },
+  {
+   "screen": "breeding.picker",
+   "feature": "breeding",
+   "defects": []
+  },
+  {
+   "screen": "breeding.filter",
+   "feature": "breeding",
+   "defects": []
+  },
+  {
+   "screen": "breeding.peek",
+   "feature": "breeding",
+   "defects": []
+  },
+  {
+   "screen": "farrowing.room",
+   "feature": "farrowing",
+   "defects": []
+  },
+  {
+   "screen": "farrowing.count",
+   "feature": "farrowing",
+   "defects": []
+  },
+  {
+   "screen": "farrowing.before",
+   "feature": "farrowing",
+   "defects": []
+  },
+  {
+   "screen": "farrowing.death",
+   "feature": "farrowing",
+   "defects": [
+    {
+     "check": "inversion",
+     "at": 290,
+     "detail": "div.st-selection is 21px from the list of 6 Stepper.st-stepper whose rows are 43px apart: it reads as part of the list"
+    },
+    {
+     "check": "crowding",
+     "at": 286,
+     "detail": "button and Stepper.st-stepper are 4px apart with nothing between"
+    }
+   ]
+  },
+  {
+   "screen": "farrowing.finish",
+   "feature": "farrowing",
+   "defects": []
+  },
+  {
+   "screen": "farrowing.leave-edit",
+   "feature": "farrowing",
+   "defects": []
+  },
+  {
+   "screen": "farrowing.locked",
+   "feature": "farrowing",
+   "defects": []
+  },
+  {
+   "screen": "farrowing.edit",
+   "feature": "farrowing",
+   "defects": []
+  },
+  {
+   "screen": "farrowing.born",
+   "feature": "farrowing",
+   "defects": []
+  },
+  {
+   "screen": "farrowing.history",
+   "feature": "farrowing",
+   "defects": []
+  },
+  {
+   "screen": "farrowing.allocate",
+   "feature": "farrowing",
+   "defects": []
+  },
+  {
+   "screen": "farrowing.ended",
+   "feature": "farrowing",
+   "defects": []
+  },
+  {
+   "screen": "farrowing.task-blocked",
+   "feature": "farrowing",
+   "defects": []
+  },
+  {
+   "screen": "farrowing.task-ready",
+   "feature": "farrowing",
+   "defects": []
+  },
+  {
+   "screen": "farrowing.task-complete",
+   "feature": "farrowing",
+   "defects": []
+  },
+  {
+   "screen": "farrowing.task-outcomes",
+   "feature": "farrowing",
+   "defects": []
+  },
+  {
+   "screen": "farrowing.edit-finished",
+   "feature": "farrowing",
+   "defects": []
+  },
+  {
+   "screen": "farrowing.overview",
+   "feature": "farrowing",
+   "defects": []
+  },
+  {
+   "screen": "farrowing.task-receipt",
+   "feature": "farrowing",
+   "defects": []
+  },
+  {
+   "screen": "farrowing.foster",
+   "feature": "farrowing",
+   "defects": []
+  },
+  {
+   "screen": "farrowing.reconcile",
+   "feature": "farrowing",
+   "defects": []
+  },
+  {
+   "screen": "farrowing.filter",
+   "feature": "farrowing",
+   "defects": []
+  },
+  {
+   "screen": "farrowing.pen-map",
+   "feature": "farrowing",
+   "defects": []
+  },
+  {
+   "screen": "farrowing.pen",
+   "feature": "farrowing",
+   "defects": []
+  },
+  {
+   "screen": "farrowing.pen-log",
+   "feature": "farrowing",
+   "defects": []
+  },
+  {
+   "screen": "farrowing.pen-note",
+   "feature": "farrowing",
+   "defects": []
+  },
+  {
+   "screen": "farrowing.pen-read-note",
+   "feature": "farrowing",
+   "defects": []
+  },
+  {
+   "screen": "farrowing.pen-feed",
+   "feature": "farrowing",
+   "defects": []
+  },
+  {
+   "screen": "farrowing.pen-fault",
+   "feature": "farrowing",
+   "defects": []
+  },
+  {
+   "screen": "farrowing.pen-fault-record",
+   "feature": "farrowing",
+   "defects": []
+  },
+  {
+   "screen": "farrowing.search",
+   "feature": "farrowing",
+   "defects": []
+  },
+  {
+   "screen": "farrowing.search-results",
+   "feature": "farrowing",
+   "defects": []
+  },
+  {
+   "screen": "farrowing.search-none",
+   "feature": "farrowing",
+   "defects": []
+  },
+  {
+   "screen": "farrowing.scan",
+   "feature": "farrowing",
+   "defects": []
+  },
+  {
+   "screen": "farrowing.scan-no-reader",
+   "feature": "farrowing",
+   "defects": []
+  },
+  {
+   "screen": "farrowing.scan-list",
+   "feature": "farrowing",
+   "defects": []
+  },
+  {
+   "screen": "farrowing.scan-ticked",
+   "feature": "farrowing",
+   "defects": []
+  },
+  {
+   "screen": "farrowing.scan-stopped",
+   "feature": "farrowing",
+   "defects": []
+  },
+  {
+   "screen": "farrowing.scan-actions",
+   "feature": "farrowing",
+   "defects": []
+  },
+  {
+   "screen": "farrowing.task-sows",
+   "feature": "farrowing",
+   "defects": []
+  },
+  {
+   "screen": "farrowing.death-breakdown",
+   "feature": "farrowing",
+   "defects": []
+  },
+  {
+   "screen": "farrowing.today",
+   "feature": "farrowing",
+   "defects": []
+  },
+  {
+   "screen": "farrowing.sow-actions",
+   "feature": "farrowing",
+   "defects": []
+  },
+  {
+   "screen": "farrowing.note",
+   "feature": "farrowing",
+   "defects": []
+  },
+  {
+   "screen": "farrowing.piglet-care",
+   "feature": "farrowing",
+   "defects": []
+  },
+  {
+   "screen": "farrowing.piglet-identity",
+   "feature": "farrowing",
+   "defects": []
+  },
+  {
+   "screen": "farrowing.piglet-death",
+   "feature": "farrowing",
+   "defects": []
+  },
+  {
+   "screen": "heat-check.list",
+   "feature": "heat-check",
+   "defects": []
+  },
+  {
+   "screen": "heat-check.overview",
+   "feature": "heat-check",
+   "defects": []
+  },
+  {
+   "screen": "heat-check.mark",
+   "feature": "heat-check",
+   "defects": []
+  },
+  {
+   "screen": "heat-check.select",
+   "feature": "heat-check",
+   "defects": []
+  },
+  {
+   "screen": "heat-check.scan",
+   "feature": "heat-check",
+   "defects": []
+  },
+  {
+   "screen": "heat-check.filter",
+   "feature": "heat-check",
+   "defects": []
+  },
+  {
+   "screen": "heat-check.filter-applied",
+   "feature": "heat-check",
+   "defects": []
+  },
+  {
+   "screen": "heat-check.picker",
+   "feature": "heat-check",
+   "defects": []
+  },
+  {
+   "screen": "heat-check.peek",
+   "feature": "heat-check",
+   "defects": []
+  },
+  {
+   "screen": "piglet-processing.pen-list",
+   "feature": "piglet-processing",
+   "defects": []
+  },
+  {
+   "screen": "piglet-processing.sheet-coming",
+   "feature": "piglet-processing",
+   "defects": []
+  },
+  {
+   "screen": "piglet-processing.sheet-todo",
+   "feature": "piglet-processing",
+   "defects": []
+  },
+  {
+   "screen": "piglet-processing.sheet-breeders",
+   "feature": "piglet-processing",
+   "defects": []
+  },
+  {
+   "screen": "piglet-processing.sheet-late",
+   "feature": "piglet-processing",
+   "defects": []
+  },
+  {
+   "screen": "piglet-processing.sheet-done",
+   "feature": "piglet-processing",
+   "defects": []
+  },
+  {
+   "screen": "piglet-processing.adjust-count",
+   "feature": "piglet-processing",
+   "defects": []
+  },
+  {
+   "screen": "piglet-processing.tagged-list",
+   "feature": "piglet-processing",
+   "defects": []
+  },
+  {
+   "screen": "piglet-processing.give-ids",
+   "feature": "piglet-processing",
+   "defects": []
+  },
+  {
+   "screen": "piglet-processing.counts",
+   "feature": "piglet-processing",
+   "defects": []
+  },
+  {
+   "screen": "piglet-processing.weight",
+   "feature": "piglet-processing",
+   "defects": []
+  },
+  {
+   "screen": "piglet-processing.more-actions",
+   "feature": "piglet-processing",
+   "defects": []
+  },
+  {
+   "screen": "piglet-processing.record-death",
+   "feature": "piglet-processing",
+   "defects": []
+  },
+  {
+   "screen": "piglet-processing.move-piglets",
+   "feature": "piglet-processing",
+   "defects": []
+  },
+  {
+   "screen": "piglet-processing.set-count",
+   "feature": "piglet-processing",
+   "defects": []
+  },
+  {
+   "screen": "piglet-processing.pen-log",
+   "feature": "piglet-processing",
+   "defects": []
+  },
+  {
+   "screen": "piglet-processing.end-task",
+   "feature": "piglet-processing",
+   "defects": []
+  },
+  {
+   "screen": "piglet-processing.list-ended",
+   "feature": "piglet-processing",
+   "defects": []
+  },
+  {
+   "screen": "piglet-processing.phone-clash",
+   "feature": "piglet-processing",
+   "defects": []
+  },
+  {
+   "screen": "piglet-processing.chip-done",
+   "feature": "piglet-processing",
+   "defects": []
+  },
+  {
+   "screen": "piglet-processing.job-chip-iron",
+   "feature": "piglet-processing",
+   "defects": []
+  },
+  {
+   "screen": "piglet-processing.job-chip-id",
+   "feature": "piglet-processing",
+   "defects": []
+  },
+  {
+   "screen": "piglet-processing.list-no-id",
+   "feature": "piglet-processing",
+   "defects": []
+  },
+  {
+   "screen": "piglet-processing.sheet-notch",
+   "feature": "piglet-processing",
+   "defects": []
+  },
+  {
+   "screen": "post-farrowing.list",
+   "feature": "post-farrowing",
+   "defects": []
+  },
+  {
+   "screen": "post-farrowing.overview",
+   "feature": "post-farrowing",
+   "defects": []
+  },
+  {
+   "screen": "post-farrowing.check",
+   "feature": "post-farrowing",
+   "defects": []
+  },
+  {
+   "screen": "pregnancy.list",
+   "feature": "pregnancy",
+   "defects": []
+  },
+  {
+   "screen": "pregnancy.detail",
+   "feature": "pregnancy",
+   "defects": []
+  },
+  {
+   "screen": "pregnancy.picker",
+   "feature": "pregnancy",
+   "defects": []
+  },
+  {
+   "screen": "pregnancy.check",
+   "feature": "pregnancy",
+   "defects": []
+  },
+  {
+   "screen": "return-heat.list",
+   "feature": "return-heat",
+   "defects": []
+  },
+  {
+   "screen": "return-heat.overview",
+   "feature": "return-heat",
+   "defects": []
+  },
+  {
+   "screen": "return-heat.entry",
+   "feature": "return-heat",
+   "defects": []
+  },
+  {
+   "screen": "return-heat.record",
+   "feature": "return-heat",
+   "defects": []
+  },
+  {
+   "screen": "return-heat.result",
+   "feature": "return-heat",
+   "defects": []
+  },
+  {
+   "screen": "weaning.list",
+   "feature": "weaning",
+   "defects": []
+  },
+  {
+   "screen": "weaning.overview",
+   "feature": "weaning",
+   "defects": []
+  },
+  {
+   "screen": "weaning.check",
+   "feature": "weaning",
+   "defects": []
+  },
+  {
+   "screen": "weaning.handoff",
+   "feature": "weaning",
+   "defects": []
+  },
+  {
+   "screen": "feed-plan.pen",
+   "feature": "feed-plan",
+   "defects": []
+  },
+  {
+   "screen": "feed-plan.adlib",
+   "feature": "feed-plan",
+   "defects": []
+  },
+  {
+   "screen": "feed-plan.bulk",
+   "feature": "feed-plan",
+   "defects": []
+  },
+  {
+   "screen": "feed-plan.editor",
+   "feature": "feed-plan",
+   "defects": []
+  },
+  {
+   "screen": "feed-plan.end-date",
+   "feature": "feed-plan",
+   "defects": []
+  },
+  {
+   "screen": "feed-plan.pig",
+   "feature": "feed-plan",
+   "defects": []
+  },
+  {
+   "screen": "feed-plan.pen-up",
+   "feature": "feed-plan",
+   "defects": []
+  },
+  {
+   "screen": "feed-plan.pen-down",
+   "feature": "feed-plan",
+   "defects": []
+  },
+  {
+   "screen": "feed-plan.pen-held",
+   "feature": "feed-plan",
+   "defects": []
+  },
+  {
+   "screen": "feed-plan.switch-pen",
+   "feature": "feed-plan",
+   "defects": []
+  },
+  {
+   "screen": "feed-plan.switch-pens",
+   "feature": "feed-plan",
+   "defects": []
+  },
+  {
+   "screen": "inspection.walk",
+   "feature": "inspection",
+   "defects": []
+  },
+  {
+   "screen": "inspection.stage-times",
+   "feature": "inspection",
+   "defects": []
+  },
+  {
+   "screen": "inspection.animal-types",
+   "feature": "inspection",
+   "defects": []
+  },
+  {
+   "screen": "inspection.pen-signals",
+   "feature": "inspection",
+   "defects": []
+  },
+  {
+   "screen": "inspection.pen",
+   "feature": "inspection",
+   "defects": []
+  },
+  {
+   "screen": "inspection.pen-note",
+   "feature": "inspection",
+   "defects": []
+  },
+  {
+   "screen": "inspection.pen-log",
+   "feature": "inspection",
+   "defects": []
+  },
+  {
+   "screen": "inspection.filters",
+   "feature": "inspection",
+   "defects": []
+  },
+  {
+   "screen": "inspection.go-to-pen",
+   "feature": "inspection",
+   "defects": []
+  },
+  {
+   "screen": "inspection.find-pig",
+   "feature": "inspection",
+   "defects": []
+  },
+  {
+   "screen": "inspection.actions",
+   "feature": "inspection",
+   "defects": []
+  },
+  {
+   "screen": "inspection.review-selected",
+   "feature": "inspection",
+   "defects": []
+  },
+  {
+   "screen": "inspection.walk-log",
+   "feature": "inspection",
+   "defects": []
+  },
+  {
+   "screen": "inspection.finish",
+   "feature": "inspection",
+   "defects": []
+  },
+  {
+   "screen": "inspection.walk-recorded",
+   "feature": "inspection",
+   "defects": []
+  },
+  {
+   "screen": "inspection.no-batches",
+   "feature": "inspection",
+   "defects": []
+  },
+  {
+   "screen": "inspection.one-batch",
+   "feature": "inspection",
+   "defects": []
+  },
+  {
+   "screen": "inspection.many-batches",
+   "feature": "inspection",
+   "defects": []
+  },
+  {
+   "screen": "inspection.batch-farrowing",
+   "feature": "inspection",
+   "defects": []
+  },
+  {
+   "screen": "inspection.batch-concurrent",
+   "feature": "inspection",
+   "defects": []
+  },
+  {
+   "screen": "inspection.pen-faults",
+   "feature": "inspection",
+   "defects": []
+  },
+  {
+   "screen": "inspection.fault-report",
+   "feature": "inspection",
+   "defects": []
+  },
+  {
+   "screen": "inspection.fault-resolve",
+   "feature": "inspection",
+   "defects": []
+  },
+  {
+   "screen": "inspection.pen-actions",
+   "feature": "inspection",
+   "defects": []
+  },
+  {
+   "screen": "inspection.fault-report-other",
+   "feature": "inspection",
+   "defects": []
+  },
+  {
+   "screen": "inspection.fault-flag",
+   "feature": "inspection",
+   "defects": []
+  },
+  {
+   "screen": "inspection.fault-resolved",
+   "feature": "inspection",
+   "defects": []
+  },
+  {
+   "screen": "inspection.set-count",
+   "feature": "inspection",
+   "defects": []
+  },
+  {
+   "screen": "inspection.set-count-batches",
+   "feature": "inspection",
+   "defects": []
+  },
+  {
+   "screen": "inspection.set-count-fewer",
+   "feature": "inspection",
+   "defects": []
+  },
+  {
+   "screen": "inspection.set-count-more",
+   "feature": "inspection",
+   "defects": []
+  },
+  {
+   "screen": "inspection.count-recorded",
+   "feature": "inspection",
+   "defects": []
+  },
+  {
+   "screen": "find-pig.search",
+   "feature": "find-pig",
+   "defects": []
+  },
+  {
+   "screen": "find-pig.scan",
+   "feature": "find-pig",
+   "defects": []
+  },
+  {
+   "screen": "find-pig.results",
+   "feature": "find-pig",
+   "defects": []
+  },
+  {
+   "screen": "pig-list.detail",
+   "feature": "pig-list",
+   "defects": []
+  },
+  {
+   "screen": "pig-list.health",
+   "feature": "pig-list",
+   "defects": []
+  },
+  {
+   "screen": "pig-list.events",
+   "feature": "pig-list",
+   "defects": []
+  },
+  {
+   "screen": "pig-list.edit",
+   "feature": "pig-list",
+   "defects": []
+  },
+  {
+   "screen": "pig-list.identity-one",
+   "feature": "pig-list",
+   "defects": []
+  },
+  {
+   "screen": "pig-list.identity-tag",
+   "feature": "pig-list",
+   "defects": []
+  },
+  {
+   "screen": "pig-list.identity-notch",
+   "feature": "pig-list",
+   "defects": []
+  },
+  {
+   "screen": "pig-list.identity-breeding",
+   "feature": "pig-list",
+   "defects": []
+  },
+  {
+   "screen": "pig-profile.full",
+   "feature": "pig-profile",
+   "defects": []
+  },
+  {
+   "screen": "pig-profile.partial",
+   "feature": "pig-profile",
+   "defects": []
+  },
+  {
+   "screen": "pig-profile.empty",
+   "feature": "pig-profile",
+   "defects": []
+  },
+  {
+   "screen": "pig-profile.tasks",
+   "feature": "pig-profile",
+   "defects": []
+  },
+  {
+   "screen": "pig-profile.production-batches",
+   "feature": "pig-profile",
+   "defects": []
+  },
+  {
+   "screen": "pig-profile.batch-record",
+   "feature": "pig-profile",
+   "defects": []
+  },
+  {
+   "screen": "pig-profile.origin",
+   "feature": "pig-profile",
+   "defects": []
+  },
+  {
+   "screen": "pig-profile.log",
+   "feature": "pig-profile",
+   "defects": []
+  },
+  {
+   "screen": "pig-profile.actions",
+   "feature": "pig-profile",
+   "defects": []
+  },
+  {
+   "screen": "pig-profile.production-task",
+   "feature": "pig-profile",
+   "defects": []
+  },
+  {
+   "screen": "pig-profile.miscarriage",
+   "feature": "pig-profile",
+   "defects": []
+  },
+  {
+   "screen": "pig-profile.batch-membership",
+   "feature": "pig-profile",
+   "defects": []
+  },
+  {
+   "screen": "pig-profile.measurements",
+   "feature": "pig-profile",
+   "defects": []
+  },
+  {
+   "screen": "pig-profile.measure",
+   "feature": "pig-profile",
+   "defects": []
+  },
+  {
+   "screen": "pig-profile.body-condition",
+   "feature": "pig-profile",
+   "defects": []
+  },
+  {
+   "screen": "pig-profile.note",
+   "feature": "pig-profile",
+   "defects": []
+  },
+  {
+   "screen": "pig-profile.unavailable-actions",
+   "feature": "pig-profile",
+   "defects": []
+  },
+  {
+   "screen": "pig-profile.not-in-pig",
+   "feature": "pig-profile",
+   "defects": []
+  },
+  {
+   "screen": "disease.add-select",
+   "feature": "disease",
+   "defects": []
+  },
+  {
+   "screen": "disease.add-drawer",
+   "feature": "disease",
+   "defects": []
+  },
+  {
+   "screen": "disease.catalogue",
+   "feature": "disease",
+   "defects": []
+  },
+  {
+   "screen": "disease.add-committed",
+   "feature": "disease",
+   "defects": []
+  },
+  {
+   "screen": "disease.resolve-one",
+   "feature": "disease",
+   "defects": []
+  },
+  {
+   "screen": "disease.resolve-many",
+   "feature": "disease",
+   "defects": []
+  },
+  {
+   "screen": "disease.resolve-in-place",
+   "feature": "disease",
+   "defects": []
+  },
+  {
+   "screen": "disease.resolve-committed",
+   "feature": "disease",
+   "defects": []
+  },
+  {
+   "screen": "health-record.mixed",
+   "feature": "health-record",
+   "defects": []
+  },
+  {
+   "screen": "health-record.ongoing",
+   "feature": "health-record",
+   "defects": []
+  },
+  {
+   "screen": "health-record.many",
+   "feature": "health-record",
+   "defects": []
+  },
+  {
+   "screen": "health-record.care-states",
+   "feature": "health-record",
+   "defects": []
+  },
+  {
+   "screen": "health-record.finding",
+   "feature": "health-record",
+   "defects": []
+  },
+  {
+   "screen": "health-record.edit-finding",
+   "feature": "health-record",
+   "defects": []
+  },
+  {
+   "screen": "health-record.resolve-finding",
+   "feature": "health-record",
+   "defects": []
+  },
+  {
+   "screen": "health-record.record-health",
+   "feature": "health-record",
+   "defects": []
+  },
+  {
+   "screen": "health-record.condition-picker",
+   "feature": "health-record",
+   "defects": []
+  },
+  {
+   "screen": "health-record.care-instructions",
+   "feature": "health-record",
+   "defects": []
+  },
+  {
+   "screen": "health-record.resolve-conditions",
+   "feature": "health-record",
+   "defects": []
+  },
+  {
+   "screen": "health-record.treatment",
+   "feature": "health-record",
+   "defects": []
+  },
+  {
+   "screen": "health-record.medicine-picker",
+   "feature": "health-record",
+   "defects": []
+  },
+  {
+   "screen": "report-death.entry",
+   "feature": "report-death",
+   "defects": []
+  },
+  {
+   "screen": "report-death.one",
+   "feature": "report-death",
+   "defects": []
+  },
+  {
+   "screen": "report-death.roster",
+   "feature": "report-death",
+   "defects": []
+  },
+  {
+   "screen": "report-death.conveyor",
+   "feature": "report-death",
+   "defects": []
+  },
+  {
+   "screen": "report-death.after",
+   "feature": "report-death",
+   "defects": []
+  },
+  {
+   "screen": "report-death.group",
+   "feature": "report-death",
+   "defects": []
+  },
+  {
+   "screen": "treat.marked-set",
+   "feature": "treat",
+   "defects": []
+  },
+  {
+   "screen": "treat.page",
+   "feature": "treat",
+   "defects": []
+  },
+  {
+   "screen": "treat.targets",
+   "feature": "treat",
+   "defects": []
+  },
+  {
+   "screen": "treat.next-walk",
+   "feature": "treat",
+   "defects": []
+  },
+  {
+   "screen": "triage.bulk",
+   "feature": "triage",
+   "defects": []
+  },
+  {
+   "screen": "triage.standalone",
+   "feature": "triage",
+   "defects": []
+  },
+  {
+   "screen": "triage.marks",
+   "feature": "triage",
+   "defects": []
+  },
+  {
+   "screen": "abortion.entry",
+   "feature": "abortion",
+   "defects": []
+  },
+  {
+   "screen": "abortion.drawer",
+   "feature": "abortion",
+   "defects": []
+  },
+  {
+   "screen": "abortion.cause",
+   "feature": "abortion",
+   "defects": []
+  },
+  {
+   "screen": "abortion.other",
+   "feature": "abortion",
+   "defects": []
+  },
+  {
+   "screen": "abortion.after",
+   "feature": "abortion",
+   "defects": []
+  },
+  {
+   "screen": "fostering.type",
+   "feature": "fostering",
+   "defects": []
+  },
+  {
+   "screen": "fostering.receive",
+   "feature": "fostering",
+   "defects": []
+  },
+  {
+   "screen": "fostering.piglets",
+   "feature": "fostering",
+   "defects": []
+  },
+  {
+   "screen": "fostering.result",
+   "feature": "fostering",
+   "defects": []
+  },
+  {
+   "screen": "heat.entry",
+   "feature": "heat",
+   "defects": []
+  },
+  {
+   "screen": "heat.drawer",
+   "feature": "heat",
+   "defects": []
+  },
+  {
+   "screen": "heat.join",
+   "feature": "heat",
+   "defects": []
+  },
+  {
+   "screen": "heat.joined",
+   "feature": "heat",
+   "defects": []
+  },
+  {
+   "screen": "heat.after",
+   "feature": "heat",
+   "defects": []
+  },
+  {
+   "screen": "keep-breeding.mark",
+   "feature": "keep-breeding",
+   "defects": []
+  },
+  {
+   "screen": "keep-breeding.blocked",
+   "feature": "keep-breeding",
+   "defects": []
+  },
+  {
+   "screen": "keep-breeding.unmark",
+   "feature": "keep-breeding",
+   "defects": []
+  },
+  {
+   "screen": "keep-breeding.after",
+   "feature": "keep-breeding",
+   "defects": []
+  },
+  {
+   "screen": "unexpected-pregnancy.entry",
+   "feature": "unexpected-pregnancy",
+   "defects": []
+  },
+  {
+   "screen": "unexpected-pregnancy.drawer",
+   "feature": "unexpected-pregnancy",
+   "defects": []
+  },
+  {
+   "screen": "unexpected-pregnancy.join",
+   "feature": "unexpected-pregnancy",
+   "defects": []
+  },
+  {
+   "screen": "unexpected-pregnancy.unclear",
+   "feature": "unexpected-pregnancy",
+   "defects": []
+  },
+  {
+   "screen": "unexpected-pregnancy.after",
+   "feature": "unexpected-pregnancy",
+   "defects": []
+  },
+  {
+   "screen": "backfat.by-eye",
+   "feature": "backfat",
+   "defects": []
+  },
+  {
+   "screen": "backfat.measured",
+   "feature": "backfat",
+   "defects": []
+  },
+  {
+   "screen": "backfat.run",
+   "feature": "backfat",
+   "defects": []
+  },
+  {
+   "screen": "backfat.after",
+   "feature": "backfat",
+   "defects": []
+  },
+  {
+   "screen": "missing.drawer",
+   "feature": "missing",
+   "defects": []
+  },
+  {
+   "screen": "missing.mixed",
+   "feature": "missing",
+   "defects": []
+  },
+  {
+   "screen": "missing.after",
+   "feature": "missing",
+   "defects": []
+  },
+  {
+   "screen": "missing.page",
+   "feature": "missing",
+   "defects": []
+  },
+  {
+   "screen": "move.tagged",
+   "feature": "move",
+   "defects": []
+  },
+  {
+   "screen": "move.picker",
+   "feature": "move",
+   "defects": []
+  },
+  {
+   "screen": "move.mixed",
+   "feature": "move",
+   "defects": []
+  },
+  {
+   "screen": "move.after",
+   "feature": "move",
+   "defects": []
+  },
+  {
+   "screen": "move.transfer-sow",
+   "feature": "move",
+   "defects": []
+  },
+  {
+   "screen": "temperature.one",
+   "feature": "temperature",
+   "defects": []
+  },
+  {
+   "screen": "temperature.run",
+   "feature": "temperature",
+   "defects": []
+  },
+  {
+   "screen": "temperature.after",
+   "feature": "temperature",
+   "defects": []
+  },
+  {
+   "screen": "weight.one",
+   "feature": "weight",
+   "defects": []
+  },
+  {
+   "screen": "weight.run",
+   "feature": "weight",
+   "defects": []
+  },
+  {
+   "screen": "weight.group",
+   "feature": "weight",
+   "defects": []
+  },
+  {
+   "screen": "weight.after",
+   "feature": "weight",
+   "defects": []
+  },
+  {
+   "screen": "data-sync.banner",
+   "feature": "data-sync",
+   "defects": []
+  },
+  {
+   "screen": "data-sync.list",
+   "feature": "data-sync",
+   "defects": []
+  },
+  {
+   "screen": "data-sync.upload",
+   "feature": "data-sync",
+   "defects": []
+  },
+  {
+   "screen": "data-sync.failed",
+   "feature": "data-sync",
+   "defects": []
+  }
+ ]
+}

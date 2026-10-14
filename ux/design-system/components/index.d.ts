@@ -680,13 +680,24 @@ export interface SentriUI {
 export type SheetText = string | { text?: string; str?: string; args?: Record<string, unknown>; html?: string };
 /** A Button spec for a footer; `waiting` draws the waiting face (aria-disabled), `describedby` is wired by sheetFooter's status. */
 export interface SheetAction { label: SheetText; action?: string; value?: string; register?: 'primary' | 'secondary' | 'tool' | 'text' | 'danger'; waiting?: boolean; busy?: boolean; describedby?: string; className?: string; attrs?: SafeAttrs }
+/** A line of text slots joined by { sep: true }; { strong: true } draws a figure in ink. */
+export type SheetParts = Array<SheetText | { sep: true } | { text: string; strong?: boolean; tone?: 'amber' | 'red' | 'green' }>;
+/** The header line: a route (the subject chip opening the animal, then at most two muted identity facts) or one fact. */
+export type HeaderLine =
+  | { chip: { id: SheetText; action?: string; value?: string; label?: SheetText }; facts?: Array<SheetText | SheetParts> }
+  | { text: SheetText | SheetParts };
 export interface SheetProps {
-  /** drawer (default): over the page, sized to its content, a handle and a ✕ · page: the whole canvas, Back in the footer, no ✕ · dialog: one small decision rising from the bottom. */
+  /** drawer (default): over the page, sized to its content, a handle, the sheet header (centred title, line, hairline) · page: the whole canvas, the page header (Back top left, title, line), no Back in the footer · dialog: one small decision rising from the bottom. */
   variant?: 'drawer' | 'page' | 'dialog';
+  /** Drawer only: '' (default) is a content or input drawer, white with tinted cards; 'menu' is a drawer whose every row is an option or a verb (Choose a unit, More actions, Go to pen), the tint with white cards. See SURFACES.md. */
+  surface?: '' | 'drawer' | 'menu';
   title: SheetText;
-  /** One line under the title; an array of text slots joined by { sep: true } (parts may carry tone). For a dialog it is the description. */
-  subtitle?: SheetText | Array<SheetText | { sep: true } | { text: string; tone: 'amber' | 'red' | 'green' }>;
-  subtitleTone?: 'amber' | 'red' | 'green';
+  /** The header line (Headers law): absent by default. A route (the subject chip, then up to two identity facts the task's budget.md names) or one fact. */
+  line?: HeaderLine | null;
+  /** Page only: the header's Back (top left). Default { action: 'back' }. */
+  back?: { action?: string; value?: string; label?: SheetText } | null;
+  /** Dialog only: its one description line. */
+  description?: SheetText | SheetParts;
   /** A glyph name before a dialog's title. */
   icon?: IconName;
   /** Ignored: no sheet carries a ✕ (drawer convention). Kept for old callers. */
@@ -695,8 +706,6 @@ export interface SheetProps {
   up?: { label: SheetText; action?: string; value?: string } | null;
   /** Raw HTML before the titles (legacy; use `up`). */
   lead?: string;
-  /** Raw HTML: the head's text actions (Clear, Reset). */
-  aside?: string;
   /** Raw HTML between the head and the body that does not scroll (a filter bar). */
   above?: string;
   body?: string;
@@ -727,6 +736,8 @@ export interface SheetProps {
 export interface SheetFooterProps {
   /** Back, the footer's exit; `false` for none. Default { action: 'back' }. */
   back?: { action?: string; value?: string; label?: SheetText } | false;
+  /** Reset or Clear: a quiet text action left of the primary, present only when there is something to reset or clear. */
+  quiet?: { label: SheetText; action?: string; value?: string } | null;
   /** The primary on the right: a Button spec, or trusted HTML. */
   primary?: SheetAction | string;
   /** A hold-to-commit in place of the primary. */
@@ -739,6 +750,10 @@ export interface SheetFooterProps {
 }
 export interface SentriUI {
   sheet(props: SheetProps): string;
+  /** The page header: Back (48px) top left, the title, the optional header line, 24px to the body. TaskHeader draws it too. */
+  pageHeader(props: { title: SheetText; back?: { action?: string; value?: string; label?: SheetText }; line?: HeaderLine | null; level?: 1 | 2; ds?: string; className?: string }): string;
+  /** The header line alone (a host that draws its own header slot). */
+  headerLine(line: HeaderLine | null): string;
   sheetFooter(props?: SheetFooterProps): string;
   backButton(props?: { action?: string; value?: string; label?: SheetText; className?: string }): string;
   scrim(props?: { action?: string; value?: string; label?: SheetText; layer?: number }): string;
@@ -765,5 +780,5 @@ declare global {
 }
 
 export interface RangeSliderProps { min?:number; max?:number; step?:number; value?:[number,number]; title?:string; icon?:string; key?:string; names?:[string,string]; labels?:[string,string]; format?:(value:number)=>string; summary?:(from:number,to:number)=>string; ends?:string[]; className?:string }
-export interface FilterSheetProps { title?:string; subtitle?:string; sections?:{title?:string;icon?:string;content?:string;help?:string}[]; body?:string; apply?:{label?:string;action?:string}; reset?:{label?:string;action?:string}; backAction?:string; backLabel?:string; closeAction?:string; className?:string; size?:'compact'|'short'|'medium'|'long'; label?:string }
+export interface FilterSheetProps { title?:string; sections?:{title?:string;icon?:string;content?:string;help?:string}[]; body?:string; apply?:{label?:string;action?:string}; reset?:{label?:string;action?:string}|false; backAction?:string; backLabel?:string; closeAction?:string; className?:string; size?:'compact'|'short'|'medium'|'long'; label?:string }
 export interface SentriUI { rangeSlider(props?:RangeSliderProps):string; filterSheet(props?:FilterSheetProps):string }

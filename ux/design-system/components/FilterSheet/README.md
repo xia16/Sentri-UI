@@ -2,7 +2,7 @@
 
 The drawer that narrows a list: Farrowing's room filter and Inspection's pig filter. It is a [Sheet](../Sheet/README.md) drawer with a fixed frame, so every list filters the same way.
 
-`SentriUI.filterSheet({ title, subtitle, sections | body, apply, reset, backAction, closeAction })`
+`SentriUI.filterSheet({ title, sections | body, apply, reset, backAction, closeAction })`
 
 ## When to use / when not
 
@@ -11,9 +11,9 @@ The drawer that narrows a list: Farrowing's room filter and Inspection's pig fil
 
 ## Anatomy
 
-1. **Head**: title, one-line subtitle (the unit), **Reset** (text action) and the ✕.
+1. **Head**: the sheet header, the title alone (a filter acts on the list under it, one Back away: no header line). Nothing in it acts (Headers law, 2026-10-13).
 2. **Sections**: each an icon-led title, the control, and an optional one-line help. A section may hold a [RangeSlider](../RangeSlider/README.md), a facet Segment, or any field. A sheet of plain fields passes `body` instead.
-3. **Footer**: **Back** and the commit, "Show 4 sows".
+3. **Footer**: **Back**, **Reset** (quiet text, left of the commit; `reset: false` leaves it out) and the commit, "Show 4 sows".
 
 ## Variants
 
@@ -31,7 +31,7 @@ The drawer that narrows a list: Farrowing's room filter and Inspection's pig fil
 
 ## Behaviour
 
-The sheet edits a draft. **Back** and ✕ return to the list and keep the draft; **Reset** clears the draft to "Any" and stays; the commit applies it. The host rewrites the commit label as the draft changes, so the count is live. A zero count still commits (the list then shows its own empty state). The filter button on the list carries a badge with the number of facets applied.
+The sheet edits a draft. **Back** (and a swipe down or the scrim) returns to the list and keep the draft; **Reset** clears the draft to "Any" and stays; the commit applies it. The host rewrites the commit label as the draft changes, so the count is live. A zero count still commits (the list then shows its own empty state). The filter button on the list carries a badge with the number of facets applied.
 
 ## Content rules
 

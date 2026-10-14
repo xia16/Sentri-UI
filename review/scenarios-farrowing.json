@@ -1,9 +1,9 @@
 {
  "feature": "farrowing",
- "commit": "c88430b94d6d6cd8b982e01e9ff140f3fd96ab67",
+ "commit": "45a855ca2fa93e8331b2a49b7441728c2d4db01d",
  "dirty": true,
- "ran": "2026-10-12T07:41:51.724Z",
- "base": "http://localhost:4418",
+ "ran": "2026-10-12T13:43:44.822Z",
+ "base": "http://localhost:62268",
  "langs": [
   "en"
  ],
@@ -12,21 +12,21 @@
   360
  ],
  "nodes": {
-  "entry": 7,
-  "state": 17,
-  "action": 56,
-  "outcome": 65,
+  "entry": 8,
+  "state": 22,
+  "action": 76,
+  "outcome": 90,
   "decision-blocker": 5
  },
  "summary": {
-  "pass": 62,
+  "pass": 87,
   "fail": 0,
   "blocked": 5,
   "pending": 3
  },
  "byLang": {
   "en": {
-   "pass": 62,
+   "pass": 87,
    "fail": 0,
    "blocked": 0
   }
@@ -72,6 +72,12 @@
    "pass": 0,
    "fail": 0,
    "blocked": 1,
+   "pending": 0
+  },
+  "search-scan": {
+   "pass": 25,
+   "fail": 0,
+   "blocked": 0,
    "pending": 0
   }
  },
@@ -626,7 +632,7 @@
    "result": "pending",
    "hard": [],
    "runs": [],
-   "why": "the prototype's Scan ear tag has no camera; a scan cannot be driven"
+   "why": "superseded by owner decision 2026-10-12: a scan adds the sow to the Scan list, and her sheet opens from her row there (fa-s21)"
   },
   {
    "id": "fa-e12-rows-recorded-counts-only",
@@ -712,7 +718,8 @@
      "notes": [],
      "evidence": [
       "review/scenarios/farrowing/fa-e13-search-rows-recorded-counts-only/en-390/00-start.png",
-      "review/scenarios/farrowing/fa-e13-search-rows-recorded-counts-only/en-390/01-data-action-room-search.png"
+      "review/scenarios/farrowing/fa-e13-search-rows-recorded-counts-only/en-390/01-data-action-room-search.png",
+      "review/scenarios/farrowing/fa-e13-search-rows-recorded-counts-only/en-390/02-fill-data-room-search.png"
      ]
     },
     {
@@ -724,7 +731,8 @@
      "notes": [],
      "evidence": [
       "review/scenarios/farrowing/fa-e13-search-rows-recorded-counts-only/en-360/00-start.png",
-      "review/scenarios/farrowing/fa-e13-search-rows-recorded-counts-only/en-360/01-data-action-room-search.png"
+      "review/scenarios/farrowing/fa-e13-search-rows-recorded-counts-only/en-360/01-data-action-room-search.png",
+      "review/scenarios/farrowing/fa-e13-search-rows-recorded-counts-only/en-360/02-fill-data-room-search.png"
      ]
     }
    ]
@@ -3888,6 +3896,1319 @@
      "src": "atlas",
      "at": "features/farrowing/feature.json",
      "says": "screen farrowing.foster exists, reached by More actions → Foster piglets"
+    }
+   ]
+  },
+  {
+   "id": "fa-s1-search-lists-nothing-until-typed",
+   "tree": "S-1",
+   "branch": "search-scan",
+   "label": "Nothing is listed before the worker types; the header names no unit",
+   "gwt": {
+    "given": "The worker has just opened Find a sow.",
+    "when": "They look at the page before typing.",
+    "then": "Only the hint \"Type part of an ear tag or a pen, or scan a tag. Searches every unit.\" is shown, no sow is listed, the header names no unit, and the field is ready for typing."
+   },
+   "path": [
+    "search-scan",
+    "search.empty",
+    "fa-s1-search-lists-nothing-until-typed"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Decisions · owner decision 2026-10-12",
+     "says": "Nothing is listed before typing; no \"Unit 7\" in the header"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-s1-search-lists-nothing-until-typed/en-390/00-start.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-s1-search-lists-nothing-until-typed/en-360/00-start.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "fa-s2-search-groups-this-unit-first",
+   "tree": "S-2",
+   "branch": "search-scan",
+   "label": "Results are grouped: this unit first, then other units",
+   "gwt": {
+    "given": "Find a sow is open and the worker has typed 43.",
+    "when": "They read the results.",
+    "then": "The results are in two groups: \"In Unit 7\" lists 000431, then \"Other units\" lists 000437, 000943 and 004318 with their units."
+   },
+   "path": [
+    "search-scan",
+    "search.empty",
+    "search.empty.43",
+    "fa-s2-search-groups-this-unit-first"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Decisions · owner decision 2026-10-12",
+     "says": "Results are grouped \"In Unit 7\" then \"Other units\""
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-s2-search-groups-this-unit-first/en-390/00-start.png",
+      "review/scenarios/farrowing/fa-s2-search-groups-this-unit-first/en-390/01-fill-data-room-search.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-s2-search-groups-this-unit-first/en-360/00-start.png",
+      "review/scenarios/farrowing/fa-s2-search-groups-this-unit-first/en-360/01-fill-data-room-search.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "fa-s6-other-unit-result-opens-her-farrowing-drawer",
+   "tree": "S-6",
+   "branch": "search-scan",
+   "label": "A result in another unit opens her farrowing drawer, which names her unit",
+   "gwt": {
+    "given": "The worker has searched for 43 and 004318, a sow in Unit 6, is a result.",
+    "when": "They tap her.",
+    "then": "Her farrowing drawer opens on her Awaiting face, the same drawer a sow in this unit opens, and its subtitle names her unit and pen."
+   },
+   "path": [
+    "search-scan",
+    "search.empty",
+    "search.empty.43",
+    "search.empty.43.other",
+    "fa-s6-other-unit-result-opens-her-farrowing-drawer"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Decisions · owner decision 2026-10-12",
+     "says": "A sow in another unit opens her farrowing drawer: Farrowing is one task across its units"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-s6-other-unit-result-opens-her-farrowing-drawer/en-390/00-start.png",
+      "review/scenarios/farrowing/fa-s6-other-unit-result-opens-her-farrowing-drawer/en-390/01-fill-data-room-search.png",
+      "review/scenarios/farrowing/fa-s6-other-unit-result-opens-her-farrowing-drawer/en-390/02-004318.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-s6-other-unit-result-opens-her-farrowing-drawer/en-360/00-start.png",
+      "review/scenarios/farrowing/fa-s6-other-unit-result-opens-her-farrowing-drawer/en-360/01-fill-data-room-search.png",
+      "review/scenarios/farrowing/fa-s6-other-unit-result-opens-her-farrowing-drawer/en-360/02-004318.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "fa-s3-tags-starting-with-the-text-rank-first",
+   "tree": "S-3",
+   "branch": "search-scan",
+   "label": "Tags that start with the typed text rank before tags that only contain it",
+   "gwt": {
+    "given": "Find a sow is open and the worker has typed 004.",
+    "when": "They read the Other units group.",
+    "then": "004318, whose tag starts with 004, is listed before 000437, whose tag only contains it."
+   },
+   "path": [
+    "search-scan",
+    "search.empty",
+    "search.empty.004",
+    "fa-s3-tags-starting-with-the-text-rank-first"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Decisions · owner decision 2026-10-12",
+     "says": "Tags that start with the typed text rank before tags that only contain it"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-s3-tags-starting-with-the-text-rank-first/en-390/00-start.png",
+      "review/scenarios/farrowing/fa-s3-tags-starting-with-the-text-rank-first/en-390/01-fill-data-room-search.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-s3-tags-starting-with-the-text-rank-first/en-360/00-start.png",
+      "review/scenarios/farrowing/fa-s3-tags-starting-with-the-text-rank-first/en-360/01-fill-data-room-search.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "fa-s4-pen-codes-match",
+   "tree": "S-4",
+   "branch": "search-scan",
+   "label": "A pen code matches too",
+   "gwt": {
+    "given": "Find a sow is open and the worker has typed B4.",
+    "when": "They read the results.",
+    "then": "The two sows in pen B4, 000431 and 000455, are listed under \"In Unit 7\", and there is no \"Other units\" group."
+   },
+   "path": [
+    "search-scan",
+    "search.empty",
+    "search.empty.b4",
+    "fa-s4-pen-codes-match"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Decisions · owner decision 2026-10-12",
+     "says": "Pen codes match too"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-s4-pen-codes-match/en-390/00-start.png",
+      "review/scenarios/farrowing/fa-s4-pen-codes-match/en-390/01-fill-data-room-search.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-s4-pen-codes-match/en-360/00-start.png",
+      "review/scenarios/farrowing/fa-s4-pen-codes-match/en-360/01-fill-data-room-search.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "fa-s5-no-match-says-so",
+   "tree": "S-5",
+   "branch": "search-scan",
+   "label": "Nothing matches: the page says so",
+   "gwt": {
+    "given": "Find a sow is open and the worker has typed 909, which no sow in any unit has.",
+    "when": "They read the page.",
+    "then": "The page says there is no sow matching 909 in any unit, and lists nothing."
+   },
+   "path": [
+    "search-scan",
+    "search.empty",
+    "search.empty.none",
+    "fa-s5-no-match-says-so"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Decisions · owner decision 2026-10-12",
+     "says": "No match reads \"No sow matching “43” in any unit.\""
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-s5-no-match-says-so/en-390/00-start.png",
+      "review/scenarios/farrowing/fa-s5-no-match-says-so/en-390/01-fill-data-room-search.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-s5-no-match-says-so/en-360/00-start.png",
+      "review/scenarios/farrowing/fa-s5-no-match-says-so/en-360/01-fill-data-room-search.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "fa-s8-search-scan-icon-opens-scan",
+   "tree": "S-8",
+   "branch": "search-scan",
+   "label": "The scan icon in the field opens Scan ear tags",
+   "gwt": {
+    "given": "Find a sow is open.",
+    "when": "The worker taps the scan icon in the field.",
+    "then": "Scan ear tags opens, with the reader connected and nothing scanned yet."
+   },
+   "path": [
+    "search-scan",
+    "search.empty",
+    "search.empty.scan",
+    "fa-s8-search-scan-icon-opens-scan"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Decisions · owner decision 2026-10-12",
+     "says": "A scan icon button inside the field opens Scan"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-s8-search-scan-icon-opens-scan/en-390/00-start.png",
+      "review/scenarios/farrowing/fa-s8-search-scan-icon-opens-scan/en-390/01-data-action-room-scan.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-s8-search-scan-icon-opens-scan/en-360/00-start.png",
+      "review/scenarios/farrowing/fa-s8-search-scan-icon-opens-scan/en-360/01-data-action-room-scan.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "fa-s9-cancel-returns-to-the-room",
+   "tree": "S-9",
+   "branch": "search-scan",
+   "label": "Cancel closes Find a sow",
+   "gwt": {
+    "given": "Find a sow is open.",
+    "when": "The worker taps Cancel.",
+    "then": "The room list is in front again."
+   },
+   "path": [
+    "search-scan",
+    "search.empty",
+    "search.empty.cancel",
+    "fa-s9-cancel-returns-to-the-room"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Decisions · owner decision 2026-10-12",
+     "says": "The field has Cancel beside it"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-s9-cancel-returns-to-the-room/en-390/00-start.png",
+      "review/scenarios/farrowing/fa-s9-cancel-returns-to-the-room/en-390/01-cancel.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-s9-cancel-returns-to-the-room/en-360/00-start.png",
+      "review/scenarios/farrowing/fa-s9-cancel-returns-to-the-room/en-360/01-cancel.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "fa-s10-no-reader-says-so-with-no-buttons",
+   "tree": "S-10",
+   "branch": "search-scan",
+   "label": "Scanner not connected: the page says what to do and offers no button",
+   "gwt": {
+    "given": "Scan ear tags is open and no tag reader is paired.",
+    "when": "The worker looks at the page.",
+    "then": "The page says \"Scanner not connected\" and how to pair the reader. There is no status pill, no list and no button: only the back arrow leaves."
+   },
+   "path": [
+    "search-scan",
+    "scan.none",
+    "fa-s10-no-reader-says-so-with-no-buttons"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Decisions · owner decision 2026-10-12",
+     "says": "Scanner not connected: the pairing instruction, no buttons"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-s10-no-reader-says-so-with-no-buttons/en-390/00-start.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-s10-no-reader-says-so-with-no-buttons/en-360/00-start.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "fa-s11-back-arrow-leaves-scan",
+   "tree": "S-11",
+   "branch": "search-scan",
+   "label": "The back arrow leaves Scan ear tags",
+   "gwt": {
+    "given": "Scan ear tags is open.",
+    "when": "The worker taps the back arrow.",
+    "then": "The room list is in front again."
+   },
+   "path": [
+    "search-scan",
+    "scan.none",
+    "scan.none.back",
+    "fa-s11-back-arrow-leaves-scan"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Decisions · owner decision 2026-10-12",
+     "says": "The back arrow leaves"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-s11-back-arrow-leaves-scan/en-390/00-start.png",
+      "review/scenarios/farrowing/fa-s11-back-arrow-leaves-scan/en-390/01-data-action-room-back.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-s11-back-arrow-leaves-scan/en-360/00-start.png",
+      "review/scenarios/farrowing/fa-s11-back-arrow-leaves-scan/en-360/01-data-action-room-back.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "fa-s12-connected-empty-says-hold-the-reader",
+   "tree": "S-12",
+   "branch": "search-scan",
+   "label": "Connected and nothing scanned: the page invites the first scan, with no banner",
+   "gwt": {
+    "given": "Scan ear tags is open, the reader is connected and nothing has been scanned.",
+    "when": "The worker looks at the page.",
+    "then": "The page says \"Hold the reader to an ear tag\" and \"Each sow you scan appears here.\", the status says Scanning and the footer offers Stop scanning. There is no \"ready for the next tag\" banner and no \"Not found\" row."
+   },
+   "path": [
+    "search-scan",
+    "scan.empty",
+    "fa-s12-connected-empty-says-hold-the-reader"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Decisions · owner decision 2026-10-12",
+     "says": "The scanner is always listening: no banner and no Not found row"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-s12-connected-empty-says-hold-the-reader/en-390/00-start.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-s12-connected-empty-says-hold-the-reader/en-360/00-start.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "fa-s13-scans-listed-newest-first-in-two-groups",
+   "tree": "S-13",
+   "branch": "search-scan",
+   "label": "Scanned sows are listed in two groups, newest first",
+   "gwt": {
+    "given": "Scan ear tags is open and three sows have been scanned: 000418, then 000431 (both in Unit 7), then 004318 (Unit 6).",
+    "when": "The worker reads the list.",
+    "then": "The list has \"In Unit 7\" with 000431 above 000418, then \"Other units\" with 004318: the newest scan first within each group."
+   },
+   "path": [
+    "search-scan",
+    "scan.list",
+    "fa-s13-scans-listed-newest-first-in-two-groups"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Decisions · owner decision 2026-10-12",
+     "says": "Groups \"In Unit 7 · n\" and \"Other units · n\", newest first"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-s13-scans-listed-newest-first-in-two-groups/en-390/00-start.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-s13-scans-listed-newest-first-in-two-groups/en-360/00-start.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "fa-s14-scan-rows-are-select-and-door",
+   "tree": "S-14",
+   "branch": "search-scan",
+   "label": "Each scan row has a tick box and opens her",
+   "gwt": {
+    "given": "Scan ear tags is open with scanned sows.",
+    "when": "The worker looks at a row.",
+    "then": "Each row has a tick box and, beside it, the sow's ear tag, where she is and her Farrowing state, with a chevron."
+   },
+   "path": [
+    "search-scan",
+    "scan.list",
+    "fa-s14-scan-rows-are-select-and-door"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Decisions · owner decision 2026-10-12",
+     "says": "Rows are the animal row with state, as a select + door"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-s14-scan-rows-are-select-and-door/en-390/00-start.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-s14-scan-rows-are-select-and-door/en-360/00-start.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "fa-s15-stop-scanning-pauses-and-keeps-the-list",
+   "tree": "S-15",
+   "branch": "search-scan",
+   "label": "Stop scanning pauses the reader and keeps the list",
+   "gwt": {
+    "given": "Scan ear tags is open with scanned sows and nothing ticked.",
+    "when": "The worker taps Stop scanning.",
+    "then": "The status reads Stopped, the footer offers Resume scanning, and the three sows stay in the list."
+   },
+   "path": [
+    "search-scan",
+    "scan.list",
+    "scan.list.stop",
+    "fa-s15-stop-scanning-pauses-and-keeps-the-list"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Decisions · owner decision 2026-10-12",
+     "says": "Stop scanning becomes Resume scanning when stopped"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-s15-stop-scanning-pauses-and-keeps-the-list/en-390/00-start.png",
+      "review/scenarios/farrowing/fa-s15-stop-scanning-pauses-and-keeps-the-list/en-390/01-stop-scanning.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-s15-stop-scanning-pauses-and-keeps-the-list/en-360/00-start.png",
+      "review/scenarios/farrowing/fa-s15-stop-scanning-pauses-and-keeps-the-list/en-360/01-stop-scanning.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "fa-s16-resume-scanning-listens-again",
+   "tree": "S-16",
+   "branch": "search-scan",
+   "label": "Resume scanning listens again",
+   "gwt": {
+    "given": "Scanning is stopped.",
+    "when": "The worker taps Resume scanning.",
+    "then": "The status reads Scanning and the footer offers Stop scanning."
+   },
+   "path": [
+    "search-scan",
+    "scan.list",
+    "scan.list.stop",
+    "scan.list.resume",
+    "fa-s16-resume-scanning-listens-again"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Decisions · owner decision 2026-10-12",
+     "says": "Stop scanning becomes Resume scanning when stopped"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-s16-resume-scanning-listens-again/en-390/00-start.png",
+      "review/scenarios/farrowing/fa-s16-resume-scanning-listens-again/en-390/01-stop-scanning.png",
+      "review/scenarios/farrowing/fa-s16-resume-scanning-listens-again/en-390/02-resume-scanning.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-s16-resume-scanning-listens-again/en-360/00-start.png",
+      "review/scenarios/farrowing/fa-s16-resume-scanning-listens-again/en-360/01-stop-scanning.png",
+      "review/scenarios/farrowing/fa-s16-resume-scanning-listens-again/en-360/02-resume-scanning.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "fa-s17-one-ticked-shows-the-selection-bar",
+   "tree": "S-17",
+   "branch": "search-scan",
+   "label": "One sow ticked: the selection bar says Actions",
+   "gwt": {
+    "given": "Scan ear tags is open with scanned sows.",
+    "when": "The worker ticks one sow.",
+    "then": "The footer reads \"1 sow selected\" with a primary \"Actions\" button; Stop scanning is gone, and nothing says \"More actions\"."
+   },
+   "path": [
+    "search-scan",
+    "scan.list",
+    "scan.list.tick1",
+    "fa-s17-one-ticked-shows-the-selection-bar"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Decisions · owner decision 2026-10-12",
+     "says": "N sows selected and the primary Actions; the button says Actions, not More actions"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-s17-one-ticked-shows-the-selection-bar/en-390/00-start.png",
+      "review/scenarios/farrowing/fa-s17-one-ticked-shows-the-selection-bar/en-390/01-data-scan-tag-000431-st-choice-t.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-s17-one-ticked-shows-the-selection-bar/en-360/00-start.png",
+      "review/scenarios/farrowing/fa-s17-one-ticked-shows-the-selection-bar/en-360/01-data-scan-tag-000431-st-choice-t.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "fa-s19-selection-count-is-plain-text",
+   "tree": "S-19",
+   "branch": "search-scan",
+   "label": "The selection count is plain text: nothing to tap",
+   "gwt": {
+    "given": "One scanned sow is ticked.",
+    "when": "The worker looks at the footer.",
+    "then": "It reads \"1 sow selected\" as plain text, without a chevron or a button, next to the Actions button."
+   },
+   "path": [
+    "search-scan",
+    "scan.list",
+    "scan.list.tick1",
+    "fa-s19-selection-count-is-plain-text"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Decisions · owner decision 2026-10-12",
+     "says": "N sows selected is a plain count, not a button"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-s19-selection-count-is-plain-text/en-390/00-start.png",
+      "review/scenarios/farrowing/fa-s19-selection-count-is-plain-text/en-390/01-data-scan-tag-000431-st-choice-t.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-s19-selection-count-is-plain-text/en-360/00-start.png",
+      "review/scenarios/farrowing/fa-s19-selection-count-is-plain-text/en-360/01-data-scan-tag-000431-st-choice-t.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "fa-s18-actions-offer-the-generic-actions-only",
+   "tree": "S-18",
+   "branch": "search-scan",
+   "label": "Actions offers the shared generic actions for the ticked sows and no Farrowing action",
+   "gwt": {
+    "given": "Two scanned sows are ticked.",
+    "when": "The worker taps Actions.",
+    "then": "A sheet titled Actions for 2 sows offers Transfer, Disease or symptom, Record treatment and Add a note, and none of Farrowing's own actions."
+   },
+   "path": [
+    "search-scan",
+    "scan.list",
+    "scan.list.tick1",
+    "scan.list.tick2",
+    "scan.list.actions",
+    "fa-s18-actions-offer-the-generic-actions-only"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Decisions · owner decision 2026-10-12",
+     "says": "Actions opens the shared generic actions for the selection only; no Farrowing-specific actions"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-s18-actions-offer-the-generic-actions-only/en-390/00-start.png",
+      "review/scenarios/farrowing/fa-s18-actions-offer-the-generic-actions-only/en-390/01-data-scan-tag-000431-st-choice-t.png",
+      "review/scenarios/farrowing/fa-s18-actions-offer-the-generic-actions-only/en-390/02-data-scan-tag-000418-st-choice-t.png",
+      "review/scenarios/farrowing/fa-s18-actions-offer-the-generic-actions-only/en-390/03-actions.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-s18-actions-offer-the-generic-actions-only/en-360/00-start.png",
+      "review/scenarios/farrowing/fa-s18-actions-offer-the-generic-actions-only/en-360/01-data-scan-tag-000431-st-choice-t.png",
+      "review/scenarios/farrowing/fa-s18-actions-offer-the-generic-actions-only/en-360/02-data-scan-tag-000418-st-choice-t.png",
+      "review/scenarios/farrowing/fa-s18-actions-offer-the-generic-actions-only/en-360/03-actions.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "fa-s26-actions-note-opens-the-note-for-the-first-sow",
+   "tree": "S-26",
+   "branch": "search-scan",
+   "label": "Add a note opens the note page for the first ticked sow",
+   "gwt": {
+    "given": "Two scanned sows are ticked and the Actions sheet is open.",
+    "when": "The worker taps Add a note.",
+    "then": "The note page opens for the first sow ticked, 000431, not the list."
+   },
+   "path": [
+    "search-scan",
+    "scan.list",
+    "scan.list.tick1",
+    "scan.list.tick2",
+    "scan.list.actions.note",
+    "fa-s26-actions-note-opens-the-note-for-the-first-sow"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Decisions · owner decision 2026-10-12",
+     "says": "Actions opens the shared generic actions for the selection"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-s26-actions-note-opens-the-note-for-the-first-sow/en-390/00-start.png",
+      "review/scenarios/farrowing/fa-s26-actions-note-opens-the-note-for-the-first-sow/en-390/01-data-scan-tag-000431-st-choice-t.png",
+      "review/scenarios/farrowing/fa-s26-actions-note-opens-the-note-for-the-first-sow/en-390/02-data-scan-tag-000418-st-choice-t.png",
+      "review/scenarios/farrowing/fa-s26-actions-note-opens-the-note-for-the-first-sow/en-390/03-actions.png",
+      "review/scenarios/farrowing/fa-s26-actions-note-opens-the-note-for-the-first-sow/en-390/04-add-a-note.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-s26-actions-note-opens-the-note-for-the-first-sow/en-360/00-start.png",
+      "review/scenarios/farrowing/fa-s26-actions-note-opens-the-note-for-the-first-sow/en-360/01-data-scan-tag-000431-st-choice-t.png",
+      "review/scenarios/farrowing/fa-s26-actions-note-opens-the-note-for-the-first-sow/en-360/02-data-scan-tag-000418-st-choice-t.png",
+      "review/scenarios/farrowing/fa-s26-actions-note-opens-the-note-for-the-first-sow/en-360/03-actions.png",
+      "review/scenarios/farrowing/fa-s26-actions-note-opens-the-note-for-the-first-sow/en-360/04-add-a-note.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "fa-s20-unticking-the-last-sow-brings-stop-scanning-back",
+   "tree": "S-20",
+   "branch": "search-scan",
+   "label": "Tapping the box again unticks her; with none ticked Stop scanning returns",
+   "gwt": {
+    "given": "One scanned sow is ticked.",
+    "when": "The worker taps her box again.",
+    "then": "She is no longer ticked and the footer offers Stop scanning again, with no selection count."
+   },
+   "path": [
+    "search-scan",
+    "scan.list",
+    "scan.list.tick1",
+    "scan.list.untick",
+    "fa-s20-unticking-the-last-sow-brings-stop-scanning-back"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Decisions · owner decision 2026-10-12",
+     "says": "To untick, tap the box; nothing ticked: Stop scanning"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-s20-unticking-the-last-sow-brings-stop-scanning-back/en-390/00-start.png",
+      "review/scenarios/farrowing/fa-s20-unticking-the-last-sow-brings-stop-scanning-back/en-390/01-data-scan-tag-000431-st-choice-t.png",
+      "review/scenarios/farrowing/fa-s20-unticking-the-last-sow-brings-stop-scanning-back/en-390/02-data-scan-tag-000431-st-choice-t.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-s20-unticking-the-last-sow-brings-stop-scanning-back/en-360/00-start.png",
+      "review/scenarios/farrowing/fa-s20-unticking-the-last-sow-brings-stop-scanning-back/en-360/01-data-scan-tag-000431-st-choice-t.png",
+      "review/scenarios/farrowing/fa-s20-unticking-the-last-sow-brings-stop-scanning-back/en-360/02-data-scan-tag-000431-st-choice-t.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "fa-s21-scan-row-opens-her-drawer",
+   "tree": "S-21",
+   "branch": "search-scan",
+   "label": "A scanned sow in this unit opens her farrowing drawer",
+   "gwt": {
+    "given": "Scan ear tags is open with 000418, in Unit 7, scanned.",
+    "when": "The worker taps her row.",
+    "then": "Her farrowing drawer opens on Counting."
+   },
+   "path": [
+    "search-scan",
+    "scan.list",
+    "scan.list.open",
+    "fa-s21-scan-row-opens-her-drawer"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Decisions · owner decision 2026-10-12",
+     "says": "The rest of the row opens her farrowing drawer"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-s21-scan-row-opens-her-drawer/en-390/00-start.png",
+      "review/scenarios/farrowing/fa-s21-scan-row-opens-her-drawer/en-390/01-data-scan-tag-000418-st-row-door.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-s21-scan-row-opens-her-drawer/en-360/00-start.png",
+      "review/scenarios/farrowing/fa-s21-scan-row-opens-her-drawer/en-360/01-data-scan-tag-000418-st-row-door.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "fa-s22-back-returns-to-the-scan-list",
+   "tree": "S-22",
+   "branch": "search-scan",
+   "label": "Back from her drawer returns to the scan list",
+   "gwt": {
+    "given": "A scanned sow's drawer is open, opened from the Scan list.",
+    "when": "The worker taps Back.",
+    "then": "Scan ear tags is in front again with the same three sows."
+   },
+   "path": [
+    "search-scan",
+    "scan.list",
+    "scan.list.open",
+    "scan.list.open.back",
+    "fa-s22-back-returns-to-the-scan-list"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Decisions · owner decision 2026-10-12",
+     "says": "The list stays while the worker opens a sow and comes back"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-s22-back-returns-to-the-scan-list/en-390/00-start.png",
+      "review/scenarios/farrowing/fa-s22-back-returns-to-the-scan-list/en-390/01-data-scan-tag-000418-st-row-door.png",
+      "review/scenarios/farrowing/fa-s22-back-returns-to-the-scan-list/en-390/02-sheet-surface-back.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-s22-back-returns-to-the-scan-list/en-360/00-start.png",
+      "review/scenarios/farrowing/fa-s22-back-returns-to-the-scan-list/en-360/01-data-scan-tag-000418-st-row-door.png",
+      "review/scenarios/farrowing/fa-s22-back-returns-to-the-scan-list/en-360/02-sheet-surface-back.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "fa-s23-ticks-survive-opening-a-sow",
+   "tree": "S-23",
+   "branch": "search-scan",
+   "label": "A tick survives opening a sow and coming back",
+   "gwt": {
+    "given": "One scanned sow is ticked and the worker has opened another from the list.",
+    "when": "They tap Back.",
+    "then": "Scan ear tags is in front with the first sow still ticked."
+   },
+   "path": [
+    "search-scan",
+    "scan.list",
+    "scan.list.tickopen",
+    "scan.list.tickopen.back",
+    "fa-s23-ticks-survive-opening-a-sow"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Decisions · owner decision 2026-10-12",
+     "says": "The list stays while the worker opens a sow and comes back"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-s23-ticks-survive-opening-a-sow/en-390/00-start.png",
+      "review/scenarios/farrowing/fa-s23-ticks-survive-opening-a-sow/en-390/01-data-scan-tag-000431-st-choice-t.png",
+      "review/scenarios/farrowing/fa-s23-ticks-survive-opening-a-sow/en-390/02-data-scan-tag-000418-st-row-door.png",
+      "review/scenarios/farrowing/fa-s23-ticks-survive-opening-a-sow/en-390/03-sheet-surface-back.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-s23-ticks-survive-opening-a-sow/en-360/00-start.png",
+      "review/scenarios/farrowing/fa-s23-ticks-survive-opening-a-sow/en-360/01-data-scan-tag-000431-st-choice-t.png",
+      "review/scenarios/farrowing/fa-s23-ticks-survive-opening-a-sow/en-360/02-data-scan-tag-000418-st-row-door.png",
+      "review/scenarios/farrowing/fa-s23-ticks-survive-opening-a-sow/en-360/03-sheet-surface-back.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "fa-s24-scan-row-in-another-unit-opens-her-drawer",
+   "tree": "S-24",
+   "branch": "search-scan",
+   "label": "A scanned sow in another unit opens her farrowing drawer",
+   "gwt": {
+    "given": "Scan ear tags is open with 004318, in Unit 6, scanned.",
+    "when": "The worker taps her row.",
+    "then": "Her farrowing drawer opens, the same drawer a sow in this unit opens, and its subtitle names her unit and pen."
+   },
+   "path": [
+    "search-scan",
+    "scan.list",
+    "scan.list.other",
+    "fa-s24-scan-row-in-another-unit-opens-her-drawer"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Decisions · owner decision 2026-10-12",
+     "says": "A sow in another unit opens her farrowing drawer: Farrowing is one task across its units"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-s24-scan-row-in-another-unit-opens-her-drawer/en-390/00-start.png",
+      "review/scenarios/farrowing/fa-s24-scan-row-in-another-unit-opens-her-drawer/en-390/01-data-scan-tag-004318-st-row-door.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-s24-scan-row-in-another-unit-opens-her-drawer/en-360/00-start.png",
+      "review/scenarios/farrowing/fa-s24-scan-row-in-another-unit-opens-her-drawer/en-360/01-data-scan-tag-004318-st-row-door.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "fa-s25-repeat-scan-does-not-duplicate",
+   "tree": "S-25",
+   "branch": "search-scan",
+   "label": "A repeat scan does not add her twice",
+   "gwt": {
+    "given": "Three sows are listed and the reader reads 000431 a second time.",
+    "when": "The worker looks at the list.",
+    "then": "000431 is still listed once, among the same three sows."
+   },
+   "path": [
+    "search-scan",
+    "scan.repeat",
+    "fa-s25-repeat-scan-does-not-duplicate"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Decisions · owner decision 2026-10-12",
+     "says": "A repeat scan doesn't duplicate; it briefly highlights her existing row"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-s25-repeat-scan-does-not-duplicate/en-390/00-start.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-s25-repeat-scan-does-not-duplicate/en-360/00-start.png"
+     ]
     }
    ]
   }

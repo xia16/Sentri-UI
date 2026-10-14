@@ -6,7 +6,7 @@ The driver fills in **TITLE**, **SCOPE**, **CHANGE CLASS** (copy · presentation
 
 **What success is.** The first design you hand over is clearly better than the screen it replaces, side by side at 390px. Inside your run, try as many times as you like. If no direction beats the original, hand over **no change** with your critique; an honest "the original stands" beats a worse screen.
 
-**How you work.** Read the six [workflow principles](../principles.md) first: P1 start from what exists, P2 every change has a known reach, P3 information before layout, P4 judge it by eye as the owner would, P5 prove it don't claim it, P6 the owner sees only finished, visual work. This brief is the order you apply them in and what each step leaves behind. The product's laws (farm legibility, drawers, colour, copy, design-system components only) are in `ux/design-system/README.md` and the owner rules in `docs/design-workflow/README.md`; follow them as binding.
+**How you work.** Read the six [workflow principles](../principles.md) first: P1 start from what exists, P2 every change has a known reach, P3 information before layout, P4 judge it by eye as the owner would, P5 prove it don't claim it, P6 the owner sees only finished, visual work. This brief is the order you apply them in and what each step leaves behind. The product's laws (farm legibility, drawers, colour, copy, design-system components only) are in `ux/design-system/README.md` and the owner rules in `docs/design-workflow/README.md`; follow them as binding. **Read [ux/design-system/SURFACES.md](../../../ux/design-system/SURFACES.md) before you build:** it fixes which colour is the base, which is the card, and how current, selected and pressed look, with good and bad examples as images. Footer and dock buttons are 56px.
 
 ## 1. Start from what exists (P1)
 
@@ -23,7 +23,7 @@ The driver fills in **TITLE**, **SCOPE**, **CHANGE CLASS** (copy · presentation
 
 ## 2. Information before layout (P3)
 
-Write `features/<id>/budget.md` and commit it before any layout. On an existing screen it decides what the problem parts show and what to cut; it never overrides Keep without a problem behind it.
+Write `features/<id>/budget.md` and commit it before any layout, for every new screen, redesign and component variant that shows facts. **Every fact the finished screen displays is in it with the question it answers there**, including the header line, the identity facts beside a subject chip (chosen per task: parity matters at farrowing, not everywhere) and whatever a shared component draws by default. A fact not in the budget is not drawn. On an existing screen, kept facts are listed as kept with their question; the budget decides what the problem parts show and what to cut, and never overrides Keep without a problem behind it.
 
 1. `## Inventory`: every fact the screen could show, per item and state.
 2. `## Questions`: the worker's questions at that moment, in order (where am I? does anything need me? what do I do? is this the right animal? who did it, when?).
@@ -51,7 +51,7 @@ Worked example, the Farrowing room row: Act now "3 days overdue" in dark red; Wa
 
 ## 5. Prove it (P5)
 
-- Run `npm test` and `npm run check`; both pass. Run `node scripts/check-states.mjs` and `node scripts/check-legibility.mjs --changed <your screen ids> --strict`; fix what they report on your screens. Change a test only when it asserted the old structure, and say so.
+- Run `npm test` and `npm run check`; both pass. Run `node scripts/check-states.mjs`, `node scripts/check-legibility.mjs --changed <your screen ids> --strict` and `node scripts/check-spacing.mjs --changed <your screen ids>`; fix what they report on your screens. Change a test only when it asserted the old structure, and say so.
 - Open every changed screen at 390 and 360 in EN and ZH: no console errors, targets ≥ 48px. For a behaviour change, run the scenario leaves it touches (`node scripts/run-scenarios.mjs`).
 - Merge main forward (`git fetch origin && git merge origin/main`), rerun, and name the commit every result comes from.
 

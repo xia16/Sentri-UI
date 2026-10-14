@@ -104,6 +104,7 @@ Every rejected owner example is a fixture each gate must fail ([gate.md](briefs/
 | `npm run atlas` | Rebuilds `atlas/atlas.json` from its sources (`atlas/SCHEMA.md`) |
 | `npm run check` | Checks the atlas sources without writing |
 | `npm run ux` | Serves the repo for the atlas and the prototypes (`http://localhost:4317/atlas/`) |
+| `npm run layers` | Writes `atlas/layers.json`: every unmerged branch as a layer over the features it changes, so `npm run ux` shows them locally. The published atlas rebuilds them on its own ([SCHEMA.md](../../atlas/SCHEMA.md#branch-layers-atlaslayersjson)) |
 | `node scripts/run-scenarios.mjs` | Runs a feature's executable leaves (`features/<id>/scenarios.json`) |
 | `node scripts/gate.mjs --candidate <branch> --scope <features>` | The mechanical gate on the exact merge candidate: every check, every screen diffed against main, the before/after pairs for the judge ([gate.md](briefs/gate.md)) |
 | `node scripts/polish-loop.mjs <command> <feature>` | The polish loop's ledger: baseline, rounds, grades, stop conditions and the review packet ([polish-loop.md](briefs/polish-loop.md)) |
@@ -126,7 +127,7 @@ Every rejected owner example is a fixture each gate must fail ([gate.md](briefs/
 
 The owner's taste, drawn from their rulings, is [taste.md](taste.md): builders aim at it and judges stand in for it.
 
-Standards these briefs point to: `ux/design-system/README.md` (laws), `docs/design-workflow/research/component-standard.md` (component page anatomy and checklist), and `atlas/SCHEMA.md` (atlas data and backlog item format).
+Standards these briefs point to: `ux/design-system/README.md` (laws), `ux/design-system/SURFACES.md` (bases, cards and the colour of current, selected and pressed: read it before building a screen), `docs/design-workflow/research/component-standard.md` (component page anatomy and checklist), and `atlas/SCHEMA.md` (atlas data and backlog item format).
 
 ## Background
 

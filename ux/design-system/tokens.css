@@ -1,10 +1,10 @@
 /* Generated from tokens.json by scripts/tokens-css.py — do not edit. */
 :root {
-  --ground: #f3f4ee;
+  --ground: #f6f7f1;
   --app-background: #f6f7f1;
   --paper: #ffffff;
-  --surface: #f8faf5;
-  --inset: #f6f8f1;
+  --surface: #f6f7f1;
+  --inset: #f6f7f1;
   --well: #eef1e7;
   --ink: #20291f;
   --muted: #657060;
@@ -124,6 +124,7 @@
   --shadow-handle: 0 2px 5px #20301920;
   --tap-min: 48px;
   --control-height: 48px;
+  --footer-height: 56px;
   --field-height: 48px;
   --row-min: 68px;
   --choice-row-min: 56px;

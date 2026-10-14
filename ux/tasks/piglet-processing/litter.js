@@ -170,17 +170,16 @@
     }
     function statusKind(s, lateBy, missedAfter) { return s === 'late' ? ['late', lateBy] : s === 'missed' ? ['missed', missedAfter] : ['today', null]; }
 
-    /* ---- the drawer head: the crate, then who the litter is (the sow, parity, day) and the one status that changes what
-       it can record (sow died · farrowing not locked · not in the task · task ended) ---- */
-    function subtitle() {
-      var x = L(), parts = [S('pp.litter.sub', { sow: SOW.sow, p: SOW.parity, d: x.dayAge })];
-      var st = null;
+    /* ---- the drawer head is the crate alone (Headers law, 2026-10-13: this round has no sow page for a chip to open, so no
+       route line). The one status that changes what the litter can record (sow died · farrowing not locked · task ended) is the
+       first line of the body. ---- */
+    function statusNote() {
+      var x = L(), st = null;
       if (x.sowDied) st = S('pp.room.chip.sowdied', null, 'red');
-      else if (x.phase === 'open') st = S('pp.litter.st.unlocked', null, 'amber');   // short: the subtitle stays one line at 360
-      // outside every task: the body says so once (R2-15), not the head too
+      else if (x.phase === 'open') st = S('pp.litter.st.unlocked', null, 'amber');
+      // outside every task: the body says so once (R2-15)
       else if (endedTask()) st = S('pp.room.ended.title');
-      if (st) parts.push({ sep: true }, st);
-      return parts;
+      return st ? U.note([st]) : '';
     }
 
     /* ---- the litter summary (farrowing's `Litter summary · View log ›` over a facts panel): the ledger identity — Born,
@@ -662,17 +661,18 @@
       if (!why) return null;
       return [why === 'task_ended' ? 'pp.litter.pointer.ended' : why === 'no_task' ? 'pp.litter.pointer.no_task' : 'pp.litter.pointer.check', null];
     }
-    function clearAside(show) { return show ? btn({ id: 'act.clear', register: 'text', action: 'clear' }) : ''; }
-    /* A treatment in the drawer: its title, one subtitle line (the crate and what is owed), the body, and Back + Save. The
+    // Clear: quiet text in the footer, left of Save, only while there is something to clear.
+    function clearQuiet(show) { return show ? { label: S('act.clear'), action: 'clear' } : null; }
+    /* A treatment in the drawer: its title, then the body (what is owed is its first line), and Back, Clear and Save. The
        reason Save waits for is the footer's status line (TaskSheet's status slot); a tap on the waiting Save flashes it. */
     /* No hint line stands above the footer (parity review 2, item 11): a waiting Save stands alone, and a tap on it says
        why — the reason line appears then (answered), and goes with the next change to the draft. */
     var whyShown = false;
-    function doseSheet(titleSlot, sub, body, aside) {
+    function doseSheet(titleSlot, sub, body, quiet) {
       var w = waiting();
-      var html = K.sheet({ title: titleSlot, subtitle: [S('pp.room.code', { code: crate }), { sep: true }].concat(sub), close: null, aside: aside, size: 'long', view: 'dose',
-        body: '<div class="lt-stack">' + body + '</div>',
-        footer: K.footer({ back: { action: 'back' }, status: w ? Object.assign(S(w[0], w[1]), { id: 'lt-why', visible: whyShown }) : null,
+      var html = K.sheet({ title: titleSlot, close: null, size: 'long', view: 'dose',
+        body: '<div class="lt-stack">' + U.note(sub) + body + '</div>',
+        footer: K.footer({ back: { action: 'back' }, quiet: quiet, status: w ? Object.assign(S(w[0], w[1]), { id: 'lt-why', visible: whyShown }) : null,
           primary: { label: S('act.save'), register: 'primary', action: 'save', waiting: !!w, describedby: w && whyShown ? 'lt-why' : '' } }) });
       return w && whyShown ? html.replace('id="lt-why"', 'id="lt-why" data-answer=""') : html;
     }
@@ -715,7 +715,7 @@
         }
       }
       if (drawer.clamped != null) body += U.receipt([{ id: 'pp.litter.resume.now', args: { n: drawer.clamped }, tone: 'amber' }]);
-      return doseSheet(S(t[0], t[1]), [sub], body, clearAside(dirty()));
+      return doseSheet(S(t[0], t[1]), [sub], body, clearQuiet(dirty()));
     }
     function resolving() {
       var p = drawer.group, g = unknownGroups(drawer.dose).filter(function (x) { return x.id === p; })[0];
@@ -741,7 +741,7 @@
     function resolveDrawer() {
       var r = resolving(), n = r.n, had = Math.max(0, Math.min(drawer.had || 0, n)), rest = n - had, visible = doseCfg(r.dose).visible;
       var tx = lower(titleText(r.dose));
-      // the treatment is the title; the arrivals and their crate the subtitle; the check (spray mark, or on the pig) sits
+      // the treatment is the title; the arrivals and their crate the body's first line; the check (spray mark, or on the pig) sits
       // beside the answer it decides
       var body = stepperRow('had', 'pp.move.res.had', visible ? 'pp.litter.res.sub_check' : 'pp.litter.res.sub_unknown', null, had, n, one('pp.move.res.ceiling', n), { n: n });
       if (rest) body += radios('rest', one('pp.move.res.rest', rest), { n: rest },
@@ -750,7 +750,7 @@
       var cap = untreatedCap(r);
       if (rest && drawer.rest && cap != null && rest > cap) body += U.receipt([{ id: 'pp.litter.caution.untreated', args: { k: cap }, tone: 'amber' }]);
       var t = title(r.dose);
-      return doseSheet(S(t[0], t[1]), [S(one('pp.litter.res.from', n), { n: n, code: r.from })], body, clearAside(drawer.had || drawer.rest));
+      return doseSheet(S(t[0], t[1]), [S(one('pp.litter.res.from', n), { n: n, code: r.from })], body, clearQuiet(drawer.had || drawer.rest));
     }
     function rangeEvents() {
       var id = drawer.dose;
@@ -764,7 +764,7 @@
       if (drawer.still) body += radios('rest', one('pp.litter.range.them', drawer.still), { n: drawer.still },
         [['record', one('pp.litter.range.record', drawer.still), { tx: lower(titleText(id)), n: drawer.still }], ['owed', one('pp.litter.range.leave', drawer.still), { n: drawer.still }]], drawer.rest);
       var doubt = rg.doubt[0] || { n: 0, to: '' };
-      return doseSheet(S(title(id)[0], title(id)[1]), [S('pp.litter.range.sub', { lo: rg.lo, hi: rg.hi, of: rg.of, n: doubt.n, to: doubt.to })], body, '');
+      return doseSheet(S(title(id)[0], title(id)[1]), [S('pp.litter.range.sub', { lo: rg.lo, hi: rg.hi, of: rg.of, n: doubt.n, to: doubt.to })], body, null);
     }
     function freshDraft(id) {
       var o = view().owed.filter(function (x) { return x.dose === id; })[0];
@@ -824,11 +824,10 @@
       if (W.pad) body += UI.numpad({ decimals: 1, intLength: 2, value: draft, key: 'bw', id: 'bw-pad', hint: '',
         strs: Object.assign({ digit: 'ds.field.figure', decimal: 'ds.field.decimal', back: 'ds.field.aria.backspace', pad: 'ds.field.aria.pad' }) });   // the keypad reserves no hint line (the field sits on its keys); a dead key's answer is the footer's status
       var ok = has && num > 0 && !refused && !conflict;
-      // farrowing's counting sheets carry Clear in the head (greyed while there is nothing to clear), not ✕
-      var clear = btn({ id: 'act.clear', register: 'text', action: 'clear-weight', waiting: !draft || !!conflict });
-      return K.sheet({ title: S('pp.common.weight.title'), subtitle: [S('pp.room.code', { code: crate }), { sep: true }, S('pp.edge.weight.pop', { n: n })], close: null, aside: clear, size: 'long', view: 'weight',
-        body: '<div class="lt-stack">' + body + '</div>',
-        footer: K.footer({ back: { action: 'back' }, status: W.hint ? { text: PP.t(W.hint), str: W.hint, id: 'bw-why', tone: 'amber' } : null, primary: btn({ id: 'act.save', register: 'primary', action: 'save-weight', waiting: !ok }) }) });
+      // Clear is quiet text in the footer (never in the head), present only while there is a draft to clear
+      return K.sheet({ title: S('pp.common.weight.title'), close: null, size: 'long', view: 'weight',
+        body: '<div class="lt-stack">' + U.note([S('pp.edge.weight.pop', { n: n })]) + body + '</div>',
+        footer: K.footer({ back: { action: 'back' }, quiet: draft && !conflict ? { label: S('act.clear'), action: 'clear-weight' } : null, status: W.hint ? { text: PP.t(W.hint), str: W.hint, id: 'bw-why', tone: 'amber' } : null, primary: btn({ id: 'act.save', register: 'primary', action: 'save-weight', waiting: !ok }) }) });
     }
     function padKey(k) {
       var r = UI.numpadInput({ value: weightView.draft }, k, { decimals: 1, intLength: 2 });
@@ -984,8 +983,8 @@
         if (!crate) return '';
         store = host.store();
         var sheet = weightView ? weightSheet() : drawer ? (drawer.kind === 'resolve' ? resolveDrawer() : drawer.kind === 'range' ? rangeDrawer() : doseDrawer())
-          : K.sheet({ title: S('pp.room.code', { code: crate }), subtitle: subtitle(), close: { action: 'close' }, size: 'long', view: 'litter', label: S('pp.litter.aria', { code: crate }),
-            body: faceBody(), footer: litterFooter() });
+          : K.sheet({ title: S('pp.room.code', { code: crate }), close: { action: 'close' }, size: 'long', view: 'litter', label: S('pp.litter.aria', { code: crate }),
+            body: statusNote() + faceBody(), footer: litterFooter() });
         return K.scrim({ action: 'scrim' }) + sheet;
       },
       radio: function (field, value) { whyShown = false; setRadio(field, value); },
