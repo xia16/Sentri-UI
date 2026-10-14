@@ -24,7 +24,7 @@ Classification: **component** (a new job; no existing component draws a map of p
 3. **Column letters** (A, B, C…) and **row numbers** (1, 2, 3…): muted 13px mono on the sheet's tint. Letters are always the columns and numbers always the rows, so the map uses the phone's height. Letters stick to the top and numbers to the left. The number column is 22px, or 30px when a row has 100 pens or more.
 4. **Tile**: a button, at least 56 × 56, 8px gaps, 12px radius, the pen code in 15px / 600 mono and nothing else. Columns are `minmax(56px, 1fr)`: when the lanes do not fit at 56px the map scrolls sideways and the tiles never shrink.
 5. **Peek** (on hold): a white card with a 1px `line` border over the lower part of the map, clear of the footer.
-6. **Range control** (footer, only when a row has more than 20 pens): a segmented control beside Back, one button per 20 pens (`1–20`, `21–40`…).
+6. **Range control** (footer, only when a row has more than 20 pens): a segmented control beside Back, one button per 20 pens (`1–20`, `21–40`…), each at least 76px wide and the control 56px tall. It scrolls sideways when the ranges overflow, with no visible scrollbar.
 
 ## Variants
 
@@ -70,6 +70,7 @@ Selected, Error and Loading do not apply: tapping a tile leaves the sheet.
 
 - Every tile is a button named by its pen and state; an empty or hidden tile is disabled. The letters and numbers are decoration (`aria-hidden`): the reading order is pen 1's row, then pen 2's.
 - Tiles are at least 56 × 56 (above the 48px target floor) with 8px between.
+- The range control is a single-choice group: a radio group of buttons, one checked (the range that holds the top visible row).
 - State is never colour alone: the legend names the two colours, and each tile's accessible name says its state. The empty face differs by surface and by being disabled.
 - Contrast: `amber-fill-ink` on `amber-fill` is 7.4:1 and `progress-fill-ink` on `progress-fill` is 7.1:1; `muted` on `well` is 4.5:1.
 - Hold to peek is a shortcut: everything in the peek is in the room list one tap away.
@@ -96,7 +97,7 @@ Selected, Error and Loading do not apply: tapping a tile leaves the sheet.
 
 ## Tokens used
 
-`amber-fill` · `amber-fill-ink` · `progress-fill` · `progress-fill-ink` (new: fills colour a status that covers a whole area, [SURFACES.md](../../SURFACES.md)) · `paper` · `well` · `ink` · `muted` · `line` · `handle` · `press` · `app-background` · `st-context-bg` · `st-panel-bg` · `st-press` · `radius-control` · `radius-segment` · `radius-inset` · `radius-panel` · `radius-4` · `space-2` · `space-4` · `space-6` · `space-8` · `space-10` · `space-12` · `space-16` · `space-24` · `space-card-x` · `size-15` · `size-16` · `size-18` · `size-22` · `size-24` · `size-34` · `size-56` · `footer-height` · `type-meta-size` · `type-identifier-size` · `type-weight-medium` · `type-weight-semibold` · `font-sans` · `font-mono` · `border-width` · `icon-pad-stroke`.
+`amber-fill` · `amber-fill-ink` · `progress-fill` · `progress-fill-ink` (new: fills colour a status that covers a whole area, [SURFACES.md](../../SURFACES.md)) · `paper` · `well` · `ink` · `muted` · `line` · `handle` · `app-background` · `st-context-bg` · `st-panel-bg` · `st-press` · `radius-control` · `radius-segment` · `radius-inset` · `radius-panel` · `radius-4` · `space-2` · `space-4` · `space-6` · `space-8` · `space-10` · `space-12` · `space-14` · `space-16` · `space-24` · `space-card-x` · `size-2` · `size-15` · `size-16` · `size-20` · `size-22` · `size-24` · `size-34` · `size-56` · `footer-height` · `type-meta-size` · `type-identifier-size` · `type-weight-medium` · `type-weight-semibold` · `font-sans` · `font-mono` · `border-width` · `icon-pad-stroke`. The geometry is set in four local properties on the map (`--pm-tile`, `--pm-gap`, `--pm-label`, `--pm-head`) built from these tokens.
 
 ## Used by
 

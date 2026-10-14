@@ -1196,7 +1196,7 @@
     const size=Math.max(1,rangeSize|0);
     if(!(depth>size))return sheetFooter({back});
     const ranges=Array.from({length:Math.ceil(depth/size)},(_,i)=>[i*size+1,Math.min(depth,(i+1)*size)]);
-    return sheetFooter({content:backButton(back)+`<div class="st-pen-ranges" data-ds="PenMap" role="group" aria-label="${esc(label)}">${ranges.map(([a,b],i)=>`<button type="button" data-from="${a}" data-to="${b}" aria-pressed="${i===0}">${a}–${b}</button>`).join('')}</div>`});
+    return sheetFooter({content:backButton(back)+`<div class="st-pen-ranges" data-ds="PenMap" role="radiogroup" aria-label="${esc(label)}">${ranges.map(([a,b],i)=>`<button type="button" role="radio" data-from="${a}" data-to="${b}" aria-checked="${i===0}">${a}–${b}</button>`).join('')}</div>`});
   }
   /* The map's own behaviour. A pen map is found by its markup, so any host that draws one gets it without a call:
      it opens centred on its current pen; the range control (in the sheet's footer) follows the top visible row, and a tap
@@ -1212,7 +1212,7 @@
     const ranges=penSheet(map).querySelector('.st-pen-ranges');if(!ranges)return;
     const btns=[...ranges.children],atEnd=map.scrollHeight>map.clientHeight+1&&map.scrollTop+map.clientHeight>=map.scrollHeight-1,n=penTopRow(map);
     const on=atEnd?btns[btns.length-1]:btns.find(b=>n>=+b.dataset.from&&n<=+b.dataset.to);
-    btns.forEach(b=>b.setAttribute('aria-pressed',String(b===on)));
+    btns.forEach(b=>b.setAttribute('aria-checked',String(b===on)));
     if(on){const r=on.getBoundingClientRect(),q=ranges.getBoundingClientRect();if(r.left<q.left)ranges.scrollLeft+=r.left-q.left;else if(r.right>q.right)ranges.scrollLeft+=r.right-q.right;}
   }
   function penMount(scope){

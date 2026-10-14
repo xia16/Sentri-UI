@@ -10,9 +10,9 @@
 <div class="ph" data-state="Filtered · a pen the list hides is empty" data-demo="filtered"><div class="bg"></div><div class="over"></div></div>
 <div class="ph" data-state="Empty · no sows shown" data-demo="empty"><div class="bg"></div><div class="over"></div></div>
 <div class="ph" data-state="Range control · 2 × 60" data-demo="b60"><div class="bg"></div><div class="over"></div></div>
-<div class="ph" data-state="Long row · 2 × 100, three-digit rows" data-demo="b100"><div class="bg"></div><div class="over"></div></div>
-<div class="ph" data-state="Long row · 2 × 160, scrolled to the end" data-demo="b160"><div class="bg"></div><div class="over"></div></div>
-<div class="ph" data-state="Sideways scroll · 8 × 20" data-demo="b8"><div class="bg"></div><div class="over"></div></div>
+<div class="ph" data-state="Long row · 2 × 100, the wider number column" data-demo="b100"><div class="bg"></div><div class="over"></div></div>
+<div class="ph" data-state="Long row · 2 × 160, eight ranges" data-demo="b160"><div class="bg"></div><div class="over"></div></div>
+<div class="ph" data-state="Sideways scroll · 8 × 20, opens on E3" data-demo="b8"><div class="bg"></div><div class="over"></div></div>
 <div class="ph" data-state="Chinese · Unit 7" data-demo="zh7"><div class="bg"></div><div class="over"></div></div>
 <div class="ph" data-state="Chinese · 2 × 100" data-demo="zh100"><div class="bg"></div><div class="over"></div></div>
 <script>
@@ -24,10 +24,10 @@ const BARNS={
  unit7:{lanes:L(4),depth:6,pens:{B1:'live',B2:'plain',B3:'act',B4:'act',C5:'live',D3:'plain',A4:'plain',C2:'plain'},current:'B2'},
  filtered:{lanes:L(4),depth:6,pens:{B1:'hidden',B2:'hidden',B3:'act',B4:'act',C5:'hidden',D3:'plain',A4:'hidden',C2:'plain'},current:'B3'},
  empty:{lanes:L(4),depth:6,pens:{},current:'B2'},
- b60:{lanes:L(2),depth:60,pens:{A8:'live',B13:'act',B4:'plain',B5:'plain',A5:'plain',B6:'act'},current:'B5'},
- b100:{lanes:L(2),depth:100,pens:{A12:'live',B37:'act',A82:'act',A39:'plain',A40:'plain',A41:'plain',B40:'plain',B41:'live'},current:'A40'},
- b160:{lanes:L(2),depth:160,pens:{A12:'live',B90:'act',A133:'act',A150:'plain',B151:'plain',B159:'live'},current:'B159'},
- b8:{lanes:L(8),depth:20,pens:{B4:'live',G11:'act',C3:'plain',D3:'plain',H2:'plain',F9:'plain'},current:'G11'}
+ b60:{lanes:L(2),depth:60,pens:{A2:'live',B3:'act',B4:'plain',B5:'plain',A5:'plain',B6:'act',A22:'plain',B45:'act'},current:'B4'},
+ b100:{lanes:L(2),depth:100,pens:{A3:'plain',A4:'plain',B4:'plain',B5:'live',A6:'act',A37:'plain',B82:'act'},current:'A4'},
+ b160:{lanes:L(2),depth:160,pens:{A2:'plain',B2:'plain',A5:'act',B5:'live',B9:'plain',A90:'act',B133:'act',B159:'live'},current:'A5'},
+ b8:{lanes:L(8),depth:20,pens:{B4:'live',G3:'act',C3:'plain',D3:'plain',H2:'plain',F9:'plain',G11:'live'},current:'E3'}
 };
 const bg=()=>'<div class="bar" aria-hidden="true"><span>9:41</span></div>'+UI.heading({title:'Farrowing',kind:'page',description:'Last record 08:41 · G.H'})+UI.panel(UI.row({title:'Unit 7',description:'Task overview'}),{className:'st-row-group'});
 const peekRows=[{code:'000418',right:{kind:'state',figure:'2 days',word:'Overdue',level:'act'}},{code:'000431',right:{kind:'state',figure:'Tomorrow',word:'Due',level:'soon'}}];
