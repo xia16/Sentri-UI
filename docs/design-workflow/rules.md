@@ -4,14 +4,18 @@ The bottom of the ladder ([principles.md](principles.md#the-ladder-rules-become-
 
 Consolidate a principle when it has three open rules or the same failure twice, and at every map close.
 
+**Consolidation 1 (2026-10-12, P2: L3, L11, L15 open).** L3 automated as the gate's known-reach check; L15 absorbed into P2's wording; L11 stays open to automate with L10 (it needs the derived "used by").
+
+**Next: consolidation 2 (P5: L8, L9, L10, L14 open).** All four are automations; they land as checks before the next trial.
+
 ## Open
 
 | # | Principle | Rule | From | Exit |
 |---|---|---|---|---|
-| L3 | P2 | A change scoped to one feature that moves another feature's screen fails, rather than being escalated to a shared change. | Environment trial 4: a shared token changed for one screen moved 60 screens in ten features (2026-10-12) | Automate: `gate.mjs` fails a non-shared declared class whose diff moves screens outside SCOPE; the builder runs the full screen diff before its final look. |
 | L8 | P5 | A screen's notes are checked against the rendered screen: when a screen's pixels change its notes are flagged, and every string the notes quote must appear in the rendered text. | Animal-row propagation audit (#113, #138), 2026-10-12: notes quoted text the screens no longer show. Again 2026-10-13: Record dead's notes say optional photos show with the camera disabled until a death is drafted; the screen hides the whole photo row instead | Automate: atlas build or gate. |
 | L9 | P5 | Changing a component variant resets its score to "in design" until it is judged again. | Same audit: scores survived changes to the component | Automate: a source-hash guard test per variant. |
 | L10 | P5 | "Used by" is derived, not kept by hand. | Same audit: hand-kept "used by" lists missed users | Automate: derive it at atlas build from the screens that actually render the component. |
+| L14 | P5 | The builder's own self-check finishes in minutes, so it is run and seen: a builder twice abandoned a gate run after an hour and never saw a styling failure. | Environment trial 6 (2026-10-12); the runs were competing with the driver's gate on one machine | Automate: a fast reach mode that shoots only the features that load the changed files; one gate run per machine at a time. |
 | L11 | P2 | A component change lists every screen, pattern (e.g. the task skeleton) and demo that uses it; each is updated or marked "until migrated", and repropagation runs on every change, not only at freeze. | Same audit: patterns weren't counted as users; the approved row reached 7 places and missed 7 | Automate: the gate prints the reach list from L10 and fails a user that is neither updated nor marked. |
 | L17 | P3 | A header holds the title and at most one header line that passes the three tests (route or fact; not on screen and not one Back away; fits at 360 in EN and ZH); nothing in it acts but Back and the subject chip; the gap to the body is 24px. | Owner on the drawer headers (Filter sows, Record dead, the farrowing record), 2026-10-13: Reset and Scanning in the head, facts repeated from the page behind, a centred header running into a section title | Automate: check-spacing measures the 24px gap; a header check fails a count, a button or an `aside` in a head and a line that wraps at 360; fails a header line or identity fact `budget.md` does not name (identity facts are chosen per task); flags a line the body repeats. Law: `ux/design-system/README.md`, Headers. |
 | L18 | P3 | Every fact a changed screen displays traces to `budget.md` with its question; nothing is shown by default or filled in by a shared component. | Owner, 2026-10-13, on header identity facts: "each display needs a clear decision, not made randomly"; absorbed into P3 and build.md §2 the same day | Automate: the gate reads the rendered text of the changed screens and lists every fact `budget.md` doesn't name. |
@@ -22,6 +26,8 @@ Consolidate a principle when it has three open rules or the same failure twice, 
 
 | # | Principle | Rule | From | Exit |
 |---|---|---|---|---|
+| L3 | P2 | A change scoped to one feature that moves another feature's screen fails, rather than being escalated to a shared change. | Environment trial 4: a shared token changed for one screen moved 60 screens in ten features (2026-10-12) | Automated: `gate.mjs` "known reach: only SCOPE moved (P2)" (consolidation 1, 2026-10-12). |
+| L15 | P2 | The driver's crit rounds stay inside SCOPE too. | Environment trial 6: the driver asked for the PREVIEW badge to go from Assistant and Maintenance headers; screens outside SCOPE moved (2026-10-12) | Absorbed into P2 ("binds everyone who touches the change"), consolidation 1. |
 | L16 | P4 | Spacing that is clearly wrong fails, never "off by a few pixels": a block closer to a list than its rows are to each other, two boxed blocks under 8px apart, two lines within 6px at one boundary. | Owner on Farrowing's Record dead: "it is really cluttered here" (the Piglets / The sow switch 10px above the first stepper, a divider directly on top of it), 2026-10-13 | Automated: `scripts/check-spacing.mjs`, run by the gate on changed screens; the law is in `ux/design-system/README.md`, "Space groups". Accepted because it fails Record dead and passes the four house references. |
 | L1 | P4 | The last look is at the pushed head after the last edit, at 390 and 360. | Trial 2: a badge raised after the crit wrapped the title (2026-10-12) | Absorbed into P4. |
 | L2 | P2 | A check that fails a kept part is questioned, not obeyed. | Trial 3: segmented controls turned into pills to satisfy check-states rule b (2026-10-12) | Absorbed into P2; rule b narrowed (#131). |
