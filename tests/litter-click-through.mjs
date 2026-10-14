@@ -1,15 +1,12 @@
 // Litter sheet click-through (scenario round 1: R1-2, R1-3, R1-4, R1-10, R1-13, R1-17, R1-19, R1-22, R1-24, R1-25, N12;
 // one sheet for orphans and nurse sows; edge Back): every fixed flow from the room by real taps.
-// Run: node tests/litter-click-through.mjs [port]. Uses the Playwright the design lint installs (~/.cache/adam-design/playwright-<v>).
+// Run: node tests/litter-click-through.mjs [port]. Uses the project's Playwright (scripts/playwright-path.mjs).
 import { spawn } from 'node:child_process';
-import { createRequire } from 'node:module';
-import { homedir } from 'node:os';
-import { join } from 'node:path';
 import assert from 'node:assert/strict';
+import { playwright } from '../scripts/playwright-path.mjs';
 
 const port = Number(process.argv[2]) || 4608;
-const require = createRequire(join(homedir(), '.cache', 'adam-design', 'playwright-1.63.0', 'package.json'));
-const { chromium } = require('playwright');
+const { chromium } = playwright();
 const server = spawn(process.execPath, ['scripts/serve-ux.cjs', String(port)], { stdio: 'ignore' });
 const base = `http://localhost:${port}/ux/tasks/piglet-processing/`;
 const ready = (p) => p.waitForSelector('html[data-ready]');
