@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-14T08:20:09.506Z",
- "commit": "8280d24",
+ "generated": "2026-10-14T20:53:23.092Z",
+ "commit": "fdca0df",
  "platforms": [
   {
    "id": "mobile",
@@ -3921,30 +3921,12 @@
          "preset": "draft",
          "figma": "",
          "notes": {
-          "purpose": "The one dead drawer: tally piglets born dead or died by type, or record the sow's own death.",
+          "purpose": "The one dead drawer: tally piglets born dead or died by cause, or record the sow's own death, with optional photos riding the save.",
           "states": [
            "Photo dialog over the drawer (tap a thumbnail): Back, Delete",
            "Opened from Before first count, Finish, the locked record or the ended record: same drawer, returns to where it was opened"
           ],
           "elements": [
-           {
-            "name": "Dead header",
-            "shows": "\"Dead 6\" with \"Born dead or died\" and Clear. A draft is counted once, as \"+1 unsaved\" on its row.",
-            "states": [
-             {
-              "state": "No draft",
-              "when": "Nothing drafted",
-              "shows": "\"Dead 5\" (saved total); no unsaved count; Clear left out; Save disabled"
-             },
-             {
-              "state": "Draft",
-              "when": "One or more deaths drafted",
-              "shows": "\"Dead 6\" (saved + draft); Clear live"
-             }
-            ],
-            "source": "farrowing-astra-concept.js identity()",
-            "at": "Born dead or died"
-           },
            {
             "name": "Type rows",
             "shows": "Stillborn · Mummified · Crushed · Scours · Starve-out · Other, each with − n +.",
@@ -3960,13 +3942,13 @@
               "shows": "+ stops when drafted deaths equal Alive now; saving lowers Alive now"
              }
             ],
-            "logic": "Value = saved total + this draft (\"+1 unsaved\" in muted ink beside the label). − only undoes the draft and is disabled at 0 draft.",
+            "logic": "Value = saved total + this draft (\"+1 unsaved\" in muted ink beside the label). − only undoes the draft and is disabled at 0 draft. Clear (top right of the header) appears only while something is drafted.",
             "source": "farrowing-astra-concept.js death(), act(\"deadStep\")",
             "at": "Crushed"
            },
            {
             "name": "Piglets | The sow",
-            "shows": "Two-way segment at the top.",
+            "shows": "Two-way switch at the top of the body, 24px above the first cause row (or the sow's Cause).",
             "states": [
              {
               "state": "Both",
@@ -3999,7 +3981,7 @@
              {
               "state": "Ready",
               "when": "Cause chosen, no draft",
-              "shows": "Save enabled; \"Other\" adds an optional details line"
+              "shows": "Save enabled; \"Other\" adds an optional Details row (the same full-width face as Photos)"
              }
             ],
             "rule": "Saving is a 0.85 s hold: ends farrowing, freezes Born, writes \"Sow died · cause\". Band always reads \"Saving ends farrowing · 7 alive stay under piglet care\" (current Alive).",
@@ -4008,10 +3990,27 @@
            },
            {
             "name": "Photos",
-            "shows": "Optional photos with a camera button and thumbnails.",
-            "logic": "Camera is disabled until a death is drafted (or a sow cause is chosen). Photos ride the save.",
+            "shows": "The optional photo row, always shown last in capture order and whole on the first frame: full width, \"Photos\" with the muted \"Optional\" and an outlined camera at the right; with photos, \"N attached\" under the label and the thumbnails below.",
             "source": "farrowing-astra-concept.js death() photo-field",
-            "at": "Photos"
+            "at": "Photos",
+            "states": [
+             {
+              "state": "Waiting",
+              "when": "No death drafted (Piglets) or no cause chosen (The sow)",
+              "shows": "The camera's outline is dashed; no line under the row. A tap shows \"Record a death first · photos ride that record\" in the row's hint line for a few seconds (the screen reader hears it as the row's description) and opens no camera"
+             },
+             {
+              "state": "Ready",
+              "when": "A death drafted or a cause chosen",
+              "shows": "No hint; a tap opens the camera"
+             },
+             {
+              "state": "With photos",
+              "when": "One or more photos taken (12 at most)",
+              "shows": "\"N attached\" under the label, thumbnails below (the body scrolls); a thumbnail opens the photo with Back and Delete"
+             }
+            ],
+            "rule": "Photos ride the save; Clear drops them with the draft."
            },
            {
             "name": "Save and Back",
@@ -4039,17 +4038,17 @@
            }
           ],
           "copy": [
-           "(raw) Dead N · Born dead or died",
            "(raw) Piglets · The sow",
            "(raw) Stillborn · Mummified · Crushed · Scours · Starve-out · Other",
-           "(raw) Photos · Optional",
+           "(raw) Photos · Record a death first · photos ride that record",
            "(raw) Farrowing · Prolapse · Found dead · Other",
            "(raw) Saving ends farrowing · N alive stay under piglet care",
            "(raw) Back · Save · HOLD TO SAVE"
           ],
           "edge": [
            "Sow cannot be saved dead twice: sow mode disappears once ended",
-           "A piglet draft or an Edit draft blocks saving the sow's death"
+           "A piglet draft or an Edit draft blocks saving the sow's death",
+           "The drawer is held 56px under the phone's top so the causes, the optional rows and the sow's banner are whole on the first frame in every state at 390 and 360; opening Details scrolls the banner back into view; thumbnails scroll."
           ],
           "rules": [
            "\"ONE dead drawer product-wide\" (Surfaces & entrances)",
@@ -4062,8 +4061,7 @@
           ],
           "issues": [
            "Back keeps the draft, as the ruling says; Finish has no banner.",
-           "No sow id or pen is shown; the worker cannot see which sow is being recorded.",
-           "Photo field is a header row with an icon button, not the ruled single card; \"Record death\" mixes with the ruled \"Record dead\"."
+           "No sow id or pen is shown; the worker cannot see which sow is being recorded."
           ]
          }
         },

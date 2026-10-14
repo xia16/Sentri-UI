@@ -53,6 +53,22 @@ Moved, not cut (crit rounds 1 and 2): the task receipt's closure stamp (`Farrowi
 
 Chains walked (crit round 1): the room, the record drawer, the logs and the pen pages read as before; More actions and Piglet processing now carry the route, so every action page about her is one Back from her chip.
 
+## Record dead (2026-10-14)
+
+Kept facts (not changed by this pass), with the question each answers: the title `Record dead` (what am I doing?); the switch `Piglets` / `The sow` (whose death?); each cause's label and count (how many of each so far, with this draft?); `+n unsaved` beside a drafted cause (what will this save add?); the sow's four causes and the banner `Saving ends farrowing · N alive stay under piglet care` (what does saving her death do?); the primary `Record N deaths` / `Record sow death` (what will the tap commit?).
+
+Facts this pass touches:
+
+| Fact | State | Question it answers there | Level |
+|---|---|---|---|
+| `Photos` (the optional row's label, camera glyph) | always, last in capture order | Can I attach a photo to this record? | Settled (quiet card) |
+| `Record a death first · photos ride that record` (the hint line, the Photos component's registered `ds.c2.photos.inactive`) | no death drafted (piglets) or no cause chosen (the sow), **only after a tap on the waiting camera** (crit round 2: the floor-gray; otherwise it is the row's screen-reader description, never a standing line) | Why can't I take a photo yet? | Settled (muted hint line, shown while the tap is answered) |
+| `N attached` (the row's answer) and thumbnails | after a photo | Did my photo go on this record? | Settled |
+
+Cut: nothing new. Hiding the Photos row until a death is drafted is cut (the row waits visibly instead). Nothing is added to the header.
+
+Crit round 2: the sow's `Details` (cause Other) keeps its fact (what else about her death?) and takes the same full-width optional row as Photos.
+
 
 ### Corner actions and titles (2026-10-14)
 
