@@ -74,6 +74,10 @@ svg{width:var(--size-20);height:var(--size-20);display:block;flex-shrink:0;fill:
 /* The header line: one quiet line, never wrapped or truncated (copy that does not fit belongs in the body). */
 .st-header-line{margin:var(--space-6) 0 0;font:var(--type-description-size)/1.5 var(--font-sans);color:var(--muted);white-space:nowrap}
 .st-header-line[data-line="route"]{display:flex;align-items:center;justify-content:center;gap:var(--space-8)}
+.st-header-line[data-line="key"]{display:flex;align-items:center;justify-content:center;gap:var(--space-16);font-weight:var(--type-weight-medium)}
+.st-header-line[data-line="key"] span{display:inline-flex;align-items:center;gap:var(--space-6)}
+.st-header-line[data-line="key"] i{flex:none;width:var(--space-12);height:var(--space-12);border-radius:var(--radius-4)}
+.st-header-line[data-line="key"] b{font-weight:var(--type-weight-semibold);color:var(--ink)}
 .st-header-line strong{font-weight:500;color:var(--ink)}
 .st-header-line .st-sep{margin:0 3px}
 .st-header-facts{min-width:0}
@@ -1022,12 +1026,6 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 .sheet-body:has(>.st-pen-map){display:flex;flex-direction:column;overflow:hidden}
 .st-pen-map{--pm-tile:var(--size-56);--pm-gap:var(--space-8);--pm-label:var(--size-22);--pm-head:var(--size-20);display:flex;flex-direction:column;flex:0 1 auto;min-width:0;min-height:0}
 .st-pen-map[data-wide]{--pm-label:calc(var(--size-24) + var(--space-6))}
-.st-pen-legend{flex:none;display:flex;gap:var(--space-16);margin:0 0 var(--space-12);font:var(--type-weight-medium) var(--type-meta-size)/1.4 var(--font-sans);color:var(--muted)}
-.st-pen-legend span{display:inline-flex;align-items:center;gap:var(--space-6);white-space:nowrap}
-.st-pen-legend b{font-weight:var(--type-weight-semibold);color:var(--ink)}
-.st-pen-legend i{flex:none;width:var(--space-12);height:var(--space-12);border-radius:var(--radius-4)}
-.st-pen-legend [data-level=act] i{background:var(--amber-fill)}
-.st-pen-legend [data-level=live] i{background:var(--progress-fill)}
 .st-pen-entrance{flex:none;display:flex;align-items:center;justify-content:center;gap:var(--space-8);min-height:calc(var(--size-34) + var(--size-2));margin:0 0 var(--space-10);border-radius:var(--radius-segment);background:var(--well);color:var(--ink);font:var(--type-weight-semibold) var(--type-meta-size) var(--font-sans)}
 .st-pen-entrance svg{width:var(--size-16);height:var(--size-16);stroke-width:var(--icon-pad-stroke)}
 .st-pen-field{position:relative;display:flex;flex:0 1 auto;min-height:0}

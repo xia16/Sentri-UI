@@ -2713,9 +2713,9 @@
         "purpose": "Jump to a pen by where it is, not by scrolling the list: a map of the room, one tile per pen, coloured by the status of the sows the list shows in it. It is drawn as seen from the door: pen 1 is nearest the entrance, at the top.",
         "elements": [
           {
-            "name": "Legend",
+            "name": "Colour key",
             "at": "need you",
-            "shows": "The first line of the body: a count of pens per colour, “need you” (amber) and “farrowing” (blue), each with its swatch.",
+            "shows": "The sheet’s header line, under the title (owner exception to the Headers law, 2026-10-14): a count of pens per colour, “need you” (amber) and “farrowing” (blue), each with its swatch.",
             "states": [
               {
                 "state": "Both colours on the map",
@@ -2730,7 +2730,7 @@
               {
                 "state": "None",
                 "when": "No pen is amber or blue",
-                "shows": "no legend; the Entrance band is the first line"
+                "shows": "no header line; the Entrance band is the first thing in the body"
               }
             ],
             "logic": "Counts pens, not sows, at each level under the current tab and filter. A count of zero is not drawn."

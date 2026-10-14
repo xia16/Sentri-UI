@@ -126,11 +126,13 @@ Which one: whether the surface covers the page, not which feature it belongs to.
 
 **The header holds** the title and, at most, one quiet **header line**. Nothing in a header acts except Back and the subject chip: no counts, no status, no Reset or Clear, no buttons. Status is the first thing in the body; Reset and Clear sit in the footer. Section titles under a header keep their own style; the hairline and the gap separate them, never a weaker title.
 
-**The header line is absent by default.** It has one of two jobs, and each fact on it passes three tests:
+**The header line is absent by default.** It has one of two jobs, and each fact on it passes three tests. There is one owner exception, below the tests:
 
 1. **A route or a fact.** A route is where the worker goes next from here (the subject chip: tag icon, `#ID`, `›`, the only tappable part, opening the animal). A fact is something the worker needs now to decide or to trust the screen (`Last record 08:41 · G.H` on a shared task page). True is not enough.
 2. **Not on screen, and not one Back away.** A fact the body shows, or that Back reaches, is out. So **hubs** (the surface a worker returns to for one subject: the farrowing record drawer, a pen sheet, a task page) carry the line, and **actions** launched from a hub (record dead, foster, allocate, a log) carry none: the hub is one Back away.
 3. **It fits.** One line, never wrapped or truncated, at 360px in English and Chinese (about 32 English or 16 Chinese characters beside Back, fewer beside a chip). Copy that does not fit belongs in the body.
+
+**The colour key is the one exception (owner, 2026-10-14).** A surface whose body is colour-coded (the pen map) may use its colour key as the header line: plain text, never tappable, one line at 360 in EN and ZH, and the only header line (owner, 2026-10-14). It does not take the three tests: it is not a route and not a fact about the screen, it decodes the body's colours, and it is the first thing the worker needs to read the body. Its counts are in `budget.md` with their question.
 
 **Identity facts are a decision per task, never a default.** On a hub, the subject chip may be followed by up to two short `muted` facts that tell the animal apart *in that task*. Which ones is decided in the task's `budget.md`, each with the worker's question it answers there: parity matters at farrowing (`#000418 › B1 · Parity 3`) and may answer nothing in another task, where the chip stands with the pen alone or with nothing. A fact the budget doesn't name is not drawn, and a shared component never fills one in. Never counts, status or dates.
 

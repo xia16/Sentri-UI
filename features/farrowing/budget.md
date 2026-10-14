@@ -44,7 +44,8 @@ The header line of every surface of this feature, decided by the Headers law (`u
 | Note, reconcile, transfer, not in pig | action | none | | More actions (chip) | one Back away |
 | Piglet identity, Report piglet mortality, Foster piglets (from Piglet processing) | action | none | | Piglet processing (chip), walked in crit round 1 | one Back away |
 | Task overview, End task (early), Task ended, task sows lists | action (from the room's summary card) | none | the scope is in the body (Choose a unit, the outcomes) | Back reaches the room |
-| Filter sows, Go to pen, Scan actions | action | none | Reset in the footer | Back reaches the room |
+| Filter sows, Scan actions | action | none | Reset in the footer | Back reaches the room |
+| Go to pen | action | the colour key: `2 need you · 1 farrowing` (owner exception, 2026-10-14; below) | Where does anything need me, and what do the colours mean? | Back reaches the room |
 | Pen page, Pen log, Pen note, Feed guidance, Report fault, Equipment fault | action | none | | Back reaches the room or the pen page |
 | Scan ear tags | action (page) | none; Scanning / Stopped is the body's first line | | Back reaches the room |
 | Find a sow | search page | not a title header: its pinned field is its head (owner, 2026-10-12) | | |
@@ -60,8 +61,7 @@ Built on the shared PenMap component. Owner design, chosen over mockup rounds on
 ## Inventory
 
 Every fact the map could show, per pen and per state:
-- Header: the title, `Go to pen`. No header line (a drawer that the room is one Back away from: Headers law, L17).
-- Body, first line: the legend, the pens that need her and the pens farrowing now, each a count with its swatch.
+- Header: the title, `Go to pen`, and one header line, the colour key: the pens that need her and the pens farrowing now, each a count with its swatch. Owner ruling, 2026-10-14: a surface whose body is colour-coded may use its colour key as the header line (plain text, never tappable, one line at 360 in EN and ZH, the only header line). It is an exception to the three tests of the Headers law; it is named here with its question.
 - The entrance band, saying which end of the map is the door.
 - The map: column letters, row numbers, one tile per pen with its pen code. The tile's colour is its status.
 - Peek (hold a tile): the pen code and its sow count, and for each sow her ear tag, state word and figure.
@@ -71,7 +71,7 @@ Every fact the map could show, per pen and per state:
 ## Questions
 
 1. Where am I in the room, and which end is the door? (the entrance band, the letters and numbers, the map opening on the pen she came from.)
-2. Which pens need me? (the amber tiles, the legend's first count.)
+2. Which pens need me? (the amber tiles, the key's first count.)
 3. Where is farrowing happening now? (the blue tiles.)
 4. Which pens have sows I could go to, and which are empty? (the white tiles against the quiet empty ones.)
 5. Which pen is this one, so I can tap it? (the pen code in the tile.)
@@ -81,7 +81,7 @@ Every fact the map could show, per pen and per state:
 
 | Fact | Level | Question it answers there |
 |---|---|---|
-| Legend counts (`2 need you`, `2 farrowing`) | **Watch** | Which pens need me, and how many are farrowing: decodes the two colours and counts them. A count of 0 is not drawn, and with none of either the legend is absent. |
+| Header line, the key (`2 need you`, `2 farrowing`) | **Watch** | Where does anything need me, and what do the colours mean? Decodes the two colours and counts the pens. A count of 0 is not drawn, and with none of either the sheet has no header line. |
 | Tile fill, amber | **Act now** | Which pens need me (a sow overdue, or a sow died with piglets to allocate: the animal row's `act` level). The only loud thing. |
 | Tile fill, blue | **Watch** | Where is farrowing happening now (the animal row's `live` level). |
 | Pen code (`B3`) | **Settled** | Which pen is this? It is the tile's only text, set in mono at 15px. |
@@ -101,4 +101,4 @@ The fact line in every tile (and with it the second status vocabulary `penFact`:
 
 ## Header
 
-No line (the table above): the title alone, centred, with the hairline. The legend, the status of the map, is the first line of the body.
+The title, centred, then the colour key as the one header line, then the hairline (owner exception, 2026-10-14). The body starts with the Entrance band, 24px under the hairline.

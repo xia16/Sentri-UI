@@ -2,7 +2,7 @@
 
 A pen map shows a room as a map of pens, each pen a tile that goes to that pen and is coloured by its status, so a worker finds the pen in front of her by where it is and sees at once which ones need her. It is Farrowing's Go to pen. It sits in a menu drawer ([Sheet](../Sheet/README.md), `surface: 'menu'`) and does not record a farm fact.
 
-`SentriUI.penMap({ lanes, depth, pens, current, action, key, rangeSize, entrance, legend, labels, peek })` draws the body: the legend, the Entrance band and the map. `SentriUI.penMapFooter({ back, depth, rangeSize, label })` draws the footer. `SentriUI.penPeek({ title, meta, rows })` draws the hold-to-peek card's content. Types are in `index.d.ts`.
+`SentriUI.penMap({ lanes, depth, pens, current, action, key, rangeSize, entrance, labels, peek })` draws the body: the Entrance band and the map. `SentriUI.penMapKey({ pens, words })` gives the items of the sheet's key line (the legend; see below). `SentriUI.penMapFooter({ back, depth, rangeSize, label })` draws the footer. `SentriUI.penPeek({ title, meta, rows })` draws the hold-to-peek card's content. Types are in `index.d.ts`.
 
 Classification: **component** (a new job; no existing component draws a map of places). One variant today, the map.
 
@@ -19,8 +19,8 @@ Classification: **component** (a new job; no existing component draws a map of p
 
 ## Anatomy
 
-1. **Legend** (optional, the body's first line): a 12px rounded swatch, a bold ink count and a muted word per coloured level ("**2** need you", "**2** farrowing"), 13px, on one line at 360 in English and Chinese. It counts pens, follows the current tab and filter, and draws only a level that has a pen; with none it is absent.
-2. **Entrance band**: a full-width band on `well`, 36px tall, a down arrow and "Entrance", 13px / 600 ink, 12px under the legend. It says the map is drawn as seen from the door: pen 1 is nearest it, at the top.
+1. **Colour key** (optional, the sheet's header line, not part of the body): `sheet({ line: { key: penMapKey({ pens, words }) } })`, the Sheet's colour-key header line (owner exception to the Headers law, 2026-10-14; see [Sheet](../Sheet/README.md)). A 12px rounded swatch, a bold ink count and a muted word per coloured level (**2** need you, **2** farrowing), 13px, centred under the title, plain text and never tappable, on one line at 360 in English and Chinese. It counts pens, follows the current tab and filter, and draws only a level that has a pen; with none the sheet has no header line.
+2. **Entrance band**: a full-width band on `well`, 36px tall, a down arrow and "Entrance", 13px / 600 ink, the first thing in the body, 24px under the hairline (the header owns the gap). It says the map is drawn as seen from the door: pen 1 is nearest it, at the top.
 3. **Column letters** (A, B, C…) and **row numbers** (1, 2, 3…): muted 13px mono on the sheet's tint. Letters are always the columns and numbers always the rows, so the map uses the phone's height. Letters stick to the top and numbers to the left. The number column is 22px, or 30px when a row has 100 pens or more.
 4. **Tile**: a button, at least 56 × 56, 8px gaps, 12px radius, the pen code in 15px / 600 mono and nothing else. Columns are `minmax(56px, 1fr)`: when the lanes do not fit at 56px the map scrolls sideways and the tiles never shrink.
 5. **Peek** (on hold): a white card with a 1px `line` border over the lower part of the map, clear of the footer.
@@ -28,7 +28,7 @@ Classification: **component** (a new job; no existing component draws a map of p
 
 ## Variants
 
-- [Map](variants/map.html): the one map, in a menu drawer. Specimens: Unit 7 (4 × 6), 2 × 60, 2 × 100, 2 × 160, 8 × 20 (sideways scroll), a filtered map, an empty map, the peek, a pressed tile and the Chinese legend.
+- [Map](variants/map.html): the one map, in a menu drawer. Specimens: Unit 7 (4 × 6), 2 × 60, 2 × 100, 2 × 160, 8 × 20 (sideways scroll), a filtered map, an empty map, the peek, a pressed tile and the Chinese key.
 
 ## States
 
@@ -43,7 +43,7 @@ A pen takes one face. A pen's level is the loudest of the sows the list shows in
 | No sows match (`hidden`) | sows, all hidden by the tab or filter | the empty face, disabled | `well`, no border | `muted`, 500 |
 | Pressed | finger down | white takes `press`; the fills darken | | |
 | Peek | held 350ms | the card, over the lower part of the map (the upper part when the held tile would sit under it) | | |
-| Long / Chinese | `lanes` and `depth` of any size; Chinese words | the legend stays on one line; pen codes are never translated | | |
+| Long / Chinese | `lanes` and `depth` of any size; Chinese words | the key stays on one line; pen codes are never translated | | |
 
 There is no text inside a tile but the pen code: no "No sows", no "Active". There is no current-pen marker (no ring, no fill): the map opens scrolled so the current pen is in view, centred under the letters.
 
@@ -53,14 +53,14 @@ Selected, Error and Loading do not apply: tapping a tile leaves the sheet.
 
 - **Tap** a tile and the host goes to that pen (`data-action` and `data-value` carry the action and the pen code). A disabled tile does nothing.
 - **Hold** a tile 350ms to peek at its sows, read-only. Moving more than 12px, scrolling or lifting hides it; the tap that follows a peek only closes it and does not go to the pen.
-- **The map scrolls** inside the sheet, sideways and down. The sheet body does not scroll; the legend and the Entrance band stay put. The scrollbar is never drawn.
+- **The map scrolls** inside the sheet, sideways and down. The sheet body does not scroll; the Entrance band stays put. The scrollbar is never drawn.
 - **Opens on the current pen**, centred in the space under the letters and beside the numbers.
 - **The range control follows the map.** The pressed range holds the top visible row (at the very end, the last range). Its button scrolls into view when the ranges overflow sideways. A tap on a range scrolls its first row to just under the letters.
 - **Mounting** is automatic: a map is found by its markup and mounted when it enters the document. A host that inserts markup some other way calls `SentriUI.penMapMount(root)`.
 
 ## Content rules
 
-- The legend word is a short phrase after the count ("need you", "farrowing"; Chinese "需处理", "分娩中"). Counts lead the word.
+- The key word is a short phrase after the count ("need you", "farrowing"; Chinese "需处理", "分娩中"). Counts lead the word.
 - Pen codes are the lane then the row (`B3`, `A120`); they are never shortened, translated or wrapped, and they are set in mono.
 - A tile says its pen code only. A tile's accessible name adds the state (`Pen B3, needs you`).
 - Strings are in the registry (`ds.penmap.*`).
@@ -71,7 +71,7 @@ Selected, Error and Loading do not apply: tapping a tile leaves the sheet.
 - Every tile is a button named by its pen and state; an empty or hidden tile is disabled. The letters and numbers are decoration (`aria-hidden`): the reading order is pen 1's row, then pen 2's.
 - Tiles are at least 56 × 56 (above the 48px target floor) with 8px between.
 - The range control is a single-choice group: a radio group of buttons, one checked (the range that holds the top visible row).
-- State is never colour alone: the legend names the two colours, and each tile's accessible name says its state. The empty face differs by surface and by being disabled.
+- State is never colour alone: the key names the two colours, and each tile's accessible name says its state. The empty face differs by surface and by being disabled.
 - Contrast: `amber-fill-ink` on `amber-fill` is 7.4:1 and `progress-fill-ink` on `progress-fill` is 7.1:1; `muted` on `well` is 4.5:1.
 - Hold to peek is a shortcut: everything in the peek is in the room list one tap away.
 

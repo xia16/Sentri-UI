@@ -51,7 +51,6 @@
     "ds.penmap.entrance": {"en": "Entrance", "zh": "入口", "kind": "label"},
     "ds.penmap.legend_act": {"en": "need you", "zh": "需处理", "kind": "status"},
     "ds.penmap.legend_live": {"en": "farrowing", "zh": "分娩中", "kind": "status"},
-    "ds.penmap.legend": {"en": "Pen key", "zh": "栏位图例", "kind": "label"},
     "ds.penmap.map": {"en": "Pens", "zh": "栏位", "kind": "label"},
     "ds.penmap.pen": {"en": "Pen {code}", "zh": "{code}栏", "kind": "label"},
     "ds.penmap.act": {"en": "needs you", "zh": "需处理", "kind": "status"},

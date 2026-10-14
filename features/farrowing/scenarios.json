@@ -4585,11 +4585,11 @@
           "en"
          ],
          "tree": "P-5",
-         "label": "A pen whose sows the tab hides is disabled, and the legend follows the tab",
+         "label": "A pen whose sows the tab hides is disabled, and the colour key follows the tab",
          "gwt": {
           "given": "The worker is on the Active tab, where only pen B1 has a farrowing sow.",
           "when": "They open Go to pen.",
-          "then": "Pens B3 and B4, whose sows the tab hides, are disabled; pen B1 can be tapped; the legend counts one farrowing pen and none that need her."
+          "then": "Pens B3 and B4, whose sows the tab hides, are disabled; pen B1 can be tapped; the colour key counts one farrowing pen and none that need her."
          },
          "authority": [
           {

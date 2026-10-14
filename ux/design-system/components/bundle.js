@@ -1019,6 +1019,11 @@
       const chip=`<button type="button" class="st-subject-chip"${sA(c.action||'open-subject',c.value??id.text)}${sL(c.label,{text:'Open '+(id.text??'')})}>${sGlyph('tag')}<span class="st-subject-chip-id">#${sT(id)}</span>${sGlyph('chevron')}</button>`;
       return `<p class="st-header-line" data-line="route">${chip}${facts.length?`<span class="st-header-facts">${facts.map(sParts).join(SEP)}</span>`:''}</p>`;
     }
+    /* key: the colour key of a body that is colour-coded (the pen map): swatch, count, label. Plain text, never tappable (owner, 2026-10-14). */
+    if(line.key){
+      const items=line.key.filter(k=>k&&k.count!=null&&k.label);
+      return items.length?`<p class="st-header-line" data-line="key">${items.map(k=>`<span><i aria-hidden="true" style="background:var(${/^--[\w-]+$/.test(k.fill||'')?k.fill:'--line'})"></i><b>${esc(k.count)}</b> ${esc(k.label)}</span>`).join('')}</p>`:'';
+    }
     const t=line.text??line;
     return t==null||t===''?'':`<p class="st-header-line" data-line="fact">${sParts(t)}</p>`;
   }
@@ -1167,25 +1172,28 @@
      columns and numbers always the rows, so the map uses the phone's height; it is drawn as seen from the door (the
      Entrance band): pen 1 is nearest it, at the top. A tile is a button that goes to its pen and says nothing but the pen
      code; its colour is its status. When the lanes do not fit at 56px the map scrolls sideways; the tiles never shrink.
-     penMap({ lanes, depth, pens:{ B3:'act'|'live'|'plain'|'hidden' }, current, action, key, rangeSize, entrance, legend:{ act, live },
-     labels, peek }): the legend, the Entrance band and the map. A pen missing from `pens` is empty; 'hidden' is a pen with
-     sows the current list does not show. Empty and hidden tiles are disabled. The legend counts the pens of each coloured
-     level and draws only a level that has one. `peek(code)` returns the HTML of the hold-to-peek card for a pen (see penPeek).
+     penMap({ lanes, depth, pens:{ B3:'act'|'live'|'plain'|'hidden' }, current, action, key, rangeSize, entrance,
+     labels, peek }): the Entrance band and the map. A pen missing from `pens` is empty; 'hidden' is a pen with
+     sows the current list does not show. Empty and hidden tiles are disabled. The colour key is the sheet's header line: penMapKey({ pens, words }) gives its items, the count of pens at each
+     coloured level, and a level with none is left out. `peek(code)` returns the HTML of the hold-to-peek card for a pen (see penPeek).
      penMapFooter({ back, depth, rangeSize, label }): Back, and beside it the range control when a row has more than
      rangeSize pens. The map opens scrolled so its current pen is in view; the range control follows the map's scroll. */
   const PEN_LEVELS=['act','live','plain','hidden'],PEN_HOLD_MS=350,PEN_SLOP=12,PEN_GAP=8,penPeeks=new Map();
   let penHold=null,penSwallow=false;
-  const penLabels=o=>Object.assign({map:'Pens',legend:'Pen key',act:'needs you',live:'farrowing',plain:'has sows',empty:'empty',hidden:'no sows match',pen:c=>'Pen '+c},o);
-  function penMap({lanes=['A','B','C','D'],depth=6,pens={},current='',action='pen',key='pen-map',rangeSize=20,entrance='Entrance',legend={},labels={},peek=null,className=''}={}){
-    const L=penLabels(labels),words=Object.assign({act:'need you',live:'farrowing'},legend),rows=Array.from({length:Math.max(1,depth|0)},(_,i)=>i+1);
+  const penLabels=o=>Object.assign({map:'Pens',act:'needs you',live:'farrowing',plain:'has sows',empty:'empty',hidden:'no sows match',pen:c=>'Pen '+c},o);
+  function penMap({lanes=['A','B','C','D'],depth=6,pens={},current='',action='pen',key='pen-map',rangeSize=20,entrance='Entrance',labels={},peek=null,className=''}={}){
+    const L=penLabels(labels),rows=Array.from({length:Math.max(1,depth|0)},(_,i)=>i+1);
     if(typeof peek==='function')penPeeks.set(key,peek);else penPeeks.delete(key);
     const level=c=>PEN_LEVELS.includes(pens[c])?pens[c]:'empty';
-    const count=l=>Object.values(pens).filter(v=>v===l).length;
-    const keyHtml=['act','live'].filter(count).map(l=>`<span data-level="${l}"><i aria-hidden="true"></i><b>${count(l)}</b> ${esc(words[l])}</span>`).join('');
     const tile=c=>{const l=level(c),off=l==='empty'||l==='hidden';
       return `<button type="button" class="st-pen-tile" data-level="${l}" data-pen="${esc(c)}"${off?' disabled':` data-action="${esc(action)}" data-value="${esc(c)}"`} aria-label="${esc(L.pen(c)+', '+L[l])}">${esc(c)}</button>`;};
     const grid=`<div class="st-pen-grid" style="--pm-lanes:${lanes.length}"><span class="st-pen-col st-pen-row" aria-hidden="true"></span>${lanes.map(c=>`<span class="st-pen-col" aria-hidden="true">${esc(c)}</span>`).join('')}${rows.map(n=>`<span class="st-pen-row" data-row="${n}" aria-hidden="true">${n}</span>${lanes.map(c=>tile(c+n)).join('')}`).join('')}</div>`;
-    return `<div class="st-pen-map${className?' '+esc(className):''}" data-ds="PenMap" data-key="${esc(key)}"${current?` data-current="${esc(current)}"`:''}${rows.length>99?' data-wide':''}>${keyHtml?`<div class="st-pen-legend" role="group" aria-label="${esc(L.legend)}">${keyHtml}</div>`:''}<div class="st-pen-entrance">${sGlyph('arrow-down')}<span>${esc(entrance)}</span></div><div class="st-pen-field"><div class="st-pen-scroll" role="group" aria-label="${esc(L.map)}">${grid}</div><div class="st-pen-peek" hidden></div></div></div>`;
+    return `<div class="st-pen-map${className?' '+esc(className):''}" data-ds="PenMap" data-key="${esc(key)}"${current?` data-current="${esc(current)}"`:''}${rows.length>99?' data-wide':''}><div class="st-pen-entrance">${sGlyph('arrow-down')}<span>${esc(entrance)}</span></div><div class="st-pen-field"><div class="st-pen-scroll" role="group" aria-label="${esc(L.map)}">${grid}</div><div class="st-pen-peek" hidden></div></div></div>`;
+  }
+  /* penMapKey({ pens, words:{ act, live } }): the items of the sheet's key line: sheet({ line:{ key: penMapKey(...) } }). */
+  function penMapKey({pens={},words={}}={}){
+    const w=Object.assign({act:'need you',live:'farrowing'},words),n=l=>Object.values(pens).filter(v=>v===l).length;
+    return [['act','--amber-fill'],['live','--progress-fill']].filter(([l])=>n(l)).map(([l,fill])=>({fill,count:n(l),label:w[l]}));
   }
   /* penPeek({ title, meta, rows }): the body of the peek card: the pen code with its count, then one animal Row per sow,
      the same row as the room list (`rows` are Row props: code and right:{ kind:'state', figure, word, level }). */
@@ -1267,7 +1275,7 @@
     document.addEventListener('contextmenu',e=>{if(e.target.closest&&e.target.closest('.st-pen-tile'))e.preventDefault();});
     if(typeof globalThis.addEventListener==='function')globalThis.addEventListener('blur',penStop);
   }
-  const api=Object.freeze({headerLine,pageHeader,rangeSlider,filterSheet,penMap,penMapFooter,penPeek,penMapMount:penMount,optionalRow,heading,panel,facts,row,rowGroup,log,logDay,logStamp,logGroups,categoryFooter,field,pickerField,pickerOptions,pickerBody,pickerHead,pickerFooter,filterChips,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowSelectDoor,rowAction,rowSelectChange,status,conditionTag,rowFitTags,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
+  const api=Object.freeze({headerLine,pageHeader,rangeSlider,filterSheet,penMap,penMapKey,penMapFooter,penPeek,penMapMount:penMount,optionalRow,heading,panel,facts,row,rowGroup,log,logDay,logStamp,logGroups,categoryFooter,field,pickerField,pickerOptions,pickerBody,pickerHead,pickerFooter,filterChips,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowSelectDoor,rowAction,rowSelectChange,status,conditionTag,rowFitTags,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
   root.SentriUI=api;
   if(typeof module!=='undefined')module.exports=api;
 })(globalThis);

@@ -155,7 +155,7 @@ The old Figma has no pen map. No existing component draws a spatial map of place
 | Pen tile | page-built `.pen-cell` with a fact line | none: part of PenMap | **fix**: PenMap, pen code only, colour = level |
 | Per-tile fact line and `penFact` | page-built (JS) | none | **cut** |
 | Status word in a tile | `SentriUI.status` word | Status is the workflow state of one item on one line, not a map | **cut** |
-| Legend | none | none: part of PenMap | **add**: first line of the body |
+| Colour key (legend) | none | Sheet header line, its new `key` form (owner exception, 2026-10-14) | **add**: the header line, under the title |
 | Entrance band | none | none: part of PenMap | **add** |
 | Range control | none | Segment is 2–5 fixed views; this is 1–N ranges that scroll sideways | **add** in PenMap, the footer control |
 | Current pen ring | page-built | (selected tile) | **cut**: the map opens scrolled to her |
@@ -170,7 +170,7 @@ The design was chosen by the owner over mockup rounds (2026-10-13/14), so there 
 
 - Problems fixed:
   - The map fits any barn (variants page: 4 × 6, 2 × 60, 2 × 100, 2 × 160, 8 × 20); fixed.
-  - The pens that need her are seen, not read: amber tiles, a blue one, a legend that decodes them; fixed.
+  - The pens that need her are seen, not read: amber tiles, a blue one, a colour key under the title that decodes them; fixed.
   - Nothing said 20 times: a tile says its pen code only; fixed.
   - One vocabulary: the colour comes from `sowFacts().level`, the room row's own; `penFact` is deleted; fixed.
   - No stray hex, no shadow, no ring (the current pen is the pen the map opens on); fixed.
@@ -182,7 +182,7 @@ The design was chosen by the owner over mockup rounds (2026-10-13/14), so there 
   - The peek card floated 12px above the map and showed row 6 beneath it: it now sits on the map's bottom edge. It covered the held pen when that pen was in the lower rows: it moves to the top then.
   - The peek rows were indented twice (card and row padding): the row padding is off inside the card.
 - Keep items as strong as before: the menu drawer and Back; the map as the room; tap to the pen with the tint fading in 900ms; the 350ms hold, the 12px cancel and the swallowed tap; the map following tab and filter; mono pen codes; empty pens cannot be opened. Tiles are 75 × 56 at 390 (they were 79 × 65): under the old height, well over the 48px floor, with 8px gaps.
-- Squint test: the amber tiles, the blue tile, then the legend and the Entrance band. The worker's first three questions are which pens need me, where is farrowing, and which end is the door. They match.
+- Squint test: the amber tiles, the blue tile, then the colour key and the Entrance band. The worker's first three questions are which pens need me, where is farrowing, and which end is the door. They match.
 - Cluttered, flat or bulky against the original: lighter. Twenty-four tiles carried a sentence each, twenty of them "No sows"; now one word-free map where three tiles are coloured. The legend and the band add two quiet lines.
 - House reference: the Farrowing room and Choose a unit (the tint, white items, one 56px Back).
 - **Better because** the three pens that matter are the only colour on the map, the map fits any barn, and the screen says each thing once, in the room list's own words.
@@ -191,8 +191,8 @@ The design was chosen by the owner over mockup rounds (2026-10-13/14), so there 
 #### Final look (ds/pen-map: its screens are efcd1a3's and are byte-identical in every later commit, the last of which is the pushed head; `e9e4052`, the current main, is merged in; the baseline renders are `7f5b627`, which differs from it in workflow files only)
 
 `farrowing.pen-map` at 390 and 360, EN and ZH, beside `7f5b627`, and the PenMap variants page at 390 and 360, measured against the mockup's checks:
-- Header: the title is centred, there is no header line, the hairline is 1px and the legend starts 24px under it (measured on the real screen and on all 11 specimens).
-- Legend: one line at 360 in EN (`2 need you · 1 farrowing`) and ZH (`2 需处理 · 1 分娩中`); with no coloured pen it is absent.
+- Header: the title is centred, the only header line is the colour key, the hairline is 1px and the Entrance band starts 24px under it (measured on the real screen and on all 11 specimens).
+- Colour key (header line): one line at 360 in EN (`2 need you · 1 farrowing`) and ZH (`2 需处理 · 1 分娩中`); with no coloured pen the sheet has no header line.
 - Tiles: 24 of 24 at least 56 × 56 on the real screen (75 × 56 at 390) and none under 56 on any specimen, up to 320 tiles; nothing clipped; nothing under the footer; no sideways page scroll; the current pen (B1 here; A4, A5, E3 and others in the specimens) is inside the map in every one.
 - Peek: shown after a 500ms hold on B3 and on B4, in EN and ZH at both widths; each time inside the map and above the footer, over the lower part, and over the upper part for B4, whose tile the lower card would cover. Letting go leaves the map open, a move of more than 12px shows none, and an empty pen shows none.
 - Tap on B4 goes to the room list with B4 on the dock; an empty pen is disabled.
