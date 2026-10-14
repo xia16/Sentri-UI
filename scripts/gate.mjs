@@ -405,6 +405,25 @@ if (changed.length) {
       if (debt) gaps.push(`spacing: ${debt} defect(s) on changed screens are already on main (review/spacing.json)`);
     }
   }
+  // P3, the Headers law (scripts/check-headers.mjs, ledger L17): the 24px gap, nothing acting but Back and the subject chip, no
+  // count, one line at 360 in EN and ZH. The candidate's check runs on both sides; a defect main already has there is main's debt.
+  if (fs.existsSync(path.join(wt.cand, 'scripts/check-headers.mjs'))) {
+    const outC = path.join(out, 'headers-cand.json'), outB = path.join(out, 'headers-base.json');
+    run(process.execPath, ['scripts/check-headers.mjs', '--base', url.cand, '--screens', changed.join(','), '--out', outC], wt.cand);
+    run(process.execPath, [path.join(wt.cand, 'scripts/check-headers.mjs'), '--base', url.base, '--screens', changed.join(','), '--out', outB], wt.cand);
+    const read = (f) => { try { return JSON.parse(fs.readFileSync(f, 'utf8')); } catch { return null; } };
+    const C = read(outC), B = read(outB) || [];
+    if (!C) check('headers on changed screens (P3)', false, 'check-headers wrote no result on the candidate');
+    else {
+      const key = (d) => d.check + ' ' + d.lang + ' ' + d.detail.replace(/\d+px/g, 'Npx');
+      const was = new Set(B.flatMap((s) => s.defects.map((d) => s.screen + '|' + key(d))));
+      const added = C.flatMap((s) => s.defects.filter((d) => !was.has(s.screen + '|' + key(d))).map((d) => `${s.screen}: ${d.check} (${d.lang}-${d.width}) — ${d.detail}`));
+      const unrendered = C.filter((s) => s.error).map((s) => `${s.screen}: did not render (${s.error})`);
+      const debt = C.reduce((n, s) => n + s.defects.length, 0) - added.length;
+      check('headers on changed screens (P3)', !added.length && !unrendered.length, added.length || unrendered.length ? `${added.length + unrendered.length} new: ${[...added, ...unrendered].slice(0, 2).join(' | ')}` : debt ? `${debt} defect(s) already on main` : '');
+      if (debt) gaps.push(`headers: ${debt} defect(s) on changed screens are already on main (review/headers.json)`);
+    }
+  }
 }
 
 // ---------- scenario leaves: the scope's features, every feature whose screens changed, every feature a touched shared file reaches ----------
