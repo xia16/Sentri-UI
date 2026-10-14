@@ -391,7 +391,8 @@ const changed = [...screens.diff.filter((s) => !mech.flaky.includes(s.id)), ...s
 if (changed.length) {
   if (fs.existsSync(path.join(wt.cand, 'scripts/check-legibility.mjs'))) {
     // the README's own line, not a sentence that mentions it ("change the line above to `Legibility gate: strict`")
-    const strict = /^Legibility gate: strict\s*$/m.test(fs.readFileSync(path.join(wt.cand, 'docs/design-workflow/README.md'), 'utf8'));
+    // A shared-component change is held to no worse than main (README, Legibility gate): pages' own debt is each feature's.
+    const strict = declared !== 'shared' && /^Legibility gate: strict\s*$/m.test(fs.readFileSync(path.join(wt.cand, 'docs/design-workflow/README.md'), 'utf8'));
     r = run(process.execPath, ['scripts/check-legibility.mjs', '--base', url.cand, '--changed', changed.join(','), ...(strict ? ['--strict'] : ['--compare', url.base])], wt.cand);
     check(`farm legibility (${strict ? 'strict' : 'no worse than base'}) on changed screens`, r.code === 0, r.tail);
   } else check('farm legibility on changed screens', false, 'scripts/check-legibility.mjs is not on this candidate (it lands with #101): the gate fails closed');
