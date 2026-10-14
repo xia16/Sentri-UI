@@ -205,6 +205,18 @@ States: S1 Find a sow, empty field · S2 Scan, no reader paired · S3 Scan, read
 
 E-11 is superseded: a scan no longer opens her sheet by itself; it adds her to the list (S-13) and her sheet opens from her row (S-21).
 
+## 8c · Go to pen (P)
+
+States: P1 the room open on its map · P2 the room on its Active tab, then the map. All S — owner decision 2026-10-14 (the PenMap design; `atlas/` notes of `farrowing.pen-map`).
+
+| # | State | Event | Result | Src | Leaf |
+|---|---|---|---|---|---|
+| P-1 | P1 | tap a pen that has sows | → the room list, that pen pinned under the tabs, the dock names it | S — owner decision 2026-10-14 | `fa-p1-tap-a-pen-goes-to-it` |
+| P-2 | P1 | hold a pen 500 ms, let go | → a peek of its sows was shown; the map stays open; the pen is not opened | S — owner decision 2026-10-14 | `fa-p2-hold-a-pen-peeks-and-stays` |
+| P-3 | P1 | read an empty pen | → disabled, its code and nothing else | S — owner decision 2026-10-14 | `fa-p3-empty-pens-are-disabled` |
+| P-4 | P1 | open Go to pen again after going to B4 | → B4 in view, no ring or fill | S — owner decision 2026-10-14 | `fa-p4-map-opens-on-the-current-pen` |
+| P-5 | P2 | open the map on the Active tab | → pens the tab hides are disabled; the legend follows the tab | S — owner decision 2026-10-14 | `fa-p5-a-pen-the-tab-hides-is-disabled` (EN only: the room list behind the map is not drawn in Chinese) |
+
 ## Walk personas (for `docs/design-workflow/briefs/walk.md`)
 
 One per main branch, plus the breaker: **s1** night shift counting two sows at once (C, D) · **s2** a sow dies

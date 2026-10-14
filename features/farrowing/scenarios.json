@@ -4350,6 +4350,292 @@
      ]
     }
    ]
+  },
+  {
+   "type": "entry",
+   "id": "pen-map",
+   "label": "Go to pen: the map of the room",
+   "children": [
+    {
+     "type": "state",
+     "id": "pen-map.open",
+     "label": "The room open on its map: Go to pen",
+     "tree": "P",
+     "reset": {
+      "screen": "farrowing.pen-map"
+     },
+     "children": [
+      {
+       "type": "action",
+       "id": "pen-map.open.tap",
+       "label": "tap pen B4",
+       "taps": [
+        "[data-pen='B4']"
+       ],
+       "children": [
+        {
+         "type": "outcome",
+         "id": "fa-p1-tap-a-pen-goes-to-it",
+         "tree": "P-1",
+         "label": "Tap a pen: the room list opens on that pen",
+         "gwt": {
+          "given": "The worker has the map of the room open, with a pen that has sows.",
+          "when": "They tap that pen.",
+          "then": "The map closes and the room list opens with that pen pinned under the tabs, and the dock names the pen."
+         },
+         "authority": [
+          {
+           "src": "atlas",
+           "at": "farrowing.pen-map",
+           "says": "Tap goes to the room list with that pen pinned just under the sticky tab row"
+          }
+         ],
+         "visible": [
+          {
+           "el": ".st-pen-map",
+           "is": "absent",
+           "hard": "dead-end"
+          },
+          {
+           "el": "[data-action='room-lens']",
+           "in": "phone",
+           "hard": "dead-end"
+          },
+          {
+           "el": ".dock-pen",
+           "in": "phone"
+          }
+         ],
+         "record": [
+          {
+           "expr": "c.currentPen === 'B4' && c.highlightPen === 'B4'",
+           "hard": "wrong-fact"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "action",
+       "id": "pen-map.open.hold",
+       "label": "hold pen B3 for 500 ms, then let go",
+       "taps": [
+        {
+         "tap": "[data-pen='B3']",
+         "hold": 500
+        }
+       ],
+       "children": [
+        {
+         "type": "outcome",
+         "id": "fa-p2-hold-a-pen-peeks-and-stays",
+         "tree": "P-2",
+         "label": "Hold a pen: its sows are peeked, and letting go does not open the pen",
+         "gwt": {
+          "given": "The worker has the map of the room open, with a pen that has two sows.",
+          "when": "They hold that pen for half a second and let go.",
+          "then": "A peek of that pen’s sows was shown, and the map stays open: the tap after a peek only closes it and does not go to the pen."
+         },
+         "authority": [
+          {
+           "src": "atlas",
+           "at": "farrowing.pen-map",
+           "says": "Hold 350 ms shows a read-only peek of the pen’s sows; the tap after a peek only closes it"
+          }
+         ],
+         "visible": [
+          {
+           "el": ".st-pen-map",
+           "is": "present",
+           "hard": "wrong-fact"
+          },
+          {
+           "el": ".st-pen-peek",
+           "is": "absent",
+           "says": "the peek is gone once the finger lifts"
+          }
+         ],
+         "record": [
+          {
+           "expr": "c.currentPen !== 'B3'",
+           "says": "the held pen was not opened",
+           "hard": "wrong-fact"
+          },
+          {
+           "expr": "['000406','000399'].every(t => document.querySelector('.st-pen-peek').textContent.includes(t))",
+           "says": "the peek listed both of its sows by ear tag",
+           "hard": "wrong-fact"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "action",
+       "id": "pen-map.open.empty-tile",
+       "label": "read an empty pen",
+       "taps": [],
+       "children": [
+        {
+         "type": "outcome",
+         "id": "fa-p3-empty-pens-are-disabled",
+         "tree": "P-3",
+         "label": "An empty pen is quiet and disabled; a pen with sows is not",
+         "gwt": {
+          "given": "The worker has the map of the room open, and pen A1 has no sow.",
+          "when": "They look at pen A1 and at pen B4, which has sows.",
+          "then": "Pen A1 is disabled and says nothing but its code; pen B4 can be tapped."
+         },
+         "authority": [
+          {
+           "src": "atlas",
+           "at": "farrowing.pen-map",
+           "says": "Empty and no-match tiles cannot be opened"
+          }
+         ],
+         "visible": [
+          {
+           "el": "[data-pen='A1']",
+           "is": "disabled",
+           "hard": "wrong-fact"
+          },
+          {
+           "el": "[data-pen='B4']",
+           "is": "enabled",
+           "hard": "wrong-fact"
+          }
+         ],
+         "record": [
+          {
+           "expr": "document.querySelector(\"[data-pen='A1']\").textContent.trim() === 'A1'",
+           "says": "a tile says its pen code and nothing else",
+           "hard": "wrong-fact"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "action",
+       "id": "pen-map.open.reopen",
+       "label": "tap pen B4, then open Go to pen again",
+       "taps": [
+        "[data-pen='B4']",
+        "[data-action='room-grid']"
+       ],
+       "children": [
+        {
+         "type": "outcome",
+         "id": "fa-p4-map-opens-on-the-current-pen",
+         "tree": "P-4",
+         "label": "The map opens with the room’s current pen in view",
+         "gwt": {
+          "given": "The worker went to pen B4 from the map and is back in the room list.",
+          "when": "They open Go to pen again.",
+          "then": "The map opens with pen B4 in view and no ring or fill marks it."
+         },
+         "authority": [
+          {
+           "src": "atlas",
+           "at": "farrowing.pen-map",
+           "says": "There is no current-pen marker: the map opens scrolled so the pen at the top of the room list is in view"
+          }
+         ],
+         "visible": [
+          {
+           "el": ".st-pen-map",
+           "is": "present",
+           "hard": "dead-end"
+          }
+         ],
+         "record": [
+          {
+           "expr": "(() => { const m = document.querySelector('.st-pen-map'), t = m.querySelector(\".st-pen-tile[data-pen='\" + c.currentPen + \"']\"), box = m.querySelector('.st-pen-scroll').getBoundingClientRect(), r = t.getBoundingClientRect(); return m.dataset.current === 'B4' && r.top >= box.top && r.bottom <= box.bottom && r.left >= box.left && r.right <= box.right; })()",
+           "says": "the current pen is B4 and it is inside the map’s box",
+           "hard": "wrong-fact"
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "type": "state",
+     "id": "pen-map.filtered",
+     "label": "The room on its Active tab, then Go to pen",
+     "tree": "P",
+     "reset": {
+      "screen": "farrowing.room"
+     },
+     "children": [
+      {
+       "type": "action",
+       "id": "pen-map.filtered.open",
+       "label": "tap the Active tab, then Go to pen",
+       "taps": [
+        "[data-action='room-lens'][data-value='Active']",
+        "[data-action='room-grid']"
+       ],
+       "children": [
+        {
+         "type": "outcome",
+         "id": "fa-p5-a-pen-the-tab-hides-is-disabled",
+         "langs": [
+          "en"
+         ],
+         "tree": "P-5",
+         "label": "A pen whose sows the tab hides is disabled, and the legend follows the tab",
+         "gwt": {
+          "given": "The worker is on the Active tab, where only pen B1 has a farrowing sow.",
+          "when": "They open Go to pen.",
+          "then": "Pens B3 and B4, whose sows the tab hides, are disabled; pen B1 can be tapped; the legend counts one farrowing pen and none that need her."
+         },
+         "authority": [
+          {
+           "src": "atlas",
+           "at": "farrowing.pen-map",
+           "says": "the map follows the tab and filter; a pen the list hides is disabled"
+          }
+         ],
+         "visible": [
+          {
+           "el": "[data-pen='B3']",
+           "is": "disabled",
+           "hard": "wrong-fact"
+          },
+          {
+           "el": "[data-pen='B4']",
+           "is": "disabled",
+           "hard": "wrong-fact"
+          },
+          {
+           "el": "[data-pen='B1']",
+           "is": "enabled",
+           "hard": "wrong-fact"
+          },
+          {
+           "text": {
+            "en": "need you",
+            "zh": "需处理"
+           },
+           "absent": true,
+           "hard": "wrong-fact"
+          },
+          {
+           "text": {
+            "en": "1 farrowing",
+            "zh": "1 分娩中"
+           },
+           "hard": "wrong-fact"
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   ]
   }
  ]
 }

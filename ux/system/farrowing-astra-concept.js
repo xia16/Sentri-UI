@@ -274,7 +274,7 @@ function switchRoomUnit(c,id){
   const key=JSON.stringify([c.lens,c.filter]);c.unitPositions[c.unitId]={key,scroll:c.scroll,currentPen:c.currentPen,tailSpace:c.tailSpace};
   c.unitId=id;const position=c.unitPositions[id];
   Object.assign(c,position?.key===key?position:{scroll:0,currentPen:next.records[0]?.pen||'',tailSpace:0});
-  c.query='';c.jump=null;c.peek=null;c.highlightPen=null;c.highlightUntil=0;
+  c.query='';c.jump=null;c.highlightPen=null;c.highlightUntil=0;
  }
  return next.records[0];
 }
@@ -283,7 +283,7 @@ function roomContext(s){
  const fixtures=[['count','000418','B1',3,11,'Due today · day 114'],['before','000392','B2',5,11,'Due tomorrow · day 113'],['before','000455','B4',2,12,'Due today · day 114'],['before','000431','B4',6,9,'Overdue · 3 days · day 117'],['before','000467','B4',5,10,'Due in 2 days · day 112'],['locked','000406','B3',4,13,'Due yesterday · day 115'],['ended','000399','B3',4,10,'Due yesterday · day 115']];
  const records=fixtures.map(([p,tag,pen,parity,lastBorn,due])=>{if(s.tag===tag){s.lastBorn=lastBorn;return s;}const r=seed(p);Object.assign(r,{tag,pen,parity,lastBorn,due,view:'room'});if(tag==='000406'){r.alive=11;r.dead=[1,0,1,0,0,0];r.frozen=13;r.finished='Today · 05:58';r.events=[{text:'Farrowing finished · born 13',day:'Today',time:'05:58',who:'G. Hansen',kind:'milestone'}];}return r;});
  if(!records.includes(s))records.unshift(s);
- const context=roomContexts[i]={unitId:'7',bornAliveTarget:12,units:[sampleUnit('6',3,1,4,{2:'004318',6:'000437'}),{id:'7',name:'Unit 7',records,livePerLitter:10},sampleUnit('8',2,0,2,{0:'000943'})],unitPositions:{},get unit(){return this.units.find(u=>u.id===this.unitId)},get records(){return this.unit.records},get listed(){return this.unit.records.filter(onList)},lens:'All',filter:defaultRoomFilter(),filterDraft:defaultRoomFilter(),currentPen:s.pen,scroll:0,query:'',jump:null,peek:null};
+ const context=roomContexts[i]={unitId:'7',bornAliveTarget:12,units:[sampleUnit('6',3,1,4,{2:'004318',6:'000437'}),{id:'7',name:'Unit 7',records,livePerLitter:10},sampleUnit('8',2,0,2,{0:'000943'})],unitPositions:{},get unit(){return this.units.find(u=>u.id===this.unitId)},get records(){return this.unit.records},get listed(){return this.unit.records.filter(onList)},lens:'All',filter:defaultRoomFilter(),filterDraft:defaultRoomFilter(),currentPen:s.pen,scroll:0,query:'',jump:null};
  scanSetup(context,s.preset);
  if(['task-ready','task-complete','task-outcomes'].includes(s.preset))context.units.forEach(u=>u.records.forEach(r=>{
   if(!r.locked&&(born(r)>0||s.preset==='task-complete'))Object.assign(r,{locked:true,frozen:born(r)||12,alive:born(r)?r.alive:12,pending:0,finished:'Today · 09:35'});
@@ -360,7 +360,28 @@ function roomSheet(title,body,actions,cls='',surface=''){
  const size=cls.includes('pen-note-sheet')?'short':cls==='picker-sheet'||cls.includes('task-end-expanded')||cls==='task-overview-sheet'?'long':'medium';
  return SentriUI.sheet({variant:page?'page':'drawer',surface,title,back:{action:'room-back'},body,footer:actions||(page?false:footer(SentriUI.backButton({action:'room-back'}))),className:('room-utility '+cls).trim(),size,label:title,close:{action:'room-back',label:'Close '+title},scrim:{action:'room-back',label:'Dismiss '+title},bar:page?status():''});
 }
-function penFact(rows){if(!rows.length)return {text:'Empty',kind:'empty'};const active=rows.filter(r=>roomState(r)==='Active').length;if(active)return {text:active>1?active+' active':'Active',kind:'active'};const late=rows.filter(r=>roomState(r)==='Awaiting'&&r.due.startsWith('Overdue')).length;if(late)return {text:late>1?late+' overdue':'Overdue',kind:'overdue'};if(rows.every(r=>r.locked))return {text:sum(rows.map(born))+' born',kind:'done'};const today=rows.filter(r=>roomState(r)==='Awaiting'&&r.due.startsWith('Due today')).length;return {text:today?'Due today':rows[0].due.split(' · day')[0].replace(/^Due /,'').replace(/^./,c=>c.toUpperCase()),kind:today?'due':'waiting'};}
+// Go to pen: one PenMap (design-system/components/PenMap). A pen takes the loudest level among the sows the room list shows in it, read from
+// sowFacts() like the animal row, so the map and the list say the same thing. A pen whose sows the tab or filter hides is "hidden", not empty.
+const penLanes=['A','B','C','D'],penDepth=6;
+const penText={title:ZH?'前往栏位':'Go to pen',back:ZH?'返回':'Back',entrance:ZH?'入口':'Entrance',need:ZH?'需处理':'need you',farrowing:rowText.farrowing.toLowerCase(),
+ key:ZH?'栏位图例':'Pen key',map:ZH?'栏位':'Pens',jump:ZH?'跳转栏位':'Jump to pens',pen:p=>rowText.pen(p),act:ZH?'需处理':'needs you',live:ZH?'分娩中':'farrowing',plain:ZH?'有母猪':'has sows',empty:ZH?'空栏':'empty',
+ hidden:ZH?'没有符合条件的母猪':'no sows match',sows:n=>ZH?`${n}头母猪`:`${n} ${n===1?'sow':'sows'}`};
+function penLevels(c){
+ const shown=visibleRoomRecords(c),pens={};
+ for(const lane of penLanes)for(let n=1;n<=penDepth;n++){
+  const p=lane+n,levels=shown.filter(r=>r.pen===p).map(r=>sowFacts(r).level);
+  if(levels.length)pens[p]=levels.includes('act')?'act':levels.includes('live')?'live':'plain';
+  else if(c.listed.some(r=>r.pen===p))pens[p]='hidden';
+ }
+ return pens;
+}
+function penMapSheet(c,sheet){
+ const shown=visibleRoomRecords(c);
+ const peek=p=>{const rows=shown.filter(r=>r.pen===p);return SentriUI.penPeek({title:p,meta:penText.sows(rows.length),rows:rows.map(r=>{const f=sowFacts(r);return {code:r.tag,right:{kind:'state',figure:f.figure,word:f.word,level:f.level}};})});};
+ const body=SentriUI.penMap({lanes:penLanes,depth:penDepth,pens:penLevels(c),current:c.currentPen,action:'room-pen',key:'farrowing-pens-'+roomContexts.indexOf(c),entrance:penText.entrance,legend:{act:penText.need,live:penText.farrowing},
+  labels:{map:penText.map,legend:penText.key,pen:penText.pen,act:penText.act,live:penText.live,plain:penText.plain,empty:penText.empty,hidden:penText.hidden},peek});
+ return sheet(penText.title,body,SentriUI.penMapFooter({back:{action:'room-back',label:{text:penText.back,str:'act.back'}},depth:penDepth,label:penText.jump}),'picker-sheet','menu');
+}
 /* ---- Find a sow and Scan ear tags (owner decisions 2026-10-12) ----
    Two full pages that replace the old search drawer and scan preview. Both look across every unit; neither switches unit by itself.
    Find a sow: nothing is listed until something is typed; results are grouped "In Unit 7" then "Other units".
@@ -528,7 +549,7 @@ function roomOverlay(s){const c=roomContext(s),unitSheet=(title,body,actions,cls
  const penPage=penSubpage(s,c);if(penPage!==null)return penPage;
  if(s.view==='roomPenDetail')return penDetails(c);
  if(s.view==='roomPenLog')return penLog(c);
- if(s.view==='roomGrid'){const cells=Array.from({length:6},(_,row)=>`<span class="map-row-label">${row+1}</span>${['A','B','C','D'].map(col=>{const p=col+(row+1),all=c.listed.filter(r=>r.pen===p),rows=visibleRoomRecords(c).filter(r=>r.pen===p),f=rows.length?penFact(rows):{text:all.length?'No match':'No sows',kind:'empty'};return btn('room-pen',`<strong>${p}</strong><small>${f.kind==='active'||f.kind==='overdue'||f.kind==='done'?SentriUI.status({variant:'word',kind:f.kind,text:f.text}):esc(f.text)}</small>`,`pen-cell ${f.kind}${c.currentPen===p?' current':''}`,p,!rows.length).replace('<button',`<button aria-label="Pen ${p}, ${f.kind==='done'?'Done, ':''}${esc(f.text)}"`);}).join('')}`).join('');return unitSheet('Go to pen',`<div class="pen-map"><span></span>${['A','B','C','D'].map(x=>`<span class="map-column-label">${x}</span>`).join('')}${cells}</div><div class="pen-peek" hidden></div>`,'','picker-sheet','menu');}
+ if(s.view==='roomGrid')return penMapSheet(c,unitSheet);
  if(s.view==='roomScanActions')return scanActionsSheet(c);
  if(s.view==='roomOverview'){
   const {units,totals:t}=taskOverview(c),review=taskClosureReview(c);
@@ -554,7 +575,7 @@ function roomAction(i,a,v){if(!a.startsWith('room-'))return false;const s=states
  if(a==='room-apply-filter'){c.filter=clone(c.filterDraft);c.scroll=nextScroll;c.tailSpace=0;s.view='room';}
  if(a==='room-clear-filter'){c.filter=defaultRoomFilter();c.scroll=nextScroll;c.tailSpace=0;}
  if(a==='room-grid')s.view='roomGrid';
- if(a==='room-pen'){if(c.peek){c.peek=null;return true;}c.currentPen=v;c.jump=v;c.highlightUntil=Date.now()+900;c.highlightPen=v;s.view='room';}
+ if(a==='room-pen'){c.currentPen=v;c.jump=v;c.highlightUntil=Date.now()+900;c.highlightPen=v;s.view='room';}
 
  if(a==='room-search'||a==='room-scan'){c.query='';s.view=a==='room-search'?'roomSearch':'roomScan';}
  if(a==='room-search-clear')c.query='';
@@ -756,13 +777,6 @@ gallery.addEventListener('input',e=>{if(!e.target.matches('[data-room-search]'))
 // The demo's own control, outside the phone: the reader reads the next sample sow.
 document.addEventListener('click',e=>{const b=e.target.closest('[data-demo-scan]');if(!b||b.disabled)return;const i=+b.closest('[data-card]').dataset.card,c=roomContext(states[i]);if(scanAdd(c))render(i);});
 gallery.addEventListener('scroll',e=>{if(e.target.matches('.scan-body')){roomContext(states[+e.target.closest('[data-card]').dataset.card]).scan.scroll=e.target.scrollTop;return;}if(!e.target.matches('.room-scroll'))return;const list=e.target,i=+list.closest('[data-card]').dataset.card,c=roomContext(states[i]);c.scroll=list.scrollTop;if(states[i].view!=='room')return;const top=list.getBoundingClientRect().top+list.querySelector('.room-controls').offsetHeight;const pen=[...list.querySelectorAll('[data-pen]')].find(p=>p.getBoundingClientRect().bottom>top+35);if(pen){c.currentPen=pen.dataset.pen;const label=list.closest('.phone').querySelector('.dock-pen>span');if(label)label.innerHTML=`${c.currentPen}<small>Go to pen</small>`;}},true);
-let peekTimer=null,peekGesture=null;
-function stopPeek(){clearTimeout(peekTimer);if(peekGesture){const root=document.querySelector(`[data-card="${peekGesture.i}"]`),peek=root.querySelector('.pen-peek');if(peek)peek.hidden=true;}peekGesture=null;}
-gallery.addEventListener('pointerdown',e=>{const cell=e.target.closest('.pen-cell:not(:disabled)');if(!cell)return;stopPeek();const i=+cell.closest('[data-card]').dataset.card,c=roomContext(states[i]);c.peek=null;peekGesture={i,x:e.clientX,y:e.clientY};peekTimer=setTimeout(()=>{if(!peekGesture)return;c.peek=cell.dataset.value;const rows=visibleRoomRecords(c).filter(r=>r.pen===c.peek),peek=cell.closest('.sheet-body').querySelector('.pen-peek');peek.innerHTML=`<strong>${c.peek} · ${rows.length} ${rows.length===1?'sow':'sows'}</strong>${rows.map(r=>`<p>${r.tag} · ${roomState(r)}<br>${r.locked||born(r)?`${r.alive} alive · ${sum(r.dead)} dead`:esc(r.due.split(' · day')[0])}</p>`).join('')}`;peek.hidden=false;},350);});
-gallery.addEventListener('pointermove',e=>{if(peekGesture&&Math.hypot(e.clientX-peekGesture.x,e.clientY-peekGesture.y)>12)stopPeek();});
-gallery.addEventListener('pointerup',stopPeek);
-gallery.addEventListener('pointercancel',stopPeek);
-window.addEventListener('blur',stopPeek);
 let grabStart=null;
 SentriUI.holdBind(gallery,{onCommit(el){const i=+el.closest('[data-card]').dataset.card,record=states[i];if(!roomAction(i,el.dataset.action,el.dataset.value))act(record,el.dataset.action);render(i);}});
 gallery.addEventListener('pointerdown',e=>{if(e.button!==0)return;if(e.target.closest('.grab'))grabStart={y:e.clientY,i:+e.target.closest('[data-card]').dataset.card};});

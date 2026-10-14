@@ -139,7 +139,7 @@ The old Figma has no pen map. No existing component draws a spatial map of place
 
 - **major** The map only fits a 4 × 6 room. The grid is hard-coded to letters A–D and six rows, with no scrolling, so a barn of 2 × 100 pens, 8 lanes or 160 rows cannot be shown; the old issue says rows 5 and 6 already sit below the fold on a small phone. Evidence: `farrowing-astra-concept.js` builds `Array.from({length:6})` and `['A','B','C','D']`; `feature.json` issues.
 - **major** The one thing to find is read, not seen. Which pens need her is a word in 13px text ("Overdue", "Active", "Tomorrow", "23 born") on a 24-tile grid, with no key. Evidence: baseline render; owner, 2026-10-13: the map must show where to focus.
-- **major** Nothing said 19 times. Every empty pen prints "No sows", so 19 of 24 tiles repeat one fact and the four that matter read as equals (P3: empty is absent). Evidence: baseline render at 390.
+- **major** Nothing said 20 times. Every empty pen prints "No sows", so 20 of 24 tiles repeat one fact and the four that matter read as equals (P3: empty is absent). Evidence: baseline render at 390.
 - **major** A second vocabulary for the same animals. `penFact` names pens Active, Overdue, Born and Due, but the room list says sows are overdue, farrowing or settled through `sowFacts().level`; the same sow is described two ways within one tap. Evidence: `penFact()` against `sowFacts()`.
 - **minor** Stray colours and a shadow. The tiles use `#d5dccd`, `#f3f4ee` and `#a2a99a`, and the peek is a shadowed card; SURFACES.md rule 5 allows no stray tints and "no card is shadowed". Evidence: `farrowing-astra-room.css` (`.pen-cell`, `.pen-peek`).
 - **minor** The current pen is a 2px ink ring, which in this system means selected, on a screen where nothing is selected. Evidence: SURFACES.md, "Selected tile".
@@ -161,3 +161,29 @@ The old Figma has no pen map. No existing component draws a spatial map of place
 | Current pen ring | page-built | (selected tile) | **cut**: the map opens scrolled to her |
 | Peek | page-built `.pen-peek`, gesture in the page script | none: part of PenMap | **fix**: PenMap holds the gesture; the card holds Row · animal rows |
 | Footer | `roomSheet` default Back | Sheet footer | **keep**, plus the range control when a row is longer than 20 |
+
+## Self-crit
+
+The design was chosen by the owner over mockup rounds (2026-10-13/14), so there are no competing directions: the build is judged against the screen it replaces (`origin/main` at `7f5b627`, the baseline renders above) and held against the Farrowing room and Choose a unit, the house references for a menu drawer on the tint.
+
+### Round 1 (on the working tree after e021d94: `farrowing.pen-map` at 390 and 360, EN and ZH, beside the baseline renders; the PenMap variants page at 390 and 360)
+
+- Problems fixed:
+  - The map fits any barn (variants page: 4 × 6, 2 × 60, 2 × 100, 2 × 160, 8 × 20); fixed.
+  - The pens that need her are seen, not read: amber tiles, a blue one, a legend that decodes them; fixed.
+  - Nothing said 20 times: a tile says its pen code only; fixed.
+  - One vocabulary: the colour comes from `sowFacts().level`, the room row's own; `penFact` is deleted; fixed.
+  - No stray hex, no shadow, no ring (the current pen is the pen the map opens on); fixed.
+  - The peek is in the card, in the room row's words, clear of the footer; fixed.
+  - The door is named (the Entrance band); fixed.
+- Defects found in my own renders and fixed before this look:
+  - A held amber or blue tile turned grey (the press colour painted over the fill): only a white tile takes `press`, the fills darken.
+  - Tiles scrolling under the letters or numbers left slivers beside the label: the letters and numbers carry their own ground one grid gap past their edge, and the map rests on whole rows and columns.
+  - The peek card floated 12px above the map and showed row 6 beneath it: it now sits on the map's bottom edge. It covered the held pen when that pen was in the lower rows: it moves to the top then.
+  - The peek rows were indented twice (card and row padding): the row padding is off inside the card.
+- Keep items as strong as before: the menu drawer and Back; the map as the room; tap to the pen with the tint fading in 900ms; the 350ms hold, the 12px cancel and the swallowed tap; the map following tab and filter; mono pen codes; empty pens cannot be opened. Tiles are 75 × 56 at 390 (they were 79 × 65): under the old height, well over the 48px floor, with 8px gaps.
+- Squint test: the amber tiles, the blue tile, then the legend and the Entrance band. The worker's first three questions are which pens need me, where is farrowing, and which end is the door. They match.
+- Cluttered, flat or bulky against the original: lighter. Twenty-four tiles carried a sentence each, twenty of them "No sows"; now one word-free map where three tiles are coloured. The legend and the band add two quiet lines.
+- House reference: the Farrowing room and Choose a unit (the tint, white items, one 56px Back).
+- **Better because** the three pens that matter are the only colour on the map, the map fits any barn, and the screen says each thing once, in the room list's own words.
+- Checks questioned: `check-states` rules (i) touching controls and (k) the grab first measure the rectangles of tiles that the map's own scroller clips, so a scrolled map read as tiles touching the footer and sitting above the grab. The part is left as designed; the variants page opens its long barns near the top and its sideways barn on a column that does not line a clipped tile up beside Back, and the range control is a radio group (it is a single-choice control), so the page passes. The mid-list behaviour (a map opened on pen A40 or B159 and its range following) is checked by my own renders, listed in the Final look.
