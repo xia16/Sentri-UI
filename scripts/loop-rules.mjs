@@ -170,7 +170,7 @@ export function checkVerdict(verdict, mech) {
     for (const x of new Set(v)) if (!allowed.includes(x)) problems.push(`pair ${name(p)} has ${kind === 'changed' ? 'both sides' : 'one side'}: its verdict is ${allowed.join(' or ') || '(unknown pair kind)'}, not "${x}"`);
     if (kind === 'changed' && p.pct === 0 && v.some((x) => x !== 'same')) problems.push(`pair ${name(p)} is pixel-identical: it can only be same`);
   }
-  const moving = listed.filter((p) => (p.kind || 'changed') === 'changed' && p.pct !== 0);
+  const moving = listed.filter((p) => (p.kind || 'changed') === 'changed' && p.pct !== 0 && !(mech.flaky || []).includes(p.screen));
   const better = moving.filter((p) => (said.get(name(p)) || []).includes('better'));
   const worse = pairs.filter((p) => p.verdict === 'worse' || p.verdict === 'fail');
   if (verdict.pass) {
@@ -180,7 +180,7 @@ export function checkVerdict(verdict, mech) {
     if ((verdict.walk || []).some((w) => w.ok !== true)) problems.push('passes with a walk entry that is not ok');
     if (mech.mode === 'refactor') { if (pairs.some((p) => p.verdict !== 'same')) problems.push('a refactor passes with a pair that is not the same'); }
     else if (moving.length && !better.length) problems.push('passes with no pair better (same is not enough)');
-    else if (!(mech.screens?.diff || []).length && !(mech.screens?.new || []).length) {
+    else if (!(mech.screens?.diff || []).filter((d) => !(mech.flaky || []).includes(d.id)).length && !(mech.screens?.new || []).length) {
       // Nothing visible changed: only a behaviour fix (which may leave every first frame alone) passes, and on a walk.
       const behaviour = ['behaviour', 'shared'].includes(mech.class?.declared);
       const walked = (verdict.walk || []).length > 0 && verdict.walk.every((w) => w.ok === true);

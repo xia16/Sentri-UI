@@ -1,15 +1,12 @@
 // Piglet processing click-through (ticket #19): the pages render from one ledger and one fixture, so a record
 // made on one page shows on the next. Run: node tests/click-through.mjs [port]
-// Uses the Playwright the design lint installs (~/.cache/adam-design/playwright-<v>).
+// Uses the project's Playwright (scripts/playwright-path.mjs).
 import { spawn } from 'node:child_process';
-import { createRequire } from 'node:module';
-import { homedir } from 'node:os';
-import { join } from 'node:path';
 import assert from 'node:assert/strict';
+import { playwright } from '../scripts/playwright-path.mjs';
 
 const port = Number(process.argv[2]) || 4602;
-const require = createRequire(join(homedir(), '.cache', 'adam-design', 'playwright-1.63.0', 'package.json'));
-const { chromium } = require('playwright');
+const { chromium } = playwright();
 const server = spawn(process.execPath, ['scripts/serve-ux.cjs', String(port)], { stdio: 'ignore' });
 const base = `http://localhost:${port}/ux/tasks/piglet-processing/`;
 const ready = (p) => p.waitForSelector('html[data-ready]');
