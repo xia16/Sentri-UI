@@ -1,8 +1,8 @@
 {
   "verbs": {
     "Back": {"meaning": "leave a screen and keep any draft on the device; pure navigation", "zh": "返回"},
-    "Clear": {"meaning": "empty what was entered or ticked (typed input, picks, a selection); a quiet text action in the footer, left of the primary, present only while there is something to empty", "zh": "清除"},
-    "Reset": {"meaning": "restore a filter's defaults; a quiet text action in the filter sheet footer, left of the primary; commits nothing until the commit", "zh": "重置"},
+    "Clear": {"meaning": "empty what was entered or ticked (typed input, picks, a selection); a quiet text action at the top right of the sheet header, present only while there is something to empty", "zh": "清除"},
+    "Reset": {"meaning": "restore a filter's defaults; a quiet text action at the top right of the filter sheet header; commits nothing until the commit", "zh": "重置"},
     "Done": {"meaning": "apply a picker's choices and close it, always with its count ('Done · 2'); records nothing", "zh": "完成"},
     "Add": {"meaning": "put a new named option into a list and choose it (a brand, a custom condition); records nothing until the record is saved", "zh": "添加"},
     "Close": {"meaning": "leave a sheet that saves per tap; names the sheet, not the data", "zh": "关闭"},

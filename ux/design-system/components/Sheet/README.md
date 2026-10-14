@@ -51,13 +51,13 @@ This is the owner's rule for every drawer and page (2026-10-10); [the design sys
 - **‹ Parent name** (`up`) sits in the header, only in a drawer with levels. It goes up one level and is never labelled "Back". The header back label names the parent; the title names the current level. **No breadcrumbs** in a drawer.
 - **The commit** ("Done · 2", "Save · 2 pigs") sits in the footer on the right. It applies and closes. A single pick commits by itself, so a single-choice sheet has Back alone.
 - **No ✕ on drawers** (nor on pages and dialogs). Swiping down and tapping the scrim do what Back does. `close` is accepted for old callers and ignored.
-- **Reset** restores defaults (a filter). **Clear** empties what was entered or ticked. Both are quiet text actions in the footer, left of the primary, present only when there is something to reset or clear, each with one meaning in `ux/laws/strings.json`.
+- **Reset** restores defaults (a filter). **Clear** empties what was entered or ticked. Both are quiet text actions at the top right of the sheet header, vertically centred on the header's text block (title + line), present only when there is something to reset or clear, each with one meaning in `ux/laws/strings.json`.
 - The word in the footer is **Back**, never Close or Cancel. Discarding a draft is its own act (Clear, Reset), never what Back does, so a sheet never loses typed work silently and needs no "discard changes?" question. The one exception is a correction to a saved record: Back with changes asks "Save correction?" (Save / Discard), so an unsaved correction never travels on.
 - **An empty selection closes.** A review of ticked subjects closes, and selection mode ends, when the last one is unticked; no empty selection sheet is ever shown.
 
 ## Footer
 
-- **At most two controls, the primary on the right,** plus Reset or Clear as quiet text between them when there is something to reset or clear (`quiet: { label, action, value }`, the text register, `st-footer-quiet`). Any other third action leaves the sheet.
+- **At most two controls, the primary on the right.** Reset and Clear are not in the footer: they are the sheet header's corner action (top right). Any other third action leaves the sheet.
 - The primary is a [Button](../Button/README.md) (`primary` ink; `danger` for destructive verbs) or a hold-to-commit for an irreversible act.
 - **No reason line.** A waiting primary or hold stands alone; a tap on it marks each empty required field "Required" (the host's field `error`, shown on the field's label line) and scrolls to the first: `status.text` is never drawn above it; it stays in the markup visually hidden, as the primary's `aria-describedby` (the hold's `statusId`). A Button `reason` placed in `content` is hoisted and hidden the same way. A status with an `action` (one text action at its end, `42 is right`) is not a reason and is drawn.
 - Geometry: padded 14 / 21 / 28 (`space-row-x`, `space-gutter-sheet`, `space-footer-bottom`), 14px apart. The buttons end 28px above the sheet's bottom; the 4px handle bar sits in the 8px below that, so a button never touches it.
@@ -106,7 +106,8 @@ Every state is drawn in `variants/drawer.html` (with the route line, a fact line
 
 - Do put one idea in a sheet and end it with one primary.
 - Do give a drawer a size cap that matches its content, and let it shrink to fit.
-- Do put Reset or Clear in the footer as quiet text, left of the primary.
+- Do put Reset or Clear at the top right of the sheet header as quiet text, centred on the title (and its line); keep the footer to Back and the primary.
+- Do write titles to fit one line between the corners at 360 in EN and ZH (about 20 / 10 characters).
 - Don't put a second drawer on a drawer, or a dialog on a dialog.
 - Don't say Close or Cancel in the footer; it is Back.
 - Don't fix a drawer's height when the content does not grow: the dead space puts the footer far from the thumb.
