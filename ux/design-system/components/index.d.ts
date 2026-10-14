@@ -61,8 +61,9 @@ export interface RowProps {
   variant?: RowCopyProps["variant"];
   reason?: string;
   /** A string, or (candidate, ADR 0002) a token list with colour on the value: `[[{text:'Overdue'},{text:'3 days',tone:'red'}]]`. */
-  title: string | Token[];
-  /** A string, or (candidate) a token list the row draws with `·` between tokens — the row law's line 2. */
+  /** With `variant: 'animal'` and no `right`: the figure on the right (the old headline). Otherwise required. */
+  title?: string | Token[];
+  /** A string, or (candidate) a token list the row draws with `·` between tokens — the row law's line 2. With `variant: 'animal'`: the 13px context line under the ID. */
   description?: string | Token[];
   /** 18px icon in a 34px tinted tile. */
   icon?: IconHtml;
@@ -78,8 +79,12 @@ export interface RowProps {
   className?: string;
   /** Candidate: a leading mono identifier (crate `A02`) at `identifier-strong`, in a `row-code-min` column. Not with icon. */
   code?: string;
-  /** Candidate: line 2 set in mono (the row law). */
+  /** Candidate: line 2 set in mono (the row law). Not drawn by the animal variant. */
   mono?: boolean;
+  /** `variant: 'animal'`: the right side, a state (figure over word) or one line of compact condition tags (call `rowFitTags(root)` after render). Without it, `title` is the figure and `chip` the word. */
+  right?: AnimalRight;
+  /** `variant: 'animal'`: a fixed left column such as '112px' (the context ends in an ellipsis). Default: the left takes what the right leaves. */
+  contextWidth?: string;
   /** Candidate: the row's one status chip (a Status word). Not with trailing. */
   chip?: StatusProps;
   /** Candidate: title and description wrap instead of truncating (evidence lines, long mono tokens). */
@@ -364,8 +369,8 @@ export type Tone = 'amber' | 'progress' | 'green' | 'red' | 'muted';
 export type Part = string | { text: string; tone?: Tone; mono?: boolean; strs?: Strs<'text'>; args?: StrArgs<'text'> };
 /** A token: one part, or a word and its value as a list of parts. Tokens with sep 'dot' are joined by a real `·` text node. */
 export type Token = Part | Part[];
-/** The status kinds: one colour map (awaiting muted, active progress, done green, late amber, overdue red, died red). */
-export type StatusKind = 'awaiting' | 'active' | 'done' | 'late' | 'overdue' | 'died';
+/** The status kinds: one colour map (awaiting muted, active progress, done green, late amber, overdue red, died red, aborted red). */
+export type StatusKind = 'awaiting' | 'active' | 'done' | 'late' | 'overdue' | 'died' | 'aborted';
 /** Status: `word` (dot and word, inline), or `chip` (filled badge in a row). `kind` picks tone and icon; `tone` alone still works. */
 export interface StatusProps { text: string; kind?: StatusKind; tone?: Tone; variant?: 'word' | 'chip'; /** chip only: a registry icon name, default from kind */ icon?: string; id?: string; className?: string; strs?: Strs<'text'>; args?: StrArgs<'text'> }
 /** ConditionTag: a recorded health condition with its care level. */
@@ -374,8 +379,8 @@ export interface ConditionTagProps {
   /** `Day 3` or `12 days` */
   day?: string;
   care?: 'attention' | 'ongoing' | 'resolved' | 'notice';
-  /** care 'attention' only; default monitor */
-  level?: 'monitor' | 'treat' | 'hospital';
+  /** care 'attention' only; default monitor. variant 'compact': 'act' | 'watch' | 'ongoing' (hospital and treat read as act, monitor as watch). */
+  level?: 'monitor' | 'treat' | 'hospital' | 'act' | 'watch' | 'ongoing';
   /** the care-level word, localized by the caller */
   careText?: string;
   /** the short visible word for treat and hospital (default Treat, Hospital) */
@@ -384,9 +389,14 @@ export interface ConditionTagProps {
   pending?: boolean;
   /** detail only */
   note?: string;
-  icon?: string; variant?: 'tag' | 'detail' | 'mark'; id?: string; className?: string;
+  /** a registry glyph name; compact shows it only for watch and ongoing (act always shows the "!") */
+  icon?: string; variant?: 'tag' | 'detail' | 'mark' | 'compact'; id?: string; className?: string;
   strs?: Strs<'name' | 'day' | 'careText' | 'note'>; args?: StrArgs<'name' | 'day' | 'careText' | 'note'>;
 }
+/** Row · animal, right side: a state (figure over word) or one line of compact condition tags. */
+export type AnimalRight =
+  | { kind: 'state'; figure?: string; word?: string; /** act: red, with the "!" icon · live: bold · soon: ink figure, muted word · settled: muted */ level: 'act' | 'live' | 'soon' | 'settled'; strs?: Strs<'figure' | 'word'>; args?: StrArgs<'figure' | 'word'> }
+  | { kind: 'tags'; /** Drawn most urgent first (act, watch, ongoing), stable inside a level. */ tags: { name: string; icon?: string; level: 'act' | 'watch' | 'ongoing' }[] };
 export interface StatusLineOptions {
   /** A persistent role=status region, mounted empty: its content waits in a <template> until liveFill() or announce(). */
   live?: boolean;
@@ -554,7 +564,7 @@ export interface RowCopyProps {
   mark?: "due" | "ticked";
   reason?: string;
   disabled?: boolean;
-  title: string | Token[];
+  title?: string | Token[];
   description?: string | Token[];
   /** A leading mono identifier (crate `A02`) at `identifier-strong`, in a `row-code-min` column. Not with an icon. */
   code?: string;
@@ -583,6 +593,8 @@ export interface RowActionProps extends RowCopyProps {
 export interface SentriUI {
   status(props: StatusProps): string;
   conditionTag(props: ConditionTagProps): string;
+  /** Fits the tag line of every animal row under `root` (default document): tags shown most urgent first until the line is full, the rest fold into +N. Call after render, fonts and resize. */
+  rowFitTags(root?: ParentNode): void;
   statusLine(tokens: Token[], options?: StatusLineOptions): string;
   /** The tokens as HTML, for announce() into a region the host holds. */
   statusText(tokens: Token[], options?: { sep?: 'dot' | ''; tight?: boolean }): string;
@@ -614,7 +626,7 @@ export interface SentriUI {
   radioBind(root: Element, options?: { onChange?: (field: string, value: string) => void }): { destroy(): void };
   rowSelect(props: RowSelectProps): string;
   /** Select + door: a checkbox and an opening door as sibling targets. */
-  rowSelectDoor(props: RowCopyProps & { checked?: boolean; action?: string; value: string; openAction?: string; openValue?: string; label?: string; doorClass?: string; inputAttrs?: SafeAttrs; contentHtml?: string }): string;
+  rowSelectDoor(props: RowCopyProps & { checked?: boolean; action?: string; value: string; openAction?: string; openValue?: string; label?: string; doorClass?: string; inputAttrs?: SafeAttrs; contentHtml?: string; right?: AnimalRight; contextWidth?: string }): string;
   rowAction(props: RowActionProps): string;
   /** From a 'change' event on a rowSelect: { value, checked, action }, or null. */
   rowSelectChange(event: Event | { target: unknown }): { value: string; checked: boolean; action: string } | null;
@@ -668,13 +680,24 @@ export interface SentriUI {
 export type SheetText = string | { text?: string; str?: string; args?: Record<string, unknown>; html?: string };
 /** A Button spec for a footer; `waiting` draws the waiting face (aria-disabled), `describedby` is wired by sheetFooter's status. */
 export interface SheetAction { label: SheetText; action?: string; value?: string; register?: 'primary' | 'secondary' | 'tool' | 'text' | 'danger'; waiting?: boolean; busy?: boolean; describedby?: string; className?: string; attrs?: SafeAttrs }
+/** A line of text slots joined by { sep: true }; { strong: true } draws a figure in ink. */
+export type SheetParts = Array<SheetText | { sep: true } | { text: string; strong?: boolean; tone?: 'amber' | 'red' | 'green' }>;
+/** The header line: a route (the subject chip opening the animal, then at most two muted identity facts) or one fact. */
+export type HeaderLine =
+  | { chip: { id: SheetText; action?: string; value?: string; label?: SheetText }; facts?: Array<SheetText | SheetParts> }
+  | { text: SheetText | SheetParts };
 export interface SheetProps {
-  /** drawer (default): over the page, sized to its content, a handle and a ✕ · page: the whole canvas, Back in the footer, no ✕ · dialog: one small decision rising from the bottom. */
+  /** drawer (default): over the page, sized to its content, a handle, the sheet header (centred title, line, hairline) · page: the whole canvas, the page header (Back top left, title, line), no Back in the footer · dialog: one small decision rising from the bottom. */
   variant?: 'drawer' | 'page' | 'dialog';
+  /** Drawer only: '' (default) is a content or input drawer, white with tinted cards; 'menu' is a drawer whose every row is an option or a verb (Choose a unit, More actions, Go to pen), the tint with white cards. See SURFACES.md. */
+  surface?: '' | 'drawer' | 'menu';
   title: SheetText;
-  /** One line under the title; an array of text slots joined by { sep: true } (parts may carry tone). For a dialog it is the description. */
-  subtitle?: SheetText | Array<SheetText | { sep: true } | { text: string; tone: 'amber' | 'red' | 'green' }>;
-  subtitleTone?: 'amber' | 'red' | 'green';
+  /** The header line (Headers law): absent by default. A route (the subject chip, then up to two identity facts the task's budget.md names) or one fact. */
+  line?: HeaderLine | null;
+  /** Page only: the header's Back (top left). Default { action: 'back' }. */
+  back?: { action?: string; value?: string; label?: SheetText } | null;
+  /** Dialog only: its one description line. */
+  description?: SheetText | SheetParts;
   /** A glyph name before a dialog's title. */
   icon?: IconName;
   /** Ignored: no sheet carries a ✕ (drawer convention). Kept for old callers. */
@@ -683,8 +706,6 @@ export interface SheetProps {
   up?: { label: SheetText; action?: string; value?: string } | null;
   /** Raw HTML before the titles (legacy; use `up`). */
   lead?: string;
-  /** Raw HTML: the head's text actions (Clear, Reset). */
-  aside?: string;
   /** Raw HTML between the head and the body that does not scroll (a filter bar). */
   above?: string;
   body?: string;
@@ -715,6 +736,8 @@ export interface SheetProps {
 export interface SheetFooterProps {
   /** Back, the footer's exit; `false` for none. Default { action: 'back' }. */
   back?: { action?: string; value?: string; label?: SheetText } | false;
+  /** Reset or Clear: a quiet text action left of the primary, present only when there is something to reset or clear. */
+  quiet?: { label: SheetText; action?: string; value?: string } | null;
   /** The primary on the right: a Button spec, or trusted HTML. */
   primary?: SheetAction | string;
   /** A hold-to-commit in place of the primary. */
@@ -727,6 +750,10 @@ export interface SheetFooterProps {
 }
 export interface SentriUI {
   sheet(props: SheetProps): string;
+  /** The page header: Back (48px) top left, the title, the optional header line, 24px to the body. TaskHeader draws it too. */
+  pageHeader(props: { title: SheetText; back?: { action?: string; value?: string; label?: SheetText }; line?: HeaderLine | null; level?: 1 | 2; ds?: string; className?: string }): string;
+  /** The header line alone (a host that draws its own header slot). */
+  headerLine(line: HeaderLine | null): string;
   sheetFooter(props?: SheetFooterProps): string;
   backButton(props?: { action?: string; value?: string; label?: SheetText; className?: string }): string;
   scrim(props?: { action?: string; value?: string; label?: SheetText; layer?: number }): string;
@@ -753,5 +780,5 @@ declare global {
 }
 
 export interface RangeSliderProps { min?:number; max?:number; step?:number; value?:[number,number]; title?:string; icon?:string; key?:string; names?:[string,string]; labels?:[string,string]; format?:(value:number)=>string; summary?:(from:number,to:number)=>string; ends?:string[]; className?:string }
-export interface FilterSheetProps { title?:string; subtitle?:string; sections?:{title?:string;icon?:string;content?:string;help?:string}[]; body?:string; apply?:{label?:string;action?:string}; reset?:{label?:string;action?:string}; backAction?:string; backLabel?:string; closeAction?:string; className?:string; size?:'compact'|'short'|'medium'|'long'; label?:string }
+export interface FilterSheetProps { title?:string; sections?:{title?:string;icon?:string;content?:string;help?:string}[]; body?:string; apply?:{label?:string;action?:string}; reset?:{label?:string;action?:string}|false; backAction?:string; backLabel?:string; closeAction?:string; className?:string; size?:'compact'|'short'|'medium'|'long'; label?:string }
 export interface SentriUI { rangeSlider(props?:RangeSliderProps):string; filterSheet(props?:FilterSheetProps):string }

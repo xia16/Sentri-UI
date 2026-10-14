@@ -4,11 +4,9 @@
 .farrowing-phone .sow-detail-frame{position:absolute;inset:0;z-index:5;width:100%;height:100%;border:0;background:transparent}
 .farrowing-phone .section-title{display:flex;align-items:center;justify-content:flex-start;gap:7px;font-weight:600;line-height:1.4}
 .farrowing-phone .section-title>svg{width:15px;height:15px;color:#69765e;stroke-width:1.7}
-.farrowing-phone .sow-title-link{display:inline-flex;align-items:center;gap:8px;background:transparent;min-height:44px;position:relative;padding:8px 4px;margin:-8px -4px;font:inherit;letter-spacing:inherit;line-height:inherit;text-align:left}
-.farrowing-phone .sow-title-link>svg{width:16px;height:16px;color:var(--muted);stroke-width:1.8}
 
 .farrowing-phone .sheet-body>.segment:first-child{margin-top:0}
-.farrowing-phone .sheet[data-view="edit"] .edit-body{display:flex;flex-direction:column;padding:12px 21px 16px}
+.farrowing-phone .sheet[data-view="edit"] .edit-body{display:flex;flex-direction:column;padding-right:21px;padding-bottom:16px;padding-left:21px}
 .farrowing-phone .edit-review,.farrowing-phone .edit-finish-door{flex-shrink:0}
 .farrowing-phone .edit-counts{display:flex;flex-direction:column;flex:1;min-height:420px}
 .farrowing-phone .edit-counts :is(.entry-row,.st-stepper[data-variant="row"]){flex:1;min-height:60px}
@@ -33,7 +31,7 @@
 /* Completed facts follow one grid; the drawer fits its content. */
 .farrowing-phone .sheet[data-view="locked"] .completed-record-body{padding-bottom:16px}
 .farrowing-phone .sheet[data-view="locked"] .finish-record{margin:0}
-.farrowing-phone .finish-record .facts-surface{padding:16px;background:#f6f7f2;border-radius:10px}
+.farrowing-phone .finish-record .facts-surface{padding:16px;background:var(--st-panel-bg);border-radius:10px}
 @media(max-width:370px){
  .farrowing-phone .finish-record .facts-surface{padding:14px}}
 .farrowing-phone .optional{background:transparent;padding:0;margin:24px 0}
@@ -82,7 +80,7 @@
 /* Finish: a task header, quiet totals, and one aligned column of controls. */
 .farrowing-phone .finish-body{display:flex;flex-direction:column;gap:20px;padding-bottom:16px}
 .farrowing-phone .finish-body>*{flex-shrink:0}
-.farrowing-phone .finish-totals{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;background:#f6f7f2;border-radius:12px;padding:13px 16px;margin:0}
+.farrowing-phone .finish-totals{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;background:var(--st-panel-bg);border-radius:12px;padding:13px 16px;margin:0}
 .farrowing-phone .finish-totals dt{font-size:13px;line-height:1.5;color:var(--muted)}
 .farrowing-phone .finish-totals dd{font:600 23px/1.3 var(--font-sans);font-variant-numeric:tabular-nums;margin:4px 0 0}
 .farrowing-phone .finish-condition{border:0;padding:0;margin:0;min-width:0}
@@ -119,7 +117,7 @@
 .farrowing-phone .sheet[data-view="count"] .tools .tool:disabled{color:#98a198;border-color:#e7ebe5;background:#fcfdfb}
 .farrowing-phone .sheet[data-view="count"] .tools .tool:disabled>svg{color:inherit}
 .farrowing-phone .count-record{padding:0 0 10px}
-.farrowing-phone .count-record-surface{background:#f6f7f2;border-radius:12px;padding:10px 12px}
+.farrowing-phone .count-record-surface{background:var(--st-panel-bg);border-radius:12px;padding:10px 12px}
 .farrowing-phone .count-record-facts{display:flex;align-items:baseline;gap:24px;margin-bottom:6px}
 .farrowing-phone .count-record-facts:only-child{margin-bottom:0}
 .farrowing-phone .count-record-facts>div{display:flex;align-items:baseline;gap:8px;padding:2px 0}
@@ -133,9 +131,9 @@
  .farrowing-phone .sheet[data-view="count"] .receipt{min-height:28px}
  .farrowing-phone .sheet[data-view="count"] .tools{margin:10px 0 6px}}@media(prefers-reduced-motion:reduce){}@media(max-width:370px){
 }
-.task-progress-section .task-progress{background:#f6f7f2}
+.task-progress-section .task-progress{background:var(--st-panel-bg)}
 .task-status-dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:5px;vertical-align:1px}
-.task-death-review{padding:0 14px 14px;background:#f6f7f2;border-radius:12px;margin-bottom:12px}
+.task-death-review{padding:0 14px 14px;background:var(--st-panel-bg);border-radius:12px;margin-bottom:12px}
 .task-death-review .task-review-sow{border:0}
 .task-death-review .task-review-state{max-width:110px}
 .task-death-litter{border-top:1px solid var(--line);padding-top:12px}
@@ -151,7 +149,7 @@
 .task-end-sheet h4,.task-end-sheet p{margin:0}
 .task-outcome-section{flex-shrink:0}
 .task-performance{flex-shrink:0}
-.task-performance-surface{background:#f6f7f2;border-radius:12px;padding:14px 15px}
+.task-performance-surface{background:var(--st-panel-bg);border-radius:12px;padding:14px 15px}
 .task-kpi-pair{display:grid;grid-template-columns:1fr 1fr;gap:18px}
 .task-kpi-pair>div{display:flex;flex-direction:column;gap:4px}
 .task-kpi-pair>div>span{font-size:13px;color:var(--muted);line-height:1.5}
@@ -162,7 +160,7 @@
 .task-performance-totals{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0 0;padding-top:11px;border-top:1px solid #e3e6dc}
 .task-performance-totals dt{font-size:13px;color:var(--muted);line-height:1.5}
 .task-performance-totals dd{font:500 17px/1.5 var(--font-mono);margin:2px 0 0}
-.task-outcomes-list{background:#f6f7f2;border-radius:12px;padding:9px 15px;margin:0}
+.task-outcomes-list{background:var(--st-panel-bg);border-radius:12px;padding:9px 15px;margin:0}
 .task-outcomes-list>div{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:27px}
 .task-outcomes-list dt{font-size:13px;line-height:1.5}
 .task-outcomes-list dd{font:500 14px var(--font-mono);margin:0}
@@ -195,7 +193,7 @@
 .task-overview-sheet .task-overview-content .task-progress{padding:16px;border-radius:12px}
 .task-overview-sheet .task-overview-content .task-performance-surface{padding:16px}
 .task-overview-sheet .task-overview-content .task-performance-totals{margin-top:16px;padding-top:14px}
-.task-other-surface{padding:6px 16px;background:#f6f7f2;border-radius:12px}@media(max-width:420px){
+.task-other-surface{padding:6px 16px;background:var(--st-panel-bg);border-radius:12px}@media(max-width:420px){
  .task-warning-card{padding:9px 10px;gap:8px;min-height:76px}
  .farrowing-phone .task-end-sheet.task-end-expanded[data-presentation="page"]{height:100%;max-height:100%;bottom:0}
  .farrowing-phone .task-end-sheet[data-size="medium"]{height:var(--drawer-long)}
@@ -237,12 +235,10 @@
 /* Record provenance belongs to the identity header in every completed state. */
 
 /* Separate location from record context with space rather than repeated punctuation. */
-.farrowing-phone .sheet-subtitle .sow-context{display:flex;flex-wrap:wrap;column-gap:12px;row-gap:2px}
-.farrowing-phone .sow-context .sow-location{white-space:nowrap}/* The Born row's correction key (the one plain key left on the edit sheet) */
+/* The Born row's correction key (the one plain key left on the edit sheet) */
 .farrowing-phone .key{width:46px;min-width:46px;height:46px;min-height:44px;border:1px solid var(--task-key-border);border-radius:12px;background:#fff;display:grid;place-items:center;touch-action:manipulation;flex-shrink:0;font-weight:500}
 .farrowing-phone .key svg{width:17px;height:17px;stroke-width:2.2}
 .farrowing-phone .key:active:not(:disabled){background:var(--ink);color:#fff}
-.farrowing-phone .sow-title-link::after{content:"";position:absolute;inset:-2px 0}
 .farrowing-phone .finish-extras.st-optional-list{margin-top:0}
 .farrowing-phone .entry-was{margin-left:6px;font:400 13px var(--font-sans);color:var(--muted)}
 /* The task outcome rows that carry a warning are the door: an amber word, what happens, a chevron */

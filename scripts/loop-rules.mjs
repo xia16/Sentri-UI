@@ -288,9 +288,9 @@ export function loopStatus(ledger) {
 }
 
 // Information before layout (owner, 2026-10-11): a feature's screens change only after its information budget is written down
-// (briefs/build.md §1b) in features/<id>/budget.md with an Inventory, the worker's Questions and the attention Levels.
+// (P3, briefs/build.md §2) in features/<id>/budget.md with an Inventory, the worker's Questions and the attention Levels.
 export const BUDGET_HEADINGS = ['## Inventory', '## Questions', '## Levels'];
-// The critique of the original (briefs/build.md §1a, §1d) in features/<id>/critique.md: what to keep, what is broken, what draws
+// The critique of the original (P1, P4, briefs/build.md §1, §4) in features/<id>/critique.md: what to keep, what is broken, what draws
 // each part, and the self-crit of the directions against the original.
 export const CRITIQUE_HEADINGS = ['## Keep', '## Problems', '## Parts', '## Self-crit'];
 function notesProblems(file, headings) {
@@ -311,7 +311,7 @@ export const critiqueProblems = notesProblems('critique.md', CRITIQUE_HEADINGS);
 
 // Design-system components only (owner, 2026-10-11): visual styling added in a page's own CSS, markup or scripts is an improvised
 // component. Layout (margin, padding, gap, grid, flex, size, position) is the page's; looks belong to ux/design-system. A line
-// marked `ds-exception` is a workaround and counts too: the part is built in the design system instead (briefs/build.md §1c).
+// marked `ds-exception` is a workaround and counts too: the part is built in the design system instead (P2, briefs/build.md §3).
 const VISUAL = /^(color|background(-color|-image)?|border(-(top|right|bottom|left))?(-(color|width|style))?|border(-[a-z]+)?-radius|box-shadow|outline(-[a-z]+)?|font(-(size|weight|family|style))?|text-decoration(-[a-z]+)?|text-transform|letter-spacing|opacity|fill|stroke(-width)?|filter|backdrop-filter)$/;
 export const isPageFile = (f) => /^ux\//.test(f) && !/^ux\/(design-system|archive)\//.test(f) && /\.(css|html|js|mjs)$/.test(f);
 export function pageStyling(addedByFile) {

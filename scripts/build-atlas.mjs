@@ -12,6 +12,8 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const check = process.argv.includes('--check');
 const problems = [];
 const read = (p) => JSON.parse(readFileSync(join(root, p), 'utf8'));
+// Text the atlas embeds is read with LF line ends, so a Windows checkout (CRLF) and any other build the same atlas.json.
+const text = (p) => readFileSync(p, 'utf8').replace(/\r\n/g, '\n');
 
 const sections = read('sections/sections.json');
 const oldUi = existsSync(join(root, 'references/figma/index.json')) ? read('references/figma/index.json') : [];
@@ -22,7 +24,7 @@ const features = readdirSync(join(root, 'features'), { withFileTypes: true })
     const f = read(`features/${d.name}/feature.json`);
     if (f.id !== d.name) problems.push(`features/${d.name}: id "${f.id}" is not its folder's name`);
     const prd = join(root, 'features', d.name, 'PRD.md');
-    f.prd = existsSync(prd) ? readFileSync(prd, 'utf8') : '';
+    f.prd = existsSync(prd) ? text(prd) : '';
     return f;
   });
 
@@ -146,7 +148,7 @@ function notSupportedOf(f) {
   if (prd.length) return { source: `features/${f.id}/PRD.md`, items: prd };
   const op = join(root, 'features', f.id, 'operations.md');
   if (!existsSync(op)) return null;
-  const src = readFileSync(op, 'utf8'), own = section(src);
+  const src = text(op), own = section(src);
   if (own.length) return { source: `features/${f.id}/operations.md`, items: own };
   const ls = src.replace(/\r/g, '').split('\n'), items = []; // a table of operations: the rows whose cut says "not supported"
   for (let i = 0; i < ls.length; i++) {
@@ -253,7 +255,7 @@ for (const p of sections.platforms) for (const s of p.sections) for (const pt of
 const backlog = [];
 const KINDS = ['decision', 'design', 'broken', 'unclear'];
 const reviewDir = join(root, 'review');
-if (existsSync(reviewDir)) for (const fn of readdirSync(reviewDir).filter((n) => n.endsWith('.json') && !['state-check.json', 'legibility.json'].includes(n) && !n.startsWith('scenarios') && !n.startsWith('compare-'))) {
+if (existsSync(reviewDir)) for (const fn of readdirSync(reviewDir).filter((n) => n.endsWith('.json') && !['state-check.json', 'legibility.json', 'spacing.json'].includes(n) && !n.startsWith('scenarios') && !n.startsWith('compare-'))) {
   let data; try { data = JSON.parse(readFileSync(join(reviewDir, fn), 'utf8')); } catch (e) { problems.push(`review/${fn}: ${e.message}`); continue; }
   for (const it of Array.isArray(data) ? data : data.items || [data]) {
     if (!it || !it.id || !it.title || !it.target) { problems.push(`review/${fn}: an item needs id, target and title`); continue; }

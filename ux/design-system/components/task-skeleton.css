@@ -1,7 +1,7 @@
 /* Task skeleton (candidate, ADR 0003): farrowing's task anatomy as shared parts.
    Every value is measured from ux/system/farrowing-astra-concept.html at 390×844 and read from tokens.css.
    Load after tokens.css and bundle.css. Classes are tk-*.
-   Parts: TaskPhone (frame + status bar), TaskHeader, TaskLatest, TaskSummary, TaskLens, TaskGroup, TaskRow,
+   Parts: TaskPhone (frame + status bar), TaskHeader, TaskSummary, TaskLens, TaskGroup, TaskRow,
    TaskDock. The sheet, page, dialog, footer and Back are the Sheet card (bundle.css). */
 
 /* ---- TaskPhone: the phone frame harness ----
@@ -32,18 +32,7 @@
 .tk-screen { flex: 1; min-height: 0; display: flex; flex-direction: column; }
 .tk-scroll { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; background: var(--app-background); }
 
-/* ---- TaskHeader: back + the task's name ---- */
-.tk-header { flex: none; min-height: 60px; display: flex; align-items: center; gap: var(--space-heading); padding: 4px var(--space-gutter) 10px; background: var(--app-background); }
-.tk-header-back { flex: none; display: grid; place-items: center; width: var(--tap-min); height: var(--tap-min); padding: 0;
-  background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-control); color: var(--ink); }
-.tk-header-back svg { width: 18px; height: 18px; }
-.tk-header-title { flex: 1; min-width: 0; margin: 0; font: 500 var(--type-page-title-size)/1.25 var(--font-sans); letter-spacing: -0.6px; color: var(--ink); }
-
-/* ---- TaskLatest: the last-record line ---- */
-.tk-latest { display: flex; align-items: center; min-height: var(--tap-min); margin: 0; padding: 0 var(--space-gutter) 8px;
-  font: var(--type-description-size)/1.5 var(--font-sans); color: var(--muted); }
-.tk-latest > p { margin: 0; }
-.tk-latest strong { font-weight: 500; color: var(--ink); }
+/* ---- TaskHeader: the page header (SentriUI.pageHeader, bundle.css .st-page-header) ---- */
 
 /* ---- TaskSummary: the unit figure | the task-overview progress ---- */
 .tk-summary { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.12fr); margin: 0 var(--space-panel) 10px;
@@ -55,7 +44,7 @@
   margin: 0; border: 0; background: transparent; color: inherit; font: inherit; text-align: left; }
 .tk-summary-task { position: relative; cursor: pointer; }
 .tk-summary-task::before { content: ""; position: absolute; left: 0; top: var(--space-row-x); bottom: var(--space-row-x); width: 1px; background: var(--line); pointer-events: none; }
-.tk-summary-task:active { background: var(--green-wash); }
+.tk-summary-task:active { background: var(--st-press); }
 .tk-summary-heading { display: flex; align-items: center; gap: 6px; width: 100%; min-height: 19px;
   font: 500 var(--type-description-size)/1.4 var(--font-sans); color: var(--muted); }
 .tk-summary-heading svg { width: var(--glyph-key); height: var(--glyph-key); stroke-width: 1.7; }
@@ -118,9 +107,9 @@
 /* ---- TaskDock: the room's bottom tools ---- */
 .tk-dock { flex: none; position: relative; display: flex; align-items: center; gap: 9px; padding: var(--space-heading) var(--space-panel) var(--space-section);
   background: var(--paper); border-top: 1px solid var(--line); }
-.tk-dock-primary { flex: 1; display: flex; align-items: center; justify-content: center; gap: var(--space-key-gap); min-height: var(--tap-min); padding: 10px var(--space-heading);
+.tk-dock-primary { flex: 1; display: flex; align-items: center; justify-content: center; gap: var(--space-key-gap); min-height: var(--footer-height); padding: 10px var(--space-heading);
   background: var(--ink); border: 1px solid var(--ink); border-radius: var(--radius-control); color: var(--paper); font: 500 var(--type-panel-title-size)/1.3 var(--font-sans); }
-.tk-dock-tool { flex: none; display: grid; place-items: center; width: var(--control-height); min-height: 50px; padding: 0;
+.tk-dock-tool { flex: none; display: grid; place-items: center; width: var(--control-height); min-height: var(--footer-height); padding: 0;
   background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-control); color: var(--ink); }
 
 /* The handle bar: the bottom edge of the dock (a sheet's footer draws its own). */
@@ -134,12 +123,13 @@
 .tk-choice-tile { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; min-height: var(--choice-tile-min); margin: 0; padding: var(--space-row-y);
   border: 1px solid var(--task-key-border); border-radius: var(--radius-inset); background: var(--paper); color: var(--ink-2); font: 600 var(--type-button-size)/1.3 var(--font-sans); text-align: center; }
 .tk-choice-tile svg { width: 24px; height: 24px; }
-.tk-choice-tile[aria-pressed="true"] { background: var(--green-wash); border-color: var(--choice-pressed-border); color: var(--ink); }
+/* Chosen is ink: a 2px ring, no fill (SURFACES.md). */
+.tk-choice-tile[aria-pressed="true"] { background: var(--paper); border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); color: var(--ink); }
 .tk-choice-tile:active { background: var(--press); }
 
 /* One left edge per surface: a ChoiceList's group title inside a page or sheet sits on the body's edge, not 17px in. */
-.sheet-body .st-choice-heading.st-choice-heading { padding-left: 0; padding-right: 0; }
-.sheet-body .st-choice-heading-row { padding-right: 0; }
+.tk-phone .sheet-body .st-choice-heading.st-choice-heading { padding-left: 0; padding-right: 0; }
+.tk-phone .sheet-body .st-choice-heading-row { padding-right: 0; }
 
 /* ---- Skeleton 3 ---- */
 
@@ -163,7 +153,7 @@
 .tk-table-surface [role="listitem"] + [role="listitem"] { border-top: 1px solid var(--rule); }
 .tk-table-row { width: 100%; min-height: var(--animal-row-min); margin: 0; padding: var(--space-row-x); border: 0; background: var(--paper); color: var(--ink);
   font: 500 var(--type-button-size) var(--font-sans); text-align: left; }
-.tk-table-row:active { background: var(--green-wash); }
+.tk-table-row:active { background: var(--st-press); }
 .tk-table-name { display: flex; flex-direction: column; align-items: flex-start; gap: 5px; min-width: 0; }
 .tk-table-name > :is(strong, small) { display: block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tk-table-name > strong { font: 500 var(--type-button-size)/1.3 var(--font-sans); }
@@ -218,14 +208,15 @@
 .tk-receipt-title { margin: 0; font: 600 var(--type-button-size)/1.5 var(--font-sans); color: var(--ink); }
 .tk-receipt-meta { margin: 5px 0 0; font: var(--type-description-size)/1.2 var(--font-sans); color: var(--muted); }
 
-/* TaskDay: the day card — a tinted band (bold day, mono status), rows that are doors (mark, title, mono meta), an act. */
+/* TaskDay: the day card — a tinted band (bold day, mono status) you read, over a white body of rows you tap (doors: mark, title, mono meta), an act.
+   It keeps this look in every context: a card of tappable items is white with a tinted head band (SURFACES.md, "tint is for reading, white is for tapping"). */
 .tk-day { overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius-inset); background: var(--paper); }
-.tk-day-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-row-y); padding: var(--space-row-y) var(--space-row-x); background: var(--surface); }
+.tk-day-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-row-y); padding: var(--space-row-y) var(--space-row-x); background: var(--app-background); }
 .tk-day-head > strong { font: 700 var(--type-row-title-size)/1.25 var(--font-sans); color: var(--ink); }
 .tk-day-head > span { font: var(--type-meta-size)/1.3 var(--font-mono); color: var(--muted); }
 
 /* TaskDock unit: the labelled place control (B1 / Go to pen). */
-.tk-dock-unit { flex: none; display: flex; align-items: center; gap: 9px; min-height: 50px; margin: 0; padding: 0 3px; border: 0; background: var(--paper); color: var(--ink); text-align: left; }
+.tk-dock-unit { flex: none; display: flex; align-items: center; gap: 9px; min-height: var(--footer-height); margin: 0; padding: 0 3px; border: 0; background: var(--paper); color: var(--ink); text-align: left; }
 .tk-dock-unit > svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .tk-dock-unit > span { display: flex; flex-direction: column; gap: 4px; }
 .tk-dock-unit strong { font: 600 var(--type-row-title-size)/1.2 var(--font-mono); }

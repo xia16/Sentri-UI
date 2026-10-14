@@ -1,0 +1,77 @@
+# Publishes the design site (atlas, prototypes, design system) to GitHub Pages.
+# https://xia16.github.io/Sentri-UI/ opens the atlas. scripts/build-pages.mjs rewrites root links for the /Sentri-UI base path.
+# Every unmerged branch shows on the atlas as a layer over the features it changes (scripts/build-layers.mjs). Pages only
+# deploys from main, so the build always runs on main and reads every branch: on a merge, when a branch is deleted, and
+# every 10 minutes, when it skips unless some branch moved since the last deploy.
+name: Pages
+
+on:
+  push:
+    branches: [main]
+  delete:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+  pull-requests: read
+
+# A build in progress finishes (a first build compares every branch and can outlast the 10-minute timer); the newest
+# waiting run replaces any older waiting one.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Has any branch moved since the last deploy?
+        id: tips
+        run: |
+          git fetch --prune origin '+refs/heads/*:refs/remotes/origin/*'
+          curl -fsSL "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/atlas/layers.json" -o "$RUNNER_TEMP/previous.json" || echo '{}' > "$RUNNER_TEMP/previous.json"
+          node -e '
+            const { execSync } = require("child_process");
+            const now = Object.fromEntries(execSync("git for-each-ref refs/remotes/origin --format=\"%(refname:short) %(objectname)\"", { encoding: "utf8" })
+              .trim().split("\n").map((l) => l.split(" ")).filter(([r]) => r !== "origin" && r !== "origin/HEAD").map(([r, s]) => [r.replace(/^origin\//, ""), s]));
+            const was = require(process.argv[1]).tips || {};
+            const same = Object.keys(now).length === Object.keys(was).length && Object.entries(now).every(([k, v]) => was[k] === v);
+            console.log(same ? "No branch moved since the last deploy." : "Branches moved since the last deploy.");
+            require("fs").appendFileSync(process.env.GITHUB_OUTPUT, `same=${same}\n`);
+          ' "$RUNNER_TEMP/previous.json"
+      - name: Install Playwright
+        if: github.event_name != 'schedule' || steps.tips.outputs.same != 'true'
+        run: |
+          npm install --prefix "$RUNNER_TEMP/pw" --no-save --no-package-lock playwright@1.63.0
+          "$RUNNER_TEMP/pw/node_modules/.bin/playwright" install --with-deps chromium
+      - name: Build branch layers
+        if: github.event_name != 'schedule' || steps.tips.outputs.same != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SENTRI_PLAYWRIGHT: ${{ runner.temp }}/pw/node_modules/playwright
+        run: node scripts/build-layers.mjs --previous "$RUNNER_TEMP/previous.json"
+      - name: Build the site
+        if: github.event_name != 'schedule' || steps.tips.outputs.same != 'true'
+        run: node scripts/build-pages.mjs "/${{ github.event.repository.name }}"
+      - uses: actions/configure-pages@v5
+        if: github.event_name != 'schedule' || steps.tips.outputs.same != 'true'
+      - uses: actions/upload-pages-artifact@v3
+        if: github.event_name != 'schedule' || steps.tips.outputs.same != 'true'
+        with:
+          path: _site
+      - id: deployment
+        if: github.event_name != 'schedule' || steps.tips.outputs.same != 'true'
+        uses: actions/deploy-pages@v4

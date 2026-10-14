@@ -255,9 +255,9 @@
 
   /* ---- the page heads: the litter (crate · sow · day) under the page's name; the table adds the farm's scheme ---- */
   function s(id, args) { var o = { text: PP.t(id, args), str: id }; if (args) o.args = args; return o; }
-  function litterDesc() { return s('pp.id.desc', { crate: crate, tag: F.sow || '', n: L.dayAge }); }
+  // The identity standard and its due day: an instruction, the first line of the table's body (the litter is one Back away).
   function tableDesc() {
-    var sch = store.config.identity, out = [litterDesc(), { sep: true }, s(notch ? 'pp.id.scheme.notch_all' : keepers ? 'pp.id.scheme.tag_keep' : 'pp.id.scheme.tag_all')];
+    var sch = store.config.identity, out = [s(notch ? 'pp.id.scheme.notch_all' : keepers ? 'pp.id.scheme.tag_keep' : 'pp.id.scheme.tag_all')];
     if (L.dayAge < sch.day) out.push({ sep: true }, s('pp.id.scheme.due', { due: sch.day }));
     return out;
   }
@@ -270,7 +270,10 @@
     else { id = 'pp.id.prog.k_of_n'; args = { k: k, n: alive() }; }
     // the piglet in hand, said once (`Piglet 4 of 12`: three are in); records past alive or every piglet in say the litter's count
     var h = over() ? null : runLabels().head;
-    return [s('pp.id.hdr.title_day', { crate: crate, n: L.dayAge }), { sep: true }, h ? s(h[0], h[1]) : s(id, args)];
+    // Progress is status: the first line of the run's body (Headers law, 2026-10-13), amber once records pass the alive count.
+    var line = h ? s(h[0], h[1]) : s(id, args);
+    if (!keepers && over()) line.tone = 'amber';
+    return [line];
   }
   function taskScreen() { return K.screen({ inert: true, header: K.header({ title: s('pp.common.task'), back: { action: 'home' } }), body: '' }); }
   // A door row (TaskRow door, farrowing's .disclosure): a title, one muted line (parts may carry colour), a chevron.
@@ -448,14 +451,14 @@
     // R3-18: every alive piglet identified, none in hand: no pad, no sex, no weight to type into (a weight typed there
     // would be swallowed). One door row says so and offers Set count; Back is the page's way out.
     if (idle() && run.active === 'tag') {
-      return K.page({ view: 'run', title: s('pp.id.run.title'), description: runDesc(), descriptionTone: '',
-        body: '<div class="id-run">' + door('pp.id.hint.all', { n: alive() }, s('pp.id.ptr.set_count', { n: alive() }), 'set-count') + '</div>', inert: !!(drawer || confirm),
-        footer: K.footer({ back: { action: 'to-table' }, primary: null }) });
+      return K.page({ view: 'run', title: s('pp.id.run.title'), back: { action: 'to-table' },
+        body: '<div class="id-run">' + U.note(runDesc()) + door('pp.id.hint.all', { n: alive() }, s('pp.id.ptr.set_count', { n: alive() }), 'set-count') + '</div>', inert: !!(drawer || confirm),
+        footer: false });
     }
     var body = '<div class="id-run">' + radio(run.sex) + weightField() + '</div>';
-    return K.page({ view: 'run', title: s('pp.id.run.title'), description: runDesc(), descriptionTone: !keepers && over() ? 'amber' : '', body: body, inert: !!(drawer || confirm),
+    return K.page({ view: 'run', title: s('pp.id.run.title'), back: { action: 'to-table' }, body: U.note(runDesc()) + body, inert: !!(drawer || confirm),
       // the pad docks between the body and the footer; the footer stays the page's last child
-      footer: '<div class="id-pad-dock">' + pad() + '</div>' + K.footer({ back: { action: 'to-table' }, primary: p ? { label: s(p[0], p[1] || undefined), action: 'record' } : null }) });
+      footer: '<div class="id-pad-dock">' + pad() + '</div>' + (p ? K.footer({ back: false, primary: { label: s(p[0], p[1] || undefined), action: 'record' } }) : '') });
   }
 
   /* ---- the table face: the litter's identified piglets, viewable and editable (through S8's Edit) forever ---- */
@@ -547,9 +550,9 @@
   // Farrowing's Piglet records page: the facts, what needs a look, the weigh day, the identified piglets; Record identity.
   // A farm whose standard is no identity (round 7): nothing is tagged or notched, so there is nothing to record here.
   function nonePage() {
-    return K.page({ view: 'none', title: s('pp.id.table.title'), description: [litterDesc()],
+    return K.page({ view: 'none', title: s('pp.id.table.title'), back: { action: 'leave' },
       body: '<div class="id-stack">' + UI.heading({ title: '', kind: 'group', level: 3, strs: { title: 'pp.id.none.title' } }) + '<p class="id-none-line" data-str="pp.id.none.line">' + PP.t('pp.id.none.line') + '</p></div>',
-      footer: K.footer({ back: { action: 'leave' }, primary: null }) });
+      footer: false });
   }
   function tablePage() {
     var body = '<div class="id-stack">' + factsBlock() + overStrip() + keepersBlock() + weighSection() + rowsSection() + '</div>';
@@ -557,8 +560,8 @@
     // A closed candidate set takes no records until Edit reopens it: Back alone.
     // every alive piglet identified (and none in hand) leaves nothing to record: Back alone
     var primary = keepers && closed || idle() ? null : { label: s(p[0], p[1] || undefined), action: 'open-run' };
-    return K.page({ view: 'table', title: s('pp.id.table.title'), description: tableDesc(), body: body, inert: !!(drawer || confirm),
-      footer: K.footer({ back: { action: 'leave' }, primary: primary }) });
+    return K.page({ view: 'table', title: s('pp.id.table.title'), back: { action: 'leave' }, body: U.note(tableDesc()) + body, inert: !!(drawer || confirm),
+      footer: primary ? K.footer({ back: false, primary: primary }) : false });
   }
 
   /* ---- the weigh-day drawer: today's litter weight + boar/gilt counts for piglets not identified. Staged: Back keeps, Clear discards, Save commits ---- */
@@ -621,9 +624,8 @@
     var status = ask ? { visible: true, str: 'pp.id.lw.replace', text: PP.t('pp.id.lw.replace', { w: ask.w }), args: { w: ask.w }, tone: 'amber', id: 'id-lw-replace' } : null;
     if (ask) save = { label: s('pp.id.lw.replace_act'), action: 'save' };
     return K.drawer({ view: 'weigh', size: 'long', scrim: { action: 'back' }, close: { action: 'back' },
-      aside: dirty ? UI.button({ label: '', register: 'text', action: 'clear', strs: { label: 'act.clear' } }) : '',
-      title: s('pp.id.sec.weigh'), subtitle: s('pp.id.lw.sub', { n: alive(), d: L.dayAge }),
-      body: '<div class="id-group">' + body + '</div>', footer: dock + K.footer({ back: { action: 'back' }, primary: save, status: status }) });
+      title: s('pp.id.sec.weigh'),
+      body: '<div class="id-group">' + body + '</div>', footer: dock + K.footer({ back: { action: 'back' }, quiet: dirty ? { label: s('act.clear'), action: 'clear' } : null, primary: save, status: status }) });
   }
   /* ---- closing the candidate set: one question (stamped; Edit reopens it) ---- */
   function confirmDialog() {

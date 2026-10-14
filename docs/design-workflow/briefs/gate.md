@@ -2,6 +2,8 @@
 
 You gate one change to the Sentri mobile app before it merges. Sentri is a native-feel phone app used one-handed and gloved in a barn, and read in two seconds. **You did not build the change.** Never edit the repo. Write only the verdict file. You are the only gate: this brief replaces the old checklist judge (`component-judge`, retired) and the separate before/after judge.
 
+Every check below tests one of the [workflow principles](../principles.md) and names it. A check never asks for something no principle states: if you find one, report it as a gap for the [rules ledger](../rules.md).
+
 The driver fills in:
 - **CANDIDATE**: the exact merge candidate. That is the branch with `origin/main` merged in, and its commit hash.
 - **BASE**: `origin/main` at that moment, and its hash.
@@ -26,18 +28,19 @@ Judge from those pairs and write `verdict.json` beside them. `node scripts/gate.
 
 A shared change that touches too many screens for one judge is split by feature. Each judge writes `verdict-<feature>.json`, and `--verdict` merges them: one failing part fails the change. `check-states` runs on both sides for every class. A problem main already has is reported as main's, and only a new one fails.
 
-## 1. Mechanical checks (run first; any failure ends the gate)
+## 1. Mechanical checks (P2, P5; run first; any failure ends the gate)
 
 On CANDIDATE:
 1. `npm test`. All pass. Skips must state a reason.
 2. `npm run check`. It also runs the farm legibility check in report mode. It must report the atlas OK. `npm run atlas` must produce no diff in `atlas/atlas.json` beyond its `generated` and `commit` stamps.
 3. **Farm legibility, blocking for changed screens.** Run `node scripts/check-legibility.mjs --changed <the SCREENS ids> --strict` on CANDIDATE. It renders each screen bare at 390×844. While `docs/design-workflow/README.md` says `Legibility gate: strict`, a screen in scope fails on any violation: text under 11px, or under 13px inside a control, contrast under 4.5:1 (7:1 for 16px+ primary values), or a target under 48×48 (an invisible hit area counts). If that line ever says `no-regression`, pass `--compare <BASE url>` instead of `--strict`; a screen in scope then fails only if it has more violations than at BASE in any category, or a violation on an element that had none. Screens outside `--changed` are reported, not blocking. Any failure ends the gate. The 16px body floor and "ink, not pale grey" are judged by eye in step 3. Crowding is fixed by tightening copy and layout, never by shrinking type. Law: `ux/design-system/README.md`.
 4. `git grep -n '^<<<<<<<\|^>>>>>>>'` finds nothing.
+4b. **Clear spacing (P4)** on changed screens: `scripts/check-spacing.mjs` (a block closer to a list than its rows, crowded boxes, doubled lines). A defect main already has there is main's; only a new one fails.
 5. For every class: `node scripts/check-states.mjs`. It renders every design-system state the way the atlas draws it and writes `review/state-check.json`; its known-bad fixtures (`scripts/check-states.fixtures/`) are the rejected examples it already catches. If the component has its own check script (e.g. `node scripts/check-button-components.cjs`), run that too, with the server running. Set `SENTRI_PREVIEW_ORIGIN` and `SENTRI_PLAYWRIGHT`. No console errors, no target under 48px, no horizontal overflow.
 6. For behaviour (and presentation that touches a walked screen): `node scripts/run-scenarios.mjs` for each affected feature. Every leaf the change touches passes, in EN and ZH at 360 and 390. A blocked leaf stays blocked; it never becomes a pass.
 7. For copy: every changed string meets the copy budget, uses a verb from `ux/laws/strings.json` with its one meaning, and renders in EN and ZH without clipping.
 
-## 2. Behaviour walk (behaviour and shared component classes)
+## 2. Behaviour walk (P2; behaviour and shared component classes)
 
 Open each touched screen bare at 390×844 (`<url>&screen=<id>`, `atlas/SCHEMA.md`) and walk the flow as a worker would: tap, read, tap. Check:
 - Every action has a way back. Footer Back keeps the draft, and ‹ Parent goes up a level.
@@ -49,9 +52,9 @@ Open each touched screen bare at 390×844 (`<url>&screen=<id>`, `atlas/SCHEMA.md
 
 Presentation changes rerun the walks they touch. A presentation fix once hid the only way to confirm a count.
 
-## 3. Cold look (before reading anything about the change)
+## 3. Cold look (P4; before reading anything about the change)
 
-**Calibrate first.** Read [the owner's eye](../taste.md): you stand in for the owner, so judge with their eye, not a generic one. Before your scope, rate every pair in `docs/design-workflow/calibration/` (`c1.png`…, BASE left, CANDIDATE right) better / same / worse, blind, and record each in `calibration` in your verdict. These are pairs the owner has ruled on; `--verdict` refuses a judge that rates any of them against the owner. The bar is the owner's approved screens and the rejected examples below. Where a screen has an approval record, look at its approved version before you judge.
+**Calibrate first.** Read [the owner's eye](../taste.md), [SURFACES.md](../../../ux/design-system/SURFACES.md) (a card is the opposite of its base; current is ink; footers are 56px) and open the [house references](../references/README.md): you stand in for the owner, so judge with their eye, not a generic one. Before your scope, rate every pair in `docs/design-workflow/calibration/` (`c1.png`…, BASE left, CANDIDATE right) better / same / worse, blind, and record each in `calibration` in your verdict. These are pairs the owner has ruled on; `--verdict` refuses a judge that rates any of them against the owner. The bar is the owner's approved screens and the rejected examples below. Where a screen has an approval record, look at its approved version before you judge.
 
 **Judge blind.** For §3 and §4 open only the `pairs/` images. Don't open `mechanical.json`, the PR or the builder's notes until §5: check output anchors judgement. Write down every issue you see before you write any verdict. A listed issue is dismissed only by a measurement, never by argument. Finding nothing is a valid result; there is no quota.
 
@@ -73,14 +76,14 @@ Screenshot each screen on BASE and on CANDIDATE in the same state, at 390×844 a
 - designed hover or focus rings;
 - web conventions in a phone app: hover rows, breadcrumbs, dropdown selects, data tables, underlined text links, tooltips, visible scrollbars, pagination, centred web modals. Native patterns (sheets, action sheets, segmented controls, switches, wheel pickers, the system keyboard, a navigation bar) are the norm wherever they fit.
 
-## 4. Before / after (this decides it)
+## 4. Before / after (P3, P4; this decides it)
 
-A new or changed list, card or screen must carry its attention budget and cut list in the PR body ([build.md §1b](build.md#1b-attention-budget-before-any-layout)); without them it fails. Judge it with the cold question first: at a glance, can I tell what needs me and what to do? Compare against the current screen only, never against other candidates.
+A new or changed list, card or screen must carry its attention budget and cut list in the PR body ([build.md §2](build.md#2-information-before-layout-p3)); without them it fails. Judge it with the cold question first: at a glance, can I tell what needs me and what to do? Compare against the current screen only, never against other candidates.
 
 
 Before judging a changed screen, do the **squint test**: write the first three things your eye lands on in the candidate, in order, and ask whether they are what the worker needs first. A screen where nothing leads, or where a control outweighs the information, fails on hierarchy however calm it looks. Fewer things is not better by itself.
 
-**The absolute bar.** Better than the base is not enough when the base was weak. Every changed screen must also look designed at the level of the approved screens (Farrowing): grouped sections with native headers, rows inside groups, a clear rhythm, and no orphan row or dead space at the end. A screen that reads as information stacked on a page fails (R16), even when it is better than its base.
+**The absolute bar.** Better than the base is not enough when the base was weak. Every changed screen must also look like it belongs beside the [house references](../references/README.md) (Home, Unit, More actions, Farrowing room): grouped sections with native headers, rows inside groups, a clear rhythm, and no orphan row or dead space at the end. A screen that reads as information stacked on a page fails (R16), even when it is better than its base.
 
 For each pair, judge **better / same / worse** and give the one reason that decides it, naming its dimension: hierarchy, alignment, legibility, touch, state or native fit. Your verdict follows from your issue list, not the other way round. The bar is the screens the owner approved (Farrowing and Inspection): calm, aligned, nothing extra, one surface, ink not colour. A change that meets a rule but looks worse is **worse**. Judge a change that departs from the current pattern by the farmer, not by familiarity: being new never makes it worse, and matching the system never makes it better.
 
@@ -89,7 +92,7 @@ For each pair, judge **better / same / worse** and give the one reason that deci
 - **Shared component**: no pair on any feature using it may be worse. Approving one feature doesn't approve the variant for the others.
 - **Frozen screen**: any change to a frozen screen fails unless the owner reopened it.
 
-## 5. Re-measure the builder's claims
+## 5. Re-measure the builder's claims (P5, P1, P2)
 
 Only now, read the PR body, the README, the references table and `features/<id>/critique.md`. Re-measure every numeric or visual claim yourself on CANDIDATE: targets, "0 px different", test counts and "identical". A claim measured on another commit, or not reproducible, is **contradicted**, and a contradicted claim fails the gate.
 
@@ -117,6 +120,7 @@ Each of these was rejected by the owner. The gate must fail a change that shows 
 | R14 | A type pass that met the floors by enlarging everything: a history label and a sample/offline disclaimer kept prime space on the sensor card (2026-10-11) | hierarchy: the attention budget; cluttered fails even when every rule is met |
 | R15 | Calmer but flat: after the cuts, three segmented controls at one weight, the switcher outweighing the reading, and a section with its heading cut (2026-10-11) | hierarchy: cutting facts never cuts structure; one heavy control |
 | R16 | Information stacked on a page: no grouping, "Reading history" floating alone at the end with dead space under it (2026-10-11) | looks undesigned; the absolute bar is the approved screens, not the base |
+| R17 | A card the same colour as its base (white on white, tint on tint), a row list on a base with no card, or a current or selected state in green or an inset bar (2026-10-12; `ux/system/surfaces.test.cjs` guards the green and the footer height) | [SURFACES.md](../../../ux/design-system/SURFACES.md): a card is the opposite of its base; current is ink |
 
 ## Output
 

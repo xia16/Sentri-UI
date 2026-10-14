@@ -11,7 +11,7 @@
 <script type="module" src="ledger.js"></script>
 <script type="module" src="fixtures.js"></script>
 <style>
-/* The room on the task skeleton (ADR 0003): farrowing's room list — TaskHeader, TaskLatest, TaskSummary, TaskLens, rows
+/* The room on the task skeleton (ADR 0003): farrowing's room list — TaskHeader (its line the last record), TaskSummary, TaskLens, rows
    grouped by crate row (TaskGroup + TaskRow), TaskDock — and its sheets and the litter drawer (TaskSheet). Layout only,
    tokens from tokens.css. Candidate:ScanFrame stays task-level. */
 /* the review / unexplained counts: one compact line, the summary card's footer line (a text action) */
@@ -34,7 +34,6 @@
 /* Find's result is the room's row, flat and divided (farrowing's finder), on the sheet's column */
 .pp-results .st-row { padding-left: 0; padding-right: 0; border-bottom: 1px solid var(--line); }
 /* Filter's footer: Back · Reset · Show (farrowing's Filter sows); Reset is Back's width */
-.sheet-footer > .button.pp-reset { flex: none; width: var(--back-width); min-width: 0; padding-left: 8px; padding-right: 8px; }
 /* the litter drawer (litter.js) */
 .lt-face { display: flex; flex-direction: column; gap: var(--space-heading); }
 .lt-face > .pp-group { margin-top: var(--space-heading); }
@@ -432,13 +431,14 @@
     if (ev.type === 'double' || ev.type === 'resolve') return PP.t('pp.room.ev.review');
     return PP.t('pp.room.ev.edit');
   }
+  // The header line (Headers law, 2026-10-13): farrowing's fact, the clock time and who (`Last record 10:25 · G.H`); what was
+  // recorded is on the litter's log. No record yet: no line.
   function latest() {
     var best = R().rows.lastRecord;
-    if (!best) return '';
-    // farrowing's line: the clock time and who (`Last record 10:25 · G.H`); what was recorded is on the litter's log
+    if (!best) return null;
     var today = String(best.at).slice(0, 10) === String(store.today).slice(0, 10);
-    return K.latest({ lead: P('pp.room.latest.lead'), value: P('pp.room.latest.when', { when: today ? U.time(best.at) : U.date(best.at) + ' · ' + U.time(best.at) }),
-      rest: P('pp.room.latest.who', { who: best.whoName || best.who }) });
+    return { text: [P('pp.room.latest.lead'), { text: ' ' }, Object.assign({ strong: true }, P('pp.room.latest.when', { when: today ? U.time(best.at) : U.date(best.at) + ' · ' + U.time(best.at) })),
+      { text: ' ' }, P('pp.room.latest.who', { who: best.whoName || best.who })] };
   }
 
   /* ---- the summary card: this unit | the task overview. Before End: the litters that owe today (under a filter, the
@@ -577,7 +577,8 @@
       primary: { icon: 'scan', label: P('act.scan'), action: 'scan' }, tools: tools });
   }
 
-  /* ---- the room's sheets: farrowing's drawer anatomy (grab, title, subtitle, ✕, divider, body, Back + primary) ---- */
+  /* ---- the room's sheets: farrowing's drawer anatomy (grab, the sheet header, body, Back + primary); the room is one Back away,
+     so no line; what was a subtitle and is status or an instruction is the body's first line ---- */
   function sheet(o) {
     return K.drawer(Object.assign({ scrim: { action: 'dismiss' }, close: { action: 'close-sheet' }, size: 'medium', footer: K.footer({ back: { action: 'close-sheet' } }) }, o));
   }
@@ -590,12 +591,11 @@
         strs: { label: txId(tx), meta: PP.one('pp.room.filter.n', n) }, args: { meta: { n: n } } });
     });
     var shown = lensOf(lens).length;
-    // farrowing's Filter sows: ✕ in the head; Back · Reset · Show N in the footer
-    var reset = UI.button({ label: PP.t('pp.room.filter.reset'), register: 'secondary', action: 'clear-filter', className: 'pp-reset', strs: { label: 'pp.room.filter.reset' } });
+    // farrowing's Filter sows: Back · Reset (quiet text) · Show N in the footer
     var show = UI.button({ label: PP.t(PP.one('pp.room.filter.show', shown), { n: shown }), register: 'primary', action: 'close-sheet', strs: { label: PP.one('pp.room.filter.show', shown) }, args: { label: { n: shown } } });
-    return sheet({ title: P('pp.room.filter.title'), subtitle: P('pp.room.unit', { n: ROOM }), view: 'filter',
+    return sheet({ title: P('pp.room.filter.title'), view: 'filter',
       body: UI.choiceGroup(rowsH.join(''), {}),
-      footer: K.footer({ back: { action: 'close-sheet' }, primary: reset + show }) });
+      footer: K.footer({ back: { action: 'close-sheet' }, quiet: S.filter.length ? { label: P('pp.room.filter.reset'), action: 'clear-filter' } : null, primary: show }) });
   }
   // The review list (N4, R1-22) and the unit's unexplained drift: each a door to where it is answered.
   var REV_ID = { double: 'pp.room.rev.double', count: 'pp.room.rev.count', held: 'pp.room.rev.held', correction: 'pp.room.rev.correction' };
@@ -630,8 +630,9 @@
         headline: [P(REV_ID[x.kind], { tx: revTx(x) })], meta: provenance(x), action: 'open-review', value: x.id });
     }).join('');
     var body = driftRow() + (rows ? UI.rowGroup(rows) : '');
-    return sheet({ title: P('pp.room.rev.sheet'), subtitle: ended() ? P('pp.room.rev.after_end') : P(PP.one('pp.room.rev.sub', n), { u: ROOM, n: n }), view: 'reviews', size: 'long',
-      body: body ? '<div class="pp-sheet-stack">' + body + '</div>' : empty('pp.room.rev.none') });
+    var note = U.note([ended() ? P('pp.room.rev.after_end') : P(PP.one('pp.room.rev.sub', n), { u: ROOM, n: n })]);
+    return sheet({ title: P('pp.room.rev.sheet'), view: 'reviews', size: 'long',
+      body: body ? '<div class="pp-sheet-stack">' + note + body + '</div>' : empty('pp.room.rev.none') });
   }
   function reviewHref(x) {
     var p = { crate: x.litter, unit: ROOM, data: dataParam() };
@@ -658,7 +659,7 @@
       return K.door({ title: joined([P('pp.room.unit', { n: u }), u === ROOM ? P('pp.room.units.here', null, 'green') : null]), description: P(desc[0], desc[1]),
         action: 'open-unit', value: String(u), trail: u === ROOM ? '' : 'chevron' });
     }).join('') + '</div>';
-    return sheet({ title: P('pp.room.units.title'), subtitle: P('pp.common.task'), view: 'units', body: body });
+    return sheet({ title: P('pp.room.units.title'), view: 'units', body: body });
   }
 
   /* ---- Find over the ledger, every unit: a piglet's tag or notch, a sow's number, a crate's code (N9) ---- */
@@ -701,13 +702,13 @@
     var typeBtn = UI.button({ label: PP.t('pp.room.scan.type'), register: S.unavailable ? 'primary' : 'secondary', action: 'type', className: 'pp-wide', strs: { label: 'pp.room.scan.type' } });
     var body = S.unavailable ? UI.panel(UI.choiceEmpty('', { strs: { text: 'pp.room.scan.unavailable' } })) + typeBtn
       : '<div class="pp-scan-frame" data-ds="Candidate:ScanFrame">' + I('scan') + '</div>' + typeBtn;
-    return sheet({ title: P('act.scan'), subtitle: S.unavailable ? null : P('pp.room.scan.hold'), view: 'scan', body: '<div class="pp-sheet-stack">' + body + '</div>' });
+    return sheet({ title: P('act.scan'), view: 'scan', body: '<div class="pp-sheet-stack">' + (S.unavailable ? '' : U.note([P('pp.room.scan.hold')])) + body + '</div>' });
   }
   function findSheet() {
     var body = '<div class="pp-findbar">' +
       UI.choiceSearch({ label: 'Find', placeholder: 'Find', value: S.q, attrs: { 'data-role': 'q', inputmode: 'text', 'data-str-attr': 'aria-label:pp.room.scan.placeholder;placeholder:pp.room.scan.placeholder' } }) +
       '</div><div id="scan-results">' + findResults() + '</div>';
-    return sheet({ title: P('pp.room.scan.title'), subtitle: P('pp.room.find.sub'), view: 'find', size: 'long', body: '<div class="pp-sheet-stack">' + body + '</div>' });
+    return sheet({ title: P('pp.room.scan.title'), view: 'find', size: 'long', body: '<div class="pp-sheet-stack">' + U.note([P('pp.room.find.sub')]) + body + '</div>' });
   }
   function errorView() {
     return '<div class="pp-after">' + UI.panel(UI.choiceEmpty('', { strs: { text: 'pp.room.err.title' } }) + UI.choiceEmpty('', { strs: { text: 'pp.room.err.why' } }) +
@@ -723,8 +724,8 @@
     var sh = phone.querySelector('.sheet'), sb = sh && sh.querySelector('.sheet-body'), sv = sh ? sh.dataset.view || '' : '', stop = sb ? sb.scrollTop : 0;
     var f = document.activeElement && document.activeElement.closest && document.activeElement.closest('[data-action]');
     var fk = f ? [f.dataset.action, f.dataset.value || '', f.dataset.step || ''] : null;
-    var header = K.header({ title: P('pp.common.task'), back: { action: 'back' }, backLabel: P('pp.room.aria.back') });
-    var body = S.error ? errorView() : latest() + summaryCard() + answersRow() + filteredBlock() + lensBar() + list();
+    var header = K.header({ title: P('pp.common.task'), back: { action: 'back' }, backLabel: P('pp.room.aria.back'), line: S.error ? null : latest() });
+    var body = S.error ? errorView() : summaryCard() + answersRow() + filteredBlock() + lensBar() + list();
     var overlay = S.error ? '' : LD.view ? LD.html() : roomSheet();
     phone.innerHTML = K.statusbar() + K.screen({ header: header, body: body, dock: S.error ? '' : dock(), inert: !!overlay, label: P('pp.room.aria.list', { n: ROOM }) }) + overlay;
     var sc2 = phone.querySelector('.tk-scroll'); if (sc2) sc2.scrollTop = top;

@@ -2,6 +2,10 @@
 
 Rules say what a screen may not do. This page says what the owner sees as good, so a builder can aim at it and a judge can stand in for it. It is drawn from the owner's rulings (`calibration/answers.json`, the rejected examples in `briefs/gate.md`) and the approved screens (Farrowing, Inspection). Every builder reads it before the critique, and every judge reads it before calibrating. Add to it whenever the owner rules on a pair.
 
+## The house references
+
+The owner points to four live screens as the product's taste: Home · Today, Unit, More actions and the Farrowing room, rendered in [references/](references/README.md) with what each teaches. They are the first thing to look at and the last thing to compare against. Base designs on what the product already does well, not on outside apps.
+
 ## What good looks like here
 
 The approved screens (Farrowing room, Task overview) share one quiet language:
@@ -22,6 +26,6 @@ The approved screens (Farrowing room, Task overview) share one quiet language:
 
 ## How to use it
 
-- **Builders**: in the critique (`briefs/build.md` §1a) and every self-crit (§1d), hold your direction against these three lessons by name. A direction that adds boxes, bold or size to "organise" the screen is c3 until proven otherwise.
+- **Builders**: in the critique (`briefs/build.md` §1) and every self-crit (§4), hold your direction against these three lessons by name. A direction that adds boxes, bold or size to "organise" the screen is c3 until proven otherwise.
 - **Judges**: before calibrating, read this page. Then judge as the owner would: prefer the lighter screen with one clear hero over the one with more structure, more weight or bigger type, unless the heavier one fixes a real problem the lighter one can't.
 - A polish pass should look like the same screen, improved. If someone who knows the original wouldn't recognise it, it wasn't a polish.

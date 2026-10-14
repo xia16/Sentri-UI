@@ -1,13 +1,12 @@
 /* Piglet processing shared UI: what two or more pages draw (ticket #19). Built from the design system's
    factories plus four compositions (CSS in shell.css, tokens only):
-     litterHeader  the litter's identity header: `A02 · 000231 ›` (the door to the sow), parity, day
      tools         `Record dead · Set count`: Button's tool register (adopted, ADR 0002)
      recordGroup   the Record group: Move, identity, birth litter weight (and why, outside a task)
      weightRow     the birth-litter-weight row, missing or set
      litterRow     Candidate:LitterRow — the room's row law (room, End)
      receipt       Candidate:Receipt — one body line, colour on the value only
      toolRow       Candidate:ToolRow — farrowing's in-sheet tools (Edit · Record dead · Set count · Move), skeleton pages
-   Plus the words every page stamps with: span, stamp, date, ago. Needs window.SentriUI and PP. */
+   Plus the words every page stamps with: span, stamp, date, ago; and note, a status line at the top of a body. Needs window.SentriUI and PP. */
 (function () {
   var UI = window.SentriUI, ICON = window.SentriIcons;
   var U = (window.PPUI = {});
@@ -44,16 +43,16 @@
     return U.date(iso);
   };
 
-  /* ---- the litter header: crate first (the first fact), the one door to the sow page ----
-     o: { crate, sow, parity, day?, sub? (html replacing the parity line), action? } */
-  U.litterHeader = function (o) {
-    var a = { crate: o.crate, tag: o.sow };
-    var ctx = o.sub ? '<p>' + o.sub + '</p>' : o.day != null
-      ? '<p class="pp-hdr-context">' + U.span('pp.common.hdr.parity', { n: o.parity }) + U.span('pp.common.unit.day', { n: o.day }) + '</p>'
-      : '<p>' + U.span('pp.common.hdr.parity', { n: o.parity }) + '</p>';
-    return '<header class="utility-header"' + (o.attrs || '') + '><div class="pp-hdr-title"><h3><button type="button" class="pp-door" data-action="open-sow" data-value="' + esc(o.sow) +
-      '" data-str-attr="aria-label:pp.common.hdr.sow_aria" data-args=\'' + esc(JSON.stringify(a)) + '\' aria-label="' + esc(PP.t('pp.common.hdr.sow_aria', a)) + '">' +
-      U.span('pp.common.hdr.door', a, { cls: 'pp-mono' }) + ICON.icon('chevron') + '</button></h3>' + ctx + '</div>' + (o.action || '') + '</header>';
+  /* ---- note: a status or instruction line, the first thing in a body (Headers law, 2026-10-13: a header holds no status, counts
+     or instructions). parts: [{ text, str, args, tone }, { sep: true }, …], the old subtitle's parts; drawn as the Status line. ---- */
+  U.note = function (parts) {
+    var list = (Array.isArray(parts) ? parts : [parts]).filter(Boolean), tokens = [[]];
+    list.forEach(function (p) {
+      if (p.sep) { tokens.push([]); return; }
+      tokens[tokens.length - 1].push({ text: p.text, tone: p.tone, strs: p.str ? { text: p.str } : undefined, args: p.args ? { text: p.args } : undefined });
+    });
+    tokens = tokens.filter(function (t) { return t.length; });
+    return tokens.length ? UI.statusLine(tokens, { sep: 'dot', className: 'pp-note' }) : '';
   };
 
   /* ---- tools: the two quick acts on the litter's numbers, in the tool register ---- */

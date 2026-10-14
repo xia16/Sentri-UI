@@ -336,14 +336,14 @@ const tools = touchesTools(files);
 if (steady.length) {
   const feats = [...screens.diff, ...screens.new].map((s) => s.feature);
   const bp = budgetProblems(feats, (p) => { const f = path.join(wt.cand, p); return fs.existsSync(f) ? fs.readFileSync(f, 'utf8') : null; });
-  check('information budget before layout', !bp.length, bp.length ? bp.join('; ') + ' (write it first: briefs/build.md §1b)' : '');
+  check('information budget before layout', !bp.length, bp.length ? bp.join('; ') + ' (P3: write it first, briefs/build.md §2)' : '');
   const cp = critiqueProblems(feats, (p) => { const f = path.join(wt.cand, p); return fs.existsSync(f) ? fs.readFileSync(f, 'utf8') : null; });
-  check('critique of the original before the change', !cp.length, cp.length ? cp.join('; ') + ' (keep-list, problems, parts and self-crit: briefs/build.md §1a, §1d)' : '');
+  check('critique of the original before the change', !cp.length, cp.length ? cp.join('; ') + ' (P1, P4: keep, problems, parts and self-crit, briefs/build.md §1, §4)' : '');
   const ps = pageStyling(addedLines(git(['diff', '-U0', mech.base, mech.candidate, '--', 'ux']).out));
   mech.pageStyling = ps;
   const proposed = files.includes('ux/design-system/components/_proposed.json') && /^\+\s*[\[{"]/m.test(git(['diff', '-U0', mech.base, mech.candidate, '--', 'ux/design-system/components/_proposed.json']).out);
-  check('no workaround beside a component proposal', !proposed, proposed ? 'this change proposes a component and changes screens: build the component in the design system in this change (briefs/build.md §2), never a workaround' : '');
-  check('design-system components only', !ps.length, ps.length ? `${ps.length} visual declaration(s) added outside ux/design-system (${ps.slice(0, 3).map((p) => p.file.split('/').pop() + ' ' + p.prop).join(', ')}): use a SentriUI component, or build the part in the design system (briefs/build.md §1c)` : '');
+  check('no workaround beside a component proposal', !proposed, proposed ? 'this change proposes a component and changes screens: build the component in the design system in this change (P2, briefs/build.md §3), never a workaround' : '');
+  check('design-system components only', !ps.length, ps.length ? `${ps.length} visual declaration(s) added outside ux/design-system (${ps.slice(0, 3).map((p) => p.file.split('/').pop() + ' ' + p.prop).join(', ')}): use a SentriUI component, or build the part in the design system (P2, briefs/build.md §3)` : '');
 }
 if (tools.length && steady.length) check('workflow changes in their own PR', false, `this change moves ${steady.length} screen(s) and also edits the workflow or the gate's tools (${tools.slice(0, 3).join(', ')}): split it`);
 // The shared-component queue: one shared change at a time, oldest first. A shared candidate waits while an older open,
@@ -388,6 +388,23 @@ if (changed.length) {
     r = run(process.execPath, ['scripts/check-legibility.mjs', '--base', url.cand, '--changed', changed.join(','), ...(strict ? ['--strict'] : ['--compare', url.base])], wt.cand);
     check(`farm legibility (${strict ? 'strict' : 'no worse than base'}) on changed screens`, r.code === 0, r.tail);
   } else check('farm legibility on changed screens', false, 'scripts/check-legibility.mjs is not on this candidate (it lands with #101): the gate fails closed');
+  // P4: clearly wrong spacing (scripts/check-spacing.mjs). A defect main already has on that screen is main's debt, not this change's.
+  if (fs.existsSync(path.join(wt.cand, 'scripts/check-spacing.mjs'))) {
+    const outC = path.join(out, 'spacing-cand.json'), outB = path.join(out, 'spacing-base.json');
+    run(process.execPath, ['scripts/check-spacing.mjs', '--base', url.cand, '--screens', changed.join(','), '--out', outC], wt.cand);
+    run(process.execPath, [path.join(wt.cand, 'scripts/check-spacing.mjs'), '--base', url.base, '--screens', changed.join(','), '--out', outB], wt.cand);
+    const read = (f) => { try { return JSON.parse(fs.readFileSync(f, 'utf8')); } catch { return null; } };
+    const C = read(outC), B = read(outB) || [];
+    if (!C) check('clear spacing on changed screens (P4)', false, 'check-spacing wrote no result on the candidate');
+    else {
+      const key = (d) => d.check + ' ' + d.detail.replace(/\d+px/g, 'Npx');
+      const was = new Set(B.flatMap((s) => s.defects.map((d) => s.screen + '|' + key(d))));
+      const added = C.flatMap((s) => s.defects.filter((d) => !was.has(s.screen + '|' + key(d))).map((d) => `${s.screen}: ${d.check} — ${d.detail}`));
+      const debt = C.reduce((n, s) => n + s.defects.length, 0) - added.length;
+      check('clear spacing on changed screens (P4)', !added.length, added.length ? `${added.length} new: ${added.slice(0, 2).join(' | ')}` : debt ? `${debt} defect(s) already on main` : '');
+      if (debt) gaps.push(`spacing: ${debt} defect(s) on changed screens are already on main (review/spacing.json)`);
+    }
+  }
 }
 
 // ---------- scenario leaves: the scope's features, every feature whose screens changed, every feature a touched shared file reaches ----------

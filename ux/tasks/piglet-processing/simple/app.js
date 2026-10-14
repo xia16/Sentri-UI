@@ -117,7 +117,10 @@
     var all = P.pens(), done = all.filter(isDone), todo = all.filter(function (p) { return !isDone(p); }), ended = P.s.ended;
     var last = P.last();
     var clash = P.s.notes.some(function (n) { return !n.seen; });
-    var body = clash ? '' : K.latest(last ? { lead: S('last'), value: S('fig', { v: hm(last.at) }), rest: S('last.who', { who: last.who }) } : { lead: S('last.none') });
+    /* The header line is the one fact the next worker needs to trust the list: the last record and who made it (Headers law;
+       features/piglet-processing/budget.md ## Headers). A clash note says something newer, so the line gives way to it. */
+    var line = clash ? null : { text: last ? [S('last'), { text: ' ' }, Object.assign({ strong: true }, S('fig', { v: hm(last.at) })), { text: ' ' }, S('last.who', { who: last.who })] : S('last.none') };
+    var body = '';
     if (V.flash && !V.pen) body += flashLine();
     P.s.notes.forEach(function (n, i) {
       if (n.seen) return;
@@ -143,7 +146,7 @@
     var shown = V.lens === 'done' ? done : todo.filter(function (p) { return !V.chip || needsToday(p, V.chip); });
     body += shown.length ? K.list(shown.map(penCard))
       : '<p class="sp-empty">' + H(V.lens === 'done' ? 'empty.done' : 'chip.none') + '</p>';
-    return K.screen({ inert: inert, label: T('task'), header: K.header({ title: S('task'), back: null }), body: body });
+    return K.screen({ inert: inert, label: T('task'), header: K.header({ title: S('task'), back: { action: 'today' }, backLabel: T('back.today'), line: line }), body: body });
   }
 
   /* The receipt line after a save: what was saved, and Undo while it can still be taken back */
@@ -260,14 +263,15 @@
     body += processing(p);
     var n = Object.keys(V.draft).length;
     var foot = K.footer({ back: { action: 'back', label: T('back') }, primary: ended ? null : { label: T('submit.n', { n: n }), action: 'submit', register: 'primary', waiting: !n }, status: !n ? T('sr.items') : null });
-    var sub = [T('sheet.pen', { pen: p.code, p: p.parity }), SEP, T('piglets', { n: p.alive }), SEP, T('day.n', { d: p.age })];
-    return K.drawer({ title: p.sow, subtitle: sub, size: 'long', height: 'full', view: 'pen', inert: inert, close: { action: 'back', label: T('close.pen') },
+    /* The pen sheet is the hub: the route line, the sow's chip and her pen, the one fact that tells her apart in this task. */
+    var line = { chip: { id: p.sow, action: 'sow', value: p.sow, label: T('sow.open', { tag: p.sow }) }, facts: [p.code] };
+    return K.drawer({ title: T('task'), line: line, size: 'long', height: 'full', view: 'pen', inert: inert, close: { action: 'back', label: T('close.pen') },
       body: body, footer: foot });
   }
   /* ---- boars · gilts: two steppers ---- */
   function countsSheet() {
     var p = pen(), c = V.counts;
-    return K.drawer({ title: T('cnt.title'), subtitle: T('w.sub', { pen: p.code, d: p.age }), size: 'long', view: 'counts',
+    return K.drawer({ title: T('cnt.title'), size: 'long', view: 'counts',
       body: stepper('boar', T('idf.boars'), c.boar) + stepper('gilt', T('idf.gilts'), c.gilt),
       footer: K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('rec.counts'), action: 'counts-save', register: 'primary' } }) });
   }
@@ -286,13 +290,14 @@
       K.list([K.group({ title: T(scheme() === 'notch' ? 'pc.notched' : 'pc.tagged'), face: 'word', meta: '· ' + idWhat(p) + ' · ' + T('breeders.n', { n: P.breeders(p) }),
         rows: rows.length ? rows : '<p class="sp-empty">' + esc(T('id.none.yet')) + '</p>' })]);
     if (scheme() === 'breeders' && !p.picked && !ended) body += UI.button({ label: T('id.done.pick', { n: P.breeders(p) }), register: 'secondary', action: 'pick-done', className: 'sp-wide' });
-    return K.page({ title: T('pl.title'), description: p.code + ' · ' + T('sow', { tag: p.sow }), view: 'tagged', body: body,
-      footer: K.footer({ back: { action: 'back', label: T('back') }, primary: ended ? null : { label: T('add.' + scheme()), action: 'give-new', register: 'primary' } }) });
+    // Give IDs comes back here, so this page carries the route (the sow's chip, the pen): the litter is on screen or one Back away.
+    return K.page({ title: T('pl.title'), back: { action: 'back', label: T('back') }, line: { chip: { id: p.sow, action: 'sow', value: p.sow, label: T('sow.open', { tag: p.sow }) }, facts: [p.code] }, view: 'tagged', body: body,
+      footer: ended ? false : K.footer({ back: false, primary: { label: T('add.' + scheme()), action: 'give-new', register: 'primary' } }) });
   }
 
   /* ---- More: Move piglets · Set count · Litter weight · Boars and gilts (the figures the Piglets card only reads) ---- */
   function moreSheet() {
-    return K.drawer({ title: T('more.title'), size: 'medium', view: 'more',
+    return K.drawer({ title: T('more.title'), size: 'medium', view: 'more', surface: 'menu',
       body: K.doors({ card: true, items: [{ title: T('move.title'), icon: 'transfer', action: 'tool', value: 'move' }, { title: T('tool.count'), icon: 'edit', action: 'tool', value: 'count' },
         { title: T('w.title'), icon: 'weight', action: 'weight-open', value: '' }, { title: T('cnt.title'), icon: 'profile', action: 'counts-open', value: '' }] }),
       footer: K.footer({ back: { action: 'back', label: T('back') } }) });
@@ -309,7 +314,7 @@
         { value: 'weak', label: T('treat.weak') }, { value: 'sick', label: T('treat.sick') }] });
       body += '<p class="sp-quiet">' + esc(T('treat.later', { n: n - d.n })) + '</p>';
     }
-    return K.drawer({ title: tr(d.k), subtitle: T('adj.sub', { pen: p.code, n: n }), size: 'long', view: 'adjust', body: body,
+    return K.drawer({ title: tr(d.k), size: 'long', view: 'adjust', body: body,
       footer: K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('adj.use', { n: d.n }), action: 'adjust-use', register: 'primary', waiting: less && !d.why }, status: less && !d.why ? T('sr.why') : null }) });
   }
 
@@ -353,14 +358,13 @@
     }
     var ready = !giveUsed(p) && giveNo(p) && g.sex;
     var primary = { label: T(g.edit ? 'give.fix' : 'give.save'), action: 'give-save', register: 'primary', waiting: !ready };
-    var sub = T('give.sub', { pen: p.code, sow: p.sow, n: left });
-    return K.page({ title: T(br ? 'tr.id.breeders' : 'give.title'), description: g.edit ? T('give.fixing', { no: g.edit }) : sub, view: 'give', body: body,
-      footer: givePad() + K.footer({ back: { action: 'back', label: T('back') }, primary: ended ? null : primary, status: !ended && !ready ? T('sr.id') : null }) });
+    return K.page({ title: T(br ? 'tr.id.breeders' : 'give.title'), back: { action: 'back', label: T('back') }, view: 'give', body: body,
+      footer: givePad() + (ended ? '' : K.footer({ back: false, primary: primary, status: !ready ? T('sr.id') : null })) });
   }
   /* the litter weight from the Piglets tab: one Measure on the same Numpad */
   function weightSheet() {
     var p = pen(), w = V.weight;
-    return K.drawer({ title: T('w.title'), subtitle: T('w.sub', { pen: p.code, d: p.age }), size: 'long', view: 'weight',
+    return K.drawer({ title: T('w.title'), size: 'long', view: 'weight',
       body: UI.measure({ label: T('w.kg'), value: w.kg, unit: 'kg', placeholder: '—', active: true, action: 'noop', key: 'w', className: 'sp-give-measure' }),
       footer: UI.numpad({ value: w.kg, unit: 'kg', action: 'pad', key: 'w', compact: true, decimals: 1, intLength: 3 }) +
         K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('rec.weight'), action: 'weight-save', register: 'primary', waiting: !(+w.kg > 0) }, status: !(+w.kg > 0) ? T('sr.kg') : null }) });
@@ -393,7 +397,7 @@
     p.weights.forEach(function (w) { list.push({ title: T('log.weight', { w: w.kg }), at: w.at || ymd(p.age - w.day), by: w.who ? short(w.who) : undefined }); });
     list.push({ title: T('log.born', { n: p.born }), detail: p.dead ? T('log.dead.birth', { n: p.dead }) : '', at: p.bornAt || ymd(p.age), by: p.bornWho ? short(p.bornWho) : undefined });
     var groups = UI.logGroups(list, { lang: L.lang === 'zh' ? 'zh-CN' : 'en', today: T('sec.today'), yesterday: T('log.yest') });
-    return K.page({ title: T('log.title'), description: p.code + ' · ' + T('sow', { tag: p.sow }), view: 'log', body: UI.log(groups, { empty: T('log.none') }) });
+    return K.page({ title: T('log.title'), back: { action: 'back', label: T('back') }, view: 'log', body: UI.log(groups, { empty: T('log.none') }), footer: false });
   }
 
   /* ---- record death ---- */
@@ -401,7 +405,7 @@
   function deathSheet() {
     var p = pen(), d = V.death, k = CAUSES.reduce(function (s, c) { return s + d.c[c]; }, 0);
     var body = CAUSES.map(function (c) { return stepper(c, T('c.' + c), d.c[c], { max: p.alive }); }).join('');
-    return K.drawer({ title: T('death.title'), subtitle: T('death.sub', { pen: p.code, n: p.alive }), size: 'long', view: 'death', body: body,
+    return K.drawer({ title: T('death.title'), size: 'long', view: 'death', body: body,
       footer: K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('rec.death', { n: k }), action: 'death-save', register: 'primary', waiting: !k }, status: !k ? T('sr.dead') : null }) });
   }
   /* ---- move piglets: only the other pens of this batch (there is nowhere else); for what was given here: had it? ---- */
@@ -424,13 +428,13 @@
         selected: d.had[k] == null ? '' : d.had[k] ? 'yes' : 'no', options: [{ value: 'no', label: T('no') }, { value: 'yes', label: T('yes') }] });
     });
     var ready = d.to && d.n > 0 && asks.every(function (k) { return d.had[k] != null; });
-    return K.page({ title: T('move.title'), description: T('move.sub', { pen: p.code, n: p.alive }), view: 'move', body: body,
-      footer: K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('move.save', { n: pigs(d.n) }), action: 'move-save', register: 'primary', waiting: !ready }, status: !ready ? T(d.to ? 'sr.had' : 'move.pick') : null }) });
+    return K.page({ title: T('move.title'), back: { action: 'back', label: T('back') }, view: 'move', body: body,
+      footer: K.footer({ back: false, primary: { label: T('move.save', { n: pigs(d.n) }), action: 'move-save', register: 'primary', waiting: !ready }, status: !ready ? T(d.to ? 'sr.had' : 'move.pick') : null }) });
   }
   /* ---- set count: the record becomes what is there now ---- */
   function countSheet() {
     var p = pen(), d = V.count;
-    return K.drawer({ title: T('count.title'), subtitle: T('count.sub', { pen: p.code, n: p.alive }), size: 'long', view: 'count',
+    return K.drawer({ title: T('count.title'), size: 'long', view: 'count',
       body: stepper('count', T('count.label'), d.n, { variant: 'count', min: 0, hint: '' }),
       footer: K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('rec.count', { n: d.n }), action: 'count-save', register: 'primary', waiting: d.n === p.alive }, status: d.n === p.alive ? T('sr.count') : null }) });
   }
@@ -453,9 +457,8 @@
       body += '<p class="sp-quiet">' + esc(T('end.coming', { n: soon.length, list: nm.join(', ') })) + '</p>';
     }
     if ((P.s.unaccounted || 0) > 0) body += '<p class="sp-quiet">' + esc(T('end.unacc', { n: P.s.unaccounted })) + '</p>';
-    var f = ended ? K.footer({ back: { action: 'back', label: T('back') } })
-      : K.footer({ back: { action: 'back', label: T('back') }, hold: { label: T('end.hold'), caption: T('end.caption'), action: 'end-commit', tone: 'danger' } });
-    return K.page({ title: ended ? T('end.done.title') : T('end.title'), description: T('end.sub', { b: P.BATCH.name }), view: 'end', body: body, footer: f });
+    var f = ended ? false : K.footer({ back: false, hold: { label: T('end.hold'), caption: T('end.caption'), action: 'end-commit', tone: 'danger' } });
+    return K.page({ title: ended ? T('end.done.title') : T('end.title'), back: { action: 'back', label: T('back') }, view: 'end', body: body, footer: f });
   }
 
   /* ================= render ================= */
@@ -595,6 +598,10 @@
       case 'pen': V.pen = v; V.flash = null; V.open = {}; V.draft = {}; V.tab = 'proc'; break;
       case 'dismiss': case 'back': closeTop(); break;
       case 'noop': return;
+      // Back from the pen list goes where the Farrowing room's goes: Today (the Home prototype).
+      case 'today': location.assign(new URL('../../../system/home-astra-prototype.html?section=farrowing', location.href).href); return;
+      // The subject chip opens the sow's page (the Pig profile prototype's sow page, as Farrowing's chip does).
+      case 'sow': location.assign(new URL('../../../system/inspection-astra-concept.html?layout=focus&embed=sow', location.href).href); return;
       case 'end': V.end = true; break;
       case 'day': V.open[v] = !V.open[v]; break;
       case 'item':

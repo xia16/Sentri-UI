@@ -2,7 +2,7 @@
 :is(.farrowing-phone,.inspection-phone) .record-toolbar .record-action-group{display:grid;grid-template-columns:.8fr 1.25fr 1.1fr;min-width:0;padding-left:10px;border-left:1px solid var(--line);gap:4px}
 
 /* Pig details offer the catalogue; task records expose contextual shortcuts. */
-.inspection-phone .pig-detail-footer>.pig-actions-entry{display:flex;align-items:center;justify-content:center;justify-self:end;gap:8px;min-height:48px;min-width:140px;padding:10px 20px;border-radius:12px;font-size:14px}
+.inspection-phone .pig-detail-footer>.pig-actions-entry{display:flex;align-items:center;justify-content:center;justify-self:end;gap:8px;min-height:var(--footer-height);min-width:140px;padding:10px 20px;border-radius:12px;font-size:14px}
 .inspection-phone .pig-actions-entry>svg{width:18px;height:18px}
 
 .inspection-phone .pig-detail-footer>.pig-actions-entry{width:100%}

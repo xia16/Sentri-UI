@@ -11,7 +11,7 @@
 <script type="module" src="fixtures.js"></script>
 <style>
 /* Layout only, tokens from tokens.css. Built on the task skeleton (ADR 0003): Move is a TaskSheet that opens from the litter
-   drawer like the dead and count sheets (title, subtitle, Clear, pinned footer with Back); Save and Back return to the litter
+   drawer like the dead and count sheets (the sheet header, no line; Back, Clear and the primary in the footer); Save and Back return to the litter
    drawer, Save with its receipt (R2-22: one Back, never a Moves page). The pre-lock door is a TaskSheet too. Content inside is
    the design system's cards (Segment, ChoiceList, Stepper, Facts, Row, Banner). */
 .mv-stack { display: flex; flex-direction: column; gap: var(--space-panel); }
@@ -477,18 +477,18 @@
   }
   function moveSheet() {
     var f = S.face, dr = S.other ? draft() : { why: 'no_receiver' }, p = pointer(dr), ready = !p && !!dr.event;
-    var sub = alive(f) > 0 ? s('pp.move.sheet.sub', { code: f, n: alive(f), day: L(f).dayAge }) : s('pp.move.sheet.sub_empty', { code: f });
     var explain = S.explains ? heading(gainOnly() ? 'pp.move.explain.title_gain' : 'pp.move.explain.title', { code: receiver(), n: gainOnly() ? S.n : count() }) : '';
     // the question sits right under the crate, above the count and the rows (R1-31: never below the fold)
     var ask = S.other && dr.event ? askSection(dr) : '', own = S.other && dr.event ? ownJoin(dr) : '';
     // why Move waits is said only when the worker taps it (a disabled primary stands alone above the footer, as farrowing's)
     var reason = p ? Object.assign({ id: 'mv-reason', visible: !!S.why }, s(p.id, p.args)) : null;
     var body = explain + directionSection() + crateSection() + pairSection() + own + ask + countSection() + closesSection(dr) + review(dr, own);
-    // Clear (as the dead sheet's): greyed while there is no draft to drop; it drops an explaining link too
-    var clear = UI.button({ label: PP.t('act.clear'), register: 'text', action: 'clear', waiting: !(draftExists() || S.explains), strs: { label: 'act.clear' } });
-    return K.drawer({ view: 'move', size: 'long', title: s('pp.move.sheet.title'), subtitle: sub, aside: clear, close: { action: 'dismiss' }, scrim: { action: 'dismiss' },
+    // Move is an action launched from the litter: no header line (Headers law, 2026-10-13). Clear is quiet text in the footer, left of
+    // the primary, present only when there is a draft (or an explaining link) to drop.
+    var clear = draftExists() || S.explains ? { label: { text: PP.t('act.clear'), str: 'act.clear' }, action: 'clear' } : null;
+    return K.drawer({ view: 'move', size: 'long', title: s('pp.move.sheet.title'), close: { action: 'dismiss' }, scrim: { action: 'dismiss' },
       body: '<div class="mv-stack">' + body + '</div>',
-      footer: K.footer({ back: { action: 'back' }, primary: primarySpec(dr, ready), status: reason }) });
+      footer: K.footer({ back: { action: 'back' }, quiet: clear, primary: primarySpec(dr, ready), status: reason }) });
   }
 
   /* ---- move-prelock: the door to the farrowing sheet ---- */
@@ -496,8 +496,9 @@
     var x = L(S.face);
     var door = doors('', row({ action: 'open-farrowing', value: S.face, title: 'pp.move.pre.door', titleArgs: { code: S.face },
       desc: 'pp.move.pre.door_meta', descArgs: { n: x.born } }));   // who and when are on the farrowing sheet
-    return K.drawer({ view: 'prelock', size: 'short', title: s('pp.move.sheet.title'), subtitle: s('pp.move.pre.why', { code: S.face }),
-      body: door, footer: K.footer({ back: { action: 'back' } }) });
+    // Why moves are closed is status: the first thing in the body, never the header.
+    return K.drawer({ view: 'prelock', size: 'short', title: s('pp.move.sheet.title'),
+      body: UI.statusLine([PP.t('pp.move.pre.why', { code: S.face })]) + door, footer: K.footer({ back: { action: 'back' } }) });
   }
 
   function render() {

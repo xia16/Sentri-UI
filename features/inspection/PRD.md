@@ -32,7 +32,10 @@ Out (owned by other features): the pig record and its actions (pig-profile), fee
 
 Taken from the research notes and the code:
 
-- The roster shows every pig (the earlier "quiet pigs collapsed" idea was dropped) with an identity line and one line of tags.
+- The roster shows every pig (the earlier "quiet pigs collapsed" idea was dropped). Owner-approved 2026-10-12: a pig is a two-line row. Left, a fixed 112px column: the pig ID over the stage line ("Gestation · 42d"; "d" is the one allowed abbreviation; no stage date, the stage alone; the stage ends in an ellipsis rather than widening the column). Right, one line of compact condition tags that fills the space up to the chevron: the name only (no day, no care word; Poor appetite is the trend-down icon and "Appetite", Diarrhoea is "Scours"), ordered by urgency then day (Treat in place and Hospital pen, then Monitor, then ongoing). Act now is a red wash with the "!" icon and bold red text; monitor is white with a thin border; ongoing is muted text with no box.
+- The tag line is one line only. Tags are added in priority order until the line is full, then "+N" says how many are left; the urgent tag is never the hidden one.
+- There is no feed tag on a pig row. A trough pen can't feed one pig, so feed is read and changed at the pen (the pen header keeps its feed summary).
+- The row is the design system's Row · animal (select + door), with the compact ConditionTag.
 - Home opens this page through the "Inspect unit" card with the unit kept in the link; Back returns to Home with the unit.
 - Pen map copies Farrowing's four-column, six-row map and 350 ms hold-to-peek.
 
@@ -41,5 +44,5 @@ Open (recorded on the screens as issues):
 - The unit summary card (pig and pen counts, faults, sensors, batch tracker) is in the code and not placed on the walk. Draw it or remove it.
 - Equipment faults have a full report-and-resolve flow in the prototype's code but no control reaches it; the pen workflow deck draws the same flow (and Set count) as screens, listed under Equipment faults and Pen head count.
 - "Health" and "Feed" lens counts do not say what they count.
-- The care level shows only by icon and colour on a row.
+- The care level shows on a row only by the tag's look (red wash with "!", outlined, plain); the care word and the day are on the record.
 - Fixed author "G. Hansen" and times 06:40 and 09:41 stand in for the signed-in worker and real times.

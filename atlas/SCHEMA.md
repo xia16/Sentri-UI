@@ -155,6 +155,24 @@ The not-supported list is the PRD's `## Not supported` section (bullets `- **Wha
 
 The generator refuses a `scenarios.json` that isn't JSON, has no `tree`, repeats an id, uses an unknown node type, or resets a state to a screen no feature has.
 
+## Branch layers: `atlas/layers.json`
+
+Work that isn't on main yet shows on the feature it changes, as a layer over main. `node scripts/build-layers.mjs` (`npm run layers`) writes `atlas/layers.json` from every branch on `origin` except main; it is generated, never committed. The Pages build regenerates it on every merge, every branch deletion, and every 10 minutes when a branch has moved, reusing the result for any branch whose tip and merge base haven't changed.
+
+A branch is compared with where it started (its merge base with main), so main moving on never shows as the branch's change:
+
+- **New:** the screen is in the branch's `atlas.json`, not the base's.
+- **Removed:** the base has it, the branch doesn't.
+- **Changed:** the screen *looks* different. Each screen whose page, or a file its page loads, changed is rendered bare at 390 × 844 from both commits and compared pixel by pixel. A change to a shared file therefore shows on every feature whose screens it moves, under the branch's own layer there.
+
+`{ "generated", "main", "tips": { "<branch>": "<sha>" }, "layers": [{ "branch", "sha", "base", "author", "updated", "commits", "behind", "pr": { number, url } | null, "features": { "<feature id>": { "screens": { "<screen id>": "new" | "changed" | "removed" }, "prd": bool, "feature": <the branch's feature from its atlas.json>, "removed": [<the base's removed screens>] } } }] }`
+
+A branch must commit its regenerated `atlas.json` (`npm run atlas`) for its new screens to show. A branch that touches no screen and no PRD has no layer. `PEOPLE` in the script names authors on the layer.
+
+The atlas: a feature with layers gets a **Layer** bar under its header (Main and one button per branch). On a branch layer the flow shows the branch's version with New, Changed and Removed tags, and unchanged screens step back. The bar says what else the branch changes ("Also on", each linking to that feature's layer) and why it can't merge yet (no PR, behind main). A changed screen's phone gets a version switch: Approved (when changed since approval), Main, and the branch, which opens first. The Features board tags each feature that has a layer with its authors. `?layer=<branch>` deep-links a feature's layer.
+
+Screens render from the branch's commit through `/@<commit>/`, the same route the approved version uses. The Pages build writes those folders out (`_site/@<commit>/` with that commit's `ux/` and `atlas/atlas.json`), so both work on the published atlas.
+
 ## Generated `atlas/atlas.json`
 
 `{ "generated", "commit", "platforms": [{ id, name, sections: [{ id, name, zh, shared, features: [<feature.json> + "status" derived from its screens + "prd" (the PRD.md text) + "scenarios" (above)] }], components: [{ name, group, status (gate.json's, else "in-design"; "placeholder" for proposed ones), gate (the gate.json or null), files, seenIn?, note? }], copy: { "registry": "ux/laws/strings.json" } | null, backlog: [the items above], oldUi: <references/figma/index.json> }] }`
@@ -162,3 +180,14 @@ The generator refuses a `scenarios.json` that isn't JSON, has no `tree`, repeats
 **The platform is the top level.** Components, copy, backlog and the Old UI catalogue are each a platform's own; the atlas draws every view for the selected platform. Everything that exists today is `mobile`: the components and strings are the mobile app's (touch, no hover or focus rings), and the Figma catalogue is the old mobile app. `web` has `components: []`, `copy: null`, `backlog: []`, `oldUi: []` until it has any: its views show a one-line empty state, no invented content. A backlog item sits under the platform of the feature or screen it targets; items that target a component, a section or nothing known are mobile.
 
 Feature status: `placeholder` when every screen is a placeholder; `in-design` when any screen is below agent-checked; `agent-checked` when all are agent-checked or approved; `frozen` when all are approved (and there is at least one).
+
+## Authoring rules for anything the atlas renders
+
+(Moved here from the build brief, 2026-10-12.)
+
+- **Previews render directly.** `preview.html` and `variants/*.html` call `SentriUI.*` directly. Don't link tokens, bundle or fonts (the atlas injects them). Don't use `new URL(relative)` (the atlas runs them in a srcdoc iframe), and don't nest your own iframe.
+- **Variant scripts iterate `[data-state]`.** Each top-level element carries `data-state="<State>"` and renders one state. Scripts draw by `document.querySelectorAll('[data-state]')` or from `document.currentScript.parentElement`, never by looking up one named state.
+- **Tokens only.** No raw hex or px in component CSS.
+- **Specimens sit in their real container.** A picker trigger sits in its form row, and a sheet's search sits in a sheet. Never stack a specimen loose beside unrelated parts.
+- **No stress-test copy.** Specimens use real Sentri words and data. Show long data the way real data is long, not invented long labels.
+- **`atlas/atlas.json` is generated.** Edit the sources, then run `npm run atlas`.
