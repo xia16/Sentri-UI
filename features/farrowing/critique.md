@@ -188,7 +188,7 @@ The design was chosen by the owner over mockup rounds (2026-10-13/14), so there 
 - **Better because** the three pens that matter are the only colour on the map, the map fits any barn, and the screen says each thing once, in the room list's own words.
 - Checks questioned: `check-states` rules (i) touching controls and (k) the grab first measure the rectangles of tiles that the map's own scroller clips, so a scrolled map read as tiles touching the footer and sitting above the grab. The part is left as designed; the variants page opens its long barns near the top and its sideways barn on a column that does not line a clipped tile up beside Back, and the range control is a radio group (it is a single-choice control), so the page passes. The mid-list behaviour (a map opened on pen A40 or B159 and its range following) is checked by my own renders, listed in the Final look.
 
-#### Final look (the pushed head of ds/pen-map, the commit that adds this block; its screens are efcd1a3's, with `7f5b627`, the current main, merged in: already up to date)
+#### Final look (the pushed head of ds/pen-map, the commit that adds this block; its screens are efcd1a3's, with `851dcba`, the current main, merged in; the baseline renders are `7f5b627`, which differs from it in workflow files only)
 
 `farrowing.pen-map` at 390 and 360, EN and ZH, beside `7f5b627`, and the PenMap variants page at 390 and 360, measured against the mockup's checks:
 - Header: the title is centred, there is no header line, the hairline is 1px and the legend starts 24px under it (measured on the real screen and on all 11 specimens).
