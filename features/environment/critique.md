@@ -104,3 +104,7 @@ The ruling fixes the design (the boards `evidence/2026-10-14-header-corners.png`
 
 #### Crit round 2 (driver)
 - Reason: the sheet was titled `Report fault` while the action that opens it says `Report issue` and its primary `Record issue`. Fixed: titled `Report issue` (114px), recorded in `budget.md`. Inspection's renamed `Report fault` (choose a pen) already matches its form's title, its primary and the pen's action (all `Report fault`), so it stays. Nothing else changed.
+
+#### Final look after crit round 2 (2761fcc; `environment.report-issue` at 390 and 360, EN and ZH, beside 39637ff)
+- `Report issue` (114px) reads the same as the Maintenance action that opens it and the `Record issue` primary; header check: 0 defects. Nothing else moved.
+- **Better because** the word the worker taps is the word on the sheet, and the title fits its room.
