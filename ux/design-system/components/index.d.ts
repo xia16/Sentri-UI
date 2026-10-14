@@ -773,7 +773,7 @@ export type IconName =
   | 'alert' | 'signal' | 'battery' | 'filter' | 'minus' | 'plus' | 'record' | 'camera' | 'edit' | 'wrench'
   | 'details' | 'calendar' | 'bookmark' | 'transfer' | 'down' | 'arrow' | 'place' | 'home' | 'toolbox' | 'spark'
   | 'heat' | 'pregnancy' | 'farrow' | 'barn' | 'return' | 'send' | 'health' | 'temperature' | 'humidity' | 'air'
-  | 'upload' | 'offline' | 'backspace';
+  | 'upload' | 'offline' | 'backspace' | 'arrow-down';
 
 declare global {
   interface Window { SentriUI: SentriUI; SentriIcons: SentriIcons }
@@ -782,3 +782,39 @@ declare global {
 export interface RangeSliderProps { min?:number; max?:number; step?:number; value?:[number,number]; title?:string; icon?:string; key?:string; names?:[string,string]; labels?:[string,string]; format?:(value:number)=>string; summary?:(from:number,to:number)=>string; ends?:string[]; className?:string }
 export interface FilterSheetProps { title?:string; sections?:{title?:string;icon?:string;content?:string;help?:string}[]; body?:string; apply?:{label?:string;action?:string}; reset?:{label?:string;action?:string}|false; backAction?:string; backLabel?:string; closeAction?:string; className?:string; size?:'compact'|'short'|'medium'|'long'; label?:string }
 export interface SentriUI { rangeSlider(props?:RangeSliderProps):string; filterSheet(props?:FilterSheetProps):string }
+
+/** A pen's status on the map. act: needs the worker. live: farrowing. plain: has sows the list shows. hidden: has sows the current tab or filter hides. A pen missing from pens is empty. */
+export type PenLevel = 'act' | 'live' | 'plain' | 'hidden';
+export interface PenMapLabels { map?: string; legend?: string; act?: string; live?: string; plain?: string; empty?: string; hidden?: string; pen?: (code: string) => string }
+export interface PenMapProps {
+  /** Column letters, in order. */
+  lanes?: string[];
+  /** Rows (pens per lane). Pen codes are the lane then the row: B3, A120. */
+  depth?: number;
+  pens?: Record<string, PenLevel>;
+  /** The pen the map opens centred on. */
+  current?: string;
+  /** The data-action of every tile that can be opened; its data-value is the pen code. */
+  action?: string;
+  /** Names this map for the peek registry; give each map on a page its own. */
+  key?: string;
+  /** Pens per range in the footer control (default 20). */
+  rangeSize?: number;
+  entrance?: string;
+  /** The word after each legend count; a level with no pens is not drawn. */
+  legend?: { act?: string; live?: string };
+  labels?: PenMapLabels;
+  /** The hold-to-peek card for a pen, as HTML (see penPeek). Without it a hold does nothing. */
+  peek?: (pen: string) => string;
+  className?: string;
+}
+export interface PenPeekProps { title?: string; meta?: string; rows?: RowProps[] }
+export interface PenMapFooterProps { back?: { action?: string; value?: string; label?: SheetText }; depth?: number; rangeSize?: number; label?: string }
+export interface SentriUI {
+  penMap(props?: PenMapProps): string;
+  penPeek(props?: PenPeekProps): string;
+  /** Back alone, or Back beside the range control when a row has more than rangeSize pens. */
+  penMapFooter(props?: PenMapFooterProps): string;
+  /** Mounts the maps under a node; a map is also mounted by itself when it enters the document. */
+  penMapMount(scope?: ParentNode): void;
+}

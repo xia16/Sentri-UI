@@ -194,6 +194,8 @@ Words the room list, the allocation sheet and the Task overview print, defined a
 | **Hand-reared** 人工哺育 | piglets | piglets kept on the dead sow's record and raised by hand in her crate (bottle or milk replacer) | from the choice, while any remain | one sow. Printed `{n} hand-reared`; piglet care continues on her record |
 | **Left the task** 已离开任务 | sows | sows off the room list: Aborted with no live piglet, or Sow died with no piglet left to allocate or hand-rear | from the moment the last piglet has a place or none was alive | one task. Printed once on the Task overview as `Left the task · n aborted · n sow died`; they are no longer in Done · Active · Awaiting, so every total still adds up (`7 / 18` once one of 19 has left) |
 | **Rearing pen** 代养栏 | a farm place | a pen the farm keeps for piglets without a sow (a "rescue deck") | farm configuration | one farm. Whether the farm has one is a farm-level option; its configuration is open |
+| **Need you** 需处理 / **Farrowing** 分娩中 (the Go to pen legend) | pens | need you: pens where a sow the list shows is at the animal row's act level (overdue, or sow died with piglets to allocate). Farrowing: else pens where one is farrowing now. Each is a count of pens, never of sows | now, from the room list under the current tab and filter | one room. A level with no pen is not printed |
+| **Entrance** 入口 (the Go to pen band) | a farm place | the door of the room, drawn at the top of the pen map: pen 1 is nearest it | farm layout | one room. The map is drawn from the door, whichever way the lanes run |
 
 ## Count grammar
 
