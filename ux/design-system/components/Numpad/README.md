@@ -41,7 +41,7 @@ Call `SentriUI.numpad({ label, value, unit, placeholder, suggested, decimals, ma
   - Returning to the suggestion is a separate, named transition: a text action in the status line, `Use 000258` (`actions`). It feeds `numpadInput(state, 'suggestion')`.
 - **Full:** a tag at `maxLength` digits, a weight at `intLength` whole digits with no point, or a weight with all its `decimals` places. The digit keys wear the floor-gray, and ⌫ stays live.
 - **Pressed:** the key scales to .96 and fills `press`. There is no transform under reduced motion.
-- **Disabled — the floor-gray** (see *States* in the design-system README). A key with nothing to do stays tappable, and the host answers the dead tap in the status line:
+- **Disabled — the floor-gray** (see *States* in the design-system README): `disabled-surface`, a dashed rim, the digit or glyph in `ink-2` (7.4:1, never faded). A key with nothing to do stays tappable, and the host answers the dead tap in the status line:
   - a digit when full: `Tag is 6 digits` or `2 decimal places at most`;
   - ⌫ on empty: `Nothing to delete`;
   - `.` after a point.

@@ -31,12 +31,12 @@ Container; visible verb label; optional leading icon; optional loading marker; o
 | --- | --- |
 | Default | Label or glyph at rest. |
 | Pressed | Visible press fill / darkening and movement; static examples use `data-preview="pressed"`. |
-| Disabled | Persistent text reason via `reason` or `describedby`; never colour alone. Prefer omitting unavailable acts. |
+| Disabled | The disabled face: `disabled-fill`, a dashed `control-border` rim, the label in `ink` (never faded; every register, tool included). Persistent text reason via `reason` or `describedby`; never colour alone. Prefer omitting unavailable acts. A text action has no surface: its word goes `muted`. |
 | Long / Chinese | Visible Button labels wrap without ellipsis; icon accessible names remain complete. |
-| Waiting | Focusable `aria-disabled`. In a sheet footer it stands alone: the reason is its screen-reader description, never a drawn line. |
+| Waiting | Focusable `aria-disabled`, the same disabled face (dashed rim, ink label) so it never reads as live. In a sheet footer it stands alone: the reason is its screen-reader description, never a drawn line. |
 | Loading | `busy`, `aria-busy`, ellipsis and reason; no duplicate commit. |
 | Hold: Holding / Armed | Progress sweep / second-press instruction and an outline on the armed button. |
-| Hold: Pending / Done / Unknown | Recording / terminal result captions; Unknown never offers the act again. |
+| Hold: Pending / Done / Unknown | Recording / terminal result captions in the register's own text colour (paper on red or ink); Unknown takes the disabled face and never offers the act again. |
 | Hold: Failed | Return to idle only after a confirmed failure, with a reason. |
 
 No empty state: omit an action with no label. No field error state: put validation on the relevant field and explain the waiting action once.
@@ -67,7 +67,7 @@ Do name the act, give one visible reason while it waits and keep one primary per
 
 Implementation: [bundle.js](../bundle.js), [bundle.css](../bundle.css), [index.d.ts](../index.d.ts). Factories return HTML; event delegation and business writes belong to the host. Existing register and helper signatures remain supported; TaskHold binding is a compatibility alias, not a second implementation.
 
-Geometry/type: `tap-min`, `control-height`, `back-width`, `radius-control`, `border-width`, `space-4`, `space-7`, `space-8`, `space-10`, `space-17`, `type-button-size`, `type-hold-caption-size`, `font-sans`. Colour/state: `ink`, `ink-2`, `paper`, `well`, `line`, `control-border`, `disabled-fill`, `disabled-ink`, `press`, `focus`. Hold: `hold-commit`, `hold-sweep-opacity`, `task-hold-caption-opacity`; destructive uses `red`.
+Geometry/type: `tap-min`, `control-height`, `back-width`, `radius-control`, `border-width`, `space-4`, `space-7`, `space-8`, `space-10`, `space-17`, `type-button-size`, `type-hold-caption-size`, `font-sans`. Colour/state: `ink`, `ink-2`, `paper`, `well`, `line`, `control-border`, `disabled-fill`, `press`, `focus`. Hold: `hold-commit`, `hold-sweep-opacity`, `task-hold-caption-opacity`; destructive uses `red`.
 
 ## Related components
 
