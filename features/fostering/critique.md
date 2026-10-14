@@ -57,6 +57,40 @@ The law and its boards fix the design (two headers, the line's three tests); the
 - Reach: 153 screens move, all in this change's features; 138 identical; none broken. npm test 674 pass; legibility and spacing pass on every moved screen; farrowing scenarios 87 of 87 in EN (ZH blocked on main as well).
 - **Better because** each header says one thing the same way everywhere, and every fact it no longer carries has a designed place in the body.
 
+## Small fixes (2026-10-14): the Move sheet at 360
+
+Scope: the bare screens' width at 360 and the "All 10" target; the sheet's design stays as Keep above says.
+
+### Problems
+- **major** · At 360 every `fostering.*` screen is 390px wide and cropped (the 360 shots end mid-tile, mid-checkbox, mid-primary): `atlas-bare.js` pins a bare screen to 390px and, because `move.html` loads it after the phone is drawn, its pin lands after a 360 phone's width and wins. On a real 360 phone (no `?screen=`) the sheet fits.
+- **minor** (questioned) · "All 10" measures 48×20: the Heading component already gives its action an invisible `::after` hit area (`inset: -16px -8px`, 64×52), which `elementFromPoint` and `check-legibility` both count. No change.
+
+### Parts
+| Part | Drawn by today | The component whose job it is | Keep / fix / cut |
+|---|---|---|---|
+| The bare screen's width | `atlas-bare.js` (390px) over the page | the page's layout CSS (`move.html`) | **fix**: the bare screen is the window's width |
+| All 10 | Heading action (Button, text register) with its 48px hit area | Heading | **keep** |
+
+### Self-crit (small fixes, 2026-10-14)
+No competing directions: each problem has one fix that changes only the named part. Final look: screens of d658bce (this block's commit adds no pixel), rendered at 390 and 360 in EN and ZH beside base 7f5b627. The gate's diff moves exactly six screens: inspection.walk-recorded ZH (再次签到 in the check-in row), pig-profile.unavailable-actions ZH (the sheet, as in EN), and the four fostering.* at 360 (the sheet now fits the screen: both choice tiles, checkboxes and the footer whole); 285 screens identical.
+- Known, not fixed: at 360 the Move sheet's primary (`Move 2 · C03 → C05`, `转移1头 B10→B08`) wraps to two lines; the crop used to hide it. It is the footer component's fit, not this page's layout.
+- **Better because** each screen now shows what it claims: Chinese copy in the check-in row, the sheet in ZH, and the whole Move sheet at 360.
+
+## Crit round 1 (driver, c65d58b): the Move primary at 360
+
+### Problems
+- **major** · At 360 the Move primary wraps to two lines (`Move 2 · C03 → C05`, `转移1头 B10→B08`), breaking the 56px footer; the crop hid it until the bare screen fit. The label repeats the source crate, which the selected tile above already says (`Out of C03` / `Into B08` names this crate, the To / From crate field the other).
+
+### Parts
+| Part | Drawn by today | The component whose job it is | Keep / fix / cut |
+|---|---|---|---|
+| Move primary label | footer primary, `pp.move.act.move` | footer primary | **fix**: verb + count + place, `Move {n} to {to}` / `转移{n}头至{to}`, the form `pp.move.act.move_with` already uses; type unchanged |
+
+### Self-crit, crit round 1 (2026-10-14), then Final look
+Final look: screens of a2990df (this block's commit adds no pixel), every inspection and fostering screen plus pig-profile.unavailable-actions rendered at 390 and 360 in EN and ZH beside base 7f5b627. Moved: inspection.walk-recorded, inspection.finish (`7单元签到`), inspection.review-selected (the Selected sheet, as in EN) and pig-profile.unavailable-actions in ZH; the four fostering.* at 360, and fostering.piglets and fostering.result at 390 for the label. The Move primary is one line at 360 in EN (`Move 2 to C05`) and ZH (`转移1头至B08`), 56px, type unchanged; the source crate stays in the selected tile and the crate field.
+- Known, not fixed: the End walk sheet's body copy (`Recorded during this walk`, the check-in note) is still English in ZH.
+- **Better because** the Move sheet fits 360 with a one-line primary that says verb, count and place, and every Inspection sheet named opens and speaks Chinese in ZH.
+- Final look after the merge of main (851dcba, docs and gate only): the screens of 3b81324, rendered by the gate at 390 and 360 in EN and ZH against base 851dcba, mechanical pass; only SCOPE moved (health-record.care-states en-360, 0.03%, renders differently twice on base: noise). This line's commit adds no pixel.
 
 # Header corners (2026-10-14)
 

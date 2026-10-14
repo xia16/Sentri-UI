@@ -29,6 +29,12 @@ Crit round 2: the first design (unit as a grey label beside Log and a dark End w
 
 Chains walked on the real Back path after this change (crit round 1): no surface here writes to or is about one animal without showing it on screen or one Back away; no line changed.
 
+## Check in again (2026-10-14)
+
+| Fact | Level | Question it answers | Change |
+|---|---|---|---|
+| `Check in again` (EN) / `再次签到` (ZH), the check-in row's action once the unit is checked in | action, quiet text | Can I record another check-in for this unit? | kept; Chinese copy added, nothing else drawn |
+| `Check in to Unit 7` / `7单元签到`, the End walk sheet's primary | Act now (the primary) | What does this tap record, and for which unit? | kept; Chinese copy added |
 
 ### Corner actions and titles (2026-10-14)
 

@@ -22,6 +22,9 @@
 .mv-over { display: contents; }
 .mv-find { display: flex; align-items: center; gap: var(--space-footer-gap); }
 .mv-find > .field { flex: 1; min-width: 0; margin: 0; }
+/* A bare screen (?screen=) is as wide as the window it opens in (390 in the atlas). atlas-bare.js pins it to 390px and, loaded
+   after the phone is drawn, lands after a narrower phone's width (a 360 shot), so the sheet ran 30px past the screen's edge. */
+html.atlas-bare:root, html.atlas-bare:root body, html.atlas-bare:root .atlas-phone { width: 100vw !important; }
 </style>
 </head>
 <body class="tk-stage">
