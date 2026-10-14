@@ -68,7 +68,16 @@ test('headers: a page takes the page header (Back top left, title, line); TaskHe
   assert.match(th, /<h1 class="st-page-title">Farrowing<\/h1><p class="st-header-line" data-line="fact">Last record 08:41<\/p>/);
   assert.match(globalThis.SentriTask.header({ title: 'Piglet processing' }), /class="st-page-back" data-action="back"/, 'Back always');
 });
-test('headers: Reset and Clear are quiet text in the footer, left of the primary', () => {
+test('headers: Reset and Clear are the sheet header\'s corner action (top right); the footer keeps Back and the primary', () => {
+  const d = UI.sheet({ title: 'Record dead', corner: { label: { text: 'Clear', str: 'act.clear' }, action: 'clear' }, body: '', footer: UI.sheetFooter({ primary: { label: 'Save', action: 's' } }) });
+  assert.match(d, /<div class="sheet-text" data-corners="end"><h2 class="sheet-title">Record dead<\/h2><button type="button" class="st-text-action st-sheet-corner"[^>]*data-corner="end"[^>]*>[^]*data-str="act.clear"/);
+  const r = UI.sheet({ title: 'Farrowing record', line: { text: 'B1' }, corner: { label: 'Clear', action: 'clear' }, body: '' });
+  assert.match(r, /class="sheet-text" data-corners="end"><h2 class="sheet-title">Farrowing record<\/h2><p class="st-header-line"[^]*st-sheet-corner/, 'the corner is centred on the title + line block');
+  assert.doesNotMatch(UI.sheet({ title: 'Record dead', body: '' }), /sheet-text|st-sheet-corner/, 'no corner, no block: the header is as before');
+  assert.match(UI.sheet({ title: 'T', cross: { action: 'dismiss' }, body: '' }), /<button type="button" class="st-sheet-corner" data-corner="start"[^>]*aria-label="Close"/);
   const f = UI.sheetFooter({ back: { action: 'back' }, quiet: { label: 'Clear', action: 'clear' }, primary: { label: 'Save', action: 's' } });
-  assert.match(f, /surface-back[^]*class="st-text-action st-footer-quiet"[^]*data-action="clear"[^]*class="button primary"/);
+  assert.doesNotMatch(f, /data-action="clear"/, 'the footer quiet action is retired');
+  const fs = UI.filterSheet({ title: 'Filter sows', reset: { label: 'Reset', action: 'r' }, apply: { label: 'Show 4 sows', action: 'a' } });
+  assert.match(fs, /utility-header[^]*data-corner="end"[^]*<\/header>/);
+  assert.doesNotMatch(UI.filterSheet({ title: 'Filter sows', reset: false }), /st-sheet-corner/);
 });

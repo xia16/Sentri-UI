@@ -167,11 +167,11 @@
   }
   // Save (or the step's primary), and the reason it waits (Button's waiting face, ADR 0002): the footer's status line
   // the answer a sanity question takes (`17 is right`, `None are there`) is the status line's text action
-  function saveFooter(p, waiting, action, id, args, backAction, quiet) {
+  function saveFooter(p, waiting, action, id, args, backAction) {
     // a waiting primary stands alone (farrowing): its reason shows once it is tapped (the guard), then stays while it applies
     var st = p ? { text: PP.t(p.id, p.args), str: p.id, args: p.args, id: 'ct-why', visible: !!S.why || !!p.act || !!p.block } : null;
     if (st && p.act) st.action = { label: s(p.act.id, p.act.args), action: p.act.action, value: String(S.observed) };
-    return K.footer({ back: { action: backAction || 'back' }, quiet: quiet || null, status: st, primary: { label: s(id || 'act.save', args), action: action || 'save', waiting: waiting } });
+    return K.footer({ back: { action: backAction || 'back' }, status: st, primary: { label: s(id || 'act.save', args), action: action || 'save', waiting: waiting } });
   }
   // What is open on this litter (missing or extra piglets, the task ended): status, the first line of the count's body.
   function openLine() {
@@ -324,10 +324,10 @@
     if (S.blank) hero = hero.replace(/(<span class="st-stepper-value"[^>]*?)\s+data-str="[^"]*"(?:\s+data-args="[^"]*")?([^>]*>)\d+(<\/span>)/, '$1 data-str="pp.count.blank"$2–$3').replace(' data-zero=""', '');
     // a held body is answered here too, above the number (R1-22): the drawer never hides the question under it
     // Count is launched from the litter: no header line. What is open (missing, extra, ended) is status: the body's first line.
-    // Clear is quiet text in the footer, present only when the count was changed.
-    return K.drawer({ size: 'long', view: 'count', title: s('pp.count.title'), close: { action: 'dismiss' },
+    // Clear is the header's corner action, top right (owner, 2026-10-14), present only when the count was changed.
+    return K.drawer({ size: 'long', view: 'count', title: s('pp.count.title'), corner: dirty() ? { label: s('act.clear'), action: 'clear' } : null, close: { action: 'dismiss' },
       body: '<div class="ct-body">' + U.note(openLine()) + heldRow() + settleRows() + hero + zeroSection(d) + rosterRow(d) + '</div>',
-      footer: saveFooter(p, !d.event || !!stale() || S.failed || S.blank || !!sanity(d), null, null, null, null, dirty() ? { label: s('act.clear'), action: 'clear' } : null), scrim: { action: 'dismiss' } });
+      footer: saveFooter(p, !d.event || !!stale() || S.failed || S.blank || !!sanity(d)), scrim: { action: 'dismiss' } });
   }
 
   /* ---- where the ledger does not take a count, the door says why: before the lock the count is the farrowing sheet's (hand-off);

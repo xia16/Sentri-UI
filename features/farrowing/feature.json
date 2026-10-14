@@ -1287,7 +1287,7 @@
                 "shows": "+ stops when drafted deaths equal Alive now; saving lowers Alive now"
               }
             ],
-            "logic": "Value = saved total + this draft (\"+1 unsaved\" in muted ink beside the label). − only undoes the draft and is disabled at 0 draft. The footer's Clear appears only while something is drafted.",
+            "logic": "Value = saved total + this draft (\"+1 unsaved\" in muted ink beside the label). − only undoes the draft and is disabled at 0 draft. Clear (top right of the header) appears only while something is drafted.",
             "source": "farrowing-astra-concept.js death(), act(\"deadStep\")",
             "at": "Crushed"
           },
