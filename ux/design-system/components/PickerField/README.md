@@ -29,7 +29,7 @@ Visible label; trigger value, chosen names (record forms, up to two lines then +
 | Default | Missing value stays missing; Select (single) or None (multi). |
 | Pressed | `choice-press`; static `pressed` prop for rows and triggers. |
 | Selected / active | Trailing ink check or checkbox plus stronger label (selection is never green); trigger shows the picked value (a cascade shows its leaf, never the path), the chosen names (record forms) or a count (filters). |
-| Disabled | Prefer omission. If needed, retain readable text and a persistent reason; `aria-disabled`, no dimming. Host rejects activation and announces the reason. |
+| Disabled | Prefer omission. If needed, `disabled-surface` with a dashed rim, the value in `ink` and a persistent reason; `aria-disabled`, no dimming. Host rejects activation and announces the reason. |
 | Error | Picker trigger has `aria-invalid`, a red border and red corrective text. "Required" is the error a host gives an empty required field when its waiting commit is tapped (`required: true` marks it). ChoiceList is not a validated field: host supplies the field error. |
 | Loading | Busy trigger and Loading options status; selection unavailable until loaded. |
 | Empty | No options available or search-specific no-match status. Never a blank panel. |
@@ -55,7 +55,7 @@ Whole rows and every step, footer and Clear action meet `tap-min`. Checkboxes us
 
 Implementation: `../bundle.js`, `../bundle.css`, types in `../index.d.ts`. Legacy call signatures remain supported. `pickerOptions` is a compatibility adapter to ChoiceList, not another row renderer. `pickerBody` takes controlled `items` (value, label, children?, aliases?, meta?, attrs?), `path`, `selected`, `query`, action and stepAction. Hosts keep two lists for a multi picker, the applied one (the trigger) and the draft (the sheet), and append a branch value, or slice the path to `up.value` when ‹ Parent is tapped (its `stepAction`); leaf selection toggles only in multi. `pickerHead` gives the header's level; `pickerFooter` renders the sole exit pair (Sheet's Back + Done · n). Hosts own data, persistence and modal lifecycle. Keep display paths separate from recorded ids/names. Going up clears search. Multi inputs emit native change with `value` and `checked`; branch buttons emit `data-action` and `data-value`. `secondaryAction` exposes a separately named removal control for session-defined options. Do not route checkbox clicks through the branch action.
 
-Tokens: `tap-min`, `choice-row-min`, `radio-row-min`, `field-height`, `radius-control`, `control-border`, `rule`, `paper`, `ink`, `muted`, `green`, `choice-press`, `disabled-surface`, `disabled-ink`, `red`, `font-sans`, `font-size-14`, `type-weight-strong`, `space-8`, `space-12`, `size-20`, `size-24`. No per-screen trigger sizing.
+Tokens: `tap-min`, `choice-row-min`, `radio-row-min`, `field-height`, `radius-control`, `control-border`, `rule`, `paper`, `ink`, `muted`, `green`, `choice-press`, `disabled-surface`, `red`, `font-sans`, `font-size-14`, `type-weight-strong`, `space-8`, `space-12`, `size-20`, `size-24`. No per-screen trigger sizing.
 
 Shared copy (Select, None, counts, All, Done, loading and empty) has English/Chinese registry ids in `ux/laws/strings.json`; hosts resolve `data-str` / `data-args` and search `data-str-attr`, or supply localized search copy through `choiceSearch`. Item labels/meta accept `strs` / `args`.
 

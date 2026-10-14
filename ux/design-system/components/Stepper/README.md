@@ -24,7 +24,7 @@ Label; optional description; decrease key; spinbutton value; increase key; persi
 | Default | See rendered variant examples. |
 | Empty | See rendered variant examples. |
 | Pressed | See rendered variant examples. |
-| Floor | The key at the bound takes the disabled face (aria-disabled); the bound (0, or the saved count when only additions are allowed) is the host's product rule. |
+| Floor | The key at the bound takes the floor-gray: `disabled-surface`, a dashed `control-border` rim and an `ink-2` glyph (7.4:1, never faded; aria-disabled); the bound (0, or the saved count when only additions are allowed) is the host's product rule. |
 | Ceiling | See rendered variant examples. |
 | Disabled | Visible reason; controls cannot change the value. |
 | Error | Persistent corrective message, not colour alone. |
@@ -50,7 +50,7 @@ Do use row for repeated fields and count for the primary count. Do reject refuse
 ## API and tokens
 SentriUI.stepper({variant, label, description, value, min, max, step, key, action, draft, changed, status, hint, hintHtml, pointers, reserveHint, disabled, reason, error, loading, pressed, strs, args}). Legacy hero maps to count. SentriTask.stepper is a compatibility adapter only; face maps to variant.
 
-CSS variables: tap-min, control-height, field-height, stepper-row-min, hero-key, glyph-key, glyph-key-hero, space-key-gap, space-row-y, space-8, space-panel, radius-control, radius-count, radius-inset, font-sans, font-mono, type-entry-label-size, type-step-value-size, type-section-title-size, type-hero-count-size, type-figure-well-size, type-description-size, ink, muted, paper, well, control-border, disabled-fill, disabled-ink, press, amber, green, size-2, size-3. All sizing and colour resolve to tokens.
+CSS variables: tap-min, control-height, field-height, stepper-row-min, hero-key, glyph-key, glyph-key-hero, space-key-gap, space-row-y, space-8, space-panel, radius-control, radius-count, radius-inset, font-sans, font-mono, type-entry-label-size, type-step-value-size, type-section-title-size, type-hero-count-size, type-figure-well-size, type-description-size, ink, muted, paper, well, control-border, disabled-surface, ink-2, press, amber, green, size-2, size-3. All sizing and colour resolve to tokens.
 
 ## Related components
 [Measure](../Measure/README.md), [Numpad](../Numpad/README.md), [Field](../Field/README.md), [Sheet](../Sheet/README.md).
