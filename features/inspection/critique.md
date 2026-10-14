@@ -123,3 +123,10 @@ Scope: the header-to-body gap (Headers law: `space-section`, 24px, the header's)
 #### Round 1
 - The header check now reads 24px on these screens (0 defects at the candidate); the body rises by the stacked padding and nothing else moves.
 - **Better because** the gap under every header is the header's alone, as on every other page.
+
+#### Final look (61bc01e, pushed head; renders at 390 and 360, EN and ZH, beside 39637ff; the gate's pairs at 4571e5e)
+- Reach: 19 screens moved (gate, base 39637ff), all in this change's scope (farrowing, inspection, pig-list, pig-profile, health-record, environment, fostering); `assistant.up-to-date` is the gate's known flaky screen. 272 identical, none broken.
+- Problems fixed: Clear and Reset sit at the top right, 0px off the title block's centre (with and without a line), present only while there is something to clear; the footers are Back and the primary; every drawer title fits 204px and every page title 216px at a true 360 (header check: 0 defects on the changed screens); the 24px under each header is the header's alone.
+- Keep as strong: titles that fit, bodies, rows and primaries unchanged; Filter sows and Filter pigs at their defaults now show no Reset.
+- Squint: the title, then the first card; the corner word stays quiet.
+- **Better because** the act that empties a draft leaves the thumb's commit zone, every drawer clears in the same place, and no title can collide with a corner at 360.
