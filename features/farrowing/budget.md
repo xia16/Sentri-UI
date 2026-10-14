@@ -68,4 +68,4 @@ By the Headers law → Corner actions and Title length (`ux/design-system/README
 | Record piglet deaths (page) | none | | **`Record piglet deaths`** (was `Report piglet mortality`, 223px): the verb every other death record uses (`Record dead`), and `deaths` is the worker's word for `mortality` | 208px (page title) |
 | Every other drawer title | none | | unchanged; all measured under 204px (the header check's room: 360 − 2 × (18 + 48 + 12)) | |
 
-The PRD's owner decision of 2026-10-10 ("the sheet becomes `N piglets to allocate`") is kept in substance: the sheet says how many, in its first body line; the scenarios' visible text for the allocation sheet now reads `Allocate piglets`.
+The PRD's owner decision of 2026-10-10 ("the sheet becomes `N piglets to allocate`") is kept in substance: the sheet says how many, in its first body line; the scenarios' visible text for the allocation sheet now reads `Allocate piglets`, and their count facts read `N piglets ·` (the first body line).

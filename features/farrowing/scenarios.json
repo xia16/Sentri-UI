@@ -2115,7 +2115,7 @@
                "hard": "dead-end"
               },
               {
-               "text": "9 piglets to allocate",
+               "text": "9 piglets ·",
                "in": "sheet"
               }
              ]
@@ -2152,7 +2152,7 @@
                ],
                "visible": [
                 {
-                 "text": "4 piglets to allocate",
+                 "text": "4 piglets ·",
                  "in": "sheet",
                  "hard": "wrong-fact"
                 },
@@ -2338,7 +2338,7 @@
          "hard": "dead-end"
         },
         {
-         "text": "7 piglets to allocate",
+         "text": "7 piglets ·",
          "in": "sheet"
         },
         {
