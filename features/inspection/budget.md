@@ -34,3 +34,4 @@ Chains walked on the real Back path after this change (crit round 1): no surface
 | Fact | Level | Question it answers | Change |
 |---|---|---|---|
 | `Check in again` (EN) / `再次签到` (ZH), the check-in row's action once the unit is checked in | action, quiet text | Can I record another check-in for this unit? | kept; Chinese copy added, nothing else drawn |
+| `Check in to Unit 7` / `7单元签到`, the End walk sheet's primary | Act now (the primary) | What does this tap record, and for which unit? | kept; Chinese copy added |

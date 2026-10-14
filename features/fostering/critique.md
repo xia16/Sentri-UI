@@ -75,3 +75,13 @@ Scope: the bare screens' width at 360 and the "All 10" target; the sheet's desig
 No competing directions: each problem has one fix that changes only the named part. Final look: screens of d658bce (this block's commit adds no pixel), rendered at 390 and 360 in EN and ZH beside base 7f5b627. The gate's diff moves exactly six screens: inspection.walk-recorded ZH (再次签到 in the check-in row), pig-profile.unavailable-actions ZH (the sheet, as in EN), and the four fostering.* at 360 (the sheet now fits the screen: both choice tiles, checkboxes and the footer whole); 285 screens identical.
 - Known, not fixed: at 360 the Move sheet's primary (`Move 2 · C03 → C05`, `转移1头 B10→B08`) wraps to two lines; the crop used to hide it. It is the footer component's fit, not this page's layout.
 - **Better because** each screen now shows what it claims: Chinese copy in the check-in row, the sheet in ZH, and the whole Move sheet at 360.
+
+## Crit round 1 (driver, c65d58b): the Move primary at 360
+
+### Problems
+- **major** · At 360 the Move primary wraps to two lines (`Move 2 · C03 → C05`, `转移1头 B10→B08`), breaking the 56px footer; the crop hid it until the bare screen fit. The label repeats the source crate, which the selected tile above already says (`Out of C03` / `Into B08` names this crate, the To / From crate field the other).
+
+### Parts
+| Part | Drawn by today | The component whose job it is | Keep / fix / cut |
+|---|---|---|---|
+| Move primary label | footer primary, `pp.move.act.move` | footer primary | **fix**: verb + count + place, `Move {n} to {to}` / `转移{n}头至{to}`, the form `pp.move.act.move_with` already uses; type unchanged |
