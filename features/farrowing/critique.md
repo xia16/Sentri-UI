@@ -111,3 +111,33 @@ The law and its boards fix the design (two headers, the line's three tests); the
 - Footers: fostering's primary stays on one line at 56px in Chinese at 390; Find a pig's primary is "Search".
 - Reach: 153 screens move, all in this change's features; 138 identical; none broken. npm test 674 pass; legibility and spacing pass on every moved screen; farrowing scenarios 87 of 87 in EN (ZH blocked on main as well).
 - **Better because** each header says one thing the same way everywhere, and every fact it no longer carries has a designed place in the body.
+
+# Record dead: spacing and the optional photo (2026-10-14)
+
+Scope: `farrowing.death` (the one Record dead drawer). `farrowing.death-breakdown` is a separate read view (`deathBreakdown()`), not this sheet, so it is out of scope. Owner ruling 2026-10-13, board option **B**. Baseline: `origin/main` at `7f5b627`, `farrowing.death` at 390 and 360, EN and ZH, plus its no-draft and The sow states.
+
+## Keep
+
+- **The Piglets / The sow switch** (Segment `view-switch`): one switch at the top of the body, the sow offered only while she is alive.
+- **The six cause rows** (Stepper `row`): label left, `− n +` right, hairlines between rows, the unsaved draft in muted text beside its label. Option C (a quieter − at its floor) was not chosen: the stepper stays as it is.
+- **The sow's causes** (ChoiceList radios in one card), the danger banner and the hold-to-record footer.
+- **The footer**: Back, Clear only when there is something to clear, the primary naming the count.
+- **The header** (title, its hairline and the 24px gap from the Headers law, #150): unchanged.
+
+## Problems
+
+- **major** · The first cause row reads as part of the switch. The switch ends 10px above the first `−` while the rows' keys are 22px apart; `scripts/check-spacing.mjs --changed farrowing.death` on `7f5b627`: "inversion div.st-selection is 21px from the list of 6 Stepper.st-stepper whose rows are 43px apart" and "crowding button and Stepper.st-stepper are 4px apart". Owner, 2026-10-13 (option B).
+- **major** · The optional photo is hidden until a death is drafted (`death()` renders `SentriUI.photos` only when `n` or a sow cause is set), so the worker cannot see that a photo can ride the record; the spec says optional photos with the camera disabled until a death is entered, and the screen's notes said so while the screen did not (ledger L8). Owner: "the optional photo part seems weird".
+- **minor** · The screen's notes describe a "Dead header" with "Dead 6", "Born dead or died" and Clear in the head, none of which the screen shows since #150 (ledger L8).
+
+## Parts
+
+| Part | Drawn by today | The component whose job it is | Keep / fix / cut |
+|---|---|---|---|
+| Piglets / The sow switch | `SentriUI.segment` (`view-switch`) | Segment | **keep** the component; **fix** the space under it (page layout) |
+| Divider on the switch | none today (the first row has no top rule) | | nothing to remove |
+| Cause rows | `farmStepper` → Stepper `row` | Stepper | **keep** |
+| Sow cause | `SentriUI.choiceRadios` | ChoiceList | **keep** |
+| Photos | `SentriUI.photos`, rendered only once a death is drafted | Photos (the optional row, Field's optional-row law) | **fix**: always rendered, last in capture order; inactive until a death, its reason in the component's hint line |
+| Danger banner (the sow) | `SentriUI.banner` | Banner | **keep** |
+| Footer | `footer()` + Button / hold | Sheet footer | **keep** |

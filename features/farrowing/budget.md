@@ -52,3 +52,17 @@ The header line of every surface of this feature, decided by the Headers law (`u
 Moved, not cut (crit rounds 1 and 2): the task receipt's closure stamp (`Farrowing · Oct 11 · 09:41 · G.H`), Scan actions' count (`2 sows`), the allocation's sow-died line and the finished record's stamp (`Finished Aug 27 at 08:12 by G.H`, Audit) each open their body as the quiet group label (13px muted, 8px over their card); Scan's Scanning / Stopped is the body's first line.
 
 Chains walked (crit round 1): the room, the record drawer, the logs and the pen pages read as before; More actions and Piglet processing now carry the route, so every action page about her is one Back from her chip.
+
+## Record dead (2026-10-14)
+
+Kept facts (not changed by this pass), with the question each answers: the title `Record dead` (what am I doing?); the switch `Piglets` / `The sow` (whose death?); each cause's label and count (how many of each so far, with this draft?); `+n unsaved` beside a drafted cause (what will this save add?); the sow's four causes and the banner `Saving ends farrowing · N alive stay under piglet care` (what does saving her death do?); the primary `Record N deaths` / `Record sow death` (what will the tap commit?).
+
+Facts this pass touches:
+
+| Fact | State | Question it answers there | Level |
+|---|---|---|---|
+| `Photos` (the optional row's label, camera glyph) | always, last in capture order | Can I attach a photo to this record? | Settled (quiet card) |
+| `Record a death first · photos ride that record` (the hint line, the Photos component's registered `ds.c2.photos.inactive`) | no death drafted (piglets) or no cause chosen (the sow) | Why can't I take a photo yet? | Settled (muted hint; the tap re-announces it) |
+| `N attached` (the row's answer) and thumbnails | after a photo | Did my photo go on this record? | Settled |
+
+Cut: nothing new. Hiding the Photos row until a death is drafted is cut (the row waits visibly instead). Nothing is added to the header.
