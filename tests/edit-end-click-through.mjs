@@ -1,16 +1,13 @@
 // Edit, the litter record and End click-through (scenario round 1: R1-7, R1-12, R1-13, R1-14, R1-21, R1-28, R1-29,
 // R1-30, N5, N6; owner round 4: two answers to a possible double, End with reviews open). Every fixed flow from the room
 // by real taps. Run: node tests/edit-end-click-through.mjs [port]
-// Uses the Playwright the design lint installs (~/.cache/adam-design/playwright-<v>).
+// Uses the project's Playwright (scripts/playwright-path.mjs).
 import { spawn } from 'node:child_process';
-import { createRequire } from 'node:module';
-import { homedir } from 'node:os';
-import { join } from 'node:path';
 import assert from 'node:assert/strict';
+import { playwright } from '../scripts/playwright-path.mjs';
 
 const port = Number(process.argv[2]) || 4608;
-const require = createRequire(join(homedir(), '.cache', 'adam-design', 'playwright-1.63.0', 'package.json'));
-const { chromium } = require('playwright');
+const { chromium } = playwright();
 const server = spawn(process.execPath, ['scripts/serve-ux.cjs', String(port)], { stdio: 'ignore' });
 const base = `http://localhost:${port}/ux/tasks/piglet-processing/`;
 const ready = (p) => p.waitForSelector('html[data-ready]');
