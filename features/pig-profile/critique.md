@@ -144,3 +144,8 @@ Scope: the header-to-body gap (Headers law: `space-section`, 24px, the header's)
 
 #### Crit round 1 (driver, on 50e04b7)
 - Reason: `Measure & condition` is not a name (a verb mashed with a noun). Fixed: the sheet is `Measurements` (137px), a noun phrase for what it holds; recorded in `budget.md`. The other rewrites were checked against the same test: `Report fault`, `Allocate piglets`, `Correct piglet count`, `Record piglet deaths` name a task as every task title here does (`Record dead`); `Feed adjustment` and `Feeding exception` are nouns. Nothing else changed.
+
+#### Final look after crit round 1 (2449cb7, origin/main merged; renders at 390 and 360, EN and ZH, beside 39637ff)
+- Screens with changed titles, and fostering after the merge: `pig-profile.measurements` (`Measurements`), `environment.report-issue`, `farrowing.allocate`, `farrowing.reconcile`, `farrowing.piglet-death`, `fostering.piglets`, `fostering.result`. Header check: 0 defects (room, corner, gap, contents, wrap).
+- Fostering keeps main's primary (`Move 2 to C05`, #159) beside Back; Clear stays at the top right, now at a true 360.
+- **Better because** each title is a name that fits its room, and nothing else moved.
