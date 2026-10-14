@@ -31,3 +31,31 @@ The header line of every surface of this feature, decided by the Headers law (`u
 | Round pages outside the atlas (room, litter, count, dead, edit, id, bulk, move, end) | room: hub; the rest actions | room: fact (last record); others none; their status and instructions are the body's first line | | |
 
 Ambiguous, quieter option taken: Give IDs: `Fixing 001216` is cut, not moved (the tag field shows the number being fixed); the litter is one Back away on Piglets. The litter drawer of the round pages has no route line (that round has no sow page for a chip to open).
+
+---
+
+# Disabled is not faded (shared change, ds/disabled-not-faded), information budget
+
+Scope: the facts a disabled or waiting control displays. The change adds and cuts no fact; it changes how loud each one is.
+
+## Inventory
+
+- The control's label (the verb: `Save setting`, `Record deaths`, `Finish farrowing`).
+- The current option of a disabled segment (`Auto` of Auto / Manual).
+- The other options of a disabled segment.
+- The floor key's glyph (− at the floor, + at the ceiling, a digit on a full pad).
+- A disabled picker's current value (`None`, the chosen names).
+- That the control is unavailable now (today: faded text).
+
+## Questions
+
+1. What will this do once it is available? (the label, at full legibility)
+2. Can I use it now? (the surface and the rim: dashed means not now)
+3. What is it set to? (the current option: weight, not a raised pill)
+4. Why not, and what do I do? (the host's reason line or hint; unchanged by this change)
+
+## Levels
+
+- **Settled**: the label, the current option and the picker value, in ink (or `ink-2` on a floor key), at the control's own size and weight.
+- **Watch**: unavailability, quiet: the flat disabled surface and the 1px dashed `control-border` rim. No colour, no icon added.
+- **Cut**: faded text as the signal (opacity, `disabled-ink` text).
