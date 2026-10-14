@@ -35,4 +35,4 @@ By the Headers law → Corner actions and Title length (`ux/design-system/README
 
 | Surface | Corner action (top right) | Present while | Title | Fits at 360 (EN · ZH) |
 |---|---|---|---|---|
-| Report fault | none | | **`Report fault`** (was `Report equipment issue`): Farrowing and Inspection name the same job `Report fault`; the Equipment field says what broke; the primary keeps `Record issue` | 108px |
+| Report issue | none | | **`Report issue`** (was `Report equipment issue`, 219px; `Report fault` in round 1, crit round 2 rejected it): the title matches the action that opens it (`Report issue` on Maintenance) and the sheet's primary (`Record issue`), so the worker reads the same word from the tap to the save; Maintenance calls these issues, so `equipment` adds nothing (the Equipment field says what broke) | 114px |

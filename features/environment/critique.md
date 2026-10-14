@@ -101,3 +101,6 @@ The ruling fixes the design (the boards `evidence/2026-10-14-header-corners.png`
 - Screens with changed titles, and fostering after the merge: `pig-profile.measurements` (`Measurements`), `environment.report-issue`, `farrowing.allocate`, `farrowing.reconcile`, `farrowing.piglet-death`, `fostering.piglets`, `fostering.result`. Header check: 0 defects (room, corner, gap, contents, wrap).
 - Fostering keeps main's primary (`Move 2 to C05`, #159) beside Back; Clear stays at the top right, now at a true 360.
 - **Better because** each title is a name that fits its room, and nothing else moved.
+
+#### Crit round 2 (driver)
+- Reason: the sheet was titled `Report fault` while the action that opens it says `Report issue` and its primary `Record issue`. Fixed: titled `Report issue` (114px), recorded in `budget.md`. Inspection's renamed `Report fault` (choose a pen) already matches its form's title, its primary and the pen's action (all `Report fault`), so it stays. Nothing else changed.
