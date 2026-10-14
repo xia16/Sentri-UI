@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="expect" content="contents"><title>A count in a sheet header title</title>
+<link rel="stylesheet" href="../../ux/design-system/tokens.css"><link rel="stylesheet" href="../../ux/design-system/components/bundle.css"><script src="../../ux/design-system/components/bundle.js"></script>
+<style>html,body{margin:0}.ph{position:relative;height:844px;overflow:hidden;background:var(--app-background);font-family:var(--font-sans);color:var(--ink)}.ph .bg{padding:56px var(--space-gutter) 0}</style></head><body>
+<div class="ph"></div><script>
+const UI=window.SentriUI;
+const behind=()=>UI.panel(UI.row({title:'Litter',description:'Day 2 · B4'}),{className:'st-row-group'});
+const body=()=>UI.field({label:'Cause',control:'<textarea rows="3"></textarea>'});
+const foot=(p)=>UI.sheetFooter(Object.assign({back:{action:'back'},primary:{label:'Record death',action:'save'}},p||{}));
+const draw=(html)=>{document.querySelector('.ph').innerHTML='<div class="bg">'+behind()+'</div>'+html;};
+// A corner action in the sheet header (ruling C, 2026-10-14): a 48px target at the top right (or left), its centre placed on
+// 'block' (the title's top to its line's bottom: the law), 'title' (the title alone) or 'box' (the header box).
+const corner=(label,{side='right',on='block',size=48,aria=''}={})=>document.fonts.ready.then(()=>{
+  const h=document.querySelector('.sheet > header');h.style.position='relative';
+  const b=document.createElement('button');b.type='button';b.className='st-text-action';b.textContent=label;if(aria)b.setAttribute('aria-label',aria);
+  b.style.cssText='position:absolute;'+side+':var(--space-gutter);height:'+size+'px;min-height:'+size+'px;min-width:'+size+'px;padding:0;justify-content:center';
+  h.appendChild(b);
+  const t=h.querySelector('.sheet-title').getBoundingClientRect(),l=h.querySelector('.st-header-line'),hr=h.getBoundingClientRect();
+  const c=on==='box'?(hr.top+hr.bottom)/2:on==='title'?(t.top+t.bottom)/2:(t.top+(l?l.getBoundingClientRect().bottom:t.bottom))/2;
+  b.style.top=(c-hr.top-size/2)+'px';
+});
+</script>
+<script>draw(UI.sheet({title:'Selected · 3 pigs',size:'short',body:body(),footer:foot()}));</script>
+</body></html>
