@@ -2,11 +2,20 @@
 
 Sentri-UI is the design source of truth for a native-feel mobile app used by gloved, one-handed farm workers in English and Chinese. AI agents run its design work. This page is the workflow. Every session and every engineer runs this one. Words are defined in the [glossary](GLOSSARY.md).
 
+## Getting started
+
+The workflow runs from this repository alone: nothing on one person's machine and no private repository is needed.
+
+1. Install [Node.js](https://nodejs.org) 22.13 or later and [Claude Code](https://code.claude.com).
+2. Clone Sentri-UI, then in the repo run `npm install` and `npx playwright install chromium`. Playwright is pinned (1.63.0) so every machine renders screens the same way; the gate, the scenario leaves and the screenshots all use it.
+3. Open the repo in Claude Code and accept the workspace trust prompt. The project settings declare Matt Pocock's public skills (`mattpocock/skills`, pinned to one commit) for Wayfinder and grilling; install them once with `claude plugin install mattpocock-skills@mattpocock`.
+4. `npm run ux` serves the atlas at `http://localhost:4317/atlas/`; `npm test` runs the guard tests; `/design <feature>` starts work on a feature.
+
 ## Legibility gate
 
 Legibility gate: strict
 
-The farm legibility check (`scripts/check-legibility.mjs`, law in `ux/design-system/README.md`) holds every screen a change moves to the absolute floors. Screens a change doesn't move are reported, not blocking. Screens still drawn from the pre-workflow prototypes in `ux/archive/` and `ux/research/` fail the floors today; each meets them when its feature is redesigned through `/design`, and any change that moves one must bring it up to the floors.
+The farm legibility check (`scripts/check-legibility.mjs`, law in `ux/design-system/README.md`) holds every screen a change moves to the absolute floors. Screens a change doesn't move are reported, not blocking. Screens still drawn from the pre-workflow prototypes in `ux/archive/` and `ux/research/` fail the floors today; each meets them when its feature is redesigned through `/design`, and any feature change that moves one must bring it up to the floors. A **shared-component change** (declared `--class shared`) is held to *no worse than main* on the screens it moves instead: it may not add a violation, but the pages' own debt is fixed in each feature's pass, not by a component change (owner, 2026-10-14: components and their usages first, features later).
 
 ## Who decides what
 

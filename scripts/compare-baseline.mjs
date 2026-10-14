@@ -6,11 +6,10 @@
 // in the page. Writes review/compare-<feature>.json (count, max channel delta, diff PNG) and diff PNGs to
 // review/compare-<feature>/. A "note" already in an existing JSON for a screen is kept (the explanation of an allowed delta).
 // ONLY=id1,id2 re-renders just those screens and keeps the rest of the JSON.
-import { createRequire } from 'node:module';
 import fs from 'node:fs';
 import path from 'node:path';
-const require = createRequire(import.meta.url);
-const { chromium } = require('C:/Users/ying_/.cache/adam-design/playwright-1.63.0/node_modules/playwright');
+import { playwright } from './playwright-path.mjs';
+const { chromium } = playwright();
 
 const [feature, baseUrl, branchUrl, outDirArg] = process.argv.slice(2);
 if (!feature || !baseUrl || !branchUrl) { console.error('usage: compare-screens.mjs <feature> <baselineUrl> <branchUrl> [outDir]'); process.exit(2); }

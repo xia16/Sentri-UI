@@ -109,7 +109,7 @@ run.
 node scripts/run-scenarios.mjs <feature> [--lang en,zh] [--width 360,390] [--base <url>] [--only leaf,leaf]
 ```
 
-It uses the cached Playwright at `C:/Users/ying_/.cache/adam-design/playwright-1.63.0`, serves the repo with
+It uses the project's Playwright (`scripts/playwright-path.mjs`: `npm install`, then `npx playwright install chromium`), serves the repo with
 `scripts/serve-ux.cjs` on a free port (unless `--base`), and runs every leaf × language × width from its reset
 fixture in a fresh browser context, the phone drawn at the run's width. Results per leaf:
 
