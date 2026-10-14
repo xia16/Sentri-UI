@@ -167,3 +167,9 @@ Held against its baseline (`7f5b627`) and the house reference the Farrowing room
 - The drawer: Record dead is held at the Sheet's outer cap (`100% - size-80`, top at 80px) instead of the long 85%. Measured on every state at 390 and 360, EN and ZH: the body no longer scrolls in Piglets (draft or not, with the hint) or The sow (with or without a cause), so the Photos row and the sow's danger banner are whole on the first frame; only thumbnails a worker adds scroll.
 - Kept: the 24px under the switch, the steppers and the header, untouched.
 - **Better because** the photo now reads as one optional row of the form, whole on screen, waiting visibly, and nothing sits under the footer.
+
+#### Final look, round 2 (the pushed head of farrowing/record-dead-spacing, the commit that adds this block; its screens are c62ef74's: the gate's pairs at 390 and 360 in EN and ZH against base e9e4052, plus both modes and every state rendered at 390 and 360, EN and ZH)
+- Reach: 2 screens changed, 289 same, none broken: `farrowing.death` and `farrowing.piglet-death` (the Photos row face), both farrowing.
+- Piglets and The sow, with and without a draft or cause: the switch has its 24px, the Photos row (label, Optional, outlined camera) and its hint are whole above the footer, the sow's banner is whole; the body scrolls only once thumbnails are added.
+- Report piglet mortality shows the same Photos row in place of the half-width card.
+- **Better because** the photo reads as one optional row of the form, whole on the first frame and waiting visibly, and nothing sits under the footer.
