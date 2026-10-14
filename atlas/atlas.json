@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-14T10:21:04.314Z",
- "commit": "bc996b1",
+ "generated": "2026-10-14T15:47:07.419Z",
+ "commit": "f8b5994",
  "platforms": [
   {
    "id": "mobile",
@@ -13761,7 +13761,7 @@
          "url": "/ux/system/inspection-astra-concept.html?layout=focus",
          "preset": "walk",
          "steps": [
-          "[aria-label=\"Select pig 000254\"]",
+          "[data-pig-select=\"000254\"]",
           "[data-action=\"review-sheet\"]"
          ],
          "figma": "",
@@ -16005,7 +16005,7 @@
          "url": "/ux/system/inspection-astra-concept.html?layout=focus",
          "preset": "walk",
          "steps": [
-          "[aria-label=\"Select pig 000254\"]",
+          "[data-pig-select=\"000254\"]",
           "[data-action=\"actions\"]",
           "[data-action=\"unavailable-actions\"]"
          ],
