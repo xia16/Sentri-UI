@@ -1,7 +1,10 @@
 {
  "tolerances": {
   "gap": 24,
-  "slack": 2
+  "slack": 2,
+  "corner": 2,
+  "clear": 12,
+  "phone": 360
  },
  "screens": [
   {
@@ -72,12 +75,28 @@
      "kind": "sheet",
      "title": "Report equipment issue",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
     }
    ],
-   "defects": []
+   "defects": [
+    {
+     "check": "room",
+     "at": 363,
+     "detail": "sheet header \"Report equipment issue\": the title is 219px on one line; at 360 there is 204px between the corner targets (where they would sit) with 12px clear: shorten it",
+     "lang": "en",
+     "width": 360
+    },
+    {
+     "check": "room",
+     "at": 363,
+     "detail": "sheet header \"Report equipment issue\": the title is 219px on one line; at 360 there is 204px between the corner targets (where they would sit) with 12px clear: shorten it",
+     "lang": "zh",
+     "width": 360
+    }
+   ]
   },
   {
    "screen": "environment.issue-detail",
@@ -87,6 +106,7 @@
      "kind": "sheet",
      "title": "Drinking station",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -102,6 +122,7 @@
      "kind": "sheet",
      "title": "Drinking station",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -135,6 +156,7 @@
      "kind": "sheet",
      "title": "Choose a unit",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -150,6 +172,7 @@
      "kind": "sheet",
      "title": "Choose a unit",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -165,6 +188,7 @@
      "kind": "page",
      "title": "Your sections",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -270,6 +294,7 @@
      "kind": "page",
      "title": "Toolbox",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -285,6 +310,7 @@
      "kind": "page",
      "title": "Records",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -336,6 +362,7 @@
      "kind": "page",
      "title": "Farrowing",
      "lines": 1,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -351,6 +378,7 @@
      "kind": "sheet",
      "title": "Farrowing record",
      "lines": 1,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -366,6 +394,7 @@
      "kind": "sheet",
      "title": "Farrowing record",
      "lines": 1,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -381,6 +410,7 @@
      "kind": "sheet",
      "title": "Record dead",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -396,6 +426,7 @@
      "kind": "sheet",
      "title": "Finish farrowing",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -417,6 +448,7 @@
      "kind": "sheet",
      "title": "Farrowing record",
      "lines": 1,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -432,6 +464,7 @@
      "kind": "sheet",
      "title": "Edit record",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -447,6 +480,7 @@
      "kind": "sheet",
      "title": "Edit record",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -462,6 +496,7 @@
      "kind": "page",
      "title": "Farrowing log",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -477,6 +512,7 @@
      "kind": "sheet",
      "title": "7 piglets to allocate",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -507,6 +543,7 @@
      "kind": "sheet",
      "title": "Farrowing record",
      "lines": 1,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -522,6 +559,7 @@
      "kind": "page",
      "title": "End task early",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -537,6 +575,7 @@
      "kind": "page",
      "title": "End task early",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -552,6 +591,7 @@
      "kind": "page",
      "title": "End task",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -567,6 +607,7 @@
      "kind": "page",
      "title": "End task early",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -582,6 +623,7 @@
      "kind": "sheet",
      "title": "Edit record",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -597,6 +639,7 @@
      "kind": "page",
      "title": "Task overview",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -612,6 +655,7 @@
      "kind": "page",
      "title": "Task ended",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -627,6 +671,7 @@
      "kind": "page",
      "title": "Foster piglets",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -642,12 +687,28 @@
      "kind": "page",
      "title": "Reconcile piglet count",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
     }
    ],
-   "defects": []
+   "defects": [
+    {
+     "check": "room",
+     "at": 56,
+     "detail": "page header \"Reconcile piglet count\": the title is 223px on one line; at 360 there is 216px between the corner targets (where they would sit) with 12px clear: shorten it",
+     "lang": "en",
+     "width": 360
+    },
+    {
+     "check": "room",
+     "at": 56,
+     "detail": "page header \"Reconcile piglet count\": the title is 223px on one line; at 360 there is 216px between the corner targets (where they would sit) with 12px clear: shorten it",
+     "lang": "zh",
+     "width": 360
+    }
+   ]
   },
   {
    "screen": "farrowing.filter",
@@ -657,6 +718,7 @@
      "kind": "sheet",
      "title": "Filter sows",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -672,6 +734,7 @@
      "kind": "sheet",
      "title": "Go to pen",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -687,6 +750,7 @@
      "kind": "page",
      "title": "Pen B1",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -702,6 +766,7 @@
      "kind": "page",
      "title": "Pen log",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -717,6 +782,7 @@
      "kind": "sheet",
      "title": "Pen note",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -732,6 +798,7 @@
      "kind": "sheet",
      "title": "Pen note",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -747,6 +814,7 @@
      "kind": "page",
      "title": "Feed guidance",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -762,6 +830,7 @@
      "kind": "sheet",
      "title": "Report fault",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -777,6 +846,7 @@
      "kind": "sheet",
      "title": "Feeding station",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -810,6 +880,7 @@
      "kind": "page",
      "title": "Scan ear tags",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -825,6 +896,7 @@
      "kind": "page",
      "title": "Scan ear tags",
      "lines": 0,
+     "corners": [],
      "lang": "en",
      "width": 390
     }
@@ -839,6 +911,7 @@
      "kind": "page",
      "title": "Scan ear tags",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -854,6 +927,7 @@
      "kind": "page",
      "title": "Scan ear tags",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -869,6 +943,7 @@
      "kind": "page",
      "title": "Scan ear tags",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -884,6 +959,7 @@
      "kind": "sheet",
      "title": "Actions",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -899,6 +975,7 @@
      "kind": "page",
      "title": "Active farrowing",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -914,6 +991,7 @@
      "kind": "sheet",
      "title": "Death breakdown",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -935,6 +1013,7 @@
      "kind": "page",
      "title": "More actions",
      "lines": 1,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -950,6 +1029,7 @@
      "kind": "page",
      "title": "Edit note",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -965,6 +1045,7 @@
      "kind": "page",
      "title": "Piglet processing",
      "lines": 1,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -980,6 +1061,7 @@
      "kind": "page",
      "title": "Add piglet identity",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -995,12 +1077,28 @@
      "kind": "page",
      "title": "Report piglet mortality",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
     }
    ],
-   "defects": []
+   "defects": [
+    {
+     "check": "room",
+     "at": 56,
+     "detail": "page header \"Report piglet mortality\": the title is 223px on one line; at 360 there is 216px between the corner targets (where they would sit) with 12px clear: shorten it",
+     "lang": "en",
+     "width": 360
+    },
+    {
+     "check": "room",
+     "at": 56,
+     "detail": "page header \"Report piglet mortality\": the title is 223px on one line; at 360 there is 216px between the corner targets (where they would sit) with 12px clear: shorten it",
+     "lang": "zh",
+     "width": 360
+    }
+   ]
   },
   {
    "screen": "heat-check.list",
@@ -1064,6 +1162,7 @@
      "kind": "page",
      "title": "Piglet processing",
      "lines": 1,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -1079,6 +1178,7 @@
      "kind": "sheet",
      "title": "Piglet processing",
      "lines": 1,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -1094,6 +1194,7 @@
      "kind": "sheet",
      "title": "Piglet processing",
      "lines": 1,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -1109,6 +1210,7 @@
      "kind": "sheet",
      "title": "Piglet processing",
      "lines": 1,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -1124,6 +1226,7 @@
      "kind": "sheet",
      "title": "Piglet processing",
      "lines": 1,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -1139,6 +1242,7 @@
      "kind": "sheet",
      "title": "Piglet processing",
      "lines": 1,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -1154,6 +1258,7 @@
      "kind": "sheet",
      "title": "Iron",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -1169,6 +1274,7 @@
      "kind": "page",
      "title": "Piglets",
      "lines": 1,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -1184,6 +1290,7 @@
      "kind": "page",
      "title": "Piglets",
      "lines": 1,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -1192,6 +1299,7 @@
      "kind": "page",
      "title": "Give IDs",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -1207,6 +1315,7 @@
      "kind": "sheet",
      "title": "Boars and gilts",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -1222,6 +1331,7 @@
      "kind": "sheet",
      "title": "Litter weight",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -1237,6 +1347,7 @@
      "kind": "sheet",
      "title": "More actions",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -1252,6 +1363,7 @@
      "kind": "sheet",
      "title": "Record death",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -1267,6 +1379,7 @@
      "kind": "page",
      "title": "Move piglets",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -1282,6 +1395,7 @@
      "kind": "sheet",
      "title": "Set count",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -1297,6 +1411,7 @@
      "kind": "page",
      "title": "Pen log",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -1312,6 +1427,7 @@
      "kind": "page",
      "title": "End task",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -1327,6 +1443,7 @@
      "kind": "page",
      "title": "Piglet processing",
      "lines": 1,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -1342,6 +1459,7 @@
      "kind": "page",
      "title": "Piglet processing",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -1357,6 +1475,7 @@
      "kind": "page",
      "title": "Piglet processing",
      "lines": 1,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -1372,6 +1491,7 @@
      "kind": "page",
      "title": "Piglet processing",
      "lines": 1,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -1387,6 +1507,7 @@
      "kind": "page",
      "title": "Piglet processing",
      "lines": 1,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -1402,6 +1523,7 @@
      "kind": "page",
      "title": "Piglet processing",
      "lines": 1,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -1417,6 +1539,7 @@
      "kind": "sheet",
      "title": "Piglet processing",
      "lines": 1,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -1468,6 +1591,7 @@
      "kind": "sheet",
      "title": "Pregnancy check",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -1531,6 +1655,7 @@
      "kind": "page",
      "title": "For weaning",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -1546,6 +1671,7 @@
      "kind": "page",
      "title": "Pen feeding",
      "lines": 1,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -1561,6 +1687,7 @@
      "kind": "page",
      "title": "Pen feeding",
      "lines": 1,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -1576,6 +1703,7 @@
      "kind": "page",
      "title": "More actions",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -1591,6 +1719,7 @@
      "kind": "page",
      "title": "Adjust feed",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -1606,6 +1735,7 @@
      "kind": "sheet",
      "title": "End date",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -1621,6 +1751,7 @@
      "kind": "page",
      "title": "Feed plan",
      "lines": 1,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -1636,6 +1767,7 @@
      "kind": "page",
      "title": "Inspection",
      "lines": 1,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -1651,6 +1783,7 @@
      "kind": "page",
      "title": "Inspection",
      "lines": 1,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -1666,6 +1799,7 @@
      "kind": "page",
      "title": "Inspection",
      "lines": 1,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -1693,6 +1827,7 @@
      "kind": "page",
      "title": "Inspection",
      "lines": 1,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -1708,6 +1843,7 @@
      "kind": "page",
      "title": "Inspection",
      "lines": 1,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -1723,6 +1859,7 @@
      "kind": "page",
      "title": "Inspection",
      "lines": 1,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -1738,6 +1875,7 @@
      "kind": "page",
      "title": "Inspection",
      "lines": 1,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -1753,6 +1891,7 @@
      "kind": "page",
      "title": "Pen C1",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -1768,6 +1907,7 @@
      "kind": "sheet",
      "title": "Pen note",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -1783,6 +1923,7 @@
      "kind": "page",
      "title": "Pen log",
      "lines": 0,
+     "corners": [],
      "gap": 34,
      "lang": "en",
      "width": 390
@@ -1806,6 +1947,7 @@
      "kind": "sheet",
      "title": "Filter pigs",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -1821,6 +1963,7 @@
      "kind": "sheet",
      "title": "Go to pen",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -1836,6 +1979,7 @@
      "kind": "sheet",
      "title": "Scan ear tag",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -1851,6 +1995,7 @@
      "kind": "page",
      "title": "More actions",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -1866,6 +2011,7 @@
      "kind": "sheet",
      "title": "Selected",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -1881,6 +2027,7 @@
      "kind": "page",
      "title": "This walk",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -1896,6 +2043,7 @@
      "kind": "sheet",
      "title": "End walk",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -1911,6 +2059,7 @@
      "kind": "sheet",
      "title": "Walk recorded",
      "lines": 0,
+     "corners": [],
      "gap": 42,
      "lang": "en",
      "width": 390
@@ -1934,6 +2083,7 @@
      "kind": "page",
      "title": "Inspection",
      "lines": 1,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -1949,6 +2099,7 @@
      "kind": "page",
      "title": "Inspection",
      "lines": 1,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -1964,6 +2115,7 @@
      "kind": "page",
      "title": "Inspection",
      "lines": 1,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -1979,6 +2131,7 @@
      "kind": "page",
      "title": "Inspection",
      "lines": 1,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -1994,6 +2147,7 @@
      "kind": "page",
      "title": "Inspection",
      "lines": 1,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -2081,6 +2235,7 @@
      "kind": "sheet",
      "title": "Find a pig or pen",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -2096,6 +2251,7 @@
      "kind": "sheet",
      "title": "Scan an ear tag",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -2111,6 +2267,7 @@
      "kind": "sheet",
      "title": "Search results",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -2126,6 +2283,7 @@
      "kind": "page",
      "title": "000267",
      "lines": 1,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -2141,6 +2299,7 @@
      "kind": "sheet",
      "title": "Record health",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -2156,6 +2315,7 @@
      "kind": "page",
      "title": "Pig log",
      "lines": 0,
+     "corners": [],
      "gap": 34,
      "lang": "en",
      "width": 390
@@ -2179,6 +2339,7 @@
      "kind": "page",
      "title": "More actions",
      "lines": 1,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -2218,6 +2379,7 @@
      "kind": "page",
      "title": "000267",
      "lines": 1,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -2233,6 +2395,7 @@
      "kind": "page",
      "title": "000254",
      "lines": 1,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -2248,6 +2411,7 @@
      "kind": "page",
      "title": "000306",
      "lines": 1,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -2263,6 +2427,7 @@
      "kind": "page",
      "title": "000254",
      "lines": 1,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -2278,6 +2443,7 @@
      "kind": "page",
      "title": "Production stats",
      "lines": 1,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -2293,6 +2459,7 @@
      "kind": "page",
      "title": "Batch 20",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -2308,6 +2475,7 @@
      "kind": "page",
      "title": "Origin",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -2323,6 +2491,7 @@
      "kind": "page",
      "title": "Pig log",
      "lines": 0,
+     "corners": [],
      "gap": 34,
      "lang": "en",
      "width": 390
@@ -2346,6 +2515,7 @@
      "kind": "page",
      "title": "More actions",
      "lines": 1,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -2361,6 +2531,7 @@
      "kind": "sheet",
      "title": "Pregnancy check",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -2376,6 +2547,7 @@
      "kind": "sheet",
      "title": "Record abortion",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -2391,6 +2563,7 @@
      "kind": "sheet",
      "title": "Batch membership",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -2406,12 +2579,28 @@
      "kind": "sheet",
      "title": "Measurements & condition",
      "lines": 1,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
     }
    ],
-   "defects": []
+   "defects": [
+    {
+     "check": "room",
+     "at": 351,
+     "detail": "sheet header \"Measurements & condition\": the title is 247px on one line; at 360 there is 204px between the corner targets (where they would sit) with 12px clear: shorten it",
+     "lang": "en",
+     "width": 360
+    },
+    {
+     "check": "room",
+     "at": 351,
+     "detail": "sheet header \"Measurements & condition\": the title is 247px on one line; at 360 there is 204px between the corner targets (where they would sit) with 12px clear: shorten it",
+     "lang": "zh",
+     "width": 360
+    }
+   ]
   },
   {
    "screen": "pig-profile.measure",
@@ -2421,6 +2610,7 @@
      "kind": "sheet",
      "title": "Record weight",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -2436,6 +2626,7 @@
      "kind": "sheet",
      "title": "Body condition",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -2451,6 +2642,7 @@
      "kind": "sheet",
      "title": "Add a note",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -2466,6 +2658,7 @@
      "kind": "sheet",
      "title": "Unavailable actions",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -2481,6 +2674,7 @@
      "kind": "sheet",
      "title": "Mark not in pig",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -2544,6 +2738,7 @@
      "kind": "page",
      "title": "000306",
      "lines": 1,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -2559,6 +2754,7 @@
      "kind": "page",
      "title": "000281",
      "lines": 1,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -2574,6 +2770,7 @@
      "kind": "page",
      "title": "000281",
      "lines": 1,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -2589,6 +2786,7 @@
      "kind": "page",
      "title": "Inspection",
      "lines": 1,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -2604,6 +2802,7 @@
      "kind": "sheet",
      "title": "Fever",
      "lines": 1,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -2619,6 +2818,7 @@
      "kind": "sheet",
      "title": "Edit finding",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -2634,6 +2834,7 @@
      "kind": "sheet",
      "title": "Resolve or remove",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -2649,6 +2850,7 @@
      "kind": "sheet",
      "title": "Record health",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -2664,6 +2866,7 @@
      "kind": "sheet",
      "title": "Conditions",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -2679,6 +2882,7 @@
      "kind": "sheet",
      "title": "Care instructions",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -2694,6 +2898,7 @@
      "kind": "sheet",
      "title": "Resolve conditions",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -2709,6 +2914,7 @@
      "kind": "page",
      "title": "Record treatment",
      "lines": 0,
+     "corners": [],
      "gap": 40,
      "lang": "en",
      "width": 390
@@ -2732,6 +2938,7 @@
      "kind": "sheet",
      "title": "Medicines",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -2855,6 +3062,7 @@
      "kind": "sheet",
      "title": "Move piglets",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -2863,6 +3071,7 @@
      "kind": "sheet",
      "title": "B06",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -2878,6 +3087,7 @@
      "kind": "sheet",
      "title": "Move piglets",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -2886,6 +3096,7 @@
      "kind": "sheet",
      "title": "B06",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -2901,6 +3112,7 @@
      "kind": "sheet",
      "title": "Move piglets",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -2909,6 +3121,7 @@
      "kind": "sheet",
      "title": "C03",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -2924,6 +3137,7 @@
      "kind": "sheet",
      "title": "Move piglets",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -2932,6 +3146,7 @@
      "kind": "sheet",
      "title": "B08",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -3103,6 +3318,7 @@
      "kind": "page",
      "title": "Transfer sow",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -3166,6 +3382,7 @@
      "kind": "sheet",
      "title": "Saved work",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -3181,6 +3398,7 @@
      "kind": "sheet",
      "title": "Saved work",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
@@ -3196,6 +3414,7 @@
      "kind": "sheet",
      "title": "Saved work",
      "lines": 0,
+     "corners": [],
      "gap": 24,
      "lang": "en",
      "width": 390
