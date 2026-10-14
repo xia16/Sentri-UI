@@ -31,3 +31,8 @@ The header line of every surface of this feature, decided by the Headers law (`u
 | Round pages outside the atlas (room, litter, count, dead, edit, id, bulk, move, end) | room: hub; the rest actions | room: fact (last record); others none; their status and instructions are the body's first line | | |
 
 Ambiguous, quieter option taken: Give IDs: `Fixing 001216` is cut, not moved (the tag field shows the number being fixed); the litter is one Back away on Piglets. The litter drawer of the round pages has no route line (that round has no sow page for a chip to open).
+
+## Drafts (2026-10-14)
+
+Back keeps a sheet's draft and Clear empties it. No fact is added, moved or cut: a reopened sheet shows the worker's own entry in the field it was typed in, and Clear is an action (the footer's quiet text, present only while something is entered), not a fact. Every first frame is unchanged.
+

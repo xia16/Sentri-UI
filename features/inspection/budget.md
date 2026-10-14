@@ -28,3 +28,8 @@ The header line of every surface of this feature, decided by the Headers law (`u
 Crit round 2: the first design (unit as a grey label beside Log and a dark End walk in a new row) read as a stray label and a floating button; the unit is the header line and End walk is a quiet text action in the check-in row.
 
 Chains walked on the real Back path after this change (crit round 1): no surface here writes to or is about one animal without showing it on screen or one Back away; no line changed.
+
+## Drafts (2026-10-14)
+
+Back keeps a sheet's draft and Clear empties it. No fact is added, moved or cut: a reopened sheet shows the worker's own entry in the field it was typed in, and Clear is an action (the footer's quiet text, present only while something is entered), not a fact. Every first frame is unchanged.
+

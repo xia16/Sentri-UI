@@ -1,0 +1,2756 @@
+{
+ "feature": "inspection",
+ "commit": "89f58f350efe8187d18dabea4d192cb4a79c565d",
+ "dirty": false,
+ "ran": "2026-10-14T09:44:24.264Z",
+ "base": "http://localhost:45503",
+ "langs": [
+  "en",
+  "zh"
+ ],
+ "widths": [
+  360,
+  390
+ ],
+ "nodes": {
+  "entry": 1,
+  "state": 4,
+  "action": 30,
+  "outcome": 30
+ },
+ "summary": {
+  "pass": 30,
+  "fail": 0,
+  "blocked": 0,
+  "pending": 0
+ },
+ "byLang": {
+  "en": {
+   "pass": 30,
+   "fail": 0,
+   "blocked": 0
+  },
+  "zh": {
+   "pass": 30,
+   "fail": 0,
+   "blocked": 0
+  }
+ },
+ "byBranch": {
+  "drafts": {
+   "pass": 30,
+   "fail": 0,
+   "blocked": 0,
+   "pending": 0
+  }
+ },
+ "hardFailures": [],
+ "leaves": [
+  {
+   "id": "in-dc0-pen-note-opens-without-clear",
+   "tree": "DC-0",
+   "branch": "drafts",
+   "label": "Pen note opens untouched: no Clear",
+   "gwt": {
+    "given": "A worker on the unit walk has pen C2 open; C2 has no pen note.",
+    "when": "They open Pen note.",
+    "then": "Pen note opens as before, with Back and its commit in the footer and no Clear, because nothing has been entered."
+   },
+   "path": [
+    "drafts",
+    "drafts.pen-c2",
+    "pen-note.open",
+    "in-dc0-pen-note-opens-without-clear"
+   ],
+   "authority": [
+    {
+     "src": "STR",
+     "at": "ux/laws/strings.json · verbs.Clear",
+     "says": "empty what was entered or ticked …; present only while there is something to empty"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dc0-pen-note-opens-without-clear/en-360/00-start.png",
+      "review/scenarios/inspection/in-dc0-pen-note-opens-without-clear/en-360/01-data-action-pen-note.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dc0-pen-note-opens-without-clear/en-390/00-start.png",
+      "review/scenarios/inspection/in-dc0-pen-note-opens-without-clear/en-390/01-data-action-pen-note.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dc0-pen-note-opens-without-clear/zh-360/00-start.png",
+      "review/scenarios/inspection/in-dc0-pen-note-opens-without-clear/zh-360/01-data-action-pen-note.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dc0-pen-note-opens-without-clear/zh-390/00-start.png",
+      "review/scenarios/inspection/in-dc0-pen-note-opens-without-clear/zh-390/01-data-action-pen-note.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "in-dc1-pen-note-typing-shows-clear",
+   "tree": "DC-1",
+   "branch": "drafts",
+   "label": "typing shows Clear in the footer",
+   "gwt": {
+    "given": "Pen note is open and empty of edits.",
+    "when": "They type \"Gate latch loose\".",
+    "then": "Clear appears in the footer, left of the commit."
+   },
+   "path": [
+    "drafts",
+    "drafts.pen-c2",
+    "pen-note.open",
+    "pen-note.type",
+    "in-dc1-pen-note-typing-shows-clear"
+   ],
+   "authority": [
+    {
+     "src": "owner",
+     "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+     "says": "Clear empties what was entered or ticked … present only when there is something to reset or clear"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dc1-pen-note-typing-shows-clear/en-360/00-start.png",
+      "review/scenarios/inspection/in-dc1-pen-note-typing-shows-clear/en-360/01-data-action-pen-note.png",
+      "review/scenarios/inspection/in-dc1-pen-note-typing-shows-clear/en-360/02-fill-data-card-0-phone-sheet-tex.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dc1-pen-note-typing-shows-clear/en-390/00-start.png",
+      "review/scenarios/inspection/in-dc1-pen-note-typing-shows-clear/en-390/01-data-action-pen-note.png",
+      "review/scenarios/inspection/in-dc1-pen-note-typing-shows-clear/en-390/02-fill-data-card-0-phone-sheet-tex.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dc1-pen-note-typing-shows-clear/zh-360/00-start.png",
+      "review/scenarios/inspection/in-dc1-pen-note-typing-shows-clear/zh-360/01-data-action-pen-note.png",
+      "review/scenarios/inspection/in-dc1-pen-note-typing-shows-clear/zh-360/02-fill-data-card-0-phone-sheet-tex.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dc1-pen-note-typing-shows-clear/zh-390/00-start.png",
+      "review/scenarios/inspection/in-dc1-pen-note-typing-shows-clear/zh-390/01-data-action-pen-note.png",
+      "review/scenarios/inspection/in-dc1-pen-note-typing-shows-clear/zh-390/02-fill-data-card-0-phone-sheet-tex.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "in-dc2-pen-note-back-keeps-draft",
+   "tree": "DC-2",
+   "branch": "drafts",
+   "label": "Back leaves Pen note and keeps the typed draft; nothing saved",
+   "gwt": {
+    "given": "Pen note holds \"Gate latch loose\", not saved.",
+    "when": "They tap Back.",
+    "then": "They are back where they came from, the typed text is kept as a draft and nothing is saved."
+   },
+   "path": [
+    "drafts",
+    "drafts.pen-c2",
+    "pen-note.open",
+    "pen-note.type",
+    "pen-note.type.back",
+    "in-dc2-pen-note-back-keeps-draft"
+   ],
+   "authority": [
+    {
+     "src": "owner",
+     "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+     "says": "Back … leaves and returns to where you came from, keeping the draft."
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dc2-pen-note-back-keeps-draft/en-360/00-start.png",
+      "review/scenarios/inspection/in-dc2-pen-note-back-keeps-draft/en-360/01-data-action-pen-note.png",
+      "review/scenarios/inspection/in-dc2-pen-note-back-keeps-draft/en-360/02-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-dc2-pen-note-back-keeps-draft/en-360/03-data-action-back.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dc2-pen-note-back-keeps-draft/en-390/00-start.png",
+      "review/scenarios/inspection/in-dc2-pen-note-back-keeps-draft/en-390/01-data-action-pen-note.png",
+      "review/scenarios/inspection/in-dc2-pen-note-back-keeps-draft/en-390/02-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-dc2-pen-note-back-keeps-draft/en-390/03-data-action-back.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dc2-pen-note-back-keeps-draft/zh-360/00-start.png",
+      "review/scenarios/inspection/in-dc2-pen-note-back-keeps-draft/zh-360/01-data-action-pen-note.png",
+      "review/scenarios/inspection/in-dc2-pen-note-back-keeps-draft/zh-360/02-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-dc2-pen-note-back-keeps-draft/zh-360/03-data-action-back.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dc2-pen-note-back-keeps-draft/zh-390/00-start.png",
+      "review/scenarios/inspection/in-dc2-pen-note-back-keeps-draft/zh-390/01-data-action-pen-note.png",
+      "review/scenarios/inspection/in-dc2-pen-note-back-keeps-draft/zh-390/02-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-dc2-pen-note-back-keeps-draft/zh-390/03-data-action-back.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "in-dc3-pen-note-reopen-shows-draft",
+   "tree": "DC-3",
+   "branch": "drafts",
+   "label": "reopening Pen note shows the draft, with Clear",
+   "gwt": {
+    "given": "They left Pen note with Back while it held \"Gate latch loose\".",
+    "when": "They open Pen note again.",
+    "then": "The field still holds \"Gate latch loose\" and Clear is in the footer."
+   },
+   "path": [
+    "drafts",
+    "drafts.pen-c2",
+    "pen-note.open",
+    "pen-note.type",
+    "pen-note.type.back",
+    "pen-note.type.back.reopen",
+    "in-dc3-pen-note-reopen-shows-draft"
+   ],
+   "authority": [
+    {
+     "src": "owner",
+     "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+     "says": "Back … leaves and returns to where you came from, keeping the draft."
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dc3-pen-note-reopen-shows-draft/en-360/00-start.png",
+      "review/scenarios/inspection/in-dc3-pen-note-reopen-shows-draft/en-360/01-data-action-pen-note.png",
+      "review/scenarios/inspection/in-dc3-pen-note-reopen-shows-draft/en-360/02-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-dc3-pen-note-reopen-shows-draft/en-360/03-data-action-back.png",
+      "review/scenarios/inspection/in-dc3-pen-note-reopen-shows-draft/en-360/04-data-action-pen-note.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dc3-pen-note-reopen-shows-draft/en-390/00-start.png",
+      "review/scenarios/inspection/in-dc3-pen-note-reopen-shows-draft/en-390/01-data-action-pen-note.png",
+      "review/scenarios/inspection/in-dc3-pen-note-reopen-shows-draft/en-390/02-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-dc3-pen-note-reopen-shows-draft/en-390/03-data-action-back.png",
+      "review/scenarios/inspection/in-dc3-pen-note-reopen-shows-draft/en-390/04-data-action-pen-note.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dc3-pen-note-reopen-shows-draft/zh-360/00-start.png",
+      "review/scenarios/inspection/in-dc3-pen-note-reopen-shows-draft/zh-360/01-data-action-pen-note.png",
+      "review/scenarios/inspection/in-dc3-pen-note-reopen-shows-draft/zh-360/02-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-dc3-pen-note-reopen-shows-draft/zh-360/03-data-action-back.png",
+      "review/scenarios/inspection/in-dc3-pen-note-reopen-shows-draft/zh-360/04-data-action-pen-note.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dc3-pen-note-reopen-shows-draft/zh-390/00-start.png",
+      "review/scenarios/inspection/in-dc3-pen-note-reopen-shows-draft/zh-390/01-data-action-pen-note.png",
+      "review/scenarios/inspection/in-dc3-pen-note-reopen-shows-draft/zh-390/02-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-dc3-pen-note-reopen-shows-draft/zh-390/03-data-action-back.png",
+      "review/scenarios/inspection/in-dc3-pen-note-reopen-shows-draft/zh-390/04-data-action-pen-note.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "in-dc4-pen-note-clear-empties",
+   "tree": "DC-4",
+   "branch": "drafts",
+   "label": "Clear empties Pen note and goes; nothing saved",
+   "gwt": {
+    "given": "Pen note was reopened holding the kept draft \"Gate latch loose\".",
+    "when": "They tap Clear.",
+    "then": "The field is back as it opened, Clear disappears and nothing is saved."
+   },
+   "path": [
+    "drafts",
+    "drafts.pen-c2",
+    "pen-note.open",
+    "pen-note.type",
+    "pen-note.type.back",
+    "pen-note.type.back.reopen",
+    "pen-note.type.back.reopen.clear",
+    "in-dc4-pen-note-clear-empties"
+   ],
+   "authority": [
+    {
+     "src": "owner",
+     "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+     "says": "Clear empties what was entered or ticked … present only when there is something to reset or clear"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dc4-pen-note-clear-empties/en-360/00-start.png",
+      "review/scenarios/inspection/in-dc4-pen-note-clear-empties/en-360/01-data-action-pen-note.png",
+      "review/scenarios/inspection/in-dc4-pen-note-clear-empties/en-360/02-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-dc4-pen-note-clear-empties/en-360/03-data-action-back.png",
+      "review/scenarios/inspection/in-dc4-pen-note-clear-empties/en-360/04-data-action-pen-note.png",
+      "review/scenarios/inspection/in-dc4-pen-note-clear-empties/en-360/05-data-action-clear-draft.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dc4-pen-note-clear-empties/en-390/00-start.png",
+      "review/scenarios/inspection/in-dc4-pen-note-clear-empties/en-390/01-data-action-pen-note.png",
+      "review/scenarios/inspection/in-dc4-pen-note-clear-empties/en-390/02-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-dc4-pen-note-clear-empties/en-390/03-data-action-back.png",
+      "review/scenarios/inspection/in-dc4-pen-note-clear-empties/en-390/04-data-action-pen-note.png",
+      "review/scenarios/inspection/in-dc4-pen-note-clear-empties/en-390/05-data-action-clear-draft.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dc4-pen-note-clear-empties/zh-360/00-start.png",
+      "review/scenarios/inspection/in-dc4-pen-note-clear-empties/zh-360/01-data-action-pen-note.png",
+      "review/scenarios/inspection/in-dc4-pen-note-clear-empties/zh-360/02-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-dc4-pen-note-clear-empties/zh-360/03-data-action-back.png",
+      "review/scenarios/inspection/in-dc4-pen-note-clear-empties/zh-360/04-data-action-pen-note.png",
+      "review/scenarios/inspection/in-dc4-pen-note-clear-empties/zh-360/05-data-action-clear-draft.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dc4-pen-note-clear-empties/zh-390/00-start.png",
+      "review/scenarios/inspection/in-dc4-pen-note-clear-empties/zh-390/01-data-action-pen-note.png",
+      "review/scenarios/inspection/in-dc4-pen-note-clear-empties/zh-390/02-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-dc4-pen-note-clear-empties/zh-390/03-data-action-back.png",
+      "review/scenarios/inspection/in-dc4-pen-note-clear-empties/zh-390/04-data-action-pen-note.png",
+      "review/scenarios/inspection/in-dc4-pen-note-clear-empties/zh-390/05-data-action-clear-draft.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "in-dc5-pen-note-cleared-stays-cleared",
+   "tree": "DC-4",
+   "branch": "drafts",
+   "label": "after Clear, Back and reopen show Pen note as it opened",
+   "gwt": {
+    "given": "They cleared the draft on Pen note.",
+    "when": "They go Back and open it again.",
+    "then": "It opens as it did the first time, with no Clear."
+   },
+   "path": [
+    "drafts",
+    "drafts.pen-c2",
+    "pen-note.open",
+    "pen-note.type",
+    "pen-note.type.back",
+    "pen-note.type.back.reopen",
+    "pen-note.type.back.reopen.clear",
+    "pen-note.type.back.reopen.clear.back",
+    "in-dc5-pen-note-cleared-stays-cleared"
+   ],
+   "authority": [
+    {
+     "src": "owner",
+     "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+     "says": "Clear empties what was entered or ticked … present only when there is something to reset or clear"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dc5-pen-note-cleared-stays-cleared/en-360/00-start.png",
+      "review/scenarios/inspection/in-dc5-pen-note-cleared-stays-cleared/en-360/01-data-action-pen-note.png",
+      "review/scenarios/inspection/in-dc5-pen-note-cleared-stays-cleared/en-360/02-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-dc5-pen-note-cleared-stays-cleared/en-360/03-data-action-back.png",
+      "review/scenarios/inspection/in-dc5-pen-note-cleared-stays-cleared/en-360/04-data-action-pen-note.png",
+      "review/scenarios/inspection/in-dc5-pen-note-cleared-stays-cleared/en-360/05-data-action-clear-draft.png",
+      "review/scenarios/inspection/in-dc5-pen-note-cleared-stays-cleared/en-360/06-data-action-back.png",
+      "review/scenarios/inspection/in-dc5-pen-note-cleared-stays-cleared/en-360/07-data-action-pen-note.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dc5-pen-note-cleared-stays-cleared/en-390/00-start.png",
+      "review/scenarios/inspection/in-dc5-pen-note-cleared-stays-cleared/en-390/01-data-action-pen-note.png",
+      "review/scenarios/inspection/in-dc5-pen-note-cleared-stays-cleared/en-390/02-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-dc5-pen-note-cleared-stays-cleared/en-390/03-data-action-back.png",
+      "review/scenarios/inspection/in-dc5-pen-note-cleared-stays-cleared/en-390/04-data-action-pen-note.png",
+      "review/scenarios/inspection/in-dc5-pen-note-cleared-stays-cleared/en-390/05-data-action-clear-draft.png",
+      "review/scenarios/inspection/in-dc5-pen-note-cleared-stays-cleared/en-390/06-data-action-back.png",
+      "review/scenarios/inspection/in-dc5-pen-note-cleared-stays-cleared/en-390/07-data-action-pen-note.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dc5-pen-note-cleared-stays-cleared/zh-360/00-start.png",
+      "review/scenarios/inspection/in-dc5-pen-note-cleared-stays-cleared/zh-360/01-data-action-pen-note.png",
+      "review/scenarios/inspection/in-dc5-pen-note-cleared-stays-cleared/zh-360/02-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-dc5-pen-note-cleared-stays-cleared/zh-360/03-data-action-back.png",
+      "review/scenarios/inspection/in-dc5-pen-note-cleared-stays-cleared/zh-360/04-data-action-pen-note.png",
+      "review/scenarios/inspection/in-dc5-pen-note-cleared-stays-cleared/zh-360/05-data-action-clear-draft.png",
+      "review/scenarios/inspection/in-dc5-pen-note-cleared-stays-cleared/zh-360/06-data-action-back.png",
+      "review/scenarios/inspection/in-dc5-pen-note-cleared-stays-cleared/zh-360/07-data-action-pen-note.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dc5-pen-note-cleared-stays-cleared/zh-390/00-start.png",
+      "review/scenarios/inspection/in-dc5-pen-note-cleared-stays-cleared/zh-390/01-data-action-pen-note.png",
+      "review/scenarios/inspection/in-dc5-pen-note-cleared-stays-cleared/zh-390/02-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-dc5-pen-note-cleared-stays-cleared/zh-390/03-data-action-back.png",
+      "review/scenarios/inspection/in-dc5-pen-note-cleared-stays-cleared/zh-390/04-data-action-pen-note.png",
+      "review/scenarios/inspection/in-dc5-pen-note-cleared-stays-cleared/zh-390/05-data-action-clear-draft.png",
+      "review/scenarios/inspection/in-dc5-pen-note-cleared-stays-cleared/zh-390/06-data-action-back.png",
+      "review/scenarios/inspection/in-dc5-pen-note-cleared-stays-cleared/zh-390/07-data-action-pen-note.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "in-dc6-pen-note-phone-back-keeps-draft",
+   "tree": "DC-2",
+   "branch": "drafts",
+   "label": "the phone's Back keeps the draft like the footer Back",
+   "gwt": {
+    "given": "Pen note holds \"Gate latch loose\", not saved.",
+    "when": "They press the phone's own Back.",
+    "then": "They are back where they came from and the typed text is kept as a draft."
+   },
+   "path": [
+    "drafts",
+    "drafts.pen-c2",
+    "pen-note.open",
+    "pen-note.type",
+    "pen-note.type.sysback",
+    "in-dc6-pen-note-phone-back-keeps-draft"
+   ],
+   "authority": [
+    {
+     "src": "owner",
+     "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+     "says": "Back … leaves and returns to where you came from, keeping the draft."
+    },
+    {
+     "src": "owner",
+     "at": "ux/design-system/README.md · The drawer convention",
+     "says": "Swiping down or tapping the scrim does what Back does."
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dc6-pen-note-phone-back-keeps-draft/en-360/00-start.png",
+      "review/scenarios/inspection/in-dc6-pen-note-phone-back-keeps-draft/en-360/01-data-action-pen-note.png",
+      "review/scenarios/inspection/in-dc6-pen-note-phone-back-keeps-draft/en-360/02-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-dc6-pen-note-phone-back-keeps-draft/en-360/03-back.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dc6-pen-note-phone-back-keeps-draft/en-390/00-start.png",
+      "review/scenarios/inspection/in-dc6-pen-note-phone-back-keeps-draft/en-390/01-data-action-pen-note.png",
+      "review/scenarios/inspection/in-dc6-pen-note-phone-back-keeps-draft/en-390/02-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-dc6-pen-note-phone-back-keeps-draft/en-390/03-back.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dc6-pen-note-phone-back-keeps-draft/zh-360/00-start.png",
+      "review/scenarios/inspection/in-dc6-pen-note-phone-back-keeps-draft/zh-360/01-data-action-pen-note.png",
+      "review/scenarios/inspection/in-dc6-pen-note-phone-back-keeps-draft/zh-360/02-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-dc6-pen-note-phone-back-keeps-draft/zh-360/03-back.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dc6-pen-note-phone-back-keeps-draft/zh-390/00-start.png",
+      "review/scenarios/inspection/in-dc6-pen-note-phone-back-keeps-draft/zh-390/01-data-action-pen-note.png",
+      "review/scenarios/inspection/in-dc6-pen-note-phone-back-keeps-draft/zh-390/02-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-dc6-pen-note-phone-back-keeps-draft/zh-390/03-back.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "in-df0-fault-report-opens-without-clear",
+   "tree": "DC-0",
+   "branch": "drafts",
+   "label": "Report fault opens untouched: no Clear",
+   "gwt": {
+    "given": "A worker has pen C2's Equipment faults open; C2 has one open fault.",
+    "when": "They open Report fault.",
+    "then": "Report fault opens as before, with Back and its commit in the footer and no Clear, because nothing has been entered."
+   },
+   "path": [
+    "drafts",
+    "drafts.faults-c2",
+    "fault-report.open",
+    "in-df0-fault-report-opens-without-clear"
+   ],
+   "authority": [
+    {
+     "src": "STR",
+     "at": "ux/laws/strings.json · verbs.Clear",
+     "says": "empty what was entered or ticked …; present only while there is something to empty"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-df0-fault-report-opens-without-clear/en-360/00-start.png",
+      "review/scenarios/inspection/in-df0-fault-report-opens-without-clear/en-360/01-data-action-new-fault.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-df0-fault-report-opens-without-clear/en-390/00-start.png",
+      "review/scenarios/inspection/in-df0-fault-report-opens-without-clear/en-390/01-data-action-new-fault.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-df0-fault-report-opens-without-clear/zh-360/00-start.png",
+      "review/scenarios/inspection/in-df0-fault-report-opens-without-clear/zh-360/01-data-action-new-fault.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-df0-fault-report-opens-without-clear/zh-390/00-start.png",
+      "review/scenarios/inspection/in-df0-fault-report-opens-without-clear/zh-390/01-data-action-new-fault.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "in-df1-fault-report-typing-shows-clear",
+   "tree": "DC-1",
+   "branch": "drafts",
+   "label": "typing shows Clear in the footer",
+   "gwt": {
+    "given": "Report fault is open and empty of edits.",
+    "when": "They type \"Feeder auger jammed\".",
+    "then": "Clear appears in the footer, left of the commit."
+   },
+   "path": [
+    "drafts",
+    "drafts.faults-c2",
+    "fault-report.open",
+    "fault-report.type",
+    "in-df1-fault-report-typing-shows-clear"
+   ],
+   "authority": [
+    {
+     "src": "owner",
+     "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+     "says": "Clear empties what was entered or ticked … present only when there is something to reset or clear"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-df1-fault-report-typing-shows-clear/en-360/00-start.png",
+      "review/scenarios/inspection/in-df1-fault-report-typing-shows-clear/en-360/01-data-action-new-fault.png",
+      "review/scenarios/inspection/in-df1-fault-report-typing-shows-clear/en-360/02-fill-data-card-0-phone-sheet-tex.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-df1-fault-report-typing-shows-clear/en-390/00-start.png",
+      "review/scenarios/inspection/in-df1-fault-report-typing-shows-clear/en-390/01-data-action-new-fault.png",
+      "review/scenarios/inspection/in-df1-fault-report-typing-shows-clear/en-390/02-fill-data-card-0-phone-sheet-tex.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-df1-fault-report-typing-shows-clear/zh-360/00-start.png",
+      "review/scenarios/inspection/in-df1-fault-report-typing-shows-clear/zh-360/01-data-action-new-fault.png",
+      "review/scenarios/inspection/in-df1-fault-report-typing-shows-clear/zh-360/02-fill-data-card-0-phone-sheet-tex.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-df1-fault-report-typing-shows-clear/zh-390/00-start.png",
+      "review/scenarios/inspection/in-df1-fault-report-typing-shows-clear/zh-390/01-data-action-new-fault.png",
+      "review/scenarios/inspection/in-df1-fault-report-typing-shows-clear/zh-390/02-fill-data-card-0-phone-sheet-tex.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "in-df2-fault-report-back-keeps-draft",
+   "tree": "DC-2",
+   "branch": "drafts",
+   "label": "Back leaves Report fault and keeps the typed draft; nothing saved",
+   "gwt": {
+    "given": "Report fault holds \"Feeder auger jammed\", not saved.",
+    "when": "They tap Back.",
+    "then": "They are back where they came from, the typed text is kept as a draft and nothing is saved."
+   },
+   "path": [
+    "drafts",
+    "drafts.faults-c2",
+    "fault-report.open",
+    "fault-report.type",
+    "fault-report.type.back",
+    "in-df2-fault-report-back-keeps-draft"
+   ],
+   "authority": [
+    {
+     "src": "owner",
+     "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+     "says": "Back … leaves and returns to where you came from, keeping the draft."
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-df2-fault-report-back-keeps-draft/en-360/00-start.png",
+      "review/scenarios/inspection/in-df2-fault-report-back-keeps-draft/en-360/01-data-action-new-fault.png",
+      "review/scenarios/inspection/in-df2-fault-report-back-keeps-draft/en-360/02-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-df2-fault-report-back-keeps-draft/en-360/03-data-action-back.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-df2-fault-report-back-keeps-draft/en-390/00-start.png",
+      "review/scenarios/inspection/in-df2-fault-report-back-keeps-draft/en-390/01-data-action-new-fault.png",
+      "review/scenarios/inspection/in-df2-fault-report-back-keeps-draft/en-390/02-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-df2-fault-report-back-keeps-draft/en-390/03-data-action-back.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-df2-fault-report-back-keeps-draft/zh-360/00-start.png",
+      "review/scenarios/inspection/in-df2-fault-report-back-keeps-draft/zh-360/01-data-action-new-fault.png",
+      "review/scenarios/inspection/in-df2-fault-report-back-keeps-draft/zh-360/02-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-df2-fault-report-back-keeps-draft/zh-360/03-data-action-back.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-df2-fault-report-back-keeps-draft/zh-390/00-start.png",
+      "review/scenarios/inspection/in-df2-fault-report-back-keeps-draft/zh-390/01-data-action-new-fault.png",
+      "review/scenarios/inspection/in-df2-fault-report-back-keeps-draft/zh-390/02-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-df2-fault-report-back-keeps-draft/zh-390/03-data-action-back.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "in-df3-fault-report-reopen-shows-draft",
+   "tree": "DC-3",
+   "branch": "drafts",
+   "label": "reopening Report fault shows the draft, with Clear",
+   "gwt": {
+    "given": "They left Report fault with Back while it held \"Feeder auger jammed\".",
+    "when": "They open Report fault again.",
+    "then": "The field still holds \"Feeder auger jammed\" and Clear is in the footer."
+   },
+   "path": [
+    "drafts",
+    "drafts.faults-c2",
+    "fault-report.open",
+    "fault-report.type",
+    "fault-report.type.back",
+    "fault-report.type.back.reopen",
+    "in-df3-fault-report-reopen-shows-draft"
+   ],
+   "authority": [
+    {
+     "src": "owner",
+     "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+     "says": "Back … leaves and returns to where you came from, keeping the draft."
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-df3-fault-report-reopen-shows-draft/en-360/00-start.png",
+      "review/scenarios/inspection/in-df3-fault-report-reopen-shows-draft/en-360/01-data-action-new-fault.png",
+      "review/scenarios/inspection/in-df3-fault-report-reopen-shows-draft/en-360/02-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-df3-fault-report-reopen-shows-draft/en-360/03-data-action-back.png",
+      "review/scenarios/inspection/in-df3-fault-report-reopen-shows-draft/en-360/04-data-action-new-fault.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-df3-fault-report-reopen-shows-draft/en-390/00-start.png",
+      "review/scenarios/inspection/in-df3-fault-report-reopen-shows-draft/en-390/01-data-action-new-fault.png",
+      "review/scenarios/inspection/in-df3-fault-report-reopen-shows-draft/en-390/02-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-df3-fault-report-reopen-shows-draft/en-390/03-data-action-back.png",
+      "review/scenarios/inspection/in-df3-fault-report-reopen-shows-draft/en-390/04-data-action-new-fault.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-df3-fault-report-reopen-shows-draft/zh-360/00-start.png",
+      "review/scenarios/inspection/in-df3-fault-report-reopen-shows-draft/zh-360/01-data-action-new-fault.png",
+      "review/scenarios/inspection/in-df3-fault-report-reopen-shows-draft/zh-360/02-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-df3-fault-report-reopen-shows-draft/zh-360/03-data-action-back.png",
+      "review/scenarios/inspection/in-df3-fault-report-reopen-shows-draft/zh-360/04-data-action-new-fault.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-df3-fault-report-reopen-shows-draft/zh-390/00-start.png",
+      "review/scenarios/inspection/in-df3-fault-report-reopen-shows-draft/zh-390/01-data-action-new-fault.png",
+      "review/scenarios/inspection/in-df3-fault-report-reopen-shows-draft/zh-390/02-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-df3-fault-report-reopen-shows-draft/zh-390/03-data-action-back.png",
+      "review/scenarios/inspection/in-df3-fault-report-reopen-shows-draft/zh-390/04-data-action-new-fault.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "in-df4-fault-report-clear-empties",
+   "tree": "DC-4",
+   "branch": "drafts",
+   "label": "Clear empties Report fault and goes; nothing saved",
+   "gwt": {
+    "given": "Report fault was reopened holding the kept draft \"Feeder auger jammed\".",
+    "when": "They tap Clear.",
+    "then": "The field is back as it opened, Clear disappears and nothing is saved."
+   },
+   "path": [
+    "drafts",
+    "drafts.faults-c2",
+    "fault-report.open",
+    "fault-report.type",
+    "fault-report.type.back",
+    "fault-report.type.back.reopen",
+    "fault-report.type.back.reopen.clear",
+    "in-df4-fault-report-clear-empties"
+   ],
+   "authority": [
+    {
+     "src": "owner",
+     "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+     "says": "Clear empties what was entered or ticked … present only when there is something to reset or clear"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-df4-fault-report-clear-empties/en-360/00-start.png",
+      "review/scenarios/inspection/in-df4-fault-report-clear-empties/en-360/01-data-action-new-fault.png",
+      "review/scenarios/inspection/in-df4-fault-report-clear-empties/en-360/02-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-df4-fault-report-clear-empties/en-360/03-data-action-back.png",
+      "review/scenarios/inspection/in-df4-fault-report-clear-empties/en-360/04-data-action-new-fault.png",
+      "review/scenarios/inspection/in-df4-fault-report-clear-empties/en-360/05-data-action-clear-draft.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-df4-fault-report-clear-empties/en-390/00-start.png",
+      "review/scenarios/inspection/in-df4-fault-report-clear-empties/en-390/01-data-action-new-fault.png",
+      "review/scenarios/inspection/in-df4-fault-report-clear-empties/en-390/02-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-df4-fault-report-clear-empties/en-390/03-data-action-back.png",
+      "review/scenarios/inspection/in-df4-fault-report-clear-empties/en-390/04-data-action-new-fault.png",
+      "review/scenarios/inspection/in-df4-fault-report-clear-empties/en-390/05-data-action-clear-draft.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-df4-fault-report-clear-empties/zh-360/00-start.png",
+      "review/scenarios/inspection/in-df4-fault-report-clear-empties/zh-360/01-data-action-new-fault.png",
+      "review/scenarios/inspection/in-df4-fault-report-clear-empties/zh-360/02-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-df4-fault-report-clear-empties/zh-360/03-data-action-back.png",
+      "review/scenarios/inspection/in-df4-fault-report-clear-empties/zh-360/04-data-action-new-fault.png",
+      "review/scenarios/inspection/in-df4-fault-report-clear-empties/zh-360/05-data-action-clear-draft.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-df4-fault-report-clear-empties/zh-390/00-start.png",
+      "review/scenarios/inspection/in-df4-fault-report-clear-empties/zh-390/01-data-action-new-fault.png",
+      "review/scenarios/inspection/in-df4-fault-report-clear-empties/zh-390/02-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-df4-fault-report-clear-empties/zh-390/03-data-action-back.png",
+      "review/scenarios/inspection/in-df4-fault-report-clear-empties/zh-390/04-data-action-new-fault.png",
+      "review/scenarios/inspection/in-df4-fault-report-clear-empties/zh-390/05-data-action-clear-draft.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "in-df5-fault-report-cleared-stays-cleared",
+   "tree": "DC-4",
+   "branch": "drafts",
+   "label": "after Clear, Back and reopen show Report fault as it opened",
+   "gwt": {
+    "given": "They cleared the draft on Report fault.",
+    "when": "They go Back and open it again.",
+    "then": "It opens as it did the first time, with no Clear."
+   },
+   "path": [
+    "drafts",
+    "drafts.faults-c2",
+    "fault-report.open",
+    "fault-report.type",
+    "fault-report.type.back",
+    "fault-report.type.back.reopen",
+    "fault-report.type.back.reopen.clear",
+    "fault-report.type.back.reopen.clear.back",
+    "in-df5-fault-report-cleared-stays-cleared"
+   ],
+   "authority": [
+    {
+     "src": "owner",
+     "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+     "says": "Clear empties what was entered or ticked … present only when there is something to reset or clear"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-df5-fault-report-cleared-stays-cleared/en-360/00-start.png",
+      "review/scenarios/inspection/in-df5-fault-report-cleared-stays-cleared/en-360/01-data-action-new-fault.png",
+      "review/scenarios/inspection/in-df5-fault-report-cleared-stays-cleared/en-360/02-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-df5-fault-report-cleared-stays-cleared/en-360/03-data-action-back.png",
+      "review/scenarios/inspection/in-df5-fault-report-cleared-stays-cleared/en-360/04-data-action-new-fault.png",
+      "review/scenarios/inspection/in-df5-fault-report-cleared-stays-cleared/en-360/05-data-action-clear-draft.png",
+      "review/scenarios/inspection/in-df5-fault-report-cleared-stays-cleared/en-360/06-data-action-back.png",
+      "review/scenarios/inspection/in-df5-fault-report-cleared-stays-cleared/en-360/07-data-action-new-fault.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-df5-fault-report-cleared-stays-cleared/en-390/00-start.png",
+      "review/scenarios/inspection/in-df5-fault-report-cleared-stays-cleared/en-390/01-data-action-new-fault.png",
+      "review/scenarios/inspection/in-df5-fault-report-cleared-stays-cleared/en-390/02-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-df5-fault-report-cleared-stays-cleared/en-390/03-data-action-back.png",
+      "review/scenarios/inspection/in-df5-fault-report-cleared-stays-cleared/en-390/04-data-action-new-fault.png",
+      "review/scenarios/inspection/in-df5-fault-report-cleared-stays-cleared/en-390/05-data-action-clear-draft.png",
+      "review/scenarios/inspection/in-df5-fault-report-cleared-stays-cleared/en-390/06-data-action-back.png",
+      "review/scenarios/inspection/in-df5-fault-report-cleared-stays-cleared/en-390/07-data-action-new-fault.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-df5-fault-report-cleared-stays-cleared/zh-360/00-start.png",
+      "review/scenarios/inspection/in-df5-fault-report-cleared-stays-cleared/zh-360/01-data-action-new-fault.png",
+      "review/scenarios/inspection/in-df5-fault-report-cleared-stays-cleared/zh-360/02-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-df5-fault-report-cleared-stays-cleared/zh-360/03-data-action-back.png",
+      "review/scenarios/inspection/in-df5-fault-report-cleared-stays-cleared/zh-360/04-data-action-new-fault.png",
+      "review/scenarios/inspection/in-df5-fault-report-cleared-stays-cleared/zh-360/05-data-action-clear-draft.png",
+      "review/scenarios/inspection/in-df5-fault-report-cleared-stays-cleared/zh-360/06-data-action-back.png",
+      "review/scenarios/inspection/in-df5-fault-report-cleared-stays-cleared/zh-360/07-data-action-new-fault.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-df5-fault-report-cleared-stays-cleared/zh-390/00-start.png",
+      "review/scenarios/inspection/in-df5-fault-report-cleared-stays-cleared/zh-390/01-data-action-new-fault.png",
+      "review/scenarios/inspection/in-df5-fault-report-cleared-stays-cleared/zh-390/02-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-df5-fault-report-cleared-stays-cleared/zh-390/03-data-action-back.png",
+      "review/scenarios/inspection/in-df5-fault-report-cleared-stays-cleared/zh-390/04-data-action-new-fault.png",
+      "review/scenarios/inspection/in-df5-fault-report-cleared-stays-cleared/zh-390/05-data-action-clear-draft.png",
+      "review/scenarios/inspection/in-df5-fault-report-cleared-stays-cleared/zh-390/06-data-action-back.png",
+      "review/scenarios/inspection/in-df5-fault-report-cleared-stays-cleared/zh-390/07-data-action-new-fault.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "in-df6-fault-report-phone-back-keeps-draft",
+   "tree": "DC-2",
+   "branch": "drafts",
+   "label": "the phone's Back keeps the draft like the footer Back",
+   "gwt": {
+    "given": "Report fault holds \"Feeder auger jammed\", not saved.",
+    "when": "They press the phone's own Back.",
+    "then": "They are back where they came from and the typed text is kept as a draft."
+   },
+   "path": [
+    "drafts",
+    "drafts.faults-c2",
+    "fault-report.open",
+    "fault-report.type",
+    "fault-report.type.sysback",
+    "in-df6-fault-report-phone-back-keeps-draft"
+   ],
+   "authority": [
+    {
+     "src": "owner",
+     "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+     "says": "Back … leaves and returns to where you came from, keeping the draft."
+    },
+    {
+     "src": "owner",
+     "at": "ux/design-system/README.md · The drawer convention",
+     "says": "Swiping down or tapping the scrim does what Back does."
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-df6-fault-report-phone-back-keeps-draft/en-360/00-start.png",
+      "review/scenarios/inspection/in-df6-fault-report-phone-back-keeps-draft/en-360/01-data-action-new-fault.png",
+      "review/scenarios/inspection/in-df6-fault-report-phone-back-keeps-draft/en-360/02-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-df6-fault-report-phone-back-keeps-draft/en-360/03-back.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-df6-fault-report-phone-back-keeps-draft/en-390/00-start.png",
+      "review/scenarios/inspection/in-df6-fault-report-phone-back-keeps-draft/en-390/01-data-action-new-fault.png",
+      "review/scenarios/inspection/in-df6-fault-report-phone-back-keeps-draft/en-390/02-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-df6-fault-report-phone-back-keeps-draft/en-390/03-back.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-df6-fault-report-phone-back-keeps-draft/zh-360/00-start.png",
+      "review/scenarios/inspection/in-df6-fault-report-phone-back-keeps-draft/zh-360/01-data-action-new-fault.png",
+      "review/scenarios/inspection/in-df6-fault-report-phone-back-keeps-draft/zh-360/02-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-df6-fault-report-phone-back-keeps-draft/zh-360/03-back.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-df6-fault-report-phone-back-keeps-draft/zh-390/00-start.png",
+      "review/scenarios/inspection/in-df6-fault-report-phone-back-keeps-draft/zh-390/01-data-action-new-fault.png",
+      "review/scenarios/inspection/in-df6-fault-report-phone-back-keeps-draft/zh-390/02-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-df6-fault-report-phone-back-keeps-draft/zh-390/03-back.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "in-dr0-fault-resolve-opens-without-clear",
+   "tree": "DC-0",
+   "branch": "drafts",
+   "label": "the open fault opens untouched: no Clear",
+   "gwt": {
+    "given": "A worker has pen C2's Equipment faults open; C2 has one open fault.",
+    "when": "They open the open fault.",
+    "then": "the open fault opens as before, with Back and its commit in the footer and no Clear, because nothing has been entered."
+   },
+   "path": [
+    "drafts",
+    "drafts.faults-c2",
+    "fault-resolve.open",
+    "in-dr0-fault-resolve-opens-without-clear"
+   ],
+   "authority": [
+    {
+     "src": "STR",
+     "at": "ux/laws/strings.json · verbs.Clear",
+     "says": "empty what was entered or ticked …; present only while there is something to empty"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dr0-fault-resolve-opens-without-clear/en-360/00-start.png",
+      "review/scenarios/inspection/in-dr0-fault-resolve-opens-without-clear/en-360/01-data-action-fault-record.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dr0-fault-resolve-opens-without-clear/en-390/00-start.png",
+      "review/scenarios/inspection/in-dr0-fault-resolve-opens-without-clear/en-390/01-data-action-fault-record.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dr0-fault-resolve-opens-without-clear/zh-360/00-start.png",
+      "review/scenarios/inspection/in-dr0-fault-resolve-opens-without-clear/zh-360/01-data-action-fault-record.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dr0-fault-resolve-opens-without-clear/zh-390/00-start.png",
+      "review/scenarios/inspection/in-dr0-fault-resolve-opens-without-clear/zh-390/01-data-action-fault-record.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "in-dr1-fault-resolve-typing-shows-clear",
+   "tree": "DC-1",
+   "branch": "drafts",
+   "label": "typing shows Clear in the footer",
+   "gwt": {
+    "given": "the open fault is open and empty of edits.",
+    "when": "They type \"Valve replaced\".",
+    "then": "Clear appears in the footer, left of the commit."
+   },
+   "path": [
+    "drafts",
+    "drafts.faults-c2",
+    "fault-resolve.open",
+    "fault-resolve.type",
+    "in-dr1-fault-resolve-typing-shows-clear"
+   ],
+   "authority": [
+    {
+     "src": "owner",
+     "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+     "says": "Clear empties what was entered or ticked … present only when there is something to reset or clear"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dr1-fault-resolve-typing-shows-clear/en-360/00-start.png",
+      "review/scenarios/inspection/in-dr1-fault-resolve-typing-shows-clear/en-360/01-data-action-fault-record.png",
+      "review/scenarios/inspection/in-dr1-fault-resolve-typing-shows-clear/en-360/02-data-st-optional.png",
+      "review/scenarios/inspection/in-dr1-fault-resolve-typing-shows-clear/en-360/03-fill-data-card-0-phone-sheet-tex.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dr1-fault-resolve-typing-shows-clear/en-390/00-start.png",
+      "review/scenarios/inspection/in-dr1-fault-resolve-typing-shows-clear/en-390/01-data-action-fault-record.png",
+      "review/scenarios/inspection/in-dr1-fault-resolve-typing-shows-clear/en-390/02-data-st-optional.png",
+      "review/scenarios/inspection/in-dr1-fault-resolve-typing-shows-clear/en-390/03-fill-data-card-0-phone-sheet-tex.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dr1-fault-resolve-typing-shows-clear/zh-360/00-start.png",
+      "review/scenarios/inspection/in-dr1-fault-resolve-typing-shows-clear/zh-360/01-data-action-fault-record.png",
+      "review/scenarios/inspection/in-dr1-fault-resolve-typing-shows-clear/zh-360/02-data-st-optional.png",
+      "review/scenarios/inspection/in-dr1-fault-resolve-typing-shows-clear/zh-360/03-fill-data-card-0-phone-sheet-tex.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dr1-fault-resolve-typing-shows-clear/zh-390/00-start.png",
+      "review/scenarios/inspection/in-dr1-fault-resolve-typing-shows-clear/zh-390/01-data-action-fault-record.png",
+      "review/scenarios/inspection/in-dr1-fault-resolve-typing-shows-clear/zh-390/02-data-st-optional.png",
+      "review/scenarios/inspection/in-dr1-fault-resolve-typing-shows-clear/zh-390/03-fill-data-card-0-phone-sheet-tex.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "in-dr2-fault-resolve-back-keeps-draft",
+   "tree": "DC-2",
+   "branch": "drafts",
+   "label": "Back leaves the open fault and keeps the typed draft; nothing saved",
+   "gwt": {
+    "given": "the open fault holds \"Valve replaced\", not saved.",
+    "when": "They tap Back.",
+    "then": "They are back where they came from, the typed text is kept as a draft and nothing is saved."
+   },
+   "path": [
+    "drafts",
+    "drafts.faults-c2",
+    "fault-resolve.open",
+    "fault-resolve.type",
+    "fault-resolve.type.back",
+    "in-dr2-fault-resolve-back-keeps-draft"
+   ],
+   "authority": [
+    {
+     "src": "owner",
+     "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+     "says": "Back … leaves and returns to where you came from, keeping the draft."
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dr2-fault-resolve-back-keeps-draft/en-360/00-start.png",
+      "review/scenarios/inspection/in-dr2-fault-resolve-back-keeps-draft/en-360/01-data-action-fault-record.png",
+      "review/scenarios/inspection/in-dr2-fault-resolve-back-keeps-draft/en-360/02-data-st-optional.png",
+      "review/scenarios/inspection/in-dr2-fault-resolve-back-keeps-draft/en-360/03-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-dr2-fault-resolve-back-keeps-draft/en-360/04-data-action-back.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dr2-fault-resolve-back-keeps-draft/en-390/00-start.png",
+      "review/scenarios/inspection/in-dr2-fault-resolve-back-keeps-draft/en-390/01-data-action-fault-record.png",
+      "review/scenarios/inspection/in-dr2-fault-resolve-back-keeps-draft/en-390/02-data-st-optional.png",
+      "review/scenarios/inspection/in-dr2-fault-resolve-back-keeps-draft/en-390/03-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-dr2-fault-resolve-back-keeps-draft/en-390/04-data-action-back.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dr2-fault-resolve-back-keeps-draft/zh-360/00-start.png",
+      "review/scenarios/inspection/in-dr2-fault-resolve-back-keeps-draft/zh-360/01-data-action-fault-record.png",
+      "review/scenarios/inspection/in-dr2-fault-resolve-back-keeps-draft/zh-360/02-data-st-optional.png",
+      "review/scenarios/inspection/in-dr2-fault-resolve-back-keeps-draft/zh-360/03-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-dr2-fault-resolve-back-keeps-draft/zh-360/04-data-action-back.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dr2-fault-resolve-back-keeps-draft/zh-390/00-start.png",
+      "review/scenarios/inspection/in-dr2-fault-resolve-back-keeps-draft/zh-390/01-data-action-fault-record.png",
+      "review/scenarios/inspection/in-dr2-fault-resolve-back-keeps-draft/zh-390/02-data-st-optional.png",
+      "review/scenarios/inspection/in-dr2-fault-resolve-back-keeps-draft/zh-390/03-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-dr2-fault-resolve-back-keeps-draft/zh-390/04-data-action-back.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "in-dr3-fault-resolve-reopen-shows-draft",
+   "tree": "DC-3",
+   "branch": "drafts",
+   "label": "reopening the open fault shows the draft, with Clear",
+   "gwt": {
+    "given": "They left the open fault with Back while it held \"Valve replaced\".",
+    "when": "They open the open fault again.",
+    "then": "The field still holds \"Valve replaced\" and Clear is in the footer."
+   },
+   "path": [
+    "drafts",
+    "drafts.faults-c2",
+    "fault-resolve.open",
+    "fault-resolve.type",
+    "fault-resolve.type.back",
+    "fault-resolve.type.back.reopen",
+    "in-dr3-fault-resolve-reopen-shows-draft"
+   ],
+   "authority": [
+    {
+     "src": "owner",
+     "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+     "says": "Back … leaves and returns to where you came from, keeping the draft."
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dr3-fault-resolve-reopen-shows-draft/en-360/00-start.png",
+      "review/scenarios/inspection/in-dr3-fault-resolve-reopen-shows-draft/en-360/01-data-action-fault-record.png",
+      "review/scenarios/inspection/in-dr3-fault-resolve-reopen-shows-draft/en-360/02-data-st-optional.png",
+      "review/scenarios/inspection/in-dr3-fault-resolve-reopen-shows-draft/en-360/03-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-dr3-fault-resolve-reopen-shows-draft/en-360/04-data-action-back.png",
+      "review/scenarios/inspection/in-dr3-fault-resolve-reopen-shows-draft/en-360/05-data-action-fault-record.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dr3-fault-resolve-reopen-shows-draft/en-390/00-start.png",
+      "review/scenarios/inspection/in-dr3-fault-resolve-reopen-shows-draft/en-390/01-data-action-fault-record.png",
+      "review/scenarios/inspection/in-dr3-fault-resolve-reopen-shows-draft/en-390/02-data-st-optional.png",
+      "review/scenarios/inspection/in-dr3-fault-resolve-reopen-shows-draft/en-390/03-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-dr3-fault-resolve-reopen-shows-draft/en-390/04-data-action-back.png",
+      "review/scenarios/inspection/in-dr3-fault-resolve-reopen-shows-draft/en-390/05-data-action-fault-record.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dr3-fault-resolve-reopen-shows-draft/zh-360/00-start.png",
+      "review/scenarios/inspection/in-dr3-fault-resolve-reopen-shows-draft/zh-360/01-data-action-fault-record.png",
+      "review/scenarios/inspection/in-dr3-fault-resolve-reopen-shows-draft/zh-360/02-data-st-optional.png",
+      "review/scenarios/inspection/in-dr3-fault-resolve-reopen-shows-draft/zh-360/03-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-dr3-fault-resolve-reopen-shows-draft/zh-360/04-data-action-back.png",
+      "review/scenarios/inspection/in-dr3-fault-resolve-reopen-shows-draft/zh-360/05-data-action-fault-record.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dr3-fault-resolve-reopen-shows-draft/zh-390/00-start.png",
+      "review/scenarios/inspection/in-dr3-fault-resolve-reopen-shows-draft/zh-390/01-data-action-fault-record.png",
+      "review/scenarios/inspection/in-dr3-fault-resolve-reopen-shows-draft/zh-390/02-data-st-optional.png",
+      "review/scenarios/inspection/in-dr3-fault-resolve-reopen-shows-draft/zh-390/03-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-dr3-fault-resolve-reopen-shows-draft/zh-390/04-data-action-back.png",
+      "review/scenarios/inspection/in-dr3-fault-resolve-reopen-shows-draft/zh-390/05-data-action-fault-record.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "in-dr4-fault-resolve-clear-empties",
+   "tree": "DC-4",
+   "branch": "drafts",
+   "label": "Clear empties the open fault and goes; nothing saved",
+   "gwt": {
+    "given": "the open fault was reopened holding the kept draft \"Valve replaced\".",
+    "when": "They tap Clear.",
+    "then": "The field is back as it opened, Clear disappears and nothing is saved."
+   },
+   "path": [
+    "drafts",
+    "drafts.faults-c2",
+    "fault-resolve.open",
+    "fault-resolve.type",
+    "fault-resolve.type.back",
+    "fault-resolve.type.back.reopen",
+    "fault-resolve.type.back.reopen.clear",
+    "in-dr4-fault-resolve-clear-empties"
+   ],
+   "authority": [
+    {
+     "src": "owner",
+     "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+     "says": "Clear empties what was entered or ticked … present only when there is something to reset or clear"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dr4-fault-resolve-clear-empties/en-360/00-start.png",
+      "review/scenarios/inspection/in-dr4-fault-resolve-clear-empties/en-360/01-data-action-fault-record.png",
+      "review/scenarios/inspection/in-dr4-fault-resolve-clear-empties/en-360/02-data-st-optional.png",
+      "review/scenarios/inspection/in-dr4-fault-resolve-clear-empties/en-360/03-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-dr4-fault-resolve-clear-empties/en-360/04-data-action-back.png",
+      "review/scenarios/inspection/in-dr4-fault-resolve-clear-empties/en-360/05-data-action-fault-record.png",
+      "review/scenarios/inspection/in-dr4-fault-resolve-clear-empties/en-360/06-data-action-clear-draft.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dr4-fault-resolve-clear-empties/en-390/00-start.png",
+      "review/scenarios/inspection/in-dr4-fault-resolve-clear-empties/en-390/01-data-action-fault-record.png",
+      "review/scenarios/inspection/in-dr4-fault-resolve-clear-empties/en-390/02-data-st-optional.png",
+      "review/scenarios/inspection/in-dr4-fault-resolve-clear-empties/en-390/03-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-dr4-fault-resolve-clear-empties/en-390/04-data-action-back.png",
+      "review/scenarios/inspection/in-dr4-fault-resolve-clear-empties/en-390/05-data-action-fault-record.png",
+      "review/scenarios/inspection/in-dr4-fault-resolve-clear-empties/en-390/06-data-action-clear-draft.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dr4-fault-resolve-clear-empties/zh-360/00-start.png",
+      "review/scenarios/inspection/in-dr4-fault-resolve-clear-empties/zh-360/01-data-action-fault-record.png",
+      "review/scenarios/inspection/in-dr4-fault-resolve-clear-empties/zh-360/02-data-st-optional.png",
+      "review/scenarios/inspection/in-dr4-fault-resolve-clear-empties/zh-360/03-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-dr4-fault-resolve-clear-empties/zh-360/04-data-action-back.png",
+      "review/scenarios/inspection/in-dr4-fault-resolve-clear-empties/zh-360/05-data-action-fault-record.png",
+      "review/scenarios/inspection/in-dr4-fault-resolve-clear-empties/zh-360/06-data-action-clear-draft.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dr4-fault-resolve-clear-empties/zh-390/00-start.png",
+      "review/scenarios/inspection/in-dr4-fault-resolve-clear-empties/zh-390/01-data-action-fault-record.png",
+      "review/scenarios/inspection/in-dr4-fault-resolve-clear-empties/zh-390/02-data-st-optional.png",
+      "review/scenarios/inspection/in-dr4-fault-resolve-clear-empties/zh-390/03-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-dr4-fault-resolve-clear-empties/zh-390/04-data-action-back.png",
+      "review/scenarios/inspection/in-dr4-fault-resolve-clear-empties/zh-390/05-data-action-fault-record.png",
+      "review/scenarios/inspection/in-dr4-fault-resolve-clear-empties/zh-390/06-data-action-clear-draft.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "in-dr5-fault-resolve-cleared-stays-cleared",
+   "tree": "DC-4",
+   "branch": "drafts",
+   "label": "after Clear, Back and reopen show the open fault as it opened",
+   "gwt": {
+    "given": "They cleared the draft on the open fault.",
+    "when": "They go Back and open it again.",
+    "then": "It opens as it did the first time, with no Clear."
+   },
+   "path": [
+    "drafts",
+    "drafts.faults-c2",
+    "fault-resolve.open",
+    "fault-resolve.type",
+    "fault-resolve.type.back",
+    "fault-resolve.type.back.reopen",
+    "fault-resolve.type.back.reopen.clear",
+    "fault-resolve.type.back.reopen.clear.back",
+    "in-dr5-fault-resolve-cleared-stays-cleared"
+   ],
+   "authority": [
+    {
+     "src": "owner",
+     "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+     "says": "Clear empties what was entered or ticked … present only when there is something to reset or clear"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dr5-fault-resolve-cleared-stays-cleared/en-360/00-start.png",
+      "review/scenarios/inspection/in-dr5-fault-resolve-cleared-stays-cleared/en-360/01-data-action-fault-record.png",
+      "review/scenarios/inspection/in-dr5-fault-resolve-cleared-stays-cleared/en-360/02-data-st-optional.png",
+      "review/scenarios/inspection/in-dr5-fault-resolve-cleared-stays-cleared/en-360/03-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-dr5-fault-resolve-cleared-stays-cleared/en-360/04-data-action-back.png",
+      "review/scenarios/inspection/in-dr5-fault-resolve-cleared-stays-cleared/en-360/05-data-action-fault-record.png",
+      "review/scenarios/inspection/in-dr5-fault-resolve-cleared-stays-cleared/en-360/06-data-action-clear-draft.png",
+      "review/scenarios/inspection/in-dr5-fault-resolve-cleared-stays-cleared/en-360/07-data-action-back.png",
+      "review/scenarios/inspection/in-dr5-fault-resolve-cleared-stays-cleared/en-360/08-data-action-fault-record.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dr5-fault-resolve-cleared-stays-cleared/en-390/00-start.png",
+      "review/scenarios/inspection/in-dr5-fault-resolve-cleared-stays-cleared/en-390/01-data-action-fault-record.png",
+      "review/scenarios/inspection/in-dr5-fault-resolve-cleared-stays-cleared/en-390/02-data-st-optional.png",
+      "review/scenarios/inspection/in-dr5-fault-resolve-cleared-stays-cleared/en-390/03-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-dr5-fault-resolve-cleared-stays-cleared/en-390/04-data-action-back.png",
+      "review/scenarios/inspection/in-dr5-fault-resolve-cleared-stays-cleared/en-390/05-data-action-fault-record.png",
+      "review/scenarios/inspection/in-dr5-fault-resolve-cleared-stays-cleared/en-390/06-data-action-clear-draft.png",
+      "review/scenarios/inspection/in-dr5-fault-resolve-cleared-stays-cleared/en-390/07-data-action-back.png",
+      "review/scenarios/inspection/in-dr5-fault-resolve-cleared-stays-cleared/en-390/08-data-action-fault-record.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dr5-fault-resolve-cleared-stays-cleared/zh-360/00-start.png",
+      "review/scenarios/inspection/in-dr5-fault-resolve-cleared-stays-cleared/zh-360/01-data-action-fault-record.png",
+      "review/scenarios/inspection/in-dr5-fault-resolve-cleared-stays-cleared/zh-360/02-data-st-optional.png",
+      "review/scenarios/inspection/in-dr5-fault-resolve-cleared-stays-cleared/zh-360/03-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-dr5-fault-resolve-cleared-stays-cleared/zh-360/04-data-action-back.png",
+      "review/scenarios/inspection/in-dr5-fault-resolve-cleared-stays-cleared/zh-360/05-data-action-fault-record.png",
+      "review/scenarios/inspection/in-dr5-fault-resolve-cleared-stays-cleared/zh-360/06-data-action-clear-draft.png",
+      "review/scenarios/inspection/in-dr5-fault-resolve-cleared-stays-cleared/zh-360/07-data-action-back.png",
+      "review/scenarios/inspection/in-dr5-fault-resolve-cleared-stays-cleared/zh-360/08-data-action-fault-record.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dr5-fault-resolve-cleared-stays-cleared/zh-390/00-start.png",
+      "review/scenarios/inspection/in-dr5-fault-resolve-cleared-stays-cleared/zh-390/01-data-action-fault-record.png",
+      "review/scenarios/inspection/in-dr5-fault-resolve-cleared-stays-cleared/zh-390/02-data-st-optional.png",
+      "review/scenarios/inspection/in-dr5-fault-resolve-cleared-stays-cleared/zh-390/03-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-dr5-fault-resolve-cleared-stays-cleared/zh-390/04-data-action-back.png",
+      "review/scenarios/inspection/in-dr5-fault-resolve-cleared-stays-cleared/zh-390/05-data-action-fault-record.png",
+      "review/scenarios/inspection/in-dr5-fault-resolve-cleared-stays-cleared/zh-390/06-data-action-clear-draft.png",
+      "review/scenarios/inspection/in-dr5-fault-resolve-cleared-stays-cleared/zh-390/07-data-action-back.png",
+      "review/scenarios/inspection/in-dr5-fault-resolve-cleared-stays-cleared/zh-390/08-data-action-fault-record.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "in-dr6-fault-resolve-phone-back-keeps-draft",
+   "tree": "DC-2",
+   "branch": "drafts",
+   "label": "the phone's Back keeps the draft like the footer Back",
+   "gwt": {
+    "given": "the open fault holds \"Valve replaced\", not saved.",
+    "when": "They press the phone's own Back.",
+    "then": "They are back where they came from and the typed text is kept as a draft."
+   },
+   "path": [
+    "drafts",
+    "drafts.faults-c2",
+    "fault-resolve.open",
+    "fault-resolve.type",
+    "fault-resolve.type.sysback",
+    "in-dr6-fault-resolve-phone-back-keeps-draft"
+   ],
+   "authority": [
+    {
+     "src": "owner",
+     "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+     "says": "Back … leaves and returns to where you came from, keeping the draft."
+    },
+    {
+     "src": "owner",
+     "at": "ux/design-system/README.md · The drawer convention",
+     "says": "Swiping down or tapping the scrim does what Back does."
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dr6-fault-resolve-phone-back-keeps-draft/en-360/00-start.png",
+      "review/scenarios/inspection/in-dr6-fault-resolve-phone-back-keeps-draft/en-360/01-data-action-fault-record.png",
+      "review/scenarios/inspection/in-dr6-fault-resolve-phone-back-keeps-draft/en-360/02-data-st-optional.png",
+      "review/scenarios/inspection/in-dr6-fault-resolve-phone-back-keeps-draft/en-360/03-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-dr6-fault-resolve-phone-back-keeps-draft/en-360/04-back.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dr6-fault-resolve-phone-back-keeps-draft/en-390/00-start.png",
+      "review/scenarios/inspection/in-dr6-fault-resolve-phone-back-keeps-draft/en-390/01-data-action-fault-record.png",
+      "review/scenarios/inspection/in-dr6-fault-resolve-phone-back-keeps-draft/en-390/02-data-st-optional.png",
+      "review/scenarios/inspection/in-dr6-fault-resolve-phone-back-keeps-draft/en-390/03-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-dr6-fault-resolve-phone-back-keeps-draft/en-390/04-back.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dr6-fault-resolve-phone-back-keeps-draft/zh-360/00-start.png",
+      "review/scenarios/inspection/in-dr6-fault-resolve-phone-back-keeps-draft/zh-360/01-data-action-fault-record.png",
+      "review/scenarios/inspection/in-dr6-fault-resolve-phone-back-keeps-draft/zh-360/02-data-st-optional.png",
+      "review/scenarios/inspection/in-dr6-fault-resolve-phone-back-keeps-draft/zh-360/03-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-dr6-fault-resolve-phone-back-keeps-draft/zh-360/04-back.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dr6-fault-resolve-phone-back-keeps-draft/zh-390/00-start.png",
+      "review/scenarios/inspection/in-dr6-fault-resolve-phone-back-keeps-draft/zh-390/01-data-action-fault-record.png",
+      "review/scenarios/inspection/in-dr6-fault-resolve-phone-back-keeps-draft/zh-390/02-data-st-optional.png",
+      "review/scenarios/inspection/in-dr6-fault-resolve-phone-back-keeps-draft/zh-390/03-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-dr6-fault-resolve-phone-back-keeps-draft/zh-390/04-back.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "in-ds0-selected-note-opens-without-clear",
+   "tree": "DC-0",
+   "branch": "drafts",
+   "label": "Pen note for the ticked pens opens untouched: no Clear",
+   "gwt": {
+    "given": "A worker on the unit walk has ticked pen C2 and opened More actions.",
+    "when": "They open Pen note for the ticked pens.",
+    "then": "Pen note for the ticked pens opens as before, with Back and its commit in the footer and no Clear, because nothing has been entered."
+   },
+   "path": [
+    "drafts",
+    "drafts.pens-selected",
+    "selected-note.open",
+    "in-ds0-selected-note-opens-without-clear"
+   ],
+   "authority": [
+    {
+     "src": "STR",
+     "at": "ux/laws/strings.json · verbs.Clear",
+     "says": "empty what was entered or ticked …; present only while there is something to empty"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-ds0-selected-note-opens-without-clear/en-360/00-start.png",
+      "review/scenarios/inspection/in-ds0-selected-note-opens-without-clear/en-360/01-data-action-selected-pen-note.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-ds0-selected-note-opens-without-clear/en-390/00-start.png",
+      "review/scenarios/inspection/in-ds0-selected-note-opens-without-clear/en-390/01-data-action-selected-pen-note.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-ds0-selected-note-opens-without-clear/zh-360/00-start.png",
+      "review/scenarios/inspection/in-ds0-selected-note-opens-without-clear/zh-360/01-data-action-selected-pen-note.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-ds0-selected-note-opens-without-clear/zh-390/00-start.png",
+      "review/scenarios/inspection/in-ds0-selected-note-opens-without-clear/zh-390/01-data-action-selected-pen-note.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "in-ds1-selected-note-typing-shows-clear",
+   "tree": "DC-1",
+   "branch": "drafts",
+   "label": "typing shows Clear in the footer",
+   "gwt": {
+    "given": "Pen note for the ticked pens is open and empty of edits.",
+    "when": "They type \"Lights left on\".",
+    "then": "Clear appears in the footer, left of the commit."
+   },
+   "path": [
+    "drafts",
+    "drafts.pens-selected",
+    "selected-note.open",
+    "selected-note.type",
+    "in-ds1-selected-note-typing-shows-clear"
+   ],
+   "authority": [
+    {
+     "src": "owner",
+     "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+     "says": "Clear empties what was entered or ticked … present only when there is something to reset or clear"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-ds1-selected-note-typing-shows-clear/en-360/00-start.png",
+      "review/scenarios/inspection/in-ds1-selected-note-typing-shows-clear/en-360/01-data-action-selected-pen-note.png",
+      "review/scenarios/inspection/in-ds1-selected-note-typing-shows-clear/en-360/02-fill-data-card-0-phone-sheet-tex.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-ds1-selected-note-typing-shows-clear/en-390/00-start.png",
+      "review/scenarios/inspection/in-ds1-selected-note-typing-shows-clear/en-390/01-data-action-selected-pen-note.png",
+      "review/scenarios/inspection/in-ds1-selected-note-typing-shows-clear/en-390/02-fill-data-card-0-phone-sheet-tex.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-ds1-selected-note-typing-shows-clear/zh-360/00-start.png",
+      "review/scenarios/inspection/in-ds1-selected-note-typing-shows-clear/zh-360/01-data-action-selected-pen-note.png",
+      "review/scenarios/inspection/in-ds1-selected-note-typing-shows-clear/zh-360/02-fill-data-card-0-phone-sheet-tex.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-ds1-selected-note-typing-shows-clear/zh-390/00-start.png",
+      "review/scenarios/inspection/in-ds1-selected-note-typing-shows-clear/zh-390/01-data-action-selected-pen-note.png",
+      "review/scenarios/inspection/in-ds1-selected-note-typing-shows-clear/zh-390/02-fill-data-card-0-phone-sheet-tex.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "in-ds2-selected-note-back-keeps-draft",
+   "tree": "DC-2",
+   "branch": "drafts",
+   "label": "Back leaves Pen note for the ticked pens and keeps the typed draft; nothing saved",
+   "gwt": {
+    "given": "Pen note for the ticked pens holds \"Lights left on\", not saved.",
+    "when": "They tap Back.",
+    "then": "They are back where they came from, the typed text is kept as a draft and nothing is saved."
+   },
+   "path": [
+    "drafts",
+    "drafts.pens-selected",
+    "selected-note.open",
+    "selected-note.type",
+    "selected-note.type.back",
+    "in-ds2-selected-note-back-keeps-draft"
+   ],
+   "authority": [
+    {
+     "src": "owner",
+     "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+     "says": "Back … leaves and returns to where you came from, keeping the draft."
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-ds2-selected-note-back-keeps-draft/en-360/00-start.png",
+      "review/scenarios/inspection/in-ds2-selected-note-back-keeps-draft/en-360/01-data-action-selected-pen-note.png",
+      "review/scenarios/inspection/in-ds2-selected-note-back-keeps-draft/en-360/02-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-ds2-selected-note-back-keeps-draft/en-360/03-data-action-back.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-ds2-selected-note-back-keeps-draft/en-390/00-start.png",
+      "review/scenarios/inspection/in-ds2-selected-note-back-keeps-draft/en-390/01-data-action-selected-pen-note.png",
+      "review/scenarios/inspection/in-ds2-selected-note-back-keeps-draft/en-390/02-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-ds2-selected-note-back-keeps-draft/en-390/03-data-action-back.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-ds2-selected-note-back-keeps-draft/zh-360/00-start.png",
+      "review/scenarios/inspection/in-ds2-selected-note-back-keeps-draft/zh-360/01-data-action-selected-pen-note.png",
+      "review/scenarios/inspection/in-ds2-selected-note-back-keeps-draft/zh-360/02-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-ds2-selected-note-back-keeps-draft/zh-360/03-data-action-back.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-ds2-selected-note-back-keeps-draft/zh-390/00-start.png",
+      "review/scenarios/inspection/in-ds2-selected-note-back-keeps-draft/zh-390/01-data-action-selected-pen-note.png",
+      "review/scenarios/inspection/in-ds2-selected-note-back-keeps-draft/zh-390/02-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-ds2-selected-note-back-keeps-draft/zh-390/03-data-action-back.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "in-ds3-selected-note-reopen-shows-draft",
+   "tree": "DC-3",
+   "branch": "drafts",
+   "label": "reopening Pen note for the ticked pens shows the draft, with Clear",
+   "gwt": {
+    "given": "They left Pen note for the ticked pens with Back while it held \"Lights left on\".",
+    "when": "They open Pen note for the ticked pens again.",
+    "then": "The field still holds \"Lights left on\" and Clear is in the footer."
+   },
+   "path": [
+    "drafts",
+    "drafts.pens-selected",
+    "selected-note.open",
+    "selected-note.type",
+    "selected-note.type.back",
+    "selected-note.type.back.reopen",
+    "in-ds3-selected-note-reopen-shows-draft"
+   ],
+   "authority": [
+    {
+     "src": "owner",
+     "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+     "says": "Back … leaves and returns to where you came from, keeping the draft."
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-ds3-selected-note-reopen-shows-draft/en-360/00-start.png",
+      "review/scenarios/inspection/in-ds3-selected-note-reopen-shows-draft/en-360/01-data-action-selected-pen-note.png",
+      "review/scenarios/inspection/in-ds3-selected-note-reopen-shows-draft/en-360/02-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-ds3-selected-note-reopen-shows-draft/en-360/03-data-action-back.png",
+      "review/scenarios/inspection/in-ds3-selected-note-reopen-shows-draft/en-360/04-data-action-selected-pen-note.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-ds3-selected-note-reopen-shows-draft/en-390/00-start.png",
+      "review/scenarios/inspection/in-ds3-selected-note-reopen-shows-draft/en-390/01-data-action-selected-pen-note.png",
+      "review/scenarios/inspection/in-ds3-selected-note-reopen-shows-draft/en-390/02-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-ds3-selected-note-reopen-shows-draft/en-390/03-data-action-back.png",
+      "review/scenarios/inspection/in-ds3-selected-note-reopen-shows-draft/en-390/04-data-action-selected-pen-note.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-ds3-selected-note-reopen-shows-draft/zh-360/00-start.png",
+      "review/scenarios/inspection/in-ds3-selected-note-reopen-shows-draft/zh-360/01-data-action-selected-pen-note.png",
+      "review/scenarios/inspection/in-ds3-selected-note-reopen-shows-draft/zh-360/02-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-ds3-selected-note-reopen-shows-draft/zh-360/03-data-action-back.png",
+      "review/scenarios/inspection/in-ds3-selected-note-reopen-shows-draft/zh-360/04-data-action-selected-pen-note.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-ds3-selected-note-reopen-shows-draft/zh-390/00-start.png",
+      "review/scenarios/inspection/in-ds3-selected-note-reopen-shows-draft/zh-390/01-data-action-selected-pen-note.png",
+      "review/scenarios/inspection/in-ds3-selected-note-reopen-shows-draft/zh-390/02-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-ds3-selected-note-reopen-shows-draft/zh-390/03-data-action-back.png",
+      "review/scenarios/inspection/in-ds3-selected-note-reopen-shows-draft/zh-390/04-data-action-selected-pen-note.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "in-ds4-selected-note-clear-empties",
+   "tree": "DC-4",
+   "branch": "drafts",
+   "label": "Clear empties Pen note for the ticked pens and goes; nothing saved",
+   "gwt": {
+    "given": "Pen note for the ticked pens was reopened holding the kept draft \"Lights left on\".",
+    "when": "They tap Clear.",
+    "then": "The field is back as it opened, Clear disappears and nothing is saved."
+   },
+   "path": [
+    "drafts",
+    "drafts.pens-selected",
+    "selected-note.open",
+    "selected-note.type",
+    "selected-note.type.back",
+    "selected-note.type.back.reopen",
+    "selected-note.type.back.reopen.clear",
+    "in-ds4-selected-note-clear-empties"
+   ],
+   "authority": [
+    {
+     "src": "owner",
+     "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+     "says": "Clear empties what was entered or ticked … present only when there is something to reset or clear"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-ds4-selected-note-clear-empties/en-360/00-start.png",
+      "review/scenarios/inspection/in-ds4-selected-note-clear-empties/en-360/01-data-action-selected-pen-note.png",
+      "review/scenarios/inspection/in-ds4-selected-note-clear-empties/en-360/02-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-ds4-selected-note-clear-empties/en-360/03-data-action-back.png",
+      "review/scenarios/inspection/in-ds4-selected-note-clear-empties/en-360/04-data-action-selected-pen-note.png",
+      "review/scenarios/inspection/in-ds4-selected-note-clear-empties/en-360/05-data-action-clear-draft.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-ds4-selected-note-clear-empties/en-390/00-start.png",
+      "review/scenarios/inspection/in-ds4-selected-note-clear-empties/en-390/01-data-action-selected-pen-note.png",
+      "review/scenarios/inspection/in-ds4-selected-note-clear-empties/en-390/02-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-ds4-selected-note-clear-empties/en-390/03-data-action-back.png",
+      "review/scenarios/inspection/in-ds4-selected-note-clear-empties/en-390/04-data-action-selected-pen-note.png",
+      "review/scenarios/inspection/in-ds4-selected-note-clear-empties/en-390/05-data-action-clear-draft.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-ds4-selected-note-clear-empties/zh-360/00-start.png",
+      "review/scenarios/inspection/in-ds4-selected-note-clear-empties/zh-360/01-data-action-selected-pen-note.png",
+      "review/scenarios/inspection/in-ds4-selected-note-clear-empties/zh-360/02-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-ds4-selected-note-clear-empties/zh-360/03-data-action-back.png",
+      "review/scenarios/inspection/in-ds4-selected-note-clear-empties/zh-360/04-data-action-selected-pen-note.png",
+      "review/scenarios/inspection/in-ds4-selected-note-clear-empties/zh-360/05-data-action-clear-draft.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-ds4-selected-note-clear-empties/zh-390/00-start.png",
+      "review/scenarios/inspection/in-ds4-selected-note-clear-empties/zh-390/01-data-action-selected-pen-note.png",
+      "review/scenarios/inspection/in-ds4-selected-note-clear-empties/zh-390/02-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-ds4-selected-note-clear-empties/zh-390/03-data-action-back.png",
+      "review/scenarios/inspection/in-ds4-selected-note-clear-empties/zh-390/04-data-action-selected-pen-note.png",
+      "review/scenarios/inspection/in-ds4-selected-note-clear-empties/zh-390/05-data-action-clear-draft.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "in-ds5-selected-note-cleared-stays-cleared",
+   "tree": "DC-4",
+   "branch": "drafts",
+   "label": "after Clear, Back and reopen show Pen note for the ticked pens as it opened",
+   "gwt": {
+    "given": "They cleared the draft on Pen note for the ticked pens.",
+    "when": "They go Back and open it again.",
+    "then": "It opens as it did the first time, with no Clear."
+   },
+   "path": [
+    "drafts",
+    "drafts.pens-selected",
+    "selected-note.open",
+    "selected-note.type",
+    "selected-note.type.back",
+    "selected-note.type.back.reopen",
+    "selected-note.type.back.reopen.clear",
+    "selected-note.type.back.reopen.clear.back",
+    "in-ds5-selected-note-cleared-stays-cleared"
+   ],
+   "authority": [
+    {
+     "src": "owner",
+     "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+     "says": "Clear empties what was entered or ticked … present only when there is something to reset or clear"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-ds5-selected-note-cleared-stays-cleared/en-360/00-start.png",
+      "review/scenarios/inspection/in-ds5-selected-note-cleared-stays-cleared/en-360/01-data-action-selected-pen-note.png",
+      "review/scenarios/inspection/in-ds5-selected-note-cleared-stays-cleared/en-360/02-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-ds5-selected-note-cleared-stays-cleared/en-360/03-data-action-back.png",
+      "review/scenarios/inspection/in-ds5-selected-note-cleared-stays-cleared/en-360/04-data-action-selected-pen-note.png",
+      "review/scenarios/inspection/in-ds5-selected-note-cleared-stays-cleared/en-360/05-data-action-clear-draft.png",
+      "review/scenarios/inspection/in-ds5-selected-note-cleared-stays-cleared/en-360/06-data-action-back.png",
+      "review/scenarios/inspection/in-ds5-selected-note-cleared-stays-cleared/en-360/07-data-action-selected-pen-note.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-ds5-selected-note-cleared-stays-cleared/en-390/00-start.png",
+      "review/scenarios/inspection/in-ds5-selected-note-cleared-stays-cleared/en-390/01-data-action-selected-pen-note.png",
+      "review/scenarios/inspection/in-ds5-selected-note-cleared-stays-cleared/en-390/02-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-ds5-selected-note-cleared-stays-cleared/en-390/03-data-action-back.png",
+      "review/scenarios/inspection/in-ds5-selected-note-cleared-stays-cleared/en-390/04-data-action-selected-pen-note.png",
+      "review/scenarios/inspection/in-ds5-selected-note-cleared-stays-cleared/en-390/05-data-action-clear-draft.png",
+      "review/scenarios/inspection/in-ds5-selected-note-cleared-stays-cleared/en-390/06-data-action-back.png",
+      "review/scenarios/inspection/in-ds5-selected-note-cleared-stays-cleared/en-390/07-data-action-selected-pen-note.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-ds5-selected-note-cleared-stays-cleared/zh-360/00-start.png",
+      "review/scenarios/inspection/in-ds5-selected-note-cleared-stays-cleared/zh-360/01-data-action-selected-pen-note.png",
+      "review/scenarios/inspection/in-ds5-selected-note-cleared-stays-cleared/zh-360/02-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-ds5-selected-note-cleared-stays-cleared/zh-360/03-data-action-back.png",
+      "review/scenarios/inspection/in-ds5-selected-note-cleared-stays-cleared/zh-360/04-data-action-selected-pen-note.png",
+      "review/scenarios/inspection/in-ds5-selected-note-cleared-stays-cleared/zh-360/05-data-action-clear-draft.png",
+      "review/scenarios/inspection/in-ds5-selected-note-cleared-stays-cleared/zh-360/06-data-action-back.png",
+      "review/scenarios/inspection/in-ds5-selected-note-cleared-stays-cleared/zh-360/07-data-action-selected-pen-note.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-ds5-selected-note-cleared-stays-cleared/zh-390/00-start.png",
+      "review/scenarios/inspection/in-ds5-selected-note-cleared-stays-cleared/zh-390/01-data-action-selected-pen-note.png",
+      "review/scenarios/inspection/in-ds5-selected-note-cleared-stays-cleared/zh-390/02-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-ds5-selected-note-cleared-stays-cleared/zh-390/03-data-action-back.png",
+      "review/scenarios/inspection/in-ds5-selected-note-cleared-stays-cleared/zh-390/04-data-action-selected-pen-note.png",
+      "review/scenarios/inspection/in-ds5-selected-note-cleared-stays-cleared/zh-390/05-data-action-clear-draft.png",
+      "review/scenarios/inspection/in-ds5-selected-note-cleared-stays-cleared/zh-390/06-data-action-back.png",
+      "review/scenarios/inspection/in-ds5-selected-note-cleared-stays-cleared/zh-390/07-data-action-selected-pen-note.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "in-ds6-selected-note-phone-back-keeps-draft",
+   "tree": "DC-2",
+   "branch": "drafts",
+   "label": "the phone's Back keeps the draft like the footer Back",
+   "gwt": {
+    "given": "Pen note for the ticked pens holds \"Lights left on\", not saved.",
+    "when": "They press the phone's own Back.",
+    "then": "They are back where they came from and the typed text is kept as a draft."
+   },
+   "path": [
+    "drafts",
+    "drafts.pens-selected",
+    "selected-note.open",
+    "selected-note.type",
+    "selected-note.type.sysback",
+    "in-ds6-selected-note-phone-back-keeps-draft"
+   ],
+   "authority": [
+    {
+     "src": "owner",
+     "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+     "says": "Back … leaves and returns to where you came from, keeping the draft."
+    },
+    {
+     "src": "owner",
+     "at": "ux/design-system/README.md · The drawer convention",
+     "says": "Swiping down or tapping the scrim does what Back does."
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-ds6-selected-note-phone-back-keeps-draft/en-360/00-start.png",
+      "review/scenarios/inspection/in-ds6-selected-note-phone-back-keeps-draft/en-360/01-data-action-selected-pen-note.png",
+      "review/scenarios/inspection/in-ds6-selected-note-phone-back-keeps-draft/en-360/02-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-ds6-selected-note-phone-back-keeps-draft/en-360/03-back.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-ds6-selected-note-phone-back-keeps-draft/en-390/00-start.png",
+      "review/scenarios/inspection/in-ds6-selected-note-phone-back-keeps-draft/en-390/01-data-action-selected-pen-note.png",
+      "review/scenarios/inspection/in-ds6-selected-note-phone-back-keeps-draft/en-390/02-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-ds6-selected-note-phone-back-keeps-draft/en-390/03-back.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-ds6-selected-note-phone-back-keeps-draft/zh-360/00-start.png",
+      "review/scenarios/inspection/in-ds6-selected-note-phone-back-keeps-draft/zh-360/01-data-action-selected-pen-note.png",
+      "review/scenarios/inspection/in-ds6-selected-note-phone-back-keeps-draft/zh-360/02-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-ds6-selected-note-phone-back-keeps-draft/zh-360/03-back.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-ds6-selected-note-phone-back-keeps-draft/zh-390/00-start.png",
+      "review/scenarios/inspection/in-ds6-selected-note-phone-back-keeps-draft/zh-390/01-data-action-selected-pen-note.png",
+      "review/scenarios/inspection/in-ds6-selected-note-phone-back-keeps-draft/zh-390/02-fill-data-card-0-phone-sheet-tex.png",
+      "review/scenarios/inspection/in-ds6-selected-note-phone-back-keeps-draft/zh-390/03-back.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "in-dq1-filters-back-applies-nothing",
+   "tree": "DC-2",
+   "branch": "drafts",
+   "label": "Back from Filter pigs applies nothing and keeps the pick as a draft",
+   "gwt": {
+    "given": "A worker on an unfiltered walk opened Filter pigs and picked Care · Monitor without showing pigs.",
+    "when": "They tap Back.",
+    "then": "The walk list is unfiltered, and the pick is kept as a draft."
+   },
+   "path": [
+    "drafts",
+    "drafts.filters",
+    "filters.pick",
+    "in-dq1-filters-back-applies-nothing"
+   ],
+   "authority": [
+    {
+     "src": "owner",
+     "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+     "says": "Back … leaves and returns to where you came from, keeping the draft."
+    },
+    {
+     "src": "owner",
+     "at": "ux/design-system/README.md · The drawer convention",
+     "says": "In a multi picker Back closes without applying, and the ticks wait as a draft for the next open."
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dq1-filters-back-applies-nothing/en-360/00-start.png",
+      "review/scenarios/inspection/in-dq1-filters-back-applies-nothing/en-360/01-data-picker-key-triagefilter.png",
+      "review/scenarios/inspection/in-dq1-filters-back-applies-nothing/en-360/02-data-action-picker-select-data-v.png",
+      "review/scenarios/inspection/in-dq1-filters-back-applies-nothing/en-360/03-data-action-back.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dq1-filters-back-applies-nothing/en-390/00-start.png",
+      "review/scenarios/inspection/in-dq1-filters-back-applies-nothing/en-390/01-data-picker-key-triagefilter.png",
+      "review/scenarios/inspection/in-dq1-filters-back-applies-nothing/en-390/02-data-action-picker-select-data-v.png",
+      "review/scenarios/inspection/in-dq1-filters-back-applies-nothing/en-390/03-data-action-back.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dq1-filters-back-applies-nothing/zh-360/00-start.png",
+      "review/scenarios/inspection/in-dq1-filters-back-applies-nothing/zh-360/01-data-picker-key-triagefilter.png",
+      "review/scenarios/inspection/in-dq1-filters-back-applies-nothing/zh-360/02-data-action-picker-select-data-v.png",
+      "review/scenarios/inspection/in-dq1-filters-back-applies-nothing/zh-360/03-data-action-back.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dq1-filters-back-applies-nothing/zh-390/00-start.png",
+      "review/scenarios/inspection/in-dq1-filters-back-applies-nothing/zh-390/01-data-picker-key-triagefilter.png",
+      "review/scenarios/inspection/in-dq1-filters-back-applies-nothing/zh-390/02-data-action-picker-select-data-v.png",
+      "review/scenarios/inspection/in-dq1-filters-back-applies-nothing/zh-390/03-data-action-back.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "in-dq2-filters-reopen-shows-draft",
+   "tree": "DC-3",
+   "branch": "drafts",
+   "label": "reopening Filter pigs shows the kept pick; Reset still restores the defaults",
+   "gwt": {
+    "given": "The worker left Filter pigs with Back after picking Care · Monitor.",
+    "when": "They open Filter pigs again.",
+    "then": "Care still reads Monitor, waiting to be shown."
+   },
+   "path": [
+    "drafts",
+    "drafts.filters",
+    "filters.pick",
+    "filters.pick.reopen",
+    "in-dq2-filters-reopen-shows-draft"
+   ],
+   "authority": [
+    {
+     "src": "owner",
+     "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+     "says": "Back … leaves and returns to where you came from, keeping the draft."
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dq2-filters-reopen-shows-draft/en-360/00-start.png",
+      "review/scenarios/inspection/in-dq2-filters-reopen-shows-draft/en-360/01-data-picker-key-triagefilter.png",
+      "review/scenarios/inspection/in-dq2-filters-reopen-shows-draft/en-360/02-data-action-picker-select-data-v.png",
+      "review/scenarios/inspection/in-dq2-filters-reopen-shows-draft/en-360/03-data-action-back.png",
+      "review/scenarios/inspection/in-dq2-filters-reopen-shows-draft/en-360/04-data-action-filters.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dq2-filters-reopen-shows-draft/en-390/00-start.png",
+      "review/scenarios/inspection/in-dq2-filters-reopen-shows-draft/en-390/01-data-picker-key-triagefilter.png",
+      "review/scenarios/inspection/in-dq2-filters-reopen-shows-draft/en-390/02-data-action-picker-select-data-v.png",
+      "review/scenarios/inspection/in-dq2-filters-reopen-shows-draft/en-390/03-data-action-back.png",
+      "review/scenarios/inspection/in-dq2-filters-reopen-shows-draft/en-390/04-data-action-filters.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dq2-filters-reopen-shows-draft/zh-360/00-start.png",
+      "review/scenarios/inspection/in-dq2-filters-reopen-shows-draft/zh-360/01-data-picker-key-triagefilter.png",
+      "review/scenarios/inspection/in-dq2-filters-reopen-shows-draft/zh-360/02-data-action-picker-select-data-v.png",
+      "review/scenarios/inspection/in-dq2-filters-reopen-shows-draft/zh-360/03-data-action-back.png",
+      "review/scenarios/inspection/in-dq2-filters-reopen-shows-draft/zh-360/04-data-action-filters.png"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/inspection/in-dq2-filters-reopen-shows-draft/zh-390/00-start.png",
+      "review/scenarios/inspection/in-dq2-filters-reopen-shows-draft/zh-390/01-data-picker-key-triagefilter.png",
+      "review/scenarios/inspection/in-dq2-filters-reopen-shows-draft/zh-390/02-data-action-picker-select-data-v.png",
+      "review/scenarios/inspection/in-dq2-filters-reopen-shows-draft/zh-390/03-data-action-back.png",
+      "review/scenarios/inspection/in-dq2-filters-reopen-shows-draft/zh-390/04-data-action-filters.png"
+     ]
+    }
+   ]
+  }
+ ]
+}

@@ -9,6 +9,7 @@ Scope: the headers of this feature's surfaces (the shared Headers change, the He
 - The house reference's look (the Farrowing room): Back as a 48px bordered icon button, the 22px title, the last-record line in muted text with the time in ink.
 - The walk's last check-in line: kept as the page header's fact.
 - The lens, filter and list: unchanged.
+- (Back keeps the draft, 2026-10-14) Every sheet's first frame: the Pen note, Report fault, the open fault, the ticked pens' note and Filter pigs open exactly as they do on main (no Clear until something is entered).
 
 ## Problems
 
@@ -18,6 +19,7 @@ Scope: the headers of this feature's surfaces (the shared Headers change, the He
 - **minor** · Pages set their own top padding under the header (18px, 20px, 12px, 16px), so the gap to the body differed screen to screen.
 - **major** · The walk header held a primary button (End walk) and the unit under the title; the Log link sat in the activity row.
 - **major** · Every drawer and page repeated a count, pens or the unit (`2 pigs · C1 / C2`, `Pen C1 · Unit 7`).
+- **major** · (Back keeps the draft, 2026-10-14) Back lost a typed draft (drawer convention: Back "leaves and returns to where you came from, keeping the draft"; gate judges on #150): the Pen note, Report fault (`inspection.fault-report*`), the open fault's resolution note, the ticked pens' Pen note and Filter pigs' picks all reopened blank (or as saved), whether left by the footer Back, the scrim or the phone's Back; none had a Clear. Evidence: `features/inspection/scenarios.json` leaves `in-dc2/3`, `in-df2/3`, `in-dr2/3`, `in-ds2/3`, `in-dq1/2` fail on origin/main.
 
 ## Parts
 
@@ -27,6 +29,8 @@ Scope: the headers of this feature's surfaces (the shared Headers change, the He
 | End walk, Log | in the header / activity row | the body's first row, with the unit | **fix** |
 | Selected: Clear | Sheet `aside` | footer `quiet` | **fix** |
 | Filter pigs: Clear | FilterSheet head | FilterSheet footer | **fix** |
+| Typed sheets' draft (Pen note, Report fault, resolution note, ticked pens' note, Filter pigs) | page-built: `c.form` reset on every open | the drawer convention's draft (parked per sheet and subject, like `parkBulkDraft` does for the record forms) | **fix** |
+| Clear on those sheets | absent | footer `quiet` (`st-footer-quiet`), only while something is entered | **fix** |
 
 ## Self-crit
 
@@ -60,3 +64,16 @@ The law and its boards fix the design (two headers, the line's three tests); the
 - Footers: fostering's primary stays on one line at 56px in Chinese at 390; Find a pig's primary is "Search".
 - Reach: 153 screens move, all in this change's features; 138 identical; none broken. npm test 674 pass; legibility and spacing pass on every moved screen; farrowing scenarios 87 of 87 in EN (ZH blocked on main as well).
 - **Better because** each header says one thing the same way everywhere, and every fact it no longer carries has a designed place in the body.
+
+#### Back keeps the draft (behaviour/back-keeps-draft, 2026-10-14)
+- One direction only: the law fixes the behaviour (Back keeps, Clear empties, Save drops), and the first frames do not change, so there is nothing to compare by eye but the frames themselves.
+- Problem fixed: the five typed sheets park what was entered per sheet and subject on every way out (footer Back, scrim, the phone's Back) and pick it up on the next open; Save drops it; Clear puts the sheet back as it opened and goes.
+- Keep as strong: every first frame is the baseline's (no Clear on an untouched sheet); Clear is the existing footer quiet action, left of the primary.
+- Not changed: the walk's search (a search, not a draft) and the log filters (they apply at once).
+- **Better because** a worker who steps back to check the pen keeps what they typed, as every other drawer in the app already does.
+
+#### Final look (the pushed head of behaviour/back-keeps-draft, the commit that adds this block; code as of 89f58f3, main merged at 3854322)
+- First frames: Pen note, Filter pigs, Report fault and the scope's other screens rendered at 390 and 360, EN and ZH, beside origin/main: byte-identical. The gate's first diff (at d821fee) flagged 8 screens by under 0.06%, single language and width each; re-shot, all identical (render noise).
+- The reopened sheets (scenario evidence in `review/scenarios/inspection/`): the typed note or description is back in its field; the footer reads Back · Clear · the commit, Clear quiet text left of the primary as in Selected; after Clear the commit waits again.
+- Scenarios: 30 of 30 pass in EN and ZH at 360 and 390 (89f58f3); on origin/main 28 of 30 fail (only the two "opens without Clear" leaves pass).
+- **Better because** what a worker typed survives Back, the scrim and the phone's Back, and only Clear or Save ends it.

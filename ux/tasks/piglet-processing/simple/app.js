@@ -12,10 +12,66 @@
 
   /* What is open on the phone (not kept: a reload starts on the pen list) */
   function fresh(keep) {
-    return { lens: 'todo', chip: '', pen: null, tab: 'proc', draft: {}, over: null, adj: null, death: null, move: null, count: null, weight: null, give: null,
+    return { lens: 'todo', chip: '', pen: null, tab: 'proc', draft: {}, over: null, adj: null, death: null, move: null, count: null, weight: null, give: null, parked: {},
       end: null, flash: null, open: {}, keepOpen: {}, justRec: [], demoOpen: keep ? keep.demoOpen : false };
   }
   var V = fresh();
+
+  /* ---- drafts: Back keeps them, Clear empties them (the drawer convention) ----
+     A drawer's draft is parked per pen and per drawer when it is left by Back (or swipe, or the phone's Back), and comes back
+     on the next open; Save drops it; Clear puts the drawer back as it opened. A drawer that opens untouched shows no Clear. */
+  function draftKind() {
+    if (V.sub === 'give' && V.give) return 'give|' + (V.give.edit || '');
+    if (V.over === 'adjust' && V.adj) return 'adjust|' + V.adj.k;
+    return ['death', 'move', 'count', 'counts', 'weight'].indexOf(V.over) >= 0 ? V.over : '';
+  }
+  function draftBlank(kind) {
+    var p = pen(), k = kind.split('|');
+    if (k[0] === 'death') return { c: { crushed: 0, scours: 0, starve: 0, other: 0 } };
+    if (k[0] === 'move') return { to: '', n: 1, had: {} };
+    if (k[0] === 'count') return { n: p.alive };
+    if (k[0] === 'weight') return { kg: '' };
+    if (k[0] === 'counts') {
+      var sx = p.sex || { boar: 0, gilt: 0 };
+      if (P.hasId() && scheme() !== 'breeders' && P.idCount(p) >= p.alive) sx = { boar: p.ids.filter(function (x) { return x.sex === 'boar'; }).length, gilt: p.ids.filter(function (x) { return x.sex === 'gilt'; }).length };
+      return { boar: sx.boar, gilt: sx.gilt };
+    }
+    if (k[0] === 'adjust') return { k: k[1], n: V.draft[k[1]].n, why: V.draft[k[1]].why };
+    if (k[0] === 'give') {
+      if (!k[1]) return giveBlank(p);
+      var y = p.ids.filter(function (z) { return z.no === k[1]; })[0], idv = notch() ? String(y.notch).split('-')[1] : y.tag;
+      return Object.assign(giveBlank(p), { id: { value: idv, suggested: false, suggestion: idv }, sex: y.sex, kg: y.kg == null ? '' : String(y.kg), keep: y.keep, edit: y.no });
+    }
+  }
+  function draftNow(kind) {
+    var k = kind.split('|')[0];
+    return k === 'give' ? V.give : k === 'adjust' ? V.adj : V[k];
+  }
+  // what the worker entered: the drawer's fields against how it opened (the flash of the last piglet is not entry)
+  function draftDirty(kind) {
+    var a = draftNow(kind), b = draftBlank(kind);
+    if (!a) return false;
+    if (kind.split('|')[0] === 'give') return a.id.value !== b.id.value || a.sex !== b.sex || a.kg !== b.kg || a.keep !== b.keep || a.litterKg !== b.litterKg;
+    return JSON.stringify(a) !== JSON.stringify(b);
+  }
+  function draftPark() {
+    var kind = draftKind(); if (!kind) return;
+    var key = V.pen + '|' + kind;
+    if (draftDirty(kind)) V.parked[key] = JSON.parse(JSON.stringify(draftNow(kind))); else delete V.parked[key];
+  }
+  function draftOpen(kind) {
+    var d = V.parked[V.pen + '|' + kind], v = d ? JSON.parse(JSON.stringify(d)) : draftBlank(kind), k = kind.split('|')[0];
+    if (k === 'give') {
+      v.last = null; v.field = '';
+      if (d && d.id.suggested) v.id = draftBlank(kind).id;   // an untouched suggestion follows the strip
+      V.give = v;
+    } else if (k === 'adjust') V.adj = v;
+    else V[k] = v;
+  }
+  function draftDrop() { var kind = draftKind(); if (kind) delete V.parked[V.pen + '|' + kind]; }
+  function draftClear() { var kind = draftKind(); if (!kind) return; draftDrop(); draftOpen(kind); }
+  // Clear, quiet text left of the primary, only while the drawer holds something entered
+  function clearAction() { var kind = draftKind(); return kind && draftDirty(kind) ? { label: T('clear'), action: 'draft-clear' } : null; }
 
   /* ---- small helpers ---- */
   var pad = function (n) { return (n < 10 ? '0' : '') + n; };
@@ -273,7 +329,7 @@
     var p = pen(), c = V.counts;
     return K.drawer({ title: T('cnt.title'), size: 'long', view: 'counts',
       body: stepper('boar', T('idf.boars'), c.boar) + stepper('gilt', T('idf.gilts'), c.gilt),
-      footer: K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('rec.counts'), action: 'counts-save', register: 'primary' } }) });
+      footer: K.footer({ back: { action: 'back', label: T('back') }, quiet: clearAction(), primary: { label: T('rec.counts'), action: 'counts-save', register: 'primary' } }) });
   }
   /* ---- Piglets: the pen's identified piglets (tag/notch · sex · weight), each with its breeder flag; tap a row to fix it;
      one primary "Tag a piglet" opens the one-piglet run, which comes back here ---- */
@@ -315,7 +371,7 @@
       body += '<p class="sp-quiet">' + esc(T('treat.later', { n: n - d.n })) + '</p>';
     }
     return K.drawer({ title: tr(d.k), size: 'long', view: 'adjust', body: body,
-      footer: K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('adj.use', { n: d.n }), action: 'adjust-use', register: 'primary', waiting: less && !d.why }, status: less && !d.why ? T('sr.why') : null }) });
+      footer: K.footer({ back: { action: 'back', label: T('back') }, quiet: clearAction(), primary: { label: T('adj.use', { n: d.n }), action: 'adjust-use', register: 'primary', waiting: less && !d.why }, status: less && !d.why ? T('sr.why') : null }) });
   }
 
   /* ---- Give IDs: one piglet at a time (farrowing's identity pattern, research/per-piglet-proposal.md flow a) ----
@@ -359,7 +415,7 @@
     var ready = !giveUsed(p) && giveNo(p) && g.sex;
     var primary = { label: T(g.edit ? 'give.fix' : 'give.save'), action: 'give-save', register: 'primary', waiting: !ready };
     return K.page({ title: T(br ? 'tr.id.breeders' : 'give.title'), back: { action: 'back', label: T('back') }, view: 'give', body: body,
-      footer: givePad() + (ended ? '' : K.footer({ back: false, primary: primary, status: !ready ? T('sr.id') : null })) });
+      footer: givePad() + (ended ? '' : K.footer({ back: false, quiet: clearAction(), primary: primary, status: !ready ? T('sr.id') : null })) });
   }
   /* the litter weight from the Piglets tab: one Measure on the same Numpad */
   function weightSheet() {
@@ -367,7 +423,7 @@
     return K.drawer({ title: T('w.title'), size: 'long', view: 'weight',
       body: UI.measure({ label: T('w.kg'), value: w.kg, unit: 'kg', placeholder: '—', active: true, action: 'noop', key: 'w', className: 'sp-give-measure' }),
       footer: UI.numpad({ value: w.kg, unit: 'kg', action: 'pad', key: 'w', compact: true, decimals: 1, intLength: 3 }) +
-        K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('rec.weight'), action: 'weight-save', register: 'primary', waiting: !(+w.kg > 0) }, status: !(+w.kg > 0) ? T('sr.kg') : null }) });
+        K.footer({ back: { action: 'back', label: T('back') }, quiet: clearAction(), primary: { label: T('rec.weight'), action: 'weight-save', register: 'primary', waiting: !(+w.kg > 0) }, status: !(+w.kg > 0) ? T('sr.kg') : null }) });
   }
   /* ---- the pen log: born, deaths, moves, counts, treatments, IDs — the history, newest first ---- */
   /* One recorded act is one entry: the IDs given on one day are one line ("IDs given · 8", the range under it); the group is the
@@ -406,7 +462,7 @@
     var p = pen(), d = V.death, k = CAUSES.reduce(function (s, c) { return s + d.c[c]; }, 0);
     var body = CAUSES.map(function (c) { return stepper(c, T('c.' + c), d.c[c], { max: p.alive }); }).join('');
     return K.drawer({ title: T('death.title'), size: 'long', view: 'death', body: body,
-      footer: K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('rec.death', { n: k }), action: 'death-save', register: 'primary', waiting: !k }, status: !k ? T('sr.dead') : null }) });
+      footer: K.footer({ back: { action: 'back', label: T('back') }, quiet: clearAction(), primary: { label: T('rec.death', { n: k }), action: 'death-save', register: 'primary', waiting: !k }, status: !k ? T('sr.dead') : null }) });
   }
   /* ---- move piglets: only the other pens of this batch (there is nowhere else); for what was given here: had it? ---- */
   function moveAsks(p) {
@@ -429,14 +485,14 @@
     });
     var ready = d.to && d.n > 0 && asks.every(function (k) { return d.had[k] != null; });
     return K.page({ title: T('move.title'), back: { action: 'back', label: T('back') }, view: 'move', body: body,
-      footer: K.footer({ back: false, primary: { label: T('move.save', { n: pigs(d.n) }), action: 'move-save', register: 'primary', waiting: !ready }, status: !ready ? T(d.to ? 'sr.had' : 'move.pick') : null }) });
+      footer: K.footer({ back: false, quiet: clearAction(), primary: { label: T('move.save', { n: pigs(d.n) }), action: 'move-save', register: 'primary', waiting: !ready }, status: !ready ? T(d.to ? 'sr.had' : 'move.pick') : null }) });
   }
   /* ---- set count: the record becomes what is there now ---- */
   function countSheet() {
     var p = pen(), d = V.count;
     return K.drawer({ title: T('count.title'), size: 'long', view: 'count',
       body: stepper('count', T('count.label'), d.n, { variant: 'count', min: 0, hint: '' }),
-      footer: K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('rec.count', { n: d.n }), action: 'count-save', register: 'primary', waiting: d.n === p.alive }, status: d.n === p.alive ? T('sr.count') : null }) });
+      footer: K.footer({ back: { action: 'back', label: T('back') }, quiet: clearAction(), primary: { label: T('rec.count', { n: d.n }), action: 'count-save', register: 'primary', waiting: d.n === p.alive }, status: d.n === p.alive ? T('sr.count') : null }) });
   }
 
   /* ================= End task (the supervisor) ================= */
@@ -585,8 +641,8 @@
   function closePen() { V.sub = null; V.pen = null; V.flash = null; V.open = {}; V.keepOpen = {}; V.draft = {}; V.tab = 'proc'; clearTimeout(openTimer); }
   function closeTop() {
     if (V.end) V.end = null;
-    else if (V.sub) V.sub = null;
-    else if (V.over) V.over = null;
+    else if (V.sub) { draftPark(); V.sub = null; }
+    else if (V.over) { draftPark(); V.over = null; }
     else if (V.pen) closePen();
   }
   function saved(key, args) { V.flash = { pen: V.pen, key: key, args: args, undo: true }; }
@@ -605,11 +661,11 @@
       case 'end': V.end = true; break;
       case 'day': V.open[v] = !V.open[v]; break;
       case 'item':
-        if (V.draft[v]) delete V.draft[v];
+        if (V.draft[v]) { delete V.draft[v]; delete V.parked[V.pen + '|adjust|' + v]; }   // an unticked item takes its adjustment with it
         else { V.draft[v] = { n: P.need(p, v), why: '' }; V.justTick = v; }
         break;
-      case 'adjust': V.over = 'adjust'; V.adj = { k: v, n: V.draft[v].n, why: V.draft[v].why }; break;
-      case 'adjust-use': V.draft[V.adj.k] = { n: V.adj.n, why: V.adj.n < P.need(p, V.adj.k) ? V.adj.why : '' }; V.over = null; break;
+      case 'adjust': V.over = 'adjust'; draftOpen('adjust|' + v); break;
+      case 'adjust-use': draftDrop(); V.draft[V.adj.k] = { n: V.adj.n, why: V.adj.n < P.need(p, V.adj.k) ? V.adj.why : '' }; V.over = null; break;
       case 'why': V.adj.why = v; break;
       case 'submit': {
         var items = Object.keys(V.draft).map(function (k) { return { k: k, n: V.draft[k].n, why: V.draft[k].why }; });
@@ -634,22 +690,21 @@
       }
       case 'tool':
         V.over = v;
-        if (v === 'death') V.death = { c: { crushed: 0, scours: 0, starve: 0, other: 0 } };
-        if (v === 'move') V.move = { to: '', n: 1, had: {} };
-        if (v === 'count') V.count = { n: p.alive };
+        if (['death', 'move', 'count'].indexOf(v) >= 0) draftOpen(v);
         break;
-      case 'count-open': V.over = 'count'; V.count = { n: p.alive }; break;
-      case 'weight-open': V.over = 'weight'; V.weight = { kg: '' }; break;
-      case 'weight-save': P.setWeight(p.code, UI.numpadCommit(V.weight.kg, { decimals: 1 })); V.over = null; saved('log.weight', { w: UI.numpadCommit(V.weight.kg, { decimals: 1 }) }); break;
+      case 'count-open': V.over = 'count'; draftOpen('count'); break;
+      case 'weight-open': V.over = 'weight'; draftOpen('weight'); break;
+      case 'draft-clear': draftClear(); break;
+      case 'weight-save': draftDrop(); P.setWeight(p.code, UI.numpadCommit(V.weight.kg, { decimals: 1 })); V.over = null; saved('log.weight', { w: UI.numpadCommit(V.weight.kg, { decimals: 1 }) }); break;
       case 'log-open': V.over = 'log'; V.pageTop = true; break;
-      case 'tool-death': V.over = 'death'; V.death = { c: { crushed: 0, scours: 0, starve: 0, other: 0 } }; break;
-      case 'counts-open': { var sx = p.sex || { boar: 0, gilt: 0 }; if (P.hasId() && scheme() !== 'breeders' && P.idCount(p) >= p.alive) sx = { boar: p.ids.filter(function (x) { return x.sex === 'boar'; }).length, gilt: p.ids.filter(function (x) { return x.sex === 'gilt'; }).length }; V.over = 'counts'; V.counts = { boar: sx.boar, gilt: sx.gilt }; break; }
-      case 'counts-save': P.setLitter(p.code, { boar: V.counts.boar, gilt: V.counts.gilt }); V.over = null; saved('flash.counts', { b: V.counts.boar, g: V.counts.gilt }); break;
+      case 'tool-death': V.over = 'death'; draftOpen('death'); break;
+      case 'counts-open': V.over = 'counts'; draftOpen('counts'); break;
+      case 'counts-save': draftDrop(); P.setLitter(p.code, { boar: V.counts.boar, gilt: V.counts.gilt }); V.over = null; saved('flash.counts', { b: V.counts.boar, g: V.counts.gilt }); break;
       case 'tagged-open': V.over = 'tagged'; V.pageTop = true; break;
       case 'breeder': P.toggleBreeder(p.code, v); break;
       case 'pick-done': { var nb = P.donePicking(p.code); V.flash = { pen: p.code, key: 'flash.pick', args: { n: T('breeders.n', { n: nb }) } }; V.over = null; break; }
       case 'id-open': V.over = 'tagged'; V.sub = null; V.pageTop = true; break;
-      case 'give-new': V.sub = 'give'; V.give = giveBlank(p); V.pageTop = true; break;
+      case 'give-new': V.sub = 'give'; draftOpen('give|'); V.pageTop = true; break;
       case 'give-field': V.give.field = V.give.field === v ? '' : v; break;
       case 'pad': padKey(v, el.getAttribute('data-key')); break;
       case 'give-scan': {   // a scan reads the tag in the ear (the demo reads the next one on the strip): it replaces what is there
@@ -659,6 +714,7 @@
       case 'give-sex': V.give.sex = v; if (v === 'boar' && scheme() !== 'breeders') V.give.keep = false; break;
       case 'give-keep': V.give.keep = !!el.checked; break;
       case 'give-save': {
+        draftDrop();
         var g = V.give, no = giveNo(p), pig = { tag: notch() ? '' : no, notch: notch() ? no : '', sex: g.sex, kg: UI.numpadCommit(g.kg, { decimals: 1 }), keep: g.edit ? (p.ids.filter(function (z) { return z.no === g.edit; })[0] || {}).keep : false };
         if (g.edit) { P.fixPig(p.code, g.edit, pig); V.sub = null; V.give = null; break; }   // a fix goes back to the list
         else { var x = P.givePig(p.code, pig); V.give = giveBlank(p, x); }
@@ -668,12 +724,12 @@
       case 'give-undo': P.removePig(p.code, V.give.last.no); V.give = giveBlank(p); V.pageTop = true; break;
       case 'give-fix': {
         var y = p.ids.filter(function (z) { return z.no === v; })[0]; if (!y) break;
-        var idv = notch() ? String(y.notch).split('-')[1] : y.tag;
-        V.give = Object.assign(giveBlank(p), { id: { value: idv, suggested: false, suggestion: idv }, sex: y.sex, kg: y.kg == null ? '' : String(y.kg), keep: y.keep, edit: y.no }); V.sub = 'give';
+        draftOpen('give|' + y.no); V.sub = 'give';
         V.pageTop = true;
         break;
       }
       case 'death-save': {
+        draftDrop();
         var k = P.death(p.code, V.death.c);
         V.over = null; saved('flash.death', { n: pigs(k) });
         break;
@@ -682,12 +738,14 @@
       case 'had': { var fl = el.closest('[data-field]'); V.move.had[fl.getAttribute('data-field')] = v === 'yes'; break; }
       case 'move-save': {
         var m = V.move;
+        draftDrop();
         P.move(p.code, m.to, m.n, m.had);
         V.over = null; saved('flash.move', { n: pigs(m.n), to: m.to });
         break;
       }
       case 'count-save': {
         var c = V.count;
+        draftDrop();
         P.setCount(p.code, c.n);
         V.over = null; saved('flash.count', { n: c.n });
         break;

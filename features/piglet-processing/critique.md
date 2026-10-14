@@ -9,6 +9,7 @@ Scope: the headers of this feature's surfaces (the shared Headers change, the He
 - The house reference's look (the Farrowing room): Back as a 48px bordered icon button, the 22px title, the last-record line in muted text with the time in ink.
 - The pen list's last-record line: kept as the task page's header line.
 - The pen sheet as the hub of a pen: it keeps the sow's identity, now as the chip.
+- (Back keeps the draft, 2026-10-14) Every drawer's first frame: Record death, Give IDs, Litter weight, Set count, Move piglets, Boars and gilts and a ticked item's count open exactly as on main (no Clear until something is entered).
 
 ## Problems
 
@@ -19,6 +20,7 @@ Scope: the headers of this feature's surfaces (the shared Headers change, the He
 - **major** · The pen list had no Back (law: every top page of a task has Back).
 - **major** · The pen sheet's title was the sow's tag and its subtitle `B05 · parity 3 · 11 piglets · day 1`: counts and a day in a header, two lines at 360 in Chinese.
 - **major** · Every action drawer repeated `A03 · day 4` or `A03 · 12 alive`; pages (Piglets, Give IDs, Move piglets, Pen log, End task) had Back in the footer and a subtitle.
+- **major** · (Back keeps the draft, 2026-10-14) Back lost the draft (drawer convention; RULINGS exit grammar: "`Back` (and swipe) keeps the draft on the device, `Clear` discards it"; scenario tree T-23, C-15, X-5; gate judges on #150): Record death, Give IDs (and a piglet's correction), Litter weight, Set count, Move piglets, Boars and gilts and a ticked item's count each reopened blank; none had a Clear. Evidence: `features/piglet-processing/scenarios.json` leaves `pp-dd3`, `pp-dg3`, `pp-dw3`, `pp-dc3` fail on origin/main.
 
 ## Parts
 
@@ -28,6 +30,8 @@ Scope: the headers of this feature's surfaces (the shared Headers change, the He
 | Pen sheet header | Sheet head, tag as title, subtitle | Sheet header, `Piglet processing` + route line | **fix** |
 | Page Back | footer Back | page header Back | **fix** |
 | shell-ui `litterHeader` (hand-built `utility-header`) | page-built, no caller | (none needed) | **cut** |
+| Staged drawers' draft (Record death, Give IDs, Litter weight, Set count, Move piglets, Boars and gilts, item count) | page-built: `V.death`, `V.give`, … reset on every open | the drawer convention's draft, parked per pen and drawer | **fix** |
+| Clear on those drawers | absent | Sheet footer `quiet` (`st-footer-quiet`), only while something is entered | **fix** |
 
 ## Self-crit
 
@@ -61,3 +65,16 @@ The law and its boards fix the design (two headers, the line's three tests); the
 - Footers: fostering's primary stays on one line at 56px in Chinese at 390; Find a pig's primary is "Search".
 - Reach: 153 screens move, all in this change's features; 138 identical; none broken. npm test 674 pass; legibility and spacing pass on every moved screen; farrowing scenarios 87 of 87 in EN (ZH blocked on main as well).
 - **Better because** each header says one thing the same way everywhere, and every fact it no longer carries has a designed place in the body.
+
+#### Back keeps the draft (behaviour/back-keeps-draft, 2026-10-14)
+- One direction only: the law and the exit grammar fix the behaviour, and the first frames do not change.
+- Problem fixed: each staged drawer parks what was entered per pen and drawer on every way out (Back, scrim, the phone's Back) and picks it up on the next open; Save drops it; Clear puts the drawer back as it opened and goes. An untouched tag suggestion follows the strip; the last piglet's Undo line is not carried into a reopened draft.
+- Keep as strong: every first frame is the baseline's; Clear is the footer's existing quiet action, left of the primary.
+- Not changed, filed for the owner: the pen sheet's ticked items (its atlas note says "Back drops unsaved ticks", the drawer convention says ticks wait as a draft).
+- **Better because** a worker who steps back mid-entry (to check the pen, or after a call) finds the deaths, the tag and the sex they entered, as Farrowing's Record dead already does.
+
+#### Final look (the pushed head of behaviour/back-keeps-draft, the commit that adds this block; code as of 89f58f3, main merged at 3854322)
+- First frames: Record death, Give IDs, Litter weight, the pen list and the scope's other screens rendered at 390 and 360, EN and ZH, beside origin/main: byte-identical.
+- The reopened drawers (scenario evidence in `review/scenarios/piglet-processing/`): Record death reads Back · Clear · Record 2 deaths with Crushed at 2; Give IDs keeps Gilt picked; after Clear the commit waits again.
+- Scenarios: 27 of 27 pass in EN and ZH at 360 and 390 (89f58f3); on origin/main 20 of 27 fail (the leaves that pass there are "opens without Clear" and "Back records nothing").
+- **Better because** a worker who steps back mid-entry finds the deaths, the tag and the sex they entered, and only Clear or Save ends it.
