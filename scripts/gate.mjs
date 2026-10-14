@@ -286,15 +286,18 @@ for (const d of screens.diff) console.log(`  DIFF ${String(d.pct).padStart(7)}% 
 check('no screen broken by the change', !screens.broken.length, screens.broken.map((s) => `${s.id} ${s.error}`).slice(0, 3).join(' | '));
 if (screens.bothBroken.length) gaps.push(`${screens.bothBroken.length} screen(s) have a run that renders on neither base nor candidate: ${screens.bothBroken.map((s) => `${s.id} (${s.error})`).slice(0, 5).join(', ')}`);
 
-// A changed screen is shot once more on base, at a run that differed: if base doesn't render the same way twice, its diff
+// A changed screen is shot once more on base and on candidate, at a run that differed: if either side doesn't render the same way twice, its diff
 // may be noise. It stays changed (the judge looks), and the judge is told.
 mech.flaky = [];
 const again = {};
 for (const d of screens.diff) { const t = d.runs.find((x) => pct[`${d.id} ${x}`] > 0); if (t) (again[t] ||= []).push(d.id); }
-const reshot = await Promise.all(Object.entries(again).map(([t, ids]) => { const [lang, w] = t.split('-'); return shoot('base', path.join(out, 'shots/again', t), ['--screens', ids.join(','), '--widths', w, '--langs', lang]); }));
-for (const x of reshot.flat()) if (x?.ok && (await pctDiff(baseAt.get(key(x)).png, x.png)) > 0) mech.flaky.push(x.screen);
+// The candidate is shot once more too: a screen that renders differently twice on either side is noise, not a change.
+const reshotOn = (side, at) => Promise.all(Object.entries(again).map(([t, ids]) => { const [lang, w] = t.split('-'); return shoot(side, path.join(out, `shots/again-${side}`, t), ['--screens', ids.join(','), '--widths', w, '--langs', lang]); }));
+const [reshot, reshotCand] = await Promise.all([reshotOn('base'), reshotOn('cand')]);
+for (const [list, at] of [[reshot, baseAt], [reshotCand, candAt]])
+  for (const x of list.flat()) if (x?.ok && at.get(key(x)) && (await pctDiff(at.get(key(x)).png, x.png)) > 0 && !mech.flaky.includes(x.screen)) mech.flaky.push(x.screen);
 if (reshot.includes(null)) gaps.push('the second base shot failed for some changed screens: their diff is not double-checked');
-if (mech.flaky.length) gaps.push(`${mech.flaky.length} changed screen(s) render differently twice on base, so their diff may be noise: ${mech.flaky.slice(0, 5).join(', ')}`);
+if (mech.flaky.length) gaps.push(`${mech.flaky.length} changed screen(s) render differently twice on base or candidate, so their diff may be noise: ${mech.flaky.slice(0, 5).join(', ')}`);
 
 // ---------- the pairs the judge decides on: every changed, new or removed screen at each run, from the shots above ----------
 const moved = [...screens.diff, ...screens.new, ...screens.gone];
