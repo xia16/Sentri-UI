@@ -353,6 +353,51 @@ export function calibrationProblems(parts, answers) {
 
 // ---------- the lighter gate: reach, the base cache, the lock, the timeout retry, carrying a pass ----------
 
+// Files that decide pixels on every screen besides SYSTEM: the shooter and what it loads, the server, the atlas and its sections,
+// the vendored fonts and the installed packages (Playwright's version is the browser's).
+const RENDERS = [
+  /^scripts\/(shoot-screens|serve-ux|font-route|playwright-path)\.(mjs|cjs)$/,
+  /^(atlas|sections|vendor)\//,
+  /^package(-lock)?\.json$/,
+];
+// Files that can't draw a pixel: the workflow's text and other prose outside ux/, CI, tests, agent settings and every other
+// script (the gate and the checks). A page that loads one of them reaches its feature first (pages are read before this list).
+const NO_PIXEL = [/^docs\//, /^\.github\//, /^tests\//, /^\.claude\//, /^scripts\//, /^(?!ux\/).*\.md$/i];
+
+// What a change can reach, from its files alone (P2): { all, features, why }. files: the changed paths (both sides of a rename);
+// screens: every atlas screen on base and candidate; assets: page -> the files it loads (pageAssets); shared: sharedFiles of the
+// same. Unsure is all: a file nothing says is harmless reaches every screen.
+export function reachOf({ files, screens = [], assets = {}, shared = {}, scope = [] }) {
+  const users = new Map();
+  for (const s of screens) { const p = pageOf(s.url); for (const f of [p, ...(assets[p] || [])]) { if (!users.has(f)) users.set(f, new Set()); users.get(f).add(s.feature); } }
+  const features = new Set(scope), notes = new Map();
+  let all = false;
+  const note = (why, f) => { if (!notes.has(why)) notes.set(why, []); notes.get(why).push(f); };
+  for (const f of files) {
+    const own = f.match(/^features\/([^/]+)\//);
+    if (own) { features.add(own[1]); note(`${own[1]}'s own files`, f); continue; }
+    if (SYSTEM.some((re) => re.test(f)) || RENDERS.some((re) => re.test(f))) { all = true; note('draws on every screen', f); continue; }
+    const u = users.get(f);
+    if (Object.hasOwn(shared, f) || u?.size > 1) { all = true; note(`loaded by pages of ${(shared[f] || [...u]).length} features`, f); continue; }
+    if (u) { for (const x of u) features.add(x); note(`a page of ${[...u][0]} or what it loads`, f); continue; }
+    if (NO_PIXEL.some((re) => re.test(f))) { note('draws no pixel', f); continue; }
+    all = true;
+    note(f.startsWith('ux/') ? 'no page loads it by name, and a page may fetch it' : 'not known to draw nothing', f);
+  }
+  const list = (fs) => fs.slice(0, 3).join(', ') + (fs.length > 3 ? ` and ${fs.length - 3} more` : '');
+  const why = [...notes].sort(([a], [b]) => (a === 'draws no pixel') - (b === 'draws no pixel')).map(([w, fs]) => `${list(fs)}: ${w}`);
+  if (scope.length) why.push(`scope ${scope.join(', ')}`);
+  return { all, features: [...features].sort(), why };
+}
+
+// The one line the gate prints, given how many screens the reach covers.
+export function reachLine(reach, n) {
+  const why = reach.why.length ? ` (${reach.why.join('; ')})` : '';
+  if (reach.all) return `reach: all screens${why}`;
+  if (!reach.features.length) return `reach: no screen${why}`;
+  return `reach: ${n} screen(s) in features ${reach.features.join(', ')}${why}`;
+}
+
 // The base shots to take: needs [{ screen, width, langs }] against the cached runs [{ screen, lang, width, file, ok }] (has(file):
 // the png is still there). A screen is reused at a width only when every language it needs is cached, since the Chinese probe
 // compares against English shot in the same run; otherwise it is shot again in all of them. take: [{ width, langs, screens }].

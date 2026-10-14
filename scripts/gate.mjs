@@ -18,7 +18,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { CLASSES, screensOf, pageOf, pageAssets, sharedFiles, coverageLost, effectiveClass, classifyScreens, checkVerdict, touchesSystem, touchesTools, queueAhead as queueOf, budgetProblems, critiqueProblems, pageStyling, addedLines, calibrationProblems, lockState, shotsToTake } from './loop-rules.mjs';
+import { CLASSES, screensOf, pageOf, pageAssets, sharedFiles, coverageLost, effectiveClass, classifyScreens, checkVerdict, touchesSystem, touchesTools, queueAhead as queueOf, budgetProblems, critiqueProblems, pageStyling, addedLines, calibrationProblems, lockState, shotsToTake, reachOf, reachLine } from './loop-rules.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -84,7 +84,7 @@ const declared = opt('class') || 'presentation';
 const mode = opt('mode') || 'normal';
 const scope = (opt('scope') || '').split(',').map((s) => s.trim()).filter(Boolean);
 if (!ref || !CLASSES.includes(declared) || !['normal', 'refactor'].includes(mode) || (mode === 'normal' && !scope.length)) {
-  console.error('usage: node scripts/gate.mjs --candidate <ref> --scope <feature,...> [--class copy|presentation|behaviour|shared] [--mode normal|refactor] [--out <dir>] [--quick] [--keep]');
+  console.error('usage: node scripts/gate.mjs --candidate <ref> --scope <feature,...> [--class copy|presentation|behaviour|shared] [--mode normal|refactor] [--out <dir>] [--quick] [--all] [--keep]');
   console.error('       node scripts/gate.mjs --verdict <out dir>');
   process.exit(2);
 }
@@ -208,6 +208,25 @@ for (const p of new Set(baseScreens.map((s) => pageOf(s.url)))) {
 const shared = sharedFiles(baseScreens, assets);
 const touched = touchesSystem(files, shared);
 mech.shared = { files: Object.keys(shared).length, touched: Object.fromEntries(touched.map((f) => [f, shared[f] || []])) };
+// What the change can reach, from its files (both sides of a rename) and both sides' pages: only those screens are shot in full
+// (scripts/loop-rules.mjs reachOf; unsure is every screen). Every other screen is still shot once, at 390 in English, as a tripwire.
+const candScreens = screensOf(JSON.parse(fs.readFileSync(path.join(wt.cand, 'atlas/atlas.json'), 'utf8')));
+const reach = (() => {
+  if (mech.quick) return { all: false, features: [...scope].sort(), why: ['quick: the scope only'] };
+  if (flag('all')) return { all: true, features: [], why: ['--all'] };
+  const both = { ...assets };
+  for (const p of new Set(candScreens.map((s) => pageOf(s.url)))) {
+    const f = path.join(wt.cand, p);
+    const mine = fs.existsSync(f) ? pageAssets(fs.readFileSync(f, 'utf8'), p).filter((a) => fs.existsSync(path.join(wt.cand, a))) : [];
+    both[p] = [...new Set([...(both[p] || []), ...mine])];
+  }
+  const screens = [...baseScreens, ...candScreens];
+  const changed = git(['diff', '--name-only', '--no-renames', mech.base, mech.candidate]).out.split(/\r?\n/).filter(Boolean);
+  return reachOf({ files: changed, screens, assets: both, shared: sharedFiles(screens, both), scope });
+})();
+const inReach = (s) => reach.all || reach.features.includes(s.feature);
+mech.reach = { ...reach, screens: new Set(candScreens.filter(inReach).map((s) => s.id)).size };
+console.log(reachLine(reach, mech.reach.screens));
 const byFiles = effectiveClass({ declared, files, diffs: [], scope, shared });
 mech.class = { declared, effective: byFiles.cls, why: byFiles.why };
 if (byFiles.cls !== declared) console.log(`class: ${declared} → ${byFiles.cls} (${byFiles.why.join('; ')})`);
@@ -284,9 +303,10 @@ const shootGroups = (side, dir, groups) => Promise.all(groups.map((g) => {
   fs.writeFileSync(list, JSON.stringify(g.screens));
   return shoot(side, sub, ['--screens-file', list, '--widths', String(g.width), '--langs', g.langs.join(',')]);
 })).then((parts) => (parts.includes(null) ? null : parts.flat()));
-// The runs each side needs: { screen, width, langs }.
-const needsOf = (list) => list.filter((s) => !mech.quick || scope.includes(s.feature)).flatMap((s) => WIDTHS.map((width) => ({ screen: s.id, width, langs: LANGS })));
-const candScreens = screensOf(JSON.parse(fs.readFileSync(path.join(wt.cand, 'atlas/atlas.json'), 'utf8')));
+// The runs each side needs: { screen, width, langs }. A screen in the reach is shot in full; every other screen once at 390 in
+// English, the tripwire (a --quick self-check skips it).
+const TRIP = { width: 390, lang: 'en' };
+const needsOf = (list) => list.flatMap((s) => (inReach(s) ? WIDTHS.map((width) => ({ screen: s.id, width, langs: LANGS })) : mech.quick ? [] : [{ screen: s.id, width: TRIP.width, langs: [TRIP.lang] }]));
 
 // ---------- base shots, once per main commit ----------
 // Base is the same main commit gate after gate, so its shots are kept in <git common dir>/sentri-gate/base-shots/<base>/<key>/,
@@ -425,6 +445,14 @@ mech.class = { declared, effective: ec.cls, why: ec.why };
 if (declared !== 'shared' && mode !== 'refactor') {
   const out = (ec.outside || []).filter((d) => !mech.flaky?.includes(d.id));
   check('known reach: only SCOPE moved (P2)', !out.length, out.length ? `declared ${declared} for ${scope.join(', ')} but moves ${out.length} screen(s) of ${[...new Set(out.map((d) => d.feature))].join(', ')} (${out.slice(0, 3).map((d) => d.id).join(', ')}): give your part its own rule or token, or make it a declared shared change` : '');
+}
+// The tripwire: a screen outside the reach that moved means the reach was wrong for this change, and its other widths and Chinese
+// were never shot. It fails whatever the class; a deliberately wide change gates again with --all.
+if (!reach.all && !mech.quick) {
+  const missed = moved.filter((s) => !inReach(s) && !mech.flaky.includes(s.id));
+  check(`reach: nothing outside it moved (tripwire, ${TRIP.width} ${TRIP.lang})`, !missed.length, missed.length
+    ? `${missed.length} screen(s) outside the reach moved (${missed.slice(0, 3).map((s) => s.id).join(', ')}): the change reaches further than its files say; gate again with --all`
+    : `${candScreens.filter((s) => !inReach(s)).length} other screen(s) unchanged`);
 }
 if (ec.cls !== byFiles.cls) console.log(`class: ${declared} → ${ec.cls} (${ec.why.join('; ')})`);
 if (mode === 'refactor') check('refactor: every screen identical', !steady.length, steady.length ? steady.map((s) => s.id).slice(0, 5).join(', ') : mech.flaky.length ? `${mech.flaky.length} unstable on base, not counted` : '');

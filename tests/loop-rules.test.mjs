@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { queueAhead, calibrationProblems, budgetProblems, critiqueProblems, pageStyling, addedLines, effectiveClass, classifyScreens, checkVerdict, checkGrades, worstFirst, isClean, loopStatus, touchesSystem, touchesTools, regressions,
-  pageOf, pageAssets, sharedFiles, outcomeLeaves, coverageLost, shotsToTake, timedOutOnly, lockState } from '../scripts/loop-rules.mjs';
+  pageOf, pageAssets, sharedFiles, outcomeLeaves, coverageLost, reachOf, reachLine, shotsToTake, timedOutOnly, lockState } from '../scripts/loop-rules.mjs';
 
 test('a change to the bundle or tokens is a shared-component change whatever was declared', () => {
   assert.deepEqual(touchesSystem(['ux/design-system/components/bundle.css', 'features/farrowing/feature.json']), ['ux/design-system/components/bundle.css']);
@@ -310,4 +310,62 @@ test('base shots: reuse a screen at a width only when every language it needs is
   assert.deepEqual(r.reuse.map((x) => x.file), ['a/en-390.png', 'a/zh-390.png']);
   assert.deepEqual(r.take, [{ width: 390, langs: ['en', 'zh'], screens: ['b'] }, { width: 360, langs: ['en', 'zh'], screens: ['b'] }, { width: 390, langs: ['en'], screens: ['c', 'd', 'e'] }]);
   assert.deepEqual(shotsToTake(needs.slice(0, 1), [run('a', 'en', 390), run('a', 'zh', 390)]).take, [], 'a complete cache shoots nothing');
+});
+
+const reachWorld = () => {
+  const screens = [
+    { id: 'farrowing.room', feature: 'farrowing', url: '/ux/system/farrowing-astra-concept.html?layout=focus' },
+    { id: 'move.transfer-sow', feature: 'move', url: '/ux/system/farrowing-astra-concept.html?layout=focus' },
+    { id: 'inspection.room', feature: 'inspection', url: '/ux/system/inspection-astra-concept.html' },
+    { id: 'piglet-processing.pens', feature: 'piglet-processing', url: '/ux/tasks/piglet-processing/simple/index.html?view=pens' },
+  ];
+  const assets = {
+    'ux/system/farrowing-astra-concept.html': ['ux/system/astra-surfaces.js', 'ux/system/farrowing-astra-concept.js', 'ux/design-system/components/bundle.js'],
+    'ux/system/inspection-astra-concept.html': ['ux/system/astra-surfaces.js', 'ux/system/inspection-astra-concept.js', 'ux/design-system/components/bundle.js'],
+    'ux/tasks/piglet-processing/simple/index.html': ['ux/tasks/piglet-processing/simple/app.js', 'ux/design-system/components/bundle.js'],
+  };
+  return { screens, assets, shared: sharedFiles(screens, assets) };
+};
+const reach = (files, scope = []) => reachOf({ ...reachWorld(), files, scope });
+
+test("reach: a page, or a file only one feature's pages load, reaches that feature; the scope is always in", () => {
+  const r = reach(['ux/tasks/piglet-processing/simple/app.js'], ['piglet-processing']);
+  assert.deepEqual([r.all, r.features], [false, ['piglet-processing']]);
+  assert.deepEqual(reach(['ux/system/inspection-astra-concept.js']).features, ['inspection']);
+  assert.deepEqual(reach(['ux/system/inspection-astra-concept.html']).features, ['inspection']);
+  assert.deepEqual(reach(['ux/system/inspection-astra-concept.js'], ['farrowing']).features, ['farrowing', 'inspection']);
+  assert.match(reachLine(reach(['ux/tasks/piglet-processing/simple/app.js']), 24), /^reach: 24 screen\(s\) in features piglet-processing \(ux\/tasks\/piglet-processing\/simple\/app\.js: a page of piglet-processing/);
+});
+
+test("reach: a feature's own folder reaches that feature", () => {
+  assert.deepEqual(reach(['features/weaning/budget.md', 'features/weaning/scenarios.json']).features, ['weaning']);
+  assert.equal(reach(['features/weaning/budget.md']).all, false);
+});
+
+test('reach: the bundle, tokens, the harness, the shooter, the atlas, packages and anything 2+ features load reach every screen', () => {
+  for (const f of ['ux/design-system/components/bundle.js', 'ux/design-system/tokens.css', 'ux/system/atlas-bare.js', 'scripts/shoot-screens.mjs', 'scripts/serve-ux.cjs', 'scripts/font-route.mjs',
+    'atlas/atlas.json', 'sections/mobile.json', 'package.json', 'package-lock.json', 'vendor/fonts/manifest.json',
+    'ux/system/astra-surfaces.js', 'ux/system/farrowing-astra-concept.js']) assert.equal(reach([f]).all, true, f);
+  assert.match(reachLine(reach(['ux/system/astra-surfaces.js']), 291), /^reach: all screens \(ux\/system\/astra-surfaces\.js: loaded by pages of 3 features\)/);
+});
+
+test('reach: a ux file no page loads by name reaches every screen, since a page may fetch it', () => {
+  const r = reach(['ux/laws/strings.json', 'docs/design-workflow/README.md']);
+  assert.equal(r.all, true);
+  assert.match(r.why[0], /ux\/laws\/strings\.json: no page loads it by name/);
+  assert.equal(reach(['ux/README.md']).all, true, 'prose inside ux/ is a ux file');
+});
+
+test('reach: docs, prose outside ux, CI, tests, agent settings and the other scripts reach no screen', () => {
+  const r = reach(['docs/design-workflow/briefs/gate.md', 'README.md', 'archive/notes.md', '.github/workflows/x.yml', 'tests/loop-rules.test.mjs', '.claude/skills/design/SKILL.md', 'scripts/gate.mjs', 'scripts/check-states.mjs']);
+  assert.deepEqual([r.all, r.features], [false, []]);
+  assert.match(reachLine(r, 0), /^reach: no screen \(docs\/design-workflow\/briefs\/gate\.md, README\.md, archive\/notes\.md and 5 more: draws no pixel\)$/);
+});
+
+test('reach: a file nothing classes falls back to every screen, and a page that loads a script reaches its feature first', () => {
+  assert.equal(reach(['references/figma/home.png']).all, true);
+  assert.equal(reach(['next.config.ts']).all, true);
+  const w = reachWorld();
+  w.assets['ux/system/inspection-astra-concept.html'].push('scripts/inspection-data.js');
+  assert.deepEqual(reachOf({ ...w, shared: sharedFiles(w.screens, w.assets), files: ['scripts/inspection-data.js'] }).features, ['inspection']);
 });
