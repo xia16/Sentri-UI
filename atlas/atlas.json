@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-14T07:37:20.878Z",
- "commit": "7f5b627",
+ "generated": "2026-10-14T08:20:09.506Z",
+ "commit": "8280d24",
  "platforms": [
   {
    "id": "mobile",
@@ -13763,7 +13763,7 @@
          "url": "/ux/system/inspection-astra-concept.html?layout=focus",
          "preset": "walk",
          "steps": [
-          "[aria-label=\"Select pig 000254\"]",
+          "[data-pig-select=\"000254\"]",
           "[data-action=\"review-sheet\"]"
          ],
          "figma": "",

@@ -943,7 +943,7 @@
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
       "preset": "walk",
       "steps": [
-        "[aria-label=\"Select pig 000254\"]",
+        "[data-pig-select=\"000254\"]",
         "[data-action=\"review-sheet\"]"
       ],
       "figma": "",
