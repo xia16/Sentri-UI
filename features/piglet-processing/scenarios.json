@@ -1,0 +1,1364 @@
+{
+ "feature": "piglet-processing",
+ "about": "The executable leaves for the drawer convention on piglet processing's staged drawers: Back keeps the draft, Clear empties it (rows of ux/tasks/piglet-processing/research/scenario-tree.md). Format: docs/design-workflow/scenarios.md. Run: node scripts/run-scenarios.mjs piglet-processing. clipCheck is off: the runner reads the waiting commit's screen-reader-only reason (st-visually-hidden) as clipped text on main as well.",
+ "defaults": {
+  "url": "/ux/tasks/piglet-processing/simple/index.html",
+  "langs": [
+   "en",
+   "zh"
+  ],
+  "widths": [
+   360,
+   390
+  ],
+  "height": 844,
+  "clipCheck": false
+ },
+ "tree": [
+  {
+   "type": "entry",
+   "id": "drafts",
+   "label": "A staged drawer (record death, give IDs, litter weight, set count) → Back → reopen → Clear",
+   "children": [
+    {
+     "type": "state",
+     "id": "drafts.a03",
+     "label": "Pen A03 open (12 alive, 1 dead, not weighed)",
+     "tree": "T-23",
+     "reset": {
+      "url": "/ux/tasks/piglet-processing/simple/index.html?pen=A03",
+      "screen": "piglet-processing.sheet-todo"
+     },
+     "children": [
+      {
+       "type": "action",
+       "id": "death.open",
+       "label": "open Record death",
+       "taps": [
+        "[data-action='tool-death']"
+       ],
+       "children": [
+        {
+         "type": "outcome",
+         "id": "pp-dd0-death-opens-without-clear",
+         "tree": "T-23",
+         "label": "Record death opens untouched: no Clear",
+         "gwt": {
+          "given": "A worker has pen A03 open: 12 piglets alive.",
+          "when": "They open Record death.",
+          "then": "Record death opens as before, with no Clear, because nothing has been entered."
+         },
+         "authority": [
+          {
+           "src": "STR",
+           "at": "ux/laws/strings.json · verbs.Clear",
+           "says": "empty what was entered or ticked …; present only while there is something to empty"
+          }
+         ],
+         "visible": [
+          {
+           "screen": "piglet-processing.record-death"
+          },
+          {
+           "el": "[data-action='draft-clear']",
+           "is": "absent",
+           "in": "sheet",
+           "says": "no Clear on an untouched drawer"
+          }
+         ]
+        },
+        {
+         "type": "action",
+         "id": "death.enter",
+         "label": "add two crushed piglets",
+         "taps": [
+          "[data-action='step'][data-value='crushed'][data-step='1']",
+          "[data-action='step'][data-value='crushed'][data-step='1']"
+         ],
+         "children": [
+          {
+           "type": "outcome",
+           "id": "pp-dd1-death-entry-shows-clear",
+           "tree": "T-23",
+           "label": "an entry shows Clear in the footer",
+           "gwt": {
+            "given": "Record death is open and untouched.",
+            "when": "They add two crushed piglets.",
+            "then": "Clear appears in the footer, left of the commit."
+           },
+           "authority": [
+            {
+             "src": "STR",
+             "at": "ux/laws/strings.json · verbs.Clear",
+             "says": "empty what was entered or ticked …; present only while there is something to empty"
+            }
+           ],
+           "visible": [
+            {
+             "verb": "Clear",
+             "in": "sheet"
+            },
+            {
+             "el": "[data-action='draft-clear']",
+             "is": "enabled",
+             "in": "sheet"
+            }
+           ]
+          },
+          {
+           "type": "action",
+           "id": "death.enter.back",
+           "label": "Back",
+           "taps": [
+            "[data-action='back']"
+           ],
+           "children": [
+            {
+             "type": "outcome",
+             "id": "pp-dd2-death-back-saves-nothing",
+             "tree": "T-23",
+             "label": "Back leaves Record death; nothing is recorded",
+             "gwt": {
+              "given": "Record death holds an entry that is not recorded.",
+              "when": "They tap Back.",
+              "then": "They are back where they came from and nothing is recorded."
+             },
+             "authority": [
+              {
+               "src": "owner",
+               "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+               "says": "Back … leaves and returns to where you came from, keeping the draft."
+              },
+              {
+               "src": "RUL",
+               "at": "ux/research/farrowing/RULINGS.md · The exit grammar",
+               "says": "The drawer and Edit are staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save` commits"
+              }
+             ],
+             "visible": [
+              {
+               "screen": "piglet-processing.sheet-todo"
+              }
+             ],
+             "record": [
+              {
+               "expr": "PPS.s.pens.A03.alive === 12 && PPS.s.pens.A03.dead === 1",
+               "says": "nothing recorded",
+               "hard": "wrong-fact"
+              }
+             ]
+            },
+            {
+             "type": "action",
+             "id": "death.enter.back.reopen",
+             "label": "reopen Record death",
+             "taps": [
+              "[data-action='tool-death']"
+             ],
+             "children": [
+              {
+               "type": "outcome",
+               "id": "pp-dd3-death-reopen-shows-draft",
+               "tree": "T-23",
+               "label": "reopening Record death shows the draft, with Clear",
+               "gwt": {
+                "given": "They left Record death with Back after they add two crushed piglets.",
+                "when": "They open Record death again.",
+                "then": "The entry is still there and Clear is in the footer."
+               },
+               "authority": [
+                {
+                 "src": "owner",
+                 "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+                 "says": "Back … leaves and returns to where you came from, keeping the draft."
+                },
+                {
+                 "src": "RUL",
+                 "at": "ux/research/farrowing/RULINGS.md · The exit grammar",
+                 "says": "The drawer and Edit are staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save` commits"
+                }
+               ],
+               "visible": [
+                {
+                 "screen": "piglet-processing.record-death"
+                },
+                {
+                 "text": {
+                  "en": "Record 2 deaths",
+                  "zh": "记录死亡2头"
+                 },
+                 "in": "sheet",
+                 "says": "the commit counts the 2 kept deaths",
+                 "hard": "lost-draft"
+                },
+                {
+                 "el": "[data-action='death-save']",
+                 "is": "enabled",
+                 "in": "sheet",
+                 "hard": "lost-draft"
+                },
+                {
+                 "el": "[data-action='draft-clear']",
+                 "is": "enabled",
+                 "in": "sheet",
+                 "hard": "lost-draft"
+                }
+               ],
+               "record": [
+                {
+                 "expr": "PPS.s.pens.A03.alive === 12 && PPS.s.pens.A03.dead === 1",
+                 "says": "still nothing recorded",
+                 "hard": "wrong-fact"
+                }
+               ]
+              },
+              {
+               "type": "action",
+               "id": "death.enter.back.reopen.clear",
+               "label": "Clear",
+               "taps": [
+                "[data-action='draft-clear']"
+               ],
+               "children": [
+                {
+                 "type": "outcome",
+                 "id": "pp-dd4-death-clear-empties",
+                 "tree": "T-23",
+                 "label": "Clear empties Record death and goes; nothing recorded",
+                 "gwt": {
+                  "given": "Record death was reopened holding the kept draft.",
+                  "when": "They tap Clear.",
+                  "then": "Record death is back as it opened, Clear disappears and nothing is recorded."
+                 },
+                 "authority": [
+                  {
+                   "src": "RUL",
+                   "at": "ux/research/farrowing/RULINGS.md · The exit grammar",
+                   "says": "The drawer and Edit are staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save` commits"
+                  },
+                  {
+                   "src": "STR",
+                   "at": "ux/laws/strings.json · verbs.Clear",
+                   "says": "empty what was entered or ticked …; present only while there is something to empty"
+                  }
+                 ],
+                 "visible": [
+                  {
+                   "el": "[data-action='death-save']",
+                   "is": "disabled",
+                   "in": "sheet",
+                   "says": "Record deaths waits again"
+                  },
+                  {
+                   "el": "[data-action='draft-clear']",
+                   "is": "absent",
+                   "in": "sheet",
+                   "says": "Clear gone"
+                  }
+                 ],
+                 "record": [
+                  {
+                   "expr": "PPS.s.pens.A03.alive === 12 && PPS.s.pens.A03.dead === 1",
+                   "says": "nothing recorded",
+                   "hard": "wrong-fact"
+                  }
+                 ]
+                },
+                {
+                 "type": "action",
+                 "id": "death.enter.back.reopen.clear.back",
+                 "label": "Back, then reopen",
+                 "taps": [
+                  "[data-action='back']",
+                  "[data-action='tool-death']"
+                 ],
+                 "children": [
+                  {
+                   "type": "outcome",
+                   "id": "pp-dd5-death-cleared-stays-cleared",
+                   "tree": "T-23",
+                   "label": "after Clear, Back and reopen show Record death as it opened",
+                   "gwt": {
+                    "given": "They cleared the draft on Record death.",
+                    "when": "They go Back and open it again.",
+                    "then": "It opens as it did the first time, with no Clear."
+                   },
+                   "authority": [
+                    {
+                     "src": "RUL",
+                     "at": "ux/research/farrowing/RULINGS.md · The exit grammar",
+                     "says": "The drawer and Edit are staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save` commits"
+                    },
+                    {
+                     "src": "STR",
+                     "at": "ux/laws/strings.json · verbs.Clear",
+                     "says": "empty what was entered or ticked …; present only while there is something to empty"
+                    }
+                   ],
+                   "visible": [
+                    {
+                     "screen": "piglet-processing.record-death"
+                    },
+                    {
+                     "el": "[data-action='death-save']",
+                     "is": "disabled",
+                     "in": "sheet",
+                     "says": "Record deaths waits again"
+                    },
+                    {
+                     "el": "[data-action='draft-clear']",
+                     "is": "absent",
+                     "in": "sheet"
+                    }
+                   ]
+                  }
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "type": "action",
+           "id": "death.enter.sysback",
+           "label": "the phone's Back, then reopen",
+           "taps": [
+            {
+             "back": true
+            },
+            "[data-action='tool-death']"
+           ],
+           "children": [
+            {
+             "type": "outcome",
+             "id": "pp-dd6-death-phone-back-keeps-draft",
+             "tree": "T-23",
+             "label": "the phone's Back keeps the draft like the footer Back",
+             "gwt": {
+              "given": "Record death holds an entry that is not recorded.",
+              "when": "They press the phone's own Back and open it again.",
+              "then": "The entry is still there and nothing is recorded."
+             },
+             "authority": [
+              {
+               "src": "owner",
+               "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+               "says": "Back … leaves and returns to where you came from, keeping the draft."
+              },
+              {
+               "src": "RUL",
+               "at": "ux/research/farrowing/RULINGS.md · The exit grammar",
+               "says": "The drawer and Edit are staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save` commits"
+              }
+             ],
+             "visible": [
+              {
+               "screen": "piglet-processing.record-death"
+              },
+              {
+               "text": {
+                "en": "Record 2 deaths",
+                "zh": "记录死亡2头"
+               },
+               "in": "sheet",
+               "says": "the commit counts the 2 kept deaths",
+               "hard": "lost-draft"
+              },
+              {
+               "el": "[data-action='death-save']",
+               "is": "enabled",
+               "in": "sheet",
+               "hard": "lost-draft"
+              }
+             ],
+             "record": [
+              {
+               "expr": "PPS.s.pens.A03.alive === 12 && PPS.s.pens.A03.dead === 1",
+               "says": "nothing recorded",
+               "hard": "wrong-fact"
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "action",
+       "id": "weight.open",
+       "label": "open Litter weight",
+       "taps": [
+        "[data-action='weight-open']"
+       ],
+       "children": [
+        {
+         "type": "outcome",
+         "id": "pp-dw0-weight-opens-without-clear",
+         "tree": "T-23",
+         "label": "Litter weight opens untouched: no Clear",
+         "gwt": {
+          "given": "A worker has pen A03 open; the litter is not weighed.",
+          "when": "They open Litter weight.",
+          "then": "Litter weight opens as before, with no Clear, because nothing has been entered."
+         },
+         "authority": [
+          {
+           "src": "STR",
+           "at": "ux/laws/strings.json · verbs.Clear",
+           "says": "empty what was entered or ticked …; present only while there is something to empty"
+          }
+         ],
+         "visible": [
+          {
+           "screen": "piglet-processing.weight"
+          },
+          {
+           "el": "[data-action='draft-clear']",
+           "is": "absent",
+           "in": "sheet",
+           "says": "no Clear on an untouched drawer"
+          }
+         ]
+        },
+        {
+         "type": "action",
+         "id": "weight.enter",
+         "label": "type 18 kg",
+         "taps": [
+          "[data-action='pad'][data-value='1']",
+          "[data-action='pad'][data-value='8']"
+         ],
+         "children": [
+          {
+           "type": "outcome",
+           "id": "pp-dw1-weight-entry-shows-clear",
+           "tree": "T-23",
+           "label": "an entry shows Clear in the footer",
+           "gwt": {
+            "given": "Litter weight is open and untouched.",
+            "when": "They type 18 kg.",
+            "then": "Clear appears in the footer, left of the commit."
+           },
+           "authority": [
+            {
+             "src": "STR",
+             "at": "ux/laws/strings.json · verbs.Clear",
+             "says": "empty what was entered or ticked …; present only while there is something to empty"
+            }
+           ],
+           "visible": [
+            {
+             "verb": "Clear",
+             "in": "sheet"
+            },
+            {
+             "el": "[data-action='draft-clear']",
+             "is": "enabled",
+             "in": "sheet"
+            }
+           ]
+          },
+          {
+           "type": "action",
+           "id": "weight.enter.back",
+           "label": "Back",
+           "taps": [
+            "[data-action='back']"
+           ],
+           "children": [
+            {
+             "type": "outcome",
+             "id": "pp-dw2-weight-back-saves-nothing",
+             "tree": "T-23",
+             "label": "Back leaves Litter weight; nothing is recorded",
+             "gwt": {
+              "given": "Litter weight holds an entry that is not recorded.",
+              "when": "They tap Back.",
+              "then": "They are back where they came from and nothing is recorded."
+             },
+             "authority": [
+              {
+               "src": "owner",
+               "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+               "says": "Back … leaves and returns to where you came from, keeping the draft."
+              },
+              {
+               "src": "RUL",
+               "at": "ux/research/farrowing/RULINGS.md · The exit grammar",
+               "says": "The drawer and Edit are staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save` commits"
+              }
+             ],
+             "visible": [
+              {
+               "screen": "piglet-processing.sheet-todo"
+              }
+             ],
+             "record": [
+              {
+               "expr": "PPS.s.pens.A03.weights.length === 0",
+               "says": "nothing recorded",
+               "hard": "wrong-fact"
+              }
+             ]
+            },
+            {
+             "type": "action",
+             "id": "weight.enter.back.reopen",
+             "label": "reopen Litter weight",
+             "taps": [
+              "[data-action='weight-open']"
+             ],
+             "children": [
+              {
+               "type": "outcome",
+               "id": "pp-dw3-weight-reopen-shows-draft",
+               "tree": "T-23",
+               "label": "reopening Litter weight shows the draft, with Clear",
+               "gwt": {
+                "given": "They left Litter weight with Back after they type 18 kg.",
+                "when": "They open Litter weight again.",
+                "then": "The entry is still there and Clear is in the footer."
+               },
+               "authority": [
+                {
+                 "src": "owner",
+                 "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+                 "says": "Back … leaves and returns to where you came from, keeping the draft."
+                },
+                {
+                 "src": "RUL",
+                 "at": "ux/research/farrowing/RULINGS.md · The exit grammar",
+                 "says": "The drawer and Edit are staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save` commits"
+                }
+               ],
+               "visible": [
+                {
+                 "screen": "piglet-processing.weight"
+                },
+                {
+                 "el": "[data-action='weight-save']",
+                 "is": "enabled",
+                 "in": "sheet",
+                 "says": "Record weight is live on the kept 18 kg",
+                 "hard": "lost-draft"
+                },
+                {
+                 "el": "[data-action='draft-clear']",
+                 "is": "enabled",
+                 "in": "sheet",
+                 "hard": "lost-draft"
+                }
+               ],
+               "record": [
+                {
+                 "expr": "PPS.s.pens.A03.weights.length === 0",
+                 "says": "still nothing recorded",
+                 "hard": "wrong-fact"
+                }
+               ]
+              },
+              {
+               "type": "action",
+               "id": "weight.enter.back.reopen.clear",
+               "label": "Clear",
+               "taps": [
+                "[data-action='draft-clear']"
+               ],
+               "children": [
+                {
+                 "type": "outcome",
+                 "id": "pp-dw4-weight-clear-empties",
+                 "tree": "T-23",
+                 "label": "Clear empties Litter weight and goes; nothing recorded",
+                 "gwt": {
+                  "given": "Litter weight was reopened holding the kept draft.",
+                  "when": "They tap Clear.",
+                  "then": "Litter weight is back as it opened, Clear disappears and nothing is recorded."
+                 },
+                 "authority": [
+                  {
+                   "src": "RUL",
+                   "at": "ux/research/farrowing/RULINGS.md · The exit grammar",
+                   "says": "The drawer and Edit are staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save` commits"
+                  },
+                  {
+                   "src": "STR",
+                   "at": "ux/laws/strings.json · verbs.Clear",
+                   "says": "empty what was entered or ticked …; present only while there is something to empty"
+                  }
+                 ],
+                 "visible": [
+                  {
+                   "el": "[data-action='weight-save']",
+                   "is": "disabled",
+                   "in": "sheet",
+                   "says": "Record weight waits again"
+                  },
+                  {
+                   "el": "[data-action='draft-clear']",
+                   "is": "absent",
+                   "in": "sheet",
+                   "says": "Clear gone"
+                  }
+                 ],
+                 "record": [
+                  {
+                   "expr": "PPS.s.pens.A03.weights.length === 0",
+                   "says": "nothing recorded",
+                   "hard": "wrong-fact"
+                  }
+                 ]
+                },
+                {
+                 "type": "action",
+                 "id": "weight.enter.back.reopen.clear.back",
+                 "label": "Back, then reopen",
+                 "taps": [
+                  "[data-action='back']",
+                  "[data-action='weight-open']"
+                 ],
+                 "children": [
+                  {
+                   "type": "outcome",
+                   "id": "pp-dw5-weight-cleared-stays-cleared",
+                   "tree": "T-23",
+                   "label": "after Clear, Back and reopen show Litter weight as it opened",
+                   "gwt": {
+                    "given": "They cleared the draft on Litter weight.",
+                    "when": "They go Back and open it again.",
+                    "then": "It opens as it did the first time, with no Clear."
+                   },
+                   "authority": [
+                    {
+                     "src": "RUL",
+                     "at": "ux/research/farrowing/RULINGS.md · The exit grammar",
+                     "says": "The drawer and Edit are staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save` commits"
+                    },
+                    {
+                     "src": "STR",
+                     "at": "ux/laws/strings.json · verbs.Clear",
+                     "says": "empty what was entered or ticked …; present only while there is something to empty"
+                    }
+                   ],
+                   "visible": [
+                    {
+                     "screen": "piglet-processing.weight"
+                    },
+                    {
+                     "el": "[data-action='weight-save']",
+                     "is": "disabled",
+                     "in": "sheet",
+                     "says": "Record weight waits again"
+                    },
+                    {
+                     "el": "[data-action='draft-clear']",
+                     "is": "absent",
+                     "in": "sheet"
+                    }
+                   ]
+                  }
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "type": "action",
+           "id": "weight.enter.sysback",
+           "label": "the phone's Back, then reopen",
+           "taps": [
+            {
+             "back": true
+            },
+            "[data-action='weight-open']"
+           ],
+           "children": [
+            {
+             "type": "outcome",
+             "id": "pp-dw6-weight-phone-back-keeps-draft",
+             "tree": "T-23",
+             "label": "the phone's Back keeps the draft like the footer Back",
+             "gwt": {
+              "given": "Litter weight holds an entry that is not recorded.",
+              "when": "They press the phone's own Back and open it again.",
+              "then": "The entry is still there and nothing is recorded."
+             },
+             "authority": [
+              {
+               "src": "owner",
+               "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+               "says": "Back … leaves and returns to where you came from, keeping the draft."
+              },
+              {
+               "src": "RUL",
+               "at": "ux/research/farrowing/RULINGS.md · The exit grammar",
+               "says": "The drawer and Edit are staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save` commits"
+              }
+             ],
+             "visible": [
+              {
+               "screen": "piglet-processing.weight"
+              },
+              {
+               "el": "[data-action='weight-save']",
+               "is": "enabled",
+               "in": "sheet",
+               "says": "Record weight is live on the kept 18 kg",
+               "hard": "lost-draft"
+              }
+             ],
+             "record": [
+              {
+               "expr": "PPS.s.pens.A03.weights.length === 0",
+               "says": "nothing recorded",
+               "hard": "wrong-fact"
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "action",
+       "id": "count.open",
+       "label": "open Set count",
+       "taps": [
+        "[data-action='more']",
+        "[data-action='tool'][data-value='count']"
+       ],
+       "children": [
+        {
+         "type": "outcome",
+         "id": "pp-dc0-count-opens-without-clear",
+         "tree": "C-15",
+         "label": "Set count opens untouched: no Clear",
+         "gwt": {
+          "given": "A worker has pen A03 open: 12 piglets alive.",
+          "when": "They open Set count.",
+          "then": "Set count opens as before, with no Clear, because nothing has been entered."
+         },
+         "authority": [
+          {
+           "src": "STR",
+           "at": "ux/laws/strings.json · verbs.Clear",
+           "says": "empty what was entered or ticked …; present only while there is something to empty"
+          }
+         ],
+         "visible": [
+          {
+           "screen": "piglet-processing.set-count"
+          },
+          {
+           "el": "[data-action='draft-clear']",
+           "is": "absent",
+           "in": "sheet",
+           "says": "no Clear on an untouched drawer"
+          }
+         ]
+        },
+        {
+         "type": "action",
+         "id": "count.enter",
+         "label": "count one fewer (11)",
+         "taps": [
+          "[data-action='step'][data-value='count'][data-step='-1']"
+         ],
+         "children": [
+          {
+           "type": "outcome",
+           "id": "pp-dc1-count-entry-shows-clear",
+           "tree": "C-15",
+           "label": "an entry shows Clear in the footer",
+           "gwt": {
+            "given": "Set count is open and untouched.",
+            "when": "They count one fewer (11).",
+            "then": "Clear appears in the footer, left of the commit."
+           },
+           "authority": [
+            {
+             "src": "STR",
+             "at": "ux/laws/strings.json · verbs.Clear",
+             "says": "empty what was entered or ticked …; present only while there is something to empty"
+            }
+           ],
+           "visible": [
+            {
+             "verb": "Clear",
+             "in": "sheet"
+            },
+            {
+             "el": "[data-action='draft-clear']",
+             "is": "enabled",
+             "in": "sheet"
+            }
+           ]
+          },
+          {
+           "type": "action",
+           "id": "count.enter.back",
+           "label": "Back",
+           "taps": [
+            "[data-action='back']"
+           ],
+           "children": [
+            {
+             "type": "outcome",
+             "id": "pp-dc2-count-back-saves-nothing",
+             "tree": "C-15",
+             "label": "Back leaves Set count; nothing is recorded",
+             "gwt": {
+              "given": "Set count holds an entry that is not recorded.",
+              "when": "They tap Back.",
+              "then": "They are back where they came from and nothing is recorded."
+             },
+             "authority": [
+              {
+               "src": "owner",
+               "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+               "says": "Back … leaves and returns to where you came from, keeping the draft."
+              },
+              {
+               "src": "RUL",
+               "at": "ux/research/farrowing/RULINGS.md · The exit grammar",
+               "says": "The drawer and Edit are staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save` commits"
+              }
+             ],
+             "visible": [
+              {
+               "screen": "piglet-processing.sheet-todo"
+              }
+             ],
+             "record": [
+              {
+               "expr": "PPS.s.pens.A03.alive === 12",
+               "says": "nothing recorded",
+               "hard": "wrong-fact"
+              }
+             ]
+            },
+            {
+             "type": "action",
+             "id": "count.enter.back.reopen",
+             "label": "reopen Set count",
+             "taps": [
+              "[data-action='more']",
+              "[data-action='tool'][data-value='count']"
+             ],
+             "children": [
+              {
+               "type": "outcome",
+               "id": "pp-dc3-count-reopen-shows-draft",
+               "tree": "C-15",
+               "label": "reopening Set count shows the draft, with Clear",
+               "gwt": {
+                "given": "They left Set count with Back after they count one fewer (11).",
+                "when": "They open Set count again.",
+                "then": "The entry is still there and Clear is in the footer."
+               },
+               "authority": [
+                {
+                 "src": "owner",
+                 "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+                 "says": "Back … leaves and returns to where you came from, keeping the draft."
+                },
+                {
+                 "src": "RUL",
+                 "at": "ux/research/farrowing/RULINGS.md · The exit grammar",
+                 "says": "The drawer and Edit are staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save` commits"
+                }
+               ],
+               "visible": [
+                {
+                 "screen": "piglet-processing.set-count"
+                },
+                {
+                 "el": "[data-action='count-save']",
+                 "is": "enabled",
+                 "in": "sheet",
+                 "says": "the commit is live on the kept 11",
+                 "hard": "lost-draft"
+                },
+                {
+                 "el": "[data-action='draft-clear']",
+                 "is": "enabled",
+                 "in": "sheet",
+                 "hard": "lost-draft"
+                }
+               ],
+               "record": [
+                {
+                 "expr": "PPS.s.pens.A03.alive === 12",
+                 "says": "still nothing recorded",
+                 "hard": "wrong-fact"
+                }
+               ]
+              },
+              {
+               "type": "action",
+               "id": "count.enter.back.reopen.clear",
+               "label": "Clear",
+               "taps": [
+                "[data-action='draft-clear']"
+               ],
+               "children": [
+                {
+                 "type": "outcome",
+                 "id": "pp-dc4-count-clear-empties",
+                 "tree": "C-15",
+                 "label": "Clear empties Set count and goes; nothing recorded",
+                 "gwt": {
+                  "given": "Set count was reopened holding the kept draft.",
+                  "when": "They tap Clear.",
+                  "then": "Set count is back as it opened, Clear disappears and nothing is recorded."
+                 },
+                 "authority": [
+                  {
+                   "src": "RUL",
+                   "at": "ux/research/farrowing/RULINGS.md · The exit grammar",
+                   "says": "The drawer and Edit are staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save` commits"
+                  },
+                  {
+                   "src": "STR",
+                   "at": "ux/laws/strings.json · verbs.Clear",
+                   "says": "empty what was entered or ticked …; present only while there is something to empty"
+                  }
+                 ],
+                 "visible": [
+                  {
+                   "el": "[data-action='count-save']",
+                   "is": "disabled",
+                   "in": "sheet",
+                   "says": "the commit waits again at 12"
+                  },
+                  {
+                   "el": "[data-action='draft-clear']",
+                   "is": "absent",
+                   "in": "sheet",
+                   "says": "Clear gone"
+                  }
+                 ],
+                 "record": [
+                  {
+                   "expr": "PPS.s.pens.A03.alive === 12",
+                   "says": "nothing recorded",
+                   "hard": "wrong-fact"
+                  }
+                 ]
+                },
+                {
+                 "type": "action",
+                 "id": "count.enter.back.reopen.clear.back",
+                 "label": "Back, then reopen",
+                 "taps": [
+                  "[data-action='back']",
+                  "[data-action='more']",
+                  "[data-action='tool'][data-value='count']"
+                 ],
+                 "children": [
+                  {
+                   "type": "outcome",
+                   "id": "pp-dc5-count-cleared-stays-cleared",
+                   "tree": "C-15",
+                   "label": "after Clear, Back and reopen show Set count as it opened",
+                   "gwt": {
+                    "given": "They cleared the draft on Set count.",
+                    "when": "They go Back and open it again.",
+                    "then": "It opens as it did the first time, with no Clear."
+                   },
+                   "authority": [
+                    {
+                     "src": "RUL",
+                     "at": "ux/research/farrowing/RULINGS.md · The exit grammar",
+                     "says": "The drawer and Edit are staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save` commits"
+                    },
+                    {
+                     "src": "STR",
+                     "at": "ux/laws/strings.json · verbs.Clear",
+                     "says": "empty what was entered or ticked …; present only while there is something to empty"
+                    }
+                   ],
+                   "visible": [
+                    {
+                     "screen": "piglet-processing.set-count"
+                    },
+                    {
+                     "el": "[data-action='count-save']",
+                     "is": "disabled",
+                     "in": "sheet",
+                     "says": "the commit waits again at 12"
+                    },
+                    {
+                     "el": "[data-action='draft-clear']",
+                     "is": "absent",
+                     "in": "sheet"
+                    }
+                   ]
+                  }
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "type": "action",
+           "id": "count.enter.sysback",
+           "label": "the phone's Back, then reopen",
+           "taps": [
+            {
+             "back": true
+            },
+            "[data-action='more']",
+            "[data-action='tool'][data-value='count']"
+           ],
+           "children": [
+            {
+             "type": "outcome",
+             "id": "pp-dc6-count-phone-back-keeps-draft",
+             "tree": "C-15",
+             "label": "the phone's Back keeps the draft like the footer Back",
+             "gwt": {
+              "given": "Set count holds an entry that is not recorded.",
+              "when": "They press the phone's own Back and open it again.",
+              "then": "The entry is still there and nothing is recorded."
+             },
+             "authority": [
+              {
+               "src": "owner",
+               "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+               "says": "Back … leaves and returns to where you came from, keeping the draft."
+              },
+              {
+               "src": "RUL",
+               "at": "ux/research/farrowing/RULINGS.md · The exit grammar",
+               "says": "The drawer and Edit are staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save` commits"
+              }
+             ],
+             "visible": [
+              {
+               "screen": "piglet-processing.set-count"
+              },
+              {
+               "el": "[data-action='count-save']",
+               "is": "enabled",
+               "in": "sheet",
+               "says": "the commit is live on the kept 11",
+               "hard": "lost-draft"
+              }
+             ],
+             "record": [
+              {
+               "expr": "PPS.s.pens.A03.alive === 12",
+               "says": "nothing recorded",
+               "hard": "wrong-fact"
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "type": "state",
+     "id": "drafts.give-a02",
+     "label": "Pen A02, Give IDs open (4 of 12 tagged)",
+     "tree": "X-5",
+     "reset": {
+      "url": "/ux/tasks/piglet-processing/simple/index.html?pen=A02",
+      "screen": "piglet-processing.give-ids"
+     },
+     "children": [
+      {
+       "type": "outcome",
+       "id": "pp-dg0-give-opens-without-clear",
+       "tree": "X-5",
+       "label": "Give IDs opens untouched: no Clear",
+       "gwt": {
+        "given": "A worker has pen A02 open with 4 of 12 piglets tagged.",
+        "when": "They open Give IDs.",
+        "then": "Give IDs opens as before, with the next tag suggested and no Clear."
+       },
+       "authority": [
+        {
+         "src": "STR",
+         "at": "ux/laws/strings.json · verbs.Clear",
+         "says": "empty what was entered or ticked …; present only while there is something to empty"
+        }
+       ],
+       "visible": [
+        {
+         "screen": "piglet-processing.give-ids"
+        },
+        {
+         "el": "[data-action='draft-clear']",
+         "is": "absent",
+         "in": "sheet"
+        }
+       ]
+      },
+      {
+       "type": "action",
+       "id": "give.enter",
+       "label": "pick Gilt",
+       "taps": [
+        "[data-action='give-sex'][data-value='gilt']"
+       ],
+       "children": [
+        {
+         "type": "outcome",
+         "id": "pp-dg1-give-entry-shows-clear",
+         "tree": "X-5",
+         "label": "an entry shows Clear in the footer",
+         "gwt": {
+          "given": "Give IDs is open and untouched.",
+          "when": "They pick Gilt.",
+          "then": "Clear appears in the footer, left of the commit."
+         },
+         "authority": [
+          {
+           "src": "STR",
+           "at": "ux/laws/strings.json · verbs.Clear",
+           "says": "empty what was entered or ticked …; present only while there is something to empty"
+          }
+         ],
+         "visible": [
+          {
+           "verb": "Clear",
+           "in": "sheet"
+          },
+          {
+           "el": "[data-action='draft-clear']",
+           "is": "enabled",
+           "in": "sheet"
+          }
+         ]
+        },
+        {
+         "type": "action",
+         "id": "give.enter.back",
+         "label": "Back",
+         "taps": [
+          "[data-action='back']"
+         ],
+         "children": [
+          {
+           "type": "outcome",
+           "id": "pp-dg2-give-back-saves-nothing",
+           "tree": "X-5",
+           "label": "Back returns to the Piglets list; nothing is recorded",
+           "gwt": {
+            "given": "Give IDs holds Gilt for the next piglet, not recorded.",
+            "when": "They tap Back.",
+            "then": "The Piglets list shows again, still 4 tagged; nothing is recorded."
+           },
+           "authority": [
+            {
+             "src": "owner",
+             "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+             "says": "Back … leaves and returns to where you came from, keeping the draft."
+            },
+            {
+             "src": "RUL",
+             "at": "ux/research/farrowing/RULINGS.md · The exit grammar",
+             "says": "The drawer and Edit are staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save` commits"
+            }
+           ],
+           "visible": [
+            {
+             "screen": "piglet-processing.tagged-list"
+            }
+           ],
+           "record": [
+            {
+             "expr": "PPS.s.pens.A02.ids.length === 4",
+             "says": "nothing recorded",
+             "hard": "wrong-fact"
+            }
+           ]
+          },
+          {
+           "type": "action",
+           "id": "give.enter.back.reopen",
+           "label": "reopen Give IDs",
+           "taps": [
+            "[data-action='give-new']"
+           ],
+           "children": [
+            {
+             "type": "outcome",
+             "id": "pp-dg3-give-reopen-shows-draft",
+             "tree": "X-5",
+             "label": "reopening Give IDs shows Gilt still picked, with Clear",
+             "gwt": {
+              "given": "They left Give IDs with Back after picking Gilt.",
+              "when": "They open Give IDs again.",
+              "then": "Gilt is still picked and Clear is in the footer."
+             },
+             "authority": [
+              {
+               "src": "owner",
+               "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+               "says": "Back … leaves and returns to where you came from, keeping the draft."
+              },
+              {
+               "src": "RUL",
+               "at": "ux/research/farrowing/RULINGS.md · The exit grammar",
+               "says": "The drawer and Edit are staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save` commits"
+              }
+             ],
+             "visible": [
+              {
+               "screen": "piglet-processing.give-ids"
+              },
+              {
+               "el": "[data-action='give-sex'][data-value='gilt'][aria-pressed='true']",
+               "in": "sheet",
+               "says": "Gilt still picked",
+               "hard": "lost-draft"
+              },
+              {
+               "el": "[data-action='draft-clear']",
+               "is": "enabled",
+               "in": "sheet",
+               "hard": "lost-draft"
+              }
+             ],
+             "record": [
+              {
+               "expr": "PPS.s.pens.A02.ids.length === 4",
+               "hard": "wrong-fact"
+              }
+             ]
+            },
+            {
+             "type": "action",
+             "id": "give.enter.back.reopen.clear",
+             "label": "Clear",
+             "taps": [
+              "[data-action='draft-clear']"
+             ],
+             "children": [
+              {
+               "type": "outcome",
+               "id": "pp-dg4-give-clear-empties",
+               "tree": "X-5",
+               "label": "Clear empties Give IDs and goes; nothing recorded",
+               "gwt": {
+                "given": "Give IDs was reopened with Gilt still picked.",
+                "when": "They tap Clear.",
+                "then": "No sex is picked, Clear disappears and nothing is recorded."
+               },
+               "authority": [
+                {
+                 "src": "RUL",
+                 "at": "ux/research/farrowing/RULINGS.md · The exit grammar",
+                 "says": "The drawer and Edit are staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save` commits"
+                },
+                {
+                 "src": "STR",
+                 "at": "ux/laws/strings.json · verbs.Clear",
+                 "says": "empty what was entered or ticked …; present only while there is something to empty"
+                }
+               ],
+               "visible": [
+                {
+                 "el": "[data-action='give-sex'][aria-pressed='true']",
+                 "is": "absent",
+                 "in": "sheet",
+                 "says": "no sex picked"
+                },
+                {
+                 "el": "[data-action='draft-clear']",
+                 "is": "absent",
+                 "in": "sheet"
+                }
+               ],
+               "record": [
+                {
+                 "expr": "PPS.s.pens.A02.ids.length === 4",
+                 "hard": "wrong-fact"
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "type": "action",
+         "id": "give.enter.sysback",
+         "label": "the phone's Back, then reopen",
+         "taps": [
+          {
+           "back": true
+          },
+          "[data-action='give-new']"
+         ],
+         "children": [
+          {
+           "type": "outcome",
+           "id": "pp-dg6-give-phone-back-keeps-draft",
+           "tree": "X-5",
+           "label": "the phone's Back keeps the draft like the header Back",
+           "gwt": {
+            "given": "Give IDs holds Gilt for the next piglet, not recorded.",
+            "when": "They press the phone's own Back and open Give IDs again.",
+            "then": "Gilt is still picked and nothing is recorded."
+           },
+           "authority": [
+            {
+             "src": "owner",
+             "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+             "says": "Back … leaves and returns to where you came from, keeping the draft."
+            },
+            {
+             "src": "RUL",
+             "at": "ux/research/farrowing/RULINGS.md · The exit grammar",
+             "says": "The drawer and Edit are staged — `Back` (and swipe) keeps the draft on the device, `Clear` discards it, `Save` commits"
+            }
+           ],
+           "visible": [
+            {
+             "screen": "piglet-processing.give-ids"
+            },
+            {
+             "el": "[data-action='give-sex'][data-value='gilt'][aria-pressed='true']",
+             "in": "sheet",
+             "hard": "lost-draft"
+            }
+           ],
+           "record": [
+            {
+             "expr": "PPS.s.pens.A02.ids.length === 4",
+             "hard": "wrong-fact"
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

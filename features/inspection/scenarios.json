@@ -1,0 +1,1470 @@
+{
+ "feature": "inspection",
+ "about": "The executable leaves for the drawer convention on inspection's typed sheets: Back keeps the draft, Clear empties it. Format: docs/design-workflow/scenarios.md. Run: node scripts/run-scenarios.mjs inspection",
+ "defaults": {
+  "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+  "langs": [
+   "en",
+   "zh"
+  ],
+  "widths": [
+   360,
+   390
+  ],
+  "height": 844,
+  "clipCheck": true
+ },
+ "tree": [
+  {
+   "type": "entry",
+   "id": "drafts",
+   "label": "A typed sheet (pen note, report fault, resolve fault, selected pens note, filters) → Back → reopen → Clear",
+   "children": [
+    {
+     "type": "state",
+     "id": "drafts.pen-c2",
+     "label": "Unit walk, pen C2 open (no pen note)",
+     "tree": "DC",
+     "reset": {
+      "screen": "inspection.walk",
+      "taps": [
+       "[data-action='pen-detail'][data-value='C2']"
+      ]
+     },
+     "children": [
+      {
+       "type": "action",
+       "id": "pen-note.open",
+       "label": "open Pen note",
+       "taps": [
+        "[data-action='pen-note']"
+       ],
+       "children": [
+        {
+         "type": "outcome",
+         "id": "in-dc0-pen-note-opens-without-clear",
+         "tree": "DC-0",
+         "label": "Pen note opens untouched: no Clear",
+         "gwt": {
+          "given": "A worker on the unit walk has pen C2 open; C2 has no pen note.",
+          "when": "They open Pen note.",
+          "then": "Pen note opens as before, with Back and its commit in the footer and no Clear, because nothing has been entered."
+         },
+         "authority": [
+          {
+           "src": "STR",
+           "at": "ux/laws/strings.json · verbs.Clear",
+           "says": "empty what was entered or ticked …; present only while there is something to empty"
+          }
+         ],
+         "visible": [
+          {
+           "screen": "inspection.pen-note"
+          },
+          {
+           "el": "[data-action='clear-draft']",
+           "is": "absent",
+           "in": "sheet",
+           "says": "no Clear on an untouched sheet"
+          }
+         ]
+        },
+        {
+         "type": "action",
+         "id": "pen-note.type",
+         "label": "type \"Gate latch loose\"",
+         "taps": [
+          {
+           "fill": "[data-card='0'] .phone > .sheet textarea[data-v2='note']",
+           "value": "Gate latch loose"
+          }
+         ],
+         "children": [
+          {
+           "type": "outcome",
+           "id": "in-dc1-pen-note-typing-shows-clear",
+           "tree": "DC-1",
+           "label": "typing shows Clear in the footer",
+           "gwt": {
+            "given": "Pen note is open and empty of edits.",
+            "when": "They type \"Gate latch loose\".",
+            "then": "Clear appears in the footer, left of the commit."
+           },
+           "authority": [
+            {
+             "src": "owner",
+             "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+             "says": "Clear empties what was entered or ticked … present only when there is something to reset or clear"
+            }
+           ],
+           "visible": [
+            {
+             "verb": "Clear",
+             "in": "sheet",
+             "says": "Clear is shown"
+            },
+            {
+             "el": "[data-action='clear-draft']",
+             "is": "enabled",
+             "in": "sheet"
+            }
+           ]
+          },
+          {
+           "type": "action",
+           "id": "pen-note.type.back",
+           "label": "Back (footer)",
+           "taps": [
+            "[data-action='back']"
+           ],
+           "children": [
+            {
+             "type": "outcome",
+             "id": "in-dc2-pen-note-back-keeps-draft",
+             "tree": "DC-2",
+             "label": "Back leaves Pen note and keeps the typed draft; nothing saved",
+             "gwt": {
+              "given": "Pen note holds \"Gate latch loose\", not saved.",
+              "when": "They tap Back.",
+              "then": "They are back where they came from, the typed text is kept as a draft and nothing is saved."
+             },
+             "authority": [
+              {
+               "src": "owner",
+               "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+               "says": "Back … leaves and returns to where you came from, keeping the draft."
+              }
+             ],
+             "visible": [
+              {
+               "screen": "inspection.pen"
+              }
+             ],
+             "record": [
+              {
+               "expr": "(InspectionStudy.states[0].sheetDrafts || {})[\"pen-note|C2\"] && (InspectionStudy.states[0].sheetDrafts || {})[\"pen-note|C2\"].note === \"Gate latch loose\"",
+               "says": "the draft is kept",
+               "hard": "lost-draft"
+              },
+              {
+               "expr": "InspectionStudy.states[0].pens.find(p => p.id === 'C2').note === ''",
+               "says": "nothing was saved",
+               "hard": "wrong-fact"
+              }
+             ]
+            },
+            {
+             "type": "action",
+             "id": "pen-note.type.back.reopen",
+             "label": "reopen Pen note",
+             "taps": [
+              "[data-action='pen-note']"
+             ],
+             "children": [
+              {
+               "type": "outcome",
+               "id": "in-dc3-pen-note-reopen-shows-draft",
+               "tree": "DC-3",
+               "label": "reopening Pen note shows the draft, with Clear",
+               "gwt": {
+                "given": "They left Pen note with Back while it held \"Gate latch loose\".",
+                "when": "They open Pen note again.",
+                "then": "The field still holds \"Gate latch loose\" and Clear is in the footer."
+               },
+               "authority": [
+                {
+                 "src": "owner",
+                 "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+                 "says": "Back … leaves and returns to where you came from, keeping the draft."
+                }
+               ],
+               "visible": [
+                {
+                 "screen": "inspection.pen-note"
+                },
+                {
+                 "verb": "Clear",
+                 "in": "sheet",
+                 "hard": "lost-draft"
+                }
+               ],
+               "record": [
+                {
+                 "expr": "InspectionStudy.states[0].view === 'pen-note' && (InspectionStudy.states[0].form.note || '') === \"Gate latch loose\"",
+                 "says": "the field holds the draft",
+                 "hard": "lost-draft"
+                },
+                {
+                 "expr": "InspectionStudy.states[0].pens.find(p => p.id === 'C2').note === ''",
+                 "says": "still nothing saved",
+                 "hard": "wrong-fact"
+                }
+               ]
+              },
+              {
+               "type": "action",
+               "id": "pen-note.type.back.reopen.clear",
+               "label": "Clear",
+               "taps": [
+                "[data-action='clear-draft']"
+               ],
+               "children": [
+                {
+                 "type": "outcome",
+                 "id": "in-dc4-pen-note-clear-empties",
+                 "tree": "DC-4",
+                 "label": "Clear empties Pen note and goes; nothing saved",
+                 "gwt": {
+                  "given": "Pen note was reopened holding the kept draft \"Gate latch loose\".",
+                  "when": "They tap Clear.",
+                  "then": "The field is back as it opened, Clear disappears and nothing is saved."
+                 },
+                 "authority": [
+                  {
+                   "src": "owner",
+                   "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+                   "says": "Clear empties what was entered or ticked … present only when there is something to reset or clear"
+                  }
+                 ],
+                 "visible": [
+                  {
+                   "el": "[data-action='clear-draft']",
+                   "is": "absent",
+                   "in": "sheet",
+                   "says": "Clear gone"
+                  },
+                  {
+                   "el": "[data-action='save-pen-note']",
+                   "is": "disabled",
+                   "in": "sheet",
+                   "says": "Save note waits again"
+                  }
+                 ],
+                 "record": [
+                  {
+                   "expr": "InspectionStudy.states[0].view === 'pen-note' && (InspectionStudy.states[0].form.note || '') === \"\" && !(InspectionStudy.states[0].sheetDrafts || {})[\"pen-note|C2\"]",
+                   "says": "the field is as it opened and no draft is kept",
+                   "hard": "wrong-fact"
+                  },
+                  {
+                   "expr": "InspectionStudy.states[0].pens.find(p => p.id === 'C2').note === ''",
+                   "says": "nothing was saved",
+                   "hard": "wrong-fact"
+                  }
+                 ]
+                },
+                {
+                 "type": "action",
+                 "id": "pen-note.type.back.reopen.clear.back",
+                 "label": "Back, then reopen",
+                 "taps": [
+                  "[data-action='back']",
+                  "[data-action='pen-note']"
+                 ],
+                 "children": [
+                  {
+                   "type": "outcome",
+                   "id": "in-dc5-pen-note-cleared-stays-cleared",
+                   "tree": "DC-4",
+                   "label": "after Clear, Back and reopen show Pen note as it opened",
+                   "gwt": {
+                    "given": "They cleared the draft on Pen note.",
+                    "when": "They go Back and open it again.",
+                    "then": "It opens as it did the first time, with no Clear."
+                   },
+                   "authority": [
+                    {
+                     "src": "owner",
+                     "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+                     "says": "Clear empties what was entered or ticked … present only when there is something to reset or clear"
+                    }
+                   ],
+                   "visible": [
+                    {
+                     "screen": "inspection.pen-note"
+                    },
+                    {
+                     "el": "[data-action='clear-draft']",
+                     "is": "absent",
+                     "in": "sheet"
+                    }
+                   ],
+                   "record": [
+                    {
+                     "expr": "InspectionStudy.states[0].view === 'pen-note' && (InspectionStudy.states[0].form.note || '') === \"\"",
+                     "says": "the field is as it opened",
+                     "hard": "wrong-fact"
+                    }
+                   ]
+                  }
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "type": "action",
+           "id": "pen-note.type.sysback",
+           "label": "the phone's Back",
+           "taps": [
+            {
+             "back": true
+            }
+           ],
+           "children": [
+            {
+             "type": "outcome",
+             "id": "in-dc6-pen-note-phone-back-keeps-draft",
+             "tree": "DC-2",
+             "label": "the phone's Back keeps the draft like the footer Back",
+             "gwt": {
+              "given": "Pen note holds \"Gate latch loose\", not saved.",
+              "when": "They press the phone's own Back.",
+              "then": "They are back where they came from and the typed text is kept as a draft."
+             },
+             "authority": [
+              {
+               "src": "owner",
+               "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+               "says": "Back … leaves and returns to where you came from, keeping the draft."
+              },
+              {
+               "src": "owner",
+               "at": "ux/design-system/README.md · The drawer convention",
+               "says": "Swiping down or tapping the scrim does what Back does."
+              }
+             ],
+             "visible": [
+              {
+               "screen": "inspection.pen"
+              }
+             ],
+             "record": [
+              {
+               "expr": "(InspectionStudy.states[0].sheetDrafts || {})[\"pen-note|C2\"] && (InspectionStudy.states[0].sheetDrafts || {})[\"pen-note|C2\"].note === \"Gate latch loose\"",
+               "says": "the draft is kept",
+               "hard": "lost-draft"
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "type": "state",
+     "id": "drafts.faults-c2",
+     "label": "Pen C2's Equipment faults (one open fault: Drinking station)",
+     "tree": "DC",
+     "reset": {
+      "screen": "inspection.walk",
+      "params": {
+       "faults": "C2"
+      }
+     },
+     "children": [
+      {
+       "type": "action",
+       "id": "fault-report.open",
+       "label": "open Report fault",
+       "taps": [
+        "[data-action='new-fault']"
+       ],
+       "children": [
+        {
+         "type": "outcome",
+         "id": "in-df0-fault-report-opens-without-clear",
+         "tree": "DC-0",
+         "label": "Report fault opens untouched: no Clear",
+         "gwt": {
+          "given": "A worker has pen C2's Equipment faults open; C2 has one open fault.",
+          "when": "They open Report fault.",
+          "then": "Report fault opens as before, with Back and its commit in the footer and no Clear, because nothing has been entered."
+         },
+         "authority": [
+          {
+           "src": "STR",
+           "at": "ux/laws/strings.json · verbs.Clear",
+           "says": "empty what was entered or ticked …; present only while there is something to empty"
+          }
+         ],
+         "visible": [
+          {
+           "screen": "inspection.fault-report"
+          },
+          {
+           "el": "[data-action='clear-draft']",
+           "is": "absent",
+           "in": "sheet",
+           "says": "no Clear on an untouched sheet"
+          }
+         ]
+        },
+        {
+         "type": "action",
+         "id": "fault-report.type",
+         "label": "type \"Feeder auger jammed\"",
+         "taps": [
+          {
+           "fill": "[data-card='0'] .phone > .sheet textarea[data-v2='description']",
+           "value": "Feeder auger jammed"
+          }
+         ],
+         "children": [
+          {
+           "type": "outcome",
+           "id": "in-df1-fault-report-typing-shows-clear",
+           "tree": "DC-1",
+           "label": "typing shows Clear in the footer",
+           "gwt": {
+            "given": "Report fault is open and empty of edits.",
+            "when": "They type \"Feeder auger jammed\".",
+            "then": "Clear appears in the footer, left of the commit."
+           },
+           "authority": [
+            {
+             "src": "owner",
+             "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+             "says": "Clear empties what was entered or ticked … present only when there is something to reset or clear"
+            }
+           ],
+           "visible": [
+            {
+             "verb": "Clear",
+             "in": "sheet",
+             "says": "Clear is shown"
+            },
+            {
+             "el": "[data-action='clear-draft']",
+             "is": "enabled",
+             "in": "sheet"
+            }
+           ]
+          },
+          {
+           "type": "action",
+           "id": "fault-report.type.back",
+           "label": "Back (footer)",
+           "taps": [
+            "[data-action='back']"
+           ],
+           "children": [
+            {
+             "type": "outcome",
+             "id": "in-df2-fault-report-back-keeps-draft",
+             "tree": "DC-2",
+             "label": "Back leaves Report fault and keeps the typed draft; nothing saved",
+             "gwt": {
+              "given": "Report fault holds \"Feeder auger jammed\", not saved.",
+              "when": "They tap Back.",
+              "then": "They are back where they came from, the typed text is kept as a draft and nothing is saved."
+             },
+             "authority": [
+              {
+               "src": "owner",
+               "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+               "says": "Back … leaves and returns to where you came from, keeping the draft."
+              }
+             ],
+             "visible": [
+              {
+               "screen": "inspection.pen-faults"
+              }
+             ],
+             "record": [
+              {
+               "expr": "(InspectionStudy.states[0].sheetDrafts || {})[\"fault-form|C2\"] && (InspectionStudy.states[0].sheetDrafts || {})[\"fault-form|C2\"].description === \"Feeder auger jammed\"",
+               "says": "the draft is kept",
+               "hard": "lost-draft"
+              },
+              {
+               "expr": "InspectionStudy.states[0].pens.find(p => p.id === 'C2').faults.length === 1",
+               "says": "nothing was saved",
+               "hard": "wrong-fact"
+              }
+             ]
+            },
+            {
+             "type": "action",
+             "id": "fault-report.type.back.reopen",
+             "label": "reopen Report fault",
+             "taps": [
+              "[data-action='new-fault']"
+             ],
+             "children": [
+              {
+               "type": "outcome",
+               "id": "in-df3-fault-report-reopen-shows-draft",
+               "tree": "DC-3",
+               "label": "reopening Report fault shows the draft, with Clear",
+               "gwt": {
+                "given": "They left Report fault with Back while it held \"Feeder auger jammed\".",
+                "when": "They open Report fault again.",
+                "then": "The field still holds \"Feeder auger jammed\" and Clear is in the footer."
+               },
+               "authority": [
+                {
+                 "src": "owner",
+                 "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+                 "says": "Back … leaves and returns to where you came from, keeping the draft."
+                }
+               ],
+               "visible": [
+                {
+                 "screen": "inspection.fault-report"
+                },
+                {
+                 "verb": "Clear",
+                 "in": "sheet",
+                 "hard": "lost-draft"
+                }
+               ],
+               "record": [
+                {
+                 "expr": "InspectionStudy.states[0].view === 'fault-form' && (InspectionStudy.states[0].form.description || '') === \"Feeder auger jammed\"",
+                 "says": "the field holds the draft",
+                 "hard": "lost-draft"
+                },
+                {
+                 "expr": "InspectionStudy.states[0].pens.find(p => p.id === 'C2').faults.length === 1",
+                 "says": "still nothing saved",
+                 "hard": "wrong-fact"
+                }
+               ]
+              },
+              {
+               "type": "action",
+               "id": "fault-report.type.back.reopen.clear",
+               "label": "Clear",
+               "taps": [
+                "[data-action='clear-draft']"
+               ],
+               "children": [
+                {
+                 "type": "outcome",
+                 "id": "in-df4-fault-report-clear-empties",
+                 "tree": "DC-4",
+                 "label": "Clear empties Report fault and goes; nothing saved",
+                 "gwt": {
+                  "given": "Report fault was reopened holding the kept draft \"Feeder auger jammed\".",
+                  "when": "They tap Clear.",
+                  "then": "The field is back as it opened, Clear disappears and nothing is saved."
+                 },
+                 "authority": [
+                  {
+                   "src": "owner",
+                   "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+                   "says": "Clear empties what was entered or ticked … present only when there is something to reset or clear"
+                  }
+                 ],
+                 "visible": [
+                  {
+                   "el": "[data-action='clear-draft']",
+                   "is": "absent",
+                   "in": "sheet",
+                   "says": "Clear gone"
+                  },
+                  {
+                   "el": "[data-action='save-fault']",
+                   "is": "disabled",
+                   "in": "sheet",
+                   "says": "Report fault waits again"
+                  }
+                 ],
+                 "record": [
+                  {
+                   "expr": "InspectionStudy.states[0].view === 'fault-form' && (InspectionStudy.states[0].form.description || '') === \"\" && !(InspectionStudy.states[0].sheetDrafts || {})[\"fault-form|C2\"]",
+                   "says": "the field is as it opened and no draft is kept",
+                   "hard": "wrong-fact"
+                  },
+                  {
+                   "expr": "InspectionStudy.states[0].pens.find(p => p.id === 'C2').faults.length === 1",
+                   "says": "nothing was saved",
+                   "hard": "wrong-fact"
+                  }
+                 ]
+                },
+                {
+                 "type": "action",
+                 "id": "fault-report.type.back.reopen.clear.back",
+                 "label": "Back, then reopen",
+                 "taps": [
+                  "[data-action='back']",
+                  "[data-action='new-fault']"
+                 ],
+                 "children": [
+                  {
+                   "type": "outcome",
+                   "id": "in-df5-fault-report-cleared-stays-cleared",
+                   "tree": "DC-4",
+                   "label": "after Clear, Back and reopen show Report fault as it opened",
+                   "gwt": {
+                    "given": "They cleared the draft on Report fault.",
+                    "when": "They go Back and open it again.",
+                    "then": "It opens as it did the first time, with no Clear."
+                   },
+                   "authority": [
+                    {
+                     "src": "owner",
+                     "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+                     "says": "Clear empties what was entered or ticked … present only when there is something to reset or clear"
+                    }
+                   ],
+                   "visible": [
+                    {
+                     "screen": "inspection.fault-report"
+                    },
+                    {
+                     "el": "[data-action='clear-draft']",
+                     "is": "absent",
+                     "in": "sheet"
+                    }
+                   ],
+                   "record": [
+                    {
+                     "expr": "InspectionStudy.states[0].view === 'fault-form' && (InspectionStudy.states[0].form.description || '') === \"\"",
+                     "says": "the field is as it opened",
+                     "hard": "wrong-fact"
+                    }
+                   ]
+                  }
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "type": "action",
+           "id": "fault-report.type.sysback",
+           "label": "the phone's Back",
+           "taps": [
+            {
+             "back": true
+            }
+           ],
+           "children": [
+            {
+             "type": "outcome",
+             "id": "in-df6-fault-report-phone-back-keeps-draft",
+             "tree": "DC-2",
+             "label": "the phone's Back keeps the draft like the footer Back",
+             "gwt": {
+              "given": "Report fault holds \"Feeder auger jammed\", not saved.",
+              "when": "They press the phone's own Back.",
+              "then": "They are back where they came from and the typed text is kept as a draft."
+             },
+             "authority": [
+              {
+               "src": "owner",
+               "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+               "says": "Back … leaves and returns to where you came from, keeping the draft."
+              },
+              {
+               "src": "owner",
+               "at": "ux/design-system/README.md · The drawer convention",
+               "says": "Swiping down or tapping the scrim does what Back does."
+              }
+             ],
+             "visible": [
+              {
+               "screen": "inspection.pen-faults"
+              }
+             ],
+             "record": [
+              {
+               "expr": "(InspectionStudy.states[0].sheetDrafts || {})[\"fault-form|C2\"] && (InspectionStudy.states[0].sheetDrafts || {})[\"fault-form|C2\"].description === \"Feeder auger jammed\"",
+               "says": "the draft is kept",
+               "hard": "lost-draft"
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "action",
+       "id": "fault-resolve.open",
+       "label": "open the open fault",
+       "taps": [
+        "[data-action='fault-record']"
+       ],
+       "children": [
+        {
+         "type": "outcome",
+         "id": "in-dr0-fault-resolve-opens-without-clear",
+         "tree": "DC-0",
+         "label": "the open fault opens untouched: no Clear",
+         "gwt": {
+          "given": "A worker has pen C2's Equipment faults open; C2 has one open fault.",
+          "when": "They open the open fault.",
+          "then": "the open fault opens as before, with Back and its commit in the footer and no Clear, because nothing has been entered."
+         },
+         "authority": [
+          {
+           "src": "STR",
+           "at": "ux/laws/strings.json · verbs.Clear",
+           "says": "empty what was entered or ticked …; present only while there is something to empty"
+          }
+         ],
+         "visible": [
+          {
+           "screen": "inspection.fault-resolve"
+          },
+          {
+           "el": "[data-action='clear-draft']",
+           "is": "absent",
+           "in": "sheet",
+           "says": "no Clear on an untouched sheet"
+          }
+         ]
+        },
+        {
+         "type": "action",
+         "id": "fault-resolve.type",
+         "label": "type \"Valve replaced\"",
+         "taps": [
+          "[data-st-optional]",
+          {
+           "fill": "[data-card='0'] .phone > .sheet textarea[data-v2='resolution']",
+           "value": "Valve replaced"
+          }
+         ],
+         "children": [
+          {
+           "type": "outcome",
+           "id": "in-dr1-fault-resolve-typing-shows-clear",
+           "tree": "DC-1",
+           "label": "typing shows Clear in the footer",
+           "gwt": {
+            "given": "the open fault is open and empty of edits.",
+            "when": "They type \"Valve replaced\".",
+            "then": "Clear appears in the footer, left of the commit."
+           },
+           "authority": [
+            {
+             "src": "owner",
+             "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+             "says": "Clear empties what was entered or ticked … present only when there is something to reset or clear"
+            }
+           ],
+           "visible": [
+            {
+             "verb": "Clear",
+             "in": "sheet",
+             "says": "Clear is shown"
+            },
+            {
+             "el": "[data-action='clear-draft']",
+             "is": "enabled",
+             "in": "sheet"
+            }
+           ]
+          },
+          {
+           "type": "action",
+           "id": "fault-resolve.type.back",
+           "label": "Back (footer)",
+           "taps": [
+            "[data-action='back']"
+           ],
+           "children": [
+            {
+             "type": "outcome",
+             "id": "in-dr2-fault-resolve-back-keeps-draft",
+             "tree": "DC-2",
+             "label": "Back leaves the open fault and keeps the typed draft; nothing saved",
+             "gwt": {
+              "given": "the open fault holds \"Valve replaced\", not saved.",
+              "when": "They tap Back.",
+              "then": "They are back where they came from, the typed text is kept as a draft and nothing is saved."
+             },
+             "authority": [
+              {
+               "src": "owner",
+               "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+               "says": "Back … leaves and returns to where you came from, keeping the draft."
+              }
+             ],
+             "visible": [
+              {
+               "screen": "inspection.pen-faults"
+              }
+             ],
+             "record": [
+              {
+               "expr": "(InspectionStudy.states[0].sheetDrafts || {})[\"fault-record|C2|fault-initial\"] && (InspectionStudy.states[0].sheetDrafts || {})[\"fault-record|C2|fault-initial\"].resolution === \"Valve replaced\"",
+               "says": "the draft is kept",
+               "hard": "lost-draft"
+              },
+              {
+               "expr": "InspectionStudy.states[0].pens.find(p => p.id === 'C2').faults.every(f => f.open)",
+               "says": "nothing was saved",
+               "hard": "wrong-fact"
+              }
+             ]
+            },
+            {
+             "type": "action",
+             "id": "fault-resolve.type.back.reopen",
+             "label": "reopen the open fault",
+             "taps": [
+              "[data-action='fault-record']"
+             ],
+             "children": [
+              {
+               "type": "outcome",
+               "id": "in-dr3-fault-resolve-reopen-shows-draft",
+               "tree": "DC-3",
+               "label": "reopening the open fault shows the draft, with Clear",
+               "gwt": {
+                "given": "They left the open fault with Back while it held \"Valve replaced\".",
+                "when": "They open the open fault again.",
+                "then": "The field still holds \"Valve replaced\" and Clear is in the footer."
+               },
+               "authority": [
+                {
+                 "src": "owner",
+                 "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+                 "says": "Back … leaves and returns to where you came from, keeping the draft."
+                }
+               ],
+               "visible": [
+                {
+                 "screen": "inspection.fault-resolve"
+                },
+                {
+                 "verb": "Clear",
+                 "in": "sheet",
+                 "hard": "lost-draft"
+                }
+               ],
+               "record": [
+                {
+                 "expr": "InspectionStudy.states[0].view === 'fault-record' && (InspectionStudy.states[0].form.resolution || '') === \"Valve replaced\"",
+                 "says": "the field holds the draft",
+                 "hard": "lost-draft"
+                },
+                {
+                 "expr": "InspectionStudy.states[0].pens.find(p => p.id === 'C2').faults.every(f => f.open)",
+                 "says": "still nothing saved",
+                 "hard": "wrong-fact"
+                }
+               ]
+              },
+              {
+               "type": "action",
+               "id": "fault-resolve.type.back.reopen.clear",
+               "label": "Clear",
+               "taps": [
+                "[data-action='clear-draft']"
+               ],
+               "children": [
+                {
+                 "type": "outcome",
+                 "id": "in-dr4-fault-resolve-clear-empties",
+                 "tree": "DC-4",
+                 "label": "Clear empties the open fault and goes; nothing saved",
+                 "gwt": {
+                  "given": "the open fault was reopened holding the kept draft \"Valve replaced\".",
+                  "when": "They tap Clear.",
+                  "then": "The field is back as it opened, Clear disappears and nothing is saved."
+                 },
+                 "authority": [
+                  {
+                   "src": "owner",
+                   "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+                   "says": "Clear empties what was entered or ticked … present only when there is something to reset or clear"
+                  }
+                 ],
+                 "visible": [
+                  {
+                   "el": "[data-action='clear-draft']",
+                   "is": "absent",
+                   "in": "sheet",
+                   "says": "Clear gone"
+                  }
+                 ],
+                 "record": [
+                  {
+                   "expr": "InspectionStudy.states[0].view === 'fault-record' && (InspectionStudy.states[0].form.resolution || '') === \"\" && !(InspectionStudy.states[0].sheetDrafts || {})[\"fault-record|C2|fault-initial\"]",
+                   "says": "the field is as it opened and no draft is kept",
+                   "hard": "wrong-fact"
+                  },
+                  {
+                   "expr": "InspectionStudy.states[0].pens.find(p => p.id === 'C2').faults.every(f => f.open)",
+                   "says": "nothing was saved",
+                   "hard": "wrong-fact"
+                  }
+                 ]
+                },
+                {
+                 "type": "action",
+                 "id": "fault-resolve.type.back.reopen.clear.back",
+                 "label": "Back, then reopen",
+                 "taps": [
+                  "[data-action='back']",
+                  "[data-action='fault-record']"
+                 ],
+                 "children": [
+                  {
+                   "type": "outcome",
+                   "id": "in-dr5-fault-resolve-cleared-stays-cleared",
+                   "tree": "DC-4",
+                   "label": "after Clear, Back and reopen show the open fault as it opened",
+                   "gwt": {
+                    "given": "They cleared the draft on the open fault.",
+                    "when": "They go Back and open it again.",
+                    "then": "It opens as it did the first time, with no Clear."
+                   },
+                   "authority": [
+                    {
+                     "src": "owner",
+                     "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+                     "says": "Clear empties what was entered or ticked … present only when there is something to reset or clear"
+                    }
+                   ],
+                   "visible": [
+                    {
+                     "screen": "inspection.fault-resolve"
+                    },
+                    {
+                     "el": "[data-action='clear-draft']",
+                     "is": "absent",
+                     "in": "sheet"
+                    }
+                   ],
+                   "record": [
+                    {
+                     "expr": "InspectionStudy.states[0].view === 'fault-record' && (InspectionStudy.states[0].form.resolution || '') === \"\"",
+                     "says": "the field is as it opened",
+                     "hard": "wrong-fact"
+                    }
+                   ]
+                  }
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "type": "action",
+           "id": "fault-resolve.type.sysback",
+           "label": "the phone's Back",
+           "taps": [
+            {
+             "back": true
+            }
+           ],
+           "children": [
+            {
+             "type": "outcome",
+             "id": "in-dr6-fault-resolve-phone-back-keeps-draft",
+             "tree": "DC-2",
+             "label": "the phone's Back keeps the draft like the footer Back",
+             "gwt": {
+              "given": "the open fault holds \"Valve replaced\", not saved.",
+              "when": "They press the phone's own Back.",
+              "then": "They are back where they came from and the typed text is kept as a draft."
+             },
+             "authority": [
+              {
+               "src": "owner",
+               "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+               "says": "Back … leaves and returns to where you came from, keeping the draft."
+              },
+              {
+               "src": "owner",
+               "at": "ux/design-system/README.md · The drawer convention",
+               "says": "Swiping down or tapping the scrim does what Back does."
+              }
+             ],
+             "visible": [
+              {
+               "screen": "inspection.pen-faults"
+              }
+             ],
+             "record": [
+              {
+               "expr": "(InspectionStudy.states[0].sheetDrafts || {})[\"fault-record|C2|fault-initial\"] && (InspectionStudy.states[0].sheetDrafts || {})[\"fault-record|C2|fault-initial\"].resolution === \"Valve replaced\"",
+               "says": "the draft is kept",
+               "hard": "lost-draft"
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "type": "state",
+     "id": "drafts.pens-selected",
+     "label": "Unit walk, pen C2 ticked, More actions open",
+     "tree": "DC",
+     "reset": {
+      "screen": "inspection.walk",
+      "taps": [
+       "[data-pen-select='C2']",
+       "[data-action='actions']",
+       "[data-action='action-scope'][data-value='pens']"
+      ]
+     },
+     "children": [
+      {
+       "type": "action",
+       "id": "selected-note.open",
+       "label": "open Pen note for the ticked pens",
+       "taps": [
+        "[data-action='selected-pen-note']"
+       ],
+       "children": [
+        {
+         "type": "outcome",
+         "id": "in-ds0-selected-note-opens-without-clear",
+         "tree": "DC-0",
+         "label": "Pen note for the ticked pens opens untouched: no Clear",
+         "gwt": {
+          "given": "A worker on the unit walk has ticked pen C2 and opened More actions.",
+          "when": "They open Pen note for the ticked pens.",
+          "then": "Pen note for the ticked pens opens as before, with Back and its commit in the footer and no Clear, because nothing has been entered."
+         },
+         "authority": [
+          {
+           "src": "STR",
+           "at": "ux/laws/strings.json · verbs.Clear",
+           "says": "empty what was entered or ticked …; present only while there is something to empty"
+          }
+         ],
+         "visible": [
+          {
+           "screen": "inspection.pen-note"
+          },
+          {
+           "el": "[data-action='clear-draft']",
+           "is": "absent",
+           "in": "sheet",
+           "says": "no Clear on an untouched sheet"
+          }
+         ]
+        },
+        {
+         "type": "action",
+         "id": "selected-note.type",
+         "label": "type \"Lights left on\"",
+         "taps": [
+          {
+           "fill": "[data-card='0'] .phone > .sheet textarea[data-v2='note']",
+           "value": "Lights left on"
+          }
+         ],
+         "children": [
+          {
+           "type": "outcome",
+           "id": "in-ds1-selected-note-typing-shows-clear",
+           "tree": "DC-1",
+           "label": "typing shows Clear in the footer",
+           "gwt": {
+            "given": "Pen note for the ticked pens is open and empty of edits.",
+            "when": "They type \"Lights left on\".",
+            "then": "Clear appears in the footer, left of the commit."
+           },
+           "authority": [
+            {
+             "src": "owner",
+             "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+             "says": "Clear empties what was entered or ticked … present only when there is something to reset or clear"
+            }
+           ],
+           "visible": [
+            {
+             "verb": "Clear",
+             "in": "sheet",
+             "says": "Clear is shown"
+            },
+            {
+             "el": "[data-action='clear-draft']",
+             "is": "enabled",
+             "in": "sheet"
+            }
+           ]
+          },
+          {
+           "type": "action",
+           "id": "selected-note.type.back",
+           "label": "Back (footer)",
+           "taps": [
+            "[data-action='back']"
+           ],
+           "children": [
+            {
+             "type": "outcome",
+             "id": "in-ds2-selected-note-back-keeps-draft",
+             "tree": "DC-2",
+             "label": "Back leaves Pen note for the ticked pens and keeps the typed draft; nothing saved",
+             "gwt": {
+              "given": "Pen note for the ticked pens holds \"Lights left on\", not saved.",
+              "when": "They tap Back.",
+              "then": "They are back where they came from, the typed text is kept as a draft and nothing is saved."
+             },
+             "authority": [
+              {
+               "src": "owner",
+               "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+               "says": "Back … leaves and returns to where you came from, keeping the draft."
+              }
+             ],
+             "visible": [],
+             "record": [
+              {
+               "expr": "InspectionStudy.states[0].view === 'actions' && InspectionStudy.states[0].actionScope === 'pens'",
+               "says": "back where they came from",
+               "hard": "dead-end"
+              },
+              {
+               "expr": "(InspectionStudy.states[0].sheetDrafts || {})[\"selected-pen-note|C2\"] && (InspectionStudy.states[0].sheetDrafts || {})[\"selected-pen-note|C2\"].note === \"Lights left on\"",
+               "says": "the draft is kept",
+               "hard": "lost-draft"
+              },
+              {
+               "expr": "InspectionStudy.states[0].pens.find(p => p.id === 'C2').note === ''",
+               "says": "nothing was saved",
+               "hard": "wrong-fact"
+              }
+             ]
+            },
+            {
+             "type": "action",
+             "id": "selected-note.type.back.reopen",
+             "label": "reopen Pen note for the ticked pens",
+             "taps": [
+              "[data-action='selected-pen-note']"
+             ],
+             "children": [
+              {
+               "type": "outcome",
+               "id": "in-ds3-selected-note-reopen-shows-draft",
+               "tree": "DC-3",
+               "label": "reopening Pen note for the ticked pens shows the draft, with Clear",
+               "gwt": {
+                "given": "They left Pen note for the ticked pens with Back while it held \"Lights left on\".",
+                "when": "They open Pen note for the ticked pens again.",
+                "then": "The field still holds \"Lights left on\" and Clear is in the footer."
+               },
+               "authority": [
+                {
+                 "src": "owner",
+                 "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+                 "says": "Back … leaves and returns to where you came from, keeping the draft."
+                }
+               ],
+               "visible": [
+                {
+                 "screen": "inspection.pen-note"
+                },
+                {
+                 "verb": "Clear",
+                 "in": "sheet",
+                 "hard": "lost-draft"
+                }
+               ],
+               "record": [
+                {
+                 "expr": "InspectionStudy.states[0].view === 'selected-pen-note' && (InspectionStudy.states[0].form.note || '') === \"Lights left on\"",
+                 "says": "the field holds the draft",
+                 "hard": "lost-draft"
+                },
+                {
+                 "expr": "InspectionStudy.states[0].pens.find(p => p.id === 'C2').note === ''",
+                 "says": "still nothing saved",
+                 "hard": "wrong-fact"
+                }
+               ]
+              },
+              {
+               "type": "action",
+               "id": "selected-note.type.back.reopen.clear",
+               "label": "Clear",
+               "taps": [
+                "[data-action='clear-draft']"
+               ],
+               "children": [
+                {
+                 "type": "outcome",
+                 "id": "in-ds4-selected-note-clear-empties",
+                 "tree": "DC-4",
+                 "label": "Clear empties Pen note for the ticked pens and goes; nothing saved",
+                 "gwt": {
+                  "given": "Pen note for the ticked pens was reopened holding the kept draft \"Lights left on\".",
+                  "when": "They tap Clear.",
+                  "then": "The field is back as it opened, Clear disappears and nothing is saved."
+                 },
+                 "authority": [
+                  {
+                   "src": "owner",
+                   "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+                   "says": "Clear empties what was entered or ticked … present only when there is something to reset or clear"
+                  }
+                 ],
+                 "visible": [
+                  {
+                   "el": "[data-action='clear-draft']",
+                   "is": "absent",
+                   "in": "sheet",
+                   "says": "Clear gone"
+                  }
+                 ],
+                 "record": [
+                  {
+                   "expr": "InspectionStudy.states[0].view === 'selected-pen-note' && (InspectionStudy.states[0].form.note || '') === \"\" && !(InspectionStudy.states[0].sheetDrafts || {})[\"selected-pen-note|C2\"]",
+                   "says": "the field is as it opened and no draft is kept",
+                   "hard": "wrong-fact"
+                  },
+                  {
+                   "expr": "InspectionStudy.states[0].pens.find(p => p.id === 'C2').note === ''",
+                   "says": "nothing was saved",
+                   "hard": "wrong-fact"
+                  }
+                 ]
+                },
+                {
+                 "type": "action",
+                 "id": "selected-note.type.back.reopen.clear.back",
+                 "label": "Back, then reopen",
+                 "taps": [
+                  "[data-action='back']",
+                  "[data-action='selected-pen-note']"
+                 ],
+                 "children": [
+                  {
+                   "type": "outcome",
+                   "id": "in-ds5-selected-note-cleared-stays-cleared",
+                   "tree": "DC-4",
+                   "label": "after Clear, Back and reopen show Pen note for the ticked pens as it opened",
+                   "gwt": {
+                    "given": "They cleared the draft on Pen note for the ticked pens.",
+                    "when": "They go Back and open it again.",
+                    "then": "It opens as it did the first time, with no Clear."
+                   },
+                   "authority": [
+                    {
+                     "src": "owner",
+                     "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+                     "says": "Clear empties what was entered or ticked … present only when there is something to reset or clear"
+                    }
+                   ],
+                   "visible": [
+                    {
+                     "screen": "inspection.pen-note"
+                    },
+                    {
+                     "el": "[data-action='clear-draft']",
+                     "is": "absent",
+                     "in": "sheet"
+                    }
+                   ],
+                   "record": [
+                    {
+                     "expr": "InspectionStudy.states[0].view === 'selected-pen-note' && (InspectionStudy.states[0].form.note || '') === \"\"",
+                     "says": "the field is as it opened",
+                     "hard": "wrong-fact"
+                    }
+                   ]
+                  }
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "type": "action",
+           "id": "selected-note.type.sysback",
+           "label": "the phone's Back",
+           "taps": [
+            {
+             "back": true
+            }
+           ],
+           "children": [
+            {
+             "type": "outcome",
+             "id": "in-ds6-selected-note-phone-back-keeps-draft",
+             "tree": "DC-2",
+             "label": "the phone's Back keeps the draft like the footer Back",
+             "gwt": {
+              "given": "Pen note for the ticked pens holds \"Lights left on\", not saved.",
+              "when": "They press the phone's own Back.",
+              "then": "They are back where they came from and the typed text is kept as a draft."
+             },
+             "authority": [
+              {
+               "src": "owner",
+               "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+               "says": "Back … leaves and returns to where you came from, keeping the draft."
+              },
+              {
+               "src": "owner",
+               "at": "ux/design-system/README.md · The drawer convention",
+               "says": "Swiping down or tapping the scrim does what Back does."
+              }
+             ],
+             "visible": [],
+             "record": [
+              {
+               "expr": "InspectionStudy.states[0].view === 'actions' && InspectionStudy.states[0].actionScope === 'pens'",
+               "says": "back where they came from",
+               "hard": "dead-end"
+              },
+              {
+               "expr": "(InspectionStudy.states[0].sheetDrafts || {})[\"selected-pen-note|C2\"] && (InspectionStudy.states[0].sheetDrafts || {})[\"selected-pen-note|C2\"].note === \"Lights left on\"",
+               "says": "the draft is kept",
+               "hard": "lost-draft"
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "type": "state",
+     "id": "drafts.filters",
+     "label": "Unit walk, no filter applied, Filter pigs open",
+     "tree": "DC",
+     "reset": {
+      "screen": "inspection.walk",
+      "taps": [
+       "[data-action='filters']"
+      ]
+     },
+     "children": [
+      {
+       "type": "action",
+       "id": "filters.pick",
+       "label": "pick Care · Monitor, Back",
+       "taps": [
+        "[data-picker-key='triageFilter']",
+        "[data-action='picker-select'][data-value='Monitor']",
+        "[data-action='back']"
+       ],
+       "children": [
+        {
+         "type": "outcome",
+         "id": "in-dq1-filters-back-applies-nothing",
+         "tree": "DC-2",
+         "label": "Back from Filter pigs applies nothing and keeps the pick as a draft",
+         "gwt": {
+          "given": "A worker on an unfiltered walk opened Filter pigs and picked Care · Monitor without showing pigs.",
+          "when": "They tap Back.",
+          "then": "The walk list is unfiltered, and the pick is kept as a draft."
+         },
+         "authority": [
+          {
+           "src": "owner",
+           "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+           "says": "Back … leaves and returns to where you came from, keeping the draft."
+          },
+          {
+           "src": "owner",
+           "at": "ux/design-system/README.md · The drawer convention",
+           "says": "In a multi picker Back closes without applying, and the ticks wait as a draft for the next open."
+          }
+         ],
+         "visible": [
+          {
+           "screen": "inspection.walk"
+          }
+         ],
+         "record": [
+          {
+           "expr": "InspectionStudy.states[0].triageFilter === 'All'",
+           "says": "nothing applied",
+           "hard": "wrong-fact"
+          },
+          {
+           "expr": "(InspectionStudy.states[0].sheetDrafts || {}).filters && InspectionStudy.states[0].sheetDrafts.filters.triageFilter === 'Monitor'",
+           "says": "the pick is kept",
+           "hard": "lost-draft"
+          }
+         ]
+        },
+        {
+         "type": "action",
+         "id": "filters.pick.reopen",
+         "label": "reopen Filter pigs",
+         "taps": [
+          "[data-action='filters']"
+         ],
+         "children": [
+          {
+           "type": "outcome",
+           "id": "in-dq2-filters-reopen-shows-draft",
+           "tree": "DC-3",
+           "label": "reopening Filter pigs shows the kept pick; Reset still restores the defaults",
+           "gwt": {
+            "given": "The worker left Filter pigs with Back after picking Care · Monitor.",
+            "when": "They open Filter pigs again.",
+            "then": "Care still reads Monitor, waiting to be shown."
+           },
+           "authority": [
+            {
+             "src": "owner",
+             "at": "ux/design-system/README.md · The drawer convention (2026-10-10)",
+             "says": "Back … leaves and returns to where you came from, keeping the draft."
+            }
+           ],
+           "visible": [
+            {
+             "screen": "inspection.filters"
+            },
+            {
+             "text": {
+              "en": "Monitor",
+              "zh": "观察"
+             },
+             "in": "sheet",
+             "hard": "lost-draft"
+            }
+           ],
+           "record": [
+            {
+             "expr": "InspectionStudy.states[0].filterDraft.triageFilter === 'Monitor' && InspectionStudy.states[0].triageFilter === 'All'",
+             "hard": "lost-draft"
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
