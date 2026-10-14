@@ -8,13 +8,17 @@
   "tap": 48
  },
  "viewport": "390x844",
- "changed": [],
+ "changed": [
+  "environment.page",
+  "environment.sensor-week",
+  "environment.sensor-other"
+ ],
  "totals": {
   "screens": 291,
   "screensFailing": 125,
   "errors": 0,
   "small": 1129,
-  "contrast": 1316,
+  "contrast": 1307,
   "contrastPrimary": 11,
   "taps": 82
  },
@@ -32,7 +36,7 @@
    "screens": 9,
    "failing": 6,
    "small": 148,
-   "contrast": 9,
+   "contrast": 0,
    "contrastPrimary": 0,
    "taps": 1,
    "errors": 0
@@ -729,7 +733,7 @@
    "id": "environment.page",
    "feature": "environment",
    "small": 35,
-   "contrast": 3,
+   "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
    "fails": true,
@@ -800,29 +804,7 @@
      "px": 10
     }
    ],
-   "lowContrast": [
-    {
-     "n": 1,
-     "sel": "span.st-selection-label",
-     "text": "Auto",
-     "px": 14,
-     "ratio": 2.7
-    },
-    {
-     "n": 1,
-     "sel": "span.st-selection-label",
-     "text": "Manual",
-     "px": 14,
-     "ratio": 2.6
-    },
-    {
-     "n": 1,
-     "sel": "span.st-button-label",
-     "text": "Save setting",
-     "px": 14,
-     "ratio": 2.7
-    }
-   ],
+   "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
   },
@@ -1080,7 +1062,7 @@
    "id": "environment.sensor-week",
    "feature": "environment",
    "small": 33,
-   "contrast": 3,
+   "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
    "fails": true,
@@ -1151,29 +1133,7 @@
      "px": 10
     }
    ],
-   "lowContrast": [
-    {
-     "n": 1,
-     "sel": "span.st-selection-label",
-     "text": "Auto",
-     "px": 14,
-     "ratio": 2.7
-    },
-    {
-     "n": 1,
-     "sel": "span.st-selection-label",
-     "text": "Manual",
-     "px": 14,
-     "ratio": 2.6
-    },
-    {
-     "n": 1,
-     "sel": "span.st-button-label",
-     "text": "Save setting",
-     "px": 14,
-     "ratio": 2.7
-    }
-   ],
+   "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
   },
@@ -1181,7 +1141,7 @@
    "id": "environment.sensor-other",
    "feature": "environment",
    "small": 35,
-   "contrast": 3,
+   "contrast": 0,
    "contrastPrimary": 0,
    "taps": 0,
    "fails": true,
@@ -1252,29 +1212,7 @@
      "px": 10
     }
    ],
-   "lowContrast": [
-    {
-     "n": 1,
-     "sel": "span.st-selection-label",
-     "text": "Auto",
-     "px": 14,
-     "ratio": 2.7
-    },
-    {
-     "n": 1,
-     "sel": "span.st-selection-label",
-     "text": "Manual",
-     "px": 14,
-     "ratio": 2.6
-    },
-    {
-     "n": 1,
-     "sel": "span.st-button-label",
-     "text": "Save setting",
-     "px": 14,
-     "ratio": 2.7
-    }
-   ],
+   "lowContrast": [],
    "lowContrastPrimary": [],
    "smallTargets": []
   },
