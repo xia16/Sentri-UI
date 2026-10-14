@@ -114,8 +114,9 @@ Every rejected owner example is a fixture each gate must fail ([gate.md](briefs/
 | `npm run check` | Checks the atlas sources without writing |
 | `npm run ux` | Serves the repo for the atlas and the prototypes (`http://localhost:4317/atlas/`) |
 | `npm run layers` | Writes `atlas/layers.json`: every unmerged branch as a layer over the features it changes, so `npm run ux` shows them locally. The published atlas rebuilds them on its own ([SCHEMA.md](../../atlas/SCHEMA.md#branch-layers-atlaslayersjson)) |
-| `node scripts/run-scenarios.mjs` | Runs a feature's executable leaves (`features/<id>/scenarios.json`) |
-| `node scripts/gate.mjs --candidate <branch> --scope <features>` | The mechanical gate on the exact merge candidate: every check, every screen diffed against main, the before/after pairs for the judge ([gate.md](briefs/gate.md)) |
+| `node scripts/run-scenarios.mjs` | Runs a feature's executable leaves (`features/<id>/scenarios.json`). A run that fails only on a navigation timeout runs once more; twice is reported as a slow machine, not a design failure |
+| `node scripts/gate.mjs --candidate <branch> --scope <features>` | The mechanical gate on the exact merge candidate: every check, the screens the change can reach diffed against main in full and every other screen at 390 EN as a tripwire (`--all`: every screen in full), the before/after pairs for the judge ([gate.md](briefs/gate.md)). One gate at a time per machine (a second waits); base shots are cached per main commit |
+| `node scripts/gate.mjs --carry <out>` | After main moves on by files that draw no pixel and the PR merged it in and nothing else: records the gate's pass for the new head without shooting a screen; otherwise says why to gate again |
 | `node scripts/polish-loop.mjs <command> <feature>` | The polish loop's ledger: baseline, rounds, grades, stop conditions and the review packet ([polish-loop.md](briefs/polish-loop.md)) |
 | `node scripts/feature-state.mjs <feature>` | Where a feature stands and what `/design` drives next: chart, plan, scenarios, build, polish, review or freeze |
 | `node scripts/component-jobs.mjs [word]` | One line per design-system component saying what job it does, so a builder names the existing component before building a new one |

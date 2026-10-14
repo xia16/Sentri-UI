@@ -447,7 +447,7 @@ export function carryDecision({ pass, mech, head, main, containsC, containsMain,
   if (both.length) why.push(`main and the candidate both changed ${both.slice(0, 3).join(', ')}: run the gate again`);
   const paths = [...new Set([...Object.keys(cand), ...Object.keys(carried)])];
   const edited = paths.filter((p) => cand[p] !== carried[p] && !both.includes(p));
-  if (edited.length) why.push(`the merge is not just main: ${edited.slice(0, 3).join(', ')} differ from the gated commit (a conflict resolved or an edit): run the gate again`);
+  if (edited.length) why.push(`the merge is not just main: ${edited.slice(0, 3).join(', ')} not as on the gated commit (a conflict resolved, or an edit in the merge): run the gate again`);
   if (!reach || reach.all || reach.features.length) why.push(`main's change since ${s(mech.base)} can reach ${!reach || reach.all ? 'every screen' : `screens of ${reach.features.join(', ')}`}${reach?.why.length ? ` (${reach.why.join('; ')})` : ''}: run the gate again`);
   return why.length ? { ok: false, why } : { ok: true, why: [`main moved ${s(mech.base)} → ${s(main)} by ${mainFiles.length} file(s) that draw no pixel, and ${s(head)} is ${s(mech.candidate)} merged with it and nothing else`] };
 }
