@@ -329,6 +329,12 @@ if (zhLost.size) gaps.push(`${zhLost.size} screen(s) rendered Chinese on base an
 const steady = moved.filter((s) => !mech.flaky.includes(s.id));
 const ec = effectiveClass({ declared, files, diffs: steady, scope, shared });
 mech.class = { declared, effective: ec.cls, why: ec.why };
+// P2, every change has a known reach: a change declared for its own features that moves another feature's screen fails here
+// instead of being quietly escalated to a shared change (rules ledger L3). A deliberate shared change declares --class shared.
+if (declared !== 'shared' && mode !== 'refactor') {
+  const out = (ec.outside || []).filter((d) => !mech.flaky?.includes(d.id));
+  check('known reach: only SCOPE moved (P2)', !out.length, out.length ? `declared ${declared} for ${scope.join(', ')} but moves ${out.length} screen(s) of ${[...new Set(out.map((d) => d.feature))].join(', ')} (${out.slice(0, 3).map((d) => d.id).join(', ')}): give your part its own rule or token, or make it a declared shared change` : '');
+}
 if (ec.cls !== byFiles.cls) console.log(`class: ${declared} → ${ec.cls} (${ec.why.join('; ')})`);
 if (mode === 'refactor') check('refactor: every screen identical', !steady.length, steady.length ? steady.map((s) => s.id).slice(0, 5).join(', ') : mech.flaky.length ? `${mech.flaky.length} unstable on base, not counted` : '');
 const tools = touchesTools(files);
