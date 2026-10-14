@@ -236,3 +236,8 @@ The ruling fixes the design (the boards `evidence/2026-10-14-header-corners.png`
 - Screens with changed titles, and fostering after the merge: `pig-profile.measurements` (`Measurements`), `environment.report-issue`, `farrowing.allocate`, `farrowing.reconcile`, `farrowing.piglet-death`, `fostering.piglets`, `fostering.result`. Header check: 0 defects (room, corner, gap, contents, wrap).
 - Fostering keeps main's primary (`Move 2 to C05`, #159) beside Back; Clear stays at the top right, now at a true 360.
 - **Better because** each title is a name that fits its room, and nothing else moved.
+
+#### Final look after merging #167 (the pushed head of farrowing/record-dead-spacing, the commit that adds this block; screens of ac662ad, the merge of origin/main with the corner Clear; no design change)
+- Both hold: main's header (Clear at the top right only while something is drafted or a cause is chosen; the footer is Back and the primary) and this branch's switch spacing, Photos/Details row face, floor-gray hint and drawer height.
+- Measured every state at 390×844 and 360×800, EN and ZH (Piglets draft / none / waiting tap / photo, The sow no cause / waiting tap / a cause / Other / Details open): body overflow 0 everywhere except added thumbnails (29px) and Details opened for typing (34px), which scroll by design; the Photos row and the sow's banner are whole. At 360 the narrower footer now keeps "Record sow death" on one line.
+- `farrowing.death` and `farrowing.piglet-death` rendered at 390 and 360, EN and ZH: the switch's 24px, the full-width optional rows, nothing under the footer. check-headers: 0 defects on both; spacing and strict legibility pass.
