@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Header: page</title>
+<style>
+.ph{height:200px;max-width:390px;margin:0 auto;font-family:var(--font-sans);color:var(--ink)}
+/* The phone frame is the state's first child, so the atlas sees the state draw its own surface and gives every state the same
+   full cell width (a cell without one is inset 16px a side, and a 360 state would no longer be 360). */
+.ph>.over{position:relative;height:100%;overflow:hidden;background:var(--app-background);border:1px solid var(--line);border-radius:var(--radius-device)}
+.ph .bar{display:flex;justify-content:space-between;align-items:center;height:var(--statusbar-height);padding:0 var(--space-24);font:700 var(--type-panel-title-size) var(--font-sans)}
+.ph[data-pressed] .st-page-back{background:var(--press)}
+</style>
+</head>
+<body>
+<!-- The page header (Headers law, ux/design-system/README.md → Headers): Back at the top left, the title beside it, the optional header line under the title, then 24px to the body. Each state is a page as Sheet builds it (variant 'page'), cropped to its header and the top of its body. -->
+<div class="ph" data-state="Default" data-demo="default"><div class="over"></div></div>
+<div class="ph" data-state="Back pressed" data-demo="default" data-pressed=""><div class="over"></div></div>
+<div class="ph" data-state="Fact line (a hub)" data-demo="fact"><div class="over"></div></div>
+<div class="ph" data-state="Longest title that fits beside Back at 360" data-demo="longest"><div class="over"></div></div>
+<div class="ph" data-state="Chinese" data-demo="zh"><div class="over"></div></div>
+<script>
+const UI=window.SentriUI;
+const bar='<div class="bar" aria-hidden="true"><span>9:41</span></div>';
+const rows=(n,t)=>UI.panel(Array.from({length:n},(_,i)=>UI.row({title:t+' '+(i+1),description:'Day 2 · B4'})).join(''),{className:'st-row-group'});
+const page=(o)=>UI.sheet(Object.assign({variant:'page',bar:bar,back:{action:'back'},body:rows(2,'Entry'),footer:false},o));
+const R={
+  default:()=>page({title:'Pen log'}),
+  fact:()=>page({title:'Farrowing',back:{action:'today',label:'Back to Today'},line:{text:[{text:'Last record '},{text:'08:41',strong:true},{text:' · G.H'}]},body:rows(2,'Sow')}),
+  longest:()=>page({title:'Farrowing room log'}),
+  zh:()=>page({title:'分娩舍 3 号',back:{action:'back',label:'返回'},line:{text:[{text:'最近记录 '},{text:'08:41',strong:true},{text:' · G.H'}]},body:rows(2,'母猪')})
+};
+document.querySelectorAll('[data-state]').forEach(el=>{const r=R[el.getAttribute('data-demo')];if(r)el.querySelector('.over').innerHTML=r();});
+</script>
+</body>
+</html>

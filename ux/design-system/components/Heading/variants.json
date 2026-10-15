@@ -1,14 +1,13 @@
 [
   {
     "id": "page",
-    "name": "Page",
-    "use": "name a screen or a sheet, once, at the top of its header",
-    "notUse": "a block inside the page (use Section) or a run of rows (use Group); a page heading never takes an icon, meta or action",
+    "name": "Page and sheet title",
+    "use": "the title of a screen or a sheet: the type the page header (22px) and the sheet header (20px) draw, once, on one line that fits at 360",
+    "notUse": "a block inside the page (use Section) or a run of rows (use Group); its place, Back, the corners and the header line belong to Header; never wrapped, never with an icon, meta or action",
     "states": [
-      "Default",
-      "With description",
-      "In a drawer",
-      "Long title wraps",
+      "Page title",
+      "Sheet title",
+      "Longest title that fits at 360",
       "Chinese"
     ]
   },
