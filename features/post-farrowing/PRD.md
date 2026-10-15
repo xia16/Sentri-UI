@@ -51,3 +51,7 @@ In scope: the assessment and its recheck. Out: the symptom module itself.
 - `ux/research/tasks/postpartum.html`
 - `ux/archive/screens.html` sections 01, 03, 04b
 - Figma node 8006-14820
+
+## Home card handoff · 2026-10-14
+
+The Home due count starts from each sow's recorded farrowing time and includes unique sows whose configured assessment window is open with no record. The bar is “Postpartum checks recorded X / Y”; Y grows only when sows actually farrow and enter this check. Show a recheck count only when the recheck has an explicit schedule. The earlier research claim that any abnormal answer automatically creates one is not sufficient to invent a Home due date. Task closure stays here. See [Home display rules](../../ux/research/home/HOME-TASK-DISPLAY-RULES.md).

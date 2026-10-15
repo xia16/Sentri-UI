@@ -53,3 +53,7 @@ In scope: the check and its outcome. Out: ended-task history (not designed).
 - `ux/archive/screens.html` sections 01, 03
 - `ux/system/inspection-astra-concept.html` (pig-tasks preset)
 - Figma node 7607-10820
+
+## Home card handoff · 2026-10-14
+
+Home counts unique sows in the open window with no record for this named check; explicitly scheduled rechecks are included in the due count. The bar is “Checks recorded X / Y” for this check instance only. An unclear result counts as a recorded check, while its later recheck remains separate. If the time source needs verification, use the general copy “Check information to confirm” instead of inventing a new check date. Task closure stays here. See [Home display rules](../../ux/research/home/HOME-TASK-DISPLAY-RULES.md).

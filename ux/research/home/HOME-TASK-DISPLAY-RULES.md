@@ -1,25 +1,30 @@
 # Home task-card display rules
 
-Status: design proposal grounded in the task specifications. Current user decisions override older screen-placement recommendations; completion stays inside the task overview. The medical/scheduling thresholds are configured farm inputs, not recommendations made by this UI.
+Status: Home design handoff, updated 2026-10-14. Authoritative task status alone determines Home placement; record progress cannot produce a ready-to-complete state. The medical/scheduling thresholds are configured farm inputs, not recommendations made by this UI. The [Android Home PRD](../../../Sentri-Android-App/docs/home-prd.md) and [production-card overview](../../../Sentri-Android-App/docs/home-production-task-cards.md) explain current examples and backend gaps.
+
+## Current Home contract
+
+Show one card per open task instance after filtering to the selected section or unit. “In progress” remains in the main list even between actions. Include unstarted tasks whose start day has arrived and assigned undated tasks that are executable now. Only future, unstarted tasks starting within seven farm-local days go to the compact preview. Show five main cards and three previews by default, with true instance totals and a way to expand. Hidden exceptions and overdue tasks get separate counts on the expansion control. Close receipts are limited to tasks authoritatively ended today and start collapsed. Section and unit picker counts are distinct open task instances, including waiting tasks. Stable sorting, explicit deadlines and pagination rules are in the Workbench PRD.
+
+The rules below describe *card content*, not a rule for removing an in-progress task from Home. The task feature owns task closure. Any old Ready-to-complete scenario or Home completion CTA is superseded.
 
 ## Shared evaluation order
 
 1. Explicitly completed or ended early: compact receipt, bottom of the list. Never revive its due counts from old records.
 2. Confirmed actionable exception: one main count and at most one supporting fact. Unrelated agent findings stay in Assistant.
 3. Task-specific work due: use the first applicable priority below. Counts include unique eligible animals or litters in the selected scope. Past-due items remain a subset of the due count, not an extra total.
-4. All required work recorded: check closure dependencies and unresolved records. A dependency keeps the full bar visible with a quiet reason; only a permitted whole-task closure gets Review & complete task.
+4. No work due now: show the next scheduled action or a quiet in-progress message. Retain cumulative progress; a full bar does not change the task status or add a closure action to Home.
 5. Unit work finished while other units remain open: Unit work complete · task still open. A unit bar cannot close the whole task.
-6. Next scheduled action: quiet time/date, cumulative progress retained. No known next event: task-specific waiting copy.
 
 ## Card slots and ordering
 
 - Identity always remains. Compact Day N of N is contextual timing, not a completion measure.
 - One headline, one optional supporting line. The supporting line uses its own priority below; lower-priority facts stay inside the task.
-- Main count = actionable now; bar = named aggregate progress. Do not compute the main count as total minus completed when eligibility is time-based.
+- Main fact follows the task-specific contract below; it can be an outcome rather than actionable-now count. A bar must name its numerator and denominator. Do not derive an eligible-now count as total minus completed when eligibility is time-based.
 - Only explicit activity can mark an observation round complete. No return/heat outcome is not a negative or completed observation.
-- Closed tasks sort last. Open-card order: actionable exceptions / active farrowing → overdue work → due work → ready to complete → waiting (earliest next event first). Equal-ranked cards retain their existing order to limit jumping.
-- Evaluate the same rules after scope filtering. Whole-task closure eligibility remains global.
-- A full outcome bar, one full treatment session or a finished unit does not prove whole-task readiness. Enrollment/dependency state and future required work must be accounted for.
+- Closed tasks sit in the collapsed Closed section. Main-list order: actionable exceptions / active farrowing → explicit overdue work → today's work → previously scheduled but unstarted work → assigned undated work → other in-progress tasks. Equal-ranked cards use task time and stable ID to avoid jumping.
+- Evaluate the same display rules after scope filtering. Scope never changes the task's authoritative status.
+- A full outcome bar, one full treatment session or a finished unit does not prove that the task has ended. Do not infer Home closure from enrollment, dependency or record counts.
 
 ## Pregnancy check
 
@@ -35,11 +40,11 @@ Source: ../research/tasks/pregnancy-check.html
 
 ## Heat check
 
-1. Eligible sows still needing the current observation
-2. Next scheduled observation
-3. Waiting for the configured heat window
+1. Overview: cumulative recorded-in-heat sows / configured target, as an outcome, not a due or completion count
+2. Unit: sows with recorded signs but no confirmed heat, with the signs subset shown only when present
+3. If reliable targets or candidates are missing, show the known fact without a fabricated denominator or “no signs” branch
 
-Supporting line: Current round. Use an overdue count only with explicit observation records and a configured deadline; no heat mark is not evidence of a missed check.
+Supporting line: one useful sign or schedule fact. Do not show a legacy observation-round label or infer missed checks from absent heat marks. The Overview outcome bar is explicitly “Recorded in heat / target”; it is not completion progress. No quick close on Home.
 
 Completion: Review the configured window and observation activity. Recorded-in-heat is an outcome, not task completion; reaching the heat target does not silently close observation work.
 
@@ -47,11 +52,12 @@ Source: ../research/tasks/heat-check.html
 
 ## Breeding
 
-1. Sows eligible for a first or repeat service now
-2. Next service time
-3. Waiting for heat confirmations
+1. Overview: unique heat-marked task sows mated at least once / unique eligible heat-marked task sows
+2. Unit: sows currently eligible for a first or repeat service, split only when useful
+3. Next service time
+4. Waiting for heat confirmations
 
-Supporting line: Past service window → first/repeat breakdown. Main count includes both first and repeat services; one sow is counted once.
+Supporting line: past service window → first/repeat breakdown. The Overview bar is “Mated at least once / heat-marked”; it is not configured-sequence completion. Unit eligibility counts each sow once. The legacy first-service timing and list eligibility need one authoritative rule before live data drives “ready now.”
 
 Completion: All required service sequences complete AND heat check closed. A full bar while heat check remains open shows Waiting for heat check to close.
 
@@ -59,26 +65,26 @@ Source: ../research/tasks/breeding.html
 
 ## Return-heat check
 
-1. Sows within their individual return window needing the current observation
-2. Next observation or next cohort entering its window
-3. No checks due
+1. Temporary Overview bridge: recorded returns and sows without a return record in the same historical scope; these are separate facts, not a rate or due count
+2. Unit: sows at their estimated return date and submitted signs; these sets may overlap and must not be added
+3. Next reliable estimated date when neither fact is current
 
-Supporting line: Current round. Returning is an outcome; neither returned counts nor blank marks establish observation completion.
+Supporting line: one estimated-date or submitted-signs fact. No Home pie, return-rate bar, observation-round wording or quick close. Current backend daily statistics are unreliable for this card; review this temporary bridge after the Return-heat feature is settled.
 
-Completion: Review all configured monitoring windows and recorded activity before closing. No Home progress bar, return-rate result or elapsed-time bar.
+Completion: owning task flow only. Neither returned counts nor blank marks establish observation completion.
 
 Source: ../research/tasks/return-heat.html
 
 ## Farrowing
 
 1. Recorded farrowing underway
-2. Past expected date without a final record
-3. Due today without a final record
+2. Past expected date without a farrowing record
+3. Due today without a farrowing record
 4. Next expected date
 
-Supporting line: While farrowing is underway: past expected date → due today. Otherwise, past-date cases show No final record. Missing start records never imply that a sow is not farrowing.
+Supporting line: while farrowing is underway, past expected date → due today. Otherwise, use a neutral expected-date fact. Missing start records never imply that a sow is not farrowing. If dates cannot be trusted, say “Expected date to confirm.”
 
-Completion: Final records or resolved outcomes across the cohort, no active farrowing or unsaved drafts. Review before closing; legitimate other outcomes are not fabricated as completed farrowings.
+Home bar: “Farrowed X / Y sows”; Y covers current task members expected to farrow. Death and abortion remove the sow from this task and from both numerator and denominator. The Farrowing feature is being revised separately; this Home-side handoff does not change that feature's task flow. Closure stays in the owning task.
 
 Source: ../research/tasks/farrowing.html
 
@@ -154,6 +160,10 @@ Supporting line: A confirmed receiving/location issue supersedes the movement co
 Completion: All required movements confirmed; selection or a destination choice is not a movement record. Order scheduling and closure remain a proposal.
 
 Source: ../research/ops/place-identity.md
+
+## End-nursery and end-finishing
+
+End-nursery is the old `NURSERY` pen check. For a verified task pen set, show “N pens to check” and “Checked X / Y pens” in the selected scope; a full bar does not end the task. If the pen set is not reliable, show the task entrance without a guessed count. Confirm the stable pen set and `check_at` before connected use. End-finishing has a backend pen-check command, but no corresponding old Web task page or Home card: leave its card fields undesigned until the workflow is agreed.
 
 ## Boundaries still open
 

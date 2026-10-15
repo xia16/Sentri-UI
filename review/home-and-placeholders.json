@@ -312,24 +312,6 @@
   "source": "notes"
  },
  {
-  "id": "home-and-placeholders-26",
-  "target": {
-   "kind": "screen",
-   "id": "workbench.task-ready"
-  },
-  "kind": "decision",
-  "severity": "medium",
-  "title": "Does completing a task show a review first?",
-  "detail": "Complete task closes at once. The rules ask for a review before closing.",
-  "source": "notes",
-  "options": [
-   "No review, plain confirm",
-   "Review sheet with what is recorded and what is open, then hold to complete",
-   "Review only when something is unrecorded"
-  ],
-  "recommendation": "Review sheet then hold to complete, like Farrowing's end task."
- },
- {
   "id": "home-and-placeholders-27",
   "target": {
    "kind": "screen",

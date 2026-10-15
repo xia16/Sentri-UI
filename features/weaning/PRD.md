@@ -50,3 +50,7 @@ In scope: the litter record and the handoff. Out: keeping breeders and filling I
 - `ux/tasks/piglet-processing/end.html`
 - `ux/model/unified-task-list.md` (historical)
 - Figma node 8023-17019
+
+## Home card handoff · 2026-10-14
+
+The old `LACTATION` task in the Web app is a weaning check; do not create a second “lactation” Home card. The target card counts unique litter/pen checks due in the window and shows “Weaning checks recorded X / Y litters”. A legacy sow-level record cannot silently become a new litter-level record: the migration mapping remains open. Completing the check is distinct from physically moving the animals. This Home decision does not settle the draft task flow above. See [Home display rules](../../ux/research/home/HOME-TASK-DISPLAY-RULES.md).

@@ -6,7 +6,7 @@
 .hc-unit-arrow{color:#89947f;display:flex}.hc-unit-arrow svg{width:12px;height:12px}.hc-unit .hc-identity{gap:8px}.hc-unit .hc-action:last-child{margin-bottom:22px}.hc-unit .hc-progress:last-child{margin-bottom:22px}
 
 /* Whole-task progress remains visible between scheduled actions. */
-.home-task-card.ready{border-color:#9db28b}.ready .hc-quiet-line{color:#4f6c3e}.hc-ready-cta{margin:6px 17px 17px;padding:13px 14px;display:flex;align-items:center;justify-content:space-between;border-radius:10px;background:var(--ink,#20291f);color:#fff;font-size:11px;font-weight:500}.home-task-card.ready:active .hc-ready-cta{background:#30392f}.hc-quiet .hc-progress{margin-top:20px}
+.hc-quiet .hc-progress{margin-top:20px}
 
 .hc-terminated .hc-complete-icon{background:#f1ece5;color:#896448}
 

@@ -1,29 +1,46 @@
-# data-sync: headers, information budget
-
-Scope: the headers only (the shared Headers change). Bodies keep their own budgets.
+# Data sync — attention budget
 
 ## Inventory
 
-- The page's name, the farm, the section, the unit, a description of the page, the source of a finding.
+可能事实：首页的本机待处理数、异常数、网络状态、同步中、最近同步时间；总览的待同步/失败/冲突/已同步数、任务与对象、地点、保存时间、操作者、错误原因、前置阻断、网络质量、重试时间；详情的原操作内容、完整耳号、地点、创建和同步时间、来源账号/猪场、服务端错误、关联前置操作、手动重试与删除后果。账号切换提示另需指出被阻止、未上传数和进入同步的门。
 
 ## Questions
 
-1. Where am I? (the title) 2. How do I get back? (Back, top left)
+1. 我刚做的记录是否安全地保存在这台手机上？
+2. 团队是否已经收到？若还没收到，系统会自己发送吗？
+3. 哪条需要我现在处理，为什么？
+4. 后续操作是否被前一条挡住？
+5. 我手动重试或删除的后果是什么？
+6. 离开首页后，我还能否知道本机有记录、上传是否在进行、是否出现异常？
+7. 正在做的这次任务还有几条在本机？能否从这里查看它们，再看全机其他记录？
 
 ## Levels
 
-- No header line on any Home page or drawer: the farm, section and unit are scope (on Home itself, one Back away); descriptions are cut.
-
-## Headers (2026-10-13)
-
-The header line of every surface of this feature, decided by the Headers law (`ux/design-system/README.md#headers-law-owner-2026-10-13`, owner 2026-10-13). The default is no line; each kept fact names its question and passes the Back test.
-
-| Surface | Hub or action | Header line | The worker's question it answers there | Back test |
+| Moment | Act now | Watch | Settled | Audit |
 |---|---|---|---|---|
-| Every page and drawer of this feature | action or destination off Home | none | | Back reaches Home, which shows the section and unit |
+| 离线提交反馈 | 保存失败需回到输入 | 已保存在本机、联网自动上传 | — | 保存时间 |
+| 首页正常待同步 | — | 本机待同步数和网络限制 | 无记录时的安静状态 | 最近上传时间可移至详情 |
+| 首页有异常 | 页眉徽标展开“异常 N”，打开详情 | 仍待自动上传数 | — | — |
+| 其他应用页面 | 需要处理时的全局入口 | 等待/上传中的本机计数与状态 | 无待传时不占位置 | 逐条原因在同步页 |
+| 任务总览与对象操作页 | 本任务异常先可打开 | 本任务的待传或上传中总数，跨单元/栏位保持同一口径 | 本任务无记录而全机仍有时明示“全机 M” | 具体单条原因在记录列表 |
+| 本任务记录列表 | 本任务异常逐条先看 | 本任务其他未上传记录、进入“本机全部 M” | 已确认上传不铺列表 | 账号、猪场与操作 ID 在详情 |
+| 同步总览 | 失败/冲突的处理入口 | 正在上传、等待前置 | 近30天已上传总数 | 已上传逐条历史不在本页 |
+| 大量不同类型的记录 | 异常仍可直接打开 | 普通待传按业务类别汇总，点进类别看记录 | 近30天已上传总数安静置后 | 任务类型过滤仅在类别内需要时出现 |
+| 回执丢失 | — | 核对服务端结果中、原记录仍在本机且暂不重发 | 查到已处理后才计入已上传 | 操作 ID 与服务端回执详情 |
+| 单条详情 | 冲突时先核对本机与服务端差异，再重试或删除确认 | 原因、前置关系；删除后依赖记录只可查看或逐条删除 | 已同步回执 | 其余业务字段 |
+| 账号/猪场切换 | 先处理 N 条，进入同步 | 当前身份 | — | — |
+| 登录失效 | 原账号重新登录后续传 | 本机记录仍安全、当前绑定 | — | — |
 
-Ambiguous, quieter option taken: The PREVIEW badges (prototype chrome) are dropped with the old page heads.
+## Cut and space
 
-Chains walked on the real Back path after this change (crit round 1): no surface here writes to or is about one animal without showing it on screen or one Back away; no line changed.
+- 原生应用壳在系统状态栏安全区下的现有页眉右侧显示至少 48dp 可点的浮动徽标；它作为尾部控件参与页眉排版，与相邻动作共用垂直中心、间距和右边距：等待与上传中用不同符号/颜色加本机数，异常展开文字“异常 N”；空队列隐藏。读屏标签说出完整状态与自动上传预期。首页不再叠加同步卡，首张工作卡更早出现。
+- 任务页沿用右侧同一槽位，但可见文案标“本任务 N”，点击先看本任务；本任务为零且全机不为零时明确标“全机 M”。任务列表不再重复放一个总数大卡，异常在前、普通记录在后，末端只放进入全机的轻入口。
+- 总览首屏优先异常数和待同步数，网络状态一句即可；每行只显示任务/对象、状态和必要的第二行。地点与时间进入详情或同一静态 meta 行，不重复。已上传只给近30天合计，不占一组逐条行。
+- 30 条记录时异常逐条在首屏，普通待传按业务类别汇总，不把类别/任务类型/任务堆成四层；类别内查看具体记录。底部无“上传全部”按钮；保留原生导航和可返回路径。360 宽中文完整耳号不截断。
+- 九条跨两类普通待传在进入列表时收成类别；同次查看中自动上传确认一条，数变八而类别布局不跳变。少量直接列出；任务范围内少量也直接列出，不叠业务分类。
+- 冲突及其已受阻后续记录的删除都在详情二次确认，不在列表行上放垃圾桶；总览无批量删除与清空。
+- 视觉第一眼应为：需要处理的异常数 → 待上传状态 → 具体记录。全部自动处理中时第一眼是工作任务；徽标不夺走独立高度。
 
-Floors (crit round 1): the drawers this change moves are brought to the legibility floors: Saved work lists its records on the design system's Row; Find a pig's and Scan's primaries use the Button's primary face (their text was ink on ink); Scan's 10px prototype note is cut.
+## Header law retained from main
+
+The Data sync pages and sheets use the shared page and sheet headers: a title, Back at the upper left, no repeated farm/unit/description line, and the shared 24px separation to the body. The phone-wide sync badge occupies the app shell's trailing status slot; it does not add a page-specific subtitle or move Back to the footer. Moving record facts out of a header must keep row text at the design system's legibility floor.
