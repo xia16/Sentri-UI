@@ -1419,38 +1419,38 @@
       "preset": "finish",
       "figma": "",
       "notes": {
-        "purpose": "Report weak and deformed piglets, add optional facts, then hold to finish and lock Born.",
+        "purpose": "Report weak and deformed piglets, answer Assisted, add the litter weight if known, then hold to finish and lock Born.",
         "states": [],
         "elements": [
           {
             "name": "Piglet condition",
-            "shows": "Weak and Deformed steppers: \"Among the 9 alive piglets · 0 if none\".",
+            "shows": "The section heading \"Piglet condition\" over one flat list: Weak and Deformed steppers, then Assisted and Litter weight in the same right column.",
             "rule": "Each tap saves at once. Weak + deformed cannot exceed Alive (the + greys out). Healthy has no row; it is Alive − weak − deformed and prints on the record.",
             "source": "farrowing-astra-concept.js act(\"classify\")",
             "at": "Piglet condition"
           },
           {
-            "name": "Optional facts",
-            "shows": "Two quiet \"+ Label\" cards, Litter weight and Assistance, each expanding a field. A filled one becomes a full-width row (label, then the value on two lines at most).",
+            "name": "Assisted and Litter weight",
+            "shows": "Two more rows of the same list: Assisted as two square keys No | Yes (No chosen, the chosen key has a 2px ink ring), and Litter weight with a muted \"Optional\" beside its label and a kg box that shows a dash until a weight is typed.",
             "states": [
               {
-                "state": "Not given",
-                "when": "Nothing entered",
-                "shows": "Button label only"
+                "state": "New finish",
+                "when": "Nothing touched",
+                "shows": "Assisted No chosen; Litter weight a dash"
               },
               {
-                "state": "Given",
-                "when": "Value entered",
-                "shows": "A full-width row: label over the answer (\"12.6 kg\", \"Yes\") with an edit pencil"
+                "state": "Weight open",
+                "when": "The kg box tapped",
+                "shows": "The Numpad docks above the footer; the box takes an ink ring and a caret; Back closes the pad and keeps the value"
               },
               {
-                "state": "Cleared",
-                "when": "Clear answer pressed",
-                "shows": "Assistance returns to \"Not recorded\""
+                "state": "Answered",
+                "when": "Yes tapped, weight typed",
+                "shows": "Yes ringed; the weight in mono with kg"
               }
             ],
-            "logic": "Litter weight is a decimal number; a negative value is cleared. No range warning in the prototype (the ruled soft warning outside 0.8–2.5 kg × alive is absent).",
-            "source": "farrowing-astra-concept.js finish(), updateTextField()",
+            "logic": "Assisted is required (No preselected; no Clear). Litter weight is optional, one decimal, typed on the Numpad (no system keyboard); empty or 0 is not recorded. No range warning in the prototype (the ruled soft warning outside 0.8–2.5 kg × alive is absent).",
+            "source": "farrowing-astra-concept.js finish(), finishDetails(), closePad()",
             "at": "Litter weight"
           },
           {
@@ -1483,10 +1483,9 @@
         "copy": [
           "(raw) Finish farrowing",
           "(raw) Born · Alive · Dead",
-          "(raw) Piglet condition · Among the N alive piglets · 0 if none",
+          "(raw) Piglet condition",
           "(raw) Weak · Deformed",
-          "(raw) Litter weight · Assistance",
-          "(raw) Assisted farrowing · No · Yes · Clear answer",
+          "(raw) Weak · Deformed · Assisted · No · Yes · Litter weight · Optional · kg",
           "(raw) Back · HOLD TO FINISH"
         ],
         "edge": [
@@ -1495,13 +1494,13 @@
         "rules": [
           "\"`Finish` is `Finish farrowing`\" and \"the Finish sheet's hold-to-lock stays the second guard\" (Surfaces & entrances)",
           "\"Classification (weak/deformed) happens at Finish, commits per tap … Healthy has no form row\" (Model)",
-          "\"Optional facts at Finish: litter weight (soft range warn) + assisted checkbox, presented as one cohesive group\" (Model)",
+          "\"Optional facts at Finish: litter weight (soft range warn) + assisted checkbox, presented as one cohesive group\" (Model); owner 2026-10-15: Assisted is a required No / Yes, No preselected, and one list holds all four rows",
           "\"Lock born N is hold-to-commit\" (Surfaces & entrances)"
         ],
         "issues": [
           "The ruled button \"Lock born N\" reads \"Finish farrowing\", the same words as the sheet title.",
           "The Born / Alive / Dead panel repeats the Counting summary one tap earlier.",
-          "Litter weight and Assistance are two collapsed buttons, not one cohesive group; X and Back both return to Counting."
+          "X and Back both return to Counting."
         ]
       }
     },
@@ -2373,7 +2372,7 @@
           },
           {
             "name": "Finish details row",
-            "shows": "One row; weak, deformed, litter weight and assistance sit behind it.",
+            "shows": "One row; weak, deformed, assisted and litter weight sit behind it.",
             "states": [
               {
                 "state": "Finished litter",

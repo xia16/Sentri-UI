@@ -109,6 +109,8 @@ States: F0 the record with a death draft waiting (from D1; Finish waits) · F1 *
 | F-8 | F2 | hold | → locked record: Born 14, Edit · Record dead, no Finish | S — RUL After the lock | `fa-f8-locked-record-face` |
 | F-9 | F2 | weak / deformed steppers | → commit per tap; healthy derived; capped at alive | S — RUL Model (classification at Finish) | — |
 | F-10 | F2 | litter weight outside 0.8–2.5 kg × alive | → soft words warning, never a gate | S — contract C5 (draft); review tasks-built-28 | — |
+| F-11 | F2 | tap Yes on Assisted | → No was chosen before (required No / Yes, no Clear); Yes is chosen and recorded | S — owner decision 2026-10-15 | `fa-f11-assisted-no-preselected` |
+| F-12 | F2 | tap the Litter weight box, type 12.6, Back | → the docked Numpad closes and keeps 12.6 kg; no system keyboard | S — owner decision 2026-10-15 | `fa-f12-weight-on-the-pad` |
 
 ## 6 · Edit and Correct born (X)
 

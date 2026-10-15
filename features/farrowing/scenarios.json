@@ -1457,6 +1457,103 @@
       },
       {
        "type": "action",
+       "id": "finish.clean.assisted-yes",
+       "label": "tap Yes on Assisted",
+       "taps": [
+        "[data-action='assistance'][data-value='true']"
+       ],
+       "children": [
+        {
+         "type": "outcome",
+         "id": "fa-f11-assisted-no-preselected",
+         "tree": "F-11",
+         "label": "Assisted is a required No / Yes: No is chosen on a new finish, Yes moves the ring",
+         "gwt": {
+          "given": "The Finish sheet is open for a sow, with nothing touched.",
+          "when": "The worker taps Yes on Assisted.",
+          "then": "Assisted was No before the tap (no unanswered state, no Clear); now Yes is chosen and the record holds Yes."
+         },
+         "authority": [
+          {
+           "src": "RUL",
+           "at": "Owner decision 2026-10-15",
+           "says": "Assisted is required, No preselected; no Clear"
+          }
+         ],
+         "visible": [
+          {
+           "el": "[data-action='assistance'][data-value='true'][aria-checked='true']",
+           "in": "sheet",
+           "hard": "wrong-fact"
+          },
+          {
+           "el": "[data-action='assistance-clear']",
+           "is": "absent",
+           "hard": "wrong-fact"
+          }
+         ],
+         "record": [
+          {
+           "expr": "s.assisted === true",
+           "hard": "wrong-fact"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "action",
+       "id": "finish.clean.weight-pad",
+       "label": "tap the Litter weight box, type 12.6, tap Back",
+       "taps": [
+        "[data-action='open-numpad']",
+        "[data-action='numpad'][data-key='1']",
+        "[data-action='numpad'][data-key='2']",
+        "[data-action='numpad'][data-key='.']",
+        "[data-action='numpad'][data-key='6']",
+        "[data-action='returnCount']"
+       ],
+       "children": [
+        {
+         "type": "outcome",
+         "id": "fa-f12-weight-on-the-pad",
+         "tree": "F-12",
+         "label": "The litter weight is typed on the docked Numpad; Back closes the pad and keeps the value",
+         "gwt": {
+          "given": "The Finish sheet is open for a sow, with nothing touched.",
+          "when": "The worker taps the Litter weight box, types 12.6 on the pad and taps Back.",
+          "then": "The pad closes, the sheet stays open and the weight reads 12.6 kg. No system keyboard opened."
+         },
+         "authority": [
+          {
+           "src": "RUL",
+           "at": "Owner decision 2026-10-15",
+           "says": "Litter weight stays optional, typed on the design system's Measure and Numpad"
+          }
+         ],
+         "visible": [
+          {
+           "el": ".st-numpad",
+           "is": "absent",
+           "hard": "wrong-fact"
+          },
+          {
+           "el": "[data-action='lock']",
+           "in": "sheet",
+           "hard": "dead-end"
+          }
+         ],
+         "record": [
+          {
+           "expr": "s.weight === '12.6' && s.view === 'finish' && s.pad === null",
+           "hard": "lost-draft"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "action",
        "id": "finish.clean.hold",
        "label": "hold Finish farrowing",
        "taps": [

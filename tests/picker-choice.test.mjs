@@ -152,19 +152,54 @@ test("flat multi keeps section headings without navigating levels", () => {
 require("../ux/system/astra-surfaces.js");
 require("../ux/system/farrowing-astra-concept.js");
 require("../ux/system/inspection-astra-concept.js");
-test("migrated assistance choices preserve missing versus No in the record and edit draft", () => {
+test("assisted is a required No / Yes on the finish and edit forms: No preselected, no Clear (owner, 2026-10-15)", () => {
   const F = globalThis.FarrowingStudy,
     s = F.seed("before");
+  assert.equal(s.assisted, false, "a new finish starts on No");
+  F.act(s, "assistance", "true");
+  assert.equal(s.assisted, true);
   F.act(s, "assistance", "false");
   assert.equal(s.assisted, false);
   F.act(s, "assistance-clear", "assistance");
-  assert.equal(s.assisted, null);
+  assert.equal(s.assisted, false, "there is no Clear: nothing returns it to unanswered");
   s.edit = { ...s };
   F.act(s, "editAssistance", "true");
   assert.equal(s.edit.assisted, true);
-  assert.equal(s.assisted, null);
+  assert.equal(s.assisted, false, "the edit draft does not write the record");
   F.act(s, "editAssistance-clear", "editAssistance");
-  assert.equal(s.edit.assisted, null);
+  assert.equal(s.edit.assisted, true);
+  // an old record that never had it keeps null until the worker answers; the form shows neither key chosen
+  const old = F.seed("locked");
+  old.assisted = null;
+  old.edit = { ...old };
+  assert.equal(old.edit.assisted, null);
+  F.act(old, "editAssistance", "false");
+  assert.equal(old.edit.assisted, false);
+  assert.equal(old.assisted, null);
+});
+test("the litter weight is a Measure on the docked Numpad: Back closes the pad and keeps the value", () => {
+  const F = globalThis.FarrowingStudy,
+    s = F.seed("before");
+  s.view = "finish";
+  F.act(s, "open-numpad", "weight");
+  assert.equal(s.pad, "weight");
+  for (const k of ["1", "2", ".", "6"]) F.act(s, "numpad", "weight:" + k);
+  assert.equal(s.weight, "12.6");
+  F.act(s, "numpad", "weight:7");
+  assert.equal(s.weight, "12.6", "one decimal place at most");
+  assert.equal(s.padHint, "1 decimal place at most");
+  F.act(s, "numpad", "weight:back");
+  F.act(s, "numpad", "weight:back");
+  assert.equal(s.weight, "12");
+  F.act(s, "numpad", "weight:.");
+  F.act(s, "back");
+  assert.equal(s.pad, null, "Back closes the pad first");
+  assert.equal(s.weight, "12", "closing keeps the typed value and drops a trailing point");
+  assert.equal(s.view, "finish", "and stays on the form");
+  F.act(s, "open-numpad", "weight");
+  for (const k of ["back", "back", "0"]) F.act(s, "numpad", "weight:" + k);
+  F.act(s, "back");
+  assert.equal(s.weight, "", "an empty or zero weight is not recorded");
 });
 test("browsing a disease branch retains its kind when adding a custom condition", () => {
   const M = globalThis.InspectionStudy,

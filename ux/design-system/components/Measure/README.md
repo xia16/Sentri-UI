@@ -6,6 +6,8 @@ A Measure holds one measured value with its unit: litter weight, a piglet's weig
 
 Call `SentriUI.measure({ label, optional, value, unit, unitGap, placeholder, key, action, active, controls, range, tone, changed, hint, note })`.
 
+**Row layout** (`layout: 'row'`, candidate). A Measure that is one row of a flat list of rows (Finish farrowing: Weak, Deformed, Assisted, Litter weight), in the Stepper row's silhouette: the label left at 16px/500 with its muted 13px "Optional" beside it, the box in the same 136px right column, the stepper face's height (44px, with a 48px hit area), value left and unit right (13px), a 60px row, a 1px `line` below it (none when last). The hint and note run under the row. The box takes the stepper key's border (`task-key-border`) until the pad opens, then the `ink` ring. Empty still shows the muted dash and the unit; the pad rule and every other state are unchanged. Opt-in: without `layout` the Measure renders as before.
+
 **Anatomy**
 - **Label** above the box, in `choice-label` 14px at 600 `ink`. It does the same job as a Stepper row's label. An optional `muted` word can sit beside it ("Optional").
 - **Box.** Shaped like a field:

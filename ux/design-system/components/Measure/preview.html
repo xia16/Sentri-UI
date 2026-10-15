@@ -1,4 +1,4 @@
-<!-- @dsCard group="Fields" height=1400 subtitle="Candidate · a measured value, unit always written" -->
+<!-- @dsCard group="Fields" height=1800 subtitle="Candidate · a measured value, unit always written" -->
 <!doctype html>
 <html lang="en">
 <head><meta charset="utf-8"><style>html,body{margin:0;background:var(--app-background)}.stack>*+*{margin-top:20px}.dock{display:flex;flex-direction:column;gap:12px}</style></head>
@@ -18,7 +18,13 @@ m.innerHTML = [
   UI.measure({ ...base, value: '16.2', changed: true, key: 'edit', note: 'was 16.8 kg' }),
   UI.measure({ ...base, value: '29.0', changed: true, key: 'edit-warn', hint: 'Usual 8.8–27.5 kg · this is 29.0', note: 'was 16.8 kg' }),
   UI.measure({ label: 'Rectal temperature', unit: '°', unitGap: false, value: '40.6', key: 'temp' }),
-  '<div class="dock">' + UI.measure({ ...base, value: '16.', active: true, key: 'open', controls: 'pad-open' }) + UI.numpad({ id: 'pad-open', decimals: 1, intLength: 2, value: '16.', key: 'open' }) + '</div>'
+  '<div class="dock">' + UI.measure({ ...base, value: '16.', active: true, key: 'open', controls: 'pad-open' }) + UI.numpad({ id: 'pad-open', decimals: 1, intLength: 2, value: '16.', key: 'open' }) + '</div>',
+  // layout 'row': a row of a flat list, in the Stepper row's right column (Finish farrowing: Weak, Deformed, Assisted, Litter weight)
+  '<div class="rows">' + UI.stepper({ label: 'Deformed', value: 1, action: 'step', key: 'deformed', variant: 'row', reserveHint: false })
+    + UI.measure({ label: 'Litter weight', optional: 'Optional', unit: 'kg', layout: 'row', value: '', key: 'row-empty' })
+    + '</div>',
+  '<div class="rows">' + UI.measure({ label: 'Litter weight', optional: 'Optional', unit: 'kg', layout: 'row', value: '12.6', key: 'row-filled' }) + '</div>',
+  '<div class="rows">' + UI.measure({ label: 'Litter weight', optional: 'Optional', unit: 'kg', layout: 'row', value: '12.', active: true, key: 'row-open', controls: 'pad-row' }) + UI.numpad({ id: 'pad-row', decimals: 1, intLength: 2, value: '12.', key: 'row-open' }) + '</div>'
 ].map(h => '<div>' + h + '</div>').join('');
 document.querySelector('.st-measure-box[data-value="pressed"]').setAttribute('data-preview', 'pressed');
 </script>

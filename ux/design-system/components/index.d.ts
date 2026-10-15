@@ -280,6 +280,8 @@ export interface StepperProps {
 /** Candidate. A measured value with its unit; the box is
  *  `<button data-action="open-numpad" data-value=key aria-expanded aria-controls>`. */
 export interface MeasureProps {
+  /** Candidate: 'row' draws the Measure as one row of a flat list in the Stepper row's right column (label left, box right). Default 'stack'. */
+  layout?: 'stack' | 'row';
   label: string;
   /** A muted word beside the label, e.g. "Optional". */
   optional?: string;
@@ -321,6 +323,8 @@ export interface FieldAction { label: string; action: string; value?: string; st
 /** Candidate. 1–9 · [. or gap] 0 ⌫; keys are `<button data-action data-value=key data-key="0-9|.|back">`.
  *  No commit key: the surface's bar primary commits. Keys never move. */
 export interface NumpadProps {
+  /** Candidate: sits between a Sheet's body and its footer, out of the scroller. */
+  dock?: boolean;
   /** Candidate (ADR 0002): a run without the running list; the host speaks the last record in the status line. */
   compact?: boolean;
   /** The readout's label ("Piglet 5 of 11 · ear tag"); omit for keys only, under a Measure. */
@@ -532,6 +536,8 @@ export interface HoldBindOptions {
 }
 export interface RadioOption { value: string; label: string; meta?: string; /** Latin and digit codes only (warns in dev otherwise). */ mono?: boolean; strs?: Strs<'label' | 'meta'>; args?: StrArgs<'label' | 'meta'> }
 export interface ChoiceRadiosProps {
+  /** Candidate, `layout: 'inline'` only: 'key' draws each option as a boxed key in the Stepper row's right column (the chosen key takes a 2px ink ring). */
+  face?: 'default' | 'key';
   /** Hide only the field label when an enclosing optional row already names it; accessible label and Clear remain. */
   labelHidden?: boolean;
   disabled?: boolean;
