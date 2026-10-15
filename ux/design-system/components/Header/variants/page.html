@@ -4,7 +4,10 @@
 <meta charset="utf-8">
 <title>Header: page</title>
 <style>
-.ph{position:relative;height:200px;max-width:390px;margin:0 auto;overflow:hidden;background:var(--app-background);font-family:var(--font-sans);color:var(--ink);border:1px solid var(--line);border-radius:var(--radius-device)}
+.ph{height:200px;max-width:390px;margin:0 auto;font-family:var(--font-sans);color:var(--ink)}
+/* The phone frame is the state's first child, so the atlas sees the state draw its own surface and gives every state the same
+   full cell width (a cell without one is inset 16px a side, and a 360 state would no longer be 360). */
+.ph>.over{position:relative;height:100%;overflow:hidden;background:var(--app-background);border:1px solid var(--line);border-radius:var(--radius-device)}
 .ph .bar{display:flex;justify-content:space-between;align-items:center;height:var(--statusbar-height);padding:0 var(--space-24);font:700 var(--type-panel-title-size) var(--font-sans)}
 .ph[data-pressed] .st-page-back{background:var(--press)}
 </style>
