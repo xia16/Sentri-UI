@@ -1,7 +1,7 @@
 // The gate's and the polish loop's rules (scripts/loop-rules.mjs).
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { queueAhead, calibrationProblems, budgetProblems, critiqueProblems, pageStyling, addedLines, effectiveClass, classifyScreens, checkVerdict, checkGrades, worstFirst, isClean, loopStatus, touchesSystem, touchesTools, regressions,
+import { queueAhead, newScenarioFailures, calibrationProblems, budgetProblems, critiqueProblems, pageStyling, addedLines, effectiveClass, classifyScreens, checkVerdict, checkGrades, worstFirst, isClean, loopStatus, touchesSystem, touchesTools, regressions,
   pageOf, pageAssets, sharedFiles, outcomeLeaves, coverageLost, reachOf, reachLine, shotsToTake, timedOutOnly, lockState, carryDecision, ghNetworkError } from '../scripts/loop-rules.mjs';
 
 test('a change to the bundle or tokens is a shared-component change whatever was declared', () => {
@@ -401,4 +401,12 @@ test('carry: a pass carries over main moving on only by files that draw no pixel
   no({ mainFiles: ['ux/system/home.css'], reach: reach(['ux/system/home.css']) }, /can reach every screen/);
   no({ mainFiles: ['features/weaning/budget.md'], reach: reach(['features/weaning/budget.md']) }, /can reach screens of weaning/);
   no({ reach: null }, /can reach every screen/);
+});
+
+test('newScenarioFailures: a leaf already failing on base is main\'s debt; one passing there, or new, is the change\'s', () => {
+  const base = 'blocked  ds-a7-global-wait\nfail     ds-a11-task-layer  en-360: "Task 2" shown → absent\npass     ds-a13-home-to-task\n\ndata-sync @ c4f98e2: pass 1 · fail 1';
+  assert.deepEqual(newScenarioFailures(['ds-a11-task-layer'], base), { added: [], debt: ['ds-a11-task-layer'] });
+  assert.deepEqual(newScenarioFailures(['ds-a13-home-to-task', 'ds-a11-task-layer'], base), { added: ['ds-a13-home-to-task'], debt: ['ds-a11-task-layer'] });
+  assert.deepEqual(newScenarioFailures(['ds-new-leaf'], base), { added: ['ds-new-leaf'], debt: [] }); // not on base: new
+  assert.deepEqual(newScenarioFailures(['x'], ''), { added: ['x'], debt: [] }); // base printed nothing: the failure stands
 });
