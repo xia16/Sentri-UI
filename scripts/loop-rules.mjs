@@ -19,6 +19,26 @@ export function screensOf(atlas, { features = [], screens = [] } = {}) {
   return list;
 }
 
+// The design system's own pages (atlas: Components → <Name> → <variant>, each state drawn by atlas/library.js stateGridAt) are
+// in the gate's reach like screens: a page teaches the law, so it must follow it (rules ledger L23). Each is a "screen" with the
+// id ds:<Name>/<variant> and the feature design-system; the variants are those the atlas draws (atlas.json: the files on disk).
+export const DS_FEATURE = 'design-system';
+export const componentPage = (id) => { const m = /^ds:([^/]+)\/([^/]+)$/.exec(String(id)); return m ? { component: m[1], variant: m[2] } : null; };
+// A screen id as a folder name: a ds: id's colon is not a legal file name on Windows.
+export const idPath = (id) => String(id).replace(/:/g, '_');
+export function componentPagesOf(atlas, { components = [], screens = [] } = {}) {
+  const list = [];
+  for (const p of atlas.platforms) for (const c of p.components || []) for (const v of c.files?.variants || []) {
+    const id = `ds:${c.name}/${v}`;
+    if (components.length && !components.includes(c.name)) continue;
+    if (screens.length && !screens.includes(id)) continue;
+    list.push({ id, feature: DS_FEATURE, component: c.name, variant: v, url: `/atlas/index.html?view=components&component=${encodeURIComponent(c.name)}&variant=${encodeURIComponent(v)}` });
+  }
+  return list;
+}
+// The components whose own folder (ux/design-system/components/<Name>/) a change edits: their pages moving is the change's own reach.
+export const componentsTouched = (files) => [...new Set(files.map((f) => (/^ux\/design-system\/components\/([^/]+)\//.exec(f) || [])[1]).filter(Boolean))].sort();
+
 // The page an atlas screen opens, as a repo path.
 export const pageOf = (url) => { const p = url.split(/[?#]/)[0].replace(/^\//, ''); return !p || p.endsWith('/') ? p + 'index.html' : p; };
 
@@ -105,9 +125,14 @@ export function effectiveClass({ declared, files, diffs, scope, shared = {} }) {
   const sys = touchesSystem(files, shared);
   const users = (f) => (shared[f] ? ` (${shared[f].slice(0, 5).join(', ')}${shared[f].length > 5 ? ` and ${shared[f].length - 5} more` : ''})` : '');
   if (sys.length) why.push(`changes the shared system: ${sys.slice(0, 4).map((f) => f + users(f)).join('; ')}${sys.length > 4 ? ' …' : ''}`);
-  const outside = diffs.filter((d) => !scope.includes(d.feature));
+  // A component page is in scope when the scope names design-system, or when the change edits that component's own folder.
+  const own = componentsTouched(files);
+  const outside = diffs.filter((d) => !scope.includes(d.feature) && !own.includes(componentPage(d.id)?.component));
   if (outside.length) why.push(`changes ${outside.length} screen(s) outside the scope (${[...new Set(outside.map((d) => d.feature))].join(', ')})`);
-  const cls = why.length ? 'shared' : declared;
+  let cls = why.length ? 'shared' : declared;
+  // A moved component page is judged before/after like a screen: a change that moves one is never a copy-only change.
+  const pages = diffs.filter((d) => componentPage(d.id));
+  if (pages.length && CLASSES.indexOf(cls) < CLASSES.indexOf('presentation')) { cls = 'presentation'; why.push(`moves ${pages.length} component page(s) (${pages.slice(0, 3).map((d) => d.id).join(', ')}): a page that teaches the law is judged like a screen`); }
   return { cls: CLASSES.indexOf(cls) < CLASSES.indexOf(declared) ? declared : cls, why, outside };
 }
 
@@ -380,6 +405,10 @@ export function reachOf({ files, screens = [], assets = {}, shared = {}, scope =
     const u = users.get(f);
     if (Object.hasOwn(shared, f) || u?.size > 1) { all = true; note(`loaded by pages of ${(shared[f] || [...u]).length} features`, f); continue; }
     if (u) { for (const x of u) features.add(x); note(`a page of ${[...u][0]} or what it loads`, f); continue; }
+    // A component's own pages and notes (its variant pages, variants.json, gate.json, README) are read by the atlas, never loaded
+    // by a screen's page: they reach that component's pages (ds:<Name>/…, feature design-system), not every screen.
+    const doc = f.match(/^ux\/design-system\/components\/([^/]+)\/(variants\/[^/]+\.html|variants\.json|gate\.json|README\.md)$/);
+    if (doc) { features.add(DS_FEATURE); note(`${doc[1]}'s component pages`, f); continue; }
     if (NO_PIXEL.some((re) => re.test(f))) { note('draws no pixel', f); continue; }
     all = true;
     note(f.startsWith('ux/') ? 'no page loads it by name, and a page may fetch it' : 'not known to draw nothing', f);
@@ -454,4 +483,16 @@ export function carryDecision({ pass, mech, head, main, containsC, containsMain,
   if (edited.length) why.push(`the merge is not just main: ${edited.slice(0, 3).join(', ')} not as on the gated commit (a conflict resolved, or an edit in the merge): run the gate again`);
   if (!reach || reach.all || reach.features.length) why.push(`main's change since ${s(mech.base)} can reach ${!reach || reach.all ? 'every screen' : `screens of ${reach.features.join(', ')}`}${reach?.why.length ? ` (${reach.why.join('; ')})` : ''}: run the gate again`);
   return why.length ? { ok: false, why } : { ok: true, why: [`main moved ${s(mech.base)} → ${s(main)} by ${mainFiles.length} file(s) that draw no pixel, and ${s(head)} is ${s(mech.candidate)} merged with it and nothing else`] };
+}
+
+// Scenario leaves, base against candidate (owner, 2026-10-15): a leaf the candidate fails is the change's only when the same leaf
+// passes on base. One already failing on main is main's debt, named as a gap, the way check-states and the header checks already
+// count a problem main has. candFailed: the leaf ids the candidate's report marks fail. baseOut: the base runner's stdout for those
+// leaves (`run-scenarios.mjs <feature> --only a,b`, one "<result>  <id>" line per leaf). A leaf base doesn't have, or doesn't print,
+// is new, so its failure is the change's.
+export function newScenarioFailures(candFailed, baseOut) {
+  const onBase = new Map();
+  for (const line of String(baseOut || '').split('\n')) { const m = /^(pass|fail|blocked|pending)\s+(\S+)/.exec(line); if (m) onBase.set(m[2], m[1]); }
+  const debt = candFailed.filter((id) => onBase.get(id) === 'fail');
+  return { added: candFailed.filter((id) => onBase.get(id) !== 'fail'), debt };
 }

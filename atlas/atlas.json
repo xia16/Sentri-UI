@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-15T08:32:55.634Z",
- "commit": "a84a995",
+ "generated": "2026-10-15T09:02:54.256Z",
+ "commit": "47dc751",
  "platforms": [
   {
    "id": "mobile",
@@ -7305,6 +7305,58 @@
                  }
                 ],
                 "result": "pass"
+               }
+              ]
+             },
+             {
+              "type": "action",
+              "id": "finish.clean.assisted-yes",
+              "label": "tap Yes on Assisted",
+              "children": [
+               {
+                "type": "outcome",
+                "id": "fa-f11-assisted-no-preselected",
+                "label": "Assisted is a required No / Yes: No is chosen on a new finish, Yes moves the ring",
+                "tree": "F-11",
+                "gwt": {
+                 "given": "The Finish sheet is open for a sow, with nothing touched.",
+                 "when": "The worker taps Yes on Assisted.",
+                 "then": "Assisted was No before the tap (no unanswered state, no Clear); now Yes is chosen and the record holds Yes."
+                },
+                "authority": [
+                 {
+                  "src": "RUL",
+                  "at": "Owner decision 2026-10-15",
+                  "says": "Assisted is required, No preselected; no Clear"
+                 }
+                ],
+                "result": "not-run"
+               }
+              ]
+             },
+             {
+              "type": "action",
+              "id": "finish.clean.weight-pad",
+              "label": "tap the Litter weight box, type 12.6, tap Back",
+              "children": [
+               {
+                "type": "outcome",
+                "id": "fa-f12-weight-on-the-pad",
+                "label": "The litter weight is typed on the docked Numpad; Back closes the pad and keeps the value",
+                "tree": "F-12",
+                "gwt": {
+                 "given": "The Finish sheet is open for a sow, with nothing touched.",
+                 "when": "The worker taps the Litter weight box, types 12.6 on the pad and taps Back.",
+                 "then": "The pad closes, the sheet stays open and the weight reads 12.6 kg. No system keyboard opened."
+                },
+                "authority": [
+                 {
+                  "src": "RUL",
+                  "at": "Owner decision 2026-10-15",
+                  "says": "Litter weight stays optional, typed on the design system's Measure and Numpad"
+                 }
+                ],
+                "result": "not-run"
                }
               ]
              },

@@ -26,7 +26,7 @@ The farm legibility check (`scripts/check-legibility.mjs`, law in `ux/design-sys
 | Who | Decides |
 |---|---|
 | **Agents** | Every design call: layout, hierarchy, copy within the rules, components and variants. They make the call, build it well and ship it behind the gates. They don't ask first. |
-| **Gates** | Whether a change merges. Merges are automatic once every gate for the change class passes. A change that moves any screen merges only on `GATE PASS`: the mechanical checks AND the blind judge. A mechanical pass alone merges only a change that moves no screen. |
+| **Gates** | Whether a change merges. Merges are automatic once every gate for the change class passes. A change that moves any screen merges only on `GATE PASS`: the mechanical checks AND the blind judge. A mechanical pass alone merges only a change that moves no screen. A design-system component page (the atlas's Components → <Name> → <variant>) counts as a screen: the page teaches the law, so it must follow it, and a change that moves one is judged before/after like any screen, never as copy only. |
 | **Owner** | Product rules (behaviour, scope, what is saved, permissions) and approval of screens. The owner reacts to built work afterwards. Only **product rules** go to the backlog as decision items; design calls never do. |
 
 An agent score is never shown as approval. The approved version of a screen stays visible until the owner promotes the new one.
@@ -124,7 +124,7 @@ Every rejected owner example is a fixture each gate must fail ([gate.md](briefs/
 | `node scripts/polish-loop.mjs <command> <feature>` | The polish loop's ledger: baseline, rounds, grades, stop conditions and the review packet ([polish-loop.md](briefs/polish-loop.md)) |
 | `node scripts/feature-state.mjs <feature>` | Where a feature stands and what `/design` drives next: chart, plan, scenarios, build, polish, review or freeze |
 | `node scripts/component-jobs.mjs [word]` | One line per design-system component saying what job it does, so a builder names the existing component before building a new one |
-| `node scripts/shoot-screens.mjs <out>` | Screenshots atlas screens bare at any widths and languages, and says where Chinese doesn't render |
+| `node scripts/shoot-screens.mjs <out>` | Screenshots atlas screens bare at any widths and languages, and says where Chinese doesn't render; `--components` adds the design system's variant pages |
 
 ## Briefs
 
