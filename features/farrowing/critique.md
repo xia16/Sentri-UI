@@ -307,3 +307,42 @@ Held against the Farrowing room (its dock: one dark primary, Back outlined) and 
 - Reach: 50 screens move, all of them rendering a disabled or waiting control: environment (page, sensor-week, sensor-other), farrowing 14 (before, death, leave-edit, edit, born, task-blocked, edit-finished, foster, reconcile, pen-note, pen-fault, piglet-care, piglet-identity, piglet-death), piglet-processing 13 (sheet-coming, sheet-todo, sheet-breeders, sheet-late, sheet-done, sheet-notch, adjust-count, give-ids, counts, weight, record-death, move-piglets, set-count), pregnancy.check, feed-plan (editor, end-date), pig-list.health, pig-profile 7 (production-task, miscarriage, batch-membership, measure, body-condition, note, not-in-pig), health-record 5 (record-health, condition-picker, care-instructions, resolve-conditions, treatment), fostering (type, receive, result), move.transfer-sow. 4 more differ in one shot only by under 0.04% (assistant.finding and farrowing.search-results, which the gate marks unstable on base; farrowing.search-none, piglet-processing.more-actions): identical by eye, render noise. 237 identical; none broken.
 - Every moved screen: only the waiting footer button (dashed rim), a floor key (dashed, `ink-2` glyph), a disabled picker (Move's Destination pen: solid rim to dashed) or the Environment fan controls changed; layout, copy and the 360 Chinese footers are unchanged.
 - **Better because** unavailable is now said by the face and the rim, never by faded words, and no waiting control looks live.
+
+---
+
+# Finish farrowing: one titled condition form (2026-10-15)
+
+Scope: `farrowing.finish` and `farrowing.edit-finished` (the Finish sheet, and the "Edit finish details" form that shares its fields). Change class: behaviour (Assisted is a required No / Yes, No preselected) with an opt-in shared-component variant (ChoiceList's boxed key face, Measure's row layout). Mode: polish. Owner ruling 2026-10-15: the design is decided (option "Ink ring" of `ux/system/finish-form-rhythm.html`); there are no competing directions, so each render is judged against its baseline. Baseline: `c4f98e2` (the worktree base), `node scripts/shoot-screens.mjs <out> --screens farrowing.finish,farrowing.edit-finished --widths 390 --langs en`, plus the answered and open-field states of the old optional chips.
+
+## Keep
+
+- **The Born · Alive · Dead totals panel.** One look at what was counted; the first question on this sheet ("is the count right before I lock it?"). Unchanged.
+- **The Weak and Deformed steppers** (Stepper `row`: label left, `− n +` right, a rule between rows, 60px). They are the sheet's real questions and each tap saves at once; their behaviour and the 144px right column are the grid the new rows follow.
+- **The footer: Back and the Finish farrowing hold** (56px, HOLD TO FINISH). Unchanged.
+- **Litter weight and Assisted remain facts the worker can record at finish**, and read as before on the locked record.
+
+## Problems
+
+- **major** The two boxed optional chips (`+ Litter weight`, `+ Assistance`) outweigh the questions above them: two filled, bordered half-width boxes under two quiet rows, the inverse of the hierarchy (Weak and Deformed are the questions; the chips are afterthoughts). Evidence: `base/farrowing.finish/en-390.png`; owner 2026-10-15 ("no boxed optional rows").
+- **major** The chips reflow and swap places after an answer, so targets move under the thumb. Evidence (baseline probe at 390): Litter weight is at y 673 before Assistance is answered and at y 533 after, and widens from 172px to full width; the answered Assistance row and its radios take over the space.
+- **major** The answer renders detached under the wrong chip: after tapping Litter weight the field sits below Assistance (`base-weight-open.png`); after tapping Assistance its No / Yes radios sit under the row, and a Clear. The worker reads a question and finds its answer under a different one.
+- **major** The weight is a page-built `<input type="number">`: a second tap into a field opens the system keyboard, which covers Hold to finish. The design system's Measure and Numpad do this job (docked pad, no system keyboard, the same pad as piglet processing's litter weight).
+- **minor** The "Piglet condition" legend (14px / 600) is bold, which the type law forbids for headings (section titles are 16px / 500 with a 16px muted icon), and its description line ("Among the 9 alive piglets · 0 if none") repeats a fact the totals panel shows two lines above (Alive 9); the steppers already stop at the alive count. P3: nothing said twice.
+- **minor** Assisted has an unanswered state and a Clear for a yes / no fact. Owner 2026-10-15: a required No / Yes with No preselected; no Clear.
+
+## Parts
+
+| Part | Drawn by today | The component whose job it is | Keep / fix / cut |
+|---|---|---|---|
+| Born · Alive · Dead | `metrics()` (TaskTotals) | TaskTotals | **keep** |
+| "Piglet condition" legend | page-built `<fieldset><legend>` (14px / 600) | Heading, kind `section` (16px / 500, 16px icon) | **fix**: Heading with the `health` icon |
+| "Among the N alive piglets · 0 if none" | page-built `<p>` | none (cut) | **cut**: Alive is on screen, the steppers stop at it |
+| Weak, Deformed | `farmStepper` → Stepper `row` | Stepper | **keep** |
+| Assisted | `optRow` + ChoiceList inline radios (page-built reveal) | ChoiceList Inline Choice | **fix**: ChoiceList inline, boxed key face (opt-in `face:'key'`), No preselected, no Clear |
+| Litter weight | `optRow` + page-built `<input type=number>` | Measure (+ Numpad) | **fix**: Measure row layout, the docked Numpad; "Optional" beside the label |
+| Edit finish details form | the same fields, page-built twice (`optional()`, `finish-question`) | the same components | **fix**: one set of rows for both forms |
+| Footer, hold | `footer()`, `hold()` | Sheet footer, Button hold | **keep** |
+
+## Self-crit
+
+(Filled in below as each render is judged against `c4f98e2`.)

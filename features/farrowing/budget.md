@@ -113,3 +113,37 @@ Scope: the facts a disabled or waiting control displays. The change adds and cut
 - **Settled**: the label, the current option and the picker value, in ink (or `ink-2` on a floor key), at the control's own size and weight.
 - **Watch**: unavailability, quiet: the flat disabled surface and the 1px dashed `control-border` rim. No colour, no icon added.
 - **Cut**: faded text as the signal (opacity, `disabled-ink` text).
+
+---
+
+## Finish farrowing and Edit finish details (2026-10-15)
+
+Owner ruling 2026-10-15 (behaviour: Assisted is required, No preselected; litter weight stays optional). Every fact the Finish sheet displays, kept facts included, with the question it answers there.
+
+### Inventory and questions
+
+| Fact | State | Question it answers there | Level |
+|---|---|---|---|
+| Title `Finish farrowing` | always | What am I doing? | Settled (the header) |
+| Born · Alive · Dead (the totals) | always | Is the count right before I lock it? | Watch (the figures lead the body) |
+| Section heading `Piglet condition` (health icon) | always | What is this group of questions about? | Settled (quiet) |
+| `Weak` and its count, `Deformed` and its count | always; counts start at 0 and stop at Alive | How many of the alive piglets are weak? deformed? | Act now (the stepper keys) |
+| `Assisted` and `No` · `Yes` | always; No chosen on a new finish | Was this farrowing assisted? | Act now (the keys) when the answer is Yes, else Settled |
+| `Litter weight` and `Optional`, the kg box | always; the box shows a dash until a weight is typed | Do I have the litter's weight to add? | Settled (quiet word, empty dash) |
+| The numpad | only while the weight box is open | What weight am I typing? | Act now (while open) |
+| Footer: Back, `Finish farrowing` / HOLD TO FINISH | always | How do I leave, and how do I commit? | Act now (the one dark control) |
+
+### Cut
+
+- **The description line `Among the 9 alive piglets · 0 if none`.** It answers nothing new: Alive is in the totals panel two lines above, the steppers start at 0 and stop at the alive count, so "0 if none" is what the stepper already shows.
+- **The two boxed optional chips `+ Litter weight` and `+ Assistance`**, and everything they revealed (the system-keyboard weight field, the `Clear` link). Assisted is a required No / Yes now (no unanswered state, no Clear); the weight is a row.
+- **`Optional` once, on the weight row, beside its label (13px muted).** Not twice, and not on Assisted (it is required).
+- **Zeros in the weight box.** Empty is a muted dash with its unit, never `0 kg` (missing is not zero).
+
+### Levels
+
+Only Weak, Deformed and Assisted ask for an action, and each is one row of one 48px control in the same right column; the Finish hold is the only dark control. The weight row is quieter: the word `Optional` and a dash. Nothing the header says is repeated; the structure (a titled section, the rows in one list, the footer) is kept.
+
+### Edit finish details
+
+The same three rows with the same controls (the totals panel does not appear there). Kept facts and their questions are the Edit record's (what was recorded, what changes). The `was N` notes on the steppers and the changes summary behind the Save correction button are kept. For an old record whose Assisted was never recorded (null), the keys show neither chosen and the read-only facts still read `Not recorded`; history is not rewritten.
