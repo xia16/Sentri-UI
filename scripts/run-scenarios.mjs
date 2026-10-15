@@ -10,6 +10,7 @@ import { join, dirname, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createServer } from 'node:net';
 import { walkTree, parseDuration, stepKind } from './scenario-tree.mjs';
+import { timedOutOnly } from './loop-rules.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const { chromium } = playwright();
@@ -318,6 +319,21 @@ async function runLeaf(browser, leaf, lang, width) {
   return { lang, width, result, failures, skipped, notes, evidence };
 }
 
+// A run whose only failure is a navigation timeout (the machine was busy, not the design) runs once more in fresh contexts.
+// Timing out again fails it as a slow machine, never as a design failure; an assertion failure never retries.
+async function runWithRetry(browser, leaf, lang, width) {
+  const first = await runLeaf(browser, leaf, lang, width);
+  if (first.result !== 'fail' || !timedOutOnly(first.failures)) return first;
+  console.log(`retry    ${leaf.node.id} ${lang}-${width}: ${first.failures[0].got}`);
+  const again = await runLeaf(browser, leaf, lang, width);
+  again.retried = first.failures.map((f) => f.got);
+  if (again.result === 'fail' && timedOutOnly(again.failures)) {
+    again.slow = true;
+    again.failures = again.failures.map((f) => ({ ...f, what: `slow machine (timed out twice): ${f.what}`, tag: null }));
+  }
+  return again;
+}
+
 // ---- run ----
 const browser = await chromium.launch();
 const out = [];
@@ -327,8 +343,9 @@ for (const leaf of leaves) {
   const row = { id: n.id, tree: n.tree || null, branch: leaf.branch, label: n.label, gwt: n.gwt || null, path: leaf.path, authority: n.authority || [], result: null, hard: [], runs: [] };
   if (n.type === 'decision-blocker') { row.result = 'blocked'; row.question = n.question; row.sources = n.sources; out.push(row); console.log(`blocked  ${n.id}  ${n.question || ''}`); continue; }
   if (n.status === 'pending') { row.result = 'pending'; row.why = n.why || ''; out.push(row); console.log(`pending  ${n.id}`); continue; }
-  for (const lang of n.langs || langs) for (const width of n.widths || widths) row.runs.push(await runLeaf(browser, leaf, lang, width));
+  for (const lang of n.langs || langs) for (const width of n.widths || widths) row.runs.push(await runWithRetry(browser, leaf, lang, width));
   row.result = row.runs.some((r) => r.result === 'fail') ? 'fail' : row.runs.some((r) => r.result === 'blocked') ? 'blocked' : 'pass';
+  if (row.result === 'fail' && row.runs.every((r) => r.result !== 'fail' || r.slow)) row.slow = true;
   row.hard = [...new Set(row.runs.flatMap((r) => r.failures.map((f) => f.tag)).filter((t) => HARD.includes(t)))];
   out.push(row);
   const first = row.runs.flatMap((r) => r.failures.map((f) => `${r.lang}-${r.width}: ${f.what} → ${f.got}`))[0] || '';
@@ -347,12 +364,12 @@ for (const x of out) for (const lang of new Set(x.runs.map((r) => r.lang))) {
 }
 const report = {
   feature, commit, dirty, ran: new Date().toISOString(), base, langs, widths,
-  nodes: nodeCount, summary: { pass: count('pass'), fail: count('fail'), blocked: count('blocked'), pending: count('pending') }, byLang, byBranch,
+  nodes: nodeCount, summary: { pass: count('pass'), fail: count('fail'), blocked: count('blocked'), pending: count('pending'), slow: out.filter((x) => x.slow).length }, byLang, byBranch,
   hardFailures: out.filter((x) => x.hard.length).map((x) => ({ id: x.id, hard: x.hard })),
   leaves: out,
 };
 const reportPath = join(root, 'review', `scenarios-${feature}.json`);
 if (!only) writeFileSync(reportPath, JSON.stringify(report, null, 1) + '\n');
-console.log(`\n${feature} @ ${commit.slice(0, 7)}${dirty ? ' (dirty)' : ''}: pass ${report.summary.pass} · fail ${report.summary.fail} · blocked ${report.summary.blocked} · pending ${report.summary.pending}${only ? '' : '  → ' + relative(root, reportPath)}`);
+console.log(`\n${feature} @ ${commit.slice(0, 7)}${dirty ? ' (dirty)' : ''}: pass ${report.summary.pass} · fail ${report.summary.fail}${report.summary.slow ? ` (${report.summary.slow} only a slow machine: timed out twice, not a design failure)` : ''} · blocked ${report.summary.blocked} · pending ${report.summary.pending}${only ? '' : '  → ' + relative(root, reportPath)}`);
 for (const [l, b] of Object.entries(byLang)) console.log(`  ${l}: pass ${b.pass} · fail ${b.fail} · blocked ${b.blocked} (leaves that ran)`);
 process.exit(report.summary.fail ? 1 : 0);

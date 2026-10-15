@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { queueAhead, calibrationProblems, budgetProblems, critiqueProblems, pageStyling, addedLines, effectiveClass, classifyScreens, checkVerdict, checkGrades, worstFirst, isClean, loopStatus, touchesSystem, touchesTools, regressions,
-  pageOf, pageAssets, sharedFiles, outcomeLeaves, coverageLost } from '../scripts/loop-rules.mjs';
+  pageOf, pageAssets, sharedFiles, outcomeLeaves, coverageLost, reachOf, reachLine, shotsToTake, timedOutOnly, lockState, carryDecision, ghNetworkError } from '../scripts/loop-rules.mjs';
 
 test('a change to the bundle or tokens is a shared-component change whatever was declared', () => {
   assert.deepEqual(touchesSystem(['ux/design-system/components/bundle.css', 'features/farrowing/feature.json']), ['ux/design-system/components/bundle.css']);
@@ -275,4 +275,130 @@ test('a judge that rates an owner-rejected calibration pair better, or skips one
   const bad = calibrationProblems([{ calibration: [{ pair: 'c1', verdict: 'better' }] }], answers);
   assert.equal(bad.length, 2);
   assert.match(bad[0], /c1 better/); assert.match(bad[1], /c2 not rated/);
+});
+
+// ---------- the lighter gate ----------
+
+test('a scenario run retries only when every failure is a navigation timeout', () => {
+  assert.ok(timedOutOnly([{ what: 'run', got: 'page.goto: Timeout 30000ms exceeded.' }]));
+  assert.ok(timedOutOnly([{ what: 'back', got: 'page.goBack: Timeout 3000ms exceeded.' }, { what: 'run', got: 'page.waitForLoadState: Timeout 30000ms exceeded.' }]));
+  assert.ok(!timedOutOnly([]), 'a pass never retries');
+  assert.ok(!timedOutOnly([{ what: 'run', got: 'page.goto: Timeout 30000ms exceeded.' }, { what: '"Done" shown', got: 'absent' }]), 'an assertion failure never retries');
+  assert.ok(!timedOutOnly([{ what: 'run', got: 'page.waitForSelector: Timeout 8000ms exceeded.' }]), 'a page that never gets ready is the design');
+  assert.ok(!timedOutOnly([{ what: 'tap Done', got: 'control not tappable: Done (locator.click: Timeout 2500ms exceeded.)' }]));
+});
+
+test('a GitHub call that failed on the network retries; an answer GitHub gave never does', () => {
+  for (const e of ['Post "https://api.github.com/graphql": EOF', 'gh api repos/x/y/pulls/166/files failed: unexpected EOF', 'net/http: TLS handshake timeout',
+    'dial tcp: lookup api.github.com: no such host', 'proxyconnect tcp: dial tcp 127.0.0.1:9: connectex: No connection could be made because the target machine actively refused it.', 'wsarecv: An existing connection was forcibly closed by the remote host (connection reset)',
+    'HTTP 502: Bad Gateway (https://api.github.com/...)', 'HTTP 503', 'context deadline exceeded (Client.Timeout exceeded while awaiting headers)']) assert.ok(ghNetworkError(e), e);
+  for (const e of ['HTTP 404: Not Found (https://api.github.com/repos/x/y/pulls/9)', 'HTTP 422: No commit found for SHA: abc', 'HTTP 401: Bad credentials', '', null]) assert.ok(!ghNetworkError(e), String(e));
+});
+
+test('a gate lock is free, held by a live gate, or stale when its process is gone', () => {
+  assert.equal(lockState(null, () => true), 'free');
+  assert.equal(lockState({ pid: 42, sha: 'abc' }, (p) => p === 42), 'held');
+  assert.equal(lockState({ pid: 42, sha: 'abc' }, () => false), 'stale');
+  assert.equal(lockState({ sha: 'abc' }, () => true), 'stale');
+});
+
+test('base shots: reuse a screen at a width only when every language it needs is cached', () => {
+  const run = (screen, lang, width) => ({ screen, lang, width, file: `${screen}/${lang}-${width}.png`, ok: true });
+  const cached = [run('a', 'en', 390), run('a', 'zh', 390), run('b', 'en', 390), { ...run('c', 'en', 390), ok: false }, run('d', 'en', 390)];
+  const needs = [
+    { screen: 'a', width: 390, langs: ['en', 'zh'] }, // cached in full
+    { screen: 'b', width: 390, langs: ['en', 'zh'] }, // zh missing: shot again in both
+    { screen: 'b', width: 360, langs: ['en', 'zh'] },
+    { screen: 'c', width: 390, langs: ['en'] }, // a failed run is never reused
+    { screen: 'd', width: 390, langs: ['en'] }, // its png is gone
+    { screen: 'e', width: 390, langs: ['en'] },
+  ];
+  const r = shotsToTake(needs, cached, (f) => !f.startsWith('d/'));
+  assert.deepEqual(r.reuse.map((x) => x.file), ['a/en-390.png', 'a/zh-390.png']);
+  assert.deepEqual(r.take, [{ width: 390, langs: ['en', 'zh'], screens: ['b'] }, { width: 360, langs: ['en', 'zh'], screens: ['b'] }, { width: 390, langs: ['en'], screens: ['c', 'd', 'e'] }]);
+  assert.deepEqual(shotsToTake(needs.slice(0, 1), [run('a', 'en', 390), run('a', 'zh', 390)]).take, [], 'a complete cache shoots nothing');
+});
+
+const reachWorld = () => {
+  const screens = [
+    { id: 'farrowing.room', feature: 'farrowing', url: '/ux/system/farrowing-astra-concept.html?layout=focus' },
+    { id: 'move.transfer-sow', feature: 'move', url: '/ux/system/farrowing-astra-concept.html?layout=focus' },
+    { id: 'inspection.room', feature: 'inspection', url: '/ux/system/inspection-astra-concept.html' },
+    { id: 'piglet-processing.pens', feature: 'piglet-processing', url: '/ux/tasks/piglet-processing/simple/index.html?view=pens' },
+  ];
+  const assets = {
+    'ux/system/farrowing-astra-concept.html': ['ux/system/astra-surfaces.js', 'ux/system/farrowing-astra-concept.js', 'ux/design-system/components/bundle.js'],
+    'ux/system/inspection-astra-concept.html': ['ux/system/astra-surfaces.js', 'ux/system/inspection-astra-concept.js', 'ux/design-system/components/bundle.js'],
+    'ux/tasks/piglet-processing/simple/index.html': ['ux/tasks/piglet-processing/simple/app.js', 'ux/design-system/components/bundle.js'],
+  };
+  return { screens, assets, shared: sharedFiles(screens, assets) };
+};
+const reach = (files, scope = []) => reachOf({ ...reachWorld(), files, scope });
+
+test("reach: a page, or a file only one feature's pages load, reaches that feature; the scope is always in", () => {
+  const r = reach(['ux/tasks/piglet-processing/simple/app.js'], ['piglet-processing']);
+  assert.deepEqual([r.all, r.features], [false, ['piglet-processing']]);
+  assert.deepEqual(reach(['ux/system/inspection-astra-concept.js']).features, ['inspection']);
+  assert.deepEqual(reach(['ux/system/inspection-astra-concept.html']).features, ['inspection']);
+  assert.deepEqual(reach(['ux/system/inspection-astra-concept.js'], ['farrowing']).features, ['farrowing', 'inspection']);
+  assert.match(reachLine(reach(['ux/tasks/piglet-processing/simple/app.js']), 24), /^reach: 24 screen\(s\) in features piglet-processing \(ux\/tasks\/piglet-processing\/simple\/app\.js: a page of piglet-processing/);
+});
+
+test("reach: a feature's own folder reaches that feature", () => {
+  assert.deepEqual(reach(['features/weaning/budget.md', 'features/weaning/scenarios.json']).features, ['weaning']);
+  assert.equal(reach(['features/weaning/budget.md']).all, false);
+});
+
+test('reach: the bundle, tokens, the harness, the shooter, the atlas, packages and anything 2+ features load reach every screen', () => {
+  for (const f of ['ux/design-system/components/bundle.js', 'ux/design-system/tokens.css', 'ux/system/atlas-bare.js', 'scripts/shoot-screens.mjs', 'scripts/serve-ux.cjs', 'scripts/font-route.mjs',
+    'atlas/atlas.json', 'sections/mobile.json', 'package.json', 'package-lock.json', 'vendor/fonts/manifest.json',
+    'ux/system/astra-surfaces.js', 'ux/system/farrowing-astra-concept.js']) assert.equal(reach([f]).all, true, f);
+  assert.match(reachLine(reach(['ux/system/astra-surfaces.js']), 291), /^reach: all screens \(ux\/system\/astra-surfaces\.js: loaded by pages of 3 features\)/);
+});
+
+test('reach: a ux file no page loads by name reaches every screen, since a page may fetch it', () => {
+  const r = reach(['ux/laws/strings.json', 'docs/design-workflow/README.md']);
+  assert.equal(r.all, true);
+  assert.match(r.why[0], /ux\/laws\/strings\.json: no page loads it by name/);
+  assert.equal(reach(['ux/README.md']).all, true, 'prose inside ux/ is a ux file');
+});
+
+test('reach: docs, prose outside ux, CI, tests, agent settings and the other scripts reach no screen', () => {
+  const r = reach(['docs/design-workflow/briefs/gate.md', 'README.md', 'archive/notes.md', '.github/workflows/x.yml', 'tests/loop-rules.test.mjs', '.claude/skills/design/SKILL.md', 'scripts/gate.mjs', 'scripts/check-states.mjs']);
+  assert.deepEqual([r.all, r.features], [false, []]);
+  assert.match(reachLine(r, 0), /^reach: no screen \(docs\/design-workflow\/briefs\/gate\.md, README\.md, archive\/notes\.md and 5 more: draws no pixel\)$/);
+});
+
+test('reach: a file nothing classes falls back to every screen, and a page that loads a script reaches its feature first', () => {
+  assert.equal(reach(['references/figma/home.png']).all, true);
+  assert.equal(reach(['next.config.ts']).all, true);
+  const w = reachWorld();
+  w.assets['ux/system/inspection-astra-concept.html'].push('scripts/inspection-data.js');
+  assert.deepEqual(reachOf({ ...w, shared: sharedFiles(w.screens, w.assets), files: ['scripts/inspection-data.js'] }).features, ['inspection']);
+});
+
+test('carry: a pass carries over main moving on only by files that draw no pixel, merged in and nothing else', () => {
+  const mech = { candidate: 'c1', base: 'm1', ref: 'origin/ds/x' };
+  const ok = { pass: { candidate: 'c1', base: 'm1' }, mech, head: 'c2', main: 'm2', containsC: true, containsMain: true, ownCommits: [],
+    cand: { 'ux/system/inspection-astra-concept.js': 'blob1' }, carried: { 'ux/system/inspection-astra-concept.js': 'blob1' },
+    mainFiles: ['docs/design-workflow/README.md'], reach: reach(['docs/design-workflow/README.md']) };
+  const r = carryDecision(ok);
+  assert.ok(r.ok, r.why.join());
+  assert.match(r.why[0], /main moved m1 → m2 by 1 file\(s\) that draw no pixel/);
+  const no = (x, re) => { const d = carryDecision({ ...ok, ...x }); assert.ok(!d.ok, JSON.stringify(x)); assert.match(d.why.join(' | '), re); };
+  no({ pass: null }, /no GATE PASS is recorded for c1/);
+  no({ pass: { candidate: 'c1', base: 'm0' } }, /is against m0/);
+  no({ pass: { candidate: 'c1', base: 'm1', carried: { from: 'c0' } } }, /itself carried/);
+  no({ main: 'm1', head: 'c1' }, /main has not moved/);
+  no({ main: 'm1' }, /moved to c2 while main did not/);
+  no({ containsC: false }, /does not contain the gated commit c1/);
+  no({ containsMain: false }, /merge main forward first/);
+  no({ ownCommits: ['e1'] }, /1 commit\(s\) on the PR since the gate/);
+  no({ carried: { 'ux/system/inspection-astra-concept.js': 'blob2' } }, /the merge is not just main: ux\/system\/inspection-astra-concept\.js/);
+  no({ carried: { ...ok.carried, 'ux/system/home.js': 'blob3' } }, /the merge is not just main: ux\/system\/home\.js/);
+  no({ carried: {} }, /the merge is not just main/);
+  no({ mainFiles: ['ux/system/inspection-astra-concept.js'], reach: reach(['ux/system/inspection-astra-concept.js']) }, /both changed ux\/system\/inspection-astra-concept\.js.*screens of inspection/);
+  no({ mainFiles: ['ux/system/home.css'], reach: reach(['ux/system/home.css']) }, /can reach every screen/);
+  no({ mainFiles: ['features/weaning/budget.md'], reach: reach(['features/weaning/budget.md']) }, /can reach screens of weaning/);
+  no({ reach: null }, /can reach every screen/);
 });

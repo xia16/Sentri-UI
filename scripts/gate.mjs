@@ -1,23 +1,28 @@
 // The mechanical gate on the exact merge candidate: docs/design-workflow/briefs/gate.md §1, plus the screen diff and the
 // before/after pairs the judge decides on (§3-4).
 // Usage: node scripts/gate.mjs --candidate <ref> --scope <feature,...> [--class copy|presentation|behaviour|shared]
-//                              [--mode normal|refactor] [--out <dir>] [--quick] [--keep]
+//                              [--mode normal|refactor] [--out <dir>] [--quick] [--all] [--keep]
 //   --candidate  the branch (or commit) to merge; it must already contain origin/main (merge main forward first)
 //   --scope      the features the change means to touch; a changed screen elsewhere makes it a shared-component change
 //   --quick      compare only the scope's screens (a builder's self-check; the gate itself never runs quick)
+//   --all        shoot every screen in full, whatever the change's reach (by default: its reach in full, a tripwire elsewhere)
+// One gate runs at a time on a machine (a lock in the git common dir); base shots are cached per main commit.
 // Run it from an up-to-date main checkout, never from the candidate: a candidate does not grade itself with its own gate.
 // Writes <out>/mechanical.json and, for every changed, new or removed screen, <out>/pairs/<screen>/<lang>-<width>.png
 // (base | candidate) at 390 and 360 in EN and ZH.
 // Exit 0 when every mechanical check passes; the judge (gate.md) then writes <out>/verdict.json, and
 // `node scripts/gate.mjs --verdict <out>` checks it against mechanical.json, the PR head and origin/main.
+// When main has moved on since a GATE PASS by files that draw no pixel and the PR merged it in and nothing else,
+// `node scripts/gate.mjs --carry <out>` records the pass for the new head without shooting a screen.
 import { spawn, spawnSync } from 'node:child_process';
 import { pwPath, playwright } from './playwright-path.mjs';
 import { createServer } from 'node:net';
+import { createHash } from 'node:crypto';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { CLASSES, screensOf, pageOf, pageAssets, sharedFiles, coverageLost, effectiveClass, classifyScreens, checkVerdict, touchesSystem, touchesTools, queueAhead as queueOf, budgetProblems, critiqueProblems, pageStyling, addedLines, calibrationProblems } from './loop-rules.mjs';
+import { CLASSES, screensOf, pageOf, pageAssets, sharedFiles, coverageLost, effectiveClass, classifyScreens, checkVerdict, touchesSystem, touchesTools, queueAhead as queueOf, budgetProblems, critiqueProblems, pageStyling, addedLines, calibrationProblems, lockState, shotsToTake, reachOf, reachLine, carryDecision, ghNetworkError } from './loop-rules.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -27,7 +32,23 @@ const opt = (k) => { const i = argv.indexOf('--' + k); return i >= 0 && argv[i +
 const flag = (k) => argv.includes('--' + k);
 const short = (s) => String(s || '?').slice(0, 7);
 const VERDICT_FILE = /^verdict(-[\w.-]+)?\.json$/;
-function passRecord(sha) { return path.join(path.resolve(root, git(['rev-parse', '--git-common-dir']).out.trim()), 'sentri-gate', `${sha}.json`); }
+// The gate's own files live in the git common dir, so every worktree on this machine sees them: pass records, the lock, base shots.
+const gateDir = () => path.join(path.resolve(root, git(['rev-parse', '--git-common-dir']).out.trim()), 'sentri-gate');
+function passRecord(sha) { return path.join(gateDir(), `${sha}.json`); }
+// Every GitHub call the gate makes (the queue, PR files, statuses): a network error (EOF, TLS, a timeout, a 5xx) is tried twice more
+// after a short wait, and then reported as "GitHub could not be reached", never read as an answer. An answer is never retried.
+function gh(args) {
+  for (let n = 1; ; n++) {
+    const r = spawnSync('gh', args, { cwd: root, encoding: 'utf8', maxBuffer: 64 << 20, timeout: 60e3 });
+    if (r.status === 0) return { ok: true, out: r.stdout || '' };
+    const err = `${r.stderr || ''} ${r.error?.code || ''} ${r.error?.message || ''}`.trim();
+    const line = (err.split('\n').find((l) => l.trim()) || `exit ${r.status}`).trim();
+    if (!ghNetworkError(err)) return { ok: false, why: `GitHub answered: ${line}` };
+    if (n === 3) return { ok: false, why: `GitHub could not be reached (3 tries): ${line}` };
+    Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 3000 * n);
+  }
+}
+const postStatus = (sha, state, description) => gh(['api', '--method', 'POST', `repos/{owner}/{repo}/statuses/${sha}`, '-f', `state=${state}`, '-f', 'context=sentri/gate', '-f', `description=${description}`]);
 function git(args, cwd = root) { const r = spawnSync('git', args, { cwd, encoding: 'utf8', maxBuffer: 64 << 20 }); return { code: r.status, out: r.stdout || '', err: r.stderr || '' }; }
 
 // ---------- --verdict <out>: check the judge's verdict against the mechanical result ----------
@@ -65,8 +86,8 @@ if (opt('verdict')) {
   const passFile = passRecord(mech.candidate);
   // The same result as a commit status on GitHub: branch protection on main can require "sentri/gate", which makes GitHub itself
   // refuse an ungated merge however it is attempted (the local merge guard is only a convenience).
-  spawnSync('gh', ['api', '--method', 'POST', `repos/{owner}/{repo}/statuses/${mech.candidate}`, '-f', `state=${ok ? 'success' : 'failure'}`,
-    '-f', 'context=sentri/gate', '-f', `description=${ok ? 'GATE PASS' : 'GATE FAIL'} against ${short(mech.base)}`], { cwd: root, encoding: 'utf8' });
+  const posted = postStatus(mech.candidate, ok ? 'success' : 'failure', `${ok ? 'GATE PASS' : 'GATE FAIL'} against ${short(mech.base)}`);
+  if (!posted.ok) console.log(`  - the sentri/gate status was not posted (${posted.why}): run --verdict again; until then GitHub ${ok ? 'refuses the merge' : 'may still show an earlier status'}`);
   if (!ok) fs.rmSync(passFile, { force: true });
   if (ok) {
     fs.mkdirSync(path.dirname(passFile), { recursive: true });
@@ -76,19 +97,130 @@ if (opt('verdict')) {
   process.exit(ok ? 0 : 1);
 }
 
+// ---------- --carry <out>: a GATE PASS carried over main moving on by files that draw no pixel ----------
+// The gate passed C against main M1 (<out>/mechanical.json and its pass record). Main is now M2 and the PR head C2. The pass is
+// recorded for C2 without shooting a screen only when C2 is C merged with M2 and nothing else (every path the candidate changed is
+// as it was on C, no other path differs from M2, no commit of its own since C) and main's change M1..M2 reaches no screen (reachOf).
+// Anything else: run the gate again. A stricter gate landing on main does not void a pass by itself (README, Approvals).
+if (opt('carry')) {
+  const dir = opt('carry');
+  const refuse = (why) => { console.log('NOT CARRIED: run the gate again'); for (const w of [].concat(why)) console.log('  -', w); process.exit(1); };
+  let mech;
+  try { mech = JSON.parse(fs.readFileSync(path.join(dir, 'mechanical.json'), 'utf8')); } catch (e) { refuse(`${path.join(dir, 'mechanical.json')}: ${e.message.split('\n')[0]}`); }
+  if (!mech.candidate || !mech.base || mech.quick) refuse('mechanical.json is not a full gate run on a candidate');
+  const fetched = git(['fetch', '-q', 'origin']);
+  if (fetched.code !== 0) refuse(`git fetch origin failed, so the PR head and origin/main can't be checked: ${fetched.err.trim().split('\n')[0]}`);
+  const stale = git(['diff', '--name-only', 'origin/main', '--', 'scripts', 'docs/design-workflow', 'package.json']).out.trim().split(/\r?\n/).filter(Boolean);
+  if (stale.length) refuse(`this checkout's ${stale.slice(0, 3).join(', ')} differ from origin/main: carry from a checkout of origin/main`);
+  const sha = (r) => (r ? git(['rev-parse', '--verify', '--quiet', `${r}^{commit}`]).out.trim() : '');
+  const C = mech.candidate, M1 = mech.base, head = sha(mech.ref), main = sha('origin/main');
+  let pass = null;
+  try { pass = JSON.parse(fs.readFileSync(passRecord(C), 'utf8')); } catch {}
+  const changed = (a, b) => git(['diff', '--name-only', '--no-renames', a, b]).out.split(/\r?\n/).filter(Boolean);
+  const blobs = (a, b, at) => Object.fromEntries(changed(a, b).map((f) => [f, git(['rev-parse', '--verify', '--quiet', `${at}:${f}`]).out.trim() || null]));
+  // An atlas commit's screens and what their pages load, read straight from git.
+  const pagesAt = (rev) => {
+    const tree = new Set(git(['ls-tree', '-r', '--name-only', rev]).out.split(/\r?\n/).filter(Boolean));
+    const show = (p) => (tree.has(p) ? git(['show', `${rev}:${p}`]).out : null);
+    let screens = [];
+    try { screens = screensOf(JSON.parse(show('atlas/atlas.json'))); } catch {}
+    const assets = {};
+    for (const p of new Set(screens.map((s) => pageOf(s.url)))) { const html = show(p); assets[p] = html == null ? [] : pageAssets(html, p).filter((a) => tree.has(a)); }
+    return { screens, assets };
+  };
+  const ready = head && main && main !== M1;
+  const mainFiles = ready ? changed(M1, main) : [];
+  let reach = null;
+  if (ready) {
+    const [a, b] = [pagesAt(M1), pagesAt(main)];
+    const screens = [...a.screens, ...b.screens], assets = { ...a.assets };
+    for (const [p, l] of Object.entries(b.assets)) assets[p] = [...new Set([...(assets[p] || []), ...l])];
+    reach = reachOf({ files: mainFiles, screens, assets, shared: sharedFiles(screens, assets), scope: [] });
+  }
+  const d = carryDecision({
+    pass, mech, head, main, reach, mainFiles,
+    containsC: ready && git(['merge-base', '--is-ancestor', C, head]).code === 0,
+    containsMain: ready && git(['merge-base', '--is-ancestor', main, head]).code === 0,
+    ownCommits: ready ? git(['rev-list', '--no-merges', head, `^${C}`, `^${main}`]).out.split(/\s+/).filter(Boolean) : [],
+    cand: ready ? blobs(M1, C, C) : {},
+    carried: ready ? blobs(main, head, head) : {},
+  });
+  if (!d.ok) refuse(d.why);
+  const desc = `GATE PASS carried from ${short(C)}: main ${short(M1)}..${short(main)} draws no pixel`;
+  const posted = postStatus(head, 'success', desc);
+  fs.mkdirSync(path.dirname(passRecord(head)), { recursive: true });
+  fs.writeFileSync(passRecord(head), JSON.stringify({ candidate: head, base: main, ref: mech.ref, out: path.resolve(dir), at: new Date().toISOString(), carried: { from: C, base: M1, verdict: 'GATE PASS', mainFiles } }, null, 2));
+  console.log(`GATE PASS ${short(head)} (carried)`);
+  console.log(`  - the gated pass: ${short(C)} against main ${short(M1)}`);
+  for (const w of d.why) console.log('  -', w);
+  if (!posted.ok) console.log(`  - the sentri/gate status was not posted (${posted.why}): run --carry again; until then GitHub refuses the merge`);
+  console.log(`merge: gh pr merge <n> --squash --match-head-commit ${head}`);
+  process.exit(0);
+}
+
 const ref = opt('candidate');
 const declared = opt('class') || 'presentation';
 const mode = opt('mode') || 'normal';
 const scope = (opt('scope') || '').split(',').map((s) => s.trim()).filter(Boolean);
 if (!ref || !CLASSES.includes(declared) || !['normal', 'refactor'].includes(mode) || (mode === 'normal' && !scope.length)) {
-  console.error('usage: node scripts/gate.mjs --candidate <ref> --scope <feature,...> [--class copy|presentation|behaviour|shared] [--mode normal|refactor] [--out <dir>] [--quick] [--keep]');
+  console.error('usage: node scripts/gate.mjs --candidate <ref> --scope <feature,...> [--class copy|presentation|behaviour|shared] [--mode normal|refactor] [--out <dir>] [--quick] [--all] [--keep]');
   console.error('       node scripts/gate.mjs --verdict <out dir>');
+  console.error('       node scripts/gate.mjs --carry <out dir>');
   process.exit(2);
 }
 const out = path.resolve(opt('out') || path.join(os.tmpdir(), `sentri-gate-${Date.now()}`));
 fs.mkdirSync(out, { recursive: true });
 // A rerun into the same folder starts clean: old shots, pairs and verdicts are about a mechanical run that no longer exists.
 for (const f of ['shots', 'pairs', 'mechanical.json', ...fs.readdirSync(out).filter((f) => VERDICT_FILE.test(f))]) fs.rmSync(path.join(out, f), { recursive: true, force: true });
+
+// ---------- one gate at a time ----------
+// Two gates on one machine starve each other's browsers into timeouts (#164), so every gate run, a builder's --quick included,
+// holds one lock beside the pass records for its whole run. A second gate waits; a lock whose process is gone is stale and is
+// taken over. The lock goes on every exit: finish, a signal, a crash (the exit handler below).
+const lockFile = path.join(gateDir(), 'gate.lock');
+const alive = (pid) => { try { process.kill(pid, 0); return true; } catch (e) { return e.code === 'EPERM'; } };
+const lockAs = (sha) => JSON.stringify({ pid: process.pid, sha, ref, at: new Date().toISOString() });
+function releaseLock() { try { if (JSON.parse(fs.readFileSync(lockFile, 'utf8')).pid === process.pid) fs.rmSync(lockFile, { force: true }); } catch {} }
+for (const sig of ['SIGINT', 'SIGTERM', 'SIGHUP', 'SIGBREAK']) process.on(sig, () => { console.log(`\n${sig}: the gate stops`); process.exit(130); });
+const waited = await (async () => {
+  fs.mkdirSync(path.dirname(lockFile), { recursive: true });
+  const t0 = Date.now(), tmp = `${lockFile}.${process.pid}`;
+  let said = '';
+  for (;;) {
+    // Created whole or not at all: a hard link to a finished file, so a reader never sees half a lock.
+    fs.writeFileSync(tmp, lockAs(git(['rev-parse', '--verify', '--quiet', ref + '^{commit}']).out.trim()));
+    try { fs.linkSync(tmp, lockFile); fs.rmSync(tmp, { force: true }); break; } catch (e) { fs.rmSync(tmp, { force: true }); if (e.code !== 'EEXIST') throw e; }
+    let raw, lock = null;
+    try { raw = fs.readFileSync(lockFile, 'utf8'); } catch { continue; } // released between the two calls
+    try { lock = JSON.parse(raw); } catch {}
+    if (!lock || lock.pid === process.pid || lockState(lock, alive) === 'stale') {
+      // Only the stale lock read above is removed, never one another gate has taken since.
+      try { if (fs.readFileSync(lockFile, 'utf8') === raw) { fs.rmSync(lockFile); console.log(`taking over a stale gate lock: pid ${lock?.pid ?? '?'} (the gate on ${short(lock?.sha)}) is gone`); } } catch {}
+      continue;
+    }
+    const line = `waiting for the gate on ${short(lock.sha)} (pid ${lock.pid}) …`;
+    if (line !== said) { console.log(line); said = line; }
+    await new Promise((res) => setTimeout(res, 5000));
+  }
+  process.on('exit', releaseLock);
+  // The gate's own checks open browsers without waiting on it (scripts/playwright-path.mjs); every other browser run from this
+  // repo registered in sentri-gate/runs/ is waited for, and a new one waits for the gate.
+  process.env.SENTRI_GATE_PID = String(process.pid);
+  const runs = path.join(gateDir(), 'runs');
+  for (said = ''; ;) {
+    const live = [];
+    for (const f of (fs.existsSync(runs) ? fs.readdirSync(runs) : []).filter((x) => x.endsWith('.json'))) {
+      let r = null;
+      try { r = JSON.parse(fs.readFileSync(path.join(runs, f), 'utf8')); } catch {}
+      if (r && lockState(r, alive) === 'held' && r.pid !== process.pid) live.push(r); else fs.rmSync(path.join(runs, f), { force: true });
+    }
+    if (!live.length) break;
+    const line = `waiting for ${live.length} other browser run(s) from this repo: ${live.slice(0, 3).map((r) => `pid ${r.pid} ${r.what || ''}`.trim()).join('; ')} …`;
+    if (line !== said) { console.log(line); said = line; }
+    await new Promise((res) => setTimeout(res, 5000));
+  }
+  return Math.round((Date.now() - t0) / 1000);
+})();
 const started = Date.now();
 const env = { ...process.env, ...(pwPath ? { SENTRI_PLAYWRIGHT: pwPath } : {}) };
 const kids = [];
@@ -114,7 +246,7 @@ function runAsync(cmd, args, cwd, log) {
 const checks = [], gaps = [];
 const check = (name, ok, detail = '') => { checks.push({ check: name, result: ok === null ? 'skipped' : ok ? 'pass' : 'fail', detail }); console.log((ok === null ? 'SKIP' : ok ? 'PASS' : 'FAIL').padEnd(5), name, detail ? '— ' + detail.split('\n')[0] : ''); };
 
-const mech = { pass: false, candidate: '', base: '', ref, mode, scope, quick: flag('quick'), class: { declared }, checks, gaps, screens: null, pairs: [] };
+const mech = { pass: false, candidate: '', base: '', ref, mode, scope, quick: flag('quick'), class: { declared }, checks, gaps, screens: null, pairs: [], waited: waited + 's' };
 const finish = (code) => {
   mech.pass = code === 0 && checks.every((c) => c.result !== 'fail');
   mech.took = Math.round((Date.now() - started) / 1000) + 's';
@@ -134,6 +266,7 @@ if (!argv.includes('--quick')) {
 }
 mech.candidate = git(['rev-parse', '--verify', ref + '^{commit}']).out.trim();
 if (!mech.candidate) { check('candidate exists', false, `no commit for ${ref}`); finish(1); }
+{ const tmp = `${lockFile}.${process.pid}`; fs.writeFileSync(tmp, lockAs(mech.candidate)); try { fs.renameSync(tmp, lockFile); } catch { fs.rmSync(tmp, { force: true }); } } // the lock names what it gates
 fs.rmSync(passRecord(mech.candidate), { force: true }); // a new gate run voids any earlier pass for this commit until its verdict
 const contains = git(['merge-base', '--is-ancestor', mech.base, mech.candidate]).code === 0;
 check('candidate contains origin/main', contains, contains ? short(mech.base) : `merge main forward first: git fetch origin && git merge origin/main (R10, R12)`);
@@ -171,6 +304,25 @@ for (const p of new Set(baseScreens.map((s) => pageOf(s.url)))) {
 const shared = sharedFiles(baseScreens, assets);
 const touched = touchesSystem(files, shared);
 mech.shared = { files: Object.keys(shared).length, touched: Object.fromEntries(touched.map((f) => [f, shared[f] || []])) };
+// What the change can reach, from its files (both sides of a rename) and both sides' pages: only those screens are shot in full
+// (scripts/loop-rules.mjs reachOf; unsure is every screen). Every other screen is still shot once, at 390 in English, as a tripwire.
+const candScreens = screensOf(JSON.parse(fs.readFileSync(path.join(wt.cand, 'atlas/atlas.json'), 'utf8')));
+const reach = (() => {
+  if (mech.quick) return { all: false, features: [...scope].sort(), why: ['quick: the scope only'] };
+  if (flag('all')) return { all: true, features: [], why: ['--all'] };
+  const both = { ...assets };
+  for (const p of new Set(candScreens.map((s) => pageOf(s.url)))) {
+    const f = path.join(wt.cand, p);
+    const mine = fs.existsSync(f) ? pageAssets(fs.readFileSync(f, 'utf8'), p).filter((a) => fs.existsSync(path.join(wt.cand, a))) : [];
+    both[p] = [...new Set([...(both[p] || []), ...mine])];
+  }
+  const screens = [...baseScreens, ...candScreens];
+  const changed = git(['diff', '--name-only', '--no-renames', mech.base, mech.candidate]).out.split(/\r?\n/).filter(Boolean);
+  return reachOf({ files: changed, screens, assets: both, shared: sharedFiles(screens, both), scope });
+})();
+const inReach = (s) => reach.all || reach.features.includes(s.feature);
+mech.reach = { ...reach, screens: new Set(candScreens.filter(inReach).map((s) => s.id)).size };
+console.log(reachLine(reach, mech.reach.screens));
 const byFiles = effectiveClass({ declared, files, diffs: [], scope, shared });
 mech.class = { declared, effective: byFiles.cls, why: byFiles.why };
 if (byFiles.cls !== declared) console.log(`class: ${declared} → ${byFiles.cls} (${byFiles.why.join('; ')})`);
@@ -210,7 +362,8 @@ check('no conflict markers', !r.out.trim(), r.out.trim().split('\n').slice(0, 3)
   check('behaviour coverage kept', !lost.length, lost.length ? `removes behaviour coverage (${lost.slice(0, 3).join('; ')}): do it in its own workflow PR` : `${withLeaves.length} feature(s) with leaves`);
 }
 
-// check-states runs on both sides for every class, beside everything below (it takes minutes). A state that already fails on
+// check-states runs on both sides for every class, beside the shots and the checks below (it takes minutes), and is done before
+// the scenario leaves start. A state that already fails on
 // main (e.g. a stress-test label the copy pass hasn't removed yet) is main's debt, reported but not blocking; a problem main
 // doesn't have fails the gate. The committed report goes first, so a run that writes none can't pass on an old one.
 const statesRun = Promise.all(['base', 'cand'].map((k) => {
@@ -238,12 +391,65 @@ const shoot = (side, dir, extra) => new Promise((res) => {
   kids.push(p);
   p.on('exit', () => { try { res(JSON.parse(fs.readFileSync(path.join(dir, 'shots.json'), 'utf8')).runs.map((x) => ({ ...x, png: path.join(dir, x.file) }))); } catch { res(null); } });
 });
-// One shoot-screens per width: each width gets its own browser context either way, so this changes no pixel and halves the wait.
-const shootAll = (side, dir, extra) => Promise.all(WIDTHS.map((w) => shoot(side, path.join(dir, `w${w}`), [...extra, '--widths', String(w), '--langs', LANGS.join(',')])))
-  .then((parts) => (parts.includes(null) ? null : parts.flat()));
-console.log(`\nshooting every screen on base and candidate at ${WIDTHS.join('/')} × ${LANGS.join('/')} …`);
-const scopeArgs = mech.quick ? ['--feature', scope.join(',')] : [];
-const capture = Promise.all([shootAll('base', path.join(out, 'shots/base'), scopeArgs), shootAll('cand', path.join(out, 'shots/cand'), scopeArgs)]);
+// One shoot-screens per group of runs (a width and its languages, from shotsToTake): each width gets its own browser context
+// either way, so this changes no pixel and halves the wait. The screen ids go in a file: a list of hundreds is too long for a command line.
+const shootGroups = (side, dir, groups) => Promise.all(groups.map((g) => {
+  const sub = path.join(dir, `${g.width}-${g.langs.join('-')}`), list = path.join(dir, `${g.width}-${g.langs.join('-')}.json`);
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(list, JSON.stringify(g.screens));
+  return shoot(side, sub, ['--screens-file', list, '--widths', String(g.width), '--langs', g.langs.join(',')]);
+})).then((parts) => (parts.includes(null) ? null : parts.flat()));
+// The runs each side needs: { screen, width, langs }. A screen in the reach is shot in full; every other screen once at 390 in
+// English, the tripwire (a --quick self-check skips it).
+const TRIP = { width: 390, lang: 'en' };
+const needsOf = (list) => list.flatMap((s) => (inReach(s) ? WIDTHS.map((width) => ({ screen: s.id, width, langs: LANGS })) : mech.quick ? [] : [{ screen: s.id, width: TRIP.width, langs: [TRIP.lang] }]));
+
+// ---------- base shots, once per main commit ----------
+// Base is the same main commit gate after gate, so its shots are kept in <git common dir>/sentri-gate/base-shots/<base>/<key>/,
+// where the key hashes everything else that decides a base pixel: the shooter and its font routing, the vendored fonts, the base
+// side's harness and server, the Playwright version and browser build, the widths and languages. Only runs that rendered are kept;
+// a missing or failed run is shot again and added. Caches for bases older than main's last 10 commits are removed.
+const baseCache = (() => {
+  const h = createHash('sha256');
+  const add = (label, f) => h.update(`${label}\0`).update(fs.existsSync(f) ? fs.readFileSync(f) : 'missing').update('\0');
+  add('shoot', path.join(root, 'scripts/shoot-screens.mjs'));
+  add('fonts', path.join(root, 'scripts/font-route.mjs'));
+  const vendor = path.join(root, 'vendor/fonts');
+  for (const f of (fs.existsSync(vendor) ? fs.readdirSync(vendor, { recursive: true }) : []).map(String).sort()) if (fs.statSync(path.join(vendor, f)).isFile()) add(`vendor/${f}`, path.join(vendor, f));
+  add('bare', path.join(wt.base, 'ux/system/atlas-bare.js'));
+  add('serve', path.join(wt.base, 'scripts/serve-ux.cjs'));
+  const pw = JSON.parse(fs.readFileSync(path.join(pwPath, 'package.json'), 'utf8')).version;
+  const browser = (playwright().chromium.executablePath().match(/chromium[^\\/]*/) || ['?'])[0];
+  h.update(`playwright ${pw} ${browser} ${process.platform} widths ${WIDTHS} langs ${LANGS}`);
+  return path.join(gateDir(), 'base-shots', mech.base, h.digest('hex').slice(0, 16));
+})();
+{
+  const dir = path.join(gateDir(), 'base-shots'), keep = new Set(git(['rev-list', '--first-parent', '-n', '10', mech.base]).out.split(/\s+/).filter(Boolean));
+  for (const d of fs.existsSync(dir) ? fs.readdirSync(dir) : []) if (!keep.has(d)) fs.rmSync(path.join(dir, d), { recursive: true, force: true });
+}
+async function shootBase(needs) {
+  let cached = [];
+  try { cached = JSON.parse(fs.readFileSync(path.join(baseCache, 'shots.json'), 'utf8')).runs || []; } catch {}
+  const plan = shotsToTake(needs, cached, (f) => fs.existsSync(path.join(baseCache, f)));
+  const taken = plan.take.length ? await shootGroups('base', path.join(out, 'shots/base'), plan.take) : [];
+  if (!taken) return null;
+  const runs = new Map(cached.map((x) => [`${x.screen} ${x.lang}-${x.width}`, x]));
+  for (const { png, ...x } of taken.filter((t) => t.ok)) {
+    fs.mkdirSync(path.dirname(path.join(baseCache, x.file)), { recursive: true });
+    fs.copyFileSync(png, path.join(baseCache, x.file));
+    runs.set(`${x.screen} ${x.lang}-${x.width}`, x);
+  }
+  if (taken.some((t) => t.ok)) { const tmp = path.join(baseCache, `shots.json.${process.pid}`); fs.writeFileSync(tmp, JSON.stringify({ commit: mech.base, runs: [...runs.values()] })); fs.renameSync(tmp, path.join(baseCache, 'shots.json')); }
+  mech.baseShots = { cache: path.relative(gateDir(), baseCache).replace(/\\/g, '/'), reused: plan.reuse.length, taken: taken.length };
+  console.log(`base ${short(mech.base)}: ${plan.reuse.length} shot(s) from the cache, ${taken.length} taken`);
+  return [...plan.reuse.map((x) => ({ ...x, png: path.join(baseCache, x.file) })), ...taken.map((x) => (x.ok ? { ...x, png: path.join(baseCache, x.file) } : x))];
+}
+
+const needs = { base: needsOf(baseScreens), cand: needsOf(candScreens) };
+const runsOf = (n) => n.reduce((k, x) => k + x.langs.length, 0);
+console.log(`\nshooting ${runsOf(needs.cand)} run(s) on the candidate and ${runsOf(needs.base)} on base (cached base runs reused) at ${WIDTHS.join('/')} × ${LANGS.join('/')} …`);
+const shotsStarted = Date.now();
+const capture = Promise.all([shootBase(needs.base), shootGroups('cand', path.join(out, 'shots/cand'), shotsToTake(needs.cand).take)]);
 
 // The tests run while the screens are shot (each in its own process; this loop just waits).
 r = run('npm', ['test'], wt.cand);
@@ -254,6 +460,7 @@ r = run('npm', ['run', 'check'], wt.cand);
 check('npm run check', r.code === 0, r.all.find((l) => /atlas:/.test(l)) || r.tail);
 
 const [shotsBase, shotsCand] = await capture;
+mech.timings = { shots: Math.round((Date.now() - shotsStarted) / 1000) + 's' };
 if (!shotsBase || !shotsCand) { check('every screen shot on both sides', false, 'shoot-screens wrote no shots.json (its errors are above)'); finish(1); }
 
 const { chromium } = playwright();
@@ -338,6 +545,14 @@ if (declared !== 'shared' && mode !== 'refactor') {
   const out = (ec.outside || []).filter((d) => !mech.flaky?.includes(d.id));
   check('known reach: only SCOPE moved (P2)', !out.length, out.length ? `declared ${declared} for ${scope.join(', ')} but moves ${out.length} screen(s) of ${[...new Set(out.map((d) => d.feature))].join(', ')} (${out.slice(0, 3).map((d) => d.id).join(', ')}): give your part its own rule or token, or make it a declared shared change` : '');
 }
+// The tripwire: a screen outside the reach that moved means the reach was wrong for this change, and its other widths and Chinese
+// were never shot. It fails whatever the class; a deliberately wide change gates again with --all.
+if (!reach.all && !mech.quick) {
+  const missed = moved.filter((s) => !inReach(s) && !mech.flaky.includes(s.id));
+  check(`reach: nothing outside it moved (tripwire, ${TRIP.width} ${TRIP.lang})`, !missed.length, missed.length
+    ? `${missed.length} screen(s) outside the reach moved (${missed.slice(0, 3).map((s) => s.id).join(', ')}): the change reaches further than its files say; gate again with --all`
+    : `${candScreens.filter((s) => !inReach(s)).length} other screen(s) unchanged`);
+}
 if (ec.cls !== byFiles.cls) console.log(`class: ${declared} → ${ec.cls} (${ec.why.join('; ')})`);
 if (mode === 'refactor') check('refactor: every screen identical', !steady.length, steady.length ? steady.map((s) => s.id).slice(0, 5).join(', ') : mech.flaky.length ? `${mech.flaky.length} unstable on base, not counted` : '');
 const tools = touchesTools(files);
@@ -377,7 +592,7 @@ function queueAhead() {
 // read over REST: GraphQL (which gh pr list uses) is blocked in cloud sessions.
 function openPrs() {
   // Pages by number: --paginate follows Link headers with numeric-ID paths, which the cloud proxy refuses.
-  const page = (p, jq) => { const r = spawnSync('gh', ['api', p, '--jq', jq], { cwd: root, encoding: 'utf8', maxBuffer: 64 << 20 }); if (r.status) throw new Error(`gh api ${p} failed: ${(r.stderr || '').trim().split('\n')[0]}`); return r.stdout.trim().split('\n').filter(Boolean).map((l) => JSON.parse(l)); };
+  const page = (p, jq) => { const r = gh(['api', p, '--jq', jq]); if (!r.ok) throw new Error(`gh api ${p}: ${r.why}`); return r.out.trim().split('\n').filter(Boolean).map((l) => JSON.parse(l)); };
   const api = (p, jq) => { const all = []; for (let n = 1; n <= 30; n++) { const got = page(`${p}&page=${n}`, jq); all.push(...got); if (got.length < 100) break; } return all; };
   try {
     return api('repos/{owner}/{repo}/pulls?state=open&per_page=100', '.[] | {number, headRefName: .head.ref, headRefOid: .head.sha, createdAt: .created_at, isDraft: .draft}').map((p) => ({
@@ -438,6 +653,12 @@ if (changed.length) {
 }
 
 // ---------- scenario leaves: the scope's features, every feature whose screens changed, every feature a touched shared file reaches ----------
+// They run alone: a gate's own check-states (both sides) running beside them starved their page loads into timeouts (#164).
+// The shots finished above; check-states is awaited here.
+let t0 = Date.now();
+const statesDone = await statesRun;
+mech.timings.statesWait = Math.round((Date.now() - t0) / 1000) + 's';
+t0 = Date.now();
 const runner = fs.existsSync(path.join(wt.cand, 'scripts/run-scenarios.mjs'));
 const noLeaves = [];
 for (const f of new Set([...scope, ...[...screens.diff, ...screens.new].map((s) => s.feature), ...touched.flatMap((t) => shared[t] || [])])) {
@@ -446,11 +667,12 @@ for (const f of new Set([...scope, ...[...screens.diff, ...screens.new].map((s) 
   r = run(process.execPath, ['scripts/run-scenarios.mjs', f, '--base', url.cand], wt.cand);
   check(`scenarios ${f}`, r.code === 0, r.tail);
 }
+mech.timings.scenarios = Math.round((Date.now() - t0) / 1000) + 's';
 if (noLeaves.length && CLASSES.indexOf(ec.cls) >= 2) gaps.push(`${noLeaves.length} affected feature(s) have no executable leaves (features/<id>/scenarios.json): ${noLeaves.slice(0, 6).join(', ')}${noLeaves.length > 6 ? ' …' : ''}. Behaviour there is covered by the walk only.`);
 
 // ---------- check-states, both sides (started at the top) ----------
 {
-  const [, rc] = await statesRun;
+  const [, rc] = statesDone;
   const problems = (dir) => {
     const f = path.join(dir, 'review/state-check.json');
     if (!fs.existsSync(f)) return null;

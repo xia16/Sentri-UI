@@ -350,3 +350,108 @@ export function calibrationProblems(parts, answers) {
   }
   return out;
 }
+
+// ---------- the lighter gate: reach, the base cache, the lock, the timeout retry, carrying a pass ----------
+
+// Files that decide pixels on every screen besides SYSTEM: the shooter and what it loads, the server, the atlas and its sections,
+// the vendored fonts and the installed packages (Playwright's version is the browser's).
+const RENDERS = [
+  /^scripts\/(shoot-screens|serve-ux|font-route|playwright-path)\.(mjs|cjs)$/,
+  /^(atlas|sections|vendor)\//,
+  /^package(-lock)?\.json$/,
+];
+// Files that can't draw a pixel: the workflow's text and other prose outside ux/, CI, tests, agent settings and every other
+// script (the gate and the checks). A page that loads one of them reaches its feature first (pages are read before this list).
+const NO_PIXEL = [/^docs\//, /^\.github\//, /^tests\//, /^\.claude\//, /^scripts\//, /^(?!ux\/).*\.md$/i];
+
+// What a change can reach, from its files alone (P2): { all, features, why }. files: the changed paths (both sides of a rename);
+// screens: every atlas screen on base and candidate; assets: page -> the files it loads (pageAssets); shared: sharedFiles of the
+// same. Unsure is all: a file nothing says is harmless reaches every screen.
+export function reachOf({ files, screens = [], assets = {}, shared = {}, scope = [] }) {
+  const users = new Map();
+  for (const s of screens) { const p = pageOf(s.url); for (const f of [p, ...(assets[p] || [])]) { if (!users.has(f)) users.set(f, new Set()); users.get(f).add(s.feature); } }
+  const features = new Set(scope), notes = new Map();
+  let all = false;
+  const note = (why, f) => { if (!notes.has(why)) notes.set(why, []); notes.get(why).push(f); };
+  for (const f of files) {
+    const own = f.match(/^features\/([^/]+)\//);
+    if (own) { features.add(own[1]); note(`${own[1]}'s own files`, f); continue; }
+    if (SYSTEM.some((re) => re.test(f)) || RENDERS.some((re) => re.test(f))) { all = true; note('draws on every screen', f); continue; }
+    const u = users.get(f);
+    if (Object.hasOwn(shared, f) || u?.size > 1) { all = true; note(`loaded by pages of ${(shared[f] || [...u]).length} features`, f); continue; }
+    if (u) { for (const x of u) features.add(x); note(`a page of ${[...u][0]} or what it loads`, f); continue; }
+    if (NO_PIXEL.some((re) => re.test(f))) { note('draws no pixel', f); continue; }
+    all = true;
+    note(f.startsWith('ux/') ? 'no page loads it by name, and a page may fetch it' : 'not known to draw nothing', f);
+  }
+  const list = (fs) => fs.slice(0, 3).join(', ') + (fs.length > 3 ? ` and ${fs.length - 3} more` : '');
+  const why = [...notes].sort(([a], [b]) => (a === 'draws no pixel') - (b === 'draws no pixel')).map(([w, fs]) => `${list(fs)}: ${w}`);
+  if (scope.length) why.push(`scope ${scope.join(', ')}`);
+  return { all, features: [...features].sort(), why };
+}
+
+// The one line the gate prints, given how many screens the reach covers.
+export function reachLine(reach, n) {
+  const why = reach.why.length ? ` (${reach.why.join('; ')})` : '';
+  if (reach.all) return `reach: all screens${why}`;
+  if (!reach.features.length) return `reach: no screen${why}`;
+  return `reach: ${n} screen(s) in features ${reach.features.join(', ')}${why}`;
+}
+
+// The base shots to take: needs [{ screen, width, langs }] against the cached runs [{ screen, lang, width, file, ok }] (has(file):
+// the png is still there). A screen is reused at a width only when every language it needs is cached, since the Chinese probe
+// compares against English shot in the same run; otherwise it is shot again in all of them. take: [{ width, langs, screens }].
+export function shotsToTake(needs, cached = [], has = () => true) {
+  const at = new Map(cached.filter((r) => r.ok && has(r.file)).map((r) => [`${r.screen} ${r.lang}-${r.width}`, r]));
+  const reuse = [], take = new Map();
+  for (const n of needs) {
+    const hit = n.langs.map((l) => at.get(`${n.screen} ${l}-${n.width}`));
+    if (hit.every(Boolean)) { reuse.push(...hit); continue; }
+    const k = `${n.width}|${n.langs.join(',')}`;
+    if (!take.has(k)) take.set(k, { width: n.width, langs: n.langs, screens: [] });
+    take.get(k).screens.push(n.screen);
+  }
+  return { reuse, take: [...take.values()] };
+}
+
+// A scenario run that failed only because a navigation timed out (page.goto, a reload, Back, waitForLoadState) says nothing about
+// the design: it is run once more. An assertion failure, a missing control or a page error never retries.
+const NAV_TIMEOUT = /\b(page|frame)\.(goto|reload|goBack|goForward|waitForLoadState|waitForURL|waitForNavigation): Timeout \d+ms exceeded/;
+export const timedOutOnly = (failures) => failures.length > 0 && failures.every((f) => NAV_TIMEOUT.test(String(f.got)));
+
+// A failed gh / GitHub API call that is the network, not an answer: EOF, TLS, a timeout, a reset or refused connection, a name that
+// doesn't resolve, a 5xx. It is retried; anything else is GitHub's answer and never is.
+export const ghNetworkError = (stderr) => /\bEOF\b|\bTLS\b|handshake|timed? ?out|timeout|connection (was )?(reset|refused|closed)|dial tcp|proxyconnect|actively refused|forcibly closed|network is unreachable|ECONNRESET|ECONNREFUSED|ETIMEDOUT|ENOTFOUND|EAI_AGAIN|could not resolve|no such host|HTTP 5\d\d|\b50[0234]\b|Bad Gateway|Service Unavailable/i.test(String(stderr || ''));
+
+// The gate's lock (one gate per machine): free, held by a live gate, or stale (its process is gone).
+export function lockState(lock, alive) {
+  if (!lock) return 'free';
+  return Number.isInteger(lock.pid) && alive(lock.pid) ? 'held' : 'stale';
+}
+
+// Carrying a GATE PASS over main moving on (gate.mjs --carry). The gate passed C on base M1; the PR head is now C2, main is M2.
+// It carries only when C2 is C merged with main and nothing else, and main's own change since M1 reaches no screen.
+//   pass: the pass record for C · mech: C's mechanical.json · head, main: C2, M2 · containsC / containsMain: C2 contains C / M2
+//   ownCommits: commits in C2 that are in neither C nor M2 and aren't merges · cand: path -> blob on C, for every path M1..C changed
+//   carried: the same for M2..C2 on C2 · mainFiles: the paths M1..M2 changed · reach: reachOf(mainFiles)
+export function carryDecision({ pass, mech, head, main, containsC, containsMain, ownCommits = [], cand = {}, carried = {}, mainFiles = [], reach }) {
+  const s = (x) => String(x || '?').slice(0, 7);
+  const no = (why) => ({ ok: false, why: [why] });
+  if (!pass) return no(`no GATE PASS is recorded for ${s(mech.candidate)}: run the gate`);
+  if (pass.carried) return no(`the pass for ${s(mech.candidate)} was itself carried: carry from the gated run's folder`);
+  if (pass.base !== mech.base) return no(`the pass for ${s(mech.candidate)} is against ${s(pass.base)}, the gate ran against ${s(mech.base)}`);
+  if (!head) return no(`${mech.ref || 'the candidate ref'} does not resolve`);
+  if (!main) return no('origin/main does not resolve');
+  if (main === mech.base) return no(head === mech.candidate ? 'main has not moved: the pass stands as it is' : `${mech.ref} moved to ${s(head)} while main did not: run the gate again`);
+  if (!containsC) return no(`${s(head)} does not contain the gated commit ${s(mech.candidate)}: run the gate again`);
+  if (!containsMain) return no(`${s(head)} does not contain origin/main ${s(main)}: merge main forward first`);
+  const why = [];
+  if (ownCommits.length) why.push(`${ownCommits.length} commit(s) on the PR since the gate besides the merge of main (${ownCommits.slice(0, 3).map(s).join(', ')}): run the gate again`);
+  const both = mainFiles.filter((f) => Object.hasOwn(cand, f));
+  if (both.length) why.push(`main and the candidate both changed ${both.slice(0, 3).join(', ')}: run the gate again`);
+  const paths = [...new Set([...Object.keys(cand), ...Object.keys(carried)])];
+  const edited = paths.filter((p) => cand[p] !== carried[p] && !both.includes(p));
+  if (edited.length) why.push(`the merge is not just main: ${edited.slice(0, 3).join(', ')} not as on the gated commit (a conflict resolved, or an edit in the merge): run the gate again`);
+  if (!reach || reach.all || reach.features.length) why.push(`main's change since ${s(mech.base)} can reach ${!reach || reach.all ? 'every screen' : `screens of ${reach.features.join(', ')}`}${reach?.why.length ? ` (${reach.why.join('; ')})` : ''}: run the gate again`);
+  return why.length ? { ok: false, why } : { ok: true, why: [`main moved ${s(mech.base)} → ${s(main)} by ${mainFiles.length} file(s) that draw no pixel, and ${s(head)} is ${s(mech.candidate)} merged with it and nothing else`] };
+}
