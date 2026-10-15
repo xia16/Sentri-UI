@@ -8,6 +8,18 @@
   "duplicates": "Old UI (Figma 首页 › 工作台) has default and expanded task lists. Both are now shown in the Workbench prototype. Select language, Log out and the operation-result screen remain outside this study.",
   "groups": [
     [
+      "Connected Home · current study",
+      [
+        "workbench.connected-few",
+        "workbench.connected-date",
+        "workbench.connected-many",
+        "workbench.connected-many-collapsed",
+        "workbench.connected-many-expanded",
+        "workbench.connected-unit",
+        "workbench.connected-empty"
+      ]
+    ],
+    [
       "Overview by section",
       [
         "workbench.today",
@@ -15,6 +27,8 @@
         "workbench.gestation",
         "workbench.many-tasks",
         "workbench.many-tasks-expanded",
+        "workbench.mixed-work",
+        "workbench.mixed-work-expanded",
         "workbench.work-due",
         "workbench.quiet-section",
         "workbench.work-waiting"
@@ -1233,6 +1247,182 @@
         "rules": [
           "Changing section or unit, or leaving Home, resets task expansion."
         ],
+        "issues": []
+      }
+    },
+    {
+      "id": "workbench.mixed-work",
+      "name": "Overview · mixed work collapsed",
+      "zh": "总览 · 多类任务收起",
+      "status": "in-design",
+      "url": "/ux/system/home-astra-prototype.html?section=gestation&many=operations&focus=task-fold",
+      "figma": "",
+      "notes": {
+        "purpose": "Review five visible cards from thirteen fictional production and non-production task instances in one section.",
+        "states": [],
+        "elements": [
+          {
+            "name": "Mixed task list",
+            "shows": "Three production tasks and two each of treatment, vaccination, transfer, outbound and sampling; first five cards and a See all 13 tasks control",
+            "logic": "Each card represents one task instance. Confirmed overdue work precedes due work, assigned undated work and waiting work; the count includes all thirteen.",
+            "source": "home-astra-prototype.js many=operations"
+          }
+        ],
+        "controls": [],
+        "copy": ["(raw)"],
+        "edge": [],
+        "rules": ["No new task lifecycle is inferred from these fictional progress bars."],
+        "issues": []
+      }
+    },
+    {
+      "id": "workbench.mixed-work-expanded",
+      "name": "Overview · mixed work expanded",
+      "zh": "总览 · 多类任务展开",
+      "status": "in-design",
+      "url": "/ux/system/home-astra-prototype.html?section=gestation&many=operations&tasks=expanded&focus=task-fold",
+      "figma": "",
+      "notes": {
+        "purpose": "Inspect the stable order and card density of all thirteen fictional task instances.",
+        "states": [],
+        "elements": [
+          {
+            "name": "Expanded mixed list",
+            "shows": "All thirteen cards across seven task types, followed by Show first 5 tasks",
+            "logic": "Unit selection keeps task IDs and narrows each card's counts; collapsing retains the same order.",
+            "source": "home-astra-prototype.js home()"
+          }
+        ],
+        "controls": [],
+        "copy": ["(raw)"],
+        "edge": [],
+        "rules": ["Operational detail pages remain explicit previews."],
+        "issues": []
+      }
+    },
+    {
+      "id": "workbench.connected-few",
+      "name": "Connected Home · few full cards",
+      "zh": "连体首页 · 少量完整卡片",
+      "status": "in-design",
+      "url": "/ux/system/home-astra-prototype.html?section=gestation&variant=connected",
+      "figma": "",
+      "notes": {
+        "purpose": "Show every full card when at most four open and today-finished instances exist.",
+        "states": [],
+        "elements": [{"name": "Few tasks", "shows": "Three open full cards and one readable finished receipt", "logic": "No type accordion until five visible instances", "source": "home()"}],
+        "controls": [],
+        "copy": ["(raw)"],
+        "edge": [],
+        "rules": ["Finished receipts keep their completion stamp and View record action."],
+        "issues": []
+      }
+    },
+    {
+      "id": "workbench.connected-date",
+      "name": "Connected Home · one of seven days selected",
+      "zh": "连体首页 · 七天中选一天",
+      "status": "in-design",
+      "url": "/ux/system/home-astra-prototype.html?section=gestation&variant=connected&day=1",
+      "figma": "",
+      "notes": {
+        "purpose": "Review a compact planned-start preview without moving ongoing work out of Today.",
+        "states": [],
+        "elements": [{"name": "Seven-date selector", "shows": "Tomorrow through the next six days, all visible; July 9 selected", "logic": "Only future unstarted task starts in the selected scope are previewed; View opens the read-only list", "source": "schedulePreview()"}],
+        "controls": [],
+        "copy": ["(raw)"],
+        "edge": [],
+        "rules": ["No earlier dates, later weeks or month navigation."],
+        "issues": []
+      }
+    },
+    {
+      "id": "workbench.connected-many",
+      "name": "Connected Home · mixed work",
+      "zh": "连体首页 · 多类任务",
+      "status": "in-design",
+      "url": "/ux/system/home-astra-prototype.html?section=gestation&many=operations&variant=connected",
+      "figma": "",
+      "notes": {
+        "purpose": "Review category grouping with thirteen open and one today-finished instance.",
+        "states": [],
+        "elements": [{"name": "Connected task categories", "shows": "Production, Treatment, Vaccination, Pig transfer, Outbound and Sampling in one bordered surface", "logic": "Urgent categories open first; categories can be independently expanded", "source": "groupedTaskCards()"}],
+        "controls": [],
+        "copy": ["(raw)"],
+        "edge": [],
+        "rules": ["Each expanded task keeps its full card facts; the category header keeps counts visible."],
+        "issues": []
+      }
+    },
+    {
+      "id": "workbench.connected-many-collapsed",
+      "name": "Connected Home · categories collapsed",
+      "zh": "连体首页 · 分类收起",
+      "status": "in-design",
+      "url": "/ux/system/home-astra-prototype.html?section=gestation&many=operations&variant=connected&groups=collapsed",
+      "figma": "",
+      "notes": {
+        "purpose": "Inspect every category summary with no detail cards open.",
+        "states": [],
+        "elements": [{"name": "Collapsed category rows", "shows": "Total, open, finished and urgent counts without truncating the status words", "logic": "Every category can open without closing another", "source": "groupedTaskCards()"}],
+        "controls": [],
+        "copy": ["(raw)"],
+        "edge": [],
+        "rules": ["This URL is a review preset; urgent categories open by default in the normal scene."],
+        "issues": []
+      }
+    },
+    {
+      "id": "workbench.connected-many-expanded",
+      "name": "Connected Home · categories expanded",
+      "zh": "连体首页 · 分类展开",
+      "status": "in-design",
+      "url": "/ux/system/home-astra-prototype.html?section=gestation&many=operations&variant=connected&groups=all",
+      "figma": "",
+      "notes": {
+        "purpose": "Inspect all full cards and the finished receipt inside their categories.",
+        "states": [],
+        "elements": [{"name": "Expanded task details", "shows": "One continuous surface with dividers; completed Pregnancy check ends Production tasks", "logic": "More than one category may stay expanded", "source": "groupedTaskCards()"}],
+        "controls": [],
+        "copy": ["(raw)"],
+        "edge": [],
+        "rules": ["Finished Home receipts use readable muted styling, a stamp and View record."],
+        "issues": []
+      }
+    },
+    {
+      "id": "workbench.connected-unit",
+      "name": "Connected Home · unit hub",
+      "zh": "连体首页 · 单元概况",
+      "status": "in-design",
+      "url": "/ux/system/home-astra-prototype.html?section=gestation&many=operations&variant=connected&view=unit&unit=7",
+      "figma": "",
+      "notes": {
+        "purpose": "Review a compact unit hub before the seven dates and task categories.",
+        "states": [],
+        "elements": [{"name": "Unit hub", "shows": "Population, pens, last inspection, attention and separate Inspect, Inventory, Environment and Maintenance entries", "logic": "Inventory is not repeated in a second card; Maintenance opens independently", "source": "unitStrip()"}],
+        "controls": [],
+        "copy": ["(raw)"],
+        "edge": [],
+        "rules": ["Unknown summaries are not displayed as zero."],
+        "issues": []
+      }
+    },
+    {
+      "id": "workbench.connected-empty",
+      "name": "Connected Home · no current tasks",
+      "zh": "连体首页 · 当前无任务",
+      "status": "in-design",
+      "url": "/ux/system/home-astra-prototype.html?section=nursery&variant=connected",
+      "figma": "",
+      "notes": {
+        "purpose": "Keep an empty work list distinct from a completed-work receipt.",
+        "states": [],
+        "elements": [{"name": "Neutral empty state", "shows": "No current tasks and a path to unit inspection, without a green completion check", "logic": "Future planned starts remain in the seven-date strip", "source": "home()"}],
+        "controls": [],
+        "copy": ["(raw)"],
+        "edge": [],
+        "rules": ["Loading, permission and read failure remain separate states."],
         "issues": []
       }
     },

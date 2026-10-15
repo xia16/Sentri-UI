@@ -1,0 +1,25 @@
+/* Opt-in visual study: a single surface for each category and its tasks. */
+.joined-preview .task-type-list{gap:10px}
+.joined-preview .task-type-group{border-radius:17px;border-color:#d9e0d1;box-shadow:0 4px 14px #25351e05}
+.joined-preview .task-type-group.has-urgent{border-color:#e3c5a2}
+.joined-preview .task-type-toggle{min-height:72px;grid-template-columns:34px minmax(0,1fr) 41px 13px;gap:11px;padding:11px 15px}
+.joined-preview .task-type-toggle .task-type-copy strong{font-size:14px;letter-spacing:-.2px}
+.joined-preview .task-type-toggle .task-type-copy small{font-size:10px}
+.joined-preview .task-type-icon{width:34px;height:34px}
+.joined-preview .task-type-cards{border-top:1px solid #e7eadf;background:#fff}
+.joined-preview .joined-task-row{width:100%;min-height:79px;display:grid;grid-template-columns:minmax(0,1fr) 64px 12px;align-items:center;gap:10px;padding:12px 17px 12px 58px;border:0;border-radius:0;background:#fff;text-align:left;box-shadow:none}
+.joined-preview .joined-task-row+.joined-task-row{border-top:1px solid #eaede6}
+.joined-preview .joined-task-row:hover,.joined-preview .joined-task-row:focus-visible{background:#f8faf5}
+.joined-preview .joined-task-row.overdue{background:#fffcf7}
+.joined-preview .joined-task-copy{display:flex;flex-direction:column;gap:5px;min-width:0}
+.joined-preview .joined-task-title{display:flex;align-items:baseline;gap:7px;min-width:0;white-space:nowrap}
+.joined-preview .joined-task-title strong{font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis}
+.joined-preview .joined-task-title small{font-size:10px;color:#74816d;flex:none;max-width:76px;overflow:hidden;text-overflow:ellipsis}
+.joined-preview .joined-task-detail{font-size:10px;line-height:1.4;color:#68775e;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.joined-preview .joined-task-row.overdue .joined-task-detail{color:#9b6330}
+.joined-preview .joined-task-value{display:flex;flex-direction:column;align-items:flex-end;gap:2px;white-space:nowrap;text-align:right}
+.joined-preview .joined-task-value strong{font:500 21px/1 var(--font-mono)}
+.joined-preview .joined-task-value small{font-size:9px;color:#68775e}
+.joined-preview .joined-task-value .joined-task-waiting{font:500 9px/1.3 var(--font-sans);letter-spacing:0;color:#68775e}
+.joined-preview .joined-task-arrow{color:#8b9683}
+.joined-preview .joined-task-arrow svg{width:11px;height:11px}

@@ -7,10 +7,10 @@
   // Home card glyphs come from the same registry as the rest of the design system.
   const iconNames=Object.freeze({stop:'minus',location:'place',arrow:'chevron'});
   const icon=name=>window.SentriIcons.icon(iconNames[name]||name);
-  function render(model,{annotated=false}={}){
+  function render(model,{annotated=false,groupCategory=null,showRecordLink=false}={}){
     const m=model,unit=m.scope.kind==='unit',p=m.progress||{},t=m.timing||{},pct=p.total>0?Math.max(0,Math.min(100,p.value/p.total*100)):0;
     const marker=n=>annotated?`<i class="slot-marker" aria-hidden="true">${n}</i>`:'';
-    if(['complete','terminated'].includes(m.state))return `<button class="home-task-card hc-complete ${m.state==='terminated'?'hc-terminated':''}" data-card="${escape(m.id)}" data-scope="${unit?'unit':'overview'}" aria-label="Review ${escape(m.identity.title)}, ${escape(m.identity.context)}, ${escape(m.scope.label)}"><span class="hc-complete-icon">${icon(m.state==='terminated'?'stop':'check')}</span><span class="hc-complete-copy"><strong>${escape(m.identity.title)}</strong><small>${escape(m.identity.context)}${unit?'':' · '+escape(m.scope.label)}</small><small>${m.state==='terminated'?'Ended early':'Completed'} · ${escape(m.completedAt||'Today, 09:10')}</small></span>${icon('arrow')}</button>`;
+    if(['complete','terminated'].includes(m.state))return `<button class="home-task-card hc-complete ${m.state==='terminated'?'hc-terminated':''}" data-card="${escape(m.id)}" data-scope="${unit?'unit':'overview'}" aria-label="Review ${escape(m.identity.title)}, ${escape(m.identity.context)}, ${escape(m.scope.label)}"><span class="hc-complete-icon">${icon(m.state==='terminated'?'stop':'check')}</span><span class="hc-complete-copy"><strong>${escape(m.identity.title)}</strong><small>${escape(m.identity.context)}${unit?'':' · '+escape(m.scope.label)}</small><small>${m.state==='terminated'?'Ended early':'Completed'} · ${escape(m.completedAt||'Today, 09:10')}</small></span>${showRecordLink?'<span class="hc-record-link">View record</span>':''}${icon('arrow')}</button>`;
     const quiet=['waiting','upcoming'].includes(m.state);
     let bar='';
     if(p.kind==='unknown')bar='';
@@ -21,8 +21,12 @@
     const progressAttrs=p.kind==='unknown'?'':p.kind==='days'?`role="img" aria-label="Monitoring window, ${p.value?`day ${p.value} of ${p.total}`:'not started'}; elapsed time, not checks completed"`:`role="progressbar" aria-label="${escape(p.label)}" aria-valuemin="0" aria-valuemax="${p.total}" aria-valuenow="${p.value}" aria-valuetext="${escape(progressName)}"`;
     const progressCount=p.kind==='unknown'?'No fixed duration':p.kind==='days'?(p.ended?'Window elapsed':p.value?`Day ${p.value} of ${p.total}`:`${p.total}-day window`):`<b>${p.value}</b> / ${p.total}`;
     const timingLabel=m.state==='overdue'?t.remaining:m.state==='undated'?t.elapsed.split(' · ')[0]:t.elapsed;
+    const contextParts=m.identity.context.split(' · ');
+    const groupedOperational=groupCategory&&groupCategory!=='Production tasks';
+    const identityTitle=groupedOperational?contextParts.shift():m.identity.title;
+    const identityContext=groupedOperational?contextParts.join(' · '):m.identity.context;
     return `<button class="home-task-card ${escape(m.state)} ${quiet?'hc-quiet':''} ${unit?'hc-unit':''}" ${m.entry?`data-entry="${escape(m.entry)}" `:''}data-card="${escape(m.id)}" data-scope="${unit?'unit':'overview'}" aria-label="Open ${escape(m.identity.title)}, ${escape(m.scope.label)}">
-      <div class="hc-identity">${marker(1)}<span class="hc-symbol">${icon(m.identity.icon)}</span><span class="hc-heading"><strong>${escape(m.identity.title)}</strong><small>${escape(m.identity.context)}${timingLabel?' · '+escape(timingLabel):''}</small></span><span class="hc-header-meta">${m.state==='overdue'?SentriUI.status({variant:'chip',kind:'overdue',text:'Overdue'}):''}${unit?`<span class="hc-unit-arrow">${icon('arrow')}</span>`:''}</span></div>
+      <div class="hc-identity">${marker(1)}<span class="hc-symbol">${icon(m.identity.icon)}</span><span class="hc-heading"><strong>${escape(identityTitle)}</strong><small>${escape(identityContext)}${timingLabel?' · '+escape(timingLabel):''}</small></span><span class="hc-header-meta">${m.state==='overdue'?SentriUI.status({variant:'chip',kind:'overdue',text:'Overdue'}):''}${unit?`<span class="hc-unit-arrow">${icon('arrow')}</span>`:''}</span></div>
       ${quiet?`<div class="hc-quiet-line">${icon('clock')}<span>${escape(m.action.message)}</span></div>`:`<div class="hc-action">${marker(2)}<span class="hc-action-value">${escape(m.action.value)}</span><span class="hc-action-copy"><span class="hc-action-label">${escape(m.action.label)}</span>${m.action.secondary?`<small>${escape(m.action.secondary)}</small>`:''}</span></div>`}
       ${!quiet&&m.route?`<div class="hc-route"><span>${escape(m.route.from)}</span>${icon('arrow')}<span>${escape(m.route.to)}</span></div>`:''}
       ${m.progress&&m.state!=='upcoming'?`<div class="hc-progress">${marker(3)}<div class="hc-progress-caption"><span>${escape(p.label)}</span><span>${progressCount}</span></div><div ${progressAttrs}>${bar}</div>${p.legend?`<div class="hc-legend">${p.legend.map(l=>`<span><i class="${escape(l.tone)}"></i>${escape(l.text)}</span>`).join('')}</div>`:''}${p.note?`<p class="hc-progress-note">${escape(p.note)}</p>`:''}</div>`:''}

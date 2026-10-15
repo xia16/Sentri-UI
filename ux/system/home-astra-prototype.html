@@ -11,6 +11,11 @@
   <link rel="stylesheet" href="home-astra-prototype.css?v=astra-consolidated-1">
   <link rel="stylesheet" href="data-sync-shell.css">
   <link rel="stylesheet" href="astra-home-task-card.css?v=astra-consolidated-1">
+  <link rel="stylesheet" href="home-compact-preview.css">
+  <link rel="stylesheet" href="home-grouped-preview.css">
+  <link rel="stylesheet" href="home-joined-preview.css">
+  <link rel="stylesheet" href="home-seamless-preview.css">
+  <link rel="stylesheet" href="home-connected-preview.css">
 <link rel="stylesheet" href="home-subpages-refinement.css?v=astra-consolidated-1"><link rel="stylesheet" href="../design-system/tokens.css"><link rel="stylesheet" href="../design-system/components/bundle.css"><script src="../design-system/components/bundle.js"></script><script src="unit-snapshot.js"></script></head>
 <body data-st-context="page">
   <main class="studio">
@@ -24,6 +29,7 @@
           <button data-demo="sections"><span>01</span><div><strong>Choose a section</strong><small>A quiet view across the farm</small></div><b>↗</b></button>
           <button data-demo="overview"><span>02</span><div><strong>Plan by task</strong><small>See what is ready across units</small></div><b>↗</b></button>
           <button data-demo="unit"><span>03</span><div><strong>Work by place</strong><small>Tasks and inspection, in one unit</small></div><b>↗</b></button>
+          <button data-demo="mixed"><span>04</span><div><strong>Review mixed work</strong><small>13 production and other task cards</small></div><b>↗</b></button>
         </div>
         <p class="study-note">390 × 844 phone preview · fictional farm data. The Home date is a fixed sample.<br>Assistant, scanning and records are previews. No live farm data is read or changed.<br>The Piglet Batch 27 card opens an independent Batch 40 task sample; the link demonstrates a destination, not one task instance.</p>
         <button class="reset-study" id="reset-study">Reset sample work ↻</button>
@@ -41,6 +47,11 @@
     </div>
     <footer class="studio-footer"><span>Astra / Sentri · First homepage direction</span><span>Shared controls. Clear context. Room to work.</span></footer>
   </main>
+  <nav class="grouped-prototype-switch" aria-label="Task count comparison" hidden>
+    <a data-grouped-previous href="?section=gestation&variant=grouped" aria-label="Show three full task cards">←</a>
+    <span data-grouped-label>Task count study</span>
+    <a data-grouped-next href="?section=gestation&many=operations&variant=grouped" aria-label="Show thirteen grouped tasks">→</a>
+  </nav>
   <script src="astra-home-task-card.js?v=astra-consolidated-1"></script>
   <script src="home-astra-prototype.js?v=astra-consolidated-1"></script>
 </body>

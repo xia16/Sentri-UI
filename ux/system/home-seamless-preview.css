@@ -1,0 +1,52 @@
+/* Opt-in Home study: one connected task surface, full cards when a type opens. */
+.seamless-preview .overview-shortcuts{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:0 0 22px}
+.seamless-preview .overview-shortcuts.unit-shortcuts{grid-template-columns:1fr}
+.seamless-preview .overview-shortcut{min-width:0;min-height:72px;display:flex;align-items:center;gap:9px;padding:10px 11px;border:1px solid #d8e1cf;border-radius:14px;background:#fff;text-align:left;box-shadow:0 3px 9px #26371b07}
+.seamless-preview .overview-shortcut:hover,.seamless-preview .overview-shortcut:focus-visible{border-color:#9faf91;background:#f9fbf5}
+.seamless-preview .overview-shortcut-icon{width:30px;height:30px;display:grid;place-items:center;flex:none;border-radius:10px;color:#647d54;background:#eef3e9}
+.seamless-preview .overview-shortcut-icon svg{width:17px;height:17px}
+.seamless-preview .overview-shortcut>span:nth-child(2){display:flex;flex-direction:column;gap:4px;min-width:0;flex:1}
+.seamless-preview .overview-shortcut strong{font-size:11px;font-weight:600;white-space:nowrap}
+.seamless-preview .overview-shortcut small{font-size:9px;line-height:1.3;color:#74816d;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.seamless-preview .overview-shortcut>svg{width:11px;height:11px;flex:none;color:#829078}
+.seamless-preview>.work-section-heading{padding:0 2px 14px}
+.seamless-preview .seamless-task-list{display:block;overflow:hidden;border:1px solid #d8e1ce;border-radius:17px;background:#fff;box-shadow:0 5px 18px #25351d07;margin-bottom:25px}
+.seamless-preview .task-type-group{border:0;border-radius:0;overflow:visible;background:transparent}
+.seamless-preview .task-type-group+.task-type-group{border-top:1px solid #e5eadf}
+.seamless-preview .task-type-group.has-urgent{border-color:#e5eadf}
+.seamless-preview .task-type-group.has-urgent>.task-type-toggle{box-shadow:inset 3px 0 #b98250;background:#fffaf4}
+.seamless-preview .task-type-toggle{min-height:69px;padding:12px 14px;grid-template-columns:33px minmax(0,1fr) 38px 12px}
+.seamless-preview .task-type-copy strong{font-size:13px}
+.seamless-preview .task-type-copy small{font-size:10px}
+.seamless-preview .task-type-cards{display:grid;gap:10px;padding:12px;background:#f4f6ef;border-top:1px solid #e4e9dc}
+.seamless-preview .task-type-cards .home-task-card{border-radius:14px;background:#fff;overflow:hidden;box-shadow:0 2px 6px #26351d08}
+.seamless-preview .task-type-cards .home-task-card:hover,.seamless-preview .task-type-cards .home-task-card:focus-visible{border-color:#96ac89}
+.seamless-preview .task-type-cards .hc-identity{padding:15px 15px 0}
+.seamless-preview .task-type-cards .hc-action{margin:17px 16px 16px}
+.seamless-preview .task-type-cards .hc-progress{margin:0 16px 15px}
+.seamless-preview .task-type-cards .hc-footer{padding:11px 15px}
+.seamless-preview .schedule-preview{margin:0 0 20px}
+.seamless-preview .schedule-preview>.work-section-heading{padding:0 2px 12px}
+.seamless-preview .schedule-days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px;padding:6px;border:1px solid #dce4d5;border-radius:15px;background:#fff}
+.seamless-preview .schedule-day{display:flex;min-width:0;min-height:55px;flex-direction:column;align-items:center;justify-content:center;gap:3px;border-radius:10px;color:#75816d}
+.seamless-preview .schedule-day:hover,.seamless-preview .schedule-day:focus-visible{background:#eef3e9}
+.seamless-preview .schedule-day.selected{color:#fff;background:#536e46}
+.seamless-preview .schedule-day span{font-size:9px}
+.seamless-preview .schedule-day strong{font:500 17px/1.1 var(--font-mono)}
+.seamless-preview .schedule-day i{width:4px;height:4px;border-radius:50%;background:transparent}
+.seamless-preview .schedule-day i.has-task{background:#a47339}
+.seamless-preview .schedule-day.selected i.has-task{background:#f9d49a}
+.seamless-preview .schedule-day-panel{margin-top:9px;padding:14px;border:1px solid #dce4d5;border-radius:14px;background:#fff}
+.seamless-preview .schedule-day-panel>strong{font-size:11px;font-weight:600}
+.seamless-preview .schedule-day-panel>p{margin:12px 0 0;font-size:10px;color:#74816d}
+.seamless-preview .schedule-planned-row{display:flex;gap:10px;align-items:center;padding:13px 0 0}
+.seamless-preview .schedule-planned-row>span{display:grid;place-items:center;width:28px;height:28px;border-radius:8px;background:#edf2e7;color:#617b53}
+.seamless-preview .schedule-planned-row svg{width:15px;height:15px}
+.seamless-preview .schedule-planned-row>div{display:flex;flex-direction:column;gap:3px}
+.seamless-preview .schedule-planned-row strong{font-size:11px;font-weight:600}
+.seamless-preview .schedule-planned-row small{font-size:10px;color:#6e7b65}
+.seamless-preview .schedule-help{margin:9px 2px 0;font-size:9px;line-height:1.5;color:#75816d}
+.inventory-summary{display:flex;flex-direction:column;gap:9px;padding:16px;margin-bottom:14px;border:1px solid #dce4d5;border-radius:14px;background:#f8faf5}
+.inventory-summary small{font-size:11px;color:#73806b}
+.inventory-summary strong{font:500 30px/1 var(--font-mono)}
+.inventory-summary strong span{margin-left:6px;font:11px var(--font-sans);color:#73806b}
