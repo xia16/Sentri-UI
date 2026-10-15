@@ -1084,6 +1084,8 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 /* Numpad · dock (opt-in: `dock: true`). Between a Sheet's body and its footer: out of the scroller, on the sheet's paper, a line above. */
 .sheet>.st-numpad[data-dock]{flex:none;padding:var(--space-row-y) var(--space-gutter);background:var(--paper);border-top:1px solid var(--line)}
 .sheet>.st-numpad[data-dock]+.sheet-footer{border-top:0}
+/* a docked pad keeps no reserved status line: the host answers a dead key under its Measure, so the keys sit right under the body */
+.st-numpad[data-dock] .st-numpad-feedback:has(>.st-numpad-hint:empty){display:none}
 
 /* The header owns the 24px under it: the body's first element brings no top margin of its own (a field's, a note's, a banner's).
    Last in the file, so a part's own margin rule of the same weight does not win here. */
