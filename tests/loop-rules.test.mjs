@@ -2,7 +2,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { queueAhead, newScenarioFailures, calibrationProblems, budgetProblems, critiqueProblems, pageStyling, addedLines, effectiveClass, classifyScreens, checkVerdict, checkGrades, worstFirst, isClean, loopStatus, touchesSystem, touchesTools, regressions,
-  pageOf, pageAssets, sharedFiles, outcomeLeaves, coverageLost, reachOf, reachLine, shotsToTake, timedOutOnly, lockState, carryDecision, ghNetworkError } from '../scripts/loop-rules.mjs';
+  pageOf, pageAssets, sharedFiles, outcomeLeaves, coverageLost, reachOf, reachLine, shotsToTake, timedOutOnly, lockState, carryDecision, ghNetworkError,
+  componentPage, componentPagesOf, componentsTouched, idPath } from '../scripts/loop-rules.mjs';
 
 test('a change to the bundle or tokens is a shared-component change whatever was declared', () => {
   assert.deepEqual(touchesSystem(['ux/design-system/components/bundle.css', 'features/farrowing/feature.json']), ['ux/design-system/components/bundle.css']);
@@ -401,6 +402,62 @@ test('carry: a pass carries over main moving on only by files that draw no pixel
   no({ mainFiles: ['ux/system/home.css'], reach: reach(['ux/system/home.css']) }, /can reach every screen/);
   no({ mainFiles: ['features/weaning/budget.md'], reach: reach(['features/weaning/budget.md']) }, /can reach screens of weaning/);
   no({ reach: null }, /can reach every screen/);
+});
+
+// Component pages are in the gate's reach (rules ledger L23): the Headers law changed, screens were gated, and Sheet → page kept
+// teaching a 21-character Chinese title because nothing shot or checked the design system's own pages.
+test('a component page id names its component and variant; anything else is a screen', () => {
+  assert.deepEqual(componentPage('ds:Sheet/page'), { component: 'Sheet', variant: 'page' });
+  assert.equal(componentPage('farrowing.room'), null);
+  assert.equal(componentPage('ds:Sheet'), null);
+  assert.equal(idPath('ds:Sheet/page'), 'ds_Sheet/page');
+  assert.equal(idPath('farrowing.room'), 'farrowing.room');
+});
+
+test('the component pages are the variants the atlas draws, filtered by component or id', () => {
+  const atlas = { platforms: [{ components: [{ name: 'Sheet', files: { variants: ['drawer', 'page'] } }, { name: 'Banner', files: {} }, { name: 'Heading', files: { variants: ['page'] } }] }, { components: [] }] };
+  const all = componentPagesOf(atlas);
+  assert.deepEqual(all.map((p) => p.id), ['ds:Sheet/drawer', 'ds:Sheet/page', 'ds:Heading/page']);
+  assert.equal(all[1].feature, 'design-system');
+  assert.equal(all[1].url, '/atlas/index.html?view=components&component=Sheet&variant=page');
+  assert.deepEqual(componentPagesOf(atlas, { components: ['Heading'] }).map((p) => p.id), ['ds:Heading/page']);
+  assert.deepEqual(componentPagesOf(atlas, { screens: ['ds:Sheet/page', 'farrowing.room'] }).map((p) => p.id), ['ds:Sheet/page']);
+});
+
+test('a change edits a component when it edits a file in its own folder, not the shared bundle', () => {
+  assert.deepEqual(componentsTouched(['ux/design-system/components/Sheet/variants/page.html', 'ux/design-system/components/bundle.css', 'ux/design-system/components/Sheet/README.md', 'features/farrowing/x.js']), ['Sheet']);
+});
+
+test('a moved component page is in scope for its own component, outside it for another, and never copy-only', () => {
+  const files = ['ux/design-system/components/Sheet/variants/page.html'];
+  const page = { id: 'ds:Sheet/page', feature: 'design-system' };
+  const own = effectiveClass({ declared: 'copy', files, diffs: [page], scope: ['farrowing'] });
+  assert.equal(own.outside.length, 0);
+  assert.equal(own.cls, 'presentation');
+  assert.match(own.why.join(), /ds:Sheet\/page/);
+  assert.equal(effectiveClass({ declared: 'copy', files: [], diffs: [page], scope: ['design-system'] }).cls, 'presentation');
+  const other = effectiveClass({ declared: 'presentation', files, diffs: [page, { id: 'ds:Heading/page', feature: 'design-system' }], scope: ['farrowing'] });
+  assert.deepEqual(other.outside.map((d) => d.id), ['ds:Heading/page']);
+  assert.equal(other.cls, 'shared');
+  assert.equal(effectiveClass({ declared: 'behaviour', files, diffs: [page], scope: ['farrowing'] }).cls, 'behaviour');
+  assert.equal(effectiveClass({ declared: 'copy', files, diffs: [], scope: ['farrowing'] }).cls, 'copy');
+});
+
+test('a moved component page needs a judgement like a screen, and a better one to pass', () => {
+  const mech = { pass: true, candidate: 'c', base: 'b', mode: 'normal', class: { declared: 'copy' }, screens: { diff: [{ id: 'ds:Sheet/page', feature: 'design-system' }], new: [], gone: [] },
+    pairs: ['390', '360'].map((w) => ({ screen: 'ds:Sheet/page', feature: 'design-system', lang: 'en', width: +w, kind: 'changed', pct: 1.2 })) };
+  assert.match(checkVerdict({ pass: true, candidate: 'c', base: 'b', pairs: [] }, mech).problems.join(), /no judgement for pair ds:Sheet\/page en-390/);
+  const same = mech.pairs.map((p) => ({ screen: p.screen, lang: p.lang, width: p.width, verdict: 'same' }));
+  assert.match(checkVerdict({ pass: true, candidate: 'c', base: 'b', pairs: same }, mech).problems.join(), /no pair better/);
+  assert.equal(checkVerdict({ pass: true, candidate: 'c', base: 'b', pairs: same.map((p) => ({ ...p, verdict: 'better' })) }, mech).ok, true);
+});
+
+test("reach: a component's own pages and notes reach the component pages, not every screen", () => {
+  const r = reach(['ux/design-system/components/Sheet/variants/page.html', 'ux/design-system/components/Sheet/variants.json', 'ux/design-system/components/Sheet/README.md']);
+  assert.deepEqual([r.all, r.features], [false, ['design-system']]);
+  assert.match(r.why[0], /Sheet's component pages/);
+  assert.equal(reach(['ux/design-system/components/bundle.css']).all, true, 'the bundle still reaches every screen');
+  assert.equal(reach(['ux/design-system/components/Sheet/sheet.css']).all, true, 'any other file in the folder is unsure, so every screen');
 });
 
 test('newScenarioFailures: a leaf already failing on base is main\'s debt; one passing there, or new, is the change\'s', () => {
