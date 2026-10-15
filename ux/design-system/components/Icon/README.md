@@ -33,6 +33,8 @@ An aria-hidden SVG on a 24-unit viewBox containing one open-stroke path. More is
 
 Compatibility aliases are non-enumerable: origin → place, arrow → chevron, condition → plus. Condition was a longer plus cross; use plus for that glyph. Aliases continue to resolve for existing callers without adding another glyph to the catalogue. Grid has four separate squares. Unknown names warn in every environment.
 
+The Home task card uses this registry too: `production` and `care` are shared glyphs; its location, clock, transfer, check and chevron use `place`, `clock`, `transfer`, `check` and `chevron`. Its ended-task mark uses `minus`. The card carries no SVG path definitions of its own.
+
 ## Content rules
 
 One lowercase name per glyph; no translated glyph keys. Labels follow their host's length and sentence-case rules. SVG contains no copy to truncate; Chinese labels remain visible beside it. Never add a screen-local path or use emoji for a verb.
@@ -59,4 +61,5 @@ Component with standard and key host presentations; names are content properties
 
 ## Changelog
 
+2026-10-10: Home task-card glyphs moved to the shared registry; added production and care.
 2026-10-10: canonical aliases, empty unknown glyph, corrected grid, visible filled More dots and token stroke; retired prototype registries.

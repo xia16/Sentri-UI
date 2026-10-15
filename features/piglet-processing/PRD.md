@@ -43,3 +43,7 @@ Open (HANDOFF, needs the owner):
 4. Build path: carry the simplified flows into the full task, or promote simple/ to be the task.
 5. Where per-piglet work (ID, weigh, sex, breeder) lives as a universal feature (Round 10 direction only; proposal first).
 6. How a farm's ID scheme is configured (Round 1 Q3); in the prototype it is a Demo switch outside the phone.
+
+## Home card handoff · 2026-10-14
+
+Home counts unique litters with at least one required care item due and unfinished now; several procedures on one litter count once. Its named progress covers litters whose entire required age-day schedule is complete, not only today's items. The next-care date appears when nothing is due. Optional-item expiry must come from a configured rule. The task flow above remains the owner of recording and closure. See [Home display rules](../../ux/research/home/HOME-TASK-DISPLAY-RULES.md).

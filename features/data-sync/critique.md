@@ -1,61 +1,115 @@
-# data-sync: headers, critique
+# Data sync — critique of current study
 
-Scope: the headers of this feature's surfaces (the shared Headers change, the Headers law (`ux/design-system/README.md#headers-law-owner-2026-10-13`, owner 2026-10-13)).
+Baseline: origin/main ccaa3f2, 390×844, review/data-sync-evidence/home-before-en-390.png and list-before-en-390.png. Current study is an in-memory Home drawer; the old mobile_webapp is a behaviour reference, not a finished visual reference. The existing Home screen is in design, and no screen has owner approval for this feature.
 
 ## Keep
 
-- The sheet's anatomy (grab, body as the one scroller, the footer with Back and the primary on drawers): bodies, rows and colours stay as they are, except where a Problem below names the change (a fact moved out of a header opens the body; a screen moved by this change is brought to the legibility floors); only the header and the footer's Back/Clear move.
-- The titles: they name the job (`Record dead`, `Edit record`, `Pen log`); they stay, and stay the heaviest thing in the header.
-- The house reference's look (the Farrowing room): Back as a 48px bordered icon button, the 22px title, the last-record line in muted text with the time in ink.
-- Home's own header (farm, section chooser, Assistant door) is the app's home, not a page or sheet header: unchanged.
+- 首页入口直接说“3 records saved on this device”：本机保存与团队收到的区别是对的，必须保留同等可见性。
+- 抽屉第一行给待处理总数，随后列任务、对象、地点和时间，工人能认出哪次操作仍在本机。
+- 底部固定 Back 在戴手套时容易离开；离开不能改变队列状态。
+- 网络状态单独一行，不用颜色替代文字。
 
 ## Problems
 
-- **major** · Saved work's record lines were 10px (the context and the time), under the farm legibility floor (11px); a change that moves the screen brings it to the floors. The records move onto the design system's Row in a card (crit round 1).
-
-- **major** · Nothing in a header acts but Back and the subject chip (law): Clear, Reset, a Scanning pill, an End walk button or a Log link sat in a header.
-- **major** · The default is no header line (law): almost every drawer and page carried a subtitle that repeated the subject, the pen, the unit, a count or a date, facts the hub one Back away already shows (P3: nothing the header says twice).
-- **major** · Two headers and no others (law): drawers had a left-aligned title with no 24px gap owned by the header; pages had Back in the footer and a title with no Back beside it; a task page had a hand-built app bar (`room-appbar`, `task-header`, `page-head`).
-- **minor** · Pages set their own top padding under the header (18px, 20px, 12px, 16px), so the gap to the body differed screen to screen.
-- **major** · Pages (Your sections, Toolbox, Records, Environment, Maintenance, Assistant, a finding, a task page) used a page-built `page-head` with a subtitle (the farm, the unit, a description) and, on two, Back in the footer.
-- **minor** · Drawers (Choose a unit, Report issue, Issue detail, Saved work, Find a pig, Scan) had a left-aligned title; Choose a unit repeated the section.
+- **Major — wrong action:** 连接可用时仍要求手动 Upload；与 2026-10-12 用户裁决的自动上传相反。首页与抽屉都把“点上传”当下一步。
+- **Major — wrong fact:** 三条记录被当成一批，一次成功全部清空，一次失败全部保留；旧版实际逐条结算，可有部分成功、冲突和受阻。
+- **Major — recovery gap:** 行不可打开，没有单条原因、手动重试或冲突删除；旧版功能和新裁决均需要这些状态。
+- **Major — work hierarchy:** 首页完整宽度的待同步卡放在第一张工作卡上方。Atlas backlog 已指出这挤掉工人的首要问题“今天做什么”。异常需要醒目，正常等待应更安静。
+- **Major — long data:** 列表标题 12px，时间 10px，缺少长耳号/任务名换行；需要操作的行标题低于 13px 地板。
+- **Minor — copy:** 入口与抽屉同时写“3 records”；详情再重复会抢注意力。页面需要一处主计数。
+- **Minor — language:** 当前 Home 原型是英文固定文案，不能验证中文长文案。
 
 ## Parts
 
-| Part | Drawn by today | The component whose job it is | Keep / fix / cut |
-|---|---|---|---|
-| Page header | page-built `page-head` | SentriUI.pageHeader | **fix** |
-| PREVIEW badge in the header | page-built | (prototype chrome, not product) | **cut** |
+| Part | Drawn by | Decision |
+|---|---|---|
+| 首页本机记录入口 | Home 页自绘 syncCard，home-astra-prototype.js/css | 保留本机事实，减小正常态权重；异常态清晰 |
+| 抽屉壳、Back | Home drawer + SentriUI sheetFooter/backButton | 保留原生底部动作与退出语义 |
+| 待上传摘要 | Home 自绘 sync-summary | 替换为设计系统 Banner/Heading 组合，避免双重信息 |
+| 网络说明 | Home 自绘 sync-connection | 保留语义，随状态更新 |
+| 记录行 | Home 自绘 sync-record | 迁入设计系统 Row 的可打开记录行 |
+| 上传按钮 | Home 自绘 btn | 删除主动上传；用逐条安全重试入口 |
+| 完成与失败消息 | Home 自绘 sync-message | 每条状态对应事实与下一步 |
 
 ## Self-crit
 
-The law and its boards fix the design (two headers, the line's three tests); there are no competing directions, so each screen is judged against its baseline and the Farrowing room. Rounds and the final look are below.
+尝试过两种首页层级：沿用旧版将完整告警卡放在首张任务卡前，及将普通本机记录入口缩成一行、放在首张任务卡后。选后者；首屏先回答“今天做什么”，仍在首张卡下方看到本机 3 条与无网络。异常态保留提前提示，不能让工人错过失败或冲突。
 
-#### Round 1 (efbef80, renders at 390 EN beside origin/main)
-- Scan ear tags: the Scanning pill, moved into the body, still sat at the right edge (its old head rule): fixed to start the body (9a7b72e).
-- Page CSS: lines that only lost a dead header rule read as new visual CSS to the gate; restored as they were (9a7b72e).
-- Everything else matched the boards: the room keeps "Last record" under the title and 24px to the cards; the record drawer reads "Farrowing record" over its chip and facts.
+390px 前后对照：旧首页的黄色卡写“tap to upload”且先于 Today’s work；新首页首张 Pregnancy check 完整可见，后面紧跟“3 records saved on this device / uploads when online”。旧抽屉的三条行无法打开，底部是 Upload 3 records；新列表将需要处理、等待、已上传分组，单条行可打开，底部只保留 Back。新列表在 390px 首屏能看到三条完整行，行标题与状态达到字体地板。取舍：正常待上传状态比旧黄色卡安静；这是有意的注意力转移，异常态仍需在真实队列中验证其提醒强度。
 
-#### Final look of round 0 (9a7b72e, superseded below; the gate's pairs at 390 and 360, EN and ZH, base bea53d3)
-- Reach: 165 screens moved, all in this change's 16 features; 126 identical; none broken.
-- Problems fixed: nothing acts in a header (Clear and Reset in footers, Scanning and End walk in bodies); one line at most, only on the hubs the budgets name; every page has Back top left and no footer Back; the 24px is the header's on every surface.
-- Keep as strong: titles, bodies, rows and primaries unchanged; the room still looks like itself.
-- Squint: the room, the title, the summary card, the lens; a drawer, its title, then its first card (the chip is quiet).
-- Against the original: less, not flatter: one muted line where there were two, no text action beside a title.
-- **Better because** each header now says one thing, the same way everywhere, and the 360 Chinese lines fit on one line.
-- Known gaps: the pig page lost its pen and unit line (one Back away); Inspection's End walk and Log now sit in the body row with the unit; Home pages lost their PREVIEW badges.
+360px 中文核对：冲突详情在首屏展示本机与服务端两份孕检结果，安全重试固定在底部；删除藏在详情后段并需二次确认。确认文案说明记录无法恢复，且后续依赖仍受阻。删除后打开依赖记录，可见“前置记录已删除”“不会上传”与逐条删除入口；再次删除仍需确认。登录失效只演示原账号续传状态，未接入账号验证。
 
-#### Crit round 1 (driver), then a final look (75e92ea, superseded below; the gate's pairs at 390 and 360, EN and ZH, base af23efc)
-- The Back test walked on the real chain: the pig page carries her identity facts; More actions (one pig), Measurements & condition, a finding, Production stats, Feed plan, Piglets and farrowing's Piglet processing carry the route; Pen feeding names its pen. Every surface about one animal now shows it on screen or one Back away.
-- Facts a header cut moved into bodies, never dropped: sow died (tag, pen, time), the receipt's closure stamp, Scan actions' count, Scanning / Stopped.
-- Floors: the Assistant, Environment and Maintenance pages stay unmoved until their bodies reach the floors; Saved work and Find a pig are brought to them. Legibility and spacing pass on every moved screen.
-- Reach: 153 screens moved, all in this change's features; 138 identical; none broken.
-- **Better because** each header says one thing the same way everywhere, and no fact the worker needs was lost: it is in the header line or the body's first line.
+结论：相对旧版，本方案修正了手动上传与整批结算的事实错误，且没有牺牲首页首张工作卡的可见性；可以作为待评审设计。真实队列、服务端差异获取、条件重试与原账号验证仍需 Android 实现阶段验证；此自评不代表 owner 批准或独立 gate 通过。
 
-#### Crit round 2 (judges on a39e84f), then Final look (the pushed head of ds/headers-build, the commit that adds this block; its screens are 8119836's, which the gate rendered at 390 and 360 in EN and ZH against base 515872e: mechanical pass)
-- What left a header is designed into the body, not dropped: the Inspection walk takes the unit as its header line and keeps its check-in row (Last check-in · Log · End walk, quiet text actions, no second dark fill); farrowing's moved facts (sow died, the finished stamp, the receipt's closure, Scan actions' count) open their body as the quiet group label over their card.
-- Restored: the sow-died banner's red wash and 17px margin in the record drawer; the finished record's stamp; 18px under More actions' Pigs / Pens tabs.
-- The 24px under every header is the component's (the body's first element brings no top margin).
-- Footers: fostering's primary stays on one line at 56px in Chinese at 390; Find a pig's primary is "Search".
-- Reach: 153 screens move, all in this change's features; 138 identical; none broken. npm test 674 pass; legibility and spacing pass on every moved screen; farrowing scenarios 87 of 87 in EN (ZH blocked on main as well).
-- **Better because** each header says one thing the same way everywhere, and every fact it no longer carries has a designed place in the body.
+## 2026-10-13 follow-up: scale and global awareness
+
+用户指出两个缺口：三条样例的状态列表在记录与任务类型增多时会变成长平铺；首页入口又无法让工人在其他任务页感知本机还有记录、正在上传或需要处理。
+
+保留：异常先于普通等待、每条记录可查看、状态与网络分开、正常工作不被大卡片遮住。问题：旧版 `OfflinePendingBadge` 在全局可见，且有待传/错误计数和上传中态；当前样稿丢了这个能力。旧版记录页按类别→任务类型→任务→记录四级进入，适合数据库浏览，但处理一条异常时路径太深。旧版浮标定位在安全栏下方，可能盖住顶端操作；旧版按当前路由缩小计数，还可能被理解为“全场仅剩这些”。
+
+方案比较：
+
+| 方向 | 得到 | 代价 | 选择 |
+|---|---|---|---|
+| 继续仅在首页提示 | 首页安静 | 任务中看不到上传与异常 | 放弃 |
+| 复制旧版右上悬浮徽标 | 所有页可见 | 遮挡、窄屏冲突；悬浮层与原生导航叠加 | 放弃 |
+| 在系统开孔处模拟“灵动岛” | 位置醒目 | Android 状态栏由系统控制；机型开孔不一致，无法可靠放自定义交互 | 不作为基本方案 |
+| 应用壳在状态栏下保留紧凑状态入口 | 所有应用页可见；不遮挡内容；48px 可点 | 占用约一行高度 | 本轮样稿 |
+
+390px 对照：旧版仅在 Home 工作卡后出现普通待传入口；[新版](../../review/data-sync-evidence/global-home-wait-en-390.png)把事实放到应用壳，首张工作卡标题与数字仍完整可见。尝试的[窄胶囊](../../review/data-sync-evidence/compact-pill-exploration-en-390.png)只剩“3 records saved on this…”且不能同时说明联网自动上传，故不采用。异常在 Toolbox 仍有入口，普通列表 30 条时首屏显示两条可处理异常和四个类别，较原先 30 行平铺更快定位；此为设计自评，仍需独立评审。
+
+列表采用“异常记录直达 → 普通待传按业务类别收起 → 近期已上传”的顺序。少量记录继续直接列出；普通待传达到 9 条且涉及多个类别才收起为类别行。类别页直接展示记录，必要时在同一页按任务类型筛选，不复制旧版四层导航。用户已裁决全局入口统计这台手机的全部未上传记录，不按任务或当前身份缩小；详情仍展示账号、猪场归属，上传遵守原账号认证规则。
+
+Android 系统级胶囊仅可能作为额外通道：[官方 Live Update 指南](https://developer.android.com/develop/ui/compose/notifications/live-update)说明系统可能将符合条件的通知提升为状态栏 chip，用户也可取消；它面向活跃、用户发起且时间敏感的活动。持续待网、失败和冲突不属于活跃上传；自动后台上传是否符合系统条件也需原生验证，不能把它当唯一入口。应用内入口留在系统安全区下方，原生实现按[官方 WindowInsets 指南](https://developer.android.com/develop/ui/compose/system/insets)避开状态栏和开孔。
+
+## 2026-10-13 second follow-up: lighter history and native Android indicator
+
+用户指出顶部整行本机记录卡仍挤占工作首屏，并确认目标产品是原生 Android；已上传历史应只呈现近期总数，本机保留 30 天。旧版的 `OfflinePendingBadge` 是悬浮于安全区下方的全局入口，能分别报待传与错误数并提示上传中，但按当前路由缩小计数；旧版 `syncedCommandHistory` 只保留最近 200 条，并避开被未完成操作依赖的已上传记录。本轮保留旧版的紧凑与依赖保护，改用全机计数和 30 天期限。
+
+重新比较了三个原生方向：
+
+| 方向 | 390px 首页首张工作卡顶部 | 任务页冲突 | 结论 |
+|---|---|---|---|
+| 当前 56px 整行卡 | 首张卡下移约 60px，卡片视觉重复 | 无遮挡 | 用户指出臃肿，淘汰 |
+| 应用内顶部中置胶囊 | 文字“待传 3”清楚，但页眉与首张卡仍下移约 40px | 不遮挡 | 保留交互对照，不作默认 |
+| 页眉右侧悬浮徽标 | 不增加纵向高度；首张卡提前出现 | 页眉为至少 48dp 点击区预留横向空间 | 默认候选 |
+
+页眉徽标不是随意盖在列表上的 `position: fixed`：它由应用壳固定，页眉预留右侧宽度；异常时扩为“异常 N”，首页不再重复告警卡。待网、上传中和异常在徽标用不同图形与颜色，点击进入同一总览，读屏标签说出完整状态。中置胶囊与默认徽标均在 Android WindowInsets 安全区内，不能直接占用物理开孔。系统 [Live Update chip](https://developer.android.com/develop/ui/compose/notifications/live-update) 由 Android 决定提升与显示；待网与异常不符合持续活跃活动，自动后台上传是否符合用户发起与时间敏感条件仍需原生评估。因此系统 chip 是活跃上传的可选增强，不能取代应用内状态。
+
+同步总览从逐条已上传列表收成“近30天已上传 N 条”，让异常与待传记录保留首屏。超过 30 × 24 小时的已确认上传本机记录仅在无未上传依赖时清理；服务端业务记录不受影响。样稿以三条已上传记录中的一条超过期限演示计数从 3 到 2，真实本机清理仍须 Android 队列实现。
+
+## 2026-10-13 third follow-up: header alignment and a fresh alternative
+
+用户选定应用内页眉右侧悬浮徽标，同时指出首页没有对齐。原样稿的徽标独立绝对定位：390px 首页 Assistant 的垂直中心是 y=63，徽标是 y=58；徽标右边距 14px，与页眉的 20px 不同；中文异常态在 Assistant 和徽标之间留下约 30px。只移动顶端坐标能修正一个状态，无法随英中标签和位数变化保持间距。
+
+修正后，默认徽标成为页眉尾部控件，共享 flex 对齐和 10px 控件间距，首页右边距回到 20px。等待、上传、异常在 360/390px 与英中两种文案下的徽标及 Assistant 垂直中心相同。英文异常短文案收为 `Fix N`，中文仍为 `异常 N`，两者保留至少 48px 点击区；完整状态由读屏标签表达。最窄的 360px 英文异常态仍能让农场名称和分区名保持一行。修正前后的任务首卡纵向位置相同；没有为徽标新增整行高度。当前证据见 `review/data-sync-evidence/README.md`。居中胶囊探索仍独立保留，不影响选定默认方案。
+
+抛开当前页眉形态，重新按“戴手套做完一条记录、短暂断网、继续走到另一任务、随后出现异常”这一时间线比较：
+
+| 方案 | 解决的问题 | 代价 | 判断 |
+|---|---|---|---|
+| 底部导航新增“本机”入口及计数 | 拇指容易点到 | 占一个高频导航位；部分任务页没有底部导航；等待与异常仍难表达 | 不比选定徽标好 |
+| 屏幕底部常驻状态条 | 能把“本机保存／自动上传”写全 | 占任务操作与表单键盘空间，重复覆盖每页 | 不比选定徽标好 |
+| 保存瞬间确认 + 常驻徽标 | 本机事务成功时明确说“已保存在本机，联网后自动上传”；离开当前页后由徽标承接状态，异常时再引导处理 | 需要每个离线业务操作统一接入事务结果与反馈 | 值得在 Android 实现时与选定徽标组合验证 |
+
+第三个方向提供了比单独徽标更完整的时间反馈，但不改变已选定的全局入口：每次本机事务成功后仅短暂确认一次；普通自动上传不逐条弹提示，避免农场作业中连续打断；需要人工处理时以全局异常徽标和同步详情为准。这条改进已落在流程的“业务提交反馈”规则中，本轮 Home 固定样例不能证明真实保存瞬间，须在首个原生离线业务功能中做端到端屏幕评审。
+
+## 2026-10-13 fourth follow-up: task-owned status
+
+用户指出：首页全机徽标已经能发现未上传记录，但走进任务、单元、栏位和对象操作时更需要确认“我刚才做的这项工作是否还在本机”。原分娩任务页眉有清楚的返回和任务名、下方也写最近一次记录时间，但**最近记录时间不是上传回执**；工人不能据此判断团队是否收到。旧版按路由推断任务范围，若业务身份尚未载入，可能误把全机数显示为本任务数。原任务页眉的基线见 [390px 图](../../review/data-sync-evidence/task-header-before-farrowing-390.png)。
+
+本轮选择在现有任务页眉尾部动作槽放“Task 2”状态徽标，进入记录抽屉和下级完整页面时仍使用相同的任务实例范围；点击进入“分娩任务 · 本机记录”，先见跨栏位的两条，再有“本机全部 · 3”入口。首页继续是全机数。这个明确的范围变化优于在同一个无标签数字上悄悄切换过滤口径。浮动在内容上的徽标会与过滤器、任务表单和底部保存操作抢空间，故不采用。危险确认或清除操作占据页眉尾部时，先保障该操作；不叠两个点击区。
+
+长列表目前是动态门槛：普通待传至少 9 条、且跨至少 2 个大类时才出现类别入口，短列表直接逐条列出。原代码每次渲染都重判；自动上传跨过门槛时可突然把分类页改为平铺。现在进入列表时确定本次的展示模式，自动上传只改状态与条数；重新进入时才重判。任务范围两条直接列出，不叠加业务类别。若单个任务内也有许多记录，下一步应按单元/栏位而非业务类别组织，因为它们已经属于同一次任务。
+
+阈值样例用九条跨生产和巡检的待传记录开始；网络恢复并确认其中一条后，待传数成为八、近30天已上传数成为一，两个类别入口保持原位。这个转场只证明布局稳定，不模拟真实队列与网络质量。
+
+390px 的[任务页前后对照](../../review/data-sync-evidence/README.md)显示首条工作卡纵向位置不变，右侧徽标不盖住任务名；母猪计数抽屉仍保留同一“Task 2”。360px 中文任务范围列表能看到两条记录与全机入口，点开后展示三条全机待传。样稿使用独立的分娩和同步页固定数据，演示的是入口与范围规则；Android 实现需要以账号、猪场和稳定任务实例 ID 关联本机操作，并在真实队列确认后同步更新两个计数。其他任务类型、异常文案和原生读屏仍需按工作流核对，不能把本轮局部样稿当成跨功能已批准组件。
+
+边界情况：如果当前任务没有未上传记录，而其他任务仍有三条，页眉改为明确的“全机 3”并打开全机列表，避免进入任务后丢失全局状态，也避免把三条误认为当前任务。全机也为零时入口隐藏。这一回退需要 Android 的同一队列视图同时给出 taskCount 与 phoneCount。
+
+Home 里默认的三条固定样例都不属于分娩任务；从 Home 进入分娩原型时，因此展示“全机 3”的回退样例。单独打开 `?taskSync=offline` 则演示本任务两条的优先入口。两种入口都明确标范围，不能把不同原型中的固定样例当成一份实时数据。
+
+## Main branch header review retained
+
+The earlier shared-header review found that the old Saved work drawer used text below the farm legibility floor and put repeated context or actions in page and sheet headers. The new Data sync flow keeps page titles and Back in shared headers, puts record facts in the body at the design system's text floor, and treats the phone-wide status badge as an app-shell control. Native review must check the 24px header-to-body spacing and ensure an expanded exception badge does not crowd Back or adjacent actions at 360px.

@@ -1,0 +1,8 @@
+/* Local task status candidate; scoped to the Farrowing design study. */
+.farrowing-phone .task-sync-badge{display:flex;align-items:center;justify-content:center;gap:5px;min-width:56px;min-height:48px;margin-left:auto;padding:0 10px;border:1px solid #cad8c6;border-radius:24px;background:#f3f7ef;color:#315b35;font:600 15px var(--font-sans);cursor:pointer}
+.farrowing-phone .task-sync-badge>span{font-size:18px;line-height:1}
+.farrowing-phone .task-sync-badge.uploading>span{animation:task-sync-turn 1.4s linear infinite}
+.farrowing-phone .task-sync-badge.needs-attention{border-color:#e6c6b1;background:#fff1e5;color:#9b4d20}
+.farrowing-phone .task-sync-badge:focus-visible{outline:3px solid #315b35;outline-offset:2px}
+@keyframes task-sync-turn{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.farrowing-phone .task-sync-badge.uploading>span{animation:none}}

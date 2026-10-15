@@ -11,7 +11,7 @@ var RENDER = {
   "state-Default": () => SentriUI.segment({variant:'facet',options:[['any','Any'],['0','0'],['1','1'],['2','2–5'],['6','6+']],active:'any',ariaLabel:'Facet',state:'Default',disabled:false,reason:''}),
   "state-Pressed": () => SentriUI.segment({variant:'facet',options:[['any','Any'],['0','0'],['1','1'],['2','2–5'],['6','6+']],active:'any',ariaLabel:'Facet',state:'Pressed',disabled:false,reason:''}),
   "state-Selected": () => SentriUI.segment({variant:'facet',options:[['any','Any'],['0','0'],['1','1'],['2','2–5'],['6','6+']],active:'1',ariaLabel:'Facet',state:'Selected',disabled:false,reason:''}),
-  "state-Disabled": () => SentriUI.segment({variant:'facet',options:[['any','Any'],['0','0'],['1','1'],['2','2–5'],['6','6+']],active:'any',ariaLabel:'Facet',state:'Disabled',disabled:true,reason:'Records are unavailable offline.'}),
+  "state-Disabled": () => SentriUI.segment({variant:'facet',options:[['any','Any'],['0','0'],['1','1'],['2','2–5'],['6','6+',{disabled:true}]],active:'any',ariaLabel:'Facet',state:'Disabled',disabled:false,reason:'No sows at parity 6+ in this unit.'}),
   "state-Long-label": () => SentriUI.segment({variant:'facet',options:[['todo','待处理的仔猪记录'],['done','已完成的母猪记录']],active:'any',ariaLabel:'Facet',state:'Long-label',disabled:false,reason:''})
 };
 document.querySelectorAll('[data-state]').forEach(function (s) {

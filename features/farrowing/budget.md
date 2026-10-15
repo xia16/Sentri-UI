@@ -103,6 +103,23 @@ The fact line in every tile (and with it the second status vocabulary `penFact`:
 
 The title, centred, then the colour key as the one header line, then the hairline (owner exception, 2026-10-14). The body starts with the Entrance band, 24px under the hairline.
 
+## Record dead (2026-10-14)
+
+Kept facts (not changed by this pass), with the question each answers: the title `Record dead` (what am I doing?); the switch `Piglets` / `The sow` (whose death?); each cause's label and count (how many of each so far, with this draft?); `+n unsaved` beside a drafted cause (what will this save add?); the sow's four causes and the banner `Saving ends farrowing · N alive stay under piglet care` (what does saving her death do?); the primary `Record N deaths` / `Record sow death` (what will the tap commit?).
+
+Facts this pass touches:
+
+| Fact | State | Question it answers there | Level |
+|---|---|---|---|
+| `Photos` (the optional row's label, camera glyph) | always, last in capture order | Can I attach a photo to this record? | Settled (quiet card) |
+| `Record a death first · photos ride that record` (the hint line, the Photos component's registered `ds.c2.photos.inactive`) | no death drafted (piglets) or no cause chosen (the sow), **only after a tap on the waiting camera** (crit round 2: the floor-gray; otherwise it is the row's screen-reader description, never a standing line) | Why can't I take a photo yet? | Settled (muted hint line, shown while the tap is answered) |
+| `N attached` (the row's answer) and thumbnails | after a photo | Did my photo go on this record? | Settled |
+
+Cut: nothing new. Hiding the Photos row until a death is drafted is cut (the row waits visibly instead). Nothing is added to the header.
+
+Crit round 2: the sow's `Details` (cause Other) keeps its fact (what else about her death?) and takes the same full-width optional row as Photos.
+
+
 ### Corner actions and titles (2026-10-14)
 
 By the Headers law → Corner actions and Title length (`ux/design-system/README.md`, owner ruling C, 2026-10-14; PR #165). Room at a true 360, as `scripts/check-headers.mjs` (workflow/header-checks) measures it: a drawer title has 360 − 2 × (18 + 48 + 12) = 204px (a missing corner counts as the room it would take); a page title has 216px beside Back. Titles measured at their own face (sheet 500 20px, page 500 22px), EN and ZH.
@@ -118,3 +135,31 @@ By the Headers law → Corner actions and Title length (`ux/design-system/README
 | Every other drawer title | none | | unchanged; all measured under 204px (the header check's room: 360 − 2 × (18 + 48 + 12)) | |
 
 The PRD's owner decision of 2026-10-10 ("the sheet becomes `N piglets to allocate`") is kept in substance: the sheet says how many, in its first body line; the scenarios' visible text for the allocation sheet now reads `Allocate piglets`, and their count facts read `N piglets ·` (the first body line).
+
+---
+
+# Disabled is not faded (shared change, ds/disabled-not-faded), information budget
+
+Scope: the facts a disabled or waiting control displays. The change adds and cuts no fact; it changes how loud each one is.
+
+## Inventory
+
+- The control's label (the verb: `Save setting`, `Record deaths`, `Finish farrowing`).
+- The current option of a disabled segment (`Auto` of Auto / Manual).
+- The other options of a disabled segment.
+- The floor key's glyph (− at the floor, + at the ceiling, a digit on a full pad).
+- A disabled picker's current value (`None`, the chosen names).
+- That the control is unavailable now (today: faded text).
+
+## Questions
+
+1. What will this do once it is available? (the label, at full legibility)
+2. Can I use it now? (the surface and the rim: dashed means not now)
+3. What is it set to? (the current option: weight, not a raised pill)
+4. Why not, and what do I do? (the host's reason line or hint; unchanged by this change)
+
+## Levels
+
+- **Settled**: the label, the current option and the picker value, in ink (or `ink-2` on a floor key), at the control's own size and weight.
+- **Watch**: unavailability, quiet: the flat disabled surface and the 1px dashed `control-border` rim. No colour, no icon added.
+- **Cut**: faded text as the signal (opacity, `disabled-ink` text).

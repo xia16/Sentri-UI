@@ -11,6 +11,8 @@
     hospital:'M13 3h8v18h-8M17 3v18M13 7h8M13 17h8M2 12h12M9 8l5 4-5 4',
     profile:'M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0M4 21v-2a8 8 0 0 1 16 0v2',
     chart:'M4 20V10M12 20V4M20 20v-7',
+    production:'M6 19V9m6 10V4m6 15v-6',
+    care:'M9 3h6v6h6v6h-6v6H9v-6H3V9h6z',
     back:'M15 5l-7 7 7 7M8 12h13',
     chevron:'M9 5l7 7-7 7',
     up:'M15 5l-7 7 7 7',
@@ -763,7 +765,7 @@
     const pending=list.filter(it=>it.pending).length;
     const value=count==null?(list.length?`${list.length} attached${pending?` · ${pending} waiting to upload`:''}`:''):Array.isArray(count)?count.map(x=>typeof x==='string'?x:x.text||'').join(' · '):typeof count==='object'?count.text:count;
     const blocked=disabledReason||(!active?'Record a death first · photos ride that record':full?`${max} photos at most`:'');
-    let head=optionalRow({label,value,optionalWord:optional,icon:glyph('camera'),action,key,className:'st-photos-head',attrs:{'aria-describedby':hid,...(reason||disabledReason||adding?{'aria-disabled':'true','data-reason':reason||'busy'}:{}),...(adding?{'aria-busy':'true'}:{}),...(preview?{'data-preview':preview}:{})}}).replace('<button type="button"','<button type="button" id="'+esc(pid)+'-camera"').replace('class="st-optional-row ', 'class="st-optional-row st-photos-camera ');
+    let head=optionalRow({label,value,optionalWord:optional,icon:glyph('camera'),action,key,face:'row',className:'st-photos-head',attrs:{'aria-describedby':hid,...(reason||disabledReason||adding?{'aria-disabled':'true','data-reason':reason||'busy'}:{}),...(adding?{'aria-busy':'true'}:{}),...(preview?{'data-preview':preview}:{})}}).replace('<button type="button"','<button type="button" id="'+esc(pid)+'-camera"').replace('class="st-optional-row ', 'class="st-optional-row st-photos-camera ');
     head=head.replace(`<span class="st-optional-label">${esc(label)}</span>`,`<span class="st-optional-label"${sa(s.label,a.label)}>${esc(label)}</span>`).replace(`<small class="st-optional-word">${esc(optional)}</small>`,`<small class="st-optional-word"${sa(s.optional,a.optional)}>${esc(optional)}</small>`);
     const countParts=count==null?(list.length?tx(`${list.length} attached`,{strs:{attached:'ds.c2.photos.attached'},args:{attached:{n:list.length}}},'attached')+(pending?' · '+tx(`${pending} waiting to upload`,{strs:{waiting:'ds.c2.photos.waiting'},args:{waiting:{n:pending}}},'waiting'):''):''):Array.isArray(count)?toks(count,{dot:true}):part(count);
     head=head.replace(`<span class="st-optional-answer" role="status">${esc(value||'')}</span>`,`<span class="st-optional-answer" role="status">${countParts}</span>`);
@@ -978,12 +980,12 @@
      a trailing icon action. Empty it shows `icon`; filled it shows the value as its answer line and `editIcon`.
      Host mode: `action` makes the row a button that asks the host to open the editor (picker, note page, camera).
      Inline mode: `inline` (the field's own markup) is revealed under the row on tap; the row tracks its value as the answer line. */
-  function optionalRow({label='',value='',icon='',editIcon='',action='',key='',inline='',open=false,optionalWord='Optional',editLabel='Edit',disabled=false,className='',attrs={}}={}){
+  function optionalRow({label='',value='',icon='',editIcon='',action='',key='',inline='',open=false,optionalWord='Optional',editLabel='Edit',disabled=false,className='',face='',attrs={}}={}){
     const filled=value!=null&&String(value).trim()!=='',glyph=filled?(editIcon||icon):icon,extra=Object.entries(attrs).filter(([k])=>/^(?:data|aria)-[a-z0-9-]+$/.test(k)).map(([k,v])=>` ${k}="${esc(v)}"`).join('');
     const copy=`<span class="st-optional-copy"><span class="st-optional-head"><span class="st-optional-label">${esc(label)}</span><small class="st-optional-word">${esc(optionalWord)}</small></span><span class="st-optional-answer" role="status">${filled&&!(inline&&open)?esc(value):''}</span></span><span class="st-optional-act" aria-hidden="true">${glyph}</span>`;
     const aria=` aria-label="${esc(filled?`${editLabel} ${label.toLowerCase()}, ${value}`:`${label}, ${optionalWord.toLowerCase()}`)}"`;
-    if(!inline)return `<button type="button" data-ds="OptionalRow" class="st-optional-row ${esc(className)}" data-filled="${filled}" data-action="${esc(action)}" data-value="${esc(key)}"${disabled?' disabled':''}${aria}${extra}>${copy}</button>`;
-    return `<div data-ds="OptionalRow" class="st-optional ${esc(className)}" data-open="${open}" data-filled="${filled}"><button type="button" class="st-optional-row" data-filled="${filled}" data-st-optional aria-expanded="${open}"${aria}${extra}>${copy}</button><div class="st-optional-body"${open?'':' hidden'}>${inline}</div></div>`;
+    if(!inline)return `<button type="button" data-ds="OptionalRow" class="st-optional-row ${esc(className)}" data-filled="${filled}"${face==='row'?' data-face="row"':''} data-action="${esc(action)}" data-value="${esc(key)}"${disabled?' disabled':''}${aria}${extra}>${copy}</button>`;
+    return `<div data-ds="OptionalRow" class="st-optional ${esc(className)}" data-open="${open}" data-filled="${filled}"><button type="button" class="st-optional-row" data-filled="${filled}"${face==='row'?' data-face="row"':''} data-st-optional aria-expanded="${open}"${aria}${extra}>${copy}</button><div class="st-optional-body"${open?'':' hidden'}>${inline}</div></div>`;
   }
   if(typeof document!=='undefined'){
     document.addEventListener('click',e=>{const control=e.target.closest('.st-picker-trigger[aria-disabled="true"],.st-choice-row[aria-disabled="true"],.st-choice-inline-opt[aria-disabled="true"]');if(control){e.preventDefault();e.stopImmediatePropagation();}},true);

@@ -52,3 +52,7 @@ In scope: matings and their batch. Out: batch-phase close (a console action, res
 - `ux/archive/screens.html` sections 01, 03, 04b
 - `ux/archive/task-screens-combined.html` sections 01c, 02, 02c
 - Figma node 7845-6780
+
+## Home card handoff · 2026-10-14
+
+Overview shows unique eligible heat-marked task sows mated at least once / eligible heat-marked task sows. Unit shows currently eligible first and repeat services, counting each sow once; no unit coverage bar. A full Overview bar is not configured-sequence completion. The legacy first-service time and work-list eligibility disagree and need one backend rule before connected use. Task closure stays in this feature. See [Home display rules](../../ux/research/home/HOME-TASK-DISPLAY-RULES.md).

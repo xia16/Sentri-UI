@@ -1,6 +1,6 @@
 # Icons
 
-The 52 glyphs of the `SentriIcons` registry (`ux/design-system/components/bundle.js`). Each file is one of them, saved as a standalone SVG.
+The canonical icon registry lives in `ux/design-system/components/bundle.js`. This folder is a historical, incomplete set of standalone exports; use the registry for current glyph names and shapes.
 
 **How the files are drawn**
 - Stroke `ink` (#20291f), 1.6 wide, with round caps and joins, on a 24×24 viewBox.
@@ -18,7 +18,7 @@ The 52 glyphs of the `SentriIcons` registry (`ux/design-system/components/bundle
 - `farrow` stands for farrowing, `pregnancy` for the pregnancy check, `feed` for feed, `health` for health and `treat` for treatment.
 - `transfer` means move.
 - `offline` means no signal, and `upload` means records waiting to upload.
-- `backspace` (candidate, ADR 0001) deletes the last typed character on the Numpad. It is the 53rd glyph: it lives in the bundle's `SentriIcons` and in `backspace.svg` here, not yet in `ux/system/sentri-icons.js` or the artifact's asset blobs.
+- `backspace` (candidate, ADR 0001) deletes the last typed character on the Numpad. Its standalone export is `backspace.svg`; the live glyph is in `SentriIcons`.
 
-**Known quirk**
-- `grid` draws its second and fourth squares back to x = 3. This comes from the source, and the file keeps it as is.
+**Current source**
+- The registry's `grid` path draws four separate squares. Do not use an older exported shape in place of it.

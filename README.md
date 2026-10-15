@@ -7,7 +7,15 @@ Drizzle support.
 ## Sentri UX design system
 
 The `ux/` directory holds the Sentri design system and product research as
-static, linked HTML prototypes — no build step. To browse it:
+static, linked HTML prototypes — no build step.
+
+For Android feature development, start with
+[the implementation and feedback workflow](docs/implementation-workflow.md).
+It links the `features/<slug>/PRD.md` and `feature.json` entries to the
+relevant prototype, component rules and native verification. The
+[design workflow](docs/design-workflow/README.md) covers design creation.
+
+To browse the prototypes:
 
 ```bash
 npm run ux

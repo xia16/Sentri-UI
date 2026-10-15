@@ -1,12 +1,14 @@
 # Home task-card component — current proposal
 
+Current Home decisions are in “Android Home handoff · 2026-10-14” below. Earlier component experiments on this page are retained as design history where their metrics differ.
+
 Supersedes the earlier 18-card gallery and its no-progress-bar proposal. The owner requested a component-first design, visible progress and elapsed/remaining days, grounded in Claude's task documents. Weight checks belong inside Inspection, not as full Home tasks.
 
 ## Review surface
 
 `../../system/task-cards-astra-prototype.html` remains linked from Sentri Home's header and Toolbox. It now opens an annotated component with Task, Scope and State controls. Tabs expose major-task examples and source-linked rules. The shared renderer and stylesheet are `astra-home-task-card.js` and `astra-home-task-card.css`; examples provide data rather than separate markup per task.
 
-The reviewed component is now used by the Home prototype in both Overview and unit scopes. Each existing task instance has its own card; repeated group headings and the old grouped rows are removed. Existing task destinations remain linked, and unfinished destinations retain their placeholder. There are eight established production types plus the owner's three major operational task types: treatments, vaccinations and transfers.
+The reviewed component is now used by the Home prototype in both Overview and unit scopes. Each existing task instance has its own card; repeated group headings and the old grouped rows are removed. Existing task destinations remain linked, and unfinished destinations retain their placeholder. The gallery includes eight earlier production types, an end-nursery Home handoff, and three proposed operational types: treatments, vaccinations and transfers.
 
 ## Fixed fields
 
@@ -26,10 +28,10 @@ White surface, 18 px corners, 17–18 px content padding, 14 px medium-weight ti
 | Task | What the bar measures | Time / caveat | Source |
 | --- | --- | --- | --- |
 | Heat check | In heat / target cohort: **outcome**, not checks completed | Day N of configured heat window plus next observation. Source mocks contain 3/7-day variants, not one hardcoded duration. | `../tasks/heat-check.html`, requirements + subtraction; `../../system/screens.html`, task configuration |
-| Breeding | Sows reaching configured service count / in-heat cohort | Batch window plus next service eligibility. One mating does not finish a sequence. | `../tasks/breeding.html`, requirements |
-| Return-heat | **Elapsed monitoring days**, displayed as day segments | Current day is visually distinct. Return count is an adverse outcome shown separately, never a success numerator. Day segments do not certify observations. | `../tasks/return-heat.html`; `../../system/screens.html`, configuration |
+| Breeding | Sows mated at least once / eligible heat-marked task sows | Batch window plus next service eligibility. One mating does not finish a sequence. | `../tasks/breeding.html`, requirements |
+| Return-heat | No Home bar; temporary old-style return count plus no-return-record count | Current day is visually distinct. Return count is an adverse outcome shown separately, never a success numerator. Day segments do not certify observations. | `../tasks/return-heat.html`; `../../system/screens.html`, configuration |
 | Pregnancy | Checked / eligible for this particular check | Configured three-day sweep; first/second checks and unclear-result rechecks remain distinct. Unclear can be recorded yet still need follow-up. | `../tasks/pregnancy-check.html`, requirements + data map |
-| Farrowing | Farrowed / enrolled, with active and awaiting segments | Batch window only if configured; individual due dates stay independent. Uses current Astra inner page for navigation and closure rather than reviving older closure rules. | `../tasks/farrowing.html`, requirements; current Farrowing prototype |
+| Farrowing | Farrowed / current task sows; death and abortion leave the denominator | Batch window only if configured; individual due dates stay independent. Uses current Astra inner page for navigation and closure rather than reviving older closure rules. | `../tasks/farrowing.html`, requirements; current Farrowing prototype |
 | Postpartum | Checked / farrowed | Denominator grows with new farrowings. Configured start/window; no invented pass or recheck triggers. | `../tasks/postpartum.html`, requirements |
 | Piglet processing | Pens with all scheduled items complete / eligible pens | Partial completion is not full completion. Litter age-day schedule controls next work; task elapsed days are a separate fact. | `../tasks/piglet-processing.html`, requirements |
 | Weaning | Assessed / eligible pens | Configured day window. No standalone consolidated weaning document was found; the shared screens are the source. Assessment is not a movement. | `../../system/screens.html`, configuration + task-detail examples |
@@ -60,7 +62,7 @@ Syntax checks passed for the component and study scripts. Browser review covered
 
 ## Current state refinement
 
-Supersedes the monitoring-bar and outcome-bar examples above for Heat and Return-heat Home cards. Both now show the eligible scope for the current observation (`38 to check`) with no monitoring bar or returned count. Results, targets and rates remain inside the task. Actionable counts are supplied independently from whole-task completion; pregnancy now illustrates 5 due among 12 unfinished.
+Supersedes the monitoring-bar and outcome-bar examples above for Heat and Return-heat Home cards. This earlier eligible-scope fixture is superseded: Heat Overview shows recorded-in-heat / target, while Return-heat temporarily shows recorded returns and the historical no-return-record count. Results, targets and rates remain inside the task. Actionable counts are supplied independently from whole-task completion; pregnancy now illustrates 5 due among 12 unfinished.
 
 - Due now: prominent count, concise action, optional whole-task progress.
 - Waiting: quiet clock line with the next scheduled time.
@@ -88,9 +90,21 @@ Home and gallery now share an attention resolver, independent from progress. Pre
 
 Breeding with no due services shows Next service or Waiting for heat confirmations. Piglet processing with no care due shows Next care; neither says completed today or round complete. Explicitly ended historical task instances alone move into Completed. Generic round-complete previews resolve to waiting for these task types. Observation rounds may still explicitly report a finished round without ending the task. Component chips illustrate both competing priorities and the selected unit having no work while the whole task does.
 
-### Waiting, ready for review, and closure
+### Waiting and closure (2026-10-12 product decision)
 - Retain cumulative progress during waiting, including service sequences; the quiet next-work line does not replace it.
-- When all required work across the whole task is recorded and no actionable blockers remain, show a full bar and Review & complete task. This is still an open task.
-- Explicit Complete task confirms closure; only then show the compact Completed card at the bottom. End task early is a separate, confirmed action and shows Ended early.
-- A finished unit retains its full bar with Unit work complete · task still open while other units remain unfinished. Outcome metrics and session-only bars never establish whole-task readiness by themselves.
-- Gallery closure controls and Home sample closure are in-memory prototype actions. Existing Farrowing closure safeguards remain in effect.
+- Record progress, including a full bar, never creates a Home ready-to-complete state or Home closure call to action. Authoritative task status determines when a task leaves the main list.
+- After the owning task flow reports completion, show its compact Completed receipt. End task early remains a separate confirmed action and shows Ended early only after authoritative success.
+- A finished unit retains its full bar with Unit work complete · task still open while other units remain unfinished. Outcome metrics and session-only bars cannot change whole-task status.
+- Older gallery and Home sample closure controls are superseded fixtures. Existing Farrowing closure safeguards remain relevant inside its owning task flow.
+
+## Android Home handoff · 2026-10-14
+
+- The shared card stays one task instance in Overview and narrows its figures in Unit. It never infers completion from a bar. Task closure remains in the owning task flow. The Workbench PRD defines the five-card default, true totals, sorting, future preview and today-only closed receipts.
+- Heat: Overview uses “Recorded in heat / target” as an outcome; Unit shows signs awaiting confirmation. No unit no-signs branch, legacy round wording or quick-end button.
+- Breeding: Overview uses “Mated at least once / heat-marked”. Unit shows eligible first/repeat service counts and omits the coverage bar.
+- Return-heat: temporarily use old-style recorded returns and no-return-record count in Overview, estimated-date and submitted-signs facts in Unit. These figures may overlap. No Home pie, rate or monitoring bar while the feature is draft.
+- Pregnancy: the due count includes separately scheduled rechecks in this named check, and a time that cannot be verified says “Check information to confirm”. Postpartum counts from actual farrowing records; piglet processing counts unique litters due across required care items.
+- Weaning is the old `LACTATION` task, not a second Home card. End-nursery can show pending and checked pens only against one verified task pen set. End-finishing remains undesigned. Treatments, vaccinations and transfer examples remain proposals.
+- Farrowing Home uses “Farrowed X / Y current task sows”; death and abortion leave the task and denominator. Its task feature is being refined by another owner and is not changed by this handoff.
+
+See [display rules](HOME-TASK-DISPLAY-RULES.md) and the [Android production-card overview](../../../Sentri-Android-App/docs/home-production-task-cards.md) for card examples and backend gaps.

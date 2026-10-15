@@ -53,3 +53,7 @@ In scope: the marks and their consequences. Out: ended-task history (not designe
 - `ux/research/ops/cycle-adhoc.md`
 - `ux/archive/screens.html` sections 01, 03
 - Figma node 7606-10300
+
+## Temporary Home card handoff · 2026-10-14
+
+Until this feature is settled, Home keeps the old information pattern: Overview shows recorded returns and sows without a return record in the same historical population; Unit shows estimated return-date count and submitted signs. The unit sets may overlap and must not be added. There is no Home pie, return-rate/monitoring bar, observation-round wording or quick-end action. The current backend daily statistics are not dependable enough for the earlier pie design. This is a Home bridge, not approval of the draft recording flow above. See [Home display rules](../../ux/research/home/HOME-TASK-DISPLAY-RULES.md).

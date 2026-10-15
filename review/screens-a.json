@@ -1,17 +1,5 @@
 [
  {
-  "id": "screens-a-7",
-  "target": {
-   "kind": "feature",
-   "id": "workbench"
-  },
-  "kind": "design",
-  "severity": "medium",
-  "title": "Home uses the banned verb Complete for ending tasks",
-  "detail": "'Review & complete task' opens 'Ready to complete … Complete the task', whose button says End task; closed cards read 'Completed', the receipt 'Task complete'. strings.json bans Complete: tasks are ended. Fix: 'End task', 'Ready to end', 'Ended · Today'.",
-  "source": "screen-review"
- },
- {
   "id": "screens-a-8",
   "target": {
    "kind": "screen",

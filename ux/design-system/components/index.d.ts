@@ -605,7 +605,7 @@ export interface SentriUI {
   banner(props: BannerProps): string;
   photos(props: PhotosProps): string;
   /** The optional input: label · muted "Optional" · trailing icon action. `action` asks the host to open the editor; `inline` reveals the field under the row. */
-  optionalRow(props: { label: string; value?: string; icon?: string; editIcon?: string; action?: string; key?: string; inline?: string; open?: boolean; optionalWord?: string; editLabel?: string; disabled?: boolean; className?: string; attrs?: Record<string, string> }): string;
+  optionalRow(props: { label: string; value?: string; icon?: string; editIcon?: string; action?: string; key?: string; inline?: string; open?: boolean; optionalWord?: string; editLabel?: string; disabled?: boolean; className?: string; face?: 'row'; attrs?: Record<string, string> }): string;
   button(props: ButtonProps): string;
   /** The persistent status line (row-title size) that says why a waiting button waits. */
   /** For delegated clicks: true when the control is aria-disabled; answers it (its described lines flash and re-announce). */

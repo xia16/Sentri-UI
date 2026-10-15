@@ -49,7 +49,7 @@
 .upcoming-work summary svg{width:13px;height:13px;color:var(--muted);transition:transform .15s}.upcoming-work[open] summary svg{transform:rotate(180deg)}
 
 .upcoming-row{display:grid;grid-template-columns:78px 1fr;gap:8px;padding:12px 2px;border-top:1px solid #e7ebe0;font-size:11px;line-height:1.6}
-.upcoming-row>span{color:var(--muted)}.upcoming-row small{display:block;font-size:10px;color:var(--muted);margin-top:3px}
+.upcoming-row>span{color:var(--muted)}.upcoming-row small{display:block;font-size:11px;color:var(--muted);margin-top:3px}
 .environment-readings>div{display:flex;justify-content:space-between;align-items:center;min-height:63px;border-bottom:1px solid var(--line);font-size:12px}
 .environment-readings strong{font:400 21px var(--font-mono)}.environment-readings small{font:10px var(--font-sans);color:var(--muted)}
 .task-overview-screen{background:#fff;padding-top:12px}.page-head:has(+.task-overview-screen){background:#fff;border-bottom:1px solid var(--line);padding-top:10px;padding-bottom:14px}
@@ -179,6 +179,9 @@
 
 /* Home and the card gallery use the same component. */
 .home-task-list{display:grid;gap:14px;margin-bottom:18px}
+.task-list-toggle{display:block;width:100%;min-height:48px;margin:0 0 18px;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);font:inherit;font-weight:600;text-align:center;cursor:pointer}
+.upcoming-work .work-section-heading{align-items:center;min-height:52px;padding:12px 16px}.upcoming-work .upcoming-row{padding-inline:16px}.upcoming-work .task-list-toggle{width:calc(100% - 32px);margin:4px 16px 14px}
+.completed-work summary{display:flex;cursor:pointer;list-style:none;min-height:48px;align-items:center}.completed-work summary::-webkit-details-marker{display:none}
 
 .next-work-heading{padding:5px 2px 0}.completed-work{margin-top:22px}.completed-work .home-task-list{gap:8px}
 
@@ -186,6 +189,22 @@
 
 
 .sensor-history summary{min-height:var(--tap-min);display:flex;align-items:center}
+
 /* The page header owns the 24px to the body: the scroller under it adds no top padding, its first element no top margin (layout only). */
 .st-page-header+.app-scroll{padding-top:0}
 .st-page-header+.app-scroll>:first-child{margin-top:0}
+
+/* Home header ↔ section chooser: mirror the native page transition. */
+#app{view-transition-name:workbench-section-page}
+#app>.bottom-nav{view-transition-name:workbench-bottom-nav}
+html[data-section-motion] .screen-enter{animation:none}
+html[data-section-motion]::view-transition-old(workbench-bottom-nav),
+html[data-section-motion]::view-transition-new(workbench-bottom-nav){animation:none}
+html[data-section-motion="forward"]::view-transition-old(workbench-section-page){animation:section-forward-out 260ms cubic-bezier(.4,0,.2,1) both}
+html[data-section-motion="forward"]::view-transition-new(workbench-section-page){animation:section-forward-in 260ms cubic-bezier(.4,0,.2,1) both}
+html[data-section-motion="back"]::view-transition-old(workbench-section-page){animation:section-back-out 260ms cubic-bezier(.4,0,.2,1) both}
+html[data-section-motion="back"]::view-transition-new(workbench-section-page){animation:section-back-in 260ms cubic-bezier(.4,0,.2,1) both}
+@keyframes section-forward-out{0%{opacity:1;transform:translateX(0)}69%{opacity:0}100%{opacity:0;transform:translateX(-16.667%)}}
+@keyframes section-forward-in{0%{opacity:0;transform:translateX(33.333%)}85%{opacity:1}100%{opacity:1;transform:translateX(0)}}
+@keyframes section-back-out{0%{opacity:1;transform:translateX(0)}69%{opacity:0}100%{opacity:0;transform:translateX(33.333%)}}
+@keyframes section-back-in{0%{opacity:0;transform:translateX(-16.667%)}85%{opacity:1}100%{opacity:1;transform:translateX(0)}}

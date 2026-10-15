@@ -55,3 +55,7 @@ In scope: the sweep and its marks. Out: the transfer, death and health records r
 - `ux/archive/task-screens-combined.html` sections 01c, 02, 02c
 - `ux/model/unified-task-list.md` (historical)
 - Figma node 7561-10830
+
+## Home card handoff · 2026-10-14
+
+Overview shows cumulative recorded-in-heat sows against the configured target; this is an outcome, not observation completion. Unit shows sows with signs awaiting confirmation, with no separate “no signs” branch. The Home card uses no legacy round wording and has no quick-end action. These decisions concern Home only; the task flow above remains draft. See [Home display rules](../../ux/research/home/HOME-TASK-DISPLAY-RULES.md).
