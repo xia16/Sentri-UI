@@ -69,7 +69,7 @@ function enterEdit(s){s.back=s.view==='finish'?'finish':s.locked?'locked':'count
 // The litter weight's Numpad is open while s.pad names its Measure; Back, a swipe, Escape or the scrim close it and keep the typed value
 // (closing never discards; a weight of 0 or an empty one is "not recorded").
 const padOpen=s=>(s.pad==='weight'&&s.view==='finish')||(s.pad==='editWeight'&&s.view==='editFinish');
-function closePad(s){if(!padOpen(s))return false;const t=s.pad==='editWeight'?s.edit:s,w=SentriUI.numpadCommit(t.weight,{decimals:1});t.weight=w==null||+w===0?'':w;s.pad=null;s.padHint='';return true;}
+function closePad(s){if(!padOpen(s))return false;const t=s.pad==='editWeight'?s.edit:s,w=SentriUI.numpadCommit(t.weight,{decimals:1});t.weight=w==null||+w===0?'':w;s.pad=null;s.padHint='';s.padFresh=false;return true;}
 function act(s,a,v){
  if(['back','close','dismiss','editCounts'].includes(a)&&closePad(s))return;
  if(['back','close','dismiss'].includes(a)&&s.popup?.kind==='born'){s.popup=null;return;}
@@ -93,8 +93,8 @@ function act(s,a,v){
  if(a==='expand')s.view='editFinish';
  if(a==='editCounts')s.view='edit';
  if(a==='assistance'||a==='editAssistance')(a==='editAssistance'?s.edit:s).assisted=v==='true';
- if(a==='open-numpad'){s.pad=v;s.padHint='';}
- if(a==='numpad'){const [k,key]=v.split(':'),t=k==='editWeight'?s.edit:s,r=SentriUI.numpadInput({value:t.weight},key,{decimals:1,intLength:2});t.weight=r.value;s.padHint=r.dead==='full'?'1 decimal place at most':r.dead==='point'?'One decimal point only':r.dead==='empty'?'Nothing to delete':'';}
+ if(a==='open-numpad'&&s.pad!==v){s.pad=v;s.padHint='';s.padFresh=!!((v==='editWeight'?s.edit:s).weight);}
+ if(a==='numpad'){const [k,key]=v.split(':'),t=k==='editWeight'?s.edit:s,r=SentriUI.numpadInput({value:t.weight,replace:s.padFresh},key,{decimals:1,intLength:2});t.weight=r.value;s.padFresh=false;s.padHint=r.dead==='full'?'1 decimal place at most':r.dead==='point'?'One decimal point only':r.dead==='empty'?'Nothing to delete':'';}
  if(a==='classify'){const [k,n]=v.split(',');const next=Math.max(0,s[k]+(+n));if(next+s[k==='weak'?'deformed':'weak']<=s.alive)s[k]=next;}
  if(a==='lock'){closePad(s);if(hasDraft(s)||!born(s))return;fold(s);s.frozen=born(s);s.finishAlive=s.alive;s.locked=true;s.finished='Today · 09:41';event(s,`Farrowing finished · born ${s.frozen}`,'milestone');s.view='locked';}
  if(a==='sowActions'){s.pageBack=s.view;s.actionsEntry=true;s.view='profile';}
@@ -249,9 +249,9 @@ const conditionHeading=()=>SentriUI.heading({kind:'section',level:3,title:'Pigle
 function finishDetails(s,editing){
  const x=editing?s.edit:s,key=editing?'editWeight':'weight',name=editing?'editAssistance':'assistance';
  return SentriUI.choiceRadios({label:'Assisted',layout:'inline',face:'key',key:name,action:name,selected:x.assisted==null?'':String(x.assisted),options:[{value:'false',label:'No'},{value:'true',label:'Yes'}]})
-  +SentriUI.measure({label:'Litter weight',optional:'Optional',layout:'row',unit:'kg',value:x.weight,key,active:s.pad===key,controls:'finish-pad',hint:s.pad===key?s.padHint:''});
+  +SentriUI.measure({label:'Litter weight',optional:'Optional',layout:'row',unit:'kg',value:x.weight,key,active:s.pad===key,controls:'finish-pad',replace:s.pad===key&&!!s.padFresh,hint:s.pad===key?s.padHint:''});
 }
-const finishPad=(s,editing)=>{const key=editing?'editWeight':'weight';return s.pad===key?SentriUI.numpad({dock:true,id:'finish-pad',key,action:'numpad',decimals:1,intLength:2,value:(editing?s.edit:s).weight}):'';};
+const finishPad=(s,editing)=>{const key=editing?'editWeight':'weight';return s.pad===key?SentriUI.numpad({dock:true,id:'finish-pad',key,action:'numpad',decimals:1,intLength:2,value:(editing?s.edit:s).weight,replace:!!s.padFresh}):'';};
 const footer=(left,right,className='')=>SentriUI.sheetFooter({content:left+(right||''),className});
 // Reset and Clear are quiet text in the footer, left of the primary (Headers law, 2026-10-13): never in a header.
 /* Clear (or Reset) is the sheet header's corner action, top right (owner, 2026-10-14), passed only while there is something to clear. */

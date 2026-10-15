@@ -317,7 +317,7 @@ Scope: `farrowing.finish` and `farrowing.edit-finished` (the Finish sheet, and t
 ## Keep
 
 - **The Born · Alive · Dead totals panel.** One look at what was counted; the first question on this sheet ("is the count right before I lock it?"). Unchanged.
-- **The Weak and Deformed steppers** (Stepper `row`: label left, `− n +` right, a rule between rows, 60px). They are the sheet's real questions and each tap saves at once; their behaviour and the 144px right column are the grid the new rows follow.
+- **The Weak and Deformed steppers** (Stepper `row`: label left, `− n +` right, a rule between rows, 60px). They are the sheet's real questions and each tap saves at once; their behaviour and the 136px right column are the grid the new rows follow.
 - **The footer: Back and the Finish farrowing hold** (56px, HOLD TO FINISH). Unchanged.
 - **Litter weight and Assisted remain facts the worker can record at finish**, and read as before on the locked record.
 
@@ -371,3 +371,8 @@ Held against the Farrowing room (quiet rows, one dark primary) and the sheet's o
 - The pad-open state kept a dead band of about 90px between the Litter weight row and the pad: the pad's reserved status line (48px), its padding and the body's 24px. A docked pad now reserves no status line (opt-in `dock`); a dead key is answered in the Measure's own hint under its row, so the keys never move. The host scrolls only until the row ends 24px above the pad, and not at all when it already fits. Measured at 390 and 360: row end to pad top is 23 to 24px in both forms, and the rows above fill the body.
 - Resting states are unchanged. Legibility strict, spacing and headers: 0 defects on both screens; `npm test` 703 pass; the four finish leaves pass.
 - **Better because** the pad-open state is one tight stack: rows, 24px, pad, footer.
+
+#### Crit round 2 (driver), then Final look (the head that adds this block; its screens are those of the commit before it, rendered at 390 and 360)
+- Main (#170, the Header component) merged forward; atlas regenerated; `check-headers` on both screens: 0 defects.
+- Defect fixed: Edit finish details opened the pad on the stored `12.6` with the digits floor-grayed (the value was full). A pad that opens on an existing value now shows it selected (a highlight and a thin ink outline on the value, no caret) with every key live: the first digit or point replaces it, backspace first clears it to empty, closing without a key keeps it. Opt-in (`replace` on Measure and Numpad), so other pads are unchanged.
+- **Better because** the worker can correct a stored weight in one tap, and the selected value says the next key replaces it.

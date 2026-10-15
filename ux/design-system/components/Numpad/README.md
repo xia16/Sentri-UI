@@ -26,6 +26,8 @@ Call `SentriUI.numpad({ label, value, unit, placeholder, suggested, decimals, ma
 
 **Dock** (`dock: true`, candidate). The pad sits between a Sheet's body and its footer, out of the scroller: `paper`, a 1px `line` above, `space-gutter` sides, and the footer's own top line dropped. A docked pad reserves no status line (the keys sit directly under the body, so the row above ends 24px above the pad); the host answers a dead key in the Measure's hint under its row. A host passes it before the footer (`footer: numpad + sheetFooter(...)`). Opt-in: without it the pad is unchanged.
 
+**Replace** (`replace: true`, candidate). The pad opens on an existing value, shown selected in its Measure (`replace` there too): the keys stay live even when the value is full, the first digit or `.` replaces it, and ⌫ first clears it to empty. Any key ends the replace state. Closing keeps the staged value. `SentriUI.numpadInput` takes `replace` in its state. Opt-in: every other pad behaves as before.
+
 **The pad rule (written once, here and in Measure)**
 - The pad docks above the bar, in the thumb zone, with its keys `space-row-y` (12px) above the bar. The pad and the bar are anchored at the bottom, independent of the feedback above the keys.
 - The host scrolls the active field into view above the pad.

@@ -473,7 +473,7 @@
   }
   /* Measure: one measured value, mono, unit always written. A button that opens the docked Numpad (active).
      range is evaluated only when the pad is closed (active false), never per keystroke. */
-  function measure({label='',optional='',value='',unit='',unitGap=true,placeholder='—',action='open-numpad',key='',active=false,controls='',range=null,tone='',changed=false,hint='',note='',id='',className='',layout='',strs,args}={}){
+  function measure({label='',optional='',value='',unit='',unitGap=true,placeholder='—',action='open-numpad',key='',active=false,controls='',range=null,tone='',changed=false,hint='',note='',id='',className='',layout='',replace=false,strs,args}={}){
     const o={strs,args},lid=id||fieldId('st-measure'),v=value==null?'':String(value),num=parseFloat(v);
     const out=!active&&Array.isArray(range)&&v!==''&&!Number.isNaN(num)&&(num<range[0]||num>range[1]);
     const t=tone==='refused'?'refused':tone==='warn'||out?'warn':'';
@@ -484,7 +484,7 @@
     const box=valueBox('button',{value:v,unit,unitGap,placeholder,active,live:active,vid,uid,attrs:` type="button" data-action="${esc(action)}" data-value="${esc(key)}" aria-labelledby="${esc(lid)} ${esc(vid)} ${esc(uid)}" aria-describedby="${esc(hid)}${hasNote?' '+esc(nid):''}" aria-expanded="${active?'true':'false'}"${controls?` aria-controls="${esc(controls)}"`:''}`},o);
     const hl=hintLine('st-measure-hint',{id:hid,text:hint,tone:t,o});
     const nl=hasNote?`<p class="st-field-hint st-measure-note" id="${esc(nid)}" data-tone="muted">${tx(note,o,'note')}</p>`:'';
-    return `<div class="st-measure ${esc(className)}" data-ds="Measure"${oneOf('Measure','layout',layout||'stack',['stack','row'],'stack')==='row'?' data-layout="row"':''} data-field="${esc(key)}"${v===''?' data-empty=""':''}${active?' data-active=""':''}${t?` data-tone="${t}"`:''}${isChanged?' data-changed=""':''}>${lab}${box}${hl}${nl}</div>`;
+    return `<div class="st-measure ${esc(className)}" data-ds="Measure"${oneOf('Measure','layout',layout||'stack',['stack','row'],'stack')==='row'?' data-layout="row"':''} data-field="${esc(key)}"${v===''?' data-empty=""':''}${active?' data-active=""':''}${active&&replace&&v!==''?' data-replace=""':''}${t?` data-tone="${t}"`:''}${isChanged?' data-changed=""':''}>${lab}${box}${hl}${nl}</div>`;
   }
   /* Numpad: the one type-to-set pad, for real typed input only (ear tags, weights), docked above the bar.
      1–9 · [. or a gap] 0 ⌫. No commit key: the bar's primary commits. Keys never move: the feedback region
@@ -494,9 +494,9 @@
     const digitsDead=dot>=0?frac.length>=decimals:((maxLength!=null&&v.length>=maxLength)||(intLength!=null&&intPart.length>=intLength));
     return {dot,digitsDead,pointDead:decimals<=0||dot>=0};
   }
-  function numpad({dock=false,compact=false,label='',value='',unit='',placeholder='—',suggested=false,decimals=0,maxLength=null,intLength=null,recent=null,id='',action='numpad',key='',tone='',hint='',actions=[],className='',strs,args}={}){
+  function numpad({dock=false,replace=false,compact=false,label='',value='',unit='',placeholder='—',suggested=false,decimals=0,maxLength=null,intLength=null,recent=null,id='',action='numpad',key='',tone='',hint='',actions=[],className='',strs,args}={}){
     const o={strs,args},s=strs||{},a=args||{},pid=id||fieldId('st-numpad'),hid=pid+'-hint';
-    const v=value==null?'':String(value),typing=suggested?'':v;
+    const v=value==null?'':String(value),typing=(suggested||replace)?'':v;
     const L=numpadLimits(typing,{decimals,maxLength,intLength});
     const t=tone==='warn'?'warn':'';
     const run=!!(label||has(o,'label'));
@@ -508,22 +508,23 @@
     const keys=['1','2','3','4','5','6','7','8','9'].map(d=>k(d,L.digitsDead)).join('')
       +(decimals>0?k('.',L.pointDead):'<span class="st-numpad-gap" aria-hidden="true"></span>')
       +k('0',L.digitsDead)
-      +`<button type="button" class="st-numpad-key" data-action="${esc(action)}" data-value="${esc(key)}" data-key="back"${typing===''&&!suggested?' aria-disabled="true"':''}${ariaText('Backspace',s.back,a.back)}>${glyph('backspace')}</button>`;
+      +`<button type="button" class="st-numpad-key" data-action="${esc(action)}" data-value="${esc(key)}" data-key="back"${typing===''&&!suggested&&!replace?' aria-disabled="true"':''}${ariaText('Backspace',s.back,a.back)}>${glyph('backspace')}</button>`;
     return `<div class="st-numpad ${esc(className)}" data-ds="Numpad"${dock?' data-dock=""':''} id="${esc(pid)}" data-field="${esc(key)}"${t?` data-tone="${t}"`:''}${L.digitsDead?' data-full=""':''}>${readout}${feedback}<div class="st-numpad-keys" role="group" aria-describedby="${esc(hid)}"${ariaText('Number pad',s.pad,a.pad)}>${keys}</div></div>`;
   }
   /* The pad's string rules, so every host types the same way. state {value, suggested, suggestion}; value is
      always a string. Keys: '0'–'9' · '.' · 'back' · 'suggestion' (the named "Use 000258" transition).
      Returns the next state plus dead: null | 'full' | 'point' | 'empty' (answer it in the status region). */
   function numpadInput(state,k,{decimals=0,maxLength=null,intLength=null}={}){
-    const st={value:String(state&&state.value!=null?state.value:''),suggested:!!(state&&state.suggested),suggestion:String(state&&state.suggestion!=null?state.suggestion:'')};
+    const st={value:String(state&&state.value!=null?state.value:''),suggested:!!(state&&state.suggested),suggestion:String(state&&state.suggestion!=null?state.suggestion:''),replace:!!(state&&state.replace)};
     const done=(value,suggested=false,dead=null)=>({value,suggested,suggestion:st.suggestion,dead});
     if(k==='suggestion')return st.suggestion?done(st.suggestion,true):done(st.value,st.suggested,'empty');
     if(k==='back'){
+      if(st.replace)return done('');                          // a value shown as replaceable: ⌫ first clears it to empty
       if(st.suggested)return done(st.value.slice(0,-1));       // a suggestion becomes typed ink, minus its last digit
       if(st.value==='')return done('',false,'empty');          // cleared is a stable empty (missing); never back to the suggestion
       return done(st.value.slice(0,-1));
     }
-    const base=st.suggested?'':st.value,L=numpadLimits(base,{decimals,maxLength,intLength});
+    const base=st.suggested||st.replace?'':st.value,L=numpadLimits(base,{decimals,maxLength,intLength});
     if(k==='.'){
       if(L.pointDead)return done(st.value,st.suggested,'point');
       return done(base===''?'0.':base+'.');

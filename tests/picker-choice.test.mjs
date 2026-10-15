@@ -201,6 +201,32 @@ test("the litter weight is a Measure on the docked Numpad: Back closes the pad a
   F.act(s, "back");
   assert.equal(s.weight, "", "an empty or zero weight is not recorded");
 });
+test("a stored weight opens replaceable: live keys, the first key replaces it, backspace clears it, closing keeps it", () => {
+  const F = globalThis.FarrowingStudy,
+    s = F.seed("locked");
+  s.view = "editFinish";
+  s.edit = { ...s, weight: "12.6" };
+  F.act(s, "open-numpad", "editWeight");
+  assert.equal(s.padFresh, true);
+  F.act(s, "open-numpad", "editWeight");
+  assert.equal(s.padFresh, true, "tapping the open Measure again does nothing");
+  F.act(s, "numpad", "editWeight:9");
+  assert.equal(s.edit.weight, "9", "the first digit replaces the stored value");
+  assert.equal(s.padFresh, false);
+  F.act(s, "back");
+  F.act(s, "open-numpad", "editWeight");
+  F.act(s, "numpad", "editWeight:back");
+  assert.equal(s.edit.weight, "", "backspace first clears it to empty");
+  F.act(s, "back");
+  s.edit.weight = "12.6";
+  F.act(s, "open-numpad", "editWeight");
+  F.act(s, "back");
+  assert.equal(s.edit.weight, "12.6", "closing without a key keeps the stored value");
+  const UI = globalThis.SentriUI;
+  assert.match(UI.numpad({ decimals: 1, intLength: 2, value: "12.6" }), /aria-disabled="true"/);
+  assert.doesNotMatch(UI.numpad({ decimals: 1, intLength: 2, value: "12.6", replace: true }), /aria-disabled/);
+  assert.equal(UI.numpadInput({ value: "12.6", replace: true }, ".", { decimals: 1, intLength: 2 }).value, "0.");
+});
 test("browsing a disease branch retains its kind when adding a custom condition", () => {
   const M = globalThis.InspectionStudy,
     c = M.seed();

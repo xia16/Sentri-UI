@@ -280,6 +280,8 @@ export interface StepperProps {
 /** Candidate. A measured value with its unit; the box is
  *  `<button data-action="open-numpad" data-value=key aria-expanded aria-controls>`. */
 export interface MeasureProps {
+  /** Candidate: with the pad open on an existing value, shows the value selected (replaceable by the first key). */
+  replace?: boolean;
   /** Candidate: 'row' draws the Measure as one row of a flat list in the Stepper row's right column (label left, box right). Default 'stack'. */
   layout?: 'stack' | 'row';
   label: string;
@@ -323,6 +325,8 @@ export interface FieldAction { label: string; action: string; value?: string; st
 /** Candidate. 1–9 · [. or gap] 0 ⌫; keys are `<button data-action data-value=key data-key="0-9|.|back">`.
  *  No commit key: the surface's bar primary commits. Keys never move. */
 export interface NumpadProps {
+  /** Candidate: the value is replaceable: the keys stay live, the first digit or point replaces it and ⌫ clears it. */
+  replace?: boolean;
   /** Candidate: sits between a Sheet's body and its footer, out of the scroller. */
   dock?: boolean;
   /** Candidate (ADR 0002): a run without the running list; the host speaks the last record in the status line. */

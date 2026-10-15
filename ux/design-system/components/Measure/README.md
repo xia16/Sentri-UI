@@ -27,6 +27,7 @@ Call `SentriUI.measure({ label, optional, value, unit, unitGap, placeholder, key
 - **Default:** the value and its unit.
 - **Empty:** `—` in `muted`, with the unit still written (`— kg`). Missing is not zero, so an unweighed litter never reads `0 kg`.
 - **Pressed:** the box fills `press`.
+- **Replace** (`replace: true`, candidate): the pad has just opened on an existing value (Edit finish details: the stored `12.6`). The value shows selected, on a `well` highlight with no caret; the first digit or `.` on the pad replaces it and ⌫ first clears it to empty. Closing keeps the value as it stands and never discards. Without it nothing changes.
 - **Active** (the pad is open):
   - the border turns `ink` at `caret-width`, and a `caret-width` `ink` caret follows the digits;
   - when the field is empty, the caret shows alone before the unit;
