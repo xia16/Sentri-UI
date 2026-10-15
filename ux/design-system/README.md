@@ -112,7 +112,7 @@ Every drawer and page leaves, goes up and commits the same way.
 
 ### Headers (law; owner, 2026-10-13)
 
-There are two headers and no others. A new kind of header goes through the rules ledger, never straight into a screen.
+There are two headers and no others. A new kind of header goes through the rules ledger, never straight into a screen. Both are the [Header](components/Header/README.md) component (page header, sheet header); the title inside them is a [Heading](components/Heading/README.md) (the page or sheet title).
 
 | | **Page header** | **Sheet header** |
 |---|---|---|
