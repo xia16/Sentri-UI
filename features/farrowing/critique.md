@@ -345,4 +345,24 @@ Scope: `farrowing.finish` and `farrowing.edit-finished` (the Finish sheet, and t
 
 ## Self-crit
 
-(Filled in below as each render is judged against `c4f98e2`.)
+Held against the Farrowing room (quiet rows, one dark primary) and the sheet's own Weak and Deformed rows; the owner's mockup fixed the direction, so there is one direction and two rounds.
+
+#### Round 1 (renders at 390 EN beside `c4f98e2`: `farrowing.finish`, its answered and weight-open states, and the Edit finish details form)
+- **Problems fixed:** the boxed chips are gone (the weight and Assisted are two more rows of the list); nothing reflows (the rows are always there, an answer changes a ring, not a position); the answer sits on its own row; the weight is a Measure on the docked Numpad, no system keyboard, Hold to finish stays on screen; the legend is a 16px/500 section heading with a muted icon; the description line is cut.
+- **Found by eye and fixed:** the first build drew No / Yes 48px tall, 144px wide with the light `control-border`, against the real Stepper faces (44px tall, `task-key-border`, their first key starting 8px in): the keys read bigger and paler than the steppers above them. The keys and the Measure box now take the stepper face's own box (44px visible in a 48px hit area, 136px column, the stepper's border), so the right and left edges line up. Where the brief says 48px keys in a 144px column, the rendered Stepper is 44 in 136 (bundle.css, Stepper row); matching it is what makes the column read as one.
+- **Found by the check:** the empty weight dash at 18px muted is 5.2:1, under the 7:1 floor for 16px text. The dash is a placeholder, so it is drawn at 15px (5.2:1 holds the 4.5:1 for small text).
+- **Keep as strong:** the totals panel, the Weak and Deformed rows and the footer are unchanged in code and in the render.
+- **Squint test:** the title, the totals, then the four rows read as one list; the first three things the eye lands on are the count (14 · 9 · 5), the steppers and the dark Hold. They match the worker's questions (is the count right? any weak or deformed? can I finish?). The ringed No is the only mark in the lower half.
+- **Cluttered, flat or bulky:** lighter than the baseline: two boxed chips and a legend plus description became one heading and two plain rows. No box, no bold and no fill was added (c3), nothing the worker needs was removed (c2), nothing was enlarged (c1).
+- **House reference:** the Farrowing room's quiet rows.
+- **Better because** the optional chips no longer outweigh the questions, no target moves under the thumb, and the weight is typed on the pad that already has a Hold to finish under it.
+
+#### Edit finish details (same rows)
+- The baseline form was a questionnaire (a bold question, a hint, two half-width steppers, two chips and a detached radio group). It now matches Finish: the same heading and rows, with the steppers' `was N` notes and the Save correction summary kept, the drawer sized to its content, 24px above the footer.
+- **Better because** it is the same list as Finish, so the worker meets one form twice, not two forms.
+
+#### Final look (`5cc9b6c`, the pushed head; rendered from it at 390 and 360, EN and ZH, beside `c4f98e2`)
+- `farrowing.finish` at 390 and 360: heading, four rows in one column, rules between rows only, 24px under the totals and above the footer; ZH matches EN (the page draws only the room rows in Chinese). The weight-open state at 390: the pad docks above the footer and the Measure stays visible above it.
+- `farrowing.edit-finished` is the Edit record page; it is unchanged (its Finish details door is the only part that leads to the form above), so its pair is identical.
+- Checks on this commit: `npm test` 703 pass, 0 fail; `npm run check` exit 0; `check-states` fails 7 states in Banner, Button, ConditionTag and Facts, none of them a component this change touches (the same Banner, ConditionTag and Facts states fail on `c4f98e2`; the Button ones are a network timeout); `check-legibility --strict` on both screens: 0; `check-spacing`: 0; `check-headers`: 0; `run-scenarios farrowing`: EN 89 of 89 pass (two new leaves), ZH blocked as on main.
+- **Better because** the same four facts are one calm list in the system's own parts, and the worker can answer Assisted or add a weight without anything moving.
