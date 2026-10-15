@@ -22,7 +22,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { CLASSES, screensOf, pageOf, pageAssets, sharedFiles, coverageLost, effectiveClass, classifyScreens, checkVerdict, touchesSystem, touchesTools, queueAhead as queueOf, budgetProblems, critiqueProblems, pageStyling, addedLines, calibrationProblems, lockState, shotsToTake, reachOf, reachLine, carryDecision, ghNetworkError } from './loop-rules.mjs';
+import { CLASSES, screensOf, pageOf, pageAssets, sharedFiles, coverageLost, effectiveClass, classifyScreens, checkVerdict, touchesSystem, touchesTools, queueAhead as queueOf, budgetProblems, critiqueProblems, pageStyling, addedLines, calibrationProblems, lockState, shotsToTake, reachOf, reachLine, carryDecision, ghNetworkError, newScenarioFailures } from './loop-rules.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -665,7 +665,16 @@ for (const f of new Set([...scope, ...[...screens.diff, ...screens.new].map((s) 
   if (!fs.existsSync(path.join(wt.cand, 'features', f, 'scenarios.json'))) { noLeaves.push(f); continue; }
   if (!runner) { check(`scenarios ${f}`, false, 'scripts/run-scenarios.mjs is not on this candidate'); continue; }
   r = run(process.execPath, ['scripts/run-scenarios.mjs', f, '--base', url.cand], wt.cand);
-  check(`scenarios ${f}`, r.code === 0, r.tail);
+  // A failed run is re-asked on base, for the failing leaves only: a leaf already failing on main is main's debt, not this change's.
+  // Exit 1 is "a leaf failed"; any other non-zero exit (a bad tree, a crash) fails as it is.
+  let report = null; try { report = JSON.parse(fs.readFileSync(path.join(wt.cand, 'review', `scenarios-${f}.json`), 'utf8')); } catch {}
+  const failed = r.code === 1 && report ? report.leaves.filter((x) => x.result === 'fail').map((x) => x.id) : [];
+  if (failed.length && fs.existsSync(path.join(wt.base, 'scripts/run-scenarios.mjs')) && fs.existsSync(path.join(wt.base, 'features', f, 'scenarios.json'))) {
+    const b = run(process.execPath, ['scripts/run-scenarios.mjs', f, '--base', url.base, '--only', failed.join(',')], wt.base);
+    const { added, debt } = newScenarioFailures(failed, b.all.join('\n'));
+    if (debt.length) gaps.push(`scenarios ${f}: ${debt.length} leaf/leaves already failing on main: ${debt.slice(0, 4).join(', ')}`);
+    check(`scenarios ${f}`, !added.length, added.length ? `${added.length} new failing leaf/leaves: ${added.slice(0, 4).join(', ')}\n${r.tail}` : `${debt.length} failing leaf/leaves already fail on main (${debt.slice(0, 4).join(', ')}); none new`);
+  } else check(`scenarios ${f}`, r.code === 0, r.tail);
 }
 mech.timings.scenarios = Math.round((Date.now() - t0) / 1000) + 's';
 if (noLeaves.length && CLASSES.indexOf(ec.cls) >= 2) gaps.push(`${noLeaves.length} affected feature(s) have no executable leaves (features/<id>/scenarios.json): ${noLeaves.slice(0, 6).join(', ')}${noLeaves.length > 6 ? ' …' : ''}. Behaviour there is covered by the walk only.`);
