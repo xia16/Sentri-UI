@@ -18,14 +18,16 @@ const curl = (url, file) => {
 };
 
 const urls = new Set();
-(function scan(dir) {
+function scan(dir) {
   for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
     if (['node_modules', '.git', 'vendor', 'archive'].includes(e.name)) continue;
     const p = path.join(dir, e.name);
     if (e.isDirectory()) scan(p);
     else if (/\.(html|css|js|mjs)$/.test(e.name)) for (const m of fs.readFileSync(p, 'utf8').matchAll(/https:\/\/fonts\.googleapis\.com\/css2\?[^"' )`]+/g)) urls.add(m[0].replace(/&amp;/g, '&'));
   }
-})(path.join(root, 'ux'));
+}
+scan(path.join(root, 'ux'));
+scan(path.join(root, 'atlas')); // the atlas's own link: the gate shoots component pages inside it (scripts/shoot-screens.mjs --components)
 
 fs.mkdirSync(path.join(out, 'css'), { recursive: true });
 fs.mkdirSync(path.join(out, 'files'), { recursive: true });

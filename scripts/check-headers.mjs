@@ -15,7 +15,9 @@
 // Renders every atlas screen bare at 390 (EN: gap, contents, corner) and 360 (EN and ZH: contents, corner, room, wrap).
 // Writes review/headers.json.
 // Usage: node scripts/check-headers.mjs [--base <url>] [--feature <id>] [--screens id,id] [--changed <ids>] [--strict]
-//                                       [--out <file.json>] [--self-test]
+//                                       [--out <file.json>] [--self-test] [--components [Name,Name]]
+//   --components the design system's variant pages instead of the screens (all, or the named components): see below;
+//                --atlas <atlas.json> names the pages from another checkout's atlas (the gate's base and candidate).
 //   --changed    exit 1 only when one of these screens has a defect; --strict: exit 1 on any defect.
 //   --self-test  the known-bad fixtures in scripts/check-headers.fixtures/ must fail the check named in their
 //                <meta name="expect">, the known-good ones must pass.
@@ -26,7 +28,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { playwright } from './playwright-path.mjs';
-import { screensOf } from './loop-rules.mjs';
+import { screensOf, componentPagesOf } from './loop-rules.mjs';
 import { routeFonts } from './font-route.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -225,6 +227,29 @@ if (argv.includes('--self-test')) {
   console.log(`${n - fails}/${n} fixtures behave as expected`);
   await browser.close(); if (server) server.kill();
   process.exit(fails ? 1 : 0);
+}
+
+/* ---------- --components: the design system's own variant pages ---------- */
+// A law that a screen must follow, the component page that teaches it must follow too: every variant page the atlas draws
+// (Components → <Name> → <variant>, ds:<Name>/<variant>; the same list the gate shoots) is audited like a screen, as the atlas
+// draws it: each state is a frame, and audit() walks every frame (room, wrap, contents and corner at 360, EN; a page's Chinese
+// cells are its own). --out writes [{ page, headers, defects, error? }]; the gate compares it base against candidate.
+// Exit 1 on any defect or page that doesn't render with --strict.
+if (argv.includes('--components')) {
+  const pages = componentPagesOf(JSON.parse(fs.readFileSync(val('--atlas') || path.join(root, 'atlas/atlas.json'), 'utf8')), { components: list('--components') });
+  const run = { width: 360, lang: 'en', checks: ['contents', 'wrap', 'corner', 'room'] };
+  const found = [];
+  for (const pg of pages) {
+    const res = { page: pg.id, headers: 0, defects: [] };
+    try { const r = await audit(base + pg.url, run, '.vbody .sgrid .scell iframe'); res.defects = dedupe(r.defects); res.headers = r.seen.length; } catch (e) { res.error = e.message.split('\n')[0]; }
+    if (res.defects.length || res.error) { console.log(`${res.error ? 'ERR ' : 'HEAD'} ${pg.id}${res.error ? ' ' + res.error : ''}`); res.defects.forEach((d) => console.log(`      ${d.check.padEnd(8)} ${d.detail}`)); }
+    found.push(res);
+  }
+  const bad = found.filter((f) => f.defects.length || f.error);
+  console.log(`headers: ${pages.length} component pages (${found.reduce((n, f) => n + f.headers, 0)} headers), ${bad.length} with a defect or not rendered`);
+  if (val('--out')) fs.writeFileSync(val('--out'), JSON.stringify(found));
+  await browser.close(); if (server) server.kill();
+  process.exit(argv.includes('--strict') && bad.length ? 1 : 0);
 }
 
 /* ---------- the atlas screens ---------- */
