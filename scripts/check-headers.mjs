@@ -124,6 +124,16 @@ function auditHeaders({ TOL, checks }) {
         if (rows.size > 1 || l.getBoundingClientRect().height > Math.max(lh, ...boxes.map((b) => b.height)) * 1.5) out.push({ check: 'wrap', at: Math.round(l.getBoundingClientRect().top), detail: `${where(h)}: the header line "${txt(l).slice(0, 40)}" wraps onto ${Math.max(2, rows.size)} lines` });
         else if (past) out.push({ check: 'wrap', at: Math.round(l.getBoundingClientRect().top), detail: `${where(h)}: the header line "${txt(l).slice(0, 40)}" runs past the header` });
       }
+      // the title itself, as drawn: room is judged from its unwrapped width against 360, so a title drawn in a frame narrower
+      // than it claims (a component page's 360 state inset 16px a side, #170) wrapped and no check saw it
+      if (title) {
+        const rs = []; const w = document.createTreeWalker(title, NodeFilter.SHOW_TEXT); let n;
+        while ((n = w.nextNode())) { if (!n.textContent.trim()) continue; const rg = document.createRange(); rg.selectNodeContents(n); rs.push(...[...rg.getClientRects()].filter((r) => r.width > 0 && r.height > 0)); }
+        const lh = parseFloat(cs(title).lineHeight) || parseFloat(cs(title).fontSize) * 1.3;
+        const mids = rs.map((r) => (r.top + r.bottom) / 2).sort((a, b) => a - b);
+        const rows = mids.length ? 1 + mids.slice(1).filter((m, i) => m - mids[i] > lh / 2).length : 0;
+        if (rows > 1) out.push({ check: 'wrap', at: Math.round(title.getBoundingClientRect().top), detail: `${where(h)}: the title "${txt(title).slice(0, 40)}" wraps onto ${rows} lines as drawn` });
+      }
     }
     // ---- gap: header to the first body content ----
     if (checks.includes('gap')) {
