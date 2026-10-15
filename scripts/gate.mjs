@@ -90,7 +90,7 @@ fs.mkdirSync(out, { recursive: true });
 // A rerun into the same folder starts clean: old shots, pairs and verdicts are about a mechanical run that no longer exists.
 for (const f of ['shots', 'pairs', 'mechanical.json', ...fs.readdirSync(out).filter((f) => VERDICT_FILE.test(f))]) fs.rmSync(path.join(out, f), { recursive: true, force: true });
 const started = Date.now();
-const env = { ...process.env, SENTRI_PLAYWRIGHT: pwPath };
+const env = { ...process.env, ...(pwPath ? { SENTRI_PLAYWRIGHT: pwPath } : {}) };
 const kids = [];
 
 function run(cmd, args, cwd, timeout = 20 * 60e3) {
@@ -329,6 +329,12 @@ if (zhLost.size) gaps.push(`${zhLost.size} screen(s) rendered Chinese on base an
 const steady = moved.filter((s) => !mech.flaky.includes(s.id));
 const ec = effectiveClass({ declared, files, diffs: steady, scope, shared });
 mech.class = { declared, effective: ec.cls, why: ec.why };
+// P2, every change has a known reach: a change declared for its own features that moves another feature's screen fails here
+// instead of being quietly escalated to a shared change (rules ledger L3). A deliberate shared change declares --class shared.
+if (declared !== 'shared' && mode !== 'refactor') {
+  const out = (ec.outside || []).filter((d) => !mech.flaky?.includes(d.id));
+  check('known reach: only SCOPE moved (P2)', !out.length, out.length ? `declared ${declared} for ${scope.join(', ')} but moves ${out.length} screen(s) of ${[...new Set(out.map((d) => d.feature))].join(', ')} (${out.slice(0, 3).map((d) => d.id).join(', ')}): give your part its own rule or token, or make it a declared shared change` : '');
+}
 if (ec.cls !== byFiles.cls) console.log(`class: ${declared} → ${ec.cls} (${ec.why.join('; ')})`);
 if (mode === 'refactor') check('refactor: every screen identical', !steady.length, steady.length ? steady.map((s) => s.id).slice(0, 5).join(', ') : mech.flaky.length ? `${mech.flaky.length} unstable on base, not counted` : '');
 const tools = touchesTools(files);
@@ -380,7 +386,8 @@ function openPrs() {
 }
 
 // ---------- legibility on the changed screens ----------
-const changed = [...screens.diff, ...screens.new].map((s) => s.id);
+// A screen base renders differently twice (mech.flaky) didn't move by this change: it isn't held to the floors here.
+const changed = [...screens.diff.filter((s) => !mech.flaky.includes(s.id)), ...screens.new].map((s) => s.id);
 if (changed.length) {
   if (fs.existsSync(path.join(wt.cand, 'scripts/check-legibility.mjs'))) {
     // the README's own line, not a sentence that mentions it ("change the line above to `Legibility gate: strict`")

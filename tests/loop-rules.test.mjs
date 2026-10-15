@@ -49,6 +49,16 @@ const mech = { pass: true, candidate: 'c1', base: 'b1', mode: 'normal', class: {
   screens: { diff: [{ id: 'farrowing.room' }], new: [], gone: [] }, pairs: [mp('farrowing.room', 'en', 390), mp('farrowing.room', 'en', 360)] };
 const pair = (verdict, lang = 'en', width = 390, screen = 'farrowing.room') => ({ screen, lang, width, verdict, why: 'x' });
 
+test('a screen base renders differently twice (flaky) needs no better pair, and alone counts as no change', () => {
+  const fl = { ...mech, class: { declared: 'shared' }, flaky: ['farrowing.room'] };
+  // a real change elsewhere still needs one better pair; the flaky screen alone doesn't demand one
+  assert.ok(!checkVerdict({ pass: true, candidate: 'c1', base: 'b1', pairs: [pair('same'), pair('same', 'en', 360)] }, fl).problems.some((p) => /same is not enough/.test(p)));
+  // only flaky screens moved: like no screen changed, a shared/behaviour change passes on a walk
+  assert.ok(checkVerdict({ pass: true, candidate: 'c1', base: 'b1', pairs: [pair('same'), pair('same', 'en', 360)], walk: [{ screen: 'x', ok: true }] }, fl).ok);
+  // without the flaky mark, same is still not enough
+  assert.match(checkVerdict({ pass: true, candidate: 'c1', base: 'b1', pairs: [pair('same'), pair('same', 'en', 360)] }, mech).problems.join(), /same is not enough/);
+});
+
 test('a verdict passes only on this candidate, with every changed screen judged and one better', () => {
   assert.ok(checkVerdict({ pass: true, candidate: 'c1', base: 'b1', pairs: [pair('better'), pair('same', 'en', 360)] }, mech).ok);
   assert.match(checkVerdict({ pass: true, candidate: 'old', base: 'b1', pairs: [pair('better'), pair('same', 'en', 360)] }, mech).problems.join(), /verdict is for old/); // R10

@@ -2,6 +2,15 @@
 
 Sentri-UI is the design source of truth for a native-feel mobile app used by gloved, one-handed farm workers in English and Chinese. AI agents run its design work. This page is the workflow. Every session and every engineer runs this one. Words are defined in the [glossary](GLOSSARY.md).
 
+## Getting started
+
+The workflow runs from this repository alone: nothing on one person's machine and no private repository is needed.
+
+1. Install [Node.js](https://nodejs.org) 22.13 or later and [Claude Code](https://code.claude.com).
+2. Clone Sentri-UI, then in the repo run `npm install` and `npx playwright install chromium`. Playwright is pinned (1.63.0) so every machine renders screens the same way; the gate, the scenario leaves and the screenshots all use it.
+3. Open the repo in Claude Code and accept the workspace trust prompt. The project settings declare Matt Pocock's public skills (`mattpocock/skills`, pinned to one commit) for Wayfinder and grilling; install them once with `claude plugin install mattpocock-skills@mattpocock`.
+4. `npm run ux` serves the atlas at `http://localhost:4317/atlas/`; `npm test` runs the guard tests; `/design <feature>` starts work on a feature.
+
 When a designed feature is implemented in the native Android app, use the
 [implementation and feedback workflow](../implementation-workflow.md) to trace
 the feature, design version, native behavior and findings in both repositories.
