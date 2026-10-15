@@ -484,3 +484,15 @@ export function carryDecision({ pass, mech, head, main, containsC, containsMain,
   if (!reach || reach.all || reach.features.length) why.push(`main's change since ${s(mech.base)} can reach ${!reach || reach.all ? 'every screen' : `screens of ${reach.features.join(', ')}`}${reach?.why.length ? ` (${reach.why.join('; ')})` : ''}: run the gate again`);
   return why.length ? { ok: false, why } : { ok: true, why: [`main moved ${s(mech.base)} → ${s(main)} by ${mainFiles.length} file(s) that draw no pixel, and ${s(head)} is ${s(mech.candidate)} merged with it and nothing else`] };
 }
+
+// Scenario leaves, base against candidate (owner, 2026-10-15): a leaf the candidate fails is the change's only when the same leaf
+// passes on base. One already failing on main is main's debt, named as a gap, the way check-states and the header checks already
+// count a problem main has. candFailed: the leaf ids the candidate's report marks fail. baseOut: the base runner's stdout for those
+// leaves (`run-scenarios.mjs <feature> --only a,b`, one "<result>  <id>" line per leaf). A leaf base doesn't have, or doesn't print,
+// is new, so its failure is the change's.
+export function newScenarioFailures(candFailed, baseOut) {
+  const onBase = new Map();
+  for (const line of String(baseOut || '').split('\n')) { const m = /^(pass|fail|blocked|pending)\s+(\S+)/.exec(line); if (m) onBase.set(m[2], m[1]); }
+  const debt = candFailed.filter((id) => onBase.get(id) === 'fail');
+  return { added: candFailed.filter((id) => onBase.get(id) !== 'fail'), debt };
+}

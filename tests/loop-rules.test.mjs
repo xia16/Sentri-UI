@@ -1,7 +1,7 @@
 // The gate's and the polish loop's rules (scripts/loop-rules.mjs).
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { queueAhead, calibrationProblems, budgetProblems, critiqueProblems, pageStyling, addedLines, effectiveClass, classifyScreens, checkVerdict, checkGrades, worstFirst, isClean, loopStatus, touchesSystem, touchesTools, regressions,
+import { queueAhead, newScenarioFailures, calibrationProblems, budgetProblems, critiqueProblems, pageStyling, addedLines, effectiveClass, classifyScreens, checkVerdict, checkGrades, worstFirst, isClean, loopStatus, touchesSystem, touchesTools, regressions,
   pageOf, pageAssets, sharedFiles, outcomeLeaves, coverageLost, reachOf, reachLine, shotsToTake, timedOutOnly, lockState, carryDecision, ghNetworkError,
   componentPage, componentPagesOf, componentsTouched, idPath } from '../scripts/loop-rules.mjs';
 
@@ -404,7 +404,7 @@ test('carry: a pass carries over main moving on only by files that draw no pixel
   no({ reach: null }, /can reach every screen/);
 });
 
-// Component pages are in the gate's reach (rules ledger L22): the Headers law changed, screens were gated, and Sheet → page kept
+// Component pages are in the gate's reach (rules ledger L23): the Headers law changed, screens were gated, and Sheet → page kept
 // teaching a 21-character Chinese title because nothing shot or checked the design system's own pages.
 test('a component page id names its component and variant; anything else is a screen', () => {
   assert.deepEqual(componentPage('ds:Sheet/page'), { component: 'Sheet', variant: 'page' });
@@ -458,4 +458,12 @@ test("reach: a component's own pages and notes reach the component pages, not ev
   assert.match(r.why[0], /Sheet's component pages/);
   assert.equal(reach(['ux/design-system/components/bundle.css']).all, true, 'the bundle still reaches every screen');
   assert.equal(reach(['ux/design-system/components/Sheet/sheet.css']).all, true, 'any other file in the folder is unsure, so every screen');
+});
+
+test('newScenarioFailures: a leaf already failing on base is main\'s debt; one passing there, or new, is the change\'s', () => {
+  const base = 'blocked  ds-a7-global-wait\nfail     ds-a11-task-layer  en-360: "Task 2" shown → absent\npass     ds-a13-home-to-task\n\ndata-sync @ c4f98e2: pass 1 · fail 1';
+  assert.deepEqual(newScenarioFailures(['ds-a11-task-layer'], base), { added: [], debt: ['ds-a11-task-layer'] });
+  assert.deepEqual(newScenarioFailures(['ds-a13-home-to-task', 'ds-a11-task-layer'], base), { added: ['ds-a13-home-to-task'], debt: ['ds-a11-task-layer'] });
+  assert.deepEqual(newScenarioFailures(['ds-new-leaf'], base), { added: ['ds-new-leaf'], debt: [] }); // not on base: new
+  assert.deepEqual(newScenarioFailures(['x'], ''), { added: ['x'], debt: [] }); // base printed nothing: the failure stands
 });
