@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-15T01:31:08.808Z",
- "commit": "8edee0e",
+ "generated": "2026-10-15T03:52:52.372Z",
+ "commit": "360d9a9",
  "platforms": [
   {
    "id": "mobile",
@@ -21772,9 +21772,9 @@
     {
      "name": "Heading",
      "group": "Base",
-     "status": "agent-checked",
+     "status": "in-design",
      "gate": {
-      "status": "agent-checked",
+      "status": "in-design",
       "judged": "2026-10-10",
       "commit": "c84edf3",
       "model": "claude-opus-5-5",
@@ -21907,15 +21907,16 @@
          "pig-profile.origin",
          "inspection.pen-log"
         ],
-        "status": "agent-checked",
-        "scores": {
+        "status": "in-design",
+        "findings": [],
+        "note": "Rebuilt 2026-10-15 as the title type only (split from Header); its 2026-10-10 check was of the old states and no longer applies.",
+        "previousScores": {
          "clarity": 9,
          "budget": 8,
          "hierarchy": 9,
          "spacing": 8,
          "broken": 9
-        },
-        "findings": []
+        }
        },
        {
         "name": "section",
@@ -21982,6 +21983,44 @@
        "group",
        "page",
        "section"
+      ]
+     }
+    },
+    {
+     "name": "Header",
+     "group": "Base",
+     "status": "in-design",
+     "gate": {
+      "status": "in-design",
+      "classification": "component",
+      "note": "Split out of Heading and Sheet on 2026-10-15 (owner). Not yet checked by the component gate.",
+      "variants": [
+       {
+        "name": "page",
+        "status": "in-design",
+        "usedBy": [
+         "farrowing.history",
+         "farrowing.overview",
+         "pig-profile.log",
+         "pig-profile.origin",
+         "inspection.pen-log"
+        ]
+       },
+       {
+        "name": "sheet",
+        "status": "in-design",
+        "usedBy": [
+         "farrowing.death",
+         "farrowing.piglet-death"
+        ]
+       }
+      ]
+     },
+     "files": {
+      "variantsJson": true,
+      "variants": [
+       "page",
+       "sheet"
       ]
      }
     },

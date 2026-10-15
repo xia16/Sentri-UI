@@ -1,5 +1,5 @@
 {
-  "status": "agent-checked",
+  "status": "in-design",
   "judged": "2026-10-10",
   "commit": "c84edf3",
   "model": "claude-opus-5-5",
@@ -132,15 +132,16 @@
         "pig-profile.origin",
         "inspection.pen-log"
       ],
-      "status": "agent-checked",
-      "scores": {
+      "status": "in-design",
+      "findings": [],
+      "note": "Rebuilt 2026-10-15 as the title type only (split from Header); its 2026-10-10 check was of the old states and no longer applies.",
+      "previousScores": {
         "clarity": 9,
         "budget": 8,
         "hierarchy": 9,
         "spacing": 8,
         "broken": 9
-      },
-      "findings": []
+      }
     },
     {
       "name": "section",
