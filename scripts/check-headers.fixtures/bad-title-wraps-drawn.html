@@ -1,0 +1,9 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="expect" content="wrap"><title>A title that fits at 360 by the numbers, drawn in a frame 32px narrower, so it wraps (Header/sheet, #170)</title>
+<link rel="stylesheet" href="../../ux/design-system/tokens.css"><link rel="stylesheet" href="../../ux/design-system/components/bundle.css"><script src="../../ux/design-system/components/bundle.js"></script>
+<style>html,body{margin:0}.ph{position:relative;width:250px;height:844px;overflow:hidden;background:var(--app-background);font-family:var(--font-sans);color:var(--ink)}</style></head><body>
+<div class="ph"></div><script>
+const UI=window.SentriUI;
+document.querySelector('.ph').innerHTML=UI.sheet({title:'Correct piglet count',corner:{label:{text:'Clear',str:'act.clear'},action:'clear'},size:'short',body:UI.panel(UI.row({title:'Piglet 1',description:'Day 2 · B4'}),{className:'st-row-group'}),footer:false});
+</script>
+</body></html>
