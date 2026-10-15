@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-15T07:44:22.610Z",
- "commit": "b92bfcc",
+ "generated": "2026-10-15T08:42:21.866Z",
+ "commit": "501663a",
  "platforms": [
   {
    "id": "mobile",
@@ -21983,6 +21983,44 @@
        "group",
        "page",
        "section"
+      ]
+     }
+    },
+    {
+     "name": "Header",
+     "group": "Base",
+     "status": "in-design",
+     "gate": {
+      "status": "in-design",
+      "classification": "component",
+      "note": "Split out of Heading and Sheet on 2026-10-15 (owner). Not yet checked by the component gate.",
+      "variants": [
+       {
+        "name": "page",
+        "status": "in-design",
+        "usedBy": [
+         "farrowing.history",
+         "farrowing.overview",
+         "pig-profile.log",
+         "pig-profile.origin",
+         "inspection.pen-log"
+        ]
+       },
+       {
+        "name": "sheet",
+        "status": "in-design",
+        "usedBy": [
+         "farrowing.death",
+         "farrowing.piglet-death"
+        ]
+       }
+      ]
+     },
+     "files": {
+      "variantsJson": true,
+      "variants": [
+       "page",
+       "sheet"
       ]
      }
     },

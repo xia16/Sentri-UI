@@ -76,7 +76,10 @@ async function gridOnly(page, width) {
   }, width);
 }
 
-const browser = await chromium.launch();
+// One raster thread: Chromium's parallel raster anti-aliases a curve a hair differently from run to run (a channel off by 1-2 at
+// a chip's rounded corners), so the same commit shot twice differed (FilterChips/tags, 1 run in 4) and blocked changes that
+// never touched it (#173). With one thread, 8 runs of 8 are identical. The base cache is keyed on this file, so it refreshes.
+const browser = await chromium.launch({ args: ['--num-raster-threads=1', '--disable-partial-raster'] });
 const runs = [];
 const text = {};
 for (const width of widths) {
