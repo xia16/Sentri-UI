@@ -19,7 +19,7 @@ the feature, design version, native behavior and findings in both repositories.
 
 Legibility gate: strict
 
-The farm legibility check (`scripts/check-legibility.mjs`, law in `ux/design-system/README.md`) holds every screen a change moves to the absolute floors. Screens a change doesn't move are reported, not blocking. Screens still drawn from the pre-workflow prototypes in `ux/archive/` and `ux/research/` fail the floors today; each meets them when its feature is redesigned through `/design`, and any change that moves one must bring it up to the floors.
+The farm legibility check (`scripts/check-legibility.mjs`, law in `ux/design-system/README.md`) holds every screen a change moves to the absolute floors. Screens a change doesn't move are reported, not blocking. Screens still drawn from the pre-workflow prototypes in `ux/archive/` and `ux/research/` fail the floors today; each meets them when its feature is redesigned through `/design`, and any feature change that moves one must bring it up to the floors. A **shared-component change** (declared `--class shared`) is held to *no worse than main* on the screens it moves instead: it may not add a violation, but the pages' own debt is fixed in each feature's pass, not by a component change (owner, 2026-10-14: components and their usages first, features later).
 
 ## Who decides what
 

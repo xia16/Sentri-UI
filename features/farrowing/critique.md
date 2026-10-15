@@ -111,3 +111,199 @@ The law and its boards fix the design (two headers, the line's three tests); the
 - Footers: fostering's primary stays on one line at 56px in Chinese at 390; Find a pig's primary is "Search".
 - Reach: 153 screens move, all in this change's features; 138 identical; none broken. npm test 674 pass; legibility and spacing pass on every moved screen; farrowing scenarios 87 of 87 in EN (ZH blocked on main as well).
 - **Better because** each header says one thing the same way everywhere, and every fact it no longer carries has a designed place in the body.
+
+# Record dead: spacing and the optional photo (2026-10-14)
+
+Scope: `farrowing.death` (the one Record dead drawer). `farrowing.death-breakdown` is a separate read view (`deathBreakdown()`), not this sheet, so it is out of scope. Owner ruling 2026-10-13, board option **B**. Baseline: `origin/main` at `7f5b627`, `farrowing.death` at 390 and 360, EN and ZH, plus its no-draft and The sow states.
+
+## Keep
+
+- **The Piglets / The sow switch** (Segment `view-switch`): one switch at the top of the body, the sow offered only while she is alive.
+- **The six cause rows** (Stepper `row`): label left, `− n +` right, hairlines between rows, the unsaved draft in muted text beside its label. Option C (a quieter − at its floor) was not chosen: the stepper stays as it is.
+- **The sow's causes** (ChoiceList radios in one card), the danger banner and the hold-to-record footer.
+- **The footer**: Back, Clear only when there is something to clear, the primary naming the count.
+- **The header** (title, its hairline and the 24px gap from the Headers law, #150): unchanged.
+
+## Problems
+
+- **major** · The first cause row reads as part of the switch. The switch ends 10px above the first `−` while the rows' keys are 22px apart; `scripts/check-spacing.mjs --changed farrowing.death` on `7f5b627`: "inversion div.st-selection is 21px from the list of 6 Stepper.st-stepper whose rows are 43px apart" and "crowding button and Stepper.st-stepper are 4px apart". Owner, 2026-10-13 (option B).
+- **major** · The optional photo is hidden until a death is drafted (`death()` renders `SentriUI.photos` only when `n` or a sow cause is set), so the worker cannot see that a photo can ride the record; the spec says optional photos with the camera disabled until a death is entered, and the screen's notes said so while the screen did not (ledger L8). Owner: "the optional photo part seems weird".
+- **minor** · The screen's notes describe a "Dead header" with "Dead 6", "Born dead or died" and Clear in the head, none of which the screen shows since #150 (ledger L8).
+
+## Parts
+
+| Part | Drawn by today | The component whose job it is | Keep / fix / cut |
+|---|---|---|---|
+| Piglets / The sow switch | `SentriUI.segment` (`view-switch`) | Segment | **keep** the component; **fix** the space under it (page layout) |
+| Divider on the switch | none today (the first row has no top rule) | | nothing to remove |
+| Cause rows | `farmStepper` → Stepper `row` | Stepper | **keep** |
+| Sow cause | `SentriUI.choiceRadios` | ChoiceList | **keep** |
+| Photos | `SentriUI.photos`, rendered only once a death is drafted | Photos (the optional row, Field's optional-row law) | **fix**: always rendered, last in capture order; inactive until a death, its reason in the component's hint line |
+| Danger banner (the sow) | `SentriUI.banner` | Banner | **keep** |
+| Footer | `footer()` + Button / hold | Sheet footer | **keep** |
+
+## Self-crit
+
+Held against its baseline (`7f5b627`) and the house reference the Farrowing room; the owner's board fixed the direction (B), so the directions differ only in the space under the switch.
+
+#### Round 1 (renders at 390 EN of the screen and its states: draft, no draft, a waiting tap, a photo, The sow with and without a cause)
+- **Direction A** (24px under the switch, `--space-24`; Photos always rendered): the switch now reads as its own block, the first `−` is 34px under it against 22px between rows; `check-spacing` passes (inversion and crowding gone). Photos sits under Other from the start, inactive until a death, its reason in the component's hint line. At 844px the long drawer (85%) is full, so the Photos card meets the footer's edge and its hint is below it: a tap on the waiting camera did not show its answer. Fixed in the host: the guarded tap scrolls the hint line above the footer, then `SentriUI.guard` re-announces it.
+- **Direction B** (16px): the first `−` 26px under the switch against 22px between rows, still close to reading as one list, and Photos is still cut by the footer. Not better than A.
+- Problems: the inversion is fixed; the hidden Photos is fixed (always visible, waits visibly, answers in its hint line); the notes are rewritten to what the screen shows.
+- Keep as strong: the switch, the six stepper rows (unchanged, option C not taken), the sow's causes, banner, footer and header are untouched. With a photo the row turns full width with its count and thumbnail (the Photos component's own face).
+- Squint: the title, the switch, the counts (the drafted row's dark `−`); Photos is a quiet card last. These answer whose death, how many, what will save.
+- Against the original: the same screen with more air under the switch and one quiet card that no longer appears from nowhere; not cluttered, not bulkier.
+- Known gaps: in The sow before a cause, Photos and its hint push the danger banner's lower edge under the footer at 844 (its headline and consequence stay visible). The empty card shows the Photos component's camera glyph, not a "+": that is the component's face (shared with Report piglet mortality), not restyled on the page.
+- **Better because** the first cause no longer reads as part of the switch and the worker can see from the start that a photo can ride the record, and why it waits.
+
+#### Final look (the pushed head of farrowing/record-dead-spacing, the commit that adds this block; its screens are fed5e07's, which the gate rendered at 390 and 360 in EN and ZH against base 7f5b627)
+- Reach: 4 screens changed, 287 same, none broken. `farrowing.death` moved in all four renders (10.3%); `assistant.up-to-date` (0.015%), `farrowing.search` (0.004%) and `fostering.result` (0.0003%) are render noise: the first and last pages load none of the changed files, and the death rule is scoped to `.sheet[data-view=death]`.
+- The switch stands apart from the list at 390 and 360; the six rows, the footer and the header are unchanged pixel for pixel in shape.
+- Photos is on screen from the start under Other, the quiet card's top edge peeking above the footer at 844 (the long drawer is full); scrolling or a tap on the waiting camera shows it whole with its hint.
+- **Better because** the first cause no longer reads as part of the switch, and the optional photo is always there, waiting visibly instead of appearing from nowhere.
+
+#### Crit round 1 (driver, on bc996b1): "the photo still looks exactly as it did, a lone half-width card, and the footer now cuts it in half"
+- Photos draws its own documented face again (README `line`): full width, `Photos` with the muted `Optional`, the outlined camera at the right (dashed while it waits). The shared quiet-card restyle of OptionalRow had reached Photos; the fix is in the component (`bundle.css`, `.st-photos-camera`), so Report piglet mortality shows the same row (farrowing, in scope).
+- The drawer: Record dead is held at the Sheet's outer cap (`100% - size-80`, top at 80px) instead of the long 85%. Measured on every state at 390 and 360, EN and ZH: the body no longer scrolls in Piglets (draft or not, with the hint) or The sow (with or without a cause), so the Photos row and the sow's danger banner are whole on the first frame; only thumbnails a worker adds scroll.
+- Kept: the 24px under the switch, the steppers and the header, untouched.
+- **Better because** the photo now reads as one optional row of the form, whole on screen, waiting visibly, and nothing sits under the footer.
+
+#### Final look, round 2 (the pushed head of farrowing/record-dead-spacing, the commit that adds this block; its screens are c62ef74's: the gate's pairs at 390 and 360 in EN and ZH against base e9e4052, plus both modes and every state rendered at 390 and 360, EN and ZH)
+- Reach: 2 screens changed, 289 same, none broken: `farrowing.death` and `farrowing.piglet-death` (the Photos row face), both farrowing.
+- Piglets and The sow, with and without a draft or cause: the switch has its 24px, the Photos row (label, Optional, outlined camera) and its hint are whole above the footer, the sow's banner is whole; the body scrolls only once thumbnails are added.
+- Report piglet mortality shows the same Photos row in place of the half-width card.
+- **Better because** the photo reads as one optional row of the form, whole on the first frame and waiting visibly, and nothing sits under the footer.
+
+#### Crit round 2 (judge on 3423d63: 8 pairs better, 0 worse; failed on states outside the pairs)
+- **The waiting Photos row drew a standing reason line** ("Record a death first · photos ride that record") under it with no death drafted: the rejected reason-line pattern (R4). Now the floor-gray: the row stays, its camera dashed; the reason is the row's screen-reader description and shows in its hint line only while a tap is answered (4 s, scrolled into view). Done in the Photos component (an inactive row's hint is visually hidden until `guard` marks it answered), so every host gets it.
+- **Two optional faces on one sheet** (The sow, cause Other: a half-width Details card over the full-width Photos row). OptionalRow now has `face:'row'`, the full-width row Photos always draws (README `line`); Details on Record dead uses it, so both optionals share one face and one track. The law's line "empty, an optional is a small quiet '+ Label' card (two sit side by side)" conflicts with Photos' own face ("the one face for optional evidence") on a sheet that holds both. Resolved: a sheet that holds Photos gives its optionals the row face (Field README); sheets without Photos (Finish's Litter weight · Assistance) keep the paired cards. To confirm with the owner as a wording change to the law.
+- **The sow's banner was not whole** with cause Other. My round-1 claim ("the body no longer scrolls … The sow (with or without a cause)") was wrong: it held for Farrowing, Prolapse and Found dead only; with Other the body overflowed 3px at 390 and 23px at 360 (the judge's measure on 3423d63; 9px and 29px on mine once Details took the row face). Fixed by sizing: the drawer now sits 56px under the phone's top (just under the status bar) and Details sits 12px under the causes. Measured on every state at 390×844 and 360×800, EN and ZH: Piglets (draft, none, tap), The sow (no cause, tap, a cause, Other) all overflow 0; the banner is whole. Two states scroll by design after a worker's act: thumbnails added (29px) and Details opened for typing (34px at 390, 54px at 360), where the host scrolls the banner back into view.
+- Untouched: the switch's 24px, the steppers, the header.
+
+#### Final look, round 3 (the pushed head of farrowing/record-dead-spacing, the commit that adds this block; its screens are 7ef6a6f's: gate MECHANICAL PASS on base 57bc4c7, pairs at 390 and 360 in EN and ZH; plus every state rendered at 390×844 and 360×800, EN and ZH: Piglets draft / none / waiting tap / photo, The sow no cause / waiting tap / a cause / Other / Details open)
+- Reach: 3 screens differ; `farrowing.death` and `farrowing.piglet-death` by design, `fostering.result` zh-390 by 0.0003% (render noise, also seen on round 2's run before any component change of this round).
+- No standing reason line: the waiting Photos row shows only its dashed camera; a tap shows the reason in its hint line.
+- One optional face: Details and Photos are the same full-width row on the rows' track.
+- The sow's banner is whole in every state at both widths (body overflow 0); only added thumbnails and an opened Details scroll, and opening Details brings the banner back into view.
+- **Better because** the photo is one quiet optional row that waits without explaining itself, the sow's optionals match it, and nothing sits under the footer.
+
+#### Crit round 4 (judge on 0bbd5a0: 8 pairs better, 0 worse; failed on the drawer's height and two stale claims)
+- **The drawer sat 56px from the top**, 24px past the Sheet's own 80px limit, so the 14px strip above it showed the parent's blurred "Farrowing" title and Back cut in half. It now opens at the Sheet's limit (`100% - size-80`), like every other drawer.
+- **That cost the sow's banner 1px** with cause Other (the body overflowed by 1px at 390 and 360, EN and ZH). Fixed by spacing, not size: on Record dead, the banner follows Photos at the rows' own 8px step instead of the photo strip's 12px trailing margin. The banner now has 3px to spare.
+- **Stale claims, corrected in the PR body:** the drawer is at 80px (not "as the task overview sheet does"). The waiting Photos row's hint shows only once the camera is tapped. It is not a standing line.
+- Measured at a true 390 and 360 (the phone forced to width), 844 tall, EN and ZH: Piglets first frame, The sow, The sow with Other, and The sow with Other after a camera tap. Each opens at top 80 with body overflow 0. `farrowing.piglet-death` is unchanged.
+- **A shorter phone still scrolls.** At a true 360×800 (the phone forced to 800 tall after load; the judge's measure on cb4366b), the body scrolls: Piglets by 13px (the Photos row under the footer edge), The sow with Other by 41px (the banner's second line under the footer). Main scrolls more in both (35px and 73px). Making both fit at 800 tall would need a change to the causes list or the banner, which is a design decision outside this PR. So the claim is scoped to what was measured: whole at 844 tall (the gate's frame) at 390 and 360, and less cut than main at 800 tall.
+- **Better because** the drawer is the Sheet's own drawer again (no half-cut page behind it), every state is whole in the gate's frame, and a short phone hides less than on main.
+
+
+# Header corners (2026-10-14)
+
+Scope: the sheet header's corner actions and title room, by the Headers law → Corner actions and Title length (`ux/design-system/README.md`, owner ruling C, 2026-10-14; PR #165). Baselines: `origin/main` at `39637ff`, shot with `node scripts/shoot-screens.mjs` at 390 and 360, EN and ZH; titles measured at a true 360 (the phone width forced after load, so a bare page pinned to 390 cannot hide an overflow).
+
+### Keep
+
+- Every title that already fits names its job (`Record dead`, `Edit record`, `Filter sows`, `Move piglets`): unchanged, still the heaviest thing in the header.
+- Clear and Reset keep their one meaning (`ux/laws/strings.json`), their quiet text register, their words and their presence rule (only while there is something to clear or reset).
+- Bodies, rows, footers' Back and primary, the hairline and the 24px to the body: untouched.
+
+### Problems
+
+- **major** · Clear (Record dead, Edit record, Edit finish details) and Reset (Filter sows) sat in the footer between Back and the primary (law 2026-10-14: they are the sheet header's corner action; the footer keeps Back and the primary).
+- **major** · `7 piglets to allocate` puts a count in the title (law: no counts in a title) and is the job named by its leftovers, not the job.
+- **minor** · Filter sows showed Reset with every facet at its default (law: present only when there is something to reset).
+- **major** · Two page titles overrun the room beside Back at a true 360 (216px): `Reconcile piglet count` and `Report piglet mortality` (223px each; header check, workflow/header-checks).
+
+### Parts
+
+| Part | Drawn by today | The component whose job it is | Keep / fix / cut |
+|---|---|---|---|
+| Clear on Record dead, Edit record, Edit finish details | sheetFooter `quiet` (via `quietClear`) | Sheet `corner` | **fix** |
+| Reset on Filter sows | FilterSheet footer | FilterSheet → Sheet `corner` | **fix** |
+| Allocation title | identity() title with the count | Sheet title (the job) + the body's first line (the count) | **fix** |
+| `Reconcile piglet count`, `Report piglet mortality` page titles | featurePage() title | Sheet page header title | **fix** (copy) |
+
+### Self-crit
+
+The ruling fixes the design (the boards `evidence/2026-10-14-header-corners.png` and `-header-room.png`, direction C): no competing directions. Each screen is held against its baseline and the Farrowing room.
+
+#### Round 1 (renders at 390 and 360, EN and ZH, beside `39637ff`)
+- Clear / Reset sit at the top right, 48px targets (Clear 52px, 清除 48px), vertically centred on the title block: measured 0px off its centre on every changed drawer, with and without a header line (`Farrowing record` + route line: the corner sits between the two lines, as board C).
+- The footer is Back and the primary alone: the primary gains the width the quiet word took.
+- Squint: the title, then the first card; the corner word is quiet and does not compete with the title.
+- Cluttered, flat or bulky against the original: less in the footer, nothing added to the body; the header gains one quiet word only while there is something to clear.
+- **Better because** the destructive-but-safe act (empty the draft) leaves the thumb zone beside the commit, and every drawer clears and resets in one place.
+
+#### Final look (61bc01e, pushed head; renders at 390 and 360, EN and ZH, beside 39637ff; the gate's pairs at 4571e5e)
+- Reach: 19 screens moved (gate, base 39637ff), all in this change's scope (farrowing, inspection, pig-list, pig-profile, health-record, environment, fostering); `assistant.up-to-date` is the gate's known flaky screen. 272 identical, none broken.
+- Problems fixed: Clear and Reset sit at the top right, 0px off the title block's centre (with and without a line), present only while there is something to clear; the footers are Back and the primary; every drawer title fits 204px and every page title 216px at a true 360 (header check: 0 defects on the changed screens); the 24px under each header is the header's alone.
+- Keep as strong: titles that fit, bodies, rows and primaries unchanged; Filter sows and Filter pigs at their defaults now show no Reset.
+- Squint: the title, then the first card; the corner word stays quiet.
+- **Better because** the act that empties a draft leaves the thumb's commit zone, every drawer clears in the same place, and no title can collide with a corner at 360.
+
+#### Final look after crit round 1 (2449cb7, origin/main merged; renders at 390 and 360, EN and ZH, beside 39637ff)
+- Screens with changed titles, and fostering after the merge: `pig-profile.measurements` (`Measurements`), `environment.report-issue`, `farrowing.allocate`, `farrowing.reconcile`, `farrowing.piglet-death`, `fostering.piglets`, `fostering.result`. Header check: 0 defects (room, corner, gap, contents, wrap).
+- Fostering keeps main's primary (`Move 2 to C05`, #159) beside Back; Clear stays at the top right, now at a true 360.
+- **Better because** each title is a name that fits its room, and nothing else moved.
+
+#### Final look after merging #167 (the pushed head of farrowing/record-dead-spacing, the commit that adds this block; screens of ac662ad, the merge of origin/main with the corner Clear; no design change)
+- Both hold: main's header (Clear at the top right only while something is drafted or a cause is chosen; the footer is Back and the primary) and this branch's switch spacing, Photos/Details row face, floor-gray hint and drawer height.
+- (Corrected in round 4: the 360×800 measures here were taken with the atlas phone still 844 tall, not a true 360×800.) Measured every state at 390×844 and 360×800, EN and ZH (Piglets draft / none / waiting tap / photo, The sow no cause / waiting tap / a cause / Other / Details open): body overflow 0 everywhere except added thumbnails (29px) and Details opened for typing (34px), which scroll by design; the Photos row and the sow's banner are whole. At 360 the narrower footer now keeps "Record sow death" on one line.
+- `farrowing.death` and `farrowing.piglet-death` rendered at 390 and 360, EN and ZH: the switch's 24px, the full-width optional rows, nothing under the footer. check-headers: 0 defects on both; spacing and strict legibility pass.
+
+---
+
+# Disabled is not faded (shared change, ds/disabled-not-faded), critique
+
+Scope: the disabled and waiting states of the design-system components (Button in every register, Segment, the floor-gray Stepper and Numpad keys, PickerField / ChoiceList rows, OptionalRow, the text action, the Hold button's pending and done faces) and every screen that renders one. Law: `ux/design-system/README.md`, Visual foundations → "Disabled is not faded" and States. Base: origin/main 7f5b627. The same block sits in every feature whose screens this change moves; the screens of this feature it moves are listed under Reach.
+
+## Keep
+
+- **The waiting Button stays present, quiet and focusable** (ADR 0002): the grey `disabled-fill` face, the ink label, no reason line above it, the screen-reader description. Only its rim changes.
+- **Omission first.** Blocked verbs stay left out; nothing becomes disabled that was hidden.
+- **The floor-gray keys stay `aria-disabled`, tappable, answered in the hint line** (owner, 2026-08-30): only their face changes.
+- **Segment's dashed rim for an unavailable option** (already the system's word for "not available here", with Banner and the Photos camera): kept, and made the one rim of every unavailable control.
+- **Labels, counts, layout, sizes and the live faces of every control**: unchanged. No new colour or token.
+
+## Problems
+
+- **major** · A disabled Segment option draws faded text: `Auto` / `Manual` on Environment & devices measure 2.6-2.7:1 (`check-legibility`, 3 screens: environment.page, environment.sensor-week, environment.sensor-other). The component sets no opacity of its own, so a page's base `button:disabled{opacity:.45}` (home-astra-prototype.css) fades it.
+- **major** · A disabled Button draws faded text and loses its surface on the same screens: `Save setting` 2.7:1 with no fill (the page base wins over the layered `.button.primary:disabled` fill). It reads as a link, not a control.
+- **major** · Trial 6's fix (opacity back to 1 on the page) made both controls look live: the selected `Auto` kept its raised white pill and `Save setting` became bare ink text (owner: "the opacity fix made controls look live"). Unavailable has to be carried by the surface and the rim, in the component.
+- **major** · The tool Button's disabled and waiting face fades itself: `opacity:.45`, 2.7:1 (Button/tool variants, `ds` state probe).
+- **major** · The Hold button's Pending, Loading and Done faces draw ink on red, 2.1:1 (Button/hold variants): the waiting rule's ink label also caught the phases that keep their register.
+- **major** · The floor-gray glyph is `disabled-ink` on `disabled-fill`, 2.45:1 (count variant `#a0b3a5` on `#f8fbf8`, 2.1:1): below the law the brief holds it to ("their glyph still meets the law").
+- **major** · A disabled PickerField trigger draws its value in `disabled-ink`, 2.6:1 (PickerField multi / cascade-multi, Disabled).
+- **minor** · The disabled text action fades itself to 2.0:1 (`opacity:.5`, Button/text Disabled; and in a heading action); OptionalRow's disabled face is `opacity:.5`. No screen renders either today.
+- **minor** · The waiting face's rim is `disabled-border` (1.4:1 on paper), so next to a live secondary a waiting primary reads as a grey button, not an unavailable one.
+
+## Parts
+
+| Part | Drawn by today | The component whose job it is | Keep / fix / cut |
+|---|---|---|---|
+| Disabled Segment option / whole segment | Segment (faded by page base CSS) | Segment | **fix**: ink text, opacity pinned; a whole unavailable segment is one dashed track on `disabled-surface`, no raised pill |
+| Disabled / waiting Button (primary, secondary, danger, caution, tool) | Button (tool fades itself; native disabled faded by page base CSS) | Button | **fix**: one disabled face for every register: `disabled-fill`, dashed `control-border` rim, ink label, opacity pinned |
+| Hold Pending / Done | Button (hold) | Button | **fix**: the register's own text colour (paper on red / ink) |
+| Floor-gray key | Stepper, Numpad | Stepper, Numpad | **fix**: `disabled-surface`, dashed rim, `ink-2` glyph (7.4:1) |
+| Disabled picker trigger / choice row | PickerField, ChoiceList | PickerField | **fix**: ink value, dashed rim on the trigger |
+| Disabled text action, OptionalRow | Button (text), Field (OptionalRow) | Button, Field | **fix**: `muted` word at full opacity (4.8:1); OptionalRow on `disabled-surface` with the dashed rim |
+| Disabled IconButton glyph | IconButton (`disabled-ink`) | IconButton | keep (an icon, no text; out of this brief: noted for the owner) |
+
+## Self-crit
+
+Held against the Farrowing room (its dock: one dark primary, Back outlined) and More actions (Back alone in the footer). Every state is shown before / after in its component's variants (Button primary, secondary, tool, text, hold; Segment four variants; Stepper count, row, well; PickerField) and on the screens below.
+
+#### Direction A (surface only: opacity pinned, ink text, the existing solid `disabled-border` rim), renders at 390 EN on 7f5b627
+- Fixed the contrast (every disabled text 4.5:1 or more) but not the look: a waiting primary is a grey button with a bold ink label, next to a live outlined Back it reads as a second live button; a floor − with an ink glyph on a near-white key reads as live. Trial 6 was rejected for exactly this. **Not better because** legible but live-looking.
+
+#### Direction B (surface and a dashed rim, one face for every unavailable control), round 1 on 8ba7e17, round 2 on 4d59150
+- Problems: Segment `Auto` / `Manual` 2.6 → 13.1:1 and the whole segment one flat dashed track with no raised pill (it can no longer pass for a live lens); `Save setting` 2.7 → 12.6:1 on a dashed grey face (was bare faded text); tool 2.7 → 12.6; hold Pending / Done 2.1 → paper on red; floor-gray glyph 2.45 → 7.4 (`ink-2`); picker value 2.6 → 13.4; text action 2.0 → 4.8. All fixed: the probe finds 0 disabled-text failures on 291 screens (was 9) and in every variant state (was 8).
+- Round 2: the waiting `End task early` (farrowing task-blocked) still wore the page's red wash and red rim, a live destructive button; the component's face now outranks that page paint (4d59150).
+- Keep: the waiting button stays present, quiet, alone; labels, sizes, layout and live faces unchanged; the dashed rim was already Segment's, Banner's and Photos' word for unavailable.
+- Squint (a record sheet): the title, the count, then the footer; the dashed Save is quieter than the live Back beside it, as it should be. On Environment: the reading, the chart, then the fan; the dashed fan controls recede.
+- Cluttered / flat / bulky: no box, weight or size added; one hairline style changes. A column of floor keys in Record death shows four dashed − keys: busier than four pale keys, but each reads as "not now" and its glyph is legible. Rejected examples (gate.md): none of c1 (nothing enlarged), c2 (no structure removed), c3 (no box or bold added).
+- **Better because** every unavailable control now reads as unavailable by its face and rim while its words stay readable, the same way everywhere, and nothing looks live that is not.
+
+#### Final look (the pushed head of ds/disabled-not-faded, the commit that adds this block; its screens are 5f0884a's, which the gate rendered at 390 and 360 in EN and ZH against base 851dcba, and shoot-screens rendered beside 7f5b627)
+- Reach: 50 screens move, all of them rendering a disabled or waiting control: environment (page, sensor-week, sensor-other), farrowing 14 (before, death, leave-edit, edit, born, task-blocked, edit-finished, foster, reconcile, pen-note, pen-fault, piglet-care, piglet-identity, piglet-death), piglet-processing 13 (sheet-coming, sheet-todo, sheet-breeders, sheet-late, sheet-done, sheet-notch, adjust-count, give-ids, counts, weight, record-death, move-piglets, set-count), pregnancy.check, feed-plan (editor, end-date), pig-list.health, pig-profile 7 (production-task, miscarriage, batch-membership, measure, body-condition, note, not-in-pig), health-record 5 (record-health, condition-picker, care-instructions, resolve-conditions, treatment), fostering (type, receive, result), move.transfer-sow. 4 more differ in one shot only by under 0.04% (assistant.finding and farrowing.search-results, which the gate marks unstable on base; farrowing.search-none, piglet-processing.more-actions): identical by eye, render noise. 237 identical; none broken.
+- Every moved screen: only the waiting footer button (dashed rim), a floor key (dashed, `ink-2` glyph), a disabled picker (Move's Destination pen: solid rim to dashed) or the Environment fan controls changed; layout, copy and the 360 Chinese footers are unchanged.
+- **Better because** unavailable is now said by the face and the rim, never by faded words, and no waiting control looks live.

@@ -33,7 +33,7 @@ See [variants.json](variants.json) for use boundaries and each variant’s rende
 | Default | Enabled options; host supplies current selection. |
 | Pressed | An unselected option darkens to the handle tone at once on touch (visibly different from both unselected and selected); a selected option keeps its paper face. The static demo presses the second option. |
 | Selected | Raised paper face plus a stronger label weight (700), in every variant. No underline. Fill and weight both change, so it is never colour alone. |
-| Disabled | Native disabled button, dashed outline; host supplies one visible reason beside the row. Prefer omission unless temporarily unavailable. |
+| Disabled | Native disabled button with ink text at full legibility (never faded). One option: a dashed outline on that option. The whole segment: one dashed track on `disabled-surface`, no raised pill; the current option keeps its weight. Host supplies one visible reason beside the row. Prefer omission unless temporarily unavailable. |
 | Long-label | English and Chinese labels wrap without clipping or ellipsis. |
 
 Error and loading belong to the list/sheet, not this synchronous control. Empty options omit the entire control; an empty result retains the current filters and shows a list-level empty state with a clear-filter action.

@@ -70,6 +70,16 @@ svg{width:var(--size-20);height:var(--size-20);display:block;flex-shrink:0;fill:
 .utility-header{flex:none;display:flex;align-items:center;gap:var(--space-10);margin:0;padding:var(--space-5) var(--space-gutter) var(--space-17);border-bottom:1px solid var(--line);text-align:center}
 .sheet-titles{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center}
 .sheet-titles>.sheet-up{align-self:flex-start}
+/* Corner actions (owner, 2026-10-14, ruling C): Clear or Reset at the top right, a ✕ (unused today) at the top left. Each is a
+   48px target vertically centred on the text block (the title + its line), its edge 10px from the sheet's (the word ends on the
+   18px gutter). The title keeps 12px clear of each target: the room is the sheet less 2 × (10 + 48 + 12). */
+.sheet-text{position:relative;align-self:stretch;display:flex;flex-direction:column;align-items:center}
+.sheet-text>.sheet-title{max-width:calc(100% + 2 * var(--space-gutter) - 2 * (var(--space-10) + var(--tap-min) + var(--space-12)))}
+.sheet-text>.st-sheet-corner.st-sheet-corner{position:absolute;top:50%;transform:translateY(-50%);min-width:var(--tap-min);min-height:var(--tap-min);margin:0;padding:0 var(--space-8);border:0;border-radius:var(--radius-control);background:transparent;color:var(--ink);font:500 var(--font-size-14)/1.3 var(--font-sans);white-space:nowrap;cursor:pointer}
+.sheet-text>.st-sheet-corner[data-corner="end"]{right:calc(var(--space-10) - var(--space-gutter))}
+.sheet-text>.st-sheet-corner[data-corner="start"]{left:calc(var(--space-10) - var(--space-gutter));display:grid;place-items:center;width:var(--tap-min);padding:0}
+.st-sheet-corner[data-corner="start"]>svg{width:var(--size-20);height:var(--size-20);fill:none;stroke:currentColor;stroke-width:var(--icon-stroke);stroke-linecap:round;stroke-linejoin:round}
+.sheet-text>.st-sheet-corner:active{background:var(--press)}
 .sheet-title{margin:0;font:500 var(--type-sheet-title-size)/1.3 var(--font-sans);letter-spacing:var(--tracking-sheet);color:var(--ink);overflow-wrap:anywhere}
 /* The header line: one quiet line, never wrapped or truncated (copy that does not fit belongs in the body). */
 .st-header-line{margin:var(--space-6) 0 0;font:var(--type-description-size)/1.5 var(--font-sans);color:var(--muted);white-space:nowrap}
@@ -115,7 +125,6 @@ svg{width:var(--size-20);height:var(--size-20);display:block;flex-shrink:0;fill:
 .sheet-footer>.button:not(.surface-back){flex:1;min-width:0;min-height:var(--footer-height);margin:0;padding:var(--space-10) var(--space-17);border-radius:var(--radius-control);font:500 var(--type-button-size)/1.3 var(--font-sans)}
 /* Back: the one exit of every footer. Alone it fills the bar in the primary's face. */
 .button.surface-back{flex:none;display:flex;align-items:center;justify-content:center;gap:var(--space-4);width:var(--back-width);min-width:var(--back-width);min-height:var(--footer-height);margin:0;padding:var(--space-8);background:var(--paper);border:1px solid var(--back-border);border-radius:var(--radius-control);box-shadow:none;color:var(--ink);font:500 var(--type-button-size) var(--font-sans);white-space:nowrap;touch-action:manipulation}
-.sheet-footer>.st-footer-quiet{flex:none;align-self:center;margin:0 calc(-1 * var(--space-4));padding:0 var(--space-4);font-weight:500}
 .surface-back>svg{width:var(--size-16);height:var(--size-16);flex:none;transform:none}
 .surface-back:active{background:var(--back-press)}
 .surface-back:only-child{flex:1 1 auto;width:auto;min-width:0;background:var(--ink);border-color:var(--ink);color:var(--paper);font-weight:600}
@@ -170,7 +179,7 @@ svg{width:var(--size-20);height:var(--size-20);display:block;flex-shrink:0;fill:
 :is(.farrowing-phone,.inspection-phone) .page-background>.sheet{z-index:1}
 .inspection-phone .sheet[data-presentation="page"].single-action-sheet>.sheet-body{display:block}
 .inspection-phone .sheet[data-presentation="page"].single-action-sheet .bulk-controls{max-width:100%}
-.inspection-phone .sheet[data-presentation="page"].single-action-sheet .bulk-controls{padding:var(--space-16);gap:var(--space-20)}
+.inspection-phone .sheet[data-presentation="page"].single-action-sheet .bulk-controls{padding:0 var(--space-16) var(--space-16);gap:var(--space-20)}
 .inspection-phone .sheet[data-presentation="page"].single-action-sheet .field{font-size:var(--font-size-13);gap:var(--space-8)}
 .inspection-phone .sheet[data-presentation="page"].single-action-sheet :is(.field input,.field select){min-height:var(--tap-min);font-size:var(--font-size-14);padding:var(--space-12)}
 .inspection-phone .sheet[data-presentation="page"].single-action-sheet .feed-optional-open{min-height:var(--tap-min)}
@@ -395,7 +404,7 @@ button.st-row:disabled{cursor:default}
 .st-stepper-face,.st-numpad-key.st-numpad-key{display:grid;place-items:center;border:1px solid var(--control-border);border-radius:var(--radius-control);background:var(--paper);color:var(--ink);transition:transform 120ms ease}
 :is(.st-stepper-face,.st-numpad-key) svg{fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round}
 /* the floor-gray: a key with nothing to do (DS README, States) */
-.st-stepper-key[aria-disabled="true"] .st-stepper-face,.st-numpad-key.st-numpad-key[aria-disabled="true"]{background:var(--disabled-fill);border-color:var(--disabled-fill);color:var(--disabled-ink);cursor:default}
+.st-stepper-key[aria-disabled="true"] .st-stepper-face,.st-numpad-key.st-numpad-key[aria-disabled="true"]{background:var(--disabled-surface);border-color:var(--control-border);border-style:dashed;color:var(--ink-2);cursor:default}
 .st-stepper-key:not([aria-disabled="true"]):is(:active,[data-preview~="pressed"]) .st-stepper-face,.st-numpad-key.st-numpad-key:not([aria-disabled="true"]):is(:active,[data-preview~="pressed"]){transform:scale(.96);background:var(--press);border-color:var(--ink-2)}
 .st-field-hint.st-field-hint{display:flex;align-items:center;flex-wrap:wrap;gap:var(--space-6);margin:0;padding:0;font:400 var(--font-size-14)/1.4 var(--font-sans);color:var(--muted)}
 .st-field-hint[data-reserve="text"]{min-height:calc(var(--font-size-14) * 1.4)}
@@ -546,8 +555,9 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 .st-text-action.st-text-action{justify-content:center;min-width:var(--tap-min)}
 .st-text-action:not([aria-disabled="true"]):is(:active,[data-preview~="pressed"]){color:var(--ink);background:var(--press);border-radius:var(--radius-control)}
 .st-text-action.st-text-action[aria-disabled="true"]{color:var(--muted);background:transparent;cursor:default}
-/* waiting: present, quiet, focusable (aria-disabled); outranks every register's fill */
-.button.button[aria-disabled="true"]{background:var(--disabled-fill);border-color:var(--disabled-border);color:var(--ink);cursor:default;filter:none;transform:none}
+/* waiting or disabled: present, quiet, focusable when waiting (aria-disabled); outranks every register's fill, a page's register paint
+   (`.phone .button.task-end-confirm`) and a page's base fade (`button:disabled{opacity:.45}`): unavailable is the surface and the dashed rim */
+.button.button.button:is(:disabled,[aria-disabled="true"]){background:var(--disabled-fill);border:var(--border-width) dashed var(--control-border);color:var(--ink);opacity:1;cursor:default;filter:none;transform:none}
 .button[data-busy]{cursor:progress}
 /* hold: the sweep fills the button over hold-commit; the caption rides under the verb */
 .button.st-hold{position:relative;overflow:hidden;flex-direction:column;gap:var(--space-4);touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
@@ -559,8 +569,8 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 .st-hold[data-phase="holding"][data-preview~="still"]::before{transform:scaleX(.5);transition:none}
 .st-hold:is([data-phase="pending"],[data-phase="done"])::before{transform:scaleX(1);transition:none}
 /* the pending and done faces keep their register (no disabled rim); unknown takes the waiting face */
-.button.button.st-hold.danger:is([data-phase="pending"],[data-phase="done"]){background:var(--red);border-color:var(--red);color:var(--paper)}
-.button.button.st-hold.primary:is([data-phase="pending"],[data-phase="done"]){background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.button.button.st-hold.danger:is([data-phase="pending"],[data-phase="done"]){background:var(--red);border-color:var(--red);border-style:solid;color:var(--paper)}
+.button.button.st-hold.primary:is([data-phase="pending"],[data-phase="done"]){background:var(--ink);border-color:var(--ink);border-style:solid;color:var(--paper)}
 .st-hold[data-phase="unknown"] .st-hold-caption{opacity:1}
 .st-hold[data-phase="armed"]{outline:var(--size-3) solid var(--focus);outline-offset:var(--size-2)}
 
@@ -624,7 +634,7 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 /* OptionalRow: the one look of every optional input: label (row-title) · muted "Optional" · trailing icon action. See Field/README. */
 .st-optional-row{display:flex;align-items:center;gap:12px;width:100%;min-height:44px;margin:12px 0 0;padding:0 0 0 14px;border:0;border-radius:10px;background:var(--inset);text-align:left;font-family:var(--font-sans);color:var(--ink);touch-action:manipulation}
 .st-optional-row:active{background:var(--press)}
-.st-optional-row:disabled{opacity:.5}
+.st-optional-row:disabled{opacity:1;background:var(--disabled-surface);outline:var(--border-width) dashed var(--control-border);outline-offset:calc(-1 * var(--border-width));color:var(--ink);cursor:default}
 .st-optional-copy{display:flex;flex-direction:column;flex:1;min-width:0;padding:var(--space-7) 0}
 .st-optional-head{display:flex;align-items:baseline;gap:var(--space-8);min-width:0}
 .st-optional-label{font:500 13px/1.5 var(--font-sans);color:var(--ink)}
@@ -643,7 +653,8 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 .st-picker-value{min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left}
 .st-picker-trigger:is(:active,[data-preview="pressed"]){background:var(--choice-press)}
 .st-choice-row:is(:active,[data-preview="pressed"]){background:var(--st-press)}
-.st-picker-trigger[aria-disabled="true"],.st-choice-row[aria-disabled="true"]{opacity:1;background:var(--disabled-surface);color:var(--disabled-ink)}
+.st-picker-trigger[aria-disabled="true"],.st-choice-row[aria-disabled="true"]{opacity:1;background:var(--disabled-surface);color:var(--ink)}
+.st-picker-trigger.st-picker-trigger[aria-disabled="true"]{border-style:dashed}
 .st-picker-trigger[aria-invalid="true"]{border-color:var(--red)}
 .st-picker-hint{font:var(--font-size-13)/1.4 var(--font-sans);color:var(--muted)}
 .st-picker-field.error .st-picker-hint{color:var(--red)}
@@ -676,7 +687,10 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 .st-segment[data-variant=two-line-lens] button{flex-direction:column}
 .st-segment[data-variant=two-line-lens] .st-selection-count:empty{min-height:1.4em}
 .st-segment button:not([aria-pressed=true]):not(:disabled):active,.st-filter-chips button:not([aria-checked=true]):not(:disabled):active,[data-state=Pressed].st-segment button:nth-child(2),[data-state=Pressed].st-filter-chips button:nth-child(2){background:var(--handle)}
-.st-segment button:disabled,.st-filter-chips button:disabled{cursor:default;border:1px dashed var(--control-border)}
+.st-segment button:disabled,.st-filter-chips button:disabled{cursor:default;border:1px dashed var(--control-border);color:var(--ink);opacity:1}
+/* a whole segment unavailable: one dashed rim on a flat disabled surface; the current option keeps its weight but loses the raised pill */
+.st-segment:not(:has(button:not(:disabled))){background:var(--disabled-surface);border-style:dashed;border-color:var(--control-border)}
+.st-segment:not(:has(button:not(:disabled))) button:disabled{border-color:transparent;background:transparent;box-shadow:none}
 .st-selection-reason{margin:var(--space-6) 0;color:var(--muted);font:400 var(--type-description-size)/1.4 var(--font-sans)}
 .st-filter-chips{min-width:0;padding:var(--space-6) 0}
 .st-filter-chips-track{display:flex;gap:var(--space-key-gap);overflow-x:auto;padding:var(--space-4) var(--space-gutter);scrollbar-width:thin}
@@ -691,8 +705,7 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 .button .st-button-label{min-width:0;overflow-wrap:anywhere}
 .button.danger:not(:disabled):not([aria-disabled="true"]){color:var(--paper)}
 .button.tool .st-button-label{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.button.tool:is(:disabled,[aria-disabled="true"]){background:#fff;border-color:var(--line);color:var(--ink);opacity:.45}
-.st-text-action:disabled{color:var(--muted);background:transparent;opacity:.5;cursor:default}
+.st-text-action:disabled{color:var(--muted);background:transparent;opacity:1;cursor:default}
 .task-header>.button.finish-walk{flex:none;min-width:auto}
 .button.tool svg{width:16px;height:16px;flex:none}
 .icon-button.icon-button{box-sizing:border-box;flex:none;width:var(--tap-min);min-width:var(--tap-min);height:var(--tap-min);min-height:var(--tap-min);padding:0;border:var(--border-width) solid var(--line);border-radius:var(--radius-control);background:var(--paper);color:var(--ink)}
@@ -841,7 +854,7 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
 .st-stepper[data-variant="count"] .st-stepper-key[data-step^="-"]:not([aria-disabled="true"]) .st-stepper-face{color:#345841}
 .st-stepper[data-variant="count"] .st-stepper-key[data-step^="-"]:not([aria-disabled="true"]) .st-stepper-face{background:var(--paper)}
 .st-stepper[data-variant="count"] .st-stepper-key:not([data-step^="-"]):not([aria-disabled="true"]) .st-stepper-face{background:var(--green);border-color:var(--green);color:#fff;box-shadow:0 3px 8px #225d3520}
-.st-stepper[data-variant="count"] .st-stepper-key[aria-disabled="true"] .st-stepper-face{background:#f8fbf8;border-color:#d9e4da;color:#a0b3a5}
+.st-stepper[data-variant="count"] .st-stepper-key[aria-disabled="true"] .st-stepper-face{background:var(--disabled-surface);border-color:var(--control-border);border-style:dashed;color:var(--ink-2)}
 .st-stepper[data-variant="count"] .st-stepper-value{display:block;min-width:0;min-height:0;color:#203d2b;line-height:1.15;letter-spacing:-3px}
 .st-stepper[data-variant="count"][data-zero] .st-stepper-value{color:#203d2b}
 .st-stepper[data-variant="count"] .st-stepper-hint.receipt{margin-top:4px;min-height:30px;font:13px/1.5 var(--font-sans);color:#52705c}
@@ -853,7 +866,7 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
 .st-panel.st-panel.st-panel.pen-card{box-shadow:0 2px 8px #20291f0a}
 .st-heading-action svg{color:var(--muted)}
 .sheet-footer>.button.surface-back.surface-back{border-color:var(--back-border)}
-.st-heading-action .st-text-action:disabled{color:var(--muted);background:transparent;opacity:.5}
+.st-heading-action .st-text-action:disabled{color:var(--muted);background:transparent;opacity:1}
 /* Stepper, row (an entry row: label left, minus / value / plus right) */
 .st-stepper[data-variant="row"]{min-height:66px;column-gap:8px;border-top:0;border-bottom:1px solid var(--line)}
 .st-stepper[data-variant="row"] .st-stepper-label{font:500 16px/normal var(--font-sans)}
@@ -861,7 +874,7 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
 .st-stepper[data-variant="row"] .st-stepper-key.st-stepper-key{width:44px;min-width:44px;min-height:44px;align-self:center}
 .st-stepper[data-variant="row"] .st-stepper-face{width:44px;height:44px;min-width:44px;min-height:44px;border-radius:12px;border-color:var(--task-key-border)}
 .st-stepper[data-variant="row"] .st-stepper-face svg{width:17px;height:17px;stroke-width:2.2}
-.st-stepper[data-variant="row"] .st-stepper-key[aria-disabled="true"] .st-stepper-face{background:var(--disabled-surface);border-color:var(--disabled-border);color:var(--disabled-ink)}
+.st-stepper[data-variant="row"] .st-stepper-key[aria-disabled="true"] .st-stepper-face{background:var(--disabled-surface);border-color:var(--control-border);border-style:dashed;color:var(--ink-2)}
 .st-stepper[data-variant="row"][data-zero] .st-stepper-value{color:var(--ink)}
 .st-stepper[data-variant="row"] .st-stepper-value{display:block;min-width:3ch;min-height:0;width:3ch;font:600 18px/normal var(--font-mono)}
 /* Segment, view switch and facet */
@@ -905,7 +918,7 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
 .st-stepper[data-variant="bare"] .st-stepper-key.st-stepper-key{width:44px;min-width:44px;min-height:44px;align-self:center}
 .st-stepper[data-variant="bare"] .st-stepper-face{width:44px;height:44px;min-width:44px;min-height:44px;border-radius:12px;border-color:var(--task-key-border)}
 .st-stepper[data-variant="bare"] .st-stepper-face svg{width:17px;height:17px;stroke-width:2.2}
-.st-stepper[data-variant="bare"] .st-stepper-key[aria-disabled="true"] .st-stepper-face{background:var(--disabled-surface);border-color:var(--disabled-border);color:var(--disabled-ink)}
+.st-stepper[data-variant="bare"] .st-stepper-key[aria-disabled="true"] .st-stepper-face{background:var(--disabled-surface);border-color:var(--control-border);border-style:dashed;color:var(--ink-2)}
 .st-stepper[data-variant="bare"] .st-stepper-value{display:block;min-width:45px;min-height:0;font:600 25px/normal var(--font-mono);color:var(--ink)}
 .st-stepper[data-variant="bare"] .st-stepper-hint:empty{display:none}
 .dialog .st-selection{margin:16px 0 1px}
@@ -968,7 +981,21 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
 .st-optional-list>.st-choice-inline,.st-optional-body>.st-choice-inline{display:flex;justify-content:flex-start;min-height:48px;padding:0 var(--space-6);border:1px solid var(--line);border-radius:12px;background:var(--st-panel-bg)}
 .st-optional-list .st-optional-body,.st-optional-list>.finish-field,.st-optional-list>.st-choice-inline{grid-column:1/-1;margin:0}
 .st-photos .st-optional-row{margin:0}
-.st-photos-camera{width:calc(50% - 5px)}
+/* OptionalRow face "row" (face:'row'): the full-width optional row, empty or filled: the label and the muted Optional word
+   on the left, the outlined action at the right. Photos always draws it (README "line", the one face for optional evidence);
+   a sheet whose optionals sit beside Photos gives them the same face, so one sheet has one optional face on one track. */
+.st-optional-row[data-face="row"]{width:100%;justify-content:flex-start;gap:var(--space-12);padding:var(--space-4) var(--space-4) var(--space-4) var(--space-row-x);text-align:left;color:var(--ink)}
+.st-optional-row[data-face="row"] .st-optional-copy{flex:1 1 0;align-items:flex-start}
+.st-optional-row[data-face="row"] .st-optional-head{justify-content:flex-start;gap:var(--space-8)}
+.st-optional-row[data-face="row"] .st-optional-label{font:400 14px/1.4 var(--font-sans);color:var(--ink)}
+.st-optional-row[data-face="row"] .st-optional-word{display:inline;font:400 13px/1.4 var(--font-sans);color:var(--muted)}
+.st-optional-row[data-face="row"] .st-optional-act{order:0;flex:none;display:grid;place-items:center;width:44px;height:44px;color:var(--ink)}
+.st-optional-row[data-face="row"] .st-optional-act svg{box-sizing:content-box;width:var(--size-16);height:var(--size-16);padding:var(--space-6);border:var(--ring-width-fine) solid var(--muted);border-radius:50%;background:var(--paper)}
+.st-optional-row[data-face="row"][aria-disabled="true"] .st-optional-act{color:var(--disabled-ink)}
+.st-optional-row[data-face="row"][aria-disabled="true"] .st-optional-act svg{border-style:dashed}
+/* Photos waiting (inactive): the floor-gray. The row stays, its camera dashed; the reason is the row's description for a
+   screen reader and shows in the hint line only while a tap is answered (guard's data-answer), never as a standing line. */
+.st-photos[data-inactive]>.st-photos-hint:not([data-answer]){position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 /* hit extenders: invisible, so the visible box stays the approved 44 while the target reaches 48 */
 .st-segment button,.farrowing-phone .key{position:relative}
 .st-segment button::after{content:"";position:absolute;inset:-3px 0}
@@ -1017,7 +1044,7 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 /* A landmark focused by script (tabindex=-1: a list, a sheet) is not a control: no ring. */
 :is(.phone,.tk-phone,.atlas-phone,.device,.st-phone,.sp-phone,[data-st-context]) [tabindex="-1"]:focus{outline:none}
 /* A waiting or disabled control says so with its surface and rim; its text stays readable (4.5:1, farm legibility law). */
-.st-hold[aria-disabled="true"] :is(.st-hold-label,.st-hold-caption){color:var(--ink);opacity:1}
+.st-hold[aria-disabled="true"]:not([data-phase="pending"]):not([data-phase="done"]) :is(.st-hold-label,.st-hold-caption){color:var(--ink);opacity:1}
 /* The header owns the 24px under it: the body's first element brings no top margin of its own (a field's, a note's, a banner's).
    Last in the file, so a part's own margin rule of the same weight does not win here. */
 .sheet>.sheet-body>:first-child,.sheet>.sheet-body>:first-child>:first-child{margin-top:0}

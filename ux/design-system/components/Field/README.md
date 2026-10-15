@@ -8,7 +8,7 @@ Status: candidate; implementation checked on this branch, owner approval remains
 Use for required text, treatment doses with units, and explanations; show a note editor only after the worker chooses Add.
 
 ### When not
-A Field is never shown open for an optional input. An optional Note is an optional row: label · muted Optional · trailing Add action, opening this Field. Reuse SentriUI.optionalRow({label, inline:SentriUI.field(...)}). Use PickerField for options, Stepper for counts, and Measure with Numpad for weights and typed tags.
+A Field is never shown open for an optional input. An optional Note is an optional row: label · muted Optional · trailing Add action, opening this Field. Reuse SentriUI.optionalRow({label, inline:SentriUI.field(...)}). `face:'row'` draws the full-width optional row (label · muted Optional · trailing action) empty as well as filled: Photos always uses it, and a sheet that holds Photos gives its other optionals the same face, so one sheet has one optional face on one track. Use PickerField for options, Stepper for counts, and Measure with Numpad for weights and typed tags.
 
 ## Anatomy
 Root label; visible label text; one input or textarea; optional unit in the label; optional help/error/reason line beneath the control.

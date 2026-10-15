@@ -764,7 +764,7 @@
     const pending=list.filter(it=>it.pending).length;
     const value=count==null?(list.length?`${list.length} attached${pending?` · ${pending} waiting to upload`:''}`:''):Array.isArray(count)?count.map(x=>typeof x==='string'?x:x.text||'').join(' · '):typeof count==='object'?count.text:count;
     const blocked=disabledReason||(!active?'Record a death first · photos ride that record':full?`${max} photos at most`:'');
-    let head=optionalRow({label,value,optionalWord:optional,icon:glyph('camera'),action,key,className:'st-photos-head',attrs:{'aria-describedby':hid,...(reason||disabledReason||adding?{'aria-disabled':'true','data-reason':reason||'busy'}:{}),...(adding?{'aria-busy':'true'}:{}),...(preview?{'data-preview':preview}:{})}}).replace('<button type="button"','<button type="button" id="'+esc(pid)+'-camera"').replace('class="st-optional-row ', 'class="st-optional-row st-photos-camera ');
+    let head=optionalRow({label,value,optionalWord:optional,icon:glyph('camera'),action,key,face:'row',className:'st-photos-head',attrs:{'aria-describedby':hid,...(reason||disabledReason||adding?{'aria-disabled':'true','data-reason':reason||'busy'}:{}),...(adding?{'aria-busy':'true'}:{}),...(preview?{'data-preview':preview}:{})}}).replace('<button type="button"','<button type="button" id="'+esc(pid)+'-camera"').replace('class="st-optional-row ', 'class="st-optional-row st-photos-camera ');
     head=head.replace(`<span class="st-optional-label">${esc(label)}</span>`,`<span class="st-optional-label"${sa(s.label,a.label)}>${esc(label)}</span>`).replace(`<small class="st-optional-word">${esc(optional)}</small>`,`<small class="st-optional-word"${sa(s.optional,a.optional)}>${esc(optional)}</small>`);
     const countParts=count==null?(list.length?tx(`${list.length} attached`,{strs:{attached:'ds.c2.photos.attached'},args:{attached:{n:list.length}}},'attached')+(pending?' · '+tx(`${pending} waiting to upload`,{strs:{waiting:'ds.c2.photos.waiting'},args:{waiting:{n:pending}}},'waiting'):''):''):Array.isArray(count)?toks(count,{dot:true}):part(count);
     head=head.replace(`<span class="st-optional-answer" role="status">${esc(value||'')}</span>`,`<span class="st-optional-answer" role="status">${countParts}</span>`);
@@ -979,12 +979,12 @@
      a trailing icon action. Empty it shows `icon`; filled it shows the value as its answer line and `editIcon`.
      Host mode: `action` makes the row a button that asks the host to open the editor (picker, note page, camera).
      Inline mode: `inline` (the field's own markup) is revealed under the row on tap; the row tracks its value as the answer line. */
-  function optionalRow({label='',value='',icon='',editIcon='',action='',key='',inline='',open=false,optionalWord='Optional',editLabel='Edit',disabled=false,className='',attrs={}}={}){
+  function optionalRow({label='',value='',icon='',editIcon='',action='',key='',inline='',open=false,optionalWord='Optional',editLabel='Edit',disabled=false,className='',face='',attrs={}}={}){
     const filled=value!=null&&String(value).trim()!=='',glyph=filled?(editIcon||icon):icon,extra=Object.entries(attrs).filter(([k])=>/^(?:data|aria)-[a-z0-9-]+$/.test(k)).map(([k,v])=>` ${k}="${esc(v)}"`).join('');
     const copy=`<span class="st-optional-copy"><span class="st-optional-head"><span class="st-optional-label">${esc(label)}</span><small class="st-optional-word">${esc(optionalWord)}</small></span><span class="st-optional-answer" role="status">${filled&&!(inline&&open)?esc(value):''}</span></span><span class="st-optional-act" aria-hidden="true">${glyph}</span>`;
     const aria=` aria-label="${esc(filled?`${editLabel} ${label.toLowerCase()}, ${value}`:`${label}, ${optionalWord.toLowerCase()}`)}"`;
-    if(!inline)return `<button type="button" data-ds="OptionalRow" class="st-optional-row ${esc(className)}" data-filled="${filled}" data-action="${esc(action)}" data-value="${esc(key)}"${disabled?' disabled':''}${aria}${extra}>${copy}</button>`;
-    return `<div data-ds="OptionalRow" class="st-optional ${esc(className)}" data-open="${open}" data-filled="${filled}"><button type="button" class="st-optional-row" data-filled="${filled}" data-st-optional aria-expanded="${open}"${aria}${extra}>${copy}</button><div class="st-optional-body"${open?'':' hidden'}>${inline}</div></div>`;
+    if(!inline)return `<button type="button" data-ds="OptionalRow" class="st-optional-row ${esc(className)}" data-filled="${filled}"${face==='row'?' data-face="row"':''} data-action="${esc(action)}" data-value="${esc(key)}"${disabled?' disabled':''}${aria}${extra}>${copy}</button>`;
+    return `<div data-ds="OptionalRow" class="st-optional ${esc(className)}" data-open="${open}" data-filled="${filled}"><button type="button" class="st-optional-row" data-filled="${filled}"${face==='row'?' data-face="row"':''} data-st-optional aria-expanded="${open}"${aria}${extra}>${copy}</button><div class="st-optional-body"${open?'':' hidden'}>${inline}</div></div>`;
   }
   if(typeof document!=='undefined'){
     document.addEventListener('click',e=>{const control=e.target.closest('.st-picker-trigger[aria-disabled="true"],.st-choice-row[aria-disabled="true"],.st-choice-inline-opt[aria-disabled="true"]');if(control){e.preventDefault();e.stopImmediatePropagation();}},true);
@@ -1051,7 +1051,7 @@
      status { text, str, args, id, tone, visible, action }: a line above the bar for a hold's progress (its statusId) or a text
      action. It is drawn only when `visible` is set or it carries an action; a waiting button gives no reason line: it stands alone. `content` is trusted
      footer markup in place of back/primary/hold (a host's own two controls); className adds a page hook. */
-  function sheetFooter({back:b={},quiet:qa=null,primary,hold:h,status:st,content='',className=''}={}){
+  function sheetFooter({back:b={},primary,hold:h,status:st,content='',className=''}={}){
     let line='';
     if(!st&&primary&&typeof primary==='object'&&primary.reason){st=sObj(primary.reason);primary=Object.assign({},primary,{reason:''});}
     if(st){
@@ -1066,9 +1066,9 @@
       if(primary&&typeof primary==='object'&&!primary.describedby)primary=Object.assign({},primary,{describedby:id});
     }
     if(content){content=content.replace(/<p class="st-field-hint st-button-reason[^]*?<\/p>/g,reason=>{line+=/<button/.test(reason)?reason.replace('<p class="','<p data-action-slot class="'):reason.replace('st-button-reason','st-button-reason st-visually-hidden');return '';});}
-    /* quiet { label, action, value }: Reset or Clear, a quiet text action left of the primary (never in a header). */
-    const q=qa?sButton(Object.assign({register:'text'},qa,{className:'st-footer-quiet'+(qa.className?' '+qa.className:'')})):'';
-    const inner=content||`${b?backButton(b):''}${q}${h?sHold(h):sButton(primary)}`;
+    /* Reset and Clear are not footer controls: they are the sheet header's corner action (sheet({ corner })). The footer's
+       old `quiet` option is retired (owner, 2026-10-14) and ignored. */
+    const inner=content||`${b?backButton(b):''}${h?sHold(h):sButton(primary)}`;
     /* A hidden reason lives inside the footer (after the two targets), so nothing above the bar is drawn or measured. */
     const quiet=line&&!/class="sheet-status"|data-action-slot/.test(line);
     return `${quiet?'':line}<div class="sheet-footer${className?' '+esc(className):''}" data-ds="Sheet">${inner}${quiet?line:''}</div>`;
@@ -1080,8 +1080,20 @@
   function scrim({action='dismiss',value='',label={text:'Dismiss sheet',str:'tk.sheet.dismiss'},layer=0}={}){
     return `<button type="button" class="scrim" data-ds="Sheet"${sLayer(layer)}${sA(action,value)}${sL(label)}></button>`;
   }
+  /* The sheet header's text block: the centred title on one line, then the optional header line. Corner actions (owner,
+     2026-10-14, ruling C): corner { label, action, value } is Clear or Reset, quiet text at the top right, passed only while
+     there is something to clear or reset; cross { action, value, label } is a ✕ at the top left (no drawer has one today: Back,
+     a swipe and the scrim close a drawer). Each is a 48px target vertically centred on this block (title + line), never on
+     the title alone or the header box; the title keeps 12px clear of each target. Without corners the block is as before. */
+  function sheetText(title,line,corner,cross){
+    const t=`<h2 class="sheet-title">${sT(title)}</h2>${headerLine(line)}`;
+    if(!corner&&!cross)return t;
+    const x=cross?`<button type="button" class="st-sheet-corner" data-corner="start" data-ds="Sheet"${sA(cross.action||'dismiss',cross.value)}${sL(cross.label,{text:'Close',str:'act.close'})}>${sGlyph('close')}</button>`:'';
+    const c=corner?sButton(Object.assign({register:'text'},corner,{className:'st-sheet-corner'+(corner.className?' '+corner.className:''),attrs:Object.assign({'data-corner':'end'},corner.attrs||{})})):'';
+    return `<div class="sheet-text" data-corners="${cross&&corner?'both':corner?'end':'start'}">${x}${t}${c}</div>`;
+  }
   const SHEET_SIZES=['compact','short','medium','long'];
-  function sheet({variant='drawer',surface='',headClass='',title,line=null,back=null,description,icon='',close={action:'dismiss'},up=null,holdRows=0,lead='',above='',body='',bodyClass='',footer:f,size='medium',sizing='content',label,view='',className='',id='',layer=0,inert=false,bar='',scrim:sc={},attrs={}}={}){
+  function sheet({variant='drawer',surface='',headClass='',title,line=null,corner=null,cross=null,back=null,description,icon='',close={action:'dismiss'},up=null,holdRows=0,lead='',above='',body='',bodyClass='',footer:f,size='medium',sizing='content',label,view='',className='',id='',layer=0,inert=false,bar='',scrim:sc={},attrs={}}={}){
     const v=oneOf('Sheet','variant',variant,['drawer','page','dialog'],'drawer'),sz=oneOf('Sheet','size',size,SHEET_SIZES,'medium');
     /* surface (drawer only): '' is a content or input drawer (white, tinted cards). 'menu' is a drawer whose every row is an option or a verb
        (Choose a unit, More actions, Go to pen): the tint with white cards, like a page. See SURFACES.md. */
@@ -1098,7 +1110,7 @@
        A page takes the page header instead (pageHeader: Back top left, the title left-aligned). */
     const head=v==='page'
       ?pageHeader({title,back,line,className:headClass})
-      :`<header class="utility-header${headClass?' '+esc(headClass):''}${upHtml?' has-up':''}">${lead}<div class="sheet-titles">${upHtml}<h2 class="sheet-title">${sT(title)}</h2>${headerLine(line)}</div></header>`;
+      :`<header class="utility-header${headClass?' '+esc(headClass):''}${upHtml?' has-up':''}">${lead}<div class="sheet-titles">${upHtml}${sheetText(title,line,corner,cross)}</div></header>`;
     const common=`data-ds="Sheet" tabindex="-1"${sLayer(layer)}${inert?' inert':''}${id?` id="${esc(id)}"`:''}${vw}${sL(label??title)}${ex}`;
     const main=`${head}${above}<div class="sheet-body${bodyClass?' '+esc(bodyClass):''}">${body}</div>${foot}`;
     if(v==='page')return `<section class="sheet${cls}" ${common} role="region" data-st-context="page" data-presentation="page">${bar}${main}</section>`;
@@ -1139,16 +1151,17 @@
     const names=root.dataset.names.split(',');
     root.dispatchEvent(new CustomEvent('sentri-range-change',{bubbles:true,detail:{key:root.dataset.key,values:{[names[0]]:a,[names[1]]:b}}}));
   }
-  /* FilterSheet: the drawer that narrows a list. It is a Sheet whose footer holds Back (keeps the draft), Reset (quiet text)
-     and the one commit, whose label carries the live count ("Show 4 sows"; the host rewrites it as the draft changes).
+  /* FilterSheet: the drawer that narrows a list. It is a Sheet whose header carries Reset (quiet text, the top-right corner
+     action), and whose footer holds Back (keeps the draft) and the one commit, whose label carries the live count ("Show 4 sows"; the host rewrites it as the draft changes).
      filterSheet({ title, sections:[{ title, icon, content, help }] | body, apply:{label, action}, reset:{label, action} | false,
      backAction, closeAction, className, size }). A section is a titled group; sections come as the host's own controls
      (a rangeSlider, a segment) so the sheet owns only the frame, the spacing and the exits. Without `sections`, `body` is used as is. */
   function filterSheet({title='Filter',sections=[],body='',apply={},reset={},backAction='filter-back',backLabel='Back',closeAction='',className='',size='medium',label}={}){
     const exit=closeAction||backAction,list=sections.map(x=>`<section class="st-filter-section">${x.title?heading({title:x.title,icon:x.icon||'',kind:'section',level:4,className:'st-filter-title'}):''}${x.content||''}${x.help?`<p class="st-filter-help">${esc(x.help)}</p>`:''}</section>`).join('');
-    /* Reset is quiet text in the footer, left of the commit (Headers law: nothing in a header acts); reset:false leaves it out. */
-    const resetHtml=reset===false?'':button({label:reset.label||'Reset',register:'text',action:reset.action||'filter-reset',className:'st-footer-quiet'});
-    return sheet({title,size,label:label||title,className:'st-filter-sheet'+(className?' '+esc(className):''),body:list||body,footer:sheetFooter({content:backButton({action:backAction,label:backLabel})+resetHtml+button({label:apply.label||'Show',register:'primary',action:apply.action||'filter-apply'})}),close:{action:exit,label:'Close '+title},scrim:{action:exit,label:'Dismiss '+title}});
+    /* Reset is the header's corner action, top right (Headers law, owner 2026-10-14); the host passes reset:false while the
+       draft is at its defaults, so Reset shows only when there is something to reset. */
+    const corner=reset===false?null:{label:reset.label||'Reset',action:reset.action||'filter-reset'};
+    return sheet({title,corner,size,label:label||title,className:'st-filter-sheet'+(className?' '+esc(className):''),body:list||body,footer:sheetFooter({content:backButton({action:backAction,label:backLabel})+button({label:apply.label||'Show',register:'primary',action:apply.action||'filter-apply'})}),close:{action:exit,label:'Close '+title},scrim:{action:exit,label:'Dismiss '+title}});
   }
   if(typeof document!=='undefined'){
     let drag=null;

@@ -79,7 +79,7 @@
 .inspection-phone .unit-sensor-reading{border:1px solid #e8eddf;background:var(--surface);}
 .inspection-phone .unit-fault-card{border-color:#eadfca;}
 .inspection-phone .unit-empty-state{border:1px dashed var(--line);}
-.inspection-phone .walk-complete{padding-top:18px;}
+.inspection-phone .walk-complete{padding-top:0;}
 .inspection-phone .walk-complete>.complete-mark{background:var(--green-wash);color:var(--green);}
 .inspection-phone .feed-feature{border:1px solid #dfe8d8;background:var(--surface);}
 

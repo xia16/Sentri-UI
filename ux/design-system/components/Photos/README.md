@@ -24,7 +24,7 @@ Optional row: visible label, muted Optional word, optional attached/upload count
 | Denied | Camera not allowed · allow it in Settings, then try again |
 | Too large | Photo too large to attach · take it again |
 | Pressed | Static press fill on the row |
-| Disabled | Inactive or custom visible reason, aria-disabled, dashed camera outline |
+| Disabled | The floor-gray: aria-disabled, dashed camera outline; the reason (default or custom) is the row's description and shows in the hint line only while a tap is answered |
 | Full | 12 photos at most; same reason pattern |
 | Cancelled | No error message; the photos already attached remain |
 | Long label / Chinese | Label and help wrap; action remains inside the row |
@@ -55,3 +55,5 @@ Generic **component**, using the optional-row arrangement documented in [Field](
 
 ## Changelog
 2026-10-10: one line face, merged TaskPhotos, migrated Farrowing, padded 48px camera, derived counts, adding/error/Chinese examples. See [verification](verification.md).
+2026-10-14: the row face is drawn again, empty or filled: the shared optional-row restyle (the quiet half-width "+ Label" card) had reached Photos, so Photos showed a lone half-width card. `.st-photos-camera` now restores full width, label · muted Optional, trailing outlined camera (dashed while inactive). Reach: farrowing Record dead and Report piglet mortality, piglet-processing's dead tally, the task-skeleton demo.
+2026-10-14 (crit round 2): the row face is OptionalRow's `face:'row'`, so a sheet's other optionals can share it; an inactive row no longer draws its reason as a standing line (the floor-gray: the tap answers it).

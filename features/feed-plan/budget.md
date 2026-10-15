@@ -38,3 +38,41 @@ The header line of every surface of this feature, decided by the Headers law (`u
 
 
 Crit round 2: More actions for several pens keeps 18px between its Pigs / Pens tabs and the actions card (the `above` bar is the page's, the gap is restored as a layout rule).
+
+
+### Corner actions and titles (2026-10-14)
+
+By the Headers law → Corner actions and Title length (`ux/design-system/README.md`, owner ruling C, 2026-10-14; PR #165). Room at a true 360, as `scripts/check-headers.mjs` (workflow/header-checks) measures it: a drawer title has 360 − 2 × (18 + 48 + 12) = 204px (a missing corner counts as the room it would take); a page title has 216px beside Back. Titles measured at their own face (sheet 500 20px, page 500 22px), EN and ZH.
+
+| Surface | Corner action (top right) | Present while | Title | Fits at 360 (EN · ZH) |
+|---|---|---|---|---|
+| Feed adjustment (one pig) | none | | **`Feed adjustment`** (was `Individual feed adjustment`): one pig is on screen in the chip and the form, so `individual` says nothing the worker needs | 156px |
+| Feeding exception (pen) | none | | **`Feeding exception`** (was `Record feed exception`): the same name as its station-fed sibling; the primary says Save | 172px |
+
+---
+
+# Disabled is not faded (shared change, ds/disabled-not-faded), information budget
+
+Scope: the facts a disabled or waiting control displays. The change adds and cuts no fact; it changes how loud each one is.
+
+## Inventory
+
+- The control's label (the verb: `Save setting`, `Record deaths`, `Finish farrowing`).
+- The current option of a disabled segment (`Auto` of Auto / Manual).
+- The other options of a disabled segment.
+- The floor key's glyph (− at the floor, + at the ceiling, a digit on a full pad).
+- A disabled picker's current value (`None`, the chosen names).
+- That the control is unavailable now (today: faded text).
+
+## Questions
+
+1. What will this do once it is available? (the label, at full legibility)
+2. Can I use it now? (the surface and the rim: dashed means not now)
+3. What is it set to? (the current option: weight, not a raised pill)
+4. Why not, and what do I do? (the host's reason line or hint; unchanged by this change)
+
+## Levels
+
+- **Settled**: the label, the current option and the picker value, in ink (or `ink-2` on a floor key), at the control's own size and weight.
+- **Watch**: unavailability, quiet: the flat disabled surface and the 1px dashed `control-border` rim. No colour, no icon added.
+- **Cut**: faded text as the signal (opacity, `disabled-ink` text).
