@@ -1,4 +1,4 @@
-/* Opt-in Workbench study: one connected task surface, with full cards inside open types. */
+/* Opt-in Workbench study: concise Overview task rows and full Unit task cards. */
 body:has(.connected-preview) .assistant-door{background:var(--paper);box-shadow:none;font-size:13px}
 body:has(.connected-preview) .scope-switch button[aria-pressed=true],body:has(.connected-preview) .scan-button{box-shadow:none}
 
@@ -37,8 +37,8 @@ body:has(.connected-preview) .schedule-detail-row small{display:block;margin-top
 .connected-preview>.work-section-heading>span{font-size:11px;white-space:nowrap;color:var(--muted)}
 .connected-preview .seamless-task-list{box-shadow:none;border-color:var(--line);border-radius:16px}
 .connected-preview .task-type-group+.task-type-group{border-top:1px solid var(--rule)}
-.connected-preview .task-type-group.has-urgent>.task-type-toggle{background:var(--paper);box-shadow:none}
-.connected-preview .task-type-toggle{min-height:72px;padding:12px 13px;grid-template-columns:33px minmax(0,1fr) 30px 12px;gap:9px}
+.connected-preview .task-type-group.has-urgent>.task-type-toggle{background:var(--app-background);box-shadow:none}
+.connected-preview .task-type-toggle{min-height:72px;padding:12px 13px;grid-template-columns:33px minmax(0,1fr) 30px 12px;gap:9px;background:var(--app-background)}
 .connected-preview .task-type-icon,.connected-preview .task-type-group.has-urgent .task-type-icon{background:var(--row-icon-bg);color:var(--row-icon-ink)}
 .connected-preview .task-type-copy strong{font-size:14px;line-height:1.25}
 .connected-preview .task-type-copy small{font-size:13px;line-height:1.3;color:var(--muted);overflow:visible;white-space:normal}
@@ -78,6 +78,20 @@ body:has(.connected-preview) .schedule-detail-row small{display:block;margin-top
 .connected-preview .home-task-list .hc-complete{background:var(--app-background);border-color:var(--line);color:var(--muted)}
 .connected-preview .home-task-list .hc-complete-copy strong{color:var(--ink);font-size:13px}
 .connected-preview .home-task-list .hc-complete-copy small{color:var(--muted);font-size:11px}
+.connected-preview .overview-task-card{min-height:84px;padding:13px 15px;text-align:left;color:var(--ink);background:var(--paper)}
+.connected-preview .overview-task-head{display:flex;align-items:center;gap:8px;min-width:0}
+.connected-preview .overview-task-head>strong{flex:1;min-width:0;font-size:14px;font-weight:600;line-height:1.35}
+.connected-preview .overview-task-arrow{display:grid;place-items:center;color:var(--muted)}
+.connected-preview .overview-task-arrow svg{width:14px;height:14px}
+.connected-preview .overview-task-status{font-size:13px;font-weight:600;color:var(--red-ink);white-space:nowrap}
+.connected-preview .overview-task-summary{display:flex;align-items:baseline;gap:5px;flex-wrap:wrap;margin-top:7px;font-size:13px;line-height:1.4;color:var(--muted)}
+.connected-preview .overview-task-summary>strong{font-size:22px;line-height:1;font-weight:600;color:var(--ink)}
+.connected-preview .overview-task-record{margin-left:auto;font-size:13px;font-weight:600;color:var(--ink)}
+.connected-preview .home-task-list .overview-task-card{border:1px solid var(--line);border-radius:13px}
+.connected-preview .home-task-list .overview-task-card.complete,.connected-preview .home-task-list .overview-task-card.terminated{background:var(--app-background)}
+.connected-preview.overview-scope .task-type-cards .overview-task-card:not(.hc-complete){padding:13px 14px 13px 49px;min-height:84px}
+.connected-preview .task-type-cards .overview-task-card.complete,.connected-preview .task-type-cards .overview-task-card.terminated{background:var(--app-background)}
+.connected-preview .task-type-cards .overview-task-card:hover,.connected-preview .home-task-list .overview-task-card:hover{background:var(--press)}
 .connected-preview .empty-state{padding:21px 17px;background:var(--paper);border:1px solid var(--line);border-radius:14px}
 .connected-preview .empty-state h3{font-size:16px}
 .connected-preview .empty-state p{font-size:12px;margin-bottom:0}

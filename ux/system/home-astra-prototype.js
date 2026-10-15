@@ -323,6 +323,22 @@
     if(!next.length)return;
     drawer(`${['Fri','Sat','Sun','Mon','Tue','Wed','Thu'][day-1]} ${day+8} Jul`,`${next.map(t=>`<div class="schedule-detail-row"><strong>${esc(t.title)}</strong><small>${esc(t.batch)} · planned to start</small></div>`).join('')}<p class="work-note">These tasks have not started. Ongoing tasks stay in Today’s work.</p>`,{size:'short'});
   }
+  function overviewTaskCard(m,category=null){
+    const source=taskBy(m.id),finished=['complete','terminated'].includes(m.state);
+    const outcomeOnly=!finished&&['Heat check','Return-heat check','Breeding'].includes(source.type);
+    const name=category&&category!=='Production tasks'?source.batch:m.identity.title+(source.batch?' · '+source.batch:'');
+    const headline=finished?`${m.state==='terminated'?'Ended early':'Completed'} · ${m.completedAt||'Today'}`:
+      outcomeOnly?source.type==='Breeding'?'Service in progress':'Observation in progress':
+      ['waiting','upcoming'].includes(m.state)?'In progress':m.action?.value===undefined?m.action?.message||'Status to confirm':
+      `<strong>${esc(m.action.value)}</strong><span>${esc(m.action.label)}</span>`;
+    const summary=finished||outcomeOnly||['waiting','upcoming'].includes(m.state)||m.action?.value===undefined?esc(headline):headline;
+    const status=m.state==='overdue'?'<span class="overview-task-status">Overdue</span>':'';
+    const label=finished?'View record':m.state==='overdue'?'Overdue task':'Open task';
+    return `<button type="button" class="home-task-card overview-task-card ${esc(m.state)}" data-card="${esc(m.id)}" aria-label="${esc(name+', '+(finished||outcomeOnly?headline:label+(m.action?.value===undefined?'':', '+m.action.value+' '+m.action.label)))}">
+      <span class="overview-task-head"><strong>${esc(name)}</strong>${status}<span class="overview-task-arrow" aria-hidden="true">${icon('arrow')}</span></span>
+      <span class="overview-task-summary">${summary}${finished?'<span class="overview-task-record">View record</span>':''}</span>
+    </button>`;
+  }
   function compactTaskRow(m){
     const source=taskBy(m.id),details=m.identity.context.split(' · '),instance=details.shift();
     const due=m.action?.value;
@@ -381,7 +397,7 @@
       const urgent=overdue+exceptions;
       const defaultOpen=connectedPreview&&groupMode==='collapsed'?false:connectedPreview&&groupMode==='all'?true:urgent>0||category===defaultOpenType;
       const isOpen=state.typeGroupOverrides[category]??defaultOpen;
-      const status=connectedPreview?[exceptions?`${exceptions} exception${exceptions===1?'':'s'}`:'',overdue?`${overdue} overdue`:'',`${currentItems.length} open`,completedCount?`${completedCount} done`:''].filter(Boolean).join(' · '):(()=>{
+      const status=connectedPreview?[exceptions?`${exceptions} exception${exceptions===1?'':'s'}`:'',overdue?`${overdue} overdue`:'',completedCount?`${currentItems.length} open`:'',completedCount?`${completedCount} done`:''].filter(Boolean).join(' · '):(()=>{
         const subtypeCounts=new Map();
         currentItems.forEach(item=>subtypeCounts.set(item.identity.title,(subtypeCounts.get(item.identity.title)||0)+1));
         const summary=category==='Production tasks'?[...subtypeCounts].sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0])).map(([type,count])=>`${type.replace(/ check$/,'')} ×${count}`).join(' · '):currentItems.map(item=>taskBy(item.id).batch.replace(/^(Care plan|Order|Plan|Task)\s+/,'')).join(' · ');
@@ -389,13 +405,13 @@
       })();
       const categoryIcon=category==='Production tasks'?'production':category==='Pig transfer'?'transfer':['Sampling','Outbound'].includes(category)?'note':'care';
       return `<section class="task-type-group ${isOpen?'is-open':''} ${urgent?'has-urgent':''}">
-        <button type="button" class="task-type-toggle" data-action="toggle-type" data-value="${esc(category)}" aria-expanded="${isOpen}" aria-label="${esc(category+', '+items.length+' tasks, '+status+', '+(isOpen?'collapse':'expand'))}">
+        <button type="button" class="task-type-toggle" data-action="toggle-type" data-value="${esc(category)}" aria-expanded="${isOpen}" aria-label="${esc(category+', '+items.length+' tasks'+(status?', '+status:'')+', '+(isOpen?'collapse':'expand'))}">
           <span class="task-type-icon" aria-hidden="true">${icon(categoryIcon)}</span>
-          <span class="task-type-copy"><strong>${esc(category)}</strong><small>${esc(status)}</small></span>
+          <span class="task-type-copy"><strong>${esc(category)}</strong>${status?`<small>${esc(status)}</small>`:''}</span>
           <span class="task-type-count">${items.length}<small>${items.length===1?'task':'tasks'}</small></span>
           <span class="task-type-arrow" aria-hidden="true">${icon('arrow')}</span>
         </button>
-        ${isOpen?`<div class="task-type-cards">${connectedPreview?items.map(item=>window.SentriHomeTaskCard.render(item,{groupCategory:category,showRecordLink:true})).join(''):seamlessPreview?items.map(item=>window.SentriHomeTaskCard.render(item)).join(''):joinedPreview?items.map(item=>joinedTaskRow(item,category)).join(''):items.map(compactTaskRow).join('')}</div>`:''}
+        ${isOpen?`<div class="task-type-cards">${connectedPreview?items.map(item=>state.unit?window.SentriHomeTaskCard.render(item,{groupCategory:category,showRecordLink:true}):overviewTaskCard(item,category)).join(''):seamlessPreview?items.map(item=>window.SentriHomeTaskCard.render(item)).join(''):joinedPreview?items.map(item=>joinedTaskRow(item,category)).join(''):items.map(compactTaskRow).join('')}</div>`:''}
       </section>`;
     }).join('');
     return {count:groups.size,html:`<div class="task-type-list ${joinedPreview?'joined-task-list':''} ${seamlessPreview?'seamless-task-list':''}">${rows}</div>`};
@@ -408,15 +424,15 @@
     const visible=state.expandedTasks?open:open.slice(0,5);
     const hidden=open.slice(5),hiddenAlerts=hidden.filter(m=>m.attentionRank===0).length,hiddenOverdue=hidden.filter(m=>m.state==='overdue'||m.attentionRank===1).length;
     const grouped=groupedPreview&&(connectedPreview?open.length+completed.length>=5:open.length>=4)?groupedTaskCards(connectedPreview?[...open,...completed]:open):null;
-    const cards=(compactPreview?visible.map(compactTaskRow).join(''):visible.map((m,i,list)=>{
+    const cards=connectedPreview&&!state.unit?[...visible,...completed].map(m=>overviewTaskCard(m)).join(''):(compactPreview?visible.map(compactTaskRow).join(''):visible.map((m,i,list)=>{
       const quiet=['waiting','upcoming'].includes(m.state),firstQuiet=quiet&&(i===0||!['waiting','upcoming'].includes(list[i-1].state));
       return (firstQuiet&&!groupedPreview?'<div class="work-section-heading next-work-heading"><h2>Next</h2></div>':'')+window.SentriHomeTaskCard.render(m);
-    }).join(''))+(connectedPreview?completed.map(m=>window.SentriHomeTaskCard.render(m,{showRecordLink:true})).join(''):'');
+    }).join(''))+(connectedPreview&&state.unit?completed.map(m=>window.SentriHomeTaskCard.render(m,{showRecordLink:true})).join(''):'');
     const completedHTML=!connectedPreview&&completed.length?'<details class="completed-work"><summary class="work-section-heading"><h2>Closed tasks</h2><span>'+completed.length+'</span></summary><div class="home-task-list">'+completed.map(m=>window.SentriHomeTaskCard.render(m)).join('')+'</div></details>':'';
     const toggle=!grouped&&open.length>5?btn('toggle-tasks',state.expandedTasks?'Show first 5 tasks':`See all ${open.length} tasks${hiddenAlerts?' · '+hiddenAlerts+' exceptions':''}${hiddenOverdue?' · '+hiddenOverdue+' overdue':''}`,'task-list-toggle','','aria-expanded="'+state.expandedTasks+'"'):'';
-    const work=grouped?grouped.html:cards?`<div class="home-task-list ${compactPreview?'compact-task-list':''}">${cards}</div>${toggle}`:`<div class="empty-state">${connectedPreview?'':`<div class="complete-mark">${icon('check')}</div>`}<h3>${connectedPreview?'No current tasks':'No tasks in progress'}</h3><p>${state.unit?'You can still inspect this unit and record anything you find.':'Select a unit to inspect pens or record anything you find.'}</p></div>`;
-    const workCount=connectedPreview?`Thu 8 Jul · ${open.length} open${completed.length?' · '+completed.length+' done':''}`:groupedPreview?`${open.length} tasks${grouped?' · '+grouped.count+' types':''}`:compactPreview?open.length+' tasks':'Sample · Thu, 8 Jul';
-    return header()+scopeRail()+`<div class="app-scroll screen-enter ${compactPreview?'compact-preview':''} ${groupedPreview?'grouped-preview':''} ${joinedPreview?'joined-preview':''} ${seamlessPreview?'seamless-preview':''} ${connectedPreview?'connected-preview':''}">${state.unit?unitStrip():''}${seamlessPreview?overviewShortcuts()+schedulePreview():''}<div class="work-section-heading"><h2>Today’s work</h2><span>${workCount}</span></div>${work}${seamlessPreview?'':comingUp()}${completedHTML}</div>`+nav();
+    const work=grouped?grouped.html:cards?`<div class="home-task-list ${compactPreview?'compact-task-list':''}">${cards}</div>${toggle}`:`<div class="empty-state">${connectedPreview?'':`<div class="complete-mark">${icon('check')}</div>`}<h3>${connectedPreview?'No current tasks':'No tasks in progress'}</h3><p>${state.unit?'You can still inspect this unit and record anything you find.':'Choose a unit to see local work and tools.'}</p></div>`;
+    const workCount=connectedPreview?(state.unit?`Thu 8 Jul · ${open.length} open${completed.length?' · '+completed.length+' done':''}`:`${open.length} open${completed.length?' · '+completed.length+' done':''}`):groupedPreview?`${open.length} tasks${grouped?' · '+grouped.count+' types':''}`:compactPreview?open.length+' tasks':'Sample · Thu, 8 Jul';
+    return header()+scopeRail()+`<div class="app-scroll screen-enter ${compactPreview?'compact-preview':''} ${groupedPreview?'grouped-preview':''} ${joinedPreview?'joined-preview':''} ${seamlessPreview?'seamless-preview':''} ${connectedPreview?'connected-preview':''} ${!state.unit?'overview-scope':'unit-scope'}">${state.unit?unitStrip():''}${seamlessPreview&&(!connectedPreview||state.unit)?overviewShortcuts()+schedulePreview():''}<div class="work-section-heading"><h2>Today’s work</h2><span>${workCount}</span></div>${work}${seamlessPreview?'':comingUp()}${completedHTML}</div>`+nav();
   }
   function globalSync(){
     const n=sync.pending.length;

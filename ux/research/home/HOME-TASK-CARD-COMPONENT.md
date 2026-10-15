@@ -8,7 +8,7 @@ Supersedes the earlier 18-card gallery and its no-progress-bar proposal. The own
 
 `../../system/task-cards-astra-prototype.html` remains linked from Sentri Home's header and Toolbox. It now opens an annotated component with Task, Scope and State controls. Tabs expose major-task examples and source-linked rules. The shared renderer and stylesheet are `astra-home-task-card.js` and `astra-home-task-card.css`; examples provide data rather than separate markup per task.
 
-The reviewed component is used by the Home prototype in both Overview and unit scopes. Each task instance keeps its own full content. In the current connected Home study, up to four visible instances appear as full cards; from five onward, type categories share one outer surface and an expanded category exposes those same full card facts. Older grouped-row variants remain comparison prototypes. Existing task destinations remain linked, and unfinished destinations retain their placeholder. The gallery includes eight earlier production types, an end-nursery Home handoff, and three proposed operational types: treatments, vaccinations and transfers.
+The reviewed full-card component remains in the task-card study and the connected Home's **Unit scope**. Each task instance retains its full facts there. In Overview, the same task identity and evaluated state feed a concise entry with one accurate work fact, whether the list has at most four instances or categories expand from five onward. Observation outcomes are not presented as work due. Older grouped-row variants remain comparison prototypes. Existing task destinations remain linked, and unfinished destinations retain their placeholder. The gallery includes eight earlier production types, an end-nursery Home handoff, and three proposed operational types: treatments, vaccinations and transfers.
 
 ## Fixed fields
 
@@ -99,7 +99,7 @@ Breeding with no due services shows Next service or Waiting for heat confirmatio
 
 ## Android Home handoff · 2026-10-14
 
-- The shared card stays one task instance in Overview and narrows its figures in Unit. It never infers completion from a bar. Task closure remains in the owning task flow. The Workbench PRD defines the four-card full view, category expansion from five, fixed next-seven-days dates, true totals and today-only finished receipts.
+- One task instance stays one task in Overview and narrows its figures in Unit. Overview shows a concise entry; Unit shows the shared full card and never infers completion from a bar. Task closure remains in the owning task flow. The Workbench PRD defines all-instance view through four, category expansion from five, Unit-only fixed next-seven-days dates, true totals and today-only finished receipts.
 - Heat: Overview uses “Recorded in heat / target” as an outcome; Unit shows signs awaiting confirmation. No unit no-signs branch, legacy round wording or quick-end button.
 - Breeding: Overview uses “Mated at least once / heat-marked”. Unit shows eligible first/repeat service counts and omits the coverage bar.
 - Return-heat: temporarily use old-style recorded returns and no-return-record count in Overview, estimated-date and submitted-signs facts in Unit. These figures may overlap. No Home pie, rate or monitoring bar while the feature is draft.

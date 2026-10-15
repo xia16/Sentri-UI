@@ -1302,15 +1302,15 @@
     },
     {
       "id": "workbench.connected-few",
-      "name": "Connected Home · few full cards",
-      "zh": "连体首页 · 少量完整卡片",
+      "name": "Connected Home · few concise Overview tasks",
+      "zh": "连体首页 · 总览少量精简任务",
       "status": "in-design",
       "url": "/ux/system/home-astra-prototype.html?section=gestation&variant=connected",
       "figma": "",
       "notes": {
-        "purpose": "Show every full card when at most four open and today-finished instances exist.",
+        "purpose": "Show every task instance as a concise Overview entry when at most four open and today-finished instances exist.",
         "states": [],
-        "elements": [{"name": "Few tasks", "shows": "Three open full cards and one readable finished receipt", "logic": "No type accordion until five visible instances", "source": "home()"}],
+        "elements": [{"name": "Few tasks", "shows": "Three concise open entries and one readable finished receipt", "logic": "No type accordion until five visible instances; full cards belong to Unit scope", "source": "home()"}],
         "controls": [],
         "copy": ["(raw)"],
         "edge": [],
@@ -1323,16 +1323,16 @@
       "name": "Connected Home · one of seven days selected",
       "zh": "连体首页 · 七天中选一天",
       "status": "in-design",
-      "url": "/ux/system/home-astra-prototype.html?section=gestation&variant=connected&day=1",
+      "url": "/ux/system/home-astra-prototype.html?section=gestation&variant=connected&view=unit&unit=7&day=1",
       "figma": "",
       "notes": {
-        "purpose": "Review a compact planned-start preview without moving ongoing work out of Today.",
+        "purpose": "Review a Unit-only planned-start preview without moving ongoing work out of Today.",
         "states": [],
         "elements": [{"name": "Seven-date selector", "shows": "Tomorrow through the next six days, all visible; July 9 selected", "logic": "Only future unstarted task starts in the selected scope are previewed; View opens the read-only list", "source": "schedulePreview()"}],
         "controls": [],
         "copy": ["(raw)"],
         "edge": [],
-        "rules": ["No earlier dates, later weeks or month navigation."],
+        "rules": ["Overview has no date selector; Unit has no earlier dates, later weeks or month navigation."],
         "issues": []
       }
     },
@@ -1350,7 +1350,7 @@
         "controls": [],
         "copy": ["(raw)"],
         "edge": [],
-        "rules": ["Each expanded task keeps its full card facts; the category header keeps counts visible."],
+        "rules": ["Expanded Overview rows show only task identity and the most useful work fact; full cards remain in Unit. Tinted headers and indented white child rows clarify hierarchy."],
         "issues": []
       }
     },
@@ -1364,7 +1364,7 @@
       "notes": {
         "purpose": "Inspect every category summary with no detail cards open.",
         "states": [],
-        "elements": [{"name": "Collapsed category rows", "shows": "Total, open, finished and urgent counts without truncating the status words", "logic": "Every category can open without closing another", "source": "groupedTaskCards()"}],
+        "elements": [{"name": "Collapsed category rows", "shows": "Total, relevant open/finished and urgent counts without truncating status words or repeating all-open totals", "logic": "Every category can open without closing another", "source": "groupedTaskCards()"}],
         "controls": [],
         "copy": ["(raw)"],
         "edge": [],
@@ -1380,9 +1380,9 @@
       "url": "/ux/system/home-astra-prototype.html?section=gestation&many=operations&variant=connected&groups=all",
       "figma": "",
       "notes": {
-        "purpose": "Inspect all full cards and the finished receipt inside their categories.",
+        "purpose": "Inspect all concise Overview tasks and the finished receipt inside their categories.",
         "states": [],
-        "elements": [{"name": "Expanded task details", "shows": "One continuous surface with dividers; completed Pregnancy check ends Production tasks", "logic": "More than one category may stay expanded", "source": "groupedTaskCards()"}],
+        "elements": [{"name": "Expanded task entries", "shows": "One continuous surface with tinted category headers, indented white child rows and a finished Pregnancy check receipt", "logic": "More than one category may stay expanded", "source": "groupedTaskCards()"}],
         "controls": [],
         "copy": ["(raw)"],
         "edge": [],
@@ -1398,13 +1398,13 @@
       "url": "/ux/system/home-astra-prototype.html?section=gestation&many=operations&variant=connected&view=unit&unit=7",
       "figma": "",
       "notes": {
-        "purpose": "Review a compact unit hub before the seven dates and task categories.",
+        "purpose": "Review the unit hub, seven dates and full task cards retained in Unit scope.",
         "states": [],
         "elements": [{"name": "Unit hub", "shows": "Population, pens, last inspection, attention and separate Inspect, Inventory, Environment and Maintenance entries", "logic": "Inventory is not repeated in a second card; Maintenance opens independently", "source": "unitStrip()"}],
         "controls": [],
         "copy": ["(raw)"],
         "edge": [],
-        "rules": ["Unknown summaries are not displayed as zero."],
+        "rules": ["Unknown summaries are not displayed as zero. Unit retains full task cards in both short and grouped lists."],
         "issues": []
       }
     },
@@ -1418,7 +1418,7 @@
       "notes": {
         "purpose": "Keep an empty work list distinct from a completed-work receipt.",
         "states": [],
-        "elements": [{"name": "Neutral empty state", "shows": "No current tasks and a path to unit inspection, without a green completion check", "logic": "Future planned starts remain in the seven-date strip", "source": "home()"}],
+        "elements": [{"name": "Neutral empty state", "shows": "No current tasks and a path to unit inspection, without a green completion check", "logic": "Overview has no date strip; future planned starts appear in the seven-date strip after selecting a unit", "source": "home()"}],
         "controls": [],
         "copy": ["(raw)"],
         "edge": [],
