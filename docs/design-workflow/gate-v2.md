@@ -71,6 +71,7 @@ Base evidence is kept per main commit (an index of the identities each base used
 - Every pair in the evidence manifest gets a judgement.
 - The change passes only with no "worse" and at least one "better". In refactor mode, every pair must be "same".
 - The tripwire is not acceptance. It can stay as a diagnostic while v2 rolls out.
+- **A moved main never voids work by itself** (driver, 2026-10-16, after #187 paid a full re-gate for a main that moved by gate scripts only). At verdict and merge time the gate recomputes the candidate's identities against the new main, keeps every result and every judged pair whose identity is unchanged (a pair is judged by its two images: the same base and candidate shot identities), recomputes only what changed, and sends to a judge only the pairs whose images changed. Anything that matters still has to pass.
 
 ## 6. Proving it works
 - **Faults that must fail to get a pass through `evaluate`:**
