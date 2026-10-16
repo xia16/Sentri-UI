@@ -1040,6 +1040,52 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 :is(.phone,.tk-phone,.atlas-phone,.device,.st-phone,.sp-phone,[data-st-context]) [tabindex="-1"]:focus{outline:none}
 /* A waiting or disabled control says so with its surface and rim; its text stays readable (4.5:1, farm legibility law). */
 .st-hold[aria-disabled="true"]:not([data-phase="pending"]):not([data-phase="done"]) :is(.st-hold-label,.st-hold-caption){color:var(--ink);opacity:1}
+/* ChoiceList · Inline Choice, key face (opt-in: `face: 'key'`). The same radiogroup, drawn as boxed keys in the Stepper row's column:
+   the first key's left edge to the last key's right edge, 3 × field-height less one key gap (136px), an 8px key gap. Each key is the
+   stepper key's face (paper, 1px task-key-border, radius-control, 16px/500, 44px tall) inside a field-height hit area, so the target
+   stays 48px. The chosen key takes the system's selected mark: a 2px ink ring (the border and an inset line, so the key never changes
+   size) and a 600 label; never a fill. Pressed is the keys' press. A row of this face sits in a flat list of rows with a 1px line
+   between them. */
+.st-choice-inline[data-face="key"]{--st-key-face:44px;--st-key-column:calc(3 * var(--field-height) - var(--space-key-gap));border-bottom:1px solid var(--line)}
+.st-choice-inline[data-face="key"]:last-child{border-bottom:0}
+.st-choice-inline[data-face="key"] .st-choice-inline-label{font-weight:var(--type-weight-medium)}
+.st-choice-inline[data-face="key"] .st-choice-inline-opts{align-self:center;width:var(--st-key-column);gap:var(--space-key-gap)}
+.st-choice-inline[data-face="key"] .st-choice-inline-opt.st-choice-inline-opt{display:grid;place-items:center;flex:1 1 0;min-width:0;min-height:var(--field-height);height:var(--field-height);padding:0;border:0;border-radius:0;background:transparent;font-weight:var(--type-weight-medium)}
+.st-choice-inline-face{display:grid;place-items:center;box-sizing:border-box;width:100%;height:var(--st-key-face);border:1px solid var(--task-key-border);border-radius:var(--radius-control);background:var(--paper);transition:transform 120ms ease}
+.st-choice-inline-opt[aria-checked="true"] .st-choice-inline-face{border-color:var(--ink);box-shadow:inset 0 0 0 calc(var(--ring-width) - 1px) var(--ink);font-weight:var(--type-weight-semibold)}
+.st-choice-inline[data-face="key"] .st-choice-inline-opt.st-choice-inline-opt:not([aria-disabled="true"]):is(:active,[data-preview~="pressed"]){background:transparent}
+.st-choice-inline-opt:not([aria-disabled="true"]):is(:active,[data-preview~="pressed"]) .st-choice-inline-face{transform:scale(.96);background:var(--press);border-color:var(--ink-2)}
+.st-choice-inline[data-face="key"] .st-choice-inline-opt.st-choice-inline-opt[aria-disabled="true"]{background:transparent}
+.st-choice-inline-opt[aria-disabled="true"] .st-choice-inline-face{border-style:dashed;background:var(--disabled-surface);color:var(--ink)}
+@media (prefers-reduced-motion:reduce){.st-choice-inline-face{transition:none}.st-choice-inline-opt:is(:active,[data-preview~="pressed"]) .st-choice-inline-face{transform:none}}
+
+/* Measure · row (opt-in: `layout: 'row'`). The Stepper row's silhouette: the label left (16px/500, with its muted "Optional"), the
+   value box in the same 136px column at the right, the stepper face's height (44px, a 48px hit area), value and unit at its two
+   ends, a 60px row with a 1px line between rows. The hint and note run under the row. Everything else is the Measure: the pad opens
+   on a tap (or, with input:'system', the phone's decimal keyboard), an empty box shows the muted dash. */
+.st-measure.st-measure[data-layout="row"]{--st-key-face:44px;--st-key-column:calc(3 * var(--field-height) - var(--space-key-gap));display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;column-gap:var(--space-row-y);row-gap:0;min-height:var(--stepper-row-min);border-bottom:1px solid var(--line)}
+.st-measure[data-layout="row"]:last-child{border-bottom:0}
+.st-measure[data-layout="row"] .st-measure-label{font-weight:var(--type-weight-medium)}
+.st-measure[data-layout="row"] .st-measure-box.st-measure-box{position:relative;align-items:center;justify-content:space-between;width:var(--st-key-column);min-height:var(--st-key-face);height:var(--st-key-face);padding:0 var(--space-row-x)}
+.st-measure[data-layout="row"] .st-measure-box::before{content:"";position:absolute;left:0;top:calc((var(--st-key-face) - var(--tap-min)) / 2);width:100%;height:var(--tap-min)}
+.st-measure[data-layout="row"]:not([data-active]) .st-measure-box.st-measure-box{border-color:var(--task-key-border)}
+.st-measure[data-layout="row"] .st-measure-value{font-size:var(--type-step-value-size);line-height:1}
+/* the empty dash is a placeholder, quiet: under 16px so the 7:1 floor for a primary value does not apply (muted holds 5.2:1) */
+.st-measure[data-layout="row"][data-empty]:not([data-active]) .st-measure-value{font-size:15px}
+.st-measure[data-layout="row"] :is(.st-measure-hint,.st-measure-note){grid-column:1/-1}
+.st-measure[data-layout="row"] :is(.st-measure-hint,.st-measure-note):empty{display:none}
+.st-measure[data-layout="row"] :is(.st-measure-hint,.st-measure-note):not(:empty){padding-bottom:var(--space-row-y)}
+
+/* Measure · system input (opt-in: `input: 'system'`). The same box, holding a native text field on the phone's decimal keyboard:
+   the value in the box's mono, the dash as its placeholder, the unit at the end. Typing is the field's active state (the ink ring
+   the pad's active Measure has); a tap anywhere in the box (its 48px hit area) puts the caret in it. */
+.st-measure-box[data-input="system"]{cursor:text}
+.st-measure-input{flex:1 1 auto;min-width:0;width:100%;margin:0;padding:0;border:0;border-radius:0;background:transparent;outline:none;box-shadow:none;appearance:none;-webkit-appearance:none;font:500 var(--type-figure-size)/1.2 var(--font-mono);font-variant-numeric:tabular-nums;color:var(--ink);caret-color:var(--ink)}
+.st-measure-input::placeholder{color:var(--muted);opacity:1}
+.st-measure.st-measure .st-measure-box.st-measure-box[data-input="system"]:focus-within{border-color:var(--ink);box-shadow:inset 0 0 0 calc(var(--caret-width) - 1px) var(--ink)}
+.st-measure[data-layout="row"] .st-measure-input{font-size:var(--type-step-value-size);line-height:1}
+.st-measure[data-layout="row"] .st-measure-input:placeholder-shown{font-size:15px}
+
 /* The header owns the 24px under it: the body's first element brings no top margin of its own (a field's, a note's, a banner's).
    Last in the file, so a part's own margin rule of the same weight does not win here. */
 .sheet>.sheet-body>:first-child,.sheet>.sheet-body>:first-child>:first-child{margin-top:0}
