@@ -11,7 +11,7 @@ import { fileURLToPath } from 'node:url';
 import { createServer } from 'node:net';
 import { walkTree } from './scenario-tree.mjs';
 import { timedOutOnly, aimdStep } from './machine.mjs';
-import { leafRunner, leafRow, reportOf } from './scenario-runner.mjs';
+import { leafRunner, leafRow, reportOf, leafContextPool } from './scenario-runner.mjs';
 import os from 'node:os';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -52,7 +52,9 @@ base = base.replace(/\/$/, '');
 let commit = 'unknown', dirty = false;
 try { commit = execSync('git rev-parse HEAD', { cwd: root }).toString().trim(); dirty = !!execSync('git status --porcelain --untracked-files=no', { cwd: root }).toString().trim(); } catch {}
 
-const runLeaf = leafRunner({ base, defaults: D, verbs, evidenceDir: join(root, 'review', 'scenarios', feature), relativeTo: root });
+// Contexts are reused between runs and cleared in between (leafContextPool): fresh ones per run ran Windows out of sockets.
+const pool = leafContextPool();
+const runLeaf = leafRunner({ base, defaults: D, verbs, evidenceDir: join(root, 'review', 'scenarios', feature), relativeTo: root, pool });
 
 // A run whose only failure is a navigation timeout (the machine was busy, not the design) runs once more in fresh contexts.
 // Timing out again fails it as a slow machine, never as a design failure; an assertion failure never retries.
@@ -117,6 +119,7 @@ for (const leaf of leaves) {
   const first = row.runs.flatMap((r) => r.failures.map((f) => `${r.lang}-${r.width}: ${f.what} → ${f.got}`))[0] || '';
   console.log(`${row.result.padEnd(8)} ${row.id}${row.hard.length ? '  [' + row.hard.join(', ') + ']' : ''}${first ? '  ' + first.slice(0, 160) : ''}`);
 }
+await pool.close();
 await browser.close();
 if (server) server.kill();
 

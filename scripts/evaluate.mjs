@@ -16,8 +16,8 @@ import { pwPath, playwright } from './playwright-path.mjs';
 import { CLASSES, DS_FEATURE, componentPage, componentPagesOf, componentsTouched, idPath, screensOf, pageOf, pageAssets, sharedFiles, coverageLost, effectiveClass, classifyScreens, touchesSystem, touchesTools, queueAhead as queueOf, budgetProblems, critiqueProblems, pageStyling, addedLines, scenarioDebt } from './loop-rules.mjs';
 // The reach analyser (gate-v2 §2): static, conservative, over both revisions. It names the screens and leaves a change can reach,
 // and what each screen's evidence depends on.
-import { reachOf, identityInputs } from './static-reach.mjs';
-import { EvidenceStore, identityOf, treeOf, blobsHash, codeHash, sha, reconcileInventory, planEvidence } from './evidence.mjs';
+import { reachOf, identityInputs, leafInputs } from './static-reach.mjs';
+import { EvidenceStore, identityOf, treeOf, blobsHash, codeHash, sha, reconcileInventory, planEvidence, inputsDigest } from './evidence.mjs';
 import { createScheduler } from './scheduler.mjs';
 import { WORKERS, LAUNCH_ARGS, machineErrorOf, classifyMachineError } from './machine.mjs';
 import { BOUNDS } from './settle.mjs';
@@ -29,7 +29,7 @@ import { auditHeadersPage, RUNS as HEADER_RUNS, dedupe as dedupeHeaders } from '
 import { auditLegibilityPage, legibilityWorse, count as legCount, failing as legFailing } from './check-legibility.mjs';
 import { checkStatesHtml, VW as STATE_VW } from './check-states.mjs';
 import { walkTree } from './scenario-tree.mjs';
-import { leafRunner, leafRow, reportOf } from './scenario-runner.mjs';
+import { leafRunner, leafRow, reportOf, leafContextPool } from './scenario-runner.mjs';
 import { openPrs } from './github.mjs';
 
 export const WIDTHS = [390, 360], LANGS = ['en', 'zh'];
@@ -37,8 +37,6 @@ const TRIP = { width: 390, lang: 'en' };
 const BUNDLE_JS = 'ux/design-system/components/bundle.js';
 // What no page can load: the analyser's own rule (static-reach), repeated for the files an `unbounded` load folds in.
 const NOT_LOADED = [/^docs\//, /^\.github\//, /^tests\//, /^\.claude\//, /^scripts\//, /^(?!ux\/).*\.md$/i];
-const MEDIA = /\.(png|jpe?g|gif|webp|avif|svg|ico|bmp|mp4|webm|mov|mp3|wav|ogg|m4a|vtt)$/i;
-const fileType = (f) => (MEDIA.test(f) ? 'media' : /\.(m?js|cjs)$/i.test(f) ? 'script' : /\.css$/i.test(f) ? 'style' : 'other');
 const short = (s) => String(s || '?').slice(0, 7);
 const secs = (ms) => Math.round(ms / 100) / 10;
 const CHECKERS = { legibility: ['scripts/check-legibility.mjs'], spacing: ['scripts/check-spacing.mjs'], headers: ['scripts/check-headers.mjs'], states: ['scripts/check-states.mjs'], leaf: ['scripts/scenario-runner.mjs'] };
@@ -180,18 +178,10 @@ export async function evaluate(opts) {
     if (!ii && componentPage(id)) v = { files: blobsHash(tree, S[side].dsFiles), bundle: blob(side, BUNDLE_JS), screen: def, why: 'a component page' };
     else if (!ii) v = { files: blobsHash(tree, S[side].runtime), bundle: blob(side, BUNDLE_JS), screen: def, why: 'no identity inputs: every page-loadable file' };
     else {
-      const unb = ii.unbounded || [];
-      const types = new Set(unb.map((u) => u.type || 'any'));
-      const folded = unb.length ? blobsHash(tree, types.has('any') ? S[side].runtime : S[side].runtime.filter((f) => types.has(fileType(f)))) : null;
-      let bundle;
-      const b = ii.bundle || { all: true };
-      if (b.all) bundle = blob(side, BUNDLE_JS);
-      else if (b.unitHashes && b.setupHash) bundle = { units: Object.fromEntries((b.units || []).map((u) => [u, b.unitHashes[u] || 'missing'])), setup: b.setupHash };
-      else { bundle = blob(side, BUNDLE_JS); bundleGap.add(id); }
-      // the bundle counts once, by the units this screen can run (or whole): its file in the page's closure is left out of the files
-      // hash, or a one-function edit would be a new identity for every screen that loads the bundle
-      const own = (ii.files || S[side].runtime).filter((f) => f !== BUNDLE_JS || typeof bundle === 'string');
-      v = { files: blobsHash(tree, own), unbounded: folded, bundle, screen: ii.screen || def };
+      // the analyser's inputs, hashed by blob (inputsDigest: the bundle once, by the units this screen can run)
+      const d = inputsDigest(ii, tree, S[side].runtime);
+      if (d.gap) bundleGap.add(id);
+      v = { ...d.digest, screen: ii.screen || def };
     }
     inputsMemo.set(k, v);
     return v;
@@ -630,6 +620,21 @@ export async function evaluate(opts) {
   const featuresWithLeaves = (side) => (fs.existsSync(path.join(S[side].dir, 'features')) ? fs.readdirSync(path.join(S[side].dir, 'features')).filter((f) => fs.existsSync(path.join(S[side].dir, 'features', f, 'scenarios.json'))) : []);
   const leafPlan = [];
   const verbsOf = (side) => { try { return JSON.parse(fs.readFileSync(path.join(S[side].dir, 'ux/laws/strings.json'), 'utf8')).verbs || {}; } catch { return {}; } };
+  // What a leaf's run can reach, hashed (gate-v2 §3): its entry page (the fixture's url) and every page its taps can navigate to,
+  // with the bundle units that closure can run (leafInputs). Whatever it can't bound means the leaf hashes every page-loadable file.
+  // one context pool per side (its server's origin), shared by every leaf run of that side
+  const leafPools = { base: leafContextPool(), cand: leafContextPool() };
+  cleanups.push(() => { leafPools.base.close(); leafPools.cand.close(); });
+  const leafMemo = new Map();
+  const leafReach = (side, l, D) => {
+    const fx = l.state?.reset || {}, url = fx.url || D.url, k = `${side} ${url} ${fx.screen || ''}`;
+    if (leafMemo.has(k)) return leafMemo.get(k);
+    let ii = null;
+    try { ii = leafInputs(S[side].side, { url, screen: fx.screen }); } catch (e) { gaps.push(`leafInputs(${side}, ${url}) threw (${e.message}): its leaves hash every page-loadable file`); }
+    const v = ii ? inputsDigest(ii, S[side].tree, S[side].runtime).digest : { files: blobsHash(S[side].tree, S[side].runtime), why: 'no leaf inputs: every page-loadable file' };
+    leafMemo.set(k, v);
+    return v;
+  };
   const leafItemsOf = (side, f, only) => {
     const spec = specOf(side, f); if (!spec) return null;
     const { leaves, nodeCount, problems } = walkTree(spec);
@@ -641,12 +646,12 @@ export async function evaluate(opts) {
       if (l.node.type !== 'outcome' || l.node.status === 'pending') { its.push({ leaf: l, row: true }); continue; }
       const { children, ...node } = l.node;
       const walked = { node, state: l.state ? { reset: l.state.reset, clock: l.state.clock } : null, taps: l.taps, defaults: D };
-      for (const lang of l.node.langs || langs) for (const width of l.node.widths || widths) its.push({ kind: 'leaf', leaf: l, lang, width, side, feature: f, id: identityOf('leaf', { walked, lang, width, files: blobsHash(S[side].tree, S[side].runtime), strings: blob(side, 'ux/laws/strings.json'), render: { ...render, locale: lang === 'zh' ? 'zh-CN' : 'en-GB' }, runner: code.leaf }) });
+      for (const lang of l.node.langs || langs) for (const width of l.node.widths || widths) its.push({ kind: 'leaf', leaf: l, lang, width, side, feature: f, id: identityOf('leaf', { walked, lang, width, reach: leafReach(side, l, D), strings: blob(side, 'ux/laws/strings.json'), render: { ...render, locale: lang === 'zh' ? 'zh-CN' : 'en-GB' }, runner: code.leaf }) });
     }
     return { its, nodeCount, D, langs, widths };
   };
   const runLeaves = async (side, f, plan) => {
-    const runner = leafRunner({ base: S[side].url, defaults: plan.D, verbs: verbsOf(side), evidenceDir: path.join(out, 'leaves', side, f) });
+    const runner = leafRunner({ base: S[side].url, defaults: plan.D, verbs: verbsOf(side), evidenceDir: path.join(out, 'leaves', side, f), pool: leafPools[side] });
     const todo = plan_(plan.its.filter((i) => i.kind));
     for (const { item, record } of todo.reuse) results.set(item.id, { ...record.run, reused: true });
     await Promise.all(todo.compute.map((it) => sched.run({ kind: 'leaf', label: `${side} ${it.leaf.node.id} ${it.lang}-${it.width}`, priority: 2, run: async ({ browser: b }) => {

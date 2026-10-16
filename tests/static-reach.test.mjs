@@ -223,3 +223,28 @@ test("identityInputs: a screen's page closure, the bundle units it can run, its 
   assert.ok(!identityInputs(BASE, 'farrowing.room').files.includes('ux/system/home.js'), 'without steps, a navigation is not a load');
   assert.equal(identityInputs(BASE, 'nope'), null);
 });
+
+// ---------- per-leaf identity (gate-v2 §3): a leaf hashes what its run can reach ----------
+test('a picker-only change is a new identity only for leaves whose closure can run the picker (an aliasing page counts)', async () => {
+  const { leafInputs } = await import('../scripts/static-reach.mjs');
+  const { inputsDigest, identityOf } = await import('../scripts/evidence.mjs');
+  const { createHash } = await import('node:crypto');
+  const more = {
+    'ux/system/rows.html': PAGE("<script>document.querySelector('.phone').innerHTML=SentriUI.row({title:'A1'});</script>"),
+    'ux/system/wander.html': PAGE("<script>const to=location.hash.slice(1);document.querySelector('.phone').innerHTML=SentriUI.row({title:'x'});location.assign(to+'.html');</script>"),
+  };
+  const side = (o) => { const c = checkout({ ...o, more }); return { ...c, rev: `r${++n}` }; };
+  const b = side({}), c = side({ bundle: { placeholder: "'Pick one'" } });
+  const treeOf = (s) => { const t = new Map(); for (const [f] of Object.entries(FILES({ ...(s === c ? { bundle: { placeholder: "'Pick one'" } } : {}), more }))) t.set(f, createHash('sha1').update(fs.readFileSync(path.join(s.dir, f))).digest('hex')); return t; };
+  const tb = treeOf(b), tc = treeOf(c), runtime = (t) => [...t.keys()].filter((f) => !/^(features|docs|tests|scripts)\//.test(f)).sort();
+  const id = (s, t, url) => identityOf('leaf', { reach: inputsDigest(leafInputs(s, { url }), t, runtime(t)).digest, walked: url });
+  const changed = (url) => id(b, tb, url) !== id(c, tc, url);
+  assert.equal(changed('/ux/system/inspection.html'), true, 'its page calls the picker (SentriUI[\'picker\'])');
+  assert.equal(changed('/ux/system/rows.html'), false, 'a leaf whose pages call Row only is reused');
+  assert.equal(changed('/ux/system/farrowing.html'), true, 'farrowing calls Row only, but its taps can reach home.html, which aliases SentriUI with let: every unit');
+  const w = leafInputs(b, { url: '/ux/system/wander.html' });
+  assert.ok(w.unbounded.some((u) => u.type === 'any'), 'a navigation to a computed URL is unbounded');
+  assert.equal(changed('/ux/system/wander.html'), true, 'unsure is everything: a leaf that can go anywhere hashes every page-loadable file');
+  assert.deepEqual(leafInputs(b, { url: '/ux/system/farrowing.html' }).pages.sort(), ['ux/system/farrowing.html', 'ux/system/home.html']);
+  assert.equal(leafInputs(b, {}), null);
+});

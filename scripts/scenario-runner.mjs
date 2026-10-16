@@ -171,7 +171,40 @@ async function systemBack(page) {
 
 // The run of one leaf, against the server at `base`, with the spec's defaults (D) and the verb registry (ux/laws/strings.json verbs).
 // Returns { lang, width, result: pass|fail|blocked, failures: [{ what, got, tag, at }], skipped, notes, evidence }.
-export function leafRunner({ base, defaults: D = {}, verbs = {}, evidenceDir, relativeTo = evidenceDir }) {
+// Contexts are kept and reused between runs, one run at a time each: a fresh context per run opened fresh connections for every file
+// of every page, and parallel runs ran Windows out of sockets (net::ERR_NO_BUFFER_SPACE, #187, 2026-10-17). A context is kept per
+// width, height, language and clock: a context whose clock was faked stays faked for every page it opens, so one never serves a run
+// on real time, and a faked one is installed again at each run's own start. Between runs everything a run can leave is cleared
+// (resetContext): pages, cookies, every storage of the origin, routes, permissions, offline. A run that failed closes its contexts,
+// so a retry starts in fresh ones.
+export function leafContextPool() {
+  const idle = new Map(), all = new Set();
+  return {
+    async take(key, make) { const l = idle.get(key) || []; while (l.length) { const c = l.pop(); if (all.has(c)) return c; } const c = await make(); all.add(c); return c; },
+    give(key, c) { if (!idle.has(key)) idle.set(key, []); idle.get(key).push(c); },
+    async drop(c) { all.delete(c); await c.close().catch(() => {}); },
+    async close() { for (const c of all) await c.close().catch(() => {}); all.clear(); idle.clear(); },
+    get size() { return all.size; },
+  };
+}
+export async function resetContext(context, base) {
+  for (const p of context.pages()) await p.close().catch(() => {});
+  await context.setOffline(false);
+  await context.unrouteAll({ behavior: 'ignoreErrors' }).catch(() => {});
+  await context.clearCookies();
+  await context.clearPermissions();
+  const p = await context.newPage();
+  try {
+    await p.goto(String(base).replace(/\/$/, '') + '/atlas/atlas.json', { timeout: 15000 });
+    await p.evaluate(async () => {
+      localStorage.clear(); sessionStorage.clear();
+      for (const d of (await indexedDB.databases?.()) || []) await new Promise((r) => { const q = indexedDB.deleteDatabase(d.name); q.onsuccess = q.onerror = q.onblocked = () => r(); });
+      if (self.caches) for (const k of await caches.keys()) await caches.delete(k);
+    });
+  } finally { await p.close().catch(() => {}); }
+}
+
+export function leafRunner({ base, defaults: D = {}, verbs = {}, evidenceDir, relativeTo = evidenceDir, pool = null }) {
   base = String(base).replace(/\/$/, '');
     async function runLeaf(browser, leaf, lang, width) {
     const n = leaf.node, st = leaf.state, fx = st.reset || {};
@@ -188,14 +221,19 @@ export function leafRunner({ base, defaults: D = {}, verbs = {}, evidenceDir, re
 
     // one device = its own browser context (own storage, own network, own clock) on the leaf's reset fixture
     async function openDevice(name) {
-      const context = await browser.newContext({ viewport: { width, height: D.height || 844 }, deviceScaleFactor: 1, locale: lang === 'zh' ? 'zh-CN' : 'en-GB' });
-      contexts.push(context);
-      // the phone is drawn at the run's width (atlas-bare pins it to 390; the runner overrides that, nothing in the page changes)
-      await context.addInitScript((w) => {
-        const css = `html.atlas-bare,html.atlas-bare body{width:${w}px!important}html.atlas-bare .atlas-phone{width:${w}px!important}`;
-        const add = () => { const s = document.createElement('style'); s.textContent = css; document.head.appendChild(s); };
-        if (document.head) add(); else document.addEventListener('DOMContentLoaded', add);
-      }, width);
+      const make = async () => {
+        const c = await browser.newContext({ viewport: { width, height: D.height || 844 }, deviceScaleFactor: 1, locale: lang === 'zh' ? 'zh-CN' : 'en-GB' });
+        // the phone is drawn at the run's width (atlas-bare pins it to 390; the runner overrides that, nothing in the page changes)
+        await c.addInitScript((w) => {
+          const css = `html.atlas-bare,html.atlas-bare body{width:${w}px!important}html.atlas-bare .atlas-phone{width:${w}px!important}`;
+          const add = () => { const s = document.createElement('style'); s.textContent = css; document.head.appendChild(s); };
+          if (document.head) add(); else document.addEventListener('DOMContentLoaded', add);
+        }, width);
+        return c;
+      };
+      const key = `${width}|${D.height || 844}|${lang}|${needsClock ? 'clock' : 'real'}`;
+      const context = pool ? await pool.take(key, make) : await make();
+      contexts.push({ context, key });
       const pg = await context.newPage();
       const tag = name === 'a' ? '' : `device ${name}: `;
       pg.on('pageerror', (e) => errors.push(tag + e.message));
@@ -278,7 +316,11 @@ export function leafRunner({ base, defaults: D = {}, verbs = {}, evidenceDir, re
     } catch (e) {
       fail('run', e.message.split('\n')[0], 'dead-end'); if (page) await shot('error');
     }
-    for (const c of contexts) await c.close().catch(() => {});
+    for (const { context, key } of contexts) {
+      if (!pool) { await context.close().catch(() => {}); continue; }
+      if (failures.length || loadFailures.length) { await pool.drop(context); continue; }   // a retry starts fresh
+      try { await resetContext(context, base); pool.give(key, context); } catch { await pool.drop(context); }
+    }
     let result = failures.length ? 'fail' : 'pass';
     if (notes.length && result === 'pass') result = 'blocked';   // the screens can't run in this language: never counted as covered
     return { lang, width, result, failures, skipped, notes, evidence, loadFailures };

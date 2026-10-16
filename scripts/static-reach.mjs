@@ -2,7 +2,8 @@
 // recording of what pages call is never an input: nothing here is narrowed by what a run happened to do.
 //
 //   reachOf(base, candidate, { files }) -> { all, screens: [ids], functions: [exports] | [] | null, leaves: [ids], why: [] }
-//   identityInputs(side, screenId)       -> { files, bundle: { all, exports, units, setup }, screen }
+//   identityInputs(side, screenId)       -> { files, unbounded, bundle: { all, exports, units, unitHashes, setupHash }, screen }
+//   leafInputs(side, { url, screen })    -> the same for a scenario leaf's run: its entry page and everything its taps can reach
 //
 // base / candidate: { dir: a checkout, atlas: its parsed atlas/atlas.json }. files: the changed paths (default: git diff of the two
 // checkouts' HEADs). Unsure is everything: a file that won't parse, a namespace used any way but `SentriUI.X` / `SentriUI['X']`, a
@@ -429,20 +430,26 @@ function pageAnalyser(dir, namespaces, shape) {
 // What one screen depends on: its page's closure; for a screen whose atlas steps tap through it, every page it can navigate to as
 // well (a tap may leave the page). An unbounded navigation makes it depend on anything.
 function screenDeps(S, s) {
-  const first = S.page(pageOf(s.url));
   const def = S.defs.get(s.id);
-  if (!def?.steps?.length) return first;
-  const out = { files: new Set(first.files), unbounded: [...first.unbounded], use: JSON.parse(JSON.stringify(first.use, (k, v) => (v instanceof Set ? [...v] : v))), missing: first.missing };
+  if (!def?.steps?.length) return S.page(pageOf(s.url));
+  return navClosure(S, pageOf(s.url), s.id);
+}
+// A page and every page it can navigate to (links, location, window.open, frames), with their loads and their use of the bundle.
+// A navigation to a computed URL can go anywhere: the closure is then unbounded (type any).
+function navClosure(S, start, label) {
+  const first = S.page(start);
+  const out = { files: new Set(first.files), unbounded: [...first.unbounded], use: JSON.parse(JSON.stringify(first.use, (k, v) => (v instanceof Set ? [...v] : v))), missing: first.missing, pages: [start] };
   for (const u of Object.values(out.use)) u.names = new Set(u.names);
-  const seen = new Set([pageOf(s.url)]), q = [...first.nav];
-  if (first.navUnbounded) out.unbounded.push({ why: `${s.id}: its steps may navigate anywhere`, type: 'any' });
+  const seen = new Set([start]), q = [...first.nav];
+  if (first.navUnbounded) out.unbounded.push({ why: `${label}: it may navigate anywhere`, type: 'any' });
   while (q.length) {
     const p = q.shift();
     if (seen.has(p)) continue;
-    seen.add(p);
+    seen.add(p); out.pages.push(p);
     const pg = S.page(p);
+    if (pg.missing) out.unbounded.push({ why: `${label}: it can navigate to ${p}, which is missing`, type: 'any' });
     pg.files.forEach((f) => out.files.add(f)); out.unbounded.push(...pg.unbounded);
-    for (const [ns, u] of Object.entries(pg.use)) { if (u.all && !out.use[ns].all) { out.use[ns].all = true; out.use[ns].why = `steps may reach ${p}: ${u.why}`; } u.names.forEach((x) => out.use[ns].names.add(x)); }
+    for (const [ns, u] of Object.entries(pg.use)) { if (u.all && !out.use[ns].all) { out.use[ns].all = true; out.use[ns].why = `it may reach ${p}: ${u.why}`; } u.names.forEach((x) => out.use[ns].names.add(x)); }
     if (pg.navUnbounded) out.unbounded.push({ why: `${p}: navigation to a computed URL`, type: 'any' });
     pg.nav.forEach((n) => q.push(n));
   }
@@ -592,6 +599,25 @@ export function identityInputs(side, screenId) {
   const s = S.screens.find((x) => x.id === screenId);
   if (!s) return null;
   const pg = screenDeps(S, s);
+  return { files: [...pg.files].sort(), unbounded: pg.unbounded, bundle: bundleInputs(S, pg), screen: S.defs.get(screenId) || null };
+}
+
+// What one scenario leaf's run depends on (gate-v2 §3): its entry page (the fixture's url) and every page its taps can navigate to,
+// as for a screen with atlas steps; the units of the bundle that closure can run (a page aliasing the namespace, e.g. through let,
+// anywhere in it means every unit); and, when the fixture opens an atlas screen, that screen's definition. A navigation it can't
+// bound, or a page it can reach that is missing, is in `unbounded` (type any): the caller then hashes everything.
+// fixture: { url, screen }. null when there is no entry url.
+export function leafInputs(side, { url, screen } = {}) {
+  if (!url) return null;
+  const S = sideOf(side), start = pageOf(url);
+  const pg = navClosure(S, start, `the leaf from ${start}`);
+  if (pg.missing) pg.unbounded.push({ why: `its entry page ${start} is missing`, type: 'any' });
+  return { files: [...pg.files].sort(), unbounded: pg.unbounded, bundle: bundleInputs(S, pg), screen: screen ? S.defs.get(screen) || null : null, pages: pg.pages };
+}
+
+// The bundle part of an identity: the exports a closure uses, the units those can run (all when a namespace is used as a whole), and
+// the content hash of each unit and of the setup, so a body edit changes exactly the identities whose closure runs that unit.
+function bundleInputs(S, pg) {
   const bundle = { all: false, exports: [], units: [], setup: true };
   if (S.shape) {
     const usedAll = Object.values(pg.use).some((u) => u.all);
@@ -607,7 +633,7 @@ export function identityInputs(side, screenId) {
     }
   } else bundle.all = true;
   bundle.why = Object.values(pg.use).filter((u) => u.all).map((u) => u.why);
-  return { files: [...pg.files].sort(), unbounded: pg.unbounded, bundle, screen: S.defs.get(screenId) || null };
+  return bundle;
 }
 
 // The units a set of exports may run or read: their locals, everything those reference (also across namespaces), and every unit that

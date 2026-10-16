@@ -44,6 +44,29 @@ export function blobsHash(tree, paths) {
 // The paths under one folder (a prefix ending in /).
 export const under = (tree, prefix) => [...tree.keys()].filter((p) => p.startsWith(prefix));
 
+// What a screen's or a leaf's evidence hashes of its side (gate-v2 §3), from the analyser's inputs (identityInputs / leafInputs):
+//   files     the page closure, by blob; the bundle file is left out when its units are named (else a one-function edit would be a
+//             new identity for everything that loads the bundle)
+//   unbounded a load or navigation the analyser can't bound: every page-loadable file of a fitting type (any: all of them)
+//   bundle    the content hashes of the units the closure can run and of the setup; or the whole bundle file
+//   screen    the atlas definition, when there is one
+// tree: path -> blob of the side's commit; runtime: every page-loadable path. Returns { digest, gap } (gap: units named without hashes).
+const MEDIA = /\.(png|jpe?g|gif|webp|avif|svg|ico|bmp|mp4|webm|mov|mp3|wav|ogg|m4a|vtt)$/i;
+export const fileType = (f) => (MEDIA.test(f) ? 'media' : /\.(m?js|cjs)$/i.test(f) ? 'script' : /\.css$/i.test(f) ? 'style' : 'other');
+export const BUNDLE_JS = 'ux/design-system/components/bundle.js';
+export function inputsDigest(ii, tree, runtime) {
+  const unb = ii.unbounded || [];
+  const types = new Set(unb.map((u) => u.type || 'any'));
+  const unbounded = unb.length ? blobsHash(tree, types.has('any') ? runtime : runtime.filter((f) => types.has(fileType(f)))) : null;
+  const b = ii.bundle || { all: true };
+  let bundle, gap = false;
+  if (b.all) bundle = tree.get(BUNDLE_JS) || 'missing';
+  else if (b.unitHashes && b.setupHash) bundle = { units: Object.fromEntries((b.units || []).map((u) => [u, b.unitHashes[u] || 'missing'])), setup: b.setupHash };
+  else { bundle = tree.get(BUNDLE_JS) || 'missing'; gap = true; }
+  const own = (ii.files || runtime).filter((f) => f !== BUNDLE_JS || typeof bundle === 'string');
+  return { digest: { files: blobsHash(tree, own), unbounded, bundle, screen: ii.screen ?? null }, gap };
+}
+
 // ---------- what code hashes to: a module and its local imports ----------
 
 // The local modules a source imports or requires by a literal path (static, dynamic or require). A computed import can't be
