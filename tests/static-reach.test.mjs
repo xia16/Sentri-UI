@@ -9,7 +9,7 @@ import { reachOf, identityInputs } from '../scripts/static-reach.mjs';
 // The miniature: a bundle (a helper tok that Row and Picker share, a start-up DEFAULTS object, Sheet), four features on four pages.
 //   farrowing.html  → farrowing.js: SentriUI.row only; fetch('../data/rooms.json') literally; steps on farrowing.finish
 //   inspection.html → an inline script: SentriUI['picker'] only
-//   home.html       → home.js: const UI = SentriUI (an alias: every export)
+//   home.html       → home.js: let UI = SentriUI (not a provable alias: every export)
 //   report.html     → report.js: fetch(`../data/${name}.json`) (computed); embeds farrowing.html in an iframe
 const BUNDLE = (o = {}) => `(function(root){'use strict';
   const DEFAULTS=${o.defaults || "{size:'regular'}"};
@@ -37,7 +37,7 @@ const FILES = (o = {}) => ({
   'ux/system/farrowing.js': o.farrowingJs || "fetch('../data/rooms.json');document.querySelector('.phone').innerHTML=SentriUI.row({title:'B1'});\nconst back=()=>location.assign('home.html');",
   'ux/system/inspection.html': PAGE("<script>document.querySelector('.phone').innerHTML=SentriUI['picker']({});</script>"),
   'ux/system/home.html': PAGE('<script src="home.js"></script>'),
-  'ux/system/home.js': "const UI=SentriUI;document.querySelector('.phone').innerHTML=UI.sheet({title:'Today'});",
+  'ux/system/home.js': o.homeJs || "let UI=SentriUI;document.querySelector('.phone').innerHTML=UI.sheet({title:'Today'});",
   'ux/system/report.html': PAGE('<script src="report.js"></script><iframe src="farrowing.html?embed=1"></iframe>'),
   'ux/system/report.js': 'const name=location.hash.slice(1);fetch(`../data/${name}.json`);',
   'ux/data/rooms.json': o.rooms || '{"B1":1}',
@@ -153,13 +153,35 @@ test('docs, tests and the type file reach no screen', () => {
 });
 
 // ---------- how a page reads the namespace, and what its URLs can name ----------
-test('namespace use: SentriUI.X and SentriUI["X"] use X; destructuring, a computed key or passing it uses every export; typeof is a check', () => {
-  const page = (js) => checkout({ farrowingJs: js });
-  const uses = (js) => identityInputs(page(js), 'farrowing.room').bundle;
+test('namespace use: NS.X and NS["X"] use X; a static destructuring uses its keys; typeof is a check; anything else uses every export', () => {
+  const uses = (js) => identityInputs(checkout({ farrowingJs: js }), 'farrowing.room').bundle;
   assert.deepEqual(uses("if(typeof SentriUI!=='undefined')SentriUI.row({});SentriUI['sheet']({});").exports, ['SentriUI.row', 'SentriUI.sheet']);
-  assert.equal(uses("if(typeof SentriUI!=='undefined')SentriUI.row({});").all, false);
-  for (const js of ['const { row: r } = SentriUI; r({});', "const k='row';SentriUI[k]({});", 'render(SentriUI);', 'window.SentriUI && go();', "window[name]('x');"]) assert.equal(uses(js).all, true, js);
+  assert.deepEqual(uses('const { row, sheet: s } = SentriUI; row({}); s({});').exports, ['SentriUI.row', 'SentriUI.sheet']);
   assert.deepEqual(uses('window.SentriUI.picker({});').exports, ['SentriUI.picker'], 'through the global object is still a direct access');
+  for (const js of ["const k='row';SentriUI[k]({});", 'render(SentriUI);', "window[name]('x');", 'const { row, ...rest } = SentriUI;']) assert.equal(uses(js).all, true, js);
+});
+
+test('provable aliases (gate-v2 review): a const alias used only statically uses exactly what it reads; anything else is every export', () => {
+  const uses = (js) => identityInputs(checkout({ farrowingJs: js }), 'farrowing.room').bundle;
+  assert.deepEqual([uses('const UI = SentriUI; UI.picker({});').all, uses('const UI = SentriUI; UI.picker({});').exports], [false, ['SentriUI.picker']]);
+  assert.deepEqual(uses('const UI = window.SentriUI; const { row, sheet: s } = UI; if (UI) row(s);').exports, ['SentriUI.row', 'SentriUI.sheet']);
+  assert.deepEqual(uses("const UI = SentriUI; const V = UI; V['row']({});").exports, ['SentriUI.row'], 'an alias of an alias resolves');
+  for (const js of [
+    'const UI = SentriUI; f(UI);', 'let UI = SentriUI; UI.picker({});', 'var UI = SentriUI; UI.picker({});', 'const { a, ...r } = SentriUI;',
+    'const UI = SentriUI; const { row, ...r } = UI;', 'const UI = SentriUI; const o = { UI };', 'const UI = SentriUI; const list = [UI];',
+    'const UI = SentriUI; function get(){ return UI; }', "const UI = SentriUI; const k = 'row'; UI[k]({});", 'const UI = SentriUI; let V = UI; V.row({});',
+    'const UI = SentriUI; function f(UI){ return UI.x; }', 'with (o) { SentriUI.row({}); }',
+  ]) assert.equal(uses(js).all, true, js);
+});
+
+test('a top-level alias of a classic script is a global: another script on the page that misuses it widens the page', () => {
+  const two = (homeJs) => identityInputs(checkout({ homeJs, more: { 'ux/system/home2.js': 'pass(UI);' } }), 'workbench.today').bundle;
+  const fine = identityInputs(checkout({ homeJs: "const UI=SentriUI;document.querySelector('.phone').innerHTML=UI.sheet({});" }), 'workbench.today').bundle;
+  assert.deepEqual([fine.all, fine.exports], [false, ['SentriUI.sheet']]);
+  const page = checkout({ homeJs: "const UI=SentriUI;UI.sheet({});", more: { 'ux/system/home2.js': 'pass(UI);', 'ux/system/home.html': PAGE('<script src="home.js"></script><script src="home2.js"></script>') } });
+  assert.equal(identityInputs(page, 'workbench.today').bundle.all, true);
+  const reads = checkout({ homeJs: "const UI=SentriUI;UI.sheet({});", more: { 'ux/system/home2.js': 'UI.picker({});', 'ux/system/home.html': PAGE('<script src="home.js"></script><script src="home2.js"></script>') } });
+  assert.deepEqual(identityInputs(reads, 'workbench.today').bundle.exports, ['SentriUI.picker', 'SentriUI.sheet']);
 });
 
 test('URLs: a literal, new URL(literal, base), location.href and a local function fed only literals are bounded; anything else is not', () => {
@@ -172,6 +194,21 @@ test('URLs: a literal, new URL(literal, base), location.href and a local functio
   assert.deepEqual(deps("el.innerHTML=`<img src=\"${p}\">`;").unbounded.map((u) => u.type), ['media'], 'an <img> can only load an image');
   assert.equal(deps("location.assign(`x/${y}.html`);").unbounded.length, 0, 'a navigation is not a load…');
   assert.ok(!deps("const go=()=>location.assign('../data/e.html');").files.includes('ux/data/e.html'), '…and a literal one does not load its target either');
+});
+
+test('identity hashes: a body edit changes exactly that unit; a setup or between-unit edit changes setupHash only; every byte is covered', () => {
+  const ids = (o) => identityInputs(checkout(o), 'workbench.today').bundle; // every unit: Home does not prove its alias
+  const a = ids({}), b = ids({ bundle: { sheet: "return '<section class=\"st-sheet\">'+title+'!</section>';" } });
+  const changed = Object.keys(a.unitHashes).filter((k) => a.unitHashes[k] !== b.unitHashes[k]);
+  assert.deepEqual(changed, ['SentriUI:sheet']);
+  assert.equal(a.setupHash, b.setupHash);
+  const comment = ids({ bundle: { extra: '/* a note between units */' } });
+  assert.deepEqual(Object.keys(a.unitHashes).filter((k) => a.unitHashes[k] !== comment.unitHashes[k]), []);
+  assert.notEqual(a.setupHash, comment.setupHash, 'a comment outside every unit is in setupHash');
+  const crlf = identityInputs(checkout({ bundle: { tok: "'<span class=\"st-tok\">'+v+\r\n'</span>'" } }), 'workbench.today').bundle;
+  const lf = identityInputs(checkout({ bundle: { tok: "'<span class=\"st-tok\">'+v+\n'</span>'" } }), 'workbench.today').bundle;
+  assert.equal(crlf.unitHashes['SentriUI:tok'], lf.unitHashes['SentriUI:tok'], 'only line endings are normalised');
+  assert.deepEqual(Object.keys(identityInputs(BASE, 'inspection.room').bundle.unitHashes), ['SentriUI:DEFAULTS', 'SentriUI:picker', 'SentriUI:tok']);
 });
 
 // ---------- identity ----------

@@ -6,6 +6,25 @@
 // is `all: true` with the reason: a changed constant or setup statement, a changed wrapper, a name it cannot resolve (dynamic
 // dispatch on root/api/a namespace, eval, Function), a taint that reaches setup code (an event listener runs on every page).
 import { parse } from './vendor/acorn.mjs';
+import { createHash } from 'node:crypto';
+
+// Content hashes for evidence identity (gate-v2 §3): { units: { 'ns:name': sha256 of that unit's source }, setup: sha256 of everything
+// else }. Every byte of the bundle is in exactly one of them: a unit's own source (a declarator's for `const a = …, b = …`), or the rest
+// (the IIFE wrappers, setup statements, export tables, comments between units, code outside the IIFEs). Only line endings are
+// normalised, never whitespace or comments, so any edit counts. null when the bundle can't be read (hash it whole).
+export function bundleHashes(src) {
+  let shape;
+  try { shape = bundleShape(src); } catch { return null; }
+  if (shape.problems.length) return null;
+  const sha = (t) => createHash('sha256').update(t.replace(/\r\n?/g, '\n')).digest('hex');
+  const units = {}, cuts = [];
+  for (const f of shape.iifes) for (const [n, u] of f.units) { units[`${f.namespace}:${n}`] = sha(src.slice(u.start, u.end)); cuts.push([u.start, u.end, `${f.namespace}:${n}`]); }
+  cuts.sort((a, b) => a[0] - b[0]);
+  let rest = '', at = 0;
+  for (const [s, e, k] of cuts) { rest += src.slice(at, s) + `\u0000${k}\u0000`; at = e; }
+  rest += src.slice(at);
+  return { units, setup: sha(rest) };
+}
 
 const ROOTISH = new Set(['root', 'globalThis', 'window', 'self', 'api', 'module', 'exports']);
 
@@ -75,7 +94,7 @@ export function bundleShape(src) {
         const r = references(s.body);
         for (const p of s.params) references(p, r.refs, r.dyn, r.writes, r.passed);
         if (iife.units.has(s.id.name)) shape.problems.push(`${s.id.name} is declared twice`);
-        iife.units.set(s.id.name, { kind: 'function', text: text(s), ...r });
+        iife.units.set(s.id.name, { kind: 'function', text: text(s), start: s.start, end: s.end, ...r });
         continue;
       }
       if (s.type === 'VariableDeclaration') {
@@ -97,7 +116,7 @@ export function bundleShape(src) {
             continue;
           }
           if (iife.units.has(d.id.name)) shape.problems.push(`${d.id.name} is declared twice`);
-          iife.units.set(d.id.name, { kind: isFn(d.init) ? 'function' : 'constant', object: !!d.init && /^(ObjectExpression|ArrayExpression|NewExpression|CallExpression)$/.test(d.init.type), text: `${s.kind} ${text(d)}`, ...r });
+          iife.units.set(d.id.name, { kind: isFn(d.init) ? 'function' : 'constant', object: !!d.init && /^(ObjectExpression|ArrayExpression|NewExpression|CallExpression)$/.test(d.init.type), text: `${s.kind} ${text(d)}`, start: d.start, end: d.end, ...r });
         }
         continue;
       }

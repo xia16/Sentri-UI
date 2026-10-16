@@ -8,10 +8,11 @@
 // checkouts' HEADs). Unsure is everything: a file that won't parse, a namespace used any way but `SentriUI.X` / `SentriUI['X']`, a
 // load whose URL can't be bounded, CSS, the harness, the shooter, fonts and packages all widen the reach; owning a feature only adds.
 import fs from 'node:fs';
+import { createHash } from 'node:crypto';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { parse } from './vendor/acorn.mjs';
-import { bundleShape, bundleChange } from './bundle-graph.mjs';
+import { bundleShape, bundleChange, bundleHashes } from './bundle-graph.mjs';
 import { screensOf, pageOf } from './loop-rules.mjs';
 
 export const BUNDLE_JS = 'ux/design-system/components/bundle.js';
@@ -54,36 +55,125 @@ function walk(node, visit) {
 }
 const literalOf = (n) => (n?.type === 'Literal' && typeof n.value === 'string' ? n.value : n?.type === 'TemplateLiteral' && !n.expressions.length ? n.quasis[0].value.cooked : null);
 
-// How a script uses each namespace: { [ns]: { all, names: Set, why } }. A supported access is `NS.X` or `NS['X']` (also through
-// window/globalThis/self/root/parent/top); `typeof NS` is a check, not a use. Anything else (an alias, destructuring, a computed key,
-// the namespace passed, returned or stored) uses every export.
-function namespaceUse(ast, namespaces) {
-  const use = Object.fromEntries(namespaces.map((n) => [n, { all: false, names: new Set(), why: '' }]));
-  const parents = new Map();
-  walk(ast, (n, parent, key) => parents.set(n, { parent, key }));
-  const access = (ns, node) => {
-    const { parent, key } = parents.get(node) || {};
-    const u = use[ns];
+// How a script uses each namespace: { use: { [ns]: { all, names: Set, why } }, globals: [{ name, ns }] }.
+// A supported access is `NS.X` or `NS['X']` (also through window/globalThis/self/root/parent/top), or a static destructuring with
+// no rest (`const { X, Y: z } = NS`). A *provable alias* is resolved too (gate-v2 review: "only when its possible targets are
+// provable"): a `const` declared once in the script, set from a namespace (or from another provable alias), whose every use is a
+// supported access, `typeof`, `!` or a test. Anything else uses every export: passing it, storing it, returning it, a computed key,
+// `...rest`, `let`/`var`, a second binding of the name, `with`. A top-level alias of a classic script is a global: it is returned in
+// `globals`, so the page checks the other scripts' uses of it too (aliasUses).
+const TEST_PARENTS = new Set(['IfStatement', 'ConditionalExpression', 'WhileStatement', 'DoWhileStatement', 'ForStatement']);
+function bindingsOf(ast) {
+  const decls = new Map();
+  const add = (name, info) => { if (!decls.has(name)) decls.set(name, []); decls.get(name).push(info); };
+  const pattern = (p, info) => {
+    if (!p) return;
+    if (p.type === 'Identifier') add(p.name, info);
+    else if (p.type === 'ObjectPattern') p.properties.forEach((q) => pattern(q.type === 'RestElement' ? q.argument : q.value, info));
+    else if (p.type === 'ArrayPattern') p.elements.forEach((e) => pattern(e, info));
+    else if (p.type === 'AssignmentPattern') pattern(p.left, info);
+    else if (p.type === 'RestElement') pattern(p.argument, info);
+  };
+  walk(ast, (n, parent) => {
+    if (n.type === 'VariableDeclaration') for (const d of n.declarations) pattern(d.id, { kind: n.kind, declarator: d, top: parent?.type === 'Program' });
+    if ((n.type === 'FunctionDeclaration' || n.type === 'ClassDeclaration') && n.id) add(n.id.name, { kind: 'function' });
+    if (/Function/.test(n.type)) n.params.forEach((p) => pattern(p, { kind: 'param' }));
+    if (n.type === 'CatchClause' && n.param) pattern(n.param, { kind: 'param' });
+    if (n.type === 'ImportSpecifier' || n.type === 'ImportDefaultSpecifier' || n.type === 'ImportNamespaceSpecifier') add(n.local.name, { kind: 'import' });
+  });
+  return decls;
+}
+// Classify every reference to `name` in a script as a use of namespace `ns`, into u ({ all, names, why }). aliases: name -> ns of the
+// provable aliases already known (their own declarations are not uses).
+function classify(ast, parents, name, ns, u, aliases) {
+  const isRef = (n, parent, key) => !((parent?.type === 'MemberExpression' && key === 'property' && !parent.computed)
+    || (parent?.type === 'Property' && key === 'key' && !parent.computed && !parent.shorthand)
+    || (parent?.type === 'MethodDefinition' && key === 'key') || (parent?.type === 'VariableDeclarator' && key === 'id'));
+  const all = (why) => { if (!u.all) { u.all = true; u.why = why; } };
+  walk(ast, (n, parent, key) => {
+    if (n.type !== 'Identifier' || n.name !== name || !isRef(n, parent, key)) return;
     if (parent?.type === 'MemberExpression' && key === 'object') {
       if (!parent.computed) u.names.add(parent.property.name);
-      else { const k = literalOf(parent.property); if (k !== null) u.names.add(k); else if (!u.all) { u.all = true; u.why = `${ns}[computed]`; } }
+      else { const k = literalOf(parent.property); if (k !== null) u.names.add(k); else all(`${name}[computed]`); }
       return;
     }
-    if (parent?.type === 'UnaryExpression' && parent.operator === 'typeof') return;
-    if (!u.all) { u.all = true; u.why = `${ns} used as a value (${parent?.type || 'top'})`; }
-  };
-  walk(ast, (n, parent, key) => {
-    if (n.type === 'Identifier' && use[n.name]) {
-      const isName = (parent?.type === 'MemberExpression' && key === 'property' && !parent.computed) || (parent?.type === 'Property' && key === 'key' && !parent.computed && !parent.shorthand);
-      if (!isName) access(n.name, n);
+    if (parent?.type === 'VariableDeclarator' && key === 'init') {
+      if (parent.id.type === 'Identifier' && aliases.get(parent.id.name) === ns) return; // a provable alias of it: classified on its own
+      if (parent.id.type === 'ObjectPattern' && parent.id.properties.every((p) => p.type === 'Property' && !p.computed)) { parent.id.properties.forEach((p) => u.names.add(p.key.name ?? p.key.value)); return; }
+      return all(`${name} bound by ${parent.id.type === 'ObjectPattern' ? 'a destructuring with a rest or a computed key' : 'an alias that is not provable'}`);
     }
-    if (n.type === 'MemberExpression' && n.object.type === 'Identifier' && ROOTISH.has(n.object.name)) {
-      const k = n.computed ? literalOf(n.property) : n.property.name;
-      if (k !== null && use[k]) access(k, n);
-      else if (n.computed && k === null) for (const ns of namespaces) if (!use[ns].all) { use[ns].all = true; use[ns].why = `${n.object.name}[computed]`; }
-    }
+    if (parent?.type === 'UnaryExpression' && (parent.operator === 'typeof' || parent.operator === '!')) return;
+    if (TEST_PARENTS.has(parent?.type) && key === 'test') return;
+    all(`${name} used as a value (${parent?.type || 'top'})`);
   });
-  return use;
+}
+function namespaceUse(ast, namespaces, { module = false } = {}) {
+  const use = Object.fromEntries(namespaces.map((n) => [n, { all: false, names: new Set(), why: '' }]));
+  const parents = new Map();
+  let hasWith = false;
+  walk(ast, (n, parent, key) => { parents.set(n, { parent, key }); if (n.type === 'WithStatement') hasWith = true; });
+  const decls = bindingsOf(ast);
+  // the namespace a node names: NS, window.NS / root['NS'] …
+  const nsOf = (n) => {
+    if (!n) return null;
+    if (n.type === 'Identifier' && use[n.name] && !decls.has(n.name)) return n.name;
+    if (n.type === 'MemberExpression' && n.object.type === 'Identifier' && ROOTISH.has(n.object.name)) { const k = n.computed ? literalOf(n.property) : n.property.name; return k !== null && use[k] ? k : null; }
+    return null;
+  };
+  // provable aliases, to a fixed point (an alias of an alias)
+  const aliases = new Map(), globals = [];
+  for (let grew = true; grew;) {
+    grew = false;
+    for (const [name, list] of decls) {
+      if (aliases.has(name)) continue;
+      // every binding of the name (one per scope, e.g. `const UI = root.SentriUI` in several functions) must be a provable alias of
+      // the same namespace: then any reference to the name is one of them. One other binding (a parameter, a let) and it is not.
+      const nsOfDecl = (x) => (x.declarator && x.declarator.id.type === 'Identifier' ? nsOf(x.declarator.init) || (x.declarator.init?.type === 'Identifier' && aliases.get(x.declarator.init.name)) : null);
+      const each = list.map(nsOfDecl);
+      const ns = each.find(Boolean);
+      if (!ns) continue;
+      const loose = list.find((x, i) => x.kind !== 'const' || each[i] !== ns);
+      if (loose) { const u = use[ns]; if (!u.all) { u.all = true; u.why = loose.kind !== 'const' ? `${loose.kind} ${name} = ${ns}: not a provable alias` : `${name} is also bound to something else`; } continue; }
+      aliases.set(name, ns); grew = true;
+      if (list.some((x) => x.top) && !module) globals.push({ name, ns });
+    }
+  }
+  if (hasWith) for (const ns of namespaces) { use[ns].all = true; use[ns].why = 'a with statement'; }
+  // every direct reference to a namespace, and every use of a provable alias
+  for (const ns of namespaces) if (!decls.has(ns)) classify(ast, parents, ns, ns, use[ns], aliases);
+  for (const [name, ns] of aliases) classify(ast, parents, name, ns, use[ns], aliases);
+  // window.NS / root['NS'] used other than as a member read or a provable alias's value; window[expr] can be any namespace
+  walk(ast, (n, parent, key) => {
+    if (n.type !== 'MemberExpression' || n.object.type !== 'Identifier' || !ROOTISH.has(n.object.name)) return;
+    const k = n.computed ? literalOf(n.property) : n.property.name;
+    if (k === null && n.computed) { for (const ns of namespaces) if (!use[ns].all) { use[ns].all = true; use[ns].why = `${n.object.name}[computed]`; } return; }
+    if (k === null || !use[k]) return;
+    const u = use[k];
+    if (parent?.type === 'MemberExpression' && key === 'object') {
+      if (!parent.computed) u.names.add(parent.property.name);
+      else { const x = literalOf(parent.property); if (x !== null) u.names.add(x); else if (!u.all) { u.all = true; u.why = `${k}[computed]`; } }
+      return;
+    }
+    if (parent?.type === 'VariableDeclarator' && key === 'init') {
+      if (parent.id.type === 'Identifier' && aliases.get(parent.id.name) === k) return;
+      if (parent.id.type === 'ObjectPattern' && parent.id.properties.every((p) => p.type === 'Property' && !p.computed)) { parent.id.properties.forEach((p) => u.names.add(p.key.name ?? p.key.value)); return; }
+    }
+    if (parent?.type === 'UnaryExpression' && (parent.operator === 'typeof' || parent.operator === '!')) return;
+    if (TEST_PARENTS.has(parent?.type) && key === 'test') return;
+    if (parent?.type === 'LogicalExpression' && parents.get(parent)?.parent?.type === 'ExpressionStatement' && parent.left === n) return; // window.NS && go()
+    if (!u.all) { u.all = true; u.why = `${n.object.name}.${k} used as a value (${parent?.type || 'top'})`; }
+  });
+  return { use, globals };
+}
+// Another script's uses of a global alias `name` (declared top-level in a classic script of the same page): its namespace `ns`.
+function aliasUses(ast, name, ns) {
+  const u = { all: false, names: new Set(), why: '' };
+  const decls = bindingsOf(ast);
+  if (decls.has(name)) return u; // its own binding of the name: not the global
+  const parents = new Map();
+  walk(ast, (n, parent, key) => parents.set(n, { parent, key }));
+  classify(ast, parents, name, ns, u, new Map());
+  return u;
 }
 
 // What a load can fetch, by how it loads: an <img> loads only images and media, a <script> only scripts; fetch, import(), a frame,
@@ -266,7 +356,8 @@ function pageAnalyser(dir, namespaces, shape) {
         r = { files: new Set(), unbounded: [{ why: `${file} does not parse`, type: 'any' }], nav: new Set(), navUnbounded: [`${file} does not parse`], use };
       } else {
         // the bundle defines the namespaces (root.SentriUI = api): its own references are not a page's use of them
-        r = { ...scriptLoads(ast, file, page), use: file === BUNDLE_JS ? blank() : namespaceUse(ast, namespaces) };
+        const ns = file === BUNDLE_JS ? { use: blank(), globals: [] } : namespaceUse(ast, namespaces, { module: ast.sourceType === 'module' });
+        r = { ...scriptLoads(ast, file, page), use: ns.use, globals: ns.globals, ast: file === BUNDLE_JS ? null : ast };
         if (file === BUNDLE_JS && shape) r.unbounded = r.unbounded.filter((u) => !/markup with a computed URL/.test(u.why));
       }
     }
@@ -299,13 +390,13 @@ function pageAnalyser(dir, namespaces, shape) {
     }
     for (const m of markup.matchAll(/url\(\s*(["']?)([^"')]+)\1\s*\)/g)) { const f = resolveRef(m[2], p); if (f) queue.push(f); }
     for (const body of scripts) queue.push({ inline: body });
-    const seen = new Set();
+    const seen = new Set(), ran = []; // every script of this document, for its global aliases
     while (queue.length) {
       const q = queue.shift();
-      if (q.inline !== undefined) { const r = script(`${p}#inline`, p, q.inline); r.files.forEach((f) => queue.push(f)); out.unbounded.push(...r.unbounded); r.nav.forEach((f) => out.nav.add(f)); if (r.navUnbounded.length) out.navUnbounded = true; merge(out.use, r.use); continue; }
+      if (q.inline !== undefined) { const r = script(`${p}#inline`, p, q.inline); ran.push(r); r.files.forEach((f) => queue.push(f)); out.unbounded.push(...r.unbounded); r.nav.forEach((f) => out.nav.add(f)); if (r.navUnbounded.length) out.navUnbounded = true; merge(out.use, r.use); continue; }
       if (seen.has(q)) continue;
       seen.add(q); out.files.add(q);
-      if (/\.(m?js|cjs)$/.test(q)) { const r = script(q, p); r.files.forEach((f) => queue.push(f)); out.unbounded.push(...r.unbounded); r.nav.forEach((f) => out.nav.add(f)); if (r.navUnbounded.length) out.navUnbounded = true; merge(out.use, r.use); }
+      if (/\.(m?js|cjs)$/.test(q)) { const r = script(q, p); ran.push(r); r.files.forEach((f) => queue.push(f)); out.unbounded.push(...r.unbounded); r.nav.forEach((f) => out.nav.add(f)); if (r.navUnbounded.length) out.navUnbounded = true; merge(out.use, r.use); }
       else if (/\.css$/.test(q)) css(q).forEach((f) => queue.push(f));
       else if (/\.html?$/.test(q) && q !== p && !stack.has(q)) {
         // a frame is a page of its own: its closure, its use of the bundle and its loads are this page's too
@@ -313,6 +404,13 @@ function pageAnalyser(dir, namespaces, shape) {
         sub.files.forEach((f) => out.files.add(f)); out.unbounded.push(...sub.unbounded); merge(out.use, sub.use);
         out.nav.add(q); sub.nav.forEach((n) => out.nav.add(n)); if (sub.navUnbounded) out.navUnbounded = true;
       }
+    }
+    // a top-level const alias in a classic script is a global: every other script of this document is checked for its uses
+    for (const g of ran.flatMap((x) => x.globals || [])) for (const x of ran) {
+      if (!x.ast || (x.globals || []).some((h) => h.name === g.name)) continue;
+      const u = aliasUses(x.ast, g.name, g.ns);
+      if (u.all && !out.use[g.ns].all) { out.use[g.ns].all = true; out.use[g.ns].why = u.why; }
+      u.names.forEach((n) => out.use[g.ns].names.add(n));
     }
     for (const f of out.files) if (/\.html?$/.test(f) && f !== p) out.nav.add(f);
     // the bundle's computed loads, for the exports this page can run
@@ -344,7 +442,7 @@ function screenDeps(S, s) {
     seen.add(p);
     const pg = S.page(p);
     pg.files.forEach((f) => out.files.add(f)); out.unbounded.push(...pg.unbounded);
-    for (const [ns, u] of Object.entries(pg.use)) { if (u.all) out.use[ns].all = true; u.names.forEach((x) => out.use[ns].names.add(x)); }
+    for (const [ns, u] of Object.entries(pg.use)) { if (u.all && !out.use[ns].all) { out.use[ns].all = true; out.use[ns].why = `steps may reach ${p}: ${u.why}`; } u.names.forEach((x) => out.use[ns].names.add(x)); }
     if (pg.navUnbounded) out.unbounded.push({ why: `${p}: navigation to a computed URL`, type: 'any' });
     pg.nav.forEach((n) => q.push(n));
   }
@@ -352,9 +450,23 @@ function screenDeps(S, s) {
 }
 
 // ---------- one side ----------
+// A side's analysis is kept per revision, never per folder alone: a folder that is checked out again, or edited, is a new side.
+// The key is the folder plus its HEAD and the state of its working tree (git), or the side's own `rev` when the caller gives one.
 const sides = new Map();
+export const clearReachCache = () => sides.clear();
+function revisionOf(dir) {
+  try {
+    const head = execFileSync('git', ['-C', dir, 'rev-parse', 'HEAD'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+    const dirty = execFileSync('git', ['-C', dir, 'status', '--porcelain', '--untracked-files=all'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+    if (!dirty.trim()) return head;
+    // edited files count by content, not only by name
+    const h = createHash('sha256').update(dirty);
+    for (const line of dirty.split(/\r?\n/).filter(Boolean)) { const f = line.slice(3).replace(/^"|"$/g, ''); try { h.update(fs.readFileSync(path.join(dir, f))); } catch {} }
+    return `${head}+${h.digest('hex').slice(0, 16)}`;
+  } catch { return `t${Date.now()}${Math.random()}`; } // not a git checkout: never reuse
+}
 function sideOf(side) {
-  const key = path.resolve(side.dir);
+  const key = `${path.resolve(side.dir)}|${side.rev || revisionOf(side.dir)}`;
   if (sides.has(key)) return sides.get(key);
   const src = read(side.dir, BUNDLE_JS);
   let shape = null;
@@ -491,7 +603,14 @@ export function identityInputs(side, screenId) {
     for (const [ns, u] of Object.entries(pg.use)) for (const x of u.names) bundle.exports.push(`${ns}.${x}`);
     bundle.exports.sort();
     bundle.units = bundle.all ? S.shape.iifes.flatMap((f) => [...f.units.keys()].map((n) => `${f.namespace}:${n}`)).sort() : forwardUnits(S.shape, bundle.exports);
+    // content hashes, so a body edit changes exactly that unit's evidence (gate-v2 §3); missing: hash the whole bundle
+    S.hashes = S.hashes === undefined ? bundleHashes(S.src) : S.hashes;
+    if (S.hashes) {
+      bundle.unitHashes = Object.fromEntries(bundle.units.map((u) => [u, S.hashes.units[u]]));
+      bundle.setupHash = S.hashes.setup;
+    }
   } else bundle.all = true;
+  bundle.why = Object.values(pg.use).filter((u) => u.all).map((u) => u.why);
   return { files: [...pg.files].sort(), unbounded: pg.unbounded, bundle, screen: S.defs.get(screenId) || null };
 }
 
