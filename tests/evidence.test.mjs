@@ -52,6 +52,11 @@ test('code: a module is hashed with its local imports, static, dynamic and requi
   fs.writeFileSync(path.join(dir, 'scripts/helper.mjs'), 'export const x = 2;');
   assert.notEqual(codeClosure(dir, ['scripts/check.mjs']).files['scripts/helper.mjs'], c.files['scripts/helper.mjs'], 'a helper it imports does');
   assert.equal(typeof h1, 'string');
+  const crlf = fs.mkdtempSync(path.join(os.tmpdir(), 'ev-crlf-'));
+  fs.mkdirSync(path.join(crlf, 'scripts'));
+  for (const f of ['check.mjs', 'helper.mjs']) fs.writeFileSync(path.join(crlf, 'scripts', f), fs.readFileSync(path.join(dir, 'scripts', f), 'utf8').replace(/\n/g, '\r\n'));
+  assert.deepEqual(codeClosure(crlf, ['scripts/check.mjs']).files, codeClosure(dir, ['scripts/check.mjs']).files, 'one commit checked out with CRLF or LF is the same code');
+  fs.rmSync(crlf, { recursive: true, force: true });
   fs.rmSync(dir, { recursive: true, force: true });
 });
 

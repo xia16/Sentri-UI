@@ -56,8 +56,8 @@ export function importsOf(source) {
   if (/\bimport\s*\(\s*[^'")\s]|\brequire\s*\(\s*[^'")\s]/.test(source)) computed = true;
   return { local: [...out], computed };
 }
-// A module's closure from a checkout: every local file it reaches, with its content hash. Content, not blobs: the gate's own tools
-// may be a working copy (its tools are checked equal to the base's before it starts).
+// A module's closure from a checkout: every local file it reaches, with its content hash (line endings normalised). Content, not
+// blobs: the gate's own tools may be a working copy (its tools are checked equal to the base's before it starts).
 export function codeClosure(root, entries) {
   const seen = new Map(), stack = [...entries].map((e) => path.posix.normalize(e));
   let computed = false;
@@ -67,7 +67,8 @@ export function codeClosure(root, entries) {
     const file = path.join(root, rel);
     if (!fs.existsSync(file)) { seen.set(rel, 'missing'); continue; }
     const text = fs.readFileSync(file);
-    seen.set(rel, sha(text));
+    // Line endings normalised: two checkouts of one commit (autocrlf on one, not the other) are the same code.
+    seen.set(rel, sha(text.toString('utf8').replace(/\r\n/g, '\n')));
     if (!/\.(mjs|cjs|js)$/.test(rel)) continue;
     const imp = importsOf(text.toString('utf8'));
     computed ||= imp.computed;
