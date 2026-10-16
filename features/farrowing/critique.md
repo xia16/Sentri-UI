@@ -32,7 +32,7 @@ Scope of this change: `farrowing.search` and `farrowing.scan` (and the screens a
 | Empty messages | page-built | none | page-built |
 | Selection bar | none | the Room dock (`.room-dock`) + Button | **fix**: the room's dock |
 | Actions sheet | none | Sheet drawer + Row navigation (the existing More actions rows) | **fix**: component |
-| Stop glyph | none in the registry | Icon | added once, in `farrowing-icons.js`, until the registry takes it |
+| Stop glyph | none in the registry | Icon | `stop`, in the shared registry |
 
 ## Self-crit
 
