@@ -43,6 +43,7 @@
       "health-record.condition-picker",
       "health-record.care-instructions",
       "health-record.treatment",
+      "health-record.treatment-batch",
       "health-record.medicine-picker"
     ]
   },
@@ -818,7 +819,7 @@
               {
                 "state": "Many pigs",
                 "when": "Bulk selection",
-                "shows": "\"Same dose for all\" (dose and unit) above the list fills every pig's Dose box; a pig's own box overrides it; changing the shared dose clears row overrides. At least three pigs stay in view above the details"
+                "shows": "health-record.treatment-batch: Medicine and Method first, then \"Same dose for all\" (dose and unit) heading the pig list, filling every pig's Dose box (a pig's own box overrides it; changing the shared dose clears row overrides), then the optional rows"
               },
               {
                 "state": "From a finding",
@@ -858,14 +859,8 @@
                 "shows": "No text"
               }
             ],
-            "logic": "Method: Injection, Oral, Topical, In feed, In water. Condition chip links only to pigs carrying that condition.",
+            "logic": "Method: Injection, Oral, Topical, In feed, In water. Picking a product fills Method and the unit with the ones it was last given with (features/medicines), unless they were set in this draft; Save stores them on the product. Condition chip links only to pigs carrying that condition.",
             "at": "Dose"
-          },
-          {
-            "name": "Brand",
-            "shows": "Brand drawer: the brands, then Add a brand ›",
-            "logic": "A single choice: a tap sets the brand and closes. Add a brand is a level of the drawer (titled Add a brand, a Brand name field, Add brand); there the footer Back goes up to the brand list, and the ✕ at the top left closes the whole drawer from either level (owner ruling B, 2026-10-16). Clear in the head removes a set brand. Back at the list leaves the drawer.",
-            "at": "Brand"
           },
           {
             "name": "Save",
@@ -879,10 +874,6 @@
           "Record treatment (raw)",
           "Medicine (raw)",
           "Method (raw)",
-          "Brand (raw)",
-          "Add a brand (raw)",
-          "Brand name (raw)",
-          "Add brand (raw)",
           "Same dose for all (raw)",
           "Record vaccination (raw)"
         ],
@@ -893,62 +884,47 @@
           "Medicines, methods and units should come from farm configuration."
         ],
         "issues": [
-          "Medicines, brands and units are a sample list, not farm configuration.",
+          "The medicine list is sample data (features/medicines); methods and units are a sample list, not farm configuration.",
           "To confirm (product rule, review/inspection-r2.json): is a dose required for every pig, or may a pig be saved without one?",
           "Record treatment from a finding and from the Health group differ only by the fixed condition."
         ]
       }
     },
     {
-      "id": "health-record.medicine-picker",
-      "name": "Select medicine",
-      "zh": "选择药品",
+      "id": "health-record.treatment-batch",
+      "name": "Record treatment · several pigs",
+      "zh": "记录治疗 · 多头猪",
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
-      "preset": "profile-full",
-      "steps": ["[data-action=\"pig-actions\"]","[data-action=\"treatment\"]","[data-action=\"medicine-open\"]"],
+      "preset": "selected",
+      "steps": ["[data-action=\"treatment\"]", "[data-action=\"medicine-open\"]", "[data-action=\"medicine-select\"][data-value=\"p:draxxin\"]"],
       "figma": "",
       "notes": {
-        "purpose": "Choose the medicine (or vaccine).",
+        "purpose": "What was given to several pigs, then each pig's dose. Shown after picking Draxxin from the recent rows: Method (Injection) and the unit (mL) are pre-filled from its last use.",
         "elements": [
           {
-            "name": "Medicine list",
-            "shows": "Antibiotics (2), Pain relief (1), Parasite control (1), Vaccines (2)",
-            "states": [
-              {
-                "state": "Browse",
-                "when": "No search text",
-                "shows": "Medicines: category doors; a category: its name as the title, its medicines (name and form); the footer Back goes up to Medicines, the ✕ at the top left closes the picker"
-              },
-              {
-                "state": "Search",
-                "when": "Text typed",
-                "shows": "Searches the level you are on (\"Search in Antibiotics\"), every medicine at Medicines; matches name and detail"
-              },
-              {
-                "state": "Vaccination task",
-                "when": "Opened from a vaccination",
-                "shows": "Only Vaccines"
-              },
-              {
-                "state": "No match",
-                "when": "Nothing found",
-                "shows": "\"No medicines found. Try another name or category.\""
-              }
-            ],
-            "logic": "A tap on a medicine commits it and closes; the field shows the medicine only (\"Antibiotic A\"), not its path. A changed medicine clears the brand. One drawer height across levels. The catalogue is a sample, not a treatment recommendation.",
-            "at": "Antibiotics"
+            "name": "Order",
+            "at": "Medicine",
+            "shows": "Medicine, Method; then Same dose for all heading the pig list; then Condition and Note",
+            "rule": "What was given comes first (owner, 2026-10-16): a dose means nothing until the medicine and its unit are known. The per-pig dose boxes are unchanged; each shows the unit, pre-filled from the product's last use."
+          },
+          {
+            "name": "Save",
+            "at": "Save",
+            "shows": "Save · N pigs",
+            "rule": "Waits until medicine, method, unit and a dose above 0 are set; a tap while it waits marks the empty fields Required. One treatment record per ticked pig."
           }
         ],
         "controls": [],
-        "copy": [
-          "Medicines (raw)",
-          "Search in {level} (raw)"
-        ],
-        "issues": [
-          "Sample names (\"Antibiotic A\", \"Sample brand A\") are placeholders."
-        ]
+        "copy": ["Record treatment (raw)", "Same dose for all (raw)"],
+        "issues": ["To confirm (product rule, review/inspection-r2.json): is a dose required for every pig, or may a pig be saved without one?"]
       }
+    },
+    {
+      "id": "health-record.medicine-picker",
+      "name": "Select medicine",
+      "zh": "选择药品",
+      "aliasOf": "medicines.picker"
     }
   ]
 }

@@ -43,3 +43,10 @@ export function recordReason(text){
   const copy=Object.entries(registry.strings).find(([id,copy])=>id.startsWith('record.reason.')&&copy.en===text)?.[1];
   return copy?copy[language]:text;
 }
+
+/* A registry string in the page's language (?lang=zh), with {key} arguments filled: for copy this prototype renders itself
+   (the medicines picker and page), so it is drawn in Chinese directly instead of matched after the fact. */
+export function str(id,args={}){
+  const copy=registry.strings[id];if(!copy)return id;
+  return (copy[language]||copy.en).replace(/\{(\w+)\}/g,(_,key)=>args[key]??'');
+}

@@ -1,0 +1,18 @@
+/* Medicines (features/medicines) in the inspection prototype: layout only; every part is a design-system component. */
+
+/* Record treatment, several pigs: what was given first, then the doses, then the optional rows (owner, 2026-10-16). One
+   scrolling page body; the fields sit straight on the page as on the one-pig form, the pigs in their one card. */
+.inspection-phone .bulk-action-layout.is-given-first{min-height:0}
+.inspection-phone .bulk-action-layout.is-given-first>.bulk-controls{display:flex;flex-direction:column;gap:16px;max-height:none;margin:0;padding:0 var(--space-gutter,18px);border:0;border-radius:0;background:transparent;box-shadow:none;overflow:visible}
+.inspection-phone .bulk-action-layout.is-given-first>.bulk-pigs{margin:24px var(--space-gutter,18px) 16px}
+.inspection-phone .bulk-action-layout.is-given-first>.bulk-after{padding-bottom:16px}
+.inspection-phone .bulk-action-layout.is-given-first>.bulk-after:empty{display:none}
+@media(max-width:370px){.inspection-phone .bulk-action-layout.is-given-first>.bulk-controls{padding:0 var(--space-gutter-narrow,12px)}.inspection-phone .bulk-action-layout.is-given-first>.bulk-pigs{margin-left:var(--space-gutter-narrow,12px);margin-right:var(--space-gutter-narrow,12px)}}
+
+/* The add level: Name, Medicine, then Category, stacked in capture order. */
+.inspection-phone .medicine-add-fields{display:flex;flex-direction:column;gap:16px}
+.inspection-phone .medicine-add-fields>.field{margin:0}
+
+/* The Medicines page: one group per medicine, a section's gap between them. */
+.inspection-phone .medicines-group+.medicines-group{margin-top:var(--space-section,24px)}
+.inspection-phone .medicine-delete-note{margin:0;font:400 var(--type-row-title-size)/1.5 var(--font-sans);color:var(--ink)}

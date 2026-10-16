@@ -24,7 +24,7 @@ Recording, editing, treatment and the pickers can happen in any status.
 - Care is the only editable condition state: No action needed, Monitor, Treat in place, Move to hospital pen. Attention is derived: every choice except No action needed needs attention.
 - Existing findings keep their original start date; adding a condition a pig already has changes nothing.
 - Bulk edits preview each pig's change, let a pig be excluded, leave pigs without the condition unchanged, and save only changed rows.
-- Treatment records medicine actually given: medicine, method, unit and a dose above 0, a shared dose with a per-pig override, and optional brand, linked condition and note. One record per included pig.
+- Treatment records medicine actually given: the product (or the medicine, brand not known) from the farm's medicine list (features/medicines), method, unit and a dose above 0, a shared dose with a per-pig override, and an optional linked condition and note. Method and unit are pre-filled from the product's last use. For several pigs the form asks what was given first (medicine, method), then the doses. One record per included pig.
 - A treatment started from a Health task (vaccination) lists vaccines only and completes the task on Save.
 - A blocked action is listed with the reason, never dropped.
 - Recovery keeps the case in history; entered in error marks a correction. Recovering a finding linked to a feed adjustment ends that adjustment.
@@ -32,14 +32,14 @@ Recording, editing, treatment and the pickers can happen in any status.
 
 ## Scope
 
-In: the pig record as a health view (needs attention, ongoing, several ongoing, care levels), the finding and its edit and resolve forms, Record health with its catalogue picker, Care instructions and Edit conditions, Resolve conditions, Record treatment with the medicine picker (and the brand and condition choosers inside it).
+In: the pig record as a health view (needs attention, ongoing, several ongoing, care levels), the finding and its edit and resolve forms, Record health with its catalogue picker, Care instructions and Edit conditions, Resolve conditions, Record treatment (and the condition chooser inside it). The medicine picker is the medicines feature's.
 
 Out: sow death and mortality reports (separate features), the pig record itself (pig-profile), feed changes (feed-plan). Health tags on the walk row belong to inspection.
 
 ## Decisions
 
 - Care replaced the older triage and status fields; one select drives both.
-- Medicines, brands and units are a sample catalogue until farm configuration exists.
+- The medicine list is the medicines feature's (2026-10-16: Category → Medicine → Product, no Brand field); methods and units are a sample list until farm configuration exists.
 - Treatment never implies identical doses across pigs.
 
 Open (recorded on the screens as issues):

@@ -1,0 +1,427 @@
+{
+  "id": "medicines",
+  "name": "Medicines",
+  "zh": "药品",
+  "platform": "mobile",
+  "section": "health",
+  "newFeature": true,
+  "duplicates": "The old Figma (健康与治疗) has no medicine list: a drug name is typed on each treatment. Before this feature, Record treatment's medicine picker (health-record.medicine-picker) and its Brand field held a sample catalogue.",
+  "groups": [
+    [
+      "Choose",
+      [
+        "medicines.picker",
+        "medicines.picker-first",
+        "medicines.category",
+        "medicines.search",
+        "medicines.vaccines"
+      ]
+    ],
+    [
+      "Add",
+      [
+        "medicines.search-none",
+        "medicines.add",
+        "medicines.add-medicine",
+        "medicines.add-new-medicine"
+      ]
+    ],
+    [
+      "Manage",
+      [
+        "medicines.page",
+        "medicines.page-category",
+        "medicines.product",
+        "medicines.rename",
+        "medicines.delete"
+      ]
+    ]
+  ],
+  "entryPoints": [
+    {
+      "section": "Health & treatments",
+      "label": "Record treatment, Medicine field",
+      "from": "health-record.treatment",
+      "control": "Medicine",
+      "lands": "medicines.picker"
+    },
+    {
+      "section": "Health & treatments",
+      "label": "Record treatment for several pigs, Medicine field",
+      "from": "health-record.treatment-batch",
+      "control": "Medicine",
+      "lands": "medicines.picker"
+    },
+    {
+      "section": "Pigs",
+      "label": "A vaccination task on a pig, Vaccine field",
+      "from": "pig-profile.tasks",
+      "control": "Vaccination → Vaccine",
+      "lands": "medicines.vaccines"
+    },
+    {
+      "section": "Home",
+      "label": "Toolbox",
+      "from": "workbench.toolbox",
+      "control": "Medicines",
+      "lands": "medicines.page"
+    }
+  ],
+  "addsTo": [
+    {
+      "feature": "workbench",
+      "what": "A Medicines row (the farm's medicine list: rename and delete products)",
+      "screen": "workbench.toolbox",
+      "open": "Toolbox",
+      "under": "Tools",
+      "added": false
+    },
+    {
+      "feature": "health-record",
+      "what": "The Medicine field of Record treatment and Record vaccination opens this picker; Method and unit are pre-filled from the product",
+      "screen": "health-record.treatment",
+      "open": "Medicine",
+      "under": "Record treatment",
+      "added": true
+    }
+  ],
+  "flow": [
+    ["medicines.picker", "medicines.category", "tap a category"],
+    ["medicines.picker", "medicines.search", "type in Search"],
+    ["medicines.category", "medicines.search", "type in Search (all categories)"],
+    ["medicines.search", "medicines.search-none", "type a name with no match"],
+    ["medicines.search-none", "medicines.add", "tap Add “Zactran”"],
+    ["medicines.add", "medicines.add-medicine", "tap Medicine"],
+    ["medicines.add-medicine", "medicines.add-new-medicine", "type a new medicine, tap Add"],
+    ["medicines.page", "medicines.page-category", "tap a category"],
+    ["medicines.page-category", "medicines.product", "tap a product"],
+    ["medicines.product", "medicines.rename", "tap Rename"],
+    ["medicines.product", "medicines.delete", "tap Delete"]
+  ],
+  "screens": [
+    {
+      "id": "medicines.picker",
+      "name": "Choose a medicine: recent, then categories",
+      "zh": "选择药品：最近使用与分类",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "profile-full",
+      "steps": ["[data-action=\"pig-actions\"]", "[data-action=\"treatment\"]", "[data-action=\"medicine-open\"]"],
+      "figma": "",
+      "notes": {
+        "purpose": "Pick what was given, over the real Record treatment page: search, the farm's recent products, then the categories.",
+        "elements": [
+          {
+            "name": "Recently used",
+            "at": "Recently used",
+            "shows": "Up to three products the farm picked last, under the group label Recently used",
+            "states": [
+              { "state": "Recent picks", "when": "The farm has recorded a treatment", "shows": "Brand, then medicine · form; a medicine given with its brand not known reads the medicine, then Brand not known" },
+              { "state": "None", "when": "Nothing recorded yet, or none fits the task", "shows": "The block is absent; the categories lose their label (medicines.picker-first)" }
+            ],
+            "logic": "Distinct, newest first, any worker, filtered to the task (a vaccination shows vaccines only). A product deleted from the list leaves it.",
+            "source": "medRecents(c)"
+          },
+          {
+            "name": "Category rows",
+            "at": "Categories",
+            "shows": "The fixed category list, the same on every farm",
+            "rule": "Categories carry no count. A tap opens the category as a level; the footer Back comes back here, the ✕ closes the picker."
+          }
+        ],
+        "controls": [],
+        "copy": ["medicines.title", "medicines.group.recent", "medicines.group.categories", "ds.picker.search", "medicines.category.*"],
+        "rules": ["A pick commits and closes; the field shows the product (Metacam · injection) or the medicine alone for Brand not known."],
+        "issues": ["The medicine list is sample data from pig farming, not a farm's real list and not a treatment recommendation."]
+      }
+    },
+    {
+      "id": "medicines.picker-first",
+      "name": "Choose a medicine: no recent picks",
+      "zh": "选择药品：无最近使用",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "medicines-first",
+      "steps": ["[data-action=\"pig-actions\"]", "[data-action=\"treatment\"]", "[data-action=\"medicine-open\"]"],
+      "figma": "",
+      "notes": {
+        "purpose": "The picker on a farm that has recorded no treatment yet: search, then the categories with no group label.",
+        "elements": [],
+        "controls": [],
+        "copy": ["medicines.title"],
+        "issues": ["Sample data."]
+      }
+    },
+    {
+      "id": "medicines.category",
+      "name": "A category: medicines and their products",
+      "zh": "分类：药品与产品",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "profile-full",
+      "steps": ["[data-action=\"pig-actions\"]", "[data-action=\"treatment\"]", "[data-action=\"medicine-open\"]", "[data-action=\"medicine-category\"][data-value=\"pain\"]"],
+      "figma": "",
+      "notes": {
+        "purpose": "One flat list: each medicine is a group label, its products are the rows, Brand not known is the last row of each.",
+        "elements": [
+          {
+            "name": "Title",
+            "at": "Pain relief",
+            "shows": "The category's short name",
+            "rule": "Pain relief and anti-inflammatory, Hormones and reproduction, and Vitamins, minerals and iron take short titles (Pain relief, Hormones, Vitamins and iron) to fit the header at 360 (budget.md)."
+          },
+          {
+            "name": "Product row",
+            "at": "Metacam",
+            "shows": "Brand, with the form as its second line",
+            "states": [
+              { "state": "Listed product", "when": "From the farm's list", "shows": "Brand · form" },
+              { "state": "Added on the farm", "when": "Added from a search", "shows": "The name alone (adding asks no form)" },
+              { "state": "Brand not known", "when": "Last row of each medicine", "shows": "Records the medicine only" },
+              { "state": "Current pick", "when": "Already set on the form", "shows": "Ink ✓" }
+            ]
+          },
+          {
+            "name": "Search",
+            "at": "[data-medicine-search]",
+            "shows": "Search all options",
+            "rule": "Searches every category from here; while it has text the head names the root (Medicines). The footer Back goes up to Medicines."
+          }
+        ],
+        "controls": [],
+        "copy": ["medicines.category.pain.short", "medicines.brand_unknown", "medicines.form.*"],
+        "issues": ["Sample data."]
+      }
+    },
+    {
+      "id": "medicines.search",
+      "name": "Search across categories",
+      "zh": "跨分类搜索",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "profile-full",
+      "steps": ["[data-action=\"pig-actions\"]", "[data-action=\"treatment\"]", "[data-action=\"medicine-open\"]", { "fill": "[data-medicine-search]", "text": "tula" }],
+      "figma": "",
+      "notes": {
+        "purpose": "Results laid out as a category is: medicine labels, product rows.",
+        "elements": [
+          {
+            "name": "Results",
+            "at": "Tulathromycin",
+            "shows": "Grouped by medicine",
+            "logic": "A match on a medicine or an ingredient lists all its products and Brand not known; a match on a brand lists only that brand's products. Only the task's categories are searched."
+          }
+        ],
+        "controls": [],
+        "copy": [],
+        "issues": ["Sample data."]
+      }
+    },
+    {
+      "id": "medicines.vaccines",
+      "name": "Choose a vaccine (vaccination)",
+      "zh": "选择疫苗（免疫）",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "pig-tasks",
+      "steps": ["[data-action=\"sow-current-task\"][data-value=\"vaccination\"]", "[data-action=\"medicine-open\"]"],
+      "figma": "",
+      "notes": {
+        "purpose": "The same picker filtered to Vaccines: recent vaccines, then the vaccines by disease.",
+        "elements": [
+          {
+            "name": "Vaccine list",
+            "at": "PRRS vaccine",
+            "shows": "One category left, so its medicines are listed at once (no one-row category level)",
+            "logic": "Recents and search are filtered to Vaccines; adding files a new vaccine under Vaccines."
+          }
+        ],
+        "controls": [],
+        "copy": ["medicines.title.vaccines"],
+        "issues": ["Sample data."]
+      }
+    },
+    {
+      "id": "medicines.search-none",
+      "name": "Search with no match: Add",
+      "zh": "搜索无结果：添加",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "profile-full",
+      "steps": ["[data-action=\"pig-actions\"]", "[data-action=\"treatment\"]", "[data-action=\"medicine-open\"]", { "fill": "[data-medicine-search]", "text": "Zactran" }],
+      "figma": "",
+      "notes": {
+        "purpose": "Nothing matches: one card, Add “Zactran”, and nothing else.",
+        "elements": [],
+        "controls": [],
+        "copy": ["medicines.add_card"],
+        "issues": []
+      }
+    },
+    {
+      "id": "medicines.add",
+      "name": "Add a product",
+      "zh": "添加产品",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "profile-full",
+      "steps": ["[data-action=\"pig-actions\"]", "[data-action=\"treatment\"]", "[data-action=\"medicine-open\"]", { "fill": "[data-medicine-search]", "text": "Zactran" }, "[data-action=\"medicine-add\"]"],
+      "figma": "",
+      "notes": {
+        "purpose": "Name (pre-filled from the search) and Medicine; Category only when the medicine is new.",
+        "elements": [
+          {
+            "name": "Add",
+            "at": "[data-action=\"medicine-add-save\"]",
+            "shows": "Add",
+            "rule": "Waits until Name and Medicine are set (and Category for a new medicine); a tap while waiting marks them Required. Adding puts the product into the farm's list for everyone at once and picks it: the drawer closes on the form."
+          },
+          {
+            "name": "Medicine",
+            "at": "Medicine",
+            "shows": "Select",
+            "states": [
+              { "state": "From inside a category", "when": "The search was typed at a category", "shows": "Its level lists that category's medicines; a new one is filed there" },
+              { "state": "From Medicines", "when": "The search was typed at the root", "shows": "Every medicine, under its category's label" }
+            ]
+          }
+        ],
+        "controls": [],
+        "copy": ["medicines.add.title", "medicines.add.name", "medicines.add.medicine", "medicines.add.commit"],
+        "rules": ["Nothing else is asked: method, dose and unit are recorded on each treatment."],
+        "issues": []
+      }
+    },
+    {
+      "id": "medicines.add-medicine",
+      "name": "Add a product: choose its medicine",
+      "zh": "添加产品：选择药品",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "profile-full",
+      "steps": ["[data-action=\"pig-actions\"]", "[data-action=\"treatment\"]", "[data-action=\"medicine-open\"]", { "fill": "[data-medicine-search]", "text": "Zactran" }, "[data-action=\"medicine-add\"]", "[data-action=\"medicine-add-pick-medicine\"]"],
+      "figma": "",
+      "notes": {
+        "purpose": "Pick the medicine the new product is, or type a new one (Add “…” when nothing matches).",
+        "elements": [],
+        "controls": [],
+        "copy": ["medicines.add.medicine", "medicines.add_card"],
+        "issues": []
+      }
+    },
+    {
+      "id": "medicines.add-new-medicine",
+      "name": "Add a product: a new medicine asks its category",
+      "zh": "添加产品：新药品需选分类",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "profile-full",
+      "steps": ["[data-action=\"pig-actions\"]", "[data-action=\"treatment\"]", "[data-action=\"medicine-open\"]", { "fill": "[data-medicine-search]", "text": "Zactran" }, "[data-action=\"medicine-add\"]", "[data-action=\"medicine-add-pick-medicine\"]", { "fill": "[data-medicine-add-search]", "text": "Gamithromycin" }, "[data-action=\"medicine-add-new-medicine\"]"],
+      "figma": "",
+      "notes": {
+        "purpose": "A medicine typed new adds the Category field.",
+        "elements": [],
+        "controls": [],
+        "copy": ["medicines.add.category"],
+        "issues": []
+      }
+    },
+    {
+      "id": "medicines.page",
+      "name": "Medicines page",
+      "zh": "药品页",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "medicines",
+      "figma": "",
+      "notes": {
+        "purpose": "The farm's medicine list, by category: where products are renamed and deleted. Reached from Home → Toolbox → Medicines (not built on Home yet).",
+        "elements": [],
+        "controls": [],
+        "copy": ["medicines.title"],
+        "issues": ["The Toolbox row on Home is not built (addsTo, added: false)."]
+      }
+    },
+    {
+      "id": "medicines.page-category",
+      "name": "Medicines page: a category",
+      "zh": "药品页：分类",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "medicines",
+      "steps": ["[data-action=\"medicines-category\"][data-value=\"pain\"]"],
+      "figma": "",
+      "notes": {
+        "purpose": "A category's medicines (group labels) and their products (rows).",
+        "elements": [
+          {
+            "name": "Medicine group",
+            "at": "Meloxicam",
+            "shows": "The medicine's name over its products",
+            "states": [
+              { "state": "No products", "when": "Only Brand not known (Flunixin)", "shows": "Absent: Brand not known is not a product" }
+            ]
+          }
+        ],
+        "controls": [],
+        "copy": [],
+        "issues": ["Sample data."]
+      }
+    },
+    {
+      "id": "medicines.product",
+      "name": "A product's sheet",
+      "zh": "产品详情",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "medicines",
+      "steps": ["[data-action=\"medicines-category\"][data-value=\"pain\"]", "[data-action=\"medicines-product\"][data-value=\"metacam\"]"],
+      "figma": "",
+      "notes": {
+        "purpose": "Rename or delete one product.",
+        "elements": [],
+        "controls": [],
+        "copy": ["medicines.product.rename", "medicines.product.delete"],
+        "issues": ["Who may rename and delete is a product rule to confirm (the prototype lets anyone)."]
+      }
+    },
+    {
+      "id": "medicines.rename",
+      "name": "Rename a product",
+      "zh": "重命名产品",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "medicines",
+      "steps": ["[data-action=\"medicines-category\"][data-value=\"pain\"]", "[data-action=\"medicines-product\"][data-value=\"metacam\"]", "[data-action=\"medicines-product-level\"][data-value=\"rename\"]"],
+      "figma": "",
+      "notes": {
+        "purpose": "The product's name, pre-filled; Rename waits until it changes.",
+        "elements": [
+          { "name": "Rename", "at": "[data-action=\"medicines-rename-save\"]", "shows": "Rename", "rule": "Renames the product in the picker and on this page for everyone; past records keep the name they were saved with." }
+        ],
+        "controls": [],
+        "copy": ["medicines.product.rename", "medicines.add.name"],
+        "issues": []
+      }
+    },
+    {
+      "id": "medicines.delete",
+      "name": "Delete a product",
+      "zh": "删除产品",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "medicines",
+      "steps": ["[data-action=\"medicines-category\"][data-value=\"pain\"]", "[data-action=\"medicines-product\"][data-value=\"metacam\"]", "[data-action=\"medicines-product-level\"][data-value=\"delete\"]"],
+      "figma": "",
+      "notes": {
+        "purpose": "Asks first, and says what happens to past records.",
+        "elements": [
+          { "name": "Delete", "at": "[data-action=\"medicines-delete-save\"]", "shows": "Delete", "rule": "Takes the product off the picker, the recent picks and this page; past records keep its name. Its medicine stays (Brand not known)." }
+        ],
+        "controls": [],
+        "copy": ["medicines.product.delete_title", "medicines.product.delete_body", "medicines.product.delete"],
+        "issues": []
+      }
+    }
+  ]
+}

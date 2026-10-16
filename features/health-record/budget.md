@@ -80,3 +80,15 @@ The catalogue pickers' heads. Questions at a level: where am I? (the title: the 
 | Level name (title) | Where am I? | Act now (the head's heaviest) | kept |
 | Parent's name ("‹ Symptoms") | Where does up go? | Settled | **cut**: Back goes up one level; the parent is one Back away and was its title |
 | Done · N | How many have I ticked? | Act now | kept |
+
+# Record treatment and the medicines picker (2026-10-16)
+
+The picker's facts are budgeted in `features/medicines/budget.md`. On the host forms:
+
+| Fact | Question it answers | Level | Decision |
+|---|---|---|---|
+| Medicine: the product as its box reads ("Draxxin · injection"), or the medicine for Brand not known | What was given? | Settled (field value) | kept; the path stays in the picker |
+| Method, pre-filled from the product's last use | How was it given? | Settled | kept, editable |
+| Unit, pre-filled from the product's last use, in "Same dose for all" and in each pig's box | In what unit is the dose? | Settled (quiet, beside the figure) | kept |
+| Brand (optional row) | — | — | **cut**: the product is the brand |
+| Batch order: Medicine, Method, then Same dose for all and each pig's dose, then Condition and Note | What was given, then how much? | — | reordered (owner decision 6); the "Treatment details" fold goes with the dock |

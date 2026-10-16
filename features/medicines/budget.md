@@ -97,7 +97,7 @@ Vaccination: one category is left, so level 1 shows the recents (vaccines only) 
 | Title: the category's short name | page header | Where am I? | kept |
 | Group label: the medicine | above its products | Which drug? | kept; a medicine with no products is absent (Brand not known is not a product) |
 | Product row: brand, form as the second line | row | Is this the one? | kept, as in the picker |
-| Product sheet title: the product's name | sheet header | Is this the one I meant? | kept; the medicine is on the page behind |
+| Product sheet title: the product's name; with its form when another product has the same name ("Metacam · injection") | sheet header | Is this the one I meant? | kept; the medicine is on the page behind |
 | Rows "Rename", "Delete" | product sheet | What can I do to it? | verbs only (a menu drawer) |
 | Rename level: Name (Field, pre-filled), commit "Rename" | What should it be called? | kept; waits until the name changes |
 | Delete level: "Delete <name>?" and one line "It leaves the list for everyone. Past records keep its name." | What happens to past records? | said once, here; commit "Delete" in red |

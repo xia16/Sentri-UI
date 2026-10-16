@@ -204,7 +204,7 @@ test('dosage units show Liquid and Weight subtitles without navigating deeper', 
  assert.equal((html.match(/data-action="picker-select"/g)||[]).length,3);
 });
 test('medicine and health render the shared flat chooser surface', () => {
- const c=model.seed();model.openBulkAction(c,'treatment',['000267']);c.view='medicine-picker';c.form.medicineCategory='Antibiotics';
+ const c=model.seed();model.openBulkAction(c,'treatment',['000267']);model.handleRecordAction(c,'medicine-open','');model.handleRecordAction(c,'medicine-category','antibiotics');
  assert.match(model.overlay(c),/class="st-panel st-choice-panel"/);
  model.openBulkAction(c,'health',['000267']);model.handleRecordAction(c,'bulk-pick-health','');
  assert.match(model.overlay(c),/class="st-panel st-choice-panel"/);
@@ -212,13 +212,13 @@ test('medicine and health render the shared flat chooser surface', () => {
 
 test('catalogue levels (owner ruling B, 2026-10-16): the level as the title, a ✕ closes, the footer Back goes up, no "‹ Parent"', () => {
  const head=html=>html.match(/<header[^]*?<\/header>/)[0], cross=/class="st-sheet-corner" data-corner="start" data-ds="Sheet" data-action="dismiss"[^>]*aria-label="Close"/;
- const c=model.seed();model.openBulkAction(c,'treatment',['000267']);c.view='medicine-picker';c.form.medicineCategory='Antibiotics';
+ const c=model.seed();model.openBulkAction(c,'treatment',['000267']);model.handleRecordAction(c,'medicine-open','');model.handleRecordAction(c,'medicine-category','antibiotics');
  let html=model.overlay(c).split('<section class="sheet picker-step')[1];
  assert.doesNotMatch(html,/Chosen levels|st-picker-steps|sheet-up/);
  assert.match(head(html),/<h2 class="sheet-title">Antibiotics</);assert.match(head(html),cross);assert.doesNotMatch(head(html),/Medicines|>Back</);
- assert.match(html,/class="sheet-footer[^]*data-action="medicine-step" data-value="0"[^]*>Back</,'Back goes up to Medicines');
+ assert.match(html,/class="sheet-footer[^]*data-action="medicine-up"[^]*>Back</,'Back goes up to Medicines');
  assert.doesNotMatch(html,/chooser-header-back|Close chooser/);
- c.form.medicineCategory='';html=model.overlay(c).split('<section class="sheet picker-step')[1];
+ model.handleRecordAction(c,'medicine-up','');html=model.overlay(c).split('<section class="sheet picker-step')[1];
  assert.match(head(html),/<h2 class="sheet-title">Medicines</);assert.match(head(html),cross,'the ✕ is there at the first level too');
  assert.match(html,/class="sheet-footer[^]*data-action="back"[^]*>Back</,'Back at the first level leaves');
  model.openBulkAction(c,'health',['000267']);c.view='bulk-health-picker';c.form.conditionPath=['Symptom','General appearance'];
@@ -236,7 +236,7 @@ test('catalogue levels (owner ruling B, 2026-10-16): the level as the title, a �
  assert.ok(model.handleRecordAction(c,'condition-step','0'));assert.deepEqual(c.form.conditionPath,[]);
  html=model.overlay(c).split('<section class="sheet picker-step')[1];assert.match(head(html),/<h2 class="sheet-title">Conditions</);assert.match(head(html),cross);assert.match(html,/class="sheet-footer[^]*data-action="back"[^]*>Back</);
 });
-test('Link condition and Brand are drawers with levels too: ✕ closes, the footer Back goes up (owner ruling B)', () => {
+test('Link condition is a drawer with levels too: ✕ closes, the footer Back goes up (owner ruling B)', () => {
  const c=model.seed();model.openBulkAction(c,'treatment',['000267']);
  const sec=()=>{const h=model.overlay(c);return h.slice(h.lastIndexOf('<section class="sheet'));};
  const cross=/<header[^]*class="st-sheet-corner" data-corner="start"[^>]*data-action="dismiss"[^]*<\/header>/;
@@ -246,9 +246,6 @@ test('Link condition and Brand are drawers with levels too: ✕ closes, the foot
  assert.match(sec(),/<h2 class="sheet-title">Respiratory diseases</);assert.match(sec(),cross);assert.doesNotMatch(sec(),/sheet-up/);
  assert.match(sec(),/class="sheet-footer[^]*data-action="health-catalog-back"[^]*>Back</);
  model.handleRecordAction(c,'health-catalog-back','');assert.equal(c.form.catalogGroup,'');
- c.view='treatment';model.handleRecordAction(c,'record-optional-open','brand');
- assert.match(sec(),cross);assert.match(sec(),/class="sheet-footer[^]*data-action="back"[^]*>Back</);
- model.handleRecordAction(c,'record-brand-add','');
- assert.match(sec(),/<h2 class="sheet-title">Add a brand</);assert.match(sec(),cross);
- assert.match(sec(),/class="sheet-footer[^]*data-action="record-brand-list"[^]*>Back</);
+ /* The Brand field is gone: the product is the brand (features/medicines). */
+ c.view='treatment';assert.doesNotMatch(model.overlay(c),/data-key="brand"|>Brand</);
 });
