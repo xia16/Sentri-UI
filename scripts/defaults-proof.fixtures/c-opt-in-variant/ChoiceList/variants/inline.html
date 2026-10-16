@@ -1,0 +1,7 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>ChoiceList inline</title></head><body>
+<section data-state="Default"><div data-choices='{"options":["No","Yes"]}'></div></section>
+<section data-state="Selected"><div data-choices='{"options":["No","Yes"],"value":"Yes"}'></div></section>
+<section data-state="Key face"><div data-choices='{"options":["No","Yes"],"face":"key"}'></div></section>
+<script>document.querySelectorAll('[data-choices]').forEach((e) => { e.outerHTML = SentriFix.choices(JSON.parse(e.dataset.choices)); });</script>
+</body></html>

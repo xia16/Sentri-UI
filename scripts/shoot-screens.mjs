@@ -6,7 +6,9 @@
 //                 (.sgrid, Components → <Name> → <variant>), lifted out of the atlas chrome with each state's frame at the run's
 //                 width and two to a row, shot whole, in English only: a variant page's Chinese cells are its own.
 // Writes <out>/<screen id>/<lang>-<width>.png (ds:<Name> as ds_<Name>) and <out>/shots.json:
-//   { base, commit, runs: [{ screen, feature, lang, width, file, ok, error?, zh? }] }
+//   { base, commit, runs: [{ screen, feature, lang, width, file, ok, error?, zh?, sha?, states? }] }
+// A component page's run also has sha (its png's hash) and states [{ name, png, html }] (each state's frame: the hash of its
+// pixels and of its HTML), the defaults proof's print (scripts/defaults-proof.mjs, gate.mjs's fast path).
 // zh is "rendered" or "ignored": a page that shows the same text with ?lang=zh does not render Chinese, and the run says so
 // instead of passing off an English screenshot as Chinese. Bare screens are pinned to 390; other widths override that the way
 // scripts/run-scenarios.mjs does (nothing in the page changes, only the phone's width).
@@ -18,16 +20,10 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { screensOf, componentPagesOf, idPath } from './loop-rules.mjs';
 import { routeFonts } from './font-route.mjs';
+// The component pages' capture (and the defaults proof's print of each state) is shared with the proof's fixtures.
+import { LAUNCH, settle, gridOnly, specimenPrints, pngSha } from './defaults-proof.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-// A sheet that slides in, or a backdrop that blurs, is still moving 250ms after load on a slow machine: wait for every finite
-// animation and transition to finish (at most 3s), then two frames, so a shot never catches a screen mid-motion.
-async function settle(page) {
-  await page.evaluate(() => Promise.race([
-    Promise.all(document.getAnimations().filter((a) => a.effect?.getComputedTiming().endTime !== Infinity).map((a) => a.finished.catch(() => {}))),
-    new Promise((r) => setTimeout(r, 3000)),
-  ]).then(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)))));
-}
 const { chromium } = playwright();
 
 const argv = process.argv.slice(2);
@@ -57,29 +53,8 @@ if (!base) {
 }
 base = base.replace(/\/$/, '');
 
-// A component page: the atlas draws its states (one srcdoc frame per state, tokens.css, bundle.css and bundle.js injected), then the
-// grid alone becomes the page, two phone-width cells to a row. Moving a frame reloads it; each frame fits its height on load.
-async function gridOnly(page, width) {
-  await page.waitForSelector('.vbody .sgrid .scell iframe', { timeout: 15000 });
-  // the atlas's first load of each frame finishes (its fonts too) before the move, so no font request is cut off mid-flight
-  await page.waitForFunction(() => [...document.querySelectorAll('.vbody .sgrid iframe')].every((f) => f.contentDocument?.readyState === 'complete'), null, { timeout: 15000 });
-  for (const f of page.frames()) await f.evaluate(() => document.fonts.ready.then(() => true)).catch(() => {});
-  await page.evaluate(async (w) => {
-    const grid = document.querySelector('.vbody .sgrid'), frames = [...grid.querySelectorAll('iframe')];
-    const loaded = Promise.all(frames.map((f) => new Promise((r) => { f.addEventListener('load', r, { once: true }); setTimeout(r, 10000); })));
-    document.body.replaceChildren(grid);
-    document.documentElement.setAttribute('style', 'height:auto!important;overflow:visible!important;background:#f2f3ee');
-    document.body.setAttribute('style', 'height:auto!important;overflow:visible!important;margin:0;padding:12px 16px;display:block;width:max-content');
-    Object.assign(grid.style, { gridTemplateColumns: `repeat(${Math.min(2, frames.length)}, ${w}px)`, margin: '0', gap: '20px 16px' });
-    frames.forEach((f) => { f.style.width = w + 'px'; f.style.maxWidth = 'none'; });
-    await loaded;
-  }, width);
-}
-
-// One raster thread: Chromium's parallel raster anti-aliases a curve a hair differently from run to run (a channel off by 1-2 at
-// a chip's rounded corners), so the same commit shot twice differed (FilterChips/tags, 1 run in 4) and blocked changes that
-// never touched it (#173). With one thread, 8 runs of 8 are identical. The base cache is keyed on this file, so it refreshes.
-const browser = await chromium.launch({ args: ['--num-raster-threads=1', '--disable-partial-raster'] });
+// One raster thread (scripts/defaults-proof.mjs LAUNCH): the same commit shoots the same pixels (#173).
+const browser = await chromium.launch(LAUNCH);
 const runs = [];
 const text = {};
 for (const width of widths) {
@@ -121,8 +96,12 @@ for (const width of widths) {
         if (attempt === 3) throw new Error(`an external font failed to load 3 times (${[...fontFailures][0]})`);
       }
       fs.mkdirSync(path.dirname(file), { recursive: true });
-      if (c.component) await page.locator('body').screenshot({ path: file }); // the whole grid: its height is the states'
-      else await page.screenshot({ path: file, clip: { x: 0, y: 0, width, height: 844 } });
+      if (c.component) {
+        await page.locator('body').screenshot({ path: file }); // the whole grid: its height is the states'
+        // the defaults proof (gate.mjs, the fast path): the page's png, and each state's frame, its pixels and its HTML
+        run.sha = pngSha(file);
+        run.states = await specimenPrints(page);
+      } else await page.screenshot({ path: file, clip: { x: 0, y: 0, width, height: 844 } });
       const words = await page.evaluate(() => (document.querySelector('.atlas-phone') || document.body).innerText.replace(/\s+/g, ' ').trim());
       text[`${c.id}|${width}|${lang}`] = words;
       if (lang !== 'en') {

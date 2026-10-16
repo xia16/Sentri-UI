@@ -1,0 +1,11 @@
+/* The defaults proof's base bundle: four tiny components, drawn the way the atlas draws a component page. */
+.x-chip { display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border-radius: 16px; background: #e8ece4; color: #1d2a20; font: 600 14px/1 sans-serif; }
+.x-chip.is-on { background: #1d2a20; color: #fff; }
+.x-badge { display: inline-block; padding: 2px 8px; border-radius: 6px; background: #fbe9d0; color: #6a3d00; font: 600 13px/18px sans-serif; }
+.x-measure { display: flex; justify-content: space-between; align-items: center; height: 56px; padding: 0 16px; border-radius: 12px; background: #fff; font: 600 16px sans-serif; }
+.x-measure-hint { font: 500 13px sans-serif; color: #4a5a4e; font-style: normal; }
+.x-measure[data-input="pad"] .x-measure-hint::after { content: "Pad"; }
+.x-measure[data-input="system"] .x-measure-hint::after { content: "Keyboard"; }
+.x-choice { display: flex; flex-direction: column; gap: 8px; }
+.x-choice-opt { height: 48px; display: flex; align-items: center; padding: 0 16px; border-radius: 12px; background: #fff; font: 500 16px sans-serif; }
+.x-choice-opt.is-on { box-shadow: inset 0 0 0 2px #1d2a20; }

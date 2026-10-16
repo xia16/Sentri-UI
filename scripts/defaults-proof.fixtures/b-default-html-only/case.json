@@ -1,0 +1,1 @@
+{ "expect": "fail", "own": [], "changed": ["Measure"], "why": "a default that changes no pixel (Measure inputmode decimal to numeric) is caught by the serialized HTML" }

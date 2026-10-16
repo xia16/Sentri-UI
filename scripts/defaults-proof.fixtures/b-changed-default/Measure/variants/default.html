@@ -1,0 +1,7 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Measure</title></head><body>
+<section data-state="Default"><div data-measure='{"label":"Weight","value":"1.42","unit":"kg"}'></div></section>
+<section data-state="Empty"><div data-measure='{"label":"Weight","unit":"kg"}'></div></section>
+<section data-state="System keyboard"><div data-measure='{"label":"Litter weight","unit":"kg","input":"system"}'></div></section>
+<script>document.querySelectorAll('[data-measure]').forEach((e) => { e.outerHTML = SentriFix.measure(JSON.parse(e.dataset.measure)); });</script>
+</body></html>

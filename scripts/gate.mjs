@@ -24,7 +24,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { CLASSES, DS_FEATURE, componentPage, componentPagesOf, componentsTouched, idPath, screensOf, pageOf, pageAssets, sharedFiles, coverageLost, effectiveClass, classifyScreens, checkVerdict, touchesSystem, touchesTools, queueAhead as queueOf, budgetProblems, critiqueProblems, pageStyling, addedLines, calibrationProblems, lockState, shotsToTake, reachOf, reachLine, carryDecision, ghNetworkError, newScenarioFailures } from './loop-rules.mjs';
+import { CLASSES, DS_FEATURE, componentPage, componentPagesOf, componentsTouched, idPath, screensOf, pageOf, pageAssets, sharedFiles, coverageLost, effectiveClass, classifyScreens, checkVerdict, touchesSystem, touchesTools, queueAhead as queueOf, budgetProblems, critiqueProblems, pageStyling, addedLines, calibrationProblems, lockState, shotsToTake, reachOf, reachLine, carryDecision, ghNetworkError, newScenarioFailures, fastPathOf, atlasChanges, proveDefaults, shotNeeds, scenariosSkip, TRIPWIRE } from './loop-rules.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -312,9 +312,7 @@ const candScreens = screensOf(JSON.parse(fs.readFileSync(path.join(wt.cand, 'atl
 // The component pages each side's atlas draws: shot like screens, kept out of the shared-file sums above (their page is the atlas).
 const pagesOf = (k) => componentPagesOf(JSON.parse(fs.readFileSync(path.join(wt[k], 'atlas/atlas.json'), 'utf8')));
 const ds = { base: pagesOf('base'), cand: pagesOf('cand') };
-const reach = (() => {
-  if (mech.quick) return { all: false, features: [...new Set([...scope, ...(componentsTouched(files).length ? [DS_FEATURE] : [])])].sort(), why: ['quick: the scope only, and the component pages of a change to a component'] };
-  if (flag('all')) return { all: true, features: [], why: ['--all'] };
+const world = (() => {
   const both = { ...assets };
   for (const p of new Set(candScreens.map((s) => pageOf(s.url)))) {
     const f = path.join(wt.cand, p);
@@ -323,14 +321,23 @@ const reach = (() => {
   }
   const screens = [...baseScreens, ...candScreens];
   const changed = git(['diff', '--name-only', '--no-renames', mech.base, mech.candidate]).out.split(/\r?\n/).filter(Boolean);
-  return reachOf({ files: changed, screens, assets: both, shared: sharedFiles(screens, both), scope });
+  return { files: changed, screens, assets: both, shared: sharedFiles(screens, both) };
 })();
+let reach = (() => {
+  if (mech.quick) return { all: false, features: [...new Set([...scope, ...(componentsTouched(files).length ? [DS_FEATURE] : [])])].sort(), why: ['quick: the scope only, and the component pages of a change to a component'] };
+  if (flag('all')) return { all: true, features: [], why: ['--all'] };
+  return reachOf({ ...world, scope });
+})();
+// What the files alone reach, without the scope: the scenario leaves are skipped when that is no screen and none moved.
+const filesReach = reachOf({ ...world, scope: [] });
+// The fast path (briefs/gate.md): a bundle change that adds an opt-in option, used by the features in this diff. Eligible by its
+// files here; it is taken only when the defaults proof passes on the component pages (below), else the gate runs in full.
+const fp = mech.quick || flag('all') ? { eligible: false, why: [mech.quick ? 'a --quick self-check' : '--all'], features: [], own: [], exempt: [] } : fastPathOf({
+  ...world, scope,
+  atlasDiff: world.files.includes('atlas/atlas.json') ? atlasChanges(...['base', 'cand'].map((k) => JSON.parse(fs.readFileSync(path.join(wt[k], 'atlas/atlas.json'), 'utf8')))) : null,
+});
+mech.fastPath = { eligible: fp.eligible, proof: 'not run', why: fp.why };
 const inReach = (s) => reach.all || reach.features.includes(s.feature);
-mech.reach = { ...reach, screens: new Set([...candScreens, ...ds.cand].filter(inReach).map((s) => s.id)).size };
-console.log(reachLine(reach, mech.reach.screens));
-const byFiles = effectiveClass({ declared, files, diffs: [], scope, shared });
-mech.class = { declared, effective: byFiles.cls, why: byFiles.why };
-if (byFiles.cls !== declared) console.log(`class: ${declared} → ${byFiles.cls} (${byFiles.why.join('; ')})`);
 
 // ---------- 1. mechanical checks on the candidate ----------
 // The atlas rebuild rewrites the candidate's atlas/atlas.json, so it runs before any page loads that file.
@@ -371,9 +378,44 @@ check('no conflict markers', !r.out.trim(), r.out.trim().split('\n').slice(0, 3)
 // the scenario leaves start. A state that already fails on
 // main (e.g. a stress-test label the copy pass hasn't removed yet) is main's debt, reported but not blocking; a problem main
 // doesn't have fails the gate. The committed report goes first, so a run that writes none can't pass on an old one.
-const statesRun = Promise.all(['base', 'cand'].map((k) => {
-  fs.rmSync(path.join(wt[k], 'review/state-check.json'), { force: true });
-  return runAsync(process.execPath, ['scripts/check-states.mjs'], wt[k], path.join(out, `check-states-${k}.log`));
+// Base's report is the same main commit gate after gate, so it is computed once and kept under the git common dir
+// (sentri-gate/states-base/<base>/<key>.json, the key hashing base's check-states.mjs and its fixtures, the Playwright build and
+// the check width), like the base shots. A report with a render failure or a resource that failed to load is not kept: a blip on
+// base must not become main's debt for every later gate. Caches for bases older than main's last 10 commits are removed.
+const pwBuild = () => `playwright ${JSON.parse(fs.readFileSync(path.join(pwPath, 'package.json'), 'utf8')).version} ${(playwright().chromium.executablePath().match(/chromium[^\\/]*/) || ['?'])[0]} ${process.platform}`;
+const statesCache = (() => {
+  const h = createHash('sha256');
+  const add = (label, f) => h.update(`${label}\0`).update(fs.existsSync(f) ? fs.readFileSync(f) : 'missing').update('\0');
+  add('check-states', path.join(wt.base, 'scripts/check-states.mjs'));
+  add('playwright-path', path.join(wt.base, 'scripts/playwright-path.mjs'));
+  const fx = path.join(wt.base, 'scripts/check-states.fixtures');
+  for (const f of (fs.existsSync(fx) ? fs.readdirSync(fx) : []).sort()) add(`fixture ${f}`, path.join(fx, f));
+  h.update(`${pwBuild()} width ${process.env.CHECK_WIDTH || ''}`);
+  const dir = path.join(gateDir(), 'states-base'), keep = new Set(git(['rev-list', '--first-parent', '-n', '10', mech.base]).out.split(/\s+/).filter(Boolean));
+  for (const d of fs.existsSync(dir) ? fs.readdirSync(dir) : []) if (!keep.has(d)) fs.rmSync(path.join(dir, d), { recursive: true, force: true });
+  return path.join(dir, mech.base, `${h.digest('hex').slice(0, 16)}.json`);
+})();
+const statesRun = Promise.all(['base', 'cand'].map(async (k) => {
+  const report = path.join(wt[k], 'review/state-check.json');
+  fs.rmSync(report, { force: true });
+  if (k === 'base' && fs.existsSync(statesCache)) {
+    fs.mkdirSync(path.dirname(report), { recursive: true });
+    fs.copyFileSync(statesCache, report);
+    mech.statesBase = { cache: path.relative(gateDir(), statesCache).replace(/\\/g, '/'), hit: true };
+    console.log(`check-states on base ${short(mech.base)}: from the cache`);
+    return { code: 0, tail: 'base report from the cache' };
+  }
+  const res = await runAsync(process.execPath, ['scripts/check-states.mjs'], wt[k], path.join(out, `check-states-${k}.log`));
+  if (k === 'base') {
+    let list = null;
+    try { list = JSON.parse(fs.readFileSync(report, 'utf8')); } catch {}
+    const blip = Array.isArray(list) && list.some((s) => (s.problems || []).some((p) => /net::ERR_|render failed/.test(String(p.detail))));
+    const keep = Array.isArray(list) && [0, 1].includes(res.code) && !blip;
+    if (keep) { fs.mkdirSync(path.dirname(statesCache), { recursive: true }); const tmp = `${statesCache}.${process.pid}`; fs.copyFileSync(report, tmp); fs.renameSync(tmp, statesCache); }
+    mech.statesBase = { cache: path.relative(gateDir(), statesCache).replace(/\\/g, '/'), hit: false, kept: keep, ...(blip ? { why: 'a render failure or a failed resource: not kept' } : {}) };
+    console.log(`check-states on base ${short(mech.base)}: computed${keep ? ' (kept for the next gate on this base)' : blip ? ' (not kept: a render failure or a failed resource)' : ''}`);
+  }
+  return res;
 }));
 
 // ---------- the screen diff: every screen, base vs candidate, at 390 and 360 in EN and ZH ----------
@@ -405,10 +447,9 @@ const shootGroups = (side, dir, groups) => Promise.all(groups.map((g) => {
   return shoot(side, sub, ['--screens-file', list, '--widths', String(g.width), '--langs', g.langs.join(',')]);
 })).then((parts) => (parts.includes(null) ? null : parts.flat()));
 // The runs each side needs: { screen, width, langs }. A screen in the reach is shot in full; every other screen once at 390 in
-// English, the tripwire (a --quick self-check skips it).
-const TRIP = { width: 390, lang: 'en' };
-// A component page is shot in English only: its Chinese cells are its own states.
-const needsOf = (list) => list.flatMap((s) => (inReach(s) ? WIDTHS.map((width) => ({ screen: s.id, width, langs: componentPage(s.id) ? ['en'] : LANGS })) : mech.quick ? [] : [{ screen: s.id, width: TRIP.width, langs: [TRIP.lang] }]));
+// English, the tripwire (a --quick self-check skips it). A component page is shot in English only: its Chinese cells are its own
+// states (loop-rules.mjs shotNeeds).
+const needsOf = (list) => shotNeeds(list, inReach, { widths: WIDTHS, langs: LANGS, quick: mech.quick });
 
 // ---------- base shots, once per main commit ----------
 // Base is the same main commit gate after gate, so its shots are kept in <git common dir>/sentri-gate/base-shots/<base>/<key>/,
@@ -419,14 +460,13 @@ const baseCache = (() => {
   const h = createHash('sha256');
   const add = (label, f) => h.update(`${label}\0`).update(fs.existsSync(f) ? fs.readFileSync(f) : 'missing').update('\0');
   add('shoot', path.join(root, 'scripts/shoot-screens.mjs'));
+  add('capture', path.join(root, 'scripts/defaults-proof.mjs'));
   add('fonts', path.join(root, 'scripts/font-route.mjs'));
   const vendor = path.join(root, 'vendor/fonts');
   for (const f of (fs.existsSync(vendor) ? fs.readdirSync(vendor, { recursive: true }) : []).map(String).sort()) if (fs.statSync(path.join(vendor, f)).isFile()) add(`vendor/${f}`, path.join(vendor, f));
   add('bare', path.join(wt.base, 'ux/system/atlas-bare.js'));
   add('serve', path.join(wt.base, 'scripts/serve-ux.cjs'));
-  const pw = JSON.parse(fs.readFileSync(path.join(pwPath, 'package.json'), 'utf8')).version;
-  const browser = (playwright().chromium.executablePath().match(/chromium[^\\/]*/) || ['?'])[0];
-  h.update(`playwright ${pw} ${browser} ${process.platform} widths ${WIDTHS} langs ${LANGS}`);
+  h.update(`${pwBuild()} widths ${WIDTHS} langs ${LANGS}`);
   return path.join(gateDir(), 'base-shots', mech.base, h.digest('hex').slice(0, 16));
 })();
 {
@@ -446,16 +486,44 @@ async function shootBase(needs) {
     runs.set(`${x.screen} ${x.lang}-${x.width}`, x);
   }
   if (taken.some((t) => t.ok)) { const tmp = path.join(baseCache, `shots.json.${process.pid}`); fs.writeFileSync(tmp, JSON.stringify({ commit: mech.base, runs: [...runs.values()] })); fs.renameSync(tmp, path.join(baseCache, 'shots.json')); }
-  mech.baseShots = { cache: path.relative(gateDir(), baseCache).replace(/\\/g, '/'), reused: plan.reuse.length, taken: taken.length };
+  const was = mech.baseShots || { reused: 0, taken: 0 }; // the defaults proof shoots first, the screens after: both count
+  mech.baseShots = { cache: path.relative(gateDir(), baseCache).replace(/\\/g, '/'), reused: was.reused + plan.reuse.length, taken: was.taken + taken.length };
   console.log(`base ${short(mech.base)}: ${plan.reuse.length} shot(s) from the cache, ${taken.length} taken`);
   return [...plan.reuse.map((x) => ({ ...x, png: path.join(baseCache, x.file) })), ...taken.map((x) => (x.ok ? { ...x, png: path.join(baseCache, x.file) } : x))];
 }
+
+// ---------- the fast path's defaults proof: every component page on both sides at 390 and 360 in EN ----------
+// A component the change doesn't declare its own draws its pages byte for byte as on base, and every state already on base draws
+// and serializes the same (loop-rules.mjs proveDefaults). Passed, the reach is the fast path's; refused, the gate runs in full.
+// The proof's shots are the component pages' shots for the screen diff too: base's go to the cache, the candidate's are reused.
+let candHave = [];
+mech.timings = {};
+if (fp.eligible) {
+  const t = Date.now();
+  const pages = (list) => list.flatMap((s) => WIDTHS.map((width) => ({ screen: s.id, width, langs: ['en'] })));
+  const [pb, pc] = await Promise.all([shootBase(pages(ds.base)), shootGroups('cand', path.join(out, 'shots/proof'), shotsToTake(pages(ds.cand)).take)]);
+  const proof = pb && pc ? proveDefaults({ base: pb, cand: pc, own: fp.own }) : { ok: false, changed: [], why: ['shoot-screens wrote no shots.json for the component pages'], line: 'the component pages did not shoot', compared: 0 };
+  mech.timings.proof = Math.round((Date.now() - t) / 1000) + 's';
+  mech.fastPath = { eligible: true, proof: proof.ok ? 'pass' : 'fail', why: proof.ok ? fp.why : [proof.line, ...proof.why.slice(0, 8)], own: fp.own, compared: proof.compared, ...(proof.changed.length ? { changed: proof.changed } : {}) };
+  if (proof.ok) reach = { all: false, features: fp.features, why: fp.why };
+  candHave = pc || [];
+  console.log(proof.ok ? `fast path: taken (${proof.line}; own: ${fp.own.join(', ') || 'none'})` : `fast path: refused, ${proof.line}: the gate runs in full`);
+} else console.log(`fast path: no (${fp.why[0]})`);
+mech.reach = { ...reach, screens: new Set([...candScreens, ...ds.cand].filter(inReach).map((s) => s.id)).size };
+console.log(reachLine(reach, mech.reach.screens));
+// On the fast path the bundle doesn't make the change shared: the proof stands in for it, so it doesn't queue. Any other shared
+// file it touches still does.
+const classFiles = mech.fastPath.proof === 'pass' ? files.filter((f) => !fp.exempt.includes(f)) : files;
+const byFiles = effectiveClass({ declared, files: classFiles, diffs: [], scope, shared });
+mech.class = { declared, effective: byFiles.cls, why: byFiles.why };
+if (byFiles.cls !== declared) console.log(`class: ${declared} → ${byFiles.cls} (${byFiles.why.join('; ')})`);
 
 const needs = { base: needsOf([...baseScreens, ...ds.base]), cand: needsOf([...candScreens, ...ds.cand]) };
 const runsOf = (n) => n.reduce((k, x) => k + x.langs.length, 0);
 console.log(`\nshooting ${runsOf(needs.cand)} run(s) on the candidate and ${runsOf(needs.base)} on base (cached base runs reused) at ${WIDTHS.join('/')} × ${LANGS.join('/')} …`);
 const shotsStarted = Date.now();
-const capture = Promise.all([shootBase(needs.base), shootGroups('cand', path.join(out, 'shots/cand'), shotsToTake(needs.cand).take)]);
+const candPlan = shotsToTake(needs.cand, candHave, () => true);
+const capture = Promise.all([shootBase(needs.base), shootGroups('cand', path.join(out, 'shots/cand'), candPlan.take).then((t) => t && [...candPlan.reuse, ...t])]);
 
 // The tests run while the screens are shot (each in its own process; this loop just waits).
 r = run('npm', ['test'], wt.cand);
@@ -466,7 +534,7 @@ r = run('npm', ['run', 'check'], wt.cand);
 check('npm run check', r.code === 0, r.all.find((l) => /atlas:/.test(l)) || r.tail);
 
 const [shotsBase, shotsCand] = await capture;
-mech.timings = { shots: Math.round((Date.now() - shotsStarted) / 1000) + 's' };
+mech.timings.shots = Math.round((Date.now() - shotsStarted) / 1000) + 's';
 if (!shotsBase || !shotsCand) { check('every screen shot on both sides', false, 'shoot-screens wrote no shots.json (its errors are above)'); finish(1); }
 
 const { chromium } = playwright();
@@ -544,7 +612,7 @@ if (zhLost.size) gaps.push(`${zhLost.size} screen(s) rendered Chinese on base an
 // A screen that renders differently twice on base can't be judged by pixels: its pairs still go to the judge, but it doesn't
 // escalate the class or fail a refactor by itself.
 const steady = moved.filter((s) => !mech.flaky.includes(s.id));
-const ec = effectiveClass({ declared, files, diffs: steady, scope, shared });
+const ec = effectiveClass({ declared, files: classFiles, diffs: steady, scope, shared });
 mech.class = { declared, effective: ec.cls, why: ec.why };
 // P2, every change has a known reach: a change declared for its own features that moves another feature's screen fails here
 // instead of being quietly escalated to a shared change (rules ledger L3). A deliberate shared change declares --class shared.
@@ -556,7 +624,7 @@ if (declared !== 'shared' && mode !== 'refactor') {
 // were never shot. It fails whatever the class; a deliberately wide change gates again with --all.
 if (!reach.all && !mech.quick) {
   const missed = moved.filter((s) => !inReach(s) && !mech.flaky.includes(s.id));
-  check(`reach: nothing outside it moved (tripwire, ${TRIP.width} ${TRIP.lang})`, !missed.length, missed.length
+  check(`reach: nothing outside it moved (tripwire, ${TRIPWIRE.width} ${TRIPWIRE.lang})`, !missed.length, missed.length
     ? `${missed.length} screen(s) outside the reach moved (${missed.slice(0, 3).map((s) => s.id).join(', ')}): the change reaches further than its files say; gate again with --all`
     : `${[...candScreens, ...ds.cand].filter((s) => !inReach(s)).length} other screen(s) unchanged`);
 }
@@ -692,7 +760,11 @@ mech.timings.statesWait = Math.round((Date.now() - t0) / 1000) + 's';
 t0 = Date.now();
 const runner = fs.existsSync(path.join(wt.cand, 'scripts/run-scenarios.mjs'));
 const noLeaves = [];
-for (const f of new Set([...scope, ...[...screens.diff, ...screens.new].map((s) => s.feature), ...touched.flatMap((t) => shared[t] || [])].filter((f) => f !== DS_FEATURE))) {
+// Nothing to walk: the files reach no screen (docs, the gate's scripts, tests) and no screen moved (loop-rules.mjs scenariosSkip).
+const skip = scenariosSkip(filesReach, screens);
+if (skip.skip) { console.log(`scenarios: skipped (${skip.why})`); checks.push({ check: 'scenarios', result: 'skipped', detail: skip.why }); mech.scenarios = { skipped: true, why: skip.why }; }
+// On the fast path the leaves still run for every feature that loads the bundle: the defaults proof is pixels and HTML, not behaviour.
+for (const f of skip.skip ? [] : new Set([...scope, ...[...screens.diff, ...screens.new].map((s) => s.feature), ...touched.flatMap((t) => shared[t] || [])].filter((f) => f !== DS_FEATURE))) {
   if (!fs.existsSync(path.join(wt.cand, 'features', f, 'scenarios.json'))) { noLeaves.push(f); continue; }
   if (!runner) { check(`scenarios ${f}`, false, 'scripts/run-scenarios.mjs is not on this candidate'); continue; }
   r = run(process.execPath, ['scripts/run-scenarios.mjs', f, '--base', url.cand], wt.cand);

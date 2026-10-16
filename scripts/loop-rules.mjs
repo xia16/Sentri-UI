@@ -112,8 +112,8 @@ export function coverageLost(base, cand) {
 // The gate's own tools and the workflow's text. A design PR that also changes these grades itself with tools it rewrote;
 // the README rule: change the workflow in its own pull request, never inside a design PR.
 const TOOLS = [
-  /^scripts\/(gate|shoot-screens|loop-rules|polish-loop|check-states|check-legibility|check-headers|run-scenarios|serve-ux|build-atlas)\.(mjs|cjs)$/,
-  /^scripts\/check-(states|legibility|headers)\.fixtures\//,
+  /^scripts\/(gate|shoot-screens|defaults-proof|loop-rules|polish-loop|check-states|check-legibility|check-headers|run-scenarios|serve-ux|build-atlas)\.(mjs|cjs)$/,
+  /^scripts\/(check-(states|legibility|headers)|defaults-proof)\.fixtures\//,
   /^docs\/design-workflow\//,
   /^\.claude\/skills\//,
 ];
@@ -381,7 +381,7 @@ export function calibrationProblems(parts, answers) {
 // Files that decide pixels on every screen besides SYSTEM: the shooter and what it loads, the server, the atlas and its sections,
 // the vendored fonts and the installed packages (Playwright's version is the browser's).
 const RENDERS = [
-  /^scripts\/(shoot-screens|serve-ux|font-route|playwright-path)\.(mjs|cjs)$/,
+  /^scripts\/(shoot-screens|serve-ux|font-route|playwright-path|defaults-proof)\.(mjs|cjs)$/,
   /^(atlas|sections|vendor)\//,
   /^package(-lock)?\.json$/,
 ];
@@ -395,7 +395,7 @@ const NO_PIXEL = [/^docs\//, /^\.github\//, /^tests\//, /^\.claude\//, /^scripts
 export function reachOf({ files, screens = [], assets = {}, shared = {}, scope = [] }) {
   const users = new Map();
   for (const s of screens) { const p = pageOf(s.url); for (const f of [p, ...(assets[p] || [])]) { if (!users.has(f)) users.set(f, new Set()); users.get(f).add(s.feature); } }
-  const features = new Set(scope), notes = new Map();
+  const features = new Set(), notes = new Map();
   let all = false;
   const note = (why, f) => { if (!notes.has(why)) notes.set(why, []); notes.get(why).push(f); };
   for (const f of files) {
@@ -416,14 +416,17 @@ export function reachOf({ files, screens = [], assets = {}, shared = {}, scope =
   const list = (fs) => fs.slice(0, 3).join(', ') + (fs.length > 3 ? ` and ${fs.length - 3} more` : '');
   const why = [...notes].sort(([a], [b]) => (a === 'draws no pixel') - (b === 'draws no pixel')).map(([w, fs]) => `${list(fs)}: ${w}`);
   if (scope.length) why.push(`scope ${scope.join(', ')}`);
-  return { all, features: [...features].sort(), why };
+  // byFiles: what the files alone reach, without the scope (the scenario skip asks whether a change can reach any screen at all).
+  return { all, features: [...new Set([...features, ...scope])].sort(), byFiles: [...features].sort(), why };
 }
 
-// The one line the gate prints, given how many screens the reach covers.
+// The one line the gate prints, given how many screens the reach covers. Files that reach no screen still have the scope's
+// screens shot in full, and the line says both.
 export function reachLine(reach, n) {
   const why = reach.why.length ? ` (${reach.why.join('; ')})` : '';
   if (reach.all) return `reach: all screens${why}`;
   if (!reach.features.length) return `reach: no screen${why}`;
+  if (Array.isArray(reach.byFiles) && !reach.byFiles.length) return `reach: no screen by its files; the scope's ${n} screen(s) in features ${reach.features.join(', ')} are shot in full${why}`;
   return `reach: ${n} screen(s) in features ${reach.features.join(', ')}${why}`;
 }
 
@@ -513,4 +516,146 @@ export function aimdStep(state, { ms, timedOut = false }) {
   if (m > 2.5 * s.baseline) { next.limit = Math.max(s.min, Math.floor(s.limit / 2)); return { state: next, why: next.limit !== s.limit ? `runs slowed to ${(m / s.baseline).toFixed(1)}x` : null }; }
   if (m <= 1.5 * s.baseline && s.limit < s.max) { next.limit = s.limit + 1; return { state: next, why: `runs at ${(m / s.baseline).toFixed(1)}x` }; }
   return { state: next, why: null };
+}
+
+// ---------- lighter gate 2: the fast path for an opt-in design-system change ----------
+// Every page loads the bundle, so a bundle change reaches every screen by its files. An opt-in option (a new prop, a new modifier
+// class) changes nothing unless a page passes it, and any page that starts passing it is in the same diff. So when the change is
+// the bundle plus component docs plus the files of the features that use the new option, the reach is those features in full
+// (and the component pages), and the defaults proof (proveDefaults) shows that no component's existing specimens moved. Every
+// other screen keeps the 390 EN tripwire. Its limit: a feature using an existing option in a combination no specimen shows is
+// covered only by the tripwire. Briefs: docs/design-workflow/briefs/gate.md, "The fast path".
+const BUNDLE = /^ux\/design-system\/components\/bundle\.(js|css)$/;
+const TYPES = /^ux\/design-system\/components\/index\.d\.ts$/;
+// A component's own docs, specimens and registries: the atlas reads them, no screen loads them.
+const COMPONENT_DOC = /^ux\/design-system\/components\/([A-Z][A-Za-z0-9]*)\/(README\.md|variants\.json|variants\/[^/]+\.html|gate\.json|preview\.html|[^/]+\.md)$/;
+// "Its own": a component whose README or specimens this change edits. Its pages may gain specimens; every state already on base
+// must still render the same, pixels and HTML.
+const OWN_DOC = /^ux\/design-system\/components\/([A-Z][A-Za-z0-9]*)\/(README\.md|variants\.json|variants\/[^/]+\.html)$/;
+export const ownComponents = (files) => [...new Set(files.map((f) => (OWN_DOC.exec(f) || [])[1]).filter(Boolean))].sort();
+
+// What changed in the generated atlas/atlas.json, base against candidate: the features and components whose entries differ, and
+// anything else (a section's own fields, a platform's, the copy registry). The stamps (generated, commit) are left out.
+export function atlasChanges(base, cand) {
+  const out = { features: new Set(), components: new Set(), other: new Set() };
+  const J = (x) => JSON.stringify(x ?? null);
+  const byId = (list, k) => new Map((list || []).map((x) => [x[k], x]));
+  const P = byId(base?.platforms, 'id'), Q = byId(cand?.platforms, 'id');
+  for (const id of new Set([...P.keys(), ...Q.keys()])) {
+    const p = P.get(id) || {}, q = Q.get(id) || {};
+    for (const k of new Set([...Object.keys(p), ...Object.keys(q)])) {
+      if (k === 'components') {
+        const a = byId(p.components, 'name'), b = byId(q.components, 'name');
+        for (const n of new Set([...a.keys(), ...b.keys()])) if (J(a.get(n)) !== J(b.get(n))) out.components.add(n);
+      } else if (k === 'sections') {
+        const a = byId(p.sections, 'id'), b = byId(q.sections, 'id');
+        for (const s of new Set([...a.keys(), ...b.keys()])) {
+          const { features: fx, ...rx } = a.get(s) || {}, { features: fy, ...ry } = b.get(s) || {};
+          if (J(rx) !== J(ry)) out.other.add(`section ${s}`);
+          const c = byId(fx, 'id'), d = byId(fy, 'id');
+          for (const f of new Set([...c.keys(), ...d.keys()])) if (J(c.get(f)) !== J(d.get(f))) out.features.add(f);
+        }
+      } else if (J(p[k]) !== J(q[k])) out.other.add(`platform ${id} ${k}`);
+    }
+  }
+  for (const k of new Set([...Object.keys(base || {}), ...Object.keys(cand || {})])) if (!['platforms', 'generated', 'commit'].includes(k) && J(base?.[k]) !== J(cand?.[k])) out.other.add(k);
+  return { features: [...out.features].sort(), components: [...out.components].sort(), other: [...out.other].sort() };
+}
+
+// Is this change eligible for the fast path, from its files alone? { eligible, why, features, own, exempt }. features: the reach
+// (the features whose own files changed, every feature whose pages load a changed page file, the scope, and the component pages);
+// own: ownComponents; exempt: the files that don't make it a shared change (the bundle, the type registry, the generated atlas).
+// Anything else that draws on every screen keeps the full gate: the tokens, the bare-screen harness, any ux/system stylesheet or
+// a stylesheet pages of two or more features load, the shooter, the server, packages, the atlas app and its sections; so does a
+// file nothing places (unsure is all). atlasDiff: atlasChanges of the two sides, when atlas/atlas.json changed.
+export function fastPathOf({ files, screens = [], assets = {}, shared = {}, scope = [], atlasDiff = null }) {
+  const no = (why) => ({ eligible: false, why: [why], features: [], own: [], exempt: [] });
+  if (!files.some((f) => BUNDLE.test(f))) return no('the bundle is not changed: the reach is what the files reach');
+  const users = new Map();
+  for (const s of screens) { const p = pageOf(s.url); for (const f of [p, ...(assets[p] || [])]) { if (!users.has(f)) users.set(f, new Set()); users.get(f).add(s.feature); } }
+  const features = new Set(), touched = new Set(), exempt = [], notes = new Map();
+  const note = (why, f) => { if (!notes.has(why)) notes.set(why, []); notes.get(why).push(f); };
+  for (const f of files) {
+    const u = users.get(f);
+    if (BUNDLE.test(f)) { exempt.push(f); note('the bundle: the defaults proof', f); continue; }
+    if (TYPES.test(f) && !u) { exempt.push(f); note('the type registry', f); continue; }
+    if (f === 'atlas/atlas.json') {
+      if (!atlasDiff) return no('atlas/atlas.json changed and was not compared');
+      exempt.push(f); note('generated from the sources above', f); continue;
+    }
+    const own = f.match(/^features\/([^/]+)\//);
+    if (own) { features.add(own[1]); note(`${own[1]}'s own files`, f); continue; }
+    if (SYSTEM.some((re) => re.test(f)) || RENDERS.some((re) => re.test(f))) return no(`${f} draws on every screen`);
+    if (u) {
+      if (/\.css$/i.test(f) && (u.size > 1 || Object.hasOwn(shared, f))) return no(`${f} is a stylesheet pages of ${u.size} features load`);
+      for (const x of u) features.add(x);
+      note(u.size > 1 ? `loaded by pages of ${[...u].sort().join(', ')}: all their screens in full` : `a page of ${[...u][0]} or what it loads`, f);
+      continue;
+    }
+    const doc = COMPONENT_DOC.exec(f);
+    if (doc) { touched.add(doc[1]); note(`${doc[1]}'s docs and specimens`, f); continue; }
+    if (NO_PIXEL.some((re) => re.test(f))) { note('draws no pixel', f); continue; }
+    return no(`${f}: ${f.startsWith('ux/') ? 'no page loads it by name, and a page may fetch it' : 'not known to draw nothing'}`);
+  }
+  if (atlasDiff) {
+    if (atlasDiff.other.length) return no(`atlas/atlas.json changes beyond features and components: ${atlasDiff.other.slice(0, 3).join(', ')}`);
+    const f = atlasDiff.features.filter((x) => !features.has(x));
+    if (f.length) return no(`atlas/atlas.json changes the screens of ${f.slice(0, 3).join(', ')}, whose files did not change`);
+    const c = atlasDiff.components.filter((x) => !touched.has(x));
+    if (c.length) return no(`atlas/atlas.json changes the component ${c.slice(0, 3).join(', ')}, whose folder did not change`);
+  }
+  const list = (fs) => fs.slice(0, 3).join(', ') + (fs.length > 3 ? ` and ${fs.length - 3} more` : '');
+  const why = [...notes].sort(([a], [b]) => (a === 'draws no pixel') - (b === 'draws no pixel')).map(([w, fs]) => `${list(fs)}: ${w}`);
+  if (scope.length) why.push(`scope ${scope.join(', ')}`);
+  why.push('every component page; every other screen: the tripwire');
+  return { eligible: true, why, features: [...new Set([...features, ...scope, DS_FEATURE])].sort(), own: ownComponents(files), exempt };
+}
+
+// The defaults proof. base, cand: the component pages' runs (shoot-screens: ds:<Name>/<variant> at a width, EN), each with sha (the
+// page's png) and states [{ name, png, html }] (each state's frame: its pixels and its serialized body). A component the change
+// doesn't declare its own must draw its pages byte for byte as on base; every state already on base, own component or not, must
+// draw the same and serialize the same (the HTML catches a default that changes no pixel: an attribute, a label, a role). An own
+// component's pages may gain states and variants. Anything else refuses the fast path: "default behaviour of <Component> changed".
+export function proveDefaults({ base = [], cand = [], own = [] }) {
+  const runs = (list) => new Map(list.filter((r) => componentPage(r.screen)).map((r) => [`${r.screen} ${r.width}`, r]));
+  const B = runs(base), C = runs(cand), changed = new Set(), why = [];
+  const fail = (c, what) => { changed.add(c); why.push(`${c}: ${what}`); };
+  const keyed = (states) => { const n = {}; return new Map((states || []).map((s) => { n[s.name] = (n[s.name] || 0) + 1; return [`${s.name}#${n[s.name]}`, s]; })); };
+  let compared = 0;
+  for (const [k, b] of B) {
+    const { component } = componentPage(b.screen), mine = own.includes(component), c = C.get(k), at = `${b.screen} at ${b.width}`;
+    if (!b.ok) { if (c?.ok && !mine) fail(component, `${at} renders on the candidate only`); continue; }
+    if (!c?.ok) { fail(component, `${at} does not render on the candidate${c?.error ? ` (${c.error})` : ''}`); continue; }
+    if (!b.sha || !c.sha || !Array.isArray(b.states) || !Array.isArray(c.states)) { fail(component, `${at} has no specimen print to compare`); continue; }
+    compared++;
+    if (!mine && b.sha !== c.sha) fail(component, `${at}: the page draws differently`);
+    const cs = keyed(c.states);
+    for (const [sk, s] of keyed(b.states)) {
+      const t = cs.get(sk);
+      if (!t) fail(component, `${at}: state "${s.name}" is gone`);
+      else if (!s.png || !s.html || !t.png || !t.html) fail(component, `${at}: state "${s.name}" has no print on ${!s.png || !s.html ? 'base' : 'the candidate'}`);
+      else if (t.png !== s.png) fail(component, `${at}: state "${s.name}" draws differently`);
+      else if (t.html !== s.html) fail(component, `${at}: state "${s.name}" has different HTML`);
+    }
+  }
+  for (const [k, c] of C) if (!B.has(k)) { const { component } = componentPage(c.screen); if (!own.includes(component)) fail(component, `${c.screen} at ${c.width} is new, and the change doesn't declare ${component} its own`); }
+  const ok = compared > 0 && !changed.size;
+  if (!compared && !changed.size) why.push('no component page was compared');
+  return { ok, changed: [...changed].sort(), why, compared, line: ok ? `defaults proof passed on ${compared} component page run(s)` : changed.size ? `default behaviour of ${[...changed].sort().join(', ')} changed` : 'no component page was compared' };
+}
+
+// The runs each side shoots: a screen in the reach in full (every width; every language, a component page in English only), every
+// other screen once as the tripwire (390 EN); a --quick self-check skips the tripwire. inReach(screen) -> bool.
+export const TRIPWIRE = { width: 390, lang: 'en' };
+export function shotNeeds(list, inReach, { widths = [390, 360], langs = ['en', 'zh'], quick = false } = {}) {
+  return list.flatMap((s) => (inReach(s) ? widths.map((width) => ({ screen: s.id, width, langs: componentPage(s.id) ? ['en'] : langs })) : quick ? [] : [{ screen: s.id, width: TRIPWIRE.width, langs: [TRIPWIRE.lang] }]));
+}
+
+// The scenario leaves can't matter when the change's files reach no screen (docs, the gate's own scripts, tests: reachOf without
+// the scope) and no screen moved: they are skipped. A moved or broken screen, or a file that may draw, runs them as always.
+export function scenariosSkip(filesReach, screens) {
+  const moved = ['diff', 'new', 'gone', 'broken'].reduce((n, k) => n + (screens?.[k]?.length || 0), 0);
+  if (filesReach.all || filesReach.byFiles.length) return { skip: false, why: 'the change can reach screens' };
+  if (moved) return { skip: false, why: `${moved} screen(s) moved` };
+  return { skip: true, why: 'no screen in reach and none moved' };
 }

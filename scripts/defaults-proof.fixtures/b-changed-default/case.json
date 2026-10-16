@@ -1,0 +1,1 @@
+{ "expect": "fail", "own": ["Measure"], "changed": ["Measure"], "why": "an option's default changes (Measure input: pad to system); the existing Default state moves even though Measure is the change's own" }

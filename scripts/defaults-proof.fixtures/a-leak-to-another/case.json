@@ -1,0 +1,1 @@
+{ "expect": "fail", "own": ["Chip"], "changed": ["Badge"], "why": "a CSS rule added for one component (Chip key face) leaks to another component's specimen (Badge)" }
