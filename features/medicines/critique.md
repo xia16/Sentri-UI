@@ -229,3 +229,9 @@ The owner approved the treatment's optional face (an ordinary labelled field wit
 - **minor** · The adjust caption read as a footnote: now one navigate **Row** (title "2 pigs · 2.5 mL each" / "2 pigs · 1 adjusted", trailing word "Adjust" with the rail's ›; the row law's "word + › when the tap acts"); the whole row opens Dose per pig. It keeps Row's one height (`row-min`), not 48px: the row law gives every row one height.
 - **major** · "Remove" under every pig doubled each row: now **Remove pigs**, a text action above the list, switches it into remove mode (the platform list's edit mode: a remove control per row, IconButton plain ×, in the dose box's place; Done to leave). Touch states only.
 - **minor** · The batch screens showed 2 pigs and Dose per pig 8: every batch screen now uses the same 2 pigs.
+
+#### Final look (`c1c689b`, the screens of the pushed head after merging `origin/main`; rendered at 390 and 360, EN and ZH)
+- 28 screens: every `medicines.*` screen and the moved and added `health-record` screens (treatment, treatment-batch and its dosage and adjusted states, Dose per pig default, adjusted, remove and search, the note, the brand list, add and details, the medicine picker alias).
+- Header check 0 and spacing 0 on all 28; strict legibility passes on them; check-states 6 failing, the same 6 as main; `npm test` 727 pass; `npm run check` passes. Measured on `c1c689b`.
+- Known: a trigger the atlas returns focus to shows the browser's focus ring (a finger draws none); Record treatment's own labels (Method) stay English in ZH, as on main.
+- **Better because** a treatment is one pick of the medicine, every optional input reads the same way, the withdrawal date sits under the field it comes from, a batch shows one dosage with one way to adjust, and the farm's list is fixed in one place.
