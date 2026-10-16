@@ -43,10 +43,21 @@ test("cascade-multi: ticks remain in the leaf catalogue; checkbox changes never 
   assert.doesNotMatch(html, /<details|type="checkbox"[^>]*data-action/);
   assert.doesNotMatch(html, /picker-step|st-picker-steps/);
   assert.match(html, /Weakness/);
-  const head = UI.pickerHead({ items: tree, path: ["symptom", "general"], title: "Select conditions", rootLabel: "Conditions" });
-  assert.equal(head.up.action, "picker-step");
-  assert.equal(head.up.value, "1");
-  assert.equal(UI.pickerHead({ items: tree, path: [], title: "Select conditions" }).up, null);
+  // Owner ruling B (2026-10-16): the footer Back goes up one level (leaves at the root), a ✕ closes the whole drawer, no "‹ Parent".
+  const head = UI.pickerHead({ items: tree, path: ["symptom", "general"], title: "Select conditions" });
+  assert.equal(head.up, undefined);
+  assert.deepEqual(head.levelBack, { action: "picker-step", value: "1" });
+  assert.equal(head.cross.action, "dismiss");
+  const root = UI.pickerHead({ items: tree, path: [], title: "Select conditions" });
+  assert.equal(root.title, "Select conditions");
+  assert.deepEqual(root.levelBack, { action: "back" });
+  assert.equal(root.cross.action, "dismiss", "the ✕ is at every level");
+  const foot = UI.pickerFooter({ multi: true, selected: [], back: head.levelBack });
+  assert.match(foot, /data-action="picker-step" data-value="1"[^>]*>[^]*>Back</);
+  assert.match(UI.pickerFooter({ back: root.levelBack }), /data-action="back"/);
+  const drawer = UI.sheet({ ...head, body: "", footer: foot });
+  assert.match(drawer.match(/<header[^]*<\/header>/)[0], /class="st-sheet-corner" data-corner="start"[^>]*data-action="dismiss"[^>]*aria-label="Close"/);
+  assert.doesNotMatch(drawer, /sheet-up/);
 });
 test("search spans the whole tree at every level; a result's meta is its group, then its own meta", () => {
   const html = UI.pickerBody({

@@ -179,3 +179,49 @@ Held against the Farrowing room (its dock: one dark primary, Back outlined) and 
 - Reach: 50 screens move, all of them rendering a disabled or waiting control: environment (page, sensor-week, sensor-other), farrowing 14 (before, death, leave-edit, edit, born, task-blocked, edit-finished, foster, reconcile, pen-note, pen-fault, piglet-care, piglet-identity, piglet-death), piglet-processing 13 (sheet-coming, sheet-todo, sheet-breeders, sheet-late, sheet-done, sheet-notch, adjust-count, give-ids, counts, weight, record-death, move-piglets, set-count), pregnancy.check, feed-plan (editor, end-date), pig-list.health, pig-profile 7 (production-task, miscarriage, batch-membership, measure, body-condition, note, not-in-pig), health-record 5 (record-health, condition-picker, care-instructions, resolve-conditions, treatment), fostering (type, receive, result), move.transfer-sow. 4 more differ in one shot only by under 0.04% (assistant.finding and farrowing.search-results, which the gate marks unstable on base; farrowing.search-none, piglet-processing.more-actions): identical by eye, render noise. 237 identical; none broken.
 - Every moved screen: only the waiting footer button (dashed rim), a floor key (dashed, `ink-2` glyph), a disabled picker (Move's Destination pen: solid rim to dashed) or the Environment fan controls changed; layout, copy and the 360 Chinese footers are unchanged.
 - **Better because** unavailable is now said by the face and the rim, never by faded words, and no waiting control looks live.
+
+# Drawers with levels: footer Back goes up, ✕ closes (owner ruling B, 2026-10-16)
+
+Scope: the head and footer of the two catalogue pickers (`health-record.condition-picker`, `health-record.medicine-picker`) and the same drawers in Inspection's bulk records (the condition picker's custom-category step, Link condition's catalogue, Brand → Add a brand). Ruling: the owner's lettered board, option B (`ux/design-system/evidence/2026-10-16-drawer-levels.png`); it replaces the 2026-10-10 Sheet rule ("‹ Parent in the header, no ✕ on any sheet"). Baselines: `origin/main` at `1634cfd`, `node scripts/shoot-screens.mjs` at 390 EN.
+
+### Keep
+
+- The title names the level the worker is on (`Antibiotics`, `General appearance`), centred, the heaviest thing in the head: kept, now alone on its line.
+- Clear at the top right (Brand, only while a brand is set): unchanged.
+- The footer: Back on the left, Done · N on the right in the multi picker; its word stays "Back" (`act.back`).
+- Back at the first level leaves and keeps the ticks as a draft (Done applies them): unchanged.
+- No breadcrumb, search pinned at the top, one drawer height across levels: unchanged.
+
+### Problems
+
+- **major** · Two controls go "back" and they go to different places: "‹ Symptoms" in the head goes up a level, Back in the footer leaves the whole picker. A worker who taps Back at `General appearance` expecting to go up loses the level (owner's standing rule: Back goes up a level; ruling B, 2026-10-16).
+- **major** · There is no single way to close the whole picker from a deep level other than Back, which on a level reads as "up" (ruling B).
+- **minor** · "‹ Parent" adds a second line of text above the title, so the head of a level is taller than the head of the root and the title moves down when you drill in (board A against B).
+
+### Parts
+
+| Part | Drawn by today | The component whose job it is | Keep / fix / cut |
+|---|---|---|---|
+| "‹ Parent" in the head | Sheet `up` (`sheet-up`), fed by `pickerHead().up` or page-built `up` objects in `ux/system/inspection-astra-concept.js` `sheet()` | none (retired by ruling B) | **cut** |
+| ✕ at the top left | — | Sheet `cross` (ruling C's start corner) | **fix** (add, every level of a drawer with levels) |
+| Footer Back | PickerField `pickerFooter` / Sheet `sheetFooter` back, action `back` at every level | the same, given the level's Back by `pickerHead().levelBack` | **fix** (up one level below the root) |
+| Title | Sheet title from `pickerHead().title` | the same | keep |
+| Clear (Brand) | Sheet `corner` | the same | keep |
+
+### Self-crit
+
+The ruling fixes the design (board option B): no competing directions. Each screen is held against its baseline and the Farrowing room.
+
+#### Round 1 (renders at 390 and 360, EN and ZH, beside `1634cfd`; the deeper levels shot by a scripted walk at 390)
+- Problem 1 (two "backs" going to different places) fixed: below the root the footer Back carries the step action (`condition-step` / `medicine-step` with the path length to keep) and goes up one level; at Conditions / Medicines it is the leave action again. Walked in a browser: drill to General appearance, tick one, Back → Symptoms → Conditions → the form; reopen: the tick is still a draft.
+- Problem 2 fixed: the ✕ at the top left (ruling C's slot, a 48px target centred on the title) closes the whole picker from the root and from General appearance / Antibiotics; the draft is kept as with Back; it is there at every level, so it never moves.
+- Problem 3 fixed: the head of a level is one line, the same height as the root's; the title no longer drops when you drill in (board B).
+- Keep: the title is still the heaviest thing in the head; Clear (Brand), the footer pair, search and the held height are untouched.
+- Squint: the title, then the first rows, then Back / Done. The ✕ is a thin glyph, quieter than the title.
+- Cluttered, flat or bulky: at the root one glyph is added (the ✕) and nothing else; at a level one line of text ("‹ Symptoms") goes. Held against the Farrowing room: a quiet head, the work in the body.
+- **Better because** Back now means one thing (up a level, the owner's standing rule) and there is one visible way out from any depth, with a head that stays still between levels.
+
+#### Final look (the pushed head of ds/drawer-levels-back-close, the commit that adds this block; its screens are 0de8652's, which the quick gate rendered at 390 and 360 in EN and ZH against base 1634cfd)
+- Changed: `health-record.condition-picker`, `health-record.medicine-picker` (the ✕ at the top left of the root; nothing else moves) and the component pages ChoiceList/multi, Header/sheet, PickerField/cascade, PickerField/cascade-multi, Sheet/drawer. Every other screen in scope is the same.
+- Headers, spacing and legibility on the changed screens: no new problem; check-states: no new problem.
+- **Better because** Back means up a level and the ✕ is the one way out from any depth; the head no longer changes height between levels.

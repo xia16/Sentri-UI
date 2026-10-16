@@ -697,7 +697,7 @@ const medicineCatalogue=[
 ];
 function medicineTree(c){return [...new Set(medicineCatalogue.filter(m=>c.form.taskId!=='vaccination'||m.category==='Vaccines').map(m=>m.category))].map(category=>({value:category,label:category,children:medicineCatalogue.filter(m=>m.category===category).map(m=>({value:m.id,label:m.name,meta:m.detail.replace(' · Sample product','')}))}));}
 function medicineResults(c){return SentriUI.pickerBody({variant:'cascade',items:medicineTree(c),path:c.form.medicineCategory?[c.form.medicineCategory]:[],selected:[c.form.medicineId],query:c.form.medicineSearch||'',action:'medicine-select',stepAction:'medicine-step',searchAttrs:{'data-medicine-search':''}});}
-function medicinePicker(c){return sheet(c,c.form.taskId==='vaccination'?'Vaccines':'Medicines','','<div class="medicine-results">'+medicineResults(c)+'</div>',SentriUI.pickerFooter({multi:false})).replace('class="sheet"','class="sheet picker-step medicine-picker-step"');}
+function medicinePicker(c){const title=c.form.taskId==='vaccination'?'Vaccines':'Medicines';return sheet(c,title,'','<div class="medicine-results">'+medicineResults(c)+'</div>',SentriUI.pickerFooter({multi:false,back:levels(c,title).levelBack})).replace('class="sheet"','class="sheet picker-step medicine-picker-step"');}
 function optionalFieldControls(items,openAction){return '<div class="st-optional-list">'+items.map(({key,label,value})=>stOptionalRow({label:label.replace(/^Add /,'').replace(/^./,m=>m.toUpperCase()),value,icon:icon('plus'),editIcon:icon('edit'),action:openAction,key})).join('')+'</div>';}
 function optNote(label,field,value){return stOptionalRow({label,value,icon:icon('plus'),editIcon:icon('edit'),inline:field});}
 function optionalSelect(c,label,key,items,value,target='form'){pickerEntry(c,key,{items,label,target,value});const hit=value===''||value==null?'':(items.find(([v])=>v===value)||[])[1]??'';return stOptionalRow({label,value:hit,icon:icon('plus'),editIcon:icon('edit'),action:'open-picker',key,attrs:{'data-picker-key':key}});}
@@ -731,15 +731,15 @@ function recordOptionalEditor(c){
  if(key==='brand'&&!f.creatingBrand){const choices=availableBrands(c);
   /* Drawer convention: Clear in the head (only when a brand is set), the brands plus one "Add a brand" row, footer Back + Done. */
   const rows=choices.map(name=>SentriUI.choiceRow({label:name,mode:'single',action:'record-brand-select',value:name,selected:f.optionalDraft===name})).concat(SentriUI.choiceRow({label:'Add a brand',mode:'navigate',action:'record-brand-add'}));
-  return sheet(c,'Brand','',SentriUI.choiceGroup(rows),footer(back(),''),'',null,f.brand?corner('record-optional-remove'):null).replace('class="sheet"','class="sheet picker-step option-picker-step brand-picker-step"');}
+  return sheet(c,'Brand','',SentriUI.choiceGroup(rows),footer(levelBack(c,'Brand'),''),'',null,f.brand?corner('record-optional-remove'):null).replace('class="sheet"','class="sheet picker-step option-picker-step brand-picker-step"');}
  if(key==='target'){
   const root=!f.search&&!f.catalogGroup&&!f.catalogSection;
-  return sheet(c,'Link condition','',(root||f.search?SentriUI.choiceSearch({label:'Search conditions',placeholder:'Search diseases and symptoms',value:f.search||'',attrs:{'data-v2':'search'}}):'')+'<div class="health-catalog st-choice-body">'+linkConditionResults(c)+'</div>',footer(back(),'')).replace('class="sheet"','class="sheet picker-step health-picker-step condition-link-picker-step"');
+  return sheet(c,'Link condition','',(root||f.search?SentriUI.choiceSearch({label:'Search conditions',placeholder:'Search diseases and symptoms',value:f.search||'',attrs:{'data-v2':'search'}}):'')+'<div class="health-catalog st-choice-body">'+linkConditionResults(c)+'</div>',footer(levelBack(c,'Link condition'),'')).replace('class="sheet"','class="sheet picker-step health-picker-step condition-link-picker-step"');
  }
  const brand=key==='brand',title=brand?'Add a brand':'Note';
  const control=brand?'<input maxlength="80" data-record-optional-input autofocus value="'+esc(value)+'">':'<textarea aria-label="Note" rows="5" data-record-optional-input>'+esc(value)+'</textarea>';
  const field=brand?SentriUI.field({label:'Brand name',control,error:f.showRequired&&!value.trim()?'Required':''}):SentriUI.field({label:'Note',labelHidden:true,control});
- return sheet(c,title,'',field,footer(back(),button('record-optional-save',brand?'Add brand':'Done','button primary','',brand?!value.trim():!optionalEditorChanged(c)))).replace('class="sheet"','class="sheet feed-optional-sheet"');
+ return sheet(c,title,'',field,footer(levelBack(c,title),button('record-optional-save',brand?'Add brand':'Done','button primary','',brand?!value.trim():!optionalEditorChanged(c)))).replace('class="sheet"','class="sheet feed-optional-sheet"');
 }
 
 function conditionMeta(c,n){const recorded=c.form.subjects.filter(id=>cases(pig(c,id)).some(k=>k.name===n.name)).length;return [n.custom?'Custom':'',recorded?'Already on '+countLabel(recorded):''].filter(Boolean).join(' · ');}
@@ -748,13 +748,12 @@ function bulkHealthBody(c){if(c.form.customDraft)return customCategoryPicker(c);
 /* Back (and the scrim) close the condition picker without applying: the trigger keeps what was applied, and the ticks
    stay as a draft that the next open shows again. Done · n applies them. */
 function leaveConditionPicker(c){const f=c.form,applied=f.conditionsBeforePicker||[],draft=f.conditions||[];if(draft.length!==applied.length||draft.some(n=>!applied.includes(n)))f.conditionsDraft=[...draft];else delete f.conditionsDraft;f.conditions=[...applied];delete f.conditionsBeforePicker;delete f.customDraft;c.view='health';}
-/* Results span every level, so while a search is open the head names the root and the "‹ Parent" steps out of the way. */
+/* Results span every level, so while a search is open the head names the root. */
 function searchHeader(sheet,searching,rootTitle){
- const title=sheet?.querySelector('.sheet-title'),up=sheet?.querySelector('.sheet-up');
+ const title=sheet?.querySelector('.sheet-title');
  if(title){if(searching){if(title.dataset.level===undefined)title.dataset.level=title.textContent;title.textContent=rootTitle;}else if(title.dataset.level!==undefined){title.textContent=title.dataset.level;delete title.dataset.level;}}
- if(up)up.style.visibility=searching?'hidden':'';
 }
-function bulkHealthPicker(c){return sheet(c,'Conditions','','<div class="health-catalog">'+bulkHealthBody(c)+'</div>',SentriUI.pickerFooter({selected:c.form.conditions,multi:true,waiting:!c.form.conditions.length&&!(c.form.conditionsBeforePicker||[]).length,doneAction:'bulk-health-done'})).replace('class="sheet"','class="sheet picker-step health-picker-step"');}
+function bulkHealthPicker(c){return sheet(c,'Conditions','','<div class="health-catalog">'+bulkHealthBody(c)+'</div>',SentriUI.pickerFooter({selected:c.form.conditions,multi:true,waiting:!c.form.conditions.length&&!(c.form.conditionsBeforePicker||[]).length,doneAction:'bulk-health-done',back:levels(c,'Conditions').levelBack})).replace('class="sheet"','class="sheet picker-step health-picker-step"');}
 function installBulkInputs(){
  gallery.addEventListener('input',e=>{const el=e.target,root=el.closest('[data-card]');if(!root)return;const c=states[+root.dataset.card];if(el.hasAttribute('data-medicine-search')){e.stopImmediatePropagation();c.form.medicineSearch=el.value;root.querySelector('.medicine-results').innerHTML=medicineResults(c);searchHeader(root.querySelector('.sheet'),!!el.value.trim(),c.form.taskId==='vaccination'?'Vaccines':'Medicines');const input=root.querySelector('[data-medicine-search]');input.focus();input.setSelectionRange(el.value.length,el.value.length);}else if(el.hasAttribute('data-record-optional-input')){e.stopImmediatePropagation();c.form.optionalDraft=el.value;setCommitWaiting(root.querySelector('[data-action=\"record-optional-save\"]'),!optionalEditorChanged(c)||(c.view==='record-optional'&&c.form.optionalKey==='brand'&&!c.form.optionalDraft.trim()));}},true);
  gallery.addEventListener('change',e=>{if(!e.target.hasAttribute('data-record-optional-input'))return;e.stopImmediatePropagation();const root=e.target.closest('[data-card]');const c=states[+root.dataset.card];c.form.optionalDraft=e.target.value;setCommitWaiting(root.querySelector('[data-action=\"record-optional-save\"]'),!optionalEditorChanged(c)||(c.view==='record-optional'&&c.form.optionalKey==='brand'&&!c.form.optionalDraft.trim()));},true);
@@ -1466,21 +1465,32 @@ function drawerSize(view,c){
    reached from the walk list, the pen sheet or the pig's page, each one Back away, so none carries a header line: `scope` (the
    old subtitle: counts, pens, the unit) is no longer drawn. A page takes the page header, Back at its top left, and its footer
    drops Back; a footer left with nothing is removed. */
+/* A drawer with levels (owner ruling B, 2026-10-16): { title, cross, levelBack, rows? } for the surface, or null. The title names
+   the level; `cross` (the ✕ top left) closes the whole drawer from any level and keeps the draft, as Back at the first level
+   does ('dismiss' is handled as leaving by each of these views); `levelBack` is the footer Back: up one level, or leave at the
+   first. The catalogue pickers take it from SentriUI.pickerHead; the condition link and Brand are levels built here. */
+function levels(c,title){
+ const f=c.form||{},cross={action:'dismiss',label:{text:'Close',str:'act.close'}};
+ if(c.view==='bulk-health-picker'&&f.customDraft){const h=SentriUI.pickerHead({items:conditionTree(c),path:[],title});return {...h,title:'Choose a category',levelBack:{action:'health-catalog-back'}};}
+ if(c.view==='bulk-health-picker')return SentriUI.pickerHead({items:conditionTree(c),path:f.conditionPath||[],title,stepAction:'condition-step'});
+ if(c.view==='medicine-picker')return SentriUI.pickerHead({items:medicineTree(c),path:f.medicineCategory?[f.medicineCategory]:[],title,stepAction:'medicine-step'});
+ if(c.view==='record-optional'&&f.optionalKey==='target')return f.catalogGroup||f.catalogSection?{title:f.catalogSection==='Body system'?'Body system':f.catalogGroup||f.catalogSection,cross,levelBack:{action:'health-catalog-back'}}:{title,cross,levelBack:{action:'back'}};
+ if(c.view==='record-optional'&&f.optionalKey==='brand')return {title,cross,levelBack:{action:f.creatingBrand?'record-brand-list':'back'}};
+ return null;
+}
+function levelBack(c,title){const lv=levels(c,title);return lv?SentriUI.backButton(lv.levelBack):back();}
 function sheet(c,title,scope,body,actions,surface='',line=null,corner=null){
- /* Drawers with levels carry "‹ Parent" in the header (Sheet up); the title names the level. No breadcrumb, no ✕. */
- let up=null,holdRows=0;
- if(c.view==='bulk-health-picker'&&c.form.customDraft){const h=SentriUI.pickerHead({items:conditionTree(c),path:[],title});title='Choose a category';up={label:'Conditions',action:'health-catalog-back'};holdRows=h.rows;}
- else if(c.view==='bulk-health-picker'){const h=SentriUI.pickerHead({items:conditionTree(c),path:c.form.conditionPath||[],title,stepAction:'condition-step'});title=h.title;up=h.up;holdRows=h.rows;}
- else if(c.view==='medicine-picker'){const h=SentriUI.pickerHead({items:medicineTree(c),path:c.form.medicineCategory?[c.form.medicineCategory]:[],title,stepAction:'medicine-step'});title=h.title;up=h.up;holdRows=h.rows;}
- else if(c.view==='record-optional'&&c.form.optionalKey==='target'&&(c.form.catalogGroup||c.form.catalogSection)){title=c.form.catalogSection==='Body system'?'Body system':c.form.catalogGroup||c.form.catalogSection;up={label:c.form.kind==='Symptom'?'Symptoms':'Diseases',action:'health-catalog-back'};}
- else if(c.view==='record-optional'&&c.form.optionalKey==='brand'&&c.form.creatingBrand){up={label:'Brand',action:'record-brand-list'};}
+ /* Drawers with levels (owner ruling B, 2026-10-16; levels()): the title names the level, the ✕ at the top left closes the whole
+    drawer, the footer's Back goes up one level. No "‹ Parent", no breadcrumb. */
+ const lv=levels(c,title);let cross=null,holdRows=0;
+ if(lv){title=lv.title;cross=lv.cross;holdRows=lv.rows||0;}
  const picker=['bulk-health-picker','medicine-picker','picker','record-optional'].includes(c.view),page=AstraSurfaces.isPage('inspection',c.view,c);
  const wantBack=!(c.view==='record-optional'&&['brand','target'].includes(c.form.optionalKey)&&!c.form.creatingBrand);
  const nav=(c.view==='actions'&&c.actionScope!=='pens'?actionCategoryNav(c):'')+(actions||'');
  const above=(c.view==='actions'&&c.selectedPens.size?'<div class="actions-subjects">'+scopeTabs(c)+'</div>':'')+(c.view==='pig-log'?logFilterBar(c,pigLogEntries(c),'pig'):c.view==='pen-log'?logFilterBar(c,penLogEntries(c,c.penId),'pen'):'');
  let foot=nav||(wantBack&&!page?SentriUI.sheetFooter({back:{action:'back'}}):false);
  if(page&&foot){foot=foot.replace(back(),'');if(!/<button/.test(foot))foot=false;}
- return SentriUI.sheet({variant:page?'page':'drawer',surface,title,line,corner,back:{action:'back'},up,above,body,footer:foot,className:c.view==='actions'?'actions-sheet':'',size:drawerSize(c.view,c),sizing:['search','scan','grid'].includes(c.view)||c.view==='record-optional'&&c.form.optionalKey==='target'?'full':holdRows?'hold':'content',holdRows,label:title,scrim:{action:'dismiss',label:'Dismiss '+title},bar:page?status():''});
+ return SentriUI.sheet({variant:page?'page':'drawer',surface,title,line,corner,cross,back:{action:'back'},above,body,footer:foot,className:c.view==='actions'?'actions-sheet':'',size:drawerSize(c.view,c),sizing:['search','scan','grid'].includes(c.view)||c.view==='record-optional'&&c.form.optionalKey==='target'?'full':holdRows?'hold':'content',holdRows,label:title,scrim:{action:'dismiss',label:'Dismiss '+title},bar:page?status():''});
 }
 function back(){return SentriUI.backButton({action:'back'});}
 /* Header lines (features/pig-profile/budget.md ## Headers): a surface that writes to or is about one pig shows that pig on screen
