@@ -9,11 +9,27 @@ import { parse } from './vendor/acorn.mjs';
 
 const ROOTISH = new Set(['root', 'globalThis', 'window', 'self', 'api', 'module', 'exports']);
 
+// The methods that change the object they are called on.
+const MUTATORS = new Set(['push', 'pop', 'shift', 'unshift', 'splice', 'sort', 'reverse', 'fill', 'copyWithin', 'set', 'add', 'delete', 'clear']);
+// The identifier a member chain starts from (`a.b[c].d` → a), or null.
+const rootName = (n) => { while (n && n.type === 'MemberExpression') n = n.object; return n && n.type === 'Identifier' ? n.name : null; };
+
 // Every Identifier a node reads, over-approximated: property names of `a.b` and object keys are left out (they are names, not
 // references); a shorthand `{a}` is a reference. Shadowing is ignored, so an edge may be extra, never missing.
-function references(node, out = new Set(), dyn = []) {
+// writes: the names it may change: the root of an assignment, ++/--, delete, a mutating method's object, Object.assign's target.
+// passed: the bare names it hands to a call (the callee may change them).
+function references(node, out = new Set(), dyn = [], writes = new Set(), passed = new Set()) {
   (function walk(n, parent, key) {
     if (!n || typeof n.type !== 'string') return;
+    if (n.type === 'AssignmentExpression') { const r = rootName(n.left); if (r) writes.add(r); }
+    if (n.type === 'UpdateExpression') { const r = rootName(n.argument); if (r) writes.add(r); }
+    if (n.type === 'UnaryExpression' && n.operator === 'delete') { const r = rootName(n.argument); if (r) writes.add(r); }
+    if (n.type === 'CallExpression' || n.type === 'NewExpression') {
+      const c = n.callee;
+      if (c.type === 'MemberExpression' && !c.computed && MUTATORS.has(c.property.name)) { const r = rootName(c.object); if (r) writes.add(r); }
+      if (c.type === 'MemberExpression' && !c.computed && /^(Object|Reflect)$/.test(c.object.name || '') && /^(assign|defineProperty|defineProperties|set|setPrototypeOf|deleteProperty)$/.test(c.property.name)) { const r = rootName(n.arguments[0]); if (r) writes.add(r); }
+      for (const a of n.arguments) if (a.type === 'Identifier') passed.add(a.name); else if (a.type === 'SpreadElement' && a.argument.type === 'Identifier') passed.add(a.argument.name);
+    }
     if (n.type === 'Identifier') {
       const isProp = (parent?.type === 'MemberExpression' && key === 'property' && !parent.computed)
         || (parent?.type === 'Property' && key === 'key' && !parent.computed && !parent.shorthand)
@@ -37,7 +53,7 @@ function references(node, out = new Set(), dyn = []) {
       if (Array.isArray(v)) v.forEach((c) => walk(c, n, k)); else if (v && typeof v.type === 'string') walk(v, n, k);
     }
   })(node, null, null);
-  return { refs: out, dyn };
+  return { refs: out, dyn, writes, passed };
 }
 
 const isFn = (init) => !!init && (init.type === 'ArrowFunctionExpression' || init.type === 'FunctionExpression');
@@ -57,7 +73,7 @@ export function bundleShape(src) {
     for (const s of fn.body.body) {
       if (s.type === 'FunctionDeclaration') {
         const r = references(s.body);
-        for (const p of s.params) references(p, r.refs, r.dyn);
+        for (const p of s.params) references(p, r.refs, r.dyn, r.writes, r.passed);
         if (iife.units.has(s.id.name)) shape.problems.push(`${s.id.name} is declared twice`);
         iife.units.set(s.id.name, { kind: 'function', text: text(s), ...r });
         continue;
@@ -65,7 +81,7 @@ export function bundleShape(src) {
       if (s.type === 'VariableDeclaration') {
         for (const d of s.declarations) {
           if (d.id.type !== 'Identifier') { shape.problems.push(`a destructuring declaration (${text(d).slice(0, 40)})`); continue; }
-          const r = d.init ? references(d.init) : { refs: new Set(), dyn: [] };
+          const r = d.init ? references(d.init) : { refs: new Set(), dyn: [], writes: new Set(), passed: new Set() };
           // the export table: const api = Object.freeze({ name, other: local, … })
           const obj = d.init?.type === 'CallExpression' && d.init.arguments[0]?.type === 'ObjectExpression' ? d.init.arguments[0] : d.init?.type === 'ObjectExpression' ? d.init : null;
           if (obj && /^(api|exports)$/.test(d.id.name)) {
@@ -81,7 +97,7 @@ export function bundleShape(src) {
             continue;
           }
           if (iife.units.has(d.id.name)) shape.problems.push(`${d.id.name} is declared twice`);
-          iife.units.set(d.id.name, { kind: isFn(d.init) ? 'function' : 'constant', text: `${s.kind} ${text(d)}`, ...r });
+          iife.units.set(d.id.name, { kind: isFn(d.init) ? 'function' : 'constant', object: !!d.init && /^(ObjectExpression|ArrayExpression|NewExpression|CallExpression)$/.test(d.init.type), text: `${s.kind} ${text(d)}`, ...r });
         }
         continue;
       }
@@ -89,7 +105,7 @@ export function bundleShape(src) {
       const ns = s.type === 'ExpressionStatement' && s.expression.type === 'AssignmentExpression' && s.expression.left.type === 'MemberExpression'
         && !s.expression.left.computed && s.expression.left.object.type === 'Identifier' && s.expression.right.type === 'Identifier' && s.expression.right.name === apiName
         ? s.expression.left.property.name : null;
-      if (ns) { iife.namespace = ns; iife.setup.push({ text: text(s), refs: new Set(), dyn: [], exportLine: true }); continue; }
+      if (ns) { iife.namespace = ns; iife.setup.push({ text: text(s), refs: new Set(), dyn: [], writes: new Set(), passed: new Set(), exportLine: true }); continue; }
       iife.setup.push({ text: text(s), ...r });
     }
     shape.iifes.push(iife);
@@ -120,10 +136,10 @@ export function bundleChange(baseSrc, candSrc) {
     if (b.namespace !== c.namespace || !b.namespace) return all(`IIFE ${i + 1} exports ${c.namespace || 'nothing it names'}, ${b.namespace || 'nothing it names'} on base`);
     if (b.params !== c.params) return all(`the ${b.namespace} wrapper changed`);
     if (b.setup.map((s) => s.text).join('\n') !== c.setup.map((s) => s.text).join('\n')) return all(`${b.namespace}'s setup code changed (event listeners, alias loops or the export lines)`);
+    // every top-level binding is a unit: a function, a constant, an object built at start-up. A changed one is a seed.
     for (const [name, u] of b.units) {
       const v = c.units.get(name);
       if (v && v.text === u.text) continue;
-      if (u.kind === 'constant' || (v && v.kind === 'constant')) return all(`${b.namespace}'s module-level constant ${name} ${v ? 'changed' : 'was removed'}`);
       seeds.push([i, name]);
     }
     // an export pointed at other units, or gone: callers of that export are affected
@@ -142,8 +158,12 @@ export function bundleChange(baseSrc, candSrc) {
     const scan = (side) => side.iifes.forEach((f, i) => {
       for (const [n, u] of f.units) {
         const k = `${i}:${n}`;
-        if (tainted.has(k)) continue;
-        if ([...u.refs].some((r) => (f.units.has(r) && tainted.has(`${i}:${r}`)) || nsTainted.has(r))) { tainted.add(k); changed = true; }
+        if (!tainted.has(k) && [...u.refs].some((r) => (f.units.has(r) && tainted.has(`${i}:${r}`)) || nsTainted.has(r))) { tainted.add(k); changed = true; }
+        // a tainted unit that writes a top-level binding (or hands an object one to a call) taints that binding, and so its readers
+        if (tainted.has(k)) for (const w of [...u.writes, ...[...u.passed].filter((p) => f.units.get(p)?.object)]) {
+          const wk = `${i}:${w}`;
+          if (w !== n && f.units.has(w) && !tainted.has(wk)) { tainted.add(wk); changed = true; }
+        }
       }
     });
     scan(B); scan(C);
@@ -157,7 +177,7 @@ export function bundleChange(baseSrc, candSrc) {
   const hit = (i, locals) => locals.split(',').some((l) => tainted.has(`${i}:${l}`));
   C.iifes.forEach((f, i) => { for (const [e, locals] of f.exports) if (hit(i, locals)) exports.add(`${f.namespace}.${e}`); });
   B.iifes.forEach((f, i) => { for (const [e, locals] of f.exports) if (hit(i, locals) || C.iifes[i].exports.get(e) !== locals) exports.add(`${f.namespace}.${e}`); });
-  return { all: false, why: [`${seeds.length} changed function(s) taint ${exports.size} export(s)`], exports: [...exports].sort(), units: [...tainted].map((k) => { const [i, n] = k.split(':'); return `${B.iifes[+i].namespace}:${n}`; }).sort() };
+  return { all: false, why: [`${seeds.length} changed binding(s) taint ${exports.size} export(s)`], exports: [...exports].sort(), units: [...tainted].map((k) => { const [i, n] = k.split(':'); return `${B.iifes[+i].namespace}:${n}`; }).sort() };
 }
 
 // Everything of a bundle the tainted units are not: the other units, the setup and the export tables, as one text. A hook found

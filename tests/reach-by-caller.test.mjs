@@ -42,7 +42,7 @@ test('the miniature reads like the real bundle: two namespaces, units, setup, ex
   assert.deepEqual(s.iifes.map((f) => f.namespace), ['SentriIcons', 'SentriUI']);
   assert.deepEqual([...s.iifes[1].exports.keys()], ['row', 'picker', 'workbenchCard', 'sheet']);
   assert.deepEqual(s.problems, []);
-  assert.deepEqual(bundleChange(BASE, BASE), { all: false, why: ['0 changed function(s) taint 0 export(s)'], exports: [], units: [] });
+  assert.deepEqual(bundleChange(BASE, BASE), { all: false, why: ['0 changed binding(s) taint 0 export(s)'], exports: [], units: [] });
 });
 
 // ---------- the five the brief requires ----------
@@ -77,11 +77,31 @@ test('an unrecorded screen is in reach: missing, failed, or recorded under anoth
   assert.deepEqual(reachOfChange(cand, { ...REC, key: 'other-base' }).screens, [...IDS].sort(), 'a stale recording is no recording');
 });
 
-test('a top-level side effect reaches every screen: setup code, a module constant, code outside the IIFEs', () => {
+test('a top-level side effect reaches every screen: setup code, code outside the IIFEs', () => {
   assert.match(bundleChange(BASE, bundle({ listener: 'e.preventDefault();' })).why[0], /setup code changed/);
-  assert.match(bundleChange(BASE, bundle({ label: "'Name'" })).why[0], /module-level constant LABEL changed/);
   assert.match(bundleChange(BASE, bundle({}, 'globalThis.x=1;\n')).why[0], /top-level code outside the IIFEs/);
+  assert.match(bundleChange(BASE, bundle({ extra: "defaults.pickerSize='compact';" })).why[0], /setup code changed/, 'a new start-up statement');
   assert.equal(reachOfChange(bundle({ listener: 'e.preventDefault();' })).all, true);
+});
+
+test('gate v2: a changed constant, or an object built at start-up, taints the units that read it', () => {
+  assert.deepEqual(bundleChange(BASE, bundle({ label: "'Name'" })).exports, ['SentriUI.sheet'], 'only sheet reads LABEL');
+  const built = bundle({ extra: "const DEFAULTS=makeDefaults();function makeDefaults(){return {size:'regular'};}function sized(){return DEFAULTS.size;}", exports: ',sized' });
+  assert.deepEqual(bundleChange(built, built.replace("size:'regular'", "size:'compact'")).exports, ['SentriUI.sized'], 'the start-up object changes because makeDefaults did');
+});
+
+test('gate v2: a changed function that mutates a top-level binding taints its readers (assignment, method, Object.assign, a call it is handed to)', () => {
+  const host = (body) => bundle({ extra: `const defaults={pickerSize:'regular'};function setUp(){${body}}function picked(){return defaults.pickerSize;}`, exports: ',setUp,picked' });
+  for (const [from, to] of [
+    ["defaults.pickerSize='regular';", "defaults.pickerSize='compact';"],
+    ["Object.assign(defaults,{a:1});", "Object.assign(defaults,{a:2});"],
+    ["list(defaults,1);", "list(defaults,2);"],
+  ]) {
+    const ch = bundleChange(host(from), host(to));
+    assert.deepEqual(ch.exports, ['SentriUI.picked', 'SentriUI.setUp'], to);
+  }
+  const arr = bundle({ extra: "const ITEMS=[];function addOne(){ITEMS.push(1);}function count(){return ITEMS.length;}", exports: ',addOne,count' });
+  assert.deepEqual(bundleChange(arr, arr.replace('ITEMS.push(1)', 'ITEMS.push(2)')).exports, ['SentriUI.addOne', 'SentriUI.count']);
 });
 
 // ---------- the acceptance faults (the pilot gates scratch branches with these) ----------
