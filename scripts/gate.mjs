@@ -379,7 +379,7 @@ check('no conflict markers', !r.out.trim(), r.out.trim().split('\n').slice(0, 3)
 // main (e.g. a stress-test label the copy pass hasn't removed yet) is main's debt, reported but not blocking; a problem main
 // doesn't have fails the gate. The committed report goes first, so a run that writes none can't pass on an old one.
 // Base's report is the same main commit gate after gate, so it is computed once and kept under the git common dir
-// (sentri-gate/states-base/<base>/<key>.json, the key hashing base's check-states.mjs and its fixtures, the Playwright build and
+// (sentri-gate/states-base/<base>/<key>.json, the key hashing base's check-states.mjs, its fixtures and font routing, the Playwright build and
 // the check width), like the base shots. A report with a render failure or a resource that failed to load is not kept: a blip on
 // base must not become main's debt for every later gate. Caches for bases older than main's last 10 commits are removed.
 const pwBuild = () => `playwright ${JSON.parse(fs.readFileSync(path.join(pwPath, 'package.json'), 'utf8')).version} ${(playwright().chromium.executablePath().match(/chromium[^\\/]*/) || ['?'])[0]} ${process.platform}`;
@@ -388,6 +388,8 @@ const statesCache = (() => {
   const add = (label, f) => h.update(`${label}\0`).update(fs.existsSync(f) ? fs.readFileSync(f) : 'missing').update('\0');
   add('check-states', path.join(wt.base, 'scripts/check-states.mjs'));
   add('playwright-path', path.join(wt.base, 'scripts/playwright-path.mjs'));
+  add('fonts', path.join(wt.base, 'scripts/font-route.mjs'));
+  add('vendor-fonts', path.join(wt.base, 'vendor/fonts/manifest.json'));
   const fx = path.join(wt.base, 'scripts/check-states.fixtures');
   for (const f of (fs.existsSync(fx) ? fs.readdirSync(fx) : []).sort()) add(`fixture ${f}`, path.join(fx, f));
   h.update(`${pwBuild()} width ${process.env.CHECK_WIDTH || ''}`);
@@ -527,6 +529,7 @@ const capture = Promise.all([shootBase(needs.base), shootGroups('cand', path.joi
 
 // The tests run while the screens are shot (each in its own process; this loop just waits).
 r = run('npm', ['test'], wt.cand);
+fs.writeFileSync(path.join(out, 'npm-test.log'), r.all.join('\n')); // a failing test is named there, not only counted
 const counts = (r.all.join('\n').match(/ℹ (pass|fail|skipped) \d+/g) || []).join(', ');
 check('npm test', r.code === 0, counts || r.tail);
 

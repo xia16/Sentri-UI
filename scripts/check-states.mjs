@@ -6,6 +6,7 @@ import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { routeFonts } from './font-route.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const { chromium } = playwright();
@@ -152,7 +153,11 @@ function audit(stateName) {
 }
 
 const browser = await chromium.launch();
-const parser = await browser.newPage();
+// The bundle's Google Fonts come from vendor/fonts/ (scripts/font-route.mjs), as in the shots: a font request that fails on the
+// network is a blip that would render a state in the fallback face, and a base report with one could not be kept for later gates.
+const context = await browser.newContext();
+await routeFonts(context, root);
+const parser = await context.newPage();
 await parser.goto(base + '/ux/design-system/tokens.css');
 
 /* renders every top-level [data-state] of one variant-style html file; returns [{name, problems}] */
@@ -169,7 +174,8 @@ async function checkHtml(html, dir, vw = VW) {
   const out = [];
   for (const s of parts.states) {
     const problems = [];
-    const page = await browser.newPage({ viewport: { width: vw, height: 900 } });
+    const page = await context.newPage();
+    await page.setViewportSize({ width: vw, height: 900 });
     page.on('console', (m) => { if (m.type() === 'error') problems.push({ check: 'h', detail: m.text().slice(0, 160) }); });
     page.on('pageerror', (e) => problems.push({ check: 'h', detail: String(e.message).slice(0, 160) }));
     const url = `${base}${dir}__check__.html`;

@@ -33,7 +33,7 @@ Each principle has the same four parts and nothing else: **the principle**, **wh
 
 **Show it.** `## Problems` (each with evidence, major or minor), the extraction commit with identical renders, and the full screen diff of the pushed branch showing only the intended screens moved.
 
-**Checked by.** The gate's screen diff on every screen and its "known reach" check, which fails a change declared for its own features that moves another feature's screen; the shared-component queue; the judge's keep-list check (gate.md §5). To automate (ledger): the reach list of every component change.
+**Checked by.** The gate's screen diff on every screen and its "known reach" check, which fails a change declared for its own features that moves another feature's screen; the defaults proof, which lets an opt-in bundle change reach only the features that pass the option when every other component page is byte-identical (ledger L25); the shared-component queue; the judge's keep-list check (gate.md §5). To automate (ledger): the reach list of every component change.
 
 ## P3 · Information before layout
 
