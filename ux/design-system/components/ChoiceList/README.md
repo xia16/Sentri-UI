@@ -40,7 +40,7 @@ Every state is in `variants/<id>.html`, drawn in its real container: navigate, s
 
 ## Behaviour
 
-Show at most eight rows before search. A single-choice sheet (Care: No action needed / Monitor / Treat in place / Move to hospital pen; a Brand list) is a drawer sized to its rows, on the bottom edge, with Back alone in its footer: a tap on a row commits and closes. A way to add an option ("Add a brand") is the last row, a navigate row that opens a level of the same drawer (‹ Brand) with a labelled field and its own commit ("Add brand"). Single rows toggle `aria-pressed` and commit; multi rows are whole-row labels around a native checkbox; navigate rows open the next level and show a chevron. Meta appears only when it distinguishes options: a group count such as "2 selected" appears only above zero, and a plain option count adds nothing. Clear appears only while an optional field has a value and returns the screen reader's focus to the group. Do not duplicate a selected row in a second list.
+Show at most eight rows before search. A single-choice sheet (Care: No action needed / Monitor / Treat in place / Move to hospital pen; a Brand list) is a drawer sized to its rows, on the bottom edge, with Back alone in its footer: a tap on a row commits and closes. A way to add an option ("Add a brand") is the last row, a navigate row that opens a level of the same drawer ("Add a brand") with a labelled field and its own commit ("Add brand"). Such a drawer has levels (owner ruling B, 2026-10-16): the footer's Back goes up one level (from "Add a brand" to the list; at the list it leaves), and a ✕ at the top left closes the whole drawer from any level. Single rows toggle `aria-pressed` and commit; multi rows are whole-row labels around a native checkbox; navigate rows open the next level and show a chevron. Meta appears only when it distinguishes options: a group count such as "2 selected" appears only above zero, and a plain option count adds nothing. Clear appears only while an optional field has a value and returns the screen reader's focus to the group. Do not duplicate a selected row in a second list.
 
 ## Content rules
 
@@ -88,6 +88,8 @@ Component: generic and shared across sections. Selection modes are variants of t
 Wheels (`UIPickerView`, `NumberPicker`) are for long ordered values only (dates, times, numbers), never for named options: they are poor with gloves and hide options a farmer should see at once.
 
 ## Changelog
+
+2026-10-16 (owner ruling B): a drawer with levels has no "‹ Parent": the title names the level, the footer's Back goes up one level, a ✕ at the top left closes the whole drawer. The multi variant's specimens (a level of a cascade) carry the ✕ and a Back that goes up.
 
 2026-10-15 (Finish farrowing): the inline key face (`face: 'key'`), variant `inline-key`, used by Finish farrowing's Assisted (No preselected, no Clear) and Edit finish details.
 

@@ -32,6 +32,8 @@ When main moves on after a `GATE PASS`, merge it forward and run `node scripts/g
 
 `--verdict` also posts the result as the `sentri/gate` commit status on GitHub. Every GitHub call the gate makes (the queue, PR files, statuses) is tried twice more after a network error (EOF, TLS, a timeout, a 5xx); after that it says `GitHub could not be reached`, which is not a queue verdict or a status: run it again. An answer from GitHub is never retried. A branch-protection rule on main that requires it makes GitHub refuse an ungated merge however it is attempted. The local merge guard (`scripts/merge-guard.mjs`) only stops our own sessions early and says why; it is not the boundary.
 
+**A change that moves no screen** (nothing changed, new or gone, and so no pair to judge) merges on the mechanical gate alone. A full run that passes then posts the `sentri/gate` status and the pass record itself, with `GATE PASS … · no screen moved`, so branch protection on main does not wait on a judge who has nothing to judge. A `--quick` run never does.
+
 A shared change that touches too many screens for one judge is split by feature. Each judge writes `verdict-<feature>.json`, and `--verdict` merges them: one failing part fails the change. `check-states` runs on both sides for every class. A problem main already has is reported as main's, and only a new one fails.
 
 ## 1. Mechanical checks (P2, P5; run first; any failure ends the gate)
@@ -50,7 +52,7 @@ On CANDIDATE:
 ## 2. Behaviour walk (P2; behaviour and shared component classes)
 
 Open each touched screen bare at 390×844 (`<url>&screen=<id>`, `atlas/SCHEMA.md`) and walk the flow as a worker would: tap, read, tap. Check:
-- Every action has a way back. Footer Back keeps the draft, and ‹ Parent goes up a level.
+- Every action has a way back. Footer Back keeps the draft; in a drawer with levels it goes up one level (at the first level it leaves), and ✕ at the top left closes the whole drawer (owner ruling B, 2026-10-16).
 - Nothing floats loose: sheets are anchored and panels docked.
 - Drafts survive Back and reopen.
 - Done applies.
@@ -123,7 +125,7 @@ Each of these was rejected by the owner. The gate must fail a change that shows 
 | R10 | "0 pixels different" measured against a stale main | evidence on the exact candidate |
 | R11 | "Passing" badge from an agent score | score never reads as approval |
 | R12 | Conflict markers committed; old wording back after a rebase | merge forward; checks on merged result |
-| R13 | An ✕ in a drawer, or Clear on a filter | drawer convention |
+| R13 | An ✕ in a drawer without levels, a "‹ Parent" in a header, or Clear and Reset in a footer | drawer convention (rulings C and B) |
 | R14 | A type pass that met the floors by enlarging everything: a history label and a sample/offline disclaimer kept prime space on the sensor card (2026-10-11) | hierarchy: the attention budget; cluttered fails even when every rule is met |
 | R15 | Calmer but flat: after the cuts, three segmented controls at one weight, the switcher outweighing the reading, and a section with its heading cut (2026-10-11) | hierarchy: cutting facts never cuts structure; one heavy control |
 | R16 | Information stacked on a page: no grouping, "Reading history" floating alone at the end with dead space under it (2026-10-11) | looks undesigned; the absolute bar is the approved screens, not the base |
