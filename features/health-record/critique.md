@@ -225,3 +225,32 @@ The ruling fixes the design (board option B): no competing directions. Each scre
 - Changed: `health-record.condition-picker`, `health-record.medicine-picker` (the ✕ at the top left of the root; nothing else moves) and the component pages ChoiceList/multi, Header/sheet, PickerField/cascade, PickerField/cascade-multi, Sheet/drawer. Every other screen in scope is the same.
 - Headers, spacing and legibility on the changed screens: no new problem; check-states: no new problem.
 - **Better because** Back means up a level and the ✕ is the one way out from any depth; the head no longer changes height between levels.
+
+# Medicines move onto the medicines feature (2026-10-16)
+
+Scope: the medicine picker and the Brand field of Record treatment (`health-record.medicine-picker`, `health-record.treatment`) move onto the new `medicines` feature's picker, and batch Record treatment (`health-record.treatment-batch`, registered by this change) asks what was given before the doses. The picker's own critique is `features/medicines/critique.md`; this block covers the host screens. Baselines: `origin/main` at `c6cc500`, 390 and 360, EN and ZH.
+
+### Keep
+
+- Record treatment, one pig: the page header (Back, the title), Medicine, Method, Dose with its unit in one box, the optional rows (Condition, Note) below the required fields, the waiting Save with no line above it.
+- Batch: the ticked pigs as one list of rows with a checkbox each, "Same dose for all" as the list's head filling every pig's box, each pig's own box overriding it; Save · N pigs. The per-pig dose boxes are not redesigned.
+- The medicine trigger shows the pick, not the path.
+
+### Problems
+
+- **major** · Brand is a second optional pick after the medicine, offering the same sample brands for every medicine; the owner decided the worker picks one product (`features/medicines/critique.md`).
+- **major** · Batch asks the doses first and folds Medicine and Method into a dock at the bottom (owner decision 6: what was given first, then the doses).
+- **major** · Method and unit start empty every time (owner decision 4: the product remembers them).
+
+### Parts
+
+| Part | Drawn by today | The component whose job it is | Keep / fix / cut |
+|---|---|---|---|
+| Medicine trigger | PickerField cascade | PickerField | keep; its value is now the product |
+| Brand optional row | Field `optionalRow` | — | **cut** |
+| Batch details dock ("Treatment details" fold) | page-built `bulkListOverlay()` dock | Sheet page body, the same fields | **fix**: Medicine and Method move to the top of the page, the fold goes with the dock; the optional rows follow the doses |
+| Method, unit | PickerField single, the unit picker in the dose box | the same | keep; pre-filled from the product |
+
+### Self-crit
+
+Rounds and the final look follow in `features/medicines/critique.md`, which renders these screens with the picker.
