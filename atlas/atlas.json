@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-15T09:02:52.527Z",
- "commit": "cb68a10",
+ "generated": "2026-10-16T03:53:53.383Z",
+ "commit": "4731d80",
  "platforms": [
   {
    "id": "mobile",
@@ -16923,7 +16923,7 @@
              {
               "state": "A level",
               "when": "A branch tapped",
-              "shows": "\"‹ <parent>\" in the head and the level as the title (‹ Conditions / Diseases; ‹ Diseases / Respiratory diseases); no breadcrumb"
+              "shows": "The level as the title (Diseases; Respiratory diseases), the ✕ at the top left (closes the whole picker, keeps the ticks), the footer Back goes up one level (at Conditions it leaves); no \"‹ Parent\", no breadcrumb (owner ruling B, 2026-10-16)"
              },
              {
               "state": "Search",
@@ -16942,7 +16942,7 @@
            {
             "name": "Done",
             "shows": "Done · N",
-            "rule": "Done · N applies the ticks to the Conditions field and closes. Back closes without applying; ticks wait for the next open (the scrim does the same). Done waits while nothing is ticked and nothing was applied.",
+            "rule": "Done · N applies the ticks to the Conditions field and closes. Back goes up one level; at Conditions it closes without applying, and so does the ✕ from any level; ticks wait for the next open (the scrim does the same). Done waits while nothing is ticked and nothing was applied.",
             "at": "Done"
            }
           ],
@@ -17179,7 +17179,7 @@
            {
             "name": "Brand",
             "shows": "Brand drawer: the brands, then Add a brand ›",
-            "logic": "A single choice: a tap sets the brand and closes. Add a brand is a level of the drawer (‹ Brand, a Brand name field, Add brand). Clear in the head removes a set brand. Back leaves the drawer.",
+            "logic": "A single choice: a tap sets the brand and closes. Add a brand is a level of the drawer (titled Add a brand, a Brand name field, Add brand); there the footer Back goes up to the brand list, and the ✕ at the top left closes the whole drawer from either level (owner ruling B, 2026-10-16). Clear in the head removes a set brand. Back at the list leaves the drawer.",
             "at": "Brand"
            },
            {
@@ -17237,7 +17237,7 @@
              {
               "state": "Browse",
               "when": "No search text",
-              "shows": "Medicines: category doors; a category: \"‹ Medicines\" in the head, its medicines (name and form)"
+              "shows": "Medicines: category doors; a category: its name as the title, its medicines (name and form); the footer Back goes up to Medicines, the ✕ at the top left closes the picker"
              },
              {
               "state": "Search",
