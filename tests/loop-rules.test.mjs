@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { queueAhead, newScenarioFailures, calibrationProblems, budgetProblems, critiqueProblems, pageStyling, addedLines, effectiveClass, classifyScreens, checkVerdict, checkGrades, worstFirst, isClean, loopStatus, touchesSystem, touchesTools, regressions,
-  pageOf, pageAssets, sharedFiles, outcomeLeaves, coverageLost, reachOf, reachLine, shotsToTake, timedOutOnly, lockState, carryDecision, ghNetworkError,
+  pageOf, pageAssets, sharedFiles, outcomeLeaves, coverageLost, reachOf, reachLine, runtimeFiles, fetchedMap, shotsToTake, timedOutOnly, lockState, carryDecision, ghNetworkError,
   componentPage, componentPagesOf, componentsTouched, idPath } from '../scripts/loop-rules.mjs';
 
 test('a change to the bundle or tokens is a shared-component change whatever was declared', () => {
@@ -371,6 +371,33 @@ test('reach: a ux file no page loads by name reaches every screen, since a page 
   assert.equal(r.all, true);
   assert.match(r.why[0], /ux\/laws\/strings\.json: no page loads it by name/);
   assert.equal(reach(['ux/README.md']).all, true, 'prose inside ux/ is a ux file');
+});
+
+test('reach: a ux file fetched at runtime reaches the screens that fetch it, by a current recording; none if no screen does', () => {
+  const w = reachWorld();
+  const base = w.screens.filter((s) => s.id !== 'move.transfer-sow');
+  assert.deepEqual(runtimeFiles({ ...w, files: ['ux/laws/strings.json', 'ux/system/inspection-astra-concept.js', 'docs/x.md'] }), ['ux/laws/strings.json']);
+  const rec = { screens: {
+    'farrowing.room': { ok: true, fns: [], files: ['ux/system/farrowing-astra-concept.html'] },
+    'inspection.room': { ok: true, fns: [], files: ['ux/system/inspection-astra-concept.html', 'ux/laws/strings.json'] },
+    'piglet-processing.pens': { ok: true, fns: [], files: [] },
+  } };
+  const fetched = fetchedMap(rec, base, base);
+  const r = reachOf({ ...w, files: ['ux/laws/strings.json'], fetched });
+  assert.deepEqual([r.all, r.features], [false, ['inspection']]);
+  assert.match(r.why[0], /fetched at runtime by screens of 1 feature/);
+  const none = reachOf({ ...w, files: ['ux/laws/other.json'], fetched });
+  assert.deepEqual([none.all, none.features], [false, []], 'copy-only: no recorded screen fetches it');
+  assert.equal(reachOf({ ...w, files: ['ux/laws/strings.json'], fetched: null }).all, true, 'no current recording: every screen');
+});
+
+test('reach: a screen the recording cannot vouch for keeps its feature in reach for a runtime file', () => {
+  const w = reachWorld();
+  const rec = { screens: { 'farrowing.room': { ok: true, fns: [], files: [] }, 'inspection.room': { ok: false, fns: [], files: [], error: 'timeout' } } };
+  const fetched = fetchedMap(rec, w.screens.slice(0, 3), [...w.screens.slice(0, 3), { id: 'weaning.new', feature: 'weaning' }]);
+  assert.deepEqual(fetched.unknown, ['inspection', 'move', 'weaning'], 'failed, missing, and only on the candidate');
+  assert.deepEqual(reachOf({ ...w, files: ['ux/laws/strings.json'], fetched }).features, ['inspection', 'move', 'weaning']);
+  assert.equal(fetchedMap(null, w.screens, w.screens), null);
 });
 
 test('reach: docs, prose outside ux, CI, tests, agent settings and the other scripts reach no screen', () => {

@@ -391,10 +391,30 @@ const RENDERS = [
 // script (the gate and the checks). A page that loads one of them reaches its feature first (pages are read before this list).
 const NO_PIXEL = [/^docs\//, /^\.github\//, /^tests\//, /^\.claude\//, /^scripts\//, /^(?!ux\/).*\.md$/i];
 
+// The changed files whose reach depends on what screens fetch at runtime: ux files no page loads by name (reachOf's last bucket).
+export function runtimeFiles({ files, screens = [], assets = {}, shared = {} }) {
+  return files.filter((f) => f.startsWith('ux/') && reachOf({ files: [f], screens, assets, shared }).why.some((w) => w.endsWith('no page loads it by name, and a page may fetch it')));
+}
+
+// The fetched map reachOf reads, from a current recording: which features' screens fetched each path, and the features with a
+// screen the recording can't vouch for. recording: record-calls output (or null); baseScreens, candScreens: [{ id, feature }].
+export function fetchedMap(recording, baseScreens, candScreens) {
+  if (!recording?.screens) return null;
+  const byFile = {}, unknown = new Set();
+  for (const s of baseScreens) {
+    const r = recording.screens[s.id];
+    if (!r || !r.ok || !Array.isArray(r.files)) { unknown.add(s.feature); continue; }
+    for (const f of r.files) (byFile[f] = byFile[f] || new Set()).add(s.feature);
+  }
+  const onBase = new Set(baseScreens.map((s) => s.id));
+  for (const s of candScreens) if (!onBase.has(s.id)) unknown.add(s.feature);
+  return { byFile: Object.fromEntries(Object.entries(byFile).map(([f, v]) => [f, [...v].sort()])), unknown: [...unknown].sort() };
+}
+
 // What a change can reach, from its files alone (P2): { all, features, why }. files: the changed paths (both sides of a rename);
 // screens: every atlas screen on base and candidate; assets: page -> the files it loads (pageAssets); shared: sharedFiles of the
-// same. Unsure is all: a file nothing says is harmless reaches every screen.
-export function reachOf({ files, screens = [], assets = {}, shared = {}, scope = [] }) {
+// same; fetched: fetchedMap of a current recording, or null. Unsure is all: a file nothing says is harmless reaches every screen.
+export function reachOf({ files, screens = [], assets = {}, shared = {}, scope = [], fetched = null }) {
   const users = new Map();
   for (const s of screens) { const p = pageOf(s.url); for (const f of [p, ...(assets[p] || [])]) { if (!users.has(f)) users.set(f, new Set()); users.get(f).add(s.feature); } }
   const features = new Set(scope), notes = new Map();
@@ -416,6 +436,16 @@ export function reachOf({ files, screens = [], assets = {}, shared = {}, scope =
     const doc = f.match(/^ux\/design-system\/components\/([^/]+)\/(variants\/[^/]+\.html|variants\.json|gate\.json|README\.md)$/);
     if (doc) { features.add(DS_FEATURE); note(`${doc[1]}'s component pages`, f); continue; }
     if (NO_PIXEL.some((re) => re.test(f))) { note('draws no pixel', f); continue; }
+    // A ux file no page loads by name may be fetched at runtime (ux/laws/strings.json). With a current recording of what each base
+    // screen fetched (scripts/record-calls.mjs), it reaches the features of the screens that fetched it, plus every feature with a
+    // screen the recording can't vouch for (failed, missing, only on the candidate): fetched = { byFile: { path: [features] },
+    // unknown: [features] }. Without one it reaches every screen.
+    if (f.startsWith('ux/') && fetched) {
+      const by = [...new Set([...(fetched.byFile[f] || []), ...(fetched.unknown || [])])];
+      for (const x of by) features.add(x);
+      note(fetched.byFile[f]?.length ? `fetched at runtime by screens of ${fetched.byFile[f].length} feature(s)` : `no recorded screen fetches it${fetched.unknown?.length ? ` (${fetched.unknown.length} feature(s) not fully recorded)` : ''}`, f);
+      continue;
+    }
     all = true;
     note(f.startsWith('ux/') ? 'no page loads it by name, and a page may fetch it' : 'not known to draw nothing', f);
   }

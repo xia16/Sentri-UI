@@ -27,7 +27,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { OPT_IN_FILES, loadApi, optInProof, cssOwnedProof } from './opt-in-proof.mjs';
 import { bundleChange, bundleRest, screensByCaller } from './bundle-graph.mjs';
-import { CLASSES, DS_FEATURE, componentPage, componentPagesOf, componentsTouched, idPath, screensOf, pageOf, pageAssets, sharedFiles, coverageLost, effectiveClass, classifyScreens, checkVerdict, touchesSystem, touchesTools, queueAhead as queueOf, budgetProblems, critiqueProblems, pageStyling, addedLines, calibrationProblems, lockState, shotsToTake, reachOf, reachLine, carryDecision, ghNetworkError, newScenarioFailures } from './loop-rules.mjs';
+import { CLASSES, DS_FEATURE, componentPage, componentPagesOf, componentsTouched, idPath, screensOf, pageOf, pageAssets, sharedFiles, coverageLost, effectiveClass, classifyScreens, checkVerdict, touchesSystem, touchesTools, queueAhead as queueOf, budgetProblems, critiqueProblems, pageStyling, addedLines, calibrationProblems, lockState, shotsToTake, reachOf, reachLine, runtimeFiles, fetchedMap, carryDecision, ghNetworkError, newScenarioFailures } from './loop-rules.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -315,8 +315,12 @@ mech.shared = { files: Object.keys(shared).length, touched: Object.fromEntries(t
 // the base bundle's hash and the recorder's hash; a recording under another key is never read.
 const readSide = (k, f) => { const p = path.join(wt[k], f); return fs.existsSync(p) ? fs.readFileSync(p, 'utf8') : ''; };
 const [jsFile, cssFile] = OPT_IN_FILES;
+// Also made when the change touches a ux file no page loads by name (ux/laws/strings.json): the recording says which screens fetch
+// it at runtime (loop-rules.mjs fetchedMap, reachOf).
+const bundleOnly = touched.length > 0 && touched.every((f) => OPT_IN_FILES.includes(f));
+const fetchedOnly = runtimeFiles({ files, screens: baseScreens, assets, shared });
 const recording = (() => {
-  if (!touched.length || mech.quick || flag('all') || !touched.every((f) => OPT_IN_FILES.includes(f))) return null;
+  if (mech.quick || flag('all') || (!bundleOnly && !fetchedOnly.length)) return null;
   const key = `${mech.base}-${createHash('sha256').update(fs.readFileSync(path.join(root, 'scripts/record-calls.mjs'))).update('\0').update(readSide('base', jsFile)).digest('hex').slice(0, 12)}`;
   const file = path.join(gateDir(), 'calls', `${key}.json`);
   if (!fs.existsSync(file)) {
@@ -334,7 +338,7 @@ const recording = (() => {
 // only the component pages (beside what the change's other files reach), raise no class and join no queue; the tripwire still
 // shoots every other screen. Not proved: reach by caller below, else the full shared gate.
 const optIn = (() => {
-  if (!recording) return null;
+  if (!recording || !bundleOnly) return null;
   const calls = recording.data?.calls || [];
   let markup = '';
   try { const api = loadApi(readSide('base', jsFile)); markup = calls.map(([f, a]) => { try { return String(api[f](...a)); } catch { return ''; } }).join('\n'); } catch {}
@@ -362,7 +366,7 @@ const ds = { base: pagesOf('base'), cand: pagesOf('cand') };
 // requires a hook nothing else emits). Whatever this cannot decide reaches every screen. The class stays shared (it still queues),
 // the tripwire still shoots every other screen, and the scenario leaves run for every feature in reach.
 const byCaller = (() => {
-  if (!recording || optIn?.ok) return null;
+  if (!recording || !bundleOnly || optIn?.ok) return null;
   const change = bundleChange(readSide('base', jsFile), readSide('cand', jsFile));
   if (change.all) return { all: true, why: change.why };
   const touchedFns = new Set(change.exports.filter((e) => e.startsWith('SentriUI.')).map((e) => e.slice('SentriUI.'.length)));
@@ -400,14 +404,23 @@ const reach = (() => {
   }
   const screens = [...baseScreens, ...candScreens];
   const changed = git(['diff', '--name-only', '--no-renames', mech.base, mech.candidate]).out.split(/\r?\n/).filter(Boolean);
-  const r = reachOf({ files: unproved(changed).filter((f) => !(byCallerOk && OPT_IN_FILES.includes(f))), screens, assets: both, shared: sharedFiles(screens, both), scope });
+  const r = reachOf({ files: unproved(changed).filter((f) => !(byCallerOk && OPT_IN_FILES.includes(f))), screens, assets: both, shared: sharedFiles(screens, both), scope, fetched: recording ? fetchedMap(recording.data, baseScreens, candScreens) : null });
   if (proved.size) return { ...r, features: [...new Set([...r.features, DS_FEATURE])].sort(), why: [...r.why, `${[...proved].join(', ')}: opt-in proved, the component pages`] };
   if (byCallerOk) return { ...r, features: [...new Set([...r.features, ...byCaller.features, DS_FEATURE])].sort(), why: [...r.why, `the bundle by caller: ${byCaller.why.join('; ')}`] };
   return r;
 })();
 const inReach = (s) => reach.all || reach.features.includes(s.feature);
-mech.reach = { ...reach, screens: new Set([...candScreens, ...ds.cand].filter(inReach).map((s) => s.id)).size };
-console.log(reachLine(reach, mech.reach.screens));
+// The reach as data, for whatever reads mechanical.json after the gate (which check-states components and scenario leaves to run):
+// { all, features, screens: [ids shot in full], count, functions: the bundle's changed exports ([] when the bundle didn't change,
+// null when the graph couldn't decide), why }.
+const changedFunctions = (() => {
+  if (!touched.some((f) => f === jsFile)) return [];
+  if (byCallerOk) return byCaller.exports;
+  try { const c = bundleChange(readSide('base', jsFile), readSide('cand', jsFile)); return c.all ? null : c.exports; } catch { return null; }
+})();
+const reachIds = [...new Set([...candScreens, ...ds.cand].filter(inReach).map((s) => s.id))].sort();
+mech.reach = { all: reach.all, features: reach.features, screens: reachIds, count: reachIds.length, functions: changedFunctions, why: reach.why };
+console.log(reachLine(reach, reachIds.length));
 const byFiles = effectiveClass({ declared, files: unproved(files), diffs: [], scope, shared });
 mech.class = { declared, effective: byFiles.cls, why: byFiles.why };
 if (byFiles.cls !== declared) console.log(`class: ${declared} → ${byFiles.cls} (${byFiles.why.join('; ')})`);

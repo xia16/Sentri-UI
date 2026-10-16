@@ -5,8 +5,9 @@
 // Usage: node scripts/record-calls.mjs <out.json> [--root <checkout>] [--base <url> --commit <hash>] [--key <k>] [--atlas <atlas.json>] [--screens a,b]
 //   --root  the checkout to serve and read (the gate's base worktree); default this one
 //   --key   stored as the recording's key (the gate: base sha, base bundle hash, this script's hash); a reader ignores another key
-// Writes { commit, key, screens: { id: { ok, fns: ['SentriUI.row', …], error? } }, calls: [[fn, args], …] } (calls: SentriUI only,
-// first-seen order). A screen that never becomes ready is { ok: false }: unrecorded, so in reach.
+// Writes { commit, key, screens: { id: { ok, fns: ['SentriUI.row', …], files: ['ux/laws/strings.json', …], error? } },
+// calls: [[fn, args], …] } (calls: SentriUI only, first-seen order; files: every path the screen fetched from the server).
+// A screen that never becomes ready is { ok: false }: unrecorded, so in reach.
 import { spawn, execSync } from 'node:child_process';
 import { createServer } from 'node:net';
 import fs from 'node:fs';
@@ -76,7 +77,11 @@ for (const s of todo) {
   const page = await context.newPage();
   await page.clock.install({ time: new Date('2026-10-11T09:41:00') });
   await page.clock.resume();
-  const fns = new Set();
+  const fns = new Set(), fetched = new Set();
+  // every file the screen (or a frame of it) asks this server for, up to the shot state: a file no page names but one fetches at
+  // runtime (ux/laws/strings.json) reaches only the screens that fetch it. The context's routes turn the HTTP cache off, so a
+  // file a second screen fetches is seen again.
+  page.on('request', (rq) => { try { const u = new URL(rq.url()); if (u.origin === new URL(base).origin) fetched.add(decodeURIComponent(u.pathname).replace(/^\/+/, '')); } catch {} });
   try {
     const url = new URL(base + s.url);
     url.searchParams.set('screen', s.id);
@@ -88,8 +93,8 @@ for (const s of todo) {
       for (const [k, v] of got.calls) if (!seen.has(k)) seen.set(k, v);
       for (const f of got.fns) fns.add(f);
     }
-    screens[s.id] = { ok: true, fns: [...fns].sort() };
-  } catch (e) { screens[s.id] = { ok: false, fns: [], error: e.message.split('\n')[0] }; }
+    screens[s.id] = { ok: true, fns: [...fns].sort(), files: [...fetched].sort() };
+  } catch (e) { screens[s.id] = { ok: false, fns: [], files: [], error: e.message.split('\n')[0] }; }
   await page.close();
 }
 await browser.close();
