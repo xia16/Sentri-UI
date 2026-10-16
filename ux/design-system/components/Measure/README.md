@@ -6,6 +6,8 @@ A Measure holds one measured value with its unit: litter weight, a piglet's weig
 
 Call `SentriUI.measure({ label, optional, value, unit, unitGap, placeholder, key, action, active, controls, range, tone, changed, hint, note })`.
 
+**Row layout** (`layout: 'row'`, candidate). A Measure that is one row of a flat list of rows (Finish farrowing: Weak, Deformed, Assisted, Litter weight), in the Stepper row's silhouette: the label left at 16px/500 with its muted 13px "Optional" beside it, the box in the same 136px right column, the stepper face's height (44px, with a 48px hit area), value left and unit right (13px), a 60px row, a 1px `line` below it (none when last). The hint and note run under the row. The box takes the stepper key's border (`task-key-border`) until the pad opens, then the `ink` ring. Empty still shows the muted dash and the unit; the pad rule and every other state are unchanged. Opt-in: without `layout` the Measure renders as before.
+
 **Anatomy**
 - **Label** above the box, in `choice-label` 14px at 600 `ink`. It does the same job as a Stepper row's label. An optional `muted` word can sit beside it ("Optional").
 - **Box.** Shaped like a field:
@@ -25,6 +27,7 @@ Call `SentriUI.measure({ label, optional, value, unit, unitGap, placeholder, key
 - **Default:** the value and its unit.
 - **Empty:** `—` in `muted`, with the unit still written (`— kg`). Missing is not zero, so an unweighed litter never reads `0 kg`.
 - **Pressed:** the box fills `press`.
+- **System input** (`input: 'system'`, candidate). The same box holds a native text field on the phone's own decimal keyboard (`inputmode="decimal"`, `enterkeyhint="done"`) instead of opening the Numpad: for **one optional value inside a form** (Finish farrowing's litter weight), where a pad would be heavier than the job. The value keeps the box's mono, the dash is the field's placeholder, the unit stays at the end; typing is the field's active state (the same ink ring). Done closes the keyboard (iOS's decimal pad has no Done key: the native app adds it as the keyboard's accessory bar). The host cleans what the keyboard can send (a locale's comma becomes a point; digits and one point only) and normalises on save. `inputAttrs` passes the host's own attributes to the field. The Numpad stays the input for **runs of typed values** (the tag and weigh run), where keys that never move matter.
 - **Active** (the pad is open):
   - the border turns `ink` at `caret-width`, and a `caret-width` `ink` caret follows the digits;
   - when the field is empty, the caret shows alone before the unit;
