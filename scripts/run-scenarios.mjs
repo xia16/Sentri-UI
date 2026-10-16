@@ -367,6 +367,20 @@ const done = new Map();
     pump();
   });
   console.log(`ran ${tasks.length} run(s) in ${Math.round((Date.now() - t0) / 1000)}s, ${fixed ? `${ctl.limit} at once (--jobs)` : `up to ${peak} at once (adaptive, ${cores} cores)`}`);
+  // A run that failed while others ran beside it is run once more alone, at the end: a control that rendered a beat late under
+  // load is the machine, not the design (adaptive reached 8 at once and fa-m22 lost "Record abortion" that way, 2026-10-16).
+  // Failing again alone is a real failure, reported as before. Passing alone keeps the pass, and the run says it failed under
+  // load (loadOnly, with the first failure), so a real timing bug in a page can't hide.
+  if (peak > 1) {
+    const again = tasks.filter((t) => done.get(t)?.result === 'fail');
+    for (const t of again) {
+      const first = done.get(t);
+      const alone = await runWithRetry(browser, t.leaf, t.lang, t.width).catch((e) => ({ lang: t.lang, width: t.width, result: 'fail', failures: [{ what: 'run', got: String((e && e.message) || e), tag: null }], skipped: [], notes: [], evidence: [] }));
+      if (alone.result !== 'fail') { alone.loadOnly = first.failures; alone.notes = [...(alone.notes || []), `failed only beside other runs: ${first.failures.map((f) => f.what + ' → ' + f.got).join('; ').slice(0, 200)}`]; }
+      done.set(t, alone);
+      console.log(`alone    ${t.leaf.node.id} ${t.lang}-${t.width}: ${alone.result === 'fail' ? 'fails alone too' : 'passes alone (failed only under load)'}`);
+    }
+  }
 }
 for (const leaf of leaves) {
   const n = leaf.node;
@@ -377,6 +391,7 @@ for (const leaf of leaves) {
   for (const t of tasks) if (t.leaf === leaf) row.runs.push(done.get(t));
   row.result = row.runs.some((r) => r.result === 'fail') ? 'fail' : row.runs.some((r) => r.result === 'blocked') ? 'blocked' : 'pass';
   if (row.result === 'fail' && row.runs.every((r) => r.result !== 'fail' || r.slow)) row.slow = true;
+  if (row.runs.some((r) => r.loadOnly)) row.loadOnly = true;   // passed alone after failing beside other runs: reported, not failed
   row.hard = [...new Set(row.runs.flatMap((r) => r.failures.map((f) => f.tag)).filter((t) => HARD.includes(t)))];
   out.push(row);
   const first = row.runs.flatMap((r) => r.failures.map((f) => `${r.lang}-${r.width}: ${f.what} → ${f.got}`))[0] || '';
