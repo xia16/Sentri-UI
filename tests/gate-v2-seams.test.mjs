@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { reachOf, identityInputs } from '../scripts/static-reach-stub.mjs';
+import { reachOf, identityInputs } from '../scripts/static-reach.mjs';
 import { leafRow, reportOf } from '../scripts/scenario-runner.mjs';
 import { scenarioDebt } from '../scripts/loop-rules.mjs';
 import { legibilityWorse } from '../scripts/check-legibility.mjs';
@@ -13,21 +13,20 @@ import { legibilityWorse } from '../scripts/check-legibility.mjs';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const atlas = JSON.parse(fs.readFileSync(path.join(root, 'atlas/atlas.json'), 'utf8'));
 
-test('the reach stand-in answers the analyser interface with everything: all screens, every leaf, whole-file identities', () => {
+test('the reach analyser answers the interface the evidence half reads: screens, leaves, and identity inputs with unit hashes', () => {
   const side = { dir: root, atlas };
-  const r = reachOf(side, side, { files: ['ux/system/atlas-bare.js'] });
-  assert.equal(r.all, true);
-  assert.equal(r.functions, null, 'null: the graph is undecided, which the gate reads as every screen');
-  assert.ok(r.screens.includes('farrowing.room') && r.screens.some((id) => id.startsWith('ds:')), 'screens and component pages');
-  assert.ok(r.leaves.length > 50, 'every outcome leaf of each feature with a screen in reach');
-  const ii = identityInputs('candidate', 'farrowing.room');
-  assert.deepEqual(Object.keys(ii).sort(), ['bundle', 'files', 'screen', 'unbounded']);
-  assert.equal(ii.bundle.all, true);
-  assert.deepEqual(ii.unbounded, []);
-  assert.ok(ii.files.includes('ux/design-system/components/bundle.js') && ii.files.includes('atlas/atlas.json'));
-  assert.ok(!ii.files.some((f) => /^(docs|tests|scripts)\//.test(f)), 'what no page loads is left out');
+  const r = reachOf(side, side, { files: ['ux/design-system/components/bundle.css'] });
+  assert.equal(r.all, true, 'any stylesheet is every screen (no CSS proof in v1)');
+  const one = reachOf(side, side, { files: ['docs/design-workflow/README.md'] });
+  assert.equal(one.all, false);
+  assert.deepEqual(one.screens, []);
+  const ii = identityInputs(side, 'farrowing.room');
+  assert.ok(ii.files.includes('ux/design-system/components/bundle.js'));
+  assert.ok(Array.isArray(ii.unbounded));
+  assert.equal(typeof ii.bundle.setupHash, 'string');
+  assert.ok(ii.bundle.all || Object.keys(ii.bundle.unitHashes || {}).length > 0, 'unit hashes for the units it can run');
   assert.equal(ii.screen.id, 'farrowing.room');
-  assert.equal(identityInputs('base', 'no.such.screen'), null);
+  assert.equal(identityInputs(side, 'no.such.screen'), null);
 });
 
 const leaf = (id, extra = {}) => ({ node: { id, type: 'outcome', label: id, authority: ['S'], ...extra }, branch: 'b', path: [id] });

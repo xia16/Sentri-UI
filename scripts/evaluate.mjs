@@ -14,9 +14,9 @@ import os from 'node:os';
 import path from 'node:path';
 import { pwPath, playwright } from './playwright-path.mjs';
 import { CLASSES, DS_FEATURE, componentPage, componentPagesOf, componentsTouched, idPath, screensOf, pageOf, pageAssets, sharedFiles, coverageLost, effectiveClass, classifyScreens, touchesSystem, touchesTools, queueAhead as queueOf, budgetProblems, critiqueProblems, pageStyling, addedLines, scenarioDebt } from './loop-rules.mjs';
-// The reach analyser (gate-v2 §2). Until scripts/static-reach.mjs lands this is its stand-in: every screen, whole-file identities.
-// The swap is this one import.
-import { reachOf, identityInputs } from './static-reach-stub.mjs';
+// The reach analyser (gate-v2 §2): static, conservative, over both revisions. It names the screens and leaves a change can reach,
+// and what each screen's evidence depends on.
+import { reachOf, identityInputs } from './static-reach.mjs';
 import { EvidenceStore, identityOf, treeOf, blobsHash, codeHash, sha, reconcileInventory, planEvidence } from './evidence.mjs';
 import { createScheduler } from './scheduler.mjs';
 import { WORKERS, LAUNCH_ARGS, machineErrorOf, classifyMachineError } from './machine.mjs';
@@ -95,6 +95,7 @@ export async function evaluate(opts) {
     s.screens = screensOf(s.atlas);
     s.ds = componentPagesOf(s.atlas);
     s.runtime = Object.freeze([...s.tree.keys()].filter((f) => !NOT_LOADED.some((re) => re.test(f))).sort());
+    s.dsFiles = Object.freeze(s.runtime.filter((f) => /^(atlas|ux\/design-system|ux\/laws|vendor|review)\//.test(f)));
     s.fontsRoot = s.dir;
   }
   // Shared files from the base checkout: each atlas screen's page and what that page loads (the class and the queue use them).
@@ -106,7 +107,13 @@ export async function evaluate(opts) {
 
   // ---------- reach (§2) ----------
   const reach = (() => {
-    const r = reachOf({ dir: S.base.dir, atlas: S.base.atlas }, { dir: S.cand.dir, atlas: S.cand.atlas }, { files });
+    // each side as the analyser reads it: its checkout, its atlas, and its commit (the worktree is that commit, untouched)
+    for (const k of ['base', 'cand']) S[k].side = { dir: S[k].dir, atlas: S[k].atlas, rev: S[k].sha };
+    let r;
+    try { r = reachOf(S.base.side, S.cand.side, { files }); } catch (e) { r = { all: true, screens: [], functions: null, leaves: null, why: [`the reach analyser failed (${String(e.message || e).split(/\r?\n/)[0]}): every screen`] }; }
+    // The design system's own pages (ds:<Name>/<variant>) are drawn by the atlas from the component folders, the tokens and the
+    // bundle; the analyser reads screens only. They are in reach whenever any of those, or the atlas, changed.
+    if (!r.all && files.some((f) => /^ux\/design-system\/|^atlas\//.test(f))) r = { ...r, screens: [...new Set([...(r.screens || []), ...S.base.ds.map((x) => x.id), ...S.cand.ds.map((x) => x.id)])], why: [...(r.why || []), 'the component pages: the design system or the atlas changed'] };
     if (quick) {
       const feats = new Set([...scope, ...(componentsTouched(files).length ? [DS_FEATURE] : [])]);
       const ids = [...S.base.screens, ...S.base.ds, ...S.cand.screens, ...S.cand.ds].filter((x) => feats.has(x.feature)).map((x) => x.id);
@@ -117,12 +124,15 @@ export async function evaluate(opts) {
     if (r.functions === null && !r.all) return { ...r, all: true, why: [...r.why, 'the bundle graph is undecided: every screen'] };
     return r;
   })();
-  const reachIds = new Set(reach.all ? [...S.base.screens, ...S.base.ds, ...S.cand.screens, ...S.cand.ds].map((x) => x.id) : reach.screens);
+  const allIds = [...S.base.screens, ...S.base.ds, ...S.cand.screens, ...S.cand.ds].map((x) => x.id);
+  const reachIds = new Set(reach.all ? allIds : reach.screens);
+  // the leaves to run: the analyser's; null (it could not decide) is every leaf
   // scope is always in
   for (const x of [...S.base.screens, ...S.base.ds, ...S.cand.screens, ...S.cand.ds]) if (scope.includes(x.feature)) reachIds.add(x.id);
   const inReach = (x) => reachIds.has(x.id);
-  mech.reach = { all: !!reach.all, screens: [...reachIds].length, functions: reach.functions, leaves: (reach.leaves || []).length, why: reach.why };
-  log(`reach: ${reach.all ? 'all screens' : `${reachIds.size} screen(s)`}${reach.why?.length ? ` (${reach.why.join('; ')})` : ''}`);
+  const total = new Set(allIds).size;
+  mech.reach = { all: !!reach.all, screens: reachIds.size, of: total, functions: reach.functions, leaves: reach.leaves ? reach.leaves.length : 'all', why: reach.why };
+  log(`reach: ${reach.all ? `all ${total} screens` : `${reachIds.size} of ${total} screens`}, ${reach.leaves ? reach.leaves.length : 'every'} leaf/leaves${reach.functions?.length ? `, functions ${reach.functions.slice(0, 6).join(', ')}` : ''}${reach.why?.length ? ` (${reach.why.join('; ')})` : ''}`);
   const byFiles = effectiveClass({ declared, files, diffs: [], scope, shared });
   mech.class = { declared, effective: byFiles.cls, why: byFiles.why };
   if (byFiles.cls !== declared) log(`class: ${declared} → ${byFiles.cls} (${byFiles.why.join('; ')})`);
@@ -154,7 +164,6 @@ export async function evaluate(opts) {
   code.visit = codeHash(root, VISIT_CODE);
   const blob = (side, f) => S[side].tree.get(f) || 'missing';
   const harness = (side) => ({ bare: blob(side, 'ux/system/atlas-bare.js'), server: blob(side, 'scripts/serve-ux.cjs'), fonts: blobsHash(S[side].tree, S[side].runtime.filter((f) => f.startsWith('vendor/fonts/'))) });
-  const sideName = (side) => (side === 'base' ? 'base' : 'candidate');
   const bundleGap = new Set();
   const inputsMemo = new Map();
   // A screen's share of its identity: what the analyser says it depends on, hashed by blob on its side.
@@ -163,10 +172,13 @@ export async function evaluate(opts) {
     if (inputsMemo.has(k)) return inputsMemo.get(k);
     const tree = S[side].tree;
     let ii = null;
-    try { ii = identityInputs(sideName(side), id); } catch (e) { gaps.push(`identityInputs(${sideName(side)}, ${id}) threw (${e.message}): its identity hashes every page-loadable file`); }
+    try { ii = identityInputs(S[side].side, id); } catch (e) { gaps.push(`identityInputs(${side}, ${id}) threw (${e.message}): its identity hashes every page-loadable file`); }
     const def = [...S[side].screens, ...S[side].ds].find((x) => x.id === id);
     let v;
-    if (!ii) v = { files: blobsHash(tree, S[side].runtime), bundle: blob(side, BUNDLE_JS), screen: def, why: 'no identity inputs: every page-loadable file' };
+    // A component page (ds:<Name>/<variant>) is the atlas drawing a component's specimen: the atlas, the design system, the
+    // strings it reads and the fonts. Anything else the analyser can't name: every page-loadable file.
+    if (!ii && componentPage(id)) v = { files: blobsHash(tree, S[side].dsFiles), bundle: blob(side, BUNDLE_JS), screen: def, why: 'a component page' };
+    else if (!ii) v = { files: blobsHash(tree, S[side].runtime), bundle: blob(side, BUNDLE_JS), screen: def, why: 'no identity inputs: every page-loadable file' };
     else {
       const unb = ii.unbounded || [];
       const types = new Set(unb.map((u) => u.type || 'any'));
@@ -176,7 +188,10 @@ export async function evaluate(opts) {
       if (b.all) bundle = blob(side, BUNDLE_JS);
       else if (b.unitHashes && b.setupHash) bundle = { units: Object.fromEntries((b.units || []).map((u) => [u, b.unitHashes[u] || 'missing'])), setup: b.setupHash };
       else { bundle = blob(side, BUNDLE_JS); bundleGap.add(id); }
-      v = { files: blobsHash(tree, ii.files || S[side].runtime), unbounded: folded, bundle, screen: ii.screen || def };
+      // the bundle counts once, by the units this screen can run (or whole): its file in the page's closure is left out of the files
+      // hash, or a one-function edit would be a new identity for every screen that loads the bundle
+      const own = (ii.files || S[side].runtime).filter((f) => f !== BUNDLE_JS || typeof bundle === 'string');
+      v = { files: blobsHash(tree, own), unbounded: folded, bundle, screen: ii.screen || def };
     }
     inputsMemo.set(k, v);
     return v;
@@ -478,10 +493,15 @@ export async function evaluate(opts) {
     const outside = ec.outside || [];
     check('known reach: only SCOPE moved (P2)', !outside.length, outside.length ? `declared ${declared} for ${scope.join(', ')} but moves ${outside.length} screen(s) of ${[...new Set(outside.map((d) => d.feature))].join(', ')} (${outside.slice(0, 3).map((d) => d.id).join(', ')}): give your part its own rule or token, or make it a declared shared change` : '');
   }
-  // The tripwire, a diagnostic while the analyser rolls out: a screen outside the reach that moved means the reach was wrong.
-  if (!quick && reachIds.size < [...S.cand.screens, ...S.cand.ds].length) {
+  // The tripwire, a diagnostic: every screen outside the reach is shot once, at 390 in English. It never accepts anything (the
+  // reach decides what gets its full evidence), and a screen outside the reach that moved means the analyser was wrong for this
+  // change: that screen's other runs were never shot, so the gate can't finish and blocks (gate again with --all).
+  if (!quick && !reach.all) {
+    const outside = [...S.cand.screens, ...S.cand.ds].filter((s) => !reachIds.has(s.id));
     const missed = moved.filter((s) => !reachIds.has(s.id));
-    check(`reach: nothing outside it moved (tripwire, ${TRIP.width} ${TRIP.lang})`, !missed.length, missed.length ? `${missed.length} screen(s) outside the reach moved (${missed.slice(0, 3).map((s) => s.id).join(', ')}): the change reaches further than the analyser says; gate again with --all` : `${[...S.cand.screens, ...S.cand.ds].filter((s) => !reachIds.has(s.id)).length} other screen(s) unchanged`);
+    mech.tripwire = { outside: outside.length, moved: missed.map((s) => s.id) };
+    if (missed.length) block(`tripwire: ${missed.length} screen(s) outside the reach moved (${missed.slice(0, 3).map((s) => s.id).join(', ')}): the analyser missed a dependency; gate again with --all, and report it`);
+    else log(`tripwire: ${outside.length} screen(s) outside the reach, none moved at ${TRIP.width} ${TRIP.lang}`);
   }
   if (ec.cls !== byFiles.cls) log(`class: ${declared} → ${ec.cls} (${ec.why.join('; ')})`);
   if (mode === 'refactor') check('refactor: every screen identical', !moved.length, moved.map((s) => s.id).slice(0, 5).join(', '));
@@ -601,8 +621,10 @@ export async function evaluate(opts) {
   mark('checks');
 
   // ---------- 7. scenario leaves: the reach's leaves (and the scope's), on the candidate; the failing ones on base ----------
-  // --quick: the scope's features only; otherwise the reach's leaves (the stand-in: every leaf of a feature with a screen in reach)
+  // --quick: the scope's features only; otherwise the reach's leaves (every leaf of an affected feature, and any leaf whose entry
+  // can navigate into the reach)
   const leafSet = new Set(quick ? [] : reach.leaves || []);
+  const everyLeaf = !quick && !Array.isArray(reach.leaves); // the analyser could not decide: every leaf
   const specOf = (side, f) => { try { return JSON.parse(fs.readFileSync(path.join(S[side].dir, 'features', f, 'scenarios.json'), 'utf8')); } catch { return null; } };
   const featuresWithLeaves = (side) => (fs.existsSync(path.join(S[side].dir, 'features')) ? fs.readdirSync(path.join(S[side].dir, 'features')).filter((f) => fs.existsSync(path.join(S[side].dir, 'features', f, 'scenarios.json'))) : []);
   const leafPlan = [];
@@ -646,12 +668,12 @@ export async function evaluate(opts) {
   const leafFeatures = featuresWithLeaves('cand').filter((f) => {
     const spec = specOf('cand', f);
     const ids = spec ? walkTree(spec).leaves.map((l) => l.node.id) : [];
-    return scope.includes(f) || ids.some((id) => leafSet.has(id)) || (quick && scope.includes(f));
+    return scope.includes(f) || everyLeaf || ids.some((id) => leafSet.has(id));
   });
   const noLeaves = [...new Set([...scope, ...moved.map((s) => s.feature)])].filter((f) => f !== DS_FEATURE && !featuresWithLeaves('cand').includes(f));
   mech.leaves = {};
   await Promise.all(leafFeatures.map(async (f) => {
-    const only = scope.includes(f) ? null : new Set(walkTree(specOf('cand', f)).leaves.map((l) => l.node.id).filter((id) => leafSet.has(id)));
+    const only = scope.includes(f) || everyLeaf ? null : new Set(walkTree(specOf('cand', f)).leaves.map((l) => l.node.id).filter((id) => leafSet.has(id)));
     const plan = leafItemsOf('cand', f, only);
     if (!plan) { check(`scenarios ${f}`, false, 'features/' + f + '/scenarios.json is unreadable'); return; }
     if (plan.problems) { check(`scenarios ${f}`, false, `the tree is malformed: ${plan.problems.slice(0, 2).join('; ')}`); return; }
