@@ -342,16 +342,14 @@ export async function evaluate(opts) {
 
   // ---------- run the browser work ----------
   mark('submit');
-  const visitResults = new Map();
-  const visitDone = Promise.all([...visits.values()].map((v) => sched.run(visitTask(v)).then((r) => visitResults.set(v, r))));
-  const stateDone = Promise.all(statePlan.compute.map((it) => sched.run(stateTask(it)).then((r) => results.set(it.id, r))));
-  await visitDone;
-  mark('visits');
-  // file each visit's results under its items' identities; store design results only
-  for (const [v, r] of visitResults) {
+  // Each visit's results are filed under its items' identities as it finishes (design results stored at once, so a gate that dies
+  // keeps what it finished); progress is printed every 250 visits.
+  let filed = 0;
+  const fileVisit = (v, r) => {
+    if (++filed % 250 === 0) log(`visits: ${filed} of ${visits.size} (${secs(Date.now() - at.submit)}s, ${sched.limit} at once)`);
     const sk = `${v.side}|${v.x.id}|${v.width}|${v.lang}`, shotItem = shotOf.get(sk);
-    if (r.machine || r.unstable) { for (const it of v.items) results.set(it.id, { machine: r.machine, unstable: r.unstable, error: r.error }); if (!v.items.includes(shotItem)) results.set(`visit ${sk}`, { machine: r.machine, unstable: r.unstable, error: r.error }); continue; }
-    if (r.error && !r.shot) { for (const it of v.items) results.set(it.id, { ok: false, error: r.error }); continue; }
+    if (r.machine || r.unstable) { for (const it of v.items) results.set(it.id, { machine: r.machine, unstable: r.unstable, error: r.error }); if (!v.items.includes(shotItem)) results.set(`visit ${sk}`, { machine: r.machine, unstable: r.unstable, error: r.error }); return; }
+    if (r.error && !r.shot) { for (const it of v.items) results.set(it.id, { ok: false, error: r.error }); return; }
     if (v.items.includes(shotItem)) {
       const rec = { ok: true, screen: v.x.id, feature: v.x.feature, width: v.width, lang: v.lang, text: r.shot.text };
       store.put('shot', shotItem.id, rec, { png: r.shot.png });
@@ -366,7 +364,11 @@ export async function evaluate(opts) {
       if (c?.ok) { store.put(it.kind, it.id, { ok: true, result: c.result }); results.set(it.id, { ok: true, result: c.result }); }
       else results.set(it.id, { ok: false, error: c?.error || 'not run' });
     }
-  }
+  };
+  const visitDone = Promise.all([...visits.values()].map((v) => sched.run(visitTask(v)).then((r) => fileVisit(v, r))));
+  const stateDone = Promise.all(statePlan.compute.map((it) => sched.run(stateTask(it)).then((r) => results.set(it.id, r))));
+  await visitDone;
+  mark('visits');
   for (const [k, r] of results) if (k.startsWith('visit ') && r.unstable) block(`${k.slice(6).replace(/\|/g, ' ')}: unstable: ${r.unstable}`);
   const png = (id) => store.file('shot', id, 'png');
 

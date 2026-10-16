@@ -89,6 +89,9 @@ export function settleSample(bounds) {
   let timers = 0;
   for (const due of S.timeouts.values()) if (due - now <= bounds.timers && due - now > -bounds.timers) timers++;
   for (const every of S.intervals.values()) if (every <= bounds.timers) timers++;
-  const animations = document.getAnimations ? document.getAnimations().filter((a) => a.playState === 'running' && a.effect?.getComputedTiming().endTime !== Infinity).length : 0;
+  // Running time-based animations that will end: a scroll-driven one (animation-timeline: scroll(), e.g. the category tabs' fade)
+  // moves only with a scroll, which is sampled above, and an infinite one is caught by the two shots differing.
+  const timed = (a) => !a.timeline || a.timeline === document.timeline || a.timeline.constructor?.name === 'DocumentTimeline';
+  const animations = document.getAnimations ? document.getAnimations().filter((a) => { if (a.playState !== 'running' || !timed(a)) return false; const end = a.effect?.getComputedTiming().endTime; return typeof end === 'number' && Number.isFinite(end); }).length : 0;
   return { fonts: document.fonts ? document.fonts.status : 'loaded', scrolling: now - S.lastScroll < bounds.scroll, timers, animations, mutations: S.mutations };
 }
