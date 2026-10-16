@@ -710,6 +710,8 @@ for (const f of new Set([...scope, ...[...screens.diff, ...screens.new].map((s) 
   // A failed run is re-asked on base, for the failing leaves only: a leaf already failing on main is main's debt, not this change's.
   // Exit 1 is "a leaf failed"; any other non-zero exit (a bad tree, a crash) fails as it is.
   let report = null; try { report = JSON.parse(fs.readFileSync(path.join(wt.cand, 'review', `scenarios-${f}.json`), 'utf8')); } catch {}
+  // The candidate's full report stays in the gate's folder, so a first failure can be read step by step without a rerun.
+  try { fs.copyFileSync(path.join(wt.cand, 'review', `scenarios-${f}.json`), path.join(out, `scenarios-${f}.json`)); } catch {}
   const failed = r.code === 1 && report ? report.leaves.filter((x) => x.result === 'fail').map((x) => x.id) : [];
   if (failed.length && fs.existsSync(path.join(wt.base, 'scripts/run-scenarios.mjs')) && fs.existsSync(path.join(wt.base, 'features', f, 'scenarios.json'))) {
     const b = run(process.execPath, ['scripts/run-scenarios.mjs', f, '--base', url.base, '--only', failed.join(',')], wt.base);
