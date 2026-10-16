@@ -1,0 +1,26 @@
+/* Opt-in density study: ?many=operations&variant=compact. */
+.compact-preview .work-section-heading{align-items:center;padding-bottom:14px}
+.compact-preview .work-section-heading h2{font-size:17px;font-weight:600}
+.compact-preview .work-section-heading>span{font-size:11px}
+.compact-preview .compact-task-list{display:block;overflow:hidden;border:1px solid #dbe2d2;border-radius:18px;background:#fff;box-shadow:0 5px 18px #26321d06;margin-bottom:12px}
+.compact-preview .compact-task-row{width:100%;min-height:94px;display:grid;grid-template-columns:34px minmax(0,1fr) 62px 13px;align-items:center;gap:10px;padding:12px 13px;border:0;border-radius:0;background:#fff;text-align:left;box-shadow:none}
+.compact-preview .compact-task-row+.compact-task-row{border-top:1px solid #edf0e7}
+.compact-preview .compact-task-row:hover,.compact-preview .compact-task-row:focus-visible{background:#f7f9f3}
+.compact-preview .compact-task-row.overdue{background:#fffbf5;box-shadow:inset 3px 0 #ba8350}
+.compact-preview .compact-task-icon{display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:#edf2e7;color:#657d57}
+.compact-preview .compact-task-icon svg{width:17px;height:17px}
+.compact-preview .compact-task-row.overdue .compact-task-icon{background:#f8ebd9;color:#9b6634}
+.compact-preview .compact-task-row.waiting .compact-task-icon{background:#f0f3eb;color:#87947b}
+.compact-preview .compact-task-copy{display:flex;flex-direction:column;gap:6px;min-width:0}
+.compact-preview .compact-task-title{display:flex;align-items:baseline;gap:7px;min-width:0;white-space:nowrap}
+.compact-preview .compact-task-title strong{font-size:13px;line-height:1.35;font-weight:600;overflow:hidden;text-overflow:ellipsis}
+.compact-preview .compact-task-title small{font-size:10px;color:#788473;overflow:hidden;text-overflow:ellipsis;flex:none;max-width:76px}
+.compact-preview .compact-task-detail{font-size:10px;line-height:1.5;color:#68775e;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.compact-preview .compact-task-row.overdue .compact-task-detail{color:#926430}
+.compact-preview .compact-task-value{display:flex;align-items:flex-end;flex-direction:column;gap:1px;white-space:nowrap;text-align:right}
+.compact-preview .compact-task-value strong{font:500 22px/1.1 var(--font-mono);letter-spacing:-.6px}
+.compact-preview .compact-task-value small{font-size:9px;color:#6d7a64}
+.compact-preview .compact-task-value .compact-task-waiting{font:500 10px/1.4 var(--font-sans);letter-spacing:0;color:#718166}
+.compact-preview .compact-task-arrow{color:#8b9683}
+.compact-preview .compact-task-arrow svg{width:12px;height:12px}
+.compact-preview .task-list-toggle{border:0;background:#e9efe2;color:#344a2d;font-size:12px}
