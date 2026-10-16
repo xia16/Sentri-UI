@@ -146,6 +146,6 @@ Standards these briefs point to: `ux/design-system/README.md` (laws), `ux/design
 ## Background
 
 - `/design-drive`, the earlier driver built on Wayfinder, is retired in favour of `/design`; its config is kept in [`docs/agents/design.md`](../agents/design.md) for history.
-- Why the workflow is shaped this way: [design-loop.md](design-loop.md) and [design-loop-research.md](design-loop-research.md). What went wrong: [pilot-retro.md](pilot-retro.md). The map is [Team design workflow #20](https://github.com/xia16/Sentri-UI/issues/20).
+- Why the workflow is shaped this way: [design-loop.md](design-loop.md) and [design-loop-research.md](design-loop-research.md). What went wrong: [pilot-retro.md](pilot-retro.md); why a PR took hours to pass the gate: [gate-retro.md](gate-retro.md). The map is [Team design workflow #20](https://github.com/xia16/Sentri-UI/issues/20).
 
 Change the workflow in its own pull request, never inside a design PR.
