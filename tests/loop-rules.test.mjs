@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { queueAhead, newScenarioFailures, calibrationProblems, budgetProblems, critiqueProblems, pageStyling, addedLines, effectiveClass, classifyScreens, checkVerdict, checkGrades, worstFirst, isClean, loopStatus, touchesSystem, touchesTools, regressions,
-  pageOf, pageAssets, sharedFiles, outcomeLeaves, coverageLost, reachOf, reachLine, shotsToTake, timedOutOnly, lockState, carryDecision, ghNetworkError,
+  pageOf, pageAssets, sharedFiles, outcomeLeaves, coverageLost, reachOf, reachLine, shotsToTake, timedOutOnly, lockState, carryDecision, carryableFile, scenarioDebt, ghNetworkError,
   componentPage, componentPagesOf, componentsTouched, idPath } from '../scripts/loop-rules.mjs';
 
 test('a change to the bundle or tokens is a shared-component change whatever was declared', () => {
@@ -382,7 +382,7 @@ test('carry: a pass carries over main moving on only by files that draw no pixel
   const mech = { candidate: 'c1', base: 'm1', ref: 'origin/ds/x' };
   const ok = { pass: { candidate: 'c1', base: 'm1' }, mech, head: 'c2', main: 'm2', containsC: true, containsMain: true, ownCommits: [],
     cand: { 'ux/system/inspection-astra-concept.js': 'blob1' }, carried: { 'ux/system/inspection-astra-concept.js': 'blob1' },
-    mainFiles: ['docs/design-workflow/README.md'], reach: reach(['docs/design-workflow/README.md']) };
+    mainFiles: ['docs/agents/design.md'], reach: reach(['docs/agents/design.md']) };
   const r = carryDecision(ok);
   assert.ok(r.ok, r.why.join());
   assert.match(r.why[0], /main moved m1 → m2 by 1 file\(s\) that draw no pixel/);
@@ -402,6 +402,38 @@ test('carry: a pass carries over main moving on only by files that draw no pixel
   no({ mainFiles: ['ux/system/home.css'], reach: reach(['ux/system/home.css']) }, /can reach every screen/);
   no({ mainFiles: ['features/weaning/budget.md'], reach: reach(['features/weaning/budget.md']) }, /can reach screens of weaning/);
   no({ reach: null }, /can reach every screen/);
+  // Review of the gate (2026-10-16): a check can change what it decides without a pixel moving, so only prose carries a pass.
+  no({ mainFiles: ['scripts/check-headers.mjs'], reach: reach(['scripts/check-headers.mjs']) }, /only prose .* carries a pass/);
+  no({ mainFiles: ['tests/loop-rules.test.mjs'], reach: reach(['tests/loop-rules.test.mjs']) }, /only prose/);
+  no({ mainFiles: ['docs/design-workflow/briefs/gate.md'], reach: reach(['docs/design-workflow/briefs/gate.md']) }, /only prose/);
+  no({ mainFiles: ['package.json'], reach: reach(['package.json']) }, /only prose/);
+});
+
+test('carryableFile: Markdown outside ux/, features/ and docs/design-workflow/ only', () => {
+  for (const f of ['README.md', 'docs/agents/design.md', 'GLOSSARY-MAP.md']) assert.equal(carryableFile(f), true, f);
+  for (const f of ['ux/README.md', 'features/farrowing/budget.md', 'docs/design-workflow/rules.md', 'scripts/gate.mjs', 'tests/x.test.mjs', 'AGENTS.txt'])
+    assert.equal(carryableFile(f), false, f);
+});
+
+test('scenarioDebt: main\'s debt only for the same leaf, width, language, assertion and failure class', () => {
+  const run = (lang, width, result, failures = []) => ({ lang, width, result, failures });
+  const leaf = (id, runs) => ({ id, result: runs.some((r) => r.result === 'fail') ? 'fail' : 'pass', runs });
+  const fl = (what, tag = null) => ({ what, got: 'x', tag });
+  const base = { leaves: [leaf('ds-a11', [run('zh', 360, 'fail', [fl('"Task 2" shown')]), run('en', 390, 'pass')])] };
+  // The same failure on main is debt.
+  assert.deepEqual(scenarioDebt({ leaves: [leaf('ds-a11', [run('zh', 360, 'fail', [fl('"Task 2" shown')])])] }, base), { added: [], debt: ['ds-a11'] });
+  // The review's case: main fails only at zh-360, the candidate also fails at en-390. It's new, not hidden as debt.
+  const both = scenarioDebt({ leaves: [leaf('ds-a11', [run('zh', 360, 'fail', [fl('"Task 2" shown')]), run('en', 390, 'fail', [fl('Done saves the record', 'lost-draft')])])] }, base);
+  assert.deepEqual(both.debt, []);
+  assert.equal(both.added[0].id, 'ds-a11');
+  assert.match(both.added[0].why.join(), /en-390: Done saves the record/);
+  // The same assertion with a different failure class is new.
+  assert.equal(scenarioDebt({ leaves: [leaf('ds-a11', [run('zh', 360, 'fail', [fl('"Task 2" shown', 'dead-end')])])] }, base).added.length, 1);
+  // A leaf base doesn't have, or no base report at all: the failure stands.
+  assert.equal(scenarioDebt({ leaves: [leaf('new-leaf', [run('en', 390, 'fail', [fl('x')])])] }, base).added.length, 1);
+  assert.equal(scenarioDebt({ leaves: [leaf('ds-a11', [run('zh', 360, 'fail', [fl('"Task 2" shown')])])] }, null).added.length, 1);
+  // Passing leaves are neither.
+  assert.deepEqual(scenarioDebt({ leaves: [leaf('ds-a13', [run('en', 390, 'pass')])] }, base), { added: [], debt: [] });
 });
 
 // Component pages are in the gate's reach (rules ledger L23): the Headers law changed, screens were gated, and Sheet → page kept

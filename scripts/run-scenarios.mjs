@@ -370,6 +370,7 @@ const report = {
 };
 const reportPath = join(root, 'review', `scenarios-${feature}.json`);
 if (!only) writeFileSync(reportPath, JSON.stringify(report, null, 1) + '\n');
+if (opt('report')) writeFileSync(opt('report'), JSON.stringify(report, null, 1) + '\n');   // --report <file>: the report for an --only run too (the gate compares base and candidate by it)
 console.log(`\n${feature} @ ${commit.slice(0, 7)}${dirty ? ' (dirty)' : ''}: pass ${report.summary.pass} · fail ${report.summary.fail}${report.summary.slow ? ` (${report.summary.slow} only a slow machine: timed out twice, not a design failure)` : ''} · blocked ${report.summary.blocked} · pending ${report.summary.pending}${only ? '' : '  → ' + relative(root, reportPath)}`);
 for (const [l, b] of Object.entries(byLang)) console.log(`  ${l}: pass ${b.pass} · fail ${b.fail} · blocked ${b.blocked} (leaves that ran)`);
 process.exit(report.summary.fail ? 1 : 0);

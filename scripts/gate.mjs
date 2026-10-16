@@ -460,7 +460,9 @@ const capture = Promise.all([shootBase(needs.base), shootGroups('cand', path.joi
 // The tests run while the screens are shot (each in its own process; this loop just waits).
 r = run('npm', ['test'], wt.cand);
 const counts = (r.all.join('\n').match(/ℹ (pass|fail|skipped) \d+/g) || []).join(', ');
-check('npm test', r.code === 0, counts || r.tail);
+fs.writeFileSync(path.join(out, 'npm-test.log'), r.all.join('\n'));   // the whole output: a failing test is named, not only counted
+const failedTests = [...new Set(r.all.join('\n').split('\n').map((l) => /^\s*✖\s+(.+?)(?:\s+\([\d.]+m?s\))?\s*$/.exec(l)?.[1]).filter((t) => t && !/^failing tests:?$/i.test(t)))];
+check('npm test', r.code === 0, r.code === 0 ? counts || r.tail : `${counts}${failedTests.length ? ` — failing: ${failedTests.slice(0, 4).join(' | ')}` : ''} (npm-test.log)`);
 
 r = run('npm', ['run', 'check'], wt.cand);
 check('npm run check', r.code === 0, r.all.find((l) => /atlas:/.test(l)) || r.tail);
@@ -701,10 +703,15 @@ for (const f of new Set([...scope, ...[...screens.diff, ...screens.new].map((s) 
   let report = null; try { report = JSON.parse(fs.readFileSync(path.join(wt.cand, 'review', `scenarios-${f}.json`), 'utf8')); } catch {}
   const failed = r.code === 1 && report ? report.leaves.filter((x) => x.result === 'fail').map((x) => x.id) : [];
   if (failed.length && fs.existsSync(path.join(wt.base, 'scripts/run-scenarios.mjs')) && fs.existsSync(path.join(wt.base, 'features', f, 'scenarios.json'))) {
-    const b = run(process.execPath, ['scripts/run-scenarios.mjs', f, '--base', url.base, '--only', failed.join(',')], wt.base);
-    const { added, debt } = newScenarioFailures(failed, b.all.join('\n'));
-    if (debt.length) gaps.push(`scenarios ${f}: ${debt.length} leaf/leaves already failing on main: ${debt.slice(0, 4).join(', ')}`);
-    check(`scenarios ${f}`, !added.length, added.length ? `${added.length} new failing leaf/leaves: ${added.slice(0, 4).join(', ')}\n${r.tail}` : `${debt.length} failing leaf/leaves already fail on main (${debt.slice(0, 4).join(', ')}); none new`);
+    // Run by run, not leaf by leaf (scenarioDebt): base's report for exactly those leaves is compared failure by failure. A base
+    // runner that writes no report (one older than --report) leaves every failure the change's: unknown is never main's debt.
+    const baseReport = path.join(out, `scenarios-base-${f}.json`);
+    fs.rmSync(baseReport, { force: true });
+    run(process.execPath, ['scripts/run-scenarios.mjs', f, '--base', url.base, '--only', failed.join(','), '--report', baseReport], wt.base);
+    let onBase = null; try { onBase = JSON.parse(fs.readFileSync(baseReport, 'utf8')); } catch {}
+    const { added, debt } = scenarioDebt(report, onBase);
+    if (debt.length) gaps.push(`scenarios ${f}: ${debt.length} leaf/leaves fail on main exactly as here (same width, language and assertion): ${debt.slice(0, 4).join(', ')}`);
+    check(`scenarios ${f}`, !added.length, added.length ? `${added.length} new failure(s): ${added.slice(0, 3).map((a) => `${a.id} (${a.why.slice(0, 2).join('; ')})`).join(', ')}${onBase ? '' : ' — base wrote no report, so none can be main\'s debt'}\n${r.tail}` : `${debt.length} failing leaf/leaves fail on main exactly as here (${debt.slice(0, 4).join(', ')}); none new`);
   } else check(`scenarios ${f}`, r.code === 0, r.tail);
 }
 mech.timings.scenarios = Math.round((Date.now() - t0) / 1000) + 's';

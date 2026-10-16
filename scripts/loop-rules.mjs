@@ -481,6 +481,8 @@ export function carryDecision({ pass, mech, head, main, containsC, containsMain,
   const paths = [...new Set([...Object.keys(cand), ...Object.keys(carried)])];
   const edited = paths.filter((p) => cand[p] !== carried[p] && !both.includes(p));
   if (edited.length) why.push(`the merge is not just main: ${edited.slice(0, 3).join(', ')} not as on the gated commit (a conflict resolved, or an edit in the merge): run the gate again`);
+  const notProse = mainFiles.filter((f) => !carryableFile(f));
+  if (notProse.length) why.push(`main changed ${notProse.slice(0, 3).join(', ')}${notProse.length > 3 ? ` and ${notProse.length - 3} more` : ''} since ${s(mech.base)}: only prose outside ux/, features/ and docs/design-workflow/ carries a pass, because a script, test or rule can change what a check decides: run the gate again`);
   if (!reach || reach.all || reach.features.length) why.push(`main's change since ${s(mech.base)} can reach ${!reach || reach.all ? 'every screen' : `screens of ${reach.features.join(', ')}`}${reach?.why.length ? ` (${reach.why.join('; ')})` : ''}: run the gate again`);
   return why.length ? { ok: false, why } : { ok: true, why: [`main moved ${s(mech.base)} → ${s(main)} by ${mainFiles.length} file(s) that draw no pixel, and ${s(head)} is ${s(mech.candidate)} merged with it and nothing else`] };
 }
@@ -496,3 +498,27 @@ export function newScenarioFailures(candFailed, baseOut) {
   const debt = candFailed.filter((id) => onBase.get(id) === 'fail');
   return { added: candFailed.filter((id) => onBase.get(id) !== 'fail'), debt };
 }
+
+// Main's scenario debt, run by run (review of the gate, 2026-10-16). A candidate failure is main's debt only when base fails the
+// same leaf in the same language at the same width with the same failure: the same assertion (what) and failure class (tag).
+// A leaf the candidate fails differently from base, at another width or language, that base passes, doesn't have, or didn't
+// report, is the change's: "already failing on main" never hides a new regression in the same leaf. Inputs are the two runners'
+// reports (run-scenarios --report); base may hold only the leaves it was asked about.
+export function scenarioDebt(candReport, baseReport) {
+  const key = (id, r, f) => [id, r.lang, r.width, f.what, f.tag || ''].join('|');
+  const onBase = new Set();
+  for (const lf of (baseReport && baseReport.leaves) || []) for (const r of lf.runs || []) if (r.result === 'fail') for (const f of r.failures || []) onBase.add(key(lf.id, r, f));
+  const added = [], debt = [];
+  for (const lf of (candReport && candReport.leaves) || []) {
+    if (lf.result !== 'fail') continue;
+    const fresh = [];
+    for (const r of lf.runs || []) if (r.result === 'fail') for (const f of r.failures || []) if (!onBase.has(key(lf.id, r, f))) fresh.push(r.lang + '-' + r.width + ': ' + f.what);
+    if (fresh.length) added.push({ id: lf.id, why: fresh }); else debt.push(lf.id);
+  }
+  return { added, debt };
+}
+
+// What main may change while a pass is carried (gate.mjs --carry): prose only. A Markdown file outside ux/ (which pages can load),
+// features/ (budgets and critiques the gate checks) and docs/design-workflow/ (the gate's own rules). Anything else, including
+// every script, test and config, can change what a check decides even when no pixel moves: it voids the carry.
+export const carryableFile = (f) => /\.md$/i.test(f) && !/^(ux|features|docs\/design-workflow)\//.test(f);
