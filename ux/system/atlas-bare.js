@@ -41,6 +41,7 @@
     'html.atlas-bare .atlas-phone{position:fixed!important;left:0!important;top:0!important;right:auto!important;bottom:auto!important;width:390px!important;height:844px!important;min-width:0!important;max-width:none!important;min-height:0!important;max-height:none!important;' +
     'margin:0!important;border:0!important;border-radius:0!important;box-shadow:none!important;outline:0!important;transform:none!important;overflow:hidden!important;z-index:1}' +
     'html.atlas-still *,html.atlas-still *::before,html.atlas-still *::after{animation-duration:0s!important;animation-delay:0s!important;transition-duration:0s!important;transition-delay:0s!important;caret-color:transparent}' +
+    'html.atlas-still,html.atlas-still *{scroll-behavior:auto!important}' +
     'html.atlas-bare .atlas-phone::before,html.atlas-bare .atlas-phone::after{box-shadow:none!important}';
   document.head.appendChild(css);
 
@@ -96,6 +97,17 @@
   function frameReady(f) {   // loaded (not the initial about:blank) and not waiting for its host
     var d = frameDoc(f); if (!d) return true;   // cross-origin: nothing to wait for
     return d.readyState === 'complete' && !(f.getAttribute('src') && d.URL === 'about:blank') && !d.documentElement.hasAttribute('data-atlas-pending');
+  }
+  /* A page that scrolls itself into place after it loads (Home's focus=task-fold) is only ready when its scroll positions stop
+     moving: Ready waits until no element's scroll offset has changed for 8 frames in a row (at most 1.5 s), so the shot of a
+     scrolled screen never catches it a few pixels short. */
+  function scrollSettled() {
+    var t0 = Date.now(), last = null, same = 0;
+    var sig = function () { return [].map.call(document.querySelectorAll('*'), function (e) { return e.scrollTop || e.scrollLeft ? e.scrollTop + ',' + e.scrollLeft : ''; }).join('|') + '|' + scrollX + ',' + scrollY; };
+    return new Promise(function (res) { (function tick() {
+      var s = sig(); if (s === last) same++; else { same = 0; last = s; }
+      if (same >= 8) res(); else if (Date.now() - t0 > 1500) { console.warn('atlas-bare: scroll still moving after 1.5 s'); res(); } else requestAnimationFrame(tick);
+    })(); });
   }
   function framesReady(phone) {   // every iframe in the phone ready, then two frames for it to paint
     var t0 = Date.now();
@@ -182,7 +194,7 @@
       (steps.length ? frames().then(function () { return replay(phone, steps); }) : Promise.resolve()).then(function () { return framesReady(phone); }).then(function () {
       hideAround(phone);
       var fonts = document.fonts && document.fonts.ready ? Promise.race([document.fonts.ready, new Promise(function (r) { setTimeout(r, 250); })]) : Promise.resolve();
-      fonts.then(function () { requestAnimationFrame(function () { requestAnimationFrame(function () {
+      fonts.then(scrollSettled).then(function () { requestAnimationFrame(function () { requestAnimationFrame(function () {
         root.classList.add('atlas-ready'); ready = true;
         if (!keepStill) root.classList.remove('atlas-still');
         if (fn) { try { prev = fn(AB.screens); } catch (e) { prev = null; } }   // the state the screen opens in is not a change
