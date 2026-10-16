@@ -5,7 +5,8 @@
 //   --candidate  the branch (or commit) to merge; it must already contain origin/main (merge main forward first)
 //   --scope      the features the change means to touch; a changed screen elsewhere makes it a shared-component change
 //   --quick      compare only the scope's screens (a builder's self-check; the gate itself never runs quick)
-//   --all        shoot every screen in full, whatever the change's reach (by default: its reach in full, a tripwire elsewhere)
+//   --all        shoot every screen in full, whatever the change's reach (by default: its reach in full, a tripwire elsewhere);
+//                also skips the opt-in proof, so a bundle change is gated as shared
 // One gate runs at a time on a machine (a lock in the git common dir); base shots are cached per main commit.
 // Run it from an up-to-date main checkout, never from the candidate: a candidate does not grade itself with its own gate.
 // Writes <out>/mechanical.json and, for every changed, new or removed screen, <out>/pairs/<screen>/<lang>-<width>.png
@@ -24,6 +25,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { OPT_IN_FILES, loadApi, optInProof } from './opt-in-proof.mjs';
 import { CLASSES, DS_FEATURE, componentPage, componentPagesOf, componentsTouched, idPath, screensOf, pageOf, pageAssets, sharedFiles, coverageLost, effectiveClass, classifyScreens, checkVerdict, touchesSystem, touchesTools, queueAhead as queueOf, budgetProblems, critiqueProblems, pageStyling, addedLines, calibrationProblems, lockState, shotsToTake, reachOf, reachLine, carryDecision, ghNetworkError, newScenarioFailures } from './loop-rules.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -306,6 +308,38 @@ for (const p of new Set(baseScreens.map((s) => pageOf(s.url)))) {
 const shared = sharedFiles(baseScreens, assets);
 const touched = touchesSystem(files, shared);
 mech.shared = { files: Object.keys(shared).length, touched: Object.fromEntries(touched.map((f) => [f, shared[f] || []])) };
+// ---------- the opt-in proof (gate.md §1, "Opt-in component change") ----------
+// A change whose only system files are the bundle (bundle.js, bundle.css, index.d.ts) may prove itself opt-in: every call the
+// base screens make into SentriUI renders the same markup through the candidate's bundle, and every CSS rule it adds needs a hook
+// no base markup or source carries (scripts/opt-in-proof.mjs). Proved, the bundle files reach only the component pages (beside
+// what the change's other files reach), they raise no class and join no queue, and the tripwire still shoots every other screen.
+// Not proved, or --all: the full shared gate, as before. The base corpus is recorded once per main commit (scripts/record-calls.mjs).
+const optIn = (() => {
+  if (!touched.length || mech.quick || flag('all') || !touched.every((f) => OPT_IN_FILES.includes(f))) return null;
+  const key = createHash('sha256').update(fs.readFileSync(path.join(root, 'scripts/record-calls.mjs'))).digest('hex').slice(0, 12);
+  const corpus = path.join(gateDir(), 'calls', `${mech.base}-${key}.json`);
+  if (!fs.existsSync(corpus)) {
+    console.log('opt-in proof: recording the calls the base screens make …');
+    const rec = run(process.execPath, [path.join(root, 'scripts/record-calls.mjs'), corpus, '--root', wt.base, '--commit', mech.base], root, 30 * 60e3);
+    if (rec.code) console.log(rec.tail);
+  }
+  let calls = [];
+  try { calls = JSON.parse(fs.readFileSync(corpus, 'utf8')).calls || []; } catch {}
+  const read = (k, f) => { const p = path.join(wt[k], f); return fs.existsSync(p) ? fs.readFileSync(p, 'utf8') : ''; };
+  const [jsFile, cssFile] = OPT_IN_FILES;
+  let markup = '';
+  try { const api = loadApi(read('base', jsFile)); markup = calls.map(([f, a]) => { try { return String(api[f](...a)); } catch { return ''; } }).join('\n'); } catch {}
+  const sources = {};
+  for (const f of git(['ls-files', 'ux'], wt.base).out.split(/\r?\n/).filter((x) => /\.(js|cjs|mjs|html|css)$/.test(x))) sources[f] = read('base', f);
+  return optInProof({ files, systemFiles: touched, base: { js: read('base', jsFile), css: read('base', cssFile) }, cand: { js: read('cand', jsFile), css: read('cand', cssFile) }, calls, known: { markup, sources } });
+})();
+const proved = new Set(optIn?.ok ? optIn.files : []);
+const unproved = (list) => list.filter((f) => !proved.has(f));
+if (optIn) {
+  mech.optIn = { ok: optIn.ok, why: optIn.why, calls: optIn.calls, files: optIn.files };
+  console.log(optIn.ok ? `opt-in proof: proved on ${optIn.calls} recorded call(s) and ${optIn.addedRules} added rule(s); ${optIn.files.join(', ')} reach their component pages only` : `opt-in proof: not proved, gated as shared (${optIn.why.join('; ')})`);
+  if (optIn.ok) check('opt-in proof: existing calls render the same, added CSS needs a new hook', true, `${optIn.calls} call(s), ${optIn.addedRules} added rule(s)`);
+}
 // What the change can reach, from its files (both sides of a rename) and both sides' pages: only those screens are shot in full
 // (scripts/loop-rules.mjs reachOf; unsure is every screen). Every other screen is still shot once, at 390 in English, as a tripwire.
 const candScreens = screensOf(JSON.parse(fs.readFileSync(path.join(wt.cand, 'atlas/atlas.json'), 'utf8')));
@@ -323,12 +357,13 @@ const reach = (() => {
   }
   const screens = [...baseScreens, ...candScreens];
   const changed = git(['diff', '--name-only', '--no-renames', mech.base, mech.candidate]).out.split(/\r?\n/).filter(Boolean);
-  return reachOf({ files: changed, screens, assets: both, shared: sharedFiles(screens, both), scope });
+  const r = reachOf({ files: unproved(changed), screens, assets: both, shared: sharedFiles(screens, both), scope });
+  return proved.size ? { ...r, features: [...new Set([...r.features, DS_FEATURE])].sort(), why: [...r.why, `${[...proved].join(', ')}: opt-in proved, the component pages`] } : r;
 })();
 const inReach = (s) => reach.all || reach.features.includes(s.feature);
 mech.reach = { ...reach, screens: new Set([...candScreens, ...ds.cand].filter(inReach).map((s) => s.id)).size };
 console.log(reachLine(reach, mech.reach.screens));
-const byFiles = effectiveClass({ declared, files, diffs: [], scope, shared });
+const byFiles = effectiveClass({ declared, files: unproved(files), diffs: [], scope, shared });
 mech.class = { declared, effective: byFiles.cls, why: byFiles.why };
 if (byFiles.cls !== declared) console.log(`class: ${declared} → ${byFiles.cls} (${byFiles.why.join('; ')})`);
 
@@ -544,7 +579,7 @@ if (zhLost.size) gaps.push(`${zhLost.size} screen(s) rendered Chinese on base an
 // A screen that renders differently twice on base can't be judged by pixels: its pairs still go to the judge, but it doesn't
 // escalate the class or fail a refactor by itself.
 const steady = moved.filter((s) => !mech.flaky.includes(s.id));
-const ec = effectiveClass({ declared, files, diffs: steady, scope, shared });
+const ec = effectiveClass({ declared, files: unproved(files), diffs: steady, scope, shared });
 mech.class = { declared, effective: ec.cls, why: ec.why };
 // P2, every change has a known reach: a change declared for its own features that moves another feature's screen fails here
 // instead of being quietly escalated to a shared change (rules ledger L3). A deliberate shared change declares --class shared.
@@ -692,7 +727,7 @@ mech.timings.statesWait = Math.round((Date.now() - t0) / 1000) + 's';
 t0 = Date.now();
 const runner = fs.existsSync(path.join(wt.cand, 'scripts/run-scenarios.mjs'));
 const noLeaves = [];
-for (const f of new Set([...scope, ...[...screens.diff, ...screens.new].map((s) => s.feature), ...touched.flatMap((t) => shared[t] || [])].filter((f) => f !== DS_FEATURE))) {
+for (const f of new Set([...scope, ...[...screens.diff, ...screens.new].map((s) => s.feature), ...unproved(touched).flatMap((t) => shared[t] || [])].filter((f) => f !== DS_FEATURE))) {
   if (!fs.existsSync(path.join(wt.cand, 'features', f, 'scenarios.json'))) { noLeaves.push(f); continue; }
   if (!runner) { check(`scenarios ${f}`, false, 'scripts/run-scenarios.mjs is not on this candidate'); continue; }
   r = run(process.execPath, ['scripts/run-scenarios.mjs', f, '--base', url.cand], wt.cand);
