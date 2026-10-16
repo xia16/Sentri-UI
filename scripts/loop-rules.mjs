@@ -496,3 +496,30 @@ export function newScenarioFailures(candFailed, baseOut) {
   const debt = candFailed.filter((id) => onBase.get(id) === 'fail');
   return { added: candFailed.filter((id) => onBase.get(id) !== 'fail'), debt };
 }
+
+// A change that moves no screen merges on the mechanical gate alone (docs/design-workflow/README.md, "Who decides what"): there is
+// no pair for a judge, so the gate itself posts the sentri/gate status and the pass record. Fail closed: the run must be a full
+// one (not --quick) whose screens were classified, with nothing changed, new or gone and no pair listed.
+export function passesWithoutJudge(mech) {
+  if (!mech || mech.pass !== true || mech.quick || !mech.candidate || !mech.base || !mech.screens) return false;
+  if ((mech.pairs || []).length) return false;
+  return ['diff', 'new', 'gone'].every((k) => Array.isArray(mech.screens[k]) && mech.screens[k].length === 0);
+}
+
+// How many scenario runs go at once (run-scenarios.mjs), found like TCP finds its window: additive increase, multiplicative
+// decrease. It starts at `start`; the first runs set a baseline (their median time); after each round (as many runs as the window),
+// it adds one while the round's median stays within 1.5x the baseline, and halves when it passes 2.5x (the machine is crowded,
+// e.g. another session's tests). A run that hit a navigation timeout halves it at once. Never below 1 or above max.
+// state: { limit, min, max, baseline, warm: [ms], window: [ms], round }; returns the next state and why it changed (or null).
+export function aimdStep(state, { ms, timedOut = false }) {
+  const s = { ...state, warm: [...(state.warm || [])], window: [...(state.window || [])] };
+  const median = (a) => { const b = [...a].sort((x, y) => x - y); return b.length ? b[Math.floor((b.length - 1) / 2)] : 0; };
+  if (timedOut) { const limit = Math.max(s.min, Math.floor(s.limit / 2)); const why = limit !== s.limit ? 'a navigation timed out' : null; return { state: { ...s, limit, window: [], round: 0 }, why }; }
+  if (s.baseline == null) { s.warm.push(ms); if (s.warm.length >= 6) { s.baseline = median(s.warm); s.round = 0; } return { state: s, why: null }; }
+  s.window.push(ms); s.round = (s.round || 0) + 1;
+  if (s.round < s.limit || s.window.length < 3) return { state: s, why: null };
+  const m = median(s.window), next = { ...s, window: [], round: 0 };
+  if (m > 2.5 * s.baseline) { next.limit = Math.max(s.min, Math.floor(s.limit / 2)); return { state: next, why: next.limit !== s.limit ? `runs slowed to ${(m / s.baseline).toFixed(1)}x` : null }; }
+  if (m <= 1.5 * s.baseline && s.limit < s.max) { next.limit = s.limit + 1; return { state: next, why: `runs at ${(m / s.baseline).toFixed(1)}x` }; }
+  return { state: next, why: null };
+}
