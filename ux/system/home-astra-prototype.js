@@ -12,6 +12,7 @@
     return `<button type="button" class="${cls}" data-action="${action}" data-value="${esc(value)}" ${extra}>${text}</button>`;
   };
   const ib = (action, key, label, value='') => SentriUI.iconButton({action,icon:icon(key),label,value,variant:key==='more'?'plain':'bordered'});
+  const manyMode=new URLSearchParams(location.search).get('many');
   const sections = [
     {id:'breeding',name:'Breeding',units:[1,2,3,4],population:184,icon:'heat',detail:'Heat checks & service'},
     {id:'gestation',name:'Gestation',units:[7,8,9],population:246,icon:'pregnancy',detail:'Pregnancy & return checks'},
@@ -21,7 +22,7 @@
   const units = {
     1:{pigs:48,pens:6,checked:'Today, 08:20 · M. Chen'},2:{pigs:46,pens:6,checked:'Yesterday, 16:10 · G. Hansen'},3:{pigs:44,pens:6,checked:'Today, 08:45 · M. Chen'},4:{pigs:46,pens:6,checked:'Yesterday, 15:40 · G. Hansen'},
     6:{pigs:8,pens:4,checked:'Today, 08:15 · G. Hansen'},
-    7:{pigs:86,pens:8,checked:SentriUnitSnapshot.checkIn.time+' · '+SentriUnitSnapshot.checkIn.who},8:{pigs:74,pens:7,checked:'Today, 08:35 · M. Chen'},9:{pigs:86,pens:8,checked:'Yesterday, 16:40 · G. Hansen'},
+    7:{pigs:86,pens:8,checked:'Today, '+SentriUnitSnapshot.checkIn.time+' · '+SentriUnitSnapshot.checkIn.who},8:{pigs:74,pens:7,checked:'Today, 08:35 · M. Chen'},9:{pigs:86,pens:8,checked:'Yesterday, 16:40 · G. Hansen'},
     10:{pigs:24,pens:24,checked:'Today, 08:15 · G. Hansen'},11:{pigs:24,pens:24,checked:'Yesterday, 17:00 · M. Chen'},12:{pigs:180,pens:6,checked:'Today, 08:30 · M. Chen'},13:{pigs:180,pens:6,checked:'Today, 08:50 · M. Chen'}
   };
   // Unit context belongs at the entrance; values remain sample data for this study.
@@ -49,16 +50,30 @@
     {id:'piglet26done',section:'farrowing',type:'Piglet processing',batch:'Batch 26',counts:{6:[4,4],7:[4,4],8:[4,4]},measure:'pens',completedAt:'Today, 09:10'}
   );
   // Extra fictional task instances for the list-overflow review URL: ?section=gestation&many=1.
-  if(new URLSearchParams(location.search).get('many')==='1'){
+  if(manyMode==='1'){
     [33,34,35,36].forEach(n=>tasks.push({...tasks[0],id:'preg'+n,batch:'Batch '+n,counts:{7:[4,1],8:[5,2]}}));
   }
+  // Mixed-work review only: two distinct instances of each non-production type, beside the existing production cards.
+  // Due counts are explicit sample schedule facts; they are not inferred from total minus recorded.
+  if(manyMode==='operations')tasks.push(
+    {id:'care04',section:'gestation',type:'Treatment course',batch:'Care plan 04',counts:{7:[6,3],8:[4,3]},measure:'pigs',preview:{context:'Dose 2 of 3',icon:'care',due:{7:3,8:1},label:'pigs due for this dose',progress:'This dose recorded',timing:'Today · 15:00',actionAt:900}},
+    {id:'care08',section:'gestation',type:'Treatment course',batch:'Care plan 08',counts:{8:[5,5],9:[4,4]},measure:'pigs',preview:{context:'Dose 1 of 2',icon:'care',due:{8:0,9:0},label:'pigs due for this dose',progress:'This dose recorded',timing:'In progress',next:'Next dose · tomorrow 08:00'}},
+    {id:'vax21',section:'gestation',type:'Vaccination',batch:'Plan V-21',counts:{7:[10,6],8:[6,4]},measure:'pigs',preview:{context:'PRRS · dose 1',icon:'care',due:{7:4,8:2},overdue:{7:1,8:1},label:'pigs due for vaccination',progress:'This vaccination recorded',timing:'',actionAt:540}},
+    {id:'vax22',section:'gestation',type:'Vaccination',batch:'Plan V-22',counts:{7:[7,2],9:[5,0]},measure:'pigs',preview:{context:'Influenza · dose 1',icon:'care',due:{7:3,9:1},label:'pigs due for vaccination',secondary:'Next session · 17:00',progress:'This vaccination recorded',timing:'Today',actionAt:1020}},
+    {id:'move241',section:'gestation',type:'Pig transfer',batch:'Order TR-241',counts:{7:[12,7],8:[8,5]},measure:'pigs',preview:{context:'Scheduled move',icon:'transfer',due:{7:5,8:3},label:'pigs to confirm moved',secondary:'Units 7 & 8 → Farrowing 6',secondaryByUnit:{7:'Unit 7 → Farrowing 6',8:'Unit 8 → Farrowing 6'},progress:'Move confirmed',timing:'Today · 14:00',actionAt:840}},
+    {id:'move242',section:'gestation',type:'Pig transfer',batch:'Order TR-242',counts:{8:[6,3],9:[4,2]},measure:'pigs',preview:{context:'To Nursery · Unit 12',icon:'transfer',due:{8:0,9:0},label:'pigs to confirm moved',progress:'Move confirmed',timing:'In progress',next:'Next receiving window · tomorrow 09:00'}},
+    {id:'out61',section:'gestation',type:'Outbound',batch:'Order OB-61',counts:{7:[12,7],9:[8,4]},measure:'pigs',preview:{context:'Cull group',icon:'note',due:{7:5,9:4},label:'pigs awaiting confirmation',progress:'Outbound confirmed',timing:'No deadline',undated:true}},
+    {id:'out62',section:'gestation',type:'Outbound',batch:'Order OB-62',counts:{8:[6,0]},measure:'pigs',preview:{context:'Sale group',icon:'note',due:{8:6},label:'pigs awaiting confirmation',progress:'Outbound confirmed',timing:'No deadline',undated:true}},
+    {id:'sample15',section:'gestation',type:'Sampling',batch:'Task SP-15',counts:{7:[3,1],8:[2,1]},measure:'targets',preview:{context:'Pig targets',icon:'note',due:{7:2,8:1},label:'targets to sample',progress:'Targets sampled',timing:'Today · 15:20',actionAt:920}},
+    {id:'sample16',section:'gestation',type:'Sampling',batch:'Task SP-16',counts:{9:[4,1]},measure:'targets',preview:{context:'Environment targets',icon:'note',due:{9:3},label:'targets to sample',progress:'Targets sampled',timing:'Due today',actionAt:1080}}
+  );
   // Future, unstarted task instances within the next seven sample farm-calendar days.
   const futureTasks=[
     {id:'preg38',section:'gestation',units:[7,8],batch:'Batch 38',title:'Pregnancy check',startDay:1,when:'Tomorrow'},
     {id:'return39',section:'gestation',units:[7,9],batch:'Batch 39',title:'Return-heat check',startDay:3,when:'In 3 days'},
     {id:'heat37',section:'breeding',units:[1,2],batch:'Batch 37',title:'Heat check',startDay:2,when:'In 2 days'},
     {id:'nursery27',section:'nursery',units:[12,13],batch:'Batch 27',title:'End-nursery check',startDay:4,when:'In 4 days'},
-    ...(new URLSearchParams(location.search).get('many')==='1'?[
+    ...(manyMode==='1'?[
       {id:'preg40',section:'gestation',units:[7],batch:'Batch 40',title:'Pregnancy check',startDay:4,when:'In 4 days'},
       {id:'preg41',section:'gestation',units:[7],batch:'Batch 41',title:'Pregnancy check',startDay:5,when:'In 5 days'}
     ]:[])
@@ -69,6 +84,26 @@
     records.set(`${task.id}:${unit}`,list);
   }));
   const params = new URLSearchParams(location.search);
+  const requestedDay=Number(params.get('day'));
+  const compactPreview=params.get('variant')==='compact';
+  const joinedPreview=params.get('variant')==='joined';
+  const connectedPreview=params.get('variant')==='connected';
+  const seamlessPreview=params.get('variant')==='seamless'||connectedPreview;
+  const groupedPreview=params.get('variant')==='grouped'||joinedPreview||seamlessPreview;
+  const groupMode=['collapsed','all'].includes(params.get('groups'))?params.get('groups'):'';
+  if(groupedPreview){
+    const switcher=$('.grouped-prototype-switch');
+    switcher.hidden=false;
+    $('[data-grouped-label]').textContent=connectedPreview?(manyMode==='operations'?'13 open · connected groups':'3 open · full cards'):manyMode==='operations'?'13 tasks · accordion':'3 tasks · full cards';
+    const nextUrl=new URL(location.href);
+    if(manyMode==='operations')nextUrl.searchParams.delete('many');else nextUrl.searchParams.set('many','operations');
+    nextUrl.searchParams.delete('tasks');
+    switcher.querySelectorAll('a').forEach(link=>{link.href=nextUrl.href;link.setAttribute('aria-label',manyMode==='operations'?'Show three full task cards':'Show thirteen grouped tasks');});
+    document.addEventListener('keydown',event=>{
+      if(!['ArrowLeft','ArrowRight'].includes(event.key)||event.target.closest('input,textarea,[contenteditable]'))return;
+      location.assign($('[data-grouped-'+(event.key==='ArrowLeft'?'previous':'next')+']').href);
+    });
+  }
   const attentionModes=['current','clear','health','feed','maintenance','busy','unknown'];
   let attentionPreview=attentionModes.includes(params.get('attention'))?params.get('attention'):'current';
   let workPreview=['mixed','active','waiting'].includes(params.get('work'))?params.get('work'):'mixed';
@@ -76,7 +111,7 @@
   try { rememberedSection=localStorage.getItem('sentri-home-prototype-section'); } catch { /* File previews may disable storage. */ }
   const requestedSection=params.get('section')||rememberedSection;
   const initialSection = sections.some(s=>s.id===requestedSection) ? requestedSection : 'gestation';
-  let state = {page:'home',section:initialSection,unit:null,task:null,workUnit:null,expandedTasks:params.get('tasks')==='expanded',expandedUpcoming:false,assistantTab:'findings',chat:[],answered:false,notes:[],log:[],overlay:null};
+  let state = {page:'home',section:initialSection,unit:null,task:null,workUnit:null,expandedTasks:params.get('tasks')==='expanded',expandedUpcoming:false,scheduleDay:Number.isInteger(requestedDay)&&requestedDay>=1&&requestedDay<=7?requestedDay:0,typeGroupOverrides:{},assistantTab:'findings',chat:[],answered:false,notes:[],log:[],overlay:null};
   // UI-only queue: no device database or upload service is connected to this study.
   const pendingExamples=[{title:'Pregnancy check · 000308',context:'Gestation · Unit 7 · Batch 31',time:'09:32'},{title:'Pen note · C2',context:'Gestation · Unit 8',time:'09:35'},{title:'Feed adjustment · 000267',context:'Gestation · Unit 7 · Pen C1',time:'09:38'}];
   const syncPreset=params.get('sync')||(params.get('connection')==='online'?'online':'offline');
@@ -100,6 +135,7 @@
   const openTaskCount = (sectionId,unit=null) => tasks.filter(t=>!t.completedAt&&!t.terminatedAt&&t.section===sectionId&&(!unit||t.counts[unit])).length;
   const nouns = (t,n) => t.measure==='pens'?`${n===1?'pen':'pens'}`:`${n===1?'sow':'sows'}`;
   function toast(text){clearTimeout(toastTimer);$('#notice').textContent=text;toastTimer=setTimeout(()=>$('#notice').textContent='',3500);}
+  function reflectTaskExpansion(){const url=new URL(location.href);if(state.expandedTasks)url.searchParams.set('tasks','expanded');else url.searchParams.delete('tasks');history.replaceState(null,'',url);}
   function sectionMotion(direction,update){
     if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){update();return;}
     if(!document.startViewTransition){
@@ -115,20 +151,21 @@
   }
   function push(page,patch={}) {
     const fromHome=state.page==='home'&&page==='sections';
-    const update=()=>{navStack.push({page:state.page,unit:state.unit,task:state.task,workUnit:state.workUnit,section:state.section,scroll:app.querySelector('.app-scroll')?.scrollTop||0});if(state.page==='home'){state.expandedTasks=false;state.expandedUpcoming=false;}Object.assign(state,patch,{page});render();};
+    const update=()=>{navStack.push({page:state.page,unit:state.unit,task:state.task,workUnit:state.workUnit,section:state.section,scroll:app.querySelector('.app-scroll')?.scrollTop||0});if(state.page==='home'){state.expandedTasks=false;state.expandedUpcoming=false;reflectTaskExpansion();}Object.assign(state,patch,{page});render();};
     if(fromHome)sectionMotion('forward',update);else update();
   }
   function back(){
     const prior=navStack.pop();
     if(prior){
       const toHome=state.page==='sections'&&prior.page==='home';
-      const update=()=>{Object.assign(state,prior);render();const scroll=app.querySelector('.app-scroll');if(scroll)scroll.scrollTop=prior.scroll||0;};
+      const resetHomeGroups=prior.page==='home'&&['toolbox','records','assistant','environment','maintenance'].includes(state.page);
+      const update=()=>{Object.assign(state,prior);if(resetHomeGroups){state.typeGroupOverrides={};state.scheduleDay=0;const url=new URL(location.href);url.searchParams.delete('day');history.replaceState(null,'',url);}render();const scroll=app.querySelector('.app-scroll');if(scroll)scroll.scrollTop=prior.scroll||0;};
       if(toHome)sectionMotion('back',update);else update();
     }else{state.page='home';render();}
   }
   function goHome(){
     const fromSections=state.page==='sections';
-    const update=()=>{state.page='home';navStack=[];render();};
+    const update=()=>{if(['toolbox','records','assistant','environment','maintenance'].includes(state.page)){state.typeGroupOverrides={};state.scheduleDay=0;const url=new URL(location.href);url.searchParams.delete('day');history.replaceState(null,'',url);}state.page='home';navStack=[];render();};
     if(fromSections)sectionMotion('back',update);else update();
   }
   function nav(active='home'){return `<nav class="bottom-nav" aria-label="Main navigation">${btn('home',icon('home')+'Home',active==='home'?'active':'')}${btn('scan',icon('scan')+'Scan','scan-button')}${btn('toolbox',icon('toolbox')+'Toolbox',active==='toolbox'?'active':'','',state.unit?'data-entry="environment" data-entry-via="toolbox"':'')}</nav>`;}
@@ -141,6 +178,13 @@
   function legacyHead(title,sub='',extra='',showBack=true){return `<header class="page-head">${showBack?ib('back','back','Back'):''}<div class="head-copy">${SentriUI.heading({title,description:sub,kind:'page',level:2})}</div>${extra}</header>`;}
   function header(){return `<header class="app-header">${btn('sections',`<span class="farm-label">GREEN VALLEY FARM</span><strong>${section().name}${icon('down')}</strong>`,'section-trigger','','aria-label="Change section, '+section().name+'"')}${btn('assistant',`${icon('spark')}Assistant`,'assistant-door','','aria-label="Assistant"')}</header>`;}
   function scopeRail(){return `<nav class="scope-switch" aria-label="Work scope">${btn('scope','Overview','scope-overview','',`aria-pressed="${!state.unit}"`)}${btn('units',`<span>${state.unit?'Unit '+state.unit:'Choose unit'}</span>${icon('down')}`,'scope-unit','',`${state.section==='farrowing'?'data-entry="farrowing" data-entry-via="choose-unit" ':''}aria-haspopup="dialog" aria-label="${state.unit?'Change unit, Unit '+state.unit:'Choose unit'}, ${section().units.length} units" aria-pressed="${!!state.unit}"`)}</nav>`;}
+  function overviewShortcuts(){
+    if(state.unit)return connectedPreview?'':`<nav class="overview-shortcuts unit-shortcuts" aria-label="Unit tools">${btn('inventory-entry',`<span class="overview-shortcut-icon">${icon('barn')}</span><span><strong>Unit ${state.unit} inventory</strong><small>${unitInfo(state.unit).pigs} pigs · ${unitInfo(state.unit).pens} pens</small></span>${icon('arrow')}`,'overview-shortcut')}</nav>`;
+    return `<nav class="overview-shortcuts" aria-label="Area tools">
+      ${btn('inspection-entry',`<span class="overview-shortcut-icon">${icon('grid')}</span><span><strong>Inspection</strong>${connectedPreview?'':'<small>Choose a unit</small>'}</span>${icon('arrow')}`,'overview-shortcut')}
+      ${btn('inventory-entry',`<span class="overview-shortcut-icon">${icon('barn')}</span><span><strong>Inventory</strong><small>${section().population} pigs${connectedPreview?'':' · '+section().units.length+' units'}</small></span>${icon('arrow')}`,'overview-shortcut')}
+    </nav>`;
+  }
   // Illustrative task windows. Unit selection changes counts, not batch time.
   const cardFields = {
     preg31:{context:'First check',day:1,days:3,label:'Checks recorded',verb:'sows ready to check',due:{7:2,8:2,9:1},nextAt:1440},
@@ -153,8 +197,18 @@
     piglet27:{context:'Age-day schedule',day:3,days:7,label:'Pens done',verb:'litters due',due:{6:2,7:2},state:'waiting',nextAt:1440}
   };
   function taskModel(t){
-    const count=Object.keys(t.counts).length,scope={kind:state.unit?'unit':'overview',label:state.unit?'Unit '+state.unit:(count===1?'One unit':'All units'),action:state.unit?'Open unit task':'View task'};
+    const count=Object.keys(t.counts).length,scope={kind:state.unit?'unit':'overview',label:state.unit?'Unit '+state.unit:(count===1?'One unit':t.preview?'Across '+count+' units':'All units'),action:state.unit?'Open unit task':'View task'};
     if(t.completedAt||t.terminatedAt)return {id:t.id,state:t.terminatedAt?'terminated':'complete',identity:{title:t.type,context:t.batch},scope,completedAt:t.completedAt||t.terminatedAt};
+    if(t.preview){
+      const f=t.preview,m=metric(t,state.unit),due=state.unit?f.due[state.unit]||0:Object.values(f.due).reduce((a,b)=>a+b,0);
+      const overdueCount=state.unit?f.overdue?.[state.unit]||0:Object.values(f.overdue||{}).reduce((a,b)=>a+b,0);
+      const waiting=due===0,overdue=!waiting&&overdueCount>0,stateName=waiting?'waiting':overdue?'overdue':f.undated?'undated':'active';
+      return {id:t.id,state:stateName,attentionRank:waiting?3:overdue?1:f.undated?2.5:2,actionAt:f.actionAt,
+        identity:{title:t.type,context:t.batch+' · '+f.context,icon:f.icon},
+        action:waiting?{message:f.next||'In progress · next time not set'}:{value:due,label:f.label,secondary:overdueCount?overdueCount+' past due':state.unit?f.secondaryByUnit?.[state.unit]||f.secondary:f.secondary},
+        progress:{kind:'completion',label:f.progress,value:m.done,total:m.total,unit:t.measure},
+        timing:{elapsed:f.timing,remaining:f.remaining||''},scope};
+    }
     const m=metric(t,state.unit),f=cardFields[t.id]||cardFields.preg31,rows=taskRecords(t,state.unit);
     let p=f.kind==='observation'?null:{kind:f.kind||'completion',label:f.label,value:m.done,total:m.total,unit:t.measure||'sows'};
     const due=f.due?(state.unit?f.due[state.unit]||0:Object.values(f.due).reduce((a,b)=>a+b,0)):0;
@@ -182,7 +236,7 @@
     const current=workPreview==='mixed'?(f.state||'active'):workPreview;
     if(current==='waiting'){facts.due=0;facts.live=0;}
     const resolved=window.SentriHomeTaskCard.attention(kind,facts);
-    return {id:t.id,entry:({farrowing:'farrowing',piglet:'piglet-processing'})[kind],...resolved,identity:{title:t.type,context:t.batch+' · '+f.context,icon:'production'},progress:p,
+    return {id:t.id,entry:({farrowing:'farrowing',piglet:'piglet-processing'})[kind],...resolved,actionAt:manyMode==='operations'&&resolved.state==='active'?f.nextAt:undefined,identity:{title:t.type,context:t.batch+' · '+f.context,icon:'production'},progress:p,
       status:{label:resolved.state==='active'?'Due now':'Waiting',tone:resolved.state==='active'?'blue':''},
       timing:{elapsed:f.days===1?'Today':'Day '+f.day+' of '+f.days},scope};
   }
@@ -194,6 +248,11 @@
     const signals=[{label:'Health',count:care.health,unit:'pig',icon:'health'},{label:'Feed',count:care.feed,unit:'pig',icon:'feed'},{label:'Maintenance',count:faults.length,unit:'issue',icon:'wrench'}];
     const active=signals.filter(s=>Number.isFinite(s.count)&&s.count>0),unavailable=signals.some(s=>s.count===null);
     const inspectLabel = `Inspect unit, ${u.pigs} pigs, ${u.pens} pens`;
+    if(connectedPreview)return `<section class="unit-hub-compact" aria-label="Unit ${state.unit} status">
+      <div class="unit-hub-compact-head"><strong>Unit ${state.unit}<span class="unit-hub-compact-facts">${u.pigs} pigs · ${u.pens} pens</span></strong><small>Checked ${esc(u.checked.split(' · ')[0])}</small></div>
+      <div class="unit-hub-compact-attention" aria-label="Unit attention">${active.length?active.map(s=>s.label==='Maintenance'?btn('maintenance',`${icon(s.icon)}${s.label} ${s.count}${icon('arrow')}`,'unit-hub-compact-chip issue'): `<span class="unit-hub-compact-chip">${icon(s.icon)}${s.label} ${s.count}</span>`).join(''):!unavailable?'<span class="unit-hub-compact-clear">No flagged items</span>':''}${unavailable?'<span class="unit-hub-compact-unknown">Health and feed summary unavailable</span>':''}</div>
+      <div class="unit-hub-compact-actions">${btn('inspect','Inspect unit','primary')} ${btn('inventory-entry','Inventory','secondary')} ${sensors.length||devices.length?btn('environment','Environment','secondary','','data-entry="environment"'):''}</div>
+    </section>`;
     return `<section class="unit-hub unit-hub-unified" aria-label="Unit ${state.unit} status">
       <button type="button" class="unit-hub-inspect" data-action="inspect" data-entry="inspection" aria-label="${esc(inspectLabel)}">
         <span class="uhi-head">${icon('grid')}<span class="uhi-title">Inspect unit<small>${u.pigs} pigs · ${u.pens} pens</small></span>${icon('arrow')}</span>
@@ -244,19 +303,136 @@
     const visible=state.expandedUpcoming?next:next.slice(0,3);
     return `<section class="upcoming-work"><div class="work-section-heading"><h2>Coming up</h2><span>${next.length} tasks</span></div>${visible.map(n=>`<div class="upcoming-row"><span>${n.batch}</span><div>${n.title}<small>${n.when}</small></div></div>`).join('')}${next.length>3?btn('toggle-upcoming',state.expandedUpcoming?'Show first 3 tasks':`See all ${next.length} upcoming tasks`,'task-list-toggle','','aria-expanded="'+state.expandedUpcoming+'"'):''}</section>`;
   }
+  function schedulePreview(){
+    const next=futureTasks.filter(t=>t.section===state.section&&(!state.unit||t.units.includes(state.unit))&&t.startDay>=1&&t.startDay<=7);
+    const weekdays=['Fri','Sat','Sun','Mon','Tue','Wed','Thu'];
+    const days=Array.from({length:7},(_,i)=>i+1);
+    const selected=next.filter(t=>t.startDay===state.scheduleDay);
+    const selectedLabel=state.scheduleDay?`${weekdays[state.scheduleDay-1]} ${state.scheduleDay+8} Jul`:'';
+    const selectedSummary=selected.length===1?`${selected[0].title} · ${selected[0].batch}`:selected.length?`${selected.length} tasks start`:'No tasks start';
+    return `<section class="schedule-preview" aria-label="Next seven days schedule">
+      <div class="work-section-heading"><h2>Next 7 days</h2><span>9–15 Jul · ${next.length} starts</span></div>
+      <div class="schedule-days" aria-label="Choose a date">${days.map((day,i)=>btn('schedule-day',`<span>${weekdays[i]}</span><strong>${day+8}</strong><i class="${next.some(t=>t.startDay===day)?'has-task':''}" aria-hidden="true"></i>`,'schedule-day'+(state.scheduleDay===day?' selected':''),day,`aria-pressed="${state.scheduleDay===day}" aria-label="July ${day+8}, ${next.filter(t=>t.startDay===day).length} tasks start"`)).join('')}</div>
+      ${state.scheduleDay?`<div class="schedule-selected" role="status"><strong>${selectedLabel}</strong><span>${esc(selectedSummary)}</span>${selected.length?btn('schedule-details',`View ${icon('arrow')}`,'schedule-selected-view','','aria-label="View '+selected.length+' task starts on '+selectedLabel+'"'):''}</div>`:''}
+    </section>`;
+  }
+  function showScheduleDetails(){
+    const day=state.scheduleDay;
+    if(!day)return;
+    const next=futureTasks.filter(t=>t.section===state.section&&(!state.unit||t.units.includes(state.unit))&&t.startDay===day);
+    if(!next.length)return;
+    drawer(`${['Fri','Sat','Sun','Mon','Tue','Wed','Thu'][day-1]} ${day+8} Jul`,`${next.map(t=>`<div class="schedule-detail-row"><strong>${esc(t.title)}</strong><small>${esc(t.batch)} · planned to start</small></div>`).join('')}<p class="work-note">These tasks have not started. Ongoing tasks stay in Today’s work.</p>`,{size:'short'});
+  }
+  function overviewTaskCard(m,category=null){
+    const source=taskBy(m.id),finished=['complete','terminated'].includes(m.state);
+    const outcomeOnly=!finished&&['Heat check','Return-heat check','Breeding'].includes(source.type);
+    const name=category&&category!=='Production tasks'?source.batch:m.identity.title+(source.batch?' · '+source.batch:'');
+    const headline=finished?`${m.state==='terminated'?'Ended early':'Completed'} · ${m.completedAt||'Today'}`:
+      outcomeOnly?source.type==='Breeding'?'Service in progress':'Observation in progress':
+      ['waiting','upcoming'].includes(m.state)?'In progress':m.action?.value===undefined?m.action?.message||'Status to confirm':
+      `<strong>${esc(m.action.value)}</strong><span>${esc(m.action.label)}</span>`;
+    const summary=finished||outcomeOnly||['waiting','upcoming'].includes(m.state)||m.action?.value===undefined?esc(headline):headline;
+    const status=m.state==='overdue'?'<span class="overview-task-status">Overdue</span>':'';
+    const label=finished?'View record':m.state==='overdue'?'Overdue task':'Open task';
+    return `<button type="button" class="home-task-card overview-task-card ${esc(m.state)}" data-card="${esc(m.id)}" aria-label="${esc(name+', '+(finished||outcomeOnly?headline:label+(m.action?.value===undefined?'':', '+m.action.value+' '+m.action.label)))}">
+      <span class="overview-task-head"><strong>${esc(name)}</strong>${status}<span class="overview-task-arrow" aria-hidden="true">${icon('arrow')}</span></span>
+      <span class="overview-task-summary">${summary}${finished?'<span class="overview-task-record">View record</span>':''}</span>
+    </button>`;
+  }
+  function compactTaskRow(m){
+    const source=taskBy(m.id),details=m.identity.context.split(' · '),instance=details.shift();
+    const due=m.action?.value;
+    const dueLabel=({
+      'Pregnancy check':'sows due','Heat check':'sows in heat','Return-heat check':'sows returned',
+      'Breeding':'sows mated','Farrowing':'sows due','Piglet processing':'litters due',
+      'Treatment course':'pigs due','Vaccination':'pigs due','Pig transfer':'pigs to move',
+      'Outbound':'pigs to confirm','Sampling':'targets due'
+    })[source.type]||((source.measure||'sows')+' due');
+    const waiting=['waiting','upcoming'].includes(m.state);
+    const context=details.join(' · '),secondary=m.action?.secondary;
+    const detail=[context==='Scheduled move'&&secondary?'':context,secondary,m.timing?.elapsed].filter(Boolean).join(' · ');
+    const displayDetail=waiting?m.action?.message||detail:detail;
+    return `<button type="button" class="home-task-card compact-task-row ${esc(m.state)}" data-card="${esc(m.id)}" aria-label="${esc(m.identity.title+', '+instance+', '+(waiting?displayDetail:due+' '+dueLabel+', '+displayDetail))}">
+      <span class="compact-task-icon" aria-hidden="true">${icon(m.identity.icon||'note')}</span>
+      <span class="compact-task-copy"><span class="compact-task-title"><strong>${esc(m.identity.title)}</strong><small>${esc(instance)}</small></span><span class="compact-task-detail">${esc(displayDetail)}</span></span>
+      <span class="compact-task-value">${waiting?'<strong class="compact-task-waiting">In progress</strong>':`<strong>${esc(due)}</strong><small>${esc(dueLabel)}</small>`}</span>
+      <span class="compact-task-arrow" aria-hidden="true">${icon('arrow')}</span>
+    </button>`;
+  }
+  function joinedTaskRow(m,category){
+    const source=taskBy(m.id),details=m.identity.context.split(' · ');details.shift();
+    const waiting=['waiting','upcoming'].includes(m.state);
+    const title=category==='Production tasks'?m.identity.title:source.batch;
+    const instance=category==='Production tasks'?source.batch:'';
+    const context=details.join(' · '),secondary=m.action?.secondary;
+    const timing=m.timing?.elapsed==='Today'&&secondary?'':m.timing?.elapsed;
+    const detail=waiting?m.action?.message||context:[context==='Scheduled move'&&secondary?'':context,secondary,timing].filter(Boolean).join(' · ');
+    const number=waiting?'In progress':m.action?.value;
+    const unit=source.measure||'sows';
+    const label=({'Pregnancy check':'sows due','Heat check':'sows in heat','Return-heat check':'sows returned','Breeding':'sows mated','Farrowing':'sows due','Piglet processing':'litters due','Treatment course':'pigs due','Vaccination':'pigs due','Pig transfer':'pigs to move','Outbound':'pigs to confirm','Sampling':'targets due'})[source.type]||unit+' due';
+    return `<button type="button" class="home-task-card joined-task-row ${esc(m.state)}" data-card="${esc(m.id)}" aria-label="${esc(m.identity.title+', '+source.batch+', '+(waiting?detail:number+' '+label+', '+detail))}">
+      <span class="joined-task-copy"><span class="joined-task-title"><strong>${esc(title)}</strong>${instance?`<small>${esc(instance)}</small>`:''}</span><span class="joined-task-detail">${esc(detail)}</span></span>
+      <span class="joined-task-value"><strong class="${waiting?'joined-task-waiting':''}">${esc(number)}</strong>${waiting?'':`<small>${esc(label)}</small>`}</span>
+      <span class="joined-task-arrow" aria-hidden="true">${icon('arrow')}</span>
+    </button>`;
+  }
+  function groupedTaskCards(models){
+    const categoryFor=type=>({
+      'Treatment course':'Treatment','Vaccination':'Vaccination','Pig transfer':'Pig transfer',
+      'Outbound':'Outbound','Sampling':'Sampling'
+    })[type]||'Production tasks';
+    const groups=new Map();
+    models.forEach(model=>{
+      const category=categoryFor(model.identity.title);
+      if(!groups.has(category))groups.set(category,[]);
+      groups.get(category).push(model);
+    });
+    const urgentTypes=[...groups].filter(([,items])=>items.some(item=>item.attentionRank===0||item.state==='overdue')).map(([category])=>category);
+    const defaultOpenType=urgentTypes.length?null:groups.keys().next().value;
+    const rows=[...groups].map(([category,items])=>{
+      const overdue=items.filter(item=>item.state==='overdue').length;
+      const exceptions=items.filter(item=>item.attentionRank===0).length;
+      const completedCount=connectedPreview?items.filter(item=>['complete','terminated'].includes(item.state)).length:0;
+      const currentItems=connectedPreview?items.filter(item=>!['complete','terminated'].includes(item.state)):items;
+      const urgent=overdue+exceptions;
+      const defaultOpen=connectedPreview&&groupMode==='collapsed'?false:connectedPreview&&groupMode==='all'?true:urgent>0||category===defaultOpenType;
+      const isOpen=state.typeGroupOverrides[category]??defaultOpen;
+      const status=connectedPreview?[exceptions?`${exceptions} exception${exceptions===1?'':'s'}`:'',overdue?`${overdue} overdue`:'',completedCount?`${currentItems.length} open`:'',completedCount?`${completedCount} done`:''].filter(Boolean).join(' · '):(()=>{
+        const subtypeCounts=new Map();
+        currentItems.forEach(item=>subtypeCounts.set(item.identity.title,(subtypeCounts.get(item.identity.title)||0)+1));
+        const summary=category==='Production tasks'?[...subtypeCounts].sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0])).map(([type,count])=>`${type.replace(/ check$/,'')} ×${count}`).join(' · '):currentItems.map(item=>taskBy(item.id).batch.replace(/^(Care plan|Order|Plan|Task)\s+/,'')).join(' · ');
+        return [exceptions?`${exceptions} exception${exceptions===1?'':'s'}`:'',overdue?`${overdue} overdue`:'',summary].filter(Boolean).join(' · ');
+      })();
+      const categoryIcon=category==='Production tasks'?'production':category==='Pig transfer'?'transfer':['Sampling','Outbound'].includes(category)?'note':'care';
+      return `<section class="task-type-group ${isOpen?'is-open':''} ${urgent?'has-urgent':''}">
+        <button type="button" class="task-type-toggle" data-action="toggle-type" data-value="${esc(category)}" aria-expanded="${isOpen}" aria-label="${esc(category+', '+items.length+' tasks'+(status?', '+status:'')+', '+(isOpen?'collapse':'expand'))}">
+          <span class="task-type-icon" aria-hidden="true">${icon(categoryIcon)}</span>
+          <span class="task-type-copy"><strong>${esc(category)}</strong>${status?`<small>${esc(status)}</small>`:''}</span>
+          <span class="task-type-count">${items.length}<small>${items.length===1?'task':'tasks'}</small></span>
+          <span class="task-type-arrow" aria-hidden="true">${icon('arrow')}</span>
+        </button>
+        ${isOpen?`<div class="task-type-cards">${connectedPreview?items.map(item=>state.unit?window.SentriHomeTaskCard.render(item,{groupCategory:category,showRecordLink:true}):overviewTaskCard(item,category)).join(''):seamlessPreview?items.map(item=>window.SentriHomeTaskCard.render(item)).join(''):joinedPreview?items.map(item=>joinedTaskRow(item,category)).join(''):items.map(compactTaskRow).join('')}</div>`:''}
+      </section>`;
+    }).join('');
+    return {count:groups.size,html:`<div class="task-type-list ${joinedPreview?'joined-task-list':''} ${seamlessPreview?'seamless-task-list':''}">${rows}</div>`};
+  }
   function home(){
     const models=window.SentriHomeTaskCard.order(scopedTasks().map(taskModel));
     const open=models.filter(m=>!['complete','terminated'].includes(m.state));
+    const endedAt=m=>{const stamp=String(m.completedAt||'');const clock=stamp.match(/(\d{1,2}):(\d{2})/);return clock?Number(clock[1])*60+Number(clock[2]):Date.parse(stamp)||0;};
+    const completed=models.filter(m=>['complete','terminated'].includes(m.state)).sort((a,b)=>endedAt(b)-endedAt(a)||String(a.id).localeCompare(String(b.id)));
     const visible=state.expandedTasks?open:open.slice(0,5);
     const hidden=open.slice(5),hiddenAlerts=hidden.filter(m=>m.attentionRank===0).length,hiddenOverdue=hidden.filter(m=>m.state==='overdue'||m.attentionRank===1).length;
-    const cards=visible.map((m,i,list)=>{
+    const grouped=groupedPreview&&(connectedPreview?open.length+completed.length>=5:open.length>=4)?groupedTaskCards(connectedPreview?[...open,...completed]:open):null;
+    const cards=connectedPreview&&!state.unit?[...visible,...completed].map(m=>overviewTaskCard(m)).join(''):(compactPreview?visible.map(compactTaskRow).join(''):visible.map((m,i,list)=>{
       const quiet=['waiting','upcoming'].includes(m.state),firstQuiet=quiet&&(i===0||!['waiting','upcoming'].includes(list[i-1].state));
-      return (firstQuiet?'<div class="work-section-heading next-work-heading"><h2>Next</h2></div>':'')+window.SentriHomeTaskCard.render(m);
-    }).join('');
-    const completed=models.filter(m=>['complete','terminated'].includes(m.state));
-    const completedHTML=completed.length?'<details class="completed-work"><summary class="work-section-heading"><h2>Closed tasks</h2><span>'+completed.length+'</span></summary><div class="home-task-list">'+completed.map(m=>window.SentriHomeTaskCard.render(m)).join('')+'</div></details>':'';
-    const toggle=open.length>5?btn('toggle-tasks',state.expandedTasks?'Show first 5 tasks':`See all ${open.length} tasks${hiddenAlerts?' · '+hiddenAlerts+' exceptions':''}${hiddenOverdue?' · '+hiddenOverdue+' overdue':''}`,'task-list-toggle','','aria-expanded="'+state.expandedTasks+'"'):'';
-    return header()+scopeRail()+`<div class="app-scroll screen-enter">${state.unit?unitStrip():''}<div class="work-section-heading"><h2>Today’s work</h2><span>Sample · Thu, 8 Jul</span></div>${cards?`<div class="home-task-list">${cards}</div>${toggle}`:`<div class="empty-state"><div class="complete-mark">${icon('check')}</div><h3>No tasks in progress</h3><p>${state.unit?'You can still inspect this unit and record anything you find.':'Select a unit to inspect pens or record anything you find.'}</p></div>`}${comingUp()}${completedHTML}</div>`+nav();
+      return (firstQuiet&&!groupedPreview?'<div class="work-section-heading next-work-heading"><h2>Next</h2></div>':'')+window.SentriHomeTaskCard.render(m);
+    }).join(''))+(connectedPreview&&state.unit?completed.map(m=>window.SentriHomeTaskCard.render(m,{showRecordLink:true})).join(''):'');
+    const completedHTML=!connectedPreview&&completed.length?'<details class="completed-work"><summary class="work-section-heading"><h2>Closed tasks</h2><span>'+completed.length+'</span></summary><div class="home-task-list">'+completed.map(m=>window.SentriHomeTaskCard.render(m)).join('')+'</div></details>':'';
+    const toggle=!grouped&&open.length>5?btn('toggle-tasks',state.expandedTasks?'Show first 5 tasks':`See all ${open.length} tasks${hiddenAlerts?' · '+hiddenAlerts+' exceptions':''}${hiddenOverdue?' · '+hiddenOverdue+' overdue':''}`,'task-list-toggle','','aria-expanded="'+state.expandedTasks+'"'):'';
+    const work=grouped?grouped.html:cards?`<div class="home-task-list ${compactPreview?'compact-task-list':''}">${cards}</div>${toggle}`:`<div class="empty-state">${connectedPreview?'':`<div class="complete-mark">${icon('check')}</div>`}<h3>${connectedPreview?'No current tasks':'No tasks in progress'}</h3><p>${state.unit?'You can still inspect this unit and record anything you find.':'Choose a unit to see local work and tools.'}</p></div>`;
+    const workCount=connectedPreview?(state.unit?`Thu 8 Jul · ${open.length} open${completed.length?' · '+completed.length+' done':''}`:`${open.length} open${completed.length?' · '+completed.length+' done':''}`):groupedPreview?`${open.length} tasks${grouped?' · '+grouped.count+' types':''}`:compactPreview?open.length+' tasks':'Sample · Thu, 8 Jul';
+    return header()+scopeRail()+`<div class="app-scroll screen-enter ${compactPreview?'compact-preview':''} ${groupedPreview?'grouped-preview':''} ${joinedPreview?'joined-preview':''} ${seamlessPreview?'seamless-preview':''} ${connectedPreview?'connected-preview':''} ${!state.unit?'overview-scope':'unit-scope'}">${state.unit?unitStrip():''}${seamlessPreview&&(!connectedPreview||state.unit)?overviewShortcuts()+schedulePreview():''}<div class="work-section-heading"><h2>Today’s work</h2><span>${workCount}</span></div>${work}${seamlessPreview?'':comingUp()}${completedHTML}</div>`+nav();
   }
   function globalSync(){
     const n=sync.pending.length;
@@ -300,6 +476,7 @@
   function placeholder(){
     const t=task();
     if(t.completedAt||t.terminatedAt)return head(t.type)+'<div class="app-scroll"><div class="empty-state"><div class="complete-mark">'+icon('check')+'</div><h3>'+(t.terminatedAt?'Task ended early':'Task complete')+'</h3><p>'+esc(t.completedAt||t.terminatedAt)+'</p><p>Results page not designed yet.</p></div></div>';
+    if(t.preview)return head(t.type)+'<div class="app-scroll"><div class="empty-state"><h3>Task detail preview</h3><p>'+esc(t.batch)+' · '+esc(t.preview.context)+'</p><p>This example shows how the task appears on Home. Its detail and actions are not connected in this study.</p></div></div>';
     return head(t.type)+
       '<div class="app-scroll"><div class="empty-state"><h3>Task preview</h3><p>This task page is still to come. The task stays open between scheduled work.</p></div></div>'+
       SentriUI.sheetFooter({content:btn('end-task-early','End task early','secondary'),className:'page-footer'});
@@ -328,7 +505,7 @@
     if(!['home','sections'].includes(state.page))return null;
     const view=state.page==='sections'?'sections':state.unit?'unit':'';
     const hit=(screens||[]).filter(c=>c.id.startsWith('workbench.')).find(c=>{const u=new URL(c.url,location.href).searchParams;
-      return (u.get('view')||'')===view&&(view==='sections'||(u.get('section')||'gestation')===state.section)&&(view!=='unit'||u.get('unit')===String(state.unit))&&(u.get('work')||'mixed')===workPreview&&(u.get('attention')||'current')===attentionPreview&&(u.get('many')||'')===(params.get('many')||'')&&(u.get('tasks')||'')===(params.get('tasks')||'');});
+      return (u.get('view')||'')===view&&(view==='sections'||(u.get('section')||'gestation')===state.section)&&(view!=='unit'||u.get('unit')===String(state.unit))&&(u.get('work')||'mixed')===workPreview&&(u.get('attention')||'current')===attentionPreview&&(u.get('many')||'')===(params.get('many')||'')&&(u.get('variant')||'')===(params.get('variant')||'')&&(u.get('groups')||'')===groupMode&&(u.get('day')||'')===(state.scheduleDay?String(state.scheduleDay):'')&&(u.get('tasks')||'')===(state.expandedTasks?'expanded':'');});
     return hit?hit.id:null;
   }
   function render(){
@@ -359,32 +536,48 @@
     drawer('Choose a unit',`<div id="unit-options" class="unit-options"></div>`,{surface:'menu'});
     overlay.querySelector('.sheet,.dialog').classList.add('unit-picker');unitChoices();
   }
+  function showInspectionEntry(){
+    if(state.unit){openDesigned('inspection-astra-concept.html',state.unit,'unit');return;}
+    drawer('Inspect a unit',`<p class="work-note">Choose where to begin the pen walk.</p><div class="st-panel st-row-group">${section().units.map(u=>SentriUI.row({variant:'navigation',icon:icon('grid'),title:'Unit '+u,description:unitInfo(u).checked,trail:'none',action:'inspect-unit',value:u})).join('')}</div>`,{surface:'menu'});
+  }
+  function showInventoryEntry(){
+    const list=state.unit?[state.unit]:section().units;
+    const pigs=list.reduce((n,u)=>n+unitInfo(u).pigs,0);
+    drawer('Inventory',`<div class="inventory-summary"><small>${state.unit?'Unit '+state.unit:section().name+' · '+list.length+' units'}</small><strong>${pigs}<span>pigs</span></strong><small>Sample snapshot · Today, 09:40</small></div><div class="st-panel st-row-group">${list.map(u=>SentriUI.row({variant:'navigation',icon:icon('barn'),title:'Unit '+u,description:unitInfo(u).pigs+' pigs · '+unitInfo(u).pens+' pens',trail:'none',action:'inventory-unit',value:u})).join('')}</div><p class="work-note">Sample location snapshot · not a live inventory count.</p>`);
+  }
   function selectScope(unit){
-    state.unit=unit;state.workUnit=null;state.expandedTasks=false;state.expandedUpcoming=false;
+    state.unit=unit;state.workUnit=null;state.expandedTasks=false;state.expandedUpcoming=false;state.typeGroupOverrides={};state.scheduleDay=0;
     const url=new URL(location.href);url.searchParams.set('section',state.section);url.searchParams.set('view',unit?'unit':'overview');
-    if(unit)url.searchParams.set('unit',unit);else url.searchParams.delete('unit');
+    if(unit)url.searchParams.set('unit',unit);else url.searchParams.delete('unit');url.searchParams.delete('tasks');url.searchParams.delete('day');
     history.replaceState(null,'',url);goHome();
   }
   function scan(){drawer('Scan an ear tag',`<div class="scan-frame">${icon('scan')}</div><p>Scanner preview. Use a sample ear tag to try the lookup.</p><form id="lookup-form">${SentriUI.field({label:'Ear tag',control:`<input id="tag" name="tag" inputmode="numeric" placeholder="${taskRecords(taskBy('preg31'),7)[2].id}" required maxlength="12">`})}<button type="submit" class="button primary">Find sample pig</button></form>${btn('sample-scan','Use a sample tag','secondary')}`);}
-  function lookup(query){const term=query.trim().toLowerCase();const matches=[];tasks.forEach(t=>Object.keys(t.counts).forEach(u=>taskRecords(t,+u).filter(r=>r.id===term||r.pen.toLowerCase()===term).forEach(r=>matches.push({t,u,r}))));drawer('Search results',matches.length?SentriUI.panel(matches.slice(0,12).map(({t,u,r})=>SentriUI.row({title:r.id+' · Pen '+r.pen,description:'Unit '+u+' · '+t.type+' · '+t.batch,action:'lookup-result',value:t.id+':'+u+':'+r.id})).join(''),{className:'st-row-group'}):'<p>No matching sample pig or pen. Try the suggested sample tag or pen A1.</p>'+btn('search','Search again','secondary'));}
+  function lookup(query){const term=query.trim().toLowerCase();const matches=[];tasks.filter(t=>!t.preview).forEach(t=>Object.keys(t.counts).forEach(u=>taskRecords(t,+u).filter(r=>r.id===term||r.pen.toLowerCase()===term).forEach(r=>matches.push({t,u,r}))));drawer('Search results',matches.length?SentriUI.panel(matches.slice(0,12).map(({t,u,r})=>SentriUI.row({title:r.id+' · Pen '+r.pen,description:'Unit '+u+' · '+t.type+' · '+t.batch,action:'lookup-result',value:t.id+':'+u+':'+r.id})).join(''),{className:'st-row-group'}):'<p>No matching sample pig or pen. Try the suggested sample tag or pen A1.</p>'+btn('search','Search again','secondary'));}
   function chat(question){state.assistantTab='chat';state.chat.push({who:'user',text:question},{who:'assistant',text:'This is a preview of the conversation entrance. In the connected app, I would use your current '+(state.workUnit?'Unit '+state.workUnit:section().name)+' context to investigate this request and ask for any missing details. No analysis or farm action has been performed.'});render();const scroller=app.querySelector('.app-scroll');scroller.scrollTop=scroller.scrollHeight;}
   SentriUI.holdBind(document.body,{onCommit(el){if(el.dataset.action==='confirm-end-task'){task().terminatedAt='Today · just now';closeDrawer();goHome();}}});
   document.addEventListener('click',e=>{
-    const demo=e.target.closest('[data-demo]');if(demo){closeDrawer();navStack=[];state.section='gestation';state.unit=demo.dataset.demo==='unit'?7:null;state.page=demo.dataset.demo==='sections'?'sections':'home';const url=new URL(location.href);url.searchParams.set('view',demo.dataset.demo);url.searchParams.set('section','gestation');history.replaceState(null,'',url);render();return;}
+    const demo=e.target.closest('[data-demo]');if(demo){const url=new URL(location.href);if(demo.dataset.demo==='mixed'){url.searchParams.set('section','gestation');url.searchParams.set('many','operations');url.searchParams.set('focus','task-fold');url.searchParams.delete('view');url.searchParams.delete('unit');url.searchParams.delete('tasks');location.assign(url.href);return;}if(manyMode==='operations'){url.searchParams.delete('many');url.searchParams.delete('focus');url.searchParams.delete('tasks');url.searchParams.set('view',demo.dataset.demo);url.searchParams.set('section','gestation');if(demo.dataset.demo==='unit')url.searchParams.set('unit','7');else url.searchParams.delete('unit');location.assign(url.href);return;}closeDrawer();navStack=[];state.section='gestation';state.unit=demo.dataset.demo==='unit'?7:null;state.page=demo.dataset.demo==='sections'?'sections':'home';url.searchParams.set('view',demo.dataset.demo);url.searchParams.set('section','gestation');history.replaceState(null,'',url);render();return;}
     const card=e.target.closest('.home-task-card[data-card]');if(card){openTask(card.dataset.card,state.unit);return;}
     const el=e.target.closest('[data-action]');if(!el||el.disabled||el.matches('.st-hold')||SentriUI.guard(el))return;const a=el.dataset.action,v=el.dataset.value;
     if(a==='close'){closeDrawer();return;}
     if(a==='sync'){showSync();return;}
-    if(a==='toggle-tasks'){const scroll=app.querySelector('.app-scroll')?.scrollTop||0;state.expandedTasks=!state.expandedTasks;render();app.querySelector('.app-scroll').scrollTop=scroll;return;}
+    if(a==='toggle-tasks'){const scroll=app.querySelector('.app-scroll')?.scrollTop||0;state.expandedTasks=!state.expandedTasks;reflectTaskExpansion();render();app.querySelector('.app-scroll').scrollTop=scroll;return;}
+    if(a==='toggle-type'){const scroll=app.querySelector('.app-scroll')?.scrollTop||0;const group=app.querySelector('.task-type-toggle[data-value="'+CSS.escape(v)+'"]');state.typeGroupOverrides[v]=group?.getAttribute('aria-expanded')!=='true';render();app.querySelector('.app-scroll').scrollTop=scroll;return;}
     if(a==='toggle-upcoming'){const scroll=app.querySelector('.app-scroll')?.scrollTop||0;state.expandedUpcoming=!state.expandedUpcoming;render();app.querySelector('.app-scroll').scrollTop=scroll;return;}
+    if(a==='schedule-day'){const scroll=app.querySelector('.app-scroll')?.scrollTop||0;state.scheduleDay=state.scheduleDay===+v?0:+v;const url=new URL(location.href);if(state.scheduleDay)url.searchParams.set('day',state.scheduleDay);else url.searchParams.delete('day');history.replaceState(null,'',url);render();app.querySelector('.app-scroll').scrollTop=scroll;return;}
+    if(a==='schedule-details'){showScheduleDetails();return;}
     if(a==='end-task-early'){dialog('End task early?','Unfinished work will remain incomplete. Existing records are kept.',{label:'End task early',action:'confirm-end-task'});return;}
     if(a==='confirm-end-task'){task().terminatedAt='Today · just now';closeDrawer();goHome();return;}
     if(a==='back'){back();return;}
     if(a==='home'){goHome();return;}
     if(a==='sections'){push('sections');return;}
-    if(a==='section'){state.section=v;state.unit=null;state.workUnit=null;state.expandedTasks=false;state.expandedUpcoming=false;try{localStorage.setItem('sentri-home-prototype-section',v);}catch{/* Optional preview preference. */}const url=new URL(location.href);url.searchParams.delete('view');url.searchParams.set('section',v);history.replaceState(null,'',url);goHome();return;}
+    if(a==='section'){state.section=v;state.unit=null;state.workUnit=null;state.expandedTasks=false;state.expandedUpcoming=false;state.typeGroupOverrides={};state.scheduleDay=0;try{localStorage.setItem('sentri-home-prototype-section',v);}catch{/* Optional preview preference. */}const url=new URL(location.href);url.searchParams.delete('view');url.searchParams.delete('tasks');url.searchParams.delete('day');url.searchParams.set('section',v);history.replaceState(null,'',url);goHome();return;}
     if(a==='scope'){selectScope(null);return;}
     if(a==='units'){showUnits();return;}
+    if(a==='inspection-entry'){showInspectionEntry();return;}
+    if(a==='inventory-entry'){showInventoryEntry();return;}
+    if(a==='inspect-unit'){closeDrawer();openDesigned('inspection-astra-concept.html',+v,'unit');return;}
+    if(a==='inventory-unit'){closeDrawer();selectScope(+v);return;}
     if(a==='pick-unit'){closeDrawer();selectScope(+v);app.querySelector('.scope-unit')?.focus();return;}
     if(a==='task'){openTask(v,state.unit);return;}
     if(a==='unit-home'){state.unit=+v;goHome();return;}
@@ -429,6 +622,7 @@
   $('#attention-preview').value=attentionPreview;
   $('#attention-preview').addEventListener('change',e=>{attentionPreview=e.target.value;maintenanceCache.clear();const url=new URL(location.href);url.searchParams.set('attention',attentionPreview);history.replaceState(null,'',url);goHome();});
   $('#work-preview').value=workPreview;
+  if(manyMode==='operations')$('#work-preview').closest('.sync-demo').hidden=true;
   $('#work-preview').addEventListener('change',e=>{workPreview=e.target.value;const url=new URL(location.href);url.searchParams.set('work',workPreview);history.replaceState(null,'',url);goHome();});
   $('#reset-study').addEventListener('click',()=>location.reload());
   document.querySelectorAll("[data-status-icons]").forEach(e=>{e.innerHTML=icon("signal")+icon("battery");});
