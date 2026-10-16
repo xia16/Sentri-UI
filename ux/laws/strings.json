@@ -40,7 +40,6 @@
     "ds.picker.none": {"en": "None", "zh": "未选择", "kind": "label"},
     "ds.picker.selected": {"en": "{n} selected", "zh": "已选 {n} 项", "kind": "label"},
     "ds.picker.search": {"en": "Search all options", "zh": "搜索所有选项", "kind": "label"},
-    "ds.picker.search_in": {"en": "Search in {level}", "zh": "在{level}中搜索", "kind": "label"},
     "ds.field.required": {"en": "Required", "zh": "必填", "kind": "label"},
     "ds.picker.all": {"en": "All", "zh": "全部", "kind": "label"},
     "ds.picker.loading": {"en": "Loading options…", "zh": "正在加载选项…", "kind": "label"},

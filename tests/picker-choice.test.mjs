@@ -59,7 +59,7 @@ test("cascade-multi: ticks remain in the leaf catalogue; checkbox changes never 
   assert.match(drawer.match(/<header[^]*<\/header>/)[0], /class="st-sheet-corner" data-corner="start"[^>]*data-action="dismiss"[^>]*aria-label="Close"/);
   assert.doesNotMatch(drawer, /sheet-up/);
 });
-test("search at the root spans kinds, groups and aliases; inside a level it searches that level only", () => {
+test("search spans the whole tree at every level; a result's meta is its group, then its own meta", () => {
   const html = UI.pickerBody({
     variant: "cascade-multi",
     items: tree,
@@ -68,20 +68,28 @@ test("search at the root spans kinds, groups and aliases; inside a level it sear
     selected: ["fever"],
   });
   assert.match(html, /Influenza/);
-  assert.match(html, /Diseases › Respiratory/);
+  assert.match(html, />Respiratory</);
+  assert.doesNotMatch(html, /Diseases › Respiratory/);
   assert.doesNotMatch(html, /No options match/);
-  const scoped = UI.pickerBody({
+  const deep = UI.pickerBody({
     variant: "cascade-multi",
     items: tree,
     path: ["symptom", "general"],
     query: "pig flu",
   });
-  assert.match(scoped, /No options match/);
-  assert.match(scoped, /data-str-attr="aria-label:ds.picker.search_in;placeholder:ds.picker.search_in" data-args="[^"]*General appearance/);
-  const inLevel = UI.pickerBody({ variant: "cascade-multi", items: tree, path: ["symptom"], query: "fev" });
-  assert.match(inLevel, /Fever/);
-  assert.match(inLevel, />General appearance</);
-  assert.doesNotMatch(inLevel, /Symptoms › General appearance/);
+  assert.match(deep, /Influenza/);
+  assert.doesNotMatch(deep, /No options match/);
+  assert.match(deep, /aria-label="Search all options"/);
+  assert.doesNotMatch(deep, /Search in/);
+  const withMeta = UI.pickerBody({
+    variant: "cascade-multi",
+    items: [{ value: "s", label: "Symptoms", children: [{ value: "g", label: "General appearance", children: [{ value: "fever", label: "Fever", meta: "Already on 2 pigs", strs: { meta: "x.meta" } }] }] }],
+    path: ["s"],
+    query: "fev",
+  });
+  assert.match(withMeta, />General appearance · Already on 2 pigs</);
+  assert.doesNotMatch(withMeta, /x\.meta/);
+  assert.match(UI.pickerBody({ variant: "cascade-multi", items: tree, path: [], query: "zz" }), /No options match/);
 });
 test("descendant counts persist across branches, with one exit pair", () => {
   const html = UI.pickerBody({
