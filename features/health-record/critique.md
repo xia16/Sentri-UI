@@ -211,3 +211,12 @@ Scope: the head and footer of the two catalogue pickers (`health-record.conditio
 ### Self-crit
 
 The ruling fixes the design (board option B): no competing directions. Each screen is held against its baseline and the Farrowing room.
+
+#### Round 1 (renders at 390 and 360, EN and ZH, beside `1634cfd`; the deeper levels shot by a scripted walk at 390)
+- Problem 1 (two "backs" going to different places) fixed: below the root the footer Back carries the step action (`condition-step` / `medicine-step` with the path length to keep) and goes up one level; at Conditions / Medicines it is the leave action again. Walked in a browser: drill to General appearance, tick one, Back → Symptoms → Conditions → the form; reopen: the tick is still a draft.
+- Problem 2 fixed: the ✕ at the top left (ruling C's slot, a 48px target centred on the title) closes the whole picker from the root and from General appearance / Antibiotics; the draft is kept as with Back; it is there at every level, so it never moves.
+- Problem 3 fixed: the head of a level is one line, the same height as the root's; the title no longer drops when you drill in (board B).
+- Keep: the title is still the heaviest thing in the head; Clear (Brand), the footer pair, search and the held height are untouched.
+- Squint: the title, then the first rows, then Back / Done. The ✕ is a thin glyph, quieter than the title.
+- Cluttered, flat or bulky: at the root one glyph is added (the ✕) and nothing else; at a level one line of text ("‹ Symptoms") goes. Held against the Farrowing room: a quiet head, the work in the body.
+- **Better because** Back now means one thing (up a level, the owner's standing rule) and there is one visible way out from any depth, with a head that stays still between levels.
