@@ -26,7 +26,11 @@
   if (!id) return;
 
   var root = document.documentElement, ready = false, fn = null, prev = null;
-  root.classList.add('atlas-bare');
+  /* Motion is frozen (atlas-still) while the screen is put in its state, so the preset and steps land at once and every shot
+     of the same commit is the same picture. A person browsing the atlas then gets the motion back: after Ready the freeze is
+     lifted, so taps animate as they would on the phone. Automation (navigator.webdriver, as under Playwright) and ?still keep it. */
+  var keepStill = navigator.webdriver === true || q.has('still');
+  root.classList.add('atlas-bare', 'atlas-still');
   var css = document.createElement('style');
   css.textContent =
     'html.atlas-bare,html.atlas-bare body{margin:0!important;padding:0!important;width:390px!important;height:844px!important;overflow:hidden!important;background:#fff!important}' +
@@ -36,8 +40,7 @@
     'overflow:visible!important;transform:none!important;filter:none!important;background:none!important;box-shadow:none!important;border-radius:0!important;contain:none!important;opacity:1!important}' +
     'html.atlas-bare .atlas-phone{position:fixed!important;left:0!important;top:0!important;right:auto!important;bottom:auto!important;width:390px!important;height:844px!important;min-width:0!important;max-width:none!important;min-height:0!important;max-height:none!important;' +
     'margin:0!important;border:0!important;border-radius:0!important;box-shadow:none!important;outline:0!important;transform:none!important;overflow:hidden!important;z-index:1}' +
-    'html.atlas-bare *,html.atlas-bare *::before,html.atlas-bare *::after{animation-duration:0s!important;animation-delay:0s!important;transition-duration:0s!important;transition-delay:0s!important;caret-color:transparent}' +
-    'html.atlas-bare *,html.atlas-bare *::before,html.atlas-bare *::after{animation-duration:0s!important;animation-delay:0s!important;transition-duration:0s!important;transition-delay:0s!important;caret-color:transparent}' +
+    'html.atlas-still *,html.atlas-still *::before,html.atlas-still *::after{animation-duration:0s!important;animation-delay:0s!important;transition-duration:0s!important;transition-delay:0s!important;caret-color:transparent}' +
     'html.atlas-bare .atlas-phone::before,html.atlas-bare .atlas-phone::after{box-shadow:none!important}';
   document.head.appendChild(css);
 
@@ -181,6 +184,7 @@
       var fonts = document.fonts && document.fonts.ready ? Promise.race([document.fonts.ready, new Promise(function (r) { setTimeout(r, 250); })]) : Promise.resolve();
       fonts.then(function () { requestAnimationFrame(function () { requestAnimationFrame(function () {
         root.classList.add('atlas-ready'); ready = true;
+        if (!keepStill) root.classList.remove('atlas-still');
         if (fn) { try { prev = fn(AB.screens); } catch (e) { prev = null; } }   // the state the screen opens in is not a change
         parent.postMessage({ atlasReady: id }, '*');
       }); }); });
