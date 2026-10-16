@@ -136,6 +136,7 @@ export interface CategoryFooterProps {
 }
 
 export interface PickerItem { group?: string; disabled?: boolean; reason?: string; strs?: Strs<'label' | 'meta'>; args?: StrArgs<'label' | 'meta'>; value: string; label: string; meta?: string; aliases?: string[]; secondaryAction?: {label: string; action: string}; children?: PickerItem[]; attrs?: SafeAttrs }
+/** query searches the whole tree from any level; a result's meta is its group, then its own meta. */
 export interface PickerBodyProps { variant?: 'single' | 'multi' | 'cascade' | 'cascade-multi'; items?: PickerItem[]; selected?: string[]; path?: string[]; query?: string; action?: string; stepAction?: string; searchAttrs?: SafeAttrs; loading?: boolean; error?: string; strs?: Strs<'search' | 'all' | 'loading' | 'error' | 'empty' | 'noMatch'>; args?: StrArgs<'search' | 'all' | 'loading' | 'error' | 'empty' | 'noMatch'> }
 export interface PickerFieldProps {
   /** Optional contextual name for repeated fields; current display is appended to it. Visible label remains. */
@@ -668,7 +669,7 @@ export interface SentriUI {
   choiceRow(props: ChoiceRowProps): string;
   /** radio (candidate): the panel is a radiogroup labelled by the heading. */
   choiceGroup(rows: string | string[], options?: { title?: string; lead?: string; className?: string; radio?: boolean; /** Raw HTML at the heading's right end (a radio field's Clear). */ aside?: string; id?: string; strs?: Strs<'title'>; args?: StrArgs<'title'> }): string;
-  /** While value is set, a Clear text action empties the field and fires `input`. args fill the strs ({ level } for ds.picker.search_in). */
+  /** While value is set, a Clear text action empties the field and fires `input`. args fill the strs. */
   choiceSearch(props?: { label?: string; placeholder?: string; value?: string; attrs?: SafeAttrs; strs?: Strs<'label' | 'placeholder'>; args?: Record<string, unknown> }): string;
   choiceEmpty(text: string, options?: { strs?: Strs<'text'>; args?: StrArgs<'text'> }): string;
   segment(props: SegmentProps): string;

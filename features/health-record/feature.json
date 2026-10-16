@@ -630,7 +630,7 @@
                 "shows": "Asks for a category; removable with an x; kept for the session"
               }
             ],
-            "logic": "Item row shows how many selected pigs already carry it (\"Already on 1 selected\"). The drawer keeps one height from open to close (its tallest level, up to the cap).",
+            "logic": "Item row shows how many selected pigs already carry it (\"Already on 1 selected\"). The drawer keeps one height from open to close (its tallest level, up to the cap). Each level keeps its own scroll: going up returns to where you were.",
             "at": "General appearance"
           },
           {
@@ -645,7 +645,7 @@
           "Conditions (raw)",
           "Diseases (raw)",
           "Symptoms (raw)",
-          "Search in {level} (raw)",
+          "Search all options (raw)",
           "Done · N (raw)"
         ],
         "edge": [
@@ -923,7 +923,7 @@
               {
                 "state": "Search",
                 "when": "Text typed",
-                "shows": "Searches the level you are on (\"Search in Antibiotics\"), every medicine at Medicines; matches name and detail"
+                "shows": "Searches every medicine from any level (\"Search all options\"); matches name and detail; each result names its category (Vaccine A · Vaccines · Injectable suspension)"
               },
               {
                 "state": "Vaccination task",
@@ -936,14 +936,14 @@
                 "shows": "\"No medicines found. Try another name or category.\""
               }
             ],
-            "logic": "A tap on a medicine commits it and closes; the field shows the medicine only (\"Antibiotic A\"), not its path. A changed medicine clears the brand. One drawer height across levels. The catalogue is a sample, not a treatment recommendation.",
+            "logic": "A tap on a medicine commits it and closes; the field shows the medicine only (\"Antibiotic A\"), not its path. A changed medicine clears the brand. One drawer height across levels; going up returns to where you were in the list. The catalogue is a sample, not a treatment recommendation.",
             "at": "Antibiotics"
           }
         ],
         "controls": [],
         "copy": [
           "Medicines (raw)",
-          "Search in {level} (raw)"
+          "Search all options (raw)"
         ],
         "issues": [
           "Sample names (\"Antibiotic A\", \"Sample brand A\") are placeholders."

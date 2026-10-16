@@ -309,17 +309,21 @@
     const leaves=(nodes,trail=[])=>nodes.flatMap(n=>n.children?leaves(n.children,[...trail,n.label]):[{...n,trail}]);
     let nodes=items;const steps=[];
     for(const value of path){const n=nodes.find(n=>n.value===value);if(!n?.children)break;steps.push(n);nodes=n.children;}
-    /* Search covers the level you are on (the whole tree at the root), so a result never sits under a level it is not in.
-       Its meta is the path below this level. */
-    const q=query.trim().toLocaleLowerCase(),scope=cascade&&steps.length?nodes:items,here=steps[steps.length-1];
-    const visible=q?leaves(scope).filter(n=>[n.label,n.group||'',...n.trail,...(n.aliases||[])].join(' ').toLocaleLowerCase().includes(q)):cascade?nodes:leaves(items);
+    /* Search finds what exists: it always covers the whole tree, whatever level is open, so the field says "Search all
+       options" at every level and never claims a scope it does not have. A result's meta is its own group, then the
+       leaf's meta ("Coughing" · "Respiratory system · Already on 2 pigs"); the levels above it stay in the sheet. */
+    const q=query.trim().toLocaleLowerCase();
+    const visible=q?leaves(items).filter(n=>[n.label,n.group||'',...n.trail,...(n.aliases||[])].join(' ').toLocaleLowerCase().includes(q)):cascade?nodes:leaves(items);
     const count=n=>leaves([n]).filter(x=>selected.includes(x.value)).length;
+    const hitMeta=n=>[n.trail[n.trail.length-1],n.meta].filter(Boolean).join(' · ');
     const rows=visible.map(n=>{
-      const row=choiceRow({label:n.label,meta:n.children?(multi&&count(n)?count(n)+' selected':''):q?n.trail.join(' › '):n.meta||'',mode:n.children?'navigate':multi?'multi':'single',action:n.children||!multi?action:'',value:n.value,selected:selected.includes(n.value),disabled:!!n.disabled,reason:n.reason||'',attrs:n.attrs||{},strs:{...n.strs,...(n.children&&multi&&count(n)?{meta:'ds.picker.selected'}:{})},args:{...n.args,...(n.children&&multi&&count(n)?{meta:{n:count(n)}}:{})}});
+      // a result's meta is built text (group · meta), so the leaf's own meta string id would overwrite it
+      const leafStrs=Object.fromEntries(Object.entries(n.strs||{}).filter(([k])=>k!=='meta'));
+      const row=choiceRow({label:n.label,meta:n.children?(multi&&count(n)?count(n)+' selected':''):q?hitMeta(n):n.meta||'',mode:n.children?'navigate':multi?'multi':'single',action:n.children||!multi?action:'',value:n.value,selected:selected.includes(n.value),disabled:!!n.disabled,reason:n.reason||'',attrs:n.attrs||{},strs:{...(q&&!n.children?leafStrs:n.strs),...(n.children&&multi&&count(n)?{meta:'ds.picker.selected'}:{})},args:{...n.args,...(n.children&&multi&&count(n)?{meta:{n:count(n)}}:{})}});
       const extra=n.secondaryAction?`<div class="st-choice-extra">${button({label:n.secondaryAction.label,action:n.secondaryAction.action,value:n.value,register:'text',attrs:{'aria-label':n.secondaryAction.label+' '+n.label}})}</div>`:'';
       return row+extra;
     });
-    const search=here?choiceSearch({label:'Search in '+here.label,value:query,attrs:searchAttrs,strs:{label:'ds.picker.search_in',placeholder:'ds.picker.search_in'},args:{level:here.label}}):choiceSearch({label:'Search all options',value:query,attrs:searchAttrs,strs:{label:strs.search||'ds.picker.search',placeholder:strs.search||'ds.picker.search'}});
+    const search=choiceSearch({label:'Search all options',value:query,attrs:searchAttrs,strs:{label:strs.search||'ds.picker.search',placeholder:strs.search||'ds.picker.search'}});
     /* No breadcrumb: the sheet's header carries the level (pickerHead: "‹ Parent" and the level's title). */
     const groups=[];
     visible.forEach((n,i)=>{const title=n.group||n.trail?.join(' › ')||'';let group=groups.find(g=>g.title===title);if(!group){group={title,rows:[]};groups.push(group);}group.rows.push(rows[i]);});
