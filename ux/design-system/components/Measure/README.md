@@ -27,7 +27,7 @@ Call `SentriUI.measure({ label, optional, value, unit, unitGap, placeholder, key
 - **Default:** the value and its unit.
 - **Empty:** `—` in `muted`, with the unit still written (`— kg`). Missing is not zero, so an unweighed litter never reads `0 kg`.
 - **Pressed:** the box fills `press`.
-- **Replace** (`replace: true`, candidate): the pad has just opened on an existing value (Edit finish details: the stored `12.6`). The value shows selected, on a `well` highlight with no caret; the first digit or `.` on the pad replaces it and ⌫ first clears it to empty. Closing keeps the value as it stands and never discards. Without it nothing changes.
+- **System input** (`input: 'system'`, candidate). The same box holds a native text field on the phone's own decimal keyboard (`inputmode="decimal"`, `enterkeyhint="done"`) instead of opening the Numpad: for **one optional value inside a form** (Finish farrowing's litter weight), where a pad would be heavier than the job. The value keeps the box's mono, the dash is the field's placeholder, the unit stays at the end; typing is the field's active state (the same ink ring). Done closes the keyboard (iOS's decimal pad has no Done key: the native app adds it as the keyboard's accessory bar). The host cleans what the keyboard can send (a locale's comma becomes a point; digits and one point only) and normalises on save. `inputAttrs` passes the host's own attributes to the field. The Numpad stays the input for **runs of typed values** (the tag and weigh run), where keys that never move matter.
 - **Active** (the pad is open):
   - the border turns `ink` at `caret-width`, and a `caret-width` `ink` caret follows the digits;
   - when the field is empty, the caret shows alone before the unit;

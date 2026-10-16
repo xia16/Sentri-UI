@@ -130,7 +130,7 @@ Owner ruling 2026-10-15 (behaviour: Assisted is required, No preselected; litter
 | `Weak` and its count, `Deformed` and its count | always; counts start at 0 and stop at Alive | How many of the alive piglets are weak? deformed? | Act now (the stepper keys) |
 | `Assisted` and `No` · `Yes` | always; No chosen on a new finish | Was this farrowing assisted? | Act now (the keys) when the answer is Yes, else Settled |
 | `Litter weight` and `Optional`, the kg box | always; the box shows a dash until a weight is typed | Do I have the litter's weight to add? | Settled (quiet word, empty dash) |
-| The numpad | only while the weight box is open | What weight am I typing? | Act now (while open) |
+| The system decimal keyboard | only while the weight field is being typed in | What weight am I typing? | Act now (while open; drawn by the phone) |
 | Footer: Back, `Finish farrowing` / HOLD TO FINISH | always | How do I leave, and how do I commit? | Act now (the one dark control) |
 
 ### Cut

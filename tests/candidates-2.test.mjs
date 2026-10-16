@@ -115,15 +115,20 @@ test('choice radios: the key face is opt-in; the default inline markup is unchan
   assert.doesNotMatch(key, /class="st-radio"/, 'a key carries no ring mark: the ring is the border of the key itself');
   assert.doesNotMatch(UI.choiceRadios({ label: 'X', options: opts, face: 'key' }), /data-face/, 'the face is for the inline layout only');
 });
-test('measure row and numpad dock are opt-in; the default markup is unchanged', () => {
+test('measure row and its system input are opt-in; the default markup is unchanged', () => {
   const stack = UI.measure({ label: 'Litter weight', value: '12', unit: 'kg', key: 'w' });
   assert.doesNotMatch(stack, /data-layout/);
   const row = UI.measure({ label: 'Litter weight', optional: 'Optional', value: '', unit: 'kg', key: 'w', layout: 'row' });
   assert.match(row, /data-layout="row"/);
   assert.match(row, /<small>Optional<\/small>/);
   assert.match(row, /<span class="st-measure-value"[^>]*>—<\/span><span class="st-measure-unit"[^>]*>kg<\/span>/, 'empty is a dash with its unit, never 0');
-  assert.doesNotMatch(UI.numpad({ decimals: 1 }), /data-dock/);
-  assert.match(UI.numpad({ decimals: 1, dock: true }), /data-dock=""/);
+  assert.match(row, /data-action="open-numpad"/, 'by default the row is the pad\'s button');
+  const sys = UI.measure({ label: 'Litter weight', optional: 'Optional', value: '', unit: 'kg', key: 'w', layout: 'row', input: 'system', inputAttrs: 'data-field="weight"' });
+  assert.match(sys, /data-input="system"/);
+  assert.match(sys, /<input class="st-measure-input"[^>]*type="text" inputmode="decimal" enterkeyhint="done"[^>]*placeholder="—"[^>]*data-field="weight">/);
+  assert.match(sys, /<span class="st-measure-unit"[^>]*>kg<\/span><\/label>/);
+  assert.doesNotMatch(sys, /open-numpad|<button/, 'the system input opens no pad');
+  assert.doesNotMatch(UI.numpad({ decimals: 1, dock: true }), /data-dock/, 'the Numpad has no docked face');
 });
 test('row: existing navigation signature retains content and routing', () => {
   assert.equal(UI.row({ title: 'Pen 14', description: '3 sows due today', action: 'open', value: 'p14' }),

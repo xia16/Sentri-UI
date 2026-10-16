@@ -110,7 +110,7 @@ States: F0 the record with a death draft waiting (from D1; Finish waits) · F1 *
 | F-9 | F2 | weak / deformed steppers | → commit per tap; healthy derived; capped at alive | S — RUL Model (classification at Finish) | — |
 | F-10 | F2 | litter weight outside 0.8–2.5 kg × alive | → soft words warning, never a gate | S — contract C5 (draft); review tasks-built-28 | — |
 | F-11 | F2 | tap Yes on Assisted | → No was chosen before (required No / Yes, no Clear); Yes is chosen and recorded | S — owner decision 2026-10-15 | `fa-f11-assisted-no-preselected` |
-| F-12 | F2 | tap the Litter weight box, type 12.6, Back | → the docked Numpad closes and keeps 12.6 kg; no system keyboard | S — owner decision 2026-10-15 | `fa-f12-weight-on-the-pad` |
+| F-12 | F2 | type 12,6 in the Litter weight field (the system decimal keyboard) | → the weight reads 12.6 kg (the comma became a point); no Numpad; the sheet stays open | S — owner decision 2026-10-16 | `fa-f12-weight-on-the-keyboard` |
 
 ## 6 · Edit and Correct born (X)
 

@@ -24,7 +24,9 @@ m.innerHTML = [
     + UI.measure({ label: 'Litter weight', optional: 'Optional', unit: 'kg', layout: 'row', value: '', key: 'row-empty' })
     + '</div>',
   '<div class="rows">' + UI.measure({ label: 'Litter weight', optional: 'Optional', unit: 'kg', layout: 'row', value: '12.6', key: 'row-filled' }) + '</div>',
-  '<div class="rows">' + UI.measure({ label: 'Litter weight', optional: 'Optional', unit: 'kg', layout: 'row', value: '12.', active: true, key: 'row-open', controls: 'pad-row' }) + UI.numpad({ id: 'pad-row', decimals: 1, intLength: 2, value: '12.', key: 'row-open' }) + '</div>'
+  // input 'system': the same row typed on the phone's decimal keyboard (one optional value in a form; no Numpad)
+  '<div class="rows">' + UI.measure({ label: 'Litter weight', optional: 'Optional', unit: 'kg', layout: 'row', input: 'system', value: '', key: 'row-system' }) + '</div>',
+  '<div class="rows">' + UI.measure({ label: 'Litter weight', optional: 'Optional', unit: 'kg', layout: 'row', input: 'system', value: '12.6', key: 'row-system-filled' }) + '</div>'
 ].map(h => '<div>' + h + '</div>').join('');
 document.querySelector('.st-measure-box[data-value="pressed"]').setAttribute('data-preview', 'pressed');
 </script>

@@ -1439,9 +1439,9 @@
                 "shows": "Assisted No chosen; Litter weight a dash"
               },
               {
-                "state": "Weight open",
-                "when": "The kg box tapped",
-                "shows": "The Numpad docks above the footer; the box takes an ink ring and a caret; Back closes the pad and keeps the value"
+                "state": "Weight typing",
+                "when": "The kg field tapped",
+                "shows": "The phone's decimal keyboard opens; the field takes an ink ring and a caret; Done closes the keyboard and keeps the value"
               },
               {
                 "state": "Answered",

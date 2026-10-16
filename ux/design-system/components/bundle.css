@@ -1067,7 +1067,7 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 /* Measure · row (opt-in: `layout: 'row'`). The Stepper row's silhouette: the label left (16px/500, with its muted "Optional"), the
    value box in the same 136px column at the right, the stepper face's height (44px, a 48px hit area), value and unit at its two
    ends, a 60px row with a 1px line between rows. The hint and note run under the row. Everything else is the Measure: the pad opens
-   on a tap, an empty box shows the muted dash. */
+   on a tap (or, with input:'system', the phone's decimal keyboard), an empty box shows the muted dash. */
 .st-measure.st-measure[data-layout="row"]{--st-key-face:44px;--st-key-column:calc(3 * var(--field-height) - var(--space-key-gap));display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;column-gap:var(--space-row-y);row-gap:0;min-height:var(--stepper-row-min);border-bottom:1px solid var(--line)}
 .st-measure[data-layout="row"]:last-child{border-bottom:0}
 .st-measure[data-layout="row"] .st-measure-label{font-weight:var(--type-weight-medium)}
@@ -1081,14 +1081,15 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 .st-measure[data-layout="row"] :is(.st-measure-hint,.st-measure-note):empty{display:none}
 .st-measure[data-layout="row"] :is(.st-measure-hint,.st-measure-note):not(:empty){padding-bottom:var(--space-row-y)}
 
-/* Numpad · dock (opt-in: `dock: true`). Between a Sheet's body and its footer: out of the scroller, on the sheet's paper, a line above. */
-.sheet>.st-numpad[data-dock]{flex:none;padding:var(--space-row-y) var(--space-gutter);background:var(--paper);border-top:1px solid var(--line)}
-.sheet>.st-numpad[data-dock]+.sheet-footer{border-top:0}
-/* a docked pad keeps no reserved status line: the host answers a dead key under its Measure, so the keys sit right under the body */
-.st-numpad[data-dock] .st-numpad-feedback:has(>.st-numpad-hint:empty){display:none}
-/* Measure · replace (opt-in: `replace: true`, with the pad open on an existing value): the value is shown selected, so the first key replaces it. */
-.st-measure[data-replace] .st-measure-value{padding:0 var(--space-4);border-radius:var(--space-4);background:var(--choice-press);box-shadow:0 0 0 1px var(--ink-2)}
-.st-measure[data-replace] .st-measure-value::after{display:none}
+/* Measure · system input (opt-in: `input: 'system'`). The same box, holding a native text field on the phone's decimal keyboard:
+   the value in the box's mono, the dash as its placeholder, the unit at the end. Typing is the field's active state (the ink ring
+   the pad's active Measure has); a tap anywhere in the box (its 48px hit area) puts the caret in it. */
+.st-measure-box[data-input="system"]{cursor:text}
+.st-measure-input{flex:1 1 auto;min-width:0;width:100%;margin:0;padding:0;border:0;border-radius:0;background:transparent;outline:none;box-shadow:none;appearance:none;-webkit-appearance:none;font:500 var(--type-figure-size)/1.2 var(--font-mono);font-variant-numeric:tabular-nums;color:var(--ink);caret-color:var(--ink)}
+.st-measure-input::placeholder{color:var(--muted);opacity:1}
+.st-measure.st-measure .st-measure-box.st-measure-box[data-input="system"]:focus-within{border-color:var(--ink);box-shadow:inset 0 0 0 calc(var(--caret-width) - 1px) var(--ink)}
+.st-measure[data-layout="row"] .st-measure-input{font-size:var(--type-step-value-size);line-height:1}
+.st-measure[data-layout="row"] .st-measure-input:placeholder-shown{font-size:15px}
 
 /* The header owns the 24px under it: the body's first element brings no top margin of its own (a field's, a note's, a banner's).
    Last in the file, so a part's own margin rule of the same weight does not win here. */

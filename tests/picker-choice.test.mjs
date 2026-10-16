@@ -177,55 +177,18 @@ test("assisted is a required No / Yes on the finish and edit forms: No preselect
   assert.equal(old.edit.assisted, false);
   assert.equal(old.assisted, null);
 });
-test("the litter weight is a Measure on the docked Numpad: Back closes the pad and keeps the value", () => {
-  const F = globalThis.FarrowingStudy,
-    s = F.seed("before");
-  s.view = "finish";
-  F.act(s, "open-numpad", "weight");
-  assert.equal(s.pad, "weight");
-  for (const k of ["1", "2", ".", "6"]) F.act(s, "numpad", "weight:" + k);
-  assert.equal(s.weight, "12.6");
-  F.act(s, "numpad", "weight:7");
-  assert.equal(s.weight, "12.6", "one decimal place at most");
-  assert.equal(s.padHint, "1 decimal place at most");
-  F.act(s, "numpad", "weight:back");
-  F.act(s, "numpad", "weight:back");
-  assert.equal(s.weight, "12");
-  F.act(s, "numpad", "weight:.");
-  F.act(s, "back");
-  assert.equal(s.pad, null, "Back closes the pad first");
-  assert.equal(s.weight, "12", "closing keeps the typed value and drops a trailing point");
-  assert.equal(s.view, "finish", "and stays on the form");
-  F.act(s, "open-numpad", "weight");
-  for (const k of ["back", "back", "0"]) F.act(s, "numpad", "weight:" + k);
-  F.act(s, "back");
-  assert.equal(s.weight, "", "an empty or zero weight is not recorded");
-});
-test("a stored weight opens replaceable: live keys, the first key replaces it, backspace clears it, closing keeps it", () => {
-  const F = globalThis.FarrowingStudy,
-    s = F.seed("locked");
+test("the litter weight is typed on the system decimal keyboard: cleaned while typing, normalised on save, blank or 0 is not recorded", () => {
+  const F = globalThis.FarrowingStudy;
+  for (const [typed, kept] of [["12,6", "12.6"], ["12.67", "12.6"], ["123", "12"], ["a1b2", "12"], [".5", "0.5"], ["1..2", "1.2"], ["", ""]])
+    assert.equal(F.cleanWeight(typed), kept, typed);
+  for (const [typed, saved] of [["12.6", "12.6"], ["12.", "12"], ["0", ""], ["0.0", ""], ["", ""]]) assert.equal(F.normWeight(typed), saved, typed);
+  const s = F.seed("locked");
   s.view = "editFinish";
-  s.edit = { ...s, weight: "12.6" };
-  F.act(s, "open-numpad", "editWeight");
-  assert.equal(s.padFresh, true);
-  F.act(s, "open-numpad", "editWeight");
-  assert.equal(s.padFresh, true, "tapping the open Measure again does nothing");
-  F.act(s, "numpad", "editWeight:9");
-  assert.equal(s.edit.weight, "9", "the first digit replaces the stored value");
-  assert.equal(s.padFresh, false);
-  F.act(s, "back");
-  F.act(s, "open-numpad", "editWeight");
-  F.act(s, "numpad", "editWeight:back");
-  assert.equal(s.edit.weight, "", "backspace first clears it to empty");
-  F.act(s, "back");
-  s.edit.weight = "12.6";
-  F.act(s, "open-numpad", "editWeight");
-  F.act(s, "back");
-  assert.equal(s.edit.weight, "12.6", "closing without a key keeps the stored value");
+  s.edit = { ...s, weight: "12." };
+  F.act(s, "saveEdit");
+  assert.equal(s.weight, "12", "saving drops a trailing point");
   const UI = globalThis.SentriUI;
-  assert.match(UI.numpad({ decimals: 1, intLength: 2, value: "12.6" }), /aria-disabled="true"/);
-  assert.doesNotMatch(UI.numpad({ decimals: 1, intLength: 2, value: "12.6", replace: true }), /aria-disabled/);
-  assert.equal(UI.numpadInput({ value: "12.6", replace: true }, ".", { decimals: 1, intLength: 2 }).value, "0.");
+  assert.doesNotMatch(UI.numpad({ decimals: 1, intLength: 2, value: "12.6", replace: true }), /data-replace/, "the Numpad has no replace option");
 });
 test("browsing a disease branch retains its kind when adding a custom condition", () => {
   const M = globalThis.InspectionStudy,

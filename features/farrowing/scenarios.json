@@ -1503,32 +1503,30 @@
       },
       {
        "type": "action",
-       "id": "finish.clean.weight-pad",
-       "label": "tap the Litter weight box, type 12.6, tap Back",
+       "id": "finish.clean.weight-keyboard",
+       "label": "type 12,6 in the Litter weight field",
        "taps": [
-        "[data-action='open-numpad']",
-        "[data-action='numpad'][data-key='1']",
-        "[data-action='numpad'][data-key='2']",
-        "[data-action='numpad'][data-key='.']",
-        "[data-action='numpad'][data-key='6']",
-        "[data-action='returnCount']"
+        {
+         "fill": "input[data-field='weight']",
+         "value": "12,6"
+        }
        ],
        "children": [
         {
          "type": "outcome",
-         "id": "fa-f12-weight-on-the-pad",
+         "id": "fa-f12-weight-on-the-keyboard",
          "tree": "F-12",
-         "label": "The litter weight is typed on the docked Numpad; Back closes the pad and keeps the value",
+         "label": "The litter weight is typed on the phone's decimal keyboard; a comma becomes a point",
          "gwt": {
           "given": "The Finish sheet is open for a sow, with nothing touched.",
-          "when": "The worker taps the Litter weight box, types 12.6 on the pad and taps Back.",
-          "then": "The pad closes, the sheet stays open and the weight reads 12.6 kg. No system keyboard opened."
+          "when": "The worker taps the Litter weight field and types 12,6 on the phone's decimal keyboard (a comma locale).",
+          "then": "The field reads 12.6 kg, the sheet stays open and Finish farrowing is still there. No Numpad opens."
          },
          "authority": [
           {
            "src": "RUL",
-           "at": "Owner decision 2026-10-15",
-           "says": "Litter weight stays optional, typed on the design system's Measure and Numpad"
+           "at": "Owner decision 2026-10-16",
+           "says": "Litter weight stays optional, typed on the phone's own decimal keyboard (Done closes it)"
           }
          ],
          "visible": [
@@ -1545,7 +1543,7 @@
          ],
          "record": [
           {
-           "expr": "s.weight === '12.6' && s.view === 'finish' && s.pad === null",
+           "expr": "s.weight === '12.6' && s.view === 'finish'",
            "hard": "lost-draft"
           }
          ]
