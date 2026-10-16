@@ -1,7 +1,7 @@
 // The gate's and the polish loop's rules (scripts/loop-rules.mjs).
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { queueAhead, newScenarioFailures, calibrationProblems, budgetProblems, critiqueProblems, pageStyling, addedLines, effectiveClass, classifyScreens, checkVerdict, checkGrades, worstFirst, isClean, loopStatus, touchesSystem, touchesTools, regressions,
+import { aimdStep, queueAhead, newScenarioFailures, calibrationProblems, budgetProblems, critiqueProblems, pageStyling, addedLines, effectiveClass, classifyScreens, checkVerdict, checkGrades, worstFirst, isClean, loopStatus, touchesSystem, touchesTools, regressions,
   pageOf, pageAssets, sharedFiles, outcomeLeaves, coverageLost, reachOf, reachLine, shotsToTake, timedOutOnly, lockState, carryDecision, ghNetworkError,
   componentPage, componentPagesOf, componentsTouched, idPath } from '../scripts/loop-rules.mjs';
 
@@ -466,4 +466,29 @@ test('newScenarioFailures: a leaf already failing on base is main\'s debt; one p
   assert.deepEqual(newScenarioFailures(['ds-a13-home-to-task', 'ds-a11-task-layer'], base), { added: ['ds-a13-home-to-task'], debt: ['ds-a11-task-layer'] });
   assert.deepEqual(newScenarioFailures(['ds-new-leaf'], base), { added: ['ds-new-leaf'], debt: [] }); // not on base: new
   assert.deepEqual(newScenarioFailures(['x'], ''), { added: ['x'], debt: [] }); // base printed nothing: the failure stands
+});
+
+test('scenario runs at once grow while runs stay fast, halve on a timeout or a slowdown, and stay between 1 and max', () => {
+  let s = { limit: 2, min: 1, max: 8, baseline: null };
+  const feed = (ms, n = 1, timedOut = false) => { let why = null; for (let i = 0; i < n; i++) ({ state: s, why } = aimdStep(s, { ms, timedOut })); return why; };
+  feed(1000, 6);
+  assert.equal(s.baseline, 1000);
+  assert.equal(s.limit, 2);
+  assert.match(feed(1100, 3), /1\.1x/);
+  assert.equal(s.limit, 3);
+  feed(1200, 3);
+  assert.equal(s.limit, 4);
+  feed(1400, 4);
+  assert.equal(s.limit, 5);
+  assert.equal(feed(2000, 5), null, 'between 1.5x and 2.5x it holds');
+  assert.equal(s.limit, 5);
+  assert.match(feed(3000, 5), /slowed to 3\.0x/);
+  assert.equal(s.limit, 2);
+  assert.match(feed(900, 1, true), /timed out/);
+  assert.equal(s.limit, 1);
+  assert.equal(feed(900, 1, true), null, 'never below min');
+  assert.equal(s.limit, 1);
+  s = { limit: 8, min: 1, max: 8, baseline: 1000 };
+  feed(1000, 8);
+  assert.equal(s.limit, 8, 'never above max');
 });
