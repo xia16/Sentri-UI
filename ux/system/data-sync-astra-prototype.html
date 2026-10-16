@@ -24,6 +24,8 @@
           <label for="scenario">Scenario preview</label>
           <select id="scenario" class="scenario">
             <option value="offline">Offline · waiting on this phone</option>
+            <option value="mixed">Mixed statuses · visual check</option>
+            <option value="volume">Many tasks · many records each</option>
             <option value="busy">Many kinds of saved work · grouped</option>
             <option value="threshold">Nine to eight records · grouping stays put</option>
             <option value="syncing">Connection restored · syncing</option>
@@ -46,6 +48,11 @@
         <div id="overlay"></div>
       </section>
     </div>
+    <nav class="sync-study-switcher" aria-label="Saved work layout options">
+      <button type="button" data-action="previous-variant" aria-label="Previous layout">‹</button>
+      <span id="sync-study-label"></span>
+      <button type="button" data-action="next-variant" aria-label="Next layout">›</button>
+    </nav>
   </main>
   <script src="data-sync-astra-prototype.js"></script>
 </body>
