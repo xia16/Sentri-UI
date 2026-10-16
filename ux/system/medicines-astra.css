@@ -56,3 +56,15 @@
 .inspection-phone .sheet.custom-doses-sheet[data-presentation="page"]>.sheet-body{padding:0 var(--space-gutter,18px) 16px}
 .inspection-phone .custom-doses-sheet .sheet-body>.bulk-pigs{margin:0}
 @media(max-width:370px){.inspection-phone .sheet.custom-doses-sheet[data-presentation="page"]>.sheet-body{padding:0 var(--space-gutter-narrow,12px) 16px}}
+
+/* In place (owner, 2026-10-16): Dosage and Unit side by side, each its own labelled 48px field; the adjust line under them. */
+.inspection-phone .treatment-dosage{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:12px;align-items:end}
+.inspection-phone .treatment-dosage>.field{margin:0}
+.inspection-phone .dosage-adjust{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:-8px 0 0;font:400 var(--type-meta-size)/1.4 var(--font-sans);color:var(--muted)}
+/* The per-pig page: the dosage reads regular; a pig's own (adjusted) dose ink and bold, "Adjusted" under it. */
+.inspection-phone .custom-doses-sheet .bulk-reading input{font-weight:400}
+.inspection-phone .custom-doses-sheet .bulk-reading input[data-own="true"]{font-weight:700;color:var(--ink)}
+/* Remove sits on its own line under the pig, right-aligned: ChoiceList's removal control (secondaryAction). */
+.inspection-phone .custom-doses-sheet .bulk-pig-row{grid-template-columns:minmax(0,1fr) auto;row-gap:0}
+.inspection-phone .dose-remove{grid-column:1/-1;display:flex;justify-content:flex-end}
+.inspection-phone [data-dosage-adjust]:empty{display:none}

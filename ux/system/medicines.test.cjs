@@ -100,7 +100,7 @@ test('Brand: a full-width optional row only once a medicine is chosen; the farm\
   assert.doesNotMatch(M.brandPickerBody(c), /Strength/);
   M.handleRecordAction(c, 'brand-details-save', ''); assert.equal(c.view, 'brand-picker', 'Add waits until a withdrawal is typed');
   c.form.brandPick.draft.withdrawal = '7'; M.handleRecordAction(c, 'brand-details-save', '');
-  assert.equal(c.view, 'treatment'); assert.match(M.overlay(c), /Withdrawal until 19 Sep/);
+  assert.equal(c.view, 'treatment'); assert.match(M.overlay(c), /Withdrawal period 7 days · until 19 Sep/);
   assert.ok(c.medFarm.brands.some(b => b.medicine === 'amoxicillin' && b.name === 'Moxylan' && b.withdrawal === 7));
   M.handleRecordAction(c, 'medicine-open', ''); M.handleRecordAction(c, 'medicine-select', 'meloxicam');
   assert.equal(c.form.brand, '', 'a new medicine drops the old brand');
@@ -127,40 +127,43 @@ test('the medicine remembers its last method and unit; saving makes it the newes
 });
 
 
-test('batch: the pigs row, Same dose for all, then a Custom doses row; no per-pig inputs on the form', () => {
+test('batch: Dosage and Unit side by side; no adjust line before a dosage; then "Same for all 2 pigs · Adjust ›", "1 pig adjusted"', () => {
   const c = M.seed(); M.openBulkAction(c, 'treatment', ['000254', '000267']); M.handleRecordAction(c, 'medicine-open', ''); M.handleRecordAction(c, 'medicine-select', 'tulathromycin');
-  c.form.dose = '2.5'; c.form.values['000254'] = '3';
-  const html = M.overlay(c), at = s => html.indexOf(s);
-  assert.ok(at('data-action="treatment-pigs"') < at('data-action="medicine-open"'));
-  assert.ok(at('data-action="brand-open"') < at('Same dose for all') && at('Same dose for all') < at('data-action="pig-doses-open"') && at('data-action="pig-doses-open"') < at('data-picker-key="target"'));
-  assert.match(html, /Custom doses[^]*?2 pigs · 1 own dose/);
-  assert.doesNotMatch(html, /data-bulk-value=|data-bulk-include=/);
+  let html = M.overlay(c);
+  assert.match(html, /class="treatment-dosage"><label class="field[^]*?Dosage[^]*?data-bulk-key="dose"[^]*?Unit[^]*?data-picker-key="doseUnit"/);
+  assert.doesNotMatch(html, /data-action="pig-doses-open"|data-action="treatment-pigs"/, 'no adjust before a dosage; no pigs row');
+  c.form.dose = '2.5'; html = M.overlay(c);
+  assert.match(html, /Same for all 2 pigs[^]*data-action="pig-doses-open"[^>]*>[^]*Adjust ›/);
+  c.form.values['000254'] = '3'; assert.match(M.overlay(c), /1 pig adjusted/);
+  assert.doesNotMatch(M.overlay(c), /data-bulk-value=/, 'no per-pig inputs on the form');
 });
 
-test('Custom doses page: inline boxes, placeholder the shared dose, no checkbox; Save waits for the shared dose or every pig\'s own; search narrows', () => {
+test('Dose per pig: every box pre-filled with the actual dose; an adjusted one ink and bold with Adjusted; unadjusted pigs follow the dosage; Save waits; search narrows', () => {
   const c = M.seed(); M.openBulkAction(c, 'treatment', ['000254', '000267']); M.handleRecordAction(c, 'medicine-open', ''); M.handleRecordAction(c, 'medicine-select', 'tulathromycin');
   assert.ok(!M.bulkActionValid(c));
-  c.form.values['000254'] = '3'; assert.ok(!M.bulkActionValid(c), '000267 has no dose and there is no shared dose');
-  c.form.values['000267'] = '4'; assert.ok(M.bulkActionValid(c), 'every pig its own dose');
-  delete c.form.values['000267']; c.form.dose = '2.5'; assert.ok(M.bulkActionValid(c), 'or a shared dose');
+  c.form.dose = '2.5'; assert.ok(M.bulkActionValid(c));
+  c.form.values['000254'] = '3';
   M.handleRecordAction(c, 'pig-doses-open', '');
   let page = M.inspectionSurface(c);
   assert.match(page, /data-presentation="page"/);
-  assert.match(page, /data-bulk-value="000254" value="3"[^>]*placeholder="2.5"/);
-  assert.match(page, /data-bulk-value="000267" value=""[^>]*placeholder="2.5"/);
-  assert.doesNotMatch(page, /bulk-pig-check|type="checkbox"/, 'no checkbox on dose rows');
-  assert.doesNotMatch(page, /class="sheet-footer/, 'values are live: no Save, Back is top left');
+  assert.match(page, /data-bulk-value="000254" value="3"[^>]*data-own="true"/);
+  assert.match(page, /data-bulk-value="000267" value="2.5"[^>]*data-own="false"/, 'the actual dosage, not a placeholder');
+  assert.match(page, /data-bulk-summary="000254">Adjusted</);
+  assert.doesNotMatch(page, /type="checkbox"/);
+  c.form.dose = '4'; page = M.inspectionSurface(c);
+  assert.match(page, /data-bulk-value="000267" value="4"/, 'unadjusted pigs follow the dosage'); assert.match(page, /data-bulk-value="000254" value="3"/, 'adjusted ones keep theirs');
   c.form.doseSearch = '267'; page = M.inspectionSurface(c);
   assert.doesNotMatch(page, /data-bulk-value="000254"/); assert.match(page, /data-action="dose-scan"/);
 });
 
-test('the selected list takes a pig out of the treatment (the walk\'s Selected review: untick to remove)', () => {
+test('Remove on the per-pig page takes a pig out of the treatment (ChoiceList\'s removal control); the last pig cannot be removed', () => {
   const c = M.seed(); M.openBulkAction(c, 'treatment', ['000254', '000267']); M.handleRecordAction(c, 'medicine-open', ''); M.handleRecordAction(c, 'medicine-select', 'tulathromycin'); c.form.dose = '2';
-  M.handleRecordAction(c, 'treatment-pigs', '');
-  assert.match(M.overlay(c), /Selected pigs[^]*data-treat-pig="000254"/);
-  c.form.excluded = ['000254']; c.view = 'treatment';
-  assert.match(M.overlay(c), /Save · 1 pig/);
-  M.handleRecordAction(c, 'pig-doses-open', ''); assert.doesNotMatch(M.inspectionSurface(c), /000254/, 'a removed pig leaves the dose list');
+  M.handleRecordAction(c, 'pig-doses-open', '');
+  assert.match(M.inspectionSurface(c), /data-action="dose-remove" data-value="000254"/);
+  M.handleRecordAction(c, 'dose-remove', '000254');
+  let page = M.inspectionSurface(c);
+  assert.doesNotMatch(page, /000254/); assert.doesNotMatch(page, /data-action="dose-remove"/, 'the last pig stays');
+  c.view = 'treatment'; assert.match(M.overlay(c), /Save · 1 pig/);
 });
 
 test('a vaccination lists the vaccines by disease, without a one-row category level', () => {
@@ -195,15 +198,17 @@ test('Medicines page: edit forms; a starting-list medicine edits only its defaul
   assert.equal(c.view, 'medicines'); assert.doesNotMatch(M.overlay(c), /Gamithromycin/);
 });
 
-test("withdrawal: the medicine's default (the usual case), a brand's override when its label differs; a notice before Save; the record keeps a copy", () => {
+test("withdrawal: a caption under Medicine for its default, under Brand for a brand's own period; the record keeps a copy", () => {
   const c = open(['000267']); M.handleRecordAction(c, 'medicine-select', 'amoxicillin');
-  assert.match(M.overlay(c), /data-ds="Banner" data-tone="notice"[^]*Withdrawal until 26 Sep/, 'Amoxicillin default: 14 days');
-  M.handleRecordAction(c, 'brand-open', ''); M.handleRecordAction(c, 'brand-select', 'amoxicillin/0');
   let html = M.overlay(c);
-  assert.match(html, /Withdrawal until 14 Sep/, 'Amoxinsol 50%: its own 2 days');
-  assert.ok(html.indexOf('Withdrawal until') < html.indexOf('class="sheet-footer'));
+  assert.match(html, /Medicine[^]*?st-picker-hint" role="status">Withdrawal period 14 days · until 26 Sep</, 'under Medicine');
+  assert.doesNotMatch(html, /data-ds="Banner"/);
+  M.handleRecordAction(c, 'brand-open', ''); M.handleRecordAction(c, 'brand-select', 'amoxicillin/0');
+  html = M.overlay(c);
+  assert.match(html, /data-action="brand-open"[^]*?st-picker-hint" role="status">Withdrawal period 2 days · until 14 Sep</, "under Brand: the brand's own");
+  assert.equal((html.match(/Withdrawal period/g) || []).length, 1, 'one caption');
   M.handleRecordAction(c, 'brand-open', ''); M.handleRecordAction(c, 'brand-select', 'amoxicillin/2');
-  assert.match(M.overlay(c), /Withdrawal until 26 Sep/, 'Clamoxyl has none: the default');
+  assert.match(M.overlay(c), /Withdrawal period 14 days · until 26 Sep/, 'Clamoxyl has none: the default, under Medicine');
   M.handleRecordAction(c, 'brand-open', ''); M.handleRecordAction(c, 'brand-select', 'amoxicillin/0');
   c.form.dose = '5'; assert.ok(M.saveBulkAction(c));
   const rec = M.pig(c, '000267').treatment;
@@ -216,5 +221,5 @@ test('every starting-list medicine but the vaccines ships with a default withdra
   for (const m of catalogue.medicines) assert.equal(m.category === 'vaccines' ? m.withdrawal === undefined : Number.isInteger(m.withdrawal), true, m.id);
   assert.match(catalogue.note, /SAMPLE values[^]*MOA Announcement No\. 278/);
   const c = open(['000267']); M.handleRecordAction(c, 'medicine-select', 'oxytocin');
-  assert.doesNotMatch(M.overlay(c), /Withdrawal until/, '0 days: nothing to wait for');
+  assert.doesNotMatch(M.overlay(c), /Withdrawal period/, '0 days: no caption');
 });

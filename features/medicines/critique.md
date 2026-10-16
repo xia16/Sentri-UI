@@ -214,3 +214,12 @@ The owner approved the treatment's optional face (an ordinary labelled field wit
 
 #### Final look (the screens of this push; 390 and 360, EN and ZH)
 - Header check 0 and spacing 0 on the 27 changed screens; strict legibility passes on them; check-states the same 6 failing as `c6cc500`; npm test 725 pass; `npm run check` passes.
+
+### In-place fixes (owner, 2026-10-16; the skeleton is approved)
+
+- **major** · The pigs row duplicated Dose per pig; removed. Taking a pig out moved onto Dose per pig as **Remove** under each pig: ChoiceList's removal control (`secondaryAction`, the separately named text action under an item, as "Remove custom condition"), not a checkbox. The last pig has none.
+- **major** · The Banner notice sat far from the medicine it came from; withdrawal is now a muted caption in the field's hint slot: under Medicine for its default, under Brand when the brand has its own period (chosen: the caption sits under the field its number comes from, so it says whose it is without a word for it).
+- **minor** · "Same dose for all" with its unit squeezed in one box: now Dosage and Unit side by side, each a labelled 48px field.
+- **major** · The Custom doses row showed before a dosage existed and the per-pig boxes showed the dosage as a placeholder: now the line appears once a dosage is typed ("Same for all 2 pigs · Adjust ›", "1 pig adjusted"), and Dose per pig is pre-filled with the actual dosage; typing over one marks it Adjusted (ink, bold); clearing returns it; unadjusted pigs follow the dosage.
+- Adding a medicine: its default withdrawal is not pre-filled. The add level opens only from a search with no match, and search covers every starting-list medicine (EN, ZH and other names), so a typed new name never matches the catalogue; skipped as asked.
+- Checks on the changed screens: header 0, spacing 0, strict legibility pass (see the hand-back for the commit).

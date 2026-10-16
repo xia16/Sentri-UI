@@ -21,7 +21,7 @@ At the picker (the worker holds a bottle, the pig is waiting): 1. Where am I? (t
 
 At the Brand list: 1. Which brand is the bottle? (its name, strength included when it matters) 2. Not listed: can I add it? (the Add card) 3. Does its label print a different withdrawal from the medicine's? (the optional details step).
 
-On the treatment: 1. What was given, how, how much? (Medicine, Method, Brand, Dose) 2. Does any pig get a different dose? (Custom doses: the count of own doses; on its page, each box: shared placeholder, own in ink) 3. Where is this pig in the list? (search, Scan) and is it in at all? (the pigs row) 4. **When may these pigs go to slaughter?** (Withdrawal until <date>) 5. Can I save?
+On the treatment: 1. What was given, how, how much? (Medicine, Method, Brand, Dose) 2. Does any pig get a different dose? (the Adjust line; on Dose per pig, each box) 3. Where is this pig, and can I take it out? (search, Scan, Remove) 4. **When may these pigs go to slaughter?** (the withdrawal caption) 5. Can I save?
 
 At the Medicines page (a supervisor tidying the list): 1. Which medicines does the farm have, by category? 2. Which brands has the farm used for this one, and what withdrawal applies? 3. What happens to past records if I change it? (said on Delete; the record keeps its copy).
 
@@ -93,17 +93,15 @@ At the Medicines page (a supervisor tidying the list): 1. Which medicines does t
 
 | Fact | Question | Level | Decision |
 |---|---|---|---|
-| Pigs row (several): "2 pigs · C1 ›" | Which pigs is this for? Can I take one out? | Settled | opens the selected list (untick to take a pig out) |
 | Medicine: its name | What was given? | Settled | kept |
+| Caption under Medicine (its default) or under Brand (the brand's own): "Withdrawal period 14 days · until 26 Sep" | When may these pigs go to slaughter? | Watch, quiet (muted hint line) | where it sits says whose number it is; absent with no period or 0; replaces the Banner |
 | Method: pre-filled from the medicine's last use | How? | Settled | pre-filled, editable |
-| Brand (PickerField, grey "Optional" beside the label, only once a medicine is chosen) | Which bottle? | Settled | "Select" until set |
-| Dose (one pig) / Same dose for all (several): number and unit on one line, unit remembered per medicine | How much, in what unit? | Settled | one field |
-| Custom doses row (several): "2 pigs" / "2 pigs · 1 own dose" ›, no inputs on the form | Does any pig get a different dose? | Settled (meta) | the own-dose count only above zero |
-| Custom doses page: ear-tag search and Scan; each pig (tag, pen · stage) with its dose box: placeholder the shared dose (ink-2, regular, 7.4:1), typed own dose ink bold | Did each pig get it, and how much? Where is this pig? | Settled | inline, no checkbox, no sheet; live values, no Save |
-| Condition (PickerField, Optional) | Which finding is this for? | Settled | picker unchanged |
-| Note (textarea, about 3 lines, Optional); "180 / 200" at the end of its label line from 160 characters | Anything to add? How much room is left? | Settled; the counter Audit-quiet | at most 200 characters, input stops there |
-| **Withdrawal until <date>**: Banner notice before Save | When may these pigs go to slaughter? | **Watch** | brand override, else the medicine's default; absent when 0 or none |
-| Order | What was given, then how much? | — | (Pigs), Medicine, Method, Brand, Dose / Same dose for all, (Custom doses), Condition, Note, the notice |
+| Brand (PickerField, "Optional", only once a medicine is chosen) | Which bottle? | Settled | "Select" until set |
+| Dosage and Unit, side by side, each a labelled 48px field; unit remembered per medicine | How much, in what unit? | Settled | two fields |
+| Several pigs: "Same for all 2 pigs · Adjust ›" / "1 pig adjusted · Adjust ›", only once a dosage is typed | Does every pig get the same? | Settled (muted line, text action) | no per-pig inputs on the form |
+| Dose per pig: search and Scan; each pig (tag, pen · stage) with its box pre-filled with the dose; adjusted: ink bold + "Adjusted"; Remove under each pig | Which pig gets what? Can I take one out? | Settled | live values; Remove not on the last pig |
+| Condition (PickerField, Optional), Note (textarea, about 3 lines, Optional, 200 characters, a counter from 160) | Which finding? Anything to add? | Settled | kept |
+| Order | What was given, then how much? | — | Medicine, Method, Brand, Dosage and Unit, (Adjust line), Condition, Note |
 
 ### Medicines page, a medicine's sheet, a brand's sheet (edit forms)
 

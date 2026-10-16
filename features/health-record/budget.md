@@ -81,6 +81,6 @@ The catalogue pickers' heads. Questions at a level: where am I? (the title: the 
 | Parent's name ("‹ Symptoms") | Where does up go? | Settled | **cut**: Back goes up one level; the parent is one Back away and was its title |
 | Done · N | How many have I ticked? | Act now | kept |
 
-# Record treatment and the medicines picker (2026-10-16, round 5)
+# Record treatment and the medicines picker (2026-10-16, in place)
 
-The facts are budgeted in `features/medicines/budget.md` (Record treatment (host)), which this form follows: the pigs row (several), Medicine, Method, Brand (optional), Dose or Same dose for all, Custom doses (several; its page edits each pig's dose inline), Condition (optional), Note (optional, 200 characters, a counter from 160), then the withdrawal notice. A pig is taken out on the selected list, not by a checkbox on its dose row.
+The facts are budgeted in `features/medicines/budget.md` (Record treatment (host)): Medicine with its withdrawal caption, Method, Brand (optional; the caption moves under it when the brand has its own period), Dosage and Unit, (several pigs: Same for all · Adjust ›, opening Dose per pig with Remove), Condition (optional), Note (optional). The Banner notice and the pigs row are gone.

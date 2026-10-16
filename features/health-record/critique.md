@@ -276,3 +276,12 @@ The Brand optional row comes back as the medicines feature's field (only once a 
 - **major** · Round 4 put each pig's dose box on the form; the form grew with the pigs. The Custom doses row and page are back, with the boxes inline on the page (no sheet).
 - **major** · The dose rows' checkboxes read as multi-select (owner). Removed; a pig is taken out on the selected list (the pigs row at the top of the form), the walk's Selected review pattern.
 - **minor** · Note had no length limit or room: now about three lines, at most 200 characters, a counter from 160.
+
+### In-place fixes (owner, 2026-10-16; the skeleton is approved)
+
+- **major** · The pigs row duplicated Dose per pig; removed. Taking a pig out moved onto Dose per pig as **Remove** under each pig: ChoiceList's removal control (`secondaryAction`, the separately named text action under an item, as "Remove custom condition"), not a checkbox. The last pig has none.
+- **major** · The Banner notice sat far from the medicine it came from; withdrawal is now a muted caption in the field's hint slot: under Medicine for its default, under Brand when the brand has its own period (chosen: the caption sits under the field its number comes from, so it says whose it is without a word for it).
+- **minor** · "Same dose for all" with its unit squeezed in one box: now Dosage and Unit side by side, each a labelled 48px field.
+- **major** · The Custom doses row showed before a dosage existed and the per-pig boxes showed the dosage as a placeholder: now the line appears once a dosage is typed ("Same for all 2 pigs · Adjust ›", "1 pig adjusted"), and Dose per pig is pre-filled with the actual dosage; typing over one marks it Adjusted (ink, bold); clearing returns it; unadjusted pigs follow the dosage.
+- Adding a medicine: its default withdrawal is not pre-filled. The add level opens only from a search with no match, and search covers every starting-list medicine (EN, ZH and other names), so a typed new name never matches the catalogue; skipped as asked.
+- Checks on the changed screens: header 0, spacing 0, strict legibility pass (see the hand-back for the commit).

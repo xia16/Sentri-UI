@@ -27,7 +27,7 @@
         "screens": ["health-record.resolve-finding", "health-record.resolve-conditions"]
       }
     ],
-    "any": ["health-record.finding", "health-record.edit-finding", "health-record.record-health", "health-record.condition-picker", "health-record.care-instructions", "health-record.treatment", "health-record.treatment-batch", "health-record.medicine-picker", "health-record.brand", "health-record.brand-add", "health-record.brand-details", "health-record.treatment-brand", "health-record.treatment-batch-brand", "health-record.custom-doses", "health-record.custom-doses-own", "health-record.custom-doses-search", "health-record.treatment-pigs", "health-record.treatment-note"]
+    "any": ["health-record.finding", "health-record.edit-finding", "health-record.record-health", "health-record.condition-picker", "health-record.care-instructions", "health-record.treatment", "health-record.treatment-batch", "health-record.medicine-picker", "health-record.brand", "health-record.brand-add", "health-record.brand-details", "health-record.treatment-brand", "health-record.treatment-batch-brand", "health-record.custom-doses", "health-record.custom-doses-own", "health-record.custom-doses-search", "health-record.treatment-note"]
   },
   "entryPoints": [
     {
@@ -154,11 +154,6 @@
       "health-record.custom-doses",
       "health-record.custom-doses-search",
       "type an ear tag"
-    ],
-    [
-      "health-record.treatment-batch",
-      "health-record.treatment-pigs",
-      "tap 2 pigs"
     ]
   ],
   "screens": [
@@ -724,7 +719,7 @@
       "steps": ["[data-action=\"pig-actions\"]", "[data-action=\"treatment\"]", "[data-action=\"medicine-open\"]", "[data-action=\"medicine-select\"][data-value=\"amoxicillin\"]"],
       "figma": "",
       "notes": {
-        "purpose": "Record medicine actually given, to one pig or many, without implying every pig got the same dose. Shown after picking Amoxicillin: Method (In water) and unit (g) pre-filled from its last use, the optional Brand row, and the withdrawal notice from the medicine's default (14 days) before Save.",
+        "purpose": "Record medicine actually given, to one pig or many, without implying every pig got the same dose. Shown after picking Amoxicillin: Method (In water) and the unit (g) pre-filled from its last use, the caption Withdrawal period 14 days · until 26 Sep under Medicine, Brand · Optional, Dosage and Unit side by side, Condition and Note.",
         "elements": [
           {
             "name": "Variant",
@@ -738,7 +733,7 @@
               {
                 "state": "Many pigs",
                 "when": "Bulk selection",
-                "shows": "health-record.treatment-batch: Medicine, Method, Brand and Same dose for all (with its unit), then the pig list on the form, each pig's own dose box showing the shared dose as its placeholder"
+                "shows": "health-record.treatment-batch: Medicine, Method, Brand, Dosage and Unit; once a dosage is typed, Same for all N pigs · Adjust › (or N adjusted), opening Dose per pig"
               },
               {
                 "state": "From a finding",
@@ -828,12 +823,12 @@
       "steps": ["[data-action=\"treatment\"]", "[data-action=\"medicine-open\"]", "[data-action=\"medicine-select\"][data-value=\"tulathromycin\"]"],
       "figma": "",
       "notes": {
-        "purpose": "Several pigs, empty: the pigs row (opens the selected list), Medicine, Method, then once a medicine is chosen Brand, Same dose for all, Custom doses; Condition and Note.",
+        "purpose": "Several pigs, empty: Medicine (its withdrawal caption once chosen), Method, Brand, Dosage and Unit side by side; no Adjust line until a dosage is typed; Condition and Note.",
         "elements": [
           {
             "name": "Order",
             "at": "Medicine",
-            "shows": "Medicine, Method, Brand (optional), Same dose for all; the ear-tag search and the pig list with a dose box per pig; then Condition and Note (optional fields); then the withdrawal notice",
+            "shows": "Medicine, Method, Brand (optional), Dosage and Unit, the Adjust line; then Condition and Note (optional fields)",
             "rule": "What was given comes first (owner, 2026-10-16): one Dose applies to all; a pig's row trails its dose, muted when it follows the shared dose, ink with Own dose when set. The checkbox stays: it takes a pig out, as on every bulk page. Save waits until the shared dose is set or every included pig has its own."
           },
           {
@@ -875,8 +870,8 @@
         "elements": [
           {
             "name": "Withdrawal",
-            "at": "Withdrawal until",
-            "shows": "Banner (notice) before Save: Withdrawal until <date>, and the days",
+            "at": "Withdrawal period",
+            "shows": "A muted caption: Withdrawal period N days · until <date>, under Medicine or Brand",
             "states": [
               {
                 "state": "Brand with its own",
@@ -999,12 +994,12 @@
       ],
       "figma": "",
       "notes": {
-        "purpose": "Filled: the pigs row (2 pigs · C1), Tulathromycin, Injection, Draxxin, Same dose for all 2.5 mL, then Custom doses \"2 pigs · 1 own dose\". No per-pig inputs on the form. The withdrawal notice closes the form.",
+        "purpose": "Filled: Tulathromycin (caption \"Withdrawal period 33 days · until 15 Oct\"), Injection, Draxxin, Dosage 2.5 mL, then \"1 pig adjusted · Adjust ›\". No per-pig inputs on the form.",
         "elements": [
           {
             "name": "Withdrawal",
-            "at": "Withdrawal until",
-            "shows": "Banner (notice) before Save: Withdrawal until <date>, and the days",
+            "at": "Withdrawal period",
+            "shows": "A muted caption under Medicine (its default) or under Brand (the brand's own period)",
             "states": [
               {
                 "state": "Brand with its own",
@@ -1023,7 +1018,7 @@
               }
             ],
             "logic": "Until = the treatment date (12 Sep in the prototype) + days. Save keeps a copy of the days, the date and the brand's strength on each record, so a later edit of the brand or medicine never changes it.",
-            "rule": "Banner notice: a condition that follows from the commit, stated before the action it governs (Banner, When); not danger (nothing is destroyed) and not correction (nothing is reviewed)."
+            "rule": "Field's hint slot under the field the number comes from; no period or 0: no caption. Replaces the Banner notice (owner)."
           }
         ],
         "controls": [],
@@ -1033,8 +1028,8 @@
     },
     {
       "id": "health-record.custom-doses",
-      "name": "Custom doses",
-      "zh": "自定义剂量",
+      "name": "Dose per pig",
+      "zh": "每头猪的剂量",
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
       "preset": "selected-all",
@@ -1052,27 +1047,27 @@
       ],
       "figma": "",
       "notes": {
-        "purpose": "Every pig in the unit (8), none with its own dose yet: each box shows the shared 2.5 as its placeholder. A page: it grows with the pigs and holds a scan.",
+        "purpose": "Adjust › opens it: every pig in the unit (8), each box pre-filled with the actual dosage (2.5); Remove under each pig takes it out of the treatment (ChoiceList's removal control). Ear-tag search and Scan at the top.",
         "elements": [
           {
             "name": "Pig dose box",
             "at": "[data-bulk-value]",
-            "shows": "The pig's own dose, or the shared dose as its placeholder",
+            "shows": "The pig's dose: the dosage, or its own (adjusted)",
             "states": [
               {
-                "state": "Shared",
-                "when": "Nothing typed",
-                "shows": "Placeholder: the shared dose in ink-2 (— when none)"
+                "state": "Dosage",
+                "when": "Not adjusted",
+                "shows": "The dosage as its value, regular; follows the dosage"
               },
               {
-                "state": "Own dose",
-                "when": "A value typed",
-                "shows": "The value in ink, bold; it stays when the shared dose changes"
+                "state": "Adjusted",
+                "when": "A different value typed",
+                "shows": "Ink, bold, Adjusted under it; keeps its value"
               },
               {
                 "state": "Cleared",
                 "when": "The box emptied",
-                "shows": "Back to the shared dose"
+                "shows": "Back to the dosage"
               },
               {
                 "state": "Not eligible",
@@ -1080,7 +1075,7 @@
                 "shows": "Not eligible, the box unavailable"
               }
             ],
-            "logic": "Values are live: no Save on the page; Back (top left) returns to the form. Save on the form waits until the shared dose is set or every included pig has a typed dose. No checkbox: a pig is taken out on the selected list."
+            "logic": "Values are live: no Save on the page; Back (top left) returns to the form. A pig is taken out with Remove (not on the last pig)."
           },
           {
             "name": "Search and Scan",
@@ -1096,8 +1091,8 @@
     },
     {
       "id": "health-record.custom-doses-own",
-      "name": "Custom doses: one own dose",
-      "zh": "自定义剂量：一头单独剂量",
+      "name": "Dose per pig: one adjusted",
+      "zh": "每头猪的剂量：一头已调整",
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
       "preset": "selected",
@@ -1119,27 +1114,27 @@
       ],
       "figma": "",
       "notes": {
-        "purpose": "000254 typed to its own 3 mL (ink, bold); 000267 keeps the shared 2.5 as its placeholder.",
+        "purpose": "000254 typed to 3: ink, bold, with Adjusted under it; 000267 keeps the dosage. Unadjusted pigs follow a later change of the dosage; adjusted ones keep theirs; clearing a box returns it to the dosage.",
         "elements": [
           {
             "name": "Pig dose box",
             "at": "[data-bulk-value]",
-            "shows": "The pig's own dose, or the shared dose as its placeholder",
+            "shows": "The pig's dose: the dosage, or its own (adjusted)",
             "states": [
               {
-                "state": "Shared",
-                "when": "Nothing typed",
-                "shows": "Placeholder: the shared dose in ink-2 (— when none)"
+                "state": "Dosage",
+                "when": "Not adjusted",
+                "shows": "The dosage as its value, regular; follows the dosage"
               },
               {
-                "state": "Own dose",
-                "when": "A value typed",
-                "shows": "The value in ink, bold; it stays when the shared dose changes"
+                "state": "Adjusted",
+                "when": "A different value typed",
+                "shows": "Ink, bold, Adjusted under it; keeps its value"
               },
               {
                 "state": "Cleared",
                 "when": "The box emptied",
-                "shows": "Back to the shared dose"
+                "shows": "Back to the dosage"
               },
               {
                 "state": "Not eligible",
@@ -1147,7 +1142,7 @@
                 "shows": "Not eligible, the box unavailable"
               }
             ],
-            "logic": "Values are live: no Save on the page; Back (top left) returns to the form. Save on the form waits until the shared dose is set or every included pig has a typed dose. No checkbox: a pig is taken out on the selected list."
+            "logic": "Values are live: no Save on the page; Back (top left) returns to the form. A pig is taken out with Remove (not on the last pig)."
           }
         ],
         "controls": [],
@@ -1157,8 +1152,8 @@
     },
     {
       "id": "health-record.custom-doses-search",
-      "name": "Custom doses: search an ear tag",
-      "zh": "自定义剂量：搜索耳标",
+      "name": "Dose per pig: search an ear tag",
+      "zh": "每头猪的剂量：搜索耳标",
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
       "preset": "selected-all",
@@ -1184,30 +1179,6 @@
         "elements": [],
         "controls": [],
         "copy": ["medicines.dose.search", "medicines.dose.no_match"],
-        "issues": []
-      }
-    },
-    {
-      "id": "health-record.treatment-pigs",
-      "name": "Selected pigs: take one out",
-      "zh": "已选猪只：移除",
-      "status": "in-design",
-      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
-      "preset": "selected",
-      "steps": ["[data-action=\"treatment\"]", "[data-action=\"treatment-pigs\"]", "[data-treat-pig=\"000254\"]"],
-      "figma": "",
-      "notes": {
-        "purpose": "The pigs row on the form opens the selected list (the walk's Selected review pattern): every pig ticked; untick one to take it out of this treatment. 000254 unticked here; the form then reads 1 pig.",
-        "elements": [
-          {
-            "name": "Pig",
-            "at": "000254",
-            "shows": "Ticked while it is in the treatment",
-            "logic": "Unticking takes the pig out: it leaves Custom doses and Save's count. Ticking again puts it back."
-          }
-        ],
-        "controls": [],
-        "copy": ["medicines.pigs.title"],
         "issues": []
       }
     },
