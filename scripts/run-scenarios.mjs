@@ -218,7 +218,7 @@ async function runLeaf(browser, leaf, lang, width) {
   const n = leaf.node, st = leaf.state, fx = st.reset || {};
   const dir = join(root, 'review', 'scenarios', feature, n.id, `${lang}-${width}`);
   rmSync(dir, { recursive: true, force: true }); mkdirSync(dir, { recursive: true });
-  const evidence = [], failures = [], skipped = [], notes = [], errors = [];
+  const evidence = [], failures = [], skipped = [], notes = [], errors = [], loadFailures = [];
   const clock = n.clock || st.clock || D.clock;
   const needsClock = !!clock || leaf.taps.some((s) => stepKind(s) === 'advance');   // a leaf that lets time pass gets a clock even if it fixes none
   const startMs = clock ? new Date(clock).getTime() : Date.now();
@@ -240,6 +240,11 @@ async function runLeaf(browser, leaf, lang, width) {
     const pg = await context.newPage();
     const tag = name === 'a' ? '' : `device ${name}: `;
     pg.on('pageerror', (e) => errors.push(tag + e.message));
+    // The page's own files (served by the runner's server) that failed to arrive: a network failure or a 5xx, never a 404, which
+    // is a missing file and so a real defect. Only these make a failed run a machine error (runWithRetry).
+    const own = (u) => u.startsWith(base);
+    pg.on('requestfailed', (r) => { if (own(r.url())) loadFailures.push(`${r.url().slice(base.length)} ${(r.failure() || {}).errorText || 'failed'}`); });
+    pg.on('response', (r) => { if (own(r.url()) && r.status() >= 500) loadFailures.push(`${r.url().slice(base.length)} HTTP ${r.status()}`); });
     pg.on('console', (m) => { if (m.type() === 'error' && /atlas-bare: step not found/.test(m.text())) errors.push(tag + m.text()); });
     if (needsClock) await pg.clock.install({ time: new Date(startMs + elapsed) });   // a second device joins at the same moment
     const url = new URL(base + (fx.url || D.url));
@@ -317,20 +322,24 @@ async function runLeaf(browser, leaf, lang, width) {
   for (const c of contexts) await c.close().catch(() => {});
   let result = failures.length ? 'fail' : 'pass';
   if (notes.length && result === 'pass') result = 'blocked';   // the screens can't run in this language: never counted as covered
-  return { lang, width, result, failures, skipped, notes, evidence };
+  return { lang, width, result, failures, skipped, notes, evidence, loadFailures };
 }
 
 // A run whose only failure is a navigation timeout (the machine was busy, not the design) runs once more in fresh contexts.
 // Timing out again fails it as a slow machine, never as a design failure; an assertion failure never retries.
 async function runWithRetry(browser, leaf, lang, width) {
   const first = await runLeaf(browser, leaf, lang, width);
-  if (first.result !== 'fail' || !timedOutOnly(first.failures)) return first;
-  console.log(`retry    ${leaf.node.id} ${lang}-${width}: ${first.failures[0].got}`);
+  // A machine error: only navigation timeouts, or the page failed to receive one of its own files (a page error such as an
+  // undefined namespace then follows from that, not from the design). Every other failure stands as it is.
+  const machine = (r) => timedOutOnly(r.failures) || (r.loadFailures || []).length > 0;
+  if (first.result !== 'fail' || !machine(first)) return first;
+  console.log(`retry    ${leaf.node.id} ${lang}-${width}: ${(first.loadFailures || [])[0] ? 'a file did not load: ' + first.loadFailures[0] : first.failures[0].got}`);
   const again = await runLeaf(browser, leaf, lang, width);
-  again.retried = first.failures.map((f) => f.got);
-  if (again.result === 'fail' && timedOutOnly(again.failures)) {
+  again.retried = [...first.failures.map((f) => f.got), ...(first.loadFailures || [])];
+  if (again.result === 'fail' && machine(again)) {
     again.slow = true;
-    again.failures = again.failures.map((f) => ({ ...f, what: `slow machine (timed out twice): ${f.what}`, tag: null }));
+    const why = (again.loadFailures || []).length ? `a file did not load twice (${again.loadFailures[0]})` : 'timed out twice';
+    again.failures = again.failures.map((f) => ({ ...f, what: `slow machine (${why}): ${f.what}`, tag: null }));
   }
   return again;
 }

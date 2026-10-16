@@ -37,7 +37,8 @@
 <script src="shell-ui.js"></script>
 <script>
 (function () {
-  var K = window.SentriTask, UI = window.SentriUI, U = window.PPUI;
+  const UI = window.SentriUI;
+  var K = window.SentriTask, U = window.PPUI;
   var zh = PP.lang === 'zh';
 
   /* ---- states: a fixture variant + the ticks + UI state. Every row and figure is the ledger's (select.bulkDraft over the
