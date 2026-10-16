@@ -106,6 +106,16 @@ Base evidence is kept per main commit (an index of the identities each base used
 
 Everything is reported per case: warm cache, cold cache and full reach.
 
+**Measured (evidence half, with the analyser's stand-in: every screen and leaf in reach; 4 workers; 2026-10-17, quiet machine).** 373 screens and component pages, 2,716 visits, 450 leaf runs, 138 state checks:
+
+| Case | Wall | Where the time went |
+|---|---|---|
+| Cold: an added and a removed screen, empty store | 20.8 min | visits (shots and visit checks, both sides) 14.7 min, leaves 6.0 min, the rest under 10 s; npm test and the state checks ran beside the visits |
+| Warm: the same change gated again | 10 s | everything reused (2,716 shots, 2,745 visit checks, 450 leaf runs, 138 state checks, npm test) |
+| Main moved by a README, `--verdict` | 24 s | 0 visits; npm test and the atlas rebuild again (whole-tree identity); 4 of 4 judgements and the removed screen's reason carried |
+| A checker (check-spacing) changed on main | 3.6 min | 610 visits for the 610 spacing results only; npm test and the atlas rebuild again; nothing else |
+| An unstable screen (the candidate changes one page) | 13.1 min | the candidate's half recomputed (1,358 visits, 448 leaf runs: the stand-in's whole-tree identity), base reused; blocked on that screen |
+
 ## What happens to work already built
 | Work | Fate |
 |---|---|
