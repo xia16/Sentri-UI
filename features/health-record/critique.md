@@ -254,3 +254,7 @@ Scope: the medicine picker and the Brand field of Record treatment (`health-reco
 ### Self-crit
 
 Rounds and the final look follow in `features/medicines/critique.md`, which renders these screens with the picker.
+
+### Revision (owner, 2026-10-16)
+
+The Brand optional row comes back as the medicines feature's field (only once a medicine is chosen; its own list with recents and an Add card), after Method and before the dose; the withdrawal notice (Banner notice) closes the form before Save when a withdrawal is in force. The picker picks a medicine; Method and unit are remembered per medicine. Renders and the final look: `features/medicines/critique.md`, Revision.

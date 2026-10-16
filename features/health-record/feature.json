@@ -44,7 +44,12 @@
       "health-record.care-instructions",
       "health-record.treatment",
       "health-record.treatment-batch",
-      "health-record.medicine-picker"
+      "health-record.medicine-picker",
+      "health-record.brand",
+      "health-record.brand-add",
+      "health-record.brand-details",
+      "health-record.treatment-brand",
+      "health-record.treatment-batch-brand"
     ]
   },
   "entryPoints": [
@@ -147,6 +152,16 @@
       "health-record.medicine-picker",
       "health-record.treatment",
       "tap a medicine"
+    ],
+    [
+      "health-record.treatment",
+      "health-record.brand",
+      "tap Brand"
+    ],
+    [
+      "health-record.brand",
+      "health-record.brand-add",
+      "type a brand with no match"
     ],
     [
       "health-record.record-health",
@@ -802,10 +817,10 @@
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
       "preset": "profile-full",
-      "steps": ["[data-action=\"pig-actions\"]","[data-action=\"treatment\"]"],
+      "steps": ["[data-action=\"pig-actions\"]","[data-action=\"treatment\"]","[data-action=\"medicine-open\"]","[data-action=\"medicine-select\"][data-value=\"amoxicillin\"]"],
       "figma": "",
       "notes": {
-        "purpose": "Record medicine actually given, to one pig or many, without implying every pig got the same dose.",
+        "purpose": "Record medicine actually given, to one pig or many, without implying every pig got the same dose. Shown after picking Amoxicillin: Method (In water) and unit (g) pre-filled from its last use, the optional Brand row, and the withdrawal notice from the medicine's default (14 days) before Save.",
         "elements": [
           {
             "name": "Variant",
@@ -859,8 +874,19 @@
                 "shows": "No text"
               }
             ],
-            "logic": "Method: Injection, Oral, Topical, In feed, In water. Picking a product fills Method and the unit with the ones it was last given with (features/medicines), unless they were set in this draft; Save stores them on the product. Condition chip links only to pigs carrying that condition.",
+            "logic": "Method: Injection, Oral, Topical, In feed, In water. Picking a medicine fills Method and the unit with the ones it was last given with (features/medicines), unless they were set in this draft; Save stores them on the medicine. Condition chip links only to pigs carrying that condition.",
             "at": "Dose"
+          },
+          {
+            "name": "Brand",
+            "at": "Brand",
+            "shows": "An optional row, after Method",
+            "states": [
+              { "state": "No medicine", "when": "Medicine not chosen", "shows": "Absent" },
+              { "state": "Empty", "when": "Medicine chosen, no brand", "shows": "+ Brand; no brand is recorded" },
+              { "state": "Set", "when": "A brand picked or added", "shows": "Brand and its name, with the edit icon; Clear in the Brand list removes it" }
+            ],
+            "logic": "A new medicine drops a brand that belonged to the old one. Opens health-record.brand."
           },
           {
             "name": "Save",
@@ -897,16 +923,16 @@
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
       "preset": "selected",
-      "steps": ["[data-action=\"treatment\"]", "[data-action=\"medicine-open\"]", "[data-action=\"medicine-select\"][data-value=\"p:draxxin\"]"],
+      "steps": ["[data-action=\"treatment\"]", "[data-action=\"medicine-open\"]", "[data-action=\"medicine-select\"][data-value=\"tulathromycin\"]"],
       "figma": "",
       "notes": {
-        "purpose": "What was given to several pigs, then each pig's dose. Shown after picking Draxxin from the recent rows: Method (Injection) and the unit (mL) are pre-filled from its last use.",
+        "purpose": "What was given to several pigs, then each pig's dose. Shown after picking Tulathromycin from the recent rows: Method (Injection) and the unit (mL) are pre-filled from its last use, the Brand row appears, and the withdrawal notice (Tulathromycin's default, 33 days) closes the form.",
         "elements": [
           {
             "name": "Order",
             "at": "Medicine",
-            "shows": "Medicine, Method; then Same dose for all heading the pig list; then Condition and Note",
-            "rule": "What was given comes first (owner, 2026-10-16): a dose means nothing until the medicine and its unit are known. The per-pig dose boxes are unchanged; each shows the unit, pre-filled from the product's last use."
+            "shows": "Medicine, Method, the optional Brand row; then Same dose for all heading the pig list; then Condition and Note",
+            "rule": "What was given comes first (owner, 2026-10-16): a dose means nothing until the medicine and its unit are known. The per-pig dose boxes are unchanged; each shows the unit, pre-filled from the medicine's last use."
           },
           {
             "name": "Save",
@@ -918,6 +944,104 @@
         "controls": [],
         "copy": ["Record treatment (raw)", "Same dose for all (raw)"],
         "issues": ["To confirm (product rule, review/inspection-r2.json): is a dose required for every pig, or may a pig be saved without one?"]
+      }
+    },
+    {
+      "id": "health-record.treatment-brand",
+      "name": "Record treatment, with a brand",
+      "zh": "记录治疗（含品牌）",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "profile-full",
+      "steps": ["[data-action=\"pig-actions\"]","[data-action=\"treatment\"]","[data-action=\"medicine-open\"]","[data-action=\"medicine-select\"][data-value=\"amoxicillin\"]","[data-action=\"brand-open\"]","[data-action=\"brand-select\"][data-value=\"amoxicillin/0\"]"],
+      "figma": "",
+      "notes": {
+        "purpose": "Amoxicillin with Amoxinsol 50 (50%, 2 days): the Brand row reads \"Amoxinsol 50 · 50%\"; the brand's own withdrawal replaces the medicine's default (14 days).",
+        "elements": [{"name": "Withdrawal", "at": "Withdrawal until", "shows": "Banner (notice) before Save: Withdrawal until <date>, and the days for meat", "states": [{"state": "Brand with its own", "when": "The chosen brand has a withdrawal", "shows": "The brand's days"}, {"state": "Medicine default", "when": "No brand, or the brand has none", "shows": "The medicine's default days"}, {"state": "None", "when": "Neither has one, or it is 0", "shows": "Absent"}], "logic": "Until = the treatment date (12 Sep in the prototype) + days. Save keeps a copy of the days, the date and the brand's strength on each record, so a later edit of the brand or medicine never changes it.", "rule": "Banner notice: a condition that follows from the commit, stated before the action it governs (Banner, When); not danger (nothing is destroyed) and not correction (nothing is reviewed)."}],
+        "controls": [],
+        "copy": ["medicines.brand.field", "medicines.withdrawal.until"],
+        "issues": ["Strengths and withdrawals are sample farm data."]
+      }
+    },
+    {
+      "id": "health-record.brand",
+      "name": "Brand",
+      "zh": "品牌",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "profile-full",
+      "steps": ["[data-action=\"pig-actions\"]","[data-action=\"treatment\"]","[data-action=\"medicine-open\"]","[data-action=\"medicine-select\"][data-value=\"amoxicillin\"]","[data-action=\"brand-open\"]"],
+      "figma": "",
+      "notes": {
+        "purpose": "The brands the farm has used for the chosen medicine (Amoxicillin): one tap sets it and closes.",
+        "elements": [
+          {
+            "name": "Brand list",
+            "at": "Recently used",
+            "shows": "The three most recently used brands under Recently used, the rest under Other brands (A to Z); no second line",
+            "states": [
+              { "state": "Three or fewer", "when": "The medicine has at most three brands", "shows": "One list, newest first, no label" },
+              { "state": "None", "when": "No brand used yet for this medicine", "shows": "Search only; typing a name offers Add" }
+            ],
+            "logic": "Brands belong to a medicine and are shared by the farm; Save moves the brand used to the top. A brand's strength is its second line (it tells sibling brands apart)."
+          }
+        ],
+        "controls": [],
+        "copy": ["medicines.brand.title", "medicines.brand.search", "medicines.group.recent", "medicines.group.other_brands"],
+        "issues": ["Brands are sample farm data."]
+      }
+    },
+    {
+      "id": "health-record.brand-add",
+      "name": "Brand: no match, Add",
+      "zh": "品牌：无结果，添加",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "profile-full",
+      "steps": ["[data-action=\"pig-actions\"]","[data-action=\"treatment\"]","[data-action=\"medicine-open\"]","[data-action=\"medicine-select\"][data-value=\"amoxicillin\"]","[data-action=\"brand-open\"]",{"fill":"[data-brand-search]","text":"Moxylan"}],
+      "figma": "",
+      "notes": {
+        "purpose": "A brand not on the list: one card, Add “Moxylan”, and nothing else.",
+        "elements": [
+          { "name": "Add card", "at": "Add “Moxylan”", "shows": "Add “Moxylan”", "rule": "One tap adds the brand under this medicine for everyone and picks it; the list closes on the form." }
+        ],
+        "controls": [],
+        "copy": ["medicines.add_card"],
+        "issues": []
+      }
+    },
+    {
+      "id": "health-record.treatment-batch-brand",
+      "name": "Record treatment · several pigs, with a brand",
+      "zh": "记录治疗 · 多头猪（含品牌）",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "selected",
+      "steps": ["[data-action=\"treatment\"]","[data-action=\"medicine-open\"]","[data-action=\"medicine-select\"][data-value=\"tulathromycin\"]","[data-action=\"brand-open\"]","[data-action=\"brand-select\"][data-value=\"tulathromycin/0\"]"],
+      "figma": "",
+      "notes": {
+        "purpose": "Tulathromycin with Draxxin (100 mg/ml, 33 days): the Brand row reads the brand and its strength; the withdrawal notice closes the form before Save.",
+        "elements": [{"name": "Withdrawal", "at": "Withdrawal until", "shows": "Banner (notice) before Save: Withdrawal until <date>, and the days for meat", "states": [{"state": "Brand with its own", "when": "The chosen brand has a withdrawal", "shows": "The brand's days"}, {"state": "Medicine default", "when": "No brand, or the brand has none", "shows": "The medicine's default days"}, {"state": "None", "when": "Neither has one, or it is 0", "shows": "Absent"}], "logic": "Until = the treatment date (12 Sep in the prototype) + days. Save keeps a copy of the days, the date and the brand's strength on each record, so a later edit of the brand or medicine never changes it.", "rule": "Banner notice: a condition that follows from the commit, stated before the action it governs (Banner, When); not danger (nothing is destroyed) and not correction (nothing is reviewed)."}],
+        "controls": [],
+        "copy": ["medicines.withdrawal.until", "medicines.withdrawal.consequence"],
+        "issues": ["Strengths and withdrawals are sample farm data, not label values to rely on."]
+      }
+    },
+    {
+      "id": "health-record.brand-details",
+      "name": "Brand: add details (optional)",
+      "zh": "品牌：添加详情（可选）",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "profile-full",
+      "steps": ["[data-action=\"pig-actions\"]","[data-action=\"treatment\"]","[data-action=\"medicine-open\"]","[data-action=\"medicine-select\"][data-value=\"amoxicillin\"]","[data-action=\"brand-open\"]",{"fill":"[data-brand-search]","text":"Moxylan"},"[data-action=\"brand-add\"]"],
+      "figma": "",
+      "notes": {
+        "purpose": "After Add “Moxylan”: the brand is already added and picked; this level offers its strength and withdrawal, and can be skipped.",
+        "elements": [{"name": "Add", "at": "[data-action=\"brand-details-save\"]", "shows": "Add", "rule": "Waits until a strength or a withdrawal is typed; neither is required. Back goes up to the Brand list (Moxylan ticked), the \u2715 closes on the form: either way the brand stays, without details."}],
+        "controls": [],
+        "copy": ["medicines.details.title", "medicines.detail.strength", "medicines.detail.withdrawal", "medicines.add.commit"],
+        "issues": []
       }
     },
     {

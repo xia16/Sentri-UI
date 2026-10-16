@@ -196,19 +196,19 @@ test("browsing a disease branch retains its kind when adding a custom condition"
   assert.deepEqual(c.form.conditionPath, ["Disease", group.group]);
 });
 
-test("the medicine trigger shows the picked product, not its path (features/medicines)", () => {
+test("the medicine trigger shows the picked medicine, not its path (features/medicines)", () => {
   const M = globalThis.InspectionStudy,
     c = M.seed();
   M.openBulkAction(c, "treatment", ["000267"]);
   M.handleRecordAction(c, "medicine-open", "");
   M.handleRecordAction(c, "medicine-category", "pain");
-  M.handleRecordAction(c, "medicine-select", "p:metacam");
+  M.handleRecordAction(c, "medicine-select", "meloxicam");
   assert.equal(c.view, "treatment");
-  assert.equal(c.form.productId, "metacam");
-  assert.equal(c.form.medicine, "Metacam · injection");
+  assert.equal(c.form.medicineId, "meloxicam");
+  assert.equal(c.form.medicine, "Meloxicam");
   const html = M.overlay(c);
-  assert.match(html, /st-picker-value[^>]*>Metacam · injection</);
-  assert.doesNotMatch(html, /Pain relief › |Meloxicam › /);
+  assert.match(html, /st-picker-value[^>]*>Meloxicam</);
+  assert.doesNotMatch(html, /Pain relief › /);
   c.form.conditionPath = ["Symptom", "General appearance"];
   c.form.search = "fever";
   c.form.conditions = ["Fever"];

@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-16T09:02:43.453Z",
- "commit": "c8a98da",
+ "generated": "2026-10-16T10:31:11.262Z",
+ "commit": "a1ed8e6",
  "platforms": [
   {
    "id": "mobile",
@@ -16335,7 +16335,12 @@
          "health-record.care-instructions",
          "health-record.treatment",
          "health-record.treatment-batch",
-         "health-record.medicine-picker"
+         "health-record.medicine-picker",
+         "health-record.brand",
+         "health-record.brand-add",
+         "health-record.brand-details",
+         "health-record.treatment-brand",
+         "health-record.treatment-batch-brand"
         ]
        },
        "entryPoints": [
@@ -16438,6 +16443,16 @@
          "health-record.medicine-picker",
          "health-record.treatment",
          "tap a medicine"
+        ],
+        [
+         "health-record.treatment",
+         "health-record.brand",
+         "tap Brand"
+        ],
+        [
+         "health-record.brand",
+         "health-record.brand-add",
+         "type a brand with no match"
         ],
         [
          "health-record.record-health",
@@ -17116,11 +17131,13 @@
          "preset": "profile-full",
          "steps": [
           "[data-action=\"pig-actions\"]",
-          "[data-action=\"treatment\"]"
+          "[data-action=\"treatment\"]",
+          "[data-action=\"medicine-open\"]",
+          "[data-action=\"medicine-select\"][data-value=\"amoxicillin\"]"
          ],
          "figma": "",
          "notes": {
-          "purpose": "Record medicine actually given, to one pig or many, without implying every pig got the same dose.",
+          "purpose": "Record medicine actually given, to one pig or many, without implying every pig got the same dose. Shown after picking Amoxicillin: Method (In water) and unit (g) pre-filled from its last use, the optional Brand row, and the withdrawal notice from the medicine's default (14 days) before Save.",
           "elements": [
            {
             "name": "Variant",
@@ -17174,8 +17191,31 @@
               "shows": "No text"
              }
             ],
-            "logic": "Method: Injection, Oral, Topical, In feed, In water. Picking a product fills Method and the unit with the ones it was last given with (features/medicines), unless they were set in this draft; Save stores them on the product. Condition chip links only to pigs carrying that condition.",
+            "logic": "Method: Injection, Oral, Topical, In feed, In water. Picking a medicine fills Method and the unit with the ones it was last given with (features/medicines), unless they were set in this draft; Save stores them on the medicine. Condition chip links only to pigs carrying that condition.",
             "at": "Dose"
+           },
+           {
+            "name": "Brand",
+            "at": "Brand",
+            "shows": "An optional row, after Method",
+            "states": [
+             {
+              "state": "No medicine",
+              "when": "Medicine not chosen",
+              "shows": "Absent"
+             },
+             {
+              "state": "Empty",
+              "when": "Medicine chosen, no brand",
+              "shows": "+ Brand; no brand is recorded"
+             },
+             {
+              "state": "Set",
+              "when": "A brand picked or added",
+              "shows": "Brand and its name, with the edit icon; Clear in the Brand list removes it"
+             }
+            ],
+            "logic": "A new medicine drops a brand that belonged to the old one. Opens health-record.brand."
            },
            {
             "name": "Save",
@@ -17215,17 +17255,17 @@
          "steps": [
           "[data-action=\"treatment\"]",
           "[data-action=\"medicine-open\"]",
-          "[data-action=\"medicine-select\"][data-value=\"p:draxxin\"]"
+          "[data-action=\"medicine-select\"][data-value=\"tulathromycin\"]"
          ],
          "figma": "",
          "notes": {
-          "purpose": "What was given to several pigs, then each pig's dose. Shown after picking Draxxin from the recent rows: Method (Injection) and the unit (mL) are pre-filled from its last use.",
+          "purpose": "What was given to several pigs, then each pig's dose. Shown after picking Tulathromycin from the recent rows: Method (Injection) and the unit (mL) are pre-filled from its last use, the Brand row appears, and the withdrawal notice (Tulathromycin's default, 33 days) closes the form.",
           "elements": [
            {
             "name": "Order",
             "at": "Medicine",
-            "shows": "Medicine, Method; then Same dose for all heading the pig list; then Condition and Note",
-            "rule": "What was given comes first (owner, 2026-10-16): a dose means nothing until the medicine and its unit are known. The per-pig dose boxes are unchanged; each shows the unit, pre-filled from the product's last use."
+            "shows": "Medicine, Method, the optional Brand row; then Same dose for all heading the pig list; then Condition and Note",
+            "rule": "What was given comes first (owner, 2026-10-16): a dose means nothing until the medicine and its unit are known. The per-pig dose boxes are unchanged; each shows the unit, pre-filled from the medicine's last use."
            },
            {
             "name": "Save",
@@ -17245,6 +17285,238 @@
          }
         },
         {
+         "id": "health-record.treatment-brand",
+         "name": "Record treatment, with a brand",
+         "zh": "记录治疗（含品牌）",
+         "status": "in-design",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "profile-full",
+         "steps": [
+          "[data-action=\"pig-actions\"]",
+          "[data-action=\"treatment\"]",
+          "[data-action=\"medicine-open\"]",
+          "[data-action=\"medicine-select\"][data-value=\"amoxicillin\"]",
+          "[data-action=\"brand-open\"]",
+          "[data-action=\"brand-select\"][data-value=\"amoxicillin/0\"]"
+         ],
+         "figma": "",
+         "notes": {
+          "purpose": "Amoxicillin with Amoxinsol 50 (50%, 2 days): the Brand row reads \"Amoxinsol 50 · 50%\"; the brand's own withdrawal replaces the medicine's default (14 days).",
+          "elements": [
+           {
+            "name": "Withdrawal",
+            "at": "Withdrawal until",
+            "shows": "Banner (notice) before Save: Withdrawal until <date>, and the days for meat",
+            "states": [
+             {
+              "state": "Brand with its own",
+              "when": "The chosen brand has a withdrawal",
+              "shows": "The brand's days"
+             },
+             {
+              "state": "Medicine default",
+              "when": "No brand, or the brand has none",
+              "shows": "The medicine's default days"
+             },
+             {
+              "state": "None",
+              "when": "Neither has one, or it is 0",
+              "shows": "Absent"
+             }
+            ],
+            "logic": "Until = the treatment date (12 Sep in the prototype) + days. Save keeps a copy of the days, the date and the brand's strength on each record, so a later edit of the brand or medicine never changes it.",
+            "rule": "Banner notice: a condition that follows from the commit, stated before the action it governs (Banner, When); not danger (nothing is destroyed) and not correction (nothing is reviewed)."
+           }
+          ],
+          "controls": [],
+          "copy": [
+           "medicines.brand.field",
+           "medicines.withdrawal.until"
+          ],
+          "issues": [
+           "Strengths and withdrawals are sample farm data."
+          ]
+         }
+        },
+        {
+         "id": "health-record.brand",
+         "name": "Brand",
+         "zh": "品牌",
+         "status": "in-design",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "profile-full",
+         "steps": [
+          "[data-action=\"pig-actions\"]",
+          "[data-action=\"treatment\"]",
+          "[data-action=\"medicine-open\"]",
+          "[data-action=\"medicine-select\"][data-value=\"amoxicillin\"]",
+          "[data-action=\"brand-open\"]"
+         ],
+         "figma": "",
+         "notes": {
+          "purpose": "The brands the farm has used for the chosen medicine (Amoxicillin): one tap sets it and closes.",
+          "elements": [
+           {
+            "name": "Brand list",
+            "at": "Recently used",
+            "shows": "The three most recently used brands under Recently used, the rest under Other brands (A to Z); no second line",
+            "states": [
+             {
+              "state": "Three or fewer",
+              "when": "The medicine has at most three brands",
+              "shows": "One list, newest first, no label"
+             },
+             {
+              "state": "None",
+              "when": "No brand used yet for this medicine",
+              "shows": "Search only; typing a name offers Add"
+             }
+            ],
+            "logic": "Brands belong to a medicine and are shared by the farm; Save moves the brand used to the top. A brand's strength is its second line (it tells sibling brands apart)."
+           }
+          ],
+          "controls": [],
+          "copy": [
+           "medicines.brand.title",
+           "medicines.brand.search",
+           "medicines.group.recent",
+           "medicines.group.other_brands"
+          ],
+          "issues": [
+           "Brands are sample farm data."
+          ]
+         }
+        },
+        {
+         "id": "health-record.brand-add",
+         "name": "Brand: no match, Add",
+         "zh": "品牌：无结果，添加",
+         "status": "in-design",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "profile-full",
+         "steps": [
+          "[data-action=\"pig-actions\"]",
+          "[data-action=\"treatment\"]",
+          "[data-action=\"medicine-open\"]",
+          "[data-action=\"medicine-select\"][data-value=\"amoxicillin\"]",
+          "[data-action=\"brand-open\"]",
+          {
+           "fill": "[data-brand-search]",
+           "text": "Moxylan"
+          }
+         ],
+         "figma": "",
+         "notes": {
+          "purpose": "A brand not on the list: one card, Add “Moxylan”, and nothing else.",
+          "elements": [
+           {
+            "name": "Add card",
+            "at": "Add “Moxylan”",
+            "shows": "Add “Moxylan”",
+            "rule": "One tap adds the brand under this medicine for everyone and picks it; the list closes on the form."
+           }
+          ],
+          "controls": [],
+          "copy": [
+           "medicines.add_card"
+          ],
+          "issues": []
+         }
+        },
+        {
+         "id": "health-record.treatment-batch-brand",
+         "name": "Record treatment · several pigs, with a brand",
+         "zh": "记录治疗 · 多头猪（含品牌）",
+         "status": "in-design",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "selected",
+         "steps": [
+          "[data-action=\"treatment\"]",
+          "[data-action=\"medicine-open\"]",
+          "[data-action=\"medicine-select\"][data-value=\"tulathromycin\"]",
+          "[data-action=\"brand-open\"]",
+          "[data-action=\"brand-select\"][data-value=\"tulathromycin/0\"]"
+         ],
+         "figma": "",
+         "notes": {
+          "purpose": "Tulathromycin with Draxxin (100 mg/ml, 33 days): the Brand row reads the brand and its strength; the withdrawal notice closes the form before Save.",
+          "elements": [
+           {
+            "name": "Withdrawal",
+            "at": "Withdrawal until",
+            "shows": "Banner (notice) before Save: Withdrawal until <date>, and the days for meat",
+            "states": [
+             {
+              "state": "Brand with its own",
+              "when": "The chosen brand has a withdrawal",
+              "shows": "The brand's days"
+             },
+             {
+              "state": "Medicine default",
+              "when": "No brand, or the brand has none",
+              "shows": "The medicine's default days"
+             },
+             {
+              "state": "None",
+              "when": "Neither has one, or it is 0",
+              "shows": "Absent"
+             }
+            ],
+            "logic": "Until = the treatment date (12 Sep in the prototype) + days. Save keeps a copy of the days, the date and the brand's strength on each record, so a later edit of the brand or medicine never changes it.",
+            "rule": "Banner notice: a condition that follows from the commit, stated before the action it governs (Banner, When); not danger (nothing is destroyed) and not correction (nothing is reviewed)."
+           }
+          ],
+          "controls": [],
+          "copy": [
+           "medicines.withdrawal.until",
+           "medicines.withdrawal.consequence"
+          ],
+          "issues": [
+           "Strengths and withdrawals are sample farm data, not label values to rely on."
+          ]
+         }
+        },
+        {
+         "id": "health-record.brand-details",
+         "name": "Brand: add details (optional)",
+         "zh": "品牌：添加详情（可选）",
+         "status": "in-design",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "profile-full",
+         "steps": [
+          "[data-action=\"pig-actions\"]",
+          "[data-action=\"treatment\"]",
+          "[data-action=\"medicine-open\"]",
+          "[data-action=\"medicine-select\"][data-value=\"amoxicillin\"]",
+          "[data-action=\"brand-open\"]",
+          {
+           "fill": "[data-brand-search]",
+           "text": "Moxylan"
+          },
+          "[data-action=\"brand-add\"]"
+         ],
+         "figma": "",
+         "notes": {
+          "purpose": "After Add “Moxylan”: the brand is already added and picked; this level offers its strength and withdrawal, and can be skipped.",
+          "elements": [
+           {
+            "name": "Add",
+            "at": "[data-action=\"brand-details-save\"]",
+            "shows": "Add",
+            "rule": "Waits until a strength or a withdrawal is typed; neither is required. Back goes up to the Brand list (Moxylan ticked), the ✕ closes on the form: either way the brand stays, without details."
+           }
+          ],
+          "controls": [],
+          "copy": [
+           "medicines.details.title",
+           "medicines.detail.strength",
+           "medicines.detail.withdrawal",
+           "medicines.add.commit"
+          ],
+          "issues": []
+         }
+        },
+        {
          "id": "health-record.medicine-picker",
          "name": "Select medicine",
          "zh": "选择药品",
@@ -17258,17 +17530,17 @@
           "[data-action=\"medicine-open\"]"
          ],
          "notes": {
-          "purpose": "Pick what was given, over the real Record treatment page: search, the farm's recent products, then the categories.",
+          "purpose": "Pick what was given, over the real Record treatment page: search, the farm's recent medicines, then the categories.",
           "elements": [
            {
             "name": "Recently used",
             "at": "Recently used",
-            "shows": "Up to three products the farm picked last, under the group label Recently used",
+            "shows": "Up to three medicines the farm picked last, under the group label Recently used; no second line",
             "states": [
              {
               "state": "Recent picks",
               "when": "The farm has recorded a treatment",
-              "shows": "Brand, then medicine · form; a medicine given with its brand not known reads the medicine, then Brand not known"
+              "shows": "The medicine's name"
              },
              {
               "state": "None",
@@ -17276,14 +17548,14 @@
               "shows": "The block is absent; the categories lose their label (medicines.picker-first)"
              }
             ],
-            "logic": "Distinct, newest first, any worker, filtered to the task (a vaccination shows vaccines only). A product deleted from the list leaves it.",
+            "logic": "Distinct, newest first, any worker, filtered to the task (a vaccination shows vaccines only). A deleted medicine leaves it.",
             "source": "medRecents(c)"
            },
            {
             "name": "Category rows",
             "at": "Categories",
-            "shows": "The fixed category list, the same on every farm",
-            "rule": "Categories carry no count. A tap opens the category as a level; the footer Back comes back here, the ✕ closes the picker."
+            "shows": "The fixed category list, the same on every farm; no second line",
+            "rule": "A tap opens the category as a level; the footer Back comes back here, the ✕ closes the picker."
            }
           ],
           "controls": [],
@@ -17291,19 +17563,16 @@
            "medicines.title",
            "medicines.group.recent",
            "medicines.group.categories",
-           "ds.picker.search",
-           "medicines.category.*"
-          ],
-          "rules": [
-           "A pick commits and closes; the field shows the product (Metacam · injection) or the medicine alone for Brand not known."
+           "ds.picker.search"
           ],
           "issues": [
-           "The medicine list is sample data from pig farming, not a farm's real list and not a treatment recommendation."
+           "The categories and medicines are the starting list every farm gets (medicines-catalogue.json): to be checked by a vet.",
+           "Brands, recent picks and remembered methods are sample farm data."
           ]
          }
         }
        ],
-       "prd": "# Health record 健康管理\n\n## Problem\n\nThe worker records a disease or symptom on one or many pigs, says what to do about it (care), records treatment, and later closes the record as recovered or entered in error. The old Figma draws health three times: in Inspection (add and remove disease or symptom), in the pig list (health management) and in the 健康与治疗 treatment file. The Inspection prototype is the one built version.\n\n## Who\n\nThe worker on the walk who finds a sick pig, and the worker who gives treatment or vaccination as a task. A supervisor reads the care levels on the list.\n\n## Anchor\n\nAnchor: the Finding (one condition on one pig).\n\n- Needs attention: care is Monitor, Treat in place or Move to hospital pen. Shown as a row on top of the pig record, with the care level and the day.\n- Ongoing, no action needed: recorded and visible as a tag until it is resolved.\n- Closed: Recovered, or Entered in error. The case leaves the active list and stays in the pig's log.\n\nRecording, editing, treatment and the pickers can happen in any status.\n\n## Rules\n\n- Diseases and symptoms are one searchable catalogue (9 disease categories; symptoms by body area and body system), for one pig or many. A name that is not in the catalogue can be added as a custom item under a chosen category.\n- Care is the only editable condition state: No action needed, Monitor, Treat in place, Move to hospital pen. Attention is derived: every choice except No action needed needs attention.\n- Existing findings keep their original start date; adding a condition a pig already has changes nothing.\n- Bulk edits preview each pig's change, let a pig be excluded, leave pigs without the condition unchanged, and save only changed rows.\n- Treatment records medicine actually given: the product (or the medicine, brand not known) from the farm's medicine list (features/medicines), method, unit and a dose above 0, a shared dose with a per-pig override, and an optional linked condition and note. Method and unit are pre-filled from the product's last use. For several pigs the form asks what was given first (medicine, method), then the doses. One record per included pig.\n- A treatment started from a Health task (vaccination) lists vaccines only and completes the task on Save.\n- A blocked action is listed with the reason, never dropped.\n- Recovery keeps the case in history; entered in error marks a correction. Recovering a finding linked to a feed adjustment ends that adjustment.\n- Hospital pen is a care choice only; no move is made.\n\n## Scope\n\nIn: the pig record as a health view (needs attention, ongoing, several ongoing, care levels), the finding and its edit and resolve forms, Record health with its catalogue picker, Care instructions and Edit conditions, Resolve conditions, Record treatment (and the condition chooser inside it). The medicine picker is the medicines feature's.\n\nOut: sow death and mortality reports (separate features), the pig record itself (pig-profile), feed changes (feed-plan). Health tags on the walk row belong to inspection.\n\n## Decisions\n\n- Care replaced the older triage and status fields; one select drives both.\n- The medicine list is the medicines feature's (2026-10-16: Category → Medicine → Product, no Brand field); methods and units are a sample list until farm configuration exists.\n- Treatment never implies identical doses across pigs.\n\nOpen (recorded on the screens as issues):\n\n- The default Care is No action needed, so the shortest path records a fever as a non-alert.\n- Two rows (Edit conditions and Care instructions) open the same form; Edit finding and Resolve or remove touch the same record for one pig; naming differs between Resolve conditions and Resolve or remove.\n- Duration is \"Day 2\" for attention and \"120 days\" for ongoing; the day count never advances in the prototype.\n- \"Recorded — · —\" shows empty dashes for unknown date and author.\n- The catalogue starts on Symptoms and needs three taps to reach an item; there is no recent or common list.\n",
+       "prd": "# Health record 健康管理\n\n## Problem\n\nThe worker records a disease or symptom on one or many pigs, says what to do about it (care), records treatment, and later closes the record as recovered or entered in error. The old Figma draws health three times: in Inspection (add and remove disease or symptom), in the pig list (health management) and in the 健康与治疗 treatment file. The Inspection prototype is the one built version.\n\n## Who\n\nThe worker on the walk who finds a sick pig, and the worker who gives treatment or vaccination as a task. A supervisor reads the care levels on the list.\n\n## Anchor\n\nAnchor: the Finding (one condition on one pig).\n\n- Needs attention: care is Monitor, Treat in place or Move to hospital pen. Shown as a row on top of the pig record, with the care level and the day.\n- Ongoing, no action needed: recorded and visible as a tag until it is resolved.\n- Closed: Recovered, or Entered in error. The case leaves the active list and stays in the pig's log.\n\nRecording, editing, treatment and the pickers can happen in any status.\n\n## Rules\n\n- Diseases and symptoms are one searchable catalogue (9 disease categories; symptoms by body area and body system), for one pig or many. A name that is not in the catalogue can be added as a custom item under a chosen category.\n- Care is the only editable condition state: No action needed, Monitor, Treat in place, Move to hospital pen. Attention is derived: every choice except No action needed needs attention.\n- Existing findings keep their original start date; adding a condition a pig already has changes nothing.\n- Bulk edits preview each pig's change, let a pig be excluded, leave pigs without the condition unchanged, and save only changed rows.\n- Treatment records medicine actually given: the medicine from the farm's medicine list (features/medicines), method, unit and a dose above 0, a shared dose with a per-pig override, and an optional brand (with its strength), linked condition and note. Method and unit are pre-filled from the medicine's last use. When a withdrawal is in force (the brand's, else the medicine's default) the form shows Withdrawal until <date> before Save, and the record keeps a copy of the days, the date and the strength. For several pigs the form asks what was given first (medicine, method, brand), then the doses. One record per included pig.\n- A treatment started from a Health task (vaccination) lists vaccines only and completes the task on Save.\n- A blocked action is listed with the reason, never dropped.\n- Recovery keeps the case in history; entered in error marks a correction. Recovering a finding linked to a feed adjustment ends that adjustment.\n- Hospital pen is a care choice only; no move is made.\n\n## Scope\n\nIn: the pig record as a health view (needs attention, ongoing, several ongoing, care levels), the finding and its edit and resolve forms, Record health with its catalogue picker, Care instructions and Edit conditions, Resolve conditions, Record treatment (and the condition chooser inside it). The medicine picker is the medicines feature's.\n\nOut: sow death and mortality reports (separate features), the pig record itself (pig-profile), feed changes (feed-plan). Health tags on the walk row belong to inspection.\n\n## Decisions\n\n- Care replaced the older triage and status fields; one select drives both.\n- The medicine list is the medicines feature's (2026-10-16, revised: Category → Medicine; Brand an optional field with its own list; optional strength and withdrawal); methods and units are a sample list until farm configuration exists.\n- Treatment never implies identical doses across pigs.\n\nOpen (recorded on the screens as issues):\n\n- The default Care is No action needed, so the shortest path records a fever as a non-alert.\n- Two rows (Edit conditions and Care instructions) open the same form; Edit finding and Resolve or remove touch the same record for one pig; naming differs between Resolve conditions and Resolve or remove.\n- Duration is \"Day 2\" for attention and \"120 days\" for ongoing; the day count never advances in the prototype.\n- \"Recorded — · —\" shows empty dashes for unknown date and author.\n- The catalogue starts on Symptoms and needs three taps to reach an item; there is no recent or common list.\n",
        "scenarios": {
         "treeDoc": false,
         "tree": null,
@@ -17319,7 +17588,7 @@
        "platform": "mobile",
        "section": "health",
        "newFeature": true,
-       "duplicates": "The old Figma (健康与治疗) has no medicine list: a drug name is typed on each treatment. Before this feature, Record treatment's medicine picker (health-record.medicine-picker) and its Brand field held a sample catalogue.",
+       "duplicates": "The old Figma (健康与治疗) has no medicine list: a drug name is typed on each treatment. Before this feature, Record treatment's medicine picker (health-record.medicine-picker) held a placeholder catalogue and a Brand field with sample brands.",
        "groups": [
         [
          "Choose",
@@ -17336,8 +17605,7 @@
          [
           "medicines.search-none",
           "medicines.add",
-          "medicines.add-medicine",
-          "medicines.add-new-medicine"
+          "medicines.add-category"
          ]
         ],
         [
@@ -17345,7 +17613,11 @@
          [
           "medicines.page",
           "medicines.page-category",
-          "medicines.product",
+          "medicines.medicine",
+          "medicines.medicine-withdrawal",
+          "medicines.medicine-farm",
+          "medicines.brand",
+          "medicines.brand-detail",
           "medicines.rename",
           "medicines.delete"
          ]
@@ -17384,7 +17656,7 @@
        "addsTo": [
         {
          "feature": "workbench",
-         "what": "A Medicines row (the farm's medicine list: rename and delete products)",
+         "what": "A Medicines row (the farm's medicine list: its brands, and rename and delete what the farm added)",
          "screen": "workbench.toolbox",
          "open": "Toolbox",
          "under": "Tools",
@@ -17392,7 +17664,7 @@
         },
         {
          "feature": "health-record",
-         "what": "The Medicine field of Record treatment and Record vaccination opens this picker; Method and unit are pre-filled from the product",
+         "what": "The Medicine field of Record treatment and Record vaccination opens this picker; Method and unit are pre-filled from the medicine's last use; Brand is an optional row from the farm's brands for that medicine",
          "screen": "health-record.treatment",
          "open": "Medicine",
          "under": "Record treatment",
@@ -17423,17 +17695,12 @@
         [
          "medicines.search-none",
          "medicines.add",
-         "tap Add “Zactran”"
+         "tap Add “…”"
         ],
         [
          "medicines.add",
-         "medicines.add-medicine",
-         "tap Medicine"
-        ],
-        [
-         "medicines.add-medicine",
-         "medicines.add-new-medicine",
-         "type a new medicine, tap Add"
+         "medicines.add-category",
+         "tap Category"
         ],
         [
          "medicines.page",
@@ -17442,18 +17709,38 @@
         ],
         [
          "medicines.page-category",
-         "medicines.product",
-         "tap a product"
+         "medicines.medicine",
+         "tap a medicine"
         ],
         [
-         "medicines.product",
+         "medicines.page-category",
+         "medicines.medicine-farm",
+         "tap a medicine the farm added"
+        ],
+        [
+         "medicines.medicine",
+         "medicines.brand",
+         "tap a brand"
+        ],
+        [
+         "medicines.brand",
          "medicines.rename",
          "tap Rename"
         ],
         [
-         "medicines.product",
+         "medicines.brand",
          "medicines.delete",
          "tap Delete"
+        ],
+        [
+         "medicines.medicine",
+         "medicines.medicine-withdrawal",
+         "tap Default withdrawal"
+        ],
+        [
+         "medicines.brand",
+         "medicines.brand-detail",
+         "tap Withdrawal"
         ]
        ],
        "screens": [
@@ -17471,17 +17758,17 @@
          ],
          "figma": "",
          "notes": {
-          "purpose": "Pick what was given, over the real Record treatment page: search, the farm's recent products, then the categories.",
+          "purpose": "Pick what was given, over the real Record treatment page: search, the farm's recent medicines, then the categories.",
           "elements": [
            {
             "name": "Recently used",
             "at": "Recently used",
-            "shows": "Up to three products the farm picked last, under the group label Recently used",
+            "shows": "Up to three medicines the farm picked last, under the group label Recently used; no second line",
             "states": [
              {
               "state": "Recent picks",
               "when": "The farm has recorded a treatment",
-              "shows": "Brand, then medicine · form; a medicine given with its brand not known reads the medicine, then Brand not known"
+              "shows": "The medicine's name"
              },
              {
               "state": "None",
@@ -17489,14 +17776,14 @@
               "shows": "The block is absent; the categories lose their label (medicines.picker-first)"
              }
             ],
-            "logic": "Distinct, newest first, any worker, filtered to the task (a vaccination shows vaccines only). A product deleted from the list leaves it.",
+            "logic": "Distinct, newest first, any worker, filtered to the task (a vaccination shows vaccines only). A deleted medicine leaves it.",
             "source": "medRecents(c)"
            },
            {
             "name": "Category rows",
             "at": "Categories",
-            "shows": "The fixed category list, the same on every farm",
-            "rule": "Categories carry no count. A tap opens the category as a level; the footer Back comes back here, the ✕ closes the picker."
+            "shows": "The fixed category list, the same on every farm; no second line",
+            "rule": "A tap opens the category as a level; the footer Back comes back here, the ✕ closes the picker."
            }
           ],
           "controls": [],
@@ -17504,14 +17791,11 @@
            "medicines.title",
            "medicines.group.recent",
            "medicines.group.categories",
-           "ds.picker.search",
-           "medicines.category.*"
-          ],
-          "rules": [
-           "A pick commits and closes; the field shows the product (Metacam · injection) or the medicine alone for Brand not known."
+           "ds.picker.search"
           ],
           "issues": [
-           "The medicine list is sample data from pig farming, not a farm's real list and not a treatment recommendation."
+           "The categories and medicines are the starting list every farm gets (medicines-catalogue.json): to be checked by a vet.",
+           "Brands, recent picks and remembered methods are sample farm data."
           ]
          }
         },
@@ -17536,14 +17820,14 @@
            "medicines.title"
           ],
           "issues": [
-           "Sample data."
+           "The categories and medicines are the starting list every farm gets (medicines-catalogue.json): to be checked by a vet."
           ]
          }
         },
         {
          "id": "medicines.category",
-         "name": "A category: medicines and their products",
-         "zh": "分类：药品与产品",
+         "name": "A category: its medicines",
+         "zh": "分类：药品",
          "status": "in-design",
          "url": "/ux/system/inspection-astra-concept.html?layout=focus",
          "preset": "profile-full",
@@ -17551,37 +17835,26 @@
           "[data-action=\"pig-actions\"]",
           "[data-action=\"treatment\"]",
           "[data-action=\"medicine-open\"]",
-          "[data-action=\"medicine-category\"][data-value=\"pain\"]"
+          "[data-action=\"medicine-category\"][data-value=\"antibiotics\"]"
          ],
          "figma": "",
          "notes": {
-          "purpose": "One flat list: each medicine is a group label, its products are the rows, Brand not known is the last row of each.",
+          "purpose": "One list of the category's medicines; a tap picks one and closes.",
           "elements": [
            {
-            "name": "Title",
-            "at": "Pain relief",
-            "shows": "The category's short name",
-            "rule": "Pain relief and anti-inflammatory, Hormones and reproduction, and Vitamins, minerals and iron take short titles (Pain relief, Hormones, Vitamins and iron) to fit the header at 360 (budget.md)."
-           },
-           {
-            "name": "Product row",
-            "at": "Metacam",
-            "shows": "Brand, with the form as its second line",
+            "name": "Medicine row",
+            "at": "Amoxicillin",
+            "shows": "The medicine's name, no second line",
             "states": [
              {
-              "state": "Listed product",
-              "when": "From the farm's list",
-              "shows": "Brand · form"
+              "state": "Starting list",
+              "when": "From the catalogue",
+              "shows": "Its name in the worker's language"
              },
              {
               "state": "Added on the farm",
               "when": "Added from a search",
-              "shows": "The name alone (adding asks no form)"
-             },
-             {
-              "state": "Brand not known",
-              "when": "Last row of each medicine",
-              "shows": "Records the medicine only"
+              "shows": "The name as typed (Gamithromycin)"
              },
              {
               "state": "Current pick",
@@ -17598,13 +17871,9 @@
            }
           ],
           "controls": [],
-          "copy": [
-           "medicines.category.pain.short",
-           "medicines.brand_unknown",
-           "medicines.form.*"
-          ],
+          "copy": [],
           "issues": [
-           "Sample data."
+           "The categories and medicines are the starting list every farm gets (medicines-catalogue.json): to be checked by a vet."
           ]
          }
         },
@@ -17621,24 +17890,24 @@
           "[data-action=\"medicine-open\"]",
           {
            "fill": "[data-medicine-search]",
-           "text": "tula"
+           "text": "tyl"
           }
          ],
          "figma": "",
          "notes": {
-          "purpose": "Results laid out as a category is: medicine labels, product rows.",
+          "purpose": "Results from every category, each with its category as the second line.",
           "elements": [
            {
-            "name": "Results",
-            "at": "Tulathromycin",
-            "shows": "Grouped by medicine",
-            "logic": "A match on a medicine or an ingredient lists all its products and Brand not known; a match on a brand lists only that brand's products. Only the task's categories are searched."
+            "name": "Result row",
+            "at": "Tylosin",
+            "shows": "Medicine, with its category as meta",
+            "logic": "Search mixes categories, so the category is what tells two results apart. Matches the English and Chinese names and common other names (PRRS: blue ear; PCV2: circovirus). In a vaccination only vaccines are searched, and the meta is dropped (one category)."
            }
           ],
           "controls": [],
           "copy": [],
           "issues": [
-           "Sample data."
+           "The categories and medicines are the starting list every farm gets (medicines-catalogue.json): to be checked by a vet."
           ]
          }
         },
@@ -17655,13 +17924,13 @@
          ],
          "figma": "",
          "notes": {
-          "purpose": "The same picker filtered to Vaccines: recent vaccines, then the vaccines by disease.",
+          "purpose": "The same picker filtered to Vaccines, named by disease: recent vaccines, then every vaccine.",
           "elements": [
            {
             "name": "Vaccine list",
-            "at": "PRRS vaccine",
-            "shows": "One category left, so its medicines are listed at once (no one-row category level)",
-            "logic": "Recents and search are filtered to Vaccines; adding files a new vaccine under Vaccines."
+            "at": "PRRS",
+            "shows": "One category left, so its diseases are listed at once under the label Vaccines (no one-row category level)",
+            "logic": "Recents and search are filtered to Vaccines; adding files the new vaccine under Vaccines."
            }
           ],
           "controls": [],
@@ -17669,7 +17938,7 @@
            "medicines.title.vaccines"
           ],
           "issues": [
-           "Sample data."
+           "The categories and medicines are the starting list every farm gets (medicines-catalogue.json): to be checked by a vet."
           ]
          }
         },
@@ -17686,12 +17955,12 @@
           "[data-action=\"medicine-open\"]",
           {
            "fill": "[data-medicine-search]",
-           "text": "Zactran"
+           "text": "Gamithro"
           }
          ],
          "figma": "",
          "notes": {
-          "purpose": "Nothing matches: one card, Add “Zactran”, and nothing else.",
+          "purpose": "Nothing matches: one card, Add “Gamithro”, and nothing else.",
           "elements": [],
           "controls": [],
           "copy": [
@@ -17702,8 +17971,8 @@
         },
         {
          "id": "medicines.add",
-         "name": "Add a product",
-         "zh": "添加产品",
+         "name": "Add a medicine",
+         "zh": "添加药品",
          "status": "in-design",
          "url": "/ux/system/inspection-astra-concept.html?layout=focus",
          "preset": "profile-full",
@@ -17713,55 +17982,35 @@
           "[data-action=\"medicine-open\"]",
           {
            "fill": "[data-medicine-search]",
-           "text": "Zactran"
+           "text": "Cefquinome"
           },
           "[data-action=\"medicine-add\"]"
          ],
          "figma": "",
          "notes": {
-          "purpose": "Name (pre-filled from the search) and Medicine; Category only when the medicine is new.",
+          "purpose": "Name (pre-filled from the search) and Category; the category is set already when the search was typed inside one.",
           "elements": [
            {
             "name": "Add",
             "at": "[data-action=\"medicine-add-save\"]",
             "shows": "Add",
-            "rule": "Waits until Name and Medicine are set (and Category for a new medicine); a tap while waiting marks them Required. Adding puts the product into the farm's list for everyone at once and picks it: the drawer closes on the form."
-           },
-           {
-            "name": "Medicine",
-            "at": "Medicine",
-            "shows": "Select",
-            "states": [
-             {
-              "state": "From inside a category",
-              "when": "The search was typed at a category",
-              "shows": "Its level lists that category's medicines; a new one is filed there"
-             },
-             {
-              "state": "From Medicines",
-              "when": "The search was typed at the root",
-              "shows": "Every medicine, under its category's label"
-             }
-            ]
+            "rule": "Waits until Name and Category are set; a tap while waiting marks them Required. Adding puts the medicine into the farm's list for everyone at once and picks it: the drawer closes on the form."
            }
           ],
           "controls": [],
           "copy": [
            "medicines.add.title",
            "medicines.add.name",
-           "medicines.add.medicine",
+           "medicines.add.category",
            "medicines.add.commit"
           ],
-          "rules": [
-           "Nothing else is asked: method, dose and unit are recorded on each treatment."
-          ],
           "issues": []
          }
         },
         {
-         "id": "medicines.add-medicine",
-         "name": "Add a product: choose its medicine",
-         "zh": "添加产品：选择药品",
+         "id": "medicines.add-category",
+         "name": "Add a medicine: its category",
+         "zh": "添加药品：分类",
          "status": "in-design",
          "url": "/ux/system/inspection-astra-concept.html?layout=focus",
          "preset": "profile-full",
@@ -17771,49 +18020,14 @@
           "[data-action=\"medicine-open\"]",
           {
            "fill": "[data-medicine-search]",
-           "text": "Zactran"
+           "text": "Cefquinome"
           },
           "[data-action=\"medicine-add\"]",
-          "[data-action=\"medicine-add-pick-medicine\"]"
+          "[data-action=\"medicine-add-pick-category\"]"
          ],
          "figma": "",
          "notes": {
-          "purpose": "Pick the medicine the new product is, or type a new one (Add “…” when nothing matches).",
-          "elements": [],
-          "controls": [],
-          "copy": [
-           "medicines.add.medicine",
-           "medicines.add_card"
-          ],
-          "issues": []
-         }
-        },
-        {
-         "id": "medicines.add-new-medicine",
-         "name": "Add a product: a new medicine asks its category",
-         "zh": "添加产品：新药品需选分类",
-         "status": "in-design",
-         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
-         "preset": "profile-full",
-         "steps": [
-          "[data-action=\"pig-actions\"]",
-          "[data-action=\"treatment\"]",
-          "[data-action=\"medicine-open\"]",
-          {
-           "fill": "[data-medicine-search]",
-           "text": "Zactran"
-          },
-          "[data-action=\"medicine-add\"]",
-          "[data-action=\"medicine-add-pick-medicine\"]",
-          {
-           "fill": "[data-medicine-add-search]",
-           "text": "Gamithromycin"
-          },
-          "[data-action=\"medicine-add-new-medicine\"]"
-         ],
-         "figma": "",
-         "notes": {
-          "purpose": "A medicine typed new adds the Category field.",
+          "purpose": "The seven categories; one tap sets it and goes back up to Add a medicine.",
           "elements": [],
           "controls": [],
           "copy": [
@@ -17831,7 +18045,7 @@
          "preset": "medicines",
          "figma": "",
          "notes": {
-          "purpose": "The farm's medicine list, by category: where products are renamed and deleted. Reached from Home → Toolbox → Medicines (not built on Home yet).",
+          "purpose": "The farm's medicine list by category. Reached from Home → Toolbox → Medicines (not built on Home yet).",
           "elements": [],
           "controls": [],
           "copy": [
@@ -17850,83 +18064,193 @@
          "url": "/ux/system/inspection-astra-concept.html?layout=focus",
          "preset": "medicines",
          "steps": [
-          "[data-action=\"medicines-category\"][data-value=\"pain\"]"
+          "[data-action=\"medicines-category\"][data-value=\"antibiotics\"]"
          ],
          "figma": "",
          "notes": {
-          "purpose": "A category's medicines (group labels) and their products (rows).",
+          "purpose": "A category's medicines, the starting list and the farm's own, one row each.",
+          "elements": [],
+          "controls": [],
+          "copy": [],
+          "issues": [
+           "The categories and medicines are the starting list every farm gets (medicines-catalogue.json): to be checked by a vet."
+          ]
+         }
+        },
+        {
+         "id": "medicines.medicine",
+         "name": "A medicine's sheet: default withdrawal and brands",
+         "zh": "药品详情：默认休药期与品牌",
+         "status": "in-design",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "medicines",
+         "steps": [
+          "[data-action=\"medicines-category\"][data-value=\"antibiotics\"]",
+          "[data-action=\"medicines-medicine\"][data-value=\"amoxicillin\"]"
+         ],
+         "figma": "",
+         "notes": {
+          "purpose": "Its default withdrawal (used when no brand is chosen or the brand has none), then the brands the farm has used, each with its strength; a starting-list medicine cannot be renamed or deleted.",
           "elements": [
            {
-            "name": "Medicine group",
-            "at": "Meloxicam",
-            "shows": "The medicine's name over its products",
+            "name": "Brands",
+            "at": "Brands",
+            "shows": "The brands, most recently used first",
             "states": [
              {
-              "state": "No products",
-              "when": "Only Brand not known (Flunixin)",
-              "shows": "Absent: Brand not known is not a product"
+              "state": "None",
+              "when": "No brand used yet",
+              "shows": "\"No brands used yet.\""
              }
             ]
            }
           ],
           "controls": [],
-          "copy": [],
+          "copy": [
+           "medicines.group.brands",
+           "medicines.no_brands"
+          ],
           "issues": [
-           "Sample data."
+           "Brands, recent picks and remembered methods are sample farm data."
           ]
          }
         },
         {
-         "id": "medicines.product",
-         "name": "A product's sheet",
-         "zh": "产品详情",
+         "id": "medicines.medicine-withdrawal",
+         "name": "A medicine: edit its default withdrawal",
+         "zh": "药品：编辑默认休药期",
          "status": "in-design",
          "url": "/ux/system/inspection-astra-concept.html?layout=focus",
          "preset": "medicines",
          "steps": [
-          "[data-action=\"medicines-category\"][data-value=\"pain\"]",
-          "[data-action=\"medicines-product\"][data-value=\"metacam\"]"
+          "[data-action=\"medicines-category\"][data-value=\"antibiotics\"]",
+          "[data-action=\"medicines-medicine\"][data-value=\"amoxicillin\"]",
+          "[data-action=\"medicines-level\"][data-value=\"withdrawal\"]"
          ],
          "figma": "",
          "notes": {
-          "purpose": "Rename or delete one product.",
+          "purpose": "The medicine's default withdrawal in days.",
           "elements": [],
           "controls": [],
           "copy": [
-           "medicines.product.rename",
-           "medicines.product.delete"
+           "medicines.update",
+           "medicines.detail.default_withdrawal"
           ],
           "issues": [
-           "Who may rename and delete is a product rule to confirm (the prototype lets anyone)."
+           "Strengths and withdrawals are sample farm data."
+          ]
+         }
+        },
+        {
+         "id": "medicines.medicine-farm",
+         "name": "A medicine the farm added",
+         "zh": "场内添加的药品",
+         "status": "in-design",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "medicines",
+         "steps": [
+          "[data-action=\"medicines-category\"][data-value=\"antibiotics\"]",
+          "[data-action=\"medicines-medicine\"][data-value=\"farm-gamithromycin\"]"
+         ],
+         "figma": "",
+         "notes": {
+          "purpose": "A farm-added medicine: Rename and Delete, then its brands.",
+          "elements": [],
+          "controls": [],
+          "copy": [
+           "medicines.rename",
+           "medicines.delete"
+          ],
+          "issues": [
+           "Who may rename and delete is a permissions rule to confirm (the prototype lets anyone)."
+          ]
+         }
+        },
+        {
+         "id": "medicines.brand",
+         "name": "A brand's sheet: strength, withdrawal, Rename, Delete",
+         "zh": "品牌详情：含量、休药期",
+         "status": "in-design",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "medicines",
+         "steps": [
+          "[data-action=\"medicines-category\"][data-value=\"antibiotics\"]",
+          "[data-action=\"medicines-medicine\"][data-value=\"amoxicillin\"]",
+          "[data-action=\"medicines-brand\"][data-value=\"amoxicillin/0\"]"
+         ],
+         "figma": "",
+         "notes": {
+          "purpose": "Strength and withdrawal, each editable (Not set until entered), then Rename and Delete.",
+          "elements": [],
+          "controls": [],
+          "copy": [
+           "medicines.rename",
+           "medicines.delete"
+          ],
+          "issues": []
+         }
+        },
+        {
+         "id": "medicines.brand-detail",
+         "name": "A brand: edit its withdrawal",
+         "zh": "品牌：编辑休药期",
+         "status": "in-design",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "medicines",
+         "steps": [
+          "[data-action=\"medicines-category\"][data-value=\"antibiotics\"]",
+          "[data-action=\"medicines-medicine\"][data-value=\"amoxicillin\"]",
+          "[data-action=\"medicines-brand\"][data-value=\"amoxicillin/0\"]",
+          "[data-action=\"medicines-level\"][data-value=\"withdrawal\"]"
+         ],
+         "figma": "",
+         "notes": {
+          "purpose": "The withdrawal in days, pre-filled; Update waits until it changes.",
+          "elements": [
+           {
+            "name": "Update",
+            "at": "[data-action=\"medicines-edit-save\"]",
+            "shows": "Update",
+            "rule": "Changes it for everyone from the next treatment; records already saved keep the copy they were saved with. Empty clears it."
+           }
+          ],
+          "controls": [],
+          "copy": [
+           "medicines.update",
+           "medicines.detail.withdrawal"
+          ],
+          "issues": [
+           "Strengths and withdrawals are sample farm data."
           ]
          }
         },
         {
          "id": "medicines.rename",
-         "name": "Rename a product",
-         "zh": "重命名产品",
+         "name": "Rename a brand",
+         "zh": "重命名品牌",
          "status": "in-design",
          "url": "/ux/system/inspection-astra-concept.html?layout=focus",
          "preset": "medicines",
          "steps": [
-          "[data-action=\"medicines-category\"][data-value=\"pain\"]",
-          "[data-action=\"medicines-product\"][data-value=\"metacam\"]",
-          "[data-action=\"medicines-product-level\"][data-value=\"rename\"]"
+          "[data-action=\"medicines-category\"][data-value=\"antibiotics\"]",
+          "[data-action=\"medicines-medicine\"][data-value=\"amoxicillin\"]",
+          "[data-action=\"medicines-brand\"][data-value=\"amoxicillin/0\"]",
+          "[data-action=\"medicines-level\"][data-value=\"rename\"]"
          ],
          "figma": "",
          "notes": {
-          "purpose": "The product's name, pre-filled; Rename waits until it changes.",
+          "purpose": "The brand's name, pre-filled; Rename waits until it changes.",
           "elements": [
            {
             "name": "Rename",
-            "at": "[data-action=\"medicines-rename-save\"]",
+            "at": "[data-action=\"medicines-edit-save\"]",
             "shows": "Rename",
-            "rule": "Renames the product in the picker and on this page for everyone; past records keep the name they were saved with."
+            "rule": "Renames it in the Brand list and on this page for everyone; past records keep the name they were saved with. The same level renames a farm-added medicine."
            }
           ],
           "controls": [],
           "copy": [
-           "medicines.product.rename",
+           "medicines.rename",
            "medicines.add.name"
           ],
           "issues": []
@@ -17934,15 +18258,16 @@
         },
         {
          "id": "medicines.delete",
-         "name": "Delete a product",
-         "zh": "删除产品",
+         "name": "Delete a brand",
+         "zh": "删除品牌",
          "status": "in-design",
          "url": "/ux/system/inspection-astra-concept.html?layout=focus",
          "preset": "medicines",
          "steps": [
-          "[data-action=\"medicines-category\"][data-value=\"pain\"]",
-          "[data-action=\"medicines-product\"][data-value=\"metacam\"]",
-          "[data-action=\"medicines-product-level\"][data-value=\"delete\"]"
+          "[data-action=\"medicines-category\"][data-value=\"antibiotics\"]",
+          "[data-action=\"medicines-medicine\"][data-value=\"amoxicillin\"]",
+          "[data-action=\"medicines-brand\"][data-value=\"amoxicillin/0\"]",
+          "[data-action=\"medicines-level\"][data-value=\"delete\"]"
          ],
          "figma": "",
          "notes": {
@@ -17952,20 +18277,20 @@
             "name": "Delete",
             "at": "[data-action=\"medicines-delete-save\"]",
             "shows": "Delete",
-            "rule": "Takes the product off the picker, the recent picks and this page; past records keep its name. Its medicine stays (Brand not known)."
+            "rule": "Takes the brand off the Brand list and this page; past records keep its name. The same level deletes a farm-added medicine (Delete medicine)."
            }
           ],
           "controls": [],
           "copy": [
-           "medicines.product.delete_title",
-           "medicines.product.delete_body",
-           "medicines.product.delete"
+           "medicines.delete_brand",
+           "medicines.delete_body",
+           "medicines.delete"
           ],
           "issues": []
          }
         }
        ],
-       "prd": "# Medicines 药品\n\n## Problem\n\nEvery treatment and vaccination names what was given. Today the worker picks a placeholder \"medicine\" and then, optionally, a \"brand\" from a list that is the same for every medicine, and the farm has no list of its own: nothing remembers what was used, nothing can be added from a treatment, and a typo can never be fixed. This feature is the farm's medicine list: choosing from it inside a record, adding to it when something is missing, and keeping it tidy.\n\n## Who\n\nThe worker recording a treatment or vaccination with a box or bottle in hand (picks, sometimes adds). The supervisor who keeps the farm's list (renames, deletes).\n\n## Anchor\n\nNone: the list has no lifecycle. Screens are grouped by surface: the picker (in Record treatment and Record vaccination), adding, and the Medicines page.\n\n## Rules\n\n- **Hierarchy: Category → Medicine → Product.** The worker picks a product and the record stores the product; \"Brand not known\" records the medicine only.\n  - Category: a fixed preset list, the same on every farm: Antibiotics; Pain relief and anti-inflammatory; Parasite control; Vaccines; Hormones and reproduction; Vitamins, minerals and iron; Other.\n  - Medicine: the drug or active ingredient (Amoxicillin, Meloxicam). A combination is its own medicine. A vaccine is named for its disease (\"PRRS vaccine\").\n  - Product: the brand and its form (\"Metacam · injection\").\n- **The picker is one drawer with levels** (owner ruling B): the long size, one height across levels, the footer Back goes up a level, the ✕ at the top left closes it from any level, keeping the draft.\n  - Level 1: search, then up to three of the farm's most recent products (distinct, newest first, shared by every worker, filtered to the task: a vaccination shows vaccines only; absent when there are none), then the categories.\n  - Level 2, a category: one flat list; the medicines are the group labels and their products the rows; one tap picks a product and closes.\n  - Search, pinned at the top of every level (\"Search all options\"), matches medicine, brand and ingredient across all categories and lists the results the way level 2 does.\n- **Adding is manual only; there is no barcode.** A search with no match shows one card and nothing else: `Add “<typed>”`. It opens the add level: Name (required, pre-filled from the search), Medicine (required: an existing medicine, the current category's when added from inside one, or a new one typed), and Category (asked only when the medicine is new). Adding puts the product straight into the farm's list for everyone and picks it. Nothing else is asked.\n- **Method, dose and unit are recorded on each treatment.** The product remembers the last method and unit used and pre-fills them next time.\n- **Rename and delete live on the Medicines page** (a page, not a drawer), reached from Home → Toolbox → Medicines. It shows the categories, then a category's medicines and their products; a product's own sheet offers Rename and Delete. Delete removes the product from the picker; past records keep its name.\n- **Hosts.** Record treatment, one pig and several (health-record). Several: what was given first (Medicine, Method), then the doses (\"Same dose for all\", then each pig's dose in the remembered unit). Record vaccination uses the same picker filtered to Vaccines.\n\n## Scope\n\nIn: the picker (level 1 with and without recents, a category, search, no match), the add level and its Medicine and Category levels, the Medicines page, a category on it, a product's sheet with Rename and Delete.\n\nOut: the Record treatment and Record vaccination forms themselves (health-record; this feature changes only their Medicine field, the Brand row and the batch order), withdrawal periods, stock and batch numbers, prescriptions (prescriptions), barcode scanning.\n\n## Decisions\n\n- 2026-10-16 (owner): the hierarchy, the picker with levels, manual adding, method and unit remembered per product, rename and delete on a page, the hosts (the six decisions above).\n- The category list is the owner's; its short titles for a level's header (Title length at 360) are this feature's budget: Pain relief, Hormones, Vitamins and iron. To confirm with the owner.\n- The Medicines page is reached from Home's Toolbox (the tools that are not today's work); there is no farm settings page yet.\n\nOpen:\n\n- The category list itself (to confirm), and whether its long names should be the short ones everywhere.\n- Who may rename and delete (permissions): the prototype lets anyone.\n- Whether a farm-added product should ask its form (decision 3 says nothing else is asked; its rows then have no second line).\n\n## Not supported\n\n- **Barcode scanning** — owner decision 3: adding is manual only.\n- **Editing a product's medicine or category** — rename and delete only (decision 5); a wrong filing is fixed by deleting and adding again.\n- **Renaming or deleting a medicine or a category** — categories are fixed; a medicine with no products stays as \"Brand not known\".\n- **Stock, batch numbers, expiry, withdrawal periods** — not part of choosing what was given; they need stock infrastructure.\n",
+       "prd": "# Medicines 药品\n\n## Problem\n\nEvery treatment and vaccination names what was given. Before this feature the worker picked a placeholder \"medicine\" and an optional \"brand\" from a list that was the same for every medicine; the farm had no list of its own, nothing remembered what was used, nothing could be added from a treatment, and a typo could never be fixed. This feature is the farm's medicine list: choosing from it inside a record, adding to it when something is missing, the optional details a label prints (strength, withdrawal), and keeping it tidy.\n\n## Who\n\nThe worker recording a treatment or vaccination with a bottle in hand (picks, sometimes adds). The supervisor who keeps the farm's list (brands, details, what the farm added).\n\n## Anchor\n\nNone: the list has no lifecycle. Screens are grouped by surface: choosing (the picker in Record treatment and Record vaccination), adding, and the Medicines page.\n\n## Rules\n\n- **Category → Medicine** (owner, 2026-10-16, revision). Picking a medicine is a complete record.\n  - Category: a fixed list, the same on every farm: Antibiotics; Pain relief and anti-inflammatory; Parasite control; Vaccines; Hormones and reproduction; Vitamins, minerals and iron; Other.\n  - Medicine: the drug or active ingredient. Vaccines are named by the disease (PRRS, PCV2…), so a vaccination lists diseases.\n  - **Every farm starts from the same categories and medicines, in English and Chinese** (`ux/system/medicines-catalogue.json`, a starting list to be checked by a vet). Farms add medicines and brands on top. Starting-list medicines cannot be renamed or deleted.\n- **Brand is an optional field of the treatment**, an optional row that appears once a medicine is chosen. It lists the brands the farm has used for that medicine (the three most recent under \"Recently used\" when there are more). A search with no match shows one card, `Add “…”`, which adds the brand under that medicine for everyone and picks it. No brand chosen means no brand; there is no \"Brand not known\".\n- **There is no product form.** Method is chosen on each treatment. The treatment remembers the last method and unit per medicine and pre-fills them.\n- **Optional details, never required:**\n  - **Strength** (free text: \"15%\", \"100 mg/ml\"), set on a brand. It shows wherever the brand is shown: the treatment's Brand row reads \"Amoxinsol 50 · 50%\", and the Brand list row's second line is the strength.\n  - **Withdrawal period** (meat, days): a brand can have one (it is printed on its label); a medicine can have a default, used when no brand is chosen or the brand has none.\n  - Entered: when a brand is added, an optional, skippable \"Add details\" step (Strength, Withdrawal); on the Medicines page, a brand's sheet (Strength, Withdrawal, Rename, Delete) and a medicine's sheet (its default withdrawal, its brands).\n  - On a treatment: when the chosen brand, or the medicine's default, has a withdrawal, the form shows **\"Withdrawal until <date>\"** before Save, as a Banner notice (a consequence of the commit stated before the action it governs, as Record dead states its consequence).\n  - **The saved record keeps a copy** of the strength, the withdrawal days and the date in force that day; later edits never change past records.\n- **The second line (meta) shows only what tells a row apart from its siblings** (ChoiceList): category, medicine and recent rows have none; a search result names its category, because search mixes categories; a brand row shows its strength, because strength tells sibling brands apart.\n- **The picker is one drawer with levels** (owner ruling B): the long size, one height across levels, the footer Back goes up a level, the ✕ at the top left closes it from any level.\n  - Level 1: search, then up to three of the farm's most recent medicines (distinct, newest first, shared by every worker, filtered to the task: a vaccination shows vaccines only; absent when there are none), then the categories.\n  - Level 2, a category: its medicines; one tap picks and closes.\n  - Search, pinned at the top of every level (\"Search all options\"), matches English and Chinese names and common other names across every category.\n- **Adding a medicine is manual only** (no barcode). A search with no match shows one card and nothing else: `Add “<typed>”`. It opens the add level: Name (pre-filled) and Category (required, one pick; already set when added from inside a category, or from a vaccination). Adding lists it for everyone and picks it.\n- **The Medicines page** (a page, not a drawer), reached from Home → Toolbox → Medicines: the categories, then a category's medicines, then a medicine's sheet: its default withdrawal, its brands (each with its strength, withdrawal, Rename and Delete), and Rename and Delete for a medicine the farm added. Delete removes the entry from the picker; past records keep the name.\n- **Hosts.** Record treatment, one pig and several (health-record): Medicine, Method, the optional Brand row, then the dose (several pigs: \"Same dose for all\" and each pig's dose), then the optional rows and the withdrawal notice. Record vaccination uses the same picker filtered to Vaccines.\n\n## Scope\n\nIn: the picker (level 1 with and without recents, a category, search, no match), adding a medicine, the Brand list with its add card and details step, the withdrawal notice and the record's copy, the Medicines page, a medicine's sheet and a brand's sheet with their edits, Rename and Delete.\n\nOut: the Record treatment and Record vaccination forms themselves (health-record; this feature changes their Medicine field, adds the Brand row and the withdrawal notice, and orders the batch form), prescriptions (prescriptions), barcode scanning.\n\n## Decisions\n\n- 2026-10-16 (owner): Category → Medicine → Product, a picker with levels, manual adding, rename and delete on a page (first round).\n- 2026-10-16 (owner, revision): the picker picks a medicine; Brand is an optional field of the treatment with its own list and quick add; no product form; method and unit remembered per medicine; one rule for the second line; a starting catalogue for every farm; adding a medicine asks Name and Category; the page holds brands, and Rename and Delete for farm-added medicines only.\n- 2026-10-16 (owner, addition): optional strength (brand) and meat withdrawal (brand, medicine default), never required; Withdrawal until <date> before Save; the record keeps a copy.\n- Category titles at a level's header use short names to fit at 360 (this feature's budget): Pain relief, Hormones, Vitamins and iron.\n- The withdrawal notice is a Banner notice: Banner states a consequence before the action it governs; danger is for destructive commits and correction for a review, neither of which this is.\n\nOpen:\n\n- The starting list (categories and medicines, EN and ZH) is to be checked by a vet.\n- Who may add, rename and delete, and edit strength and withdrawal (permissions): the prototype lets anyone.\n- Whether milk withdrawal is ever needed (meat only for now).\n\nFollow-ups (other features, not built here):\n\n- Show a pig's or pen's withdrawal on the pig (pig-profile) and the pen, and flag a pig under withdrawal when it is moved or sold for slaughter (move). The record already keeps the date.\n\n## Not supported\n\n- **Barcode scanning** — owner decision: adding is manual only.\n- **Product form (powder, injection, oral suspension)** — owner revision: method is chosen on the treatment.\n- **Renaming or deleting a starting-list medicine or a category** — the starting list is the same on every farm.\n- **Batch numbers, expiry and stock** — they belong to future inventory, not to the treatment.\n- **Milk withdrawal, withdrawal by species or route** — meat only, one number per brand or medicine.\n",
        "scenarios": {
         "treeDoc": false,
         "tree": null,
@@ -17975,19 +18300,23 @@
          "items": [
           {
            "what": "Barcode scanning",
-           "why": "owner decision 3: adding is manual only."
+           "why": "owner decision: adding is manual only."
           },
           {
-           "what": "Editing a product's medicine or category",
-           "why": "rename and delete only (decision 5); a wrong filing is fixed by deleting and adding again."
+           "what": "Product form (powder, injection, oral suspension)",
+           "why": "owner revision: method is chosen on the treatment."
           },
           {
-           "what": "Renaming or deleting a medicine or a category",
-           "why": "categories are fixed; a medicine with no products stays as \"Brand not known\"."
+           "what": "Renaming or deleting a starting-list medicine or a category",
+           "why": "the starting list is the same on every farm."
           },
           {
-           "what": "Stock, batch numbers, expiry, withdrawal periods",
-           "why": "not part of choosing what was given; they need stock infrastructure."
+           "what": "Batch numbers, expiry and stock",
+           "why": "they belong to future inventory, not to the treatment."
+          },
+          {
+           "what": "Milk withdrawal, withdrawal by species or route",
+           "why": "meat only, one number per brand or medicine."
           }
          ]
         }

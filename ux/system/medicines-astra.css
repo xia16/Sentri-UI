@@ -16,3 +16,11 @@
 /* The Medicines page: one group per medicine, a section's gap between them. */
 .inspection-phone .medicines-group+.medicines-group{margin-top:var(--space-section,24px)}
 .inspection-phone .medicine-delete-note{margin:0;font:400 var(--type-row-title-size)/1.5 var(--font-sans);color:var(--ink)}
+
+/* The dose unit beside a short unit ("g") keeps its 48px target. */
+.inspection-phone .bulk-unit-button{min-width:var(--tap-min,48px);justify-content:center}
+/* A medicine's or brand's sheet: its details, then its verbs and brands a section below. */
+.inspection-phone .medicine-sheet-verbs{margin-top:var(--space-section,24px)}
+.inspection-phone .medicine-sheet-verbs>*+*{margin-top:var(--space-section,24px)}
+/* The withdrawal notice closes the form, a section below the last field. */
+.inspection-phone .bulk-controls .medicine-withdrawal{margin-top:8px}

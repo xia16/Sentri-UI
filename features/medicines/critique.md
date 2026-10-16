@@ -80,3 +80,51 @@ The owner's six decisions of 2026-10-16 fix the structure (levels, what each lev
 - Every title fits at 360 in EN and ZH (header check: 0 defects on 17 screens); spacing 0 defects; legibility strict passes on the changed screens; check-states 6 failing states, the same 6 as `c6cc500` (Banner, ConditionTag, Facts).
 - Known: the batch screen's Medicine trigger shows the browser's focus ring because the atlas replays taps as clicks and the picker returns focus to its trigger; a finger tap draws none. Record treatment's own labels (Medicine, Method, Same dose for all) are not in the registry yet and stay English in ZH, as on main.
 - **Better because** each level answers one question with the system's own parts, and nothing the owner rejected (unlabelled rows, cards per medicine, a fake header) is left.
+
+# Revision (owner, 2026-10-16): a medicine, not a product; brand, strength and withdrawal are optional
+
+The owner reviewed the first round's screens (head `1d7eeab`) and revised the decisions (`PRD.md`, Decisions). The first round's critique above stands as the critique of the old UI; this block critiques the first round itself, against the revised decisions.
+
+### Keep (from the first round)
+
+- One drawer with levels, its ✕ and footer Back, one height across levels; search pinned at every level, "Search all options", across every category; "Recently used" and "Categories" as group labels; the no-match Add card and nothing else; the add level with its waiting "Add"; the Medicines page as a page; the batch form asking what was given before the doses.
+
+### Problems
+
+- **major** · The picker made the worker choose a product (brand and form) to record a treatment, with a "Brand not known" row under every medicine: the owner wants picking a medicine to be a complete record and the brand an optional field (revision 1). Evidence: owner, on `medicines.category`.
+- **major** · Product form (injection, oral suspension) sat in names and second lines, but the method is chosen on the treatment (revision 2).
+- **major** · Second lines had no one rule: recents carried medicine · form, products their form. The ChoiceList rule (meta only to tell siblings apart) gives: none on category, medicine and recent rows, the category on search results, the strength on brand rows (revision 3, addition).
+- **major** · The list was invented sample data; every farm needs the same starting list in EN and ZH (revision 4).
+- **major** · Adding asked a Medicine pick inside the add level; the medicine is what is added (revision 5).
+- **major** · The page managed products; it must hold a medicine's brands, with Rename and Delete for what the farm added only (revision 6).
+- **major** · No place for what a label prints (strength, withdrawal), and nothing told the worker when treated pigs may go to slaughter (addition).
+- **minor** · The single form's dose unit button was 46px wide with a one-letter unit ("g"), under the 48px target (legibility check on `health-record.treatment`).
+
+### Parts (revised)
+
+| Part | Drawn by | Component | Keep / fix / cut |
+|---|---|---|---|
+| Product rows, Brand not known rows, form meta | ChoiceList rows | — | **cut** |
+| Medicine rows (category, recents, search) | ChoiceList single rows | ChoiceList | **fix**: one row per medicine; meta by the rule |
+| Starting list | `medicines-catalogue.json` (one data file the prototype loads) | — | **fix** (add) |
+| Brand optional row | Field `optionalRow` | Field | **fix** (add back, only once a medicine is chosen; reads brand · strength) |
+| Brand list, Add card, Add details step | Sheet drawer with levels, ChoiceList, Field | the same | **fix** (add) |
+| Withdrawal until <date> | Banner, tone notice | Banner (a consequence stated before the action it governs) | **fix** (add) |
+| Medicine sheet (default withdrawal, brands, Rename/Delete if farm-added), brand sheet (strength, withdrawal, Rename, Delete) | Sheet drawer with levels, PickerField triggers, ChoiceList rows, Field | the same | **fix** |
+| Dose unit button | page-built `bulk-unit-button` | — | **fix**: a 48px minimum target (layout CSS) |
+
+### Self-crit
+
+#### Round 2 (renders at 390 and 360, EN and ZH, beside the first round and `c6cc500`)
+- Withdrawal notice: **A** Banner notice before Save (chosen); **B** a quiet line under the Brand row (reads as a fact of the brand, not the consequence of saving; a worker can miss it); **C** in the footer beside Save (the footer holds Back and the primary only). Banner's job is "a consequence or pending condition before the action it governs"; danger is for destructive commits and correction for a review, so notice.
+- Brand list: three or fewer brands as one unlabelled list; more, the three newest under "Recently used" and the rest A to Z under "Other brands", so the labels say why the order changes.
+- Add details: a skippable level after Add “…” (Back goes up to the list with the new brand ticked, ✕ closes) against two optional rows on an add level before the brand exists (makes the common case, name only, two taps longer).
+- Problems fixed: picking a medicine records it; Brand is an optional row with its own list, recents and Add card; no form anywhere; the second-line rule holds on every list; 58 starting medicines in EN and ZH from one file; Add asks Name and Category only; the page shows brands, details, and Rename/Delete only for what the farm added; Withdrawal until <date> before Save (brand's own, else the medicine's default) and the record keeps a copy; the unit target is 48px.
+- Keep: as strong; the first round's levels, search, labels and add card are unchanged.
+- Squint (treatment): the title, Medicine, then the withdrawal notice (the one coloured block, the consequence of saving), then Save. Picker: the title, search, the recent names.
+- Cluttered, flat or bulky: every list lost its second line except where it tells rows apart; the picker's rows halved in count (no product rows). One notice added to the form, only when a withdrawal is in force. Not c1, c2 or c3.
+- **Better because** a treatment is one pick, the bottle's brand and strength are there when the worker wants them and never in the way, and the form says when the pigs may go to slaughter before it is saved.
+
+#### Final look (the screens of this push; renders at 390 and 360 in EN and ZH)
+- Header check on the 25 changed screens: 0 defects (a first render titled the withdrawal edit "Default withdrawal (meat)", 235px at 360; now "Withdrawal (meat)"). Spacing 0; strict legibility passes on the changed screens; check-states 6 failing states, the same 6 as `c6cc500`; npm test 723 pass.
+- Known: the atlas replays taps as clicks, so a trigger the picker returns focus to shows the browser's focus ring; a finger draws none. Record treatment's own labels (Method, Same dose for all) are not in the registry and stay English in ZH, as on main. In the batch form the withdrawal notice sits below the optional rows and scrolls under the footer at 360; it is reached by scrolling, as the rows above it.

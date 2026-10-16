@@ -50,3 +50,4 @@ export function str(id,args={}){
   const copy=registry.strings[id];if(!copy)return id;
   return (copy[language]||copy.en).replace(/\{(\w+)\}/g,(_,key)=>args[key]??'');
 }
+export {language};
