@@ -5,6 +5,8 @@
 <title>Header: sheet</title>
 <style>
 .ph{height:300px;max-width:390px;margin:0 auto;font-family:var(--font-sans);color:var(--ink)}
+/* The levels state shows the footer too (its Back goes up a level), so its frame is taller. */
+.ph[data-demo="levels"]{height:420px}
 /* The phone frame is the state's first child, so the atlas sees the state draw its own surface and gives every state the same
    full cell width (a cell without one is inset 16px a side, and a 360 state would no longer be 360). */
 .ph>.over{position:relative;height:100%;overflow:hidden;background:var(--app-background);border:1px solid var(--line);border-radius:var(--radius-device)}
@@ -12,14 +14,14 @@
 </style>
 </head>
 <body>
-<!-- The sheet header (Headers law, ux/design-system/README.md → Headers): the title centred, the optional header line under it (a hub only), the corner actions (Clear or Reset at the top right, a ✕ at the top left: used by no drawer today), each a 48px target centred on the title block, then the hairline and 24px to the body. Each state is a drawer as Sheet builds it, cropped to its header and the top of its body. -->
+<!-- The sheet header (Headers law, ux/design-system/README.md → Headers): the title centred, the optional header line under it (a hub only), the corner actions (Clear or Reset at the top right, a ✕ at the top left: a drawer with levels, where it closes the whole drawer), each a 48px target centred on the title block, then the hairline and 24px to the body. Each state is a drawer as Sheet builds it, cropped to its header and the top of its body. -->
 <div class="ph" data-state="Default (an action: no line)" data-demo="default"><div class="over"></div></div>
 <div class="ph" data-state="Clear at the top right" data-demo="clear"><div class="over"></div></div>
 <div class="ph" data-state="Reset at the top right" data-demo="reset"><div class="over"></div></div>
 <div class="ph" data-state="Route line (a hub)" data-demo="route"><div class="over"></div></div>
 <div class="ph" data-state="Fact line" data-demo="fact"><div class="over"></div></div>
 <div class="ph" data-state="Clear with a route line" data-demo="clear-route"><div class="over"></div></div>
-<div class="ph" data-state="Up (a drawer with levels)" data-demo="up"><div class="over"></div></div>
+<div class="ph" data-state="Levels: ✕ closes, Back goes up" data-demo="levels"><div class="over"></div></div>
 <div class="ph" data-state="Longest title that fits between the corners at 360" data-demo="longest"><div class="over"></div></div>
 <div class="ph" data-state="Chinese (an action)" data-demo="zh"><div class="over"></div></div>
 <div class="ph" data-state="Chinese (a hub)" data-demo="zh-hub"><div class="over"></div></div>
@@ -36,7 +38,8 @@ const R={
   route:()=>drawer({title:'Farrowing record',line:chip}),
   fact:()=>drawer({title:'Pen note',line:{text:[{text:'Last note '},{text:'08:41',strong:true},{text:' · G.H'}]}}),
   'clear-route':()=>drawer({title:'Farrowing record',line:chip,corner:corner('act.clear')}),
-  up:()=>drawer({title:'Skin',up:{label:'Symptoms',action:'up',value:'1'},body:rows(1,'Symptom')}),
+  /* A drawer with levels (owner ruling B, 2026-10-16): the level is the title, the ✕ closes the whole drawer, the footer's Back goes up one level. */
+  levels:()=>{const h=UI.pickerHead({items:[{value:'s',label:'Symptoms',children:[{value:'skin',label:'Skin',children:[{value:'rash',label:'Rash'}]}]}],path:['s','skin'],title:'Symptoms',stepAction:'step'});return drawer({title:h.title,cross:h.cross,corner:corner('act.clear'),body:rows(1,'Symptom'),footer:UI.pickerFooter({multi:true,selected:['rash','lesions'],back:h.levelBack})});},
   longest:()=>drawer({title:'Correct piglet count',corner:corner('act.clear')}),
   zh:()=>drawer({title:'记录死亡',corner:corner('act.clear','清除'),body:rows(1,'仔猪')}),
   'zh-hub':()=>drawer({title:'分娩记录',line:{chip:{id:'000254',action:'open-sow'},facts:['B4','胎次 3']},body:rows(1,'仔猪')})
