@@ -4,11 +4,11 @@ The owner asked: "1 PR takes like few hrs just to pass the gate. Where is it dum
 
 ## The numbers
 
-**Open to merge** (wall clock, last 30 merged PRs):
+**Open to merge** (wall clock, the 29 merged PRs #151–#189):
 
 | | PRs | Open → merge |
 |---|---|---|
-| Tooling and docs that moved no screen (#151–#156, #168, #172, #174, #176, #182) | 11 | 0.1–0.3h |
+| Tooling and docs that moved no screen (#151–#154, #156, #158, #168, #172, #174, #176, #182) | 11 | 0.1–0.3h |
 | Gate tooling that moved screens or needed a second round (#161, #166, #171, #173, #189) | 5 | 1.0–2.8h |
 | Screen changes (#159, #162, #163, #165, #167, #170, #180) | 7 | 0.7–10.9h, median 4.2h |
 | Long-lived workflow PRs (#155, #157, #169, #177, #178, #181) | 6 | 5.6–10.2h |
@@ -115,6 +115,12 @@ The owner asked: "1 PR takes like few hrs just to pass the gate. Where is it dum
 
 **Change.** Pin Playwright in `package.json` to the version whose browsers the container ships, and have the doctor check it before a gate starts.
 
+### G10 · a flaky-only diff deadlocks the pass
+
+**What happens.** This retro's own PR (#191) met it: docs only, one screen (`data-sync.detail`, a status-bar icon drawn half on one side) differed and the gate itself listed it as flaky. Because a screen "changed", the gate did not post its no-screen pass; because the only changed screen is flaky, `checkVerdict` reads it as "no screen changed" and refuses a judge's pass unless the change is behaviour with a walk. Neither path merges it, so the PR waits on a re-gate and luck. A regenerated `review/legibility.json` riding along had also put it at full reach, which is what shot `data-sync` at all.
+
+**Change.** One rule in both places: a diff made only of flaky screens is "no screen moved" — the gate posts its pass, and the verdict path agrees. And the check commands stop leaving `review/legibility.json` modified in the worktree (write it to the gate's out folder), so it can't be committed by accident.
+
 ## What is not dumb (keep)
 
 - **Base against candidate, in pixels.** It is what caught the 56px drawer slicing the parent title on #163, and the Chinese route line on #170. No unit check would.
@@ -132,6 +138,6 @@ The owner asked: "1 PR takes like few hrs just to pass the gate. Where is it dum
 | 4 | G4: legibility, check-states and scenarios on the reach only; full sweep nightly | 3–10m per gate run | small–medium |
 | 5 | G5: split only for edited checks | one PR round when it applies | rule text |
 | 6 | G8: copy-class without the lock; resumable shots | queue time; restart losses | medium |
-| 7 | G6, G7, G9: merge driver, shared critique, auto-flaky, pinned Playwright | intermittent hours | small each |
+| 7 | G6, G7, G9, G10: merge driver, shared critique, auto-flaky, pinned Playwright, flaky-only counts as no move | intermittent hours | small each |
 
 The target is under an hour from open to merge for a screen PR that passes on its first judge, and 15 minutes for a tooling PR. Items 1–3 alone should take today's 4–11h screen PRs to about 1–2h, because they remove the loops (re-gate, re-judge), not just seconds from each step.
