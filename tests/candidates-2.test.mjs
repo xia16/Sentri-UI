@@ -102,6 +102,34 @@ test('choice radios: one tab stop; Clear only on an optional field with a value'
   assert.match(chosen, /role="radiogroup"/);
   assert.doesNotMatch(UI.choiceRadios({ label: 'X', options: opts, selected: 'b' }), /choose-clear/, 'a required field has no Clear');
 });
+test('choice radios: the key face is opt-in; the default inline markup is unchanged', () => {
+  const opts = [{ value: 'false', label: 'No' }, { value: 'true', label: 'Yes' }];
+  const plain = UI.choiceRadios({ label: 'Assisted', layout: 'inline', options: opts, selected: 'false', key: 'a', action: 'a' });
+  assert.doesNotMatch(plain, /data-face|st-choice-inline-face/);
+  assert.match(plain, /<span class="st-radio" aria-hidden="true"><\/span>/);
+  const key = UI.choiceRadios({ label: 'Assisted', layout: 'inline', face: 'key', options: opts, selected: 'false', key: 'a', action: 'a' });
+  assert.match(key, /data-face="key"/);
+  assert.match(key, /role="radiogroup"/);
+  assert.equal((key.match(/role="radio"/g) || []).length, 2);
+  assert.match(key, /aria-checked="true" tabindex="0" data-action="a" data-value="false"><span class="st-choice-inline-face"><span>No<\/span><\/span>/);
+  assert.doesNotMatch(key, /class="st-radio"/, 'a key carries no ring mark: the ring is the border of the key itself');
+  assert.doesNotMatch(UI.choiceRadios({ label: 'X', options: opts, face: 'key' }), /data-face/, 'the face is for the inline layout only');
+});
+test('measure row and its system input are opt-in; the default markup is unchanged', () => {
+  const stack = UI.measure({ label: 'Litter weight', value: '12', unit: 'kg', key: 'w' });
+  assert.doesNotMatch(stack, /data-layout/);
+  const row = UI.measure({ label: 'Litter weight', optional: 'Optional', value: '', unit: 'kg', key: 'w', layout: 'row' });
+  assert.match(row, /data-layout="row"/);
+  assert.match(row, /<small>Optional<\/small>/);
+  assert.match(row, /<span class="st-measure-value"[^>]*>—<\/span><span class="st-measure-unit"[^>]*>kg<\/span>/, 'empty is a dash with its unit, never 0');
+  assert.match(row, /data-action="open-numpad"/, 'by default the row is the pad\'s button');
+  const sys = UI.measure({ label: 'Litter weight', optional: 'Optional', value: '', unit: 'kg', key: 'w', layout: 'row', input: 'system', inputAttrs: 'data-field="weight"' });
+  assert.match(sys, /data-input="system"/);
+  assert.match(sys, /<input class="st-measure-input"[^>]*type="text" inputmode="decimal" enterkeyhint="done"[^>]*placeholder="—"[^>]*data-field="weight">/);
+  assert.match(sys, /<span class="st-measure-unit"[^>]*>kg<\/span><\/label>/);
+  assert.doesNotMatch(sys, /open-numpad|<button/, 'the system input opens no pad');
+  assert.doesNotMatch(UI.numpad({ decimals: 1, dock: true }), /data-dock/, 'the Numpad has no docked face');
+});
 test('row: existing navigation signature retains content and routing', () => {
   assert.equal(UI.row({ title: 'Pen 14', description: '3 sows due today', action: 'open', value: 'p14' }),
     '<button class="st-row " data-ds="Row" data-variant="plain" type="button" data-action="open" data-value="p14"><span class="st-row-copy"><strong>Pen 14</strong><small>3 sows due today</small></span><span class="st-row-chevron"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 5l7 7-7 7"/></svg></span></button>');

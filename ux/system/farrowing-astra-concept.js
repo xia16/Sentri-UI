@@ -33,7 +33,7 @@ function placeTaskSyncBadge(root){
 // People are initials on every record stamp: "G. Hansen" is "G.H".
 const initials=n=>{const m=/^([A-Za-z])[.]? ([A-Za-z])/.exec(n||'');return m?m[1]+'.'+m[2]:(n||'');};
 function seed(preset='count'){
- const s={preset,view:'count',back:'count',finishAlive:9,due:'Due today · day 114',alive:9,dead:[1,1,2,0,0,1],anchor:10,pending:4,weak:1,deformed:1,weight:'',assisted:null,locked:false,ended:false,frozen:14,tag:'000418',pen:'B1',parity:3,deathDraft:[0,0,0,0,0,0],moved:0,handReared:null,mode:'piglets',sowCause:'',sowNote:'',photos:[],edit:null,expanded:false,popup:null,pointers:false,lens:'All',stamp:'08:41',finished:'Aug 27 · 08:12',markers:[{text:'Red line on left shoulder · monitor overnight',meta:'Today · 06:20 · G.H'}],markerDraft:'',pigletTab:'care',processingDirty:false,processingTasks:[{id:'dry',day:1,title:'Dry and warm',done:true,meta:'Aug 26 · 07:18 · G.H'},{id:'navel',day:1,title:'Disinfect navel',done:true,meta:'Aug 26 · 07:24 · G.H'},{id:'iron',day:3,title:'Iron supplement',done:false,meta:'Due today'},{id:'identity',day:3,title:'Ear tag, notch and weight',done:false,meta:'3 identified · 6 without identity'},{id:'health',day:5,title:'Health check',done:false,meta:'In 2 days'}],piglets:[{tag:'418001',notch:'36-38',sex:'Female',weight:'1.4',state:'Alive'},{tag:'418002',notch:'36-41',sex:'Male',weight:'1.5',state:'Alive'},{tag:'418003',notch:'',sex:'Female',weight:'',state:'Alive'}],unidentified:6,pigletQuery:'',pigletSelected:[],pigletDraft:null,pigletEditIndex:-1,fosterDraft:{direction:'out',target:'000392',count:1},mortalityDraft:{cause:'',unidentified:0,photos:[]},countDraft:9,countReason:'',events:[{text:'Crushed 3 → 2',day:'Aug 26',time:'08:20',who:'G. Hansen',kind:'correction'},{text:'+3 crushed · +1 other',day:'Aug 26',time:'08:12',who:'G. Hansen'},{text:'+5 alive',day:'Aug 26',time:'07:52',who:'G. Hansen'},{text:'+1 stillborn · +1 mummified',day:'Aug 26',time:'07:30',who:'G. Hansen'}]};
+ const s={preset,view:'count',back:'count',finishAlive:9,due:'Due today · day 114',alive:9,dead:[1,1,2,0,0,1],anchor:10,pending:4,weak:1,deformed:1,weight:'',assisted:false,locked:false,ended:false,frozen:14,tag:'000418',pen:'B1',parity:3,deathDraft:[0,0,0,0,0,0],moved:0,handReared:null,mode:'piglets',sowCause:'',sowNote:'',photos:[],edit:null,expanded:false,popup:null,pointers:false,lens:'All',stamp:'08:41',finished:'Aug 27 · 08:12',markers:[{text:'Red line on left shoulder · monitor overnight',meta:'Today · 06:20 · G.H'}],markerDraft:'',pigletTab:'care',processingDirty:false,processingTasks:[{id:'dry',day:1,title:'Dry and warm',done:true,meta:'Aug 26 · 07:18 · G.H'},{id:'navel',day:1,title:'Disinfect navel',done:true,meta:'Aug 26 · 07:24 · G.H'},{id:'iron',day:3,title:'Iron supplement',done:false,meta:'Due today'},{id:'identity',day:3,title:'Ear tag, notch and weight',done:false,meta:'3 identified · 6 without identity'},{id:'health',day:5,title:'Health check',done:false,meta:'In 2 days'}],piglets:[{tag:'418001',notch:'36-38',sex:'Female',weight:'1.4',state:'Alive'},{tag:'418002',notch:'36-41',sex:'Male',weight:'1.5',state:'Alive'},{tag:'418003',notch:'',sex:'Female',weight:'',state:'Alive'}],unidentified:6,pigletQuery:'',pigletSelected:[],pigletDraft:null,pigletEditIndex:-1,fosterDraft:{direction:'out',target:'000392',count:1},mortalityDraft:{cause:'',unidentified:0,photos:[]},countDraft:9,countReason:'',events:[{text:'Crushed 3 → 2',day:'Aug 26',time:'08:20',who:'G. Hansen',kind:'correction'},{text:'+3 crushed · +1 other',day:'Aug 26',time:'08:12',who:'G. Hansen'},{text:'+5 alive',day:'Aug 26',time:'07:52',who:'G. Hansen'},{text:'+1 stillborn · +1 mummified',day:'Aug 26',time:'07:30',who:'G. Hansen'}]};
  if(preset==='room')s.view='room';
  if(/^search-/.test(preset))s.view='roomSearch';
  if(/^scan-/.test(preset))s.view=preset==='scan-actions'?'roomScanActions':'roomScan';
@@ -66,6 +66,12 @@ const hasDraft=s=>sum(s.deathDraft)>0||(!s.ended&&s.sowCause)||changes(s).length
 function event(s,text,kind='',photos=[]){s.events.unshift({text,kind,day:'Today',time:'09:41',who:'G. Hansen',photos:[...photos]});s.stamp='09:41';}
 function fold(s){if(s.pending){event(s,s.pending>0?`+${s.pending} alive`:`${-s.pending} died this visit`);s.pending=0;}s.anchor=born(s);}
 function enterEdit(s){s.back=s.view==='finish'?'finish':s.locked?'locked':'count';if(!s.edit)s.edit=snap(s);s.view='edit';}
+// The litter weight is typed on the phone's own decimal keyboard; on save or finish it is normalised to one decimal place,
+// and an empty value or 0 is "not recorded".
+const normWeight=w=>{const c=SentriUI.numpadCommit(String(w??'').trim(),{decimals:1});return c==null||+c===0?'':c;};
+// The weight is typed on the system decimal keyboard: a comma (some locales) becomes a point, only digits and one point stay,
+// at most 2 whole digits and 1 decimal (the limits the Numpad keeps elsewhere).
+const cleanWeight=v=>{let t=String(v).replace(/,/g,'.').replace(/[^0-9.]/g,'');const p=t.indexOf('.');if(p>=0)t=t.slice(0,p+1)+t.slice(p+1).replace(/\./g,'');let [w,d]=t.split('.');w=(w||'').slice(0,2);return d===undefined?w:(w||'0')+'.'+d.slice(0,1);};
 function act(s,a,v){
  if(['back','close','dismiss'].includes(a)&&s.popup?.kind==='born'){s.popup=null;return;}
  if(['back','close','dismiss'].includes(a)&&s.view==='edit'&&s.edit&&changes(s).length){s.popup={kind:'leaveEdit'};return;}
@@ -84,15 +90,12 @@ function act(s,a,v){
  if(a==='edit')enterEdit(s);
  if(a==='editStep'){const [k,i,n]=v.split(',');if(k==='dead'){const next=Math.max(0,s.edit.dead[+i]+(+n));if(s.locked&&sum(s.edit.dead)-s.edit.dead[+i]+next>s.edit.born)return;s.edit.dead[+i]=next;}else{let next=Math.max(0,s.edit[k]+(+n));const live=s.locked?Math.max(0,s.finishAlive+s.edit.born-s.frozen):s.edit.alive;if(['weak','deformed'].includes(k)&&next+s.edit[k==='weak'?'deformed':'weak']>live)return;s.edit[k]=next;} }
  if(a==='clearEdit'){s.edit=snap(s);}
- if(a==='saveEdit'){const lines=changes(s);if(!lines.length)return;fold(s);const e=s.edit;s.dead=[...e.dead];if(s.locked){s.frozen=e.born;s.alive=s.frozen-sum(s.dead)-(s.moved||0);s.weak=e.weak;s.deformed=e.deformed;s.weight=e.weight;s.assisted=e.assisted;}else s.alive=e.alive;s.anchor=born(s);event(s,lines.join(' · '),'correction');s.edit=null;s.view=s.back==='finish'?'finish':s.locked?'locked':'count';}
+ if(a==='saveEdit'){s.edit.weight=normWeight(s.edit.weight);const lines=changes(s);if(!lines.length)return;fold(s);const e=s.edit;s.dead=[...e.dead];if(s.locked){s.frozen=e.born;s.alive=s.frozen-sum(s.dead)-(s.moved||0);s.weak=e.weak;s.deformed=e.deformed;s.weight=e.weight;s.assisted=e.assisted;}else s.alive=e.alive;s.anchor=born(s);event(s,lines.join(' · '),'correction');s.edit=null;s.view=s.back==='finish'?'finish':s.locked?'locked':'count';}
  if(a==='expand')s.view='editFinish';
  if(a==='editCounts')s.view='edit';
- if(a==='finishOptional'){s.finishOptional=s.finishOptional===v?null:v;}
  if(a==='assistance'||a==='editAssistance')(a==='editAssistance'?s.edit:s).assisted=v==='true';
- if(a==='assistance-clear'||a==='editAssistance-clear')(a==='editAssistance-clear'?s.edit:s).assisted=null;
- if(a==='clearAssistance'){const target=v==='true'?s.edit:s;target.assisted=null;}
  if(a==='classify'){const [k,n]=v.split(',');const next=Math.max(0,s[k]+(+n));if(next+s[k==='weak'?'deformed':'weak']<=s.alive)s[k]=next;}
- if(a==='lock'){if(hasDraft(s)||!born(s))return;fold(s);s.frozen=born(s);s.finishAlive=s.alive;s.locked=true;s.finished='Today · 09:41';event(s,`Farrowing finished · born ${s.frozen}`,'milestone');s.view='locked';}
+ if(a==='lock'){s.weight=normWeight(s.weight);if(hasDraft(s)||!born(s))return;fold(s);s.frozen=born(s);s.finishAlive=s.alive;s.locked=true;s.finished='Today · 09:41';event(s,`Farrowing finished · born ${s.frozen}`,'milestone');s.view='locked';}
  if(a==='sowActions'){s.pageBack=s.view;s.actionsEntry=true;s.view='profile';}
  if(a==='profile')s.actionsEntry=false;
  if(a==='history'||a==='profile'||a==='deathBreakdown'){s.pageBack=s.view;s.view=a;}
@@ -171,7 +174,7 @@ function closeTask(c,at=new Date().toISOString()){
  review.finished.forEach(({record})=>{fold(record);record.taskDisposition='retained';});
  return true;
 }
-globalThis.FarrowingStudy={seed,act,born,floor,changes,hasDraft,penLogEvents,taskClosureReview,closeTask,sowActionCatalogue,toAllocate,leftTask,config:farmConfig};
+globalThis.FarrowingStudy={seed,act,cleanWeight,normWeight,born,floor,changes,hasDraft,penLogEvents,taskClosureReview,closeTask,sowActionCatalogue,toAllocate,leftTask,config:farmConfig};
 if(typeof document==='undefined')return;
 // The atlas follows the demo (?screen=): which of the feature's screens this state is. Null when no screen is that state.
 function atlasScreen(s,c){
@@ -238,13 +241,14 @@ function identity(s){
 function farmStepper(props,prefix=''){return SentriUI.stepper(props).replace(/data-value="[^"]*" data-step="(-?\d+)"/g,(_,d)=>`data-value="${prefix}${d}" data-step="${d}"`);}
 function row(label,val,action,value,min=false,max=false,cls='',draftStatus='',was){const isWas=was!==undefined&&was!==null&&was!==val;return farmStepper({label,value:val,action,key:value,min:typeof min==='number'?min:min?val:0,max:typeof max==='number'?max:max?val:null,draft:cls.includes('draft')||isWas,status:isWas?'was '+was:draftStatus,strs:!isWas&&draftStatus?{status:'ds.stepper.draft'}:undefined,args:!isWas&&draftStatus?{status:{n:draftStatus.match(/\d+/)?.[0]||'1'}}:undefined,reserveHint:false},value);}
 
-const optRow=o=>SentriUI.optionalRow({icon:icon('plus'),editIcon:icon('edit'),...o});
-function assistanceChoices(x,editing){return SentriUI.choiceRadios({label:'Was farrowing assisted?',labelHidden:true,optional:'Optional',layout:'inline',key:editing?'editAssistance':'assistance',action:editing?'editAssistance':'assistance',selected:x.assisted==null?'':String(x.assisted),options:[{value:'false',label:'No'},{value:'true',label:'Yes'}]});}
-function optional(s,editing=false){
- const x=editing?s.edit:s,hasW=x.weight!==''&&x.weight!=null;
- const weight=`<label class="question-field"><span class="weight-control"><input aria-label="Litter weight in kilograms" data-field="weight" data-edit="${editing}" inputmode="decimal" type="number" min="0" step="0.1" placeholder="e.g. 12.6" value="${esc(x.weight)}"><span>kg</span></span></label>`;
- const assisted=assistanceChoices(x,editing);
- return `<div class="optional finish-form-details st-optional-list">${optRow({label:'Litter weight',value:hasW?x.weight+' kg':'',inline:weight,open:hasW})}${optRow({label:'Assistance',value:x.assisted!=null?assistanceLabel(x.assisted):'',inline:assisted,open:x.assisted!=null})}</div>`;
+/* The finish form, shared by Finish farrowing and Edit finish details: one flat list of 60px rows, every control in the Stepper's 136px right column.
+   Assisted is a required No / Yes (No on a new finish; a record that never had it shows neither key chosen); the litter weight is optional,
+   a Measure row typed on the phone's own decimal keyboard (Done closes it). */
+const conditionHeading=()=>SentriUI.heading({kind:'section',level:3,title:'Piglet condition',icon:icon('health')});
+function finishDetails(s,editing){
+ const x=editing?s.edit:s,key=editing?'editWeight':'weight',name=editing?'editAssistance':'assistance';
+ return SentriUI.choiceRadios({label:'Assisted',layout:'inline',face:'key',key:name,action:name,selected:x.assisted==null?'':String(x.assisted),options:[{value:'false',label:'No'},{value:'true',label:'Yes'}]})
+  +SentriUI.measure({label:'Litter weight',optional:'Optional',layout:'row',input:'system',unit:'kg',value:x.weight,key,inputAttrs:`data-field="weight" data-edit="${editing}" aria-label="Litter weight in kilograms, optional"`});
 }
 const footer=(left,right,className='')=>SentriUI.sheetFooter({content:left+(right||''),className});
 // Reset and Clear are quiet text in the footer, left of the primary (Headers law, 2026-10-13): never in a header.
@@ -610,8 +614,8 @@ function receipt(s){return s.pointers?'<span class="count-reminder">Use <strong>
 function litterHeading(disabled=false){return SentriUI.heading({title:'Litter summary',icon:icon('record'),action:disabled?'':{label:'View log',action:'history',ariaLabel:'Open farrowing log'},kind:'section',level:3});}
 function count(s){const pending=sum(s.deathDraft);return {cls:'',body:`${farmStepper({variant:'count',label:'Alive',value:s.alive,min:floor(s),action:'alive',reserveHint:true,hintHtml:receipt(s)}).replace('st-stepper-hint','st-stepper-hint receipt')}<section class="count-record">${litterHeading(!s.events.length&&!s.pending)}<div class="count-record-surface st-panel">${metrics([['Born',born(s)],['Dead',sum(s.dead)]],{panel:false})}${sum(s.dead)?causes(s.dead):''}</div>${recordActions(s)}</section>`,footer:recordNavigation(SentriUI.button({label:'Finish farrowing',register:'primary',action:'finish',waiting:born(s)>0&&hasDraft(s),disabled:!born(s)}))};}
 function finish(s){
- return {cls:'finish-body',body:`${metrics([['Born',born(s)],['Alive',s.alive],['Dead',sum(s.dead)]])}<fieldset class="finish-condition"><legend>Piglet condition</legend><p>Among the ${s.alive} alive piglets · 0 if none</p>${row('Weak',s.weak,'classify','weak,',s.weak===0,s.weak+s.deformed>=s.alive)}${row('Deformed',s.deformed,'classify','deformed,',s.deformed===0,s.weak+s.deformed>=s.alive)}</fieldset><section class="finish-extras st-optional-list" aria-label="Details to add">${optRow({label:'Litter weight',value:s.weight!==''&&s.weight!=null?s.weight+' kg':'',action:'finishOptional',key:'weight',attrs:{'aria-expanded':s.finishOptional==='weight'}})}${optRow({label:'Assistance',value:s.assisted!=null?assistanceLabel(s.assisted):'',action:'finishOptional',key:'assisted',attrs:{'aria-expanded':s.finishOptional==='assisted'}})}${s.finishOptional==='weight'?`<label class="finish-field finish-field-answer"><span class="finish-weight-control"><input aria-label="Litter weight in kilograms, optional" data-field="weight" data-edit="false" inputmode="decimal" type="number" min="0" step="0.1" placeholder="—" value="${esc(s.weight)}"><span>kg</span></span></label>`:''}${s.finishOptional==='assisted'?assistanceChoices(s,false):''}</section>`,footer:footer(SentriUI.backButton({action:'returnCount'}),hold('lock','Finish farrowing',!born(s)))};
-
+ const rows=row('Weak',s.weak,'classify','weak,',s.weak===0,s.weak+s.deformed>=s.alive)+row('Deformed',s.deformed,'classify','deformed,',s.deformed===0,s.weak+s.deformed>=s.alive)+finishDetails(s,false);
+ return {cls:'finish-body',body:`${metrics([['Born',born(s)],['Alive',s.alive],['Dead',sum(s.dead)]])}<section class="finish-condition" aria-label="Piglet condition">${conditionHeading()}<div class="finish-rows">${rows}</div></section>`,footer:footer(SentriUI.backButton({action:'returnCount'}),hold('lock','Finish farrowing',!born(s)))};
 }
 function moreSowActions(s){return btn('sowActions',`More actions ${icon('chevron')}`,'more-sow-actions').replace('<button',`<button aria-label="More actions for sow ${s.tag}"`);}
 function recordActions(s){const pending=sum(s.deathDraft);return `<div class="record-inline-actions" aria-label="Record actions"><div class="record-action-group" role="group" aria-label="Quick actions">${s.events.length||born(s)?btn('edit',`${icon('edit')}<span>Edit</span>`,'record-toolbar-action'):''}${btn('death',`${icon('alert')}<span>Record dead</span>${pending?`<small>${pending} unsaved</small>`:''}`,'record-toolbar-action')}${btn('sowActions',`${icon('more')}<span>More actions</span>`,'record-toolbar-action record-toolbar-more').replace('<button',`<button aria-label="More actions for sow ${s.tag}"`)}</div></div>`;}
@@ -646,7 +650,8 @@ function edit(s){
 }
 function editFinish(s){
  const e=s.edit,live=Math.max(0,s.finishAlive+e.born-s.frozen);
- return {cls:'edit-body',body:`<fieldset class="finish-question"><legend>Any weak or deformed piglets?</legend><p class="question-hint">Of the alive piglets · 0 if none</p><div class="condition-counts">${row('Weak',e.weak,'editStep','weak,0,',!e.weak,e.weak+e.deformed>=live,'','',s.weak)}${row('Deformed',e.deformed,'editStep','deformed,0,',!e.deformed,e.weak+e.deformed>=live,'','',s.deformed)}</div></fieldset>${optional(s,true)}`,corner:changes(s).length?cornerClear('clearEdit'):null,footer:footer(SentriUI.backButton({action:'editCounts'}),btn('saveEdit','Save correction','button primary','',!changes(s).length),'edit-footer')};
+ const rows=row('Weak',e.weak,'editStep','weak,0,',!e.weak,e.weak+e.deformed>=live,'','',s.weak)+row('Deformed',e.deformed,'editStep','deformed,0,',!e.deformed,e.weak+e.deformed>=live,'','',s.deformed)+finishDetails(s,true);
+ return {cls:'edit-body',body:`<section class="finish-condition" aria-label="Piglet condition">${conditionHeading()}<div class="finish-rows">${rows}</div></section>`,corner:changes(s).length?cornerClear('clearEdit'):null,footer:footer(SentriUI.backButton({action:'editCounts'}),btn('saveEdit','Save correction','button primary','',!changes(s).length),'edit-footer')};
 }
 // Reading destinations share Inspection's medium drawer and record timeline.
 // The log and the death breakdown are read from the sow's record drawer, one Back away: no header line (Headers law, 2026-10-13).
@@ -759,7 +764,7 @@ function capabilitySurface(s){return s.view==='marker'?markerPage(s):s.view==='p
 
 function farrowingRecordSurface(s){const surface=({count,finish,locked,death,edit,editFinish,allocate})[s.view];if(!surface)return '';const v=surface(s),h=identity(s),page=AstraSurfaces.isPage('farrowing',s.view);
  const label={allocate:'Allocate piglets',count:'Count alive',finish:'Finish farrowing',locked:'Locked litter',death:'Record dead',editFinish:'Edit finish details',edit:'Edit record'}[s.view];
- return SentriUI.sheet(Object.assign({variant:page?'page':'drawer',body:v.body,bodyClass:v.cls,corner:v.corner||null,footer:v.footer,size:['death','edit','editFinish','finish'].includes(s.view)?'long':'medium',sizing:['count','death','edit','editFinish'].includes(s.view)?'full':'content',view:s.view,label,scrim:{action:'dismiss',label:'Dismiss sheet'},bar:page?status():''},h));}
+ return SentriUI.sheet(Object.assign({variant:page?'page':'drawer',body:v.body,bodyClass:v.cls,corner:v.corner||null,footer:v.footer,size:['death','edit','editFinish','finish'].includes(s.view)?'long':'medium',sizing:['count','death','edit'].includes(s.view)?'full':'content',view:s.view,label,scrim:{action:'dismiss',label:'Dismiss sheet'},bar:page?status():''},h));}
 function farrowingBackground(s){
  if(s.view==='roomPicker'){const c=roomContext(s),back=c.picker?.returnView||'';const behind=['roomPenReadNote','roomPenNote','roomPenFault','roomPenFaultRecord'].includes(back)?penSubpage({...s,view:back},c):['marker','pigletCare','pigletEdit','foster','pigletDeath','countReconcile'].includes(back)?capabilitySurface({...s,view:back}):'';return behind?'<div class="page-background" inert aria-hidden="true">'+behind+'</div>':'';}
  if(['roomPenReadNote','roomPenNote','roomPenFault','roomPenFaultRecord'].includes(s.view))return '<div class="page-background" inert aria-hidden="true">'+penDetails(roomContext(s))+'</div>';
@@ -791,7 +796,7 @@ SentriUI.holdBind(gallery,{onCommit(el){const i=+el.closest('[data-card]').datas
 gallery.addEventListener('pointerdown',e=>{if(e.button!==0)return;if(e.target.closest('.grab'))grabStart={y:e.clientY,i:+e.target.closest('[data-card]').dataset.card};});
 gallery.addEventListener('pointerup',e=>{if(grabStart){if(e.clientY-grabStart.y>100||Math.abs(e.clientY-grabStart.y)<8){const s=states[grabStart.i];if(['marker','pigletCare','pigletEdit','foster','pigletDeath','countReconcile'].includes(s.view))act(s,'featureBack');else if(['death','edit','editFinish','history','profile','deathBreakdown'].includes(s.view))act(s,'back');else if(s.view==='finish')s.view='count';else if(s.view.startsWith('room'))roomAction(grabStart.i,'room-back');else act(s,'close');render(grabStart.i);}grabStart=null;}});
 gallery.addEventListener('pointercancel',()=>{grabStart=null});
-gallery.addEventListener('keydown',e=>{if(e.key==='Tab'&&e.target.closest('.dialog,.sheet')){const items=[...e.target.closest('.dialog,.sheet').querySelectorAll('button:not(:disabled),input:not(:disabled):not([tabindex="-1"]),select,textarea')],first=items[0],last=items[items.length-1];if(e.shiftKey&&e.target===first){e.preventDefault();last?.focus();}else if(!e.shiftKey&&e.target===last){e.preventDefault();first?.focus();}}if(e.key==='Escape'){const i=+e.target.closest('[data-card]').dataset.card,s=states[i];if(s.popup)s.popup=null;else if(['marker','pigletCare','pigletEdit','foster','pigletDeath','countReconcile'].includes(s.view))act(s,'featureBack');else if(['death','edit','editFinish','history','profile','deathBreakdown'].includes(s.view))act(s,'back');else if(s.view==='finish')s.view='count';else if(s.view.startsWith('room'))roomAction(i,'room-back');else act(s,'close');render(i);}});
+gallery.addEventListener('keydown',e=>{const pi=e.target.closest?.('[data-card]')?+e.target.closest('[data-card]').dataset.card:-1;if(e.key==='Tab'&&e.target.closest('.dialog,.sheet')){const items=[...e.target.closest('.dialog,.sheet').querySelectorAll('button:not(:disabled),input:not(:disabled):not([tabindex="-1"]),select,textarea')],first=items[0],last=items[items.length-1];if(e.shiftKey&&e.target===first){e.preventDefault();last?.focus();}else if(!e.shiftKey&&e.target===last){e.preventDefault();first?.focus();}}if(e.key==='Escape'){const i=+e.target.closest('[data-card]').dataset.card,s=states[i];if(s.popup)s.popup=null;else if(['marker','pigletCare','pigletEdit','foster','pigletDeath','countReconcile'].includes(s.view))act(s,'featureBack');else if(['death','edit','editFinish','history','profile','deathBreakdown'].includes(s.view))act(s,'back');else if(s.view==='finish')s.view='count';else if(s.view.startsWith('room'))roomAction(i,'room-back');else act(s,'close');render(i);}});
 // Record dead: opening the sow's Details grows the body; keep the danger banner whole above the footer (crit round 2).
 gallery.addEventListener('click',e=>{const row=e.target.closest('.sheet[data-view=death] [data-st-optional]');if(row)requestAnimationFrame(()=>row.closest('.sheet-body')?.querySelector(':scope > .st-banner')?.scrollIntoView({block:'nearest'}));});
 gallery.addEventListener('click',e=>{const el=e.target.closest('[data-action]');if(!el||el.disabled||el.classList.contains('st-hold'))return;
@@ -822,17 +827,15 @@ gallery.addEventListener('change',e=>{
 });
 function updateTextField(el,i){
  const s=states[i],target=el.dataset.edit==='true'?s.edit:s,f=el.dataset.field;
+ if(f==='weight'){const c=cleanWeight(el.value);if(c!==el.value)el.value=c;}
  target[f]=el.value;
- if(f==='weight'){
-  if(target[f]!==''&&+target[f]<0){target[f]='';el.value='';}
-  if(el.dataset.edit==='true'){
-   const root=el.closest('.spec'),cs=changes(s);
-   root.querySelector('[data-action="saveEdit"]').disabled=!cs.length;
-  }
+ if(f==='weight'&&el.dataset.edit==='true'){const save=el.closest('.spec')?.querySelector('[data-action="saveEdit"]');if(save)save.disabled=!changes(s).length;}
  }
-}
+// Done (Enter) on the weight closes the system keyboard; leaving the field redraws the sheet (the edit form's Clear, the kept value).
+gallery.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.dataset?.field==='weight'){e.preventDefault();e.target.blur();}});
+gallery.addEventListener('change',e=>{if(e.target.dataset?.field!=='weight')return;render(+e.target.closest('[data-card]').dataset.card);});
 gallery.addEventListener('input',e=>{if(['weight','sowNote'].includes(e.target.dataset.field))updateTextField(e.target,+e.target.closest('[data-card]').dataset.card);});
-gallery.addEventListener('change',e=>{const el=e.target,i=+el.closest('[data-card]').dataset.card,s=states[i];if(el.matches('.scenario')){roomContexts[i]=null;states[i]=seed(el.value);restoreDraft(states[i]);if(el.value==='foster')act(states[i],'foster');if(el.value==='reconcile')act(states[i],'countReconcile');render(i);return;}const f=el.dataset.field;if(!f)return;if(['weight','sowNote'].includes(f)){updateTextField(el,i);return;}if(f==='photo'){for(const file of el.files){if(s.photos.length>=12)break;s.photos.push(URL.createObjectURL(file));}}else{const target=el.dataset.edit==='true'?s.edit:s;target[f]=f==='assisted'?el.value==='true':el.type==='checkbox'?el.checked:el.value;if(f==='weight'&&target[f]!==''&&+target[f]<0)target[f]='';}render(i,f==='photo'?{a:'addPhoto',v:'photos'}:undefined);});
+gallery.addEventListener('change',e=>{const el=e.target,card=el.closest('[data-card]');if(!card)return;const i=+card.dataset.card,s=states[i];if(el.matches('.scenario')){roomContexts[i]=null;states[i]=seed(el.value);restoreDraft(states[i]);if(el.value==='foster')act(states[i],'foster');if(el.value==='reconcile')act(states[i],'countReconcile');render(i);return;}const f=el.dataset.field;if(!f)return;if(f==='sowNote'){updateTextField(el,i);return;}if(f==='photo'){for(const file of el.files){if(s.photos.length>=12)break;s.photos.push(URL.createObjectURL(file));}}else{const target=el.dataset.edit==='true'?s.edit:s;target[f]=f==='assisted'?el.value==='true':el.type==='checkbox'?el.checked:el.value;}render(i,f==='photo'?{a:'addPhoto',v:'photos'}:undefined);});
 document.getElementById('reset-all').onclick=()=>{states.forEach((s,i)=>{roomContexts[i]=null;try{sessionStorage.removeItem(draftKey(s));}catch(e){}states[i]=seed(cards[i].initial);document.querySelector(`[data-card="${i}"] .scenario`).value=cards[i].initial;render(i);});};
 document.querySelectorAll('[data-layout]').forEach(b=>b.onclick=()=>{const focus=b.dataset.layout==='focus';gallery.classList.toggle('focus',focus);document.querySelectorAll('[data-layout]').forEach(x=>x.setAttribute('aria-pressed',x===b));const u=new URL(location.href);u.searchParams.set('layout',focus?'focus':'overview');window.history.replaceState(null,'',u);});
 if(new URLSearchParams(location.search).get('layout')==='focus')document.querySelector('[data-layout="focus"]').click();

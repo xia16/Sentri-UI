@@ -280,6 +280,12 @@ export interface StepperProps {
 /** Candidate. A measured value with its unit; the box is
  *  `<button data-action="open-numpad" data-value=key aria-expanded aria-controls>`. */
 export interface MeasureProps {
+  /** Candidate: 'system' draws the box as a native text field on the phone's decimal keyboard (no Numpad), for one optional value in a form. Default 'pad'. */
+  input?: 'pad' | 'system';
+  /** With input 'system': the host's own attributes for the field (e.g. data-field). */
+  inputAttrs?: string;
+  /** Candidate: 'row' draws the Measure as one row of a flat list in the Stepper row's right column (label left, box right). Default 'stack'. */
+  layout?: 'stack' | 'row';
   label: string;
   /** A muted word beside the label, e.g. "Optional". */
   optional?: string;
@@ -532,6 +538,8 @@ export interface HoldBindOptions {
 }
 export interface RadioOption { value: string; label: string; meta?: string; /** Latin and digit codes only (warns in dev otherwise). */ mono?: boolean; strs?: Strs<'label' | 'meta'>; args?: StrArgs<'label' | 'meta'> }
 export interface ChoiceRadiosProps {
+  /** Candidate, `layout: 'inline'` only: 'key' draws each option as a boxed key in the Stepper row's right column (the chosen key takes a 2px ink ring). */
+  face?: 'default' | 'key';
   /** Hide only the field label when an enclosing optional row already names it; accessible label and Clear remain. */
   labelHidden?: boolean;
   disabled?: boolean;
