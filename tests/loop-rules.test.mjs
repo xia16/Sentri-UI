@@ -1,7 +1,7 @@
 // The gate's and the polish loop's rules (scripts/loop-rules.mjs).
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { aimdStep, queueAhead, newScenarioFailures, calibrationProblems, budgetProblems, critiqueProblems, pageStyling, addedLines, effectiveClass, classifyScreens, checkVerdict, checkGrades, worstFirst, isClean, loopStatus, touchesSystem, touchesTools, regressions,
+import { passesWithoutJudge, aimdStep, queueAhead, newScenarioFailures, calibrationProblems, budgetProblems, critiqueProblems, pageStyling, addedLines, effectiveClass, classifyScreens, checkVerdict, checkGrades, worstFirst, isClean, loopStatus, touchesSystem, touchesTools, regressions,
   pageOf, pageAssets, sharedFiles, outcomeLeaves, coverageLost, reachOf, reachLine, timedOutOnly, lockState, scenarioDebt, ghNetworkError,
   componentPage, componentPagesOf, componentsTouched, idPath } from '../scripts/loop-rules.mjs';
 
@@ -469,4 +469,19 @@ test('scenario runs at once grow while runs stay fast, halve on a timeout or a s
   s = { limit: 8, min: 1, max: 8, baseline: 1000 };
   feed(1000, 8);
   assert.equal(s.limit, 8, 'never above max');
+});
+
+test("a mechanical pass that moves no screen is a gate pass without a judge; anything else still needs one", () => {
+  const ok = { pass: true, candidate: "c", base: "b", quick: false, screens: { diff: [], new: [], gone: [] }, pairs: [] };
+  assert.equal(passesWithoutJudge(ok), true);
+  assert.equal(passesWithoutJudge({ ...ok, pass: false }), false);
+  assert.equal(passesWithoutJudge({ ...ok, quick: true }), false);
+  assert.equal(passesWithoutJudge({ ...ok, screens: null }), false);
+  assert.equal(passesWithoutJudge({ ...ok, screens: { diff: [{ id: "farrowing.pen-map" }], new: [], gone: [] } }), false);
+  assert.equal(passesWithoutJudge({ ...ok, screens: { diff: [], new: [{ id: "x" }], gone: [] } }), false);
+  assert.equal(passesWithoutJudge({ ...ok, screens: { diff: [], new: [], gone: [{ id: "x" }] } }), false);
+  assert.equal(passesWithoutJudge({ ...ok, screens: { diff: [], new: [] } }), false);
+  assert.equal(passesWithoutJudge({ ...ok, pairs: [{ screen: "x" }] }), false);
+  assert.equal(passesWithoutJudge({ ...ok, candidate: "" }), false);
+  assert.equal(passesWithoutJudge({ ...ok, outcome: "blocked" }), false, "gate v2: a blocked gate is never a pass");
 });

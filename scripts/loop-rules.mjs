@@ -431,3 +431,12 @@ export function scenarioDebt(candReport, baseReport) {
   }
   return { added, debt };
 }
+
+// A change that moves no screen merges on the mechanical gate alone (docs/design-workflow/README.md, "Who decides what"): there is
+// no pair for a judge, so the gate itself posts the sentri/gate status and the pass record. Fail closed: the run must be a full
+// one (not --quick) whose screens were classified, with nothing changed, new or gone and no pair listed.
+export function passesWithoutJudge(mech) {
+  if (!mech || mech.pass !== true || (mech.outcome && mech.outcome !== 'pass') || mech.quick || !mech.candidate || !mech.base || !mech.screens) return false;
+  if ((mech.pairs || []).length) return false;
+  return ['diff', 'new', 'gone'].every((k) => Array.isArray(mech.screens[k]) && mech.screens[k].length === 0);
+}

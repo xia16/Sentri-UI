@@ -24,7 +24,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { CLASSES, checkVerdict, calibrationProblems, lockState } from './loop-rules.mjs';
+import { CLASSES, checkVerdict, calibrationProblems, lockState, passesWithoutJudge } from './loop-rules.mjs';
 import { postStatus as post } from './github.mjs';
 import { evaluate } from './evaluate.mjs';
 
@@ -171,6 +171,17 @@ try {
   res = { outcome: 'blocked', mech: { outcome: 'blocked', pass: false, ref, mode, scope, blocked: [`the gate crashed: ${String(e.message || e).split('\n')[0]}`], checks: [], gaps: [], pairs: [] } };
 }
 const mech = { ...res.mech, waited: waited + 's' };
+// No screen moved: there is nothing to judge, so this pass is the gate pass. It posts the sentri/gate status (which branch protection
+// on main requires) and the pass record the merge guard reads, as --verdict does for a change that moves screens. Never for a run
+// against another base than origin/main (--base, for testing the gate): that pass could not merge anyway.
+if (!opt('base') && passesWithoutJudge(mech)) {
+  mech.gatePass = true;
+  const posted = postStatus(mech.candidate, 'success', `GATE PASS against ${short(mech.base)} · no screen moved`);
+  if (!posted.ok) console.log(`  - the sentri/gate status was not posted (${posted.why}): gate again; until then GitHub refuses the merge`);
+  const passFile = passRecord(mech.candidate);
+  fs.mkdirSync(path.dirname(passFile), { recursive: true });
+  fs.writeFileSync(passFile, JSON.stringify({ candidate: mech.candidate, base: mech.base, ref: mech.ref, out: path.resolve(out), noScreenMoved: true, at: new Date().toISOString() }, null, 2));
+}
 fs.writeFileSync(path.join(out, 'mechanical.json'), JSON.stringify(mech, null, 2));
 const t = mech.timings || {};
 console.log(`\ntimings (s): ${Object.entries(t).map(([k, v]) => `${k} ${v}`).join(', ')}`);
@@ -178,4 +189,5 @@ if (mech.evidence) console.log(`evidence: ${mech.evidence.reused ?? 0} of ${mech
 const word = { pass: 'MECHANICAL PASS', fail: 'MECHANICAL FAIL', blocked: 'MECHANICAL BLOCKED' }[mech.outcome] || 'MECHANICAL FAIL';
 console.log(`${word} ${short(mech.candidate)} on base ${short(mech.base)} (${mech.class?.effective || declared}, ${mode}) — ${out}`);
 for (const b of mech.blocked || []) console.log('  blocked:', b);
+if (mech.gatePass) console.log(`GATE PASS (no screen moved, so no judge): gh pr merge <n> --squash --match-head-commit ${mech.candidate}`);
 process.exit(mech.outcome === 'pass' ? 0 : mech.outcome === 'blocked' ? 3 : 1);
