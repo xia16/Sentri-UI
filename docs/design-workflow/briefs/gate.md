@@ -32,6 +32,8 @@ When main moves on after a `GATE PASS`, merge it forward and run `node scripts/g
 
 `--verdict` also posts the result as the `sentri/gate` commit status on GitHub. Every GitHub call the gate makes (the queue, PR files, statuses) is tried twice more after a network error (EOF, TLS, a timeout, a 5xx); after that it says `GitHub could not be reached`, which is not a queue verdict or a status: run it again. An answer from GitHub is never retried. A branch-protection rule on main that requires it makes GitHub refuse an ungated merge however it is attempted. The local merge guard (`scripts/merge-guard.mjs`) only stops our own sessions early and says why; it is not the boundary.
 
+**A change that moves no screen** (nothing changed, new or gone, and so no pair to judge) merges on the mechanical gate alone. A full run that passes then posts the `sentri/gate` status and the pass record itself, with `GATE PASS … · no screen moved`, so branch protection on main does not wait on a judge who has nothing to judge. A `--quick` run never does.
+
 A shared change that touches too many screens for one judge is split by feature. Each judge writes `verdict-<feature>.json`, and `--verdict` merges them: one failing part fails the change. `check-states` runs on both sides for every class. A problem main already has is reported as main's, and only a new one fails.
 
 ## 1. Mechanical checks (P2, P5; run first; any failure ends the gate)
