@@ -188,7 +188,7 @@ The owner reviewed the first round's screens (head `1d7eeab`) and revised the de
 
 - **major** · Each pig's box sat on the form, so the form grew with the pigs (owner). The form now ends its dose section with "Same dose for all" and a "Custom doses" row ("2 pigs · 1 own dose"); the boxes are on the Custom doses page, inline in each row.
 - **major** · Checkboxes on dose rows read as multi-select (owner: they meant "include", which is ambiguous). Removed from dose rows; a pig is taken out where pigs are chosen: the pigs row at the top of the form opens the selected list, the walk's **Selected review** pattern (`selectionReview`: every pig ticked, untick to take one out).
-- **minor** · Note: no limit and one line tall. Now about three lines, at most 200 characters (maxlength: input stops, nothing is cut afterwards), a counter at the end of the label line from 160 ("193 / 200").
+- **minor** · Note: no limit and one line tall. Now about three lines, at most 200 characters (maxlength: input stops, nothing is cut afterwards), a counter from 160 as the Field's hint under it ("193 / 200").
 
 ### Optional rows elsewhere (the reach of the shared Field PR)
 

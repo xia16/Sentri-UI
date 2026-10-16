@@ -42,6 +42,7 @@
     "ds.picker.search": {"en": "Search all options", "zh": "搜索所有选项", "kind": "label"},
     "ds.picker.search_in": {"en": "Search in {level}", "zh": "在{level}中搜索", "kind": "label"},
     "ds.field.required": {"en": "Required", "zh": "必填", "kind": "label"},
+    "ds.field.optional": {"en": "Optional", "zh": "可选", "kind": "label"},
     "ds.picker.all": {"en": "All", "zh": "全部", "kind": "label"},
     "ds.picker.loading": {"en": "Loading options…", "zh": "正在加载选项…", "kind": "label"},
     "ds.picker.empty": {"en": "No options available.", "zh": "暂无可选项。", "kind": "label"},
@@ -2899,7 +2900,6 @@
     "medicines.brand.search": {"en": "Search brands", "zh": "搜索品牌", "kind": "label"},
     "medicines.no_brands": {"en": "No brands used yet.", "zh": "尚未使用过任何品牌。", "kind": "body"},
     "medicines.delete": {"en": "Delete", "zh": "删除", "kind": "action"},
-    "medicines.delete_body": {"en": "{name} leaves the list for everyone. Past records keep its name.", "zh": "{name}将从全场的列表中移除。以往记录保留其名称。", "kind": "body"},
     "medicines.detail.days": {"en": "{n} days", "zh": "{n} 天", "kind": "unit"},
     "medicines.detail.day": {"en": "1 day", "zh": "1 天", "kind": "unit"},
     "medicines.details.title": {"en": "Add details", "zh": "添加详情", "kind": "title"},
@@ -2929,6 +2929,7 @@
     "medicines.dose.summary_each": {"en": "{pigs} · {dose} each", "zh": "{n} 头 · 每头 {dose}", "kind": "label"},
     "medicines.dose.summary_adjusted": {"en": "{pigs} · {k} adjusted", "zh": "{n} 头 · {k} 头已调整", "kind": "label"},
     "medicines.pigs.remove_mode": {"en": "Remove pigs", "zh": "移除猪只", "kind": "action"},
-    "medicines.pigs.done": {"en": "Done", "zh": "完成", "kind": "action"}
+    "medicines.pigs.done": {"en": "Done", "zh": "完成", "kind": "action"},
+    "medicines.delete_body": {"en": "Leaves the list for everyone. Past records keep its name.", "zh": "将从全场的列表中移除。以往记录保留其名称。", "kind": "body"}
   }
 }

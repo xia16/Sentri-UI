@@ -87,7 +87,7 @@ test('Brand: a full-width optional row only once a medicine is chosen; the farm\
   M.handleRecordAction(c, 'medicine-open', ''); M.handleRecordAction(c, 'medicine-select', 'amoxicillin');
   const form = M.overlay(c), at = s => form.indexOf(s);
   assert.ok(at('data-picker-key="method"') < at('data-action="brand-open"') && at('data-action="brand-open"') < at('data-bulk-key="dose"'), 'Medicine, Method, Brand, then the dose');
-  assert.match(form, /data-ds="PickerField"[^>]*>[^]*?Brand <small class="medicine-optional">Optional<\/small>[^]*?data-action="brand-open"/, 'a PickerField labelled Brand · Optional');
+  assert.match(form, /data-ds="PickerField"[^>]*>[^]*?Brand <small class="st-field-optional">Optional<\/small>[^]*?data-action="brand-open"/, 'a PickerField labelled Brand · Optional');
   assert.match(form, /data-action="record-optional-open" data-picker-key="target"/, 'Condition: a PickerField');
   assert.match(form, /<textarea data-bulk-key="note"/, 'Note: a textarea on the form');
   assert.doesNotMatch(form, /data-face="row"/);
@@ -110,9 +110,9 @@ test('Note: a three-line textarea on the form, at most 200 characters, a counter
   const c = open(['000267']); M.handleRecordAction(c, 'medicine-select', 'amoxicillin');
   let html = M.overlay(c);
   assert.match(html, /<textarea data-bulk-key="note" rows="3" maxlength="200"/);
-  assert.match(html, /data-note-count[^>]* hidden>/, 'no counter while short');
+  assert.doesNotMatch(html.slice(html.indexOf('data-bulk-key="note"')), /st-field-message/, 'no counter while short');
   c.form.note = 'x'.repeat(180); html = M.overlay(c);
-  assert.match(html, /data-note-count[^>]*>180 \/ 200</);
+  assert.match(html, /data-bulk-key="note"[^]*?class="st-field-message"[^>]*>180 \/ 200</, "the counter is the Field's hint");
 });
 
 test('the medicine remembers its last method and unit; saving makes it the newest recent and its brand the first', () => {

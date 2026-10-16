@@ -13,7 +13,7 @@ Use [Segment](../Segment/README.md) for changing a lens. Use [Field](../Field/RE
 
 ## Anatomy
 
-Visible label; trigger value, chosen names (record forms, up to two lines then +n) or count (filters); trailing chevron; optional persistent reason/error. The sheet is a [Sheet](../Sheet/README.md) drawer: header: the current level as the title and, in a cascade, a ✕ at the top left that closes the whole picker; search pinned at the top of the body; one ChoiceList option group; footer Back (in a cascade, up one level; at the root it leaves), plus Done · n (multi only; a single pick commits, so single has Back alone). No breadcrumb, no ✕.
+Visible label, with an optional muted "Optional" beside it (`optional`, as on [Field](../Field/README.md)); trigger value, chosen names (record forms, up to two lines then +n) or count (filters); trailing chevron; optional persistent reason/error. The sheet is a [Sheet](../Sheet/README.md) drawer: header: the current level as the title and, in a cascade, a ✕ at the top left that closes the whole picker; search pinned at the top of the body; one ChoiceList option group; footer Back (in a cascade, up one level; at the root it leaves), plus Done · n (multi only; a single pick commits, so single has Back alone). No breadcrumb, no ✕.
 
 ## Variants
 
@@ -99,6 +99,8 @@ Where screens today differ from the platform choice (for the owner):
 - Care (4 outcomes), Outcome (2: Recovered / Entered in error), Body condition (2) and Dose unit (3: mL / mg / g) open a picker list today; by the record-sheet law (2–4 outcomes = Choice) the platform equivalent is an inline segmented control or radio rows, not a sheet. Left as approved; flagged.
 
 ## Changelog
+
+2026-10-16 (medicines): `optional` draws Field's muted "Optional" word beside the label (`.st-field-optional`); `reason` carries a persistent caption under the value (the withdrawal period under Medicine and Brand).
 
 2026-10-16 (medicines): search says "Search all options" at every level and spans the tree; adding starts from a search with no match (one `Add “<typed>”` card, then an add level).
 

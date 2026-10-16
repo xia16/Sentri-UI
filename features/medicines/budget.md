@@ -114,7 +114,7 @@ At the Medicines page (a supervisor tidying the list): 1. Which medicines does t
 | Withdrawal period (days) (field, prefilled) | medicine sheet | What withdrawal applies when no brand says otherwise? | editable; the usual case |
 | Group "Brands": brand rows | medicine sheet | Which brands have we used? | no second line; "No brands used yet." when none |
 | Brand sheet: Name, Withdrawal period (days) with "Uses <medicine>'s N days when empty" | brand sheet | Is the name right? Does its label differ from the default? | fields on the sheet; no Rename step |
-| Delete brand / Delete medicine (text action, bottom) → "<name> leaves the list for everyone. Past records keep its name." | sheet bottom, confirm level | Can I remove it, and what happens to past records? | farm-added medicines and brands only; Delete in red on the confirm |
+| Delete brand / Delete medicine (text action, bottom) → a danger Banner: the name, then "Leaves the list for everyone. Past records keep its name." | sheet bottom, confirm level | Can I remove it, and what happens to past records? | farm-added medicines and brands only; Delete in red on the confirm |
 | Footer Back + Save | sheet | Is it kept? | Save waits until something changes |
 | Who added it, when, how often used | — | — | **cut** (Audit) |
 

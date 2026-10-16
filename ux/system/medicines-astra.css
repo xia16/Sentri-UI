@@ -1,70 +1,42 @@
 /* Medicines (features/medicines) in the inspection prototype: layout only; every part is a design-system component. */
 
-/* Record treatment, several pigs: what was given first, then the doses, then the optional rows (owner, 2026-10-16). One
-   scrolling page body; the fields sit straight on the page as on the one-pig form, the pigs in their one card. */
+/* Record treatment, several pigs: what was given first, then the doses, then the optional fields (owner, 2026-10-16). One
+   scrolling page body; the fields sit straight on the page as on the one-pig form. */
 .inspection-phone .bulk-action-layout.is-given-first{min-height:0}
-.inspection-phone .bulk-action-layout.is-given-first>.bulk-controls{display:flex;flex-direction:column;gap:16px;max-height:none;margin:0;padding:0 var(--space-gutter,18px);border:0;border-radius:0;background:transparent;box-shadow:none;overflow:visible}
-.inspection-phone .bulk-action-layout.is-given-first>.bulk-pigs{margin:24px var(--space-gutter,18px) 16px}
-.inspection-phone .bulk-action-layout.is-given-first>.bulk-after{padding-bottom:16px}
+.inspection-phone .bulk-action-layout.is-given-first>.bulk-controls{display:flex;flex-direction:column;gap:16px;max-height:none;margin:0;padding:0 var(--space-gutter,18px);overflow:visible}
+.inspection-phone .bulk-action-layout.is-given-first>.bulk-after{padding-top:16px;padding-bottom:16px}
 .inspection-phone .bulk-action-layout.is-given-first>.bulk-after:empty{display:none}
-@media(max-width:370px){.inspection-phone .bulk-action-layout.is-given-first>.bulk-controls{padding:0 var(--space-gutter-narrow,12px)}.inspection-phone .bulk-action-layout.is-given-first>.bulk-pigs{margin-left:var(--space-gutter-narrow,12px);margin-right:var(--space-gutter-narrow,12px)}}
+@media(max-width:370px){.inspection-phone .bulk-action-layout.is-given-first>.bulk-controls{padding:0 var(--space-gutter-narrow,12px)}}
 
 /* The add level: Name, Medicine, then Category, stacked in capture order. */
 .inspection-phone .medicine-add-fields{display:flex;flex-direction:column;gap:16px}
 .inspection-phone .medicine-add-fields>.field{margin:0}
 
-/* The Medicines page: one group per medicine, a section's gap between them. */
-.inspection-phone .medicines-group+.medicines-group{margin-top:var(--space-section,24px)}
-.inspection-phone .medicine-delete-note{margin:0;font:400 var(--type-row-title-size)/1.5 var(--font-sans);color:var(--ink)}
-
 /* The dose unit beside a short unit ("g") keeps its 48px target. */
 .inspection-phone .bulk-unit-button{min-width:var(--tap-min,48px);justify-content:center}
-/* A medicine's or brand's sheet: its details, then its verbs and brands a section below. */
+/* A medicine's or brand's sheet: its details, then its verbs and brands a section below; Delete closes the form. */
 .inspection-phone .medicine-sheet-verbs{margin-top:var(--space-section,24px)}
 .inspection-phone .medicine-sheet-verbs>*+*{margin-top:var(--space-section,24px)}
-/* The withdrawal notice closes the form, a section below the last field. */
-.inspection-phone .bulk-controls .medicine-withdrawal{margin-top:8px}
-
-/* Record treatment's optional rows (OptionalRow face 'row'), one under another; the pig doses as one list under its label. */
-.inspection-phone .treatment-optionals{display:flex;flex-direction:column;gap:16px}
-.inspection-phone .treatment-optionals>.st-optional-row{margin:0}
-.inspection-phone .bulk-action-layout.is-given-first>.treatment-pig-doses{margin:24px var(--space-gutter,18px) 16px}
-@media(max-width:370px){.inspection-phone .bulk-action-layout.is-given-first>.treatment-pig-doses{margin-left:var(--space-gutter-narrow,12px);margin-right:var(--space-gutter-narrow,12px)}}
-/* A pig's dose sheet and the edit forms: the text action sits under its field; Delete closes the form. */
-.inspection-phone .pig-dose-same{margin-top:8px}
 .inspection-phone .medicine-delete-action{margin-top:var(--space-section,24px)}
-/* "Custom doses" under the Dose field; on its page, the ear-tag search with Scan beside it. */
-.inspection-phone .bulk-given>.custom-doses-row{margin:0}
-.inspection-phone .custom-doses-search{display:flex;align-items:center;gap:8px;margin-bottom:16px}
-.inspection-phone .custom-doses-search>.st-choice-search{flex:1 1 auto;margin:0}
-.inspection-phone .bulk-action-layout.is-given-first>.bulk-after{padding-top:16px}
 
-/* Round 4: the batch's pig list sits on the form, its ear-tag search above it. */
-.inspection-phone .treatment-pig-doses>.custom-doses-search{margin-bottom:8px}
+/* Record treatment's optional fields, one under another. */
+.inspection-phone .treatment-optionals{display:flex;flex-direction:column;gap:16px}
 .inspection-phone .treatment-optionals .field{margin:0}
-/* The grey "Optional" beside an optional field's label (owner, round 4). */
-.inspection-phone .medicine-optional{margin-left:6px;font:400 13px/1.4 var(--font-sans);color:var(--muted)}
-/* A pig's box shows the shared dose as its placeholder in ink-2, regular (7.4:1: a 16px figure the worker acts on holds 7:1); a typed (own) dose is ink, bold. */
-.inspection-phone [data-bulk-kind="treatment"] .bulk-reading input::placeholder{color:var(--ink-2);font-weight:400;opacity:1}
-
-/* Round 5: the Note's counter (from 160 characters) under it, right-aligned; the batch's pig and Custom doses rows. */
-.inspection-phone .medicine-note{display:flex;flex-direction:column;gap:4px}
+/* The Note: three lines; its counter (from 160 characters) is the Field's hint under it. */
 .inspection-phone .medicine-note textarea{min-height:calc(3 * 1.5em + 24px);resize:none}
-.inspection-phone .medicine-note .field>span:first-child{display:flex;align-items:baseline}
-.inspection-phone .medicine-note-count{margin-left:auto;font:400 var(--type-meta-size)/1.4 var(--font-sans);color:var(--muted)}
-.inspection-phone .medicine-note-count[hidden]{display:none}
-.inspection-phone .sheet.custom-doses-sheet[data-presentation="page"]>.sheet-body{padding:0 var(--space-gutter,18px) 16px}
-.inspection-phone .custom-doses-sheet .sheet-body>.bulk-pigs{margin:0}
-@media(max-width:370px){.inspection-phone .sheet.custom-doses-sheet[data-presentation="page"]>.sheet-body{padding:0 var(--space-gutter-narrow,12px) 16px}}
 
-/* In place (owner, 2026-10-16): Dosage and Unit side by side, each its own labelled 48px field; the adjust line under them. */
+/* Dosage and Unit side by side, each its own labelled 48px field; the Adjust row under them. */
 .inspection-phone .treatment-dosage{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:12px;align-items:end}
 .inspection-phone .treatment-dosage>.field{margin:0}
-/* The per-pig page: the dosage reads regular; a pig's own (adjusted) dose ink and bold, "Adjusted" under it. */
-.inspection-phone .custom-doses-sheet .bulk-reading input{font-weight:400}
-.inspection-phone .custom-doses-sheet .bulk-reading input[data-own="true"]{font-weight:700;color:var(--ink)}
-/* Remove mode: the remove control takes the dose box's place on the right; the tool line sits right-aligned above the list. */
+.inspection-phone [data-dosage-adjust]:empty{display:none}
+
+/* The per-pig page: the ear-tag search with Scan beside it, the tool line right-aligned above the list; in remove mode the
+   remove control takes the dose box's place on the right. */
+.inspection-phone .sheet.custom-doses-sheet[data-presentation="page"]>.sheet-body{padding:0 var(--space-gutter,18px) 16px}
+@media(max-width:370px){.inspection-phone .sheet.custom-doses-sheet[data-presentation="page"]>.sheet-body{padding:0 var(--space-gutter-narrow,12px) 16px}}
+.inspection-phone .custom-doses-sheet .sheet-body>.bulk-pigs{margin:0}
+.inspection-phone .custom-doses-search{display:flex;align-items:center;gap:8px;margin-bottom:16px}
+.inspection-phone .custom-doses-search>.st-choice-search{flex:1 1 auto;margin:0}
 .inspection-phone .custom-doses-sheet .bulk-pig-row{grid-template-columns:minmax(0,1fr) auto}
 .inspection-phone .dose-remove{display:flex;justify-content:flex-end}
 .inspection-phone .dose-list-tools{display:flex;justify-content:flex-end;margin:-8px 0 0}
-.inspection-phone [data-dosage-adjust]:empty{display:none}

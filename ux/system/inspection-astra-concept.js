@@ -845,16 +845,15 @@ function withdrawalCaption(c,where){
 /* The treatment's optional fields (owner, 2026-10-16, rounds 4 and 5): Brand, Condition and Note are ordinary labelled fields
    like Medicine and Method, with a grey "Optional" beside the label. The owner approved this face; the Field law and component
    change come as their own shared PR. Brand appears only once a medicine is chosen. */
-const medOptionalLabel=html=>html.replace(/(<span id="[^"]+-label">)([^<]*)(<\/span>)/,(_,a,b,z)=>a+b+' <small class="medicine-optional">'+esc(str('medicines.optional'))+'</small>'+z);
-const brandField=c=>{const f=c.form;return f.medicineId?medOptionalLabel(SentriUI.pickerField({label:str('medicines.brand.field'),value:f.brand||'',action:'brand-open',key:'brand',reason:withdrawalCaption(c,'brand')})):'';};
+const brandField=c=>{const f=c.form;return f.medicineId?SentriUI.pickerField({label:str('medicines.brand.field'),optional:str('medicines.optional'),value:f.brand||'',action:'brand-open',key:'brand',reason:withdrawalCaption(c,'brand')}):'';};
 /* Note: about three lines, typed into directly; at most 200 characters (input stops at the limit); a counter from 160. */
 const NOTE_MAX=200,NOTE_COUNT_FROM=160;
 const noteCount=n=>n>=NOTE_COUNT_FROM?str('medicines.note.count',{n,max:NOTE_MAX}):'';
 function treatmentOptionals(c){
  const f=c.form,n=[...(f.note||'')].length;
- const condition=!f.returnFinding&&f.taskId!=='vaccination'?medOptionalLabel(SentriUI.pickerField({label:str('medicines.condition'),value:f.target||'',action:'record-optional-open',key:'target'}).replace('data-picker-key="target"','data-picker-key="target" data-value="target"')):'';
- /* The counter sits at the end of the label line, so it is in view with the start of the note. */
- const note=SentriUI.field({label:esc(str('medicines.note'))+' <small class="medicine-optional">'+esc(str('medicines.optional'))+'</small><small class="medicine-note-count" data-note-count aria-live="polite"'+(noteCount(n)?'':' hidden')+'>'+esc(noteCount(n))+'</small>',variant:'textarea',control:'<textarea data-bulk-key="note" rows="3" maxlength="'+NOTE_MAX+'" aria-label="'+esc(str('medicines.note'))+'">'+esc(f.note||'')+'</textarea>'});
+ const condition=!f.returnFinding&&f.taskId!=='vaccination'?SentriUI.pickerField({label:str('medicines.condition'),optional:str('medicines.optional'),value:f.target||'',action:'record-optional-open',key:'target'}).replace('data-picker-key="target"','data-picker-key="target" data-value="target"'):'';
+ /* The counter is Field's hint, under the note, from 160 characters. */
+ const note=SentriUI.field({label:esc(str('medicines.note')),optional:str('medicines.optional'),variant:'textarea',hint:noteCount(n),control:'<textarea data-bulk-key="note" rows="3" maxlength="'+NOTE_MAX+'" aria-label="'+esc(str('medicines.note'))+'">'+esc(f.note||'')+'</textarea>'});
  return '<div class="treatment-optionals">'+condition+'<div class="medicine-note">'+note+'</div></div>';
 }
 const medDose=v=>{const t=String(v??'').trim(),n=Number(t);return t!==''&&Number.isFinite(n)&&n>0?n:null;};
@@ -931,7 +930,7 @@ function medPageChanged(c){const t=medPageTarget(c),d=medPageDraft(c);if(!t)retu
 function medicineSheet(c){
  const pg=medPage(c),m=medicineById(c,pg.medicine);if(!m)return '';
  const t=medPageTarget(c),lv=levels(c,m.name),wrap=html=>html.replace('class="sheet"','class="sheet medicine-sheet-step"');
- if(pg.level==='delete')return wrap(sheet(c,lv.title,'','<p class="medicine-delete-note">'+esc(str('medicines.delete_body',{name:t.name}))+'</p>',SentriUI.sheetFooter({content:SentriUI.backButton(lv.levelBack)+SentriUI.button({label:str('medicines.delete'),register:'danger',action:'medicines-delete-save'})})));
+ if(pg.level==='delete')return wrap(sheet(c,lv.title,'',SentriUI.banner({tone:'danger',headline:t.name,consequence:str('medicines.delete_body')}),SentriUI.sheetFooter({content:SentriUI.backButton(lv.levelBack)+SentriUI.button({label:str('medicines.delete'),register:'danger',action:'medicines-delete-save'})})));
  const d=medPageDraft(c),save=SentriUI.sheetFooter({content:SentriUI.backButton(lv.levelBack)+SentriUI.button({label:str('medicines.save'),register:'primary',action:'medicines-edit-save',waiting:!medPageChanged(c)||!d.name.trim()})});
  const input=(key,label,{number=false,hint=''}={})=>SentriUI.field({label,hint,variant:number?'number':'text',control:'<input'+(number?' type="number" inputmode="numeric" min="0" step="1"':'')+' data-med-edit="'+key+'" maxlength="80" value="'+esc(d[key])+'">'});
  const del=label=>'<div class="medicine-delete-action">'+SentriUI.button({label,register:'text',action:'medicines-level',value:'delete'})+'</div>';
@@ -939,7 +938,7 @@ function medicineSheet(c){
   const fallback=m.withdrawal!=null?str('medicines.detail.uses_default',{medicine:m.name,days:medDaysLabel(m.withdrawal)}):str('medicines.detail.no_default',{medicine:m.name});
   return wrap(sheet(c,lv.title,'','<div class="medicine-add-fields">'+input('name',str('medicines.add.name'))+input('withdrawal',str('medicines.detail.withdrawal'),{number:true,hint:fallback})+'</div>'+del(str('medicines.delete_brand_action')),save));
  }
- const brands=medBrands(c,m.id),brandGroup=brands.length?SentriUI.choiceGroup(brands.map(x=>SentriUI.choiceRow({label:x.name,mode:'navigate',action:'medicines-brand',value:x.id})),{title:str('medicines.group.brands')}):'<p class="medicine-delete-note">'+esc(str('medicines.no_brands'))+'</p>';
+ const brands=medBrands(c,m.id),brandGroup=brands.length?SentriUI.choiceGroup(brands.map(x=>SentriUI.choiceRow({label:x.name,mode:'navigate',action:'medicines-brand',value:x.id})),{title:str('medicines.group.brands')}):SentriUI.choiceEmpty(str('medicines.no_brands'));
  const fields=(m.catalogue?'':input('name',str('medicines.add.name')))+input('withdrawal',str('medicines.detail.default_withdrawal_days'),{number:true});
  return wrap(sheet(c,lv.title,'','<div class="medicine-add-fields">'+fields+'</div><div class="medicine-sheet-verbs">'+brandGroup+'</div>'+(m.catalogue?'':del(str('medicines.delete_medicine_action'))),save));
 }
@@ -1041,7 +1040,7 @@ function installBulkInputs(){
   const f=c.form;
   if(el.hasAttribute('data-bulk-include')){f.excluded=el.checked?f.excluded.filter(id=>id!==el.dataset.bulkInclude):[...new Set([...f.excluded,el.dataset.bulkInclude])];}
   else if(el.hasAttribute('data-bulk-value')){if(c.view==='pig-doses'){const id=el.dataset.bulkValue;if(el.value.trim()===''||el.value.trim()===String(f.dose??'').trim())delete f.values[id];else f.values[id]=el.value;el.dataset.own=String(Object.hasOwn(f.values,id));if(e.type==='change'&&el.value.trim()===''){el.value=f.dose??'';}}else f.values[el.dataset.bulkValue]=el.value;}
-  else {f[el.dataset.bulkKey]=el.value;if(el.dataset.bulkKey==='dose'){const line=root.querySelector('[data-dosage-adjust]');if(line)line.innerHTML=dosageAdjustLine(c);}if(el.dataset.bulkKey==='note'){const box=root.querySelector('[data-note-count]'),t=noteCount([...el.value].length);if(box){box.textContent=t;box.hidden=!t;}}}
+  else {f[el.dataset.bulkKey]=el.value;if(el.dataset.bulkKey==='dose'){const line=root.querySelector('[data-dosage-adjust]');if(line)line.innerHTML=dosageAdjustLine(c);}if(el.dataset.bulkKey==='note'){const fd=el.closest('.field'),t=noteCount([...el.value].length);let box=fd?.querySelector('.st-field-message');if(t&&!box&&fd){box=document.createElement('span');box.className='st-field-message';box.setAttribute('role','status');fd.appendChild(box);}if(box){box.textContent=t;box.hidden=!t;}}}
   if(el.value.trim()!==''&&el.getAttribute('aria-invalid')==='true'&&!el.hasAttribute('data-bulk-value')){el.setAttribute('aria-invalid','false');const fd=el.closest('.field');fd?.classList.remove('error');el.closest('.bulk-same-box')?.classList.remove('is-invalid');el.closest('.bulk-same-dose,.bulk-dose-field')?.querySelector('.bulk-required')?.remove();fd?.querySelector('.st-field-message')?.remove();}
   const rail=root.querySelector('[data-bulk-rows]');
   if(el.hasAttribute('data-bulk-value')){
