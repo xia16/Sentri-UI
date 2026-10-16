@@ -134,6 +134,15 @@ export async function evaluate(opts) {
   // ---------- the evidence store and the identities ----------
   const gateDir = path.join(path.resolve(root, git(['rev-parse', '--git-common-dir'], root).out.trim()), 'sentri-gate');
   const store = new EvidenceStore(path.join(gateDir, 'evidence'));
+  // reused and computed, per evidence kind: what mechanical.json's evidence.byKind reports
+  const tally = {};
+  const plan_ = (list) => {
+    const p = planEvidence(list, (k, id) => store.get(k, id));
+    for (const { item } of p.reuse) (tally[item.kind] ||= { reused: 0, computed: 0 }).reused++;
+    for (const it of p.compute) (tally[it.kind] ||= { reused: 0, computed: 0 }).computed++;
+    return p;
+  };
+  const tallyRepo = (kind, reused) => { (tally[kind] ||= { reused: 0, computed: 0 })[reused ? 'reused' : 'computed']++; };
   const sched = createScheduler({ playwright, log });
   cleanups.push(() => { sched.close(); });
   const browser = await sched.browser();
@@ -178,6 +187,7 @@ export async function evaluate(opts) {
   const repoId = (kind) => identityOf(kind, { tree: wholeTree('cand'), node: process.version, playwright: pwVersion, gate: kind === 'atlas' ? codeHash(root, ['scripts/evaluate.mjs']) : null });
   {
     const id = repoId('atlas'), had = store.get('atlas', id);
+    tallyRepo('atlas', !!had);
     if (had) check('atlas.json is regenerated', true, 'reused (same tree)');
     else {
       const strip = (s) => { const j = JSON.parse(s); delete j.generated; delete j.commit; return JSON.stringify(j); };
@@ -240,7 +250,7 @@ export async function evaluate(opts) {
     items.push({ kind: 'shot', id: shotId(side, x, width, lang, vmode), side, x, width, lang, vmode });
     for (const c of visitChecks(side, x, width, lang)) items.push({ kind: `check-${c.name}`, id: checkId(side, x, width, lang, c.name, c.params), side, x, width, lang, name: c.name, params: c.params, vmode });
   }
-  const plan = planEvidence(items, (k, id) => store.get(k, id));
+  const plan = plan_(items);
   const results = new Map();  // id → record (stored, or computed now)
   for (const { item, record } of plan.reuse) results.set(item.id, { ...record, reused: true });
   // Group what must be computed into visits: one per side, screen, width and language.
@@ -294,7 +304,7 @@ export async function evaluate(opts) {
     const [, comp, variant] = /^ux\/design-system\/components\/([^/]+)\/variants\/([^/]+)\.html$/.exec(f);
     stateItems.push({ kind: 'state', id, side, file: f, comp, variant });
   }
-  const statePlan = planEvidence(stateItems, (k, id) => store.get(k, id));
+  const statePlan = plan_(stateItems);
   for (const { item, record } of statePlan.reuse) results.set(item.id, { ...record, reused: true });
   const stateTask = (it) => ({
     kind: 'state', label: `${it.side} ${it.comp}/${it.variant}`, priority: 1,
@@ -317,6 +327,7 @@ export async function evaluate(opts) {
   // ---------- npm test (its own browsers: two of the scheduler's slots) ----------
   const testId = repoId('npm-test');
   const testHad = store.get('npm-test', testId);
+  tallyRepo('npm-test', !!testHad);
   const npmTest = testHad ? Promise.resolve({ ...testHad, reused: true }) : sched.run({
     kind: 'npm-test', label: 'npm test', weight: 2, priority: 0, browserless: true,
     run: () => new Promise((res) => {
@@ -544,7 +555,7 @@ export async function evaluate(opts) {
       const x = S[side].ds.find((p) => p.id === id);
       if (x) dsItems.push({ kind: 'ds-headers', id: identityOf('ds-headers', { screen: screenInputs(side, id), harness: harness(side), render, width: 360, lang: 'en', code: code.visit, checker: code.headers }), side, x });
     }
-    const p = planEvidence(dsItems, (k, id) => store.get(k, id));
+    const p = plan_(dsItems);
     for (const { item, record } of p.reuse) results.set(item.id, record);
     await Promise.all(p.compute.map((it) => sched.run({ kind: 'visit', label: `${it.side} ${it.x.id} headers`, priority: 0, run: async ({ browser: b }) => {
       const vis = await prepareVisit(b, { url: urlOf(it.side, it.x), mode: 'atlas', width: 360, lang: 'en', fontsRoot: S[it.side].fontsRoot });
@@ -572,7 +583,8 @@ export async function evaluate(opts) {
   mark('checks');
 
   // ---------- 7. scenario leaves: the reach's leaves (and the scope's), on the candidate; the failing ones on base ----------
-  const leafSet = new Set(reach.leaves || []);
+  // --quick: the scope's features only; otherwise the reach's leaves (the stand-in: every leaf of a feature with a screen in reach)
+  const leafSet = new Set(quick ? [] : reach.leaves || []);
   const specOf = (side, f) => { try { return JSON.parse(fs.readFileSync(path.join(S[side].dir, 'features', f, 'scenarios.json'), 'utf8')); } catch { return null; } };
   const featuresWithLeaves = (side) => (fs.existsSync(path.join(S[side].dir, 'features')) ? fs.readdirSync(path.join(S[side].dir, 'features')).filter((f) => fs.existsSync(path.join(S[side].dir, 'features', f, 'scenarios.json'))) : []);
   const leafPlan = [];
@@ -594,7 +606,7 @@ export async function evaluate(opts) {
   };
   const runLeaves = async (side, f, plan) => {
     const runner = leafRunner({ base: S[side].url, defaults: plan.D, verbs: verbsOf(side), evidenceDir: path.join(out, 'leaves', side, f) });
-    const todo = planEvidence(plan.its.filter((i) => i.kind), (k, id) => store.get(k, id));
+    const todo = plan_(plan.its.filter((i) => i.kind));
     for (const { item, record } of todo.reuse) results.set(item.id, { ...record.run, reused: true });
     await Promise.all(todo.compute.map((it) => sched.run({ kind: 'leaf', label: `${side} ${it.leaf.node.id} ${it.lang}-${it.width}`, priority: 2, run: async ({ browser: b }) => {
       let r;
@@ -684,8 +696,11 @@ export async function evaluate(opts) {
   const keepBases = git(['rev-list', '--first-parent', '-n', '10', mech.base], root).out.split(/\s+/).filter(Boolean);
   const swept = store.sweep(keepBases);
   const st = sched.stats;
-  mech.evidence = { ...mech.evidence, hits: store.hits, misses: store.misses, swept, scheduler: { workers: WORKERS, lowest: st.lowest, retried: st.retried, machineTwice: st.machineTwice, busy: Object.fromEntries(Object.entries(st.byKind).map(([k, v]) => [k, { n: v.n, s: secs(v.ms) }])) } };
+  mech.evidence = { ...mech.evidence, byKind: tally, hits: store.hits, misses: store.misses, swept, scheduler: { workers: WORKERS, lowest: st.lowest, retried: st.retried, machineTwice: st.machineTwice, busy: Object.fromEntries(Object.entries(st.byKind).map(([k, v]) => [k, { n: v.n, s: secs(v.ms) }])) } };
   const span = (a, b) => (at[a] && at[b] ? secs(at[b] - at[a]) : null);
-  mech.timings = { setup: secs(at.setup - t0), plan: span('setup', 'plan'), repoChecks: span('plan', 'submit'), visits: span('submit', 'visits'), compare: span('visits', 'compare'), confirm: span('compare', 'confirm'), pairs: span('confirm', 'pairs'), checks: span('pairs', 'checks'), leaves: span('checks', 'leaves'), states: span('leaves', 'states'), npmTest: span('states', 'npmtest') };
+  // Wall-clock phases, in order (the scheduler's busy time per kind is in evidence.scheduler.busy): worktrees and atlases; the
+  // repository checks, servers and the evidence plan; the visits (state checks and npm test run beside them); comparing shots; the
+  // confirming visits; the pair images; the visit checks; the leaves; what was left of the state checks; what was left of npm test.
+  mech.timings = { worktrees: secs(at.setup - t0), prepare: span('setup', 'submit'), visits: span('submit', 'visits'), compare: span('visits', 'compare'), confirm: span('compare', 'confirm'), pairs: span('confirm', 'pairs'), checks: span('pairs', 'checks'), leaves: span('checks', 'leaves'), statesTail: span('leaves', 'states'), npmTestTail: span('states', 'npmtest') };
   return finish();
 }
