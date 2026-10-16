@@ -3215,8 +3215,8 @@
                 "shows": "The plain count \"N sows selected\" and the primary \"Actions\""
               }
             ],
-            "rule": "Stop scanning only pauses listening: the list stays. The stop glyph is not in the shared icon registry yet; the Farrowing page adds it from ux/system/farrowing-icons.js.",
-            "source": "farrowing-astra-concept.js scanPage(), farrowing-icons.js"
+            "rule": "Stop scanning only pauses listening: the list stays.",
+            "source": "farrowing-astra-concept.js scanPage()"
           }
         ],
         "controls": [
