@@ -22,6 +22,7 @@ Group heading (optional); lead control (optional); option label; meta line (opti
 - **Multi** (`multi`): use for independent values with trailing checkboxes; use single for one value instead.
 - **Radio rows** (`radio`): use for two to four recorded outcomes with visible rings; use PickerField for five or more outcomes instead.
 - **Inline Choice** (`inline`): use for two or three short required outcomes in one 60px row; use radio rows for long labels, and an optional row for an optional input.
+- **Inline Choice, key face** (`inline` with `face: 'key'`, candidate): the same radiogroup drawn as two or three boxed keys in the Stepper row's right column, for a required No / Yes among Stepper rows and Measures (Finish farrowing: Assisted). Each key is the stepper key's face: `paper`, 1px `task-key-border`, `radius-control`, 16px/500, 44px tall in a 48px hit area, an 8px gap; the column runs from the first key's left edge to the last key's right edge (136px). The chosen key takes the selected mark, a 2px `ink` ring and a 600 label, never a fill. Pressed is the keys' press (`press`, scale .96). A row of this face carries a 1px `line` below it, none when last, like a Stepper row. Opt-in: every other inline caller renders as before. Use it only for a required answer; an optional one stays an optional row.
 
 ## States
 
@@ -51,7 +52,7 @@ Rows meet `tap-min` (radio and inline rows `radio-row-min`). Single rows expose 
 
 ## API and tokens
 
-`choiceRow`, `choiceGroup`, `choiceSearch`, `choiceEmpty`, `choiceRadios`, `radioBind`; `pickerOptions` is a compatibility adapter. `secondaryAction` exposes a separately named removal control. `labelHidden` hides only the field label when an enclosing optional row already names it; the accessible label and Clear remain. Types in `../index.d.ts`.
+`choiceRow`, `choiceGroup`, `choiceSearch`, `choiceEmpty`, `choiceRadios` (`layout: 'inline'`, `face: 'key'`), `radioBind`; `pickerOptions` is a compatibility adapter. `secondaryAction` exposes a separately named removal control. `labelHidden` hides only the field label when an enclosing optional row already names it; the accessible label and Clear remain. Types in `../index.d.ts`.
 
 Tokens: `tap-min`, `choice-row-min`, `radio-row-min`, `rule`, `paper`, `ink`, `muted`, `green`, `choice-press`, `disabled-surface`, `font-sans`, `font-size-14`, `type-weight-strong`, `space-8`, `space-12`, `size-20`, `size-24`.
 
@@ -91,6 +92,8 @@ Wheels (`UIPickerView`, `NumberPicker`) are for long ordered values only (dates,
 2026-10-16 (medicines, owner decision 3): adding starts from a search with no match (one `Add “<typed>”` card, then an add level); the always-shown "Add a brand" row is retired with the Brand field. A secondary group (recently used) takes a group heading.
 
 2026-10-16 (owner ruling B): a drawer with levels has no "‹ Parent": the title names the level, the footer's Back goes up one level, a ✕ at the top left closes the whole drawer. The multi variant's specimens (a level of a cascade) carry the ✕ and a Back that goes up.
+
+2026-10-15 (Finish farrowing): the inline key face (`face: 'key'`), variant `inline-key`, used by Finish farrowing's Assisted (No preselected, no Clear) and Edit finish details.
 
 2026-10-10 (multi-choice family): single-choice sheets have Back alone and sit on the bottom edge; specimens drawn in the phone; Native mapping.
 
