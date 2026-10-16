@@ -76,6 +76,7 @@ const SYSTEM = [
   /^ux\/system\/atlas-bare\.js$/,
   /^ux\/system\/[^/]+\.css$/,
 ];
+const SHEET = /^ux\/system\/[^/]+\.css$/;
 // The shared system: SYSTEM, plus `shared` (sharedFiles on the base checkout). The gate's escalation and its queue both use it.
 export const touchesSystem = (files, shared = {}) => files.filter((f) => SYSTEM.some((re) => re.test(f)) || Object.hasOwn(shared, f));
 
@@ -401,10 +402,14 @@ export function reachOf({ files, screens = [], assets = {}, shared = {}, scope =
   for (const f of files) {
     const own = f.match(/^features\/([^/]+)\//);
     if (own) { features.add(own[1]); note(`${own[1]}'s own files`, f); continue; }
-    if (SYSTEM.some((re) => re.test(f)) || RENDERS.some((re) => re.test(f))) { all = true; note('draws on every screen', f); continue; }
     const u = users.get(f);
-    if (Object.hasOwn(shared, f) || u?.size > 1) { all = true; note(`loaded by pages of ${(shared[f] || [...u]).length} features`, f); continue; }
-    if (u) { for (const x of u) features.add(x); note(`a page of ${[...u][0]} or what it loads`, f); continue; }
+    // A shared prototype stylesheet the pages load by name reaches the features whose pages load it, like any shared file below;
+    // the bundle, the tokens and the harness draw on every screen whatever loads them.
+    if (RENDERS.some((re) => re.test(f)) || SYSTEM.some((re) => re.test(f) && !(u && SHEET.test(f)))) { all = true; note('draws on every screen', f); continue; }
+    // A file the pages load by name reaches exactly the features whose pages load it (both sides' pages): one feature, or the
+    // several a shared file serves. Its class is still shared (effectiveClass) and it still queues; only the shots narrow.
+    if (u) { for (const x of u) features.add(x); note(u.size > 1 ? `loaded by pages of ${u.size} features` : `a page of ${[...u][0]} or what it loads`, f); continue; }
+    if (Object.hasOwn(shared, f)) { all = true; note('shared on base, and no page loads it now', f); continue; }
     // A component's own pages and notes (its variant pages, variants.json, gate.json, README) are read by the atlas, never loaded
     // by a screen's page: they reach that component's pages (ds:<Name>/…, feature design-system), not every screen.
     const doc = f.match(/^ux\/design-system\/components\/([^/]+)\/(variants\/[^/]+\.html|variants\.json|gate\.json|README\.md)$/);

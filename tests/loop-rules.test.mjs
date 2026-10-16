@@ -350,11 +350,20 @@ test("reach: a feature's own folder reaches that feature", () => {
   assert.equal(reach(['features/weaning/budget.md']).all, false);
 });
 
-test('reach: the bundle, tokens, the harness, the shooter, the atlas, packages and anything 2+ features load reach every screen', () => {
+test('reach: the bundle, tokens, the harness, the shooter, the atlas and packages reach every screen', () => {
   for (const f of ['ux/design-system/components/bundle.js', 'ux/design-system/tokens.css', 'ux/system/atlas-bare.js', 'scripts/shoot-screens.mjs', 'scripts/serve-ux.cjs', 'scripts/font-route.mjs',
-    'atlas/atlas.json', 'sections/mobile.json', 'package.json', 'package-lock.json', 'vendor/fonts/manifest.json',
-    'ux/system/astra-surfaces.js', 'ux/system/farrowing-astra-concept.js']) assert.equal(reach([f]).all, true, f);
-  assert.match(reachLine(reach(['ux/system/astra-surfaces.js']), 291), /^reach: all screens \(ux\/system\/astra-surfaces\.js: loaded by pages of 3 features\)/);
+    'atlas/atlas.json', 'sections/mobile.json', 'package.json', 'package-lock.json', 'vendor/fonts/manifest.json']) assert.equal(reach([f]).all, true, f);
+});
+
+test('reach: a file 2+ features load reaches exactly the features whose pages load it (the class is still shared)', () => {
+  assert.deepEqual([reach(['ux/system/astra-surfaces.js']).all, reach(['ux/system/astra-surfaces.js']).features], [false, ['farrowing', 'inspection', 'move']]);
+  assert.deepEqual(reach(['ux/system/farrowing-astra-concept.js']).features, ['farrowing', 'move'], 'a page two features draw from');
+  assert.match(reachLine(reach(['ux/system/astra-surfaces.js']), 40), /^reach: 40 screen\(s\) in features farrowing, inspection, move \(ux\/system\/astra-surfaces\.js: loaded by pages of 3 features\)/);
+  const w = reachWorld();
+  w.assets['ux/system/farrowing-astra-concept.html'].push('ux/system/farrowing-astra-unified.css');
+  assert.deepEqual(reachOf({ ...w, files: ['ux/system/farrowing-astra-unified.css'] }).features, ['farrowing', 'move'], 'a prototype stylesheet the pages load by name');
+  assert.equal(reach(['ux/system/sentri-visual-foundation.css']).all, true, 'a stylesheet no page loads by name may be imported anywhere');
+  assert.equal(effectiveClass({ declared: 'presentation', files: ['ux/system/astra-surfaces.js'], diffs: [], scope: ['farrowing'], shared: reachWorld().shared }).cls, 'shared', 'it still queues');
 });
 
 test('reach: a ux file no page loads by name reaches every screen, since a page may fetch it', () => {
