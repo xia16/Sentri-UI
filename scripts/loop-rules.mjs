@@ -443,9 +443,10 @@ export function shotsToTake(needs, cached = [], has = () => true) {
   return { reuse, take: [...take.values()] };
 }
 
-// A scenario run that failed only because a navigation timed out (page.goto, a reload, Back, waitForLoadState) says nothing about
-// the design: it is run once more. An assertion failure, a missing control or a page error never retries.
-const NAV_TIMEOUT = /\b(page|frame)\.(goto|reload|goBack|goForward|waitForLoadState|waitForURL|waitForNavigation): Timeout \d+ms exceeded/;
+// A scenario run that failed only because a navigation timed out (page.goto, a reload, Back, waitForLoadState), or was refused by
+// the network (net::ERR_*, e.g. ERR_NO_BUFFER_SPACE when Windows ran out of sockets under parallel runs, #187 2026-10-17), says
+// nothing about the design: it is run once more. An assertion failure, a missing control or a page error never retries.
+const NAV_TIMEOUT = /\b(page|frame)\.(goto|reload|goBack|goForward|waitForLoadState|waitForURL|waitForNavigation): (Timeout \d+ms exceeded|net::ERR_[A-Z_]+)/;
 export const timedOutOnly = (failures) => failures.length > 0 && failures.every((f) => NAV_TIMEOUT.test(String(f.got)));
 
 // A failed gh / GitHub API call that is the network, not an answer: EOF, TLS, a timeout, a reset or refused connection, a name that
