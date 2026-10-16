@@ -1,6 +1,6 @@
 # Gate v2: one module, static reach, evidence by identity
 
-Status: a proposal. It was reviewed blind and then challenged by another model family (GPT-6, 2026-10-16), and every finding below is folded in. Nothing in it is built yet. It replaces the "lanes" plan (opt-in fast path, reach by caller), the replay proof and the tripwire as acceptance.
+Status: approved by the owner (2026-10-16, "fix everything") after a blind review and a challenge by another model family (GPT-6), whose every finding is folded in. The evidence half (§1, §3, §4, §5) is built: `scripts/evaluate.mjs`, `evidence.mjs`, `scheduler.mjs`, `visit.mjs`, `settle.mjs`, `machine.mjs`; the analyser (§2) plugs in through `scripts/static-reach.mjs`, with a stand-in that answers everything until then. It replaces the "lanes" plan (opt-in fast path, reach by caller), the replay proof and the tripwire as acceptance.
 
 ## The owner's rules it has to keep
 - No screen changes that nobody saw: every moved screen gets its four pairs (390/360 × EN/ZH) and the blind judge.
