@@ -1507,7 +1507,7 @@
        "label": "type 12,6 in the Litter weight field",
        "taps": [
         {
-         "fill": "input[data-field='weight']",
+         "fill": "[data-card='0'] input[data-field='weight']",
          "value": "12,6"
         }
        ],
