@@ -1,7 +1,8 @@
 // The header check: the Headers law (ux/design-system/README.md, "Headers") made measurable. Five defects:
 //   gap       the header-to-body gap is not space-section (24px ±2): a drawer from its hairline, a page from its last line
 //             (the bottom of its title block or Back, whichever is lower) to the first body content (text, a control, a box)
-//   contents  a header holds a control other than Back (‹ Parent in a drawer with levels), the subject chip and a sheet
+//   contents  a header holds a control other than Back (a page's; a drawer's Back is in its footer, and a drawer with levels goes up with it:
+//             no ‹ Parent in a header, owner ruling B 2026-10-16), the subject chip and a sheet
 //             header's corner actions (Clear or Reset at the top right, a ✕ at the top left), an aside, or a number-with-unit
 //             count ("2 sows", "3 unsaved", "7 / 18", "11 头") in its title or header line
 //   corner    a corner action whose vertical centre is more than 2px off the centre of the header's text block (the title's
@@ -53,8 +54,9 @@ function auditHeaders({ TOL, checks }) {
   const titleOf = (h) => h.querySelector('.st-page-title, .sheet-title, h1, h2, h3');
   const linesOf = (h) => [...h.querySelectorAll('.st-header-line, .sheet-subtitle')].filter(vis);
   const where = (h) => (isPage(h) ? 'page header' : 'sheet header') + ` "${txt(titleOf(h)).slice(0, 40)}"`;
-  // Back (top left of a page, a lead "Back to …" icon button) and ‹ Parent act; the subject chip acts; nothing else does.
-  const allowed = (el) => el.matches('.st-page-back, .st-subject-chip, .sheet-up') || /(^|[-_\s])back($|[-_\s])/i.test(typeof el.className === 'string' ? el.className : '') || /^(back|返回)\b/i.test((el.getAttribute('aria-label') || txt(el)).trim());
+  // Back (top left of a page, a lead "Back to …" icon button) acts; the subject chip acts; a sheet's corner actions act; nothing
+  // else does. ‹ Parent no longer does (ruling B, 2026-10-16): a drawer with levels goes up with its footer Back and closes with ✕.
+  const allowed = (el) => el.matches('.st-page-back, .st-subject-chip') || /(^|[-_\s])back($|[-_\s])/i.test(typeof el.className === 'string' ? el.className : '') || /^(back|返回)\b/i.test((el.getAttribute('aria-label') || txt(el)).trim());
   // A corner action (sheet header only; owner ruling C, 2026-10-14): Clear or Reset as quiet text at the top right, a ✕ at the
   // top left. Which corner is told by where the control sits in its header.
   const cornerOf = (h, el) => {
@@ -71,7 +73,7 @@ function auditHeaders({ TOL, checks }) {
   for (const h of headers) {
     const title = titleOf(h), lines = linesOf(h), note = { kind: isPage(h) ? 'page' : 'sheet', title: txt(title).slice(0, 40), lines: lines.length };
     seen.push(note);
-    const controls = [...h.querySelectorAll('button, a[href], [role="button"], [role="link"], input, select, textarea, [contenteditable="true"]')].filter((el) => vis(el) && !el.parentElement.closest('.st-page-back, .st-subject-chip, .sheet-up, button, a[href]'));
+    const controls = [...h.querySelectorAll('button, a[href], [role="button"], [role="link"], input, select, textarea, [contenteditable="true"]')].filter((el) => vis(el) && !el.parentElement.closest('.st-page-back, .st-subject-chip, button, a[href]'));
     const corners = controls.map((el) => ({ el, side: cornerOf(h, el) })).filter((c) => c.side);
     note.corners = corners.map((c) => c.side);
     // ---- corner: each corner action a 48px target, vertically centred (±2px) on the text block: the title's top to the
@@ -123,6 +125,16 @@ function auditHeaders({ TOL, checks }) {
         const past = [...rs, ...boxes].some((r) => r.right > right || r.left < left) || l.scrollWidth > l.clientWidth + 1;
         if (rows.size > 1 || l.getBoundingClientRect().height > Math.max(lh, ...boxes.map((b) => b.height)) * 1.5) out.push({ check: 'wrap', at: Math.round(l.getBoundingClientRect().top), detail: `${where(h)}: the header line "${txt(l).slice(0, 40)}" wraps onto ${Math.max(2, rows.size)} lines` });
         else if (past) out.push({ check: 'wrap', at: Math.round(l.getBoundingClientRect().top), detail: `${where(h)}: the header line "${txt(l).slice(0, 40)}" runs past the header` });
+      }
+      // the title itself, as drawn: room is judged from its unwrapped width against 360, so a title drawn in a frame narrower
+      // than it claims (a component page's 360 state inset 16px a side, #170) wrapped and no check saw it
+      if (title) {
+        const rs = []; const w = document.createTreeWalker(title, NodeFilter.SHOW_TEXT); let n;
+        while ((n = w.nextNode())) { if (!n.textContent.trim()) continue; const rg = document.createRange(); rg.selectNodeContents(n); rs.push(...[...rg.getClientRects()].filter((r) => r.width > 0 && r.height > 0)); }
+        const lh = parseFloat(cs(title).lineHeight) || parseFloat(cs(title).fontSize) * 1.3;
+        const mids = rs.map((r) => (r.top + r.bottom) / 2).sort((a, b) => a - b);
+        const rows = mids.length ? 1 + mids.slice(1).filter((m, i) => m - mids[i] > lh / 2).length : 0;
+        if (rows > 1) out.push({ check: 'wrap', at: Math.round(title.getBoundingClientRect().top), detail: `${where(h)}: the title "${txt(title).slice(0, 40)}" wraps onto ${rows} lines as drawn` });
       }
     }
     // ---- gap: header to the first body content ----

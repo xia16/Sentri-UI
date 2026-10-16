@@ -102,9 +102,9 @@ Fields stack in capture order, never in columns. The bar holds at most two actio
 Every drawer and page leaves, goes up and commits the same way.
 
 - **Back** sits in the footer of every drawer, and at the top left of every page (in the page header; amended 2026-10-13, see Headers). It leaves and returns to where you came from, keeping the draft. Every top page of a task has it.
-- **‹ Parent name** sits in the header, only in a drawer with levels (a cascade picker, a catalogue). It goes up one level and is never labelled "Back". The header back label names the parent; the title names the current level. No breadcrumbs.
+- **A drawer with levels** (a cascade picker, a catalogue, a list with an "Add" step; amended 2026-10-16, owner ruling B, [board](evidence/2026-10-16-drawer-levels.png)): the footer's **Back goes up one level**, and at the first level it leaves, keeping the draft. A **✕ at the top left** of the sheet header closes the whole drawer from any level, keeping the draft as Back does; it is there at every level, so it never moves. The title names the current level; there is no "‹ Parent" in the header and no breadcrumb. Clear or Reset stays at the top right. (`pickerHead()` gives the title, the ✕ and the footer's Back for each level.) This replaces the 2026-10-10 rule ("‹ Parent name in the header, no ✕ on any sheet").
 - **The commit** ("Done · 2", "Save · 2 pigs") sits in the footer, on the right of Back. It applies and closes. A single pick commits by itself, so a single-choice sheet has Back alone. In a multi picker Back closes without applying, and the ticks wait as a draft for the next open.
-- **No ✕ on drawers.** Swiping down or tapping the scrim does what Back does.
+- **No ✕ on a drawer without levels.** Swiping down or tapping the scrim does what Back does. Only a drawer with levels carries the ✕ (above).
 - **Reset** restores defaults (a filter). **Clear** empties what was entered or ticked. Both are quiet text actions at the **top right of the sheet header** (amended 2026-10-14, owner ruling C), present only when there is something to reset or clear; each has one meaning (`ux/laws/strings.json`).
 - **No reason line** above a waiting commit: the disabled button stands alone. Tapping it marks each empty required field "Required" (on the field's own label line) and scrolls to the first.
 - **An empty selection is no selection.** Unticking the last subject closes the review and ends selection mode; no empty selection sheet is ever shown.
@@ -112,7 +112,7 @@ Every drawer and page leaves, goes up and commits the same way.
 
 ### Headers (law; owner, 2026-10-13)
 
-There are two headers and no others. A new kind of header goes through the rules ledger, never straight into a screen.
+There are two headers and no others. A new kind of header goes through the rules ledger, never straight into a screen. Both are the [Header](components/Header/README.md) component (page header, sheet header); the title inside them is a [Heading](components/Heading/README.md) (the page or sheet title).
 
 | | **Page header** | **Sheet header** |
 |---|---|---|
@@ -125,7 +125,7 @@ Which one: whether the surface covers the page, not which feature it belongs to.
 
 **The header holds** the title and, at most, one quiet **header line**. Nothing in a header acts except Back, the subject chip and the sheet header's **corner actions**: no counts, no status, no other buttons. Status is the first thing in the body.
 
-**Corner actions (sheet header; owner, 2026-10-14).** **Clear** or **Reset** sits at the top right as quiet text, present only when there is something to clear or reset. A **✕**, if a sheet ever has one, sits at the top left; drawers have none today (Back, swipe and the scrim close them). Each is a 48px target, **vertically centred on the header's text block**: the title, plus its header line when there is one (ruling C: never the title alone, never the header box). The footer keeps Back and the primary only.
+**Corner actions (sheet header; owner, 2026-10-14).** **Clear** or **Reset** sits at the top right as quiet text, present only when there is something to clear or reset. A **✕** sits at the top left, used only by a drawer with levels, where it closes the whole drawer (owner ruling B, 2026-10-16); other drawers have none (Back, swipe and the scrim close them). Each is a 48px target, **vertically centred on the header's text block**: the title, plus its header line when there is one (ruling C: never the title alone, never the header box). The footer keeps Back and the primary only.
 
 **Title length.** A header title fits on one line between the corner targets at 360px in English and Chinese, with at least 12px clear on each side: about 20 English or 10 Chinese characters. Copy is written to fit (a shorter name, decided in the feature's budget), never truncated, wrapped or shrunk. Section titles under a header keep their own style; the hairline and the gap separate them, never a weaker title.
 
@@ -137,7 +137,7 @@ Which one: whether the surface covers the page, not which feature it belongs to.
 
 **Identity facts are a decision per task, never a default.** On a hub, the subject chip may be followed by up to two short `muted` facts that tell the animal apart *in that task*. Which ones is decided in the task's `budget.md`, each with the worker's question it answers there: parity matters at farrowing (`#000418 › B1 · Parity 3`) and may answer nothing in another task, where the chip stands with the pen alone or with nothing. A fact the budget doesn't name is not drawn, and a shared component never fills one in. Never counts, status or dates.
 
-The header line is part of the information budget (`budget.md`, Levels): the builder names its job, the Back test, each identity fact with its question, and the string; a line or fact the budget does not name is not drawn. Evidence: [corner actions and alignment](evidence/2026-10-14-header-corners.png), [title room](evidence/2026-10-14-header-room.png), [header boards](evidence/2026-10-13-headers.png), [where the pen goes](evidence/2026-10-13-header-pen.png), [page header](evidence/2026-10-13-page-header.png).
+The header line is part of the information budget (`budget.md`, Levels): the builder names its job, the Back test, each identity fact with its question, and the string; a line or fact the budget does not name is not drawn. Evidence: [drawers with levels: Back goes up, ✕ closes](evidence/2026-10-16-drawer-levels.png) (ruling B), [corner actions and alignment](evidence/2026-10-14-header-corners.png), [title room](evidence/2026-10-14-header-room.png), [header boards](evidence/2026-10-13-headers.png), [where the pen goes](evidence/2026-10-13-header-pen.png), [page header](evidence/2026-10-13-page-header.png).
 
 ### Containers
 

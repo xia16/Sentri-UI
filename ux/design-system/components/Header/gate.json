@@ -1,0 +1,26 @@
+{
+  "status": "in-design",
+  "classification": "component",
+  "note": "Split out of Heading and Sheet on 2026-10-15 (owner). Not yet checked by the component gate.",
+  "variants": [
+    {
+      "name": "page",
+      "status": "in-design",
+      "usedBy": [
+        "farrowing.history",
+        "farrowing.overview",
+        "pig-profile.log",
+        "pig-profile.origin",
+        "inspection.pen-log"
+      ]
+    },
+    {
+      "name": "sheet",
+      "status": "in-design",
+      "usedBy": [
+        "farrowing.death",
+        "farrowing.piglet-death"
+      ]
+    }
+  ]
+}

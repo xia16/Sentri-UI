@@ -4,7 +4,6 @@
 .ph .bg{padding:0 var(--space-gutter)}
 .ph .bar{display:flex;justify-content:space-between;align-items:center;height:var(--statusbar-height);padding:0 var(--space-24);font:700 var(--type-panel-title-size) var(--font-sans)}
 .ph[data-pressed] .surface-back{background:var(--back-press)}
-.ph[data-pressed] .sheet-up{background:var(--press)}
 .ph[data-pressed] .sheet-footer .button.primary{filter:brightness(.96);transform:translateY(1px)}
 .ph[data-pressed] .sheet-footer .surface-back:only-child{background:var(--ink)}
 </style></head><body>
@@ -19,7 +18,7 @@
 <div class="ph" data-state="Empty" data-demo="drawer-empty"><div class="bg"></div><div class="over"></div></div>
 <div class="ph" data-state="Long / Chinese" data-demo="drawer-zh"><div class="bg"></div><div class="over"></div></div>
 <div class="ph" data-state="Held at its size" data-demo="drawer-full"><div class="bg"></div><div class="over"></div></div>
-<div class="ph" data-state="Up + Above (levels)" data-demo="drawer-lead"><div class="bg"></div><div class="over"></div></div>
+<div class="ph" data-state="Levels + Above: ✕ closes, Back goes up" data-demo="drawer-lead"><div class="bg"></div><div class="over"></div></div>
 <script>
 const UI=window.SentriUI,esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const bg=()=>'<div class="bar" aria-hidden="true"><span>9:41</span></div>'+UI.heading({title:'Pen B4',kind:'page',description:'Sow 000254 \u00b7 11 piglets'})+UI.panel(UI.row({title:'Litter',description:'11 alive \u00b7 day 2'}),{className:'st-row-group'});
@@ -28,17 +27,17 @@ const note=(l,v)=>UI.field({label:l,control:'<textarea rows="3" placeholder="'+e
 const rows=(n,t)=>UI.panel(Array.from({length:n},(_,i)=>UI.row({title:(t||'Piglet')+' '+(i+1),description:'Day 2 \u00b7 B4',action:'x'})).join(''),{className:'st-row-group'});
 const foot=(p,extra)=>UI.sheetFooter(Object.assign({back:{action:'back'},primary:{label:'Record death',action:'save'}},p||{}));
 const R={
-"drawer-default":()=>UI.sheet({title:'Record a death',size:'short',body:note('Cause','Crushed, scours, starved…'),footer:foot()}),
-"drawer-pressed":()=>UI.sheet({title:'Record a death',size:'short',body:note('Cause','Crushed, scours, starved…'),footer:foot()}),
+"drawer-default":()=>UI.sheet({title:'Record dead',size:'short',body:note('Cause','Crushed, scours, starved…'),footer:foot()}),
+"drawer-pressed":()=>UI.sheet({title:'Record dead',size:'short',body:note('Cause','Crushed, scours, starved…'),footer:foot()}),
 "drawer-route":()=>UI.sheet({title:'Farrowing record',line:{chip:{id:'000418',action:'open-sow',label:'Open sow 000418'},facts:['B1','Parity 3']},size:'short',body:note('Note'),footer:foot({primary:{label:'Finish farrowing',action:'finish'}})}),
 "drawer-fact":()=>UI.sheet({title:'Pen note',line:{text:[{text:'Last note '},{text:'08:41',strong:true},{text:' · G.H'}]},size:'short',body:note('Note'),footer:foot({primary:{label:'Save note',action:'save'}})}),
 "drawer-clear":()=>UI.sheet({title:'Record dead',corner:{label:{text:'Clear',str:'act.clear'},action:'clear'},size:'short',body:UI.stepper({label:'Crushed',value:3,key:'crushed',action:'step'}),footer:foot({primary:{label:'Record 3 deaths',action:'save'}})}),
 "drawer-clear-line":()=>UI.sheet({title:'Farrowing record',line:{chip:{id:'000418',action:'open-sow',label:'Open sow 000418'},facts:['B1','Parity 3']},corner:{label:{text:'Clear',str:'act.clear'},action:'clear'},size:'short',body:note('Note'),footer:foot({primary:{label:'Finish farrowing',action:'finish'}})}),
-"drawer-waiting":()=>UI.sheet({title:'Record a death',size:'short',body:UI.stepper({label:'Died',value:0,key:'died',action:'step'}),footer:foot({primary:{label:'Record death',action:'save',waiting:true},status:{text:'Say how many died'}})}),
+"drawer-waiting":()=>UI.sheet({title:'Record dead',size:'short',body:UI.stepper({label:'Died',value:0,key:'died',action:'step'}),footer:foot({primary:{label:'Record death',action:'save',waiting:true},status:{text:'Say how many died'}})}),
 "drawer-error":()=>UI.sheet({title:'Litter weight',size:'short',body:UI.field({label:'Weight (kg)',variant:'number',error:'48 kg is over the scale limit · check the number',control:'<input type="number" inputmode="decimal" value="48" aria-invalid="true">'}),footer:foot({primary:{label:'Record weight',action:'save',waiting:true},status:{text:'48 kg is over the scale limit'}})}),
 "drawer-empty":()=>UI.sheet({title:'Pen log',size:'short',body:'<p class="st-choice-empty">No activity recorded yet</p>',footer:foot()}),
 "drawer-zh":()=>UI.sheet({title:'记录死亡',line:{chip:{id:'000254',action:'open-sow'},facts:['B4','胎次 3']},corner:{label:'清除',action:'clear'},size:'medium',body:note('原因'),footer:UI.sheetFooter({back:{action:'back',label:'返回'},primary:{label:'记录死亡 · 3 头',action:'save'}})}),
-"drawer-lead":()=>UI.sheet({title:'Skin',up:{label:'Symptoms',action:'up',value:'1'},size:'long',above:'<div style="padding:var(--space-12) var(--space-gutter-sheet) 0">'+UI.choiceSearch({label:'Search symptoms',placeholder:'Search symptoms'})+'</div>',body:rows(4,'Symptom'),footer:foot({primary:{label:'Done · 2',action:'done'}})}),
+"drawer-lead":()=>UI.sheet({title:'Skin',cross:{action:'dismiss',label:{text:'Close',str:'act.close'}},size:'long',above:'<div style="padding:var(--space-12) var(--space-gutter-sheet) 0">'+UI.choiceSearch({label:'Search symptoms',placeholder:'Search symptoms'})+'</div>',body:rows(4,'Symptom'),footer:foot({back:{action:'step',value:'1'},primary:{label:'Done · 2',action:'done'}})}),
 "drawer-full":()=>UI.sheet({title:'Count piglets',size:'medium',sizing:'full',body:rows(5),footer:foot({primary:{label:'Record count',action:'save'}})})
 };
 document.querySelectorAll('[data-state]').forEach(el=>{const k=el.getAttribute('data-demo'),r=R[k];el.querySelector('.bg').innerHTML=bg();if(r)el.querySelector('.over').innerHTML=r();});

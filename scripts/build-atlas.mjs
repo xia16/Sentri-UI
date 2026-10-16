@@ -226,7 +226,7 @@ if (problems.length) {
 
 // components: the mobile design system's parts (group, status from the gate result), plus the proposed ones not built yet
 const GROUPS = [
-  ['Base', ['Button', 'IconButton', 'Icon', 'Heading', 'Row', 'Panel', 'Facts', 'Log', 'Sheet', 'Segment', 'FilterChips', 'ChoiceList', 'CategoryFooter']],
+  ['Base', ['Button', 'IconButton', 'Icon', 'Heading', 'Header', 'Row', 'Panel', 'Facts', 'Log', 'Sheet', 'Segment', 'FilterChips', 'ChoiceList', 'CategoryFooter']],
   ['Inputs and filters', ['FilterSheet', 'RangeSlider']],
   ['Fields', ['Field', 'PickerField', 'Stepper', 'Measure', 'Numpad']],
   ['Status and feedback', ['Status', 'ConditionTag', 'Banner', 'Photos']],
@@ -234,6 +234,8 @@ const GROUPS = [
 ];
 const components = [];
 for (const [group, names] of GROUPS) for (const name of names) {
+  // a part named here before its folder lands (a component built in its own PR) is left out until it exists
+  if (!existsSync(join(root, 'ux/design-system/components', name))) continue;
   const gp = join(root, 'ux/design-system/components', name, 'gate.json');
   let gate = null;
   if (existsSync(gp)) { try { gate = JSON.parse(readFileSync(gp, 'utf8')); } catch (e) { problems.push(`components/${name}/gate.json: ${e.message}`); } }

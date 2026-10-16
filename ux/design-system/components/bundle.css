@@ -69,7 +69,6 @@ svg{width:var(--size-20);height:var(--size-20);display:block;flex-shrink:0;fill:
    the body starts space-section (24px) below it. Nothing in it acts but the subject chip and, in a drawer with levels, ‹ Parent. */
 .utility-header{flex:none;display:flex;align-items:center;gap:var(--space-10);margin:0;padding:var(--space-5) var(--space-gutter) var(--space-17);border-bottom:1px solid var(--line);text-align:center}
 .sheet-titles{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center}
-.sheet-titles>.sheet-up{align-self:flex-start}
 /* Corner actions (owner, 2026-10-14, ruling C): Clear or Reset at the top right, a ✕ (unused today) at the top left. Each is a
    48px target vertically centred on the text block (the title + its line), its edge 10px from the sheet's (the word ends on the
    18px gutter). The title keeps 12px clear of each target: the room is the sheet less 2 × (10 + 48 + 12). */
@@ -103,10 +102,6 @@ svg{width:var(--size-20);height:var(--size-20);display:block;flex-shrink:0;fill:
 .st-page-title{margin:0;font:500 var(--type-page-title-size)/1.25 var(--font-sans);letter-spacing:-0.6px;color:var(--ink);overflow-wrap:anywhere}
 .st-page-header .st-header-line{justify-content:flex-start;margin-top:var(--space-2);text-align:left}
 /* Up one level (a drawer with levels only): "‹ Parent" above the title. It names the parent; the title names this level. */
-.sheet-up{display:flex;align-items:center;gap:var(--space-2);max-width:100%;min-height:var(--tap-min);margin:calc(-1 * var(--space-12)) 0 calc(-1 * var(--space-6)) calc(-1 * var(--space-8));padding:0 var(--space-8);border:0;border-radius:var(--radius-control);background:transparent;color:var(--ink);font:500 var(--font-size-14)/1.3 var(--font-sans);text-align:left;cursor:pointer}
-.sheet-up>span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.sheet-up>svg{flex:none;width:var(--size-18);height:var(--size-18);fill:none;stroke:currentColor;stroke-width:var(--icon-stroke);stroke-linecap:round;stroke-linejoin:round}
-.sheet-up:active{background:var(--press)}
 
 /* Body: the one scroller. */
 .sheet-body{flex:0 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:0 var(--space-gutter);scrollbar-width:none;-webkit-overflow-scrolling:touch}
