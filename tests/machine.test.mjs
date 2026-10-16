@@ -75,3 +75,13 @@ test('scheduler: a machine error halves how many run at once', async () => {
   await s.run(task('visit', async () => ({ machine: 'navigation-timeout', error: 'page.goto: Timeout' })));
   assert.equal(s.limit, 2);
 });
+
+test('scheduler: after a machine error halves it, a run of clean tasks brings it back one at a time, never above its workers', async () => {
+  const s = sched(4);
+  await s.run(task('visit', async () => ({ machine: 'net-error', error: 'net::ERR_NO_BUFFER_SPACE' })));
+  assert.equal(s.limit, 2);
+  for (let i = 0; i < 32; i++) await s.run(task('visit', async () => ({ ok: true })));
+  assert.equal(s.limit, 3);
+  for (let i = 0; i < 200; i++) await s.run(task('visit', async () => ({ ok: true })));
+  assert.equal(s.limit, 4);
+});

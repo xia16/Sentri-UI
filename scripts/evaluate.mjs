@@ -21,7 +21,7 @@ import { EvidenceStore, identityOf, treeOf, blobsHash, codeHash, sha, reconcileI
 import { createScheduler } from './scheduler.mjs';
 import { WORKERS, LAUNCH_ARGS, machineErrorOf, classifyMachineError } from './machine.mjs';
 import { BOUNDS } from './settle.mjs';
-import { prepareVisit, captureShot, VISIT_CODE, CLOCK, HEIGHT } from './visit.mjs';
+import { prepareVisit, captureShot, contextPool, VISIT_CODE, CLOCK, HEIGHT } from './visit.mjs';
 import { pctDiff } from './png.mjs';
 import { routeFonts } from './font-route.mjs';
 import { auditSpacingPage } from './check-spacing.mjs';
@@ -146,6 +146,8 @@ export async function evaluate(opts) {
   const sched = createScheduler({ playwright, log });
   cleanups.push(() => { sched.close(); });
   const browser = await sched.browser();
+  const pool = contextPool();
+  cleanups.push(() => { pool.close(); });
   const pwVersion = (() => { try { return JSON.parse(fs.readFileSync(path.join(pwPath, 'package.json'), 'utf8')).version; } catch { return '?'; } })();
   const render = { playwright: pwVersion, browser: browser.version(), platform: process.platform, launch: LAUNCH_ARGS, clock: CLOCK, height: HEIGHT, dsf: 1, bounds: BOUNDS };
   const code = Object.fromEntries(Object.entries(CHECKERS).map(([k, f]) => [k, codeHash(root, f)]));
@@ -272,7 +274,7 @@ export async function evaluate(opts) {
   const visitTask = (v) => ({
     kind: 'visit', label: `${v.side} ${v.x.id} ${v.lang}-${v.width}`, priority: 0,
     run: async ({ browser: b }) => {
-      const vis = await prepareVisit(b, { url: urlOf(v.side, v.x), mode: v.vmode, width: v.width, lang: v.lang, fontsRoot: S[v.side].fontsRoot });
+      const vis = await prepareVisit(b, { url: urlOf(v.side, v.x), mode: v.vmode, width: v.width, lang: v.lang, fontsRoot: S[v.side].fontsRoot, pool });
       try {
         if (vis.machine) return { machine: vis.machine, error: vis.error };
         if (vis.unstable) return { unstable: vis.unstable };
@@ -283,9 +285,9 @@ export async function evaluate(opts) {
         const got = { shot, checks: {} };
         // legibility scrolls the page, so it goes last
         for (const it of v.items.filter((i) => i.kind !== 'shot').sort((a, c) => (a.name === 'legibility') - (c.name === 'legibility'))) {
-          try { got.checks[it.id] = { ok: true, result: await auditFor[it.name](vis.page, it) }; } catch (e) { const msg = String(e.message || e).split('\n')[0]; if (classifyMachineError(msg)) return { machine: classifyMachineError(msg), error: msg }; got.checks[it.id] = { ok: false, error: msg }; }
+          try { got.checks[it.id] = { ok: true, result: await auditFor[it.name](vis.page, it) }; } catch (e) { const msg = String(e.message || e).split('\n')[0]; if (classifyMachineError(msg)) { vis.machine = classifyMachineError(msg); return { machine: vis.machine, error: msg }; } got.checks[it.id] = { ok: false, error: msg }; }
         }
-        if (vis.netErrors.length) return { machine: 'net-error', error: vis.netErrors[0] };
+        if (vis.netErrors.length) { vis.machine = 'net-error'; return { machine: 'net-error', error: vis.netErrors[0] }; }
         return got;
       } finally { await vis.close(); }
     },
@@ -422,7 +424,7 @@ export async function evaluate(opts) {
   await Promise.all(confirm.map((c) => {
     const x = [...S[c.side].screens, ...S[c.side].ds].find((s) => s.id === c.id), first = (c.side === 'base' ? baseAt : candAt).get(`${c.id} ${c.lang}-${c.width}`);
     return sched.run({ kind: 'confirm', label: `confirm ${c.side} ${c.id} ${c.lang}-${c.width}`, priority: 0, run: async ({ browser: b }) => {
-      const vis = await prepareVisit(b, { url: urlOf(c.side, x), mode: componentPage(x.id) ? 'grid' : 'screen', width: c.width, lang: c.lang, fontsRoot: S[c.side].fontsRoot });
+      const vis = await prepareVisit(b, { url: urlOf(c.side, x), mode: componentPage(x.id) ? 'grid' : 'screen', width: c.width, lang: c.lang, fontsRoot: S[c.side].fontsRoot, pool });
       try { if (vis.machine) return { machine: vis.machine, error: vis.error }; if (!vis.ok) return { unstable: vis.unstable || vis.error }; return await captureShot(vis); } finally { await vis.close(); }
     } }).then((r) => {
       if (r.machine) block(`${c.id} ${c.side} ${c.lang}-${c.width}: the confirming visit hit a machine error twice (${r.machine}): its diff can't be confirmed`);
@@ -572,7 +574,7 @@ export async function evaluate(opts) {
     const p = plan_(dsItems);
     for (const { item, record } of p.reuse) results.set(item.id, record);
     await Promise.all(p.compute.map((it) => sched.run({ kind: 'visit', label: `${it.side} ${it.x.id} headers`, priority: 0, run: async ({ browser: b }) => {
-      const vis = await prepareVisit(b, { url: urlOf(it.side, it.x), mode: 'atlas', width: 360, lang: 'en', fontsRoot: S[it.side].fontsRoot });
+      const vis = await prepareVisit(b, { url: urlOf(it.side, it.x), mode: 'atlas', width: 360, lang: 'en', fontsRoot: S[it.side].fontsRoot, pool });
       try {
         if (vis.machine) return { machine: vis.machine, error: vis.error };
         if (vis.unstable) return { unstable: vis.unstable };

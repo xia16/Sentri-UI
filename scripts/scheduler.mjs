@@ -16,7 +16,7 @@ export function createScheduler({ playwright, workers = WORKERS, log = () => {} 
   const queue = [], retries = [];
   let busy = 0, running = 0, ctl = { limit: workers, min: 1, max: workers, baseline: null };
   const stats = { byKind: {}, retried: 0, machineTwice: 0, lowest: workers, started: Date.now(), firstAt: {}, lastAt: {} };
-  let solo = false;
+  let solo = false, clean = 0;
   const idleWaiters = [];
   const note = (kind, ms) => {
     const k = (stats.byKind[kind] ||= { n: 0, ms: 0 });
@@ -34,7 +34,12 @@ export function createScheduler({ playwright, workers = WORKERS, log = () => {} 
     catch (e) { const msg = String(e?.message || e).split('\n')[0]; r = classifyMachineError(msg) ? { machine: classifyMachineError(msg), error: msg } : { error: msg }; }
     note(t.kind, Date.now() - s);
     if (t.kind === 'leaf' && !alone) { const { state, why } = aimdStep(ctl, { ms: Date.now() - s, timedOut: !!machineOf(r) }); if (why && state.limit !== ctl.limit) log(`scheduler: ${ctl.limit} → ${state.limit} at once (${why})`); ctl = state; stats.lowest = Math.min(stats.lowest, ctl.limit); }
-    else if (machineOf(r) && !alone) halve(`${t.label}: ${machineOf(r)}`);
+    else if (machineOf(r) && !alone) { halve(`${t.label}: ${machineOf(r)}`); clean = 0; }
+    else if (!alone && !machineOf(r)) {
+      // Back up, one at a time, after a run of clean tasks: a machine error halves the window; it does not hold it there for good.
+      // (Leaf runs move it by their timings instead: aimdStep.)
+      if (++clean >= 16 * ctl.limit && ctl.limit < ctl.max) { log(`scheduler: ${ctl.limit} → ${ctl.limit + 1} at once (${clean} clean tasks)`); ctl = { ...ctl, limit: ctl.limit + 1 }; clean = 0; }
+    }
     return r;
   }
   function pump() {

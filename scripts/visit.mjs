@@ -43,15 +43,50 @@ const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 // Open and prepare one visit. mode: 'screen' (a bare atlas screen, ?screen=<id>), 'grid' (a component page's state grid lifted out
 // at the width, as shot), 'atlas' (a component page as the atlas draws it, as header-checked). url: the page URL, absolute.
 // fontsRoot: the checkout whose vendor/fonts serve the fonts (the side's own). Returns the visit; close() it.
-export async function prepareVisit(browser, { url, mode = 'screen', width, lang = 'en', fontsRoot, bounds = BOUNDS }) {
-  const v = { width, lang, mode, ok: false, page: null, context: null, close: async () => { await v.context?.close().catch(() => {}); } };
-  const missingFonts = new Set(), netErrors = [];
+// Contexts are kept and reused, one visit at a time each, per origin, width and mode: a fresh context per visit opens fresh
+// connections for every file of every page, and ~2,700 visits ran Windows out of sockets (net::ERR_NO_BUFFER_SPACE, 2026-10-17).
+// A visit starts on a context whose cookies and storage the last visit cleared; a visit that hit a machine error closes its
+// context, so its retry starts in a fresh one.
+export function contextPool() {
+  const idle = new Map(), all = new Set();
+  return {
+    async take(key, make) { const l = idle.get(key) || []; while (l.length) { const c = l.pop(); if (all.has(c)) return c; } const c = await make(); all.add(c); return c; },
+    give(key, c) { if (!idle.has(key)) idle.set(key, []); idle.get(key).push(c); },
+    async drop(c) { all.delete(c); await c.close().catch(() => {}); },
+    async close() { for (const c of all) await c.close().catch(() => {}); all.clear(); idle.clear(); },
+    get size() { return all.size; },
+  };
+}
+
+export async function prepareVisit(browser, { url, mode = 'screen', width, lang = 'en', fontsRoot, bounds = BOUNDS, pool = null }) {
+  const key = `${new URL(url).origin}|${width}|${mode}|${fontsRoot}`;
+  const v = { width, lang, mode, ok: false, page: null, context: null };
+  const netErrors = [];
+  const make = async () => {
+    const c = await browser.newContext({ viewport: { width, height: HEIGHT }, deviceScaleFactor: 1 });
+    c._missingFonts = new Set();
+    await routeFonts(c, fontsRoot, c._missingFonts);
+    if (mode === 'screen') await c.addInitScript(widthOverride, width);
+    await c.addInitScript(settleProbe);
+    return c;
+  };
+  // close(): the page goes; the context is cleared and kept for the next visit, or closed when this one was the machine's fault
+  v.close = async () => {
+    const c = v.context;
+    if (!c) return;
+    if (!pool || v.machine) { if (pool) await pool.drop(c); else await c.close().catch(() => {}); return; }
+    try {
+      await v.page?.evaluate(async () => { try { localStorage.clear(); sessionStorage.clear(); } catch {} try { for (const d of (await indexedDB.databases?.()) || []) indexedDB.deleteDatabase(d.name); } catch {} });
+      await c.clearCookies();
+      for (const p of c.pages()) await p.close();
+      pool.give(key, c);
+    } catch { await pool.drop(c); }
+  };
   let inflight = 0;
   try {
-    v.context = await browser.newContext({ viewport: { width, height: HEIGHT }, deviceScaleFactor: 1 });
-    await routeFonts(v.context, fontsRoot, missingFonts);
-    if (mode === 'screen') await v.context.addInitScript(widthOverride, width);
-    await v.context.addInitScript(settleProbe);
+    v.context = pool ? await pool.take(key, make) : await make();
+    const missingFonts = v.context._missingFonts;
+    missingFonts.clear();
     const page = v.page = await v.context.newPage();
     // The clock starts at a fixed moment and then runs: a screen that prints "now" would otherwise differ from minute to minute, and
     // a frozen clock would stall the screens' own tap guards and timers.
@@ -96,7 +131,7 @@ export async function prepareVisit(browser, { url, mode = 'screen', width, lang 
       await wait(bounds.sample);
     }
     v.sample = sample;
-    if (missingFonts.size) v.error = `a font the vendor folder doesn't have: ${[...missingFonts][0]} (scripts/vendor-fonts.mjs)`;
+    if (v.context._missingFonts.size) v.error = `a font the vendor folder doesn't have: ${[...missingFonts][0]} (scripts/vendor-fonts.mjs)`;
     if (netErrors.length) { v.machine = 'net-error'; v.error = netErrors[0]; }
     v.netErrors = netErrors;
     v.ok = !v.unstable && !v.error && !v.machine;
@@ -122,7 +157,7 @@ export async function captureShot(v, bounds = BOUNDS) {
   const after = await v.sample();
   const b = await shoot();
   const ok = verifyCapture({ a, b, before, after });
-  if (v.netErrors.length) return { machine: 'net-error', error: v.netErrors[0] };
+  if (v.netErrors.length) { v.machine = 'net-error'; return { machine: 'net-error', error: v.netErrors[0] }; }
   if (!ok.stable) return { unstable: ok.why };
   // the words on the screen: a ?lang=zh page that shows the same words as English does not render Chinese
   const text = await page.evaluate(() => (document.querySelector('.atlas-phone') || document.body).innerText.replace(/\s+/g, ' ').trim()).catch(() => '');
