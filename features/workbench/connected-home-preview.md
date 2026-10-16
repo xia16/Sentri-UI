@@ -4,7 +4,7 @@ These are **in-design** Workbench prototype states, rendered from fictional farm
 
 ## Overview: concise tasks
 
-Overview omits Inspection, Inventory and date selection. Through four visible task instances, every instance has a concise entry. From five onward, task categories fold inside one surface; opening a category reveals the same concise task entries, indented below a tinted header.
+Overview omits Inspection, Inventory and date selection. Through four visible task instances, every instance has a concise entry. From five onward, task categories fold inside one surface: folded rows are white against the page; opening a category gives its header a pale tint and narrow side accent above indented task entries.
 
 | Up to four: every task visible | Five or more: categories folded |
 | --- | --- |

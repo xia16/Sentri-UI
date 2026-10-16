@@ -39,6 +39,9 @@ body:has(.connected-preview) .schedule-detail-row small{display:block;margin-top
 .connected-preview .task-type-group+.task-type-group{border-top:1px solid var(--rule)}
 .connected-preview .task-type-group.has-urgent>.task-type-toggle{background:var(--app-background);box-shadow:none}
 .connected-preview .task-type-toggle{min-height:72px;padding:12px 13px;grid-template-columns:33px minmax(0,1fr) 30px 12px;gap:9px;background:var(--app-background)}
+.connected-preview.overview-scope .task-type-group>.task-type-toggle,.connected-preview.overview-scope .task-type-group.has-urgent>.task-type-toggle{background:var(--paper)}
+.connected-preview.overview-scope .task-type-group.is-open>.task-type-toggle{background:var(--app-background);box-shadow:inset 3px 0 var(--green)}
+.connected-preview.overview-scope .task-type-group.is-open.has-urgent>.task-type-toggle{box-shadow:inset 3px 0 var(--amber)}
 .connected-preview .task-type-icon,.connected-preview .task-type-group.has-urgent .task-type-icon{background:var(--row-icon-bg);color:var(--row-icon-ink)}
 .connected-preview .task-type-copy strong{font-size:14px;line-height:1.25}
 .connected-preview .task-type-copy small{font-size:13px;line-height:1.3;color:var(--muted);overflow:visible;white-space:normal}
