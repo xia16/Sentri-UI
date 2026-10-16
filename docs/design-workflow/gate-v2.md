@@ -106,7 +106,7 @@ Base evidence is kept per main commit (an index of the identities each base used
 
 Everything is reported per case: warm cache, cold cache and full reach.
 
-**Measured with the analyser (2026-10-17, quiet machine, 4 workers).** A picker-sized one-function bundle change (pickerField's body), base evidence warm: reach 214 of 374 (145 of 305 screens, the 69 component pages, 117 leaves); 11.0 min wall: the candidate's 719 visits 4.4 min (1,762 base items reused), confirming visits 12 s, leaves 6.1 min (448 runs: a leaf's identity is still the whole page tree, so every leaf in reach runs again), npm test 14 s beside the visits. The leaves are now the larger half.
+**Measured with the analyser (2026-10-17, quiet machine, 4 workers).** A fresh picker-sized one-function bundle change (pickerField's body, never gated before), base evidence warm: reach 214 of 374 (145 of 305 screens, the 69 component pages, 117 leaves); 8.0 min wall: the candidate's 719 visits 4.5 min (1,762 base items reused), confirming visits 7 s, leaves 3.2 min, npm test 15 s beside the visits. Every one of the 448 leaf runs ran again, by its own identity: every leaf can reach Farrowing's page, which calls the picker, and every leaf's closure reaches the task-cards study, whose computed link (`sourceHref`) can't be bounded, so it hashes every page-loadable file. With the leaf runner's contexts reused, the same 448 runs take 3.2 min instead of 6.1, with no `ERR_NO_BUFFER_SPACE`.
 
 **Measured (evidence half, with the analyser's stand-in: every screen and leaf in reach; 4 workers; 2026-10-17, quiet machine).** 373 screens and component pages, 2,716 visits, 450 leaf runs, 138 state checks:
 
