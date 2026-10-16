@@ -220,3 +220,8 @@ The ruling fixes the design (board option B): no competing directions. Each scre
 - Squint: the title, then the first rows, then Back / Done. The ✕ is a thin glyph, quieter than the title.
 - Cluttered, flat or bulky: at the root one glyph is added (the ✕) and nothing else; at a level one line of text ("‹ Symptoms") goes. Held against the Farrowing room: a quiet head, the work in the body.
 - **Better because** Back now means one thing (up a level, the owner's standing rule) and there is one visible way out from any depth, with a head that stays still between levels.
+
+#### Final look (the pushed head of ds/drawer-levels-back-close, the commit that adds this block; its screens are 0de8652's, which the quick gate rendered at 390 and 360 in EN and ZH against base 1634cfd)
+- Changed: `health-record.condition-picker`, `health-record.medicine-picker` (the ✕ at the top left of the root; nothing else moves) and the component pages ChoiceList/multi, Header/sheet, PickerField/cascade, PickerField/cascade-multi, Sheet/drawer. Every other screen in scope is the same.
+- Headers, spacing and legibility on the changed screens: no new problem; check-states: no new problem.
+- **Better because** Back means up a level and the ✕ is the one way out from any depth; the head no longer changes height between levels.
