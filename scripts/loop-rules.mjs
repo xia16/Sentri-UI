@@ -440,3 +440,38 @@ export function passesWithoutJudge(mech) {
   if ((mech.pairs || []).length) return false;
   return ['diff', 'new', 'gone'].every((k) => Array.isArray(mech.screens[k]) && mech.screens[k].length === 0);
 }
+
+// Gate v2: a moved main (or a PR head that merged it forward) never voids work by itself (gate-v2.md §3). The gate runs again on
+// the new head and main, reusing every result whose identity is unchanged; then every judgement is carried to the pair of the new
+// manifest with the same identity (the same screen, run and kind, the same base shot and the same candidate shot: the same two
+// images), and a removed screen's reason with it. Only pairs whose images changed need a new judgement.
+//   old: { mech, parts: [verdict files] } of the judged run · now: the new run's mechanical.json
+// → { carried: a verdict part for the new run (or null when nothing carries), need: [pair names], goneNeed: [screen ids] }
+export function carryJudgements(old, now) {
+  const name = (p) => `${p.screen} ${p.lang}-${p.width}`;
+  const idOf = (p) => (p.identity ? `${name(p)} ${p.kind || 'changed'} ${p.identity.base || '-'} ${p.identity.cand || '-'}` : null);
+  const said = new Map();
+  for (const part of old.parts || []) for (const j of part.pairs || []) if (!said.has(name(j))) said.set(name(j), j);
+  const judged = new Map();
+  for (const p of old.mech?.pairs || []) { const k = idOf(p), j = said.get(name(p)); if (k && j) judged.set(k, j); }
+  const pairs = [], need = [];
+  for (const p of now.pairs || []) { const j = idOf(p) && judged.get(idOf(p)); if (j) pairs.push({ ...j, carried: true }); else need.push(name(p)); }
+  // a removed screen's reason carries when it was removed before too and every one of its pairs carried
+  const goneSaid = new Map((old.parts || []).flatMap((p) => p.gone || []).filter((g) => g.why).map((g) => [g.screen, g]));
+  const wasGone = new Set((old.mech?.screens?.gone || []).map((g) => g.id));
+  const gone = [], goneNeed = [];
+  for (const g of now.screens?.gone || []) {
+    const mine = (now.pairs || []).filter((p) => p.screen === g.id);
+    if (wasGone.has(g.id) && goneSaid.has(g.id) && mine.every((p) => !need.includes(name(p)))) gone.push(goneSaid.get(g.id)); else goneNeed.push(g.id);
+  }
+  const first = (old.parts || [])[0] || {};
+  const cat = (k) => (old.parts || []).flatMap((p) => p[k] || []);
+  const carried = pairs.length || gone.length ? {
+    pass: (old.parts || []).every((p) => p.pass === true), candidate: now.candidate, base: now.base, class: first.class, mode: first.mode,
+    mechanical: first.mechanical || [], walk: cat('walk'), pairs, defects: cat('defects'), gone, calibration: first.calibration || [],
+    rejected: cat('rejected'), contradicted: cat('contradicted'),
+    notes: `carried by identity from the verdict on ${String(old.mech?.candidate).slice(0, 7)} against ${String(old.mech?.base).slice(0, 7)}${first.notes ? `; ${first.notes}` : ''}`,
+    carriedFrom: { candidate: old.mech?.candidate, base: old.mech?.base },
+  } : null;
+  return { carried, need, goneNeed };
+}

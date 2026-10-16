@@ -112,3 +112,36 @@ test('verdict: every pair of the manifest judged, none outside it; a blocked gat
   assert.match(checkVerdict(good, { ...mech, outcome: 'blocked', pass: false, blocked: ['s1 cand en-390: unstable'] }).problems.join(' | '), /blocked \(s1 cand en-390: unstable\)/);
   assert.match(checkVerdict({ ...good, pairs: good.pairs.map((p) => (p.screen === 's1' ? { ...p, verdict: 'same' } : p)) }, mech).problems.join(' | '), /no pair better/);
 });
+
+test('a moved main voids nothing by itself: judgements carry to pairs with the same two images; only changed images need a judge', async () => {
+  const { carryJudgements } = await import('../scripts/loop-rules.mjs');
+  const pair = (screen, kind, b, c, extra = {}) => ({ screen, lang: 'en', width: 390, kind, pct: kind === 'changed' ? 3 : null, identity: { base: b, cand: c }, ...extra });
+  const oldMech = { candidate: 'C1', base: 'M1', screens: { diff: [{ id: 's1' }, { id: 's2' }], new: [], gone: [{ id: 'g1' }] },
+    pairs: [pair('s1', 'changed', 'b1', 'c1'), pair('s2', 'changed', 'b2', 'c2'), pair('g1', 'gone', 'bg', null)] };
+  const parts = [{ pass: true, candidate: 'C1', base: 'M1', calibration: [{ pair: 'c1', verdict: 'same' }], walk: [], defects: [],
+    pairs: [{ screen: 's1', lang: 'en', width: 390, verdict: 'better', why: 'r1' }, { screen: 's2', lang: 'en', width: 390, verdict: 'same', why: 'r2' }, { screen: 'g1', lang: 'en', width: 390, verdict: 'pass', why: 'r3' }],
+    gone: [{ screen: 'g1', why: 'its job moved to s1' }] }];
+  // main moved by a file no shot depends on: every identity is the same
+  const same = { candidate: 'C2', base: 'M2', screens: oldMech.screens, pairs: oldMech.pairs.map((p) => ({ ...p })) };
+  const a = carryJudgements({ mech: oldMech, parts }, same);
+  assert.deepEqual(a.need, []);
+  assert.deepEqual(a.goneNeed, []);
+  assert.equal(a.carried.candidate, 'C2');
+  assert.equal(a.carried.base, 'M2');
+  assert.deepEqual(a.carried.pairs.map((p) => `${p.screen} ${p.verdict}`), ['s1 better', 's2 same', 'g1 pass']);
+  assert.deepEqual(a.carried.gone.map((g) => g.screen), ['g1']);
+  assert.deepEqual(a.carried.calibration, parts[0].calibration);
+  assert.deepEqual(checkVerdict(a.carried, { ...same, pass: true, outcome: 'pass', mode: 'normal', class: { declared: 'presentation' } }).problems, [], 'the carried verdict passes the new manifest as it is');
+  // main moved by something s2's base shot depends on: s2 has a new base image and needs a judge; s1 and g1 carry
+  const moved = { ...same, pairs: [pair('s1', 'changed', 'b1', 'c1'), pair('s2', 'changed', 'b2-new', 'c2'), pair('g1', 'gone', 'bg', null)] };
+  const b = carryJudgements({ mech: oldMech, parts }, moved);
+  assert.deepEqual(b.need, ['s2 en-390']);
+  assert.deepEqual(b.carried.pairs.map((p) => p.screen), ['s1', 'g1']);
+  // a new pair, or a screen gone now that wasn't before, is never carried
+  const more = { ...same, screens: { ...same.screens, gone: [{ id: 'g1' }, { id: 'g2' }] }, pairs: [...same.pairs, pair('n1', 'new', null, 'cn'), pair('g2', 'gone', 'bg2', null)] };
+  const c = carryJudgements({ mech: oldMech, parts }, more);
+  assert.deepEqual(c.need, ['n1 en-390', 'g2 en-390']);
+  assert.deepEqual(c.goneNeed, ['g2']);
+  // a failed verdict carries as failed
+  assert.equal(carryJudgements({ mech: oldMech, parts: [{ ...parts[0], pass: false }] }, same).carried.pass, false);
+});

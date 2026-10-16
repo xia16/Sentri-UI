@@ -404,8 +404,21 @@ export async function evaluate(opts) {
 
   // A changed screen is visited once more on each side, fresh, at a run that differed: each side must draw exactly its own shot
   // again. One that doesn't is unstable across visits, and its diff can't be told from noise: the gate blocks.
+  // A shot already confirmed this way (a fresh visit drew exactly it) is evidence of its own, kept by the shot's identity: an
+  // unchanged screen is not visited again because main moved or the gate is run again.
   const confirm = [];
-  for (const d of screens.diff) { const t = d.runs.find((x) => pct[`${d.id} ${x}`] > 0); if (t) { const [lang, w] = t.split('-'); for (const side of ['base', 'cand']) confirm.push({ side, id: d.id, lang, width: Number(w) }); } }
+  let confirmedBefore = 0;
+  for (const d of screens.diff) {
+    const t = d.runs.find((x) => pct[`${d.id} ${x}`] > 0);
+    if (!t) continue;
+    const [lang, w] = t.split('-');
+    for (const side of ['base', 'cand']) {
+      const first = (side === 'base' ? baseAt : candAt).get(`${d.id} ${lang}-${w}`);
+      if (store.get('confirm', first.id)) { confirmedBefore++; tallyRepo('confirm', true); continue; }
+      tallyRepo('confirm', false);
+      confirm.push({ side, id: d.id, lang, width: Number(w) });
+    }
+  }
   await Promise.all(confirm.map((c) => {
     const x = [...S[c.side].screens, ...S[c.side].ds].find((s) => s.id === c.id), first = (c.side === 'base' ? baseAt : candAt).get(`${c.id} ${c.lang}-${c.width}`);
     return sched.run({ kind: 'confirm', label: `confirm ${c.side} ${c.id} ${c.lang}-${c.width}`, priority: 0, run: async ({ browser: b }) => {
@@ -415,9 +428,10 @@ export async function evaluate(opts) {
       if (r.machine) block(`${c.id} ${c.side} ${c.lang}-${c.width}: the confirming visit hit a machine error twice (${r.machine}): its diff can't be confirmed`);
       else if (r.unstable) block(`${c.id} ${c.side} ${c.lang}-${c.width}: unstable on the confirming visit: ${r.unstable}`);
       else if (!fs.readFileSync(first.png).equals(Buffer.from(r.png))) block(`${c.id} ${c.side} ${c.lang}-${c.width}: unstable: two visits drew it differently, so its diff can't be told from noise`);
+      else store.put('confirm', first.id, { ok: true, screen: c.id, run: `${c.lang}-${c.width}` });
     });
   }));
-  mech.confirmed = confirm.length;
+  mech.confirmed = { visited: confirm.length, before: confirmedBefore };
   mark('confirm');
 
   // ---------- 4. the pairs the judge decides on: every changed, new or removed screen at each run ----------
