@@ -128,3 +128,29 @@ The owner reviewed the first round's screens (head `1d7eeab`) and revised the de
 #### Final look (the screens of this push; renders at 390 and 360 in EN and ZH)
 - Header check on the 25 changed screens: 0 defects (a first render titled the withdrawal edit "Default withdrawal (meat)", 235px at 360; now "Withdrawal (meat)"). Spacing 0; strict legibility passes on the changed screens; check-states 6 failing states, the same 6 as `c6cc500`; npm test 723 pass.
 - Known: the atlas replays taps as clicks, so a trigger the picker returns focus to shows the browser's focus ring; a finger draws none. Record treatment's own labels (Method, Same dose for all) are not in the registry and stay English in ZH, as on main. In the batch form the withdrawal notice sits below the optional rows and scrolls under the footer at 360; it is reached by scrolling, as the rows above it.
+
+# Round 3 (owner, 2026-10-16): full-width optional rows, one batch dose, edit forms, no strength, prefilled withdrawals
+
+### Problems (from round 2's screens)
+
+- **major** · Two optional faces on one form: half-width "+" cards for empty optionals and a filled card with a pencil (owner). OptionalRow's `face:'row'` is the one full-width face (Field README: a sheet gives its optionals one face on one track).
+- **major** · The batch form grew with the pigs (a dose box per pig under "Same dose for all"); one Dose applies to most batches, and a few pigs differ (owner).
+- **major** · Strength as a field and a second line: many medicines have no meaningful strength (vaccines in doses, premixes and powders vary) (owner). It belongs in the brand's name when it matters.
+- **major** · Withdrawal defaults were empty for most medicines, so the notice rarely appeared; the default is the usual case and should ship prefilled (owner).
+- **major** · The Medicines page's sheets were menus of steps (Rename, Strength, Withdrawal, each a level); an edit form shows the fields on the sheet and saves once (owner).
+- **minor** · `medicines.search-none` typed "Gamithro", which matches the farm-added Gamithromycin: not a no-match state (owner). Now "Cefquinome".
+
+### Self-crit
+
+#### Round 3 (renders at 390 and 360, EN and ZH)
+- Custom doses as a **page**, not a drawer level: the list grows with the pigs and holds a scan (Sheet: a surface that fills the screen, a scan, is a page), and the pig's dose sheet must open over it; a drawer level would put a drawer on a drawer. Its Back (top left) returns to the form.
+- Found pig: Inspection has no highlight-and-scroll pattern; its patterns are Find a pig's results (search narrows the list) and Scan (opens the pig). Followed both: search narrows the list to the tag; Scan opens that pig's dose. Not the owner's "highlight and scroll into view" literally; said in the hand-back.
+- Checkbox kept on the Custom doses rows: every bulk page lets a pig be taken out (health-record PRD: "let a pig be excluded"); without it there is no way to exclude one.
+- Delete as Button's text register (ink): the system has no red text action; the red is on the confirm level. Filed as open.
+- Problems fixed: one optional face, full width; the form no longer grows with the pigs ("2 pigs · 1 own dose"); no strength anywhere (brand names carry it: "Amoxinsol 15%", "Amoxinsol 50%"); every non-vaccine starting-list medicine has a default withdrawal (sample, verify before release); edit forms with Save; a true no-match.
+- Squint (batch): the title, Medicine, Dose, then the withdrawal notice. Custom doses: the search, then the tags with their doses.
+- **Better because** the form is the same height for 2 pigs or 200, every optional reads the same way, and a brand or medicine is fixed in one place with one Save.
+
+#### Final look (the screens of this push; 390 and 360, EN and ZH)
+- Header check 0, spacing 0 on the 26 changed screens; strict legibility passes on them; check-states 6 failing, the same 6 as `c6cc500`; npm test passes.
+- Known: a trigger the atlas returns focus to shows the browser's focus ring (a finger draws none); Record treatment's own labels (Method) stay English in ZH, as on main.

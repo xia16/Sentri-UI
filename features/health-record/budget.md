@@ -81,15 +81,16 @@ The catalogue pickers' heads. Questions at a level: where am I? (the title: the 
 | Parent's name ("‹ Symptoms") | Where does up go? | Settled | **cut**: Back goes up one level; the parent is one Back away and was its title |
 | Done · N | How many have I ticked? | Act now | kept |
 
-# Record treatment and the medicines picker (2026-10-16, revised)
+# Record treatment and the medicines picker (2026-10-16, round 3)
 
-The picker's and the Brand list's facts are budgeted in `features/medicines/budget.md`. On the host forms:
+The picker's, the Brand list's and Custom doses' facts are budgeted in `features/medicines/budget.md` (Record treatment (host)). On the host forms, in order:
 
 | Fact | Question it answers | Level | Decision |
 |---|---|---|---|
-| Medicine: its name | What was given? | Settled (field value) | kept; the category stays in the picker |
+| Medicine: its name | What was given? | Settled (field value) | kept |
 | Method, pre-filled from the medicine's last use | How was it given? | Settled | kept, editable |
-| Brand (optional row, only once a medicine is chosen): "Amoxinsol 50 · 50%" | Which bottle? | Settled | added back as the medicines feature's field |
-| Unit, pre-filled from the medicine's last use, in "Same dose for all" and each pig's box | In what unit is the dose? | Settled (quiet, beside the figure) | kept |
-| Withdrawal until <date> (Banner notice, before Save) | When may these pigs go to slaughter? | Watch | added; absent when no withdrawal is in force |
-| Order | What was given, then how much? | — | Medicine, Method, Brand, Dose (several pigs: the dose card), Condition, Note, the notice; the "Treatment details" fold goes with the dock |
+| Brand (optional row, full width, OptionalRow face `row`), only once a medicine is chosen | Which bottle? | Settled | the brand's name under the label once set |
+| Dose with its unit (pre-filled from the medicine's last use) | How much, in what unit? | Settled | one field for one pig or all |
+| Custom doses (several pigs): "3 pigs · 1 own dose" | Does any pig get a different dose? | Settled | a row opening the Custom doses page; replaces "Same dose for all" and the per-pig boxes on the form |
+| Condition, Note (optional rows, full width) | Which finding? Anything to add? | Settled | the condition's name, the note's first line |
+| Withdrawal until <date> (Banner notice, before Save) | When may these pigs go to slaughter? | Watch | absent when no withdrawal is in force |

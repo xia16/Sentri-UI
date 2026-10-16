@@ -258,3 +258,9 @@ Rounds and the final look follow in `features/medicines/critique.md`, which rend
 ### Revision (owner, 2026-10-16)
 
 The Brand optional row comes back as the medicines feature's field (only once a medicine is chosen; its own list with recents and an Add card), after Method and before the dose; the withdrawal notice (Banner notice) closes the form before Save when a withdrawal is in force. The picker picks a medicine; Method and unit are remembered per medicine. Renders and the final look: `features/medicines/critique.md`, Revision.
+
+### Round 3 (owner, 2026-10-16)
+
+- **major** · The half-width "+ Brand / + Condition / + Note" cards and the filled Brand card with its pencil were two optional faces on one form; the owner asked for full-width rows (OptionalRow face `row`, as Record dead's Photos and Details). Fixed on the single and batch forms; the condition picker itself is unchanged (the owner reworks conditions separately).
+- **major** · The batch form drew a dose box per pig under "Same dose for all", which grows the form with the pigs; now one Dose for all and a "Custom doses" row opening a page of pigs (each pig's dose on the right; a tap edits it; ear-tag search and Scan).
+- Renders and the final look: `features/medicines/critique.md`, Round 3.

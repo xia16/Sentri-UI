@@ -81,23 +81,37 @@ test('adding a medicine: Name pre-filled, Category required (set when added insi
   assert.equal(c.form.med.add.category, 'hormones');
 });
 
-test('Brand: an optional row only once a medicine is chosen; the farm\'s brands with recents; Add under the medicine', () => {
+test('Brand: a full-width optional row only once a medicine is chosen; the farm\'s brands with recents, no second line; Add, then the optional withdrawal', () => {
   const c = open(['000267']); M.handleRecordAction(c, 'dismiss', ''); c.view = 'treatment';
   assert.doesNotMatch(M.overlay(c), /data-action="brand-open"/);
   M.handleRecordAction(c, 'medicine-open', ''); M.handleRecordAction(c, 'medicine-select', 'amoxicillin');
   const form = M.overlay(c), at = s => form.indexOf(s);
   assert.ok(at('data-picker-key="method"') < at('data-action="brand-open"') && at('data-action="brand-open"') < at('data-bulk-key="dose"'), 'Medicine, Method, Brand, then the dose');
+  assert.match(form, /data-ds="OptionalRow"[^>]*data-face="row" data-action="brand-open"/);
+  assert.match(form, /data-face="row" data-action="record-optional-open" data-value="target"/);
+  assert.match(form, /data-face="row" data-action="record-optional-open" data-value="note"/);
   M.handleRecordAction(c, 'brand-open', '');
-  assert.deepEqual(rows(M.brandPickerBody(c)), ['# Recently used', 'Amoxinsol 50', '  50%', 'Betamox LA', '  150 mg/ml', 'Clamoxyl', '# Other brands', 'Duphamox', '  150 mg/ml', 'Vetrimoxin'], 'a strength is the second line: it tells sibling brands apart');
+  assert.deepEqual(rows(M.brandPickerBody(c)), ['# Recently used', 'Amoxinsol 50%', 'Betamox LA', 'Clamoxyl', '# Other brands', 'Amoxinsol 15%', 'Vetrimoxin'], 'two strengths are two brands; no second line');
   c.form.brandPick.search = 'Moxylan'; assert.deepEqual(rows(M.brandPickerBody(c)), ['Add “Moxylan”']);
   M.handleRecordAction(c, 'brand-add', 'Moxylan');
-  assert.equal(c.form.brand, 'Moxylan'); assert.equal(c.form.brandPick.level, 'details', 'then the optional details');
-  M.handleRecordAction(c, 'brand-details-save', ''); assert.equal(c.view, 'brand-picker', 'Add waits until a detail is typed');
-  c.form.brandPick.draft.strength = '15%'; M.handleRecordAction(c, 'brand-details-save', '');
-  assert.equal(c.view, 'treatment'); assert.match(M.overlay(c), /Moxylan · 15%/);
-  assert.ok(c.medFarm.brands.some(b => b.medicine === 'amoxicillin' && b.name === 'Moxylan'));
+  assert.equal(c.form.brand, 'Moxylan'); assert.equal(c.form.brandPick.level, 'details', 'then the optional withdrawal');
+  assert.match(M.brandPickerBody(c), /Uses Amoxicillin(&#39;|')s 14 days when empty/);
+  assert.doesNotMatch(M.brandPickerBody(c), /Strength/);
+  M.handleRecordAction(c, 'brand-details-save', ''); assert.equal(c.view, 'brand-picker', 'Add waits until a withdrawal is typed');
+  c.form.brandPick.draft.withdrawal = '7'; M.handleRecordAction(c, 'brand-details-save', '');
+  assert.equal(c.view, 'treatment'); assert.match(M.overlay(c), /Withdrawal until 19 Sep/);
+  assert.ok(c.medFarm.brands.some(b => b.medicine === 'amoxicillin' && b.name === 'Moxylan' && b.withdrawal === 7));
   M.handleRecordAction(c, 'medicine-open', ''); M.handleRecordAction(c, 'medicine-select', 'meloxicam');
   assert.equal(c.form.brand, '', 'a new medicine drops the old brand');
+});
+
+test('Note: a small sheet with Save; the row then shows the note\'s first line', () => {
+  const c = open(['000267']); M.handleRecordAction(c, 'medicine-select', 'amoxicillin');
+  M.handleRecordAction(c, 'record-optional-open', 'note');
+  assert.match(M.overlay(c), /data-action="record-optional-save"[^>]*>[^]*Save/);
+  c.form.optionalDraft = 'Gave in the morning water.\nRecheck tomorrow.'; M.handleRecordAction(c, 'record-optional-save', '');
+  assert.equal(c.view, 'treatment');
+  assert.match(M.overlay(c), /st-optional-answer" role="status">Gave in the morning water\.</);
 });
 
 test('the medicine remembers its last method and unit; saving makes it the newest recent and its brand the first', () => {
@@ -111,13 +125,38 @@ test('the medicine remembers its last method and unit; saving makes it the newes
   assert.equal(c.medFarm.brands[0].name, 'Loxicom');
 });
 
-test('batch: Medicine, Method and Brand first, then the doses, then the optional rows', () => {
+
+test('batch: one Dose for all, then a Custom doses row; no per-pig rows on the form', () => {
   const c = M.seed(); M.openBulkAction(c, 'treatment', ['000254', '000267']); M.handleRecordAction(c, 'medicine-open', ''); M.handleRecordAction(c, 'medicine-select', 'tulathromycin');
   const html = M.overlay(c), at = s => html.indexOf(s);
-  assert.ok(at('data-action="medicine-open"') < at('data-picker-key="method"'));
-  assert.ok(at('data-picker-key="method"') < at('data-action="brand-open"'));
-  assert.ok(at('data-action="brand-open"') < at('Same dose for all'));
-  assert.ok(at('data-bulk-value="000267"') < at('>Condition<'));
+  assert.ok(at('data-action="medicine-open"') < at('data-picker-key="method"') && at('data-picker-key="method"') < at('data-action="brand-open"'));
+  assert.ok(at('data-action="brand-open"') < at('data-bulk-key="dose"') && at('data-bulk-key="dose"') < at('data-action="pig-doses-open"'));
+  assert.ok(at('data-action="pig-doses-open"') < at('data-value="target"'));
+  assert.doesNotMatch(html, /data-bulk-value=|Same dose for all|data-bulk-include/);
+  assert.match(html, /Custom doses[^]*2 pigs/);
+});
+
+test('custom doses: a page of pigs with their dose; a pig\'s own dose in ink with Own dose; search and scan; Save waits for every pig', () => {
+  const c = M.seed(); M.openBulkAction(c, 'treatment', ['000254', '000267']); M.handleRecordAction(c, 'medicine-open', ''); M.handleRecordAction(c, 'medicine-select', 'tulathromycin');
+  assert.ok(!M.bulkActionValid(c), 'no dose yet');
+  M.handleRecordAction(c, 'pig-doses-open', '');
+  let page = M.inspectionSurface(c);
+  assert.match(page, /data-presentation="page"/); assert.match(page, /data-dose-search/); assert.match(page, /data-action="pig-doses-scan"/);
+  M.handleRecordAction(c, 'pig-dose-open', '000254'); c.form.doseDraft = '3'; M.handleRecordAction(c, 'pig-dose-save', '');
+  assert.equal(c.view, 'pig-doses');
+  page = M.inspectionSurface(c);
+  assert.match(page, /data-level="soon"><span class="st-animal-figure">3 mL<\/span><span class="st-animal-word">Own dose/);
+  const valid = () => { const v = c.view; c.view = 'treatment'; const ok = M.bulkActionValid(c); c.view = v; return ok; };
+  assert.ok(!valid(), '000267 has no dose and there is no shared dose');
+  c.form.values['000267'] = '4'; assert.ok(valid(), 'every pig its own dose');
+  delete c.form.values['000267']; c.form.dose = '2.5'; assert.ok(valid(), 'or a shared dose');
+  assert.match(M.inspectionSurface(c), /data-level="settled"><span class="st-animal-figure">2.5 mL/);
+  c.form.doseSearch = '267'; assert.doesNotMatch(M.inspectionSurface(c), /000254/);
+  M.handleRecordAction(c, 'pig-doses-scan', ''); assert.equal(c.view, 'pig-dose'); assert.equal(c.form.doseFor, '000267');
+  M.handleRecordAction(c, 'back', ''); c.view = 'pig-doses';
+  M.handleRecordAction(c, 'pig-dose-open', '000254'); M.handleRecordAction(c, 'pig-dose-same', '');
+  assert.ok(!Object.hasOwn(c.form.values, '000254'), 'Use the same dose undoes it');
+  c.view = 'treatment'; assert.match(M.overlay(c), /Custom doses[^]*2 pigs</);
 });
 
 test('a vaccination lists the vaccines by disease, without a one-row category level', () => {
@@ -127,55 +166,51 @@ test('a vaccination lists the vaccines by disease, without a one-row category le
   assert.ok(rows(html).includes('PRRS') && rows(html).includes('Classical swine fever') && !rows(html).includes('Meloxicam'));
 });
 
-test('Medicines page: catalogue medicines show brands only; farm-added ones rename and delete; brands rename and delete', () => {
+test('Medicines page: edit forms; a starting-list medicine edits only its default withdrawal; brands and farm-added medicines edit name and withdrawal and delete', () => {
   const c = M.seed(); c.view = 'medicines';
   assert.match(M.overlay(c), /data-presentation="page"/);
-  M.handleRecordAction(c, 'medicines-category', 'antibiotics');
-  M.handleRecordAction(c, 'medicines-medicine', 'amoxicillin');
+  M.handleRecordAction(c, 'medicines-category', 'antibiotics'); M.handleRecordAction(c, 'medicines-medicine', 'amoxicillin');
   let html = M.overlay(c);
-  assert.doesNotMatch(html, /data-action="medicines-level" data-value="(rename|delete)"/, 'a starting-list medicine cannot be renamed or deleted');
-  assert.match(html, />Brands</);
-  M.handleRecordAction(c, 'medicines-brand', 'amoxicillin/1'); M.handleRecordAction(c, 'medicines-level', 'rename'); c.medPage.draft = 'Betamox LA 150';
-  M.handleRecordAction(c, 'medicines-edit-save', '');
-  assert.ok(c.medFarm.brands.some(b => b.name === 'Betamox LA 150'));
-  M.handleRecordAction(c, 'medicines-level', 'delete'); M.handleRecordAction(c, 'medicines-delete-save', '');
-  assert.ok(c.medFarm.brands.find(b => b.id === 'amoxicillin/1').deleted);
-  M.handleRecordAction(c, 'medicines-medicine', 'farm-gamithromycin');
-  assert.match(M.overlay(c), /data-action="medicines-level" data-value="rename"/);
-  M.handleRecordAction(c, 'medicines-level', 'delete'); assert.match(M.overlay(c), /Past records keep its name/);
+  assert.doesNotMatch(html, /data-med-edit="name"|medicines-level/, 'name read-only, no Delete');
+  assert.match(html, /data-med-edit="withdrawal"[^>]*value="14"/, 'the default ships prefilled');
+  c.medPage.medicineDraft.withdrawal = '10'; M.handleRecordAction(c, 'medicines-edit-save', '');
+  assert.equal(c.medFarm.medicines.find(m => m.id === 'amoxicillin').withdrawal, 10);
+  M.handleRecordAction(c, 'medicines-medicine', 'amoxicillin'); M.handleRecordAction(c, 'medicines-brand', 'amoxicillin/2');
+  html = M.overlay(c);
+  assert.match(html, /data-med-edit="name"/); assert.doesNotMatch(html, /Strength/); assert.match(html, /Uses Amoxicillin(&#39;|')s 10 days when empty/);
+  assert.match(html, /data-action="medicines-level" data-value="delete"[^>]*>[^]*Delete brand/);
+  c.medPage.brandDraft.name = 'Clamoxyl 15%'; M.handleRecordAction(c, 'medicines-edit-save', '');
+  assert.ok(c.medFarm.brands.some(b => b.name === 'Clamoxyl 15%'));
+  M.handleRecordAction(c, 'medicines-brand', 'amoxicillin/2'); M.handleRecordAction(c, 'medicines-level', 'delete');
+  assert.match(M.overlay(c), /Past records keep its name/);
   M.handleRecordAction(c, 'medicines-delete-save', '');
+  assert.ok(c.medFarm.brands.find(b => b.id === 'amoxicillin/2').deleted);
+  M.handleRecordAction(c, 'medicines-medicine', 'farm-gamithromycin');
+  assert.match(M.overlay(c), /data-med-edit="name"[^]*Delete medicine/);
+  M.handleRecordAction(c, 'medicines-level', 'delete'); M.handleRecordAction(c, 'medicines-delete-save', '');
   assert.equal(c.view, 'medicines'); assert.doesNotMatch(M.overlay(c), /Gamithromycin/);
 });
 
-test("withdrawal: the brand's own, else the medicine's default, shown as a notice before Save; the record keeps a copy", () => {
+test("withdrawal: the medicine's default (the usual case), a brand's override when its label differs; a notice before Save; the record keeps a copy", () => {
   const c = open(['000267']); M.handleRecordAction(c, 'medicine-select', 'amoxicillin');
   assert.match(M.overlay(c), /data-ds="Banner" data-tone="notice"[^]*Withdrawal until 26 Sep/, 'Amoxicillin default: 14 days');
   M.handleRecordAction(c, 'brand-open', ''); M.handleRecordAction(c, 'brand-select', 'amoxicillin/0');
   let html = M.overlay(c);
-  assert.match(html, /Withdrawal until 14 Sep/, 'Amoxinsol 50: its own 2 days');
+  assert.match(html, /Withdrawal until 14 Sep/, 'Amoxinsol 50%: its own 2 days');
   assert.ok(html.indexOf('Withdrawal until') < html.indexOf('class="sheet-footer'));
   M.handleRecordAction(c, 'brand-open', ''); M.handleRecordAction(c, 'brand-select', 'amoxicillin/2');
   assert.match(M.overlay(c), /Withdrawal until 26 Sep/, 'Clamoxyl has none: the default');
   M.handleRecordAction(c, 'brand-open', ''); M.handleRecordAction(c, 'brand-select', 'amoxicillin/0');
   c.form.dose = '5'; assert.ok(M.saveBulkAction(c));
   const rec = M.pig(c, '000267').treatment;
-  assert.deepEqual([rec.brand, rec.strength, rec.withdrawalDays, rec.withdrawalUntil], ['Amoxinsol 50', '50%', 2, '14 Sep']);
+  assert.deepEqual([rec.brand, rec.withdrawalDays, rec.withdrawalUntil], ['Amoxinsol 50%', 2, '14 Sep']);
   c.medFarm.brands.find(b => b.id === 'amoxicillin/0').withdrawal = 7;
   assert.equal(M.pig(c, '000267').treatment.withdrawalDays, 2, 'a later edit does not change the record');
 });
 
-test('no withdrawal in force: no notice', () => {
-  const c = open(['000267']); M.handleRecordAction(c, 'medicine-select', 'penicillin');
-  assert.doesNotMatch(M.overlay(c), /Withdrawal until/);
-});
-
-test('Medicines page: a medicine\'s default withdrawal and a brand\'s strength and withdrawal are editable', () => {
-  const c = M.seed(); c.view = 'medicines'; M.handleRecordAction(c, 'medicines-category', 'antibiotics'); M.handleRecordAction(c, 'medicines-medicine', 'amoxicillin');
-  assert.match(M.overlay(c), /Default withdrawal \(meat\)[^]*14 days/);
-  M.handleRecordAction(c, 'medicines-level', 'withdrawal'); c.medPage.draft = '10'; M.handleRecordAction(c, 'medicines-edit-save', '');
-  assert.equal(c.medFarm.medicines.find(m => m.id === 'amoxicillin').withdrawal, 10);
-  M.handleRecordAction(c, 'medicines-brand', 'amoxicillin/2');
-  assert.match(M.overlay(c), /Strength[^]*Not set/);
-  M.handleRecordAction(c, 'medicines-level', 'strength'); c.medPage.draft = '200 mg/ml'; M.handleRecordAction(c, 'medicines-edit-save', '');
-  assert.equal(c.medFarm.brands.find(b => b.id === 'amoxicillin/2').strength, '200 mg/ml');
+test('every starting-list medicine but the vaccines ships with a default withdrawal; none in force means no notice', () => {
+  for (const m of catalogue.medicines) assert.equal(m.category === 'vaccines' ? m.withdrawal === undefined : Number.isInteger(m.withdrawal), true, m.id);
+  assert.match(catalogue.note, /SAMPLE values[^]*MOA Announcement No\. 278/);
+  const c = open(['000267']); M.handleRecordAction(c, 'medicine-select', 'oxytocin');
+  assert.doesNotMatch(M.overlay(c), /Withdrawal until/, '0 days: nothing to wait for');
 });

@@ -24,3 +24,17 @@
 .inspection-phone .medicine-sheet-verbs>*+*{margin-top:var(--space-section,24px)}
 /* The withdrawal notice closes the form, a section below the last field. */
 .inspection-phone .bulk-controls .medicine-withdrawal{margin-top:8px}
+
+/* Record treatment's optional rows (OptionalRow face 'row'), one under another; the pig doses as one list under its label. */
+.inspection-phone .treatment-optionals{display:flex;flex-direction:column;gap:8px}
+.inspection-phone .treatment-optionals>.st-optional-row{margin:0}
+.inspection-phone .bulk-action-layout.is-given-first>.treatment-pig-doses{margin:24px var(--space-gutter,18px) 16px}
+@media(max-width:370px){.inspection-phone .bulk-action-layout.is-given-first>.treatment-pig-doses{margin-left:var(--space-gutter-narrow,12px);margin-right:var(--space-gutter-narrow,12px)}}
+/* A pig's dose sheet and the edit forms: the text action sits under its field; Delete closes the form. */
+.inspection-phone .pig-dose-same{margin-top:8px}
+.inspection-phone .medicine-delete-action{margin-top:var(--space-section,24px)}
+/* "Custom doses" under the Dose field; on its page, the ear-tag search with Scan beside it. */
+.inspection-phone .bulk-given>.custom-doses-row{margin:0}
+.inspection-phone .custom-doses-search{display:flex;align-items:center;gap:8px;margin-bottom:16px}
+.inspection-phone .custom-doses-search>.st-choice-search{flex:1 1 auto;margin:0}
+.inspection-phone .bulk-action-layout.is-given-first>.bulk-after{padding-top:16px}

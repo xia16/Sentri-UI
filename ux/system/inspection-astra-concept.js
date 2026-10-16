@@ -565,7 +565,7 @@ function bulkChanges(c){
   return row;
  });
 }
-function bulkActionValid(c){const rows=bulkChanges(c);return rows.some(r=>r.change)&&!rows.some(r=>r.error);}
+function bulkActionValid(c){const rows=bulkChanges(c);if(c.view==='treatment'&&rows.some(r=>r.eligible&&!r.change))return false;return rows.some(r=>r.change)&&!rows.some(r=>r.error);}
 function saveBulkAction(c){
  if(!bulkActionValid(c))return false;
  const f=c.form,view=c.view,rows=bulkChanges(c).filter(r=>r.change&&r.eligible);
@@ -608,6 +608,7 @@ function bulkRowState(row,view){if(row.change&&row.eligible&&!row.error)return '
 /* "C1 · Gestation · 40 days" breaks only after a "·", never inside "40 days". */
 function bulkMeta(text){return String(text).split(' · ').map(part=>esc(part).replace(/ /g,'&nbsp;')).join('&nbsp;· ');}
 function bulkRows(c){
+ if(c.view==='pig-doses')return treatmentDoseRows(c,(c.form.doseSearch||'').trim());
  const f=c.form,m=bulkMeasurements[c.view],dose=c.view==='treatment',firstMissing=f.showRequired&&m&&!bulkActionValid(c)?bulkChanges(c).find(r=>r.eligible&&!r.change)?.id:'';
  return bulkChanges(c).map(row=>{
   const p=row.p,blocked=p?.stage==='Sow died'&&c.view!=='note'||c.view==='backfat'&&!['Sow','Gilt'].includes(animalType(p));
@@ -672,12 +673,12 @@ function bulkActionPage(c){
  if(view==='resolve')controls=target+bulkSelect(c,'Outcome','outcome',[['','Choose outcome'],['recover','Recovered'],['strike','Entered in error']],need(f.outcome));
  if(view==='treatment'){
   const method=bulkSelect(c,'Method','method',[['','Choose method'],['Injection','Injection'],['Oral','Oral'],['Topical','Topical'],['In feed','In feed'],['In water','In water']],need(f.method));
-  const anyDose=String(f.dose||'').trim()!==''||Object.values(f.values||{}).some(v=>String(v).trim()!=='');
-  const dose=bulkDoseControl(c,{single,label:single?'Dose':'Same dose for all',needDose:need(anyDose),needUnit:need(f.doseUnit)});
-  controls=SentriUI.pickerField({label:f.taskId==='vaccination'?'Vaccine':'Medicine',value:f.medicine,action:'medicine-open',variant:'cascade',error:need(f.medicine.trim()),required:true})+method+brandField(c)+(single?dose:'')+(f.returnFinding?'<div class="field">Condition<strong>'+esc(f.returnFinding)+'</strong></div>':'');sameDose=single?'':dose;
+  const dosed=bulkChanges(c).filter(r=>r.eligible).every(r=>String(r.value??'').trim()!=='');
+  const dose=bulkDoseControl(c,{single:true,label:str('medicines.dose.label'),needDose:need(String(f.dose||'').trim()!==''||dosed),needUnit:need(f.doseUnit)});
+  controls=SentriUI.pickerField({label:f.taskId==='vaccination'?'Vaccine':'Medicine',value:f.medicine,action:'medicine-open',variant:'cascade',error:need(f.medicine.trim()),required:true})+method+brandField(c)+dose+(f.returnFinding?'<div class="field">Condition<strong>'+esc(f.returnFinding)+'</strong></div>':'');
  }
  if(view==='body')controls=bulkSelect(c,'Condition','condition',[['','Choose condition'],['Thin','Thin'],['Over-conditioned','Over-conditioned']],need(f.condition));
- const note=view==='note'?(SentriUI.field({label:"Note",error:need(f.note.trim()),control:"<textarea data-bulk-key=\"note\" rows=\"2\""+(need(f.note.trim())?' aria-invalid="true"':'')+">"+(esc(f.note))+"</textarea>"})):recordOptionalControls(c);
+ const note=view==='treatment'?treatmentOptionals(c):view==='note'?(SentriUI.field({label:"Note",error:need(f.note.trim()),control:"<textarea data-bulk-key=\"note\" rows=\"2\""+(need(f.note.trim())?' aria-invalid="true"':'')+">"+(esc(f.note))+"</textarea>"})):recordOptionalControls(c);
  const rows=bulkChanges(c),count=rows.filter(r=>r.change&&r.eligible).length;
  if(single){
   const p=pig(c,f.subjects[0]),m=bulkMeasurements[view];
@@ -687,7 +688,7 @@ function bulkActionPage(c){
  }
  /* Treatment, several pigs (owner, 2026-10-16): what was given first (Medicine, Method), then the doses (Same dose for all,
     then each pig's dose in the remembered unit), then the optional rows. The same fields and dose boxes, in that order. */
- if(view==='treatment')return sheet(c,bulkTitles[view],countLabel(f.subjects.length),'<div class="bulk-action-layout is-given-first" data-bulk-kind="treatment"><section class="bulk-controls bulk-given" aria-label="Treatment details">'+controls+'</section><section class="pig-review-card bulk-pigs is-short">'+sameDose+'<div class="pig-review-list bulk-pig-list" role="region" aria-label="Pigs" tabindex="0" data-bulk-rows>'+bulkRows(c)+'</div></section><section class="bulk-controls bulk-after" aria-label="Optional details">'+note+withdrawalBanner(c)+'</section></div>',footer(back(),bulkCommit(c))).replace('class="sheet"','class="sheet bulk-action-sheet"');
+ if(view==='treatment')return sheet(c,bulkTitles[view],countLabel(f.subjects.length),'<div class="bulk-action-layout is-given-first" data-bulk-kind="treatment"><section class="bulk-controls bulk-given" aria-label="Treatment details">'+controls+customDosesRow(c)+'</section><section class="bulk-controls bulk-after" aria-label="Optional details">'+note+withdrawalBanner(c)+'</section></div>',footer(back(),bulkCommit(c))).replace('class="sheet"','class="sheet bulk-action-sheet"');
  const body=bulkListOverlay(c,{kind:view,rowsHtml:bulkRows(c),heading:'Pigs',sub:'',column:(bulkMeasurements[view]?'Current → New · '+bulkMeasurements[view].unit:''),headHtml:sameDose,summary:bulkDetailsSummary(c),toggleLabel:view==='treatment'?'Treatment details':'Details',controlsHtml:controls+note,short:f.subjects.length<=3});
  return sheet(c,bulkTitles[view],countLabel(f.subjects.length),body,footer(back(),bulkCommit(c))).replace('class="sheet"','class="sheet bulk-action-sheet"');
 }
@@ -700,17 +701,15 @@ const medLang=language==='zh'?'zh':'en';
 const medicineCategories=medicineCatalogue.categories.map(x=>x.id);
 const medCategoryName=(id,short=false)=>{const x=medicineCatalogue.categories.find(x=>x.id===id);return x?(short?x.short[medLang]:x[medLang]):'';};
 function medicineFarmSeed(){
- const medicines=medicineCatalogue.medicines.map(m=>({id:m.id,category:m.category,name:m[medLang],names:[m.en,m.zh,...(m.also||[])],catalogue:true}));
+ // Each starting-list medicine ships with a default meat withdrawal (SAMPLE days, to be verified before release); vaccines none.
+ const medicines=medicineCatalogue.medicines.map(m=>({id:m.id,category:m.category,name:m[medLang],names:[m.en,m.zh,...(m.also||[])],catalogue:true,withdrawal:m.withdrawal??null}));
  // A medicine this farm added itself (it can be renamed and deleted; catalogue medicines cannot).
- medicines.push({id:'farm-gamithromycin',category:'antibiotics',name:'Gamithromycin',names:['Gamithromycin'],catalogue:false});
+ medicines.push({id:'farm-gamithromycin',category:'antibiotics',name:'Gamithromycin',names:['Gamithromycin'],catalogue:false,withdrawal:null});
  // The brands the farm has used, per medicine, most recently used first.
- const brands=[['amoxicillin',['Amoxinsol 50','Betamox LA','Clamoxyl','Vetrimoxin','Duphamox']],['tulathromycin',['Draxxin','Tulissin']],['meloxicam',['Metacam']],['iron-dextran',['Uniferon 200']],['swine-influenza',['Respiporc FLU3']],['prrs',['Ingelvac PRRS MLV']],['farm-gamithromycin',['Zactran']]]
-  .flatMap(([medicine,names])=>names.map((name,i)=>({id:medicine+'/'+i,medicine,name,strength:'',withdrawal:null})));
- // Optional details, sample values: a brand's strength and meat withdrawal (days) as its label prints them, and a medicine's
- // default withdrawal, used when no brand is chosen or the brand has none.
- const details={'amoxicillin/0':['50%',2],'amoxicillin/1':['150 mg/ml',21],'amoxicillin/4':['150 mg/ml',null],'tulathromycin/0':['100 mg/ml',33],'tulathromycin/1':['100 mg/ml',null],'meloxicam/0':['20 mg/ml',5],'iron-dextran/0':['200 mg/ml',null]};
- for(const b of brands)if(details[b.id])[b.strength,b.withdrawal]=details[b.id];
- for(const [id,days] of [['amoxicillin',14],['tulathromycin',33],['meloxicam',5]])medicines.find(m=>m.id===id).withdrawal=days;
+ const brands=[['amoxicillin',['Amoxinsol 50%','Betamox LA','Clamoxyl','Vetrimoxin','Amoxinsol 15%']],['tulathromycin',['Draxxin','Tulissin']],['meloxicam',['Metacam 20 mg/ml']],['iron-dextran',['Uniferon 200']],['swine-influenza',['Respiporc FLU3']],['prrs',['Ingelvac PRRS MLV']],['farm-gamithromycin',['Zactran']]]
+  .flatMap(([medicine,names])=>names.map((name,i)=>({id:medicine+'/'+i,medicine,name,withdrawal:null})));
+ // A brand overrides its medicine's withdrawal only when its label differs (sample values): Amoxinsol 50%, an oral powder, 2 days.
+ for(const [id,days] of [['amoxicillin/0',2],['amoxicillin/1',21]])brands.find(b=>b.id===id).withdrawal=days;
  // The farm's picks, newest first, by any worker; and the method and unit each medicine was last given with.
  const recents=['tulathromycin','amoxicillin','meloxicam','swine-influenza','prrs'];
  const memory={tulathromycin:{method:'Injection',unit:'mL'},amoxicillin:{method:'In water',unit:'g'},meloxicam:{method:'Injection',unit:'mL'},'iron-dextran':{method:'Injection',unit:'mL'}};
@@ -786,12 +785,12 @@ function medicineAction(c,a,v){
   const farm=medFarm(c),id='farm-'+farm.medicines.length,name=ad.name.trim();farm.medicines.push({id,category:ad.category,name,names:[name],catalogue:false});
   pickMedicine(c,id);return true;}
  /* Brand: the brands the farm has used for this medicine. A search with no match adds one under it for everyone and picks it,
-    then offers its details (strength, withdrawal) as a skippable level: Back goes up to the list, the ✕ closes. */
+    then offers its withdrawal as a skippable details level: Back goes up to the list, the ✕ closes. */
  if(a==='brand-open'){if(!f.medicineId)return true;f.brandPick={search:'',level:'list'};c.view='brand-picker';return true;}
  if(a==='brand-select'){const b=medFarm(c).brands.find(b=>b.id===v&&!b.deleted);if(b){f.brand=b.name;f.brandId=b.id;}delete f.brandPick;c.view='treatment';return true;}
- if(a==='brand-add'){const name=String(v||'').trim();if(!name)return true;const farm=medFarm(c),b={id:f.medicineId+'/farm'+farm.brands.length,medicine:f.medicineId,name,strength:'',withdrawal:null};farm.brands.push(b);f.brand=b.name;f.brandId=b.id;f.brandPick={search:'',level:'details',draft:{strength:'',withdrawal:''}};return true;}
+ if(a==='brand-add'){const name=String(v||'').trim();if(!name)return true;const farm=medFarm(c),b={id:f.medicineId+'/farm'+farm.brands.length,medicine:f.medicineId,name,withdrawal:null};farm.brands.push(b);f.brand=b.name;f.brandId=b.id;f.brandPick={search:'',level:'details',draft:{withdrawal:''}};return true;}
  if(a==='brand-up'){f.brandPick.level='list';f.brandPick.search='';return true;}
- if(a==='brand-details-save'){const b=medFarm(c).brands.find(b=>b.id===f.brandId),d=f.brandPick?.draft;if(!b||!d||!medDetailsEntered(d))return true;b.strength=d.strength.trim();b.withdrawal=medDays(d.withdrawal);delete f.brandPick;c.view='treatment';return true;}
+ if(a==='brand-details-save'){const b=medFarm(c).brands.find(b=>b.id===f.brandId),d=f.brandPick?.draft;if(!b||!d||!medDetailsEntered(d))return true;b.withdrawal=medDays(d.withdrawal);delete f.brandPick;c.view='treatment';return true;}
  if(a==='brand-clear'){f.brand='';f.brandId='';delete f.brandPick;c.view='treatment';return true;}
  return false;
 }
@@ -813,30 +812,82 @@ function rememberMedicine(c,f){
  farm.recents=[f.medicineId,...farm.recents.filter(id=>id!==f.medicineId)];
  const b=f.brandId&&farm.brands.find(b=>b.id===f.brandId);if(b)farm.brands=[b,...farm.brands.filter(x=>x!==b)];
 }
-/* Optional details (owner, 2026-10-16): a brand's strength (free text, "15%", "100 mg/ml") and meat withdrawal in days, and a
-   medicine's default withdrawal. Never required. */
+/* Withdrawal (owner, 2026-10-16): every medicine has a default meat withdrawal in days (the usual case); a brand overrides it
+   only when its label differs. Never required. There is no strength field: when strength matters it is in the brand's name
+   ("Amoxinsol 50%"), so two strengths are two brands. */
 const medDays=v=>{const n=Math.round(Number(String(v??'').trim()));return String(v??'').trim()!==''&&Number.isFinite(n)&&n>=0?n:null;};
-const medDetailsEntered=d=>!!(d.strength.trim()||medDays(d.withdrawal)!=null);
-const medDaysLabel=n=>n==null?str('medicines.detail.not_set'):str(n===1?'medicines.detail.day':'medicines.detail.days',{n});
-const medBrandLabel=b=>b?b.name+(b.strength?' · '+b.strength:''):'';
+const medDetailsEntered=d=>medDays(d.withdrawal)!=null;
+const medDaysLabel=n=>n==null?'':str(n===1?'medicines.detail.day':'medicines.detail.days',{n});
+const medWithdrawalHint=c=>{const m=medicineById(c,c.form.medicineId);return m?.withdrawal!=null?str('medicines.detail.uses_default',{medicine:m.name,days:medDaysLabel(m.withdrawal)}):str('medicines.detail.no_default',{medicine:m?.name||''});};
+const medBrandLabel=b=>b?b.name:'';
 /* The withdrawal in force: the chosen brand's own, else the medicine's default, else none. */
 function medWithdrawal(c){const f=c.form,b=f.brandId&&medFarm(c).brands.find(x=>x.id===f.brandId),m=f.medicineId&&medicineById(c,f.medicineId);return b?.withdrawal!=null?b.withdrawal:m?.withdrawal??null;}
 function medWithdrawalUntil(days){const d=new Date(walkDate+'T12:00:00Z');d.setUTCDate(d.getUTCDate()+days);return medLang==='zh'?(d.getUTCMonth()+1)+'月'+d.getUTCDate()+'日':d.getUTCDate()+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getUTCMonth()];}
 /* The record keeps a copy of what was in force that day, so a later edit of the brand or medicine never changes it. */
-function medRecordCopy(c){const f=c.form,b=f.brandId&&medFarm(c).brands.find(x=>x.id===f.brandId),days=medWithdrawal(c);return {brand:f.brand||'',strength:b?.strength||'',withdrawalDays:days,withdrawalUntil:days!=null?medWithdrawalUntil(days):''};}
+function medRecordCopy(c){const f=c.form,b=f.brandId&&medFarm(c).brands.find(x=>x.id===f.brandId),days=medWithdrawal(c);return {brand:f.brand||'',withdrawalDays:days,withdrawalUntil:days!=null?medWithdrawalUntil(days):''};}
 /* The consequence of this record, before Save: Banner notice (a condition that follows from the commit; not danger, nothing is
    destroyed; not correction, nothing is reviewed). Absent when nothing is in force. */
 function withdrawalBanner(c){const days=medWithdrawal(c);if(days==null||!days)return '';return SentriUI.banner({tone:'notice',headline:str('medicines.withdrawal.until',{date:medWithdrawalUntil(days)}),consequence:str('medicines.withdrawal.consequence',{days:medDaysLabel(days)}),className:'medicine-withdrawal'});}
-/* The Brand field: an optional row, only once a medicine is chosen; it reads the brand and its strength. */
-const brandField=c=>{const f=c.form,b=f.brandId&&medFarm(c).brands.find(x=>x.id===f.brandId);return f.medicineId?'<div class="st-optional-list">'+stOptionalRow({label:str('medicines.brand.field'),value:b?medBrandLabel(b):f.brand||'',icon:icon('plus'),editIcon:icon('edit'),action:'brand-open',key:'brand'})+'</div>':'';};
+/* The treatment's optional rows (owner, 2026-10-16, round 3): Brand, Condition and Note are full-width optional rows, the face
+   Record dead gives Photos and Details (OptionalRow face 'row'): the label with a muted "Optional"; once set, the value under
+   it and the edit icon. Brand appears only once a medicine is chosen and reads the brand. */
+const treatmentOptional=(label,value,action,key)=>stOptionalRow({label,value,icon:icon('plus'),editIcon:icon('edit'),action,key,face:'row',optionalWord:str('medicines.optional')});
+const brandField=c=>{const f=c.form,b=f.brandId&&medFarm(c).brands.find(x=>x.id===f.brandId);return f.medicineId?'<div class="treatment-optionals">'+treatmentOptional(str('medicines.brand.field'),b?medBrandLabel(b):f.brand||'','brand-open','brand')+'</div>':'';};
+function treatmentOptionals(c){
+ const f=c.form,firstLine=(f.note||'').trim().split('\n')[0];
+ const condition=!f.returnFinding&&f.taskId!=='vaccination'?treatmentOptional(str('medicines.condition'),f.target||'','record-optional-open','target'):'';
+ return '<div class="treatment-optionals">'+condition+treatmentOptional(str('medicines.note'),firstLine,'record-optional-open','note')+'</div>';
+}
+/* Several pigs (owner, 2026-10-16, round 3 A): one Dose (with its unit) applies to all; a "Custom doses" row under it says how
+   many pigs and how many have their own dose, and opens the pig list. */
+const medDose=v=>{const t=String(v??'').trim(),n=Number(t);return t!==''&&Number.isFinite(n)&&n>0?n:null;};
+function customDosesRow(c){
+ const f=c.form,live=f.subjects.filter(id=>!f.excluded.includes(id)),own=live.filter(id=>Object.hasOwn(f.values,id)).length;
+ return '<div class="st-panel st-row-group custom-doses-row">'+stRow({action:'pig-doses-open',title:str('medicines.dose.custom'),description:countLabel(live.length)+(own?' · '+str(own===1?'medicines.dose.own_count_one':'medicines.dose.own_count',{n:own}):'')})+'</div>';
+}
+/* The pig list is a page (Sheet: a surface that can grow with the pigs and holds a scan; a drawer would carry a long list and
+   a second level, the pig's dose, on a drawer). Each pig's dose trails its row: quiet while it follows the shared dose, ink with
+   "Own dose" when set. The checkbox stays: it is the bulk pages' way to take a pig out (PRD, Rules). Search an ear tag (the
+   list narrows to it, as Find a pig's results do) or Scan (as Inspection's scan, it opens the pig: here its dose). */
+function customDosesPage(c){
+ const f=c.form,q=(f.doseSearch||'').trim();
+ const search='<div class="custom-doses-search">'+SentriUI.choiceSearch({label:str('medicines.dose.search'),value:f.doseSearch||'',attrs:{'data-dose-search':''}})+stIconButton({action:'pig-doses-scan',icon:icon('scan'),label:str('medicines.dose.scan')})+'</div>';
+ const rows=treatmentDoseRows(c,q);
+ return sheet({...c,view:'pig-doses'},str('medicines.dose.custom'),'',search+'<div class="custom-doses-results">'+(rows?'<div class="st-panel st-row-group" data-bulk-rows>'+rows+'</div>':SentriUI.choiceEmpty(str('medicines.dose.no_match',{q})))+'</div>','');
+}
+function treatmentDoseRows(c,q=''){
+ const f=c.form,unit=f.doseUnit?' '+f.doseUnit:'';
+ return bulkChanges(c).filter(row=>!q||row.id.includes(q)).map(row=>{
+  const p=row.p,own=Object.hasOwn(f.values,row.id),blocked=!row.eligible&&!f.excluded.includes(row.id);
+  const value=own?f.values[row.id]:f.dose,figure=String(value??'').trim()!==''?Number(value)+unit:'';
+  const right=blocked||f.excluded.includes(row.id)?{word:row.summary,level:'settled'}:own?{figure,word:str('medicines.dose.own'),level:'soon'}:{figure,level:'settled'};
+  return SentriUI.rowSelectDoor({code:row.id,description:p?penOf(c,row.id).id+' · '+stageSummary(p):'',checked:!f.excluded.includes(row.id)&&!blocked,action:'',openAction:blocked?'':'pig-dose-open',openValue:row.id,right,inputAttrs:{'data-bulk-include':row.id,'aria-label':'Include pig '+row.id,...(blocked?{'aria-disabled':'true'}:{})},className:'treatment-dose-row'});
+ }).join('');
+}
+/* A pig's own dose: a small sheet, "Dose for 000254", its dose in the shared unit; "Use the same dose" undoes it. */
+function pigDoseSheet(c){
+ const f=c.form,id=f.doseFor,own=Object.hasOwn(f.values,id),draft=f.doseDraft??(own?f.values[id]:f.dose??'');
+ const field=SentriUI.field({label:str('medicines.dose.label')+(f.doseUnit?' ('+f.doseUnit+')':''),variant:'number',control:'<input type="number" inputmode="decimal" min="0" step="any" data-pig-dose value="'+esc(draft)+'">'});
+ const same=own?'<div class="pig-dose-same">'+SentriUI.button({label:str('medicines.dose.same'),register:'text',action:'pig-dose-same'})+'</div>':'';
+ return sheet(c,str('medicines.dose.for',{id}),'',field+same,SentriUI.sheetFooter({content:back()+SentriUI.button({label:str('medicines.save'),register:'primary',action:'pig-dose-save',waiting:medDose(draft)==null})})).replace('class="sheet"','class="sheet pig-dose-sheet"');
+}
+function pigDoseAction(c,a,v){
+ const f=c.form;
+ if(a==='pig-dose-open'){if(!v)return true;f.doseFor=v;delete f.doseDraft;c.view='pig-dose';return true;}
+ if(a==='pig-doses-open'){f.doseSearch='';c.view='pig-doses';return true;}
+ if(a==='pig-doses-scan'){/* No camera in the prototype: a scan reads a sample tag, the last pig's. */const id=f.subjects.filter(x=>!f.excluded.includes(x)).at(-1);if(id){f.doseFor=id;delete f.doseDraft;c.view='pig-dose';}return true;}
+ if(a==='pig-dose-save'){const n=medDose(f.doseDraft??(Object.hasOwn(f.values,f.doseFor)?f.values[f.doseFor]:f.dose));if(n==null)return true;f.values[f.doseFor]=String(n);delete f.doseFor;delete f.doseDraft;c.view='pig-doses';return true;}
+ if(a==='pig-dose-same'){delete f.values[f.doseFor];delete f.doseFor;delete f.doseDraft;c.view='pig-doses';return true;}
+ return false;
+}
 /* The Brand list: the farm's brands for this medicine, most recently used first (the three newest under "Recently used" when
-   there are more); a brand's strength is its second line, because it tells sibling brands apart. Search, and Add “…” when
+   there are more); brand rows have no second line. Search, and Add “…” when
    nothing matches; then the optional details level. */
 function brandPickerBody(c){
  const f=c.form,pick=f.brandPick||{};
- if(pick.level==='details'){const d=pick.draft;return '<div class="medicine-add-fields">'+SentriUI.field({label:str('medicines.detail.strength'),control:'<input data-brand-detail="strength" maxlength="40" value="'+esc(d.strength)+'">'})+SentriUI.field({label:str('medicines.detail.withdrawal'),variant:'number',control:'<input type="number" inputmode="numeric" min="0" step="1" data-brand-detail="withdrawal" value="'+esc(d.withdrawal)+'">'})+'</div>';}
+ if(pick.level==='details'){const d=pick.draft;return '<div class="medicine-add-fields">'+SentriUI.field({label:str('medicines.detail.withdrawal'),variant:'number',hint:medWithdrawalHint(c),control:'<input type="number" inputmode="numeric" min="0" step="1" data-brand-detail="withdrawal" value="'+esc(d.withdrawal)+'">'})+'</div>';}
  const q=(pick.search||'').trim(),all=medBrands(c,f.medicineId);
- const row=b=>SentriUI.choiceRow({label:b.name,meta:b.strength||'',mode:'single',action:'brand-select',value:b.id,selected:f.brandId===b.id});
+ const row=b=>SentriUI.choiceRow({label:b.name,mode:'single',action:'brand-select',value:b.id,selected:f.brandId===b.id});
  let body;
  if(q){const hits=all.filter(b=>b.name.toLocaleLowerCase().includes(q.toLocaleLowerCase()));body=hits.length?SentriUI.choiceGroup(hits.map(row)):medAddCard('brand-add',pick.search);}
  else if(all.length>3)body=SentriUI.choiceGroup(all.slice(0,3).map(row),{title:str('medicines.group.recent')})+SentriUI.choiceGroup(all.slice(3).sort((x,y)=>x.name.localeCompare(y.name)).map(row),{title:str('medicines.group.other_brands')});
@@ -850,9 +901,10 @@ function brandPicker(c){
  return sheet(c,lv.title,'','<div class="brand-results">'+brandPickerBody(c)+'</div>',SentriUI.sheetFooter({content:SentriUI.backButton(lv.levelBack)+add,className:'st-picker-footer'}),'',null,!details&&f.brand?corner('brand-clear'):null).replace('class="sheet"','class="sheet picker-step brand-picker-step"');
 }
 
-/* The Medicines page (Home → Toolbox → Medicines): the categories, then a category's medicines; a medicine's sheet holds its
-   default withdrawal and its brands (and, for a medicine the farm added, Rename and Delete); a brand's level holds its strength
-   and withdrawal, Rename and Delete. Catalogue medicines cannot be renamed or deleted. */
+/* The Medicines page (Home → Toolbox → Medicines): the categories, then a category's medicines. A medicine's sheet and a
+   brand's level are edit forms (owner, 2026-10-16, round 3): Name, Strength and Withdrawal as fields on the sheet, Delete as a
+   text action at the bottom opening a confirm level, footer Back + Save. A starting-list medicine's name is read-only (the
+   title), it has no Delete, and only its default withdrawal is editable. */
 const medPage=c=>c.medPage||={category:'',medicine:'',brand:'',level:''};
 function medicinesPage(c){
  const pg=medPage(c);
@@ -861,45 +913,45 @@ function medicinesPage(c){
  return sheet({...c,view:'medicines'},medCategoryName(pg.category,true),'','<div class="st-panel st-row-group medicines-list">'+rows+'</div>','');
 }
 const medPageTarget=c=>{const pg=medPage(c);return pg.brand?medFarm(c).brands.find(x=>x.id===pg.brand&&!x.deleted):medicineById(c,pg.medicine);};
+/* The draft of the open form: the medicine's, or the brand's. */
+function medPageDraft(c){const pg=medPage(c),t=medPageTarget(c),key=pg.brand?'brandDraft':'medicineDraft';return pg[key]||={name:t?.name||'',withdrawal:t?.withdrawal??''};}
+function medPageChanged(c){const t=medPageTarget(c),d=medPageDraft(c);if(!t)return false;return d.name.trim()!==t.name||medDays(d.withdrawal)!==(t.withdrawal??null);}
 function medicineSheet(c){
  const pg=medPage(c),m=medicineById(c,pg.medicine);if(!m)return '';
- const t=medPageTarget(c),lv=levels(c,m.name);
- const foot=(primary='')=>SentriUI.sheetFooter({content:SentriUI.backButton(lv.levelBack)+primary});
- const wrap=html=>html.replace('class="sheet"','class="sheet medicine-sheet-step"');
- const changed=v=>String(v??'').trim()!==String(pg.draft??'').trim();
- if(pg.level==='rename')return wrap(sheet(c,lv.title,'',SentriUI.field({label:str('medicines.add.name'),control:'<input data-medicine-edit maxlength="80" value="'+esc(pg.draft??t.name)+'">'}),foot(SentriUI.button({label:str('medicines.rename'),register:'primary',action:'medicines-edit-save',waiting:!(String(pg.draft||'').trim()&&changed(t.name))}))));
- if(pg.level==='strength')return wrap(sheet(c,lv.title,'',SentriUI.field({label:str('medicines.detail.strength'),control:'<input data-medicine-edit maxlength="40" value="'+esc(pg.draft??'')+'">'}),foot(SentriUI.button({label:str('medicines.update'),register:'primary',action:'medicines-edit-save',waiting:!changed(t.strength)}))));
- if(pg.level==='withdrawal')return wrap(sheet(c,lv.title,'',SentriUI.field({label:str('medicines.detail.withdrawal'),variant:'number',control:'<input type="number" inputmode="numeric" min="0" step="1" data-medicine-edit value="'+esc(pg.draft??'')+'">'}),foot(SentriUI.button({label:str('medicines.update'),register:'primary',action:'medicines-edit-save',waiting:!changed(t.withdrawal??'')}))));
- if(pg.level==='delete')return wrap(sheet(c,lv.title,'','<p class="medicine-delete-note">'+esc(str('medicines.delete_body',{name:t.name}))+'</p>',foot(SentriUI.button({label:str('medicines.delete'),register:'danger',action:'medicines-delete-save'}))));
- const verbs=SentriUI.choiceGroup([SentriUI.choiceRow({label:str('medicines.rename'),mode:'navigate',action:'medicines-level',value:'rename'}),SentriUI.choiceRow({label:str('medicines.delete'),mode:'navigate',action:'medicines-level',value:'delete'})]);
- const detail=(label,value,level,empty)=>SentriUI.pickerField({label,value:value,placeholder:empty,action:'medicines-level',key:level}).replace('data-picker-key="'+level+'"','data-picker-key="'+level+'" data-value="'+level+'"');
- const notSet=str('medicines.detail.not_set');
- if(pg.brand)return wrap(sheet(c,lv.title,'','<div class="medicine-add-fields">'+detail(str('medicines.detail.strength'),t.strength,'strength',notSet)+detail(str('medicines.detail.withdrawal_short'),t.withdrawal!=null?medDaysLabel(t.withdrawal):'','withdrawal',notSet)+'</div><div class="medicine-sheet-verbs">'+verbs+'</div>',foot(),'menu'));
- const brands=medBrands(c,m.id),brandGroup=brands.length?SentriUI.choiceGroup(brands.map(x=>SentriUI.choiceRow({label:x.name,meta:x.strength||'',mode:'navigate',action:'medicines-brand',value:x.id})),{title:str('medicines.group.brands')}):'<p class="medicine-delete-note">'+esc(str('medicines.no_brands'))+'</p>';
- return wrap(sheet(c,lv.title,'','<div class="medicine-add-fields">'+detail(str('medicines.detail.default_withdrawal'),m.withdrawal!=null?medDaysLabel(m.withdrawal):'','withdrawal',notSet)+'</div><div class="medicine-sheet-verbs">'+(m.catalogue?'':verbs)+brandGroup+'</div>',foot(),'menu'));
+ const t=medPageTarget(c),lv=levels(c,m.name),wrap=html=>html.replace('class="sheet"','class="sheet medicine-sheet-step"');
+ if(pg.level==='delete')return wrap(sheet(c,lv.title,'','<p class="medicine-delete-note">'+esc(str('medicines.delete_body',{name:t.name}))+'</p>',SentriUI.sheetFooter({content:SentriUI.backButton(lv.levelBack)+SentriUI.button({label:str('medicines.delete'),register:'danger',action:'medicines-delete-save'})})));
+ const d=medPageDraft(c),save=SentriUI.sheetFooter({content:SentriUI.backButton(lv.levelBack)+SentriUI.button({label:str('medicines.save'),register:'primary',action:'medicines-edit-save',waiting:!medPageChanged(c)||!d.name.trim()})});
+ const input=(key,label,{number=false,hint=''}={})=>SentriUI.field({label,hint,variant:number?'number':'text',control:'<input'+(number?' type="number" inputmode="numeric" min="0" step="1"':'')+' data-med-edit="'+key+'" maxlength="80" value="'+esc(d[key])+'">'});
+ const del=label=>'<div class="medicine-delete-action">'+SentriUI.button({label,register:'text',action:'medicines-level',value:'delete'})+'</div>';
+ if(pg.brand){
+  const fallback=m.withdrawal!=null?str('medicines.detail.uses_default',{medicine:m.name,days:medDaysLabel(m.withdrawal)}):str('medicines.detail.no_default',{medicine:m.name});
+  return wrap(sheet(c,lv.title,'','<div class="medicine-add-fields">'+input('name',str('medicines.add.name'))+input('withdrawal',str('medicines.detail.withdrawal'),{number:true,hint:fallback})+'</div>'+del(str('medicines.delete_brand_action')),save));
+ }
+ const brands=medBrands(c,m.id),brandGroup=brands.length?SentriUI.choiceGroup(brands.map(x=>SentriUI.choiceRow({label:x.name,mode:'navigate',action:'medicines-brand',value:x.id})),{title:str('medicines.group.brands')}):'<p class="medicine-delete-note">'+esc(str('medicines.no_brands'))+'</p>';
+ const fields=(m.catalogue?'':input('name',str('medicines.add.name')))+input('withdrawal',str('medicines.detail.default_withdrawal_days'),{number:true});
+ return wrap(sheet(c,lv.title,'','<div class="medicine-add-fields">'+fields+'</div><div class="medicine-sheet-verbs">'+brandGroup+'</div>'+(m.catalogue?'':del(str('medicines.delete_medicine_action'))),save));
 }
-/* The medicine's sheet has levels: the medicine (its default withdrawal, its brands); a brand (its strength and withdrawal);
-   each one's edit, Rename and Delete. */
+/* The sheet has levels: the medicine; a brand; Delete's confirm. */
 function medicineSheetLevels(c,title){
  const pg=medPage(c),cross={action:'dismiss',label:{text:'Close',str:'act.close'}},b=pg.brand&&medFarm(c).brands.find(x=>x.id===pg.brand);
- const t=pg.level==='rename'?str('medicines.rename'):pg.level==='delete'?str(b?'medicines.delete_brand':'medicines.delete_medicine'):pg.level==='strength'?str('medicines.detail.strength'):pg.level==='withdrawal'?str('medicines.detail.withdrawal_short'):b?b.name:title;
- return {title:t,cross,levelBack:pg.level||pg.brand?{action:'medicines-up'}:{action:'back'},rows:6};
+ const t=pg.level==='delete'?str(b?'medicines.delete_brand':'medicines.delete_medicine'):b?b.name:title;
+ return {title:t,cross,levelBack:pg.level||pg.brand?{action:'medicines-up'}:{action:'back'},rows:7};
 }
 function medicinesPageAction(c,a,v){
  const pg=medPage(c);
  if(a==='medicines-category'){pg.category=v;return true;}
- if(a==='medicines-medicine'){Object.assign(pg,{medicine:v,brand:'',level:'',draft:undefined});c.view='medicine-sheet';return true;}
- if(a==='medicines-brand'){Object.assign(pg,{brand:v,level:''});return true;}
- if(a==='medicines-level'){const t=medPageTarget(c);if(!t||['rename','delete'].includes(v)&&!pg.brand&&t.catalogue)return true;pg.level=v;pg.draft=v==='rename'?t.name:v==='strength'?t.strength||'':v==='withdrawal'?(t.withdrawal??''):undefined;return true;}
- if(a==='medicines-up'){if(pg.level)pg.level='';else pg.brand='';return true;}
- /* Rename, strength and withdrawal change the list for everyone; past records keep the copy they were saved with. */
- if(a==='medicines-edit-save'){const t=medPageTarget(c),d=String(pg.draft??'').trim();if(!t)return true;
-  if(pg.level==='rename'){if(!d||d===t.name)return true;t.name=d;if(!pg.brand)t.names=[d];}
-  else if(pg.level==='strength')t.strength=d;
-  else if(pg.level==='withdrawal')t.withdrawal=medDays(d);
-  pg.level='';return true;}
+ if(a==='medicines-medicine'){Object.assign(pg,{medicine:v,brand:'',level:'',medicineDraft:null,brandDraft:null});c.view='medicine-sheet';return true;}
+ if(a==='medicines-brand'){Object.assign(pg,{brand:v,level:'',brandDraft:null});return true;}
+ if(a==='medicines-level'){const t=medPageTarget(c);if(!t||v==='delete'&&!pg.brand&&t.catalogue)return true;pg.level=v;return true;}
+ if(a==='medicines-up'){if(pg.level)pg.level='';else {pg.brand='';pg.brandDraft=null;}return true;}
+ /* Save changes the list for everyone; records already saved keep the copy they were saved with. */
+ if(a==='medicines-edit-save'){const t=medPageTarget(c),d=medPageDraft(c);if(!t||!medPageChanged(c)||!d.name.trim())return true;
+  if(pg.brand||!t.catalogue){t.name=d.name.trim();if(!pg.brand)t.names=[t.name];}
+  t.withdrawal=medDays(d.withdrawal);
+  if(pg.brand){pg.brand='';pg.brandDraft=null;}else {pg.medicineDraft=null;c.view='medicines';}
+  return true;}
  /* Delete takes the entry off the list (the picker, the page); records already saved keep the name they were written with. */
- if(a==='medicines-delete-save'){const t=medPageTarget(c);if(!t||!pg.brand&&t.catalogue)return true;t.deleted=true;pg.level='';if(pg.brand)pg.brand='';else {pg.medicine='';c.view='medicines';}return true;}
+ if(a==='medicines-delete-save'){const t=medPageTarget(c);if(!t||!pg.brand&&t.catalogue)return true;t.deleted=true;pg.level='';if(pg.brand){pg.brand='';pg.brandDraft=null;}else {pg.medicine='';c.view='medicines';}return true;}
  return false;
 }
 function optionalFieldControls(items,openAction){return '<div class="st-optional-list">'+items.map(({key,label,value})=>stOptionalRow({label:label.replace(/^Add /,'').replace(/^./,m=>m.toUpperCase()),value,icon:icon('plus'),editIcon:icon('edit'),action:openAction,key})).join('')+'</div>';}
@@ -937,7 +989,7 @@ function recordOptionalEditor(c){
  const title='Note';
  const control='<textarea aria-label="Note" rows="5" data-record-optional-input>'+esc(value)+'</textarea>';
  const field=SentriUI.field({label:'Note',labelHidden:true,control});
- return sheet(c,title,'',field,footer(levelBack(c,title),button('record-optional-save','Done','button primary','',!optionalEditorChanged(c)))).replace('class="sheet"','class="sheet feed-optional-sheet"');
+ return sheet(c,title,'',field,footer(levelBack(c,title),button('record-optional-save',f.optionalReturn==='treatment'?str('medicines.save'):'Done','button primary','',!optionalEditorChanged(c)))).replace('class="sheet"','class="sheet feed-optional-sheet"');
 }
 
 function conditionMeta(c,n){const recorded=c.form.subjects.filter(id=>cases(pig(c,id)).some(k=>k.name===n.name)).length;return [n.custom?'Custom':'',recorded?'Already on '+countLabel(recorded):''].filter(Boolean).join(' · ');}
@@ -964,7 +1016,7 @@ function searchHeader(sheet,searching,rootTitle){
 }
 function bulkHealthPicker(c){return sheet(c,'Conditions','','<div class="health-catalog">'+bulkHealthBody(c)+'</div>',SentriUI.pickerFooter({selected:c.form.conditions,multi:true,waiting:!c.form.conditions.length&&!(c.form.conditionsBeforePicker||[]).length,doneAction:'bulk-health-done',back:levels(c,'Conditions').levelBack})).replace('class="sheet"','class="sheet picker-step health-picker-step"');}
 function installBulkInputs(){
- gallery.addEventListener('input',e=>{const el=e.target,root=el.closest('[data-card]');if(!root)return;const c=states[+root.dataset.card];if(el.hasAttribute('data-medicine-search')){e.stopImmediatePropagation();medState(c).search=el.value;const sheetEl=[...root.querySelectorAll('.medicine-picker-step')].pop();sheetEl.querySelector('.medicine-results').innerHTML=medicinePickerBody(c);sheetEl.querySelector('.sheet-title').textContent=medicineLevels(c,medRootTitle(c)).title;const input=sheetEl.querySelector('[data-medicine-search]');input.focus();input.setSelectionRange(el.value.length,el.value.length);}else if(el.hasAttribute('data-brand-search')){e.stopImmediatePropagation();c.form.brandPick.search=el.value;const sheetEl=[...root.querySelectorAll('.brand-picker-step')].pop();sheetEl.querySelector('.brand-results').innerHTML=brandPickerBody(c);const input=sheetEl.querySelector('[data-brand-search]');input.focus();input.setSelectionRange(el.value.length,el.value.length);}else if(el.hasAttribute('data-medicine-add-name')){e.stopImmediatePropagation();medState(c).add.name=el.value;setCommitWaiting(root.querySelector('[data-action="medicine-add-save"]'),!medAddReady(medState(c).add));}else if(el.hasAttribute('data-medicine-edit')){e.stopImmediatePropagation();const pg=medPage(c),t=medPageTarget(c);pg.draft=el.value;const v=el.value.trim(),was=String(pg.level==='rename'?t?.name:pg.level==='strength'?t?.strength||'':t?.withdrawal??'').trim();setCommitWaiting(root.querySelector('[data-action="medicines-edit-save"]'),v===was||pg.level==='rename'&&!v);}else if(el.hasAttribute('data-brand-detail')){e.stopImmediatePropagation();const d=c.form.brandPick.draft;d[el.dataset.brandDetail]=el.value;setCommitWaiting(root.querySelector('[data-action="brand-details-save"]'),!medDetailsEntered(d));}else if(el.hasAttribute('data-record-optional-input')){e.stopImmediatePropagation();c.form.optionalDraft=el.value;setCommitWaiting(root.querySelector('[data-action=\"record-optional-save\"]'),!optionalEditorChanged(c));}},true);
+ gallery.addEventListener('input',e=>{const el=e.target,root=el.closest('[data-card]');if(!root)return;const c=states[+root.dataset.card];if(el.hasAttribute('data-medicine-search')){e.stopImmediatePropagation();medState(c).search=el.value;const sheetEl=[...root.querySelectorAll('.medicine-picker-step')].pop();sheetEl.querySelector('.medicine-results').innerHTML=medicinePickerBody(c);sheetEl.querySelector('.sheet-title').textContent=medicineLevels(c,medRootTitle(c)).title;const input=sheetEl.querySelector('[data-medicine-search]');input.focus();input.setSelectionRange(el.value.length,el.value.length);}else if(el.hasAttribute('data-brand-search')){e.stopImmediatePropagation();c.form.brandPick.search=el.value;const sheetEl=[...root.querySelectorAll('.brand-picker-step')].pop();sheetEl.querySelector('.brand-results').innerHTML=brandPickerBody(c);const input=sheetEl.querySelector('[data-brand-search]');input.focus();input.setSelectionRange(el.value.length,el.value.length);}else if(el.hasAttribute('data-medicine-add-name')){e.stopImmediatePropagation();medState(c).add.name=el.value;setCommitWaiting(root.querySelector('[data-action="medicine-add-save"]'),!medAddReady(medState(c).add));}else if(el.hasAttribute('data-med-edit')){e.stopImmediatePropagation();medPageDraft(c)[el.dataset.medEdit]=el.value;setCommitWaiting(root.querySelector('[data-action="medicines-edit-save"]'),!medPageChanged(c)||!medPageDraft(c).name.trim());}else if(el.hasAttribute('data-dose-search')){e.stopImmediatePropagation();c.form.doseSearch=el.value;const box=root.querySelector('.custom-doses-results');const q=el.value.trim(),rows=treatmentDoseRows(c,q);box.innerHTML=rows?'<div class="st-panel st-row-group" data-bulk-rows>'+rows+'</div>':SentriUI.choiceEmpty(str('medicines.dose.no_match',{q}));}else if(el.hasAttribute('data-pig-dose')){e.stopImmediatePropagation();c.form.doseDraft=el.value;const v=medDose(el.value);setCommitWaiting(root.querySelector('[data-action="pig-dose-save"]'),v==null);}else if(el.hasAttribute('data-brand-detail')){e.stopImmediatePropagation();const d=c.form.brandPick.draft;d[el.dataset.brandDetail]=el.value;setCommitWaiting(root.querySelector('[data-action="brand-details-save"]'),!medDetailsEntered(d));}else if(el.hasAttribute('data-record-optional-input')){e.stopImmediatePropagation();c.form.optionalDraft=el.value;setCommitWaiting(root.querySelector('[data-action=\"record-optional-save\"]'),!optionalEditorChanged(c));}},true);
  gallery.addEventListener('change',e=>{if(!e.target.hasAttribute('data-record-optional-input'))return;e.stopImmediatePropagation();const root=e.target.closest('[data-card]');const c=states[+root.dataset.card];c.form.optionalDraft=e.target.value;setCommitWaiting(root.querySelector('[data-action=\"record-optional-save\"]'),!optionalEditorChanged(c));},true);
 
  const update=(e)=>{
@@ -975,7 +1027,7 @@ function installBulkInputs(){
   const f=c.form;
   if(el.hasAttribute('data-bulk-include')){f.excluded=el.checked?f.excluded.filter(id=>id!==el.dataset.bulkInclude):[...new Set([...f.excluded,el.dataset.bulkInclude])];}
   else if(el.hasAttribute('data-bulk-value'))f.values[el.dataset.bulkValue]=el.value;
-  else {f[el.dataset.bulkKey]=el.value;if(el.dataset.bulkKey==='dose')f.values={};}
+  else {f[el.dataset.bulkKey]=el.value;}
   if(el.value.trim()!==''&&el.getAttribute('aria-invalid')==='true'&&!el.hasAttribute('data-bulk-value')){el.setAttribute('aria-invalid','false');const fd=el.closest('.field');fd?.classList.remove('error');el.closest('.bulk-same-box')?.classList.remove('is-invalid');el.closest('.bulk-same-dose,.bulk-dose-field')?.querySelector('.bulk-required')?.remove();fd?.querySelector('.st-field-message')?.remove();}
   const rail=root.querySelector('[data-bulk-rows]');
   if(el.hasAttribute('data-bulk-value')){
@@ -1121,7 +1173,7 @@ function updateActionCategory(root,c){
  root.querySelectorAll('[data-action="action-category"]').forEach(b=>b.setAttribute('aria-current',b.dataset.value===c.actionCategory?'location':'false'));
  const nav=root.querySelector('.action-category-nav'),active=nav?.querySelector('[aria-current="location"]');if(active){const n=nav.getBoundingClientRect(),b=active.getBoundingClientRect();if(b.left<n.left+16)nav.scrollLeft-=n.left+16-b.left;else if(b.right>n.right-16)nav.scrollLeft+=b.right-(n.right-16);}
 }
-function overlay(c){if(c.view==='medicines')return medicinesPage(c);if(c.view==='medicine-sheet'&&!c.isDrawerBackground)return '<div class="drawer-background chooser-background" inert aria-hidden="true">'+medicinesPage(c).replace(/ aria-modal="true"/g,'')+'</div>'+medicineSheet(c);if(c.view==='medicine-sheet')return medicineSheet(c);if(c.logDatePicker)return '<div class="drawer-background" inert aria-hidden="true">'+overlay({...c,logDatePicker:false})+'</div>'+logDatePicker(c);if(['record-optional','feed-date','feed-note','medicine-picker','brand-picker','bulk-health-picker','picker'].includes(c.view)&&!c.isDrawerBackground){const parent={...c,view:c.view==='picker'?c.form.pickerReturn:c.view==='record-optional'?c.form.optionalReturn:['medicine-picker','brand-picker'].includes(c.view)?'treatment':c.view==='bulk-health-picker'?'health':'feed-editor',isDrawerBackground:true};if(!AstraSurfaces.isPage('inspection',parent.view,parent))return overlay({...c,isDrawerBackground:true});return '<div class="drawer-background chooser-background" inert aria-hidden="true">'+overlay(parent).replace(/ aria-modal="true"/g,'')+'</div>'+overlay({...c,isDrawerBackground:true});}if(c.view==='medicine-picker')return medicinePicker(c);if(c.view==='brand-picker')return brandPicker(c);if(c.view==='picker')return pickerPage(c);if(c.view==='record-optional')return recordOptionalEditor(c);if(c.form?.recordEditor&&bulkActionKinds.includes(c.view))return bulkActionPage(c);if(c.view==='bulk-health-picker')return bulkHealthPicker(c);if(c.view==='sow-transfer')return transferPage(c);if(c.view==='unavailable-actions')return unavailableActionsPage(c);if(c.view==='measurements-menu')return measurementsMenu(c);if(c.view==='miscarriage')return miscarriagePage(c);if(c.view==='production-task')return productionTaskPage(c);if(c.view==='batch-membership')return batchMembershipPage(c);if(['batch-removal','not-in-pig'].includes(c.view))return productionDispositionPage(c);if(c.view==='feed-date'||c.view==='feed-note')return feedOptionalEditor(c);if(c.view==='feed-breakdown')return feedBreakdown(c);if(c.view==='pig-production-batch')return productionBatchPage(c);if(c.view==='feed-editor')return feedEditor(c);const recordView=recordFlowOverlay(c);if(recordView!==null)return recordView;const revised=round3Overlay(c);if(revised!==null)return revised;const f=c.form;
+function overlay(c){if(c.view==='medicines')return medicinesPage(c);if(c.view==='medicine-sheet'&&!c.isDrawerBackground)return '<div class="drawer-background chooser-background" inert aria-hidden="true">'+medicinesPage(c).replace(/ aria-modal="true"/g,'')+'</div>'+medicineSheet(c);if(c.view==='medicine-sheet')return medicineSheet(c);if(c.logDatePicker)return '<div class="drawer-background" inert aria-hidden="true">'+overlay({...c,logDatePicker:false})+'</div>'+logDatePicker(c);if(['record-optional','feed-date','feed-note','medicine-picker','brand-picker','pig-dose','bulk-health-picker','picker'].includes(c.view)&&!c.isDrawerBackground){const parent={...c,view:c.view==='picker'?c.form.pickerReturn:c.view==='record-optional'?c.form.optionalReturn:['medicine-picker','brand-picker'].includes(c.view)?'treatment':c.view==='pig-dose'?'pig-doses':c.view==='bulk-health-picker'?'health':'feed-editor',isDrawerBackground:true};if(!AstraSurfaces.isPage('inspection',parent.view,parent))return overlay({...c,isDrawerBackground:true});return '<div class="drawer-background chooser-background" inert aria-hidden="true">'+overlay(parent).replace(/ aria-modal="true"/g,'')+'</div>'+overlay({...c,isDrawerBackground:true});}if(c.view==='medicine-picker')return medicinePicker(c);if(c.view==='brand-picker')return brandPicker(c);if(c.view==='pig-dose')return pigDoseSheet(c);if(c.view==='pig-doses')return customDosesPage(c);if(c.view==='picker')return pickerPage(c);if(c.view==='record-optional')return recordOptionalEditor(c);if(c.form?.recordEditor&&bulkActionKinds.includes(c.view))return bulkActionPage(c);if(c.view==='bulk-health-picker')return bulkHealthPicker(c);if(c.view==='sow-transfer')return transferPage(c);if(c.view==='unavailable-actions')return unavailableActionsPage(c);if(c.view==='measurements-menu')return measurementsMenu(c);if(c.view==='miscarriage')return miscarriagePage(c);if(c.view==='production-task')return productionTaskPage(c);if(c.view==='batch-membership')return batchMembershipPage(c);if(['batch-removal','not-in-pig'].includes(c.view))return productionDispositionPage(c);if(c.view==='feed-date'||c.view==='feed-note')return feedOptionalEditor(c);if(c.view==='feed-breakdown')return feedBreakdown(c);if(c.view==='pig-production-batch')return productionBatchPage(c);if(c.view==='feed-editor')return feedEditor(c);const recordView=recordFlowOverlay(c);if(recordView!==null)return recordView;const revised=round3Overlay(c);if(revised!==null)return revised;const f=c.form;
  if(c.view==='actions')return actionsPage(c);
  if(c.view==='treatment')return sheet(c,f.taskId==='vaccination'?'Record vaccination':'Record treatment',f.returnFinding?c.pigId+' · '+f.returnFinding:scope(c),(SentriUI.field({label:(f.taskId==='vaccination'?'Vaccine':'Medicine'),control:"<input data-v2=\"medicine\" value=\""+(esc(f.medicine||''))+"\" placeholder=\""+(f.taskId==='vaccination'?'Vaccine administered':'Medicine administered')+"\">"}))+(fieldSelect(c,'Method','method',[['','Choose method'],['Injection','Injection'],['Oral','Oral'],['Topical','Topical'],['In feed','In feed'],['In water','In water']],f.method||''))+(fieldSelect(c,'Unit','doseUnit',[['','Choose unit'],['mL','mL'],['mg','mg'],['g','g']],f.doseUnit||''))+(SentriUI.field({label:'Dose per pig',unit:f.doseUnit||'',variant:'number',control:`<input type="number" inputmode="decimal" min="0" step="any" data-v2="dose" value="${esc(f.dose||'')}">`}))+(f.taskId==='vaccination'?'':f.returnFinding?'<div class="detail-line"><span>For this finding</span><strong>'+esc(f.returnFinding)+'</strong></div>':optionalSelect(c,'Condition','target',[['','No linked condition'],...[...new Set(f.subjects.flatMap(id=>cases(pig(c,id)).map(k=>k.name)))].map(n=>[n,n])],f.target||''))+"<p class=\"quiet-note\">"+(f.taskId==='vaccination'?'Record the vaccination administered for this task.':'Records the treatment already administered to these pigs. A target links only to pigs carrying that condition.')+"</p>",footer(back(),button('save-treatment',f.taskId?'Save':`Record · ${countLabel(f.subjects.length)}`,'button primary','',!valid(c))));
  if(c.view==='health')return healthForm(c);
@@ -1452,7 +1504,7 @@ function handleRecordAction(c,a,v){
  if(a==='health-remove-custom'){
   const name=String(v);delete c.customHealthCatalog?.[name];delete c.form.customConditions?.[name];delete c.form.conditionKinds?.[name];c.form.conditions=c.form.conditions.filter(item=>item!==name);return true;
  }
- if(medicineAction(c,a,v)||medicinesPageAction(c,a,v))return true;
+ if(medicineAction(c,a,v)||medicinesPageAction(c,a,v)||pigDoseAction(c,a,v))return true;
  if(a==='bulk-toggle-controls'){c.form.controlsCollapsed=!c.form.controlsCollapsed;return true;}
  if(a==='bulk-save'){if(c.actionEntry)c.returnAfterActionSave=true;saveBulkAction(c);return true;}
  if(a==='condition-step'){c.form.conditionPath=(c.form.conditionPath||[]).slice(0,+v);c.form.search='';return true;}
@@ -1626,9 +1678,12 @@ function atlasScreen(c){
  if(c.view==='feed')return pen(c,c.penId)?.mode==='adlib'?'feed-plan.adlib':'feed-plan.pen';
  if(c.view==='treatment'&&c.form?.bulk)return 'health-record.treatment-batch';
  if(c.view==='medicine-picker'){const s=medState(c),q=(s.search||'').trim();return s.level==='add'?'medicines.add':s.level==='add-category'?'medicines.add-category':q?(medSearchRows(c,q)?'medicines.search':'medicines.search-none'):s.level==='category'?'medicines.category':c.form.taskId==='vaccination'?'medicines.vaccines':medRecents(c).length?'medicines.picker':'medicines.picker-first';}
+ if(c.view==='pig-dose')return 'health-record.pig-dose';
+ if(c.view==='pig-doses')return (c.form.doseSearch||'').trim()?'health-record.custom-doses-search':'health-record.custom-doses';
+ if(c.view==='record-optional'&&c.form.optionalKey==='note'&&c.form.optionalReturn==='treatment')return 'health-record.treatment-note';
  if(c.view==='brand-picker'){const pick=c.form.brandPick||{},q=(pick.search||'').trim().toLocaleLowerCase();return pick.level==='details'?'health-record.brand-details':q&&!medBrands(c,c.form.medicineId).some(b=>b.name.toLocaleLowerCase().includes(q))?'health-record.brand-add':'health-record.brand';}
  if(c.view==='medicines')return medPage(c).category?'medicines.page-category':'medicines.page';
- if(c.view==='medicine-sheet'){const pg=medPage(c);return pg.level==='rename'?'medicines.rename':pg.level==='delete'?'medicines.delete':pg.level==='strength'||pg.level==='withdrawal'?(pg.brand?'medicines.brand-detail':'medicines.medicine-withdrawal'):pg.brand?'medicines.brand':medicineById(c,pg.medicine)?.catalogue?'medicines.medicine':'medicines.medicine-farm';}
+ if(c.view==='medicine-sheet'){const pg=medPage(c);return pg.level==='delete'?'medicines.delete':pg.brand?'medicines.brand':medicineById(c,pg.medicine)?.catalogue?'medicines.medicine':'medicines.medicine-farm';}
  return atlasViews[c.view]||null;
 }
 const scenarios=[['walk','Unit walk'],['stage-times','Stage · elapsed days'],['animal-types','Types · boars and piglets'],['health-mixed','Attention · mixed items'],['health-ongoing','Disease · ongoing arthritis'],['health-many','Health · multiple ongoing conditions'],['care-states','Health · care states'],['sensors','Unit · connected sensors'],['no-sensors','Unit · no sensors'],['sensor-unavailable','Unit · sensor unavailable'],['no-batches','Unit · no batches'],['one-batch','Unit · one batch'],['many-batches','Unit · three batches'],['batch-farrowing','Unit · batch in farrowing'],['batch-concurrent','Unit · heat check and breeding'],['pen-signals','Pen · note and fault'],['pig-tasks','Pig · multiple current tasks'],['selected','Multiple pigs'],['feed','Pen feed'],['feed-bulk','Feed · multiple pens'],['pen-feed-up','Pen feed · increased'],['pen-feed-down','Pen feed · decreased'],['pen-feed-held','Pen feed · held'],['adlib','Ad-lib feeding'],['production-batches','Production · batch history'],['profile-full','Pig record · populated'],['profile-partial','Pig record · partial'],['profile-empty','Pig record · empty fields'],['medicines-first','Medicines · no recent picks'],['medicines','Medicines page']];
@@ -1647,7 +1702,7 @@ function feedLabel(pe){return pe.mode==='adlib'?'Ad-lib':pe.mode==='station'?'St
 function drawerSize(view,c){
  if(view==='log-date-picker')return 'medium';
  if(view==='picker'){const n=c?.pickerOptions?.[c?.form?.pickerKey]?.items?.length||0;return n<=4?'short':'medium';}
- if(view==='record-optional')return c?.form?.optionalKey==='target'?'long':'short';if(view==='measurements-menu')return 'medium';if(view==='bulk-health-picker')return 'long';if(view==='medicine-picker')return 'long';if(view==='medicine-sheet')return 'medium';if(view==='brand-picker')return 'medium';
+ if(view==='record-optional')return c?.form?.optionalKey==='target'?'long':'short';if(view==='measurements-menu')return 'medium';if(view==='bulk-health-picker')return 'long';if(view==='medicine-picker')return 'long';if(view==='medicine-sheet')return 'medium';if(view==='brand-picker')return 'medium';if(view==='pig-dose')return 'short';if(view==='pig-doses')return 'long';
  if(c?.form?.recordEditor&&bulkActionKinds.includes(view))return c.form.bulk?'long':['weight','temperature','backfat','note','body'].includes(view)?'short':'medium';
  if(view==='feed-editor'&&c?.form?.feedIds?.length===1)return 'medium';
  
@@ -1764,13 +1819,13 @@ function legacyValid(c){const f=c.form;if(c.view==='condition'||c.view==='report
 function notify(c,text){c.toast=text;c.toastUntil=Date.now()+3200;clearTimeout(c.toastTimer);c.toastTimer=setTimeout(()=>{c.toast='';const i=states.indexOf(c);document.querySelector(`[data-card="${i}"] .inspect-toast`)?.remove();},3200);}
 function inspectionSurface(c){
  const content=overlay(c);
- if(AstraSurfaces.isPage('inspection',c.view,c)||c.isDrawerBackground||['record-optional','feed-date','feed-note','medicine-picker','brand-picker','medicine-sheet','bulk-health-picker','picker'].includes(c.view))return content;
+ if(AstraSurfaces.isPage('inspection',c.view,c)||c.isDrawerBackground||['record-optional','feed-date','feed-note','medicine-picker','brand-picker','pig-dose','medicine-sheet','bulk-health-picker','picker'].includes(c.view))return content;
  const parent=[...(c.navTrail||[])].reverse().find(p=>AstraSurfaces.isPage('inspection',p.view,{...c,...p}));
  if(!parent)return content;
  return '<div class="page-background" inert aria-hidden="true">'+overlay({...c,...parent,isDrawerBackground:true})+'</div>'+content;
 }
 function render(i,focus){if(states[i].actionEntry&&states[i].view==='list'&&states[i].returnAfterActionSave){states[i].selected=new Set([states[i].actionEntry]);states[i].actionScope='pigs';states[i].view='actions';states[i].restoreSheetScroll=states[i].actionMenuScroll||0;}delete states[i].returnAfterActionSave;settleDetailNavigation(states[i]);if(embeddedSow&&embeddedSowReady&&i===0){sendSowDetail(states[i].view==='list'?'sow-detail-close':'sow-detail-state',states[i]);if(states[i].view==='list')return;}const c=states[i],root=gallery.querySelector(`[data-card="${i}"]`),previous=root.dataset.view;const active=document.activeElement;const focusKey=active&&root.contains(active)?['data-v2','data-condition','data-verdict','data-log-category','data-log-date-field','data-feed-edit'].find(k=>active.hasAttribute(k)):null;const focusValue=focusKey?active.getAttribute(focusKey):null;const catalogScroll=root.querySelector('.health-catalog')?.scrollTop||0;const sheetScroll=previous===c.view?root.querySelector('.phone > .sheet > .sheet-body')?.scrollTop||0:0;root.dataset.view=c.view;if(i===0&&window.AtlasBare)AtlasBare.watch(()=>atlasScreen(c));root.querySelector('.phone').innerHTML=main(c)+inspectionSurface(c)+(c.toast&&Date.now()<c.toastUntil?`<div class="inspect-toast" role="status">${esc(c.toast)}</div>`:'');localizeFeed(root.querySelector('.phone'));SentriUI.rowFitTags(root);dockBulkDetails(root);if(previous!==c.view)root.querySelector('.phone > .sheet')?.classList.add('drawer-enter');const parentList=root.querySelector('.bulk-pig-list,.feed-pig-rows');if(parentList&&c.form?.parentListScroll!=null)parentList.scrollTop=c.form.parentListScroll;const pigTaskRail=root.querySelector('.pig-current-task-list');if(pigTaskRail)pigTaskRail.scrollLeft=c.pigTaskRailScroll?.[c.pigId]||0;const taskRail=root.querySelector('.sow-task-rail');if(taskRail){taskRail.scrollLeft=c.taskRailScroll||0;}root.querySelector('.inspect-list').style.paddingBottom=(c.tailSpace||18)+'px';root.querySelector('.inspect-scroll').scrollTop=c.scroll;const carousel=root.querySelector('.batch-carousel');if(carousel)carousel.scrollLeft=c.batchScroll||0;root.querySelectorAll('[data-mixed]').forEach(x=>x.indeterminate=x.dataset.mixed==='true');if(root.querySelector('.phone > .sheet > .sheet-body'))root.querySelector('.phone > .sheet > .sheet-body').scrollTop=c.restoreSheetScroll??sheetScroll;delete c.restoreSheetScroll;if(previous!==c.view)root.querySelector(c.view==='list'?'.inspect-scroll':'.phone > .sheet')?.focus({preventScroll:true});if(focus){const el=[...root.querySelectorAll('[data-action],[data-pig-select],[data-pen-select],[data-field]')].find(e=>focus.a?e.dataset.action===focus.a&&e.dataset.value===focus.v:focus.p?e.dataset.pigSelect===focus.p:focus.pe?e.dataset.penSelect===focus.pe:e.dataset.field===focus.f&&e.value===focus.v);(el||root.querySelector(c.view==='weight'?'[data-field="weight"]':c.view==='list'?'.inspect-scroll':'.phone > .sheet'))?.focus({preventScroll:true});}if(root.querySelector('.health-catalog'))root.querySelector('.health-catalog').scrollTop=catalogScroll;if(focusKey&&previous===c.view){[...root.querySelectorAll('['+focusKey+']')].find(x=>x.getAttribute(focusKey)===focusValue)?.focus({preventScroll:true});}if(c.logDateFocus){root.querySelector(c.logDateFocus==='dialog'?'.phone > .sheet [data-action="log-date-preset"][aria-pressed="true"]':'.phone > .sheet [data-action="log-date-open"]')?.focus({preventScroll:true});delete c.logDateFocus;}if(c.chooserReturnFocus&&c.view===c.chooserReturnFocus.view&&previous!==c.view){const saved=c.chooserReturnFocus;[...root.querySelectorAll('.phone > .sheet [data-action]')].find(el=>el.dataset.action===saved.action&&(!saved.key||el.dataset.pickerKey===saved.key)&&(!saved.value||el.dataset.value===saved.value))?.focus({preventScroll:true});delete c.chooserReturnFocus;}const list=root.querySelector('.inspect-list');list.style.paddingBottom=(c.tailSpace||18)+'px';if(c.jump){const target=root.querySelector(`[data-pen="${c.jump}"]`),scroll=root.querySelector('.inspect-scroll'),sticky=root.querySelector('.inspect-controls').offsetHeight;if(target){c.tailSpace=Math.max(18,scroll.clientHeight-sticky-target.offsetHeight);list.style.paddingBottom=c.tailSpace+'px';scroll.scrollTop+=target.getBoundingClientRect().top-scroll.getBoundingClientRect().top-sticky;target.classList.add('arrival');setTimeout(()=>target.classList.remove('arrival'),900);}c.scroll=scroll.scrollTop;c.jump=null;}}
-function backTo(c){if(c.view==='medicine-picker'){delete c.form.med;c.view='treatment';return;}if(c.view==='brand-picker'){delete c.form.brandPick;c.view='treatment';return;}if(c.view==='medicine-sheet'){c.view='medicines';return;}if(c.view==='medicines'){const pg=medPage(c);if(pg.category)pg.category='';else c.view='list';return;}if(c.view==='bulk-health-picker'){leaveConditionPicker(c);return;}if(c.view==='record-optional'){c.view=c.form.optionalReturn;delete c.form.optionalDraft;return;}if(c.view==='picker'){c.view=c.form.pickerReturn||'list';delete c.form.pickerKey;delete c.form.pickerReturn;return;}if(c.navTrail?.length){const parent=c.navTrail.pop();Object.assign(c,parent);c.restoreSheetScroll=parent.sheetScroll;return;}if(['health','body','individual-plan','resolve','triage','temperature','backfat','treatment'].includes(c.view)){parkBulkDraft(c);c.form={};c.view='actions';return;}if(['fault-form','fault-record','pen-note'].includes(c.view)){c.view='pen-detail';return;}if(['condition','note','plan','weight'].includes(c.view)){parkBulkDraft(c);c.form={};c.view='actions';}else if(['report','exception'].includes(c.view)){c.form={};c.view='feed';}else if(c.view==='review')c.view=c.reviewBack||'actions';else c.view='list';}
+function backTo(c){if(c.view==='medicine-picker'){delete c.form.med;c.view='treatment';return;}if(c.view==='brand-picker'){delete c.form.brandPick;c.view='treatment';return;}if(c.view==='pig-dose'){delete c.form.doseFor;c.view='pig-doses';return;}if(c.view==='pig-doses'){delete c.form.doseSearch;c.view='treatment';return;}if(c.view==='medicine-sheet'){c.view='medicines';return;}if(c.view==='medicines'){const pg=medPage(c);if(pg.category)pg.category='';else c.view='list';return;}if(c.view==='bulk-health-picker'){leaveConditionPicker(c);return;}if(c.view==='record-optional'){c.view=c.form.optionalReturn;delete c.form.optionalDraft;return;}if(c.view==='picker'){c.view=c.form.pickerReturn||'list';delete c.form.pickerKey;delete c.form.pickerReturn;return;}if(c.navTrail?.length){const parent=c.navTrail.pop();Object.assign(c,parent);c.restoreSheetScroll=parent.sheetScroll;return;}if(['health','body','individual-plan','resolve','triage','temperature','backfat','treatment'].includes(c.view)){parkBulkDraft(c);c.form={};c.view='actions';return;}if(['fault-form','fault-record','pen-note'].includes(c.view)){c.view='pen-detail';return;}if(['condition','note','plan','weight'].includes(c.view)){parkBulkDraft(c);c.form={};c.view='actions';}else if(['report','exception'].includes(c.view)){c.form={};c.view='feed';}else if(c.view==='review')c.view=c.reviewBack||'actions';else c.view='list';}
 
 // Detail sheets return to the actual entry page; form values are discarded on Back.
 function detailLocation(c){return {view:c.view,productionRecordId:c.productionRecordId,penId:c.penId,pigId:c.pigId,batchId:c.batchId,faultId:c.faultId,closedNoteId:c.closedNoteId,findingName:c.findingName,profileTab:c.profileTab,feedTab:c.feedTab,form:JSON.parse(JSON.stringify(c.form||{}))};}
@@ -1798,6 +1853,8 @@ function installDetailNavigation(){
   if(a==='log-date-open')c.logDateScroll=root.querySelector('.phone > .sheet > .sheet-body')?.scrollTop||0;
   if(c.logDatePicker&&(a==='back'||a==='dismiss')){e.stopImmediatePropagation();handleRecordAction(c,'log-date-cancel');render(i);return;}
   if(c.view==='medicine-picker'&&(a==='back'||a==='dismiss')){e.stopImmediatePropagation();delete c.form.med;c.view='treatment';render(i);return;}
+  if(c.view==='pig-dose'&&(a==='back'||a==='dismiss')){e.stopImmediatePropagation();delete c.form.doseFor;c.view='pig-doses';render(i);return;}
+  if(c.view==='pig-doses'&&a==='back'){e.stopImmediatePropagation();delete c.form.doseSearch;c.view='treatment';render(i);return;}
   if(c.view==='brand-picker'&&(a==='back'||a==='dismiss')){e.stopImmediatePropagation();delete c.form.brandPick;c.view='treatment';render(i);return;}
   if(c.view==='medicine-sheet'&&(a==='back'||a==='dismiss')){e.stopImmediatePropagation();Object.assign(medPage(c),{level:'',brand:''});c.view='medicines';render(i);return;}
   if(c.view==='medicines'&&a==='back'){e.stopImmediatePropagation();const pg=medPage(c);if(pg.category)pg.category='';else c.view='list';render(i);return;}
