@@ -54,7 +54,7 @@ On CANDIDATE:
 ## 2. Behaviour walk (P2; behaviour and shared component classes)
 
 Open each touched screen bare at 390×844 (`<url>&screen=<id>`, `atlas/SCHEMA.md`) and walk the flow as a worker would: tap, read, tap. Check:
-- Every action has a way back. Footer Back keeps the draft, and ‹ Parent goes up a level.
+- Every action has a way back. Footer Back keeps the draft; in a drawer with levels it goes up one level (at the first level it leaves), and ✕ at the top left closes the whole drawer (owner ruling B, 2026-10-16).
 - Nothing floats loose: sheets are anchored and panels docked.
 - Drafts survive Back and reopen.
 - Done applies.
@@ -127,7 +127,7 @@ Each of these was rejected by the owner. The gate must fail a change that shows 
 | R10 | "0 pixels different" measured against a stale main | evidence on the exact candidate |
 | R11 | "Passing" badge from an agent score | score never reads as approval |
 | R12 | Conflict markers committed; old wording back after a rebase | merge forward; checks on merged result |
-| R13 | An ✕ in a drawer, or Clear on a filter | drawer convention |
+| R13 | An ✕ in a drawer without levels, a "‹ Parent" in a header, or Clear and Reset in a footer | drawer convention (rulings C and B) |
 | R14 | A type pass that met the floors by enlarging everything: a history label and a sample/offline disclaimer kept prime space on the sensor card (2026-10-11) | hierarchy: the attention budget; cluttered fails even when every rule is met |
 | R15 | Calmer but flat: after the cuts, three segmented controls at one weight, the switcher outweighing the reading, and a section with its heading cut (2026-10-11) | hierarchy: cutting facts never cuts structure; one heavy control |
 | R16 | Information stacked on a page: no grouping, "Reading history" floating alone at the end with dead space under it (2026-10-11) | looks undesigned; the absolute bar is the approved screens, not the base |
