@@ -23,7 +23,7 @@ var RENDER = {
   "state-Selected": () => form(UI.choiceRadios({"label": "Assisted", "layout": "inline", "face": "key", "options": NO_YES, "selected": "true", "key": "assisted", "action": "assisted"})),
   "state-Disabled": () => form(UI.choiceRadios({"label": "Assisted", "layout": "inline", "face": "key", "options": NO_YES, "selected": "false", "disabled": true, "reason": "Unavailable offline. Reconnect to select.", "key": "assisted", "action": "assisted"})),
   "state-Empty": () => form(UI.choiceRadios({"label": "Assisted", "layout": "inline", "face": "key", "options": NO_YES, "selected": "", "key": "assisted", "action": "assisted"})),
-  "state-Long-label": () => form(UI.choiceRadios({"label": "\u4ed4\u732a\u662f\u5426\u5df2\u7ecf\u5b8c\u6210\u5f53\u5929\u6240\u9700\u7684\u5904\u7406", "layout": "inline", "face": "key", "options": [{"value": "false", "label": "\u5c1a\u672a"}, {"value": "true", "label": "\u5df2\u7ecf"}], "selected": "", "key": "assisted", "action": "assisted"}))
+  "state-Long-label": () => form(UI.choiceRadios({"label": "助产", "layout": "inline", "face": "key", "options": [{"value": "false", "label": "否"}, {"value": "true", "label": "是"}], "selected": "", "key": "assisted", "action": "assisted"}))
 };
 document.querySelectorAll('[data-state]').forEach(function (s) { if (RENDER[s.id]) s.innerHTML = RENDER[s.id](); });
 </script></body></html>
