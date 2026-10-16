@@ -447,7 +447,7 @@ function navClosure(S, start, label) {
     if (seen.has(p)) continue;
     seen.add(p); out.pages.push(p);
     const pg = S.page(p);
-    if (pg.missing) out.unbounded.push({ why: `${label}: it can navigate to ${p}, which is missing`, type: 'any' });
+    // a link to a page that isn't there lands on a 404: nothing of the repo runs there
     pg.files.forEach((f) => out.files.add(f)); out.unbounded.push(...pg.unbounded);
     for (const [ns, u] of Object.entries(pg.use)) { if (u.all && !out.use[ns].all) { out.use[ns].all = true; out.use[ns].why = `it may reach ${p}: ${u.why}`; } u.names.forEach((x) => out.use[ns].names.add(x)); }
     if (pg.navUnbounded) out.unbounded.push({ why: `${p}: navigation to a computed URL`, type: 'any' });
