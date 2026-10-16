@@ -72,7 +72,7 @@ async function runWithRetry(browser, leaf, lang, width) {
 // ---- run ----
 // Every run (a leaf in one language at one width) opens its own contexts on its reset fixture and writes its own evidence folder,
 // so runs share nothing and several go at once in one browser. How many is found as it goes (aimdStep: start at 2, add one while
-// runs stay as fast as the first ones, halve on a timeout or when they slow down, at most the machine's cores). --jobs N (or
+// runs stay as fast as the first ones, halve on a timeout or when they slow down, at most 4 by default). --jobs N (or
 // SENTRI_SCENARIO_JOBS) fixes it instead; --jobs 1 is the old one-by-one order. Results are put back in leaf order, so the report
 // and the log read the same however many ran at once.
 const fixed = Number(opt('jobs') || process.env.SENTRI_SCENARIO_JOBS) || 0;
@@ -83,7 +83,9 @@ const tasks = runnable.flatMap((leaf) => (leaf.node.langs || langs).flatMap((lan
 const done = new Map();
 {
   const cores = Math.max(1, os.cpus().length);
-  let ctl = { limit: fixed ? Math.max(1, fixed) : Math.min(2, cores), min: 1, max: fixed ? Math.max(1, fixed) : cores, baseline: null };
+  // At most 4 at once by default: measured clean on this machine; 8 produced a false failure (2026-10-16). SENTRI_SCENARIO_MAX raises it.
+  const ceiling = Math.max(1, Math.min(cores, Number(process.env.SENTRI_SCENARIO_MAX) || 4));
+  let ctl = { limit: fixed ? Math.max(1, fixed) : Math.min(2, ceiling), min: 1, max: fixed ? Math.max(1, fixed) : ceiling, baseline: null };
   let next = 0, inflight = 0, peak = ctl.limit;
   const t0 = Date.now();
   await new Promise((resolve) => {
