@@ -12,7 +12,8 @@
 (function () {
   'use strict';
   window.PPLitter = function (host) {
-    var UI = window.SentriUI, U = window.PPUI, K = window.SentriTask;
+    const UI = window.SentriUI;
+    var U = window.PPUI, K = window.SentriTask;
     var zh = PP.lang === 'zh';
     var store, CFG, SOW, TODAY, crate = '';
     var visit = {};                         // record ids this phone made this visit
