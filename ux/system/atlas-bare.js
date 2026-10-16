@@ -99,8 +99,9 @@
     return d.readyState === 'complete' && !(f.getAttribute('src') && d.URL === 'about:blank') && !d.documentElement.hasAttribute('data-atlas-pending');
   }
   /* A page that scrolls itself into place after it loads (Home's focus=task-fold) is only ready when its scroll positions stop
-     moving: Ready waits until no element's scroll offset has changed for 8 frames in a row (at most 1.5 s), so the shot of a
-     scrolled screen never catches it a few pixels short. */
+     moving: Ready waits until no element's scroll offset has changed for 8 frames in a row (at most 1.5 s), so a shot never
+     catches a scroll still under way. Where the page scrolls to is the page's own: it must measure after its fonts load (Home
+     does), or a font that lands later moves the target and the shot with it. */
   function scrollSettled() {
     var t0 = Date.now(), last = null, same = 0;
     var sig = function () { return [].map.call(document.querySelectorAll('*'), function (e) { return e.scrollTop || e.scrollLeft ? e.scrollTop + ',' + e.scrollLeft : ''; }).join('|') + '|' + scrollX + ',' + scrollY; };
