@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // The behaviour gate: runs a feature's scenario leaves (features/<feature>/scenarios.json) in a real browser.
-// Usage: node scripts/run-scenarios.mjs <feature> [--lang en,zh] [--width 360,390] [--base <url>] [--only <leaf,leaf>]
+// Usage: node scripts/run-scenarios.mjs <feature> [--lang en,zh] [--width 360,390] [--base <url>] [--only <leaf,leaf>] [--jobs N]
 // Format: docs/design-workflow/scenarios.md (the pure tree walk and format checks: scripts/scenario-tree.mjs). Writes review/scenarios-<feature>.json and screenshots under
 // review/scenarios/<feature>/<leaf>/<lang>-<width>/. Exits 1 when any leaf fails.
 import { spawn, execSync } from 'node:child_process';
@@ -10,7 +10,8 @@ import { join, dirname, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createServer } from 'node:net';
 import { walkTree, parseDuration, stepKind } from './scenario-tree.mjs';
-import { timedOutOnly } from './loop-rules.mjs';
+import { timedOutOnly, aimdStep } from './loop-rules.mjs';
+import os from 'node:os';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const { chromium } = playwright();
@@ -18,7 +19,7 @@ const { chromium } = playwright();
 // ---- arguments ----
 const argv = process.argv.slice(2);
 const feature = argv.find((a, i) => !a.startsWith('--') && !(argv[i - 1] || '').startsWith('--'));
-if (!feature) { console.error('usage: node scripts/run-scenarios.mjs <feature> [--lang en,zh] [--width 360,390] [--base <url>] [--only a,b]'); process.exit(2); }
+if (!feature) { console.error('usage: node scripts/run-scenarios.mjs <feature> [--lang en,zh] [--width 360,390] [--base <url>] [--only a,b] [--jobs N]'); process.exit(2); }
 const opt = (k) => { const i = argv.indexOf('--' + k); return i >= 0 ? argv[i + 1] : null; };
 const specPath = join(root, 'features', feature, 'scenarios.json');
 if (!existsSync(specPath)) { console.error(`no ${relative(root, specPath)}`); process.exit(2); }
@@ -335,15 +336,45 @@ async function runWithRetry(browser, leaf, lang, width) {
 }
 
 // ---- run ----
+// Every run (a leaf in one language at one width) opens its own contexts on its reset fixture and writes its own evidence folder,
+// so runs share nothing and several go at once in one browser. How many is found as it goes (aimdStep: start at 2, add one while
+// runs stay as fast as the first ones, halve on a timeout or when they slow down, at most the machine's cores). --jobs N (or
+// SENTRI_SCENARIO_JOBS) fixes it instead; --jobs 1 is the old one-by-one order. Results are put back in leaf order, so the report
+// and the log read the same however many ran at once.
+const fixed = Number(opt('jobs') || process.env.SENTRI_SCENARIO_JOBS) || 0;
 const browser = await chromium.launch();
 const out = [];
+const runnable = leaves.filter((l) => (!only || only.has(l.node.id)) && l.node.type !== 'decision-blocker' && l.node.status !== 'pending');
+const tasks = runnable.flatMap((leaf) => (leaf.node.langs || langs).flatMap((lang) => (leaf.node.widths || widths).map((width) => ({ leaf, lang, width }))));
+const done = new Map();
+{
+  const cores = Math.max(1, os.cpus().length);
+  let ctl = { limit: fixed ? Math.max(1, fixed) : Math.min(2, cores), min: 1, max: fixed ? Math.max(1, fixed) : cores, baseline: null };
+  let next = 0, inflight = 0, peak = ctl.limit;
+  const t0 = Date.now();
+  await new Promise((resolve) => {
+    const pump = () => {
+      if (next >= tasks.length && inflight === 0) return resolve();
+      while (inflight < ctl.limit && next < tasks.length) {
+        const t = tasks[next++], s = Date.now(); inflight++;
+        runWithRetry(browser, t.leaf, t.lang, t.width).catch((e) => ({ lang: t.lang, width: t.width, result: 'fail', failures: [{ what: 'run', got: String((e && e.message) || e), tag: null }], skipped: [], notes: [], evidence: [] })).then((r) => {
+          done.set(t, r); inflight--;
+          if (!fixed) { const { state, why } = aimdStep(ctl, { ms: Date.now() - s, timedOut: !!r.retried }); if (why && state.limit !== ctl.limit) console.log(`at once: ${ctl.limit} → ${state.limit} (${why})`); ctl = state; peak = Math.max(peak, ctl.limit); }
+          pump();
+        });
+      }
+    };
+    pump();
+  });
+  console.log(`ran ${tasks.length} run(s) in ${Math.round((Date.now() - t0) / 1000)}s, ${fixed ? `${ctl.limit} at once (--jobs)` : `up to ${peak} at once (adaptive, ${cores} cores)`}`);
+}
 for (const leaf of leaves) {
   const n = leaf.node;
   if (only && !only.has(n.id)) continue;
   const row = { id: n.id, tree: n.tree || null, branch: leaf.branch, label: n.label, gwt: n.gwt || null, path: leaf.path, authority: n.authority || [], result: null, hard: [], runs: [] };
   if (n.type === 'decision-blocker') { row.result = 'blocked'; row.question = n.question; row.sources = n.sources; out.push(row); console.log(`blocked  ${n.id}  ${n.question || ''}`); continue; }
   if (n.status === 'pending') { row.result = 'pending'; row.why = n.why || ''; out.push(row); console.log(`pending  ${n.id}`); continue; }
-  for (const lang of n.langs || langs) for (const width of n.widths || widths) row.runs.push(await runWithRetry(browser, leaf, lang, width));
+  for (const t of tasks) if (t.leaf === leaf) row.runs.push(done.get(t));
   row.result = row.runs.some((r) => r.result === 'fail') ? 'fail' : row.runs.some((r) => r.result === 'blocked') ? 'blocked' : 'pass';
   if (row.result === 'fail' && row.runs.every((r) => r.result !== 'fail' || r.slow)) row.slow = true;
   row.hard = [...new Set(row.runs.flatMap((r) => r.failures.map((f) => f.tag)).filter((t) => HARD.includes(t)))];
