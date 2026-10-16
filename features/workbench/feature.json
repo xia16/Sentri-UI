@@ -1350,7 +1350,7 @@
         "controls": [],
         "copy": ["(raw)"],
         "edge": [],
-        "rules": ["Expanded Overview rows show only task identity and the most useful work fact; full cards remain in Unit. Tinted headers and indented white child rows clarify hierarchy."],
+        "rules": ["Expanded Overview rows show only task identity and the most useful work fact; full cards remain in Unit. Open headers contrast with the page; overdue headers use a warm tint. White child rows sit inward of the same vertical guide used in Unit."],
         "issues": []
       }
     },
@@ -1404,7 +1404,7 @@
         "controls": [],
         "copy": ["(raw)"],
         "edge": [],
-        "rules": ["Unknown summaries are not displayed as zero. Unit retains full task cards in both short and grouped lists."],
+        "rules": ["Unknown summaries are not displayed as zero. Unit retains full task cards in both short and grouped lists. Grouped full cards follow the same inset vertical guide as Overview; narrow Unit facts and maintenance action break onto deliberate rows."],
         "issues": []
       }
     },

@@ -249,7 +249,7 @@
     const active=signals.filter(s=>Number.isFinite(s.count)&&s.count>0),unavailable=signals.some(s=>s.count===null);
     const inspectLabel = `Inspect unit, ${u.pigs} pigs, ${u.pens} pens`;
     if(connectedPreview)return `<section class="unit-hub-compact" aria-label="Unit ${state.unit} status">
-      <div class="unit-hub-compact-head"><strong>Unit ${state.unit} · ${u.pigs} pigs · ${u.pens} pens</strong><small>Checked ${esc(u.checked.split(' · ')[0])}</small></div>
+      <div class="unit-hub-compact-head"><strong>Unit ${state.unit}<span class="unit-hub-compact-facts">${u.pigs} pigs · ${u.pens} pens</span></strong><small>Checked ${esc(u.checked.split(' · ')[0])}</small></div>
       <div class="unit-hub-compact-attention" aria-label="Unit attention">${active.length?active.map(s=>s.label==='Maintenance'?btn('maintenance',`${icon(s.icon)}${s.label} ${s.count}${icon('arrow')}`,'unit-hub-compact-chip issue'): `<span class="unit-hub-compact-chip">${icon(s.icon)}${s.label} ${s.count}</span>`).join(''):!unavailable?'<span class="unit-hub-compact-clear">No flagged items</span>':''}${unavailable?'<span class="unit-hub-compact-unknown">Health and feed summary unavailable</span>':''}</div>
       <div class="unit-hub-compact-actions">${btn('inspect','Inspect unit','primary')} ${btn('inventory-entry','Inventory','secondary')} ${sensors.length||devices.length?btn('environment','Environment','secondary','','data-entry="environment"'):''}</div>
     </section>`;
@@ -311,7 +311,7 @@
     const selectedLabel=state.scheduleDay?`${weekdays[state.scheduleDay-1]} ${state.scheduleDay+8} Jul`:'';
     const selectedSummary=selected.length===1?`${selected[0].title} · ${selected[0].batch}`:selected.length?`${selected.length} tasks start`:'No tasks start';
     return `<section class="schedule-preview" aria-label="Next seven days schedule">
-      <div class="work-section-heading"><h2>Next 7 days</h2><span>Today 8 Jul · ${next.length} starts</span></div>
+      <div class="work-section-heading"><h2>Next 7 days</h2><span>9–15 Jul · ${next.length} starts</span></div>
       <div class="schedule-days" aria-label="Choose a date">${days.map((day,i)=>btn('schedule-day',`<span>${weekdays[i]}</span><strong>${day+8}</strong><i class="${next.some(t=>t.startDay===day)?'has-task':''}" aria-hidden="true"></i>`,'schedule-day'+(state.scheduleDay===day?' selected':''),day,`aria-pressed="${state.scheduleDay===day}" aria-label="July ${day+8}, ${next.filter(t=>t.startDay===day).length} tasks start"`)).join('')}</div>
       ${state.scheduleDay?`<div class="schedule-selected" role="status"><strong>${selectedLabel}</strong><span>${esc(selectedSummary)}</span>${selected.length?btn('schedule-details',`View ${icon('arrow')}`,'schedule-selected-view','','aria-label="View '+selected.length+' task starts on '+selectedLabel+'"'):''}</div>`:''}
     </section>`;

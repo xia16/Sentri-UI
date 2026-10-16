@@ -8,7 +8,7 @@ Overview omits Inspection, Inventory and date selection. Through four visible ta
 
 | Up to four: every task visible | Five or more: categories folded |
 | --- | --- |
-| ![Overview with four concise tasks](home-overview-compact-few-demo.png) | ![Overview with six folded task categories](home-overview-grouped-folded-demo.png) |
+| ![Overview with four concise tasks](home-connected-hierarchy-overview-few-390.png) | ![Overview with six folded task categories](home-connected-hierarchy-overview-folded-390.png) |
 
 | Urgent category open by default | All categories open for review |
 | --- | --- |
@@ -27,3 +27,19 @@ Selecting a unit keeps the unit hub with Inspection, Inventory and Environment, 
 ![Full task facts retained inside an expanded Unit category](home-unit-expanded-category-detail.png)
 
 Desktop pointer feedback fills the whole task row. The native touch design uses pressed feedback.
+
+## Expanded hierarchy and Unit polish · 2026-10-16
+
+The page and an expanded category header now use different surfaces. A regular open header has a neutral tint and a narrow neutral accent; an overdue category uses a pale warm tint and amber accent. Overview and Unit both use the same thin vertical guide beneath an expanded header. Their child rows or full cards sit inward of it, without adding borders around each task card.
+
+| Overview: expanded categories | Unit: hub, dates and first group |
+| --- | --- |
+| ![Overview category headers and inset task rows](home-connected-hierarchy-overview-390.png) | ![Unit page at 390px](home-connected-hierarchy-unit-390.png) |
+
+| Unit: full cards inside the group | Unit: narrow width |
+| --- | --- |
+| ![Unit task details following the group guide](home-connected-hierarchy-unit-detail-390.png) | ![Unit page at 360px](home-connected-hierarchy-unit-360.png) |
+
+The Unit review also raised the small status and card captions to readable size, made the 360px population and maintenance rows break deliberately, and corrected the seven-day caption to **9–15 Jul · 2 starts**. The sample date remains fixed to 8 July in this study.
+
+Overview task separators now start at the child content inset and end before its right padding, matching Unit. They no longer cross the left guide; the rule also applies to finished entries and stays visible during pointer feedback.
