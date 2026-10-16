@@ -625,7 +625,8 @@ export async function evaluate(opts) {
     await Promise.all(todo.compute.map((it) => sched.run({ kind: 'leaf', label: `${side} ${it.leaf.node.id} ${it.lang}-${it.width}`, priority: 2, run: async ({ browser: b }) => {
       let r;
       try { r = await runner(b, it.leaf, it.lang, it.width); } catch (e) { r = { lang: it.lang, width: it.width, result: 'fail', failures: [{ what: 'run', got: String(e?.message || e), tag: null }], skipped: [], notes: [], evidence: [] }; }
-      const m = r.result === 'fail' ? machineErrorOf(r.failures) : null;
+      // a machine error: every failure is one (a navigation timed out or refused), or a page's own file did not arrive (#190)
+      const m = r.result === 'fail' ? machineErrorOf(r.failures) || ((r.loadFailures || []).length ? 'net-error' : null) : null;
       return m ? { machine: m, error: r.failures[0]?.got, run: r } : { run: r };
     } }).then((x) => {
       if (x.machine) { results.set(it.id, { ...x.run, machine: x.machine }); return; }

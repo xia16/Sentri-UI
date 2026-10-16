@@ -67,6 +67,9 @@ export async function prepareVisit(browser, { url, mode = 'screen', width, lang 
       if (/ERR_ABORTED/.test(err) || /^https:\/\/fonts\.(googleapis|gstatic)\.com\//.test(r.url())) return;
       if (/net::ERR_/.test(err)) netErrors.push(`${err} ${r.url()}`);
     });
+    // a 5xx from the gate's own server is the machine too (a 404 is a missing file: a design result)
+    const origin = new URL(url).origin;
+    page.on('response', (r) => { if (r.status() >= 500 && r.url().startsWith(origin)) netErrors.push(`HTTP ${r.status()} ${r.url()}`); });
     const u = new URL(url);
     if (lang !== 'en') u.searchParams.set('lang', lang);
     await page.goto(u.href, { timeout: 30000 });

@@ -58,13 +58,17 @@ const runLeaf = leafRunner({ base, defaults: D, verbs, evidenceDir: join(root, '
 // Timing out again fails it as a slow machine, never as a design failure; an assertion failure never retries.
 async function runWithRetry(browser, leaf, lang, width) {
   const first = await runLeaf(browser, leaf, lang, width);
-  if (first.result !== 'fail' || !timedOutOnly(first.failures)) return first;
-  console.log(`retry    ${leaf.node.id} ${lang}-${width}: ${first.failures[0].got}`);
+  // A machine error: only navigation timeouts, or the page failed to receive one of its own files (a page error such as an
+  // undefined namespace then follows from that, not from the design). Every other failure stands as it is.
+  const machine = (r) => timedOutOnly(r.failures) || (r.loadFailures || []).length > 0;
+  if (first.result !== 'fail' || !machine(first)) return first;
+  console.log(`retry    ${leaf.node.id} ${lang}-${width}: ${(first.loadFailures || [])[0] ? 'a file did not load: ' + first.loadFailures[0] : first.failures[0].got}`);
   const again = await runLeaf(browser, leaf, lang, width);
-  again.retried = first.failures.map((f) => f.got);
-  if (again.result === 'fail' && timedOutOnly(again.failures)) {
+  again.retried = [...first.failures.map((f) => f.got), ...(first.loadFailures || [])];
+  if (again.result === 'fail' && machine(again)) {
     again.slow = true;
-    again.failures = again.failures.map((f) => ({ ...f, what: `slow machine (timed out twice): ${f.what}`, tag: null }));
+    const why = (again.loadFailures || []).length ? `a file did not load twice (${again.loadFailures[0]})` : 'timed out twice';
+    again.failures = again.failures.map((f) => ({ ...f, what: `slow machine (${why}): ${f.what}`, tag: null }));
   }
   return again;
 }

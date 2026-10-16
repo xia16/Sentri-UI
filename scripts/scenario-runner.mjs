@@ -177,7 +177,7 @@ export function leafRunner({ base, defaults: D = {}, verbs = {}, evidenceDir, re
     const n = leaf.node, st = leaf.state, fx = st.reset || {};
     const dir = join(evidenceDir, n.id, `${lang}-${width}`);
     rmSync(dir, { recursive: true, force: true }); mkdirSync(dir, { recursive: true });
-    const evidence = [], failures = [], skipped = [], notes = [], errors = [];
+    const evidence = [], failures = [], skipped = [], notes = [], errors = [], loadFailures = [];
     const clock = n.clock || st.clock || D.clock;
     const needsClock = !!clock || leaf.taps.some((s) => stepKind(s) === 'advance');   // a leaf that lets time pass gets a clock even if it fixes none
     const startMs = clock ? new Date(clock).getTime() : Date.now();
@@ -199,6 +199,11 @@ export function leafRunner({ base, defaults: D = {}, verbs = {}, evidenceDir, re
       const pg = await context.newPage();
       const tag = name === 'a' ? '' : `device ${name}: `;
       pg.on('pageerror', (e) => errors.push(tag + e.message));
+      // The page's own files (served by the runner's server) that failed to arrive: a network failure or a 5xx, never a 404, which
+      // is a missing file and so a real defect. Only these make a failed run a machine error (#190).
+      const own = (u) => u.startsWith(base);
+      pg.on('requestfailed', (r) => { if (own(r.url())) loadFailures.push(`${r.url().slice(base.length)} ${(r.failure() || {}).errorText || 'failed'}`); });
+      pg.on('response', (r) => { if (own(r.url()) && r.status() >= 500) loadFailures.push(`${r.url().slice(base.length)} HTTP ${r.status()}`); });
       pg.on('console', (m) => { if (m.type() === 'error' && /atlas-bare: step not found/.test(m.text())) errors.push(tag + m.text()); });
       if (needsClock) await pg.clock.install({ time: new Date(startMs + elapsed) });   // a second device joins at the same moment
       const url = new URL(base + (fx.url || D.url));
@@ -276,7 +281,7 @@ export function leafRunner({ base, defaults: D = {}, verbs = {}, evidenceDir, re
     for (const c of contexts) await c.close().catch(() => {});
     let result = failures.length ? 'fail' : 'pass';
     if (notes.length && result === 'pass') result = 'blocked';   // the screens can't run in this language: never counted as covered
-    return { lang, width, result, failures, skipped, notes, evidence };
+    return { lang, width, result, failures, skipped, notes, evidence, loadFailures };
   }
   return runLeaf;
 }

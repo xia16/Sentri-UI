@@ -11,9 +11,10 @@ export const WORKERS = Math.max(1, Math.min(16, Number(process.env.SENTRI_WORKER
 // a chip's rounded corners), so the same commit shot twice differed (#173). With one thread, 8 runs of 8 are identical.
 export const LAUNCH_ARGS = ['--num-raster-threads=1', '--disable-partial-raster'];
 
-// A scenario run that failed only because a navigation timed out (page.goto, a reload, Back, waitForLoadState) says nothing about
-// the design: it is run once more. An assertion failure, a missing control or a page error never retries.
-const NAV_TIMEOUT = /\b(page|frame)\.(goto|reload|goBack|goForward|waitForLoadState|waitForURL|waitForNavigation): Timeout \d+ms exceeded/;
+// A scenario run that failed only because a navigation timed out (page.goto, a reload, Back, waitForLoadState), or was refused by
+// the network (net::ERR_*, e.g. ERR_NO_BUFFER_SPACE when Windows ran out of sockets under parallel runs, #187 2026-10-17), says
+// nothing about the design: it is run once more. An assertion failure, a missing control or a page error never retries.
+const NAV_TIMEOUT = /\b(page|frame)\.(goto|reload|goBack|goForward|waitForLoadState|waitForURL|waitForNavigation): (Timeout \d+ms exceeded|net::ERR_[A-Z_]+)/;
 export const timedOutOnly = (failures) => failures.length > 0 && failures.every((f) => NAV_TIMEOUT.test(String(f.got)));
 
 // The recognised machine errors (gate-v2.md §4): a navigation that timed out, and a request the network or the server dropped
@@ -22,8 +23,8 @@ export const timedOutOnly = (failures) => failures.length > 0 && failures.every(
 const NET_ERROR = /\bnet::ERR_[A-Z_]+\b/;
 export function classifyMachineError(text) {
   const s = String(text || '');
-  if (NAV_TIMEOUT.test(s)) return 'navigation-timeout';
   if (NET_ERROR.test(s)) return 'net-error';
+  if (NAV_TIMEOUT.test(s)) return 'navigation-timeout';
   return null;
 }
 // A run's failures ({ got } or strings) are a machine error only when every one of them is: one design failure among them and the

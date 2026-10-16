@@ -9,6 +9,7 @@ test('machine errors: a navigation timeout and net::ERR only; an assertion, a mi
   assert.equal(classifyMachineError('frame.waitForLoadState: Timeout 8000ms exceeded'), 'navigation-timeout');
   assert.equal(classifyMachineError('net::ERR_CONNECTION_RESET http://127.0.0.1:5000/ux/system/a.js'), 'net-error');
   assert.equal(classifyMachineError('page.goto: net::ERR_EMPTY_RESPONSE at http://127.0.0.1'), 'net-error');
+  assert.equal(classifyMachineError("page.goto: net::ERR_NO_BUFFER_SPACE at http://127.0.0.1:5000/"), "net-error", "#190: a navigation the network refused");
   for (const design of ['page.waitForSelector: Timeout 10000ms exceeded', 'control not found: Done', 'expected "Saved" shown, got absent', 'TypeError: x is undefined', '', null]) assert.equal(classifyMachineError(design), null, String(design));
 });
 

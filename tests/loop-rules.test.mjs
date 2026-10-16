@@ -283,6 +283,8 @@ test('a judge that rates an owner-rejected calibration pair better, or skips one
 test('a scenario run retries only when every failure is a navigation timeout', () => {
   assert.ok(timedOutOnly([{ what: 'run', got: 'page.goto: Timeout 30000ms exceeded.' }]));
   assert.ok(timedOutOnly([{ what: 'back', got: 'page.goBack: Timeout 3000ms exceeded.' }, { what: 'run', got: 'page.waitForLoadState: Timeout 30000ms exceeded.' }]));
+  assert.ok(timedOutOnly([{ what: 'run', got: 'page.goto: net::ERR_NO_BUFFER_SPACE at http://127.0.0.1:5000/ux/x.html' }]), 'a navigation the network refused is the machine');
+  assert.ok(!timedOutOnly([{ what: 'run', got: 'page.evaluate: TypeError: x is undefined' }]), 'a script error is not');
   assert.ok(!timedOutOnly([]), 'a pass never retries');
   assert.ok(!timedOutOnly([{ what: 'run', got: 'page.goto: Timeout 30000ms exceeded.' }, { what: '"Done" shown', got: 'absent' }]), 'an assertion failure never retries');
   assert.ok(!timedOutOnly([{ what: 'run', got: 'page.waitForSelector: Timeout 8000ms exceeded.' }]), 'a page that never gets ready is the design');
