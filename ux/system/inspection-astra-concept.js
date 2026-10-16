@@ -618,7 +618,7 @@ function bulkRows(c){
   const change=(m||dose)?'<span class="pig-review-change bulk-pig-change"><span class="feed-pig-values">'+(m?'<span class="feed-reading"><small>Current</small><span>'+esc(p?.[c.view]??'—')+'</span></span><span class="feed-change-arrow" aria-hidden="true">→</span>':'')+'<label class="feed-reading is-new bulk-reading">'+(m?'<small>New</small>':'')+'<input type="number" inputmode="decimal" min="0" step="any" data-bulk-value="'+esc(row.id)+'" value="'+esc(value??'')+'" aria-label="'+(m?m.label:'Dose')+' for '+esc(row.id)+'" placeholder="—"'+(dose?' data-own="'+Object.hasOwn(f.values,row.id)+'"':'')+''+(!row.eligible?' disabled':'')+' aria-invalid="'+(row.error||row.id===firstMissing)+'">'+(dose&&f.doseUnit?'<span class="bulk-unit" aria-hidden="true">'+esc(f.doseUnit)+'</span>':'')+'</label></span><small class="feed-change-state" data-bulk-summary="'+esc(row.id)+'"'+(!state?' hidden':'')+'>'+esc(state)+'</small></span>':'<span class="pig-review-change bulk-pig-change"><small class="feed-change-state" data-bulk-summary="'+esc(row.id)+'"'+(!state?' hidden':'')+'>'+esc(state)+'</small></span>';
   /* Dose rows carry no checkbox (round 5): a pig is taken out on the selected list, where pigs are chosen. */
   const include=f.bulk&&!dose?'<label class="bulk-pig-check"><input type="checkbox" data-bulk-include="'+esc(row.id)+'" aria-label="Include pig '+esc(row.id)+'"'+(!f.excluded.includes(row.id)&&!blocked?' checked':'')+(blocked?' disabled':'')+'></label>':'';
-  return '<div class="pig-review-row bulk-pig-row'+(!f.bulk||!include?' is-single':'')+(!row.eligible?' is-excluded':row.change?' is-changed':' is-unchanged')+'">'+include+'<span class="pig-review-identity bulk-pig-copy"><strong>'+esc(row.id)+'</strong><small>'+(p?bulkMeta(penOf(c,row.id).id+' · '+stageSummary(p)):'Unavailable')+'</small>'+(c.view==='resolve'&&row.finding?.feedLinked?'<small>Resets linked feed adjustment</small>':'')+'</span>'+change+(dose&&f.bulk&&row.eligible&&treatmentLive(c).length>1?'<span class="dose-remove">'+SentriUI.button({label:str('medicines.pigs.remove'),register:'text',action:'dose-remove',value:row.id,attrs:{'aria-label':str('medicines.pigs.remove')+' '+row.id}})+'</span>':'')+'</div>';
+  return '<div class="pig-review-row bulk-pig-row'+(!f.bulk||!include?' is-single':'')+(!row.eligible?' is-excluded':row.change?' is-changed':' is-unchanged')+'">'+include+'<span class="pig-review-identity bulk-pig-copy"><strong>'+esc(row.id)+'</strong><small>'+(p?bulkMeta(penOf(c,row.id).id+' · '+stageSummary(p)):'Unavailable')+'</small>'+(c.view==='resolve'&&row.finding?.feedLinked?'<small>Resets linked feed adjustment</small>':'')+'</span>'+(dose&&f.bulk&&f.removeMode?(row.eligible&&treatmentLive(c).length>1?'<span class="dose-remove">'+stIconButton({action:'dose-remove',value:row.id,icon:icon('close'),label:str('medicines.pigs.remove')+' '+row.id,variant:'plain'})+'</span>':''):change)+'</div>';
  }).join('');
 }
 // The bulk action page (one component, every use): the selected pigs as one list of select rows on top, and the details
@@ -794,8 +794,9 @@ function medicineAction(c,a,v){
  if(a==='brand-add'){const name=String(v||'').trim();if(!name)return true;const farm=medFarm(c),b={id:f.medicineId+'/farm'+farm.brands.length,medicine:f.medicineId,name,withdrawal:null};farm.brands.push(b);f.brand=b.name;f.brandId=b.id;f.brandPick={search:'',level:'details',draft:{withdrawal:''}};return true;}
  if(a==='brand-up'){f.brandPick.level='list';f.brandPick.search='';return true;}
  if(a==='brand-details-save'){const b=medFarm(c).brands.find(b=>b.id===f.brandId),d=f.brandPick?.draft;if(!b||!d||!medDetailsEntered(d))return true;b.withdrawal=medDays(d.withdrawal);delete f.brandPick;c.view='treatment';return true;}
- if(a==='pig-doses-open'){f.doseSearch='';c.view='pig-doses';return true;}
- if(a==='dose-remove'){if(treatmentLive(c).length>1&&!f.excluded.includes(v)){f.excluded=[...f.excluded,v];delete f.values[v];}return true;}
+ if(a==='pig-doses-open'){f.doseSearch='';f.removeMode=false;c.view='pig-doses';return true;}
+ if(a==='dose-remove-mode'){f.removeMode=v==='on'&&treatmentLive(c).length>1;return true;}
+ if(a==='dose-remove'){if(treatmentLive(c).length>1&&!f.excluded.includes(v)){f.excluded=[...f.excluded,v];delete f.values[v];}if(treatmentLive(c).length<2)f.removeMode=false;return true;}
  if(a==='brand-clear'){f.brand='';f.brandId='';delete f.brandPick;c.view='treatment';return true;}
  return false;
 }
@@ -873,19 +874,21 @@ function treatmentDosage(c,{needDose,needUnit}){
 /* Several pigs, modelled on splitting a bill equally, then adjusting: once a dosage is typed, one line says it applies to every
    pig, with "Adjust ›" opening the per-pig page; after adjusting it counts the pigs adjusted. */
 function dosageAdjustLine(c){
- const f=c.form,live=treatmentLive(c),own=live.filter(id=>Object.hasOwn(f.values,id)).length;
- if(String(f.dose??'').trim()===''&&!own)return '';
- const text=own?str(own===1?'medicines.dose.adjusted_one':'medicines.dose.adjusted_n',{n:own}):str('medicines.dose.same_for_n',{pigs:countLabel(live.length)});
- return '<p class="dosage-adjust"><span>'+esc(text)+'</span>'+SentriUI.button({label:str('medicines.dose.adjust'),register:'text',action:'pig-doses-open'})+'</p>';
+ const f=c.form,live=treatmentLive(c),own=live.filter(id=>Object.hasOwn(f.values,id)).length,dose=String(f.dose??'').trim();
+ if(dose===''&&!own)return '';
+ /* One navigate Row (the row law: a word + › on the right when the tap acts); the whole row opens Dose per pig. */
+ const title=own?str('medicines.dose.summary_adjusted',{pigs:countLabel(live.length),n:live.length,k:own}):str('medicines.dose.summary_each',{pigs:countLabel(live.length),n:live.length,dose:Number(dose)+(f.doseUnit?' '+f.doseUnit:'')});
+ return '<div class="st-panel st-row-group dosage-adjust-row">'+stRow({action:'pig-doses-open',title,trailing:str('medicines.dose.adjust')})+'</div>';
 }
 /* The Custom doses page: an ear-tag search with Scan, then each pig with its dose box in the row (inline, no sheet). The box's
    placeholder is the shared dose (ink-2); a typed value is ink and bold, the pig's own dose; clearing it returns the pig to the
    shared dose. Values are live: the page has no Save, its Back (top left, the page header) returns to the form. Search narrows
    the list; Scan jumps to the pig's box (scrolls it into view and focuses it: new, the prototype had no find-and-focus). */
 function customDosesPage(c){
- const f=c.form,q=(f.doseSearch||'').trim(),rows=bulkRows(c);
+ const f=c.form,q=(f.doseSearch||'').trim(),rows=bulkRows(c),canRemove=treatmentLive(c).length>1;
+ const tools=f.removeMode?'<div class="dose-list-tools">'+SentriUI.button({label:str('medicines.pigs.done'),register:'text',action:'dose-remove-mode',value:'off'})+'</div>':canRemove?'<div class="dose-list-tools">'+SentriUI.button({label:str('medicines.pigs.remove_mode'),register:'text',action:'dose-remove-mode',value:'on'})+'</div>':'';
  const search='<div class="custom-doses-search">'+SentriUI.choiceSearch({label:str('medicines.dose.search'),value:f.doseSearch||'',attrs:{'data-dose-search':''}})+stIconButton({action:'dose-scan',icon:icon('scan'),label:str('medicines.dose.scan')})+'</div>';
- return sheet({...c,view:'pig-doses'},str('medicines.dose.per_pig'),'',search+'<section class="pig-review-card bulk-pigs is-short" data-bulk-kind="treatment"><div class="pig-review-list bulk-pig-list" role="region" aria-label="'+esc(str('medicines.dose.per_pig'))+'" tabindex="0" data-bulk-rows>'+(rows||SentriUI.choiceEmpty(str('medicines.dose.no_match',{q})))+'</div></section>','').replace('class="sheet"','class="sheet bulk-action-sheet custom-doses-sheet"');
+ return sheet({...c,view:'pig-doses'},str('medicines.dose.per_pig'),'',search+tools+'<section class="pig-review-card bulk-pigs is-short" data-bulk-kind="treatment"><div class="pig-review-list bulk-pig-list" role="region" aria-label="'+esc(str('medicines.dose.per_pig'))+'" tabindex="0" data-bulk-rows>'+(rows||SentriUI.choiceEmpty(str('medicines.dose.no_match',{q})))+'</div></section>','').replace('class="sheet"','class="sheet bulk-action-sheet custom-doses-sheet"');
 }
 /* Scan (no camera in the prototype): reads a sample tag, the last included pig's, and jumps to its dose box. */
 function doseScanTarget(c){return treatmentLive(c).at(-1);}
@@ -1689,7 +1692,7 @@ function atlasScreen(c){
  if(c.view==='feed')return pen(c,c.penId)?.mode==='adlib'?'feed-plan.adlib':'feed-plan.pen';
  if(c.view==='treatment'&&c.form?.bulk)return 'health-record.treatment-batch';
  if(c.view==='medicine-picker'){const s=medState(c),q=(s.search||'').trim();return s.level==='add'?'medicines.add':s.level==='add-category'?'medicines.add-category':q?(medSearchRows(c,q)?'medicines.search':'medicines.search-none'):s.level==='category'?'medicines.category':c.form.taskId==='vaccination'?'medicines.vaccines':medRecents(c).length?'medicines.picker':'medicines.picker-first';}
- if(c.view==='pig-doses')return (c.form.doseSearch||'').trim()?'health-record.custom-doses-search':Object.keys(c.form.values||{}).length?'health-record.custom-doses-own':'health-record.custom-doses';
+ if(c.view==='pig-doses')return c.form.removeMode?'health-record.custom-doses-remove':(c.form.doseSearch||'').trim()?'health-record.custom-doses-search':Object.keys(c.form.values||{}).length?'health-record.custom-doses-own':'health-record.custom-doses';
  if(c.view==='brand-picker'){const pick=c.form.brandPick||{},q=(pick.search||'').trim().toLocaleLowerCase();return pick.level==='details'?'health-record.brand-details':q&&!medBrands(c,c.form.medicineId).some(b=>b.name.toLocaleLowerCase().includes(q))?'health-record.brand-add':'health-record.brand';}
  if(c.view==='medicines')return medPage(c).category?'medicines.page-category':'medicines.page';
  if(c.view==='medicine-sheet'){const pg=medPage(c);return pg.level==='delete'?'medicines.delete':pg.brand?'medicines.brand':medicineById(c,pg.medicine)?.catalogue?'medicines.medicine':'medicines.medicine-farm';}

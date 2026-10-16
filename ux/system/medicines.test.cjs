@@ -133,8 +133,8 @@ test('batch: Dosage and Unit side by side; no adjust line before a dosage; then 
   assert.match(html, /class="treatment-dosage"><label class="field[^]*?Dosage[^]*?data-bulk-key="dose"[^]*?Unit[^]*?data-picker-key="doseUnit"/);
   assert.doesNotMatch(html, /data-action="pig-doses-open"|data-action="treatment-pigs"/, 'no adjust before a dosage; no pigs row');
   c.form.dose = '2.5'; html = M.overlay(c);
-  assert.match(html, /Same for all 2 pigs[^]*data-action="pig-doses-open"[^>]*>[^]*Adjust ›/);
-  c.form.values['000254'] = '3'; assert.match(M.overlay(c), /1 pig adjusted/);
+  assert.match(html, /class="st-panel st-row-group dosage-adjust-row"><button class="st-row[^>]*data-action="pig-doses-open"[^]*?2 pigs · 2.5 mL each[^]*?st-row-trailing">Adjust</, 'one navigate Row');
+  c.form.values['000254'] = '3'; assert.match(M.overlay(c), /2 pigs · 1 adjusted/);
   assert.doesNotMatch(M.overlay(c), /data-bulk-value=/, 'no per-pig inputs on the form');
 });
 
@@ -156,13 +156,16 @@ test('Dose per pig: every box pre-filled with the actual dose; an adjusted one i
   assert.doesNotMatch(page, /data-bulk-value="000254"/); assert.match(page, /data-action="dose-scan"/);
 });
 
-test('Remove on the per-pig page takes a pig out of the treatment (ChoiceList\'s removal control); the last pig cannot be removed', () => {
+test('Remove pigs switches Dose per pig into a remove mode (a remove control in place of the dose box, Done to leave); the last pig cannot be removed', () => {
   const c = M.seed(); M.openBulkAction(c, 'treatment', ['000254', '000267']); M.handleRecordAction(c, 'medicine-open', ''); M.handleRecordAction(c, 'medicine-select', 'tulathromycin'); c.form.dose = '2';
   M.handleRecordAction(c, 'pig-doses-open', '');
-  assert.match(M.inspectionSurface(c), /data-action="dose-remove" data-value="000254"/);
-  M.handleRecordAction(c, 'dose-remove', '000254');
   let page = M.inspectionSurface(c);
-  assert.doesNotMatch(page, /000254/); assert.doesNotMatch(page, /data-action="dose-remove"/, 'the last pig stays');
+  assert.match(page, /data-action="dose-remove-mode" data-value="on"/); assert.doesNotMatch(page, /data-action="dose-remove"/);
+  M.handleRecordAction(c, 'dose-remove-mode', 'on'); page = M.inspectionSurface(c);
+  assert.equal((page.match(/data-action="dose-remove" data-value="0002/g) || []).length, 2); assert.doesNotMatch(page, /data-bulk-value=/, 'the remove control takes the box\'s place');
+  M.handleRecordAction(c, 'dose-remove', '000254');
+  page = M.inspectionSurface(c);
+  assert.doesNotMatch(page, /000254/); assert.doesNotMatch(page, /data-action="dose-remove"/, 'the last pig stays; the mode ends');
   c.view = 'treatment'; assert.match(M.overlay(c), /Save · 1 pig/);
 });
 

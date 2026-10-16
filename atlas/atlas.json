@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-16T16:53:01.177Z",
- "commit": "8323777",
+ "generated": "2026-10-16T17:19:24.549Z",
+ "commit": "206680b",
  "platforms": [
   {
    "id": "mobile",
@@ -16340,9 +16340,11 @@
          "health-record.brand-add",
          "health-record.brand-details",
          "health-record.treatment-brand",
+         "health-record.treatment-batch-dosage",
          "health-record.treatment-batch-brand",
          "health-record.custom-doses",
          "health-record.custom-doses-own",
+         "health-record.custom-doses-remove",
          "health-record.custom-doses-search",
          "health-record.treatment-note"
         ]
@@ -16464,14 +16466,24 @@
          "Save: the finding appears as a row or tag"
         ],
         [
-         "health-record.treatment-batch",
-         "health-record.custom-doses",
-         "tap Custom doses"
-        ],
-        [
          "health-record.custom-doses",
          "health-record.custom-doses-search",
          "type an ear tag"
+        ],
+        [
+         "health-record.treatment-batch",
+         "health-record.treatment-batch-dosage",
+         "type a dosage"
+        ],
+        [
+         "health-record.treatment-batch-dosage",
+         "health-record.custom-doses",
+         "tap the Adjust row"
+        ],
+        [
+         "health-record.custom-doses",
+         "health-record.custom-doses-remove",
+         "tap Remove pigs"
         ]
        ],
        "screens": [
@@ -17445,9 +17457,89 @@
          }
         },
         {
+         "id": "health-record.treatment-batch-dosage",
+         "name": "Record treatment · several pigs, a dosage",
+         "zh": "记录治疗 · 多头猪（已填剂量）",
+         "status": "in-design",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "selected",
+         "steps": [
+          "[data-action=\"treatment\"]",
+          "[data-action=\"medicine-open\"]",
+          "[data-action=\"medicine-select\"][data-value=\"tulathromycin\"]",
+          "[data-action=\"brand-open\"]",
+          "[data-action=\"brand-select\"][data-value=\"tulathromycin/0\"]",
+          {
+           "fill": "[data-bulk-key=\"dose\"]",
+           "text": "2.5"
+          }
+         ],
+         "figma": "",
+         "notes": {
+          "purpose": "A dosage typed (2.5 mL): the row \"2 pigs · 2.5 mL each\" with Adjust › appears under Dosage and Unit.",
+          "elements": [
+           {
+            "name": "Adjust row",
+            "at": "[data-action=\"pig-doses-open\"]",
+            "shows": "2 pigs · 2.5 mL each / 2 pigs · N adjusted, with Adjust ›",
+            "states": [
+             {
+              "state": "No dosage",
+              "when": "Dosage empty",
+              "shows": "Absent"
+             },
+             {
+              "state": "Same for all",
+              "when": "Dosage typed, none adjusted",
+              "shows": "N pigs · <dose> each"
+             },
+             {
+              "state": "Adjusted",
+              "when": "One or more pigs changed",
+              "shows": "N pigs · K adjusted"
+             }
+            ],
+            "logic": "Row (navigate: the row law's word + › on the right when the tap acts); the whole row opens Dose per pig."
+           },
+           {
+            "name": "Withdrawal",
+            "at": "Withdrawal period",
+            "shows": "A muted caption under Medicine (its default) or under Brand (the brand's own period)",
+            "states": [
+             {
+              "state": "Brand with its own",
+              "when": "The chosen brand has a withdrawal",
+              "shows": "The brand's days"
+             },
+             {
+              "state": "Medicine default",
+              "when": "No brand, or the brand has none",
+              "shows": "The medicine's default days"
+             },
+             {
+              "state": "None",
+              "when": "Neither has one, or it is 0",
+              "shows": "Absent"
+             }
+            ],
+            "logic": "Until = the treatment date (12 Sep in the prototype) + days. Save keeps a copy of the days, the date and the brand's strength on each record, so a later edit of the brand or medicine never changes it.",
+            "rule": "Field's hint slot under the field the number comes from; no period or 0: no caption. Replaces the Banner notice (owner)."
+           }
+          ],
+          "controls": [],
+          "copy": [
+           "medicines.withdrawal.until",
+           "medicines.withdrawal.consequence"
+          ],
+          "issues": [
+           "Brands and withdrawals are sample farm data."
+          ]
+         }
+        },
+        {
          "id": "health-record.treatment-batch-brand",
-         "name": "Record treatment · several pigs, filled",
-         "zh": "记录治疗 · 多头猪（已填写）",
+         "name": "Record treatment · several pigs, one adjusted",
+         "zh": "记录治疗 · 多头猪（一头已调整）",
          "status": "in-design",
          "url": "/ux/system/inspection-astra-concept.html?layout=focus",
          "preset": "selected",
@@ -17470,8 +17562,31 @@
          ],
          "figma": "",
          "notes": {
-          "purpose": "Filled: Tulathromycin (caption \"Withdrawal period 33 days · until 15 Oct\"), Injection, Draxxin, Dosage 2.5 mL, then \"1 pig adjusted · Adjust ›\". No per-pig inputs on the form.",
+          "purpose": "After one adjustment: Tulathromycin (its withdrawal caption), Injection, Draxxin, Dosage 2.5, Unit mL, then the row \"2 pigs · 1 adjusted\" with Adjust ›. No per-pig inputs on the form.",
           "elements": [
+           {
+            "name": "Adjust row",
+            "at": "[data-action=\"pig-doses-open\"]",
+            "shows": "2 pigs · 2.5 mL each / 2 pigs · N adjusted, with Adjust ›",
+            "states": [
+             {
+              "state": "No dosage",
+              "when": "Dosage empty",
+              "shows": "Absent"
+             },
+             {
+              "state": "Same for all",
+              "when": "Dosage typed, none adjusted",
+              "shows": "N pigs · <dose> each"
+             },
+             {
+              "state": "Adjusted",
+              "when": "One or more pigs changed",
+              "shows": "N pigs · K adjusted"
+             }
+            ],
+            "logic": "Row (navigate: the row law's word + › on the right when the tap acts); the whole row opens Dose per pig."
+           },
            {
             "name": "Withdrawal",
             "at": "Withdrawal period",
@@ -17513,7 +17628,7 @@
          "zh": "每头猪的剂量",
          "status": "in-design",
          "url": "/ux/system/inspection-astra-concept.html?layout=focus",
-         "preset": "selected-all",
+         "preset": "selected",
          "steps": [
           "[data-action=\"treatment\"]",
           "[data-action=\"medicine-open\"]",
@@ -17528,7 +17643,7 @@
          ],
          "figma": "",
          "notes": {
-          "purpose": "Adjust › opens it: every pig in the unit (8), each box pre-filled with the actual dosage (2.5); Remove under each pig takes it out of the treatment (ChoiceList's removal control). Ear-tag search and Scan at the top.",
+          "purpose": "Adjust opens it: the 2 pigs of the form, each box pre-filled with the dosage (2.5). Remove pigs (above the list) switches to remove mode. Ear-tag search and Scan at the top.",
           "elements": [
            {
             "name": "Pig dose box",
@@ -17556,7 +17671,7 @@
               "shows": "Not eligible, the box unavailable"
              }
             ],
-            "logic": "Values are live: no Save on the page; Back (top left) returns to the form. A pig is taken out with Remove (not on the last pig)."
+            "logic": "Values are live: no Save on the page; Back (top left) returns to the form. Remove pigs switches the list into remove mode (custom-doses-remove)."
            },
            {
             "name": "Search and Scan",
@@ -17627,7 +17742,7 @@
               "shows": "Not eligible, the box unavailable"
              }
             ],
-            "logic": "Values are live: no Save on the page; Back (top left) returns to the form. A pig is taken out with Remove (not on the last pig)."
+            "logic": "Values are live: no Save on the page; Back (top left) returns to the form. Remove pigs switches the list into remove mode (custom-doses-remove)."
            }
           ],
           "controls": [],
@@ -17638,12 +17753,54 @@
          }
         },
         {
+         "id": "health-record.custom-doses-remove",
+         "name": "Dose per pig: remove pigs",
+         "zh": "每头猪的剂量：移除猪只",
+         "status": "in-design",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "selected",
+         "steps": [
+          "[data-action=\"treatment\"]",
+          "[data-action=\"medicine-open\"]",
+          "[data-action=\"medicine-select\"][data-value=\"tulathromycin\"]",
+          "[data-action=\"brand-open\"]",
+          "[data-action=\"brand-select\"][data-value=\"tulathromycin/0\"]",
+          {
+           "fill": "[data-bulk-key=\"dose\"]",
+           "text": "2.5"
+          },
+          "[data-action=\"pig-doses-open\"]",
+          "[data-action=\"dose-remove-mode\"][data-value=\"on\"]"
+         ],
+         "figma": "",
+         "notes": {
+          "purpose": "Remove pigs switches the list into remove mode: each pig's dose box gives way to a remove control (×), Done leaves. Removing takes the pig out of the treatment; the last pig has no control.",
+          "elements": [
+           {
+            "name": "Remove control",
+            "at": "[data-action=\"dose-remove\"]",
+            "shows": "× named \"Remove 000254\"",
+            "logic": "The platform list's edit mode (a mode switch above the list, a remove control per row, Done to leave), drawn with IconButton (plain); nothing is removed until a row's control is tapped."
+           }
+          ],
+          "controls": [],
+          "copy": [
+           "medicines.pigs.remove_mode",
+           "medicines.pigs.remove",
+           "medicines.pigs.done"
+          ],
+          "issues": [
+           "\"Done\" here leaves a mode; the registry's Done applies a picker's choices with its count. To confirm the word."
+          ]
+         }
+        },
+        {
          "id": "health-record.custom-doses-search",
          "name": "Dose per pig: search an ear tag",
          "zh": "每头猪的剂量：搜索耳标",
          "status": "in-design",
          "url": "/ux/system/inspection-astra-concept.html?layout=focus",
-         "preset": "selected-all",
+         "preset": "selected",
          "steps": [
           "[data-action=\"treatment\"]",
           "[data-action=\"medicine-open\"]",

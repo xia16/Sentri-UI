@@ -35,7 +35,7 @@ None: the list has no lifecycle. Screens are grouped by surface: choosing (the p
 - **Hosts.** Record treatment, one pig and several (health-record): Medicine, Method, Brand (optional), Dose (a number and its unit on one line; the unit remembered per medicine), Condition (optional PickerField; its picker unchanged until the condition rework), Note (optional), then the withdrawal notice. Optional fields are ordinary labelled fields with a grey "Optional" (owner, rounds 4 and 5; the Field law and component change come as their own shared PR).
   - **Note:** a textarea about three lines tall, typed into directly; **at most 200 characters**: input stops at the limit and nothing is cut afterwards; a counter ("180 / 200") shows from 160.
   - **Dosage:** a number and a Unit picker side by side, each its own labelled 48px field ("Dosage", "Unit"); the unit is remembered per medicine.
-  - **Several pigs** (modelled on splitting a bill equally, then adjusting): no per-pig inputs on the form. Once a dosage is typed, a line under it reads "Same for all 2 pigs · Adjust ›" (after adjusting, "1 pig adjusted · Adjust ›"), opening **Dose per pig**: an ear-tag search with Scan, then every pig with its dose box pre-filled with the actual dosage; typing over one makes it that pig's own dose (ink, bold, "Adjusted"); clearing it returns it to the dosage. Unadjusted pigs follow a later change of the dosage; adjusted ones keep their value. Values are live: no Save, Back top left. Each pig row has **Remove** (ChoiceList's removal control, the `secondaryAction` text action under the item), taking the pig out of the treatment; the last pig cannot be removed.
+  - **Several pigs** (modelled on splitting a bill equally, then adjusting): no per-pig inputs on the form. Once a dosage is typed, one navigate row under it reads "2 pigs · 2.5 mL each" with "Adjust ›" (after changes: "2 pigs · 1 adjusted"); no dosage, no row. It opens **Dose per pig**: an ear-tag search with Scan, then every pig with its dose box pre-filled with the dosage; typing a different value makes it that pig's own (ink, bold, "Adjusted"); clearing it returns it to the dosage. Unadjusted pigs follow a later change of the dosage; adjusted ones keep theirs. Values are live: no Save, Back top left. **Remove pigs** (a text action above the list) switches the list into remove mode: each row's dose box gives way to a remove control (×), Done leaves; the last pig cannot be removed.
   - **Save** waits until the shared dose is set, or every included pig has a typed dose.
   - Record vaccination uses the same picker filtered to Vaccines.
 
@@ -50,6 +50,7 @@ Out: the Record treatment and Record vaccination forms themselves (health-record
 - 2026-10-16 (owner): Category → Medicine → Product, a picker with levels, manual adding, rename and delete on a page (first round).
 - 2026-10-16 (owner, revision): the picker picks a medicine; Brand is an optional field of the treatment with its own list and quick add; no product form; method and unit remembered per medicine; one rule for the second line; a starting catalogue for every farm; adding a medicine asks Name and Category; the page holds brands, and Rename and Delete for farm-added medicines only.
 - 2026-10-16 (owner, addition): optional withdrawal (medicine default, brand override), never required; shown on the form (now a caption); the record keeps a copy.
+- 2026-10-16 (owner, in place, 2): the Adjust line becomes one navigate row ("2 pigs · 2.5 mL each · Adjust ›"); Remove pigs as a mode on Dose per pig; the samples show the same pigs throughout.
 - 2026-10-16 (owner, in place): no pigs row; Remove on Dose per pig; withdrawal as a caption under Medicine or Brand; Dosage and Unit side by side; Same for all · Adjust ›, the per-pig page pre-filled with the dosage.
 - 2026-10-16 (owner, round 5): optional fields approved as labelled fields with a grey Optional (the law follows in a shared PR); Note 200 characters with a counter from 160; the Custom doses row and page back, with inline boxes and no checkboxes; a pig is taken out on the selected list.
 - 2026-10-16 (owner, round 4): "Withdrawal period (days)" everywhere; optional fields as ordinary labelled fields (Brand and Condition PickerFields, Note a textarea); batch doses inline on the form with search and Scan (replacing round 3's Custom doses page).
@@ -58,6 +59,9 @@ Out: the Record treatment and Record vaccination forms themselves (health-record
 - The withdrawal notice is a Banner notice: Banner states a consequence before the action it governs; danger is for destructive commits and correction for a review, neither of which this is.
 
 Open:
+
+- "Done" leaves Dose per pig's remove mode; the registry's Done applies a picker's choices with its count. The word is to confirm.
+- The red Delete text action, Field's `optional` label and ChoiceList's row faces are separate component decisions.
 
 - The starting list (categories and medicines, EN and ZH) is to be checked by a vet, and its default withdrawals verified against the official periods (China: MOA Announcement No. 278 and its updates) before release.
 - The Delete text action is drawn by Button's text register, which has no destructive (red) face; the red is on the confirm. A destructive text face would be a Button change of its own.

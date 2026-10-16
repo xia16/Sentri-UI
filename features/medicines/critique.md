@@ -223,3 +223,9 @@ The owner approved the treatment's optional face (an ordinary labelled field wit
 - **major** · The Custom doses row showed before a dosage existed and the per-pig boxes showed the dosage as a placeholder: now the line appears once a dosage is typed ("Same for all 2 pigs · Adjust ›", "1 pig adjusted"), and Dose per pig is pre-filled with the actual dosage; typing over one marks it Adjusted (ink, bold); clearing returns it; unadjusted pigs follow the dosage.
 - Adding a medicine: its default withdrawal is not pre-filled. The add level opens only from a search with no match, and search covers every starting-list medicine (EN, ZH and other names), so a typed new name never matches the catalogue; skipped as asked.
 - Checks on the changed screens: header 0, spacing 0, strict legibility pass (see the hand-back for the commit).
+
+### In-place fixes, 2 (owner, 2026-10-16)
+
+- **minor** · The adjust caption read as a footnote: now one navigate **Row** (title "2 pigs · 2.5 mL each" / "2 pigs · 1 adjusted", trailing word "Adjust" with the rail's ›; the row law's "word + › when the tap acts"); the whole row opens Dose per pig. It keeps Row's one height (`row-min`), not 48px: the row law gives every row one height.
+- **major** · "Remove" under every pig doubled each row: now **Remove pigs**, a text action above the list, switches it into remove mode (the platform list's edit mode: a remove control per row, IconButton plain ×, in the dose box's place; Done to leave). Touch states only.
+- **minor** · The batch screens showed 2 pigs and Dose per pig 8: every batch screen now uses the same 2 pigs.

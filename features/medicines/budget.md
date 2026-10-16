@@ -98,8 +98,8 @@ At the Medicines page (a supervisor tidying the list): 1. Which medicines does t
 | Method: pre-filled from the medicine's last use | How? | Settled | pre-filled, editable |
 | Brand (PickerField, "Optional", only once a medicine is chosen) | Which bottle? | Settled | "Select" until set |
 | Dosage and Unit, side by side, each a labelled 48px field; unit remembered per medicine | How much, in what unit? | Settled | two fields |
-| Several pigs: "Same for all 2 pigs · Adjust ›" / "1 pig adjusted · Adjust ›", only once a dosage is typed | Does every pig get the same? | Settled (muted line, text action) | no per-pig inputs on the form |
-| Dose per pig: search and Scan; each pig (tag, pen · stage) with its box pre-filled with the dose; adjusted: ink bold + "Adjusted"; Remove under each pig | Which pig gets what? Can I take one out? | Settled | live values; Remove not on the last pig |
+| Several pigs: one navigate Row "2 pigs · 2.5 mL each" / "2 pigs · 1 adjusted", trailing "Adjust ›", only once a dosage is typed | Does every pig get the same? How many differ? | Settled (Row, the word + › of a row whose tap acts) | no per-pig inputs on the form |
+| Dose per pig: search and Scan; each pig (tag, pen · stage) with its box pre-filled with the dose; adjusted: ink bold + "Adjusted"; "Remove pigs" switches to remove mode (× per row, Done) | Which pig gets what? Can I take one out? | Settled | live values; no remove control on the last pig |
 | Condition (PickerField, Optional), Note (textarea, about 3 lines, Optional, 200 characters, a counter from 160) | Which finding? Anything to add? | Settled | kept |
 | Order | What was given, then how much? | — | Medicine, Method, Brand, Dosage and Unit, (Adjust line), Condition, Note |
 

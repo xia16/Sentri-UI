@@ -2922,12 +2922,13 @@
     "medicines.dose.label": {"en": "Dosage", "zh": "剂量", "kind": "label"},
     "medicines.unit": {"en": "Unit", "zh": "单位", "kind": "label"},
     "medicines.dose.per_pig": {"en": "Dose per pig", "zh": "每头猪的剂量", "kind": "title"},
-    "medicines.dose.adjust": {"en": "Adjust ›", "zh": "调整 ›", "kind": "action"},
-    "medicines.dose.same_for_n": {"en": "Same for all {pigs}", "zh": "{pigs}剂量相同", "kind": "label"},
-    "medicines.dose.adjusted_one": {"en": "1 pig adjusted", "zh": "已调整 1 头", "kind": "label"},
-    "medicines.dose.adjusted_n": {"en": "{n} pigs adjusted", "zh": "已调整 {n} 头", "kind": "label"},
     "medicines.dose.adjusted": {"en": "Adjusted", "zh": "已调整", "kind": "status"},
     "medicines.pigs.remove": {"en": "Remove", "zh": "移除", "kind": "action"},
-    "medicines.withdrawal.caption": {"en": "Withdrawal period {days} · until {date}", "zh": "休药期{days} · 至{date}", "kind": "description"}
+    "medicines.withdrawal.caption": {"en": "Withdrawal period {days} · until {date}", "zh": "休药期{days} · 至{date}", "kind": "description"},
+    "medicines.dose.adjust": {"en": "Adjust", "zh": "调整", "kind": "action"},
+    "medicines.dose.summary_each": {"en": "{pigs} · {dose} each", "zh": "{n} 头 · 每头 {dose}", "kind": "label"},
+    "medicines.dose.summary_adjusted": {"en": "{pigs} · {k} adjusted", "zh": "{n} 头 · {k} 头已调整", "kind": "label"},
+    "medicines.pigs.remove_mode": {"en": "Remove pigs", "zh": "移除猪只", "kind": "action"},
+    "medicines.pigs.done": {"en": "Done", "zh": "完成", "kind": "action"}
   }
 }
