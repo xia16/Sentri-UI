@@ -9,23 +9,10 @@ import { fileURLToPath } from 'node:url';
 import { routeFonts } from './font-route.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const { chromium } = playwright();
 const DS = '/ux/design-system';
 const VW = Number(process.env.CHECK_WIDTH) || 354; // the atlas cell at 1440 wide (340 to 400 in practice)
+export { VW };
 const TYPES = { '.html': 'text/html', '.css': 'text/css', '.js': 'text/javascript', '.mjs': 'text/javascript', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.md': 'text/plain' };
-
-let server = null, base = process.argv.slice(2).find((a) => /^https?:/.test(a));
-if (!base) {
-  server = http.createServer((req, res) => {
-    const f = path.resolve(root, '.' + decodeURIComponent(new URL(req.url, 'http://x').pathname));
-    if (!f.startsWith(root) || !fs.existsSync(f) || fs.statSync(f).isDirectory()) { res.writeHead(404); return res.end(); }
-    res.writeHead(200, { 'content-type': (TYPES[path.extname(f)] || 'application/octet-stream') + '; charset=utf-8' });
-    fs.createReadStream(f).pipe(res);
-  });
-  await new Promise((r) => server.listen(0, '127.0.0.1', r));
-  base = `http://127.0.0.1:${server.address().port}`;
-}
-base = base.replace(/\/$/, '');
 
 /* runs inside the rendered state; returns [{check, detail}] */
 function audit(stateName) {
@@ -152,16 +139,8 @@ function audit(stateName) {
   return P;
 }
 
-const browser = await chromium.launch();
-// The bundle's Google Fonts come from vendor/fonts/ (scripts/font-route.mjs), as in the shots: a font request that fails on the
-// network is a blip that would render a state in the fallback face, and a base report with one could not be kept for later gates.
-const context = await browser.newContext();
-await routeFonts(context, root);
-const parser = await context.newPage();
-await parser.goto(base + '/ux/design-system/tokens.css');
-
 /* renders every top-level [data-state] of one variant-style html file; returns [{name, problems}] */
-async function checkHtml(html, dir, vw = VW) {
+export async function checkStatesHtml({ context, parser, base, html, dir, vw = VW }) {
   const parts = await parser.evaluate((h) => {
     const d = new DOMParser().parseFromString(h, 'text/html');
     const sts = [...d.querySelectorAll('[data-state]')].filter((x) => !x.parentElement.closest('[data-state]'));
@@ -198,6 +177,31 @@ async function checkHtml(html, dir, vw = VW) {
   }
   return out;
 }
+
+const main = process.argv[1] && path.resolve(process.argv[1]).toLowerCase() === fileURLToPath(import.meta.url).toLowerCase();
+if (main) {
+const { chromium } = playwright();
+let server = null, base = process.argv.slice(2).find((a) => /^https?:/.test(a));
+if (!base) {
+  server = http.createServer((req, res) => {
+    const f = path.resolve(root, '.' + decodeURIComponent(new URL(req.url, 'http://x').pathname));
+    if (!f.startsWith(root) || !fs.existsSync(f) || fs.statSync(f).isDirectory()) { res.writeHead(404); return res.end(); }
+    res.writeHead(200, { 'content-type': (TYPES[path.extname(f)] || 'application/octet-stream') + '; charset=utf-8' });
+    fs.createReadStream(f).pipe(res);
+  });
+  await new Promise((r) => server.listen(0, '127.0.0.1', r));
+  base = `http://127.0.0.1:${server.address().port}`;
+}
+base = base.replace(/\/$/, '');
+
+const browser = await chromium.launch();
+// The bundle's Google Fonts come from vendor/fonts/ (scripts/font-route.mjs), as in the shots: a font request that fails on the
+// network is a blip that would render a state in the fallback face, and a base report with one could not be kept for later gates.
+const context = await browser.newContext();
+await routeFonts(context, root);
+const parser = await context.newPage();
+await parser.goto(base + '/ux/design-system/tokens.css');
+const checkHtml = (html, dir, vw) => checkStatesHtml({ context, parser, base, html, dir, vw });
 
 /* --self-test: known-bad fixtures must be flagged by the check named in their <meta name="expect">, known-good ones must pass */
 if (process.argv.includes('--self-test')) {
@@ -239,3 +243,4 @@ let total = 0;
 for (const [k, c] of Object.entries(by)) { total += c.bad; const top = Object.entries(c.checks).sort((a, b) => b[1] - a[1])[0]; console.log(k.padEnd(18) + String(c.n).padStart(7) + String(c.bad).padStart(9) + '  ' + (top ? `(${top[0]}) x${top[1]}` : '-')); }
 console.log(`\n${results.length} states, ${total} failing. Details: review/state-check.json`);
 process.exit(total ? 1 : 0);
+}

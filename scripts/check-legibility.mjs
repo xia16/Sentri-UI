@@ -15,7 +15,6 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const { chromium } = playwright();
 const TYPES = { '.html': 'text/html', '.css': 'text/css', '.js': 'text/javascript', '.mjs': 'text/javascript', '.cjs': 'text/javascript', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.webp': 'image/webp', '.gif': 'image/gif', '.woff': 'font/woff', '.woff2': 'font/woff2', '.ttf': 'font/ttf', '.otf': 'font/otf', '.md': 'text/plain' };
 
 // minText: quiet descriptive text; actText: text inside a control (what a worker reads to act on). Owner, 2026-10-11.
@@ -179,6 +178,61 @@ function tokensInPage(F) {
   return Object.entries(tokens).map(([name, px]) => ({ name, px, usedBy: uses[name] || 0 }));
 }
 
+export const merge = (parts) => {
+  const m = { small: [], c45: [], c7: [], taps: [], unverified: 0, sizes: {} };
+  for (const p of parts) {
+    m.unverified += p.unverified;
+    for (const [k, v] of Object.entries(p.sizes)) m.sizes[k] = (m.sizes[k] || 0) + v;
+    for (const k of ['small', 'c45', 'c7', 'taps']) for (const o of p[k]) { const f = m[k].find((a) => a.sel === o.sel && a.px === o.px && a.ratio === o.ratio && a.size === o.size); if (f) f.n += o.n; else m[k].push({ ...o }); }
+  }
+  return m;
+};
+export const count = (arr) => arr.reduce((s, o) => s + o.n, 0);
+export const failing = (a) => a.small.length + a.c45.length + a.c7.length + a.taps.length > 0;
+
+// Every frame of a prepared page (the gate's shared visit at 390 EN, or the CLI's own), below the fold too: it scrolls each scroll
+// area a screen at a time, so it runs last on a visit. Returns { audit, tokens }.
+export async function auditLegibilityPage(page) {
+  const parts = [];
+  for (const fr of page.frames()) {
+    try {
+      if (!(await fr.evaluate(() => innerWidth > 0 && innerHeight > 0))) continue;
+      parts.push(await fr.evaluate(auditInPage, FLOORS));
+      // Below the fold counts too: scroll every scroll area a screen at a time and audit what comes into view (each node once).
+      const steps = await fr.evaluate(() => [document.scrollingElement, ...document.querySelectorAll('*')].filter((e) => e && e.scrollHeight > e.clientHeight + 8 && (e === document.scrollingElement || /auto|scroll/.test(getComputedStyle(e).overflowY)) && e.clientHeight > 0).length);
+      for (let i = 0; i < steps; i++) {
+        for (let k = 0; k < 40; k++) {
+          const moved = await fr.evaluate((i) => { const sc = [document.scrollingElement, ...document.querySelectorAll('*')].filter((e) => e && e.scrollHeight > e.clientHeight + 8 && (e === document.scrollingElement || /auto|scroll/.test(getComputedStyle(e).overflowY)) && e.clientHeight > 0)[i]; if (!sc) return false; const before = sc.scrollTop; sc.scrollTop = before + Math.max(200, Math.round(sc.clientHeight * 0.8)); return sc.scrollTop > before; }, i);
+          if (!moved) break;
+          await page.waitForTimeout(80);
+          parts.push(await fr.evaluate(auditInPage, FLOORS));
+        }
+      }
+    } catch (e) { /* detached frame */ }
+  }
+  const tokens = await page.evaluate(tokensInPage, FLOORS);
+  return { audit: merge(parts), tokens };
+}
+
+// A changed screen against the same screen on base (--compare, and the gate for a shared change): worse when it has more violations
+// in a category, or one on an element that had none. base, cand: { audit } as auditLegibilityPage returns (base null: a new screen).
+export function legibilityWorse(base, cand) {
+  const sum = (a) => ({ small: count(a.small), contrast: count(a.c45) + count(a.c7), taps: count(a.taps), smallText: a.small, lowContrast: [...a.c45, ...a.c7], smallTargets: a.taps });
+  const c = sum(cand.audit), why = [];
+  const b = base ? sum(base.audit) : { small: 0, contrast: 0, taps: 0, smallText: [], lowContrast: [], smallTargets: [] };
+  if (!base) why.push('new screen: no baseline');
+  for (const [k, arr, label] of [['small', 'smallText', 'text under 13px'], ['contrast', 'lowContrast', 'low contrast'], ['taps', 'smallTargets', 'target under 48px']]) {
+    const had = new Set(b[arr].map((o) => o.sel));
+    if (c[k] > b[k]) why.push(label + ': ' + b[k] + ' -> ' + c[k]);
+    const fresh = [...new Set(c[arr].filter((o) => !had.has(o.sel)).map((o) => o.sel))];
+    if (fresh.length) why.push('new ' + label + ' on ' + fresh.slice(0, 4).join(', '));
+  }
+  return { worse: why.some((w) => !w.startsWith('new screen')), why, base: { small: b.small, contrast: b.contrast, taps: b.taps }, cand: { small: c.small, contrast: c.contrast, taps: c.taps } };
+}
+
+const main = process.argv[1] && path.resolve(process.argv[1]).toLowerCase() === fileURLToPath(import.meta.url).toLowerCase();
+if (main) {
+const { chromium } = playwright();
 /* ---------- harness ---------- */
 let server = null, base = val('--base');
 if (!base) {
@@ -193,18 +247,6 @@ if (!base) {
 }
 base = base.replace(/\/$/, '');
 
-const merge = (parts) => {
-  const m = { small: [], c45: [], c7: [], taps: [], unverified: 0, sizes: {} };
-  for (const p of parts) {
-    m.unverified += p.unverified;
-    for (const [k, v] of Object.entries(p.sizes)) m.sizes[k] = (m.sizes[k] || 0) + v;
-    for (const k of ['small', 'c45', 'c7', 'taps']) for (const o of p[k]) { const f = m[k].find((a) => a.sel === o.sel && a.px === o.px && a.ratio === o.ratio && a.size === o.size); if (f) f.n += o.n; else m[k].push({ ...o }); }
-  }
-  return m;
-};
-const count = (arr) => arr.reduce((s, o) => s + o.n, 0);
-const failing = (a) => a.small.length + a.c45.length + a.c7.length + a.taps.length > 0;
-
 async function auditUrl(browser, url, bare) {
   const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1 });
   const page = await ctx.newPage();
@@ -214,25 +256,7 @@ async function auditUrl(browser, url, bare) {
     await page.evaluate(() => document.fonts.ready);
     await page.waitForTimeout(600);
     await page.evaluate(() => document.fonts.ready);
-    const parts = [];
-    for (const fr of page.frames()) {
-      try {
-        if (!(await fr.evaluate(() => innerWidth > 0 && innerHeight > 0))) continue;
-        parts.push(await fr.evaluate(auditInPage, FLOORS));
-        // Below the fold counts too: scroll every scroll area a screen at a time and audit what comes into view (each node once).
-        const steps = await fr.evaluate(() => [document.scrollingElement, ...document.querySelectorAll('*')].filter((e) => e && e.scrollHeight > e.clientHeight + 8 && (e === document.scrollingElement || /auto|scroll/.test(getComputedStyle(e).overflowY)) && e.clientHeight > 0).length);
-        for (let i = 0; i < steps; i++) {
-          for (let k = 0; k < 40; k++) {
-            const moved = await fr.evaluate((i) => { const sc = [document.scrollingElement, ...document.querySelectorAll('*')].filter((e) => e && e.scrollHeight > e.clientHeight + 8 && (e === document.scrollingElement || /auto|scroll/.test(getComputedStyle(e).overflowY)) && e.clientHeight > 0)[i]; if (!sc) return false; const before = sc.scrollTop; sc.scrollTop = before + Math.max(200, Math.round(sc.clientHeight * 0.8)); return sc.scrollTop > before; }, i);
-            if (!moved) break;
-            await page.waitForTimeout(80);
-            parts.push(await fr.evaluate(auditInPage, FLOORS));
-          }
-        }
-      } catch (e) { /* detached frame */ }
-    }
-    const tokens = await page.evaluate(tokensInPage, FLOORS);
-    return { audit: merge(parts), tokens };
+    return await auditLegibilityPage(page);
   } finally { await ctx.close(); }
 }
 
@@ -351,3 +375,4 @@ if (changed.length && (compare || (!gateStrict && !flag('--strict')))) {
 if (blocked.length) { console.error('\nblocked: ' + blocked.length + ' changed screen(s) ' + (gateStrict || flag('--strict') ? 'break the farm legibility law' : 'got worse than the base') + ': ' + blocked.map((r) => r.id).join(', ')); process.exit(1); }
 if (flag('--strict') && !changed.length && (t.screensFailing || t.errors)) { console.error('\nstrict: screens fail the farm legibility law'); process.exit(1); }
 process.exit(0);
+}

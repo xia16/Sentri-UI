@@ -7,54 +7,8 @@ export const CLASSES = ['copy', 'presentation', 'behaviour', 'shared'];
 export const DIMENSIONS = ['hierarchy', 'alignment', 'legibility', 'touch', 'state', 'native'];
 export const HARD = ['wrong-fact', 'lost-draft', 'dead-end', 'unreachable-control', 'broken-ruling', 'rejected-example'];
 
-// Every atlas screen that renders, with its feature.
-export function screensOf(atlas, { features = [], screens = [] } = {}) {
-  const list = [];
-  for (const p of atlas.platforms) for (const s of p.sections) for (const f of s.features) for (const c of f.screens) {
-    if (!c.url) continue;
-    if (features.length && !features.includes(f.id)) continue;
-    if (screens.length && !screens.includes(c.id)) continue;
-    list.push({ id: c.id, feature: f.id, url: c.url, status: c.status });
-  }
-  return list;
-}
-
-// The design system's own pages (atlas: Components → <Name> → <variant>, each state drawn by atlas/library.js stateGridAt) are
-// in the gate's reach like screens: a page teaches the law, so it must follow it (rules ledger L23). Each is a "screen" with the
-// id ds:<Name>/<variant> and the feature design-system; the variants are those the atlas draws (atlas.json: the files on disk).
-export const DS_FEATURE = 'design-system';
-export const componentPage = (id) => { const m = /^ds:([^/]+)\/([^/]+)$/.exec(String(id)); return m ? { component: m[1], variant: m[2] } : null; };
-// A screen id as a folder name: a ds: id's colon is not a legal file name on Windows.
-export const idPath = (id) => String(id).replace(/:/g, '_');
-export function componentPagesOf(atlas, { components = [], screens = [] } = {}) {
-  const list = [];
-  for (const p of atlas.platforms) for (const c of p.components || []) for (const v of c.files?.variants || []) {
-    const id = `ds:${c.name}/${v}`;
-    if (components.length && !components.includes(c.name)) continue;
-    if (screens.length && !screens.includes(id)) continue;
-    list.push({ id, feature: DS_FEATURE, component: c.name, variant: v, url: `/atlas/index.html?view=components&component=${encodeURIComponent(c.name)}&variant=${encodeURIComponent(v)}` });
-  }
-  return list;
-}
-// The components whose own folder (ux/design-system/components/<Name>/) a change edits: their pages moving is the change's own reach.
-export const componentsTouched = (files) => [...new Set(files.map((f) => (/^ux\/design-system\/components\/([^/]+)\//.exec(f) || [])[1]).filter(Boolean))].sort();
-
-// The page an atlas screen opens, as a repo path.
-export const pageOf = (url) => { const p = url.split(/[?#]/)[0].replace(/^\//, ''); return !p || p.endsWith('/') ? p + 'index.html' : p; };
-
-// The repo files a page loads itself (scripts, stylesheets, images, frames), resolved from the page. Links it only points
-// to, anything off this server and markup built inside a script string are left out.
-export function pageAssets(html, page) {
-  const dir = path.posix.dirname(page);
-  const out = new Set();
-  for (const m of html.matchAll(/<(?:script|link|img|iframe|source)\b[^>]*?\s(?:src|href)\s*=\s*(["'])(.*?)\1/gis)) {
-    const ref = m[2].split(/[?#]/)[0].trim();
-    if (!ref || /^([a-z][a-z\d+.-]*:|\/\/)/i.test(ref) || /['"+\s<>]/.test(ref)) continue;
-    const f = ref.startsWith('/') ? path.posix.normalize(ref.slice(1)) : path.posix.normalize(path.posix.join(dir, ref));
-    if (!f.startsWith('../')) out.add(f);
-  }
-  return [...out];
-}
+export { screensOf, DS_FEATURE, componentPage, idPath, componentPagesOf, componentsTouched, pageOf, pageAssets } from './atlas-screens.mjs';
+import { DS_FEATURE, componentPage, componentsTouched, pageOf } from './atlas-screens.mjs';
 
 // file -> the features whose screens load it: each screen's page, and what that page loads (assetsOf: page -> files).
 // A file pages of two or more features load is shared: changing it reaches them all, whatever their first frames show.
@@ -180,6 +134,9 @@ export function checkVerdict(verdict, mech) {
   if (verdict.base !== mech.base) problems.push(`verdict compares against ${verdict.base}, the base is ${mech.base}`);
   if (verdict.pass && !mech.pass) problems.push('verdict passes a candidate whose mechanical gate failed');
   if (mech.quick) problems.push('the mechanical run was --quick (a builder self-check): gate it in full');
+  // Gate v2: a blocked gate could not establish its evidence (an unstable capture, a machine error twice, a run that produced nothing);
+  // nothing can pass it, whatever the judge saw.
+  if (mech.outcome === 'blocked') problems.push(`the mechanical gate was blocked (${(mech.blocked || [])[0] || 'no reason recorded'}): gate again; no verdict passes a blocked gate`);
   const acked = new Set((verdict.gone || []).filter((g) => g.why).map((g) => g.screen));
   for (const g of mech.screens?.gone || []) if (!acked.has(g.id)) problems.push(`screen ${g.id} was removed from the atlas: the verdict must say why under "gone"`);
   const name = (p) => `${p.screen} ${p.lang}-${p.width}`;
@@ -188,6 +145,9 @@ export function checkVerdict(verdict, mech) {
   for (const p of pairs) said.set(name(p), [...(said.get(name(p)) || []), p.verdict]);
   const paired = new Set(listed.map((p) => p.screen));
   for (const s of [...(mech.screens?.diff || []), ...(mech.screens?.new || []), ...(mech.screens?.gone || [])]) if (!paired.has(s.id)) problems.push(`screen ${s.id} moved but has no pair to judge: gate again`);
+  // A judgement of a pair the manifest doesn't list is about other evidence (an earlier run, another commit): the verdict is stale.
+  const manifest = new Set(listed.map(name));
+  for (const p of pairs) if (!manifest.has(name(p))) problems.push(`the verdict judges pair ${name(p)}, which is not in the evidence manifest (mechanical.json pairs): judge this run's pairs`);
   for (const p of listed) {
     const kind = p.kind || 'changed', allowed = VERDICTS[kind] || [], v = said.get(name(p)) || [];
     if (!v.length) { problems.push(`no judgement for pair ${name(p)}`); continue; }
@@ -376,7 +336,7 @@ export function calibrationProblems(parts, answers) {
   return out;
 }
 
-// ---------- the lighter gate: reach, the base cache, the lock, the timeout retry, carrying a pass ----------
+// ---------- the lighter gate: reach by files, the lock ----------
 
 // Files that decide pixels on every screen besides SYSTEM: the shooter and what it loads, the server, the atlas and its sections,
 // the vendored fonts and the installed packages (Playwright's version is the browser's).
@@ -427,26 +387,9 @@ export function reachLine(reach, n) {
   return `reach: ${n} screen(s) in features ${reach.features.join(', ')}${why}`;
 }
 
-// The base shots to take: needs [{ screen, width, langs }] against the cached runs [{ screen, lang, width, file, ok }] (has(file):
-// the png is still there). A screen is reused at a width only when every language it needs is cached, since the Chinese probe
-// compares against English shot in the same run; otherwise it is shot again in all of them. take: [{ width, langs, screens }].
-export function shotsToTake(needs, cached = [], has = () => true) {
-  const at = new Map(cached.filter((r) => r.ok && has(r.file)).map((r) => [`${r.screen} ${r.lang}-${r.width}`, r]));
-  const reuse = [], take = new Map();
-  for (const n of needs) {
-    const hit = n.langs.map((l) => at.get(`${n.screen} ${l}-${n.width}`));
-    if (hit.every(Boolean)) { reuse.push(...hit); continue; }
-    const k = `${n.width}|${n.langs.join(',')}`;
-    if (!take.has(k)) take.set(k, { width: n.width, langs: n.langs, screens: [] });
-    take.get(k).screens.push(n.screen);
-  }
-  return { reuse, take: [...take.values()] };
-}
-
-// A scenario run that failed only because a navigation timed out (page.goto, a reload, Back, waitForLoadState) says nothing about
-// the design: it is run once more. An assertion failure, a missing control or a page error never retries.
-const NAV_TIMEOUT = /\b(page|frame)\.(goto|reload|goBack|goForward|waitForLoadState|waitForURL|waitForNavigation): Timeout \d+ms exceeded/;
-export const timedOutOnly = (failures) => failures.length > 0 && failures.every((f) => NAV_TIMEOUT.test(String(f.got)));
+// Machine errors, the navigation-timeout retry and the AIMD window live in scripts/machine.mjs (the runner and the scheduler use them
+// without the gate's rules); re-exported here for the callers that import them from the rules.
+export { timedOutOnly, aimdStep, classifyMachineError, machineErrorOf } from './machine.mjs';
 
 // A failed gh / GitHub API call that is the network, not an answer: EOF, TLS, a timeout, a reset or refused connection, a name that
 // doesn't resolve, a 5xx. It is retried; anything else is GitHub's answer and never is.
@@ -456,35 +399,6 @@ export const ghNetworkError = (stderr) => /\bEOF\b|\bTLS\b|handshake|timed? ?out
 export function lockState(lock, alive) {
   if (!lock) return 'free';
   return Number.isInteger(lock.pid) && alive(lock.pid) ? 'held' : 'stale';
-}
-
-// Carrying a GATE PASS over main moving on (gate.mjs --carry). The gate passed C on base M1; the PR head is now C2, main is M2.
-// It carries only when C2 is C merged with main and nothing else, and main's own change since M1 reaches no screen.
-//   pass: the pass record for C · mech: C's mechanical.json · head, main: C2, M2 · containsC / containsMain: C2 contains C / M2
-//   ownCommits: commits in C2 that are in neither C nor M2 and aren't merges · cand: path -> blob on C, for every path M1..C changed
-//   carried: the same for M2..C2 on C2 · mainFiles: the paths M1..M2 changed · reach: reachOf(mainFiles)
-export function carryDecision({ pass, mech, head, main, containsC, containsMain, ownCommits = [], cand = {}, carried = {}, mainFiles = [], reach }) {
-  const s = (x) => String(x || '?').slice(0, 7);
-  const no = (why) => ({ ok: false, why: [why] });
-  if (!pass) return no(`no GATE PASS is recorded for ${s(mech.candidate)}: run the gate`);
-  if (pass.carried) return no(`the pass for ${s(mech.candidate)} was itself carried: carry from the gated run's folder`);
-  if (pass.base !== mech.base) return no(`the pass for ${s(mech.candidate)} is against ${s(pass.base)}, the gate ran against ${s(mech.base)}`);
-  if (!head) return no(`${mech.ref || 'the candidate ref'} does not resolve`);
-  if (!main) return no('origin/main does not resolve');
-  if (main === mech.base) return no(head === mech.candidate ? 'main has not moved: the pass stands as it is' : `${mech.ref} moved to ${s(head)} while main did not: run the gate again`);
-  if (!containsC) return no(`${s(head)} does not contain the gated commit ${s(mech.candidate)}: run the gate again`);
-  if (!containsMain) return no(`${s(head)} does not contain origin/main ${s(main)}: merge main forward first`);
-  const why = [];
-  if (ownCommits.length) why.push(`${ownCommits.length} commit(s) on the PR since the gate besides the merge of main (${ownCommits.slice(0, 3).map(s).join(', ')}): run the gate again`);
-  const both = mainFiles.filter((f) => Object.hasOwn(cand, f));
-  if (both.length) why.push(`main and the candidate both changed ${both.slice(0, 3).join(', ')}: run the gate again`);
-  const paths = [...new Set([...Object.keys(cand), ...Object.keys(carried)])];
-  const edited = paths.filter((p) => cand[p] !== carried[p] && !both.includes(p));
-  if (edited.length) why.push(`the merge is not just main: ${edited.slice(0, 3).join(', ')} not as on the gated commit (a conflict resolved, or an edit in the merge): run the gate again`);
-  const notProse = mainFiles.filter((f) => !carryableFile(f));
-  if (notProse.length) why.push(`main changed ${notProse.slice(0, 3).join(', ')}${notProse.length > 3 ? ` and ${notProse.length - 3} more` : ''} since ${s(mech.base)}: only prose outside ux/, features/ and docs/design-workflow/ carries a pass, because a script, test or rule can change what a check decides: run the gate again`);
-  if (!reach || reach.all || reach.features.length) why.push(`main's change since ${s(mech.base)} can reach ${!reach || reach.all ? 'every screen' : `screens of ${reach.features.join(', ')}`}${reach?.why.length ? ` (${reach.why.join('; ')})` : ''}: run the gate again`);
-  return why.length ? { ok: false, why } : { ok: true, why: [`main moved ${s(mech.base)} → ${s(main)} by ${mainFiles.length} file(s) that draw no pixel, and ${s(head)} is ${s(mech.candidate)} merged with it and nothing else`] };
 }
 
 // Scenario leaves, base against candidate (owner, 2026-10-15): a leaf the candidate fails is the change's only when the same leaf
@@ -516,27 +430,4 @@ export function scenarioDebt(candReport, baseReport) {
     if (fresh.length) added.push({ id: lf.id, why: fresh }); else debt.push(lf.id);
   }
   return { added, debt };
-}
-
-// What main may change while a pass is carried (gate.mjs --carry): prose only. A Markdown file outside ux/ (which pages can load),
-// features/ (budgets and critiques the gate checks) and docs/design-workflow/ (the gate's own rules). Anything else, including
-// every script, test and config, can change what a check decides even when no pixel moves: it voids the carry.
-export const carryableFile = (f) => /\.md$/i.test(f) && !/^(ux|features|docs\/design-workflow)\//.test(f);
-
-// How many scenario runs go at once (run-scenarios.mjs), found like TCP finds its window: additive increase, multiplicative
-// decrease. It starts at `start`; the first runs set a baseline (their median time); after each round (as many runs as the window),
-// it adds one while the round's median stays within 1.5x the baseline, and halves when it passes 2.5x (the machine is crowded,
-// e.g. another session's tests). A run that hit a navigation timeout halves it at once. Never below 1 or above max.
-// state: { limit, min, max, baseline, warm: [ms], window: [ms], round }; returns the next state and why it changed (or null).
-export function aimdStep(state, { ms, timedOut = false }) {
-  const s = { ...state, warm: [...(state.warm || [])], window: [...(state.window || [])] };
-  const median = (a) => { const b = [...a].sort((x, y) => x - y); return b.length ? b[Math.floor((b.length - 1) / 2)] : 0; };
-  if (timedOut) { const limit = Math.max(s.min, Math.floor(s.limit / 2)); const why = limit !== s.limit ? 'a navigation timed out' : null; return { state: { ...s, limit, window: [], round: 0 }, why }; }
-  if (s.baseline == null) { s.warm.push(ms); if (s.warm.length >= 6) { s.baseline = median(s.warm); s.round = 0; } return { state: s, why: null }; }
-  s.window.push(ms); s.round = (s.round || 0) + 1;
-  if (s.round < s.limit || s.window.length < 3) return { state: s, why: null };
-  const m = median(s.window), next = { ...s, window: [], round: 0 };
-  if (m > 2.5 * s.baseline) { next.limit = Math.max(s.min, Math.floor(s.limit / 2)); return { state: next, why: next.limit !== s.limit ? `runs slowed to ${(m / s.baseline).toFixed(1)}x` : null }; }
-  if (m <= 1.5 * s.baseline && s.limit < s.max) { next.limit = s.limit + 1; return { state: next, why: `runs at ${(m / s.baseline).toFixed(1)}x` }; }
-  return { state: next, why: null };
 }
