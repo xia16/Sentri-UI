@@ -60,7 +60,8 @@
     air:'M3 8h12a3 3 0 1 0-3-3M3 12h16a3 3 0 1 1-3 3M3 16h5',
     upload:'M12 16V4m-4 4 4-4 4 4M4 15v6h16v-6',
     backspace:'M9 5h12v14H9l-6-7zM12 9l6 6M18 9l-6 6',
-    offline:'m3 3 18 18M4 9a13 13 0 0 1 2-1M10 6a14 14 0 0 1 10 3M7 13a8 8 0 0 1 3-1M14 12a8 8 0 0 1 3 1M10 17a3 3 0 0 1 4 0M12 21h.01'
+    offline:'m3 3 18 18M4 9a13 13 0 0 1 2-1M10 6a14 14 0 0 1 10 3M7 13a8 8 0 0 1 3-1M14 12a8 8 0 0 1 3 1M10 17a3 3 0 0 1 4 0M12 21h.01',
+    stop:'M8.5 6.5h7a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-7a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2z'
   };
   const aliases=Object.freeze({origin:'place',arrow:'chevron',condition:'plus'});
   // Compatibility aliases do not add duplicate glyphs to the enumerable registry.
