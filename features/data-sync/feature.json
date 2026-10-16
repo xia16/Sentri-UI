@@ -16,9 +16,21 @@
         "data-sync.task-badge",
         "data-sync.task-list",
         "data-sync.list",
+        "data-sync.history",
         "data-sync.grouped",
         "data-sync.category",
         "data-sync.detail"
+      ]
+    ],
+    [
+      "多任务与操作链 · 待评审",
+      [
+        "data-sync.volume-index",
+        "data-sync.volume-synced",
+        "data-sync.volume-task",
+        "data-sync.volume-serial-chain",
+        "data-sync.volume-parallel-chain",
+        "data-sync.volume-transfer-chain"
       ]
     ],
     [
@@ -47,8 +59,8 @@
         "states": [
           {
             "state": "Waiting",
-            "when": "本机有待上传记录",
-            "shows": "页眉徽标报这台手机待上传数；恢复网络后自动上传，首页不重复同步卡"
+            "when": "本机有待同步记录",
+            "shows": "页眉徽标报这台手机未完成同步数；恢复网络后自动同步，首页不重复同步卡"
           },
           {
             "state": "Needs attention",
@@ -57,8 +69,8 @@
           },
           {
             "state": "Empty",
-            "when": "本机无待上传记录",
-            "shows": "全局入口隐藏；总览仍可说明本机暂无待上传记录，不能称团队全部记录已齐"
+            "when": "本机无未完成同步记录",
+            "shows": "全局入口隐藏；总览仍可说明本机暂无待同步记录，不能称团队全部记录已齐"
           }
         ],
         "issues": [
@@ -157,7 +169,7 @@
       "zh": "数据同步列表",
       "status": "in-design",
       "notes": {
-        "purpose": "本机记录总览。异常与待上传记录逐条呈现；已确认上传仅显示近30天总数，不铺历史记录行。",
+        "purpose": "本机记录总览。未完成记录只分待同步、同步中、冲突或错误三类；底部以次级入口显示近30天已同步数量，可点入逐条查看。",
         "states": [
           {
             "state": "Offline",
@@ -172,12 +184,12 @@
           {
             "state": "Partial",
             "when": "部分记录已同步",
-            "shows": "已上传显示近30天总数，未解决记录仍逐条可见"
+            "shows": "失败记录留在冲突或错误区；已同步放在底部近30天入口，不参与未完成数量"
           },
           {
             "state": "Recent history",
             "when": "已确认上传记录跨越30天期限",
-            "shows": "仅期限内记录计入本机已上传合计；过期且无未上传依赖的本机副本可清理"
+            "shows": "入口只统计期限内本机已同步记录；过期且无未同步依赖的本机副本可清理"
           }
         ],
         "issues": [
@@ -185,6 +197,28 @@
         ]
       },
       "url": "/ux/system/data-sync-astra-prototype.html?scenario=offline"
+    },
+    {
+      "id": "data-sync.history",
+      "name": "Recently synced records",
+      "zh": "最近已同步记录",
+      "status": "in-design",
+      "url": "/ux/system/data-sync-astra-prototype.html?scenario=partial&view=history",
+      "notes": {
+        "purpose": "从总览底部的低强调入口查看本机最近30天已由服务端确认的逐条记录，显示业务、位置与确认时间；不代表服务端全部历史。",
+        "states": [
+          {
+            "state": "Recent records",
+            "when": "最近30天有已同步记录",
+            "shows": "可逐条打开详情，返回后仍停留在已同步列表"
+          },
+          {
+            "state": "Empty",
+            "when": "最近30天没有已同步记录",
+            "shows": "保留总览入口并在次页说明本机无近期已同步记录"
+          }
+        ]
+      }
     },
     {
       "id": "data-sync.detail",
@@ -242,6 +276,78 @@
       }
     },
     {
+      "id": "data-sync.volume-index",
+      "name": "Many tasks on this phone · proposal",
+      "zh": "全机多任务列表 · 待评审",
+      "status": "in-design",
+      "url": "/ux/system/data-sync-astra-prototype.html?scenario=volume&variant=chains&lang=zh",
+      "notes": {
+        "purpose": "评审 10 项任务、97 条本机操作的两级列表：顶部未同步与已同步 Tab，全机先按任务汇总，再进入任务查看操作。",
+        "issues": [
+          "这是 volume-list-review.md 中的候选方案，尚未替换已确认的本机记录列表规则；原型使用虚构数据。"
+        ]
+      }
+    },
+    {
+      "id": "data-sync.volume-synced",
+      "name": "Many recently synced tasks · proposal",
+      "zh": "已同步任务 Tab · 待评审",
+      "status": "in-design",
+      "url": "/ux/system/data-sync-astra-prototype.html?scenario=volume&variant=chains&lang=zh&tab=synced",
+      "notes": {
+        "purpose": "评审高数据量下已同步记录始终可从顶部 Tab 到达；仅包括这台手机最近 30 天保留的服务端确认记录。",
+        "issues": [
+          "顶部 Tab 替代现有底部次级入口仍待产品确认。"
+        ]
+      }
+    },
+    {
+      "id": "data-sync.volume-task",
+      "name": "Many operations in one task · proposal",
+      "zh": "单任务多条操作 · 待评审",
+      "status": "in-design",
+      "url": "/ux/system/data-sync-astra-prototype.html?scenario=volume&variant=chains&lang=zh&task=preg31",
+      "notes": {
+        "purpose": "评审一项孕检任务的 18 条操作；有关联的操作按组折叠，无关联操作单独列出，筛选不拆散一组。",
+        "issues": [
+          "任务及操作数量为设计样例，真实 Android 列表读取模型与性能尚需验证。"
+        ]
+      }
+    },
+    {
+      "id": "data-sync.volume-serial-chain",
+      "name": "Ordered operations · proposal",
+      "zh": "串行操作链展开 · 待评审",
+      "status": "in-design",
+      "url": "/ux/system/data-sync-astra-prototype.html?scenario=volume&variant=chains&lang=zh&task=preg31&expand=preg31-0",
+      "notes": {
+        "purpose": "评审同一任务中已同步前置、失败步骤、等待中的后续步骤同屏展示；借用 Log 的竖线与节点视觉语法。",
+        "issues": [
+          "当前 Log 组件按日期倒序且只读，这里并未直接采用该组件；是否增加顺序链变体待评审。"
+        ]
+      }
+    },
+    {
+      "id": "data-sync.volume-parallel-chain",
+      "name": "Multiple predecessors · proposal",
+      "zh": "多项前置操作链展开 · 待评审",
+      "status": "in-design",
+      "url": "/ux/system/data-sync-astra-prototype.html?scenario=volume&variant=chains&lang=zh&task=preg31&expand=preg31-4",
+      "notes": {
+        "purpose": "评审两个检查操作可独立发送、提交操作须等两项前置都完成的展示；避免把同任务误画为单条直线。"
+      }
+    },
+    {
+      "id": "data-sync.volume-transfer-chain",
+      "name": "Shared group key · proposal",
+      "zh": "同分组键的转群操作链 · 待评审",
+      "status": "in-design",
+      "url": "/ux/system/data-sync-astra-prototype.html?scenario=volume&variant=chains&lang=zh&task=transfer08&expand=transfer08-0",
+      "notes": {
+        "purpose": "评审三条转群操作仅共享 groupKey、未逐条设置 dependsOn 时，仍按创建顺序显示失败前置与受阻后续。"
+      }
+    },
+    {
       "id": "data-sync.category",
       "name": "Saved records within a category",
       "zh": "类别内查看本机记录",
@@ -259,15 +365,15 @@
     {
       "id": "data-sync.upload",
       "name": "All uploaded on this phone",
-      "zh": "本机暂无待上传",
+      "zh": "本机暂无待同步",
       "status": "in-design",
       "notes": {
-        "purpose": "本机无待处理队列；仅显示近30天已上传总数，不列逐条历史。",
+        "purpose": "本机无未完成队列；底部仍显示最近30天已同步入口，可点入查看本机保留的逐条记录。",
         "states": [
           {
             "state": "Empty",
-            "when": "待上传及异常都为零",
-            "shows": "仅声明本机暂无待上传记录，并附上近30天已上传合计；不推断团队数据完整"
+            "when": "未完成同步记录为零",
+            "shows": "仅声明本机暂无待同步记录，并保留最近30天已同步入口；不推断团队数据完整"
           }
         ]
       },

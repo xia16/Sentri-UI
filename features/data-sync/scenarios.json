@@ -56,8 +56,8 @@
                 },
                 {
                   "text": {
-                    "en": "Waiting to upload",
-                    "zh": "待上传"
+                    "en": "Waiting to sync",
+                    "zh": "待同步"
                   }
                 }
               ]
@@ -100,8 +100,8 @@
               "visible": [
                 {
                   "text": {
-                    "en": "No records waiting on this phone",
-                    "zh": "本机暂无待上传记录"
+                    "en": "No records waiting to sync on this phone",
+                    "zh": "本机暂无待同步记录"
                   }
                 }
               ]
@@ -157,8 +157,8 @@
                   "visible": [
                     {
                       "text": {
-                        "en": "uploading automatically",
-                        "zh": "正在自动上传"
+                        "en": "Syncing",
+                        "zh": "同步中"
                       }
                     }
                   ]
@@ -203,20 +203,17 @@
               "visible": [
                 {
                   "text": {
-                    "en": "Needs you",
-                    "zh": "需要处理"
+                    "en": "Conflict or error",
+                    "zh": "冲突或错误"
                   }
                 },
                 {
-                  "text": {
-                    "en": "Uploaded in last 30 days · 2",
-                    "zh": "近30天已上传 · 2"
-                  }
+                  "el": ".sync-history-entry[data-count=\"2\"]"
                 },
                 {
                   "text": {
-                    "en": "Failed",
-                    "zh": "失败"
+                    "en": "Conflict or error",
+                    "zh": "冲突或错误"
                   }
                 }
               ]
@@ -457,14 +454,14 @@
               "visible": [
                 {
                   "text": {
-                    "en": "Blocked",
-                    "zh": "受阻"
+                    "en": "Waiting to sync",
+                    "zh": "待同步"
                   }
                 },
                 {
                   "text": {
-                    "en": "Failed",
-                    "zh": "失败"
+                    "en": "Conflict or error",
+                    "zh": "冲突或错误"
                   }
                 }
               ]
@@ -666,8 +663,8 @@
                     },
                     {
                       "text": {
-                        "en": "Blocked",
-                        "zh": "受阻"
+                        "en": "Waiting to sync",
+                        "zh": "待同步"
                       }
                     },
                     {
@@ -749,15 +746,12 @@
                   "visible": [
                     {
                       "text": {
-                        "en": "No records are waiting on this phone",
-                        "zh": "本机暂无待上传记录"
+                        "en": "No records waiting to sync on this phone",
+                        "zh": "本机暂无待同步记录"
                       }
                     },
                     {
-                      "text": {
-                        "en": "Uploaded in last 30 days · 1",
-                        "zh": "近30天已上传 · 1"
-                      }
+                      "el": ".sync-history-entry[data-count=\"1\"]"
                     },
                     {
                       "text": {
@@ -797,8 +791,8 @@
                   "expect": [
                     {
                       "text": {
-                        "en": "Sign in to the original account",
-                        "zh": "请重新登录原账号"
+                        "en": "Upload paused",
+                        "zh": "上传已暂停"
                       }
                     },
                     {
@@ -840,14 +834,14 @@
                   "visible": [
                     {
                       "text": {
-                        "en": "Uploading automatically",
-                        "zh": "正在自动上传"
+                        "en": "Syncing",
+                        "zh": "同步中"
                       }
                     },
                     {
                       "text": {
-                        "en": "Uploading",
-                        "zh": "上传中"
+                        "en": "Syncing",
+                        "zh": "同步中"
                       }
                     }
                   ]
@@ -881,14 +875,14 @@
                   "expect": [
                     {
                       "text": {
-                        "en": "Checking server result",
+                        "en": "Checking the server result",
                         "zh": "正在核对服务端结果"
                       }
                     },
                     {
                       "text": {
-                        "en": "Checking result",
-                        "zh": "核对结果中"
+                        "en": "Syncing",
+                        "zh": "同步中"
                       }
                     }
                   ]
@@ -918,26 +912,17 @@
                   "visible": [
                     {
                       "text": {
-                        "en": "No records waiting on this phone",
-                        "zh": "本机暂无待上传记录"
+                        "en": "No records waiting to sync on this phone",
+                        "zh": "本机暂无待同步记录"
                       }
                     },
                     {
-                      "text": {
-                        "en": "Uploaded in last 30 days · 3",
-                        "zh": "近30天已上传 · 3"
-                      }
+                      "el": ".sync-history-entry[data-count=\"3\"]"
                     },
                     {
                       "text": {
-                        "en": "The server confirmed this operation was already received",
-                        "zh": "服务端确认已收到这条操作"
-                      }
-                    },
-                    {
-                      "text": {
-                        "en": "Checking result",
-                        "zh": "核对结果中"
+                        "en": "Syncing",
+                        "zh": "同步中"
                       },
                       "absent": true
                     }
@@ -1010,15 +995,12 @@
                   ],
                   "visible": [
                     {
-                      "text": {
-                        "en": "Waiting to upload · 3",
-                        "zh": "待上传 · 3"
-                      }
+                      "el": ".sync-status-section--pending[data-count=\"3\"]"
                     },
                     {
                       "text": {
-                        "en": "These records upload automatically when connected",
-                        "zh": "网络恢复后会自动上传这些记录"
+                        "en": "Records are saved on this phone. Upload resumes automatically when connected.",
+                        "zh": "操作已保存在本机。联网后会自动同步。"
                       }
                     }
                   ]
@@ -1151,15 +1133,12 @@
                   ],
                   "visible": [
                     {
-                      "text": {
-                        "en": "Needs you · 1",
-                        "zh": "需要处理 · 1"
-                      }
+                      "el": ".sync-status-section--error[data-count=\"1\"]"
                     },
                     {
                       "text": {
-                        "en": "Failed",
-                        "zh": "失败"
+                        "en": "Conflict or error",
+                        "zh": "冲突或错误"
                       }
                     }
                   ]
@@ -1192,16 +1171,10 @@
                 {
                   "expect": [
                     {
-                      "text": {
-                        "en": "Needs you · 2",
-                        "zh": "需要处理 · 2"
-                      }
+                      "el": ".sync-status-section--error[data-count=\"2\"]"
                     },
                     {
-                      "text": {
-                        "en": "Waiting to upload · 24",
-                        "zh": "待上传 · 24"
-                      }
+                      "el": ".sync-status-section--pending[data-count=\"24\"]"
                     },
                     {
                       "text": {
@@ -1233,10 +1206,7 @@
                   ],
                   "visible": [
                     {
-                      "text": {
-                        "en": "Waiting to upload · 6",
-                        "zh": "待上传 · 6"
-                      }
+                      "el": ".sync-status-section--pending[data-count=\"6\"]"
                     },
                     {
                       "text": {
@@ -1274,35 +1244,77 @@
           },
           "children": [
             {
-              "type": "outcome",
-              "id": "ds-b8-recent-upload-total",
-              "tree": "B-8",
-              "label": "Only recent confirmed uploads count locally",
-              "gwt": {
-                "given": "The phone has two confirmed uploads within 30 days and one older uploaded fixture.",
-                "when": "The worker opens Saved work.",
-                "then": "Only the last-30-days total is shown; the older unreferenced uploaded fixture is pruned locally and individual uploaded history does not fill the work list."
-              },
-              "authority": [
+              "type": "action",
+              "id": "ds-b8-recent-upload-total.act",
+              "label": "Open the quiet synced-records entry",
+              "taps": [
                 {
-                  "src": "PRD",
-                  "at": "Decisions 2026-10-13",
-                  "says": "Show only a recent uploaded total and keep confirmed local upload history for 30 days."
-                }
-              ],
-              "visible": [
-                {
-                  "text": {
-                    "en": "Uploaded in last 30 days · 2",
-                    "zh": "近30天已上传 · 2"
-                  }
+                  "expect": [
+                    {
+                      "el": ".sync-history-entry[data-count=\"2\"]"
+                    },
+                    {
+                      "text": {
+                        "en": "Pregnancy check",
+                        "zh": "孕检"
+                      },
+                      "absent": true
+                    }
+                  ]
                 },
+                "[data-action=\"open-history\"]"
+              ],
+              "children": [
                 {
-                  "text": {
-                    "en": "Pregnancy check",
-                    "zh": "孕检"
+                  "type": "outcome",
+                  "id": "ds-b8-recent-upload-total",
+                  "tree": "B-8",
+                  "label": "Recent confirmed records stay in a secondary list",
+                  "gwt": {
+                    "given": "The phone has two confirmed uploads within 30 days and one older uploaded fixture.",
+                    "when": "The worker opens Synced records from the quiet entry.",
+                    "then": "Two recent confirmed records and their confirmation times appear; the record older than 30 days does not."
                   },
-                  "absent": true
+                  "authority": [
+                    {
+                      "src": "PRD",
+                      "at": "Decisions 2026-10-13 and 2026-10-16",
+                      "says": "Keep confirmed local history for 30 days and show it through a low-emphasis entry."
+                    }
+                  ],
+                  "visible": [
+                    {
+                      "text": {
+                        "en": "Synced",
+                        "zh": "已同步"
+                      }
+                    },
+                    {
+                      "text": {
+                        "en": "Pregnancy check",
+                        "zh": "孕检"
+                      }
+                    },
+                    {
+                      "text": {
+                        "en": "Pen note",
+                        "zh": "栏位备注"
+                      }
+                    },
+                    {
+                      "text": {
+                        "en": "Synced",
+                        "zh": "同步于"
+                      }
+                    },
+                    {
+                      "text": {
+                        "en": "Feed adjustment",
+                        "zh": "饲喂调整"
+                      },
+                      "absent": true
+                    }
+                  ]
                 }
               ]
             }
@@ -1360,10 +1372,7 @@
                       }
                     },
                     {
-                      "text": {
-                        "en": "Waiting to upload · 2",
-                        "zh": "待上传 · 2"
-                      }
+                      "el": ".sync-status-section--pending[data-count=\"2\"]"
                     },
                     {
                       "text": {
@@ -1439,10 +1448,7 @@
                       }
                     },
                     {
-                      "text": {
-                        "en": "Waiting to upload · 3",
-                        "zh": "待上传 · 3"
-                      }
+                      "el": ".sync-status-section--pending[data-count=\"3\"]"
                     },
                     {
                       "text": {
@@ -1576,7 +1582,7 @@
                       "text": "Saved work"
                     },
                     {
-                      "text": "Waiting to upload · 3"
+                      "el": ".sync-status-section--pending[data-count=\"3\"]"
                     }
                   ]
                 }
@@ -1668,10 +1674,7 @@
                 {
                   "expect": [
                     {
-                      "text": {
-                        "en": "Waiting to upload · 9",
-                        "zh": "待上传 · 9"
-                      }
+                      "el": ".sync-status-section--pending[data-count=\"9\"]"
                     },
                     {
                       "text": {
@@ -1708,10 +1711,7 @@
                   ],
                   "visible": [
                     {
-                      "text": {
-                        "en": "Waiting to upload · 8",
-                        "zh": "待上传 · 8"
-                      }
+                      "el": ".sync-status-section--pending[data-count=\"8\"]"
                     },
                     {
                       "text": {
@@ -1720,10 +1720,7 @@
                       }
                     },
                     {
-                      "text": {
-                        "en": "Uploaded in last 30 days · 1",
-                        "zh": "近30天已上传 · 1"
-                      }
+                      "el": ".sync-history-entry[data-count=\"1\"]"
                     },
                     {
                       "text": {
