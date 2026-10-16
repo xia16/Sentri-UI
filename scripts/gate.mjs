@@ -774,6 +774,9 @@ for (const f of skip.skip ? [] : new Set([...scope, ...[...screens.diff, ...scre
   // A failed run is re-asked on base, for the failing leaves only: a leaf already failing on main is main's debt, not this change's.
   // Exit 1 is "a leaf failed"; any other non-zero exit (a bad tree, a crash) fails as it is.
   let report = null; try { report = JSON.parse(fs.readFileSync(path.join(wt.cand, 'review', `scenarios-${f}.json`), 'utf8')); } catch {}
+  // A leaf that failed beside other runs and passed alone (run-scenarios loadOnly) is a pass, named as a gap.
+  const loadOnly = report ? report.leaves.filter((x) => x.loadOnly && x.result !== 'fail').map((x) => x.id) : [];
+  if (loadOnly.length) gaps.push(`scenarios ${f}: failed only under load: ${loadOnly.slice(0, 6).join(', ')}${loadOnly.length > 6 ? ' …' : ''}`);
   const failed = r.code === 1 && report ? report.leaves.filter((x) => x.result === 'fail').map((x) => x.id) : [];
   if (failed.length && fs.existsSync(path.join(wt.base, 'scripts/run-scenarios.mjs')) && fs.existsSync(path.join(wt.base, 'features', f, 'scenarios.json'))) {
     const b = run(process.execPath, ['scripts/run-scenarios.mjs', f, '--base', url.base, '--only', failed.join(',')], wt.base);
