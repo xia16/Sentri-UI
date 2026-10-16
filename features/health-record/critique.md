@@ -264,3 +264,9 @@ The Brand optional row comes back as the medicines feature's field (only once a 
 - **major** · The half-width "+ Brand / + Condition / + Note" cards and the filled Brand card with its pencil were two optional faces on one form; the owner asked for full-width rows (OptionalRow face `row`, as Record dead's Photos and Details). Fixed on the single and batch forms; the condition picker itself is unchanged (the owner reworks conditions separately).
 - **major** · The batch form drew a dose box per pig under "Same dose for all", which grows the form with the pigs; now one Dose for all and a "Custom doses" row opening a page of pigs (each pig's dose on the right; a tap edits it; ear-tag search and Scan).
 - Renders and the final look: `features/medicines/critique.md`, Round 3.
+
+### Round 4 (owner, 2026-10-16)
+
+- **major** · The optional rows did not look like the other inputs on the same form; the owner wants Brand and Condition as PickerFields and Note as a textarea, each with a grey "Optional" beside the label. The Field README's law makes an optional input an optional row ("A Field is never shown open for an optional input"); this departs from it at the owner's request (said in the hand-back).
+- **major** · Round 3's Custom doses page hid every pig's dose one tap away; doses are back on the form, inline like the other bulk editors: each pig's box shows the shared dose as a grey placeholder until its own is typed.
+- **minor** · Pre-existing: typing in a bulk page's field redrew its footer with a Back, though a page's Back is top left (`refreshBulkCommit`). Fixed: a page's footer keeps no Back.

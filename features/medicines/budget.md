@@ -4,16 +4,16 @@ Every fact the picker, the Brand list, the add levels, the treatment's medicine 
 
 ## The second-line rule
 
-A row's second line (meta) shows only what tells it apart from its siblings (ChoiceList). So: category, medicine, recent and brand rows have none; a search result names its category (search mixes categories, and two results may be told apart only by it). There is no strength field: when strength matters it is in the brand's name ("Amoxinsol 50%"), so it needs no line of its own. A summary row that opens a list ("Custom doses") carries its count as meta, because that is what it says. Nothing else earns a second line here.
+A row's second line (meta) shows only what tells it apart from its siblings (ChoiceList). So: category, medicine, recent and brand rows have none; a search result names its category (search mixes categories, and two results may be told apart only by it). There is no strength field: when strength matters it is in the brand's name ("Amoxinsol 50%"), so it needs no line of its own. Nothing else earns a second line here.
 
 ## Inventory
 
-Per medicine: name in EN and ZH, other names (PRRS: blue ear), category, starting list or farm-added, its brands, its default meat withdrawal (prefilled for the starting list, sample values), the method and unit it was last given with, when last given and by whom.
-Per brand: name (with its strength when that matters), its medicine, meat withdrawal override, when last used.
+Per medicine: name in EN and ZH, other names (PRRS: blue ear), category, starting list or farm-added, its brands, its default withdrawal period (prefilled for the starting list, sample values), the method and unit it was last given with, when last given and by whom.
+Per brand: name (with its strength when that matters), its medicine, withdrawal period override, when last used.
 Per category: name, short name, its medicines, counts.
 Farm: the three most recent distinct medicines given (any worker), the task (treatment or vaccination).
 Picker and Brand list state: the level, the search text, matches, no match.
-Treatment: medicine, method, brand, dose, unit, each pig's own dose, condition, note, the withdrawal in force and its date.
+Treatment: medicine, method, brand, dose, unit, each pig's own dose (typed) or the shared one, condition, note, the withdrawal in force and its date.
 
 ## Questions
 
@@ -21,7 +21,7 @@ At the picker (the worker holds a bottle, the pig is waiting): 1. Where am I? (t
 
 At the Brand list: 1. Which brand is the bottle? (its name, strength included when it matters) 2. Not listed: can I add it? (the Add card) 3. Does its label print a different withdrawal from the medicine's? (the optional details step).
 
-On the treatment: 1. What was given, how, how much? (Medicine, Method, Brand, Dose) 2. Does any pig get a different dose? (Custom doses: how many pigs, how many own doses) 3. **When may these pigs go to slaughter?** (Withdrawal until <date>) 4. Can I save?
+On the treatment: 1. What was given, how, how much? (Medicine, Method, Brand, Dose) 2. Does any pig get a different dose? (its box: grey shared, ink own) 3. Where is this pig in the list? (search, Scan) 4. **When may these pigs go to slaughter?** (Withdrawal until <date>) 5. Can I save?
 
 At the Medicines page (a supervisor tidying the list): 1. Which medicines does the farm have, by category? 2. Which brands has the farm used for this one, and what withdrawal applies? 3. What happens to past records if I change it? (said on Delete; the record keeps its copy).
 
@@ -85,7 +85,7 @@ At the Medicines page (a supervisor tidying the list): 1. Which medicines does t
 | Field | Question | Decision |
 |---|---|---|
 | Title "Add details" | Where am I? | kept |
-| Withdrawal (meat, days), with "Uses Amoxicillin's 14 days when empty" under it | Does this label print a different withdrawal from the medicine's? | optional; the hint says it overrides the default |
+| Withdrawal period (days), with "Uses Amoxicillin's 14 days when empty" under it | Does this label print a different withdrawal from the medicine's? | optional; the hint says it overrides the default |
 | Strength | — | **cut** (owner, round 3): in the name when it matters |
 | Commit "Add" | — | waits until a withdrawal is typed; Back goes up to the list, the ✕ closes: both skip, the brand stays on the medicine's default |
 
@@ -94,15 +94,15 @@ At the Medicines page (a supervisor tidying the list): 1. Which medicines does t
 | Fact | Question | Level | Decision |
 |---|---|---|---|
 | Medicine: its name | What was given? | Settled | kept |
-| Method, unit: pre-filled from the medicine's last use | How, in what unit? | Settled | pre-filled, editable |
-| Brand (optional row, full width, only once a medicine is chosen): "Brand · Optional", then its name under it | Which bottle? | Settled | OptionalRow face `row` |
-| Dose (with its unit) | How much? | Settled | one field, one pig or all pigs |
-| Custom doses (several pigs): "3 pigs · 1 own dose" | Does any pig get a different dose? | Settled (row meta) | kept; opens the page; the count of own doses only above zero |
-| Custom doses page: each pig's tag, pen · stage, its dose on the right (muted when shared; ink with "Own dose") | Which pigs got what? | Settled | the checkbox stays (excludes a pig, the bulk convention); search and Scan for an ear tag |
-| Condition, Note (optional rows) | Linked to which finding? Anything to add? | Settled | Note shows its first line |
-| **Withdrawal until <date>**: Banner notice before Save, one line "N days for meat: these pigs go to slaughter no earlier than this date." | When may these pigs go to slaughter? | **Watch** (the only coloured block; the consequence of saving) | from the brand's override, else the medicine's default; absent when 0 or none |
-| The source of the days (brand or default) | — | — | **cut**: the worker acts on the date; the Medicines page shows both |
-| Order | What was given, then how much? | — | Medicine, Method, Brand, Dose, (Custom doses), Condition, Note, the notice |
+| Method: pre-filled from the medicine's last use | How? | Settled | pre-filled, editable |
+| Brand (PickerField, "Optional" beside the label, only once a medicine is chosen) | Which bottle? | Settled | "Select" until set; the brand's name once set |
+| Dose (one pig) / Same dose for all (several): a number and its unit on one line; the unit remembered per medicine | How much, in what unit? | Settled | one field |
+| Ear-tag search and Scan (several pigs) | Where is this pig in the list? | Settled | search narrows; Scan jumps to the pig's box |
+| Pig row: ear tag, pen · stage; its dose box (placeholder: the shared dose, ink-2 regular, 7.4:1; typed: its own, ink bold) | Did this pig get the same as the rest? | Settled | the checkbox stays (excludes a pig, the bulk convention); no "Own dose" word: ink against grey says it |
+| Condition (PickerField, Optional) | Which finding is this for? | Settled | picker unchanged (condition rework later) |
+| Note (textarea, Optional) | Anything to add? | Settled | on the form; no sheet |
+| **Withdrawal until <date>**: Banner notice before Save, one line "N days: these pigs go to slaughter no earlier than this date." | When may these pigs go to slaughter? | **Watch** (the only coloured block) | brand override, else the medicine's default; absent when 0 or none |
+| Order | What was given, then how much? | — | Medicine, Method, Brand, Dose (several pigs: then the search and the pigs), Condition, Note, the notice |
 
 ### Medicines page, a medicine's sheet, a brand's sheet (edit forms)
 
@@ -112,13 +112,13 @@ At the Medicines page (a supervisor tidying the list): 1. Which medicines does t
 | Title: short category name; medicine rows (name) | page | Which medicine? | no second line |
 | Medicine sheet title: its name | sheet header | Is this the one? | read-only for a starting-list medicine |
 | Name (field) | medicine sheet | What do we call what we added? | farm-added medicines only |
-| Default withdrawal (meat, days) (field, prefilled) | medicine sheet | What withdrawal applies when no brand says otherwise? | editable; the usual case |
+| Withdrawal period (days) (field, prefilled) | medicine sheet | What withdrawal applies when no brand says otherwise? | editable; the usual case |
 | Group "Brands": brand rows | medicine sheet | Which brands have we used? | no second line; "No brands used yet." when none |
-| Brand sheet: Name, Withdrawal (meat, days) with "Uses <medicine>'s N days when empty" | brand sheet | Is the name right? Does its label differ from the default? | fields on the sheet; no Rename step |
+| Brand sheet: Name, Withdrawal period (days) with "Uses <medicine>'s N days when empty" | brand sheet | Is the name right? Does its label differ from the default? | fields on the sheet; no Rename step |
 | Delete brand / Delete medicine (text action, bottom) → "<name> leaves the list for everyone. Past records keep its name." | sheet bottom, confirm level | Can I remove it, and what happens to past records? | farm-added medicines and brands only; Delete in red on the confirm |
 | Footer Back + Save | sheet | Is it kept? | Save waits until something changes |
 | Who added it, when, how often used | — | — | **cut** (Audit) |
 
 ## Cut list
 
-Brand not known; product form; strength as a field or a line (round 3); per-pig dose boxes and "Same dose for all" on the form (round 3); the second line on category, medicine, recent and brand rows; counts per category; when/by whom on recents; withdrawal on brand rows; Rename as a separate step; the source of the withdrawal days on the form; who added an entry and when; any count in a header.
+Brand not known; product form; strength as a field or a line (round 3); the Custom doses page and the dose sheet (round 4: the doses are inline again); "meat" in the withdrawal label (round 4); the second line on category, medicine, recent and brand rows; counts per category; when/by whom on recents; withdrawal on brand rows; Rename as a separate step; the source of the withdrawal days on the form; who added an entry and when; any count in a header.

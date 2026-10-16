@@ -26,7 +26,7 @@
 .inspection-phone .bulk-controls .medicine-withdrawal{margin-top:8px}
 
 /* Record treatment's optional rows (OptionalRow face 'row'), one under another; the pig doses as one list under its label. */
-.inspection-phone .treatment-optionals{display:flex;flex-direction:column;gap:8px}
+.inspection-phone .treatment-optionals{display:flex;flex-direction:column;gap:16px}
 .inspection-phone .treatment-optionals>.st-optional-row{margin:0}
 .inspection-phone .bulk-action-layout.is-given-first>.treatment-pig-doses{margin:24px var(--space-gutter,18px) 16px}
 @media(max-width:370px){.inspection-phone .bulk-action-layout.is-given-first>.treatment-pig-doses{margin-left:var(--space-gutter-narrow,12px);margin-right:var(--space-gutter-narrow,12px)}}
@@ -38,3 +38,11 @@
 .inspection-phone .custom-doses-search{display:flex;align-items:center;gap:8px;margin-bottom:16px}
 .inspection-phone .custom-doses-search>.st-choice-search{flex:1 1 auto;margin:0}
 .inspection-phone .bulk-action-layout.is-given-first>.bulk-after{padding-top:16px}
+
+/* Round 4: the batch's pig list sits on the form, its ear-tag search above it. */
+.inspection-phone .treatment-pig-doses>.custom-doses-search{margin-bottom:8px}
+.inspection-phone .treatment-optionals .field{margin:0}
+/* The grey "Optional" beside an optional field's label (owner, round 4). */
+.inspection-phone .medicine-optional{margin-left:6px;font:400 13px/1.4 var(--font-sans);color:var(--muted)}
+/* A pig's box shows the shared dose as its placeholder in ink-2, regular (7.4:1: a 16px figure the worker acts on holds 7:1); a typed (own) dose is ink, bold. */
+.inspection-phone [data-bulk-kind="treatment"] .bulk-reading input::placeholder{color:var(--ink-2);font-weight:400;opacity:1}

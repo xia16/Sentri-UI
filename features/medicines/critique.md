@@ -154,3 +154,30 @@ The owner reviewed the first round's screens (head `1d7eeab`) and revised the de
 #### Final look (the screens of this push; 390 and 360, EN and ZH)
 - Header check 0, spacing 0 on the 26 changed screens; strict legibility passes on them; check-states 6 failing, the same 6 as `c6cc500`; npm test passes.
 - Known: a trigger the atlas returns focus to shows the browser's focus ring (a finger draws none); Record treatment's own labels (Method) stay English in ZH, as on main.
+
+# Round 4 (owner, 2026-10-16): fields, inline doses, "Withdrawal period (days)"
+
+### Problems (from round 3's screens)
+
+- **major** · "Meat withdrawal" reads oddly: for pigs it is always meat (owner). Every label is now "Withdrawal period (days)" / 休药期（天）; the notice stays "Withdrawal until <date>".
+- **major** · The optional rows did not look like Medicine and Method (owner). Brand and Condition are PickerFields, Note a textarea, each with a grey "Optional" beside the label. **Law:** the Field README makes an optional input an optional row ("A Field is never shown open for an optional input"); this is drawn against it at the owner's request. The grey word is a page-drawn small beside the label (the OptionalRow word is hidden outside its row), until Field takes an `optional` label.
+- **major** · The Custom doses page hid each pig's dose one tap away (owner). Doses are inline again, as a bulk editor: Same dose for all, then each pig's box with the shared dose as its grey placeholder; a typed value is ink and is the pig's own; clearing it returns it to the shared dose.
+- **minor** · A typed field redrew a page's footer with Back (pre-existing `refreshBulkCommit`); fixed.
+
+### Known problem (not changed here)
+
+- ChoiceList's navigate and single rows look alike apart from the trailing chevron (picker categories against medicine rows; the brand list against the Medicines page's brand rows). The owner is taking it as a separate component decision; untouched.
+
+### Self-crit
+
+#### Round 4 (renders at 390 and 360, EN and ZH)
+- Pig rows are the bulk editors' existing row (`pig-review-row`: checkbox, ear tag, pen · stage, a dose box), as weights and temperatures use, not Row: Row has no input slot. The checkbox stays (the bulk way to take a pig out).
+- Search narrows the list; Scan jumps to the pig's box (scrolls it into view and focuses it). The jump is new: the prototype had no find-and-focus pattern for a row's input. Scan reads a sample tag (no camera).
+- Placeholder grey and regular, own dose ink and bold: one glance says which pigs differ, without an "Own dose" word.
+- Squint (batch): the title, Medicine, Same dose for all, then the pigs; the withdrawal notice closes the form.
+- **Better because** every input on the form now reads the same way, and a batch shows each pig's dose where it is entered, with no second surface.
+
+#### Final look (the screens of this push; 390 and 360, EN and ZH)
+- Header check 0 and spacing 0 on the changed screens; strict legibility passes on them; check-states the same 6 as `c6cc500`; npm test passes.
+- Known: a trigger the atlas returns focus to shows the browser's focus ring (a finger draws none); Record treatment's own labels (Method) stay English in ZH, as on main.
+- Legibility: the first render drew the placeholder in `muted` (5.2:1), under the 7:1 a 16px figure the worker acts on must hold; it is now `ink-2`, regular (7.4:1), against the own dose in ink, bold. Strict legibility passes on all 24 changed screens.

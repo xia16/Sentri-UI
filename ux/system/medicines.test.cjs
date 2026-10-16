@@ -87,9 +87,10 @@ test('Brand: a full-width optional row only once a medicine is chosen; the farm\
   M.handleRecordAction(c, 'medicine-open', ''); M.handleRecordAction(c, 'medicine-select', 'amoxicillin');
   const form = M.overlay(c), at = s => form.indexOf(s);
   assert.ok(at('data-picker-key="method"') < at('data-action="brand-open"') && at('data-action="brand-open"') < at('data-bulk-key="dose"'), 'Medicine, Method, Brand, then the dose');
-  assert.match(form, /data-ds="OptionalRow"[^>]*data-face="row" data-action="brand-open"/);
-  assert.match(form, /data-face="row" data-action="record-optional-open" data-value="target"/);
-  assert.match(form, /data-face="row" data-action="record-optional-open" data-value="note"/);
+  assert.match(form, /data-ds="PickerField"[^>]*>[^]*?Brand <small class="medicine-optional">Optional<\/small>[^]*?data-action="brand-open"/, 'a PickerField labelled Brand · Optional');
+  assert.match(form, /data-action="record-optional-open" data-picker-key="target"/, 'Condition: a PickerField');
+  assert.match(form, /<textarea data-bulk-key="note"/, 'Note: a textarea on the form');
+  assert.doesNotMatch(form, /data-face="row"/);
   M.handleRecordAction(c, 'brand-open', '');
   assert.deepEqual(rows(M.brandPickerBody(c)), ['# Recently used', 'Amoxinsol 50%', 'Betamox LA', 'Clamoxyl', '# Other brands', 'Amoxinsol 15%', 'Vetrimoxin'], 'two strengths are two brands; no second line');
   c.form.brandPick.search = 'Moxylan'; assert.deepEqual(rows(M.brandPickerBody(c)), ['Add “Moxylan”']);
@@ -105,13 +106,11 @@ test('Brand: a full-width optional row only once a medicine is chosen; the farm\
   assert.equal(c.form.brand, '', 'a new medicine drops the old brand');
 });
 
-test('Note: a small sheet with Save; the row then shows the note\'s first line', () => {
+test('Note: a textarea on the form, no sheet', () => {
   const c = open(['000267']); M.handleRecordAction(c, 'medicine-select', 'amoxicillin');
-  M.handleRecordAction(c, 'record-optional-open', 'note');
-  assert.match(M.overlay(c), /data-action="record-optional-save"[^>]*>[^]*Save/);
-  c.form.optionalDraft = 'Gave in the morning water.\nRecheck tomorrow.'; M.handleRecordAction(c, 'record-optional-save', '');
-  assert.equal(c.view, 'treatment');
-  assert.match(M.overlay(c), /st-optional-answer" role="status">Gave in the morning water\.</);
+  const html = M.overlay(c);
+  assert.match(html, /Note <small class="medicine-optional">Optional<\/small>[^]*<textarea data-bulk-key="note"/);
+  assert.doesNotMatch(html, /data-action="record-optional-open" data-value="note"/);
 });
 
 test('the medicine remembers its last method and unit; saving makes it the newest recent and its brand the first', () => {
@@ -126,37 +125,29 @@ test('the medicine remembers its last method and unit; saving makes it the newes
 });
 
 
-test('batch: one Dose for all, then a Custom doses row; no per-pig rows on the form', () => {
+test('batch: Same dose for all, then the pig list on the form, each pig\'s box showing the shared dose as its placeholder', () => {
   const c = M.seed(); M.openBulkAction(c, 'treatment', ['000254', '000267']); M.handleRecordAction(c, 'medicine-open', ''); M.handleRecordAction(c, 'medicine-select', 'tulathromycin');
+  c.form.dose = '2.5'; c.form.values['000254'] = '3';
   const html = M.overlay(c), at = s => html.indexOf(s);
   assert.ok(at('data-action="medicine-open"') < at('data-picker-key="method"') && at('data-picker-key="method"') < at('data-action="brand-open"'));
-  assert.ok(at('data-action="brand-open"') < at('data-bulk-key="dose"') && at('data-bulk-key="dose"') < at('data-action="pig-doses-open"'));
-  assert.ok(at('data-action="pig-doses-open"') < at('data-value="target"'));
-  assert.doesNotMatch(html, /data-bulk-value=|Same dose for all|data-bulk-include/);
-  assert.match(html, /Custom doses[^]*2 pigs/);
+  assert.ok(at('data-action="brand-open"') < at('Same dose for all') && at('Same dose for all') < at('data-dose-search') && at('data-dose-search') < at('data-bulk-value="000254"'));
+  assert.ok(at('data-bulk-value="000267"') < at('data-picker-key="target"'));
+  assert.match(html, /data-bulk-value="000254" value="3"[^>]*placeholder="2.5"/, 'own dose typed, in ink');
+  assert.match(html, /data-bulk-value="000267" value=""[^>]*placeholder="2.5"/, 'the shared dose as a grey placeholder');
+  assert.match(html, /data-bulk-include="000254"/, 'the checkbox stays: the bulk way to take a pig out');
 });
 
-test('custom doses: a page of pigs with their dose; a pig\'s own dose in ink with Own dose; search and scan; Save waits for every pig', () => {
+test('batch doses: Save waits for the shared dose or every pig\'s own; clearing a box returns the pig to the shared dose; search narrows the list', () => {
   const c = M.seed(); M.openBulkAction(c, 'treatment', ['000254', '000267']); M.handleRecordAction(c, 'medicine-open', ''); M.handleRecordAction(c, 'medicine-select', 'tulathromycin');
-  assert.ok(!M.bulkActionValid(c), 'no dose yet');
-  M.handleRecordAction(c, 'pig-doses-open', '');
-  let page = M.inspectionSurface(c);
-  assert.match(page, /data-presentation="page"/); assert.match(page, /data-dose-search/); assert.match(page, /data-action="pig-doses-scan"/);
-  M.handleRecordAction(c, 'pig-dose-open', '000254'); c.form.doseDraft = '3'; M.handleRecordAction(c, 'pig-dose-save', '');
-  assert.equal(c.view, 'pig-doses');
-  page = M.inspectionSurface(c);
-  assert.match(page, /data-level="soon"><span class="st-animal-figure">3 mL<\/span><span class="st-animal-word">Own dose/);
-  const valid = () => { const v = c.view; c.view = 'treatment'; const ok = M.bulkActionValid(c); c.view = v; return ok; };
-  assert.ok(!valid(), '000267 has no dose and there is no shared dose');
-  c.form.values['000267'] = '4'; assert.ok(valid(), 'every pig its own dose');
-  delete c.form.values['000267']; c.form.dose = '2.5'; assert.ok(valid(), 'or a shared dose');
-  assert.match(M.inspectionSurface(c), /data-level="settled"><span class="st-animal-figure">2.5 mL/);
-  c.form.doseSearch = '267'; assert.doesNotMatch(M.inspectionSurface(c), /000254/);
-  M.handleRecordAction(c, 'pig-doses-scan', ''); assert.equal(c.view, 'pig-dose'); assert.equal(c.form.doseFor, '000267');
-  M.handleRecordAction(c, 'back', ''); c.view = 'pig-doses';
-  M.handleRecordAction(c, 'pig-dose-open', '000254'); M.handleRecordAction(c, 'pig-dose-same', '');
-  assert.ok(!Object.hasOwn(c.form.values, '000254'), 'Use the same dose undoes it');
-  c.view = 'treatment'; assert.match(M.overlay(c), /Custom doses[^]*2 pigs</);
+  assert.ok(!M.bulkActionValid(c));
+  c.form.values['000254'] = '3'; assert.ok(!M.bulkActionValid(c), '000267 has no dose and there is no shared dose');
+  c.form.values['000267'] = '4'; assert.ok(M.bulkActionValid(c), 'every pig its own dose');
+  delete c.form.values['000267']; c.form.dose = '2.5'; assert.ok(M.bulkActionValid(c), 'or a shared dose');
+  assert.equal(M.bulkChanges(c).find(r => r.id === '000267').value, '2.5');
+  c.form.doseSearch = '267';
+  const html = M.overlay(c);
+  assert.doesNotMatch(html, /data-bulk-value="000254"/); assert.match(html, /data-bulk-value="000267"/);
+  assert.match(html, /data-action="dose-scan"/);
 });
 
 test('a vaccination lists the vaccines by disease, without a one-row category level', () => {

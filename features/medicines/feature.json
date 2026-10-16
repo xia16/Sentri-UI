@@ -433,11 +433,11 @@
       "steps": ["[data-action=\"medicines-category\"][data-value=\"antibiotics\"]", "[data-action=\"medicines-medicine\"][data-value=\"amoxicillin\"]"],
       "figma": "",
       "notes": {
-        "purpose": "An edit form: the name is the title and read-only, the default withdrawal (meat, days) is the one editable field, prefilled from the starting list, then the brands the farm has used. No Delete. Footer Back + Save (waits until something changes).",
+        "purpose": "An edit form: the name is the title and read-only, the withdrawal period (days) is the one editable field, prefilled from the starting list, then the brands the farm has used. No Delete. Footer Back + Save (waits until something changes).",
         "elements": [
           {
             "name": "Default withdrawal",
-            "at": "Default withdrawal (meat, days)",
+            "at": "Withdrawal period (days)",
             "shows": "14",
             "logic": "Used on a treatment when no brand is chosen, or the chosen brand has none (the usual case). Save changes it for everyone from the next treatment; records already saved keep their copy."
           },
@@ -486,11 +486,11 @@
       "steps": ["[data-action=\"medicines-category\"][data-value=\"antibiotics\"]", "[data-action=\"medicines-medicine\"][data-value=\"amoxicillin\"]", "[data-action=\"medicines-brand\"][data-value=\"amoxicillin/0\"]"],
       "figma": "",
       "notes": {
-        "purpose": "An edit form: Name and Withdrawal (meat, days) as fields, then Delete brand (a text action opening a confirm level). Footer Back + Save.",
+        "purpose": "An edit form: Name and Withdrawal period (days) as fields, then Delete brand (a text action opening a confirm level). Footer Back + Save.",
         "elements": [
           {
             "name": "Withdrawal",
-            "at": "Withdrawal (meat, days)",
+            "at": "Withdrawal period (days)",
             "shows": "2, with \"Uses Amoxicillin's 14 days when empty\" under it",
             "logic": "The medicine's default is the usual case; a brand overrides it only when its label differs. Empty means the default applies."
           },

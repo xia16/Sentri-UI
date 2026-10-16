@@ -27,7 +27,7 @@
         "screens": ["health-record.resolve-finding", "health-record.resolve-conditions"]
       }
     ],
-    "any": ["health-record.finding", "health-record.edit-finding", "health-record.record-health", "health-record.condition-picker", "health-record.care-instructions", "health-record.treatment", "health-record.treatment-batch", "health-record.medicine-picker", "health-record.brand", "health-record.brand-add", "health-record.brand-details", "health-record.treatment-brand", "health-record.treatment-batch-brand", "health-record.custom-doses", "health-record.custom-doses-search", "health-record.pig-dose", "health-record.treatment-note"]
+    "any": ["health-record.finding", "health-record.edit-finding", "health-record.record-health", "health-record.condition-picker", "health-record.care-instructions", "health-record.treatment", "health-record.treatment-batch", "health-record.medicine-picker", "health-record.brand", "health-record.brand-add", "health-record.brand-details", "health-record.treatment-brand", "health-record.treatment-batch-brand", "health-record.treatment-batch-many", "health-record.treatment-batch-search"]
   },
   "entryPoints": [
     {
@@ -146,18 +146,8 @@
       "Save: the finding appears as a row or tag"
     ],
     [
-      "health-record.treatment-batch",
-      "health-record.custom-doses",
-      "tap Custom doses"
-    ],
-    [
-      "health-record.custom-doses",
-      "health-record.pig-dose",
-      "tap a pig"
-    ],
-    [
-      "health-record.custom-doses",
-      "health-record.custom-doses-search",
+      "health-record.treatment-batch-many",
+      "health-record.treatment-batch-search",
       "type an ear tag"
     ]
   ],
@@ -738,7 +728,7 @@
               {
                 "state": "Many pigs",
                 "when": "Bulk selection",
-                "shows": "health-record.treatment-batch: Medicine, Method, Brand and one Dose (with its unit) for all pigs; the pig list (Row) trails each pig's dose; tap a pig for its own dose (health-record.pig-dose)"
+                "shows": "health-record.treatment-batch: Medicine, Method, Brand and Same dose for all (with its unit), then the pig list on the form, each pig's own dose box showing the shared dose as its placeholder"
               },
               {
                 "state": "From a finding",
@@ -784,7 +774,7 @@
           {
             "name": "Brand",
             "at": "Brand",
-            "shows": "An optional row, after Method",
+            "shows": "An optional PickerField (grey Optional beside the label), after Method",
             "states": [
               {
                 "state": "No medicine",
@@ -794,7 +784,7 @@
               {
                 "state": "Empty",
                 "when": "Medicine chosen, no brand",
-                "shows": "Brand · Optional (a full-width row); no brand is recorded"
+                "shows": "Brand Optional, Select; no brand is recorded"
               },
               {
                 "state": "Set",
@@ -833,7 +823,7 @@
           {
             "name": "Order",
             "at": "Medicine",
-            "shows": "Medicine, Method, Brand (optional), Dose for all; then Dose per pig; then Condition and Note (optional rows); then the withdrawal notice",
+            "shows": "Medicine, Method, Brand (optional), Same dose for all; the ear-tag search and the pig list with a dose box per pig; then Condition and Note (optional fields); then the withdrawal notice",
             "rule": "What was given comes first (owner, 2026-10-16): one Dose applies to all; a pig's row trails its dose, muted when it follows the shared dose, ink with Own dose when set. The checkbox stays: it takes a pig out, as on every bulk page. Save waits until the shared dose is set or every included pig has its own."
           },
           {
@@ -864,21 +854,19 @@
         "[data-action=\"brand-select\"][data-value=\"amoxicillin/0\"]",
         "[data-action=\"record-optional-open\"][data-value=\"target\"]",
         "[data-action=\"record-condition-select\"]",
-        "[data-action=\"record-optional-open\"][data-value=\"note\"]",
         {
-          "fill": "[data-record-optional-input]",
-          "text": "Gave in the morning water.\nRecheck tomorrow."
-        },
-        "[data-action=\"record-optional-save\"]"
+          "fill": "[data-bulk-key=\"note\"]",
+          "text": "Gave in the morning water."
+        }
       ],
       "figma": "",
       "notes": {
-        "purpose": "Amoxicillin with Amoxinsol 50% (its own 2 days), a condition and a note: each optional row is a full-width row (OptionalRow face row) showing its value under the label; the Note row shows the note's first line. The brand's withdrawal overrides the medicine's default (14 days) because its label differs.",
+        "purpose": "Amoxicillin with Amoxinsol 50% (its own 2 days), a condition and a note. Brand and Condition are PickerFields and Note a textarea, each labelled with a grey Optional, styled like Medicine and Method. The brand's withdrawal overrides the medicine's default (14 days) because its label differs.",
         "elements": [
           {
             "name": "Withdrawal",
             "at": "Withdrawal until",
-            "shows": "Banner (notice) before Save: Withdrawal until <date>, and the days for meat",
+            "shows": "Banner (notice) before Save: Withdrawal until <date>, and the days",
             "states": [
               {
                 "state": "Brand with its own",
@@ -977,8 +965,8 @@
     },
     {
       "id": "health-record.treatment-batch-brand",
-      "name": "Record treatment · several pigs, with a brand",
-      "zh": "记录治疗 · 多头猪（含品牌）",
+      "name": "Record treatment · several pigs, one with its own dose",
+      "zh": "记录治疗 · 多头猪（一头单独剂量）",
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
       "preset": "selected",
@@ -992,23 +980,47 @@
           "fill": "[data-bulk-key=\"dose\"]",
           "text": "2.5"
         },
-        "[data-action=\"pig-doses-open\"]",
-        "[data-action=\"pig-dose-open\"][data-value=\"000254\"]",
         {
-          "fill": "[data-pig-dose]",
+          "fill": "[data-bulk-value=\"000254\"]",
           "text": "3"
-        },
-        "[data-action=\"pig-dose-save\"]",
-        "[data-presentation=\"page\"] .st-page-back"
+        }
       ],
       "figma": "",
       "notes": {
-        "purpose": "Tulathromycin with Draxxin, Dose 2.5 mL for all, and 000254 on its own 3 mL: the Custom doses row reads \"2 pigs · 1 own dose\"; no per-pig rows on the form; the withdrawal notice (Tulathromycin's default, 33 days) closes the form.",
+        "purpose": "Tulathromycin with Draxxin, Same dose for all 2.5 mL, and 000254 typed to its own 3 mL (ink); 000267's box shows 2.5 as its grey placeholder. The withdrawal notice (Tulathromycin's default, 33 days) closes the form.",
         "elements": [
+          {
+            "name": "Pig dose box",
+            "at": "[data-bulk-value=\"000254\"]",
+            "shows": "The pig's own dose, or the shared dose as a grey placeholder",
+            "states": [
+              {
+                "state": "Shared",
+                "when": "Nothing typed",
+                "shows": "Placeholder: the shared dose (— when none)"
+              },
+              {
+                "state": "Own dose",
+                "when": "A value typed",
+                "shows": "The value in ink; it stays when the shared dose changes"
+              },
+              {
+                "state": "Cleared",
+                "when": "The box emptied",
+                "shows": "Back to the shared dose"
+              },
+              {
+                "state": "Excluded",
+                "when": "Checkbox unticked",
+                "shows": "Excluded, the box unavailable"
+              }
+            ],
+            "logic": "Save waits until the shared dose is set or every included pig has a typed dose. The checkbox stays: it is how every bulk page takes a pig out."
+          },
           {
             "name": "Withdrawal",
             "at": "Withdrawal until",
-            "shows": "Banner (notice) before Save: Withdrawal until <date>, and the days for meat",
+            "shows": "Banner (notice) before Save: Withdrawal until <date>, and the days",
             "states": [
               {
                 "state": "Brand with its own",
@@ -1033,6 +1045,71 @@
         "controls": [],
         "copy": ["medicines.withdrawal.until", "medicines.withdrawal.consequence"],
         "issues": ["Brands and withdrawals are sample farm data."]
+      }
+    },
+    {
+      "id": "health-record.treatment-batch-many",
+      "name": "Record treatment · 8 pigs",
+      "zh": "记录治疗 · 8 头猪",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "selected-all",
+      "steps": [
+        "[data-action=\"treatment\"]",
+        "[data-action=\"medicine-open\"]",
+        "[data-action=\"medicine-select\"][data-value=\"tulathromycin\"]",
+        "[data-action=\"brand-open\"]",
+        "[data-action=\"brand-select\"][data-value=\"tulathromycin/0\"]",
+        {
+          "fill": "[data-bulk-key=\"dose\"]",
+          "text": "2.5"
+        }
+      ],
+      "figma": "",
+      "notes": {
+        "purpose": "Eight pigs: the list grows on the form, below Same dose for all, the ear-tag search and Scan above it; the page body scrolls.",
+        "elements": [
+          {
+            "name": "Scan",
+            "at": "[data-action=\"dose-scan\"]",
+            "shows": "Scan beside the ear-tag search",
+            "logic": "Jumps to the scanned pig's dose box: scrolls it into view and focuses it. New: the prototype had no find-and-focus pattern for a row's input. No camera in the prototype: Scan reads a sample tag (the last pig)."
+          }
+        ],
+        "controls": [],
+        "copy": ["medicines.dose.same_for_all", "medicines.dose.search", "medicines.dose.scan"],
+        "issues": []
+      }
+    },
+    {
+      "id": "health-record.treatment-batch-search",
+      "name": "Record treatment · search an ear tag",
+      "zh": "记录治疗 · 搜索耳标",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "selected-all",
+      "steps": [
+        "[data-action=\"treatment\"]",
+        "[data-action=\"medicine-open\"]",
+        "[data-action=\"medicine-select\"][data-value=\"tulathromycin\"]",
+        "[data-action=\"brand-open\"]",
+        "[data-action=\"brand-select\"][data-value=\"tulathromycin/0\"]",
+        {
+          "fill": "[data-bulk-key=\"dose\"]",
+          "text": "2.5"
+        },
+        {
+          "fill": "[data-dose-search]",
+          "text": "267"
+        }
+      ],
+      "figma": "",
+      "notes": {
+        "purpose": "An ear tag typed: the list narrows to the matching pig, its dose box ready.",
+        "elements": [],
+        "controls": [],
+        "copy": ["medicines.dose.search", "medicines.dose.no_match"],
+        "issues": []
       }
     },
     {
@@ -1067,172 +1144,6 @@
         ],
         "controls": [],
         "copy": ["medicines.details.title", "medicines.detail.withdrawal", "medicines.detail.uses_default", "medicines.add.commit"],
-        "issues": []
-      }
-    },
-    {
-      "id": "health-record.custom-doses",
-      "name": "Custom doses",
-      "zh": "自定义剂量",
-      "status": "in-design",
-      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
-      "preset": "selected",
-      "steps": [
-        "[data-action=\"treatment\"]",
-        "[data-action=\"medicine-open\"]",
-        "[data-action=\"medicine-select\"][data-value=\"tulathromycin\"]",
-        "[data-action=\"brand-open\"]",
-        "[data-action=\"brand-select\"][data-value=\"tulathromycin/0\"]",
-        {
-          "fill": "[data-bulk-key=\"dose\"]",
-          "text": "2.5"
-        },
-        "[data-action=\"pig-doses-open\"]",
-        "[data-action=\"pig-dose-open\"][data-value=\"000254\"]",
-        {
-          "fill": "[data-pig-dose]",
-          "text": "3"
-        },
-        "[data-action=\"pig-dose-save\"]"
-      ],
-      "figma": "",
-      "notes": {
-        "purpose": "The pigs of a batch treatment, each with its dose on the right: the shared dose muted, an own dose in ink with Own dose. A page: it grows with the pigs and holds a scan, and the pig's dose sheet opens over it.",
-        "elements": [
-          {
-            "name": "Pig row",
-            "at": "000254",
-            "shows": "Ear tag, pen · stage; dose on the right",
-            "states": [
-              {
-                "state": "Shared dose",
-                "when": "No own dose",
-                "shows": "2.5 mL, muted"
-              },
-              {
-                "state": "Own dose",
-                "when": "Set from its sheet",
-                "shows": "3 mL in ink, Own dose"
-              },
-              {
-                "state": "Excluded",
-                "when": "Checkbox unticked",
-                "shows": "Excluded"
-              },
-              {
-                "state": "Not eligible",
-                "when": "Dead sow",
-                "shows": "Not eligible, the checkbox unavailable"
-              }
-            ],
-            "logic": "The checkbox stays: it is how every bulk page takes a pig out. Save on the form waits until the shared dose is set or every included pig has its own."
-          },
-          {
-            "name": "Search and Scan",
-            "at": "[data-dose-search]",
-            "shows": "Search ear tag, with Scan beside it",
-            "logic": "Search narrows the list to the matching tags (Find a pig's results pattern); Scan opens the scanned pig's dose (Inspection's scan opens the pig). No camera in the prototype: Scan reads a sample tag (000267)."
-          }
-        ],
-        "controls": [],
-        "copy": ["medicines.dose.custom", "medicines.dose.own", "medicines.dose.search", "medicines.dose.scan"],
-        "issues": ["Inspection has no highlight-and-scroll pattern for a found row; the list narrows instead, as Find a pig's search does."]
-      }
-    },
-    {
-      "id": "health-record.custom-doses-search",
-      "name": "Custom doses: search an ear tag",
-      "zh": "自定义剂量：搜索耳标",
-      "status": "in-design",
-      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
-      "preset": "selected",
-      "steps": [
-        "[data-action=\"treatment\"]",
-        "[data-action=\"medicine-open\"]",
-        "[data-action=\"medicine-select\"][data-value=\"tulathromycin\"]",
-        "[data-action=\"brand-open\"]",
-        "[data-action=\"brand-select\"][data-value=\"tulathromycin/0\"]",
-        {
-          "fill": "[data-bulk-key=\"dose\"]",
-          "text": "2.5"
-        },
-        "[data-action=\"pig-doses-open\"]",
-        "[data-action=\"pig-dose-open\"][data-value=\"000254\"]",
-        {
-          "fill": "[data-pig-dose]",
-          "text": "3"
-        },
-        "[data-action=\"pig-dose-save\"]",
-        {
-          "fill": "[data-dose-search]",
-          "text": "267"
-        }
-      ],
-      "figma": "",
-      "notes": {
-        "purpose": "An ear tag typed: the list narrows to the matching pig.",
-        "elements": [],
-        "controls": [],
-        "copy": ["medicines.dose.search", "medicines.dose.no_match"],
-        "issues": []
-      }
-    },
-    {
-      "id": "health-record.pig-dose",
-      "name": "Dose for one pig",
-      "zh": "单头猪剂量",
-      "status": "in-design",
-      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
-      "preset": "selected",
-      "steps": [
-        "[data-action=\"treatment\"]",
-        "[data-action=\"medicine-open\"]",
-        "[data-action=\"medicine-select\"][data-value=\"tulathromycin\"]",
-        "[data-action=\"brand-open\"]",
-        "[data-action=\"brand-select\"][data-value=\"tulathromycin/0\"]",
-        {
-          "fill": "[data-bulk-key=\"dose\"]",
-          "text": "2.5"
-        },
-        "[data-action=\"pig-doses-open\"]",
-        "[data-action=\"pig-dose-open\"][data-value=\"000254\"]",
-        {
-          "fill": "[data-pig-dose]",
-          "text": "3"
-        },
-        "[data-action=\"pig-dose-save\"]",
-        "[data-action=\"pig-dose-open\"][data-value=\"000254\"]"
-      ],
-      "figma": "",
-      "notes": {
-        "purpose": "From Custom doses, tap a pig: its own dose in the shared unit; Use the same dose undoes it (shown once the pig has its own). Footer Back + Save.",
-        "elements": [
-          {
-            "name": "Save",
-            "at": "[data-action=\"pig-dose-save\"]",
-            "shows": "Save",
-            "rule": "Waits for a dose above 0. The pig keeps its own dose when the shared dose changes; Use the same dose returns it to the shared one."
-          }
-        ],
-        "controls": [],
-        "copy": ["medicines.dose.for", "medicines.dose.same", "medicines.save"],
-        "issues": []
-      }
-    },
-    {
-      "id": "health-record.treatment-note",
-      "name": "Note on a treatment",
-      "zh": "治疗备注",
-      "status": "in-design",
-      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
-      "preset": "profile-full",
-      "steps": ["[data-action=\"pig-actions\"]", "[data-action=\"treatment\"]", "[data-action=\"medicine-open\"]", "[data-action=\"medicine-select\"][data-value=\"amoxicillin\"]", "[data-action=\"record-optional-open\"][data-value=\"note\"]"],
-      "figma": "",
-      "notes": {
-        "purpose": "The Note row opens a small sheet: the note field, footer Back + Save. The row then shows the note's first line.",
-        "elements": [],
-        "controls": [],
-        "copy": ["medicines.note", "medicines.save"],
         "issues": []
       }
     },
