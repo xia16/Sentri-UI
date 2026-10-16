@@ -109,9 +109,12 @@ export async function prepareVisit(browser, { url, mode = 'screen', width, lang 
 // Returns { png, text } or { unstable } (or { machine, error } when a request failed meanwhile).
 export async function captureShot(v, bounds = BOUNDS) {
   const page = v.page;
-  const shoot = () => (v.mode === 'grid' ? page.locator('body').screenshot() : page.screenshot({ clip: { x: 0, y: 0, width: v.width, height: HEIGHT } }));
-  const before = await v.sample();
+  // caret: 'initial' — Playwright would otherwise hide the caret by injecting a style into every frame for each shot, a DOM change
+  // of its own (the harness already draws the caret transparent). The page is sampled after the first shot and again a quiet window
+  // later, before the second: nothing may change between them.
+  const shoot = () => (v.mode === 'grid' ? page.locator('body').screenshot({ caret: 'initial' }) : page.screenshot({ clip: { x: 0, y: 0, width: v.width, height: HEIGHT }, caret: 'initial' }));
   const a = await shoot();
+  const before = await v.sample();
   await wait(bounds.quiet);
   const after = await v.sample();
   const b = await shoot();
