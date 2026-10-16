@@ -25,7 +25,8 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { OPT_IN_FILES, loadApi, optInProof } from './opt-in-proof.mjs';
+import { OPT_IN_FILES, loadApi, optInProof, cssOwnedProof } from './opt-in-proof.mjs';
+import { bundleChange, bundleRest, screensByCaller } from './bundle-graph.mjs';
 import { CLASSES, DS_FEATURE, componentPage, componentPagesOf, componentsTouched, idPath, screensOf, pageOf, pageAssets, sharedFiles, coverageLost, effectiveClass, classifyScreens, checkVerdict, touchesSystem, touchesTools, queueAhead as queueOf, budgetProblems, critiqueProblems, pageStyling, addedLines, calibrationProblems, lockState, shotsToTake, reachOf, reachLine, carryDecision, ghNetworkError, newScenarioFailures } from './loop-rules.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -308,36 +309,44 @@ for (const p of new Set(baseScreens.map((s) => pageOf(s.url)))) {
 const shared = sharedFiles(baseScreens, assets);
 const touched = touchesSystem(files, shared);
 mech.shared = { files: Object.keys(shared).length, touched: Object.fromEntries(touched.map((f) => [f, shared[f] || []])) };
-// ---------- the opt-in proof (gate.md §1, "Opt-in component change") ----------
-// A change whose only system files are the bundle (bundle.js, bundle.css, index.d.ts) may prove itself opt-in: every call the
-// base screens make into SentriUI renders the same markup through the candidate's bundle, and every CSS rule it adds needs a hook
-// no base markup or source carries (scripts/opt-in-proof.mjs). Proved, the bundle files reach only the component pages (beside
-// what the change's other files reach), they raise no class and join no queue, and the tripwire still shoots every other screen.
-// Not proved, or --all: the full shared gate, as before. The base corpus is recorded once per main commit (scripts/record-calls.mjs).
-const optIn = (() => {
+// ---------- the base recording: which design-system functions each base screen calls ----------
+// For a change whose only system files are the bundle (bundle.js, bundle.css, index.d.ts), every base screen is loaded once (after
+// its preset and steps) and every call into SentriUI / SentriIcons noted (scripts/record-calls.mjs). Kept per key: the base commit,
+// the base bundle's hash and the recorder's hash; a recording under another key is never read.
+const readSide = (k, f) => { const p = path.join(wt[k], f); return fs.existsSync(p) ? fs.readFileSync(p, 'utf8') : ''; };
+const [jsFile, cssFile] = OPT_IN_FILES;
+const recording = (() => {
   if (!touched.length || mech.quick || flag('all') || !touched.every((f) => OPT_IN_FILES.includes(f))) return null;
-  const key = createHash('sha256').update(fs.readFileSync(path.join(root, 'scripts/record-calls.mjs'))).digest('hex').slice(0, 12);
-  const corpus = path.join(gateDir(), 'calls', `${mech.base}-${key}.json`);
-  if (!fs.existsSync(corpus)) {
-    console.log('opt-in proof: recording the calls the base screens make …');
-    const rec = run(process.execPath, [path.join(root, 'scripts/record-calls.mjs'), corpus, '--root', wt.base, '--commit', mech.base], root, 30 * 60e3);
+  const key = `${mech.base}-${createHash('sha256').update(fs.readFileSync(path.join(root, 'scripts/record-calls.mjs'))).update('\0').update(readSide('base', jsFile)).digest('hex').slice(0, 12)}`;
+  const file = path.join(gateDir(), 'calls', `${key}.json`);
+  if (!fs.existsSync(file)) {
+    console.log('recording the calls the base screens make …');
+    const rec = run(process.execPath, [path.join(root, 'scripts/record-calls.mjs'), file, '--root', wt.base, '--commit', mech.base, '--key', key], root, 30 * 60e3);
     if (rec.code) console.log(rec.tail);
   }
-  let calls = [];
-  try { calls = JSON.parse(fs.readFileSync(corpus, 'utf8')).calls || []; } catch {}
-  const read = (k, f) => { const p = path.join(wt[k], f); return fs.existsSync(p) ? fs.readFileSync(p, 'utf8') : ''; };
-  const [jsFile, cssFile] = OPT_IN_FILES;
+  let data = null;
+  try { data = JSON.parse(fs.readFileSync(file, 'utf8')); } catch {}
+  return { key, data: data && data.key === key ? data : null };
+})();
+// ---------- the opt-in proof (gate.md §1, "Opt-in component change") ----------
+// The change may prove itself opt-in: every recorded SentriUI call renders the same markup through the candidate's bundle, and
+// every CSS rule it adds needs a hook no base markup or source carries (scripts/opt-in-proof.mjs). Proved, the bundle files reach
+// only the component pages (beside what the change's other files reach), raise no class and join no queue; the tripwire still
+// shoots every other screen. Not proved: reach by caller below, else the full shared gate.
+const optIn = (() => {
+  if (!recording) return null;
+  const calls = recording.data?.calls || [];
   let markup = '';
-  try { const api = loadApi(read('base', jsFile)); markup = calls.map(([f, a]) => { try { return String(api[f](...a)); } catch { return ''; } }).join('\n'); } catch {}
+  try { const api = loadApi(readSide('base', jsFile)); markup = calls.map(([f, a]) => { try { return String(api[f](...a)); } catch { return ''; } }).join('\n'); } catch {}
   const sources = {};
-  for (const f of git(['ls-files', 'ux'], wt.base).out.split(/\r?\n/).filter((x) => /\.(js|cjs|mjs|html|css)$/.test(x))) sources[f] = read('base', f);
-  return optInProof({ files, systemFiles: touched, base: { js: read('base', jsFile), css: read('base', cssFile) }, cand: { js: read('cand', jsFile), css: read('cand', cssFile) }, calls, known: { markup, sources } });
+  for (const f of git(['ls-files', 'ux'], wt.base).out.split(/\r?\n/).filter((x) => /\.(js|cjs|mjs|html|css)$/.test(x))) sources[f] = readSide('base', f);
+  return optInProof({ files, systemFiles: touched, base: { js: readSide('base', jsFile), css: readSide('base', cssFile) }, cand: { js: readSide('cand', jsFile), css: readSide('cand', cssFile) }, calls, known: { markup, sources } });
 })();
 const proved = new Set(optIn?.ok ? optIn.files : []);
 const unproved = (list) => list.filter((f) => !proved.has(f));
 if (optIn) {
   mech.optIn = { ok: optIn.ok, why: optIn.why, calls: optIn.calls, files: optIn.files };
-  console.log(optIn.ok ? `opt-in proof: proved on ${optIn.calls} recorded call(s) and ${optIn.addedRules} added rule(s); ${optIn.files.join(', ')} reach their component pages only` : `opt-in proof: not proved, gated as shared (${optIn.why.join('; ')})`);
+  console.log(optIn.ok ? `opt-in proof: proved on ${optIn.calls} recorded call(s) and ${optIn.addedRules} added rule(s); ${optIn.files.join(', ')} reach their component pages only` : `opt-in proof: not proved (${optIn.why.join('; ')})`);
   if (optIn.ok) check('opt-in proof: existing calls render the same, added CSS needs a new hook', true, `${optIn.calls} call(s), ${optIn.addedRules} added rule(s)`);
 }
 // What the change can reach, from its files (both sides of a rename) and both sides' pages: only those screens are shot in full
@@ -346,6 +355,40 @@ const candScreens = screensOf(JSON.parse(fs.readFileSync(path.join(wt.cand, 'atl
 // The component pages each side's atlas draws: shot like screens, kept out of the shared-file sums above (their page is the atlas).
 const pagesOf = (k) => componentPagesOf(JSON.parse(fs.readFileSync(path.join(wt[k], 'atlas/atlas.json'), 'utf8')));
 const ds = { base: pagesOf('base'), cand: pagesOf('cand') };
+// ---------- reach by caller (gate.md §1, "Reach by caller") ----------
+// A bundle change that is not opt-in reaches the screens that call what it changed: the exported functions the parsed bundle's
+// diff taints through its own call graph (scripts/bundle-graph.mjs), looked up in the base recording. A screen with no current
+// recording, or that only one side has, is in reach; every changed CSS rule must be owned by the changed functions (each selector
+// requires a hook nothing else emits). Whatever this cannot decide reaches every screen. The class stays shared (it still queues),
+// the tripwire still shoots every other screen, and the scenario leaves run for every feature in reach.
+const byCaller = (() => {
+  if (!recording || optIn?.ok) return null;
+  const change = bundleChange(readSide('base', jsFile), readSide('cand', jsFile));
+  if (change.all) return { all: true, why: change.why };
+  const touchedFns = new Set(change.exports.filter((e) => e.startsWith('SentriUI.')).map((e) => e.slice('SentriUI.'.length)));
+  // what else can emit a hook: every other ux/ source that can write markup (not a stylesheet), on both sides; the bundle's
+  // untouched units and setup; the markup of every recorded call to an untouched export, through both bundles
+  const sources = {};
+  for (const k of ['base', 'cand']) {
+    for (const f of git(['ls-files', 'ux'], wt[k]).out.split(/\r?\n/).filter((x) => /\.(js|cjs|mjs|html)$/.test(x) && !OPT_IN_FILES.includes(x))) sources[`${k}:${f}`] = readSide(k, f);
+    sources[`${k}:bundle (untouched parts)`] = bundleRest(readSide(k, jsFile), change.units);
+  }
+  let markup = '';
+  for (const k of ['base', 'cand']) {
+    try { const api = loadApi(readSide(k, jsFile)); markup += (recording.data?.calls || []).filter(([f]) => !touchedFns.has(f)).map(([f, a]) => { try { return String(api[f](...a)); } catch { return ''; } }).join('\n'); } catch {}
+  }
+  const css = cssOwnedProof(readSide('base', cssFile), readSide('cand', cssFile), { markup, sources });
+  if (!css.ok) return { all: true, why: css.why };
+  const scr = screensByCaller({ change, recordings: recording.data, key: recording.key, baseIds: baseScreens.map((s) => s.id), candIds: candScreens.map((s) => s.id) });
+  const ids = new Set(scr.screens);
+  const features = [...new Set([...baseScreens, ...candScreens].filter((s) => ids.has(s.id)).map((s) => s.feature))].sort();
+  return { all: false, exports: change.exports, screens: scr.screens, features, why: [...change.why, ...scr.why, `${css.rules} CSS rule(s) owned by them`] };
+})();
+const byCallerOk = !!byCaller && !byCaller.all;
+if (byCaller) {
+  mech.byCaller = byCaller;
+  console.log(byCallerOk ? `reach by caller: ${byCaller.exports.length} export(s) changed (${byCaller.exports.slice(0, 4).join(', ')}${byCaller.exports.length > 4 ? ' …' : ''}); ${byCaller.screens.length} screen(s) in ${byCaller.features.join(', ') || 'no feature'}` : `reach by caller: undecided, every screen (${byCaller.why.join('; ')})`);
+}
 const reach = (() => {
   if (mech.quick) return { all: false, features: [...new Set([...scope, ...(componentsTouched(files).length ? [DS_FEATURE] : [])])].sort(), why: ['quick: the scope only, and the component pages of a change to a component'] };
   if (flag('all')) return { all: true, features: [], why: ['--all'] };
@@ -357,8 +400,10 @@ const reach = (() => {
   }
   const screens = [...baseScreens, ...candScreens];
   const changed = git(['diff', '--name-only', '--no-renames', mech.base, mech.candidate]).out.split(/\r?\n/).filter(Boolean);
-  const r = reachOf({ files: unproved(changed), screens, assets: both, shared: sharedFiles(screens, both), scope });
-  return proved.size ? { ...r, features: [...new Set([...r.features, DS_FEATURE])].sort(), why: [...r.why, `${[...proved].join(', ')}: opt-in proved, the component pages`] } : r;
+  const r = reachOf({ files: unproved(changed).filter((f) => !(byCallerOk && OPT_IN_FILES.includes(f))), screens, assets: both, shared: sharedFiles(screens, both), scope });
+  if (proved.size) return { ...r, features: [...new Set([...r.features, DS_FEATURE])].sort(), why: [...r.why, `${[...proved].join(', ')}: opt-in proved, the component pages`] };
+  if (byCallerOk) return { ...r, features: [...new Set([...r.features, ...byCaller.features, DS_FEATURE])].sort(), why: [...r.why, `the bundle by caller: ${byCaller.why.join('; ')}`] };
+  return r;
 })();
 const inReach = (s) => reach.all || reach.features.includes(s.feature);
 mech.reach = { ...reach, screens: new Set([...candScreens, ...ds.cand].filter(inReach).map((s) => s.id)).size };
@@ -727,7 +772,7 @@ mech.timings.statesWait = Math.round((Date.now() - t0) / 1000) + 's';
 t0 = Date.now();
 const runner = fs.existsSync(path.join(wt.cand, 'scripts/run-scenarios.mjs'));
 const noLeaves = [];
-for (const f of new Set([...scope, ...[...screens.diff, ...screens.new].map((s) => s.feature), ...unproved(touched).flatMap((t) => shared[t] || [])].filter((f) => f !== DS_FEATURE))) {
+for (const f of new Set([...scope, ...[...screens.diff, ...screens.new].map((s) => s.feature), ...(byCallerOk ? [...byCaller.features, ...unproved(touched).filter((t) => !OPT_IN_FILES.includes(t)).flatMap((t) => shared[t] || [])] : unproved(touched).flatMap((t) => shared[t] || []))].filter((f) => f !== DS_FEATURE))) {
   if (!fs.existsSync(path.join(wt.cand, 'features', f, 'scenarios.json'))) { noLeaves.push(f); continue; }
   if (!runner) { check(`scenarios ${f}`, false, 'scripts/run-scenarios.mjs is not on this candidate'); continue; }
   r = run(process.execPath, ['scripts/run-scenarios.mjs', f, '--base', url.cand], wt.cand);

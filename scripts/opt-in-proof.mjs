@@ -49,7 +49,24 @@ export function cssChange(baseText, candText) {
   const kept = c.filter((r) => bk.has(r.key)).map((r) => r.key);
   const reordered = !removed.length && kept.join('\n') !== b.map((r) => r.key).join('\n');
   const added = c.filter((r) => !bk.has(r.key) || (ck.get(r.key) || 0) > (bk.get(r.key) || 0));
-  return { removed, reordered, added };
+  const removedRules = b.filter((r) => removed.includes(r.key));
+  return { removed, removedRules, reordered, added };
+}
+
+// Reach by caller's CSS half: every rule the change adds, removes or edits (an edit is both) must, in every selector, require a
+// hook that only the changed functions can emit. known: as hookIsNew, built from everything else (the untouched units and setup
+// of the bundle, every other ux/ source on both sides, and the markup of every recorded call to an untouched export). A reorder of
+// the existing rules changes the cascade anywhere. Returns { ok, why }.
+export function cssOwnedProof(baseText, candText, known) {
+  const ch = cssChange(baseText, candText), why = [];
+  if (ch.reordered) why.push('the existing rules changed order (the cascade between them)');
+  const loose = [];
+  for (const r of [...ch.removedRules, ...ch.added]) {
+    if (r.head.startsWith('@')) { loose.push(r.head); continue; }
+    for (const sel of splitSelectors(r.head)) if (!hooksOf(sel).some((h) => hookIsNew(h, known))) loose.push(r.media ? `${r.media} ${sel}` : sel);
+  }
+  if (loose.length) why.push(`${loose.length} changed selector(s) can match markup the changed functions don't emit: ${loose.slice(0, 3).join(' · ')}`);
+  return { ok: !why.length, why, rules: ch.added.length + ch.removedRules.length };
 }
 
 // A selector list split at its top-level commas (not the ones inside :is(), :not() …).
