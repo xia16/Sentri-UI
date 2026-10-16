@@ -433,8 +433,9 @@
   $('#reset-study').addEventListener('click',()=>location.reload());
   document.querySelectorAll("[data-status-icons]").forEach(e=>{e.innerHTML=icon("signal")+icon("battery");});
   render();
-  if(params.get('focus')==='task-fold')requestAnimationFrame(()=>{
+  // The fold is measured once the fonts have loaded: measured before, the toggle sits a few pixels off and the page lands short.
+  if(params.get('focus')==='task-fold')(document.fonts?document.fonts.ready:Promise.resolve()).then(()=>requestAnimationFrame(()=>{
     const scroller=app.querySelector('.app-scroll'),toggle=app.querySelector('[data-action="toggle-tasks"]');
     if(scroller&&toggle)scroller.scrollTop+=toggle.getBoundingClientRect().top-scroller.getBoundingClientRect().top-420;
-  });
+  }));
 })();

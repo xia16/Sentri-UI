@@ -24,7 +24,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { CLASSES, DS_FEATURE, componentPage, componentPagesOf, componentsTouched, idPath, screensOf, pageOf, pageAssets, sharedFiles, coverageLost, effectiveClass, classifyScreens, checkVerdict, touchesSystem, touchesTools, queueAhead as queueOf, budgetProblems, critiqueProblems, pageStyling, addedLines, calibrationProblems, lockState, shotsToTake, reachOf, reachLine, carryDecision, ghNetworkError, newScenarioFailures } from './loop-rules.mjs';
+import { passesWithoutJudge, CLASSES, DS_FEATURE, componentPage, componentPagesOf, componentsTouched, idPath, screensOf, pageOf, pageAssets, sharedFiles, coverageLost, effectiveClass, classifyScreens, checkVerdict, touchesSystem, touchesTools, queueAhead as queueOf, budgetProblems, critiqueProblems, pageStyling, addedLines, calibrationProblems, lockState, shotsToTake, reachOf, reachLine, carryDecision, ghNetworkError, newScenarioFailures } from './loop-rules.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -252,8 +252,19 @@ const mech = { pass: false, candidate: '', base: '', ref, mode, scope, quick: fl
 const finish = (code) => {
   mech.pass = code === 0 && checks.every((c) => c.result !== 'fail');
   mech.took = Math.round((Date.now() - started) / 1000) + 's';
+  // No screen moved: there is nothing to judge, so this pass is the gate pass. It posts the sentri/gate status (which branch
+  // protection on main requires) and the pass record the merge guard reads, as --verdict does for a change that moves screens.
+  if (passesWithoutJudge(mech)) {
+    mech.gatePass = true;
+    const posted = postStatus(mech.candidate, 'success', `GATE PASS against ${short(mech.base)} · no screen moved`);
+    if (!posted.ok) console.log(`  - the sentri/gate status was not posted (${posted.why}): gate again; until then GitHub refuses the merge`);
+    const passFile = passRecord(mech.candidate);
+    fs.mkdirSync(path.dirname(passFile), { recursive: true });
+    fs.writeFileSync(passFile, JSON.stringify({ candidate: mech.candidate, base: mech.base, ref: mech.ref, out: path.resolve(out), noScreenMoved: true, at: new Date().toISOString() }, null, 2));
+  }
   fs.writeFileSync(path.join(out, 'mechanical.json'), JSON.stringify(mech, null, 2));
   console.log(`\n${mech.pass ? 'MECHANICAL PASS' : 'MECHANICAL FAIL'} ${short(mech.candidate)} on base ${short(mech.base)} (${mech.class.effective || declared}, ${mode}) — ${out}`);
+  if (mech.gatePass) console.log(`GATE PASS (no screen moved, so no judge): gh pr merge <n> --squash --match-head-commit ${mech.candidate}`);
   process.exit(mech.pass ? 0 : 1);
 };
 
