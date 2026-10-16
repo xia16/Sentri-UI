@@ -114,7 +114,7 @@ async function runGate({ ref, base, out, mode, scope, declared, quick = false, a
   if (candidate) fs.rmSync(passRecord(candidate), { force: true }); // a new gate run voids any earlier pass for this commit until its verdict
   let res;
   try {
-    res = await evaluate({ root, out, base, candidate: ref, ref, mode, scope, declared, quick, all, keep, env });
+    res = await evaluate({ root, out, base, candidate: ref, ref, mode, scope, declared, quick, all, keep, env, testBase });
   } catch (e) {
     console.error(e.stack || e);
     res = { outcome: 'blocked', mech: { outcome: 'blocked', pass: false, ref, mode, scope, class: { declared }, blocked: [`the gate crashed: ${String(e.message || e).split('\n')[0]}`], checks: [], gaps: [], pairs: [] } };

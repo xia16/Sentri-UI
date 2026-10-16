@@ -520,7 +520,8 @@ export async function evaluate(opts) {
     check('design-system components only', !ps.length, ps.length ? `${ps.length} visual declaration(s) added outside ux/design-system (${ps.slice(0, 3).map((p) => p.file.split('/').pop() + ' ' + p.prop).join(', ')}): use a SentriUI component, or build the part in the design system (P2, briefs/build.md §3)` : '');
   }
   if (tools.length && moved.length) check('workflow changes in their own PR', false, `this change moves ${moved.length} screen(s) and also edits the workflow or the gate's tools (${tools.slice(0, 3).join(', ')}): split it`);
-  if (ec.cls === 'shared') {
+  if (ec.cls === 'shared' && opts.testBase) gaps.push(`shared-component change against a test base (${opts.base}): the PR queue is not read (it orders real PRs only)`);
+  else if (ec.cls === 'shared') {
     const branch = String(mech.ref).replace(/^origin\//, '');
     const prs = openPrs(root);
     if (prs.error) check('shared-component queue: first in line', false, `cannot read the queue: ${prs.error}`);
