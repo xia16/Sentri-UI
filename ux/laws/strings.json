@@ -2922,6 +2922,10 @@
     "medicines.detail.default_withdrawal_days": {"en": "Withdrawal period (days)", "zh": "休药期（天）", "kind": "label"},
     "medicines.withdrawal.consequence": {"en": "{days}: these pigs go to slaughter no earlier than this date.", "zh": "休药{days}：此日期前这些猪不得屠宰。", "kind": "body"},
     "medicines.dose.same_for_all": {"en": "Same dose for all", "zh": "统一剂量", "kind": "label"},
-    "medicines.dose.per_pig": {"en": "Dose per pig", "zh": "每头猪的剂量", "kind": "label"}
+    "medicines.dose.custom": {"en": "Custom doses", "zh": "自定义剂量", "kind": "label"},
+    "medicines.dose.own_count": {"en": "{n} own doses", "zh": "{n} 头单独剂量", "kind": "label"},
+    "medicines.dose.own_count_one": {"en": "1 own dose", "zh": "1 头单独剂量", "kind": "label"},
+    "medicines.note.count": {"en": "{n} / {max}", "zh": "{n} / {max}", "kind": "figure"},
+    "medicines.pigs.title": {"en": "Selected pigs", "zh": "已选猪只", "kind": "title"}
   }
 }

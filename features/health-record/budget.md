@@ -81,16 +81,6 @@ The catalogue pickers' heads. Questions at a level: where am I? (the title: the 
 | Parent's name ("‹ Symptoms") | Where does up go? | Settled | **cut**: Back goes up one level; the parent is one Back away and was its title |
 | Done · N | How many have I ticked? | Act now | kept |
 
-# Record treatment and the medicines picker (2026-10-16, round 4)
+# Record treatment and the medicines picker (2026-10-16, round 5)
 
-The picker's and the Brand list's facts are budgeted in `features/medicines/budget.md` (Record treatment (host)). On the host forms, in order:
-
-| Fact | Question it answers | Level | Decision |
-|---|---|---|---|
-| Medicine: its name | What was given? | Settled (field value) | kept |
-| Method, pre-filled from the medicine's last use | How was it given? | Settled | kept, editable |
-| Brand (PickerField, grey "Optional" beside the label), only once a medicine is chosen | Which bottle? | Settled | "Select" until set |
-| Dose (one pig) / Same dose for all (several): number and unit on one line, the unit remembered per medicine | How much, in what unit? | Settled | kept |
-| Several pigs: ear-tag search and Scan, then each pig (ear tag, pen · stage) with its dose box (placeholder: the shared dose, ink-2 regular; typed: its own, ink bold) | Did each pig get it, and how much? | Settled | inline, like the other bulk editors; the checkbox excludes a pig |
-| Condition (PickerField, Optional), Note (textarea, Optional) | Which finding? Anything to add? | Settled | ordinary fields; the condition picker unchanged |
-| Withdrawal until <date> (Banner notice, before Save) | When may these pigs go to slaughter? | Watch | absent when no withdrawal is in force |
+The facts are budgeted in `features/medicines/budget.md` (Record treatment (host)), which this form follows: the pigs row (several), Medicine, Method, Brand (optional), Dose or Same dose for all, Custom doses (several; its page edits each pig's dose inline), Condition (optional), Note (optional, 200 characters, a counter from 160), then the withdrawal notice. A pig is taken out on the selected list, not by a checkbox on its dose row.

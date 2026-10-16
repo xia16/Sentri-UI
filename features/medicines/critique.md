@@ -181,3 +181,36 @@ The owner reviewed the first round's screens (head `1d7eeab`) and revised the de
 - Header check 0 and spacing 0 on the changed screens; strict legibility passes on them; check-states the same 6 as `c6cc500`; npm test passes.
 - Known: a trigger the atlas returns focus to shows the browser's focus ring (a finger draws none); Record treatment's own labels (Method) stay English in ZH, as on main.
 - Legibility: the first render drew the placeholder in `muted` (5.2:1), under the 7:1 a 16px figure the worker acts on must hold; it is now `ink-2`, regular (7.4:1), against the own dose in ink, bold. Strict legibility passes on all 24 changed screens.
+
+# Round 5 (owner, 2026-10-16): Custom doses back, no checkboxes, Note limit
+
+### Problems (from round 4's screens)
+
+- **major** · Each pig's box sat on the form, so the form grew with the pigs (owner). The form now ends its dose section with "Same dose for all" and a "Custom doses" row ("2 pigs · 1 own dose"); the boxes are on the Custom doses page, inline in each row.
+- **major** · Checkboxes on dose rows read as multi-select (owner: they meant "include", which is ambiguous). Removed from dose rows; a pig is taken out where pigs are chosen: the pigs row at the top of the form opens the selected list, the walk's **Selected review** pattern (`selectionReview`: every pig ticked, untick to take one out).
+- **minor** · Note: no limit and one line tall. Now about three lines, at most 200 characters (maxlength: input stops, nothing is cut afterwards), a counter at the end of the label line from 160 ("193 / 200").
+
+### Optional rows elsewhere (the reach of the shared Field PR)
+
+The owner approved the treatment's optional face (an ordinary labelled field with a grey "Optional"); the Field law and component change come as their own shared PR. Today these surfaces draw optional inputs as OptionalRow (`SentriUI.optionalRow`), the reach that PR must update or mark until migrated:
+
+- **Farrowing** (`ux/system/farrowing-astra-concept.js`): Record dead, Photos and Details (`face:'row'`, `death()`); Finish farrowing, Litter weight and Note (`finish-form-details`, `optRow`); a pen fault's Resolution note (`pen-detail`).
+- **Inspection, pig-profile, health-record** (`ux/system/inspection-astra-concept.js`): every bulk record's Add note (`recordOptionalControls`: Record health, Care instructions, Edit conditions, Resolve conditions, weights, temperature, backfat, body condition); a production task's note (`production-task`); Edit finding's and Resolve or remove's Note (`optNote`); Report an issue and Feeding exception notes (`optNote`, feed); the feed editor's End date and Add note (`optionalFieldControls`, feed-plan.editor); `optionalSelect` pickers (legacy record forms).
+- **Piglet processing** (`ux/tasks/piglet-processing/simple/app.js`): Give IDs' weight (kg) optional.
+- **Design system**: Field's OptionalRow variants and the Photos card (`ux/design-system/components/Field`, `Photos`).
+
+### Known problem (not changed here)
+
+- ChoiceList's navigate and single rows look alike apart from the trailing chevron; a separate component decision.
+
+### Self-crit
+
+#### Round 5 (renders at 390 and 360, EN and ZH)
+- Custom doses stays a page (it grows with the pigs and holds a scan; the Sheet law); values are live, so no Save. The owner asked for a footer Back: the page header law puts a page's Back top left and gives a page no footer Back, so Back is top left. Said in the hand-back.
+- The dose rows use the bulk editors' row (as weights and temperatures do) without its checkbox: Row has no input slot.
+- The selected list reuses the walk's Selected review (rowSelect rows, ticked, untick to remove) as a drawer over the form; the form's pigs row says "2 pigs · C1" (C1: where they are).
+- Squint (batch form): the title, the pigs row, Medicine, then Same dose for all; Custom doses is one quiet row. Custom doses page: the search, then the tags and their doses.
+- **Better because** the form is the same height for any number of pigs, each pig's dose is entered where it is shown, and taking a pig out is one unambiguous act in one place.
+
+#### Final look (the screens of this push; 390 and 360, EN and ZH)
+- Header check 0 and spacing 0 on the 27 changed screens; strict legibility passes on them; check-states the same 6 failing as `c6cc500`; npm test 725 pass; `npm run check` passes.

@@ -46,3 +46,13 @@
 .inspection-phone .medicine-optional{margin-left:6px;font:400 13px/1.4 var(--font-sans);color:var(--muted)}
 /* A pig's box shows the shared dose as its placeholder in ink-2, regular (7.4:1: a 16px figure the worker acts on holds 7:1); a typed (own) dose is ink, bold. */
 .inspection-phone [data-bulk-kind="treatment"] .bulk-reading input::placeholder{color:var(--ink-2);font-weight:400;opacity:1}
+
+/* Round 5: the Note's counter (from 160 characters) under it, right-aligned; the batch's pig and Custom doses rows. */
+.inspection-phone .medicine-note{display:flex;flex-direction:column;gap:4px}
+.inspection-phone .medicine-note textarea{min-height:calc(3 * 1.5em + 24px);resize:none}
+.inspection-phone .medicine-note .field>span:first-child{display:flex;align-items:baseline}
+.inspection-phone .medicine-note-count{margin-left:auto;font:400 var(--type-meta-size)/1.4 var(--font-sans);color:var(--muted)}
+.inspection-phone .medicine-note-count[hidden]{display:none}
+.inspection-phone .sheet.custom-doses-sheet[data-presentation="page"]>.sheet-body{padding:0 var(--space-gutter,18px) 16px}
+.inspection-phone .custom-doses-sheet .sheet-body>.bulk-pigs{margin:0}
+@media(max-width:370px){.inspection-phone .sheet.custom-doses-sheet[data-presentation="page"]>.sheet-body{padding:0 var(--space-gutter-narrow,12px) 16px}}

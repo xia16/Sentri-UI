@@ -27,7 +27,7 @@
         "screens": ["health-record.resolve-finding", "health-record.resolve-conditions"]
       }
     ],
-    "any": ["health-record.finding", "health-record.edit-finding", "health-record.record-health", "health-record.condition-picker", "health-record.care-instructions", "health-record.treatment", "health-record.treatment-batch", "health-record.medicine-picker", "health-record.brand", "health-record.brand-add", "health-record.brand-details", "health-record.treatment-brand", "health-record.treatment-batch-brand", "health-record.treatment-batch-many", "health-record.treatment-batch-search"]
+    "any": ["health-record.finding", "health-record.edit-finding", "health-record.record-health", "health-record.condition-picker", "health-record.care-instructions", "health-record.treatment", "health-record.treatment-batch", "health-record.medicine-picker", "health-record.brand", "health-record.brand-add", "health-record.brand-details", "health-record.treatment-brand", "health-record.treatment-batch-brand", "health-record.custom-doses", "health-record.custom-doses-own", "health-record.custom-doses-search", "health-record.treatment-pigs", "health-record.treatment-note"]
   },
   "entryPoints": [
     {
@@ -146,9 +146,19 @@
       "Save: the finding appears as a row or tag"
     ],
     [
-      "health-record.treatment-batch-many",
-      "health-record.treatment-batch-search",
+      "health-record.treatment-batch",
+      "health-record.custom-doses",
+      "tap Custom doses"
+    ],
+    [
+      "health-record.custom-doses",
+      "health-record.custom-doses-search",
       "type an ear tag"
+    ],
+    [
+      "health-record.treatment-batch",
+      "health-record.treatment-pigs",
+      "tap 2 pigs"
     ]
   ],
   "screens": [
@@ -818,7 +828,7 @@
       "steps": ["[data-action=\"treatment\"]", "[data-action=\"medicine-open\"]", "[data-action=\"medicine-select\"][data-value=\"tulathromycin\"]"],
       "figma": "",
       "notes": {
-        "purpose": "What was given to several pigs, then each pig's dose. Shown after picking Tulathromycin from the recent rows: Method (Injection) and the unit (mL) are pre-filled from its last use, the Brand row appears, and the withdrawal notice (Tulathromycin's default, 33 days) closes the form.",
+        "purpose": "Several pigs, empty: the pigs row (opens the selected list), Medicine, Method, then once a medicine is chosen Brand, Same dose for all, Custom doses; Condition and Note.",
         "elements": [
           {
             "name": "Order",
@@ -965,8 +975,8 @@
     },
     {
       "id": "health-record.treatment-batch-brand",
-      "name": "Record treatment · several pigs, one with its own dose",
-      "zh": "记录治疗 · 多头猪（一头单独剂量）",
+      "name": "Record treatment · several pigs, filled",
+      "zh": "记录治疗 · 多头猪（已填写）",
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
       "preset": "selected",
@@ -980,43 +990,17 @@
           "fill": "[data-bulk-key=\"dose\"]",
           "text": "2.5"
         },
+        "[data-action=\"pig-doses-open\"]",
         {
           "fill": "[data-bulk-value=\"000254\"]",
           "text": "3"
-        }
+        },
+        "[data-presentation=\"page\"] .st-page-back"
       ],
       "figma": "",
       "notes": {
-        "purpose": "Tulathromycin with Draxxin, Same dose for all 2.5 mL, and 000254 typed to its own 3 mL (ink); 000267's box shows 2.5 as its grey placeholder. The withdrawal notice (Tulathromycin's default, 33 days) closes the form.",
+        "purpose": "Filled: the pigs row (2 pigs · C1), Tulathromycin, Injection, Draxxin, Same dose for all 2.5 mL, then Custom doses \"2 pigs · 1 own dose\". No per-pig inputs on the form. The withdrawal notice closes the form.",
         "elements": [
-          {
-            "name": "Pig dose box",
-            "at": "[data-bulk-value=\"000254\"]",
-            "shows": "The pig's own dose, or the shared dose as a grey placeholder",
-            "states": [
-              {
-                "state": "Shared",
-                "when": "Nothing typed",
-                "shows": "Placeholder: the shared dose (— when none)"
-              },
-              {
-                "state": "Own dose",
-                "when": "A value typed",
-                "shows": "The value in ink; it stays when the shared dose changes"
-              },
-              {
-                "state": "Cleared",
-                "when": "The box emptied",
-                "shows": "Back to the shared dose"
-              },
-              {
-                "state": "Excluded",
-                "when": "Checkbox unticked",
-                "shows": "Excluded, the box unavailable"
-              }
-            ],
-            "logic": "Save waits until the shared dose is set or every included pig has a typed dose. The checkbox stays: it is how every bulk page takes a pig out."
-          },
           {
             "name": "Withdrawal",
             "at": "Withdrawal until",
@@ -1048,43 +1032,9 @@
       }
     },
     {
-      "id": "health-record.treatment-batch-many",
-      "name": "Record treatment · 8 pigs",
-      "zh": "记录治疗 · 8 头猪",
-      "status": "in-design",
-      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
-      "preset": "selected-all",
-      "steps": [
-        "[data-action=\"treatment\"]",
-        "[data-action=\"medicine-open\"]",
-        "[data-action=\"medicine-select\"][data-value=\"tulathromycin\"]",
-        "[data-action=\"brand-open\"]",
-        "[data-action=\"brand-select\"][data-value=\"tulathromycin/0\"]",
-        {
-          "fill": "[data-bulk-key=\"dose\"]",
-          "text": "2.5"
-        }
-      ],
-      "figma": "",
-      "notes": {
-        "purpose": "Eight pigs: the list grows on the form, below Same dose for all, the ear-tag search and Scan above it; the page body scrolls.",
-        "elements": [
-          {
-            "name": "Scan",
-            "at": "[data-action=\"dose-scan\"]",
-            "shows": "Scan beside the ear-tag search",
-            "logic": "Jumps to the scanned pig's dose box: scrolls it into view and focuses it. New: the prototype had no find-and-focus pattern for a row's input. No camera in the prototype: Scan reads a sample tag (the last pig)."
-          }
-        ],
-        "controls": [],
-        "copy": ["medicines.dose.same_for_all", "medicines.dose.search", "medicines.dose.scan"],
-        "issues": []
-      }
-    },
-    {
-      "id": "health-record.treatment-batch-search",
-      "name": "Record treatment · search an ear tag",
-      "zh": "记录治疗 · 搜索耳标",
+      "id": "health-record.custom-doses",
+      "name": "Custom doses",
+      "zh": "自定义剂量",
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
       "preset": "selected-all",
@@ -1098,6 +1048,131 @@
           "fill": "[data-bulk-key=\"dose\"]",
           "text": "2.5"
         },
+        "[data-action=\"pig-doses-open\"]"
+      ],
+      "figma": "",
+      "notes": {
+        "purpose": "Every pig in the unit (8), none with its own dose yet: each box shows the shared 2.5 as its placeholder. A page: it grows with the pigs and holds a scan.",
+        "elements": [
+          {
+            "name": "Pig dose box",
+            "at": "[data-bulk-value]",
+            "shows": "The pig's own dose, or the shared dose as its placeholder",
+            "states": [
+              {
+                "state": "Shared",
+                "when": "Nothing typed",
+                "shows": "Placeholder: the shared dose in ink-2 (— when none)"
+              },
+              {
+                "state": "Own dose",
+                "when": "A value typed",
+                "shows": "The value in ink, bold; it stays when the shared dose changes"
+              },
+              {
+                "state": "Cleared",
+                "when": "The box emptied",
+                "shows": "Back to the shared dose"
+              },
+              {
+                "state": "Not eligible",
+                "when": "Dead sow",
+                "shows": "Not eligible, the box unavailable"
+              }
+            ],
+            "logic": "Values are live: no Save on the page; Back (top left) returns to the form. Save on the form waits until the shared dose is set or every included pig has a typed dose. No checkbox: a pig is taken out on the selected list."
+          },
+          {
+            "name": "Search and Scan",
+            "at": "[data-dose-search]",
+            "shows": "Search ear tag, with Scan beside it",
+            "logic": "Search narrows the list; Scan jumps to the scanned pig's box (scrolls it into view and focuses it). New: the prototype had no find-and-focus pattern. No camera in the prototype: Scan reads a sample tag (the last pig)."
+          }
+        ],
+        "controls": [],
+        "copy": ["medicines.dose.custom", "medicines.dose.search", "medicines.dose.scan"],
+        "issues": []
+      }
+    },
+    {
+      "id": "health-record.custom-doses-own",
+      "name": "Custom doses: one own dose",
+      "zh": "自定义剂量：一头单独剂量",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "selected",
+      "steps": [
+        "[data-action=\"treatment\"]",
+        "[data-action=\"medicine-open\"]",
+        "[data-action=\"medicine-select\"][data-value=\"tulathromycin\"]",
+        "[data-action=\"brand-open\"]",
+        "[data-action=\"brand-select\"][data-value=\"tulathromycin/0\"]",
+        {
+          "fill": "[data-bulk-key=\"dose\"]",
+          "text": "2.5"
+        },
+        "[data-action=\"pig-doses-open\"]",
+        {
+          "fill": "[data-bulk-value=\"000254\"]",
+          "text": "3"
+        }
+      ],
+      "figma": "",
+      "notes": {
+        "purpose": "000254 typed to its own 3 mL (ink, bold); 000267 keeps the shared 2.5 as its placeholder.",
+        "elements": [
+          {
+            "name": "Pig dose box",
+            "at": "[data-bulk-value]",
+            "shows": "The pig's own dose, or the shared dose as its placeholder",
+            "states": [
+              {
+                "state": "Shared",
+                "when": "Nothing typed",
+                "shows": "Placeholder: the shared dose in ink-2 (— when none)"
+              },
+              {
+                "state": "Own dose",
+                "when": "A value typed",
+                "shows": "The value in ink, bold; it stays when the shared dose changes"
+              },
+              {
+                "state": "Cleared",
+                "when": "The box emptied",
+                "shows": "Back to the shared dose"
+              },
+              {
+                "state": "Not eligible",
+                "when": "Dead sow",
+                "shows": "Not eligible, the box unavailable"
+              }
+            ],
+            "logic": "Values are live: no Save on the page; Back (top left) returns to the form. Save on the form waits until the shared dose is set or every included pig has a typed dose. No checkbox: a pig is taken out on the selected list."
+          }
+        ],
+        "controls": [],
+        "copy": ["medicines.dose.custom"],
+        "issues": []
+      }
+    },
+    {
+      "id": "health-record.custom-doses-search",
+      "name": "Custom doses: search an ear tag",
+      "zh": "自定义剂量：搜索耳标",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "selected-all",
+      "steps": [
+        "[data-action=\"treatment\"]",
+        "[data-action=\"medicine-open\"]",
+        "[data-action=\"medicine-select\"][data-value=\"tulathromycin\"]",
+        "[data-action=\"brand-open\"]",
+        "[data-action=\"brand-select\"][data-value=\"tulathromycin/0\"]",
+        {
+          "fill": "[data-bulk-key=\"dose\"]",
+          "text": "2.5"
+        },
+        "[data-action=\"pig-doses-open\"]",
         {
           "fill": "[data-dose-search]",
           "text": "267"
@@ -1105,10 +1180,67 @@
       ],
       "figma": "",
       "notes": {
-        "purpose": "An ear tag typed: the list narrows to the matching pig, its dose box ready.",
+        "purpose": "An ear tag typed: the list narrows to the matching pig, its box ready.",
         "elements": [],
         "controls": [],
         "copy": ["medicines.dose.search", "medicines.dose.no_match"],
+        "issues": []
+      }
+    },
+    {
+      "id": "health-record.treatment-pigs",
+      "name": "Selected pigs: take one out",
+      "zh": "已选猪只：移除",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "selected",
+      "steps": ["[data-action=\"treatment\"]", "[data-action=\"treatment-pigs\"]", "[data-treat-pig=\"000254\"]"],
+      "figma": "",
+      "notes": {
+        "purpose": "The pigs row on the form opens the selected list (the walk's Selected review pattern): every pig ticked; untick one to take it out of this treatment. 000254 unticked here; the form then reads 1 pig.",
+        "elements": [
+          {
+            "name": "Pig",
+            "at": "000254",
+            "shows": "Ticked while it is in the treatment",
+            "logic": "Unticking takes the pig out: it leaves Custom doses and Save's count. Ticking again puts it back."
+          }
+        ],
+        "controls": [],
+        "copy": ["medicines.pigs.title"],
+        "issues": []
+      }
+    },
+    {
+      "id": "health-record.treatment-note",
+      "name": "Note near its limit",
+      "zh": "备注接近上限",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "profile-full",
+      "steps": [
+        "[data-action=\"pig-actions\"]",
+        "[data-action=\"treatment\"]",
+        "[data-action=\"medicine-open\"]",
+        "[data-action=\"medicine-select\"][data-value=\"amoxicillin\"]",
+        {
+          "fill": "[data-bulk-key=\"note\"]",
+          "text": "Gave in the morning water through the medicator at 2 g per litre. Two sows in C1 drank less than the rest; recheck their appetite tomorrow before feeding and treat again if no better. Tell G.H."
+        }
+      ],
+      "figma": "",
+      "notes": {
+        "purpose": "The Note, about three lines, typed into directly; at most 200 characters (input stops at the limit); the counter appears from 160 (\"185 / 200\").",
+        "elements": [
+          {
+            "name": "Counter",
+            "at": "[data-note-count]",
+            "shows": "193 / 200",
+            "rule": "Shown from 160 characters; the textarea's maxlength stops input at 200, so nothing is cut afterwards."
+          }
+        ],
+        "controls": [],
+        "copy": ["medicines.note", "medicines.note.count"],
         "issues": []
       }
     },

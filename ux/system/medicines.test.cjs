@@ -106,11 +106,13 @@ test('Brand: a full-width optional row only once a medicine is chosen; the farm\
   assert.equal(c.form.brand, '', 'a new medicine drops the old brand');
 });
 
-test('Note: a textarea on the form, no sheet', () => {
+test('Note: a three-line textarea on the form, at most 200 characters, a counter from 160', () => {
   const c = open(['000267']); M.handleRecordAction(c, 'medicine-select', 'amoxicillin');
-  const html = M.overlay(c);
-  assert.match(html, /Note <small class="medicine-optional">Optional<\/small>[^]*<textarea data-bulk-key="note"/);
-  assert.doesNotMatch(html, /data-action="record-optional-open" data-value="note"/);
+  let html = M.overlay(c);
+  assert.match(html, /<textarea data-bulk-key="note" rows="3" maxlength="200"/);
+  assert.match(html, /data-note-count[^>]* hidden>/, 'no counter while short');
+  c.form.note = 'x'.repeat(180); html = M.overlay(c);
+  assert.match(html, /data-note-count[^>]*>180 \/ 200</);
 });
 
 test('the medicine remembers its last method and unit; saving makes it the newest recent and its brand the first', () => {
@@ -125,29 +127,40 @@ test('the medicine remembers its last method and unit; saving makes it the newes
 });
 
 
-test('batch: Same dose for all, then the pig list on the form, each pig\'s box showing the shared dose as its placeholder', () => {
+test('batch: the pigs row, Same dose for all, then a Custom doses row; no per-pig inputs on the form', () => {
   const c = M.seed(); M.openBulkAction(c, 'treatment', ['000254', '000267']); M.handleRecordAction(c, 'medicine-open', ''); M.handleRecordAction(c, 'medicine-select', 'tulathromycin');
   c.form.dose = '2.5'; c.form.values['000254'] = '3';
   const html = M.overlay(c), at = s => html.indexOf(s);
-  assert.ok(at('data-action="medicine-open"') < at('data-picker-key="method"') && at('data-picker-key="method"') < at('data-action="brand-open"'));
-  assert.ok(at('data-action="brand-open"') < at('Same dose for all') && at('Same dose for all') < at('data-dose-search') && at('data-dose-search') < at('data-bulk-value="000254"'));
-  assert.ok(at('data-bulk-value="000267"') < at('data-picker-key="target"'));
-  assert.match(html, /data-bulk-value="000254" value="3"[^>]*placeholder="2.5"/, 'own dose typed, in ink');
-  assert.match(html, /data-bulk-value="000267" value=""[^>]*placeholder="2.5"/, 'the shared dose as a grey placeholder');
-  assert.match(html, /data-bulk-include="000254"/, 'the checkbox stays: the bulk way to take a pig out');
+  assert.ok(at('data-action="treatment-pigs"') < at('data-action="medicine-open"'));
+  assert.ok(at('data-action="brand-open"') < at('Same dose for all') && at('Same dose for all') < at('data-action="pig-doses-open"') && at('data-action="pig-doses-open"') < at('data-picker-key="target"'));
+  assert.match(html, /Custom doses[^]*?2 pigs · 1 own dose/);
+  assert.doesNotMatch(html, /data-bulk-value=|data-bulk-include=/);
 });
 
-test('batch doses: Save waits for the shared dose or every pig\'s own; clearing a box returns the pig to the shared dose; search narrows the list', () => {
+test('Custom doses page: inline boxes, placeholder the shared dose, no checkbox; Save waits for the shared dose or every pig\'s own; search narrows', () => {
   const c = M.seed(); M.openBulkAction(c, 'treatment', ['000254', '000267']); M.handleRecordAction(c, 'medicine-open', ''); M.handleRecordAction(c, 'medicine-select', 'tulathromycin');
   assert.ok(!M.bulkActionValid(c));
   c.form.values['000254'] = '3'; assert.ok(!M.bulkActionValid(c), '000267 has no dose and there is no shared dose');
   c.form.values['000267'] = '4'; assert.ok(M.bulkActionValid(c), 'every pig its own dose');
   delete c.form.values['000267']; c.form.dose = '2.5'; assert.ok(M.bulkActionValid(c), 'or a shared dose');
-  assert.equal(M.bulkChanges(c).find(r => r.id === '000267').value, '2.5');
-  c.form.doseSearch = '267';
-  const html = M.overlay(c);
-  assert.doesNotMatch(html, /data-bulk-value="000254"/); assert.match(html, /data-bulk-value="000267"/);
-  assert.match(html, /data-action="dose-scan"/);
+  M.handleRecordAction(c, 'pig-doses-open', '');
+  let page = M.inspectionSurface(c);
+  assert.match(page, /data-presentation="page"/);
+  assert.match(page, /data-bulk-value="000254" value="3"[^>]*placeholder="2.5"/);
+  assert.match(page, /data-bulk-value="000267" value=""[^>]*placeholder="2.5"/);
+  assert.doesNotMatch(page, /bulk-pig-check|type="checkbox"/, 'no checkbox on dose rows');
+  assert.doesNotMatch(page, /class="sheet-footer/, 'values are live: no Save, Back is top left');
+  c.form.doseSearch = '267'; page = M.inspectionSurface(c);
+  assert.doesNotMatch(page, /data-bulk-value="000254"/); assert.match(page, /data-action="dose-scan"/);
+});
+
+test('the selected list takes a pig out of the treatment (the walk\'s Selected review: untick to remove)', () => {
+  const c = M.seed(); M.openBulkAction(c, 'treatment', ['000254', '000267']); M.handleRecordAction(c, 'medicine-open', ''); M.handleRecordAction(c, 'medicine-select', 'tulathromycin'); c.form.dose = '2';
+  M.handleRecordAction(c, 'treatment-pigs', '');
+  assert.match(M.overlay(c), /Selected pigs[^]*data-treat-pig="000254"/);
+  c.form.excluded = ['000254']; c.view = 'treatment';
+  assert.match(M.overlay(c), /Save · 1 pig/);
+  M.handleRecordAction(c, 'pig-doses-open', ''); assert.doesNotMatch(M.inspectionSurface(c), /000254/, 'a removed pig leaves the dose list');
 });
 
 test('a vaccination lists the vaccines by disease, without a one-row category level', () => {

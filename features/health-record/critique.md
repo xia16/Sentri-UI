@@ -270,3 +270,9 @@ The Brand optional row comes back as the medicines feature's field (only once a 
 - **major** · The optional rows did not look like the other inputs on the same form; the owner wants Brand and Condition as PickerFields and Note as a textarea, each with a grey "Optional" beside the label. The Field README's law makes an optional input an optional row ("A Field is never shown open for an optional input"); this departs from it at the owner's request (said in the hand-back).
 - **major** · Round 3's Custom doses page hid every pig's dose one tap away; doses are back on the form, inline like the other bulk editors: each pig's box shows the shared dose as a grey placeholder until its own is typed.
 - **minor** · Pre-existing: typing in a bulk page's field redrew its footer with a Back, though a page's Back is top left (`refreshBulkCommit`). Fixed: a page's footer keeps no Back.
+
+### Round 5 (owner, 2026-10-16)
+
+- **major** · Round 4 put each pig's dose box on the form; the form grew with the pigs. The Custom doses row and page are back, with the boxes inline on the page (no sheet).
+- **major** · The dose rows' checkboxes read as multi-select (owner). Removed; a pig is taken out on the selected list (the pigs row at the top of the form), the walk's Selected review pattern.
+- **minor** · Note had no length limit or room: now about three lines, at most 200 characters, a counter from 160.
