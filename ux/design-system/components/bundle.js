@@ -476,8 +476,10 @@
     return `<${tag} class="st-measure-box"${unitGap?'':' data-unit-gap="none"'}${attrs}><span class="st-measure-value"${vid?` id="${esc(vid)}"`:''}${live?' aria-live="polite" aria-atomic="true"':''}${sid?sa(sid,sargs):''}>${esc(shown)}</span>${unit||has(o,'unit')?`<span class="st-measure-unit"${uid?` id="${esc(uid)}"`:''}>${tx(unit,o,'unit')}</span>`:''}</${tag}>`;
   }
   /* Measure: one measured value, mono, unit always written. A button that opens the docked Numpad (active).
+     input:'system' (opt-in) draws the same box as a native text field on the phone's decimal keyboard instead: for one
+     optional value inside a form, where a pad would be heavier than the job (the Numpad stays for runs of typed values).
      range is evaluated only when the pad is closed (active false), never per keystroke. */
-  function measure({label='',optional='',value='',unit='',unitGap=true,placeholder='—',action='open-numpad',key='',active=false,controls='',range=null,tone='',changed=false,hint='',note='',id='',className='',strs,args}={}){
+  function measure({label='',optional='',value='',unit='',unitGap=true,placeholder='—',action='open-numpad',key='',active=false,controls='',range=null,tone='',changed=false,hint='',note='',id='',className='',layout='',input='',inputAttrs='',strs,args}={}){
     const o={strs,args},lid=id||fieldId('st-measure'),v=value==null?'':String(value),num=parseFloat(v);
     const out=!active&&Array.isArray(range)&&v!==''&&!Number.isNaN(num)&&(num<range[0]||num>range[1]);
     const t=tone==='refused'?'refused':tone==='warn'||out?'warn':'';
@@ -485,10 +487,12 @@
     const lab=`<span class="st-measure-label" id="${esc(lid)}"><span${sa(o.strs&&o.strs.label,o.args&&o.args.label)}>${esc(label)}</span>${optional||has(o,'optional')?`<small>${tx(optional,o,'optional')}</small>`:''}</span>`;
     const vid=lid+'-value',uid=lid+'-unit',hid=lid+'-hint',nid=lid+'-note';
     const hasNote=!!(note||has(o,'note'));
-    const box=valueBox('button',{value:v,unit,unitGap,placeholder,active,live:active,vid,uid,attrs:` type="button" data-action="${esc(action)}" data-value="${esc(key)}" aria-labelledby="${esc(lid)} ${esc(vid)} ${esc(uid)}" aria-describedby="${esc(hid)}${hasNote?' '+esc(nid):''}" aria-expanded="${active?'true':'false'}"${controls?` aria-controls="${esc(controls)}"`:''}`},o);
+    const sys=oneOf('Measure','input',input||'pad',['pad','system'],'pad')==='system';
+    const box=sys?`<label class="st-measure-box" data-input="system"${unitGap?'':' data-unit-gap="none"'}><input class="st-measure-input" id="${esc(vid)}" type="text" inputmode="decimal" enterkeyhint="done" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="${esc(placeholder)}" value="${esc(v)}" aria-labelledby="${esc(lid)} ${esc(uid)}" aria-describedby="${esc(hid)}${hasNote?' '+esc(nid):''}" ${inputAttrs}>${unit||has(o,'unit')?`<span class="st-measure-unit" id="${esc(uid)}">${tx(unit,o,'unit')}</span>`:''}</label>`
+      :valueBox('button',{value:v,unit,unitGap,placeholder,active,live:active,vid,uid,attrs:` type="button" data-action="${esc(action)}" data-value="${esc(key)}" aria-labelledby="${esc(lid)} ${esc(vid)} ${esc(uid)}" aria-describedby="${esc(hid)}${hasNote?' '+esc(nid):''}" aria-expanded="${active?'true':'false'}"${controls?` aria-controls="${esc(controls)}"`:''}`},o);
     const hl=hintLine('st-measure-hint',{id:hid,text:hint,tone:t,o});
     const nl=hasNote?`<p class="st-field-hint st-measure-note" id="${esc(nid)}" data-tone="muted">${tx(note,o,'note')}</p>`:'';
-    return `<div class="st-measure ${esc(className)}" data-ds="Measure" data-field="${esc(key)}"${v===''?' data-empty=""':''}${active?' data-active=""':''}${t?` data-tone="${t}"`:''}${isChanged?' data-changed=""':''}>${lab}${box}${hl}${nl}</div>`;
+    return `<div class="st-measure ${esc(className)}" data-ds="Measure"${oneOf('Measure','layout',layout||'stack',['stack','row'],'stack')==='row'?' data-layout="row"':''} data-field="${esc(key)}"${v===''?' data-empty=""':''}${active?' data-active=""':''}${sys?' data-input="system"':''}${t?` data-tone="${t}"`:''}${isChanged?' data-changed=""':''}>${lab}${box}${hl}${nl}</div>`;
   }
   /* Numpad: the one type-to-set pad, for real typed input only (ear tags, weights), docked above the bar.
      1–9 · [. or a gap] 0 ⌫. No commit key: the bar's primary commits. Keys never move: the feedback region
@@ -934,9 +938,11 @@
      row (the sex field). Roving tab stop (radioBind moves it). An optional field clears through a visible `Clear` text
      action while a value is chosen (data-action "<action>-clear"); focus then returns to the group's tab stop. */
   const MONO_OK=/^[A-Za-z0-9 .·:/-]*$/;
-  function choiceRadios({label='',optional='',options=[],selected='',action='choose',key='',layout='rows',lead='',clear='Clear',id='',className='',disabled=false,reason='',pressed=false,labelHidden=false,strs,args}={}){
+  function choiceRadios({label='',optional='',options=[],selected='',action='choose',key='',layout='rows',face='',lead='',clear='Clear',id='',className='',disabled=false,reason='',pressed=false,labelHidden=false,strs,args}={}){
     const o={strs,args},s=strs||{},a=args||{},rid=id||fieldId('st-radios');
     const lay=oneOf('ChoiceList','layout',layout,['rows','plain','inline'],'rows');
+    /* face (inline only, opt-in): 'key' draws each option as a boxed key in the Stepper's 136px column instead of a ring and a word. */
+    const keyFace=oneOf('ChoiceList','face',face||'default',['default','key'],'default')==='key'&&lay==='inline';
     options.forEach(x=>{if(x.mono&&!MONO_OK.test(String(x.label||'')))warn('ChoiceList',`mono is for Latin and digit codes only: "${x.label}"`);});
     const chosen=options.some(x=>x.value===selected),stop=chosen?selected:(options[0]&&options[0].value);
     const isOptional=!!(optional||has(o,'optional'));
@@ -946,8 +952,8 @@
       return choiceGroup(rows,{title:label,lead,radio:true,aside:clearBtn,id:rid,className:(lay==='plain'?'st-choice-plain ':'')+className,strs:s.label?{title:s.label}:undefined,args:a.label?{title:a.label}:undefined});
     }
     const lid=rid+'-label';
-    const opt=x=>`<button type="button" class="st-choice-inline-opt"${disabled?' aria-disabled="true"':''}${pressed&&x===options[0]?' data-preview="pressed"':''} role="radio" aria-checked="${x.value===selected?'true':'false'}" tabindex="${x.value===stop?0:-1}" data-action="${esc(action)}" data-value="${esc(x.value)}"><span class="st-radio" aria-hidden="true"></span><span${x.mono?' data-mono=""':''}>${tx(x.label,x,'label')}</span></button>`;
-    return `<div class="st-choice-inline ${esc(className)}" data-ds="ChoiceList" data-mode="radio" id="${esc(rid)}" data-field="${esc(key)}"><span class="st-choice-inline-label"><span id="${esc(lid)}"${labelHidden?' class="st-visually-hidden"':''}><span${sa(s.label,a.label)}>${esc(label)}</span>${isOptional?`<small>${tx(optional,o,'optional')}</small>`:''}</span>${isOptional?`<span class="st-choice-inline-clear">${clearBtn}</span>`:''}</span><span class="st-choice-inline-opts" role="radiogroup" aria-labelledby="${esc(lid)}">${options.map(opt).join('')}</span>${reason?`<span class="st-choice-meta" role="status">${esc(reason)}</span>`:''}</div>`;
+    const opt=x=>`<button type="button" class="st-choice-inline-opt"${disabled?' aria-disabled="true"':''}${pressed&&x===options[0]?' data-preview="pressed"':''} role="radio" aria-checked="${x.value===selected?'true':'false'}" tabindex="${x.value===stop?0:-1}" data-action="${esc(action)}" data-value="${esc(x.value)}">${keyFace?'<span class="st-choice-inline-face">':'<span class="st-radio" aria-hidden="true"></span>'}<span${x.mono?' data-mono=""':''}>${tx(x.label,x,'label')}</span>${keyFace?'</span>':''}</button>`;
+    return `<div class="st-choice-inline ${esc(className)}" data-ds="ChoiceList" data-mode="radio"${keyFace?' data-face="key"':''} id="${esc(rid)}" data-field="${esc(key)}"><span class="st-choice-inline-label"><span id="${esc(lid)}"${labelHidden?' class="st-visually-hidden"':''}><span${sa(s.label,a.label)}>${esc(label)}</span>${isOptional?`<small>${tx(optional,o,'optional')}</small>`:''}</span>${isOptional?`<span class="st-choice-inline-clear">${clearBtn}</span>`:''}</span><span class="st-choice-inline-opts" role="radiogroup" aria-labelledby="${esc(lid)}">${options.map(opt).join('')}</span>${reason?`<span class="st-choice-meta" role="status">${esc(reason)}</span>`:''}</div>`;
   }
   /* The radio keyboard model, pure: ArrowDown/ArrowRight → next, ArrowUp/ArrowLeft → previous (both wrap), Home → first,
      End → last. Returns the value to select and focus, or null for any other key. */

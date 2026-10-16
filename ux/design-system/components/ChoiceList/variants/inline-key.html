@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ChoiceList · inline keys</title><style>
+.ph{position:relative;width:390px;max-width:100%;height:720px;margin:0 auto;overflow:hidden;background:var(--app-background);border:1px solid var(--line);border-radius:var(--radius-device,28px);font-family:var(--font-sans);color:var(--ink)}
+.ph-page{padding:0 var(--space-gutter)}
+.ph-bar{display:flex;align-items:center;height:var(--statusbar-height);padding:0 var(--space-6);font:600 var(--font-size-13) var(--font-sans)}
+</style></head><body>
+<div data-state="Default" id="state-Default"></div>
+<div data-state="Pressed" id="state-Pressed"></div>
+<div data-state="Selected" id="state-Selected"></div>
+<div data-state="Disabled" id="state-Disabled"></div>
+<div data-state="Empty" id="state-Empty"></div>
+<div data-state="Long-label" id="state-Long-label"></div>
+<script>
+var UI = window.SentriUI;
+/* The real container: a 390px phone; the form is a drawer over the sow's page. The key face is a row of a flat list of rows: here under a Stepper row, in the same right column. */
+function page(){return '<div class="ph-page"><div class="ph-bar" aria-hidden="true">9:41</div>'+UI.heading({title:'000418',kind:'page',description:'B1 \u00b7 Parity 3'})+UI.panel(UI.row({title:'Farrowing',description:'9 alive \u00b7 5 dead'}),{className:'st-row-group'})+'</div>';}
+function phone(over){return '<div class="ph" data-st-context="page">'+page()+over+'</div>';}
+function form(fields){return phone(UI.sheet({title:'Finish farrowing',size:'medium',body:'<div class="ph-rows">'+UI.stepper({label:'Weak',value:1,action:'step',key:'weak',variant:'row',reserveHint:false})+fields+'</div>',footer:UI.sheetFooter({back:{action:'back'}})}));}
+var NO_YES = [{"value": "false", "label": "No"}, {"value": "true", "label": "Yes"}];
+var RENDER = {
+  "state-Default": () => form(UI.choiceRadios({"label": "Assisted", "layout": "inline", "face": "key", "options": NO_YES, "selected": "false", "key": "assisted", "action": "assisted"})),
+  "state-Pressed": () => form(UI.choiceRadios({"label": "Assisted", "layout": "inline", "face": "key", "options": NO_YES, "selected": "false", "pressed": true, "key": "assisted", "action": "assisted"})),
+  "state-Selected": () => form(UI.choiceRadios({"label": "Assisted", "layout": "inline", "face": "key", "options": NO_YES, "selected": "true", "key": "assisted", "action": "assisted"})),
+  "state-Disabled": () => form(UI.choiceRadios({"label": "Assisted", "layout": "inline", "face": "key", "options": NO_YES, "selected": "false", "disabled": true, "reason": "Unavailable offline. Reconnect to select.", "key": "assisted", "action": "assisted"})),
+  "state-Empty": () => form(UI.choiceRadios({"label": "Assisted", "layout": "inline", "face": "key", "options": NO_YES, "selected": "", "key": "assisted", "action": "assisted"})),
+  "state-Long-label": () => form(UI.choiceRadios({"label": "助产", "layout": "inline", "face": "key", "options": [{"value": "false", "label": "否"}, {"value": "true", "label": "是"}], "selected": "", "key": "assisted", "action": "assisted"}))
+};
+document.querySelectorAll('[data-state]').forEach(function (s) { if (RENDER[s.id]) s.innerHTML = RENDER[s.id](); });
+</script></body></html>
