@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-17T03:58:01.172Z",
- "commit": "10ed873",
+ "generated": "2026-10-17T07:41:02.016Z",
+ "commit": "884b1f3",
  "platforms": [
   {
    "id": "mobile",
@@ -2628,6 +2628,9 @@
          "farrowing.history",
          "farrowing.filter",
          "farrowing.pen-map",
+         "farrowing.pen-landed",
+         "farrowing.pen-landed-live",
+         "farrowing.pen-landed-plain",
          "farrowing.pen",
          "farrowing.pen-log",
          "farrowing.pen-note",
@@ -5359,6 +5362,54 @@
           "issues": [
            "The prototype draws every room as 4 lanes by 6 rows. A barn with a longer row (range buttons, sideways scroll) is shown on the PenMap component page only."
           ]
+         }
+        },
+        {
+         "id": "farrowing.pen-landed",
+         "name": "Landed on a pen · needs you",
+         "zh": "落到栏位 · 需处理",
+         "status": "in-design",
+         "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+         "preset": "room",
+         "steps": [
+          ".dock-map",
+          "[data-ds=\"PenMap\"] button[data-value=\"B4\"]"
+         ],
+         "figma": "",
+         "notes": {
+          "purpose": "The room the moment after pen B4 is tapped on the Pen map, at the landing cue's held frame (PenMap README, Landing on the pen): the pen's header takes the tapped tile's amber fill. On the phone it holds for land-hold (900ms) and fades over land-fade (700ms); the atlas shows the held frame so the gate can judge it."
+         }
+        },
+        {
+         "id": "farrowing.pen-landed-live",
+         "name": "Landed on a pen · farrowing",
+         "zh": "落到栏位 · 分娩中",
+         "status": "in-design",
+         "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+         "preset": "room",
+         "steps": [
+          ".dock-map",
+          "[data-ds=\"PenMap\"] button[data-value=\"B1\"]"
+         ],
+         "figma": "",
+         "notes": {
+          "purpose": "The room the moment after pen B1 is tapped on the Pen map, at the landing cue's held frame (PenMap README, Landing on the pen): the pen's header takes the tapped tile's blue fill. On the phone it holds for land-hold (900ms) and fades over land-fade (700ms); the atlas shows the held frame so the gate can judge it."
+         }
+        },
+        {
+         "id": "farrowing.pen-landed-plain",
+         "name": "Landed on a pen · has sows",
+         "zh": "落到栏位 · 有母猪",
+         "status": "in-design",
+         "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+         "preset": "room",
+         "steps": [
+          ".dock-map",
+          "[data-ds=\"PenMap\"] button[data-value=\"B2\"]"
+         ],
+         "figma": "",
+         "notes": {
+          "purpose": "The room the moment after pen B2 is tapped on the Pen map, at the landing cue's held frame (PenMap README, Landing on the pen): a white tile has no fill to carry, so the pen card takes a 2px ink ring drawn just inside its edge. On the phone it holds for land-hold (900ms) and fades over land-fade (700ms); the atlas shows the held frame so the gate can judge it."
          }
         },
         {
