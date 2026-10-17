@@ -1,16 +1,18 @@
 #!/usr/bin/env node
 // The behaviour gate: runs a feature's scenario leaves (features/<feature>/scenarios.json) in a real browser.
-// Usage: node scripts/run-scenarios.mjs <feature> [--lang en,zh] [--width 360,390] [--base <url>] [--only <leaf,leaf>]
+// Usage: node scripts/run-scenarios.mjs <feature> [--lang en,zh] [--width 360,390] [--base <url>] [--only <leaf,leaf>] [--jobs N]
 // Format: docs/design-workflow/scenarios.md (the pure tree walk and format checks: scripts/scenario-tree.mjs). Writes review/scenarios-<feature>.json and screenshots under
 // review/scenarios/<feature>/<leaf>/<lang>-<width>/. Exits 1 when any leaf fails.
 import { spawn, execSync } from 'node:child_process';
 import { playwright } from './playwright-path.mjs';
-import { mkdirSync, readFileSync, rmSync, writeFileSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { join, dirname, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createServer } from 'node:net';
-import { walkTree, parseDuration, stepKind } from './scenario-tree.mjs';
-import { timedOutOnly } from './loop-rules.mjs';
+import { walkTree } from './scenario-tree.mjs';
+import { timedOutOnly, aimdStep } from './machine.mjs';
+import { leafRunner, leafRow, reportOf, leafContextPool } from './scenario-runner.mjs';
+import os from 'node:os';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const { chromium } = playwright();
@@ -18,7 +20,7 @@ const { chromium } = playwright();
 // ---- arguments ----
 const argv = process.argv.slice(2);
 const feature = argv.find((a, i) => !a.startsWith('--') && !(argv[i - 1] || '').startsWith('--'));
-if (!feature) { console.error('usage: node scripts/run-scenarios.mjs <feature> [--lang en,zh] [--width 360,390] [--base <url>] [--only a,b]'); process.exit(2); }
+if (!feature) { console.error('usage: node scripts/run-scenarios.mjs <feature> [--lang en,zh] [--width 360,390] [--base <url>] [--only a,b] [--jobs N]'); process.exit(2); }
 const opt = (k) => { const i = argv.indexOf('--' + k); return i >= 0 ? argv[i + 1] : null; };
 const specPath = join(root, 'features', feature, 'scenarios.json');
 if (!existsSync(specPath)) { console.error(`no ${relative(root, specPath)}`); process.exit(2); }
@@ -28,7 +30,6 @@ const langs = (opt('lang') || (D.langs || ['en']).join(',')).split(',').filter(B
 const widths = (opt('width') || (D.widths || [390]).join(',')).split(',').map(Number).filter(Boolean);
 const only = opt('only') ? new Set(opt('only').split(',')) : null;
 const verbs = JSON.parse(readFileSync(join(root, 'ux/laws/strings.json'), 'utf8')).verbs || {};
-const HARD = ['wrong-fact', 'lost-draft', 'dead-end', 'unreachable-control', 'broken-ruling'];
 
 // ---- the tree: walk it into executable leaves (scripts/scenario-tree.mjs) ----
 // A leaf's run = the reset fixture of its nearest `state` ancestor + the steps of every `action` between them + its own.
@@ -51,325 +52,82 @@ base = base.replace(/\/$/, '');
 let commit = 'unknown', dirty = false;
 try { commit = execSync('git rev-parse HEAD', { cwd: root }).toString().trim(); dirty = !!execSync('git status --porcelain --untracked-files=no', { cwd: root }).toString().trim(); } catch {}
 
-// ---- in-page helpers (atlas-bare's step finder, ported; plus the checks) ----
-const PAGE_HELPERS = String.raw`
-window.__scen = (() => {
-  const shown = (el) => !!(el.offsetWidth || el.offsetHeight || el.getClientRects().length) && getComputedStyle(el).visibility !== 'hidden';
-  const norm = (t) => (t || '').replace(/\s+/g, ' ').trim().toLowerCase();
-  const TAPPABLE = 'button,a,[data-action],[role=button],label,summary,[tabindex],input,select,textarea';
-  function phone() { return document.querySelector('.atlas-phone') || document.querySelector('[data-card="0"] .phone') || document.querySelector('.phone, section.device, .tk-phone') || document.body; }
-  function top(ph) {   // the topmost open sheet/dialog in the phone, else the phone
-    const list = [...ph.querySelectorAll('.sheet, [role=dialog]')].filter(shown);
-    return list.length ? list[list.length - 1] : ph;
-  }
-  function scope(where) { const ph = phone(); return where === 'sheet' ? top(ph) : where && where !== 'phone' ? ph.querySelector(where) : ph; }
-  function findStep(rootEl, key) {
-    const k = String(key), want = norm(k); let el, list, i;
-    if (/^[\[.#]/.test(k)) { list = rootEl.querySelectorAll(k); for (i = list.length - 1; i >= 0; i--) if (shown(list[i])) return list[i]; return null; }
-    const all = [...rootEl.querySelectorAll('*')].filter(shown); let best = null;
-    for (el of all) if (norm(el.textContent) === want && (!best || best.contains(el))) best = el;
-    if (best) { const t = best.closest(TAPPABLE); return t && rootEl.contains(t) ? t : best; }
-    for (el of all) if (el.matches(TAPPABLE) && norm(el.textContent).indexOf(want) === 0 && (!best || best.contains(el))) best = el;
-    if (best) return best;
-    for (el of all) if (norm(el.getAttribute('aria-label')) === want || norm(el.getAttribute('title')) === want) return el;
-    return null;
-  }
-  function find(key) {   // the top sheet first (a drawer covers the room behind it), then the phone, then same-origin iframes
-    const ph = phone(), t = top(ph);
-    let el = (t !== ph && findStep(t, key)) || findStep(ph, key);
-    if (el) return el;
-    for (const fr of ph.querySelectorAll('iframe')) { let d = null; try { d = fr.contentDocument; } catch (e) {} if (d && d.body && (el = findStep(d.body, key))) return el; }
-    return null;
-  }
-  // An exit verb may be an icon button named by its aria-label (the page header's Back, Headers law 2026-10-13).
-  function hasName(where, text) {
-    const s = scope(where); if (!s) return false;
-    const want = norm(text);
-    return [...s.querySelectorAll('button[aria-label],a[aria-label],[role="button"][aria-label]')].some((n) => shown(n) && norm(n.getAttribute('aria-label')) === want);
-  }
-  function hasText(where, text) {
-    const s = scope(where); if (!s) return false;
-    const want = norm(text);
-    const walker = document.createTreeWalker(s, NodeFilter.SHOW_ELEMENT);
-    for (let n = walker.currentNode; n; n = walker.nextNode()) if (shown(n) && norm(n.innerText).includes(want)) {
-      // the smallest element that holds it must be visible
-      const kids = [...n.children].filter((c) => shown(c) && norm(c.innerText).includes(want));
-      if (!kids.length) return true;
-    }
-    return false;
-  }
-  function elState(where, sel) {
-    const s = scope(where); if (!s) return 'absent';
-    const el = [...s.querySelectorAll(sel)].filter(shown).pop();
-    if (!el) return 'absent';
-    return el.disabled || el.getAttribute('aria-disabled') === 'true' ? 'disabled' : 'enabled';
-  }
-  function clipped(width) {   // text that is cut off: past the phone's right edge, or hidden by its own box
-    const ph = phone(), pr = ph.getBoundingClientRect(), out = [];
-    for (const el of ph.querySelectorAll('*')) {
-      if (!shown(el) || el.closest('[aria-hidden=true],[inert],.page-background,iframe,svg')) continue;
-      const own = [...el.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim());
-      if (!own) continue;
-      const r = el.getBoundingClientRect(); if (r.width === 0 || r.bottom < pr.top || r.top > pr.bottom) continue;
-      let scroller = el.parentElement, inScroll = false;
-      while (scroller && scroller !== ph) { const ox = getComputedStyle(scroller).overflowX; if (ox === 'auto' || ox === 'scroll') { inScroll = true; break; } scroller = scroller.parentElement; }
-      if (inScroll) continue;
-      const cs = getComputedStyle(el);
-      const cut = r.right > pr.left + width + 1 || r.left < pr.left - 1 || ((cs.overflow === 'hidden' || cs.overflowX === 'hidden' || cs.textOverflow === 'ellipsis') && el.scrollWidth > el.clientWidth + 1);
-      if (cut) out.push((el.innerText || '').replace(/\s+/g, ' ').trim().slice(0, 40) + ' <' + el.tagName.toLowerCase() + (el.className && typeof el.className === 'string' ? '.' + el.className.split(' ')[0] : '') + '>');
-      if (out.length >= 6) break;
-    }
-    return out;
-  }
-  function record(expr) {
-    const F = window.FarrowingStudy || {}, s = F.states && F.states[0], c = F.room ? F.room(0) : null;
-    const sum = (a) => a.reduce((x, y) => x + y, 0);
-    return new Function('s', 'c', 'F', 'sum', 'return (' + expr + ');')(s, c, F, sum);
-  }
-  function backTarget() { return top(phone()); }
-  return { find, hasText, hasName, elState, clipped, record, backTarget, current: () => (window.AtlasBare && window.AtlasBare.current ? window.AtlasBare.current() : null), lang: () => document.documentElement.lang };
-})();`;
-
-const textOf = (a, lang) => {
-  if (a.verb) { const v = verbs[a.verb]; if (!v) return { err: `verb "${a.verb}" is not in ux/laws/strings.json` }; return { text: lang === 'zh' ? v.zh : a.verb }; }
-  if (typeof a.text === 'string') return lang === 'en' ? { text: a.text } : { skip: `no ${lang} copy given` };
-  if (a.text && typeof a.text === 'object') return a.text[lang] ? { text: a.text[lang] } : { skip: `no ${lang} copy given` };
-  return null;
-};
-
-async function checkOne(page, a, lang, width, noLocale = false) {
-  // returns null when it holds, else { got }; copy checks are skipped in a language the page does not render
-  await ensureHelpers(page);
-  if (noLocale && (a.verb || a.text)) return { skipped: `page does not render ${lang}` };
-  if ('expr' in a) {
-    let got; try { got = await page.evaluate((e) => window.__scen.record(e), a.expr); } catch (e) { return { got: 'error: ' + e.message.split('\n')[0] }; }
-    return got === true ? null : { got: JSON.stringify(got) };
-  }
-  if (a.screen) { const got = await page.evaluate(() => window.__scen.current()); return got === a.screen ? null : { got: String(got) }; }
-  if (a.el) {
-    const got = await page.evaluate(([w, s]) => window.__scen.elState(w, s), [a.in || 'phone', a.el]);
-    const want = a.is || 'present';
-    const ok = want === 'present' ? got !== 'absent' : got === want;
-    return ok ? null : { got };
-  }
-  if (a.noClip) { const got = await page.evaluate((w) => window.__scen.clipped(w), width); return got.length ? { got: got.join(' | ') } : null; }
-  const t = textOf(a, lang);
-  if (t?.err) return { got: t.err };
-  if (t?.skip) return { skipped: t.skip };
-  if (t) {
-    const has = await page.evaluate(([w, x, v]) => window.__scen.hasText(w, x) || (v && window.__scen.hasName(w, x)), [a.in || 'phone', t.text, !!a.verb]);
-    return has === !a.absent ? null : { got: has ? 'present' : 'absent', want: t.text };
-  }
-  return { got: 'unknown assertion ' + JSON.stringify(a) };
-}
-async function ensureHelpers(page) { if (!(await page.evaluate(() => !!window.__scen).catch(() => false))) await page.evaluate(PAGE_HELPERS); }
-const describe = (a) => a.says || (a.expr ? a.expr : a.verb ? `"${a.verb}" ${a.absent ? 'absent' : 'shown'}` : a.el ? `${a.el} ${a.is || 'present'}` : a.screen ? `on ${a.screen}` : a.noClip ? 'nothing clipped' : `"${typeof a.text === 'string' ? a.text : a.text?.en}" ${a.absent ? 'absent' : 'shown'}`);
-
-async function settle(page) {
-  await page.waitForLoadState('domcontentloaded').catch(() => {});
-  await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)))).catch(() => {});
-  await page.waitForTimeout(120);
-}
-
-async function tap(page, step) {
-  const key = typeof step === 'string' ? step : step.tap;
-  await ensureHelpers(page);
-  const handle = await page.evaluateHandle((k) => window.__scen.find(k), key);
-  const el = handle.asElement();
-  if (!el) return `control not found: ${key}`;
-  try {
-    if (step.hold) {
-      await el.scrollIntoViewIfNeeded({ timeout: 2000 });
-      const box = await el.boundingBox();
-      if (!box) return `control has no box: ${key}`;
-      // the press must land on the control itself, not on whatever covers it
-      const hit = await el.evaluate((n, [x, y]) => { const t = n.ownerDocument.elementFromPoint(x, y); return !!t && (n === t || n.contains(t)); }, [box.x + box.width / 2, box.y + box.height / 2]);
-      if (!hit) return `control is covered: ${key}`;
-      await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
-      await page.mouse.down(); await page.waitForTimeout(step.hold); await page.mouse.up();
-    } else {
-      await el.click({ timeout: 2500 });
-    }
-  } catch (e) { return `control not tappable: ${key} (${e.message.split('\n')[0]})`; }
-  await settle(page);
-  return null;
-}
-
-const slug = (s) => String(typeof s === 'string' ? s : s.tap || s.fill || s.says || 'check').replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '').toLowerCase().slice(0, 32) || 'step';
-// how a step reads in screenshots and failures
-const stepName = (s) => { const k = stepKind(s); return k === 'tap' ? (typeof s === 'string' ? s : s.tap) : k === 'offline' ? (s.offline ? 'offline' : 'online') : k === 'advance' ? 'advance ' + s.advance : k === 'device' ? 'device ' + s.device : k || 'step'; };
-
-// The phone's own Back: the browser history back when the page has an earlier entry (the Navigation API's canGoBack;
-// the blank start page does not count), else the Escape key, which is what the prototypes (farrowing-astra-concept.js,
-// home-astra-prototype.js) listen to as "dismiss / Back the top surface". The key is sent to the topmost open sheet
-// (or the phone) so it reaches the prototype's own handler. The prototypes only replaceState, so today this is Escape.
-async function systemBack(page) {
-  if (await page.evaluate(() => typeof navigation !== 'undefined' && navigation.canGoBack).catch(() => false)) {
-    await page.goBack({ waitUntil: 'domcontentloaded', timeout: 3000 }); await settle(page); return 'history';
-  }
-  await ensureHelpers(page);
-  await page.evaluate(() => { const t = window.__scen.backTarget(); (document.activeElement && t.contains(document.activeElement) ? document.activeElement : t).dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', code: 'Escape', keyCode: 27, bubbles: true, cancelable: true })); });
-  await settle(page);
-  return 'escape';
-}
-
-async function runLeaf(browser, leaf, lang, width) {
-  const n = leaf.node, st = leaf.state, fx = st.reset || {};
-  const dir = join(root, 'review', 'scenarios', feature, n.id, `${lang}-${width}`);
-  rmSync(dir, { recursive: true, force: true }); mkdirSync(dir, { recursive: true });
-  const evidence = [], failures = [], skipped = [], notes = [], errors = [];
-  const clock = n.clock || st.clock || D.clock;
-  const needsClock = !!clock || leaf.taps.some((s) => stepKind(s) === 'advance');   // a leaf that lets time pass gets a clock even if it fixes none
-  const startMs = clock ? new Date(clock).getTime() : Date.now();
-  const devices = {}, contexts = [];   // device "a" is the phone the leaf starts on; "b" opens on first use
-  let page = null, cur = null, elapsed = 0, i = 0;
-  const shot = async (label) => { const f = join(dir, `${String(i++).padStart(2, '0')}-${slug(label)}.png`); await page.screenshot({ path: f }).catch(() => {}); evidence.push(relative(root, f).replace(/\\/g, '/')); };
-  const fail = (what, got, tag, at) => failures.push({ what, got, tag: tag || null, at });
-
-  // one device = its own browser context (own storage, own network, own clock) on the leaf's reset fixture
-  async function openDevice(name) {
-    const context = await browser.newContext({ viewport: { width, height: D.height || 844 }, deviceScaleFactor: 1, locale: lang === 'zh' ? 'zh-CN' : 'en-GB' });
-    contexts.push(context);
-    // the phone is drawn at the run's width (atlas-bare pins it to 390; the runner overrides that, nothing in the page changes)
-    await context.addInitScript((w) => {
-      const css = `html.atlas-bare,html.atlas-bare body{width:${w}px!important}html.atlas-bare .atlas-phone{width:${w}px!important}`;
-      const add = () => { const s = document.createElement('style'); s.textContent = css; document.head.appendChild(s); };
-      if (document.head) add(); else document.addEventListener('DOMContentLoaded', add);
-    }, width);
-    const pg = await context.newPage();
-    const tag = name === 'a' ? '' : `device ${name}: `;
-    pg.on('pageerror', (e) => errors.push(tag + e.message));
-    pg.on('console', (m) => { if (m.type() === 'error' && /atlas-bare: step not found/.test(m.text())) errors.push(tag + m.text()); });
-    if (needsClock) await pg.clock.install({ time: new Date(startMs + elapsed) });   // a second device joins at the same moment
-    const url = new URL(base + (fx.url || D.url));
-    if (fx.screen) url.searchParams.set('screen', fx.screen);
-    for (const [k, v] of Object.entries(fx.params || {})) url.searchParams.set(k, v);
-    if (lang !== 'en') url.searchParams.set('lang', lang);
-    await pg.goto(url.href);
-    if (fx.screen) await pg.waitForSelector('html.atlas-ready', { timeout: 8000 });
-    await settle(pg);
-    if (fx.preset) {   // the reset fixture: the prototype's own deterministic seed for this preset
-      const ok = await pg.evaluate((p) => { const sel = document.querySelector('select.scenario'); if (!sel || ![...sel.options].some((o) => o.value === p)) return false; if (sel.value !== p) { sel.value = p; sel.dispatchEvent(new Event('change', { bubbles: true })); } return true; }, fx.preset);
-      if (!ok) throw new Error(`preset "${fx.preset}" is not in the page`);
-      await settle(pg);
-    }
-    for (const t of fx.taps || []) { const e = await tap(pg, t); if (e) throw new Error('fixture: ' + e); }
-    await ensureHelpers(pg);
-    if (lang !== 'en' && name === 'a') {   // the locale probe: does the page render this language at all?
-      const back = verbs.Back?.[lang];
-      const ok = back && await pg.evaluate((x) => window.__scen.hasText('phone', x) || window.__scen.hasName('phone', x), back);
-      if (!ok) notes.push(`no ${lang} rendering: ?lang=${lang} is ignored (no "${back}")`);
-    }
-    return { name, context, page: pg, offline: false };
-  }
-
-  let stepFailed = false;
-  try {
-    cur = devices.a = await openDevice('a'); page = cur.page;
-    await shot('start');
-    for (const step of leaf.taps) {
-      const kind = stepKind(step);
-      if (kind === 'expect') {
-        for (const a of [].concat(step.expect)) { const r = await checkOne(page, a, lang, width, notes.length > 0); if (r?.skipped) skipped.push(describe(a)); else if (r) fail(describe(a), r.got, a.hard, `after step ${i - 1}`); }
-        continue;
-      }
-      if (kind === 'fill') {   // the field is on the page, or in a same-origin iframe of it (the embedded pig profile)
-        await ensureHelpers(page);
-        let loc = page.locator(step.fill);
-        if (!(await loc.count())) for (const fr of page.frames()) if (fr !== page.mainFrame() && (await fr.locator(step.fill).count())) { loc = fr.locator(step.fill); break; }
-        await loc.last().fill(String(step.value)); await settle(page); await shot('fill-' + step.fill); continue;
-      }
-      if (kind === 'wait') { await page.waitForTimeout(step.wait); continue; }
-      if (kind === 'reload') {   // an interruption: the app is closed and opened again on the same device
-
-        await page.reload(); if (fx.screen) await page.waitForSelector('html.atlas-ready', { timeout: 8000 });
-        await settle(page); await shot('reload'); continue;
-      }
-      if (kind === 'offline' || kind === 'advance' || kind === 'back' || kind === 'device') {   // the other interruptions
-        try {
-          if (kind === 'offline') { await cur.context.setOffline(step.offline); cur.offline = step.offline; await settle(page); }
-          else if (kind === 'advance') {   // time passes for every device at once
-            const ms = parseDuration(step.advance); elapsed += ms;
-            for (const d of Object.values(devices)) await d.page.clock.fastForward(ms);
-            await settle(page);
-          } else if (kind === 'back') await systemBack(page);
-          else {   // a second phone opens on the same reset fixture the first time; later steps act on this one
-            if (!devices[step.device]) devices[step.device] = await openDevice(step.device);
-            cur = devices[step.device]; page = cur.page; await page.bringToFront().catch(() => {}); await settle(page);
-          }
-        } catch (e) { fail(stepName(step), e.message.split('\n')[0], 'dead-end', `step ${i - 1}`); stepFailed = true; await shot(stepName(step)); break; }
-        await shot(stepName(step)); continue;
-      }
-      const e = await tap(page, step);
-      await shot(step);
-      if (e) { fail(`tap ${stepName(step)}`, e, step.hard || 'unreachable-control', `step ${i - 1}`); stepFailed = true; break; }
-    }
-    if (!stepFailed) {
-      for (const a of n.visible || []) { const r = await checkOne(page, a, lang, width, notes.length > 0); if (r?.skipped) skipped.push(describe(a)); else if (r) fail(describe(a), r.got, a.hard); }
-      for (const a of n.record || []) { const r = await checkOne(page, a, lang, width); if (r) fail(describe(a), r.got, a.hard); }
-      if (n.clip !== false && D.clipCheck !== false) { const r = await checkOne(page, { noClip: true }, lang, width); if (r) fail('nothing clipped', r.got, null); }
-    }
-    for (const e of errors) fail('no page errors', e, null);
-  } catch (e) {
-    fail('run', e.message.split('\n')[0], 'dead-end'); if (page) await shot('error');
-  }
-  for (const c of contexts) await c.close().catch(() => {});
-  let result = failures.length ? 'fail' : 'pass';
-  if (notes.length && result === 'pass') result = 'blocked';   // the screens can't run in this language: never counted as covered
-  return { lang, width, result, failures, skipped, notes, evidence };
-}
+// Contexts are reused between runs and cleared in between (leafContextPool): fresh ones per run ran Windows out of sockets.
+const pool = leafContextPool();
+const runLeaf = leafRunner({ base, defaults: D, verbs, evidenceDir: join(root, 'review', 'scenarios', feature), relativeTo: root, pool });
 
 // A run whose only failure is a navigation timeout (the machine was busy, not the design) runs once more in fresh contexts.
 // Timing out again fails it as a slow machine, never as a design failure; an assertion failure never retries.
 async function runWithRetry(browser, leaf, lang, width) {
   const first = await runLeaf(browser, leaf, lang, width);
-  if (first.result !== 'fail' || !timedOutOnly(first.failures)) return first;
-  console.log(`retry    ${leaf.node.id} ${lang}-${width}: ${first.failures[0].got}`);
+  // A machine error: only navigation timeouts, or the page failed to receive one of its own files (a page error such as an
+  // undefined namespace then follows from that, not from the design). Every other failure stands as it is.
+  const machine = (r) => timedOutOnly(r.failures) || (r.loadFailures || []).length > 0;
+  if (first.result !== 'fail' || !machine(first)) return first;
+  console.log(`retry    ${leaf.node.id} ${lang}-${width}: ${(first.loadFailures || [])[0] ? 'a file did not load: ' + first.loadFailures[0] : first.failures[0].got}`);
   const again = await runLeaf(browser, leaf, lang, width);
-  again.retried = first.failures.map((f) => f.got);
-  if (again.result === 'fail' && timedOutOnly(again.failures)) {
+  again.retried = [...first.failures.map((f) => f.got), ...(first.loadFailures || [])];
+  if (again.result === 'fail' && machine(again)) {
     again.slow = true;
-    again.failures = again.failures.map((f) => ({ ...f, what: `slow machine (timed out twice): ${f.what}`, tag: null }));
+    const why = (again.loadFailures || []).length ? `a file did not load twice (${again.loadFailures[0]})` : 'timed out twice';
+    again.failures = again.failures.map((f) => ({ ...f, what: `slow machine (${why}): ${f.what}`, tag: null }));
   }
   return again;
 }
 
 // ---- run ----
+// Every run (a leaf in one language at one width) opens its own contexts on its reset fixture and writes its own evidence folder,
+// so runs share nothing and several go at once in one browser. How many is found as it goes (aimdStep: start at 2, add one while
+// runs stay as fast as the first ones, halve on a timeout or when they slow down, at most 4 by default). --jobs N (or
+// SENTRI_SCENARIO_JOBS) fixes it instead; --jobs 1 is the old one-by-one order. Results are put back in leaf order, so the report
+// and the log read the same however many ran at once.
+const fixed = Number(opt('jobs') || process.env.SENTRI_SCENARIO_JOBS) || 0;
 const browser = await chromium.launch();
 const out = [];
-for (const leaf of leaves) {
-  const n = leaf.node;
-  if (only && !only.has(n.id)) continue;
-  const row = { id: n.id, tree: n.tree || null, branch: leaf.branch, label: n.label, gwt: n.gwt || null, path: leaf.path, authority: n.authority || [], result: null, hard: [], runs: [] };
-  if (n.type === 'decision-blocker') { row.result = 'blocked'; row.question = n.question; row.sources = n.sources; out.push(row); console.log(`blocked  ${n.id}  ${n.question || ''}`); continue; }
-  if (n.status === 'pending') { row.result = 'pending'; row.why = n.why || ''; out.push(row); console.log(`pending  ${n.id}`); continue; }
-  for (const lang of n.langs || langs) for (const width of n.widths || widths) row.runs.push(await runWithRetry(browser, leaf, lang, width));
-  row.result = row.runs.some((r) => r.result === 'fail') ? 'fail' : row.runs.some((r) => r.result === 'blocked') ? 'blocked' : 'pass';
-  if (row.result === 'fail' && row.runs.every((r) => r.result !== 'fail' || r.slow)) row.slow = true;
-  row.hard = [...new Set(row.runs.flatMap((r) => r.failures.map((f) => f.tag)).filter((t) => HARD.includes(t)))];
-  out.push(row);
-  const first = row.runs.flatMap((r) => r.failures.map((f) => `${r.lang}-${r.width}: ${f.what} → ${f.got}`))[0] || '';
-  console.log(`${row.result.padEnd(8)} ${n.id}${row.hard.length ? '  [' + row.hard.join(', ') + ']' : ''}${first ? '  ' + first.slice(0, 160) : ''}`);
+const runnable = leaves.filter((l) => (!only || only.has(l.node.id)) && l.node.type !== 'decision-blocker' && l.node.status !== 'pending');
+const tasks = runnable.flatMap((leaf) => (leaf.node.langs || langs).flatMap((lang) => (leaf.node.widths || widths).map((width) => ({ leaf, lang, width }))));
+const done = new Map();
+{
+  const cores = Math.max(1, os.cpus().length);
+  // At most 4 at once by default: measured clean on this machine; 8 produced a false failure (2026-10-16). SENTRI_SCENARIO_MAX raises it.
+  const ceiling = Math.max(1, Math.min(cores, Number(process.env.SENTRI_SCENARIO_MAX) || 4));
+  let ctl = { limit: fixed ? Math.max(1, fixed) : Math.min(2, ceiling), min: 1, max: fixed ? Math.max(1, fixed) : ceiling, baseline: null };
+  let next = 0, inflight = 0, peak = ctl.limit;
+  const t0 = Date.now();
+  await new Promise((resolve) => {
+    const pump = () => {
+      if (next >= tasks.length && inflight === 0) return resolve();
+      while (inflight < ctl.limit && next < tasks.length) {
+        const t = tasks[next++], s = Date.now(); inflight++;
+        runWithRetry(browser, t.leaf, t.lang, t.width).catch((e) => ({ lang: t.lang, width: t.width, result: 'fail', failures: [{ what: 'run', got: String((e && e.message) || e), tag: null }], skipped: [], notes: [], evidence: [] })).then((r) => {
+          done.set(t, r); inflight--;
+          if (!fixed) { const { state, why } = aimdStep(ctl, { ms: Date.now() - s, timedOut: !!r.retried }); if (why && state.limit !== ctl.limit) console.log(`at once: ${ctl.limit} → ${state.limit} (${why})`); ctl = state; peak = Math.max(peak, ctl.limit); }
+          pump();
+        });
+      }
+    };
+    pump();
+  });
+  console.log(`ran ${tasks.length} run(s) in ${Math.round((Date.now() - t0) / 1000)}s, ${fixed ? `${ctl.limit} at once (--jobs)` : `up to ${peak} at once (adaptive, ${cores} cores)`}`);
 }
+for (const leaf of leaves) {
+  if (only && !only.has(leaf.node.id)) continue;
+  const row = leafRow(leaf, tasks.filter((t) => t.leaf === leaf).map((t) => done.get(t)));
+  out.push(row);
+  if (row.result === 'blocked' && 'question' in row) { console.log(`blocked  ${row.id}  ${row.question || ''}`); continue; }
+  if (row.result === 'pending') { console.log(`pending  ${row.id}`); continue; }
+  const first = row.runs.flatMap((r) => r.failures.map((f) => `${r.lang}-${r.width}: ${f.what} → ${f.got}`))[0] || '';
+  console.log(`${row.result.padEnd(8)} ${row.id}${row.hard.length ? '  [' + row.hard.join(', ') + ']' : ''}${first ? '  ' + first.slice(0, 160) : ''}`);
+}
+await pool.close();
 await browser.close();
 if (server) server.kill();
 
-const count = (r) => out.filter((x) => x.result === r).length;
-const byBranch = {};
-for (const x of out) { const b = byBranch[x.branch] || (byBranch[x.branch] = { pass: 0, fail: 0, blocked: 0, pending: 0 }); b[x.result]++; }
-const byLang = {};   // per language: a leaf passes in a language when every width passed there
-for (const x of out) for (const lang of new Set(x.runs.map((r) => r.lang))) {
-  const rs = x.runs.filter((r) => r.lang === lang), b = byLang[lang] || (byLang[lang] = { pass: 0, fail: 0, blocked: 0 });
-  b[rs.some((r) => r.result === 'fail') ? 'fail' : rs.some((r) => r.result === 'blocked') ? 'blocked' : 'pass']++;
-}
-const report = {
-  feature, commit, dirty, ran: new Date().toISOString(), base, langs, widths,
-  nodes: nodeCount, summary: { pass: count('pass'), fail: count('fail'), blocked: count('blocked'), pending: count('pending'), slow: out.filter((x) => x.slow).length }, byLang, byBranch,
-  hardFailures: out.filter((x) => x.hard.length).map((x) => ({ id: x.id, hard: x.hard })),
-  leaves: out,
-};
+const report = reportOf({ feature, commit, dirty, base, langs, widths, nodeCount, rows: out });
+const byLang = report.byLang;
 const reportPath = join(root, 'review', `scenarios-${feature}.json`);
 if (!only) writeFileSync(reportPath, JSON.stringify(report, null, 1) + '\n');
+if (opt('report')) writeFileSync(opt('report'), JSON.stringify(report, null, 1) + '\n');   // --report <file>: the report for an --only run too (the gate compares base and candidate by it)
 console.log(`\n${feature} @ ${commit.slice(0, 7)}${dirty ? ' (dirty)' : ''}: pass ${report.summary.pass} · fail ${report.summary.fail}${report.summary.slow ? ` (${report.summary.slow} only a slow machine: timed out twice, not a design failure)` : ''} · blocked ${report.summary.blocked} · pending ${report.summary.pending}${only ? '' : '  → ' + relative(root, reportPath)}`);
 for (const [l, b] of Object.entries(byLang)) console.log(`  ${l}: pass ${b.pass} · fail ${b.fail} · blocked ${b.blocked} (leaves that ran)`);
 process.exit(report.summary.fail ? 1 : 0);

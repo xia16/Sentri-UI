@@ -1,11 +1,11 @@
 {
   "verbs": {
-    "Back": {"meaning": "leave a screen and keep any draft on the device; pure navigation", "zh": "返回"},
+    "Back": {"meaning": "leave a screen and keep any draft on the device; pure navigation. In a drawer with levels it goes up one level, and leaves at the first (owner ruling B, 2026-10-16)", "zh": "返回"},
     "Clear": {"meaning": "empty what was entered or ticked (typed input, picks, a selection); a quiet text action at the top right of the sheet header, present only while there is something to empty", "zh": "清除"},
     "Reset": {"meaning": "restore a filter's defaults; a quiet text action at the top right of the filter sheet header; commits nothing until the commit", "zh": "重置"},
     "Done": {"meaning": "apply a picker's choices and close it, always with its count ('Done · 2'); records nothing", "zh": "完成"},
     "Add": {"meaning": "put a new named option into a list and choose it (a brand, a custom condition); records nothing until the record is saved", "zh": "添加"},
-    "Close": {"meaning": "leave a sheet that saves per tap; names the sheet, not the data", "zh": "关闭"},
+    "Close": {"meaning": "leave a sheet that saves per tap; names the sheet, not the data. Also the ✕ at the top left of a drawer with levels (its accessible name): leaves the whole drawer from any level and keeps the draft, as Back does at the first level (owner ruling B, 2026-10-16)", "zh": "关闭"},
     "Delete": {"meaning": "erase an attachment (a photo) for good; destructive, red, asks first", "zh": "删除"},
     "Edit": {"meaning": "correct something already posted; stamped, original kept, corrected value amber", "zh": "修改"},
     "End task": {"meaning": "close the task for the batch; manual only, hold-to-commit, with a receipt", "zh": "结束任务"},

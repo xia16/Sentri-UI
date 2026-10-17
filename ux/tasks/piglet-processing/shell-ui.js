@@ -8,7 +8,7 @@
      toolRow       Candidate:ToolRow — farrowing's in-sheet tools (Edit · Record dead · Set count · Move), skeleton pages
    Plus the words every page stamps with: span, stamp, date, ago; and note, a status line at the top of a body. Needs window.SentriUI and PP. */
 (function () {
-  var UI = window.SentriUI, ICON = window.SentriIcons;
+  const UI = window.SentriUI, ICON = window.SentriIcons;
   var U = (window.PPUI = {});
 
   function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }

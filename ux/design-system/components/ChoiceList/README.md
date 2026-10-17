@@ -22,6 +22,7 @@ Group heading (optional); lead control (optional); option label; meta line (opti
 - **Multi** (`multi`): use for independent values with trailing checkboxes; use single for one value instead.
 - **Radio rows** (`radio`): use for two to four recorded outcomes with visible rings; use PickerField for five or more outcomes instead.
 - **Inline Choice** (`inline`): use for two or three short required outcomes in one 60px row; use radio rows for long labels, and an optional row for an optional input.
+- **Inline Choice, key face** (`inline` with `face: 'key'`, candidate): the same radiogroup drawn as two or three boxed keys in the Stepper row's right column, for a required No / Yes among Stepper rows and Measures (Finish farrowing: Assisted). Each key is the stepper key's face: `paper`, 1px `task-key-border`, `radius-control`, 16px/500, 44px tall in a 48px hit area, an 8px gap; the column runs from the first key's left edge to the last key's right edge (136px). The chosen key takes the selected mark, a 2px `ink` ring and a 600 label, never a fill. Pressed is the keys' press (`press`, scale .96). A row of this face carries a 1px `line` below it, none when last, like a Stepper row. Opt-in: every other inline caller renders as before. Use it only for a required answer; an optional one stays an optional row.
 
 ## States
 
@@ -39,7 +40,7 @@ Every state is in `variants/<id>.html`, drawn in its real container: navigate, s
 
 ## Behaviour
 
-Show at most eight rows before search. A single-choice sheet (Care: No action needed / Monitor / Treat in place / Move to hospital pen; a Brand list) is a drawer sized to its rows, on the bottom edge, with Back alone in its footer: a tap on a row commits and closes. A way to add an option ("Add a brand") is the last row, a navigate row that opens a level of the same drawer (‹ Brand) with a labelled field and its own commit ("Add brand"). Single rows toggle `aria-pressed` and commit; multi rows are whole-row labels around a native checkbox; navigate rows open the next level and show a chevron. Meta appears only when it distinguishes options: a group count such as "2 selected" appears only above zero, and a plain option count adds nothing. Clear appears only while an optional field has a value and returns the screen reader's focus to the group. Do not duplicate a selected row in a second list.
+Show at most eight rows before search. A single-choice sheet (Care: No action needed / Monitor / Treat in place / Move to hospital pen; a Brand list) is a drawer sized to its rows, on the bottom edge, with Back alone in its footer: a tap on a row commits and closes. A way to add an option ("Add a brand") is the last row, a navigate row that opens a level of the same drawer ("Add a brand") with a labelled field and its own commit ("Add brand"). Such a drawer has levels (owner ruling B, 2026-10-16): the footer's Back goes up one level (from "Add a brand" to the list; at the list it leaves), and a ✕ at the top left closes the whole drawer from any level. Single rows toggle `aria-pressed` and commit; multi rows are whole-row labels around a native checkbox; navigate rows open the next level and show a chevron. Meta appears only when it distinguishes options: a group count such as "2 selected" appears only above zero, and a plain option count adds nothing. Clear appears only while an optional field has a value and returns the screen reader's focus to the group. Do not duplicate a selected row in a second list.
 
 ## Content rules
 
@@ -51,7 +52,7 @@ Rows meet `tap-min` (radio and inline rows `radio-row-min`). Single rows expose 
 
 ## API and tokens
 
-`choiceRow`, `choiceGroup`, `choiceSearch`, `choiceEmpty`, `choiceRadios`, `radioBind`; `pickerOptions` is a compatibility adapter. `secondaryAction` exposes a separately named removal control. `labelHidden` hides only the field label when an enclosing optional row already names it; the accessible label and Clear remain. Types in `../index.d.ts`.
+`choiceRow`, `choiceGroup`, `choiceSearch`, `choiceEmpty`, `choiceRadios` (`layout: 'inline'`, `face: 'key'`), `radioBind`; `pickerOptions` is a compatibility adapter. `secondaryAction` exposes a separately named removal control. `labelHidden` hides only the field label when an enclosing optional row already names it; the accessible label and Clear remain. Types in `../index.d.ts`.
 
 Tokens: `tap-min`, `choice-row-min`, `radio-row-min`, `rule`, `paper`, `ink`, `muted`, `green`, `choice-press`, `disabled-surface`, `font-sans`, `font-size-14`, `type-weight-strong`, `space-8`, `space-12`, `size-20`, `size-24`.
 
@@ -87,6 +88,10 @@ Component: generic and shared across sections. Selection modes are variants of t
 Wheels (`UIPickerView`, `NumberPicker`) are for long ordered values only (dates, times, numbers), never for named options: they are poor with gloves and hide options a farmer should see at once.
 
 ## Changelog
+
+2026-10-16 (owner ruling B): a drawer with levels has no "‹ Parent": the title names the level, the footer's Back goes up one level, a ✕ at the top left closes the whole drawer. The multi variant's specimens (a level of a cascade) carry the ✕ and a Back that goes up.
+
+2026-10-15 (Finish farrowing): the inline key face (`face: 'key'`), variant `inline-key`, used by Finish farrowing's Assisted (No preselected, no Clear) and Edit finish details.
 
 2026-10-10 (multi-choice family): single-choice sheets have Back alone and sit on the bottom edge; specimens drawn in the phone; Native mapping.
 

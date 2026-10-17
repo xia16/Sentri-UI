@@ -32,7 +32,7 @@ Scope of this change: `farrowing.search` and `farrowing.scan` (and the screens a
 | Empty messages | page-built | none | page-built |
 | Selection bar | none | the Room dock (`.room-dock`) + Button | **fix**: the room's dock |
 | Actions sheet | none | Sheet drawer + Row navigation (the existing More actions rows) | **fix**: component |
-| Stop glyph | none in the registry | Icon | added once, in `farrowing-icons.js`, until the registry takes it |
+| Stop glyph | none in the registry | Icon | `stop`, in the shared registry |
 
 ## Self-crit
 
@@ -395,3 +395,77 @@ Held against the Farrowing room (its dock: one dark primary, Back outlined) and 
 - Reach: 50 screens move, all of them rendering a disabled or waiting control: environment (page, sensor-week, sensor-other), farrowing 14 (before, death, leave-edit, edit, born, task-blocked, edit-finished, foster, reconcile, pen-note, pen-fault, piglet-care, piglet-identity, piglet-death), piglet-processing 13 (sheet-coming, sheet-todo, sheet-breeders, sheet-late, sheet-done, sheet-notch, adjust-count, give-ids, counts, weight, record-death, move-piglets, set-count), pregnancy.check, feed-plan (editor, end-date), pig-list.health, pig-profile 7 (production-task, miscarriage, batch-membership, measure, body-condition, note, not-in-pig), health-record 5 (record-health, condition-picker, care-instructions, resolve-conditions, treatment), fostering (type, receive, result), move.transfer-sow. 4 more differ in one shot only by under 0.04% (assistant.finding and farrowing.search-results, which the gate marks unstable on base; farrowing.search-none, piglet-processing.more-actions): identical by eye, render noise. 237 identical; none broken.
 - Every moved screen: only the waiting footer button (dashed rim), a floor key (dashed, `ink-2` glyph), a disabled picker (Move's Destination pen: solid rim to dashed) or the Environment fan controls changed; layout, copy and the 360 Chinese footers are unchanged.
 - **Better because** unavailable is now said by the face and the rim, never by faded words, and no waiting control looks live.
+
+---
+
+# Finish farrowing: one titled condition form (2026-10-15)
+
+Scope: `farrowing.finish` and `farrowing.edit-finished` (the Finish sheet, and the "Edit finish details" form that shares its fields). Change class: behaviour (Assisted is a required No / Yes, No preselected) with an opt-in shared-component variant (ChoiceList's boxed key face, Measure's row layout). Mode: polish. Owner ruling 2026-10-15: the design is decided (option "Ink ring" of `ux/system/finish-form-rhythm.html`); there are no competing directions, so each render is judged against its baseline. Baseline: `c4f98e2` (the worktree base), `node scripts/shoot-screens.mjs <out> --screens farrowing.finish,farrowing.edit-finished --widths 390 --langs en`, plus the answered and open-field states of the old optional chips.
+
+## Keep
+
+- **The Born · Alive · Dead totals panel.** One look at what was counted; the first question on this sheet ("is the count right before I lock it?"). Unchanged.
+- **The Weak and Deformed steppers** (Stepper `row`: label left, `− n +` right, a rule between rows, 60px). They are the sheet's real questions and each tap saves at once; their behaviour and the 136px right column are the grid the new rows follow.
+- **The footer: Back and the Finish farrowing hold** (56px, HOLD TO FINISH). Unchanged.
+- **Litter weight and Assisted remain facts the worker can record at finish**, and read as before on the locked record.
+
+## Problems
+
+- **major** The two boxed optional chips (`+ Litter weight`, `+ Assistance`) outweigh the questions above them: two filled, bordered half-width boxes under two quiet rows, the inverse of the hierarchy (Weak and Deformed are the questions; the chips are afterthoughts). Evidence: `base/farrowing.finish/en-390.png`; owner 2026-10-15 ("no boxed optional rows").
+- **major** The chips reflow and swap places after an answer, so targets move under the thumb. Evidence (baseline probe at 390): Litter weight is at y 673 before Assistance is answered and at y 533 after, and widens from 172px to full width; the answered Assistance row and its radios take over the space.
+- **major** The answer renders detached under the wrong chip: after tapping Litter weight the field sits below Assistance (`base-weight-open.png`); after tapping Assistance its No / Yes radios sit under the row, and a Clear. The worker reads a question and finds its answer under a different one.
+- **major** The weight is a page-built `<input type="number">`: a second tap into a field opens the system keyboard, which covers Hold to finish. The design system's Measure and Numpad do this job (docked pad, no system keyboard, the same pad as piglet processing's litter weight).
+- **minor** The "Piglet condition" legend (14px / 600) is bold, which the type law forbids for headings (section titles are 16px / 500 with a 16px muted icon), and its description line ("Among the 9 alive piglets · 0 if none") repeats a fact the totals panel shows two lines above (Alive 9); the steppers already stop at the alive count. P3: nothing said twice.
+- **minor** Assisted has an unanswered state and a Clear for a yes / no fact. Owner 2026-10-15: a required No / Yes with No preselected; no Clear.
+
+## Parts
+
+| Part | Drawn by today | The component whose job it is | Keep / fix / cut |
+|---|---|---|---|
+| Born · Alive · Dead | `metrics()` (TaskTotals) | TaskTotals | **keep** |
+| "Piglet condition" legend | page-built `<fieldset><legend>` (14px / 600) | Heading, kind `section` (16px / 500, 16px icon) | **fix**: Heading with the `health` icon |
+| "Among the N alive piglets · 0 if none" | page-built `<p>` | none (cut) | **cut**: Alive is on screen, the steppers stop at it |
+| Weak, Deformed | `farmStepper` → Stepper `row` | Stepper | **keep** |
+| Assisted | `optRow` + ChoiceList inline radios (page-built reveal) | ChoiceList Inline Choice | **fix**: ChoiceList inline, boxed key face (opt-in `face:'key'`), No preselected, no Clear |
+| Litter weight | `optRow` + page-built `<input type=number>` | Measure (+ Numpad) | **fix**: Measure row layout, the docked Numpad; "Optional" beside the label |
+| Edit finish details form | the same fields, page-built twice (`optional()`, `finish-question`) | the same components | **fix**: one set of rows for both forms |
+| Footer, hold | `footer()`, `hold()` | Sheet footer, Button hold | **keep** |
+
+## Self-crit
+
+Held against the Farrowing room (quiet rows, one dark primary) and the sheet's own Weak and Deformed rows; the owner's mockup fixed the direction, so there is one direction and two rounds.
+
+#### Round 1 (renders at 390 EN beside `c4f98e2`: `farrowing.finish`, its answered and weight-open states, and the Edit finish details form)
+- **Problems fixed:** the boxed chips are gone (the weight and Assisted are two more rows of the list); nothing reflows (the rows are always there, an answer changes a ring, not a position); the answer sits on its own row; the weight is a Measure on the docked Numpad, no system keyboard, Hold to finish stays on screen; the legend is a 16px/500 section heading with a muted icon; the description line is cut.
+- **Found by eye and fixed:** the first build drew No / Yes 48px tall, 144px wide with the light `control-border`, against the real Stepper faces (44px tall, `task-key-border`, their first key starting 8px in): the keys read bigger and paler than the steppers above them. The keys and the Measure box now take the stepper face's own box (44px visible in a 48px hit area, 136px column, the stepper's border), so the right and left edges line up. Where the brief says 48px keys in a 144px column, the rendered Stepper is 44 in 136 (bundle.css, Stepper row); matching it is what makes the column read as one.
+- **Found by the check:** the empty weight dash at 18px muted is 5.2:1, under the 7:1 floor for 16px text. The dash is a placeholder, so it is drawn at 15px (5.2:1 holds the 4.5:1 for small text).
+- **Keep as strong:** the totals panel, the Weak and Deformed rows and the footer are unchanged in code and in the render.
+- **Squint test:** the title, the totals, then the four rows read as one list; the first three things the eye lands on are the count (14 · 9 · 5), the steppers and the dark Hold. They match the worker's questions (is the count right? any weak or deformed? can I finish?). The ringed No is the only mark in the lower half.
+- **Cluttered, flat or bulky:** lighter than the baseline: two boxed chips and a legend plus description became one heading and two plain rows. No box, no bold and no fill was added (c3), nothing the worker needs was removed (c2), nothing was enlarged (c1).
+- **House reference:** the Farrowing room's quiet rows.
+- **Better because** the optional chips no longer outweigh the questions, no target moves under the thumb, and the weight is typed on the pad that already has a Hold to finish under it.
+
+#### Edit finish details (same rows)
+- The baseline form was a questionnaire (a bold question, a hint, two half-width steppers, two chips and a detached radio group). It now matches Finish: the same heading and rows, with the steppers' `was N` notes and the Save correction summary kept, the drawer sized to its content, 24px above the footer.
+- **Better because** it is the same list as Finish, so the worker meets one form twice, not two forms.
+
+#### Final look (`5cc9b6c`, the pushed head; rendered from it at 390 and 360, EN and ZH, beside `c4f98e2`)
+- `farrowing.finish` at 390 and 360: heading, four rows in one column, rules between rows only, 24px under the totals and above the footer; ZH matches EN (the page draws only the room rows in Chinese). The weight-open state at 390: the pad docks above the footer and the Measure stays visible above it.
+- `farrowing.edit-finished` is the Edit record page; it is unchanged (its Finish details door is the only part that leads to the form above), so its pair is identical.
+- Checks on this commit: `npm test` 703 pass, 0 fail; `npm run check` exit 0; `check-states` fails 7 states in Banner, Button, ConditionTag and Facts, none of them a component this change touches (the same Banner, ConditionTag and Facts states fail on `c4f98e2`; the Button ones are a network timeout); `check-legibility --strict` on both screens: 0; `check-spacing`: 0; `check-headers`: 0; `run-scenarios farrowing`: EN 89 of 89 pass (two new leaves), ZH blocked as on main.
+- **Better because** the same four facts are one calm list in the system's own parts, and the worker can answer Assisted or add a weight without anything moving.
+
+#### Crit round 1 (driver), then Final look (`3a5ca7d`, rendered from the pushed head at 390 and 360, resting and pad-open, Finish and Edit finish details)
+- The pad-open state kept a dead band of about 90px between the Litter weight row and the pad: the pad's reserved status line (48px), its padding and the body's 24px. A docked pad now reserves no status line (opt-in `dock`); a dead key is answered in the Measure's own hint under its row, so the keys never move. The host scrolls only until the row ends 24px above the pad, and not at all when it already fits. Measured at 390 and 360: row end to pad top is 23 to 24px in both forms, and the rows above fill the body.
+- Resting states are unchanged. Legibility strict, spacing and headers: 0 defects on both screens; `npm test` 703 pass; the four finish leaves pass.
+- **Better because** the pad-open state is one tight stack: rows, 24px, pad, footer.
+
+#### Crit round 2 (driver), then Final look (the head that adds this block; its screens are those of the commit before it, rendered at 390 and 360)
+- Main (#170, the Header component) merged forward; atlas regenerated; `check-headers` on both screens: 0 defects.
+- Defect fixed: Edit finish details opened the pad on the stored `12.6` with the digits floor-grayed (the value was full). A pad that opens on an existing value now shows it selected (a highlight and a thin ink outline on the value, no caret) with every key live: the first digit or point replaces it, backspace first clears it to empty, closing without a key keeps it. Opt-in (`replace` on Measure and Numpad), so other pads are unchanged.
+- **Better because** the worker can correct a stored weight in one tap, and the selected value says the next key replaces it.
+
+#### Owner ruling, 2026-10-16: the system keyboard for the weight
+- The owner asked when apps build their own keypad. They do for runs of typed values (keys that never move, a running list, a scanner wedge: the piglet weigh run), when the pad is the whole screen (amount entry), and for restricted keys (PINs, a fixed decimal point). One optional value inside a form is the system keyboard's job; the owner rule *Design for the medium* names the system keyboard and asks for a custom one only where none fits.
+- So the litter weight is now the same Measure row typed on the phone's decimal keyboard (Measure `input: 'system'`: `inputmode="decimal"`, `enterkeyhint="done"`). Done closes it; the host cleans what a keyboard can send (a comma becomes a point; digits and one point, 2 whole digits, 1 decimal) and normalises on save. The Numpad's `dock` and the Measure and Numpad `replace` options are retired (nothing else used them); the Numpad stays for the weigh run, unchanged.
+- Accepted cost: the system keyboard covers the footer while typing (Done or a tap away brings Finish back); iOS's decimal pad has no Done key, so the native app adds one as the keyboard's accessory bar.

@@ -61,7 +61,8 @@
     air:'M3 8h12a3 3 0 1 0-3-3M3 12h16a3 3 0 1 1-3 3M3 16h5',
     upload:'M12 16V4m-4 4 4-4 4 4M4 15v6h16v-6',
     backspace:'M9 5h12v14H9l-6-7zM12 9l6 6M18 9l-6 6',
-    offline:'m3 3 18 18M4 9a13 13 0 0 1 2-1M10 6a14 14 0 0 1 10 3M7 13a8 8 0 0 1 3-1M14 12a8 8 0 0 1 3 1M10 17a3 3 0 0 1 4 0M12 21h.01'
+    offline:'m3 3 18 18M4 9a13 13 0 0 1 2-1M10 6a14 14 0 0 1 10 3M7 13a8 8 0 0 1 3-1M14 12a8 8 0 0 1 3 1M10 17a3 3 0 0 1 4 0M12 21h.01',
+    stop:'M8.5 6.5h7a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-7a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2z'
   };
   const aliases=Object.freeze({origin:'place',arrow:'chevron',condition:'plus'});
   // Compatibility aliases do not add duplicate glyphs to the enumerable registry.
@@ -321,7 +322,7 @@
       return row+extra;
     });
     const search=here?choiceSearch({label:'Search in '+here.label,value:query,attrs:searchAttrs,strs:{label:'ds.picker.search_in',placeholder:'ds.picker.search_in'},args:{level:here.label}}):choiceSearch({label:'Search all options',value:query,attrs:searchAttrs,strs:{label:strs.search||'ds.picker.search',placeholder:strs.search||'ds.picker.search'}});
-    /* No breadcrumb: the sheet's header carries the level (pickerHead: "‹ Parent" and the level's title). */
+    /* No breadcrumb: the sheet's title names the level (pickerHead); the footer's Back goes up one. */
     const groups=[];
     visible.forEach((n,i)=>{const title=n.group||n.trail?.join(' › ')||'';let group=groups.find(g=>g.title===title);if(!group){group={title,rows:[]};groups.push(group);}group.rows.push(rows[i]);});
     const list=!cascade&&!q?groups.map(g=>choiceGroup(g.rows,{title:g.title})).join(''):choiceGroup(rows);
@@ -329,23 +330,27 @@
     return `<div class="st-picker-body" data-ds="PickerField" data-variant="${esc(variant)}">${search}${content}</div>`;
   }
 
-  /* The cascade level in the sheet's header, so the body needs no breadcrumb: at the root the sheet's own title and no up
-     control; one level down, "‹ <rootLabel>" and the level's name; deeper, "‹ <parent level>" and the level's name.
-     Spread the result into sheet(): sheet({...pickerHead({…}), body, footer}). `up.value` is the path length to keep, so the
-     host's stepAction slices the path exactly as before. */
-  function pickerHead({items=[],path=[],title='',rootLabel='',stepAction='picker-step'}={}){
+  /* A drawer with levels (owner ruling B, 2026-10-16): the title names the level you are on; a ✕ at the top left closes the
+     whole drawer from any level; the footer's Back goes up one level, and at the first level it leaves (the draft is kept).
+     No "‹ Parent" in the header. Spread title, cross and rows into sheet(): sheet({...pickerHead({…}), body, footer}), and
+     hand `levelBack` to the footer: pickerFooter({back: head.levelBack}) or sheetFooter({back: head.levelBack}). Below the
+     root `levelBack` is { action: stepAction, value }: the path length to keep, so the host's stepAction slices the path
+     exactly as before; at the root it is { action: backAction } (leave). `cross` uses closeAction, which the host handles as
+     leaving (the scrim's action by default). */
+  function pickerHead({items=[],path=[],title='',stepAction='picker-step',backAction='back',closeAction='dismiss'}={}){
     let nodes=items;const steps=[];
     for(const value of path){const n=nodes.find(n=>n.value===value);if(!n?.children)break;steps.push(n);nodes=n.children;}
     const most=list=>Math.max(list.length,...list.filter(n=>n.children).map(n=>most(n.children)));
-    const rows=most(items);
-    if(!steps.length)return {title,up:null,rows};
-    const here=steps[steps.length-1],parent=steps.length>1?steps[steps.length-2]:null;
+    const rows=most(items),cross={action:closeAction,label:{text:'Close',str:'act.close'}};
+    if(!steps.length)return {title,cross,levelBack:{action:backAction},rows};
+    const here=steps[steps.length-1];
     const name=n=>n.strs?.label?{text:n.label,str:n.strs.label,args:n.args?.label}:n.label;
-    return {title:name(here),up:{label:parent?name(parent):(rootLabel||title),action:stepAction,value:String(steps.length-1)},rows};
+    return {title:name(here),cross,levelBack:{action:stepAction,value:String(steps.length-1)},rows};
   }
-  /* Back leaves and keeps the draft (pure navigation); Done confirms it. A single pick commits, so single has Back alone. */
-  function pickerFooter({selected=[],multi=false,waiting=false,backAction='back',doneAction='picker-done',strs={},args={}}={}){
-    const backBtn=backButton({action:backAction,label:strs.back?{text:'Back',str:strs.back}:{text:'Back',str:'act.back'}});
+  /* Back goes up one level (back: pickerHead().levelBack) and at the first level leaves, keeping the draft (pure navigation);
+     Done confirms it. A single pick commits, so single has Back alone. The word is always Back. */
+  function pickerFooter({selected=[],multi=false,waiting=false,back=null,backAction='back',doneAction='picker-done',strs={},args={}}={}){
+    const backBtn=backButton({action:back?.action||backAction,value:back?.value??'',label:strs.back?{text:'Back',str:strs.back}:{text:'Back',str:'act.back'}});
     if(!multi)return sheetFooter({content:backBtn,className:'st-picker-footer'});
     return sheetFooter({content:backBtn+`<button type="button" class="button primary" data-ds="Button" data-register="primary" data-action="${esc(doneAction)}"${waiting?' aria-disabled="true"':''}>${tx('Done · '+selected.length,{strs:{done:strs.done||'ds.picker.done_count'},args:{done:{n:selected.length,...args.done}}},'done')}</button>`,className:'st-picker-footer'});
   }
@@ -473,8 +478,10 @@
     return `<${tag} class="st-measure-box"${unitGap?'':' data-unit-gap="none"'}${attrs}><span class="st-measure-value"${vid?` id="${esc(vid)}"`:''}${live?' aria-live="polite" aria-atomic="true"':''}${sid?sa(sid,sargs):''}>${esc(shown)}</span>${unit||has(o,'unit')?`<span class="st-measure-unit"${uid?` id="${esc(uid)}"`:''}>${tx(unit,o,'unit')}</span>`:''}</${tag}>`;
   }
   /* Measure: one measured value, mono, unit always written. A button that opens the docked Numpad (active).
+     input:'system' (opt-in) draws the same box as a native text field on the phone's decimal keyboard instead: for one
+     optional value inside a form, where a pad would be heavier than the job (the Numpad stays for runs of typed values).
      range is evaluated only when the pad is closed (active false), never per keystroke. */
-  function measure({label='',optional='',value='',unit='',unitGap=true,placeholder='—',action='open-numpad',key='',active=false,controls='',range=null,tone='',changed=false,hint='',note='',id='',className='',strs,args}={}){
+  function measure({label='',optional='',value='',unit='',unitGap=true,placeholder='—',action='open-numpad',key='',active=false,controls='',range=null,tone='',changed=false,hint='',note='',id='',className='',layout='',input='',inputAttrs='',strs,args}={}){
     const o={strs,args},lid=id||fieldId('st-measure'),v=value==null?'':String(value),num=parseFloat(v);
     const out=!active&&Array.isArray(range)&&v!==''&&!Number.isNaN(num)&&(num<range[0]||num>range[1]);
     const t=tone==='refused'?'refused':tone==='warn'||out?'warn':'';
@@ -482,10 +489,12 @@
     const lab=`<span class="st-measure-label" id="${esc(lid)}"><span${sa(o.strs&&o.strs.label,o.args&&o.args.label)}>${esc(label)}</span>${optional||has(o,'optional')?`<small>${tx(optional,o,'optional')}</small>`:''}</span>`;
     const vid=lid+'-value',uid=lid+'-unit',hid=lid+'-hint',nid=lid+'-note';
     const hasNote=!!(note||has(o,'note'));
-    const box=valueBox('button',{value:v,unit,unitGap,placeholder,active,live:active,vid,uid,attrs:` type="button" data-action="${esc(action)}" data-value="${esc(key)}" aria-labelledby="${esc(lid)} ${esc(vid)} ${esc(uid)}" aria-describedby="${esc(hid)}${hasNote?' '+esc(nid):''}" aria-expanded="${active?'true':'false'}"${controls?` aria-controls="${esc(controls)}"`:''}`},o);
+    const sys=oneOf('Measure','input',input||'pad',['pad','system'],'pad')==='system';
+    const box=sys?`<label class="st-measure-box" data-input="system"${unitGap?'':' data-unit-gap="none"'}><input class="st-measure-input" id="${esc(vid)}" type="text" inputmode="decimal" enterkeyhint="done" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="${esc(placeholder)}" value="${esc(v)}" aria-labelledby="${esc(lid)} ${esc(uid)}" aria-describedby="${esc(hid)}${hasNote?' '+esc(nid):''}" ${inputAttrs}>${unit||has(o,'unit')?`<span class="st-measure-unit" id="${esc(uid)}">${tx(unit,o,'unit')}</span>`:''}</label>`
+      :valueBox('button',{value:v,unit,unitGap,placeholder,active,live:active,vid,uid,attrs:` type="button" data-action="${esc(action)}" data-value="${esc(key)}" aria-labelledby="${esc(lid)} ${esc(vid)} ${esc(uid)}" aria-describedby="${esc(hid)}${hasNote?' '+esc(nid):''}" aria-expanded="${active?'true':'false'}"${controls?` aria-controls="${esc(controls)}"`:''}`},o);
     const hl=hintLine('st-measure-hint',{id:hid,text:hint,tone:t,o});
     const nl=hasNote?`<p class="st-field-hint st-measure-note" id="${esc(nid)}" data-tone="muted">${tx(note,o,'note')}</p>`:'';
-    return `<div class="st-measure ${esc(className)}" data-ds="Measure" data-field="${esc(key)}"${v===''?' data-empty=""':''}${active?' data-active=""':''}${t?` data-tone="${t}"`:''}${isChanged?' data-changed=""':''}>${lab}${box}${hl}${nl}</div>`;
+    return `<div class="st-measure ${esc(className)}" data-ds="Measure"${oneOf('Measure','layout',layout||'stack',['stack','row'],'stack')==='row'?' data-layout="row"':''} data-field="${esc(key)}"${v===''?' data-empty=""':''}${active?' data-active=""':''}${sys?' data-input="system"':''}${t?` data-tone="${t}"`:''}${isChanged?' data-changed=""':''}>${lab}${box}${hl}${nl}</div>`;
   }
   /* Numpad: the one type-to-set pad, for real typed input only (ear tags, weights), docked above the bar.
      1–9 · [. or a gap] 0 ⌫. No commit key: the bar's primary commits. Keys never move: the feedback region
@@ -931,9 +940,11 @@
      row (the sex field). Roving tab stop (radioBind moves it). An optional field clears through a visible `Clear` text
      action while a value is chosen (data-action "<action>-clear"); focus then returns to the group's tab stop. */
   const MONO_OK=/^[A-Za-z0-9 .·:/-]*$/;
-  function choiceRadios({label='',optional='',options=[],selected='',action='choose',key='',layout='rows',lead='',clear='Clear',id='',className='',disabled=false,reason='',pressed=false,labelHidden=false,strs,args}={}){
+  function choiceRadios({label='',optional='',options=[],selected='',action='choose',key='',layout='rows',face='',lead='',clear='Clear',id='',className='',disabled=false,reason='',pressed=false,labelHidden=false,strs,args}={}){
     const o={strs,args},s=strs||{},a=args||{},rid=id||fieldId('st-radios');
     const lay=oneOf('ChoiceList','layout',layout,['rows','plain','inline'],'rows');
+    /* face (inline only, opt-in): 'key' draws each option as a boxed key in the Stepper's 136px column instead of a ring and a word. */
+    const keyFace=oneOf('ChoiceList','face',face||'default',['default','key'],'default')==='key'&&lay==='inline';
     options.forEach(x=>{if(x.mono&&!MONO_OK.test(String(x.label||'')))warn('ChoiceList',`mono is for Latin and digit codes only: "${x.label}"`);});
     const chosen=options.some(x=>x.value===selected),stop=chosen?selected:(options[0]&&options[0].value);
     const isOptional=!!(optional||has(o,'optional'));
@@ -943,8 +954,8 @@
       return choiceGroup(rows,{title:label,lead,radio:true,aside:clearBtn,id:rid,className:(lay==='plain'?'st-choice-plain ':'')+className,strs:s.label?{title:s.label}:undefined,args:a.label?{title:a.label}:undefined});
     }
     const lid=rid+'-label';
-    const opt=x=>`<button type="button" class="st-choice-inline-opt"${disabled?' aria-disabled="true"':''}${pressed&&x===options[0]?' data-preview="pressed"':''} role="radio" aria-checked="${x.value===selected?'true':'false'}" tabindex="${x.value===stop?0:-1}" data-action="${esc(action)}" data-value="${esc(x.value)}"><span class="st-radio" aria-hidden="true"></span><span${x.mono?' data-mono=""':''}>${tx(x.label,x,'label')}</span></button>`;
-    return `<div class="st-choice-inline ${esc(className)}" data-ds="ChoiceList" data-mode="radio" id="${esc(rid)}" data-field="${esc(key)}"><span class="st-choice-inline-label"><span id="${esc(lid)}"${labelHidden?' class="st-visually-hidden"':''}><span${sa(s.label,a.label)}>${esc(label)}</span>${isOptional?`<small>${tx(optional,o,'optional')}</small>`:''}</span>${isOptional?`<span class="st-choice-inline-clear">${clearBtn}</span>`:''}</span><span class="st-choice-inline-opts" role="radiogroup" aria-labelledby="${esc(lid)}">${options.map(opt).join('')}</span>${reason?`<span class="st-choice-meta" role="status">${esc(reason)}</span>`:''}</div>`;
+    const opt=x=>`<button type="button" class="st-choice-inline-opt"${disabled?' aria-disabled="true"':''}${pressed&&x===options[0]?' data-preview="pressed"':''} role="radio" aria-checked="${x.value===selected?'true':'false'}" tabindex="${x.value===stop?0:-1}" data-action="${esc(action)}" data-value="${esc(x.value)}">${keyFace?'<span class="st-choice-inline-face">':'<span class="st-radio" aria-hidden="true"></span>'}<span${x.mono?' data-mono=""':''}>${tx(x.label,x,'label')}</span>${keyFace?'</span>':''}</button>`;
+    return `<div class="st-choice-inline ${esc(className)}" data-ds="ChoiceList" data-mode="radio"${keyFace?' data-face="key"':''} id="${esc(rid)}" data-field="${esc(key)}"><span class="st-choice-inline-label"><span id="${esc(lid)}"${labelHidden?' class="st-visually-hidden"':''}><span${sa(s.label,a.label)}>${esc(label)}</span>${isOptional?`<small>${tx(optional,o,'optional')}</small>`:''}</span>${isOptional?`<span class="st-choice-inline-clear">${clearBtn}</span>`:''}</span><span class="st-choice-inline-opts" role="radiogroup" aria-labelledby="${esc(lid)}">${options.map(opt).join('')}</span>${reason?`<span class="st-choice-meta" role="status">${esc(reason)}</span>`:''}</div>`;
   }
   /* The radio keyboard model, pure: ArrowDown/ArrowRight → next, ArrowUp/ArrowLeft → previous (both wrap), Home → first,
      End → last. Returns the value to select and focus, or null for any other key. */
@@ -1088,8 +1099,8 @@
   }
   /* The sheet header's text block: the centred title on one line, then the optional header line. Corner actions (owner,
      2026-10-14, ruling C): corner { label, action, value } is Clear or Reset, quiet text at the top right, passed only while
-     there is something to clear or reset; cross { action, value, label } is a ✕ at the top left (no drawer has one today: Back,
-     a swipe and the scrim close a drawer). Each is a 48px target vertically centred on this block (title + line), never on
+     there is something to clear or reset; cross { action, value, label } is a ✕ at the top left, used by a drawer with levels
+     (owner ruling B, 2026-10-16: it closes the whole drawer from any level; pickerHead().cross). Each is a 48px target vertically centred on this block (title + line), never on
      the title alone or the header box; the title keeps 12px clear of each target. Without corners the block is as before. */
   function sheetText(title,line,corner,cross){
     const t=`<h2 class="sheet-title">${sT(title)}</h2>${headerLine(line)}`;
@@ -1099,7 +1110,7 @@
     return `<div class="sheet-text" data-corners="${cross&&corner?'both':corner?'end':'start'}">${x}${t}${c}</div>`;
   }
   const SHEET_SIZES=['compact','short','medium','long'];
-  function sheet({variant='drawer',surface='',headClass='',title,line=null,corner=null,cross=null,back=null,description,icon='',close={action:'dismiss'},up=null,holdRows=0,lead='',above='',body='',bodyClass='',footer:f,size='medium',sizing='content',label,view='',className='',id='',layer=0,inert=false,bar='',scrim:sc={},attrs={}}={}){
+  function sheet({variant='drawer',surface='',headClass='',title,line=null,corner=null,cross=null,back=null,description,icon='',close={action:'dismiss'},holdRows=0,lead='',above='',body='',bodyClass='',footer:f,size='medium',sizing='content',label,view='',className='',id='',layer=0,inert=false,bar='',scrim:sc={},attrs={}}={}){
     const v=oneOf('Sheet','variant',variant,['drawer','page','dialog'],'drawer'),sz=oneOf('Sheet','size',size,SHEET_SIZES,'medium');
     /* surface (drawer only): '' is a content or input drawer (white, tinted cards). 'menu' is a drawer whose every row is an option or a verb
        (Choose a unit, More actions, Go to pen): the tint with white cards, like a page. See SURFACES.md. */
@@ -1108,15 +1119,14 @@
     if(v==='dialog'){
       return `<div class="dialog-backdrop" data-ds="Sheet" data-variant="dialog"${sLayer(layer)}><div class="dialog${cls}" role="dialog" aria-modal="true" tabindex="-1"${id?` id="${esc(id)}"`:''}${vw}${inert?' inert':''}${sL(label??title)}${ex}><div class="dialog-body${bodyClass?' '+esc(bodyClass):''}"><h2 class="dialog-title">${icon?sGlyph(icon):''}${sT(title)}</h2>${description?`<p class="dialog-desc">${sParts(description)}</p>`:''}${body}</div>${foot}</div></div>`;
     }
-    /* No ✕ on any sheet: Back in the footer is the way out, and the scrim and a swipe down do what Back does. `close` is kept
-       for old callers and ignored. `up` { label, action, value } is the header's "‹ Parent" control, only in a drawer with
-       levels: it goes up one level and names the parent; it is never labelled Back. */
-    const upHtml=up&&(up.label!=null)?`<button type="button" class="sheet-up" data-ds="Sheet"${sA(up.action||'up',up.value)}>${sGlyph('up')}<span>${sT(up.label)}</span></button>`:'';
+    /* Back in the footer is the way out, and the scrim and a swipe down do what Back does. `close` is kept for old callers and
+       ignored. A drawer with levels (owner ruling B, 2026-10-16) adds `cross`, the ✕ at the top left that closes the whole
+       drawer from any level; its footer Back goes up one level (pickerHead). There is no "‹ Parent" control. */
     /* The sheet header (a drawer): the centred title, the optional header line, the 1px hairline; the body starts 24px below.
        A page takes the page header instead (pageHeader: Back top left, the title left-aligned). */
     const head=v==='page'
       ?pageHeader({title,back,line,className:headClass})
-      :`<header class="utility-header${headClass?' '+esc(headClass):''}${upHtml?' has-up':''}">${lead}<div class="sheet-titles">${upHtml}${sheetText(title,line,corner,cross)}</div></header>`;
+      :`<header class="utility-header${headClass?' '+esc(headClass):''}">${lead}<div class="sheet-titles">${sheetText(title,line,corner,cross)}</div></header>`;
     const common=`data-ds="Sheet" tabindex="-1"${sLayer(layer)}${inert?' inert':''}${id?` id="${esc(id)}"`:''}${vw}${sL(label??title)}${ex}`;
     const main=`${head}${above}<div class="sheet-body${bodyClass?' '+esc(bodyClass):''}">${body}</div>${foot}`;
     if(v==='page')return `<section class="sheet${cls}" ${common} role="region" data-st-context="page" data-presentation="page">${bar}${main}</section>`;

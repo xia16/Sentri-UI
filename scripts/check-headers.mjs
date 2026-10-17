@@ -1,7 +1,8 @@
 // The header check: the Headers law (ux/design-system/README.md, "Headers") made measurable. Five defects:
 //   gap       the header-to-body gap is not space-section (24px ±2): a drawer from its hairline, a page from its last line
 //             (the bottom of its title block or Back, whichever is lower) to the first body content (text, a control, a box)
-//   contents  a header holds a control other than Back (‹ Parent in a drawer with levels), the subject chip and a sheet
+//   contents  a header holds a control other than Back (a page's; a drawer's Back is in its footer, and a drawer with levels goes up with it:
+//             no ‹ Parent in a header, owner ruling B 2026-10-16), the subject chip and a sheet
 //             header's corner actions (Clear or Reset at the top right, a ✕ at the top left), an aside, or a number-with-unit
 //             count ("2 sows", "3 unsaved", "7 / 18", "11 头") in its title or header line
 //   corner    a corner action whose vertical centre is more than 2px off the centre of the header's text block (the title's
@@ -15,7 +16,9 @@
 // Renders every atlas screen bare at 390 (EN: gap, contents, corner) and 360 (EN and ZH: contents, corner, room, wrap).
 // Writes review/headers.json.
 // Usage: node scripts/check-headers.mjs [--base <url>] [--feature <id>] [--screens id,id] [--changed <ids>] [--strict]
-//                                       [--out <file.json>] [--self-test]
+//                                       [--out <file.json>] [--self-test] [--components [Name,Name]]
+//   --components the design system's variant pages instead of the screens (all, or the named components): see below;
+//                --atlas <atlas.json> names the pages from another checkout's atlas (the gate's base and candidate).
 //   --changed    exit 1 only when one of these screens has a defect; --strict: exit 1 on any defect.
 //   --self-test  the known-bad fixtures in scripts/check-headers.fixtures/ must fail the check named in their
 //                <meta name="expect">, the known-good ones must pass.
@@ -26,7 +29,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { playwright } from './playwright-path.mjs';
-import { screensOf } from './loop-rules.mjs';
+import { screensOf, componentPagesOf } from './atlas-screens.mjs';
 import { routeFonts } from './font-route.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -51,8 +54,9 @@ function auditHeaders({ TOL, checks }) {
   const titleOf = (h) => h.querySelector('.st-page-title, .sheet-title, h1, h2, h3');
   const linesOf = (h) => [...h.querySelectorAll('.st-header-line, .sheet-subtitle')].filter(vis);
   const where = (h) => (isPage(h) ? 'page header' : 'sheet header') + ` "${txt(titleOf(h)).slice(0, 40)}"`;
-  // Back (top left of a page, a lead "Back to …" icon button) and ‹ Parent act; the subject chip acts; nothing else does.
-  const allowed = (el) => el.matches('.st-page-back, .st-subject-chip, .sheet-up') || /(^|[-_\s])back($|[-_\s])/i.test(typeof el.className === 'string' ? el.className : '') || /^(back|返回)\b/i.test((el.getAttribute('aria-label') || txt(el)).trim());
+  // Back (top left of a page, a lead "Back to …" icon button) acts; the subject chip acts; a sheet's corner actions act; nothing
+  // else does. ‹ Parent no longer does (ruling B, 2026-10-16): a drawer with levels goes up with its footer Back and closes with ✕.
+  const allowed = (el) => el.matches('.st-page-back, .st-subject-chip') || /(^|[-_\s])back($|[-_\s])/i.test(typeof el.className === 'string' ? el.className : '') || /^(back|返回)\b/i.test((el.getAttribute('aria-label') || txt(el)).trim());
   // A corner action (sheet header only; owner ruling C, 2026-10-14): Clear or Reset as quiet text at the top right, a ✕ at the
   // top left. Which corner is told by where the control sits in its header.
   const cornerOf = (h, el) => {
@@ -69,7 +73,7 @@ function auditHeaders({ TOL, checks }) {
   for (const h of headers) {
     const title = titleOf(h), lines = linesOf(h), note = { kind: isPage(h) ? 'page' : 'sheet', title: txt(title).slice(0, 40), lines: lines.length };
     seen.push(note);
-    const controls = [...h.querySelectorAll('button, a[href], [role="button"], [role="link"], input, select, textarea, [contenteditable="true"]')].filter((el) => vis(el) && !el.parentElement.closest('.st-page-back, .st-subject-chip, .sheet-up, button, a[href]'));
+    const controls = [...h.querySelectorAll('button, a[href], [role="button"], [role="link"], input, select, textarea, [contenteditable="true"]')].filter((el) => vis(el) && !el.parentElement.closest('.st-page-back, .st-subject-chip, button, a[href]'));
     const corners = controls.map((el) => ({ el, side: cornerOf(h, el) })).filter((c) => c.side);
     note.corners = corners.map((c) => c.side);
     // ---- corner: each corner action a 48px target, vertically centred (±2px) on the text block: the title's top to the
@@ -122,6 +126,16 @@ function auditHeaders({ TOL, checks }) {
         if (rows.size > 1 || l.getBoundingClientRect().height > Math.max(lh, ...boxes.map((b) => b.height)) * 1.5) out.push({ check: 'wrap', at: Math.round(l.getBoundingClientRect().top), detail: `${where(h)}: the header line "${txt(l).slice(0, 40)}" wraps onto ${Math.max(2, rows.size)} lines` });
         else if (past) out.push({ check: 'wrap', at: Math.round(l.getBoundingClientRect().top), detail: `${where(h)}: the header line "${txt(l).slice(0, 40)}" runs past the header` });
       }
+      // the title itself, as drawn: room is judged from its unwrapped width against 360, so a title drawn in a frame narrower
+      // than it claims (a component page's 360 state inset 16px a side, #170) wrapped and no check saw it
+      if (title) {
+        const rs = []; const w = document.createTreeWalker(title, NodeFilter.SHOW_TEXT); let n;
+        while ((n = w.nextNode())) { if (!n.textContent.trim()) continue; const rg = document.createRange(); rg.selectNodeContents(n); rs.push(...[...rg.getClientRects()].filter((r) => r.width > 0 && r.height > 0)); }
+        const lh = parseFloat(cs(title).lineHeight) || parseFloat(cs(title).fontSize) * 1.3;
+        const mids = rs.map((r) => (r.top + r.bottom) / 2).sort((a, b) => a - b);
+        const rows = mids.length ? 1 + mids.slice(1).filter((m, i) => m - mids[i] > lh / 2).length : 0;
+        if (rows > 1) out.push({ check: 'wrap', at: Math.round(title.getBoundingClientRect().top), detail: `${where(h)}: the title "${txt(title).slice(0, 40)}" wraps onto ${rows} lines as drawn` });
+      }
     }
     // ---- gap: header to the first body content ----
     if (checks.includes('gap')) {
@@ -172,6 +186,19 @@ function auditHeaders({ TOL, checks }) {
   return { out, seen };
 }
 
+export const RUNS = [{ width: 390, lang: 'en', checks: ['gap', 'contents', 'corner'] }, { width: 360, lang: 'en', checks: ['contents', 'wrap', 'corner', 'room'] }, { width: 360, lang: 'zh', checks: ['contents', 'wrap', 'corner', 'room'] }];
+// Every frame of a prepared page (the gate's shared visit, or the CLI's own) for one run ({ width, lang, checks }).
+export async function auditHeadersPage(page, run) {
+  const defects = [], seen = [];
+  for (const f of page.frames()) { try { const r = await f.evaluate(auditHeaders, { TOL, checks: run.checks }); defects.push(...r.out.map((d) => ({ ...d, lang: run.lang, width: run.width }))); seen.push(...r.seen.map((x) => ({ ...x, lang: run.lang, width: run.width }))); } catch {} }
+  return { defects, seen };
+}
+// one finding per check, language and text: the same one at two widths is one
+export const dedupe = (ds) => { const k = new Set(); return ds.filter((d) => { const key = d.check + '|' + d.lang + '|' + d.detail; if (k.has(key)) return false; k.add(key); return true; }); };
+
+
+const main = process.argv[1] && path.resolve(process.argv[1]).toLowerCase() === fileURLToPath(import.meta.url).toLowerCase();
+if (main) {
 const free = () => new Promise((res) => { const s = createServer(); s.listen(0, () => { const p = s.address().port; s.close(() => res(p)); }); });
 let base = val('--base'), server = null;
 if (!base) { const port = await free(); server = spawn(process.execPath, ['scripts/serve-ux.cjs', String(port)], { cwd: root, stdio: 'ignore' }); base = `http://localhost:${port}`; await new Promise((r) => setTimeout(r, 1500)); }
@@ -187,7 +214,6 @@ async function ctx(width) {
   await c.addInitScript((w) => { const css = `html.atlas-bare,html.atlas-bare body{width:${w}px!important}html.atlas-bare .atlas-phone{width:${w}px!important}`; const add = () => { const s = document.createElement('style'); s.textContent = css; document.head.appendChild(s); }; if (document.head) add(); else document.addEventListener('DOMContentLoaded', add); }, width);
   return (contexts[width] = c);
 }
-const RUNS = [{ width: 390, lang: 'en', checks: ['gap', 'contents', 'corner'] }, { width: 360, lang: 'en', checks: ['contents', 'wrap', 'corner', 'room'] }, { width: 360, lang: 'zh', checks: ['contents', 'wrap', 'corner', 'room'] }];
 async function audit(href, run, ready) {
   const page = await (await ctx(run.width)).newPage();
   await page.clock.install({ time: new Date('2026-10-11T09:41:00') }); await page.clock.resume();
@@ -199,13 +225,10 @@ async function audit(href, run, ready) {
     await page.waitForTimeout(400);
     // a sheet that slides in is still moving: wait for finite animations (at most 3s)
     await page.evaluate(() => Promise.race([Promise.all(document.getAnimations().filter((a) => a.effect?.getComputedTiming().endTime !== Infinity).map((a) => a.finished.catch(() => {}))), new Promise((r) => setTimeout(r, 3000))]));
-    for (const f of page.frames()) { try { const r = await f.evaluate(auditHeaders, { TOL, checks: run.checks }); defects.push(...r.out.map((d) => ({ ...d, lang: run.lang, width: run.width }))); seen.push(...r.seen.map((x) => ({ ...x, lang: run.lang, width: run.width }))); } catch {} }
+    const r = await auditHeadersPage(page, run); defects.push(...r.defects); seen.push(...r.seen);
   } finally { await page.close(); }
   return { defects, seen };
 }
-// one finding per check, language and text: the same one at two widths is one
-const dedupe = (ds) => { const k = new Set(); return ds.filter((d) => { const key = d.check + '|' + d.lang + '|' + d.detail; if (k.has(key)) return false; k.add(key); return true; }); };
-
 /* ---------- --self-test ---------- */
 if (argv.includes('--self-test')) {
   const dir = path.join(root, 'scripts/check-headers.fixtures');
@@ -225,6 +248,29 @@ if (argv.includes('--self-test')) {
   console.log(`${n - fails}/${n} fixtures behave as expected`);
   await browser.close(); if (server) server.kill();
   process.exit(fails ? 1 : 0);
+}
+
+/* ---------- --components: the design system's own variant pages ---------- */
+// A law that a screen must follow, the component page that teaches it must follow too: every variant page the atlas draws
+// (Components → <Name> → <variant>, ds:<Name>/<variant>; the same list the gate shoots) is audited like a screen, as the atlas
+// draws it: each state is a frame, and audit() walks every frame (room, wrap, contents and corner at 360, EN; a page's Chinese
+// cells are its own). --out writes [{ page, headers, defects, error? }]; the gate compares it base against candidate.
+// Exit 1 on any defect or page that doesn't render with --strict.
+if (argv.includes('--components')) {
+  const pages = componentPagesOf(JSON.parse(fs.readFileSync(val('--atlas') || path.join(root, 'atlas/atlas.json'), 'utf8')), { components: list('--components') });
+  const run = { width: 360, lang: 'en', checks: ['contents', 'wrap', 'corner', 'room'] };
+  const found = [];
+  for (const pg of pages) {
+    const res = { page: pg.id, headers: 0, defects: [] };
+    try { const r = await audit(base + pg.url, run, '.vbody .sgrid .scell iframe'); res.defects = dedupe(r.defects); res.headers = r.seen.length; } catch (e) { res.error = e.message.split('\n')[0]; }
+    if (res.defects.length || res.error) { console.log(`${res.error ? 'ERR ' : 'HEAD'} ${pg.id}${res.error ? ' ' + res.error : ''}`); res.defects.forEach((d) => console.log(`      ${d.check.padEnd(8)} ${d.detail}`)); }
+    found.push(res);
+  }
+  const bad = found.filter((f) => f.defects.length || f.error);
+  console.log(`headers: ${pages.length} component pages (${found.reduce((n, f) => n + f.headers, 0)} headers), ${bad.length} with a defect or not rendered`);
+  if (val('--out')) fs.writeFileSync(val('--out'), JSON.stringify(found));
+  await browser.close(); if (server) server.kill();
+  process.exit(argv.includes('--strict') && bad.length ? 1 : 0);
 }
 
 /* ---------- the atlas screens ---------- */
@@ -251,3 +297,4 @@ const bad = results.filter((r) => r.defects.length), all = bad.flatMap((r) => r.
 console.log(`headers: ${results.length} screens (${results.filter((r) => r.headers.length).length} with a header, ${results.reduce((n, r) => n + r.headers.length, 0)} headers), ${bad.length} with a defect (${['gap', 'contents', 'corner', 'room', 'wrap'].map((k) => `${k} ${all.filter((d) => d.check === k).length}`).join(', ')})${errs.length ? `, ${errs.length} failed to render` : ''}`);
 const failing = list('--changed').length ? results.filter((r) => list('--changed').includes(r.screen) && (r.defects.length || r.error)) : argv.includes('--strict') ? [...bad, ...errs] : [];
 process.exit(failing.length ? 1 : 0);
+}

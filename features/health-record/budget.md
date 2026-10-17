@@ -70,3 +70,13 @@ Scope: the facts a disabled or waiting control displays. The change adds and cut
 - **Settled**: the label, the current option and the picker value, in ink (or `ink-2` on a floor key), at the control's own size and weight.
 - **Watch**: unavailability, quiet: the flat disabled surface and the 1px dashed `control-border` rim. No colour, no icon added.
 - **Cut**: faded text as the signal (opacity, `disabled-ink` text).
+
+# Drawers with levels (owner ruling B, 2026-10-16)
+
+The catalogue pickers' heads. Questions at a level: where am I? (the title: the level's name) · how do I go up? (footer Back) · how do I get out? (✕ top left, or Back at the first level).
+
+| Fact | Question it answered | Level | Decision |
+|---|---|---|---|
+| Level name (title) | Where am I? | Act now (the head's heaviest) | kept |
+| Parent's name ("‹ Symptoms") | Where does up go? | Settled | **cut**: Back goes up one level; the parent is one Back away and was its title |
+| Done · N | How many have I ticked? | Act now | kept |

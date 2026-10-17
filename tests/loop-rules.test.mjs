@@ -1,8 +1,9 @@
 // The gate's and the polish loop's rules (scripts/loop-rules.mjs).
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { queueAhead, calibrationProblems, budgetProblems, critiqueProblems, pageStyling, addedLines, effectiveClass, classifyScreens, checkVerdict, checkGrades, worstFirst, isClean, loopStatus, touchesSystem, touchesTools, regressions,
-  pageOf, pageAssets, sharedFiles, outcomeLeaves, coverageLost, reachOf, reachLine, shotsToTake, timedOutOnly, lockState, carryDecision, ghNetworkError } from '../scripts/loop-rules.mjs';
+import { passesWithoutJudge, aimdStep, queueAhead, newScenarioFailures, calibrationProblems, budgetProblems, critiqueProblems, pageStyling, addedLines, effectiveClass, classifyScreens, checkVerdict, checkGrades, worstFirst, isClean, loopStatus, touchesSystem, touchesTools, regressions,
+  pageOf, pageAssets, sharedFiles, outcomeLeaves, coverageLost, reachOf, reachLine, timedOutOnly, lockState, scenarioDebt, ghNetworkError,
+  componentPage, componentPagesOf, componentsTouched, idPath } from '../scripts/loop-rules.mjs';
 
 test('a change to the bundle or tokens is a shared-component change whatever was declared', () => {
   assert.deepEqual(touchesSystem(['ux/design-system/components/bundle.css', 'features/farrowing/feature.json']), ['ux/design-system/components/bundle.css']);
@@ -282,6 +283,8 @@ test('a judge that rates an owner-rejected calibration pair better, or skips one
 test('a scenario run retries only when every failure is a navigation timeout', () => {
   assert.ok(timedOutOnly([{ what: 'run', got: 'page.goto: Timeout 30000ms exceeded.' }]));
   assert.ok(timedOutOnly([{ what: 'back', got: 'page.goBack: Timeout 3000ms exceeded.' }, { what: 'run', got: 'page.waitForLoadState: Timeout 30000ms exceeded.' }]));
+  assert.ok(timedOutOnly([{ what: 'run', got: 'page.goto: net::ERR_NO_BUFFER_SPACE at http://127.0.0.1:5000/ux/x.html' }]), 'a navigation the network refused is the machine');
+  assert.ok(!timedOutOnly([{ what: 'run', got: 'page.evaluate: TypeError: x is undefined' }]), 'a script error is not');
   assert.ok(!timedOutOnly([]), 'a pass never retries');
   assert.ok(!timedOutOnly([{ what: 'run', got: 'page.goto: Timeout 30000ms exceeded.' }, { what: '"Done" shown', got: 'absent' }]), 'an assertion failure never retries');
   assert.ok(!timedOutOnly([{ what: 'run', got: 'page.waitForSelector: Timeout 8000ms exceeded.' }]), 'a page that never gets ready is the design');
@@ -300,23 +303,6 @@ test('a gate lock is free, held by a live gate, or stale when its process is gon
   assert.equal(lockState({ pid: 42, sha: 'abc' }, (p) => p === 42), 'held');
   assert.equal(lockState({ pid: 42, sha: 'abc' }, () => false), 'stale');
   assert.equal(lockState({ sha: 'abc' }, () => true), 'stale');
-});
-
-test('base shots: reuse a screen at a width only when every language it needs is cached', () => {
-  const run = (screen, lang, width) => ({ screen, lang, width, file: `${screen}/${lang}-${width}.png`, ok: true });
-  const cached = [run('a', 'en', 390), run('a', 'zh', 390), run('b', 'en', 390), { ...run('c', 'en', 390), ok: false }, run('d', 'en', 390)];
-  const needs = [
-    { screen: 'a', width: 390, langs: ['en', 'zh'] }, // cached in full
-    { screen: 'b', width: 390, langs: ['en', 'zh'] }, // zh missing: shot again in both
-    { screen: 'b', width: 360, langs: ['en', 'zh'] },
-    { screen: 'c', width: 390, langs: ['en'] }, // a failed run is never reused
-    { screen: 'd', width: 390, langs: ['en'] }, // its png is gone
-    { screen: 'e', width: 390, langs: ['en'] },
-  ];
-  const r = shotsToTake(needs, cached, (f) => !f.startsWith('d/'));
-  assert.deepEqual(r.reuse.map((x) => x.file), ['a/en-390.png', 'a/zh-390.png']);
-  assert.deepEqual(r.take, [{ width: 390, langs: ['en', 'zh'], screens: ['b'] }, { width: 360, langs: ['en', 'zh'], screens: ['b'] }, { width: 390, langs: ['en'], screens: ['c', 'd', 'e'] }]);
-  assert.deepEqual(shotsToTake(needs.slice(0, 1), [run('a', 'en', 390), run('a', 'zh', 390)]).take, [], 'a complete cache shoots nothing');
 });
 
 const reachWorld = () => {
@@ -377,28 +363,158 @@ test('reach: a file nothing classes falls back to every screen, and a page that 
   assert.deepEqual(reachOf({ ...w, shared: sharedFiles(w.screens, w.assets), files: ['scripts/inspection-data.js'] }).features, ['inspection']);
 });
 
-test('carry: a pass carries over main moving on only by files that draw no pixel, merged in and nothing else', () => {
-  const mech = { candidate: 'c1', base: 'm1', ref: 'origin/ds/x' };
-  const ok = { pass: { candidate: 'c1', base: 'm1' }, mech, head: 'c2', main: 'm2', containsC: true, containsMain: true, ownCommits: [],
-    cand: { 'ux/system/inspection-astra-concept.js': 'blob1' }, carried: { 'ux/system/inspection-astra-concept.js': 'blob1' },
-    mainFiles: ['docs/design-workflow/README.md'], reach: reach(['docs/design-workflow/README.md']) };
-  const r = carryDecision(ok);
-  assert.ok(r.ok, r.why.join());
-  assert.match(r.why[0], /main moved m1 → m2 by 1 file\(s\) that draw no pixel/);
-  const no = (x, re) => { const d = carryDecision({ ...ok, ...x }); assert.ok(!d.ok, JSON.stringify(x)); assert.match(d.why.join(' | '), re); };
-  no({ pass: null }, /no GATE PASS is recorded for c1/);
-  no({ pass: { candidate: 'c1', base: 'm0' } }, /is against m0/);
-  no({ pass: { candidate: 'c1', base: 'm1', carried: { from: 'c0' } } }, /itself carried/);
-  no({ main: 'm1', head: 'c1' }, /main has not moved/);
-  no({ main: 'm1' }, /moved to c2 while main did not/);
-  no({ containsC: false }, /does not contain the gated commit c1/);
-  no({ containsMain: false }, /merge main forward first/);
-  no({ ownCommits: ['e1'] }, /1 commit\(s\) on the PR since the gate/);
-  no({ carried: { 'ux/system/inspection-astra-concept.js': 'blob2' } }, /the merge is not just main: ux\/system\/inspection-astra-concept\.js/);
-  no({ carried: { ...ok.carried, 'ux/system/home.js': 'blob3' } }, /the merge is not just main: ux\/system\/home\.js/);
-  no({ carried: {} }, /the merge is not just main/);
-  no({ mainFiles: ['ux/system/inspection-astra-concept.js'], reach: reach(['ux/system/inspection-astra-concept.js']) }, /both changed ux\/system\/inspection-astra-concept\.js.*screens of inspection/);
-  no({ mainFiles: ['ux/system/home.css'], reach: reach(['ux/system/home.css']) }, /can reach every screen/);
-  no({ mainFiles: ['features/weaning/budget.md'], reach: reach(['features/weaning/budget.md']) }, /can reach screens of weaning/);
-  no({ reach: null }, /can reach every screen/);
+test('scenarioDebt: main\'s debt only for the same leaf, width, language, assertion and failure class', () => {
+  const run = (lang, width, result, failures = []) => ({ lang, width, result, failures });
+  const leaf = (id, runs) => ({ id, result: runs.some((r) => r.result === 'fail') ? 'fail' : 'pass', runs });
+  // a failure as the runner reports it: the assertion it broke (its contract) and how (its category); the tag is the hard class
+  const fl = (what, tag = null, category = 'wrong-text') => ({ what, got: 'x', tag, contract: `c:${what}`, category: tag === 'dead-end' ? 'timeout' : category });
+  const base = { leaves: [leaf('ds-a11', [run('zh', 360, 'fail', [fl('"Task 2" shown')]), run('en', 390, 'pass')])] };
+  // The same failure on main is debt.
+  assert.deepEqual(scenarioDebt({ leaves: [leaf('ds-a11', [run('zh', 360, 'fail', [fl('"Task 2" shown')])])] }, base), { added: [], debt: ['ds-a11'] });
+  // The review's case: main fails only at zh-360, the candidate also fails at en-390. It's new, not hidden as debt.
+  const both = scenarioDebt({ leaves: [leaf('ds-a11', [run('zh', 360, 'fail', [fl('"Task 2" shown')]), run('en', 390, 'fail', [fl('Done saves the record', 'lost-draft')])])] }, base);
+  assert.deepEqual(both.debt, []);
+  assert.equal(both.added[0].id, 'ds-a11');
+  assert.match(both.added[0].why.join(), /en-390: Done saves the record/);
+  // The same assertion with a different failure class is new.
+  assert.equal(scenarioDebt({ leaves: [leaf('ds-a11', [run('zh', 360, 'fail', [fl('"Task 2" shown', 'dead-end')])])] }, base).added.length, 1);
+  // A leaf base doesn't have, or no base report at all: the failure stands.
+  assert.equal(scenarioDebt({ leaves: [leaf('new-leaf', [run('en', 390, 'fail', [fl('x')])])] }, base).added.length, 1);
+  assert.equal(scenarioDebt({ leaves: [leaf('ds-a11', [run('zh', 360, 'fail', [fl('"Task 2" shown')])])] }, null).added.length, 1);
+  // Passing leaves are neither.
+  assert.deepEqual(scenarioDebt({ leaves: [leaf('ds-a13', [run('en', 390, 'pass')])] }, base), { added: [], debt: [] });
+});
+
+test('scenarioDebt: two unrelated failures in one leaf, language and width are not equated (review of #194)', () => {
+  const run = (lang, width, failures) => ({ lang, width, result: 'fail', failures });
+  const leaf = (id, runs) => ({ id, result: 'fail', runs });
+  // the probe: main breaks on a missing preset, the candidate on a timeout waiting for a selector; both reported as a 'run' dead end
+  const base = { leaves: [leaf('fa-1', [run('en', 390, [{ what: 'run', got: 'preset "count" is not in the page', tag: 'dead-end', contract: 'c-open', category: 'preset-missing' }])])] };
+  const cand = { leaves: [leaf('fa-1', [run('en', 390, [{ what: 'run', got: 'page.waitForSelector: Timeout 8000ms exceeded.', tag: 'dead-end', contract: 'c-open', category: 'timeout' }])])] };
+  const d = scenarioDebt(cand, base);
+  assert.deepEqual(d.debt, []);
+  assert.match(d.added[0].why.join(), /en-390: run \(timeout\)/);
+  // the same contract and category is debt; either unknown, on either side, is not
+  assert.deepEqual(scenarioDebt(base, base).debt, ['fa-1']);
+  const unknown = { leaves: [leaf('fa-1', [run('en', 390, [{ what: 'run', got: 'x', tag: 'dead-end', contract: 'c-open', category: 'unknown' }])])] };
+  assert.deepEqual(scenarioDebt(unknown, unknown).debt, [], 'unknown is never debt');
+  const old = { leaves: [leaf('fa-1', [run('en', 390, [{ what: 'run', got: 'preset "count" is not in the page', tag: 'dead-end' }])])] };
+  assert.deepEqual(scenarioDebt(old, old).debt, [], 'a report without fingerprints (an older runner) is never debt');
+});
+
+test('the runner classes failures by category and fingerprints the definition that failed', async () => {
+  const { failureCategory, contractOf } = await import('../scripts/scenario-runner.mjs');
+  assert.equal(failureCategory({ got: 'preset "count" is not in the page' }), 'preset-missing');
+  assert.equal(failureCategory({ got: 'page.waitForSelector: Timeout 8000ms exceeded.' }), 'timeout');
+  assert.equal(failureCategory({ got: 'control not found: Done', kind: 'step' }), 'missing-control');
+  assert.equal(failureCategory({ got: 'control is covered: Done', kind: 'step' }), 'unreachable-control');
+  assert.equal(failureCategory({ got: 'absent', kind: 'text' }), 'wrong-text');
+  assert.equal(failureCategory({ got: 'TypeError: x', kind: 'page-error' }), 'page-error');
+  assert.equal(failureCategory({ got: 'something else' }), 'unknown');
+  assert.equal(contractOf({ assertion: { text: 'Saved' } }), contractOf({ assertion: { text: 'Saved' } }));
+  assert.notEqual(contractOf({ assertion: { text: 'Saved' } }), contractOf({ assertion: { text: 'Done' } }));
+});
+
+// Component pages are in the gate's reach (rules ledger L23): the Headers law changed, screens were gated, and Sheet → page kept
+// teaching a 21-character Chinese title because nothing shot or checked the design system's own pages.
+test('a component page id names its component and variant; anything else is a screen', () => {
+  assert.deepEqual(componentPage('ds:Sheet/page'), { component: 'Sheet', variant: 'page' });
+  assert.equal(componentPage('farrowing.room'), null);
+  assert.equal(componentPage('ds:Sheet'), null);
+  assert.equal(idPath('ds:Sheet/page'), 'ds_Sheet/page');
+  assert.equal(idPath('farrowing.room'), 'farrowing.room');
+});
+
+test('the component pages are the variants the atlas draws, filtered by component or id', () => {
+  const atlas = { platforms: [{ components: [{ name: 'Sheet', files: { variants: ['drawer', 'page'] } }, { name: 'Banner', files: {} }, { name: 'Heading', files: { variants: ['page'] } }] }, { components: [] }] };
+  const all = componentPagesOf(atlas);
+  assert.deepEqual(all.map((p) => p.id), ['ds:Sheet/drawer', 'ds:Sheet/page', 'ds:Heading/page']);
+  assert.equal(all[1].feature, 'design-system');
+  assert.equal(all[1].url, '/atlas/index.html?view=components&component=Sheet&variant=page');
+  assert.deepEqual(componentPagesOf(atlas, { components: ['Heading'] }).map((p) => p.id), ['ds:Heading/page']);
+  assert.deepEqual(componentPagesOf(atlas, { screens: ['ds:Sheet/page', 'farrowing.room'] }).map((p) => p.id), ['ds:Sheet/page']);
+});
+
+test('a change edits a component when it edits a file in its own folder, not the shared bundle', () => {
+  assert.deepEqual(componentsTouched(['ux/design-system/components/Sheet/variants/page.html', 'ux/design-system/components/bundle.css', 'ux/design-system/components/Sheet/README.md', 'features/farrowing/x.js']), ['Sheet']);
+});
+
+test('a moved component page is in scope for its own component, outside it for another, and never copy-only', () => {
+  const files = ['ux/design-system/components/Sheet/variants/page.html'];
+  const page = { id: 'ds:Sheet/page', feature: 'design-system' };
+  const own = effectiveClass({ declared: 'copy', files, diffs: [page], scope: ['farrowing'] });
+  assert.equal(own.outside.length, 0);
+  assert.equal(own.cls, 'presentation');
+  assert.match(own.why.join(), /ds:Sheet\/page/);
+  assert.equal(effectiveClass({ declared: 'copy', files: [], diffs: [page], scope: ['design-system'] }).cls, 'presentation');
+  const other = effectiveClass({ declared: 'presentation', files, diffs: [page, { id: 'ds:Heading/page', feature: 'design-system' }], scope: ['farrowing'] });
+  assert.deepEqual(other.outside.map((d) => d.id), ['ds:Heading/page']);
+  assert.equal(other.cls, 'shared');
+  assert.equal(effectiveClass({ declared: 'behaviour', files, diffs: [page], scope: ['farrowing'] }).cls, 'behaviour');
+  assert.equal(effectiveClass({ declared: 'copy', files, diffs: [], scope: ['farrowing'] }).cls, 'copy');
+});
+
+test('a moved component page needs a judgement like a screen, and a better one to pass', () => {
+  const mech = { pass: true, candidate: 'c', base: 'b', mode: 'normal', class: { declared: 'copy' }, screens: { diff: [{ id: 'ds:Sheet/page', feature: 'design-system' }], new: [], gone: [] },
+    pairs: ['390', '360'].map((w) => ({ screen: 'ds:Sheet/page', feature: 'design-system', lang: 'en', width: +w, kind: 'changed', pct: 1.2 })) };
+  assert.match(checkVerdict({ pass: true, candidate: 'c', base: 'b', pairs: [] }, mech).problems.join(), /no judgement for pair ds:Sheet\/page en-390/);
+  const same = mech.pairs.map((p) => ({ screen: p.screen, lang: p.lang, width: p.width, verdict: 'same' }));
+  assert.match(checkVerdict({ pass: true, candidate: 'c', base: 'b', pairs: same }, mech).problems.join(), /no pair better/);
+  assert.equal(checkVerdict({ pass: true, candidate: 'c', base: 'b', pairs: same.map((p) => ({ ...p, verdict: 'better' })) }, mech).ok, true);
+});
+
+test("reach: a component's own pages and notes reach the component pages, not every screen", () => {
+  const r = reach(['ux/design-system/components/Sheet/variants/page.html', 'ux/design-system/components/Sheet/variants.json', 'ux/design-system/components/Sheet/README.md']);
+  assert.deepEqual([r.all, r.features], [false, ['design-system']]);
+  assert.match(r.why[0], /Sheet's component pages/);
+  assert.equal(reach(['ux/design-system/components/bundle.css']).all, true, 'the bundle still reaches every screen');
+  assert.equal(reach(['ux/design-system/components/Sheet/sheet.css']).all, true, 'any other file in the folder is unsure, so every screen');
+});
+
+test('newScenarioFailures: a leaf already failing on base is main\'s debt; one passing there, or new, is the change\'s', () => {
+  const base = 'blocked  ds-a7-global-wait\nfail     ds-a11-task-layer  en-360: "Task 2" shown → absent\npass     ds-a13-home-to-task\n\ndata-sync @ c4f98e2: pass 1 · fail 1';
+  assert.deepEqual(newScenarioFailures(['ds-a11-task-layer'], base), { added: [], debt: ['ds-a11-task-layer'] });
+  assert.deepEqual(newScenarioFailures(['ds-a13-home-to-task', 'ds-a11-task-layer'], base), { added: ['ds-a13-home-to-task'], debt: ['ds-a11-task-layer'] });
+  assert.deepEqual(newScenarioFailures(['ds-new-leaf'], base), { added: ['ds-new-leaf'], debt: [] }); // not on base: new
+  assert.deepEqual(newScenarioFailures(['x'], ''), { added: ['x'], debt: [] }); // base printed nothing: the failure stands
+});
+
+test('scenario runs at once grow while runs stay fast, halve on a timeout or a slowdown, and stay between 1 and max', () => {
+  let s = { limit: 2, min: 1, max: 8, baseline: null };
+  const feed = (ms, n = 1, timedOut = false) => { let why = null; for (let i = 0; i < n; i++) ({ state: s, why } = aimdStep(s, { ms, timedOut })); return why; };
+  feed(1000, 6);
+  assert.equal(s.baseline, 1000);
+  assert.equal(s.limit, 2);
+  assert.match(feed(1100, 3), /1\.1x/);
+  assert.equal(s.limit, 3);
+  feed(1200, 3);
+  assert.equal(s.limit, 4);
+  feed(1400, 4);
+  assert.equal(s.limit, 5);
+  assert.equal(feed(2000, 5), null, 'between 1.5x and 2.5x it holds');
+  assert.equal(s.limit, 5);
+  assert.match(feed(3000, 5), /slowed to 3\.0x/);
+  assert.equal(s.limit, 2);
+  assert.match(feed(900, 1, true), /timed out/);
+  assert.equal(s.limit, 1);
+  assert.equal(feed(900, 1, true), null, 'never below min');
+  assert.equal(s.limit, 1);
+  s = { limit: 8, min: 1, max: 8, baseline: 1000 };
+  feed(1000, 8);
+  assert.equal(s.limit, 8, 'never above max');
+});
+
+test("a mechanical pass that moves no screen is a gate pass without a judge; anything else still needs one", () => {
+  const ok = { pass: true, candidate: "c", base: "b", quick: false, screens: { diff: [], new: [], gone: [] }, pairs: [] };
+  assert.equal(passesWithoutJudge(ok), true);
+  assert.equal(passesWithoutJudge({ ...ok, pass: false }), false);
+  assert.equal(passesWithoutJudge({ ...ok, quick: true }), false);
+  assert.equal(passesWithoutJudge({ ...ok, screens: null }), false);
+  assert.equal(passesWithoutJudge({ ...ok, screens: { diff: [{ id: "farrowing.pen-map" }], new: [], gone: [] } }), false);
+  assert.equal(passesWithoutJudge({ ...ok, screens: { diff: [], new: [{ id: "x" }], gone: [] } }), false);
+  assert.equal(passesWithoutJudge({ ...ok, screens: { diff: [], new: [], gone: [{ id: "x" }] } }), false);
+  assert.equal(passesWithoutJudge({ ...ok, screens: { diff: [], new: [] } }), false);
+  assert.equal(passesWithoutJudge({ ...ok, pairs: [{ screen: "x" }] }), false);
+  assert.equal(passesWithoutJudge({ ...ok, candidate: "" }), false);
+  assert.equal(passesWithoutJudge({ ...ok, outcome: "blocked" }), false, "gate v2: a blocked gate is never a pass");
 });

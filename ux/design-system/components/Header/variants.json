@@ -1,0 +1,33 @@
+[
+  {
+    "id": "page",
+    "name": "Page header",
+    "use": "the top of every page and of every top page of a task: Back at the top left, the title beside it, an optional header line, then 24px to the body",
+    "notUse": "a drawer or a dialog (use the sheet header); it never holds a control besides Back and the subject chip, a count, a status or an aside",
+    "states": [
+      "Default",
+      "Back pressed",
+      "Fact line (a hub)",
+      "Longest title that fits beside Back at 360",
+      "Chinese"
+    ]
+  },
+  {
+    "id": "sheet",
+    "name": "Sheet header",
+    "use": "the top of every drawer: the title centred, an optional header line (a hub only), Clear or Reset at the top right while there is something to clear or reset, a ✕ at the top left in a drawer with levels (it closes the whole drawer; the footer Back goes up a level), then the hairline and 24px to the body",
+    "notUse": "a page (use the page header); an action launched from a hub never carries a line (the hub is one Back away); nothing else acts in it: no counts, no status, no Save",
+    "states": [
+      "Default (an action: no line)",
+      "Clear at the top right",
+      "Reset at the top right",
+      "Route line (a hub)",
+      "Fact line",
+      "Clear with a route line",
+      "Levels: ✕ closes, Back goes up",
+      "Longest title that fits between the corners at 360",
+      "Chinese (an action)",
+      "Chinese (a hub)"
+    ]
+  }
+]

@@ -108,12 +108,7 @@ const fs = require("fs");
     }
     if (s.id === "farrowing.finish") {
       await page
-        .locator(
-          ".atlas-phone [data-action=finishOptional][data-value=assisted]",
-        )
-        .click();
-      await page
-        .locator(".atlas-phone [data-action=assistance][data-value=false]")
+        .locator(".atlas-phone [data-action=assistance][data-value=true]")
         .click();
       await page.screenshot({ path: `${proof}/farrowing-assisted.png` });
       const small = await targets(page);

@@ -280,6 +280,12 @@ export interface StepperProps {
 /** Candidate. A measured value with its unit; the box is
  *  `<button data-action="open-numpad" data-value=key aria-expanded aria-controls>`. */
 export interface MeasureProps {
+  /** Candidate: 'system' draws the box as a native text field on the phone's decimal keyboard (no Numpad), for one optional value in a form. Default 'pad'. */
+  input?: 'pad' | 'system';
+  /** With input 'system': the host's own attributes for the field (e.g. data-field). */
+  inputAttrs?: string;
+  /** Candidate: 'row' draws the Measure as one row of a flat list in the Stepper row's right column (label left, box right). Default 'stack'. */
+  layout?: 'stack' | 'row';
   label: string;
   /** A muted word beside the label, e.g. "Optional". */
   optional?: string;
@@ -532,6 +538,8 @@ export interface HoldBindOptions {
 }
 export interface RadioOption { value: string; label: string; meta?: string; /** Latin and digit codes only (warns in dev otherwise). */ mono?: boolean; strs?: Strs<'label' | 'meta'>; args?: StrArgs<'label' | 'meta'> }
 export interface ChoiceRadiosProps {
+  /** Candidate, `layout: 'inline'` only: 'key' draws each option as a boxed key in the Stepper row's right column (the chosen key takes a 2px ink ring). */
+  face?: 'default' | 'key';
   /** Hide only the field label when an enclosing optional row already names it; accessible label and Clear remain. */
   labelHidden?: boolean;
   disabled?: boolean;
@@ -660,10 +668,13 @@ export interface SentriUI {
   pickerField(props: PickerFieldProps): string;
   pickerOptions(props: { options: PickerOption[]; selected?: string | string[]; action?: string; className?: string; variant?: 'single' | 'multi'; loading?: boolean; error?: string }): string;
   pickerBody(props: PickerBodyProps): string;
-  /** The cascade level for the sheet head: spread into sheet(). Root: { title, up: null }; below: the level's name and ‹ parent. */
-  pickerHead(props: { items: unknown[]; path?: string[]; title?: string; rootLabel?: string; stepAction?: string }): { title: SheetText; up: { label: SheetText; action: string; value: string } | null; rows: number };
-  /** waiting: Done waits (nothing ticked and nothing applied). */
-  pickerFooter(props?: { selected?: string[]; multi?: boolean; waiting?: boolean; backAction?: string; doneAction?: string; strs?: Strs<'back' | 'done'>; args?: StrArgs<'back' | 'done'> }): string;
+  /** A drawer with levels (owner ruling B, 2026-10-16). Spread title, cross and rows into sheet(); hand levelBack to the footer
+      (pickerFooter({ back }) or sheetFooter({ back })). title: the level's name (the root: `title`). cross: the ✕ that closes the
+      whole drawer (closeAction, default 'dismiss'). levelBack: below the root { action: stepAction, value: the path length to
+      keep } (up one level); at the root { action: backAction } (leave, keeping the draft). */
+  pickerHead(props: { items: unknown[]; path?: string[]; title?: string; stepAction?: string; backAction?: string; closeAction?: string }): { title: SheetText; cross: { action: string; label: SheetText }; levelBack: { action: string; value?: string }; rows: number };
+  /** waiting: Done waits (nothing ticked and nothing applied). back: pickerHead().levelBack (up a level; leaves at the root). */
+  pickerFooter(props?: { selected?: string[]; multi?: boolean; waiting?: boolean; back?: { action: string; value?: string } | null; backAction?: string; doneAction?: string; strs?: Strs<'back' | 'done'>; args?: StrArgs<'back' | 'done'> }): string;
   chooserList(content: string, options?: { tone?: 'flat' | 'inset'; className?: string; ds?: string }): string;
   choiceRow(props: ChoiceRowProps): string;
   /** radio (candidate): the panel is a radiogroup labelled by the heading. */
@@ -697,7 +708,7 @@ export interface SheetProps {
   line?: HeaderLine | null;
   /** Drawer only, the header's corner action (owner, 2026-10-14): Clear or Reset as quiet text at the top right, a 48px target vertically centred on the title + line. Pass it only while there is something to clear or reset. */
   corner?: { label: SheetText; action?: string; value?: string; attrs?: SafeAttrs } | null;
-  /** Drawer only: a ✕ at the top left, centred like `corner`. No drawer has one today (Back, a swipe and the scrim close a drawer). */
+  /** Drawer only: a ✕ at the top left, centred like `corner`. A drawer with levels carries it at every level: it closes the whole drawer (owner ruling B, 2026-10-16; pickerHead().cross). */
   cross?: { action?: string; value?: string; label?: SheetText } | null;
   /** Page only: the header's Back (top left). Default { action: 'back' }. */
   back?: { action?: string; value?: string; label?: SheetText } | null;
@@ -705,11 +716,9 @@ export interface SheetProps {
   description?: SheetText | SheetParts;
   /** A glyph name before a dialog's title. */
   icon?: IconName;
-  /** Ignored: no sheet carries a ✕ (drawer convention). Kept for old callers. */
+  /** Ignored (the ✕ is `cross`). Kept for old callers. */
   close?: { action?: string; value?: string; label?: SheetText };
-  /** "‹ Parent" in the head, only in a drawer with levels: goes up one level, names the parent, never labelled Back. */
-  up?: { label: SheetText; action?: string; value?: string } | null;
-  /** Raw HTML before the titles (legacy; use `up`). */
+  /** Raw HTML before the titles (legacy). */
   lead?: string;
   /** Raw HTML between the head and the body that does not scroll (a filter bar). */
   above?: string;

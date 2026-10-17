@@ -4,7 +4,6 @@
 .ph .bg{padding:0 var(--space-gutter)}
 .ph .bar{display:flex;justify-content:space-between;align-items:center;height:var(--statusbar-height);padding:0 var(--space-24);font:700 var(--type-panel-title-size) var(--font-sans)}
 .ph[data-pressed] .surface-back{background:var(--back-press)}
-.ph[data-pressed] .sheet-up{background:var(--press)}
 .ph[data-pressed] .sheet-footer .button.primary{filter:brightness(.96);transform:translateY(1px)}
 .ph[data-pressed] .sheet-footer .surface-back:only-child{background:var(--ink)}
 </style></head><body>
@@ -29,7 +28,7 @@ const R={
 "page-fact":()=>UI.sheet({variant:'page',bar:bar,title:'Farrowing',back:{action:'today',label:'Back to Today'},line:{text:[{text:'Last record '},{text:'08:41',strong:true},{text:' · G.H'}]},body:rows(3,'Sow'),footer:false}),
 "page-waiting":()=>UI.sheet({variant:'page',bar:bar,title:'Move piglets',back:{action:'back'},body:rows(2,'Pen'),footer:pf({primary:{label:'Move 3',action:'save',waiting:true},status:{text:'Pick a pen first'}})}),
 "page-empty":()=>UI.sheet({variant:'page',bar:bar,title:'Pen log',back:{action:'back'},body:'<p class="st-choice-empty">No activity recorded yet.</p>',footer:false}),
-"page-zh":()=>UI.sheet({variant:'page',bar:bar,title:'猪注记录和事件清单，包括出生、死亡、转栏和计数',back:{action:'back',label:'返回'},line:{text:[{text:'最近记录 '},{text:'08:41',strong:true},{text:' · G.H'}]},body:rows(3,'记录'),footer:false}),
+"page-zh":()=>UI.sheet({variant:'page',bar:bar,title:'猪只记录',back:{action:'back',label:'返回'},line:{text:[{text:'最近记录 '},{text:'08:41',strong:true},{text:' · G.H'}]},body:rows(3,'记录'),footer:false}),
 "page-over":()=>UI.sheet({variant:'page',bar:bar,title:'Treatment',back:{action:'back'},body:rows(2),footer:pf({primary:{label:'Record treatment',action:'save'}})})+UI.sheet({title:'Medicine',size:'short',body:rows(2,'Medicine'),footer:UI.sheetFooter({back:{action:'back'}})})
 };
 document.querySelectorAll('[data-state]').forEach(el=>{const k=el.getAttribute('data-demo'),r=R[k];el.querySelector('.bg').innerHTML=bg();if(r)el.querySelector('.over').innerHTML=r();});

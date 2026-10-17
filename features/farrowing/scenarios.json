@@ -1457,6 +1457,101 @@
       },
       {
        "type": "action",
+       "id": "finish.clean.assisted-yes",
+       "label": "tap Yes on Assisted",
+       "taps": [
+        "[data-action='assistance'][data-value='true']"
+       ],
+       "children": [
+        {
+         "type": "outcome",
+         "id": "fa-f11-assisted-no-preselected",
+         "tree": "F-11",
+         "label": "Assisted is a required No / Yes: No is chosen on a new finish, Yes moves the ring",
+         "gwt": {
+          "given": "The Finish sheet is open for a sow, with nothing touched.",
+          "when": "The worker taps Yes on Assisted.",
+          "then": "Assisted was No before the tap (no unanswered state, no Clear); now Yes is chosen and the record holds Yes."
+         },
+         "authority": [
+          {
+           "src": "RUL",
+           "at": "Owner decision 2026-10-15",
+           "says": "Assisted is required, No preselected; no Clear"
+          }
+         ],
+         "visible": [
+          {
+           "el": "[data-action='assistance'][data-value='true'][aria-checked='true']",
+           "in": "sheet",
+           "hard": "wrong-fact"
+          },
+          {
+           "el": "[data-action='assistance-clear']",
+           "is": "absent",
+           "hard": "wrong-fact"
+          }
+         ],
+         "record": [
+          {
+           "expr": "s.assisted === true",
+           "hard": "wrong-fact"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "action",
+       "id": "finish.clean.weight-keyboard",
+       "label": "type 12,6 in the Litter weight field",
+       "taps": [
+        {
+         "fill": "[data-card='0'] input[data-field='weight']",
+         "value": "12,6"
+        }
+       ],
+       "children": [
+        {
+         "type": "outcome",
+         "id": "fa-f12-weight-on-the-keyboard",
+         "tree": "F-12",
+         "label": "The litter weight is typed on the phone's decimal keyboard; a comma becomes a point",
+         "gwt": {
+          "given": "The Finish sheet is open for a sow, with nothing touched.",
+          "when": "The worker taps the Litter weight field and types 12,6 on the phone's decimal keyboard (a comma locale).",
+          "then": "The field reads 12.6 kg, the sheet stays open and Finish farrowing is still there. No Numpad opens."
+         },
+         "authority": [
+          {
+           "src": "RUL",
+           "at": "Owner decision 2026-10-16",
+           "says": "Litter weight stays optional, typed on the phone's own decimal keyboard (Done closes it)"
+          }
+         ],
+         "visible": [
+          {
+           "el": ".st-numpad",
+           "is": "absent",
+           "hard": "wrong-fact"
+          },
+          {
+           "el": "[data-action='lock']",
+           "in": "sheet",
+           "hard": "dead-end"
+          }
+         ],
+         "record": [
+          {
+           "expr": "s.weight === '12.6' && s.view === 'finish'",
+           "hard": "lost-draft"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "action",
        "id": "finish.clean.hold",
        "label": "hold Finish farrowing",
        "taps": [
