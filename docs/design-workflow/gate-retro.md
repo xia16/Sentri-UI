@@ -2,6 +2,17 @@
 
 The owner asked: "1 PR takes like few hrs just to pass the gate. Where is it dumb, too brute force?" This is the answer, measured on the last 30 merged PRs (#151–#189) and the gate's own `mechanical.json` from the runs this session drove. Each entry gives what happens, what it costs, why it is brute force, and the change. The ranked plan is at the end.
 
+## Status after Gate v2 (#194, 2026-10-17)
+
+Written before Gate v2 landed. Against it:
+
+- **Done by v2:** G1 (static reach replaces "draws on every screen"), G2 (a moved main never voids work), re-shooting only what changed (evidence by identity), G8 in part (one scheduler, four workers), docs-only gates in about a minute. v2 measures 8 min for a warm one-function change and 21 min cold.
+- **Still open:** G3 (Results block written by the gate), G5 (split rule), G6 (atlas and critique merge conflicts), G9 (pinned Playwright), G10 (flaky-only deadlock; check against `evaluate()`).
+- **Found since:**
+  - `check-legibility.mjs --compare` on the command line still blocks every new screen ("new screen: no baseline"). Gate v2's own `legibilityWorse` does not; #193 fixes the command line.
+  - A leaf that fails while the scheduler is throttled (#192: "control not found" at 2.9x slowdown, blocked 3 of 3 when run alone) is stored as a design result by identity (`evaluate.mjs` "a design result, pass or fail"), so a re-gate reuses the failure. A missing control under throttling should count as a machine error and be retried.
+  - Cloud sessions can't post the `sentri/gate` status (the proxy answers 403), so a passing gate there can't merge without someone else posting the status.
+
 ## The numbers
 
 **Open to merge** (wall clock, the 29 merged PRs #151–#189):
