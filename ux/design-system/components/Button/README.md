@@ -67,6 +67,8 @@ Do name the act, give one visible reason while it waits and keep one primary per
 
 Implementation: [bundle.js](../bundle.js), [bundle.css](../bundle.css), [index.d.ts](../index.d.ts). Factories return HTML; event delegation and business writes belong to the host. Existing register and helper signatures remain supported; TaskHold binding is a compatibility alias, not a second implementation.
 
+Text register `align`: by default the word is centred in its 48px target, so a short word ("Done") sits a few pixels inside the edge it belongs to. `align:'start'` sets the word on the content edge (a Delete under a form's fields, starting on the field labels' gutter); `align:'end'` ends it on the right edge (a tool word over a list, flush with the list's edge). The target stays 48px either way.
+
 Geometry/type: `tap-min`, `control-height`, `back-width`, `radius-control`, `border-width`, `space-4`, `space-7`, `space-8`, `space-10`, `space-17`, `type-button-size`, `type-hold-caption-size`, `font-sans`. Colour/state: `ink`, `ink-2`, `paper`, `well`, `line`, `control-border`, `disabled-fill`, `press`, `focus`. Hold: `hold-commit`, `hold-sweep-opacity`, `task-hold-caption-opacity`; destructive uses `red`.
 
 ## Related components
@@ -83,6 +85,8 @@ Geometry/type: `tap-min`, `control-height`, `back-width`, `radius-control`, `bor
 Generic component, used across sections. Registers are variants of this component; footer placement is a Sheet composition pattern. Hold absorbs TaskHold; tools absorb Piglet’s former `.sp-tool`. Neither is a second component.
 
 ## References and changelog
+
+2026-10-17 (medicines): text register `align` ('start' | 'end'), so a short text action lines up with the content edge instead of centring in its target.
 
 2026-10-10: unified variants, reasons, hold face and glove targets; removed unused end-early register. [Ant Design Mobile Button](https://github.com/ant-design/ant-design-mobile/blob/master/src/components/button/index.en.md) and [TDesign Button](https://github.com/Tencent/tdesign-mobile-vue/blob/develop/src/button/button.md) guide fill, optional icon and busy state; [Sentri’s research](../../../../docs/design-workflow/research/component-standard.md) records Material 3 and Apple interaction guidance. Sentri retains its stricter 48px glove floor.
 

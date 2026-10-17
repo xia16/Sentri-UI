@@ -56,7 +56,7 @@ Out: the Record treatment and Record vaccination forms themselves (health-record
 - 2026-10-16 (owner, round 4): "Withdrawal period (days)" everywhere; optional fields as ordinary labelled fields (Brand and Condition PickerFields, Note a textarea); batch doses inline on the form with search and Scan (replacing round 3's Custom doses page).
 - 2026-10-16 (owner, round 3): one batch dose; no strength field (strength in the brand's name); withdrawal defaults prefilled in the starting list (sample values); the Medicines page sheets are edit forms with Delete at the bottom.
 - Category titles at a level's header use short names to fit at 360 (this feature's budget): Pain relief, Hormones, Vitamins and iron.
-- The withdrawal notice is a Banner notice: Banner states a consequence before the action it governs; danger is for destructive commits and correction for a review, neither of which this is.
+- The withdrawal period is a muted caption in the PickerField's hint slot (`reason`), under Medicine for its default and under Brand for a brand's own period (owner, in place 2026-10-16): where it sits says whose number it is, and it informs without warning, so it is not a Banner.
 
 Open:
 

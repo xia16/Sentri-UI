@@ -138,7 +138,7 @@ test('batch: Dosage and Unit side by side; no adjust line before a dosage; then 
   assert.doesNotMatch(M.overlay(c), /data-bulk-value=/, 'no per-pig inputs on the form');
 });
 
-test('Dose per pig: every box pre-filled with the actual dose; an adjusted one ink and bold with Adjusted; unadjusted pigs follow the dosage; Save waits; search narrows', () => {
+test('Dose per pig: every box pre-filled with the actual dose; an adjusted one says Adjusted beside its ID; unadjusted pigs follow the dosage; Save waits; search narrows', () => {
   const c = M.seed(); M.openBulkAction(c, 'treatment', ['000254', '000267']); M.handleRecordAction(c, 'medicine-open', ''); M.handleRecordAction(c, 'medicine-select', 'tulathromycin');
   assert.ok(!M.bulkActionValid(c));
   c.form.dose = '2.5'; assert.ok(M.bulkActionValid(c));
@@ -148,7 +148,9 @@ test('Dose per pig: every box pre-filled with the actual dose; an adjusted one i
   assert.match(page, /data-presentation="page"/);
   assert.match(page, /data-bulk-value="000254" value="3"[^>]*data-own="true"/);
   assert.match(page, /data-bulk-value="000267" value="2.5"[^>]*data-own="false"/, 'the actual dosage, not a placeholder');
-  assert.match(page, /data-bulk-summary="000254">Adjusted</);
+  assert.match(page, /<strong>000254<\/strong><small class="feed-change-state" data-bulk-summary="000254">Adjusted</, 'Adjusted on the ear-tag line, adding no height');
+  assert.doesNotMatch(page, /bulk-pig-row[^"]*is-changed/, 'dose rows stay white (no changed tint)');
+  assert.match(page, /Gestation&nbsp;· \d+&nbsp;days/, 'the pig line from the registry');
   assert.doesNotMatch(page, /type="checkbox"/);
   c.form.dose = '4'; page = M.inspectionSurface(c);
   assert.match(page, /data-bulk-value="000267" value="4"/, 'unadjusted pigs follow the dosage'); assert.match(page, /data-bulk-value="000254" value="3"/, 'adjusted ones keep theirs');
@@ -161,6 +163,7 @@ test('Remove pigs switches Dose per pig into a remove mode (a remove control in 
   M.handleRecordAction(c, 'pig-doses-open', '');
   let page = M.inspectionSurface(c);
   assert.match(page, /data-action="dose-remove-mode" data-value="on"/); assert.doesNotMatch(page, /data-action="dose-remove"/);
+  assert.match(page, /class="st-text-action st-text-action--end"[^>]*data-action="dose-remove-mode"/, 'the tool word ends on the list edge');
   M.handleRecordAction(c, 'dose-remove-mode', 'on'); page = M.inspectionSurface(c);
   assert.equal((page.match(/data-action="dose-remove" data-value="0002/g) || []).length, 2); assert.doesNotMatch(page, /data-bulk-value=/, 'the remove control takes the box\'s place');
   M.handleRecordAction(c, 'dose-remove', '000254');

@@ -753,6 +753,9 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
 .st-stepper-value{display:grid;place-items:center;min-width:var(--control-height);min-height:var(--control-height)}
 .st-stepper[data-error] .st-stepper-hint{color:var(--red)}
 .st-text-action{min-height:var(--tap-min)}
+/* Button text register, align: the word on the content edge ('start') or the right edge ('end') instead of centred in its target. */
+.st-text-action.st-text-action--start{justify-content:flex-start;padding-left:0}
+.st-text-action.st-text-action--end{justify-content:flex-end;padding-left:0}
 .st-optional-body .field textarea{height:auto;field-sizing:content;resize:none}
 
 /* Field owns its skin in phone hosts as well as standalone variant pages. */

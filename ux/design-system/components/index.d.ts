@@ -473,6 +473,8 @@ export interface PhotosProps {
 }
 export type ButtonRegister = 'primary' | 'secondary' | 'tool' | 'text' | 'danger' | 'caution';
 export interface ButtonProps {
+  /** Text register only: 'start' puts the word on the content edge, 'end' ends it on the right edge; default centred in its target. */
+  align?: 'start' | 'end';
   icon?: IconHtml;
   disabled?: boolean;
   label: string;

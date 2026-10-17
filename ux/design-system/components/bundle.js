@@ -793,9 +793,11 @@
      word, 13/700 ink-2, no container, ≥48px) · danger. waiting: the waiting face — present, quiet,
      focusable (aria-disabled, never disabled); guard() answers its tap. busy: sent, until the host settles. */
   const REGISTER={primary:'button primary',secondary:'button secondary',tool:'button tool',danger:'button danger',caution:'button caution'};
-  function button({label='',register='secondary',action='',value='',waiting=false,disabled=false,busy=false,icon='',reason='',describedby='',labelledby='',id='',attrs={},className='',strs,args}={}){
+  function button({align='',label='',register='secondary',action='',value='',waiting=false,disabled=false,busy=false,icon='',reason='',describedby='',labelledby='',id='',attrs={},className='',strs,args}={}){
     const o={strs,args},r=oneOf('Button','register',register,['primary','secondary','tool','text','danger','caution'],'secondary');
-    const cls=r==='text'?'st-text-action':REGISTER[r];
+    /* align (text register only): 'start' sets the word on the content edge (a Delete under a form's fields); 'end' ends it on the
+       right edge (a short word over a list). Default: centred in its 48px target. */
+    const cls=r==='text'?'st-text-action'+(align==='start'?' st-text-action--start':align==='end'?' st-text-action--end':''):REGISTER[r];
     const rid=reason?(describedby||fieldId('st-button-reason')):describedby;
     return `<button type="button" class="${cls}${className?' '+esc(className):''}" data-ds="Button" data-register="${r}"${id?` id="${esc(id)}"`:''} data-action="${esc(action)}" data-value="${esc(value)}"${waiting||busy?' aria-disabled="true"':''}${disabled?' disabled':''}${busy?' aria-busy="true" data-busy=""':''}${rid?` aria-describedby="${esc(rid)}"`:''}${labelledby?` aria-labelledby="${esc(labelledby)}"`:''}${r==='tool'&&typeof label==='string'&&label&&!strs?` title="${esc(label)}"`:''}${safeAttr(attrs)}>${icon?`<span aria-hidden="true">${icon}</span>`:''}<span class="st-button-label">${tx(label,o,'label')}</span>${busy?'<span class="st-button-busy" aria-hidden="true">…</span>':''}</button>${reason?buttonReason({id:rid,text:reason}):''}`;
   }

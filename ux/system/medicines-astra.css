@@ -6,7 +6,7 @@
 .inspection-phone .bulk-action-layout.is-given-first>.bulk-controls{display:flex;flex-direction:column;gap:16px;max-height:none;margin:0;padding:0 var(--space-gutter,18px);overflow:visible}
 .inspection-phone .bulk-action-layout.is-given-first>.bulk-after{padding-top:16px;padding-bottom:16px}
 .inspection-phone .bulk-action-layout.is-given-first>.bulk-after:empty{display:none}
-@media(max-width:370px){.inspection-phone .bulk-action-layout.is-given-first>.bulk-controls{padding:0 var(--space-gutter-narrow,12px)}}
+@media(max-width:370px){.inspection-phone .bulk-action-layout.is-given-first>.bulk-controls{padding-left:var(--space-gutter-narrow,12px);padding-right:var(--space-gutter-narrow,12px)}}
 
 /* The add level: Name, Medicine, then Category, stacked in capture order. */
 .inspection-phone .medicine-add-fields{display:flex;flex-direction:column;gap:16px}
@@ -39,4 +39,8 @@
 .inspection-phone .custom-doses-search>.st-choice-search{flex:1 1 auto;margin:0}
 .inspection-phone .custom-doses-sheet .bulk-pig-row{grid-template-columns:minmax(0,1fr) auto}
 .inspection-phone .dose-remove{display:flex;justify-content:flex-end}
+/* "Adjusted" sits on the ear-tag line beside the ID, the pig's line under both, so an adjusted row is as tall as the others. */
+.inspection-phone .custom-doses-sheet .bulk-pig-copy{display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:8px;row-gap:4px;align-items:center}
+.inspection-phone .custom-doses-sheet .bulk-pig-copy>.feed-change-state{justify-self:start}
+.inspection-phone .custom-doses-sheet .bulk-pig-copy>small:not(.feed-change-state){grid-column:1/-1}
 .inspection-phone .dose-list-tools{display:flex;justify-content:flex-end;margin:-8px 0 0}
