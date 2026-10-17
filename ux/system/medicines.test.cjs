@@ -181,7 +181,7 @@ test('a vaccination lists the vaccines by disease, without a one-row category le
   assert.equal(title(c), 'Vaccines');
   assert.doesNotMatch(html, /data-action="medicine-category"/);
   assert.ok(rows(html).includes('PRRS') && rows(html).includes('Classical swine fever') && !rows(html).includes('Meloxicam'));
-  assert.ok(rows(html).includes('# All vaccines') && !rows(html).includes('# Vaccines'), 'the list label differs from the title');
+  assert.ok(rows(html).includes('# All') && !rows(html).some(r => /^# .*Vaccines/.test(r)), 'the list label never repeats the title');
 });
 
 test('Add a medicine: Back keeps the draft, so Add from the same search reopens it as it was left', () => {

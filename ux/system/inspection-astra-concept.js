@@ -757,8 +757,8 @@ function medicinePickerBody(c){
  else {
   const recents=medRecents(c),cats=medTaskCategories(c);
   const recentGroup=recents.length?SentriUI.choiceGroup(recents.map(m=>medRow(c,m)),{title:str('medicines.group.recent')}):'';
-  /* One category left (a vaccination): its diseases straight away, no one-row level; the label differs from the title. */
-  const rest=cats.length===1?SentriUI.choiceGroup(medFarm(c).medicines.filter(m=>m.category===cats[0]&&!m.deleted).map(m=>medRow(c,m)),{title:recents.length?str('medicines.group.all_vaccines'):''}):SentriUI.choiceGroup(cats.map(id=>SentriUI.choiceRow({label:medCategoryName(id),mode:'navigate',action:'medicine-category',value:id})),{title:recents.length?str('medicines.group.categories'):''});
+  /* One category left (a vaccination): its diseases straight away, no one-row level; "All" beside "Recently used", never the title again. */
+  const rest=cats.length===1?SentriUI.choiceGroup(medFarm(c).medicines.filter(m=>m.category===cats[0]&&!m.deleted).map(m=>medRow(c,m)),{title:recents.length?str('medicines.group.all'):''}):SentriUI.choiceGroup(cats.map(id=>SentriUI.choiceRow({label:medCategoryName(id),mode:'navigate',action:'medicine-category',value:id})),{title:recents.length?str('medicines.group.categories'):''});
   body=recentGroup+rest;
  }
  return '<div class="st-picker-body" data-ds="PickerField" data-variant="cascade">'+medSearch(s.search||'')+body+'</div>';

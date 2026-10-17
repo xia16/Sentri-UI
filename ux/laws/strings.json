@@ -2905,7 +2905,7 @@
     "medicines.group.categories": {"en": "Categories", "zh": "分类", "kind": "label"},
     "medicines.group.brands": {"en": "Brands", "zh": "品牌", "kind": "label"},
     "medicines.group.other_brands": {"en": "Other brands", "zh": "其他品牌", "kind": "label"},
-    "medicines.group.all_vaccines": {"en": "All vaccines", "zh": "全部疫苗", "kind": "label"},
+    "medicines.group.all": {"en": "All", "zh": "全部", "kind": "label"},
     "medicines.add_card": {"en": "Add “{name}”", "zh": "添加“{name}”", "kind": "action"},
     "medicines.add.title": {"en": "Add a medicine", "zh": "添加药品", "kind": "title"},
     "medicines.add.name": {"en": "Name", "zh": "名称", "kind": "label"},
