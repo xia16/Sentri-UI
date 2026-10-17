@@ -2905,6 +2905,7 @@
     "medicines.group.categories": {"en": "Categories", "zh": "分类", "kind": "label"},
     "medicines.group.brands": {"en": "Brands", "zh": "品牌", "kind": "label"},
     "medicines.group.other_brands": {"en": "Other brands", "zh": "其他品牌", "kind": "label"},
+    "medicines.group.all_vaccines": {"en": "All vaccines", "zh": "全部疫苗", "kind": "label"},
     "medicines.add_card": {"en": "Add “{name}”", "zh": "添加“{name}”", "kind": "action"},
     "medicines.add.title": {"en": "Add a medicine", "zh": "添加药品", "kind": "title"},
     "medicines.add.name": {"en": "Name", "zh": "名称", "kind": "label"},
@@ -2945,6 +2946,7 @@
     "medicines.dose.scan": {"en": "Scan ear tag", "zh": "扫描耳标", "kind": "label"},
     "medicines.dose.no_match": {"en": "No pig with “{q}”.", "zh": "没有耳标为“{q}”的猪。", "kind": "body"},
     "medicines.detail.withdrawal": {"en": "Withdrawal period (days)", "zh": "休药期（天）", "kind": "label"},
+    "medicines.detail.brand_withdrawal": {"en": "{brand} withdrawal (days)", "zh": "{brand}休药期（天）", "kind": "label"},
     "medicines.detail.default_withdrawal_days": {"en": "Withdrawal period (days)", "zh": "休药期（天）", "kind": "label"},
     "medicines.note.count": {"en": "{n} / {max}", "zh": "{n} / {max}", "kind": "figure"},
     "medicines.dose.label": {"en": "Dosage", "zh": "剂量", "kind": "label"},
@@ -2958,6 +2960,6 @@
     "medicines.dose.summary_adjusted": {"en": "{pigs} · {k} adjusted", "zh": "{n} 头 · {k} 头已调整", "kind": "label"},
     "medicines.pigs.remove_mode": {"en": "Remove pigs", "zh": "移除猪只", "kind": "action"},
     "medicines.pigs.done": {"en": "Done", "zh": "完成", "kind": "action"},
-    "medicines.delete_body": {"en": "Leaves the list for everyone. Past records keep its name.", "zh": "将从全场的列表中移除。以往记录保留其名称。", "kind": "body"}
+    "medicines.delete_body": {"en": "Leaves the list for everyone. Past records keep its name.", "zh": "将从全场列表移除，以往记录保留名称。", "kind": "body"}
   }
 }

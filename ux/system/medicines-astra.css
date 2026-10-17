@@ -18,6 +18,10 @@
 .inspection-phone .medicine-sheet-verbs{margin-top:var(--space-section,24px)}
 .inspection-phone .medicine-sheet-verbs>*+*{margin-top:var(--space-section,24px)}
 .inspection-phone .medicine-delete-action{margin-top:var(--space-section,24px)}
+/* In the edit sheets the Brands heading sits on the field labels' left edge. */
+.inspection-phone .medicine-sheet-verbs .st-choice-heading{padding-left:0}
+/* A field a touch pick returned focus to: no keyboard ring (inspection-astra-concept.js, quietFocus). */
+.inspection-phone [data-touch-focus]:focus-visible{outline:none}
 
 /* Record treatment's optional fields, one under another. */
 .inspection-phone .treatment-optionals{display:flex;flex-direction:column;gap:16px}

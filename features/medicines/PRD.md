@@ -31,7 +31,7 @@ None: the list has no lifecycle. Screens are grouped by surface: choosing (the p
   - Level 2, a category: its medicines; one tap picks and closes.
   - Search, pinned at the top of every level ("Search all options"), matches English and Chinese names and common other names across every category.
 - **Adding a medicine is manual only** (no barcode). A search with no match shows one card and nothing else: `Add “<typed>”`. It opens the add level: Name (pre-filled) and Category (required, one pick; already set when added from inside a category, or from a vaccination). Adding lists it for everyone and picks it.
-- **The Medicines page** (a page, not a drawer), reached from Home → Toolbox → Medicines: the categories, then a category's medicines. A medicine's sheet and a brand's are **edit forms**: their fields on the sheet (a brand: Name, Withdrawal; a farm-added medicine: Name, Default withdrawal; a starting-list medicine: its default withdrawal only, its name read-only), the medicine's brands as rows, **Delete** as a text action at the bottom opening a confirm level ("Past records keep its name"), footer Back + Save. Starting-list medicines have no Delete. Delete removes the entry from the picker; past records keep the name.
+- **The Medicines page** (a page, not a drawer), reached from Home → Toolbox → Medicines: the categories, then a category's medicines. A medicine's sheet and a brand's are **edit forms**: their fields on the sheet (a brand: Name, Withdrawal; a farm-added medicine: Name, Default withdrawal; a starting-list medicine: its default withdrawal only, its name read-only), the medicine's brands as rows, **Delete** as a navigate Row in its own card at the bottom, opening a confirm level ("Past records keep its name"), footer Back + Save. Starting-list medicines have no Delete. Delete removes the entry from the picker; past records keep the name.
 - **Hosts.** Record treatment, one pig and several (health-record): Medicine, Method, Brand (optional), Dose (a number and its unit on one line; the unit remembered per medicine), Condition (optional PickerField; its picker unchanged until the condition rework), Note (optional), then the withdrawal notice. Optional fields are ordinary labelled fields with a grey "Optional" (owner, rounds 4 and 5; the Field law and component change come as their own shared PR).
   - **Note:** a textarea about three lines tall, typed into directly; **at most 200 characters**: input stops at the limit and nothing is cut afterwards; a counter ("180 / 200") shows from 160.
   - **Dosage:** a number and a Unit picker side by side, each its own labelled 48px field ("Dosage", "Unit"); the unit is remembered per medicine.
@@ -61,10 +61,10 @@ Out: the Record treatment and Record vaccination forms themselves (health-record
 Open:
 
 - "Done" leaves Dose per pig's remove mode; the registry's Done applies a picker's choices with its count. The word is to confirm.
-- The red Delete text action, Field's `optional` label and ChoiceList's row faces are separate component decisions.
+- The red Delete, Field's `optional` label and ChoiceList's row faces are separate component decisions.
 
 - The starting list (categories and medicines, EN and ZH) is to be checked by a vet, and its default withdrawals verified against the official periods (China: MOA Announcement No. 278 and its updates) before release.
-- The Delete text action is drawn by Button's text register, which has no destructive (red) face; the red is on the confirm. A destructive text face would be a Button change of its own.
+- The Delete Row is an ordinary navigate Row (ink, no red face); the red is on the confirm. A destructive Row face would be a Row change of its own.
 - Who may add, rename and delete, and edit names and withdrawals (permissions): the prototype lets anyone.
 - None on milk withdrawal: pigs are not milked for sale.
 

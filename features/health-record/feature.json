@@ -1386,7 +1386,7 @@
             "name": "Add",
             "at": "[data-action=\"brand-details-save\"]",
             "shows": "Add",
-            "rule": "Waits until a withdrawal is typed; it is never required. Back goes up to the Brand list (Moxylan ticked), the ✕ closes on the form: either way the brand stays, using the medicine's default."
+            "rule": "Never waits: Add with the field empty keeps the medicine's default; the field label names the brand (Moxylan withdrawal (days)). Back goes up to the Brand list (Moxylan ticked), the ✕ closes on the form: either way the brand stays, using the medicine's default."
           }
         ],
         "controls": [],

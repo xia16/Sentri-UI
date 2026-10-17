@@ -98,10 +98,14 @@ test('Brand: a full-width optional row only once a medicine is chosen; the farm\
   assert.equal(c.form.brand, 'Moxylan'); assert.equal(c.form.brandPick.level, 'details', 'then the optional withdrawal');
   assert.match(M.brandPickerBody(c), /Uses Amoxicillin(&#39;|')s 14 days when empty/);
   assert.doesNotMatch(M.brandPickerBody(c), /Strength/);
-  M.handleRecordAction(c, 'brand-details-save', ''); assert.equal(c.view, 'brand-picker', 'Add waits until a withdrawal is typed');
+  assert.match(M.brandPickerBody(c), /Moxylan withdrawal \(days\)/, 'the label names the brand');
+  assert.doesNotMatch(M.overlay(c), /data-action="brand-details-save"[^>]*aria-disabled="true"/, 'Add never waits: the field is optional');
   c.form.brandPick.draft.withdrawal = '7'; M.handleRecordAction(c, 'brand-details-save', '');
   assert.equal(c.view, 'treatment'); assert.match(M.overlay(c), /Withdrawal period 7 days · until 19 Sep/);
   assert.ok(c.medFarm.brands.some(b => b.medicine === 'amoxicillin' && b.name === 'Moxylan' && b.withdrawal === 7));
+  M.handleRecordAction(c, 'brand-open', ''); M.handleRecordAction(c, 'brand-add', 'Moxylan B'); M.handleRecordAction(c, 'brand-details-save', '');
+  assert.equal(c.view, 'treatment', 'Add with the field empty applies');
+  assert.ok(c.medFarm.brands.some(b => b.name === 'Moxylan B' && b.withdrawal === null), "an empty field keeps the medicine's default");
   M.handleRecordAction(c, 'medicine-open', ''); M.handleRecordAction(c, 'medicine-select', 'meloxicam');
   assert.equal(c.form.brand, '', 'a new medicine drops the old brand');
 });
@@ -177,6 +181,16 @@ test('a vaccination lists the vaccines by disease, without a one-row category le
   assert.equal(title(c), 'Vaccines');
   assert.doesNotMatch(html, /data-action="medicine-category"/);
   assert.ok(rows(html).includes('PRRS') && rows(html).includes('Classical swine fever') && !rows(html).includes('Meloxicam'));
+  assert.ok(rows(html).includes('# All vaccines') && !rows(html).includes('# Vaccines'), 'the list label differs from the title');
+});
+
+test('Add a medicine: Back keeps the draft, so Add from the same search reopens it as it was left', () => {
+  const c = open(); c.form.med.search = 'Cefquinome';
+  M.handleRecordAction(c, 'medicine-add', 'Cefquinome'); M.handleRecordAction(c, 'medicine-add-category', 'antibiotics');
+  M.handleRecordAction(c, 'medicine-up', ''); assert.equal(c.form.med.level, 'root'); assert.equal(c.form.med.search, 'Cefquinome');
+  M.handleRecordAction(c, 'medicine-add', 'Cefquinome'); assert.equal(c.form.med.add.category, 'antibiotics');
+  c.form.med.add.category = ''; M.handleRecordAction(c, 'medicine-add-save', '');
+  assert.match(drawer(c), /Category[^]*?Required/, 'a tap on the waiting Add marks Category Required');
 });
 
 test('Medicines page: edit forms; a starting-list medicine edits only its default withdrawal; brands and farm-added medicines edit name and withdrawal and delete', () => {
@@ -186,13 +200,15 @@ test('Medicines page: edit forms; a starting-list medicine edits only its defaul
   let html = M.overlay(c);
   assert.doesNotMatch(html, /data-med-edit="name"|medicines-level/, 'name read-only, no Delete');
   assert.match(html, /data-med-edit="withdrawal"[^>]*value="14"/, 'the default ships prefilled');
-  c.medPage.medicineDraft.withdrawal = '10'; M.handleRecordAction(c, 'medicines-edit-save', '');
+  c.medPage.drafts['medicine:amoxicillin'].withdrawal = '10'; M.handleRecordAction(c, 'medicines-edit-save', '');
   assert.equal(c.medFarm.medicines.find(m => m.id === 'amoxicillin').withdrawal, 10);
   M.handleRecordAction(c, 'medicines-medicine', 'amoxicillin'); M.handleRecordAction(c, 'medicines-brand', 'amoxicillin/2');
   html = M.overlay(c);
   assert.match(html, /data-med-edit="name"/); assert.doesNotMatch(html, /Strength/); assert.match(html, /Uses Amoxicillin(&#39;|')s 10 days when empty/);
-  assert.match(html, /data-action="medicines-level" data-value="delete"[^>]*>[^]*Delete brand/);
-  c.medPage.brandDraft.name = 'Clamoxyl 15%'; M.handleRecordAction(c, 'medicines-edit-save', '');
+  assert.match(html, /class="medicine-delete-action"><[^>]*st-choice-group[^]*?data-action="medicines-level" data-value="delete"[^>]*>[^]*Delete brand/, 'Delete: a navigate Row in its own card');
+  c.medPage.drafts['brand:amoxicillin/2'].name = 'Clamoxyl X'; M.handleRecordAction(c, 'medicines-up', ''); M.handleRecordAction(c, 'medicines-brand', 'amoxicillin/2');
+  assert.match(M.overlay(c), /data-med-edit="name"[^>]*value="Clamoxyl X"/, 'Back keeps the draft');
+  c.medPage.drafts['brand:amoxicillin/2'].name = 'Clamoxyl 15%'; M.handleRecordAction(c, 'medicines-edit-save', '');
   assert.ok(c.medFarm.brands.some(b => b.name === 'Clamoxyl 15%'));
   M.handleRecordAction(c, 'medicines-brand', 'amoxicillin/2'); M.handleRecordAction(c, 'medicines-level', 'delete');
   assert.match(M.overlay(c), /Past records keep its name/);

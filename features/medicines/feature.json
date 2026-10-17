@@ -296,12 +296,12 @@
           {
             "name": "Vaccine list",
             "at": "PRRS",
-            "shows": "One category left, so its diseases are listed at once under the label Vaccines (no one-row category level)",
+            "shows": "One category left, so its diseases are listed at once under the label All vaccines, which differs from the title (no one-row category level)",
             "logic": "Recents and search are filtered to Vaccines; adding files the new vaccine under Vaccines."
           }
         ],
         "controls": [],
-        "copy": ["medicines.title.vaccines"],
+        "copy": ["medicines.title.vaccines", "medicines.group.all_vaccines"],
         "issues": ["The categories and medicines are the starting list every farm gets (medicines-catalogue.json): to be checked by a vet."]
       }
     },
@@ -469,7 +469,7 @@
       "steps": ["[data-action=\"medicines-category\"][data-value=\"antibiotics\"]", "[data-action=\"medicines-medicine\"][data-value=\"farm-gamithromycin\"]"],
       "figma": "",
       "notes": {
-        "purpose": "An edit form: Name and Default withdrawal editable, then its brands, then Delete medicine (a text action opening a confirm level). Footer Back + Save.",
+        "purpose": "An edit form: Name and Default withdrawal editable, then its brands, then Delete medicine (a navigate Row in its own card, opening a confirm level). Footer Back + Save.",
         "elements": [],
         "controls": [],
         "copy": ["medicines.add.name", "medicines.delete_medicine_action", "medicines.save"],
@@ -486,7 +486,7 @@
       "steps": ["[data-action=\"medicines-category\"][data-value=\"antibiotics\"]", "[data-action=\"medicines-medicine\"][data-value=\"amoxicillin\"]", "[data-action=\"medicines-brand\"][data-value=\"amoxicillin/0\"]"],
       "figma": "",
       "notes": {
-        "purpose": "An edit form: Name and Withdrawal period (days) as fields, then Delete brand (a text action opening a confirm level). Footer Back + Save.",
+        "purpose": "An edit form: Name and Withdrawal period (days) as fields, then Delete brand (a navigate Row in its own card, opening a confirm level). Footer Back + Save.",
         "elements": [
           {
             "name": "Withdrawal",
