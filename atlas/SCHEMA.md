@@ -93,6 +93,10 @@ Examples: `/ux/archive/workflows.html?sec=wf-fault&slide=1` · `/ux/archive/task
 
 The task skeleton demo (`ux/design-system/components/task-skeleton-demo.html`) takes its own screen as `?demo=room|sheet|...`; `screen` is the atlas's.
 
+## `holds`: motion the gate can see
+
+The atlas freezes motion, so a cue that only exists while it animates (a landing tint, a ring that fades) is never shot unless a screen holds it. Give such a screen `"holds": ["<keyframes name>", …]`: the screen is reached the usual way (`url`, `preset`, `steps`), and a still render shows the cue at its hold until the next action (the page or component draws its held frame without motion, e.g. PenMap's `data-pen-land-held`). Every `@keyframes` a change adds or alters in a stylesheet under `ux/` must be held by some screen, or the gate fails "motion has a held frame" (rules ledger L25); the atlas build refuses a `holds` naming a keyframe no stylesheet defines. Example: `farrowing.pen-landed` holds `st-pen-land-act` and `st-pen-land-act-ink`.
+
 ## `steps` inside an embedded page
 
 Steps are looked for in the phone first, then inside its same-origin iframes, so a host screen can reach an embedded page's controls. Farrowing embeds inspection's sow sheet (`?embed=sow`), so its sow actions are meant to be reachable with `steps` such as a sow row, then Actions, then Remove from batch (the population agent verifies the exact path); the poll waits up to 2 s for the iframe to load. A host-only state that needs data posted by the host over `postMessage` is reached the same way, by tapping the host's control that posts it.
