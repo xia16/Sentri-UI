@@ -469,3 +469,40 @@ Held against the Farrowing room (quiet rows, one dark primary) and the sheet's o
 - The owner asked when apps build their own keypad. They do for runs of typed values (keys that never move, a running list, a scanner wedge: the piglet weigh run), when the pad is the whole screen (amount entry), and for restricted keys (PINs, a fixed decimal point). One optional value inside a form is the system keyboard's job; the owner rule *Design for the medium* names the system keyboard and asks for a custom one only where none fits.
 - So the litter weight is now the same Measure row typed on the phone's decimal keyboard (Measure `input: 'system'`: `inputmode="decimal"`, `enterkeyhint="done"`). Done closes it; the host cleans what a keyboard can send (a comma becomes a point; digits and one point, 2 whole digits, 1 decimal) and normalises on save. The Numpad's `dock` and the Measure and Numpad `replace` options are retired (nothing else used them); the Numpad stays for the weigh run, unchanged.
 - Accepted cost: the system keyboard covers the footer while typing (Done or a tap away brings Finish back); iOS's decimal pad has no Done key, so the native app adds one as the keyboard's accessory bar.
+
+# Pen map: the way in, the title and the landing (2026-10-17)
+
+Scope: the room dock's place control (`farrowing.room`, and `data-sync.task-badge`, which draws the same room), the sheet it opens (`farrowing.pen-map`), and the moment after a pen is tapped. Change class: shared component (TaskDock's `unit` gains a framed form; PenMap gains the landing cue; tokens `land-hold` and `land-fade`). Mode: polish. The design is the owner's (rulings of 2026-10-14: entry option C and the name "Pen map"; 2026-10-16: "settle" + "colour carries over"), so each render is judged against its baseline, `0a10c9a` (#164 merged). This section supersedes the 2026-10-14 Keep items that name `Go to pen` and the 900ms tint.
+
+## Keep
+
+- **The pen map itself** (#164): the map as the room, the colour key under the title, the 350ms hold and peek, the map following tab and filter, empty pens disabled. Unchanged.
+- **The dock's order and weight:** Scan ear tag is the one dark button; Search is an icon button on the right; every dock button is 56px.
+- **Tap goes to the pen:** the room list opens with that pen under the sticky tabs.
+
+## Problems
+
+- **major** The owner could not tell when the jump had landed (2026-10-16: "I couldn't really tell when it landed on the pig list"). The list scrolled while the sheet closed, and the cue was a pale green tint (`#e8efdf`) for 900ms that read as nothing on the tinted page. Evidence: the owner's review of the motion strips, 2026-10-16.
+- **major** The dock's place control was frameless text, `B1` over `Go to pen`, beside two framed buttons. It read as a label, not a button (owner, 2026-10-14: "it needs to be a button? it looks kind of weird"), and the pen number repeated the pen the list already shows.
+- **minor** The title `Go to pen` names one use of a surface that is a map of the room; the worker also scans it for where the work is. Owner, 2026-10-14: call the entry and the sheet "Pen map".
+
+## Parts
+
+| Part | Drawn by today | The component whose job it is | Keep / fix / cut |
+|---|---|---|---|
+| Dock place control | page-built `.dock-pen` (frameless, pen number and caption) | TaskDock `unit` | **fix**: the framed form (`.tk-dock-unit[data-framed]`): Search's frame, the grid icon, "Pen map" at 13px / 600, no pen number |
+| Pen number in the dock | page-built | none | **cut**: the list shows the pen |
+| Sheet title | `penText.title` "Go to pen" | Sheet head | **fix**: "Pen map" / 栏位图 |
+| Landing cue | page-built `pen-arrival` tint and ring keyframes in the room stylesheet | PenMap (landing) | **fix**: PenMap's `data-pen-land` cue: the header takes the tapped tile's fill, holds it for `land-hold` (900ms) and fades over `land-fade` (700ms); a white pen gets a 2px ink ring |
+| Sheet exit | Sheet close, with the list scrolling at the same time | Sheet `data-leave` (`sheet-out`, 180ms) | **fix**: the list is placed under the sheet first, then the sheet leaves |
+
+## Self-crit
+
+Held against the room's own dock (Search's frame) and the pen map's tiles (the fills the cue carries over).
+
+#### Final look (`5c0ca0a`, rendered at 390 and 360, EN and ZH, beside `0a10c9a`)
+- **Problems fixed:** the cue lands about 200ms after the tap, in the colour the worker just tapped, on the pen's header; it holds to 0.9s and is gone by 1.6s, and a white pen gets the ink ring. Nothing scrolls in view. The dock entry is a framed button (110px EN, 95px ZH) with no pen number, and Scan's label does not clip at 360. The sheet is titled Pen map.
+- **Keep as strong:** the map, key, peek and filter behaviour are unchanged (`farrowing.pen-map` differs only in its title); Scan stays the only dark button; all three dock buttons are 56px on one centre line.
+- **Squint test:** the dock reads as three buttons, Scan the loudest; after a tap the eye goes to the pen whose colour it just tapped.
+- **Cluttered, flat or bulky:** the dock lost a number and a caption; the cue is one colour on one header, and nothing dims or moves.
+- **Better because** the worker sees where they landed in the colour they tapped, and the way in reads as a button that says what it opens.

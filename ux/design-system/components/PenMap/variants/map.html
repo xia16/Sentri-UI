@@ -35,7 +35,7 @@ const open=(name,lang,o)=>{
  const b=BARNS[name],t=lang==='zh'?ZH:EN;
  const peek=code=>UI.penPeek({title:code,meta:lang==='zh'?'2头母猪':'2 sows',rows:peekRows});
  const body=UI.penMap(Object.assign({},b,{action:'pick',key:'pm-'+name+lang,entrance:t.entrance,labels:t.labels,peek},o||{}));
- return UI.sheet({surface:'menu',size:'long',title:lang==='zh'?'前往栏位':'Go to pen',label:'Go to pen',line:{key:UI.penMapKey({pens:b.pens,words:t.legend})},body,footer:UI.penMapFooter({back:{action:'back',label:lang==='zh'?'返回':'Back'},depth:b.depth,label:lang==='zh'?'跳转栏位':'Jump to pens'})});
+ return UI.sheet({surface:'menu',size:'long',title:lang==='zh'?'栏位图':'Pen map',label:'Pen map',line:{key:UI.penMapKey({pens:b.pens,words:t.legend})},body,footer:UI.penMapFooter({back:{action:'back',label:lang==='zh'?'返回':'Back'},depth:b.depth,label:lang==='zh'?'跳转栏位':'Jump to pens'})});
 };
 const R={
  unit7:()=>open('unit7','en'),

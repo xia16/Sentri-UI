@@ -1080,6 +1080,16 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 .st-pen-ranges button{flex:1 0 auto;min-width:var(--size-56);margin:0;padding:0 var(--space-8);border:0;border-radius:var(--radius-segment);background:transparent;color:var(--ink);font:var(--type-weight-semibold) var(--type-identifier-size) var(--font-mono);white-space:nowrap}
 .st-pen-ranges button[aria-checked=true]{background:var(--paper);box-shadow:0 1px 2px #20291f22}
 .st-pen-ranges button[aria-checked=false]:active{background:var(--handle)}
+/* PenMap · landing ("colour carries over"). The host marks the pen it lands on with data-pen-land (the tapped tile's level) and that pen's
+   header with data-pen-land-head: the header takes the tile's fill, holds it (--land-hold) and fades back (--land-fade); a pen whose tile
+   is white (plain) gets a 2px ink ring on the marked element instead. --land-elapsed resumes a re-rendered pen part-way. One cue; nothing else moves. */
+[data-pen-land] [data-pen-land-head]{animation:st-pen-land-act var(--land-fade) ease-in-out calc(var(--land-hold) - var(--land-elapsed,0ms)) both}
+[data-pen-land=live] [data-pen-land-head]{animation-name:st-pen-land-live}
+[data-pen-land=plain] [data-pen-land-head]{animation:none}
+[data-pen-land=plain]{animation:st-pen-land-ring var(--land-fade) ease-in-out calc(var(--land-hold) - var(--land-elapsed,0ms)) both}
+@keyframes st-pen-land-act{from{background-color:var(--amber-fill)}}
+@keyframes st-pen-land-live{from{background-color:var(--progress-fill)}}
+@keyframes st-pen-land-ring{from{box-shadow:0 0 0 2px var(--ink)}to{box-shadow:0 0 0 2px transparent}}
 
 /* ChoiceList · Inline Choice, key face (opt-in: `face: 'key'`). The same radiogroup, drawn as boxed keys in the Stepper row's column:
    the first key's left edge to the last key's right edge, 3 × field-height less one key gap (136px), an 8px key gap. Each key is the
