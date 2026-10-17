@@ -1091,6 +1091,11 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 @keyframes st-pen-land-act{from{background-color:var(--amber-fill)}}
 @keyframes st-pen-land-live{from{background-color:var(--progress-fill)}}
 @keyframes st-pen-land-ring{from{outline-color:var(--ink)}to{outline-color:transparent}}
+/* the held frame (data-pen-land-held): the cue at its hold, without motion, for a still render (the atlas shoots it; the gate judges it) */
+[data-pen-land][data-pen-land-held],[data-pen-land][data-pen-land-held] [data-pen-land-head]{animation:none}
+[data-pen-land=act][data-pen-land-held] [data-pen-land-head]{background-color:var(--amber-fill)}
+[data-pen-land=live][data-pen-land-held] [data-pen-land-head]{background-color:var(--progress-fill)}
+[data-pen-land=plain][data-pen-land-held]{outline-color:var(--ink)}
 
 /* ChoiceList · Inline Choice, key face (opt-in: `face: 'key'`). The same radiogroup, drawn as boxed keys in the Stepper row's column:
    the first key's left edge to the last key's right edge, 3 × field-height less one key gap (136px), an 8px key gap. Each key is the
