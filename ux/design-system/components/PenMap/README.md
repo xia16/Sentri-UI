@@ -24,7 +24,7 @@ Classification: **component** (a new job; no existing component draws a map of p
 3. **Column letters** (A, B, C…) and **row numbers** (1, 2, 3…): muted 13px mono on the sheet's tint. Letters are always the columns and numbers always the rows, so the map uses the phone's height. Letters stick to the top and numbers to the left. The number column is 22px, or 30px when a row has 100 pens or more.
 4. **Tile**: a button, at least 56 × 56, 8px gaps, 12px radius, the pen code in 15px / 600 mono and nothing else. Columns are `minmax(56px, 1fr)`: when the lanes do not fit at 56px the map scrolls sideways and the tiles never shrink.
 5. **Peek** (on hold): a white card with a 1px `line` border over the lower part of the map, clear of the footer.
-6. **Range control** (footer, only when a row has more than 20 pens): a segmented control beside Back, one button per 20 pens (`1–20`, `21–40`…), each at least 76px wide and the control 56px tall. It scrolls sideways when the ranges overflow, with no visible scrollbar.
+6. **Range control** (footer, only when a row has more than 20 pens): a segmented control beside Back, one button per 20 pens (`1–20`, `21–40`…), each as wide as its label (at least 56px) and sharing the spare width, the control 56px tall. Up to three ranges (60 pens a row) fit beside Back at 360. More scroll sideways, with no visible scrollbar: the next range shows cut at the edge, which says there is more.
 
 ## Variants
 

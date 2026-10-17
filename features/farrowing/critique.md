@@ -132,7 +132,7 @@ The old Figma has no pen map. No existing component draws a spatial map of place
 - **Tap goes to the pen.** The room list opens with that pen pinned under the sticky tab row, its tint fading within 900ms (`room-pen`).
 - **Hold to peek.** 350ms shows the sows of a pen read-only; moving more than 12px cancels; the tap after a peek only closes it.
 - **The map follows the tab and filter.** A pen shows what the list shows in it. Stays, and now says so by colour.
-- **Pen codes in mono, tiles you can hit.** The code is the tile's identity; tiles are larger than today's.
+- **Pen codes in mono, tiles you can hit.** The code is the tile's identity; tiles stay at least 56 × 56, above the 48px floor (a little smaller than the old 78 × 65, so the whole room fits).
 - **Empty pens cannot be opened.**
 
 ## Problems
