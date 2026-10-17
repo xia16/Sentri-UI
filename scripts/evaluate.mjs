@@ -28,7 +28,8 @@ import { auditSpacingPage } from './check-spacing.mjs';
 import { auditHeadersPage, RUNS as HEADER_RUNS, dedupe as dedupeHeaders } from './check-headers.mjs';
 import { auditLegibilityPage, legibilityWorse, count as legCount, failing as legFailing } from './check-legibility.mjs';
 import { checkStatesHtml, VW as STATE_VW } from './check-states.mjs';
-import { walkTree } from './scenario-tree.mjs';
+import { walkTree, leafEntryUrl } from './scenario-tree.mjs';
+import { renderDef } from './atlas-screens.mjs';
 import { leafRunner, leafRow, reportOf, leafContextPool } from './scenario-runner.mjs';
 import { openPrs } from './github.mjs';
 
@@ -164,6 +165,18 @@ export async function evaluate(opts) {
   const harness = (side) => ({ bare: blob(side, 'ux/system/atlas-bare.js'), server: blob(side, 'scripts/serve-ux.cjs'), fonts: blobsHash(S[side].tree, S[side].runtime.filter((f) => f.startsWith('vendor/fonts/'))) });
   const bundleGap = new Set();
   const inputsMemo = new Map(), iiMemo = new Map();
+  // atlas/atlas.json reaches every page through the bare harness, which hands a page only what renders of the screens on it (the
+  // harness's rendered(); renderDef in scripts/atlas-screens.mjs). So an identity whose closure holds atlas.json hashes that, per page
+  // in the closure, instead of the file's blob: a notes edit, an approval or a regenerated atlas re-shoots nothing (#192, 2026-10-17:
+  // every forward merge re-shot every screen). A closure with a load the analyser can't bound that could fetch JSON keeps the file.
+  const ATLAS = 'atlas/atlas.json';
+  const atlasDigest = (side, ii) => {
+    if (!ii?.files?.includes(ATLAS) || (ii.unbounded || []).some((u) => ['any', 'other'].includes(u.type || 'any'))) return { ii, atlas: null };
+    const s = S[side];
+    if (!s.onPage) { s.onPage = new Map(); for (const x of s.screens) { const p = pageOf(x.url); if (!s.onPage.has(p)) s.onPage.set(p, []); s.onPage.get(p).push(renderDef(x)); } }
+    const pages = ii.files.filter((f) => /\.html?$/i.test(f)).sort();
+    return { ii: { ...ii, files: ii.files.filter((f) => f !== ATLAS) }, atlas: sha(canonical(pages.map((p) => [p, s.onPage.get(p) || []]))) };
+  };
   // A screen's share of its identity: what the analyser says it depends on, hashed by blob on its side.
   const screenInputs = (side, id) => {
     const k = side + ' ' + id;
@@ -171,17 +184,22 @@ export async function evaluate(opts) {
     const tree = S[side].tree;
     let ii = null;
     try { ii = identityInputs(S[side].side, id); iiMemo.set(side + ' ' + id, ii); } catch (e) { gaps.push(`identityInputs(${side}, ${id}) threw (${e.message}): its identity hashes every page-loadable file`); }
-    const def = [...S[side].screens, ...S[side].ds].find((x) => x.id === id);
+    const ds = componentPage(id);
+    // a feature screen's definition is what renders of its atlas entry (renderDef): its notes and status draw nothing
+    const def = ds ? S[side].ds.find((x) => x.id === id) : renderDef(S[side].screens.find((x) => x.id === id));
     let v;
-    // A component page (ds:<Name>/<variant>) is the atlas drawing a component's specimen: the atlas, the design system, the
-    // strings it reads and the fonts. Anything else the analyser can't name: every page-loadable file.
-    if (!ii && componentPage(id)) v = { files: blobsHash(tree, S[side].dsFiles), bundle: blob(side, BUNDLE_JS), screen: def, why: 'a component page' };
+    // A component page (ds:<Name>/<variant>) is the atlas drawing a component's specimen: the atlas's code, the design system, the
+    // strings it reads and the fonts. Of atlas.json it reads only the components (stateGridAt draws the variant's own file), so
+    // the screens' entries are not hashed: a notes edit, which rewrites atlas.json, must not re-shoot every component page.
+    // Anything else the analyser can't name: every page-loadable file.
+    if (!ii && ds) v = { files: blobsHash(tree, S[side].dsFiles.filter((f) => f !== 'atlas/atlas.json')), components: sha(canonical(S[side].atlas.platforms.map((p) => p.components || []))), bundle: blob(side, BUNDLE_JS), screen: def, why: 'a component page' };
     else if (!ii) v = { files: blobsHash(tree, S[side].runtime), bundle: blob(side, BUNDLE_JS), screen: def, why: 'no identity inputs: every page-loadable file' };
     else {
-      // the analyser's inputs, hashed by blob (inputsDigest: the bundle once, by the units this screen can run)
-      const d = inputsDigest(ii, tree, S[side].runtime);
+      // the analyser's inputs, hashed by blob (inputsDigest: the bundle once, by the units this screen can run); the atlas by what renders
+      const a = atlasDigest(side, ii);
+      const d = inputsDigest(a.ii, tree, S[side].runtime);
       if (d.gap) bundleGap.add(id);
-      v = { ...d.digest, screen: ii.screen || def };
+      v = { ...d.digest, ...(a.atlas ? { atlas: a.atlas } : {}), screen: ii.screen || def };
     }
     inputsMemo.set(k, v);
     return v;
@@ -190,9 +208,11 @@ export async function evaluate(opts) {
   // change. Its stored evidence would be reused for a screen the analyser says the change can affect: the identity missed an input.
   // In reach because of the files: one of them is in its page closure, or fits a load it can't bound; or the bundle changed and the
   // screen loads it and the analyser says every screen, or it uses a changed export (or the namespace as a whole).
+  // atlas.json is in every closure but is hashed by what renders of it (atlasDigest): a change that leaves that alone leaves the
+  // identity alone by design, so it is not a miss.
   const identityMisses = () => identityContradictions({
     ids: S.cand.screens.filter((x) => reachIds.has(x.id) && S.base.screens.some((b) => b.id === x.id)).map((x) => x.id),
-    files, runtime: new Set([...S.base.runtime, ...S.cand.runtime]), reach,
+    files: files.filter((f) => f !== ATLAS), runtime: new Set([...S.base.runtime, ...S.cand.runtime]), reach,
     same: (id) => canonical(screenInputs('base', id)) === canonical(screenInputs('cand', id)),
     inputs: (id) => [iiMemo.get('base ' + id), iiMemo.get('cand ' + id)].filter(Boolean),
   });
@@ -486,7 +506,10 @@ export async function evaluate(opts) {
     if (noZh(c) && b?.ok && !noZh(b)) zhLost.add(s.id);
     const kind = b?.ok && c?.ok ? 'changed' : c?.ok ? 'new' : 'gone';
     const file = path.join(out, 'pairs', idPath(s.id), `${lang}-${width}.png`);
-    mech.pairs.push({ screen: s.id, feature: s.feature, lang, width, kind, pct: kind === 'changed' ? round4(pct[k] ?? 0) : null, file: path.relative(out, file).replace(/\\/g, '/'), identity: { base: b?.ok ? b.id : null, cand: c?.ok ? c.id : null } });
+    // image: each side's shot by its bytes, so a judgement carries to a pair that shows the same two pictures even when an input
+    // nothing renders from changed both shots' identities (carryJudgements, G17)
+    const imageOf = (x) => { try { return x?.ok && x.png ? sha(fs.readFileSync(x.png)) : null; } catch { return null; } };
+    mech.pairs.push({ screen: s.id, feature: s.feature, lang, width, kind, pct: kind === 'changed' ? round4(pct[k] ?? 0) : null, file: path.relative(out, file).replace(/\\/g, '/'), identity: { base: b?.ok ? b.id : null, cand: c?.ok ? c.id : null }, image: { base: imageOf(b), cand: imageOf(c) } });
     pairJobs.push({ file, b, c, lang, width, noZh });
   }
   if (pairJobs.length) await sched.run({ kind: 'pairs', label: `${pairJobs.length} pair image(s)`, priority: 0, run: async ({ browser: b }) => {
@@ -665,11 +688,12 @@ export async function evaluate(opts) {
   cleanups.push(() => { leafPools.base.close(); leafPools.cand.close(); });
   const leafMemo = new Map();
   const leafReach = (side, l, D) => {
-    const fx = l.state?.reset || {}, url = fx.url || D.url, k = `${side} ${url} ${fx.screen || ''}`;
+    const fx = l.state?.reset || {}, url = leafEntryUrl(fx, D), k = `${side} ${url} ${fx.screen || ''}`;
     if (leafMemo.has(k)) return leafMemo.get(k);
     let ii = null;
     try { ii = leafInputs(S[side].side, { url, screen: fx.screen }); } catch (e) { gaps.push(`leafInputs(${side}, ${url}) threw (${e.message}): its leaves hash every page-loadable file`); }
-    const v = ii ? inputsDigest(ii, S[side].tree, S[side].runtime).digest : { files: blobsHash(S[side].tree, S[side].runtime), why: 'no leaf inputs: every page-loadable file' };
+    const a = ii ? atlasDigest(side, ii) : null;
+    const v = ii ? { ...inputsDigest(a.ii, S[side].tree, S[side].runtime).digest, ...(a.atlas ? { atlas: a.atlas } : {}) } : { files: blobsHash(S[side].tree, S[side].runtime), why: 'no leaf inputs: every page-loadable file' };
     leafMemo.set(k, v);
     return v;
   };

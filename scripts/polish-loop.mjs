@@ -46,7 +46,7 @@ function onMain() {
   return main;
 }
 
-// The checks rewrite tracked reports (review/legibility.json, review/scenarios-*.json); a ledger checkout stays clean.
+// The checks rewrite tracked reports (review/scenarios-*.json); a ledger checkout stays clean.
 const restoreReview = () => sh('git', ['checkout', '--', 'review']);
 
 function shoot(out) {

@@ -50,13 +50,11 @@ const mech = { pass: true, candidate: 'c1', base: 'b1', mode: 'normal', class: {
   screens: { diff: [{ id: 'farrowing.room' }], new: [], gone: [] }, pairs: [mp('farrowing.room', 'en', 390), mp('farrowing.room', 'en', 360)] };
 const pair = (verdict, lang = 'en', width = 390, screen = 'farrowing.room') => ({ screen, lang, width, verdict, why: 'x' });
 
-test('a screen base renders differently twice (flaky) needs no better pair, and alone counts as no change', () => {
+test('there is no flaky exemption: a moved screen needs a better pair, whatever an old run calls flaky (gate v2)', () => {
+  // Gate v2 visits a changed screen again on both sides: it draws its own shot again (a real change) or the gate blocks. A
+  // `flaky` list left in mechanical.json by an older run changes nothing.
   const fl = { ...mech, class: { declared: 'shared' }, flaky: ['farrowing.room'] };
-  // a real change elsewhere still needs one better pair; the flaky screen alone doesn't demand one
-  assert.ok(!checkVerdict({ pass: true, candidate: 'c1', base: 'b1', pairs: [pair('same'), pair('same', 'en', 360)] }, fl).problems.some((p) => /same is not enough/.test(p)));
-  // only flaky screens moved: like no screen changed, a shared/behaviour change passes on a walk
-  assert.ok(checkVerdict({ pass: true, candidate: 'c1', base: 'b1', pairs: [pair('same'), pair('same', 'en', 360)], walk: [{ screen: 'x', ok: true }] }, fl).ok);
-  // without the flaky mark, same is still not enough
+  assert.match(checkVerdict({ pass: true, candidate: 'c1', base: 'b1', pairs: [pair('same'), pair('same', 'en', 360)] }, fl).problems.join(), /same is not enough/);
   assert.match(checkVerdict({ pass: true, candidate: 'c1', base: 'b1', pairs: [pair('same'), pair('same', 'en', 360)] }, mech).problems.join(), /same is not enough/);
 });
 
@@ -214,7 +212,7 @@ test('a candidate that removes behaviour coverage is caught: the runner, a scena
   assert.deepEqual(coverageLost(base, { runner: true, specs: { farrowing: spec(4) } }), []);
   assert.deepEqual(coverageLost(base, { runner: false, specs: { farrowing: spec(3) } }), ['scripts/run-scenarios.mjs is gone']);
   assert.deepEqual(coverageLost(base, { runner: true, specs: { farrowing: null } }), ['features/farrowing/scenarios.json is gone or unreadable']);
-  assert.deepEqual(coverageLost(base, { runner: true, specs: { farrowing: spec(2) } }), ['farrowing has 2 outcome leaves, 3 on base']);
+  assert.deepEqual(coverageLost(base, { runner: true, specs: { farrowing: spec(2) } }), ['farrowing has 2 outcome leaves, 3 on base', 'farrowing: leaf o2 is gone']);
 });
 
 test("the gate's own tools and the workflow text are told apart from design files", () => {

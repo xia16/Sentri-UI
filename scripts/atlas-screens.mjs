@@ -15,6 +15,11 @@ export function screensOf(atlas, { features = [], screens = [] } = {}) {
   return list;
 }
 
+// What renders, of a screen's atlas entry: the bare harness (ux/system/atlas-bare.js) reads only its url, preset and steps. Notes,
+// names, status and approvals describe a screen and draw nothing, so they are part of neither its reach nor its evidence identity
+// (gate-v2 §3: "the screen definition (atlas entry: url, preset, steps)"): editing a screen's notes, or approving it, re-shoots nothing.
+export const renderDef = (d) => (d ? { id: d.id, url: d.url, ...(d.preset !== undefined ? { preset: d.preset } : {}), ...(d.steps !== undefined ? { steps: d.steps } : {}) } : null);
+
 // The design system's own pages (atlas: Components → <Name> → <variant>, each state drawn by atlas/library.js stateGridAt) are
 // in the gate's reach like screens: a page teaches the law, so it must follow it (rules ledger L23). Each is a "screen" with the
 // id ds:<Name>/<variant> and the feature design-system; the variants are those the atlas draws (atlas.json: the files on disk).

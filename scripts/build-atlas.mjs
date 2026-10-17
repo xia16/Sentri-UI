@@ -289,8 +289,8 @@ if (problems.length) {
   process.exit(1);
 }
 
-let commit = '';
-try { commit = execSync('git rev-parse --short HEAD', { cwd: root }).toString().trim(); } catch {}
+// No build stamps (time, commit): the same sources always give the same file, so two branches never conflict on stamps alone and
+// a rebuild that changed nothing is no diff. The published site stamps its own copy (scripts/build-pages.mjs).
 // Components, copy, backlog and the Old UI catalogue belong to a platform. Everything that exists today is mobile.
 // A backlog item inherits the platform of the feature or screen it targets; component, section and unknown targets are mobile.
 const platOfFeature = Object.fromEntries(features.map((f) => [f.id, f.platform]));
@@ -301,8 +301,6 @@ const backlogPlatform = (b) => {
   return 'mobile';
 };
 const atlas = {
-  generated: new Date().toISOString(),
-  commit,
   platforms: sections.platforms.map((p) => {
     const mobile = p.id === 'mobile';
     return {
