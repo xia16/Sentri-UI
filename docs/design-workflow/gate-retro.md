@@ -10,7 +10,7 @@ Written before Gate v2 landed. Against it:
 - **Still open:** G3 (Results block written by the gate), G5 (split rule), G6 (atlas and critique merge conflicts), G9 (pinned Playwright), G10 (flaky-only deadlock; check against `evaluate()`).
 - **Found since:**
   - `check-legibility.mjs --compare` on the command line still blocks every new screen ("new screen: no baseline"). Gate v2's own `legibilityWorse` does not; #193 fixes the command line.
-  - A leaf that fails while the scheduler is throttled (#192: "control not found" at 2.9x slowdown, blocked 3 of 3 when run alone) is stored as a design result by identity (`evaluate.mjs` "a design result, pass or fail"), so a re-gate reuses the failure. A missing control under throttling should count as a machine error and be retried.
+  - A leaf that fails while the scheduler is throttled (#192: "control not found" at 2.9x slowdown, blocked 3 of 3 when run alone) is stored as a design result by identity (`evaluate.mjs` "a design result, pass or fail"), so a re-gate reuses the failure. The cause was a race, not the machine: a tap looked for its control once, 120ms after the step before, while the drawer was still drawing. #198 makes a tap wait for its control to appear and hold still, up to the settling bound; a control that never appears still fails. The runner is part of every leaf's identity, so the stored failure is not reused.
   - Cloud sessions can't post the `sentri/gate` status (the proxy answers 403), so a passing gate there can't merge without someone else posting the status.
 
 ## The numbers
