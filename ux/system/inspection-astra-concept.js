@@ -1853,7 +1853,7 @@ function inspectionSurface(c){
  if(!parent)return content;
  return '<div class="page-background" inert aria-hidden="true">'+overlay({...c,...parent,isDrawerBackground:true})+'</div>'+content;
 }
-/* A pick made by touch hands focus back to its field as a tap does: no keyboard ring (the atlas taps by script, which the
+/* A pick made by touch hands focus back to its field as a tap does: no keyboard ring (bundle.css, data-touch-focus; the atlas taps by script, which the
    browser would otherwise ring). A key pressed in the last second keeps the ring; the mark goes on blur. */
 let lastKeyAt=0;
 gallery.addEventListener('keydown',()=>{lastKeyAt=Date.now();},true);

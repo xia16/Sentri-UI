@@ -1008,8 +1008,8 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
 .room-pen-name,.edit-finish-door{min-height:48px;margin-top:-2px;margin-bottom:-2px}
 .st-fact-link{min-height:48px;min-width:48px;margin:-12px 0}
 .dialog .sheet-footer>.button.secondary{background:#fff;border:1px solid var(--back-border)}
-/* a tap leaves no ring: only keyboard focus may draw one */
-:is(.farrowing-phone,.inspection-phone,.phone,.device,.atlas-phone) :focus:not(:focus-visible){outline:none}
+/* a tap leaves no ring: only keyboard focus may draw one; [data-touch-focus] marks focus a tap handed back (a pick returning to its field) */
+:is(.farrowing-phone,.inspection-phone,.phone,.device,.atlas-phone) :is(:focus:not(:focus-visible),[data-touch-focus]:focus){outline:none}
 /* stepper keys and value in rows: the target is 48, the face stays 44, the margins give the space back */
 .st-stepper[data-variant="row"] .st-stepper-key.st-stepper-key,.st-stepper[data-variant="bare"] .st-stepper-key.st-stepper-key{width:48px;min-width:48px;min-height:48px;margin:-2px}
 .st-stepper[data-variant="row"] .st-stepper-value{display:grid;place-items:center;min-width:calc(3ch + 12px);width:calc(3ch + 12px);min-height:48px;margin:-12px -6px}
