@@ -1,4 +1,4 @@
-/* @ds-bundle: {"format":4,"namespace":"SentriUI","components":[{"name":"Heading"},{"name":"Panel"},{"name":"Facts"},{"name":"Row"},{"name":"Log"},{"name":"Segment"},{"name":"IconButton"},{"name":"Button"},{"name":"Field"},{"name":"PickerField"},{"name":"ChoiceList"},{"name":"CategoryFooter"},{"name":"Sheet"},{"name":"FilterSheet"},{"name":"RangeSlider"},{"name":"Icon"},{"name":"Stepper"},{"name":"Measure"},{"name":"Numpad"},{"name":"Status"},{"name":"ConditionTag"},{"name":"Banner"},{"name":"Photos"}]} */
+/* @ds-bundle: {"format":4,"namespace":"SentriUI","components":[{"name":"Heading"},{"name":"Panel"},{"name":"Facts"},{"name":"Row"},{"name":"Log"},{"name":"Segment"},{"name":"IconButton"},{"name":"Button"},{"name":"Field"},{"name":"PickerField"},{"name":"ChoiceList"},{"name":"CategoryFooter"},{"name":"Sheet"},{"name":"FilterSheet"},{"name":"RangeSlider"},{"name":"PenMap"},{"name":"Icon"},{"name":"Stepper"},{"name":"Measure"},{"name":"Numpad"},{"name":"Status"},{"name":"ConditionTag"},{"name":"Banner"},{"name":"Photos"}]} */
 /* SentriIcons (sentri-icons.js) and the SentriUI parts, in one file. */
 /* Shared icon registry for the Sentri prototypes. One path vocabulary so every
    app renders the same glyphs; apps keep a local fallback for source-only checks. */
@@ -43,6 +43,7 @@
     bookmark:'M6 3h12v18l-6-4-6 4z',tag:'M3.5 4.5v6.3a1 1 0 0 0 .3.7l8.7 8.7a1.5 1.5 0 0 0 2.1 0l5.6-5.6a1.5 1.5 0 0 0 0-2.1L11.5 3.8a1 1 0 0 0-.7-.3H4.5a1 1 0 0 0-1 1zM8 8h.01',
     transfer:'M7 7h11l-3-3M18 7l-3 3M17 17H6l3-3M6 17l3 3',
     down:'m6 9 6 6 6-6',
+    'arrow-down':'M12 5v14M6 13l6 6 6-6',
     'trend-down':'M3 6l7 7 4-4 7 7M21 11v5h-5',
     place:'M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0M15 10a3 3 0 1 1-6 0 3 3 0 0 1 6 0',
     home:'m3 10 9-7 9 7v11h-6v-7H9v7H3z',
@@ -60,7 +61,8 @@
     air:'M3 8h12a3 3 0 1 0-3-3M3 12h16a3 3 0 1 1-3 3M3 16h5',
     upload:'M12 16V4m-4 4 4-4 4 4M4 15v6h16v-6',
     backspace:'M9 5h12v14H9l-6-7zM12 9l6 6M18 9l-6 6',
-    offline:'m3 3 18 18M4 9a13 13 0 0 1 2-1M10 6a14 14 0 0 1 10 3M7 13a8 8 0 0 1 3-1M14 12a8 8 0 0 1 3 1M10 17a3 3 0 0 1 4 0M12 21h.01'
+    offline:'m3 3 18 18M4 9a13 13 0 0 1 2-1M10 6a14 14 0 0 1 10 3M7 13a8 8 0 0 1 3-1M14 12a8 8 0 0 1 3 1M10 17a3 3 0 0 1 4 0M12 21h.01',
+    stop:'M8.5 6.5h7a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-7a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2z'
   };
   const aliases=Object.freeze({origin:'place',arrow:'chevron',condition:'plus'});
   // Compatibility aliases do not add duplicate glyphs to the enumerable registry.
@@ -1033,6 +1035,11 @@
       const chip=`<button type="button" class="st-subject-chip"${sA(c.action||'open-subject',c.value??id.text)}${sL(c.label,{text:'Open '+(id.text??'')})}>${sGlyph('tag')}<span class="st-subject-chip-id">#${sT(id)}</span>${sGlyph('chevron')}</button>`;
       return `<p class="st-header-line" data-line="route">${chip}${facts.length?`<span class="st-header-facts">${facts.map(sParts).join(SEP)}</span>`:''}</p>`;
     }
+    /* key: the colour key of a body that is colour-coded (the pen map): swatch, count, label. Plain text, never tappable (owner, 2026-10-14). */
+    if(line.key){
+      const items=line.key.filter(k=>k&&k.count!=null&&k.label);
+      return items.length?`<p class="st-header-line" data-line="key">${items.map(k=>`<span><i aria-hidden="true" style="background:var(${/^--[\w-]+$/.test(k.fill||'')?k.fill:'--line'})"></i><b>${esc(k.count)}</b> ${esc(k.label)}</span>`).join('')}</p>`:'';
+    }
     const t=line.text??line;
     return t==null||t===''?'':`<p class="st-header-line" data-line="fact">${sParts(t)}</p>`;
   }
@@ -1189,7 +1196,120 @@
     const end=()=>{drag=null;};
     document.addEventListener('pointerup',end);document.addEventListener('pointercancel',end);if(typeof globalThis.addEventListener==='function')globalThis.addEventListener('blur',end);
   }
-  const api=Object.freeze({headerLine,pageHeader,rangeSlider,filterSheet,optionalRow,heading,panel,facts,row,rowGroup,log,logDay,logStamp,logGroups,categoryFooter,field,pickerField,pickerOptions,pickerBody,pickerHead,pickerFooter,filterChips,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowSelectDoor,rowAction,rowSelectChange,status,conditionTag,rowFitTags,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
+  /* PenMap: the room as a map of pens, so a worker finds the pen in front of her by where it is. Letters are always the
+     columns and numbers always the rows, so the map uses the phone's height; it is drawn as seen from the door (the
+     Entrance band): pen 1 is nearest it, at the top. A tile is a button that goes to its pen and says nothing but the pen
+     code; its colour is its status. When the lanes do not fit at 56px the map scrolls sideways; the tiles never shrink.
+     penMap({ lanes, depth, pens:{ B3:'act'|'live'|'plain'|'hidden' }, current, action, key, rangeSize, entrance,
+     labels, peek }): the Entrance band and the map. A pen missing from `pens` is empty; 'hidden' is a pen with
+     sows the current list does not show. Empty and hidden tiles are disabled. The colour key is the sheet's header line: penMapKey({ pens, words }) gives its items, the count of pens at each
+     coloured level, and a level with none is left out. `peek(code)` returns the HTML of the hold-to-peek card for a pen (see penPeek).
+     penMapFooter({ back, depth, rangeSize, label }): Back, and beside it the range control when a row has more than
+     rangeSize pens. The map opens scrolled so its current pen is in view; the range control follows the map's scroll. */
+  const PEN_LEVELS=['act','live','plain','hidden'],PEN_HOLD_MS=350,PEN_SLOP=12,PEN_GAP=8,penPeeks=new Map();
+  let penHold=null,penSwallow=false;
+  const penLabels=o=>Object.assign({map:'Pens',act:'needs you',live:'farrowing',plain:'has sows',empty:'empty',hidden:'no sows match',pen:c=>'Pen '+c},o);
+  function penMap({lanes=['A','B','C','D'],depth=6,pens={},current='',action='pen',key='pen-map',rangeSize=20,entrance='Entrance',labels={},peek=null,className=''}={}){
+    const L=penLabels(labels),rows=Array.from({length:Math.max(1,depth|0)},(_,i)=>i+1);
+    if(typeof peek==='function')penPeeks.set(key,peek);else penPeeks.delete(key);
+    const level=c=>PEN_LEVELS.includes(pens[c])?pens[c]:'empty';
+    const tile=c=>{const l=level(c),off=l==='empty'||l==='hidden';
+      return `<button type="button" class="st-pen-tile" data-level="${l}" data-pen="${esc(c)}"${off?' disabled':` data-action="${esc(action)}" data-value="${esc(c)}"`} aria-label="${esc(L.pen(c)+', '+L[l])}">${esc(c)}</button>`;};
+    const grid=`<div class="st-pen-grid" style="--pm-lanes:${lanes.length}"><span class="st-pen-col st-pen-row" aria-hidden="true"></span>${lanes.map(c=>`<span class="st-pen-col" aria-hidden="true">${esc(c)}</span>`).join('')}${rows.map(n=>`<span class="st-pen-row" data-row="${n}" aria-hidden="true">${n}</span>${lanes.map(c=>tile(c+n)).join('')}`).join('')}</div>`;
+    return `<div class="st-pen-map${className?' '+esc(className):''}" data-ds="PenMap" data-key="${esc(key)}"${current?` data-current="${esc(current)}"`:''}${rows.length>99?' data-wide':''}><div class="st-pen-entrance">${sGlyph('arrow-down')}<span>${esc(entrance)}</span></div><div class="st-pen-field"><div class="st-pen-scroll" role="group" aria-label="${esc(L.map)}">${grid}</div><div class="st-pen-peek" hidden></div></div></div>`;
+  }
+  /* penMapKey({ pens, words:{ act, live } }): the items of the sheet's key line: sheet({ line:{ key: penMapKey(...) } }). */
+  function penMapKey({pens={},words={}}={}){
+    const w=Object.assign({act:'need you',live:'farrowing'},words),n=l=>Object.values(pens).filter(v=>v===l).length;
+    return [['act','--amber-fill'],['live','--progress-fill']].filter(([l])=>n(l)).map(([l,fill])=>({fill,count:n(l),label:w[l]}));
+  }
+  /* penPeek({ title, meta, rows }): the body of the peek card: the pen code with its count, then one animal Row per sow,
+     the same row as the room list (`rows` are Row props: code and right:{ kind:'state', figure, word, level }). */
+  function penPeek({title='',meta='',rows=[]}={}){
+    return `<div class="st-pen-peek-head"><b>${esc(title)}</b>${meta?`<span>${esc(meta)}</span>`:''}</div>${rows.map(r=>row(Object.assign({variant:'animal',className:'st-pen-peek-row'},r))).join('')}`;
+  }
+  function penMapFooter({back={action:'back'},depth=0,rangeSize=20,label='Jump to pens'}={}){
+    const size=Math.max(1,rangeSize|0);
+    if(!(depth>size))return sheetFooter({back});
+    const ranges=Array.from({length:Math.ceil(depth/size)},(_,i)=>[i*size+1,Math.min(depth,(i+1)*size)]);
+    return sheetFooter({content:backButton(back)+`<div class="st-pen-ranges" data-ds="PenMap" role="radiogroup" aria-label="${esc(label)}">${ranges.map(([a,b],i)=>`<button type="button" role="radio" data-from="${a}" data-to="${b}" aria-checked="${i===0}">${a}–${b}</button>`).join('')}</div>`});
+  }
+  /* The map's own behaviour. A pen map is found by its markup, so any host that draws one gets it without a call:
+     it opens centred on its current pen; the range control (in the sheet's footer) follows the top visible row, and a tap
+     on a range scrolls its first row to just under the column letters; a hold shows the peek (350ms; a move of more than
+     12px, a scroll or a release hides it), and the tap after a peek only closes it. */
+  const penHead=map=>map.querySelector('.st-pen-col'),penSheet=el=>el.closest('.sheet,.phone')||document.body;
+  function penTopRow(map){
+    const h=penHead(map).getBoundingClientRect().bottom;
+    for(const l of map.querySelectorAll('.st-pen-row[data-row]'))if(l.getBoundingClientRect().bottom>h+4)return +l.dataset.row;
+    return 1;
+  }
+  function penMark(map){
+    const ranges=penSheet(map).querySelector('.st-pen-ranges');if(!ranges)return;
+    const btns=[...ranges.children],atEnd=map.scrollHeight>map.clientHeight+1&&map.scrollTop+map.clientHeight>=map.scrollHeight-1,n=penTopRow(map);
+    const on=atEnd?btns[btns.length-1]:btns.find(b=>n>=+b.dataset.from&&n<=+b.dataset.to);
+    btns.forEach(b=>b.setAttribute('aria-checked',String(b===on)));
+    if(on){const r=on.getBoundingClientRect(),q=ranges.getBoundingClientRect();if(r.left<q.left)ranges.scrollLeft+=r.left-q.left;else if(r.right>q.right)ranges.scrollLeft+=r.right-q.right;}
+    penEdges(ranges);
+  }
+  /* ranges that overflow fade on the side that has more, so a cut range reads as "more this way", never as clipped */
+  function penEdges(r){
+    const s=r.scrollLeft,more=[s>1&&'start',s+r.clientWidth<r.scrollWidth-1&&'end'].filter(Boolean).join(' ');
+    if(more)r.dataset.more=more;else delete r.dataset.more;
+  }
+  function penMount(scope){
+    const maps=!scope||!scope.querySelectorAll?[]:scope.matches&&scope.matches('.st-pen-map')?[scope]:[...scope.querySelectorAll('.st-pen-map')];
+    for(const m of maps){
+      if(m.dataset.mounted)continue;m.dataset.mounted='1';
+      const map=m.querySelector('.st-pen-scroll'),cur=m.dataset.current&&[...map.querySelectorAll('.st-pen-tile')].find(t=>t.dataset.pen===m.dataset.current);
+      if(cur){
+        const box=map.getBoundingClientRect(),head=penHead(map).getBoundingClientRect(),side=map.querySelector('.st-pen-row').getBoundingClientRect(),r=cur.getBoundingClientRect();
+        map.scrollTop+=r.top+r.height/2-(head.bottom+box.bottom)/2;map.scrollLeft+=r.left+r.width/2-(side.right+box.right)/2;
+        /* then rest on a whole row and column: the tile edge sits PEN_GAP under the letters and beside the numbers */
+        const snap=(d,pitch)=>{d=((d%pitch)+pitch)%pitch;return d>pitch/2?d-pitch:d;},at=cur.getBoundingClientRect();
+        map.scrollTop+=snap(at.top-(head.bottom+PEN_GAP),at.height+PEN_GAP);
+        if(map.scrollWidth>map.clientWidth+1)map.scrollLeft+=snap(at.left-(side.right+PEN_GAP),at.width+PEN_GAP);
+      }
+      penMark(map);
+    }
+  }
+  function penStop(){
+    const p=penHold;if(!p)return;
+    clearTimeout(p.timer);penHold=null;p.map.querySelector('.st-pen-peek').hidden=true;
+  }
+  if(typeof document!=='undefined'){
+    if(typeof MutationObserver!=='undefined')new MutationObserver(ms=>{for(const m of ms)for(const n of m.addedNodes)if(n.nodeType===1)penMount(n);}).observe(document,{childList:true,subtree:true});
+    if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>penMount(document));else penMount(document);
+    let frame=0;
+    document.addEventListener('scroll',e=>{const t=e.target;if(t.classList&&t.classList.contains('st-pen-ranges')){penEdges(t);return;}if(!t.classList||!t.classList.contains('st-pen-scroll'))return;penStop();cancelAnimationFrame(frame);frame=requestAnimationFrame(()=>penMark(t));},true);
+    document.addEventListener('click',e=>{
+      const b=e.target.closest&&e.target.closest('.st-pen-ranges button');
+      if(b){
+        const map=penSheet(b).querySelector('.st-pen-scroll'),l=map&&map.querySelector(`.st-pen-row[data-row="${b.dataset.from}"]`);
+        if(l)map.scrollTop+=l.getBoundingClientRect().top-penHead(map).getBoundingClientRect().bottom-PEN_GAP;
+        return;
+      }
+      if(penSwallow&&e.target.closest&&e.target.closest('.st-pen-tile')){penSwallow=false;e.stopImmediatePropagation();e.preventDefault();}
+    },true);
+    document.addEventListener('pointerdown',e=>{
+      penSwallow=false;penStop();
+      const t=e.target.closest&&e.target.closest('.st-pen-tile:not(:disabled)');if(!t||e.button!==0)return;
+      const root=t.closest('.st-pen-map'),fn=penPeeks.get(root.dataset.key);if(!fn)return;
+      penHold={map:root,x:e.clientX,y:e.clientY,timer:setTimeout(()=>{
+        const card=root.querySelector('.st-pen-peek'),code=t.dataset.pen;
+        card.innerHTML=fn(code);card.dataset.at='bottom';card.hidden=false;penSwallow=true;
+        /* over the lower part of the map, and over the upper part when the held tile would sit under it */
+        const c=card.getBoundingClientRect(),r=t.getBoundingClientRect();
+        if(r.bottom>c.top&&r.top<c.bottom)card.dataset.at='top';
+        root.dispatchEvent(new CustomEvent('sentri-pen-peek',{bubbles:true,detail:{pen:code}}));
+      },PEN_HOLD_MS)};
+    });
+    document.addEventListener('pointermove',e=>{if(penHold&&Math.hypot(e.clientX-penHold.x,e.clientY-penHold.y)>PEN_SLOP)penStop();});
+    for(const n of ['pointerup','pointercancel'])document.addEventListener(n,penStop);
+    document.addEventListener('contextmenu',e=>{if(e.target.closest&&e.target.closest('.st-pen-tile'))e.preventDefault();});
+    if(typeof globalThis.addEventListener==='function')globalThis.addEventListener('blur',penStop);
+  }
+  const api=Object.freeze({headerLine,pageHeader,rangeSlider,filterSheet,penMap,penMapKey,penMapFooter,penPeek,penMapMount:penMount,optionalRow,heading,panel,facts,row,rowGroup,log,logDay,logStamp,logGroups,categoryFooter,field,pickerField,pickerOptions,pickerBody,pickerHead,pickerFooter,filterChips,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowSelectDoor,rowAction,rowSelectChange,status,conditionTag,rowFitTags,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
   root.SentriUI=api;
   if(typeof module!=='undefined')module.exports=api;
 })(globalThis);

@@ -63,7 +63,8 @@
 <script src="shell-ui.js"></script>
 <script>
 (function () {
-  var UI = window.SentriUI, U = window.PPUI, ICON = window.SentriIcons, K = window.SentriTask;
+  const UI = window.SentriUI, ICON = window.SentriIcons;
+  var U = window.PPUI, K = window.SentriTask;
 
   /* ---- states: a variant of the shared fixture + the crate + the Edit draft. What can be corrected, the change summary,
      the records a change would drop, why Save waits and the effect of Save are the ledger's (select.edit: the draft is ONE

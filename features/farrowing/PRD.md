@@ -49,7 +49,7 @@ From RULINGS.md, quoted short:
 
 In:
 
-- Room list: unit card, whole-task card, Awaiting / Active / Done / All tabs, due and parity filter, pen grouping, Go to pen, Scan ear tag, Search.
+- Room list: unit card, whole-task card, Awaiting / Active / Done / All tabs, due and parity filter, pen grouping, Pen map, Scan ear tag, Search.
 - Find a sow (a full page that searches every unit) and Scan ear tags (a full page, always listening, that collects scanned sows). A sow in any unit opens her farrowing drawer.
 - The sow sheet in its faces: Before first count, Counting, Finish (and its blocked form), Locked record, Sow died.
 - Death entry (piglets and the sow), Edit record, Edit of a finished litter and the Correct born correction (in place), the Farrowing log.
@@ -116,7 +116,7 @@ Out:
 - **Scan always listens.** The dock's Scan ear tag button, and the scan icon in Find a sow, open **Scan ear tags**, a full page. The reader is always listening: there is no "ready for the next tag" banner and no "Not found" row. A small status pill in the header says `● Scanning` or `○ Stopped` (the dot is ink, never green). Not connected: a scan icon, "Scanner not connected" and the pairing instruction, with no buttons (the back arrow leaves). Connected and nothing scanned: "Hold the reader to an ear tag". Each scan adds the sow to a list, grouped **In Unit 7 · n** and **Other units · n**, newest first; a repeat scan adds nothing and briefly highlights her existing row. Each row is the Row · animal variant with her Farrowing state, as a select + door: the tick box selects, the rest of the row opens her farrowing drawer, in this unit or another.
 - **Ticks are for bulk, with generic Actions only.** Nothing ticked: one full-width button, **Stop scanning** (it becomes **Resume scanning** while stopped). One or more ticked: **N sows selected** (a plain count: no chevron, nothing to tap; to untick, tap the box) and the primary **Actions**, which opens the shared generic actions for the selection only: Transfer, Health finding or treatment, Note. Scan offers no Farrowing action. In the prototype each Action opens its existing single-sow flow for the first ticked sow, because no shared flow takes a whole selection yet (a gap for the shared Actions).
 - **The selection bar's button says "Actions"**, not "More actions".
-- Prototype only: `?scanner=off` opens Scan as if no reader were paired, and a "Simulate scan" control outside the phone frame adds the next sample sow. The `stop` glyph is added from `ux/system/farrowing-icons.js` until it joins the shared icon registry.
+- Prototype only: `?scanner=off` opens Scan as if no reader were paired, and a "Simulate scan" control outside the phone frame adds the next sample sow. The `stop` glyph is in the shared icon registry.
 
 ### Owner decisions, 2026-10-15 · Finish farrowing
 

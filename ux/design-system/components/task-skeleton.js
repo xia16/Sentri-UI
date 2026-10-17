@@ -239,10 +239,11 @@
   }
 
   /* ---- TaskDock ---- */
-  /* unit: farrowing's labelled place control at the dock's start (B1 / Go to pen): { icon = 'grid', label, caption, action,
-     value, aria } — the place in 13px/600 mono over a 9px caption, the icon left, no frame. */
+  /* unit: the place control at the dock's start. framed: farrowing's Pen map, the Search button's frame holding the icon and a 13px/600
+     label (no caption, no place figure). Without framed it is the older frameless form with a caption (Piglet processing's room, until
+     it migrates): { icon = 'grid', label, caption, action, value, aria, framed }. */
   function dock({ primary, tools = [], unit } = {}) {
-    const u = unit ? `<button type="button" class="tk-dock-unit"${A(unit.action || 'unit', unit.value)}${L(unit.aria)}>${glyph(unit.icon || 'grid')}<span><strong>${T(unit.label)}</strong>${unit.caption ? `<small>${T(unit.caption)}</small>` : ''}</span></button>` : '';
+    const u = unit ? `<button type="button" class="tk-dock-unit"${unit.framed ? ' data-framed' : ''}${A(unit.action || 'unit', unit.value)}${L(unit.aria)}>${glyph(unit.icon || 'grid')}<span><strong>${T(unit.label)}</strong>${unit.caption && !unit.framed ? `<small>${T(unit.caption)}</small>` : ''}</span></button>` : '';
     const p = u + (primary ? `<button type="button" class="tk-dock-primary"${A(primary.action, primary.value)}>${primary.icon ? glyph(primary.icon) : ''}<span>${T(primary.label)}</span></button>` : '');
     const t = tools.map(x => `<button type="button" class="tk-dock-tool"${A(x.action, x.value)}${L(x.label)}>${glyph(x.icon)}</button>`).join('');
     return `<nav class="tk-dock" data-ds="TaskDock"${L(tools.label)}>${p}${t}</nav>`;

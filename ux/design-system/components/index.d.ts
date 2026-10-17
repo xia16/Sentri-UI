@@ -695,10 +695,11 @@ export type SheetText = string | { text?: string; str?: string; args?: Record<st
 export interface SheetAction { label: SheetText; action?: string; value?: string; register?: 'primary' | 'secondary' | 'tool' | 'text' | 'danger'; waiting?: boolean; busy?: boolean; describedby?: string; className?: string; attrs?: SafeAttrs }
 /** A line of text slots joined by { sep: true }; { strong: true } draws a figure in ink. */
 export type SheetParts = Array<SheetText | { sep: true } | { text: string; strong?: boolean; tone?: 'amber' | 'red' | 'green' }>;
-/** The header line: a route (the subject chip opening the animal, then at most two muted identity facts) or one fact. */
+/** The header line: a route (the subject chip opening the animal, then at most two muted identity facts), one fact, or a colour key for a colour-coded body (owner, 2026-10-14): plain text, never tappable. */
 export type HeaderLine =
   | { chip: { id: SheetText; action?: string; value?: string; label?: SheetText }; facts?: Array<SheetText | SheetParts> }
-  | { text: SheetText | SheetParts };
+  | { text: SheetText | SheetParts }
+  | { key: Array<{ fill: string; count: number | string; label: string }> };
 export interface SheetProps {
   /** drawer (default): over the page, sized to its content, a handle, the sheet header (centred title, line, hairline) · page: the whole canvas, the page header (Back top left, title, line), no Back in the footer · dialog: one small decision rising from the bottom. */
   variant?: 'drawer' | 'page' | 'dialog';
@@ -786,7 +787,7 @@ export type IconName =
   | 'alert' | 'signal' | 'battery' | 'filter' | 'minus' | 'plus' | 'record' | 'camera' | 'edit' | 'wrench'
   | 'details' | 'calendar' | 'bookmark' | 'transfer' | 'down' | 'arrow' | 'place' | 'home' | 'toolbox' | 'spark'
   | 'heat' | 'pregnancy' | 'farrow' | 'barn' | 'return' | 'send' | 'health' | 'temperature' | 'humidity' | 'air'
-  | 'upload' | 'offline' | 'backspace';
+  | 'upload' | 'offline' | 'backspace' | 'arrow-down';
 
 declare global {
   interface Window { SentriUI: SentriUI; SentriIcons: SentriIcons }
@@ -795,3 +796,39 @@ declare global {
 export interface RangeSliderProps { min?:number; max?:number; step?:number; value?:[number,number]; title?:string; icon?:string; key?:string; names?:[string,string]; labels?:[string,string]; format?:(value:number)=>string; summary?:(from:number,to:number)=>string; ends?:string[]; className?:string }
 export interface FilterSheetProps { title?:string; sections?:{title?:string;icon?:string;content?:string;help?:string}[]; body?:string; apply?:{label?:string;action?:string}; reset?:{label?:string;action?:string}|false; backAction?:string; backLabel?:string; closeAction?:string; className?:string; size?:'compact'|'short'|'medium'|'long'; label?:string }
 export interface SentriUI { rangeSlider(props?:RangeSliderProps):string; filterSheet(props?:FilterSheetProps):string }
+
+/** A pen's status on the map. act: needs the worker. live: farrowing. plain: has sows the list shows. hidden: has sows the current tab or filter hides. A pen missing from pens is empty. */
+export type PenLevel = 'act' | 'live' | 'plain' | 'hidden';
+export interface PenMapLabels { map?: string; act?: string; live?: string; plain?: string; empty?: string; hidden?: string; pen?: (code: string) => string }
+export interface PenMapProps {
+  /** Column letters, in order. */
+  lanes?: string[];
+  /** Rows (pens per lane). Pen codes are the lane then the row: B3, A120. */
+  depth?: number;
+  pens?: Record<string, PenLevel>;
+  /** The pen the map opens centred on. */
+  current?: string;
+  /** The data-action of every tile that can be opened; its data-value is the pen code. */
+  action?: string;
+  /** Names this map for the peek registry; give each map on a page its own. */
+  key?: string;
+  /** Pens per range in the footer control (default 20). */
+  rangeSize?: number;
+  entrance?: string;
+  labels?: PenMapLabels;
+  /** The hold-to-peek card for a pen, as HTML (see penPeek). Without it a hold does nothing. */
+  peek?: (pen: string) => string;
+  className?: string;
+}
+export interface PenPeekProps { title?: string; meta?: string; rows?: RowProps[] }
+export interface PenMapFooterProps { back?: { action?: string; value?: string; label?: SheetText }; depth?: number; rangeSize?: number; label?: string }
+export interface SentriUI {
+  penMap(props?: PenMapProps): string;
+  /** The items of the sheet's key line (`sheet({ line: { key: penMapKey({ pens, words }) } })`): the count of pens at each coloured level; a level with none is left out. */
+  penMapKey(props?: { pens?: Record<string, PenLevel>; words?: { act?: string; live?: string } }): Array<{ fill: string; count: number; label: string }>;
+  penPeek(props?: PenPeekProps): string;
+  /** Back alone, or Back beside the range control when a row has more than rangeSize pens. */
+  penMapFooter(props?: PenMapFooterProps): string;
+  /** Mounts the maps under a node; a map is also mounted by itself when it enters the document. */
+  penMapMount(scope?: ParentNode): void;
+}

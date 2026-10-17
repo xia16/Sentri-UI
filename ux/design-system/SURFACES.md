@@ -4,7 +4,7 @@ Owner ruling, 2026-10-12. **Read this before you build or change any screen, she
 
 ## The rule
 
-1. **Pages and menu drawers are the tint (`app-background`) with white cards.** A menu drawer is one where every row is an option or a verb (Choose a unit, More actions, Allocate piglets, Go to pen, Measurements & condition). **Content and input drawers are white with tinted cards**: search, forms, records, filters, pen sheets, and **Today**, which stays white.
+1. **Pages and menu drawers are the tint (`app-background`) with white cards.** A menu drawer is one where every row is an option or a verb (Choose a unit, More actions, Allocate piglets, Pen map, Measurements & condition). **Content and input drawers are white with tinted cards**: search, forms, records, filters, pen sheets, and **Today**, which stays white.
 2. **A card is always the opposite of its base, with a 1px `line` border.** Nothing is flat (white on white), nothing is tint on tint, and no row list sits on a base without a card. **Docks and footers are white.**
 3. **Icon tiles are `row-icon-bg`. Pressed is one step deeper than its surface:** `press` on white, `choice-press` on the tint.
 4. **Current or selected is ink:** a ✓, a checkbox, or an ink ring. No green fill and no inset marker bar, anywhere.
@@ -14,6 +14,8 @@ Owner ruling, 2026-10-12. **Read this before you build or change any screen, she
 Open question (owner to decide): lists of tappable rows in input drawers (Find a sow results, picker lists, the allocation choices) are a tinted card today. Rule 6 suggests white; both versions will be mocked before this changes.
 
 Green means done, recorded or synced, nothing else. Amber and red washes mean status and are never a card's resting colour.
+
+**Fills and washes (owner, 2026-10-14).** Fills colour a status that covers a whole area (a pen tile); washes stay text backgrounds; a fill is never a card's resting colour. The washes measure ΔE 2.8 from the tint and read grey at tile size, so an area takes a fill: `amber-fill` and `progress-fill`, each with its own dark ink, at 85% strength.
 
 ### Which context is my screen?
 
@@ -43,6 +45,7 @@ Screens choose a context and never paint a panel colour. The context sets `--st-
 | Field | bare on the base, `field-border` | bare on the base |
 | Footer, dock, bottom nav | `paper`, `line` top border | `paper`, `line` top border |
 | Status wash (amber, red) | only for a status, never a card's resting colour | the same |
+| Status fill (a pen tile) | `amber-fill` / `progress-fill` with `amber-fill-ink` / `progress-fill-ink` text and no border, only for a status that covers a whole area; never a card's resting colour | the same |
 
 ## Examples
 

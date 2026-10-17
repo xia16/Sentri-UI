@@ -16,7 +16,9 @@ import { createServer } from 'node:net';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { screensOf, componentPagesOf, idPath } from './loop-rules.mjs';
+import { screensOf, componentPagesOf, idPath } from './atlas-screens.mjs';
+import { gridOnly } from './visit.mjs';
+import { LAUNCH_ARGS } from './machine.mjs';
 import { routeFonts } from './font-route.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -57,29 +59,8 @@ if (!base) {
 }
 base = base.replace(/\/$/, '');
 
-// A component page: the atlas draws its states (one srcdoc frame per state, tokens.css, bundle.css and bundle.js injected), then the
-// grid alone becomes the page, two phone-width cells to a row. Moving a frame reloads it; each frame fits its height on load.
-async function gridOnly(page, width) {
-  await page.waitForSelector('.vbody .sgrid .scell iframe', { timeout: 15000 });
-  // the atlas's first load of each frame finishes (its fonts too) before the move, so no font request is cut off mid-flight
-  await page.waitForFunction(() => [...document.querySelectorAll('.vbody .sgrid iframe')].every((f) => f.contentDocument?.readyState === 'complete'), null, { timeout: 15000 });
-  for (const f of page.frames()) await f.evaluate(() => document.fonts.ready.then(() => true)).catch(() => {});
-  await page.evaluate(async (w) => {
-    const grid = document.querySelector('.vbody .sgrid'), frames = [...grid.querySelectorAll('iframe')];
-    const loaded = Promise.all(frames.map((f) => new Promise((r) => { f.addEventListener('load', r, { once: true }); setTimeout(r, 10000); })));
-    document.body.replaceChildren(grid);
-    document.documentElement.setAttribute('style', 'height:auto!important;overflow:visible!important;background:#f2f3ee');
-    document.body.setAttribute('style', 'height:auto!important;overflow:visible!important;margin:0;padding:12px 16px;display:block;width:max-content');
-    Object.assign(grid.style, { gridTemplateColumns: `repeat(${Math.min(2, frames.length)}, ${w}px)`, margin: '0', gap: '20px 16px' });
-    frames.forEach((f) => { f.style.width = w + 'px'; f.style.maxWidth = 'none'; });
-    await loaded;
-  }, width);
-}
-
-// One raster thread: Chromium's parallel raster anti-aliases a curve a hair differently from run to run (a channel off by 1-2 at
-// a chip's rounded corners), so the same commit shot twice differed (FilterChips/tags, 1 run in 4) and blocked changes that
-// never touched it (#173). With one thread, 8 runs of 8 are identical. The base cache is keyed on this file, so it refreshes.
-const browser = await chromium.launch({ args: ['--num-raster-threads=1', '--disable-partial-raster'] });
+// One raster thread, so the same commit shoots the same pixels (scripts/machine.mjs LAUNCH_ARGS, #173).
+const browser = await chromium.launch({ args: LAUNCH_ARGS });
 const runs = [];
 const text = {};
 for (const width of widths) {

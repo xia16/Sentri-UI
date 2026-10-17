@@ -32,7 +32,7 @@ Scope of this change: `farrowing.search` and `farrowing.scan` (and the screens a
 | Empty messages | page-built | none | page-built |
 | Selection bar | none | the Room dock (`.room-dock`) + Button | **fix**: the room's dock |
 | Actions sheet | none | Sheet drawer + Row navigation (the existing More actions rows) | **fix**: component |
-| Stop glyph | none in the registry | Icon | added once, in `farrowing-icons.js`, until the registry takes it |
+| Stop glyph | none in the registry | Icon | `stop`, in the shared registry |
 
 ## Self-crit
 
@@ -111,6 +111,94 @@ The law and its boards fix the design (two headers, the line's three tests); the
 - Footers: fostering's primary stays on one line at 56px in Chinese at 390; Find a pig's primary is "Search".
 - Reach: 153 screens move, all in this change's features; 138 identical; none broken. npm test 674 pass; legibility and spacing pass on every moved screen; farrowing scenarios 87 of 87 in EN (ZH blocked on main as well).
 - **Better because** each header says one thing the same way everywhere, and every fact it no longer carries has a designed place in the body.
+
+# Go to pen (2026-10-14)
+
+Scope: `farrowing.pen-map` and the new PenMap component page. The owner chose the design over mockup rounds on 2026-10-13 and 2026-10-14, so this critique is of the screen it replaces. Baseline: `origin/main` at `7f5b627` (`node scripts/shoot-screens.mjs <out> --screens farrowing.pen-map --widths 390,360 --langs en,zh`).
+
+| Job | Where it exists | Status | Baseline | Commit |
+|---|---|---|---|---|
+| Go to a pen from the room | `farrowing.pen-map` (this screen) | in-design | `farrowing.pen-map/en-390.png`, `zh-390.png`, `en-360.png`, `zh-360.png` | `7f5b627` |
+| Go to a pen on the walk | `inspection.go-to-pen` (its own hand-built map) | in-design | not in scope; listed "until migrated" in the PenMap README | `7f5b627` |
+| A menu drawer of places | Choose a unit, More actions (house references) | approved | the surfaces rule's boards | `7f5b627` |
+| The animal's levels and words | the room list's Row · animal (`sowFacts`) | approved | `farrowing.room` | `7f5b627` |
+
+The old Figma has no pen map. No existing component draws a spatial map of places (`node scripts/component-jobs.mjs`): the nearest, Row and ChoiceList, are lists.
+
+## Keep
+
+- **The menu drawer.** `Go to pen` on the tint, a centred title, a hairline, Back in the footer. SURFACES.md names it as a menu drawer.
+- **The map is the room.** Pens are places, so they are a map and not a list: the worker finds the pen in front of her by where it is, not by reading. Stays, with the layout independent of the filter.
+- **Tap goes to the pen.** The room list opens with that pen pinned under the sticky tab row, its tint fading within 900ms (`room-pen`).
+- **Hold to peek.** 350ms shows the sows of a pen read-only; moving more than 12px cancels; the tap after a peek only closes it.
+- **The map follows the tab and filter.** A pen shows what the list shows in it. Stays, and now says so by colour.
+- **Pen codes in mono, tiles you can hit.** The code is the tile's identity; tiles stay at least 56 × 56, above the 48px floor (a little smaller than the old 78 × 65, so the whole room fits).
+- **Empty pens cannot be opened.**
+
+## Problems
+
+- **major** The map only fits a 4 × 6 room. The grid is hard-coded to letters A–D and six rows, with no scrolling, so a barn of 2 × 100 pens, 8 lanes or 160 rows cannot be shown; the old issue says rows 5 and 6 already sit below the fold on a small phone. Evidence: `farrowing-astra-concept.js` builds `Array.from({length:6})` and `['A','B','C','D']`; `feature.json` issues.
+- **major** The one thing to find is read, not seen. Which pens need her is a word in 13px text ("Overdue", "Active", "Tomorrow", "23 born") on a 24-tile grid, with no key. Evidence: baseline render; owner, 2026-10-13: the map must show where to focus.
+- **major** Nothing said 20 times. Every empty pen prints "No sows", so 20 of 24 tiles repeat one fact and the four that matter read as equals (P3: empty is absent). Evidence: baseline render at 390.
+- **major** A second vocabulary for the same animals. `penFact` names pens Active, Overdue, Born and Due, but the room list says sows are overdue, farrowing or settled through `sowFacts().level`; the same sow is described two ways within one tap. Evidence: `penFact()` against `sowFacts()`.
+- **minor** Stray colours and a shadow. The tiles use `#d5dccd`, `#f3f4ee` and `#a2a99a`, and the peek is a shadowed card; SURFACES.md rule 5 allows no stray tints and "no card is shadowed". Evidence: `farrowing-astra-room.css` (`.pen-cell`, `.pen-peek`).
+- **minor** The current pen is a 2px ink ring, which in this system means selected, on a screen where nothing is selected. Evidence: SURFACES.md, "Selected tile".
+- **minor** The peek opens below the map, behind the footer on a phone and in words the room does not use (`Awaiting`, `11 alive · 2 dead`). Evidence: `.pen-peek{bottom:50px}`.
+- **minor** The map does not say where the door is, so "pen 1 at the top" is a guess.
+
+## Parts
+
+| Part | Drawn by today | Component whose job it is | Call |
+|---|---|---|---|
+| Drawer, title, hairline, Back | `roomSheet` → Sheet drawer, `surface:'menu'` | Sheet | **keep** |
+| Map grid, letters and numbers | page-built `.pen-map` (`farrowing-astra-room.css`) | none: PenMap is the new component | **fix**: PenMap |
+| Pen tile | page-built `.pen-cell` with a fact line | none: part of PenMap | **fix**: PenMap, pen code only, colour = level |
+| Per-tile fact line and `penFact` | page-built (JS) | none | **cut** |
+| Status word in a tile | `SentriUI.status` word | Status is the workflow state of one item on one line, not a map | **cut** |
+| Colour key (legend) | none | Sheet header line, its new `key` form (owner exception, 2026-10-14) | **add**: the header line, under the title |
+| Entrance band | none | none: part of PenMap | **add** |
+| Range control | none | Segment is 2–5 fixed views; this is 1–N ranges that scroll sideways | **add** in PenMap, the footer control |
+| Current pen ring | page-built | (selected tile) | **cut**: the map opens scrolled to her |
+| Peek | page-built `.pen-peek`, gesture in the page script | none: part of PenMap | **fix**: PenMap holds the gesture; the card holds Row · animal rows |
+| Footer | `roomSheet` default Back | Sheet footer | **keep**, plus the range control when a row is longer than 20 |
+
+## Self-crit
+
+The design was chosen by the owner over mockup rounds (2026-10-13/14), so there are no competing directions: the build is judged against the screen it replaces (`origin/main` at `7f5b627`, the baseline renders above) and held against the Farrowing room and Choose a unit, the house references for a menu drawer on the tint.
+
+### Round 1 (on the working tree after e021d94: `farrowing.pen-map` at 390 and 360, EN and ZH, beside the baseline renders; the PenMap variants page at 390 and 360)
+
+- Problems fixed:
+  - The map fits any barn (variants page: 4 × 6, 2 × 60, 2 × 100, 2 × 160, 8 × 20); fixed.
+  - The pens that need her are seen, not read: amber tiles, a blue one, a colour key under the title that decodes them; fixed.
+  - Nothing said 20 times: a tile says its pen code only; fixed.
+  - One vocabulary: the colour comes from `sowFacts().level`, the room row's own; `penFact` is deleted; fixed.
+  - No stray hex, no shadow, no ring (the current pen is the pen the map opens on); fixed.
+  - The peek is in the card, in the room row's words, clear of the footer; fixed.
+  - The door is named (the Entrance band); fixed.
+- Defects found in my own renders and fixed before this look:
+  - A held amber or blue tile turned grey (the press colour painted over the fill): only a white tile takes `press`, the fills darken.
+  - Tiles scrolling under the letters or numbers left slivers beside the label: the letters and numbers carry their own ground one grid gap past their edge, and the map rests on whole rows and columns.
+  - The peek card floated 12px above the map and showed row 6 beneath it: it now sits on the map's bottom edge. It covered the held pen when that pen was in the lower rows: it moves to the top then.
+  - The peek rows were indented twice (card and row padding): the row padding is off inside the card.
+- Keep items as strong as before: the menu drawer and Back; the map as the room; tap to the pen with the tint fading in 900ms; the 350ms hold, the 12px cancel and the swallowed tap; the map following tab and filter; mono pen codes; empty pens cannot be opened. Tiles are 75 × 56 at 390 (they were 79 × 65): under the old height, well over the 48px floor, with 8px gaps.
+- Squint test: the amber tiles, the blue tile, then the colour key and the Entrance band. The worker's first three questions are which pens need me, where is farrowing, and which end is the door. They match.
+- Cluttered, flat or bulky against the original: lighter. Twenty-four tiles carried a sentence each, twenty of them "No sows"; now one word-free map where three tiles are coloured. The legend and the band add two quiet lines.
+- House reference: the Farrowing room and Choose a unit (the tint, white items, one 56px Back).
+- **Better because** the three pens that matter are the only colour on the map, the map fits any barn, and the screen says each thing once, in the room list's own words.
+- Checks questioned: `check-states` rules (i) touching controls and (k) the grab first measure the rectangles of tiles that the map's own scroller clips, so a scrolled map read as tiles touching the footer and sitting above the grab. The part is left as designed; the variants page opens its long barns near the top and its sideways barn on a column that does not line a clipped tile up beside Back, and the range control is a radio group (it is a single-choice control), so the page passes. The mid-list behaviour (a map opened on pen A40 or B159 and its range following) is checked by my own renders, listed in the Final look.
+
+#### Final look (ds/pen-map: its screens are a3ce0ed's and are byte-identical in every later commit, the last of which is the pushed head; `a0003ae`, the current main, is merged in; the baseline renders are `7f5b627`, which differs from it in workflow files only)
+
+`farrowing.pen-map` at 390 and 360, EN and ZH, beside `7f5b627`, and the PenMap variants page at 390 and 360, measured against the mockup's checks. The owner's ruling of 2026-10-14 is built in: the colour key is the sheet's header line.
+- Header: the title is centred, the only header line is the colour key, the hairline is 1px and the Entrance band starts 24px under it (the real screen and all 11 specimens).
+- Colour key (header line): one line at 360 in EN (`2 need you · 1 farrowing`) and ZH (`2 需处理 · 1 分娩中`), plain text; with no coloured pen the sheet has no header line.
+- Tiles: 24 of 24 at least 56 × 56 on the real screen (75 × 56 at 390) and none under 56 on any specimen, up to 320 tiles; nothing clipped; nothing under the footer; no sideways page scroll; the current pen (B1 here; A4, A5, E3 and others in the specimens) is inside the map in every one.
+- Peek: shown after a 500ms hold on B3 and on B4, in EN and ZH at both widths; each time inside the map and above the footer, over the lower part, and over the upper part for B4, whose tile the lower card would cover. Letting go leaves the map open, a move of more than 12px shows none, and an empty pen shows none.
+- Tap on B4 goes to the room list with B4 on the dock; an empty pen is disabled.
+- Reach: farrowing scenarios 92 of 92 in EN at 390 and 360 on a3ce0ed (ZH: the room list behind the map is not drawn in Chinese on main either, so only the map's four leaves run there); `npm test` 678 pass, 2 skipped; `check-states` 0 failing for PenMap and Sheet; legibility and spacing pass on `farrowing.pen-map`. The Sheet drawer variants page gains one specimen (the colour key); no other screen or component page moves.
+- Against the baseline: the three pens that matter are the only colour on the map and the other 20 tiles say nothing; at 360 the baseline's "Tomorrow" and "Overdue" no longer touch their tile edges.
+- **Better because** the pens that need her are seen at a glance, in the same words as the room list, on a map that fits any barn.
 
 # Record dead: spacing and the optional photo (2026-10-14)
 
@@ -381,3 +469,40 @@ Held against the Farrowing room (quiet rows, one dark primary) and the sheet's o
 - The owner asked when apps build their own keypad. They do for runs of typed values (keys that never move, a running list, a scanner wedge: the piglet weigh run), when the pad is the whole screen (amount entry), and for restricted keys (PINs, a fixed decimal point). One optional value inside a form is the system keyboard's job; the owner rule *Design for the medium* names the system keyboard and asks for a custom one only where none fits.
 - So the litter weight is now the same Measure row typed on the phone's decimal keyboard (Measure `input: 'system'`: `inputmode="decimal"`, `enterkeyhint="done"`). Done closes it; the host cleans what a keyboard can send (a comma becomes a point; digits and one point, 2 whole digits, 1 decimal) and normalises on save. The Numpad's `dock` and the Measure and Numpad `replace` options are retired (nothing else used them); the Numpad stays for the weigh run, unchanged.
 - Accepted cost: the system keyboard covers the footer while typing (Done or a tap away brings Finish back); iOS's decimal pad has no Done key, so the native app adds one as the keyboard's accessory bar.
+
+# Pen map: the way in, the title and the landing (2026-10-17)
+
+Scope: the room dock's place control (`farrowing.room`, and `data-sync.task-badge`, which draws the same room), the sheet it opens (`farrowing.pen-map`), and the moment after a pen is tapped. Change class: shared component (TaskDock's `unit` gains a framed form; PenMap gains the landing cue; tokens `land-hold` and `land-fade`). Mode: polish. The design is the owner's (rulings of 2026-10-14: entry option C and the name "Pen map"; 2026-10-16: "settle" + "colour carries over"), so each render is judged against its baseline, `0a10c9a` (#164 merged). This section supersedes the 2026-10-14 Keep items that name `Go to pen` and the 900ms tint.
+
+## Keep
+
+- **The pen map itself** (#164): the map as the room, the colour key under the title, the 350ms hold and peek, the map following tab and filter, empty pens disabled. Unchanged.
+- **The dock's order and weight:** Scan ear tag is the one dark button; Search is an icon button on the right; every dock button is 56px.
+- **Tap goes to the pen:** the room list opens with that pen under the sticky tabs.
+
+## Problems
+
+- **major** The owner could not tell when the jump had landed (2026-10-16: "I couldn't really tell when it landed on the pig list"). The list scrolled while the sheet closed, and the cue was a pale green tint (`#e8efdf`) for 900ms that read as nothing on the tinted page. Evidence: the owner's review of the motion strips, 2026-10-16.
+- **major** The dock's place control was frameless text, `B1` over `Go to pen`, beside two framed buttons. It read as a label, not a button (owner, 2026-10-14: "it needs to be a button? it looks kind of weird"), and the pen number repeated the pen the list already shows.
+- **minor** The title `Go to pen` names one use of a surface that is a map of the room; the worker also scans it for where the work is. Owner, 2026-10-14: call the entry and the sheet "Pen map".
+
+## Parts
+
+| Part | Drawn by today | The component whose job it is | Keep / fix / cut |
+|---|---|---|---|
+| Dock place control | page-built `.dock-pen` (frameless, pen number and caption) | TaskDock `unit` | **fix**: the framed form (`.tk-dock-unit[data-framed]`): Search's frame, the grid icon, "Pen map" at 13px / 600, no pen number |
+| Pen number in the dock | page-built | none | **cut**: the list shows the pen |
+| Sheet title | `penText.title` "Go to pen" | Sheet head | **fix**: "Pen map" / 栏位图 |
+| Landing cue | page-built `pen-arrival` tint and ring keyframes in the room stylesheet | PenMap (landing) | **fix**: PenMap's `data-pen-land` cue: the header takes the tapped tile's fill, holds it for `land-hold` (900ms) and fades over `land-fade` (700ms); a white pen gets a 2px ink ring |
+| Sheet exit | Sheet close, with the list scrolling at the same time | Sheet `data-leave` (`sheet-out`, 180ms) | **fix**: the list is placed under the sheet first, then the sheet leaves |
+
+## Self-crit
+
+Held against the room's own dock (Search's frame) and the pen map's tiles (the fills the cue carries over).
+
+#### Final look (`5c0ca0a`, rendered at 390 and 360, EN and ZH, beside `0a10c9a`)
+- **Problems fixed:** the cue lands about 200ms after the tap, in the colour the worker just tapped, on the pen's header; it holds to 0.9s and is gone by 1.6s, and a white pen gets the ink ring. Nothing scrolls in view. The dock entry is a framed button (110px EN, 95px ZH) with no pen number, and Scan's label does not clip at 360. The sheet is titled Pen map.
+- **Keep as strong:** the map, key, peek and filter behaviour are unchanged (`farrowing.pen-map` differs only in its title); Scan stays the only dark button; all three dock buttons are 56px on one centre line.
+- **Squint test:** the dock reads as three buttons, Scan the loudest; after a tap the eye goes to the pen whose colour it just tapped.
+- **Cluttered, flat or bulky:** the dock lost a number and a caption; the cue is one colour on one header, and nothing dims or moves.
+- **Better because** the worker sees where they landed in the colour they tapped, and the way in reads as a button that says what it opens.

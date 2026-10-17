@@ -80,7 +80,7 @@
     return K.screen({ inert: inert, label: s('tk.demo.room', 'Unit 7 farrowing sows'),
       header: K.header({ title: s('tk.demo.task', 'Farrowing'), back: { action: 'home' }, line: { text: [s('tk.demo.latest.lead', 'Last record'), { text: ' ' }, Object.assign({ strong: true }, s('tk.demo.latest.time', '08:41')), { text: ' ' }, s('tk.demo.latest.who', '· G. Hansen')] } }),
       body: body,
-      dock: K.dock({ unit: { icon: 'grid', label: s('tk.demo.pen', 'B1', { pen: 'B1' }), caption: s('tk.demo.dock.goto', 'Go to pen'), action: 'go-pen', aria: s('tk.demo.dock.goto', 'Go to pen') }, primary: { icon: 'scan', label: s('act.scan', 'Scan ear tag'), action: 'scan' }, tools: tools }) });
+      dock: K.dock({ unit: { icon: 'grid', framed: true, label: s('tk.demo.dock.penmap', 'Pen map'), action: 'go-pen' }, primary: { icon: 'scan', label: s('act.scan', 'Scan ear tag'), action: 'scan' }, tools: tools }) });
   }
 
   // TaskStepper: the Stepper card in farrowing's face (row: outlined keys, 15px label, 18px mono value).
