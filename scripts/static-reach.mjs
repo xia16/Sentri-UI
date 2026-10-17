@@ -314,8 +314,12 @@ function scriptLoads(ast, file, page) {
       n.quasis.forEach((q, i) => {
         const s = q.value.cooked || '';
         markup(s);
-        const open = i < n.expressions.length && s.match(/<(\w+)\b[^<>]*\b(?:src|href|data|srcset|poster)\s*=\s*["']?[^"'\s>]*$/i);
-        if (open && open[1].toLowerCase() !== 'a') unbounded.push({ why: `${file}: <${open[1]}> markup with a computed URL`, type: TAG_TYPE[open[1].toLowerCase()] || 'any' });
+        const open = i < n.expressions.length && s.match(/<(\w+)\b[^<>]*\b(src|href|data|srcset|poster)\s*=\s*["']?([^"'\s>]*)$/i);
+        // The file is fixed once the literal part reaches a query or a fragment: href="page.html?entry=${x}" can only open
+        // page.html (a value of "?…" alone is the page itself). Not for srcset, which can list further URLs after the expression.
+        const fixed = open && open[2].toLowerCase() !== 'srcset' && /[?#]/.test(open[3]) ? (open[3].split(/[?#]/)[0] ? resolveRef(open[3].split(/[?#]/)[0], page) : page) : null;
+        if (fixed) { if (open[1].toLowerCase() === 'a') nav.add(fixed); else files.add(fixed); }
+        else if (open && open[1].toLowerCase() !== 'a') unbounded.push({ why: `${file}: <${open[1]}> markup with a computed URL`, type: TAG_TYPE[open[1].toLowerCase()] || 'any' });
         else if (open) navUnbounded.push(`${file}: <a> markup with a computed href`);
       });
     }

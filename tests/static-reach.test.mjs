@@ -198,6 +198,19 @@ test('URLs: a literal, new URL(literal, base), location.href and a local functio
   assert.ok(!deps("const go=()=>location.assign('../data/e.html');").files.includes('ux/data/e.html'), '…and a literal one does not load its target either');
 });
 
+test('markup whose literal part reaches a query or a fragment names its file: only the query is computed (G6)', () => {
+  // farrowing.finish has steps, so its closure follows navigation
+  const deps = (js) => identityInputs(checkout({ farrowingJs: js }), 'farrowing.finish');
+  const anywhere = (ii) => ii.unbounded.filter((u) => /navigate anywhere|navigation to a computed URL/.test(u.why));
+  assert.equal(anywhere(deps("el.innerHTML=`<a href=\"${t}\">x</a>`;")).length, 1, 'a computed file can go anywhere');
+  const q = deps("el.innerHTML=`<a class=\"d\" href=\"home.html?entry=${t.id}&from=x\">x</a>`;");
+  assert.equal(anywhere(q).length, 0, 'home.html?entry=${…} can only open home.html');
+  assert.ok(q.files.includes('ux/system/home.js'), 'and its page is followed like a literal link');
+  assert.equal(anywhere(deps("el.innerHTML=`<a href=\"?view=${v}\">x</a>`;")).length, 0, 'a query alone is the page itself');
+  assert.deepEqual(deps("el.innerHTML=`<img src=\"pic.png?v=${n}\">`;").unbounded, [], 'a load with a computed query is its file');
+  assert.equal(deps("el.innerHTML=`<img srcset=\"a.png?w=${n} 2x\">`;").unbounded.length, 1, 'srcset can list more URLs: still unbounded');
+});
+
 test('identity hashes: a body edit changes exactly that unit; a setup or between-unit edit changes setupHash only; every byte is covered', () => {
   const ids = (o) => identityInputs(checkout(o), 'workbench.today').bundle; // every unit: Home does not prove its alias
   const a = ids({}), b = ids({ bundle: { sheet: "return '<section class=\"st-sheet\">'+title+'!</section>';" } });
