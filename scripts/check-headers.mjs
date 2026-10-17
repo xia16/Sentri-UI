@@ -1,7 +1,8 @@
 // The header check: the Headers law (ux/design-system/README.md, "Headers") made measurable. Five defects:
 //   gap       the header-to-body gap is not space-section (24px ±2): a drawer from its hairline, a page from its last line
 //             (the bottom of its title block or Back, whichever is lower) to the first body content (text, a control, a box)
-//   contents  a header holds a control other than Back (‹ Parent in a drawer with levels), the subject chip and a sheet
+//   contents  a header holds a control other than Back (a page's; a drawer's Back is in its footer, and a drawer with levels goes up with it:
+//             no ‹ Parent in a header, owner ruling B 2026-10-16), the subject chip and a sheet
 //             header's corner actions (Clear or Reset at the top right, a ✕ at the top left), an aside, or a number-with-unit
 //             count ("2 sows", "3 unsaved", "7 / 18", "11 头") in its title or header line
 //   corner    a corner action whose vertical centre is more than 2px off the centre of the header's text block (the title's
@@ -28,7 +29,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { playwright } from './playwright-path.mjs';
-import { screensOf, componentPagesOf } from './loop-rules.mjs';
+import { screensOf, componentPagesOf } from './atlas-screens.mjs';
 import { routeFonts } from './font-route.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -53,8 +54,9 @@ function auditHeaders({ TOL, checks }) {
   const titleOf = (h) => h.querySelector('.st-page-title, .sheet-title, h1, h2, h3');
   const linesOf = (h) => [...h.querySelectorAll('.st-header-line, .sheet-subtitle')].filter(vis);
   const where = (h) => (isPage(h) ? 'page header' : 'sheet header') + ` "${txt(titleOf(h)).slice(0, 40)}"`;
-  // Back (top left of a page, a lead "Back to …" icon button) and ‹ Parent act; the subject chip acts; nothing else does.
-  const allowed = (el) => el.matches('.st-page-back, .st-subject-chip, .sheet-up') || /(^|[-_\s])back($|[-_\s])/i.test(typeof el.className === 'string' ? el.className : '') || /^(back|返回)\b/i.test((el.getAttribute('aria-label') || txt(el)).trim());
+  // Back (top left of a page, a lead "Back to …" icon button) acts; the subject chip acts; a sheet's corner actions act; nothing
+  // else does. ‹ Parent no longer does (ruling B, 2026-10-16): a drawer with levels goes up with its footer Back and closes with ✕.
+  const allowed = (el) => el.matches('.st-page-back, .st-subject-chip') || /(^|[-_\s])back($|[-_\s])/i.test(typeof el.className === 'string' ? el.className : '') || /^(back|返回)\b/i.test((el.getAttribute('aria-label') || txt(el)).trim());
   // A corner action (sheet header only; owner ruling C, 2026-10-14): Clear or Reset as quiet text at the top right, a ✕ at the
   // top left. Which corner is told by where the control sits in its header.
   const cornerOf = (h, el) => {
@@ -71,7 +73,7 @@ function auditHeaders({ TOL, checks }) {
   for (const h of headers) {
     const title = titleOf(h), lines = linesOf(h), note = { kind: isPage(h) ? 'page' : 'sheet', title: txt(title).slice(0, 40), lines: lines.length };
     seen.push(note);
-    const controls = [...h.querySelectorAll('button, a[href], [role="button"], [role="link"], input, select, textarea, [contenteditable="true"]')].filter((el) => vis(el) && !el.parentElement.closest('.st-page-back, .st-subject-chip, .sheet-up, button, a[href]'));
+    const controls = [...h.querySelectorAll('button, a[href], [role="button"], [role="link"], input, select, textarea, [contenteditable="true"]')].filter((el) => vis(el) && !el.parentElement.closest('.st-page-back, .st-subject-chip, button, a[href]'));
     const corners = controls.map((el) => ({ el, side: cornerOf(h, el) })).filter((c) => c.side);
     note.corners = corners.map((c) => c.side);
     // ---- corner: each corner action a 48px target, vertically centred (±2px) on the text block: the title's top to the
@@ -184,6 +186,19 @@ function auditHeaders({ TOL, checks }) {
   return { out, seen };
 }
 
+export const RUNS = [{ width: 390, lang: 'en', checks: ['gap', 'contents', 'corner'] }, { width: 360, lang: 'en', checks: ['contents', 'wrap', 'corner', 'room'] }, { width: 360, lang: 'zh', checks: ['contents', 'wrap', 'corner', 'room'] }];
+// Every frame of a prepared page (the gate's shared visit, or the CLI's own) for one run ({ width, lang, checks }).
+export async function auditHeadersPage(page, run) {
+  const defects = [], seen = [];
+  for (const f of page.frames()) { try { const r = await f.evaluate(auditHeaders, { TOL, checks: run.checks }); defects.push(...r.out.map((d) => ({ ...d, lang: run.lang, width: run.width }))); seen.push(...r.seen.map((x) => ({ ...x, lang: run.lang, width: run.width }))); } catch {} }
+  return { defects, seen };
+}
+// one finding per check, language and text: the same one at two widths is one
+export const dedupe = (ds) => { const k = new Set(); return ds.filter((d) => { const key = d.check + '|' + d.lang + '|' + d.detail; if (k.has(key)) return false; k.add(key); return true; }); };
+
+
+const main = process.argv[1] && path.resolve(process.argv[1]).toLowerCase() === fileURLToPath(import.meta.url).toLowerCase();
+if (main) {
 const free = () => new Promise((res) => { const s = createServer(); s.listen(0, () => { const p = s.address().port; s.close(() => res(p)); }); });
 let base = val('--base'), server = null;
 if (!base) { const port = await free(); server = spawn(process.execPath, ['scripts/serve-ux.cjs', String(port)], { cwd: root, stdio: 'ignore' }); base = `http://localhost:${port}`; await new Promise((r) => setTimeout(r, 1500)); }
@@ -199,7 +214,6 @@ async function ctx(width) {
   await c.addInitScript((w) => { const css = `html.atlas-bare,html.atlas-bare body{width:${w}px!important}html.atlas-bare .atlas-phone{width:${w}px!important}`; const add = () => { const s = document.createElement('style'); s.textContent = css; document.head.appendChild(s); }; if (document.head) add(); else document.addEventListener('DOMContentLoaded', add); }, width);
   return (contexts[width] = c);
 }
-const RUNS = [{ width: 390, lang: 'en', checks: ['gap', 'contents', 'corner'] }, { width: 360, lang: 'en', checks: ['contents', 'wrap', 'corner', 'room'] }, { width: 360, lang: 'zh', checks: ['contents', 'wrap', 'corner', 'room'] }];
 async function audit(href, run, ready) {
   const page = await (await ctx(run.width)).newPage();
   await page.clock.install({ time: new Date('2026-10-11T09:41:00') }); await page.clock.resume();
@@ -211,13 +225,10 @@ async function audit(href, run, ready) {
     await page.waitForTimeout(400);
     // a sheet that slides in is still moving: wait for finite animations (at most 3s)
     await page.evaluate(() => Promise.race([Promise.all(document.getAnimations().filter((a) => a.effect?.getComputedTiming().endTime !== Infinity).map((a) => a.finished.catch(() => {}))), new Promise((r) => setTimeout(r, 3000))]));
-    for (const f of page.frames()) { try { const r = await f.evaluate(auditHeaders, { TOL, checks: run.checks }); defects.push(...r.out.map((d) => ({ ...d, lang: run.lang, width: run.width }))); seen.push(...r.seen.map((x) => ({ ...x, lang: run.lang, width: run.width }))); } catch {} }
+    const r = await auditHeadersPage(page, run); defects.push(...r.defects); seen.push(...r.seen);
   } finally { await page.close(); }
   return { defects, seen };
 }
-// one finding per check, language and text: the same one at two widths is one
-const dedupe = (ds) => { const k = new Set(); return ds.filter((d) => { const key = d.check + '|' + d.lang + '|' + d.detail; if (k.has(key)) return false; k.add(key); return true; }); };
-
 /* ---------- --self-test ---------- */
 if (argv.includes('--self-test')) {
   const dir = path.join(root, 'scripts/check-headers.fixtures');
@@ -286,3 +297,4 @@ const bad = results.filter((r) => r.defects.length), all = bad.flatMap((r) => r.
 console.log(`headers: ${results.length} screens (${results.filter((r) => r.headers.length).length} with a header, ${results.reduce((n, r) => n + r.headers.length, 0)} headers), ${bad.length} with a defect (${['gap', 'contents', 'corner', 'room', 'wrap'].map((k) => `${k} ${all.filter((d) => d.check === k).length}`).join(', ')})${errs.length ? `, ${errs.length} failed to render` : ''}`);
 const failing = list('--changed').length ? results.filter((r) => list('--changed').includes(r.screen) && (r.defects.length || r.error)) : argv.includes('--strict') ? [...bad, ...errs] : [];
 process.exit(failing.length ? 1 : 0);
+}

@@ -43,10 +43,21 @@ test("cascade-multi: ticks remain in the leaf catalogue; checkbox changes never 
   assert.doesNotMatch(html, /<details|type="checkbox"[^>]*data-action/);
   assert.doesNotMatch(html, /picker-step|st-picker-steps/);
   assert.match(html, /Weakness/);
-  const head = UI.pickerHead({ items: tree, path: ["symptom", "general"], title: "Select conditions", rootLabel: "Conditions" });
-  assert.equal(head.up.action, "picker-step");
-  assert.equal(head.up.value, "1");
-  assert.equal(UI.pickerHead({ items: tree, path: [], title: "Select conditions" }).up, null);
+  // Owner ruling B (2026-10-16): the footer Back goes up one level (leaves at the root), a ✕ closes the whole drawer, no "‹ Parent".
+  const head = UI.pickerHead({ items: tree, path: ["symptom", "general"], title: "Select conditions" });
+  assert.equal(head.up, undefined);
+  assert.deepEqual(head.levelBack, { action: "picker-step", value: "1" });
+  assert.equal(head.cross.action, "dismiss");
+  const root = UI.pickerHead({ items: tree, path: [], title: "Select conditions" });
+  assert.equal(root.title, "Select conditions");
+  assert.deepEqual(root.levelBack, { action: "back" });
+  assert.equal(root.cross.action, "dismiss", "the ✕ is at every level");
+  const foot = UI.pickerFooter({ multi: true, selected: [], back: head.levelBack });
+  assert.match(foot, /data-action="picker-step" data-value="1"[^>]*>[^]*>Back</);
+  assert.match(UI.pickerFooter({ back: root.levelBack }), /data-action="back"/);
+  const drawer = UI.sheet({ ...head, body: "", footer: foot });
+  assert.match(drawer.match(/<header[^]*<\/header>/)[0], /class="st-sheet-corner" data-corner="start"[^>]*data-action="dismiss"[^>]*aria-label="Close"/);
+  assert.doesNotMatch(drawer, /sheet-up/);
 });
 test("search at the root spans kinds, groups and aliases; inside a level it searches that level only", () => {
   const html = UI.pickerBody({
@@ -152,19 +163,43 @@ test("flat multi keeps section headings without navigating levels", () => {
 require("../ux/system/astra-surfaces.js");
 require("../ux/system/farrowing-astra-concept.js");
 require("../ux/system/inspection-astra-concept.js");
-test("migrated assistance choices preserve missing versus No in the record and edit draft", () => {
+test("assisted is a required No / Yes on the finish and edit forms: No preselected, no Clear (owner, 2026-10-15)", () => {
   const F = globalThis.FarrowingStudy,
     s = F.seed("before");
+  assert.equal(s.assisted, false, "a new finish starts on No");
+  F.act(s, "assistance", "true");
+  assert.equal(s.assisted, true);
   F.act(s, "assistance", "false");
   assert.equal(s.assisted, false);
   F.act(s, "assistance-clear", "assistance");
-  assert.equal(s.assisted, null);
+  assert.equal(s.assisted, false, "there is no Clear: nothing returns it to unanswered");
   s.edit = { ...s };
   F.act(s, "editAssistance", "true");
   assert.equal(s.edit.assisted, true);
-  assert.equal(s.assisted, null);
+  assert.equal(s.assisted, false, "the edit draft does not write the record");
   F.act(s, "editAssistance-clear", "editAssistance");
-  assert.equal(s.edit.assisted, null);
+  assert.equal(s.edit.assisted, true);
+  // an old record that never had it keeps null until the worker answers; the form shows neither key chosen
+  const old = F.seed("locked");
+  old.assisted = null;
+  old.edit = { ...old };
+  assert.equal(old.edit.assisted, null);
+  F.act(old, "editAssistance", "false");
+  assert.equal(old.edit.assisted, false);
+  assert.equal(old.assisted, null);
+});
+test("the litter weight is typed on the system decimal keyboard: cleaned while typing, normalised on save, blank or 0 is not recorded", () => {
+  const F = globalThis.FarrowingStudy;
+  for (const [typed, kept] of [["12,6", "12.6"], ["12.67", "12.6"], ["123", "12"], ["a1b2", "12"], [".5", "0.5"], ["1..2", "1.2"], ["", ""]])
+    assert.equal(F.cleanWeight(typed), kept, typed);
+  for (const [typed, saved] of [["12.6", "12.6"], ["12.", "12"], ["0", ""], ["0.0", ""], ["", ""]]) assert.equal(F.normWeight(typed), saved, typed);
+  const s = F.seed("locked");
+  s.view = "editFinish";
+  s.edit = { ...s, weight: "12." };
+  F.act(s, "saveEdit");
+  assert.equal(s.weight, "12", "saving drops a trailing point");
+  const UI = globalThis.SentriUI;
+  assert.doesNotMatch(UI.numpad({ decimals: 1, intLength: 2, value: "12.6", replace: true }), /data-replace/, "the Numpad has no replace option");
 });
 test("browsing a disease branch retains its kind when adding a custom condition", () => {
   const M = globalThis.InspectionStudy,

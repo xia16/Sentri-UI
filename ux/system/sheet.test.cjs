@@ -11,13 +11,16 @@ test('sheet drawer: scrim, grab, head without a ✕, body, a Back footer by defa
   assert.doesNotMatch(html, /sheet-close/);
   assert.equal((html.match(/class="button secondary surface-back"/g) || []).length, 1);
 });
-test('no ✕ on any drawer and nothing else in the head; up names the parent and is never Back', () => {
+test('nothing else in the head; a drawer with levels: a ✕ closes, no "‹ Parent" (owner ruling B, 2026-10-16)', () => {
   const html = UI.sheet({ title: 'T', aside: '<button class="st-text-action">Clear</button>', subtitle: 'B4' });
   assert.doesNotMatch(html, /Clear|sheet-aside|sheet-subtitle|B4/, 'aside and subtitle are retired');
-  assert.doesNotMatch(html, /sheet-close/);
-  const up = UI.sheet({ title: 'Respiratory diseases', up: { label: 'Diseases', action: 'step', value: '1' } });
-  assert.match(up, /<button type="button" class="sheet-up" data-ds="Sheet" data-action="step" data-value="1"><svg[^]*<span>Diseases<\/span><\/button><h2 class="sheet-title">Respiratory diseases/);
-  assert.doesNotMatch(up.match(/<header[^]*<\/header>/)[0], />Back</);
+  assert.doesNotMatch(html, /sheet-close|st-sheet-corner/, 'no ✕ unless a drawer with levels asks for one');
+  const lv = UI.sheet({ title: 'Respiratory diseases', up: { label: 'Diseases', action: 'step', value: '1' }, cross: { action: 'dismiss', label: { text: 'Close', str: 'act.close' } }, footer: UI.sheetFooter({ back: { action: 'step', value: '1' } }) });
+  const head = lv.match(/<header[^]*<\/header>/)[0];
+  assert.doesNotMatch(head, /sheet-up|Diseases|>Back</, 'the retired up control is not drawn');
+  assert.match(head, /<button type="button" class="st-sheet-corner" data-corner="start" data-ds="Sheet" data-action="dismiss"[^>]*aria-label="Close"/);
+  assert.match(head, /<h2 class="sheet-title">Respiratory diseases<\/h2>/);
+  assert.match(lv, /class="sheet-footer"[^]*data-action="step" data-value="1"[^]*>Back</, 'the footer Back goes up a level');
 });
 test('sheet page: no scrim, no grab, no ✕, one Back; dialog: backdrop, no ✕', () => {
   const page = UI.sheet({ variant: 'page', title: 'Log', bar: '<div class="statusbar"></div>', footer: false });

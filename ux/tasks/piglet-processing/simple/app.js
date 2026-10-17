@@ -5,7 +5,8 @@
    the pen now, and the identified piglets) — with [⋯] More for Move · Record death · Set count. */
 (function () {
   'use strict';
-  var K = window.SentriTask, UI = window.SentriUI, P = window.PPS, L = window.PPT, I = window.SentriIcons.icon;
+  const UI = window.SentriUI;
+  var K = window.SentriTask, P = window.PPS, L = window.PPT, I = window.SentriIcons.icon;
   var T = function (k, a) { return L.t(k, a); };
   var phone = document.getElementById('phone'), demo = document.getElementById('demo');
   var SEP = { sep: true };
