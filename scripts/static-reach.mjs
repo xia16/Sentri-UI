@@ -624,7 +624,10 @@ function bundleInputs(S, pg) {
     bundle.all = usedAll;
     for (const [ns, u] of Object.entries(pg.use)) for (const x of u.names) bundle.exports.push(`${ns}.${x}`);
     bundle.exports.sort();
-    bundle.units = bundle.all ? S.shape.iifes.flatMap((f) => [...f.units.keys()].map((n) => `${f.namespace}:${n}`)).sort() : forwardUnits(S.shape, bundle.exports);
+    // a page that loads the bundle runs its start-up effects whatever it calls: they are part of its identity (eagerUnits)
+    const eager = pg.files.has(BUNDLE_JS) ? eagerUnits(S.shape) : { units: [], all: false, why: [] };
+    if (eager.all) { bundle.all = true; pg.use = { ...pg.use, [S.namespaces[0] || 'SentriUI']: { all: true, names: new Set(), why: `a start-up effect the analyser can't bound (${eager.why[0]})` } }; }
+    bundle.units = bundle.all ? S.shape.iifes.flatMap((f) => [...f.units.keys()].map((n) => `${f.namespace}:${n}`)).sort() : [...new Set([...forwardUnits(S.shape, bundle.exports), ...eager.units])].sort();
     // content hashes, so a body edit changes exactly that unit's evidence (gate-v2 §3); missing: hash the whole bundle
     S.hashes = S.hashes === undefined ? bundleHashes(S.src) : S.hashes;
     if (S.hashes) {
@@ -638,11 +641,12 @@ function bundleInputs(S, pg) {
 
 // The units a set of exports may run or read: their locals, everything those reference (also across namespaces), and every unit that
 // writes a binding one of them reads.
-function forwardUnits(shape, exports) {
+function forwardUnits(shape, exports, seeds = []) {
   const byNs = new Map(shape.iifes.map((f, i) => [f.namespace, i]));
   const done = new Set(), q = [];
   const push = (i, n) => { const k = `${i}:${n}`; if (!done.has(k) && shape.iifes[i].units.has(n)) { done.add(k); q.push([i, n]); } };
   for (const e of exports) { const [ns, x] = e.split('.'); const i = byNs.get(ns); const locals = i === undefined ? '' : shape.iifes[i].exports.get(x) || ''; for (const l of locals.split(',').filter(Boolean)) push(i, l); }
+  for (const [i, n] of seeds) push(i, n);
   while (q.length) {
     const [i, n] = q.shift(), f = shape.iifes[i], u = f.units.get(n);
     for (const r of u.refs) { if (f.units.has(r)) push(i, r); if (byNs.has(r)) for (const [, locals] of shape.iifes[byNs.get(r)].exports) for (const l of locals.split(',')) push(byNs.get(r), l); }
@@ -650,4 +654,23 @@ function forwardUnits(shape, exports) {
     for (const [wn, w] of f.units) if ([...w.writes, ...[...w.passed].filter((p) => f.units.get(p)?.object)].some((x) => f.units.has(x) && u.refs.has(x))) push(i, wn);
   }
   return [...done].map((k) => { const [i, n] = k.split(':'); return `${shape.iifes[+i].namespace}:${n}`; }).sort();
+}
+
+// What runs on every page that loads the bundle, whichever export it calls (review of #194, 2026-10-17): every top-level constant's
+// initialiser (it runs at load: `new Map()`, a call, an object built eagerly) and every setup statement (listeners, alias loops),
+// with everything those read or call, through the same graph. Its units belong to the identity of every screen that loads the
+// bundle. A start-up effect the graph can't bound (dynamic dispatch in an initialiser or a setup statement) is all of it.
+function eagerUnits(shape) {
+  if (shape.eager) return shape.eager;
+  const byNs = new Map(shape.iifes.map((f, i) => [f.namespace, i]));
+  const seeds = [], why = [];
+  shape.iifes.forEach((f, i) => {
+    for (const [n, u] of f.units) if (u.kind !== 'function') { seeds.push([i, n]); if (u.dyn?.length) why.push(`${f.namespace}:${n}'s initialiser reads ${u.dyn[0]}`); }
+    for (const st of f.setup) {
+      if (st.dyn?.length) why.push(`${f.namespace}'s setup reads ${st.dyn[0]}`);
+      for (const r of st.refs || []) { if (f.units.has(r)) seeds.push([i, r]); if (byNs.has(r)) for (const [, locals] of shape.iifes[byNs.get(r)].exports) for (const l of locals.split(',').filter(Boolean)) seeds.push([byNs.get(r), l]); }
+    }
+  });
+  shape.eager = { units: forwardUnits(shape, [], seeds), all: why.length > 0, why };
+  return shape.eager;
 }

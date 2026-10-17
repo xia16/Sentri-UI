@@ -248,3 +248,20 @@ test('a picker-only change is a new identity only for leaves whose closure can r
   assert.deepEqual(leafInputs(b, { url: '/ux/system/farrowing.html' }).pages.sort(), ['ux/system/farrowing.html', 'ux/system/home.html']);
   assert.equal(leafInputs(b, {}), null);
 });
+
+// ---------- review of #194: start-up effects are part of every identity that loads the bundle ----------
+test('a start-up initialiser change is a new identity for every screen that loads the bundle, not only a reach of all', async () => {
+  const { inputsDigest, canonical } = await import('../scripts/evidence.mjs');
+  const { createHash } = await import('node:crypto');
+  const extra = (v) => `const OPACITY=${v};const formats=new Map([['a',OPACITY]]);if(typeof document!=='undefined')document.documentElement.style.opacity=String(formats.get('a'));`;
+  const mk = (v) => { const o = { bundle: { extra: extra(v) } }; const c = checkout(o); const t = new Map(Object.keys(FILES(o)).map((f) => [f, createHash('sha1').update(fs.readFileSync(path.join(c.dir, f))).digest('hex')])); return { side: { ...c, rev: `o${++n}` }, tree: t }; };
+  const b = mk('1'), c = mk('0.99');
+  const r = reachOf(b.side, c.side, { files: BJS });
+  assert.equal(r.all, true, 'a changed start-up effect reaches every screen');
+  const rt = (t) => [...t.keys()].filter((f) => !/^(features|docs|tests|scripts)\//.test(f)).sort();
+  for (const id of ['inspection.room', 'farrowing.room', 'reports.week']) {
+    const d = (x) => canonical(inputsDigest(identityInputs(x.side, id), x.tree, rt(x.tree)).digest);
+    assert.notEqual(d(b), d(c), `${id}: its evidence must not be reused across a start-up change (the initialiser and what it reads are in its identity)`);
+  }
+  assert.ok(identityInputs(b.side, 'inspection.room').bundle.units.some((u) => /OPACITY|formats/.test(u)), 'the initialisers are units of the identity');
+});

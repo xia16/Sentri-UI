@@ -3,9 +3,34 @@
 // It opens its own contexts on the leaf's reset fixture and writes its screenshots under <evidenceDir>/<leaf>/<lang>-<width>/.
 import { mkdirSync, rmSync } from 'node:fs';
 import { join, relative } from 'node:path';
-import { parseDuration, stepKind } from './scenario-tree.mjs';
+import { createHash } from 'node:crypto';
+import { parseDuration, stepKind, ASSERTION_KINDS } from './scenario-tree.mjs';
 
 export const HARD = ['wrong-fact', 'lost-draft', 'dead-end', 'unreachable-control', 'broken-ruling'];
+
+// Every failure a run reports carries what failed and how (review of #194), so main's debt is only ever the same failure:
+//   contract  a fingerprint of the definition that failed: the assertion, the step, or the phase a run broke in (a page error by its
+//             message, numbers and addresses left out)
+//   category  a stable class: preset-missing, missing-control, unreachable-control, timeout, network, page-error, clipped,
+//             wrong-text, wrong-state, wrong-record, wrong-screen, step-failed; unknown when none fits
+export const contractOf = (def) => createHash('sha1').update(JSON.stringify(def ?? null)).digest('hex').slice(0, 16);
+export function failureCategory({ got, kind }) {
+  const g = String(got || '');
+  if (/preset ".*" is not in the page/.test(g)) return 'preset-missing';
+  if (/control not found/.test(g)) return 'missing-control';
+  if (/control not tappable|control is covered|control has no box/.test(g)) return 'unreachable-control';
+  if (/Timeout \d+ms exceeded/.test(g)) return 'timeout';
+  if (/net::ERR_/.test(g)) return 'network';
+  if (kind === 'page-error') return 'page-error';
+  if (kind === 'noClip') return 'clipped';
+  if (kind === 'text' || kind === 'verb') return 'wrong-text';
+  if (kind === 'el') return 'wrong-state';
+  if (kind === 'expr') return 'wrong-record';
+  if (kind === 'screen') return 'wrong-screen';
+  if (kind === 'step') return 'step-failed';
+  return 'unknown';
+}
+const assertionKind = (a) => ASSERTION_KINDS.find((k) => a && typeof a === 'object' && k in a) || null;
 
 // ---- in-page helpers (atlas-bare's step finder, ported; plus the checks) ----
 const PAGE_HELPERS = String.raw`
@@ -217,7 +242,10 @@ export function leafRunner({ base, defaults: D = {}, verbs = {}, evidenceDir, re
     const devices = {}, contexts = [];   // device "a" is the phone the leaf starts on; "b" opens on first use
     let page = null, cur = null, elapsed = 0, i = 0;
     const shot = async (label) => { const f = join(dir, `${String(i++).padStart(2, '0')}-${slug(label)}.png`); await page.screenshot({ path: f }).catch(() => {}); evidence.push(relative(relativeTo, f).replace(/\\/g, '/')); };
-    const fail = (what, got, tag, at) => failures.push({ what, got, tag: tag || null, at });
+    // def: what failed ({ assertion } | { step } | { phase } | { pageError }); kind: the assertion's kind, 'step' or 'page-error'
+    let phase = 'opening the reset fixture';
+    const fail = (what, got, tag, at, def = { phase }, kind = null) => failures.push({ what, got, tag: tag || null, at, contract: contractOf(def), category: failureCategory({ got, kind }) });
+    const failAssert = (a, got, tag, at) => fail(describe(a), got, tag, at, { assertion: a }, assertionKind(a));
 
     // one device = its own browser context (own storage, own network, own clock) on the leaf's reset fixture
     async function openDevice(name) {
@@ -270,10 +298,12 @@ export function leafRunner({ base, defaults: D = {}, verbs = {}, evidenceDir, re
     try {
       cur = devices.a = await openDevice('a'); page = cur.page;
       await shot('start');
+      let at = 0;
       for (const step of leaf.taps) {
+        phase = `step ${at++}: ${JSON.stringify(step)}`;
         const kind = stepKind(step);
         if (kind === 'expect') {
-          for (const a of [].concat(step.expect)) { const r = await checkOne(page, a, lang, width, notes.length > 0, verbs); if (r?.skipped) skipped.push(describe(a)); else if (r) fail(describe(a), r.got, a.hard, `after step ${i - 1}`); }
+          for (const a of [].concat(step.expect)) { const r = await checkOne(page, a, lang, width, notes.length > 0, verbs); if (r?.skipped) skipped.push(describe(a)); else if (r) failAssert(a, r.got, a.hard, `after step ${i - 1}`); }
           continue;
         }
         if (kind === 'fill') {   // the field is on the page, or in a same-origin iframe of it (the embedded pig profile)
@@ -300,19 +330,20 @@ export function leafRunner({ base, defaults: D = {}, verbs = {}, evidenceDir, re
               if (!devices[step.device]) devices[step.device] = await openDevice(step.device);
               cur = devices[step.device]; page = cur.page; await page.bringToFront().catch(() => {}); await settle(page);
             }
-          } catch (e) { fail(stepName(step), e.message.split('\n')[0], 'dead-end', `step ${i - 1}`); stepFailed = true; await shot(stepName(step)); break; }
+          } catch (e) { fail(stepName(step), e.message.split('\n')[0], 'dead-end', `step ${i - 1}`, { step }, 'step'); stepFailed = true; await shot(stepName(step)); break; }
           await shot(stepName(step)); continue;
         }
         const e = await tap(page, step);
         await shot(step);
-        if (e) { fail(`tap ${stepName(step)}`, e, step.hard || 'unreachable-control', `step ${i - 1}`); stepFailed = true; break; }
+        if (e) { fail(`tap ${stepName(step)}`, e, step.hard || 'unreachable-control', `step ${i - 1}`, { step }, 'step'); stepFailed = true; break; }
       }
+      phase = 'the outcome checks';
       if (!stepFailed) {
-        for (const a of n.visible || []) { const r = await checkOne(page, a, lang, width, notes.length > 0, verbs); if (r?.skipped) skipped.push(describe(a)); else if (r) fail(describe(a), r.got, a.hard); }
-        for (const a of n.record || []) { const r = await checkOne(page, a, lang, width, false, verbs); if (r) fail(describe(a), r.got, a.hard); }
-        if (n.clip !== false && D.clipCheck !== false) { const r = await checkOne(page, { noClip: true }, lang, width, false, verbs); if (r) fail('nothing clipped', r.got, null); }
+        for (const a of n.visible || []) { const r = await checkOne(page, a, lang, width, notes.length > 0, verbs); if (r?.skipped) skipped.push(describe(a)); else if (r) failAssert(a, r.got, a.hard); }
+        for (const a of n.record || []) { const r = await checkOne(page, a, lang, width, false, verbs); if (r) failAssert(a, r.got, a.hard); }
+        if (n.clip !== false && D.clipCheck !== false) { const r = await checkOne(page, { noClip: true }, lang, width, false, verbs); if (r) fail('nothing clipped', r.got, null, undefined, { assertion: { noClip: true } }, 'noClip'); }
       }
-      for (const e of errors) fail('no page errors', e, null);
+      for (const e of errors) fail('no page errors', e, null, undefined, { pageError: String(e).replace(/https?:\/\/\S+/g, 'URL').replace(/\d+/g, 'N') }, 'page-error');
     } catch (e) {
       fail('run', e.message.split('\n')[0], 'dead-end'); if (page) await shot('error');
     }

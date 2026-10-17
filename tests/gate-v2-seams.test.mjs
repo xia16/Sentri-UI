@@ -34,13 +34,13 @@ const run = (lang, width, result, failures = []) => ({ lang, width, result, fail
 
 test('leaf rows and reports, as the scheduler assembles them, compare base against candidate run by run', () => {
   const cand = reportOf({ feature: 'f', commit: 'c', base: 'u', langs: ['en', 'zh'], widths: [390], rows: [
-    leafRow(leaf('a'), [run('en', 390, 'fail', [{ what: 'Saved shown', got: 'absent', tag: 'wrong-fact' }]), run('zh', 390, 'blocked')]),
-    leafRow(leaf('b'), [run('en', 390, 'pass'), run('zh', 390, 'fail', [{ what: 'nothing clipped', got: 'x', tag: null }])]),
+    leafRow(leaf('a'), [run('en', 390, 'fail', [{ what: 'Saved shown', got: 'absent', tag: 'wrong-fact', contract: 'c-saved', category: 'wrong-text' }]), run('zh', 390, 'blocked')]),
+    leafRow(leaf('b'), [run('en', 390, 'pass'), run('zh', 390, 'fail', [{ what: 'nothing clipped', got: 'x', tag: null, contract: 'c-clip', category: 'clipped' }])]),
     leafRow(leaf('c', { status: 'pending' })),
   ] });
   assert.deepEqual(cand.summary, { pass: 0, fail: 2, blocked: 0, pending: 1, slow: 0 });
   assert.deepEqual(cand.leaves[0].hard, ['wrong-fact']);
-  const base = reportOf({ feature: 'f', commit: 'b', base: 'u', langs: ['en'], widths: [390], rows: [leafRow(leaf('a'), [run('en', 390, 'fail', [{ what: 'Saved shown', got: 'absent', tag: 'wrong-fact' }])])] });
+  const base = reportOf({ feature: 'f', commit: 'b', base: 'u', langs: ['en'], widths: [390], rows: [leafRow(leaf('a'), [run('en', 390, 'fail', [{ what: 'Saved shown', got: 'absent', tag: 'wrong-fact', contract: 'c-saved', category: 'wrong-text' }])])] });
   const d = scenarioDebt(cand, base);
   assert.deepEqual(d.debt, ['a'], "a fails on main exactly as here: main's debt");
   assert.deepEqual(d.added.map((x) => x.id), ['b'], "b's failure is the change's");

@@ -150,3 +150,42 @@ test('a moved main voids nothing by itself: judgements carry to pairs with the s
   // a failed verdict carries as failed
   assert.equal(carryJudgements({ mech: oldMech, parts: [{ ...parts[0], pass: false }] }, same).carried.pass, false);
 });
+
+test('an in-reach screen whose identity did not change because of the changed files is a contradiction the gate blocks on', async () => {
+  const { identityContradictions } = await import('../scripts/evidence.mjs');
+  const BUNDLE = 'ux/design-system/components/bundle.js';
+  const inputs = { 'a': [{ files: ['ux/a.html', BUNDLE], bundle: { exports: ['SentriUI.row'] } }], 'b': [{ files: ['ux/b.html'], bundle: { exports: [] } }], 'c': [{ files: ['ux/c.html', BUNDLE], bundle: { exports: ['SentriUI.picker'] } }], 'd': [{ files: ['ux/d.html'], unbounded: [{ type: 'any' }] }] };
+  const base = { ids: Object.keys(inputs), runtime: new Set(['ux/a.html', 'ux/b.html', 'ux/c.html', 'ux/d.html', BUNDLE]), inputs: (id) => inputs[id] };
+  // a page file changed but the identity stayed the same: contradiction; a changed identity is fine
+  assert.deepEqual(identityContradictions({ ...base, files: ['ux/a.html'], reach: { all: false }, same: (id) => id === 'a' }), ['a (ux/a.html)']);
+  assert.deepEqual(identityContradictions({ ...base, files: ['ux/a.html'], reach: { all: false }, same: () => false }), []);
+  // a bundle change the analyser says reaches every screen: every bundle-loading screen must have a new identity
+  assert.deepEqual(identityContradictions({ ...base, files: [BUNDLE], reach: { all: true, why: ['the bundle: a setup change'] }, same: () => true }), [`a (${BUNDLE})`, `c (${BUNDLE})`]);
+  // a one-function change: only the screens that use it
+  assert.deepEqual(identityContradictions({ ...base, files: [BUNDLE], reach: { all: false, functions: ['SentriUI.picker'] }, same: () => true }), [`c (${BUNDLE})`]);
+  // a load it can't bound fits any changed file
+  assert.deepEqual(identityContradictions({ ...base, files: ['ux/other.json'], runtime: new Set(['ux/other.json']), reach: { all: false }, same: (id) => id === 'd' }), ['d (ux/other.json)']);
+});
+
+test('carrying judgements never launders a verdict from another commit, or two conflicting ones (review of #194)', async () => {
+  const { carryJudgements } = await import('../scripts/loop-rules.mjs');
+  const pair = (screen, b, c) => ({ screen, lang: 'en', width: 390, kind: 'changed', pct: 3, identity: { base: b, cand: c } });
+  const oldMech = { candidate: 'C1', base: 'M1', screens: { diff: [{ id: 's1' }], new: [], gone: [] }, pairs: [pair('s1', 'b1', 'c1')] };
+  const now = { candidate: 'C2', base: 'M2', screens: oldMech.screens, pairs: [pair('s1', 'b1', 'c1')] };
+  const v = (o) => ({ pass: true, candidate: 'C1', base: 'M1', calibration: [], walk: [], defects: [], pairs: [{ screen: 's1', lang: 'en', width: 390, verdict: 'better', why: 'r' }], ...o });
+  // the probe: a verdict judged on another candidate, sitting in the judged run's folder
+  const foreign = v({ candidate: 'X9' });
+  const a = carryJudgements({ mech: oldMech, parts: [foreign] }, now);
+  assert.equal(a.carried, null, 'nothing carries');
+  assert.deepEqual(a.problems, checkVerdict(foreign, { ...oldMech, pass: true, outcome: 'pass' }).problems.filter((p) => /verdict is for/.test(p)), 'it fails exactly as checkVerdict fails the original');
+  assert.deepEqual(a.need, ['s1 en-390']);
+  const wrongBase = carryJudgements({ mech: oldMech, parts: [v({ base: 'M0' })] }, now);
+  assert.match(wrongBase.problems.join(' | '), /verdict compares against M0, the base is M1/);
+  // two parts that judge one pair differently
+  const conflict = carryJudgements({ mech: oldMech, parts: [v({}), v({ pairs: [{ screen: 's1', lang: 'en', width: 390, verdict: 'worse', why: 'q' }] })] }, now);
+  assert.equal(conflict.carried, null);
+  assert.deepEqual(conflict.problems, ['pair s1 en-390 is judged better and worse']);
+  assert.ok(checkVerdict({ ...v({}), pairs: [...v({}).pairs, { screen: 's1', lang: 'en', width: 390, verdict: 'worse' }] }, { ...oldMech, pass: true, outcome: 'pass' }).problems.includes('pair s1 en-390 is judged better and worse'), 'the same words checkVerdict uses');
+  // the judged run's own verdict still carries
+  assert.equal(carryJudgements({ mech: oldMech, parts: [v({})] }, now).carried.pairs.length, 1);
+});

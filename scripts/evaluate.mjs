@@ -17,7 +17,7 @@ import { CLASSES, DS_FEATURE, componentPage, componentPagesOf, componentsTouched
 // The reach analyser (gate-v2 §2): static, conservative, over both revisions. It names the screens and leaves a change can reach,
 // and what each screen's evidence depends on.
 import { reachOf, identityInputs, leafInputs } from './static-reach.mjs';
-import { EvidenceStore, identityOf, treeOf, blobsHash, codeHash, sha, reconcileInventory, planEvidence, inputsDigest } from './evidence.mjs';
+import { EvidenceStore, identityOf, treeOf, blobsHash, codeHash, sha, canonical, reconcileInventory, planEvidence, inputsDigest, identityContradictions } from './evidence.mjs';
 import { createScheduler } from './scheduler.mjs';
 import { WORKERS, LAUNCH_ARGS, machineErrorOf, classifyMachineError } from './machine.mjs';
 import { BOUNDS } from './settle.mjs';
@@ -163,14 +163,14 @@ export async function evaluate(opts) {
   const blob = (side, f) => S[side].tree.get(f) || 'missing';
   const harness = (side) => ({ bare: blob(side, 'ux/system/atlas-bare.js'), server: blob(side, 'scripts/serve-ux.cjs'), fonts: blobsHash(S[side].tree, S[side].runtime.filter((f) => f.startsWith('vendor/fonts/'))) });
   const bundleGap = new Set();
-  const inputsMemo = new Map();
+  const inputsMemo = new Map(), iiMemo = new Map();
   // A screen's share of its identity: what the analyser says it depends on, hashed by blob on its side.
   const screenInputs = (side, id) => {
     const k = side + ' ' + id;
     if (inputsMemo.has(k)) return inputsMemo.get(k);
     const tree = S[side].tree;
     let ii = null;
-    try { ii = identityInputs(S[side].side, id); } catch (e) { gaps.push(`identityInputs(${side}, ${id}) threw (${e.message}): its identity hashes every page-loadable file`); }
+    try { ii = identityInputs(S[side].side, id); iiMemo.set(side + ' ' + id, ii); } catch (e) { gaps.push(`identityInputs(${side}, ${id}) threw (${e.message}): its identity hashes every page-loadable file`); }
     const def = [...S[side].screens, ...S[side].ds].find((x) => x.id === id);
     let v;
     // A component page (ds:<Name>/<variant>) is the atlas drawing a component's specimen: the atlas, the design system, the
@@ -186,6 +186,16 @@ export async function evaluate(opts) {
     inputsMemo.set(k, v);
     return v;
   };
+  // A contradiction the gate refuses (review of #194): a screen in reach because of the changed files whose evidence identity didn't
+  // change. Its stored evidence would be reused for a screen the analyser says the change can affect: the identity missed an input.
+  // In reach because of the files: one of them is in its page closure, or fits a load it can't bound; or the bundle changed and the
+  // screen loads it and the analyser says every screen, or it uses a changed export (or the namespace as a whole).
+  const identityMisses = () => identityContradictions({
+    ids: S.cand.screens.filter((x) => reachIds.has(x.id) && S.base.screens.some((b) => b.id === x.id)).map((x) => x.id),
+    files, runtime: new Set([...S.base.runtime, ...S.cand.runtime]), reach,
+    same: (id) => canonical(screenInputs('base', id)) === canonical(screenInputs('cand', id)),
+    inputs: (id) => [iiMemo.get('base ' + id), iiMemo.get('cand ' + id)].filter(Boolean),
+  });
   const shotId = (side, x, width, lang, vmode) => identityOf('shot', { screen: screenInputs(side, x.id), harness: harness(side), render, width, lang, mode: vmode, code: code.visit });
   const checkId = (side, x, width, lang, name, params) => identityOf(`check-${name}`, { screen: screenInputs(side, x.id), harness: harness(side), render, width, lang, params, code: code.visit, checker: code[name] });
 
@@ -273,6 +283,11 @@ export async function evaluate(opts) {
   mech.evidence = { items: items.length, reused: plan.reuse.length, toCompute: plan.compute.length, visits: visits.size };
   log(`evidence: ${items.length} item(s), ${plan.reuse.length} reused, ${plan.compute.length} to compute in ${visits.size} visit(s)`);
   mark('plan');
+  {
+    const missed = identityMisses();
+    mech.identityMisses = missed;
+    if (missed.length) block(`identity missed a change: ${missed.length} screen(s) in reach because of the changed files have the same evidence identity on both sides, so their evidence would be reused (${missed.slice(0, 3).join(', ')}): fix the identity inputs; never reuse it`);
+  }
 
   const urlOf = (side, x) => { const u = new URL(S[side].url + x.url); if (!componentPage(x.id)) u.searchParams.set('screen', x.id); return u.href; };
   const auditFor = { spacing: (page) => auditSpacingPage(page), headers: async (page, it) => dedupeHeaders((await auditHeadersPage(page, { width: it.width, lang: it.lang, checks: it.params.checks })).defects), legibility: (page) => auditLegibilityPage(page) };

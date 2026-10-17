@@ -415,19 +415,23 @@ export function newScenarioFailures(candFailed, baseOut) {
 }
 
 // Main's scenario debt, run by run (review of the gate, 2026-10-16). A candidate failure is main's debt only when base fails the
-// same leaf in the same language at the same width with the same failure: the same assertion (what) and failure class (tag).
+// same leaf in the same language at the same width with the same failure: the same assertion contract and failure category.
 // A leaf the candidate fails differently from base, at another width or language, that base passes, doesn't have, or didn't
 // report, is the change's: "already failing on main" never hides a new regression in the same leaf. Inputs are the two runners'
 // reports (run-scenarios --report); base may hold only the leaves it was asked about.
 export function scenarioDebt(candReport, baseReport) {
-  const key = (id, r, f) => [id, r.lang, r.width, f.what, f.tag || ''].join('|');
+  // the same failure (review of #194): the same assertion contract (what was defined to hold) and the same failure category (how it
+  // broke). A failure without both, on either side, is never debt: a base "preset missing" and a candidate "timeout" in one leaf are
+  // two failures, not one.
+  const known = (f) => !!f.contract && !!f.category && f.category !== 'unknown';
+  const key = (id, r, f) => [id, r.lang, r.width, f.contract, f.category].join('|');
   const onBase = new Set();
-  for (const lf of (baseReport && baseReport.leaves) || []) for (const r of lf.runs || []) if (r.result === 'fail') for (const f of r.failures || []) onBase.add(key(lf.id, r, f));
+  for (const lf of (baseReport && baseReport.leaves) || []) for (const r of lf.runs || []) if (r.result === 'fail') for (const f of r.failures || []) if (known(f)) onBase.add(key(lf.id, r, f));
   const added = [], debt = [];
   for (const lf of (candReport && candReport.leaves) || []) {
     if (lf.result !== 'fail') continue;
     const fresh = [];
-    for (const r of lf.runs || []) if (r.result === 'fail') for (const f of r.failures || []) if (!onBase.has(key(lf.id, r, f))) fresh.push(r.lang + '-' + r.width + ': ' + f.what);
+    for (const r of lf.runs || []) if (r.result === 'fail') for (const f of r.failures || []) if (!known(f) || !onBase.has(key(lf.id, r, f))) fresh.push(r.lang + '-' + r.width + ': ' + f.what + (f.category ? ` (${f.category})` : ''));
     if (fresh.length) added.push({ id: lf.id, why: fresh }); else debt.push(lf.id);
   }
   return { added, debt };
@@ -451,8 +455,18 @@ export function passesWithoutJudge(mech) {
 export function carryJudgements(old, now) {
   const name = (p) => `${p.screen} ${p.lang}-${p.width}`;
   const idOf = (p) => (p.identity ? `${name(p)} ${p.kind || 'changed'} ${p.identity.base || '-'} ${p.identity.cand || '-'}` : null);
-  const said = new Map();
-  for (const part of old.parts || []) for (const j of part.pairs || []) if (!said.has(name(j))) said.set(name(j), j);
+  // Only the judged run's own verdicts carry (review of #194): a part stamped for another candidate or base, or two parts that judge
+  // one pair differently, carry nothing; the problems read as checkVerdict reads them on the original verdict.
+  const problems = [];
+  for (const part of old.parts || []) {
+    if (part.candidate !== old.mech?.candidate) problems.push(`verdict is for ${part.candidate}, the candidate is ${old.mech?.candidate}`);
+    if (part.base !== old.mech?.base) problems.push(`verdict compares against ${part.base}, the base is ${old.mech?.base}`);
+  }
+  const all = new Map();
+  for (const part of old.parts || []) for (const j of part.pairs || []) all.set(name(j), [...(all.get(name(j)) || []), j]);
+  for (const [k, js] of all) { const v = new Set(js.map((j) => j.verdict)); if (v.size > 1) problems.push(`pair ${k} is judged ${[...v].join(' and ')}`); }
+  if (problems.length) return { carried: null, need: (now.pairs || []).map(name), goneNeed: (now.screens?.gone || []).map((g) => g.id), problems: [...new Set(problems)] };
+  const said = new Map([...all].map(([k, js]) => [k, js[0]]));
   const judged = new Map();
   for (const p of old.mech?.pairs || []) { const k = idOf(p), j = said.get(name(p)); if (k && j) judged.set(k, j); }
   const pairs = [], need = [];
@@ -474,5 +488,5 @@ export function carryJudgements(old, now) {
     notes: `carried by identity from the verdict on ${String(old.mech?.candidate).slice(0, 7)} against ${String(old.mech?.base).slice(0, 7)}${first.notes ? `; ${first.notes}` : ''}`,
     carriedFrom: { candidate: old.mech?.candidate, base: old.mech?.base },
   } : null;
-  return { carried, need, goneNeed };
+  return { carried, need, goneNeed, problems: [] };
 }

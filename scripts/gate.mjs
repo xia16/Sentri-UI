@@ -162,7 +162,8 @@ if (opt('verdict')) {
     const again = path.join(dir, `regate-${short(head)}-${short(main)}`);
     const now = await runGate({ ref: mech.ref, base: mainRef, out: again, mode: mech.mode, scope: mech.scope, declared: mech.class?.declared || 'presentation' });
     if (now.outcome !== 'pass') { console.log(`GATE FAIL ${short(now.candidate)}\n  - the mechanical gate on the new head and main: ${now.outcome}${(now.blocked || [])[0] ? ` (${now.blocked[0]})` : ''}`); process.exit(1); }
-    const { carried, need, goneNeed } = carryJudgements({ mech, parts }, now);
+    const { carried, need, goneNeed, problems: refused } = carryJudgements({ mech, parts }, now);
+    if (refused.length) { console.log(`GATE FAIL ${short(now.candidate)}: the judged run's verdicts can't be carried`); for (const p of refused) console.log('  -', p); process.exit(1); }
     if (carried) fs.writeFileSync(path.join(again, 'verdict-carried.json'), JSON.stringify(carried, null, 2));
     console.log(`carried ${carried?.pairs.length || 0} judgement(s) of ${now.pairs.length} pair(s) by identity${carried?.gone.length ? `, and ${carried.gone.length} removed screen reason(s)` : ''}`);
     if (need.length || goneNeed.length) {

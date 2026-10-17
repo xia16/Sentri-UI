@@ -366,7 +366,8 @@ test('reach: a file nothing classes falls back to every screen, and a page that 
 test('scenarioDebt: main\'s debt only for the same leaf, width, language, assertion and failure class', () => {
   const run = (lang, width, result, failures = []) => ({ lang, width, result, failures });
   const leaf = (id, runs) => ({ id, result: runs.some((r) => r.result === 'fail') ? 'fail' : 'pass', runs });
-  const fl = (what, tag = null) => ({ what, got: 'x', tag });
+  // a failure as the runner reports it: the assertion it broke (its contract) and how (its category); the tag is the hard class
+  const fl = (what, tag = null, category = 'wrong-text') => ({ what, got: 'x', tag, contract: `c:${what}`, category: tag === 'dead-end' ? 'timeout' : category });
   const base = { leaves: [leaf('ds-a11', [run('zh', 360, 'fail', [fl('"Task 2" shown')]), run('en', 390, 'pass')])] };
   // The same failure on main is debt.
   assert.deepEqual(scenarioDebt({ leaves: [leaf('ds-a11', [run('zh', 360, 'fail', [fl('"Task 2" shown')])])] }, base), { added: [], debt: ['ds-a11'] });
@@ -382,6 +383,36 @@ test('scenarioDebt: main\'s debt only for the same leaf, width, language, assert
   assert.equal(scenarioDebt({ leaves: [leaf('ds-a11', [run('zh', 360, 'fail', [fl('"Task 2" shown')])])] }, null).added.length, 1);
   // Passing leaves are neither.
   assert.deepEqual(scenarioDebt({ leaves: [leaf('ds-a13', [run('en', 390, 'pass')])] }, base), { added: [], debt: [] });
+});
+
+test('scenarioDebt: two unrelated failures in one leaf, language and width are not equated (review of #194)', () => {
+  const run = (lang, width, failures) => ({ lang, width, result: 'fail', failures });
+  const leaf = (id, runs) => ({ id, result: 'fail', runs });
+  // the probe: main breaks on a missing preset, the candidate on a timeout waiting for a selector; both reported as a 'run' dead end
+  const base = { leaves: [leaf('fa-1', [run('en', 390, [{ what: 'run', got: 'preset "count" is not in the page', tag: 'dead-end', contract: 'c-open', category: 'preset-missing' }])])] };
+  const cand = { leaves: [leaf('fa-1', [run('en', 390, [{ what: 'run', got: 'page.waitForSelector: Timeout 8000ms exceeded.', tag: 'dead-end', contract: 'c-open', category: 'timeout' }])])] };
+  const d = scenarioDebt(cand, base);
+  assert.deepEqual(d.debt, []);
+  assert.match(d.added[0].why.join(), /en-390: run \(timeout\)/);
+  // the same contract and category is debt; either unknown, on either side, is not
+  assert.deepEqual(scenarioDebt(base, base).debt, ['fa-1']);
+  const unknown = { leaves: [leaf('fa-1', [run('en', 390, [{ what: 'run', got: 'x', tag: 'dead-end', contract: 'c-open', category: 'unknown' }])])] };
+  assert.deepEqual(scenarioDebt(unknown, unknown).debt, [], 'unknown is never debt');
+  const old = { leaves: [leaf('fa-1', [run('en', 390, [{ what: 'run', got: 'preset "count" is not in the page', tag: 'dead-end' }])])] };
+  assert.deepEqual(scenarioDebt(old, old).debt, [], 'a report without fingerprints (an older runner) is never debt');
+});
+
+test('the runner classes failures by category and fingerprints the definition that failed', async () => {
+  const { failureCategory, contractOf } = await import('../scripts/scenario-runner.mjs');
+  assert.equal(failureCategory({ got: 'preset "count" is not in the page' }), 'preset-missing');
+  assert.equal(failureCategory({ got: 'page.waitForSelector: Timeout 8000ms exceeded.' }), 'timeout');
+  assert.equal(failureCategory({ got: 'control not found: Done', kind: 'step' }), 'missing-control');
+  assert.equal(failureCategory({ got: 'control is covered: Done', kind: 'step' }), 'unreachable-control');
+  assert.equal(failureCategory({ got: 'absent', kind: 'text' }), 'wrong-text');
+  assert.equal(failureCategory({ got: 'TypeError: x', kind: 'page-error' }), 'page-error');
+  assert.equal(failureCategory({ got: 'something else' }), 'unknown');
+  assert.equal(contractOf({ assertion: { text: 'Saved' } }), contractOf({ assertion: { text: 'Saved' } }));
+  assert.notEqual(contractOf({ assertion: { text: 'Saved' } }), contractOf({ assertion: { text: 'Done' } }));
 });
 
 // Component pages are in the gate's reach (rules ledger L23): the Headers law changed, screens were gated, and Sheet → page kept
