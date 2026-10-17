@@ -516,3 +516,25 @@ test("a mechanical pass that moves no screen is a gate pass without a judge; any
   assert.equal(passesWithoutJudge({ ...ok, candidate: "" }), false);
   assert.equal(passesWithoutJudge({ ...ok, outcome: "blocked" }), false, "gate v2: a blocked gate is never a pass");
 });
+
+// L25: motion has a held frame. The case it came from: #195 added the pen-map landing keyframes and no screen showed them.
+test('motion: a keyframe a change adds or alters needs a screen that holds it', async () => {
+  const { keyframesOf, unheldMotion, heldOf } = await import('../scripts/loop-rules.mjs');
+  const css195 = '.x{color:red}\n@keyframes st-pen-land-act{from{background-color:var(--amber-fill)}}\n@keyframes st-pen-land-ring{from{box-shadow:0 0 0 2px var(--ink)}to{box-shadow:0 0 0 2px transparent}}';
+  assert.deepEqual([...keyframesOf(css195).keys()], ['st-pen-land-act', 'st-pen-land-ring']);
+  const f = 'ux/design-system/components/bundle.css';
+  // #195: both new, none held: both fail
+  assert.deepEqual(unheldMotion({ base: { [f]: '.x{color:red}' }, cand: { [f]: css195 } }).map((m) => m.name + ' ' + m.kind), ['st-pen-land-act new', 'st-pen-land-ring new']);
+  // held by a screen: passes
+  const atlas = { platforms: [{ sections: [{ features: [{ screens: [{ id: 'a', holds: ['st-pen-land-act'] }, { id: 'b', holds: ['st-pen-land-ring'] }] }] }] }] };
+  assert.deepEqual(unheldMotion({ base: { [f]: '' }, cand: { [f]: css195 }, held: heldOf(atlas) }), []);
+  // #196: the ring's body changed (box-shadow to outline): a change, so it needs its holding screen again
+  const css196 = css195.replace('{from{box-shadow:0 0 0 2px var(--ink)}to{box-shadow:0 0 0 2px transparent}}', '{from{outline-color:var(--ink)}to{outline-color:transparent}}');
+  assert.deepEqual(unheldMotion({ base: { [f]: css195 }, cand: { [f]: css196 } }).map((m) => m.name + ' ' + m.kind), ['st-pen-land-ring changed']);
+  // untouched keyframes (only whitespace moved), a removed one, a page outside ux/ or in the archive: nothing to hold
+  assert.deepEqual(unheldMotion({ base: { [f]: css195 }, cand: { [f]: css195.replace(/\{from/g, '{ from') } }), []);
+  assert.deepEqual(unheldMotion({ base: { [f]: css195 }, cand: { [f]: '.x{color:red}' } }), []);
+  assert.deepEqual(unheldMotion({ base: {}, cand: { 'atlas/atlas.css': css195, 'ux/archive/old.css': css195 } }), []);
+  // nested braces inside a keyframe are read whole
+  assert.equal(keyframesOf('@keyframes k{0%{a:1}50%{a:2}100%{a:3}}.y{}').get('k'), '0%{a:1}50%{a:2}100%{a:3}');
+});

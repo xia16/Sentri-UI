@@ -48,6 +48,11 @@ for (const f of features) for (const s of f.screens || []) {
   for (const k of ['url', 'preset', 'steps', 'notes']) if (s[k] === undefined && t[k] !== undefined) s[k] = t[k];
 }
 
+// holds (SCHEMA.md, "holds"): a screen that holds a motion names keyframes that exist in a stylesheet under ux/ (not the archive)
+const keyframes = new Set();
+(function walk(d) { for (const e of readdirSync(d, { withFileTypes: true })) { const p = join(d, e.name); if (e.isDirectory()) { if (e.name !== 'archive' && e.name !== 'node_modules') walk(p); } else if (e.name.endsWith('.css')) for (const m of readFileSync(p, 'utf8').matchAll(/@keyframes\s+([\w-]+)/g)) keyframes.add(m[1]); } })(join(root, 'ux'));
+for (const f of features) for (const s of f.screens || []) for (const k of s.holds || []) if (!keyframes.has(k)) problems.push(`features/${f.id}: ${s.id} holds ${k}, which no stylesheet under ux/ defines`);
+
 // approvals: features/<id>/approvals.json (SCHEMA.md, "Approval records"). Only the owner approves; a record says who,
 // when and which commit. An approved screen that a later change touched is "changed since approval": back in design,
 // with its approved version still viewable at the approval commit.

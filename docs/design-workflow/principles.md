@@ -53,7 +53,7 @@ Each principle has the same four parts and nothing else: **the principle**, **wh
 
 **Show it.** `## Self-crit` in `critique.md`: per direction and round, each problem fixed or not, each Keep item as strong or not, the squint test, cluttered / flat / bulky against the original, the reference it was held against, and **better because** or **not better because**; last, a `Final look` block naming the commit it rendered.
 
-**Checked by.** The driver's look; the judge's calibration on the owner's rulings, cold look and before/after (gate.md §3–4); `scripts/check-spacing.mjs` for the clearly wrong spacing the eye reads as clutter (a block closer to a list than its rows, crowded boxes, doubled lines).
+**Checked by.** The driver's look; the judge's calibration on the owner's rulings, cold look and before/after (gate.md §3–4); `scripts/check-spacing.mjs` for the clearly wrong spacing the eye reads as clutter (a block closer to a list than its rows, crowded boxes, doubled lines); the gate's "motion has a held frame" check, so a cue that only exists in motion is still rendered and judged (L25).
 
 ## P5 · Prove it, don't claim it
 

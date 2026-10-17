@@ -13,7 +13,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { pwPath, playwright } from './playwright-path.mjs';
-import { CLASSES, DS_FEATURE, componentPage, componentPagesOf, componentsTouched, idPath, screensOf, pageOf, pageAssets, sharedFiles, coverageLost, effectiveClass, classifyScreens, touchesSystem, touchesTools, queueAhead as queueOf, budgetProblems, critiqueProblems, pageStyling, addedLines, scenarioDebt } from './loop-rules.mjs';
+import { CLASSES, DS_FEATURE, componentPage, componentPagesOf, componentsTouched, idPath, screensOf, pageOf, pageAssets, sharedFiles, coverageLost, effectiveClass, classifyScreens, touchesSystem, touchesTools, queueAhead as queueOf, budgetProblems, critiqueProblems, pageStyling, addedLines, scenarioDebt, isMotionFile, unheldMotion, heldOf } from './loop-rules.mjs';
 // The reach analyser (gate-v2 §2): static, conservative, over both revisions. It names the screens and leaves a change can reach,
 // and what each screen's evidence depends on.
 import { reachOf, identityInputs, leafInputs } from './static-reach.mjs';
@@ -561,6 +561,14 @@ export async function evaluate(opts) {
     const proposed = files.includes('ux/design-system/components/_proposed.json') && /^\+\s*[\[{"]/m.test(git(['diff', '-U0', mech.base, mech.candidate, '--', 'ux/design-system/components/_proposed.json'], root).out);
     check('no workaround beside a component proposal', !proposed, proposed ? 'this change proposes a component and changes screens: build the component in the design system in this change (P2, briefs/build.md §3), never a workaround' : '');
     check('design-system components only', !ps.length, ps.length ? `${ps.length} visual declaration(s) added outside ux/design-system (${ps.slice(0, 3).map((p) => p.file.split('/').pop() + ' ' + p.prop).join(', ')}): use a SentriUI component, or build the part in the design system (P2, briefs/build.md §3)` : '');
+  }
+  // motion has a held frame (L25): run whether or not a screen moved, since a frozen atlas shows no motion change as a moved screen
+  const motionFiles = files.filter(isMotionFile);
+  if (motionFiles.length) {
+    const read = (dir) => Object.fromEntries(motionFiles.map((f) => { const p = path.join(dir, f); return [f, fs.existsSync(p) ? fs.readFileSync(p, 'utf8') : '']; }));
+    const unheld = unheldMotion({ base: read(S.base.dir), cand: read(S.cand.dir), held: heldOf(S.cand.atlas) });
+    mech.unheldMotion = unheld;
+    check('motion has a held frame (P4)', !unheld.length, unheld.length ? `${unheld.length} keyframe animation(s) no screen holds (${unheld.slice(0, 3).map((m) => `${m.name}, ${m.kind}`).join('; ')}): add a still render that shows the cue at its hold and name it in that screen's "holds" (atlas/SCHEMA.md)` : '');
   }
   if (tools.length && moved.length) check('workflow changes in their own PR', false, `this change moves ${moved.length} screen(s) and also edits the workflow or the gate's tools (${tools.slice(0, 3).join(', ')}): split it`);
   if (ec.cls === 'shared' && opts.testBase) gaps.push(`shared-component change against a test base (${opts.base}): the PR queue is not read (it orders real PRs only)`);
