@@ -1086,14 +1086,22 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
    own border and nothing sticky above can hide it). --land-elapsed resumes a re-rendered pen part-way. One cue; nothing else moves. */
 [data-pen-land] [data-pen-land-head]{animation:st-pen-land-act var(--land-fade) ease-in-out calc(var(--land-hold) - var(--land-elapsed,0ms)) both}
 [data-pen-land=live] [data-pen-land-head]{animation-name:st-pen-land-live}
+/* the header's text and icons take the fill's own ink while the fill holds (muted on a fill reads under 4.5:1), and fade back with it */
+[data-pen-land=act] [data-pen-land-head] *{animation:st-pen-land-act-ink var(--land-fade) ease-in-out calc(var(--land-hold) - var(--land-elapsed,0ms)) both}
+[data-pen-land=live] [data-pen-land-head] *{animation:st-pen-land-live-ink var(--land-fade) ease-in-out calc(var(--land-hold) - var(--land-elapsed,0ms)) both}
 [data-pen-land=plain] [data-pen-land-head]{animation:none}
 [data-pen-land=plain]{outline:2px solid transparent;outline-offset:-2px;animation:st-pen-land-ring var(--land-fade) ease-in-out calc(var(--land-hold) - var(--land-elapsed,0ms)) both}
 @keyframes st-pen-land-act{from{background-color:var(--amber-fill)}}
 @keyframes st-pen-land-live{from{background-color:var(--progress-fill)}}
+@keyframes st-pen-land-act-ink{from{color:var(--amber-fill-ink)}}
+@keyframes st-pen-land-live-ink{from{color:var(--progress-fill-ink)}}
 @keyframes st-pen-land-ring{from{outline-color:var(--ink)}to{outline-color:transparent}}
 /* the held frame (data-pen-land-held): the cue at its hold, without motion, for a still render (the atlas shoots it; the gate judges it) */
 [data-pen-land][data-pen-land-held],[data-pen-land][data-pen-land-held] [data-pen-land-head]{animation:none}
 [data-pen-land=act][data-pen-land-held] [data-pen-land-head]{background-color:var(--amber-fill)}
+[data-pen-land][data-pen-land-held] [data-pen-land-head] *{animation:none}
+[data-pen-land=act][data-pen-land-held] [data-pen-land-head] *{color:var(--amber-fill-ink)}
+[data-pen-land=live][data-pen-land-held] [data-pen-land-head] *{color:var(--progress-fill-ink)}
 [data-pen-land=live][data-pen-land-held] [data-pen-land-head]{background-color:var(--progress-fill)}
 [data-pen-land=plain][data-pen-land-held]{outline-color:var(--ink)}
 
