@@ -50,12 +50,20 @@
   var dataUrl = here ? new URL('../../atlas/atlas.json', here).href : '/atlas/atlas.json';
   var data = fetch(dataUrl).then(function (r) { return r.json(); }).catch(function () { return null; });
 
+  /* A page gets only what renders of a screen: its id, url, preset and steps. Notes, names and status describe a screen and draw
+     nothing, and the gate hashes only these of the atlas (scripts/atlas-screens.mjs renderDef), so a page must not read the rest. */
+  function rendered(c) {
+    var r = { id: c.id, url: c.url };
+    if (c.preset !== undefined) r.preset = c.preset;
+    if (c.steps !== undefined) r.steps = c.steps;
+    return r;
+  }
   function findScreen(d) {
     var found = null, path = location.pathname;
     if (!d) return;
     d.platforms.forEach(function (p) { p.sections.forEach(function (s) { s.features.forEach(function (f) { f.screens.forEach(function (c) {
-      if (c.id === id) found = c;
-      if (c.url && c.url.split('?')[0] === path) AB.screens.push(c);
+      if (c.id === id) found = rendered(c);
+      if (c.url && c.url.split('?')[0] === path) AB.screens.push(rendered(c));
     }); }); }); });
     AB.screen = found;
   }

@@ -14,7 +14,8 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { parse } from './vendor/acorn.mjs';
 import { bundleShape, bundleChange, bundleHashes } from './bundle-graph.mjs';
-import { screensOf, pageOf } from './atlas-screens.mjs';
+import { screensOf, pageOf, renderDef } from './atlas-screens.mjs';
+import { leafEntryUrl } from './scenario-tree.mjs';
 
 export const BUNDLE_JS = 'ux/design-system/components/bundle.js';
 const ROOTISH = new Set(['window', 'globalThis', 'self', 'root', 'parent', 'top']);
@@ -487,17 +488,20 @@ function sideOf(side) {
   return s;
 }
 
-// The leaves of a feature's scenarios.json: [{ id, feature, entry: the page its nearest reset opens, or null }].
+// The leaves of a feature's scenarios.json: [{ id, feature, entry: the page its nearest reset opens, or null }]. The entry comes
+// from leafEntryUrl, the resolver the gate's leaf identities use: it read `defaults.reset.url`, which no spec has (they say
+// `defaults.url`), so 95 of Farrowing's 97 leaves had no entry and counted as in reach on every change.
 function leavesOf(dir, feature) {
   const spec = (() => { try { return JSON.parse(read(dir, `features/${feature}/scenarios.json`) || 'null'); } catch { return null; } })();
-  const out = [];
+  const D = spec?.defaults || {}, out = [];
+  const entryOf = (reset) => { const u = leafEntryUrl(reset, D); return u ? pageOf(u) : null; };
   (function w(nodes, entry) {
     for (const n of nodes || []) {
-      const e = n.reset?.url ? pageOf(n.reset.url) : entry;
+      const e = n.reset ? entryOf(n.reset) : entry;
       if (n.type === 'outcome') out.push({ id: n.id, feature, entry: e });
       w(n.children, e);
     }
-  })(spec?.tree, spec?.defaults?.reset?.url ? pageOf(spec.defaults.reset.url) : null);
+  })(spec?.tree, entryOf(null));
   return out;
 }
 
@@ -540,11 +544,11 @@ export function reachOf(base, candidate, { files } = {}) {
     // a load the analyser can't bound depends on every changed runtime file it could fetch, even one another page names literally
     for (const f of runtime) { const u = pg.unbounded.find((x) => typeFits(new Set([x.type]), f)); if (u) hit(s.id, `its page loads by a computed URL (${u.why})`); }
   }
-  // the atlas: a screen whose definition (url, preset, steps…) changed, and a screen only one side has
+  // the atlas: a screen whose definition (url, preset, steps: what renders) changed, and a screen only one side has
   for (const id of allIds) {
     const b = B.defs.get(id), c = C.defs.get(id);
     if (!b || !c) hit(id, 'only one side has it');
-    else if (JSON.stringify(b) !== JSON.stringify(c)) hit(id, 'its atlas definition changed');
+    else if (JSON.stringify(renderDef(b)) !== JSON.stringify(renderDef(c))) hit(id, 'its atlas definition changed');
   }
   // a feature's own files add its screens; owning a feature never removes a dependency
   const ownFeatures = new Set(changed.map((f) => f.match(/^features\/([^/]+)\//)?.[1]).filter(Boolean));
@@ -599,7 +603,7 @@ export function identityInputs(side, screenId) {
   const s = S.screens.find((x) => x.id === screenId);
   if (!s) return null;
   const pg = screenDeps(S, s);
-  return { files: [...pg.files].sort(), unbounded: pg.unbounded, bundle: bundleInputs(S, pg), screen: S.defs.get(screenId) || null };
+  return { files: [...pg.files].sort(), unbounded: pg.unbounded, bundle: bundleInputs(S, pg), screen: renderDef(S.defs.get(screenId)) };
 }
 
 // What one scenario leaf's run depends on (gate-v2 §3): its entry page (the fixture's url) and every page its taps can navigate to,

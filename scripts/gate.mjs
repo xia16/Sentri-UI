@@ -162,14 +162,15 @@ if (opt('verdict')) {
     const again = path.join(dir, `regate-${short(head)}-${short(main)}`);
     const now = await runGate({ ref: mech.ref, base: mainRef, out: again, mode: mech.mode, scope: mech.scope, declared: mech.class?.declared || 'presentation' });
     if (now.outcome !== 'pass') { console.log(`GATE FAIL ${short(now.candidate)}\n  - the mechanical gate on the new head and main: ${now.outcome}${(now.blocked || [])[0] ? ` (${now.blocked[0]})` : ''}`); process.exit(1); }
-    const { carried, need, goneNeed, problems: refused } = carryJudgements({ mech, parts }, now);
+    const { carried, need, goneNeed, walkNeed = [], problems: refused } = carryJudgements({ mech, parts }, now);
     if (refused.length) { console.log(`GATE FAIL ${short(now.candidate)}: the judged run's verdicts can't be carried`); for (const p of refused) console.log('  -', p); process.exit(1); }
-    if (carried) fs.writeFileSync(path.join(again, 'verdict-carried.json'), JSON.stringify(carried, null, 2));
-    console.log(`carried ${carried?.pairs.length || 0} judgement(s) of ${now.pairs.length} pair(s) by identity${carried?.gone.length ? `, and ${carried.gone.length} removed screen reason(s)` : ''}`);
-    if (need.length || goneNeed.length) {
-      console.log(`GATE FAIL ${short(now.candidate)}: ${need.length} pair(s) show different images now${goneNeed.length ? ` and ${goneNeed.length} removed screen(s) need a reason` : ''}; a judge decides only those`);
+    if (carried) fs.writeFileSync(path.join(again, 'verdict-carried.json'), JSON.stringify({ ...carried, walkNeed }, null, 2));
+    console.log(`carried ${carried?.pairs.length || 0} judgement(s) of ${now.pairs.length} pair(s) by image or identity${carried?.gone.length ? `, and ${carried.gone.length} removed screen reason(s)` : ''}`);
+    if (need.length || goneNeed.length || walkNeed.length) {
+      console.log(`GATE FAIL ${short(now.candidate)}: ${need.length} pair(s) show different images now${goneNeed.length ? ` and ${goneNeed.length} removed screen(s) need a reason` : ''}${walkNeed.length ? `; ${walkNeed.length} screen(s) look the same from changed inputs and are walked again` : ''}; a judge decides only those`);
       for (const n of need.slice(0, 20)) console.log('  - judge', n);
       for (const g of goneNeed) console.log('  - say why under "gone":', g);
+      for (const w of walkNeed) console.log('  - walk again:', w);
       console.log(`  write them as ${path.join(again, 'verdict-new.json')} (every other pair is in verdict-carried.json), then: node scripts/gate.mjs --verdict ${again}`);
       process.exit(1);
     }
@@ -177,9 +178,14 @@ if (opt('verdict')) {
     head = sha(mech.ref); main = sha(mainRef);
   }
   const cat = (k) => parts.flatMap((p) => p[k] || []);
+  // Each part's pass is about its own pairs: no worse or failed pair, no defect, no failed walk, no contradicted claim. "At least
+  // one pair better" is the whole change's, which checkVerdict applies over every part's pairs together (G13): a part that is all
+  // "same", or all new screens, passes on its own.
   const verdict = { ...parts[0], pass: parts.every((p) => p.pass === true), pairs: cat('pairs'), walk: cat('walk'), defects: cat('defects'), gone: cat('gone'), rejected: cat('rejected'), contradicted: cat('contradicted') };
   for (const p of parts) if (p.candidate !== verdict.candidate || p.base !== verdict.base) verdict.candidate = 'mixed verdicts';
   const v = checkVerdict(verdict, mech);
+  // a screen whose walk could not carry (same picture, changed inputs) needs a walk in this verdict
+  for (const s of new Set(cat('walkNeed'))) if (!verdict.walk.some((w) => w.screen === s)) v.problems.push(`walk ${s} again: it looks the same as when it was walked, but its inputs changed`);
   const calFile = path.join(root, 'docs/design-workflow/calibration/answers.json');
   if (fs.existsSync(calFile)) v.problems.push(...calibrationProblems(parts, JSON.parse(fs.readFileSync(calFile, 'utf8')).pairs));
   if (head !== mech.candidate) v.problems.push(`${mech.ref} moved to ${short(head)} while the gate ran on ${short(mech.candidate)}: run --verdict again`);

@@ -48,8 +48,17 @@ export function outcomeLeaves(spec) {
   return n;
 }
 
+// A spec's outcome leaves by id: { status, checks: how many assertions the leaf makes (visible and record) }.
+function outcomesById(spec) {
+  const m = new Map();
+  (function walk(nodes) { for (const x of nodes || []) { if (x.type === 'outcome') m.set(x.id, { status: x.status || null, checks: (x.visible || []).length + (x.record || []).length }); walk(x.children); } })(spec?.tree);
+  return m;
+}
+
 // Behaviour coverage a candidate drops, per side { runner: bool, specs: { feature: parsed scenarios.json | null } }:
-// the runner, a feature's scenarios.json, or outcome leaves. Removing coverage is a workflow change, never a design PR's.
+// the runner, a feature's scenarios.json, or a leaf. Removing coverage is a workflow change, never a design PR's.
+// A leaf is compared by its id, not counted (G14): a leaf that runs on base and is gone, made pending, or makes fewer assertions on
+// the candidate is lost coverage, even when the feature's count of leaves holds (a failing leaf made pending kept the count).
 export function coverageLost(base, cand) {
   const lost = [];
   if (base.runner && !cand.runner) lost.push('scripts/run-scenarios.mjs is gone');
@@ -59,6 +68,14 @@ export function coverageLost(base, cand) {
     if (!c) { lost.push(`features/${f}/scenarios.json is gone or unreadable`); continue; }
     const nb = outcomeLeaves(spec), nc = outcomeLeaves(c);
     if (nc < nb) lost.push(`${f} has ${nc} outcome leaves, ${nb} on base`);
+    const B = outcomesById(spec), C = outcomesById(c);
+    for (const [id, b] of B) {
+      if (b.status === 'pending') continue;
+      const x = C.get(id);
+      if (!x) lost.push(`${f}: leaf ${id} is gone`);
+      else if (x.status === 'pending') lost.push(`${f}: leaf ${id} runs on base and is pending here`);
+      else if (x.checks < b.checks) lost.push(`${f}: leaf ${id} makes ${x.checks} assertion(s), ${b.checks} on base`);
+    }
   }
   return lost;
 }
@@ -156,7 +173,8 @@ export function checkVerdict(verdict, mech) {
     for (const x of new Set(v)) if (!allowed.includes(x)) problems.push(`pair ${name(p)} has ${kind === 'changed' ? 'both sides' : 'one side'}: its verdict is ${allowed.join(' or ') || '(unknown pair kind)'}, not "${x}"`);
     if (kind === 'changed' && p.pct === 0 && v.some((x) => x !== 'same')) problems.push(`pair ${name(p)} is pixel-identical: it can only be same`);
   }
-  const moving = listed.filter((p) => (p.kind || 'changed') === 'changed' && p.pct !== 0 && !(mech.flaky || []).includes(p.screen));
+  // Gate v2 has no flaky list: a changed screen is visited again on both sides and either draws its own shot again or blocks.
+  const moving = listed.filter((p) => (p.kind || 'changed') === 'changed' && p.pct !== 0);
   const better = moving.filter((p) => (said.get(name(p)) || []).includes('better'));
   const worse = pairs.filter((p) => p.verdict === 'worse' || p.verdict === 'fail');
   if (verdict.pass) {
@@ -166,7 +184,7 @@ export function checkVerdict(verdict, mech) {
     if ((verdict.walk || []).some((w) => w.ok !== true)) problems.push('passes with a walk entry that is not ok');
     if (mech.mode === 'refactor') { if (pairs.some((p) => p.verdict !== 'same')) problems.push('a refactor passes with a pair that is not the same'); }
     else if (moving.length && !better.length) problems.push('passes with no pair better (same is not enough)');
-    else if (!(mech.screens?.diff || []).filter((d) => !(mech.flaky || []).includes(d.id)).length && !(mech.screens?.new || []).length) {
+    else if (!(mech.screens?.diff || []).length && !(mech.screens?.new || []).length) {
       // Nothing visible changed: only a behaviour fix (which may leave every first frame alone) passes, and on a walk.
       const behaviour = ['behaviour', 'shared'].includes(mech.class?.declared);
       const walked = (verdict.walk || []).length > 0 && verdict.walk.every((w) => w.ok === true);
@@ -448,13 +466,21 @@ export function passesWithoutJudge(mech) {
 
 // Gate v2: a moved main (or a PR head that merged it forward) never voids work by itself (gate-v2.md §3). The gate runs again on
 // the new head and main, reusing every result whose identity is unchanged; then every judgement is carried to the pair of the new
-// manifest with the same identity (the same screen, run and kind, the same base shot and the same candidate shot: the same two
-// images), and a removed screen's reason with it. Only pairs whose images changed need a new judgement.
+// manifest that shows the same two images (the same screen, run and kind, and each side's shot byte for byte), and a removed
+// screen's reason with it. Only pairs whose images changed need a new judgement. A pair is matched by its images when both runs
+// recorded them (`image`, G17): a change to an input nothing renders from (strings another page uses, a shared stylesheet rule
+// this screen doesn't match) gives every shot a new identity and the same picture, and judging the same picture again proves
+// nothing (#192, 2026-10-17: 0 of 112 judgements carried twice, with 108 and then 112 pairs pixel-identical). Older runs, without
+// `image`, match by shot identity as before.
 //   old: { mech, parts: [verdict files] } of the judged run · now: the new run's mechanical.json
 // → { carried: a verdict part for the new run (or null when nothing carries), need: [pair names], goneNeed: [screen ids] }
 export function carryJudgements(old, now) {
   const name = (p) => `${p.screen} ${p.lang}-${p.width}`;
-  const idOf = (p) => (p.identity ? `${name(p)} ${p.kind || 'changed'} ${p.identity.base || '-'} ${p.identity.cand || '-'}` : null);
+  // a pair's keys: by its two images when the run recorded them, and by its two shot identities; a judgement carries on either
+  const keysOf = (p) => [
+    p.image && (p.image.base || p.image.cand) ? `${name(p)} ${p.kind || 'changed'} image ${p.image.base || '-'} ${p.image.cand || '-'}` : null,
+    p.identity ? `${name(p)} ${p.kind || 'changed'} ${p.identity.base || '-'} ${p.identity.cand || '-'}` : null,
+  ].filter(Boolean);
   // Only the judged run's own verdicts carry (review of #194): a part stamped for another candidate or base, or two parts that judge
   // one pair differently, carry nothing; the problems read as checkVerdict reads them on the original verdict.
   const problems = [];
@@ -468,9 +494,16 @@ export function carryJudgements(old, now) {
   if (problems.length) return { carried: null, need: (now.pairs || []).map(name), goneNeed: (now.screens?.gone || []).map((g) => g.id), problems: [...new Set(problems)] };
   const said = new Map([...all].map(([k, js]) => [k, js[0]]));
   const judged = new Map();
-  for (const p of old.mech?.pairs || []) { const k = idOf(p), j = said.get(name(p)); if (k && j) judged.set(k, j); }
-  const pairs = [], need = [];
-  for (const p of now.pairs || []) { const j = idOf(p) && judged.get(idOf(p)); if (j) pairs.push({ ...j, carried: true }); else need.push(name(p)); }
+  for (const p of old.mech?.pairs || []) { const j = said.get(name(p)); if (j) for (const k of keysOf(p)) judged.set(k, j); }
+  const pairs = [], need = [], sameImageNewInputs = new Set();
+  const idKey = (p) => keysOf(p).find((x) => !x.includes(' image '));
+  for (const p of now.pairs || []) {
+    const k = keysOf(p).find((x) => judged.has(x));
+    if (!k) { need.push(name(p)); continue; }
+    pairs.push({ ...judged.get(k), carried: true });
+    // the same picture from changed inputs (a page script, a handler): what it looks like carries, how it behaves does not
+    if (!judged.has(idKey(p))) sameImageNewInputs.add(p.screen);
+  }
   // a removed screen's reason carries when it was removed before too and every one of its pairs carried
   const goneSaid = new Map((old.parts || []).flatMap((p) => p.gone || []).filter((g) => g.why).map((g) => [g.screen, g]));
   const wasGone = new Set((old.mech?.screens?.gone || []).map((g) => g.id));
@@ -481,12 +514,17 @@ export function carryJudgements(old, now) {
   }
   const first = (old.parts || [])[0] || {};
   const cat = (k) => (old.parts || []).flatMap((p) => p[k] || []);
+  // A walk is about behaviour, so it carries only for screens whose inputs are unchanged; a screen carried by its picture alone
+  // is walked again (walkNeed). Its pair judgements still carry.
+  const walk = cat('walk').filter((w) => !sameImageNewInputs.has(w.screen));
+  const walkNeed = [...new Set(cat('walk').filter((w) => sameImageNewInputs.has(w.screen)).map((w) => w.screen))];
   const carried = pairs.length || gone.length ? {
+    // a part's pass is about its own pairs (no worse, no defect); "at least one better" is checkVerdict's, over every part (G13)
     pass: (old.parts || []).every((p) => p.pass === true), candidate: now.candidate, base: now.base, class: first.class, mode: first.mode,
-    mechanical: first.mechanical || [], walk: cat('walk'), pairs, defects: cat('defects'), gone, calibration: first.calibration || [],
+    mechanical: first.mechanical || [], walk, pairs, defects: cat('defects'), gone, calibration: first.calibration || [],
     rejected: cat('rejected'), contradicted: cat('contradicted'),
-    notes: `carried by identity from the verdict on ${String(old.mech?.candidate).slice(0, 7)} against ${String(old.mech?.base).slice(0, 7)}${first.notes ? `; ${first.notes}` : ''}`,
+    notes: `carried by image or identity from the verdict on ${String(old.mech?.candidate).slice(0, 7)} against ${String(old.mech?.base).slice(0, 7)}${first.notes ? `; ${first.notes}` : ''}`,
     carriedFrom: { candidate: old.mech?.candidate, base: old.mech?.base },
   } : null;
-  return { carried, need, goneNeed, problems: [] };
+  return { carried, need, goneNeed, walkNeed, problems: [] };
 }

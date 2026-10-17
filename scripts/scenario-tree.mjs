@@ -13,6 +13,10 @@ export const DEVICES = ['a', 'b'];
 export const GWT_PARTS = ['given', 'when', 'then'];
 
 const UNITS = { s: 1000, m: 60000, h: 3600000, d: 86400000 };
+// The page a leaf's run opens: its nearest reset's url, else the spec's default url (scenario-runner opens `fx.url || D.url`).
+// One resolver for the analyser's leaf reach (static-reach leavesOf) and the gate's leaf identities (evaluate leafReach).
+export const leafEntryUrl = (reset, defaults) => (reset && reset.url) || (defaults && defaults.url) || null;
+
 /** "30m" / "2h" / "1d" / "45s" → milliseconds, or null when it is not a duration. */
 export function parseDuration(text) {
   const m = /^(\d+(?:\.\d+)?)(s|m|h|d)$/.exec(String(text).trim());

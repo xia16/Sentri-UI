@@ -36,6 +36,13 @@ for (const file of files) {
 
 const commits = new Set();
 const atlas = JSON.parse(fs.readFileSync('atlas/atlas.json', 'utf8'));
+// The repo's atlas.json carries no build stamps (scripts/build-atlas.mjs); the published copy says when and from which commit it
+// was built, for the brand's tooltip (atlas/boot.js).
+{
+  let commit = ''; try { commit = execFileSync('git', ['rev-parse', '--short', 'HEAD'], { encoding: 'utf8' }).trim(); } catch {}
+  const site = path.join(out, 'atlas/atlas.json');
+  if (fs.existsSync(site)) { const a = JSON.parse(fs.readFileSync(site, 'utf8')); fs.writeFileSync(site, JSON.stringify({ generated: new Date().toISOString(), commit, ...a }, null, 1) + '\n'); }
+}
 for (const p of atlas.platforms) for (const s of p.sections) for (const f of s.features) for (const c of f.screens) if (c.approval && c.approval.commit) commits.add(c.approval.commit);
 if (fs.existsSync('atlas/layers.json')) for (const l of JSON.parse(fs.readFileSync('atlas/layers.json', 'utf8')).layers) commits.add(l.sha);
 for (const sha of commits) {
