@@ -1247,6 +1247,12 @@
     const on=atEnd?btns[btns.length-1]:btns.find(b=>n>=+b.dataset.from&&n<=+b.dataset.to);
     btns.forEach(b=>b.setAttribute('aria-checked',String(b===on)));
     if(on){const r=on.getBoundingClientRect(),q=ranges.getBoundingClientRect();if(r.left<q.left)ranges.scrollLeft+=r.left-q.left;else if(r.right>q.right)ranges.scrollLeft+=r.right-q.right;}
+    penEdges(ranges);
+  }
+  /* ranges that overflow fade on the side that has more, so a cut range reads as "more this way", never as clipped */
+  function penEdges(r){
+    const s=r.scrollLeft,more=[s>1&&'start',s+r.clientWidth<r.scrollWidth-1&&'end'].filter(Boolean).join(' ');
+    if(more)r.dataset.more=more;else delete r.dataset.more;
   }
   function penMount(scope){
     const maps=!scope||!scope.querySelectorAll?[]:scope.matches&&scope.matches('.st-pen-map')?[scope]:[...scope.querySelectorAll('.st-pen-map')];
@@ -1272,7 +1278,7 @@
     if(typeof MutationObserver!=='undefined')new MutationObserver(ms=>{for(const m of ms)for(const n of m.addedNodes)if(n.nodeType===1)penMount(n);}).observe(document,{childList:true,subtree:true});
     if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>penMount(document));else penMount(document);
     let frame=0;
-    document.addEventListener('scroll',e=>{const t=e.target;if(!t.classList||!t.classList.contains('st-pen-scroll'))return;penStop();cancelAnimationFrame(frame);frame=requestAnimationFrame(()=>penMark(t));},true);
+    document.addEventListener('scroll',e=>{const t=e.target;if(t.classList&&t.classList.contains('st-pen-ranges')){penEdges(t);return;}if(!t.classList||!t.classList.contains('st-pen-scroll'))return;penStop();cancelAnimationFrame(frame);frame=requestAnimationFrame(()=>penMark(t));},true);
     document.addEventListener('click',e=>{
       const b=e.target.closest&&e.target.closest('.st-pen-ranges button');
       if(b){

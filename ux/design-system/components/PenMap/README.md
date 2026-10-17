@@ -24,7 +24,7 @@ Classification: **component** (a new job; no existing component draws a map of p
 3. **Column letters** (A, B, C…) and **row numbers** (1, 2, 3…): muted 13px mono on the sheet's tint. Letters are always the columns and numbers always the rows, so the map uses the phone's height. Letters stick to the top and numbers to the left. The number column is 22px, or 30px when a row has 100 pens or more.
 4. **Tile**: a button, at least 56 × 56, 8px gaps, 12px radius, the pen code in 15px / 600 mono and nothing else. Columns are `minmax(56px, 1fr)`: when the lanes do not fit at 56px the map scrolls sideways and the tiles never shrink.
 5. **Peek** (on hold): a white card with a 1px `line` border over the lower part of the map, clear of the footer.
-6. **Range control** (footer, only when a row has more than 20 pens): a segmented control beside Back, one button per 20 pens (`1–20`, `21–40`…), each at least 76px wide and the control 56px tall. It scrolls sideways when the ranges overflow, with no visible scrollbar.
+6. **Range control** (footer, only when a row has more than 20 pens): a segmented control beside Back, one button per 20 pens (`1–20`, `21–40`…), each as wide as its label (at least 56px) and sharing the spare width, the control 56px tall. Up to three ranges (60 pens a row) fit beside Back at 360. More scroll sideways, with no visible scrollbar: the next range shows cut at the edge, which says there is more.
 
 ## Variants
 
@@ -53,7 +53,7 @@ Selected, Error and Loading do not apply: tapping a tile leaves the sheet.
 
 - **One pen, one colour.** A pen shows the loudest level among the animals the current list shows in it. Change the tab or filter and the colours follow.
 - **A fixed ladder, loudest first:** Needs you (amber) > In progress (blue) > Has animals (white) > Empty / filtered out (quiet, disabled). Severity never adds a colour: a worse "needs you" is still amber, and the detail lives in the peek or on the page the tile opens.
-- **The task supplies the levels.** It says which of its row states sit on which rung; the component never decides. A task with no "in progress" state simply never draws blue. Each task varies only through a mapping table in its `budget.md`: [Farrowing's](../../../../features/farrowing/budget.md). Inspection, breeding, heat-check and pregnancy add theirs when they adopt PenMap.
+- **The task supplies the levels.** It says which of its row states sit on which rung; the component never decides. A task with no "in progress" state simply never draws blue. Each task varies only through a mapping table in its `budget.md`: [Farrowing's](../../../../features/farrowing/budget.md#pen-colours-the-mapping-table). Inspection, breeding, heat-check and pregnancy add theirs when they adopt PenMap.
 - **A tile shows only the pen code.** Counts go in the colour key (the sheet's header line), never in the tile.
 - **The map follows the list.** It uses the list's current tab and filter: a pen the list hides is drawn as filtered out.
 - **Severity never adds a colour.** An Inspection red marker becomes Needs you (amber); how bad it is stays in the peek or on the page.

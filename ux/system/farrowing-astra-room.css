@@ -55,7 +55,7 @@
 .pen-detail-section:last-child{margin-bottom:0}
 .pen-detail-section h4{font-size:13px;margin:0 0 12px}
 .farrowing-phone .room-filter-summary button{min-height:44px}
-/* Go to pen: a pen that can't be opened stays readable. It sits on a quiet surface and says why in one word on one line. */
+/* Pen map: a pen that can't be opened stays readable. It sits on a quiet surface and says why in one word on one line. */
 .pen-cell small{white-space:nowrap}
 .pen-cell:disabled{background:var(--disabled-surface);border-color:var(--disabled-border);color:var(--ink-2)}
 .pen-cell:disabled small{color:var(--muted)}
