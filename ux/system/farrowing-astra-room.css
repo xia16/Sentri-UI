@@ -31,7 +31,7 @@
 .home-task-title svg{width:17px;height:17px}
 .home-task-states{font-size:13px;color:var(--muted)}
 .home-task-states b{color:#24613a;font-weight:600}
-.home-resume{font-size:13px;color:var(--muted);padding-top:13px;border-top:1px solid var(--line);width:100%}@media(max-width:370px){.room-list .row-main{font-size:13px}.sow-identity{min-width:60px}}@media(prefers-reduced-motion:reduce){.room-list .pen-card,.room-list .pen-top{transition:none}}
+.home-resume{font-size:13px;color:var(--muted);padding-top:13px;border-top:1px solid var(--line);width:100%}@media(max-width:370px){.room-list .row-main{font-size:13px}.sow-identity{min-width:60px}}@media(prefers-reduced-motion:reduce){.room-list .pen-card,.room-list .pen-top{transition:none}.room-list .pen-card.pen-arrival,.room-list .pen-arrival .pen-top{animation:none}.room-list .pen-card.pen-arrival{border-color:#91a77f}.room-list .pen-arrival .pen-top{background:#e8efdf}}
 
 /* Keep the comparison table;
 
