@@ -216,6 +216,8 @@
   --sheet-out: 180ms;
   --fade: 200ms;
   --ease-arrive: cubic-bezier(.22,1,.36,1);
+  --land-hold: 900ms;
+  --land-fade: 700ms;
   --drawer-compact-max: 42%;
   --drawer-short-max: 58%;
   --drawer-medium-max: 76%;

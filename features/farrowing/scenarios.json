@@ -228,7 +228,7 @@
           {
            "src": "PRD",
            "at": "Scope",
-           "says": "Room list: … Go to pen, Scan ear tag, Search."
+           "says": "Room list: … Pen map, Scan ear tag, Search."
           }
          ],
          "visible": [
@@ -4449,12 +4449,12 @@
   {
    "type": "entry",
    "id": "pen-map",
-   "label": "Go to pen: the map of the room",
+   "label": "Pen map: the map of the room",
    "children": [
     {
      "type": "state",
      "id": "pen-map.open",
-     "label": "The room open on its map: Go to pen",
+     "label": "The room open on its map: Pen map",
      "tree": "P",
      "reset": {
       "screen": "farrowing.pen-map"
@@ -4476,7 +4476,7 @@
          "gwt": {
           "given": "The worker has the map of the room open, with a pen that has sows.",
           "when": "They tap that pen.",
-          "then": "The map closes and the room list opens with that pen pinned under the tabs, and the dock names the pen."
+          "then": "The map closes and the room list opens with that pen pinned under the tabs, and its header takes the colour of the tile she tapped, then settles back (a white tile gets a ring instead)."
          },
          "authority": [
           {
@@ -4497,7 +4497,7 @@
            "hard": "dead-end"
           },
           {
-           "el": ".dock-pen",
+           "el": ".dock-map",
            "in": "phone"
           }
          ],
@@ -4613,7 +4613,7 @@
       {
        "type": "action",
        "id": "pen-map.open.reopen",
-       "label": "tap pen B4, then open Go to pen again",
+       "label": "tap pen B4, then open Pen map again",
        "taps": [
         "[data-pen='B4']",
         "[data-action='room-grid']"
@@ -4626,7 +4626,7 @@
          "label": "The map opens with the room’s current pen in view",
          "gwt": {
           "given": "The worker went to pen B4 from the map and is back in the room list.",
-          "when": "They open Go to pen again.",
+          "when": "They open Pen map again.",
           "then": "The map opens with pen B4 in view and no ring or fill marks it."
          },
          "authority": [
@@ -4658,7 +4658,7 @@
     {
      "type": "state",
      "id": "pen-map.filtered",
-     "label": "The room on its Active tab, then Go to pen",
+     "label": "The room on its Active tab, then Pen map",
      "tree": "P",
      "reset": {
       "screen": "farrowing.room"
@@ -4667,7 +4667,7 @@
       {
        "type": "action",
        "id": "pen-map.filtered.open",
-       "label": "tap the Active tab, then Go to pen",
+       "label": "tap the Active tab, then Pen map",
        "taps": [
         "[data-action='room-lens'][data-value='Active']",
         "[data-action='room-grid']"
@@ -4683,7 +4683,7 @@
          "label": "A pen whose sows the tab hides is disabled, and the colour key follows the tab",
          "gwt": {
           "given": "The worker is on the Active tab, where only pen B1 has a farrowing sow.",
-          "when": "They open Go to pen.",
+          "when": "They open Pen map.",
           "then": "Pens B3 and B4, whose sows the tab hides, are disabled; pen B1 can be tapped; the colour key counts one farrowing pen and none that need her."
          },
          "authority": [

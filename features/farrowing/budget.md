@@ -45,7 +45,7 @@ The header line of every surface of this feature, decided by the Headers law (`u
 | Piglet identity, Report piglet mortality, Foster piglets (from Piglet processing) | action | none | | Piglet processing (chip), walked in crit round 1 | one Back away |
 | Task overview, End task (early), Task ended, task sows lists | action (from the room's summary card) | none | the scope is in the body (Choose a unit, the outcomes) | Back reaches the room |
 | Filter sows, Scan actions | action | none | Reset in the footer | Back reaches the room |
-| Go to pen | action | the colour key: `2 need you · 1 farrowing` (owner exception, 2026-10-14; below) | Where does anything need me, and what do the colours mean? | Back reaches the room |
+| Pen map | action | the colour key: `2 need you · 1 farrowing` (owner exception, 2026-10-14; below) | Where does anything need me, and what do the colours mean? | Back reaches the room |
 | Pen page, Pen log, Pen note, Feed guidance, Report fault, Equipment fault | action | none | | Back reaches the room or the pen page |
 | Scan ear tags | action (page) | none; Scanning / Stopped is the body's first line | | Back reaches the room |
 | Find a sow | search page | not a title header: its pinned field is its head (owner, 2026-10-12) | | |
@@ -54,19 +54,19 @@ Moved, not cut (crit rounds 1 and 2): the task receipt's closure stamp (`Farrowi
 
 Chains walked (crit round 1): the room, the record drawer, the logs and the pen pages read as before; More actions and Piglet processing now carry the route, so every action page about her is one Back from her chip.
 
-# Farrowing: Go to pen, information budget (2026-10-14)
+# Farrowing: Pen map, information budget (2026-10-14)
 
 Built on the shared PenMap component. Owner design, chosen over mockup rounds on 2026-10-13 and 2026-10-14.
 
 ## Inventory
 
 Every fact the map could show, per pen and per state:
-- Header: the title, `Go to pen`, and one header line, the colour key: the pens that need her and the pens farrowing now, each a count with its swatch. Owner ruling, 2026-10-14: a surface whose body is colour-coded may use its colour key as the header line (plain text, never tappable, one line at 360 in EN and ZH, the only header line). It is an exception to the three tests of the Headers law; it is named here with its question.
+- Header: the title, `Pen map`, and one header line, the colour key: the pens that need her and the pens farrowing now, each a count with its swatch. Owner ruling, 2026-10-14: a surface whose body is colour-coded may use its colour key as the header line (plain text, never tappable, one line at 360 in EN and ZH, the only header line). It is an exception to the three tests of the Headers law; it is named here with its question.
 - The entrance band, saying which end of the map is the door.
 - The map: column letters, row numbers, one tile per pen with its pen code. The tile's colour is its status.
 - Peek (hold a tile): the pen code and its sow count, and for each sow her ear tag, state word and figure.
 - Footer: Back; and, only when a row has more than 20 pens, the range control (`1–20`, `21–40`…).
-- Could have shown and does not: a fact line in every tile (Active, Overdue, Due today, N born, No sows, No match), a sow count per tile, the ear tags, the unit name, a count of empty pens, a ring on the current pen, an intro line ("Tap a pen to go to its pigs. Hold to peek."), a note about the layout, the filter in force.
+- Could have shown and does not: a fact line in every tile (Active, Overdue, Due today, N born, No sows, No match), a sow count per tile, the ear tags, the unit name, a count of empty pens, a ring on the current pen, the current pen number on the dock's Pen map button (2026-10-17: the button is the icon and the label), an intro line ("Tap a pen to go to its pigs. Hold to peek."), a note about the layout, the filter in force.
 
 ## Questions
 
@@ -94,6 +94,17 @@ Every fact the map could show, per pen and per state:
 | Peek: ear tag, state word and figure (`000418 · Overdue · 2 days`) | the animal row's own levels | Who is in it, and does anyone need me? The same words and levels as the room list (`sowFacts`). |
 
 The answer to the first question (where do I go) is the heaviest thing on the screen: the colour of the tiles. Nothing but a pen code is written inside a tile.
+
+## Pen colours: the mapping table
+
+The generic rule is in [PenMap](../../ux/design-system/components/PenMap/README.md#the-colour-rule-every-tasks-pen-map): a pen shows the loudest level among the sows the list shows in it. Farrowing's row levels (`sowFacts().level`) sit on the rungs so:
+
+| Rung | Row level | Row states |
+|---|---|---|
+| Needs you (amber) | `act` | Overdue; Sow died with piglets to allocate |
+| In progress (blue) | `live` | Active (farrowing now) |
+| Has animals (white) | every other shown sow | Due today or tomorrow, Due later, Done, Aborted, outcomes, hand-reared |
+| Empty / filtered out (quiet, disabled) | none | no sows in the pen, or every sow hidden by the tab or filter |
 
 ## Cut list
 

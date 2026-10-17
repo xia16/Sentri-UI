@@ -9,10 +9,10 @@ The room's bottom bar: **one primary tool (Scan ear tag) and icon tools**. It is
 - **Primary** (`.tk-dock-primary`): flex 1, `tap-min` tall, `ink` with a `paper` label, `radius-control`, the glyph 8px before a 12px/500 label.
 - **Tool** (`.tk-dock-tool`): 48 × 50, `paper`, 1px `line`, `radius-control`, one glyph, an aria-label.
 
-- **Place control** (`unit`, optional, first): farrowing's `B1 / Go to pen` — no frame, `paper`, at least 50px, padded `0 3px`, 9px between: an 18px icon, then the place in 13px/600 mono over its caption in `dock-caption` 9px `muted` (farrowing's size, below the floor by the owner's ruling). Props: `dock({ unit: { icon = 'grid', label, caption, action, value, aria }, primary, tools })`.
+- **Place control** (`unit`, optional, first): the framed form is farrowing's **Pen map** button: the Search button's frame (`paper`, 1px `line`, `radius-control`, `footer-height` 56px tall) around an 18px icon and a 13px/600 `ink` label, 14px side padding, 8px between, width to content, no pen number or caption. The older frameless form (an icon, a 13px/600 mono place over a 9px `dock-caption`, padded `0 3px`) remains for Piglet processing's room until it migrates. Props: `dock({ unit: { icon = 'grid', label, action, value, aria, framed, caption }, primary, tools })`; `framed: true` draws the first form and ignores `caption`.
 
 **States**
-- Pressed: the Button press (darken, 1px down) is not drawn yet. Disabled: never.
+- Pressed: the framed place control takes IconButton's press (`press` fill, 2px down; none with reduced motion). The Primary and the Tools do not draw a press here yet. Disabled: never.
 
 **Component contract**
 - **Props:** `SentriTask.dock({ primary: { icon, label, action, value }, tools: [{ icon, label, action, value }] })`. `tools.label` names the nav.
@@ -25,3 +25,6 @@ The room's bottom bar: **one primary tool (Scan ear tag) and icon tools**. It is
 
 **Strings**
 - Host strings (`act.scan` for Scan ear tag).
+
+**Changelog**
+- 2026-10-17: the place control gains a framed form (Pen map) and loses the pen number in farrowing's dock; the sheet it opens is titled Pen map (was Go to pen). Farrowing's room dock draws it with its own `.dock-map` rules (same frame); the skeleton demo uses `framed`.

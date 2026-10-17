@@ -1,6 +1,6 @@
 # PenMap
 
-A pen map shows a room as a map of pens, each pen a tile that goes to that pen and is coloured by its status, so a worker finds the pen in front of her by where it is and sees at once which ones need her. It is Farrowing's Go to pen. It sits in a menu drawer ([Sheet](../Sheet/README.md), `surface: 'menu'`) and does not record a farm fact.
+A pen map shows a room as a map of pens, each pen a tile that goes to that pen and is coloured by its status, so a worker finds the pen in front of her by where it is and sees at once which ones need her. It is Farrowing's Pen map. It sits in a menu drawer ([Sheet](../Sheet/README.md), `surface: 'menu'`) and does not record a farm fact.
 
 `SentriUI.penMap({ lanes, depth, pens, current, action, key, rangeSize, entrance, labels, peek })` draws the body: the Entrance band and the map. `SentriUI.penMapKey({ pens, words })` gives the items of the sheet's key line (the legend; see below). `SentriUI.penMapFooter({ back, depth, rangeSize, label })` draws the footer. `SentriUI.penPeek({ title, meta, rows })` draws the hold-to-peek card's content. Types are in `index.d.ts`.
 
@@ -32,15 +32,15 @@ Classification: **component** (a new job; no existing component draws a map of p
 
 ## States
 
-A pen takes one face. A pen's level is the loudest of the sows the list shows in it.
+A pen takes one face: the loudest level among the animals the list shows in it (the colour rule below). Farrowing's animals are sows.
 
 | State | When | Tile | Fill | Text |
 |---|---|---|---|---|
 | Needs you (`act`) | any shown sow is at the animal row's `act` level | amber | `amber-fill` `#fede82`, no border | `amber-fill-ink` `#5c3f00` |
-| Farrowing (`live`) | else any shown sow is at `live` | blue | `progress-fill` `#c1ddfd`, no border | `progress-fill-ink` `#1f4470` |
-| Has sows (`plain`) | else the pen has shown sows | white | `paper`, 1px `line` | `ink` |
-| Empty | no sows | quiet, disabled | `well`, no border | `muted`, 500 |
-| No sows match (`hidden`) | sows, all hidden by the tab or filter | the empty face, disabled | `well`, no border | `muted`, 500 |
+| In progress (`live`; Farrowing says "farrowing") | else any shown sow is at `live` | blue | `progress-fill` `#c1ddfd`, no border | `progress-fill-ink` `#1f4470` |
+| Has animals (`plain`; Farrowing says "has sows") | else the pen has shown sows | white | `paper`, 1px `line` | `ink` |
+| Empty | no animals | quiet, disabled | `well`, no border | `muted`, 500 |
+| Filtered out (`hidden`) | animals, all hidden by the tab or filter | the empty face, disabled | `well`, no border | `muted`, 500 |
 | Pressed | finger down | white takes `press`; the fills darken | | |
 | Peek | held 350ms | the card, over the lower part of the map (the upper part when the held tile would sit under it) | | |
 | Long / Chinese | `lanes` and `depth` of any size; Chinese words | the key stays on one line; pen codes are never translated | | |
@@ -49,9 +49,23 @@ There is no text inside a tile but the pen code: no "No sows", no "Active". Ther
 
 Selected, Error and Loading do not apply: tapping a tile leaves the sheet.
 
+## The colour rule (every task's pen map)
+
+- **One pen, one colour.** A pen shows the loudest level among the animals the current list shows in it. Change the tab or filter and the colours follow.
+- **A fixed ladder, loudest first:** Needs you (amber) > In progress (blue) > Has animals (white) > Empty / filtered out (quiet, disabled). Severity never adds a colour: a worse "needs you" is still amber, and the detail lives in the peek or on the page the tile opens.
+- **The task supplies the levels.** It says which of its row states sit on which rung; the component never decides. A task with no "in progress" state simply never draws blue. Each task varies only through a mapping table in its `budget.md`: [Farrowing's](../../../../features/farrowing/budget.md). Inspection, breeding, heat-check and pregnancy add theirs when they adopt PenMap.
+- **A tile shows only the pen code.** Counts go in the colour key (the sheet's header line), never in the tile.
+- **The map follows the list.** It uses the list's current tab and filter: a pen the list hides is drawn as filtered out.
+- **Severity never adds a colour.** An Inspection red marker becomes Needs you (amber); how bad it is stays in the peek or on the page.
+- **Open (Inspection):** how the walk shows checked against not-yet-checked pens is still to be decided.
+
+## Landing on the pen
+
+Tapping a tile is one motion, with one cue. The host places its list on the pen first, under the sheet, so no scroll is seen. The sheet then slides down in `sheet-out` (180ms) with its scrim, and the pen's header takes the tapped tile's own fill (amber, blue), held for `land-hold` (900ms) and faded back by `land-fade` (700ms) later, 1.6s in all. A white tile (Has animals) has no fill to carry, so its pen card takes a 2px ink ring with the same timing. Nothing else dims or moves. With reduced motion the sheet just goes and the colour shows and fades without movement. Where motion is frozen (the atlas) the pen is reached at once and the list is the plain list.
+
 ## Behaviour
 
-- **Tap** a tile and the host goes to that pen (`data-action` and `data-value` carry the action and the pen code). A disabled tile does nothing.
+- **Tap** a tile and the host goes to that pen (`data-action` and `data-value` carry the action and the pen code), as in Landing on the pen. A disabled tile does nothing.
 - **Hold** a tile 350ms to peek at its sows, read-only. Moving more than 12px, scrolling or lifting hides it; the tap that follows a peek only closes it and does not go to the pen.
 - **The map scrolls** inside the sheet, sideways and down. The sheet body does not scroll; the Entrance band stays put. The scrollbar is never drawn.
 - **Opens on the current pen**, centred in the space under the letters and beside the numbers.
@@ -97,13 +111,14 @@ Selected, Error and Loading do not apply: tapping a tile leaves the sheet.
 
 ## Tokens used
 
-`amber-fill` · `amber-fill-ink` · `progress-fill` · `progress-fill-ink` (new: fills colour a status that covers a whole area, [SURFACES.md](../../SURFACES.md)) · `paper` · `well` · `ink` · `muted` · `line` · `handle` · `app-background` · `st-context-bg` · `st-panel-bg` · `st-press` · `radius-control` · `radius-segment` · `radius-inset` · `radius-panel` · `radius-4` · `space-2` · `space-4` · `space-6` · `space-8` · `space-10` · `space-12` · `space-14` · `space-16` · `space-24` · `space-card-x` · `size-2` · `size-15` · `size-16` · `size-20` · `size-22` · `size-24` · `size-34` · `size-56` · `footer-height` · `type-meta-size` · `type-identifier-size` · `type-weight-medium` · `type-weight-semibold` · `font-sans` · `font-mono` · `border-width` · `icon-pad-stroke`. The geometry is set in four local properties on the map (`--pm-tile`, `--pm-gap`, `--pm-label`, `--pm-head`) built from these tokens.
+`land-hold` · `land-fade` · `sheet-out` · `amber-fill` · `amber-fill-ink` · `progress-fill` · `progress-fill-ink` (new: fills colour a status that covers a whole area, [SURFACES.md](../../SURFACES.md)) · `paper` · `well` · `ink` · `muted` · `line` · `handle` · `app-background` · `st-context-bg` · `st-panel-bg` · `st-press` · `radius-control` · `radius-segment` · `radius-inset` · `radius-panel` · `radius-4` · `space-2` · `space-4` · `space-6` · `space-8` · `space-10` · `space-12` · `space-14` · `space-16` · `space-24` · `space-card-x` · `size-2` · `size-15` · `size-16` · `size-20` · `size-22` · `size-24` · `size-34` · `size-56` · `footer-height` · `type-meta-size` · `type-identifier-size` · `type-weight-medium` · `type-weight-semibold` · `font-sans` · `font-mono` · `border-width` · `icon-pad-stroke`. The geometry is set in four local properties on the map (`--pm-tile`, `--pm-gap`, `--pm-label`, `--pm-head`) built from these tokens.
 
 ## Used by
 
-- `farrowing.pen-map` (Go to pen).
+- `farrowing.pen-map` (Pen map).
 - **Until migrated:** `inspection.go-to-pen` still draws its own map and peek (`ux/system/inspection-astra-concept.js`, `penMapSheet`); it moves onto PenMap in the next change.
 
 ## Changelog
 
 2026-10-14: new. Farrowing's Go to pen moves onto it. Adds the `arrow-down` glyph and the tokens `amber-fill`, `amber-fill-ink`, `progress-fill` and `progress-fill-ink`.
+2026-10-17: Farrowing's dock entry is a framed Pen map button (the sheet is titled Pen map, formerly Go to pen). Adds the colour rule, the landing cue and the tokens `land-hold` and `land-fade`.
