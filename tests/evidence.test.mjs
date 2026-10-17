@@ -189,3 +189,11 @@ test('carrying judgements never launders a verdict from another commit, or two c
   // the judged run's own verdict still carries
   assert.equal(carryJudgements({ mech: oldMech, parts: [v({})] }, now).carried.pairs.length, 1);
 });
+
+test('an item whose identity changed is in the reach even when the analyser left it out (review of #194, round 2)', async () => {
+  const { widenByIdentity } = await import('../scripts/evidence.mjs');
+  const changed = new Set(['data-sync.list', 'fa-leaf-1']);
+  assert.deepEqual(widenByIdentity({ ids: ['data-sync.list', 'farrowing.room', 'home.today'], inReach: (id) => id === 'farrowing.room', changed: (id) => changed.has(id) }), ['data-sync.list'], 'added: shot in full, and reported as an analyser miss');
+  assert.deepEqual(widenByIdentity({ ids: ['farrowing.room'], inReach: () => true, changed: () => true }), [], 'already in reach: nothing to add');
+  assert.deepEqual(widenByIdentity({ ids: ['fa-leaf-1', 'fa-leaf-2'], inReach: () => false, changed: (id) => changed.has(id) }), ['fa-leaf-1'], 'leaves too');
+});

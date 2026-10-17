@@ -91,6 +91,12 @@ export function identityContradictions({ ids, files, runtime, reach, same, input
   return out;
 }
 
+// The structural guarantee (review of #194, round 2): the items (screens, leaves) whose evidence identity differs between base and
+// candidate but which the analyser left out of the reach. The gate adds them, in full, and reports each one as an analyser miss.
+export function widenByIdentity({ ids, inReach, changed }) {
+  return ids.filter((id) => !inReach(id) && changed(id));
+}
+
 // ---------- what code hashes to: a module and its local imports ----------
 
 // The local modules a source imports or requires by a literal path (static, dynamic or require). A computed import can't be

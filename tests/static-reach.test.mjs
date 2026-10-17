@@ -81,7 +81,9 @@ test('a mutation reaches the readers of what it mutates', () => {
 test('a computed export name, or a start-up change, reaches every screen', () => {
   const computed = checkout({ bundle: { extra: "const k='row';" } });
   const r = reachOf(computed, checkout({ bundle: { extra: "const k='row';const api2=Object.freeze({[k]:row});" } }), { files: BJS });
-  assert.equal(r.all, false, 'a second table that nothing exports is just a constant');
+  assert.equal(r.all, true, 'a new binding built by a call at start-up (Object.freeze) runs on every page, even though nothing exports it (review of #194, round 2)');
+  assert.match(r.why[0], /api2 is a new binding whose initialiser runs at start-up/);
+  assert.equal(reachOf(computed, checkout({ bundle: { extra: "const k='row';const k2='sheet';" } }), { files: BJS }).all, false, 'a new constant of literals does nothing at load: it is just a constant');
   const viaApi = reachOf(BASE, checkout({ bundle: { extra: 'function pick(n){return api[n];}', exports: ',pick' } }), { files: BJS });
   assert.equal(viaApi.all, true);
   const startUp = reachOf(BASE, checkout({ bundle: { extra: "DEFAULTS.size='compact';" } }), { files: BJS });
@@ -264,4 +266,22 @@ test('a start-up initialiser change is a new identity for every screen that load
     assert.notEqual(d(b), d(c), `${id}: its evidence must not be reused across a start-up change (the initialiser and what it reads are in its identity)`);
   }
   assert.ok(identityInputs(b.side, 'inspection.room').bundle.units.some((u) => /OPACITY|formats/.test(u)), 'the initialisers are units of the identity');
+});
+
+// ---------- review of #194, round 2: a new start-up initialiser can't escape reach, and nothing whose identity changed is left out ----------
+test('the probe: a new DOMContentLoaded initialiser that dims one page at 360 only reaches every screen, and is in its identity', async () => {
+  const { inputsDigest, canonical, widenByIdentity } = await import('../scripts/evidence.mjs');
+  const { createHash } = await import('node:crypto');
+  const probe = "const boot=typeof document!=='undefined'&&document.addEventListener('DOMContentLoaded',()=>{if(innerWidth===360&&/report/.test(location.pathname))document.documentElement.style.opacity='0.5';});";
+  const mk = (o) => { const c = checkout(o); const t = new Map(Object.keys(FILES(o)).map((f) => [f, createHash('sha1').update(fs.readFileSync(path.join(c.dir, f))).digest('hex')])); return { side: { ...c, rev: `p${++n}` }, tree: t }; };
+  const b = mk({}), c = mk({ bundle: { extra: probe } });
+  // reach selection: before the fix, all=false, functions=[] and no screen
+  const r = reachOf(b.side, c.side, { files: BJS });
+  assert.equal(r.all, true, 'a new binding whose initialiser runs at start-up reaches every bundle-loading screen');
+  assert.match(r.why[0], /boot is a new binding whose initialiser runs at start-up/);
+  // evidence planning: the dimmed page's identity changed, so even a reach that left it out would get it back, in full
+  const rt = (t) => [...t.keys()].filter((f) => !/^(features|docs|tests|scripts)\//.test(f)).sort();
+  const changed = (id) => canonical(inputsDigest(identityInputs(b.side, id), b.tree, rt(b.tree)).digest) !== canonical(inputsDigest(identityInputs(c.side, id), c.tree, rt(c.tree)).digest);
+  assert.equal(changed('reports.week'), true);
+  assert.deepEqual(widenByIdentity({ ids: ['reports.week', 'farrowing.room'], inReach: () => false, changed }).sort(), ['farrowing.room', 'reports.week'], 'every bundle-loading screen: the initialiser is a start-up effect of each');
 });

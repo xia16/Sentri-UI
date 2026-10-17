@@ -76,6 +76,19 @@ function references(node, out = new Set(), dyn = [], writes = new Set(), passed 
 }
 
 const isFn = (init) => !!init && (init.type === 'ArrowFunctionExpression' || init.type === 'FunctionExpression');
+// Does an initialiser do something when the bundle loads (review of #194, round 2)? A call, a construction, an assignment or any
+// other effect runs on every page that loads the bundle; a literal, an object of literals or a function (whose body runs only when
+// called) does not. Function bodies are not walked: they don't run at load.
+function hasEffect(node) {
+  let found = false;
+  (function walk(n) {
+    if (found || !n || typeof n.type !== 'string') return;
+    if (/^(ArrowFunctionExpression|FunctionExpression|FunctionDeclaration)$/.test(n.type)) return;
+    if (/^(CallExpression|NewExpression|AssignmentExpression|UpdateExpression|AwaitExpression|YieldExpression|TaggedTemplateExpression|ImportExpression)$/.test(n.type) || (n.type === 'UnaryExpression' && n.operator === 'delete')) { found = true; return; }
+    for (const k of Object.keys(n)) { if (k === 'start' || k === 'end') continue; const v = n[k]; if (Array.isArray(v)) v.forEach(walk); else if (v && typeof v.type === 'string') walk(v); }
+  })(node);
+  return found;
+}
 
 // The bundle's shape: { iifes: [{ namespace, params, units: Map(name -> { kind, text, refs, dyn }), setup: [{ text, refs, dyn }],
 // exports: Map(exportName -> localName) }], outside: [text of top-level statements that are not an IIFE], problems: [] }.
@@ -116,7 +129,7 @@ export function bundleShape(src) {
             continue;
           }
           if (iife.units.has(d.id.name)) shape.problems.push(`${d.id.name} is declared twice`);
-          iife.units.set(d.id.name, { kind: isFn(d.init) ? 'function' : 'constant', object: !!d.init && /^(ObjectExpression|ArrayExpression|NewExpression|CallExpression)$/.test(d.init.type), text: `${s.kind} ${text(d)}`, start: d.start, end: d.end, ...r });
+          iife.units.set(d.id.name, { kind: isFn(d.init) ? 'function' : 'constant', effect: !!d.init && !isFn(d.init) && hasEffect(d.init), object: !!d.init && /^(ObjectExpression|ArrayExpression|NewExpression|CallExpression)$/.test(d.init.type), text: `${s.kind} ${text(d)}`, start: d.start, end: d.end, ...r });
         }
         continue;
       }
@@ -155,10 +168,14 @@ export function bundleChange(baseSrc, candSrc) {
     if (b.namespace !== c.namespace || !b.namespace) return all(`IIFE ${i + 1} exports ${c.namespace || 'nothing it names'}, ${b.namespace || 'nothing it names'} on base`);
     if (b.params !== c.params) return all(`the ${b.namespace} wrapper changed`);
     if (b.setup.map((s) => s.text).join('\n') !== c.setup.map((s) => s.text).join('\n')) return all(`${b.namespace}'s setup code changed (event listeners, alias loops or the export lines)`);
-    // every top-level binding is a unit: a function, a constant, an object built at start-up. A changed one is a seed.
-    for (const [name, u] of b.units) {
-      const v = c.units.get(name);
-      if (v && v.text === u.text) continue;
+    // every top-level binding is a unit: a function, a constant, an object built at start-up. A changed one is a seed. One whose
+    // initialiser has a start-up effect (a call, a construction, an assignment) runs on every page that loads the bundle, whether
+    // or not an export reads it: added, removed or changed, it reaches every screen (review of #194, round 2). Candidate-only and
+    // base-only bindings count as changed.
+    for (const name of new Set([...b.units.keys(), ...c.units.keys()])) {
+      const u = b.units.get(name), v = c.units.get(name);
+      if (u && v && v.text === u.text) continue;
+      if (u?.effect || v?.effect) return all(`${b.namespace}:${name} ${!u ? 'is a new' : !v ? 'was a' : 'is a changed'} binding whose initialiser runs at start-up`);
       seeds.push([i, name]);
     }
     // an export pointed at other units, or gone: callers of that export are affected

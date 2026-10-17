@@ -17,7 +17,7 @@ import { CLASSES, DS_FEATURE, componentPage, componentPagesOf, componentsTouched
 // The reach analyser (gate-v2 §2): static, conservative, over both revisions. It names the screens and leaves a change can reach,
 // and what each screen's evidence depends on.
 import { reachOf, identityInputs, leafInputs } from './static-reach.mjs';
-import { EvidenceStore, identityOf, treeOf, blobsHash, codeHash, sha, canonical, reconcileInventory, planEvidence, inputsDigest, identityContradictions } from './evidence.mjs';
+import { EvidenceStore, identityOf, treeOf, blobsHash, codeHash, sha, canonical, reconcileInventory, planEvidence, inputsDigest, identityContradictions, widenByIdentity } from './evidence.mjs';
 import { createScheduler } from './scheduler.mjs';
 import { WORKERS, LAUNCH_ARGS, machineErrorOf, classifyMachineError } from './machine.mjs';
 import { BOUNDS } from './settle.mjs';
@@ -249,6 +249,21 @@ export async function evaluate(opts) {
   // ---------- 2. plan the evidence: every run each side needs ----------
   // A screen in the reach is shot at 390 and 360 in EN and ZH (a component page in EN: its Chinese cells are its own states); every
   // other screen once at 390 EN, a tripwire (a --quick self-check skips it). A screen in the reach also gets its visit checks.
+  // The structural guarantee (review of #194, round 2): the reach is never smaller than what changed. Every screen whose evidence
+  // identity differs between base and candidate is in the reach, shot in full with all its checks, whatever the analyser said; each
+  // one it adds is an analyser miss, reported as a gap.
+  if (!quick && !reach.all) {
+    const both = [...S.cand.screens, ...S.cand.ds].filter((x) => [...S.base.screens, ...S.base.ds].some((b) => b.id === x.id));
+    const byId = new Map([...S.base.screens, ...S.base.ds].map((b) => [b.id, b]));
+    const added = widenByIdentity({ ids: both.map((x) => x.id), inReach: (id) => reachIds.has(id), changed: (id) => shotId('base', byId.get(id), TRIP.width, TRIP.lang, componentPage(id) ? 'grid' : 'screen') !== shotId('cand', both.find((x) => x.id === id), TRIP.width, TRIP.lang, componentPage(id) ? 'grid' : 'screen') });
+    for (const id of added) reachIds.add(id);
+    mech.reach.byIdentity = { screens: added };
+    mech.reach.screens = reachIds.size;
+    if (added.length) {
+      log(`reach: +${added.length} screen(s) whose evidence identity changed but the analyser left out (${added.slice(0, 5).join(', ')}${added.length > 5 ? ' …' : ''})`);
+      gaps.push(`analyser miss: ${added.length} screen(s) whose evidence identity changed were outside its reach and were added, shot in full (${added.slice(0, 5).join(', ')}${added.length > 5 ? ' …' : ''}): report it`);
+    }
+  }
   const runsOf = (x) => (inReach(x) ? WIDTHS.flatMap((width) => (componentPage(x.id) ? ['en'] : LANGS).map((lang) => ({ width, lang }))) : quick ? [] : [{ width: TRIP.width, lang: TRIP.lang }]);
   const visitChecks = (side, x, width, lang) => {
     if (!inReach(x) || componentPage(x.id)) return [];
@@ -686,6 +701,24 @@ export async function evaluate(opts) {
     for (const l of new Set(plan.its.map((i) => i.leaf))) rows.push(leafRow(l, plan.its.filter((i) => i.leaf === l && i.kind).map((i) => results.get(i.id)).filter((r) => r && !r.machine)));
     return reportOf({ feature: f, commit: S[side].sha, base: S[side].url, langs: plan.langs, widths: plan.widths, nodeCount: plan.nodeCount, rows });
   };
+  // the same guarantee for leaves: a leaf whose identity differs between base and candidate runs, whatever the analyser said
+  if (!quick && !everyLeaf) {
+    const added = [];
+    for (const f of featuresWithLeaves('cand').filter((x) => featuresWithLeaves('base').includes(x))) {
+      const pb = leafItemsOf('base', f, null), pc = leafItemsOf('cand', f, null);
+      if (!pb || !pc || pb.problems || pc.problems) continue;
+      const idOf = (p) => new Map(p.its.filter((i) => i.kind).map((i) => [`${i.leaf.node.id} ${i.lang}-${i.width}`, i.id]));
+      const b = idOf(pb), c = idOf(pc);
+      const ids = [...new Set(pc.its.filter((i) => i.kind).map((i) => i.leaf.node.id))];
+      added.push(...widenByIdentity({ ids, inReach: (id) => leafSet.has(id), changed: (id) => [...c].some(([k, v]) => k.startsWith(id + ' ') && b.get(k) !== v) }));
+    }
+    for (const id of added) leafSet.add(id);
+    mech.reach.byIdentity = { ...(mech.reach.byIdentity || {}), leaves: added };
+    if (added.length) {
+      log(`leaves: +${added.length} whose evidence identity changed but the analyser left out (${added.slice(0, 5).join(', ')})`);
+      gaps.push(`analyser miss: ${added.length} leaf/leaves whose evidence identity changed were outside its reach and were run (${added.slice(0, 5).join(', ')}${added.length > 5 ? ' …' : ''}): report it`);
+    }
+  }
   const leafFeatures = featuresWithLeaves('cand').filter((f) => {
     const spec = specOf('cand', f);
     const ids = spec ? walkTree(spec).leaves.map((l) => l.node.id) : [];
