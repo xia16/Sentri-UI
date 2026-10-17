@@ -2707,59 +2707,84 @@
       ],
       "figma": "",
       "notes": {
-        "purpose": "Jump to a pen by its place in the room instead of scrolling the list; the map is the room layout, columns A–D by rows 1–6.",
+        "purpose": "Jump to a pen by where it is, not by scrolling the list: a map of the room, one tile per pen, coloured by the status of the sows the list shows in it. It is drawn as seen from the door: pen 1 is nearest the entrance, at the top.",
         "elements": [
           {
-            "name": "Pen cell",
-            "at": "B1",
-            "shows": "Pen code and one fact line for the sows now visible in that pen. One line, never wrapped.",
+            "name": "Colour key",
+            "at": "need you",
+            "shows": "The sheet’s header line, under the title (owner exception to the Headers law, 2026-10-14): a count of pens per colour, “need you” (amber) and “farrowing” (blue), each with its swatch.",
             "states": [
               {
-                "state": "Active",
-                "when": "Any sow in the pen is Active",
-                "shows": "\"Active\", or \"2 active\""
+                "state": "Both colours on the map",
+                "when": "At least one pen needs her and one is farrowing",
+                "shows": "“2 need you” and “1 farrowing” on one line"
               },
               {
-                "state": "Overdue",
-                "when": "No active sow, and an Awaiting sow is Overdue",
-                "shows": "\"Overdue\" (red), or \"2 overdue\""
+                "state": "One colour",
+                "when": "Only one of the two is on the map under the current tab and filter",
+                "shows": "only that one"
               },
               {
-                "state": "Born",
-                "when": "Every visible sow is finished",
-                "shows": "\"23 born\" (green)"
-              },
-              {
-                "state": "Due",
-                "when": "Awaiting sows only",
-                "shows": "\"Due today\", or the first sow's due text without \"Due\" (\"Tomorrow\", \"In 2 days\")"
-              },
-              {
-                "state": "No match",
-                "when": "The pen has task sows but none pass the current tab and filter",
-                "shows": "Disabled, but readable: a quiet surface, the pen name in ink, the word in muted ink"
-              },
-              {
-                "state": "No sows",
-                "when": "No task sow in the pen",
-                "shows": "Disabled, but readable: a quiet surface, the pen name in ink, the word in muted ink"
-              },
-              {
-                "state": "Current",
-                "when": "The pen at the top of the room list (also named on the dock)",
-                "shows": "Quiet filled tile"
+                "state": "None",
+                "when": "No pen is amber or blue",
+                "shows": "no header line; the Entrance band is the first thing in the body"
               }
             ],
-            "logic": "The facts follow the current state tab and filter, so the same pen reads differently under Active and under All. The layout itself is fixed and independent of filters.",
-            "rule": "Tap goes to the room list with that pen pinned just under the sticky tab row; its tint fades within 900 ms. Hold 350 ms shows a read-only peek of the pen's sows in place; moving more than 12 px cancels it, and the tap after a peek only closes the peek. Disabled pens cannot be opened.",
-            "source": "farrowing-astra-concept.js penFact(), room-pen; ASTRA-ROOM-PAGE-AUDIT.md"
+            "logic": "Counts pens, not sows, at each level under the current tab and filter. A count of zero is not drawn."
+          },
+          {
+            "name": "Pen tile",
+            "at": "B3",
+            "shows": "The pen code and nothing else. The tile’s colour is the pen’s status.",
+            "states": [
+              {
+                "state": "Needs you",
+                "when": "Any sow the list shows in the pen is at the animal row’s act level (overdue, or sow died with piglets to allocate)",
+                "shows": "amber fill, dark amber code, no border"
+              },
+              {
+                "state": "Farrowing",
+                "when": "No sow needs her and any shown sow is farrowing now",
+                "shows": "blue fill, dark blue code, no border"
+              },
+              {
+                "state": "Has sows",
+                "when": "Shown sows, none at those levels",
+                "shows": "white, ink code, 1px line"
+              },
+              {
+                "state": "Empty",
+                "when": "No sow in the pen",
+                "shows": "quiet tile on the well, muted code, disabled"
+              },
+              {
+                "state": "No sows match",
+                "when": "The pen has sows but the current tab or filter hides them all",
+                "shows": "the empty face, disabled (screen reader: no sows match)"
+              }
+            ],
+            "logic": "A pen takes the loudest level among the sows the room list currently shows in it, from the same levels as the animal row (the room list’s sowFacts level); there is no second mapping. The facts follow the current tab and filter, so the same pen can change colour between Active and All. The layout is fixed and independent of both.",
+            "rule": "Tap goes to the room list with that pen pinned just under the sticky tab row; its tint fades within 900 ms. Hold 350 ms for a peek (below). Empty and no-match tiles cannot be opened. There is no current-pen marker: the map opens scrolled so the pen at the top of the room list (also named on the dock) is in view, centred.",
+            "source": "farrowing-astra-concept.js penMapSheet(), room-pen; ux/design-system/components/PenMap/README.md"
+          },
+          {
+            "name": "Entrance band",
+            "at": "Entrance",
+            "shows": "Which end of the map is the door. Letters are always the columns and numbers the rows, so the map uses the phone’s height.",
+            "logic": "Column letters stick to the top and row numbers to the left as the map scrolls. A room too wide to fit tiles of 56 px scrolls sideways and the tiles never shrink; a row of more than 20 pens adds range buttons beside Back that follow the map’s scroll and jump to a range. This room (4 by 6) never needs either; they are shown on the PenMap component page."
+          },
+          {
+            "name": "Peek",
+            "at": "B3",
+            "shows": "A white card over the lower part of the map, clear of the footer: the pen code and its sow count, then each shown sow’s ear tag, state word and figure, as in the room list.",
+            "rule": "Hold a tile 350 ms; read-only. Moving more than 12 px, scrolling or lifting hides it. The tap after a peek only closes it and does not go to the pen. When the held tile sits where the card would be, the card shows over the upper part of the map instead."
           }
         ],
         "edge": [
-          "A pen hidden by the filter stays on the map as \"No match\" and is not selectable; the room list gives the way back (\"Show sows\")."
+          "A pen hidden by the tab or filter stays on the map in the empty face and cannot be opened; the room list gives the way back (another tab, or Clear in the filter summary)."
         ],
         "issues": [
-          "The map is taller than the phone: rows 5 and 6 sit below the fold on a small phone."
+          "The prototype draws every room as 4 lanes by 6 rows. A barn with a longer row (range buttons, sideways scroll) is shown on the PenMap component page only."
         ]
       }
     },

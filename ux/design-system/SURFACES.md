@@ -15,6 +15,8 @@ Open question (owner to decide): lists of tappable rows in input drawers (Find a
 
 Green means done, recorded or synced, nothing else. Amber and red washes mean status and are never a card's resting colour.
 
+**Fills and washes (owner, 2026-10-14).** Fills colour a status that covers a whole area (a pen tile); washes stay text backgrounds; a fill is never a card's resting colour. The washes measure ΔE 2.8 from the tint and read grey at tile size, so an area takes a fill: `amber-fill` and `progress-fill`, each with its own dark ink, at 85% strength.
+
 ### Which context is my screen?
 
 | Screen | `data-st-context` | Base | Cards | Pressed |
@@ -43,6 +45,7 @@ Screens choose a context and never paint a panel colour. The context sets `--st-
 | Field | bare on the base, `field-border` | bare on the base |
 | Footer, dock, bottom nav | `paper`, `line` top border | `paper`, `line` top border |
 | Status wash (amber, red) | only for a status, never a card's resting colour | the same |
+| Status fill (a pen tile) | `amber-fill` / `progress-fill` with `amber-fill-ink` / `progress-fill-ink` text and no border, only for a status that covers a whole area; never a card's resting colour | the same |
 
 ## Examples
 

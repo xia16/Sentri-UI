@@ -1,9 +1,9 @@
 {
  "feature": "farrowing",
- "commit": "45a855ca2fa93e8331b2a49b7441728c2d4db01d",
- "dirty": true,
- "ran": "2026-10-12T13:43:44.822Z",
- "base": "http://localhost:62268",
+ "commit": "a3ce0edc81f49ca79c17c5ea6cef36d2054227cc",
+ "dirty": false,
+ "ran": "2026-10-14T11:18:33.160Z",
+ "base": "http://localhost:56504",
  "langs": [
   "en"
  ],
@@ -12,21 +12,21 @@
   360
  ],
  "nodes": {
-  "entry": 8,
-  "state": 22,
-  "action": 76,
-  "outcome": 90,
+  "entry": 9,
+  "state": 24,
+  "action": 81,
+  "outcome": 95,
   "decision-blocker": 5
  },
  "summary": {
-  "pass": 87,
+  "pass": 92,
   "fail": 0,
   "blocked": 5,
   "pending": 3
  },
  "byLang": {
   "en": {
-   "pass": 87,
+   "pass": 92,
    "fail": 0,
    "blocked": 0
   }
@@ -76,6 +76,12 @@
   },
   "search-scan": {
    "pass": 25,
+   "fail": 0,
+   "blocked": 0,
+   "pending": 0
+  },
+  "pen-map": {
+   "pass": 5,
    "fail": 0,
    "blocked": 0,
    "pending": 0
@@ -5208,6 +5214,268 @@
      "notes": [],
      "evidence": [
       "review/scenarios/farrowing/fa-s25-repeat-scan-does-not-duplicate/en-360/00-start.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "fa-p1-tap-a-pen-goes-to-it",
+   "tree": "P-1",
+   "branch": "pen-map",
+   "label": "Tap a pen: the room list opens on that pen",
+   "gwt": {
+    "given": "The worker has the map of the room open, with a pen that has sows.",
+    "when": "They tap that pen.",
+    "then": "The map closes and the room list opens with that pen pinned under the tabs, and the dock names the pen."
+   },
+   "path": [
+    "pen-map",
+    "pen-map.open",
+    "pen-map.open.tap",
+    "fa-p1-tap-a-pen-goes-to-it"
+   ],
+   "authority": [
+    {
+     "src": "atlas",
+     "at": "farrowing.pen-map",
+     "says": "Tap goes to the room list with that pen pinned just under the sticky tab row"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-p1-tap-a-pen-goes-to-it/en-390/00-start.png",
+      "review/scenarios/farrowing/fa-p1-tap-a-pen-goes-to-it/en-390/01-data-pen-b4.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-p1-tap-a-pen-goes-to-it/en-360/00-start.png",
+      "review/scenarios/farrowing/fa-p1-tap-a-pen-goes-to-it/en-360/01-data-pen-b4.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "fa-p2-hold-a-pen-peeks-and-stays",
+   "tree": "P-2",
+   "branch": "pen-map",
+   "label": "Hold a pen: its sows are peeked, and letting go does not open the pen",
+   "gwt": {
+    "given": "The worker has the map of the room open, with a pen that has two sows.",
+    "when": "They hold that pen for half a second and let go.",
+    "then": "A peek of that pen’s sows was shown, and the map stays open: the tap after a peek only closes it and does not go to the pen."
+   },
+   "path": [
+    "pen-map",
+    "pen-map.open",
+    "pen-map.open.hold",
+    "fa-p2-hold-a-pen-peeks-and-stays"
+   ],
+   "authority": [
+    {
+     "src": "atlas",
+     "at": "farrowing.pen-map",
+     "says": "Hold 350 ms shows a read-only peek of the pen’s sows; the tap after a peek only closes it"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-p2-hold-a-pen-peeks-and-stays/en-390/00-start.png",
+      "review/scenarios/farrowing/fa-p2-hold-a-pen-peeks-and-stays/en-390/01-data-pen-b3.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-p2-hold-a-pen-peeks-and-stays/en-360/00-start.png",
+      "review/scenarios/farrowing/fa-p2-hold-a-pen-peeks-and-stays/en-360/01-data-pen-b3.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "fa-p3-empty-pens-are-disabled",
+   "tree": "P-3",
+   "branch": "pen-map",
+   "label": "An empty pen is quiet and disabled; a pen with sows is not",
+   "gwt": {
+    "given": "The worker has the map of the room open, and pen A1 has no sow.",
+    "when": "They look at pen A1 and at pen B4, which has sows.",
+    "then": "Pen A1 is disabled and says nothing but its code; pen B4 can be tapped."
+   },
+   "path": [
+    "pen-map",
+    "pen-map.open",
+    "pen-map.open.empty-tile",
+    "fa-p3-empty-pens-are-disabled"
+   ],
+   "authority": [
+    {
+     "src": "atlas",
+     "at": "farrowing.pen-map",
+     "says": "Empty and no-match tiles cannot be opened"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-p3-empty-pens-are-disabled/en-390/00-start.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-p3-empty-pens-are-disabled/en-360/00-start.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "fa-p4-map-opens-on-the-current-pen",
+   "tree": "P-4",
+   "branch": "pen-map",
+   "label": "The map opens with the room’s current pen in view",
+   "gwt": {
+    "given": "The worker went to pen B4 from the map and is back in the room list.",
+    "when": "They open Go to pen again.",
+    "then": "The map opens with pen B4 in view and no ring or fill marks it."
+   },
+   "path": [
+    "pen-map",
+    "pen-map.open",
+    "pen-map.open.reopen",
+    "fa-p4-map-opens-on-the-current-pen"
+   ],
+   "authority": [
+    {
+     "src": "atlas",
+     "at": "farrowing.pen-map",
+     "says": "There is no current-pen marker: the map opens scrolled so the pen at the top of the room list is in view"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-p4-map-opens-on-the-current-pen/en-390/00-start.png",
+      "review/scenarios/farrowing/fa-p4-map-opens-on-the-current-pen/en-390/01-data-pen-b4.png",
+      "review/scenarios/farrowing/fa-p4-map-opens-on-the-current-pen/en-390/02-data-action-room-grid.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-p4-map-opens-on-the-current-pen/en-360/00-start.png",
+      "review/scenarios/farrowing/fa-p4-map-opens-on-the-current-pen/en-360/01-data-pen-b4.png",
+      "review/scenarios/farrowing/fa-p4-map-opens-on-the-current-pen/en-360/02-data-action-room-grid.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "fa-p5-a-pen-the-tab-hides-is-disabled",
+   "tree": "P-5",
+   "branch": "pen-map",
+   "label": "A pen whose sows the tab hides is disabled, and the colour key follows the tab",
+   "gwt": {
+    "given": "The worker is on the Active tab, where only pen B1 has a farrowing sow.",
+    "when": "They open Go to pen.",
+    "then": "Pens B3 and B4, whose sows the tab hides, are disabled; pen B1 can be tapped; the colour key counts one farrowing pen and none that need her."
+   },
+   "path": [
+    "pen-map",
+    "pen-map.filtered",
+    "pen-map.filtered.open",
+    "fa-p5-a-pen-the-tab-hides-is-disabled"
+   ],
+   "authority": [
+    {
+     "src": "atlas",
+     "at": "farrowing.pen-map",
+     "says": "the map follows the tab and filter; a pen the list hides is disabled"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-p5-a-pen-the-tab-hides-is-disabled/en-390/00-start.png",
+      "review/scenarios/farrowing/fa-p5-a-pen-the-tab-hides-is-disabled/en-390/01-data-action-room-lens-data-value.png",
+      "review/scenarios/farrowing/fa-p5-a-pen-the-tab-hides-is-disabled/en-390/02-data-action-room-grid.png"
+     ]
+    },
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/farrowing/fa-p5-a-pen-the-tab-hides-is-disabled/en-360/00-start.png",
+      "review/scenarios/farrowing/fa-p5-a-pen-the-tab-hides-is-disabled/en-360/01-data-action-room-lens-data-value.png",
+      "review/scenarios/farrowing/fa-p5-a-pen-the-tab-hides-is-disabled/en-360/02-data-action-room-grid.png"
      ]
     }
    ]

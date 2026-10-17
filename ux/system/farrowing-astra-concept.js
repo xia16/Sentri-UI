@@ -300,7 +300,7 @@ function switchRoomUnit(c,id){
   const key=JSON.stringify([c.lens,c.filter]);c.unitPositions[c.unitId]={key,scroll:c.scroll,currentPen:c.currentPen,tailSpace:c.tailSpace};
   c.unitId=id;const position=c.unitPositions[id];
   Object.assign(c,position?.key===key?position:{scroll:0,currentPen:next.records[0]?.pen||'',tailSpace:0});
-  c.query='';c.jump=null;c.peek=null;c.highlightPen=null;c.highlightUntil=0;
+  c.query='';c.jump=null;c.highlightPen=null;c.highlightUntil=0;
  }
  return next.records[0];
 }
@@ -309,7 +309,7 @@ function roomContext(s){
  const fixtures=[['count','000418','B1',3,11,'Due today · day 114'],['before','000392','B2',5,11,'Due tomorrow · day 113'],['before','000455','B4',2,12,'Due today · day 114'],['before','000431','B4',6,9,'Overdue · 3 days · day 117'],['before','000467','B4',5,10,'Due in 2 days · day 112'],['locked','000406','B3',4,13,'Due yesterday · day 115'],['ended','000399','B3',4,10,'Due yesterday · day 115']];
  const records=fixtures.map(([p,tag,pen,parity,lastBorn,due])=>{if(s.tag===tag){s.lastBorn=lastBorn;return s;}const r=seed(p);Object.assign(r,{tag,pen,parity,lastBorn,due,view:'room'});if(tag==='000406'){r.alive=11;r.dead=[1,0,1,0,0,0];r.frozen=13;r.finished='Today · 05:58';r.events=[{text:'Farrowing finished · born 13',day:'Today',time:'05:58',who:'G. Hansen',kind:'milestone'}];}return r;});
  if(!records.includes(s))records.unshift(s);
- const context=roomContexts[i]={unitId:'7',bornAliveTarget:12,units:[sampleUnit('6',3,1,4,{2:'004318',6:'000437'}),{id:'7',name:'Unit 7',records,livePerLitter:10},sampleUnit('8',2,0,2,{0:'000943'})],unitPositions:{},get unit(){return this.units.find(u=>u.id===this.unitId)},get records(){return this.unit.records},get listed(){return this.unit.records.filter(onList)},lens:'All',filter:defaultRoomFilter(),filterDraft:defaultRoomFilter(),currentPen:s.pen,scroll:0,query:'',jump:null,peek:null};
+ const context=roomContexts[i]={unitId:'7',bornAliveTarget:12,units:[sampleUnit('6',3,1,4,{2:'004318',6:'000437'}),{id:'7',name:'Unit 7',records,livePerLitter:10},sampleUnit('8',2,0,2,{0:'000943'})],unitPositions:{},get unit(){return this.units.find(u=>u.id===this.unitId)},get records(){return this.unit.records},get listed(){return this.unit.records.filter(onList)},lens:'All',filter:defaultRoomFilter(),filterDraft:defaultRoomFilter(),currentPen:s.pen,scroll:0,query:'',jump:null};
  scanSetup(context,s.preset);
  if(['task-ready','task-complete','task-outcomes'].includes(s.preset))context.units.forEach(u=>u.records.forEach(r=>{
   if(!r.locked&&(born(r)>0||s.preset==='task-complete'))Object.assign(r,{locked:true,frozen:born(r)||12,alive:born(r)?r.alive:12,pending:0,finished:'Today · 09:35'});
@@ -381,12 +381,33 @@ function room(s){
  return `${status()}${SentriTask.header({title:'Farrowing',back:{action:'room-home'},backLabel:'Back to Today',line:{text:[{text:'Last record '},{text:latest,strong:true},{text:' · G.H'}]}})}<div class="room-scroll" tabindex="-1" role="region" aria-label="${esc(c.unit.name)} farrowing sows"><div class="room-context-strip overview-host">${AstraTaskOverview.render({headingIcons:true,unit:{name:c.unit.name,value:avg,metric:'Live / litter',target:'Target 12',belowTarget:true},task:{value:allCounts.Done,total:allCounts.ProgressTotal,label:'Done',statuses:{farrowed:allCounts.Done,active:allCounts.Active,awaiting:allCounts.Awaiting}}})}</div><div class="room-controls"><div class="room-lensbar">${SentriUI.segment({variant:'two-line-lens',options:roomLenses.map(l=>[l,l,{count:counts[l]}]),active:c.lens,action:'room-lens',ariaLabel:'Farrowing state'})}${SentriUI.iconButton({action:'room-filter',icon:roomIcon('filter'),label:'Filter sows',className:'room-filter-button',badge:roomFilterCount(c.filter)||''})}</div>${roomFilterCount(c.filter)?`<div class="room-filter-summary"><span>${esc(roomFilterLabel(c.filter))}</span>${btn('room-clear-filter','Clear','text-button')}</div>`:''}</div><div class="room-list">${!visible.length?`<div class="room-empty"><strong>No ${c.lens==='All'?'matching':c.lens.toLowerCase()} sows</strong><p>${roomFilterCount(c.filter)?'Adjust the filters to see more task sows.':'Choose another status to see the other task sows in this unit.'}</p></div>`:''}${pens.map(p=>{const all=c.listed.filter(r=>r.pen===p),rows=visible.filter(r=>r.pen===p);return `<section class="st-panel pen-card" data-pen="${p}"><header class="pen-top">${btn('room-pen-detail',`<strong>${p}</strong><small>· ${all.length} ${all.length===1?'sow':'sows'}</small>${icon('chevron')}`,'room-pen-name',p).replace('<button',`<button aria-label="Pen ${p}, ${all.length} ${all.length===1?'sow':'sows'}, view details"`)}${rows.length!==all.length?`<span class="pen-visible-count">${rows.length} shown</span>`:''}</header>${rows.map(r=>sowRow(r)).join('')}</section>`;}).join('')}</div></div><nav class="room-dock" aria-label="Farrowing tools">${btn('room-grid',`${roomIcon('grid')}<span>${c.currentPen||'Pens'}<small>Go to pen</small></span>`,'dock-pen').replace('<button','<button aria-label="Go to pen"')}${btn('room-scan',`${roomIcon('scan')}<span>Scan ear tag</span>`,'button primary dock-scan')}${btn('room-search',roomIcon('search'),'dock-search').replace('<button','<button aria-label="Search ear tag"')}</nav>`;
 }
 function roomHome(c){if(c.completion)return `${status()}<div class="room-home"><p class="home-eyebrow">All units</p><h2>Today</h2><p class="home-intro">Ended tasks</p>${btn('room-task-receipt',`<span class="home-task-title">Farrowing ${icon('chevron')}</span><span class="home-task-states">Task ended · ${c.completion.finished} finished</span><span class="home-resume">View receipt</span>`,'home-task')}</div>`;const n=roomCounts(c.listed);return `${status()}<div class="room-home"><p class="home-eyebrow">${esc(c.unit.name)}</p><h2>Today</h2><p class="home-intro">Your work in this unit</p>${btn('room-return',`<span class="home-task-title">Farrowing ${icon('chevron')}</span><span class="home-task-states"><b>${n.Active} active</b> · ${n.Awaiting} awaiting · ${n.Done} done</span><span class="home-resume">Continue from pen ${c.currentPen}</span>`,'home-task')}</div>`;}
-function roomSheet(title,body,actions,cls='',surface=''){
+function roomSheet(title,body,actions,cls='',surface='',line=null){
  const page=cls.includes('task-overview-sheet')||cls.includes('task-end-sheet')||cls.includes('pen-detail-sheet')||cls.includes('pen-log-sheet')||cls.includes('pen-feed-page');
  const size=cls.includes('pen-note-sheet')?'short':cls==='picker-sheet'||cls.includes('task-end-expanded')||cls==='task-overview-sheet'?'long':'medium';
- return SentriUI.sheet({variant:page?'page':'drawer',surface,title,back:{action:'room-back'},body,footer:actions||(page?false:footer(SentriUI.backButton({action:'room-back'}))),className:('room-utility '+cls).trim(),size,label:title,close:{action:'room-back',label:'Close '+title},scrim:{action:'room-back',label:'Dismiss '+title},bar:page?status():''});
+ return SentriUI.sheet({variant:page?'page':'drawer',surface,title,line,back:{action:'room-back'},body,footer:actions||(page?false:footer(SentriUI.backButton({action:'room-back'}))),className:('room-utility '+cls).trim(),size,label:title,close:{action:'room-back',label:'Close '+title},scrim:{action:'room-back',label:'Dismiss '+title},bar:page?status():''});
 }
-function penFact(rows){if(!rows.length)return {text:'Empty',kind:'empty'};const active=rows.filter(r=>roomState(r)==='Active').length;if(active)return {text:active>1?active+' active':'Active',kind:'active'};const late=rows.filter(r=>roomState(r)==='Awaiting'&&r.due.startsWith('Overdue')).length;if(late)return {text:late>1?late+' overdue':'Overdue',kind:'overdue'};if(rows.every(r=>r.locked))return {text:sum(rows.map(born))+' born',kind:'done'};const today=rows.filter(r=>roomState(r)==='Awaiting'&&r.due.startsWith('Due today')).length;return {text:today?'Due today':rows[0].due.split(' · day')[0].replace(/^Due /,'').replace(/^./,c=>c.toUpperCase()),kind:today?'due':'waiting'};}
+// Go to pen: one PenMap (design-system/components/PenMap). A pen takes the loudest level among the sows the room list shows in it, read from
+// sowFacts() like the animal row, so the map and the list say the same thing. A pen whose sows the tab or filter hides is "hidden", not empty.
+const penLanes=['A','B','C','D'],penDepth=6;
+const penText={title:ZH?'前往栏位':'Go to pen',back:ZH?'返回':'Back',entrance:ZH?'入口':'Entrance',need:ZH?'需处理':'need you',farrowing:rowText.farrowing.toLowerCase(),
+ map:ZH?'栏位':'Pens',jump:ZH?'跳转栏位':'Jump to pens',pen:p=>rowText.pen(p),act:ZH?'需处理':'needs you',live:ZH?'分娩中':'farrowing',plain:ZH?'有母猪':'has sows',empty:ZH?'空栏':'empty',
+ hidden:ZH?'没有符合条件的母猪':'no sows match',sows:n=>ZH?`${n}头母猪`:`${n} ${n===1?'sow':'sows'}`};
+function penLevels(c){
+ const shown=visibleRoomRecords(c),pens={};
+ for(const lane of penLanes)for(let n=1;n<=penDepth;n++){
+  const p=lane+n,levels=shown.filter(r=>r.pen===p).map(r=>sowFacts(r).level);
+  if(levels.length)pens[p]=levels.includes('act')?'act':levels.includes('live')?'live':'plain';
+  else if(c.listed.some(r=>r.pen===p))pens[p]='hidden';
+ }
+ return pens;
+}
+function penMapSheet(c,sheet){
+ const shown=visibleRoomRecords(c);
+ const peek=p=>{const rows=shown.filter(r=>r.pen===p);return SentriUI.penPeek({title:p,meta:penText.sows(rows.length),rows:rows.map(r=>{const f=sowFacts(r);return {code:r.tag,right:{kind:'state',figure:f.figure,word:f.word,level:f.level}};})});};
+ const pens=penLevels(c),body=SentriUI.penMap({lanes:penLanes,depth:penDepth,pens,current:c.currentPen,action:'room-pen',key:'farrowing-pens-'+roomContexts.indexOf(c),entrance:penText.entrance,
+  labels:{map:penText.map,pen:penText.pen,act:penText.act,live:penText.live,plain:penText.plain,empty:penText.empty,hidden:penText.hidden},peek});
+ return sheet(penText.title,body,SentriUI.penMapFooter({back:{action:'room-back',label:{text:penText.back,str:'act.back'}},depth:penDepth,label:penText.jump}),'picker-sheet','menu',{key:SentriUI.penMapKey({pens,words:{act:penText.need,live:penText.farrowing}})});
+}
 /* ---- Find a sow and Scan ear tags (owner decisions 2026-10-12) ----
    Two full pages that replace the old search drawer and scan preview. Both look across every unit; neither switches unit by itself.
    Find a sow: nothing is listed until something is typed; results are grouped "In Unit 7" then "Other units".
@@ -548,13 +569,13 @@ function taskEndSheet(s,c){
  const closureLabel=r.awaiting.length||r.blocked?'End task early':'End task';
  return sheet(closureLabel,`${taskPerformance(r.performance)}${taskOutcomeSummary({total:r.rows.length,finished:r.finished.length,active:r.active.length,awaiting:r.awaiting.length,removed:r.removed.length,ended:r.ended.length,abortions:r.abortions.length,notInPig:r.notInPig.length})}`,pageFooter(hold('room-end-confirm',closureLabel,r.blocked,closureLabel==='End task early').replace('button primary hold','button primary hold '+(closureLabel==='End task'?'task-complete':'task-end-confirm'))),'task-end-expanded');
 }
-function roomOverlay(s){const c=roomContext(s),unitSheet=(title,body,actions,cls='',surface='')=>roomSheet(title,body,actions,cls,surface);if(s.view==='roomFilter'){const f=c.filterDraft,n=visibleRoomRecords(c,f).length;return SentriUI.filterSheet({title:'Filter sows',sections:[{content:SentriUI.rangeSlider({min:-7,max:7,value:[f.from,f.to],title:'Expected farrowing',icon:icon('calendar'),key:'due',labels:['Earliest expected farrowing','Latest expected farrowing'],format:dueDay,summary:(from,to)=>dueRangeLabel({from,to}),ends:['7+ days ago','Today','In 7+ days']})},{title:'Parity',icon:icon('profile'),content:SentriUI.segment({variant:'facet',options:parityChoices.map(v=>[v,v]),active:f.parity,action:'room-parity',ariaLabel:'Parity'})}],apply:{label:`Show ${n} ${n===1?'sow':'sows'}`,action:'room-apply-filter'},reset:roomFilterCount(f)?{label:'Reset',action:'room-reset-filter'}:false,backAction:'room-back',className:'room-utility room-filter-sheet'});}
+function roomOverlay(s){const c=roomContext(s),unitSheet=(title,body,actions,cls='',surface='',line=null)=>roomSheet(title,body,actions,cls,surface,line);if(s.view==='roomFilter'){const f=c.filterDraft,n=visibleRoomRecords(c,f).length;return SentriUI.filterSheet({title:'Filter sows',sections:[{content:SentriUI.rangeSlider({min:-7,max:7,value:[f.from,f.to],title:'Expected farrowing',icon:icon('calendar'),key:'due',labels:['Earliest expected farrowing','Latest expected farrowing'],format:dueDay,summary:(from,to)=>dueRangeLabel({from,to}),ends:['7+ days ago','Today','In 7+ days']})},{title:'Parity',icon:icon('profile'),content:SentriUI.segment({variant:'facet',options:parityChoices.map(v=>[v,v]),active:f.parity,action:'room-parity',ariaLabel:'Parity'})}],apply:{label:`Show ${n} ${n===1?'sow':'sows'}`,action:'room-apply-filter'},reset:roomFilterCount(f)?{label:'Reset',action:'room-reset-filter'}:false,backAction:'room-back',className:'room-utility room-filter-sheet'});}
  if(s.view==='roomPicker'&&c.picker)return roomSheet(c.picker.label,SentriUI.pickerOptions({options:c.picker.options,selected:c.picker.selected}),footer(SentriUI.backButton({action:'room-back'})),'picker-sheet');
  if(['roomEndTask','roomTaskSows','roomTaskReceipt'].includes(s.view))return taskEndSheet(s,c);
  const penPage=penSubpage(s,c);if(penPage!==null)return penPage;
  if(s.view==='roomPenDetail')return penDetails(c);
  if(s.view==='roomPenLog')return penLog(c);
- if(s.view==='roomGrid'){const cells=Array.from({length:6},(_,row)=>`<span class="map-row-label">${row+1}</span>${['A','B','C','D'].map(col=>{const p=col+(row+1),all=c.listed.filter(r=>r.pen===p),rows=visibleRoomRecords(c).filter(r=>r.pen===p),f=rows.length?penFact(rows):{text:all.length?'No match':'No sows',kind:'empty'};return btn('room-pen',`<strong>${p}</strong><small>${f.kind==='active'||f.kind==='overdue'||f.kind==='done'?SentriUI.status({variant:'word',kind:f.kind,text:f.text}):esc(f.text)}</small>`,`pen-cell ${f.kind}${c.currentPen===p?' current':''}`,p,!rows.length).replace('<button',`<button aria-label="Pen ${p}, ${f.kind==='done'?'Done, ':''}${esc(f.text)}"`);}).join('')}`).join('');return unitSheet('Go to pen',`<div class="pen-map"><span></span>${['A','B','C','D'].map(x=>`<span class="map-column-label">${x}</span>`).join('')}${cells}</div><div class="pen-peek" hidden></div>`,'','picker-sheet','menu');}
+ if(s.view==='roomGrid')return penMapSheet(c,unitSheet);
  if(s.view==='roomScanActions')return scanActionsSheet(c);
  if(s.view==='roomOverview'){
   const {units,totals:t}=taskOverview(c),review=taskClosureReview(c);
@@ -580,7 +601,7 @@ function roomAction(i,a,v){if(!a.startsWith('room-'))return false;const s=states
  if(a==='room-apply-filter'){c.filter=clone(c.filterDraft);c.scroll=nextScroll;c.tailSpace=0;s.view='room';}
  if(a==='room-clear-filter'){c.filter=defaultRoomFilter();c.scroll=nextScroll;c.tailSpace=0;}
  if(a==='room-grid')s.view='roomGrid';
- if(a==='room-pen'){if(c.peek){c.peek=null;return true;}c.currentPen=v;c.jump=v;c.highlightUntil=Date.now()+900;c.highlightPen=v;s.view='room';}
+ if(a==='room-pen'){c.currentPen=v;c.jump=v;c.highlightUntil=Date.now()+900;c.highlightPen=v;s.view='room';}
 
  if(a==='room-search'||a==='room-scan'){c.query='';s.view=a==='room-search'?'roomSearch':'roomScan';}
  if(a==='room-search-clear')c.query='';
@@ -784,13 +805,6 @@ gallery.addEventListener('input',e=>{if(!e.target.matches('[data-room-search]'))
 // The demo's own control, outside the phone: the reader reads the next sample sow.
 document.addEventListener('click',e=>{const b=e.target.closest('[data-demo-scan]');if(!b||b.disabled)return;const i=+b.closest('[data-card]').dataset.card,c=roomContext(states[i]);if(scanAdd(c))render(i);});
 gallery.addEventListener('scroll',e=>{if(e.target.matches('.scan-body')){roomContext(states[+e.target.closest('[data-card]').dataset.card]).scan.scroll=e.target.scrollTop;return;}if(!e.target.matches('.room-scroll'))return;const list=e.target,i=+list.closest('[data-card]').dataset.card,c=roomContext(states[i]);c.scroll=list.scrollTop;if(states[i].view!=='room')return;const top=list.getBoundingClientRect().top+list.querySelector('.room-controls').offsetHeight;const pen=[...list.querySelectorAll('[data-pen]')].find(p=>p.getBoundingClientRect().bottom>top+35);if(pen){c.currentPen=pen.dataset.pen;const label=list.closest('.phone').querySelector('.dock-pen>span');if(label)label.innerHTML=`${c.currentPen}<small>Go to pen</small>`;}},true);
-let peekTimer=null,peekGesture=null;
-function stopPeek(){clearTimeout(peekTimer);if(peekGesture){const root=document.querySelector(`[data-card="${peekGesture.i}"]`),peek=root.querySelector('.pen-peek');if(peek)peek.hidden=true;}peekGesture=null;}
-gallery.addEventListener('pointerdown',e=>{const cell=e.target.closest('.pen-cell:not(:disabled)');if(!cell)return;stopPeek();const i=+cell.closest('[data-card]').dataset.card,c=roomContext(states[i]);c.peek=null;peekGesture={i,x:e.clientX,y:e.clientY};peekTimer=setTimeout(()=>{if(!peekGesture)return;c.peek=cell.dataset.value;const rows=visibleRoomRecords(c).filter(r=>r.pen===c.peek),peek=cell.closest('.sheet-body').querySelector('.pen-peek');peek.innerHTML=`<strong>${c.peek} · ${rows.length} ${rows.length===1?'sow':'sows'}</strong>${rows.map(r=>`<p>${r.tag} · ${roomState(r)}<br>${r.locked||born(r)?`${r.alive} alive · ${sum(r.dead)} dead`:esc(r.due.split(' · day')[0])}</p>`).join('')}`;peek.hidden=false;},350);});
-gallery.addEventListener('pointermove',e=>{if(peekGesture&&Math.hypot(e.clientX-peekGesture.x,e.clientY-peekGesture.y)>12)stopPeek();});
-gallery.addEventListener('pointerup',stopPeek);
-gallery.addEventListener('pointercancel',stopPeek);
-window.addEventListener('blur',stopPeek);
 let grabStart=null;
 SentriUI.holdBind(gallery,{onCommit(el){const i=+el.closest('[data-card]').dataset.card,record=states[i];if(!roomAction(i,el.dataset.action,el.dataset.value))act(record,el.dataset.action);render(i);}});
 gallery.addEventListener('pointerdown',e=>{if(e.button!==0)return;if(e.target.closest('.grab'))grabStart={y:e.clientY,i:+e.target.closest('[data-card]').dataset.card};});

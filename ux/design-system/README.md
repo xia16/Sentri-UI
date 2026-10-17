@@ -26,6 +26,7 @@ The ground is a green-tinted off-white; text is one deep green-black; colour app
 - Set all primary text in `ink` and all secondary text (descriptions, meta, fact labels, group headings, chevrons) in `muted`. `muted` holds 4.5:1 on `paper`, `app-background` and `well` only.
 - **Every primary button is `ink` with a white label.** Green is never a button fill: `green` means done, recorded, synced; never selected. Selection is `ink`: an ink tick or checkbox, and a ticked row on the neutral `well`.
 - Status words are coloured text with a 4px dot, never filled badges: `amber` due now / waiting to upload, `progress` in progress, `green` done, `muted` waiting. A pending block may sit on `pending-surface` with a `pending-border`.
+- **Fills colour a status that covers a whole area; washes stay text backgrounds; a fill is never a card's resting colour (owner, 2026-10-14).** A pen tile on the map takes `amber-fill` (needs you) or `progress-fill` (farrowing), with `amber-fill-ink` or `progress-fill-ink` for its text and no border. The washes (`amber-wash`, `progress-wash`) are for text backgrounds and read grey at tile size.
 - `red` is for destructive and ending acts only — "Delete photo", "End task" (filled, white label) and "End early" (`red-wash` fill, `red` border and label). Destructive controls never inherit the green treatment.
 - Borders: `line` between surfaces, `rule` between rows inside a panel (never above the first row), `control-border` on fields and secondary buttons, `back-border` on Back.
 - No gradients, textures, photography or illustration. The only translucency is `scrim` (with a 1.4px blur) behind a drawer and `dialog-backdrop` behind a dialog.
@@ -129,11 +130,13 @@ Which one: whether the surface covers the page, not which feature it belongs to.
 
 **Title length.** A header title fits on one line between the corner targets at 360px in English and Chinese, with at least 12px clear on each side: about 20 English or 10 Chinese characters. Copy is written to fit (a shorter name, decided in the feature's budget), never truncated, wrapped or shrunk. Section titles under a header keep their own style; the hairline and the gap separate them, never a weaker title.
 
-**The header line is absent by default.** It has one of two jobs, and each fact on it passes three tests:
+**The header line is absent by default.** It has one of two jobs, and each fact on it passes three tests. There is one owner exception, below the tests:
 
 1. **A route or a fact.** A route is where the worker goes next from here (the subject chip: tag icon, `#ID`, `›`, the only tappable part, opening the animal). A fact is something the worker needs now to decide or to trust the screen (`Last record 08:41 · G.H` on a shared task page). True is not enough.
 2. **Not on screen, and not one Back away.** A fact the body shows, or that Back reaches, is out. So **hubs** (the surface a worker returns to for one subject: the farrowing record drawer, a pen sheet, a task page) carry the line, and **actions** launched from a hub (record dead, foster, allocate, a log) carry none: the hub is one Back away.
 3. **It fits.** One line, never wrapped or truncated, at 360px in English and Chinese (about 32 English or 16 Chinese characters beside Back, fewer beside a chip). Copy that does not fit belongs in the body.
+
+**The colour key is the one exception (owner, 2026-10-14).** A surface whose body is colour-coded (the pen map) may use its colour key as the header line: plain text, never tappable, one line at 360 in EN and ZH, and the only header line (owner, 2026-10-14). It does not take the three tests: it is not a route and not a fact about the screen, it decodes the body's colours, and it is the first thing the worker needs to read the body. Its counts are in `budget.md` with their question.
 
 **Identity facts are a decision per task, never a default.** On a hub, the subject chip may be followed by up to two short `muted` facts that tell the animal apart *in that task*. Which ones is decided in the task's `budget.md`, each with the worker's question it answers there: parity matters at farrowing (`#000418 › B1 · Parity 3`) and may answer nothing in another task, where the chip stands with the pen alone or with nothing. A fact the budget doesn't name is not drawn, and a shared component never fills one in. Never counts, status or dates.
 

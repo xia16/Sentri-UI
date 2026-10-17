@@ -1310,6 +1310,72 @@
     "problems": []
   },
   {
+    "component": "PenMap",
+    "variant": "map",
+    "state": "Default · Unit 7, 4 × 6",
+    "problems": []
+  },
+  {
+    "component": "PenMap",
+    "variant": "map",
+    "state": "Pressed",
+    "problems": []
+  },
+  {
+    "component": "PenMap",
+    "variant": "map",
+    "state": "Hold to peek",
+    "problems": []
+  },
+  {
+    "component": "PenMap",
+    "variant": "map",
+    "state": "Filtered · a pen the list hides is empty",
+    "problems": []
+  },
+  {
+    "component": "PenMap",
+    "variant": "map",
+    "state": "Empty · no sows shown",
+    "problems": []
+  },
+  {
+    "component": "PenMap",
+    "variant": "map",
+    "state": "Range control · 2 × 60",
+    "problems": []
+  },
+  {
+    "component": "PenMap",
+    "variant": "map",
+    "state": "Long row · 2 × 100, the wider number column",
+    "problems": []
+  },
+  {
+    "component": "PenMap",
+    "variant": "map",
+    "state": "Long row · 2 × 160, eight ranges",
+    "problems": []
+  },
+  {
+    "component": "PenMap",
+    "variant": "map",
+    "state": "Sideways scroll · 8 × 20, opens on E3",
+    "problems": []
+  },
+  {
+    "component": "PenMap",
+    "variant": "map",
+    "state": "Chinese · Unit 7",
+    "problems": []
+  },
+  {
+    "component": "PenMap",
+    "variant": "map",
+    "state": "Chinese · 2 × 100",
+    "problems": []
+  },
+  {
     "component": "Photos",
     "variant": "line",
     "state": "Default",
@@ -2122,7 +2188,25 @@
   {
     "component": "Sheet",
     "variant": "drawer",
-    "state": "Aside",
+    "state": "Route line (a hub)",
+    "problems": []
+  },
+  {
+    "component": "Sheet",
+    "variant": "drawer",
+    "state": "Colour key (a colour-coded body)",
+    "problems": []
+  },
+  {
+    "component": "Sheet",
+    "variant": "drawer",
+    "state": "Fact line",
+    "problems": []
+  },
+  {
+    "component": "Sheet",
+    "variant": "drawer",
+    "state": "Clear in the footer",
     "problems": []
   },
   {
@@ -2176,7 +2260,7 @@
   {
     "component": "Sheet",
     "variant": "page",
-    "state": "Aside",
+    "state": "Fact line (a task page)",
     "problems": []
   },
   {
