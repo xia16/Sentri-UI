@@ -20,10 +20,7 @@
 .room-controls .room-filter-summary{margin:3px 17px -5px}
 .room-scroll .room-list{flex:none;overflow:visible;min-height:auto;padding-top:1px}
 .room-list .pen-top{top:var(--room-sticky-height);background:#fff;transition:background-color .5s ease}
-.room-list .pen-card.pen-arrival{animation:pen-arrival-ring .9s cubic-bezier(.22,1,.36,1) both}
-.room-list .pen-arrival .pen-top{animation:pen-arrival-tint .9s cubic-bezier(.22,1,.36,1) both;transition:none}
 @keyframes pen-arrival-ring{0%{border-color:#e0e3d8;box-shadow:0 0 0 0 #829c7000}16%{border-color:#91a77f;box-shadow:0 0 0 2px #829c7030}100%{border-color:#e0e3d8;box-shadow:0 0 0 2px #829c7000}}
-@keyframes pen-arrival-tint{0%,100%{background:#fff}16%{background:#e8efdf}}
 .dock-pen:active{background:#e7eddf;border-radius:9px}
 .room-home{padding:30px 22px}
 .home-eyebrow{font:13px var(--font-mono);color:var(--muted);margin:0 0 10px}
@@ -50,13 +47,13 @@
 .pen-detail-section:last-child{margin-bottom:0}
 .pen-detail-section h4{font-size:13px;margin:0 0 12px}
 .farrowing-phone .room-filter-summary button{min-height:44px}
-/* Go to pen: a pen that can't be opened stays readable. It sits on a quiet surface and says why in one word on one line. */
+/* Pen map: a pen that can't be opened stays readable. It sits on a quiet surface and says why in one word on one line. */
 .pen-cell small{white-space:nowrap}
 .pen-cell:disabled{background:var(--disabled-surface);border-color:var(--disabled-border);color:var(--ink-2)}
 .pen-cell:disabled small{color:var(--muted)}
 .pen-cell>strong{color:inherit}
 
-/* The dock names the pen you are in; a pinned header only left an empty stub under the tabs while the card scrolled away. */
+/* The pen header scrolls with its card: a pinned one only left an empty stub under the tabs while the card scrolled away. */
 .farrowing-phone .room-list .pen-top{position:static}
 
 /* Find a sow and Scan ear tags: two full pages (owner decisions 2026-10-12). Find a sow sits on white, Scan on the tinted app background with white cards. */

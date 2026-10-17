@@ -49,7 +49,7 @@ From RULINGS.md, quoted short:
 
 In:
 
-- Room list: unit card, whole-task card, Awaiting / Active / Done / All tabs, due and parity filter, pen grouping, Go to pen, Scan ear tag, Search.
+- Room list: unit card, whole-task card, Awaiting / Active / Done / All tabs, due and parity filter, pen grouping, Pen map, Scan ear tag, Search.
 - Find a sow (a full page that searches every unit) and Scan ear tags (a full page, always listening, that collects scanned sows). A sow in any unit opens her farrowing drawer.
 - The sow sheet in its faces: Before first count, Counting, Finish (and its blocked form), Locked record, Sow died.
 - Death entry (piglets and the sow), Edit record, Edit of a finished litter and the Correct born correction (in place), the Farrowing log.
