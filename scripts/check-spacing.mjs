@@ -13,7 +13,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { playwright } from './playwright-path.mjs';
-import { screensOf } from './loop-rules.mjs';
+import { screensOf } from './atlas-screens.mjs';
 import { routeFonts } from './font-route.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -96,6 +96,15 @@ function auditFrame(TOL) {
   const key = new Set(); return out.filter((o) => { const k = o.check + '|' + Math.round(o.at / 10); if (key.has(k)) return false; key.add(k); return true; });
 }
 
+// Every frame of a prepared page (the gate's shared visit, or the CLI's own): the defects, deduplicated per frame as above.
+export async function auditSpacingPage(page) {
+  const defects = [];
+  for (const f of page.frames()) { try { defects.push(...await f.evaluate(auditFrame, TOL)); } catch {} }
+  return defects;
+}
+
+const main = process.argv[1] && path.resolve(process.argv[1]).toLowerCase() === fileURLToPath(import.meta.url).toLowerCase();
+if (main) {
 const free = () => new Promise((res) => { const s = createServer(); s.listen(0, () => { const p = s.address().port; s.close(() => res(p)); }); });
 let base = val('--base'), server = null;
 if (!base) { const port = await free(); server = spawn(process.execPath, ['scripts/serve-ux.cjs', String(port)], { cwd: root, stdio: 'ignore' }); base = `http://localhost:${port}`; await new Promise((r) => setTimeout(r, 1500)); }
@@ -116,7 +125,7 @@ for (const s of todo) {
   const res = { screen: s.id, feature: s.feature, defects: [] };
   try {
     await page.goto(u.href); await page.waitForSelector('html.atlas-ready', { timeout: 15000 }); await page.waitForTimeout(400);
-    for (const f of page.frames()) { try { res.defects.push(...await f.evaluate(auditFrame, TOL)); } catch {} }
+    res.defects.push(...await auditSpacingPage(page));
   } catch (e) { res.error = e.message.split('\n')[0]; }
   await page.close();
   results.push(res);
@@ -129,3 +138,4 @@ const bad = results.filter((r) => r.defects.length);
 console.log(`spacing: ${results.length} screens, ${bad.length} with a clear defect (inversion ${bad.flatMap((r) => r.defects).filter((d) => d.check === 'inversion').length}, crowding ${bad.flatMap((r) => r.defects).filter((d) => d.check === 'crowding').length}, double ${bad.flatMap((r) => r.defects).filter((d) => d.check === 'double').length})`);
 const failing = list('--changed').length ? bad.filter((r) => list('--changed').includes(r.screen)) : argv.includes('--strict') ? bad : [];
 process.exit(failing.length ? 1 : 0);
+}

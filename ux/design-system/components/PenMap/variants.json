@@ -1,0 +1,24 @@
+[
+  {
+    "id": "map",
+    "name": "Map",
+    "use": "Use for going to one of many places that have a layout, where it is matters, and each has a status to see before the tap: Farrowing's Pen map. A menu drawer: the legend, the Entrance band and the map, with Back and, past 20 pens in a row, the range control in the footer.",
+    "notUse": "Not for places with no layout or a list to read (use ChoiceList or Row · navigation); not for a few fixed choices of one list (use Segment); not for status that needs words (put it in the peek or on the page the tile opens).",
+    "states": [
+      "Default · Unit 7, 4 × 6",
+      "Pressed",
+      "Hold to peek",
+      "Filtered · a pen the list hides is empty",
+      "Empty · no sows shown",
+      "Range control · 2 × 60",
+      "Long row · 2 × 100, the wider number column",
+      "Long row · 2 × 160, eight ranges",
+      "Sideways scroll · 8 × 20, opens on E3",
+      "Chinese · Unit 7",
+      "Chinese · 2 × 100"
+    ],
+    "usedBy": [
+      "farrowing.pen-map"
+    ]
+  }
+]

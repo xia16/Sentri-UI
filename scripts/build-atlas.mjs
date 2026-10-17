@@ -226,7 +226,7 @@ if (problems.length) {
 
 // components: the mobile design system's parts (group, status from the gate result), plus the proposed ones not built yet
 const GROUPS = [
-  ['Base', ['Button', 'IconButton', 'Icon', 'Heading', 'Header', 'Row', 'Panel', 'Facts', 'Log', 'Sheet', 'Segment', 'FilterChips', 'ChoiceList', 'CategoryFooter']],
+  ['Base', ['Button', 'IconButton', 'Icon', 'Heading', 'Header', 'Row', 'Panel', 'Facts', 'Log', 'Sheet', 'PenMap', 'Segment', 'FilterChips', 'ChoiceList', 'CategoryFooter']],
   ['Inputs and filters', ['FilterSheet', 'RangeSlider']],
   ['Fields', ['Field', 'PickerField', 'Stepper', 'Measure', 'Numpad']],
   ['Status and feedback', ['Status', 'ConditionTag', 'Banner', 'Photos']],

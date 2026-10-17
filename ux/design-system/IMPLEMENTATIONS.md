@@ -112,3 +112,7 @@ See [verification and rendered proof](components/pass-proof/README.md).
 
 `node scripts/check-states.mjs [baseUrl]` renders every `[data-state]` of every component variant as the atlas does (390px, tokens + bundle) and writes `review/state-check.json`; it exits non-zero on any problem.
 It finds Playwright through `scripts/playwright-path.mjs` (`SENTRI_PLAYWRIGHT` or `PLAYWRIGHT_DIR`, else the owner's cache, else a project or global install); with no argument it serves the repo itself.
+
+## PenMap pass (2026-10-14)
+
+`SentriUI.penMap` (the legend, the Entrance band and the map of pens), `SentriUI.penMapFooter` (Back, plus the range control when a row has more than 20 pens) and `SentriUI.penPeek` (the hold-to-peek card) are new, drawn from the owner-approved Pen map design. Farrowing's Pen map renders from them; its hand-built grid, tiles, per-tile fact lines (`penFact`) and peek gesture are deleted. The map's scroll sync, range control and hold-to-peek gesture live in the bundle, found by markup. Adds the tokens `amber-fill`, `amber-fill-ink`, `progress-fill` and `progress-fill-ink` and the `arrow-down` glyph. Inspection's Pen map still draws its own map (`.pen-map`, `.pen-cell`, `.pen-peek` in farrowing-astra-room.css): until migrated, the next change. See [PenMap](components/PenMap/README.md).

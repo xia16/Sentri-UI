@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { passesWithoutJudge, aimdStep, queueAhead, newScenarioFailures, calibrationProblems, budgetProblems, critiqueProblems, pageStyling, addedLines, effectiveClass, classifyScreens, checkVerdict, checkGrades, worstFirst, isClean, loopStatus, touchesSystem, touchesTools, regressions,
-  pageOf, pageAssets, sharedFiles, outcomeLeaves, coverageLost, reachOf, reachLine, shotsToTake, timedOutOnly, lockState, carryDecision, ghNetworkError,
+  pageOf, pageAssets, sharedFiles, outcomeLeaves, coverageLost, reachOf, reachLine, timedOutOnly, lockState, scenarioDebt, ghNetworkError,
   componentPage, componentPagesOf, componentsTouched, idPath } from '../scripts/loop-rules.mjs';
 
 test('a change to the bundle or tokens is a shared-component change whatever was declared', () => {
@@ -305,23 +305,6 @@ test('a gate lock is free, held by a live gate, or stale when its process is gon
   assert.equal(lockState({ sha: 'abc' }, () => true), 'stale');
 });
 
-test('base shots: reuse a screen at a width only when every language it needs is cached', () => {
-  const run = (screen, lang, width) => ({ screen, lang, width, file: `${screen}/${lang}-${width}.png`, ok: true });
-  const cached = [run('a', 'en', 390), run('a', 'zh', 390), run('b', 'en', 390), { ...run('c', 'en', 390), ok: false }, run('d', 'en', 390)];
-  const needs = [
-    { screen: 'a', width: 390, langs: ['en', 'zh'] }, // cached in full
-    { screen: 'b', width: 390, langs: ['en', 'zh'] }, // zh missing: shot again in both
-    { screen: 'b', width: 360, langs: ['en', 'zh'] },
-    { screen: 'c', width: 390, langs: ['en'] }, // a failed run is never reused
-    { screen: 'd', width: 390, langs: ['en'] }, // its png is gone
-    { screen: 'e', width: 390, langs: ['en'] },
-  ];
-  const r = shotsToTake(needs, cached, (f) => !f.startsWith('d/'));
-  assert.deepEqual(r.reuse.map((x) => x.file), ['a/en-390.png', 'a/zh-390.png']);
-  assert.deepEqual(r.take, [{ width: 390, langs: ['en', 'zh'], screens: ['b'] }, { width: 360, langs: ['en', 'zh'], screens: ['b'] }, { width: 390, langs: ['en'], screens: ['c', 'd', 'e'] }]);
-  assert.deepEqual(shotsToTake(needs.slice(0, 1), [run('a', 'en', 390), run('a', 'zh', 390)]).take, [], 'a complete cache shoots nothing');
-});
-
 const reachWorld = () => {
   const screens = [
     { id: 'farrowing.room', feature: 'farrowing', url: '/ux/system/farrowing-astra-concept.html?layout=focus' },
@@ -380,30 +363,56 @@ test('reach: a file nothing classes falls back to every screen, and a page that 
   assert.deepEqual(reachOf({ ...w, shared: sharedFiles(w.screens, w.assets), files: ['scripts/inspection-data.js'] }).features, ['inspection']);
 });
 
-test('carry: a pass carries over main moving on only by files that draw no pixel, merged in and nothing else', () => {
-  const mech = { candidate: 'c1', base: 'm1', ref: 'origin/ds/x' };
-  const ok = { pass: { candidate: 'c1', base: 'm1' }, mech, head: 'c2', main: 'm2', containsC: true, containsMain: true, ownCommits: [],
-    cand: { 'ux/system/inspection-astra-concept.js': 'blob1' }, carried: { 'ux/system/inspection-astra-concept.js': 'blob1' },
-    mainFiles: ['docs/design-workflow/README.md'], reach: reach(['docs/design-workflow/README.md']) };
-  const r = carryDecision(ok);
-  assert.ok(r.ok, r.why.join());
-  assert.match(r.why[0], /main moved m1 → m2 by 1 file\(s\) that draw no pixel/);
-  const no = (x, re) => { const d = carryDecision({ ...ok, ...x }); assert.ok(!d.ok, JSON.stringify(x)); assert.match(d.why.join(' | '), re); };
-  no({ pass: null }, /no GATE PASS is recorded for c1/);
-  no({ pass: { candidate: 'c1', base: 'm0' } }, /is against m0/);
-  no({ pass: { candidate: 'c1', base: 'm1', carried: { from: 'c0' } } }, /itself carried/);
-  no({ main: 'm1', head: 'c1' }, /main has not moved/);
-  no({ main: 'm1' }, /moved to c2 while main did not/);
-  no({ containsC: false }, /does not contain the gated commit c1/);
-  no({ containsMain: false }, /merge main forward first/);
-  no({ ownCommits: ['e1'] }, /1 commit\(s\) on the PR since the gate/);
-  no({ carried: { 'ux/system/inspection-astra-concept.js': 'blob2' } }, /the merge is not just main: ux\/system\/inspection-astra-concept\.js/);
-  no({ carried: { ...ok.carried, 'ux/system/home.js': 'blob3' } }, /the merge is not just main: ux\/system\/home\.js/);
-  no({ carried: {} }, /the merge is not just main/);
-  no({ mainFiles: ['ux/system/inspection-astra-concept.js'], reach: reach(['ux/system/inspection-astra-concept.js']) }, /both changed ux\/system\/inspection-astra-concept\.js.*screens of inspection/);
-  no({ mainFiles: ['ux/system/home.css'], reach: reach(['ux/system/home.css']) }, /can reach every screen/);
-  no({ mainFiles: ['features/weaning/budget.md'], reach: reach(['features/weaning/budget.md']) }, /can reach screens of weaning/);
-  no({ reach: null }, /can reach every screen/);
+test('scenarioDebt: main\'s debt only for the same leaf, width, language, assertion and failure class', () => {
+  const run = (lang, width, result, failures = []) => ({ lang, width, result, failures });
+  const leaf = (id, runs) => ({ id, result: runs.some((r) => r.result === 'fail') ? 'fail' : 'pass', runs });
+  // a failure as the runner reports it: the assertion it broke (its contract) and how (its category); the tag is the hard class
+  const fl = (what, tag = null, category = 'wrong-text') => ({ what, got: 'x', tag, contract: `c:${what}`, category: tag === 'dead-end' ? 'timeout' : category });
+  const base = { leaves: [leaf('ds-a11', [run('zh', 360, 'fail', [fl('"Task 2" shown')]), run('en', 390, 'pass')])] };
+  // The same failure on main is debt.
+  assert.deepEqual(scenarioDebt({ leaves: [leaf('ds-a11', [run('zh', 360, 'fail', [fl('"Task 2" shown')])])] }, base), { added: [], debt: ['ds-a11'] });
+  // The review's case: main fails only at zh-360, the candidate also fails at en-390. It's new, not hidden as debt.
+  const both = scenarioDebt({ leaves: [leaf('ds-a11', [run('zh', 360, 'fail', [fl('"Task 2" shown')]), run('en', 390, 'fail', [fl('Done saves the record', 'lost-draft')])])] }, base);
+  assert.deepEqual(both.debt, []);
+  assert.equal(both.added[0].id, 'ds-a11');
+  assert.match(both.added[0].why.join(), /en-390: Done saves the record/);
+  // The same assertion with a different failure class is new.
+  assert.equal(scenarioDebt({ leaves: [leaf('ds-a11', [run('zh', 360, 'fail', [fl('"Task 2" shown', 'dead-end')])])] }, base).added.length, 1);
+  // A leaf base doesn't have, or no base report at all: the failure stands.
+  assert.equal(scenarioDebt({ leaves: [leaf('new-leaf', [run('en', 390, 'fail', [fl('x')])])] }, base).added.length, 1);
+  assert.equal(scenarioDebt({ leaves: [leaf('ds-a11', [run('zh', 360, 'fail', [fl('"Task 2" shown')])])] }, null).added.length, 1);
+  // Passing leaves are neither.
+  assert.deepEqual(scenarioDebt({ leaves: [leaf('ds-a13', [run('en', 390, 'pass')])] }, base), { added: [], debt: [] });
+});
+
+test('scenarioDebt: two unrelated failures in one leaf, language and width are not equated (review of #194)', () => {
+  const run = (lang, width, failures) => ({ lang, width, result: 'fail', failures });
+  const leaf = (id, runs) => ({ id, result: 'fail', runs });
+  // the probe: main breaks on a missing preset, the candidate on a timeout waiting for a selector; both reported as a 'run' dead end
+  const base = { leaves: [leaf('fa-1', [run('en', 390, [{ what: 'run', got: 'preset "count" is not in the page', tag: 'dead-end', contract: 'c-open', category: 'preset-missing' }])])] };
+  const cand = { leaves: [leaf('fa-1', [run('en', 390, [{ what: 'run', got: 'page.waitForSelector: Timeout 8000ms exceeded.', tag: 'dead-end', contract: 'c-open', category: 'timeout' }])])] };
+  const d = scenarioDebt(cand, base);
+  assert.deepEqual(d.debt, []);
+  assert.match(d.added[0].why.join(), /en-390: run \(timeout\)/);
+  // the same contract and category is debt; either unknown, on either side, is not
+  assert.deepEqual(scenarioDebt(base, base).debt, ['fa-1']);
+  const unknown = { leaves: [leaf('fa-1', [run('en', 390, [{ what: 'run', got: 'x', tag: 'dead-end', contract: 'c-open', category: 'unknown' }])])] };
+  assert.deepEqual(scenarioDebt(unknown, unknown).debt, [], 'unknown is never debt');
+  const old = { leaves: [leaf('fa-1', [run('en', 390, [{ what: 'run', got: 'preset "count" is not in the page', tag: 'dead-end' }])])] };
+  assert.deepEqual(scenarioDebt(old, old).debt, [], 'a report without fingerprints (an older runner) is never debt');
+});
+
+test('the runner classes failures by category and fingerprints the definition that failed', async () => {
+  const { failureCategory, contractOf } = await import('../scripts/scenario-runner.mjs');
+  assert.equal(failureCategory({ got: 'preset "count" is not in the page' }), 'preset-missing');
+  assert.equal(failureCategory({ got: 'page.waitForSelector: Timeout 8000ms exceeded.' }), 'timeout');
+  assert.equal(failureCategory({ got: 'control not found: Done', kind: 'step' }), 'missing-control');
+  assert.equal(failureCategory({ got: 'control is covered: Done', kind: 'step' }), 'unreachable-control');
+  assert.equal(failureCategory({ got: 'absent', kind: 'text' }), 'wrong-text');
+  assert.equal(failureCategory({ got: 'TypeError: x', kind: 'page-error' }), 'page-error');
+  assert.equal(failureCategory({ got: 'something else' }), 'unknown');
+  assert.equal(contractOf({ assertion: { text: 'Saved' } }), contractOf({ assertion: { text: 'Saved' } }));
+  assert.notEqual(contractOf({ assertion: { text: 'Saved' } }), contractOf({ assertion: { text: 'Done' } }));
 });
 
 // Component pages are in the gate's reach (rules ledger L23): the Headers law changed, screens were gated, and Sheet → page kept
@@ -470,20 +479,6 @@ test('newScenarioFailures: a leaf already failing on base is main\'s debt; one p
   assert.deepEqual(newScenarioFailures(['x'], ''), { added: ['x'], debt: [] }); // base printed nothing: the failure stands
 });
 
-test("a mechanical pass that moves no screen is a gate pass without a judge; anything else still needs one", () => {
-  const ok = { pass: true, candidate: "c", base: "b", quick: false, screens: { diff: [], new: [], gone: [] }, pairs: [] };
-  assert.equal(passesWithoutJudge(ok), true);
-  assert.equal(passesWithoutJudge({ ...ok, pass: false }), false);
-  assert.equal(passesWithoutJudge({ ...ok, quick: true }), false);
-  assert.equal(passesWithoutJudge({ ...ok, screens: null }), false);
-  assert.equal(passesWithoutJudge({ ...ok, screens: { diff: [{ id: "farrowing.pen-map" }], new: [], gone: [] } }), false);
-  assert.equal(passesWithoutJudge({ ...ok, screens: { diff: [], new: [{ id: "x" }], gone: [] } }), false);
-  assert.equal(passesWithoutJudge({ ...ok, screens: { diff: [], new: [], gone: [{ id: "x" }] } }), false);
-  assert.equal(passesWithoutJudge({ ...ok, screens: { diff: [], new: [] } }), false);
-  assert.equal(passesWithoutJudge({ ...ok, pairs: [{ screen: "x" }] }), false);
-  assert.equal(passesWithoutJudge({ ...ok, candidate: "" }), false);
-});
-
 test('scenario runs at once grow while runs stay fast, halve on a timeout or a slowdown, and stay between 1 and max', () => {
   let s = { limit: 2, min: 1, max: 8, baseline: null };
   const feed = (ms, n = 1, timedOut = false) => { let why = null; for (let i = 0; i < n; i++) ({ state: s, why } = aimdStep(s, { ms, timedOut })); return why; };
@@ -507,4 +502,19 @@ test('scenario runs at once grow while runs stay fast, halve on a timeout or a s
   s = { limit: 8, min: 1, max: 8, baseline: 1000 };
   feed(1000, 8);
   assert.equal(s.limit, 8, 'never above max');
+});
+
+test("a mechanical pass that moves no screen is a gate pass without a judge; anything else still needs one", () => {
+  const ok = { pass: true, candidate: "c", base: "b", quick: false, screens: { diff: [], new: [], gone: [] }, pairs: [] };
+  assert.equal(passesWithoutJudge(ok), true);
+  assert.equal(passesWithoutJudge({ ...ok, pass: false }), false);
+  assert.equal(passesWithoutJudge({ ...ok, quick: true }), false);
+  assert.equal(passesWithoutJudge({ ...ok, screens: null }), false);
+  assert.equal(passesWithoutJudge({ ...ok, screens: { diff: [{ id: "farrowing.pen-map" }], new: [], gone: [] } }), false);
+  assert.equal(passesWithoutJudge({ ...ok, screens: { diff: [], new: [{ id: "x" }], gone: [] } }), false);
+  assert.equal(passesWithoutJudge({ ...ok, screens: { diff: [], new: [], gone: [{ id: "x" }] } }), false);
+  assert.equal(passesWithoutJudge({ ...ok, screens: { diff: [], new: [] } }), false);
+  assert.equal(passesWithoutJudge({ ...ok, pairs: [{ screen: "x" }] }), false);
+  assert.equal(passesWithoutJudge({ ...ok, candidate: "" }), false);
+  assert.equal(passesWithoutJudge({ ...ok, outcome: "blocked" }), false, "gate v2: a blocked gate is never a pass");
 });
