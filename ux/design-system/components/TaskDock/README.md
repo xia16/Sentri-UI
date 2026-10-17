@@ -27,4 +27,4 @@ The room's bottom bar: **one primary tool (Scan ear tag) and icon tools**. It is
 - Host strings (`act.scan` for Scan ear tag).
 
 **Changelog**
-- 2026-10-17: the place control gains a framed form (Pen map) and loses the pen number in farrowing's dock; the sheet it opens is titled Pen map (was Go to pen). Farrowing's room dock draws it with its own `.dock-map` rules (same frame); the skeleton demo uses `framed`.
+- 2026-10-17: the place control gains a framed form (Pen map) and loses the pen number in farrowing's dock; the sheet it opens is titled Pen map (was Go to pen). Farrowing's room dock uses the framed form (`.tk-dock-unit[data-framed]`, its markup built in the room page); the skeleton demo uses `framed`.
