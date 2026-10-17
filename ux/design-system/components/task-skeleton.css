@@ -222,7 +222,7 @@
 .tk-dock-unit strong { font: 600 var(--type-row-title-size)/1.2 var(--font-mono); }
 .tk-dock-unit small { font: var(--type-dock-caption-size)/1.2 var(--font-sans); color: var(--muted); }
 .tk-dock-unit[data-framed] { gap: var(--space-8); padding: 0 var(--space-14); border: var(--border-width) solid var(--line); border-radius: var(--radius-control); white-space: nowrap; }
-.tk-dock-unit[data-framed] strong { font: 600 var(--type-row-title-size)/1.2 var(--font-sans); }
+.tk-dock-unit[data-framed] strong { font: 600 var(--type-dock-caption-size)/1.2 var(--font-sans); }
 .tk-dock-unit[data-framed]:active { background: var(--press); transform: translateY(var(--size-2)); }
 @media (prefers-reduced-motion: reduce) { .tk-dock-unit[data-framed]:active { transform: none; } }
 

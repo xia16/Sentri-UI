@@ -63,6 +63,8 @@ Selected, Error and Loading do not apply: tapping a tile leaves the sheet.
 
 Tapping a tile is one motion, with one cue. The host places its list on the pen first, under the sheet, so no scroll is seen. The sheet then slides down in `sheet-out` (180ms) with its scrim, and the pen's header takes the tapped tile's own fill (amber, blue), held for `land-hold` (900ms) and faded back by `land-fade` (700ms) later, 1.6s in all. A white tile (Has animals) has no fill to carry, so its pen card takes a 2px ink ring with the same timing. Nothing else dims or moves. With reduced motion the sheet just goes and the colour shows and fades without movement. Where motion is frozen (the atlas) the pen is reached at once and the list is the plain list.
 
+The cue is the component's, so every task lands the same way: the host marks the pen it lands on with `data-pen-land="act|live|plain"` (the tapped tile's level) and that pen's header with `data-pen-land-head`, and removes both after `land-hold` + `land-fade`. A pen re-drawn mid-cue sets `--land-elapsed` to resume part-way. The host draws nothing of its own.
+
 ## Behaviour
 
 - **Tap** a tile and the host goes to that pen (`data-action` and `data-value` carry the action and the pen code), as in Landing on the pen. A disabled tile does nothing.
