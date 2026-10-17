@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-17T01:39:41.291Z",
- "commit": "1923a6e",
+ "generated": "2026-10-17T01:50:13.020Z",
+ "commit": "1c857bc",
  "platforms": [
   {
    "id": "mobile",
@@ -23408,6 +23408,20 @@
        "dialog",
        "drawer",
        "page"
+      ]
+     }
+    },
+    {
+     "name": "PenMap",
+     "group": "Base",
+     "status": "in-design",
+     "gate": {
+      "status": "in-design"
+     },
+     "files": {
+      "variantsJson": true,
+      "variants": [
+       "map"
       ]
      }
     },
