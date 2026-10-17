@@ -506,3 +506,7 @@ Held against the room's own dock (Search's frame) and the pen map's tiles (the f
 - **Squint test:** the dock reads as three buttons, Scan the loudest; after a tap the eye goes to the pen whose colour it just tapped.
 - **Cluttered, flat or bulky:** the dock lost a number and a caption; the cue is one colour on one header, and nothing dims or moves.
 - **Better because** the worker sees where they landed in the colour they tapped, and the way in reads as a button that says what it opens.
+
+#### Owner report, 2026-10-17: the white pen's ring (after #195)
+- **major** The ring a white pen lands with was a `box-shadow` 2px outside the card. A pen that lands right under the sticky tabs lost the ring's top edge under them, and the card's own pale 1px border showed inside the ring, a double line round the corners (owner screenshot, B2 on Awaiting at 390).
+- **Fixed:** the ring is an outline drawn 2px inside the card's edge (`outline-offset: -2px`), faded through `outline-color`. It covers the pale border, follows the radius, and nothing above can hide it; the card keeps its own soft shadow. Measured at 390 and 360: one even 2px ink line on all four sides, fading after `land-hold` and gone with `land-fade` as before.
