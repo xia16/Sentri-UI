@@ -1,6 +1,7 @@
 // The header check: the Headers law (ux/design-system/README.md, "Headers") made measurable. Five defects:
 //   gap       the header-to-body gap is not space-section (24px ±2): a drawer from its hairline, a page from its last line
-//             (the bottom of its title block or Back, whichever is lower) to the first body content (text, a control, a box)
+//             (the bottom of its title block or Back, whichever is lower) to the first body content (text, a control, a box),
+//             measured at rest: a screen whose body is scrolled down is judged as if scrolled to its top
 //   contents  a header holds a control other than Back (a page's; a drawer's Back is in its footer, and a drawer with levels goes up with it:
 //             no ‹ Parent in a header, owner ruling B 2026-10-16), the subject chip and a sheet
 //             header's corner actions (Clear or Reset at the top right, a ✕ at the top left), an aside, or a number-with-unit
@@ -173,8 +174,11 @@ function auditHeaders({ TOL, checks }) {
       const el0 = descend(after), first = el0 && { el: el0, top: topOf(el0) };
       // a state centred in the space under the header (an empty or waiting screen) is placed by its container, not the header gap
       const centred = (el) => { for (let e = el.parentElement; e && e !== host; e = e.parentElement) { const c = cs(e); if ((/flex/.test(c.display) && c.flexDirection.startsWith('column') && c.justifyContent === 'center') || (/grid/.test(c.display) && /center/.test(c.alignContent))) return true; } return false; };
+      // the gap is the layout at rest: a body scrolled down (a list landed on a pen) is measured as if at its top, by adding back
+      // the scroll of every container between the body content and the header's surface
+      const scrolled = (el) => { let s = 0; for (let e = el.parentElement; e && e !== host; e = e.parentElement) s += e.scrollTop; return s; };
       if (first && !centred(first.el)) {
-        const gap = first.top - from;
+        const gap = first.top + scrolled(first.el) - from;
         note.gap = Math.round(gap * 10) / 10;
         if (Math.abs(gap - TOL.gap) > TOL.slack) {
           const nm = first.el.tagName.toLowerCase() + (typeof first.el.className === 'string' && first.el.className.trim() ? '.' + first.el.className.trim().split(/\s+/)[0] : '');
