@@ -358,7 +358,8 @@ if (changed.length && (compare || (!gateStrict && !flag('--strict')))) {
       const u = new URL(baseUrl + sc.url); u.searchParams.set('screen', r.id);
       try { const { audit } = await auditUrl(b2, u.toString(), true); bs = { small: count(audit.small), contrast: count(audit.c45) + count(audit.c7), taps: count(audit.taps), smallText: audit.small, lowContrast: [...audit.c45, ...audit.c7], smallTargets: audit.taps }; }
       catch (e) { console.warn('warning: base render of ' + r.id + ' failed: ' + e.message.split('\n')[0]); }
-    } else why.push('new screen: no baseline');
+    }
+    // A new screen has no base: its baseline is zero, so any violation it draws is "new" below and blocks it (strict for new screens).
     const cand = { small: r.small, contrast: r.contrast + r.contrastPrimary, taps: r.taps };
     for (const [k, arr, label] of CATS) {
       const mine = k === 'contrast' ? [...r.lowContrast, ...r.lowContrastPrimary] : r[arr];
