@@ -313,6 +313,38 @@ export function pageStyling(addedByFile) {
   }
   return out;
 }
+// Motion has a held frame (rules ledger L25, owner 2026-10-17). The atlas freezes motion (atlas-still), so a keyframe animation is
+// never shot unless a screen holds it: a still render that shows the cue at its hold. Every @keyframes a change adds, or whose body
+// it alters, in a stylesheet under ux/ must be named in some candidate screen's `holds`; one that is not is motion no gate has seen.
+export function keyframesOf(css) {
+  const out = new Map();
+  const re = /@keyframes\s+([\w-]+)\s*\{/g;
+  for (let m; (m = re.exec(css));) {
+    let depth = 1, i = re.lastIndex;
+    for (; i < css.length && depth; i++) depth += css[i] === '{' ? 1 : css[i] === '}' ? -1 : 0;
+    out.set(m[1], css.slice(re.lastIndex, i - 1).replace(/\s+/g, ''));
+    re.lastIndex = i;
+  }
+  return out;
+}
+export const isMotionFile = (f) => /^ux\//.test(f) && !/^ux\/archive\//.test(f) && /\.css$/.test(f);
+// base, cand: { file: css text } for the changed stylesheets (a file missing on one side is ''); held: the names screens hold.
+export function unheldMotion({ base = {}, cand = {}, held = [] }) {
+  const has = new Set(held), before = new Map(), out = [];
+  for (const [f, css] of Object.entries(base)) if (isMotionFile(f)) for (const [k, v] of keyframesOf(css || '')) before.set(k, v);
+  for (const [f, css] of Object.entries(cand)) {
+    if (!isMotionFile(f)) continue;
+    for (const [k, v] of keyframesOf(css || '')) if (before.get(k) !== v && !has.has(k)) out.push({ file: f, name: k, kind: before.has(k) ? 'changed' : 'new' });
+  }
+  return out;
+}
+// The keyframes the atlas's screens hold (feature.json screens: "holds": ["name", …]).
+export function heldOf(atlas) {
+  const out = [];
+  for (const p of atlas?.platforms || []) for (const s of p.sections || []) for (const f of s.features || []) for (const c of f.screens || []) out.push(...(c.holds || []));
+  return out;
+}
+
 // The added lines of a unified diff, by file.
 export function addedLines(diff) {
   const out = {}; let file = null;
