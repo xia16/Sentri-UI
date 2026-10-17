@@ -80,3 +80,7 @@ The catalogue pickers' heads. Questions at a level: where am I? (the title: the 
 | Level name (title) | Where am I? | Act now (the head's heaviest) | kept |
 | Parent's name ("‹ Symptoms") | Where does up go? | Settled | **cut**: Back goes up one level; the parent is one Back away and was its title |
 | Done · N | How many have I ticked? | Act now | kept |
+
+# Record treatment and the medicines picker (2026-10-16, in place)
+
+The facts are budgeted in `features/medicines/budget.md` (Record treatment (host)): Medicine with its withdrawal caption, Method, Brand (optional; the caption moves under it when the brand has its own period), Dosage and Unit, (several pigs: Same for all · Adjust ›, opening Dose per pig with Remove), Condition (optional), Note (optional). The Banner notice and the pigs row are gone.

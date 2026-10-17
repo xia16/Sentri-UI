@@ -8,10 +8,10 @@ Status: candidate; implementation checked on this branch, owner approval remains
 Use for required text, treatment doses with units, and explanations; show a note editor only after the worker chooses Add.
 
 ### When not
-A Field is never shown open for an optional input. An optional Note is an optional row: label · muted Optional · trailing Add action, opening this Field. Reuse SentriUI.optionalRow({label, inline:SentriUI.field(...)}). `face:'row'` draws the full-width optional row (label · muted Optional · trailing action) empty as well as filled: Photos always uses it, and a sheet that holds Photos gives its other optionals the same face, so one sheet has one optional face on one track. Use PickerField for options, Stepper for counts, and Measure with Numpad for weights and typed tags.
+A Field is shown open for an optional input only in a form whose optional fields stand open below its required ones (Record treatment: Brand, Condition, Note), with `optional` drawing the muted Optional beside the label. Everywhere else an optional input is an optional row: label · muted Optional · trailing Add action, opening this Field. Reuse SentriUI.optionalRow({label, inline:SentriUI.field(...)}). `face:'row'` draws the full-width optional row (label · muted Optional · trailing action) empty as well as filled: Photos always uses it, and a sheet that holds Photos gives its other optionals the same face, so one sheet has one optional face on one track. Use PickerField for options, Stepper for counts, and Measure with Numpad for weights and typed tags.
 
 ## Anatomy
-Root label; visible label text; one input or textarea; optional unit in the label; optional help/error/reason line beneath the control.
+Root label; visible label text, with an optional muted "Optional" beside it; one input or textarea; optional unit in the label; optional help/error/reason line beneath the control.
 
 ## Variants
 - **Text** (`text`): use for identity and required short text. not for choices — use PickerField.
@@ -40,7 +40,7 @@ Native label associates with one nested control. Hint/error uses aria-describedb
 Do name the missing value and a fix in errors. Do pick Unit first, then Dose with the unit in its label. Don’t show an optional textarea before Add. Don’t repeat “Add a note” as title, label and placeholder.
 
 ## API and tokens
-SentriUI.field({label, variant, value, unit, hint, error, disabled, reason, id, placeholder, control, className, ds, labelHidden}). control remains a compatible trusted HTML slot; otherwise the component generates the native control. label accepts trusted registry markup. labelHidden hides only the visual label when the opening OptionalRow already names it; retain its accessible association. Optional inputs use SentriUI.optionalRow; required conditional explanations use Field directly.
+SentriUI.field({label, variant, value, unit, hint, error, disabled, reason, id, placeholder, control, className, ds, labelHidden, optional}). control remains a compatible trusted HTML slot; otherwise the component generates the native control. label accepts trusted registry markup. labelHidden hides only the visual label when the opening OptionalRow already names it; retain its accessible association. `optional` draws the muted "Optional" word beside the label (`.st-field-optional`, `type-description-size`, `muted`): `true` uses the registry word `ds.field.optional`, a string is the word already in the page's language. It is for a form whose optional fields stand open below its required ones (Record treatment: Brand, Condition, Note); a sheet that hides its optionals keeps the optional row. Optional inputs use SentriUI.optionalRow; required conditional explanations use Field directly.
 
 CSS variables: tap-min, field-height, font-sans, font-size-12, font-size-14, type-description-size, space-9, space-18, space-12, control-border, radius-control, ink, muted, paper, well, red, size-2, size-3, ring-width-fine, size-90. All sizing and colour resolve to tokens.
 
@@ -54,4 +54,5 @@ Component: generic input used across sections. The named faces are variants, not
 [Preview](preview.html); [verification and screenshots](verification.md); each variant's states live in variants/*.html and variants.json. Primary guidance: the [component standard](../../../../docs/design-workflow/research/component-standard.md), Ant Design Mobile and TDesign; Material 3 and Apple HIG guide labels and target sizes.
 
 ## Changelog
+2026-10-16 (medicines): `optional` draws the muted "Optional" word beside the label (was page CSS in the treatment form); a Note's character counter is the Field's `hint`.
 2026-10-10: consolidated variants, corrected gate findings, documented states and migrated prototype forks. Numpad / Measure decisions remain outside this pass.

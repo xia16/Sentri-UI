@@ -742,6 +742,8 @@ button.st-row[data-variant="tick"]:active:not(:disabled){background:var(--st-pre
 label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-row-x) var(--space-row-y) 0;gap:0}
 
 .field .st-field-message{font:400 var(--type-description-size)/1.5 var(--font-sans);color:var(--muted)}
+/* Field / PickerField optional: the muted word beside the label. */
+.st-field-optional{margin-left:var(--space-6);font:400 var(--type-description-size)/1.5 var(--font-sans);color:var(--muted)}
 .field.error .st-field-message{color:var(--red)}
 .field :is(input,textarea):disabled{background:var(--well);color:var(--muted)}
 .st-stepper[data-variant="well"] .st-stepper-keys{padding:var(--space-row-y);background:var(--well);border-radius:var(--radius-inset)}
@@ -751,6 +753,9 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
 .st-stepper-value{display:grid;place-items:center;min-width:var(--control-height);min-height:var(--control-height)}
 .st-stepper[data-error] .st-stepper-hint{color:var(--red)}
 .st-text-action{min-height:var(--tap-min)}
+/* Button text register, align: the word on the content edge ('start') or the right edge ('end') instead of centred in its target. */
+.st-text-action.st-text-action--start{justify-content:flex-start;padding-left:0}
+.st-text-action.st-text-action--end{justify-content:flex-end;padding-left:0}
 .st-optional-body .field textarea{height:auto;field-sizing:content;resize:none}
 
 /* Field owns its skin in phone hosts as well as standalone variant pages. */
@@ -1003,8 +1008,8 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
 .room-pen-name,.edit-finish-door{min-height:48px;margin-top:-2px;margin-bottom:-2px}
 .st-fact-link{min-height:48px;min-width:48px;margin:-12px 0}
 .dialog .sheet-footer>.button.secondary{background:#fff;border:1px solid var(--back-border)}
-/* a tap leaves no ring: only keyboard focus may draw one */
-:is(.farrowing-phone,.inspection-phone,.phone,.device,.atlas-phone) :focus:not(:focus-visible){outline:none}
+/* a tap leaves no ring: only keyboard focus may draw one; [data-touch-focus] marks focus a tap handed back (a pick returning to its field) */
+:is(.farrowing-phone,.inspection-phone,.phone,.device,.atlas-phone) :is(:focus:not(:focus-visible),[data-touch-focus]:focus){outline:none}
 /* stepper keys and value in rows: the target is 48, the face stays 44, the margins give the space back */
 .st-stepper[data-variant="row"] .st-stepper-key.st-stepper-key,.st-stepper[data-variant="bare"] .st-stepper-key.st-stepper-key{width:48px;min-width:48px;min-height:48px;margin:-2px}
 .st-stepper[data-variant="row"] .st-stepper-value{display:grid;place-items:center;min-width:calc(3ch + 12px);width:calc(3ch + 12px);min-height:48px;margin:-12px -6px}

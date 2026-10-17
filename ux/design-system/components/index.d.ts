@@ -142,6 +142,8 @@ export interface PickerFieldProps {
   ariaLabel?: string;
   /** Marks a required field (data-required); the host gives it error "Required" when its waiting commit is tapped while empty. */
   required?: boolean;
+  /** The muted "Optional" word beside the label: true draws the registry word (ds.field.optional); a string is the word in the page's language. */
+  optional?: boolean | string;
   variant?: 'single' | 'multi' | 'cascade' | 'cascade-multi';
   selected?: string[];
   /** Record forms: the chosen names, shown on the trigger instead of a count. */
@@ -471,6 +473,8 @@ export interface PhotosProps {
 }
 export type ButtonRegister = 'primary' | 'secondary' | 'tool' | 'text' | 'danger' | 'caution';
 export interface ButtonProps {
+  /** Text register only: 'start' puts the word on the content edge, 'end' ends it on the right edge; default centred in its target. */
+  align?: 'start' | 'end';
   icon?: IconHtml;
   disabled?: boolean;
   label: string;
@@ -664,7 +668,7 @@ export interface SentriUI {
   logGroups(entries: LogEntry[], options?: LogDayOptions & { earlier?: string }): LogGroup[];
   log(groups: LogGroup[], options?: { empty?: string; kind?: 'day' | 'categorised'; correctedLabel?: string; className?: string; strs?: Strs<'empty'>; args?: StrArgs<'empty'> }): string;
   categoryFooter(props: CategoryFooterProps): string;
-  field(props: { label?: string; control?: string; className?: string; ds?: string; variant?: 'text' | 'number' | 'textarea'; value?: string; unit?: string; hint?: string; error?: string; disabled?: boolean; reason?: string; id?: string; placeholder?: string; labelHidden?: boolean; focus?: boolean }): string;
+  field(props: { label?: string; control?: string; className?: string; ds?: string; variant?: 'text' | 'number' | 'textarea'; value?: string; unit?: string; hint?: string; error?: string; disabled?: boolean; reason?: string; id?: string; placeholder?: string; labelHidden?: boolean; focus?: boolean; /** The muted "Optional" word beside the label (true: registry ds.field.optional; a string: the word already localized). */ optional?: boolean | string }): string;
   pickerField(props: PickerFieldProps): string;
   pickerOptions(props: { options: PickerOption[]; selected?: string | string[]; action?: string; className?: string; variant?: 'single' | 'multi'; loading?: boolean; error?: string }): string;
   pickerBody(props: PickerBodyProps): string;

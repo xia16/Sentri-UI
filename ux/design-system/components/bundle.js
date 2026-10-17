@@ -266,7 +266,10 @@
   }
   const chevron=root.SentriIcons.icon('chevron');
   const check=root.SentriIcons.icon('check');
-  function field({label='',control='',className='',ds='Field',variant='text',value='',unit='',hint='',error='',disabled=false,reason='',id='',placeholder='',labelHidden=false}={}){
+  /* optional: a muted "Optional" beside the label (the treatment's optional fields, owner 2026-10-16). true draws the registry word
+     (ds.field.optional); a string is the word already in the page's language. */
+  const optionalWord=on=>on===true?` <small class="st-field-optional"><span data-str="ds.field.optional">Optional</span></small>`:on?` <small class="st-field-optional">${esc(on)}</small>`:'';
+  function field({label='',control='',className='',ds='Field',variant='text',value='',unit='',hint='',error='',disabled=false,reason='',id='',placeholder='',labelHidden=false,optional=false}={}){
     const fid=id||fieldId('st-field'),hid=fid+'-hint';
     const bad=!!error||className.split(' ').includes('error');
     const message=error|| (bad?'Invalid value. Enter a valid value.':disabled?(reason||'This record cannot be edited.'):hint);
@@ -278,12 +281,12 @@
       if(bad)attrs=attrs.replace(/\saria-invalid=["'][^"']*["']/i,'');
       return `<${tag}${attrs}${label&&!/aria-label(?:ledby)?=/.test(attrs)?` aria-labelledby="${esc(fid)}-label"`:""}${message?` aria-describedby="${esc([previous,hid].filter(Boolean).join(' '))}"`:''}${bad?' aria-invalid="true"':''}${disabled&&!/\bdisabled\b/.test(attrs)?' disabled':''}>`;
     });
-    return `<label class="field ${bad?'error ':''}${esc(className)}" data-ds="${esc(ds||'Field')}" data-variant="${esc(variant)}">${label||unit?`<span${labelHidden?' class="visually-hidden"':''} id="${esc(fid)}-label">${label}${unit?` (${esc(unit)})`:''}</span>`: ''}${control}${message?`<span class="st-field-message" id="${esc(hid)}" role="${bad?'alert':'status'}">${esc(message)}</span>`:''}</label>`;
+    return `<label class="field ${bad?'error ':''}${esc(className)}" data-ds="${esc(ds||'Field')}" data-variant="${esc(variant)}">${label||unit?`<span${labelHidden?' class="visually-hidden"':''} id="${esc(fid)}-label">${label}${unit?` (${esc(unit)})`:''}${optionalWord(optional)}</span>`: ''}${control}${message?`<span class="st-field-message" id="${esc(hid)}" role="${bad?'alert':'status'}">${esc(message)}</span>`:''}</label>`;
   }
   /* Mobile-standard choice control: a trigger button that opens a picker sheet.
      Replaces native <select>; the host app owns the picker view and state.
      strs: label (raw label wrapped in a span), display or value (the shown value), placeholder. */
-  function pickerField({label='',value='',display='',placeholder='Select',action='open-picker',key='',disabled=false,reason='',error='',loading=false,variant='single',selected=[],names=[],path=[],pressed=false,active=false,required=false,ariaLabel='',className='',strs,args}={}){
+  function pickerField({label='',value='',display='',placeholder='Select',action='open-picker',key='',disabled=false,reason='',error='',loading=false,variant='single',selected=[],names=[],path=[],pressed=false,active=false,required=false,optional=false,ariaLabel='',className='',strs,args}={}){
     const multi=variant.includes('multi'), named=multi&&names.length>0;
     /* Record forms show the chosen names in up to two lines, then +n: names are kept while they fit a two-line budget
        (about 30 characters a line at the narrowest phone; CJK counts double), so the line is never clamped mid-name; the first name is always shown. */
@@ -292,7 +295,7 @@
     const text=named?shownNames.join(' · ')+(hiddenN?' · +'+hiddenN:''):multi?(selected.length?selected.length+' selected':'None'):path.length?path[path.length-1]:display||value;
     const more=named&&hiddenN?'+'+hiddenN:'';
     const shown=text!==''&&text!=null, id=fieldId('st-picker'), hint=error||reason||(loading?'Loading options…':'');
-    return `<div class="field st-picker-field ${esc(className)}${error?' error':''}" data-ds="PickerField" data-variant="${esc(variant)}"${required?' data-required=""':''}><span id="${id}-label">${tx(label,{strs,args},'label')}</span><button type="button" class="st-picker-trigger${shown?'':' is-placeholder'}" ${ariaLabel?`aria-label="${esc(ariaLabel)}, ${esc(shown?text:placeholder)}"`:`aria-labelledby="${id}-label ${id}-value"`} aria-haspopup="dialog" aria-expanded="${active}"${hint?` aria-describedby="${id}-hint"`:''}${error?' aria-invalid="true"':''}${disabled||loading?' aria-disabled="true"':''}${loading?' aria-busy="true"':''}${pressed?' data-preview="pressed"':''} data-action="${esc(action)}" data-picker-key="${esc(key)}"><span id="${id}-value" class="st-picker-value${named?' is-names':''}"${named?'':sa(multi?(strs?.display|| (selected.length?'ds.picker.selected':'ds.picker.none')):shown?(strs?.display||strs?.value):(strs?.placeholder||(placeholder==='Select'?'ds.picker.select':undefined)),multi?{n:selected.length,...args?.display}:args?.display||args?.value)}>${named?`<span class="st-picker-names">${esc(shownNames.join(' · '))}</span>${more?`<span class="st-picker-more">${esc(more)}</span>`:''}`:esc(shown?text:placeholder)}</span>${chevron}</button>${hint?`<span id="${id}-hint" class="st-picker-hint" role="status">${esc(hint)}</span>`:''}</div>`;
+    return `<div class="field st-picker-field ${esc(className)}${error?' error':''}" data-ds="PickerField" data-variant="${esc(variant)}"${required?' data-required=""':''}><span id="${id}-label">${tx(label,{strs,args},'label')}${optionalWord(optional)}</span><button type="button" class="st-picker-trigger${shown?'':' is-placeholder'}" ${ariaLabel?`aria-label="${esc(ariaLabel)}, ${esc(shown?text:placeholder)}"`:`aria-labelledby="${id}-label ${id}-value"`} aria-haspopup="dialog" aria-expanded="${active}"${hint?` aria-describedby="${id}-hint"`:''}${error?' aria-invalid="true"':''}${disabled||loading?' aria-disabled="true"':''}${loading?' aria-busy="true"':''}${pressed?' data-preview="pressed"':''} data-action="${esc(action)}" data-picker-key="${esc(key)}"><span id="${id}-value" class="st-picker-value${named?' is-names':''}"${named?'':sa(multi?(strs?.display|| (selected.length?'ds.picker.selected':'ds.picker.none')):shown?(strs?.display||strs?.value):(strs?.placeholder||(placeholder==='Select'?'ds.picker.select':undefined)),multi?{n:selected.length,...args?.display}:args?.display||args?.value)}>${named?`<span class="st-picker-names">${esc(shownNames.join(' · '))}</span>${more?`<span class="st-picker-more">${esc(more)}</span>`:''}`:esc(shown?text:placeholder)}</span>${chevron}</button>${hint?`<span id="${id}-hint" class="st-picker-hint" role="status">${esc(hint)}</span>`:''}</div>`;
   }
   // Shared chooser surface: flat catalogue lists or a muted inset for short choices.
   function chooserList(content,{className='',tone='flat',ds='ChoiceList'}={}){
@@ -790,9 +793,11 @@
      word, 13/700 ink-2, no container, ≥48px) · danger. waiting: the waiting face — present, quiet,
      focusable (aria-disabled, never disabled); guard() answers its tap. busy: sent, until the host settles. */
   const REGISTER={primary:'button primary',secondary:'button secondary',tool:'button tool',danger:'button danger',caution:'button caution'};
-  function button({label='',register='secondary',action='',value='',waiting=false,disabled=false,busy=false,icon='',reason='',describedby='',labelledby='',id='',attrs={},className='',strs,args}={}){
+  function button({align='',label='',register='secondary',action='',value='',waiting=false,disabled=false,busy=false,icon='',reason='',describedby='',labelledby='',id='',attrs={},className='',strs,args}={}){
     const o={strs,args},r=oneOf('Button','register',register,['primary','secondary','tool','text','danger','caution'],'secondary');
-    const cls=r==='text'?'st-text-action':REGISTER[r];
+    /* align (text register only): 'start' sets the word on the content edge (a Delete under a form's fields); 'end' ends it on the
+       right edge (a short word over a list). Default: centred in its 48px target. */
+    const cls=r==='text'?'st-text-action'+(align==='start'?' st-text-action--start':align==='end'?' st-text-action--end':''):REGISTER[r];
     const rid=reason?(describedby||fieldId('st-button-reason')):describedby;
     return `<button type="button" class="${cls}${className?' '+esc(className):''}" data-ds="Button" data-register="${r}"${id?` id="${esc(id)}"`:''} data-action="${esc(action)}" data-value="${esc(value)}"${waiting||busy?' aria-disabled="true"':''}${disabled?' disabled':''}${busy?' aria-busy="true" data-busy=""':''}${rid?` aria-describedby="${esc(rid)}"`:''}${labelledby?` aria-labelledby="${esc(labelledby)}"`:''}${r==='tool'&&typeof label==='string'&&label&&!strs?` title="${esc(label)}"`:''}${safeAttr(attrs)}>${icon?`<span aria-hidden="true">${icon}</span>`:''}<span class="st-button-label">${tx(label,o,'label')}</span>${busy?'<span class="st-button-busy" aria-hidden="true">…</span>':''}</button>${reason?buttonReason({id:rid,text:reason}):''}`;
   }
