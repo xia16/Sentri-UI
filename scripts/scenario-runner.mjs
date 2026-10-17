@@ -152,15 +152,41 @@ async function settle(page) {
   await page.waitForTimeout(120);
 }
 
-async function tap(page, step) {
+// How long a tap waits for its control to appear and to stop moving: the settling protocol's bound (settle.mjs). The step before
+// may have opened a drawer or a list that is still drawing; on a loaded machine (the scheduler at 2 workers, steps at ~3x) a single
+// look 120ms after it read as "control not found", a design failure, and was stored as one (#192, 2026-10-17). A control that is
+// really missing still fails, after the bound.
+export const CONTROL_WAIT_MS = 5000;
+
+async function findControl(page, key, waitMs) {
+  const until = Date.now() + waitMs;
+  for (;;) {
+    // the page may navigate between looks; the helpers are installed again on the new document
+    const el = await (async () => { await ensureHelpers(page); return (await page.evaluateHandle((k) => window.__scen.find(k), key)).asElement(); })().catch(() => null);
+    if (el) return el;
+    if (Date.now() >= until) return null;
+    await page.waitForTimeout(50);
+  }
+}
+
+export async function tap(page, step, waitMs = CONTROL_WAIT_MS) {
   const key = typeof step === 'string' ? step : step.tap;
-  await ensureHelpers(page);
-  const handle = await page.evaluateHandle((k) => window.__scen.find(k), key);
-  const el = handle.asElement();
+  const until = Date.now() + waitMs;
+  let el = await findControl(page, key, waitMs);
   if (!el) return `control not found: ${key}`;
   try {
+    // a control inside a drawer that is still sliding in is found, but not yet where it will be: wait until it holds still. A page
+    // that draws the list again while it settles replaces the control: look for it again, within the same bound.
+    for (;;) {
+      try { await el.waitForElementState('stable', { timeout: Math.max(1, until - Date.now()) }); break; }
+      catch (e) {
+        if (!/not attached|detached/i.test(e.message) || Date.now() >= until) throw e;
+        el = await findControl(page, key, Math.max(0, until - Date.now()));
+        if (!el) return `control not found: ${key}`;
+      }
+    }
     if (step.hold) {
-      await el.scrollIntoViewIfNeeded({ timeout: 2000 });
+      await el.scrollIntoViewIfNeeded({ timeout: waitMs });
       const box = await el.boundingBox();
       if (!box) return `control has no box: ${key}`;
       // the press must land on the control itself, not on whatever covers it
@@ -169,7 +195,7 @@ async function tap(page, step) {
       await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
       await page.mouse.down(); await page.waitForTimeout(step.hold); await page.mouse.up();
     } else {
-      await el.click({ timeout: 2500 });
+      await el.click({ timeout: waitMs });
     }
   } catch (e) { return `control not tappable: ${key} (${e.message.split('\n')[0]})`; }
   await settle(page);
