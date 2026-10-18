@@ -390,6 +390,7 @@
     const clear=value?`<button type="button" class="st-text-action st-search-clear" data-search-clear=""><span data-str="act.clear">Clear</span></button>`:'';
     return `<label class="field catalog-search st-choice-search" data-ds="ChoiceList"><span class="st-search-box"><input type="search" aria-label="${esc(label)}"${strs.label?` data-str-attr="aria-label:${esc(strs.label)}${strs.placeholder?`;placeholder:${esc(strs.placeholder)}`:''}"${sArgs(args)}`:''} placeholder="${esc(placeholder||label)}" value="${esc(value)}"${extra}>${clear}</span></label>`;
   }
+  function toast(text,{strs,args}={}){return `<div class="st-toast" data-ds="Toast" role="status">${tx(text,{strs,args},'text')}</div>`}
   function choiceEmpty(text,{strs,args,title,icon}={}){if(title)return `<div class="st-choice-empty st-choice-empty--lead" data-ds="ChoiceList" role="status">${icon&&globalThis.SentriIcons?`<span class="st-choice-empty-icon" aria-hidden="true">${globalThis.SentriIcons.icon(icon)}</span>`:''}<strong class="st-choice-empty-title">${tx(title,{strs,args},'title')}</strong><span class="st-choice-empty-text">${tx(text,{strs,args},'text')}</span></div>`;return `<p class="st-choice-empty" data-ds="ChoiceList" role="status">${tx(text,{strs,args},'text')}</p>`;}
   /* options: [value,label,{strs:{label},args:{label}}?]; label is raw HTML, kept as the span's fallback. */
   function segment({options=[],active='',action='',className='',ariaLabel='',variant='two-line-lens',state='Default',disabled=false,reason=''}={}){
@@ -1311,7 +1312,7 @@
     document.addEventListener('contextmenu',e=>{if(e.target.closest&&e.target.closest('.st-pen-tile'))e.preventDefault();});
     if(typeof globalThis.addEventListener==='function')globalThis.addEventListener('blur',penStop);
   }
-  const api=Object.freeze({headerLine,pageHeader,rangeSlider,filterSheet,penMap,penMapKey,penMapFooter,penPeek,penMapMount:penMount,optionalRow,heading,panel,facts,row,rowGroup,log,logDay,logStamp,logGroups,categoryFooter,field,pickerField,pickerOptions,pickerBody,pickerHead,pickerFooter,filterChips,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowSelectDoor,rowAction,rowSelectChange,status,conditionTag,rowFitTags,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
+  const api=Object.freeze({headerLine,pageHeader,rangeSlider,filterSheet,penMap,penMapKey,penMapFooter,penPeek,penMapMount:penMount,optionalRow,heading,panel,facts,row,rowGroup,log,logDay,logStamp,logGroups,categoryFooter,field,pickerField,pickerOptions,pickerBody,pickerHead,pickerFooter,filterChips,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,toast,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowSelectDoor,rowAction,rowSelectChange,status,conditionTag,rowFitTags,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
   root.SentriUI=api;
   if(typeof module!=='undefined')module.exports=api;
 })(globalThis);

@@ -393,6 +393,8 @@ button.st-row:disabled{cursor:default}
 .st-picker-body .st-choice-row.st-choice-row{padding-block:var(--space-8)}
 /* Search stays at the top of the sheet while the one list scrolls under it (sticky in the sheet body, never a second scroller). */
 .sheet-body>.st-picker-body>.st-choice-search,.sheet-body>*>.st-picker-body>.st-choice-search{position:sticky;top:calc(-1 * var(--space-section));z-index:1;margin:calc(-1 * var(--space-section)) calc(-1 * var(--space-gutter-sheet)) var(--space-12);padding:var(--space-section) var(--space-gutter-sheet) var(--space-8);background:var(--paper)}
+/* Toast: a short confirmation over the page, above its dock (moved as-is from Inspection, where it was page-built). */
+.st-toast{position:absolute;bottom:98px;left:19px;right:19px;z-index:7;border-radius:12px;padding:13px 15px;background:#263023;color:white;box-shadow:0 5px 22px #20271f20;font-size:var(--type-meta-size);line-height:1.6;pointer-events:none}
 .st-choice-empty{margin:0;padding:var(--space-24) var(--space-17);font:400 var(--font-size-13)/1.5 var(--font-sans);color:var(--st-muted)}
 /* An empty collection the worker can add to (a farm's brands for a medicine): the native "nothing here yet" — a glyph on the tint, a
    title that names what is missing, one line that says how to add it. Centred under the search, which stays the way in. */

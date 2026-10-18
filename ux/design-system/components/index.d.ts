@@ -685,6 +685,7 @@ export interface SentriUI {
   choiceGroup(rows: string | string[], options?: { title?: string; lead?: string; className?: string; radio?: boolean; /** Raw HTML at the heading's right end (a radio field's Clear). */ aside?: string; id?: string; strs?: Strs<'title'>; args?: StrArgs<'title'> }): string;
   /** While value is set, a Clear text action empties the field and fires `input`. args fill the strs ({ level } for ds.picker.search_in). */
   choiceSearch(props?: { label?: string; placeholder?: string; value?: string; attrs?: SafeAttrs; strs?: Strs<'label' | 'placeholder'>; args?: Record<string, unknown> }): string;
+  toast(text: string, options?: { strs?: Strs<'text'>; args?: StrArgs<'text'> }): string;
   choiceEmpty(text: string, options?: { strs?: Strs<'text' | 'title'>; args?: StrArgs<'text' | 'title'>; title?: string; icon?: string }): string;
   segment(props: SegmentProps): string;
   filterChips(props: { items: { value: string; label: string; count?: string | number; checked?: boolean; disabled?: boolean; aria?: string }[]; action?: string; key?: string; label?: string; state?: string; reason?: string }): string;
