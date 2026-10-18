@@ -9,6 +9,7 @@ export const HARD = ['wrong-fact', 'lost-draft', 'dead-end', 'unreachable-contro
 
 export { screensOf, DS_FEATURE, componentPage, idPath, componentPagesOf, componentsTouched, pageOf, pageAssets } from './atlas-screens.mjs';
 import { DS_FEATURE, componentPage, componentsTouched, pageOf } from './atlas-screens.mjs';
+import { holderAlive, pidAlive, startOf } from './process-start.mjs';
 
 // file -> the features whose screens load it: each screen's page, and what that page loads (assetsOf: page -> files).
 // A file pages of two or more features load is shared: changing it reaches them all, whatever their first frames show.
@@ -83,7 +84,7 @@ export function coverageLost(base, cand) {
 // The gate's own tools and the workflow's text. A design PR that also changes these grades itself with tools it rewrote;
 // the README rule: change the workflow in its own pull request, never inside a design PR.
 const TOOLS = [
-  /^scripts\/(gate|evaluate|evidence|scheduler|visit|settle|machine|png|github|static-reach|bundle-graph|scenario-runner|atlas-screens|shoot-screens|loop-rules|polish-loop|check-states|check-legibility|check-headers|run-scenarios|serve-ux|build-atlas)\.(mjs|cjs)$/,
+  /^scripts\/(gate|process-start|evaluate|evidence|scheduler|visit|settle|machine|png|github|static-reach|bundle-graph|scenario-runner|atlas-screens|shoot-screens|loop-rules|polish-loop|check-states|check-legibility|check-headers|run-scenarios|serve-ux|build-atlas)\.(mjs|cjs)$/,
   /^scripts\/vendor\//,
   /^scripts\/check-(states|legibility|headers)\.fixtures\//,
   /^docs\/design-workflow\//,
@@ -446,10 +447,11 @@ export { timedOutOnly, aimdStep, classifyMachineError, machineErrorOf } from './
 // doesn't resolve, a 5xx. It is retried; anything else is GitHub's answer and never is.
 export const ghNetworkError = (stderr) => /\bEOF\b|\bTLS\b|handshake|timed? ?out|timeout|connection (was )?(reset|refused|closed)|dial tcp|proxyconnect|actively refused|forcibly closed|network is unreachable|ECONNRESET|ECONNREFUSED|ETIMEDOUT|ENOTFOUND|EAI_AGAIN|could not resolve|no such host|HTTP 5\d\d|\b50[0234]\b|Bad Gateway|Service Unavailable/i.test(String(stderr || ''));
 
-// The gate's lock (one gate per machine): free, held by a live gate, or stale (its process is gone).
-export function lockState(lock, alive) {
+// The gate's lock (one gate per machine): free, held by a live gate, or stale (its process is gone, or its pid now belongs to
+// another process: scripts/process-start.mjs).
+export function lockState(lock, alive = pidAlive, start = startOf) {
   if (!lock) return 'free';
-  return Number.isInteger(lock.pid) && alive(lock.pid) ? 'held' : 'stale';
+  return holderAlive(lock, { alive, start }) ? 'held' : 'stale';
 }
 
 // Scenario leaves, base against candidate (owner, 2026-10-15): a leaf the candidate fails is the change's only when the same leaf
