@@ -154,6 +154,14 @@ test('docs, tests and the type file reach no screen', () => {
   assert.deepEqual([r.all, r.screens, r.leaves], [false, [], []]);
 });
 
+test("the atlas's prose reaches no screen; its code still reaches every one", () => {
+  // #200 edited atlas/SCHEMA.md and ran all 404 screens: a markdown file the atlas never loads can't draw
+  const prose = reachOf(BASE, BASE, { files: ['atlas/SCHEMA.md', 'sections/home/notes.md'] });
+  assert.deepEqual([prose.all, prose.screens, prose.leaves], [false, [], []]);
+  for (const f of ['atlas/library.js', 'atlas/app.css', 'atlas/index.html']) assert.equal(reachOf(BASE, BASE, { files: [f] }).all, true, f);
+  assert.equal(reachOf(BASE, BASE, { files: ['atlas/SCHEMA.md', 'atlas/library.js'] }).all, true, 'prose beside code: the code still widens');
+});
+
 // ---------- how a page reads the namespace, and what its URLs can name ----------
 test('namespace use: NS.X and NS["X"] use X; a static destructuring uses its keys; typeof is a check; anything else uses every export', () => {
   const uses = (js) => identityInputs(checkout({ farrowingJs: js }), 'farrowing.room').bundle;
