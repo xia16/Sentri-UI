@@ -538,3 +538,20 @@ test('motion: a keyframe a change adds or alters needs a screen that holds it', 
   // nested braces inside a keyframe are read whole
   assert.equal(keyframesOf('@keyframes k{0%{a:1}50%{a:2}100%{a:3}}.y{}').get('k'), '0%{a:1}50%{a:2}100%{a:3}');
 });
+
+// L26: a leaf's failure is a design result only once it repeats. The case it came from: #197's fa-s26 failed once at en-360 (a tap
+// racing a drawer), was stored by identity, and every re-gate reused it.
+test('leaf: a fresh failure is stored only when a confirming run fails too; a pass after it is unstable', async () => {
+  const { confirmLeaf, reusableLeaf } = await import('../scripts/loop-rules.mjs');
+  const fail = { run: { result: 'fail', failures: [{ what: 'on farrowing.note' }] } }, pass = { run: { result: 'pass' } };
+  assert.deepEqual(confirmLeaf(fail, fail), { store: true, unstable: false }, 'the same failure twice: a design result');
+  assert.deepEqual(confirmLeaf(fail, pass), { store: false, unstable: true, why: 'passed' }, 'fa-s26: failed, then passed: unstable, stored as nothing');
+  assert.equal(confirmLeaf(fail, { run: { result: 'blocked' } }).unstable, true, 'any other result is a disagreement');
+  assert.deepEqual(confirmLeaf(fail, { machine: 'navigation-timeout' }), { store: false, unstable: false }, 'a lost confirming run confirms nothing');
+  assert.deepEqual(confirmLeaf(fail, { error: 'boom' }), { store: false, unstable: false });
+  // reuse: a pass, or a confirmed failure; never a failure stored before L26
+  assert.equal(reusableLeaf({ run: { result: 'pass' } }), true);
+  assert.equal(reusableLeaf({ run: { result: 'fail' }, confirmed: true }), true);
+  assert.equal(reusableLeaf({ run: { result: 'fail' } }), false, 'an unconfirmed stored failure is run again');
+  assert.equal(reusableLeaf(null), false);
+});
