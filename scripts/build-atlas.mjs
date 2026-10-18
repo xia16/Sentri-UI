@@ -234,7 +234,7 @@ const GROUPS = [
   ['Base', ['Button', 'IconButton', 'Icon', 'Heading', 'Header', 'Row', 'Panel', 'Facts', 'Log', 'Sheet', 'PenMap', 'Segment', 'FilterChips', 'ChoiceList', 'CategoryFooter']],
   ['Inputs and filters', ['FilterSheet', 'RangeSlider']],
   ['Fields', ['Field', 'PickerField', 'Stepper', 'Measure', 'Numpad']],
-  ['Status and feedback', ['Status', 'ConditionTag', 'Banner', 'Photos']],
+  ['Status and feedback', ['Status', 'ConditionTag', 'Banner', 'Toast', 'Photos']],
   ['Task skeleton', ['TaskPhone', 'TaskHeader', 'TaskSummary', 'TaskLens', 'TaskGroup', 'TaskDock', 'TaskHold', 'TaskTotals', 'TaskProgress', 'TaskStepper', 'TaskPhotos', 'TaskChoice', 'TaskRadios', 'TaskWarning', 'TaskTable', 'TaskMetrics', 'TaskSection', 'TaskReceipt', 'TaskDay', 'TaskChips']],
 ];
 const components = [];
