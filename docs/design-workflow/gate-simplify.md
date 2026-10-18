@@ -128,6 +128,10 @@ With most gates at 1–3 minutes, the lock queue shrinks with them, so G11 (smal
    evaluate.mjs). Leaves run at the narrowest width their spec lists. A ZH run goes only where its start renders Chinese: one per
    start goes first, and the rest are blocked without running when it finds none. ZH shots of screens that ignore `?lang=zh` stay as
    one run, and are dropped from the pairs as before.
-5. X3, X6, X7: the flags.
+5. **Done (2026-10-18):** X3, X6, X7 and G15: `--quick` and `--class` are gone, and the gate derives the class (`classOfFiles`:
+   behaviour for a page-runnable script, copy for the strings registry alone, presentation otherwise; shared and what moved raise
+   it). `--scope` is optional and only a declaration: it brings no screen or leaf into the reach, and the known-reach check skips
+   a change that touches the shared system. G15: a screen that runs changed code and draws the same is named in `walkNeed`, one
+   per page; such a change needs a judge's walk, and `--verdict` refuses one left unwalked.
 6. G2 (X4, X5), with the GitHub setting.
 7. S6–S8 and G9: the judge's load and the Results block.

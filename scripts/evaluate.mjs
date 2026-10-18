@@ -13,7 +13,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { pwPath, playwright } from './playwright-path.mjs';
-import { CLASSES, DS_FEATURE, componentPage, componentPagesOf, componentsTouched, idPath, screensOf, pageOf, pageAssets, sharedFiles, coverageLost, effectiveClass, classifyScreens, touchesSystem, touchesTools, queueAhead as queueOf, budgetProblems, critiqueProblems, pageStyling, addedLines, scenarioDebt, isMotionFile, unheldMotion, heldOf, confirmLeaf, reusableLeaf } from './loop-rules.mjs';
+import { CLASSES, classOfFiles, DS_FEATURE, componentPage, componentPagesOf, componentsTouched, idPath, screensOf, pageOf, pageAssets, sharedFiles, coverageLost, effectiveClass, classifyScreens, touchesSystem, touchesTools, queueAhead as queueOf, budgetProblems, critiqueProblems, pageStyling, addedLines, scenarioDebt, isMotionFile, unheldMotion, heldOf, confirmLeaf, reusableLeaf } from './loop-rules.mjs';
 // The analyser (gate-v2 §2): static and conservative, over both revisions. It says what each screen's and each leaf's evidence
 // depends on; the reach is every screen and leaf whose evidence identity that makes differs between the two (gate-simplify.md X1).
 import { identityInputs, leafInputs } from './static-reach.mjs';
@@ -50,13 +50,13 @@ export const TOOL_PATHS = ['scripts', 'docs/design-workflow', 'package.json'];
 export const toolsDiffer = (root, base) => git(['diff', '--name-only', base, '--', ...TOOL_PATHS], root).out.trim().split(/\r?\n/).filter(Boolean);
 
 export async function evaluate(opts) {
-  const { root, out, mode = 'normal', scope = [], declared = 'presentation', quick = false, audit = false, keep = false, log = console.log, env = process.env } = opts;
+  const { root, out, mode = 'normal', scope = [], audit = false, keep = false, log = console.log, env = process.env } = opts;
   const t0 = Date.now(), at = {};
   const mark = (k) => { at[k] = Date.now(); };
   const checks = [], gaps = [], blocked = [];
   const check = (name, ok, detail = '') => { checks.push({ check: name, result: ok === null ? 'skipped' : ok ? 'pass' : 'fail', detail }); log((ok === null ? 'SKIP' : ok ? 'PASS' : 'FAIL').padEnd(5), name, detail ? '— ' + String(detail).split('\n')[0] : ''); };
   const block = (why) => { blocked.push(why); log('BLOCK', why); };
-  const mech = { outcome: null, pass: false, candidate: '', base: '', ref: opts.ref || opts.candidate, mode, scope, quick, class: { declared }, checks, gaps, blocked, screens: null, pairs: [], inventory: null, evidence: null, timings: {} };
+  const mech = { outcome: null, pass: false, candidate: '', base: '', ref: opts.ref || opts.candidate, mode, scope, class: {}, checks, gaps, blocked, screens: null, pairs: [], inventory: null, evidence: null, timings: {} };
   const kids = [], cleanups = [];
   const finish = () => {
     for (const k of kids) try { k.kill(); } catch {}
@@ -73,7 +73,7 @@ export async function evaluate(opts) {
   mech.candidate = rev(opts.candidate);
   if (!mech.base) { block(`the base ${opts.base} does not resolve`); return finish(); }
   if (!mech.candidate) { check('candidate exists', false, `no commit for ${opts.candidate}`); return finish(); }
-  if (!quick) {
+  {
     // gate.mjs runs itself from a worktree of the base when its checkout's tools differ; this is the backstop for a base that moved
     // while it started
     const stale = toolsDiffer(root, mech.base);
@@ -118,12 +118,16 @@ export async function evaluate(opts) {
   // The reach (gate-simplify.md X1) is filled once the identities are known, under "plan the evidence" below.
   const reachIds = new Set();
   const inReach = (x) => reachIds.has(x.id);
-  const byFiles = effectiveClass({ declared, files, diffs: [], scope, shared });
-  mech.class = { declared, effective: byFiles.cls, why: byFiles.why };
-  if (byFiles.cls !== declared) log(`class: ${declared} → ${byFiles.cls} (${byFiles.why.join('; ')})`);
+  // The class is the gate's, from the change itself (gate-simplify.md X6): shared when it touches the shared system, behaviour when
+  // it changes a script a page can run, copy when it changes only the strings, presentation otherwise; then raised by what moved.
+  const fileClass = classOfFiles(files);
+  const sharedByFiles = touched.length > 0;
+  const byFiles = effectiveClass({ declared: fileClass, files, diffs: [], scope, shared });
+  mech.class = { effective: byFiles.cls, why: byFiles.why };
+  log(`class: ${byFiles.cls}${byFiles.why.length ? ` (${byFiles.why.join('; ')})` : ''}`);
   // A shared-component change is held to no worse than main on legibility (README, Legibility gate); otherwise strict while the
   // README says so. Known before anything is shot, so the visits know whether base needs its legibility audit.
-  const strictLeg = declared !== 'shared' && /^Legibility gate: strict\s*$/m.test(fs.readFileSync(path.join(S.cand.dir, 'docs/design-workflow/README.md'), 'utf8'));
+  const strictLeg = !sharedByFiles && /^Legibility gate: strict\s*$/m.test(fs.readFileSync(path.join(S.cand.dir, 'docs/design-workflow/README.md'), 'utf8'));
   mark('setup');
 
   // ---------- the evidence store and the identities ----------
@@ -144,7 +148,7 @@ export async function evaluate(opts) {
   const blob = (side, f) => S[side].tree.get(f) || 'missing';
   const harness = (side) => ({ bare: blob(side, 'ux/system/atlas-bare.js'), server: blob(side, 'scripts/serve-ux.cjs'), fonts: blobsHash(S[side].tree, S[side].runtime.filter((f) => f.startsWith('vendor/fonts/'))) });
   const bundleGap = new Set();
-  const inputsMemo = new Map();
+  const inputsMemo = new Map(), iiOf = new Map();
   // atlas/atlas.json reaches every page through the bare harness, which hands a page only what renders of the screens on it (the
   // harness's rendered(); renderDef in scripts/atlas-screens.mjs). So an identity whose closure holds atlas.json hashes that, per page
   // in the closure, instead of the file's blob: a notes edit, an approval or a regenerated atlas re-shoots nothing (#192, 2026-10-17:
@@ -163,7 +167,7 @@ export async function evaluate(opts) {
     if (inputsMemo.has(k)) return inputsMemo.get(k);
     const tree = S[side].tree;
     let ii = null;
-    try { ii = identityInputs(S[side].side, id); } catch (e) { gaps.push(`identityInputs(${side}, ${id}) threw (${e.message}): its identity hashes every page-loadable file`); }
+    try { ii = identityInputs(S[side].side, id); iiOf.set(side + ' ' + id, ii); } catch (e) { gaps.push(`identityInputs(${side}, ${id}) threw (${e.message}): its identity hashes every page-loadable file`); }
     const ds = componentPage(id);
     // a feature screen's definition is what renders of its atlas entry (renderDef): its notes and status draw nothing
     const def = ds ? S[side].ds.find((x) => x.id === id) : renderDef(S[side].screens.find((x) => x.id === id));
@@ -260,23 +264,20 @@ export async function evaluate(opts) {
   // whose shot identity differs between base and candidate, and every screen only one side has. A screen with the same identity on
   // both sides shares one shot, so its diff is 0 by definition: shooting it proved nothing, and the tripwire and "every screen" for
   // CSS that did were removed. Identity completeness is the guarantee (gate-v2.md §3, the stylesheet syntax the analyser checks), and
-  // `--audit` checks it off the merge path. The scope's own screens stay in (until X7); a --quick self-check takes the scope only, and
-  // the component pages when the change edits a component. A screen in the reach is shot at RUNS (EN 390 and 360, ZH 360; a
+  // `--audit` checks it off the merge path. The scope is a declaration only (X7): it brings in no screen of its own. A screen in the
+  // reach is shot at RUNS (EN 390 and 360, ZH 360; a
   // component page in EN only) and gets its visit checks; nothing else is shot.
   const sideList = (k) => [...S[k].screens, ...S[k].ds];
   const idAt = (side, x) => shotId(side, x, 390, 'en', componentPage(x.id) ? 'grid' : 'screen');
-  if (audit) for (const x of sideList('base')) reachIds.add(x.id);
-  else if (quick) {
-    const feats = new Set([...scope, ...(componentsTouched(files).length ? [DS_FEATURE] : [])]);
-    for (const x of [...sideList('base'), ...sideList('cand')]) if (feats.has(x.feature)) reachIds.add(x.id);
-  } else {
+  const identityChanged = new Set();
+  if (audit) { for (const x of sideList('base')) reachIds.add(x.id); mech.reach = { screens: reachIds.size, of: total, why: ['audit: every screen of the base'] }; }
+  else {
     const d = identityDiff({ base: sideList('base'), cand: sideList('cand'), idOf: idAt });
     for (const id of [...d.changed, ...d.added, ...d.removed]) reachIds.add(id);
-    for (const x of [...sideList('base'), ...sideList('cand')]) if (scope.includes(x.feature)) reachIds.add(x.id);
-    mech.reach = { screens: reachIds.size, of: total, changed: d.changed.length, added: d.added.length, removed: d.removed.length, scope: reachIds.size - d.changed.length - d.added.length - d.removed.length };
+    for (const id of d.changed) identityChanged.add(id);
+    mech.reach = { screens: reachIds.size, of: total, changed: d.changed.length, added: d.added.length, removed: d.removed.length };
   }
-  if (audit || quick) mech.reach = { screens: reachIds.size, of: total, why: [audit ? 'audit: every screen of the base' : 'quick: the scope only, and the component pages of a change to a component'] };
-  log(`reach: ${reachIds.size} of ${total} screens${mech.reach.changed !== undefined ? ` (${mech.reach.changed} whose identity changed, ${mech.reach.added} added, ${mech.reach.removed} removed; the rest the scope's)` : ` (${mech.reach.why[0]})`}`);
+  log(`reach: ${reachIds.size} of ${total} screens${mech.reach.changed !== undefined ? ` (${mech.reach.changed} whose identity changed, ${mech.reach.added} added, ${mech.reach.removed} removed)` : ` (${mech.reach.why[0]})`}`);
   const runsOf = (x) => (inReach(x) ? RUNS.filter((r) => !componentPage(x.id) || r.lang === 'en').map(({ width, lang }) => ({ width, lang })) : []);
   const visitChecks = (side, x, width, lang) => {
     if (audit || !inReach(x) || componentPage(x.id)) return [];
@@ -551,13 +552,29 @@ export async function evaluate(opts) {
   mark('pairs');
 
   // ---------- 5. the class, now that the screens are known; the checks that follow from it ----------
-  const ec = effectiveClass({ declared, files, diffs: moved, scope, shared });
-  mech.class = { declared, effective: ec.cls, why: ec.why };
-  if (declared !== 'shared' && mode !== 'refactor') {
+  const ec = effectiveClass({ declared: fileClass, files, diffs: moved, scope, shared });
+  mech.class = { effective: ec.cls, why: ec.why };
+  // P2, known reach: a change that touches no shared file moves only the scope's screens. A change to the shared system is judged on
+  // every feature it moves instead.
+  if (!sharedByFiles && mode !== 'refactor') {
     const outside = ec.outside || [];
-    check('known reach: only SCOPE moved (P2)', !outside.length, outside.length ? `declared ${declared} for ${scope.join(', ')} but moves ${outside.length} screen(s) of ${[...new Set(outside.map((d) => d.feature))].join(', ')} (${outside.slice(0, 3).map((d) => d.id).join(', ')}): give your part its own rule or token, or make it a declared shared change` : '');
+    check('known reach: only SCOPE moved (P2)', !outside.length, outside.length ? `scope ${scope.join(', ') || '(none)'}, but it moves ${outside.length} screen(s) of ${[...new Set(outside.map((d) => d.feature))].join(', ')} (${outside.slice(0, 3).map((d) => d.id).join(', ')}): give your part its own rule or token, or name those features in --scope` : '');
   }
-  if (ec.cls !== byFiles.cls) log(`class: ${declared} → ${ec.cls} (${ec.why.join('; ')})`);
+  if (ec.cls !== byFiles.cls) log(`class: ${byFiles.cls} → ${ec.cls} (${ec.why.join('; ')})`);
+  // G15 (owner, 2026-10-18): a change that alters what a screen runs (a page script, a shared helper, a bundle unit) but leaves it
+  // drawn the same needs a walk, refactors included. One screen per page is named; the verdict walks each one named.
+  {
+    const scripts = files.filter((f) => /\.(m?js|cjs)$/i.test(f) && S.cand.runtime.includes(f));
+    const same = new Set((screens.same || []).map((s) => s.id));
+    const perPage = new Map();
+    for (const id of [...identityChanged].filter((i) => same.has(i) && !componentPage(i)).sort()) {
+      const ii = iiOf.get('cand ' + id), x = S.cand.screens.find((s) => s.id === id);
+      if (!ii || !x || !scripts.some((f) => ii.files.includes(f))) continue;
+      if (!perPage.has(pageOf(x.url))) perPage.set(pageOf(x.url), id);
+    }
+    mech.walkNeed = [...perPage.values()];
+    if (mech.walkNeed.length) log(`walk: ${mech.walkNeed.length} screen(s) run changed code and draw the same (G15): ${mech.walkNeed.slice(0, 5).join(', ')}${mech.walkNeed.length > 5 ? ' …' : ''}`);
+  }
   if (mode === 'refactor') check('refactor: every screen identical', !moved.length, moved.map((s) => s.id).slice(0, 5).join(', '));
   const tools = touchesTools(files);
   const readCand = (p) => { const f = path.join(S.cand.dir, p); return fs.existsSync(f) ? fs.readFileSync(f, 'utf8') : null; };
@@ -682,7 +699,7 @@ export async function evaluate(opts) {
 
   // ---------- 7. scenario leaves: the reach's leaves (and the scope's), on the candidate; the failing ones on base ----------
   // The reach's leaves (gate-simplify.md X1): every leaf whose evidence identity differs between base and candidate at some run, and
-  // every leaf base doesn't have. The scope's features run every leaf (until X7); --quick runs only those.
+  // every leaf base doesn't have.
   const specOf = (side, f) => { try { return JSON.parse(fs.readFileSync(path.join(S[side].dir, 'features', f, 'scenarios.json'), 'utf8')); } catch { return null; } };
   const featuresWithLeaves = (side) => (fs.existsSync(path.join(S[side].dir, 'features')) ? fs.readdirSync(path.join(S[side].dir, 'features')).filter((f) => fs.existsSync(path.join(S[side].dir, 'features', f, 'scenarios.json'))) : []);
   const leafPlan = [];
@@ -764,7 +781,7 @@ export async function evaluate(opts) {
     return reportOf({ feature: f, commit: S[side].sha, base: S[side].url, langs: plan.langs, widths: plan.widths, nodeCount: plan.nodeCount, rows });
   };
   const leafSet = new Set(), unreadable = new Set();
-  if (!quick) {
+  {
     const idOf = (p) => new Map(p.its.filter((i) => i.kind).map((i) => [`${i.leaf.node.id} ${i.lang}-${i.width}`, i.id]));
     for (const f of featuresWithLeaves('cand')) {
       const pc = leafItemsOf('cand', f, null);
@@ -779,12 +796,12 @@ export async function evaluate(opts) {
   const leafFeatures = featuresWithLeaves('cand').filter((f) => {
     const spec = specOf('cand', f);
     const ids = spec ? walkTree(spec).leaves.map((l) => l.node.id) : [];
-    return scope.includes(f) || unreadable.has(f) || ids.some((id) => leafSet.has(id));
+    return unreadable.has(f) || ids.some((id) => leafSet.has(id));
   });
   const noLeaves = [...new Set([...scope, ...moved.map((s) => s.feature)])].filter((f) => f !== DS_FEATURE && !featuresWithLeaves('cand').includes(f));
   mech.leaves = {};
   await Promise.all(leafFeatures.map(async (f) => {
-    const only = scope.includes(f) || unreadable.has(f) ? null : new Set(walkTree(specOf('cand', f)).leaves.map((l) => l.node.id).filter((id) => leafSet.has(id)));
+    const only = unreadable.has(f) ? null : new Set(walkTree(specOf('cand', f)).leaves.map((l) => l.node.id).filter((id) => leafSet.has(id)));
     const plan = leafItemsOf('cand', f, only);
     if (!plan) { check(`scenarios ${f}`, false, 'features/' + f + '/scenarios.json is unreadable'); return; }
     if (plan.problems) { check(`scenarios ${f}`, false, `the tree is malformed: ${plan.problems.slice(0, 2).join('; ')}`); return; }

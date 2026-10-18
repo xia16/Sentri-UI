@@ -2,13 +2,14 @@
 // before/after pairs the judge decides on (§3-4). The work is scripts/evaluate.mjs (gate v2, docs/design-workflow/gate-v2.md):
 // evaluate(base, candidate, mode) → pass | fail | blocked. This file parses arguments, holds the machine's one-gate lock, writes
 // mechanical.json and checks the judge's verdict.
-// Usage: node scripts/gate.mjs --candidate <ref> --scope <feature,...> [--class copy|presentation|behaviour|shared]
-//                              [--mode normal|refactor] [--out <dir>] [--quick] [--keep] [--base <ref>]
+// Usage: node scripts/gate.mjs --candidate <ref> [--scope <feature,...>] [--mode normal|refactor] [--out <dir>] [--keep] [--base <ref>]
 //        node scripts/gate.mjs --verdict <out> [--base <ref>]
 //        node scripts/gate.mjs --audit [--out <dir>]
 //   --candidate  the branch (or commit) to merge; it must already contain the base (merge main forward first)
-//   --scope      the features the change means to touch; a changed screen elsewhere makes it a shared-component change
-//   --quick      compare only the scope's screens (a builder's self-check; the gate itself never runs quick)
+//   --scope      the features the change means to touch: a declaration for the known-reach check only (a change that touches no
+//                shared file and moves another feature's screen fails). It brings no screen or leaf into the reach.
+//   The class (copy, presentation, behaviour, shared) is the gate's, from the change itself: there is no --class, and no --quick
+//   (a full gate of a local change takes minutes; gate-simplify.md X3, X6).
 //   --audit      not a gate: every screen of main drawn afresh at every run and compared with the stored shot of the same identity.
 //                A difference is an identity that misses an input, or a screen that doesn't draw the same twice (gate-simplify.md
 //                K12). Run it by hand, weekly; it posts nothing and passes nothing.
@@ -31,7 +32,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { CLASSES, checkVerdict, calibrationProblems, lockState, passesWithoutJudge, carryJudgements } from './loop-rules.mjs';
+import { checkVerdict, calibrationProblems, lockState, passesWithoutJudge, carryJudgements } from './loop-rules.mjs';
 import { selfStart } from './process-start.mjs';
 import { postStatus as post } from './github.mjs';
 import { evaluate, toolsDiffer } from './evaluate.mjs';
@@ -75,7 +76,7 @@ if (!process.env.SENTRI_GATE_TOOLS) {
 }
 
 // ---------- one gate at a time ----------
-// Two gates on one machine starve each other's browsers into timeouts (#164), so every gate run, a builder's --quick included, and a
+// Two gates on one machine starve each other's browsers into timeouts (#164), so every gate run, an audit included, and a
 // --verdict that has to gate again, holds one lock beside the pass records for its whole run. A second gate waits; a lock whose
 // process is gone, or whose pid now belongs to another process (a reboot reuses pids), is stale and is taken over: the lock records
 // its process's start time beside the pid (scripts/process-start.mjs). The lock goes on every exit: finish, a signal, a crash.
@@ -128,7 +129,7 @@ async function acquireLock(ref) {
 // One mechanical gate run, under the lock: evaluate(), then mechanical.json. A change that moves no screen has nothing to judge, so
 // its pass is the gate pass: it posts the sentri/gate status (which branch protection on main requires) and the pass record the
 // merge guard reads. Never for a run against a test base.
-async function runGate({ ref, base, out, mode, scope, declared, quick = false, audit = false, keep = false }) {
+async function runGate({ ref, base, out, mode, scope, audit = false, keep = false }) {
   fs.mkdirSync(out, { recursive: true });
   // A rerun into the same folder starts clean: old shots, pairs and verdicts are about a mechanical run that no longer exists.
   for (const f of ['shots', 'pairs', 'leaves', 'scenarios', 'npm-test.log', 'mechanical.json', ...fs.readdirSync(out).filter((f) => VERDICT_FILE.test(f))]) fs.rmSync(path.join(out, f), { recursive: true, force: true });
@@ -140,10 +141,10 @@ async function runGate({ ref, base, out, mode, scope, declared, quick = false, a
   if (candidate && !audit) fs.rmSync(passRecord(candidate), { force: true }); // a new gate run voids any earlier pass for this commit until its verdict
   let res;
   try {
-    res = await evaluate({ root, out, base, candidate: ref, ref, mode, scope, declared, quick, audit, keep, env, testBase });
+    res = await evaluate({ root, out, base, candidate: ref, ref, mode, scope, audit, keep, env, testBase });
   } catch (e) {
     console.error(e.stack || e);
-    res = { outcome: 'blocked', mech: { outcome: 'blocked', pass: false, ref, mode, scope, class: { declared }, blocked: [`the gate crashed: ${String(e.message || e).split('\n')[0]}`], checks: [], gaps: [], pairs: [] } };
+    res = { outcome: 'blocked', mech: { outcome: 'blocked', pass: false, ref, mode, scope, class: {}, blocked: [`the gate crashed: ${String(e.message || e).split('\n')[0]}`], checks: [], gaps: [], pairs: [] } };
   }
   const mech = { ...res.mech, waited: waited + 's', testBase: testBase || undefined };
   if (!testBase && !audit && passesWithoutJudge(mech)) {
@@ -159,7 +160,7 @@ async function runGate({ ref, base, out, mode, scope, declared, quick = false, a
   console.log(`\ntimings (s): ${Object.entries(t).map(([k, v]) => `${k} ${v}`).join(', ')}`);
   if (mech.evidence) console.log(`evidence: ${JSON.stringify(mech.evidence.byKind || {})}; scheduler ${JSON.stringify(mech.evidence.scheduler?.busy || {})}`);
   const word = (audit ? { pass: 'AUDIT PASS', fail: 'AUDIT FAIL', blocked: 'AUDIT BLOCKED' } : { pass: 'MECHANICAL PASS', fail: 'MECHANICAL FAIL', blocked: 'MECHANICAL BLOCKED' })[mech.outcome] || 'MECHANICAL FAIL';
-  console.log(`${word} ${short(mech.candidate)} on base ${short(mech.base)} (${mech.class?.effective || declared}, ${mode}) — ${out}`);
+  console.log(`${word} ${short(mech.candidate)} on base ${short(mech.base)} (${mech.class?.effective || '?'}, ${mode}) — ${out}`);
   for (const b of mech.blocked || []) console.log('  blocked:', b);
   if (mech.gatePass) console.log(`GATE PASS (no screen moved, so no judge): gh pr merge <n> --squash --match-head-commit ${mech.candidate}`);
   return mech;
@@ -183,10 +184,9 @@ if (opt('verdict')) {
   // A moved head or main never voids the work on its own (gate-v2.md §3): gate the new head against the new main, reusing every
   // result whose identity is unchanged, and carry every judgement whose pair still shows the same two images.
   if (head !== mech.candidate || main !== mech.base) {
-    if (mech.quick) { console.log(`GATE FAIL ${short(mech.candidate)}\n  - the judged run was --quick: gate it in full`); process.exit(1); }
     console.log(`${mech.ref} is ${short(head)} and ${mainRef} is ${short(main)} since the gate ran on ${short(mech.candidate)} against ${short(mech.base)}: gating again, reusing every result and judgement whose identity is unchanged`);
     const again = path.join(dir, `regate-${short(head)}-${short(main)}`);
-    const now = await runGate({ ref: mech.ref, base: mainRef, out: again, mode: mech.mode, scope: mech.scope, declared: mech.class?.declared || 'presentation' });
+    const now = await runGate({ ref: mech.ref, base: mainRef, out: again, mode: mech.mode, scope: mech.scope });
     if (now.outcome !== 'pass') { console.log(`GATE FAIL ${short(now.candidate)}\n  - the mechanical gate on the new head and main: ${now.outcome}${(now.blocked || [])[0] ? ` (${now.blocked[0]})` : ''}`); process.exit(1); }
     const { carried, need, goneNeed, walkNeed = [], problems: refused } = carryJudgements({ mech, parts }, now);
     if (refused.length) { console.log(`GATE FAIL ${short(now.candidate)}: the judged run's verdicts can't be carried`); for (const p of refused) console.log('  -', p); process.exit(1); }
@@ -212,6 +212,8 @@ if (opt('verdict')) {
   const v = checkVerdict(verdict, mech);
   // a screen whose walk could not carry (same picture, changed inputs) needs a walk in this verdict
   for (const s of new Set(cat('walkNeed'))) if (!verdict.walk.some((w) => w.screen === s)) v.problems.push(`walk ${s} again: it looks the same as when it was walked, but its inputs changed`);
+  // G15: a screen that runs changed code and draws the same is walked
+  for (const s of mech.walkNeed || []) if (!verdict.walk.some((w) => w.screen === s)) v.problems.push(`walk ${s}: it runs changed code and draws the same (G15)`);
   const calFile = path.join(root, 'docs/design-workflow/calibration/answers.json');
   if (fs.existsSync(calFile)) v.problems.push(...calibrationProblems(parts, JSON.parse(fs.readFileSync(calFile, 'utf8')).pairs));
   if (head !== mech.candidate) v.problems.push(`${mech.ref} moved to ${short(head)} while the gate ran on ${short(mech.candidate)}: run --verdict again`);
@@ -251,21 +253,21 @@ if (argv.includes('--carry')) {
 // ---------- --audit: the identities, checked off the merge path ----------
 if (flag('audit')) {
   const out = path.resolve(opt('out') || path.join(os.tmpdir(), `sentri-audit-${Date.now()}`));
-  const mech = await runGate({ ref: mainRef, base: mainRef, out, mode: 'normal', scope: [], declared: 'presentation', audit: true });
+  const mech = await runGate({ ref: mainRef, base: mainRef, out, mode: 'normal', scope: [], audit: true });
   for (const d of (mech.audit?.differ || []).slice(0, 20)) console.log(`  - ${d.screen} ${d.run}: ${d.pct}% different from the stored shot of identity ${short(d.identity)}`);
   process.exit(mech.outcome === 'pass' ? 0 : mech.outcome === 'blocked' ? 3 : 1);
 }
 
 const ref = opt('candidate');
-const declared = opt('class') || 'presentation';
+for (const gone of ['quick', 'class']) if (argv.includes('--' + gone)) { console.log(`--${gone} is gone (gate-simplify.md X3, X6): the gate derives the class itself, and a full run of a local change takes minutes`); process.exit(2); }
 const mode = opt('mode') || 'normal';
 const scope = (opt('scope') || '').split(',').map((s) => s.trim()).filter(Boolean);
-if (!ref || !CLASSES.includes(declared) || !['normal', 'refactor'].includes(mode) || (mode === 'normal' && !scope.length)) {
-  console.error('usage: node scripts/gate.mjs --candidate <ref> --scope <feature,...> [--class copy|presentation|behaviour|shared] [--mode normal|refactor] [--out <dir>] [--quick] [--keep] [--base <ref>]');
+if (!ref || !['normal', 'refactor'].includes(mode)) {
+  console.error('usage: node scripts/gate.mjs --candidate <ref> [--scope <feature,...>] [--mode normal|refactor] [--out <dir>] [--keep] [--base <ref>]');
   console.error('       node scripts/gate.mjs --verdict <out dir> [--base <ref>]');
   console.error('       node scripts/gate.mjs --audit [--out <dir>]');
   process.exit(2);
 }
 const out = path.resolve(opt('out') || path.join(os.tmpdir(), `sentri-gate-${Date.now()}`));
-const mech = await runGate({ ref, base: mainRef, out, mode, scope, declared, quick: flag('quick'), keep: flag('keep') });
+const mech = await runGate({ ref, base: mainRef, out, mode, scope, keep: flag('keep') });
 process.exit(mech.outcome === 'pass' ? 0 : mech.outcome === 'blocked' ? 3 : 1);

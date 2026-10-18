@@ -555,3 +555,25 @@ test('leaf: a fresh failure is stored only when a confirming run fails too; a pa
   assert.equal(reusableLeaf({ run: { result: 'fail' } }), false, 'an unconfirmed stored failure is run again');
   assert.equal(reusableLeaf(null), false);
 });
+
+// ---------- gate-simplify.md step 5: the gate's own class (X6), and walks for code that draws the same (G15) ----------
+test('the class comes from the change: behaviour for a page-runnable script, copy for the strings alone, presentation otherwise', async () => {
+  const { classOfFiles, effectiveClass } = await import('../scripts/loop-rules.mjs');
+  assert.equal(classOfFiles(['ux/system/inspection-astra-concept.js']), 'behaviour');
+  assert.equal(classOfFiles(['ux/design-system/components/bundle.js', 'docs/x.md']), 'behaviour');
+  assert.equal(classOfFiles(['ux/laws/strings.json']), 'copy');
+  assert.equal(classOfFiles(['ux/laws/strings.json', 'ux/system/page.css']), 'presentation');
+  assert.equal(classOfFiles(['scripts/gate.mjs', 'docs/design-workflow/README.md']), 'presentation', 'the gate\'s tools run no page');
+  // the shared system and moved screens outside the scope still raise it
+  assert.equal(effectiveClass({ declared: classOfFiles(['ux/design-system/components/bundle.css']), files: ['ux/design-system/components/bundle.css'], diffs: [], scope: [] }).cls, 'shared');
+});
+
+test('a change that moves no screen but runs changed code needs a walk (G15), and its verdict passes on that walk', async () => {
+  const { passesWithoutJudge, checkVerdict } = await import('../scripts/loop-rules.mjs');
+  const mech = { pass: true, outcome: 'pass', candidate: 'C', base: 'M', mode: 'normal', class: { effective: 'behaviour' }, screens: { diff: [], new: [], gone: [], same: [{ id: 'a' }] }, pairs: [] };
+  assert.equal(passesWithoutJudge(mech), true);
+  assert.equal(passesWithoutJudge({ ...mech, walkNeed: ['a'] }), false, 'a judge walks it first');
+  const v = { pass: true, candidate: 'C', base: 'M', calibration: [], pairs: [], defects: [], walk: [{ screen: 'a', ok: true }] };
+  assert.deepEqual(checkVerdict(v, { ...mech, walkNeed: ['a'] }).problems, [], 'the gate\'s own class is what makes a no-pixel change a behaviour change');
+  assert.match(checkVerdict(v, { ...mech, class: { effective: 'presentation' } }).problems.join(' | '), /class presentation/);
+});

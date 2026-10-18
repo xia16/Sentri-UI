@@ -7,7 +7,7 @@ Every check below tests one of the [workflow principles](../principles.md) and n
 The driver fills in:
 - **CANDIDATE**: the exact merge candidate. That is the branch with `origin/main` merged in, and its commit hash.
 - **BASE**: `origin/main` at that moment, and its hash.
-- **CLASS**: copy · presentation · behaviour · shared component.
+- **CLASS**: the gate's, from the change itself (`mechanical.json`'s `class`): **shared** when it touches the shared system, **behaviour** when it changes a script a page can run, **copy** when it changes only the strings registry, **presentation** otherwise, then raised by what moved. Nobody declares it (gate-simplify.md X6).
 - **MODE**: normal or **refactor** (nothing visible may change).
 - **SCREENS**: the screens in scope. For a shared component, that is every screen of every feature using it (search `atlas/atlas.json`).
 - **REFERENCES**: the builder's references table and baselines (build brief §1).
@@ -38,7 +38,7 @@ Judge from those pairs and write `verdict.json` beside them. `node scripts/gate.
 
 `--verdict` also posts the result as the `sentri/gate` commit status on GitHub. Every GitHub call the gate makes (the queue, PR files, statuses) is tried twice more after a network error (EOF, TLS, a timeout, a 5xx); after that it says `GitHub could not be reached`, which is not a queue verdict or a status: run it again. An answer from GitHub is never retried. A branch-protection rule on main that requires it makes GitHub refuse an ungated merge however it is attempted. The local merge guard (`scripts/merge-guard.mjs`) only stops our own sessions early and says why; it is not the boundary.
 
-**A change that moves no screen** (nothing changed, new or gone, and so no pair to judge) merges on the mechanical gate alone. A full run that passes then posts the `sentri/gate` status and the pass record itself, with `GATE PASS … · no screen moved`, so branch protection on main does not wait on a judge who has nothing to judge. A `--quick` run never does.
+**A change that moves no screen** (nothing changed, new or gone, and so no pair to judge) merges on the mechanical gate alone, **unless it changes what a screen runs** (G15, owner 2026-10-18, refactors included): a screen whose page script, shared helper or bundle unit changed but that draws the same is listed in `mechanical.json`'s `walkNeed`, one screen per page, and a judge walks each one (§2) and writes it under `walk`; `--verdict` refuses a verdict that leaves one unwalked. A full run that passes then posts the `sentri/gate` status and the pass record itself, with `GATE PASS … · no screen moved`, so branch protection on main does not wait on a judge who has nothing to judge.
 
 A shared change that touches too many screens for one judge is split by feature. Each judge writes `verdict-<feature>.json`, and `--verdict` merges them: one failing part fails the change. A part's `pass` is about its own pairs: no worse or failed pair, no defect, no failed walk and no contradicted claim. "At least one pair better" is the whole change's, and `--verdict` applies it over every part together, so a part that is all "same", or all new screens, passes on its own. `check-states` runs on both sides for every class. A problem main already has is reported as main's, and only a new one fails.
 
