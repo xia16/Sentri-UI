@@ -122,7 +122,8 @@ With most gates at 1–3 minutes, the lock queue shrinks with them, so G11 (smal
    the identity can carry the reach alone. Then the reach set, the tripwire, `--all`, `identityMisses` and `widenByIdentity` are
    cut, and `--audit` is added. `reachOf` stays in `static-reach.mjs` for its tests and the planning step (change-map); the gate
    no longer calls it.
-3. S3: checker identities hash only what computes.
+3. **Done (2026-10-18):** S3: checker identities hash only what computes. `scripts/playwright-path.mjs` and
+   `scripts/process-start.mjs` are left out of every code closure (`NOT_RESULTS` in evidence.mjs).
 4. S4, S5, X8: the run matrix.
 5. X3, X6, X7: the flags.
 6. G2 (X4, X5), with the GitHub setting.
