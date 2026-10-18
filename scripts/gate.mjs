@@ -19,7 +19,7 @@
 // It judges with the base's own tools, never the candidate's: a candidate does not grade itself with its own gate. Run from a
 // checkout whose tools differ from the base (any branch, a stale main), it runs itself from a worktree of the base instead.
 // Writes <out>/mechanical.json and, for every changed, new or removed screen, <out>/pairs/<screen>/<lang>-<width>.png
-// (base | candidate) at 390 and 360 in EN and ZH. The design system's variant pages are screens here too (ds:<Name>/<variant>).
+// (base | candidate) at EN 390, EN 360 and ZH 360. The design system's variant pages are screens here too (ds:<Name>/<variant>).
 // Exit 0 when every mechanical check passes, 1 when one fails, 3 when the gate is blocked (it could not establish the evidence).
 // The judge (gate.md) then writes <out>/verdict.json, and `node scripts/gate.mjs --verdict <out>` checks it against mechanical.json,
 // the PR head and origin/main. When the head or main has moved since, --verdict gates the new head against the new main (reusing
