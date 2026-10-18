@@ -90,6 +90,27 @@
                   ]
                 },
                 {
+                  "type": "action", "id": "hr-t6.save", "label": "Tap Save · 2 pigs",
+                  "taps": ["[data-action=\"bulk-save\"]"],
+                  "children": [
+                    {
+                      "type": "outcome", "id": "hr-t6-saved-toast", "tree": "T-6",
+                      "label": "Saving lands on the walk list, where a toast says what was recorded and for how many pigs",
+                      "gwt": { "given": "A worker has set a dosage for two pigs on Record treatment.",
+                               "when": "They tap Save.",
+                               "then": "The form closes onto the walk list and a message says the treatment was recorded for 2 pigs." },
+                      "authority": [
+                        { "src": "RUL", "at": "Design law: Feedback after saving (owner, 2026-10-18)", "says": "The result is not visible: a Toast, what was done and for whom" }
+                      ],
+                      "visible": [
+                        { "el": "[data-bulk-key=\"dose\"]", "is": "absent", "says": "the form has closed" },
+                        { "text": { "en": "Treatment recorded", "zh": "治疗已记录" }, "in": "phone" },
+                        { "text": { "en": "2 pigs", "zh": "2 头猪" }, "in": "phone" }
+                      ]
+                    }
+                  ]
+                },
+                {
                   "type": "action", "id": "hr-t5.leave-reopen", "label": "Back out of the form, then open Record treatment again",
                   "taps": ["[data-action=\"back\"]",
                            { "expect": [{ "el": "[data-bulk-key=\"dose\"]", "is": "absent", "says": "the form has closed" }] },
