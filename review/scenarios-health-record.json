@@ -1,0 +1,513 @@
+{
+ "feature": "health-record",
+ "commit": "6355fee428dbaba45b3b5f64664bf5bcff80d8a1",
+ "dirty": true,
+ "ran": "2026-10-18T03:24:47.810Z",
+ "base": "http://localhost:64843",
+ "langs": [
+  "en",
+  "zh"
+ ],
+ "widths": [
+  360,
+  390
+ ],
+ "nodes": {
+  "entry": 1,
+  "state": 1,
+  "outcome": 5,
+  "action": 4
+ },
+ "summary": {
+  "pass": 5,
+  "fail": 0,
+  "blocked": 0,
+  "pending": 0,
+  "slow": 0
+ },
+ "byLang": {
+  "en": {
+   "pass": 5,
+   "fail": 0,
+   "blocked": 0
+  },
+  "zh": {
+   "pass": 5,
+   "fail": 0,
+   "blocked": 0
+  }
+ },
+ "byBranch": {
+  "hr-t.entry": {
+   "pass": 5,
+   "fail": 0,
+   "blocked": 0,
+   "pending": 0
+  }
+ },
+ "hardFailures": [],
+ "leaves": [
+  {
+   "id": "hr-t1-save-waits-for-dose",
+   "tree": "T-1",
+   "branch": "hr-t.entry",
+   "label": "Save waits until a dose is set, and no Adjust row shows before a dosage",
+   "gwt": {
+    "given": "A worker recording a treatment for two pigs has picked the medicine but typed no dosage.",
+    "when": "They look at the form.",
+    "then": "Save is waiting, and there is no row offering to adjust the doses."
+   },
+   "path": [
+    "hr-t.entry",
+    "hr-t.state",
+    "hr-t1-save-waits-for-dose"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "features/medicines, Hosts: Save",
+     "says": "Save waits until the shared dose is set, or every included pig has a typed dose."
+    },
+    {
+     "src": "PRD",
+     "at": "features/medicines, Hosts: several pigs",
+     "says": "no dosage, no row"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/health-record/hr-t1-save-waits-for-dose/en-360/00-start.png"
+     ],
+     "loadFailures": []
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/health-record/hr-t1-save-waits-for-dose/en-390/00-start.png"
+     ],
+     "loadFailures": []
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/health-record/hr-t1-save-waits-for-dose/zh-360/00-start.png"
+     ],
+     "loadFailures": []
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/health-record/hr-t1-save-waits-for-dose/zh-390/00-start.png"
+     ],
+     "loadFailures": []
+    }
+   ]
+  },
+  {
+   "id": "hr-t2-shared-dose-row",
+   "tree": "T-2",
+   "branch": "hr-t.entry",
+   "label": "One dosage applies to every pig: one row says so and offers Adjust; Save counts the pigs",
+   "gwt": {
+    "given": "A worker is recording a treatment for two pigs.",
+    "when": "They type a dosage of 2.5.",
+    "then": "A row reads 2 pigs at 2.5 mL each with Adjust, and Save is ready for both pigs."
+   },
+   "path": [
+    "hr-t.entry",
+    "hr-t.state",
+    "hr-t2.dose",
+    "hr-t2-shared-dose-row"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "features/medicines, Hosts: several pigs",
+     "says": "Once a dosage is typed, one navigate row under it reads \"2 pigs · 2.5 mL each\" with \"Adjust ›\""
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/health-record/hr-t2-shared-dose-row/en-360/00-start.png",
+      "review/scenarios/health-record/hr-t2-shared-dose-row/en-360/01-fill-data-bulk-key-dose.png"
+     ],
+     "loadFailures": []
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/health-record/hr-t2-shared-dose-row/en-390/00-start.png",
+      "review/scenarios/health-record/hr-t2-shared-dose-row/en-390/01-fill-data-bulk-key-dose.png"
+     ],
+     "loadFailures": []
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [
+      "\"Save · 2 pigs\" shown"
+     ],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/health-record/hr-t2-shared-dose-row/zh-360/00-start.png",
+      "review/scenarios/health-record/hr-t2-shared-dose-row/zh-360/01-fill-data-bulk-key-dose.png"
+     ],
+     "loadFailures": []
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [
+      "\"Save · 2 pigs\" shown"
+     ],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/health-record/hr-t2-shared-dose-row/zh-390/00-start.png",
+      "review/scenarios/health-record/hr-t2-shared-dose-row/zh-390/01-fill-data-bulk-key-dose.png"
+     ],
+     "loadFailures": []
+    }
+   ]
+  },
+  {
+   "id": "hr-t3-one-pig-adjusted",
+   "tree": "T-3",
+   "branch": "hr-t.entry",
+   "label": "A pig's own dose is kept and the form counts it as adjusted",
+   "gwt": {
+    "given": "A worker set a dosage of 2.5 for two pigs.",
+    "when": "On Dose per pig they give one pig 3 and go back.",
+    "then": "The form's row reads 2 pigs with 1 adjusted, and Save is still ready for both."
+   },
+   "path": [
+    "hr-t.entry",
+    "hr-t.state",
+    "hr-t2.dose",
+    "hr-t3.adjust",
+    "hr-t3-one-pig-adjusted"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "features/medicines, Hosts: several pigs",
+     "says": "typing a different value makes it that pig's own … (after changes: \"2 pigs · 1 adjusted\")"
+    },
+    {
+     "src": "PRD",
+     "at": "health-record Rules",
+     "says": "Treatment never implies identical doses across pigs."
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/health-record/hr-t3-one-pig-adjusted/en-360/00-start.png",
+      "review/scenarios/health-record/hr-t3-one-pig-adjusted/en-360/01-fill-data-bulk-key-dose.png",
+      "review/scenarios/health-record/hr-t3-one-pig-adjusted/en-360/02-data-action-pig-doses-open.png",
+      "review/scenarios/health-record/hr-t3-one-pig-adjusted/en-360/03-fill-data-bulk-value-000254.png",
+      "review/scenarios/health-record/hr-t3-one-pig-adjusted/en-360/04-data-action-back.png"
+     ],
+     "loadFailures": []
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/health-record/hr-t3-one-pig-adjusted/en-390/00-start.png",
+      "review/scenarios/health-record/hr-t3-one-pig-adjusted/en-390/01-fill-data-bulk-key-dose.png",
+      "review/scenarios/health-record/hr-t3-one-pig-adjusted/en-390/02-data-action-pig-doses-open.png",
+      "review/scenarios/health-record/hr-t3-one-pig-adjusted/en-390/03-fill-data-bulk-value-000254.png",
+      "review/scenarios/health-record/hr-t3-one-pig-adjusted/en-390/04-data-action-back.png"
+     ],
+     "loadFailures": []
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [
+      "\"Save · 2 pigs\" shown"
+     ],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/health-record/hr-t3-one-pig-adjusted/zh-360/00-start.png",
+      "review/scenarios/health-record/hr-t3-one-pig-adjusted/zh-360/01-fill-data-bulk-key-dose.png",
+      "review/scenarios/health-record/hr-t3-one-pig-adjusted/zh-360/02-data-action-pig-doses-open.png",
+      "review/scenarios/health-record/hr-t3-one-pig-adjusted/zh-360/03-fill-data-bulk-value-000254.png",
+      "review/scenarios/health-record/hr-t3-one-pig-adjusted/zh-360/04-data-action-back.png"
+     ],
+     "loadFailures": []
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [
+      "\"Save · 2 pigs\" shown"
+     ],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/health-record/hr-t3-one-pig-adjusted/zh-390/00-start.png",
+      "review/scenarios/health-record/hr-t3-one-pig-adjusted/zh-390/01-fill-data-bulk-key-dose.png",
+      "review/scenarios/health-record/hr-t3-one-pig-adjusted/zh-390/02-data-action-pig-doses-open.png",
+      "review/scenarios/health-record/hr-t3-one-pig-adjusted/zh-390/03-fill-data-bulk-value-000254.png",
+      "review/scenarios/health-record/hr-t3-one-pig-adjusted/zh-390/04-data-action-back.png"
+     ],
+     "loadFailures": []
+    }
+   ]
+  },
+  {
+   "id": "hr-t4-remove-pig",
+   "tree": "T-4",
+   "branch": "hr-t.entry",
+   "label": "Removing a pig takes it out of the treatment; the last pig cannot be removed",
+   "gwt": {
+    "given": "A worker is recording a treatment for two pigs with a dosage set.",
+    "when": "On Dose per pig they remove one pig and go back.",
+    "then": "Remove mode ends with one pig left, and the form saves the treatment for one pig."
+   },
+   "path": [
+    "hr-t.entry",
+    "hr-t.state",
+    "hr-t2.dose",
+    "hr-t4.remove",
+    "hr-t4-remove-pig"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "features/medicines, Hosts: several pigs",
+     "says": "Remove pigs … switches the list into remove mode … the last pig cannot be removed."
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/health-record/hr-t4-remove-pig/en-360/00-start.png",
+      "review/scenarios/health-record/hr-t4-remove-pig/en-360/01-fill-data-bulk-key-dose.png",
+      "review/scenarios/health-record/hr-t4-remove-pig/en-360/02-data-action-pig-doses-open.png",
+      "review/scenarios/health-record/hr-t4-remove-pig/en-360/03-data-action-dose-remove-mode-dat.png",
+      "review/scenarios/health-record/hr-t4-remove-pig/en-360/04-data-action-dose-remove-data-val.png",
+      "review/scenarios/health-record/hr-t4-remove-pig/en-360/05-data-action-back.png"
+     ],
+     "loadFailures": []
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/health-record/hr-t4-remove-pig/en-390/00-start.png",
+      "review/scenarios/health-record/hr-t4-remove-pig/en-390/01-fill-data-bulk-key-dose.png",
+      "review/scenarios/health-record/hr-t4-remove-pig/en-390/02-data-action-pig-doses-open.png",
+      "review/scenarios/health-record/hr-t4-remove-pig/en-390/03-data-action-dose-remove-mode-dat.png",
+      "review/scenarios/health-record/hr-t4-remove-pig/en-390/04-data-action-dose-remove-data-val.png",
+      "review/scenarios/health-record/hr-t4-remove-pig/en-390/05-data-action-back.png"
+     ],
+     "loadFailures": []
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [
+      "\"Save · 1 pig\" shown"
+     ],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/health-record/hr-t4-remove-pig/zh-360/00-start.png",
+      "review/scenarios/health-record/hr-t4-remove-pig/zh-360/01-fill-data-bulk-key-dose.png",
+      "review/scenarios/health-record/hr-t4-remove-pig/zh-360/02-data-action-pig-doses-open.png",
+      "review/scenarios/health-record/hr-t4-remove-pig/zh-360/03-data-action-dose-remove-mode-dat.png",
+      "review/scenarios/health-record/hr-t4-remove-pig/zh-360/04-data-action-dose-remove-data-val.png",
+      "review/scenarios/health-record/hr-t4-remove-pig/zh-360/05-data-action-back.png"
+     ],
+     "loadFailures": []
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [
+      "\"Save · 1 pig\" shown"
+     ],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/health-record/hr-t4-remove-pig/zh-390/00-start.png",
+      "review/scenarios/health-record/hr-t4-remove-pig/zh-390/01-fill-data-bulk-key-dose.png",
+      "review/scenarios/health-record/hr-t4-remove-pig/zh-390/02-data-action-pig-doses-open.png",
+      "review/scenarios/health-record/hr-t4-remove-pig/zh-390/03-data-action-dose-remove-mode-dat.png",
+      "review/scenarios/health-record/hr-t4-remove-pig/zh-390/04-data-action-dose-remove-data-val.png",
+      "review/scenarios/health-record/hr-t4-remove-pig/zh-390/05-data-action-back.png"
+     ],
+     "loadFailures": []
+    }
+   ]
+  },
+  {
+   "id": "hr-t5-draft-survives-reopen",
+   "tree": "T-5",
+   "branch": "hr-t.entry",
+   "label": "The treatment draft survives leaving the form and reopening it",
+   "gwt": {
+    "given": "A worker has picked Tulathromycin and typed a dosage of 2.5 for two pigs.",
+    "when": "They go Back out of the form and open Record treatment again for the same pigs.",
+    "then": "The form still has Tulathromycin and the 2.5 dosage."
+   },
+   "path": [
+    "hr-t.entry",
+    "hr-t.state",
+    "hr-t2.dose",
+    "hr-t5.leave-reopen",
+    "hr-t5-draft-survives-reopen"
+   ],
+   "authority": [
+    {
+     "src": "RUL",
+     "at": "Owner ruling B, 2026-10-16 (drawer levels)",
+     "says": "Footer Back keeps the draft"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/health-record/hr-t5-draft-survives-reopen/en-360/00-start.png",
+      "review/scenarios/health-record/hr-t5-draft-survives-reopen/en-360/01-fill-data-bulk-key-dose.png",
+      "review/scenarios/health-record/hr-t5-draft-survives-reopen/en-360/02-data-action-back.png",
+      "review/scenarios/health-record/hr-t5-draft-survives-reopen/en-360/03-data-action-treatment.png"
+     ],
+     "loadFailures": []
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/health-record/hr-t5-draft-survives-reopen/en-390/00-start.png",
+      "review/scenarios/health-record/hr-t5-draft-survives-reopen/en-390/01-fill-data-bulk-key-dose.png",
+      "review/scenarios/health-record/hr-t5-draft-survives-reopen/en-390/02-data-action-back.png",
+      "review/scenarios/health-record/hr-t5-draft-survives-reopen/en-390/03-data-action-treatment.png"
+     ],
+     "loadFailures": [
+      "/ux/system/farrowing-astra-concept.css?v=astra-consolidated-1 net::ERR_NO_BUFFER_SPACE"
+     ]
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [
+      "\"Tulathromycin\" shown"
+     ],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/health-record/hr-t5-draft-survives-reopen/zh-360/00-start.png",
+      "review/scenarios/health-record/hr-t5-draft-survives-reopen/zh-360/01-fill-data-bulk-key-dose.png",
+      "review/scenarios/health-record/hr-t5-draft-survives-reopen/zh-360/02-data-action-back.png",
+      "review/scenarios/health-record/hr-t5-draft-survives-reopen/zh-360/03-data-action-treatment.png"
+     ],
+     "loadFailures": []
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [
+      "\"Tulathromycin\" shown"
+     ],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/health-record/hr-t5-draft-survives-reopen/zh-390/00-start.png",
+      "review/scenarios/health-record/hr-t5-draft-survives-reopen/zh-390/01-fill-data-bulk-key-dose.png",
+      "review/scenarios/health-record/hr-t5-draft-survives-reopen/zh-390/02-data-action-back.png",
+      "review/scenarios/health-record/hr-t5-draft-survives-reopen/zh-390/03-data-action-treatment.png"
+     ],
+     "loadFailures": []
+    }
+   ]
+  }
+ ]
+}
