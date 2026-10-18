@@ -391,8 +391,9 @@ button.st-row:disabled{cursor:default}
 .sheet-body .st-choice-empty{padding-inline:0}
 /* In a picker sheet every option row is one height: one line and a wrapped two-line label both fit the 56px row. */
 .st-picker-body .st-choice-row.st-choice-row{padding-block:var(--space-8)}
-/* Search stays at the top of the sheet while the one list scrolls under it (sticky in the sheet body, never a second scroller). */
-.sheet-body>.st-picker-body>.st-choice-search,.sheet-body>*>.st-picker-body>.st-choice-search{position:sticky;top:calc(-1 * var(--space-section));z-index:1;margin:calc(-1 * var(--space-section)) calc(-1 * var(--space-gutter-sheet)) var(--space-12);padding:var(--space-section) var(--space-gutter-sheet) var(--space-8);background:var(--paper)}
+/* Search stays at the top of the sheet while the one list scrolls under it (sticky in the sheet body, never a second scroller).
+   Its paper bleeds to the sheet's edges by exactly the sheet body's gutter, so the body never scrolls sideways. */
+.sheet-body>.st-picker-body>.st-choice-search,.sheet-body>*>.st-picker-body>.st-choice-search{position:sticky;top:calc(-1 * var(--space-section));z-index:1;margin:calc(-1 * var(--space-section)) calc(-1 * var(--space-gutter)) var(--space-12);padding:var(--space-section) var(--space-gutter) var(--space-8);background:var(--paper)}
 .st-choice-empty{margin:0;padding:var(--space-24) var(--space-17);font:400 var(--font-size-13)/1.5 var(--font-sans);color:var(--st-muted)}
 
 /* 6 · Field cards (candidate, ADR 0001): Stepper, Measure, Numpad.
