@@ -396,7 +396,7 @@ button.st-row:disabled{cursor:default}
 /* Toast: what was just saved, on the ink above the page's dock (the Android snackbar). Solid, never see-through: it is read in sun
    and glare. A glyph says how it went (done: a check on the green; offline: no-signal, saved on this phone), the title what was done,
    the second line for whom or where it went. It rises in once and never takes a tap. */
-.st-toast{position:absolute;bottom:var(--toast-bottom,104px);left:var(--space-gutter);right:var(--space-gutter);z-index:7;display:flex;align-items:center;gap:var(--space-12);min-height:56px;box-sizing:border-box;padding:var(--space-10) var(--space-16);border-radius:var(--radius-inset);background:var(--ink);color:#fff;box-shadow:0 8px 24px #141c1238;pointer-events:none;animation:st-toast-in .2s ease-out both}
+.st-toast{position:absolute;bottom:var(--toast-bottom,104px);left:var(--space-gutter);right:var(--space-gutter);z-index:7;display:flex;align-items:center;gap:var(--space-12);min-height:56px;box-sizing:border-box;padding:var(--space-10) var(--space-16);border-radius:var(--radius-inset);background:var(--ink);color:#fff;box-shadow:0 8px 24px #141c1238;cursor:default;animation:st-toast-in .2s ease-out both}
 .st-toast-glyph{display:grid;place-items:center;flex:none;width:28px;height:28px;border-radius:50%;background:#ffffff24;color:#fff}
 .st-toast--done .st-toast-glyph{background:var(--green)}
 .st-toast-glyph svg{width:16px;height:16px}
