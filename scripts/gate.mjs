@@ -13,7 +13,8 @@
 //                no status and writes no pass record, so it can never merge.
 // One gate runs at a time on a machine (a lock in the git common dir). Evidence is kept by identity in the git common dir
 // (sentri-gate/evidence/): a rerun, or a later gate on the same main, reuses every result whose identity didn't change.
-// Run it from a checkout of the base (origin/main), never from the candidate: a candidate does not grade itself with its own gate.
+// It judges with the base's own tools, never the candidate's: a candidate does not grade itself with its own gate. Run from a
+// checkout whose tools differ from the base (any branch, a stale main), it runs itself from a worktree of the base instead.
 // Writes <out>/mechanical.json and, for every changed, new or removed screen, <out>/pairs/<screen>/<lang>-<width>.png
 // (base | candidate) at 390 and 360 in EN and ZH. The design system's variant pages are screens here too (ds:<Name>/<variant>).
 // Exit 0 when every mechanical check passes, 1 when one fails, 3 when the gate is blocked (it could not establish the evidence).
@@ -30,7 +31,7 @@ import { fileURLToPath } from 'node:url';
 import { CLASSES, checkVerdict, calibrationProblems, lockState, passesWithoutJudge, carryJudgements } from './loop-rules.mjs';
 import { selfStart } from './process-start.mjs';
 import { postStatus as post } from './github.mjs';
-import { evaluate } from './evaluate.mjs';
+import { evaluate, toolsDiffer } from './evaluate.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -48,6 +49,27 @@ const mainRef = opt('base') || 'origin/main';
 const postStatus = (sha, state, description) => (testBase ? { ok: true } : post(root, sha, state, description));
 function git(args, cwd = root) { const r = spawnSync('git', args, { cwd, encoding: 'utf8', maxBuffer: 64 << 20 }); return { code: r.status, out: r.stdout || '', err: r.stderr || '' }; }
 const sha = (r) => (r ? git(['rev-parse', '--verify', '--quiet', `${r}^{commit}`]).out.trim() : '');
+
+// ---------- the base's own tools ----------
+// The gate judges with the base's tools (gate-v2.md §1). From a checkout whose scripts/, docs/design-workflow/ or package.json
+// differ from the base, this run starts the base's own gate.mjs from a detached worktree of the base, with the same arguments and
+// working directory, and removes that worktree when it ends. Before, such a run blocked until the driver checked main out (three
+// blocks on 2026-10-17/18). SENTRI_GATE_TOOLS marks the run inside, so it never goes round again.
+if (!process.env.SENTRI_GATE_TOOLS) {
+  if (!testBase) git(['fetch', '-q', 'origin']);
+  const base = sha(mainRef);
+  const stale = base ? toolsDiffer(root, base) : [];
+  if (stale.length) {
+    const dir = path.join(os.tmpdir(), `sentri-gate-tools-${short(base)}-${process.pid.toString(36)}`);
+    const added = git(['worktree', 'add', '--detach', dir, base]);
+    if (added.code) { console.log(`GATE BLOCKED — this checkout's tools differ from ${short(base)}, and a worktree of it could not be made: ${added.err.trim().split('\n')[0]}`); process.exit(3); }
+    console.log(`this checkout's ${stale.slice(0, 3).join(', ')}${stale.length > 3 ? ' …' : ''} differ from ${mainRef} (${short(base)}): the gate runs ${short(base)}'s own tools, from ${dir}`);
+    const r = spawnSync(process.execPath, [path.join(dir, 'scripts/gate.mjs'), ...argv], { stdio: 'inherit', cwd: process.cwd(), env: { ...process.env, SENTRI_GATE_TOOLS: base, ...(pwPath ? { SENTRI_PLAYWRIGHT: pwPath } : {}) } });
+    git(['worktree', 'remove', '--force', dir]);
+    git(['worktree', 'prune']);
+    process.exit(r.status ?? 1);
+  }
+}
 
 // ---------- one gate at a time ----------
 // Two gates on one machine starve each other's browsers into timeouts (#164), so every gate run, a builder's --quick included, and a

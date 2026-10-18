@@ -44,6 +44,10 @@ const CHECKERS = { legibility: ['scripts/check-legibility.mjs'], spacing: ['scri
 
 function git(args, cwd) { const r = spawnSync('git', args, { cwd, encoding: 'utf8', maxBuffer: 256 << 20 }); return { code: r.status, out: r.stdout || '', err: r.stderr || '' }; }
 
+// The gate's tools in a checkout that differ from a base commit (uncommitted edits included): what the gate judges with.
+export const TOOL_PATHS = ['scripts', 'docs/design-workflow', 'package.json'];
+export const toolsDiffer = (root, base) => git(['diff', '--name-only', base, '--', ...TOOL_PATHS], root).out.trim().split(/\r?\n/).filter(Boolean);
+
 export async function evaluate(opts) {
   const { root, out, mode = 'normal', scope = [], declared = 'presentation', quick = false, all: everything = false, keep = false, log = console.log, env = process.env } = opts;
   const t0 = Date.now(), at = {};
@@ -69,8 +73,10 @@ export async function evaluate(opts) {
   if (!mech.base) { block(`the base ${opts.base} does not resolve`); return finish(); }
   if (!mech.candidate) { check('candidate exists', false, `no commit for ${opts.candidate}`); return finish(); }
   if (!quick) {
-    const stale = git(['diff', '--name-only', mech.base, '--', 'scripts', 'docs/design-workflow', 'package.json'], root).out.trim().split(/\r?\n/).filter(Boolean);
-    if (stale.length) { block(`the gate runs the base's own tools: this checkout's ${stale.slice(0, 3).join(', ')} differ from ${short(mech.base)} (run it from a checkout of the base: git checkout --detach origin/main)`); return finish(); }
+    // gate.mjs runs itself from a worktree of the base when its checkout's tools differ; this is the backstop for a base that moved
+    // while it started
+    const stale = toolsDiffer(root, mech.base);
+    if (stale.length) { block(`the gate runs the base's own tools: this checkout's ${stale.slice(0, 3).join(', ')} differ from ${short(mech.base)} (the base moved while the gate started: run it again)`); return finish(); }
   }
   const contains = git(['merge-base', '--is-ancestor', mech.base, mech.candidate], root).code === 0;
   check('candidate contains the base', contains, contains ? short(mech.base) : 'merge main forward first: git fetch origin && git merge origin/main (R10, R12)');
@@ -152,13 +158,7 @@ export async function evaluate(opts) {
     return p;
   };
   const tallyRepo = (kind, reused) => { (tally[kind] ||= { reused: 0, computed: 0 })[reused ? 'reused' : 'computed']++; };
-  const sched = createScheduler({ playwright, log });
-  cleanups.push(() => { sched.close(); });
-  const browser = await sched.browser();
-  const pool = contextPool();
-  cleanups.push(() => { pool.close(); });
   const pwVersion = (() => { try { return JSON.parse(fs.readFileSync(path.join(pwPath, 'package.json'), 'utf8')).version; } catch { return '?'; } })();
-  const render = { playwright: pwVersion, browser: browser.version(), platform: process.platform, launch: LAUNCH_ARGS, clock: CLOCK, height: HEIGHT, dsf: 1, bounds: BOUNDS };
   const code = Object.fromEntries(Object.entries(CHECKERS).map(([k, f]) => [k, codeHash(root, f)]));
   code.visit = codeHash(root, VISIT_CODE);
   const blob = (side, f) => S[side].tree.get(f) || 'missing';
@@ -254,6 +254,27 @@ export async function evaluate(opts) {
     const lost = coverageLost(coverage(S.base.dir), coverage(S.cand.dir));
     check('behaviour coverage kept', !lost.length, lost.length ? `removes behaviour coverage (${lost.slice(0, 3).join('; ')}): do it in its own workflow PR` : `${withLeaves.length} feature(s) with leaves`);
   }
+  {
+    // P2: visual declarations belong to the design system. Read from the diff, so it holds whether or not a screen moves.
+    const ps = pageStyling(addedLines(git(['diff', '-U0', mech.base, mech.candidate, '--', 'ux'], root).out));
+    mech.pageStyling = ps;
+    check('design-system components only', !ps.length, ps.length ? `${ps.length} visual declaration(s) added outside ux/design-system (${ps.slice(0, 3).map((p) => p.file.split('/').pop() + ' ' + p.prop).join(', ')}): use a SentriUI component, or build the part in the design system (P2, briefs/build.md §3)` : '');
+  }
+  // Fail fast (gate-simplify.md S1): a rule the diff decides has failed, so nothing a browser could show changes the outcome. The
+  // gate stops before it starts one: such failures used to arrive after full runs of 3 to 15 minutes (2026-10-17/18).
+  if (checks.some((c) => c.result === 'fail')) {
+    mech.stoppedEarly = 'a check the diff decides failed: no browser work ran (fix it and gate again)';
+    log(`STOP  ${mech.stoppedEarly}`);
+    return finish();
+  }
+
+  // ---------- the browser ----------
+  const sched = createScheduler({ playwright, log });
+  cleanups.push(() => { sched.close(); });
+  const browser = await sched.browser();
+  const pool = contextPool();
+  cleanups.push(() => { pool.close(); });
+  const render = { playwright: pwVersion, browser: browser.version(), platform: process.platform, launch: LAUNCH_ARGS, clock: CLOCK, height: HEIGHT, dsf: 1, bounds: BOUNDS };
 
   // ---------- servers ----------
   const freePort = () => new Promise((res) => { const s = createServer(); s.listen(0, () => { const p = s.address().port; s.close(() => res(p)); }); });
@@ -556,11 +577,8 @@ export async function evaluate(opts) {
     check('information budget before layout', !bp.length, bp.length ? bp.join('; ') + ' (P3: write it first, briefs/build.md §2)' : '');
     const cp = critiqueProblems(feats, readCand);
     check('critique of the original before the change', !cp.length, cp.length ? cp.join('; ') + ' (P1, P4: keep, problems, parts and self-crit, briefs/build.md §1, §4)' : '');
-    const ps = pageStyling(addedLines(git(['diff', '-U0', mech.base, mech.candidate, '--', 'ux'], root).out));
-    mech.pageStyling = ps;
     const proposed = files.includes('ux/design-system/components/_proposed.json') && /^\+\s*[\[{"]/m.test(git(['diff', '-U0', mech.base, mech.candidate, '--', 'ux/design-system/components/_proposed.json'], root).out);
     check('no workaround beside a component proposal', !proposed, proposed ? 'this change proposes a component and changes screens: build the component in the design system in this change (P2, briefs/build.md §3), never a workaround' : '');
-    check('design-system components only', !ps.length, ps.length ? `${ps.length} visual declaration(s) added outside ux/design-system (${ps.slice(0, 3).map((p) => p.file.split('/').pop() + ' ' + p.prop).join(', ')}): use a SentriUI component, or build the part in the design system (P2, briefs/build.md §3)` : '');
   }
   // motion has a held frame (L25): run whether or not a screen moved, since a frozen atlas shows no motion change as a moved screen
   const motionFiles = files.filter(isMotionFile);
