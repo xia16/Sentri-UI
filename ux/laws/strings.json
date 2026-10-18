@@ -2915,6 +2915,8 @@
     "medicines.brand.title": {"en": "Brand", "zh": "品牌", "kind": "title"},
     "medicines.brand.search": {"en": "Search brands", "zh": "搜索品牌", "kind": "label"},
     "medicines.no_brands": {"en": "No brands used yet.", "zh": "尚未使用过任何品牌。", "kind": "body"},
+    "medicines.brand.none": {"en": "No brands for {medicine} yet", "zh": "{medicine}还没有品牌", "kind": "title"},
+    "medicines.brand.none_hint": {"en": "Type the name on the bottle's label above to add it.", "zh": "在上方输入瓶身标签上的名称即可添加。", "kind": "body"},
     "medicines.delete": {"en": "Delete", "zh": "删除", "kind": "action"},
     "medicines.detail.days": {"en": "{n} days", "zh": "{n} 天", "kind": "unit"},
     "medicines.detail.day": {"en": "1 day", "zh": "1 天", "kind": "unit"},

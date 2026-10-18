@@ -16624,6 +16624,7 @@
          "health-record.medicine-picker",
          "health-record.brand",
          "health-record.brand-add",
+         "health-record.brand-empty",
          "health-record.brand-details",
          "health-record.treatment-brand",
          "health-record.treatment-batch-dosage",
@@ -16745,6 +16746,16 @@
          "health-record.brand",
          "health-record.brand-add",
          "type a brand with no match"
+        ],
+        [
+         "health-record.treatment",
+         "health-record.brand-empty",
+         "tap Brand for a medicine with no brands yet"
+        ],
+        [
+         "health-record.brand-empty",
+         "health-record.brand-add",
+         "type the brand's name"
         ],
         [
          "health-record.record-health",
@@ -17738,6 +17749,41 @@
           "controls": [],
           "copy": [
            "medicines.add_card"
+          ],
+          "issues": []
+         }
+        },
+        {
+         "id": "health-record.brand-empty",
+         "name": "Brand: none used yet",
+         "zh": "品牌：尚未使用",
+         "status": "in-design",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "profile-full",
+         "steps": [
+          "[data-action=\"pig-actions\"]",
+          "[data-action=\"treatment\"]",
+          "[data-action=\"medicine-open\"]",
+          "[data-action=\"medicine-category\"][data-value=\"antibiotics\"]",
+          "[data-action=\"medicine-select\"][data-value=\"ceftiofur\"]",
+          "[data-action=\"brand-open\"]"
+         ],
+         "figma": "",
+         "notes": {
+          "purpose": "A medicine the farm has never recorded a brand for: the search, then ChoiceList's can-add empty state saying what is missing and how to add it. Typing a name gives Add “…”, as on Brand: no match.",
+          "elements": [
+           {
+            "name": "Empty state",
+            "at": ".st-choice-empty",
+            "shows": "A tag glyph on the tint; No brands for Ceftiofur yet; Type the name on the bottle's label above to add it.",
+            "rule": "Shown only when the medicine has no brands and nothing is typed. It names the medicine; the search above is the way to add (no separate page, no button)."
+           }
+          ],
+          "controls": [],
+          "copy": [
+           "medicines.brand.search",
+           "medicines.brand.none",
+           "medicines.brand.none_hint"
           ],
           "issues": []
          }
@@ -19178,6 +19224,37 @@
              },
              {
               "type": "action",
+              "id": "med-b3.no-brands",
+              "label": "Pick Ceftiofur (no brands used yet), open Brand",
+              "children": [
+               {
+                "type": "outcome",
+                "id": "med-b3-no-brands-says-how-to-add",
+                "label": "A medicine with no brands yet says how to add one, and typing a name adds it",
+                "tree": "B-3",
+                "gwt": {
+                 "given": "The farm has never recorded a brand for Ceftiofur.",
+                 "when": "A worker opens Brand for it, types the name on the bottle and adds it.",
+                 "then": "The empty list first says there are no brands yet and to type a name; after adding, the form's Brand reads the new name."
+                },
+                "authority": [
+                 {
+                  "src": "PRD",
+                  "at": "Rules: Brand",
+                  "says": "A search with no match shows one card, Add “…”, which adds the brand under that medicine for everyone and picks it"
+                 },
+                 {
+                  "src": "atlas",
+                  "at": "health-record.brand-empty, Empty line",
+                  "says": "Shown only when the medicine has no brands and nothing is typed. It names the medicine; the search above is the way to add"
+                 }
+                ],
+                "result": "pass"
+               }
+              ]
+             },
+             {
+              "type": "action",
               "id": "med-a5.search",
               "label": "Search \"amox\"",
               "children": [
@@ -19532,9 +19609,9 @@
          }
         ],
         "run": {
-         "commit": "6355fee",
+         "commit": "a0f5582",
          "dirty": true,
-         "ran": "2026-10-18T03:24:28.463Z",
+         "ran": "2026-10-18T07:49:54.032Z",
          "langs": [
           "en",
           "zh"

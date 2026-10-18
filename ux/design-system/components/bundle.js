@@ -390,7 +390,7 @@
     const clear=value?`<button type="button" class="st-text-action st-search-clear" data-search-clear=""><span data-str="act.clear">Clear</span></button>`:'';
     return `<label class="field catalog-search st-choice-search" data-ds="ChoiceList"><span class="st-search-box"><input type="search" aria-label="${esc(label)}"${strs.label?` data-str-attr="aria-label:${esc(strs.label)}${strs.placeholder?`;placeholder:${esc(strs.placeholder)}`:''}"${sArgs(args)}`:''} placeholder="${esc(placeholder||label)}" value="${esc(value)}"${extra}>${clear}</span></label>`;
   }
-  function choiceEmpty(text,{strs,args}={}){return `<p class="st-choice-empty" data-ds="ChoiceList" role="status">${tx(text,{strs,args},'text')}</p>`;}
+  function choiceEmpty(text,{strs,args,title,icon}={}){if(title)return `<div class="st-choice-empty st-choice-empty--lead" data-ds="ChoiceList" role="status">${icon&&globalThis.SentriIcons?`<span class="st-choice-empty-icon" aria-hidden="true">${globalThis.SentriIcons.icon(icon)}</span>`:''}<strong class="st-choice-empty-title">${tx(title,{strs,args},'title')}</strong><span class="st-choice-empty-text">${tx(text,{strs,args},'text')}</span></div>`;return `<p class="st-choice-empty" data-ds="ChoiceList" role="status">${tx(text,{strs,args},'text')}</p>`;}
   /* options: [value,label,{strs:{label},args:{label}}?]; label is raw HTML, kept as the span's fallback. */
   function segment({options=[],active='',action='',className='',ariaLabel='',variant='two-line-lens',state='Default',disabled=false,reason=''}={}){
     if(!options.length)return '';

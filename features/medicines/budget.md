@@ -79,6 +79,7 @@ At the Medicines page (a supervisor tidying the list): 1. Which medicines does t
 | Brand row: its name ("Amoxinsol 50%") | row | Which bottle? | **no second line**; strength is in the name when it matters |
 | Withdrawal on a brand row | — | — | **cut**: it is the form's consequence notice |
 | No match: `Add “<typed>”` | the body | Can I add it? | one card, nothing else; adds under this medicine for everyone and picks it |
+| None used yet: a tag glyph, "No brands for Ceftiofur yet", "Type the name on the bottle's label above to add it." | the body, only when the medicine has no brands and nothing is typed | Why is it empty, and how do I add the bottle's brand? | kept: ChoiceList's can-add empty state (glyph, title naming the medicine, one line), centred under the search, which is the way in. No separate page, no button: nothing to choose, so they would only add a tap |
 
 ### Add details (after adding a brand; optional, skippable)
 

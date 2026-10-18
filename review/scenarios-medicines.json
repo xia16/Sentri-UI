@@ -1,9 +1,9 @@
 {
  "feature": "medicines",
- "commit": "6355fee428dbaba45b3b5f64664bf5bcff80d8a1",
+ "commit": "a0f5582967c403f0847d492985e139f563b8fdae",
  "dirty": true,
- "ran": "2026-10-18T03:24:28.463Z",
- "base": "http://localhost:50580",
+ "ran": "2026-10-18T07:49:54.032Z",
+ "base": "http://localhost:59853",
  "langs": [
   "en",
   "zh"
@@ -15,11 +15,11 @@
  "nodes": {
   "entry": 4,
   "state": 4,
-  "action": 18,
-  "outcome": 14
+  "action": 19,
+  "outcome": 15
  },
  "summary": {
-  "pass": 13,
+  "pass": 14,
   "fail": 0,
   "blocked": 0,
   "pending": 1,
@@ -27,19 +27,19 @@
  },
  "byLang": {
   "en": {
-   "pass": 13,
+   "pass": 14,
    "fail": 0,
    "blocked": 0
   },
   "zh": {
-   "pass": 13,
+   "pass": 14,
    "fail": 0,
    "blocked": 0
   }
  },
  "byBranch": {
   "med-a.entry": {
-   "pass": 7,
+   "pass": 8,
    "fail": 0,
    "blocked": 0,
    "pending": 1
@@ -412,6 +412,115 @@
      "evidence": [
       "review/scenarios/medicines/med-a4-method-unit-remembered/zh-390/00-start.png",
       "review/scenarios/medicines/med-a4-method-unit-remembered/zh-390/01-data-action-medicine-select-data.png"
+     ],
+     "loadFailures": []
+    }
+   ]
+  },
+  {
+   "id": "med-b3-no-brands-says-how-to-add",
+   "tree": "B-3",
+   "branch": "med-a.entry",
+   "label": "A medicine with no brands yet says how to add one, and typing a name adds it",
+   "gwt": {
+    "given": "The farm has never recorded a brand for Ceftiofur.",
+    "when": "A worker opens Brand for it, types the name on the bottle and adds it.",
+    "then": "The empty list first says there are no brands yet and to type a name; after adding, the form's Brand reads the new name."
+   },
+   "path": [
+    "med-a.entry",
+    "med-a.state",
+    "med-b3.no-brands",
+    "med-b3-no-brands-says-how-to-add"
+   ],
+   "authority": [
+    {
+     "src": "PRD",
+     "at": "Rules: Brand",
+     "says": "A search with no match shows one card, Add “…”, which adds the brand under that medicine for everyone and picks it"
+    },
+    {
+     "src": "atlas",
+     "at": "health-record.brand-empty, Empty line",
+     "says": "Shown only when the medicine has no brands and nothing is typed. It names the medicine; the search above is the way to add"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/medicines/med-b3-no-brands-says-how-to-add/en-360/00-start.png",
+      "review/scenarios/medicines/med-b3-no-brands-says-how-to-add/en-360/01-data-action-medicine-category-da.png",
+      "review/scenarios/medicines/med-b3-no-brands-says-how-to-add/en-360/02-data-action-medicine-select-data.png",
+      "review/scenarios/medicines/med-b3-no-brands-says-how-to-add/en-360/03-data-action-brand-open.png",
+      "review/scenarios/medicines/med-b3-no-brands-says-how-to-add/en-360/04-fill-data-brand-search.png",
+      "review/scenarios/medicines/med-b3-no-brands-says-how-to-add/en-360/05-data-action-brand-add.png",
+      "review/scenarios/medicines/med-b3-no-brands-says-how-to-add/en-360/06-data-action-brand-details-save.png"
+     ],
+     "loadFailures": []
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/medicines/med-b3-no-brands-says-how-to-add/en-390/00-start.png",
+      "review/scenarios/medicines/med-b3-no-brands-says-how-to-add/en-390/01-data-action-medicine-category-da.png",
+      "review/scenarios/medicines/med-b3-no-brands-says-how-to-add/en-390/02-data-action-medicine-select-data.png",
+      "review/scenarios/medicines/med-b3-no-brands-says-how-to-add/en-390/03-data-action-brand-open.png",
+      "review/scenarios/medicines/med-b3-no-brands-says-how-to-add/en-390/04-fill-data-brand-search.png",
+      "review/scenarios/medicines/med-b3-no-brands-says-how-to-add/en-390/05-data-action-brand-add.png",
+      "review/scenarios/medicines/med-b3-no-brands-says-how-to-add/en-390/06-data-action-brand-details-save.png"
+     ],
+     "loadFailures": []
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [
+      "\"Excenel\" shown"
+     ],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/medicines/med-b3-no-brands-says-how-to-add/zh-360/00-start.png",
+      "review/scenarios/medicines/med-b3-no-brands-says-how-to-add/zh-360/01-data-action-medicine-category-da.png",
+      "review/scenarios/medicines/med-b3-no-brands-says-how-to-add/zh-360/02-data-action-medicine-select-data.png",
+      "review/scenarios/medicines/med-b3-no-brands-says-how-to-add/zh-360/03-data-action-brand-open.png",
+      "review/scenarios/medicines/med-b3-no-brands-says-how-to-add/zh-360/04-fill-data-brand-search.png",
+      "review/scenarios/medicines/med-b3-no-brands-says-how-to-add/zh-360/05-data-action-brand-add.png",
+      "review/scenarios/medicines/med-b3-no-brands-says-how-to-add/zh-360/06-data-action-brand-details-save.png"
+     ],
+     "loadFailures": []
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [
+      "\"Excenel\" shown"
+     ],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/medicines/med-b3-no-brands-says-how-to-add/zh-390/00-start.png",
+      "review/scenarios/medicines/med-b3-no-brands-says-how-to-add/zh-390/01-data-action-medicine-category-da.png",
+      "review/scenarios/medicines/med-b3-no-brands-says-how-to-add/zh-390/02-data-action-medicine-select-data.png",
+      "review/scenarios/medicines/med-b3-no-brands-says-how-to-add/zh-390/03-data-action-brand-open.png",
+      "review/scenarios/medicines/med-b3-no-brands-says-how-to-add/zh-390/04-fill-data-brand-search.png",
+      "review/scenarios/medicines/med-b3-no-brands-says-how-to-add/zh-390/05-data-action-brand-add.png",
+      "review/scenarios/medicines/med-b3-no-brands-says-how-to-add/zh-390/06-data-action-brand-details-save.png"
      ],
      "loadFailures": []
     }

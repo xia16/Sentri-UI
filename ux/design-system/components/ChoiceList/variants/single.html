@@ -11,6 +11,7 @@
 <div data-state="Disabled" id="state-Disabled"></div>
 <div data-state="Loading" id="state-Loading"></div>
 <div data-state="Empty" id="state-Empty"></div>
+<div data-state="Empty-add" id="state-Empty-add"></div>
 <div data-state="Long-label" id="state-Long-label"></div>
 <script>
 var UI = window.SentriUI;
@@ -27,6 +28,7 @@ var RENDER = {
   "state-Disabled": () => phone(UI.sheet({title:"Care",up:null,size:'long',body:UI.choiceGroup([UI.choiceRow({"label": "No action needed", "mode": "single", "value": "none", "action": "choose", "selected": false}),UI.choiceRow({"label": "Monitor", "mode": "single", "value": "monitor", "action": "choose", "selected": false}),UI.choiceRow({"label": "Treat in place", "mode": "single", "value": "treat", "action": "choose", "selected": false}),UI.choiceRow({"label": "Move to hospital pen", "mode": "single", "value": "hospital", "action": "choose", "selected": false, "disabled": true, "reason": "Unavailable offline. Reconnect to select."})]),footer:UI.pickerFooter({multi:false,selected:[]})})),
   "state-Loading": () => phone(UI.sheet({title:"Care",up:null,size:'long',body:UI.choiceEmpty("Loading options\u2026"),footer:UI.pickerFooter({multi:false,selected:[]})})),
   "state-Empty": () => phone(UI.sheet({title:"Care",up:null,size:'long',body:UI.choiceEmpty("No options available."),footer:UI.pickerFooter({multi:false,selected:[]})})),
+  "state-Empty-add": () => phone(UI.sheet({title:"Brand",cross:{action:'dismiss',label:'Close'},up:null,size:'long',body:'<div class="st-picker-body" data-ds="PickerField" data-variant="single">'+UI.choiceSearch({label:'Search brands',value:''})+UI.choiceEmpty("Type the name on the bottle\u2019s label above to add it.",{title:"No brands for Ceftiofur yet",icon:'tag'})+'</div>',footer:UI.pickerFooter({multi:false,selected:[]})})),
   "state-Long-label": () => phone(UI.sheet({title:"\u62a4\u7406",up:null,size:'long',body:UI.choiceGroup([UI.choiceRow({"label": "\u65e0\u9700\u5904\u7406", "mode": "single", "value": "none", "action": "choose", "selected": false}),UI.choiceRow({"label": "\u89c2\u5bdf", "mode": "single", "value": "monitor", "action": "choose", "selected": false}),UI.choiceRow({"label": "\u539f\u680f\u6cbb\u7597", "mode": "single", "value": "treat", "action": "choose", "selected": false}),UI.choiceRow({"label": "\u8f6c\u5165\u75c5\u732a\u680f\uff0c\u5355\u72ec\u9972\u517b\u5e76\u6bcf\u65e5\u590d\u67e5\u4e24\u6b21", "mode": "single", "value": "hospital", "action": "choose", "selected": true})]),footer:UI.pickerFooter({multi:false,selected:[]})}))
 };
 document.querySelectorAll('[data-state]').forEach(function (s) { if (RENDER[s.id]) s.innerHTML = RENDER[s.id](); });

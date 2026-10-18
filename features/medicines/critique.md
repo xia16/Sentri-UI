@@ -235,3 +235,14 @@ The owner approved the treatment's optional face (an ordinary labelled field wit
 - Header check 0 and spacing 0 on all 28; strict legibility passes on them; check-states 6 failing, the same 6 as main; `npm test` 727 pass; `npm run check` passes. Measured on `c1c689b`.
 - Known: a trigger the atlas returns focus to shows the browser's focus ring (a finger draws none); Record treatment's own labels (Method) stay English in ZH, as on main.
 - **Better because** a treatment is one pick of the medicine, every optional input reads the same way, the withdrawal date sits under the field it comes from, a batch shows one dosage with one way to adjust, and the farm's list is fixed in one place.
+
+# Empty Brand list (owner, 2026-10-18)
+
+### Problems
+- **major** · A medicine the farm had never recorded a brand for opened Brand on a bare search field and nothing else: no sign the list was empty on purpose, nor that typing a name is how to add one (owner, from `health-record.brand` with a brandless medicine). Now one quiet line under the search, ChoiceList's empty line: "No brands for Ceftiofur yet. Type a name to add one." (ZH 头孢噻呋还没有品牌，输入名称即可添加。). It names the medicine and goes as soon as a name is typed, when the `Add “…”` card takes its place. A separate "add a brand" page was weighed and cut: there is nothing to choose, so it would only add a tap before the same search.
+
+### Self-crit
+- New screen `health-record.brand-empty` (a brandless medicine, Ceftiofur). The line sits on the field's left edge under the search, one line in EN and ZH at 390 and 360, quiet (13px, muted), and leaves the search the only control: the brand list's own rows, cards and Back are unchanged. Leaf `med-b3-no-brands-says-how-to-add` walks it through to the brand on the form.
+
+### Round 2 (owner, 2026-10-18: "this placeholder looks really bad")
+- **major** · The one grey line read as a leftover, not a designed state: small, flush left, alone in a white sheet. Now ChoiceList's can-add empty state, the native "nothing here yet": a tag glyph on the tint (56px circle), a title that names what is missing ("No brands for Ceftiofur yet", 16px/600 ink) and one line that says how to add it ("Type the name on the bottle's label above to add it.", 14px muted, balanced on two lines in EN, one in ZH), centred under the search. It is a ChoiceList option (`choiceEmpty` with `title` and `icon`), not a page part: every existing empty line is unchanged, and ChoiceList's Single page shows it as the state "Empty-add".

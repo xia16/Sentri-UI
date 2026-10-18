@@ -916,7 +916,9 @@ function brandPickerBody(c){
  let body;
  if(q){const hits=all.filter(b=>b.name.toLocaleLowerCase().includes(q.toLocaleLowerCase()));body=hits.length?SentriUI.choiceGroup(hits.map(row)):medAddCard('brand-add',pick.search);}
  else if(all.length>3)body=SentriUI.choiceGroup(all.slice(0,3).map(row),{title:str('medicines.group.recent')})+SentriUI.choiceGroup(all.slice(3).sort((x,y)=>x.name.localeCompare(y.name)).map(row),{title:str('medicines.group.other_brands')});
- else body=all.length?SentriUI.choiceGroup(all.map(row)):'';
+ /* No brand used for this medicine yet: ChoiceList's empty state names what is missing and says how to add one (the search is the
+    way in), not an empty sheet. */
+ else {const medicine=medicineById(c,f.medicineId)?.name||'';body=all.length?SentriUI.choiceGroup(all.map(row)):SentriUI.choiceEmpty(str('medicines.brand.none_hint'),{title:str('medicines.brand.none',{medicine}),icon:'tag'});}
  return '<div class="st-picker-body" data-ds="PickerField" data-variant="single">'+SentriUI.choiceSearch({label:str('medicines.brand.search'),value:pick.search||'',attrs:{'data-brand-search':''}})+body+'</div>';
 }
 function brandLevels(c,title){const pick=c.form.brandPick||{};return {title:pick.level==='details'?str('medicines.details.title'):title,cross:{action:'dismiss',label:{text:'Close',str:'act.close'}},levelBack:pick.level==='details'?{action:'brand-up'}:{action:'back'},rows:7};}
@@ -1710,7 +1712,7 @@ function atlasScreen(c){
  if(c.view==='treatment'&&c.form?.bulk)return 'health-record.treatment-batch';
  if(c.view==='medicine-picker'){const s=medState(c),q=(s.search||'').trim();return s.level==='add'?'medicines.add':s.level==='add-category'?'medicines.add-category':q?(medSearchRows(c,q)?'medicines.search':'medicines.search-none'):s.level==='category'?'medicines.category':c.form.taskId==='vaccination'?'medicines.vaccines':medRecents(c).length?'medicines.picker':'medicines.picker-first';}
  if(c.view==='pig-doses')return c.form.removeMode?'health-record.custom-doses-remove':(c.form.doseSearch||'').trim()?'health-record.custom-doses-search':Object.keys(c.form.values||{}).length?'health-record.custom-doses-own':'health-record.custom-doses';
- if(c.view==='brand-picker'){const pick=c.form.brandPick||{},q=(pick.search||'').trim().toLocaleLowerCase();return pick.level==='details'?'health-record.brand-details':q&&!medBrands(c,c.form.medicineId).some(b=>b.name.toLocaleLowerCase().includes(q))?'health-record.brand-add':'health-record.brand';}
+ if(c.view==='brand-picker'){const pick=c.form.brandPick||{},q=(pick.search||'').trim().toLocaleLowerCase();return pick.level==='details'?'health-record.brand-details':q&&!medBrands(c,c.form.medicineId).some(b=>b.name.toLocaleLowerCase().includes(q))?'health-record.brand-add':!q&&!medBrands(c,c.form.medicineId).length?'health-record.brand-empty':'health-record.brand';}
  if(c.view==='medicines')return medPage(c).category?'medicines.page-category':'medicines.page';
  if(c.view==='medicine-sheet'){const pg=medPage(c);return pg.level==='delete'?'medicines.delete':pg.brand?'medicines.brand':medicineById(c,pg.medicine)?.catalogue?'medicines.medicine':'medicines.medicine-farm';}
  return atlasViews[c.view]||null;
