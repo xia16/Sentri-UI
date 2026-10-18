@@ -313,6 +313,20 @@ function notesProblems(file, headings) {
 export const budgetProblems = notesProblems('budget.md', BUDGET_HEADINGS);
 export const critiqueProblems = notesProblems('critique.md', CRITIQUE_HEADINGS);
 
+// A leaf's failure is a design result only once it repeats (rules ledger L26). The store keeps a result by identity ("the same
+// identity gives the same result"), so a one-off failure (a tap racing a sheet's arrival) would stand for every later gate. A fresh
+// failure gets one confirming run on the same identity: the same failure again is stored, confirmed; a pass (or any other result)
+// is an unstable leaf, which blocks and is stored as nothing; a confirming run lost to a machine error confirms nothing.
+// x, y: the scheduler's results ({ run } or { machine } or { error }).
+export function confirmLeaf(x, y) {
+  if (!y || y.machine || y.error) return { store: false, unstable: false };
+  if (y.run?.result === 'fail') return { store: true, unstable: false };
+  return { store: false, unstable: true, why: y.run?.result === 'pass' ? 'passed' : `came back ${y.run?.result}` };
+}
+// A stored leaf result is reused only when it is a pass, or a failure that was confirmed (a store written before L26 holds
+// unconfirmed failures: they are run again).
+export const reusableLeaf = (record) => !!record?.run && (record.run.result !== 'fail' || record.confirmed === true);
+
 // Design-system components only (owner, 2026-10-11): visual styling added in a page's own CSS, markup or scripts is an improvised
 // component. Layout (margin, padding, gap, grid, flex, size, position) is the page's; looks belong to ux/design-system. A line
 // marked `ds-exception` is a workaround and counts too: the part is built in the design system instead (P2, briefs/build.md §3).
