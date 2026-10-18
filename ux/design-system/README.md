@@ -111,6 +111,17 @@ Every drawer and page leaves, goes up and commits the same way.
 - **An empty selection is no selection.** Unticking the last subject closes the review and ends selection mode; no empty selection sheet is ever shown.
 - **Sized to content, on the bottom edge.** A drawer sits on the bottom edge, as tall as its content up to its cap, its footer on its bottom edge. It never floats and never holds dead space under its content, with two exceptions: `sizing: 'full'` for content that grows as the worker taps, and `sizing: 'hold'` for a drawer with levels, which keeps one height (its tallest level) from open to close so nothing moves under the thumb.
 
+### Feedback after saving (owner, 2026-10-18)
+
+A save confirms itself where the worker's eye lands, once, and never louder than it needs to.
+
+- **The result is visible where you land** (the edited row shows its new value): the row is the confirmation. No toast.
+- **The result is not visible** (Record treatment returns to the walk list; a death takes the pig off the list): a [Toast](components/Toast/README.md), what was done and for whom: "Treatment recorded · 000267", "12 pigs". It goes after about 3 seconds.
+- **Repeated entries inside a task** (counts, weights, piglet processing): the task's own rows and receipt confirm them. No toast per entry.
+- **Saved with no connection**: the same toast in its offline form, "Saved on this phone · Uploads when connected · 000267". Never "uploaded" or "synced" until the server confirms. The toast is never the only offline signal: the header badge carries it after the toast has gone (Data sync).
+- **An upload that succeeds later**: nothing pops up; the count goes down.
+- **A failure is never a toast.** A save that fails keeps its sheet open with the error; an upload that fails stays in the badge and in Data sync until someone deals with it.
+
 ### Headers (law; owner, 2026-10-13)
 
 There are two headers and no others. A new kind of header goes through the rules ledger, never straight into a screen. Both are the [Header](components/Header/README.md) component (page header, sheet header); the title inside them is a [Heading](components/Heading/README.md) (the page or sheet title).

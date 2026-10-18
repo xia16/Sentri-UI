@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><style>
+/* The real container: the bottom of a 390px phone page, the toast above its dock. */
+.ph{position:relative;height:200px;overflow:hidden;background:var(--app-background);border:1px solid var(--line);border-radius:var(--radius-device,28px)}
+.ph-dock{position:absolute;left:0;right:0;bottom:0;height:94px;border-top:1px solid var(--line);background:var(--paper,#fff)}
+.ph-row{margin:16px var(--space-gutter) 0;height:64px;border-radius:var(--radius-panel);background:var(--paper,#fff);border:1px solid var(--line)}
+</style></head><body>
+<section data-state="Default · one pig" id="done-0"></section>
+<section data-state="Several pigs" id="done-1"></section>
+<section data-state="Title only" id="done-2"></section>
+<section data-state="Chinese" id="done-3"></section>
+<script>
+const put=(id,html)=>document.querySelectorAll('[data-state]').forEach(el=>{if(el.id===id)el.innerHTML='<div class="ph"><div class="ph-row"></div><div class="ph-dock"></div>'+html+'</div>'});
+put("done-0",SentriUI.toast('Treatment recorded',{detail:'000267',tone:'done'}));
+put("done-1",SentriUI.toast('Treatment recorded',{detail:'12 pigs',tone:'done'}));
+put("done-2",SentriUI.toast('Weights saved',{tone:'done'}));
+put("done-3",SentriUI.toast('治疗已记录',{detail:'000267',tone:'done'}));
+</script>
+</body></html>

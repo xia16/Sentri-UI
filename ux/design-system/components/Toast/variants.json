@@ -1,0 +1,25 @@
+[
+  {
+    "id": "done",
+    "name": "Done",
+    "use": "Use after a save that closes a sheet and lands where the result is not visible: Record treatment returning to the walk list.",
+    "notUse": "Not when the result shows where you land (the row itself says it), not for each entry inside a task, not for an upload that succeeds later, never for a failure.",
+    "states": [
+      "Default · one pig",
+      "Several pigs",
+      "Title only",
+      "Chinese"
+    ]
+  },
+  {
+    "id": "offline",
+    "name": "Offline",
+    "use": "Use for the same save made with no connection: it is kept on this phone and uploads when connected.",
+    "notUse": "Not as the only offline signal: the header badge carries the state after the toast has gone.",
+    "states": [
+      "Default · one pig",
+      "Several pigs",
+      "Chinese"
+    ]
+  }
+]
