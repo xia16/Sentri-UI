@@ -242,14 +242,15 @@ async function renderComponents() {
       setParam('variant', id === 'overview' ? null : id); body.innerHTML = '';
       if (id === 'overview') {
         body.append(gateBlock(gate, st));
-        if (withStates.length > 1) { // one captioned example per variant; the states live in the variant tabs
+        // a single-variant component shows its own preview.html; without one (or with several variants) the overview is one
+        // captioned example per drawn variant, so a component that has a variant page never shows an empty overview
+        const own = withStates.length > 1 ? null : await styledPreview(name);
+        if (own) body.append(own);
+        else if (withStates.length) { // the states live in the variant tabs
           const g = el('<div class="sgrid ovgrid"></div>');
           for (const v of withStates) { const one = await stateGridAt(dirOf, v.id, { one: true, bare: true, caption: v.name }); if (one) g.append(...one.children); }
           body.append(g);
-        } else {
-          const prev = await styledPreview(name);
-          body.append(prev || el('<div class="nopreview">No preview of its own yet — built in the component pass</div>'));
-        }
+        } else body.append(el('<div class="nopreview">No preview of its own yet — built in the component pass</div>'));
         if (without.length) body.append(el(`<p class="muted" style="margin:0 0 14px;font-size:12.5px">Variants (to be drawn in the component pass): ${without.map((v) => esc(v.name)).join(' · ')}</p>`));
         else if (!variants.length) body.append(el('<p class="muted" style="margin:0 0 14px;font-size:12px">Variants and their states are written in the component pass.</p>'));
         if (readme) { body.append(el('<h3>Guidelines</h3>')); body.append(el(`<div class="guide doc">${md(readme.replace(/^\s*#\s+.*\r?\n/, ''), { link: compLink })}</div>`)); }
