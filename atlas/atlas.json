@@ -28174,6 +28174,22 @@
      }
     },
     {
+     "name": "Toast",
+     "group": "Status and feedback",
+     "status": "in-design",
+     "gate": {
+      "status": "in-design"
+     },
+     "files": {
+      "variantsJson": true,
+      "variants": [
+       "done",
+       "offline",
+       "plain"
+      ]
+     }
+    },
+    {
      "name": "Photos",
      "group": "Status and feedback",
      "status": "agent-checked",
