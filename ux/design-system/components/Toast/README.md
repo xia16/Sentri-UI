@@ -81,8 +81,19 @@ The host owns timing, replacement, clearing on the next view and the tap: see In
 `--ink`, `--green`, `--radius-inset`, `--space-gutter`, `--space-10`, `--space-12`, `--space-16`, `--type-row-title-size`, `--font-size-13`, `--font-sans`; host override `--toast-bottom`.
 
 ## Used by
-- **Health record**: Record treatment and Record vaccination after Save (`health-record.treatment-saved`, `health-record.treatment-saved-offline`).
-- **Inspection** (plain, until moved to a tone): "Weights saved", "Saved for N pigs", "Saved to pen …", "Task completed".
+Inspection's record actions, through one rule (`saveFeedback` in `ux/system/inspection-astra-concept.js`; tested in `ux/system/save-feedback.test.cjs`):
+
+| Action | One pig | Several pigs |
+| --- | --- | --- |
+| Record treatment / vaccination | "Treatment recorded · 000267" | "… · 12 pigs" |
+| Measurements: weight, temperature, backfat | "Weight recorded · 000267" | "… · 12 pigs" |
+| Add a note | "Note added · 000267" | "… · 12 pigs" |
+| Resolve conditions | "Marked recovered" / "Record corrected · 000267" | "… · 12 pigs" |
+| Record health (disease or symptom) | none when the row is on screen and shows every tag; else "Condition recorded · 000267" | "Condition recorded · 12 pigs" |
+| Body condition, care instructions, edit conditions | as Record health: none only when the row is in view with every tag | "… · 12 pigs" |
+| Record abortion, batch membership | "Abortion recorded" / "Batch updated · 000267" | one pig only |
+
+None after a save that returns to its finding (the finding shows it). Moving a pig is saved by Farrowing's host, which owns its own feedback. Older plain toasts ("Weights saved", "Saved to pen …", "Task completed") remain where Inspection's older flows draw them.
 
 ## Related
 [Banner](../Banner/README.md) · [Status](../Status/README.md) · [TaskReceipt](../TaskReceipt/README.md) (a finished task's receipt, which stays) · the design law's Feedback after saving.

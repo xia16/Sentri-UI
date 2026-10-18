@@ -303,3 +303,14 @@ The Brand optional row comes back as the medicines feature's field (only once a 
 
 ### Self-crit
 - New held screens `health-record.treatment-saved` and `health-record.treatment-saved-offline` (EN and ZH, 390): the toast sits 10px above the dock, on the gutters, 56px tall, one line each; the check on the green is the only colour; offline swaps the glyph and the second line and never says uploaded. The walk list behind it is unchanged. House references: Linear's "Issue created" snackbar, Material's snackbar; solid ink because it is read in glare.
+
+# Saved, every action (owner, 2026-10-18)
+
+### Problems
+- **major** · Only Record treatment confirmed its save; the owner asked which other actions need it ("record conditions does that need it? measure weight?"). Weight, temperature, backfat, notes, Resolve and every several-pig save landed on the walk list with nothing to show they had saved: the row shows only the ear tag, the stage line and condition tags.
+
+### Parts
+- One rule in `saveFeedback`: one pig, a toast only where the row does not show the result; several pigs, always, with the count; Resolve always (the tag it removes is easy to miss); none when the save returns to its finding. Record abortion and batch membership land on the pig's page, where the change is one word or absent: a toast. Recording a condition, body condition, care or an edit for one pig shows on its row: no toast.
+
+### Self-crit
+- No screen moves: the toasts are transient and the held screens from #218 already show the component. `ux/system/save-feedback.test.cjs` pins each action's outcome; the copy is in `strings.json` (`save.*`) with Chinese.
