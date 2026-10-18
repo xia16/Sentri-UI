@@ -9,15 +9,18 @@ require('./inspection-astra-concept.js');
 const M = globalThis.InspectionStudy;
 
 const CONDITION = 'Porcine reproductive and respiratory syndrome';
-const save = (view, ids, fill) => {
+const save = (view, ids, fill, out = {}) => {
   const c = M.seed(); M.openBulkAction(c, view, ids); fill(c.form, c);
   assert.ok(M.bulkActionValid(c), view + ' form is valid'); assert.ok(M.saveBulkAction(c), view + ' saves');
+  out.rowCheck = c.rowCheck;
   return c.toast || null;
 };
 const one = ['000267'], two = ['000267', '000254'];
 
-test('one pig: no toast where the row shows the result (condition tags, body condition, care, edits)', () => {
-  assert.equal(save('health', one, (f) => { f.conditions = [CONDITION]; f.triage = 'Monitor'; }), null, 'a recorded condition shows as a tag');
+test('one pig: where the row can show the result, the drawn list decides (on screen, every tag shown), not the save', () => {
+  const o = {};
+  assert.equal(save('health', one, (f) => { f.conditions = [CONDITION]; f.triage = 'Monitor'; }, o), null, 'a recorded condition shows as a tag');
+  assert.deepEqual(o.rowCheck, { id: '000267', toast: { title: 'Condition recorded', detail: '000267', tone: 'done' } }, 'the list checks the row once drawn; the toast waits for it');
   assert.equal(save('body', one, (f) => { f.condition = 'Over-conditioned'; }), null, 'body condition shows as a tag');
   assert.equal(save('triage', one, (f) => { f.target = 'Thin'; f.triage = 'Treat'; }), null, 'care shows on the tag');
   assert.equal(save('edit-conditions', one, (f) => { f.target = 'Thin'; f.note = 'Feed more'; }), null, 'an edit shows on the tag');

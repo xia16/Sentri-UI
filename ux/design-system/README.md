@@ -115,7 +115,7 @@ Every drawer and page leaves, goes up and commits the same way.
 
 A save confirms itself where the worker's eye lands, once, and never louder than it needs to.
 
-- **The result is visible where you land** (the edited row shows its new value): the row is the confirmation. No toast.
+- **The result is visible where you land** (the edited row shows its new value, on screen and with every tag shown, not behind a "+N"): the row is the confirmation. No toast. A row below the dock or a change hidden behind "+N" is not visible: a toast.
 - **The result is not visible** (Record treatment returns to the walk list; a death takes the pig off the list): a [Toast](components/Toast/README.md), what was done and for whom: "Treatment recorded · 000267", "12 pigs". It goes after about 3 seconds, is cleared by the next view, and a tap dismisses it without reaching what it covers.
 - **Several pigs**: always a toast with the count ("Condition recorded · 5 pigs"): their rows may sit in other pens or off screen.
 - **A change that removes or barely moves what you see** (Resolve takes a tag away; an abortion changes one word on the pig's page): a toast, since the change is easy to miss.

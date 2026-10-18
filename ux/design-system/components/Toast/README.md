@@ -89,8 +89,8 @@ Inspection's record actions, through one rule (`saveFeedback` in `ux/system/insp
 | Measurements: weight, temperature, backfat | "Weight recorded · 000267" | "… · 12 pigs" |
 | Add a note | "Note added · 000267" | "… · 12 pigs" |
 | Resolve conditions | "Marked recovered" / "Record corrected · 000267" | "… · 12 pigs" |
-| Record health (disease or symptom) | none: the row shows the tag | "Condition recorded · 12 pigs" |
-| Body condition, care instructions, edit conditions | none: the row shows it | "… · 12 pigs" |
+| Record health (disease or symptom) | none when the row is on screen and shows every tag; else "Condition recorded · 000267" | "Condition recorded · 12 pigs" |
+| Body condition, care instructions, edit conditions | as Record health: none only when the row is in view with every tag | "… · 12 pigs" |
 | Record abortion, batch membership | "Abortion recorded" / "Batch updated · 000267" | one pig only |
 
 None after a save that returns to its finding (the finding shows it). Moving a pig is saved by Farrowing's host, which owns its own feedback. Older plain toasts ("Weights saved", "Saved to pen …", "Task completed") remain where Inspection's older flows draw them.
