@@ -16633,7 +16633,9 @@
          "health-record.custom-doses-own",
          "health-record.custom-doses-remove",
          "health-record.custom-doses-search",
-         "health-record.treatment-note"
+         "health-record.treatment-note",
+         "health-record.treatment-saved",
+         "health-record.treatment-saved-offline"
         ]
        },
        "entryPoints": [
@@ -16741,6 +16743,16 @@
          "health-record.treatment",
          "health-record.brand",
          "tap Brand"
+        ],
+        [
+         "health-record.treatment",
+         "health-record.treatment-saved",
+         "Save: the walk list, with the toast"
+        ],
+        [
+         "health-record.treatment",
+         "health-record.treatment-saved-offline",
+         "Save with no connection"
         ],
         [
          "health-record.brand",
@@ -18198,6 +18210,85 @@
          }
         },
         {
+         "id": "health-record.treatment-saved",
+         "name": "Record treatment: saved",
+         "zh": "记录治疗：已保存",
+         "status": "in-design",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "profile-full",
+         "steps": [
+          "[data-action=\"pig-actions\"]",
+          "[data-action=\"treatment\"]",
+          "[data-action=\"medicine-open\"]",
+          "[data-action=\"medicine-select\"][data-value=\"amoxicillin\"]",
+          {
+           "fill": "[data-bulk-key=\"dose\"]",
+           "text": "2"
+          },
+          "[data-action=\"bulk-save\"]"
+         ],
+         "holds": [
+          "st-toast-in"
+         ],
+         "figma": "",
+         "notes": {
+          "purpose": "Saving a treatment closes the form onto the walk list, where the record is not visible, so a Toast says what was saved and for whom (design law: Feedback after saving). Held so the gate can see it.",
+          "elements": [
+           {
+            "name": "Toast",
+            "at": ".st-toast",
+            "shows": "A check on the green; Treatment recorded; 000267",
+            "rule": "Shows after a treatment or vaccination saves; about 3 seconds; one at a time. Several pigs: N pigs."
+           }
+          ],
+          "controls": [],
+          "copy": [
+           "save.treatment_recorded"
+          ],
+          "issues": []
+         }
+        },
+        {
+         "id": "health-record.treatment-saved-offline",
+         "name": "Record treatment: saved, no connection",
+         "zh": "记录治疗：已保存（无网络）",
+         "status": "in-design",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus&connection=offline",
+         "preset": "profile-full",
+         "steps": [
+          "[data-action=\"pig-actions\"]",
+          "[data-action=\"treatment\"]",
+          "[data-action=\"medicine-open\"]",
+          "[data-action=\"medicine-select\"][data-value=\"amoxicillin\"]",
+          {
+           "fill": "[data-bulk-key=\"dose\"]",
+           "text": "2"
+          },
+          "[data-action=\"bulk-save\"]"
+         ],
+         "holds": [
+          "st-toast-in"
+         ],
+         "figma": "",
+         "notes": {
+          "purpose": "The same save with no connection: the record is kept on this phone and uploads when connected. Never says uploaded. The header badge carries the state after the toast goes (Data sync). Held so the gate can see it.",
+          "elements": [
+           {
+            "name": "Toast",
+            "at": ".st-toast",
+            "shows": "No-signal on the ink; Saved on this phone; Uploads when connected · 000267",
+            "rule": "Shows instead of the done form when the phone has no connection."
+           }
+          ],
+          "controls": [],
+          "copy": [
+           "save.on_this_phone",
+           "save.uploads_when_connected"
+          ],
+          "issues": []
+         }
+        },
+        {
          "id": "health-record.brand-details",
          "name": "Brand: add details (optional)",
          "zh": "品牌：添加详情（可选）",
@@ -18416,6 +18507,32 @@
                },
                {
                 "type": "action",
+                "id": "hr-t6.save",
+                "label": "Tap Save · 2 pigs",
+                "children": [
+                 {
+                  "type": "outcome",
+                  "id": "hr-t6-saved-toast",
+                  "label": "Saving lands on the walk list, where a toast says what was recorded and for how many pigs",
+                  "tree": "T-6",
+                  "gwt": {
+                   "given": "A worker has set a dosage for two pigs on Record treatment.",
+                   "when": "They tap Save.",
+                   "then": "The form closes onto the walk list and a message says the treatment was recorded for 2 pigs."
+                  },
+                  "authority": [
+                   {
+                    "src": "RUL",
+                    "at": "Design law: Feedback after saving (owner, 2026-10-18)",
+                    "says": "The result is not visible: a Toast, what was done and for whom"
+                   }
+                  ],
+                  "result": "pass"
+                 }
+                ]
+               },
+               {
+                "type": "action",
                 "id": "hr-t5.leave-reopen",
                 "label": "Back out of the form, then open Record treatment again",
                 "children": [
@@ -18448,9 +18565,9 @@
          }
         ],
         "run": {
-         "commit": "6355fee",
+         "commit": "0c291f6",
          "dirty": true,
-         "ran": "2026-10-18T03:24:47.810Z",
+         "ran": "2026-10-18T11:10:31.370Z",
          "langs": [
           "en",
           "zh"
@@ -19609,9 +19726,9 @@
          }
         ],
         "run": {
-         "commit": "a0f5582",
+         "commit": "0c291f6",
          "dirty": true,
-         "ran": "2026-10-18T07:49:54.032Z",
+         "ran": "2026-10-18T11:11:10.604Z",
          "langs": [
           "en",
           "zh"
@@ -28053,6 +28170,22 @@
        "correction",
        "danger",
        "notice"
+      ]
+     }
+    },
+    {
+     "name": "Toast",
+     "group": "Status and feedback",
+     "status": "in-design",
+     "gate": {
+      "status": "in-design"
+     },
+     "files": {
+      "variantsJson": true,
+      "variants": [
+       "done",
+       "offline",
+       "plain"
       ]
      }
     },

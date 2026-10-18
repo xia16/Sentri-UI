@@ -84,3 +84,17 @@ The catalogue pickers' heads. Questions at a level: where am I? (the title: the 
 # Record treatment and the medicines picker (2026-10-16, in place)
 
 The facts are budgeted in `features/medicines/budget.md` (Record treatment (host)): Medicine with its withdrawal caption, Method, Brand (optional; the caption moves under it when the brand has its own period), Dosage and Unit, (several pigs: Same for all · Adjust ›, opening Dose per pig with Remove), Condition (optional), Note (optional). The Banner notice and the pigs row are gone.
+
+# Saved, the walk list (Feedback after saving, owner 2026-10-18)
+
+The worker's questions after tapping Save on Record treatment: 1. Did it save? 2. Which pig, or how many? 3. Did it reach the team, or is it on this phone? The walk list they land on doesn't show the record, so a Toast answers them for about 3 seconds.
+
+| Fact | Question it answers | Level | Decision |
+|---|---|---|---|
+| Glyph: a check on the green / no-signal on the ink | Did it save, and where did it go? | Act now (the moment) | kept: the one coloured mark, green only for done |
+| "Treatment recorded" / "Saved on this phone" | Did it save? | Act now | kept |
+| "000267" / "2 pigs" | Which pig, or how many? | Settled | kept: the second line |
+| "Uploads when connected" (offline only) | Did it reach the team? | Watch | kept, offline only; never "uploaded" or "synced" |
+| Medicine, dose and withdrawal | — | — | **cut**: the record holds them; the toast is not a receipt |
+| "Successfully", "!" | — | — | **cut** |
+| An Undo or View action | — | — | **cut**: a toast never takes a tap here (gloves; it would hide under the thumb on the dock) |

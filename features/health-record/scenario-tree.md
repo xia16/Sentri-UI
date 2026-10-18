@@ -13,3 +13,4 @@ States: the treatment form for two selected pigs with a medicine picked, with or
 | T-3 | Dosage 2.5 | Give one pig 3 on Dose per pig, then Back | → "2 pigs · 1 adjusted"; Save · 2 pigs | S — M several pigs; P never identical doses | hr-t3-one-pig-adjusted |
 | T-4 | Dosage 2.5 | Remove pigs, remove one, then Back | → remove mode ends at one pig; Save · 1 pig | S — M several pigs | hr-t4-remove-pig |
 | T-5 | Medicine and dosage set | Back out of the form, reopen Record treatment | → the medicine and dosage are kept | S — B | hr-t5-draft-survives-reopen |
+| T-6 | Dosage set for two pigs | Save | → the walk list, and a toast: Treatment recorded · 2 pigs | S — design law, Feedback after saving | hr-t6-saved-toast |

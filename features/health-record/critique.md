@@ -291,3 +291,15 @@ The Brand optional row comes back as the medicines feature's field (only once a 
 - **minor** · The adjust caption read as a footnote: now one navigate **Row** (title "2 pigs · 2.5 mL each" / "2 pigs · 1 adjusted", trailing word "Adjust" with the rail's ›; the row law's "word + › when the tap acts"); the whole row opens Dose per pig. It keeps Row's one height (`row-min`), not 48px: the row law gives every row one height.
 - **major** · "Remove" under every pig doubled each row: now **Remove pigs**, a text action above the list, switches it into remove mode (the platform list's edit mode: a remove control per row, IconButton plain ×, in the dose box's place; Done to leave). Touch states only.
 - **minor** · The batch screens showed 2 pigs and Dose per pig 8: every batch screen now uses the same 2 pigs.
+
+# Saved, the walk list (owner, 2026-10-18)
+
+### Problems
+- **major** · Saving Record treatment for one pig closed the form onto the walk list with no sign it had saved: nothing on the list shows the record (owner: "do we need a small thing that fades letting know the thing has been recorded?"). Offline it was worse: nothing said the record was only on this phone.
+- **minor** · The older toast Inspection drew for some saves ("Weights saved") was page-built (`.inspect-toast` in the page's CSS), a bare dark box with no glyph and no subject.
+
+### Parts
+- Toast: page-built `.inspect-toast` → moved into the design system as it looked (byte-identical render), then designed: **Toast** (`SentriUI.toast`, done and offline forms). Kept for the older saves, which now draw the same box.
+
+### Self-crit
+- New held screens `health-record.treatment-saved` and `health-record.treatment-saved-offline` (EN and ZH, 390): the toast sits 10px above the dock, on the gutters, 56px tall, one line each; the check on the green is the only colour; offline swaps the glyph and the second line and never says uploaded. The walk list behind it is unchanged. House references: Linear's "Issue created" snackbar, Material's snackbar; solid ink because it is read in glare.

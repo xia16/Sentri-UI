@@ -1,9 +1,9 @@
 {
  "feature": "health-record",
- "commit": "6355fee428dbaba45b3b5f64664bf5bcff80d8a1",
+ "commit": "0c291f6ed79b3153c22e14986e0e5764201da93c",
  "dirty": true,
- "ran": "2026-10-18T03:24:47.810Z",
- "base": "http://localhost:64843",
+ "ran": "2026-10-18T11:10:31.370Z",
+ "base": "http://localhost:55602",
  "langs": [
   "en",
   "zh"
@@ -15,11 +15,11 @@
  "nodes": {
   "entry": 1,
   "state": 1,
-  "outcome": 5,
-  "action": 4
+  "outcome": 6,
+  "action": 5
  },
  "summary": {
-  "pass": 5,
+  "pass": 6,
   "fail": 0,
   "blocked": 0,
   "pending": 0,
@@ -27,19 +27,19 @@
  },
  "byLang": {
   "en": {
-   "pass": 5,
+   "pass": 6,
    "fail": 0,
    "blocked": 0
   },
   "zh": {
-   "pass": 5,
+   "pass": 6,
    "fail": 0,
    "blocked": 0
   }
  },
  "byBranch": {
   "hr-t.entry": {
-   "pass": 5,
+   "pass": 6,
    "fail": 0,
    "blocked": 0,
    "pending": 0
@@ -415,6 +415,91 @@
    ]
   },
   {
+   "id": "hr-t6-saved-toast",
+   "tree": "T-6",
+   "branch": "hr-t.entry",
+   "label": "Saving lands on the walk list, where a toast says what was recorded and for how many pigs",
+   "gwt": {
+    "given": "A worker has set a dosage for two pigs on Record treatment.",
+    "when": "They tap Save.",
+    "then": "The form closes onto the walk list and a message says the treatment was recorded for 2 pigs."
+   },
+   "path": [
+    "hr-t.entry",
+    "hr-t.state",
+    "hr-t2.dose",
+    "hr-t6.save",
+    "hr-t6-saved-toast"
+   ],
+   "authority": [
+    {
+     "src": "RUL",
+     "at": "Design law: Feedback after saving (owner, 2026-10-18)",
+     "says": "The result is not visible: a Toast, what was done and for whom"
+    }
+   ],
+   "result": "pass",
+   "hard": [],
+   "runs": [
+    {
+     "lang": "en",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/health-record/hr-t6-saved-toast/en-360/00-start.png",
+      "review/scenarios/health-record/hr-t6-saved-toast/en-360/01-fill-data-bulk-key-dose.png",
+      "review/scenarios/health-record/hr-t6-saved-toast/en-360/02-data-action-bulk-save.png"
+     ],
+     "loadFailures": []
+    },
+    {
+     "lang": "en",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/health-record/hr-t6-saved-toast/en-390/00-start.png",
+      "review/scenarios/health-record/hr-t6-saved-toast/en-390/01-fill-data-bulk-key-dose.png",
+      "review/scenarios/health-record/hr-t6-saved-toast/en-390/02-data-action-bulk-save.png"
+     ],
+     "loadFailures": []
+    },
+    {
+     "lang": "zh",
+     "width": 360,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/health-record/hr-t6-saved-toast/zh-360/00-start.png",
+      "review/scenarios/health-record/hr-t6-saved-toast/zh-360/01-fill-data-bulk-key-dose.png",
+      "review/scenarios/health-record/hr-t6-saved-toast/zh-360/02-data-action-bulk-save.png"
+     ],
+     "loadFailures": []
+    },
+    {
+     "lang": "zh",
+     "width": 390,
+     "result": "pass",
+     "failures": [],
+     "skipped": [],
+     "notes": [],
+     "evidence": [
+      "review/scenarios/health-record/hr-t6-saved-toast/zh-390/00-start.png",
+      "review/scenarios/health-record/hr-t6-saved-toast/zh-390/01-fill-data-bulk-key-dose.png",
+      "review/scenarios/health-record/hr-t6-saved-toast/zh-390/02-data-action-bulk-save.png"
+     ],
+     "loadFailures": []
+    }
+   ]
+  },
+  {
    "id": "hr-t5-draft-survives-reopen",
    "tree": "T-5",
    "branch": "hr-t.entry",
@@ -469,9 +554,7 @@
       "review/scenarios/health-record/hr-t5-draft-survives-reopen/en-390/02-data-action-back.png",
       "review/scenarios/health-record/hr-t5-draft-survives-reopen/en-390/03-data-action-treatment.png"
      ],
-     "loadFailures": [
-      "/ux/system/farrowing-astra-concept.css?v=astra-consolidated-1 net::ERR_NO_BUFFER_SPACE"
-     ]
+     "loadFailures": []
     },
     {
      "lang": "zh",

@@ -393,6 +393,18 @@ button.st-row:disabled{cursor:default}
 .st-picker-body .st-choice-row.st-choice-row{padding-block:var(--space-8)}
 /* Search stays at the top of the sheet while the one list scrolls under it (sticky in the sheet body, never a second scroller). */
 .sheet-body>.st-picker-body>.st-choice-search,.sheet-body>*>.st-picker-body>.st-choice-search{position:sticky;top:calc(-1 * var(--space-section));z-index:1;margin:calc(-1 * var(--space-section)) calc(-1 * var(--space-gutter-sheet)) var(--space-12);padding:var(--space-section) var(--space-gutter-sheet) var(--space-8);background:var(--paper)}
+/* Toast: what was just saved, on the ink above the page's dock (the Android snackbar). Solid, never see-through: it is read in sun
+   and glare. A glyph says how it went (done: a check on the green; offline: no-signal, saved on this phone), the title what was done,
+   the second line for whom or where it went. It rises in once and never takes a tap. */
+.st-toast{position:absolute;bottom:var(--toast-bottom,104px);left:var(--space-gutter);right:var(--space-gutter);z-index:7;display:flex;align-items:center;gap:var(--space-12);min-height:56px;box-sizing:border-box;padding:var(--space-10) var(--space-16);border-radius:var(--radius-inset);background:var(--ink);color:#fff;box-shadow:0 8px 24px #141c1238;cursor:default;animation:st-toast-in .2s ease-out both}
+.st-toast-glyph{display:grid;place-items:center;flex:none;width:28px;height:28px;border-radius:50%;background:#ffffff24;color:#fff}
+.st-toast--done .st-toast-glyph{background:var(--green)}
+.st-toast-glyph svg{width:16px;height:16px}
+.st-toast-copy{display:flex;flex-direction:column;gap:2px;min-width:0}
+.st-toast-title{font:600 var(--type-row-title-size)/1.3 var(--font-sans)}
+.st-toast-detail{font:400 var(--font-size-13)/1.35 var(--font-sans);color:#ffffffc7}
+@keyframes st-toast-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.st-toast{animation:none}}
 .st-choice-empty{margin:0;padding:var(--space-24) var(--space-17);font:400 var(--font-size-13)/1.5 var(--font-sans);color:var(--st-muted)}
 /* An empty collection the worker can add to (a farm's brands for a medicine): the native "nothing here yet" — a glyph on the tint, a
    title that names what is missing, one line that says how to add it. Centred under the search, which stays the way in. */

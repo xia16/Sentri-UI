@@ -1,9 +1,9 @@
 {
  "feature": "medicines",
- "commit": "a0f5582967c403f0847d492985e139f563b8fdae",
+ "commit": "0c291f6ed79b3153c22e14986e0e5764201da93c",
  "dirty": true,
- "ran": "2026-10-18T07:49:54.032Z",
- "base": "http://localhost:59853",
+ "ran": "2026-10-18T11:11:10.604Z",
+ "base": "http://localhost:60753",
  "langs": [
   "en",
   "zh"
