@@ -1,9 +1,10 @@
-// The spacing check: only what is clearly wrong, never "off by a few pixels". Four defects, each with a tolerance:
+// The spacing check: only what is clearly wrong, never "off by a few pixels". Five defects, each with a tolerance:
 //   inversion  a block sits closer to a list than the list's own rows sit to each other, so it reads as part of the list
 //              (gap < 60% of the list's row rhythm, rhythm at least 20px)
 //   crowding   two different boxed blocks (a surface or border each) less than 8px apart, one above the other, nothing between
 //   double     two horizontal edges (hairline, border, box edge) within 6px of each other: two lines doing one job
 //   scrollbar  a scroll container whose desktop scrollbar shows (it takes width when the content overflows, and the content jumps)
+//   sideways   a scroll container that scrolls sideways (more than 1px) though its content is not a row
 // Renders every atlas screen bare at 390 x 844 and audits the first screen. Writes review/spacing.json.
 // Usage: node scripts/check-spacing.mjs [--base <url>] [--feature <id>] [--screens id,id] [--changed <ids>] [--strict] [--out <file.json>]
 //   --changed  exit 1 only when one of these screens has a defect; --strict: exit 1 on any defect.
@@ -106,6 +107,20 @@ function auditFrame(TOL) {
     if (!hidden) out.push({ check: 'scrollbar', at: Math.round(el.getBoundingClientRect().top), detail: `${name(el)} scrolls with a visible desktop scrollbar (scrollbar-width: ${cs.scrollbarWidth}): it takes its width once the content overflows and the content jumps sideways; hide it (scrollbar-width: none)` });
   }
 
+  // sideways: a scroll container that a swipe moves sideways although its content is not laid out as a row (#207: the picker's
+  // sticky search bled 21px past the list that scrolled it). A row meant to scroll sideways (a chip track: a flex row that does not
+  // wrap, a grid flowing in columns, text that does not wrap) is a track, not a defect; overflow-x hidden or clip cannot be swiped,
+  // so it is not one either. Shots are taken at scroll offset 0, so no pixel pair can show it.
+  for (const el of document.querySelectorAll('body *')) {
+    const cs = getComputedStyle(el);
+    if (!(cs.overflowX === 'auto' || cs.overflowX === 'scroll') || el.scrollWidth <= el.clientWidth + 1 || !vis(el)) continue;
+    const row = (/flex/.test(cs.display) && /^row/.test(cs.flexDirection) && cs.flexWrap === 'nowrap') || (/grid/.test(cs.display) && /column/.test(cs.gridAutoFlow)) || /^(nowrap|pre)$/.test(cs.whiteSpace);
+    if (row) continue;
+    const box = el.getBoundingClientRect(), over = el.scrollWidth - el.clientWidth;
+    const wide = [...el.querySelectorAll('*')].find((k) => { const r = k.getBoundingClientRect(); return r.width > 0 && (r.right > box.right + 1 || r.left < box.left - 1); });
+    out.push({ check: 'sideways', at: Math.round(box.top), detail: `${name(el)} scrolls ${over}px sideways though its content is not a row${wide ? ` (${name(wide)} reaches past it)` : ''}: fix what overflows, or clip it (overflow-x: hidden)` });
+  }
+
   // one finding per check and place
   const key = new Set(); return out.filter((o) => { const k = o.check + '|' + Math.round(o.at / 10); if (key.has(k)) return false; key.add(k); return true; });
 }
@@ -149,7 +164,7 @@ await browser.close(); if (server) server.kill();
 if (!only.length && !val('--feature')) fs.writeFileSync(path.join(root, 'review/spacing.json'), JSON.stringify({ tolerances: TOL, screens: results }, null, 1));
 if (val('--out')) fs.writeFileSync(val('--out'), JSON.stringify(results));
 const bad = results.filter((r) => r.defects.length);
-console.log(`spacing: ${results.length} screens, ${bad.length} with a clear defect (inversion ${bad.flatMap((r) => r.defects).filter((d) => d.check === 'inversion').length}, crowding ${bad.flatMap((r) => r.defects).filter((d) => d.check === 'crowding').length}, double ${bad.flatMap((r) => r.defects).filter((d) => d.check === 'double').length}, scrollbar ${bad.flatMap((r) => r.defects).filter((d) => d.check === 'scrollbar').length})`);
+console.log(`spacing: ${results.length} screens, ${bad.length} with a clear defect (inversion ${bad.flatMap((r) => r.defects).filter((d) => d.check === 'inversion').length}, crowding ${bad.flatMap((r) => r.defects).filter((d) => d.check === 'crowding').length}, double ${bad.flatMap((r) => r.defects).filter((d) => d.check === 'double').length}, scrollbar ${bad.flatMap((r) => r.defects).filter((d) => d.check === 'scrollbar').length}, sideways ${bad.flatMap((r) => r.defects).filter((d) => d.check === 'sideways').length})`);
 const failing = list('--changed').length ? bad.filter((r) => list('--changed').includes(r.screen)) : argv.includes('--strict') ? bad : [];
 process.exit(failing.length ? 1 : 0);
 }
