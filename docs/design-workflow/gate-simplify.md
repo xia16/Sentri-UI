@@ -124,7 +124,10 @@ With most gates at 1–3 minutes, the lock queue shrinks with them, so G11 (smal
    no longer calls it.
 3. **Done (2026-10-18):** S3: checker identities hash only what computes. `scripts/playwright-path.mjs` and
    `scripts/process-start.mjs` are left out of every code closure (`NOT_RESULTS` in evidence.mjs).
-4. S4, S5, X8: the run matrix.
+4. **Done (2026-10-18):** S4, S5, X8: the run matrix. A moved screen is shot at EN 390, EN 360 and ZH 360 (`RUNS` in
+   evaluate.mjs). Leaves run at the narrowest width their spec lists. A ZH run goes only where its start renders Chinese: one per
+   start goes first, and the rest are blocked without running when it finds none. ZH shots of screens that ignore `?lang=zh` stay as
+   one run, and are dropped from the pairs as before.
 5. X3, X6, X7: the flags.
 6. G2 (X4, X5), with the GitHub setting.
 7. S6–S8 and G9: the judge's load and the Results block.

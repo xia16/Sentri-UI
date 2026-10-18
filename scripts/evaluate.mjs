@@ -33,7 +33,9 @@ import { renderDef } from './atlas-screens.mjs';
 import { leafRunner, leafRow, reportOf, leafContextPool } from './scenario-runner.mjs';
 import { openPrs } from './github.mjs';
 
-export const WIDTHS = [390, 360], LANGS = ['en', 'zh'];
+// The runs of a screen in the reach (gate-simplify.md S4): EN at 390 and 360, ZH at 360. ZH at the narrowest width is its worst case
+// for fit; ZH at 390 showed nothing ZH 360 didn't. A component page is EN only (its Chinese cells are its own states).
+export const RUNS = [{ width: 390, lang: 'en' }, { width: 360, lang: 'en' }, { width: 360, lang: 'zh' }];
 const BUNDLE_JS = 'ux/design-system/components/bundle.js';
 // What no page can load: the analyser's own rule (static-reach), repeated for the files an `unbounded` load folds in.
 const NOT_LOADED = [/^docs\//, /^\.github\//, /^tests\//, /^\.claude\//, /^scripts\//, /^(?!ux\/).*\.md$/i];
@@ -259,8 +261,8 @@ export async function evaluate(opts) {
   // both sides shares one shot, so its diff is 0 by definition: shooting it proved nothing, and the tripwire and "every screen" for
   // CSS that did were removed. Identity completeness is the guarantee (gate-v2.md §3, the stylesheet syntax the analyser checks), and
   // `--audit` checks it off the merge path. The scope's own screens stay in (until X7); a --quick self-check takes the scope only, and
-  // the component pages when the change edits a component. A screen in the reach is shot at 390 and 360 in EN and ZH (a component
-  // page in EN: its Chinese cells are its own states) and gets its visit checks; nothing else is shot.
+  // the component pages when the change edits a component. A screen in the reach is shot at RUNS (EN 390 and 360, ZH 360; a
+  // component page in EN only) and gets its visit checks; nothing else is shot.
   const sideList = (k) => [...S[k].screens, ...S[k].ds];
   const idAt = (side, x) => shotId(side, x, 390, 'en', componentPage(x.id) ? 'grid' : 'screen');
   if (audit) for (const x of sideList('base')) reachIds.add(x.id);
@@ -275,7 +277,7 @@ export async function evaluate(opts) {
   }
   if (audit || quick) mech.reach = { screens: reachIds.size, of: total, why: [audit ? 'audit: every screen of the base' : 'quick: the scope only, and the component pages of a change to a component'] };
   log(`reach: ${reachIds.size} of ${total} screens${mech.reach.changed !== undefined ? ` (${mech.reach.changed} whose identity changed, ${mech.reach.added} added, ${mech.reach.removed} removed; the rest the scope's)` : ` (${mech.reach.why[0]})`}`);
-  const runsOf = (x) => (inReach(x) ? WIDTHS.flatMap((width) => (componentPage(x.id) ? ['en'] : LANGS).map((lang) => ({ width, lang }))) : []);
+  const runsOf = (x) => (inReach(x) ? RUNS.filter((r) => !componentPage(x.id) || r.lang === 'en').map(({ width, lang }) => ({ width, lang })) : []);
   const visitChecks = (side, x, width, lang) => {
     if (audit || !inReach(x) || componentPage(x.id)) return [];
     const out = [];
@@ -516,7 +518,7 @@ export async function evaluate(opts) {
   const moved = [...screens.diff, ...screens.new, ...screens.gone];
   const zhIgnored = new Set(), zhLost = new Set(), pairJobs = [];
   const round4 = (p) => (p > 0 ? Math.max(0.0001, Math.round(p * 1e4) / 1e4) : 0);
-  for (const s of moved) for (const width of WIDTHS) for (const lang of LANGS) {
+  for (const s of moved) for (const { width, lang } of RUNS) {
     const k = `${s.id} ${lang}-${width}`, b = baseAt.get(k), c = candAt.get(k);
     const noZh = (x) => lang === 'zh' && x?.ok && x.zh === 'ignored';
     const sides = [b, c].filter((x) => x?.ok);
@@ -705,7 +707,8 @@ export async function evaluate(opts) {
     const spec = specOf(side, f); if (!spec) return null;
     const { leaves, nodeCount, problems } = walkTree(spec);
     if (problems.length) return { problems };
-    const D = spec.defaults || {}, langs = D.langs || ['en'], widths = D.widths || [390];
+    // S5: a leaf runs at the narrowest width its spec lists (360), unless the leaf names its own widths
+    const D = spec.defaults || {}, langs = D.langs || ['en'], widths = [Math.min(...(D.widths || [390]))];
     const its = [];
     for (const l of leaves) {
       if (only && !only.has(l.node.id)) continue;
@@ -731,7 +734,7 @@ export async function evaluate(opts) {
       const m = r.result === 'fail' ? machineErrorOf(r.failures) || ((r.loadFailures || []).length ? 'net-error' : null) : null;
       return m ? { machine: m, error: r.failures[0]?.got, run: r } : { run: r };
     } });
-    await Promise.all(todo.compute.map((it) => runOnce(it).then(async (x) => {
+    const runIt = (it) => runOnce(it).then(async (x) => {
       if (x.machine) { results.set(it.id, { ...x.run, machine: x.machine }); return; }
       if (x.error) { results.set(it.id, { lang: it.lang, width: it.width, result: 'fail', failures: [{ what: 'run', got: x.error, tag: null }], skipped: [], notes: [], evidence: [] }); return; }
       results.set(it.id, x.run);
@@ -740,7 +743,21 @@ export async function evaluate(opts) {
       const c = confirmLeaf(x, await runOnce(it, true));
       if (c.store) store.put('leaf', it.id, { run: x.run, confirmed: true });
       if (c.unstable) block(`scenarios ${f}: ${it.leaf.node.id} ${side} ${it.lang}-${it.width} failed, then ${c.why} on the same identity: an unstable leaf, not a design result (fix the leaf or the page's race)`);
-    })));
+    });
+    // X8: another language only where its start renders it. The runner checks that once a leaf's start is set up (its reset
+    // fixture: page, preset, fixture taps); one run per start and language goes first, and when it finds no rendering, the other
+    // runs from that start are blocked the same way without running. A blocked run never passes, so nothing is let through.
+    const startOf = (it) => `${it.lang} ${it.width} ${canonical(it.leaf.state?.reset || {})} ${plan.D.url || ''}`;
+    const other = todo.compute.filter((it) => it.lang !== 'en'), firsts = new Map();
+    for (const it of other) if (!firsts.has(startOf(it))) firsts.set(startOf(it), it);
+    await Promise.all([...todo.compute.filter((it) => it.lang === 'en'), ...firsts.values()].map(runIt));
+    const NONE = /^no \w+ rendering:/;
+    await Promise.all(other.filter((it) => firsts.get(startOf(it)) !== it).map((it) => {
+      const r = results.get(firsts.get(startOf(it)).id);
+      if (!(r?.result === 'blocked' && (r.notes || []).some((n) => NONE.test(n)))) return runIt(it);
+      results.set(it.id, { lang: it.lang, width: it.width, result: 'blocked', failures: [], skipped: [], notes: [...r.notes.filter((n) => NONE.test(n)), `not run: ${firsts.get(startOf(it)).leaf.node.id} from the same start found no ${it.lang} rendering`], evidence: [], loadFailures: [] });
+      return null;
+    }));
     for (const it of plan.its.filter((i) => i.kind)) { const r = results.get(it.id); if (r?.machine) block(`scenarios ${f}: ${it.leaf.node.id} ${side} ${it.lang}-${it.width}: machine error twice (${r.machine}: ${String(r.failures?.[0]?.got || '').slice(0, 100)})`); }
     const rows = [];
     for (const l of new Set(plan.its.map((i) => i.leaf))) rows.push(leafRow(l, plan.its.filter((i) => i.leaf === l && i.kind).map((i) => results.get(i.id)).filter((r) => r && !r.machine)));
