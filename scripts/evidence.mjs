@@ -93,12 +93,16 @@ export function importsOf(source) {
 }
 // A module's closure from a checkout: every local file it reaches, with its content hash (line endings normalised). Content, not
 // blobs: the gate's own tools may be a working copy (its tools are checked equal to the base's before it starts).
+// Modules that decide no result, left out of every closure (gate-simplify.md S3): they find Playwright (whose version is hashed
+// separately, as the render) and tell one run's process from another (the gate lock). Before, #205's lock fix gave every check a new
+// identity, and the next gate re-shot and re-checked everything it reached.
+export const NOT_RESULTS = new Set(['scripts/playwright-path.mjs', 'scripts/process-start.mjs']);
 export function codeClosure(root, entries) {
   const seen = new Map(), stack = [...entries].map((e) => path.posix.normalize(e));
   let computed = false;
   while (stack.length) {
     const rel = stack.pop();
-    if (seen.has(rel)) continue;
+    if (seen.has(rel) || NOT_RESULTS.has(rel)) continue;
     const file = path.join(root, rel);
     if (!fs.existsSync(file)) { seen.set(rel, 'missing'); continue; }
     const text = fs.readFileSync(file);

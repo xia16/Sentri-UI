@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { canonical, identityOf, importsOf, codeClosure, codeHash, blobsHash, planEvidence, reconcileInventory, EvidenceStore, SCHEME } from '../scripts/evidence.mjs';
 import { checkVerdict } from '../scripts/loop-rules.mjs';
 
@@ -58,6 +59,13 @@ test('code: a module is hashed with its local imports, static, dynamic and requi
   assert.deepEqual(codeClosure(crlf, ['scripts/check.mjs']).files, codeClosure(dir, ['scripts/check.mjs']).files, 'one commit checked out with CRLF or LF is the same code');
   fs.rmSync(crlf, { recursive: true, force: true });
   fs.rmSync(dir, { recursive: true, force: true });
+  // gate-simplify.md S3: finding Playwright and telling processes apart decide no result, so a lock fix re-checks nothing
+  const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+  for (const checker of ['scripts/check-legibility.mjs', 'scripts/check-spacing.mjs', 'scripts/check-headers.mjs', 'scripts/check-states.mjs', 'scripts/visit.mjs', 'scripts/scenario-runner.mjs']) {
+    const files = Object.keys(codeClosure(root, [checker]).files);
+    assert.ok(files.includes(checker));
+    for (const x of ['scripts/playwright-path.mjs', 'scripts/process-start.mjs']) assert.ok(!files.includes(x), `${checker}'s identity leaves out ${x}`);
+  }
 });
 
 test('reuse: only on a matching identity; two items with one identity are computed once', () => {
