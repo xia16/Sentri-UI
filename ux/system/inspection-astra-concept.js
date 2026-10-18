@@ -594,7 +594,8 @@ function saveBulkAction(c){
   }
   p.last='Updated just now';
  }
- if(view==='treatment'){rememberMedicine(c,f);if(!f.returnFinding)saveToast(c,f.taskId==='vaccination'?'save.vaccination_recorded':'save.treatment_recorded',rows.map(r=>r.p.id));}
+ if(view==='treatment')rememberMedicine(c,f);
+ saveFeedback(c,view,f,rows.map(r=>r.p.id));
  if(f.taskId)completeCurrentTask(c,f.taskId,f.subjects);
  if(f.returnFinding){c.findingName=f.returnFinding;c.form={};c.view='finding';return true;}
  c.form={};c.view='list';c.reviewOnly=false;c.selected.clear();c.selectedPens.clear();return true;
@@ -1187,13 +1188,13 @@ function saveBatchMembership(c){
  const old=c.batches?.find(batch=>batch.id===p.batchId);if(old)old.pigIds=old.pigIds.filter(id=>id!==p.id);
  if(target==='__none__')p.batchId='';
  else {const next=c.batches?.find(batch=>batch.id===target);if(!next)return false;next.pigIds=[...new Set([...next.pigIds,p.id])];p.batchId=next.id;p.stage=next.stage;}
- addEvent(c,'Batch membership changed',[p.id],(old?'Batch '+old.id:'No batch')+' → '+(target==='__none__'?'No batch':'Batch '+target)+(f.batchNote?.trim()?' · '+f.batchNote.trim():''),'Production');
+ saveToast(c,'save.batch_updated',[p.id]);addEvent(c,'Batch membership changed',[p.id],(old?'Batch '+old.id:'No batch')+' → '+(target==='__none__'?'No batch':'Batch '+target)+(f.batchNote?.trim()?' · '+f.batchNote.trim():''),'Production');
  c.pigId=p.id;c.selected.clear();c.navTrail=[];c.form={};c.view='pig';return true;
 }
 function saveMiscarriage(c){
  const p=picked(c)[0],reason=String(c.lossReason||'').trim();if(!p||!reason)return false;
  const batch=c.batches?.find(batch=>batch.id===p.batchId);if(batch)batch.pigIds=batch.pigIds.filter(id=>id!==p.id);
- p.batchId='';p.stage='Off production';p.breedingStatus='Open';addEvent(c,'Abortion recorded',[p.id],reason,'Production');
+ p.batchId='';p.stage='Off production';p.breedingStatus='Open';addEvent(c,'Abortion recorded',[p.id],reason,'Production');saveToast(c,'save.abortion_recorded',[p.id]);
  c.pigId=p.id;c.selected.clear();c.navTrail=[];c.lossReason='';c.form={};c.view='pig';return true;
 }
 function transferReady(c){const d=c.transferDraft||{},p=picked(c)[0],pe=p&&penOf(c,p.id);return !!d.unit&&!!d.pen&&c.transferDestinations?.some(u=>u.id===d.unit&&u.pens.includes(d.pen))&&!(d.unit===c.transferOrigin?.unit&&d.pen===pe?.id);}
@@ -1848,6 +1849,17 @@ function inspectionPenPreview(c,id){
 }
 function searchResults(c){const q=c.query.trim().toLowerCase(),rows=pigs(c).filter(p=>!q||p.id.includes(q)||penOf(c,p.id).id.toLowerCase().includes(q));return `<p class="quiet-note">${countLabel(rows.length)} found</p>${rows.length?`<div class="search-result-list st-panel st-row-group">${rows.map(p=>SentriUI.row({variant:'animal',action:'search-pig',code:p.id,description:'Pen '+penOf(c,p.id).id+' · '+p.stage,right:{kind:'state'},value:p.id})).join('')}</div>`:'<p class="quiet-note">No matching pigs in this unit.</p>'}`;}
 function legacyValid(c){const f=c.form;if(c.view==='condition'||c.view==='report')return !!f.choice&&(f.choice!=='Other'||!!f.note?.trim());if(c.view==='note')return !!f.note?.trim();if(c.view==='weight')return !!f.weight&&Number.isFinite(+f.weight)&&+f.weight>0;if(c.view==='plan')return !!f.preset;if(c.view==='exception')return !!f.choice&&(pen(c,c.penId).mode==='station'||f.actual!==''&&f.actual!=null&&Number.isFinite(+f.actual)&&+f.actual>=0);return true;}
+/* Which saves confirm with a toast (owner, 2026-10-18): one pig only when the walk list's row doesn't show the result (its ear tag,
+   stage line and condition tags do show a recorded condition, body condition, an edit or care change); several pigs always, since
+   their rows may sit in other pens or off screen; Resolve always, since a tag that disappears is easy to miss. A save that returns to
+   a finding shows it there, so no toast; one that returns to More actions doesn't show it, so a toast. */
+function saveToastRule(view){return ({health:{key:'save.condition_recorded',row:true},'edit-conditions':{key:'save.conditions_updated',row:true},triage:{key:'save.care_updated',row:true},body:{key:'save.body_condition_recorded',row:true},resolve:{key:'save.resolved',row:false},weight:{key:'save.weight_recorded',row:false},temperature:{key:'save.temperature_recorded',row:false},backfat:{key:'save.backfat_recorded',row:false},note:{key:'save.note_added',row:false},treatment:{key:'save.treatment_recorded',row:false}})[view];}
+function saveFeedback(c,view,f,ids){
+ const rule=saveToastRule(view);if(!rule||!ids.length||f.returnFinding)return;
+ if(ids.length===1&&rule.row&&!c.actionEntry)return;
+ const key=view==='treatment'&&f.taskId==='vaccination'?'save.vaccination_recorded':view==='resolve'?(f.outcome==='recover'?'save.recovered':'save.record_corrected'):rule.key;
+ saveToast(c,key,ids);
+}
 /* Feedback after saving (design law): the result is not visible on the walk list, so a Toast says what was saved and for whom; with no
    connection (?connection=offline) it says the record is on this phone and uploads when connected. */
 function offlineNow(){return typeof location!=='undefined'&&new URLSearchParams(location.search).get('connection')==='offline';}
