@@ -108,6 +108,9 @@ test('Brand: a full-width optional row only once a medicine is chosen; the farm\
   assert.ok(c.medFarm.brands.some(b => b.name === 'Moxylan B' && b.withdrawal === null), "an empty field keeps the medicine's default");
   M.handleRecordAction(c, 'medicine-open', ''); M.handleRecordAction(c, 'medicine-select', 'meloxicam');
   assert.equal(c.form.brand, '', 'a new medicine drops the old brand');
+  M.handleRecordAction(c, 'medicine-open', ''); M.handleRecordAction(c, 'medicine-select', 'ceftiofur'); M.handleRecordAction(c, 'brand-open', '');
+  assert.match(M.brandPickerBody(c), /class="st-choice-empty"[^>]*>No brands for Ceftiofur yet\. Type a name to add one\./, 'no brands yet: one line says how to add one');
+  c.form.brandPick.search = 'Excenel'; assert.doesNotMatch(M.brandPickerBody(c), /st-choice-empty/, 'once a name is typed, the Add card replaces it');
 });
 
 test('Note: a three-line textarea on the form, at most 200 characters, a counter from 160', () => {

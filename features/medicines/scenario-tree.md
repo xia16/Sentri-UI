@@ -23,6 +23,7 @@ States: the picker at level 1, at a category, searching, or at the add level (Na
 |---|---|---|---|---|---|
 | B-1 | Amoxicillin picked | Pick a brand with its own withdrawal | → its period shows under Brand | S — P withdrawal | med-b1-brand-own-period |
 | B-2 | Brand search with no match | Add “Moxylan”, then Add with the withdrawal empty | → Brand is Moxylan; the medicine's 14 days still apply | S — P Brand, withdrawal never required | med-b2-add-brand-details-optional |
+| B-3 | A medicine with no brands yet | Open Brand, type a name, Add | → the empty list says there are none and to type a name; the new brand is on the form | S — P Brand; atlas health-record.brand-empty | med-b3-no-brands-says-how-to-add |
 
 ## C · Record vaccination
 

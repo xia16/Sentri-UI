@@ -101,6 +101,30 @@
               ]
             },
             {
+              "type": "action", "id": "med-b3.no-brands", "label": "Pick Ceftiofur (no brands used yet), open Brand",
+              "taps": ["[data-action=\"medicine-category\"][data-value=\"antibiotics\"]", "[data-action=\"medicine-select\"][data-value=\"ceftiofur\"]", "[data-action=\"brand-open\"]",
+                       { "expect": [{ "screen": "health-record.brand-empty" },
+                                    { "text": { "en": "No brands for Ceftiofur yet. Type a name to add one.", "zh": "头孢噻呋还没有品牌，输入名称即可添加。" }, "in": "sheet", "says": "the empty list says how to add one" }] },
+                       { "fill": "[data-brand-search]", "value": "Excenel" }, "[data-action=\"brand-add\"]", "[data-action=\"brand-details-save\"]"],
+              "children": [
+                {
+                  "type": "outcome", "id": "med-b3-no-brands-says-how-to-add", "tree": "B-3",
+                  "label": "A medicine with no brands yet says how to add one, and typing a name adds it",
+                  "gwt": { "given": "The farm has never recorded a brand for Ceftiofur.",
+                           "when": "A worker opens Brand for it, types the name on the bottle and adds it.",
+                           "then": "The empty list first says there are no brands yet and to type a name; after adding, the form's Brand reads the new name." },
+                  "authority": [
+                    { "src": "PRD", "at": "Rules: Brand", "says": "A search with no match shows one card, Add “…”, which adds the brand under that medicine for everyone and picks it" },
+                    { "src": "atlas", "at": "health-record.brand-empty, Empty line", "says": "Shown only when the medicine has no brands and nothing is typed. It names the medicine; the search above is the way to add" }
+                  ],
+                  "visible": [
+                    { "screen": "health-record.treatment" },
+                    { "text": "Excenel", "in": "sheet" }
+                  ]
+                }
+              ]
+            },
+            {
               "type": "action", "id": "med-a5.search", "label": "Search \"amox\"",
               "taps": [{ "fill": "[data-medicine-search]", "value": "amox" }],
               "children": [
