@@ -696,6 +696,8 @@
 .inspection-phone .picker-step>.sheet-body{display:flex;flex-direction:column;overflow:hidden;min-height:0}
 .picker-step .health-catalog{height:auto;min-height:0;flex:1;overflow-y:auto}
 .picker-step .medicine-results{min-height:0;flex:1;overflow-y:auto;overscroll-behavior:contain}
+/* Here the list, not the sheet body, is the scroller: the sticky search's bleed past it is clipped, never scrolled sideways. */
+.picker-step :is(.health-catalog,.medicine-results){overflow-x:hidden}
 .drawer-background{position:absolute;inset:0;z-index:1;pointer-events:none}
 .drawer-background .sheet{filter:brightness(.96)}
 @media(prefers-reduced-motion:no-preference){
