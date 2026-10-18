@@ -13,7 +13,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { pwPath, playwright } from './playwright-path.mjs';
-import { CLASSES, classOfFiles, DS_FEATURE, componentPage, componentPagesOf, componentsTouched, idPath, screensOf, pageOf, pageAssets, sharedFiles, coverageLost, effectiveClass, classifyScreens, touchesSystem, touchesTools, queueAhead as queueOf, budgetProblems, critiqueProblems, pageStyling, addedLines, scenarioDebt, isMotionFile, unheldMotion, heldOf, confirmLeaf, reusableLeaf } from './loop-rules.mjs';
+import { CLASSES, classOfFiles, DS_FEATURE, componentPage, componentPagesOf, componentsTouched, idPath, screensOf, pageOf, pageAssets, sharedFiles, coverageLost, effectiveClass, classifyScreens, touchesSystem, touchesTools, budgetProblems, critiqueProblems, pageStyling, addedLines, scenarioDebt, isMotionFile, unheldMotion, heldOf, confirmLeaf, reusableLeaf } from './loop-rules.mjs';
 // The analyser (gate-v2 §2): static and conservative, over both revisions. It says what each screen's and each leaf's evidence
 // depends on; the reach is every screen and leaf whose evidence identity that makes differs between the two (gate-simplify.md X1).
 import { identityInputs, leafInputs } from './static-reach.mjs';
@@ -31,7 +31,6 @@ import { checkStatesHtml, VW as STATE_VW } from './check-states.mjs';
 import { walkTree, leafEntryUrl } from './scenario-tree.mjs';
 import { renderDef } from './atlas-screens.mjs';
 import { leafRunner, leafRow, reportOf, leafContextPool } from './scenario-runner.mjs';
-import { openPrs } from './github.mjs';
 
 // The runs of a screen in the reach (gate-simplify.md S4): EN at 390 and 360, ZH at 360. ZH at the narrowest width is its worst case
 // for fit; ZH at 390 showed nothing ZH 360 didn't. A component page is EN only (its Chinese cells are its own states).
@@ -596,16 +595,9 @@ export async function evaluate(opts) {
     check('motion has a held frame (P4)', !unheld.length, unheld.length ? `${unheld.length} keyframe animation(s) no screen holds (${unheld.slice(0, 3).map((m) => `${m.name}, ${m.kind}`).join('; ')}): add a still render that shows the cue at its hold and name it in that screen's "holds" (atlas/SCHEMA.md)` : '');
   }
   if (tools.length && moved.length) check('workflow changes in their own PR', false, `this change moves ${moved.length} screen(s) and also edits the workflow or the gate's tools (${tools.slice(0, 3).join(', ')}): split it`);
-  if (ec.cls === 'shared' && opts.testBase) gaps.push(`shared-component change against a test base (${opts.base}): the PR queue is not read (it orders real PRs only)`);
-  else if (ec.cls === 'shared') {
-    const branch = String(mech.ref).replace(/^origin\//, '');
-    const prs = openPrs(root);
-    if (prs.error) check('shared-component queue: first in line', false, `cannot read the queue: ${prs.error}`);
-    else {
-      const mine = prs.find((p) => p.headRefName === branch);
-      if (!mine) check('shared-component queue: first in line', false, `no open PR for ${branch}: open one, the queue orders PRs`);
-      else { const ahead = queueOf(prs, mine, shared, (h) => !!h && fs.existsSync(path.join(gateDir, `${h}.json`))); check('shared-component queue: first in line', !ahead.length, ahead.length ? `waiting behind ${ahead.map((p) => '#' + p.number).join(', ')}: merge or close those first, then merge main forward and gate again` : `#${mine.number}`); }
-    }
+  // There is no shared-component queue (gate-simplify.md X4): main requires a branch to be up to date before it merges, so a change
+  // merges only on a gate against main as it is, and a re-gate after main moves reuses every result whose identity is unchanged.
+  if (ec.cls === 'shared') {
     gaps.push('shared-component change: every changed screen on every feature is judged (split the judges by feature if needed)');
   }
 

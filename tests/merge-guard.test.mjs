@@ -32,8 +32,9 @@ test('a merge that is not exactly one pinned command is blocked', () => {
   ]) assert.equal(guard(c), 2, c);
 });
 
-test('a pinned merge without a gate pass is blocked, and so is a direct push to main', () => {
-  assert.equal(guard(`gh pr merge 7 --squash --match-head-commit ${sha}`), 2);
+test('a pinned merge in the one form passes (GitHub requires the gate, up to date: G2), and a direct push to main is blocked', () => {
+  assert.equal(guard(`gh pr merge 7 --squash --match-head-commit ${sha}`), 0, "whether it passed the gate is GitHub's to say");
+  assert.equal(guard(`gh pr merge 7 --squash --match-head-commit ${sha} --auto`), 2, 'only the one form');
   for (const c of ['git push origin HEAD:main', 'git push origin HEAD:refs/heads/main', 'git push --all origin', 'git push --mirror origin',
     'git checkout main && git merge feature && git push', 'git push -u origin HEAD', 'git push', 'git -C ../main-checkout push', 'git push origin main']) assert.equal(guard(c), 2, c);
 });

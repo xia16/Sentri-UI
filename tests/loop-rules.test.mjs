@@ -1,7 +1,7 @@
 // The gate's and the polish loop's rules (scripts/loop-rules.mjs).
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { passesWithoutJudge, aimdStep, queueAhead, newScenarioFailures, calibrationProblems, budgetProblems, critiqueProblems, pageStyling, addedLines, effectiveClass, classifyScreens, checkVerdict, checkGrades, worstFirst, isClean, loopStatus, touchesSystem, touchesTools, regressions,
+import { passesWithoutJudge, aimdStep, newScenarioFailures, calibrationProblems, budgetProblems, critiqueProblems, pageStyling, addedLines, effectiveClass, classifyScreens, checkVerdict, checkGrades, worstFirst, isClean, loopStatus, touchesSystem, touchesTools, regressions,
   pageOf, pageAssets, sharedFiles, outcomeLeaves, coverageLost, reachOf, reachLine, timedOutOnly, lockState, scenarioDebt, ghNetworkError,
   componentPage, componentPagesOf, componentsTouched, idPath } from '../scripts/loop-rules.mjs';
 
@@ -239,16 +239,6 @@ test('clean rounds with uncovered leaves still stop at the cap; score order neve
   const r1 = { hard: 1, scores: { a: 8, b: 9 }, leaves: { fail: 1 }, fix: { kind: 'defect', merged: false } };
   const r2 = { hard: 1, scores: { b: 9, a: 8 }, leaves: { fail: 1 }, fix: { kind: 'defect', merged: false } };
   assert.match(loopStatus({ cap: 9, rounds: [r1, r2] }).why, /no progress/);
-});
-
-test('the shared queue holds only older shared PRs whose head has passed the gate', () => {
-  const pr = (number, createdAt, extra = {}) => ({ number, createdAt, headRefOid: 'sha' + number, isDraft: false, files: [{ path: 'ux/design-system/components/bundle.css' }], statusCheckRollup: [], ...extra });
-  const mine = pr(120, '2026-10-11');
-  const ok = [{ context: 'sentri/gate', state: 'SUCCESS' }];
-  const prs = [mine, pr(113, '2026-10-10'), pr(112, '2026-10-09', { statusCheckRollup: ok }), pr(111, '2026-10-08', { statusCheckRollup: [{ context: 'sentri/gate', state: 'FAILURE' }] }),
-    pr(110, '2026-10-07', { statusCheckRollup: ok, isDraft: true }), pr(109, '2026-10-06', { statusCheckRollup: ok, files: [{ path: 'features/x/PRD.md' }] }), pr(121, '2026-10-12', { statusCheckRollup: ok })];
-  assert.deepEqual(queueAhead(prs, mine).map((p) => p.number), [112]);
-  assert.deepEqual(queueAhead(prs, mine, {}, (sha) => sha === 'sha113').map((p) => p.number), [113, 112]);
 });
 
 test('a feature whose screens change needs its information budget, with inventory, questions and levels', () => {

@@ -14,7 +14,7 @@
 //                A difference is an identity that misses an input, or a screen that doesn't draw the same twice (gate-simplify.md
 //                K12). Run it by hand, weekly; it posts nothing and passes nothing.
 //   --base       the base to gate against (default origin/main). Only for testing the gate itself: a run against another base posts
-//                no status and writes no pass record, so it can never merge.
+//                no status, so it can never merge.
 // One gate runs at a time on a machine (a lock in the git common dir). Evidence is kept by identity in the git common dir
 // (sentri-gate/evidence/): a rerun, or a later gate on the same main, reuses every result whose identity didn't change.
 // It judges with the base's own tools, never the candidate's: a candidate does not grade itself with its own gate. Run from a
@@ -44,9 +44,10 @@ const opt = (k) => { const i = argv.indexOf('--' + k); return i >= 0 && argv[i +
 const flag = (k) => argv.includes('--' + k);
 const short = (s) => String(s || '?').slice(0, 7);
 const VERDICT_FILE = /^verdict(-[\w.-]+)?\.json$/;
-// The gate's own files live in the git common dir, so every worktree on this machine sees them: pass records, the lock, evidence.
+// The gate's own files live in the git common dir, so every worktree on this machine sees them: the lock and the evidence. Its result
+// is the sentri/gate commit status on GitHub, which branch protection on main requires, with branches up to date (gate-simplify.md
+// G2): there are no local pass records.
 const gateDir = () => path.join(path.resolve(root, git(['rev-parse', '--git-common-dir']).out.trim()), 'sentri-gate');
-function passRecord(sha) { return path.join(gateDir(), `${sha}.json`); }
 // A run against a test base (--base) never reaches GitHub or the merge guard.
 const testBase = !!opt('base');
 const mainRef = opt('base') || 'origin/main';
@@ -77,7 +78,7 @@ if (!process.env.SENTRI_GATE_TOOLS) {
 
 // ---------- one gate at a time ----------
 // Two gates on one machine starve each other's browsers into timeouts (#164), so every gate run, an audit included, and a
-// --verdict that has to gate again, holds one lock beside the pass records for its whole run. A second gate waits; a lock whose
+// --verdict that has to gate again, holds one lock in the gate's folder for its whole run. A second gate waits; a lock whose
 // process is gone, or whose pid now belongs to another process (a reboot reuses pids), is stale and is taken over: the lock records
 // its process's start time beside the pid (scripts/process-start.mjs). The lock goes on every exit: finish, a signal, a crash.
 const lockFile = path.join(gateDir(), 'gate.lock');
@@ -127,8 +128,9 @@ async function acquireLock(ref) {
 }
 
 // One mechanical gate run, under the lock: evaluate(), then mechanical.json. A change that moves no screen has nothing to judge, so
-// its pass is the gate pass: it posts the sentri/gate status (which branch protection on main requires) and the pass record the
-// merge guard reads. Never for a run against a test base.
+// its pass is the gate pass: it posts the sentri/gate status (which branch protection on main requires). A run starts by posting
+// "pending", so an earlier pass on the same commit never stands for this run, and ends with "failure" when it fails or blocks. Never
+// for a run against a test base or an audit.
 async function runGate({ ref, base, out, mode, scope, audit = false, keep = false }) {
   fs.mkdirSync(out, { recursive: true });
   // A rerun into the same folder starts clean: old shots, pairs and verdicts are about a mechanical run that no longer exists.
@@ -138,7 +140,7 @@ async function runGate({ ref, base, out, mode, scope, audit = false, keep = fals
   git(['fetch', '-q', 'origin']);
   const candidate = sha(ref);
   if (candidate) { const tmp = `${lockFile}.${process.pid}`; fs.writeFileSync(tmp, lockAs(candidate)); try { fs.renameSync(tmp, lockFile); } catch { fs.rmSync(tmp, { force: true }); } } // the lock names what it gates
-  if (candidate && !audit) fs.rmSync(passRecord(candidate), { force: true }); // a new gate run voids any earlier pass for this commit until its verdict
+  if (candidate && !audit) postStatus(candidate, 'pending', `gate running against ${short(sha(base))}`); // an earlier pass for this commit no longer stands
   let res;
   try {
     res = await evaluate({ root, out, base, candidate: ref, ref, mode, scope, audit, keep, env, testBase });
@@ -151,9 +153,9 @@ async function runGate({ ref, base, out, mode, scope, audit = false, keep = fals
     mech.gatePass = true;
     const posted = postStatus(mech.candidate, 'success', `GATE PASS against ${short(mech.base)} · no screen moved`);
     if (!posted.ok) console.log(`  - the sentri/gate status was not posted (${posted.why}): gate again; until then GitHub refuses the merge`);
-    const passFile = passRecord(mech.candidate);
-    fs.mkdirSync(path.dirname(passFile), { recursive: true });
-    fs.writeFileSync(passFile, JSON.stringify({ candidate: mech.candidate, base: mech.base, ref: mech.ref, out: path.resolve(out), noScreenMoved: true, at: new Date().toISOString() }, null, 2));
+  } else if (!testBase && !audit && mech.candidate) {
+    const failed = mech.outcome !== 'pass';
+    postStatus(mech.candidate, failed ? 'failure' : 'pending', failed ? `MECHANICAL ${String(mech.outcome).toUpperCase()} against ${short(mech.base)}` : `mechanical pass against ${short(mech.base)}: waiting for the judge's verdict`);
   }
   fs.writeFileSync(path.join(out, 'mechanical.json'), JSON.stringify(mech, null, 2));
   const t = mech.timings || {};
@@ -224,21 +226,11 @@ if (opt('verdict')) {
   if (verdict.pass !== true) console.log('  - the judge failed it');
   if (verdict.pass !== true && mech.pass !== true) console.log('  - the mechanical gate failed');
   // The merge names the gated commit, so GitHub refuses it if the PR head has moved since.
-  // The pass record the merge guard (scripts/merge-guard.mjs) looks for lives in the git common dir, so every worktree sees it;
-  // a failed verdict removes any earlier pass for the same commit.
-  const passFile = passRecord(mech.candidate);
   // The same result as a commit status on GitHub: branch protection on main can require "sentri/gate", which makes GitHub itself
   // refuse an ungated merge however it is attempted (the local merge guard is only a convenience).
   const posted = postStatus(mech.candidate, ok ? 'success' : 'failure', `${ok ? 'GATE PASS' : 'GATE FAIL'} against ${short(mech.base)}`);
   if (!posted.ok) console.log(`  - the sentri/gate status was not posted (${posted.why}): run --verdict again; until then GitHub ${ok ? 'refuses the merge' : 'may still show an earlier status'}`);
-  if (!testBase) {
-    if (!ok) fs.rmSync(passFile, { force: true });
-    if (ok) {
-      fs.mkdirSync(path.dirname(passFile), { recursive: true });
-      fs.writeFileSync(passFile, JSON.stringify({ candidate: mech.candidate, base: mech.base, ref: mech.ref, out: path.resolve(dir), at: new Date().toISOString() }, null, 2));
-      console.log(`merge: gh pr merge <n> --squash --match-head-commit ${mech.candidate}`);
-    }
-  }
+  if (!testBase && ok) console.log(`merge: gh pr merge <n> --squash --match-head-commit ${mech.candidate}`);
   process.exit(ok ? 0 : 1);
 }
 
