@@ -93,6 +93,15 @@ const TOOLS = [
 export const touchesTools = (files) => files.filter((f) => TOOLS.some((re) => re.test(f)));
 
 // The class the gate runs: never lower than declared; shared when the system changed or screens outside the scope changed.
+// The class a change's files give it (gate-simplify.md X6), before the shared system or what moved raises it: behaviour when it
+// changes a script a page can run, copy when it changes only the strings registry, presentation otherwise.
+export function classOfFiles(files) {
+  const runtime = files.filter((f) => /^(ux|atlas|vendor)\//.test(f) && !/\.md$/i.test(f));
+  if (runtime.some((f) => /\.(m?js|cjs)$/i.test(f))) return 'behaviour';
+  if (runtime.length && runtime.every((f) => f === 'ux/laws/strings.json')) return 'copy';
+  return 'presentation';
+}
+
 export function effectiveClass({ declared, files, diffs, scope, shared = {} }) {
   const why = [];
   const sys = touchesSystem(files, shared);
@@ -187,9 +196,9 @@ export function checkVerdict(verdict, mech) {
     else if (moving.length && !better.length) problems.push('passes with no pair better (same is not enough)');
     else if (!(mech.screens?.diff || []).length && !(mech.screens?.new || []).length) {
       // Nothing visible changed: only a behaviour fix (which may leave every first frame alone) passes, and on a walk.
-      const behaviour = ['behaviour', 'shared'].includes(mech.class?.declared);
+      const behaviour = ['behaviour', 'shared'].includes(mech.class?.effective || mech.class?.declared);
       const walked = (verdict.walk || []).length > 0 && verdict.walk.every((w) => w.ok === true);
-      if (!behaviour || !walked) problems.push(`no screen changed: only a change declared behaviour (or shared) passes that way, with a walk where every entry is ok (declared ${mech.class?.declared || 'nothing'}, ${(verdict.walk || []).length} walk entries)`);
+      if (!behaviour || !walked) problems.push(`no screen changed: only a change declared behaviour (or shared) passes that way, with a walk where every entry is ok (class ${mech.class?.effective || mech.class?.declared || 'nothing'}, ${(verdict.walk || []).length} walk entries)`);
     }
   }
   return { ok: problems.length === 0, problems };
@@ -509,6 +518,7 @@ export function scenarioDebt(candReport, baseReport) {
 export function passesWithoutJudge(mech) {
   if (!mech || mech.pass !== true || (mech.outcome && mech.outcome !== 'pass') || mech.quick || !mech.candidate || !mech.base || !mech.screens) return false;
   if ((mech.pairs || []).length) return false;
+  if ((mech.walkNeed || []).length) return false; // G15: a screen that runs changed code and draws the same is walked
   return ['diff', 'new', 'gone'].every((k) => Array.isArray(mech.screens[k]) && mech.screens[k].length === 0);
 }
 

@@ -2,7 +2,7 @@
 
 You design and build a screen, a feature or a component family for **Sentri-UI**, a native-feel mobile app for gloved, one-handed pig-farm workers, in English and Chinese. You make the design calls yourself; the owner reacts afterwards. Work on your own branch in a worktree off `origin/main`; never commit to `main`.
 
-The driver fills in **TITLE**, **SCOPE**, **CHANGE CLASS** (copy · presentation · behaviour · shared component) and **MODE** (new · polish · refactor). Every build gets this whole brief. A one-off instruction is added to it, never replaces it.
+The driver fills in **TITLE**, **SCOPE**, **CHANGE CLASS** (copy · presentation · behaviour · shared component; the gate derives the same from the change, and its class is the one that counts) and **MODE** (new · polish · refactor). Every build gets this whole brief. A one-off instruction is added to it, never replaces it.
 
 **What success is.** The first design you hand over is clearly better than the screen it replaces, side by side at 390px. Inside your run, try as many times as you like. If no direction beats the original, hand over **no change** with your critique; an honest "the original stands" beats a worse screen.
 
@@ -38,7 +38,7 @@ Worked example, the Farrowing room row: Act now "3 days overdue" in dark red; Wa
 - **Scope is the problem list.** In polish mode change only parts a problem names. In new mode the critique is of the old UI, and Keep says what the new design carries over.
 - **Use the component whose job it is.** A part a component already does moves onto it (a variant if needed). A page-built part with no component is built in the design system **as it looks today**, proven identical by renders before and after, committed on its own, and only then improved. Never restyle a component on the page or leave a workaround; the page's CSS sets layout only. Component delivery: `docs/design-workflow/research/component-standard.md`; atlas authoring: `atlas/SCHEMA.md`.
 - **A check that fails a kept part is questioned, not obeyed.** Leave the part, name the check in your final message.
-- **Know the reach.** A shared rule, token or component you change reaches every screen, pattern and demo using it. Before your final look, run the full screen diff on your pushed branch (from any checkout: the gate runs main's own tools): `node scripts/gate.mjs --candidate origin/<branch> --scope <features>` (not `--quick`; about 20 minutes). Every changed screen outside SCOPE is a bug in your change: give your component its own rule or token. A deliberate shared change is its own task.
+- **Know the reach.** A shared rule, token or component you change reaches every screen, pattern and demo using it. Before your final look, run the full screen diff on your pushed branch (from any checkout: the gate runs main's own tools): `node scripts/gate.mjs --candidate origin/<branch> --scope <features>` (minutes for a change to one feature; longer for a shared one). Every changed screen outside SCOPE is a bug in your change: give your component its own rule or token. A deliberate shared change is its own task.
 - **Don't decide product rules** (calculations, eligibility, what is saved, permissions, which actions exist). Build to the current ruling; a missing one becomes a decision item for the owner.
 
 ## 4. Judge it by eye (P4)
