@@ -291,7 +291,7 @@ test('a start-up initialiser change is a new identity for every screen that load
 
 // ---------- review of #194, round 2: a new start-up initialiser can't escape reach, and nothing whose identity changed is left out ----------
 test('the probe: a new DOMContentLoaded initialiser that dims one page at 360 only reaches every screen, and is in its identity', async () => {
-  const { inputsDigest, canonical, widenByIdentity } = await import('../scripts/evidence.mjs');
+  const { inputsDigest, canonical, identityDiff } = await import('../scripts/evidence.mjs');
   const { createHash } = await import('node:crypto');
   const probe = "const boot=typeof document!=='undefined'&&document.addEventListener('DOMContentLoaded',()=>{if(innerWidth===360&&/report/.test(location.pathname))document.documentElement.style.opacity='0.5';});";
   const mk = (o) => { const c = checkout(o); const t = new Map(Object.keys(FILES(o)).map((f) => [f, createHash('sha1').update(fs.readFileSync(path.join(c.dir, f))).digest('hex')])); return { side: { ...c, rev: `p${++n}` }, tree: t }; };
@@ -300,9 +300,36 @@ test('the probe: a new DOMContentLoaded initialiser that dims one page at 360 on
   const r = reachOf(b.side, c.side, { files: BJS });
   assert.equal(r.all, true, 'a new binding whose initialiser runs at start-up reaches every bundle-loading screen');
   assert.match(r.why[0], /boot is a new binding whose initialiser runs at start-up/);
-  // evidence planning: the dimmed page's identity changed, so even a reach that left it out would get it back, in full
+  // the reach by identity: the dimmed page's identity changed, so it is shot in full
   const rt = (t) => [...t.keys()].filter((f) => !/^(features|docs|tests|scripts)\//.test(f)).sort();
   const changed = (id) => canonical(inputsDigest(identityInputs(b.side, id), b.tree, rt(b.tree)).digest) !== canonical(inputsDigest(identityInputs(c.side, id), c.tree, rt(c.tree)).digest);
   assert.equal(changed('reports.week'), true);
-  assert.deepEqual(widenByIdentity({ ids: ['reports.week', 'farrowing.room'], inReach: () => false, changed }).sort(), ['farrowing.room', 'reports.week'], 'every bundle-loading screen: the initialiser is a start-up effect of each');
+  const ids = ['reports.week', 'farrowing.room'].map((id) => ({ id }));
+  assert.deepEqual(identityDiff({ base: ids, cand: ids, idOf: (side, x) => (side === 'base' || !changed(x.id) ? x.id : x.id + '+') }).changed.sort(), ['farrowing.room', 'reports.week'], 'every bundle-loading screen is in the reach: the initialiser is a start-up effect of each');
+});
+
+// ---------- gate-simplify.md K3: the reach is the identity, so a stylesheet is read only in the syntax the gate checks ----------
+test('a stylesheet loads only through lowercase @import "…" or url(…) before any rule; anything else widens the identity to every stylesheet', async () => {
+  const { cssLoads } = await import('../scripts/static-reach.mjs');
+  const loads = (text) => { const r = cssLoads(text, 'ux/system/page.css'); return { files: [...r.files].sort(), unchecked: r.unchecked.map((u) => u.type) }; };
+  assert.deepEqual(loads('@charset "utf-8";\n@import "leaf.css";\n@import url(\'/ux/x.css\') screen;\n.a{background:url(bg.png)}'), { files: ['ux/system/bg.png', 'ux/system/leaf.css', 'ux/x.css'], unchecked: [] });
+  assert.deepEqual(loads('@IMPORT "leaf.css";').unchecked, ['style'], 'another case: the browser loads it, the gate does not read it');
+  assert.deepEqual(loads('@\\69mport "leaf.css";').unchecked, ['style'], 'an escape');
+  assert.deepEqual(loads('.a{color:red}\n@import "leaf.css";').unchecked, ['style'], 'after a rule');
+  assert.deepEqual(loads('/* @IMPORT "x.css" */ .a{}'), { files: [], unchecked: [] }, 'a comment is not a load');
+  assert.deepEqual(loads('.a{background:image-set("a.png" 1x)}').unchecked, ['media'], 'a file named by a string');
+  assert.deepEqual(loads('@media (min-width:1px){.a{}} @font-face{src:url(f.woff2)}'), { files: ['ux/system/f.woff2'], unchecked: [] }, 'other at-rules are not imports');
+});
+
+test("a page's identity follows its stylesheets' checked imports, and a stylesheet it can't read makes it hash every stylesheet", () => {
+  const ii = (more) => identityInputs(checkout({ more }), 'farrowing.room');
+  const checked = ii({ 'ux/system/page.css': '@import "leaf.css";\n.phone{width:390px}', 'ux/system/leaf.css': '.x{}' });
+  assert.ok(checked.files.includes('ux/system/leaf.css'));
+  assert.equal(checked.unbounded.filter((u) => u.type === 'style').length, 0);
+  const loose = ii({ 'ux/system/page.css': '@IMPORT "leaf.css";\n.phone{width:390px}', 'ux/system/leaf.css': '.x{}' });
+  assert.match(loose.unbounded.find((u) => u.type === 'style')?.why || '', /ux\/system\/page\.css: an @import the gate doesn't read/);
+  const block = ii({ 'ux/system/farrowing.html': PAGE('<style>@import "leaf.css";</style><script src="farrowing.js"></script>'), 'ux/system/leaf.css': '.x{}' });
+  assert.ok(block.files.includes('ux/system/leaf.css'), 'a <style> block is read like a stylesheet');
+  const blockLoose = ii({ 'ux/system/farrowing.html': PAGE('<style>.a{} @import "leaf.css";</style><script src="farrowing.js"></script>') });
+  assert.match(blockLoose.unbounded.find((u) => u.type === 'style')?.why || '', /farrowing\.html <style>/);
 });

@@ -14,6 +14,9 @@ Status: approved by the owner (2026-10-16, "fix everything") after a blind revie
 Reach, scheduling, evidence reuse, failure accounting and verdict completeness all live inside it. Callers never assemble these facts themselves.
 
 ## 2. Reach: static, conservative, both revisions
+
+**Since 2026-10-18 (gate-simplify.md X1) the gate's reach is the identity diff.** It covers every screen and leaf whose evidence identity (§3) differs between base and candidate, plus those only one side has. The analyser below decides what each identity hashes, and the gate no longer uses its own screen set (`reachOf`), its "every screen" for any stylesheet, or the tripwire. A screen with the same identity on both sides shares one shot, so none of those could ever show a difference. Stylesheets are read only in the checked syntax (lowercase `@import` before any rule, `url()` for media); any other import widens the identity of the pages that load it to every stylesheet. `gate.mjs --audit` checks identity completeness off the merge path. What follows is how the analyser reads a revision.
+
 - **The bundle.** Parse base and candidate.
   - The changed units are exports and every top-level binding: helpers, constants, objects built at start-up.
   - Unchanged IIFE scaffolding is recognised as such, and its declarations are analysed one by one, so a one-function edit stays one function.
@@ -70,7 +73,7 @@ Base evidence is kept per main commit (an index of the identities each base used
 ## 5. Verdict
 - Every pair in the evidence manifest gets a judgement.
 - The change passes only with no "worse" and at least one "better". In refactor mode, every pair must be "same".
-- The tripwire is not acceptance. It can stay as a diagnostic while v2 rolls out.
+- The tripwire is not acceptance. It was removed on 2026-10-18 (gate-simplify.md X2): it could never fire, since a screen outside the reach has one identity on both sides and so one shot. `--audit` does its job off the merge path.
 - **A moved main never voids work by itself** (driver, 2026-10-16, after #187 paid a full re-gate for a main that moved by gate scripts only). At verdict and merge time the gate recomputes the candidate's identities against the new main, keeps every result whose identity is unchanged and every judged pair whose two images are unchanged (a pair is judged by its two images: each side's shot byte for byte, or, for a run that recorded no images, the same shot identities), recomputes only what changed, and sends to a judge only the pairs whose images changed. A walk carries only for a screen whose inputs are unchanged; one that looks the same from changed inputs is walked again. Anything that matters still has to pass. (#192, 2026-10-17: matching by identity alone carried 0 of 112 judgements twice, with every pair pixel-identical.)
 
 ## 6. Proving it works

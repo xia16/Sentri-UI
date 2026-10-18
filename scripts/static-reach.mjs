@@ -40,6 +40,28 @@ function resolveRef(ref, from) {
   return p.startsWith('../') ? null : (p.endsWith('/') ? p + 'index.html' : p);
 }
 
+// ---------- stylesheets: the one syntax the gate reads ----------
+// A stylesheet's loads (gate-simplify.md K3): `@charset`, then lowercase `@import "…"` or `@import url(…)` before any rule, and
+// `url(…)` for fonts and images. Anything else that can load is returned as unchecked, never guessed at: an @import in another case,
+// spelled with an escape, or after a rule (the pages that load the stylesheet then hash every stylesheet), and image-set() naming a
+// file by a string (every media file). The reach is the identity, so whatever a page's identity leaves out is a screen the gate
+// never looks at: this is where that is closed.
+export function cssLoads(text, from) {
+  const src = String(text || '').replace(/\/\*[\s\S]*?\*\//g, '');
+  const files = new Set(), unchecked = [];
+  const PRELUDE = /^\s*(?:@charset\s+"[^"]*"\s*;|@import\s+(?:url\(\s*(["']?)([^"')\s]+)\1\s*\)|(["'])([^"']+)\3)[^;{}]*;)/;
+  let rest = src;
+  for (let m; (m = PRELUDE.exec(rest)); rest = rest.slice(m[0].length)) { const f = (m[2] || m[4]) && resolveRef(m[2] || m[4], from); if (f) files.add(f); }
+  // after the prelude, any at-rule that reads as an import once its escapes are undone and its case folded
+  for (const m of rest.matchAll(/@((?:[\w-]|\\[0-9a-fA-F]{1,6}\s?|\\[^\n\r0-9a-fA-F])+)/g)) {
+    const name = m[1].replace(/\\([0-9a-fA-F]{1,6})\s?/g, (_, h) => String.fromCodePoint(parseInt(h, 16))).replace(/\\(.)/g, '$1').toLowerCase();
+    if (name === 'import') unchecked.push({ why: `an @import the gate doesn't read (${m[0].slice(0, 24)}): only lowercase @import "…" or url(…), before any rule`, type: 'style' });
+  }
+  for (const m of src.matchAll(/url\(\s*(["']?)([^"')]+)\1\s*\)/g)) { const f = resolveRef(m[2], from); if (f) files.add(f); }
+  if (/image-set\(\s*["']/i.test(src)) unchecked.push({ why: 'image-set() names a file by a string', type: 'media' });
+  return { files, unchecked };
+}
+
 // ---------- scripts: namespace use and loads ----------
 function parseJs(src) {
   for (const sourceType of ['script', 'module']) { try { return parse(src, { ecmaVersion: 'latest', sourceType, allowHashBang: true }); } catch {} }
@@ -372,9 +394,7 @@ function pageAnalyser(dir, namespaces, shape) {
     return r;
   };
   const css = (file) => {
-    const text = read(dir, file) || '', files = new Set();
-    for (const m of text.matchAll(/url\(\s*(["']?)([^"')]+)\1\s*\)|@import\s+(["'])([^"']+)\3/g)) { const f = resolveRef(m[2] || m[4], file); if (f) files.add(f); }
-    return files;
+    return cssLoads(read(dir, file), file);
   };
   const page = (p, stack = new Set()) => {
     if (memoPage.has(p)) return memoPage.get(p);
@@ -396,6 +416,8 @@ function pageAnalyser(dir, namespaces, shape) {
       }
     }
     for (const m of markup.matchAll(/url\(\s*(["']?)([^"')]+)\1\s*\)/g)) { const f = resolveRef(m[2], p); if (f) queue.push(f); }
+    // a <style> block is a stylesheet of this page, read the same way
+    for (const m of markup.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/gi)) { const c = cssLoads(m[1], p); c.files.forEach((f) => queue.push(f)); for (const u of c.unchecked) out.unbounded.push({ why: `${p} <style>: ${u.why}`, type: u.type }); }
     for (const body of scripts) queue.push({ inline: body });
     const seen = new Set(), ran = []; // every script of this document, for its global aliases
     while (queue.length) {
@@ -404,7 +426,7 @@ function pageAnalyser(dir, namespaces, shape) {
       if (seen.has(q)) continue;
       seen.add(q); out.files.add(q);
       if (/\.(m?js|cjs)$/.test(q)) { const r = script(q, p); ran.push(r); r.files.forEach((f) => queue.push(f)); out.unbounded.push(...r.unbounded); r.nav.forEach((f) => out.nav.add(f)); if (r.navUnbounded.length) out.navUnbounded = true; merge(out.use, r.use); }
-      else if (/\.css$/.test(q)) css(q).forEach((f) => queue.push(f));
+      else if (/\.css$/.test(q)) { const c = css(q); c.files.forEach((f) => queue.push(f)); for (const u of c.unchecked) out.unbounded.push({ why: `${q}: ${u.why}`, type: u.type }); }
       else if (/\.html?$/.test(q) && q !== p && !stack.has(q)) {
         // a frame is a page of its own: its closure, its use of the bundle and its loads are this page's too
         const sub = page(q, new Set([...stack, p]));

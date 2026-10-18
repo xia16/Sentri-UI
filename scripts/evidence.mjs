@@ -67,34 +67,16 @@ export function inputsDigest(ii, tree, runtime) {
   return { digest: { files: blobsHash(tree, own), unbounded, bundle, screen: ii.screen ?? null }, gap };
 }
 
-// The screens in reach because of the changed files whose evidence identity is the same on both sides (review of #194): their
-// stored evidence would be reused for a screen the analyser says the change can affect, so the identity missed an input. In reach
-// because of the files: a changed page-loadable file is in its page closure or fits a load it can't bound; or the bundle changed,
-// the screen loads it, and the analyser says every screen (a bundle change), or the screen uses a changed export or the namespace
-// as a whole. ids: screens in reach on both sides; same(id): equal identity inputs; inputs(id): the analyser's inputs, both sides.
-// → [ 'id (the file that should have changed it)' ]
-export function identityContradictions({ ids, files, runtime, reach, same, inputs }) {
-  const out = [];
-  const changed = files.filter((f) => f !== BUNDLE_JS && runtime.has(f));
-  const bundleAll = !!reach?.all && (reach.why || []).some((w) => /^the bundle:/.test(w));
-  const fn = new Set(reach?.functions || []);
-  for (const id of ids) {
-    if (!same(id)) continue;
-    const ii = inputs(id);
-    if (!ii.length) continue;
-    const loads = new Set(ii.flatMap((v) => v.files || []));
-    const types = new Set(ii.flatMap((v) => (v.unbounded || []).map((u) => u.type || 'any')));
-    const cause = changed.find((f) => loads.has(f)) || changed.find((f) => types.has('any') || types.has(fileType(f)))
-      || (files.includes(BUNDLE_JS) && loads.has(BUNDLE_JS) && (bundleAll || ii.some((v) => v.bundle?.all || (v.bundle?.exports || []).some((e) => fn.has(e)))) ? BUNDLE_JS : null);
-    if (cause) out.push(`${id} (${cause})`);
-  }
+// The reach (gate-simplify.md X1): what the evidence identities say a change can alter. An item with the same identity on both
+// sides shares one result, so comparing it proves nothing; everything else is compared in full.
+// base, cand: [{ id, ... }]; idOf(side, item) → that item's evidence identity on that side.
+// → { changed: ids on both sides with different identities, added: ids only the candidate has, removed: ids only base has }
+export function identityDiff({ base, cand, idOf }) {
+  const b = new Map(base.map((x) => [x.id, x])), c = new Map(cand.map((x) => [x.id, x]));
+  const out = { changed: [], added: [], removed: [] };
+  for (const [id, x] of c) { if (!b.has(id)) out.added.push(id); else if (idOf('base', b.get(id)) !== idOf('cand', x)) out.changed.push(id); }
+  for (const id of b.keys()) if (!c.has(id)) out.removed.push(id);
   return out;
-}
-
-// The structural guarantee (review of #194, round 2): the items (screens, leaves) whose evidence identity differs between base and
-// candidate but which the analyser left out of the reach. The gate adds them, in full, and reports each one as an analyser miss.
-export function widenByIdentity({ ids, inReach, changed }) {
-  return ids.filter((id) => !inReach(id) && changed(id));
 }
 
 // ---------- what code hashes to: a module and its local imports ----------
