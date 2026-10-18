@@ -18249,9 +18249,171 @@
        ],
        "prd": "# Health record 健康管理\n\n## Problem\n\nThe worker records a disease or symptom on one or many pigs, says what to do about it (care), records treatment, and later closes the record as recovered or entered in error. The old Figma draws health three times: in Inspection (add and remove disease or symptom), in the pig list (health management) and in the 健康与治疗 treatment file. The Inspection prototype is the one built version.\n\n## Who\n\nThe worker on the walk who finds a sick pig, and the worker who gives treatment or vaccination as a task. A supervisor reads the care levels on the list.\n\n## Anchor\n\nAnchor: the Finding (one condition on one pig).\n\n- Needs attention: care is Monitor, Treat in place or Move to hospital pen. Shown as a row on top of the pig record, with the care level and the day.\n- Ongoing, no action needed: recorded and visible as a tag until it is resolved.\n- Closed: Recovered, or Entered in error. The case leaves the active list and stays in the pig's log.\n\nRecording, editing, treatment and the pickers can happen in any status.\n\n## Rules\n\n- Diseases and symptoms are one searchable catalogue (9 disease categories; symptoms by body area and body system), for one pig or many. A name that is not in the catalogue can be added as a custom item under a chosen category.\n- Care is the only editable condition state: No action needed, Monitor, Treat in place, Move to hospital pen. Attention is derived: every choice except No action needed needs attention.\n- Existing findings keep their original start date; adding a condition a pig already has changes nothing.\n- Bulk edits preview each pig's change, let a pig be excluded, leave pigs without the condition unchanged, and save only changed rows.\n- Treatment records medicine actually given: the medicine from the farm's medicine list (features/medicines), method, unit and a dose above 0, a shared dose with a per-pig override, and an optional brand (with its strength), linked condition and note. Method and unit are pre-filled from the medicine's last use. When a withdrawal is in force (the brand's, else the medicine's default) the form shows Withdrawal until <date> before Save, and the record keeps a copy of the days, the date and the strength. For several pigs the form asks what was given first (medicine, method, brand), then the doses. One record per included pig.\n- A treatment started from a Health task (vaccination) lists vaccines only and completes the task on Save.\n- A blocked action is listed with the reason, never dropped.\n- Recovery keeps the case in history; entered in error marks a correction. Recovering a finding linked to a feed adjustment ends that adjustment.\n- Hospital pen is a care choice only; no move is made.\n\n## Scope\n\nIn: the pig record as a health view (needs attention, ongoing, several ongoing, care levels), the finding and its edit and resolve forms, Record health with its catalogue picker, Care instructions and Edit conditions, Resolve conditions, Record treatment (and the condition chooser inside it). The medicine picker is the medicines feature's.\n\nOut: sow death and mortality reports (separate features), the pig record itself (pig-profile), feed changes (feed-plan). Health tags on the walk row belong to inspection.\n\n## Decisions\n\n- Care replaced the older triage and status fields; one select drives both.\n- The medicine list is the medicines feature's (2026-10-16, revised: Category → Medicine; Brand an optional field with its own list; optional strength and withdrawal); methods and units are a sample list until farm configuration exists.\n- Treatment never implies identical doses across pigs.\n\nOpen (recorded on the screens as issues):\n\n- The default Care is No action needed, so the shortest path records a fever as a non-alert.\n- Two rows (Edit conditions and Care instructions) open the same form; Edit finding and Resolve or remove touch the same record for one pig; naming differs between Resolve conditions and Resolve or remove.\n- Duration is \"Day 2\" for attention and \"120 days\" for ongoing; the day count never advances in the prototype.\n- \"Recorded — · —\" shows empty dashes for unknown date and author.\n- The catalogue starts on Symptoms and needs three taps to reach an item; there is no recent or common list.\n",
        "scenarios": {
-        "treeDoc": false,
-        "tree": null,
-        "run": null,
+        "treeDoc": true,
+        "tree": [
+         {
+          "type": "entry",
+          "id": "hr-t.entry",
+          "label": "Record treatment for several pigs (two selected)",
+          "children": [
+           {
+            "type": "state",
+            "id": "hr-t.state",
+            "label": "Record treatment for two pigs, Tulathromycin picked, no dosage yet",
+            "tree": "T",
+            "screen": "health-record.treatment-batch",
+            "children": [
+             {
+              "type": "outcome",
+              "id": "hr-t1-save-waits-for-dose",
+              "label": "Save waits until a dose is set, and no Adjust row shows before a dosage",
+              "tree": "T-1",
+              "gwt": {
+               "given": "A worker recording a treatment for two pigs has picked the medicine but typed no dosage.",
+               "when": "They look at the form.",
+               "then": "Save is waiting, and there is no row offering to adjust the doses."
+              },
+              "authority": [
+               {
+                "src": "PRD",
+                "at": "features/medicines, Hosts: Save",
+                "says": "Save waits until the shared dose is set, or every included pig has a typed dose."
+               },
+               {
+                "src": "PRD",
+                "at": "features/medicines, Hosts: several pigs",
+                "says": "no dosage, no row"
+               }
+              ],
+              "result": "pass"
+             },
+             {
+              "type": "action",
+              "id": "hr-t2.dose",
+              "label": "Type a dosage of 2.5",
+              "children": [
+               {
+                "type": "outcome",
+                "id": "hr-t2-shared-dose-row",
+                "label": "One dosage applies to every pig: one row says so and offers Adjust; Save counts the pigs",
+                "tree": "T-2",
+                "gwt": {
+                 "given": "A worker is recording a treatment for two pigs.",
+                 "when": "They type a dosage of 2.5.",
+                 "then": "A row reads 2 pigs at 2.5 mL each with Adjust, and Save is ready for both pigs."
+                },
+                "authority": [
+                 {
+                  "src": "PRD",
+                  "at": "features/medicines, Hosts: several pigs",
+                  "says": "Once a dosage is typed, one navigate row under it reads \"2 pigs · 2.5 mL each\" with \"Adjust ›\""
+                 }
+                ],
+                "result": "pass"
+               },
+               {
+                "type": "action",
+                "id": "hr-t3.adjust",
+                "label": "Tap the row, give 000254 its own dose of 3, then Back",
+                "children": [
+                 {
+                  "type": "outcome",
+                  "id": "hr-t3-one-pig-adjusted",
+                  "label": "A pig's own dose is kept and the form counts it as adjusted",
+                  "tree": "T-3",
+                  "gwt": {
+                   "given": "A worker set a dosage of 2.5 for two pigs.",
+                   "when": "On Dose per pig they give one pig 3 and go back.",
+                   "then": "The form's row reads 2 pigs with 1 adjusted, and Save is still ready for both."
+                  },
+                  "authority": [
+                   {
+                    "src": "PRD",
+                    "at": "features/medicines, Hosts: several pigs",
+                    "says": "typing a different value makes it that pig's own … (after changes: \"2 pigs · 1 adjusted\")"
+                   },
+                   {
+                    "src": "PRD",
+                    "at": "health-record Rules",
+                    "says": "Treatment never implies identical doses across pigs."
+                   }
+                  ],
+                  "result": "pass"
+                 }
+                ]
+               },
+               {
+                "type": "action",
+                "id": "hr-t4.remove",
+                "label": "Open Dose per pig, Remove pigs, remove 000254, then Back",
+                "children": [
+                 {
+                  "type": "outcome",
+                  "id": "hr-t4-remove-pig",
+                  "label": "Removing a pig takes it out of the treatment; the last pig cannot be removed",
+                  "tree": "T-4",
+                  "gwt": {
+                   "given": "A worker is recording a treatment for two pigs with a dosage set.",
+                   "when": "On Dose per pig they remove one pig and go back.",
+                   "then": "Remove mode ends with one pig left, and the form saves the treatment for one pig."
+                  },
+                  "authority": [
+                   {
+                    "src": "PRD",
+                    "at": "features/medicines, Hosts: several pigs",
+                    "says": "Remove pigs … switches the list into remove mode … the last pig cannot be removed."
+                   }
+                  ],
+                  "result": "pass"
+                 }
+                ]
+               },
+               {
+                "type": "action",
+                "id": "hr-t5.leave-reopen",
+                "label": "Back out of the form, then open Record treatment again",
+                "children": [
+                 {
+                  "type": "outcome",
+                  "id": "hr-t5-draft-survives-reopen",
+                  "label": "The treatment draft survives leaving the form and reopening it",
+                  "tree": "T-5",
+                  "gwt": {
+                   "given": "A worker has picked Tulathromycin and typed a dosage of 2.5 for two pigs.",
+                   "when": "They go Back out of the form and open Record treatment again for the same pigs.",
+                   "then": "The form still has Tulathromycin and the 2.5 dosage."
+                  },
+                  "authority": [
+                   {
+                    "src": "RUL",
+                    "at": "Owner ruling B, 2026-10-16 (drawer levels)",
+                    "says": "Footer Back keeps the draft"
+                   }
+                  ],
+                  "result": "pass"
+                 }
+                ]
+               }
+              ]
+             }
+            ]
+           }
+          ]
+         }
+        ],
+        "run": {
+         "commit": "6355fee",
+         "dirty": true,
+         "ran": "2026-10-18T03:24:47.810Z",
+         "langs": [
+          "en",
+          "zh"
+         ],
+         "widths": [
+          360,
+          390
+         ]
+        },
         "notSupported": null
        },
        "status": "in-design"
@@ -18884,9 +19046,504 @@
        ],
        "prd": "# Medicines 药品\n\n## Problem\n\nEvery treatment and vaccination names what was given. Before this feature the worker picked a placeholder \"medicine\" and an optional \"brand\" from a list that was the same for every medicine; the farm had no list of its own, nothing remembered what was used, nothing could be added from a treatment, and a typo could never be fixed. This feature is the farm's medicine list: choosing from it inside a record, adding to it when something is missing, the withdrawal period a label prints, and keeping it tidy.\n\n## Who\n\nThe worker recording a treatment or vaccination with a bottle in hand (picks, sometimes adds). The supervisor who keeps the farm's list (brands, details, what the farm added).\n\n## Anchor\n\nNone: the list has no lifecycle. Screens are grouped by surface: choosing (the picker in Record treatment and Record vaccination), adding, and the Medicines page.\n\n## Rules\n\n- **Category → Medicine** (owner, 2026-10-16, revision). Picking a medicine is a complete record.\n  - Category: a fixed list, the same on every farm: Antibiotics; Pain relief and anti-inflammatory; Parasite control; Vaccines; Hormones and reproduction; Vitamins, minerals and iron; Other.\n  - Medicine: the drug or active ingredient. Vaccines are named by the disease (PRRS, PCV2…), so a vaccination lists diseases.\n  - **Every farm starts from the same categories and medicines, in English and Chinese** (`ux/system/medicines-catalogue.json`, a starting list to be checked by a vet). Farms add medicines and brands on top. Starting-list medicines cannot be renamed or deleted.\n- **Brand is an optional field of the treatment**: a PickerField labelled \"Brand\" with a grey \"Optional\", styled like Medicine and Method (\"Select\" until set), that appears once a medicine is chosen. It lists the brands the farm has used for that medicine (the three most recent under \"Recently used\" when there are more). A search with no match shows one card, `Add “…”`, which adds the brand under that medicine for everyone and picks it, then offers an optional, skippable details step (its withdrawal). No brand chosen means no brand; there is no \"Brand not known\".\n- **There is no strength field and no product form** (owner, round 3): not every medicine has a meaningful strength (vaccines are counted in doses; premixes and powders vary). When strength matters it is part of the brand's name (\"Amoxinsol 50%\"), so two strengths are two brand entries (\"Amoxinsol 15%\", \"Amoxinsol 50%\"). Method is chosen on each treatment. The treatment remembers the last method and unit per medicine and pre-fills them.\n- **Withdrawal period (days), never required.** For pigs it is always the meat withdrawal, so every label reads \"Withdrawal period (days)\" (ZH 休药期（天）):\n  - **The medicine's default is the usual case.** Every starting-list medicine ships with a default (vaccines none: usually 0 or not applicable), which the farm can change on the Medicines page. The defaults are **sample values**, to be verified against the official withdrawal periods (China: MOA Announcement No. 278 and its updates) before release; they are not authoritative.\n  - **A brand overrides it only when its label differs.** The brand's field says so: \"Uses Amoxicillin's 14 days when empty\".\n  - On a treatment: once a medicine is chosen, a muted caption in the field's hint slot reads **\"Withdrawal period 14 days · until 26 Sep\"**: under Medicine for its default, under Brand when the chosen brand has its own period (where it sits says whose number it is). No period, or 0: no caption. (In place, 2026-10-16: replaces the Banner notice.)\n  - **The saved record keeps a copy** of the withdrawal days and date in force that day; later edits never change past records.\n- **The second line (meta) shows only what tells a row apart from its siblings** (ChoiceList): category, medicine, recent and brand rows have none; a search result names its category, because search mixes categories.\n- **The picker is one drawer with levels** (owner ruling B): the long size, one height across levels, the footer Back goes up a level, the ✕ at the top left closes it from any level.\n  - Level 1: search, then up to three of the farm's most recent medicines (distinct, newest first, shared by every worker, filtered to the task: a vaccination shows vaccines only; absent when there are none), then the categories.\n  - Level 2, a category: its medicines; one tap picks and closes.\n  - Search, pinned at the top of every level (\"Search all options\"), matches English and Chinese names and common other names across every category.\n- **Adding a medicine is manual only** (no barcode). A search with no match shows one card and nothing else: `Add “<typed>”`. It opens the add level: Name (pre-filled) and Category (required, one pick; already set when added from inside a category, or from a vaccination). Adding lists it for everyone and picks it.\n- **The Medicines page** (a page, not a drawer), reached from Home → Toolbox → Medicines: the categories, then a category's medicines. A medicine's sheet and a brand's are **edit forms**: their fields on the sheet (a brand: Name, Withdrawal; a farm-added medicine: Name, Default withdrawal; a starting-list medicine: its default withdrawal only, its name read-only), the medicine's brands as rows, **Delete** as a navigate Row in its own card at the bottom, opening a confirm level (\"Past records keep its name\"), footer Back + Save. Starting-list medicines have no Delete. Delete removes the entry from the picker; past records keep the name.\n- **Hosts.** Record treatment, one pig and several (health-record): Medicine, Method, Brand (optional), Dose (a number and its unit on one line; the unit remembered per medicine), Condition (optional PickerField; its picker unchanged until the condition rework), Note (optional), then the withdrawal notice. Optional fields are ordinary labelled fields with a grey \"Optional\" (owner, rounds 4 and 5; the Field law and component change come as their own shared PR).\n  - **Note:** a textarea about three lines tall, typed into directly; **at most 200 characters**: input stops at the limit and nothing is cut afterwards; a counter (\"180 / 200\") shows from 160.\n  - **Dosage:** a number and a Unit picker side by side, each its own labelled 48px field (\"Dosage\", \"Unit\"); the unit is remembered per medicine.\n  - **Several pigs** (modelled on splitting a bill equally, then adjusting): no per-pig inputs on the form. Once a dosage is typed, one navigate row under it reads \"2 pigs · 2.5 mL each\" with \"Adjust ›\" (after changes: \"2 pigs · 1 adjusted\"); no dosage, no row. It opens **Dose per pig**: an ear-tag search with Scan, then every pig with its dose box pre-filled with the dosage; typing a different value makes it that pig's own (ink, bold, \"Adjusted\"); clearing it returns it to the dosage. Unadjusted pigs follow a later change of the dosage; adjusted ones keep theirs. Values are live: no Save, Back top left. **Remove pigs** (a text action above the list) switches the list into remove mode: each row's dose box gives way to a remove control (×), Done leaves; the last pig cannot be removed.\n  - **Save** waits until the shared dose is set, or every included pig has a typed dose.\n  - Record vaccination uses the same picker filtered to Vaccines.\n\n## Scope\n\nIn: the picker (level 1 with and without recents, a category, search, no match), adding a medicine, the Brand list with its add card and details step, the withdrawal notice and the record's copy, the Medicines page with the medicine and brand edit forms and Delete. The treatment's optional fields and its batch doses are health-record's screens built on this feature. The condition picker is unchanged (the owner reworks conditions separately).\n\nOut: the Record treatment and Record vaccination forms themselves (health-record; this feature changes their Medicine field, adds the Brand row and the withdrawal notice, and orders the batch form), prescriptions (prescriptions), barcode scanning.\n\n## Decisions\n\n- 2026-10-16 (owner): Category → Medicine → Product, a picker with levels, manual adding, rename and delete on a page (first round).\n- 2026-10-16 (owner, revision): the picker picks a medicine; Brand is an optional field of the treatment with its own list and quick add; no product form; method and unit remembered per medicine; one rule for the second line; a starting catalogue for every farm; adding a medicine asks Name and Category; the page holds brands, and Rename and Delete for farm-added medicines only.\n- 2026-10-16 (owner, addition): optional withdrawal (medicine default, brand override), never required; shown on the form (now a caption); the record keeps a copy.\n- 2026-10-16 (owner, in place, 2): the Adjust line becomes one navigate row (\"2 pigs · 2.5 mL each · Adjust ›\"); Remove pigs as a mode on Dose per pig; the samples show the same pigs throughout.\n- 2026-10-16 (owner, in place): no pigs row; Remove on Dose per pig; withdrawal as a caption under Medicine or Brand; Dosage and Unit side by side; Same for all · Adjust ›, the per-pig page pre-filled with the dosage.\n- 2026-10-16 (owner, round 5): optional fields approved as labelled fields with a grey Optional (the law follows in a shared PR); Note 200 characters with a counter from 160; the Custom doses row and page back, with inline boxes and no checkboxes; a pig is taken out on the selected list.\n- 2026-10-16 (owner, round 4): \"Withdrawal period (days)\" everywhere; optional fields as ordinary labelled fields (Brand and Condition PickerFields, Note a textarea); batch doses inline on the form with search and Scan (replacing round 3's Custom doses page).\n- 2026-10-16 (owner, round 3): one batch dose; no strength field (strength in the brand's name); withdrawal defaults prefilled in the starting list (sample values); the Medicines page sheets are edit forms with Delete at the bottom.\n- Category titles at a level's header use short names to fit at 360 (this feature's budget): Pain relief, Hormones, Vitamins and iron.\n- The withdrawal period is a muted caption in the PickerField's hint slot (`reason`), under Medicine for its default and under Brand for a brand's own period (owner, in place 2026-10-16): where it sits says whose number it is, and it informs without warning, so it is not a Banner.\n\nOpen:\n\n- \"Done\" leaves Dose per pig's remove mode; the registry's Done applies a picker's choices with its count. The word is to confirm.\n- The red Delete, Field's `optional` label and ChoiceList's row faces are separate component decisions.\n\n- The starting list (categories and medicines, EN and ZH) is to be checked by a vet, and its default withdrawals verified against the official periods (China: MOA Announcement No. 278 and its updates) before release.\n- The Delete Row is an ordinary navigate Row (ink, no red face); the red is on the confirm. A destructive Row face would be a Row change of its own.\n- Who may add, rename and delete, and edit names and withdrawals (permissions): the prototype lets anyone.\n- None on milk withdrawal: pigs are not milked for sale.\n\nFollow-ups (other features, not built here):\n\n- Show a pig's or pen's withdrawal on the pig (pig-profile) and the pen, and flag a pig under withdrawal when it is moved or sold for slaughter (move). The record already keeps the date.\n\n## Not supported\n\n- **Barcode scanning** — owner decision: adding is manual only.\n- **Product form and a strength field** — owner revisions: method is chosen on the treatment; a strength that matters is in the brand's name.\n- **Renaming or deleting a starting-list medicine or a category** — the starting list is the same on every farm.\n- **Batch numbers, expiry and stock** — they belong to future inventory, not to the treatment.\n- **Milk withdrawal, withdrawal by species or route** — meat only, one number per brand or medicine.\n",
        "scenarios": {
-        "treeDoc": false,
-        "tree": null,
-        "run": null,
+        "treeDoc": true,
+        "tree": [
+         {
+          "type": "entry",
+          "id": "med-a.entry",
+          "label": "Choosing a medicine in Record treatment (one pig)",
+          "children": [
+           {
+            "type": "state",
+            "id": "med-a.state",
+            "label": "Record treatment for one pig, the medicine picker open at its first level",
+            "tree": "A",
+            "screen": "medicines.picker",
+            "children": [
+             {
+              "type": "action",
+              "id": "med-a1.open-category",
+              "label": "Open Antibiotics",
+              "children": [
+               {
+                "type": "action",
+                "id": "med-a1.pick",
+                "label": "Tap Amoxicillin",
+                "children": [
+                 {
+                  "type": "outcome",
+                  "id": "med-a1-pick-closes",
+                  "label": "One tap picks the medicine and closes the picker onto the form, with its withdrawal caption",
+                  "tree": "A-1",
+                  "gwt": {
+                   "given": "A worker is recording a treatment and has opened Antibiotics in the medicine picker.",
+                   "when": "They tap Amoxicillin.",
+                   "then": "The picker closes, Medicine reads Amoxicillin, and a caption under it gives its 14-day withdrawal and the date it ends."
+                  },
+                  "authority": [
+                   {
+                    "src": "PRD",
+                    "at": "Rules: the picker, level 2",
+                    "says": "a category: its medicines; one tap picks and closes"
+                   },
+                   {
+                    "src": "PRD",
+                    "at": "Rules: withdrawal on a treatment",
+                    "says": "a muted caption in the field's hint slot reads \"Withdrawal period 14 days · until 26 Sep\""
+                   }
+                  ],
+                  "result": "pass"
+                 }
+                ]
+               },
+               {
+                "type": "action",
+                "id": "med-a2.back",
+                "label": "Footer Back",
+                "children": [
+                 {
+                  "type": "outcome",
+                  "id": "med-a2-back-up-a-level",
+                  "label": "Footer Back in a category goes up to the picker's first level, not out of the drawer",
+                  "tree": "A-2",
+                  "gwt": {
+                   "given": "A worker has opened Antibiotics in the medicine picker.",
+                   "when": "They tap Back in the footer.",
+                   "then": "The picker shows its first level again, with the recent medicines and the categories, and the drawer stays open."
+                  },
+                  "authority": [
+                   {
+                    "src": "PRD",
+                    "at": "Rules: the picker is one drawer with levels",
+                    "says": "the footer Back goes up a level, the ✕ at the top left closes it from any level"
+                   }
+                  ],
+                  "result": "pass"
+                 }
+                ]
+               },
+               {
+                "type": "action",
+                "id": "med-a3.close",
+                "label": "Tap ✕ at the top left",
+                "children": [
+                 {
+                  "type": "outcome",
+                  "id": "med-a3-close-from-level",
+                  "label": "✕ closes the whole picker from a level, leaving Medicine unset",
+                  "tree": "A-3",
+                  "gwt": {
+                   "given": "A worker has opened Antibiotics in the medicine picker without picking.",
+                   "when": "They tap ✕ at the top left.",
+                   "then": "The whole picker closes onto the form and Medicine is still not chosen."
+                  },
+                  "authority": [
+                   {
+                    "src": "PRD",
+                    "at": "Rules: the picker is one drawer with levels",
+                    "says": "the ✕ at the top left closes it from any level"
+                   }
+                  ],
+                  "result": "pass"
+                 }
+                ]
+               }
+              ]
+             },
+             {
+              "type": "action",
+              "id": "med-a4.remembered",
+              "label": "Pick Meloxicam from the recent medicines",
+              "children": [
+               {
+                "type": "outcome",
+                "id": "med-a4-method-unit-remembered",
+                "label": "The medicine's last method and unit fill the form",
+                "tree": "A-4",
+                "gwt": {
+                 "given": "The farm last gave Meloxicam by injection in mL.",
+                 "when": "A worker picks Meloxicam for a new treatment.",
+                 "then": "Method reads Injection and the dose unit reads mL without the worker setting them."
+                },
+                "authority": [
+                 {
+                  "src": "PRD",
+                  "at": "Rules: no strength field",
+                  "says": "The treatment remembers the last method and unit per medicine and pre-fills them."
+                 }
+                ],
+                "result": "pass"
+               }
+              ]
+             },
+             {
+              "type": "action",
+              "id": "med-a5.search",
+              "label": "Search \"amox\"",
+              "children": [
+               {
+                "type": "outcome",
+                "id": "med-a5-search-names-category",
+                "label": "A search result names its category, because search mixes categories",
+                "tree": "A-5",
+                "gwt": {
+                 "given": "A worker has the medicine picker open.",
+                 "when": "They type part of a medicine's name.",
+                 "then": "The matching medicine is listed with its category under it, and the categories list is gone."
+                },
+                "authority": [
+                 {
+                  "src": "PRD",
+                  "at": "Rules: the second line",
+                  "says": "a search result names its category, because search mixes categories"
+                 }
+                ],
+                "result": "pass"
+               }
+              ]
+             },
+             {
+              "type": "action",
+              "id": "med-a6.add-open",
+              "label": "Search \"Cefquinome\" and tap its Add card",
+              "children": [
+               {
+                "type": "action",
+                "id": "med-a6.add-waiting",
+                "label": "Tap the waiting Add",
+                "children": [
+                 {
+                  "type": "outcome",
+                  "id": "med-a6-waiting-add-required",
+                  "label": "A tap on the waiting Add marks the empty Category Required",
+                  "tree": "A-6",
+                  "gwt": {
+                   "given": "A worker is adding a medicine named from their search and has not chosen its category.",
+                   "when": "They tap Add.",
+                   "then": "Nothing is added; Category is marked Required and the add level stays open."
+                  },
+                  "authority": [
+                   {
+                    "src": "atlas",
+                    "at": "medicines.add, Add",
+                    "says": "Waits until Name and Category are set; a tap while waiting marks them Required."
+                   },
+                   {
+                    "src": "PRD",
+                    "at": "Rules: adding a medicine",
+                    "says": "Category (required, one pick)"
+                   }
+                  ],
+                  "result": "pending",
+                  "why": "The runner refuses to tap a waiting (aria-disabled) control as unreachable, but a worker can tap it: the leaf needs a step that taps a waiting control. Covered meanwhile by ux/system/medicines.test.cjs."
+                 }
+                ]
+               },
+               {
+                "type": "action",
+                "id": "med-a7.add-category",
+                "label": "Choose Antibiotics as its category",
+                "children": [
+                 {
+                  "type": "action",
+                  "id": "med-a7.add-commit",
+                  "label": "Tap Add",
+                  "children": [
+                   {
+                    "type": "outcome",
+                    "id": "med-a7-add-lists-and-picks",
+                    "label": "Adding lists the medicine and picks it: the drawer closes on the form",
+                    "tree": "A-7",
+                    "gwt": {
+                     "given": "A worker has named a missing medicine Cefquinome and chosen Antibiotics.",
+                     "when": "They tap Add.",
+                     "then": "The picker closes and the treatment's Medicine reads Cefquinome."
+                    },
+                    "authority": [
+                     {
+                      "src": "PRD",
+                      "at": "Rules: adding a medicine",
+                      "says": "Adding lists it for everyone and picks it."
+                     }
+                    ],
+                    "result": "pass"
+                   }
+                  ]
+                 },
+                 {
+                  "type": "action",
+                  "id": "med-a8.add-back",
+                  "label": "Footer Back to the search, then tap the Add card again",
+                  "children": [
+                   {
+                    "type": "outcome",
+                    "id": "med-a8-add-draft-kept",
+                    "label": "Back from the add level keeps its draft: the category chosen is still there",
+                    "tree": "A-8",
+                    "gwt": {
+                     "given": "A worker adding Cefquinome has chosen Antibiotics as its category.",
+                     "when": "They go Back to the search and tap the same Add card again.",
+                     "then": "The add level reopens with Antibiotics still chosen."
+                    },
+                    "authority": [
+                     {
+                      "src": "RUL",
+                      "at": "Owner ruling B, 2026-10-16 (drawer levels)",
+                      "says": "Footer Back keeps the draft; in a drawer with levels it goes up one level"
+                     }
+                    ],
+                    "result": "pass"
+                   }
+                  ]
+                 }
+                ]
+               }
+              ]
+             }
+            ]
+           }
+          ]
+         },
+         {
+          "type": "entry",
+          "id": "med-b.entry",
+          "label": "Brand on Record treatment (one pig)",
+          "children": [
+           {
+            "type": "state",
+            "id": "med-b.state",
+            "label": "Record treatment with Amoxicillin picked",
+            "tree": "B",
+            "screen": "health-record.treatment",
+            "children": [
+             {
+              "type": "action",
+              "id": "med-b1.own-period",
+              "label": "Open Brand and tap Amoxinsol 50%",
+              "children": [
+               {
+                "type": "outcome",
+                "id": "med-b1-brand-own-period",
+                "label": "A brand with its own withdrawal shows it under Brand",
+                "tree": "B-1",
+                "gwt": {
+                 "given": "Amoxinsol 50% has its own 2-day withdrawal, unlike Amoxicillin's 14 days.",
+                 "when": "A worker picks that brand on the treatment.",
+                 "then": "Brand reads Amoxinsol 50% and the caption under it gives its 2-day withdrawal."
+                },
+                "authority": [
+                 {
+                  "src": "PRD",
+                  "at": "Rules: withdrawal",
+                  "says": "A brand overrides it only when its label differs."
+                 },
+                 {
+                  "src": "PRD",
+                  "at": "Rules: withdrawal on a treatment",
+                  "says": "under Brand when the chosen brand has its own period"
+                 }
+                ],
+                "result": "pass"
+               }
+              ]
+             },
+             {
+              "type": "action",
+              "id": "med-b2.add",
+              "label": "Open Brand, search \"Moxylan\", tap its Add card",
+              "children": [
+               {
+                "type": "action",
+                "id": "med-b2.skip",
+                "label": "Tap Add with the withdrawal empty",
+                "children": [
+                 {
+                  "type": "outcome",
+                  "id": "med-b2-add-brand-details-optional",
+                  "label": "The new brand's details are optional: Add with the field empty keeps the medicine's period",
+                  "tree": "B-2",
+                  "gwt": {
+                   "given": "A worker has added a new brand, Moxylan, from the brand search.",
+                   "when": "They tap Add on its details without typing a withdrawal.",
+                   "then": "The form shows Brand Moxylan, and the caption under Medicine still gives Amoxicillin's 14 days."
+                  },
+                  "authority": [
+                   {
+                    "src": "PRD",
+                    "at": "Rules: Brand",
+                    "says": "then offers an optional, skippable details step (its withdrawal)"
+                   },
+                   {
+                    "src": "PRD",
+                    "at": "Rules: withdrawal",
+                    "says": "Withdrawal period (days), never required."
+                   }
+                  ],
+                  "result": "pass"
+                 }
+                ]
+               }
+              ]
+             }
+            ]
+           }
+          ]
+         },
+         {
+          "type": "entry",
+          "id": "med-c.entry",
+          "label": "Record vaccination",
+          "children": [
+           {
+            "type": "state",
+            "id": "med-c.state",
+            "label": "The vaccine picker open from a pig's vaccination task",
+            "tree": "C",
+            "screen": "medicines.vaccines",
+            "children": [
+             {
+              "type": "outcome",
+              "id": "med-c1-vaccines-by-disease",
+              "label": "A vaccination lists vaccines by disease at once, under a label that is not the title",
+              "tree": "C-1",
+              "gwt": {
+               "given": "A worker is recording a vaccination.",
+               "when": "They open the vaccine picker.",
+               "then": "It lists vaccines by disease straight away, recent ones then All, with no medicines and no category level."
+              },
+              "authority": [
+               {
+                "src": "PRD",
+                "at": "Rules: Hosts",
+                "says": "Record vaccination uses the same picker filtered to Vaccines."
+               },
+               {
+                "src": "PRD",
+                "at": "Rules: Category → Medicine",
+                "says": "Vaccines are named by the disease (PRRS, PCV2…), so a vaccination lists diseases."
+               }
+              ],
+              "result": "pass"
+             }
+            ]
+           }
+          ]
+         },
+         {
+          "type": "entry",
+          "id": "med-d.entry",
+          "label": "The Medicines page (Home → Toolbox → Medicines)",
+          "children": [
+           {
+            "type": "state",
+            "id": "med-d.state",
+            "label": "The Medicines page open on Antibiotics",
+            "tree": "D",
+            "screen": "medicines.page-category",
+            "children": [
+             {
+              "type": "action",
+              "id": "med-d1.starting",
+              "label": "Open Amoxicillin (a starting-list medicine)",
+              "children": [
+               {
+                "type": "outcome",
+                "id": "med-d1-starting-list-read-only-name",
+                "label": "A starting-list medicine edits only its default withdrawal: no name field, no Delete",
+                "tree": "D-1",
+                "gwt": {
+                 "given": "The farm's list includes Amoxicillin from the starting list.",
+                 "when": "The supervisor opens it on the Medicines page.",
+                 "then": "Only its default withdrawal can be edited; its name is the title and there is no Delete."
+                },
+                "authority": [
+                 {
+                  "src": "PRD",
+                  "at": "Rules: the Medicines page",
+                  "says": "a starting-list medicine: its default withdrawal only, its name read-only … Starting-list medicines have no Delete."
+                 }
+                ],
+                "result": "pass"
+               }
+              ]
+             },
+             {
+              "type": "action",
+              "id": "med-d2.brand-edit",
+              "label": "Open Amoxicillin, then Clamoxyl, and type a new name",
+              "children": [
+               {
+                "type": "action",
+                "id": "med-d2.back-reopen",
+                "label": "Footer Back, then open Clamoxyl again",
+                "children": [
+                 {
+                  "type": "outcome",
+                  "id": "med-d2-brand-draft-kept",
+                  "label": "Back keeps a brand's unsaved edit when it is reopened",
+                  "tree": "D-2",
+                  "gwt": {
+                   "given": "The supervisor typed a new name for the brand Clamoxyl but did not save.",
+                   "when": "They go Back to Amoxicillin and open Clamoxyl again.",
+                   "then": "The name field still holds what they typed."
+                  },
+                  "authority": [
+                   {
+                    "src": "RUL",
+                    "at": "Owner ruling B, 2026-10-16 (drawer levels)",
+                    "says": "Footer Back keeps the draft; in a drawer with levels it goes up one level"
+                   }
+                  ],
+                  "result": "pass"
+                 }
+                ]
+               }
+              ]
+             },
+             {
+              "type": "action",
+              "id": "med-d3.delete",
+              "label": "Open Gamithromycin (farm-added), Delete medicine, then Delete",
+              "children": [
+               {
+                "type": "outcome",
+                "id": "med-d3-delete-farm-medicine",
+                "label": "Deleting a farm-added medicine takes it off the list after a confirm level",
+                "tree": "D-3",
+                "gwt": {
+                 "given": "The farm added Gamithromycin itself.",
+                 "when": "The supervisor opens it, taps Delete medicine and confirms.",
+                 "then": "The confirm says past records keep its name, and Gamithromycin is gone from Antibiotics."
+                },
+                "authority": [
+                 {
+                  "src": "PRD",
+                  "at": "Rules: the Medicines page",
+                  "says": "Delete as a navigate Row in its own card at the bottom, opening a confirm level (\"Past records keep its name\") … Delete removes the entry from the picker"
+                 }
+                ],
+                "result": "pass"
+               }
+              ]
+             }
+            ]
+           }
+          ]
+         }
+        ],
+        "run": {
+         "commit": "6355fee",
+         "dirty": true,
+         "ran": "2026-10-18T03:24:28.463Z",
+         "langs": [
+          "en",
+          "zh"
+         ],
+         "widths": [
+          360,
+          390
+         ]
+        },
         "notSupported": {
          "source": "features/medicines/PRD.md",
          "items": [
