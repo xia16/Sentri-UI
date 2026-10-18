@@ -29,7 +29,7 @@ Write `features/<id>/budget.md` and commit it before any layout, for every new s
 2. `## Questions`: the worker's questions at that moment, in order (where am I? does anything need me? what do I do? is this the right animal? who did it, when?).
 3. `## Levels`: each fact gets one level. **Act now** (something to do now; the only loud thing), **Watch**, **Coming up**, **Settled** (quiet), **Audit** (smallest). A state that qualifies facts (offline, stale) sits quietly beside them. A fact that answers no question is cut.
 4. Budget it against real volumes and the real header and bar: one coloured element per row at most, a second line only when it changes what the worker does, nothing the header says, no zeros, no derived figure beside its parts. The answer to the first question is the heaviest thing on the screen.
-5. The cut list goes in the PR body. Cut before you enlarge; cutting facts never cuts structure (sections keep their headings, rows stay in groups, the page ends on a group).
+5. The cut list goes in the PR body. Its **Results** block is the gate's `results.md`, pasted whole; the body states no measurements of its own (test counts, pixel differences, sizes, "identical"), since the gate's are on the gated commit and yours go stale with the next push (gate-simplify.md S8). Cut before you enlarge; cutting facts never cuts structure (sections keep their headings, rows stay in groups, the page ends on a group).
 
 Worked example, the Farrowing room row: Act now "3 days overdue" in dark red; Watch "Farrowing now · 9 alive · 5 dead"; Coming up "Due today · P2"; Settled "11 alive · 2 dead" in grey with a small "05:58 · G.H"; cut born N, "Done", the pencil, chips, zeros.
 

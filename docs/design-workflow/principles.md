@@ -63,7 +63,7 @@ Each principle has the same four parts and nothing else: **the principle**, **wh
 
 **Show it.** Every result in the PR names its commit; claims link to the measurement.
 
-**Checked by.** The gate runs every check on the exact merge candidate and re-measures the builder's claims (gate.md §1, §5); `--verdict` refuses a moved head or main. To automate (ledger): notes checked against the rendered screen, a component change resetting its score, "used by" derived at atlas build.
+**Checked by.** The gate runs every check on the exact merge candidate and re-measures the builder's claims ([gate-machine.md](gate-machine.md), §5); `--verdict` refuses a moved head or main. To automate (ledger): notes checked against the rendered screen, a component change resetting its score, "used by" derived at atlas build.
 
 ## P6 · The owner sees only finished, visual work
 

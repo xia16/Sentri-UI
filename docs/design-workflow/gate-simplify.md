@@ -136,4 +136,7 @@ With most gates at 1–3 minutes, the lock queue shrinks with them, so G11 (smal
 6. **Done (2026-10-18):** G2 (X4, X5). Main requires branches to be up to date (`strict`), admins included. The shared-component
    queue and the local pass records are gone; a gate run posts `pending` at its start and `failure` when it fails or blocks, so
    the `sentri/gate` status is the one record. The merge guard keeps only the merge's form and the push rule.
-7. S6–S8 and G9: the judge's load and the Results block.
+7. **Done (2026-10-18):** S7 and S8 (S6 dropped, §6). `briefs/gate.md` is the judge's brief alone, about half its length;
+   what the machine does moved to `gate-machine.md`. Every gate run writes `results.md`, the PR's Results block, and the PR body
+   states no measurements of its own; §5 re-measures only what a body still claims. G9's obligations and `Docs:` trailers wait on
+   their own decisions (change-map.md §9, 4 and 5).
