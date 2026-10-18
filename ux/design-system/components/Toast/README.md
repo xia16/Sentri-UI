@@ -38,7 +38,7 @@ The check on the green is the only colour; green means done (design law: colour)
 | Default | Glyph, title, second line | Done, Offline, Plain |
 | Several pigs | The second line counts them: "12 pigs" / "12 头猪" | Done, Offline |
 | Title only | Glyph and title; no second line | Done ("Changes saved"), Plain |
-| Long line wraps | A long second line wraps; the box grows, nothing is clipped or cut with an ellipsis | Done, Offline |
+| Long line | A longer line wraps and the box grows; nothing is clipped or cut with an ellipsis. Not drawn: every real line fits one line at 360px (no invented stress copy) | — |
 | Chinese | The same parts; Chinese wraps rather than clips | Done, Offline, Plain |
 | Entering | Rises 8px and fades in over 0.2s (`st-toast-in`); no motion under reduced motion | Held screens (below) |
 | Showing | About 3 seconds, one at a time; `role="status"` reads it once to a screen reader | Held screens |

@@ -7,16 +7,15 @@
 .ph-row+.ph-row{border-top:1px solid var(--line)}
 .ph-row b{font:600 16px/1.2 var(--font-mono,ui-monospace,monospace);color:var(--ink)}
 .ph-row i{font:400 13px/1.2 var(--font-sans);font-style:normal;color:var(--muted)}
-.ph-dock{position:absolute;left:0;right:0;bottom:0;height:94px;display:grid;grid-template-columns:96px 1fr 56px;gap:10px;align-items:start;padding:14px var(--space-gutter) 0;box-sizing:border-box;border-top:1px solid var(--line);background:var(--app-background)}
+.ph-dock{position:absolute;left:0;right:0;bottom:0;height:94px;display:grid;grid-template-columns:96px 1fr 56px;gap:10px;align-items:start;padding:14px var(--space-gutter) 0;box-sizing:border-box;border-top:1px solid var(--line);background:var(--paper,#fff)}
 .ph-dock span{height:56px;border-radius:16px;border:1px solid var(--line);background:var(--paper,#fff)}
 </style></head><body>
 <section data-state="Default · one pig" id="done-0"></section>
 <section data-state="Several pigs" id="done-1"></section>
 <section data-state="Vaccination" id="done-2"></section>
 <section data-state="Title only" id="done-3"></section>
-<section data-state="Long line wraps" id="done-4"></section>
-<section data-state="Chinese" id="done-5"></section>
-<section data-state="Chinese · several pigs" id="done-6"></section>
+<section data-state="Chinese" id="done-4"></section>
+<section data-state="Chinese · several pigs" id="done-5"></section>
 <script>
 const page='<div class="ph"><div class="ph-list"><div class="ph-row"><b>000254</b><i>Gestation · 40d</i></div><div class="ph-row"><b>000281</b><i>Gestation · 46d</i></div></div><div class="ph-dock"><span></span><span></span><span></span></div>';
 const put=(id,html)=>document.querySelectorAll('[data-state]').forEach(el=>{if(el.id===id)el.innerHTML=page+html+'</div>'});
@@ -24,8 +23,7 @@ put('done-0',SentriUI.toast('Treatment recorded',{detail:'000267',tone:'done'}))
 put('done-1',SentriUI.toast('Treatment recorded',{detail:'12 pigs',tone:'done'}));
 put('done-2',SentriUI.toast('Vaccination recorded',{detail:'000267',tone:'done'}));
 put('done-3',SentriUI.toast('Changes saved',{tone:'done'}));
-put('done-4',SentriUI.toast('Treatment recorded',{detail:'000267, 000281, 000306 and 9 more pigs in C1 and C2',tone:'done'}));
-put('done-5',SentriUI.toast('治疗已记录',{detail:'000267',tone:'done'}));
-put('done-6',SentriUI.toast('治疗已记录',{detail:'12 头猪',tone:'done'}));
+put('done-4',SentriUI.toast('治疗已记录',{detail:'000267',tone:'done'}));
+put('done-5',SentriUI.toast('治疗已记录',{detail:'12 头猪',tone:'done'}));
 </script>
 </body></html>
