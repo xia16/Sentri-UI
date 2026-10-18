@@ -507,6 +507,23 @@ export function scenarioDebt(candReport, baseReport) {
 // A change that moves no screen merges on the mechanical gate alone (docs/design-workflow/README.md, "Who decides what"): there is
 // no pair for a judge, so the gate itself posts the sentri/gate status. Fail closed: the run must be a full
 // one (not --quick) whose screens were classified, with nothing changed, new or gone and no pair listed.
+// The PR's Results block (gate-simplify.md S8), from one gate run's mechanical.json: every number in it was measured on the gated
+// commit, so a PR body that pastes it never carries a stale claim (#163, #192). Markdown; the driver pastes it whole.
+export function resultsBlock(mech) {
+  const short = (s) => String(s || '?').slice(0, 7);
+  const n = (a) => (Array.isArray(a) ? a.length : 0);
+  const r = mech.reach || {}, sc = mech.screens || {};
+  const word = { pass: 'MECHANICAL PASS', fail: 'MECHANICAL FAIL', blocked: 'MECHANICAL BLOCKED' }[mech.outcome] || 'MECHANICAL ?';
+  const out = [`### Results`, '', `The gate's, on \`${short(mech.candidate)}\` against main \`${short(mech.base)}\` (\`node scripts/gate.mjs\`, ${mech.timings?.total ?? '?'} s).`, ''];
+  out.push(`- **${word}**${mech.gatePass ? ' · GATE PASS (no screen moved)' : ''}, class **${mech.class?.effective || '?'}**${mech.stoppedEarly ? ` · stopped before any browser work: ${mech.stoppedEarly}` : ''}`);
+  if (r.of) out.push(`- Reach: ${r.screens} of ${r.of} screens${r.changed !== undefined ? ` (${r.changed} changed identity, ${r.added} added, ${r.removed} removed)` : ''}${r.leaves !== undefined ? `, ${r.leaves} leaves` : ''}`);
+  if (mech.screens) out.push(`- Screens: ${n(sc.diff)} changed, ${n(sc.new)} new, ${n(sc.gone)} gone, ${n(sc.broken)} broken; ${n(mech.pairs)} pair(s) to judge${n(mech.walkNeed) ? `; ${mech.walkNeed.length} screen(s) to walk (${mech.walkNeed.slice(0, 4).join(', ')}${mech.walkNeed.length > 4 ? ' …' : ''})` : ''}`);
+  for (const c of mech.checks || []) out.push(`- ${c.result === 'pass' ? '✓' : c.result === 'fail' ? '✗' : '–'} ${c.check}${c.detail ? `: ${String(c.detail).split('\n')[0].slice(0, 160)}` : ''}`);
+  for (const b of mech.blocked || []) out.push(`- ⛔ ${String(b).slice(0, 200)}`);
+  for (const g of mech.gaps || []) out.push(`- gap: ${String(g).slice(0, 200)}`);
+  return out.join('\n') + '\n';
+}
+
 export function passesWithoutJudge(mech) {
   if (!mech || mech.pass !== true || (mech.outcome && mech.outcome !== 'pass') || mech.quick || !mech.candidate || !mech.base || !mech.screens) return false;
   if ((mech.pairs || []).length) return false;

@@ -567,3 +567,19 @@ test('a change that moves no screen but runs changed code needs a walk (G15), an
   assert.deepEqual(checkVerdict(v, { ...mech, walkNeed: ['a'] }).problems, [], 'the gate\'s own class is what makes a no-pixel change a behaviour change');
   assert.match(checkVerdict(v, { ...mech, class: { effective: 'presentation' } }).problems.join(' | '), /class presentation/);
 });
+
+// ---------- gate-simplify.md step 7 (S8): the PR's Results block is the gate's ----------
+test("the Results block is the gate run's own measurements, on the gated commit", async () => {
+  const { resultsBlock } = await import('../scripts/loop-rules.mjs');
+  const md = resultsBlock({ outcome: 'fail', candidate: 'abcdef1234', base: '9876543210', timings: { total: 31.9 }, class: { effective: 'presentation' },
+    reach: { screens: 3, of: 405, changed: 3, added: 0, removed: 0, leaves: 2 }, screens: { diff: [{}], new: [], gone: [], broken: [] }, pairs: [{}, {}, {}], walkNeed: [],
+    checks: [{ check: 'npm test', result: 'pass', detail: 'ℹ pass 816' }, { check: 'clear spacing on changed screens (P4)', result: 'fail', detail: '1 new: x' }], blocked: [], gaps: ['check-states: 8 problem(s) already on main'] });
+  assert.match(md, /^### Results\n/);
+  assert.match(md, /on `abcdef1` against main `9876543`/);
+  assert.match(md, /\*\*MECHANICAL FAIL\*\*, class \*\*presentation\*\*/);
+  assert.match(md, /Reach: 3 of 405 screens \(3 changed identity, 0 added, 0 removed\), 2 leaves/);
+  assert.match(md, /1 changed, 0 new, 0 gone, 0 broken; 3 pair\(s\) to judge/);
+  assert.match(md, /- ✓ npm test: ℹ pass 816\n- ✗ clear spacing on changed screens \(P4\): 1 new: x/);
+  assert.match(md, /- gap: check-states: 8 problem\(s\) already on main/);
+  assert.match(resultsBlock({ outcome: 'fail', stoppedEarly: 'a check the diff decides failed', checks: [] }), /stopped before any browser work/);
+});

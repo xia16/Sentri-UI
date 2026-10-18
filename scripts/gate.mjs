@@ -1,5 +1,5 @@
-// The mechanical gate on the exact merge candidate: docs/design-workflow/briefs/gate.md §1, plus the screen diff and the
-// before/after pairs the judge decides on (§3-4). The work is scripts/evaluate.mjs (gate v2, docs/design-workflow/gate-v2.md):
+// The mechanical gate on the exact merge candidate (docs/design-workflow/gate-machine.md), plus the screen diff and the before/after
+// pairs the judge decides on (docs/design-workflow/briefs/gate.md §3-4). The work is scripts/evaluate.mjs (gate v2, docs/design-workflow/gate-v2.md):
 // evaluate(base, candidate, mode) → pass | fail | blocked. This file parses arguments, holds the machine's one-gate lock, writes
 // mechanical.json and checks the judge's verdict.
 // Usage: node scripts/gate.mjs --candidate <ref> [--scope <feature,...>] [--mode normal|refactor] [--out <dir>] [--keep] [--base <ref>]
@@ -19,7 +19,7 @@
 // (sentri-gate/evidence/): a rerun, or a later gate on the same main, reuses every result whose identity didn't change.
 // It judges with the base's own tools, never the candidate's: a candidate does not grade itself with its own gate. Run from a
 // checkout whose tools differ from the base (any branch, a stale main), it runs itself from a worktree of the base instead.
-// Writes <out>/mechanical.json and, for every changed, new or removed screen, <out>/pairs/<screen>/<lang>-<width>.png
+// Writes <out>/mechanical.json, <out>/results.md (the PR's Results block) and, for every changed, new or removed screen, <out>/pairs/<screen>/<lang>-<width>.png
 // (base | candidate) at EN 390, EN 360 and ZH 360. The design system's variant pages are screens here too (ds:<Name>/<variant>).
 // Exit 0 when every mechanical check passes, 1 when one fails, 3 when the gate is blocked (it could not establish the evidence).
 // The judge (gate.md) then writes <out>/verdict.json, and `node scripts/gate.mjs --verdict <out>` checks it against mechanical.json,
@@ -32,7 +32,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { checkVerdict, calibrationProblems, lockState, passesWithoutJudge, carryJudgements } from './loop-rules.mjs';
+import { checkVerdict, calibrationProblems, lockState, passesWithoutJudge, carryJudgements, resultsBlock } from './loop-rules.mjs';
 import { selfStart } from './process-start.mjs';
 import { postStatus as post } from './github.mjs';
 import { evaluate, toolsDiffer } from './evaluate.mjs';
@@ -158,6 +158,8 @@ async function runGate({ ref, base, out, mode, scope, audit = false, keep = fals
     postStatus(mech.candidate, failed ? 'failure' : 'pending', failed ? `MECHANICAL ${String(mech.outcome).toUpperCase()} against ${short(mech.base)}` : `mechanical pass against ${short(mech.base)}: waiting for the judge's verdict`);
   }
   fs.writeFileSync(path.join(out, 'mechanical.json'), JSON.stringify(mech, null, 2));
+  // the PR's Results block (gate-simplify.md S8): the gate's own measurements, pasted whole into the PR body
+  fs.writeFileSync(path.join(out, 'results.md'), resultsBlock(mech));
   const t = mech.timings || {};
   console.log(`\ntimings (s): ${Object.entries(t).map(([k, v]) => `${k} ${v}`).join(', ')}`);
   if (mech.evidence) console.log(`evidence: ${JSON.stringify(mech.evidence.byKind || {})}; scheduler ${JSON.stringify(mech.evidence.scheduler?.busy || {})}`);
