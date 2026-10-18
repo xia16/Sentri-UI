@@ -1,0 +1,374 @@
+{
+  "feature": "medicines",
+  "defaults": { "url": "/ux/system/inspection-astra-concept.html?layout=focus", "clock": "2026-09-12T09:41:00",
+                "langs": ["en", "zh"], "widths": [360, 390], "height": 844, "clipCheck": true },
+  "tree": [
+    {
+      "type": "entry", "id": "med-a.entry", "label": "Choosing a medicine in Record treatment (one pig)",
+      "children": [
+        {
+          "type": "state", "id": "med-a.state", "label": "Record treatment for one pig, the medicine picker open at its first level", "tree": "A",
+          "reset": { "screen": "medicines.picker" },
+          "children": [
+            {
+              "type": "action", "id": "med-a1.open-category", "label": "Open Antibiotics",
+              "taps": ["[data-action=\"medicine-category\"][data-value=\"antibiotics\"]"],
+              "children": [
+                {
+                  "type": "action", "id": "med-a1.pick", "label": "Tap Amoxicillin",
+                  "taps": ["[data-action=\"medicine-select\"][data-value=\"amoxicillin\"]"],
+                  "children": [
+                    {
+                      "type": "outcome", "id": "med-a1-pick-closes", "tree": "A-1",
+                      "label": "One tap picks the medicine and closes the picker onto the form, with its withdrawal caption",
+                      "gwt": { "given": "A worker is recording a treatment and has opened Antibiotics in the medicine picker.",
+                               "when": "They tap Amoxicillin.",
+                               "then": "The picker closes, Medicine reads Amoxicillin, and a caption under it gives its 14-day withdrawal and the date it ends." },
+                      "authority": [
+                        { "src": "PRD", "at": "Rules: the picker, level 2", "says": "a category: its medicines; one tap picks and closes" },
+                        { "src": "PRD", "at": "Rules: withdrawal on a treatment", "says": "a muted caption in the field's hint slot reads \"Withdrawal period 14 days · until 26 Sep\"" }
+                      ],
+                      "visible": [
+                        { "screen": "health-record.treatment" },
+                        { "text": "Amoxicillin", "in": "sheet" },
+                        { "text": { "en": "Withdrawal period 14 days", "zh": "休药期14 天" }, "in": "sheet" }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "action", "id": "med-a2.back", "label": "Footer Back",
+                  "taps": ["[data-action=\"medicine-up\"]"],
+                  "children": [
+                    {
+                      "type": "outcome", "id": "med-a2-back-up-a-level", "tree": "A-2",
+                      "label": "Footer Back in a category goes up to the picker's first level, not out of the drawer",
+                      "gwt": { "given": "A worker has opened Antibiotics in the medicine picker.",
+                               "when": "They tap Back in the footer.",
+                               "then": "The picker shows its first level again, with the recent medicines and the categories, and the drawer stays open." },
+                      "authority": [
+                        { "src": "PRD", "at": "Rules: the picker is one drawer with levels", "says": "the footer Back goes up a level, the ✕ at the top left closes it from any level" }
+                      ],
+                      "visible": [
+                        { "screen": "medicines.picker" },
+                        { "el": "[data-action=\"medicine-category\"][data-value=\"antibiotics\"]", "is": "present", "says": "the categories are listed again" }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "action", "id": "med-a3.close", "label": "Tap ✕ at the top left",
+                  "taps": ["[data-action=\"dismiss\"]"],
+                  "children": [
+                    {
+                      "type": "outcome", "id": "med-a3-close-from-level", "tree": "A-3",
+                      "label": "✕ closes the whole picker from a level, leaving Medicine unset",
+                      "gwt": { "given": "A worker has opened Antibiotics in the medicine picker without picking.",
+                               "when": "They tap ✕ at the top left.",
+                               "then": "The whole picker closes onto the form and Medicine is still not chosen." },
+                      "authority": [
+                        { "src": "PRD", "at": "Rules: the picker is one drawer with levels", "says": "the ✕ at the top left closes it from any level" }
+                      ],
+                      "visible": [
+                        { "el": "[data-action=\"medicine-open\"]", "is": "present", "says": "the form's Medicine field is showing" },
+                        { "el": "[data-action=\"medicine-category\"]", "is": "absent", "says": "no picker level is open" },
+                        { "el": "[data-action=\"brand-open\"]", "is": "absent", "says": "no medicine was picked, so Brand has not appeared" }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "action", "id": "med-a4.remembered", "label": "Pick Meloxicam from the recent medicines",
+              "taps": ["[data-action=\"medicine-select\"][data-value=\"meloxicam\"]"],
+              "children": [
+                {
+                  "type": "outcome", "id": "med-a4-method-unit-remembered", "tree": "A-4",
+                  "label": "The medicine's last method and unit fill the form",
+                  "gwt": { "given": "The farm last gave Meloxicam by injection in mL.",
+                           "when": "A worker picks Meloxicam for a new treatment.",
+                           "then": "Method reads Injection and the dose unit reads mL without the worker setting them." },
+                  "authority": [
+                    { "src": "PRD", "at": "Rules: no strength field", "says": "The treatment remembers the last method and unit per medicine and pre-fills them." }
+                  ],
+                  "visible": [
+                    { "text": "Meloxicam", "in": "sheet" },
+                    { "text": "Injection", "in": "sheet" },
+                    { "text": "mL", "in": "sheet" }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "action", "id": "med-a5.search", "label": "Search \"amox\"",
+              "taps": [{ "fill": "[data-medicine-search]", "value": "amox" }],
+              "children": [
+                {
+                  "type": "outcome", "id": "med-a5-search-names-category", "tree": "A-5",
+                  "label": "A search result names its category, because search mixes categories",
+                  "gwt": { "given": "A worker has the medicine picker open.",
+                           "when": "They type part of a medicine's name.",
+                           "then": "The matching medicine is listed with its category under it, and the categories list is gone." },
+                  "authority": [
+                    { "src": "PRD", "at": "Rules: the second line", "says": "a search result names its category, because search mixes categories" }
+                  ],
+                  "visible": [
+                    { "text": "Amoxicillin", "in": "sheet" },
+                    { "text": { "en": "Antibiotics", "zh": "抗生素" }, "in": "sheet" },
+                    { "el": "[data-action=\"medicine-category\"]", "is": "absent", "says": "the categories are not shown while searching" }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "action", "id": "med-a6.add-open", "label": "Search \"Cefquinome\" and tap its Add card",
+              "taps": [{ "fill": "[data-medicine-search]", "value": "Cefquinome" }, "[data-action=\"medicine-add\"]"],
+              "children": [
+                {
+                  "type": "action", "id": "med-a6.add-waiting", "label": "Tap the waiting Add",
+                  "taps": ["[data-action=\"medicine-add-save\"]"],
+                  "children": [
+                    {
+                      "type": "outcome", "id": "med-a6-waiting-add-required", "tree": "A-6", "status": "pending",
+                      "why": "The runner refuses to tap a waiting (aria-disabled) control as unreachable, but a worker can tap it: the leaf needs a step that taps a waiting control. Covered meanwhile by ux/system/medicines.test.cjs.",
+                      "label": "A tap on the waiting Add marks the empty Category Required",
+                      "gwt": { "given": "A worker is adding a medicine named from their search and has not chosen its category.",
+                               "when": "They tap Add.",
+                               "then": "Nothing is added; Category is marked Required and the add level stays open." },
+                      "authority": [
+                        { "src": "atlas", "at": "medicines.add, Add", "says": "Waits until Name and Category are set; a tap while waiting marks them Required." },
+                        { "src": "PRD", "at": "Rules: adding a medicine", "says": "Category (required, one pick)" }
+                      ],
+                      "visible": [
+                        { "screen": "medicines.add" },
+                        { "text": { "en": "Required", "zh": "必填" }, "in": "sheet" }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "action", "id": "med-a7.add-category", "label": "Choose Antibiotics as its category",
+                  "taps": ["[data-action=\"medicine-add-pick-category\"]", "[data-action=\"medicine-add-category\"][data-value=\"antibiotics\"]"],
+                  "children": [
+                    {
+                      "type": "action", "id": "med-a7.add-commit", "label": "Tap Add",
+                      "taps": ["[data-action=\"medicine-add-save\"]"],
+                      "children": [
+                        {
+                          "type": "outcome", "id": "med-a7-add-lists-and-picks", "tree": "A-7",
+                          "label": "Adding lists the medicine and picks it: the drawer closes on the form",
+                          "gwt": { "given": "A worker has named a missing medicine Cefquinome and chosen Antibiotics.",
+                                   "when": "They tap Add.",
+                                   "then": "The picker closes and the treatment's Medicine reads Cefquinome." },
+                          "authority": [
+                            { "src": "PRD", "at": "Rules: adding a medicine", "says": "Adding lists it for everyone and picks it." }
+                          ],
+                          "visible": [
+                            { "screen": "health-record.treatment" },
+                            { "text": "Cefquinome", "in": "sheet" }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "action", "id": "med-a8.add-back", "label": "Footer Back to the search, then tap the Add card again",
+                      "taps": ["[data-action=\"medicine-up\"]", "[data-action=\"medicine-add\"]"],
+                      "children": [
+                        {
+                          "type": "outcome", "id": "med-a8-add-draft-kept", "tree": "A-8",
+                          "label": "Back from the add level keeps its draft: the category chosen is still there",
+                          "gwt": { "given": "A worker adding Cefquinome has chosen Antibiotics as its category.",
+                                   "when": "They go Back to the search and tap the same Add card again.",
+                                   "then": "The add level reopens with Antibiotics still chosen." },
+                          "authority": [
+                            { "src": "RUL", "at": "Owner ruling B, 2026-10-16 (drawer levels)", "says": "Footer Back keeps the draft; in a drawer with levels it goes up one level" }
+                          ],
+                          "visible": [
+                            { "screen": "medicines.add" },
+                            { "text": { "en": "Antibiotics", "zh": "抗生素" }, "in": "sheet", "hard": "lost-draft" }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "entry", "id": "med-b.entry", "label": "Brand on Record treatment (one pig)",
+      "children": [
+        {
+          "type": "state", "id": "med-b.state", "label": "Record treatment with Amoxicillin picked", "tree": "B",
+          "reset": { "screen": "health-record.treatment" },
+          "children": [
+            {
+              "type": "action", "id": "med-b1.own-period", "label": "Open Brand and tap Amoxinsol 50%",
+              "taps": ["[data-action=\"brand-open\"]", "[data-action=\"brand-select\"][data-value=\"amoxicillin/0\"]"],
+              "children": [
+                {
+                  "type": "outcome", "id": "med-b1-brand-own-period", "tree": "B-1",
+                  "label": "A brand with its own withdrawal shows it under Brand",
+                  "gwt": { "given": "Amoxinsol 50% has its own 2-day withdrawal, unlike Amoxicillin's 14 days.",
+                           "when": "A worker picks that brand on the treatment.",
+                           "then": "Brand reads Amoxinsol 50% and the caption under it gives its 2-day withdrawal." },
+                  "authority": [
+                    { "src": "PRD", "at": "Rules: withdrawal", "says": "A brand overrides it only when its label differs." },
+                    { "src": "PRD", "at": "Rules: withdrawal on a treatment", "says": "under Brand when the chosen brand has its own period" }
+                  ],
+                  "visible": [
+                    { "text": "Amoxinsol 50%", "in": "sheet" },
+                    { "text": { "en": "Withdrawal period 2 days", "zh": "休药期2 天" }, "in": "sheet" }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "action", "id": "med-b2.add", "label": "Open Brand, search \"Moxylan\", tap its Add card",
+              "taps": ["[data-action=\"brand-open\"]", { "fill": "[data-brand-search]", "value": "Moxylan" }, "[data-action=\"brand-add\"]"],
+              "children": [
+                {
+                  "type": "action", "id": "med-b2.skip", "label": "Tap Add with the withdrawal empty",
+                  "taps": ["[data-action=\"brand-details-save\"]"],
+                  "children": [
+                    {
+                      "type": "outcome", "id": "med-b2-add-brand-details-optional", "tree": "B-2",
+                      "label": "The new brand's details are optional: Add with the field empty keeps the medicine's period",
+                      "gwt": { "given": "A worker has added a new brand, Moxylan, from the brand search.",
+                               "when": "They tap Add on its details without typing a withdrawal.",
+                               "then": "The form shows Brand Moxylan, and the caption under Medicine still gives Amoxicillin's 14 days." },
+                      "authority": [
+                        { "src": "PRD", "at": "Rules: Brand", "says": "then offers an optional, skippable details step (its withdrawal)" },
+                        { "src": "PRD", "at": "Rules: withdrawal", "says": "Withdrawal period (days), never required." }
+                      ],
+                      "visible": [
+                        { "screen": "health-record.treatment" },
+                        { "text": "Moxylan", "in": "sheet" },
+                        { "text": { "en": "Withdrawal period 14 days", "zh": "休药期14 天" }, "in": "sheet" }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "entry", "id": "med-c.entry", "label": "Record vaccination",
+      "children": [
+        {
+          "type": "state", "id": "med-c.state", "label": "The vaccine picker open from a pig's vaccination task", "tree": "C",
+          "reset": { "screen": "medicines.vaccines" },
+          "children": [
+            {
+              "type": "outcome", "id": "med-c1-vaccines-by-disease", "tree": "C-1",
+              "label": "A vaccination lists vaccines by disease at once, under a label that is not the title",
+              "gwt": { "given": "A worker is recording a vaccination.",
+                       "when": "They open the vaccine picker.",
+                       "then": "It lists vaccines by disease straight away, recent ones then All, with no medicines and no category level." },
+              "authority": [
+                { "src": "PRD", "at": "Rules: Hosts", "says": "Record vaccination uses the same picker filtered to Vaccines." },
+                { "src": "PRD", "at": "Rules: Category → Medicine", "says": "Vaccines are named by the disease (PRRS, PCV2…), so a vaccination lists diseases." }
+              ],
+              "visible": [
+                { "screen": "medicines.vaccines" },
+                { "text": { "en": "PRRS", "zh": "蓝耳病" }, "in": "sheet" },
+                { "text": { "en": "All", "zh": "全部" }, "in": "sheet" },
+                { "text": "Meloxicam", "in": "sheet", "absent": true },
+                { "el": "[data-action=\"medicine-category\"]", "is": "absent", "says": "no one-row category level" }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "entry", "id": "med-d.entry", "label": "The Medicines page (Home → Toolbox → Medicines)",
+      "children": [
+        {
+          "type": "state", "id": "med-d.state", "label": "The Medicines page open on Antibiotics", "tree": "D",
+          "reset": { "screen": "medicines.page-category" },
+          "children": [
+            {
+              "type": "action", "id": "med-d1.starting", "label": "Open Amoxicillin (a starting-list medicine)",
+              "taps": ["[data-action=\"medicines-medicine\"][data-value=\"amoxicillin\"]"],
+              "children": [
+                {
+                  "type": "outcome", "id": "med-d1-starting-list-read-only-name", "tree": "D-1",
+                  "label": "A starting-list medicine edits only its default withdrawal: no name field, no Delete",
+                  "gwt": { "given": "The farm's list includes Amoxicillin from the starting list.",
+                           "when": "The supervisor opens it on the Medicines page.",
+                           "then": "Only its default withdrawal can be edited; its name is the title and there is no Delete." },
+                  "authority": [
+                    { "src": "PRD", "at": "Rules: the Medicines page", "says": "a starting-list medicine: its default withdrawal only, its name read-only … Starting-list medicines have no Delete." }
+                  ],
+                  "visible": [
+                    { "screen": "medicines.medicine" },
+                    { "el": "[data-med-edit=\"withdrawal\"]", "is": "present" },
+                    { "el": "[data-med-edit=\"name\"]", "is": "absent", "says": "no name field" },
+                    { "el": "[data-action=\"medicines-level\"][data-value=\"delete\"]", "is": "absent", "says": "no Delete" }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "action", "id": "med-d2.brand-edit", "label": "Open Amoxicillin, then Clamoxyl, and type a new name",
+              "taps": ["[data-action=\"medicines-medicine\"][data-value=\"amoxicillin\"]", "[data-action=\"medicines-brand\"][data-value=\"amoxicillin/2\"]",
+                       { "fill": "[data-med-edit=\"name\"]", "value": "Clamoxyl X" }],
+              "children": [
+                {
+                  "type": "action", "id": "med-d2.back-reopen", "label": "Footer Back, then open Clamoxyl again",
+                  "taps": ["[data-action=\"medicines-up\"]", "[data-action=\"medicines-brand\"][data-value=\"amoxicillin/2\"]"],
+                  "children": [
+                    {
+                      "type": "outcome", "id": "med-d2-brand-draft-kept", "tree": "D-2",
+                      "label": "Back keeps a brand's unsaved edit when it is reopened",
+                      "gwt": { "given": "The supervisor typed a new name for the brand Clamoxyl but did not save.",
+                               "when": "They go Back to Amoxicillin and open Clamoxyl again.",
+                               "then": "The name field still holds what they typed." },
+                      "authority": [
+                        { "src": "RUL", "at": "Owner ruling B, 2026-10-16 (drawer levels)", "says": "Footer Back keeps the draft; in a drawer with levels it goes up one level" }
+                      ],
+                      "visible": [
+                        { "screen": "medicines.brand" },
+                        { "el": "[data-med-edit=\"name\"][value=\"Clamoxyl X\"]", "is": "present", "says": "the typed name is kept", "hard": "lost-draft" }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "action", "id": "med-d3.delete", "label": "Open Gamithromycin (farm-added), Delete medicine, then Delete",
+              "taps": ["[data-action=\"medicines-medicine\"][data-value=\"farm-gamithromycin\"]", "[data-action=\"medicines-level\"][data-value=\"delete\"]",
+                       { "expect": [{ "text": { "en": "Past records keep its name", "zh": "以往记录保留名称" }, "in": "sheet", "says": "the confirm level says what happens to past records" }] },
+                       "[data-action=\"medicines-delete-save\"]"],
+              "children": [
+                {
+                  "type": "outcome", "id": "med-d3-delete-farm-medicine", "tree": "D-3",
+                  "label": "Deleting a farm-added medicine takes it off the list after a confirm level",
+                  "gwt": { "given": "The farm added Gamithromycin itself.",
+                           "when": "The supervisor opens it, taps Delete medicine and confirms.",
+                           "then": "The confirm says past records keep its name, and Gamithromycin is gone from Antibiotics." },
+                  "authority": [
+                    { "src": "PRD", "at": "Rules: the Medicines page", "says": "Delete as a navigate Row in its own card at the bottom, opening a confirm level (\"Past records keep its name\") … Delete removes the entry from the picker" }
+                  ],
+                  "visible": [
+                    { "screen": "medicines.page-category" },
+                    { "text": "Gamithromycin", "in": "phone", "absent": true }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
