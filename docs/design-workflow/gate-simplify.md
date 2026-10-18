@@ -133,5 +133,7 @@ With most gates at 1–3 minutes, the lock queue shrinks with them, so G11 (smal
    it). `--scope` is optional and only a declaration: it brings no screen or leaf into the reach, and the known-reach check skips
    a change that touches the shared system. G15: a screen that runs changed code and draws the same is named in `walkNeed`, one
    per page; such a change needs a judge's walk, and `--verdict` refuses one left unwalked.
-6. G2 (X4, X5), with the GitHub setting.
+6. **Done (2026-10-18):** G2 (X4, X5). Main requires branches to be up to date (`strict`), admins included. The shared-component
+   queue and the local pass records are gone; a gate run posts `pending` at its start and `failure` when it fails or blocks, so
+   the `sentri/gate` status is the one record. The merge guard keeps only the merge's form and the push rule.
 7. S6–S8 and G9: the judge's load and the Results block.
