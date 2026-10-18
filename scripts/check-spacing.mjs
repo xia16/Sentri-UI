@@ -1,8 +1,9 @@
-// The spacing check: only what is clearly wrong, never "off by a few pixels". Three defects, each with a tolerance:
+// The spacing check: only what is clearly wrong, never "off by a few pixels". Four defects, each with a tolerance:
 //   inversion  a block sits closer to a list than the list's own rows sit to each other, so it reads as part of the list
 //              (gap < 60% of the list's row rhythm, rhythm at least 20px)
 //   crowding   two different boxed blocks (a surface or border each) less than 8px apart, one above the other, nothing between
 //   double     two horizontal edges (hairline, border, box edge) within 6px of each other: two lines doing one job
+//   scrollbar  a scroll container whose desktop scrollbar shows (it takes width when the content overflows, and the content jumps)
 // Renders every atlas screen bare at 390 x 844 and audits the first screen. Writes review/spacing.json.
 // Usage: node scripts/check-spacing.mjs [--base <url>] [--feature <id>] [--screens id,id] [--changed <ids>] [--strict] [--out <file.json>]
 //   --changed  exit 1 only when one of these screens has a defect; --strict: exit 1 on any defect.
@@ -92,6 +93,19 @@ function auditFrame(TOL) {
     const overlap = Math.min(a.rr, b.rr) - Math.max(a.l, b.l);
     if (b.y - a.y > 0.5 && b.y - a.y < TOL.double && overlap > W * 0.5) out.push({ check: 'double', at: Math.round(a.y), detail: `${name(a.el)} and ${name(b.el)} draw edges ${Math.round(b.y - a.y)}px apart` });
   }
+  // scrollbar: a scroll container whose desktop scrollbar shows (scrollbar-width not none, no hidden ::-webkit-scrollbar) takes its
+  // width once the content overflows, and the content jumps sideways (#197, in the atlas on a desktop). Headless shots hide
+  // scrollbars, so no pixel pair shows it: it is read from the styles. The page's own root scrolls under the phone frame, not in it.
+  for (const el of document.querySelectorAll('body *')) {
+    const cs = getComputedStyle(el);
+    const y = cs.overflowY === 'scroll' || (cs.overflowY === 'auto' && el.scrollHeight > el.clientHeight + 1);
+    const x = cs.overflowX === 'scroll' || (cs.overflowX === 'auto' && el.scrollWidth > el.clientWidth + 1);
+    if (!(y || x) || cs.scrollbarWidth === 'none' || !vis(el)) continue;
+    let hidden = false;
+    try { const ps = getComputedStyle(el, '::-webkit-scrollbar'); hidden = ps.display === 'none' || parseFloat(ps.width) === 0 || parseFloat(ps.height) === 0; } catch {}
+    if (!hidden) out.push({ check: 'scrollbar', at: Math.round(el.getBoundingClientRect().top), detail: `${name(el)} scrolls with a visible desktop scrollbar (scrollbar-width: ${cs.scrollbarWidth}): it takes its width once the content overflows and the content jumps sideways; hide it (scrollbar-width: none)` });
+  }
+
   // one finding per check and place
   const key = new Set(); return out.filter((o) => { const k = o.check + '|' + Math.round(o.at / 10); if (key.has(k)) return false; key.add(k); return true; });
 }
@@ -135,7 +149,7 @@ await browser.close(); if (server) server.kill();
 if (!only.length && !val('--feature')) fs.writeFileSync(path.join(root, 'review/spacing.json'), JSON.stringify({ tolerances: TOL, screens: results }, null, 1));
 if (val('--out')) fs.writeFileSync(val('--out'), JSON.stringify(results));
 const bad = results.filter((r) => r.defects.length);
-console.log(`spacing: ${results.length} screens, ${bad.length} with a clear defect (inversion ${bad.flatMap((r) => r.defects).filter((d) => d.check === 'inversion').length}, crowding ${bad.flatMap((r) => r.defects).filter((d) => d.check === 'crowding').length}, double ${bad.flatMap((r) => r.defects).filter((d) => d.check === 'double').length})`);
+console.log(`spacing: ${results.length} screens, ${bad.length} with a clear defect (inversion ${bad.flatMap((r) => r.defects).filter((d) => d.check === 'inversion').length}, crowding ${bad.flatMap((r) => r.defects).filter((d) => d.check === 'crowding').length}, double ${bad.flatMap((r) => r.defects).filter((d) => d.check === 'double').length}, scrollbar ${bad.flatMap((r) => r.defects).filter((d) => d.check === 'scrollbar').length})`);
 const failing = list('--changed').length ? bad.filter((r) => list('--changed').includes(r.screen)) : argv.includes('--strict') ? bad : [];
 process.exit(failing.length ? 1 : 0);
 }

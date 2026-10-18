@@ -13,7 +13,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { pwPath, playwright } from './playwright-path.mjs';
-import { CLASSES, DS_FEATURE, componentPage, componentPagesOf, componentsTouched, idPath, screensOf, pageOf, pageAssets, sharedFiles, coverageLost, effectiveClass, classifyScreens, touchesSystem, touchesTools, queueAhead as queueOf, budgetProblems, critiqueProblems, pageStyling, addedLines, scenarioDebt, isMotionFile, unheldMotion, heldOf } from './loop-rules.mjs';
+import { CLASSES, DS_FEATURE, componentPage, componentPagesOf, componentsTouched, idPath, screensOf, pageOf, pageAssets, sharedFiles, coverageLost, effectiveClass, classifyScreens, touchesSystem, touchesTools, queueAhead as queueOf, budgetProblems, critiqueProblems, pageStyling, addedLines, scenarioDebt, isMotionFile, unheldMotion, heldOf, confirmLeaf, reusableLeaf } from './loop-rules.mjs';
 // The reach analyser (gate-v2 §2): static, conservative, over both revisions. It names the screens and leaves a change can reach,
 // and what each screen's evidence depends on.
 import { reachOf, identityInputs, leafInputs } from './static-reach.mjs';
@@ -714,19 +714,28 @@ export async function evaluate(opts) {
   };
   const runLeaves = async (side, f, plan) => {
     const runner = leafRunner({ base: S[side].url, defaults: plan.D, verbs: verbsOf(side), evidenceDir: path.join(out, 'leaves', side, f), pool: leafPools[side] });
-    const todo = plan_(plan.its.filter((i) => i.kind));
+    const planned = plan_(plan.its.filter((i) => i.kind));
+    // an unconfirmed stored failure (written before L26) is run again, not reused
+    const stale = planned.reuse.filter((x) => !reusableLeaf(x.record));
+    for (const { item } of stale) { tally[item.kind].reused--; tally[item.kind].computed++; }
+    const todo = { reuse: planned.reuse.filter((x) => reusableLeaf(x.record)), compute: [...planned.compute, ...stale.map((x) => x.item)] };
     for (const { item, record } of todo.reuse) results.set(item.id, { ...record.run, reused: true });
-    await Promise.all(todo.compute.map((it) => sched.run({ kind: 'leaf', label: `${side} ${it.leaf.node.id} ${it.lang}-${it.width}`, priority: 2, run: async ({ browser: b }) => {
+    const runOnce = (it, again = false) => sched.run({ kind: 'leaf', label: `${side} ${it.leaf.node.id} ${it.lang}-${it.width}${again ? ' (confirming)' : ''}`, priority: 2, run: async ({ browser: b }) => {
       let r;
       try { r = await runner(b, it.leaf, it.lang, it.width); } catch (e) { r = { lang: it.lang, width: it.width, result: 'fail', failures: [{ what: 'run', got: String(e?.message || e), tag: null }], skipped: [], notes: [], evidence: [] }; }
       // a machine error: every failure is one (a navigation timed out or refused), or a page's own file did not arrive (#190)
       const m = r.result === 'fail' ? machineErrorOf(r.failures) || ((r.loadFailures || []).length ? 'net-error' : null) : null;
       return m ? { machine: m, error: r.failures[0]?.got, run: r } : { run: r };
-    } }).then((x) => {
+    } });
+    await Promise.all(todo.compute.map((it) => runOnce(it).then(async (x) => {
       if (x.machine) { results.set(it.id, { ...x.run, machine: x.machine }); return; }
       if (x.error) { results.set(it.id, { lang: it.lang, width: it.width, result: 'fail', failures: [{ what: 'run', got: x.error, tag: null }], skipped: [], notes: [], evidence: [] }); return; }
       results.set(it.id, x.run);
-      store.put('leaf', it.id, { run: x.run }); // a design result, pass or fail: the same identity gives the same result
+      if (x.run.result !== 'fail') { store.put('leaf', it.id, { run: x.run }); return; } // a pass: the same identity gives the same result
+      // a fresh failure is a design result only once it repeats (L26): one confirming run on the same identity
+      const c = confirmLeaf(x, await runOnce(it, true));
+      if (c.store) store.put('leaf', it.id, { run: x.run, confirmed: true });
+      if (c.unstable) block(`scenarios ${f}: ${it.leaf.node.id} ${side} ${it.lang}-${it.width} failed, then ${c.why} on the same identity: an unstable leaf, not a design result (fix the leaf or the page's race)`);
     })));
     for (const it of plan.its.filter((i) => i.kind)) { const r = results.get(it.id); if (r?.machine) block(`scenarios ${f}: ${it.leaf.node.id} ${side} ${it.lang}-${it.width}: machine error twice (${r.machine}: ${String(r.failures?.[0]?.got || '').slice(0, 100)})`); }
     const rows = [];

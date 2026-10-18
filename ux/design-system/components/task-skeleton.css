@@ -30,7 +30,9 @@
 .tk-statusbar-icons svg { width: 16px; height: 16px; stroke-width: 2; }
 /* The task surface under the status bar: header, the one scroller, and the dock. */
 .tk-screen { flex: 1; min-height: 0; display: flex; flex-direction: column; }
-.tk-scroll { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; background: var(--app-background); }
+.tk-scroll { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; background: var(--app-background); }
+/* the phone scrolls by touch: no desktop scrollbar takes width inside it (L27; the same law as bundle.css .device scrollers) */
+.tk-scroll::-webkit-scrollbar { display: none; width: 0; height: 0; }
 
 /* ---- TaskHeader: the page header (SentriUI.pageHeader, bundle.css .st-page-header) ---- */
 

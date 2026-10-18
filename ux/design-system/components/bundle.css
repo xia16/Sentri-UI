@@ -693,7 +693,8 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 .st-segment:not(:has(button:not(:disabled))) button:disabled{border-color:transparent;background:transparent;box-shadow:none}
 .st-selection-reason{margin:var(--space-6) 0;color:var(--muted);font:400 var(--type-description-size)/1.4 var(--font-sans)}
 .st-filter-chips{min-width:0;padding:var(--space-6) 0}
-.st-filter-chips-track{display:flex;gap:var(--space-key-gap);overflow-x:auto;padding:var(--space-4) var(--space-gutter);scrollbar-width:thin}
+.st-filter-chips-track{display:flex;gap:var(--space-key-gap);overflow-x:auto;padding:var(--space-4) var(--space-gutter);scrollbar-width:none}
+.st-filter-chips-track::-webkit-scrollbar{display:none;width:0;height:0}
 .st-filter-chips button{flex:none;max-width:100%;padding:var(--space-6) calc(var(--space-row-x) + (var(--size-16) + var(--space-3)) / 2);border:1px solid var(--line);border-radius:var(--radius-control);background:var(--well)}
 .st-filter-chips button[aria-checked=true]{background:var(--paper);font-weight:500;padding-inline:var(--space-row-x)}
 .st-chip-check{display:flex;width:var(--size-16);flex:none}
