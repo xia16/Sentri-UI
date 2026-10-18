@@ -27,7 +27,8 @@ const EVERYTHING = [
   /^sections\//, /^atlas\/(?!atlas\.json$)/,
 ];
 // Files that can't draw or run on a page: the workflow's text, prose outside ux/, CI, tests, agent settings, the other scripts.
-const INERT = [/^docs\//, /^\.github\//, /^tests\//, /^\.claude\//, /^scripts\//, /^(?!ux\/).*\.md$/i, /^features\/[^/]+\/.*\.md$/i, /^ux\/design-system\/components\/index\.d\.ts$/];
+const PROSE = /^(?!ux\/).*\.md$/i;
+const INERT = [/^docs\//, /^\.github\//, /^tests\//, /^\.claude\//, /^scripts\//, PROSE, /^features\/[^/]+\/.*\.md$/i, /^ux\/design-system\/components\/index\.d\.ts$/];
 
 const read = (dir, f) => { try { return fs.readFileSync(path.join(dir, f), 'utf8'); } catch { return null; } };
 const isLocal = (u) => !!u && !/^([a-z][a-z\d+.-]*:|\/\/|#)/i.test(u);
@@ -520,7 +521,8 @@ export function reachOf(base, candidate, { files } = {}) {
 
   // 1. what can't be narrowed
   // any stylesheet is every screen: there is no CSS proof in v1 (gate-v2 §2), so not even one page's own stylesheet is narrowed
-  const wide = changed.filter((f) => EVERYTHING.some((re) => re.test(f)) || /\.css$/i.test(f));
+  // (prose outside ux/ is never loaded, even under atlas/ or sections/: the atlas reads only ux/'s READMEs)
+  const wide = changed.filter((f) => !PROSE.test(f) && (EVERYTHING.some((re) => re.test(f)) || /\.css$/i.test(f)));
   if (wide.length) return everything(`${wide.slice(0, 3).join(', ')}: CSS, the harness, the shooter, fonts or packages reach every screen`);
 
   // 2. the bundle

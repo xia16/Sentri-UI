@@ -112,7 +112,7 @@ export async function evaluate(opts) {
     try { r = reachOf(S.base.side, S.cand.side, { files }); } catch (e) { r = { all: true, screens: [], functions: null, leaves: null, why: [`the reach analyser failed (${String(e.message || e).split(/\r?\n/)[0]}): every screen`] }; }
     // The design system's own pages (ds:<Name>/<variant>) are drawn by the atlas from the component folders, the tokens and the
     // bundle; the analyser reads screens only. They are in reach whenever any of those, or the atlas, changed.
-    if (!r.all && files.some((f) => /^ux\/design-system\/|^atlas\//.test(f))) r = { ...r, screens: [...new Set([...(r.screens || []), ...S.base.ds.map((x) => x.id), ...S.cand.ds.map((x) => x.id)])], why: [...(r.why || []), 'the component pages: the design system or the atlas changed'] };
+    if (!r.all && files.some((f) => /^ux\/design-system\/|^atlas\//.test(f) && !NOT_LOADED.some((re) => re.test(f)))) r = { ...r, screens: [...new Set([...(r.screens || []), ...S.base.ds.map((x) => x.id), ...S.cand.ds.map((x) => x.id)])], why: [...(r.why || []), 'the component pages: the design system or the atlas changed'] };
     if (quick) {
       const feats = new Set([...scope, ...(componentsTouched(files).length ? [DS_FEATURE] : [])]);
       const ids = [...S.base.screens, ...S.base.ds, ...S.cand.screens, ...S.cand.ds].filter((x) => feats.has(x.feature)).map((x) => x.id);
