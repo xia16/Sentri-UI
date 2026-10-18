@@ -1,19 +1,31 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><style>
-/* The real container: the bottom of a 390px phone page, the toast above its dock. */
-.ph{position:relative;height:200px;overflow:hidden;background:var(--app-background);border:1px solid var(--line);border-radius:var(--radius-device,28px)}
-.ph-dock{position:absolute;left:0;right:0;bottom:0;height:94px;border-top:1px solid var(--line);background:var(--paper,#fff)}
-.ph-row{margin:16px var(--space-gutter) 0;height:64px;border-radius:var(--radius-panel);background:var(--paper,#fff);border:1px solid var(--line)}
+/* The real container: the bottom of the walk list, two rows of pigs, the toast over the second as after a save, the dock under it. */
+.ph{position:relative;height:262px;overflow:hidden;background:var(--app-background);border:1px solid var(--line);border-radius:0 0 var(--radius-device,28px) var(--radius-device,28px)}
+.ph-list{margin:16px var(--space-gutter) 0;border-radius:var(--radius-panel);background:var(--paper,#fff);border:1px solid var(--line);overflow:hidden}
+.ph-row{display:flex;flex-direction:column;justify-content:center;gap:4px;height:68px;padding:0 16px;box-sizing:border-box}
+.ph-row+.ph-row{border-top:1px solid var(--line)}
+.ph-row b{font:600 16px/1.2 var(--font-mono,ui-monospace,monospace);color:var(--ink)}
+.ph-row i{font:400 13px/1.2 var(--font-sans);font-style:normal;color:var(--muted)}
+.ph-dock{position:absolute;left:0;right:0;bottom:0;height:94px;display:grid;grid-template-columns:96px 1fr 56px;gap:10px;align-items:start;padding:14px var(--space-gutter) 0;box-sizing:border-box;border-top:1px solid var(--line);background:var(--app-background)}
+.ph-dock span{height:56px;border-radius:16px;border:1px solid var(--line);background:var(--paper,#fff)}
 </style></head><body>
 <section data-state="Default · one pig" id="done-0"></section>
 <section data-state="Several pigs" id="done-1"></section>
-<section data-state="Title only" id="done-2"></section>
-<section data-state="Chinese" id="done-3"></section>
+<section data-state="Vaccination" id="done-2"></section>
+<section data-state="Title only" id="done-3"></section>
+<section data-state="Long line wraps" id="done-4"></section>
+<section data-state="Chinese" id="done-5"></section>
+<section data-state="Chinese · several pigs" id="done-6"></section>
 <script>
-const put=(id,html)=>document.querySelectorAll('[data-state]').forEach(el=>{if(el.id===id)el.innerHTML='<div class="ph"><div class="ph-row"></div><div class="ph-dock"></div>'+html+'</div>'});
-put("done-0",SentriUI.toast('Treatment recorded',{detail:'000267',tone:'done'}));
-put("done-1",SentriUI.toast('Treatment recorded',{detail:'12 pigs',tone:'done'}));
-put("done-2",SentriUI.toast('Weights saved',{tone:'done'}));
-put("done-3",SentriUI.toast('治疗已记录',{detail:'000267',tone:'done'}));
+const page='<div class="ph"><div class="ph-list"><div class="ph-row"><b>000254</b><i>Gestation · 40d</i></div><div class="ph-row"><b>000281</b><i>Gestation · 46d</i></div></div><div class="ph-dock"><span></span><span></span><span></span></div>';
+const put=(id,html)=>document.querySelectorAll('[data-state]').forEach(el=>{if(el.id===id)el.innerHTML=page+html+'</div>'});
+put('done-0',SentriUI.toast('Treatment recorded',{detail:'000267',tone:'done'}));
+put('done-1',SentriUI.toast('Treatment recorded',{detail:'12 pigs',tone:'done'}));
+put('done-2',SentriUI.toast('Vaccination recorded',{detail:'000267',tone:'done'}));
+put('done-3',SentriUI.toast('Changes saved',{tone:'done'}));
+put('done-4',SentriUI.toast('Treatment recorded',{detail:'000267, 000281, 000306 and 9 more pigs in C1 and C2',tone:'done'}));
+put('done-5',SentriUI.toast('治疗已记录',{detail:'000267',tone:'done'}));
+put('done-6',SentriUI.toast('治疗已记录',{detail:'12 头猪',tone:'done'}));
 </script>
 </body></html>

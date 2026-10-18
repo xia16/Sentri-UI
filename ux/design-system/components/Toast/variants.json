@@ -2,24 +2,47 @@
   {
     "id": "done",
     "name": "Done",
-    "use": "Use after a save that closes a sheet and lands where the result is not visible: Record treatment returning to the walk list.",
-    "notUse": "Not when the result shows where you land (the row itself says it), not for each entry inside a task, not for an upload that succeeds later, never for a failure.",
+    "use": "Use after a save that closes a sheet and lands where the result is not visible: Record treatment or vaccination returning to the walk list.",
+    "notUse": "Not where the result shows where you land (a finding sheet shows its treatment; the row itself says it), not for each entry inside a task, not for an upload that succeeds later, never for a failure.",
     "states": [
       "Default · one pig",
       "Several pigs",
+      "Vaccination",
       "Title only",
-      "Chinese"
+      "Long line wraps",
+      "Chinese",
+      "Chinese · several pigs"
+    ],
+    "usedBy": [
+      "health-record.treatment-saved"
     ]
   },
   {
     "id": "offline",
     "name": "Offline",
-    "use": "Use for the same save made with no connection: it is kept on this phone and uploads when connected.",
-    "notUse": "Not as the only offline signal: the header badge carries the state after the toast has gone.",
+    "use": "Use for the same save made with no connection: the record is kept on this phone and uploads when connected.",
+    "notUse": "Not as the only offline signal: the header badge carries \"saved on this phone\" after the toast has gone. Never says uploaded or synced.",
     "states": [
       "Default · one pig",
       "Several pigs",
-      "Chinese"
+      "Long line wraps",
+      "Chinese",
+      "Chinese · several pigs"
+    ],
+    "usedBy": [
+      "health-record.treatment-saved-offline"
     ]
+  },
+  {
+    "id": "plain",
+    "name": "Plain",
+    "use": "Use only where a host has not yet been moved to a tone: Inspection's older saves (\"Weights saved\", \"Saved to pen C1\") draw the same box with a title and no glyph.",
+    "notUse": "Not for new saves: give them a tone (done or offline) and a second line saying for whom.",
+    "states": [
+      "Default",
+      "Longer title",
+      "Chinese"
+    ],
+    "usedBy": []
   }
 ]

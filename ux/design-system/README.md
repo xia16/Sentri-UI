@@ -116,7 +116,7 @@ Every drawer and page leaves, goes up and commits the same way.
 A save confirms itself where the worker's eye lands, once, and never louder than it needs to.
 
 - **The result is visible where you land** (the edited row shows its new value): the row is the confirmation. No toast.
-- **The result is not visible** (Record treatment returns to the walk list; a death takes the pig off the list): a [Toast](components/Toast/README.md), what was done and for whom: "Treatment recorded · 000267", "12 pigs". It goes after about 3 seconds.
+- **The result is not visible** (Record treatment returns to the walk list; a death takes the pig off the list): a [Toast](components/Toast/README.md), what was done and for whom: "Treatment recorded · 000267", "12 pigs". It goes after about 3 seconds, is cleared by the next view, and a tap dismisses it without reaching what it covers.
 - **Repeated entries inside a task** (counts, weights, piglet processing): the task's own rows and receipt confirm them. No toast per entry.
 - **Saved with no connection**: the same toast in its offline form, "Saved on this phone · Uploads when connected · 000267". Never "uploaded" or "synced" until the server confirms. The toast is never the only offline signal: the header badge carries it after the toast has gone (Data sync).
 - **An upload that succeeds later**: nothing pops up; the count goes down.
