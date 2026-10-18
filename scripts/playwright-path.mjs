@@ -6,6 +6,7 @@ import { createRequire } from 'node:module';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { holderAlive, selfStart } from './process-start.mjs';
 
 const HELP = 'Playwright not found. Run `npm install` and `npx playwright install chromium` in the repo, or set SENTRI_PLAYWRIGHT to a Playwright install.';
 function find() {
@@ -35,14 +36,14 @@ function besideNoGate() {
   let dir;
   try { dir = path.join(path.resolve(here, execSync('git rev-parse --git-common-dir', { cwd: here, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim()), 'sentri-gate'); } catch { return; }
   const me = path.join(dir, 'runs', `${process.pid}.json`);
-  const alive = (pid) => { try { process.kill(pid, 0); return true; } catch (e) { return e.code === 'EPERM'; } };
-  const gate = () => { try { const g = JSON.parse(fs.readFileSync(path.join(dir, 'gate.lock'), 'utf8')); return Number.isInteger(g.pid) && alive(g.pid) ? g : null; } catch { return null; } };
+  // a gate whose pid is alive and is still the process that wrote the lock (a reboot reuses pids: scripts/process-start.mjs)
+  const gate = () => { try { const g = JSON.parse(fs.readFileSync(path.join(dir, 'gate.lock'), 'utf8')); return holderAlive(g) ? g : null; } catch { return null; } };
   let said = false;
   for (;;) {
     let g = gate();
     if (!g) {
       fs.mkdirSync(path.dirname(me), { recursive: true });
-      fs.writeFileSync(`${me}.tmp`, JSON.stringify({ pid: process.pid, what: process.argv.slice(1).map((a) => path.basename(a)).join(' ').slice(0, 120), at: new Date().toISOString() }));
+      fs.writeFileSync(`${me}.tmp`, JSON.stringify({ pid: process.pid, start: selfStart(), what: process.argv.slice(1).map((a) => path.basename(a)).join(' ').slice(0, 120), at: new Date().toISOString() }));
       fs.renameSync(`${me}.tmp`, me); // whole or not at all
       if (!(g = gate())) break; // a gate that took the lock meanwhile would wait for this run: this run steps back for it instead
       fs.rmSync(me, { force: true });
