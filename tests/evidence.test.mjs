@@ -151,20 +151,23 @@ test('a moved main voids nothing by itself: judgements carry to pairs with the s
   assert.equal(carryJudgements({ mech: oldMech, parts: [{ ...parts[0], pass: false }] }, same).carried.pass, false);
 });
 
-test('an in-reach screen whose identity did not change because of the changed files is a contradiction the gate blocks on', async () => {
-  const { identityContradictions } = await import('../scripts/evidence.mjs');
+test('an identity changes whenever a file it depends on changes, so a reach by identity leaves nothing out (gate-simplify.md X1)', async () => {
+  const { inputsDigest, canonical } = await import('../scripts/evidence.mjs');
   const BUNDLE = 'ux/design-system/components/bundle.js';
-  const inputs = { 'a': [{ files: ['ux/a.html', BUNDLE], bundle: { exports: ['SentriUI.row'] } }], 'b': [{ files: ['ux/b.html'], bundle: { exports: [] } }], 'c': [{ files: ['ux/c.html', BUNDLE], bundle: { exports: ['SentriUI.picker'] } }], 'd': [{ files: ['ux/d.html'], unbounded: [{ type: 'any' }] }] };
-  const base = { ids: Object.keys(inputs), runtime: new Set(['ux/a.html', 'ux/b.html', 'ux/c.html', 'ux/d.html', BUNDLE]), inputs: (id) => inputs[id] };
-  // a page file changed but the identity stayed the same: contradiction; a changed identity is fine
-  assert.deepEqual(identityContradictions({ ...base, files: ['ux/a.html'], reach: { all: false }, same: (id) => id === 'a' }), ['a (ux/a.html)']);
-  assert.deepEqual(identityContradictions({ ...base, files: ['ux/a.html'], reach: { all: false }, same: () => false }), []);
-  // a bundle change the analyser says reaches every screen: every bundle-loading screen must have a new identity
-  assert.deepEqual(identityContradictions({ ...base, files: [BUNDLE], reach: { all: true, why: ['the bundle: a setup change'] }, same: () => true }), [`a (${BUNDLE})`, `c (${BUNDLE})`]);
-  // a one-function change: only the screens that use it
-  assert.deepEqual(identityContradictions({ ...base, files: [BUNDLE], reach: { all: false, functions: ['SentriUI.picker'] }, same: () => true }), [`c (${BUNDLE})`]);
-  // a load it can't bound fits any changed file
-  assert.deepEqual(identityContradictions({ ...base, files: ['ux/other.json'], runtime: new Set(['ux/other.json']), reach: { all: false }, same: (id) => id === 'd' }), ['d (ux/other.json)']);
+  const tree = new Map([['ux/a.html', 'h1'], ['ux/a.css', 'c1'], ['ux/b.css', 'd1'], ['ux/b.png', 'p1'], [BUNDLE, 'j1'], ['ux/other.html', 'o1']]);
+  const runtime = [...tree.keys()].sort();
+  const digest = (ii, t) => canonical(inputsDigest(ii, t, runtime).digest);
+  const bumped = (f) => new Map([...tree, [f, tree.get(f) + '+']]);
+  const own = { files: ['ux/a.html', 'ux/a.css', BUNDLE], unbounded: [], bundle: { all: true } };
+  for (const f of own.files) assert.notEqual(digest(own, bumped(f)), digest(own, tree), `${f} is in the closure`);
+  assert.equal(digest(own, bumped('ux/other.html')), digest(own, tree), 'a file outside the closure leaves it alone');
+  // a stylesheet the analyser can't read (unbounded, type style): every stylesheet, and nothing else
+  const loose = { ...own, unbounded: [{ why: 'ux/a.css: @IMPORT', type: 'style' }] };
+  assert.notEqual(digest(loose, bumped('ux/b.css')), digest(loose, tree));
+  assert.equal(digest(loose, bumped('ux/b.png')), digest(loose, tree));
+  // a load it can't bound at all: every page-loadable file
+  const any = { ...own, unbounded: [{ why: 'computed', type: 'any' }] };
+  for (const f of runtime) assert.notEqual(digest(any, bumped(f)), digest(any, tree), f);
 });
 
 test('carrying judgements never launders a verdict from another commit, or two conflicting ones (review of #194)', async () => {
@@ -190,10 +193,9 @@ test('carrying judgements never launders a verdict from another commit, or two c
   assert.equal(carryJudgements({ mech: oldMech, parts: [v({})] }, now).carried.pairs.length, 1);
 });
 
-test('an item whose identity changed is in the reach even when the analyser left it out (review of #194, round 2)', async () => {
-  const { widenByIdentity } = await import('../scripts/evidence.mjs');
-  const changed = new Set(['data-sync.list', 'fa-leaf-1']);
-  assert.deepEqual(widenByIdentity({ ids: ['data-sync.list', 'farrowing.room', 'home.today'], inReach: (id) => id === 'farrowing.room', changed: (id) => changed.has(id) }), ['data-sync.list'], 'added: shot in full, and reported as an analyser miss');
-  assert.deepEqual(widenByIdentity({ ids: ['farrowing.room'], inReach: () => true, changed: () => true }), [], 'already in reach: nothing to add');
-  assert.deepEqual(widenByIdentity({ ids: ['fa-leaf-1', 'fa-leaf-2'], inReach: () => false, changed: (id) => changed.has(id) }), ['fa-leaf-1'], 'leaves too');
+test('the reach is the identity diff: changed, added and removed, and nothing whose identity is the same (gate-simplify.md X1)', async () => {
+  const { identityDiff } = await import('../scripts/evidence.mjs');
+  const ids = { base: { a: 'A', b: 'B', gone: 'G' }, cand: { a: 'A', b: 'B2', fresh: 'F' } };
+  const d = identityDiff({ base: Object.keys(ids.base).map((id) => ({ id })), cand: Object.keys(ids.cand).map((id) => ({ id })), idOf: (side, x) => ids[side][x.id] });
+  assert.deepEqual(d, { changed: ['b'], added: ['fresh'], removed: ['gone'] });
 });
