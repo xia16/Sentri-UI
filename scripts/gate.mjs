@@ -28,6 +28,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { CLASSES, checkVerdict, calibrationProblems, lockState, passesWithoutJudge, carryJudgements } from './loop-rules.mjs';
+import { selfStart } from './process-start.mjs';
 import { postStatus as post } from './github.mjs';
 import { evaluate } from './evaluate.mjs';
 
@@ -51,11 +52,11 @@ const sha = (r) => (r ? git(['rev-parse', '--verify', '--quiet', `${r}^{commit}`
 // ---------- one gate at a time ----------
 // Two gates on one machine starve each other's browsers into timeouts (#164), so every gate run, a builder's --quick included, and a
 // --verdict that has to gate again, holds one lock beside the pass records for its whole run. A second gate waits; a lock whose
-// process is gone is stale and is taken over. The lock goes on every exit: finish, a signal, a crash (the exit handler below).
+// process is gone, or whose pid now belongs to another process (a reboot reuses pids), is stale and is taken over: the lock records
+// its process's start time beside the pid (scripts/process-start.mjs). The lock goes on every exit: finish, a signal, a crash.
 const lockFile = path.join(gateDir(), 'gate.lock');
-const alive = (pid) => { try { process.kill(pid, 0); return true; } catch (e) { return e.code === 'EPERM'; } };
 let lockedRef = null;
-const lockAs = (s) => JSON.stringify({ pid: process.pid, sha: s, ref: lockedRef, at: new Date().toISOString() });
+const lockAs = (s) => JSON.stringify({ pid: process.pid, start: selfStart(), sha: s, ref: lockedRef, at: new Date().toISOString() });
 function releaseLock() { try { if (JSON.parse(fs.readFileSync(lockFile, 'utf8')).pid === process.pid) fs.rmSync(lockFile, { force: true }); } catch {} }
 for (const sig of ['SIGINT', 'SIGTERM', 'SIGHUP', 'SIGBREAK']) process.on(sig, () => { console.log(`\n${sig}: the gate stops`); process.exit(130); });
 async function acquireLock(ref) {
@@ -70,9 +71,9 @@ async function acquireLock(ref) {
     let raw, lock = null;
     try { raw = fs.readFileSync(lockFile, 'utf8'); } catch { continue; } // released between the two calls
     try { lock = JSON.parse(raw); } catch {}
-    if (!lock || lock.pid === process.pid || lockState(lock, alive) === 'stale') {
+    if (!lock || lock.pid === process.pid || lockState(lock) === 'stale') {
       // Only the stale lock read above is removed, never one another gate has taken since.
-      try { if (fs.readFileSync(lockFile, 'utf8') === raw) { fs.rmSync(lockFile); console.log(`taking over a stale gate lock: pid ${lock?.pid ?? '?'} (the gate on ${short(lock?.sha)}) is gone`); } } catch {}
+      try { if (fs.readFileSync(lockFile, 'utf8') === raw) { fs.rmSync(lockFile); console.log(`taking over a stale gate lock: pid ${lock?.pid ?? '?'} (the gate on ${short(lock?.sha)}) is gone, or its pid is another process now`); } } catch {}
       continue;
     }
     const line = `waiting for the gate on ${short(lock.sha)} (pid ${lock.pid}) …`;
@@ -89,7 +90,7 @@ async function acquireLock(ref) {
     for (const f of (fs.existsSync(runs) ? fs.readdirSync(runs) : []).filter((x) => x.endsWith('.json'))) {
       let r = null;
       try { r = JSON.parse(fs.readFileSync(path.join(runs, f), 'utf8')); } catch {}
-      if (r && lockState(r, alive) === 'held' && r.pid !== process.pid) live.push(r); else fs.rmSync(path.join(runs, f), { force: true });
+      if (r && lockState(r) === 'held' && r.pid !== process.pid) live.push(r); else fs.rmSync(path.join(runs, f), { force: true });
     }
     if (!live.length) break;
     const line = `waiting for ${live.length} other browser run(s) from this repo: ${live.slice(0, 3).map((r) => `pid ${r.pid} ${r.what || ''}`.trim()).join('; ')} …`;
