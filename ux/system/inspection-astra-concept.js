@@ -916,8 +916,9 @@ function brandPickerBody(c){
  let body;
  if(q){const hits=all.filter(b=>b.name.toLocaleLowerCase().includes(q.toLocaleLowerCase()));body=hits.length?SentriUI.choiceGroup(hits.map(row)):medAddCard('brand-add',pick.search);}
  else if(all.length>3)body=SentriUI.choiceGroup(all.slice(0,3).map(row),{title:str('medicines.group.recent')})+SentriUI.choiceGroup(all.slice(3).sort((x,y)=>x.name.localeCompare(y.name)).map(row),{title:str('medicines.group.other_brands')});
- /* No brand used for this medicine yet: one quiet line says how to add one (the search is the way in), not an empty sheet. */
- else body=all.length?SentriUI.choiceGroup(all.map(row)):SentriUI.choiceEmpty(str('medicines.brand.none',{medicine:medicineById(c,f.medicineId)?.name||''}));
+ /* No brand used for this medicine yet: ChoiceList's empty state names what is missing and says how to add one (the search is the
+    way in), not an empty sheet. */
+ else {const medicine=medicineById(c,f.medicineId)?.name||'';body=all.length?SentriUI.choiceGroup(all.map(row)):SentriUI.choiceEmpty(str('medicines.brand.none_hint'),{title:str('medicines.brand.none',{medicine}),icon:'tag'});}
  return '<div class="st-picker-body" data-ds="PickerField" data-variant="single">'+SentriUI.choiceSearch({label:str('medicines.brand.search'),value:pick.search||'',attrs:{'data-brand-search':''}})+body+'</div>';
 }
 function brandLevels(c,title){const pick=c.form.brandPick||{};return {title:pick.level==='details'?str('medicines.details.title'):title,cross:{action:'dismiss',label:{text:'Close',str:'act.close'}},levelBack:pick.level==='details'?{action:'brand-up'}:{action:'back'},rows:7};}

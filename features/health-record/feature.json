@@ -1005,17 +1005,17 @@
       ],
       "figma": "",
       "notes": {
-        "purpose": "A medicine the farm has never recorded a brand for: the search, then one quiet line saying how to add one. Typing a name gives Add “…”, as on Brand: no match.",
+        "purpose": "A medicine the farm has never recorded a brand for: the search, then ChoiceList's can-add empty state saying what is missing and how to add it. Typing a name gives Add “…”, as on Brand: no match.",
         "elements": [
           {
-            "name": "Empty line",
+            "name": "Empty state",
             "at": ".st-choice-empty",
-            "shows": "No brands for Ceftiofur yet. Type a name to add one.",
+            "shows": "A tag glyph on the tint; No brands for Ceftiofur yet; Type the name on the bottle's label above to add it.",
             "rule": "Shown only when the medicine has no brands and nothing is typed. It names the medicine; the search above is the way to add (no separate page, no button)."
           }
         ],
         "controls": [],
-        "copy": ["medicines.brand.search", "medicines.brand.none"],
+        "copy": ["medicines.brand.search", "medicines.brand.none", "medicines.brand.none_hint"],
         "issues": []
       }
     },

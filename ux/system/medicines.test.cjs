@@ -109,7 +109,7 @@ test('Brand: a full-width optional row only once a medicine is chosen; the farm\
   M.handleRecordAction(c, 'medicine-open', ''); M.handleRecordAction(c, 'medicine-select', 'meloxicam');
   assert.equal(c.form.brand, '', 'a new medicine drops the old brand');
   M.handleRecordAction(c, 'medicine-open', ''); M.handleRecordAction(c, 'medicine-select', 'ceftiofur'); M.handleRecordAction(c, 'brand-open', '');
-  assert.match(M.brandPickerBody(c), /class="st-choice-empty"[^>]*>No brands for Ceftiofur yet\. Type a name to add one\./, 'no brands yet: one line says how to add one');
+  assert.match(M.brandPickerBody(c), /st-choice-empty--lead[^]*?st-choice-empty-title">No brands for Ceftiofur yet<[^]*?st-choice-empty-text">Type the name on the bottle(&#39;|')s label above to add it\./, 'no brands yet: the empty state names what is missing and how to add it');
   c.form.brandPick.search = 'Excenel'; assert.doesNotMatch(M.brandPickerBody(c), /st-choice-empty/, 'once a name is typed, the Add card replaces it');
 });
 

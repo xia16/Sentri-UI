@@ -104,7 +104,8 @@
               "type": "action", "id": "med-b3.no-brands", "label": "Pick Ceftiofur (no brands used yet), open Brand",
               "taps": ["[data-action=\"medicine-category\"][data-value=\"antibiotics\"]", "[data-action=\"medicine-select\"][data-value=\"ceftiofur\"]", "[data-action=\"brand-open\"]",
                        { "expect": [{ "screen": "health-record.brand-empty" },
-                                    { "text": { "en": "No brands for Ceftiofur yet. Type a name to add one.", "zh": "头孢噻呋还没有品牌，输入名称即可添加。" }, "in": "sheet", "says": "the empty list says how to add one" }] },
+                                    { "text": { "en": "No brands for Ceftiofur yet", "zh": "头孢噻呋还没有品牌" }, "in": "sheet", "says": "the empty list names what is missing" },
+                                    { "text": { "en": "Type the name on the bottle's label above to add it.", "zh": "在上方输入瓶身标签上的名称即可添加。" }, "in": "sheet", "says": "and says how to add one" }] },
                        { "fill": "[data-brand-search]", "value": "Excenel" }, "[data-action=\"brand-add\"]", "[data-action=\"brand-details-save\"]"],
               "children": [
                 {

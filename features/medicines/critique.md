@@ -243,3 +243,6 @@ The owner approved the treatment's optional face (an ordinary labelled field wit
 
 ### Self-crit
 - New screen `health-record.brand-empty` (a brandless medicine, Ceftiofur). The line sits on the field's left edge under the search, one line in EN and ZH at 390 and 360, quiet (13px, muted), and leaves the search the only control: the brand list's own rows, cards and Back are unchanged. Leaf `med-b3-no-brands-says-how-to-add` walks it through to the brand on the form.
+
+### Round 2 (owner, 2026-10-18: "this placeholder looks really bad")
+- **major** · The one grey line read as a leftover, not a designed state: small, flush left, alone in a white sheet. Now ChoiceList's can-add empty state, the native "nothing here yet": a tag glyph on the tint (56px circle), a title that names what is missing ("No brands for Ceftiofur yet", 16px/600 ink) and one line that says how to add it ("Type the name on the bottle's label above to add it.", 14px muted, balanced on two lines in EN, one in ZH), centred under the search. It is a ChoiceList option (`choiceEmpty` with `title` and `icon`), not a page part: every existing empty line is unchanged, and ChoiceList's Single page shows it as the state "Empty-add".

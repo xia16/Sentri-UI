@@ -394,6 +394,13 @@ button.st-row:disabled{cursor:default}
 /* Search stays at the top of the sheet while the one list scrolls under it (sticky in the sheet body, never a second scroller). */
 .sheet-body>.st-picker-body>.st-choice-search,.sheet-body>*>.st-picker-body>.st-choice-search{position:sticky;top:calc(-1 * var(--space-section));z-index:1;margin:calc(-1 * var(--space-section)) calc(-1 * var(--space-gutter-sheet)) var(--space-12);padding:var(--space-section) var(--space-gutter-sheet) var(--space-8);background:var(--paper)}
 .st-choice-empty{margin:0;padding:var(--space-24) var(--space-17);font:400 var(--font-size-13)/1.5 var(--font-sans);color:var(--st-muted)}
+/* An empty collection the worker can add to (a farm's brands for a medicine): the native "nothing here yet" — a glyph on the tint, a
+   title that names what is missing, one line that says how to add it. Centred under the search, which stays the way in. */
+.st-choice-empty.st-choice-empty--lead{display:flex;flex-direction:column;align-items:center;gap:var(--space-8);padding:var(--space-32) var(--space-24) var(--space-24);text-align:center}
+.st-choice-empty-icon{display:grid;place-items:center;width:56px;height:56px;margin-bottom:var(--space-8);border-radius:50%;background:var(--well);color:var(--ink-2)}
+.st-choice-empty-icon svg{width:26px;height:26px}
+.st-choice-empty-title{font:600 var(--type-row-title-size)/1.35 var(--font-sans);color:var(--st-ink)}
+.st-choice-empty-text{max-width:280px;text-wrap:balance;font:400 var(--font-size-14)/1.5 var(--font-sans);color:var(--st-muted)}
 
 /* 6 · Field cards (candidate, ADR 0001): Stepper, Measure, Numpad.
    Tokens only, including the candidate sizes (stepper-row-min, hero-key, glyph-*, caret-width, status-dot, space-key-gap). */

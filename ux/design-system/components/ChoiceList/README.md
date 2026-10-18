@@ -34,6 +34,7 @@ Group heading (optional); lead control (optional); option label; meta line (opti
 | Disabled | Prefer omission. Otherwise readable text, `aria-disabled`, and a persistent reason line; no dimming. |
 | Loading | Loading options status in place of rows. |
 | Empty | No options or no search match; never a blank panel. |
+| Empty, can add | A collection the worker fills (a farm's brands for a medicine): `choiceEmpty(hint, { title, icon })` draws the native "nothing here yet": a glyph on the tint, a title that names what is missing, one line that says how to add it, centred under the search. The search stays the way in: no button beside it. |
 | Long label | Labels and meta wrap, including Chinese; rows grow, never truncate. |
 
 Every state is in `variants/<id>.html`, drawn in its real container: navigate, single and multi in a picker drawer; radio and inline in a record drawer; each in the 390px phone.
@@ -52,7 +53,7 @@ Rows meet `tap-min` (radio and inline rows `radio-row-min`). Single rows expose 
 
 ## API and tokens
 
-`choiceRow`, `choiceGroup`, `choiceSearch`, `choiceEmpty`, `choiceRadios` (`layout: 'inline'`, `face: 'key'`), `radioBind`; `pickerOptions` is a compatibility adapter. `secondaryAction` exposes a separately named removal control. `labelHidden` hides only the field label when an enclosing optional row already names it; the accessible label and Clear remain. Types in `../index.d.ts`.
+`choiceRow`, `choiceGroup`, `choiceSearch`, `choiceEmpty` (`title` and `icon` for the can-add empty state), `choiceRadios` (`layout: 'inline'`, `face: 'key'`), `radioBind`; `pickerOptions` is a compatibility adapter. `secondaryAction` exposes a separately named removal control. `labelHidden` hides only the field label when an enclosing optional row already names it; the accessible label and Clear remain. Types in `../index.d.ts`.
 
 Tokens: `tap-min`, `choice-row-min`, `radio-row-min`, `rule`, `paper`, `ink`, `muted`, `green`, `choice-press`, `disabled-surface`, `font-sans`, `font-size-14`, `type-weight-strong`, `space-8`, `space-12`, `size-20`, `size-24`.
 
