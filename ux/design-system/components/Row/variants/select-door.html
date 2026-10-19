@@ -7,7 +7,7 @@
 <div data-state="No door" id="sd-state-5"></div>
 <div data-state="Chinese" id="sd-state-4"></div>
 <script>
-// Each state renders in its own iframe in the atlas: draw only the states present, each in its card (rowGroup), as the screens do.
+// Each state renders in its own iframe in the atlas: draw only the states present.
 // Calls copied from the live screens: Inspection's walk (tags, the group without ear tags), Farrowing's scan list (state).
 var UI = window.SentriUI;
 var TAGS = {"kind": "tags", "tags": [{"name": "Lame", "level": "watch"}, {"name": "Arthritis", "level": "ongoing"}]};
@@ -24,7 +24,7 @@ var RENDER = {
 };
 document.querySelectorAll('[data-state]').forEach(function (s) {
   var t = RENDER[s.id] ? s : s.querySelector('[id]');
-  if (t && RENDER[t.id]) t.innerHTML = SentriUI.rowGroup(RENDER[t.id]());
+  if (t && RENDER[t.id]) t.innerHTML = RENDER[t.id]();
 });
 UI.rowFitTags(document);
 </script>
