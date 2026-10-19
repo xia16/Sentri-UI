@@ -30,7 +30,7 @@ view are fixed in the prototype.
 | Add condition drawer (deck) | static deck markup | Record health page (PickerField, Field) | **cut**: replaced |
 | Verdict page (deck) | static deck markup | Resolve conditions (bulk rows, PickerField) | **cut**: replaced |
 | Focus on a field after a pick | `render()` chooser return in `inspection-astra-concept.js` | the quiet focus (`[data-touch-focus]`, bundle.css) | **fix**: every chooser return, not only Treatment |
-| Unchanged pig on a bulk form | `.bulk-pig-row.is-excluded .bulk-pig-copy{opacity:.55}` | the row's own line says unchanged | **fix**: ear tag in `--ink-2`, no fade |
+| Unchanged pig on a bulk form | `.bulk-pig-row.is-excluded .bulk-pig-copy{opacity:.55}` | the row's own line says unchanged | **cut**: no fade; the row reads like the others and its line says unchanged |
 
 ## Self-crit
 
