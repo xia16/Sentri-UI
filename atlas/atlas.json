@@ -17240,12 +17240,12 @@
            {
             "name": "Pig row",
             "at": "000254",
-            "shows": "The new condition tag with its care level (Coughing · No action needed)",
+            "shows": "The new condition on the row's one line (Coughing)",
             "states": [
              {
               "state": "Newly added",
               "when": "The pig did not have it",
-              "shows": "The tag joins the row's one line, ordered by care level"
+              "shows": "The condition joins the row, ordered by care level; No action needed prints as plain text, a care level that needs attention as its tag"
              },
              {
               "state": "Already had it",
