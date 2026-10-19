@@ -299,20 +299,26 @@
       days:{day,total:days,over:tf.over||0,text:tf.text||(!tf.over&&day===days&&days>1?`Day ${day} of ${days} · last day`:undefined)}};
   }
   const unitList=list=>list.length?(list.length===1?'Unit ':'Units ')+list.join(', '):'';
-  function overviewHeading(title,link){return `<div class="work-section-heading ov-heading"><h2>${title}</h2>${link?btn('schedule','Schedule<span aria-hidden="true"> ›</span>','ov-schedule-link',link,`aria-label="Schedule, ${title}"`):''}</div>`;}
+  // A section heading with its icon (owner, 2026-10-19), and "Schedule ›" as the heading's own action.
+  const sectionIcons={Production:'production',Health:'health',Other:'transfer'};
+  function overviewHeading(title,link){return SentriUI.heading({title,kind:'section',level:2,icon:icon(sectionIcons[title]),className:'ov-heading',action:link?{label:'Schedule',action:'schedule',value:link,ariaLabel:'Schedule, '+title}:''});}
+  const quietGroup=text=>SentriUI.rowGroup(SentriUI.row({title:text,variant:'plain'}));
   function overview(){
     const all=tasks.filter(t=>t.section===state.section),open=all.filter(t=>!t.completedAt&&!t.terminatedAt),closed=all.filter(t=>t.completedAt||t.terminatedAt);
     const prod=open.filter(t=>!t.category).sort(byStage),health=open.filter(t=>t.category==='health').sort(byStage),other=open.filter(t=>t.category==='other').sort((a,b)=>a.type.localeCompare(b.type)||a.batch.localeCompare(b.batch));
-    const tiles=list=>`<div class="ov-tiles">${list.map(t=>window.SentriHomeTaskCard.tile(tileModel(t))).join('')}</div>`;
-    const closedLine=closed.length?btn('closed-task',`${icon('check')}<span>${closed.length} closed today · ${esc(closed[0].type)} ${esc(closed[0].batch.replace('Batch ','B'))}</span>${icon('chevron')}`,'ov-closed',closed[0].id):'';
+    const tiles=list=>`<div class="ov-tiles">${list.map(t=>SentriUI.taskTile(tileModel(t))).join('')}</div>`;
+    // The closed line (owner, 2026-10-19): just "N closed today", quiet and muted; it opens a drawer listing them.
+    const closedLine=closed.length?`<div class="ov-closed">${SentriUI.button({register:'text',align:'start',className:'st-text-action--quiet',icon:icon('check'),label:`${closed.length} closed today`,action:'closed-today'})}</div>`:'';
     const m=marks[state.section]||{treat:0,monitor:0,treatUnits:[],monitorUnits:[]};
+    // A red line is a red token in the row's own line 2, never page colour.
+    const line=(text,act)=>act?[{text,tone:'red'}]:text;
     const care=SentriUI.rowGroup(
-      SentriUI.row({variant:'navigation',icon:icon('treat'),title:'To treat',description:m.treat?(m.sinceYesterday?`${m.sinceYesterday} waiting since yesterday`:unitList(m.treatUnits)):'Nothing marked',trailing:{text:String(m.treat)},action:m.treat?'to-treat':'',trail:m.treat?'auto':'none',className:m.sinceYesterday?'ov-row-act':''})+
+      SentriUI.row({variant:'navigation',icon:icon('treat'),title:'To treat',description:m.treat?(m.sinceYesterday?line(`${m.sinceYesterday} waiting since yesterday`,true):unitList(m.treatUnits)):'Nothing marked',trailing:{text:String(m.treat)},action:m.treat?'to-treat':'',trail:m.treat?'auto':'none'})+
       SentriUI.row({variant:'navigation',icon:icon('monitor'),title:'Monitoring',description:m.monitor?unitList(m.monitorUnits):'Nothing marked',trailing:{text:String(m.monitor)},action:m.monitor?'monitoring':'',trail:m.monitor?'auto':'none'})
     );
-    const otherRows=other.length?SentriUI.rowGroup(other.map(t=>SentriUI.row({variant:'navigation',icon:icon(t.icon||'note'),title:t.title||`${t.type} · ${t.batch}`,description:t.line||'',trailing:{text:`${t.due} ${t.unit}`},action:'task',value:t.id,className:t.lineTone==='act'?'ov-row-act':''})).join('')):`<p class="ov-empty">Nothing open</p>`;
+    const otherRows=other.length?SentriUI.rowGroup(other.map(t=>SentriUI.row({variant:'navigation',icon:icon(t.icon||'note'),title:t.title||`${t.type} · ${t.batch}`,description:line(t.line||'',t.lineTone==='act'),trailing:{text:`${t.due} ${t.unit}`},action:'task',value:t.id})).join('')):quietGroup('Nothing open');
     return header()+scopeRail()+`<div class="app-scroll screen-enter ov-page">
-      <section class="ov-section">${overviewHeading('Production','production')}${prod.length?tiles(prod):'<p class="ov-empty">Nothing open</p>'}${closedLine}</section>
+      <section class="ov-section">${overviewHeading('Production','production')}${prod.length?tiles(prod):quietGroup('Nothing open')}${closedLine}</section>
       <section class="ov-section">${overviewHeading('Health','health')}${care}${health.length?tiles(health):''}</section>
       <section class="ov-section">${overviewHeading('Other','')}${otherRows}</section>
     </div>`+nav();
@@ -337,18 +343,7 @@
     breeding:{'0':{production:[['Heat check','estimated in heat',[['B34',['','','d18','o20','e6','','']],['B35',['','','','o10','e6','e2','']]]],['Breeding','1 batch',[['B34',['','d9','d14','o5','e7','e3','e1>']]]]],health:[],other:[]}},
     farrowing:{'0':{production:[['Farrowing','1 batch',[['B28',['','','d4','o2','e5','e4','e3>']]]],['Processing','1 batch',[['B27',['','d4','d4','n','p4','','']]]]],health:[],other:[['Pig transfer','1 order',[['To Nursery 12 · from Unit 6',['','','','o96','','','']]]]]}}
   };
-  const fmt=(n,est)=>n>=1000?(est?'~'+Math.round(n/1000)+'k':(Math.round(n/100)/10)+'k'):(est?'~':'')+n;
-  function cell(code){
-    if(!code)return '<span></span>';
-    let c=code,cont='',from='';
-    if(c.endsWith('>')){cont=' sc-cont';c=c.slice(0,-1);}
-    if(c.startsWith('<')){from=' sc-from';c=c.slice(1);}
-    const k=c[0],v=c.slice(1),n=+v;
-    const map={n:['sc-nil','·'],u:['sc-wait','–'],d:['sc-done',fmt(n)],o:['sc-today',fmt(n)],p:['sc-plan',fmt(n)],e:['sc-est',fmt(n,true)],v:['sc-late',fmt(n)],w:['sc-latedone',fmt(n)],t:['sc-today sc-time',v],q:['sc-plan sc-time',v]};
-    const [cls,text]=map[k]||['',''];
-    return `<span class="${cls}${cont}${from}">${esc(text)}</span>`;
-  }
-  const cellWord={n:'Nothing due',u:'Waiting on today',d:'Done',o:'Due today',p:'Planned',e:'Estimate',v:'Past its plan',w:'Past its plan',t:'Today',q:'Planned'};
+  const cellWord={n:'Nothing due',u:'Waiting on today',d:'Done',o:'Due today',p:'Planned',e:'Estimate',v:'Past its plan',w:'Past its plan'};
   function scheduleWeek(){return schedule[state.section]?.[String(state.scheduleWeek||0)]||{production:[],health:[],other:[]};}
   function scheduleGroups(){
     const w=scheduleWeek(),f=state.scheduleFilter||'production';
@@ -356,30 +351,27 @@
   }
   function schedulePage(){
     const wk=String(state.scheduleWeek||0),meta=weekMeta[wk],f=state.scheduleFilter||'production';
-    const days=`<div class="sc-days"><span></span><div class="sc-grid">${meta.dates.map((d,i)=>`<span class="sc-day${i===meta.today?' sc-is-today':''}${meta.past.includes(i)?' sc-is-past':''}"><span>${dayShort[i]}</span><b>${d}</b></span>`).join('')}</div></div>`;
     const sectionIcon={production:'production',health:'health',other:'transfer'},sectionName={production:'Production',health:'Health',other:'Other'};
     const groups=scheduleGroups();
     // A row is the tap (full width, 48px): it opens that task's week in words. Production rows are batches (B31) in the gutter;
     // health and other rows say what they are and where on their own line ("PRRS blood · Units 7, 9").
-    const body=groups.map(([k,types])=>{
-      const band=f==='all'?`<div class="sc-band"><span class="sc-band-icon">${icon(sectionIcon[k])}</span><b>${sectionName[k]}</b></div>`:'';
-      const named=k!=='production';
-      const rows=types.map(([type,sub,batches],ti)=>`<div class="sc-type"><div class="sc-type-head"><span>${esc(type)}</span><small>${esc(sub)}</small></div>${batches.map(([b,cells,late],bi)=>`<button type="button" class="sc-row${named?' sc-row-named':''}" data-action="schedule-row" data-value="${k}.${ti}.${bi}" aria-label="${esc(type)}, ${esc(b)}, this week">${named?`<span class="sc-name${late?' sc-batch-late':''}">${esc(b)}</span><span></span>`:`<span class="sc-batch${late?' sc-batch-late':''}">${esc(b)}</span>`}<span class="sc-grid">${cells.map(cell).join('')}</span></button>`).join('')}</div>`).join('');
-      return band+(rows||(f==='all'?'<p class="sc-none">Nothing planned</p>':''));
-    }).join('');
-    const empty=groups.every(([,types])=>!types.length);
-    const todayCol=meta.today!=null?`<span class="sc-today-band" style="left:calc(52px + (100% - 84px) / 7 * ${meta.today} + ${3*meta.today}px);width:calc((100% - 84px) / 7)" aria-hidden="true"></span>`:'';
-    const board=empty?`${days}<p class="sc-none sc-none-week">Nothing planned this week</p>`:`${days}${body}${todayCol}`;
+    const board=SentriUI.weekBoard({
+      days:meta.dates.map((d,i)=>({label:dayShort[i],date:d,today:i===meta.today,past:meta.past.includes(i)})),
+      empty:groups.every(([,types])=>!types.length)?'Nothing planned this week':'',
+      groups:groups.map(([k,types])=>({band:f==='all'?{icon:icon(sectionIcon[k]),label:sectionName[k]}:null,none:'Nothing planned',
+        types:types.map(([type,sub,batches],ti)=>({title:type,sub,rows:batches.map(([b,cells,late],bi)=>({label:b,named:k!=='production',late:!!late,action:'schedule-row',value:k+'.'+ti+'.'+bi,aria:type+', '+b+', this week',cells}))}))}))
+    });
     const prev=weekMeta[String(+wk-1)],next=weekMeta[String(+wk+1)];
-    const foot=`<div class="sc-foot">${prev?SentriUI.button({action:'schedule-week',value:String(+wk-1),register:'secondary',label:'‹ Week '+prev.wk}):''}${wk!=='0'?SentriUI.button({action:'schedule-week',value:'0',register:'primary',label:'This week'}):''}${next?SentriUI.button({action:'schedule-week',value:String(+wk+1),register:'secondary',label:'Week '+next.wk+' ›'}):''}</div>`;
-    return `<div class="sc-top">${SentriUI.iconButton({action:'back',icon:icon('close'),label:'Close schedule',variant:'plain'})}<div class="sc-title"><strong>${meta.range}</strong><small>Week ${meta.wk}${wk==='1'?' · next week':wk==='-1'?' · last week':''} · ${esc(section().name)}</small></div>${SentriUI.iconButton({action:'schedule-key',icon:icon('info'),label:'How to read the board',variant:'bordered'})}</div>
-      <div class="app-scroll sc-scroll">${SentriUI.segment({variant:'lens',options:[['all','All'],['production','Production'],['health','Health'],['other','Other']],active:f,action:'schedule-filter',ariaLabel:'Show'})}
-      <div class="sc-board${f==='all'?' sc-all':''}">${board}</div></div>
-      ${SentriUI.sheetFooter({content:foot,className:'page-footer sc-footer'})}`;
+    // Week paging in the footer, from the Sheet footer's own parts: the earlier week is the footer's back slot (a chevron), the later week its primary.
+    const foot=SentriUI.sheetFooter({className:'sc-footer',back:prev?{action:'schedule-week',value:String(+wk-1),label:{text:'Week '+prev.wk}}:null,primary:next?{action:'schedule-week',value:String(+wk+1),label:'Week '+next.wk+' ›'}:undefined});
+    const title=SentriUI.heading({title:meta.range,description:'Week '+meta.wk+(wk==='1'?' · next week':wk==='-1'?' · last week':'')+' · '+section().name,kind:'page',level:1,className:'sc-title'});
+    return `<div class="sc-top">${SentriUI.iconButton({action:'back',icon:icon('close'),label:'Close schedule',variant:'plain'})}${title}${SentriUI.iconButton({action:'schedule-key',icon:icon('info'),label:'How to read the board',variant:'bordered'})}</div>
+      <div class="app-scroll sc-scroll">${SentriUI.segment({variant:'lens',options:[['all','All'],['production','Production'],['health','Health'],['other','Other']],active:f,action:'schedule-filter',ariaLabel:'Show'})}<div class="sc-board">${board}</div></div>
+      ${foot}`;
   }
   function scheduleKey(){
     const rows=[['d12','Done','How many were recorded that day'],['o10','Today','Due today'],['p8','Planned','Exact number, already known'],['e6','Estimate','Expected: heat, returns, farrowing'],['u','Waiting on today','Known after today’s results'],['v4','Past its plan','The task should have finished; it carries on until done'],['n','Nothing due','Running, nothing to do that day']];
-    drawer('How to read the board',`<p class="sc-key-note">Tap a row to see its week in numbers.</p><div class="st-panel sc-key">${rows.map(([c,t,d])=>`<div class="sc-key-row"><div class="sc-grid sc-key-cell">${cell(c)}</div><div><strong>${t}</strong><small>${d}</small></div></div>`).join('')}</div>`,{size:'medium'});
+    drawer('How to read the board',SentriUI.heading({title:'Tap a row to see its week in numbers',kind:'group',level:3})+SentriUI.weekBoardKey(rows),{size:'medium'});
     overlay.querySelector('.sheet,.dialog')?.classList.add('schedule-key');
   }
   // A row's week in words: each day it runs, what kind of count it is, and the exact number (the cells stay short).
@@ -387,13 +379,19 @@
     const [k,ti,bi]=String(ref).split('.'),wk=String(state.scheduleWeek||0),meta=weekMeta[wk];
     const t=(scheduleWeek()[k]||[])[+ti];if(!t)return;const [type,,batches]=t,row=batches[+bi];if(!row)return;
     const [b,cells]=row;
-    const value=c=>['t','q'].includes(c[0])?c.slice(1):c[0]==='u'?'–':c[0]==='n'?'·':(c[0]==='e'?'~':'')+(+c.slice(1)).toLocaleString('en');
+    const value=c=>c[0]==='u'?'–':c[0]==='n'?'·':(c[0]==='e'?'~':'')+(+c.slice(1)).toLocaleString('en');
     const list=cells.map((c,i)=>({i,code:(c||'').replace(/[<>]/g,'')})).filter(r=>r.code);
-    const body=`<div class="st-panel sc-day-list">${list.map(r=>SentriUI.row({title:`${dayNames[r.i]} ${meta.dates[r.i]} ${monthOf(wk,r.i)}${r.i===meta.today?' · today':''}`,description:cellWord[r.code[0]],trailing:{text:value(r.code)},className:['v','w'].includes(r.code[0])?'ov-row-act':''})).join('')}</div>`;
+    const body=SentriUI.rowGroup(list.map(r=>SentriUI.row({title:`${dayNames[r.i]} ${meta.dates[r.i]} ${monthOf(wk,r.i)}${r.i===meta.today?' · today':''}`,trailing:{text:value(r.code)},description:['v','w'].includes(r.code[0])?[{text:cellWord[r.code[0]],tone:'red'}]:cellWord[r.code[0]]})).join(''));
     drawer(`${type} · ${b}`,body,{size:'medium'});
     overlay.querySelector('.sheet,.dialog')?.classList.add('schedule-row');
   }
 
+  // Today's closed tasks (completed or ended early in farm time): each opens its receipt. Older receipts live in Records.
+  function closedToday(){
+    const closed=tasks.filter(t=>t.section===state.section&&(t.completedAt||t.terminatedAt));
+    drawer('Closed today',SentriUI.rowGroup(closed.map(t=>SentriUI.row({variant:'navigation',icon:icon('check'),title:`${shortName[t.type]||t.type} · ${t.batch}`,description:(t.terminatedAt?'Ended early · ':'Completed · ')+String(t.completedAt||t.terminatedAt).replace('Today, ',''),action:'closed-task',value:t.id})).join('')),{size:'medium',surface:'menu'});
+    overlay.querySelector('.sheet,.dialog')?.classList.add('closed-today');
+  }
   function home(){
     if(!state.unit)return overview();
     const models=window.SentriHomeTaskCard.order(scopedTasks().map(taskModel));
@@ -476,6 +474,7 @@
     if(state.page==='records')return 'workbench.records';
     if(state.page==='maintenance'){if(dr)return dr.querySelector('#fault-form')?'environment.report-issue':maintenanceRecords().find(f=>f.id===state.faultId)?.resolved?'environment.issue-resolved':'environment.issue-detail';return maintenanceRecords().length?'environment.maintenance':'environment.maintenance-empty';}
     if(dr){
+      if(dr.classList.contains('closed-today'))return 'workbench.closed-today';
       if(dr.classList.contains('unit-picker'))return 'workbench.choose-unit';
       if(dr.querySelector('#lookup-form'))return dr.querySelector('#tag')?'find-pig.scan':'find-pig.search';
       if((dr.querySelector('[data-action="lookup-result"]')||/No matching sample pig/.test(dr.textContent)))return 'find-pig.results';
@@ -529,7 +528,7 @@
   SentriUI.holdBind(document.body,{onCommit(el){if(el.dataset.action==='confirm-end-task'){task().terminatedAt='Today · just now';closeDrawer();goHome();}}});
   document.addEventListener('click',e=>{
     const demo=e.target.closest('[data-demo]');if(demo){closeDrawer();navStack=[];state.section='gestation';state.unit=demo.dataset.demo==='unit'?7:null;state.page=demo.dataset.demo==='sections'?'sections':'home';const url=new URL(location.href);url.searchParams.set('view',demo.dataset.demo);url.searchParams.set('section','gestation');history.replaceState(null,'',url);render();return;}
-    const card=e.target.closest('.home-task-card[data-card],.home-task-tile[data-card]');if(card){openTask(card.dataset.card,state.unit);return;}
+    const card=e.target.closest('.home-task-card[data-card],.st-tile[data-card]');if(card){openTask(card.dataset.card,state.unit);return;}
     const el=e.target.closest('[data-action]');if(!el||el.disabled||el.matches('.st-hold')||SentriUI.guard(el))return;const a=el.dataset.action,v=el.dataset.value;
     if(a==='close'){closeDrawer();return;}
     if(a==='sync'){showSync();return;}
@@ -538,7 +537,8 @@
     if(a==='schedule-week'){state.scheduleWeek=+v;render();return;}
     if(a==='schedule-key'){scheduleKey();return;}
     if(a==='schedule-row'){scheduleRow(v);return;}
-    if(a==='closed-task'){openTask(v);return;}
+    if(a==='closed-task'){closeDrawer();openTask(v);return;}
+    if(a==='closed-today'){closedToday();return;}
     // Marked pigs are worked through on the unit walk (Inspection's Health lens) until the cross-unit To treat list is designed.
     if(a==='to-treat'||a==='monitoring'){const m=marks[state.section];const u=(a==='to-treat'?m.treatUnits:m.monitorUnits)[0];if(u)openDesigned('inspection-astra-concept.html',u,'unit','Health');return;}
     if(a==='toggle-tasks'){const scroll=app.querySelector('.app-scroll')?.scrollTop||0;state.expandedTasks=!state.expandedTasks;render();app.querySelector('.app-scroll').scrollTop=scroll;return;}
@@ -600,6 +600,7 @@
   document.querySelectorAll("[data-status-icons]").forEach(e=>{e.innerHTML=icon("signal")+icon("battery");});
   render();
   // Atlas start states for the Schedule's drawers: ?view=schedule&sheet=key, or &sheet=row&row=production.1.1 (Pregnancy check B31).
+  if(state.page==='home'&&!state.unit&&params.get('sheet')==='closed')closedToday();
   if(state.page==='schedule'&&params.get('sheet')==='key')scheduleKey();
   if(state.page==='schedule'&&params.get('sheet')==='row')scheduleRow(params.get('row')||'production.1.1');
   // The fold is measured once the fonts have loaded: measured before, the toggle sits a few pixels off and the page lands short.

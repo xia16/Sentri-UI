@@ -898,7 +898,8 @@
           "workbench.many-tasks",
           "workbench.work-due",
           "workbench.quiet-section",
-          "workbench.work-waiting"
+          "workbench.work-waiting",
+          "workbench.closed-today"
          ]
         ],
         [
@@ -1030,6 +1031,16 @@
          "workbench.schedule",
          "workbench.schedule-row",
          "tap the Pregnancy check · B31 row"
+        ],
+        [
+         "workbench.gestation",
+         "workbench.closed-today",
+         "tap 1 closed today"
+        ],
+        [
+         "workbench.closed-today",
+         "workbench.closed-task",
+         "tap Pregnancy check · Batch 29"
         ]
        ],
        "screens": [
@@ -1095,7 +1106,7 @@
            "Sections in this order: Production, Health, Other. No headline-number strip.",
            "Production is in the order of the sow's cycle (Heat check, Breeding, Return heat, Pregnancy check, Farrowing, Processing, Weaning), then oldest batch first. Overdue is a mark, never a re-sort.",
            "Every open task is listed; there is no \"see all\". Upcoming work is on the Schedule, not Home.",
-           "A closed task leaves the grid for one quiet \"N closed today\" line."
+           "A closed task leaves the grid for one quiet, muted \"N closed today\" line that opens the list."
           ],
           "issues": []
          }
@@ -1325,7 +1336,7 @@
            "Sections in this order: Production, Health, Other. No headline-number strip.",
            "Production is in the order of the sow's cycle (Heat check, Breeding, Return heat, Pregnancy check, Farrowing, Processing, Weaning), then oldest batch first. Overdue is a mark, never a re-sort.",
            "Every open task is listed; there is no \"see all\". Upcoming work is on the Schedule, not Home.",
-           "A closed task leaves the grid for one quiet \"N closed today\" line."
+           "A closed task leaves the grid for one quiet, muted \"N closed today\" line that opens the list."
           ],
           "issues": []
          }
@@ -2114,7 +2125,7 @@
           "edge": [],
           "rules": [
            "Full screen: ✕ closes back to Home (owner, 2026-10-19); no page header and no bottom bar. The date range is the only text at the top, the week number a small label.",
-           "Natural Mon–Sun weeks; ‹ › in a 56px footer; \"This week\" once you are away from it.",
+           "Natural Mon–Sun weeks, paged in the 56px footer: the earlier week is the footer's back slot (\"‹ Week 26\"), the later week its primary (\"Week 28 ›\").",
            "Opens filtered to the Home section whose \"Schedule ›\" was tapped; All, Production, Health and Other are a segment.",
            "All: one card, one tinted band per section (owner chose B, 2026-10-19).",
            "No daily total row."
@@ -2190,7 +2201,7 @@
           "edge": [],
           "rules": [
            "Full screen: ✕ closes back to Home (owner, 2026-10-19); no page header and no bottom bar. The date range is the only text at the top, the week number a small label.",
-           "Natural Mon–Sun weeks; ‹ › in a 56px footer; \"This week\" once you are away from it.",
+           "Natural Mon–Sun weeks, paged in the 56px footer: the earlier week is the footer's back slot (\"‹ Week 26\"), the later week its primary (\"Week 28 ›\").",
            "Opens filtered to the Home section whose \"Schedule ›\" was tapped; All, Production, Health and Other are a segment.",
            "All: one card, one tinted band per section (owner chose B, 2026-10-19).",
            "No daily total row."
@@ -2207,7 +2218,7 @@
          "preset": "",
          "figma": "",
          "notes": {
-          "purpose": "Week 28: runs that started last week enter from the left edge; \"This week\" returns.",
+          "purpose": "Week 28: runs that started last week enter from the left edge; the footer's \"‹ Week 27\" returns to this week.",
           "states": [],
           "elements": [
            {
@@ -2266,7 +2277,7 @@
           "edge": [],
           "rules": [
            "Full screen: ✕ closes back to Home (owner, 2026-10-19); no page header and no bottom bar. The date range is the only text at the top, the week number a small label.",
-           "Natural Mon–Sun weeks; ‹ › in a 56px footer; \"This week\" once you are away from it.",
+           "Natural Mon–Sun weeks, paged in the 56px footer: the earlier week is the footer's back slot (\"‹ Week 26\"), the later week its primary (\"Week 28 ›\").",
            "Opens filtered to the Home section whose \"Schedule ›\" was tapped; All, Production, Health and Other are a segment.",
            "All: one card, one tinted band per section (owner chose B, 2026-10-19).",
            "No daily total row."
@@ -2348,7 +2359,7 @@
           "edge": [],
           "rules": [
            "Full screen: ✕ closes back to Home (owner, 2026-10-19); no page header and no bottom bar. The date range is the only text at the top, the week number a small label.",
-           "Natural Mon–Sun weeks; ‹ › in a 56px footer; \"This week\" once you are away from it.",
+           "Natural Mon–Sun weeks, paged in the 56px footer: the earlier week is the footer's back slot (\"‹ Week 26\"), the later week its primary (\"Week 28 ›\").",
            "Opens filtered to the Home section whose \"Schedule ›\" was tapped; All, Production, Health and Other are a segment.",
            "All: one card, one tinted band per section (owner chose B, 2026-10-19).",
            "No daily total row."
@@ -2430,11 +2441,39 @@
           "edge": [],
           "rules": [
            "Full screen: ✕ closes back to Home (owner, 2026-10-19); no page header and no bottom bar. The date range is the only text at the top, the week number a small label.",
-           "Natural Mon–Sun weeks; ‹ › in a 56px footer; \"This week\" once you are away from it.",
+           "Natural Mon–Sun weeks, paged in the 56px footer: the earlier week is the footer's back slot (\"‹ Week 26\"), the later week its primary (\"Week 28 ›\").",
            "Opens filtered to the Home section whose \"Schedule ›\" was tapped; All, Production, Health and Other are a segment.",
            "All: one card, one tinted band per section (owner chose B, 2026-10-19).",
            "No daily total row."
           ],
+          "issues": []
+         }
+        },
+        {
+         "id": "workbench.closed-today",
+         "name": "Overview · closed today",
+         "zh": "总览 · 今日已关闭",
+         "status": "in-design",
+         "url": "/ux/system/home-astra-prototype.html?section=gestation&sheet=closed",
+         "preset": "",
+         "figma": "",
+         "notes": {
+          "purpose": "Tapping \"1 closed today\" under the tiles: the tasks completed or ended early today, each opening its receipt.",
+          "states": [],
+          "elements": [
+           {
+            "name": "Closed today drawer",
+            "shows": "Task · batch, \"Completed · 08:45\" or \"Ended early · …\"",
+            "logic": "The Overview keeps only a quiet muted \"N closed today\" line (owner, 2026-10-19); the list lives here. Older receipts live in Records.",
+            "source": "closedToday()"
+           }
+          ],
+          "controls": [],
+          "copy": [
+           "(raw)"
+          ],
+          "edge": [],
+          "rules": [],
           "issues": []
          }
         }

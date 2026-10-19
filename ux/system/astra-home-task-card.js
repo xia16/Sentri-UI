@@ -228,21 +228,5 @@
     const time=m=>m.actionAt??m.startAt??m.nextAt??Infinity;
     return rank(a)-rank(b)||time(a)-time(b)||String(a.id).localeCompare(String(b.id));
   });
-  /* The Overview tile (owner, 2026-10-18): four fixed slots, each with one kind of message, so a row of tiles scans line by line.
-     1 the task (one line, short name), 2 the batch, 3 to-do (count due now; a quiet next-timer line, red when overdue), 4 the run
-     (one segment per day, "Day N of N"). No done state: a multi-day task stays a tile until the task closes. */
-  function tile(m){
-    // A task past its plan (owner, 2026-10-19): the to-do says how many are overdue, and the run grows one red segment per day over.
-    const days=m.days||{},n=Math.max(1,days.total||1),d=Math.max(0,Math.min(n,days.day||0)),over=Math.max(0,days.over||0);
-    const todo=m.todo.none?`<span class="ht-todo ht-none"><b>${escape(m.todo.none)}</b></span>`:`<span class="ht-todo${m.todo.tone==='act'?' ht-act':''}"><b>${escape(m.todo.value)}</b><span>${escape(m.todo.label)}</span></span>`;
-    const next=m.next?`<span class="ht-next${m.next.tone==='act'?' ht-act':''}">${m.next.tone==='act'?'<span class="ht-bang" aria-hidden="true">!</span>':icon('clock')}<span>${escape(m.next.text)}</span></span>`:'<span class="ht-next" aria-hidden="true"></span>';
-    const segs=Array.from({length:n},(_,i)=>`<i class="${i<d?'on':''}"></i>`).join('')+Array.from({length:over},()=>'<i class="over"></i>').join('');
-    const dayText=days.text||(over?`${over} ${over===1?'day':'days'} overdue`:`Day ${d} of ${n}`);
-    const name=[m.title,m.sub,m.todo.none||`${m.todo.value} ${m.todo.label}`,m.next&&m.next.text,dayText].filter(Boolean).join(', ');
-    return `<button type="button" class="home-task-tile${m.late?' ht-late':''}" data-card="${escape(m.id)}" ${m.entry?`data-entry="${escape(m.entry)}" `:''}aria-label="Open ${escape(name)}">
-      <span class="ht-name">${escape(m.title)}</span><span class="ht-sub">${escape(m.sub)}</span>${todo}${next}
-      <span class="ht-run"><span class="ht-segs" aria-hidden="true">${segs}</span><span class="ht-day${over?' ht-act':''}">${escape(dayText)}</span></span>
-    </button>`;
-  }
-  window.SentriHomeTaskCard={render,tile,escape,icon,order,attention,displayRules};
+  window.SentriHomeTaskCard={render,escape,icon,order,attention,displayRules};
 })();

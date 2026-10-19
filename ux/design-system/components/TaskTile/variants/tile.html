@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><style>
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,169px));gap:10px}
+</style></head><body>
+<section data-state="Due now"></section>
+<section data-state="Overdue part"></section>
+<section data-state="Nothing due now"></section>
+<section data-state="Past its plan"></section>
+<section data-state="Last day"></section>
+<section data-state="Pressed"></section>
+<section data-state="Long label / Chinese"></section>
+<script>
+const T=SentriUI.taskTile;
+const S={
+  'Due now':[T({id:'r30',title:'Return heat',sub:'Batch 30',todo:{value:10,label:'to watch'},next:{text:'4 more from Sat'},days:{day:3,total:7}}),T({id:'h34',title:'Heat check',sub:'Batch 34',todo:{value:20,label:'due now'},next:{text:'Next round 14:30'},days:{day:2,total:3}})],
+  'Overdue part':[T({id:'p31',title:'Pregnancy check',sub:'Batch 31',todo:{value:5,label:'ready now'},next:{text:'2 overdue',tone:'act'},days:{day:1,total:3}})],
+  'Nothing due now':[T({id:'p32',title:'Pregnancy check',sub:'Batch 32',todo:{none:'None now'},next:{text:'8 open tomorrow'},days:{day:1,total:2}})],
+  'Past its plan':[T({id:'v21',title:'Vaccination',sub:'PRRS · Units 7, 8',todo:{value:6,label:'overdue',tone:'act'},next:null,days:{day:3,total:3,over:1},late:true})],
+  'Last day':[T({id:'w25',title:'Weaning',sub:'Batch 25',todo:{value:4,label:'pens ready'},next:{text:'2 pens tomorrow'},days:{day:2,total:2,text:'Day 2 of 2 · last day'}})],
+  'Pressed':[T({id:'f28',title:'Farrowing',sub:'Batch 28',todo:{value:2,label:'farrowing'},next:{text:'4 due today'},days:{day:2,total:7}}).replace('class="st-tile"','class="st-tile" style="background:var(--press)"')],
+  'Long label / Chinese':[T({id:'pp27',title:'Piglet processing and fostering',sub:'Batch 127 · Units 6, 7, 8, 9',todo:{value:128,label:'litters due'},next:{text:'34 more tomorrow and Saturday'},days:{day:3,total:14}}),T({id:'zh31',title:'妊娠检查',sub:'批次 31',todo:{value:5,label:'待检查'},next:{text:'2 头已逾期',tone:'act'},days:{day:1,total:3,text:'第 1 天，共 3 天'}})]
+};
+document.querySelectorAll('[data-state]').forEach(el=>{const t=S[el.dataset.state];if(t)el.innerHTML='<div class="tiles">'+t.join('')+'</div>';});
+</script>
+</body></html>

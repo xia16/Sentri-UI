@@ -1,4 +1,4 @@
-/* @ds-bundle: {"format":4,"namespace":"SentriUI","components":[{"name":"Heading"},{"name":"Panel"},{"name":"Facts"},{"name":"Row"},{"name":"Log"},{"name":"Segment"},{"name":"IconButton"},{"name":"Button"},{"name":"Field"},{"name":"PickerField"},{"name":"ChoiceList"},{"name":"CategoryFooter"},{"name":"Sheet"},{"name":"FilterSheet"},{"name":"RangeSlider"},{"name":"PenMap"},{"name":"Icon"},{"name":"Stepper"},{"name":"Measure"},{"name":"Numpad"},{"name":"Status"},{"name":"ConditionTag"},{"name":"Banner"},{"name":"Photos"}]} */
+/* @ds-bundle: {"format":4,"namespace":"SentriUI","components":[{"name":"Heading"},{"name":"Panel"},{"name":"Facts"},{"name":"Row"},{"name":"Log"},{"name":"Segment"},{"name":"IconButton"},{"name":"Button"},{"name":"Field"},{"name":"PickerField"},{"name":"ChoiceList"},{"name":"CategoryFooter"},{"name":"Sheet"},{"name":"FilterSheet"},{"name":"RangeSlider"},{"name":"PenMap"},{"name":"TaskTile"},{"name":"WeekBoard"},{"name":"Icon"},{"name":"Stepper"},{"name":"Measure"},{"name":"Numpad"},{"name":"Status"},{"name":"ConditionTag"},{"name":"Banner"},{"name":"Photos"}]} */
 /* SentriIcons (sentri-icons.js) and the SentriUI parts, in one file. */
 /* Shared icon registry for the Sentri prototypes. One path vocabulary so every
    app renders the same glyphs; apps keep a local fallback for source-only checks. */
@@ -1314,7 +1314,52 @@
     document.addEventListener('contextmenu',e=>{if(e.target.closest&&e.target.closest('.st-pen-tile'))e.preventDefault();});
     if(typeof globalThis.addEventListener==='function')globalThis.addEventListener('blur',penStop);
   }
-  const api=Object.freeze({headerLine,pageHeader,rangeSlider,filterSheet,penMap,penMapKey,penMapFooter,penPeek,penMapMount:penMount,optionalRow,heading,panel,facts,row,rowGroup,log,logDay,logStamp,logGroups,categoryFooter,field,pickerField,pickerOptions,pickerBody,pickerHead,pickerFooter,filterChips,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,toast,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowSelectDoor,rowAction,rowSelectChange,status,conditionTag,rowFitTags,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
+  /* TaskTile: one open task instance as a tile on the Overview (owner, 2026-10-18). Four fixed slots, each with one kind of
+     message, at the same height in every tile, so a row of tiles scans line by line: 1 the task (one line, a short name),
+     2 the batch (or what and where), 3 to-do (the count due now and a short word; one quiet line under it: the next timer,
+     red when overdue), 4 the run (one segment per planned day, red segments for days past the plan). No done state.
+     taskTile({ id, title, sub, todo:{value,label,tone}|{none}, next:{text,tone}|null, days:{day,total,over,text}, late, action, entry }) */
+  function taskTile({id='',title='',sub='',todo={},next=null,days={},late=false,action='',entry=''}={}){
+    const n=Math.max(1,days.total||1),d=Math.max(0,Math.min(n,days.day||0)),over=Math.max(0,days.over||0);
+    const act=t=>t==='act'||t==='red';
+    const todoHtml=todo.none?`<span class="st-tile-todo" data-none=""><b>${esc(todo.none)}</b></span>`:`<span class="st-tile-todo"${act(todo.tone)?' data-tone="act"':''}><b>${esc(todo.value)}</b><span>${esc(todo.label)}</span></span>`;
+    const nextHtml=next?`<span class="st-tile-next"${act(next.tone)?' data-tone="act"':''}>${act(next.tone)?'<span class="st-tile-bang" aria-hidden="true">!</span>':glyph('clock')}<span>${esc(next.text)}</span></span>`:'<span class="st-tile-next" aria-hidden="true"></span>';
+    const segs=Array.from({length:n},(_,i)=>`<i${i<d?' data-on=""':''}></i>`).join('')+Array.from({length:over},()=>'<i data-over=""></i>').join('');
+    const dayText=days.text||(over?`${over} ${over===1?'day':'days'} overdue`:`Day ${d} of ${n}`);
+    const name=[title,sub,todo.none||`${todo.value} ${todo.label}`,next&&next.text,dayText].filter(Boolean).join(', ');
+    return `<button type="button" class="st-tile" data-ds="TaskTile"${late?' data-late=""':''}${id?` data-card="${esc(id)}"`:''}${action?` data-action="${esc(action)}" data-value="${esc(id)}"`:''}${entry?` data-entry="${esc(entry)}"`:''} aria-label="Open ${esc(name)}">`+
+      `<span class="st-tile-name">${esc(title)}</span><span class="st-tile-sub">${esc(sub)}</span>${todoHtml}${nextHtml}`+
+      `<span class="st-tile-run"><span class="st-tile-segs" aria-hidden="true">${segs}</span><span class="st-tile-day"${over?' data-tone="act"':''}>${esc(dayText)}</span></span></button>`;
+  }
+  /* WeekBoard: a week of work, one line per task under its type, a cell per day holding that day's count (owner, 2026-10-19).
+     Cell codes: '' nothing · n running, nothing due · u waiting on today · dN done · oN due today · pN planned · eN estimate ·
+     vN past its plan, today · wN past its plan, a past day; a trailing '>' runs into next week, a leading '<' came from last week.
+     Counts up to 999 print in full; actual counts from 1,000 shorten to "1.2k", estimates to "~1k".
+     weekBoard({ days:[{label,date,today,past}], groups:[{band:{icon,label}|null, types:[{title,sub,rows:[{label,named,late,action,value,aria,cells}]}]}], empty })
+     weekCell(code) draws one cell; weekBoardKey([[code,title,line]]) the legend rows for the "How to read the board" drawer. */
+  const weekFmt=(n,est)=>n>=1000?(est?'~'+Math.round(n/1000)+'k':(Math.round(n/100)/10)+'k'):(est?'~':'')+n;
+  function weekCell(code){
+    if(!code)return '<span class="st-week-cell"></span>';
+    let c=String(code),cont='',from='';
+    if(c.endsWith('>')){cont=' data-cont=""';c=c.slice(0,-1);}
+    if(c.startsWith('<')){from=' data-from=""';c=c.slice(1);}
+    const k=c[0],n=+c.slice(1);
+    const map={n:['nil','·'],u:['wait','–'],d:['done',weekFmt(n)],o:['today',weekFmt(n)],p:['plan',weekFmt(n)],e:['est',weekFmt(n,true)],v:['late',weekFmt(n)],w:['latedone',weekFmt(n)]};
+    const [kind,text]=map[k]||['',''];
+    return `<span class="st-week-cell" data-kind="${kind}"${cont}${from}>${esc(text)}</span>`;
+  }
+  function weekBoard({days=[],groups=[],empty=''}={}){
+    const today=days.findIndex(d=>d.today);
+    const head=`<div class="st-week-days"><span></span><span class="st-week-grid">${days.map(d=>`<span class="st-week-day"${d.today?' data-today=""':''}${d.past?' data-past=""':''}><span>${esc(d.label)}</span><b>${esc(d.date)}</b></span>`).join('')}</span></div>`;
+    const body=groups.map(g=>(g.band?`<div class="st-week-band"><span class="st-week-band-icon">${g.band.icon||''}</span><b>${esc(g.band.label)}</b></div>`:'')+
+      ((g.types||[]).map(t=>`<div class="st-week-type"><div class="st-week-type-head"><span>${esc(t.title)}</span><small>${esc(t.sub||'')}</small></div>${(t.rows||[]).map(r=>`<button type="button" class="st-week-row"${r.named?' data-named=""':''}${r.action?` data-action="${esc(r.action)}" data-value="${esc(r.value)}"`:''} aria-label="${esc(r.aria||r.label)}">${r.named?`<span class="st-week-name"${r.late?' data-late=""':''}>${esc(r.label)}</span><span></span>`:`<span class="st-week-batch"${r.late?' data-late=""':''}>${esc(r.label)}</span>`}<span class="st-week-grid">${(r.cells||[]).map(weekCell).join('')}</span></button>`).join('')}</div>`).join('')||(g.band&&g.none?`<p class="st-week-none">${esc(g.none)}</p>`:''))).join('');
+    const band=today>=0?`<span class="st-week-today" aria-hidden="true" style="left:calc(52px + (100% - 84px) / 7 * ${today} + ${3*today}px);width:calc((100% - 84px) / 7)"></span>`:'';
+    return `<div class="st-week" data-ds="WeekBoard">${head}${empty?`<p class="st-week-none" data-week="">${esc(empty)}</p>`:body+band}</div>`;
+  }
+  function weekBoardKey(rows=[]){
+    return `<div class="st-panel st-week-key" data-ds="WeekBoard">${rows.map(([c,t,l])=>`<div class="st-week-key-row"><span class="st-week-grid" data-one="">${weekCell(c)}</span><div><strong>${esc(t)}</strong><small>${esc(l)}</small></div></div>`).join('')}</div>`;
+  }
+  const api=Object.freeze({taskTile,weekBoard,weekCell,weekBoardKey,headerLine,pageHeader,rangeSlider,filterSheet,penMap,penMapKey,penMapFooter,penPeek,penMapMount:penMount,optionalRow,heading,panel,facts,row,rowGroup,log,logDay,logStamp,logGroups,categoryFooter,field,pickerField,pickerOptions,pickerBody,pickerHead,pickerFooter,filterChips,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,toast,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowSelectDoor,rowAction,rowSelectChange,status,conditionTag,rowFitTags,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
   root.SentriUI=api;
   if(typeof module!=='undefined')module.exports=api;
 })(globalThis);
