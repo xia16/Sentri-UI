@@ -1,5 +1,7 @@
 # Implementation verification — 2026-10-10
 
+> 2026-10-20: the focus and hover shots in `proof/` were removed. The mobile app has touch states only (no designed focus or hover); this record of the pass is otherwise kept as it was.
+
 Branch: `45-stepper-field`. Self-review against component-standard.md §5; this does not replace the historical frontier-model judgment or owner approval.
 
 | # | Checklist | Result / evidence |

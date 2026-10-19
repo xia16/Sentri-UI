@@ -4,7 +4,7 @@ Row presents one item and its next action in a consistent list anatomy. Use [Log
 
 ## When to use
 
-Use in groups of places, animals, bulk selections, scope choices, counts, or editable records. The same job with different content stays in this family.
+Use in groups of places, animals, bulk selections, a task's items, counts, or editable records. The same job with different content stays in this family.
 
 ## When not to use
 
@@ -12,25 +12,30 @@ Use [Field](../Field/README.md) for typed input, [ChoiceList](../ChoiceList/READ
 
 ## Anatomy
 
-Leading selection box (select + door only: a 24px box in a 48px hit area, always on the left), tick mark (tick only: an empty ring when due, a check disc when ticked; 24px, the whole row is the target), identity (optional code with one Status chip below it), navigation icon tile (optional, replaces identity), title, line 2 (optional), typed trailing word/count (optional), trail (chevron or Edit, optional; none when disabled), and one act button (door + act only). Icon tiles belong only to navigation lists of places or actions and to verb tiles; never animal or record rows. Chips use `SentriUI.status({variant:'chip',kind,text})`.
+One row, five slots, left to right. Each variant below fills them its own way; a row never fills a slot two ways.
+
+1. **Lead** (optional): an icon tile (navigation only), a tick mark (task item: an empty ring when due, an ink disc when ticked; 24px, the whole row is the target) or a selection box (select + door: a 24px box in a 48px hit area, always on the left).
+2. **Body**: a title over line 2; or, for an animal, the ID over one context line.
+3. **Right** (optional): one thing only. A count (`trailing`), the animal's state (figure over word), one line of condition tags, or one Status chip (`SentriUI.status({variant:'chip',kind,text})`).
+4. **Trail** (optional, none when disabled): a chevron, Edit (a saved record), or the current ✓.
+5. **Act** (task item only): one sibling button beside the door, never nested in it.
+
+Icon tiles belong only to navigation lists of places or actions and to verb tiles; never animal or record rows.
 
 ## Variants
 
-- **Navigation**: places or actions, icon tile, title, line 2 and chevron inside `rowGroup`; Inspection actions and Piglet more actions.
+Five tabs, one per job. Each lists the faces the live screens draw, and nothing they don't (cleaned up 2026-10-20: Scope and Summary count became Navigation states, Animal (classic) became Animal states, and Tick in place, Door + act and Done / record became Task item).
+
+- **Navigation**: a row that opens a place, an action or a saved record, inside `rowGroup`. An icon tile, a title, line 2 and a chevron (Inspection and Pig profile actions, Workbench). Its faces: **Current** (`attrs: {'aria-current':'location'}`, Workbench's unit list: an ink ✓ in the trail and a 600 title, no fill and no bar); **Count on the right** (`trailing: {text}`, Farrowing's task end: a number in place of line 2's job; at zero the caller leaves the row out, or passes no `action` so it stays inert and says why); **No icon** (reports `data-variant="plain"`, e.g. a Show/Hide toggle or a Fostering door); **Edit** (`trail: 'edit'`, a saved record that opens to be corrected, Fostering; reports `record`).
 - **Tile** (`rowTile`, in a `rowGrid`): the everyday verbs of More actions (owner, 2026-10-19). One action as a 48px icon well (the navigation icon's colours) over one 13px word: the short verb ("Treat"). Its accessible name always contains that word, so voice control can say what it sees: it is the full action name when that holds the word as a whole word ("Add a note"), else the word, then the full name ("Condition, Disease or symptom", "Treat, Record treatment"). `rowGrid(tiles, {more, expanded, label})` lays them in one panel in two rows (one only for a single tile), split evenly so row two is never short by more than one (5 = 3+2, 6 = 3+3, 8 = 4+4, 10 = 5+5), at most five across. `tone: 'danger'` is the one irreversible verb (Death): red ink on its well and word, never folded and always the last tile. Over ten tiles, nine show and `more` sits just before Death; opening it (`expanded`) shows every tile in even rows of at most five (11 = 4+4+3), the one case of a third row. The words come from the strings registry (`actions.tile.*`), each with its Chinese. Verbs that need a line to explain them (Production) stay navigation rows below the grid.
 - **Animal**: one animal in a list. Designed from Farrowing room + Inspection walk, owner-approved 2026-10-11/12. Used by the Farrowing room list, Find a sow, Scan results and the task's sow list, and by the Inspection walk (a select + door row) and Find a pig. It is drawn when the caller passes `right`. Left, always the same: the ID (`code`, 16px/600 mono, ink) over one 13px muted context line (`description`); `contextWidth` (`112px` on the walk) fixes the left column and the context then ends in an ellipsis. Right, one of two (`right`), right-aligned:
   - **State** (`right: { kind: 'state', figure, word, level }`): the figure (16px) over the state word (13px). `level`: **act** (figure 700 and word in `red-ink`, the word led by the 15px solid "!" circle: overdue, a sow died with piglets to allocate; the only icon in a row), **live** (figure 700 ink: farrowing), **soon** (figure 500 ink, word muted: due today or tomorrow), **settled** (word muted, figure in `ink-2` so it holds 7:1: done, due in 2+ days, aborted).
   - **Tags** (`right: { kind: 'tags', tags: [{ name, icon?, level }] }`): one line of compact [ConditionTags](../ConditionTag/README.md) (`level` act, watch, ongoing), drawn in that order. The screen calls `SentriUI.rowFitTags(root)` after render, fonts and resize: tags show in order until the line is full, the rest fold into `+N`, and the first (urgent) tag never hides. The screen owns short names (Poor appetite becomes `Appetite` with the `trend-down` glyph) and passes no day or care word.
   - **Group** (`lead`, `count`, with `right: { kind: 'tags' }`): animals without an ID as one row, owner 2026-10-18 (Inspection: a pen's pigs without ear tags). The name is the count (`14 pigs`, sans 600) after a muted `lead` glyph (`tag-off`); the tags take the context line and fold the same way; no chevron; a 48px count field ends the row, always there, so the row keeps the Animal height ticked or not (`count.idle`: not ticked, the number in `ink-2` at 500, which holds 7:1).
   The new layout has no status chip under the ID, no headline beside the ID and no mono meta line. The row's own chevron ends it; no pencil.
-- **Animal (classic)**, until migrated: without `right`, the row is the older animal row (code column, status chip, headline, meta line), unchanged. Piglet processing's lists (several items per animal), Weaning handoff and Pig profile still use it. Not for new lists.
-- **Tick in place**: an item ticked before saving (`mark: 'due' | 'ticked'`). A due item shows the ring, a ticked one an ink disc with a white check, and the row takes `well`; a ticked item is a draft and never shows a Done chip. Done is said only for a saved item (see Done / record). No chevron. Piglet day list.
-- **Select + door** (`rowSelectDoor`): a list that selects for a bulk act and opens items. The leading box toggles selection; the door (text column, then a small fixed chevron) opens the item. They are sibling targets, never nested. Without a door (`rowSelect`) the whole row is a label that only selects, the same box on the same side. Inspection pig rows use the door; the Inspection and Feed plan pen header box is the no-door case (box only, with the pen door beside it; `fill: false`, so the tick doesn't tint its cell, owner 2026-10-18).
-- **Plain**: a row with no icon, code, mark or trail (a Show/Hide toggle) reports `data-variant="plain"`, not navigation.
-- **Door + act**: details opens a sheet; a sibling act records or removes in one tap. Piglet task sheets and Inspection review.
-- **Scope**: workbench choose-unit; trailing count word and `aria-current="location"` for the current unit.
-- **Summary count**: Farrowing overview; trailing number, inert at zero and a button above zero. Zero rows intentionally retain category coverage and say why the list is empty; no disabled chevron.
-- **Done / record**: full evidence wraps, with Edit; Piglet done rows. Any row with a Done chip or an Edit rail reports `record`.
+  **Classic**, until migrated: a row with a `code` and no `right` is the older animal row (code column with one status chip under it, a headline, a mono meta line). Piglet processing's pen list (several items per sow), Fostering and Weaning handoff still use it. No new list uses it; each moves to the face above in its own feature's pass.
+- **Task item** (`row` with `mark`, `rowAction` for the act; [TaskDay](../TaskDay/README.md) lays them out): one item of a task's day list. **Due**: an empty ring (`mark: 'due'`), the whole row is the door. **Ticked**: an ink disc with a white check (`mark: 'ticked'`); the row takes `well`; it is a draft, so it never shows Done. **One-tap act** (`act: {label, action, busy}`): records or removes in one tap beside the door; `busy` says Recording while the host settles, and an error puts the reason in line 2 with a Retry act. **Done (saved)**: the Done chip on the right, then Edit; the evidence line wraps and is never cut. Piglet processing and Fostering; Inspection's review list uses the select + door face.
+- **Select + door** (`rowSelectDoor`): a list that selects for a bulk act and opens items. The leading box toggles selection; the door (text column, then a small fixed chevron) opens the item. The door draws the Animal face: tags on Inspection's walk, a state on Farrowing's scan list, and the Group row for pigs without ear tags. Box and door are sibling targets, never nested. Without a door (`rowSelect`) the whole row is a label that only selects, the same box on the same side. Inspection pig rows use the door; the Inspection and Feed plan pen header box is the no-door case (box only, with the pen door beside it; `fill: false`, so the tick doesn't tint its cell, owner 2026-10-18).
 
 ## States
 
@@ -38,13 +43,13 @@ Leading selection box (select + door only: a 24px box in a 48px hit area, always
 |---|---|
 | Default | Native button, checkbox label, or inert div according to job. |
 | Pressed | One step deeper than the surface (`--st-press`: `press` on a white card, `choice-press` on a tinted one) on every tappable face; `attrs: {'data-preview':'pressed'}` demonstrates it statically. |
-| Selected | Native checked checkbox, never colour alone. Tick: the ink check disc. |
-| Ticked | Tick only: ink disc and a `well` row, no Done chip until saved. |
+| Selected | Native checked checkbox, never colour alone. |
+| Ticked | Task item only: ink disc and a `well` row, no Done chip until saved. |
 | Current | `aria-current="location"`: an ink ✓ in the right rail and a 600 title, no fill and no bar. |
 | Disabled | Prefer omission. If retained, pass `disabled` and `reason`: a visible reason line replaces line 2 and the chevron is dropped; no opacity face. |
 | Loading | `act.busy` prevents repeated act while the host settles; label says Recording. |
 | Error | Host supplies actionable reason in line 2 and Retry act; no colour-only error. |
-| Empty | Summary count zero is inert and says No sows due today. Empty groups are omitted with a separate reason. |
+| Empty | A count row at zero is left out, or kept inert with line 2 saying why. Empty groups are omitted with a separate reason. |
 | Long label / Chinese | Wrap evidence and animal content; no clipping of identifiers or status chips. Animal: the ID wraps and the row grows; the figure never wraps (a value long enough to wrap needs another component); on the tags side the context ends in an ellipsis and a tag is never cut: it folds into `+N`. |
 
 Every applicable state appears in [variants.json](variants.json) and `variants/<id>.html`.
@@ -61,7 +66,7 @@ Sentence case. Aim for titles ≤32 English characters or 16 Chinese characters,
 
 ## Accessibility
 
-Native button and checkbox semantics; inert rows are divs. Checkbox label covers the row; screen readers announce checked state. Use `attrs` for descriptive ARIA, `inputAttrs` for checkbox ARIA. Scope announces current location. No gesture is required. Disabled reason remains readable at full contrast. One-handed targets never overlap.
+Native button and checkbox semantics; inert rows are divs. Checkbox label covers the row; screen readers announce checked state. Use `attrs` for descriptive ARIA, `inputAttrs` for checkbox ARIA. The current row announces its location. No gesture is required. Disabled reason remains readable at full contrast. One-handed targets never overlap.
 
 ## Do / don't
 

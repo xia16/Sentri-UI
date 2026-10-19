@@ -25737,14 +25737,9 @@
       "variantsJson": true,
       "variants": [
        "animal",
-       "animal-classic",
-       "door-act",
        "navigation",
-       "record",
-       "scope",
        "select-door",
-       "summary-count",
-       "tick",
+       "task-item",
        "tile"
       ]
      }
@@ -27271,208 +27266,6 @@
        "navigate",
        "radio",
        "single"
-      ]
-     }
-    },
-    {
-     "name": "CategoryFooter",
-     "group": "Base",
-     "status": "agent-checked",
-     "gate": {
-      "status": "agent-checked",
-      "round": 1,
-      "judged": "2026-10-10",
-      "commit": "7f47b7b",
-      "model": "claude-opus-5-5",
-      "scores": {
-       "clarity": 8,
-       "budget": 8,
-       "hierarchy": 8,
-       "spacing": 8,
-       "broken": 8
-      },
-      "lowest": 8,
-      "previous": [
-       {
-        "finding": "Screens show Production · Health · General; law says Health · Routine · Production.",
-        "fixed": true,
-        "note": "pig-profile.*, health-record.* action pages show Health · Routine · Production; inspection.actions (batch) Health · Routine. No 'General' category left on any screen."
-       },
-       {
-        "finding": "disabled dims a tab to half opacity.",
-        "fixed": true,
-        "note": "Removed from bundle.js, bundle.css and index.d.ts; README states omit + reason pattern. (Stale copy remains in unused ux/system/sentri-components.js.)"
-       },
-       {
-        "finding": "Preview shows one state only.",
-        "fixed": true,
-        "note": "Nine cells render: Default, Pressed, Active, Focused, Empty, Five at 300px, Long/Chinese, Back pressed, Scrolled."
-       },
-       {
-        "finding": "Raw px widths and paddings.",
-        "fixed": true,
-        "note": "back-width, control-height, space-footer-top/bottom, space-gutter, border-width."
-       },
-       {
-        "finding": "Variant: screens contradict README order.",
-        "fixed": true,
-        "note": "Same as the first."
-       }
-      ],
-      "previousChecklistFails": [
-       {
-        "line": 2,
-        "fixed": true
-       },
-       {
-        "line": 5,
-        "fixed": true
-       },
-       {
-        "line": 7,
-        "fixed": true,
-        "note": "max three on real verb sheets"
-       },
-       {
-        "line": 9,
-        "fixed": true
-       },
-       {
-        "line": 11,
-        "fixed": true
-       },
-       {
-        "line": 14,
-        "fixed": true
-       },
-       {
-        "line": 15,
-        "fixed": true
-       }
-      ],
-      "checklist": [
-       {
-        "line": 1,
-        "pass": true,
-        "why": "Job plus use Sheet footer instead."
-       },
-       {
-        "line": 2,
-        "pass": true,
-        "why": "When-not names Segment, FilterChips, Sheet footer."
-       },
-       {
-        "line": 3,
-        "pass": true,
-        "why": "Back, nav, buttons, underline, handle; categories optional."
-       },
-       {
-        "line": 4,
-        "pass": true,
-        "why": "One variant, two+ screens."
-       },
-       {
-        "line": 5,
-        "pass": true,
-        "why": "All states rendered; disabled unsupported with omit-and-explain pattern."
-       },
-       {
-        "line": 6,
-        "pass": true,
-        "why": "Back 86x48, tabs 48 tall and 48+ wide on pig-profile.actions and in every preview cell."
-       },
-       {
-        "line": 7,
-        "pass": true,
-        "why": "At most three on real sheets; five is a labelled stress fixture."
-       },
-       {
-        "line": 8,
-        "pass": true,
-        "why": "Active = bold + underline + aria-current."
-       },
-       {
-        "line": 9,
-        "pass": true,
-        "why": "12 EN / 6 ZH chars, sentence case, never ellipsised; long example shown."
-       },
-       {
-        "line": 10,
-        "pass": true,
-        "why": "nav + aria-label, aria-current=location, focus ring rendered, keyboard row, no swipe-only."
-       },
-       {
-        "line": 11,
-        "pass": true,
-        "why": "No raw values in .st-category* rules; tokens listed."
-       },
-       {
-        "line": 12,
-        "pass": true,
-        "why": "n/a"
-       },
-       {
-        "line": 13,
-        "pass": true,
-        "why": "n/a"
-       },
-       {
-        "line": 14,
-        "pass": true,
-        "why": "Related links and classification present."
-       },
-       {
-        "line": 15,
-        "pass": true,
-        "why": "375 preview: no page overflow; overflow only inside the tab scroller for the 300px/Chinese fixtures."
-       }
-      ],
-      "classification": "component",
-      "variants": [
-       {
-        "name": "Category navigation",
-        "usedBy": [
-         "pig-profile.actions",
-         "inspection.actions",
-         "pig-profile.unavailable-actions",
-         "health-record.record-health"
-        ],
-        "status": "agent-checked",
-        "scores": {
-         "clarity": 8,
-         "budget": 8,
-         "hierarchy": 8,
-         "spacing": 8,
-         "broken": 8
-        },
-        "findings": [
-         "Overflowing labels are cut mid-word with no edge cue (300px fixture 'Productio', Scrolled 'roduction')."
-        ]
-       }
-      ],
-      "findings": [
-       {
-        "severity": "low",
-        "text": "When tabs overflow, a label is hard-cut mid-word with no cue that the strip scrolls (300px and Scrolled cells; in the 323px atlas cells even the 3-category Default cuts 'Productic'). Real phones at 360px+ fit three English labels, so this only bites on stress cases.",
-        "fix": "Add scroll-snap-type:x proximity with scroll-snap-align:start on tabs and a token-based edge fade (mask-image) on .st-category-tabs when scrollWidth > clientWidth."
-       },
-       {
-        "severity": "low",
-        "text": "The Overview tab's Used by says 'Not mapped yet' while the variant lists two screens; the footer also appears on pig-profile.* sub-pages and health-record.record-health / care-instructions / resolve-conditions.",
-        "fix": "Add those screen ids to variants.json usedBy and map the component in the atlas screen notes."
-       },
-       {
-        "severity": "low",
-        "text": "A stale categoryFooter with the c.disabled option survives in ux/system/sentri-components.js (no page loads it).",
-        "fix": "Delete ux/system/sentri-components.js with the legacy icon registry."
-       }
-      ],
-      "proposals": []
-     },
-     "files": {
-      "variantsJson": true,
-      "variants": [
-       "default"
       ]
      }
     },
@@ -29317,16 +29110,6 @@
      }
     },
     {
-     "name": "TaskLens",
-     "group": "Task skeleton",
-     "status": "in-design",
-     "gate": null,
-     "files": {
-      "variantsJson": false,
-      "variants": []
-     }
-    },
-    {
      "name": "TaskGroup",
      "group": "Task skeleton",
      "status": "in-design",
@@ -29338,16 +29121,6 @@
     },
     {
      "name": "TaskDock",
-     "group": "Task skeleton",
-     "status": "in-design",
-     "gate": null,
-     "files": {
-      "variantsJson": false,
-      "variants": []
-     }
-    },
-    {
-     "name": "TaskHold",
      "group": "Task skeleton",
      "status": "in-design",
      "gate": null,
@@ -29377,50 +29150,6 @@
      }
     },
     {
-     "name": "TaskStepper",
-     "group": "Task skeleton",
-     "status": "retired",
-     "gate": {
-      "status": "retired",
-      "round": 1,
-      "judged": "2026-10-10",
-      "commit": "67fbfe2",
-      "model": "claude-opus-5-5",
-      "classification": "variant-of:Stepper",
-      "note": "Merged into Stepper (variants row, count, well). The folder holds only a README pointing to Stepper; SentriTask.stepper is a compatibility adapter with no markup or CSS. Judged under Stepper/gate.json.",
-      "previous": {
-       "findings": [
-        {
-         "text": "TaskStepper faces should be Stepper variants",
-         "fixed": true
-        }
-       ]
-      }
-     },
-     "files": {
-      "variantsJson": false,
-      "variants": []
-     }
-    },
-    {
-     "name": "TaskPhotos",
-     "group": "Task skeleton",
-     "status": "retired",
-     "gate": {
-      "status": "retired",
-      "round": 1,
-      "judged": "2026-10-10",
-      "commit": "726879e",
-      "model": "claude-opus-5-5",
-      "classification": "variant-of:Photos",
-      "why": "Thin compatibility alias of SentriUI.photos with no CSS of its own. Judged as Photos."
-     },
-     "files": {
-      "variantsJson": false,
-      "variants": []
-     }
-    },
-    {
      "name": "TaskChoice",
      "group": "Task skeleton",
      "status": "in-design",
@@ -29435,24 +29164,6 @@
      "group": "Task skeleton",
      "status": "in-design",
      "gate": null,
-     "files": {
-      "variantsJson": false,
-      "variants": []
-     }
-    },
-    {
-     "name": "TaskWarning",
-     "group": "Task skeleton",
-     "status": "retired",
-     "gate": {
-      "status": "retired",
-      "round": 1,
-      "judged": "2026-10-10",
-      "commit": "726879e",
-      "model": "claude-opus-5-5",
-      "classification": "variant-of:Banner",
-      "why": "Thin compatibility alias of SentriUI.banner with no CSS of its own. Judged as Banner."
-     },
      "files": {
       "variantsJson": false,
       "variants": []
@@ -29500,16 +29211,6 @@
     },
     {
      "name": "TaskDay",
-     "group": "Task skeleton",
-     "status": "in-design",
-     "gate": null,
-     "files": {
-      "variantsJson": false,
-      "variants": []
-     }
-    },
-    {
-     "name": "TaskChips",
      "group": "Task skeleton",
      "status": "in-design",
      "gate": null,
@@ -34544,42 +34245,6 @@
      "severity": "low",
      "title": "Inline Disabled options sit on a filled wash each, unlike Default; reads as a second surface.",
      "detail": "Inline Disabled options sit on a filled wash each, unlike Default; reads as a second surface.\nFix: Keep Disabled options on the row background; the reason line carries the state.",
-     "source": "gate"
-    },
-    {
-     "id": "gate:CategoryFooter:0",
-     "target": {
-      "kind": "component",
-      "id": "CategoryFooter"
-     },
-     "kind": "broken",
-     "severity": "low",
-     "title": "When tabs overflow, a label is hard-cut mid-word with no cue that the strip scrolls (300px and…",
-     "detail": "When tabs overflow, a label is hard-cut mid-word with no cue that the strip scrolls (300px and Scrolled cells; in the 323px atlas cells even the 3-category Default cuts 'Productic'). Real phones at 360px+ fit three English labels, so this only bites on stress cases.\nFix: Add scroll-snap-type:x proximity with scroll-snap-align:start on tabs and a token-based edge fade (mask-image) on .st-category-tabs when scrollWidth > clientWidth.",
-     "source": "gate"
-    },
-    {
-     "id": "gate:CategoryFooter:1",
-     "target": {
-      "kind": "component",
-      "id": "CategoryFooter"
-     },
-     "kind": "design",
-     "severity": "low",
-     "title": "The Overview tab's Used by says 'Not mapped yet' while the variant lists two screens; the footer…",
-     "detail": "The Overview tab's Used by says 'Not mapped yet' while the variant lists two screens; the footer also appears on pig-profile.* sub-pages and health-record.record-health / care-instructions / resolve-conditions.\nFix: Add those screen ids to variants.json usedBy and map the component in the atlas screen notes.",
-     "source": "gate"
-    },
-    {
-     "id": "gate:CategoryFooter:2",
-     "target": {
-      "kind": "component",
-      "id": "CategoryFooter"
-     },
-     "kind": "design",
-     "severity": "low",
-     "title": "A stale categoryFooter with the c.disabled option survives in ux/system/sentri-components.js (no…",
-     "detail": "A stale categoryFooter with the c.disabled option survives in ux/system/sentri-components.js (no page loads it).\nFix: Delete ux/system/sentri-components.js with the legacy icon registry.",
      "source": "gate"
     },
     {

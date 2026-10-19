@@ -18,8 +18,9 @@ Context fill, hairline border, rounded corners and content slot. Padding belongs
 
 - **Page:** use on the app canvas; paper on app-background.
 - **Drawer:** use inside a drawer; inset on paper.
+- **Menu:** use inside a menu drawer, one where every row is an option or a verb (`Sheet({ surface: 'menu' })`, see [SURFACES](../../SURFACES.md)); paper on the tint, like the page.
 
-The enclosing `data-st-context="page|drawer"` chooses the variant. The default outside a context is page.
+The enclosing `data-st-context="page|drawer|menu"` chooses the variant. The default outside a context is page.
 
 ## States
 
