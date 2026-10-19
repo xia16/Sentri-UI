@@ -42,6 +42,7 @@ The owner's rounds of 2026-10-18/19 named each of these on the live Overview.
 - Keep as strong: the header and switch are untouched; the count due now is still the one large figure, now in the same place on every tile.
 - Squint (Gestation): the section switch, the tiles' large counts, the red "2 overdue".
 - Against the original: less, and every fact in a fixed place; no fact the worker acts on was dropped (phase, outcomes and the bar label moved to the task page).
+- A continuing cell now has no border on its open side, so the run reads as going on past the week and the arrow stands clear.
 - **Better because** the first screen answers "what's on and how far along" for every task at once, in the same place on each tile.
 
 ## Schedule fixes (2026-10-20)
@@ -52,6 +53,7 @@ Keep: the board's layout, cells and colours; today as the one ringed date and th
 
 - **minor** · Today's day label ("Thu") sat about 5px above the other labels and almost touched its ring: the ringed date is 28px tall and the others 18px, and each column centred its own pair.
 - **minor** · The board marks a run that continues into the next or last week with an open edge and an arrow, but the key never said what the arrow means.
+- **minor** · A run that continues into the next or last week is meant to end in an open edge with an arrow (README, Cell), but the cell kept its border on that side, so the arrow sat on the line ("~4▸").
 - **minor** · WeekBoard's atlas pages capped the board at 348px, so it sat flush left with a dead gutter; the Past its plan specimen showed a red "0" the Schedule never draws.
 
 #### Final look (the gate's pairs at 390 and 360, EN and ZH)
