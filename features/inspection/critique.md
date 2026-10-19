@@ -239,4 +239,6 @@ Scope: the Inspection pen page (`inspection.pen`) and the walk's pen header. Own
 | Pen log | a row in the verb list | Row navigation, alone at the end | keep (a preview of its last entries said the note twice; driver look, 26777d5) |
 | Pen header checkbox on the walk | Row select | — (`Tick all` on the pen page) | **cut** |
 
+Walk (gate): the Assistant's composer and finding answer lost their text on tab switch or Back (also on main; `assistant.conversation` is walked because it shares the prototype's code). They now keep it until sent.
+
 Order (owner, 2026-10-19, confirmed after judge round 1): the pen verbs stay on top; Needs attention follows them. Round 1 (void, calibration miss) asked for Needs attention first; the owner kept actions first.
