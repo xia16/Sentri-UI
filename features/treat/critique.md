@@ -343,3 +343,27 @@ Scope: the gate's judge on #222 found two defects carried over unchanged from ma
 ### Parts
 - Sheet (`bundle.css`): a page-presented one-pig form sits on the sheet body's gutter, with no second inset. At 360 it takes the narrow gutter, like the header and the several-pig form.
 - Strings: `medicines.record_treatment`, `.record_vaccination`, `.medicine`, `.vaccine`, `.method`, `.method.choose`, `.method.<injection|oral|topical|in_feed|in_water>` and `.unit.choose`, in EN and ZH. The stored method stays its English value; only the label follows the language.
+
+# Conditions (2026-10-17 to 10-19)
+
+Scope: the Medicines and Vaccines pickers, and the walk behind the saved toast. The owner's rounds on conditions and selection, built in the Inspection prototype (features/conditions/PRD.md, budget.md; PR #223). Baselines: `origin/main` at `92e0f0d`, the gate's pairs at 390 and 360, EN and ZH.
+
+### Keep
+
+- The pickers' search, Recently used and Categories, their rows and the footer.
+- The saved toast's words and place.
+
+### Problems
+
+- **minor** · The group headings (Recently used, Categories, All) had no icon, unlike the section titles on the Actions page.
+- **major** · A pen header counted only its tagged pigs (D4 · 2 pigs) while 14 more stood in the pen without ear tags, so the walk under-reported the pen.
+
+### Parts
+
+| Part | Drawn by today | The component whose job it is | Keep / fix / cut |
+|---|---|---|---|
+| Group heading icon | none | ChoiceList `icon` (starts at the card edge) | **fix** |
+
+### Self-crit
+
+- **Better because** the headings read as the same family as the Actions page's, and the walk behind the toast counts the pen's whole herd.

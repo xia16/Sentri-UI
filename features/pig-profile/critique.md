@@ -207,3 +207,19 @@ Held against the Farrowing room (its dock: one dark primary, Back outlined) and 
 - Reach: 50 screens move, all of them rendering a disabled or waiting control: environment (page, sensor-week, sensor-other), farrowing 14 (before, death, leave-edit, edit, born, task-blocked, edit-finished, foster, reconcile, pen-note, pen-fault, piglet-care, piglet-identity, piglet-death), piglet-processing 13 (sheet-coming, sheet-todo, sheet-breeders, sheet-late, sheet-done, sheet-notch, adjust-count, give-ids, counts, weight, record-death, move-piglets, set-count), pregnancy.check, feed-plan (editor, end-date), pig-list.health, pig-profile 7 (production-task, miscarriage, batch-membership, measure, body-condition, note, not-in-pig), health-record 5 (record-health, condition-picker, care-instructions, resolve-conditions, treatment), fostering (type, receive, result), move.transfer-sow. 4 more differ in one shot only by under 0.04% (assistant.finding and farrowing.search-results, which the gate marks unstable on base; farrowing.search-none, piglet-processing.more-actions): identical by eye, render noise. 237 identical; none broken.
 - Every moved screen: only the waiting footer button (dashed rim), a floor key (dashed, `ink-2` glyph), a disabled picker (Move's Destination pen: solid rim to dashed) or the Environment fan controls changed; layout, copy and the 360 Chinese footers are unchanged.
 - **Better because** unavailable is now said by the face and the rim, never by faded words, and no waiting control looks live.
+
+# Conditions (2026-10-17 to 10-19)
+
+Scope: the pig's Actions page and the drawers that open over it. The owner's rounds on conditions and selection, built in the Inspection prototype (features/conditions/PRD.md, budget.md; PR #223). Baselines: `origin/main` at `92e0f0d`, the gate's pairs at 390 and 360, EN and ZH.
+
+### Keep
+
+- The Actions page's sections, rows and the drawers over it.
+
+### Problems
+
+- **minor** · The action sheet was titled "More actions", though it is the only place the actions live; the owner renamed it Actions (2026-10-17).
+
+### Self-crit
+
+- **Better because** the title says what the page is.
