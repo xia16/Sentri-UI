@@ -236,3 +236,35 @@ The ruling fixes the design (board option B): no competing directions. Each scre
 
 ### Self-crit
 - No screen moves: the toasts are transient and the held screens from #218 already show the component. `ux/system/save-feedback.test.cjs` pins each action's outcome; the copy is in `strings.json` (`save.*`) with Chinese.
+
+# Conditions (2026-10-17 to 10-19)
+
+Scope: Record health, Choose conditions, and the screens that show the Actions page behind them. The owner's rounds on conditions and selection, built in the Inspection prototype (features/conditions/PRD.md, budget.md; PR #223). Baselines: `origin/main` at `92e0f0d`, the gate's pairs at 390 and 360, EN and ZH.
+
+### Keep
+
+- Record health's fields (Conditions, Care, Note) and Care's default; Save · N in the footer.
+- The picker's drawer, search, ✕ and footer Back up a level, Done · N (owner ruling B).
+- On these pigs and Recent at the first level.
+
+### Problems
+
+- **major** · Record health listed the pigs again under a docked Details panel, though the selection is made on the walk and fixed here; one pig opened the older drawer (owner, 2026-10-17).
+- **major** · The catalogue was two trees (Diseases | Symptoms) with duplicates and items in one place only; the first tap asked "disease or symptom?" before showing anything.
+- **major** · The first level gave group names only, so a worker couldn't tell what was inside without opening it.
+- **minor** · A typed search with no match offered "Add … · symptom" with no way to choose the kind.
+- **minor** · Found dead, Aborted and pen-wide signs sat in the catalogue as conditions.
+- **minor** · The action sheet was titled "More actions", though it is the only place the actions live; the owner renamed it Actions (2026-10-17).
+
+### Parts
+
+| Part | Drawn by today | The component whose job it is | Keep / fix / cut |
+|---|---|---|---|
+| Pig list + Details dock | page-built list | none (fields page as Record treatment) | **cut** |
+| First-level rows | ChoiceList rows | Row navigation (icon tile, examples) in the ChoiceList card | **fix** |
+| Add condition | text button | ChoiceList card + fields level, as Add medicine | **fix** |
+
+### Self-crit
+
+- Squint, the picker: Search, then On these pigs, then Symptoms' rows; Diseases sit right under them.
+- **Better because** the worker records against the pigs they already chose, sees what each area holds before opening it, and can add a missing condition with its kind.

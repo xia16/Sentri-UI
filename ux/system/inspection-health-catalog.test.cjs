@@ -75,11 +75,12 @@ test('health picker drills from categories to findings', () => {
   assert.match(model.healthList(context), /General appearance/);
 });
 
-test('single health uses a direct form while bulk keeps the list', () => {
+test('Record health is a page of fields for one pig or several, with no pig list (owner, 2026-10-17)', () => {
   const single = model.seed();
   model.openBulkAction(single, 'health', ['000267']);
   const singleHtml = model.overlay(single);
-  assert.match(singleHtml, /sheet single-action-sheet/);
+  assert.match(singleHtml, /sheet bulk-action-sheet/);
+  assert.match(singleHtml, /is-given-first/);
   // an action launched from the pig's page: no header line (Headers law, 2026-10-13); the pig is one Back away
   assert.doesNotMatch(singleHtml.match(/<header[^]*?<\/header>/)[0], /000267|st-header-line/);
   assert.match(singleHtml, /data-action="bulk-pick-health"/);
@@ -89,10 +90,10 @@ test('single health uses a direct form while bulk keeps the list', () => {
   model.openBulkAction(bulk, 'health', ['000254', '000267']);
   const bulkHtml = model.overlay(bulk);
   assert.match(bulkHtml, /sheet bulk-action-sheet/);
-  assert.match(bulkHtml, /pig-review-card bulk-pigs is-short/);
+  assert.doesNotMatch(bulkHtml, /pig-review-card|bulk-pigs|bulk-dock|data-bulk-include/);
   assert.doesNotMatch(bulkHtml, />2 selected<|facts-surface/);
-  assert.match(bulkHtml, /bulk-controls bulk-dock/);
-  assert.equal((bulkHtml.match(/data-bulk-include/g) || []).length, 2);
+  assert.match(bulkHtml, /data-action="bulk-pick-health"/);
+  assert.match(bulkHtml, /Save · 2 pigs/);
 });
 
 test('condition picker holds one height (its tallest level) for single and bulk records', () => {
@@ -221,18 +222,18 @@ test('catalogue levels (owner ruling B, 2026-10-16): the level as the title, a �
  model.handleRecordAction(c,'medicine-up','');html=model.overlay(c).split('<section class="sheet picker-step')[1];
  assert.match(head(html),/<h2 class="sheet-title">Medicines</);assert.match(head(html),cross,'the ✕ is there at the first level too');
  assert.match(html,/class="sheet-footer[^]*data-action="back"[^]*>Back</,'Back at the first level leaves');
- model.openBulkAction(c,'health',['000267']);c.view='bulk-health-picker';c.form.conditionPath=['Symptom','General appearance'];
+ model.openBulkAction(c,'health',['000267']);c.view='bulk-health-picker';c.form.conditionPath=['g:rear','t:diarrhoea'];
  html=model.overlay(c).split('<section class="sheet picker-step')[1];
- assert.match(head(html),/<h2 class="sheet-title">General appearance</);assert.match(head(html),cross);assert.doesNotMatch(head(html),/Symptoms|sheet-up/);
+ assert.match(head(html),/<h2 class="sheet-title">Diarrhoea</);assert.match(head(html),cross);assert.doesNotMatch(head(html),/Rear and belly|sheet-up/);
  assert.match(html,/class="sheet-footer[^]*data-action="condition-step" data-value="1"[^]*>Back</);
  assert.equal((html.match(/data-action="back"/g)||[]).length,0,'below the root no control leaves by Back');
  assert.equal((html.match(/data-action="dismiss"/g)||[]).length,1,'one ✕ (the scrim sits outside the section)');
  assert.equal((html.match(/data-action="bulk-health-done"/g)||[]).length,1);
  assert.doesNotMatch(html,/<details|chooser-header-back|Close chooser/);
  /* Back walks up one level at a time and keeps the ticks; at the root it is the leave action again. */
- c.form.conditions=['Lethargy'];
- assert.ok(model.handleRecordAction(c,'condition-step','1'));assert.deepEqual(c.form.conditionPath,['Symptom']);assert.deepEqual(c.form.conditions,['Lethargy']);
- html=model.overlay(c).split('<section class="sheet picker-step')[1];assert.match(head(html),/<h2 class="sheet-title">Symptoms</);assert.match(html,/class="sheet-footer[^]*data-action="condition-step" data-value="0"[^]*>Back</);
+ c.form.conditions=['Lethargic'];
+ assert.ok(model.handleRecordAction(c,'condition-step','1'));assert.deepEqual(c.form.conditionPath,['g:rear']);assert.deepEqual(c.form.conditions,['Lethargic']);
+ html=model.overlay(c).split('<section class="sheet picker-step')[1];assert.match(head(html),/<h2 class="sheet-title">Rear and belly</);assert.match(html,/class="sheet-footer[^]*data-action="condition-step" data-value="0"[^]*>Back</);
  assert.ok(model.handleRecordAction(c,'condition-step','0'));assert.deepEqual(c.form.conditionPath,[]);
  html=model.overlay(c).split('<section class="sheet picker-step')[1];assert.match(head(html),/<h2 class="sheet-title">Conditions</);assert.match(head(html),cross);assert.match(html,/class="sheet-footer[^]*data-action="back"[^]*>Back</);
 });

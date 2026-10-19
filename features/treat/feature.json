@@ -108,9 +108,9 @@
   "addsTo": [
     {
       "feature": "pig-profile",
-      "what": "Record treatment in the Health group of a pig's More actions",
+      "what": "Record treatment in the Health group of a pig's Actions",
       "screen": "pig-profile.actions",
-      "open": "More actions",
+      "open": "Actions",
       "under": "Health",
       "added": true
     },

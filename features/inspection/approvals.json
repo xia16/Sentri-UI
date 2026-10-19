@@ -4,7 +4,11 @@
     "commit": "fc98e360417f0ba10b86bc3249f0258ee4a53949",
     "date": "2026-10-12",
     "by": "owner",
-    "note": "Owner approved the animal row (Farrowing) and the compact-tag roster row (Inspection), 2026-10-12"
+    "note": "Owner approved the animal row (Farrowing) and the compact-tag roster row (Inspection), 2026-10-12",
+    "changed": {
+      "since": "#223",
+      "why": "Pigs without ear tags as one group row per pen, pen counts include them, tagged pigs by ID, a ticked pen keeps its header colour (owner, 2026-10-17 to 10-19)"
+    }
   },
   {
     "screen": "inspection.find-pig",
