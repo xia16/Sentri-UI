@@ -72,7 +72,7 @@
   };
   // Extra fictional task instances for the list-overflow review URL: ?section=gestation&many=1.
   if(new URLSearchParams(location.search).get('many')==='1'){
-    [33,34,35,36].forEach(n=>tasks.push({...tasks[0],id:'preg'+n,batch:'Batch '+n,counts:{7:[4,1],8:[5,2]}}));
+    [33,34,35,36].forEach(n=>tasks.push({...tasks[0],id:'preg'+n,batch:'Batch '+n,base:'preg31',counts:{7:[4,1],8:[5,2]}}));
   }
   // Future, unstarted task instances within the next seven sample farm-calendar days.
   const futureTasks=[
@@ -286,10 +286,13 @@
     farrow28:{label:'farrowing',next:{text:'4 due today'}},
     piglet27:{label:'litters due',next:{text:'4 litters tomorrow'}},
     vax21:{label:'overdue',tone:'act',due:6,day:3,days:3,over:1,late:true,next:null},
-    treat118:{label:'due now',due:5,day:2,days:5,next:{text:'5 again tomorrow'}}
+    treat118:{label:'due now',due:5,day:2,days:5,next:{text:'5 again tomorrow'}},
+    // The busy-day review (?many=1): further first-check batches, each with its own count and next window.
+    preg33:{label:'ready now',due:3,next:{text:'3 open tomorrow'}},preg34:{label:'ready now',due:4,next:{text:'5 open tomorrow'}},
+    preg35:{label:'ready now',due:2,next:{text:'6 open tomorrow'}},preg36:{label:'ready now',due:6,next:{text:'1 open tomorrow'}}
   };
   function tileModel(t){
-    const f=cardFields[t.id]||{},tf=tileFields[t.id]||{},current=workPreview==='mixed'?(f.state||'active'):workPreview;
+    const k=cardFields[t.id]?t.id:(t.base||t.id),f=cardFields[k]||{},tf=tileFields[t.id]||tileFields[k]||{},current=workPreview==='mixed'?(f.state||'active'):workPreview;
     let due=tf.due!=null?tf.due:(f.due?Object.values(f.due).reduce((a,b)=>a+b,0):0);
     if(t.id==='farrow28')due=taskRecords(t).filter(r=>r.active).length;
     const none=current==='waiting'||!due,day=tf.day||f.day||1,days=tf.days||f.days||1;
@@ -302,7 +305,7 @@
   // A section heading with its icon (owner, 2026-10-19), and "Schedule ›" as the heading's own action.
   const sectionIcons={Production:'production',Health:'health',Other:'transfer'};
   function overviewHeading(title,link){return SentriUI.heading({title,kind:'section',level:2,icon:icon(sectionIcons[title]),className:'ov-heading',action:link?{label:'Schedule',action:'schedule',value:link,ariaLabel:'Schedule, '+title}:''});}
-  const quietGroup=text=>SentriUI.rowGroup(SentriUI.row({title:text,variant:'plain'}));
+  const quietGroup=text=>SentriUI.heading({title:text,kind:'group',level:3,className:'ov-empty'});
   function overview(){
     const all=tasks.filter(t=>t.section===state.section),open=all.filter(t=>!t.completedAt&&!t.terminatedAt),closed=all.filter(t=>t.completedAt||t.terminatedAt);
     const prod=open.filter(t=>!t.category).sort(byStage),health=open.filter(t=>t.category==='health').sort(byStage),other=open.filter(t=>t.category==='other').sort((a,b)=>a.type.localeCompare(b.type)||a.batch.localeCompare(b.batch));
