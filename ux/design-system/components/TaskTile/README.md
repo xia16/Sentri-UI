@@ -39,7 +39,7 @@ White on the tinted page, 1px `line` border, `radius-panel`, 14px padding. **One
 | Overdue part | "5 now · 2 overdue": the overdue part is the only red. |
 | Nothing due now | The next count in grey ("8 tomorrow"), or "None now". No done state: a multi-day task stays until it closes. |
 | Past its plan | "6 overdue"; a red run segment per day over (the only colour); "1 day overdue". |
-| Ready to close | Everything recorded, task still open: a tick and "Ready to close" in the count line, the run full. A reminder only: closing stays inside the task. |
+| All recorded | Everything recorded, task still open: a tick and "Ready to close" in the count line, the run full. A reminder only: closing stays inside the task. |
 | Last day | "Day 3 of 3 · last day". |
 | Pressed | One step deeper (`press`). |
 | Long label / Chinese | Name and batch end in an ellipsis; the count never wraps; the Chinese task name fits one line. |

@@ -48,3 +48,5 @@ Questions, in order, for a worker opening Home at the start of a shift: 1 Is any
 | Closed today | Settled | One quiet line under Production |
 
 Cut from the Overview: phase, supporting counts, outcomes, progress labels, "All units · View task" (the Overview is all units; the tile is the tap), order numbers, walks, withdrawal as a Health fact (it shows on the row it blocks), deaths, open cases by disease, the sample date and the headline-number strip.
+
+To treat / Monitoring drawer (2026-10-19): which pig (tag), where (unit as the group, pen), how it is treated ("Hospital", "In place"), how long it waited ("1d"), what it has (condition tag). Cut: colour on every row (the title says what to do), the mark time, who marked it.

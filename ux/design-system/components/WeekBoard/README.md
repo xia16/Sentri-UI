@@ -21,7 +21,7 @@ Classification: **component** (a new job: no part draws work across days). One b
 1. **Day header**: Mon…Sun over the date in 15px mono; past dates muted; today ringed in ink. Not a target (a day column is too narrow for 48px).
 2. **Section band** (All only): a rule across the board, then the section's icon tile and name (15px / 600); no fill, so it is never a surface inside the board.
 3. **Task type**: 14px / 600 title written once, a 13px muted note on the right, a rule above.
-4. **Row** (a 48px button, the whole width): production rows show the batch ("B31", 13px mono) in a 34px gutter; health and other rows say what they are and where on their own line ("PRRS blood · Units 7, 9", 13px / 500). A row past its plan keeps its plain label; the red is on its cells.
+4. **Row** (a 48px button, the whole width), one kind only (owner, 2026-10-19): a 34px gutter holds the shortest label that tells the row from its siblings under the same type, 13px / 500 with tabular figures, at most about 4 characters: the batch ("B31"), a pickup time ("14:00"), a destination unit ("→6", or "→×3" for a transfer to three units; unit numbers are farm-wide, so a move across sections reads the same), a sample or product ("PRRS", "Amox"). The full name ("To Farrowing 6 · from Units 7, 8") heads the drawer the row opens. A row past its plan keeps its plain label; the red is on its cells.
 5. **Cell**: 30px tall, 13px / 500 mono, one per day. Done: the count on `well`. Today: paper on `ink-2`. Planned: an `ink-2` outline. Estimate: a dashed outline and "~". Waiting on today: "–" in a `line` outline. Nothing due: "·" on `well`. Past its plan: a red edge, nothing else red. Continues: an open edge with an arrow into next or last week.
 6. **Today band**: a `press` column behind the cells of today.
 
@@ -44,7 +44,7 @@ Classification: **component** (a new job: no part draws work across days). One b
 
 ## API
 
-`weekBoard({ days: [{ label, date, today, past }], groups: [{ band: { icon, label } | null, none, types: [{ title, sub, rows: [{ label, named, late, action, value, aria, cells }] }] }], empty })`. Cell codes: `''` nothing · `n` nothing due · `u` waiting on today · `dN` done · `oN` today · `pN` planned · `eN` estimate · `vN` past its plan, today · `wN` past its plan, a past day; a trailing `>` runs into next week, a leading `<` came from last week. `weekBoardKey([[code, title, line]])`.
+`weekBoard({ days: [{ label, date, today, past }], groups: [{ band: { icon, label } | null, none, types: [{ title, sub, rows: [{ label, late, action, value, aria, cells }] }] }], empty })`. Cell codes: `''` nothing · `n` nothing due · `u` waiting on today · `dN` done · `oN` today · `pN` planned · `eN` estimate · `vN` past its plan, today · `wN` past its plan, a past day; a trailing `>` runs into next week, a leading `<` came from last week. `weekBoardKey([[code, title, line]])`.
 
 ## Copy
 

@@ -7,6 +7,8 @@
 .ov-section>.ov-heading{margin:0 0 12px}
 .ov-tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .ov-section .st-row-group+.ov-tiles,.ov-closed{margin-top:10px}
+/* To treat / Monitoring: one group per unit, groups a section apart. */
+:is(.marked-treat,.marked-monitor) .st-row-group+.st-heading{margin-top:24px}
 
 /* ---------- Schedule: full screen, no page header, no bottom bar ---------- */
 #app.schedule-open{display:flex;flex-direction:column}

@@ -87,6 +87,7 @@ Generic component, used across sections. Registers are variants of this componen
 ## References and changelog
 
 2026-10-19 (workbench): text register, quiet (`className: 'st-text-action--quiet'`): a settled line that still opens something, muted 13px / 400 in the same 48px target (Home's "1 closed today").
+2026-10-19 (workbench): text register, `chevron: true`: the button spans the content width and ends in the row chevron, so a quiet line reads as a tap (Home's "1 closed today ›").
 
 2026-10-17 (medicines): text register `align` ('start' | 'end'), so a short text action lines up with the content edge instead of centring in its target.
 

@@ -17,7 +17,8 @@
         "workbench.work-due",
         "workbench.quiet-section",
         "workbench.work-waiting",
-        "workbench.closed-today"
+        "workbench.closed-today",
+        "workbench.to-treat"
       ]
     ],
     [
@@ -159,6 +160,11 @@
       "workbench.closed-today",
       "workbench.closed-task",
       "tap Pregnancy check · Batch 29"
+    ],
+    [
+      "workbench.gestation",
+      "workbench.to-treat",
+      "tap To treat"
     ]
   ],
   "screens": [
@@ -199,7 +205,7 @@
                 "shows": "\"6 overdue\"; one red run segment per day over (the only colour on the tile); \"1 day overdue\""
               },
               {
-                "state": "Ready to close",
+                "state": "All recorded",
                 "when": "Everything the task asks for is recorded and the task is still open",
                 "shows": "A quiet tick and \"Ready to close\" in the count line, the run full; closing stays inside the task"
               }
@@ -434,7 +440,7 @@
                 "shows": "\"6 overdue\"; one red run segment per day over (the only colour on the tile); \"1 day overdue\""
               },
               {
-                "state": "Ready to close",
+                "state": "All recorded",
                 "when": "Everything the task asks for is recorded and the task is still open",
                 "shows": "A quiet tick and \"Ready to close\" in the count line, the run full; closing stays inside the task"
               }
@@ -506,7 +512,7 @@
                 "shows": "\"6 overdue\"; one red run segment per day over (the only colour on the tile); \"1 day overdue\""
               },
               {
-                "state": "Ready to close",
+                "state": "All recorded",
                 "when": "Everything the task asks for is recorded and the task is still open",
                 "shows": "A quiet tick and \"Ready to close\" in the count line, the run full; closing stays inside the task"
               }
@@ -872,7 +878,7 @@
                 "shows": "\"6 overdue\"; one red run segment per day over (the only colour on the tile); \"1 day overdue\""
               },
               {
-                "state": "Ready to close",
+                "state": "All recorded",
                 "when": "Everything the task asks for is recorded and the task is still open",
                 "shows": "A quiet tick and \"Ready to close\" in the count line, the run full; closing stays inside the task"
               }
@@ -1135,7 +1141,7 @@
                 "shows": "\"6 overdue\"; one red run segment per day over (the only colour on the tile); \"1 day overdue\""
               },
               {
-                "state": "Ready to close",
+                "state": "All recorded",
                 "when": "Everything the task asks for is recorded and the task is still open",
                 "shows": "A quiet tick and \"Ready to close\" in the count line, the run full; closing stays inside the task"
               }
@@ -1257,7 +1263,7 @@
                 "shows": "An open edge with an arrow"
               }
             ],
-            "logic": "No \"late\" state and no grace period: unfinished work carries on, and each past day shows what was done. Counts up to 999 print in full; actual counts from 1,000 shorten to \"1.2k\", estimates to \"~1k\". Production rows show the batch (B31) in a gutter; health and other rows say what they are and where (\"PRRS blood · Units 7, 9\") on their own line. A row is the tap target.",
+            "logic": "No \"late\" state and no grace period: unfinished work carries on, and each past day shows what was done. Counts up to 999 print in full; actual counts from 1,000 shorten to \"1.2k\", estimates to \"~1k\". Every row is one line: the gutter holds the shortest label that tells it from its siblings (B31, 14:00, →6 or →×3 for a transfer to three units, PRRS); the full name heads the drawer the row opens. A row is the tap target.",
             "source": "schedulePage() in home-astra-prototype.js"
           }
         ],
@@ -1333,7 +1339,7 @@
                 "shows": "An open edge with an arrow"
               }
             ],
-            "logic": "No \"late\" state and no grace period: unfinished work carries on, and each past day shows what was done. Counts up to 999 print in full; actual counts from 1,000 shorten to \"1.2k\", estimates to \"~1k\". Production rows show the batch (B31) in a gutter; health and other rows say what they are and where (\"PRRS blood · Units 7, 9\") on their own line. A row is the tap target.",
+            "logic": "No \"late\" state and no grace period: unfinished work carries on, and each past day shows what was done. Counts up to 999 print in full; actual counts from 1,000 shorten to \"1.2k\", estimates to \"~1k\". Every row is one line: the gutter holds the shortest label that tells it from its siblings (B31, 14:00, →6 or →×3 for a transfer to three units, PRRS); the full name heads the drawer the row opens. A row is the tap target.",
             "source": "schedulePage() in home-astra-prototype.js"
           }
         ],
@@ -1409,7 +1415,7 @@
                 "shows": "An open edge with an arrow"
               }
             ],
-            "logic": "No \"late\" state and no grace period: unfinished work carries on, and each past day shows what was done. Counts up to 999 print in full; actual counts from 1,000 shorten to \"1.2k\", estimates to \"~1k\". Production rows show the batch (B31) in a gutter; health and other rows say what they are and where (\"PRRS blood · Units 7, 9\") on their own line. A row is the tap target.",
+            "logic": "No \"late\" state and no grace period: unfinished work carries on, and each past day shows what was done. Counts up to 999 print in full; actual counts from 1,000 shorten to \"1.2k\", estimates to \"~1k\". Every row is one line: the gutter holds the shortest label that tells it from its siblings (B31, 14:00, →6 or →×3 for a transfer to three units, PRRS); the full name heads the drawer the row opens. A row is the tap target.",
             "source": "schedulePage() in home-astra-prototype.js"
           }
         ],
@@ -1485,7 +1491,7 @@
                 "shows": "An open edge with an arrow"
               }
             ],
-            "logic": "No \"late\" state and no grace period: unfinished work carries on, and each past day shows what was done. Counts up to 999 print in full; actual counts from 1,000 shorten to \"1.2k\", estimates to \"~1k\". Production rows show the batch (B31) in a gutter; health and other rows say what they are and where (\"PRRS blood · Units 7, 9\") on their own line. A row is the tap target.",
+            "logic": "No \"late\" state and no grace period: unfinished work carries on, and each past day shows what was done. Counts up to 999 print in full; actual counts from 1,000 shorten to \"1.2k\", estimates to \"~1k\". Every row is one line: the gutter holds the shortest label that tells it from its siblings (B31, 14:00, →6 or →×3 for a transfer to three units, PRRS); the full name heads the drawer the row opens. A row is the tap target.",
             "source": "schedulePage() in home-astra-prototype.js"
           },
           {
@@ -1567,7 +1573,7 @@
                 "shows": "An open edge with an arrow"
               }
             ],
-            "logic": "No \"late\" state and no grace period: unfinished work carries on, and each past day shows what was done. Counts up to 999 print in full; actual counts from 1,000 shorten to \"1.2k\", estimates to \"~1k\". Production rows show the batch (B31) in a gutter; health and other rows say what they are and where (\"PRRS blood · Units 7, 9\") on their own line. A row is the tap target.",
+            "logic": "No \"late\" state and no grace period: unfinished work carries on, and each past day shows what was done. Counts up to 999 print in full; actual counts from 1,000 shorten to \"1.2k\", estimates to \"~1k\". Every row is one line: the gutter holds the shortest label that tells it from its siblings (B31, 14:00, →6 or →×3 for a transfer to three units, PRRS); the full name heads the drawer the row opens. A row is the tap target.",
             "source": "schedulePage() in home-astra-prototype.js"
           },
           {
@@ -1609,6 +1615,34 @@
             "shows": "Task · batch, \"Completed · 08:45\" or \"Ended early · …\"",
             "logic": "The Overview keeps only a quiet muted \"N closed today\" line (owner, 2026-10-19); the list lives here. Older receipts live in Records.",
             "source": "closedToday()"
+          }
+        ],
+        "controls": [],
+        "copy": [
+          "(raw)"
+        ],
+        "edge": [],
+        "rules": [],
+        "issues": []
+      }
+    },
+    {
+      "id": "workbench.to-treat",
+      "name": "Overview · to treat",
+      "zh": "总览 · 待治疗",
+      "status": "in-design",
+      "url": "/ux/system/home-astra-prototype.html?section=gestation&sheet=treat",
+      "preset": "",
+      "figma": "",
+      "notes": {
+        "purpose": "Tapping To treat on the Overview: every pig marked to treat across the section's units, unit by unit (owner, 2026-10-19). Monitoring opens the same list for the pigs marked Monitor.",
+        "states": [],
+        "elements": [
+          {
+            "name": "Marked pigs, one group per unit",
+            "shows": "Unit 7, then its pigs: tag over \"Pen B2 · Hospital · 1d\", the condition as a plain tag on the right",
+            "logic": "Row · Animal with tags. No row is coloured: the title already says what to do. \"Hospital\" or \"In place\" is how the pig is treated; \"1d\" marks a pig waiting since yesterday. A pig opens its unit's walk on the Health lens.",
+            "source": "markedList()"
           }
         ],
         "controls": [],
