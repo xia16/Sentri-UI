@@ -1263,7 +1263,7 @@
                 "shows": "An open edge with an arrow"
               }
             ],
-            "logic": "No \"late\" state and no grace period: unfinished work carries on, and each past day shows what was done. Counts up to 999 print in full; actual counts from 1,000 shorten to \"1.2k\", estimates to \"~1k\". Every row is one line: the gutter holds the shortest label that tells it from its siblings (B31, 14:00, →6 or →×3 for a transfer to three units, PRRS); the full name heads the drawer the row opens. A row is the tap target.",
+            "logic": "No \"late\" state and no grace period: unfinished work carries on, and each past day shows what was done. Counts up to 999 print in full; actual counts from 1,000 shorten to \"1.2k\", estimates to \"~1k\". Every row is one line: the gutter holds the shortest label that tells it from its siblings (B31; 14:00; a transfer's batch, B29, or Mixed; PRRS); the full name heads the drawer the row opens. A row is the tap target.",
             "source": "schedulePage() in home-astra-prototype.js"
           }
         ],
@@ -1339,7 +1339,7 @@
                 "shows": "An open edge with an arrow"
               }
             ],
-            "logic": "No \"late\" state and no grace period: unfinished work carries on, and each past day shows what was done. Counts up to 999 print in full; actual counts from 1,000 shorten to \"1.2k\", estimates to \"~1k\". Every row is one line: the gutter holds the shortest label that tells it from its siblings (B31, 14:00, →6 or →×3 for a transfer to three units, PRRS); the full name heads the drawer the row opens. A row is the tap target.",
+            "logic": "No \"late\" state and no grace period: unfinished work carries on, and each past day shows what was done. Counts up to 999 print in full; actual counts from 1,000 shorten to \"1.2k\", estimates to \"~1k\". Every row is one line: the gutter holds the shortest label that tells it from its siblings (B31; 14:00; a transfer's batch, B29, or Mixed; PRRS); the full name heads the drawer the row opens. A row is the tap target.",
             "source": "schedulePage() in home-astra-prototype.js"
           }
         ],
@@ -1415,7 +1415,7 @@
                 "shows": "An open edge with an arrow"
               }
             ],
-            "logic": "No \"late\" state and no grace period: unfinished work carries on, and each past day shows what was done. Counts up to 999 print in full; actual counts from 1,000 shorten to \"1.2k\", estimates to \"~1k\". Every row is one line: the gutter holds the shortest label that tells it from its siblings (B31, 14:00, →6 or →×3 for a transfer to three units, PRRS); the full name heads the drawer the row opens. A row is the tap target.",
+            "logic": "No \"late\" state and no grace period: unfinished work carries on, and each past day shows what was done. Counts up to 999 print in full; actual counts from 1,000 shorten to \"1.2k\", estimates to \"~1k\". Every row is one line: the gutter holds the shortest label that tells it from its siblings (B31; 14:00; a transfer's batch, B29, or Mixed; PRRS); the full name heads the drawer the row opens. A row is the tap target.",
             "source": "schedulePage() in home-astra-prototype.js"
           }
         ],
@@ -1491,7 +1491,7 @@
                 "shows": "An open edge with an arrow"
               }
             ],
-            "logic": "No \"late\" state and no grace period: unfinished work carries on, and each past day shows what was done. Counts up to 999 print in full; actual counts from 1,000 shorten to \"1.2k\", estimates to \"~1k\". Every row is one line: the gutter holds the shortest label that tells it from its siblings (B31, 14:00, →6 or →×3 for a transfer to three units, PRRS); the full name heads the drawer the row opens. A row is the tap target.",
+            "logic": "No \"late\" state and no grace period: unfinished work carries on, and each past day shows what was done. Counts up to 999 print in full; actual counts from 1,000 shorten to \"1.2k\", estimates to \"~1k\". Every row is one line: the gutter holds the shortest label that tells it from its siblings (B31; 14:00; a transfer's batch, B29, or Mixed; PRRS); the full name heads the drawer the row opens. A row is the tap target.",
             "source": "schedulePage() in home-astra-prototype.js"
           },
           {
@@ -1573,7 +1573,7 @@
                 "shows": "An open edge with an arrow"
               }
             ],
-            "logic": "No \"late\" state and no grace period: unfinished work carries on, and each past day shows what was done. Counts up to 999 print in full; actual counts from 1,000 shorten to \"1.2k\", estimates to \"~1k\". Every row is one line: the gutter holds the shortest label that tells it from its siblings (B31, 14:00, →6 or →×3 for a transfer to three units, PRRS); the full name heads the drawer the row opens. A row is the tap target.",
+            "logic": "No \"late\" state and no grace period: unfinished work carries on, and each past day shows what was done. Counts up to 999 print in full; actual counts from 1,000 shorten to \"1.2k\", estimates to \"~1k\". Every row is one line: the gutter holds the shortest label that tells it from its siblings (B31; 14:00; a transfer's batch, B29, or Mixed; PRRS); the full name heads the drawer the row opens. A row is the tap target.",
             "source": "schedulePage() in home-astra-prototype.js"
           },
           {

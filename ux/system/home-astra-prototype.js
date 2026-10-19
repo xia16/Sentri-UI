@@ -354,20 +354,20 @@
       '0':{production:[['Return heat','estimated returns',[['B30',['','d2','d6','o10','e8','e6','e4>']],['B39',['','','','','','','e3>']]]],
                        ['Pregnancy check','5 batches',[['B28',['d6','d6','d6','n','','','']],['B29',['','','d11','d6','','','']],['B31',['','','','o5','p8','p7','']],['B32',['','','','n','p8','','']],['B38',['','','','','p22','u','u']]]]],
            health:[['Vaccination','1 plan',[['PRRS · Units 7, 8',['','d4','d2','v6','','',''],true]]],['Treatment','1 order',[['Amoxicillin · Units 7, 9',['','','d5','o5','p5','p5','p5>']]]]],
-           other:[['Outbound','2 orders',[['Pickup 14:00 · Units 7, 8',['','','','o24','','','']],['Pickup 16:30 · Unit 8',['','','','o18','','','']]]],['Pig transfer','2 orders',[['To Farrowing 6 · from Units 7, 8',['','','','o8','','','']],['To Unit 9 · from Unit 8',['','','d12','o8','','','']]]],['Sampling','2 tasks',[['PRRS blood · Units 7, 9',['','','','o10','','','']],['Oral fluids · Unit 8',['','','','o4','','','']]]]]},
+           other:[['Outbound','2 orders',[['Pickup 14:00 · Units 7, 8',['','','','o24','','','']],['Pickup 16:30 · Unit 8',['','','','o18','','','']]]],['Pig transfer','2 orders',[['Batch 29 to Farrowing 6 · from Units 7, 8',['','','','o8','','','']],['To Unit 9 · from Unit 8',['','','d12','o8','','','']]]],['Sampling','2 tasks',[['PRRS blood · Units 7, 9',['','','','o10','','','']],['Oral fluids · Unit 8',['','','','o4','','','']]]]]},
       '1':{production:[['Return heat','estimated returns',[['B30',['<e2','','','','','','']],['B39',['<e5','e6','e5','e3','e2','e1','']]]],['Pregnancy check','1 batch',[['B34',['','p7','p7','p6','','','']]]]],
            health:[['Treatment','1 order',[['Amoxicillin · Units 7, 9',['<p5','','','','','','']]]]],other:[['Pig transfer','1 order',[['To Units 6, 10, 11 · from Units 7, 8',['','','p30','','','','']]]],['Sampling','1 task',[['Blood repeat · Unit 7',['','p6','','','','','']]]]]},
       '-1':{production:[['Return heat','1 batch',[['B26',['d3','d5','d4','d2','d1','','']]]],['Pregnancy check','1 batch',[['B27',['','','d10','d9','d8','','']]]]],health:[],other:[['Outbound','1 order',[['Pickup 09:00 · Units 7, 9',['','','d22','','','','']]]]]}
     },
     breeding:{'0':{production:[['Heat check','estimated in heat',[['B34',['','','d18','o20','e6','','']],['B35',['','','','o10','e6','e2','']]]],['Breeding','1 batch',[['B34',['','d9','d14','o5','e7','e3','e1>']]]]],health:[],other:[]}},
-    farrowing:{'0':{production:[['Farrowing','1 batch',[['B28',['','','d4','o2','e5','e4','e3>']]]],['Processing','1 batch',[['B27',['','d4','d4','n','p4','','']]]]],health:[],other:[['Pig transfer','1 order',[['To Nursery 12 · from Unit 6',['','','','o96','','','']]]]]}}
+    farrowing:{'0':{production:[['Farrowing','1 batch',[['B28',['','','d4','o2','e5','e4','e3>']]]],['Processing','1 batch',[['B27',['','d4','d4','n','p4','','']]]]],health:[],other:[['Pig transfer','1 order',[['Batch 27 to Nursery 12 · from Unit 6',['','','','o96','','','']]]]]}}
   };
   // The gutter label of a health or other row: what tells it from its siblings under the same type, at most about 4 characters.
-  // A transfer names its destination unit (unit numbers are farm-wide, so a move across sections reads the same), or how many
-  // units it goes to when several ("→×3"); the drawer names them all.
+  // A transfer that moves a batch shows the batch, as production rows do; any other move (mixed pigs, many units to many)
+  // reads "Mixed". The drawer names where from and where to.
   const gutterLabel={'PRRS · Units 7, 8':'PRRS','Amoxicillin · Units 7, 9':'Amox','Pickup 14:00 · Units 7, 8':'14:00','Pickup 16:30 · Unit 8':'16:30',
-    'Pickup 09:00 · Units 7, 9':'9:00','To Farrowing 6 · from Units 7, 8':'→6','To Unit 9 · from Unit 8':'→9','To Nursery 12 · from Unit 6':'→12',
-    'To Units 6, 10, 11 · from Units 7, 8':'→×3',
+    'Pickup 09:00 · Units 7, 9':'9:00','Batch 29 to Farrowing 6 · from Units 7, 8':'B29','To Unit 9 · from Unit 8':'Mixed','Batch 27 to Nursery 12 · from Unit 6':'B27',
+    'To Units 6, 10, 11 · from Units 7, 8':'Mixed',
     'PRRS blood · Units 7, 9':'PRRS','Oral fluids · Unit 8':'Oral','Blood repeat · Unit 7':'PRRS'};
   const cellWord={n:'Nothing due',u:'Waiting on today',d:'Done',o:'Due today',p:'Planned',e:'Estimate',v:'Past its plan',w:'Past its plan'};
   function scheduleWeek(){return schedule[state.section]?.[String(state.scheduleWeek||0)]||{production:[],health:[],other:[]};}

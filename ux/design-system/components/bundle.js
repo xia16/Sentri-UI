@@ -1365,7 +1365,7 @@
     const head=`<div class="st-week-days"><span></span><span class="st-week-grid">${days.map(d=>`<span class="st-week-day"${d.today?' data-today=""':''}${d.past?' data-past=""':''}><span>${esc(d.label)}</span><b>${esc(d.date)}</b></span>`).join('')}</span></div>`;
     const body=groups.map(g=>(g.band?`<div class="st-week-band"><span class="st-week-band-icon">${g.band.icon||''}</span><b>${esc(g.band.label)}</b></div>`:'')+
       ((g.types||[]).map(t=>`<div class="st-week-type"><div class="st-week-type-head"><span>${esc(t.title)}</span><small>${esc(t.sub||'')}</small></div>${(t.rows||[]).map(r=>`<button type="button" class="st-week-row"${r.action?` data-action="${esc(r.action)}" data-value="${esc(r.value)}"`:''} aria-label="${esc(r.aria||r.label)}"><span class="st-week-batch"${r.late?' data-late=""':''}>${esc(r.label)}</span><span class="st-week-grid">${(r.cells||[]).map(weekCell).join('')}</span></button>`).join('')}</div>`).join('')||(g.band&&g.none?`<p class="st-week-none">${esc(g.none)}</p>`:''))).join('');
-    const band=today>=0?`<span class="st-week-today" aria-hidden="true" style="left:calc(52px + (100% - 84px) / 7 * ${today} + ${3*today}px);width:calc((100% - 84px) / 7)"></span>`:'';
+    const band=today>=0?`<span class="st-week-today" aria-hidden="true" style="left:calc(54px + (100% - 86px) / 7 * ${today} + ${3*today}px);width:calc((100% - 86px) / 7)"></span>`:'';
     return `<div class="st-week" data-ds="WeekBoard">${head}${empty?`<p class="st-week-none" data-week="">${esc(empty)}</p>`:body+band}</div>`;
   }
   function weekBoardKey(rows=[]){

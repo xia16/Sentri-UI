@@ -1208,7 +1208,7 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 
 /* WeekBoard: a week of work, one line per task, a count per day (components/WeekBoard/README.md). */
 .st-week{position:relative;padding:4px 14px 6px;background:var(--paper);border:1px solid var(--line);border-radius:var(--radius-panel);font-family:var(--font-sans);color:var(--ink)}
-.st-week-days,.st-week-row{display:grid;grid-template-columns:34px 1fr;gap:4px;align-items:center}
+.st-week-days,.st-week-row{display:grid;grid-template-columns:36px 1fr;gap:4px;align-items:center}
 .st-week-days{position:relative;z-index:1}
 .st-week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
 .st-week-day{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:44px;color:var(--muted);font:500 11px var(--font-sans)}
