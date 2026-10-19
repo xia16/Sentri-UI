@@ -10,6 +10,8 @@
 .inspection-phone .inspect-list{padding:0 18px 20px;gap:12px}
 .inspection-phone .inspect-pen{border:1px solid var(--line);border-radius:18px;background:#fff}
 .inspection-phone .inspect-pen-head{background:#f8faf5;min-height:50px;padding-left:0;border-bottom-color:#e8eddf}
+/* The pen header is a door only (no checkbox, owner 2026-10-19): its name lines up with the pig rows' boxes. */
+.inspection-phone .inspect-pen-head{padding-left:var(--space-12)}
 .inspection-phone .pen-name strong{font-weight:500}
 .inspection-phone .pen-feed strong{font-family:var(--font-sans);font-weight:500;font-size:var(--type-row-title-size)}
 .inspection-phone .roster-pig{border-bottom-color:#e8eddf;padding-right:12px}
@@ -21,3 +23,5 @@
  .inspection-phone .task-activity{padding-left:12px;padding-right:12px}
 }
 .inspection-phone .inspect-pen-head .pen-select-target.st-row{flex:none;width:var(--tap-min);min-width:var(--tap-min);min-height:var(--tap-min);padding:0;justify-content:center}
+/* Pen page (owner, 2026-10-19): the fault rows and the note card under Needs attention are two cards, 8px apart. */
+.inspection-phone .detail-section .st-row-group+.record-card-stack{margin-top:var(--space-8)}
