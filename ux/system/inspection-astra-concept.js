@@ -1419,7 +1419,7 @@ function installV2(){
  else if(a==='read-pen-note'){c.penId=v;c.closedNoteId=null;c.view='read-pen-note';}
  else if(a==='close-pen-note'){closePenNote(c,c.penId);}
  else if(a==='undo-close-pen-note'){undoPenNoteClose(c,c.penId);}
- else if(a==='pen-note'){c.penId=v;const d=(c.penDrafts||={});d['note:'+v]||={note:pen(c,v).note};c.form=d['note:'+v];c.view='pen-note';}else if(a==='pen-observe'){c.penId=v;c.form={observations:[...(pen(c,v).observations||[])]};c.view='pen-observe';}
+ else if(a==='pen-note'){c.penId=v;const d=(c.penDrafts||={});d['note:'+v]||={note:pen(c,v).note};c.form=d['note:'+v];c.view='pen-note';}else if(a==='pen-observe'){c.penId=v;const d=(c.penDrafts||={});d['observe:'+v]||={observations:[...(pen(c,v).observations||[])]};c.form=d['observe:'+v];c.view='pen-observe';}
  else if(a==='save-pen-note'&&valid(c)){pen(c,c.penId).note=c.form.note.trim();delete c.penDrafts?.['note:'+c.penId];pen(c,c.penId).noteBy='G. Hansen · today · 09:41';addEvent(c,'Pen note',[c.penId],c.form.note.trim());c.view=c.navTrail?.at(-1)?.view==='read-pen-note'?'read-pen-note':'pen-detail';}
  else if(a==='pig-profile'){c.pigId=v;c.profileTab='details';c.pigLogFilter='All';c.view='pig-profile';}
  else if(a==='tick-pen'){tickPen(c,v);}
@@ -1704,7 +1704,7 @@ function handleRecordAction(c,a,v){
  if(a==='condition-add-back'){const ad=c.form.condAdd;if(ad.picking){ad.picking=false;return true;}c.form.conditionPath=ad.back.path;c.form.search=ad.back.search;delete c.form.condAdd;return true;}
  if(a==='condition-add-save'){const ad=c.form.condAdd;if(!conditionAddReady(ad)){ad.showRequired=true;return true;}addFarmCondition(ad.name.trim(),ad.category);const name=ad.name.trim();if(!c.form.conditions.includes(name))c.form.conditions.push(name);c.form.conditionPath=[ad.category];c.form.search='';delete c.form.condAdd;return true;}
  if(a==='pen-observe-toggle'){const o=c.form.observations;o.includes(v)?o.splice(o.indexOf(v),1):o.push(v);return true;}
- if(a==='save-pen-observe'){const pe=pen(c,c.penId);pe.observations=CC.penObservations.map(o=>o.id).filter(id=>c.form.observations.includes(id));addEvent(c,'Pen observation',[c.penId],pe.observations.map(id=>CC.penObservations.find(o=>o.id===id).en).join(', ')||'Nothing unusual');c.view='pen-detail';return true;}
+ if(a==='save-pen-observe'){delete c.penDrafts?.['observe:'+c.penId];const pe=pen(c,c.penId);pe.observations=CC.penObservations.map(o=>o.id).filter(id=>c.form.observations.includes(id));addEvent(c,'Pen observation',[c.penId],pe.observations.map(id=>CC.penObservations.find(o=>o.id===id).en).join(', ')||'Nothing unusual');c.view='pen-detail';return true;}
  if(a==='condition-step'){c.form.conditionPath=(c.form.conditionPath||[]).slice(0,+v);c.form.search='';return true;}
  if(a==='condition-level'){const path=c.form.conditionPath||=[];if(!path.length&&['Disease','Symptom'].includes(v))c.form.kind=v;path.push(v);return true;}
  if(a==='record-optional-open'){Object.assign(c.form,{optionalKey:v,optionalDraft:c.form[v]||'',optionalReturn:c.view,search:'',catalogSection:'',catalogGroup:''});c.view='record-optional';return true;}
