@@ -60,7 +60,7 @@
     {id:'tr242',section:'gestation',category:'other',type:'Pig transfer',icon:'transfer',batch:'TR-242',title:'Move to Unit 9',line:'From Unit 8 · 12 of 20 moved',due:8,unit:'pigs',counts:{8:[20,12]}},
     {id:'s11',section:'gestation',category:'other',type:'Sampling',icon:'note',batch:'S-11',title:'PRRS blood samples',line:'Units 7, 9',due:10,unit:'pigs',counts:{7:[6,0],9:[4,0]}},
     {id:'s12',section:'gestation',category:'other',type:'Sampling',icon:'note',batch:'S-12',title:'Oral fluid samples',line:'Unit 8',due:4,unit:'pens',counts:{8:[4,0]}},
-    {id:'tr250',section:'farrowing',category:'other',type:'Pig transfer',icon:'transfer',batch:'TR-250',title:'Move weaned pigs to Nursery 12',line:'From Unit 6',due:96,unit:'pigs',counts:{6:[96,0]}}
+    {id:'tr250',section:'farrowing',category:'other',type:'Pig transfer',icon:'transfer',batch:'TR-250',title:'Move to Nursery, Unit 12',line:'Weaned pigs from Unit 6',due:96,unit:'pigs',counts:{6:[96,0]}}
   );
   // Everything recorded, task still open (owner, 2026-10-19): the tile reminds the worker to close it; closing stays inside the task.
   tasks.push({id:'preg28',section:'gestation',type:'Pregnancy check',batch:'Batch 28',overviewOnly:true,counts:{7:[10,10],8:[8,8]},outcomes:['Pregnant','Not pregnant','Recheck']});
@@ -332,8 +332,8 @@
     const closedLine=closed.length?`<div class="ov-closed">${SentriUI.button({register:'text',align:'start',className:'st-text-action--quiet',icon:icon('check'),label:`${closed.length} closed today`,action:'closed-today',chevron:true})}</div>`:'';
     const m=marks[state.section]||{treat:0,monitor:0,treatUnits:[],monitorUnits:[]};
     const care=SentriUI.rowGroup(
-      SentriUI.row({variant:'navigation',icon:icon('treat'),title:'To treat',description:m.treat?(m.sinceYesterday?`${m.sinceYesterday} waiting since yesterday`:unitList(m.treatUnits)):'Nothing marked',trailing:{text:String(m.treat)},action:m.treat?'to-treat':'',trail:m.treat?'auto':'none'})+
-      SentriUI.row({variant:'navigation',icon:icon('monitor'),title:'Monitoring',description:m.monitor?unitList(m.monitorUnits):'Nothing marked',trailing:{text:String(m.monitor)},action:m.monitor?'monitoring':'',trail:m.monitor?'auto':'none'})
+      SentriUI.row({variant:'navigation',icon:icon('treat'),title:'To treat',description:m.treat?(m.sinceYesterday?`${m.sinceYesterday} waiting since yesterday`:unitList(m.treatUnits)):'Nothing marked',trailing:m.treat?{text:String(m.treat)}:'',action:m.treat?'to-treat':'',trail:m.treat?'auto':'none'})+
+      SentriUI.row({variant:'navigation',icon:icon('monitor'),title:'Monitoring',description:m.monitor?unitList(m.monitorUnits):'Nothing marked',trailing:m.monitor?{text:String(m.monitor)}:'',action:m.monitor?'monitoring':'',trail:m.monitor?'auto':'none'})
     );
     const otherRows=other.length?SentriUI.rowGroup(other.map(t=>SentriUI.row({variant:'navigation',icon:icon(t.icon||'note'),title:t.title||`${t.type} · ${t.batch}`,description:t.warn?[t.line,{text:t.warn,tone:'red'}]:(t.line||''),trailing:{text:`${t.due} ${t.unit}`},action:'task',value:t.id})).join('')):quietGroup('Nothing open');
     return header()+scopeRail()+`<div class="app-scroll screen-enter ov-page">
@@ -369,6 +369,8 @@
     'Pickup 09:00 · Units 7, 9':'9:00','Batch 29 to Farrowing 6 · from Units 7, 8':'B29','To Unit 9 · from Unit 8':'Mixed','Batch 27 to Nursery 12 · from Unit 6':'B27',
     'To Units 6, 10, 11 · from Units 7, 8':'Mixed',
     'PRRS blood · Units 7, 9':'PRRS','Oral fluids · Unit 8':'Oral','Blood repeat · Unit 7':'PRRS'};
+  // A day in the row drawer, count first (gate12): "11 done", "~6 expected", "Nothing due".
+  const countPhrase=c=>{const k=c[0],n=(+c.slice(1)).toLocaleString('en');return ({n:'Nothing due',u:'Waiting on today',d:n+' done',o:n+' due today',p:n+' planned',e:'~'+n+' expected',v:n+' due · past its plan',w:n+' done · past its plan'})[k]||'';};
   const cellWord={n:'Nothing due',u:'Waiting on today',d:'Done',o:'Due today',p:'Planned',e:'Estimate',v:'Past its plan',w:'Past its plan'};
   function scheduleWeek(){return schedule[state.section]?.[String(state.scheduleWeek||0)]||{production:[],health:[],other:[]};}
   function scheduleGroups(){
@@ -386,7 +388,7 @@
       days:meta.dates.map((d,i)=>({label:dayShort[i],date:d,today:i===meta.today,past:meta.past.includes(i)})),
       empty:groups.every(([,types])=>!types.length)?'Nothing planned this week':'',
       groups:groups.map(([k,types])=>({band:f==='all'?{icon:icon(sectionIcon[k]),label:sectionName[k]}:null,none:'Nothing planned',
-        types:types.map(([type,sub,batches],ti)=>({title:type,sub,rows:batches.map(([b,cells,late],bi)=>({label:gutterLabel[b]||b,late:!!late,action:'schedule-row',value:k+'.'+ti+'.'+bi,aria:type+', '+b+', this week',cells}))}))}))
+        types:types.map(([type,sub,batches],ti)=>({title:type,sub:/^\d+ (batch|batches|order|orders|task|tasks|plan|plans)$/.test(sub)?'':sub,rows:batches.map(([b,cells,late],bi)=>({label:gutterLabel[b]||b,late:!!late,action:'schedule-row',value:k+'.'+ti+'.'+bi,aria:type+', '+b+', this week',cells}))}))}))
     });
     const prev=weekMeta[String(+wk-1)],next=weekMeta[String(+wk+1)];
     // Week paging in the footer, from the Sheet footer's own parts: the earlier week is the footer's back slot (a chevron), the later week its primary.
@@ -397,7 +399,7 @@
       ${foot}`;
   }
   function scheduleKey(){
-    const rows=[['d12','Done','How many were recorded that day'],['o10','Today','Due today'],['p8','Planned','Exact number, already known'],['e6','Estimate','Expected: heat, returns, farrowing'],['u','Waiting on today','Known after today’s results'],['v4','Past its plan','The task should have finished; it carries on until done'],['n','Nothing due','Running, nothing to do that day']];
+    const rows=[['d12','Done','How many were recorded that day'],['o10','Today','Due today'],['p8','Planned','Exact number, already known'],['e6','Estimate','Expected: heat, returns, farrowing'],['u','Waiting on today','Known after today’s results'],['v4','Past its plan','Should have ended; carries on'],['n','Nothing due','Running, nothing to do that day']];
     drawer('How to read the board',SentriUI.heading({title:'Tap a row to see its week in numbers',kind:'group',level:3})+SentriUI.weekBoardKey(rows),{size:'medium'});
     overlay.querySelector('.sheet,.dialog')?.classList.add('schedule-key');
   }
@@ -409,7 +411,7 @@
     const value=c=>c[0]==='u'?'–':c[0]==='n'?'·':(c[0]==='e'?'~':'')+(+c.slice(1)).toLocaleString('en');
     const list=cells.map((c,i)=>({i,code:(c||'').replace(/[<>]/g,'')})).filter(r=>r.code);
     // The task is the title; the batch heads the days (title + batch overflowed the header at 360).
-    const body=SentriUI.heading({title:String(b).replace(/^B(\d+)$/,'Batch $1'),kind:'group',level:3})+SentriUI.rowGroup(list.map(r=>SentriUI.row({title:`${dayNames[r.i]} ${meta.dates[r.i]} ${monthOf(wk,r.i)}${r.i===meta.today?' · today':''}`,trailing:{text:value(r.code)},description:cellWord[r.code[0]]})).join(''));
+    const body=SentriUI.heading({title:String(b).replace(/^B(\d+)$/,'Batch $1'),kind:'group',level:3})+SentriUI.rowGroup(list.map(r=>SentriUI.row({title:countPhrase(r.code),description:`${dayNames[r.i]} ${meta.dates[r.i]} ${monthOf(wk,r.i)}${r.i===meta.today?' · today':''}`})).join(''));
     drawer(shortName[type]||type,body,{size:'medium'});
     overlay.querySelector('.sheet,.dialog')?.classList.add('schedule-row');
   }
@@ -423,13 +425,13 @@
       return SentriUI.heading({title:'Unit '+u,kind:'group',level:3})+SentriUI.rowGroup(list.map(p=>SentriUI.row({variant:'animal',code:p.tag,
         // Plain tags: the list's title already says what to do, so no row is coloured; "1d" marks a pig waiting since yesterday.
         description:['Pen '+p.pen,({'Hospital pen':'Hospital','Treat in place':'In place'})[p.care]||'',p.since?'1d':''].filter(Boolean).join(' · '),right:{kind:'tags',tags:[{name:p.cond,level:'ongoing'}]},action:'marked-pig',value:String(u)})).join(''));}).join('');
-    drawer(kind==='treat'?'To treat':'Monitoring',body,{size:'medium',surface:'menu'});
+    drawer(kind==='treat'?'To treat':'Monitoring',body,{size:'medium'});
     overlay.querySelector('.sheet,.dialog')?.classList.add('marked-'+kind);
     if(SentriUI.rowFitTags)requestAnimationFrame(()=>SentriUI.rowFitTags(overlay));
   }
   function closedToday(){
     const closed=tasks.filter(t=>t.section===state.section&&(t.completedAt||t.terminatedAt));
-    drawer('Closed today',SentriUI.rowGroup(closed.map(t=>SentriUI.row({variant:'navigation',icon:icon('check'),title:`${shortName[t.type]||t.type} · ${t.batch}`,description:(t.terminatedAt?'Ended early · ':'Completed · ')+String(t.completedAt||t.terminatedAt).replace('Today, ',''),action:'closed-task',value:t.id})).join('')),{size:'medium',surface:'menu'});
+    drawer('Closed today',SentriUI.rowGroup(closed.map(t=>SentriUI.row({variant:'navigation',icon:icon('check'),title:`${shortName[t.type]||t.type} · ${t.batch}`,description:(t.terminatedAt?'Ended early · ':'Completed · ')+String(t.completedAt||t.terminatedAt).replace('Today, ',''),action:'closed-task',value:t.id})).join('')),{size:'medium'});
     overlay.querySelector('.sheet,.dialog')?.classList.add('closed-today');
   }
   function home(){
