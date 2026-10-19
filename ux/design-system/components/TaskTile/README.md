@@ -20,7 +20,7 @@ Classification: **component** (a new job: the Overview needs every open task at 
 
 Four fixed slots, each with one kind of message, at the same height in every tile:
 
-1. **Task**: 16px / 500, one line, a short name of at most about 15 characters ("Return heat", "Processing"); ellipsis is only a guard.
+1. **Task**: 16px / 500 (15px at 370px and below, where the tile also pads 12px), one line, a short name of at most about 15 characters ("Return heat", "Processing"); ellipsis is only a guard.
 2. **Batch**: 13px muted, one line ("Batch 31"; for health work what and where: "PRRS · Units 7, 8").
 3. **To-do**: the count due now in 26px mono with a 13px word ("5 ready now"), or "None now" (16px / 500, ink-2). Under it one quiet 13px line: the next timer or due date with a clock ("4 more from Sat"), red with the solid "!" when part is overdue ("2 overdue"). The line keeps its height when empty.
 4. **Run**: a hairline, then one 6px segment per planned day (filled up to today) and "Day N of N". A task past its planned end adds one red segment per day over and reads "1 day overdue" in red; its to-do says how many are overdue ("6 overdue", red word).
