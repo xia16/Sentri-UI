@@ -95,11 +95,11 @@ test('Actions is a menu drawer: everyday verbs as a grid, Production as navigati
     assert.match(group,/st-row-group/);
   }
 });
-test('the verb grid keeps two even rows and folds past ten into More', () => {
+test('the verb grid: one row up to three, then even rows, and folds past ten into More', () => {
   const c=context('actions');c.selected.add(c.pigId);
   const items=n=>Array.from({length:n},(_,i)=>({a:'note',k:'note',title:'Verb '+i,sub:'',value:String(i)}));
   const cols=html=>+html.match(/--st-row-grid-cols:(\d+)/)[1],count=html=>html.match(/class="st-row-tile[" ]/g).length;
-  for(const [n,expected] of [[2,1],[5,3],[6,3],[7,4],[8,4],[10,5]]) assert.equal(cols(model.verbGrid(c,items(n))),expected,n+' verbs');
+  for(const [n,expected] of [[1,1],[2,2],[3,3],[4,2],[5,3],[6,3],[7,4],[8,4],[10,5]]) assert.equal(cols(model.verbGrid(c,items(n))),expected,n+' verbs');
   const folded=model.verbGrid(c,items(12));
   assert.equal(count(folded),10);assert.match(folded,/data-action="actions-grid-all"/);assert.equal(cols(folded),5);
   c.actionsGridAll=true;assert.equal(count(model.verbGrid(c,items(12))),12);
