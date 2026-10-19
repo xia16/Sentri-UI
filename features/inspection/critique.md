@@ -167,3 +167,40 @@ Scope: the header-to-body gap (Headers law: `space-section`, 24px, the header's)
 - Keep as strong: titles that fit, bodies, rows and primaries unchanged; Filter sows and Filter pigs at their defaults now show no Reset.
 - Squint: the title, then the first card; the corner word stays quiet.
 - **Better because** the act that empties a draft leaves the thumb's commit zone, every drawer clears in the same place, and no title can collide with a corner at 360.
+
+# Conditions (2026-10-17 to 10-19)
+
+Scope: the walk list, its dock, the Selected review, the Actions page and the pen page. The owner's rounds on conditions and selection, built in the Inspection prototype (features/conditions/PRD.md, budget.md; PR #223). Baselines: `origin/main` at `92e0f0d`, the gate's pairs at 390 and 360, EN and ZH.
+
+### Keep
+
+- The pen card: header (box, pen, count, feed), tagged pig rows as the approved Animal row, the 68px rhythm, the condition tags and their order.
+- The dock's two-part shape (selection on the left, the one action on the right) and the 56px footer.
+- The Actions page's sections (Health, Routine), its rows and icon tiles.
+
+### Problems
+
+- **major** · A pen header counted only its tagged pigs (D4 · 2 pigs) while 14 more stood in the pen without ear tags, so the walk under-reported the pen.
+- **major** · Pigs without ear tags had no row: their conditions and how many had each were nowhere on the walk.
+- **major** · A ticked pen looked the same as all its pigs ticked one by one, and the box's cell took a square tint (owner, 2026-10-18).
+- **minor** · Tagged pigs came in seed order, so a number couldn't be found by scanning.
+- **major** · The dock said "1 pen · 2 pigs selected" and opened a drawer; the owner wants one total and a page to edit the selection (2026-10-17).
+- **minor** · The action sheet was titled "More actions", though it is the only place the actions live; the owner renamed it Actions (2026-10-17).
+- **minor** · The dock's Actions button had no icon; the owner asked for one (2026-10-17). It takes the grid glyph the pig record's Actions button already carries (a menu of acts, not an edit).
+- **major** · The Actions page carried a Pigs / Pens switch in its header slot and a Health / Routine bar at the bottom; pen actions belong on the pen page (owner, 2026-10-18).
+- **minor** · Pen-wide signs (coughing heard, scours on the floor) had no place except as pig conditions.
+
+### Parts
+
+| Part | Drawn by today | The component whose job it is | Keep / fix / cut |
+|---|---|---|---|
+| Group row (pigs without ear tags) | none | Row · Animal · group (`lead`, `count`) | **new** |
+| Pen header box | Row select | Row select `fill: false` | **fix** |
+| Selected review | drawer | page, Row select rows | **fix** |
+| Actions switch and bottom bar | Segment, page bar | none | **cut** |
+| How the pen looks | none | ChoiceList in a drawer, as Pen note | **new** |
+
+### Self-crit
+
+- Squint, the walk: the pen header, then the urgent tags, then the group row's tags; the count field is the one control and stays quiet until ticked.
+- **Better because** the pen's whole herd is on the walk with its conditions, a pen tick no longer paints a square, and the selection is one number with one place to edit it.
