@@ -96,7 +96,7 @@
       "name": "navigate",
       "usedBy": [
         "health-record.condition-picker",
-        "health-record.medicine-picker"
+        "treat.medicine-picker"
       ],
       "status": "agent-checked",
       "scores": {
@@ -113,7 +113,7 @@
     {
       "name": "single",
       "usedBy": [
-        "health-record.medicine-picker",
+        "treat.medicine-picker",
         "health-record.edit-finding",
         "farrowing.death"
       ],

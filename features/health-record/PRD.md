@@ -2,11 +2,11 @@
 
 ## Problem
 
-The worker records a disease or symptom on one or many pigs, says what to do about it (care), records treatment, and later closes the record as recovered or entered in error. The old Figma draws health three times: in Inspection (add and remove disease or symptom), in the pig list (health management) and in the 健康与治疗 treatment file. The Inspection prototype is the one built version.
+The worker records a disease or symptom on one or many pigs, says what to do about it (care), and later closes the record as recovered or entered in error. The old Figma draws health three times: in Inspection (add and remove disease or symptom), in the pig list (health management) and in the 健康与治疗 treatment file. The Inspection prototype is the one built version. Giving the pig something for it is Treatment (`features/treat`), reached from the finding's Record treatment.
 
 ## Who
 
-The worker on the walk who finds a sick pig, and the worker who gives treatment or vaccination as a task. A supervisor reads the care levels on the list.
+The worker on the walk who finds a sick pig. A supervisor reads the care levels on the list.
 
 ## Anchor
 
@@ -16,7 +16,7 @@ Anchor: the Finding (one condition on one pig).
 - Ongoing, no action needed: recorded and visible as a tag until it is resolved.
 - Closed: Recovered, or Entered in error. The case leaves the active list and stays in the pig's log.
 
-Recording, editing, treatment and the pickers can happen in any status.
+Recording, editing and the pickers can happen in any status; so can Record treatment, which opens Treatment.
 
 ## Rules
 
@@ -24,23 +24,21 @@ Recording, editing, treatment and the pickers can happen in any status.
 - Care is the only editable condition state: No action needed, Monitor, Treat in place, Move to hospital pen. Attention is derived: every choice except No action needed needs attention.
 - Existing findings keep their original start date; adding a condition a pig already has changes nothing.
 - Bulk edits preview each pig's change, let a pig be excluded, leave pigs without the condition unchanged, and save only changed rows.
-- Treatment records medicine actually given: the medicine from the farm's medicine list (features/medicines), method, unit and a dose above 0, a shared dose with a per-pig override, and an optional brand (with its strength), linked condition and note. Method and unit are pre-filled from the medicine's last use. When a withdrawal is in force (the brand's, else the medicine's default) the form shows Withdrawal until <date> before Save, and the record keeps a copy of the days, the date and the strength. For several pigs the form asks what was given first (medicine, method, brand), then the doses. One record per included pig.
-- A treatment started from a Health task (vaccination) lists vaccines only and completes the task on Save.
+- Record treatment on the finding opens Treatment's form with the condition fixed (`features/treat`); Save returns to the finding, which shows the record.
 - A blocked action is listed with the reason, never dropped.
 - Recovery keeps the case in history; entered in error marks a correction. Recovering a finding linked to a feed adjustment ends that adjustment.
 - Hospital pen is a care choice only; no move is made.
 
 ## Scope
 
-In: the pig record as a health view (needs attention, ongoing, several ongoing, care levels), the finding and its edit and resolve forms, Record health with its catalogue picker, Care instructions and Edit conditions, Resolve conditions, Record treatment (and the condition chooser inside it). The medicine picker is the medicines feature's.
+In: the pig record as a health view (needs attention, ongoing, several ongoing, care levels), the finding and its edit and resolve forms, Record health with its catalogue picker, Care instructions and Edit conditions, Resolve conditions. The condition chooser inside Record treatment is this feature's picker.
 
-Out: sow death and mortality reports (separate features), the pig record itself (pig-profile), feed changes (feed-plan). Health tags on the walk row belong to inspection.
+Out: sow death and mortality reports (separate features), the pig record itself (pig-profile), feed changes (feed-plan), treatment and the medicine list (treat), vaccination (a task). Health tags on the walk row belong to inspection.
 
 ## Decisions
 
 - Care replaced the older triage and status fields; one select drives both.
-- The medicine list is the medicines feature's (2026-10-16, revised: Category → Medicine; Brand an optional field with its own list; optional strength and withdrawal); methods and units are a sample list until farm configuration exists.
-- Treatment never implies identical doses across pigs.
+- 2026-10-19 (owner): Record treatment, its pickers and its save moved to Treatment (`features/treat`), which is ad hoc treatment only; vaccination is a task.
 
 Open (recorded on the screens as issues):
 

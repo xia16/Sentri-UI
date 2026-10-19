@@ -3,7 +3,7 @@
   "id": "inspection-r2-1",
   "target": {
    "kind": "screen",
-   "id": "health-record.treatment"
+   "id": "treat.record"
   },
   "kind": "decision",
   "severity": "medium",

@@ -111,7 +111,7 @@
         "inspection.walk",
         "pig-profile.actions",
         "piglet-processing.more-actions",
-        "health-record.treatment"
+        "treat.record"
       ],
       "status": "agent-checked",
       "scores": {

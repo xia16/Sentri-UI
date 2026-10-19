@@ -95,7 +95,7 @@
     {
       "name": "single",
       "usedBy": [
-        "health-record.treatment (Method, Unit)",
+        "treat.record (Method, Unit)",
         "health-record.edit-finding (Care)",
         "farrowing.death"
       ],
@@ -131,7 +131,7 @@
     {
       "name": "cascade",
       "usedBy": [
-        "health-record.medicine-picker"
+        "treat.medicine-picker"
       ],
       "status": "agent-checked",
       "scores": {
