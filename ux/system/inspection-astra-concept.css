@@ -1,6 +1,6 @@
 /* Same Sentri surfaces and type, with explicit pig and pen scopes. */
-.inspection-phone .actions-sheet>.sheet-body{flex:1;padding-top:0}
-.inspection-phone .actions-subjects{flex-shrink:0;padding:18px 21px 16px}
+.inspection-phone .actions-sheet>.sheet-body{flex:1}
+.inspection-phone .actions-subjects{flex-shrink:0;margin-top:var(--space-section);padding:0 21px 16px}
 @media(max-width:370px){.inspection-phone .actions-subjects{padding-left:17px;padding-right:17px}}
 .inspection-phone{display:flex;flex-direction:column}
 .inspection-phone>.statusbar{flex-shrink:0}
