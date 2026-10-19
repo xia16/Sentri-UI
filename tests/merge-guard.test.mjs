@@ -57,3 +57,12 @@ test('a worktree is removed only through scripts/worktree-remove.mjs, and node_m
     'SENTRI_PLAYWRIGHT=../Sentri-UI/node_modules/playwright node scripts/gate.mjs --candidate origin/x --out o']) assert.equal(guard(c), 0, c);
   assert.equal(run({ tool_name: 'PowerShell', tool_input: { command: 'git worktree remove --force C:\\wt' } }), 2, 'PowerShell too');
 });
+
+test('a finished or stale branch may be deleted, one named branch at a time, never main (2026-10-20)', () => {
+  for (const c of ['git push origin --delete treat/category-rows', 'git push origin -d workflow/x']) assert.equal(guard(c), 0, c);
+  for (const c of [
+    'git push origin --delete main', 'git push origin -d master', 'git push origin --delete HEAD',
+    'git push origin --delete a b', 'git push origin --delete', 'git push origin :treat/x', 'git push --delete origin main',
+    'git push origin --all', 'git push origin --mirror', 'git push origin --tags',
+  ]) assert.equal(guard(c), 2, c);
+});
