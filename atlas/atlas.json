@@ -18278,7 +18278,7 @@
              {
               "state": "No condition chosen",
               "when": "Condition picker empty",
-              "shows": "The pig's conditions or \"No open conditions\""
+              "shows": "The pig's conditions or \"Nothing open\""
              },
              {
               "state": "Chosen, pig has it",
