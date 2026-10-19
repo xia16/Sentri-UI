@@ -136,8 +136,8 @@
     return panel((title||has({strs},'title')?heading({title,kind:'group',level,className:'st-row-group-label',strs,args}):'')+content,{className:'st-row-group '+className,ds:'Row'});
   }
   /* Row tile (owner, 2026-10-19): one action as an icon well over one word, for the grid of everyday verbs in More actions.
-     The word is the short verb ("Treat"); the accessible name starts with that word (label in name: voice control says what it sees)
-     and adds the full action name when that does not hold it as a whole word ("Condition, Disease or symptom", "Treat, Record treatment"). tone 'danger' is
+     The word is the short verb ("Treat"); the accessible name always contains that word (label in name: voice control says what it sees):
+     it is the full action name when that holds the word as a whole word ("Add a note"), else the word, then the full name ("Condition, Disease or symptom", "Treat, Record treatment"). tone 'danger' is
      the one irreversible verb (Death): red ink on its well and word, nothing louder. */
   function rowTile({label,title='',icon='',action='',value='',tone='',attrs={},className=''}={}){
     const word=new RegExp('(^|[^\\p{L}\\p{N}])'+String(label).replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'($|[^\\p{L}\\p{N}])','iu');
