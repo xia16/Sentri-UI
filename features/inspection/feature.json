@@ -579,8 +579,7 @@
           "Feed today (raw)",
           "Pigs (raw)",
           "Looked (raw)",
-          "Pen log (raw)",
-          "All activity (raw)"
+          "Pen log (raw)"
         ],
         "issues": [
           "Count (Set count, pen-ops 2.3) is not a verb Inspection has yet, so it is not a tile.",

@@ -309,6 +309,7 @@ test('the pen page leads with its verbs, then what needs someone, then how the p
   assert.ok(order.every((x,i)=>x>0&&(i===0||x>order[i-1])),'verbs, needs attention, now, log: '+order);
   assert.match(html,/data-action="fault-record" data-value="C1\|f1"/);
   assert.match(html,/data-action="read-pen-note"/);
+  assert.equal((html.match(/Close the aisle gate after passing\./g)||[]).length,1,'the note is said once');
   pe.note='';pe.faults=[];
   assert.doesNotMatch(model.overlay(c),/Needs attention/,'nothing open: the group is left out');
 });

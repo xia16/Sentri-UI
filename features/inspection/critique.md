@@ -232,7 +232,7 @@ Scope: the Inspection pen page (`inspection.pen`) and the walk's pen header. Own
 | Part | Drawn by today | The component whose job it is | Keep / fix / cut |
 |---|---|---|---|
 | Pen verbs | Row navigation in a group under `Pen information` | Row `tile` in `rowGrid` (the More actions grid) | **fix** |
-| Open faults, the pen note | the note as a record card; faults one tap away | Row navigation in one group under `Needs attention` | **fix** |
+| Open faults, the pen note | the note as a record card; faults one tap away | Faults as Row navigation, then the note's record card (its weight kept), under `Needs attention` | **fix** |
 | Feed, pigs, last look | second lines of verb rows, or absent | Facts | **fix** |
-| Pen log | one tap away | Log (the last three) + a quiet `All activity ›` | **fix** |
+| Pen log | a row in the verb list | Row navigation, alone at the end | keep (a preview of its last entries said the note twice; driver look, 26777d5) |
 | Pen header checkbox on the walk | Row select | — (`Tick all` on the pen page) | **cut** |

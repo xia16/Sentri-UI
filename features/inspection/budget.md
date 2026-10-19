@@ -55,10 +55,10 @@ Owner ruling, 2026-10-19: the pen is a door, not a tick. The pen header's `›` 
 | `Pen C1`, line `3 pigs · Unit 7` | header | Which pen, how many pigs? | kept |
 | Pen verbs: Note, Feed, Observe, Fault, Tick all | Act now (one grid, Row tile) | What can I do to this pen? | verbs move to the top; their explanatory second lines are cut |
 | Open equipment fault (`Drinker · leaking`, its description) | Needs someone | Is something broken here? | new on this page (today one tap away, in the pen's fault list) |
-| Pen note (its text, who and when) | Needs someone | What did the last person leave me? | kept, now a row in the same group as the faults |
+| Pen note (its text, who and when) | Needs someone | What did the last person leave me? | kept as its card (same weight as on main), under the faults |
 | Feed today (`7.6 kg`, the formula) | Now | What does this pen eat today? | new on the page (was the second line of Feed guidance) |
 | Pigs (`3`, `2 without tags`) | Now | How many are here, tagged or not? | new on the page |
 | Looked (`Huddling`) | Now | How did the pen look last? | new on the page (was the second line of How the pen looks); left out when nothing is recorded |
-| Pen log: the last three entries, then `All activity ›` | What happened | What has happened here lately? | new on the page (was one tap away) |
+| Pen log | door | What has happened here? | kept as one row at the end: a preview repeated the note, which is already on the page |
 
 Cut: the `Pen information` heading; the verb rows' second lines; the pen header's checkbox on the walk (it ticked the pen and its pigs; `Tick all` does that from the pen page). Count (`Set count`) is not a verb Inspection has today, so it is not drawn.

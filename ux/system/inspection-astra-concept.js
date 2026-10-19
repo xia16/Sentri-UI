@@ -514,7 +514,7 @@ function pigOverview(c){
  return sheet(c,p.id,unitName(c)+' · '+pe.id+' · '+stageSummary(p),pigRecordCards(p)+pigCurrentTasks(c)+(()=>{const d=overviewDetails(p,c);return d?'<section class="detail-section reading-section pig-overview-facts">'+general+d+'</section>':''})()+typeDetails(p,c)+pigFeedFacts(p,pe)+'<section class="detail-section reading-section pig-record-links">'+record+'<div class="compact-actions detail-destinations st-panel st-row-group">'+action('pig-production','chart','Production stats','Averages and batch records',p.id)+action('pig-origin','origin','Origin','Provenance, dates and identities',p.id)+action('pig-log','clock','Log','Production, health and movement',p.id)+'</div></section>',pigRecordToolbar(p),'',pigFacts(c,p));
 }
 /* The pen page (owner, 2026-10-19): the pen is a door, not a tick. Everything done to the pen as a whole happens here, for this one pen:
-   its verbs on top (the More actions grid), then what needs someone (open faults, the pen note), then how the pen is now, then its log.
+   its verbs on top (the More actions grid), then what needs someone (open faults, then the pen note as its card), then how the pen is now, then the door to its log.
    Ticking pigs on the walk gives pig actions only; Tick all ticks this pen's pigs for them. */
 /* Tick all (pen page): back on the walk with this pen's shown pigs, and its untagged group, ticked for the pig Actions, landed on the pen. */
 function tickPen(c,id){const pe=pen(c,id);displayPigs(c,pe).forEach(p=>c.selected.add(p.id));if(pe.untagged?.count){(c.selectedNoTags||=new Set()).add(pe.id);(c.noTagsCount||={})[pe.id]=pe.untagged.count;}c.navTrail=[];c.reviewOnly=false;c.view='list';c.jump=pe.id;}
@@ -528,16 +528,15 @@ function penOverview(c){
   {label:str('actions.tile.fault'),title:'Report equipment fault',icon:icon('wrench'),action:'new-fault',value:pe.id},
   {label:str('actions.tile.tick_all'),title:'Tick all '+countLabel(shown.length+untagged)+' in pen '+pe.id,icon:icon('check'),action:'tick-pen',value:pe.id}
  ],{label:'Pen actions'});
- const needs=faults.map(x=>SentriUI.row({variant:'navigation',action:'fault-record',value:pe.id+'|'+x.id,icon:icon('wrench'),title:x.name,description:x.description,wrap:true,className:'action-item'}))
-  .concat(pe.note?[SentriUI.row({variant:'navigation',action:'read-pen-note',value:pe.id,icon:icon('note'),title:pe.note,description:pe.noteBy,wrap:true,className:'action-item'})]:[]);
+ const faultRows=faults.map(x=>SentriUI.row({variant:'navigation',action:'fault-record',value:pe.id+'|'+x.id,icon:icon('wrench'),title:x.name,description:x.description,wrap:true,className:'action-item'}));
+ const note=pe.note?'<div class="record-card-stack" aria-label="Pen notes">'+recordCard({kind:'Pen note',title:pe.note,meta:pe.noteBy,tone:'record-neutral record-note-preview',link:'read-pen-note',value:pe.id})+'</div>':'';
  const now=SentriUI.facts([{label:'Feed today',value:feedLabel(pe),meta:pe.formula||''},{label:'Pigs',value:String(total),meta:untagged?untagged+' without tags':'All tagged'},...(looks.length?[{label:'Looked',value:looks[0]+(looks.length>1?' +'+(looks.length-1):'')}]:[])],{columns:looks.length?3:2});
- const log=penLogEntries(c,pe.id);
  const section=(title,k,body)=>'<section class="detail-section">'+stHeading({title,icon:icon(k),kind:'section',level:4})+body+'</section>';
  return sheet(c,'Pen '+pe.id,countLabel(total)+' · '+unitName(c),
   '<section class="detail-section">'+verbs+'</section>'+
-  (needs.length?section('Needs attention','alert','<div class="compact-actions st-panel st-row-group st-action-list">'+needs.join('')+'</div>'):'')+
+  (faultRows.length||note?section('Needs attention','alert',(faultRows.length?'<div class="compact-actions st-panel st-row-group st-action-list">'+faultRows.join('')+'</div>':'')+note):'')+
   section('Now','details',now)+
-  section('Pen log','clock',(log.length?categorizedLog(c,log.slice(0,3),'pen'):'<p class="quiet-note">No activity recorded yet</p>')+button('pen-log','All activity '+icon('chevron'),'unavailable-actions-link',pe.id)),
+  '<section class="detail-section"><div class="compact-actions st-panel st-row-group st-action-list">'+action('pen-log','clock','Pen log','Transfers, health and notes',pe.id)+'</div></section>',
   footer(back(),''));}
 
 // Bulk actions are drafts over explicit pig IDs; pens only provide selection context.

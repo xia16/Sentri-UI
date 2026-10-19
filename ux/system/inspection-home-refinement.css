@@ -23,3 +23,5 @@
  .inspection-phone .task-activity{padding-left:12px;padding-right:12px}
 }
 .inspection-phone .inspect-pen-head .pen-select-target.st-row{flex:none;width:var(--tap-min);min-width:var(--tap-min);min-height:var(--tap-min);padding:0;justify-content:center}
+/* Pen page (owner, 2026-10-19): the fault rows and the note card under Needs attention are two cards, 8px apart. */
+.inspection-phone .detail-section .st-row-group+.record-card-stack{margin-top:var(--space-8)}
