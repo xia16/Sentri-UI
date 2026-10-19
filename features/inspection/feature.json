@@ -859,17 +859,17 @@
           {
             "name": "Verb grid",
             "at": "Condition",
-            "shows": "Health then Routine verbs as one card of icon tiles, one word each (Condition, Treat, Edit, Resolve, Care, Note, Move, Measure, Feed)",
+            "shows": "Health then Routine verbs as one card of icon tiles, one word each from the strings registry (Condition, Treat, Edit, Resolve, Care, Note, Transfer, Measure, Feed)",
             "states": [
               {
                 "state": "Two rows",
                 "when": "Two or more verbs",
-                "shows": "Always two rows, split evenly: 5 = 3+2, 6 = 3+3, 8 = 4+4, 10 = 5+5"
+                "shows": "Two rows, split evenly: 5 = 3+2, 6 = 3+3, 8 = 4+4, 10 = 5+5"
               },
               {
                 "state": "More",
                 "when": "More than ten verbs",
-                "shows": "Nine tiles (Death never folds) and a More tile, which opens the rest in place"
+                "shows": "Nine tiles and More just before Death (Death never folds); More opens every tile in even rows of at most five, the one case of a third row"
               },
               {
                 "state": "Death",

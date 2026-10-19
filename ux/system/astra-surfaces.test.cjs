@@ -102,11 +102,21 @@ test('the verb grid keeps two even rows and folds past ten into More', () => {
   const foldedDeath=model.verbGrid({},[{a:'sow-host-action',k:'alert',title:'Record sow death',sub:'',value:'sow-death'},...items(11)]);
   assert.match(foldedDeath,/is-danger/,'Death never folds behind More');
   assert.equal(count(foldedDeath),10);
+  assert.ok(foldedDeath.indexOf('data-action="actions-grid-all"')<foldedDeath.indexOf('is-danger'),'More sits before Death: Death is the last tile');
 });
 
-test('pen Actions keeps its drawer', () => {
+test('pen Actions is a menu drawer too', () => {
   const c=context('actions');c.actionScope='pens';c.selectedPens.add('C1');
-  assert.doesNotMatch(model.overlay(c),/data-presentation="page"/);
+  checkMenuDrawer(model.overlay(c));
+});
+
+test('the verb words come from the strings registry, and Transfer is not the registered verb Move', () => {
+  const c=context('actions');c.selected.add(c.pigId);
+  c.hostActions=farrowing.sowActionCatalogue(farrowing.seed('count'));
+  const labels=[...model.overlay(c).matchAll(/<span class="st-row-tile-label">([^<]+)<\/span>/g)].map(m=>m[1]);
+  assert.ok(labels.includes('Transfer'));assert.ok(!labels.includes('Move'));
+  const registry=require('../laws/strings.json').strings;
+  for(const label of labels)assert.ok(Object.entries(registry).some(([id,s])=>id.startsWith('actions.tile.')&&s.en===label&&s.zh),label);
 });
 test('current tasks live on pig detail and stay out of Actions', () => {
   const c = context('pig');

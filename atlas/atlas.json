@@ -6213,7 +6213,7 @@
          ],
          "figma": "",
          "notes": {
-          "purpose": "All other things to do for one sow, in the More actions drawer opened from her drawer: the everyday verbs as a grid of icon tiles (Note and Move come from Farrowing), then Production as described rows grouped by task.",
+          "purpose": "All other things to do for one sow, in the More actions drawer opened from her drawer: the everyday verbs as a grid of icon tiles (Note and Transfer come from Farrowing), then Production as described rows grouped by task.",
           "states": [
            "Awaiting (nothing counted): Record abortion, Remove from batch, Mark not in pig, Record sow death, note and transfer are open; the piglet rows and Edit litter record are closed.",
            "Farrowing: the piglet rows, Edit litter record and Foster piglets open; Remove from batch and Mark not in pig close.",
@@ -13886,17 +13886,17 @@
            {
             "name": "Verb grid",
             "at": "Condition",
-            "shows": "Health then Routine verbs as one card of icon tiles, one word each (Condition, Treat, Edit, Resolve, Care, Note, Move, Measure, Feed)",
+            "shows": "Health then Routine verbs as one card of icon tiles, one word each from the strings registry (Condition, Treat, Edit, Resolve, Care, Note, Transfer, Measure, Feed)",
             "states": [
              {
               "state": "Two rows",
               "when": "Two or more verbs",
-              "shows": "Always two rows, split evenly: 5 = 3+2, 6 = 3+3, 8 = 4+4, 10 = 5+5"
+              "shows": "Two rows, split evenly: 5 = 3+2, 6 = 3+3, 8 = 4+4, 10 = 5+5"
              },
              {
               "state": "More",
               "when": "More than ten verbs",
-              "shows": "Nine tiles (Death never folds) and a More tile, which opens the rest in place"
+              "shows": "Nine tiles and More just before Death (Death never folds); More opens every tile in even rows of at most five, the one case of a third row"
              },
              {
               "state": "Death",
@@ -15795,17 +15795,17 @@
            {
             "name": "Verb grid",
             "at": "Condition",
-            "shows": "Health then Routine verbs as one card of icon tiles, one word each (Condition, Treat, Edit, Resolve, Care, Note, Move, Measure, Feed)",
+            "shows": "Health then Routine verbs as one card of icon tiles, one word each from the strings registry (Condition, Treat, Edit, Resolve, Care, Note, Transfer, Measure, Feed)",
             "states": [
              {
               "state": "Two rows",
               "when": "Two or more verbs",
-              "shows": "Always two rows, split evenly: 5 = 3+2, 6 = 3+3, 8 = 4+4, 10 = 5+5"
+              "shows": "Two rows, split evenly: 5 = 3+2, 6 = 3+3, 8 = 4+4, 10 = 5+5"
              },
              {
               "state": "More",
               "when": "More than ten verbs",
-              "shows": "Nine tiles (Death never folds) and a More tile, which opens the rest in place"
+              "shows": "Nine tiles and More just before Death (Death never folds); More opens every tile in even rows of at most five, the one case of a third row"
              },
              {
               "state": "Death",
