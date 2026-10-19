@@ -49,3 +49,14 @@ test('a save that returns to its finding shows no toast; production saves that l
   const c = M.seed(); c.selected = new Set(['000254']); c.lossReason = 'Found an aborted litter';
   assert.ok(M.saveMiscarriage(c)); assert.deepEqual(c.toast, { title: 'Abortion recorded', detail: '000254', tone: 'done' }, 'the pig page changes one word only');
 });
+
+test('Record health counts pigs without ear tags: 2 tagged and 3 of a pen\'s group is 5 pigs; the group alone still confirms', () => {
+  const run = (ids, n) => {
+    const c = M.seed(); c.selectedNoTags = new Set(['D4']); c.noTagsCount = { D4: n };
+    M.openBulkAction(c, 'health', ids); c.form.conditions = ['Coughing'];
+    assert.ok(M.bulkActionValid(c), 'valid'); assert.ok(M.saveBulkAction(c), 'saves');
+    return c.toast || null;
+  };
+  assert.deepEqual(run(['000801', '000802'], 3), { title: 'Condition recorded', detail: '5 pigs', tone: 'done' });
+  assert.deepEqual(run([], 3), { title: 'Condition recorded', detail: '3 pigs', tone: 'done' });
+});
