@@ -19,11 +19,11 @@ var RENDER = {
   "task-item-state-1": () => item({"title": "Dock tail", "description": "12 owed · day 3", "mark": "due", "attrs": {"aria-pressed": "false", "data-preview": "pressed"}}),
   "task-item-state-2": () => item({"title": "Dock tail", "description": "12 owed · day 3", "mark": "ticked", "attrs": {"aria-pressed": "true", "data-ticked": ""}}),
   "task-item-state-3": () => SentriUI.rowAction({"title": "Dock tail", "description": "12 owed · day 3", "action": "item", "value": "tail", "wrap": true, "mono": true, "mark": "ticked", "attrs": {"aria-pressed": "true", "data-ticked": ""}, "act": {"label": "2 piglets", "action": "count", "value": "tail", "busy": false}}),
-  "task-item-state-4": () => acted({"title": "Iron", "description": "12 owed · day 3"}, {"label": "Record 12"}),
-  "task-item-state-5": () => acted({"title": "Iron", "description": "12 owed · day 3"}, {"label": "Recording 12", "busy": true}),
+  "task-item-state-4": () => acted({"title": "Iron", "description": "12 owed"}, {"label": "Record 12"}),
+  "task-item-state-5": () => acted({"title": "Iron", "description": "12 owed"}, {"label": "Recording 12", "busy": true}),
   "task-item-state-6": () => acted({"title": "Iron", "description": "Could not save. Retry recording."}, {"label": "Retry"}),
-  "task-item-state-7": () => item({"title": "Castrate", "description": "6 castrated · 08:20 · G.H", "action": "open-edit", "value": "r1", "trail": "edit", "chip": DONE, "attrs": {"data-done": ""}}),
-  "task-item-state-8": () => item({"title": "断尾", "description": "待处理 12头 · 3日龄", "mark": "due", "attrs": {"aria-pressed": "false"}}) + item({"title": "阉割", "description": "阉割6头 · 08:20 · G.H", "action": "open-edit", "value": "r1", "trail": "edit", "chip": {"variant": "chip", "kind": "done", "text": "已处理"}, "attrs": {"data-done": ""}})
+  "task-item-state-7": () => item({"title": "Castrate", "description": "6 castrated · 08:20", "action": "open-edit", "value": "r1", "trail": "edit", "chip": DONE, "attrs": {"data-done": ""}}),
+  "task-item-state-8": () => item({"title": "断尾", "description": "待处理 12头 · 3日龄", "mark": "due", "attrs": {"aria-pressed": "false"}}) + item({"title": "阉割", "description": "待处理 6头 · 3日龄", "mark": "ticked", "attrs": {"aria-pressed": "true", "data-ticked": ""}})
 };
 document.querySelectorAll('[data-state]').forEach(function (s) {
   var t = RENDER[s.id] ? s : s.querySelector('[id]');
