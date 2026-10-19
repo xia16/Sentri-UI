@@ -30,7 +30,7 @@ this feature's screens shows, by the worker's question, so a later change knows 
 ## Levels
 
 - **Act now**: the primary (Save · N, Done · N, Add); the verb tiles on Actions.
-- **Watch**: a pig the action will not change ("No Thin · unchanged"), a feed adjustment the outcome resets.
+- **Watch**: a pig the action will not change ("No Thin"), a feed adjustment the outcome resets.
 - **Settled**: the field values (Coughing, No action needed, Recovered); the pig's pen · stage · days; the ear tag of a pig left
   unchanged, in the same ink as the others.
 - **Audit**: the toast's detail (2 pigs, the ear tag).

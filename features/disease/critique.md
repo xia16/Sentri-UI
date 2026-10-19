@@ -22,7 +22,7 @@ view are fixed in the prototype.
 - **major** · A pick returning to its field drew the ink focus ring (Record health's Conditions after Done, Resolve's Outcome after a
   pick): a tap must leave no ring (touch states only). Only Record treatment's form had the quiet return.
 - **major** · On Resolve, a pig the action leaves unchanged faded to 55%: its ear tag at 3.6:1 and its line at 2.2:1, under the 4.5:1
-  floor. Its right-hand line ("No Thin · unchanged") already says it will not change.
+  floor. Its right-hand line ("No Thin") already says it will not change.
 - **major** · In Chinese the health flow read English: Record health's labels, the whole catalogue (areas, examples, condition
   names), Add a condition's fields, Resolve's labels and outcomes, and the condition tags on the walk list. The catalogue already
   carries every name in Chinese; the page's localizer never used it, and the labels had no registry entries.

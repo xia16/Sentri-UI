@@ -17289,7 +17289,7 @@
              {
               "state": "Pig lacks it",
               "when": "No such condition",
-              "shows": "\"No X · unchanged\""
+              "shows": "\"No X\""
              },
              {
               "state": "Feed-linked",
@@ -17349,7 +17349,7 @@
              {
               "state": "Pig lacks it",
               "when": "No such condition",
-              "shows": "\"No X · unchanged\""
+              "shows": "\"No X\""
              },
              {
               "state": "Feed-linked",
@@ -17412,7 +17412,7 @@
              {
               "state": "Pig lacks it",
               "when": "No such condition",
-              "shows": "\"No X · unchanged\""
+              "shows": "\"No X\""
              },
              {
               "state": "Feed-linked",
@@ -17476,7 +17476,7 @@
              {
               "state": "Pig lacks it",
               "when": "No such condition",
-              "shows": "\"No X · unchanged\""
+              "shows": "\"No X\""
              },
              {
               "state": "Feed-linked",
@@ -18288,7 +18288,7 @@
              {
               "state": "Chosen, pig lacks it",
               "when": "Pig without that condition",
-              "shows": "\"No Thin · unchanged\""
+              "shows": "\"No Thin\""
              },
              {
               "state": "Not eligible",
@@ -18473,7 +18473,7 @@
              {
               "state": "Pig lacks it",
               "when": "No such condition",
-              "shows": "\"No X · unchanged\""
+              "shows": "\"No X\""
              },
              {
               "state": "Feed-linked",
