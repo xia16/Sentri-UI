@@ -367,3 +367,18 @@ Scope: the Medicines and Vaccines pickers, and the walk behind the saved toast. 
 ### Self-crit
 
 - **Better because** the headings read as the same family as the Actions page's, and the walk behind the toast counts the pen's whole herd.
+
+# Category rows (owner, 2026-10-19)
+
+Scope: the medicine picker's first level (`treat.medicine-picker`, `treat.medicine-picker-first`) and the Medicines page (`treat.medicines-page`). The owner asked whether the conditions picker's first level fits here. House pattern: the conditions first level (`health-record.condition-picker`, feature/conditions, #223), the sibling with the same job: a level that opens categories.
+
+### Keep
+- Search pinned first, then Recently used, then Categories, in that order and weight; one tap opens a category; the page's white card on the tint.
+
+### Problems
+- **major** · A category row was its name only. A worker holding a bottle of Draxxin can't tell from "Antibiotics" that it is in there; vaccines are named by their disease, which "Vaccines" doesn't say; and "Other" said nothing about what it holds.
+- **minor** · The medicine picker and the conditions picker do the same job with two faces.
+
+### Parts
+- Row (`stRow` with `icon` and `description`, the Actions row in a ChoiceList card, as the conditions first level): an icon tile, the category, and three examples from the starting list. Icons: Antibiotics pill (new), Pain relief heat, Parasite control bug (new), Vaccines treat, Hormones repro, Vitamins drop, Other more. Icon registry +2 (`pill`, `bug`; `index.d.ts`).
+- Data: `examples` (EN, ZH) on each category in `medicines-catalogue.json`.

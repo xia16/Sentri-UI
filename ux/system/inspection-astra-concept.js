@@ -726,6 +726,12 @@ function bulkActionPage(c){
 const medLang=language==='zh'?'zh':'en';
 const medicineCategories=medicineCatalogue.categories.map(x=>x.id);
 const medCategoryName=(id,short=false)=>{const x=medicineCatalogue.categories.find(x=>x.id===id);return x?(short?x.short[medLang]:x[medLang]):'';};
+/* A category row (owner, 2026-10-19), as the conditions first level: an icon tile, the category, and a line of examples that
+   says what is inside, so a worker with a bottle in hand finds its category ("PRRS, PCV2, swine fever" under Vaccines). */
+function medCategoryRow(id,action){
+ const x=medicineCatalogue.categories.find(x=>x.id===id),ic={antibiotics:'pill',pain:'heat',parasites:'bug',vaccines:'treat',hormones:'repro',vitamins:'drop',other:'more'}[id]||'more';
+ return stRow({action,value:id,title:medCategoryName(id),description:x?.examples?.[medLang]||'',icon:icon(ic),className:'action-item'});
+}
 function medicineFarmSeed(){
  // Each starting-list medicine ships with a default meat withdrawal (SAMPLE days, to be verified before release); vaccines none.
  const medicines=medicineCatalogue.medicines.map(m=>({id:m.id,category:m.category,name:m[medLang],names:[m.en,m.zh,...(m.also||[])],catalogue:true,withdrawal:m.withdrawal??null}));
@@ -769,7 +775,7 @@ function medicinePickerBody(c){
   const recents=medRecents(c),cats=medTaskCategories(c);
   const recentGroup=recents.length?SentriUI.choiceGroup(recents.map(m=>medRow(c,m)),{title:str('medicines.group.recent'),icon:'clock'}):'';
   /* One category left (a vaccination): its diseases straight away, no one-row level; "All" beside "Recently used", never the title again. */
-  const rest=cats.length===1?SentriUI.choiceGroup(medFarm(c).medicines.filter(m=>m.category===cats[0]&&!m.deleted).map(m=>medRow(c,m)),{title:recents.length?str('medicines.group.all'):'',icon:'grid'}):SentriUI.choiceGroup(cats.map(id=>SentriUI.choiceRow({label:medCategoryName(id),mode:'navigate',action:'medicine-category',value:id})),{title:recents.length?str('medicines.group.categories'):'',icon:'grid'});
+  const rest=cats.length===1?SentriUI.choiceGroup(medFarm(c).medicines.filter(m=>m.category===cats[0]&&!m.deleted).map(m=>medRow(c,m)),{title:recents.length?str('medicines.group.all'):'',icon:'grid'}):SentriUI.choiceGroup(cats.map(id=>medCategoryRow(id,'medicine-category')),{title:recents.length?str('medicines.group.categories'):'',icon:'grid'});
   body=recentGroup+rest;
  }
  return '<div class="st-picker-body" data-ds="PickerField" data-variant="cascade">'+medSearch(s.search||'')+body+'</div>';
@@ -946,7 +952,7 @@ function brandPicker(c){
 const medPage=c=>c.medPage||={category:'',medicine:'',brand:'',level:''};
 function medicinesPage(c){
  const pg=medPage(c);
- if(!pg.category)return sheet({...c,view:'medicines'},str('medicines.title'),'','<div class="st-panel st-row-group medicines-list">'+medicineCategories.map(id=>stRow({action:'medicines-category',value:id,title:medCategoryName(id)})).join('')+'</div>','');
+ if(!pg.category)return sheet({...c,view:'medicines'},str('medicines.title'),'','<div class="st-panel st-row-group medicines-list">'+medicineCategories.map(id=>medCategoryRow(id,'medicines-category')).join('')+'</div>','');
  const rows=medFarm(c).medicines.filter(m=>m.category===pg.category&&!m.deleted).map(m=>stRow({action:'medicines-medicine',value:m.id,title:m.name})).join('');
  return sheet({...c,view:'medicines'},medCategoryName(pg.category,true),'','<div class="st-panel st-row-group medicines-list">'+rows+'</div>','');
 }
