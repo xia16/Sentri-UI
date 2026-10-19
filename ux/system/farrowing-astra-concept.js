@@ -708,7 +708,7 @@ function popup(s){const p=s.popup;if(!p)return'';if(p.kind==='leaveEdit')return 
 return '';
 }
 function deathBreakdown(s){return detailSheet(s,'Death breakdown',SentriUI.facts([...s.dead.map((n,i)=>n?{label:types[i],value:n}:null).filter(Boolean),{label:'Total dead',value:sum(s.dead)}]),'compact');}
-function profile(s){return `<iframe class="sow-detail-frame" title="Sow details · ${esc(s.tag)}" src="inspection-astra-concept.html?layout=focus&embed=sow&v=stage-actions-15"></iframe>`;}
+function profile(s){return `<iframe class="sow-detail-frame" title="Sow details · ${esc(s.tag)}" src="inspection-astra-concept.html?layout=focus&embed=sow&v=stage-actions-15${ZH?'&lang=zh':''}"></iframe>`;}
 const sowDetailContexts=new WeakMap();
 function sowActionCatalogue(s){return [
  {id:'miscarriage',title:'Record abortion',group:'production',scope:'farrowing',sub:'Record a pregnancy loss',reason:s.ended?'This sow has died.':s.productionOutcome?'A production outcome is already recorded.':s.locked?'Farrowing is already finished.':''},
@@ -721,7 +721,7 @@ function sowActionCatalogue(s){return [
  {id:'remove-batch',title:'Remove from batch',group:'production',scope:'other',sub:'Remove this sow without recording a litter',icon:'close',reason:s.ended?'This sow has died.':s.productionOutcome?'A production outcome is already recorded.':born(s)?'A litter has already been recorded.':''},
  {id:'not-in-pig',title:'Mark not in pig',group:'production',scope:'farrowing',sub:'Record the outcome and return to rebreed watch',icon:'alert',reason:s.ended?'This sow has died.':s.productionOutcome?'A production outcome is already recorded.':born(s)?'A litter has already been recorded.':''},
  {id:'move-batch',title:'Move to another farrowing batch',group:'production',scope:'other',sub:'Keep the sow in the production plan',icon:'transfer',reason:'No destination farrowing batches are connected in this preview.'},
- {id:'marker',title:s.markers.length?'Edit note':'Add note',group:'routine',sub:s.markers[0]?.text||'Leave a note or describe a visible marker',icon:'note',reason:s.ended?'This sow has died.':''},
+ {id:'marker',title:s.markers.length?'Edit note':'Add note',content:s.markers.length>0,group:'routine',sub:s.markers[0]?.text||'Leave a note or describe a visible marker',icon:'note',reason:s.ended?'This sow has died.':''},
  {id:'transfer',title:'Transfer sow',group:'routine',sub:'Move this sow to another unit or pen',icon:'transfer',reason:s.ended?'This sow has died.':''}
 ];}
 // Scan's Actions: the embedded actions page opens for the first ticked sow, and the row the worker chose is opened in it.

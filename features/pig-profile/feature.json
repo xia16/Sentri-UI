@@ -734,7 +734,7 @@
                 "shows": "The last tile, in red ink"
               }
             ],
-            "rule": "Each tile keeps the full action name as its accessible name; the word under the icon is the short verb."
+            "rule": "Each tile keeps the full action name as its accessible name; the word under the icon is the short verb. A verb whose line is content (an existing sow note) keeps its described row under the grid."
           },
           {
             "name": "Production group",

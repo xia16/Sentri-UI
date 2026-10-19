@@ -1140,7 +1140,7 @@ function actionCatalogue(c){
  const measurements=live?[item('measurements-menu','measure','Measurements & condition',single?'Weight, condition, backfat':'Body condition and measurements')]:[];
  const adjustFeed=live&&rows.some(p=>!feedUnavailableReason(p,penOf(c,p.id)))?[item('feed-edit-selected','feed','Adjust feed','Review the current daily allowance')]:[];
  if(live&&!adjustFeed.length)unavailable.push({title:'Adjust feed',group:'routine',k:'feed',reason:feedUnavailableReason(rows[0],penOf(c,rows[0].id))+'.'});
- add('routine','Routine',[...hostGeneral.map(x=>item('sow-host-action',x.icon||'note',x.title,x.sub,x.id)),...(!hasUnifiedNote?[item('note','note','Add a note',single?'Leave a note for this sow':'The same note for these pigs')]:[]),...hostRecords.map(x=>item('sow-host-action',x.icon||'note',x.title,x.sub,x.id)),...measurements,...adjustFeed]);
+ add('routine','Routine',[...hostGeneral.map(x=>Object.assign(item('sow-host-action',x.icon||'note',x.title,x.sub,x.id),{content:!!x.content})),...(!hasUnifiedNote?[item('note','note','Add a note',single?'Leave a note for this sow':'The same note for these pigs')]:[]),...hostRecords.map(x=>item('sow-host-action',x.icon||'note',x.title,x.sub,x.id)),...measurements,...adjustFeed]);
  if(!fed&&live&&single)unavailable.push({title:'Body condition adjustment',group:'routine',k:'measure',reason:'Ad-lib pigs do not have an individual ration.'});
  const order=['health','routine','production'];groups.sort((a,b)=>order.indexOf(a.id)-order.indexOf(b.id));
  return {groups,unavailable};
@@ -1169,7 +1169,9 @@ function verbGrid(c,items){
 function actionsPage(c){
  const {groups,unavailable}=actionCatalogue(c),single=picked(c).length===1,p=single?picked(c)[0]:null;
  const everyday=groups.filter(g=>g.id!=='production').flatMap(g=>g.items),production=groups.filter(g=>g.id==='production');
- const body=(everyday.length?verbGrid(c,everyday):'')+actionSections(c,production,false,production[0]?.items.length<=3)+(unavailable.length?button('unavailable-actions',`Unavailable actions (${unavailable.length}) ${icon('chevron')}`,'unavailable-actions-link'):'');
+ /* A verb whose second line is content (a sow's existing note: 'Edit note · Red line on left shoulder') is not a bare verb: it keeps its row, under the grid. */
+ const verbs=everyday.filter(x=>!x.content),content=everyday.filter(x=>x.content);
+ const body=(verbs.length?verbGrid(c,verbs):'')+(content.length?`<section class="sow-action-group" data-action-group="content" aria-label="Notes"><div class="compact-actions st-panel st-row-group st-action-list">${actionRows(content)}</div></section>`:'')+actionSections(c,production,false,production[0]?.items.length<=3)+(unavailable.length?button('unavailable-actions',`Unavailable actions (${unavailable.length}) ${icon('chevron')}`,'unavailable-actions-link'):'');
  return sheet(c,'More actions',single?p.id+' · '+penOf(c,p.id).id:selectionLabel(c),body,'','menu',single?pigRoute(c,p):null);
 }
 

@@ -105,6 +105,16 @@ test('the verb grid keeps two even rows and folds past ten into More', () => {
   assert.ok(foldedDeath.indexOf('data-action="actions-grid-all"')<foldedDeath.indexOf('is-danger'),'More sits before Death: Death is the last tile');
 });
 
+test('a sow\'s existing note keeps its row under the grid; only bare verbs become tiles', () => {
+  const c=context('actions');c.selected.add(c.pigId);
+  c.hostActions=[{id:'marker',title:'Edit note',content:true,group:'routine',sub:'Red line on left shoulder',icon:'note'},{id:'transfer',title:'Transfer sow',group:'routine',sub:'Move this sow to another unit or pen',icon:'transfer'}];
+  const html=model.overlay(c);
+  assert.match(html,/data-action-group="content"[\s\S]*?<strong>Edit note<\/strong><small>Red line on left shoulder<\/small>/);
+  assert.doesNotMatch(html,/class="st-row-tile[^"]*"[^>]*data-value="marker"/);
+  assert.match(html,/class="st-row-tile[^"]*"[^>]*data-value="transfer"/);
+  assert.ok(html.indexOf('data-action-group="everyday"')<html.indexOf('data-action-group="content"'));
+});
+
 test('pen Actions is a menu drawer too', () => {
   const c=context('actions');c.actionScope='pens';c.selectedPens.add('C1');
   checkMenuDrawer(model.overlay(c));

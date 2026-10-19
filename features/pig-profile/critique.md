@@ -250,4 +250,5 @@ Directions, each mocked at 390 before the build (owner, 2026-10-19): (A) the arc
 - Pig profile, one sow (7 verbs + 3 Production rows): the base needed three tabs and still ran past the screen; the candidate shows every verb in two rows of icons (4 + 3) and all of Production in one view, over her record. **Better because** the daily verbs read at a glance and the rare ones keep their words.
 - Two pigs (8 verbs): 4 + 4, the ticked rows visible above the drawer.
 - Farrowing sow (5 verbs + 5 Production rows): 3 + 2; Production keeps its task headings and scrolls inside the drawer.
+- Judge round 3 (2026-10-19): a verb whose second line is content is not a bare verb. A Farrowing sow's existing note (`Edit note · Red line on left shoulder · monitor overnight`) is handover information, so it keeps its described row directly under the grid; only verbs whose line merely explains them become tiles. The Farrowing embed now follows `?lang=zh`, so its drawer, tiles included, renders in Chinese.
 - Known, not fixed: the Death tile (danger, always last) has no caller yet: Farrowing does not pass `Record sow death` into the drawer, and Inspection has no death verb.
