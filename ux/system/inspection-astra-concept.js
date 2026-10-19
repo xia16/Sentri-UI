@@ -522,12 +522,12 @@ function penOverview(c){
  const pe=pen(c,c.penId),faults=openFaults(pe),shown=displayPigs(c,pe),untagged=pe.untagged?.count||0,total=pe.pigs.length+untagged;
  const looks=(pe.observations||[]).map(id=>CC.penObservations.find(o=>o.id===id)?.en).filter(Boolean);
  const verbs=SentriUI.rowGrid([
-  {label:str('actions.tile.note'),title:pe.note?'Edit pen note':'Add pen note',icon:icon('note'),action:'pen-note',value:pe.id},
-  {label:str('actions.tile.feed'),title:'Feed guidance',icon:icon('feed'),action:'feed',value:pe.id},
-  {label:str('actions.tile.observe'),title:'How the pen looks',icon:icon('monitor'),action:'pen-observe',value:pe.id},
-  {label:str('actions.tile.fault'),title:'Report equipment fault',icon:icon('wrench'),action:'new-fault',value:pe.id},
-  {label:str('actions.tile.tick_all'),title:'Tick all '+countLabel(shown.length+untagged)+' in pen '+pe.id,icon:icon('check'),action:'tick-pen',value:pe.id}
- ],{label:'Pen actions'});
+  {label:str('actions.tile.note'),title:str(pe.note?'pen.title.note_edit':'pen.title.note_add'),icon:icon('note'),action:'pen-note',value:pe.id},
+  {label:str('actions.tile.feed'),title:str('pen.title.feed'),icon:icon('feed'),action:'feed',value:pe.id},
+  {label:str('actions.tile.observe'),title:str('pen.title.observe'),icon:icon('monitor'),action:'pen-observe',value:pe.id},
+  {label:str('actions.tile.fault'),title:str('pen.title.fault'),icon:icon('wrench'),action:'new-fault',value:pe.id},
+  {label:str('actions.tile.tick_all'),title:str('pen.title.tick_all',{n:shown.length+untagged,code:pe.id}),icon:icon('check'),action:'tick-pen',value:pe.id}
+ ],{label:str('pen.actions')});
  const faultRows=faults.map(x=>SentriUI.row({variant:'navigation',action:'fault-record',value:pe.id+'|'+x.id,icon:icon('wrench'),title:x.name,description:x.description,wrap:true,className:'action-item'}));
  const note=pe.note?'<div class="record-card-stack" aria-label="Pen notes">'+recordCard({kind:'Pen note',title:pe.note,meta:pe.noteBy,tone:'record-neutral record-note-preview',link:'read-pen-note',value:pe.id})+'</div>':'';
  const now=SentriUI.facts([{label:'Feed today',value:feedLabel(pe),meta:pe.formula||''},{label:'Pigs',value:String(total),meta:untagged?untagged+' without tags':'All tagged'},...(looks.length?[{label:'Looked',value:looks[0]+(looks.length>1?' +'+(looks.length-1):'')}]:[])],{columns:looks.length?3:2});
@@ -1412,15 +1412,15 @@ function installV2(){
  else if(a==='filter-apply'){Object.assign(c,c.filterDraft);c.reviewOnly=false;c.view='list';c.scroll=0;}
  else if(a==='unit-detail'||a==='equipment'){c.view=a;}
  else if(['pen-detail','pen-faults','pen-log'].includes(a)){c.penId=v;c.view=a;if(a==='pen-log'){c.penLogFilter='All';c.penLogDate={preset:'all'};}}
- else if(a==='new-fault'){c.penId=v;c.form={device:'',name:'',description:''};c.view='fault-form';}
+ else if(a==='new-fault'){c.penId=v;const d=(c.penDrafts||={});d['fault:'+v]||={device:'',name:'',description:''};c.form=d['fault:'+v];c.view='fault-form';}
  else if(a==='fault-record'){[c.penId,c.faultId]=v.split('|');c.form={resolution:''};c.view='fault-record';}
- else if(a==='save-fault'&&valid(c)){const pe=pen(c,c.penId),f=c.form,existing=pe.faults.find(x=>x.open&&x.device===f.device&&f.device!=='Other');if(existing){c.faultId=existing.id;c.view='fault-record';}else{const x={id:'fault-'+Date.now(),device:f.device,name:f.device==='Other'?f.name.trim():f.device,description:f.description.trim(),time:'09:41',who:'G. Hansen',open:true};pe.faults.push(x);addEvent(c,'Fault reported',[pe.id],x.name+' · '+x.description);returnFromFault(c);}}
+ else if(a==='save-fault'&&valid(c)){delete c.penDrafts?.['fault:'+c.penId];const pe=pen(c,c.penId),f=c.form,existing=pe.faults.find(x=>x.open&&x.device===f.device&&f.device!=='Other');if(existing){c.faultId=existing.id;c.view='fault-record';}else{const x={id:'fault-'+Date.now(),device:f.device,name:f.device==='Other'?f.name.trim():f.device,description:f.description.trim(),time:'09:41',who:'G. Hansen',open:true};pe.faults.push(x);addEvent(c,'Fault reported',[pe.id],x.name+' · '+x.description);returnFromFault(c);}}
  else if(a==='close-fault'){const pe=pen(c,c.penId),x=pe.faults.find(x=>x.id===c.faultId);x.open=false;x.resolution=c.form.resolution||'';addEvent(c,'Fault resolved',[pe.id],x.name+' · '+x.resolution);returnFromFault(c);}
  else if(a==='read-pen-note'){c.penId=v;c.closedNoteId=null;c.view='read-pen-note';}
  else if(a==='close-pen-note'){closePenNote(c,c.penId);}
  else if(a==='undo-close-pen-note'){undoPenNoteClose(c,c.penId);}
- else if(a==='pen-note'){c.penId=v;c.form={note:pen(c,v).note};c.view='pen-note';}else if(a==='pen-observe'){c.penId=v;c.form={observations:[...(pen(c,v).observations||[])]};c.view='pen-observe';}
- else if(a==='save-pen-note'&&valid(c)){pen(c,c.penId).note=c.form.note.trim();pen(c,c.penId).noteBy='G. Hansen · today · 09:41';addEvent(c,'Pen note',[c.penId],c.form.note.trim());c.view=c.navTrail?.at(-1)?.view==='read-pen-note'?'read-pen-note':'pen-detail';}
+ else if(a==='pen-note'){c.penId=v;const d=(c.penDrafts||={});d['note:'+v]||={note:pen(c,v).note};c.form=d['note:'+v];c.view='pen-note';}else if(a==='pen-observe'){c.penId=v;c.form={observations:[...(pen(c,v).observations||[])]};c.view='pen-observe';}
+ else if(a==='save-pen-note'&&valid(c)){pen(c,c.penId).note=c.form.note.trim();delete c.penDrafts?.['note:'+c.penId];pen(c,c.penId).noteBy='G. Hansen · today · 09:41';addEvent(c,'Pen note',[c.penId],c.form.note.trim());c.view=c.navTrail?.at(-1)?.view==='read-pen-note'?'read-pen-note':'pen-detail';}
  else if(a==='pig-profile'){c.pigId=v;c.profileTab='details';c.pigLogFilter='All';c.view='pig-profile';}
  else if(a==='tick-pen'){tickPen(c,v);}
  else if(a==='pig-actions'){c.actionsGridAll=false;c.selected=new Set([v]);c.selectedPens.clear();c.actionScope='pigs';c.form={};c.view='actions';}
