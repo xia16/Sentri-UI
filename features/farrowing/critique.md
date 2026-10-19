@@ -551,7 +551,7 @@ Scope: the room's pen page (`farrowing.pen`) and the pen forms it opens (`farrow
 - **major** · It does not match its sibling with the same job: Inspection's pen page (owner ruling 2026-10-19) puts the verbs on top as a tile grid, then Needs attention, then Now, then one Pen log row. A worker who walks both tasks learns two pen pages.
 - **major** · Drafts are lost on Back: a pen note or a fault half typed is gone when the worker opens it again (atlas edge: "Back discards the draft"; walk law: drafts survive Back and reopen).
 - **minor** · The fault and note notices are tinted cards on the page's tint base (SURFACES.md: a card is the opposite of its base; gate R17), each in its own frame, with a kind chip (`Equipment`, `Note`) the section heading now says.
-- **minor** · Every verb row carries a second line that explains it rather than a state; at 390 and 360 the note row's line clips (`Leave information for the next pers…`).
+- **minor** · Every verb row carries a second line that explains it rather than a state; at 360 the note row's line clips (`Leave information for the next pers…`).
 - **minor** · In Chinese the pen page is all English (`?lang=zh`: `Feed guidance`, `Pen log`, …): the page draws no names from the registry.
 - **minor** · The atlas steps to the pen screens tap English names (`Pen B1, 1 sow, view details`, `Add pen note`, `Select`, `Feeding station`), which a translated page breaks; they become selectors.
 
@@ -583,3 +583,5 @@ House reference held against: Inspection's pen page (`inspection.pen`, its sibli
 - `farrowing.pen`: tiles, Now (Sows 1 · Farrowing; Piglets alive 9 · 5 dead), Pen log; nothing clips at 360; ZH reads `B1栏 · 备注 / 饲喂 / 故障 · 当前 · 本栏记录`. The 2 + 1 grid leaves the right half of row two empty (the component's law; follow-up filed).
 - `farrowing.pen-attention` (new): the fault row, then the note row in one white group under `Needs attention`; the descriptions wrap without breaking the rows at 360.
 - `farrowing.pen-note`, `-fault`, `-fault-record`, `-read-note`: the sheets are unchanged; only the page dimmed behind them moved. Their own copy stays English under `?lang=zh` on both sides: Farrowing's prototype translates its rows and, now, the pen page; its form sheets are outside this change.
+
+Walk (gate, 298bd9e): every pen screen passed. Three screens the gate walks because they share changed files (the strings registry) failed, all also on main. In `data-sync.category` and `data-sync.task-badge`, the page header's Back did nothing (no handler for `back`); it now goes up one level as the footer's does. In `feed-plan.editor`, a typed note or end date and an unsaved adjustment were lost on Back; the adjustment is now kept per set of subjects, and the note and date per field, until Save or Clear. Both fixes change behaviour only.
