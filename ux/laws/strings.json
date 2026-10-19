@@ -2470,6 +2470,7 @@
     "feed.copy.128": {"en": "{n} without tags", "zh": "{n}头无耳标", "kind": "label"},
     "feed.copy.129": {"en": "All activity", "zh": "全部记录", "kind": "action"},
     "feed.copy.130": {"en": "Pen notes", "zh": "本栏备注", "kind": "label"},
+    "feed.copy.131": {"en": "Transfers, health and notes", "zh": "转栏、健康与备注", "kind": "label"},
     "feed.copy.extra.0": {"en": "More actions", "zh": "更多操作", "kind": "label"},
     "feed.copy.extra.1": {"en": "{n} pens", "zh": "{n}栏", "kind": "label"},
     "feed.copy.extra.2": {"en": "1 pen", "zh": "1栏", "kind": "label"},

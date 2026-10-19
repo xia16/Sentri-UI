@@ -238,3 +238,5 @@ Scope: the Inspection pen page (`inspection.pen`) and the walk's pen header. Own
 | Feed, pigs, last look | second lines of verb rows, or absent | Facts | **fix** |
 | Pen log | a row in the verb list | Row navigation, alone at the end | keep (a preview of its last entries said the note twice; driver look, 26777d5) |
 | Pen header checkbox on the walk | Row select | — (`Tick all` on the pen page) | **cut** |
+
+Order (owner, 2026-10-19, confirmed after judge round 1): the pen verbs stay on top; Needs attention follows them. Round 1 (void, calibration miss) asked for Needs attention first; the owner kept actions first.
