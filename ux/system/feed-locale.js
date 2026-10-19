@@ -25,7 +25,7 @@ function conditionName(value){
   return conditionNames.get(value.toLowerCase());
 }
 function translated(text){
-  text = text.replace(/ /g, ' ');
+  text = text.replace(/\u00a0/g, ' ');
   const value = text.trim();
   if(!value)return null;
   for(const entry of entries){
@@ -49,7 +49,9 @@ export function localizeFeed(root){
   while(walker.nextNode())nodes.push(walker.currentNode);
   for(const node of nodes){
     if(node.parentElement.closest('script,style,textarea'))continue;
-    const result=translated(node.textContent);if(!result)continue;
+    /* Inside a condition row the words are the catalogue's ("Clear" is a type of nasal discharge, not the verb). */
+    const name=node.parentElement.closest('.st-choice-row')?.querySelector('[data-condition]')&&conditionName(node.textContent.replace(/\u00a0/g,' ').trim());
+    const result=name?{text:node.textContent.replace(node.textContent.trim(),name)}:translated(node.textContent);if(!result)continue;
     node.textContent=result.text;
     if(result.id)node.parentElement.setAttribute('data-str',result.id);
   }

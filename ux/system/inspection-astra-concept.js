@@ -573,7 +573,7 @@ function bulkChanges(c){
    row.finding=cases(p).find(k=>k.name===f.target);
    if(!f.target)row.summary=cases(p).map(k=>k.name).join(', ')||'Nothing open';
    else if(!row.finding){row.eligible=false;row.summary='No '+f.target;}
-   else if(view==='resolve'){row.change=['recover','strike'].includes(f.outcome);row.summary=f.target+(row.change?' → '+(f.outcome==='recover'?'Recovered':'Entered in error'):' · choose outcome');}
+   else if(view==='resolve'){row.change=['recover','strike'].includes(f.outcome);row.summary=f.target+(row.change?' → '+(f.outcome==='recover'?'Recovered':'Entered in error'):'');}
    else {
     const k=row.finding,changes=[];
     if(f.triage!=='keep'&&(k.triage||'None')!==f.triage)changes.push(careLabel(k.triage)+' → '+careLabel(f.triage));
@@ -1073,13 +1073,17 @@ const ccEntries=[
  ...CC.items.flatMap(x=>{const base={kind:CC_KIND[x.kind],id:x.id,reportable:!!x.notifiable,aliases:x.also||[],group:x.groups?.[0]||'',systems:x.systems||[],signs:x.signs||[]};return [{...base,name:x.en},...(x.types||[]).map(t=>({...base,name:x.en+' ('+t.en.toLowerCase()+')',type:t.id}))];}),
 ];
 function ccDefinition(name){return ccEntries.find(e=>e.name===name);}
-function addFarmCondition(name,category){if(ccDefinition(name))return;const sym=category.startsWith('g:'),id='farm-'+CC.items.length,x=sym?{id,kind:'symptom',en:name,zh:name,groups:[category.slice(2)],also:[],farm:true}:{id,kind:'disease',en:name,zh:name,systems:[category.slice(2)],also:[],signs:[],farm:true};CC.items.push(x);CC.byId[id]=x;ccEntries.push({kind:CC_KIND[x.kind],id,name,aliases:[],group:x.groups?.[0]||'',systems:x.systems||[],signs:[]});}
+/* A condition's other names for search: its Chinese name, its other names and its area, so 咳嗽 finds Coughing. */
+function ccSearchNames(name){const d=ccDefinition(name),x=d&&CC.byId[d.id];if(!x)return [];const t=d.type&&(x.types||[]).find(y=>y.id===d.type);return [x.zh,...(x.also||[]),...(t?[x.zh+'（'+t.zh+'）',t.zh]:[]),...(x.groups||[]).map(g=>CC.groups.find(y=>y.id===g)?.zh),...(x.systems||[]).map(g=>CC.systems.find(y=>y.id===g)?.zh)].filter(Boolean);}
+/* A typed name that is already in the catalogue (in English, Chinese or another name) is that condition, never a second one. */
+function ccExisting(name){const n=name.toLocaleLowerCase();return CC.items.find(x=>x.en.toLocaleLowerCase()===n||x.zh===name||(x.also||[]).some(a=>a.toLocaleLowerCase()===n))?.en;}
+function addFarmCondition(name,category){const known=ccDefinition(name)?name:ccExisting(name);if(known)return known;const sym=category.startsWith('g:'),id='farm-'+CC.items.length,x=sym?{id,kind:'symptom',en:name,zh:name,groups:[category.slice(2)],also:[],farm:true}:{id,kind:'disease',en:name,zh:name,systems:[category.slice(2)],also:[],signs:[],farm:true};CC.items.push(x);CC.byId[id]=x;ccEntries.push({kind:CC_KIND[x.kind],id,name,aliases:[],group:x.groups?.[0]||'',systems:x.systems||[],signs:[]});return name;}
 /* Which production stages the record is for, so sow-only symptoms never show for growers. */
 function stageOfPig(p){const t=String(animalType(p)||'').toLowerCase(),s=String(p.stage||'').toLowerCase();if(t==='boar')return 'boar';if(/sow|gilt|gestat|lactat|farrow/.test(t+' '+s))return 'sow';if(/piglet|suckling/.test(s))return 'piglet';if(/wean|nursery/.test(s))return 'nursery';return 'grower';}
 function subjectStages(c){const f=c.form;return new Set([...(f.subjects||[]).map(id=>stageOfPig(pig(c,id))),...(f.noTags||[]).map(()=>'grower')]);}
 function conditionTree(c){
  const f=c.form,stages=subjectStages(c),fits=x=>!x.stages||x.stages.some(s=>stages.has(s));
- const leaf=(name,label,meta)=>({value:name,label:label||name,meta:meta??conditionMeta(c,{name}),attrs:{'data-condition':name,'data-condition-kind':ccDefinition(name)?.kind||'Symptom'}});
+ const leaf=(name,label,meta)=>({value:name,label:label||name,aliases:ccSearchNames(name),meta:meta??conditionMeta(c,{name}),attrs:{'data-condition':name,'data-condition-kind':ccDefinition(name)?.kind||'Symptom'}});
  const groups=CC.groups.filter(g=>g.id!=='pen'||(f.noTags||[]).length).map(g=>({value:'g:'+g.id,label:g.en,children:CC.items.filter(x=>x.groups?.[0]===g.id&&fits(x)).map(x=>x.types?{value:'t:'+x.id,label:x.en,children:[...x.types.map(t=>leaf(x.en+' ('+t.en.toLowerCase()+')',t.en)),leaf(x.en,'Not sure which')]}:leaf(x.en))}));
  const sysName=id=>CC.systems.find(s=>s.id===id).en;
  const diseases=CC.systems.map(s=>({value:'s:'+s.id,label:s.en,children:CC.items.filter(x=>x.kind==='disease'&&x.systems.includes(s.id)).map(x=>leaf(x.en,null,[x.notifiable?'Reportable':'',x.systems.length>1?'Also in '+x.systems.filter(y=>y!==s.id).map(sysName).join(', '):'',conditionMeta(c,{name:x.en})].filter(Boolean).join(' · ')))}));
@@ -1702,7 +1706,7 @@ function handleRecordAction(c,a,v){
  if(a==='condition-add-pick-category'){c.form.condAdd.picking=true;return true;}
  if(a==='condition-add-category'){Object.assign(c.form.condAdd,{category:v,picking:false});return true;}
  if(a==='condition-add-back'){const ad=c.form.condAdd;if(ad.picking){ad.picking=false;return true;}c.form.conditionPath=ad.back.path;c.form.search=ad.back.search;delete c.form.condAdd;return true;}
- if(a==='condition-add-save'){const ad=c.form.condAdd;if(!conditionAddReady(ad)){ad.showRequired=true;return true;}addFarmCondition(ad.name.trim(),ad.category);const name=ad.name.trim();if(!c.form.conditions.includes(name))c.form.conditions.push(name);c.form.conditionPath=[ad.category];c.form.search='';delete c.form.condAdd;return true;}
+ if(a==='condition-add-save'){const ad=c.form.condAdd;if(!conditionAddReady(ad)){ad.showRequired=true;return true;}const name=addFarmCondition(ad.name.trim(),ad.category);if(!c.form.conditions.includes(name))c.form.conditions.push(name);c.form.conditionPath=[ad.category];c.form.search='';delete c.form.condAdd;return true;}
  if(a==='pen-observe-toggle'){const o=c.form.observations;o.includes(v)?o.splice(o.indexOf(v),1):o.push(v);return true;}
  if(a==='save-pen-observe'){delete c.penDrafts?.['observe:'+c.penId];const pe=pen(c,c.penId);pe.observations=CC.penObservations.map(o=>o.id).filter(id=>c.form.observations.includes(id));addEvent(c,'Pen observation',[c.penId],pe.observations.map(id=>CC.penObservations.find(o=>o.id===id).en).join(', ')||'Nothing unusual');c.view='pen-detail';return true;}
  if(a==='condition-step'){c.form.conditionPath=(c.form.conditionPath||[]).slice(0,+v);c.form.search='';return true;}

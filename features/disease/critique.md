@@ -26,7 +26,7 @@ view are fixed in the prototype.
 - **major** · In Chinese the health flow read English: Record health's labels, the whole catalogue (areas, examples, condition
   names), Add a condition's fields, Resolve's labels and outcomes, and the condition tags on the walk list. The catalogue already
   carries every name in Chinese; the page's localizer never used it, and the labels had no registry entries.
-- **minor** · On Resolve at 360, "No open conditions" on a pig with nothing open pushed its pen · stage · days line onto two lines,
+- **minor** · On Resolve at 360, "No open conditions" (nothing open), "No Thin · unchanged" (not this condition) and "Thin · choose outcome" (before an outcome) pushed the pig's pen · stage · days line onto two lines,
   so the two pig rows had different heights.
 
 ## Parts
