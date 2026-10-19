@@ -8,7 +8,7 @@
 <div data-state="Done (saved)" id="task-item-state-7"></div>
 <div data-state="Chinese" id="task-item-state-8"></div>
 <script>
-// Each state renders in its own iframe in the atlas: draw only the states present, each in its card (rowGroup), as the screens do.
+// Each state renders in its own iframe in the atlas: draw only the states present.
 // One item of a task's day list (TaskDay draws these): due ring, ticked disc, one-tap act, or saved with Done and Edit.
 var UI = window.SentriUI;
 var DONE = {"variant": "chip", "kind": "done", "text": "Done", "strs": {"text": "ds.row.done"}};
@@ -27,6 +27,6 @@ var RENDER = {
 };
 document.querySelectorAll('[data-state]').forEach(function (s) {
   var t = RENDER[s.id] ? s : s.querySelector('[id]');
-  if (t && RENDER[t.id]) t.innerHTML = SentriUI.rowGroup(RENDER[t.id]());
+  if (t && RENDER[t.id]) t.innerHTML = RENDER[t.id]();
 });
 </script>
