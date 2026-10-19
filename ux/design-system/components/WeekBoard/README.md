@@ -21,8 +21,8 @@ Classification: **component** (a new job: no part draws work across days). One b
 1. **Day header**: Mon…Sun over the date in 15px mono; past dates muted; today ringed in ink. Not a target (a day column is too narrow for 48px).
 2. **Section band** (All only): a rule across the board, then the section's icon tile and name (15px / 600); no fill, so it is never a surface inside the board.
 3. **Task type**: 14px / 600 title written once, a 13px muted note on the right, a rule above.
-4. **Row** (a 48px button, the whole width): production rows show the batch ("B31", 13px mono) in a 34px gutter; health and other rows say what they are and where on their own line ("PRRS blood · Units 7, 9", 13px / 500). A row past its plan has a red label.
-5. **Cell**: 30px tall, 13px / 500 mono, one per day. Done: the count on `well`. Today: paper on `ink-2`. Planned: an `ink-2` outline. Estimate: a dashed outline and "~". Waiting on today: "–" in a `line` outline. Nothing due: "·" on `well`. Past its plan: a red edge (today: red count on `red-wash`). Continues: an open edge with an arrow into next or last week.
+4. **Row** (a 48px button, the whole width): production rows show the batch ("B31", 13px mono) in a 34px gutter; health and other rows say what they are and where on their own line ("PRRS blood · Units 7, 9", 13px / 500). A row past its plan keeps its plain label; the red is on its cells.
+5. **Cell**: 30px tall, 13px / 500 mono, one per day. Done: the count on `well`. Today: paper on `ink-2`. Planned: an `ink-2` outline. Estimate: a dashed outline and "~". Waiting on today: "–" in a `line` outline. Nothing due: "·" on `well`. Past its plan: a red edge, nothing else red. Continues: an open edge with an arrow into next or last week.
 6. **Today band**: a `press` column behind the cells of today.
 
 ## Variants
@@ -37,7 +37,7 @@ Classification: **component** (a new job: no part draws work across days). One b
 | This week | Past days show what was done; today filled; the rest planned, estimated or waiting. |
 | All sections | A band per section in one card. |
 | Next week | Rows from last week enter with an open left edge; no today band. |
-| Past its plan | A red edge on every day after the planned end; the label turns red. |
+| Past its plan | A red edge on every day after the planned end; the label stays plain. |
 | Empty week | "Nothing planned this week". |
 | Pressed row | One step deeper (`press`). |
 | Long label / Chinese | Row names end in an ellipsis; cells keep 13px; counts up to 999 in full, from 1,000 "1.2k" (estimates "~1k"). |

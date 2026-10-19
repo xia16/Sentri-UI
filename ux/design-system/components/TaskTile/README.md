@@ -22,10 +22,10 @@ Four fixed slots, each with one kind of message, at the same height in every til
 
 1. **Task**: 16px / 500 (15px at 370px and below, where the tile also pads 12px), one line, a short name of at most about 15 characters ("Return heat", "Processing"); ellipsis is only a guard.
 2. **Batch**: 13px muted, one line ("Batch 31"; for health work what and where: "PRRS · Units 7, 8").
-3. **To-do**: the count due now in 26px mono with a 13px word ("5 ready now"), or "None now" (16px / 500, ink-2). Under it one quiet 13px line: the next timer or due date with a clock ("4 more from Sat"), red with the solid "!" when part is overdue ("2 overdue"). The line keeps its height when empty.
-4. **Run**: a hairline, then one 6px segment per planned day (filled up to today) and "Day N of N". A task past its planned end adds one red segment per day over and reads "1 day overdue" in red; its to-do says how many are overdue ("6 overdue", red word).
+3. **To-do**: the count due now in 26px mono with a 13px word ("5 ready now"), or "None now" (16px / 500, ink-2). Under it one quiet 13px line: the next timer or due date with a clock ("4 more from Sat"), red with the solid "!" when part is overdue ("2 overdue"), or a quiet tick for "Ready to close". The line keeps its height when empty.
+4. **Run**: a hairline, then one 6px segment per planned day (filled up to today) and "Day N of N". A task past its planned end adds one red segment per day over and reads "1 day overdue"; its to-do says how many are overdue ("6 overdue"). The red segment is the only colour on that tile.
 
-White on the tinted page, 1px `line` border, `radius-panel`, 14px padding. A tile past its plan has a `danger-border` edge.
+White on the tinted page, 1px `line` border, `radius-panel`, 14px padding. **One coloured signal at most** (owner, 2026-10-19): red only on the overdue line or the days over; no red edge, no red words beside it.
 
 ## Variants
 
@@ -38,7 +38,8 @@ White on the tinted page, 1px `line` border, `radius-panel`, 14px padding. A til
 | Due now | Count and word; quiet next line with a clock. |
 | Overdue part | The quiet line is red with "!" ("2 overdue"). |
 | Nothing due now | "None now" and the next timer. No done state: a multi-day task stays until it closes. |
-| Past its plan | Red edge; "6 overdue" (red word); a red run segment per day over; "1 day overdue". |
+| Past its plan | "6 overdue"; a red run segment per day over (the only colour); "1 day overdue". |
+| Ready to close | Everything recorded, task still open: "All recorded", a tick and "Ready to close", the run full. A reminder only: closing stays inside the task. |
 | Last day | "Day 3 of 3 · last day". |
 | Pressed | One step deeper (`press`). |
 | Long label / Chinese | Name and batch end in an ellipsis; the count never wraps; the Chinese task name fits one line. |

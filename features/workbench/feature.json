@@ -196,7 +196,12 @@
               {
                 "state": "Past its plan",
                 "when": "The task has run past its planned last day and is still open",
-                "shows": "Red edge; the to-do says how many are overdue (\"6 overdue\"); the run grows one red segment per day over and says \"1 day overdue\""
+                "shows": "\"6 overdue\"; one red run segment per day over (the only colour on the tile); \"1 day overdue\""
+              },
+              {
+                "state": "Ready to close",
+                "when": "Everything the task asks for is recorded and the task is still open",
+                "shows": "\"All recorded\", a quiet tick and \"Ready to close\", the run full; closing stays inside the task"
               }
             ],
             "logic": "Four fixed slots, each with one kind of message, at the same height in every tile. Short task names (≤15 characters: \"Return heat\", \"Processing\"). A tile stays until the task closes.",
@@ -426,7 +431,12 @@
               {
                 "state": "Past its plan",
                 "when": "The task has run past its planned last day and is still open",
-                "shows": "Red edge; the to-do says how many are overdue (\"6 overdue\"); the run grows one red segment per day over and says \"1 day overdue\""
+                "shows": "\"6 overdue\"; one red run segment per day over (the only colour on the tile); \"1 day overdue\""
+              },
+              {
+                "state": "Ready to close",
+                "when": "Everything the task asks for is recorded and the task is still open",
+                "shows": "\"All recorded\", a quiet tick and \"Ready to close\", the run full; closing stays inside the task"
               }
             ],
             "logic": "Four fixed slots, each with one kind of message, at the same height in every tile. Short task names (≤15 characters: \"Return heat\", \"Processing\"). A tile stays until the task closes.",
@@ -493,7 +503,12 @@
               {
                 "state": "Past its plan",
                 "when": "The task has run past its planned last day and is still open",
-                "shows": "Red edge; the to-do says how many are overdue (\"6 overdue\"); the run grows one red segment per day over and says \"1 day overdue\""
+                "shows": "\"6 overdue\"; one red run segment per day over (the only colour on the tile); \"1 day overdue\""
+              },
+              {
+                "state": "Ready to close",
+                "when": "Everything the task asks for is recorded and the task is still open",
+                "shows": "\"All recorded\", a quiet tick and \"Ready to close\", the run full; closing stays inside the task"
               }
             ],
             "logic": "Four fixed slots, each with one kind of message, at the same height in every tile. Short task names (≤15 characters: \"Return heat\", \"Processing\"). A tile stays until the task closes.",
@@ -854,7 +869,12 @@
               {
                 "state": "Past its plan",
                 "when": "The task has run past its planned last day and is still open",
-                "shows": "Red edge; the to-do says how many are overdue (\"6 overdue\"); the run grows one red segment per day over and says \"1 day overdue\""
+                "shows": "\"6 overdue\"; one red run segment per day over (the only colour on the tile); \"1 day overdue\""
+              },
+              {
+                "state": "Ready to close",
+                "when": "Everything the task asks for is recorded and the task is still open",
+                "shows": "\"All recorded\", a quiet tick and \"Ready to close\", the run full; closing stays inside the task"
               }
             ],
             "logic": "Four fixed slots, each with one kind of message, at the same height in every tile. Short task names (≤15 characters: \"Return heat\", \"Processing\"). A tile stays until the task closes.",
@@ -1112,7 +1132,12 @@
               {
                 "state": "Past its plan",
                 "when": "The task has run past its planned last day and is still open",
-                "shows": "Red edge; the to-do says how many are overdue (\"6 overdue\"); the run grows one red segment per day over and says \"1 day overdue\""
+                "shows": "\"6 overdue\"; one red run segment per day over (the only colour on the tile); \"1 day overdue\""
+              },
+              {
+                "state": "Ready to close",
+                "when": "Everything the task asks for is recorded and the task is still open",
+                "shows": "\"All recorded\", a quiet tick and \"Ready to close\", the run full; closing stays inside the task"
               }
             ],
             "logic": "Four fixed slots, each with one kind of message, at the same height in every tile. Short task names (≤15 characters: \"Return heat\", \"Processing\"). A tile stays until the task closes.",

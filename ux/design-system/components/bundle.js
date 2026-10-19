@@ -1323,7 +1323,8 @@
     const n=Math.max(1,days.total||1),d=Math.max(0,Math.min(n,days.day||0)),over=Math.max(0,days.over||0);
     const act=t=>t==='act'||t==='red';
     const todoHtml=todo.none?`<span class="st-tile-todo" data-none=""><b>${esc(todo.none)}</b></span>`:`<span class="st-tile-todo"${act(todo.tone)?' data-tone="act"':''}><b>${esc(todo.value)}</b><span>${esc(todo.label)}</span></span>`;
-    const nextHtml=next?`<span class="st-tile-next"${act(next.tone)?' data-tone="act"':''}>${act(next.tone)?'<span class="st-tile-bang" aria-hidden="true">!</span>':glyph('clock')}<span>${esc(next.text)}</span></span>`:'<span class="st-tile-next" aria-hidden="true"></span>';
+    // One coloured signal at most (owner, 2026-10-19): red only on the overdue line or the days over; "ready to close" is a quiet tick.
+    const nextHtml=next?`<span class="st-tile-next"${act(next.tone)?' data-tone="act"':''}>${act(next.tone)?'<span class="st-tile-bang" aria-hidden="true">!</span>':glyph(next.tone==='done'?'check':'clock')}<span>${esc(next.text)}</span></span>`:'<span class="st-tile-next" aria-hidden="true"></span>';
     const segs=Array.from({length:n},(_,i)=>`<i${i<d?' data-on=""':''}></i>`).join('')+Array.from({length:over},()=>'<i data-over=""></i>').join('');
     const dayText=days.text||(over?`${over} ${over===1?'day':'days'} overdue`:`Day ${d} of ${n}`);
     const name=[title,sub,todo.none||`${todo.value} ${todo.label}`,next&&next.text,dayText].filter(Boolean).join(', ');
