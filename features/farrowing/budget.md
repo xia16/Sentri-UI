@@ -241,10 +241,10 @@ Scope: the room's pen page (`farrowing.pen`, `roomPenDetail`), moved onto the la
 | `Pen B1` | header | Which pen? | kept (no second line: the sow count is said once, in Now) |
 | Pen verbs: Note, Feed, Fault | Act now (one grid, Row tile) | What can I do to this pen? | verbs move to the top as tiles; their explanatory second lines are cut. Only the verbs Farrowing has: no Observe, no Tick all (Farrowing's room list has no ticking) |
 | Open equipment fault (device, its description) | Needs attention | Is something broken here? | kept, as a Row navigation row (as on Inspection), under `Needs attention`; the reported stamp is on the fault's record, one tap in |
-| Pen note (its text, who and when) | Needs attention | What did the last person leave me? | kept as its note card (same weight as on main), under the faults |
+| Pen note (its text, who and when) | Needs attention | What did the last person leave me? | kept, as a row after the faults in the same white group (its text in ink, who and when under it); its `Note` chip is cut (the row's note icon and the heading say it) |
 | Sows (`1`, `Farrowing`; `3`, `Awaiting`; `2`, `1 done · 1 sow died`) | Now | Who is in this pen, and where are they? | new on the page (today only on the room list's rows) |
 | Piglets alive (`9`, `5 dead`) | Now | How many piglets are here? | new on the page; left out when no sow in the pen has farrowed (no zeros); dead is said only when there are any |
 | Feed (formula, method) | Now | What does this pen eat? | new on the page (was the second line of Feed guidance); left out when nothing is recorded |
 | Pen log (`All recorded activity`) | door | What has happened here? | kept as one row at the end |
 
-Cut: the verb rows' second lines (`View feeding information`, `Name the device and what is wrong`, `Leave information for the next person`, `Update the note for this pen`); the fault notice's `Equipment` chip and its stamp line on the pen page (the fault row is the door to both). No `Observe` or `Tick all` tile: Farrowing has neither verb, and none is invented.
+Cut: the notices' kind chips (`Equipment`, `Note`); the verb rows' second lines (`View feeding information`, `Name the device and what is wrong`, `Leave information for the next person`, `Update the note for this pen`); the fault notice's `Equipment` chip and its stamp line on the pen page (the fault row is the door to both). No `Observe` or `Tick all` tile: Farrowing has neither verb, and none is invented.

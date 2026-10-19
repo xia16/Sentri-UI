@@ -542,7 +542,7 @@ Scope: the room's pen page (`farrowing.pen`) and the pen forms it opens (`farrow
 
 - The page header `Pen B1` and Back, as a page (not a drawer), reached from the pen header on the room list.
 - Every pen verb and where it goes: Feed guidance, Report equipment fault, Add / Edit pen note, Pen log; Resolve lives on the fault's record.
-- The note's text, author and time, as a card the same weight as on main.
+- The note's text, author and time, and its door to the note page.
 - Open faults listed before the note; a resolved fault leaves the page and stays in the log.
 
 ## Problems
@@ -550,6 +550,7 @@ Scope: the room's pen page (`farrowing.pen`) and the pen forms it opens (`farrow
 - **major** · The pen page shows no state of the pen: who is in it, the piglets and its feed are not on it, and the page reads as four tool rows (sibling: Inspection's pen page leads with its verbs and then says how the pen is).
 - **major** · It does not match its sibling with the same job: Inspection's pen page (owner ruling 2026-10-19) puts the verbs on top as a tile grid, then Needs attention, then Now, then one Pen log row. A worker who walks both tasks learns two pen pages.
 - **major** · Drafts are lost on Back: a pen note or a fault half typed is gone when the worker opens it again (atlas edge: "Back discards the draft"; walk law: drafts survive Back and reopen).
+- **minor** · The fault and note notices are tinted cards on the page's tint base (SURFACES.md: a card is the opposite of its base; gate R17), each in its own frame, with a kind chip (`Equipment`, `Note`) the section heading now says.
 - **minor** · Every verb row carries a second line that explains it rather than a state; at 390 and 360 the note row's line clips (`Leave information for the next pers…`).
 - **minor** · In Chinese the pen page is all English (`?lang=zh`: `Feed guidance`, `Pen log`, …): the page draws no names from the registry.
 - **minor** · The atlas steps to the pen screens tap English names (`Pen B1, 1 sow, view details`, `Add pen note`, `Select`, `Feeding station`), which a translated page breaks; they become selectors.
@@ -559,7 +560,21 @@ Scope: the room's pen page (`farrowing.pen`) and the pen forms it opens (`farrow
 | Part | Drawn by today | The component whose job it is | Keep / fix / cut |
 |---|---|---|---|
 | Pen verbs | Row navigation, four rows in one group | Row `tile` in `rowGrid` (as on Inspection's pen page and More actions) | **fix** |
-| Open faults | page-built `pen-notice` card (amber) | Row navigation in a group under `Needs attention` (as on Inspection) | **fix** |
-| Pen note | page-built `pen-notice` card | the same card, under the faults, under `Needs attention` | keep (its weight) |
+| Open faults | page-built `pen-notice` card (amber) | Row navigation in a white group under `Needs attention` (as on Inspection) | **fix** |
+| Pen note | page-built `pen-notice` card (tint on tint) | Row navigation in the same group, after the faults: the note's text (wrapping) over its hand and time | **fix** (the page-built `penNotice` is retired) |
 | Sows, piglets, feed | absent (feed: the second line of a verb row) | Facts | **fix** |
 | Pen log | a row in the verb list | Row navigation, alone at the end | keep |
+
+## Self-crit
+
+House reference held against: Inspection's pen page (`inspection.pen`, its sibling) and More actions (`farrowing.sow-actions`).
+
+**Round 1** (verbs as tiles; faults as rows; the note kept as its `pen-notice` card): the fault row and the note card touched with no gap, and the note card was a tint card on the page's tint (R17). Not handed over.
+
+**Round 2** (the note as a row after the faults, in one white group):
+- Problems: state on the page (Sows, Piglets alive with dead, Feed when recorded) **fixed**; the sibling's order (verbs, Needs attention, Now, Pen log) **fixed**; drafts kept per pen through Back (note, fault, a fault's resolution) **fixed** (walked live: typed, Back, reopened, saved, reopened empty); the clipped second lines **fixed** (cut); Chinese names **fixed** (`B1栏`, `备注 / 饲喂 / 故障`, `需要处理`, `当前`, `本栏记录`); atlas steps as selectors **fixed**; tint-on-tint notices **fixed**.
+- Keep: the title and Back as on main; every verb and where it goes (Note → Add / Edit pen note, Feed → Feed guidance, Fault → Report equipment fault, Pen log); faults before the note; a resolved fault leaves the page. The note's text keeps ink weight as a row title, its hand and time under it.
+- Squint test: the three tiles, then `Needs attention` with its rows when something is open, then the two Now figures. The worker's first questions are what can I do here, does anything need me, how is the pen: in that order, which is the owner's order (verbs on top, 2026-10-19).
+- Cluttered, flat or bulky: four rows with explanatory lines became three tiles and two quiet facts; one more card (Now) carries state the page lacked. No bold, no colour added; the amber fault card became an ink row (state is said by the heading).
+- Open point: three verbs draw 2 + 1 (Row tile law: always two rows, row two short by at most one). A one-row rule for 2–3 tiles is a shared change to an approved component, so it is not made here; it is filed as a follow-up.
+- **Better because** the pen page now says how the pen is and what needs someone, in the same order as Inspection's pen page, and nothing typed is lost on Back.
