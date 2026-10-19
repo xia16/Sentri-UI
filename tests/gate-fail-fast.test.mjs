@@ -53,6 +53,8 @@ test("from a checkout whose tools differ from the base, the gate runs the base's
     assert.match(r.stdout, /docs\/design-workflow\/README\.md.* differ from HEAD \(\w{7}\): the gate runs \w{7}'s own tools, from /);
     assert.match(r.stderr, /usage: node scripts\/gate\.mjs/, "the base's own gate.mjs ran, with the same arguments");
     assert.equal(r.status, 2, 'its exit code is the run inside');
-    assert.doesNotMatch(git(['worktree', 'list']), /sentri-gate-tools-/, 'the tools worktree is removed afterwards');
+    // this run's own tools worktree, by name: inside a gate, npm test runs beside the gate's own one (gate.mjs from a checkout whose tools differ)
+    const tools = path.basename(/own tools, from (.+)$/m.exec(r.stdout)[1].trim());
+    assert.ok(!git(['worktree', 'list']).includes(tools), 'the tools worktree is removed afterwards');
   } finally { w.done(); }
 });
