@@ -7,6 +7,7 @@
 // protection requiring the gate's `sentri/gate` status. So this is an allowlist, and it fails closed:
 //   merge: exactly  gh pr merge <n> [-R owner/repo] --squash [--delete-branch] --match-head-commit <40-hex sha>
 //   push:  each push exactly  git push [-q] [-u|--set-upstream] origin <branch>   (a named branch that isn't main)
+//          or, to delete a finished or stale branch (2026-10-20),  git push origin --delete <branch>   (one named branch, never main)
 //   auto-merge: never.
 //   worktrees: removed only through  node scripts/worktree-remove.mjs <dir>  (git deletes through a node_modules junction on Windows
 //              and empties the main checkout's), and node_modules is never linked into one (SENTRI_PLAYWRIGHT finds Playwright).
@@ -38,8 +39,8 @@ const isMerge = prSub.some((s) => !SAFE_PR.test(s))
 if (/\bpush\b/i.test(plain) && /\bgit\b/i.test(plain)) {
   const segs = plain.split(/;|&&|\|\||\||&|\r?\n/).map((s) => s.trim()).filter((s) => /\bpush\b/i.test(s));
   for (const seg of segs) {
-    const m = seg.match(/^git push(?: -q| --quiet)?(?: -u| --set-upstream)? origin ([\w./-]+)$/);
-    if (!m || /^(main|master|HEAD)$/i.test(m[1]) || m[1].includes(':')) block(`a push must be one plain "git push origin <branch>" naming a branch that isn't main: "${seg}"`);
+    const m = seg.match(/^git push(?: -q| --quiet)?(?: -u| --set-upstream)? origin ([\w./][\w./-]*)$/) || seg.match(/^git push origin (?:--delete|-d) ([\w./][\w./-]*)$/);
+    if (!m || /^(main|master|HEAD)$/i.test(m[1]) || m[1].includes(':')) block(`a push must be one plain "git push origin <branch>", or "git push origin --delete <branch>", naming a branch that isn't main: "${seg}"`);
   }
   if (/\b(checkout|switch)\b[^;&|\n]*\b(main|master)\b/i.test(plain)) block('a command that pushes may not switch to main');
 }
