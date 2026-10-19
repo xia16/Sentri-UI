@@ -226,6 +226,8 @@ Scope: the Inspection pen page (`inspection.pen`) and the walk's pen header. Own
 - **major** · Pen and pigs were ticked together: the pen header's checkbox ticked the pen and all its pigs, mixing two subjects in one selection (owner ruling 2026-10-19).
 - **minor** · Every verb row carries a second line that explains it (`Update the note for this pen`, `Transfers, health and notes`) rather than a state.
 - **minor** · Reporting an equipment fault has no entry on the Inspection pen page (Farrowing's pen page has one).
+- **minor** · In Chinese the log filter's `All activity` stays English, on every log that uses it (`inspection.pen-log`, `pig-list.events`, `pig-profile.log`): the registry had no Chinese for it. Shared reach: the one `feed.copy` entry (`全部记录`) translates it on all three.
+- **minor** · The Chinese capture of `inspection.filters` never opened the sheet: its step tapped the English `aria-label` "Filter pigs", which the Chinese page translates. The step now taps the action (`[data-action="filters"]`).
 
 ## Parts
 
