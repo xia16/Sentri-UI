@@ -136,11 +136,12 @@
     return panel((title||has({strs},'title')?heading({title,kind:'group',level,className:'st-row-group-label',strs,args}):'')+content,{className:'st-row-group '+className,ds:'Row'});
   }
   /* Row tile (owner, 2026-10-19): one action as an icon well over one word, for the grid of everyday verbs in More actions.
-     The word is the short verb ("Treat"); the full action name ("Record treatment") is its accessible name. tone 'danger' is
+     The word is the short verb ("Treat"); the accessible name starts with that word (label in name: voice control says what it sees)
+     and adds the full action name when it does not already hold it ("Condition, Disease or symptom"). tone 'danger' is
      the one irreversible verb (Death): red ink on its well and word, nothing louder. */
   function rowTile({label,title='',icon='',action='',value='',tone='',attrs={},className=''}={}){
-    const danger=tone==='danger';
-    return `<button type="button" class="st-row-tile${danger?' is-danger':''}${className?' '+esc(className):''}" data-ds="Row" data-variant="tile" data-action="${esc(action)}" data-value="${esc(value)}" aria-label="${esc(title||label)}"${safeAttr(attrs)}><span class="st-row-tile-icon" aria-hidden="true">${icon}</span><span class="st-row-tile-label">${esc(label)}</span></button>`;
+    const danger=tone==='danger',name=title&&!String(title).toLowerCase().includes(String(label).toLowerCase())?label+', '+title:(title||label);
+    return `<button type="button" class="st-row-tile${danger?' is-danger':''}${className?' '+esc(className):''}" data-ds="Row" data-variant="tile" data-action="${esc(action)}" data-value="${esc(value)}" aria-label="${esc(name)}"${safeAttr(attrs)}><span class="st-row-tile-icon" aria-hidden="true">${icon}</span><span class="st-row-tile-label">${esc(label)}</span></button>`;
   }
   /* The tile grid: one panel, always two rows (one only for a single tile), split evenly so row two is never short by more than one
      (5 = 3+2, 6 = 3+3, 8 = 4+4, 10 = 5+5), at most five across. Danger tiles never fold and are always the last tile. Over ten,

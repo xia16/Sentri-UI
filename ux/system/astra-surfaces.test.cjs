@@ -86,7 +86,8 @@ test('Actions is a menu drawer: everyday verbs as a grid, Production as navigati
   assert.ok(grid,'everyday grid');
   const tiles=grid[2].match(/class="st-row-tile[" ]/g).length;
   assert.equal(+grid[1],Math.ceil(tiles/2),'two rows, split evenly');
-  assert.match(grid[2],/aria-label="Disease or symptom"[^>]*>[\s\S]*?<span class="st-row-tile-label">Condition<\/span>/);
+  assert.match(grid[2],/aria-label="Condition, Disease or symptom"[^>]*>[\s\S]*?<span class="st-row-tile-label">Condition<\/span>/);
+  assert.match(grid[2],/aria-label="Record treatment"[^>]*>[\s\S]*?<span class="st-row-tile-label">Treat<\/span>/,'a name that already holds the word stays as it is');
   for(const group of html.match(/<div class="[^"]*compact-actions[^"]*">/g)||[]) {
     assert.match(group,/st-action-list/);
     assert.match(group,/st-panel/);

@@ -13907,7 +13907,7 @@
               "shows": "The last tile, in red ink"
              }
             ],
-            "rule": "Each tile keeps the full action name as its accessible name; the word under the icon is the short verb. A verb whose line is content (an existing sow note) keeps its described row under the grid."
+            "rule": "The word under the icon is the short verb; the accessible name starts with it and adds the full action name when that does not already hold it (Condition, Disease or symptom). A verb whose line is content (an existing sow note) keeps its described row under the grid."
            },
            {
             "name": "Action row availability",
@@ -15816,7 +15816,7 @@
               "shows": "The last tile, in red ink"
              }
             ],
-            "rule": "Each tile keeps the full action name as its accessible name; the word under the icon is the short verb. A verb whose line is content (an existing sow note) keeps its described row under the grid."
+            "rule": "The word under the icon is the short verb; the accessible name starts with it and adds the full action name when that does not already hold it (Condition, Disease or symptom). A verb whose line is content (an existing sow note) keeps its described row under the grid."
            },
            {
             "name": "Production group",
