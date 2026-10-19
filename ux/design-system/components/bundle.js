@@ -135,6 +135,29 @@
   function rowGroup(content,{title='',level=5,className='',strs,args}={}){
     return panel((title||has({strs},'title')?heading({title,kind:'group',level,className:'st-row-group-label',strs,args}):'')+content,{className:'st-row-group '+className,ds:'Row'});
   }
+  /* Row tile (owner, 2026-10-19): one action as an icon well over one word, for the grid of everyday verbs in More actions.
+     The word is the short verb ("Treat"); the accessible name always contains that word (label in name: voice control says what it sees):
+     it is the full action name when that holds the word as a whole word ("Add a note"), else the word, then the full name ("Condition, Disease or symptom", "Treat, Record treatment"). tone 'danger' is
+     the one irreversible verb (Death): red ink on its well and word, nothing louder. */
+  function rowTile({label,title='',icon='',action='',value='',tone='',attrs={},className=''}={}){
+    const word=new RegExp('(^|[^\\p{L}\\p{N}])'+String(label).replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'($|[^\\p{L}\\p{N}])','iu');
+    const holds=/\p{Script=Han}/u.test(String(label))?String(title).includes(String(label)):word.test(String(title)); // Chinese has no spaces: containment is the word test
+    const danger=tone==='danger',name=title&&!holds?label+', '+title:(title||label);
+    return `<button type="button" class="st-row-tile${danger?' is-danger':''}${className?' '+esc(className):''}" data-ds="Row" data-variant="tile" data-action="${esc(action)}" data-value="${esc(value)}" aria-label="${esc(name)}"${safeAttr(attrs)}><span class="st-row-tile-icon" aria-hidden="true">${icon}</span><span class="st-row-tile-label">${esc(label)}</span></button>`;
+  }
+  /* The tile grid: one panel, always two rows (one only for a single tile), split evenly so row two is never short by more than one
+     (5 = 3+2, 6 = 3+3, 8 = 4+4, 10 = 5+5), at most five across. Danger tiles never fold and are always the last tile. Over ten,
+     nine show and `more` (a tile that opens the rest in place) sits just before the danger tiles; `expanded` shows them all in
+     even rows of at most five (11 = 4+4+3). */
+  function rowGrid(tiles=[],{more=null,expanded=false,label='',className=''}={}){
+    const calm=tiles.filter(t=>t.tone!=='danger'),danger=tiles.filter(t=>t.tone==='danger'),ordered=[...calm,...danger];
+    const folded=ordered.length>10&&!expanded&&!!more,shown=folded?[...calm.slice(0,Math.max(0,9-danger.length)),...danger]:ordered,slots=shown.length+(folded?1:0);
+    if(!slots)return '';
+    const rows=slots<2?1:Math.max(2,Math.ceil(slots/5)),cols=Math.ceil(slots/rows);
+    const moreTile=folded?rowTile(Object.assign({label:'More',title:`${ordered.length-9} more actions`,icon:SentriIcons.icon('more')},more)):'';
+    const calmShown=shown.filter(t=>t.tone!=='danger'),dangerShown=shown.filter(t=>t.tone==='danger');
+    return `<div class="st-panel st-row-grid${className?' '+esc(className):''}" data-ds="Row" role="group"${label?` aria-label="${esc(label)}"`:''} style="--st-row-grid-cols:${cols}">${calmShown.map(rowTile).join('')}${moreTile}${dangerShown.map(rowTile).join('')}</div>`;
+  }
   /* Row family: button or inert row, select label and sibling door + act targets.
      All variants share the copy renderer, Status chips and token-based layout. */
   function rowCopy({title,description,code,mono,tight,o,titleId=''}){
@@ -1373,7 +1396,7 @@
   function weekBoardKey(rows=[]){
     return `<div class="st-panel st-week-key" data-ds="WeekBoard">${rows.map(([c,t,l])=>`<div class="st-week-key-row"><span class="st-week-grid" data-one="">${weekCell(c)}</span><div><strong>${esc(t)}</strong><small>${esc(l)}</small></div></div>`).join('')}</div>`;
   }
-  const api=Object.freeze({taskTile,weekBoard,weekCell,weekBoardKey,headerLine,pageHeader,rangeSlider,filterSheet,penMap,penMapKey,penMapFooter,penPeek,penMapMount:penMount,optionalRow,heading,panel,facts,row,rowGroup,log,logDay,logStamp,logGroups,categoryFooter,field,pickerField,pickerOptions,pickerBody,pickerHead,pickerFooter,filterChips,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,toast,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowSelectDoor,rowAction,rowSelectChange,status,conditionTag,rowFitTags,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
+  const api=Object.freeze({taskTile,weekBoard,weekCell,weekBoardKey,headerLine,pageHeader,rangeSlider,filterSheet,penMap,penMapKey,penMapFooter,penPeek,penMapMount:penMount,optionalRow,heading,panel,facts,row,rowGroup,log,logDay,logStamp,logGroups,categoryFooter,field,rowTile,rowGrid,pickerField,pickerOptions,pickerBody,pickerHead,pickerFooter,filterChips,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,toast,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowSelectDoor,rowAction,rowSelectChange,status,conditionTag,rowFitTags,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
   root.SentriUI=api;
   if(typeof module!=='undefined')module.exports=api;
 })(globalThis);

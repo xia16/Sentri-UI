@@ -204,3 +204,5 @@ Scope: the walk list, its dock, the Selected review, the Actions page and the pe
 
 - Squint, the walk: the pen header, then the urgent tags, then the group row's tags; the count field is the one control and stays quiet until ticked.
 - **Better because** the pen's whole herd is on the walk with its conditions, a pen tick no longer paints a square, and the selection is one number with one place to edit it.
+
+- More actions became a menu drawer with a verb grid (PR #224): see the block at the end of [pig-profile/critique.md](../pig-profile/critique.md); `inspection.actions` and `feed-plan.bulk` are the same renderer.

@@ -224,3 +224,48 @@ Scope: the pig's Actions page and the drawers that open over it. The owner's rou
 ### Self-crit
 
 - **Better because** the title says what the page is.
+
+---
+
+# More actions as a menu drawer with a verb grid (PR #224), critique
+
+Scope: More actions, one renderer (`ux/system/inspection-astra-concept.js` `actionsPage`) drawn for one pig (`pig-profile.actions`), for the ticked pigs or pens (`inspection.actions`, `feed-plan.bulk`) and in Farrowing's sow embed (`farrowing.sow-actions`). Owner, 2026-10-19: the everyday verbs become a grid of icon tiles, the stage-bound ones stay described rows, and the page becomes a drawer; the grid takes at least two rows, split evenly (owner: "at least 2 rows … distributed evenly"): two rows, and a third only once More is opened past ten verbs. Base: origin/main 92e0f0d.
+
+## Keep
+
+- **Omission first.** Blocked verbs stay left out; one quiet line (`Unavailable actions (N) ›`) opens the reasons.
+- **Production as described rows**, its order and its per-task grouping when there is enough to group (Farrowing, Piglet processing, Shared…). Their second line tells the stage-bound verbs apart (`Pregnancy check · Tomorrow · 13 Sep · Batch 20`).
+- **The header**: `More actions` and the subject chip with its pen. Back is the way out and keeps nothing to lose.
+- **The Pigs / Pens switch** when pens are ticked, and the Pens rows (Pen note, Feed).
+- **Every verb, its order and where it goes**: Health then Routine then Production; each tap opens the same surface as before.
+
+## Problems
+
+- **major** · The everyday verbs cost a whole described row each: up to nine rows whose second line does not change what the worker does (`Disease or symptom` / `Record a health finding`, `Add a note` / `The same note for these pigs`). With Production the page ran past the screen, so the verbs a worker taps many times a walk shared one long scroll with the rare ones.
+- **major** · As a page, More actions covered the list or record it acts on: the ticked pigs and the sow's record disappeared behind it.
+- **minor** · The Health / Routine / Production footer tabs said the section headings a second time and needed a scroll-spy to stay true.
+- **minor** · Production's per-task headings over a single row each (`Pregnancy check` over `Pregnancy check`, `Gestation` over `Record abortion`): a heading per row, the same word twice.
+
+## Parts
+
+| Part | Drawn by today | The component whose job it is | Keep / fix / cut |
+|---|---|---|---|
+| Surface | Sheet `page` | Sheet `drawer`, `surface: 'menu'` (SURFACES.md lists More actions as a menu drawer) | **fix** |
+| Everyday verbs (Health, Routine) | Row `navigation`, one per verb, in two groups with headings | Row `tile` in `rowGrid` (new variant: the icon well of the navigation row over one word; the full name is the accessible name) | **fix** |
+| Health / Routine headings | Heading `section` | — (the grid's order carries them) | **cut** |
+| Footer | CategoryFooter (tabs, no Back) | Sheet footer: Back | **fix** |
+| Production rows | Row `navigation` in task clusters | Row `navigation` | keep; clusters only above three rows |
+| Unavailable actions line | page-built quiet link | same | keep |
+
+## Attention budget
+
+First three things the eye lands on, in order: the subject (`More actions` · `#000254 · C1`, or the ticked pigs behind the drawer), the everyday verbs (one row of icons, one word each), the Production rows. Cut: nine second lines, two section headings, the three footer tabs, Production's single-row headings. Added: nothing but the grid's card.
+
+## Self-crit
+
+Directions, each mocked at 390 before the build (owner, 2026-10-19): (A) the archive tile sheet in today's style: a 73% drawer of boxed tiles in three columns, rejected (more space, not less, and the ticked pigs hidden); (B) icon buttons with one word, five across, in a ~60% drawer; (C) B for the everyday verbs and described rows for Production, chosen; then one grid with no Health / Routine headings (colour by category was tried and rejected: the split falls mid-row and reads as random), and the owner's rule of at least two rows, split evenly.
+- Pig profile, one sow (7 verbs + 3 Production rows): the base needed three tabs and still ran past the screen; the candidate shows every verb in two rows of icons (4 + 3) and all of Production in one view, over her record. **Better because** the daily verbs read at a glance and the rare ones keep their words.
+- Two pigs (8 verbs): 4 + 4, the ticked rows visible above the drawer.
+- Farrowing sow (5 verbs + 5 Production rows): 3 + 2; Production keeps its task headings and scrolls inside the drawer.
+- Judge round 3 (2026-10-19): a verb whose second line is content is not a bare verb. A Farrowing sow's existing note (`Edit note · Red line on left shoulder · monitor overnight`) is handover information, so it keeps its described row directly under the grid; only verbs whose line merely explains them become tiles. The Farrowing embed now follows `?lang=zh`, so its drawer, tiles included, renders in Chinese.
+- Known, not fixed: the Death tile (danger, always last) has no caller yet: Farrowing does not pass `Record sow death` into the drawer, and Inspection has no death verb.

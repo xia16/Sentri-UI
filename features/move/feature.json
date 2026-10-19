@@ -133,7 +133,7 @@
       "preset": "count",
       "steps": [
         "Actions",
-        "Transfer sow"
+        "[data-action=\"sow-host-action\"][data-value=\"transfer\"]"
       ],
       "figma": "",
       "notes": {
