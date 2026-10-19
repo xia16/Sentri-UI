@@ -212,7 +212,7 @@ Held against the Farrowing room (its dock: one dark primary, Back outlined) and 
 
 # More actions as a menu drawer with a verb grid (PR #224), critique
 
-Scope: More actions, one renderer (`ux/system/inspection-astra-concept.js` `actionsPage`) drawn for one pig (`pig-profile.actions`), for the ticked pigs or pens (`inspection.actions`, `feed-plan.bulk`) and in Farrowing's sow embed (`farrowing.sow-actions`). Owner, 2026-10-19: the everyday verbs become a grid of icon tiles, the stage-bound ones stay described rows, and the page becomes a drawer; the grid is always two rows, split evenly. Base: origin/main 92e0f0d.
+Scope: More actions, one renderer (`ux/system/inspection-astra-concept.js` `actionsPage`) drawn for one pig (`pig-profile.actions`), for the ticked pigs or pens (`inspection.actions`, `feed-plan.bulk`) and in Farrowing's sow embed (`farrowing.sow-actions`). Owner, 2026-10-19: the everyday verbs become a grid of icon tiles, the stage-bound ones stay described rows, and the page becomes a drawer; the grid takes at least two rows, split evenly (owner: "at least 2 rows … distributed evenly"): two rows, and a third only once More is opened past ten verbs. Base: origin/main 92e0f0d.
 
 ## Keep
 
@@ -246,7 +246,7 @@ First three things the eye lands on, in order: the subject (`More actions` · `#
 
 ## Self-crit
 
-Directions, each mocked at 390 before the build (owner, 2026-10-19): (A) the archive tile sheet in today's style: a 73% drawer of boxed tiles in three columns, rejected (more space, not less, and the ticked pigs hidden); (B) icon buttons with one word, five across, in a ~60% drawer; (C) B for the everyday verbs and described rows for Production, chosen; then one grid with no Health / Routine headings (colour by category was tried and rejected: the split falls mid-row and reads as random), and the owner's two-row rule.
+Directions, each mocked at 390 before the build (owner, 2026-10-19): (A) the archive tile sheet in today's style: a 73% drawer of boxed tiles in three columns, rejected (more space, not less, and the ticked pigs hidden); (B) icon buttons with one word, five across, in a ~60% drawer; (C) B for the everyday verbs and described rows for Production, chosen; then one grid with no Health / Routine headings (colour by category was tried and rejected: the split falls mid-row and reads as random), and the owner's rule of at least two rows, split evenly.
 - Pig profile, one sow (7 verbs + 3 Production rows): the base needed three tabs and still ran past the screen; the candidate shows every verb in two rows of icons (4 + 3) and all of Production in one view, over her record. **Better because** the daily verbs read at a glance and the rare ones keep their words.
 - Two pigs (8 verbs): 4 + 4, the ticked rows visible above the drawer.
 - Farrowing sow (5 verbs + 5 Production rows): 3 + 2; Production keeps its task headings and scrolls inside the drawer.

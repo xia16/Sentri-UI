@@ -4,6 +4,7 @@
 <div data-state="Six verbs (3 + 3)" id="tile-state-3"></div>
 <div data-state="Danger · Death is last" id="tile-state-4"></div>
 <div data-state="Over ten · More" id="tile-state-5"></div>
+<div data-state="More opened · eleven verbs (4 + 4 + 3)" id="tile-state-7"></div>
 <div data-state="Chinese" id="tile-state-6"></div>
 <script>
 // Each state renders in its own iframe in the atlas: draw only the states present.
@@ -31,6 +32,7 @@ var RENDER = {
   "tile-state-3": () => UI.rowGrid(pick(['condition', 'treat', 'resolve', 'care', 'note', 'move']), { more: more, label: 'Everyday actions' }),
   "tile-state-4": () => UI.rowGrid(pick(['death', 'condition', 'treat', 'note', 'move']), { more: more, label: 'Everyday actions' }),
   "tile-state-5": () => UI.rowGrid(pick(['condition', 'treat', 'edit', 'resolve', 'care', 'note', 'move', 'measure', 'feed', 'weigh', 'temp', 'death']), { more: more, label: 'Everyday actions' }),
+  "tile-state-7": () => UI.rowGrid(pick(['condition', 'treat', 'edit', 'resolve', 'care', 'note', 'move', 'measure', 'feed', 'weigh', 'death']), { more: more, expanded: true, label: 'Everyday actions' }),
   "tile-state-6": () => UI.rowGrid([
     { label: '疾病', title: '疾病或症状', icon: I('condition'), action: 'health' },
     { label: '治疗', title: '记录治疗', icon: I('treat'), action: 'treatment' },

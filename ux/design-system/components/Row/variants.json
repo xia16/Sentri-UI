@@ -18,7 +18,7 @@
   {
     "id": "tile",
     "name": "Tile",
-    "use": "Use for the everyday verbs of More actions: one action as an icon well over one word, in a grid of always two rows split evenly (SentriUI.rowGrid). Owner, 2026-10-19.",
+    "use": "Use for the everyday verbs of More actions: one action as an icon well over one word, in a grid of two rows split evenly, a third only once More is opened (SentriUI.rowGrid). Owner, 2026-10-19.",
     "notUse": "Not for verbs that need a line to explain them (Production) — use navigation; not for places or animals.",
     "states": [
       "Default · eight verbs (4 + 4)",
@@ -27,6 +27,7 @@
       "Six verbs (3 + 3)",
       "Danger · Death is last",
       "Over ten · More",
+      "More opened · eleven verbs (4 + 4 + 3)",
       "Chinese"
     ],
     "usedBy": [
