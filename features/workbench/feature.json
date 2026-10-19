@@ -1245,7 +1245,7 @@
           "Full screen: ✕ closes back to Home (owner, 2026-10-19); no page header and no bottom bar. The date range is the only text at the top, the week number a small label.",
           "Natural Mon–Sun weeks, paged in the 56px footer: the earlier week is the footer's back slot (\"‹ Week 26\"), the later week its primary (\"Week 28 ›\").",
           "Opens filtered to the Home section whose \"Schedule ›\" was tapped; All, Production, Health and Other are a segment.",
-          "All: one card, one tinted band per section (owner chose B, 2026-10-19).",
+          "All: one card, a band per section (owner chose B, 2026-10-19): a rule, the section icon and its name, with no fill.",
           "No daily total row."
         ],
         "issues": []
@@ -1321,7 +1321,7 @@
           "Full screen: ✕ closes back to Home (owner, 2026-10-19); no page header and no bottom bar. The date range is the only text at the top, the week number a small label.",
           "Natural Mon–Sun weeks, paged in the 56px footer: the earlier week is the footer's back slot (\"‹ Week 26\"), the later week its primary (\"Week 28 ›\").",
           "Opens filtered to the Home section whose \"Schedule ›\" was tapped; All, Production, Health and Other are a segment.",
-          "All: one card, one tinted band per section (owner chose B, 2026-10-19).",
+          "All: one card, a band per section (owner chose B, 2026-10-19): a rule, the section icon and its name, with no fill.",
           "No daily total row."
         ],
         "issues": []
@@ -1397,7 +1397,7 @@
           "Full screen: ✕ closes back to Home (owner, 2026-10-19); no page header and no bottom bar. The date range is the only text at the top, the week number a small label.",
           "Natural Mon–Sun weeks, paged in the 56px footer: the earlier week is the footer's back slot (\"‹ Week 26\"), the later week its primary (\"Week 28 ›\").",
           "Opens filtered to the Home section whose \"Schedule ›\" was tapped; All, Production, Health and Other are a segment.",
-          "All: one card, one tinted band per section (owner chose B, 2026-10-19).",
+          "All: one card, a band per section (owner chose B, 2026-10-19): a rule, the section icon and its name, with no fill.",
           "No daily total row."
         ],
         "issues": []
@@ -1479,7 +1479,7 @@
           "Full screen: ✕ closes back to Home (owner, 2026-10-19); no page header and no bottom bar. The date range is the only text at the top, the week number a small label.",
           "Natural Mon–Sun weeks, paged in the 56px footer: the earlier week is the footer's back slot (\"‹ Week 26\"), the later week its primary (\"Week 28 ›\").",
           "Opens filtered to the Home section whose \"Schedule ›\" was tapped; All, Production, Health and Other are a segment.",
-          "All: one card, one tinted band per section (owner chose B, 2026-10-19).",
+          "All: one card, a band per section (owner chose B, 2026-10-19): a rule, the section icon and its name, with no fill.",
           "No daily total row."
         ],
         "issues": []
@@ -1561,7 +1561,7 @@
           "Full screen: ✕ closes back to Home (owner, 2026-10-19); no page header and no bottom bar. The date range is the only text at the top, the week number a small label.",
           "Natural Mon–Sun weeks, paged in the 56px footer: the earlier week is the footer's back slot (\"‹ Week 26\"), the later week its primary (\"Week 28 ›\").",
           "Opens filtered to the Home section whose \"Schedule ›\" was tapped; All, Production, Health and Other are a segment.",
-          "All: one card, one tinted band per section (owner chose B, 2026-10-19).",
+          "All: one card, a band per section (owner chose B, 2026-10-19): a rule, the section icon and its name, with no fill.",
           "No daily total row."
         ],
         "issues": []
