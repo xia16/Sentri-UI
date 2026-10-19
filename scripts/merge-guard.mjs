@@ -8,6 +8,8 @@
 //   merge: exactly  gh pr merge <n> [-R owner/repo] --squash [--delete-branch] --match-head-commit <40-hex sha>
 //   push:  each push exactly  git push [-q] [-u|--set-upstream] origin <branch>   (a named branch that isn't main)
 //   auto-merge: never.
+//   worktrees: removed only through  node scripts/worktree-remove.mjs <dir>  (git deletes through a node_modules junction on Windows
+//              and empties the main checkout's), and node_modules is never linked into one (SENTRI_PLAYWRIGHT finds Playwright).
 
 const block = (why) => { console.error(`merge guard: ${why}\nMerges run only behind GATE PASS (docs/design-workflow/briefs/gate.md): node scripts/gate.mjs --verdict <out>, then, as a command of its own:\n  gh pr merge <n> --squash --match-head-commit <sha>\nPushes name their branch: git push origin <branch>.`); process.exit(2); };
 process.on('uncaughtException', (e) => block(`the guard failed (${e.message}), so it blocks`));
@@ -22,6 +24,11 @@ const cmd = String(j.tool_input?.command || '');
 
 // Normalise away quoting, escapes and .exe before looking for anything that could merge a PR or move main.
 const plain = cmd.replace(/["'`^\\]/g, '').replace(/\.exe\b/gi, '');
+
+// Worktrees (2026-10-19): a hand-typed removal can delete through a link; a node_modules link is what it deletes through.
+const wtBlock = (why) => { console.error(`worktree guard: ${why}`); process.exit(2); };
+if (/\bgit\b[^;&|\n]*\bworktree\s+remove\b/i.test(plain)) wtBlock('remove a worktree with "node scripts/worktree-remove.mjs <dir>": it unlinks a junction or symlink inside first. git worktree remove --force deletes through a node_modules junction on Windows and empties the main checkout\'s node_modules.');
+if (/node_modules/i.test(plain) && /\bmklink\b|ItemType\s+(Junction|SymbolicLink)|\bln\s+-\w*s|symlinkSync/i.test(plain)) wtBlock('never link node_modules into a worktree: a removal can delete through the link. Set SENTRI_PLAYWRIGHT to the main checkout\'s node_modules/playwright instead.');
 const SAFE_PR = /^(view|list|create|edit|comment|checks|diff|status|checkout|ready|close|reopen|review)$/;
 const prSub = [...plain.matchAll(/\bgh\s+pr\s+(\S+)/gi)].map((m) => m[1]);
 const isMerge = prSub.some((s) => !SAFE_PR.test(s))

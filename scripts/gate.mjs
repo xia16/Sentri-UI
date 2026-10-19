@@ -36,6 +36,7 @@ import { checkVerdict, calibrationProblems, lockState, passesWithoutJudge, carry
 import { selfStart } from './process-start.mjs';
 import { postStatus as post } from './github.mjs';
 import { evaluate, toolsDiffer } from './evaluate.mjs';
+import { removeWorktree } from './worktree-remove.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -70,8 +71,7 @@ if (!process.env.SENTRI_GATE_TOOLS) {
     if (added.code) { console.log(`GATE BLOCKED — this checkout's tools differ from ${short(base)}, and a worktree of it could not be made: ${added.err.trim().split('\n')[0]}`); process.exit(3); }
     console.log(`this checkout's ${stale.slice(0, 3).join(', ')}${stale.length > 3 ? ' …' : ''} differ from ${mainRef} (${short(base)}): the gate runs ${short(base)}'s own tools, from ${dir}`);
     const r = spawnSync(process.execPath, [path.join(dir, 'scripts/gate.mjs'), ...argv], { stdio: 'inherit', cwd: process.cwd(), env: { ...process.env, SENTRI_GATE_TOOLS: base, ...(pwPath ? { SENTRI_PLAYWRIGHT: pwPath } : {}) } });
-    git(['worktree', 'remove', '--force', dir]);
-    git(['worktree', 'prune']);
+    removeWorktree(dir, { cwd: root });
     process.exit(r.status ?? 1);
   }
 }

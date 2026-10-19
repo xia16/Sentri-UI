@@ -9,6 +9,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { evaluate } from '../scripts/evaluate.mjs';
+import { removeWorktree } from '../scripts/worktree-remove.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const git = (args, cwd = root) => { const r = spawnSync('git', args, { cwd, encoding: 'utf8' }); assert.equal(r.status, 0, r.stderr); return r.stdout.trim(); };
@@ -16,7 +17,7 @@ const scratch = (name) => path.join(os.tmpdir(), `sentri-${name}-${process.pid}-
 function worktree(name) {
   const dir = scratch(name);
   git(['worktree', 'add', '--detach', dir, 'HEAD']);
-  return { dir, done: () => { spawnSync('git', ['worktree', 'remove', '--force', dir], { cwd: root }); spawnSync('git', ['worktree', 'prune'], { cwd: root }); } };
+  return { dir, done: () => removeWorktree(dir, { cwd: root }) };
 }
 
 test('a visual declaration outside the design system fails the gate before any browser work', async () => {
