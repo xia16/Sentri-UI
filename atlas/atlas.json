@@ -896,7 +896,6 @@
           "workbench.sections",
           "workbench.gestation",
           "workbench.many-tasks",
-          "workbench.many-tasks-expanded",
           "workbench.work-due",
           "workbench.quiet-section",
           "workbench.work-waiting"
@@ -915,6 +914,16 @@
           "workbench.unit-maintenance",
           "workbench.unit-busy",
           "workbench.unit-unknown"
+         ]
+        ],
+        [
+         "Schedule",
+         [
+          "workbench.schedule",
+          "workbench.schedule-all",
+          "workbench.schedule-next",
+          "workbench.schedule-key",
+          "workbench.schedule-row"
          ]
         ],
         [
@@ -996,6 +1005,31 @@
          "workbench.unit",
          "workbench.unit-clear",
          "attention preview: all signals zero"
+        ],
+        [
+         "workbench.gestation",
+         "workbench.schedule",
+         "tap Schedule › on Production"
+        ],
+        [
+         "workbench.schedule",
+         "workbench.schedule-all",
+         "tap All"
+        ],
+        [
+         "workbench.schedule",
+         "workbench.schedule-next",
+         "tap Week 28 ›"
+        ],
+        [
+         "workbench.schedule",
+         "workbench.schedule-key",
+         "tap ⓘ"
+        ],
+        [
+         "workbench.schedule",
+         "workbench.schedule-row",
+         "tap the Pregnancy check · B31 row"
         ]
        ],
        "screens": [
@@ -1008,189 +1042,62 @@
          "preset": "",
          "figma": "",
          "notes": {
-          "purpose": "The first screen of the app: what needs doing now in the worker's section, task by task across all its units.",
+          "purpose": "The first screen of the app: Production tiles, then Health, then Other, for the worker's section across all its units.",
           "states": [],
           "elements": [
            {
-            "name": "Task card · state",
-            "shows": "Farrowing: \"2 sows farrowing · 4 due today\"; Piglet processing: \"Next care · Tomorrow\"",
+            "name": "Production tile",
+            "shows": "Task · batch · to-do (count due now + a quiet next line) · run (day segments, Day N of N)",
             "states": [
              {
-              "state": "Alert",
-              "when": "f.alert.count > 0 (a confirmed exception). No sample reaches it: Home never supplies alert",
-              "shows": "Exception count and its label, rank 0"
-             },
-             {
-              "state": "Live",
-              "when": "Farrowing only: at least one sow row in the scope is flagged active",
-              "shows": "\"N sows farrowing\"; supporting line \"N due today\" when due > 0 (the \"N past expected date\" line needs a late count, which no sample supplies)"
-             },
-             {
-              "state": "Past expected",
-              "when": "Farrowing, no live sow, late > 0. No sample reaches it: Home never supplies late",
-              "shows": "\"N sows past expected date\"; do not infer a final outcome from missing records"
-             },
-             {
-              "state": "Due",
-              "when": "Not farrowing and the due count in the scope is > 0",
-              "shows": "One task-specific headline and at most one supporting fact. Heat Overview is recorded-in-heat / target; Return-heat uses the temporary historical return facts."
+              "state": "Due now",
+              "when": "The task has animals due now in the section",
+              "shows": "Count + short word (\"5 ready now\"); quiet line is the next timer or due date (\"◷ 4 more from Sat\")"
              },
              {
               "state": "Overdue",
-              "when": "Due > 0 and f.overdue > 0. No sample reaches it: Home never supplies overdue",
-              "shows": "Supporting line \"N past due\" replaces the other line; rank 1"
+              "when": "Part of the due work is past its window",
+              "shows": "The quiet line turns red: \"! 2 overdue\"; the tile keeps its place"
              },
              {
-              "state": "Pregnancy rechecks / breeding split",
-              "when": "f.rechecks > 0, or f.first and f.repeat supplied. No sample reaches it",
-              "shows": "\"N rechecks due\" (before \"scheduled later\"); breeding \"N first · N repeat\""
+              "state": "Nothing due now",
+              "when": "A multi-day task has nothing due at this moment",
+              "shows": "\"None now\" and the next timer (\"◷ 8 open tomorrow\"); no done state"
              },
              {
-              "state": "Waiting for another task",
-              "when": "The open task has a separately confirmed upstream dependency",
-              "shows": "\"Waiting for <task> to close\", quiet style"
-             },
-             {
-              "state": "Unit work complete",
-              "when": "f.unitComplete is set. No sample reaches it",
-              "shows": "\"Unit work complete · task still open\""
-             },
-             {
-              "state": "Waiting",
-              "when": "An authoritative in-progress task has later or unknown next work",
-              "shows": "A quiet next-time or in-progress line; the card stays in Today’s work."
-             },
-             {
-              "state": "Waiting, next unknown",
-              "when": "Nothing due and no nextLabel. No sample reaches it: every sample card has a nextAt",
-              "shows": "\"Waiting for heat confirmations\" (breeding), \"Waiting for next scheduled care\" (piglet), \"Waiting for farrowing records\" (postpartum), else \"No work due now\""
-             },
-             {
-              "state": "Closed",
-              "when": "Authoritative completion or early end happened today in farm time",
-              "shows": "Compact receipt at the bottom (see Closed task card)"
+              "state": "Past its plan",
+              "when": "The task has run past its planned last day and is still open",
+              "shows": "Red edge; the to-do says how many are overdue (\"6 overdue\"); the run grows one red segment per day over and says \"1 day overdue\""
              }
             ],
-            "logic": "Authoritative task status selects the list. Card content resolves confirmed exception, task-specific facts, unit status, then next scheduled action. A full bar never changes task status.",
-            "rule": "Show one task instance per card; Home figures may be outcomes or currently eligible objects depending on task type.",
-            "source": "resolveAttention() in astra-home-task-card.js; HOME-TASK-DISPLAY-RULES.md",
-            "at": "sows farrowing"
+            "logic": "Four fixed slots, each with one kind of message, at the same height in every tile. Short task names (≤15 characters: \"Return heat\", \"Processing\"). A tile stays until the task closes.",
+            "source": "tile() in astra-home-task-card.js; tileModel() in home-astra-prototype.js"
            },
            {
-            "name": "Task card · headline and supporting line",
-            "shows": "2 sows farrowing · 4 due today",
-            "logic": "One main task-specific fact and at most one supporting line. Farrowing uses recorded activity before expected dates. Heat Overview uses recorded-in-heat / target; Breeding Overview uses mated-at-least-once / heat-marked; Return-heat temporarily uses historical return facts.",
-            "source": "taskModel() facts; cardFields in home-astra-prototype.js",
-            "at": "4 due today"
+            "name": "Health",
+            "shows": "To treat (count; \"N waiting since yesterday\" in red, else its units) · Monitoring (count, units) · planned health tasks as tiles",
+            "logic": "Reactive first: triage marks set on the walk (Treat in place / Hospital pen not yet treated or moved; Monitor). Vaccination plans and treatment orders are tasks, so they use the production tile.",
+            "source": "overview() and marks in home-astra-prototype.js"
            },
            {
-            "name": "Task card · progress bar",
-            "shows": "Farrowed · 7 / 18 sows",
-            "logic": "Each bar names its numerator and denominator. Farrowing uses current task sows; death or abortion leaves that denominator. Heat Overview shows an outcome bar, Breeding Overview shows at-least-once coverage, and Return-heat has no Home bar.",
-            "source": "metric(t, unit); tasks[].counts and measure",
-            "at": "7 / 18 sows"
-           },
-           {
-            "name": "Task card · timing pill and footer",
-            "shows": "Day 2 of 7 · Across 3 units · View task",
-            "logic": "The pill is the position in the batch window (cardFields day, days), \"Today\" when the window is one day; it is context, not a completion measure, and not the litters' own age. \"Across N units\" = units that carry the task (not units with work due); in a unit scope the footer is replaced by an arrow in the header and the card opens that unit's task.",
-            "source": "cardFields.*.day/days; taskModel().scope",
-            "at": "Across 3 units"
-           },
-           {
-            "name": "\"Next\" sub-heading and card order",
-            "shows": "Next",
-            "logic": "Today’s work sorts confirmed actionable exceptions, explicit overdue work, today’s scheduled actions, previously scheduled unstarted tasks, assigned executable undated tasks, then other in-progress tasks. Ties use time and stable task ID; task types do not add a grouping layer.",
-            "source": "SentriHomeTaskCard.order()",
-            "at": "Next"
-           },
-           {
-            "name": "Task-list limit",
-            "shows": "First five task-instance cards · See all N tasks",
-            "logic": "Expansion uses the complete scoped total and preserves order. If hidden cards contain confirmed exceptions or overdue tasks, show their separate counts. Scope change or leaving Home resets expansion.",
-            "source": "home(); ?section=gestation&many=1",
-            "at": "See all 7 tasks"
-           },
-           {
-            "name": "App-shell Saved work status",
-            "shows": "↑ 3 in a compact app-header badge",
-            "states": [
-             {
-              "state": "Waiting, offline",
-              "when": "Records are queued and there is no connection",
-              "shows": "The app-header badge shows the phone-wide count. Home has no separate saved-work card."
-             },
-             {
-              "state": "Waiting, online",
-              "when": "A connection becomes available",
-              "shows": "Records upload automatically; there is no Upload button."
-             },
-             {
-              "state": "Needs attention",
-              "when": "A record failed or conflicts",
-              "shows": "The badge says Fix N and opens the Data sync flow."
-             },
-             {
-              "state": "Uploading",
-              "when": "Automatic upload is running",
-              "shows": "The badge shows Sending N."
-             },
-             {
-              "state": "Clear",
-              "when": "Nothing is waiting",
-              "shows": "The badge disappears; Data sync still shows the empty state."
-             }
-            ],
-            "logic": "The app-shell entry appears on Home and internal pages. It counts all unsent records on this phone regardless of section, unit or task. The queue is fictional in this prototype; the Data sync feature owns record-level outcomes.",
-            "source": "globalSync() and features/data-sync/PRD.md",
-            "at": "↑ 3"
-           },
-           {
-            "name": "Section and unit scope",
-            "shows": "Farrowing ⌄ · Overview · Choose unit · 3 units",
-            "logic": "Section on first load = URL `section` when valid, else the last one picked (localStorage sentri-home-prototype-section; ignored if storage is blocked), else Gestation. The second scope button reads \"Choose unit\" with no unit chosen and \"Unit N\" with one; the small figure is the number of units in the section (Farrowing 6, 7, 8; Gestation 7, 8, 9; Breeding 1-4; Nursery 12, 13). Choosing a unit re-runs every card rule on that unit's figures; whole-task closure stays global.",
-            "source": "sections[], scopeRail(), params.get('section')",
-            "at": "Choose unit"
-           },
-           {
-            "name": "Closed task card",
-            "shows": "Piglet processing · Batch 26 · Across 3 units · Completed · Today, 09:10",
-            "states": [
-             {
-              "state": "Completed",
-              "when": "completedAt is set on the instance",
-              "shows": "Check icon, title, batch (and scope in the Overview), \"Completed · <stamp>\""
-             },
-             {
-              "state": "Ended early",
-              "when": "terminatedAt is set (End task early)",
-              "shows": "Stop icon and \"Ended early · <stamp>\""
-             }
-            ],
-            "logic": "Closed cards collect at the bottom under \"Closed tasks N\" (N = closed instances in the scope), always sort last, and never show due counts again, even if old records would say otherwise.",
-            "source": "tasks[] completedAt/terminatedAt; SentriHomeTaskCard.render",
-            "at": "Completed · Today, 09:10"
+            "name": "Other",
+            "shows": "One flat list: type icon, what the work is (\"Move to Farrowing, Unit 6\", \"PRRS blood samples\"), where the pigs are (\"From Units 7, 8\"), pigs or pens due on the right",
+            "logic": "No category headers (there are only a few). Order numbers stay on the task page. Ordered by type. Withdrawal shows in red on the outbound or transfer row it blocks.",
+            "source": "overview()"
            }
           ],
           "controls": [],
           "copy": [
-           "(raw) every string on Home is literal in home-astra-prototype.js and astra-home-task-card.js; none uses ux/laws/strings.json yet"
+           "(raw)"
           ],
-          "edge": [
-           "A section with no tasks shows the quiet empty state (Nursery, see workbench.quiet-section).",
-           "A unit that does not carry a task hides that task's card."
+          "edge": [],
+          "rules": [
+           "Sections in this order: Production, Health, Other. No headline-number strip.",
+           "Production is in the order of the sow's cycle (Heat check, Breeding, Return heat, Pregnancy check, Farrowing, Processing, Weaning), then oldest batch first. Overdue is a mark, never a re-sort.",
+           "Every open task is listed; there is no \"see all\". Upcoming work is on the Schedule, not Home.",
+           "A closed task leaves the grid for one quiet \"N closed today\" line."
           ],
-          "rules": [],
-          "issues": [
-           "The visible date \"Sample · Thu, 8 Jul\" is a fixed fixture, not the device clock or a real task schedule. The connected Home date source remains open.",
-           "\"Across 3 units\" counts units that carry the task, not units with work due, and repeats on every card.",
-           "The Piglet card mixes litters (\"4 litters with care due\") and pens (\"1 / 8 pens\"). A pen is a litter in the prototype.",
-           "The Piglet card is an independent Batch 27 / 8-pen fixture; the linked piglet-processing page is a Batch 40 / 12-pen fixture. The click-through shows a destination, not the same task instance. Align fixtures before connected-data acceptance.",
-           "Assistant, Scan and Toolbox are visible prototype entrances to separate sample pages. A Home-only native preview explains that they are not connected; production navigation belongs to their owning features.",
-           "The app-header Saved work badge counts fictional records across the phone; it opens the separate Data sync prototype without taking a Home card row.",
-           "`layout=focus` has no effect on Home; it is only forwarded to detail pages.",
-           "No way to reach language or log out (the old Figma has both)."
-          ]
+          "issues": []
          }
         },
         {
@@ -1365,76 +1272,62 @@
          "preset": "",
          "figma": "",
          "notes": {
-          "purpose": "The same Overview in a section that shows several card states at once.",
+          "purpose": "The Overview with every tile state and all three sections filled.",
           "states": [],
           "elements": [
            {
-            "name": "Pregnancy check card",
-            "shows": "5 sows ready to check · 7 scheduled later · 8 / 20 sows",
+            "name": "Production tile",
+            "shows": "Task · batch · to-do (count due now + a quiet next line) · run (day segments, Day N of N)",
             "states": [
              {
-              "state": "Due",
-              "when": "Check windows are open",
-              "shows": "\"N sows ready to check\" = sum of due {7:2, 8:2, 9:1}; supporting line \"N scheduled later\" (unrecorded 12 minus due 5)"
+              "state": "Due now",
+              "when": "The task has animals due now in the section",
+              "shows": "Count + short word (\"5 ready now\"); quiet line is the next timer or due date (\"◷ 4 more from Sat\")"
              },
              {
-              "state": "Waiting",
-              "when": "Nothing due, next check known (Batch 32)",
-              "shows": "\"Next checks · Tomorrow\", 0 / 8 sows"
-             }
-            ],
-            "logic": "Supporting line priority: overdue checks, then due rechecks, then scheduled later; only the first applies and rechecks are inside the main count. A full first-check bar does not complete later checks.",
-            "source": "attention(\"pregnancy\"); facts.later in taskModel()",
-            "at": "7 scheduled later"
-           },
-           {
-            "name": "Return-heat card",
-            "shows": "1 sow recorded returned · 9 without return record",
-            "states": [],
-            "rule": "Only explicit activity marks a round complete. No return and a blank mark are not evidence of a completed or negative observation. No Home progress bar, return rate or elapsed-time bar.",
-            "source": "resolveAttention(); roundComplete",
-            "at": "Round complete · Next check · 14:30",
-            "logic": "Temporary Home bridge: historical returns and no-return-record count share one population. Unit estimated-date and submitted-signs figures may overlap. No pie or progress bar."
-           },
-           {
-            "name": "\"Next\" sub-heading and card order",
-            "shows": "Next",
-            "logic": "Cards sort by attention rank: live farrowing or alert 0, overdue 1, due 2, waiting 3 (earliest next event first), closed 4. Equal ranks keep their order so the list does not jump. \"Next\" is printed once above the first quiet card (waiting, round complete or upcoming).",
-            "source": "SentriHomeTaskCard.order()",
-            "at": "Next"
-           },
-           {
-            "name": "Closed task card",
-            "shows": "Piglet processing · Batch 26 · Across 3 units · Completed · Today, 09:10",
-            "states": [
-             {
-              "state": "Completed",
-              "when": "completedAt is set on the instance",
-              "shows": "Check icon, title, batch (and scope in the Overview), \"Completed · <stamp>\""
+              "state": "Overdue",
+              "when": "Part of the due work is past its window",
+              "shows": "The quiet line turns red: \"! 2 overdue\"; the tile keeps its place"
              },
              {
-              "state": "Ended early",
-              "when": "terminatedAt is set (End task early)",
-              "shows": "Stop icon and \"Ended early · <stamp>\""
+              "state": "Nothing due now",
+              "when": "A multi-day task has nothing due at this moment",
+              "shows": "\"None now\" and the next timer (\"◷ 8 open tomorrow\"); no done state"
+             },
+             {
+              "state": "Past its plan",
+              "when": "The task has run past its planned last day and is still open",
+              "shows": "Red edge; the to-do says how many are overdue (\"6 overdue\"); the run grows one red segment per day over and says \"1 day overdue\""
              }
             ],
-            "logic": "Closed cards collect at the bottom under \"Closed tasks N\" (N = closed instances in the scope), always sort last, and never show due counts again, even if old records would say otherwise.",
-            "source": "tasks[] completedAt/terminatedAt; SentriHomeTaskCard.render",
-            "at": "Completed · Today, 08:45"
+            "logic": "Four fixed slots, each with one kind of message, at the same height in every tile. Short task names (≤15 characters: \"Return heat\", \"Processing\"). A tile stays until the task closes.",
+            "source": "tile() in astra-home-task-card.js; tileModel() in home-astra-prototype.js"
+           },
+           {
+            "name": "Health",
+            "shows": "To treat (count; \"N waiting since yesterday\" in red, else its units) · Monitoring (count, units) · planned health tasks as tiles",
+            "logic": "Reactive first: triage marks set on the walk (Treat in place / Hospital pen not yet treated or moved; Monitor). Vaccination plans and treatment orders are tasks, so they use the production tile.",
+            "source": "overview() and marks in home-astra-prototype.js"
+           },
+           {
+            "name": "Other",
+            "shows": "One flat list: type icon, what the work is (\"Move to Farrowing, Unit 6\", \"PRRS blood samples\"), where the pigs are (\"From Units 7, 8\"), pigs or pens due on the right",
+            "logic": "No category headers (there are only a few). Order numbers stay on the task page. Ordered by type. Withdrawal shows in red on the outbound or transfer row it blocks.",
+            "source": "overview()"
            }
           ],
           "controls": [],
           "copy": [
            "(raw)"
           ],
-          "edge": [
-           "Tasks without a detail page open the \"not designed yet\" preview instead of a task."
+          "edge": [],
+          "rules": [
+           "Sections in this order: Production, Health, Other. No headline-number strip.",
+           "Production is in the order of the sow's cycle (Heat check, Breeding, Return heat, Pregnancy check, Farrowing, Processing, Weaning), then oldest batch first. Overdue is a mark, never a re-sort.",
+           "Every open task is listed; there is no \"see all\". Upcoming work is on the Schedule, not Home.",
+           "A closed task leaves the grid for one quiet \"N closed today\" line."
           ],
-          "rules": [],
-          "issues": [
-           "Batch 32 shows \"Today\" in the pill and \"Next checks · Tomorrow\" in the body.",
-           "Heat check (Breeding section) shows \"20 sows to check\" and \"0 / 20 sows\" in heat: the same 20 twice."
-          ]
+          "issues": []
          }
         },
         {
@@ -1446,27 +1339,36 @@
          "preset": "",
          "figma": "",
          "notes": {
-          "purpose": "Shows the Overview when every task has work due now.",
+          "purpose": "Every production task with work due now.",
           "states": [],
           "elements": [
            {
-            "name": "Piglet processing card · due",
-            "shows": "4 litters with care due",
+            "name": "Production tile",
+            "shows": "Task · batch · to-do (count due now + a quiet next line) · run (day segments, Day N of N)",
             "states": [
              {
-              "state": "Due",
-              "when": "?work=active (or the Work preview select outside the phone)",
-              "shows": "\"N litters with care due\" = sum of cardFields.piglet27.due {6:2, 7:2}; singular \"1 litter with care due\""
+              "state": "Due now",
+              "when": "The task has animals due now in the section",
+              "shows": "Count + short word (\"5 ready now\"); quiet line is the next timer or due date (\"◷ 4 more from Sat\")"
              },
              {
-              "state": "Waiting",
-              "when": "Default",
-              "shows": "\"Next care · Tomorrow\", due counts ignored"
+              "state": "Overdue",
+              "when": "Part of the due work is past its window",
+              "shows": "The quiet line turns red: \"! 2 overdue\"; the tile keeps its place"
+             },
+             {
+              "state": "Nothing due now",
+              "when": "A multi-day task has nothing due at this moment",
+              "shows": "\"None now\" and the next timer (\"◷ 8 open tomorrow\"); no done state"
+             },
+             {
+              "state": "Past its plan",
+              "when": "The task has run past its planned last day and is still open",
+              "shows": "Red edge; the to-do says how many are overdue (\"6 overdue\"); the run grows one red segment per day over and says \"1 day overdue\""
              }
             ],
-            "rule": "Count unique litters, not procedures. A supporting line would be litters with overdue required care; Home supplies none.",
-            "source": "attention(\"piglet\"); displayRules.piglet",
-            "at": "litters with care due"
+            "logic": "Four fixed slots, each with one kind of message, at the same height in every tile. Short task names (≤15 characters: \"Return heat\", \"Processing\"). A tile stays until the task closes.",
+            "source": "tile() in astra-home-task-card.js; tileModel() in home-astra-prototype.js"
            }
           ],
           "controls": [],
@@ -1475,9 +1377,7 @@
           ],
           "edge": [],
           "rules": [],
-          "issues": [
-           "\"Due now\" exists only in the card's accessible name; visually the pill still says \"Day 3 of 7\"."
-          ]
+          "issues": []
          }
         },
         {
@@ -1489,40 +1389,23 @@
          "preset": "",
          "figma": "",
          "notes": {
-          "purpose": "What the Overview shows when a section has no task today.",
+          "purpose": "A section with nothing open: Production says \"Nothing open\", Health shows its rows at 0 or a small count, Other says \"Nothing open\".",
           "states": [],
           "elements": [
            {
-            "name": "Empty state",
-            "shows": "No scheduled tasks today",
-            "states": [
-             {
-              "state": "Overview, no tasks",
-              "when": "The scoped task list is empty (Nursery)",
-              "shows": "\"No scheduled tasks today\", \"Select a unit to inspect pens or record anything you find.\" and a Tomorrow card"
-             },
-             {
-              "state": "Unit, no tasks",
-              "when": "A unit is chosen and carries no task",
-              "shows": "\"You can still inspect this unit and record anything you find.\"; the Tomorrow card is hidden"
-             }
-            ],
-            "logic": "The Tomorrow card (Growth check · Batch 26 · Units 12-13) is fixed sample text, not derived from any task.",
-            "source": "home()",
-            "at": "No scheduled tasks today"
+            "name": "Empty sections",
+            "shows": "\"Nothing open\" in Production and Other; To treat \"Nothing marked\" (no chevron)",
+            "logic": "Sections shrink but never disappear, so the worker sees they were checked.",
+            "source": "overview()"
            }
           ],
           "controls": [],
           "copy": [
            "(raw)"
           ],
-          "edge": [
-           "Units 12 and 13 still have environment and device access."
-          ],
+          "edge": [],
           "rules": [],
-          "issues": [
-           "The Tomorrow card is hard-coded text, not derived from any task."
-          ]
+          "issues": []
          }
         },
         {
@@ -1817,36 +1700,43 @@
          "status": "in-design",
          "url": "/ux/system/home-astra-prototype.html?section=gestation&work=waiting",
          "notes": {
-          "purpose": "Shows the Overview when no task has work due: every open card is quiet and lists its next time.",
+          "purpose": "Every production task between its scheduled work: \"None now\" with the next timer on each tile.",
           "states": [],
           "elements": [
            {
-            "name": "Waiting cards",
-            "at": "Next",
-            "shows": "Each card: identity, \"Next ... · <time>\", cumulative progress kept, no headline count",
+            "name": "Production tile",
+            "shows": "Task · batch · to-do (count due now + a quiet next line) · run (day segments, Day N of N)",
             "states": [
              {
-              "state": "Waiting",
-              "when": "No work due now and the next event is known (work=waiting)",
-              "shows": "Quiet line with the next time (Tomorrow, 14:30); due and live counts are zero"
+              "state": "Due now",
+              "when": "The task has animals due now in the section",
+              "shows": "Count + short word (\"5 ready now\"); quiet line is the next timer or due date (\"◷ 4 more from Sat\")"
              },
              {
-              "state": "Waiting, nothing scheduled",
-              "when": "No known next event",
-              "shows": "Task-specific waiting copy (rule 6 of the display rules)"
+              "state": "Overdue",
+              "when": "Part of the due work is past its window",
+              "shows": "The quiet line turns red: \"! 2 overdue\"; the tile keeps its place"
+             },
+             {
+              "state": "Nothing due now",
+              "when": "A multi-day task has nothing due at this moment",
+              "shows": "\"None now\" and the next timer (\"◷ 8 open tomorrow\"); no done state"
+             },
+             {
+              "state": "Past its plan",
+              "when": "The task has run past its planned last day and is still open",
+              "shows": "Red edge; the to-do says how many are overdue (\"6 overdue\"); the run grows one red segment per day over and says \"1 day overdue\""
              }
             ],
-            "logic": "Waiting cards sort by earliest next event; \"Next\" is printed once above the first quiet card. In this preview the Work select forces every card to waiting; in the app the state comes from the schedule.",
-            "source": "taskModel(); HOME-TASK-DISPLAY-RULES rule 6"
+            "logic": "Four fixed slots, each with one kind of message, at the same height in every tile. Short task names (≤15 characters: \"Return heat\", \"Processing\"). A tile stays until the task closes.",
+            "source": "tile() in astra-home-task-card.js; tileModel() in home-astra-prototype.js"
            }
           ],
           "controls": [],
           "copy": [
            "(raw)"
           ],
-          "edge": [
-           "A quiet card still shows the cumulative progress bar, so a full bar here does not mean the task can close."
-          ],
+          "edge": [],
           "rules": [],
           "issues": []
          }
@@ -2062,20 +1952,42 @@
         },
         {
          "id": "workbench.many-tasks",
-         "name": "Overview · five of seven tasks",
-         "zh": "总览 · 七项任务收起",
+         "name": "Overview · busy day, every tile listed",
+         "zh": "总览 · 任务较多，全部列出",
          "status": "in-design",
-         "url": "/ux/system/home-astra-prototype.html?section=gestation&many=1&focus=task-fold",
+         "url": "/ux/system/home-astra-prototype.html?section=gestation&many=1",
          "figma": "",
          "notes": {
-          "purpose": "Show the actual collapsed list control, with five of seven fictional open task cards visible in stable order. The preview starts at the fold.",
+          "purpose": "A busy Gestation day: seven open production tasks, all listed as tiles in stage order (no \"see all\").",
           "states": [],
           "elements": [
            {
-            "name": "Task list expansion",
-            "shows": "Five task cards, followed by See all 7 tasks",
-            "logic": "The remaining two cards stay hidden until expanded. The fold control reports the complete scoped total and any hidden exception or overdue count.",
-            "source": "home() and openTaskCount()"
+            "name": "Production tile",
+            "shows": "Task · batch · to-do (count due now + a quiet next line) · run (day segments, Day N of N)",
+            "states": [
+             {
+              "state": "Due now",
+              "when": "The task has animals due now in the section",
+              "shows": "Count + short word (\"5 ready now\"); quiet line is the next timer or due date (\"◷ 4 more from Sat\")"
+             },
+             {
+              "state": "Overdue",
+              "when": "Part of the due work is past its window",
+              "shows": "The quiet line turns red: \"! 2 overdue\"; the tile keeps its place"
+             },
+             {
+              "state": "Nothing due now",
+              "when": "A multi-day task has nothing due at this moment",
+              "shows": "\"None now\" and the next timer (\"◷ 8 open tomorrow\"); no done state"
+             },
+             {
+              "state": "Past its plan",
+              "when": "The task has run past its planned last day and is still open",
+              "shows": "Red edge; the to-do says how many are overdue (\"6 overdue\"); the run grows one red segment per day over and says \"1 day overdue\""
+             }
+            ],
+            "logic": "Four fixed slots, each with one kind of message, at the same height in every tile. Short task names (≤15 characters: \"Return heat\", \"Processing\"). A tile stays until the task closes.",
+            "source": "tile() in astra-home-task-card.js; tileModel() in home-astra-prototype.js"
            }
           ],
           "controls": [],
@@ -2084,36 +1996,7 @@
           ],
           "edge": [],
           "rules": [
-           "The displayed total must come from the complete scoped task set, not the first fetched page."
-          ],
-          "issues": []
-         }
-        },
-        {
-         "id": "workbench.many-tasks-expanded",
-         "name": "Overview · all seven tasks",
-         "zh": "总览 · 七项任务展开",
-         "status": "in-design",
-         "url": "/ux/system/home-astra-prototype.html?section=gestation&many=1&tasks=expanded&focus=task-fold",
-         "figma": "",
-         "notes": {
-          "purpose": "Inspect the expanded state of the same seven task instances.",
-          "states": [],
-          "elements": [
-           {
-            "name": "Expanded task list",
-            "shows": "Seven task cards · Show first 5 tasks",
-            "logic": "The list keeps the collapsed order and returns to five cards when the control is pressed.",
-            "source": "home()"
-           }
-          ],
-          "controls": [],
-          "copy": [
-           "(raw)"
-          ],
-          "edge": [],
-          "rules": [
-           "Changing section or unit, or leaving Home, resets task expansion."
+           "Every open task instance is a tile; the list never folds."
           ],
           "issues": []
          }
@@ -2161,6 +2044,398 @@
           "issues": [
            "The log has one writer today (the Assistant answer); its real source is undecided."
           ]
+         }
+        },
+        {
+         "id": "workbench.schedule",
+         "name": "Schedule · this week, Production",
+         "zh": "计划 · 本周 · 生产",
+         "status": "in-design",
+         "url": "/ux/system/home-astra-prototype.html?section=gestation&view=schedule",
+         "preset": "",
+         "figma": "",
+         "notes": {
+          "purpose": "The plan for this week, opened from Production's \"Schedule ›\": done counts on past days, today's list, planned counts, estimates and waiting days.",
+          "states": [],
+          "elements": [
+           {
+            "name": "Week board",
+            "shows": "One line per batch under its task type; a cell per day with that day's count",
+            "states": [
+             {
+              "state": "Done",
+              "when": "A past day",
+              "shows": "How many were recorded (can be 0); light fill"
+             },
+             {
+              "state": "Today",
+              "when": "Today",
+              "shows": "Due today; filled"
+             },
+             {
+              "state": "Planned",
+              "when": "A future day with an exact count",
+              "shows": "Outlined count"
+             },
+             {
+              "state": "Estimate",
+              "when": "A forecast from expected dates (heat, returns, farrowing)",
+              "shows": "Dashed outline, \"~8\""
+             },
+             {
+              "state": "Waiting on today",
+              "when": "The count depends on today's results",
+              "shows": "Outlined \"–\""
+             },
+             {
+              "state": "Past its plan",
+              "when": "A day after the planned end of a task still open",
+              "shows": "Red edge; the batch label turns red"
+             },
+             {
+              "state": "Nothing due",
+              "when": "The task runs but nothing is due that day",
+              "shows": "\"·\""
+             },
+             {
+              "state": "Continues",
+              "when": "The run crosses the week boundary",
+              "shows": "An open edge with an arrow"
+             }
+            ],
+            "logic": "No \"late\" state and no grace period: unfinished work carries on, and each past day shows what was done. Counts up to 999 print in full; actual counts from 1,000 shorten to \"1.2k\", estimates to \"~1k\". Production rows show the batch (B31) in a gutter; health and other rows say what they are and where (\"PRRS blood · Units 7, 9\") on their own line. A row is the tap target.",
+            "source": "schedulePage() in home-astra-prototype.js"
+           }
+          ],
+          "controls": [],
+          "copy": [
+           "(raw)"
+          ],
+          "edge": [],
+          "rules": [
+           "Full screen: ✕ closes back to Home (owner, 2026-10-19); no page header and no bottom bar. The date range is the only text at the top, the week number a small label.",
+           "Natural Mon–Sun weeks; ‹ › in a 56px footer; \"This week\" once you are away from it.",
+           "Opens filtered to the Home section whose \"Schedule ›\" was tapped; All, Production, Health and Other are a segment.",
+           "All: one card, one tinted band per section (owner chose B, 2026-10-19).",
+           "No daily total row."
+          ],
+          "issues": []
+         }
+        },
+        {
+         "id": "workbench.schedule-all",
+         "name": "Schedule · this week, All",
+         "zh": "计划 · 本周 · 全部",
+         "status": "in-design",
+         "url": "/ux/system/home-astra-prototype.html?section=gestation&view=schedule&filter=all",
+         "preset": "",
+         "figma": "",
+         "notes": {
+          "purpose": "Every section on one board, each starting with a tinted band; vaccination plan #21 is past its plan.",
+          "states": [],
+          "elements": [
+           {
+            "name": "Week board",
+            "shows": "One line per batch under its task type; a cell per day with that day's count",
+            "states": [
+             {
+              "state": "Done",
+              "when": "A past day",
+              "shows": "How many were recorded (can be 0); light fill"
+             },
+             {
+              "state": "Today",
+              "when": "Today",
+              "shows": "Due today; filled"
+             },
+             {
+              "state": "Planned",
+              "when": "A future day with an exact count",
+              "shows": "Outlined count"
+             },
+             {
+              "state": "Estimate",
+              "when": "A forecast from expected dates (heat, returns, farrowing)",
+              "shows": "Dashed outline, \"~8\""
+             },
+             {
+              "state": "Waiting on today",
+              "when": "The count depends on today's results",
+              "shows": "Outlined \"–\""
+             },
+             {
+              "state": "Past its plan",
+              "when": "A day after the planned end of a task still open",
+              "shows": "Red edge; the batch label turns red"
+             },
+             {
+              "state": "Nothing due",
+              "when": "The task runs but nothing is due that day",
+              "shows": "\"·\""
+             },
+             {
+              "state": "Continues",
+              "when": "The run crosses the week boundary",
+              "shows": "An open edge with an arrow"
+             }
+            ],
+            "logic": "No \"late\" state and no grace period: unfinished work carries on, and each past day shows what was done. Counts up to 999 print in full; actual counts from 1,000 shorten to \"1.2k\", estimates to \"~1k\". Production rows show the batch (B31) in a gutter; health and other rows say what they are and where (\"PRRS blood · Units 7, 9\") on their own line. A row is the tap target.",
+            "source": "schedulePage() in home-astra-prototype.js"
+           }
+          ],
+          "controls": [],
+          "copy": [
+           "(raw)"
+          ],
+          "edge": [],
+          "rules": [
+           "Full screen: ✕ closes back to Home (owner, 2026-10-19); no page header and no bottom bar. The date range is the only text at the top, the week number a small label.",
+           "Natural Mon–Sun weeks; ‹ › in a 56px footer; \"This week\" once you are away from it.",
+           "Opens filtered to the Home section whose \"Schedule ›\" was tapped; All, Production, Health and Other are a segment.",
+           "All: one card, one tinted band per section (owner chose B, 2026-10-19).",
+           "No daily total row."
+          ],
+          "issues": []
+         }
+        },
+        {
+         "id": "workbench.schedule-next",
+         "name": "Schedule · next week",
+         "zh": "计划 · 下周",
+         "status": "in-design",
+         "url": "/ux/system/home-astra-prototype.html?section=gestation&view=schedule&week=1",
+         "preset": "",
+         "figma": "",
+         "notes": {
+          "purpose": "Week 28: runs that started last week enter from the left edge; \"This week\" returns.",
+          "states": [],
+          "elements": [
+           {
+            "name": "Week board",
+            "shows": "One line per batch under its task type; a cell per day with that day's count",
+            "states": [
+             {
+              "state": "Done",
+              "when": "A past day",
+              "shows": "How many were recorded (can be 0); light fill"
+             },
+             {
+              "state": "Today",
+              "when": "Today",
+              "shows": "Due today; filled"
+             },
+             {
+              "state": "Planned",
+              "when": "A future day with an exact count",
+              "shows": "Outlined count"
+             },
+             {
+              "state": "Estimate",
+              "when": "A forecast from expected dates (heat, returns, farrowing)",
+              "shows": "Dashed outline, \"~8\""
+             },
+             {
+              "state": "Waiting on today",
+              "when": "The count depends on today's results",
+              "shows": "Outlined \"–\""
+             },
+             {
+              "state": "Past its plan",
+              "when": "A day after the planned end of a task still open",
+              "shows": "Red edge; the batch label turns red"
+             },
+             {
+              "state": "Nothing due",
+              "when": "The task runs but nothing is due that day",
+              "shows": "\"·\""
+             },
+             {
+              "state": "Continues",
+              "when": "The run crosses the week boundary",
+              "shows": "An open edge with an arrow"
+             }
+            ],
+            "logic": "No \"late\" state and no grace period: unfinished work carries on, and each past day shows what was done. Counts up to 999 print in full; actual counts from 1,000 shorten to \"1.2k\", estimates to \"~1k\". Production rows show the batch (B31) in a gutter; health and other rows say what they are and where (\"PRRS blood · Units 7, 9\") on their own line. A row is the tap target.",
+            "source": "schedulePage() in home-astra-prototype.js"
+           }
+          ],
+          "controls": [],
+          "copy": [
+           "(raw)"
+          ],
+          "edge": [],
+          "rules": [
+           "Full screen: ✕ closes back to Home (owner, 2026-10-19); no page header and no bottom bar. The date range is the only text at the top, the week number a small label.",
+           "Natural Mon–Sun weeks; ‹ › in a 56px footer; \"This week\" once you are away from it.",
+           "Opens filtered to the Home section whose \"Schedule ›\" was tapped; All, Production, Health and Other are a segment.",
+           "All: one card, one tinted band per section (owner chose B, 2026-10-19).",
+           "No daily total row."
+          ],
+          "issues": []
+         }
+        },
+        {
+         "id": "workbench.schedule-key",
+         "name": "Schedule · how to read the board",
+         "zh": "计划 · 看板说明",
+         "status": "in-design",
+         "url": "/ux/system/home-astra-prototype.html?section=gestation&view=schedule&sheet=key",
+         "preset": "",
+         "figma": "",
+         "notes": {
+          "purpose": "The ⓘ drawer: each cell type as it looks, one plain line each.",
+          "states": [],
+          "elements": [
+           {
+            "name": "Week board",
+            "shows": "One line per batch under its task type; a cell per day with that day's count",
+            "states": [
+             {
+              "state": "Done",
+              "when": "A past day",
+              "shows": "How many were recorded (can be 0); light fill"
+             },
+             {
+              "state": "Today",
+              "when": "Today",
+              "shows": "Due today; filled"
+             },
+             {
+              "state": "Planned",
+              "when": "A future day with an exact count",
+              "shows": "Outlined count"
+             },
+             {
+              "state": "Estimate",
+              "when": "A forecast from expected dates (heat, returns, farrowing)",
+              "shows": "Dashed outline, \"~8\""
+             },
+             {
+              "state": "Waiting on today",
+              "when": "The count depends on today's results",
+              "shows": "Outlined \"–\""
+             },
+             {
+              "state": "Past its plan",
+              "when": "A day after the planned end of a task still open",
+              "shows": "Red edge; the batch label turns red"
+             },
+             {
+              "state": "Nothing due",
+              "when": "The task runs but nothing is due that day",
+              "shows": "\"·\""
+             },
+             {
+              "state": "Continues",
+              "when": "The run crosses the week boundary",
+              "shows": "An open edge with an arrow"
+             }
+            ],
+            "logic": "No \"late\" state and no grace period: unfinished work carries on, and each past day shows what was done. Counts up to 999 print in full; actual counts from 1,000 shorten to \"1.2k\", estimates to \"~1k\". Production rows show the batch (B31) in a gutter; health and other rows say what they are and where (\"PRRS blood · Units 7, 9\") on their own line. A row is the tap target.",
+            "source": "schedulePage() in home-astra-prototype.js"
+           },
+           {
+            "name": "Legend drawer",
+            "shows": "Done, Today, Planned, Estimate, Waiting on today, Past its plan, Nothing due",
+            "logic": "Opens from the ⓘ button (top right).",
+            "source": "scheduleKey()"
+           }
+          ],
+          "controls": [],
+          "copy": [
+           "(raw)"
+          ],
+          "edge": [],
+          "rules": [
+           "Full screen: ✕ closes back to Home (owner, 2026-10-19); no page header and no bottom bar. The date range is the only text at the top, the week number a small label.",
+           "Natural Mon–Sun weeks; ‹ › in a 56px footer; \"This week\" once you are away from it.",
+           "Opens filtered to the Home section whose \"Schedule ›\" was tapped; All, Production, Health and Other are a segment.",
+           "All: one card, one tinted band per section (owner chose B, 2026-10-19).",
+           "No daily total row."
+          ],
+          "issues": []
+         }
+        },
+        {
+         "id": "workbench.schedule-row",
+         "name": "Schedule · one task's week",
+         "zh": "计划 · 单项任务本周",
+         "status": "in-design",
+         "url": "/ux/system/home-astra-prototype.html?section=gestation&view=schedule&sheet=row&row=production.1.1",
+         "preset": "",
+         "figma": "",
+         "notes": {
+          "purpose": "Tapping a row (Pregnancy check · B31): each day it runs, what kind of count it is, and the exact number.",
+          "states": [],
+          "elements": [
+           {
+            "name": "Week board",
+            "shows": "One line per batch under its task type; a cell per day with that day's count",
+            "states": [
+             {
+              "state": "Done",
+              "when": "A past day",
+              "shows": "How many were recorded (can be 0); light fill"
+             },
+             {
+              "state": "Today",
+              "when": "Today",
+              "shows": "Due today; filled"
+             },
+             {
+              "state": "Planned",
+              "when": "A future day with an exact count",
+              "shows": "Outlined count"
+             },
+             {
+              "state": "Estimate",
+              "when": "A forecast from expected dates (heat, returns, farrowing)",
+              "shows": "Dashed outline, \"~8\""
+             },
+             {
+              "state": "Waiting on today",
+              "when": "The count depends on today's results",
+              "shows": "Outlined \"–\""
+             },
+             {
+              "state": "Past its plan",
+              "when": "A day after the planned end of a task still open",
+              "shows": "Red edge; the batch label turns red"
+             },
+             {
+              "state": "Nothing due",
+              "when": "The task runs but nothing is due that day",
+              "shows": "\"·\""
+             },
+             {
+              "state": "Continues",
+              "when": "The run crosses the week boundary",
+              "shows": "An open edge with an arrow"
+             }
+            ],
+            "logic": "No \"late\" state and no grace period: unfinished work carries on, and each past day shows what was done. Counts up to 999 print in full; actual counts from 1,000 shorten to \"1.2k\", estimates to \"~1k\". Production rows show the batch (B31) in a gutter; health and other rows say what they are and where (\"PRRS blood · Units 7, 9\") on their own line. A row is the tap target.",
+            "source": "schedulePage() in home-astra-prototype.js"
+           },
+           {
+            "name": "Row drawer",
+            "shows": "Day, the kind of count (Done, Due today, Planned, Estimate…), the exact number",
+            "logic": "A whole row is the tap target (full width, 48px). Day columns are too narrow for a 48px target, so the day header is not tappable.",
+            "source": "scheduleRow()"
+           }
+          ],
+          "controls": [],
+          "copy": [
+           "(raw)"
+          ],
+          "edge": [],
+          "rules": [
+           "Full screen: ✕ closes back to Home (owner, 2026-10-19); no page header and no bottom bar. The date range is the only text at the top, the week number a small label.",
+           "Natural Mon–Sun weeks; ‹ › in a 56px footer; \"This week\" once you are away from it.",
+           "Opens filtered to the Home section whose \"Schedule ›\" was tapped; All, Production, Health and Other are a segment.",
+           "All: one card, one tinted band per section (owner chose B, 2026-10-19).",
+           "No daily total row."
+          ],
+          "issues": []
          }
         }
        ],

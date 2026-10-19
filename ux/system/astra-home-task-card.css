@@ -24,3 +24,26 @@
   white-space: nowrap;
 }
 
+/* Overview tile: four fixed slots (task, batch, to-do, run), the same rows at the same height in every tile. */
+.home-task-tile{display:grid;grid-template-rows:auto auto auto auto auto;align-content:start;min-width:0;width:100%;text-align:left;padding:14px;border:1px solid var(--line);border-radius:18px;background:var(--paper);color:var(--ink);font-family:var(--font-sans,"Plus Jakarta Sans",system-ui,sans-serif);cursor:pointer}
+.home-task-tile:active{background:var(--press)}
+.home-task-tile.ht-late{border-color:var(--danger-border)}
+.ht-name{font-size:16px;line-height:22px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ht-sub{font-size:13px;line-height:18px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ht-todo{display:flex;align-items:baseline;gap:6px;height:28px;margin-top:14px;white-space:nowrap}
+.ht-todo b{font:400 26px/28px var(--font-mono,"IBM Plex Mono",monospace);letter-spacing:-.5px;color:var(--ink)}
+.ht-todo span{font-size:13px;color:var(--muted)}
+.ht-todo.ht-none b{font:500 16px/28px var(--font-sans,"Plus Jakarta Sans",system-ui,sans-serif);letter-spacing:0;color:var(--ink-2)}
+.ht-next{display:flex;align-items:center;gap:6px;height:18px;margin-top:8px;font-size:13px;line-height:18px;color:var(--ink-2);white-space:nowrap;overflow:hidden}
+.ht-next svg{width:13px;height:13px;flex:none}
+.ht-next>span:last-child{overflow:hidden;text-overflow:ellipsis}
+.ht-next.ht-act{color:var(--red-ink)}
+.ht-bang{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:var(--red);color:#fff;font-size:10px;font-weight:700;flex:none}
+.ht-run{display:block;margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+.ht-segs{display:flex;gap:3px;height:6px}
+.ht-segs i{flex:1;border-radius:2px;background:var(--well)}
+.ht-segs i.on{background:var(--ink-2)}
+.ht-segs i.over{background:var(--red)}
+.ht-todo.ht-act span,.ht-day.ht-act{color:var(--red-ink)}
+.ht-day{display:block;margin-top:6px;font-size:13px;line-height:18px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+

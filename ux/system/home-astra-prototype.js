@@ -48,6 +48,28 @@
     {id:'service33done',section:'breeding',type:'Breeding',batch:'Batch 33',counts:{1:[4,4],2:[4,4],3:[4,4],4:[4,4]},completedAt:'Today, 08:50'},
     {id:'piglet26done',section:'farrowing',type:'Piglet processing',batch:'Batch 26',counts:{6:[4,4],7:[4,4],8:[4,4]},measure:'pens',completedAt:'Today, 09:10'}
   );
+  // Health and other work (owner, 2026-10-18): the Overview shows them as their own sections below Production. Fictional instances.
+  // Planned health work (a vet's vaccination plan, a treatment order) is a task like production; reactive health is the triage marks below.
+  tasks.push(
+    // A row says what the work is and where the pigs are; order numbers stay on the task page (owner, 2026-10-19: "#11" means nothing).
+    {id:'vax21',section:'gestation',category:'health',type:'Vaccination',batch:'Plan V-21',sub:'PRRS · Units 7, 8',counts:{7:[10,6],8:[6,4]},outcomes:null},
+    {id:'treat118',section:'gestation',category:'health',type:'Treatment',batch:'Order T-118',sub:'Amoxicillin · Units 7, 9',counts:{7:[4,2],9:[6,3]},outcomes:null},
+    {id:'ob77',section:'gestation',category:'other',type:'Outbound',icon:'send',batch:'OB-77',title:'Outbound · pickup 14:00',line:'Units 7, 8 · 2 in withdrawal',lineTone:'act',due:24,unit:'pigs',counts:{7:[12,0],8:[12,0]}},
+    {id:'ob78',section:'gestation',category:'other',type:'Outbound',icon:'send',batch:'OB-78',title:'Outbound · pickup 16:30',line:'Unit 8',due:18,unit:'pigs',counts:{8:[18,0]}},
+    {id:'tr241',section:'gestation',category:'other',type:'Pig transfer',icon:'transfer',batch:'TR-241',title:'Move to Farrowing, Unit 6',line:'From Units 7, 8',due:8,unit:'pigs',counts:{7:[5,0],8:[3,0]}},
+    {id:'tr242',section:'gestation',category:'other',type:'Pig transfer',icon:'transfer',batch:'TR-242',title:'Move to Unit 9',line:'From Unit 8 · 12 of 20 moved',due:8,unit:'pigs',counts:{8:[20,12]}},
+    {id:'s11',section:'gestation',category:'other',type:'Sampling',icon:'note',batch:'S-11',title:'PRRS blood samples',line:'Units 7, 9',due:10,unit:'pigs',counts:{7:[6,0],9:[4,0]}},
+    {id:'s12',section:'gestation',category:'other',type:'Sampling',icon:'note',batch:'S-12',title:'Oral fluid samples',line:'Unit 8',due:4,unit:'pens',counts:{8:[4,0]}},
+    {id:'tr250',section:'farrowing',category:'other',type:'Pig transfer',icon:'transfer',batch:'TR-250',title:'Move weaned pigs to Nursery 12',line:'From Unit 6',due:96,unit:'pigs',counts:{6:[96,0]}}
+  );
+  // Reactive health (Triage marks set on the walk, by whoever walks): pigs marked Treat in place or Hospital pen and not yet treated
+  // or moved, and pigs marked Monitor. Section totals for the Overview; the day a mark was set gives the aging line.
+  const marks={
+    gestation:{treat:4,sinceYesterday:1,treatUnits:[7,8],monitor:7,monitorUnits:[7,8,9]},
+    breeding:{treat:1,sinceYesterday:0,treatUnits:[2],monitor:2,monitorUnits:[1,3]},
+    farrowing:{treat:2,sinceYesterday:0,treatUnits:[6],monitor:3,monitorUnits:[6,7]},
+    nursery:{treat:0,sinceYesterday:0,treatUnits:[],monitor:3,monitorUnits:[12]}
+  };
   // Extra fictional task instances for the list-overflow review URL: ?section=gestation&many=1.
   if(new URLSearchParams(location.search).get('many')==='1'){
     [33,34,35,36].forEach(n=>tasks.push({...tasks[0],id:'preg'+n,batch:'Batch '+n,counts:{7:[4,1],8:[5,2]}}));
@@ -86,6 +108,8 @@
   // Atlas-only start states for the screens a tap cannot reach (typing an answer): ?answered=1 (answer on file), ?view=finding.
   if(params.get('answered')==='1'){state.answered=true;state.answer='Unit 8, pen B3';}
   if(params.get('view')==='finding')state.page='finding';
+  // The Schedule opens from a Home section's "Schedule ›", filtered to that section: ?view=schedule&filter=all|production|health|other&week=-1|0|1.
+  if(params.get('view')==='schedule'){state.page='schedule';state.scheduleFilter=['all','production','health','other'].includes(params.get('filter'))?params.get('filter'):'production';state.scheduleWeek=['-1','1'].includes(params.get('week'))?+params.get('week'):0;}
   if(params.get('view')==='unit'){const available=sections.find(s=>s.id===initialSection).units;state.unit=available.includes(+params.get('unit'))?+params.get('unit'):available[0];}
   const app = $('#app'), overlay = $('#overlay');
   let returnFocus = null, toastTimer, navStack = [];
@@ -96,8 +120,9 @@
   const task = () => taskBy(state.task);
   const taskRecords = (t,unit=null) => unit ? (records.get(`${t.id}:${unit}`)||[]) : Object.keys(t.counts).flatMap(u=>records.get(`${t.id}:${u}`)||[]);
   const metric = (t,unit=null) => {const rows=taskRecords(t,unit);return {total:rows.length,done:rows.filter(r=>r.result).length,left:rows.filter(r=>!r.result).length};};
-  const scopedTasks = () => tasks.filter(t=>t.section===state.section&&(!state.unit||t.counts[state.unit]));
-  const openTaskCount = (sectionId,unit=null) => tasks.filter(t=>!t.completedAt&&!t.terminatedAt&&t.section===sectionId&&(!unit||t.counts[unit])).length;
+  // The unit page keeps its production cards until its own round; health and other work show on the Overview only for now.
+  const scopedTasks = () => tasks.filter(t=>t.section===state.section&&(!state.unit||(t.counts[state.unit]&&!t.category)));
+  const openTaskCount = (sectionId,unit=null) => tasks.filter(t=>!t.completedAt&&!t.terminatedAt&&t.section===sectionId&&(!unit||(t.counts[unit]&&!t.category))).length;
   const nouns = (t,n) => t.measure==='pens'?`${n===1?'pen':'pens'}`:`${n===1?'sow':'sows'}`;
   function toast(text){clearTimeout(toastTimer);$('#notice').textContent=text;toastTimer=setTimeout(()=>$('#notice').textContent='',3500);}
   function sectionMotion(direction,update){
@@ -244,7 +269,133 @@
     const visible=state.expandedUpcoming?next:next.slice(0,3);
     return `<section class="upcoming-work"><div class="work-section-heading"><h2>Coming up</h2><span>${next.length} tasks</span></div>${visible.map(n=>`<div class="upcoming-row"><span>${n.batch}</span><div>${n.title}<small>${n.when}</small></div></div>`).join('')}${next.length>3?btn('toggle-upcoming',state.expandedUpcoming?'Show first 3 tasks':`See all ${next.length} upcoming tasks`,'task-list-toggle','','aria-expanded="'+state.expandedUpcoming+'"'):''}</section>`;
   }
+  /* ---------- Overview (owner, 2026-10-18): Production tiles, Health, Other. The unit page keeps its cards (home() below). ---------- */
+  // Production runs in the order of the sow's cycle, then oldest batch first: a tile keeps its place day to day; overdue is a mark, never a re-sort.
+  const stageOrder=['Heat check','Breeding','Return-heat check','Pregnancy check','Farrowing','Piglet processing','Weaning'];
+  const shortName={'Return-heat check':'Return heat','Piglet processing':'Processing'};
+  const batchNo=t=>parseInt(String(t.batch).replace(/\D+/g,''),10)||0;
+  const byStage=(a,b)=>(stageOrder.indexOf(a.type)-stageOrder.indexOf(b.type))||(batchNo(a)-batchNo(b))||a.id.localeCompare(b.id);
+  // Tile copy per sample task: the to-do word, and the quiet next line (a timer, a due date, or red when overdue).
+  const tileFields={
+    heat34:{label:'due now',next:{text:'Next round 14:30'}},
+    heat35:{label:'to confirm',next:{text:'Next round 14:30'}},
+    service34:{label:'due now',next:{text:'3 more at 14:00'}},
+    return30:{label:'to watch',next:{text:'4 more from Sat'}},
+    preg31:{label:'ready now',next:{tone:'act',text:'2 overdue'}},
+    preg32:{label:'ready now',days:2,next:{text:'8 open tomorrow'}},
+    farrow28:{label:'farrowing',next:{text:'4 due today'}},
+    piglet27:{label:'litters due',next:{text:'4 litters tomorrow'}},
+    vax21:{label:'overdue',tone:'act',due:6,day:3,days:3,over:1,late:true,next:null},
+    treat118:{label:'due now',due:5,day:2,days:5,next:{text:'5 again tomorrow'}}
+  };
+  function tileModel(t){
+    const f=cardFields[t.id]||{},tf=tileFields[t.id]||{},current=workPreview==='mixed'?(f.state||'active'):workPreview;
+    let due=tf.due!=null?tf.due:(f.due?Object.values(f.due).reduce((a,b)=>a+b,0):0);
+    if(t.id==='farrow28')due=taskRecords(t).filter(r=>r.active).length;
+    const none=current==='waiting'||!due,day=tf.day||f.day||1,days=tf.days||f.days||1;
+    const next=none?(tf.next&&tf.next.tone!=='act'?tf.next:f.nextAt!=null?{text:'Next '+(f.nextAt>=1440?'tomorrow':Math.floor(f.nextAt/60)+':'+String(f.nextAt%60).padStart(2,'0'))}:null):tf.next;
+    return {id:t.id,entry:({farrow28:'farrowing',piglet27:'piglet-processing'})[t.id],title:shortName[t.type]||t.type,sub:t.sub||t.batch,
+      todo:none?{none:'None now'}:{value:due,label:tf.label||'due now',tone:tf.tone},next,late:!!tf.late,
+      days:{day,total:days,over:tf.over||0,text:tf.text||(!tf.over&&day===days&&days>1?`Day ${day} of ${days} · last day`:undefined)}};
+  }
+  const unitList=list=>list.length?(list.length===1?'Unit ':'Units ')+list.join(', '):'';
+  function overviewHeading(title,link){return `<div class="work-section-heading ov-heading"><h2>${title}</h2>${link?btn('schedule','Schedule<span aria-hidden="true"> ›</span>','ov-schedule-link',link,`aria-label="Schedule, ${title}"`):''}</div>`;}
+  function overview(){
+    const all=tasks.filter(t=>t.section===state.section),open=all.filter(t=>!t.completedAt&&!t.terminatedAt),closed=all.filter(t=>t.completedAt||t.terminatedAt);
+    const prod=open.filter(t=>!t.category).sort(byStage),health=open.filter(t=>t.category==='health').sort(byStage),other=open.filter(t=>t.category==='other').sort((a,b)=>a.type.localeCompare(b.type)||a.batch.localeCompare(b.batch));
+    const tiles=list=>`<div class="ov-tiles">${list.map(t=>window.SentriHomeTaskCard.tile(tileModel(t))).join('')}</div>`;
+    const closedLine=closed.length?btn('closed-task',`${icon('check')}<span>${closed.length} closed today · ${esc(closed[0].type)} ${esc(closed[0].batch.replace('Batch ','B'))}</span>${icon('chevron')}`,'ov-closed',closed[0].id):'';
+    const m=marks[state.section]||{treat:0,monitor:0,treatUnits:[],monitorUnits:[]};
+    const care=SentriUI.rowGroup(
+      SentriUI.row({variant:'navigation',icon:icon('treat'),title:'To treat',description:m.treat?(m.sinceYesterday?`${m.sinceYesterday} waiting since yesterday`:unitList(m.treatUnits)):'Nothing marked',trailing:{text:String(m.treat)},action:m.treat?'to-treat':'',trail:m.treat?'auto':'none',className:m.sinceYesterday?'ov-row-act':''})+
+      SentriUI.row({variant:'navigation',icon:icon('monitor'),title:'Monitoring',description:m.monitor?unitList(m.monitorUnits):'Nothing marked',trailing:{text:String(m.monitor)},action:m.monitor?'monitoring':'',trail:m.monitor?'auto':'none'})
+    );
+    const otherRows=other.length?SentriUI.rowGroup(other.map(t=>SentriUI.row({variant:'navigation',icon:icon(t.icon||'note'),title:t.title||`${t.type} · ${t.batch}`,description:t.line||'',trailing:{text:`${t.due} ${t.unit}`},action:'task',value:t.id,className:t.lineTone==='act'?'ov-row-act':''})).join('')):`<p class="ov-empty">Nothing open</p>`;
+    return header()+scopeRail()+`<div class="app-scroll screen-enter ov-page">
+      <section class="ov-section">${overviewHeading('Production','production')}${prod.length?tiles(prod):'<p class="ov-empty">Nothing open</p>'}${closedLine}</section>
+      <section class="ov-section">${overviewHeading('Health','health')}${care}${health.length?tiles(health):''}</section>
+      <section class="ov-section">${overviewHeading('Other','')}${otherRows}</section>
+    </div>`+nav();
+  }
+
+  /* ---------- Schedule (owner, 2026-10-19): the week board. Full screen with ✕, no page header or bottom bar; natural Mon–Sun weeks
+     paged in the footer; one line per batch under its task type; a tinted band per section in All; the cell says what that day holds. ---------- */
+  const weekMeta={'-1':{range:'28 Jun – 4 Jul',wk:26,dates:[28,29,30,1,2,3,4],today:null,past:[0,1,2,3,4,5,6]},'0':{range:'5 – 11 Jul',wk:27,dates:[5,6,7,8,9,10,11],today:3,past:[0,1,2]},'1':{range:'12 – 18 Jul',wk:28,dates:[12,13,14,15,16,17,18],today:null,past:[]}};
+  const dayNames=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'],dayShort=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],monthOf=(w,i)=>w==='-1'&&i<3?'Jun':'Jul';
+  // Cell codes: '' nothing · n running, nothing due · u waiting on today · dN done · oN due today · pN planned · eN estimate ·
+  // vN past its plan, today · wN past its plan, a past day · tHH:MM / qHH:MM a one-day job's time (today / planned) · '>' runs into next week, '<' came from last week.
+  const schedule={
+    gestation:{
+      '0':{production:[['Return heat','estimated returns',[['B30',['','d2','d6','o10','e8','e6','e4>']],['B39',['','','','','','','e3>']]]],
+                       ['Pregnancy check','4 batches',[['B29',['','','d11','d6','','','']],['B31',['','','','o5','p8','p7','']],['B32',['','','','n','p8','','']],['B38',['','','','','p22','u','u']]]]],
+           health:[['Vaccination','1 plan',[['PRRS · Units 7, 8',['','d4','d2','v6','','',''],true]]],['Treatment','1 order',[['Amoxicillin · Units 7, 9',['','','d5','o5','p5','p5','p5>']]]]],
+           other:[['Outbound','2 orders',[['Pickup 14:00 · Units 7, 8',['','','','o24','','','']],['Pickup 16:30 · Unit 8',['','','','o18','','','']]]],['Pig transfer','2 orders',[['To Farrowing 6 · from Units 7, 8',['','','','o8','','','']],['To Unit 9 · from Unit 8',['','','d12','o8','','','']]]],['Sampling','2 tasks',[['PRRS blood · Units 7, 9',['','','','o10','','','']],['Oral fluids · Unit 8',['','','','o4','','','']]]]]},
+      '1':{production:[['Return heat','estimated returns',[['B30',['<e2','','','','','','']],['B39',['<e5','e6','e5','e3','e2','e1','']]]],['Pregnancy check','1 batch',[['B34',['','p7','p7','p6','','','']]]]],
+           health:[['Treatment','1 order',[['Amoxicillin · Units 7, 9',['<p5','','','','','','']]]]],other:[['Sampling','1 task',[['Blood repeat · Unit 7',['','p6','','','','','']]]]]},
+      '-1':{production:[['Return heat','1 batch',[['B26',['d3','d5','d4','d2','d1','','']]]],['Pregnancy check','1 batch',[['B27',['','','d10','d9','d8','','']]]]],health:[],other:[['Outbound','1 order',[['Pickup · Units 7, 9',['','','d22','','','','']]]]]}
+    },
+    breeding:{'0':{production:[['Heat check','estimated in heat',[['B34',['','','d18','o20','e6','','']],['B35',['','','','o10','e6','e2','']]]],['Breeding','1 batch',[['B34',['','d9','d14','o5','e7','e3','e1>']]]]],health:[],other:[]}},
+    farrowing:{'0':{production:[['Farrowing','1 batch',[['B28',['','','d4','o2','e5','e4','e3>']]]],['Processing','1 batch',[['B27',['','d4','d4','n','p4','','']]]]],health:[],other:[['Pig transfer','1 order',[['To Nursery 12 · from Unit 6',['','','','o96','','','']]]]]}}
+  };
+  const fmt=(n,est)=>n>=1000?(est?'~'+Math.round(n/1000)+'k':(Math.round(n/100)/10)+'k'):(est?'~':'')+n;
+  function cell(code){
+    if(!code)return '<span></span>';
+    let c=code,cont='',from='';
+    if(c.endsWith('>')){cont=' sc-cont';c=c.slice(0,-1);}
+    if(c.startsWith('<')){from=' sc-from';c=c.slice(1);}
+    const k=c[0],v=c.slice(1),n=+v;
+    const map={n:['sc-nil','·'],u:['sc-wait','–'],d:['sc-done',fmt(n)],o:['sc-today',fmt(n)],p:['sc-plan',fmt(n)],e:['sc-est',fmt(n,true)],v:['sc-late',fmt(n)],w:['sc-latedone',fmt(n)],t:['sc-today sc-time',v],q:['sc-plan sc-time',v]};
+    const [cls,text]=map[k]||['',''];
+    return `<span class="${cls}${cont}${from}">${esc(text)}</span>`;
+  }
+  const cellWord={n:'Nothing due',u:'Waiting on today',d:'Done',o:'Due today',p:'Planned',e:'Estimate',v:'Past its plan',w:'Past its plan',t:'Today',q:'Planned'};
+  function scheduleWeek(){return schedule[state.section]?.[String(state.scheduleWeek||0)]||{production:[],health:[],other:[]};}
+  function scheduleGroups(){
+    const w=scheduleWeek(),f=state.scheduleFilter||'production';
+    return (f==='all'?['production','health','other']:[f]).map(k=>[k,w[k]||[]]);
+  }
+  function schedulePage(){
+    const wk=String(state.scheduleWeek||0),meta=weekMeta[wk],f=state.scheduleFilter||'production';
+    const days=`<div class="sc-days"><span></span><div class="sc-grid">${meta.dates.map((d,i)=>`<span class="sc-day${i===meta.today?' sc-is-today':''}${meta.past.includes(i)?' sc-is-past':''}"><span>${dayShort[i]}</span><b>${d}</b></span>`).join('')}</div></div>`;
+    const sectionIcon={production:'production',health:'health',other:'transfer'},sectionName={production:'Production',health:'Health',other:'Other'};
+    const groups=scheduleGroups();
+    // A row is the tap (full width, 48px): it opens that task's week in words. Production rows are batches (B31) in the gutter;
+    // health and other rows say what they are and where on their own line ("PRRS blood · Units 7, 9").
+    const body=groups.map(([k,types])=>{
+      const band=f==='all'?`<div class="sc-band"><span class="sc-band-icon">${icon(sectionIcon[k])}</span><b>${sectionName[k]}</b></div>`:'';
+      const named=k!=='production';
+      const rows=types.map(([type,sub,batches],ti)=>`<div class="sc-type"><div class="sc-type-head"><span>${esc(type)}</span><small>${esc(sub)}</small></div>${batches.map(([b,cells,late],bi)=>`<button type="button" class="sc-row${named?' sc-row-named':''}" data-action="schedule-row" data-value="${k}.${ti}.${bi}" aria-label="${esc(type)}, ${esc(b)}, this week">${named?`<span class="sc-name${late?' sc-batch-late':''}">${esc(b)}</span><span></span>`:`<span class="sc-batch${late?' sc-batch-late':''}">${esc(b)}</span>`}<span class="sc-grid">${cells.map(cell).join('')}</span></button>`).join('')}</div>`).join('');
+      return band+(rows||(f==='all'?'<p class="sc-none">Nothing planned</p>':''));
+    }).join('');
+    const empty=groups.every(([,types])=>!types.length);
+    const todayCol=meta.today!=null?`<span class="sc-today-band" style="left:calc(52px + (100% - 84px) / 7 * ${meta.today} + ${3*meta.today}px);width:calc((100% - 84px) / 7)" aria-hidden="true"></span>`:'';
+    const board=empty?`${days}<p class="sc-none sc-none-week">Nothing planned this week</p>`:`${days}${body}${todayCol}`;
+    const prev=weekMeta[String(+wk-1)],next=weekMeta[String(+wk+1)];
+    const foot=`<div class="sc-foot">${prev?SentriUI.button({action:'schedule-week',value:String(+wk-1),register:'secondary',label:'‹ Week '+prev.wk}):''}${wk!=='0'?SentriUI.button({action:'schedule-week',value:'0',register:'primary',label:'This week'}):''}${next?SentriUI.button({action:'schedule-week',value:String(+wk+1),register:'secondary',label:'Week '+next.wk+' ›'}):''}</div>`;
+    return `<div class="sc-top">${SentriUI.iconButton({action:'back',icon:icon('close'),label:'Close schedule',variant:'plain'})}<div class="sc-title"><strong>${meta.range}</strong><small>Week ${meta.wk}${wk==='1'?' · next week':wk==='-1'?' · last week':''} · ${esc(section().name)}</small></div>${SentriUI.iconButton({action:'schedule-key',icon:icon('info'),label:'How to read the board',variant:'bordered'})}</div>
+      <div class="app-scroll sc-scroll">${SentriUI.segment({variant:'lens',options:[['all','All'],['production','Production'],['health','Health'],['other','Other']],active:f,action:'schedule-filter',ariaLabel:'Show'})}
+      <div class="sc-board${f==='all'?' sc-all':''}">${board}</div></div>
+      ${SentriUI.sheetFooter({content:foot,className:'page-footer sc-footer'})}`;
+  }
+  function scheduleKey(){
+    const rows=[['d12','Done','How many were recorded that day'],['o10','Today','Due today'],['p8','Planned','Exact number, already known'],['e6','Estimate','Expected: heat, returns, farrowing'],['u','Waiting on today','Known after today’s results'],['v4','Past its plan','The task should have finished; it carries on until done'],['n','Nothing due','Running, nothing to do that day']];
+    drawer('How to read the board',`<p class="sc-key-note">Tap a row to see its week in numbers.</p><div class="st-panel sc-key">${rows.map(([c,t,d])=>`<div class="sc-key-row"><div class="sc-grid sc-key-cell">${cell(c)}</div><div><strong>${t}</strong><small>${d}</small></div></div>`).join('')}</div>`,{size:'medium'});
+    overlay.querySelector('.sheet,.dialog')?.classList.add('schedule-key');
+  }
+  // A row's week in words: each day it runs, what kind of count it is, and the exact number (the cells stay short).
+  function scheduleRow(ref){
+    const [k,ti,bi]=String(ref).split('.'),wk=String(state.scheduleWeek||0),meta=weekMeta[wk];
+    const t=(scheduleWeek()[k]||[])[+ti];if(!t)return;const [type,,batches]=t,row=batches[+bi];if(!row)return;
+    const [b,cells]=row;
+    const value=c=>['t','q'].includes(c[0])?c.slice(1):c[0]==='u'?'–':c[0]==='n'?'·':(c[0]==='e'?'~':'')+(+c.slice(1)).toLocaleString('en');
+    const list=cells.map((c,i)=>({i,code:(c||'').replace(/[<>]/g,'')})).filter(r=>r.code);
+    const body=`<div class="st-panel sc-day-list">${list.map(r=>SentriUI.row({title:`${dayNames[r.i]} ${meta.dates[r.i]} ${monthOf(wk,r.i)}${r.i===meta.today?' · today':''}`,description:cellWord[r.code[0]],trailing:{text:value(r.code)},className:['v','w'].includes(r.code[0])?'ov-row-act':''})).join('')}</div>`;
+    drawer(`${type} · ${b}`,body,{size:'medium'});
+    overlay.querySelector('.sheet,.dialog')?.classList.add('schedule-row');
+  }
+
   function home(){
+    if(!state.unit)return overview();
     const models=window.SentriHomeTaskCard.order(scopedTasks().map(taskModel));
     const open=models.filter(m=>!['complete','terminated'].includes(m.state));
     const visible=state.expandedTasks?open:open.slice(0,5);
@@ -308,10 +459,16 @@
   function finding(){return legacyHead('Movement needs clarification','Assistant · overnight review','<span class="preview-badge">PREVIEW</span>',false)+`<div class="app-scroll screen-enter"><div class="scope-label">${icon('place')}Gestation / Unit 7 / Pen A2</div><div class="assistant-hero"><p class="overline">YOUR INPUT NEEDED</p><h3>Where did these pigs go?</h3><p>The overnight review found a movement note without a destination.</p></div><div class="evidence"><strong>Movement note · yesterday, 15:40</strong><p>“Moved 4 pigs out of A2.”<br>Recorded by G. Hansen · Unit 7</p></div><div class="evidence"><strong>What is missing</strong><p>The destination unit and pen. No movement record has been changed.</p></div>${state.answered?`<div class="message">Your answer: ${esc(state.answer)}<br>Saved in this preview. No live record was changed.</div>`:`<form id="answer-form">${SentriUI.field({label:`Destination or clarification`,control:`<textarea id="answer" name="answer" placeholder="For example: Unit 8, pen B3" required maxlength="500"></textarea>`})}</form>`}<p class="work-note">Sample decision for reviewing the Assistant experience.</p>${btn('finding-unit','View Unit 7','secondary')}</div>${SentriUI.sheetFooter({content:SentriUI.backButton({action:'back'})+(state.answered?'':'<button class="primary" type="submit" form="answer-form">Send clarification</button>'),className:'page-footer'})}`;}
   function toolbox(){const rows=[...(state.unit?[{action:'maintenance',icon:icon('wrench'),title:'Maintenance',description:'Unit '+state.unit+' · equipment issues'}]:[]),{action:'search',icon:icon('search'),title:'Find a pig or pen',description:'Search by ear tag or pen code'},{action:'records',icon:icon('note'),title:'Records',description:'Updates made in this preview'},{action:'sections',icon:icon('barn'),title:'Sections & units',description:'Browse the farm'},{action:'assistant',icon:icon('spark'),title:'Assistant',description:'Questions, findings and decisions'}];return head('Toolbox')+'<div class="app-scroll screen-enter">'+SentriUI.panel(rows.map(r=>SentriUI.row(r)).join(''),{className:'st-row-group'})+'</div>'+nav('toolbox');}
   function recordLog(){return head('Records')+'<div class="app-scroll screen-enter">'+SentriUI.log(SentriUI.logGroups(state.log.map(l=>({title:l.title,detail:l.context,at:l.at,by:'G. Hansen'}))),{empty:'No new records yet. Answers to overnight findings will appear here.'})+'</div>'+nav('toolbox');}
-  const pages={home,sections:sectionChooser,placeholder,environment,maintenance,assistant,finding,toolbox,records:recordLog};
+  const pages={home,sections:sectionChooser,placeholder,environment,maintenance,assistant,finding,toolbox,records:recordLog,schedule:schedulePage};
   // The atlas follows the demo (?screen=): the screen whose url holds this scope (view, section, unit, work, attention), else null.
   function atlasScreen(screens){
     const dr=overlay.querySelector('.sheet,.dialog');
+    if(state.page==='schedule'){
+      if(state.section!=='gestation')return null;
+      const f=state.scheduleFilter||'production',w=state.scheduleWeek||0;
+      if(dr)return w===0&&f==='production'?(dr.classList.contains('schedule-key')?'workbench.schedule-key':dr.classList.contains('schedule-row')?'workbench.schedule-row':null):null;
+      return w===1&&f==='production'?'workbench.schedule-next':w===0&&f==='all'?'workbench.schedule-all':w===0&&f==='production'?'workbench.schedule':null;
+    }
     if(state.page==='environment')return unitDevices()[0]?.draftMode==='manual'?'environment.fan-manual':state.sensorRange==='week'?'environment.sensor-week':(state.sensor||0)>0?'environment.sensor-other':'environment.page';
     if(state.page==='assistant')return state.assistantTab==='chat'?(state.chat.length?'assistant.conversation':'assistant.conversations'):state.answered?'assistant.up-to-date':'assistant.needs-you';
     if(state.page==='finding')return state.answered?'assistant.answered':'assistant.finding';
@@ -336,7 +493,8 @@
     app.classList.toggle('has-global-sync',!!badge);
     app.classList.toggle('island-sync',island);
     app.innerHTML=(island?badge:'')+(pages[state.page]||home)();
-    if(badge&&!island)(app.querySelector('.app-header,.page-head,.st-page-header')||app).insertAdjacentHTML('beforeend',badge);
+    app.classList.toggle('schedule-open',state.page==='schedule');
+    if(badge&&!island&&state.page!=='schedule')(app.querySelector('.app-header,.page-head,.st-page-header')||app).insertAdjacentHTML('beforeend',badge);
     window.AtlasBare&&AtlasBare.watch(atlasScreen);
     document.querySelectorAll('[data-demo]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.demo===(state.page==='sections'?'sections':state.unit?'unit':'overview'))));
   }
@@ -371,10 +529,18 @@
   SentriUI.holdBind(document.body,{onCommit(el){if(el.dataset.action==='confirm-end-task'){task().terminatedAt='Today · just now';closeDrawer();goHome();}}});
   document.addEventListener('click',e=>{
     const demo=e.target.closest('[data-demo]');if(demo){closeDrawer();navStack=[];state.section='gestation';state.unit=demo.dataset.demo==='unit'?7:null;state.page=demo.dataset.demo==='sections'?'sections':'home';const url=new URL(location.href);url.searchParams.set('view',demo.dataset.demo);url.searchParams.set('section','gestation');history.replaceState(null,'',url);render();return;}
-    const card=e.target.closest('.home-task-card[data-card]');if(card){openTask(card.dataset.card,state.unit);return;}
+    const card=e.target.closest('.home-task-card[data-card],.home-task-tile[data-card]');if(card){openTask(card.dataset.card,state.unit);return;}
     const el=e.target.closest('[data-action]');if(!el||el.disabled||el.matches('.st-hold')||SentriUI.guard(el))return;const a=el.dataset.action,v=el.dataset.value;
     if(a==='close'){closeDrawer();return;}
     if(a==='sync'){showSync();return;}
+    if(a==='schedule'){push('schedule',{scheduleFilter:v||'production',scheduleWeek:0});return;}
+    if(a==='schedule-filter'){state.scheduleFilter=v;render();return;}
+    if(a==='schedule-week'){state.scheduleWeek=+v;render();return;}
+    if(a==='schedule-key'){scheduleKey();return;}
+    if(a==='schedule-row'){scheduleRow(v);return;}
+    if(a==='closed-task'){openTask(v);return;}
+    // Marked pigs are worked through on the unit walk (Inspection's Health lens) until the cross-unit To treat list is designed.
+    if(a==='to-treat'||a==='monitoring'){const m=marks[state.section];const u=(a==='to-treat'?m.treatUnits:m.monitorUnits)[0];if(u)openDesigned('inspection-astra-concept.html',u,'unit','Health');return;}
     if(a==='toggle-tasks'){const scroll=app.querySelector('.app-scroll')?.scrollTop||0;state.expandedTasks=!state.expandedTasks;render();app.querySelector('.app-scroll').scrollTop=scroll;return;}
     if(a==='toggle-upcoming'){const scroll=app.querySelector('.app-scroll')?.scrollTop||0;state.expandedUpcoming=!state.expandedUpcoming;render();app.querySelector('.app-scroll').scrollTop=scroll;return;}
     if(a==='end-task-early'){dialog('End task early?','Unfinished work will remain incomplete. Existing records are kept.',{label:'End task early',action:'confirm-end-task'});return;}
@@ -433,6 +599,9 @@
   $('#reset-study').addEventListener('click',()=>location.reload());
   document.querySelectorAll("[data-status-icons]").forEach(e=>{e.innerHTML=icon("signal")+icon("battery");});
   render();
+  // Atlas start states for the Schedule's drawers: ?view=schedule&sheet=key, or &sheet=row&row=production.1.1 (Pregnancy check B31).
+  if(state.page==='schedule'&&params.get('sheet')==='key')scheduleKey();
+  if(state.page==='schedule'&&params.get('sheet')==='row')scheduleRow(params.get('row')||'production.1.1');
   // The fold is measured once the fonts have loaded: measured before, the toggle sits a few pixels off and the page lands short.
   if(params.get('focus')==='task-fold')(document.fonts?document.fonts.ready:Promise.resolve()).then(()=>requestAnimationFrame(()=>{
     const scroller=app.querySelector('.app-scroll'),toggle=app.querySelector('[data-action="toggle-tasks"]');

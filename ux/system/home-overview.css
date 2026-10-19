@@ -1,0 +1,79 @@
+/* Home Overview and Schedule (owner, 2026-10-18/19). The Overview: Production tiles, Health, Other. The Schedule: the week board.
+   Tokens only; the tile itself lives with the task card (astra-home-task-card.css). */
+
+/* ---------- Overview ---------- */
+
+.ov-section{margin-top:24px}
+.ov-section:first-child{margin-top:0}
+.ov-heading{display:flex;align-items:center;justify-content:space-between;margin:0 0 12px;min-height:24px}
+.ov-heading h2{margin:0}
+.ov-schedule-link{min-height:48px;margin:-12px -8px;padding:0 8px;border:0;background:none;color:var(--ink);font:500 15px var(--font-sans);display:inline-flex;align-items:center;cursor:pointer;border-radius:10px}
+.ov-schedule-link:active{background:var(--choice-press)}
+.ov-tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ov-section .st-row-group+.ov-tiles{margin-top:10px}
+.ov-closed{display:flex;align-items:center;gap:8px;width:100%;min-height:48px;margin-top:10px;padding:0 14px;border:1px dashed var(--line);border-radius:14px;background:transparent;color:var(--muted);font:400 13px var(--font-sans);text-align:left;cursor:pointer}
+.ov-closed svg{width:14px;height:14px;flex:none}
+.ov-closed span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ov-closed:active{background:var(--choice-press)}
+.ov-empty{margin:0;padding:14px;border:1px dashed var(--line);border-radius:14px;color:var(--muted);font:400 13px var(--font-sans)}
+.st-row.ov-row-act .st-row-copy small{color:var(--red-ink)}
+
+/* ---------- Schedule: full screen, no page header, no bottom bar ---------- */
+#app.schedule-open{display:flex;flex-direction:column}
+.sc-top{display:flex;align-items:center;gap:6px;padding:2px 12px 0}
+.sc-title{flex:1;text-align:center;min-width:0}
+.sc-title strong{display:block;font:500 20px/1.25 var(--font-sans);letter-spacing:-.4px;color:var(--ink)}
+.sc-title small{display:block;font:400 13px/1.35 var(--font-sans);color:var(--muted)}
+.sc-scroll{padding:0 21px 16px}
+.sc-scroll>.st-segment{margin-top:16px}
+.sc-board{position:relative;margin-top:12px;padding:4px 14px 6px;background:var(--paper);border:1px solid var(--line);border-radius:18px}
+.sc-days,.sc-row{display:grid;grid-template-columns:34px 1fr;gap:4px;align-items:center}
+.sc-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.sc-day{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:44px;padding:0;border:0;background:none;border-radius:10px;color:var(--muted);font:500 11px var(--font-sans)}
+.sc-day b{font:400 15px/1.2 var(--font-mono);color:var(--ink)}
+.sc-day.sc-is-past b{color:var(--muted)}
+.sc-day.sc-is-today b{display:inline-flex;width:28px;height:28px;align-items:center;justify-content:center;border:2px solid var(--ink);border-radius:14px}
+.sc-type{position:relative;z-index:1;border-top:1px solid var(--line)}
+.sc-type-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding:12px 0 4px}
+.sc-type-head span{font:600 14px var(--font-sans);color:var(--ink)}
+.sc-type-head small{font:400 13px var(--font-sans);color:var(--muted)}
+.sc-row{min-height:48px;position:relative;z-index:1;width:100%;padding:0;border:0;background:none;text-align:left;font:inherit;color:inherit;cursor:pointer;border-radius:8px}
+.sc-row:active{background:var(--press)}
+.sc-row-named{grid-template-rows:auto auto;row-gap:4px;padding:4px 0 8px}
+.sc-name{grid-column:1/-1;font:500 13px/18px var(--font-sans);color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sc-batch{font:400 13px var(--font-mono);color:var(--ink)}
+.sc-batch-late{color:var(--red-ink);font-weight:500}
+.sc-grid>span{height:30px;border-radius:6px;display:flex;align-items:center;justify-content:center;font:500 13px var(--font-mono);color:var(--ink);position:relative;min-width:0}
+.sc-done{background:var(--well);color:var(--ink-2)!important}
+.sc-today{background:var(--ink-2);color:#fff!important}
+.sc-plan{border:1.5px solid var(--ink-2)}
+.sc-est{border:1.5px dashed var(--ink-2);color:var(--ink-2)!important}
+.sc-wait{border:1.5px solid var(--line);color:var(--muted)!important}
+.sc-nil{background:var(--well);color:var(--muted)!important}
+.sc-late{background:var(--red-wash);border:1.5px solid var(--red);color:var(--red-ink)!important;font-weight:600!important}
+.sc-latedone{background:var(--well);border:1.5px solid var(--red);color:var(--ink-2)!important}
+.sc-time{font-size:11px!important;letter-spacing:-.3px}
+.sc-cont{border-top-right-radius:0!important;border-bottom-right-radius:0!important}
+.sc-cont::after{content:"";position:absolute;right:-7px;top:50%;margin-top:-5px;border-left:6px solid var(--ink-2);border-top:5px solid transparent;border-bottom:5px solid transparent}
+.sc-from{border-top-left-radius:0!important;border-bottom-left-radius:0!important}
+.sc-from::before{content:"";position:absolute;left:-8px;top:50%;margin-top:-5px;border-right:6px solid var(--ink-2);border-top:5px solid transparent;border-bottom:5px solid transparent}
+.sc-today-band{position:absolute;top:4px;bottom:6px;background:rgba(32,41,31,.06);border-radius:8px;pointer-events:none;z-index:0}
+.sc-band{position:relative;z-index:1;display:flex;align-items:center;gap:10px;margin:8px -14px 0;padding:10px 14px;background:var(--app-background);border-top:1px solid var(--line)}
+.sc-band+.sc-type{border-top:0}
+.sc-band-icon{width:28px;height:28px;border-radius:8px;background:var(--row-icon-bg);display:flex;align-items:center;justify-content:center;color:var(--ink-2)}
+.sc-band-icon svg{width:16px;height:16px}
+.sc-band b{font:600 15px var(--font-sans);color:var(--ink)}
+.sc-none{margin:0;padding:12px 0 8px;color:var(--muted);font:400 13px var(--font-sans);position:relative;z-index:1}
+.sc-none-week{border-top:1px solid var(--line);padding:16px 0 10px}
+.sc-footer .sc-foot{display:flex;gap:10px;width:100%}
+.sc-footer .sc-foot .button{flex:1;min-height:56px;height:56px;border-radius:var(--radius-control,12px)}
+#app .sc-footer .sc-foot .button.secondary{background:var(--paper);border:1px solid var(--back-border)}
+/* Key and day drawers */
+.sc-key-note{margin:0 0 12px;color:var(--muted);font:400 13px var(--font-sans)}
+.sc-key{padding:0}
+.sc-key-row{display:grid;grid-template-columns:48px 1fr;gap:12px;align-items:center;padding:10px 14px;min-height:52px}
+.sc-key-row+.sc-key-row{border-top:1px solid var(--line)}
+.sc-key-row .sc-key-cell{grid-template-columns:1fr}
+.sc-key-row strong{display:block;font:500 15px var(--font-sans);color:var(--ink)}
+.sc-key-row small{display:block;font:400 13px var(--font-sans);color:var(--muted)}
+.sc-day-list{padding:0}
