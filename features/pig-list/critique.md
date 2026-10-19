@@ -159,7 +159,8 @@ Scope: Record health and Edit conditions reached from the pig list. The owner's 
 ### Problems
 
 - **major** · Record health listed the pigs again under a docked Details panel, though the selection is made first and fixed (owner, 2026-10-17).
-- **minor** · The action sheet was titled "More actions", though it is the only place the actions live; the owner renamed it Actions (2026-10-17).
+- **minor** · The action sheet was titled "More actions", though it is the only place the actions live; the owner renamed it Actions (2026-10-17), and the button that opens it says Actions too.
+- **major** · The Actions page carried a Health / Routine bar at the bottom, a second way to the same sections already on the page (owner, 2026-10-18: removed).
 
 ### Self-crit
 

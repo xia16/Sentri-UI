@@ -23,7 +23,7 @@ Fixture: Inspection's sample unit. Pen **D4** (growers) has 000801 (Diarrhoea, s
 | B2 | list | tick the group row only | dock `14 pigs selected` + Actions; Actions shows Disease or symptom only | S PRD 1 |
 | B3 | B1 | tap the group row's field, type 3 | the phone's number pad, 14 selected; the field shows `3`; dock `5 pigs selected`; the row keeps its height | S PRD 2 |
 | B4 | B3 | type 20 | the field caps at 14 | S PRD 2 |
-| B5 | B3 | tap `5 pigs selected ›` | Selected page: Pens (D4 · 5 pigs), Without ear tags (D4, 14 pigs, `3 · of 14`), Clear selection | S PRD flow |
+| B5 | B3 | tap `5 pigs selected ›` | Selected page: Pens (D4 · 5 pigs), Without ear tags (`D4 · 3 of 14 pigs`); each row unticks; no Clear | S PRD flow |
 | B6 | B3 | Actions | the Actions page: pig actions only, no Pigs / Pens switch, no bottom bar | S PRD flow |
 | B7 | list | tap D4's › | the pen page: Pen note, Feed guidance, Pen log | S PRD flow |
 

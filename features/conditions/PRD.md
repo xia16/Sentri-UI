@@ -23,8 +23,8 @@ symptom** → **Record health**, a page of fields like Record treatment: Conditi
 `Save · n` → Conditions picker (one drawer with levels: footer Back goes up, ✕ closes, Done · n applies) → Save → the tags
 on the rows.
 
-- "N pigs selected ›" opens the **Selected** page (not a drawer): Pens, Pigs, then Without ear tags, each untickable, with Clear
-  selection; Back returns to Record health or the list, so the selection is edited in one place.
+- "N pigs selected ›" opens the **Selected** page (not a drawer): Pens, Pigs, then Without ear tags, each untickable (no Clear: a page header has no corner action and Clear never sits in a
+  footer); Back returns to Record health or the list, so the selection is edited in one place.
 - **Actions** page holds **pig actions only**: no Pigs / Pens switch, no bottom Health / Routine bar. A pen's own actions
   (note, feed guidance, log) live on its pen page, through the header's › (owner, 2026-10-18). Feed-plan's "Actions for
   several pens" is now an earlier design.
