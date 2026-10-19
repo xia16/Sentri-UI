@@ -230,14 +230,9 @@ if (problems.length) {
 }
 
 // components: the mobile design system's parts (group, status from the gate result), plus the proposed ones not built yet
-const GROUPS = [
-  ['Base', ['Button', 'IconButton', 'Icon', 'Heading', 'Header', 'Row', 'Panel', 'Facts', 'Log', 'Sheet', 'PenMap', 'Segment', 'FilterChips', 'ChoiceList', 'CategoryFooter']],
-  ['Inputs and filters', ['FilterSheet', 'RangeSlider']],
-  ['Fields', ['Field', 'PickerField', 'Stepper', 'Measure', 'Numpad']],
-  ['Status and feedback', ['Status', 'ConditionTag', 'Banner', 'Toast', 'Photos']],
-  ['Home', ['TaskTile', 'WeekBoard']],
-  ['Task skeleton', ['TaskPhone', 'TaskHeader', 'TaskSummary', 'TaskLens', 'TaskGroup', 'TaskDock', 'TaskHold', 'TaskTotals', 'TaskProgress', 'TaskStepper', 'TaskPhotos', 'TaskChoice', 'TaskRadios', 'TaskWarning', 'TaskTable', 'TaskMetrics', 'TaskSection', 'TaskReceipt', 'TaskDay', 'TaskChips']],
-];
+// the groups and their order are design-system data (components/_groups.json), so a new component is listed there, not here:
+// a change that only lists one is a design change, never an edit to the gate's tools
+const GROUPS = read('ux/design-system/components/_groups.json').map((g) => [g.group, g.components]);
 const components = [];
 for (const [group, names] of GROUPS) for (const name of names) {
   // a part named here before its folder lands (a component built in its own PR) is left out until it exists
