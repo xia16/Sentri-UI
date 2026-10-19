@@ -2537,6 +2537,7 @@
     "feed.copy.health.43": {"en": "{name} → Entered in error", "zh": "{name} → 录入错误", "kind": "label"},
     "feed.copy.health.44": {"en": "Disease", "zh": "疾病", "kind": "label"},
     "feed.copy.health.45": {"en": "Symptom", "zh": "症状", "kind": "label"},
+    "feed.copy.health.46": {"en": "Body condition", "zh": "体况", "kind": "label"},
     "feed.aria.back-today": {"en": "Back to Today", "zh": "返回今日", "kind": "label"},
     "feed.aria.unit-list": {"en": "Unit {n} inspection list", "zh": "{n}单元巡查列表", "kind": "label"},
     "feed.aria.walk-updates": {"en": "Updates this walk", "zh": "本次巡查更新", "kind": "label"},
