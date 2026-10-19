@@ -531,3 +531,35 @@ Scope: the sow's Actions page. The owner's rounds on conditions and selection, b
 ### Self-crit
 
 - **Better because** the title says what the page is, the button names it, and the tool row reads as one row at every width.
+
+---
+
+# Pen page (2026-10-20)
+
+Scope: the room's pen page (`farrowing.pen`) and the pen forms it opens (`farrowing.pen-note`, `farrowing.pen-fault`). Its sibling with the same job is the Inspection pen page (`inspection.pen`, PR #229, the owner's ruling of 2026-10-19: the pen is a door, its verbs on top, then what needs someone). Budget: `budget.md` → Pen page. Base: origin/main 7c22bed.
+
+## Keep
+
+- The page header `Pen B1` and Back, as a page (not a drawer), reached from the pen header on the room list.
+- Every pen verb and where it goes: Feed guidance, Report equipment fault, Add / Edit pen note, Pen log; Resolve lives on the fault's record.
+- The note's text, author and time, as a card the same weight as on main.
+- Open faults listed before the note; a resolved fault leaves the page and stays in the log.
+
+## Problems
+
+- **major** · The pen page shows no state of the pen: who is in it, the piglets and its feed are not on it, and the page reads as four tool rows (sibling: Inspection's pen page leads with its verbs and then says how the pen is).
+- **major** · It does not match its sibling with the same job: Inspection's pen page (owner ruling 2026-10-19) puts the verbs on top as a tile grid, then Needs attention, then Now, then one Pen log row. A worker who walks both tasks learns two pen pages.
+- **major** · Drafts are lost on Back: a pen note or a fault half typed is gone when the worker opens it again (atlas edge: "Back discards the draft"; walk law: drafts survive Back and reopen).
+- **minor** · Every verb row carries a second line that explains it rather than a state; at 390 and 360 the note row's line clips (`Leave information for the next pers…`).
+- **minor** · In Chinese the pen page is all English (`?lang=zh`: `Feed guidance`, `Pen log`, …): the page draws no names from the registry.
+- **minor** · The atlas steps to the pen screens tap English names (`Pen B1, 1 sow, view details`, `Add pen note`, `Select`, `Feeding station`), which a translated page breaks; they become selectors.
+
+## Parts
+
+| Part | Drawn by today | The component whose job it is | Keep / fix / cut |
+|---|---|---|---|
+| Pen verbs | Row navigation, four rows in one group | Row `tile` in `rowGrid` (as on Inspection's pen page and More actions) | **fix** |
+| Open faults | page-built `pen-notice` card (amber) | Row navigation in a group under `Needs attention` (as on Inspection) | **fix** |
+| Pen note | page-built `pen-notice` card | the same card, under the faults, under `Needs attention` | keep (its weight) |
+| Sows, piglets, feed | absent (feed: the second line of a verb row) | Facts | **fix** |
+| Pen log | a row in the verb list | Row navigation, alone at the end | keep |
