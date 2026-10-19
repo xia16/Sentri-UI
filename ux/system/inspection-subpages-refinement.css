@@ -8,7 +8,6 @@
 .inspection-phone .sheet-footer .button.primary[data-action^="record-"]:disabled{opacity:.55;}
 
 /* Action menus and review rows are quiet navigation surfaces, not clinical cards. */
-.inspection-phone .actions-sheet .sheet-body,
 .inspection-phone .actions-subjects{background:var(--surface);border-bottom:1px solid var(--line);}
 .inspection-phone .action-group-label{margin-top:18px;color:var(--muted);}
 .inspection-phone .review-list li:not(.st-row){min-height:56px;padding:8px 0;border-bottom:1px solid #e8eddf;}
