@@ -1,5 +1,7 @@
 # Home task-card component — current proposal
 
+**Overview tile · 2026-10-19 (current for the Overview).** The Overview no longer uses this card: it uses `SentriHomeTaskCard.tile(model)` in the same renderer, a 2-column tile with four fixed slots, each with one kind of message at the same height in every tile: (1) `title`, one line, a short task name of at most about 15 characters; (2) `sub`, the batch (or for health work, what and where: "PRRS · Units 7, 8"); (3) `todo` `{value,label,tone}` or `{none:'None now'}` plus `next` `{text,tone}`, a quiet next-timer line, red (`tone:'act'`) when overdue; (4) `days` `{day,total,over,text}`, one segment per planned day, with `over` red segments and "N days overdue" once a task runs past its plan. No done state. The whole tile is one button. The card below remains the unit page's card until the unit redesign. Rules: [workbench PRD](../../../features/workbench/PRD.md), "Overview and Schedule · 2026-10-19".
+
 Current Home decisions are in “Android Home handoff · 2026-10-14” below. Earlier component experiments on this page are retained as design history where their metrics differ.
 
 Supersedes the earlier 18-card gallery and its no-progress-bar proposal. The owner requested a component-first design, visible progress and elapsed/remaining days, grounded in Claude's task documents. Weight checks belong inside Inspection, not as full Home tasks.

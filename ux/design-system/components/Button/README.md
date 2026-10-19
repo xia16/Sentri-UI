@@ -86,6 +86,9 @@ Generic component, used across sections. Registers are variants of this componen
 
 ## References and changelog
 
+2026-10-19 (workbench): text register, quiet (`className: 'st-text-action--quiet'`): a settled line that still opens something, muted 13px / 400 in the same 48px target (Home's "1 closed today").
+2026-10-19 (workbench): text register, `chevron: true`: the button spans the content width and ends in the row chevron, so a quiet line reads as a tap (Home's "1 closed today ›").
+
 2026-10-17 (medicines): text register `align` ('start' | 'end'), so a short text action lines up with the content edge instead of centring in its target.
 
 2026-10-10: unified variants, reasons, hold face and glove targets; removed unused end-early register. [Ant Design Mobile Button](https://github.com/ant-design/ant-design-mobile/blob/master/src/components/button/index.en.md) and [TDesign Button](https://github.com/Tencent/tdesign-mobile-vue/blob/develop/src/button/button.md) guide fill, optional icon and busy state; [Sentri’s research](../../../../docs/design-workflow/research/component-standard.md) records Material 3 and Apple interaction guidance. Sentri retains its stricter 48px glove floor.

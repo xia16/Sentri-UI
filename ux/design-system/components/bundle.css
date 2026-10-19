@@ -1177,6 +1177,79 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 .st-measure[data-layout="row"] .st-measure-input{font-size:var(--type-step-value-size);line-height:1}
 .st-measure[data-layout="row"] .st-measure-input:placeholder-shown{font-size:15px}
 
+/* Button · text register, quiet: a settled line that still opens something (Home's "1 closed today"): muted 13px / 400, the same 48px target. */
+.st-text-action.st-text-action.st-text-action--quiet{color:var(--muted);font-weight:400;font-size:var(--type-description-size)}
+/* A quiet line that opens a list: the whole content width is the target and it ends in the row chevron, like "Schedule ›". */
+.st-text-action.st-text-action[data-chevron]{display:flex;width:100%;gap:6px}
+.st-text-action[data-chevron] .st-button-label{flex:1;min-width:0;text-align:left}
+.st-text-action[data-chevron]>.st-button-chevron{display:inline-flex;color:var(--muted)}
+.st-text-action[data-chevron] svg{width:14px;height:14px;flex:none}
+
+/* TaskTile: one open task on the Overview (components/TaskTile/README.md). Four fixed slots at the same height in every tile. */
+.st-tile{display:grid;grid-template-rows:auto auto auto auto auto;align-content:start;min-width:0;width:100%;text-align:left;padding:14px;border:1px solid var(--line);border-radius:var(--radius-panel);background:var(--paper);color:var(--ink);font-family:var(--font-sans);cursor:pointer}
+.st-tile:active{background:var(--press)}
+.st-tile-name{font-size:16px;line-height:22px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.st-tile-sub{font-size:13px;line-height:18px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.st-tile-todo{display:flex;align-items:baseline;gap:6px;height:28px;margin-top:14px;white-space:nowrap}
+.st-tile-todo b{font:400 26px/28px var(--font-mono);letter-spacing:-.5px;color:var(--ink)}
+.st-tile-todo span{font-size:13px;color:var(--muted)}
+.st-tile-todo[data-none] b,.st-tile-todo[data-done] b{font:500 16px/28px var(--font-sans);letter-spacing:0;color:var(--ink-2)}
+.st-tile-todo[data-done]{align-items:center}
+.st-tile-todo[data-done] svg{width:15px;height:15px;flex:none;color:var(--ink-2)}
+.st-tile-todo[data-next] b{color:var(--ink-2)}
+.st-tile-todo .st-tile-also[data-tone="act"]{color:var(--red-ink)}
+.st-tile-run{display:block;margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+.st-tile-segs{display:flex;gap:3px;height:6px}
+.st-tile-segs i{flex:1;border-radius:2px;background:var(--well)}
+.st-tile-segs i[data-on]{background:var(--ink-2)}
+.st-tile-segs i[data-over]{background:var(--red)}
+.st-tile-day{display:block;margin-top:6px;font-size:13px;line-height:18px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:370px){.st-tile{padding:12px}.st-tile-name{font-size:15px}}
+
+/* WeekBoard: a week of work, one line per task, a count per day (components/WeekBoard/README.md). */
+.st-week{position:relative;padding:4px 14px 6px;background:var(--paper);border:1px solid var(--line);border-radius:var(--radius-panel);font-family:var(--font-sans);color:var(--ink)}
+.st-week-days,.st-week-row{display:grid;grid-template-columns:36px 1fr;gap:4px;align-items:center}
+.st-week-days{position:relative;z-index:1}
+.st-week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.st-week-day{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:44px;color:var(--muted);font:500 11px var(--font-sans)}
+.st-week-day b{font:400 15px/1.2 var(--font-mono);color:var(--ink)}
+.st-week-day[data-past] b{color:var(--muted)}
+.st-week-day[data-today] b{display:inline-flex;width:28px;height:28px;align-items:center;justify-content:center;border:2px solid var(--ink);border-radius:14px}
+.st-week-type{position:relative;z-index:1;border-top:1px solid var(--line)}
+.st-week-type-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding:12px 0 4px}
+.st-week-type-head span{font:600 14px var(--font-sans);color:var(--ink)}
+.st-week-type-head small{font:400 13px var(--font-sans);color:var(--muted)}
+.st-week-row{min-height:48px;position:relative;z-index:1;width:100%;padding:0;border:0;background:none;text-align:left;font:inherit;color:inherit;cursor:pointer;border-radius:8px}
+.st-week-row:active{background:var(--press)}
+.st-week-batch{font:500 13px var(--font-sans);font-variant-numeric:tabular-nums;letter-spacing:-.3px;color:var(--ink);white-space:nowrap;overflow:hidden}
+.st-week-cell{height:30px;border-radius:6px;display:flex;align-items:center;justify-content:center;font:500 13px var(--font-mono);color:var(--ink);position:relative;min-width:0}
+.st-week-cell[data-kind="done"]{background:var(--well);color:var(--ink-2)}
+.st-week-cell[data-kind="today"]{background:var(--ink-2);color:var(--paper)}
+.st-week-cell[data-kind="plan"]{border:1.5px solid var(--ink-2)}
+.st-week-cell[data-kind="est"]{border:1.5px dashed var(--ink-2);color:var(--ink-2)}
+.st-week-cell[data-kind="wait"]{border:1.5px solid var(--line);color:var(--muted)}
+.st-week-cell[data-kind="nil"]{background:var(--well);color:var(--muted)}
+.st-week-cell[data-kind="late"]{border:1.5px solid var(--red);color:var(--ink)}
+.st-week-cell[data-kind="latedone"]{background:var(--well);border:1.5px solid var(--red);color:var(--ink-2)}
+.st-week-cell[data-cont]{border-top-right-radius:0;border-bottom-right-radius:0}
+.st-week-cell[data-cont]::after{content:"";position:absolute;right:3px;top:50%;margin-top:-5px;border-left:5px solid currentColor;border-top:5px solid transparent;border-bottom:5px solid transparent}
+.st-week-cell[data-from]{border-top-left-radius:0;border-bottom-left-radius:0}
+.st-week-cell[data-from]::before{content:"";position:absolute;left:3px;top:50%;margin-top:-5px;border-right:5px solid currentColor;border-top:5px solid transparent;border-bottom:5px solid transparent}
+.st-week-today{position:absolute;top:4px;bottom:6px;background:var(--press);border-radius:8px;pointer-events:none;z-index:0}
+.st-week-band{position:relative;z-index:1;display:flex;align-items:center;gap:10px;margin:12px -14px 0;padding:12px 14px 4px;border-top:1px solid var(--line)}
+.st-week-band+.st-week-type{border-top:0}
+.st-week-band-icon{width:28px;height:28px;border-radius:8px;background:var(--row-icon-bg);display:flex;align-items:center;justify-content:center;color:var(--ink-2)}
+.st-week-band-icon svg{width:16px;height:16px}
+.st-week-band b{font:600 15px var(--font-sans);color:var(--ink)}
+.st-week-none{margin:0;padding:12px 0 8px;color:var(--muted);font:400 13px var(--font-sans);position:relative;z-index:1}
+.st-week-none[data-week]{border-top:1px solid var(--line);padding:16px 0 10px}
+.st-week-key{padding:0}
+.st-week-key-row{display:grid;grid-template-columns:48px 1fr;gap:12px;align-items:center;padding:10px 14px;min-height:52px}
+.st-week-key-row+.st-week-key-row{border-top:1px solid var(--line)}
+.st-week-key-row .st-week-grid[data-one]{grid-template-columns:1fr}
+.st-week-key-row strong{display:block;font:500 15px var(--font-sans);color:var(--ink)}
+.st-week-key-row small{display:block;font:400 13px var(--font-sans);color:var(--muted)}
+
 /* The header owns the 24px under it: the body's first element brings no top margin of its own (a field's, a note's, a banner's).
    Last in the file, so a part's own margin rule of the same weight does not win here. */
 .sheet>.sheet-body>:first-child,.sheet>.sheet-body>:first-child>:first-child{margin-top:0}
