@@ -12,6 +12,7 @@ Words are the design workflow's ([glossary](../docs/design-workflow/GLOSSARY.md)
 | `features/<id>/feature.json` | one feature (below) |
 | `features/<id>/PRD.md` | the feature's PRD, prose: Problem · Who · Anchor · Rules · Scope · Decisions |
 | `ux/design-system/components/<Name>/gate.json` | a component's gate result (below); optional |
+| `ux/design-system/components/_groups.json` | the design system's groups in library order, and the components in each: `[{ group, components: [Name] }]`. A component folder no group names gets no atlas page and is outside the gate's reach |
 | `ux/design-system/components/_proposed.json` | components seen in screens but not in the design system yet: `[{ name, group, seenIn: [screenId], note }]` |
 | `references/figma/index.json` | the old UI in Figma: `[{ "file", "key", "screens", "flows": [[name, screens, nodeId]] }]` |
 
