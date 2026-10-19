@@ -11,5 +11,5 @@ What a litter owes, grouped by day: a card per day, its rows the items.
 - **Act** (optional): the row's one-tap at its end (`Record 12`, the Button card, 48px), beside the door; its accessible name is its label plus the row's title.
 
 **Component contract**
-- **Props:** `SentriTask.day({ title, status, items: [{ title, meta, mark: 'done' | 'due' | '', action, value, label, act: { label, action, value, register, waiting, busy }, id }], label })`.
+- **Props:** `SentriTask.day({ title, status, items: [{ title, meta, mark: 'done' | 'due' | 'ticked' | '', action, value, label, act: { label, action, value, register, waiting, busy }, id }], label })`. `mark` `'due'` is an open ring; `'ticked'` is a check disc, ticked but not yet saved, with no Done word; `'done'` is saved and shows the Done chip.
 - **Events:** the door is `<button data-action data-value>`; the act is a Button with its own `data-action`.

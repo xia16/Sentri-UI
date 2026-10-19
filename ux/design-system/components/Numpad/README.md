@@ -92,7 +92,7 @@ Call `SentriUI.numpad({ label, value, unit, placeholder, suggested, decimals, ma
 - Don't add an OK, Enter, Next or Clear key, and don't reorder keys per field.
 - Don't block Record on a duplicate or short tag. Warn in words, and keep the mark on the list.
 - Don't append a scan to typed digits, and don't let the last ⌫ restore the suggestion.
-- Don't let the system keyboard open instead, and don't show more than three recorded values.
+- Don't let the system keyboard open instead (the one exception is a Measure with `input: 'system'`, one optional value in a form, which never opens the Numpad), and don't show more than three recorded values.
 
 **Strings**
 - `strs: { label, value, unit, placeholder, hint, digit, decimal, back, pad, recent }` and `args`. Without `strs` the output is unchanged.

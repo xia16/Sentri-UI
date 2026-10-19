@@ -2,17 +2,28 @@
   {
     "id": "navigation",
     "name": "Navigation",
-    "use": "Use for lists of places or actions",
-    "notUse": "Not for animal records — use animal",
+    "use": "Use for a row that opens a place, an action or a saved record: an optional icon tile, a title, line 2, and on the right a chevron, a count, Edit, or the current ✓",
+    "notUse": "Not for an animal — use animal; not for an item of a task's day list — use task item",
     "states": [
       "Default",
       "Pressed",
-      "Long label / Chinese",
+      "Current",
+      "Count on the right",
+      "No icon",
+      "Edit · a saved record",
+      "Chinese",
       "Disabled"
     ],
     "usedBy": [
-      "piglet-processing.more-actions",
-      "inspection.actions"
+      "workbench.today",
+      "workbench.choose-unit",
+      "workbench.toolbox",
+      "farrowing.sow-actions",
+      "farrowing.task-outcomes",
+      "pig-profile.actions",
+      "health-record.finding",
+      "fostering.result",
+      "data-sync.banner"
     ]
   },
   {
@@ -39,8 +50,8 @@
   {
     "id": "animal",
     "name": "Animal",
-    "use": "Use for one animal in a list: the ID over a 13px context line, and on the right either its state (figure over word, weighted by level) or one line of condition tags. Designed from Farrowing room + Inspection walk, owner-approved 2026-10-11/12.",
-    "notUse": "Not for navigation — use navigation; not for a record with an Edit rail — use record.",
+    "use": "Use for one animal in a list: the ID over a 13px context line, and on the right either its state (figure over word, weighted by level) or one line of condition tags. Designed from Farrowing room + Inspection walk, owner-approved 2026-10-11/12. The classic face (a chip under the ID, a headline, a mono meta line) stays only for the lists that still use it until they migrate.",
+    "notUse": "Not for navigation — use navigation; not for a list that selects for a bulk act — use select + door; no new lists on the classic face.",
     "states": [
       "Default · live",
       "Pressed",
@@ -58,128 +69,66 @@
       "Tags · none",
       "Tags · too many for the line (+N)",
       "Tags · long tag name folds into +N",
-      "Tags · Chinese"
+      "Tags · Chinese",
+      "Classic · several items (until migrated)",
+      "Classic · Pressed",
+      "Classic · Chinese"
     ],
     "usedBy": [
       "farrowing.room",
       "farrowing.search",
       "farrowing.scan",
       "farrowing.task-sows",
-      "inspection.walk"
-    ]
-  },
-  {
-    "id": "animal-classic",
-    "name": "Animal (classic)",
-    "use": "Until migrated: the older animal row for lists whose rows carry several items (a code column, a status chip, a headline and a meta line). Piglet processing lists, Weaning handoff, Pig profile. Not for new lists: use Animal.",
-    "notUse": "Not for a list of one-state animals or a walk with conditions — use Animal (the approved row).",
-    "states": [
-      "Default",
-      "Pressed",
-      "Long label / Chinese",
-      "Disabled"
-    ],
-    "usedBy": [
+      "workbench.to-treat",
       "piglet-processing.pen-list",
-      "weaning.handoff"
+      "weaning.handoff",
+      "fostering.type"
     ]
   },
   {
-    "id": "door-act",
-    "name": "Door + act",
-    "use": "Use for opening details beside one immediate act",
-    "notUse": "Not for a record without an act — use record",
+    "id": "task-item",
+    "name": "Task item",
+    "use": "Use for one item of a task's day list (TaskDay): due (an empty ring), ticked before saving (an ink disc), with a one-tap act beside the door, or saved (Done, then Edit)",
+    "notUse": "Not for bulk selection — use select + door; not for a saved record outside a day list — use navigation with Edit",
     "states": [
-      "Default",
+      "Due",
       "Pressed",
-      "Long label / Chinese",
-      "Loading",
-      "Error"
-    ],
-    "usedBy": [
-      "inspection.review-selected",
-      "piglet-processing.sheet-todo"
-    ]
-  },
-  {
-    "id": "scope",
-    "name": "Scope",
-    "use": "Use for choosing a work unit",
-    "notUse": "Not for bulk selection — use select + door",
-    "states": [
-      "Default",
-      "Pressed",
-      "Long label / Chinese",
-      "Current",
-      "Disabled"
-    ],
-    "usedBy": [
-      "workbench.choose-unit"
-    ]
-  },
-  {
-    "id": "summary-count",
-    "name": "Summary count",
-    "use": "Use for overview counts that open a list above zero",
-    "notUse": "Not for task progress cards — use the Home task card pattern",
-    "states": [
-      "Default",
-      "Pressed",
-      "Long label / Chinese",
-      "Empty"
-    ],
-    "usedBy": [
-      "farrowing.overview"
-    ]
-  },
-  {
-    "id": "record",
-    "name": "Done / record",
-    "use": "Use for wrapped evidence and Edit",
-    "notUse": "Not for event timelines — use Log",
-    "states": [
-      "Default",
-      "Pressed",
-      "Long label / Chinese",
-      "Disabled"
-    ],
-    "usedBy": [
-      "piglet-processing.sheet-todo"
-    ]
-  },
-  {
-    "id": "tick",
-    "name": "Tick in place",
-    "use": "Use for an item ticked in place before saving (piglet day list)",
-    "notUse": "Not for bulk selection — use select + door; saved items — use record",
-    "states": [
-      "Default",
       "Ticked",
       "Ticked + count act",
-      "Pressed",
-      "Long label / Chinese"
+      "Due + one-tap act",
+      "Act loading",
+      "Act error",
+      "Done (saved)",
+      "Chinese"
     ],
     "usedBy": [
-      "piglet-processing.sheet-todo"
+      "piglet-processing.sheet-todo",
+      "fostering.type",
+      "fostering.receive"
     ]
   },
   {
     "id": "select-door",
     "name": "Select + door",
-    "use": "Use when a list selects for a bulk act (Inspection pens and pigs); with a door it also opens the item, without one the whole row selects",
-    "notUse": "Not for open + one-tap act — use door-act",
+    "use": "Use when a list selects for a bulk act and opens each item: the box selects, the door opens; without a door the whole row selects",
+    "notUse": "Not for open + one-tap act — use task item",
     "states": [
       "Default",
       "Pressed (door)",
       "Selected",
       "Selected + Pressed",
+      "State on the right",
+      "Group · pigs without ear tags",
       "No door",
-      "Long label / Chinese"
+      "Chinese"
     ],
     "usedBy": [
       "inspection.walk",
       "inspection.actions",
-      "feed-plan.pen"
+      "inspection.review-selected",
+      "farrowing.scan-list",
+      "feed-plan.pen",
+      "treat.record"
     ]
   }
 ]

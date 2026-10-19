@@ -1,5 +1,7 @@
 # Component pass verification · 2026-10-10
 
+> 2026-10-20: the focus and hover shots in `proof/` were removed. The mobile app has touch states only (no designed focus or hover); this record of the pass is otherwise kept as it was.
+
 Original frontier-model findings remain in `gate.json` as the review history; this records the implementation fixes and self-check, not new model scores or owner approval.
 
 ## Gate resolutions

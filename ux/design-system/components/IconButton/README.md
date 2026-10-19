@@ -12,7 +12,7 @@ Use [Button](../Button/README.md) for Record, Move or Set count. Use [ChoiceList
 
 ## Anatomy
 
-48 × 48 container; registry glyph (decorative to assistive technology); accessible label; optional count badge; optional selected check; no reason line outside the target.
+48 × 48 container; registry glyph (decorative to assistive technology); accessible label; optional count badge; optional selected check; an optional reason line (`reason`) below the target, never above it.
 
 ## Variants
 
@@ -27,7 +27,7 @@ Use [Button](../Button/README.md) for Record, Move or Set count. Use [ChoiceList
 | --- | --- |
 | Default | Label or glyph at rest. |
 | Pressed | Visible press fill / darkening and movement; static examples use `data-preview="pressed"`. |
-| Disabled | The disabled face stands alone (no reason line); never colour alone. Prefer omitting unavailable acts. |
+| Disabled | Focusable, `aria-disabled`, drawn alone in the specimen. If the act stays, pass `reason`: a status line below the button (never above it), linked by `aria-describedby`. Never colour alone. Prefer omitting unavailable acts. |
 | Long / Chinese | The target stays 48 x 48; the accessible name stays complete in both languages. |
 | Selected | Optional `aria-pressed` plus a visible check, for the breeder mark. |
 | Badge | Count is visible and included in the accessible name, e.g. “Filter pigs, 2 applied”. |
@@ -36,7 +36,7 @@ No empty state: omit an action with no label. No field error state: put validati
 
 ## Behaviour
 
-Native button activation emits `data-action` / `data-value`. Bordered is the default, including header returns. Plain is for icon actions inside a surface (a sheet's only ✕ is Sheet's own `cross`, in a drawer with levels). Use `selected` only for a binary mark and update it with its accessible name. `disabled` stays focusable with `aria-disabled`; delegated hosts call `guard(el)` and retain a visible reason.
+Native button activation emits `data-action` / `data-value`. Bordered is the default, including header returns. Plain is for icon actions inside a surface (a sheet's only ✕ is Sheet's own `cross`, in a drawer with levels). Use `selected` only for a binary mark and update it with its accessible name. `disabled` stays focusable with `aria-disabled`; delegated hosts call `guard(el)` and, when the act stays, supply a `reason` drawn below it.
 
 ## Content rules
 
@@ -46,7 +46,7 @@ Aim for an accessible name within 64 English characters or 32 Chinese characters
 
 ## Accessibility
 
-Native `button` role; the glyph is `aria-hidden`, so `aria-label` is required and names the act and what it acts on ("Close pen sheet", not "Close"). A disabled icon stays focusable with `aria-disabled` and a visible reason. Targets use `tap-min`, never less than 48 × 48. Respect reduced motion.
+Native `button` role; the glyph is `aria-hidden`, so `aria-label` is required and names the act and what it acts on ("Close pen sheet", not "Close"). A disabled icon stays focusable with `aria-disabled`; when it stays, its reason is visible below it. Targets use `tap-min`, never less than 48 × 48. Respect reduced motion.
 
 ## Do / don’t
 

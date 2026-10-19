@@ -88,7 +88,7 @@ Button now owns primary, secondary, text action, tool, destructive and hold vari
 
 ## Stepper + Field pass (2026-10-10)
 
-Stepper owns row, count and well in bundle.js / bundle.css. TaskStepper's markup and CSS face layer is retired; SentriTask.stepper is only a compatibility adapter. Piglet processing calls SentriUI.stepper directly. Farrowing translates its existing delta-in-value event contract through a small adapter and has no row-stepper, hero-stepper or feature-stepper markup or styles. The unused filled-ink face is retired; count keys remain neutral pending an owner colour decision.
+Stepper owns row, count and well in bundle.js / bundle.css. TaskStepper's markup and CSS face layer is retired; SentriTask.stepper is only a compatibility adapter. Piglet processing's full-task pages call `SentriTask.stepper` (the adapter into `SentriUI.stepper`); only its simple app calls `SentriUI.stepper` directly. Farrowing translates its existing delta-in-value event contract through a small adapter and has no row-stepper, hero-stepper or feature-stepper markup or styles. The unused filled-ink face is retired; count keys remain neutral pending an owner colour decision.
 
 Field owns the input/textarea skin, error border, sans font, auto-grow, visible corrective/help/reason line and ARIA association. Removed phone and page border overrides and local Field skins. Home's report and clarification fields, Inspection's capture helpers / optional-note controls / treatment dose, and Farrowing's optional fault resolution use the bundle. Dose then Unit stack in capture order. No Numpad or Measure split was implemented.
 
