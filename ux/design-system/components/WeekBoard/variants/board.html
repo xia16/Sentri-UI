@@ -1,7 +1,5 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><style>
-.w{max-width:348px}
-</style></head><body>
+<html lang="en"><head><meta charset="utf-8"></head><body>
 <section data-state="This week"></section>
 <section data-state="All sections"></section>
 <section data-state="Next week"></section>
@@ -23,11 +21,11 @@ const S={
   'This week':B({days:W27,groups:[{types:PROD}]}),
   'All sections':B({days:W27,groups:[{band:{icon:I('production'),label:'Production'},types:PROD.slice(0,1)},{band:{icon:I('health'),label:'Health'},types:HEALTH},{band:{icon:I('transfer'),label:'Other'},types:OTHER}]}),
   'Next week':B({days:W28,groups:[{types:[{title:'Return heat',sub:'estimated returns',rows:[R('B30',['<e2','','','','','','']),R('B39',['<e5','e6','e5','e3','e2','e1',''])]},{title:'Pregnancy check',sub:'',rows:[R('B34',['','p7','p7','p6','','',''])]}]}]}),
-  'Past its plan':B({days:W27,groups:[{types:[{title:'Pregnancy check',sub:'',rows:[R('B28',['d10','d8','d6','v4','','',''],{late:true})]},{title:'Breeding',sub:'',rows:[R('B35',['d16','d5','w0','v3','','',''],{late:true})]}]}]}),
+  'Past its plan':B({days:W27,groups:[{types:[{title:'Pregnancy check',sub:'',rows:[R('B28',['d10','d8','d6','v4','','',''],{late:true})]},{title:'Breeding',sub:'',rows:[R('B35',['d16','d5','w2','v3','','',''],{late:true})]}]}]}),
   'Empty week':B({days:W28,empty:'Nothing planned this week'}),
   'Pressed row':B({days:W27,groups:[{types:PROD.slice(1)}]}).replace('<button type="button" class="st-week-row"','<button type="button" class="st-week-row" style="background:var(--press)"'),
   'Long label / Chinese':B({days:D(['5','6','7','8','9','10','11'],3,[0,1,2]).map((d,i)=>Object.assign(d,{label:['周一','周二','周三','周四','周五','周六','周日'][i]})),groups:[{types:[{title:'Processing',sub:'',rows:[R('B127',['d312','d288','d340','o1180','p180','',''])]},{title:'转群',sub:'',rows:[R('混合',['','','','o8','','',''])]}]}]})
 };
-document.querySelectorAll('[data-state]').forEach(el=>{const h=S[el.dataset.state];if(h)el.innerHTML='<div class="w">'+h+'</div>';});
+document.querySelectorAll('[data-state]').forEach(el=>{const h=S[el.dataset.state];if(h)el.innerHTML=h;});
 </script>
 </body></html>
