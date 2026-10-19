@@ -246,6 +246,6 @@ test('Link condition is a drawer with levels too: ✕ closes, the footer Back go
  assert.match(sec(),/<h2 class="sheet-title">Respiratory diseases</);assert.match(sec(),cross);assert.doesNotMatch(sec(),/sheet-up/);
  assert.match(sec(),/class="sheet-footer[^]*data-action="health-catalog-back"[^]*>Back</);
  model.handleRecordAction(c,'health-catalog-back','');assert.equal(c.form.catalogGroup,'');
- /* The Brand field is gone: the product is the brand (features/medicines). */
+ /* The Brand field is gone: the product is the brand (features/treat). */
  c.view='treatment';assert.doesNotMatch(model.overlay(c),/data-key="brand"|>Brand</);
 });

@@ -28,7 +28,7 @@
     { "name": "text", "usedBy": ["inspection.fault-report", "farrowing fault report (Device name, Other)", "farrowing piglet identity"], "status": "agent-checked",
       "scores": { "clarity": 8, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 8 },
       "findings": ["Filled example puts 'Gate repaired beside the aisle.' in an Identity field"] },
-    { "name": "number with unit", "usedBy": ["health-record.treatment"], "status": "agent-checked",
+    { "name": "number with unit", "usedBy": ["treat.record"], "status": "agent-checked",
       "scores": { "clarity": 8, "budget": 8, "hierarchy": 8, "spacing": 8, "broken": 8 },
       "findings": ["Native number spinner arrows appear inside Dose on focus"] },
     { "name": "textarea", "usedBy": ["inspection.pen-note", "inspection.fault-report", "farrowing fault resolution (after Add)", "farrowing reconcile (Reason for mismatch)"], "status": "agent-checked",
@@ -44,8 +44,8 @@
     "round": 1, "commit": "67fbfe2", "lowest": 5,
     "findings": [
       { "text": "Atlas variant tabs blank except Default", "fixed": true, "evidence": "Text, Number with unit, Textarea each render 6 of 6 cells from data-args; console clean" },
-      { "text": "Dose and Unit side by side on health-record.treatment", "fixed": true, "evidence": "Medicine, Method, Unit, Dose stacked on the bulk and single-pig paths (both bulkActionPage) and in the v2 treatment sheet" },
-      { "text": "Number with unit used by no screen", "fixed": true, "evidence": "Picking mL relabels Dose to 'Dose (mL)'; usedBy health-record.treatment" },
+      { "text": "Dose and Unit side by side on treat.record", "fixed": true, "evidence": "Medicine, Method, Unit, Dose stacked on the bulk and single-pig paths (both bulkActionPage) and in the v2 treatment sheet" },
+      { "text": "Number with unit used by no screen", "fixed": true, "evidence": "Picking mL relabels Dose to 'Dose (mL)'; usedBy treat.record" },
       { "text": "Overview prints 18 fields with no state names", "fixed": true, "evidence": "Variant heading and state caption above each example" },
       { "text": "Variant tabs said No screen uses this yet", "fixed": true, "evidence": "Each tab lists Used by screens" }
     ]

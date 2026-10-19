@@ -327,7 +327,7 @@
   "id": "inspection-group-29",
   "target": {
    "kind": "screen",
-   "id": "health-record.treatment"
+   "id": "treat.record"
   },
   "kind": "decision",
   "severity": "medium",
@@ -789,7 +789,7 @@
   "id": "inspection-group-58",
   "target": {
    "kind": "screen",
-   "id": "health-record.treatment"
+   "id": "treat.record"
   },
   "kind": "design",
   "severity": "low",
