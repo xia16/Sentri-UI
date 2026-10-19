@@ -39,7 +39,7 @@ Sentence-case section titles that name the facet ("Parity"), never the control. 
 
 ## Accessibility
 
-A Sheet drawer: a dialog with its scrim and ✕. Every control is at least 48px (`tap-min`). The Segment row reads as one group per section.
+A Sheet drawer: a dialog with its scrim and no ✕ (a drawer has one only when it has levels; swiping down or tapping the scrim goes Back, see [Sheet](../Sheet/README.md)). Every control is at least 48px (`tap-min`). The Segment row reads as one group per section.
 
 ## API and tokens
 

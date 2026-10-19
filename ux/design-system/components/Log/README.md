@@ -18,7 +18,7 @@ Call `SentriUI.log(groups, { kind, empty, correctedLabel })`. `groups` is a list
 - **Panel** with one or more day groups.
 - **Group heading**: a [Heading](../Heading/README.md) group, the day (and an optional one-line `description` for the whole group, such as `Kept and stamped; the ended figures do not change`).
 - **Thread and dot**: a 1px `log-line` with a `log-dot` per entry; the last entry's thread ends at its dot.
-- **Entry**: category word (categorised only) or a "Corrected" word, the title (13/500), a `detail` line (11px `muted`), a `was` line, the stamp (10px) and an optional `extraHtml` slot.
+- **Entry**: category word (categorised only) or a "Corrected" word, the title (16px/500), a `detail` line (13px `muted`), a `was` line, the stamp (13px) and an optional `extraHtml` slot.
 
 ## Variants
 

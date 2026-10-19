@@ -1,0 +1,6 @@
+{
+  "status": "retired",
+  "judged": "2026-10-20",
+  "classification": "adapter-of:Segment",
+  "note": "SentriTask.lens forwards to Segment (two-line lens) and IconButton; its one caller is piglet-processing room.html (not an atlas screen). No library page: use Segment."
+}

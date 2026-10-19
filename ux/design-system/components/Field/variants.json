@@ -12,7 +12,8 @@
       "Long Chinese label"
     ],
     "usedBy": [
-      "inspection.fault-report"
+      "treat.medicine-add",
+      "treat.medicine-sheet-farm"
     ]
   },
   {
@@ -28,7 +29,9 @@
       "Long Chinese label"
     ],
     "usedBy": [
-      "treat.record"
+      "treat.record",
+      "treat.medicine-sheet-farm",
+      "treat.brand-details"
     ]
   },
   {
@@ -45,8 +48,7 @@
     ],
     "usedBy": [
       "inspection.pen-note",
-      "inspection.fault-report",
-      "inspection.fault-resolve"
+      "treat.record-note"
     ]
   }
 ]

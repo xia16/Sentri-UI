@@ -1,10 +1,12 @@
 # CategoryFooter
 
+Retired 2026-10-20: no live screen draws it; kept for the components study page.
+
 The actions-page footer keeps Back beside navigation to verb categories. Use Sheet footer for Back plus a primary record action instead.
 
 ## When to use
 
-Use on an actions page with several categories; selecting a category scrolls to its section in the current page. Since 2026-10-19 More actions (Inspection, pig profile, the Farrowing sow embed) is a menu drawer whose everyday verbs are one grid, so it needs no category tabs and this footer has no live caller; it stays until the other action surfaces have moved onto the drawer, then retires.
+Use on an actions page with several categories; selecting a category scrolls to its section in the current page. Since 2026-10-19 More actions (Inspection, pig profile, the Farrowing sow embed) is a menu drawer whose everyday verbs are one grid, so it needs no category tabs and this footer has no live caller; it is now retired (see the top line).
 
 ## When not to use
 
@@ -16,7 +18,7 @@ Back button, labelled navigation region, category buttons, active underline and 
 
 ## Variants
 
-**Category navigation:** the single variant, used on both action pages. Narrow width and overflow are states, not new variants.
+**Category navigation:** the single variant. No live screen uses it. Narrow width and overflow are states, not new variants.
 
 ## States
 

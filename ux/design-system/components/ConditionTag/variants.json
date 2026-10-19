@@ -3,7 +3,7 @@
     "id": "tag",
     "name": "Tag",
     "use": "use for a recorded condition on a list row (pig list, pig profile): its name, day count and care level, never colour alone.",
-    "notUse": "not for a workflow state like Active or Done — use Status; not for a filter choice — use TaskChips.",
+    "notUse": "not for a workflow state like Active or Done — use Status; not for a filter choice — use FilterChips.",
     "states": [
       "Needs attention · Monitor",
       "Needs attention · Treat in place",

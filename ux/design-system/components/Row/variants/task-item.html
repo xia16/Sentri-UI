@@ -1,0 +1,32 @@
+<div data-state="Due" id="task-item-state-0"></div>
+<div data-state="Pressed" id="task-item-state-1"></div>
+<div data-state="Ticked" id="task-item-state-2"></div>
+<div data-state="Ticked + count act" id="task-item-state-3"></div>
+<div data-state="Due + one-tap act" id="task-item-state-4"></div>
+<div data-state="Act loading" id="task-item-state-5"></div>
+<div data-state="Act error" id="task-item-state-6"></div>
+<div data-state="Done (saved)" id="task-item-state-7"></div>
+<div data-state="Chinese" id="task-item-state-8"></div>
+<script>
+// Each state renders in its own iframe in the atlas: draw only the states present, each in its card (rowGroup), as the screens do.
+// One item of a task's day list (TaskDay draws these): due ring, ticked disc, one-tap act, or saved with Done and Edit.
+var UI = window.SentriUI;
+var DONE = {"variant": "chip", "kind": "done", "text": "Done", "strs": {"text": "ds.row.done"}};
+function item(p) { return SentriUI.row(Object.assign({"action": "open-dose", "value": "tail", "trail": "none", "wrap": true, "mono": true}, p)); }
+function acted(p, act) { return SentriUI.rowAction(Object.assign({"action": "open-dose", "value": "iron", "wrap": true, "mono": true, "mark": "due", "attrs": {"aria-pressed": "false"}}, p, {"act": Object.assign({"action": "record", "value": "iron", "busy": false}, act)})); }
+var RENDER = {
+  "task-item-state-0": () => item({"title": "Dock tail", "description": "12 owed · day 3", "mark": "due", "attrs": {"aria-pressed": "false"}}),
+  "task-item-state-1": () => item({"title": "Dock tail", "description": "12 owed · day 3", "mark": "due", "attrs": {"aria-pressed": "false", "data-preview": "pressed"}}),
+  "task-item-state-2": () => item({"title": "Dock tail", "description": "12 owed · day 3", "mark": "ticked", "attrs": {"aria-pressed": "true", "data-ticked": ""}}),
+  "task-item-state-3": () => SentriUI.rowAction({"title": "Dock tail", "description": "12 owed · day 3", "action": "item", "value": "tail", "wrap": true, "mono": true, "mark": "ticked", "attrs": {"aria-pressed": "true", "data-ticked": ""}, "act": {"label": "2 piglets", "action": "count", "value": "tail", "busy": false}}),
+  "task-item-state-4": () => acted({"title": "Iron", "description": "12 owed · day 3"}, {"label": "Record 12"}),
+  "task-item-state-5": () => acted({"title": "Iron", "description": "12 owed · day 3"}, {"label": "Recording 12", "busy": true}),
+  "task-item-state-6": () => acted({"title": "Iron", "description": "Could not save. Retry recording."}, {"label": "Retry"}),
+  "task-item-state-7": () => item({"title": "Castrate", "description": "6 castrated · 08:20 · G.H", "action": "open-edit", "value": "r1", "trail": "edit", "chip": DONE, "attrs": {"data-done": ""}}),
+  "task-item-state-8": () => item({"title": "断尾", "description": "待处理 12头 · 3日龄", "mark": "due", "attrs": {"aria-pressed": "false"}}) + item({"title": "阉割", "description": "阉割6头 · 08:20 · G.H", "action": "open-edit", "value": "r1", "trail": "edit", "chip": {"variant": "chip", "kind": "done", "text": "已处理"}, "attrs": {"data-done": ""}})
+};
+document.querySelectorAll('[data-state]').forEach(function (s) {
+  var t = RENDER[s.id] ? s : s.querySelector('[id]');
+  if (t && RENDER[t.id]) t.innerHTML = SentriUI.rowGroup(RENDER[t.id]());
+});
+</script>
