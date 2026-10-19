@@ -793,66 +793,6 @@
    `Last record 08:41 · G.H`), so it fits; nowrap and the ellipsis are only a safety net (layout only). */
 .inspection-phone .inspect-intro>p{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-/* Conditions skeleton: a pen's No tags row keeps the animal row's geometry, but "No tags" is a label, not an ear tag. */
-.inspection-phone .no-tags-row:not(.is-review) .st-animal-id { font-family: var(--font-sans, 'Plus Jakarta Sans', sans-serif); font-weight: 600; }
-.inspection-phone .bulk-notags-row { align-items: center; }
-.inspection-phone .bulk-notags-row .st-stepper { flex: 1; min-width: 0; }
-
-/* A ticked pen tints its whole header like a ticked pig row, not only the checkbox's cell. */
-.inspection-phone .inspect-pen-head .st-row.pen-select-target:has(input:checked) { background: transparent; }
+/* The Selected page (owner, 2026-10-17): its groups sit a section apart, Clear selection under them. */
 .inspection-phone .review-clear { margin-top: 16px; }
 .inspection-phone .sheet-body > .review-list + .st-heading.st-heading, .inspection-phone .sheet-body > .review-list + .review-clear { margin-top: var(--space-section); }
-/* On the Selected page the No tags group's pen ID matches the Pens and Pigs rows above it. */
-.inspection-phone .no-tags-row.is-review .st-animal-id { font-size: 13px; }
-/* The Pigs / Pens toggle now opens the Actions page's body: it spans the content width, with no header-slot padding or rule. */
-.inspection-phone .sheet-body .actions-subjects { padding: 0; border: 0; background: none; margin: 0 0 var(--space-section); }
-
-/* ── Study (owner, 2026-10-18): a ticked pen, and the No tags row with a visible count. Remove the options not picked. ── */
-/* Pen option ink: the pen header turns ink; the pigs it brings keep the row tint. */
-[data-pen-option="ink"] .inspection-phone .inspect-pen-head:has(.pen-select-target input:checked) { background: var(--ink); color: #fff; }
-[data-pen-option="ink"] .inspection-phone .inspect-pen-head:has(.pen-select-target input:checked) * { color: #fff; }
-[data-pen-option="ink"] .inspection-phone .inspect-pen-head:has(.pen-select-target input:checked) input { accent-color: #fff; }
-/* Pen option ring (owner, 2026-10-18): the ring is on the header only, since ticking every pig is not ticking the pen.
-   The header keeps its own colour (SURFACES: a selected tile or pen cell is a 2px ink ring, no fill); its top corners follow
-   the card. */
-[data-pen-option="ring"] .inspection-phone .inspect-pen-head:has(.pen-select-target input:checked) { box-shadow: inset 0 0 0 2px var(--ink); border-radius: 17px 17px 0 0; }
-/* Pen option quiet: only the header tints; the pigs a pen brings show their ticks without the row tint. */
-[data-pen-option="quiet"] .inspection-phone .inspect-pen:has(.inspect-pen-head .pen-select-target input:checked) .inspect-pig.selected { background: transparent; }
-/* No tags mark: an icon (a struck tag) or a count badge before the words. */
-.inspection-phone .study-nt .st-animal-id { display: inline-flex; align-items: center; gap: 6px; }
-.inspection-phone .study-nt .nt-icon { display: inline-flex; color: var(--muted); }
-.inspection-phone .study-nt .nt-icon svg { width: 18px; height: 18px; }
-.inspection-phone .study-nt .nt-badge { min-width: 24px; height: 22px; padding: 0 6px; border-radius: var(--radius-chip); background: var(--well); border: 1px solid var(--line); font: 600 13px/22px var(--font-sans); text-align: center; color: var(--ink); }
-/* The count field: 44px tall, the number big; "of 14" beside it. */
-.inspection-phone .nt-field { display: flex; align-items: center; gap: 6px; flex: none; }
-.inspection-phone .nt-field input { width: 52px; height: 44px; box-sizing: border-box; border: 1px solid var(--control-border, var(--line)); border-radius: var(--radius-10); background: var(--paper, #fff); color: var(--ink); font: 600 17px/1 var(--font-sans); text-align: center; padding: 0; }
-.inspection-phone .nt-field span { font-size: 13px; color: var(--muted); white-space: nowrap; }
-/* A: the field takes the name's slot when ticked; the tags stay right. */
-.inspection-phone .nt-a.selected .st-animal-left { display: none; }
-.inspection-phone .nt-a.selected .nt-field { width: 112px; }
-/* B: the field sits right, after the tags. */
-.inspection-phone .nt-b .nt-field { padding-right: 6px; }
-.inspection-phone .nt-b .nt-field span { display: none; }
-/* C: a taller row: name and count on top, the tags on their own line, the field always there. */
-.inspection-phone .nt-c { align-items: flex-start; padding-top: 10px; padding-bottom: 10px; }
-.inspection-phone .nt-c .st-animal-body { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
-.inspection-phone .nt-c .st-animal-tags { justify-content: flex-start; max-width: none; }
-.inspection-phone .nt-c .nt-field { padding-right: 6px; margin-top: 4px; }
-.inspection-phone .nt-c .st-row-chevron { display: none; }
-.inspection-phone .study-nt.study-nt .st-animal-id { display: inline-flex; align-items: center; gap: 6px; }
-.inspection-phone .nt-a .nt-field span { display: flex; flex-direction: column; line-height: 1.3; }
-.inspection-phone .nt-a .nt-field span b { font-weight: 600; color: var(--ink); font-size: 13px; }
-.inspection-phone .study-nt .nt-icon, .inspection-phone .study-nt .nt-badge { display: inline-block; margin-right: 6px; vertical-align: -3px; }
-.inspection-phone .study-nt .nt-badge { vertical-align: 1px; }
-
-/* D: two lines like a pig row (the count as the name, the tags under it on one line); the field always there, so the row
-   keeps one height ticked or not. Idle, the field's number is quiet. */
-.inspection-phone .nt-d .st-animal-body { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 6px; min-width: 0; }
-.inspection-phone .nt-d .st-animal-left { width: auto; }
-.inspection-phone .nt-d .st-animal-tags { justify-content: flex-start; width: 100%; }
-.inspection-phone .nt-d .st-row-chevron { display: none; }
-.inspection-phone .nt-d .nt-field { padding-right: 6px; }
-.inspection-phone .nt-d .nt-field.is-idle input { color: var(--muted); font-weight: 500; }
-/* D matches a pig row's height: the tag line replaces the context line, so the gap and the door's padding tighten. */
-.inspection-phone .nt-d .st-animal-body { gap: 2px; }
-.inspection-phone .st-row.nt-d .st-row-door.st-row-door { padding-top: 8px; padding-bottom: 8px; }

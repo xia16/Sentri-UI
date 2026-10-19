@@ -593,7 +593,7 @@ export interface RowCopyProps {
   strs?: Strs<'title' | 'description' | 'code'>;
   args?: StrArgs<'title' | 'description' | 'code'>;
 }
-export interface RowSelectProps extends RowCopyProps { inputAttrs?: SafeAttrs; checked?: boolean; /** Default 'select'. */ action?: string; value: string }
+export interface RowSelectProps extends RowCopyProps { inputAttrs?: SafeAttrs; checked?: boolean; /** Default 'select'. */ action?: string; value: string; /** false: the tick doesn't tint the cell (a box beside its own door). */ fill?: boolean }
 export interface RowActionProps extends RowCopyProps {
   /** The door (the copy, with an inline ›). */
   action: string;
@@ -638,7 +638,7 @@ export interface SentriUI {
   radioBind(root: Element, options?: { onChange?: (field: string, value: string) => void }): { destroy(): void };
   rowSelect(props: RowSelectProps): string;
   /** Select + door: a checkbox and an opening door as sibling targets. */
-  rowSelectDoor(props: RowCopyProps & { checked?: boolean; action?: string; value: string; openAction?: string; openValue?: string; label?: string; doorClass?: string; inputAttrs?: SafeAttrs; contentHtml?: string; right?: AnimalRight; contextWidth?: string }): string;
+  rowSelectDoor(props: RowCopyProps & { checked?: boolean; action?: string; value: string; openAction?: string; openValue?: string; label?: string; doorClass?: string; inputAttrs?: SafeAttrs; contentHtml?: string; right?: AnimalRight; contextWidth?: string; /** Group form: a registry glyph before the name. */ lead?: IconName; /** Group form: a count field after the door (idle = muted). */ count?: { value: number | string; idle?: boolean; attrs?: SafeAttrs } }): string;
   rowAction(props: RowActionProps): string;
   /** From a 'change' event on a rowSelect: { value, checked, action }, or null. */
   rowSelectChange(event: Event | { target: unknown }): { value: string; checked: boolean; action: string } | null;

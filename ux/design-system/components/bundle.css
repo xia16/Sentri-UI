@@ -1185,3 +1185,19 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 /* With an icon, the heading starts at the card edge, as Heading's section titles do on the Actions page. */
 .st-choice-heading.st-choice-heading:has(> svg) { display: flex; align-items: center; gap: 6px; padding-left: 0; }
 .st-choice-heading > svg { width: 16px; height: 16px; flex: none; }
+
+/* Row · select: fill:false (a box whose tick doesn't tint its cell; the Inspection pen header, owner 2026-10-18). */
+.st-row[data-variant="select-door"][data-fill="none"]:has(input:checked){background:transparent}
+/* Row · Animal · group (owner, 2026-10-18): animals without an ID as one row. The name ("14 pigs") leads with a muted glyph and is
+   sans, the tags take the context line, the door has no chevron, and a 44px count field ends the row: idle (not ticked) its
+   number is muted. The padding keeps the Animal row's height. */
+.st-row[data-group] .st-animal-body{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:2px;min-width:0}
+.st-row[data-group] .st-animal-left{width:auto}
+.st-row[data-group] .st-animal-id{font-family:var(--font-sans);font-weight:600}
+.st-row[data-group] .st-animal-id>svg{display:inline-block;width:18px;height:18px;margin-right:6px;vertical-align:-3px;color:var(--st-muted,var(--muted))}
+.st-row[data-group] .st-animal-tags{justify-content:flex-start;width:100%}
+.st-row[data-group] .st-row-chevron{display:none}
+.st-row[data-variant="select-door"][data-group] .st-row-door.st-row-door{padding-top:8px;padding-bottom:8px}
+.st-row-count{flex:none;display:flex;align-items:center;padding-right:6px}
+.st-row-count input{width:52px;height:44px;box-sizing:border-box;margin:0;padding:0;border:1px solid var(--control-border,var(--line));border-radius:var(--radius-10);background:var(--paper,#fff);color:var(--ink);font:600 17px/1 var(--font-sans);text-align:center}
+.st-row-count[data-idle] input{color:var(--muted);font-weight:500}
