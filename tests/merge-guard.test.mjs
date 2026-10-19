@@ -43,3 +43,17 @@ test('auto-merge is never allowed, and a guard that cannot read its input blocks
   assert.equal(run({ tool_name: 'mcp__ccd_pr__set_auto_merge', tool_input: { enabled: true } }), 2);
   assert.equal(spawnSync(process.execPath, ['scripts/merge-guard.mjs'], { input: 'not json', encoding: 'utf8' }).status, 2);
 });
+
+test('a worktree is removed only through scripts/worktree-remove.mjs, and node_modules is never linked into one (2026-10-19)', () => {
+  for (const c of [
+    'git worktree remove --force ../Sentri-UI-x',
+    'git -C ../Sentri-UI worktree remove ../Sentri-UI-x',
+    'cd ../Sentri-UI && git worktree   remove "../Sentri-UI-x"',
+    'New-Item -ItemType Junction -Path ..\\Sentri-UI-x\\node_modules -Target ..\\Sentri-UI\\node_modules',
+    'cmd /c mklink /J node_modules ..\\Sentri-UI\\node_modules',
+    'ln -s ../Sentri-UI/node_modules node_modules',
+  ]) assert.equal(guard(c), 2, c);
+  for (const c of ['node scripts/worktree-remove.mjs ../Sentri-UI-x', 'git worktree add --detach ../Sentri-UI-x HEAD', 'git worktree list', 'git worktree prune',
+    'SENTRI_PLAYWRIGHT=../Sentri-UI/node_modules/playwright node scripts/gate.mjs --candidate origin/x --out o']) assert.equal(guard(c), 0, c);
+  assert.equal(run({ tool_name: 'PowerShell', tool_input: { command: 'git worktree remove --force C:\\wt' } }), 2, 'PowerShell too');
+});
