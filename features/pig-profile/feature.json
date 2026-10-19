@@ -1257,7 +1257,7 @@
       "preset": "room",
       "steps": [
         "[data-action=\"room-sow\"][data-value=\"000392\"]",
-        "More actions",
+        "Actions",
         "Mark not in pig"
       ]
     }

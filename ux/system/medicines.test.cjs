@@ -10,7 +10,7 @@ const catalogue = require('./medicines-catalogue.json');
 const open = (ids = ['000267'], task) => { const c = M.seed(); M.openBulkAction(c, 'treatment', ids); if (task) c.form.taskId = task; M.handleRecordAction(c, 'medicine-open', ''); return c; };
 const drawer = c => { const h = M.overlay(c); return h.slice(h.lastIndexOf('<section class="sheet')); };
 const title = c => drawer(c).match(/<h2 class="sheet-title">([^<]*)</)[1];
-const rows = html => [...html.matchAll(/st-choice-(heading|label|meta)">([^<]*)</g)].map(m => (m[1] === 'heading' ? '# ' : m[1] === 'meta' ? '  ' : '') + m[2]);
+const rows = html => [...html.matchAll(/st-choice-(heading|label|meta)">(?:<svg[^]*?<\/svg>)?([^<]*)</g)].map(m => (m[1] === 'heading' ? '# ' : m[1] === 'meta' ? '  ' : '') + m[2]);
 
 test('the starting list: seven categories, every medicine named in EN and ZH, vaccines by disease', () => {
   assert.deepEqual(catalogue.categories.map(c => c.id), ['antibiotics', 'pain', 'parasites', 'vaccines', 'hormones', 'vitamins', 'other']);

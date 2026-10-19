@@ -208,6 +208,23 @@ Held against the Farrowing room (its dock: one dark primary, Back outlined) and 
 - Every moved screen: only the waiting footer button (dashed rim), a floor key (dashed, `ink-2` glyph), a disabled picker (Move's Destination pen: solid rim to dashed) or the Environment fan controls changed; layout, copy and the 360 Chinese footers are unchanged.
 - **Better because** unavailable is now said by the face and the rim, never by faded words, and no waiting control looks live.
 
+# Conditions (2026-10-17 to 10-19)
+
+Scope: the pig's Actions page and the drawers that open over it. The owner's rounds on conditions and selection, built in the Inspection prototype (features/conditions/PRD.md, budget.md; PR #223). Baselines: `origin/main` at `92e0f0d`, the gate's pairs at 390 and 360, EN and ZH.
+
+### Keep
+
+- The Actions page's sections, rows and the drawers over it.
+
+### Problems
+
+- **minor** · The action sheet was titled "More actions", though it is the only place the actions live; the owner renamed it Actions (2026-10-17), and the button that opens it says Actions too.
+- **major** · The Actions page carried a Health / Routine bar at the bottom, a second way to the same sections already on the page (owner, 2026-10-18: removed).
+
+### Self-crit
+
+- **Better because** the title says what the page is.
+
 ---
 
 # More actions as a menu drawer with a verb grid (PR #224), critique

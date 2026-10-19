@@ -638,12 +638,12 @@
     [
       "farrowing.count",
       "farrowing.sow-actions",
-      "More actions"
+      "Actions"
     ],
     [
       "farrowing.locked",
       "farrowing.sow-actions",
-      "More actions"
+      "Actions"
     ],
     [
       "farrowing.sow-actions",
@@ -1122,7 +1122,7 @@
           "(raw) Use Record dead for deaths. Use Edit for corrections.",
           "(raw) Litter summary · View log",
           "(raw) Born · Dead",
-          "(raw) Edit · Record death · More actions",
+          "(raw) Edit · Record death · Actions",
           "(raw) Back · Finish farrowing"
         ],
         "edge": [
@@ -1594,7 +1594,7 @@
           "(raw) Litter summary · View log",
           "(raw) Born · Alive now · Dead · Weak · Deformed · Assisted · Litter weight",
           "(raw) Not recorded",
-          "(raw) Edit · Record death · More actions"
+          "(raw) Edit · Record death · Actions"
         ],
         "edge": [
           "Post-lock events never reopen farrowing",
@@ -3589,13 +3589,13 @@
     },
     {
       "id": "farrowing.sow-actions",
-      "name": "More actions",
-      "zh": "更多操作",
+      "name": "Actions",
+      "zh": "操作",
       "status": "in-design",
       "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
       "preset": "count",
       "steps": [
-        "More actions"
+        "Actions"
       ],
       "figma": "",
       "notes": {
@@ -3672,7 +3672,7 @@
       "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
       "preset": "count",
       "steps": [
-        "More actions",
+        "Actions",
         "Edit note"
       ],
       "figma": "",
@@ -3705,7 +3705,7 @@
       "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
       "preset": "count",
       "steps": [
-        "More actions",
+        "Actions",
         "[data-action=\"sow-host-action\"][data-value=\"piglets\"]"
       ],
       "figma": "",
@@ -3754,7 +3754,7 @@
       "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
       "preset": "count",
       "steps": [
-        "More actions",
+        "Actions",
         "[data-action=\"sow-host-action\"][data-value=\"piglets\"]",
         "Piglet records",
         "Add piglet"
@@ -3792,7 +3792,7 @@
       "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
       "preset": "count",
       "steps": [
-        "More actions",
+        "Actions",
         "[data-action=\"sow-host-action\"][data-value=\"piglets\"]",
         "Piglet records",
         "Report mortality"
