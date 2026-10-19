@@ -36,11 +36,11 @@
       "Pressed",
       "Five verbs (3 + 2)",
       "Six verbs (3 + 3)",
-      "Three verbs (one row)",
       "Danger · Death is last",
       "Over ten · More",
       "More opened · eleven verbs (4 + 4 + 3)",
-      "Chinese"
+      "Chinese",
+      "Three verbs (one row)"
     ],
     "usedBy": [
       "inspection.actions",
