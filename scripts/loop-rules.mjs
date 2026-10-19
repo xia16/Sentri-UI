@@ -52,19 +52,24 @@ function outcomesById(spec) {
 // the runner, a feature's scenarios.json, or a leaf. Removing coverage is a workflow change, never a design PR's.
 // A leaf is compared by its id, not counted (G14): a leaf that runs on base and is gone, made pending, or makes fewer assertions on
 // the candidate is lost coverage, even when the feature's count of leaves holds (a failing leaf made pending kept the count).
+// A leaf that moves to another feature keeping its id (features merged or split) is kept coverage where it lands, under the
+// same tests; a scenarios.json whose every leaf moved is not lost.
 export function coverageLost(base, cand) {
   const lost = [];
   if (base.runner && !cand.runner) lost.push('scripts/run-scenarios.mjs is gone');
+  const landed = new Map();
+  for (const [g, s] of Object.entries(cand.specs || {})) for (const [id, x] of outcomesById(s)) if (!landed.has(id)) landed.set(id, { ...x, feature: g });
   for (const [f, spec] of Object.entries(base.specs || {})) {
     if (!spec) continue;
-    const c = cand.specs?.[f];
-    if (!c) { lost.push(`features/${f}/scenarios.json is gone or unreadable`); continue; }
-    const nb = outcomeLeaves(spec), nc = outcomeLeaves(c);
+    const c = cand.specs?.[f], B = outcomesById(spec), C = outcomesById(c);
+    const moved = (id) => !C.has(id) && landed.has(id) && landed.get(id).feature !== f;
+    const away = [...B.keys()].filter(moved).length;
+    if (!c && away < B.size) { lost.push(`features/${f}/scenarios.json is gone or unreadable`); continue; }
+    const nb = outcomeLeaves(spec), nc = outcomeLeaves(c) + away;
     if (nc < nb) lost.push(`${f} has ${nc} outcome leaves, ${nb} on base`);
-    const B = outcomesById(spec), C = outcomesById(c);
     for (const [id, b] of B) {
       if (b.status === 'pending') continue;
-      const x = C.get(id);
+      const x = C.get(id) || (moved(id) ? landed.get(id) : null);
       if (!x) lost.push(`${f}: leaf ${id} is gone`);
       else if (x.status === 'pending') lost.push(`${f}: leaf ${id} runs on base and is pending here`);
       else if (x.checks < b.checks) lost.push(`${f}: leaf ${id} makes ${x.checks} assertion(s), ${b.checks} on base`);
