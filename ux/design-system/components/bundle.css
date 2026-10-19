@@ -178,7 +178,8 @@ svg{width:var(--size-20);height:var(--size-20);display:block;flex-shrink:0;fill:
 :is(.farrowing-phone,.inspection-phone) .page-background>.sheet{z-index:1}
 .inspection-phone .sheet[data-presentation="page"].single-action-sheet>.sheet-body{display:block}
 .inspection-phone .sheet[data-presentation="page"].single-action-sheet .bulk-controls{max-width:100%}
-.inspection-phone .sheet[data-presentation="page"].single-action-sheet .bulk-controls{padding:0 var(--space-16) var(--space-16);gap:var(--space-20)}
+.inspection-phone .sheet[data-presentation="page"].single-action-sheet .bulk-controls{padding:0 0 var(--space-16);gap:var(--space-20)}
+@media(max-width:370px){.inspection-phone .sheet[data-presentation="page"].single-action-sheet>.sheet-body{padding-left:var(--space-gutter-narrow);padding-right:var(--space-gutter-narrow)}}
 .inspection-phone .sheet[data-presentation="page"].single-action-sheet .field{font-size:var(--font-size-13);gap:var(--space-8)}
 .inspection-phone .sheet[data-presentation="page"].single-action-sheet :is(.field input,.field select){min-height:var(--tap-min);font-size:var(--font-size-14);padding:var(--space-12)}
 .inspection-phone .sheet[data-presentation="page"].single-action-sheet .feed-optional-open{min-height:var(--tap-min)}

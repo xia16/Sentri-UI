@@ -30,7 +30,7 @@ Branch: `45-stepper-field`. Self-review against component-standard.md §5; this 
 
 All six variants loaded in a page with tokens.css, bundle.css and bundle.js; each manifest state was captured at 375px. At 390×844, no overflow, console/page errors or undersized component targets. The `proof/` PNG files are the per-state evidence. Both previews also run under the same injected assets.
 
-Bare atlas screens checked at 390×844: farrowing.count, death, finish, edit, born, edit-finished; piglet-processing.counts, record-death, adjust-count, move-piglets, set-count; health-record.treatment, edit-finding; inspection.pen-note; pig-profile.note. Visible button/native text-control/spinbutton targets meet 48px. Inert backgrounds, hidden optional editors and visual radio/checkbox glyphs are excluded as independent targets; their enclosing controls own the tap.
+Bare atlas screens checked at 390×844: farrowing.count, death, finish, edit, born, edit-finished; piglet-processing.counts, record-death, adjust-count, move-piglets, set-count; treat.record, edit-finding; inspection.pen-note; pig-profile.note. Visible button/native text-control/spinbutton targets meet 48px. Inert backgrounds, hidden optional editors and visual radio/checkbox glyphs are excluded as independent targets; their enclosing controls own the tap.
 
 An extended audit also opened all **115 reachable atlas URLs** for Home, Farrowing, Inspection and Piglet processing. Every URL became atlas-ready, with no console/page errors and no undersized visible button/native text-control/spinbutton targets. This includes 18 screens containing Fields and 13 containing Steppers. The reachability caveats below still apply to entries that do not replay into their named form.
 

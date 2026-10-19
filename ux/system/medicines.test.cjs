@@ -1,4 +1,4 @@
-// Medicines (features/medicines): the picker's levels, recents, search, adding, brands, remembered method and unit, the page.
+// Medicines (features/treat): the picker's levels, recents, search, adding, brands, remembered method and unit, the page.
 const test = require('node:test');
 const assert = require('node:assert/strict');
 require('../design-system/components/bundle.js');

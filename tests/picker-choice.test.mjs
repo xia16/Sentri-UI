@@ -220,7 +220,7 @@ test("browsing a disease branch retains its kind when adding a custom condition"
   assert.deepEqual(c.form.conditionPath, ["Disease", group.group]);
 });
 
-test("the medicine trigger shows the picked medicine, not its path (features/medicines)", () => {
+test("the medicine trigger shows the picked medicine, not its path (features/treat)", () => {
   const M = globalThis.InspectionStudy,
     c = M.seed();
   M.openBulkAction(c, "treatment", ["000267"]);

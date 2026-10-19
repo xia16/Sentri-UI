@@ -13,7 +13,7 @@
       "Chinese · several pigs"
     ],
     "usedBy": [
-      "health-record.treatment-saved"
+      "treat.saved"
     ]
   },
   {
@@ -28,7 +28,7 @@
       "Chinese · several pigs"
     ],
     "usedBy": [
-      "health-record.treatment-saved-offline"
+      "treat.saved-offline"
     ]
   },
   {

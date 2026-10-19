@@ -1,4 +1,8 @@
-# medicines: critique
+# Treatment: critique
+
+> Treatment took in the Medicines feature and Health record's Record treatment on 2026-10-19. The sections below are kept as written, with the screen ids of their day; the map to today's ids is in the PRD's Decisions.
+
+# From Medicines: critique
 
 Scope: choosing, adding and managing the farm's medicines (new feature, mode **new**). The picker is the one Record treatment and Record vaccination open (`health-record.treatment`, `health-record.treatment-batch`); the Medicines page and a product's sheet are new. Owner's decisions of 2026-10-16 are the brief (`features/medicines/PRD.md`, Decisions). Baselines: `origin/main` at `c6cc500`, `node scripts/shoot-screens.mjs` at 390 and 360, EN and ZH: `health-record.medicine-picker`, `health-record.treatment`, and the batch form (`health-record.treatment-batch`, registered by this change; on `c6cc500` it is the `selected` preset → Record treatment).
 
@@ -246,3 +250,96 @@ The owner approved the treatment's optional face (an ordinary labelled field wit
 
 ### Round 2 (owner, 2026-10-18: "this placeholder looks really bad")
 - **major** · The one grey line read as a leftover, not a designed state: small, flush left, alone in a white sheet. Now ChoiceList's can-add empty state, the native "nothing here yet": a tag glyph on the tint (56px circle), a title that names what is missing ("No brands for Ceftiofur yet", 16px/600 ink) and one line that says how to add it ("Type the name on the bottle's label above to add it.", 14px muted, balanced on two lines in EN, one in ZH), centred under the search. It is a ChoiceList option (`choiceEmpty` with `title` and `icon`), not a page part: every existing empty line is unchanged, and ChoiceList's Single page shows it as the state "Empty-add".
+
+# From Health record: Medicines move onto the medicines feature (2026-10-16)
+
+Scope: the medicine picker and the Brand field of Record treatment (`health-record.medicine-picker`, `health-record.treatment`) move onto the new `medicines` feature's picker, and batch Record treatment (`health-record.treatment-batch`, registered by this change) asks what was given before the doses. The picker's own critique is `features/medicines/critique.md`; this block covers the host screens. Baselines: `origin/main` at `c6cc500`, 390 and 360, EN and ZH.
+
+### Keep
+
+- Record treatment, one pig: the page header (Back, the title), Medicine, Method, Dose with its unit in one box, the optional rows (Condition, Note) below the required fields, the waiting Save with no line above it.
+- Batch: the ticked pigs as one list of rows with a checkbox each, "Same dose for all" as the list's head filling every pig's box, each pig's own box overriding it; Save · N pigs. The per-pig dose boxes are not redesigned.
+- The medicine trigger shows the pick, not the path.
+
+### Problems
+
+- **major** · Brand is a second optional pick after the medicine, offering the same sample brands for every medicine; the owner decided the worker picks one product (`features/medicines/critique.md`).
+- **major** · Batch asks the doses first and folds Medicine and Method into a dock at the bottom (owner decision 6: what was given first, then the doses).
+- **major** · Method and unit start empty every time (owner decision 4: the product remembers them).
+
+### Parts
+
+| Part | Drawn by today | The component whose job it is | Keep / fix / cut |
+|---|---|---|---|
+| Medicine trigger | PickerField cascade | PickerField | keep; its value is now the product |
+| Brand optional row | Field `optionalRow` | — | **cut** |
+| Batch details dock ("Treatment details" fold) | page-built `bulkListOverlay()` dock | Sheet page body, the same fields | **fix**: Medicine and Method move to the top of the page, the fold goes with the dock; the optional rows follow the doses |
+| Method, unit | PickerField single, the unit picker in the dose box | the same | keep; pre-filled from the product |
+
+### Self-crit
+
+Rounds and the final look follow in `features/medicines/critique.md`, which renders these screens with the picker.
+
+### Revision (owner, 2026-10-16)
+
+The Brand optional row comes back as the medicines feature's field (only once a medicine is chosen; its own list with recents and an Add card), after Method and before the dose; the withdrawal notice (Banner notice) closes the form before Save when a withdrawal is in force. The picker picks a medicine; Method and unit are remembered per medicine. Renders and the final look: `features/medicines/critique.md`, Revision.
+
+### Round 3 (owner, 2026-10-16)
+
+- **major** · The half-width "+ Brand / + Condition / + Note" cards and the filled Brand card with its pencil were two optional faces on one form; the owner asked for full-width rows (OptionalRow face `row`, as Record dead's Photos and Details). Fixed on the single and batch forms; the condition picker itself is unchanged (the owner reworks conditions separately).
+- **major** · The batch form drew a dose box per pig under "Same dose for all", which grows the form with the pigs; now one Dose for all and a "Custom doses" row opening a page of pigs (each pig's dose on the right; a tap edits it; ear-tag search and Scan).
+- Renders and the final look: `features/medicines/critique.md`, Round 3.
+
+### Round 4 (owner, 2026-10-16)
+
+- **major** · The optional rows did not look like the other inputs on the same form; the owner wants Brand and Condition as PickerFields and Note as a textarea, each with a grey "Optional" beside the label. The Field README's law makes an optional input an optional row ("A Field is never shown open for an optional input"); this departs from it at the owner's request (said in the hand-back).
+- **major** · Round 3's Custom doses page hid every pig's dose one tap away; doses are back on the form, inline like the other bulk editors: each pig's box shows the shared dose as a grey placeholder until its own is typed.
+- **minor** · Pre-existing: typing in a bulk page's field redrew its footer with a Back, though a page's Back is top left (`refreshBulkCommit`). Fixed: a page's footer keeps no Back.
+
+### Round 5 (owner, 2026-10-16)
+
+- **major** · Round 4 put each pig's dose box on the form; the form grew with the pigs. The Custom doses row and page are back, with the boxes inline on the page (no sheet).
+- **major** · The dose rows' checkboxes read as multi-select (owner). Removed; a pig is taken out on the selected list (the pigs row at the top of the form), the walk's Selected review pattern.
+- **minor** · Note had no length limit or room: now about three lines, at most 200 characters, a counter from 160.
+
+### In-place fixes (owner, 2026-10-16; the skeleton is approved)
+
+- **major** · The pigs row duplicated Dose per pig; removed. Taking a pig out moved onto Dose per pig as **Remove** under each pig: ChoiceList's removal control (`secondaryAction`, the separately named text action under an item, as "Remove custom condition"), not a checkbox. The last pig has none.
+- **major** · The Banner notice sat far from the medicine it came from; withdrawal is now a muted caption in the field's hint slot: under Medicine for its default, under Brand when the brand has its own period (chosen: the caption sits under the field its number comes from, so it says whose it is without a word for it).
+- **minor** · "Same dose for all" with its unit squeezed in one box: now Dosage and Unit side by side, each a labelled 48px field.
+- **major** · The Custom doses row showed before a dosage existed and the per-pig boxes showed the dosage as a placeholder: now the line appears once a dosage is typed ("Same for all 2 pigs · Adjust ›", "1 pig adjusted"), and Dose per pig is pre-filled with the actual dosage; typing over one marks it Adjusted (ink, bold); clearing returns it; unadjusted pigs follow the dosage.
+- Adding a medicine: its default withdrawal is not pre-filled. The add level opens only from a search with no match, and search covers every starting-list medicine (EN, ZH and other names), so a typed new name never matches the catalogue; skipped as asked.
+- Checks on the changed screens: header 0, spacing 0, strict legibility pass (see the hand-back for the commit).
+
+### In-place fixes, 2 (owner, 2026-10-16)
+
+- **minor** · The adjust caption read as a footnote: now one navigate **Row** (title "2 pigs · 2.5 mL each" / "2 pigs · 1 adjusted", trailing word "Adjust" with the rail's ›; the row law's "word + › when the tap acts"); the whole row opens Dose per pig. It keeps Row's one height (`row-min`), not 48px: the row law gives every row one height.
+- **major** · "Remove" under every pig doubled each row: now **Remove pigs**, a text action above the list, switches it into remove mode (the platform list's edit mode: a remove control per row, IconButton plain ×, in the dose box's place; Done to leave). Touch states only.
+- **minor** · The batch screens showed 2 pigs and Dose per pig 8: every batch screen now uses the same 2 pigs.
+
+# From Health record: Saved, the walk list (owner, 2026-10-18)
+
+### Problems
+- **major** · Saving Record treatment for one pig closed the form onto the walk list with no sign it had saved: nothing on the list shows the record (owner: "do we need a small thing that fades letting know the thing has been recorded?"). Offline it was worse: nothing said the record was only on this phone.
+- **minor** · The older toast Inspection drew for some saves ("Weights saved") was page-built (`.inspect-toast` in the page's CSS), a bare dark box with no glyph and no subject.
+
+### Parts
+- Toast: page-built `.inspect-toast` → moved into the design system as it looked (byte-identical render), then designed: **Toast** (`SentriUI.toast`, done and offline forms). Kept for the older saves, which now draw the same box.
+
+### Self-crit
+- New held screens `health-record.treatment-saved` and `health-record.treatment-saved-offline` (EN and ZH, 390): the toast sits 10px above the dock, on the gutters, 56px tall, one line each; the check on the green is the only colour; offline swaps the glyph and the second line and never says uploaded. The walk list behind it is unchanged. House references: Linear's "Issue created" snackbar, Material's snackbar; solid ink because it is read in glare.
+
+# Treatment merge: the judge's findings (2026-10-19)
+
+Scope: the gate's judge on #222 found two defects carried over unchanged from main by the renamed screens. A visible defect voids a pass, so both are fixed here.
+
+### Keep
+- Every Treatment screen's layout, order and copy, as on main; the several-pig form is untouched.
+
+### Problems
+- **major** · The one-pig form (`treat.record`, `treat.record-brand`, `treat.record-note`) sat 34px in from the phone's edge, 16px inside the header's track. The page-presented one-pig sheet padded its controls again inside the sheet body's gutter (Sheet, `bundle.css`). This affects every one-pig action page that uses it.
+- **major** · In ZH the form's title, the Medicine (Vaccine) and Method labels, the method names and the unit's "Choose unit" stayed English (the "Known" item above).
+
+### Parts
+- Sheet (`bundle.css`): a page-presented one-pig form sits on the sheet body's gutter, with no second inset. At 360 it takes the narrow gutter, like the header and the several-pig form.
+- Strings: `medicines.record_treatment`, `.record_vaccination`, `.medicine`, `.vaccine`, `.method`, `.method.choose`, `.method.<injection|oral|topical|in_feed|in_water>` and `.unit.choose`, in EN and ZH. The stored method stays its English value; only the label follows the language.

@@ -46,7 +46,7 @@ The check on the green is the only colour; green means done (design law: colour)
 | Cleared by the next view | It belongs to the view it landed on: opening a pig, a sheet or another page clears it at once | — |
 | Dismissed by a tap | A tap on it dismisses it and never reaches the row or control it covers | — |
 | Gone | Removed after its time; nothing replaces it | — |
-| Held (atlas) | While the atlas holds a screen still, it stays on screen so the gate can see it (rules ledger L25) | `health-record.treatment-saved`, `…-saved-offline` |
+| Held (atlas) | While the atlas holds a screen still, it stays on screen so the gate can see it (rules ledger L25) | `treat.saved`, `…-saved-offline` |
 
 There is no pressed, disabled, loading or error state: it takes no action, and a failure is never a toast.
 
