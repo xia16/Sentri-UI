@@ -219,8 +219,9 @@ export async function evaluate(opts) {
     check('no conflict markers', !r.out.trim(), r.out.trim().split('\n').slice(0, 3).join(' | '));
   }
   {
-    const dirs = fs.existsSync(path.join(S.base.dir, 'features')) ? fs.readdirSync(path.join(S.base.dir, 'features')) : [];
-    const withLeaves = dirs.filter((f) => fs.existsSync(path.join(S.base.dir, 'features', f, 'scenarios.json')));
+    // features with leaves on either side: a leaf may move into a feature that had none on base
+    const leavesIn = (dir) => (fs.existsSync(path.join(dir, 'features')) ? fs.readdirSync(path.join(dir, 'features')) : []).filter((f) => fs.existsSync(path.join(dir, 'features', f, 'scenarios.json')));
+    const withLeaves = [...new Set([...leavesIn(S.base.dir), ...leavesIn(S.cand.dir)])];
     const coverage = (dir) => ({ runner: fs.existsSync(path.join(dir, 'scripts/run-scenarios.mjs')), specs: Object.fromEntries(withLeaves.map((f) => { try { return [f, JSON.parse(fs.readFileSync(path.join(dir, 'features', f, 'scenarios.json'), 'utf8'))]; } catch { return [f, null]; } })) });
     const lost = coverageLost(coverage(S.base.dir), coverage(S.cand.dir));
     check('behaviour coverage kept', !lost.length, lost.length ? `removes behaviour coverage (${lost.slice(0, 3).join('; ')}): do it in its own workflow PR` : `${withLeaves.length} feature(s) with leaves`);

@@ -50,6 +50,21 @@ test('coverage is compared leaf by leaf: a leaf made pending, weakened or replac
   assert.deepEqual(coverageLost(base, { runner: true, specs: { f: spec(leaf('l1'), leaf('l2'), leaf('l3'), leaf('p2', { status: 'pending' })) } }), []);
 });
 
+test('a leaf that moves to another feature with its id is kept coverage there; one that is weakened on the way is not', () => {
+  const leaf = (id, extra = {}) => ({ type: 'outcome', id, visible: [{ text: 'a' }, { text: 'b' }], ...extra });
+  const spec = (...leaves) => ({ tree: [{ type: 'state', id: 'st', reset: { url: '/p.html' }, children: leaves }] });
+  const base = { runner: true, specs: { a: spec(leaf('a1'), leaf('a2')), b: spec(leaf('b1'), leaf('bp', { status: 'pending' })), c: null } };
+  // a and b merge into c: every leaf lands, the two scenarios.json files go
+  assert.deepEqual(coverageLost(base, { runner: true, specs: { a: null, b: null, c: spec(leaf('a1'), leaf('a2'), leaf('b1'), leaf('bp', { status: 'pending' })) } }), []);
+  // part of a feature moves out, the rest stays
+  assert.deepEqual(coverageLost(base, { runner: true, specs: { a: spec(leaf('a1')), b: spec(leaf('b1'), leaf('bp', { status: 'pending' })), c: spec(leaf('a2')) } }), []);
+  // a leaf left behind, one weakened, one made pending where it lands
+  assert.deepEqual(coverageLost(base, { runner: true, specs: { a: null, b: null, c: spec(leaf('a1', { visible: [{ text: 'a' }] }), leaf('b1', { status: 'pending' })) } }),
+    ['features/a/scenarios.json is gone or unreadable', 'features/b/scenarios.json is gone or unreadable']);
+  assert.deepEqual(coverageLost(base, { runner: true, specs: { a: spec(), b: spec(leaf('bp', { status: 'pending' })), c: spec(leaf('a1', { visible: [{ text: 'a' }] }), leaf('a2'), leaf('b1', { status: 'pending' })) } }),
+    ['a: leaf a1 makes 1 assertion(s), 2 on base', 'b: leaf b1 runs on base and is pending here']);
+});
+
 test('what renders of a screen is its url, preset and steps (G7)', () => {
   const entry = { id: 'f.s', name: 'S', zh: '屏', status: 'approved', url: '/ux/p.html?x=1', preset: 'room', steps: ['[data-a]'], figma: '', notes: { purpose: 'p' }, approval: { commit: 'abc' } };
   assert.deepEqual(renderDef(entry), { id: 'f.s', url: '/ux/p.html?x=1', preset: 'room', steps: ['[data-a]'] });
