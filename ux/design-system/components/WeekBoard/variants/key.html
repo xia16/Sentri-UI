@@ -4,7 +4,7 @@
 </style></head><body>
 <section data-state="Default"></section>
 <script>
-const rows=[['d12','Done','How many were recorded that day'],['o10','Today','Due today'],['p8','Planned','Exact number, already known'],['e6','Estimate','Expected: heat, returns, farrowing'],['u','Waiting on today','Known after today’s results'],['v4','Past its plan','The task should have finished; it carries on until done'],['n','Nothing due','Running, nothing to do that day']];
+const rows=[['d12','Done','How many were recorded that day'],['o10','Today','Due today'],['p8','Planned','Exact number, already known'],['e6','Estimate','Expected: heat, returns, farrowing'],['u','Waiting on today','Known after today’s results'],['v4','Past its plan','Should have ended; carries on'],['n','Nothing due','Running, nothing to do that day']];
 document.querySelectorAll('[data-state]').forEach(el=>{el.innerHTML='<div class="w">'+SentriUI.weekBoardKey(rows)+'</div>';});
 </script>
 </body></html>
