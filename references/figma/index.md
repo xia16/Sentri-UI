@@ -2,6 +2,8 @@
 
 The seven old-UI files, from Figma's page structure (`outline.txt`). Screens are Figma frames, counted per file. A flow is a sub-group in a section; the node id opens its section. Link: `https://www.figma.com/design/<key>?node-id=<node id with - for :>`.
 
+The web and console files are indexed separately in [web/index.md](web/index.md).
+
 | File | Key | Screens | Flows |
 |---|---|---|---|
 | 首页 Home | `UuyZbUklgF674X57hm3PHF` | 17 | 1 |
