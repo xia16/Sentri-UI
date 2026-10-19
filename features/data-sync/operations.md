@@ -1,5 +1,7 @@
 # Data sync — operations inventory and 95% cut
 
+> 取舍说明（2026-10-20）：本文件保留 Zhaoxu 2026-10-16 版本。被 2026-10-18 至 2026-10-20 用户裁决改变或取消的条目，以 [PRD](PRD.md) 和 [consolidation.md](consolidation.md) 为准。
+
 频率标签 S 表示来源已有此操作或事件，I 表示按断网、多人协作与本机队列特性推断；并不代表已测得现场发生率。here 只负责同步状态和恢复动作，业务记录的修改由原功能负责。
 
 | Operation | How often | At stake | Recorded? | Where | Least UI | Reason |

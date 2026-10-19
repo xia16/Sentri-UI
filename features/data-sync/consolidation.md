@@ -1,6 +1,6 @@
 # Data sync — consolidation map (working document)
 
-Status: working document for the cleanup, 2026-10-20. It maps Zhaoxu's offline work onto the design agreed with the owner on 2026-10-18 to 2026-10-20, lists what is still missing or open, and names every place in the repo the cleanup touches. It is not a ruling: rules move into `PRD.md` only once the open items below are answered.
+Status: working document for the cleanup, 2026-10-20. The PRD now carries everything decided here; this map keeps the trace from Zhaoxu's version. It maps Zhaoxu's offline work onto the design agreed with the owner on 2026-10-18 to 2026-10-20, lists what is still missing or open, and names every place in the repo the cleanup touches. It is not a ruling: rules move into `PRD.md` only once the open items below are answered.
 
 ## Sources
 
@@ -17,6 +17,18 @@ Status: working document for the cleanup, 2026-10-20. It maps Zhaoxu's offline w
 
 Key: **Kept** = his rule stands as written. **Changed** = the job stays, the rule or screen changes. **Dropped** = no longer needed. **New** = ours, not in his version. **Open** = needs an owner call before it is written down.
 
+## 0 · Two layers (owner, 2026-10-20)
+
+**The sync layer is shared** and the same in every feature: the phone's queue, automatic upload, the header badge, Saved work and its log, past uploads, the Not accepted list, the words Saved / Uploaded / Not accepted, the switch block and the sign-in rule. Data sync owns it.
+
+**The feature layer is each feature's own**, decided when that feature is designed or implemented, and written as an "Offline" section in its PRD:
+
+- which of its actions work offline at all (already Zhaoxu's rule; Environment disables device settings offline);
+- what a collision means when two phones recorded the same thing (Piglet processing keeps both and flags them for Edit; Farrowing keeps records made after a task ended, flagged and not counted);
+- why the server would refuse one of its records, one plain line per reason.
+
+The sync layer shows whatever the feature decided: a refusal appears in Not accepted with the feature's reason; "keep both and flag" uploads normally and the flag lives in the feature, never in Saved work. **Default** for a feature that hasn't decided: the earlier team record stands, and the later one shows as Not accepted · Already recorded.
+
 ## 1 · Rules (his PRD Rules and Decisions)
 
 | His rule | Agreed design | Status |
@@ -28,7 +40,7 @@ Key: **Kept** = his rule stands as written. **Changed** = the job stays, the rul
 | Stable operation ID; unknown receipt is queried, never re-sent with a new ID | Same; while checking it shows as uploading | Kept |
 | Later records on the same object wait for earlier ones (`groupKey`, `dependsOn`) | Order only: once the earlier record settles (uploaded **or not accepted**), later ones upload as their own records. A later record that no longer makes sense is refused by the server with its own reason | Changed |
 | Failed record: see reason, retry by hand | The phone retries while a retry can still work, then marks it **not accepted** with its reason. No retry button | Changed (owner 20 Oct) |
-| Conflict: stops auto-sync; compare, retry by hand, or delete with double confirmation | The team record stands (it was never going to be overwritten); the worker's record is marked **not accepted · already recorded** and shown read-only. No compare, retry or delete. Same values on both sides count as uploaded and show nothing | Changed (owner 20 Oct) — **see Open 1** |
+| Conflict: stops auto-sync; compare, retry by hand, or delete with double confirmation | What a collision means is the owning feature's call (section 0). Default: the team record stands and the worker's record is marked **not accepted · already recorded**, read-only. No compare, retry or delete in Saved work. Same values on both sides count as uploaded and show nothing | Changed (owner 20 Oct) |
 | Records after a deleted conflict stay blocked; delete one by one | Not needed: nothing is deleted, and later records upload on their own | Dropped |
 | Only conflicts and their blocked follow-ons may be deleted; nothing else is cleared | Nothing in Saved work deletes or clears. Not-accepted records leave after 30 days | Changed |
 | Switching account or farm is blocked while records wait | Same; a sheet "Upload first" with See saved work | Kept |
@@ -63,14 +75,14 @@ Key: **Kept** = his rule stands as written. **Changed** = the job stays, the rul
 | B-7 | Receipt unknown | Shows as uploading until the query answers | Covered |
 | B-8 | Uploaded last 30 days | Past uploads (clock) | Changed |
 | C-1, C-2 | Failed: reason, manual retry | Auto retry, then not accepted with reason | Changed |
-| C-3, C-4, C-9 | Conflict: no auto retry, compare, manual retry | Not accepted · already recorded | Changed — Open 1 |
+| C-3, C-4, C-9 | Conflict: no auto retry, compare, manual retry | The feature's collision rule; default Not accepted · already recorded | Changed |
 | C-5, C-6 | Delete conflict, cancel or confirm | No delete | Dropped |
 | C-7, C-8 | Later record waits on an earlier one, then sends | Waits in the log as an ordinary record; uploads once the earlier one settles | Covered |
 | C-10, C-11 | Blocked after a deleted conflict | No longer arises | Dropped |
 | D-1 | Switch account or farm with records waiting | "Upload first" sheet | Covered (needs final screen) |
 | D-2 | Everything uploaded: switching allowed | Same | Kept |
 | D-3 | Sign-in expired | Saved work asks to sign in as the same person; badge red | Covered (needs final screen) |
-| D-4 | Another phone changed the same object | Server decides: uploaded, or not accepted · already recorded | Covered — Open 1 |
+| D-4 | Another phone changed the same object | The feature's collision rule, decided by the server: uploaded (perhaps flagged in the feature), or not accepted | Covered |
 | D-5 | Records a day or more old | Log groups by day; work waiting 24 h turns the badge red | Covered — Open 3 |
 
 ## 3 · Screens (his `feature.json`)
@@ -97,7 +109,7 @@ Key: **Kept** = his rule stands as written. **Changed** = the job stays, the rul
 
 ## 5 · Open: owner calls before the PRD is rewritten
 
-1. **Conflicts are a per-feature policy, not a sync rule.** Piglet processing already rules that two phones' records of one litter are **both kept, flagged, never merged** and resolved in Edit (the farm glossary, `ux/laws/glossary.md`: "Possible double treatment", "Two counts disagree", "Sync review"). "Team record kept, yours not accepted" contradicts that for piglets. Proposal: the owning feature decides what a collision means; Saved work only reports what the server actually refused. Piglet collisions then upload (kept and flagged in the feature) and never appear as not accepted.
+1. ~~Conflicts are a per-feature policy~~ **Decided 2026-10-20** (section 0): each feature decides what a collision means; the default is the earlier team record standing.
 2. **Vocabulary**: Saved (on the phone) → Uploaded (the farm has it) → **Not accepted** (the farm said no). Categories **Already recorded** and **Couldn't be accepted**. Entry: what the farm has first ("000412 · Not pregnant"), yours under it ("You recorded Pregnant").
 3. **Work stuck on the phone**: threshold for turning the badge red (24 h or end of shift).
 4. **Toast standing form**: the Needs-you / Not-accepted bar stays until looked at and opens a page. The Toast card forbids that today; it is the Medicines session's component.
@@ -115,7 +127,8 @@ Key: **Kept** = his rule stands as written. **Changed** = the job stays, the rul
 | Farrowing | `ux/system/farrowing-astra-concept.js` (`taskSyncBadge`, `placeTaskSyncBadge`), `farrowing-task-sync-study.css` | "Task 2" pill → icon + count; drop "All 3"; delete the pill CSS |
 | Inspection | `ux/system/inspection-astra-concept.js` | Add the task header badge; its offline save toast already follows #218 |
 | Other tasks | Piglet processing, Weaning, Pregnancy, Move, Treat prototypes | Same header badge where the task runs offline; End rule (Gap 2) |
-| Piglet processing | `ux/laws/glossary.md` (its collision terms), `features/piglet-processing` | Unchanged if Open 1 is accepted; otherwise its collision rules conflict |
+| Piglet processing, Farrowing | `ux/laws/glossary.md` (collision terms), their PRDs | Unchanged: their collision rules already are their feature layer; label them as an Offline section when next touched |
+| Every other feature | its `PRD.md` | An "Offline" section (what works offline, collisions, refusal reasons) when the feature is designed; until then the default applies |
 | Design system: Header | `ux/design-system/README.md` (Headers law), `components/Header` | One line: a page may carry one icon action at the top right |
 | Design system: Toast | `components/Toast` (Medicines session) | Standing form; first-offline-save shrink into the badge with a held frame |
 | Design system: Log | `components/Log` | Identifiers in entry titles set in mono |
