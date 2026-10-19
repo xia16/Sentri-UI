@@ -1144,7 +1144,7 @@ function conditionRootGroups(c){
  const symptoms=tree.filter(n=>n.value.startsWith('g:')),systems=tree.filter(n=>n.value.startsWith('s:'));
  /* Owner, 2026-10-19: Actions-style rows in the drawer's ChoiceList card: an icon tile, the area, and a line of examples
     ("1 selected" once something inside is ticked). Diseases sit right under Symptoms; a row opens its level in one tap. */
- const row=n=>{const k=leaves(n).filter(v=>f.conditions.includes(v)).length,[ic,ex]=CONDITION_AREA[n.value]||['health',''];return stRow({action:'condition-level',value:n.value,title:n.label,description:k?k+' selected':ex,icon:icon(ic),className:'action-item condition-area-row'});};
+ const row=n=>{const k=leaves(n).filter(v=>f.conditions.includes(v)).length,[ic,ex]=CONDITION_AREA[n.value]||['health',''];return stRow({action:'condition-level',value:n.value,title:n.label,description:k?str('ds.picker.selected',{n:k}):ex,icon:icon(ic),className:'action-item condition-area-row'});};
  return SentriUI.choiceGroup(symptoms.map(row),{title:'Symptoms',icon:'health'})+SentriUI.choiceGroup(systems.map(row),{title:'Diseases',icon:'care'});
 }
 /* The first level's areas: their icon and the examples that say what is inside. */
