@@ -578,3 +578,8 @@ House reference held against: Inspection's pen page (`inspection.pen`, its sibli
 - Cluttered, flat or bulky: four rows with explanatory lines became three tiles and two quiet facts; one more card (Now) carries state the page lacked. No bold, no colour added; the amber fault card became an ink row (state is said by the heading).
 - Open point: three verbs draw 2 + 1 (Row tile law: always two rows, row two short by at most one). A one-row rule for 2–3 tiles is a shared change to an approved component, so it is not made here; it is filed as a follow-up.
 - **Better because** the pen page now says how the pen is and what needs someone, in the same order as Inspection's pen page, and nothing typed is lost on Back.
+
+**Final look** (the gate's pairs on 81eaf18 against main d006a15, EN 390 / 360, ZH 360; the critique edit after it changes no screen):
+- `farrowing.pen`: tiles, Now (Sows 1 · Farrowing; Piglets alive 9 · 5 dead), Pen log; nothing clips at 360; ZH reads `B1栏 · 备注 / 饲喂 / 故障 · 当前 · 本栏记录`. The 2 + 1 grid leaves the right half of row two empty (the component's law; follow-up filed).
+- `farrowing.pen-attention` (new): the fault row, then the note row in one white group under `Needs attention`; the descriptions wrap without breaking the rows at 360.
+- `farrowing.pen-note`, `-fault`, `-fault-record`, `-read-note`: the sheets are unchanged; only the page dimmed behind them moved. Their own copy stays English under `?lang=zh` on both sides: Farrowing's prototype translates its rows and, now, the pen page; its form sheets are outside this change.
