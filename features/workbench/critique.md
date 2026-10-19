@@ -43,3 +43,18 @@ The owner's rounds of 2026-10-18/19 named each of these on the live Overview.
 - Squint (Gestation): the section switch, the tiles' large counts, the red "2 overdue".
 - Against the original: less, and every fact in a fixed place; no fact the worker acts on was dropped (phase, outcomes and the bar label moved to the task page).
 - **Better because** the first screen answers "what's on and how far along" for every task at once, in the same place on each tile.
+
+## Schedule fixes (2026-10-20)
+
+Scope: the Schedule's day header and its "How to read the board" drawer, plus WeekBoard's own atlas pages. A blind gate judge flagged these when the pages entered the gate's reach (ledger L23). The rest of the Schedule keeps its design.
+
+Keep: the board's layout, cells and colours; today as the one ringed date and the one filled cell; the key's seven rows and their order.
+
+- **minor** · Today's day label ("Thu") sat about 5px above the other labels and almost touched its ring: the ringed date is 28px tall and the others 18px, and each column centred its own pair.
+- **minor** · The board marks a run that continues into the next or last week with an open edge and an arrow, but the key never said what the arrow means.
+- **minor** · WeekBoard's atlas pages capped the board at 348px, so it sat flush left with a dead gutter; the Past its plan specimen showed a red "0" the Schedule never draws.
+
+#### Final look (the gate's pairs at 390 and 360, EN and ZH)
+- Every date sits in the same 28px box, 2px under its label, so all seven labels share one line and the ring has room.
+- The key gains "Continues · Runs into next week, or from last" as its last row. Its drawer is `long` (85% cap, sized to content), so all eight rows show at 360 without scrolling.
+- **Better because** the header reads as one line again, and every mark on the board is in the key.
