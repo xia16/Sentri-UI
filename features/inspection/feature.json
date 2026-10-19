@@ -535,7 +535,7 @@
     },
     {
       "id": "inspection.pen",
-      "name": "Pen sheet",
+      "name": "Pen page",
       "zh": "栏位详情",
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
@@ -545,43 +545,46 @@
       ],
       "figma": "",
       "notes": {
-        "purpose": "Everything about one pen outside its pigs: the note, the feed guidance and the pen log.",
+        "purpose": "Everything done to one pen as a whole, for that pen (owner, 2026-10-19: the pen is a door, not a tick): its verbs on top, then what needs someone, then how the pen is now, then its log.",
         "elements": [
           {
-            "name": "Note card and note row",
-            "shows": "Note card above the list; row Add / Edit pen note",
-            "states": [
-              {
-                "state": "Pen has a note (C1)",
-                "when": "pen.note is set",
-                "shows": "Note card with text, author, time; row reads \"Edit pen note\"; the card is the only place the text shows"
-              },
-              {
-                "state": "No note (C2)",
-                "when": "No note",
-                "shows": "No card; row reads \"Add pen note\""
-              }
-            ],
-            "logic": "Author and time as saved (\"today · 09:41\" for notes saved in this session). Notes are attached to the pen, never recorded on its pigs.",
-            "at": "Close the aisle gate after passing."
+            "name": "Pen verbs",
+            "at": "Note",
+            "shows": "One card of icon tiles (Row tile grid): Note, Feed, Observe, Fault, Tick all (3 + 2)",
+            "rule": "Tick all returns to the walk with the pen's shown pigs and its untagged group ticked, for the pig Actions; no other surface selects a pen."
           },
           {
-            "name": "Feed guidance row",
-            "shows": "Gestation 1 · 7.6 kg",
-            "logic": "Formula name + allocation in kg, \"Station-fed\" or \"Ad-lib\". Opens the reading page first; its Adjust feed button opens the editor.",
-            "source": "feedLabel",
-            "at": "Gestation 1 · 7.6 kg"
+            "name": "Needs attention",
+            "at": "Drinking station",
+            "shows": "Open equipment faults (device, description; opens the fault record, where Resolve lives), then the pen note (text, author, time; opens the note)",
+            "states": [
+              {
+                "state": "Nothing open",
+                "when": "No open fault and no note",
+                "shows": "The group is left out"
+              }
+            ]
+          },
+          {
+            "name": "Now",
+            "at": "7.6 kg",
+            "logic": "Feed today is the pen's allowance (or Ad-lib / Station-fed) over its formula; Pigs counts tagged and untagged pigs, with the untagged count or All tagged beneath; Looked is the pen's last observation and is left out when none is recorded."
           }
         ],
         "controls": [],
         "copy": [
-          "Pen information (raw)",
-          "Feed guidance (raw)",
-          "Pen log (raw)"
+          "Pen actions (raw)",
+          "Needs attention (raw)",
+          "Now (raw)",
+          "Feed today (raw)",
+          "Pigs (raw)",
+          "Looked (raw)",
+          "Pen log (raw)",
+          "All activity (raw)"
         ],
         "issues": [
-          "Two doors to the pen's feed with different results: header value opens the editor, this row opens the reading page first.",
-          "The note appears twice on this sheet (card and Edit row) and again in the pen log as \"Pen note added\"."
+          "Count (Set count, pen-ops 2.3) is not a verb Inspection has yet, so it is not a tile.",
+          "Farrowing's pen page (Pen B1) still lists four verb rows; it moves onto this page next."
         ]
       }
     },

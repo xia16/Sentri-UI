@@ -289,3 +289,32 @@ test('farrowing surface policy includes substantial pages but preserves review d
   for (const view of ['history', 'roomOverview', 'roomEndTask', 'roomTaskReceipt', 'roomTaskSows', 'roomPenDetail', 'roomPenFeed', 'roomPenLog', 'marker', 'pigletCare', 'pigletEdit', 'foster', 'pigletDeath', 'countReconcile']) assert.equal(surfaces.isPage('farrowing', view), true, view);
   for (const view of ['count', 'finish', 'locked', 'death', 'edit', 'editFinish', 'deathBreakdown']) assert.equal(surfaces.isPage('farrowing', view), false, view);
 });
+
+// The pen page (owner, 2026-10-19): the pen is a door, not a tick; its verbs are on its page, for that one pen.
+test('the walk has no pen checkbox: a pen header is a door to its page', () => {
+  const c=context('list');
+  const html=model.main(c);
+  assert.doesNotMatch(html,/data-pen-select=/);
+  assert.match(html,/data-action="pen-detail" data-value="C1"/);
+});
+test('the pen page leads with its verbs, then what needs someone, then how the pen is, then its log', () => {
+  const c=context('pen-detail');const pe=c.pens.find(p=>p.id==='C1');
+  pe.note='Close the aisle gate after passing.';pe.noteBy='G. Hansen · today · 06:40';
+  pe.faults=[{id:'f1',name:'Drinking station',description:'Leaking valve at the east end.',open:true}];
+  const html=model.overlay(c);
+  const grid=html.match(/<div class="st-panel st-row-grid[^"]*"[^>]*aria-label="Pen actions"[^>]*>([\s\S]*?)<\/div><\/section>/);
+  assert.ok(grid,'pen verbs as a tile grid');
+  assert.deepEqual([...grid[1].matchAll(/data-action="([^"]+)"/g)].map(m=>m[1]),['pen-note','feed','pen-observe','new-fault','tick-pen']);
+  const order=['Pen actions','Needs attention','>Now<','Pen log'].map(k=>html.indexOf(k));
+  assert.ok(order.every((x,i)=>x>0&&(i===0||x>order[i-1])),'verbs, needs attention, now, log: '+order);
+  assert.match(html,/data-action="fault-record" data-value="C1\|f1"/);
+  assert.match(html,/data-action="read-pen-note"/);
+  pe.note='';pe.faults=[];
+  assert.doesNotMatch(model.overlay(c),/Needs attention/,'nothing open: the group is left out');
+});
+test('Tick all returns to the walk with the pen\'s shown pigs ticked', () => {
+  const c=context('pen-detail');const pe=c.pens.find(p=>p.id==='C1');
+  model.tickPen(c,'C1');
+  assert.equal(c.view,'list');
+  assert.deepEqual([...c.selected].sort(),pe.pigs.map(p=>p.id).sort());
+});
