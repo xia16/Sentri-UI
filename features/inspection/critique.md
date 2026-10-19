@@ -206,3 +206,39 @@ Scope: the walk list, its dock, the Selected review, the Actions page and the pe
 - **Better because** the pen's whole herd is on the walk with its conditions, a pen tick no longer paints a square, and the selection is one number with one place to edit it.
 
 - More actions became a menu drawer with a verb grid (PR #224): see the block at the end of [pig-profile/critique.md](../pig-profile/critique.md); `inspection.actions` and `feed-plan.bulk` are the same renderer.
+
+---
+
+# Pen page (2026-10-19)
+
+Scope: the Inspection pen page (`inspection.pen`) and the walk's pen header. Owner ruling 2026-10-19 (pen is a door; pen actions on one pen's page; no multi-pen actions; Tick all kept). Budget: `budget.md` → Pen page. Base: origin/main b34c75b.
+
+## Keep
+
+- The pen header's door (`C1 · 3 pigs ›`), its note mark and its feed figure, in the same place on the walk.
+- The page header (`Pen C1`, `3 pigs · Unit 7`) and Back.
+- Every pen verb and where it goes: pen note, feed guidance, how the pen looks, the pen log; equipment faults through the fault record (Resolve lives there).
+- The note's text, author and time.
+
+## Problems
+
+- **major** · The pen page shows no state: an open equipment fault, today's feed, the head count and the last observation are each one tap away or missing; the page is a list of verbs under a `Pen information` heading.
+- **major** · Pen and pigs were ticked together: the pen header's checkbox ticked the pen and all its pigs, mixing two subjects in one selection (owner ruling 2026-10-19).
+- **minor** · Every verb row carries a second line that explains it (`Update the note for this pen`, `Transfers, health and notes`) rather than a state.
+- **minor** · Reporting an equipment fault has no entry on the Inspection pen page (Farrowing's pen page has one).
+- **minor** · In Chinese the log filter's `All activity` stays English, on every log that uses it (`inspection.pen-log`, `pig-list.events`, `pig-profile.log`): the registry had no Chinese for it. Shared reach: the one `feed.copy` entry (`全部记录`) translates it on all three.
+- **minor** · The Chinese capture of `inspection.filters` never opened the sheet: its step tapped the English `aria-label` "Filter pigs", which the Chinese page translates. The step now taps the action (`[data-action="filters"]`).
+
+## Parts
+
+| Part | Drawn by today | The component whose job it is | Keep / fix / cut |
+|---|---|---|---|
+| Pen verbs | Row navigation in a group under `Pen information` | Row `tile` in `rowGrid` (the More actions grid) | **fix** |
+| Open faults, the pen note | the note as a record card; faults one tap away | Faults as Row navigation, then the note's record card (its weight kept), under `Needs attention` | **fix** |
+| Feed, pigs, last look | second lines of verb rows, or absent | Facts | **fix** |
+| Pen log | a row in the verb list | Row navigation, alone at the end | keep (a preview of its last entries said the note twice; driver look, 26777d5) |
+| Pen header checkbox on the walk | Row select | — (`Tick all` on the pen page) | **cut** |
+
+Walk (gate): the Assistant's composer and finding answer lost their text on tab switch or Back (also on main; `assistant.conversation` is walked because it shares the prototype's code). They now keep it until sent.
+
+Order (owner, 2026-10-19, confirmed after judge round 1): the pen verbs stay on top; Needs attention follows them. Round 1 (void, calibration miss) asked for Needs attention first; the owner kept actions first.
