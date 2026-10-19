@@ -576,7 +576,7 @@ House reference held against: Inspection's pen page (`inspection.pen`, its sibli
 - Keep: the title and Back as on main; every verb and where it goes (Note → Add / Edit pen note, Feed → Feed guidance, Fault → Report equipment fault, Pen log); faults before the note; a resolved fault leaves the page. The note's text keeps ink weight as a row title, its hand and time under it.
 - Squint test: the three tiles, then `Needs attention` with its rows when something is open, then the two Now figures. The worker's first questions are what can I do here, does anything need me, how is the pen: in that order, which is the owner's order (verbs on top, 2026-10-19).
 - Cluttered, flat or bulky: four rows with explanatory lines became three tiles and two quiet facts; one more card (Now) carries state the page lacked. No bold, no colour added; the amber fault card became an ink row (state is said by the heading).
-- Open point: three verbs draw 2 + 1 (Row tile law: always two rows, row two short by at most one). A one-row rule for 2–3 tiles is a shared change to an approved component, so it is not made here; it is filed as a follow-up.
+- **Known issue, pending an owner ruling:** three verbs draw 2 + 1, which leaves the right half of row two empty. The grid's "at least two rows, split evenly" is the owner's own ruling (2026-10-19, PR #224), so the component stays as it is. Whether 2–3 tiles may sit in one row has gone to the owner; if yes, that change goes in its own PR.
 - **Better because** the pen page now says how the pen is and what needs someone, in the same order as Inspection's pen page, and nothing typed is lost on Back.
 
 **Final look** (the gate's pairs on 81eaf18 against main d006a15, EN 390 / 360, ZH 360; the critique edit after it changes no screen):
