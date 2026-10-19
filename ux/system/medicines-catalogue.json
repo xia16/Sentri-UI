@@ -1,12 +1,12 @@
-{"note": "Starting list of categories and medicines every farm gets, with EN and ZH names (owner, 2026-10-16). To be checked by a vet. Farms add medicines and brands on top; brands are farm data, not part of this list. Vaccines are named by the disease. withdrawal: the default meat withdrawal in days, which a farm can change; these are SAMPLE values, not authoritative, to be verified against the official withdrawal periods (China: MOA Announcement No. 278 and its updates) before release. Vaccines carry none (usually 0 or not applicable).",
+{"note": "Starting list of categories and medicines every farm gets, with EN and ZH names (owner, 2026-10-16). To be checked by a vet. Farms add medicines and brands on top; brands are farm data, not part of this list. Vaccines are named by the disease. withdrawal: the default meat withdrawal in days, which a farm can change; these are SAMPLE values, not authoritative, to be verified against the official withdrawal periods (China: MOA Announcement No. 278 and its updates) before release. Vaccines carry none (usually 0 or not applicable). examples: the line under a category that says what is inside (owner, 2026-10-19).",
  "categories": [
-  {"id": "antibiotics", "en": "Antibiotics", "zh": "抗生素", "short": {"en": "Antibiotics", "zh": "抗生素"}},
-  {"id": "pain", "en": "Pain relief and anti-inflammatory", "zh": "解热镇痛抗炎", "short": {"en": "Pain relief", "zh": "解热镇痛抗炎"}},
-  {"id": "parasites", "en": "Parasite control", "zh": "驱虫", "short": {"en": "Parasite control", "zh": "驱虫"}},
-  {"id": "vaccines", "en": "Vaccines", "zh": "疫苗", "short": {"en": "Vaccines", "zh": "疫苗"}},
-  {"id": "hormones", "en": "Hormones and reproduction", "zh": "生殖激素", "short": {"en": "Hormones", "zh": "生殖激素"}},
-  {"id": "vitamins", "en": "Vitamins, minerals and iron", "zh": "维生素与补铁", "short": {"en": "Vitamins and iron", "zh": "维生素与补铁"}},
-  {"id": "other", "en": "Other", "zh": "其他", "short": {"en": "Other", "zh": "其他"}}
+  {"id": "antibiotics", "en": "Antibiotics", "zh": "抗生素", "short": {"en": "Antibiotics", "zh": "抗生素"}, "examples": {"en": "Amoxicillin, penicillin, tulathromycin", "zh": "阿莫西林、青霉素、泰拉霉素"}},
+  {"id": "pain", "en": "Pain relief and anti-inflammatory", "zh": "解热镇痛抗炎", "short": {"en": "Pain relief", "zh": "解热镇痛抗炎"}, "examples": {"en": "Meloxicam, flunixin, ketoprofen", "zh": "美洛昔康、氟尼辛、酮洛芬"}},
+  {"id": "parasites", "en": "Parasite control", "zh": "驱虫", "short": {"en": "Parasite control", "zh": "驱虫"}, "examples": {"en": "Ivermectin, fenbendazole, toltrazuril", "zh": "伊维菌素、芬苯达唑、托曲珠利"}},
+  {"id": "vaccines", "en": "Vaccines", "zh": "疫苗", "short": {"en": "Vaccines", "zh": "疫苗"}, "examples": {"en": "PRRS, PCV2, swine fever", "zh": "蓝耳病、圆环病毒、猪瘟"}},
+  {"id": "hormones", "en": "Hormones and reproduction", "zh": "生殖激素", "short": {"en": "Hormones", "zh": "生殖激素"}, "examples": {"en": "Oxytocin, altrenogest, PG600", "zh": "缩宫素、烯丙孕素、PG600"}},
+  {"id": "vitamins", "en": "Vitamins, minerals and iron", "zh": "维生素与补铁", "short": {"en": "Vitamins and iron", "zh": "维生素与补铁"}, "examples": {"en": "Iron, vitamin E, selenium", "zh": "补铁、维生素E、硒"}},
+  {"id": "other", "en": "Other", "zh": "其他", "short": {"en": "Other", "zh": "其他"}, "examples": {"en": "Glucose, saline, probiotics", "zh": "葡萄糖、生理盐水、益生菌"}}
  ],
  "medicines": [
   {"id": "amoxicillin", "category": "antibiotics", "en": "Amoxicillin", "zh": "阿莫西林", "withdrawal": 14},

@@ -8,7 +8,7 @@ Every fact the picker, the Brand list, the add levels, the treatment's medicine 
 
 ## The second-line rule
 
-A row's second line (meta) shows only what tells it apart from its siblings (ChoiceList). So: category, medicine, recent and brand rows have none; a search result names its category (search mixes categories, and two results may be told apart only by it). There is no strength field: when strength matters it is in the brand's name ("Amoxinsol 50%"), so it needs no line of its own. Nothing else earns a second line here.
+A row's second line (meta) shows only what tells it apart from its siblings (ChoiceList). So: medicine, recent and brand rows have none; a category row says what is inside (below); a search result names its category (search mixes categories, and two results may be told apart only by it). There is no strength field: when strength matters it is in the brand's name ("Amoxinsol 50%"), so it needs no line of its own. Nothing else earns a second line here.
 
 ## Inventory
 
@@ -41,7 +41,8 @@ At the Medicines page (a supervisor tidying the list): 1. Which medicines does t
 | Recent row: the medicine's name | row | Is it the one I gave lately? | Settled | kept; **no second line** (siblings differ by name) |
 | When / by whom last given | — | — | Audit | **cut** |
 | Group label "Categories" | above the category rows | What are these rows, after the recents? | Settled | only when the recents are there |
-| Category row: its full name | row | Where is it? | Settled | kept; no count, no second line |
+| Category row: its icon tile and full name | row | Where is it? | Settled | kept; no count |
+| Category row: three examples from the starting list ("PRRS, PCV2, swine fever") | second line | Is my bottle in this one? | Settled | **added** (owner, 2026-10-19): the name alone does not say that Draxxin is an antibiotic, that a vaccine is named by its disease, or what "Other" holds |
 | Vaccination: the vaccines (diseases) under the label "Vaccines" | after the recents | Which disease? | Settled | one category left: listed at once, no one-row level |
 
 ### Picker, level 2 (a category)
@@ -112,7 +113,7 @@ At the Medicines page (a supervisor tidying the list): 1. Which medicines does t
 
 | Fact | Where | Question | Decision |
 |---|---|---|---|
-| Title "Medicines"; category rows (name) | page | Which kind? | no counts, no second line |
+| Title "Medicines"; category rows (icon tile, name, examples) | page | Which kind? | no counts; the examples as in the picker |
 | Title: short category name; medicine rows (name) | page | Which medicine? | no second line |
 | Medicine sheet title: its name | sheet header | Is this the one? | read-only for a starting-list medicine |
 | Name (field) | medicine sheet | What do we call what we added? | farm-added medicines only |

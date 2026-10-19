@@ -936,7 +936,7 @@
           {
             "name": "Category rows",
             "at": "Categories",
-            "shows": "The fixed category list, the same on every farm; no second line",
+            "shows": "The fixed category list, the same on every farm: an icon tile, the category, and three examples from the starting list (owner, 2026-10-19, as the conditions first level)",
             "rule": "A tap opens the category as a level; the footer Back comes back here, the ✕ closes the picker."
           }
         ],
