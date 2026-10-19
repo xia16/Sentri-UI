@@ -4,7 +4,7 @@ The actions-page footer keeps Back beside navigation to verb categories. Use She
 
 ## When to use
 
-Use on Inspection and pig-profile action pages; selecting a category scrolls to its section in the current page.
+Use on an actions page with several categories; selecting a category scrolls to its section in the current page. Since 2026-10-19 More actions (Inspection, pig profile, the Farrowing sow embed) is a menu drawer whose everyday verbs are one grid, so it needs no category tabs and this footer has no live caller; it stays until the other action surfaces have moved onto the drawer, then retires.
 
 ## When not to use
 

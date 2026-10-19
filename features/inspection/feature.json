@@ -854,8 +854,31 @@
       "preset": "selected",
       "figma": "",
       "notes": {
-        "purpose": "One action sheet for the ticked pigs or pens. Here two pigs are selected.",
+        "purpose": "One menu drawer of actions for the ticked pigs or pens: the everyday verbs as a grid of icon tiles, over the list it acts on. Here two pigs are selected.",
         "elements": [
+          {
+            "name": "Verb grid",
+            "at": "Condition",
+            "shows": "Health then Routine verbs as one card of icon tiles, one word each (Condition, Treat, Edit, Resolve, Care, Note, Move, Measure, Feed)",
+            "states": [
+              {
+                "state": "Two rows",
+                "when": "Two or more verbs",
+                "shows": "Always two rows, split evenly: 5 = 3+2, 6 = 3+3, 8 = 4+4, 10 = 5+5"
+              },
+              {
+                "state": "More",
+                "when": "More than ten verbs",
+                "shows": "Nine verbs and a More tile, which opens the rest in place"
+              },
+              {
+                "state": "Death",
+                "when": "Record sow death is offered",
+                "shows": "The last tile, in red ink"
+              }
+            ],
+            "rule": "Each tile keeps the full action name as its accessible name; the word under the icon is the short verb."
+          },
           {
             "name": "Action row availability",
             "shows": "Rows in Health and General groups",
