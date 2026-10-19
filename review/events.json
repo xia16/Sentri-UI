@@ -1,20 +1,5 @@
 [
  {
-  "id": "events-2",
-  "target": { "kind": "feature", "id": "disease" },
-  "kind": "decision",
-  "severity": "high",
-  "title": "Disease vs health-record",
-  "detail": "Add condition and Resolve in the event deck and the Health record built in Inspection both cover recording and closing a condition. They differ: the deck has one Conditions field with triage inline (Monitor preset), Recover and Strike verbs with silent prints, and no care instructions; the Health record has care levels (No action needed, Monitor, Treat in place, Move to hospital pen) as the editable state, per-pig change preview, and Recovered or Entered in error that keep the case in history. Both are in-design and cannot both be the feature.",
-  "options": [
-    "The Health record is the one design; the deck's Add and Resolve become its history only",
-    "The deck is the design and the Health record is rebuilt to it",
-    "Merge: the deck's verdict page and silent prints with the Health record's care levels"
-  ],
-  "recommendation": "Decide with the vet which of the two models of recovery (closed line vanishes vs kept in history) is right, then keep one.",
-  "source": "populate-events"
- },
- {
   "id": "events-3",
   "target": { "kind": "feature", "id": "triage" },
   "kind": "decision",
