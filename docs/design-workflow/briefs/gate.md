@@ -13,7 +13,7 @@ The driver fills in:
 - **REFERENCES**: the builder's references table and baselines (build brief §1).
 - **OUT**: the gate run's folder: `mechanical.json`, `results.md`, `pairs/`. Your `verdict.json` goes beside them.
 
-For the walk (§2), check out CANDIDATE and BASE in two worktrees and serve each with `node scripts/serve-ux.cjs <port>`. Every result you record names the commit it ran on. Evidence from any other commit doesn't count, including the builder's own runs.
+For the walk (§2), check out CANDIDATE and BASE in two worktrees and serve each with `node scripts/serve-ux.cjs <port>`. Playwright comes from `SENTRI_PLAYWRIGHT` (the main checkout's `node_modules/playwright`): never link `node_modules` into a worktree. Remove them with `node scripts/worktree-remove.mjs <dir>`, never `git worktree remove`, which deletes through a junction on Windows. Every result you record names the commit it ran on. Evidence from any other commit doesn't count, including the builder's own runs.
 
 **The machine has already run.** `node scripts/gate.mjs` ran every mechanical check on the exact candidate ([gate-machine.md](../gate-machine.md)) and you judge only a mechanical pass. Don't run its checks again (`npm test`, `check-*`, `run-scenarios`, `check-states`) and start no browser run beyond your walk: a gate may be running on the machine. What it leaves you:
 - `pairs/<screen>/<lang>-<width>.png` (base | candidate) for every changed, new or removed screen, at EN 390, EN 360 and ZH 360 (a component page at EN 390 and 360). A missing side reads "not on this side"; a ZH image marked NO CHINESE is a page that ignores `?lang=zh`.

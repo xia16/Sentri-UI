@@ -81,7 +81,7 @@ export function coverageLost(base, cand) {
 // The gate's own tools and the workflow's text. A design PR that also changes these grades itself with tools it rewrote;
 // the README rule: change the workflow in its own pull request, never inside a design PR.
 const TOOLS = [
-  /^scripts\/(gate|process-start|evaluate|evidence|scheduler|visit|settle|machine|png|github|static-reach|bundle-graph|scenario-runner|atlas-screens|shoot-screens|loop-rules|polish-loop|check-states|check-legibility|check-headers|run-scenarios|serve-ux|build-atlas)\.(mjs|cjs)$/,
+  /^scripts\/(gate|process-start|evaluate|evidence|scheduler|visit|settle|machine|png|github|static-reach|bundle-graph|scenario-runner|atlas-screens|shoot-screens|loop-rules|polish-loop|check-states|check-legibility|check-headers|run-scenarios|serve-ux|build-atlas|worktree-remove|merge-guard)\.(mjs|cjs)$/,
   /^scripts\/vendor\//,
   /^scripts\/check-(states|legibility|headers)\.fixtures\//,
   /^docs\/design-workflow\//,

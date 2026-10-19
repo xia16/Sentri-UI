@@ -13,6 +13,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { pwPath, playwright } from './playwright-path.mjs';
+import { removeWorktree } from './worktree-remove.mjs';
 import { CLASSES, classOfFiles, DS_FEATURE, componentPage, componentPagesOf, componentsTouched, idPath, screensOf, pageOf, pageAssets, sharedFiles, coverageLost, effectiveClass, classifyScreens, touchesSystem, touchesTools, budgetProblems, critiqueProblems, pageStyling, addedLines, scenarioDebt, isMotionFile, unheldMotion, heldOf, confirmLeaf, reusableLeaf } from './loop-rules.mjs';
 // The analyser (gate-v2 §2): static and conservative, over both revisions. It says what each screen's and each leaf's evidence
 // depends on; the reach is every screen and leaf whose evidence identity that makes differs between the two (gate-simplify.md X1).
@@ -88,7 +89,7 @@ export async function evaluate(opts) {
   const wtRoot = path.join(os.tmpdir(), `sg-${process.pid.toString(36)}${Date.now().toString(36).slice(-4)}`);
   const S = { base: { sha: mech.base, dir: path.join(wtRoot, 'base') }, cand: { sha: mech.candidate, dir: path.join(wtRoot, 'cand') } };
   mech.worktrees = { base: S.base.dir, cand: S.cand.dir };
-  cleanups.push(() => { if (keep) return; for (const k of ['base', 'cand']) git(['worktree', 'remove', '--force', S[k].dir], root); git(['worktree', 'prune'], root); try { fs.rmSync(wtRoot, { recursive: true, force: true, maxRetries: 5 }); } catch {} });
+  cleanups.push(() => { if (keep) return; for (const k of ['base', 'cand']) removeWorktree(S[k].dir, { cwd: root }); try { fs.rmSync(wtRoot, { recursive: true, force: true, maxRetries: 5 }); } catch {} });
   for (const k of ['base', 'cand']) {
     const r = git(['worktree', 'add', '--detach', S[k].dir, S[k].sha], root);
     if (r.code || !fs.existsSync(path.join(S[k].dir, 'scripts/serve-ux.cjs'))) { block(`worktree ${k}: ${r.err.split('\n').filter((l) => /error|fatal/.test(l)).slice(0, 2).join(' | ')}`); return finish(); }
