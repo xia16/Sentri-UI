@@ -682,7 +682,7 @@ export interface SentriUI {
   chooserList(content: string, options?: { tone?: 'flat' | 'inset'; className?: string; ds?: string }): string;
   choiceRow(props: ChoiceRowProps): string;
   /** radio (candidate): the panel is a radiogroup labelled by the heading. */
-  choiceGroup(rows: string | string[], options?: { title?: string; lead?: string; className?: string; radio?: boolean; /** Raw HTML at the heading's right end (a radio field's Clear). */ aside?: string; id?: string; strs?: Strs<'title'>; args?: StrArgs<'title'> }): string;
+  choiceGroup(rows: string | string[], options?: { title?: string; /** A registry glyph before the title (clock, grid, tag, health). */ icon?: string; lead?: string; className?: string; radio?: boolean; /** Raw HTML at the heading's right end (a radio field's Clear). */ aside?: string; id?: string; strs?: Strs<'title'>; args?: StrArgs<'title'> }): string;
   /** While value is set, a Clear text action empties the field and fires `input`. args fill the strs ({ level } for ds.picker.search_in). */
   choiceSearch(props?: { label?: string; placeholder?: string; value?: string; attrs?: SafeAttrs; strs?: Strs<'label' | 'placeholder'>; args?: Record<string, unknown> }): string;
   toast(title: string, options?: { detail?: string; tone?: 'done' | 'offline'; strs?: Strs<'title' | 'detail'>; args?: StrArgs<'title' | 'detail'> }): string;
@@ -790,7 +790,8 @@ export type IconName =
   | 'alert' | 'signal' | 'battery' | 'filter' | 'minus' | 'plus' | 'record' | 'camera' | 'edit' | 'wrench'
   | 'details' | 'calendar' | 'bookmark' | 'transfer' | 'down' | 'arrow' | 'place' | 'home' | 'toolbox' | 'spark'
   | 'heat' | 'pregnancy' | 'farrow' | 'barn' | 'return' | 'send' | 'health' | 'temperature' | 'humidity' | 'air'
-  | 'upload' | 'offline' | 'backspace' | 'arrow-down';
+  | 'upload' | 'offline' | 'backspace' | 'arrow-down'
+  | 'tag-off' | 'pig' | 'lungs' | 'head' | 'skin' | 'leg' | 'tail' | 'gut' | 'repro' | 'drop' | 'bone';
 
 declare global {
   interface Window { SentriUI: SentriUI; SentriIcons: SentriIcons }

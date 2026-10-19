@@ -250,12 +250,12 @@
       "id": "feed-plan.bulk",
       "name": "Actions for several pens",
       "zh": "多栏位操作",
-      "status": "in-design",
+      "status": "earlier",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
       "preset": "feed-bulk",
       "figma": "",
       "notes": {
-        "purpose": "All three pens are ticked: the Actions sheet opens on its Pens tab, whose only rows are Pen note and Feed.",
+        "purpose": "Earlier design (owner, 2026-10-18: Actions holds pig actions only; a pen's note and feed live on its pen page, through the header's ›). All three pens are ticked: the Actions sheet opens on its Pens tab, whose only rows are Pen note and Feed.",
         "elements": [
           {
             "name": "Pens tab",

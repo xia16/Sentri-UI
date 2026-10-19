@@ -12613,12 +12613,12 @@
          "id": "feed-plan.bulk",
          "name": "Actions for several pens",
          "zh": "多栏位操作",
-         "status": "in-design",
+         "status": "earlier",
          "url": "/ux/system/inspection-astra-concept.html?layout=focus",
          "preset": "feed-bulk",
          "figma": "",
          "notes": {
-          "purpose": "All three pens are ticked: the Actions sheet opens on its Pens tab, whose only rows are Pen note and Feed.",
+          "purpose": "Earlier design (owner, 2026-10-18: Actions holds pig actions only; a pen's note and feed live on its pen page, through the header's ›). All three pens are ticked: the Actions sheet opens on its Pens tab, whose only rows are Pen note and Feed.",
           "elements": [
            {
             "name": "Pens tab",
@@ -13352,7 +13352,7 @@
               "shows": "Strip \"Feeder low · 06:40\" under the header"
              }
             ],
-            "logic": "Pig count is ALL pigs in the pen, not only those the filter shows. Ticking the pen selects it AND every pig it shows under the current filters; the checkbox is indeterminate when only some are ticked.",
+            "logic": "Pig count is ALL pigs in the pen, its pigs without ear tags included. Ticking the pen ticks every pig it shows under the current filters and its group row; the header keeps its colour, only its checkbox ticks (owner, 2026-10-18). The checkbox is indeterminate when only some are ticked. Tagged pigs are listed by ID number; the group row (struck-tag icon, \"14 pigs\", its conditions on one line, a count field) is always last.",
             "source": "penFeedEntry() · allocation(pe) · pe.switchDue · c.selectedPens",
             "at": "7.6 kg"
            },
@@ -13375,7 +13375,7 @@
              {
               "state": "Selection",
               "when": "One or more ticked",
-              "shows": "\"2 pens · 3 pigs selected\" (opens the review, which has Clear), More actions; unticking the last one in the review ends selection"
+              "shows": "\"16 pigs selected ›\" (one total, untagged pigs counted) opens the Selected page (Pens, Pigs, Without ear tags, Clear selection); Actions (pencil icon) opens the Actions page: pig actions only, no Pigs / Pens switch. Unticking the last one on the Selected page ends selection."
              }
             ],
             "logic": "Scan has no camera in the prototype; Search finds by ear tag or pen.",
@@ -13650,7 +13650,7 @@
            "Undo close (raw)"
           ],
           "edge": [
-           "A pen note can also be written for several pens at once from the Actions sheet (Pens tab)."
+           "A pen note is written from its pen page only: Actions holds pig actions (owner, 2026-10-18). The pen page also has How the pen looks (a pen observation)."
           ],
           "issues": [
            "Close note and Edit note overlap (edit replaces, close archives); two notes cannot coexist.",
@@ -17094,44 +17094,11 @@
          ],
          "figma": "",
          "notes": {
-          "purpose": "Add one or more diseases or symptoms to one pig or many in one move.",
+          "purpose": "Add one or more diseases or symptoms to the pigs chosen on the walk list, in one move. The selection is made first and is fixed here: Record health is a page of fields like Record treatment, with no pig list (owner, 2026-10-17).",
           "states": [
-           "Details held on the bottom edge above the footer; with many pigs the list scrolls under them. The Details heading folds them away and, folded, reads one line of what is set (the condition and care, or the medicine and method)."
+           "One pig or many, the same page: Conditions, Care, Note (optional) and Save · N. To change who, go Back and use the Selected page."
           ],
           "elements": [
-           {
-            "name": "Pig row",
-            "shows": "Only the exceptions: Already recorded · unchanged, Excluded, Not eligible",
-            "states": [
-             {
-              "state": "Will change",
-              "when": "Condition not yet on the pig",
-              "shows": "Nothing: the commit carries the count"
-             },
-             {
-              "state": "Already recorded",
-              "when": "She already has all chosen conditions",
-              "shows": "\"Already recorded · unchanged\""
-             },
-             {
-              "state": "Nothing chosen",
-              "when": "No conditions chosen",
-              "shows": "Nothing"
-             },
-             {
-              "state": "Excluded",
-              "when": "Checkbox unticked",
-              "shows": "\"Excluded\""
-             },
-             {
-              "state": "Not eligible",
-              "when": "Dead sow",
-              "shows": "\"Not eligible\""
-             }
-            ],
-            "logic": "One pig shows only the Details panel, several show the list. Dead sows are not eligible.",
-            "at": "C1 · Gestation · 42 days"
-           },
            {
             "name": "Care default",
             "shows": "Care · No action needed",
@@ -17142,7 +17109,7 @@
            {
             "name": "Save",
             "shows": "Save · N pigs",
-            "rule": "Waits until a condition is chosen and at least one row would change; N = pigs that would change (the ticked pigs while it waits). No line is drawn above it: a tap while it waits marks Conditions \"Required\" and scrolls to it. Writes one finding per pig and name, day 1, recorded 12 Sep 2026 by G. Hansen, plus one \"Health recorded\" log entry. A condition the pig already has is skipped and keeps its original start date. Returns to the walk list.",
+            "rule": "Waits until a condition is chosen. N counts the tagged pigs and the pigs without ear tags chosen on their group rows (2 tagged + 3 of 14 = Save · 5 pigs). A tap while it waits marks Conditions \"Required\". Writes one finding per tagged pig and name, and the count on each group row; a condition a pig already has is skipped and keeps its start date. Returns to the walk list; several pigs confirm with a toast (\"Condition recorded · 5 pigs\"), one pig with its new tag on the row.",
             "at": "Save"
            }
           ],
@@ -17177,35 +17144,35 @@
          ],
          "figma": "",
          "notes": {
-          "purpose": "Search or browse the disease and symptom catalogue and tick one or more.",
+          "purpose": "Search or browse one conditions catalogue and tick one or more: symptoms by where you look, diseases by body system (features/conditions).",
           "elements": [
            {
             "name": "Catalogue",
-            "shows": "Conditions › Diseases or Symptoms › category › items, one level at a time",
+            "shows": "Search; On these pigs; Recent; Symptoms (six areas); Diseases (six body systems), each area a row with an icon and a line of examples",
             "states": [
              {
-              "state": "Conditions (root)",
+              "state": "First level",
               "when": "Opened",
-              "shows": "Diseases and Symptoms, each with \"N selected\" once something below is ticked"
+              "shows": "Symptoms: Whole animal, Breathing, Head, Skin, Legs and feet, Rear and belly. Diseases: Respiratory, Gut, Reproductive, Udder, Joints skin and nerves, Whole body. Each row: icon tile, name, examples (\"Coughing, breathing hard, sneezing\"), or \"1 selected\" once something inside is ticked."
              },
              {
               "state": "A level",
-              "when": "A branch tapped",
-              "shows": "The level as the title (Diseases; Respiratory diseases), the ✕ at the top left (closes the whole picker, keeps the ticks), the footer Back goes up one level (at Conditions it leaves); no \"‹ Parent\", no breadcrumb (owner ruling B, 2026-10-16)"
+              "when": "A row tapped",
+              "shows": "The area as the title; ✕ closes the picker and keeps the ticks; the footer Back goes up one level (owner ruling B, 2026-10-16). A symptom with types (Diarrhoea, Lame, Off feed, Nasal discharge…) opens its types plus \"Not sure which\"."
              },
              {
               "state": "Search",
               "when": "Text typed",
-              "shows": "Searches the whole catalogue from any level (\"Search all options\"); matches name and aliases (PRRS, pig flu); every result names its category (Coughing · Respiratory system); Clear empties it; \"Add “name”\" only when nothing matches"
+              "shows": "Searches the whole catalogue (names and other names); every result names its area; with no match, one card: Add \"…\""
              },
              {
-              "state": "Custom item",
-              "when": "Added by typing",
-              "shows": "Asks for a category; removable with an x; kept for the session"
+              "state": "Add a condition",
+              "when": "Add \"…\" tapped",
+              "shows": "Name (pre-filled) and Category (one pick: a symptom area or a disease system, so the kind is chosen with it); Back, Add. Adding lists it for the farm and ticks it. Anyone may add a symptom or a disease."
              }
             ],
-            "logic": "Item row shows how many selected pigs already carry it (\"Already on 1 selected\"). The drawer keeps one height from open to close (its tallest level, up to the cap).",
-            "at": "General appearance"
+            "logic": "A reportable disease (ASF, FMD, CSF, PRRS, PED) stays in its system, marked \"Reportable\"; there is no separate Report a disease. Deaths, abortions and pen-wide observations are not conditions. The drawer keeps one height from open to close.",
+            "at": "Breathing"
            },
            {
             "name": "Done",
@@ -17217,13 +17184,15 @@
           "controls": [],
           "copy": [
            "Conditions (raw)",
-           "Diseases (raw)",
            "Symptoms (raw)",
-           "Search in {level} (raw)",
+           "Diseases (raw)",
+           "Search all options (raw)",
+           "Add “{name}” (raw)",
+           "Add a condition (raw)",
            "Done · N (raw)"
           ],
           "edge": [
-           "The disease and symptom hierarchy was translated from the Figma file."
+           "The catalogue is ux/system/conditions-catalogue.js: one list, three kinds (symptom, event, disease), English and Chinese."
           ],
           "rules": [
            "Diseases and symptoms are one catalogue and one picker."
@@ -17498,7 +17467,7 @@
          }
         }
        ],
-       "prd": "# Health record 健康管理\n\n## Problem\n\nThe worker records a disease or symptom on one or many pigs, says what to do about it (care), and later closes the record as recovered or entered in error. The old Figma draws health three times: in Inspection (add and remove disease or symptom), in the pig list (health management) and in the 健康与治疗 treatment file. The Inspection prototype is the one built version. Giving the pig something for it is Treatment (`features/treat`), reached from the finding's Record treatment.\n\n## Who\n\nThe worker on the walk who finds a sick pig. A supervisor reads the care levels on the list.\n\n## Anchor\n\nAnchor: the Finding (one condition on one pig).\n\n- Needs attention: care is Monitor, Treat in place or Move to hospital pen. Shown as a row on top of the pig record, with the care level and the day.\n- Ongoing, no action needed: recorded and visible as a tag until it is resolved.\n- Closed: Recovered, or Entered in error. The case leaves the active list and stays in the pig's log.\n\nRecording, editing and the pickers can happen in any status; so can Record treatment, which opens Treatment.\n\n## Rules\n\n- Diseases and symptoms are one searchable catalogue (9 disease categories; symptoms by body area and body system), for one pig or many. A name that is not in the catalogue can be added as a custom item under a chosen category.\n- Care is the only editable condition state: No action needed, Monitor, Treat in place, Move to hospital pen. Attention is derived: every choice except No action needed needs attention.\n- Existing findings keep their original start date; adding a condition a pig already has changes nothing.\n- Bulk edits preview each pig's change, let a pig be excluded, leave pigs without the condition unchanged, and save only changed rows.\n- Record treatment on the finding opens Treatment's form with the condition fixed (`features/treat`); Save returns to the finding, which shows the record.\n- A blocked action is listed with the reason, never dropped.\n- Recovery keeps the case in history; entered in error marks a correction. Recovering a finding linked to a feed adjustment ends that adjustment.\n- Hospital pen is a care choice only; no move is made.\n\n## Scope\n\nIn: the pig record as a health view (needs attention, ongoing, several ongoing, care levels), the finding and its edit and resolve forms, Record health with its catalogue picker, Care instructions and Edit conditions, Resolve conditions. The condition chooser inside Record treatment is this feature's picker.\n\nOut: sow death and mortality reports (separate features), the pig record itself (pig-profile), feed changes (feed-plan), treatment and the medicine list (treat), vaccination (a task). Health tags on the walk row belong to inspection.\n\n## Decisions\n\n- Care replaced the older triage and status fields; one select drives both.\n- 2026-10-19 (owner): Record treatment, its pickers and its save moved to Treatment (`features/treat`), which is ad hoc treatment only; vaccination is a task.\n\nOpen (recorded on the screens as issues):\n\n- The default Care is No action needed, so the shortest path records a fever as a non-alert.\n- Two rows (Edit conditions and Care instructions) open the same form; Edit finding and Resolve or remove touch the same record for one pig; naming differs between Resolve conditions and Resolve or remove.\n- Duration is \"Day 2\" for attention and \"120 days\" for ongoing; the day count never advances in the prototype.\n- \"Recorded — · —\" shows empty dashes for unknown date and author.\n- The catalogue starts on Symptoms and needs three taps to reach an item; there is no recent or common list.\n",
+       "prd": "# Health record 健康管理\n\n## Problem\n\nThe worker records a disease or symptom on one or many pigs, says what to do about it (care), and later closes the record as recovered or entered in error. The old Figma draws health three times: in Inspection (add and remove disease or symptom), in the pig list (health management) and in the 健康与治疗 treatment file. The Inspection prototype is the one built version. Giving the pig something for it is Treatment (`features/treat`), reached from the finding's Record treatment.\n\n## Who\n\nThe worker on the walk who finds a sick pig. A supervisor reads the care levels on the list.\n\n## Anchor\n\nAnchor: the Finding (one condition on one pig).\n\n- Needs attention: care is Monitor, Treat in place or Move to hospital pen. Shown as a row on top of the pig record, with the care level and the day.\n- Ongoing, no action needed: recorded and visible as a tag until it is resolved.\n- Closed: Recovered, or Entered in error. The case leaves the active list and stays in the pig's log.\n\nRecording, editing and the pickers can happen in any status; so can Record treatment, which opens Treatment.\n\n## Rules\n\n- Diseases and symptoms are one searchable catalogue (9 disease categories; symptoms by body area and body system), for one pig or many. A name that is not in the catalogue can be added as a custom item under a chosen category.\n- Care is the only editable condition state: No action needed, Monitor, Treat in place, Move to hospital pen. Attention is derived: every choice except No action needed needs attention.\n- Existing findings keep their original start date; adding a condition a pig already has changes nothing.\n- Bulk edits preview each pig's change, let a pig be excluded, leave pigs without the condition unchanged, and save only changed rows.\n- Record treatment on the finding opens Treatment's form with the condition fixed (`features/treat`); Save returns to the finding, which shows the record.\n- A blocked action is listed with the reason, never dropped.\n- Recovery keeps the case in history; entered in error marks a correction. Recovering a finding linked to a feed adjustment ends that adjustment.\n- Hospital pen is a care choice only; no move is made.\n\n## Scope\n\nIn: the pig record as a health view (needs attention, ongoing, several ongoing, care levels), the finding and its edit and resolve forms, Record health with its catalogue picker, Care instructions and Edit conditions, Resolve conditions. The condition chooser inside Record treatment is this feature's picker.\n\nOut: sow death and mortality reports (separate features), the pig record itself (pig-profile), feed changes (feed-plan), treatment and the medicine list (treat), vaccination (a task). Health tags on the walk row belong to inspection.\n\n## Decisions\n\n- Care replaced the older triage and status fields; one select drives both.\n- 2026-10-19 (owner): Record treatment, its pickers and its save moved to Treatment (`features/treat`), which is ad hoc treatment only; vaccination is a task.\n- 2026-10-17 to 10-19 (owner): the selection is made on the walk list and is fixed when recording, so Record health is a page of fields (Conditions, Care, Note, Save · N) with no pig list; the condition picker uses one catalogue (symptoms by where you look, diseases by body system, Add condition as Add medicine). The model and its reasons are in [Conditions](../conditions/PRD.md).\n\nOpen (recorded on the screens as issues):\n\n- The default Care is No action needed, so the shortest path records a fever as a non-alert.\n- Two rows (Edit conditions and Care instructions) open the same form; Edit finding and Resolve or remove touch the same record for one pig; naming differs between Resolve conditions and Resolve or remove.\n- Duration is \"Day 2\" for attention and \"120 days\" for ongoing; the day count never advances in the prototype.\n- \"Recorded — · —\" shows empty dashes for unknown date and author.\n- The catalogue starts on Symptoms and needs three taps to reach an item; there is no recent or common list.\n",
        "scenarios": {
         "treeDoc": false,
         "tree": null,

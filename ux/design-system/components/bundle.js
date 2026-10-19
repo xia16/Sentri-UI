@@ -40,7 +40,7 @@
     wrench:'M14 3a6 6 0 0 0-7 8L2 16a3 3 0 0 0 4 4l5-5a6 6 0 0 0 8-7l-4 4-3-3 4-4z',
     details:'M4 6h16M4 12h16M4 18h16M8 3v6M16 9v6M10 15v6',
     calendar:'M4 5h16v16H4zM8 3v4M16 3v4M4 10h16',
-    bookmark:'M6 3h12v18l-6-4-6 4z',tag:'M3.5 4.5v6.3a1 1 0 0 0 .3.7l8.7 8.7a1.5 1.5 0 0 0 2.1 0l5.6-5.6a1.5 1.5 0 0 0 0-2.1L11.5 3.8a1 1 0 0 0-.7-.3H4.5a1 1 0 0 0-1 1zM8 8h.01',
+    bookmark:'M6 3h12v18l-6-4-6 4z',tag:'M3.5 4.5v6.3a1 1 0 0 0 .3.7l8.7 8.7a1.5 1.5 0 0 0 2.1 0l5.6-5.6a1.5 1.5 0 0 0 0-2.1L11.5 3.8a1 1 0 0 0-.7-.3H4.5a1 1 0 0 0-1 1zM8 8h.01','tag-off':'M3.5 4.5v6.3a1 1 0 0 0 .3.7l8.7 8.7a1.5 1.5 0 0 0 2.1 0l5.6-5.6a1.5 1.5 0 0 0 0-2.1L11.5 3.8a1 1 0 0 0-.7-.3H4.5a1 1 0 0 0-1 1zM3 3l18 18',pig:'M5 12.5a5 4.5 0 0 1 5-4.5h5a4.5 4.5 0 0 1 4.3 3.2H21v3.3h-1.7a4.5 4.5 0 0 1-2.3 2.3V19h-2.2v-2h-5.6v2H7v-2.4a4.5 4.5 0 0 1-2-4.1zM16.5 10.6h.01M5 12.5H3.5',lungs:'M12 4v7.5M12 11.5l-2.5 2M12 11.5l2.5 2M9.5 7.5C6.6 7.5 4.5 11.4 4.5 15.4c0 2.2 1 3.6 2.8 3.6 1.6 0 2.7-1 2.7-2.8V10M14.5 7.5c2.9 0 5 3.9 5 7.9 0 2.2-1 3.6-2.8 3.6-1.6 0-2.7-1-2.7-2.8V10',head:'M7.5 8.5 5.5 4l4.3 2.4M16.5 8.5 18.5 4l-4.3 2.4M6 13.5a6 6 0 1 0 12 0 6 6 0 1 0-12 0M9.8 15.2h4.4a1 1 0 0 1 1 1v.6a1 1 0 0 1-1 1H9.8a1 1 0 0 1-1-1v-.6a1 1 0 0 1 1-1zM10 11.5h.01M14 11.5h.01',skin:'M4 8.5c2.7-1.8 5.3 1.8 8 0s5.3-1.8 8 0M4 13c2.7-1.8 5.3 1.8 8 0s5.3-1.8 8 0M4 17.5c2.7-1.8 5.3 1.8 8 0s5.3-1.8 8 0',leg:'M10 3.5v10.5l-2.2 5.5h3.4l.8-2.6.8 2.6h3.4L14 14V3.5',tail:'M4.5 12.5h6.5c2.2 0 4 1.6 4 3.6 0 1.5-1.1 2.6-2.4 2.6-1.1 0-1.9-.8-1.9-1.8 0-1.6 1.6-2.5 3.3-2.5 2.6 0 4.5 1.9 4.5 4.1M4.5 8.5h11',gut:'M8 4.5h8a2.8 2.8 0 0 1 0 5.6H8a2.8 2.8 0 0 0 0 5.6h8a2.8 2.8 0 0 1 0 5.6',repro:'M12 4a4.8 4.8 0 1 0 0 9.6A4.8 4.8 0 1 0 12 4M12 13.6V21M8.8 17.6h6.4',drop:'M12 3.5c3 4 6 7 6 10.8a6 6 0 0 1-12 0C6 10.5 9 7.5 12 3.5z',bone:'M9.2 9.2l5.6 5.6M8 10.4a2.3 2.3 0 1 1-2.4-3.9 2.3 2.3 0 1 1 3.9-2.4M16 13.6a2.3 2.3 0 1 1 2.4 3.9 2.3 2.3 0 1 1-3.9 2.4',
     transfer:'M7 7h11l-3-3M18 7l-3 3M17 17H6l3-3M6 17l3 3',
     down:'m6 9 6 6 6-6',
     'arrow-down':'M12 5v14M6 13l6 6 6-6',
@@ -377,11 +377,11 @@
   }
   // lead: optional control between heading and panel (e.g. a segment that filters only this group).
   // radio (candidate, ADR 0002): the panel is the radiogroup, labelled by the heading.
-  function choiceGroup(rows,{title='',lead='',className='',radio=false,aside='',id='',strs,args}={}){
+  function choiceGroup(rows,{title='',lead='',className='',radio=false,aside='',id='',icon='',strs,args}={}){
     const body=Array.isArray(rows)?rows.join(''):rows;
     const showTitle=title||has({strs},'title');
     const hid=radio&&showTitle?(id||fieldId('st-choice'))+'-title':'';
-    return `<section class="st-choice-group ${esc(className)}" data-ds="ChoiceList"${title?` aria-label="${esc(title)}"`:''}>${showTitle?(aside?`<div class="st-choice-heading-row"><h5 class="st-choice-heading"${hid?` id="${esc(hid)}"`:''}>${tx(title,{strs,args},'title')}</h5>${aside}</div>`:`<h5 class="st-choice-heading"${hid?` id="${esc(hid)}"`:''}>${tx(title,{strs,args},'title')}</h5>`):''}${lead?`<div class="st-choice-lead">${lead}</div>`:''}<div class="st-panel st-choice-panel"${radio?` role="radiogroup"${hid?` aria-labelledby="${esc(hid)}"`:''}`:''}>${body}</div></section>`;
+    return `<section class="st-choice-group ${esc(className)}" data-ds="ChoiceList"${title?` aria-label="${esc(title)}"`:''}>${showTitle?(aside?`<div class="st-choice-heading-row"><h5 class="st-choice-heading"${hid?` id="${esc(hid)}"`:''}>${icon?glyph(icon):''}${tx(title,{strs,args},'title')}</h5>${aside}</div>`:`<h5 class="st-choice-heading"${hid?` id="${esc(hid)}"`:''}>${icon?glyph(icon):''}${tx(title,{strs,args},'title')}</h5>`):''}${lead?`<div class="st-choice-lead">${lead}</div>`:''}<div class="st-panel st-choice-panel"${radio?` role="radiogroup"${hid?` aria-labelledby="${esc(hid)}"`:''}`:''}>${body}</div></section>`;
   }
   /* Search: the browser's cancel glyph is hidden; while there is text, a Clear text action empties it and fires `input`, so
      the host's own input handler refreshes the list. */

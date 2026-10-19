@@ -1180,3 +1180,8 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 /* The header owns the 24px under it: the body's first element brings no top margin of its own (a field's, a note's, a banner's).
    Last in the file, so a part's own margin rule of the same weight does not win here. */
 .sheet>.sheet-body>:first-child,.sheet>.sheet-body>:first-child>:first-child{margin-top:0}
+
+/* ChoiceList: a group heading may lead with an icon (2026-10-17), as Heading's section titles do. */
+/* With an icon, the heading starts at the card edge, as Heading's section titles do on the Actions page. */
+.st-choice-heading.st-choice-heading:has(> svg) { display: flex; align-items: center; gap: 6px; padding-left: 0; }
+.st-choice-heading > svg { width: 16px; height: 16px; flex: none; }

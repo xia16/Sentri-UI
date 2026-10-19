@@ -24,7 +24,7 @@ function checkPage(html) {
 for (const view of ['pig', 'pig-profile', 'pig-production', 'pig-origin', 'pig-log', 'pig-feed', 'pig-feed-curve', 'pig-feed-changes', 'history', 'pen-detail', 'pen-log', 'feed', 'unit-detail', 'environment', 'equipment', 'batch-detail']) {
   test(`${view} renders as a page with one navigation exit`, () => checkPage(model.overlay(context(view))));
 }
-for (const view of ['body', 'note', 'weight', 'temperature', 'backfat', 'health']) {
+for (const view of ['body', 'note', 'weight', 'temperature', 'backfat']) {
   test(`single-pig ${view} keeps a drawer and bottom Back`, () => {
     const c = context('pig'); c.selected.add(c.pigId); model.openBulkAction(c, view);
     const html = model.overlay(c);
@@ -33,6 +33,10 @@ for (const view of ['body', 'note', 'weight', 'temperature', 'backfat', 'health'
     assert.match(html, /class="sheet-footer"/);
   });
 }
+test('Record health is a full page like Record treatment (owner, 2026-10-17)', () => {
+  const c = context('pig'); c.selected.add(c.pigId); model.openBulkAction(c, 'health');
+  checkPage(model.overlay(c)); assert.match(model.overlay(c), /data-action="bulk-save"/);
+});
 test('treatment and transfer use full pages with completion controls', () => {
   const c = context('pig'); c.selected.add(c.pigId); model.openBulkAction(c, 'treatment');
   checkPage(model.overlay(c)); assert.match(model.overlay(c), /data-action="bulk-save"/);

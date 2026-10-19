@@ -341,7 +341,7 @@
                 "shows": "Strip \"Feeder low · 06:40\" under the header"
               }
             ],
-            "logic": "Pig count is ALL pigs in the pen, not only those the filter shows. Ticking the pen selects it AND every pig it shows under the current filters; the checkbox is indeterminate when only some are ticked.",
+            "logic": "Pig count is ALL pigs in the pen, its pigs without ear tags included. Ticking the pen ticks every pig it shows under the current filters and its group row; the header keeps its colour, only its checkbox ticks (owner, 2026-10-18). The checkbox is indeterminate when only some are ticked. Tagged pigs are listed by ID number; the group row (struck-tag icon, \"14 pigs\", its conditions on one line, a count field) is always last.",
             "source": "penFeedEntry() · allocation(pe) · pe.switchDue · c.selectedPens",
             "at": "7.6 kg"
           },
@@ -364,7 +364,7 @@
               {
                 "state": "Selection",
                 "when": "One or more ticked",
-                "shows": "\"2 pens · 3 pigs selected\" (opens the review, which has Clear), More actions; unticking the last one in the review ends selection"
+                "shows": "\"16 pigs selected ›\" (one total, untagged pigs counted) opens the Selected page (Pens, Pigs, Without ear tags, Clear selection); Actions (pencil icon) opens the Actions page: pig actions only, no Pigs / Pens switch. Unticking the last one on the Selected page ends selection."
               }
             ],
             "logic": "Scan has no camera in the prototype; Search finds by ear tag or pen.",
@@ -631,7 +631,7 @@
           "Undo close (raw)"
         ],
         "edge": [
-          "A pen note can also be written for several pens at once from the Actions sheet (Pens tab)."
+          "A pen note is written from its pen page only: Actions holds pig actions (owner, 2026-10-18). The pen page also has How the pen looks (a pen observation)."
         ],
         "issues": [
           "Close note and Edit note overlap (edit replaces, close archives); two notes cannot coexist.",

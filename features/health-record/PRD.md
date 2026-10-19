@@ -39,6 +39,7 @@ Out: sow death and mortality reports (separate features), the pig record itself 
 
 - Care replaced the older triage and status fields; one select drives both.
 - 2026-10-19 (owner): Record treatment, its pickers and its save moved to Treatment (`features/treat`), which is ad hoc treatment only; vaccination is a task.
+- 2026-10-17 to 10-19 (owner): the selection is made on the walk list and is fixed when recording, so Record health is a page of fields (Conditions, Care, Note, Save · N) with no pig list; the condition picker uses one catalogue (symptoms by where you look, diseases by body system, Add condition as Add medicine). The model and its reasons are in [Conditions](../conditions/PRD.md).
 
 Open (recorded on the screens as issues):
 
