@@ -277,32 +277,32 @@
   const shortName={'Return-heat check':'Return heat','Piglet processing':'Processing'};
   const batchNo=t=>parseInt(String(t.batch).replace(/\D+/g,''),10)||0;
   const byStage=(a,b)=>(stageOrder.indexOf(a.type)-stageOrder.indexOf(b.type))||(batchNo(a)-batchNo(b))||a.id.localeCompare(b.id);
-  // Tile copy per sample task: the to-do word, and the quiet next line (a timer, a due date, or red when overdue).
+  // Tile copy per sample task, one line (owner, 2026-10-19): the to-do word; an overdue part after it (red); the next
+  // count when nothing is due yet. Timers and later windows live in the task and on the Schedule.
   const tileFields={
-    heat34:{label:'due now',next:{text:'Next round 14:30'}},
-    heat35:{label:'to confirm',next:{text:'Next round 14:30'}},
-    service34:{label:'due now',next:{text:'3 more at 14:00'}},
-    return30:{label:'to watch',next:{text:'4 more from Sat'}},
-    preg31:{label:'ready now',next:{tone:'act',text:'2 overdue'}},
-    preg32:{label:'ready now',days:2,next:{text:'8 open tomorrow'}},
+    heat34:{label:'due now'},
+    heat35:{label:'to confirm'},
+    service34:{label:'due now'},
+    return30:{label:'to watch'},
+    preg31:{label:'now',also:{tone:'act',text:'2 overdue'}},
+    preg32:{label:'ready now',days:2,soon:{value:8,label:'tomorrow'}},
     preg28:{ready:true,day:3,days:3},
-    farrow28:{label:'farrowing',next:{text:'4 due today'}},
-    piglet27:{label:'litters due',next:{text:'4 litters tomorrow'}},
-    vax21:{label:'overdue',tone:'act',due:6,day:3,days:3,over:1,late:true,next:null},
-    treat118:{label:'due now',due:5,day:2,days:5,next:{text:'5 again tomorrow'}},
-    // The busy-day review (?many=1): further first-check batches, each with its own count and next window.
-    preg33:{label:'ready now',due:3,next:{text:'3 open tomorrow'}},preg34:{label:'ready now',due:4,next:{text:'5 open tomorrow'}},
-    preg35:{label:'ready now',due:2,next:{text:'6 open tomorrow'}},preg36:{label:'ready now',due:6,next:{text:'1 open tomorrow'}}
+    farrow28:{label:'farrowing'},
+    piglet27:{label:'litters due',soon:{value:4,label:'tomorrow'}},
+    vax21:{label:'overdue',tone:'act',due:6,day:3,days:3,over:1,late:true},
+    treat118:{label:'due now',due:5,day:2,days:5},
+    // The busy-day review (?many=1): further first-check batches, each with its own count.
+    preg33:{label:'ready now',due:3},preg34:{label:'ready now',due:4},
+    preg35:{label:'ready now',due:2},preg36:{label:'ready now',due:6}
   };
   function tileModel(t){
     const k=cardFields[t.id]?t.id:(t.base||t.id),f=cardFields[k]||{},tf=tileFields[t.id]||tileFields[k]||{},current=workPreview==='mixed'?(f.state||'active'):workPreview;
     let due=tf.due!=null?tf.due:(f.due?Object.values(f.due).reduce((a,b)=>a+b,0):0);
     if(t.id==='farrow28')due=taskRecords(t).filter(r=>r.active).length;
-    if(tf.ready)return {id:t.id,title:shortName[t.type]||t.type,sub:t.sub||t.batch,todo:{none:'All recorded'},next:{text:'Ready to close',tone:'done'},days:{day:tf.days,total:tf.days}};
+    if(tf.ready)return {id:t.id,title:shortName[t.type]||t.type,sub:t.sub||t.batch,todo:{done:'Ready to close'},days:{day:tf.days,total:tf.days}};
     const none=current==='waiting'||!due,day=tf.day||f.day||1,days=tf.days||f.days||1;
-    const next=none?(tf.next&&tf.next.tone!=='act'?tf.next:f.nextAt!=null?{text:'Next '+(f.nextAt>=1440?'tomorrow':Math.floor(f.nextAt/60)+':'+String(f.nextAt%60).padStart(2,'0'))}:null):tf.next;
     return {id:t.id,entry:({farrow28:'farrowing',piglet27:'piglet-processing'})[t.id],title:shortName[t.type]||t.type,sub:t.sub||t.batch,
-      todo:none?{none:'None now'}:{value:due,label:tf.label||'due now',tone:tf.tone},next,late:!!tf.late,
+      todo:none?(tf.soon?{next:tf.soon}:{none:'None now'}):{value:due,label:tf.label||'due now',tone:tf.tone,also:tf.also},late:!!tf.late,
       days:{day,total:days,over:tf.over||0,text:tf.text||(!tf.over&&day===days&&days>1?`Day ${day} of ${days} · last day`:undefined)}};
   }
   const unitList=list=>list.length?(list.length===1?'Unit ':'Units ')+list.join(', '):'';
@@ -386,8 +386,9 @@
     const [b,cells]=row;
     const value=c=>c[0]==='u'?'–':c[0]==='n'?'·':(c[0]==='e'?'~':'')+(+c.slice(1)).toLocaleString('en');
     const list=cells.map((c,i)=>({i,code:(c||'').replace(/[<>]/g,'')})).filter(r=>r.code);
-    const body=SentriUI.rowGroup(list.map(r=>SentriUI.row({title:`${dayNames[r.i]} ${meta.dates[r.i]} ${monthOf(wk,r.i)}${r.i===meta.today?' · today':''}`,trailing:{text:value(r.code)},description:cellWord[r.code[0]]})).join(''));
-    drawer(`${type} · ${b}`,body,{size:'medium'});
+    // The task is the title; the batch heads the days (title + batch overflowed the header at 360).
+    const body=SentriUI.heading({title:String(b).replace(/^B(\d+)$/,'Batch $1'),kind:'group',level:3})+SentriUI.rowGroup(list.map(r=>SentriUI.row({title:`${dayNames[r.i]} ${meta.dates[r.i]} ${monthOf(wk,r.i)}${r.i===meta.today?' · today':''}`,trailing:{text:value(r.code)},description:cellWord[r.code[0]]})).join(''));
+    drawer(shortName[type]||type,body,{size:'medium'});
     overlay.querySelector('.sheet,.dialog')?.classList.add('schedule-row');
   }
 

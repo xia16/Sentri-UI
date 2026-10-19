@@ -181,17 +181,17 @@
               {
                 "state": "Due now",
                 "when": "The task has animals due now in the section",
-                "shows": "Count + short word (\"5 ready now\"); quiet line is the next timer or due date (\"◷ 4 more from Sat\")"
+                "shows": "One line: the count due now and a short word (\"10 to watch\"); timers and later windows live in the task and on the Schedule"
               },
               {
                 "state": "Overdue",
                 "when": "Part of the due work is past its window",
-                "shows": "The quiet line turns red: \"! 2 overdue\"; the tile keeps its place"
+                "shows": "The overdue part follows the count on the same line, only it red: \"5 now · 2 overdue\"; the tile keeps its place"
               },
               {
                 "state": "Nothing due now",
                 "when": "A multi-day task has nothing due at this moment",
-                "shows": "\"None now\" and the next timer (\"◷ 8 open tomorrow\"); no done state"
+                "shows": "The next count in grey (\"8 tomorrow\"), or \"None now\"; no done state"
               },
               {
                 "state": "Past its plan",
@@ -201,7 +201,7 @@
               {
                 "state": "Ready to close",
                 "when": "Everything the task asks for is recorded and the task is still open",
-                "shows": "\"All recorded\", a quiet tick and \"Ready to close\", the run full; closing stays inside the task"
+                "shows": "A quiet tick and \"Ready to close\" in the count line, the run full; closing stays inside the task"
               }
             ],
             "logic": "Four fixed slots, each with one kind of message, at the same height in every tile. Short task names (≤15 characters: \"Return heat\", \"Processing\"). A tile stays until the task closes.",
@@ -416,17 +416,17 @@
               {
                 "state": "Due now",
                 "when": "The task has animals due now in the section",
-                "shows": "Count + short word (\"5 ready now\"); quiet line is the next timer or due date (\"◷ 4 more from Sat\")"
+                "shows": "One line: the count due now and a short word (\"10 to watch\"); timers and later windows live in the task and on the Schedule"
               },
               {
                 "state": "Overdue",
                 "when": "Part of the due work is past its window",
-                "shows": "The quiet line turns red: \"! 2 overdue\"; the tile keeps its place"
+                "shows": "The overdue part follows the count on the same line, only it red: \"5 now · 2 overdue\"; the tile keeps its place"
               },
               {
                 "state": "Nothing due now",
                 "when": "A multi-day task has nothing due at this moment",
-                "shows": "\"None now\" and the next timer (\"◷ 8 open tomorrow\"); no done state"
+                "shows": "The next count in grey (\"8 tomorrow\"), or \"None now\"; no done state"
               },
               {
                 "state": "Past its plan",
@@ -436,7 +436,7 @@
               {
                 "state": "Ready to close",
                 "when": "Everything the task asks for is recorded and the task is still open",
-                "shows": "\"All recorded\", a quiet tick and \"Ready to close\", the run full; closing stays inside the task"
+                "shows": "A quiet tick and \"Ready to close\" in the count line, the run full; closing stays inside the task"
               }
             ],
             "logic": "Four fixed slots, each with one kind of message, at the same height in every tile. Short task names (≤15 characters: \"Return heat\", \"Processing\"). A tile stays until the task closes.",
@@ -488,17 +488,17 @@
               {
                 "state": "Due now",
                 "when": "The task has animals due now in the section",
-                "shows": "Count + short word (\"5 ready now\"); quiet line is the next timer or due date (\"◷ 4 more from Sat\")"
+                "shows": "One line: the count due now and a short word (\"10 to watch\"); timers and later windows live in the task and on the Schedule"
               },
               {
                 "state": "Overdue",
                 "when": "Part of the due work is past its window",
-                "shows": "The quiet line turns red: \"! 2 overdue\"; the tile keeps its place"
+                "shows": "The overdue part follows the count on the same line, only it red: \"5 now · 2 overdue\"; the tile keeps its place"
               },
               {
                 "state": "Nothing due now",
                 "when": "A multi-day task has nothing due at this moment",
-                "shows": "\"None now\" and the next timer (\"◷ 8 open tomorrow\"); no done state"
+                "shows": "The next count in grey (\"8 tomorrow\"), or \"None now\"; no done state"
               },
               {
                 "state": "Past its plan",
@@ -508,7 +508,7 @@
               {
                 "state": "Ready to close",
                 "when": "Everything the task asks for is recorded and the task is still open",
-                "shows": "\"All recorded\", a quiet tick and \"Ready to close\", the run full; closing stays inside the task"
+                "shows": "A quiet tick and \"Ready to close\" in the count line, the run full; closing stays inside the task"
               }
             ],
             "logic": "Four fixed slots, each with one kind of message, at the same height in every tile. Short task names (≤15 characters: \"Return heat\", \"Processing\"). A tile stays until the task closes.",
@@ -844,7 +844,7 @@
       "status": "in-design",
       "url": "/ux/system/home-astra-prototype.html?section=gestation&work=waiting",
       "notes": {
-        "purpose": "Every production task between its scheduled work: \"None now\" with the next timer on each tile.",
+        "purpose": "Every production task between its scheduled work: the next count in grey (\"8 tomorrow\") or \"None now\" on each tile.",
         "states": [],
         "elements": [
           {
@@ -854,17 +854,17 @@
               {
                 "state": "Due now",
                 "when": "The task has animals due now in the section",
-                "shows": "Count + short word (\"5 ready now\"); quiet line is the next timer or due date (\"◷ 4 more from Sat\")"
+                "shows": "One line: the count due now and a short word (\"10 to watch\"); timers and later windows live in the task and on the Schedule"
               },
               {
                 "state": "Overdue",
                 "when": "Part of the due work is past its window",
-                "shows": "The quiet line turns red: \"! 2 overdue\"; the tile keeps its place"
+                "shows": "The overdue part follows the count on the same line, only it red: \"5 now · 2 overdue\"; the tile keeps its place"
               },
               {
                 "state": "Nothing due now",
                 "when": "A multi-day task has nothing due at this moment",
-                "shows": "\"None now\" and the next timer (\"◷ 8 open tomorrow\"); no done state"
+                "shows": "The next count in grey (\"8 tomorrow\"), or \"None now\"; no done state"
               },
               {
                 "state": "Past its plan",
@@ -874,7 +874,7 @@
               {
                 "state": "Ready to close",
                 "when": "Everything the task asks for is recorded and the task is still open",
-                "shows": "\"All recorded\", a quiet tick and \"Ready to close\", the run full; closing stays inside the task"
+                "shows": "A quiet tick and \"Ready to close\" in the count line, the run full; closing stays inside the task"
               }
             ],
             "logic": "Four fixed slots, each with one kind of message, at the same height in every tile. Short task names (≤15 characters: \"Return heat\", \"Processing\"). A tile stays until the task closes.",
@@ -1117,17 +1117,17 @@
               {
                 "state": "Due now",
                 "when": "The task has animals due now in the section",
-                "shows": "Count + short word (\"5 ready now\"); quiet line is the next timer or due date (\"◷ 4 more from Sat\")"
+                "shows": "One line: the count due now and a short word (\"10 to watch\"); timers and later windows live in the task and on the Schedule"
               },
               {
                 "state": "Overdue",
                 "when": "Part of the due work is past its window",
-                "shows": "The quiet line turns red: \"! 2 overdue\"; the tile keeps its place"
+                "shows": "The overdue part follows the count on the same line, only it red: \"5 now · 2 overdue\"; the tile keeps its place"
               },
               {
                 "state": "Nothing due now",
                 "when": "A multi-day task has nothing due at this moment",
-                "shows": "\"None now\" and the next timer (\"◷ 8 open tomorrow\"); no done state"
+                "shows": "The next count in grey (\"8 tomorrow\"), or \"None now\"; no done state"
               },
               {
                 "state": "Past its plan",
@@ -1137,7 +1137,7 @@
               {
                 "state": "Ready to close",
                 "when": "Everything the task asks for is recorded and the task is still open",
-                "shows": "\"All recorded\", a quiet tick and \"Ready to close\", the run full; closing stays inside the task"
+                "shows": "A quiet tick and \"Ready to close\" in the count line, the run full; closing stays inside the task"
               }
             ],
             "logic": "Four fixed slots, each with one kind of message, at the same height in every tile. Short task names (≤15 characters: \"Return heat\", \"Processing\"). A tile stays until the task closes.",

@@ -36,15 +36,15 @@ Questions, in order, for a worker opening Home at the start of a shift: 1 Is any
 
 | Fact | Level | Where |
 |---|---|---|
-| Overdue part of a task; a task past its plan | Act now | Red quiet line on the tile; "6 overdue", red run segment |
+| Overdue part of a task; a task past its plan | Act now | Red part of the count line ("5 now · 2 overdue"); "6 overdue", red run segment |
 | Count due now, with a short word | Act now | Tile slot 3 |
 | Pigs marked to treat, aging since yesterday | Act now | Health card, To treat (plain line) |
-| Next timer or due date | Coming up | Tile slot 3, quiet line |
+| Next count when nothing is due yet | Coming up | Tile slot 3 in grey ("8 tomorrow"); timers in the task and on the Schedule |
 | Day N of N | Live | Tile slot 4 |
 | Pigs marked Monitor | Watch | Health card, Monitoring |
 | Other work: what, where, how many | Live | Other list row |
 | Future tasks | Coming up | The Schedule, not Home |
-| Everything recorded, task still open | Act now (quiet) | Tile: "All recorded", tick "Ready to close" |
+| Everything recorded, task still open | Act now (quiet) | Tile slot 3: tick "Ready to close" |
 | Closed today | Settled | One quiet line under Production |
 
 Cut from the Overview: phase, supporting counts, outcomes, progress labels, "All units · View task" (the Overview is all units; the tile is the tap), order numbers, walks, withdrawal as a Health fact (it shows on the row it blocks), deaths, open cases by disease, the sample date and the headline-number strip.

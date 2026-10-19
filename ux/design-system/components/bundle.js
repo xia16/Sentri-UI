@@ -1316,20 +1316,26 @@
   }
   /* TaskTile: one open task instance as a tile on the Overview (owner, 2026-10-18). Four fixed slots, each with one kind of
      message, at the same height in every tile, so a row of tiles scans line by line: 1 the task (one line, a short name),
-     2 the batch (or what and where), 3 to-do (the count due now and a short word; one quiet line under it: the next timer,
-     red when overdue), 4 the run (one segment per planned day, red segments for days past the plan). No done state.
-     taskTile({ id, title, sub, todo:{value,label,tone}|{none}, next:{text,tone}|null, days:{day,total,over,text}, late, action, entry }) */
-  function taskTile({id='',title='',sub='',todo={},next=null,days={},late=false,action='',entry=''}={}){
+     2 the batch (or what and where), 3 to-do: one line that says it all (owner, 2026-10-19, no second line), 4 the run (one
+     segment per planned day, red segments for days past the plan).
+     Slot 3 is one of: the count due now and a short word, with an optional overdue part after it ("5 now · 2 overdue");
+     the next count in grey when nothing is due yet ("8 tomorrow"); a tick and "Ready to close" when all is recorded.
+     taskTile({ id, title, sub, todo:{value,label,tone,also:{text,tone}}|{next:{value,label}}|{done}|{none}, days:{day,total,over,text}, late, action, entry }) */
+  function taskTile({id='',title='',sub='',todo={},days={},late=false,action='',entry=''}={}){
     const n=Math.max(1,days.total||1),d=Math.max(0,Math.min(n,days.day||0)),over=Math.max(0,days.over||0);
     const act=t=>t==='act'||t==='red';
-    const todoHtml=todo.none?`<span class="st-tile-todo" data-none=""><b>${esc(todo.none)}</b></span>`:`<span class="st-tile-todo"${act(todo.tone)?' data-tone="act"':''}><b>${esc(todo.value)}</b><span>${esc(todo.label)}</span></span>`;
-    // One coloured signal at most (owner, 2026-10-19): red only on the overdue line or the days over; "ready to close" is a quiet tick.
-    const nextHtml=next?`<span class="st-tile-next"${act(next.tone)?' data-tone="act"':''}>${act(next.tone)?'<span class="st-tile-bang" aria-hidden="true">!</span>':glyph(next.tone==='done'?'check':'clock')}<span>${esc(next.text)}</span></span>`:'<span class="st-tile-next" aria-hidden="true"></span>';
+    // One coloured signal at most (owner, 2026-10-19): red only on the overdue part or the days over; "Ready to close" is a quiet tick.
+    const also=todo.also?`<span class="st-tile-also"${act(todo.also.tone)?' data-tone="act"':''}>· ${esc(todo.also.text)}</span>`:'';
+    const todoHtml=todo.done?`<span class="st-tile-todo" data-done="">${glyph('check')}<b>${esc(todo.done)}</b></span>`
+      :todo.next?`<span class="st-tile-todo" data-next=""><b>${esc(todo.next.value)}</b><span>${esc(todo.next.label)}</span></span>`
+      :todo.none?`<span class="st-tile-todo" data-none=""><b>${esc(todo.none)}</b></span>`
+      :`<span class="st-tile-todo"${act(todo.tone)?' data-tone="act"':''}><b>${esc(todo.value)}</b><span>${esc(todo.label)}</span>${also}</span>`;
+    const todoText=todo.done||todo.none||(todo.next?`${todo.next.value} ${todo.next.label}`:[`${todo.value} ${todo.label}`,todo.also&&todo.also.text].filter(Boolean).join(', '));
     const segs=Array.from({length:n},(_,i)=>`<i${i<d?' data-on=""':''}></i>`).join('')+Array.from({length:over},()=>'<i data-over=""></i>').join('');
     const dayText=days.text||(over?`${over} ${over===1?'day':'days'} overdue`:`Day ${d} of ${n}`);
-    const name=[title,sub,todo.none||`${todo.value} ${todo.label}`,next&&next.text,dayText].filter(Boolean).join(', ');
+    const name=[title,sub,todoText,dayText].filter(Boolean).join(', ');
     return `<button type="button" class="st-tile" data-ds="TaskTile"${late?' data-late=""':''}${id?` data-card="${esc(id)}"`:''}${action?` data-action="${esc(action)}" data-value="${esc(id)}"`:''}${entry?` data-entry="${esc(entry)}"`:''} aria-label="Open ${esc(name)}">`+
-      `<span class="st-tile-name">${esc(title)}</span><span class="st-tile-sub">${esc(sub)}</span>${todoHtml}${nextHtml}`+
+      `<span class="st-tile-name">${esc(title)}</span><span class="st-tile-sub">${esc(sub)}</span>${todoHtml}`+
       `<span class="st-tile-run"><span class="st-tile-segs" aria-hidden="true">${segs}</span><span class="st-tile-day"${over?' data-tone="act"':''}>${esc(dayText)}</span></span></button>`;
   }
   /* WeekBoard: a week of work, one line per task under its type, a cell per day holding that day's count (owner, 2026-10-19).

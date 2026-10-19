@@ -21,7 +21,7 @@ The Overview showed the same full cards as the Unit page, so it was a second Uni
 - **Production tile: four fixed slots.** Every tile has the same rows in the same place:
   1. Task name: one line, at most about 15 characters (for example "Return heat").
   2. "Batch NN".
-  3. To-do: the count due now, then a quiet line with the next timer ("◷ 8 at 15:00", "◷ 4 due today"), or red "! N overdue".
+  3. To-do: the count due now, then a quiet line with the next timer ("◷ 8 at 15:00", "◷ 4 due today"), or red "! N overdue". Revised 2026-10-19 (owner): no second line; one count line carries it ("5 now · 2 overdue", "8 tomorrow", "✓ Ready to close"), timers live in the task and on the Schedule.
   4. Progress: day segments and "Day N of N".
 - The tile has no "today done" state. Outcomes are on the task page, not the tile.
 - **Health** is reactive:
