@@ -17417,11 +17417,11 @@
           ],
           "controls": [],
           "copy": [
-           "Record treatment (raw)",
-           "Medicine (raw)",
-           "Method (raw)",
+           "medicines.record_treatment",
+           "medicines.medicine",
+           "medicines.method",
            "medicines.dose.label",
-           "Record vaccination (raw)"
+           "medicines.record_vaccination"
           ],
           "edge": [
            "A task-triggered treatment may prefill the medicine but the user still confirms (the prototype prefills nothing)."
@@ -18198,11 +18198,11 @@
           ],
           "controls": [],
           "copy": [
-           "Record treatment (raw)",
-           "Medicine (raw)",
-           "Method (raw)",
+           "medicines.record_treatment",
+           "medicines.medicine",
+           "medicines.method",
            "medicines.dose.label",
-           "Record vaccination (raw)"
+           "medicines.record_vaccination"
           ],
           "edge": [
            "A task-triggered treatment may prefill the medicine but the user still confirms (the prototype prefills nothing)."
@@ -18423,7 +18423,7 @@
           ],
           "controls": [],
           "copy": [
-           "Record treatment (raw)",
+           "medicines.record_treatment",
            "medicines.dose.per_pig",
            "medicines.dose.own"
           ],
@@ -20141,9 +20141,9 @@
          }
         ],
         "run": {
-         "commit": "865f349",
+         "commit": "2690fef",
          "dirty": true,
-         "ran": "2026-10-19T03:13:28.834Z",
+         "ran": "2026-10-19T03:49:20.580Z",
          "langs": [
           "en",
           "zh"

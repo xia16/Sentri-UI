@@ -360,7 +360,7 @@
           }
         ],
         "controls": [],
-        "copy": ["Record treatment (raw)", "Medicine (raw)", "Method (raw)", "medicines.dose.label", "Record vaccination (raw)"],
+        "copy": ["medicines.record_treatment", "medicines.medicine", "medicines.method", "medicines.dose.label", "medicines.record_vaccination"],
         "edge": ["A task-triggered treatment may prefill the medicine but the user still confirms (the prototype prefills nothing)."],
         "rules": ["Medicines, methods and units should come from farm configuration."],
         "issues": ["The medicine list is sample data (features/treat); methods and units are a sample list, not farm configuration.", "To confirm (product rule, review/inspection-r2.json): is a dose required for every pig, or may a pig be saved without one?", "Record treatment from a finding and from the Health group differ only by the fixed condition."]
@@ -550,7 +550,7 @@
           }
         ],
         "controls": [],
-        "copy": ["Record treatment (raw)", "medicines.dose.per_pig", "medicines.dose.own"],
+        "copy": ["medicines.record_treatment", "medicines.dose.per_pig", "medicines.dose.own"],
         "issues": ["To confirm (product rule, review/inspection-r2.json): is a dose required for every pig, or may a pig be saved without one?"]
       }
     },

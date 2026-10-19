@@ -328,3 +328,18 @@ The Brand optional row comes back as the medicines feature's field (only once a 
 
 ### Self-crit
 - New held screens `health-record.treatment-saved` and `health-record.treatment-saved-offline` (EN and ZH, 390): the toast sits 10px above the dock, on the gutters, 56px tall, one line each; the check on the green is the only colour; offline swaps the glyph and the second line and never says uploaded. The walk list behind it is unchanged. House references: Linear's "Issue created" snackbar, Material's snackbar; solid ink because it is read in glare.
+
+# Treatment merge: the judge's findings (2026-10-19)
+
+Scope: the gate's judge on #222 found two defects carried over unchanged from main by the renamed screens. A visible defect voids a pass, so both are fixed here.
+
+### Keep
+- Every Treatment screen's layout, order and copy, as on main; the several-pig form is untouched.
+
+### Problems
+- **major** · The one-pig form (`treat.record`, `treat.record-brand`, `treat.record-note`) sat 34px in from the phone's edge, 16px inside the header's track. The page-presented one-pig sheet padded its controls again inside the sheet body's gutter (Sheet, `bundle.css`). This affects every one-pig action page that uses it.
+- **major** · In ZH the form's title, the Medicine (Vaccine) and Method labels, the method names and the unit's "Choose unit" stayed English (the "Known" item above).
+
+### Parts
+- Sheet (`bundle.css`): a page-presented one-pig form sits on the sheet body's gutter, with no second inset. At 360 it takes the narrow gutter, like the header and the several-pig form.
+- Strings: `medicines.record_treatment`, `.record_vaccination`, `.medicine`, `.vaccine`, `.method`, `.method.choose`, `.method.<injection|oral|topical|in_feed|in_water>` and `.unit.choose`, in EN and ZH. The stored method stays its English value; only the label follows the language.

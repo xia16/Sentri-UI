@@ -681,6 +681,9 @@ function bulkDetailsSummary(c){
  if(c.view==='health')return f.conditions.length?f.conditions.join(' · ')+' · '+careLabel(f.triage):'';
  return '';
 }
+/* The treatment form's title and methods (the stored method stays the English value; the label is the worker's language). */
+function treatmentTitle(f){return str(f.taskId==='vaccination'?'medicines.record_vaccination':'medicines.record_treatment');}
+function treatmentMethods(){return [['',str('medicines.method.choose')],...[['Injection','injection'],['Oral','oral'],['Topical','topical'],['In feed','in_feed'],['In water','in_water']].map(([v,k])=>[v,str('medicines.method.'+k)])];}
 function bulkActionPage(c){
  const f=c.form,view=c.view,single=!f.bulk,conditions=[...new Set(f.subjects.flatMap(id=>cases(pig(c,id)).map(k=>k.name)))],need=v=>f.showRequired&&!v?'Required':'';
  const target=bulkSelect(c,'Condition','target',[['','Choose condition'],...conditions.map(n=>[n,n])],need(f.target));let controls='',sameDose='';
@@ -688,10 +691,10 @@ function bulkActionPage(c){
  if(view==='edit-conditions'||view==='triage')controls=target+bulkSelect(c,'Care','triage',[['keep','Keep current care'],...careOptions],f.target&&f.showRequired&&!bulkActionValid(c)?'Required':'');
  if(view==='resolve')controls=target+bulkSelect(c,'Outcome','outcome',[['','Choose outcome'],['recover','Recovered'],['strike','Entered in error']],need(f.outcome));
  if(view==='treatment'){
-  const method=bulkSelect(c,'Method','method',[['','Choose method'],['Injection','Injection'],['Oral','Oral'],['Topical','Topical'],['In feed','In feed'],['In water','In water']],need(f.method));
+  const method=bulkSelect(c,str('medicines.method'),'method',treatmentMethods(),need(f.method));
   const dosed=bulkChanges(c).filter(r=>r.eligible).every(r=>String(r.value??'').trim()!=='');
   const dose=treatmentDosage(c,{needDose:need(String(f.dose||'').trim()!==''||dosed),needUnit:need(f.doseUnit)})+(single?'':'<div data-dosage-adjust>'+dosageAdjustLine(c)+'</div>');
-  controls=SentriUI.pickerField({label:f.taskId==='vaccination'?'Vaccine':'Medicine',value:f.medicine,action:'medicine-open',variant:'cascade',error:need(f.medicine.trim()),required:true,reason:withdrawalCaption(c,'medicine')})+method+brandField(c)+dose+(f.returnFinding?'<div class="field">Condition<strong>'+esc(f.returnFinding)+'</strong></div>':'');
+  controls=SentriUI.pickerField({label:str(f.taskId==='vaccination'?'medicines.vaccine':'medicines.medicine'),value:f.medicine,action:'medicine-open',variant:'cascade',error:need(f.medicine.trim()),required:true,reason:withdrawalCaption(c,'medicine')})+method+brandField(c)+dose+(f.returnFinding?'<div class="field">Condition<strong>'+esc(f.returnFinding)+'</strong></div>':'');
  }
  if(view==='body')controls=bulkSelect(c,'Condition','condition',[['','Choose condition'],['Thin','Thin'],['Over-conditioned','Over-conditioned']],need(f.condition));
  const note=view==='treatment'?treatmentOptionals(c):view==='note'?(SentriUI.field({label:"Note",error:need(f.note.trim()),control:"<textarea data-bulk-key=\"note\" rows=\"2\""+(need(f.note.trim())?' aria-invalid="true"':'')+">"+(esc(f.note))+"</textarea>"})):recordOptionalControls(c);
@@ -699,12 +702,12 @@ function bulkActionPage(c){
  if(single){
   const p=pig(c,f.subjects[0]),m=bulkMeasurements[view];
   if(m)controls=(SentriUI.field({label:(m.label)+" · "+(m.unit),error:need(String(f.values[p.id]??'').trim()),control:"<input type=\"number\" min=\"0\" step=\"any\" inputmode=\"decimal\" data-bulk-value=\""+(esc(p.id))+"\" value=\""+(esc(f.values[p.id]??''))+"\" aria-label=\""+(m.label)+" for "+(esc(p.id))+"\" placeholder=\"—\""+(need(String(f.values[p.id]??'').trim())?' aria-invalid="true"':'')+">"}))+"<p class=\"quiet-note\">Last recorded: "+esc(p[view]??'—')+(p[view]!=null?' '+m.unit+' · '+measurementAge(p,view):'')+'</p>';
-  const title=f.taskId==='vaccination'?'Record vaccination':m?'Record '+m.label.toLowerCase():bulkTitles[view];
+  const title=view==='treatment'?treatmentTitle(f):m?'Record '+m.label.toLowerCase():bulkTitles[view];
   return sheet(c,title,p.id+' · '+penOf(c,p.id).id,'<section class="bulk-controls single-controls" aria-label="Record details">'+controls+note+'</section>',footer(back(),bulkCommit(c))).replace('class="sheet"','class="sheet single-action-sheet"');
  }
  /* Treatment, several pigs (owner, 2026-10-16): what was given first (Medicine, Method), then the doses (Same dose for all,
     then each pig's dose in the remembered unit), then the optional rows. The same fields and dose boxes, in that order. */
- if(view==='treatment')return sheet(c,bulkTitles[view],countLabel(f.subjects.length),'<div class="bulk-action-layout is-given-first" data-bulk-kind="treatment"><section class="bulk-controls bulk-given" aria-label="Treatment details">'+controls+'</section><section class="bulk-controls bulk-after" aria-label="Optional details">'+note+'</section></div>',footer(back(),bulkCommit(c))).replace('class="sheet"','class="sheet bulk-action-sheet"');
+ if(view==='treatment')return sheet(c,treatmentTitle(f),countLabel(f.subjects.length),'<div class="bulk-action-layout is-given-first" data-bulk-kind="treatment"><section class="bulk-controls bulk-given" aria-label="Treatment details">'+controls+'</section><section class="bulk-controls bulk-after" aria-label="Optional details">'+note+'</section></div>',footer(back(),bulkCommit(c))).replace('class="sheet"','class="sheet bulk-action-sheet"');
  const body=bulkListOverlay(c,{kind:view,rowsHtml:bulkRows(c),heading:'Pigs',sub:'',column:(bulkMeasurements[view]?'Current → New · '+bulkMeasurements[view].unit:''),headHtml:sameDose,summary:bulkDetailsSummary(c),toggleLabel:view==='treatment'?'Treatment details':'Details',controlsHtml:controls+note,short:f.subjects.length<=3});
  return sheet(c,bulkTitles[view],countLabel(f.subjects.length),body,footer(back(),bulkCommit(c))).replace('class="sheet"','class="sheet bulk-action-sheet"');
 }
@@ -880,7 +883,7 @@ const treatmentLive=c=>c.form.subjects.filter(id=>!c.form.excluded.includes(id))
    per medicine. */
 function treatmentDosage(c,{needDose,needUnit}){
  const f=c.form;
- pickerEntry(c,'doseUnit',{items:[['','Choose unit'],['mL','mL'],['mg','mg'],['g','g']],label:str('medicines.unit'),target:'bulk',value:f.doseUnit||''});
+ pickerEntry(c,'doseUnit',{items:[['',str('medicines.unit.choose')],['mL','mL'],['mg','mg'],['g','g']],label:str('medicines.unit'),target:'bulk',value:f.doseUnit||''});
  const amount=SentriUI.field({label:str('medicines.dose.label'),variant:'number',error:needDose,control:'<input data-bulk-key="dose" type="number" min="0" step="any" inputmode="decimal" value="'+esc(f.dose||'')+'">'});
  const unit=SentriUI.pickerField({label:str('medicines.unit'),value:f.doseUnit||'',key:'doseUnit',error:needUnit});
  return '<div class="treatment-dosage">'+amount+unit+'</div>';
