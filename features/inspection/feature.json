@@ -869,7 +869,7 @@
               {
                 "state": "More",
                 "when": "More than ten verbs",
-                "shows": "Nine verbs and a More tile, which opens the rest in place"
+                "shows": "Nine tiles (Death never folds) and a More tile, which opens the rest in place"
               },
               {
                 "state": "Death",

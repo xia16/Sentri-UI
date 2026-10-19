@@ -16,6 +16,26 @@
     ]
   },
   {
+    "id": "tile",
+    "name": "Tile",
+    "use": "Use for the everyday verbs of More actions: one action as an icon well over one word, in a grid of always two rows split evenly (SentriUI.rowGrid). Owner, 2026-10-19.",
+    "notUse": "Not for verbs that need a line to explain them (Production) — use navigation; not for places or animals.",
+    "states": [
+      "Default · eight verbs (4 + 4)",
+      "Pressed",
+      "Five verbs (3 + 2)",
+      "Six verbs (3 + 3)",
+      "Danger · Death is last",
+      "Over ten · More",
+      "Chinese"
+    ],
+    "usedBy": [
+      "inspection.actions",
+      "pig-profile.actions",
+      "farrowing.sow-actions"
+    ]
+  },
+  {
     "id": "animal",
     "name": "Animal",
     "use": "Use for one animal in a list: the ID over a 13px context line, and on the right either its state (figure over word, weighted by level) or one line of condition tags. Designed from Farrowing room + Inspection walk, owner-approved 2026-10-11/12.",

@@ -1161,14 +1161,10 @@ function unavailableActionGroups(c){const rows=actionCatalogue(c).unavailable;re
    Production keeps described rows, because its verbs are stage-bound and need their line; up to three rows share one card, more are grouped by task. */
 const verbShort={health:'Condition',treatment:'Treat','edit-conditions':'Edit',resolve:'Resolve',triage:'Care',note:'Note','measurements-menu':'Measure','feed-edit-selected':'Feed'},hostVerbShort={marker:'Note',transfer:'Move','sow-death':'Death'},dangerVerbs=new Set(['sow-death']);
 const verbLabel=x=>x.a==='sow-host-action'?hostVerbShort[x.value]||x.title:verbShort[x.a]||x.title;
-/* Always two rows (owner, 2026-10-19), split evenly so row two is never short by more than one (5 = 3+2, 6 = 3+3, 8 = 4+4, 10 = 5+5);
-   at most five across. Death is always the last verb. Over ten, nine show and the tenth slot is More, which opens the rest in place. */
+/* The grid and its two-row rule are the design system's (Row tile, SentriUI.rowGrid). Death is the danger tile, always last. */
 function verbGrid(c,items){
- const danger=x=>x.a==='sow-host-action'&&dangerVerbs.has(x.value),ordered=[...items.filter(x=>!danger(x)),...items.filter(danger)];
- const folded=ordered.length>10&&!c.actionsGridAll,shown=folded?ordered.slice(0,9):ordered,slots=shown.length+(folded?1:0);
- const rows=slots<2?1:Math.max(2,Math.ceil(slots/5)),cols=Math.ceil(slots/rows);
- const tile=x=>button(x.a,`<span class="verb-icon">${icon(x.k)}</span><span class="verb-label">${esc(verbLabel(x))}</span>`,'verb-tile'+(danger(x)?' is-danger':''),x.value).replace('<button',`<button aria-label="${esc(x.title)}"`);
- return `<section class="verb-grid-section" data-action-group="everyday" aria-label="Everyday actions"><div class="verb-grid st-panel" style="--verb-cols:${cols}">${shown.map(tile).join('')}${folded?button('actions-grid-all',`<span class="verb-icon">${icon('more')}</span><span class="verb-label">More</span>`,'verb-tile').replace('<button',`<button aria-label="${ordered.length-9} more actions"`):''}</div></section>`;
+ const tiles=items.map(x=>({label:verbLabel(x),title:x.title,icon:icon(x.k),action:x.a,value:x.value,tone:x.a==='sow-host-action'&&dangerVerbs.has(x.value)?'danger':'',attrs:entryFor(x.a)?{'data-entry':entryFor(x.a)}:{}}));
+ return `<section class="sow-action-group" data-action-group="everyday" aria-label="Everyday actions">${SentriUI.rowGrid(tiles,{more:{action:'actions-grid-all'},expanded:!!c.actionsGridAll,label:'Everyday actions'})}</section>`;
 }
 function actionsPage(c){
  const {groups,unavailable}=actionCatalogue(c),single=picked(c).length===1,p=single?picked(c)[0]:null;

@@ -78,11 +78,11 @@ test('Actions is a menu drawer: everyday verbs as a grid, Production as navigati
   const c=context('actions');c.selected.add(c.pigId);
   const html=model.overlay(c);
   checkMenuDrawer(html);
-  const grid=html.match(/<div class="verb-grid[^"]*" style="--verb-cols:(\d+)">([\s\S]*?)<\/div><\/section>/);
+  const grid=html.match(/<div class="st-panel st-row-grid[^"]*"[^>]*style="--st-row-grid-cols:(\d+)">([\s\S]*?)<\/div><\/section>/);
   assert.ok(grid,'everyday grid');
-  const tiles=grid[2].match(/class="verb-tile/g).length;
+  const tiles=grid[2].match(/class="st-row-tile[" ]/g).length;
   assert.equal(+grid[1],Math.ceil(tiles/2),'two rows, split evenly');
-  assert.match(grid[2],/aria-label="Disease or symptom"[^>]*>[\s\S]*?<span class="verb-label">Condition<\/span>/);
+  assert.match(grid[2],/aria-label="Disease or symptom"[^>]*>[\s\S]*?<span class="st-row-tile-label">Condition<\/span>/);
   for(const group of html.match(/<div class="[^"]*compact-actions[^"]*">/g)||[]) {
     assert.match(group,/st-action-list/);
     assert.match(group,/st-panel/);
@@ -92,13 +92,16 @@ test('Actions is a menu drawer: everyday verbs as a grid, Production as navigati
 test('the verb grid keeps two even rows and folds past ten into More', () => {
   const c=context('actions');c.selected.add(c.pigId);
   const items=n=>Array.from({length:n},(_,i)=>({a:'note',k:'note',title:'Verb '+i,sub:'',value:String(i)}));
-  const cols=html=>+html.match(/--verb-cols:(\d+)/)[1],count=html=>html.match(/class="verb-tile/g).length;
+  const cols=html=>+html.match(/--st-row-grid-cols:(\d+)/)[1],count=html=>html.match(/class="st-row-tile[" ]/g).length;
   for(const [n,expected] of [[2,1],[5,3],[6,3],[7,4],[8,4],[10,5]]) assert.equal(cols(model.verbGrid(c,items(n))),expected,n+' verbs');
   const folded=model.verbGrid(c,items(12));
   assert.equal(count(folded),10);assert.match(folded,/data-action="actions-grid-all"/);assert.equal(cols(folded),5);
   c.actionsGridAll=true;assert.equal(count(model.verbGrid(c,items(12))),12);
   const death=model.verbGrid({},[{a:'sow-host-action',k:'alert',title:'Record sow death',sub:'',value:'sow-death'},...items(3)]);
   assert.ok(death.lastIndexOf('is-danger')>death.lastIndexOf('Verb 2'),'Death is the last verb');
+  const foldedDeath=model.verbGrid({},[{a:'sow-host-action',k:'alert',title:'Record sow death',sub:'',value:'sow-death'},...items(11)]);
+  assert.match(foldedDeath,/is-danger/,'Death never folds behind More');
+  assert.equal(count(foldedDeath),10);
 });
 
 test('pen Actions keeps its drawer', () => {

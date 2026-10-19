@@ -133,6 +133,24 @@
   function rowGroup(content,{title='',level=5,className='',strs,args}={}){
     return panel((title||has({strs},'title')?heading({title,kind:'group',level,className:'st-row-group-label',strs,args}):'')+content,{className:'st-row-group '+className,ds:'Row'});
   }
+  /* Row tile (owner, 2026-10-19): one action as an icon well over one word, for the grid of everyday verbs in More actions.
+     The word is the short verb ("Treat"); the full action name ("Record treatment") is its accessible name. tone 'danger' is
+     the one irreversible verb (Death): red ink on its well and word, nothing louder. */
+  function rowTile({label,title='',icon='',action='',value='',tone='',attrs={},className=''}={}){
+    const danger=tone==='danger';
+    return `<button type="button" class="st-row-tile${danger?' is-danger':''}${className?' '+esc(className):''}" data-ds="Row" data-variant="tile" data-action="${esc(action)}" data-value="${esc(value)}" aria-label="${esc(title||label)}"${safeAttr(attrs)}><span class="st-row-tile-icon" aria-hidden="true">${icon}</span><span class="st-row-tile-label">${esc(label)}</span></button>`;
+  }
+  /* The tile grid: one panel, always two rows (one only for a single tile), split evenly so row two is never short by more than one
+     (5 = 3+2, 6 = 3+3, 8 = 4+4, 10 = 5+5), at most five across. Danger tiles go last and never fold. Over ten tiles, nine show
+     and the tenth slot is `more` (a tile that opens the rest in place); `expanded` shows them all, five across. */
+  function rowGrid(tiles=[],{more=null,expanded=false,label='',className=''}={}){
+    const calm=tiles.filter(t=>t.tone!=='danger'),danger=tiles.filter(t=>t.tone==='danger'),ordered=[...calm,...danger];
+    const folded=ordered.length>10&&!expanded&&!!more,shown=folded?[...calm.slice(0,Math.max(0,9-danger.length)),...danger]:ordered,slots=shown.length+(folded?1:0);
+    if(!slots)return '';
+    const rows=slots<2?1:Math.max(2,Math.ceil(slots/5)),cols=Math.ceil(slots/rows);
+    const moreTile=folded?rowTile(Object.assign({label:'More',title:`${ordered.length-9} more actions`,icon:SentriIcons.icon('more')},more)):'';
+    return `<div class="st-panel st-row-grid${className?' '+esc(className):''}" data-ds="Row" role="group"${label?` aria-label="${esc(label)}"`:''} style="--st-row-grid-cols:${cols}">${shown.map(rowTile).join('')}${moreTile}</div>`;
+  }
   /* Row family: button or inert row, select label and sibling door + act targets.
      All variants share the copy renderer, Status chips and token-based layout. */
   function rowCopy({title,description,code,mono,tight,o,titleId=''}){
@@ -1314,7 +1332,7 @@
     document.addEventListener('contextmenu',e=>{if(e.target.closest&&e.target.closest('.st-pen-tile'))e.preventDefault();});
     if(typeof globalThis.addEventListener==='function')globalThis.addEventListener('blur',penStop);
   }
-  const api=Object.freeze({headerLine,pageHeader,rangeSlider,filterSheet,penMap,penMapKey,penMapFooter,penPeek,penMapMount:penMount,optionalRow,heading,panel,facts,row,rowGroup,log,logDay,logStamp,logGroups,categoryFooter,field,pickerField,pickerOptions,pickerBody,pickerHead,pickerFooter,filterChips,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,toast,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowSelectDoor,rowAction,rowSelectChange,status,conditionTag,rowFitTags,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
+  const api=Object.freeze({headerLine,pageHeader,rangeSlider,filterSheet,penMap,penMapKey,penMapFooter,penPeek,penMapMount:penMount,optionalRow,heading,panel,facts,row,rowGroup,log,logDay,logStamp,logGroups,categoryFooter,field,rowTile,rowGrid,pickerField,pickerOptions,pickerBody,pickerHead,pickerFooter,filterChips,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,toast,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowSelectDoor,rowAction,rowSelectChange,status,conditionTag,rowFitTags,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
   root.SentriUI=api;
   if(typeof module!=='undefined')module.exports=api;
 })(globalThis);

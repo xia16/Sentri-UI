@@ -1,0 +1,46 @@
+<div data-state="Default · eight verbs (4 + 4)" id="tile-state-0"></div>
+<div data-state="Pressed" id="tile-state-1"></div>
+<div data-state="Five verbs (3 + 2)" id="tile-state-2"></div>
+<div data-state="Six verbs (3 + 3)" id="tile-state-3"></div>
+<div data-state="Danger · Death is last" id="tile-state-4"></div>
+<div data-state="Over ten · More" id="tile-state-5"></div>
+<div data-state="Chinese" id="tile-state-6"></div>
+<script>
+// Each state renders in its own iframe in the atlas: draw only the states present.
+var UI = window.SentriUI, I = function (k) { return SentriIcons.icon(k); };
+var V = {
+  condition: { label: 'Condition', title: 'Disease or symptom', icon: I('condition'), action: 'health' },
+  treat: { label: 'Treat', title: 'Record treatment', icon: I('treat'), action: 'treatment' },
+  edit: { label: 'Edit', title: 'Edit conditions', icon: I('note'), action: 'edit-conditions' },
+  resolve: { label: 'Resolve', title: 'Resolve conditions', icon: I('check'), action: 'resolve' },
+  care: { label: 'Care', title: 'Care instructions', icon: I('alert'), action: 'triage' },
+  note: { label: 'Note', title: 'Add a note', icon: I('note'), action: 'note' },
+  move: { label: 'Move', title: 'Transfer sow', icon: I('transfer'), action: 'transfer' },
+  measure: { label: 'Measure', title: 'Measurements & condition', icon: I('measure'), action: 'measurements-menu' },
+  feed: { label: 'Feed', title: 'Adjust feed', icon: I('feed'), action: 'feed-edit-selected' },
+  death: { label: 'Death', title: 'Record sow death', icon: I('close'), action: 'sow-death', tone: 'danger' },
+  temp: { label: 'Temp', title: 'Record temperature', icon: I('temperature'), action: 'temperature' },
+  weigh: { label: 'Weigh', title: 'Record weight', icon: I('weight'), action: 'weight' }
+};
+var pick = function (keys) { return keys.map(function (k) { return Object.assign({}, V[k]); }); };
+var more = { action: 'actions-grid-all' };
+var RENDER = {
+  "tile-state-0": () => UI.rowGrid(pick(['condition', 'treat', 'edit', 'resolve', 'care', 'note', 'measure', 'feed']), { more: more, label: 'Everyday actions' }),
+  "tile-state-1": () => UI.rowGrid(pick(['condition', 'treat', 'edit', 'resolve', 'care', 'note', 'measure', 'feed']).map(function (t, i) { return i === 1 ? Object.assign(t, { attrs: { 'data-preview': 'pressed' } }) : t; }), { more: more, label: 'Everyday actions' }),
+  "tile-state-2": () => UI.rowGrid(pick(['condition', 'treat', 'note', 'measure', 'feed']), { more: more, label: 'Everyday actions' }),
+  "tile-state-3": () => UI.rowGrid(pick(['condition', 'treat', 'resolve', 'care', 'note', 'move']), { more: more, label: 'Everyday actions' }),
+  "tile-state-4": () => UI.rowGrid(pick(['death', 'condition', 'treat', 'note', 'move']), { more: more, label: 'Everyday actions' }),
+  "tile-state-5": () => UI.rowGrid(pick(['condition', 'treat', 'edit', 'resolve', 'care', 'note', 'move', 'measure', 'feed', 'weigh', 'temp', 'death']), { more: more, label: 'Everyday actions' }),
+  "tile-state-6": () => UI.rowGrid([
+    { label: '疾病', title: '疾病或症状', icon: I('condition'), action: 'health' },
+    { label: '治疗', title: '记录治疗', icon: I('treat'), action: 'treatment' },
+    { label: '备注', title: '添加备注', icon: I('note'), action: 'note' },
+    { label: '测量', title: '测量与体况', icon: I('measure'), action: 'measurements-menu' },
+    { label: '饲喂', title: '调整饲喂', icon: I('feed'), action: 'feed-edit-selected' }
+  ], { more: more, label: '日常操作' })
+};
+document.querySelectorAll('[data-state]').forEach(function (s) {
+  var t = RENDER[s.id] ? s : s.querySelector('[id]');
+  if (t && RENDER[t.id]) t.innerHTML = RENDER[t.id]();
+});
+</script>

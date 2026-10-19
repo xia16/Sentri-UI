@@ -6213,7 +6213,7 @@
          ],
          "figma": "",
          "notes": {
-          "purpose": "All other things to do for one sow, grouped Health, Routine, Production, opened from \"More actions\" on her drawer.",
+          "purpose": "All other things to do for one sow, in the More actions drawer opened from her drawer: the everyday verbs as a grid of icon tiles (Note and Move come from Farrowing), then Production as described rows grouped by task.",
           "states": [
            "Awaiting (nothing counted): Record abortion, Remove from batch, Mark not in pig, Record sow death, note and transfer are open; the piglet rows and Edit litter record are closed.",
            "Farrowing: the piglet rows, Edit litter record and Foster piglets open; Remove from batch and Mark not in pig close.",
@@ -13881,8 +13881,31 @@
          "preset": "selected",
          "figma": "",
          "notes": {
-          "purpose": "One action sheet for the ticked pigs or pens. Here two pigs are selected.",
+          "purpose": "One menu drawer of actions for the ticked pigs or pens: the everyday verbs as a grid of icon tiles, over the list it acts on. Here two pigs are selected.",
           "elements": [
+           {
+            "name": "Verb grid",
+            "at": "Condition",
+            "shows": "Health then Routine verbs as one card of icon tiles, one word each (Condition, Treat, Edit, Resolve, Care, Note, Move, Measure, Feed)",
+            "states": [
+             {
+              "state": "Two rows",
+              "when": "Two or more verbs",
+              "shows": "Always two rows, split evenly: 5 = 3+2, 6 = 3+3, 8 = 4+4, 10 = 5+5"
+             },
+             {
+              "state": "More",
+              "when": "More than ten verbs",
+              "shows": "Nine tiles (Death never folds) and a More tile, which opens the rest in place"
+             },
+             {
+              "state": "Death",
+              "when": "Record sow death is offered",
+              "shows": "The last tile, in red ink"
+             }
+            ],
+            "rule": "Each tile keeps the full action name as its accessible name; the word under the icon is the short verb."
+           },
            {
             "name": "Action row availability",
             "shows": "Rows in Health and General groups",
@@ -15764,19 +15787,42 @@
          ],
          "figma": "",
          "notes": {
-          "purpose": "Everything a worker can do to one pig, in three groups: Production, Health, General. The same sheet opens for several pigs (inspection.actions).",
+          "purpose": "Everything a worker can do to one pig, in a menu drawer over her record: the everyday verbs (Health, Routine) as one grid of icon tiles, then Production as described rows. The same drawer opens for several pigs (inspection.actions).",
           "states": [
            "Opened from Farrowing (embedded): rows added by Farrowing are mixed in (piglet processing, piglet deaths, reconcile count, foster, edit litter, sow death, remove from batch, mark not in pig, transfer)."
           ],
           "elements": [
+           {
+            "name": "Verb grid",
+            "at": "Condition",
+            "shows": "Health then Routine verbs as one card of icon tiles, one word each (Condition, Treat, Edit, Resolve, Care, Note, Move, Measure, Feed)",
+            "states": [
+             {
+              "state": "Two rows",
+              "when": "Two or more verbs",
+              "shows": "Always two rows, split evenly: 5 = 3+2, 6 = 3+3, 8 = 4+4, 10 = 5+5"
+             },
+             {
+              "state": "More",
+              "when": "More than ten verbs",
+              "shows": "Nine tiles (Death never folds) and a More tile, which opens the rest in place"
+             },
+             {
+              "state": "Death",
+              "when": "Record sow death is offered",
+              "shows": "The last tile, in red ink"
+             }
+            ],
+            "rule": "Each tile keeps the full action name as its accessible name; the word under the icon is the short verb."
+           },
            {
             "name": "Production group",
             "shows": "Task cluster, Record abortion, Batch membership",
             "states": [
              {
               "state": "Task cluster",
-              "when": "One per production scope among her tasks and stage (Farrowing, Piglet processing, Pregnancy check, Gestation, Breeding, Lactation, Growth, Shared)",
-              "shows": "Heading and a single row carrying the same word"
+              "when": "Production has more than three rows: one per production scope among her tasks and stage (Farrowing, Piglet processing, Pregnancy check, Gestation, Breeding, Lactation, Growth, Shared)",
+              "shows": "Heading and its rows; three rows or fewer share one card with no headings"
              },
              {
               "state": "Record abortion",
@@ -24747,7 +24793,8 @@
        "scope",
        "select-door",
        "summary-count",
-       "tick"
+       "tick",
+       "tile"
       ]
      }
     },

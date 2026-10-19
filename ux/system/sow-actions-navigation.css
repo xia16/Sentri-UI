@@ -50,17 +50,3 @@
 /* Category sections can reach the top; the footer owns Back and the home indicator. */
 
 .action-category-empty{font-size:var(--type-meta-size);line-height:1.5;color:var(--muted);margin:4px 0 12px}
-
-/* More actions drawer: the everyday verbs as one white card of icon tiles, one word each (owner, 2026-10-19).
-   The card is the only box; the icon wells are the Row navigation icon's colours, larger for a gloved thumb. */
-.verb-grid-section{margin:0 0 var(--space-section)}
-.verb-grid-section:last-child{margin-bottom:0}
-.verb-grid{display:grid;grid-template-columns:repeat(var(--verb-cols,5),minmax(0,1fr));row-gap:var(--space-16);padding:var(--space-16) var(--space-8)}
-.verb-tile{display:flex;flex-direction:column;align-items:center;gap:var(--space-8);min-width:0;min-height:var(--tap-min);padding:0;border:0;background:none;color:var(--ink);font:500 var(--type-meta-size)/1.3 var(--font-sans);text-align:center;cursor:pointer;-webkit-tap-highlight-color:transparent}
-.verb-icon{display:grid;place-items:center;width:48px;height:48px;border-radius:var(--radius-14);background:var(--row-icon-bg);color:var(--row-icon-ink)}
-.verb-icon svg{width:22px;height:22px}
-.verb-label{max-width:100%;overflow-wrap:anywhere}
-.verb-tile:active .verb-icon,.verb-tile[data-preview="pressed"] .verb-icon{background:var(--choice-press)}
-/* Death is the one irreversible verb: red ink on its icon and word, nothing louder. */
-.verb-tile.is-danger{color:var(--red-ink)}
-.verb-tile.is-danger .verb-icon{background:var(--red-wash);color:var(--red-ink)}
