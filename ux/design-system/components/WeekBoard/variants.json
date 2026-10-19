@@ -1,0 +1,34 @@
+[
+  {
+    "id": "board",
+    "name": "Board",
+    "use": "Use for a calendar week of tasks that run over several days, a count per day: Home's Schedule.",
+    "notUse": "Not for today's work (TaskTile on the Overview); not for days that need words (the Row drawer the board opens).",
+    "states": [
+      "This week",
+      "All sections",
+      "Next week",
+      "Past its plan",
+      "Empty week",
+      "Pressed row",
+      "Long label / Chinese"
+    ],
+    "usedBy": [
+      "workbench.schedule",
+      "workbench.schedule-all",
+      "workbench.schedule-next"
+    ]
+  },
+  {
+    "id": "key",
+    "name": "Key",
+    "use": "Use for the legend in the board's \"How to read the board\" drawer: each cell as it looks, one plain line each.",
+    "notUse": "Not as a strip on the board itself.",
+    "states": [
+      "Default"
+    ],
+    "usedBy": [
+      "workbench.schedule-key"
+    ]
+  }
+]

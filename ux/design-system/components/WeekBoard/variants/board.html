@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><style>
+.w{max-width:348px}
+</style></head><body>
+<section data-state="This week"></section>
+<section data-state="All sections"></section>
+<section data-state="Next week"></section>
+<section data-state="Past its plan"></section>
+<section data-state="Empty week"></section>
+<section data-state="Pressed row"></section>
+<section data-state="Long label / Chinese"></section>
+<script>
+const I=k=>SentriIcons.icon(k);
+const D=(dates,today,past)=>['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map((l,i)=>({label:l,date:dates[i],today:i===today,past:past.includes(i)}));
+const W27=D([5,6,7,8,9,10,11],3,[0,1,2]),W28=D([12,13,14,15,16,17,18],-1,[]);
+const R=(label,cells,o={})=>Object.assign({label,cells,action:'row',value:label},o);
+const PROD=[{title:'Return heat',sub:'estimated returns',rows:[R('B30',['','d2','d6','o10','e8','e6','e4>']),R('B39',['','','','','','','e3>'])]},
+  {title:'Pregnancy check',sub:'',rows:[R('B29',['','','d11','d6','','','']),R('B31',['','','','o5','p8','p7','']),R('B32',['','','','n','p8','','']),R('B38',['','','','','p22','u','u'])]}];
+const HEALTH=[{title:'Vaccination',sub:'',rows:[R('PRRS',['','d4','d2','v6','','',''],{late:true})]},{title:'Treatment',sub:'',rows:[R('Amox',['','','d5','o5','p5','p5','p5>'])]}];
+const OTHER=[{title:'Pig transfer',sub:'',rows:[R('B29',['','','','o8','','','']),R('Mixed',['','','','','p30','',''])]}];
+const B=SentriUI.weekBoard;
+const S={
+  'This week':B({days:W27,groups:[{types:PROD}]}),
+  'All sections':B({days:W27,groups:[{band:{icon:I('production'),label:'Production'},types:PROD.slice(0,1)},{band:{icon:I('health'),label:'Health'},types:HEALTH},{band:{icon:I('transfer'),label:'Other'},types:OTHER}]}),
+  'Next week':B({days:W28,groups:[{types:[{title:'Return heat',sub:'estimated returns',rows:[R('B30',['<e2','','','','','','']),R('B39',['<e5','e6','e5','e3','e2','e1',''])]},{title:'Pregnancy check',sub:'',rows:[R('B34',['','p7','p7','p6','','',''])]}]}]}),
+  'Past its plan':B({days:W27,groups:[{types:[{title:'Pregnancy check',sub:'',rows:[R('B28',['d10','d8','d6','v4','','',''],{late:true})]},{title:'Breeding',sub:'',rows:[R('B35',['d16','d5','w0','v3','','',''],{late:true})]}]}]}),
+  'Empty week':B({days:W28,empty:'Nothing planned this week'}),
+  'Pressed row':B({days:W27,groups:[{types:PROD.slice(1)}]}).replace('<button type="button" class="st-week-row"','<button type="button" class="st-week-row" style="background:var(--press)"'),
+  'Long label / Chinese':B({days:D(['5','6','7','8','9','10','11'],3,[0,1,2]).map((d,i)=>Object.assign(d,{label:['周一','周二','周三','周四','周五','周六','周日'][i]})),groups:[{types:[{title:'Processing',sub:'',rows:[R('B127',['d312','d288','d340','o1180','p180','',''])]},{title:'转群',sub:'',rows:[R('混合',['','','','o8','','',''])]}]}]})
+};
+document.querySelectorAll('[data-state]').forEach(el=>{const h=S[el.dataset.state];if(h)el.innerHTML='<div class="w">'+h+'</div>';});
+</script>
+</body></html>

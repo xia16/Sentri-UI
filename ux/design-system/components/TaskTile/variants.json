@@ -1,0 +1,25 @@
+[
+  {
+    "id": "tile",
+    "name": "Tile",
+    "use": "Use for one open task instance among all of a scope's open tasks, when the worker needs the count due now and the run at a glance: Home's Overview (production and planned health work), two to a row.",
+    "notUse": "Not for the unit page (the task card shows pens and recorded totals); not for work with no run of days (Row · navigation); not for a single task's page.",
+    "states": [
+      "Due now",
+      "Overdue part",
+      "Nothing due now",
+      "Past its plan",
+      "All recorded",
+      "Last day",
+      "Pressed",
+      "Long label / Chinese"
+    ],
+    "usedBy": [
+      "workbench.today",
+      "workbench.gestation",
+      "workbench.many-tasks",
+      "workbench.work-due",
+      "workbench.work-waiting"
+    ]
+  }
+]

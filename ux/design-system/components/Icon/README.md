@@ -61,5 +61,6 @@ Component with standard and key host presentations; names are content properties
 
 ## Changelog
 
+2026-10-19: added info (a circled i) for the Schedule's "How to read the board" button.
 2026-10-10: Home task-card glyphs moved to the shared registry; added production and care.
 2026-10-10: canonical aliases, empty unknown glyph, corrected grid, visible filled More dots and token stroke; retired prototype registries.

@@ -1,4 +1,4 @@
-/* @ds-bundle: {"format":4,"namespace":"SentriUI","components":[{"name":"Heading"},{"name":"Panel"},{"name":"Facts"},{"name":"Row"},{"name":"Log"},{"name":"Segment"},{"name":"IconButton"},{"name":"Button"},{"name":"Field"},{"name":"PickerField"},{"name":"ChoiceList"},{"name":"CategoryFooter"},{"name":"Sheet"},{"name":"FilterSheet"},{"name":"RangeSlider"},{"name":"PenMap"},{"name":"Icon"},{"name":"Stepper"},{"name":"Measure"},{"name":"Numpad"},{"name":"Status"},{"name":"ConditionTag"},{"name":"Banner"},{"name":"Photos"}]} */
+/* @ds-bundle: {"format":4,"namespace":"SentriUI","components":[{"name":"Heading"},{"name":"Panel"},{"name":"Facts"},{"name":"Row"},{"name":"Log"},{"name":"Segment"},{"name":"IconButton"},{"name":"Button"},{"name":"Field"},{"name":"PickerField"},{"name":"ChoiceList"},{"name":"CategoryFooter"},{"name":"Sheet"},{"name":"FilterSheet"},{"name":"RangeSlider"},{"name":"PenMap"},{"name":"TaskTile"},{"name":"WeekBoard"},{"name":"Icon"},{"name":"Stepper"},{"name":"Measure"},{"name":"Numpad"},{"name":"Status"},{"name":"ConditionTag"},{"name":"Banner"},{"name":"Photos"}]} */
 /* SentriIcons (sentri-icons.js) and the SentriUI parts, in one file. */
 /* Shared icon registry for the Sentri prototypes. One path vocabulary so every
    app renders the same glyphs; apps keep a local fallback for source-only checks. */
@@ -38,7 +38,7 @@
     camera:'M3 7h4l2-3h6l2 3h4v14H3zM16 13a4 4 0 1 1-8 0 4 4 0 0 1 8 0',
     edit:'M4 20l4-1L20 7l-4-4L4 15zM13 6l4 4',
     wrench:'M14 3a6 6 0 0 0-7 8L2 16a3 3 0 0 0 4 4l5-5a6 6 0 0 0 8-7l-4 4-3-3 4-4z',
-    details:'M4 6h16M4 12h16M4 18h16M8 3v6M16 9v6M10 15v6',
+    details:'M4 6h16M4 12h16M4 18h16M8 3v6M16 9v6M10 15v6',info:'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 11v6M12 7.5v.5',
     calendar:'M4 5h16v16H4zM8 3v4M16 3v4M4 10h16',
     bookmark:'M6 3h12v18l-6-4-6 4z',tag:'M3.5 4.5v6.3a1 1 0 0 0 .3.7l8.7 8.7a1.5 1.5 0 0 0 2.1 0l5.6-5.6a1.5 1.5 0 0 0 0-2.1L11.5 3.8a1 1 0 0 0-.7-.3H4.5a1 1 0 0 0-1 1zM8 8h.01','tag-off':'M3.5 4.5v6.3a1 1 0 0 0 .3.7l8.7 8.7a1.5 1.5 0 0 0 2.1 0l5.6-5.6a1.5 1.5 0 0 0 0-2.1L11.5 3.8a1 1 0 0 0-.7-.3H4.5a1 1 0 0 0-1 1zM3 3l18 18',pig:'M5 12.5a5 4.5 0 0 1 5-4.5h5a4.5 4.5 0 0 1 4.3 3.2H21v3.3h-1.7a4.5 4.5 0 0 1-2.3 2.3V19h-2.2v-2h-5.6v2H7v-2.4a4.5 4.5 0 0 1-2-4.1zM16.5 10.6h.01M5 12.5H3.5',lungs:'M12 4v7.5M12 11.5l-2.5 2M12 11.5l2.5 2M9.5 7.5C6.6 7.5 4.5 11.4 4.5 15.4c0 2.2 1 3.6 2.8 3.6 1.6 0 2.7-1 2.7-2.8V10M14.5 7.5c2.9 0 5 3.9 5 7.9 0 2.2-1 3.6-2.8 3.6-1.6 0-2.7-1-2.7-2.8V10',head:'M7.5 8.5 5.5 4l4.3 2.4M16.5 8.5 18.5 4l-4.3 2.4M6 13.5a6 6 0 1 0 12 0 6 6 0 1 0-12 0M9.8 15.2h4.4a1 1 0 0 1 1 1v.6a1 1 0 0 1-1 1H9.8a1 1 0 0 1-1-1v-.6a1 1 0 0 1 1-1zM10 11.5h.01M14 11.5h.01',skin:'M4 8.5c2.7-1.8 5.3 1.8 8 0s5.3-1.8 8 0M4 13c2.7-1.8 5.3 1.8 8 0s5.3-1.8 8 0M4 17.5c2.7-1.8 5.3 1.8 8 0s5.3-1.8 8 0',leg:'M10 3.5v10.5l-2.2 5.5h3.4l.8-2.6.8 2.6h3.4L14 14V3.5',tail:'M4.5 12.5h6.5c2.2 0 4 1.6 4 3.6 0 1.5-1.1 2.6-2.4 2.6-1.1 0-1.9-.8-1.9-1.8 0-1.6 1.6-2.5 3.3-2.5 2.6 0 4.5 1.9 4.5 4.1M4.5 8.5h11',gut:'M8 4.5h8a2.8 2.8 0 0 1 0 5.6H8a2.8 2.8 0 0 0 0 5.6h8a2.8 2.8 0 0 1 0 5.6',repro:'M12 4a4.8 4.8 0 1 0 0 9.6A4.8 4.8 0 1 0 12 4M12 13.6V21M8.8 17.6h6.4',drop:'M12 3.5c3 4 6 7 6 10.8a6 6 0 0 1-12 0C6 10.5 9 7.5 12 3.5z',bone:'M9.2 9.2l5.6 5.6M8 10.4a2.3 2.3 0 1 1-2.4-3.9 2.3 2.3 0 1 1 3.9-2.4M16 13.6a2.3 2.3 0 1 1 2.4 3.9 2.3 2.3 0 1 1-3.9 2.4',
     transfer:'M7 7h11l-3-3M18 7l-3 3M17 17H6l3-3M6 17l3 3',
@@ -825,13 +825,14 @@
      word, 13/700 ink-2, no container, ≥48px) · danger. waiting: the waiting face — present, quiet,
      focusable (aria-disabled, never disabled); guard() answers its tap. busy: sent, until the host settles. */
   const REGISTER={primary:'button primary',secondary:'button secondary',tool:'button tool',danger:'button danger',caution:'button caution'};
-  function button({align='',label='',register='secondary',action='',value='',waiting=false,disabled=false,busy=false,icon='',reason='',describedby='',labelledby='',id='',attrs={},className='',strs,args}={}){
+  /* chevron (text register): the button spans the content width and ends in the row chevron, for a quiet line that opens a list ("1 closed today ›"). */
+  function button({align='',label='',register='secondary',action='',value='',waiting=false,disabled=false,busy=false,icon='',reason='',describedby='',labelledby='',id='',attrs={},className='',chevron=false,strs,args}={}){
     const o={strs,args},r=oneOf('Button','register',register,['primary','secondary','tool','text','danger','caution'],'secondary');
     /* align (text register only): 'start' sets the word on the content edge (a Delete under a form's fields); 'end' ends it on the
        right edge (a short word over a list). Default: centred in its 48px target. */
     const cls=r==='text'?'st-text-action'+(align==='start'?' st-text-action--start':align==='end'?' st-text-action--end':''):REGISTER[r];
     const rid=reason?(describedby||fieldId('st-button-reason')):describedby;
-    return `<button type="button" class="${cls}${className?' '+esc(className):''}" data-ds="Button" data-register="${r}"${id?` id="${esc(id)}"`:''} data-action="${esc(action)}" data-value="${esc(value)}"${waiting||busy?' aria-disabled="true"':''}${disabled?' disabled':''}${busy?' aria-busy="true" data-busy=""':''}${rid?` aria-describedby="${esc(rid)}"`:''}${labelledby?` aria-labelledby="${esc(labelledby)}"`:''}${r==='tool'&&typeof label==='string'&&label&&!strs?` title="${esc(label)}"`:''}${safeAttr(attrs)}>${icon?`<span aria-hidden="true">${icon}</span>`:''}<span class="st-button-label">${tx(label,o,'label')}</span>${busy?'<span class="st-button-busy" aria-hidden="true">…</span>':''}</button>${reason?buttonReason({id:rid,text:reason}):''}`;
+    return `<button type="button" class="${cls}${className?' '+esc(className):''}" data-ds="Button" data-register="${r}"${chevron&&r==='text'?' data-chevron=""':''}${id?` id="${esc(id)}"`:''} data-action="${esc(action)}" data-value="${esc(value)}"${waiting||busy?' aria-disabled="true"':''}${disabled?' disabled':''}${busy?' aria-busy="true" data-busy=""':''}${rid?` aria-describedby="${esc(rid)}"`:''}${labelledby?` aria-labelledby="${esc(labelledby)}"`:''}${r==='tool'&&typeof label==='string'&&label&&!strs?` title="${esc(label)}"`:''}${safeAttr(attrs)}>${icon?`<span aria-hidden="true">${icon}</span>`:''}<span class="st-button-label">${tx(label,o,'label')}</span>${chevron&&r==='text'?`<span class="st-button-chevron" aria-hidden="true">${glyph('chevron')}</span>`:''}${busy?'<span class="st-button-busy" aria-hidden="true">…</span>':''}</button>${reason?buttonReason({id:rid,text:reason}):''}`;
   }
   /* The reason a waiting button waits, one persistent status line beside the bar (row-title size). */
   function buttonReason({text='',id='',actions=[],className='',strs,args}={}){
@@ -1343,7 +1344,59 @@
     document.addEventListener('contextmenu',e=>{if(e.target.closest&&e.target.closest('.st-pen-tile'))e.preventDefault();});
     if(typeof globalThis.addEventListener==='function')globalThis.addEventListener('blur',penStop);
   }
-  const api=Object.freeze({headerLine,pageHeader,rangeSlider,filterSheet,penMap,penMapKey,penMapFooter,penPeek,penMapMount:penMount,optionalRow,heading,panel,facts,row,rowGroup,log,logDay,logStamp,logGroups,categoryFooter,field,rowTile,rowGrid,pickerField,pickerOptions,pickerBody,pickerHead,pickerFooter,filterChips,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,toast,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowSelectDoor,rowAction,rowSelectChange,status,conditionTag,rowFitTags,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
+  /* TaskTile: one open task instance as a tile on the Overview (owner, 2026-10-18). Four fixed slots, each with one kind of
+     message, at the same height in every tile, so a row of tiles scans line by line: 1 the task (one line, a short name),
+     2 the batch (or what and where), 3 to-do: one line that says it all (owner, 2026-10-19, no second line), 4 the run (one
+     segment per planned day, red segments for days past the plan).
+     Slot 3 is one of: the count due now and a short word, with an optional overdue part after it ("5 now · 2 overdue");
+     the next count in grey when nothing is due yet ("8 tomorrow"); a tick and "Ready to close" when all is recorded.
+     taskTile({ id, title, sub, todo:{value,label,tone,also:{text,tone}}|{next:{value,label}}|{done}|{none}, days:{day,total,over,text}, late, action, entry }) */
+  function taskTile({id='',title='',sub='',todo={},days={},late=false,action='',entry=''}={}){
+    const n=Math.max(1,days.total||1),d=Math.max(0,Math.min(n,days.day||0)),over=Math.max(0,days.over||0);
+    const act=t=>t==='act'||t==='red';
+    // One coloured signal at most (owner, 2026-10-19): red only on the overdue part or the days over; "Ready to close" is a quiet tick.
+    const also=todo.also?`<span class="st-tile-also"${act(todo.also.tone)?' data-tone="act"':''}>· ${esc(todo.also.text)}</span>`:'';
+    const todoHtml=todo.done?`<span class="st-tile-todo" data-done="">${glyph('check')}<b>${esc(todo.done)}</b></span>`
+      :todo.next?`<span class="st-tile-todo" data-next=""><b>${esc(todo.next.value)}</b><span>${esc(todo.next.label)}</span></span>`
+      :todo.none?`<span class="st-tile-todo" data-none=""><b>${esc(todo.none)}</b></span>`
+      :`<span class="st-tile-todo"${act(todo.tone)?' data-tone="act"':''}><b>${esc(todo.value)}</b><span>${esc(todo.label)}</span>${also}</span>`;
+    const todoText=todo.done||todo.none||(todo.next?`${todo.next.value} ${todo.next.label}`:[`${todo.value} ${todo.label}`,todo.also&&todo.also.text].filter(Boolean).join(', '));
+    const segs=Array.from({length:n},(_,i)=>`<i${i<d?' data-on=""':''}></i>`).join('')+Array.from({length:over},()=>'<i data-over=""></i>').join('');
+    const dayText=days.text||(over?`${over} ${over===1?'day':'days'} overdue`:`Day ${d} of ${n}`);
+    const name=[title,sub,todoText,dayText].filter(Boolean).join(', ');
+    return `<button type="button" class="st-tile" data-ds="TaskTile"${late?' data-late=""':''}${id?` data-card="${esc(id)}"`:''}${action?` data-action="${esc(action)}" data-value="${esc(id)}"`:''}${entry?` data-entry="${esc(entry)}"`:''} aria-label="Open ${esc(name)}">`+
+      `<span class="st-tile-name">${esc(title)}</span><span class="st-tile-sub">${esc(sub)}</span>${todoHtml}`+
+      `<span class="st-tile-run"><span class="st-tile-segs" aria-hidden="true">${segs}</span><span class="st-tile-day"${over?' data-tone="act"':''}>${esc(dayText)}</span></span></button>`;
+  }
+  /* WeekBoard: a week of work, one line per task under its type, a cell per day holding that day's count (owner, 2026-10-19).
+     Cell codes: '' nothing · n running, nothing due · u waiting on today · dN done · oN due today · pN planned · eN estimate ·
+     vN past its plan, today · wN past its plan, a past day; a trailing '>' runs into next week, a leading '<' came from last week.
+     Counts up to 999 print in full; actual counts from 1,000 shorten to "1.2k", estimates to "~1k".
+     weekBoard({ days:[{label,date,today,past}], groups:[{band:{icon,label}|null, types:[{title,sub,rows:[{label,late,action,value,aria,cells}]}]}], empty })
+     weekCell(code) draws one cell; weekBoardKey([[code,title,line]]) the legend rows for the "How to read the board" drawer. */
+  const weekFmt=(n,est)=>n>=1000?(est?'~'+Math.round(n/1000)+'k':(Math.round(n/100)/10)+'k'):(est?'~':'')+n;
+  function weekCell(code){
+    if(!code)return '<span class="st-week-cell"></span>';
+    let c=String(code),cont='',from='';
+    if(c.endsWith('>')){cont=' data-cont=""';c=c.slice(0,-1);}
+    if(c.startsWith('<')){from=' data-from=""';c=c.slice(1);}
+    const k=c[0],n=+c.slice(1);
+    const map={n:['nil','·'],u:['wait','–'],d:['done',weekFmt(n)],o:['today',weekFmt(n)],p:['plan',weekFmt(n)],e:['est',weekFmt(n,true)],v:['late',weekFmt(n)],w:['latedone',weekFmt(n)]};
+    const [kind,text]=map[k]||['',''];
+    return `<span class="st-week-cell" data-kind="${kind}"${cont}${from}>${esc(text)}</span>`;
+  }
+  function weekBoard({days=[],groups=[],empty=''}={}){
+    const today=days.findIndex(d=>d.today);
+    const head=`<div class="st-week-days"><span></span><span class="st-week-grid">${days.map(d=>`<span class="st-week-day"${d.today?' data-today=""':''}${d.past?' data-past=""':''}><span>${esc(d.label)}</span><b>${esc(d.date)}</b></span>`).join('')}</span></div>`;
+    const body=groups.map(g=>(g.band?`<div class="st-week-band"><span class="st-week-band-icon">${g.band.icon||''}</span><b>${esc(g.band.label)}</b></div>`:'')+
+      ((g.types||[]).map(t=>`<div class="st-week-type"><div class="st-week-type-head"><span>${esc(t.title)}</span><small>${esc(t.sub||'')}</small></div>${(t.rows||[]).map(r=>`<button type="button" class="st-week-row"${r.action?` data-action="${esc(r.action)}" data-value="${esc(r.value)}"`:''} aria-label="${esc(r.aria||r.label)}"><span class="st-week-batch"${r.late?' data-late=""':''}>${esc(r.label)}</span><span class="st-week-grid">${(r.cells||[]).map(weekCell).join('')}</span></button>`).join('')}</div>`).join('')||(g.band&&g.none?`<p class="st-week-none">${esc(g.none)}</p>`:''))).join('');
+    const band=today>=0?`<span class="st-week-today" aria-hidden="true" style="left:calc(54px + (100% - 86px) / 7 * ${today} + ${3*today}px);width:calc((100% - 86px) / 7)"></span>`:'';
+    return `<div class="st-week" data-ds="WeekBoard">${head}${empty?`<p class="st-week-none" data-week="">${esc(empty)}</p>`:body+band}</div>`;
+  }
+  function weekBoardKey(rows=[]){
+    return `<div class="st-panel st-week-key" data-ds="WeekBoard">${rows.map(([c,t,l])=>`<div class="st-week-key-row"><span class="st-week-grid" data-one="">${weekCell(c)}</span><div><strong>${esc(t)}</strong><small>${esc(l)}</small></div></div>`).join('')}</div>`;
+  }
+  const api=Object.freeze({taskTile,weekBoard,weekCell,weekBoardKey,headerLine,pageHeader,rangeSlider,filterSheet,penMap,penMapKey,penMapFooter,penPeek,penMapMount:penMount,optionalRow,heading,panel,facts,row,rowGroup,log,logDay,logStamp,logGroups,categoryFooter,field,rowTile,rowGrid,pickerField,pickerOptions,pickerBody,pickerHead,pickerFooter,filterChips,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,toast,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowSelectDoor,rowAction,rowSelectChange,status,conditionTag,rowFitTags,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
   root.SentriUI=api;
   if(typeof module!=='undefined')module.exports=api;
 })(globalThis);

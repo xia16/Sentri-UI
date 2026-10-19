@@ -34,9 +34,9 @@
       {
        "type": "action",
        "id": "room.home.view-task",
-       "label": "tap the Farrowing task card",
+       "label": "tap the Farrowing tile",
        "taps": [
-        ".home-task-card[data-card='farrow28']"
+        ".st-tile[data-card='farrow28']"
        ],
        "children": [
         {
