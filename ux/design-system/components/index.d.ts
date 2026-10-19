@@ -795,7 +795,7 @@ export type IconName =
   | 'details' | 'calendar' | 'bookmark' | 'transfer' | 'down' | 'arrow' | 'place' | 'home' | 'toolbox' | 'spark'
   | 'heat' | 'pregnancy' | 'farrow' | 'barn' | 'return' | 'send' | 'health' | 'temperature' | 'humidity' | 'air'
   | 'upload' | 'offline' | 'backspace' | 'arrow-down'
-  | 'tag-off' | 'pig' | 'lungs' | 'head' | 'skin' | 'leg' | 'tail' | 'gut' | 'repro' | 'drop' | 'bone';
+  | 'tag-off' | 'pig' | 'lungs' | 'head' | 'skin' | 'leg' | 'tail' | 'gut' | 'repro' | 'drop' | 'bone' | 'pill' | 'bug';
 
 declare global {
   interface Window { SentriUI: SentriUI; SentriIcons: SentriIcons }
