@@ -167,3 +167,5 @@ Scope: the header-to-body gap (Headers law: `space-section`, 24px, the header's)
 - Keep as strong: titles that fit, bodies, rows and primaries unchanged; Filter sows and Filter pigs at their defaults now show no Reset.
 - Squint: the title, then the first card; the corner word stays quiet.
 - **Better because** the act that empties a draft leaves the thumb's commit zone, every drawer clears in the same place, and no title can collide with a corner at 360.
+
+- More actions became a menu drawer with a verb grid (PR #224): see the block at the end of [pig-profile/critique.md](../pig-profile/critique.md); `inspection.actions` and `feed-plan.bulk` are the same renderer.
