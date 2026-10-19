@@ -1064,7 +1064,7 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 .st-row[data-tone="forecast"] .st-row-copy strong{color:var(--ink-2)}
 /* the record tools: two tools share the row when Edit is not offered yet */
 .record-inline-actions .record-action-group{display:grid;grid-auto-flow:column;grid-auto-columns:1fr}
-.record-inline-actions .record-action-group:has(>:nth-child(3)){grid-template-columns:.65fr 1.15fr 1.15fr}
+.record-inline-actions .record-action-group:has(>:nth-child(3)){grid-template-columns:.7fr 1.3fr 1fr}
 .st-banner[data-tone="danger"] .st-banner-headline{color:var(--red-ink)}
 /* A landmark focused by script (tabindex=-1: a list, a sheet) is not a control: no ring. */
 :is(.phone,.tk-phone,.atlas-phone,.device,.st-phone,.sp-phone,[data-st-context]) [tabindex="-1"]:focus{outline:none}

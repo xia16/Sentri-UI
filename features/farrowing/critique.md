@@ -525,8 +525,9 @@ Scope: the sow's Actions page. The owner's rounds on conditions and selection, b
 
 ### Problems
 
-- **minor** · The action sheet was titled "More actions", though it is the only place the actions live; the owner renamed it Actions (2026-10-17).
+- **minor** · The action sheet was titled "More actions", though it is the only place the actions live; the owner renamed it Actions (2026-10-17). The record's two buttons that open it (the tool row and the line under the record) say Actions too, so the button names the page it opens.
+- **minor** · With the shorter label, the record's tool row at 360 mixed layouts (Record dead stacked its icon, Actions sat inline): the columns now share the width so all three stay inline (.7 / 1.3 / 1).
 
 ### Self-crit
 
-- **Better because** the title says what the page is.
+- **Better because** the title says what the page is, the button names it, and the tool row reads as one row at every width.

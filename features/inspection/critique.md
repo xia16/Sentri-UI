@@ -186,6 +186,7 @@ Scope: the walk list, its dock, the Selected review, the Actions page and the pe
 - **minor** · Tagged pigs came in seed order, so a number couldn't be found by scanning.
 - **major** · The dock said "1 pen · 2 pigs selected" and opened a drawer; the owner wants one total and a page to edit the selection (2026-10-17).
 - **minor** · The action sheet was titled "More actions", though it is the only place the actions live; the owner renamed it Actions (2026-10-17).
+- **minor** · The dock's Actions button had no icon; the owner asked for one (2026-10-17). It takes the grid glyph the pig record's Actions button already carries (a menu of acts, not an edit).
 - **major** · The Actions page carried a Pigs / Pens switch in its header slot and a Health / Routine bar at the bottom; pen actions belong on the pen page (owner, 2026-10-18).
 - **minor** · Pen-wide signs (coughing heard, scours on the floor) had no place except as pig conditions.
 

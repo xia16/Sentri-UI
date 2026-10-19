@@ -3206,12 +3206,12 @@
         [
          "farrowing.count",
          "farrowing.sow-actions",
-         "More actions"
+         "Actions"
         ],
         [
          "farrowing.locked",
          "farrowing.sow-actions",
-         "More actions"
+         "Actions"
         ],
         [
          "farrowing.sow-actions",
@@ -3698,7 +3698,7 @@
            "(raw) Use Record dead for deaths. Use Edit for corrections.",
            "(raw) Litter summary · View log",
            "(raw) Born · Dead",
-           "(raw) Edit · Record death · More actions",
+           "(raw) Edit · Record death · Actions",
            "(raw) Back · Finish farrowing"
           ],
           "edge": [
@@ -4170,7 +4170,7 @@
            "(raw) Litter summary · View log",
            "(raw) Born · Alive now · Dead · Weak · Deformed · Assisted · Litter weight",
            "(raw) Not recorded",
-           "(raw) Edit · Record death · More actions"
+           "(raw) Edit · Record death · Actions"
           ],
           "edge": [
            "Post-lock events never reopen farrowing",
@@ -6203,13 +6203,13 @@
         },
         {
          "id": "farrowing.sow-actions",
-         "name": "More actions",
-         "zh": "更多操作",
+         "name": "Actions",
+         "zh": "操作",
          "status": "in-design",
          "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
          "preset": "count",
          "steps": [
-          "More actions"
+          "Actions"
          ],
          "figma": "",
          "notes": {
@@ -6286,7 +6286,7 @@
          "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
          "preset": "count",
          "steps": [
-          "More actions",
+          "Actions",
           "Edit note"
          ],
          "figma": "",
@@ -6319,7 +6319,7 @@
          "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
          "preset": "count",
          "steps": [
-          "More actions",
+          "Actions",
           "[data-action=\"sow-host-action\"][data-value=\"piglets\"]"
          ],
          "figma": "",
@@ -6368,7 +6368,7 @@
          "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
          "preset": "count",
          "steps": [
-          "More actions",
+          "Actions",
           "[data-action=\"sow-host-action\"][data-value=\"piglets\"]",
           "Piglet records",
           "Add piglet"
@@ -6406,7 +6406,7 @@
          "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
          "preset": "count",
          "steps": [
-          "More actions",
+          "Actions",
           "[data-action=\"sow-host-action\"][data-value=\"piglets\"]",
           "Piglet records",
           "Report mortality"
@@ -13257,7 +13257,7 @@
          "id": "inspection.walk",
          "name": "Unit walk",
          "zh": "巡检列表",
-         "status": "approved",
+         "status": "in-design",
          "url": "/ux/system/inspection-astra-concept.html?layout=focus",
          "preset": "walk",
          "figma": "",
@@ -13440,7 +13440,10 @@
           "by": "owner",
           "note": "Owner approved the animal row (Farrowing) and the compact-tag roster row (Inspection), 2026-10-12",
           "url": "/ux/system/inspection-astra-concept.html?layout=focus",
-          "changed": null
+          "changed": {
+           "since": "#223",
+           "why": "Pigs without ear tags as one group row per pen, pen counts include them, tagged pigs by ID, a ticked pen keeps its header colour (owner, 2026-10-17 to 10-19)"
+          }
          }
         },
         {
@@ -16290,7 +16293,7 @@
          "preset": "room",
          "steps": [
           "[data-action=\"room-sow\"][data-value=\"000392\"]",
-          "More actions",
+          "Actions",
           "Mark not in pig"
          ]
         }
@@ -17909,9 +17912,9 @@
        "addsTo": [
         {
          "feature": "pig-profile",
-         "what": "Record treatment in the Health group of a pig's More actions",
+         "what": "Record treatment in the Health group of a pig's Actions",
          "screen": "pig-profile.actions",
-         "open": "More actions",
+         "open": "Actions",
          "under": "Health",
          "added": true
         },
@@ -21634,7 +21637,7 @@
          "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
          "preset": "count",
          "steps": [
-          "More actions",
+          "Actions",
           "Transfer sow"
          ],
          "figma": "",
