@@ -119,6 +119,15 @@ test('a sow\'s existing note keeps its row under the grid; only bare verbs becom
   assert.ok(html.indexOf('data-action-group="everyday"')<html.indexOf('data-action-group="content"'));
 });
 
+test('a group of pigs without ear tags alone is offered Condition only: no verb that cannot act on it', () => {
+  const c=context('actions');c.selected.clear();
+  const penWithGroup=c.pens.find(p=>p.untagged?.count);
+  if(!penWithGroup)return; // seed without untagged groups
+  c.selectedNoTags=new Set([penWithGroup.id]);c.noTagsCount={[penWithGroup.id]:penWithGroup.untagged.count};
+  const actions=model.actionCatalogue(c).groups.flatMap(g=>g.items).map(x=>x.a);
+  assert.deepEqual(actions,['health']);
+});
+
 test('pen Actions is a menu drawer too', () => {
   const c=context('actions');c.actionScope='pens';c.selectedPens.add('C1');
   checkMenuDrawer(model.overlay(c));

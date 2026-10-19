@@ -1254,7 +1254,7 @@ function actionCatalogue(c){
  const measurements=live?[item('measurements-menu','measure','Measurements & condition',single?'Weight, condition, backfat':'Body condition and measurements')]:[];
  const adjustFeed=live&&rows.some(p=>!feedUnavailableReason(p,penOf(c,p.id)))?[item('feed-edit-selected','feed','Adjust feed','Review the current daily allowance')]:[];
  if(live&&!adjustFeed.length)unavailable.push({title:'Adjust feed',group:'routine',k:'feed',reason:feedUnavailableReason(rows[0],penOf(c,rows[0].id))+'.'});
- add('routine','Routine',[...hostGeneral.map(x=>Object.assign(item('sow-host-action',x.icon||'note',x.title,x.sub,x.id),{content:!!x.content})),...(!hasUnifiedNote?[item('note','note','Add a note',single?'Leave a note for this sow':'The same note for these pigs')]:[]),...hostRecords.map(x=>item('sow-host-action',x.icon||'note',x.title,x.sub,x.id)),...measurements,...adjustFeed]);
+ add('routine','Routine',[...hostGeneral.map(x=>Object.assign(item('sow-host-action',x.icon||'note',x.title,x.sub,x.id),{content:!!x.content})),...(!hasUnifiedNote&&rows.length?[item('note','note','Add a note',single?'Leave a note for this sow':'The same note for these pigs')]:[]),...hostRecords.map(x=>item('sow-host-action',x.icon||'note',x.title,x.sub,x.id)),...measurements,...adjustFeed]);
  if(!fed&&live&&single)unavailable.push({title:'Body condition adjustment',group:'routine',k:'measure',reason:'Ad-lib pigs do not have an individual ration.'});
  const order=['health','routine','production'];groups.sort((a,b)=>order.indexOf(a.id)-order.indexOf(b.id));
  return {groups,unavailable};
@@ -1369,8 +1369,8 @@ function installV2(){
  else if(a==='batch-page'){c.batchPreview=+v;}
  else if(a==='action-scope'){c.actionScope=v;c.restoreSheetScroll=0;}
  else if(a==='selected-fault'){c.form={faultPenIds:[...c.selectedPens]};if(c.selectedPens.size===1){c.penId=[...c.selectedPens][0];c.form={device:'',description:'',name:''};c.view='fault-form';}else c.view='choose-fault-pen';}
- else if(a==='selected-pen-note'){c.form={note:''};c.view='selected-pen-note';}
- else if(a==='save-selected-note'&&c.form.note?.trim()){const ids=[...c.selectedPens];ids.forEach(id=>{pen(c,id).note=c.form.note.trim();pen(c,id).noteBy='G. Hansen · today · 09:41';});addEvent(c,'Pen note',ids,c.form.note.trim());c.selected.clear();c.selectedPens.clear();c.reviewOnly=false;c.view='list';}
+ else if(a==='selected-pen-note'){const key=[...c.selectedPens].sort().join(' ');if(c.penNoteDraft?.key!==key)c.penNoteDraft={key,note:''};c.form=c.penNoteDraft;c.view='selected-pen-note';} // the form is the draft: Back keeps it (drawer law)
+ else if(a==='save-selected-note'&&c.form.note?.trim()){const ids=[...c.selectedPens];ids.forEach(id=>{pen(c,id).note=c.form.note.trim();pen(c,id).noteBy='G. Hansen · today · 09:41';});addEvent(c,'Pen note',ids,c.form.note.trim());c.penNoteDraft=null;c.selected.clear();c.selectedPens.clear();c.reviewOnly=false;c.view='list';}
  else if(a==='batch-detail'){c.batchId=v;c.view='batch-detail';}
  else if(a==='show-batch'){c.batchFilter=v;c.stage='All';c.healthFilter='All';c.healthStatus='All';c.manualOnly=false;c.triageFilter='All';c.lens='All';c.scroll=0;c.view='list';}
  else if(a==='environment')c.view='environment';
