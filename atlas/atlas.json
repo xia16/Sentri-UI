@@ -28695,21 +28695,6 @@
      }
     },
     {
-     "name": "WeekBoard",
-     "group": "Home",
-     "status": "in-design",
-     "gate": {
-      "status": "in-design"
-     },
-     "files": {
-      "variantsJson": true,
-      "variants": [
-       "board",
-       "key"
-      ]
-     }
-    },
-    {
      "name": "TaskPhone",
      "group": "Task skeleton",
      "status": "in-design",
