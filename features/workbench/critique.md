@@ -88,7 +88,7 @@ Keep: today's rows exactly (Row · Animal with tags: tag over "Pen B2 · Hospita
 
 | Part | Drawn by | Component | Keep / fix / cut |
 |---|---|---|---|
-| The list's frame | Sheet drawer | Page header (pageHeader) + TaskDock | **fix** |
+| The list's frame | Sheet drawer | Page header (pageHeader) | **fix** |
 | Unit heading + rows | Heading · group, Row · Animal in rowGroup | same | keep |
 | Search, with Scan ear tag in it | none | ChoiceList search field (choiceSearch) + IconButton · plain | **new** |
 | Filter | none | IconButton (count badge) + FilterSheet: Segment facets, PickerField, ChoiceList | **new** |

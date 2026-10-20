@@ -447,7 +447,7 @@
   function markedShown(){const m=state.marked,q=(m.q||'').trim().toLowerCase();return markedAll().filter(p=>markedMatch(p,m.filter)&&(!q||p.tag.includes(q)||p.pen.toLowerCase()===q)).sort(penOrder);}
   function markedList(){
     const shown=markedShown();
-    if(!shown.length)return `<div class="mk-empty">${SentriUI.choiceEmpty(state.marked.q?'Check the ear tag, or scan it.':'No pig matches the filter.',{title:'No pigs found',icon:'search'})}${markedFilterCount(state.marked.filter)?SentriUI.button({register:'text',label:'Show all pigs',action:'marked-reset'}):''}</div>`;
+    if(!shown.length)return `<div class="mk-empty">${SentriUI.choiceEmpty(state.marked.q?(markedFilterCount(state.marked.filter)?'The filter may be hiding it.':'Check the ear tag, or scan it.'):'No pig matches the filter.',{title:'No pigs found',icon:'search'})}${markedFilterCount(state.marked.filter)?SentriUI.button({register:'text',label:'Show all pigs',action:'marked-reset'}):''}</div>`;
     return [...new Set(shown.map(p=>p.unit))].map(u=>SentriUI.heading({title:'Unit '+u,kind:'section',level:3})+SentriUI.rowGroup(shown.filter(p=>p.unit===u).map(p=>
       // Plain tags: the title says what to do, so no row is coloured; "1d" marks a pig waiting since yesterday.
       SentriUI.row({variant:'animal',code:p.tag,description:['Pen '+p.pen,careShort[p.care]||'',p.wait?p.wait+'d':''].filter(Boolean).join(' · '),right:{kind:'tags',tags:[{name:p.cond,level:'ongoing'}]},action:'marked-pig',value:String(p.unit)})).join(''))).join('');
