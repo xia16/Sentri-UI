@@ -3,6 +3,7 @@
 <div data-state="Selected" id="sd-state-2"></div>
 <div data-state="Selected + Pressed" id="sd-state-3"></div>
 <div data-state="State on the right" id="sd-state-6"></div>
+<div data-state="Just scanned" id="sd-state-8"></div>
 <div data-state="Group · pigs without ear tags" id="sd-state-7"></div>
 <div data-state="No door" id="sd-state-5"></div>
 <div data-state="Chinese" id="sd-state-4"></div>
@@ -18,6 +19,7 @@ var RENDER = {
   "sd-state-2": () => pig({"checked": true}),
   "sd-state-3": () => pig({"checked": true, "attrs": {"data-preview": "pressed"}}),
   "sd-state-6": () => SentriUI.rowSelectDoor({"code": "000431", "description": "Parity 6", "right": {"kind": "state", "figure": "3 days", "word": "Overdue", "level": "act"}, "action": "room-scan-pick", "value": "000431", "openAction": "open", "openValue": "000431", "inputAttrs": {"aria-label": "Select 000431"}}),
+  "sd-state-8": () => SentriUI.rowSelectDoor({"code": "004318", "description": "Pen A2 · Parity 4", "right": {"kind": "state", "figure": "Tomorrow", "word": "Due", "level": "settled"}, "action": "room-scan-pick", "value": "004318", "openAction": "open", "openValue": "004318", "attrs": {"data-arrival": "on"}, "inputAttrs": {"aria-label": "Select 004318"}}),
   "sd-state-7": () => SentriUI.rowSelectDoor({"code": "14 pigs", "lead": "tag-off", "contextWidth": "112px", "right": {"kind": "tags", "tags": [{"name": "Cough", "level": "watch"}]}, "action": "", "value": "notags-C1", "openAction": "notags-count-open", "openValue": "C1", "label": "14 pigs without ear tags, pen C1", "inputAttrs": {"aria-label": "Select the pigs without ear tags in pen C1"}, "count": {"value": "14", "idle": true}}),
   "sd-state-5": () => SentriUI.rowSelect({"title": "Pen C1", "description": "3 pigs need a look", "value": "C1", "wrap": true, "checked": true}),
   "sd-state-4": () => pig({"description": "妊娠 · 42天", "right": {"kind": "tags", "tags": [{"name": "发烧", "level": "act"}, {"name": "跛行", "level": "watch"}]}})

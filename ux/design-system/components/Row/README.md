@@ -45,6 +45,7 @@ Five tabs, one per job. Each lists the faces the live screens draw, and nothing 
 | Pressed | One step deeper than the surface (`--st-press`: `press` on a white card, `choice-press` on a tinted one) on every tappable face; `attrs: {'data-preview':'pressed'}` demonstrates it statically. |
 | Selected | Native checked checkbox, never colour alone. |
 | Ticked | Task item only: ink disc and a `well` row, no Done chip until saved. |
+| Just scanned | Select + door only (`data-arrival="on"`, set by the host): the row takes `progress-wash` for a moment after its tag is read, then `"off"` fades it back over 0.9 s before the host removes the attribute. Never `well`, which is the ticked tint, and a ticked row keeps its well. Reduced motion: no fade. Farrowing's scan list (owner, 2026-10-20). |
 | Current | `aria-current="location"`: an ink ✓ in the right rail and a 600 title, no fill and no bar. |
 | Disabled | Prefer omission. If retained, pass `disabled` and `reason`: a visible reason line replaces line 2 and the chevron is dropped; no opacity face. |
 | Loading | `act.busy` prevents repeated act while the host settles; label says Recording. |
