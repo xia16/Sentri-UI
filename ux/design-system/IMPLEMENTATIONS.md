@@ -25,6 +25,7 @@ All 18 functions of the old file exist in the bundle. A differential run of 34 c
 | `rowGroup` | diverged (superset) | `data-ds`; `strs` for the title |
 | `row` | diverged (superset) | adds `code`, `chip`, `trail`, typed `trailing`, `wrap`, `tight`, `mono`, token-list title/description, `id`; no change without them |
 | `log` | diverged (superset) | `data-ds`; `strs` per entry; group description |
+| `categoryFooter` | diverged (superset) | `data-ds`; `strs` for Back and each tab |
 | `field` | diverged (superset) | `data-ds` option |
 | `pickerField` | diverged (superset) | `strs` for label, value, placeholder |
 | `chooserList` | diverged (superset) | `data-ds` |
@@ -87,7 +88,7 @@ Button now owns primary, secondary, text action, tool, destructive and hold vari
 
 ## Stepper + Field pass (2026-10-10)
 
-Stepper owns row, count and well in bundle.js / bundle.css. TaskStepper is retired and its `SentriTask.stepper` adapter deleted (2026-10-20): every Piglet processing page calls `SentriUI.stepper` with its variant. Farrowing translates its existing delta-in-value event contract through a small adapter and has no row-stepper, hero-stepper or feature-stepper markup or styles. The unused filled-ink face is retired; count keys remain neutral pending an owner colour decision.
+Stepper owns row, count and well in bundle.js / bundle.css. TaskStepper's markup and CSS face layer is retired; SentriTask.stepper is only a compatibility adapter. Piglet processing's full-task pages call `SentriTask.stepper` (the adapter into `SentriUI.stepper`); only its simple app calls `SentriUI.stepper` directly. Farrowing translates its existing delta-in-value event contract through a small adapter and has no row-stepper, hero-stepper or feature-stepper markup or styles. The unused filled-ink face is retired; count keys remain neutral pending an owner colour decision.
 
 Field owns the input/textarea skin, error border, sans font, auto-grow, visible corrective/help/reason line and ARIA association. Removed phone and page border overrides and local Field skins. Home's report and clarification fields, Inspection's capture helpers / optional-note controls / treatment dose, and Farrowing's optional fault resolution use the bundle. Dose then Unit stack in capture order. No Numpad or Measure split was implemented.
 
@@ -105,7 +106,7 @@ See [verification and rendered proof](components/pass-proof/README.md).
 
 `SentriUI.banner` owns danger, correction and notice; door and small size are properties. `SentriTask.warning` is only an adapter for legacy string slots and tone names. TaskWarning CSS, Farrowing danger/door markup, Inspection removal warnings and Home sync-card styling are retired. Piglet processing's ended notice uses notice and its dist is rebuilt.
 
-`SentriUI.photos` owns the line face built on the existing `optionalRow`; Farrowing death and piglet mortality use it. The unused well/circle face and TaskPhotos CSS are retired. Optional-row labels share choice-label type; Farrowing litter weight already uses that row. Give IDs Measure is unchanged pending the owner's Numpad split. State documents and 375px screenshots live with the two component pages.
+`SentriUI.photos` owns the line face built on the existing `optionalRow`; `SentriTask.photos` delegates without rewriting markup or styling. Farrowing death and piglet mortality use it. The unused well/circle face and TaskPhotos CSS are retired. Optional-row labels share choice-label type; Farrowing litter weight already uses that row. Give IDs Measure is unchanged pending the owner's Numpad split. State documents and 375px screenshots live with the two component pages.
 
 ## State check
 

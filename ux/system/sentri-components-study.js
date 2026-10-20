@@ -33,7 +33,7 @@ actionSection(UI.heading({title:'Production',className:'st-category-heading',ico
 section(UI.heading({title:'General details',icon:icon('profile')}),UI.facts([{label:'Type',value:'Sow'},{label:'Breed',value:state==='empty'?null:'Landrace × Yorkshire'},{label:'Age',value:null},{label:'Weight',value:state==='empty'?null:'186 kg'}]))+section(UI.heading({title:'Litter summary',icon:icon('record'),action:action()}),facts())+section(UI.heading({title:'Pig record',icon:icon('record')}),routeRows());
 const primary=kind==='profile'?'<button class="button primary" data-action="sample">Actions</button>':'';
 // A page's Back is in its page header (Headers law, 2026-10-13); the footer keeps the act alone.
-const page=c==='page',footer=page?(primary?UI.sheetFooter({content:primary}):false):UI.sheetFooter({content:UI.backButton({action:'back'})+primary});
+const page=c==='page',footer=kind==='actions'?UI.categoryFooter({categories:[{id:'health',label:'Health'},{id:'routine',label:'Routine'},{id:'production',label:'Production'}],active:'production',backAction:page?false:'back',categoryAction:'study-category'}):page?(primary?UI.sheetFooter({content:primary}):false):UI.sheetFooter({content:UI.backButton({action:'back'})+primary});
 const sheet=UI.sheet({variant:page?'page':'drawer',title:heading,back:{action:'back'},body,footer,bar:'<div class="statusbar">9:41</div>'});
 return `<div class="study-recipe phone inspection-phone" data-st-context="${c}" data-surface="${c}">${sheet}</div>`;
 }

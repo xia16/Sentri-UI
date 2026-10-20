@@ -28,5 +28,5 @@ test('photo errors win over hints, cancellation keeps silent, task adapter is id
  assert.match(UI.photos({error:'denied',hint:'Wrong hint'}),/Camera not allowed/);
  assert.doesNotMatch(UI.photos({error:'denied',hint:'Wrong hint'}),/Wrong hint/);
  assert.doesNotMatch(UI.photos({error:'cancelled',hint:'Wrong hint'}),/Wrong hint/);
- assert.equal(K.photos,undefined); // the TaskPhotos alias is gone: Photos is called directly
+ const props={id:'same',items:[{id:'one'}]};assert.equal(K.photos(props),UI.photos(props));
 });

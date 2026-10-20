@@ -319,7 +319,7 @@
   function settleRows() { var c = countsNow(); return settleRow(c) + agreeRow(c); }
   function countSheet() {
     var d = draft(), h = hint(d), p = pointer(d);
-    var hero = UI.stepper({ variant: 'count', label: '', value: S.observed, min: 0, key: 'observed', draft: dirty(), hint: '', reserveHint: true,
+    var hero = K.stepper({ face: 'count', label: '', value: S.observed, min: 0, key: 'observed', variant: 'hero', draft: dirty(), hint: '', reserveHint: true,
       strs: { label: 'pp.count.seen', value: 'ds.field.figure', hint: h.id, decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase' },
       args: { label: { code: crate }, hint: h.args } });
     if (S.blank) hero = hero.replace(/(<span class="st-stepper-value"[^>]*?)\s+data-str="[^"]*"(?:\s+data-args="[^"]*")?([^>]*>)\d+(<\/span>)/, '$1 data-str="pp.count.blank"$2–$3').replace(' data-zero=""', '');

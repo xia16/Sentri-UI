@@ -20,17 +20,19 @@ test('canonical glyphs retain aliases without duplicate catalogue entries or fal
  assert.match(icons.paths.grid,/M14 14h7v7h-7z/);
  assert.equal((icons.icon('more').match(/r="1.5"/g)||[]).length,3);
 });
-test('Panel consumers share their surface',()=>{
+test('Panel consumers share their surface and category navigation never disables an empty strip',()=>{
  assert.equal(ctx.SentriUI.panel(''),'');
  assert.match(ctx.SentriUI.choiceGroup(['content']),/class="st-panel st-choice-panel"/);
- assert.equal(ctx.SentriUI.categoryFooter,undefined); // retired 2026-10-20: no live screen drew it
+ const footer=ctx.SentriUI.categoryFooter({categories:[{id:'health',label:'Health',disabled:true}],active:'missing'});
+ assert.match(footer,/aria-current="location"/);
+ assert.doesNotMatch(footer,/ disabled|aria-disabled/);
  vm.runInNewContext(fs.readFileSync(path.join(base,'task-skeleton.js'),'utf8'),ctx);
  assert.match(ctx.SentriTask.group({title:'B1',rows:'row'}),/class="st-panel tk-group"/);
 });
 test('variant states remain independently renderable in atlas srcdoc',()=>{
  const atlas=JSON.parse(fs.readFileSync(path.join(__dirname,'../../atlas/atlas.json'),'utf8'));
  const ids=new Set();function walk(v){if(v&&typeof v==='object'){if(v.id&&v.url)ids.add(v.id);Object.values(v).forEach(walk)}}walk(atlas);
- for(const name of ['Panel','Icon']){
+ for(const name of ['Panel','Icon','CategoryFooter']){
   const dir=path.join(base,name);const variants=JSON.parse(fs.readFileSync(path.join(dir,'variants.json'),'utf8'));
   for(const variant of variants){
    for(const id of variant.usedBy)assert.ok(ids.has(id),id);

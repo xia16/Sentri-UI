@@ -2,5 +2,5 @@
   "status": "retired",
   "judged": "2026-10-20",
   "classification": "variant-of:Button",
-  "note": "Merged into Button (hold variant) and SentriUI.holdBind. The SentriTask.holdBind alias was deleted on 2026-10-20."
+  "note": "Merged into Button (hold variant) and SentriUI.holdBind. SentriTask.holdBind is a compatibility alias with two callers left (piglet-processing bulk.html and end.html); delete it once they call SentriUI.holdBind. No library page."
 }

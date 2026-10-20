@@ -596,7 +596,7 @@
     if (rem > 0 && !drawer.active) {
       var step = function (k, label, desc, v, other, fromRows) {
         var cap = rem - other, ceil = drawer.ceil === k && v >= cap;
-        return UI.stepper({ variant: 'row', label: '', description: '', value: v, min: 0, max: cap, key: k, action: 'count', draft: v > (L.sexCounts.saved || { boars: 0, gilts: 0 })[k], hint: ceil ? '' : undefined,
+        return K.stepper({ face: 'row', label: '', description: '', value: v, min: 0, max: cap, key: k, action: 'count', draft: v > (L.sexCounts.saved || { boars: 0, gilts: 0 })[k], hint: ceil ? '' : undefined,
           strs: Object.assign({ label: label, description: desc, value: 'ds.field.figure', decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase' },
             ceil ? { hint: 'pp.id.lw.ceiling' } : {}),
           args: { description: { t: v + fromRows, k: fromRows }, hint: { r: rem } } });

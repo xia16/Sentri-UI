@@ -109,7 +109,13 @@
     return root.SentriUI.row(props);
   }
 
+  // Compatibility adapter; Stepper owns every face and its implementation.
+  function stepper(props = {}) {
+    return root.SentriUI.stepper({...props,variant:props.face||(props.variant==='hero'?'well':props.variant||'row')});
+  }
 
+  /* TaskPhotos: compatibility alias; Photos owns the optional line face. */
+  function photos(props = {}) { return root.SentriUI.photos(props); }
 
   /* ---- door (alias of SentriUI.row / rowAction — use Row): a row with no id column (farrowing's .disclosure): a title, one muted description line, a chevron.
      For a non-animal door inside a sheet or a page (`Record here › Move piglets`). ---- */
@@ -179,6 +185,8 @@
     return `<section class="tk-day" data-ds="TaskDay"${L(label ?? title)}><header class="tk-day-head"><strong>${parts(title)}</strong>${status ? `<span>${parts(status)}</span>` : ''}</header>${rows}</section>`;
   }
 
+  // Compatibility alias: Button owns the hold face and interaction.
+  const holdBind = (scope, opts = {}) => root.SentriUI.holdBind(scope, opts);
 
   /* ---- TaskDoors: a list of doors. card: false (default) — flat door rows (SentriTask.door, no id column).
      card: true — farrowing's Pen page / sow-actions list: an optional section title with its icon, then the doors in one
@@ -256,7 +264,7 @@
   }
   function dialog(o = {}) { return root.SentriUI.sheet(Object.assign({}, o, { variant: 'dialog' })); }
 
-  const api = { T, statusbar, phone, screen, header, summary, progress, lens, list, group, row, door, doors, radios, warning, section, receipt, day, table, metrics, choice, totals, dock, footer, scrim, sheet, drawer, page, dialog, glyph };
+  const api = { T, statusbar, phone, screen, header, summary, progress, lens, list, group, row, door, doors, radios, warning, section, receipt, day, holdBind, table, metrics, stepper, photos, choice, totals, dock, footer, scrim, sheet, drawer, page, dialog, glyph };
   root.SentriTask = api;
   if (typeof module !== 'undefined') module.exports = api;
 })(globalThis);

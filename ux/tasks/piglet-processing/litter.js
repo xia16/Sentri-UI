@@ -607,7 +607,7 @@
     function stepperRow(key, label, desc, descArgs, value, max, ceilId, ceilArgs, min) {
       var atCeil = ceilTap === key && max != null && value >= max;
       // farrowing's entry row (TaskStepper row face): outlined keys, 15px label, 18px mono value
-      return UI.stepper({ variant: 'row', label: '', description: desc ? '' : undefined, value: value, min: min || 0, max: max, key: key, hint: atCeil ? '' : undefined,
+      return K.stepper({ face: 'row', label: '', description: desc ? '' : undefined, value: value, min: min || 0, max: max, key: key, hint: atCeil ? '' : undefined,
         strs: Object.assign({ label: label, value: 'ds.field.figure', decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase' }, desc ? { description: desc } : {}, atCeil ? { hint: ceilId } : {}),
         args: Object.assign({}, desc ? { description: descArgs } : {}, atCeil ? { hint: ceilArgs } : {}) });
     }

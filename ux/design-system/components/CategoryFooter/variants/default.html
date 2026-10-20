@@ -1,0 +1,18 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><style>body{margin:0;font-family:var(--font-sans);color:var(--ink)}[data-state]{box-sizing:border-box;max-width:100%}.glyphs{display:grid;grid-template-columns:repeat(auto-fit,minmax(var(--back-width),1fr));gap:var(--space-8)}.glyphs span{display:flex;align-items:center;gap:var(--space-4);font-size:var(--font-size-12)}[data-st-context="drawer"]{background:var(--paper)}</style><body>
+<div data-state="Default"></div>
+<div data-state="Pressed"></div>
+<div data-state="Active"></div>
+<div data-state="Empty"></div>
+<div data-state="Five categories at 300px"></div>
+<div data-state="Long label / Chinese"></div>
+<div data-state="Back pressed"></div>
+<div data-state="Scrolled"></div>
+<script>document.querySelectorAll('[data-state]').forEach(el=>{const state=el.dataset.state;
+let categories=[{id:'health',label:'Health'},{id:'routine',label:'Routine'},{id:'production',label:'Production'}];
+if(state==='Empty')categories=[];
+if(state.includes('Chinese'))categories=[{id:'health',label:'健康与动物护理记录'},{id:'routine',label:'日常工作'},{id:'production',label:'生产'}];
+if(state.includes('300px')||state==='Scrolled'){el.style.width='var(--size-300)';el.style.padding='0';categories.push({id:'equipment',label:'Equipment'},{id:'records',label:'Records'});}
+el.innerHTML=SentriUI.categoryFooter({categories,active:state==='Active'?'routine':'health'});
+if(state==='Back pressed')el.querySelector('.surface-back').dataset.preview='pressed';
+if(state==='Scrolled')el.querySelector('.st-category-tabs').scrollLeft=el.querySelector('.st-category-tabs').scrollWidth;
+if(state==='Pressed')el.querySelector('.st-category-tabs button').dataset.preview='pressed';});</script></body></html>

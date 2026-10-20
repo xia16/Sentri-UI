@@ -744,7 +744,7 @@
     S.ended = true; S.pending = S.already = S.unconfirmed = false; S.sheet = sheet;
     setUrl(false, { sheet: sheet || undefined, deep: true, ended: true }); render();
   }
-  holds = UI.holdBind(screen, { t: function (id) { return PP.t(id); },
+  holds = K.holdBind(screen, { t: function (id) { return PP.t(id); },
     cues: { keep: 'pp.end.hold.keep', tap: 'pp.end.hold.tap', released: 'pp.end.hold.released', disarmed: 'pp.end.hold.released', again: 'pp.end.hold.again', early: 'pp.end.hold.again', pending: 'pp.end.hold.pending', failed: 'pp.end.hold.failed', unknown: 'pp.end.hold.unknown' },
     onCommit: function (el) { commitEnd(el); } });
   screen.addEventListener('keydown', function (ev) {

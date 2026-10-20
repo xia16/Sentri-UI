@@ -8,6 +8,7 @@
 #study-content[data-view="components"] .study-canvas{padding:18px}
 .study-recipe{width:100%;max-width:var(--study-phone-width,390px)}
 
+#study-content[data-view="components"] .study-canvas>.st-category-footer{margin:-18px;width:calc(100% + 36px)}
 
 /* Phone previews retain touch scrolling without showing a desktop scrollbar. */
 .study-recipe .sheet-body,.study-canvas{scrollbar-width:none;-ms-overflow-style:none;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}

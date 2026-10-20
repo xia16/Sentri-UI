@@ -208,7 +208,7 @@
   function tallyRow(c) {
     var d = S.pig.tallies[c] || 0, full = bodies() >= draft().cap;
     var cause = PP.t('ds.dead.cause.' + c);
-    return UI.stepper({ variant: 'row', label: '', value: d, min: 0, max: full ? d : null, key: c, action: 'dead-step',
+    return K.stepper({ face: 'row', label: '', value: d, min: 0, max: full ? d : null, key: c, action: 'dead-step',
       draft: d > 0, reserveHint: S.hint === c, hint: S.hint === c ? ' ' : '',
       strs: Object.assign({ label: 'ds.dead.cause.' + c, value: 'ds.field.figure', decrease: 'pp.dead.aria.less', increase: 'pp.dead.aria.more' },
         S.hint === c ? { hint: roster().length ? 'ds.dead.hint.cap_identified' : 'ds.dead.hint.cap' } : {}),
@@ -242,7 +242,7 @@
         options: [opt('some', pl('pp.dead.loss.some', m), { m: m }), opt('none', 'ds.dead.loss.none')] });
     }
     if (k > 0 && (many || d.kMin > 0)) {
-      out += UI.stepper({ variant: 'row', label: '', value: k, min: Math.max(1, d.kMin), max: d.kMax, key: 'k', action: 'loss-step', hint: ' ',
+      out += K.stepper({ face: 'row', label: '', value: k, min: Math.max(1, d.kMin), max: d.kMax, key: 'k', action: 'loss-step', hint: ' ',
         strs: { label: 'pp.dead.loss.howmany', value: 'ds.field.figure', hint: hint ? hint.id : 'ds.dead.loss.ask', decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase' },
         args: { hint: hint ? hint.args : null } });
     }
@@ -291,7 +291,7 @@
   function photoField(key, active) {
     var list = S[key].photos, del = S.deleted && S.deleted.key === key;
     var hint = del ? 'ds.c2.photos.deleted' : S.photoHint[key] || '';
-    return UI.photos({ label: '', optional: '', key: key, id: 'dd-photos-' + key, active: active, items: list.map(function (p) { return { id: p.id }; }),
+    return K.photos({ label: '', optional: '', key: key, id: 'dd-photos-' + key, active: active, items: list.map(function (p) { return { id: p.id }; }),
       count: list.length ? { text: '', strs: { text: 'ds.c2.photos.attached' }, args: { text: { n: list.length } } } : null, hint: hint ? ' ' : '',
       strs: Object.assign({ label: 'ds.dead.photos', optional: 'ds.field.optional', camera: 'ds.c2.aria.camera', thumb: 'ds.c2.aria.thumb', index: 'ds.c2.photos.index' }, hint ? { hint: hint } : {}),
       args: { hint: { n: 12 } } }) + (del ? textAct('photo-undo', 'ds.c2.undo', null, key) : '');

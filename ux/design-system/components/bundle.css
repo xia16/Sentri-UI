@@ -317,6 +317,23 @@ button.st-row:disabled{cursor:default}
 .device .sheet-footer .primary{margin:0;min-width:0;flex:1;min-height:var(--footer-height);background:var(--st-ink)}
 [data-st-context="drawer"] .evidence,.device .drawer[data-st-context="drawer"] .evidence{background:var(--st-panel-bg)}
 
+/* Section navigation footer: preserve the approved Back + underlined categories. */
+.st-category-footer.st-category-footer{display:grid;grid-template-columns:var(--back-width) minmax(0,1fr);align-items:center;gap:var(--space-16);position:relative;flex:none;min-width:0;padding:var(--space-footer-top) var(--space-gutter) var(--space-footer-bottom);border-top:var(--border-width) solid var(--st-line);background:var(--st-paper);container-type:inline-size}
+.st-category-footer.st-category-footer[data-back="none"]{grid-template-columns:minmax(0,1fr)}
+.st-category-footer .st-category-tabs{display:flex;min-width:0;gap:var(--space-2);overflow-x:auto;overscroll-behavior-x:contain;padding:0;margin:0;border:0;background:transparent;scrollbar-width:none}
+.st-category-tabs::-webkit-scrollbar{display:none}
+/* Overflow cue: tabs snap to their start, and the strip fades at whichever edge has more to scroll. No overflow, no fade. */
+@property --st-fade-l{syntax:"<length>";inherits:false;initial-value:0px}
+@property --st-fade-r{syntax:"<length>";inherits:false;initial-value:0px}
+.st-category-footer .st-category-tabs{scroll-snap-type:x proximity;--st-fade-l:0px;--st-fade-r:0px;-webkit-mask-image:linear-gradient(to right,transparent,#000 var(--st-fade-l),#000 calc(100% - var(--st-fade-r)),transparent);mask-image:linear-gradient(to right,transparent,#000 var(--st-fade-l),#000 calc(100% - var(--st-fade-r)),transparent);animation:st-tabs-fade linear both;animation-timeline:scroll(self inline)}
+.st-category-footer .st-category-tabs button{scroll-snap-align:start}
+@keyframes st-tabs-fade{0%{--st-fade-l:0px;--st-fade-r:var(--space-24)}8%{--st-fade-l:var(--space-24);--st-fade-r:var(--space-24)}92%{--st-fade-l:var(--space-24);--st-fade-r:var(--space-24)}100%{--st-fade-l:var(--space-24);--st-fade-r:0px}}
+.st-category-footer .st-category-tabs button{position:relative;flex:1 0 auto;min-width:var(--tap-min);min-height:var(--footer-height);margin:0;padding:0 var(--space-8);border:0;border-radius:0;background:transparent;color:var(--tab-ink);font:500 var(--font-size-12) var(--font-sans);white-space:nowrap;touch-action:manipulation}
+.st-category-footer .st-category-tabs button[aria-current="location"]{background:transparent;color:var(--tab-ink-active);font-weight:700}
+.st-category-tabs button[aria-current="location"]:after{content:"";position:absolute;bottom:var(--border-width);left:var(--space-8);right:var(--space-8);height:var(--size-3);border-radius:var(--radius-2);background:var(--current-marker)}
+.st-category-footer .st-category-tabs button:is(:active,[data-preview="pressed"]){background:var(--press)}
+@container(max-width:310px){.st-category-footer .st-category-tabs button{padding-left:var(--space-4);padding-right:var(--space-4);font-size:var(--font-size-11)}}
+
 /* Picker field: the mobile-standard choice control that replaces native selects.
    The trigger echoes text-input geometry; the sheet lists options as tappable rows. */
 .st-picker-field .st-picker-trigger{display:flex;align-items:center;justify-content:space-between;gap:var(--space-10);width:100%;min-height:var(--field-height);padding:var(--space-12);border:1px solid var(--control-border);border-radius:var(--radius-12);background:var(--st-paper);color:var(--st-ink);font:400 var(--font-size-14)/1.5 var(--font-sans);text-align:left;touch-action:manipulation}
