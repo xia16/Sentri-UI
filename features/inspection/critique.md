@@ -242,3 +242,27 @@ Scope: the Inspection pen page (`inspection.pen`) and the walk's pen header. Own
 Walk (gate): the Assistant's composer and finding answer lost their text on tab switch or Back (also on main; `assistant.conversation` is walked because it shares the prototype's code). They now keep it until sent.
 
 Order (owner, 2026-10-19, confirmed after judge round 1): the pen verbs stay on top; Needs attention follows them. Round 1 (void, calibration miss) asked for Needs attention first; the owner kept actions first.
+
+---
+
+# Tile grid: one row up to five (2026-10-20)
+
+Scope: the pen page's verb grid (`inspection.pen`: Note, Feed, Observe, Fault, Tick all) and the Actions drawers (`inspection.actions`, `inspection.pen-actions`). The facts drawn are unchanged (budget unchanged). Owner ruling 2026-10-20: one row up to five tiles, two rows only from six.
+
+## Keep
+
+- Every verb, word, icon and order; the pen page's order (verbs, Needs attention, Now, Pen log).
+
+## Problems
+
+- **major** · The pen page's five verbs drew 3 + 2, and four-verb drawers 2 + 2: a short second row and a gap (owner, 2026-10-20: two rows only from six).
+
+## Parts
+
+| Part | Drawn by | Keep / fix / cut |
+|---|---|---|
+| Pen verbs, everyday verbs | Row `tile` in `rowGrid` | **fix** (one row up to five) |
+
+## Self-crit
+
+- **Better because** the pen page's verbs are one line above Needs attention, so what needs someone moves up the screen; six and more keep two even rows.

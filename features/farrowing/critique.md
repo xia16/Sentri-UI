@@ -568,3 +568,27 @@ Scope: Farrowing's Scan ear tags and Find a sow, its Scan Actions sheet, Home's 
 - **Squint test:** on Scan, the sow ids and her red overdue state, then the footer's one control. On Find a sow, the field, then the unit headings, then the tags. On To treat, the title, the ids, then the unit headings.
 - **Cluttered, flat or bulky:** two facts went (the pill and the counts) and nothing was added beside them. The arrival wash is temporary. The verb grid is the house grid.
 - **Better because** each fact is said once, every unit list reads the same way, the scan list lines up with the room, a scan lands where the eye can find it, and Back goes one level up.
+
+---
+
+# Tile grid: one row up to five (2026-10-20)
+
+Scope: the verb grids in Farrowing's drawers: `farrowing.sow-actions` (a sow's Actions) and `farrowing.scan-actions` (the ticked sows' Actions after a scan: Transfer, Condition, Treat, Note). No verb, word or icon changes (budget unchanged). Owner ruling 2026-10-20: one row up to five tiles, two rows only from six.
+
+## Keep
+
+- Every verb, its word and icon, the order, Back alone in the footer.
+
+## Problems
+
+- **major** · Four or five verbs drew two rows (2 + 2, 3 + 2): a short second row and a gap (owner, 2026-10-20: "looks really dumb").
+
+## Parts
+
+| Part | Drawn by | Keep / fix / cut |
+|---|---|---|
+| Verb grid | Row `tile` in `rowGrid` | **fix** (one row up to five) |
+
+## Self-crit
+
+- **Better because** the scan drawer's four verbs are one line under Actions and the drawer is shorter, so more of the ticked sows stay in view above it.
