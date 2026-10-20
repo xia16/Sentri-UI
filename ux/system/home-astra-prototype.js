@@ -459,7 +459,7 @@
     const tools='<span class="mk-field-tools">'+SentriUI.iconButton({variant:'plain',action:'mk-clear',icon:icon('close'),label:'Clear',className:'mk-clear'}).replace('<button','<button'+(m.q?'':' hidden'))+SentriUI.iconButton({variant:'plain',action:'mk-scan',icon:icon('scan'),label:'Scan ear tag',className:'mk-scan'})+'</span>';
     const search=SentriUI.choiceSearch({label:'Search ear tag or pen',placeholder:'Ear tag or pen',value:m.q||'',attrs:{'data-mk-search':''}}).replace(/<button[^>]*st-search-clear[\s\S]*?<\/button>/,'').replace(/<\/span><\/label>$/,tools+'</span></label>');
     const filter=SentriUI.iconButton({action:'marked-filter',icon:icon('filter'),label:'Filter pigs'+(n?', '+n+' applied':''),badge:n||'',className:'mk-filter'});
-    return head(title)+`<div class="app-scroll mk-scroll"><div class="mk-bar">${search}${filter}</div><div class="mk-list">${markedList()}</div></div>`;
+    return head(title)+`<div class="app-scroll mk-scroll"><div class="tk-lens mk-bar"><div class="tk-lens-bar">${search}${filter}</div></div><div class="mk-list">${markedList()}</div></div>`;
   }
   // The filter holds every facet: unit (when the list spans more than one), care (To treat), and the condition.
   function markedFilter(){
