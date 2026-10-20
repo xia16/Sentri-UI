@@ -16743,14 +16743,17 @@
        "platform": "mobile",
        "section": "health",
        "newFeature": false,
-       "duplicates": "built inside Inspection — see inspection / health-record",
+       "duplicates": "",
        "groups": [
         [
-         "Add condition",
+         "Add a condition",
          [
           "disease.add-select",
           "disease.add-drawer",
           "disease.catalogue",
+          "disease.catalogue-area",
+          "disease.catalogue-add",
+          "disease.add-ready",
           "disease.add-committed"
          ]
         ],
@@ -16759,100 +16762,495 @@
          [
           "disease.resolve-one",
           "disease.resolve-many",
+          "disease.resolve-outcome",
           "disease.resolve-in-place",
           "disease.resolve-committed"
          ]
         ]
        ],
+       "entryPoints": [
+        {
+         "section": "Inspection",
+         "label": "Pigs ticked on the walk: Actions",
+         "from": "inspection.walk",
+         "control": "Actions",
+         "lands": "disease.add-select"
+        },
+        {
+         "section": "Pigs",
+         "label": "One pig: Actions on its record",
+         "from": "pig-profile.full",
+         "control": "Actions → Resolve",
+         "lands": "disease.resolve-one"
+        }
+       ],
        "screens": [
         {
          "id": "disease.add-select",
-         "name": "Select pigs · verb sheet",
-         "zh": "选择猪只",
+         "name": "Two pigs ticked · Actions",
+         "zh": "已选两头 · 操作",
+         "aliasOf": "inspection.actions",
          "status": "in-design",
-         "url": "/ux/archive/workflows.html?sec=wf-condition&slide=1",
-         "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "selected",
          "notes": {
-          "purpose": "Two ticked pigs raise the verb sheet; Condition is a tile under Health.",
-          "rules": [
-           "Blocked verbs are omitted, not greyed; one line accounts for them."
+          "purpose": "One menu drawer of actions for the ticked pigs or pens: the everyday verbs as a grid of icon tiles, over the list it acts on. Here two pigs are selected.",
+          "elements": [
+           {
+            "name": "Verb grid",
+            "at": "Condition",
+            "shows": "Health then Routine verbs as one card of icon tiles, one word each from the strings registry (Condition, Treat, Edit, Resolve, Care, Note, Transfer, Measure, Feed)",
+            "states": [
+             {
+              "state": "Two rows",
+              "when": "Two or more verbs",
+              "shows": "Two rows, split evenly: 5 = 3+2, 6 = 3+3, 8 = 4+4, 10 = 5+5"
+             },
+             {
+              "state": "More",
+              "when": "More than ten verbs",
+              "shows": "Nine tiles and More just before Death (Death never folds); More opens every tile in even rows of at most five, the one case of a third row"
+             },
+             {
+              "state": "Death",
+              "when": "Record sow death is offered",
+              "shows": "The last tile, in red ink"
+             }
+            ],
+            "rule": "The word under the icon is the short verb; the accessible name always contains it: the full action name when that holds the word as a whole word (Add a note), else the word, then the full name (Condition, Disease or symptom). A verb whose line is content (an existing sow note) keeps its described row under the grid."
+           },
+           {
+            "name": "Action row availability",
+            "shows": "Rows in Health and General groups",
+            "states": [
+             {
+              "state": "Record a health finding / treatment",
+              "when": "At least one selected pig is alive",
+              "shows": "Shown"
+             },
+             {
+              "state": "Edit conditions",
+              "when": "Two or more selected AND one has a condition",
+              "shows": "Shown; bulk only"
+             },
+             {
+              "state": "Resolve conditions · Care instructions",
+              "when": "A selected pig has a condition",
+              "shows": "Shown; otherwise unavailable (\"No open conditions to resolve.\" / \"Record a health finding first.\")"
+             },
+             {
+              "state": "Adjust feed",
+              "when": "At least one pig can be fed (not ad-lib, not dead, has a plan)",
+              "shows": "Shown; otherwise unavailable with the reason"
+             },
+             {
+              "state": "Add a note",
+              "when": "Live pigs",
+              "shows": "Always shown"
+             },
+             {
+              "state": "Production group",
+              "when": "Exactly one pig",
+              "shows": "Hidden for several pigs or pens so a group never gets a single-sow workflow"
+             },
+             {
+              "state": "Adjust feed unavailable",
+              "when": "No selected pig can be fed",
+              "shows": "Reason is that of the first selected pig only (Pig has died / Ad-lib feeding has no fixed daily allowance / No feeding plan recorded)"
+             },
+             {
+              "state": "Health group empty",
+              "when": "No selected pig is alive",
+              "shows": "Group and its rows are absent"
+             }
+            ],
+            "logic": "Rows that do not apply move to \"Unavailable actions (N)\" with the reason. Dead sows get only a note.",
+            "source": "ASTRA-BULK-ACTIONS",
+            "at": "Edit conditions"
+           },
+           {
+            "name": "Measurements & condition menu",
+            "shows": "Body condition, weight, backfat, temperature",
+            "logic": "Weight takes a separate value per pig. Backfat for sows and gilts only. Temperature is offered for one pig only.",
+            "rule": "Batch save applies only to included, changed rows; an invalid entered value blocks the whole save.",
+            "at": "Measurements & condition"
+           },
+           {
+            "name": "Footer tabs",
+            "shows": "Health · General",
+            "logic": "Jump to a group; the active tab follows the scroll.",
+            "at": "General"
+           }
           ],
-          "edge": [
-           "A missing Production strip (growers) is a reading, not a gap."
+          "controls": [],
+          "copy": [
+           "Actions (raw)",
+           "Disease or symptom (raw)",
+           "Record treatment (raw)",
+           "Adjust feed (raw)",
+           "Unavailable actions (raw)"
+          ],
+          "issues": [
+           "Health and General groups sit in one long scroll with tabs at the foot; two small groups do not need tabs.",
+           "Edit conditions, Resolve conditions and Care instructions all edit a finding: three doors for one record.",
+           "Measurements & condition puts body condition (a health record) next to weight and backfat.",
+           "The sheet header says only \"2 pigs\"; it does not name them."
           ]
          }
         },
         {
          "id": "disease.add-drawer",
-         "name": "Add condition · one drawer",
-         "zh": "添加疾病 / 症状",
+         "name": "Record health · two pigs",
+         "zh": "记录健康 · 两头",
+         "aliasOf": "health-record.record-health",
+         "preset": "selected",
+         "steps": [
+          "[data-action=\"health\"]"
+         ],
          "status": "in-design",
-         "url": "/ux/archive/workflows.html?sec=wf-condition&slide=2",
-         "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
          "notes": {
-          "purpose": "The whole add flow is one sheet: conditions, triage preset and the primary that says what it writes.",
+          "purpose": "Add one or more diseases or symptoms to the pigs chosen on the walk list, in one move. The selection is made first and is fixed here: Record health is a page of fields like Record treatment, with no pig list (owner, 2026-10-17).",
+          "states": [
+           "One pig or many, the same page: Conditions, Care, Note (optional) and Save · N. To change who, go Back and use the Selected page."
+          ],
           "elements": [
            {
-            "name": "Triage",
-            "at": "Triage",
-            "shows": "Inline Choice with Monitor preselected",
-            "rule": "Triage rides inline with the preset Monitor because no null level exists. Its option hints carry the consequences."
+            "name": "Care default",
+            "shows": "Care · No action needed",
+            "logic": "The same care is given to every added condition. The default is No action needed, so a newly recorded Fever does not need attention unless Care is changed.",
+            "rule": "Care is the only editable condition state: No action needed, Monitor, Treat in place, Move to hospital pen. A condition needs attention for every choice except No action needed.",
+            "at": "No action needed"
+           },
+           {
+            "name": "Save",
+            "shows": "Save · N pigs",
+            "rule": "Waits until a condition is chosen. N counts the tagged pigs and the pigs without ear tags chosen on their group rows (2 tagged + 3 of 14 = Save · 5 pigs). A tap while it waits marks Conditions \"Required\". Writes one finding per tagged pig and name, and the count on each group row; a condition a pig already has is skipped and keeps its start date. Returns to the walk list; several pigs confirm with a toast (\"Condition recorded · 5 pigs\"), one pig with its new tag on the row.",
+            "at": "Save"
            }
           ],
+          "controls": [],
+          "copy": [
+           "Record health (raw)",
+           "Required (raw)",
+           "Care (raw)",
+           "Add note (raw)",
+           "No action needed (raw)"
+          ],
           "rules": [
-           "The drawer is the review: the picker step, the confirm card, the read-only roster and the toast were removed.",
-           "view > filters the live list, which can still deselect."
+           "One searchable disease/symptom catalogue for one or many pigs."
+          ],
+          "issues": [
+           "Default Care \"No action needed\" makes the quickest path (choose Fever, Save) record a fever as a non-alert (filed To confirm).",
+           "The catalogue needs three levels (tab, door, item) for a gloved worker."
           ]
          }
         },
         {
          "id": "disease.catalogue",
-         "name": "Condition catalogue",
-         "zh": "疾病目录",
+         "name": "Choose conditions",
+         "zh": "选择病症",
+         "aliasOf": "health-record.condition-picker",
+         "preset": "selected",
+         "steps": [
+          "[data-action=\"health\"]",
+          "[data-action=\"bulk-pick-health\"]"
+         ],
          "status": "in-design",
-         "url": "/ux/archive/workflows.html?sec=wf-condition&slide=3",
-         "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
          "notes": {
-          "purpose": "One flat list under body-system groups with search; each entry carries its class silently.",
+          "purpose": "Search or browse one conditions catalogue and tick one or more: symptoms by where you look, diseases by body system (features/conditions).",
           "elements": [
            {
-            "name": "Condition row",
-            "shows": "Name, class behind the info icon, and how many of the selected pigs already carry it",
-            "logic": "The per-item count answers \"already carrying\" before the tick. A fever writes a case with a day count; a hernia writes a characteristic on the pig page.",
-            "source": "wf-condition, slide 3"
+            "name": "Catalogue",
+            "shows": "Search; On these pigs; Recent; Symptoms (six areas); Diseases (six body systems), each area a row with an icon and a line of examples",
+            "states": [
+             {
+              "state": "First level",
+              "when": "Opened",
+              "shows": "Symptoms: Whole animal, Breathing, Head, Skin, Legs and feet, Rear and belly. Diseases: Respiratory, Gut, Reproductive, Udder, Joints skin and nerves, Whole body. Each row: icon tile, name, examples (\"Coughing, breathing hard, sneezing\"), or \"1 selected\" once something inside is ticked."
+             },
+             {
+              "state": "A level",
+              "when": "A row tapped",
+              "shows": "The area as the title; ✕ closes the picker and keeps the ticks; the footer Back goes up one level (owner ruling B, 2026-10-16). A symptom with types (Diarrhoea, Lame, Off feed, Nasal discharge…) opens its types plus \"Not sure which\"."
+             },
+             {
+              "state": "Search",
+              "when": "Text typed",
+              "shows": "Searches the whole catalogue (names and other names); every result names its area; with no match, one card: Add \"…\""
+             },
+             {
+              "state": "Add a condition",
+              "when": "Add \"…\" tapped",
+              "shows": "Name (pre-filled) and Category (one pick: a symptom area or a disease system, so the kind is chosen with it); Back, Add. Adding lists it for the farm and ticks it. Anyone may add a symptom or a disease."
+             }
+            ],
+            "logic": "A reportable disease (ASF, FMD, CSF, PRRS, PED) stays in its system, marked \"Reportable\"; there is no separate Report a disease. Deaths, abortions and pen-wide observations are not conditions. The drawer keeps one height from open to close.",
+            "at": "Breathing"
+           },
+           {
+            "name": "Done",
+            "shows": "Done · N",
+            "rule": "Done · N applies the ticks to the Conditions field and closes. Back goes up one level; at Conditions it closes without applying, and so does the ✕ from any level; ticks wait for the next open (the scrim does the same). Done waits while nothing is ticked and nothing was applied.",
+            "at": "Done"
            }
           ],
-          "rules": [
-           "Groups are body words (Belly), never the class (Standing). The footnote states a consequence: a tick adds no second case."
+          "controls": [],
+          "copy": [
+           "Conditions (raw)",
+           "Symptoms (raw)",
+           "Diseases (raw)",
+           "Search all options (raw)",
+           "Add “{name}” (raw)",
+           "Add a condition (raw)",
+           "Done · N (raw)"
           ],
           "edge": [
-           "Ambiguous entries split in the catalogue (injury versus chronic lameness) rather than asking the farmer."
+           "The catalogue is ux/system/conditions-catalogue.js: one list, three kinds (symptom, event, disease), English and Chinese."
+          ],
+          "rules": [
+           "Diseases and symptoms are one catalogue and one picker."
+          ],
+          "issues": [
+           "\"Link condition\" (for a treatment) reuses this catalogue with another layout: two near-identical pickers.",
+           "No recently used list: a frequent condition sits two doors deep each time."
+          ]
+         }
+        },
+        {
+         "id": "disease.catalogue-area",
+         "name": "Choose conditions · a body area",
+         "zh": "选择病症 · 部位",
+         "aliasOf": "health-record.condition-picker",
+         "preset": "selected",
+         "steps": [
+          "[data-action=\"health\"]",
+          "[data-action=\"bulk-pick-health\"]",
+          "[data-action=\"condition-level\"][data-value=\"g:breathing\"]"
+         ],
+         "status": "in-design",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "notes": {
+          "purpose": "Search or browse one conditions catalogue and tick one or more: symptoms by where you look, diseases by body system (features/conditions).",
+          "elements": [
+           {
+            "name": "Catalogue",
+            "shows": "Search; On these pigs; Recent; Symptoms (six areas); Diseases (six body systems), each area a row with an icon and a line of examples",
+            "states": [
+             {
+              "state": "First level",
+              "when": "Opened",
+              "shows": "Symptoms: Whole animal, Breathing, Head, Skin, Legs and feet, Rear and belly. Diseases: Respiratory, Gut, Reproductive, Udder, Joints skin and nerves, Whole body. Each row: icon tile, name, examples (\"Coughing, breathing hard, sneezing\"), or \"1 selected\" once something inside is ticked."
+             },
+             {
+              "state": "A level",
+              "when": "A row tapped",
+              "shows": "The area as the title; ✕ closes the picker and keeps the ticks; the footer Back goes up one level (owner ruling B, 2026-10-16). A symptom with types (Diarrhoea, Lame, Off feed, Nasal discharge…) opens its types plus \"Not sure which\"."
+             },
+             {
+              "state": "Search",
+              "when": "Text typed",
+              "shows": "Searches the whole catalogue (names and other names); every result names its area; with no match, one card: Add \"…\""
+             },
+             {
+              "state": "Add a condition",
+              "when": "Add \"…\" tapped",
+              "shows": "Name (pre-filled) and Category (one pick: a symptom area or a disease system, so the kind is chosen with it); Back, Add. Adding lists it for the farm and ticks it. Anyone may add a symptom or a disease."
+             }
+            ],
+            "logic": "A reportable disease (ASF, FMD, CSF, PRRS, PED) stays in its system, marked \"Reportable\"; there is no separate Report a disease. Deaths, abortions and pen-wide observations are not conditions. The drawer keeps one height from open to close.",
+            "at": "Breathing"
+           },
+           {
+            "name": "Done",
+            "shows": "Done · N",
+            "rule": "Done · N applies the ticks to the Conditions field and closes. Back goes up one level; at Conditions it closes without applying, and so does the ✕ from any level; ticks wait for the next open (the scrim does the same). Done waits while nothing is ticked and nothing was applied.",
+            "at": "Done"
+           }
+          ],
+          "controls": [],
+          "copy": [
+           "Conditions (raw)",
+           "Symptoms (raw)",
+           "Diseases (raw)",
+           "Search all options (raw)",
+           "Add “{name}” (raw)",
+           "Add a condition (raw)",
+           "Done · N (raw)"
+          ],
+          "edge": [
+           "The catalogue is ux/system/conditions-catalogue.js: one list, three kinds (symptom, event, disease), English and Chinese."
+          ],
+          "rules": [
+           "Diseases and symptoms are one catalogue and one picker."
+          ],
+          "issues": [
+           "\"Link condition\" (for a treatment) reuses this catalogue with another layout: two near-identical pickers.",
+           "No recently used list: a frequent condition sits two doors deep each time."
+          ]
+         }
+        },
+        {
+         "id": "disease.catalogue-add",
+         "name": "Add a condition",
+         "zh": "添加病症",
+         "aliasOf": "health-record.condition-picker",
+         "preset": "selected",
+         "steps": [
+          "[data-action=\"health\"]",
+          "[data-action=\"bulk-pick-health\"]",
+          {
+           "fill": "[data-v2=\"search\"]",
+           "text": "Bitten ear"
+          },
+          "[data-action=\"condition-add\"]"
+         ],
+         "status": "in-design",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "notes": {
+          "purpose": "Search or browse one conditions catalogue and tick one or more: symptoms by where you look, diseases by body system (features/conditions).",
+          "elements": [
+           {
+            "name": "Catalogue",
+            "shows": "Search; On these pigs; Recent; Symptoms (six areas); Diseases (six body systems), each area a row with an icon and a line of examples",
+            "states": [
+             {
+              "state": "First level",
+              "when": "Opened",
+              "shows": "Symptoms: Whole animal, Breathing, Head, Skin, Legs and feet, Rear and belly. Diseases: Respiratory, Gut, Reproductive, Udder, Joints skin and nerves, Whole body. Each row: icon tile, name, examples (\"Coughing, breathing hard, sneezing\"), or \"1 selected\" once something inside is ticked."
+             },
+             {
+              "state": "A level",
+              "when": "A row tapped",
+              "shows": "The area as the title; ✕ closes the picker and keeps the ticks; the footer Back goes up one level (owner ruling B, 2026-10-16). A symptom with types (Diarrhoea, Lame, Off feed, Nasal discharge…) opens its types plus \"Not sure which\"."
+             },
+             {
+              "state": "Search",
+              "when": "Text typed",
+              "shows": "Searches the whole catalogue (names and other names); every result names its area; with no match, one card: Add \"…\""
+             },
+             {
+              "state": "Add a condition",
+              "when": "Add \"…\" tapped",
+              "shows": "Name (pre-filled) and Category (one pick: a symptom area or a disease system, so the kind is chosen with it); Back, Add. Adding lists it for the farm and ticks it. Anyone may add a symptom or a disease."
+             }
+            ],
+            "logic": "A reportable disease (ASF, FMD, CSF, PRRS, PED) stays in its system, marked \"Reportable\"; there is no separate Report a disease. Deaths, abortions and pen-wide observations are not conditions. The drawer keeps one height from open to close.",
+            "at": "Breathing"
+           },
+           {
+            "name": "Done",
+            "shows": "Done · N",
+            "rule": "Done · N applies the ticks to the Conditions field and closes. Back goes up one level; at Conditions it closes without applying, and so does the ✕ from any level; ticks wait for the next open (the scrim does the same). Done waits while nothing is ticked and nothing was applied.",
+            "at": "Done"
+           }
+          ],
+          "controls": [],
+          "copy": [
+           "Conditions (raw)",
+           "Symptoms (raw)",
+           "Diseases (raw)",
+           "Search all options (raw)",
+           "Add “{name}” (raw)",
+           "Add a condition (raw)",
+           "Done · N (raw)"
+          ],
+          "edge": [
+           "The catalogue is ux/system/conditions-catalogue.js: one list, three kinds (symptom, event, disease), English and Chinese."
+          ],
+          "rules": [
+           "Diseases and symptoms are one catalogue and one picker."
+          ],
+          "issues": [
+           "\"Link condition\" (for a treatment) reuses this catalogue with another layout: two near-identical pickers.",
+           "No recently used list: a frequent condition sits two doors deep each time."
+          ]
+         }
+        },
+        {
+         "id": "disease.add-ready",
+         "name": "Record health · a condition chosen",
+         "zh": "记录健康 · 已选病症",
+         "aliasOf": "health-record.record-health",
+         "preset": "selected",
+         "steps": [
+          "[data-action=\"health\"]",
+          "[data-action=\"bulk-pick-health\"]",
+          "[data-condition=\"Coughing\"]",
+          "[data-action=\"bulk-health-done\"]"
+         ],
+         "status": "in-design",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "notes": {
+          "purpose": "Add one or more diseases or symptoms to the pigs chosen on the walk list, in one move. The selection is made first and is fixed here: Record health is a page of fields like Record treatment, with no pig list (owner, 2026-10-17).",
+          "states": [
+           "One pig or many, the same page: Conditions, Care, Note (optional) and Save · N. To change who, go Back and use the Selected page."
+          ],
+          "elements": [
+           {
+            "name": "Care default",
+            "shows": "Care · No action needed",
+            "logic": "The same care is given to every added condition. The default is No action needed, so a newly recorded Fever does not need attention unless Care is changed.",
+            "rule": "Care is the only editable condition state: No action needed, Monitor, Treat in place, Move to hospital pen. A condition needs attention for every choice except No action needed.",
+            "at": "No action needed"
+           },
+           {
+            "name": "Save",
+            "shows": "Save · N pigs",
+            "rule": "Waits until a condition is chosen. N counts the tagged pigs and the pigs without ear tags chosen on their group rows (2 tagged + 3 of 14 = Save · 5 pigs). A tap while it waits marks Conditions \"Required\". Writes one finding per tagged pig and name, and the count on each group row; a condition a pig already has is skipped and keeps its start date. Returns to the walk list; several pigs confirm with a toast (\"Condition recorded · 5 pigs\"), one pig with its new tag on the row.",
+            "at": "Save"
+           }
+          ],
+          "controls": [],
+          "copy": [
+           "Record health (raw)",
+           "Required (raw)",
+           "Care (raw)",
+           "Add note (raw)",
+           "No action needed (raw)"
+          ],
+          "rules": [
+           "One searchable disease/symptom catalogue for one or many pigs."
+          ],
+          "issues": [
+           "Default Care \"No action needed\" makes the quickest path (choose Fever, Save) record a fever as a non-alert (filed To confirm).",
+           "The catalogue needs three levels (tab, door, item) for a gloved worker."
           ]
          }
         },
         {
          "id": "disease.add-committed",
-         "name": "After adding · list is the receipt",
-         "zh": "添加完成",
+         "name": "Saved: the walk list, with the toast",
+         "zh": "已保存 · 巡栏列表",
          "status": "in-design",
-         "url": "/ux/archive/workflows.html?sec=wf-condition&slide=4",
-         "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "selected",
+         "steps": [
+          "[data-action=\"health\"]",
+          "[data-action=\"bulk-pick-health\"]",
+          "[data-condition=\"Coughing\"]",
+          "[data-action=\"bulk-health-done\"]",
+          "[data-action=\"bulk-save\"]"
+         ],
+         "figma": "",
          "notes": {
-          "purpose": "The walk list after commit: rows update in place, selection clears, scroll is kept.",
+          "purpose": "After Save the walk list is back: each pig's row carries the new tag, the selection clears and a toast counts the pigs.",
           "elements": [
            {
-            "name": "What prints",
-            "shows": "The walk list after commit: rows update in place, selection clears, scroll is kept.",
+            "name": "Pig row",
+            "at": "000254",
+            "shows": "The new condition on the row's one line (Coughing)",
             "states": [
              {
               "state": "Newly added",
-              "when": "Pig did not carry the condition",
-              "shows": "Opens at today with the amber dot (Monitor preset: dot, no trail means watching)"
+              "when": "The pig did not have it",
+              "shows": "The condition joins the row, ordered by care level; No action needed prints as plain text, a care level that needs attention as its tag"
              },
              {
-              "state": "Already carried",
-              "when": "Pig already had it open",
-              "shows": "No duplicate case; day count keeps aging"
+              "state": "Already had it",
+              "when": "The condition was open on the pig",
+              "shows": "No second finding; the tag keeps its start date"
              }
             ]
            }
@@ -16863,92 +17261,286 @@
          "id": "disease.resolve-one",
          "name": "Resolve · one pig",
          "zh": "康复 / 移除 · 单只",
+         "aliasOf": "health-record.resolve-conditions",
          "status": "in-design",
-         "url": "/ux/archive/workflows.html?sec=wf-resolve&slide=1",
-         "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "profile-full",
+         "steps": [
+          "[data-action=\"pig-actions\"]",
+          "[data-action=\"resolve\"]"
+         ],
          "notes": {
-          "purpose": "One pig: her open cases as verdict lines, Recover (big tick, left) and Strike (small chip, right).",
+          "purpose": "Recover or correct one chosen condition across the selected pigs.",
           "elements": [
            {
-            "name": "Verdict line",
-            "shows": "One open condition with its trail",
-            "rule": "Left tick = Recover (the outcome, the walk's normal act). Right chip \"wrong\" = Strike (correction of a wrong entry). Characteristics never appear."
+            "name": "Pig row",
+            "shows": "Thin → Recovered",
+            "states": [
+             {
+              "state": "Outcome not chosen",
+              "when": "Condition chosen only",
+              "shows": "\"Thin · choose outcome\""
+             },
+             {
+              "state": "Outcome chosen",
+              "when": "Recovered or Entered in error",
+              "shows": "\"Thin → Recovered\""
+             },
+             {
+              "state": "Pig lacks it",
+              "when": "No such condition",
+              "shows": "\"No X\""
+             },
+             {
+              "state": "Feed-linked",
+              "when": "Body-condition finding with feed adjustment",
+              "shows": "Note \"Resets linked feed adjustment\"; factor returns to 1"
+             }
+            ],
+            "logic": "Condition options are the names found on the selected pigs.",
+            "at": "Condition"
+           },
+           {
+            "name": "Save",
+            "shows": "Save · N pigs",
+            "rule": "Closes each case and logs \"Recovered\" or \"Record corrected\". Recovery keeps the case in history; entered in error marks a correction.",
+            "at": "Save"
            }
           ],
-          "edge": [
-           "A hernia ends by correction on the pig record, not here."
+          "controls": [],
+          "copy": [
+           "Resolve conditions (raw)",
+           "Recovered (raw)",
+           "Entered in error (raw)"
+          ],
+          "issues": [
+           "Log wording differs: \"Recovered\" / \"Record corrected\" here, \"Finding entered in error\" in the single-pig form."
           ]
          }
         },
         {
          "id": "disease.resolve-many",
-         "name": "Resolve · verdict page",
-         "zh": "康复 / 移除 · 多只",
+         "name": "Resolve conditions · two pigs",
+         "zh": "解除病症 · 两头",
+         "aliasOf": "health-record.resolve-conditions",
+         "preset": "selected",
+         "steps": [
+          "[data-action=\"resolve\"]"
+         ],
          "status": "in-design",
-         "url": "/ux/archive/workflows.html?sec=wf-resolve&slide=2",
-         "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
          "notes": {
-          "purpose": "Several pigs: one line per pig and open condition, pen-grouped, in the walk row grammar.",
-          "rules": [
-           "The master row and pen headers are recover-all shortcuts.",
-           "The primary is disabled at zero verdicts.",
-           "The zero rule keeps pigs with nothing open off the page; the footnote counts them."
+          "purpose": "Recover or correct one chosen condition across the selected pigs.",
+          "elements": [
+           {
+            "name": "Pig row",
+            "shows": "Thin → Recovered",
+            "states": [
+             {
+              "state": "Outcome not chosen",
+              "when": "Condition chosen only",
+              "shows": "\"Thin · choose outcome\""
+             },
+             {
+              "state": "Outcome chosen",
+              "when": "Recovered or Entered in error",
+              "shows": "\"Thin → Recovered\""
+             },
+             {
+              "state": "Pig lacks it",
+              "when": "No such condition",
+              "shows": "\"No X\""
+             },
+             {
+              "state": "Feed-linked",
+              "when": "Body-condition finding with feed adjustment",
+              "shows": "Note \"Resets linked feed adjustment\"; factor returns to 1"
+             }
+            ],
+            "logic": "Condition options are the names found on the selected pigs.",
+            "at": "Condition"
+           },
+           {
+            "name": "Save",
+            "shows": "Save · N pigs",
+            "rule": "Closes each case and logs \"Recovered\" or \"Record corrected\". Recovery keeps the case in history; entered in error marks a correction.",
+            "at": "Save"
+           }
           ],
-          "edge": [
-           "Production was condition-major (one line per disease across 10 pigs); this page is pig-major and the condition-major shortcuts are cut."
+          "controls": [],
+          "copy": [
+           "Resolve conditions (raw)",
+           "Recovered (raw)",
+           "Entered in error (raw)"
+          ],
+          "issues": [
+           "Log wording differs: \"Recovered\" / \"Record corrected\" here, \"Finding entered in error\" in the single-pig form."
+          ]
+         }
+        },
+        {
+         "id": "disease.resolve-outcome",
+         "name": "Resolve · Recovered or Entered in error",
+         "zh": "解除病症 · 结果",
+         "aliasOf": "health-record.resolve-conditions",
+         "preset": "selected",
+         "steps": [
+          "[data-action=\"resolve\"]",
+          "[data-action=\"open-picker\"][data-picker-key=\"target\"]",
+          "[data-action=\"picker-select\"][data-value=\"Thin\"]",
+          "[data-action=\"open-picker\"][data-picker-key=\"outcome\"]"
+         ],
+         "status": "in-design",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "notes": {
+          "purpose": "Recover or correct one chosen condition across the selected pigs.",
+          "elements": [
+           {
+            "name": "Pig row",
+            "shows": "Thin → Recovered",
+            "states": [
+             {
+              "state": "Outcome not chosen",
+              "when": "Condition chosen only",
+              "shows": "\"Thin · choose outcome\""
+             },
+             {
+              "state": "Outcome chosen",
+              "when": "Recovered or Entered in error",
+              "shows": "\"Thin → Recovered\""
+             },
+             {
+              "state": "Pig lacks it",
+              "when": "No such condition",
+              "shows": "\"No X\""
+             },
+             {
+              "state": "Feed-linked",
+              "when": "Body-condition finding with feed adjustment",
+              "shows": "Note \"Resets linked feed adjustment\"; factor returns to 1"
+             }
+            ],
+            "logic": "Condition options are the names found on the selected pigs.",
+            "at": "Condition"
+           },
+           {
+            "name": "Save",
+            "shows": "Save · N pigs",
+            "rule": "Closes each case and logs \"Recovered\" or \"Record corrected\". Recovery keeps the case in history; entered in error marks a correction.",
+            "at": "Save"
+           }
+          ],
+          "controls": [],
+          "copy": [
+           "Resolve conditions (raw)",
+           "Recovered (raw)",
+           "Entered in error (raw)"
+          ],
+          "issues": [
+           "Log wording differs: \"Recovered\" / \"Record corrected\" here, \"Finding entered in error\" in the single-pig form."
           ]
          }
         },
         {
          "id": "disease.resolve-in-place",
-         "name": "Resolve · verdicts in place",
-         "zh": "康复 / 移除 · 已选",
+         "name": "Resolve · outcome chosen",
+         "zh": "解除病症 · 已选结果",
+         "aliasOf": "health-record.resolve-conditions",
+         "preset": "selected",
+         "steps": [
+          "[data-action=\"resolve\"]",
+          "[data-action=\"open-picker\"][data-picker-key=\"target\"]",
+          "[data-action=\"picker-select\"][data-value=\"Thin\"]",
+          "[data-action=\"open-picker\"][data-picker-key=\"outcome\"]",
+          "[data-action=\"picker-select\"][data-value=\"recover\"]"
+         ],
          "status": "in-design",
-         "url": "/ux/archive/workflows.html?sec=wf-resolve&slide=3",
-         "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
          "notes": {
-          "purpose": "Mixed verdicts on one page: recover some, strike one, one commit.",
+          "purpose": "Recover or correct one chosen condition across the selected pigs.",
           "elements": [
            {
-            "name": "Verdict lines",
-            "shows": "Mixed verdicts on one page: recover some, strike one, one commit.",
+            "name": "Pig row",
+            "shows": "Thin → Recovered",
             "states": [
              {
-              "state": "Recover ticked",
-              "when": "Big tick pressed",
-              "shows": "Line marked to close as recovered"
+              "state": "Outcome not chosen",
+              "when": "Condition chosen only",
+              "shows": "\"Thin · choose outcome\""
              },
              {
-              "state": "Struck",
-              "when": "Wrong chip pressed",
-              "shows": "Row struck through (struck · wrong entry) with an undo"
+              "state": "Outcome chosen",
+              "when": "Recovered or Entered in error",
+              "shows": "\"Thin → Recovered\""
              },
              {
-              "state": "Group line",
-              "when": "Un-identified group",
-              "shows": "Recovers by count; an inline stepper lowers the number (12 to 5)"
+              "state": "Pig lacks it",
+              "when": "No such condition",
+              "shows": "\"No X\""
+             },
+             {
+              "state": "Feed-linked",
+              "when": "Body-condition finding with feed adjustment",
+              "shows": "Note \"Resets linked feed adjustment\"; factor returns to 1"
              }
-            ]
+            ],
+            "logic": "Condition options are the names found on the selected pigs.",
+            "at": "Condition"
+           },
+           {
+            "name": "Save",
+            "shows": "Save · N pigs",
+            "rule": "Closes each case and logs \"Recovered\" or \"Record corrected\". Recovery keeps the case in history; entered in error marks a correction.",
+            "at": "Save"
            }
           ],
-          "rules": [
-           "One commit carries both verbs; no mode switch, no leave guard.",
-           "Strike is plain human-error correction: no KPI language; the audit keeps the record."
+          "controls": [],
+          "copy": [
+           "Resolve conditions (raw)",
+           "Recovered (raw)",
+           "Entered in error (raw)"
+          ],
+          "issues": [
+           "Log wording differs: \"Recovered\" / \"Record corrected\" here, \"Finding entered in error\" in the single-pig form."
           ]
          }
         },
         {
          "id": "disease.resolve-committed",
-         "name": "After resolving",
-         "zh": "完成",
+         "name": "Resolved: the walk list, with the toast",
+         "zh": "已解除 · 巡栏列表",
          "status": "in-design",
-         "url": "/ux/archive/workflows.html?sec=wf-resolve&slide=4",
-         "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "selected",
+         "steps": [
+          "[data-action=\"resolve\"]",
+          "[data-action=\"open-picker\"][data-picker-key=\"target\"]",
+          "[data-action=\"picker-select\"][data-value=\"Thin\"]",
+          "[data-action=\"open-picker\"][data-picker-key=\"outcome\"]",
+          "[data-action=\"picker-select\"][data-value=\"recover\"]",
+          "[data-action=\"bulk-save\"]"
+         ],
+         "figma": "",
          "notes": {
-          "purpose": "The walk list after commit: what remains is what prints.",
-          "rules": [
-           "Recovery prints as silence: closed lines vanish and nothing says \"recovered\". The group ledger re-aggregates (12 to 7).",
-           "A struck entry prints nothing anywhere; audit keeps it, history lines do not. No toast."
+          "purpose": "After Save the walk list is back: the resolved tag leaves the row and a toast names what was saved.",
+          "elements": [
+           {
+            "name": "Toast",
+            "at": "Marked recovered",
+            "shows": "Marked recovered with the pig's ear tag",
+            "states": [
+             {
+              "state": "Recovered",
+              "when": "Outcome Recovered",
+              "shows": "The tag leaves the row; the case stays in the pig's history as recovered"
+             },
+             {
+              "state": "Entered in error",
+              "when": "Outcome Entered in error",
+              "shows": "The tag leaves the row; the log keeps a record correction"
+             }
+            ]
+           }
           ]
          }
         }
@@ -16957,40 +17549,60 @@
         [
          "disease.add-select",
          "disease.add-drawer",
-         "tap Condition in the verb sheet"
+         "tap Condition"
         ],
         [
          "disease.add-drawer",
          "disease.catalogue",
-         "tap the Conditions field"
+         "tap Conditions"
         ],
         [
          "disease.catalogue",
-         "disease.add-drawer",
-         "tap a condition"
+         "disease.catalogue-area",
+         "tap a body area"
         ],
         [
-         "disease.add-drawer",
+         "disease.catalogue",
+         "disease.catalogue-add",
+         "search with no match, tap Add"
+        ],
+        [
+         "disease.catalogue",
+         "disease.add-ready",
+         "tick a condition, tap Done"
+        ],
+        [
+         "disease.add-ready",
          "disease.add-committed",
-         "tap Record"
+         "tap Save"
+        ],
+        [
+         "disease.add-select",
+         "disease.resolve-many",
+         "tap Resolve"
+        ],
+        [
+         "disease.resolve-many",
+         "disease.resolve-outcome",
+         "choose the condition, tap Outcome"
+        ],
+        [
+         "disease.resolve-outcome",
+         "disease.resolve-in-place",
+         "tap Recovered"
+        ],
+        [
+         "disease.resolve-in-place",
+         "disease.resolve-committed",
+         "tap Save"
         ],
         [
          "disease.resolve-one",
          "disease.resolve-committed",
-         "tap Recover or the wrong-entry chip"
-        ],
-        [
-         "disease.resolve-many",
-         "disease.resolve-in-place",
-         "tick verdicts"
-        ],
-        [
-         "disease.resolve-in-place",
-         "disease.resolve-committed",
-         "tap the primary"
+         "tap Save"
         ]
        ],
-       "prd": "# Disease and symptom 疾病与症状\n\n> Draft — compiled from existing docs, not yet confirmed.\n\n## Problem\n\nA farmer who sees a pig with scours or a limp needs to put that on the record and later close it, without choosing between a disease list and a symptom list and without a chain of confirmation screens. Production used five screens to add and four plus a dialog to remove.\n\n## Who\n\nAnyone on the walk (stockperson, supervisor) recording what they see on one or many pigs; the same record is read by the vet.\n\n## Anchor\n\nAnchor: The condition (a case with a day count, or a characteristic on the pig page) opened or closed on a pig.\n\n## Rules\n\n- One catalogue, one Conditions field: disease versus symptom is taxonomy the catalogue carries silently. An entry that is a characteristic (a hernia) writes a fact on the pig page, not a case.\n- Triage rides inline on Add condition with the preset Monitor (no null level exists); the distribution card is cut from Add.\n- Commit is idempotent for a carrier: a pig already carrying the condition gets no second case and its day count keeps aging. The drawer footnote states the subtraction before commit.\n- No toast and no result screen: the list rows are the receipt, the selection clears and the walk keeps its scroll.\n- Resolve has two verbs with unequal weight: Recover (the outcome, big tick on the left) and Strike (a correction of a wrong entry, small chip on the right). One commit carries mixed verdicts; characteristics are never listed in Resolve.\n- Resolve at one pig is a drawer; at several pigs it is a verdict page, one line per pig by open condition, grouped by pen, with recover-all on the master row and pen headers. The primary is disabled at zero verdicts.\n- The zero rule: pigs with nothing open stay off the page and a footnote counts them. Recovery prints as silence: the closed line disappears and nothing says \"recovered\". A struck entry prints nothing anywhere; the audit keeps it.\n\n## Scope\n\nIn: Select pigs · verb sheet; Add condition · one drawer; Condition catalogue; After adding · list is the receipt; Resolve · one pig; Resolve · verdict page; Resolve · verdicts in place; After resolving.\n\nOut: see the neighbouring features of the same section for what the same sheet does elsewhere; nothing outside the screens above is designed here.\n\n## Decisions\n\nOpen questions and items to confirm:\n\n- How this feature relates to the Health record built in the Inspection prototype (filed as a decision).\n- The deck states the decisions were taken from production frames; confirm the catalogue contents with the farm vet.\n\nSources:\n\n- The event workflow deck: `ux/system/workflows/health.html` (all decks render in `ux/archive/workflows.html`).\n- The ops requirements: `ux/research/ops/health.md` and `ux/research/ops/SYNTHESIS.md`.\n",
+       "prd": "# Disease and symptom 疾病与症状\n\n## Problem\n\nA worker who sees a pig with scours or a limp needs to put that on the record and later close it, without choosing between a disease list and a symptom list and without a chain of confirmation screens. Production used five screens to add and four plus a dialog to remove.\n\n## Who\n\nAnyone on the walk (stockperson, supervisor) recording what they see on one or many pigs; the same record is read by the vet.\n\n## Anchor\n\nAnchor: the condition on a pig (a finding in [Health record](../health-record/PRD.md)): open with a care level, then closed as Recovered or Entered in error.\n\n## Rules\n\nThis feature is the walk's path through Health record's pages; the rules are Health record's and [Conditions](../conditions/PRD.md)'s, not repeated here. In short:\n\n- The selection is made first on the walk list and is fixed: Actions → Condition opens Record health, a page of fields (Conditions, Care, Note) with Save · N and no pig list.\n- One catalogue for diseases and symptoms: symptoms by where you look, diseases by body system, search across all, and Add “…” when nothing matches (Name and Category, like Add medicine).\n- A pig that already has the condition gets no second finding; it keeps its start date.\n- Save returns to the walk list: the tags are on the rows and a toast counts the pigs.\n- Resolve picks one condition across the selected pigs and an outcome: Recovered (kept in history) or Entered in error (a correction). Pigs without that condition are listed as unchanged.\n\n## Scope\n\nIn: Actions on two ticked pigs; Record health; Choose conditions (first level, a body area, Add a condition); the walk list after saving; Resolve conditions for one pig and for several, its outcome, and the walk list after resolving.\n\nOut: the pig record as a health view, the finding and its edit forms, Care instructions (Health record); giving medicine (Treatment); pen-wide observations, deaths and abortions (not conditions; see Conditions).\n\n## Decisions\n\n- 2026-10-20 (owner): the Health record built in the Inspection prototype is the design. The event deck's Add condition and Resolve (one drawer with triage inline, Recover and Strike, silent prints) are earlier designs and are no longer this feature's screens; they stay viewable in `ux/archive/workflows.html` (`wf-condition`, `wf-resolve`). This feature's screens are the live prototype's states, most of them the same screens as Health record's with two pigs selected.\n\nOpen questions are Health record's and Conditions' (default care, folding, group counts, reporting); confirm the catalogue contents with the farm vet.\n\nSources:\n\n- The prototype: `ux/system/inspection-astra-concept.html` and the catalogue `ux/system/conditions-catalogue.js`.\n- The ops requirements: `ux/research/ops/health.md` and `ux/research/ops/SYNTHESIS.md`.\n",
        "scenarios": {
         "treeDoc": false,
         "tree": null,
@@ -17666,7 +18278,7 @@
              {
               "state": "No condition chosen",
               "when": "Condition picker empty",
-              "shows": "The pig's conditions or \"No open conditions\""
+              "shows": "The pig's conditions or \"Nothing open\""
              },
              {
               "state": "Chosen, pig has it",
@@ -17676,7 +18288,7 @@
              {
               "state": "Chosen, pig lacks it",
               "when": "Pig without that condition",
-              "shows": "\"No Thin · unchanged\""
+              "shows": "\"No Thin\""
              },
              {
               "state": "Not eligible",
@@ -17861,7 +18473,7 @@
              {
               "state": "Pig lacks it",
               "when": "No such condition",
-              "shows": "\"No X · unchanged\""
+              "shows": "\"No X\""
              },
              {
               "state": "Feed-linked",
@@ -28644,24 +29256,6 @@
     {
      "severity": "high",
      "source": "populate-events",
-     "id": "events-2",
-     "target": {
-      "kind": "feature",
-      "id": "disease"
-     },
-     "kind": "decision",
-     "title": "Disease vs health-record",
-     "detail": "Add condition and Resolve in the event deck and the Health record built in Inspection both cover recording and closing a condition. They differ: the deck has one Conditions field with triage inline (Monitor preset), Recover and Strike verbs with silent prints, and no care instructions; the Health record has care levels (No action needed, Monitor, Treat in place, Move to hospital pen) as the editable state, per-pig change preview, and Recovered or Entered in error that keep the case in history. Both are in-design and cannot both be the feature.",
-     "options": [
-      "The Health record is the one design; the deck's Add and Resolve become its history only",
-      "The deck is the design and the Health record is rebuilt to it",
-      "Merge: the deck's verdict page and silent prints with the Health record's care levels"
-     ],
-     "recommendation": "Decide with the vet which of the two models of recovery (closed line vanishes vs kept in history) is right, then keep one."
-    },
-    {
-     "severity": "high",
-     "source": "populate-events",
      "id": "events-3",
      "target": {
       "kind": "feature",
@@ -29314,18 +29908,6 @@
       "Drop the page; use Inspection's list"
      ],
      "recommendation": "Search and filter only, opening Pig profile; Edit pig info joins its actions."
-    },
-    {
-     "severity": "medium",
-     "source": "sweep",
-     "id": "home-and-placeholders-43",
-     "target": {
-      "kind": "feature",
-      "id": "disease"
-     },
-     "kind": "design",
-     "title": "Duplicates Health record; keep only the missing parts",
-     "detail": "Add, remove or recover and triage are built as Health record (record health, resolve conditions, care instructions). Left over: second confirmations. Mark as duplicate or reduce to the catalogue."
     },
     {
      "severity": "medium",
