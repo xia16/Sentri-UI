@@ -75,3 +75,31 @@ Keep: the three sections, their headings and Schedule links; the tiles, rows and
 - An empty section keeps its place and says so in a white card, one quiet line with a tick ("No production work open", "Nothing else open"); with no marks and no planned health work, Health says "No pigs marked to treat or watch". A zero row is absent.
 - The closed line has a hairline edge and no fill, the quietest framed target, so it reads as a tap without competing with the tiles above it.
 - **Better because** every section reads as checked and in its usual place, nothing on the page is a dead row, and the closed tasks have a visible door.
+
+## To treat / Monitoring page (2026-10-20)
+
+Scope: the To treat and Monitoring lists the Overview's Health card opens. The Overview itself, its Health rows and every other Home page keep their design.
+
+Keep: today's rows exactly (Row · Animal with tags: tag over "Pen B2 · Hospital · 1d", the condition as a plain tag, no colour); one card per unit under a "Unit 7" heading; pigs in walking order; a pig opens its unit's walk on the Health lens.
+
+- **major** · The list was a medium drawer, so at 100 pigs (a heavy Gestation day) it is a long scroll in a sheet with no way to find one pig or narrow it. Owner, 2026-10-20: "what if we have 100 pigs that need treatment in that list? … we need to make it a list with filters".
+- **major** · Nothing found the pig in front of the worker: no search, no scan.
+- **minor** · Monitoring opened the same drawer as To treat but had no atlas screen.
+
+| Part | Drawn by | Component | Keep / fix / cut |
+|---|---|---|---|
+| The list's frame | Sheet drawer | Page header (pageHeader) | **fix** |
+| Unit heading + rows | Heading · group, Row · Animal in rowGroup | same | keep |
+| Search, with Scan ear tag in it | none | ChoiceList search field (choiceSearch) + IconButton · plain | **new** |
+| Filter | none | IconButton (count badge) + FilterSheet: Segment facets, PickerField, ChoiceList | **new** |
+
+Directions shown to the owner (all at 390 in the real prototype): A pen cards under a unit lens (Inspection's walk); B unit cards under a unit lens; C a care lens (Hospital / In place). The owner chose none of the lenses: "everything goes inside the filter i think, search bar at top, flat list". Built: B's list with the search and the filter on top. On the build the owner moved scan into the search ("scan and search goes hand in hand") and cut the Waiting facet.
+
+Also fixed on the way: IconButton's count badge was styled only inside the Inspection and Farrowing phones, so anywhere else (and on IconButton's own Badge page) the number fell under the glyph. The rule is now the component's own.
+
+#### Self-crit
+- Problems fixed: the list is a page that holds 104 pigs in the same rows; the search finds a tag or a pen as typed; the filter narrows by unit, care and condition with a live "Show N pigs"; Scan ear tag sits in the search field and fills it.
+- Keep as strong: the rows are unchanged pixel for pixel; unit headings and walking order stay.
+- Squint (104 pigs): the title, the search field, the first tags. The search leads, as the owner asked; the rows read as before.
+- Against the original: one control row added (search with scan, and the filter); nothing added to the rows.
+- **Better because** a worker with 100 pigs can find the one in front of them or keep only their unit, where before they could only scroll a drawer.
