@@ -1,10 +1,8 @@
 # Disease and symptom 疾病与症状
 
-> Draft — compiled from existing docs, not yet confirmed.
-
 ## Problem
 
-A farmer who sees a pig with scours or a limp needs to put that on the record and later close it, without choosing between a disease list and a symptom list and without a chain of confirmation screens. Production used five screens to add and four plus a dialog to remove.
+A worker who sees a pig with scours or a limp needs to put that on the record and later close it, without choosing between a disease list and a symptom list and without a chain of confirmation screens. Production used five screens to add and four plus a dialog to remove.
 
 ## Who
 
@@ -12,32 +10,31 @@ Anyone on the walk (stockperson, supervisor) recording what they see on one or m
 
 ## Anchor
 
-Anchor: The condition (a case with a day count, or a characteristic on the pig page) opened or closed on a pig.
+Anchor: the condition on a pig (a finding in [Health record](../health-record/PRD.md)): open with a care level, then closed as Recovered or Entered in error.
 
 ## Rules
 
-- One catalogue, one Conditions field: disease versus symptom is taxonomy the catalogue carries silently. An entry that is a characteristic (a hernia) writes a fact on the pig page, not a case.
-- Triage rides inline on Add condition with the preset Monitor (no null level exists); the distribution card is cut from Add.
-- Commit is idempotent for a carrier: a pig already carrying the condition gets no second case and its day count keeps aging. The drawer footnote states the subtraction before commit.
-- No toast and no result screen: the list rows are the receipt, the selection clears and the walk keeps its scroll.
-- Resolve has two verbs with unequal weight: Recover (the outcome, big tick on the left) and Strike (a correction of a wrong entry, small chip on the right). One commit carries mixed verdicts; characteristics are never listed in Resolve.
-- Resolve at one pig is a drawer; at several pigs it is a verdict page, one line per pig by open condition, grouped by pen, with recover-all on the master row and pen headers. The primary is disabled at zero verdicts.
-- The zero rule: pigs with nothing open stay off the page and a footnote counts them. Recovery prints as silence: the closed line disappears and nothing says "recovered". A struck entry prints nothing anywhere; the audit keeps it.
+This feature is the walk's path through Health record's pages; the rules are Health record's and [Conditions](../conditions/PRD.md)'s, not repeated here. In short:
+
+- The selection is made first on the walk list and is fixed: Actions → Condition opens Record health, a page of fields (Conditions, Care, Note) with Save · N and no pig list.
+- One catalogue for diseases and symptoms: symptoms by where you look, diseases by body system, search across all, and Add “…” when nothing matches (Name and Category, like Add medicine).
+- A pig that already has the condition gets no second finding; it keeps its start date.
+- Save returns to the walk list: the tags are on the rows and a toast counts the pigs.
+- Resolve picks one condition across the selected pigs and an outcome: Recovered (kept in history) or Entered in error (a correction). Pigs without that condition are listed as unchanged.
 
 ## Scope
 
-In: Select pigs · verb sheet; Add condition · one drawer; Condition catalogue; After adding · list is the receipt; Resolve · one pig; Resolve · verdict page; Resolve · verdicts in place; After resolving.
+In: Actions on two ticked pigs; Record health; Choose conditions (first level, a body area, Add a condition); the walk list after saving; Resolve conditions for one pig and for several, its outcome, and the walk list after resolving.
 
-Out: see the neighbouring features of the same section for what the same sheet does elsewhere; nothing outside the screens above is designed here.
+Out: the pig record as a health view, the finding and its edit forms, Care instructions (Health record); giving medicine (Treatment); pen-wide observations, deaths and abortions (not conditions; see Conditions).
 
 ## Decisions
 
-Open questions and items to confirm:
+- 2026-10-20 (owner): the Health record built in the Inspection prototype is the design. The event deck's Add condition and Resolve (one drawer with triage inline, Recover and Strike, silent prints) are earlier designs and are no longer this feature's screens; they stay viewable in `ux/archive/workflows.html` (`wf-condition`, `wf-resolve`). This feature's screens are the live prototype's states, most of them the same screens as Health record's with two pigs selected.
 
-- How this feature relates to the Health record built in the Inspection prototype (filed as a decision).
-- The deck states the decisions were taken from production frames; confirm the catalogue contents with the farm vet.
+Open questions are Health record's and Conditions' (default care, folding, group counts, reporting); confirm the catalogue contents with the farm vet.
 
 Sources:
 
-- The event workflow deck: `ux/system/workflows/health.html` (all decks render in `ux/archive/workflows.html`).
+- The prototype: `ux/system/inspection-astra-concept.html` and the catalogue `ux/system/conditions-catalogue.js`.
 - The ops requirements: `ux/research/ops/health.md` and `ux/research/ops/SYNTHESIS.md`.
