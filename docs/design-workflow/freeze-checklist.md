@@ -12,7 +12,7 @@ Freeze automation isn't built yet. Until it is, the driver runs this list by han
   - update its "used by";
   - regenerate its specimens from the frozen screens.
 
-  Then recheck every other feature that uses it. **Approval scope:** approving one feature doesn't approve a shared variant for the others. Each other feature passes its own before/after.
+  Then the gate checks the features in progress that use it (`features/_in-progress.json`) for propagation only (owner, 2026-10-20). **Approval scope:** approving one feature doesn't approve a shared variant for the others: each other feature is judged on its own screens in its own pass.
 - [ ] **Section patterns.** Update the section's patterns (Task skeleton, Home task card) from the frozen screens and regenerate the section doc. Diff sibling features against the new pattern and file a backlog item for each gap.
 - [ ] **Notes and PRD.** Reconcile each screen's notes (states tables, hidden logic, edge cases) with the frozen behaviour. Mark the PRD final, close its decisions, and remove the provisional flags.
 - [ ] **Scenarios.** Every leaf in `features/<id>/scenarios.json` passes (`node scripts/run-scenarios.mjs`) on the frozen commit, or is blocked by a recorded owner decision that keeps it out of scope.

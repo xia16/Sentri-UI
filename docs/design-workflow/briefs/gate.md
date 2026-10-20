@@ -1,6 +1,6 @@
 # Gate brief
 
-You gate one change to the Sentri mobile app before it merges. Sentri is a native-feel phone app used one-handed and gloved in a barn, and read in two seconds. **You did not build the change.** Never edit the repo. Write only the verdict file. You are the only gate: this brief replaces the old checklist judge (`component-judge`, retired) and the separate before/after judge.
+You review one change to the Sentri mobile app, as advice. Sentri is a native-feel phone app used one-handed and gloved in a barn, and read in two seconds. **You did not build the change.** Never edit the repo. Write only the verdict file. **You do not hold the merge.** Owner ruling (2026-10-20): the owner's "PR it" is the design approval. A PR merges on the machine gate alone (`node scripts/gate.mjs`: the tests, broken screens, legibility, spacing, headers, states, scenarios and the library check). A builder may ask you for a review before showing the owner; your findings go in the PR body, and `--verdict` checks your file but posts no status. Calibration, "at least one pair better" and the walk entries below are how a good review works, not merge conditions.
 
 Every check below tests one of the [workflow principles](../principles.md) and names it. A check never asks for something no principle states: if you find one, report it as a gap for the [rules ledger](../rules.md).
 
@@ -9,7 +9,7 @@ The driver fills in:
 - **BASE**: `origin/main` at that moment, and its hash.
 - **CLASS**: the gate's, from the change itself (`mechanical.json`'s `class`): **shared** when it touches the shared system, **behaviour** when it changes a script a page can run, **copy** when it changes only the strings registry, **presentation** otherwise, then raised by what moved. Nobody declares it (gate-simplify.md X6).
 - **MODE**: normal or **refactor** (nothing visible may change).
-- **SCREENS**: the screens in scope. For a shared component, that is every screen of every feature using it (search `atlas/atlas.json`).
+- **SCREENS**: the screens in scope. For a shared change the gate sets them (owner, 2026-10-20; `mechanical.json`'s `ownFeatures`, `inProgress` and `outOfScope`): the PR's own features and the component pages, judged in full, and the features in progress (`features/_in-progress.json`), checked for propagation only. No other feature is checked.
 - **REFERENCES**: the builder's references table and baselines (build brief §1).
 - **OUT**: the gate run's folder: `mechanical.json`, `results.md`, `pairs/`. Your `verdict.json` goes beside them.
 
@@ -17,10 +17,10 @@ For the walk (§2), check out CANDIDATE and BASE in two worktrees and serve each
 
 **The machine has already run.** `node scripts/gate.mjs` ran every mechanical check on the exact candidate ([gate-machine.md](../gate-machine.md)) and you judge only a mechanical pass. Don't run its checks again (`npm test`, `check-*`, `run-scenarios`, `check-states`) and start no browser run beyond your walk: a gate may be running on the machine. What it leaves you:
 - `pairs/<screen>/<lang>-<width>.png` (base | candidate) for every changed, new or removed screen, at EN 390, EN 360 and ZH 360 (a component page at EN 390 and 360). A missing side reads "not on this side"; a ZH image marked NO CHINESE is a page that ignores `?lang=zh`.
-- `mechanical.json`: its `pairs` (each with a `kind`: changed, new or gone, and a `pct`, 0 being pixel-identical), `inventory.removed` (each needs a reason under `gone`), `walkNeed` (screens that run changed code and draw the same: walk each one, §2), the class and the gaps. Open it only at §5.
+- `mechanical.json`: its `pairs` (each with a `kind`: changed, new or gone, a `pct`, 0 being pixel-identical, and `propagation` on a propagation pair, §4), `inventory.removed` (each needs a reason under `gone`), `walkNeed` (screens that run changed code and draw the same: walk each one, §2), the class and the gaps. Open it only at §5.
 - `results.md`: the Results block, the gate's own measurements. You don't re-measure it.
 
-`node scripts/gate.mjs --verdict <out>` checks your `verdict.json`. It refuses a verdict about another commit, a pair left unjudged, a pair the manifest doesn't list, a pass with a worse or failed pair, a `walkNeed` screen left unwalked, and any pass of a blocked gate. A shared change too big for one judge is split by feature: each judge writes `verdict-<feature>.json` about its own pairs, and "at least one pair better" is the whole change's. When main has moved since, `--verdict` re-gates and carries every judgement whose two images are the same; a judge decides only the pairs it lists, in `verdict-new.json`.
+`node scripts/gate.mjs --verdict <out>` checks your `verdict.json`. It refuses a verdict about another commit, a pair left unjudged, a pair the manifest doesn't list, a pass with a worse, failed or broken pair, a `walkNeed` screen left unwalked, a component change with no `library` fit or with `extend-existing`, and any pass of a blocked gate. A shared change too big for one judge is split by feature: each judge writes `verdict-<feature>.json` about its own pairs, and "at least one pair better" is the whole change's. When main has moved since, `--verdict` re-gates and carries every judgement whose two images are the same; a judge decides only the pairs it lists, in `verdict-new.json`. Main is merged forward with `node scripts/merge-main.mjs`, which regenerates `atlas/atlas.json` and `tokens.css` instead of resolving them by hand.
 
 **Component pages are screens too** (ledger L23). Each variant page the atlas draws (`ds:<Name>/<variant>`, pairs under `pairs/ds_<Name>/<variant>/`) is the atlas's own state grid. Judge it exactly like a screen (§3–4): the page teaches the law, so a state that breaks it is a defect, and a page that moved needs a better pair to pass. A component page is in scope when SCOPE names `design-system` or the change edits that component's own folder.
 
@@ -78,16 +78,23 @@ Before judging a changed screen, do the **squint test**: write the first three t
 
 For each pair, judge **better / same / worse** and give the one reason that decides it, naming its dimension: hierarchy, alignment, legibility, touch, state or native fit. Your verdict follows from your issue list, not the other way round. The bar is the screens the owner approved (Farrowing and Inspection): calm, aligned, nothing extra, one surface, ink not colour. A change that meets a rule but looks worse is **worse**. Judge a change that departs from the current pattern by the farmer, not by familiarity: being new never makes it worse, and matching the system never makes it better.
 
-- **Normal**: it passes only if no pair is worse, at least one changed pair is better, and the cold look found no defect. A pair with one side (a new screen, or a removed one) is judged **pass** or **fail**, and any fail fails the change. When no screen changed or was added, only a behaviour (or shared) change in the gate's class can pass, on a walk where every entry is ok: a behaviour fix may leave every first frame alone.
+- **Normal**: it passes only if no pair is worse, at least one changed pair is better (a propagation pair never counts), and the cold look found no defect. A pair with one side (a new screen, or a removed one) is judged **pass** or **fail**, and any fail fails the change. When no screen changed or was added, only a behaviour (or shared) change in the gate's class can pass, on a walk where every entry is ok: a behaviour fix may leave every first frame alone.
 - **Refactor**: it passes only if every pair is **same**, pixel-identical where the change claims identity, and the cold look found no defect.
-- **Shared component**: no pair on any feature using it may be worse. Approving one feature doesn't approve the variant for the others.
+- **Shared component** (owner, 2026-10-20): the PR's own features and the component's own atlas pages (`ds:<Name>/…`) are judged in full, as above. The features in progress get propagation pairs only (below). Every other feature is not checked, and `results.md` says how many screens that leaves out. The change must show on a page of its own: a shared change whose only moved pairs are propagation pairs fails.
 - **Frozen screen**: any change to a frozen screen fails unless the owner reopened it.
+
+**Propagation pairs.** A pair marked `propagation` in `mechanical.json` is a screen of an in-progress feature that the shared change reaches. Judge one thing only: did the component update arrive, and does it render correctly there? Write **propagated** or **broken**. It is broken when the old look still shows, the part is clipped or broken, or the screen draws its own copy of the part instead of the shared one (`mechanical.json`'s `propagation` flags `notUsingShared` for a moved screen that calls none of the changed exports). Nothing else on those screens is judged: no better or worse, no budget, no redesign. Any broken pair fails the change.
 
 ## 5. Re-measure the builder's claims (P5, P1, P2)
 
 Only now, read `mechanical.json`, the PR body, the README, the references table and `features/<id>/critique.md`. The PR's Results block is the gate's `results.md` and is not re-measured. The PR body states no measurements of its own (S8); any it does state (a target, "0 px different", a count, "identical") you re-measure on CANDIDATE. A claim measured on another commit, or not reproducible, is **contradicted**, and a contradicted claim fails the gate.
 
 Then check the critique against the pairs: every **Keep** item is at least as strong on CANDIDATE as on BASE (same or more weight, same place in the order), and every part that changed is named by a **Problem**. A kept element that got weaker, or a part changed with no problem behind it, fails the change: that is how a pass throws away what the original did well.
+
+**Library fit** (P1, P2). For any change that touches a component (a file under `ux/design-system/components/`), look at the library as a whole once (`node scripts/component-jobs.mjs`, `_groups.json`) and write `library` in your verdict:
+- **ok**: the part sits in the right component and group.
+- **extend-existing**: it adds a parallel part where an existing component or variant already has the job. This fails: extend that one instead.
+- **restructure-needed**: the part is right, but the grouping no longer makes sense or parts are piling up. This passes, and the note names the restructure.
 
 ## Rejected examples
 
@@ -120,13 +127,14 @@ Write `OUT/verdict.json`:
 { "pass": false, "candidate": "<hash>", "base": "<hash>", "class": "", "mode": "",
   "mechanical": [{ "check": "npm test", "result": "pass|fail", "detail": "" }],
   "walk": [{ "screen": "", "ok": true, "issue": "" }],
-  "pairs": [{ "screen": "", "lang": "en|zh", "width": 390, "verdict": "better|same|worse (both sides) | pass|fail (one side)", "why": "" }],
+  "pairs": [{ "screen": "", "lang": "en|zh", "width": 390, "verdict": "better|same|worse (both sides) | pass|fail (one side) | propagated|broken (propagation)", "why": "" }],
   "defects": [{ "screen": "", "what": "", "fix": "" }],
   "gone": [{ "screen": "", "why": "" }],
+  "library": { "fit": "ok|extend-existing|restructure-needed", "note": "" },
   "calibration": [{ "pair": "c1", "verdict": "better|same|worse" }],
   "rejected": ["R#"], "contradicted": [""], "notes": "" }
 ```
-`pairs` judges every pair in `mechanical.json`, not only EN 390; a pixel-identical pair is **same**. `gone` accounts for every screen `mechanical.json` lists as removed from the atlas: where its job went, or why it no longer exists.
+`pairs` judges every pair in `mechanical.json`, not only EN 390; a pixel-identical pair is **same**, except a propagation pair, which is **propagated** or **broken**. `library` is needed only when the change touches a component. `gone` accounts for every screen `mechanical.json` lists as removed from the atlas: where its job went, or why it no longer exists.
 **Re-checks report changes only.** When a fix comes back after a failed gate, report each earlier finding as resolved, partial or unresolved, plus at most 3 new regressions.
 
 **DEGRADED.** If you couldn't work as a separate judge (you saw the builder's reasoning, or no fresh agent was available), start your report and `verdict.json`'s `notes` with DEGRADED and why.
