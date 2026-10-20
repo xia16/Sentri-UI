@@ -6,7 +6,8 @@ import { createRequire } from 'node:module';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { holderAlive, selfStart } from './process-start.mjs';
+import { selfStart } from './process-start.mjs';
+import { gateAhead, registerRun } from './gate-queue.mjs';
 
 const HELP = 'Playwright not found. Run `npm install` and `npx playwright install chromium` in the repo, or set SENTRI_PLAYWRIGHT to a Playwright install.';
 function find() {
@@ -26,8 +27,9 @@ export const playwright = () => {
 
 // A gate never shares the machine with another browser run from this repo (scripts/gate.mjs holds sentri-gate/gate.lock in the git
 // common dir). Every other run that opens a browser through here (npm test's browser suites, run-scenarios, check-states,
-// shoot-screens on their own) registers in sentri-gate/runs/ and, while a gate runs, waits for it. Many such runs may go at once;
-// a gate waits until they have ended. The gate's own checks carry SENTRI_GATE_PID and pass straight through.
+// shoot-screens on their own) registers in sentri-gate/runs/ and, while a gate runs or is queued, waits for it. Many such runs may go
+// at once; a gate waits until they have ended, or have stopped working for 10 minutes (the record beats while the run uses the CPU:
+// scripts/gate-queue.mjs). The gate's own checks carry SENTRI_GATE_PID and pass straight through.
 let registered = false;
 function besideNoGate() {
   if (registered || process.env.SENTRI_GATE_PID) return;
@@ -36,20 +38,16 @@ function besideNoGate() {
   let dir;
   try { dir = path.join(path.resolve(here, execSync('git rev-parse --git-common-dir', { cwd: here, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim()), 'sentri-gate'); } catch { return; }
   const me = path.join(dir, 'runs', `${process.pid}.json`);
-  // a gate whose pid is alive and is still the process that wrote the lock (a reboot reuses pids: scripts/process-start.mjs)
-  const gate = () => { try { const g = JSON.parse(fs.readFileSync(path.join(dir, 'gate.lock'), 'utf8')); return holderAlive(g) ? g : null; } catch { return null; } };
+  const rec = { pid: process.pid, start: selfStart(), what: process.argv.slice(1).map((a) => path.basename(a)).join(' ').slice(0, 120) };
   let said = false;
   for (;;) {
-    let g = gate();
+    let g = gateAhead(dir);
     if (!g) {
-      fs.mkdirSync(path.dirname(me), { recursive: true });
-      fs.writeFileSync(`${me}.tmp`, JSON.stringify({ pid: process.pid, start: selfStart(), what: process.argv.slice(1).map((a) => path.basename(a)).join(' ').slice(0, 120), at: new Date().toISOString() }));
-      fs.renameSync(`${me}.tmp`, me); // whole or not at all
-      if (!(g = gate())) break; // a gate that took the lock meanwhile would wait for this run: this run steps back for it instead
-      fs.rmSync(me, { force: true });
+      const drop = registerRun(me, { ...rec, at: new Date().toISOString() });
+      if (!(g = gateAhead(dir))) { process.on('exit', drop); break; } // a gate that came meanwhile would wait for this run: this run steps back for it instead
+      drop();
     }
-    if (!said) { console.error(`waiting for the gate on ${String(g.sha || '?').slice(0, 7)} (pid ${g.pid}) before opening a browser …`); said = true; }
+    if (!said) { console.error(`waiting for the gate on ${String(g.sha || '?').slice(0, 7)} (${g.ref || '?'}, pid ${g.pid}) before opening a browser …`); said = true; }
     Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 5000);
   }
-  process.on('exit', () => fs.rmSync(me, { force: true }));
 }

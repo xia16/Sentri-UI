@@ -66,3 +66,25 @@ test('a finished or stale branch may be deleted, one named branch at a time, nev
     'git push origin --all', 'git push origin --mirror', 'git push origin --tags',
   ]) assert.equal(guard(c), 2, c);
 });
+
+test('the word "push" is not a push: only a command that runs git push is checked (2026-10-20)', () => {
+  for (const c of [
+    'grep -n push scripts/merge-guard.mjs',
+    'git log --oneline -5 | grep -i push',
+    'git -C ../x log --grep push',
+    'cat .git/config && echo push',
+    'node -e "const out = []; out.push(\'git\'); console.log(out)" && git status',
+    'git commit -m "push the fix; git push origin main stays blocked"',
+    "cat > notes.md <<'EOF'\nThe guard used to block this.\n// s = s.push(x)\nj.commits.push(c)\ngit push origin main\nEOF\ngit status",
+    "git commit -q -m \"$(cat <<'EOF'\nGuard: a push word is not a push\n\ngit push origin HEAD:main stays blocked\nEOF\n)\" && git push -u origin workflow/x",
+  ]) assert.equal(guard(c), 0, c);
+  assert.equal(run({ tool_name: 'PowerShell', tool_input: { command: "git commit -m @'\nconst x = a.push(1)\ngit push origin main\n'@; if ($?) { git push origin workflow/x }" } }), 0, 'PowerShell here-string');
+  for (const c of [
+    'git push origin main', 'git push origin HEAD:main', 'git -C x push origin main', 'git -C x push origin feat', 'git --git-dir=x/.git push origin feat',
+    'git push --force origin feat', 'git push -f origin feat', 'git checkout main && git push origin feat', 'git switch master; git push origin feat',
+    'git push origin "main"', '"git" push origin main', 'git.exe push origin main', 'GIT_TRACE=1 git push origin main', 'cd x && git push origin main',
+    '(git push origin main)', 'echo $(git push origin main)', 'if git push origin main; then echo ok; fi', 'git commit -m "x" && git push origin HEAD',
+    'node -e "a.push(1)" && git push origin main', 'bash -c "git push origin main"', "sh -c 'cd x && git push origin main'", 'cmd /c "git push origin main"',
+    "bash <<'EOF'\ngit push origin main\nEOF", 'git push origin feat \\\n  main', 'git push origin feat > log.txt',
+  ]) assert.equal(guard(c), 2, c);
+});
