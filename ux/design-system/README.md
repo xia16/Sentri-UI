@@ -131,15 +131,17 @@ There are two headers and no others. A new kind of header goes through the rules
 | | **Page header** | **Sheet header** |
 |---|---|---|
 | Where | A surface that fills the screen: a task page, a log, a scan, ending a task | A drawer that leaves the page visible above it |
-| Parts | Back (48px, left) · title (left) · optional header line under the title | Centred title · optional header line under it · optional corner actions · a 1px `line` hairline that belongs to the header |
+| Parts | Back (48px, left) · title (left) · optional header line under the title · optional page action (48px icon, right) | Centred title · optional header line under it · optional corner actions · a 1px `line` hairline that belongs to the header |
 | Gap to the body | `space-section` (24px) from the last header line | `space-section` (24px) from the hairline |
 | Back | Top left; the footer has no Back | In the footer (the drawer convention) |
 
 Which one: whether the surface covers the page, not which feature it belongs to. A drawer that fills the screen is a page and takes the page header.
 
-**The header holds** the title and, at most, one quiet **header line**. Nothing in a header acts except Back, the subject chip and the sheet header's **corner actions**: no counts, no status, no other buttons. Status is the first thing in the body.
+**The header holds** the title and, at most, one quiet **header line**. Nothing in a header acts except Back, the subject chip, the sheet header's **corner actions** and the page header's one **page action**: no counts in the title or its line, no status, no other buttons. Status is the first thing in the body.
 
 **Corner actions (sheet header; owner, 2026-10-14).** **Clear** or **Reset** sits at the top right as quiet text, present only when there is something to clear or reset. A **✕** sits at the top left, used only by a drawer with levels, where it closes the whole drawer (owner ruling B, 2026-10-16); other drawers have none (Back, swipe and the scrim close them). Each is a 48px target, **vertically centred on the header's text block**: the title, plus its header line when there is one (ruling C: never the title alone, never the header box). The footer keeps Back and the primary only.
+
+**Page action (page header; owner, 2026-10-20).** A page header may carry one action at the top right: an [IconButton](components/IconButton/README.md), 48px, with an accessible name, vertically centred on the header's text block like a corner action. It opens something about the whole page (Saved work's past uploads, behind a clock) or is the app's sync badge (an upload icon with a task's record count, owner 2026-10-18). Never a text button, never two, never a commit: the page's commit is its footer's primary.
 
 **Title length.** A header title fits on one line between the corner targets at 360px in English and Chinese, with at least 12px clear on each side: about 20 English or 10 Chinese characters. Copy is written to fit (a shorter name, decided in the feature's budget), never truncated, wrapped or shrunk. Section titles under a header keep their own style; the hairline and the gap separate them, never a weaker title.
 
