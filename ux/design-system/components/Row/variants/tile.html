@@ -1,7 +1,8 @@
 <div data-state="Default · eight verbs (4 + 4)" id="tile-state-0"></div>
 <div data-state="Pressed" id="tile-state-1"></div>
-<div data-state="Five verbs (3 + 2)" id="tile-state-2"></div>
+<div data-state="Five verbs (one row)" id="tile-state-2"></div>
 <div data-state="Six verbs (3 + 3)" id="tile-state-3"></div>
+<div data-state="Seven verbs (4 + 3)" id="tile-state-9"></div>
 <div data-state="Danger · Death is last" id="tile-state-4"></div>
 <div data-state="Over ten · More" id="tile-state-5"></div>
 <div data-state="More opened · eleven verbs (4 + 4 + 3)" id="tile-state-7"></div>
@@ -31,6 +32,7 @@ var RENDER = {
   "tile-state-1": () => UI.rowGrid(pick(['condition', 'treat', 'edit', 'resolve', 'care', 'note', 'measure', 'feed']).map(function (t, i) { return i === 1 ? Object.assign(t, { attrs: { 'data-preview': 'pressed' } }) : t; }), { more: more, label: 'Everyday actions' }),
   "tile-state-2": () => UI.rowGrid(pick(['condition', 'treat', 'note', 'measure', 'feed']), { more: more, label: 'Everyday actions' }),
   "tile-state-3": () => UI.rowGrid(pick(['condition', 'treat', 'resolve', 'care', 'note', 'move']), { more: more, label: 'Everyday actions' }),
+  "tile-state-9": () => UI.rowGrid(pick(['condition', 'treat', 'resolve', 'care', 'note', 'move', 'feed']), { more: more, label: 'Everyday actions' }),
   "tile-state-8": () => UI.rowGrid([{ label: 'Note', title: 'Add pen note', icon: I('note'), action: 'pen-note' }, { label: 'Feed', title: 'Feed guidance', icon: I('feed'), action: 'feed' }, { label: 'Fault', title: 'Report equipment fault', icon: I('wrench'), action: 'fault' }], { label: 'Pen actions' }),
   "tile-state-4": () => UI.rowGrid(pick(['death', 'condition', 'treat', 'note', 'move']), { more: more, label: 'Everyday actions' }),
   "tile-state-5": () => UI.rowGrid(pick(['condition', 'treat', 'edit', 'resolve', 'care', 'note', 'move', 'measure', 'feed', 'weigh', 'temp', 'death']), { more: more, label: 'Everyday actions' }),

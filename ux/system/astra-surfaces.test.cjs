@@ -85,7 +85,7 @@ test('Actions is a menu drawer: everyday verbs as a grid, Production as navigati
   const grid=html.match(/<div class="st-panel st-row-grid[^"]*"[^>]*style="--st-row-grid-cols:(\d+)">([\s\S]*?)<\/div><\/section>/);
   assert.ok(grid,'everyday grid');
   const tiles=grid[2].match(/class="st-row-tile[" ]/g).length;
-  assert.equal(+grid[1],Math.ceil(tiles/2),'two rows, split evenly');
+  assert.equal(+grid[1],tiles<=5?tiles:Math.ceil(tiles/2),'one row up to five, two even rows from six');
   assert.match(grid[2],/aria-label="Condition, Disease or symptom"[^>]*>[\s\S]*?<span class="st-row-tile-label">Condition<\/span>/);
   assert.match(grid[2],/aria-label="Treat, Record treatment"[^>]*>[\s\S]*?<span class="st-row-tile-label">Treat<\/span>/,'a word that is only a prefix (treat-ment) does not count');
   assert.match(grid[2],/aria-label="Add a note"[^>]*>[\s\S]*?<span class="st-row-tile-label">Note<\/span>/,'a name that holds the whole word stays as it is');
@@ -95,11 +95,11 @@ test('Actions is a menu drawer: everyday verbs as a grid, Production as navigati
     assert.match(group,/st-row-group/);
   }
 });
-test('the verb grid: one row up to three, then even rows, and folds past ten into More', () => {
+test('the verb grid: one row up to five, two even rows from six, and folds past ten into More', () => {
   const c=context('actions');c.selected.add(c.pigId);
   const items=n=>Array.from({length:n},(_,i)=>({a:'note',k:'note',title:'Verb '+i,sub:'',value:String(i)}));
   const cols=html=>+html.match(/--st-row-grid-cols:(\d+)/)[1],count=html=>html.match(/class="st-row-tile[" ]/g).length;
-  for(const [n,expected] of [[1,1],[2,2],[3,3],[4,2],[5,3],[6,3],[7,4],[8,4],[10,5]]) assert.equal(cols(model.verbGrid(c,items(n))),expected,n+' verbs');
+  for(const [n,expected] of [[1,1],[2,2],[3,3],[4,4],[5,5],[6,3],[7,4],[8,4],[9,5],[10,5]]) assert.equal(cols(model.verbGrid(c,items(n))),expected,n+' verbs');
   const folded=model.verbGrid(c,items(12));
   assert.equal(count(folded),10);assert.match(folded,/data-action="actions-grid-all"/);assert.equal(cols(folded),5);
   c.actionsGridAll=true;assert.equal(count(model.verbGrid(c,items(12))),12);
