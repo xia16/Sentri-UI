@@ -14,7 +14,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { pwPath, playwright } from './playwright-path.mjs';
 import { removeWorktree } from './worktree-remove.mjs';
-import { CLASSES, classOfFiles, DS_FEATURE, componentPage, componentPagesOf, componentsTouched, idPath, screensOf, pageOf, pageAssets, sharedFiles, coverageLost, effectiveClass, classifyScreens, touchesSystem, touchesTools, budgetProblems, critiqueProblems, pageStyling, addedLines, scenarioDebt, isMotionFile, unheldMotion, heldOf, confirmLeaf, reusableLeaf, IN_PROGRESS, readInProgress, ownFeatures, scopeReach, componentScope, exportStamps, readLibrary, libraryProblems, newExportProblems } from './loop-rules.mjs';
+import { CLASSES, classOfFiles, DS_FEATURE, componentPage, componentPagesOf, componentsTouched, idPath, screensOf, pageOf, pageAssets, sharedFiles, coverageLost, effectiveClass, classifyScreens, touchesSystem, touchesTools, budgetProblems, critiqueProblems, pageStyling, addedLines, scenarioDebt, isMotionFile, unheldMotion, heldOf, confirmLeaf, reusableLeaf, IN_PROGRESS, readInProgress, ownFeatures, scopeReach, componentScope, exportStamps, readLibrary, libraryProblems, newExportProblems, frozenFeatures, checksChinese } from './loop-rules.mjs';
 import { bundleShape, bundleChange } from './bundle-graph.mjs';
 // The analyser (gate-v2 §2): static and conservative, over both revisions. It says what each screen's and each leaf's evidence
 // depends on; the reach is every screen and leaf whose evidence identity that makes differs between the two (gate-simplify.md X1).
@@ -128,6 +128,9 @@ export async function evaluate(opts) {
   log(`class: ${byFiles.cls}${byFiles.why.length ? ` (${byFiles.why.join('; ')})` : ''}`);
   // A shared-component change is held to no worse than main on legibility (README, Legibility gate); otherwise strict while the
   // README says so. Known before anything is shot, so the visits know whether base needs its legibility audit.
+  // English first (owner, 2026-10-21): ZH runs and ZH leaves only for frozen features
+  const zhFrozen = new Set([...frozenFeatures(S.base.atlas), ...frozenFeatures(S.cand.atlas)]);
+  mech.zh = { frozen: [...zhFrozen].sort() };
   const strictLeg = !sharedByFiles && /^Legibility gate: strict\s*$/m.test(fs.readFileSync(path.join(S.cand.dir, 'docs/design-workflow/README.md'), 'utf8'));
   mark('setup');
 
@@ -286,7 +289,7 @@ export async function evaluate(opts) {
   // both sides shares one shot, so its diff is 0 by definition: shooting it proved nothing, and the tripwire and "every screen" for
   // CSS that did were removed. Identity completeness is the guarantee (gate-v2.md §3, the stylesheet syntax the analyser checks), and
   // `--audit` checks it off the merge path. The scope is a declaration only (X7): it brings in no screen of its own. A screen in the
-  // reach is shot at RUNS (EN 390 and 360, ZH 360; a
+  // reach is shot at RUNS (EN 390 and 360, and ZH 360 for a frozen feature's screen; a
   // component page in EN only) and gets its visit checks; nothing else is shot.
   const sideList = (k) => [...S[k].screens, ...S[k].ds];
   const idAt = (side, x) => shotId(side, x, 390, 'en', componentPage(x.id) ? 'grid' : 'screen');
@@ -337,7 +340,7 @@ export async function evaluate(opts) {
     }
   }
   log(`reach: ${reachIds.size} of ${total} screens${mech.reach.changed !== undefined ? ` (${mech.reach.changed} whose identity changed, ${mech.reach.added} added, ${mech.reach.removed} removed)` : ` (${mech.reach.why[0]})`}`);
-  const runsOf = (x) => (inReach(x) ? RUNS.filter((r) => !componentPage(x.id) || r.lang === 'en').map(({ width, lang }) => ({ width, lang })) : []);
+  const runsOf = (x) => (inReach(x) ? RUNS.filter((r) => (!componentPage(x.id) || r.lang === 'en') && (r.lang === 'en' || checksChinese(x.feature, zhFrozen))).map(({ width, lang }) => ({ width, lang })) : []);
   const visitChecks = (side, x, width, lang) => {
     if (audit || !inReach(x) || componentPage(x.id)) return [];
     const out = [];
@@ -785,14 +788,14 @@ export async function evaluate(opts) {
     const { leaves, nodeCount, problems } = walkTree(spec);
     if (problems.length) return { problems };
     // S5: a leaf runs at the narrowest width its spec lists (360), unless the leaf names its own widths
-    const D = spec.defaults || {}, langs = D.langs || ['en'], widths = [Math.min(...(D.widths || [390]))];
+    const D = spec.defaults || {}, langs = (D.langs || ['en']).filter((g) => g === 'en' || checksChinese(f, zhFrozen)), widths = [Math.min(...(D.widths || [390]))];
     const its = [];
     for (const l of leaves) {
       if (only && !only.has(l.node.id)) continue;
       if (l.node.type !== 'outcome' || l.node.status === 'pending') { its.push({ leaf: l, row: true }); continue; }
       const { children, ...node } = l.node;
       const walked = { node, state: l.state ? { reset: l.state.reset, clock: l.state.clock } : null, taps: l.taps, defaults: D };
-      for (const lang of l.node.langs || langs) for (const width of l.node.widths || widths) its.push({ kind: 'leaf', leaf: l, lang, width, side, feature: f, id: identityOf('leaf', { walked, lang, width, reach: leafReach(side, l, D), strings: blob(side, 'ux/laws/strings.json'), render: { ...render, locale: lang === 'zh' ? 'zh-CN' : 'en-GB' }, runner: code.leaf }) });
+      for (const lang of (l.node.langs || langs).filter((g) => g === 'en' || checksChinese(f, zhFrozen))) for (const width of l.node.widths || widths) its.push({ kind: 'leaf', leaf: l, lang, width, side, feature: f, id: identityOf('leaf', { walked, lang, width, reach: leafReach(side, l, D), strings: blob(side, 'ux/laws/strings.json'), render: { ...render, locale: lang === 'zh' ? 'zh-CN' : 'en-GB' }, runner: code.leaf }) });
     }
     return { its, nodeCount, D, langs, widths };
   };

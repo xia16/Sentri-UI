@@ -165,8 +165,8 @@ test("the library fit of split verdicts is the worst part's, and it carries acro
 test('the Results block says in one line what a shared change left unchecked', () => {
   const md = resultsBlock({ outcome: 'pass', candidate: 'c1', base: 'b1', class: { effective: 'shared' }, checks: [], ownFeatures: ['move'], inProgress: ['farrowing', 'piglet-processing'],
     outOfScope: { screens: 120, features: ['inspection', 'wean', 'treat'], componentPages: 0 }, pairs: [prop('farrowing.room'), mp('move.pick', 'en', 390)], propagation: [{ screen: 'farrowing.room', uses: [], notUsingShared: true }] });
-  assert.match(md, /- Scope: judged in full on move and the component pages; propagation only on farrowing, piglet-processing \(in progress\); 120 screens in 3 features not checked: not in progress/);
-  assert.match(md, /- Propagation: 1 pair\(s\), judged propagated or broken; calls none of the changed exports \(a local copy\?\): farrowing.room/);
+  assert.match(md, /- Scope: checked in full on move and the component pages; propagation only on farrowing, piglet-processing \(in progress\); 120 screens in 3 features not checked: not in progress/);
+  assert.match(md, /- Propagation: 1 pair\(s\) checked by the machine; calls none of the changed exports \(a local copy\?\): farrowing.room/);
   assert.doesNotMatch(resultsBlock({ outcome: 'pass', checks: [] }), /Scope:/);
 });
 
