@@ -1506,12 +1506,12 @@
     if(r)r.scrollIntoView({block:'nearest',behavior:'smooth'});
   }
   /* A new row arrives without a jump: it slides in at the top of its card and everything under it glides to its new place (measured before
-     and after the render with scanPlaces, then animated back from the old place by scanGlide). A new card fades in with its heading. Rows
-     move with their card, so a row is measured against its card. Reduced motion and the atlas's still frames skip it. */
+     and after the render with scanPlaces, then animated back from the old place by scanGlide). A new card fades in with its heading, and a card
+     that gains a row grows with it. Rows move with their card, so a row is measured against its card. Reduced motion and the atlas's still frames skip it. */
   const scanKey=e=>e.dataset.scanTag?'r'+e.dataset.scanTag:e.classList.contains('st-scan-card')?'c'+e.previousElementSibling?.textContent:'h'+e.textContent;
   const scanMovers=root=>[...root.querySelectorAll('.st-scan-body .st-heading,.st-scan-body .st-scan-card,.st-scan-body [data-scan-tag]')];
   const scanTop=e=>e.getBoundingClientRect().top-(e.dataset.scanTag?e.closest('.st-scan-card').getBoundingClientRect().top:0);
-  function scanPlaces(root){const m=new Map();if(root)for(const e of scanMovers(root))m.set(scanKey(e),scanTop(e));return m;}
+  function scanPlaces(root){const m=new Map();if(root)for(const e of scanMovers(root)){m.set(scanKey(e),scanTop(e));if(e.classList.contains('st-scan-card'))m.set('H'+scanKey(e),e.getBoundingClientRect().height);}return m;}
   function scanGlide(root,before){
     if(!root||document.documentElement.classList.contains('atlas-still')||matchMedia('(prefers-reduced-motion: reduce)').matches)return;
     const ease={duration:280,easing:'cubic-bezier(.22,1,.36,1)'};
@@ -1519,6 +1519,8 @@
       const was=before.get(scanKey(e)),now=scanTop(e);
       if(was===undefined)e.animate([{opacity:0,transform:'translateY(-10px)'},{opacity:1,transform:'none'}],ease);
       else if(Math.abs(was-now)>.5)e.animate([{transform:`translateY(${was-now}px)`},{transform:'none'}],ease);
+      // A card that gained a row grows with it, so no empty strip opens under its last row while the rows glide.
+      const h=before.get('H'+scanKey(e)),hn=e.getBoundingClientRect().height;if(h!==undefined&&Math.abs(h-hn)>.5)e.animate([{height:h+'px',overflow:'hidden'},{height:hn+'px',overflow:'hidden'}],ease);
     }
   }
   const api=Object.freeze({lookupGroups,findPage,findResults,findRow,findMark,scanPage,scanArrive,scanPlaces,scanGlide,taskTile,weekBoard,weekCell,weekBoardKey,headerLine,pageHeader,rangeSlider,filterSheet,penMap,penMapKey,penMapFooter,penPeek,penMapMount:penMount,optionalRow,keyboardLift,heading,panel,facts,row,rowGroup,log,logDay,logStamp,logGroups,categoryFooter,field,rowTile,rowGrid,pickerField,pickerOptions,pickerBody,pickerHead,pickerFooter,filterChips,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,toast,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowSelectDoor,rowAction,rowSelectChange,status,conditionTag,rowFitTags,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});

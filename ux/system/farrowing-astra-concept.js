@@ -114,7 +114,7 @@ function act(s,a,v){
  if(a==='deletePhoto'){const list=s.popup.mortality?s.mortalityDraft.photos:s.photos;list.splice(s.popup.index,1);s.photoOrigin={action:'addPhoto',index:'photos'};s.popup=null;}
  if(a==='lens')s.lens=v;
  if(a==='marker'){if(s.markerDraft==null)s.markerDraft=s.markers[0]?.text||'';s.view='marker';} // Back keeps the draft (drawer law): reopening finds it
- if(a==='saveMarker'){const text=(s.markerDraft??s.markers[0]?.text??'').trim();if(!text)return;s.markers=[{text,meta:'Today · 09:41 · G.H'}];event(s,'Note updated · '+text,'milestone');s.markerDraft=null;s.actionsEntry=true;s.view='profile';}
+ if(a==='saveMarker'){const text=(s.markerDraft??s.markers[0]?.text??'').trim();if(!text)return;s.markers=[{text,meta:'Today · 09:41 · G.H'}];event(s,'Note updated · '+text,'milestone');s.markerDraft=null;if(s.scanReturn){s.scanReturn=false;s.actionsEntry=false;s.view=s.pageBack||'roomScan';}else{s.actionsEntry=true;s.view='profile';}}
  if(a==='piglets'){s.pigletSelected=[];s.view='pigletCare';}
  if(a==='pigletTab')s.pigletTab=v;
  if(a==='processingTask'){const task=s.processingTasks.find(x=>x.id===v);if(task){task.done=!task.done;task.meta=task.done?'This visit · G.H':task.id==='health'?'In 2 days':'Due today';s.processingDirty=true;}}
@@ -137,7 +137,7 @@ function act(s,a,v){
  if(a==='countReconcile'){s.countDraft=s.alive;s.countReason='';s.view='countReconcile';}
  if(a==='countReconcileStep'){const identified=s.piglets.filter(p=>p.state==='Alive').length;s.countDraft=Math.max(identified,Math.min(30,s.countDraft+Number(v)));}
  if(a==='saveCountReconcile'){if(s.countDraft===s.alive||!s.countReason.trim())return;const before=s.alive,diff=s.countDraft-before;s.alive=s.countDraft;s.unidentified=Math.max(0,s.unidentified+diff);s.anchor=born(s);if(s.locked)s.frozen=Math.max(s.frozen,born(s));event(s,`Piglet count corrected · ${before} → ${s.alive} · ${s.countReason.trim()}`,'correction');s.actionsEntry=true;s.view='profile';}
- if(a==='featureBack'){if(s.view==='foster'&&s.featureReturn==='allocate'){s.view='allocate';}else if(['pigletEdit','pigletDeath'].includes(s.view)||s.view==='foster'&&s.featureReturn==='pigletCare'){s.pigletTab='records';s.view='pigletCare';}else{s.actionsEntry=true;s.view='profile';}}
+ if(a==='featureBack'){if(s.view==='foster'&&s.featureReturn==='allocate'){s.view='allocate';}else if(['pigletEdit','pigletDeath'].includes(s.view)||s.view==='foster'&&s.featureReturn==='pigletCare'){s.pigletTab='records';s.view='pigletCare';}else if(s.scanReturn){s.scanReturn=false;s.actionsEntry=false;s.view=s.pageBack||'roomScan';}else{s.actionsEntry=true;s.view='profile';}}   // opened from Scan's Actions: Back returns to the scan list
 }
 // Merge every saved event in the pen, independent of the current list filters.
 // Resolve the prototype's relative date labels against one reference day.
@@ -573,7 +573,7 @@ function roomOverlay(s){const c=roomContext(s),unitSheet=(title,body,actions,cls
  return '';
 }
 function roomAction(i,a,v){if(!a.startsWith('room-'))return false;const s=states[i],c=roomContext(s);if(a!=='room-pen'&&atlasStill())c.highlightUntil=0;const list=document.querySelector(`[data-card="${i}"] .room-scroll`);if(list)c.scroll=list.scrollTop;const intro=list?list.querySelector('.room-context-strip').offsetHeight+10:0;const nextScroll=c.scroll>=intro?intro:0;
-  if(a==='room-sow'){const hit=findSow(c,v),r=hit?.record;if(r){if(s.view==='roomScan')c.returnToTaskReview='roomScan';states[i]=r;r.view=recordView(r);if(r.view==='history')r.pageBack='room';if(hit.unit.id===c.unitId)c.currentPen=r.pen;c.query='';}}   // Farrowing is one task across its units: a sow in another unit opens the same drawer
+  if(a==='room-sow'){const hit=findSow(c,v),r=hit?.record;if(r){const from=s.view;if(from==='roomScan'||from==='roomSearch')c.returnToTaskReview=from;states[i]=r;r.view=recordView(r);if(r.view==='history')r.pageBack='room';if(hit.unit.id===c.unitId)c.currentPen=r.pen;if(from!=='roomSearch')c.query='';}}   // Back returns to the list she was opened from; Find a sow keeps what was typed   // Farrowing is one task across its units: a sow in another unit opens the same drawer
  if(a==='room-back'||a==='room-return'){c.returnToTaskReview=false;if(s.view==='roomPenDetail')c.returnFocusPen=c.detailPen;const from=s.view;s.view=from==='roomScanActions'?'roomScan':from==='roomPicker'&&c.picker?c.picker.returnView:from==='roomEndTask'?'roomOverview':from==='roomTaskSows'?c.taskListBack||'roomEndTask':from==='roomTaskReceipt'?'roomHome':penParent(from);if(from==='roomPicker')c.picker=null;}
  handlePenAction(s,c,a,v);
  if(a==='room-pen-log')s.view='roomPenLog';
@@ -590,7 +590,7 @@ function roomAction(i,a,v){if(!a.startsWith('room-'))return false;const s=states
 
  if(a==='room-search'||a==='room-scan'){c.query='';s.view=a==='room-search'?'roomSearch':'roomScan';}
  if(a==='room-search-clear')c.query='';
- if(a==='room-scan-act'){const hit=findSow(c,c.scan.picked[0]);if(hit){const r=hit.record;states[i]=r;r.view='roomScan';r.deepLink=v;act(r,'sowActions');}}
+ if(a==='room-scan-act'){const hit=findSow(c,c.scan.picked[0]);if(hit){const r=hit.record;states[i]=r;r.view='roomScan';r.deepLink=v;r.scanDeep='armed';act(r,'sowActions');}}
  else if(a.startsWith('room-scan-'))scanAction(s,c,a,v);
  if(a==='room-overview')s.view=c.completion?'roomTaskReceipt':'roomOverview';
  if(a==='room-end-review')s.view=c.completion?'roomTaskReceipt':'roomEndTask';
@@ -723,13 +723,16 @@ window.addEventListener('message',e=>{
  if(e.origin!==location.origin||!['sow-detail-state','sow-detail-close','sow-action'].includes(e.data?.type))return;
  const i=states.findIndex((s,i)=>s.view==='profile'&&document.querySelector(`[data-card="${i}"] .sow-detail-frame`)?.contentWindow===e.source);
  if(i<0)return;const s=states[i];sowDetailContexts.set(s,e.data.context);
+ // Scan's Actions opened one of her flows directly: leaving that flow goes back to the scan list in one Back, not via her Actions sheet.
+ if(e.data.type==='sow-detail-state'&&s.scanDeep){const v=e.data.context?.view;if(v&&v!=='actions')s.scanDeep='in';else if(s.scanDeep==='in'&&v==='actions'){s.scanDeep=false;s.actionsEntry=false;act(s,'back');render(i);return;}}
+ const viaScan=!!s.scanDeep;if(e.data.type!=='sow-detail-state')s.scanDeep=false;
  if(e.data.type==='sow-action'){
   const a=e.data.action;if(a==='current-task'&&!s.productionOutcome&&!s.ended){s.actionReturn=false;s.actionsEntry=false;s.view=e.data.taskId==='piglet-processing'&&born(s)?'pigletCare':s.locked?'locked':'count';render(i);return;}const actionId={'save-miscarriage':'miscarriage','save-transfer':'transfer','save-batch-removal':'remove-batch','save-not-in-pig':'not-in-pig'}[a]||a,entry=sowActionCatalogue(s).find(x=>x.id===actionId&&!x.reason);if(!entry)return;
   if(a==='save-transfer'){const c=roomContext(s),from=c.units.find(u=>u.records.includes(s)),to=c.units.find(u=>u.id===e.data.unit),pen=String(e.data.pen||'');if(!from||!to||!to.records.some(r=>r.pen===pen)||(from===to&&s.pen===pen))return;const origin=from.name+' · '+s.pen;if(from!==to){from.records.splice(from.records.indexOf(s),1);to.records.push(s);}s.pen=pen;switchRoomUnit(c,to.id);c.currentPen=pen;event(s,'Transferred · '+origin+' → '+to.name+' · '+pen,'milestone');s.actionsEntry=true;s.view='profile';}
   else if(a==='save-miscarriage'){const reason=String(e.data.reason||'').trim();if(!reason)return;s.frozen=born(s);s.productionOutcome='abortion';s.locked=true;event(s,'Abortion · '+reason,'danger');s.actionsEntry=false;s.view='history';s.pageBack='room';}
   else if(a==='save-batch-removal'){const reason=String(e.data.reason||'').trim();if(!reason)return;s.productionOutcome='removed';s.locked=true;s.frozen=0;s.alive=0;s.pending=0;event(s,'Removed from farrowing batch · '+reason+(e.data.note?' · '+String(e.data.note).trim():''),'milestone');s.actionsEntry=false;s.view='history';s.pageBack='room';}
   else if(a==='save-not-in-pig'){const reason=String(e.data.reason||'').trim();if(!reason)return;s.productionOutcome='not-in-pig';s.locked=true;s.frozen=0;s.alive=0;s.pending=0;event(s,'Not in pig · '+reason+(e.data.note?' · '+String(e.data.note).trim():''),'milestone');s.actionsEntry=false;s.view='history';s.pageBack='room';}
-  else {s.actionReturn=true;s.view=s.locked?'locked':'count';if(a==='sow-death'){act(s,'death');s.mode='sow';}else act(s,a);}
+  else {s.actionReturn=true;s.scanReturn=viaScan;s.view=s.locked?'locked':'count';if(a==='sow-death'){act(s,'death');s.mode='sow';}else act(s,a);}
   render(i);return;
  }
  if(e.data.type==='sow-detail-close'){s.actionsEntry=false;act(s,'back');render(i);document.querySelector(`[data-card="${i}"] [data-action="profile"]`)?.focus({preventScroll:true,focusVisible:false});}
