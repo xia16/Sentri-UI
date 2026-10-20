@@ -16,6 +16,7 @@ Freeze automation isn't built yet. Until it is, the driver runs this list by han
 - [ ] **Section patterns.** Update the section's patterns (Task skeleton, Home task card) from the frozen screens and regenerate the section doc. Diff sibling features against the new pattern and file a backlog item for each gap.
 - [ ] **Notes and PRD.** Reconcile each screen's notes (states tables, hidden logic, edge cases) with the frozen behaviour. Mark the PRD final, close its decisions, and remove the provisional flags.
 - [ ] **Scenarios.** Every leaf in `features/<id>/scenarios.json` passes (`node scripts/run-scenarios.mjs`) on the frozen commit, or is blocked by a recorded owner decision that keeps it out of scope.
+- [ ] **Chinese pass.** Until the freeze the gate checks English only (owner, 2026-10-21). Translate the feature's strings, then freeze: from then on the gate shoots its screens at ZH 360 and runs its ZH leaves.
 - [ ] **Copy.** Mark the feature's strings approved in EN and ZH. The copy-budget test passes. New terms go into the glossary (`ux/laws/glossary.md`).
 - [ ] **Cross-feature.** Document the "adds to" contributions on host features, and check that the entry points and links are live.
 - [ ] **Native handoff.** Name the native control for every component on every screen. Bundle the bare HTML, notes and PRD.

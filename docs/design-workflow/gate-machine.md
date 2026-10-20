@@ -4,6 +4,8 @@ What `node scripts/gate.mjs` does, for whoever runs or maintains it. The judge's
 
 **The machine is the merge gate** (owner, 2026-10-20): the owner's "PR it" is the design approval, so a mechanical pass posts `sentri/gate` success whether or not screens moved, and a mechanical fail posts failure. The judge ([briefs/gate.md](briefs/gate.md)) is advice the builder may ask for; it never holds a merge.
 
+**English first** (owner, 2026-10-21): Chinese is checked only on a frozen feature (every current screen approved; the atlas's `frozen` status). Until a feature freezes, its ZH runs and ZH leaves don't run in the gate and don't hold a merge; the Chinese pass belongs to the freeze ([freeze-checklist.md](freeze-checklist.md)).
+
 `node scripts/gate.mjs` is the mechanical part of the gate. The driver runs it from any checkout of this repo. Its work is one call, `evaluate(base, candidate, mode)` in `scripts/evaluate.mjs`, which answers **pass**, **fail** or **blocked** ([gate-v2.md](gate-v2.md)):
 - It judges with main's rules. When the checkout it runs from has `scripts/`, `docs/design-workflow/` or `package.json` different from main (a branch, a stale main, uncommitted edits), it runs main's own `gate.mjs` from a worktree of main, with the same arguments, and removes that worktree after.
 - It refuses a candidate that doesn't contain `origin/main`.

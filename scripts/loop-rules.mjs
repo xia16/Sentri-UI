@@ -671,19 +671,30 @@ export function scenarioDebt(candReport, baseReport) {
 // one (not --quick) whose screens were classified, with nothing changed, new or gone and no pair listed.
 // The PR's Results block (gate-simplify.md S8), from one gate run's mechanical.json: every number in it was measured on the gated
 // commit, so a PR body that pastes it never carries a stale claim (#163, #192). Markdown; the driver pastes it whole.
+// English first (owner, 2026-10-21): Chinese is checked only on a frozen feature, one whose every current screen is approved (the
+// atlas's own status, build-atlas.mjs statusOf). Until a feature freezes, its ZH runs and ZH leaves don't gate: copy and layout are
+// still moving, and the Chinese pass belongs to the freeze (freeze-checklist.md). A feature frozen on either side keeps its Chinese.
+export function frozenFeatures(atlas) {
+  const out = new Set();
+  for (const p of atlas?.platforms || []) for (const s of p.sections || []) for (const f of s.features || []) if (f?.status === 'frozen') out.add(f.id);
+  return out;
+}
+export const checksChinese = (feature, frozen) => !!feature && frozen.has(feature);
+
 export function resultsBlock(mech) {
   const short = (s) => String(s || '?').slice(0, 7);
   const n = (a) => (Array.isArray(a) ? a.length : 0);
   const r = mech.reach || {}, sc = mech.screens || {};
   const word = { pass: 'MECHANICAL PASS', fail: 'MECHANICAL FAIL', blocked: 'MECHANICAL BLOCKED' }[mech.outcome] || 'MECHANICAL ?';
   const out = [`### Results`, '', `The gate's, on \`${short(mech.candidate)}\` against main \`${short(mech.base)}\` (\`node scripts/gate.mjs\`, ${mech.timings?.total ?? '?'} s).`, ''];
-  out.push(`- **${word}**${mech.gatePass ? ' · GATE PASS (no screen moved)' : ''}, class **${mech.class?.effective || '?'}**${mech.stoppedEarly ? ` · stopped before any browser work: ${mech.stoppedEarly}` : ''}`);
+  out.push(`- **${word}**${mech.gatePass ? ' · GATE PASS' : ''}, class **${mech.class?.effective || '?'}**${mech.stoppedEarly ? ` · stopped before any browser work: ${mech.stoppedEarly}` : ''}`);
   if (r.of) out.push(`- Reach: ${r.screens} of ${r.of} screens${r.changed !== undefined ? ` (${r.changed} changed identity, ${r.added} added, ${r.removed} removed)` : ''}${r.leaves !== undefined ? `, ${r.leaves} leaves` : ''}`);
   // the scoped reach of a shared change (owner, 2026-10-20), in one line, and the propagation pairs
   const os = mech.outOfScope;
-  if (os) out.push(`- Scope: judged in full on ${(mech.ownFeatures || []).join(', ') || 'no feature of its own'} and the component pages; propagation only on ${(mech.inProgress || []).join(', ') || 'none'} (in progress)${os.screens ? `; ${os.screens} screens in ${os.features.length} features not checked: not in progress` : ''}${os.componentPages ? `; ${os.componentPages} component page(s) of parts the change doesn't call` : ''}`);
+  if (os) out.push(`- Scope: checked in full on ${(mech.ownFeatures || []).join(', ') || 'no feature of its own'} and the component pages; propagation only on ${(mech.inProgress || []).join(', ') || 'none'} (in progress)${os.screens ? `; ${os.screens} screens in ${os.features.length} features not checked: not in progress` : ''}${os.componentPages ? `; ${os.componentPages} component page(s) of parts the change doesn't call` : ''}`);
   const prop = (mech.pairs || []).filter((p) => p.propagation).length, notUsing = (mech.propagation || []).filter((p) => p.notUsingShared).map((p) => p.screen);
-  if (prop || notUsing.length) out.push(`- Propagation: ${prop} pair(s), judged propagated or broken${notUsing.length ? `; calls none of the changed exports (a local copy?): ${notUsing.slice(0, 4).join(', ')}${notUsing.length > 4 ? ' …' : ''}` : ''}`);
+  if (prop || notUsing.length) out.push(`- Propagation: ${prop} pair(s) checked by the machine${notUsing.length ? `; calls none of the changed exports (a local copy?): ${notUsing.slice(0, 4).join(', ')}${notUsing.length > 4 ? ' …' : ''}` : ''}`);
+  if (mech.zh) out.push(`- Chinese: checked only on frozen features (English first, owner 2026-10-21): ${mech.zh.frozen.length ? mech.zh.frozen.join(', ') : 'none frozen, so no ZH runs or ZH leaves'}`);
   if (mech.screens) out.push(`- Screens: ${n(sc.diff)} changed, ${n(sc.new)} new, ${n(sc.gone)} gone, ${n(sc.broken)} broken; ${n(mech.pairs)} pair(s) to judge${n(mech.walkNeed) ? `; ${mech.walkNeed.length} screen(s) to walk (${mech.walkNeed.slice(0, 4).join(', ')}${mech.walkNeed.length > 4 ? ' …' : ''})` : ''}`);
   for (const c of mech.checks || []) out.push(`- ${c.result === 'pass' ? '✓' : c.result === 'fail' ? '✗' : '–'} ${c.check}${c.detail ? `: ${String(c.detail).split('\n')[0].slice(0, 160)}` : ''}`);
   for (const b of mech.blocked || []) out.push(`- ⛔ ${String(b).slice(0, 200)}`);

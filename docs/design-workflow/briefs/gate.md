@@ -16,7 +16,7 @@ The driver fills in:
 For the walk (§2), check out CANDIDATE and BASE in two worktrees and serve each with `node scripts/serve-ux.cjs <port>`. Playwright comes from `SENTRI_PLAYWRIGHT` (the main checkout's `node_modules/playwright`): never link `node_modules` into a worktree. Remove them with `node scripts/worktree-remove.mjs <dir>`, never `git worktree remove`, which deletes through a junction on Windows. Every result you record names the commit it ran on. Evidence from any other commit doesn't count, including the builder's own runs.
 
 **The machine has already run.** `node scripts/gate.mjs` ran every mechanical check on the exact candidate ([gate-machine.md](../gate-machine.md)) and you judge only a mechanical pass. Don't run its checks again (`npm test`, `check-*`, `run-scenarios`, `check-states`) and start no browser run beyond your walk: a gate may be running on the machine. What it leaves you:
-- `pairs/<screen>/<lang>-<width>.png` (base | candidate) for every changed, new or removed screen, at EN 390, EN 360 and ZH 360 (a component page at EN 390 and 360). A missing side reads "not on this side"; a ZH image marked NO CHINESE is a page that ignores `?lang=zh`.
+- `pairs/<screen>/<lang>-<width>.png` (base | candidate) for every changed, new or removed screen, at EN 390 and EN 360, and ZH 360 for a frozen feature only (English first, owner 2026-10-21; a component page at EN 390 and 360). A missing side reads "not on this side"; a ZH image marked NO CHINESE is a page that ignores `?lang=zh`.
 - `mechanical.json`: its `pairs` (each with a `kind`: changed, new or gone, a `pct`, 0 being pixel-identical, and `propagation` on a propagation pair, §4), `inventory.removed` (each needs a reason under `gone`), `walkNeed` (screens that run changed code and draw the same: walk each one, §2), the class and the gaps. Open it only at §5.
 - `results.md`: the Results block, the gate's own measurements. You don't re-measure it.
 
@@ -28,7 +28,7 @@ For the walk (§2), check out CANDIDATE and BASE in two worktrees and serve each
 
 The machine measures type sizes, contrast, targets, spacing, headers, held motion, states and the leaves. These it can't, and you look for them in §3–§4:
 - the 16px body floor and "ink, not pale grey"; crowding fixed by tightening copy and layout, never by shrinking type (law: `ux/design-system/README.md`);
-- copy: every changed string meets the copy budget, uses a verb from `ux/laws/strings.json` with its one meaning, and fits in EN and ZH without clipping;
+- copy: every changed string meets the copy budget, uses a verb from `ux/laws/strings.json` with its one meaning, and fits in EN without clipping (ZH too once the feature is frozen);
 - a held motion frame (L25) also as a person opening the atlas sees it (fonts from the network, `atlas/index.html?feature=<id>&screen=<id>`): the gate serves fonts locally, and a late font is a different layout.
 
 ## 2. Behaviour walk (P2; behaviour and shared component classes)
