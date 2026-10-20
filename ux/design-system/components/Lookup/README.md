@@ -35,7 +35,7 @@ Classification: **component**. It was lifted from Farrowing's Find a sow and Sca
 ## Variants
 
 - [Find](variants/find.html): empty, results in two units, no match, a 12-digit tag, no reader (no scan icon), and Chinese.
-- [Scan](variants/scan.html): nothing scanned, no reader, sow rows in two units, condition-tag rows, the arrival tint, ticked, stopped, a 12-digit tag, and Chinese.
+- [Scan](variants/scan.html): nothing scanned, no reader, sow rows in two units, condition-tag rows, stopped, a 12-digit tag, and Chinese. A row's ticked and Just scanned faces are [Row · select + door](../Row/variants/select-door.html)'s own states; the page with rows ticked is on the live screens (Farrowing's and Inspection's Scan · ticked).
 
 ## States
 

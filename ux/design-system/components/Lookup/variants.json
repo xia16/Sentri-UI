@@ -34,11 +34,9 @@
       "Reader not connected",
       "Scanned · two units (Farrowing's sow rows)",
       "Scanned · condition tags (Inspection's roster rows)",
-      "A pig just scanned · arrival tint",
-      "Ticked · N selected and Actions",
       "Stopped · list kept",
       "Long tag · 12 digits",
-      "Chinese · ticked"
+      "Chinese · scanned"
     ],
     "usedBy": [
       "farrowing.scan",

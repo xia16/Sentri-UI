@@ -7,13 +7,12 @@
 <div class="ph" data-state="Reader not connected" data-demo="off"></div>
 <div class="ph" data-state="Scanned · two units (Farrowing's sow rows)" data-demo="sows"></div>
 <div class="ph" data-state="Scanned · condition tags (Inspection's roster rows)" data-demo="pigs"></div>
-<div class="ph" data-state="A pig just scanned · arrival tint" data-demo="new"></div>
-<div class="ph" data-state="Ticked · N selected and Actions" data-demo="ticked"></div>
 <div class="ph" data-state="Stopped · list kept" data-demo="stopped"></div>
 <div class="ph" data-state="Long tag · 12 digits" data-demo="long"></div>
-<div class="ph" data-state="Chinese · ticked" data-demo="zh"></div>
+<div class="ph" data-state="Chinese · scanned" data-demo="zh"></div>
 <script>
 // Calls copied from the live screens: Farrowing's Scan ear tags (sow rows), Inspection's (the walk's roster rows), Home's.
+// A row's ticked and Just scanned faces are Row · select + door's own states (Row/variants/select-door.html): here every row is at rest.
 const UI=window.SentriUI;
 const bar='<div class="statusbar" aria-hidden="true"><span>9:41</span></div>';
 const sow=(code,context,figure,word,level,checked=false)=>UI.rowSelectDoor({code,description:context,right:{kind:'state',figure,word,level},checked,action:'pick',value:code,openAction:'open',openValue:code,attrs:{'data-scan-tag':code},inputAttrs:{'aria-label':'Select '+code}});
@@ -27,14 +26,11 @@ const R={
  off:()=>page({connected:false,groups:[]}),
  sows:()=>page({groups:SOWS(false),selected:n=>n+' '+(n===1?'sow':'sows')+' selected'}),
  pigs:()=>page({groups:PIGS()}),
- new:()=>page({groups:PIGS()}),
- ticked:()=>page({groups:PIGS(['000267','000254']),picked:2}),
  stopped:()=>page({listening:false,groups:PIGS()}),
  long:()=>page({groups:[{title:'Unit 7',rows:[pig('276000144710','Gestation · 42d',[{name:'Lame',level:'watch'},{name:'Arthritis',level:'ongoing'}]),pig('276000144719','Gestation',[])]}]}),
- zh:()=>UI.scanPage({title:'扫描耳标',back:{action:'back',label:'返回'},groups:[{title:'7单元',rows:PIGS(['000267','000254'])[0].rows}],picked:2,selected:n=>'已选 '+n+' 头',actions:{action:'actions',label:'操作'},toggle:{action:'toggle',stop:'停止扫描',resume:'继续扫描'},bar})
+ zh:()=>UI.scanPage({title:'扫描耳标',back:{action:'back',label:'返回'},groups:[{title:'7单元',rows:PIGS()[0].rows}],toggle:{action:'toggle',stop:'停止扫描',resume:'继续扫描'},bar})
 };
 document.querySelectorAll('[data-state]').forEach(el=>{
  el.innerHTML=R[el.dataset.demo]();
- if(el.dataset.demo==='new')UI.scanArrive(el,{fresh:{'000306':Infinity},last:''});
 });
 </script></body></html>
