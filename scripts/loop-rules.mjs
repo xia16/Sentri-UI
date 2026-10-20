@@ -156,11 +156,12 @@ export const IN_PROGRESS = 'features/_in-progress.json';
 export function readInProgress(text) {
   try { const j = JSON.parse(text); return Array.isArray(j?.features) && j.features.every((f) => typeof f === 'string' && f) ? [...j.features] : null; } catch { return null; }
 }
-// The PR's own features: those whose features/<id>/ files it changes, those its scope names, and those whose pages load a page file
-// it changes (usersOf: file -> the features whose screens' closures hold it). The shared parts are not page files: the system files,
-// the design system (the bundle, the task skeleton, the components), the strings registry and the atlas. A change to them alone owns
-// no feature; a page or page script it edits makes every feature that loads it its own, however many (2026-10-20: on main 81 of the
-// 84 files the closures hold are loaded by two or more features, so "loaded by one feature" would own almost nothing).
+// The PR's own features: those whose features/<id>/ files it changes, those its scope names, and the one feature of a page file only
+// that feature's pages load (usersOf: file -> the features whose screens' closures hold it). A file two or more features load is
+// shared, like the system files, the design system, the strings registry and the atlas: it owns no feature, and its other users are
+// checked only where they are in progress (owner, 2026-10-20). On main 81 of the 84 files the closures hold are loaded by two or more
+// features, so a PR names its features by its features/<id>/ files or its scope; "every feature that loads it" owned 15 features for
+// one Home change (PR 243's dry run).
 const SHARED_PART = [...SYSTEM, /^ux\/design-system\//, /^ux\/laws\//, /^atlas\//];
 export function ownFeatures({ files, scope = [], usersOf = () => null }) {
   const own = new Set(scope);
@@ -168,7 +169,8 @@ export function ownFeatures({ files, scope = [], usersOf = () => null }) {
     const m = /^features\/([^/]+)\//.exec(f);
     if (m) { own.add(m[1]); continue; }
     if (SHARED_PART.some((re) => re.test(f))) continue;
-    for (const x of usersOf(f) || []) own.add(x);
+    const users = [...(usersOf(f) || [])];
+    if (users.length === 1) own.add(users[0]);
   }
   own.delete(DS_FEATURE);
   return [...own].sort();

@@ -19,13 +19,15 @@ test('the in-progress list is read from features/_in-progress.json, and names re
   assert.equal(readInProgress('{"features":[""]}'), null);
 });
 
-test("the PR's own features: its features/<id>/ files, its scope, and every feature whose pages load a page file it changes", () => {
+test("the PR's own features: its features/<id>/ files, its scope, and the one feature of a page file only it loads", () => {
   const all = new Set(['farrowing', 'inspection', 'wean']);
-  const users = { 'ux/system/farrowing.js': new Set(['farrowing', 'farrowing-record']), 'ux/system/astra-surfaces.js': new Set(['farrowing', 'inspection']), 'atlas/atlas.json': all, 'ux/laws/strings.json': all, 'ux/design-system/components/task-skeleton.js': all, 'ux/system/surfaces.css': all };
+  const users = { 'ux/system/wean.js': new Set(['wean']), 'ux/system/farrowing.js': new Set(['farrowing', 'farrowing-record']), 'ux/system/astra-surfaces.js': new Set(['farrowing', 'inspection']), 'atlas/atlas.json': all, 'ux/laws/strings.json': all, 'ux/design-system/components/task-skeleton.js': all, 'ux/system/surfaces.css': all };
   const own = (files, scope) => ownFeatures({ files, scope, usersOf: (f) => users[f] });
   assert.deepEqual(own(['ux/design-system/components/bundle.css', 'features/move/feature.json']), ['move']);
-  assert.deepEqual(own(['ux/design-system/components/bundle.js', 'ux/system/farrowing.js']), ['farrowing', 'farrowing-record'], 'a page edit is its features\' own, however many load it');
-  assert.deepEqual(own(['ux/system/astra-surfaces.js']), ['farrowing', 'inspection']);
+  assert.deepEqual(own(['ux/design-system/components/bundle.js', 'ux/system/farrowing.js']), [], 'a page file two features load is shared');
+  assert.deepEqual(own(['ux/system/astra-surfaces.js']), []);
+  assert.deepEqual(own(['ux/system/wean.js']), ['wean'], 'a page file one feature loads is that feature\'s');
+  assert.deepEqual(own(['ux/system/farrowing.js', 'features/farrowing/critique.md']), ['farrowing'], 'the PR names its feature by its folder');
   assert.deepEqual(own(['atlas/atlas.json', 'ux/laws/strings.json', 'ux/design-system/components/task-skeleton.js', 'ux/system/surfaces.css']), [], 'the shared parts own no feature');
   assert.deepEqual(own(['features/_in-progress.json']), [], 'the list is not a feature');
   assert.deepEqual(own([], ['wean', 'design-system']), ['wean']);
