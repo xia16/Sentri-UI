@@ -28,7 +28,7 @@ The enclosing `data-st-context="page|drawer|menu"` chooses the variant. The defa
 | --- | --- |
 | Default | Bordered surface, no shadow |
 | Empty | Absent; `panel('')` returns an empty string |
-| Empty, place kept | `panel('', { empty: 'No production work open' })`: one quiet line with a tick (16px / 400, `muted`, 56px tall). Only where the host keeps its sections in place: Home's Overview (owner, 2026-10-20) |
+| Empty, place kept | `panel('', { empty: 'No production work open' })`: one quiet line with a tick (16px / 400 in `ink-2`, the tick `muted`, 56px tall). Only where the host keeps its sections in place: Home's Overview (owner, 2026-10-20) |
 | Long label / Chinese | Content wraps using the consumer's copy rules |
 | Pressed, active, disabled, error, loading | Owned by the contained control; Panel is static |
 
