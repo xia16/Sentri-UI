@@ -234,19 +234,4 @@
 
 @media (prefers-reduced-motion: reduce) { .tk-summary-task { transition: none; } }
 
-/* ---- TaskChips (candidate): one row of filter chips over a task list (README: TaskChips/README.md) ----
-   Farrowing's segment faces on separate chips: a `well` chip with a 1px `line`, `radius-segment`; the chosen chip is the
-   pressed segment (`paper`, `ink` 500, the segment shadow). 48px targets; the count in mono inside the chip. The track
-   scrolls sideways; a trailing spacer the gutter's width keeps the last chip clear of the edge fade. */
-.tk-chips { padding: 6px 0 9px; background: var(--app-background); }
-.tk-chips-track { display: flex; gap: var(--space-key-gap); overflow-x: auto; padding: 0 0 0 var(--space-gutter); scrollbar-width: none;
-  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - var(--space-gutter)), transparent); mask-image: linear-gradient(to right, #000 calc(100% - var(--space-gutter)), transparent); }
-.tk-chips-track::-webkit-scrollbar { display: none; }
-.tk-chips-track::after { content: ""; flex: none; width: var(--space-gutter); }
-.tk-chips-chip { flex: none; display: inline-flex; align-items: center; gap: var(--space-key-gap); min-height: var(--tap-min); margin: 0; padding: 0 var(--space-row-x);
-  border: 1px solid var(--line); border-radius: var(--radius-segment); background: var(--well); color: var(--tab-ink);
-  font: 400 var(--type-row-title-size)/1.2 var(--font-sans); white-space: nowrap; cursor: pointer; }
-.tk-chips-chip[aria-checked="true"] { background: var(--paper); color: var(--ink); font-weight: 500; box-shadow: 0 1px 3px #20271f0d; }
-.tk-chips-count { font: 500 var(--type-meta-size)/1 var(--font-mono); color: var(--muted); }
-.tk-chips-chip:active { background: var(--press); }
 .tk-radios .st-choice-row[data-mode="radio"][aria-checked="true"] .st-choice-label,.tk-radios[data-face="row"] .st-choice-inline-opt[aria-checked="true"]{font-weight:var(--type-weight-strong)}

@@ -1,3 +1,3 @@
-# TaskChips
+# TaskChips (retired)
 
-`SentriTask.chips({items, action, key, label})` is a compatibility adapter into [FilterChips](../FilterChips/README.md). It translates skeleton text slots and delegates all controls and states to the bundle. Classification: adapter, not an independent component. Done is a Segment lens above the list; tags only narrow jobs within To do.
+Use [FilterChips](../FilterChips/README.md): `SentriUI.filterChips`. The `SentriTask.chips` adapter and its unused `.tk-chips` CSS were deleted on 2026-10-20; its one caller (Piglet processing's simple app) calls `SentriUI.filterChips` and resolves its text slots with `SentriTask.T`.
