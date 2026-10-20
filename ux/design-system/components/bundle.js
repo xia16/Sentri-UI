@@ -1172,7 +1172,7 @@
     return `${scrimHtml}<section class="sheet${cls}" ${common} role="dialog" aria-modal="true" data-st-context="${ctx}" data-size="${sz}"${sizing==='full'?' data-sizing="full"':sizing==='hold'?` data-sizing="hold" style="--hold-rows:${Math.max(1,Number(holdRows)||1)}"`:' data-sizing="content"'}><div class="grab" aria-hidden="true"></div>${main}</section>`;
   }
   /* Keyboard lift (owner, 2026-10-20): the on-screen keyboard never covers a sheet's footer. While a text field inside a sheet
-     (drawer or page) has focus and the visible viewport (visualViewport) ends above the sheet's bottom, the sheet's bottom is raised
+     (drawer or page) has focus, the visible viewport (visualViewport) has shrunk for the keyboard and ends above the sheet's bottom, the sheet's bottom is raised
      to the keyboard's top (data-keyboard, --st-keyboard-lift) and its height is capped to what stays visible, so the footer with
      Save, Done or Send sits just above the keys and the focused field scrolls into the body's view. Behaviour only: without a
      keyboard nothing moves. keyboardLift is the measure: how far the sheet's resting bottom sits under the visible bottom.
@@ -1182,13 +1182,19 @@
   if(typeof document!=='undefined'&&typeof window!=='undefined'){
     const typed=el=>!!el&&!!el.matches&&el.matches('textarea,[contenteditable="true"],input:not([type="range"]):not([type="checkbox"]):not([type="radio"]):not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="file"]):not([type="color"])');
     let lifted=null;
+    // The keyboard is the visible viewport shrinking: its full height is taken while no text field has focus, and a sheet lifts only
+    // when the view has lost at least a keyboard's worth (KEYBOARD_MIN). A sheet merely below the fold (a phone lower on a study page) never moves.
+    const KEYBOARD_MIN=120,view=()=>window.visualViewport?window.visualViewport.height:window.innerHeight;let full=view();
+    // Where the surface rests, ignoring transforms: a drawer still rising (drawer-enter, sheet-in) or a page sliding in is measured where it will stop.
+    const rest=x=>{const p=x.offsetParent;return (p?p.getBoundingClientRect().top+p.clientTop:0)+x.offsetTop+x.offsetHeight;};
     const drop=()=>{if(!lifted)return;lifted.removeAttribute('data-keyboard');lifted.style.removeProperty('--st-keyboard-lift');lifted=null;};
     const fit=()=>{
       const vv=window.visualViewport,el=document.activeElement,sheet=typed(el)?el.closest('.sheet,[data-st-keyboard-host]'):null;
       if(lifted&&(lifted!==sheet||!lifted.isConnected))drop();
+      if(!typed(el))full=view();
       if(!sheet||!vv)return;
       const was=parseFloat(sheet.style.getPropertyValue('--st-keyboard-lift'))||0;
-      const lift=keyboardLift(sheet.getBoundingClientRect().bottom,sheet.classList.contains('sheet')?was:0,vv.offsetTop+vv.height); // a sheet moves up by its lift; a host's box stays and only its padding grows
+      const lift=full-vv.height<KEYBOARD_MIN?0:keyboardLift(rest(sheet),sheet.classList.contains('sheet')?was:0,vv.offsetTop+vv.height); // a sheet moves up by its lift; a host's box stays and only its padding grows
       if(!lift){if(was){lifted=sheet;drop();}return;}
       if(lift!==was)sheet.style.setProperty('--st-keyboard-lift',lift+'px');
       sheet.setAttribute('data-keyboard','');lifted=sheet;
