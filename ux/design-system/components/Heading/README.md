@@ -14,7 +14,7 @@ Call `SentriUI.heading({ title, kind, level, icon, description, meta, action })`
 | `section` (default) | the title of one block, sitting **above** its panel | title, icon, description, meta, action | |
 | `group` | a label for a run of rows or log entries **inside** one panel (Day 2, Today, Health) | title, description | icon, meta, action |
 
-One block has one heading: never stack a section heading over a group heading, and never put a heading over an empty block (leave the block out). A title inside a panel is a group heading. The old `panel` kind is retired: `kind: 'panel'` reads as `section`. A group heading is reached through `rowGroup({ title })` or `log()`, not called on its own.
+One block has one heading: never stack a section heading over a group heading, and never put a heading over an empty block (leave the block out). A title inside a panel is a group heading. The old `panel` kind is a legacy kind with its own 14px title; Piglet processing's count and dead pages and Farrowing's whole-task progress still call it. Do not use it on a new screen. Group headings are usually drawn by `rowGroup({ title })` or `log()`, and may also be called directly (`kind: 'group'`, as Home does).
 
 ## When to use / when not to use
 
@@ -34,8 +34,8 @@ One block has one heading: never stack a section heading over a group heading, a
 ## Variants
 
 - **Page and sheet title** — the title type, as the page header (22px `page-title`) and the sheet header (20px `sheet-title`) draw it. [variants/page.html](variants/page.html). For the headers themselves, see [Header](../Header/README.md).
-- **Section** — name one block above its panel. 13px `section-title`, `space-heading` (12px) above the panel. [variants/section.html](variants/section.html)
-- **Group** — label a run inside a panel. 11px `group-label`, `muted`. [variants/group.html](variants/group.html)
+- **Section** — name one block above its panel. 16px `section-title`, `space-heading` (12px) above the panel. [variants/section.html](variants/section.html)
+- **Group** — label a run inside a panel. 13px `group-label`, `muted`. [variants/group.html](variants/group.html)
 
 ## States
 

@@ -550,7 +550,7 @@
           {
             "name": "Pen verbs",
             "at": "Note",
-            "shows": "One card of icon tiles (Row tile grid): Note, Feed, Observe, Fault, Tick all (3 + 2)",
+            "shows": "One card of icon tiles (Row tile grid): Note, Feed, Observe, Fault, Tick all, in one row",
             "rule": "Tick all returns to the walk with the pen's shown pigs and its untagged group ticked, for the pig Actions; no other surface selects a pen."
           },
           {
@@ -864,9 +864,9 @@
             "shows": "Health then Routine verbs as one card of icon tiles, one word each from the strings registry (Condition, Treat, Edit, Resolve, Care, Note, Transfer, Measure, Feed)",
             "states": [
               {
-                "state": "Two rows",
+                "state": "Rows",
                 "when": "Two or more verbs",
-                "shows": "Two rows, split evenly: 5 = 3+2, 6 = 3+3, 8 = 4+4, 10 = 5+5"
+                "shows": "One row up to five; from six, two rows split evenly: 6 = 3+3, 7 = 4+3, 8 = 4+4, 9 = 5+4, 10 = 5+5"
               },
               {
                 "state": "More",

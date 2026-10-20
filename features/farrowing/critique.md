@@ -585,3 +585,64 @@ House reference held against: Inspection's pen page (`inspection.pen`, its sibli
 - `farrowing.pen-note`, `-fault`, `-fault-record`, `-read-note`: the sheets are unchanged; only the page dimmed behind them moved. Their own copy stays English under `?lang=zh` on both sides: Farrowing's prototype translates its rows and, now, the pen page; its form sheets are outside this change.
 
 Walk (gate, 298bd9e): every pen screen passed. Three screens the gate walks because they share changed files (the strings registry) failed, all also on main. In `data-sync.category` and `data-sync.task-badge`, the page header's Back did nothing (no handler for `back`); it now goes up one level as the footer's does. In `feed-plan.editor`, a typed note or end date and an unsaved adjustment were lost on Back; the adjustment is now kept per set of subjects, and the note and date per field, until Save or Clear. Both fixes change behaviour only.
+
+
+# Scan and search tidy (2026-10-20, PR 247)
+
+Scope: Farrowing's Scan ear tags and Find a sow, its Scan Actions sheet, Home's To treat drawer, and Row's select-door variant page. The owner reviewed the screenshots on 2026-10-20. This critique is of the screens on `origin/main` at `ac92e5b`, from the gate's pairs at 390 and 360 in EN and ZH, plus the walk on that commit.
+
+### Keep
+
+- The scan list's rows: Row · animal as select + door, with her Farrowing state on the right, exactly as in the room.
+- Find a sow's pinned, focused field, and the typed part of the tag in bold.
+- The scan page's footer: Stop / Resume scanning, or "N sows selected · Actions".
+- Home's To treat rows: the tag over "Pen · care", with the condition as a plain tag.
+
+### Problems
+
+- **major** · Scan said its scanner state twice: a Scanning / Stopped pill in the body over a footer that already says Stop scanning or Resume scanning. Evidence: `farrowing.scan`, `scan-list` and `scan-stopped` at 390. The owner's words: "why is there a scanning status when the bottom bar already shows the scanning?"
+- **major** · The unit header had three looks for one job: "In Unit 7 · 2 / Other units · 1" on Scan, "In Unit 7 / Other units" on Find a sow, and a 13px label outside the card on To treat. On Scan and Find a sow, rows in "Other units" also repeated their unit. Evidence: `farrowing.scan-list`, `farrowing.search-results` and `workbench.to-treat`.
+- **major** · Scan's cards sat 34px in from the phone edge (the page body's 18px plus the list's own 16px). The room list and Find a sow sit at 16px, so at 360 the 000418 context line wrapped. Evidence: `farrowing.scan-list` en-360 and zh-360.
+- **major** · Scan Actions was four described rows plus a "2 sows" line that the footer had just said, while More actions had moved to the verb grid (PR 224, whose notes name Scan Actions as next).
+- **major** · A scan appeared at once: the list snapped to the top and only a repeat scan flashed. The flash was one shared slot, so the next scan cut it short. The owner asked what the experience should be when scans come in quick succession.
+- **major** · The walk on `ac92e5b` found that Back went to the wrong level in three places. In Find a sow, Back from a result's drawer lost the typed text. Scan Actions needed two Backs, the flow and then her Actions sheet. And Back from a pig opened off To treat landed on bare Home.
+
+### Parts
+
+| Part | Component | Change |
+|---|---|---|
+| Unit heading | Heading, `section` (a title above its panel) | used everywhere a list is grouped by unit; no meta |
+| Unit card | Panel / Row group | one card per unit |
+| Scan Actions | Row tile, `rowGrid` (More actions' grid) | replaces the described rows |
+| Arrival cue | Row select + door, new **Just scanned** state (`data-arrival`) | additive; progress-wash, never the ticked well |
+| Scan list gutter | page layout only | one 16px gutter |
+
+### Self-crit
+
+- **Squint test:** on Scan, the sow ids and her red overdue state, then the footer's one control. On Find a sow, the field, then the unit headings, then the tags. On To treat, the title, the ids, then the unit headings.
+- **Cluttered, flat or bulky:** two facts went (the pill and the counts) and nothing was added beside them. The arrival wash is temporary. The verb grid is the house grid.
+- **Better because** each fact is said once, every unit list reads the same way, the scan list lines up with the room, a scan lands where the eye can find it, and Back goes one level up.
+
+---
+
+# Tile grid: one row up to five (2026-10-20)
+
+Scope: the verb grids in Farrowing's drawers: `farrowing.sow-actions` (a sow's Actions) and `farrowing.scan-actions` (the ticked sows' Actions after a scan: Transfer, Condition, Treat, Note). No verb, word or icon changes (budget unchanged). Owner ruling 2026-10-20: one row up to five tiles, two rows only from six.
+
+## Keep
+
+- Every verb, its word and icon, the order, Back alone in the footer.
+
+## Problems
+
+- **major** · Four or five verbs drew two rows (2 + 2, 3 + 2): a short second row and a gap (owner, 2026-10-20: "looks really dumb").
+
+## Parts
+
+| Part | Drawn by | Keep / fix / cut |
+|---|---|---|
+| Verb grid | Row `tile` in `rowGrid` | **fix** (one row up to five) |
+
+## Self-crit
+
+- **Better because** the scan drawer's four verbs are one line under Actions and the drawer is shorter, so more of the ticked sows stay in view above it.

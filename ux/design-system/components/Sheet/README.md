@@ -84,6 +84,7 @@ Every state is drawn in `variants/drawer.html` (with the route line, a fact line
 - **The page behind is inert** while a sheet is open (`inert` on the screen, or `inert: true` on a page under a drawer).
 - **The screen reader's focus** moves to the sheet when it opens and returns to the control that opened it when it closes.
 - **Motion:** a drawer rises (`sheet-in`, 240ms), a page slides in from the side, a scrim or dialog backdrop fades (`fade`). The host sets `data-enter` on the render that opens a surface and `data-leave` before it removes it. Reduced motion turns it off.
+- **The keyboard never covers the footer** (owner, 2026-10-20). While a text field inside a sheet has focus and the on-screen keyboard covers the sheet's bottom (the visible viewport, `visualViewport`, ends above it), the sheet's bottom rides on the keyboard's top and its height is capped to what stays visible: a drawer keeps its top margin, a page shrinks from the bottom. The footer (Save, Done, Send) sits just above the keys and the focused field scrolls into the body's view. It is the design system's own binder (`keyboardLift`, `data-keyboard`); sheets need nothing from the host. A screen that is not a Sheet but ends in its own footer or dock (Home's Assistant composer, the Inspection walk with its count fields) marks its root `data-st-keyboard-host` and takes the lift as bottom padding: its list shrinks and the field scrolls into view. Without a keyboard nothing moves.
 - **A sheet is sized by its nearest positioned ancestor.** Give the phone root `position: relative; height: 100dvh; overflow: hidden`. Without it a page fills a far ancestor and percent heights collapse.
 
 ## Content rules
@@ -93,7 +94,7 @@ Every state is drawn in `variants/drawer.html` (with the route line, a fact line
 - **Header line:** absent by default; a route (the subject chip, with up to two identity facts the task's `budget.md` chooses, e.g. `#000418 › B1 · Parity 3` at farrowing; the component never picks them) or one fact (`Last record 08:41 · G.H`) that passes the three tests in [Headers](../../README.md#headers-law-owner-2026-10-13); one line at 360px in EN and ZH; `muted`; no full stops.
 - **Primary label:** a verb with its count and place (`Record 12 piglets`, `Move 3 to B6`), not Save, Submit or Done (see Button).
 - **Status line:** a short instruction, no colon, no full stop.
-- Chinese strings are shorter than the English; nothing is clipped, titles wrap to two lines.
+- Chinese strings are shorter than the English; nothing is clipped.
 
 ## Accessibility
 

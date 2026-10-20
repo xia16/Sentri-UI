@@ -1,7 +1,8 @@
 [
-  { "group": "Base", "components": ["Button", "IconButton", "Icon", "Heading", "Header", "Row", "Panel", "Facts", "Log", "Sheet", "PenMap", "Segment", "FilterChips", "ChoiceList", "CategoryFooter"] },
+  { "group": "Base", "components": ["Button", "IconButton", "Icon", "Heading", "Header", "Row", "Panel", "Facts", "Log", "Sheet", "PenMap", "Segment", "FilterChips", "ChoiceList"] },
   { "group": "Inputs and filters", "components": ["FilterSheet", "RangeSlider"] },
   { "group": "Fields", "components": ["Field", "PickerField", "Stepper", "Measure", "Numpad"] },
   { "group": "Status and feedback", "components": ["Status", "ConditionTag", "Banner", "Toast", "Photos"] },
-  { "group": "Task skeleton", "components": ["TaskPhone", "TaskHeader", "TaskSummary", "TaskLens", "TaskGroup", "TaskDock", "TaskHold", "TaskTotals", "TaskProgress", "TaskStepper", "TaskPhotos", "TaskChoice", "TaskRadios", "TaskWarning", "TaskTable", "TaskMetrics", "TaskSection", "TaskReceipt", "TaskDay", "TaskChips"] }
+  { "group": "Home", "components": ["TaskTile", "WeekBoard"] },
+  { "group": "Task skeleton", "components": ["TaskPhone", "TaskHeader", "TaskSummary", "TaskGroup", "TaskDock", "TaskTotals", "TaskProgress", "TaskChoice", "TaskRadios", "TaskTable", "TaskMetrics", "TaskSection", "TaskReceipt", "TaskDay"] }
 ]

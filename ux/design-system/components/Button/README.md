@@ -23,7 +23,8 @@ Container; visible verb label; optional leading icon; optional loading marker; o
 | [Text action](variants/text.html) | Clear, reset or edit beside content. | `button({register:"text"})` |
 | [Hold](variants/hold.html) | Finish farrowing, lock or end task with deliberate confirmation. | `holdButton()` |
 | [Tool](variants/tool.html) | Labelled mid-sheet acts such as record death or set count. | `button({register:"tool"})` |
-| [Destructive](variants/destructive.html) | Delete an attachment in the real farrowing photo dialog. | `button({register:"danger"})` |
+| [Destructive](variants/destructive.html) | Delete something for good: Data sync's delete confirm, Inspection's medicine delete, a photo in Piglet processing. | `button({register:"danger"})` |
+| Caution | End a task early: a tinted red outline, reversible until the hold (Farrowing's End task early). No specimen yet. | `button({register:"caution"})` |
 
 ## States
 
@@ -86,11 +87,14 @@ Generic component, used across sections. Registers are variants of this componen
 
 ## References and changelog
 
+2026-10-20: `caution` register documented: a tinted red outline for ending a task early, live in Farrowing's End task early.
+
 2026-10-19 (workbench): text register, quiet (`className: 'st-text-action--quiet'`): a settled line that still opens something, muted 13px / 400 in the same 48px target (Home's "1 closed today").
+2026-10-20 (workbench): text register, quiet and framed (`className: 'st-text-action--quiet st-text-action--framed'`): the quiet line gains a hairline edge (`line`, `radius-panel`, no fill), so a settled line still reads as a target on the tint (Home's "1 closed today ›", owner's pick of three).
 2026-10-19 (workbench): text register, `chevron: true`: the button spans the content width and ends in the row chevron, so a quiet line reads as a tap (Home's "1 closed today ›").
 
 2026-10-17 (medicines): text register `align` ('start' | 'end'), so a short text action lines up with the content edge instead of centring in its target.
 
-2026-10-10: unified variants, reasons, hold face and glove targets; removed unused end-early register. [Ant Design Mobile Button](https://github.com/ant-design/ant-design-mobile/blob/master/src/components/button/index.en.md) and [TDesign Button](https://github.com/Tencent/tdesign-mobile-vue/blob/develop/src/button/button.md) guide fill, optional icon and busy state; [Sentri’s research](../../../../docs/design-workflow/research/component-standard.md) records Material 3 and Apple interaction guidance. Sentri retains its stricter 48px glove floor.
+2026-10-10: unified variants, reasons, hold face and glove targets; the first end-early register was removed (the `caution` register later took its job). [Ant Design Mobile Button](https://github.com/ant-design/ant-design-mobile/blob/master/src/components/button/index.en.md) and [TDesign Button](https://github.com/Tencent/tdesign-mobile-vue/blob/develop/src/button/button.md) guide fill, optional icon and busy state; [Sentri’s research](../../../../docs/design-workflow/research/component-standard.md) records Material 3 and Apple interaction guidance. Sentri retains its stricter 48px glove floor.
 
 Rendered verification and the 15-line self-review: [verification](../Button/verification.md). Screenshots: [state proof](proof/).

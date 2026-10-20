@@ -180,7 +180,7 @@ States: S1 Find a sow, empty field · S2 Scan, no reader paired · S3 Scan, read
 | # | State | Event | Result | Src | Leaf |
 |---|---|---|---|---|---|
 | S-1 | S1 | open, before typing | → only the hint; nothing listed; no unit in the header; field focused | S — owner decision 2026-10-12 | `fa-s1-search-lists-nothing-until-typed` |
-| S-2 | S1 | type 43 | → "In Unit 7" (000431), then "Other units" (000437, 000943, 004318) | S — owner decision 2026-10-12 | `fa-s2-search-groups-this-unit-first` |
+| S-2 | S1 | type 43 | → "Unit 7" (000431), then "Unit 6" (000437, 004318), then "Unit 8" (000943) | S — owner decision 2026-10-12 | `fa-s2-search-groups-this-unit-first` |
 | S-3 | S1 | type 004 | → a tag that starts with it ranks before a tag that contains it | S — owner decision 2026-10-12 | `fa-s3-tags-starting-with-the-text-rank-first` |
 | S-4 | S1 | type B4 | → the sows of pen B4; pen codes match | S — owner decision 2026-10-12 | `fa-s4-pen-codes-match` |
 | S-5 | S1 | type 909 | → "No sow matching “909” in any unit." | S — owner decision 2026-10-12 | `fa-s5-no-match-says-so` |
@@ -189,13 +189,13 @@ States: S1 Find a sow, empty field · S2 Scan, no reader paired · S3 Scan, read
 | S-9 | S1 | Cancel | → the room list | S — owner decision 2026-10-12 | `fa-s9-cancel-returns-to-the-room` |
 | S-10 | S2 | open | → "Scanner not connected" and the pairing instruction; no pill, no list, no button | S — owner decision 2026-10-12 | `fa-s10-no-reader-says-so-with-no-buttons` |
 | S-11 | S2 | back arrow | → the room list | S — owner decision 2026-10-12 | `fa-s11-back-arrow-leaves-scan` |
-| S-12 | S3 | open | → "Hold the reader to an ear tag"; Scanning; Stop scanning; no banner, no "Not found" | S — owner decision 2026-10-12 | `fa-s12-connected-empty-says-hold-the-reader` |
-| S-13 | S4 | read the list | → two groups, newest first | S — owner decision 2026-10-12 | `fa-s13-scans-listed-newest-first-in-two-groups` |
+| S-12 | S3 | open | → "Hold the reader to an ear tag"; Stop scanning (the only status); no banner, no "Not found" | S — owner decision 2026-10-12 | `fa-s12-connected-empty-says-hold-the-reader` |
+| S-13 | S4 | read the list | → one card per unit, this unit first, newest first | S — owner decision 2026-10-12 | `fa-s13-scans-listed-newest-first-in-two-groups` |
 | S-14 | S4 | read a row | → tick box + the animal row with her Farrowing state | S — owner decision 2026-10-12 | `fa-s14-scan-rows-are-select-and-door` |
-| S-15 | S4 | Stop scanning | → Stopped; Resume scanning; the list is kept | S — owner decision 2026-10-12 | `fa-s15-stop-scanning-pauses-and-keeps-the-list` |
-| S-16 | S4 | Resume scanning | → Scanning; Stop scanning | S — owner decision 2026-10-12 | `fa-s16-resume-scanning-listens-again` |
+| S-15 | S4 | Stop scanning | → Resume scanning; the list is kept | S — owner decision 2026-10-12 | `fa-s15-stop-scanning-pauses-and-keeps-the-list` |
+| S-16 | S4 | Resume scanning | → Stop scanning | S — owner decision 2026-10-12 | `fa-s16-resume-scanning-listens-again` |
 | S-17 | S4 | tick one sow | → "1 sow selected" + Actions (never "More actions") | S — owner decision 2026-10-12 | `fa-s17-one-ticked-shows-the-selection-bar` |
-| S-18 | S4 | Actions with two ticked | → Transfer, Disease or symptom, Record treatment, Add a note; no Farrowing action | S — owner decision 2026-10-12 | `fa-s18-actions-offer-the-generic-actions-only` |
+| S-18 | S4 | Actions with two ticked | → the verb tiles Transfer, Condition, Treat, Note; no Farrowing action | S — owner decision 2026-10-12 | `fa-s18-actions-offer-the-generic-actions-only` |
 | S-19 | S4 | read the footer with a sow ticked | → "N sows selected" as plain text, no chevron, nothing to tap | S — owner decision 2026-10-12 | `fa-s19-selection-count-is-plain-text` |
 | S-20 | S4 | tap the box of the last ticked sow again | → unticked; Stop scanning returns | S — owner decision 2026-10-12 | `fa-s20-unticking-the-last-sow-brings-stop-scanning-back` |
 | S-21 | S4 | tap a row in this unit | → her farrowing drawer | S — owner decision 2026-10-12 | `fa-s21-scan-row-opens-her-drawer` |
@@ -203,6 +203,7 @@ States: S1 Find a sow, empty field · S2 Scan, no reader paired · S3 Scan, read
 | S-23 | S4 | tick, open another sow, Back | → the tick is kept | I — as S-22 | `fa-s23-ticks-survive-opening-a-sow` |
 | S-24 | S4 | tap a row in another unit | → her farrowing drawer (the same drawer), subtitle "Unit 6 · A2" | S — owner decision 2026-10-12 | `fa-s24-scan-row-in-another-unit-opens-her-drawer` |
 | S-25 | S5 | the reader reads a listed sow again | → still one row (highlighted briefly) | S — owner decision 2026-10-12 | `fa-s25-repeat-scan-does-not-duplicate` |
+| S-26 | S5 | the reader reads a sow | → her row slides in and holds the arrival tint; nothing ticked | S — owner 2026-10-20 | `fa-s26-a-new-scan-lights-her-row` |
 | S-26 | S4 | Actions with two ticked, then Add a note | → the note page for the first ticked sow (no flow takes several sows yet) | S — owner decision 2026-10-12 | `fa-s26-actions-note-opens-the-note-for-the-first-sow` |
 
 E-11 is superseded: a scan no longer opens her sheet by itself; it adds her to the list (S-13) and her sheet opens from her row (S-21).

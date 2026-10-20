@@ -18,8 +18,9 @@ Context fill, hairline border, rounded corners and content slot. Padding belongs
 
 - **Page:** use on the app canvas; paper on app-background.
 - **Drawer:** use inside a drawer; inset on paper.
+- **Menu:** use inside a menu drawer, one where every row is an option or a verb (`Sheet({ surface: 'menu' })`, see [SURFACES](../../SURFACES.md)); paper on the tint, like the page.
 
-The enclosing `data-st-context="page|drawer"` chooses the variant. The default outside a context is page.
+The enclosing `data-st-context="page|drawer|menu"` chooses the variant. The default outside a context is page.
 
 ## States
 
@@ -27,6 +28,7 @@ The enclosing `data-st-context="page|drawer"` chooses the variant. The default o
 | --- | --- |
 | Default | Bordered surface, no shadow |
 | Empty | Absent; `panel('')` returns an empty string |
+| Empty, place kept | `panel('', { empty: 'No production work open' })`: one quiet line with a tick (16px / 400 in `ink-2`, the tick `muted`, 56px tall). Only where the host keeps its sections in place: Home's Overview (owner, 2026-10-20) |
 | Long label / Chinese | Content wraps using the consumer's copy rules |
 | Pressed, active, disabled, error, loading | Owned by the contained control; Panel is static |
 
@@ -59,5 +61,7 @@ Do show one Facts block or one Row group per surface. Don't wrap Facts or Log in
 Component; page and drawer are context variants. Consumer compositions retain their own component APIs. See variants.json for screen usage and variants/ for isolated states.
 
 ## Changelog
+
+2026-10-20 (workbench): `empty` option: a panel whose host keeps its place says what is missing in one quiet line with a tick, instead of being absent (Home's Overview sections).
 
 2026-10-10: unified TaskGroup, ChoiceList and Farrowing pen surfaces; replaced the paragraph demo with Facts and Row groups.

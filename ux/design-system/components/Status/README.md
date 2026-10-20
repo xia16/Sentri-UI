@@ -1,4 +1,4 @@
-**Status: in design.** One implementation of "how a state is said", rebuilt from the hand-built chips (TaskRow `.tk-chip`, Farrowing `.state-word` / `.done-word` / `.ended-word`, Home's card status) and the candidate word and line (ADR 0002).
+**Status: agent-checked.** One implementation of "how a state is said", rebuilt from the hand-built chips (TaskRow `.tk-chip`, Farrowing `.state-word` / `.done-word` / `.ended-word`, Home's card status) and the candidate word and line (ADR 0002).
 
 # Status
 
@@ -30,8 +30,8 @@ Green means done and nothing else: a pending item is never green. `To do` is `aw
 - **Line:** a body line (13px, `ink`) whose values carry the colour at 600; the words around them stay `ink`. Tokens join with a real `·` text node.
 
 ## Variants
-- **Chip** (`variant: 'chip'`): a state on a list row, one per row, under the ID. Used by TaskRow (Piglet processing) and Home's task card (`Overdue` only: a count of days is meta text, not a status).
-- **Word** (`variant: 'word'`, the default): a state in a heading, a meta line or a map cell. Used by Farrowing's Go-to-pen map (`Active`, `Overdue`), Farrowing's room list (`Active`, `Done`, `Sow died` under the ear tag) and the Row's `chip` slot there. One status looks one way in one feature.
+- **Chip** (`variant: 'chip'`): a state on a list row, one per row, under the ID. Used by Row (`SentriUI.row({chip})`, Piglet processing) and Home's task card (`Overdue` only: a count of days is meta text, not a status).
+- **Word** (`variant: 'word'`, the default): a state in a heading, a meta line or a map cell. Used by Farrowing's Pen map (`Active`, `Overdue`), Farrowing's room list (`Active`, `Done`, `Sow died` under the ear tag) and the Row's `chip` slot there. One status looks one way in one feature.
 - A **dot** variant was built and removed: a bare shape tells Done, Late and Overdue apart by colour alone. Add it back when a screen needs it, with a shape per kind.
 - **Line** (`statusLine`): coloured values in a body line: the receipt `Saved · +4 this visit`, `Overdue · 3 days`, a row's mono line 2.
 
@@ -40,7 +40,7 @@ Status is text and holds no action, so most interaction states do not apply.
 
 | State | Chip | Word | Line |
 |---|---|---|---|
-| Default (one per kind) | drawn, 6 kinds | drawn, 6 kinds | drawn |
+| Default (one per kind) | drawn, 7 kinds | drawn, 7 kinds | drawn |
 | Pressed | none: the Row or Button around it owns them | same | same |
 | Selected, disabled | none: a state is a fact, not a control | same | same |
 | Error, loading | none: a pending upload is the amber word `waiting to upload` | same | same |
@@ -52,7 +52,7 @@ Status is text and holds no action, so most interaction states do not apply.
 ## Behaviour
 - `kind` picks the tone, and for a chip the icon. `tone` alone still works for a word (`status({ text, tone })`); a `kind` with a `tone` uses the tone.
 - A live line is mounted **empty**: its content waits in a `<template>` and the host calls `SentriUI.liveFill(scope)` once after inserting the markup. To change it later call `SentriUI.announce(el, SentriUI.statusText(tokens))`, which clears and then sets after 60ms and keeps only the latest message per region.
-- **Props:** `status({ text, kind, tone, variant, icon, id, className, strs, args })`; `statusLine(tokens, { live, sep: 'dot' | '', mono, tight, id, className })`; `statusText(tokens, { sep, tight })`; `announce(el, html, { delay, then })`; `liveFill(scope, { delay, then })`. TaskRow takes `chip: { text, str, args, kind }`.
+- **Props:** `status({ text, kind, tone, variant, icon, id, className, strs, args })`; `statusLine(tokens, { live, sep: 'dot' | '', mono, tight, id, className })`; `statusText(tokens, { sep, tight })`; `announce(el, html, { delay, then })`; `liveFill(scope, { delay, then })`. Row takes `chip: { text, str, args, kind }`.
 - **Events:** none. **Slots:** the text (chip, word) or the tokens (line). **Ids:** `id` is written on the root.
 - **Port note (Vue / React Native):** a live line is a view with `accessibilityLiveRegion="polite"` (Android) or an `announceForAccessibility` call (iOS) that fires after mount; the separator is a text child.
 
@@ -81,8 +81,7 @@ Status is text and holds no action, so most interaction states do not apply.
 | Component | Use it for |
 |---|---|
 | [ConditionTag](../ConditionTag/README.md) | a recorded health condition and its care level |
-| [Row](../Row/README.md) | the `chip` slot takes a Status word; the row owns the tap |
-| [Row](../Row/README.md) | the animal row; its chip is a Status chip |
+| [Row](../Row/README.md) | the `chip` slot takes a Status chip or word; the row owns the tap. The animal row's chip is a Status chip |
 | [Banner](../Banner/README.md) | a message the worker must read |
 | [TaskProgress](../TaskProgress/README.md) | how much of the task is done |
 

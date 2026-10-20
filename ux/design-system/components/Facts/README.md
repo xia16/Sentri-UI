@@ -4,7 +4,7 @@ Read-only label and value pairs in a panel: the reading half of a detail page.
 
 Use [Row](../Row/README.md) instead for a figure the worker taps or edits; use [TaskMetrics](../TaskMetrics/README.md) for headline figures that carry a total.
 
-Call `SentriUI.facts(items, { columns })`. Each item is `{ label, value | valueHtml, mono, meta }`.
+Call `SentriUI.facts(items, { columns })`. Each item is `{ label, value | valueHtml, mono, meta, inline }`. `variant: 'record'` is the form Farrowing uses on a finished litter.
 
 ## When to use / when not to use
 
@@ -15,16 +15,18 @@ Call `SentriUI.facts(items, { columns })`. Each item is `{ label, value | valueH
 ## Anatomy
 
 - **Panel**: the `st-panel` surface, `space-panel` padding.
-- **Label** (required): 11px `muted`.
-- **Value** (required): 14px `fact-value`, weight 500; with units written out (`24.6 kg`).
-- **Meta** (optional): a 10px `muted` line under the value, for the trail: `Jul 8 · 07:14 · G.H`.
+- **Label** (required): 13px `muted` (`type-description-size`).
+- **Value** (required): 16px `fact-value`, weight 500; with units written out (`24.6 kg`).
+- **Meta** (optional): a 13px `muted` line under the value, for the trail: `Jul 8 · 07:14 · G.H`.
 
 ## Variants
 
 - **Two-column** (default) — label over value, two to a row. [variants/two-column.html](variants/two-column.html)
 - **Three-column** (`columns: 3`) — three short counts side by side. [variants/three-column.html](variants/three-column.html)
 
-A `columns: 1` form exists for a single long value on the full width; no Sentri screen uses it, so it has no variant page. Prefer two-column and let the value wrap.
+A `columns: 1` form exists for a single long value on the full width; Piglet processing's litter and move pages and Data sync use it, but it has no variant page. Prefer two-column and let the value wrap.
+
+**Record** (`variant: 'record'`): no panel surface of its own (the caller wraps it in a [Panel](../Panel/README.md)), 13px label over a 14px value in tabular figures. An item with `inline: true` takes the full width, label and value on one line (Farrowing's litter weight).
 
 ## States
 

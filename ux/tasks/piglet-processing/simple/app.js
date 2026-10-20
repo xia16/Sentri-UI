@@ -110,7 +110,7 @@
     var items = [{ value: '', label: S('chips.all'), checked: V.chip === '', aria: T('chips.all') }]
       .concat(chipCounts().map(function (c) { return { value: c.k, label: S(chipKey(c.k)), count: S('fig', { v: c.n }), checked: V.chip === c.k, aria: T('chip.aria', { name: chipName(c.k), n: c.n }) }; }))
       ;
-    return '<div class="sp-list-lens">'+UI.segment({variant:'two-line-lens',options:[['todo',K.T(S('lens.todo')),{count:all.length-done}],['done',K.T(S('lens.done'))]],active:V.lens,action:'list-lens',ariaLabel:T('chips.label')})+'</div>' + (V.lens==='todo'?K.chips({ items: items, action: 'chip', key: 'chips', label: T('chips.label') }):'');
+    return '<div class="sp-list-lens">'+UI.segment({variant:'two-line-lens',options:[['todo',K.T(S('lens.todo')),{count:all.length-done}],['done',K.T(S('lens.done'))]],active:V.lens,action:'list-lens',ariaLabel:T('chips.label')})+'</div>' + (V.lens==='todo'?UI.filterChips({ items: items.map(function (i) { return Object.assign({}, i, { label: K.T(i.label), count: i.count == null ? null : K.T(i.count) }); }), action: 'chip', key: 'chips', label: T('chips.label') }):'');
   }
   /* the task's overall checker: piglets the records cannot account for (set counts lower than the record), batch level only */
   function batchLine() { var u = P.s.unaccounted || 0; return u > 0 ? S('batch.unacc', { b: P.BATCH.name, n: u }) : S('batch', { b: P.BATCH.name }); }
@@ -583,11 +583,11 @@
     if (!Object.keys(V.keepOpen).length) return;
     openTimer = setTimeout(function () { if (V.over || V.end) { keepOpenSoon(); return; } V.keepOpen = {}; render(); }, 4000);
   }
-  function closePen() { V.sub = null; V.pen = null; V.flash = null; V.open = {}; V.keepOpen = {}; V.draft = {}; V.tab = 'proc'; clearTimeout(openTimer); }
+  function closePen() { V.sub = null; V.pen = null; V.flash = null; V.open = {}; V.keepOpen = {}; V.draft = {}; V.adjDrafts = {}; V.tab = 'proc'; clearTimeout(openTimer); }
   function closeTop() {
     if (V.end) V.end = null;
     else if (V.sub) V.sub = null;
-    else if (V.over) V.over = null;
+    else if (V.over) { if (V.over === 'adjust' && V.adj) (V.adjDrafts = V.adjDrafts || {})[V.pen + '|' + V.adj.k] = V.adj; V.over = null; } // Back keeps the Adjust draft (count and reason) until Use
     else if (V.pen) closePen();
   }
   function saved(key, args) { V.flash = { pen: V.pen, key: key, args: args, undo: true }; }
@@ -596,7 +596,7 @@
     switch (a) {
       case 'list-lens': V.lens = v; break;
       case 'chip': if (v === V.chip) return; V.chip = v; break;
-      case 'pen': V.pen = v; V.flash = null; V.open = {}; V.draft = {}; V.tab = 'proc'; break;
+      case 'pen': V.pen = v; V.flash = null; V.open = {}; V.draft = {}; V.adjDrafts = {}; V.tab = 'proc'; break;
       case 'dismiss': case 'back': closeTop(); break;
       case 'noop': return;
       // Back from the pen list goes where the Farrowing room's goes: Today (the Home prototype).
@@ -606,18 +606,18 @@
       case 'end': V.end = true; break;
       case 'day': V.open[v] = !V.open[v]; break;
       case 'item':
-        if (V.draft[v]) delete V.draft[v];
+        if (V.draft[v]) { delete V.draft[v]; if (V.adjDrafts) delete V.adjDrafts[V.pen + '|' + v]; }
         else { V.draft[v] = { n: P.need(p, v), why: '' }; V.justTick = v; }
         break;
-      case 'adjust': V.over = 'adjust'; V.adj = { k: v, n: V.draft[v].n, why: V.draft[v].why }; break;
-      case 'adjust-use': V.draft[V.adj.k] = { n: V.adj.n, why: V.adj.n < P.need(p, V.adj.k) ? V.adj.why : '' }; V.over = null; break;
+      case 'adjust': V.over = 'adjust'; V.adj = (V.adjDrafts && V.adjDrafts[V.pen + '|' + v]) || { k: v, n: V.draft[v].n, why: V.draft[v].why }; break;
+      case 'adjust-use': V.draft[V.adj.k] = { n: V.adj.n, why: V.adj.n < P.need(p, V.adj.k) ? V.adj.why : '' }; if (V.adjDrafts) delete V.adjDrafts[V.pen + '|' + V.adj.k]; V.over = null; break;
       case 'why': V.adj.why = v; break;
       case 'submit': {
         var items = Object.keys(V.draft).map(function (k) { return { k: k, n: V.draft[k].n, why: V.draft[k].why }; });
         var recs = P.submit(p.code, items) || [];
         recs.forEach(function (r) { V.keepOpen[r.tr] = true; });
         V.justRec = recs.map(function (r) { return r.id; });
-        V.draft = {};
+        V.draft = {}; V.adjDrafts = {};
         V.flash = { pen: p.code, key: 'flash.items', args: { n: recs.length }, undoIds: V.justRec.slice() };
         keepOpenSoon();
         break;

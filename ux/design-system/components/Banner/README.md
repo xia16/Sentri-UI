@@ -3,7 +3,7 @@
 Banner states a consequence or pending condition before the action it governs. Use [Field](../Field/README.md) instead for validation of one input.
 
 ## When
-Use above a destructive commit, when a correction needs review, or for offline work waiting to upload. Farrowing uses danger and correction; Home and Piglet processing use notice.
+Use above a destructive commit, when a correction needs review, or for offline work waiting to upload. Farrowing uses danger; Piglet processing uses danger and notice (through `SentriTask.warning`) and correction on its edit page; Data sync uses danger and notice. Home does not draw a Banner.
 
 ## When not
 Use [Status](../Status/README.md) for a quiet recorded fact; use Field for a refused value. Do not stack banners or repeat the same consequence in a card below.
@@ -13,10 +13,10 @@ Box; leading icon (alert for danger, edit for correction, note for notice; the h
 
 ## Variants
 - **Danger** (`danger`): consequence before a destructive commit or a terminal fact, as in Farrowing death and Inspection removal.
-- **Correction** (`correction`): amber review before recording a changed fact. `door` opens Review; a summary supports Clear and Undo.
-- **Notice** (`notice`): pending offline uploads or work waiting, as on Home and the ended Piglet task.
+- **Correction** (`correction`): amber review before recording a changed fact. `door` opens Review; a summary supports Clear and Undo. Used by Piglet processing's edit page.
+- **Notice** (`notice`): pending offline uploads or work waiting, as in Data sync and the ended Piglet task.
 
-`door`, `icon` and `size: 'small'` are properties, not extra variants. TaskWarning is a compatibility alias to Banner, not another face.
+`door`, `icon` and `size` are properties, not extra variants. `size` is `'small'` (a smaller headline; what `SentriTask.warning` draws), `'inline'` (a one-line amber strip with its door; in danger tone a red box; Farrowing's aborted line) or `'card'` (a taller warning card with its door; no live screen yet). Default is the full size. TaskWarning is a compatibility alias to Banner, not another face.
 
 ## States
 | State | Rendered behavior |

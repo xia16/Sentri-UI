@@ -1,5 +1,7 @@
 # Row pass verification
 
+> 2026-10-20: this is the record of the 2026-10-10 pass. Since then the ten variant tabs became five (Navigation, Tile, Animal, Task item, Select + door; see the README), and `proof/` was removed: its screenshots showed retired variants and designed focus states. The atlas draws every state live from `variants/`.
+
 Branch: `45-row`. Implementation checks do not confer owner approval.
 
 The 15-line component checklist was reviewed against the finished README, variant specimens, bundle and real callers:
