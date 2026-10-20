@@ -432,7 +432,7 @@
   }
 
   // Today's closed tasks (completed or ended early in farm time): each opens its receipt. Older receipts live in Records.
-  // To treat / Monitoring: the marked pigs across units, one group per unit (Row · Animal: tag over pen and care, the condition tag right).
+  // To treat / Monitoring: the marked pigs across units, one card per unit under its section heading (as Farrowing's scan and search; Row · Animal: tag over pen and care, the condition tag right).
   // A pig opens its unit's walk on the Health lens, where it is treated or its mark changed.
   // To treat / Monitoring is a list page (owner, 2026-10-20: "what if we have 100 pigs?… everything goes inside the filter, search
   // bar at top, flat list"): the search at the top with the filter beside it, then today's list, one card per unit, pigs in walking order.
@@ -448,7 +448,7 @@
   function markedList(){
     const shown=markedShown();
     if(!shown.length)return `<div class="mk-empty">${SentriUI.choiceEmpty(state.marked.q?'Check the ear tag, or scan it.':'No pig matches the filter.',{title:'No pigs found',icon:'search'})}${markedFilterCount(state.marked.filter)?SentriUI.button({register:'text',label:'Show all pigs',action:'marked-reset'}):''}</div>`;
-    return [...new Set(shown.map(p=>p.unit))].map(u=>SentriUI.heading({title:'Unit '+u,kind:'group',level:3})+SentriUI.rowGroup(shown.filter(p=>p.unit===u).map(p=>
+    return [...new Set(shown.map(p=>p.unit))].map(u=>SentriUI.heading({title:'Unit '+u,kind:'section',level:3})+SentriUI.rowGroup(shown.filter(p=>p.unit===u).map(p=>
       // Plain tags: the title says what to do, so no row is coloured; "1d" marks a pig waiting since yesterday.
       SentriUI.row({variant:'animal',code:p.tag,description:['Pen '+p.pen,careShort[p.care]||'',p.wait?p.wait+'d':''].filter(Boolean).join(' · '),right:{kind:'tags',tags:[{name:p.cond,level:'ongoing'}]},action:'marked-pig',value:String(p.unit)})).join(''))).join('');
   }
@@ -520,7 +520,7 @@
   }
   function renderSync(){const top=app.querySelector('.app-scroll')?.scrollTop||0;render();const scroller=app.querySelector('.app-scroll');if(scroller)scroller.scrollTop=top;}
   function sectionChooser(){return head('Your sections')+`<div class="app-scroll screen-enter"><p class="work-note">Select where you're working.</p>${SentriUI.choiceGroup(sections.map(s=>{const count=openTaskCount(s.id);return SentriUI.choiceRow({label:s.name,meta:s.units.length+' units · '+s.population+' pigs · '+(count?count+' '+(count===1?'task':'tasks'):'No open tasks'),mode:'single',selected:s.id===state.section,action:'section',value:s.id});}))}<p class="work-note">Work is shared with your team. Your section selection changes the view for you.</p></div>`+nav();}
-  function openDesigned(file,unit,entry,lens=null,taskSync=''){
+  function openDesigned(file,unit,entry,lens=null,taskSync='',returnSheet=''){
     const url=new URL(file,location.href);
     url.searchParams.set('layout','focus');url.searchParams.set('from','home');
     url.searchParams.set('section',state.section);url.searchParams.set('entry',entry);
@@ -528,10 +528,12 @@
     if(taskSync)url.searchParams.set('taskSync',taskSync);
     if(['Health','Feed'].includes(lens))url.searchParams.set('lens',lens);
     if(state.unit)url.searchParams.set('returnUnit',state.unit);
+    if(returnSheet)url.searchParams.set('returnSheet',returnSheet);   // Back reopens the drawer the worker left from (To treat, Monitoring)
     // Save the exact Home scope for the browser's Back button too.
     const homeURL=new URL(location.href);homeURL.searchParams.set('section',state.section);
     homeURL.searchParams.set('view',state.unit?'unit':'overview');
     if(state.unit)homeURL.searchParams.set('unit',state.unit);else homeURL.searchParams.delete('unit');
+    if(returnSheet)homeURL.searchParams.set('sheet',returnSheet);else homeURL.searchParams.delete('sheet');
     history.replaceState(null,'',homeURL);location.assign(url.href);
   }
   function openTask(id,unit=null){
@@ -654,7 +656,8 @@
     if(a==='mk-reset'){state.marked.draft=markedDefaults();markedFilter();return;}
     if(a==='mk-apply'){state.marked.filter={...state.marked.draft};closeDrawer();render();return;}
     if(a==='marked-reset'){state.marked.filter=markedDefaults();state.marked.q='';render();return;}
-    if(a==='marked-pig'){openDesigned('inspection-astra-concept.html',+v,'unit','Health');return;}
+    // Back from the pig's walk reopens this list (openDesigned's returnSheet).
+    if(a==='marked-pig'){openDesigned('inspection-astra-concept.html',+v,'unit','Health','',state.marked.kind);return;}
     if(a==='toggle-tasks'){const scroll=app.querySelector('.app-scroll')?.scrollTop||0;state.expandedTasks=!state.expandedTasks;render();app.querySelector('.app-scroll').scrollTop=scroll;return;}
     if(a==='toggle-upcoming'){const scroll=app.querySelector('.app-scroll')?.scrollTop||0;state.expandedUpcoming=!state.expandedUpcoming;render();app.querySelector('.app-scroll').scrollTop=scroll;return;}
     if(a==='end-task-early'){dialog('End task early?','Unfinished work will remain incomplete. Existing records are kept.',{label:'End task early',action:'confirm-end-task'});return;}
