@@ -3696,7 +3696,7 @@
       "preset": "count",
       "steps": [
         "Actions",
-        "Edit note"
+        "[data-action=\"sow-host-action\"][data-value=\"marker\"]"
       ],
       "figma": "",
       "notes": {

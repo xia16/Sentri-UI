@@ -114,3 +114,23 @@ Held against the Farrowing room (its dock: one dark primary, Back outlined) and 
 - Reach: 50 screens move, all of them rendering a disabled or waiting control: environment (page, sensor-week, sensor-other), farrowing 14 (before, death, leave-edit, edit, born, task-blocked, edit-finished, foster, reconcile, pen-note, pen-fault, piglet-care, piglet-identity, piglet-death), piglet-processing 13 (sheet-coming, sheet-todo, sheet-breeders, sheet-late, sheet-done, sheet-notch, adjust-count, give-ids, counts, weight, record-death, move-piglets, set-count), pregnancy.check, feed-plan (editor, end-date), pig-list.health, pig-profile 7 (production-task, miscarriage, batch-membership, measure, body-condition, note, not-in-pig), health-record 5 (record-health, condition-picker, care-instructions, resolve-conditions, treatment), fostering (type, receive, result), move.transfer-sow. 4 more differ in one shot only by under 0.04% (assistant.finding and farrowing.search-results, which the gate marks unstable on base; farrowing.search-none, piglet-processing.more-actions): identical by eye, render noise. 237 identical; none broken.
 - Every moved screen: only the waiting footer button (dashed rim), a floor key (dashed, `ink-2` glyph), a disabled picker (Move's Destination pen: solid rim to dashed) or the Environment fan controls changed; layout, copy and the 360 Chinese footers are unchanged.
 - **Better because** unavailable is now said by the face and the rim, never by faded words, and no waiting control looks live.
+
+# Chinese pass (PR 244), critique
+
+Scope: the words only. At `?lang=zh` these screens read in English where the Inspection prototype draws them: the embedded Transfer sow sheet (From, Destination unit, Destination pen) and the sow Actions it is opened from. Nothing is added, moved or cut in EN.
+
+## Keep
+
+- Every surface, row, order, weight and colour as it is: the change replaces English words with Chinese in the same place, in the same component, at the same weight.
+- EN exactly as it is.
+- Ear tags, pen codes, medicine and brand names, the worker's name, RFID, record numbers and the units mL and °C stay in Latin script; kg reads 公斤 (as on main) and mm reads 毫米.
+
+## Problems
+
+- **major** · At ZH 360 the parts above read in English beside Chinese, so a Chinese-reading worker reads two languages on one screen (P2: read in two seconds).
+- **minor** · Dates read in English forms (`1 Aug 2026`, `Aug 1`, `Thu`) and day counts as `40d`.
+- **minor** · Copy that is longer in Chinese has to fit its component at 360 (a pen-map tile holds four characters: `Not in unit` reads 非本单元).
+
+## Attention budget
+
+Unchanged: each screen shows the same information in the same order as on main, in Chinese. Cut list: nothing is cut.

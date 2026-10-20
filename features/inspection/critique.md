@@ -266,3 +266,23 @@ Scope: the pen page's verb grid (`inspection.pen`: Note, Feed, Observe, Fault, T
 ## Self-crit
 
 - **Better because** the pen page's verbs are one line above Needs attention, so what needs someone moves up the screen; six and more keep two even rows.
+
+# Chinese pass (PR 244), critique
+
+Scope: the words only. At `?lang=zh` these screens read in English where the Inspection prototype draws them: the walk list's stage days (`Gestation · 40d`), Go to pen (its hint, `Not in unit` on each pen, `N health`, the layout line), Inspection filters (Production stage, Disease or symptom, Any care, Show pigs), Find a pig, the pen note and pen log (Activity, Dates, entries, weekdays), the walk log, End walk and Walk recorded. Nothing is added, moved or cut in EN.
+
+## Keep
+
+- Every surface, row, order, weight and colour as it is: the change replaces English words with Chinese in the same place, in the same component, at the same weight.
+- EN exactly as it is.
+- Ear tags, pen codes, medicine and brand names, the worker's name, RFID, record numbers and the units mL and °C stay in Latin script; kg reads 公斤 (as on main) and mm reads 毫米.
+
+## Problems
+
+- **major** · At ZH 360 the parts above read in English beside Chinese, so a Chinese-reading worker reads two languages on one screen (P2: read in two seconds).
+- **minor** · Dates read in English forms (`1 Aug 2026`, `Aug 1`, `Thu`) and day counts as `40d`.
+- **minor** · Copy that is longer in Chinese has to fit its component at 360 (a pen-map tile holds four characters: `Not in unit` reads 非本单元).
+
+## Attention budget
+
+Unchanged: each screen shows the same information in the same order as on main, in Chinese. Cut list: nothing is cut.

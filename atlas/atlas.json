@@ -6712,7 +6712,7 @@
          "preset": "count",
          "steps": [
           "Actions",
-          "Edit note"
+          "[data-action=\"sow-host-action\"][data-value=\"marker\"]"
          ],
          "figma": "",
          "notes": {
@@ -16794,7 +16794,7 @@
          "steps": [
           "[data-action=\"room-sow\"][data-value=\"000392\"]",
           "Actions",
-          "Mark not in pig"
+          "[data-action=\"sow-host-action\"][data-value=\"not-in-pig\"]"
          ]
         }
        ],
