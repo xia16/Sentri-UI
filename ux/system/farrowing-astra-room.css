@@ -78,11 +78,6 @@
 /* The typed part is bold ink; the rest of the tag is muted. */
 .find-row .st-animal-id{color:var(--ink-2);font-weight:500}
 .find-row .st-animal-id b,.find-row .st-animal-state b{color:var(--ink);font-weight:700}
-/* The scanner's state, in ink: a filled dot while it listens, a ring when it is stopped. Never green. */
-.scan-live{flex:none;display:inline-flex;align-items:center;gap:7px;min-height:32px;margin-left:auto;padding:0 12px;border:1px solid var(--line);border-radius:16px;background:var(--paper);font:600 13px var(--font-sans)}
-.scan-live i{width:8px;height:8px;border-radius:50%;background:var(--ink)}
-.scan-live.is-off{color:var(--muted)}
-.scan-live.is-off i{border:1.5px solid var(--muted);background:transparent}
 .scan-body{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;padding:4px 16px 24px}
 .scan-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 36px 40px;text-align:center}
 .scan-empty svg{width:44px;height:44px;margin-bottom:14px;color:var(--muted)}
@@ -99,5 +94,3 @@
 .demo-scan:disabled{color:var(--muted)}
 .room-surface.find-surface>.statusbar{background:var(--paper)}
 
-/* Scanning / Stopped is the first line of the scan page body (Headers law: status leaves the header): at the start, not pushed right. */
-.scan-page .scan-live{align-self:flex-start;margin-left:0}

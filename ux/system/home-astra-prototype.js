@@ -417,12 +417,12 @@
   }
 
   // Today's closed tasks (completed or ended early in farm time): each opens its receipt. Older receipts live in Records.
-  // To treat / Monitoring: the marked pigs across units, one group per unit (Row · Animal: tag over pen and care, the condition tag right).
+  // To treat / Monitoring: the marked pigs across units, one card per unit under its section heading (as Farrowing's scan and search; Row · Animal: tag over pen and care, the condition tag right).
   // A pig opens its unit's walk on the Health lens, where it is treated or its mark changed.
   function markedList(kind){
     const pigs=(markedPigs[state.section]||{})[kind]||[],units=[...new Set(pigs.map(p=>p.unit))];
     const body=units.map(u=>{const list=pigs.filter(p=>p.unit===u);
-      return SentriUI.heading({title:'Unit '+u,kind:'group',level:3})+SentriUI.rowGroup(list.map(p=>SentriUI.row({variant:'animal',code:p.tag,
+      return SentriUI.heading({title:'Unit '+u,kind:'section',level:3})+SentriUI.rowGroup(list.map(p=>SentriUI.row({variant:'animal',code:p.tag,
         // Plain tags: the list's title already says what to do, so no row is coloured; "1d" marks a pig waiting since yesterday.
         description:['Pen '+p.pen,({'Hospital pen':'Hospital','Treat in place':'In place'})[p.care]||'',p.since?'1d':''].filter(Boolean).join(' · '),right:{kind:'tags',tags:[{name:p.cond,level:'ongoing'}]},action:'marked-pig',value:String(u)})).join(''));}).join('');
     drawer(kind==='treat'?'To treat':'Monitoring',body,{size:'medium'});

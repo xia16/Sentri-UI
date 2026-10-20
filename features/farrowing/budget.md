@@ -8,15 +8,15 @@
 - Could have shown and does not: her state, her parity, her pen's other sows, a count line ("N sows found"), the unit in the header, recent searches.
 
 **Scan ear tags, per state**
-- Header: back, the title, the context (Farrowing · Unit 7), the scanner state (Scanning / Stopped).
-- Not connected: one message and how to fix it. Nothing scanned: one invitation. Scanned: groups with counts, one row per sow (ear tag, where she is, her state), a tick box. Footer: Stop or Resume scanning, or the selection count and Actions.
+- Header: back, the title, the context (Farrowing · Unit 7). The scanner state is the footer's Stop or Resume scanning, said once.
+- Not connected: one message and how to fix it. Nothing scanned: one invitation. Scanned: one card per unit under its plain unit heading, one row per sow (ear tag, where she is, her state), a tick box. Footer: Stop or Resume scanning, or the selection count and Actions.
 - Could have shown and does not: a "ready for the next tag" banner, a "Not found" row, scan times, battery or signal of the reader, a totals line, her born or dead counts as separate facts.
 
 ## Questions
 
 1. Which sow is this? (Find a sow: type a part of the tag; Scan: hold the reader.)
-2. Is she in my unit? (the group: "In Unit 7" or "Other units"; the place on the right.)
-3. Is the reader working? (the pill, or the not-connected message.)
+2. Is she in my unit? (the card's unit heading: "Unit 7", "Unit 6".)
+3. Is the reader working? (the footer's Stop scanning, or the not-connected message.)
 4. What can I do with her, or with these? (tap a row to open her; tick several, then Actions.)
 5. How do I stop? (Stop scanning; the back arrow.)
 
@@ -47,10 +47,10 @@ The header line of every surface of this feature, decided by the Headers law (`u
 | Filter sows, Scan actions | action | none | Reset in the footer | Back reaches the room |
 | Pen map | action | the colour key: `2 need you · 1 farrowing` (owner exception, 2026-10-14; below) | Where does anything need me, and what do the colours mean? | Back reaches the room |
 | Pen page, Pen log, Pen note, Feed guidance, Report fault, Equipment fault | action | none | | Back reaches the room or the pen page |
-| Scan ear tags | action (page) | none; Scanning / Stopped is the body's first line | | Back reaches the room |
+| Scan ear tags | action (page) | none; the footer's Stop / Resume scanning says whether it listens | | Back reaches the room |
 | Find a sow | search page | not a title header: its pinned field is its head (owner, 2026-10-12) | | |
 
-Moved, not cut (crit rounds 1 and 2): the task receipt's closure stamp (`Farrowing · Oct 11 · 09:41 · G.H`), Scan actions' count (`2 sows`), the allocation's sow-died line and the finished record's stamp (`Finished Aug 27 at 08:12 by G.H`, Audit) each open their body as the quiet group label (13px muted, 8px over their card); Scan's Scanning / Stopped is the body's first line.
+Moved, not cut (crit rounds 1 and 2): the task receipt's closure stamp (`Farrowing · Oct 11 · 09:41 · G.H`), the allocation's sow-died line and the finished record's stamp (`Finished Aug 27 at 08:12 by G.H`, Audit) each open their body as the quiet group label (13px muted, 8px over their card). Scan actions' count (`2 sows`) and Scan's Scanning / Stopped pill were cut (owner, 2026-10-20): the footer already says both.
 
 Chains walked (crit round 1): the room, the record drawer, the logs and the pen pages read as before; More actions and Piglet processing now carry the route, so every action page about her is one Back from her chip.
 

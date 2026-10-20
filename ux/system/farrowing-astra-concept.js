@@ -410,23 +410,27 @@ function penMapSheet(c,sheet){
 }
 /* ---- Find a sow and Scan ear tags (owner decisions 2026-10-12) ----
    Two full pages that replace the old search drawer and scan preview. Both look across every unit; neither switches unit by itself.
-   Find a sow: nothing is listed until something is typed; results are grouped "In Unit 7" then "Other units".
+   Find a sow: nothing is listed until something is typed; results are grouped by unit, this unit first.
    Scan ear tags: the reader is always listening; every scan adds a sow to a list, newest first; a tick box selects for the shared Actions. */
 const scannerOff=/[?&]scanner=(off|0|no)(&|$)/.test(globalThis.location?.search||'');   // ?scanner=off: the tag reader is not connected
 const scanSequence=['000418','000431','004318','000437','000943','000392','000455','000467'];   // what "Simulate scan" scans, in turn
 function findSow(c,tag){for(const unit of c.units){const record=unit.records.find(r=>r.tag===tag);if(record)return {record,unit};}return null;}
+// One card per unit under a plain "Unit 7" section heading, this unit first, then the others in unit order (as Home's To treat groups pigs).
+// The heading names the unit, so no row repeats it.
+function byUnit(c,hits){return c.units.filter(u=>hits.some(h=>h.unit.id===u.id)).sort((a,b)=>(b.id===c.unitId)-(a.id===c.unitId)).map(unit=>({unit,list:hits.filter(h=>h.unit.id===unit.id)}));}
+const unitCards=(c,hits,row,className)=>byUnit(c,hits).map(({unit,list})=>SentriUI.heading({title:unit.name,kind:'section',level:3})+SentriUI.panel(list.map(row).join(''),{className:'st-row-group '+className})).join('');
 // Every unit, one list. Tags that start with the typed text come first, then tags that contain it, then a pen that matches; her own unit leads.
 function findHits(c){
  const q=c.query.trim().toLowerCase();if(!q)return null;
  const rank=r=>r.tag.startsWith(q)?0:r.tag.includes(q)?1:2;
  const hits=c.units.flatMap(unit=>unit.records.filter(onList).filter(r=>r.tag.includes(q)||r.pen.toLowerCase().includes(q)).map(record=>({record,unit}))).sort((a,b)=>rank(a.record)-rank(b.record)||a.record.tag.localeCompare(b.record.tag));
- return {q,count:hits.length,here:hits.filter(h=>h.unit.id===c.unitId),other:hits.filter(h=>h.unit.id!==c.unitId)};
+ return {q,hits};
 }
 // The typed part bold, the rest muted (the page's CSS mutes the tag; this only marks the part that matched).
 const markHit=(text,q)=>{const i=q?String(text).toLowerCase().indexOf(q):-1;return i<0?esc(text):esc(text.slice(0,i))+'<b>'+esc(text.slice(i,i+q.length))+'</b>'+esc(text.slice(i+q.length));};
-function findRow({record:r,unit},q,here){
+function findRow({record:r},q){
  const pen=rowText.pen(r.pen);
- let html=SentriUI.row({variant:'animal',code:r.tag,right:{kind:'state',figure:here?pen:unit.name,word:here?'':pen,level:'settled'},action:'room-sow',value:r.tag,className:'find-row'});
+ let html=SentriUI.row({variant:'animal',code:r.tag,right:{kind:'state',figure:pen,word:'',level:'settled'},action:'room-sow',value:r.tag,className:'find-row'});
  html=html.replace(`<strong class="st-animal-id">${esc(r.tag)}</strong>`,`<strong class="st-animal-id">${markHit(r.tag,q)}</strong>`);
  if(r.pen.toLowerCase().includes(q))html=html.replace(`>${esc(pen)}<`,`>${markHit(pen,q)}<`);
  return html;
@@ -434,9 +438,8 @@ function findRow({record:r,unit},q,here){
 function searchBody(c){
  const f=findHits(c);
  if(!f)return '<p class="find-hint">Type part of an ear tag or a pen, or scan a tag. Searches every unit.</p>';
- if(!f.count)return `<p class="find-hint">No sow matching “${esc(c.query.trim())}” in any unit.</p>`;
- const group=(title,list,here)=>list.length?SentriUI.heading({title,kind:'section',level:3})+SentriUI.panel(list.map(h=>findRow(h,f.q,here)).join(''),{className:'st-row-group find-list'}):'';
- return group('In '+c.unit.name,f.here,true)+group('Other units',f.other,false);
+ if(!f.hits.length)return `<p class="find-hint">No sow matching “${esc(c.query.trim())}” in any unit.</p>`;
+ return unitCards(c,f.hits,h=>findRow(h,f.q),'find-list');
 }
 // The field is pinned and focused. Natively this is the number-first keyboard with an ABC switch (iOS numbersAndPunctuation, Android's number-first
 // keyboard with a 123/ABC toggle); the web has no such input mode, so the field asks for plain text with no auto-capital fixes and no suggestions.
@@ -468,26 +471,25 @@ function scanAction(s,c,a,v){
 const scanEmpty=(title,text)=>`<div class="scan-empty">${icon('scan')}<strong>${title}</strong><p>${text}</p></div>`;
 function scanPage(c){
  const sc=c.scan,items=sc.items.map(t=>findSow(c,t)).filter(Boolean),n=sc.picked.length;
- const group=(title,list,here)=>list.length?SentriUI.heading({title,meta:String(list.length),kind:'section',level:3})+SentriUI.panel(list.map(h=>sowRow(h.record,{select:{checked:sc.picked.includes(h.record.tag)},...(here?{flat:true}:{place:h.unit.name+' · '+rowText.pen(h.record.pen)})})).join(''),{className:'st-row-group scan-card'}):'';
- const pill=sc.connected?`<span class="scan-live${sc.listening?'':' is-off'}"><i aria-hidden="true"></i>${sc.listening?'Scanning':'Stopped'}</span>`:'';
  const body=!sc.connected?scanEmpty('Scanner not connected',"Turn on the tag reader and pair it in your phone's Bluetooth settings. Scanning starts as soon as it connects."):
   !items.length?(sc.listening?scanEmpty('Hold the reader to an ear tag','Each sow you scan appears here.'):scanEmpty('Scanning is stopped','Resume scanning to add sows.')):
-  `<div class="scan-body">${group('In '+c.unit.name,items.filter(h=>h.unit.id===c.unitId),true)}${group('Other units',items.filter(h=>h.unit.id!==c.unitId),false)}</div>`;
- // A page (it fills the screen), so the page header: Back at the top left, the title, no line (Headers law, 2026-10-13). The scanner's
- // state (Scanning / Stopped) is status, so it is the first thing in the body, never in the header. The footer has no Back: the act alone,
- // or, with sows ticked, the count and Actions (as Inspection's selection footer does); with no reader there is no footer.
+  `<div class="scan-body">${unitCards(c,items,h=>sowRow(h.record,{flat:true,select:{checked:sc.picked.includes(h.record.tag)}}),'scan-card')}</div>`;
+ // A page (it fills the screen), so the page header: Back at the top left, the title, no line (Headers law, 2026-10-13). The footer says
+ // whether the reader listens (Stop scanning / Resume scanning), so the body carries no second Scanning status. The footer has no Back:
+ // the act alone, or, with sows ticked, the count and Actions (as Inspection's selection footer does); with no reader there is no footer.
  const foot=!sc.connected?false:n?footer(`<p class="scan-selected">${n} ${n===1?'sow':'sows'} selected</p>`,SentriUI.button({label:'Actions',icon:icon('more'),register:'primary',action:'room-scan-actions'}),'scan-foot'):
   pageFooter(SentriUI.button({label:sc.listening?'Stop scanning':'Resume scanning',icon:icon(sc.listening?'stop':'scan'),register:sc.listening?'secondary':'primary',className:'scan-toggle',action:'room-scan-toggle'}),'scan-foot');
- return SentriUI.sheet({variant:'page',title:'Scan ear tags',back:{action:'room-back'},body:pill+body,footer:foot,className:'feature-page scan-page',label:'Scan ear tags',bar:status()});
+ return SentriUI.sheet({variant:'page',title:'Scan ear tags',back:{action:'room-back'},body,footer:foot,className:'feature-page scan-page',label:'Scan ear tags',bar:status()});
 }
 const pageUnder=(s,c)=>s.view==='roomScanActions'?'roomScan':s.view;
 function findPage(s){const c=roomContext(s),under=pageUnder(s,c);return under==='roomSearch'?searchPage(c):under==='roomScan'?scanPage(c):'';}
-// The shared generic actions, for the ticked sows only: no farrowing action here (the owner, 2026-10-12). The rows are Inspection's More actions rows.
+// The shared generic actions, for the ticked sows only: no farrowing action here (the owner, 2026-10-12). They are More actions' everyday
+// verbs (owner, 2026-10-19): one Row tile grid of an icon and one word, the full action name kept as each tile's accessible name.
 function scanActionsSheet(c){
- const n=c.scan.picked.length;
- const rows=penActionRow('room-scan-act','transfer','Transfer','Move to another unit or pen','transfer')+penActionRow('room-scan-act','condition','Disease or symptom','Record a health finding','health')+penActionRow('room-scan-act','treat','Record treatment','Medicine, dose and method','treatment')+penActionRow('room-scan-act','note','Add a note',n===1?'Leave a note for this sow':'Leave a note for these sows','marker');
- // The ticked count is what the actions apply to: the body's first line.
- return roomSheet('Actions',`${bodyLead(`${n} ${n===1?'sow':'sows'}`)}<div class="compact-actions st-panel st-row-group">${rows}</div>`,footer(SentriUI.backButton({action:'room-back'})),'scan-actions-sheet','menu');
+ const tiles=[['transfer','Transfer','转栏','Transfer','transfer'],['condition','Condition','疾病','Disease or symptom','health'],['treat','Treat','治疗','Record treatment','treatment'],['note','Note','备注','Add a note','marker']]
+  .map(([symbol,en,zh,title,value])=>({label:ZH?zh:en,title,icon:icon(symbol),action:'room-scan-act',value}));
+ // No count line: the footer under it already said "N sows selected", and More actions has none.
+ return roomSheet('Actions',SentriUI.rowGrid(tiles,{label:'Actions for the ticked sows'}),footer(SentriUI.backButton({action:'room-back'})),'scan-actions-sheet','menu');
 }
 // Pen context is shared by its drawers within the unit; task rows stay sow-focused.
 function penInfo(c){const pens=c.unit.penDetails||(c.unit.penDetails={});return pens[c.detailPen]||(pens[c.detailPen]={note:'',noteBy:'',faults:[],events:[],feed:null});}

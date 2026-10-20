@@ -3377,27 +3377,30 @@
          "gwt": {
           "given": "Find a sow is open and the worker has typed 43.",
           "when": "They read the results.",
-          "then": "The results are in two groups: \"In Unit 7\" lists 000431, then \"Other units\" lists 000437, 000943 and 004318 with their units."
+          "then": "The results are grouped by unit, this unit first: \"Unit 7\" lists 000431, \"Unit 6\" lists 000437 and 004318, \"Unit 8\" lists 000943."
          },
          "authority": [
           {
            "src": "PRD",
            "at": "Decisions · owner decision 2026-10-12",
-           "says": "Results are grouped \"In Unit 7\" then \"Other units\""
+           "says": "Results are grouped by unit, this unit first (owner, 2026-10-20: one plain unit heading, as Home's To treat)"
           }
          ],
          "visible": [
           {
-           "text": "In Unit 7"
+           "text": "Unit 7"
           },
           {
-           "text": "Other units"
+           "text": "Other units",
+           "absent": true,
+           "hard": "broken-ruling",
+           "says": "every unit has its own heading"
           }
          ],
          "record": [
           {
-           "expr": "JSON.stringify([...document.querySelectorAll('.room-search-results .find-list')].map(l=>[...l.querySelectorAll('.st-animal-id')].map(e=>e.textContent).join())) === JSON.stringify(['000431','000437,000943,004318'])",
-           "says": "the lists are In Unit 7: 000431, then Other units: 000437, 000943, 004318",
+           "expr": "JSON.stringify([...document.querySelectorAll('.room-search-results .find-list')].map(l=>l.previousElementSibling.textContent.trim()+':'+[...l.querySelectorAll('.st-animal-id')].map(e=>e.textContent).join())) === JSON.stringify(['Unit 7:000431','Unit 6:000437,004318','Unit 8:000943'])",
+           "says": "the cards are Unit 7: 000431, Unit 6: 000437, 004318, Unit 8: 000943",
            "hard": "wrong-fact"
           }
          ]
@@ -3469,7 +3472,7 @@
          "label": "Tags that start with the typed text rank before tags that only contain it",
          "gwt": {
           "given": "Find a sow is open and the worker has typed 004.",
-          "when": "They read the Other units group.",
+          "when": "They read the Unit 6 card.",
           "then": "004318, whose tag starts with 004, is listed before 000437, whose tag only contains it."
          },
          "authority": [
@@ -3481,7 +3484,7 @@
          ],
          "record": [
           {
-           "expr": "JSON.stringify([...document.querySelectorAll('.room-search-results .find-list')].map(l=>[...l.querySelectorAll('.st-animal-id')].map(e=>e.textContent).join())[1]) === JSON.stringify('004318,000437')",
+           "expr": "JSON.stringify([...document.querySelectorAll('.room-search-results .find-list')].filter(l=>l.previousElementSibling.textContent.trim()==='Unit 6').map(l=>[...l.querySelectorAll('.st-animal-id')].map(e=>e.textContent).join())[0]) === JSON.stringify('004318,000437')",
            "says": "004318 is listed before 000437",
            "hard": "wrong-fact"
           }
@@ -3508,7 +3511,7 @@
          "gwt": {
           "given": "Find a sow is open and the worker has typed B4.",
           "when": "They read the results.",
-          "then": "The two sows in pen B4, 000431 and 000455, are listed under \"In Unit 7\", and there is no \"Other units\" group."
+          "then": "The two sows in pen B4, 000431 and 000455, are listed under \"Unit 7\", and no other unit is listed."
          },
          "authority": [
           {
@@ -3525,7 +3528,7 @@
            "text": "000455"
           },
           {
-           "text": "Other units",
+           "text": "Unit 6",
            "absent": true,
            "hard": "wrong-fact",
            "says": "no sow in another unit has pen B4"
@@ -3688,12 +3691,6 @@
          "text": "Turn on the tag reader and pair it in your phone's Bluetooth settings. Scanning starts as soon as it connects."
         },
         {
-         "el": ".scan-live",
-         "is": "absent",
-         "hard": "broken-ruling",
-         "says": "no status pill when no reader is paired"
-        },
-        {
          "el": ".scan-empty button",
          "is": "absent",
          "hard": "broken-ruling",
@@ -3769,7 +3766,7 @@
        "gwt": {
         "given": "Scan ear tags is open, the reader is connected and nothing has been scanned.",
         "when": "The worker looks at the page.",
-        "then": "The page says \"Hold the reader to an ear tag\" and \"Each sow you scan appears here.\", the status says Scanning and the footer offers Stop scanning. There is no \"ready for the next tag\" banner and no \"Not found\" row."
+        "then": "The page says \"Hold the reader to an ear tag\" and \"Each sow you scan appears here.\", the footer offers Stop scanning (it is the only Scanning status). There is no \"ready for the next tag\" banner and no \"Not found\" row."
        },
        "authority": [
         {
@@ -3786,11 +3783,13 @@
          "text": "Each sow you scan appears here."
         },
         {
-         "text": "Scanning",
-         "in": ".scan-page .sheet-body .scan-live"
+         "text": "Stop scanning"
         },
         {
-         "text": "Stop scanning"
+         "el": ".scan-page .sheet-body .scan-live",
+         "is": "absent",
+         "hard": "broken-ruling",
+         "says": "the footer says the reader is listening; the body has no second status"
         },
         {
          "text": "ready for the next tag",
@@ -3819,25 +3818,25 @@
        "type": "outcome",
        "id": "fa-s13-scans-listed-newest-first-in-two-groups",
        "tree": "S-13",
-       "label": "Scanned sows are listed in two groups, newest first",
+       "label": "Scanned sows are listed by unit, newest first",
        "gwt": {
         "given": "Scan ear tags is open and three sows have been scanned: 000418, then 000431 (both in Unit 7), then 004318 (Unit 6).",
         "when": "The worker reads the list.",
-        "then": "The list has \"In Unit 7\" with 000431 above 000418, then \"Other units\" with 004318: the newest scan first within each group."
+        "then": "The list has \"Unit 7\" with 000431 above 000418, then \"Unit 6\" with 004318: the newest scan first within each unit."
        },
        "authority": [
         {
          "src": "PRD",
          "at": "Decisions · owner decision 2026-10-12",
-         "says": "Groups \"In Unit 7 · n\" and \"Other units · n\", newest first"
+         "says": "Grouped by unit, this unit first, newest first (owner, 2026-10-20: one plain unit heading, no count)"
         }
        ],
        "visible": [
         {
-         "text": "In Unit 7"
+         "text": "Unit 7"
         },
         {
-         "text": "Other units"
+         "text": "Unit 6"
         }
        ],
        "record": [
@@ -3897,7 +3896,7 @@
          "gwt": {
           "given": "Scan ear tags is open with scanned sows and nothing ticked.",
           "when": "The worker taps Stop scanning.",
-          "then": "The status reads Stopped, the footer offers Resume scanning, and the three sows stay in the list."
+          "then": "The footer offers Resume scanning and the three sows stay in the list."
          },
          "authority": [
           {
@@ -3907,10 +3906,6 @@
           }
          ],
          "visible": [
-          {
-           "text": "Stopped",
-           "in": ".scan-page .sheet-body .scan-live"
-          },
           {
            "text": "Resume scanning"
           }
@@ -3939,7 +3934,7 @@
            "gwt": {
             "given": "Scanning is stopped.",
             "when": "The worker taps Resume scanning.",
-            "then": "The status reads Scanning and the footer offers Stop scanning."
+            "then": "The footer offers Stop scanning again."
            },
            "authority": [
             {
@@ -3949,10 +3944,6 @@
             }
            ],
            "visible": [
-            {
-             "text": "Scanning",
-             "in": ".scan-page .sheet-body .scan-live"
-            },
             {
              "text": "Stop scanning"
             }
@@ -4078,7 +4069,7 @@
              "gwt": {
               "given": "Two scanned sows are ticked.",
               "when": "The worker taps Actions.",
-              "then": "A sheet titled Actions for 2 sows offers Transfer, Disease or symptom, Record treatment and Add a note, and none of Farrowing's own actions."
+              "then": "A sheet titled Actions offers the everyday verb tiles Transfer, Condition, Treat and Note (More actions' grid), and none of Farrowing's own actions."
              },
              "authority": [
               {
@@ -4089,24 +4080,25 @@
              ],
              "visible": [
               {
-               "text": "2 sows",
-               "in": "sheet"
-              },
-              {
                "text": "Transfer",
                "in": "sheet"
               },
               {
-               "text": "Disease or symptom",
+               "text": "Condition",
                "in": "sheet"
               },
               {
-               "text": "Record treatment",
+               "text": "Treat",
                "in": "sheet"
               },
               {
-               "text": "Add a note",
+               "text": "Note",
                "in": "sheet"
+              },
+              {
+               "el": ".scan-actions-sheet .st-row-grid",
+               "says": "the verbs are More actions' tile grid",
+               "hard": "broken-ruling"
               },
               {
                "text": "Record abortion",
