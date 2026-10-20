@@ -50,3 +50,5 @@ Questions, in order, for a worker opening Home at the start of a shift: 1 Is any
 Cut from the Overview: phase, supporting counts, outcomes, progress labels, "All units · View task" (the Overview is all units; the tile is the tap), order numbers, walks, withdrawal as a Health fact (it shows on the row it blocks), deaths, open cases by disease, the sample date and the headline-number strip.
 
 To treat / Monitoring drawer (2026-10-19): which pig (tag), where (unit as the group, pen), how it is treated ("Hospital", "In place"), how long it waited ("1d"), what it has (condition tag). Cut: colour on every row (the title says what to do), the mark time, who marked it.
+
+How to read the board (2026-10-20): one row per mark a cell can carry, each the cell as drawn, a name and one plain line: Done, Today, Planned, Estimate, Waiting on today, Past its plan, Nothing due, Continues. The question is "what does this cell mean?", so every mark on the board has a row and nothing else does. Continues was added because the arrow had no row.

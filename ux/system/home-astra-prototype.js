@@ -399,8 +399,8 @@
       ${foot}`;
   }
   function scheduleKey(){
-    const rows=[['d12','Done','How many were recorded that day'],['o10','Today','Due today'],['p8','Planned','Exact number, already known'],['e6','Estimate','Expected: heat, returns, farrowing'],['u','Waiting on today','Known after today’s results'],['v4','Past its plan','Should have ended; carries on'],['n','Nothing due','Running, nothing to do that day']];
-    drawer('How to read the board',SentriUI.heading({title:'Tap a row to see its week in numbers',kind:'group',level:3})+SentriUI.weekBoardKey(rows),{size:'medium'});
+    const rows=[['d12','Done','How many were recorded that day'],['o10','Today','Due today'],['p8','Planned','Exact number, already known'],['e6','Estimate','Expected: heat, returns, farrowing'],['u','Waiting on today','Known after today’s results'],['v4','Past its plan','Should have ended; carries on'],['n','Nothing due','Running, nothing to do that day'],['p5>','Continues','Runs into next week, or from last']];
+    drawer('How to read the board',SentriUI.heading({title:'Tap a row to see its week in numbers',kind:'group',level:3})+SentriUI.weekBoardKey(rows),{size:'long'});
     overlay.querySelector('.sheet,.dialog')?.classList.add('schedule-key');
   }
   // A row's week in words: each day it runs, what kind of count it is, and the exact number (the cells stay short).
