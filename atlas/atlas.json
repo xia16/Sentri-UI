@@ -14628,7 +14628,7 @@
             "name": "Selection bar",
             "at": "Actions",
             "shows": "The plain count \"2 pigs selected\" and the primary Actions.",
-            "rule": "Actions is the walk's own: the task's actions and the general ones (transfer, condition, treatment, note) for the ticked pigs. Back from it returns here.",
+            "rule": "Actions is the walk's own Actions page for the ticked pigs, the one the walk's selection opens (conditions, treatment, notes, measures, feed). It has no Transfer yet, on main as here (a follow-up). Back from it returns here.",
             "source": "SentriUI.scanPage (components/Lookup); inspection-astra-concept.js actionsPage()"
            }
           ],

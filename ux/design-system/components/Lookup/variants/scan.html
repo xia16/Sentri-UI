@@ -8,7 +8,6 @@
 <div class="ph" data-state="Scanned · two units (Farrowing's sow rows)" data-demo="sows"></div>
 <div class="ph" data-state="Scanned · condition tags (Inspection's roster rows)" data-demo="pigs"></div>
 <div class="ph" data-state="Stopped · list kept" data-demo="stopped"></div>
-<div class="ph" data-state="Long tag · 12 digits" data-demo="long"></div>
 <div class="ph" data-state="Chinese · scanned" data-demo="zh"></div>
 <script>
 // Calls copied from the live screens: Farrowing's Scan ear tags (sow rows), Inspection's (the walk's roster rows), Home's.
@@ -17,8 +16,10 @@ const UI=window.SentriUI;
 const bar='<div class="statusbar" aria-hidden="true"><span>9:41</span></div>';
 const sow=(code,context,figure,word,level,checked=false)=>UI.rowSelectDoor({code,description:context,right:{kind:'state',figure,word,level},checked,action:'pick',value:code,openAction:'open',openValue:code,attrs:{'data-scan-tag':code},inputAttrs:{'aria-label':'Select '+code}});
 const pig=(code,stage,tags,checked=false)=>UI.rowSelectDoor({code,description:stage,contextWidth:'112px',right:{kind:'tags',tags},checked,action:'',value:code,openAction:'pig',openValue:code,attrs:{'data-scan-tag':code},inputAttrs:{'aria-label':'Select pig '+code}});
-const SOWS=c=>[{title:'Unit 7',rows:[sow('000431','Pen B4 · Parity 6','3 days','Overdue','act',c),sow('000418','Pen B1 · 1h ago','9 alive · 5 dead','Farrowing','live',c)]},{title:'Unit 6',rows:[sow('004318','Pen A2 · Parity 4','Tomorrow','Due','soon')]}];
-const PIGS=(t=[])=>[{title:'Unit 7',rows:[pig('000306','Gestation',[{name:'Fever',level:'act'},{name:'Appetite',level:'watch'}],t.includes('000306')),pig('000267','Gestation · 42d',[{name:'Thin',level:'watch'}],t.includes('000267')),pig('000254','Gestation · 40d',[],t.includes('000254'))]}];
+const SOWS=c=>[{title:'Unit 7',rows:[sow('000431','Pen B4 · Parity 6','3 days','Overdue','act',c),sow('000418','Pen B1','9 alive · 5 dead','Farrowing','live',c)]},{title:'Unit 6',rows:[sow('004318','Pen A2 · Parity 4','Tomorrow','Due','soon')]}];
+// One condition per pig: how a row folds several tags into "+N" is Row's (Row/variants/animal.html). The walk's own words, in English or in the registry's Chinese (Gestation 妊娠, Fever 发热, Appetite 食欲差, Thin 偏瘦).
+const W={en:{unit:'Unit 7',stage:'Gestation',fever:'Fever',appetite:'Appetite',thin:'Thin'},zh:{unit:'7单元',stage:'妊娠',fever:'发热',appetite:'食欲差',thin:'偏瘦'}};
+const PIGS=(t=[],lang='en')=>{const w=W[lang];return [{title:w.unit,rows:[pig('000306',w.stage,[{name:w.fever,level:'act'}],t.includes('000306')),pig('000267',w.stage+' · 42d',[{name:w.thin,level:'watch'}],t.includes('000267')),pig('000254',w.stage+' · 40d',[{name:w.appetite,level:'watch'}],t.includes('000254'))]}];};
 const EN={selected:n=>n+' '+(n===1?'pig':'pigs')+' selected',empty:{text:'Each pig you scan appears here.',stoppedText:'Resume scanning to add pigs.'}};
 const page=(o)=>UI.scanPage(Object.assign({title:'Scan ear tags',back:{action:'back'},selected:EN.selected,actions:{action:'actions',label:'Actions'},toggle:{action:'toggle'},empty:EN.empty,bar},o));
 const R={
@@ -27,10 +28,10 @@ const R={
  sows:()=>page({groups:SOWS(false),selected:n=>n+' '+(n===1?'sow':'sows')+' selected'}),
  pigs:()=>page({groups:PIGS()}),
  stopped:()=>page({listening:false,groups:PIGS()}),
- long:()=>page({groups:[{title:'Unit 7',rows:[pig('276000144710','Gestation · 42d',[{name:'Lame',level:'watch'},{name:'Arthritis',level:'ongoing'}]),pig('276000144719','Gestation',[])]}]}),
- zh:()=>UI.scanPage({title:'扫描耳标',back:{action:'back',label:'返回'},groups:[{title:'7单元',rows:PIGS()[0].rows}],toggle:{action:'toggle',stop:'停止扫描',resume:'继续扫描'},bar})
+ zh:()=>UI.scanPage({title:'扫描耳标',back:{action:'back',label:'返回'},groups:PIGS([],'zh'),toggle:{action:'toggle',stop:'停止扫描',resume:'继续扫描'},bar})
 };
 document.querySelectorAll('[data-state]').forEach(el=>{
  el.innerHTML=R[el.dataset.demo]();
+ UI.rowFitTags(el);   // as the walk does after it renders: tags that do not fit fold into "+N"
 });
 </script></body></html>

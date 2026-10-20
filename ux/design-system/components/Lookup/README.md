@@ -35,7 +35,7 @@ Classification: **component**. It was lifted from Farrowing's Find a sow and Sca
 ## Variants
 
 - [Find](variants/find.html): empty, results in two units, no match, a 12-digit tag, no reader (no scan icon), and Chinese.
-- [Scan](variants/scan.html): nothing scanned, no reader, sow rows in two units, condition-tag rows, stopped, a 12-digit tag, and Chinese. A row's ticked and Just scanned faces are [Row · select + door](../Row/variants/select-door.html)'s own states; the page with rows ticked is on the live screens (Farrowing's and Inspection's Scan · ticked).
+- [Scan](variants/scan.html): nothing scanned, no reader, sow rows in two units, condition-tag rows, stopped, and Chinese. A row's ticked and Just scanned faces are [Row · select + door](../Row/variants/select-door.html)'s own states; the page with rows ticked is on the live screens (Farrowing's and Inspection's Scan · ticked).
 
 ## States
 
@@ -52,12 +52,12 @@ Classification: **component**. It was lifted from Farrowing's Find a sow and Sca
 ## Behaviour
 
 - **Find** opens with the field focused. Natively the keyboard is number-first with an ABC switch for pens (iOS `numbersAndPunctuation`, Android's 123/ABC). The web field asks for plain text with no auto-capitals and no suggestions. Results follow every keystroke: tags that start with the text come first, then tags that contain it, then pens that match. A result opens that animal **in the host's context**: Farrowing opens her farrowing drawer, Inspection opens her pig record in the walk, and Home opens her pig record (owner, 2026-10-20). Back from there returns to the results with the text kept.
-- **Scan** always listens while the page is open. A repeat scan adds no second row; it lights hers again. A tick selects. Tapping the rest of the row opens her, as Find does. **Actions** belongs to the host: the task's own actions where it has them (Inspection's), plus the general ones everywhere (transfer, condition, treatment, note). Home has no task, so it offers only the general ones. Leaving and coming back keeps the list.
+- **Scan** always listens while the page is open. A repeat scan adds no second row; it lights hers again. A tick selects. Tapping the rest of the row opens her, as Find does. **Actions** belongs to the host (owner ruling: the task's own actions where it has them, plus the general ones: transfer, condition, treatment, note). Farrowing and Home show the general ones as More actions' verb grid; Inspection opens the walk's own Actions page, which has no Transfer yet (a follow-up). Leaving and coming back keeps the list.
 - **Motion**: a new row slides in at the top of its card and the rows under it glide down (280ms). A new card fades in with its heading. Reduced motion and the atlas's still frames skip the slide; the tint stays.
 
 ## Content rules
 
-- Tags are shown whole in mono, never truncated; the tag format is not fixed, so a 12-digit tag must fit (specimens). The place on the right is short ("Pen C2", "B12").
+- Tags are shown whole in mono, never truncated. The tag format is not fixed yet (owner: mock with 6-digit tags); Find's specimens include a 12-digit tag. How a row lays out a long tag beside its figure or tags is [Row](../Row/README.md)'s rule. The place on the right is short ("Pen C2", "B12").
 - Unit headings are the unit's plain name with no count and no "Other units" (owner, 2026-10-20).
 - The selected count names the context's animal: "2 sows selected", "2 pigs selected".
 
