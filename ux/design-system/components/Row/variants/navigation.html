@@ -1,15 +1,25 @@
 <div data-state="Default" id="navigation-state-0"></div>
 <div data-state="Pressed" id="navigation-state-1"></div>
-<div data-state="Long label / Chinese" id="navigation-state-3"></div>
-<div data-state="Disabled" id="navigation-state-4"></div>
+<div data-state="Current" id="navigation-state-2"></div>
+<div data-state="Count on the right" id="navigation-state-7"></div>
+<div data-state="No icon" id="navigation-state-3"></div>
+<div data-state="Edit · a saved record" id="navigation-state-4"></div>
+<div data-state="Chinese" id="navigation-state-5"></div>
+<div data-state="Disabled" id="navigation-state-6"></div>
 <script>
 // Each state renders in its own iframe in the atlas: draw only the states present.
+// Calls copied from the live screens: Workbench's unit list (current unit), Farrowing's task end (counts), Fostering's record doors (Edit).
 var UI = window.SentriUI;
+function unit(u, desc, attrs) { return SentriUI.row({"variant": "navigation", "icon": SentriIcons.icon('grid'), "title": u, "description": desc, "trail": "none", "attrs": attrs || {}, "action": "pick-unit", "value": u}); }
 var RENDER = {
   "navigation-state-0": () => SentriUI.rowGroup(SentriUI.row({"title": "Farrowing", "description": "3 sows due today · room 3", "action": "open", "value": "A02", "variant": "navigation", "wrap": true, "attrs": {}, "icon": SentriIcons.icon('farrow')})),
   "navigation-state-1": () => SentriUI.rowGroup(SentriUI.row({"title": "Farrowing", "description": "3 sows due today · room 3", "action": "open", "value": "A02", "variant": "navigation", "wrap": true, "attrs": {"data-preview": "pressed"}, "icon": SentriIcons.icon('farrow')})),
-  "navigation-state-3": () => SentriUI.rowGroup(SentriUI.row({"title": "检查待处理的母猪与仔猪记录", "description": "记录时间 09:41 · 饲养员张伟 · 长文字完整换行", "action": "open", "value": "A02", "variant": "navigation", "wrap": true, "attrs": {}, "icon": SentriIcons.icon('farrow')})),
-  "navigation-state-4": () => SentriUI.rowGroup(SentriUI.row({"title": "Farrowing", "description": "3 sows due today · room 3", "action": "open", "value": "A02", "variant": "navigation", "wrap": true, "attrs": {}, "icon": SentriIcons.icon('farrow'), "disabled": true, "reason": "Unavailable — unit is closed"}))
+  "navigation-state-2": () => SentriUI.rowGroup(unit("Unit 6", "8 pigs · 4 pens · 2 tasks", {"aria-current": "location"}) + unit("Unit 7", "12 pigs · 6 pens · No tasks")),
+  "navigation-state-7": () => SentriUI.rowGroup(SentriUI.row({"title": "Not in pig", "variant": "summary-count", "trailing": {"text": "2"}, "action": "room-task-list", "value": "notInPig"}) + SentriUI.row({"title": "Removed from batch", "variant": "summary-count", "trailing": {"text": "1"}, "action": "room-task-list", "value": "removed"})),
+  "navigation-state-3": () => SentriUI.rowGroup(SentriUI.row({"title": "Fostered in", "description": "6 piglets from 000412", "action": "open", "value": "in", "wrap": true})),
+  "navigation-state-4": () => SentriUI.rowGroup(SentriUI.row({"title": "Fostered in", "description": "6 piglets from 000412 · 09:41", "action": "open-edit", "value": "in", "wrap": true, "trail": "edit"})),
+  "navigation-state-5": () => SentriUI.rowGroup(unit("6单元", "8头猪 · 4个栏 · 2项任务", {"aria-current": "location"}) + SentriUI.row({"title": "分娩", "description": "今天3头母猪预产 · 3号产房", "action": "open", "value": "A02", "variant": "navigation", "wrap": true, "icon": SentriIcons.icon('farrow')})),
+  "navigation-state-6": () => SentriUI.rowGroup(SentriUI.row({"title": "Farrowing", "description": "3 sows due today · room 3", "action": "open", "value": "A02", "variant": "navigation", "wrap": true, "attrs": {}, "icon": SentriIcons.icon('farrow'), "disabled": true, "reason": "Unavailable — unit is closed"}))
 };
 document.querySelectorAll('[data-state]').forEach(function (s) {
   var t = RENDER[s.id] ? s : s.querySelector('[id]');

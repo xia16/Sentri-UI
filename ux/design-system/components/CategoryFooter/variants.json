@@ -14,11 +14,6 @@
       "Back pressed",
       "Scrolled"
     ],
-    "usedBy": [
-      "pig-profile.actions",
-      "inspection.actions",
-      "pig-profile.unavailable-actions",
-      "health-record.record-health"
-    ]
+    "usedBy": []
   }
 ]

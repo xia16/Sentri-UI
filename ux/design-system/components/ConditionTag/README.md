@@ -1,8 +1,8 @@
-**Status: in design.** New. It replaces Inspection's hand-built `.recorded-tag` pills (and the finding page's care block).
+**Status: agent-checked.** New. It replaces Inspection's hand-built `.recorded-tag` pills (and the finding page's care block).
 
 # ConditionTag
 
-ConditionTag names a **recorded health condition** on an animal, with its day count and its care level: `Thin · Day 3`, `Arthritis · 12 days`. Use [Status](../Status/README.md) instead for a workflow state (Active, Done, Late), [Banner](../Banner/README.md) for a message, and [TaskChips](../TaskChips/README.md) for a filter.
+ConditionTag names a **recorded health condition** on an animal, with its day count and its care level: `Thin · Day 3`, `Arthritis · 12 days`. Use [Status](../Status/README.md) instead for a workflow state (Active, Done, Late), [Banner](../Banner/README.md) for a message, and [FilterChips](../FilterChips/README.md) for a filter.
 
 ## When to use / when not
 - **Use** wherever a condition recorded on a pig is shown: the pig list, the pig profile, the finding (condition) page header.
@@ -48,7 +48,7 @@ The colours follow the Status map: green is done (resolved), amber needs attenti
 | Overflow in a line | the host folds the extra tags into `+N` (Row · animal's `rowFitTags` for compact tags) | n/a |
 
 ## Behaviour
-- `conditionTag({ name, day, care, level, careText, note, icon, variant, id, className, strs, args })`. `care` defaults to `ongoing`; `level` defaults to `monitor` when `care` is `attention`. `careText` is the care-level word, localized by the caller (default English: Monitor, Treat in place, Hospital pen, Ongoing, Resolved).
+- `conditionTag({ name, day, care, level, careText, levelText, pending, note, icon, variant, id, className, strs, args })`. `care` defaults to `ongoing`; `level` defaults to `monitor` when `care` is `attention`. `careText` is the care-level word, localized by the caller (default English: Monitor, Treat in place, Hospital pen, Ongoing, Resolved). `levelText` is the short visible word after the day for treat and hospital (default Treat, Hospital). `pending` draws a tag that will be removed on save: muted, name struck.
 - `day` is text the caller writes: `Day 3` while it needs attention, `12 days` while it is ongoing.
 - No events. A tag inside a tappable row is carried by that row's tap target (48px).
 
@@ -79,4 +79,4 @@ The colours follow the Status map: green is done (resolved), amber needs attenti
 | [Facts](../Facts/README.md) | the profile's other recorded facts |
 
 ## Classification
-**Component** (used by health-record, pig-profile and inspection.walk). `tag` and `detail` are its **variants**.
+**Component** (used by health-record, pig-profile and inspection.walk). `tag`, `detail`, `mark` and `compact` are its **variants**.
