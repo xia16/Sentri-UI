@@ -1184,14 +1184,17 @@
     let lifted=null;
     // The keyboard is the visible viewport shrinking: its full height is taken while no text field has focus, and a sheet lifts only
     // when the view has lost at least a keyboard's worth (KEYBOARD_MIN). A sheet merely below the fold (a phone lower on a study page) never moves.
-    const KEYBOARD_MIN=120,view=()=>window.visualViewport?window.visualViewport.height:window.innerHeight;let full=view();
+    // The full height only ever rises (a field left while the keyboard is still closing must not lower it); a change of width (a rotation)
+    // takes it afresh.
+    const KEYBOARD_MIN=120,view=()=>window.visualViewport?window.visualViewport.height:window.innerHeight;let full=view(),wide=window.innerWidth;
     // Where the surface rests, ignoring transforms: a drawer still rising (drawer-enter, sheet-in) or a page sliding in is measured where it will stop.
     const rest=x=>{const p=x.offsetParent;return (p?p.getBoundingClientRect().top+p.clientTop:0)+x.offsetTop+x.offsetHeight;};
     const drop=()=>{if(!lifted)return;lifted.removeAttribute('data-keyboard');lifted.style.removeProperty('--st-keyboard-lift');lifted=null;};
     const fit=()=>{
       const vv=window.visualViewport,el=document.activeElement,sheet=typed(el)?el.closest('.sheet,[data-st-keyboard-host]'):null;
       if(lifted&&(lifted!==sheet||!lifted.isConnected))drop();
-      if(!typed(el))full=view();
+      if(window.innerWidth!==wide){wide=window.innerWidth;full=view();}
+      if(!typed(el))full=Math.max(full,view());
       if(!sheet||!vv)return;
       const was=parseFloat(sheet.style.getPropertyValue('--st-keyboard-lift'))||0;
       const lift=full-vv.height<KEYBOARD_MIN?0:keyboardLift(rest(sheet),sheet.classList.contains('sheet')?was:0,vv.offsetTop+vv.height); // a sheet moves up by its lift; a host's box stays and only its padding grows
