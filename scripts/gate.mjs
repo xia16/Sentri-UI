@@ -15,7 +15,7 @@
 //                K12). Run it by hand, weekly; it posts nothing and passes nothing.
 //   --base       the base to gate against (default origin/main). Only for testing the gate itself: a run against another base posts
 //                no status, so it can never merge.
-// One gate runs at a time on a machine (a lock in the git common dir). Evidence is kept by identity in the git common dir
+// One gate runs at a time on a machine (a lock in the git common dir, taken in turn; a --verdict re-gate goes first). Evidence is kept by identity in the git common dir
 // (sentri-gate/evidence/): a rerun, or a later gate on the same main, reuses every result whose identity didn't change.
 // It judges with the base's own tools, never the candidate's: a candidate does not grade itself with its own gate. Run from a
 // checkout whose tools differ from the base (any branch, a stale main), it runs itself from a worktree of the base instead.
@@ -32,8 +32,8 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { checkVerdict, calibrationProblems, lockState, passesWithoutJudge, carryJudgements, resultsBlock } from './loop-rules.mjs';
-import { selfStart } from './process-start.mjs';
+import { checkVerdict, calibrationProblems, machinePass, carryJudgements, resultsBlock, mergeLibrary } from './loop-rules.mjs';
+import { takeTurn, waitForRuns } from './gate-queue.mjs';
 import { postStatus as post } from './github.mjs';
 import { evaluate, toolsDiffer } from './evaluate.mjs';
 import { removeWorktree } from './worktree-remove.mjs';
@@ -78,68 +78,35 @@ if (!process.env.SENTRI_GATE_TOOLS) {
 
 // ---------- one gate at a time ----------
 // Two gates on one machine starve each other's browsers into timeouts (#164), so every gate run, an audit included, and a
-// --verdict that has to gate again, holds one lock in the gate's folder for its whole run. A second gate waits; a lock whose
-// process is gone, or whose pid now belongs to another process (a reboot reuses pids), is stale and is taken over: the lock records
-// its process's start time beside the pid (scripts/process-start.mjs). The lock goes on every exit: finish, a signal, a crash.
-const lockFile = path.join(gateDir(), 'gate.lock');
-let lockedRef = null;
-const lockAs = (s) => JSON.stringify({ pid: process.pid, start: selfStart(), sha: s, ref: lockedRef, at: new Date().toISOString() });
-function releaseLock() { try { if (JSON.parse(fs.readFileSync(lockFile, 'utf8')).pid === process.pid) fs.rmSync(lockFile, { force: true }); } catch {} }
-for (const sig of ['SIGINT', 'SIGTERM', 'SIGHUP', 'SIGBREAK']) process.on(sig, () => { console.log(`\n${sig}: the gate stops`); process.exit(130); });
-async function acquireLock(ref) {
-  lockedRef = ref;
-  fs.mkdirSync(path.dirname(lockFile), { recursive: true });
-  const t0 = Date.now(), tmp = `${lockFile}.${process.pid}`;
-  let said = '';
-  for (;;) {
-    // Created whole or not at all: a hard link to a finished file, so a reader never sees half a lock.
-    fs.writeFileSync(tmp, lockAs(sha(ref)));
-    try { fs.linkSync(tmp, lockFile); fs.rmSync(tmp, { force: true }); break; } catch (e) { fs.rmSync(tmp, { force: true }); if (e.code !== 'EEXIST') throw e; }
-    let raw, lock = null;
-    try { raw = fs.readFileSync(lockFile, 'utf8'); } catch { continue; } // released between the two calls
-    try { lock = JSON.parse(raw); } catch {}
-    if (!lock || lock.pid === process.pid || lockState(lock) === 'stale') {
-      // Only the stale lock read above is removed, never one another gate has taken since.
-      try { if (fs.readFileSync(lockFile, 'utf8') === raw) { fs.rmSync(lockFile); console.log(`taking over a stale gate lock: pid ${lock?.pid ?? '?'} (the gate on ${short(lock?.sha)}) is gone, or its pid is another process now`); } } catch {}
-      continue;
-    }
-    const line = `waiting for the gate on ${short(lock.sha)} (pid ${lock.pid}) …`;
-    if (line !== said) { console.log(line); said = line; }
-    await new Promise((res) => setTimeout(res, 5000));
-  }
-  process.on('exit', releaseLock);
+// --verdict that has to gate again, holds one lock in the gate's folder for its whole run. Gates take it in turn
+// (scripts/gate-queue.mjs): first come, first served, except that a --verdict re-gate goes ahead of ordinary gates. A lock or
+// ticket whose process is gone, or whose pid now belongs to another process (a reboot reuses pids), is stale and dropped. The lock
+// goes on every exit: finish, a signal, a crash.
+let turn = null;
+for (const sig of ['SIGINT', 'SIGTERM', 'SIGHUP', 'SIGBREAK']) process.on(sig, () => { console.log(`
+${sig}: the gate stops`); process.exit(130); });
+async function acquireLock(ref, priority) {
+  turn = await takeTurn(gateDir(), { ref, sha: sha(ref), priority });
   // The gate's own checks open browsers without waiting on it (scripts/playwright-path.mjs); every other browser run from this
-  // repo registered in sentri-gate/runs/ is waited for, and a new one waits for the gate.
+  // repo registered in sentri-gate/runs/ is waited for while it works, and a new one waits for the gate.
   process.env.SENTRI_GATE_PID = String(process.pid);
-  const runs = path.join(gateDir(), 'runs');
-  for (said = ''; ;) {
-    const live = [];
-    for (const f of (fs.existsSync(runs) ? fs.readdirSync(runs) : []).filter((x) => x.endsWith('.json'))) {
-      let r = null;
-      try { r = JSON.parse(fs.readFileSync(path.join(runs, f), 'utf8')); } catch {}
-      if (r && lockState(r) === 'held' && r.pid !== process.pid) live.push(r); else fs.rmSync(path.join(runs, f), { force: true });
-    }
-    if (!live.length) break;
-    const line = `waiting for ${live.length} other browser run(s) from this repo: ${live.slice(0, 3).map((r) => `pid ${r.pid} ${r.what || ''}`.trim()).join('; ')} …`;
-    if (line !== said) { console.log(line); said = line; }
-    await new Promise((res) => setTimeout(res, 5000));
-  }
-  return Math.round((Date.now() - t0) / 1000);
+  await waitForRuns(gateDir());
+  return turn.waited;
 }
 
 // One mechanical gate run, under the lock: evaluate(), then mechanical.json. A change that moves no screen has nothing to judge, so
 // its pass is the gate pass: it posts the sentri/gate status (which branch protection on main requires). A run starts by posting
 // "pending", so an earlier pass on the same commit never stands for this run, and ends with "failure" when it fails or blocks. Never
 // for a run against a test base or an audit.
-async function runGate({ ref, base, out, mode, scope, audit = false, keep = false }) {
+async function runGate({ ref, base, out, mode, scope, audit = false, keep = false, priority = false }) {
   fs.mkdirSync(out, { recursive: true });
   // A rerun into the same folder starts clean: old shots, pairs and verdicts are about a mechanical run that no longer exists.
   for (const f of ['shots', 'pairs', 'leaves', 'scenarios', 'npm-test.log', 'mechanical.json', ...fs.readdirSync(out).filter((f) => VERDICT_FILE.test(f))]) fs.rmSync(path.join(out, f), { recursive: true, force: true });
-  const waited = await acquireLock(ref);
+  const waited = await acquireLock(ref, priority);
   const env = { ...process.env, ...(pwPath ? { SENTRI_PLAYWRIGHT: pwPath } : {}) };
   git(['fetch', '-q', 'origin']);
   const candidate = sha(ref);
-  if (candidate) { const tmp = `${lockFile}.${process.pid}`; fs.writeFileSync(tmp, lockAs(candidate)); try { fs.renameSync(tmp, lockFile); } catch { fs.rmSync(tmp, { force: true }); } } // the lock names what it gates
+  if (candidate) turn.relabel(candidate); // the lock names what it gates
   if (candidate && !audit) postStatus(candidate, 'pending', `gate running against ${short(sha(base))}`); // an earlier pass for this commit no longer stands
   let res;
   try {
@@ -149,13 +116,13 @@ async function runGate({ ref, base, out, mode, scope, audit = false, keep = fals
     res = { outcome: 'blocked', mech: { outcome: 'blocked', pass: false, ref, mode, scope, class: {}, blocked: [`the gate crashed: ${String(e.message || e).split('\n')[0]}`], checks: [], gaps: [], pairs: [] } };
   }
   const mech = { ...res.mech, waited: waited + 's', testBase: testBase || undefined };
-  if (!testBase && !audit && passesWithoutJudge(mech)) {
+  if (!testBase && !audit && machinePass(mech)) {
     mech.gatePass = true;
-    const posted = postStatus(mech.candidate, 'success', `GATE PASS against ${short(mech.base)} · no screen moved`);
+    const moved = ['diff', 'new', 'gone'].reduce((n, k) => n + mech.screens[k].length, 0);
+    const posted = postStatus(mech.candidate, 'success', `GATE PASS against ${short(mech.base)} · ${moved ? `${moved} screen(s) moved; machine checks only (the owner approved the design)` : 'no screen moved'}`);
     if (!posted.ok) console.log(`  - the sentri/gate status was not posted (${posted.why}): gate again; until then GitHub refuses the merge`);
   } else if (!testBase && !audit && mech.candidate) {
-    const failed = mech.outcome !== 'pass';
-    postStatus(mech.candidate, failed ? 'failure' : 'pending', failed ? `MECHANICAL ${String(mech.outcome).toUpperCase()} against ${short(mech.base)}` : `mechanical pass against ${short(mech.base)}: waiting for the judge's verdict`);
+    postStatus(mech.candidate, 'failure', `MECHANICAL ${String(mech.outcome).toUpperCase()} against ${short(mech.base)}`);
   }
   fs.writeFileSync(path.join(out, 'mechanical.json'), JSON.stringify(mech, null, 2));
   // the PR's Results block (gate-simplify.md S8): the gate's own measurements, pasted whole into the PR body
@@ -166,11 +133,12 @@ async function runGate({ ref, base, out, mode, scope, audit = false, keep = fals
   const word = (audit ? { pass: 'AUDIT PASS', fail: 'AUDIT FAIL', blocked: 'AUDIT BLOCKED' } : { pass: 'MECHANICAL PASS', fail: 'MECHANICAL FAIL', blocked: 'MECHANICAL BLOCKED' })[mech.outcome] || 'MECHANICAL FAIL';
   console.log(`${word} ${short(mech.candidate)} on base ${short(mech.base)} (${mech.class?.effective || '?'}, ${mode}) — ${out}`);
   for (const b of mech.blocked || []) console.log('  blocked:', b);
-  if (mech.gatePass) console.log(`GATE PASS (no screen moved, so no judge): gh pr merge <n> --squash --match-head-commit ${mech.candidate}`);
+  if (mech.gatePass) console.log(`GATE PASS (machine checks; the owner's "PR it" approved the design): gh pr merge <n> --squash --match-head-commit ${mech.candidate}`);
   return mech;
 }
 
-// ---------- --verdict <out>: check the judge's verdict against the mechanical result ----------
+// ---------- --verdict <out>: advice only. Check an optional judge's verdict against the mechanical result ----------
+// Owner ruling (2026-10-20): the judge no longer holds a merge, so --verdict posts no status; the machine's pass is the gate.
 if (opt('verdict')) {
   let dir = opt('verdict');
   const readIn = (d, f) => { try { return JSON.parse(fs.readFileSync(path.join(d, f), 'utf8')); } catch (e) { console.log(`GATE FAIL — ${path.join(d, f)}: ${e.message.split('\n')[0]}`); process.exit(1); } };
@@ -190,7 +158,7 @@ if (opt('verdict')) {
   if (head !== mech.candidate || main !== mech.base) {
     console.log(`${mech.ref} is ${short(head)} and ${mainRef} is ${short(main)} since the gate ran on ${short(mech.candidate)} against ${short(mech.base)}: gating again, reusing every result and judgement whose identity is unchanged`);
     const again = path.join(dir, `regate-${short(head)}-${short(main)}`);
-    const now = await runGate({ ref: mech.ref, base: mainRef, out: again, mode: mech.mode, scope: mech.scope });
+    const now = await runGate({ ref: mech.ref, base: mainRef, out: again, mode: mech.mode, scope: mech.scope, priority: true });
     if (now.outcome !== 'pass') { console.log(`GATE FAIL ${short(now.candidate)}\n  - the mechanical gate on the new head and main: ${now.outcome}${(now.blocked || [])[0] ? ` (${now.blocked[0]})` : ''}`); process.exit(1); }
     const { carried, need, goneNeed, walkNeed = [], problems: refused } = carryJudgements({ mech, parts }, now);
     if (refused.length) { console.log(`GATE FAIL ${short(now.candidate)}: the judged run's verdicts can't be carried`); for (const p of refused) console.log('  -', p); process.exit(1); }
@@ -211,7 +179,7 @@ if (opt('verdict')) {
   // Each part's pass is about its own pairs: no worse or failed pair, no defect, no failed walk, no contradicted claim. "At least
   // one pair better" is the whole change's, which checkVerdict applies over every part's pairs together (G13): a part that is all
   // "same", or all new screens, passes on its own.
-  const verdict = { ...parts[0], pass: parts.every((p) => p.pass === true), pairs: cat('pairs'), walk: cat('walk'), defects: cat('defects'), gone: cat('gone'), rejected: cat('rejected'), contradicted: cat('contradicted') };
+  const verdict = { ...parts[0], pass: parts.every((p) => p.pass === true), pairs: cat('pairs'), walk: cat('walk'), defects: cat('defects'), gone: cat('gone'), rejected: cat('rejected'), contradicted: cat('contradicted'), library: mergeLibrary(parts) };
   for (const p of parts) if (p.candidate !== verdict.candidate || p.base !== verdict.base) verdict.candidate = 'mixed verdicts';
   const v = checkVerdict(verdict, mech);
   // a screen whose walk could not carry (same picture, changed inputs) needs a walk in this verdict
@@ -230,9 +198,7 @@ if (opt('verdict')) {
   // The merge names the gated commit, so GitHub refuses it if the PR head has moved since.
   // The same result as a commit status on GitHub: branch protection on main can require "sentri/gate", which makes GitHub itself
   // refuse an ungated merge however it is attempted (the local merge guard is only a convenience).
-  const posted = postStatus(mech.candidate, ok ? 'success' : 'failure', `${ok ? 'GATE PASS' : 'GATE FAIL'} against ${short(mech.base)}`);
-  if (!posted.ok) console.log(`  - the sentri/gate status was not posted (${posted.why}): run --verdict again; until then GitHub ${ok ? 'refuses the merge' : 'may still show an earlier status'}`);
-  if (!testBase && ok) console.log(`merge: gh pr merge <n> --squash --match-head-commit ${mech.candidate}`);
+  console.log('  (advice only: the judge does not hold the merge; sentri/gate is the machine\'s result)');
   process.exit(ok ? 0 : 1);
 }
 

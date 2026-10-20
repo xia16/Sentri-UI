@@ -295,3 +295,23 @@ Scope: the everyday verb grid of the Actions drawer (`pig-profile.actions`, and 
 ## Self-crit
 
 - **Better because** four or five verbs read as one line of choices, with no half-empty second row; six and more keep two even rows.
+
+# Chinese pass (PR 244), critique
+
+Scope: the words only. At `?lang=zh` these screens read in English where the Inspection prototype draws them: the pig record (Current tasks, General details, Sow cycle, Feeding's View plan, the record links), Production stats, Origin (its facts, dates and identities), the pig log, the measure, batch-membership and abortion sheets, Unavailable actions, and the embedded Not in pig sheet. Nothing is added, moved or cut in EN.
+
+## Keep
+
+- Every surface, row, order, weight and colour as it is: the change replaces English words with Chinese in the same place, in the same component, at the same weight.
+- EN exactly as it is.
+- Ear tags, pen codes, medicine and brand names, the worker's name, RFID, record numbers and the units mL and °C stay in Latin script; kg reads 公斤 (as on main) and mm reads 毫米.
+
+## Problems
+
+- **major** · At ZH 360 the parts above read in English beside Chinese, so a Chinese-reading worker reads two languages on one screen (P2: read in two seconds).
+- **minor** · Dates read in English forms (`1 Aug 2026`, `Aug 1`, `Thu`) and day counts as `40d`.
+- **minor** · Copy that is longer in Chinese has to fit its component at 360 (a pen-map tile holds four characters: `Not in unit` reads 非本单元).
+
+## Attention budget
+
+Unchanged: each screen shows the same information in the same order as on main, in Chinese. Cut list: nothing is cut.

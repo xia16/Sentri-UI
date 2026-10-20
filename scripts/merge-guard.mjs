@@ -6,13 +6,13 @@
 // A convenience, not a security boundary: a command line can always be spelled past a hook. The boundary is GitHub's branch
 // protection requiring the gate's `sentri/gate` status. So this is an allowlist, and it fails closed:
 //   merge: exactly  gh pr merge <n> [-R owner/repo] --squash [--delete-branch] --match-head-commit <40-hex sha>
-//   push:  each push exactly  git push [-q] [-u|--set-upstream] origin <branch>   (a named branch that isn't main)
+//   push:  each git push it runs exactly  git push [-q] [-u|--set-upstream] origin <branch>   (a named branch that isn't main)
 //          or, to delete a finished or stale branch (2026-10-20),  git push origin --delete <branch>   (one named branch, never main)
 //   auto-merge: never.
 //   worktrees: removed only through  node scripts/worktree-remove.mjs <dir>  (git deletes through a node_modules junction on Windows
 //              and empties the main checkout's), and node_modules is never linked into one (SENTRI_PLAYWRIGHT finds Playwright).
 
-const block = (why) => { console.error(`merge guard: ${why}\nMerges run only behind GATE PASS (docs/design-workflow/briefs/gate.md): node scripts/gate.mjs --verdict <out>, then, as a command of its own:\n  gh pr merge <n> --squash --match-head-commit <sha>\nPushes name their branch: git push origin <branch>.`); process.exit(2); };
+const block = (why) => { console.error(`merge guard: ${why}\nMerges run only behind a green sentri/gate (the machine gate: node scripts/gate.mjs --candidate <ref>), then, as a command of its own:\n  gh pr merge <n> --squash --match-head-commit <sha>\nPushes name their branch: git push origin <branch>.`); process.exit(2); };
 process.on('uncaughtException', (e) => block(`the guard failed (${e.message}), so it blocks`));
 
 let input = '';
@@ -35,15 +35,67 @@ const prSub = [...plain.matchAll(/\bgh\s+pr\s+(\S+)/gi)].map((m) => m[1]);
 const isMerge = prSub.some((s) => !SAFE_PR.test(s))
   || /pulls\/\d+\/merge|\/merges\b|mergePullRequest|PullRequestAutoMerge|auto-merge|git\/refs/i.test(plain);
 
-// Pushes: every push segment must name a branch that isn't main; a command that pushes may not switch to main first.
-if (/\bpush\b/i.test(plain) && /\bgit\b/i.test(plain)) {
-  const segs = plain.split(/;|&&|\|\||\||&|\r?\n/).map((s) => s.trim()).filter((s) => /\bpush\b/i.test(s));
-  for (const seg of segs) {
-    const m = seg.match(/^git push(?: -q| --quiet)?(?: -u| --set-upstream)? origin ([\w./][\w./-]*)$/) || seg.match(/^git push origin (?:--delete|-d) ([\w./][\w./-]*)$/);
-    if (!m || /^(main|master|HEAD)$/i.test(m[1]) || m[1].includes(':')) block(`a push must be one plain "git push origin <branch>", or "git push origin --delete <branch>", naming a branch that isn't main: "${seg}"`);
+// Pushes: every push must name a branch that isn't main; a command that pushes may not switch to main first.
+// Only what runs as `git push` counts (2026-10-20): the word in a grep, a script, a message or a heredoc body is not a push, but a
+// string or heredoc handed to a shell (bash -c "…", bash <<EOF, cmd /c "…") is read as commands too.
+const LAUNCHER = /(?:^|[\s;&|(){}/\\])(?:(?:(?:ba|z|da)?sh|pwsh|powershell|cmd)(?:\.exe)?(?:\s+[-/][\w-]+)*|eval|iex|Invoke-Expression)\s*$/i;
+const STR = '\x01'; // what a quoted string becomes: never a branch name, never a command
+const segments = (src, depth = 0) => {
+  const nested = [], lines = String(src).split('\n'), kept = [];
+  // Heredoc and PowerShell here-string bodies are data unless a shell reads them.
+  for (let k = 0; k < lines.length; k++) {
+    const line = lines[k], here = /@(['"])\s*$/.exec(line);
+    if (here) {
+      let e = k + 1;
+      while (e < lines.length && !lines[e].trimStart().startsWith(`${here[1]}@`)) e++;
+      kept.push(line.slice(0, here.index) + STR + (e < lines.length ? lines[e].trimStart().slice(2) : ''));
+      k = e; continue;
+    }
+    kept.push(line);
+    for (const h of line.matchAll(/(?<!<)<<(?!<)-?\s*(['"]?)([\w.-]+)\1/g)) {
+      const body = [];
+      for (k++; k < lines.length && lines[k].trim() !== h[2]; k++) body.push(lines[k]);
+      if (LAUNCHER.test(line.slice(0, h.index))) nested.push(body.join('\n'));
+    }
   }
-  if (/\b(checkout|switch)\b[^;&|\n]*\b(main|master)\b/i.test(plain)) block('a command that pushes may not switch to main');
+  // Quoted strings become one placeholder (a bare word in quotes is just that word); escapes and comments go.
+  const s = kept.join('\n');
+  let out = '';
+  const str = (body) => {
+    if (LAUNCHER.test(out)) { nested.push(body); return STR; }
+    if (/(?:^|[\\/])git(?:\.exe)?$/i.test(body)) return 'git';
+    return /^[^\s;&|()<>{}`#$"'\\]*$/.test(body) ? body : STR;
+  };
+  for (let i = 0; i < s.length;) {
+    const c = s[i];
+    if (c === "'") { const e = s.indexOf("'", i + 1); if (e < 0) { i++; continue; } out += str(s.slice(i + 1, e)); i = e + 1; }
+    else if (c === '"') { let e = i + 1; while (e < s.length && s[e] !== '"') e += s[e] === '\\' || s[e] === '`' ? 2 : 1; out += str(s.slice(i + 1, e)); i = e + 1; }
+    else if (c === '\\' || c === '`') { const n = /^\r?\n/.exec(s.slice(i + 1)); out += n ? ' ' : c === '\\' ? (s[i + 1] ?? '') : ''; i += n ? 1 + n[0].length : c === '\\' ? 2 : 1; }
+    else if (c === '^') i++;
+    else if (c === '#' && (i === 0 || /\s/.test(s[i - 1]))) { while (i < s.length && s[i] !== '\n') i++; }
+    else { out += c; i++; }
+  }
+  const segs = out.split(/;|&&|\|\||\||&|\n|[(){}]/).map((g) => g.replace(/\.exe\b/gi, '').replace(/\s+/g, ' ').trim()
+    .replace(/^(?:(?:[A-Za-z_]\w*=\S*|if|then|else|elif|do|while|until|time|exec|command|env|sudo|nohup|xargs|!) )+/, ''));
+  if (depth < 4) for (const n of nested) segs.push(...segments(n, depth + 1));
+  return segs;
+};
+// A git command's subcommand, after any global options (-C <dir>, -c <k=v>, --git-dir=…).
+const GIT_ARG = /^(?:-C|-c|--git-dir|--work-tree|--namespace|--exec-path|--config-env|--super-prefix|--attr-source)$/;
+const gitCmd = (seg) => {
+  const t = seg.split(' ');
+  if (!/^(?:\S*\/)?git$/i.test(t[0])) return null;
+  let k = 1, opts = false;
+  while (k < t.length && t[k].startsWith('-')) { opts = true; k += GIT_ARG.test(t[k]) ? 2 : 1; }
+  return { seg, sub: (t[k] || '').toLowerCase(), opts, args: t.slice(k + 1) };
+};
+const gits = segments(cmd).map(gitCmd).filter(Boolean);
+const pushes = gits.filter((g) => g.sub === 'push');
+for (const { seg, opts } of pushes) {
+  const m = !opts && (seg.match(/^git push(?: -q| --quiet)?(?: -u| --set-upstream)? origin ([\w./][\w./-]*)$/) || seg.match(/^git push origin (?:--delete|-d) ([\w./][\w./-]*)$/));
+  if (!m || /^(main|master|HEAD)$/i.test(m[1])) block(`a push must be one plain "git push origin <branch>", or "git push origin --delete <branch>", naming a branch that isn't main: "${seg.replaceAll(STR, '"…"')}"`);
 }
+if (pushes.length && gits.some((g) => /^(checkout|switch)$/.test(g.sub) && g.args.some((a) => /^(main|master)$/i.test(a)))) block('a command that pushes may not switch to main');
 if (!isMerge) process.exit(0);
 
 const m = cmd.trim().match(/^gh pr merge (\d+)(?: (?:-R|--repo) [\w.-]+\/[\w.-]+)? --squash(?: --delete-branch)? --match-head-commit ([0-9a-f]{40})$/);

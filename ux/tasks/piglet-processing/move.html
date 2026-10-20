@@ -106,12 +106,15 @@ html.atlas-bare:root, html.atlas-bare:root body, html.atlas-bare:root .atlas-pho
   if (S.n == null) S.n = 1;
   /* The draft on this phone (like the dead and count drafts): kept on every change in sessionStorage, so phone Back and reopening
      bring it back; dropped by Clear and by Save. A state that shows a link (loss line, explain) or a fixed draft holds none. */
-  var DRAFTABLE = function () { return name === 'move' && !S.explains && !S.fromLoss && !qs.get('q'); };
+  var DRAFTABLE = function () { return STATES[name].view === 'move' && !S.explains && !S.fromLoss && !qs.get('q'); };
   var DKEY = function () { return 'pp-move-draft:' + store.name + ':' + S.face; };
+  /* A design state that opens on a fixed draft (move-tagged, move-review…) keeps nothing until the worker changes something (S.touched);
+     while the crate list is open over a chosen crate (S.picking), the crate that was chosen is the draft (leaving by ✕ or the scrim keeps it). */
   function keep() {
-    if (!DRAFTABLE() || S.saved) return;
+    if (!DRAFTABLE() || S.saved || (name !== 'move' && !S.touched)) return;
+    var P0 = S.picking && S.prev ? S.prev : null;
     try {
-      if (draftExists()) sessionStorage.setItem(DKEY(), JSON.stringify({ other: S.other || '', n: S.n, rows: S.rows, untagged: S.untagged, answers: S.answers, dir: S.dir, query: S.query || '' }));
+      if (P0 || draftExists()) sessionStorage.setItem(DKEY(), JSON.stringify({ other: P0 ? P0.other : S.other || '', n: S.n, rows: P0 ? P0.rows : S.rows, untagged: P0 ? P0.untagged : S.untagged, answers: P0 ? P0.answers : S.answers, dir: S.dir, query: P0 ? '' : S.query || '' }));
       else sessionStorage.removeItem(DKEY());
     } catch (e) {}
   }
@@ -543,17 +546,22 @@ html.atlas-bare:root, html.atlas-bare:root body, html.atlas-bare:root .atlas-pho
     if (!b) return;
     var a = b.dataset.action, v = b.dataset.value;
     if (a !== 'save-move') S.why = false;                      // any other act takes the answered reason away
+    if (a !== 'back' && a !== 'dismiss') S.touched = true;
     if (a === 'pick-row' || a === 'pair-loss') v = b.value;  // a multi row's checkbox carries its id as value
     if (a === 'pick-crate') {
-      S.other = v; S.query = ''; S.scanned = ''; S.rows = []; S.untagged = 0; S.answers = {}; S.closesLoss = !!S.fromLoss;   // opened from a loss line (R3-3): "this is the missing piglet" stays ticked
+      S.other = v; S.query = ''; S.scanned = ''; S.picking = false; S.prev = null; S.rows = []; S.untagged = 0; S.answers = {}; S.closesLoss = !!S.fromLoss;   // opened from a loss line (R3-3): "this is the missing piglet" stays ticked
       // explaining a gain from a tagged source: the stray starts as untagged (a tag, if it has one, is picked instead)
       if (gainOnly() && S.dir === 'in' && hasRows(v)) S.untagged = Math.min(S.n, remainder(v));
       // opened from a loss line (R3-3): the missing piglet is untagged unless its tag is picked, so the Move already counts it
       if (S.fromLoss && S.dir === 'out' && hasRows(S.face)) S.untagged = Math.min(S.n, remainder(S.face));
       render();
     }
-    else if (a === 'change-crate') { if (S.explains && !gainOnly()) return; S.other = ''; S.rows = []; S.untagged = 0; S.answers = {}; S.closesLoss = !!S.fromLoss; render(); }
-    else if (a === 'dir') { if (S.dir !== v) { S.dir = v; S.rows = []; S.untagged = 0; S.answers = {}; S.closesLoss = !!S.fromLoss && v === 'out'; } render(); }
+    else if (a === 'change-crate') {
+      if (S.explains && !gainOnly()) return;
+      // the crate list opens one level above the form: Back returns to the form with this choice (the ticks, the answers) as it was
+      S.prev = { other: S.other, rows: S.rows, untagged: S.untagged, answers: S.answers, closesLoss: S.closesLoss }; S.picking = true;
+      S.other = ''; S.rows = []; S.untagged = 0; S.answers = {}; S.closesLoss = !!S.fromLoss; render(); }
+    else if (a === 'dir') { if (S.dir !== v) { S.picking = false; S.prev = null; S.dir = v; S.rows = []; S.untagged = 0; S.answers = {}; S.closesLoss = !!S.fromLoss && v === 'out'; } render(); }
     else if (a === 'step') {
       if (b.getAttribute('aria-disabled') === 'true') return;
       var k = b.dataset.value, st = +b.dataset.step;
@@ -569,6 +577,12 @@ html.atlas-bare:root, html.atlas-bare:root body, html.atlas-bare:root .atlas-pho
     else if (a === 'answer') { var p = v.split(':'); S.answers[p[0]] = p[1]; render(); }
     else if (a === 'clear') { if (b.getAttribute('aria-disabled') === 'true') return; var keep = { view: 'move', face: S.face }; S = Object.assign(JSON.parse(DEFAULT), keep); render(); }   // Clear also drops an explaining link
     // Back, the ✕ and the scrim leave for the litter drawer the Move was opened from (the one Back).
+    else if (a === 'back' && S.picking && S.prev) {
+      var pv = S.prev, ticked = S.rows.length || S.untagged;
+      S.other = pv.other; S.query = ''; S.scanned = ''; S.picking = false; S.prev = null;
+      if (!ticked) { S.rows = pv.rows; S.untagged = pv.untagged; S.answers = pv.answers; S.closesLoss = pv.closesLoss; }
+      render();
+    }
     else if (a === 'back' || a === 'dismiss') { location.href = litterHref(S.face); }
     // a tap on a waiting Move says why: the reason line appears above the footer and is announced
     else if (a === 'save-move') {
@@ -581,7 +595,7 @@ html.atlas-bare:root, html.atlas-bare:root body, html.atlas-bare:root .atlas-pho
   // Find a crate (R1-5): typing filters the list in place (the field keeps focus); Enter picks the one crate that can take part.
   document.getElementById('screen').addEventListener('input', function (ev) {
     if (ev.target.dataset.role !== 'crate-q') return;
-    S.query = ev.target.value; S.scanned = '';
+    S.query = ev.target.value; S.scanned = ''; S.touched = true;
     var r = document.getElementById('mv-results'); if (r) { r.innerHTML = crateLists(); PP.apply(r); }
   });
   document.getElementById('screen').addEventListener('keydown', function (ev) {
@@ -596,7 +610,7 @@ html.atlas-bare:root, html.atlas-bare:root body, html.atlas-bare:root .atlas-pho
     store = PP.open(S.data || 'base', STATES[name].view === 'receipt' ? { fresh: true } : null);     // a receipt state saves for real, from a clean log, and lands in the drawer
     CFG = store.config; TODAY = store.today; UNIT = L(S.face).room;
     var restored = restore();
-    if (S.allRows) S.rows = liveRows(S.face).map(function (r) { return r.rowId; });
+    if (S.allRows && !restored) S.rows = liveRows(S.face).map(function (r) { return r.rowId; });
     // A count on a source with tagged piglets is the untagged ones (the rest are picked by their tags).
     if (!restored && S.other && hasRows(source()) && !S.rows.length && S.n) S.untagged = Math.min(S.n, remainder(source()));
     if (qs.get('q') && S.view === 'move') S.query = qs.get('q');

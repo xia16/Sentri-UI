@@ -900,8 +900,19 @@
           "workbench.quiet-section",
           "workbench.all-quiet",
           "workbench.work-waiting",
-          "workbench.closed-today",
-          "workbench.to-treat"
+          "workbench.closed-today"
+         ]
+        ],
+        [
+         "To treat / Monitoring",
+         [
+          "workbench.to-treat",
+          "workbench.to-treat-many",
+          "workbench.to-treat-filter",
+          "workbench.to-treat-condition",
+          "workbench.to-treat-scanned",
+          "workbench.to-treat-none",
+          "workbench.monitoring"
          ]
         ],
         [
@@ -1048,6 +1059,26 @@
          "workbench.gestation",
          "workbench.to-treat",
          "tap To treat"
+        ],
+        [
+         "workbench.gestation",
+         "workbench.monitoring",
+         "tap Monitoring"
+        ],
+        [
+         "workbench.to-treat-many",
+         "workbench.to-treat-filter",
+         "tap Filter pigs"
+        ],
+        [
+         "workbench.to-treat-filter",
+         "workbench.to-treat-condition",
+         "tap Any condition"
+        ],
+        [
+         "workbench.to-treat",
+         "workbench.to-treat-scanned",
+         "tap Scan ear tag"
         ]
        ],
        "screens": [
@@ -2539,21 +2570,223 @@
         },
         {
          "id": "workbench.to-treat",
-         "name": "Overview · to treat",
-         "zh": "总览 · 待治疗",
+         "name": "To treat",
+         "zh": "待治疗",
          "status": "in-design",
          "url": "/ux/system/home-astra-prototype.html?section=gestation&sheet=treat",
          "preset": "",
          "figma": "",
          "notes": {
-          "purpose": "Tapping To treat on the Overview: every pig marked to treat across the section's units, unit by unit (owner, 2026-10-19). Monitoring opens the same list for the pigs marked Monitor.",
+          "purpose": "Tapping To treat on the Overview: a page listing every pig marked to treat across the section's units (owner, 2026-10-20: a list with filters that holds up at 100 pigs; \"everything goes inside the filter, search bar at top, flat list\").",
           "states": [],
           "elements": [
            {
+            "name": "Search and filter",
+            "shows": "The search field (ear tag or pen) with Scan ear tag inside it, and the filter button, held at the top while the list scrolls",
+            "logic": "Typing narrows the list at once: a tag as typed, or a pen code across units. A scan fills the field with the tag read (search and scan go together, owner 2026-10-20). Every facet (unit, care, condition) is in the filter; the button carries the number applied.",
+            "source": "markedPage()"
+           },
+           {
             "name": "Marked pigs, one card per unit",
-            "shows": "A plain \"Unit 7\" section heading over one card of its pigs (the same unit heading as Farrowing's Find a sow and Scan ear tags): tag over \"Pen B2 · Hospital · 1d\", the condition as a plain tag on the right",
-            "logic": "Row · Animal with tags. No row is coloured: the title already says what to do. \"Hospital\" or \"In place\" is how the pig is treated; \"1d\" marks a pig waiting since yesterday. A pig opens its unit's walk on the Health lens; Back from there reopens this drawer (Monitoring likewise).",
-            "source": "markedList()"
+            "shows": "A plain \"Unit 7\" section heading over one card of its pigs in walking order (the same unit heading as Farrowing's Find a sow and Scan ear tags): tag over \"Pen B2 · Hospital · 1d\", the condition as a plain tag on the right",
+            "logic": "Row · Animal with tags. No row is coloured: the title already says what to do. \"Hospital\" or \"In place\" is how the pig is treated; \"1d\" marks a pig waiting since yesterday. A pig opens its unit's walk on the Health lens; Back from there reopens this list.",
+            "source": "markedPage()"
+           }
+          ],
+          "controls": [],
+          "copy": [
+           "(raw)"
+          ],
+          "edge": [],
+          "rules": [],
+          "issues": []
+         }
+        },
+        {
+         "id": "workbench.to-treat-many",
+         "name": "To treat · 104 pigs",
+         "zh": "待治疗 · 104 头",
+         "status": "in-design",
+         "url": "/ux/system/home-astra-prototype.html?section=gestation&sheet=treat&marked=many",
+         "preset": "",
+         "figma": "",
+         "notes": {
+          "purpose": "A heavy day: 104 pigs to treat across Units 7–9. The list keeps today's rows; search and the filter narrow it.",
+          "states": [],
+          "elements": [
+           {
+            "name": "Search and filter",
+            "shows": "The search field (ear tag or pen) with Scan ear tag inside it, and the filter button, held at the top while the list scrolls",
+            "logic": "Typing narrows the list at once: a tag as typed, or a pen code across units. A scan fills the field with the tag read (search and scan go together, owner 2026-10-20). Every facet (unit, care, condition) is in the filter; the button carries the number applied.",
+            "source": "markedPage()"
+           },
+           {
+            "name": "Marked pigs, one card per unit",
+            "shows": "A plain \"Unit 7\" section heading over one card of its pigs in walking order (the same unit heading as Farrowing's Find a sow and Scan ear tags): tag over \"Pen B2 · Hospital · 1d\", the condition as a plain tag on the right",
+            "logic": "Row · Animal with tags. No row is coloured: the title already says what to do. \"Hospital\" or \"In place\" is how the pig is treated; \"1d\" marks a pig waiting since yesterday. A pig opens its unit's walk on the Health lens; Back from there reopens this list.",
+            "source": "markedPage()"
+           }
+          ],
+          "controls": [],
+          "copy": [
+           "(raw)"
+          ],
+          "edge": [],
+          "rules": [],
+          "issues": []
+         }
+        },
+        {
+         "id": "workbench.to-treat-filter",
+         "name": "To treat · filter",
+         "zh": "待治疗 · 筛选",
+         "status": "in-design",
+         "url": "/ux/system/home-astra-prototype.html?section=gestation&sheet=treat&marked=many",
+         "preset": "",
+         "steps": [
+          "Filter pigs"
+         ],
+         "figma": "",
+         "notes": {
+          "purpose": "The filter: unit (when the list spans more than one), care, and the condition. \"Show N pigs\" applies it; Reset appears once a facet is set.",
+          "states": [],
+          "elements": [
+           {
+            "name": "Filter pigs",
+            "shows": "Unit · Care as facets, Condition as a picker, Back and \"Show 104 pigs\"",
+            "logic": "FilterSheet. Monitoring has no care facet: a mark to watch has none. No waiting facet (owner, 2026-10-20): \"1d\" on the row is enough.",
+            "source": "markedPage()"
+           }
+          ],
+          "controls": [],
+          "copy": [
+           "(raw)"
+          ],
+          "edge": [],
+          "rules": [],
+          "issues": []
+         }
+        },
+        {
+         "id": "workbench.to-treat-condition",
+         "name": "To treat · condition",
+         "zh": "待治疗 · 病症",
+         "status": "in-design",
+         "url": "/ux/system/home-astra-prototype.html?section=gestation&sheet=treat&marked=many",
+         "preset": "",
+         "steps": [
+          "Filter pigs",
+          "Any condition"
+         ],
+         "figma": "",
+         "notes": {
+          "purpose": "The filter's second level: one condition, with how many pigs carry it under the other facets.",
+          "states": [],
+          "elements": [
+           {
+            "name": "Condition",
+            "shows": "Any condition, then each condition with its count",
+            "logic": "A single pick returns to the filter. Back returns without a change; ✕ closes the filter (ruling B).",
+            "source": "markedPage()"
+           }
+          ],
+          "controls": [],
+          "copy": [
+           "(raw)"
+          ],
+          "edge": [],
+          "rules": [],
+          "issues": []
+         }
+        },
+        {
+         "id": "workbench.to-treat-scanned",
+         "name": "To treat · scanned",
+         "zh": "待治疗 · 已扫描",
+         "status": "in-design",
+         "url": "/ux/system/home-astra-prototype.html?section=gestation&sheet=treat",
+         "preset": "",
+         "steps": [
+          "Scan ear tag"
+         ],
+         "figma": "",
+         "notes": {
+          "purpose": "A scanned ear tag fills the search, so the list shows that pig (owner, 2026-10-20: scan and search go together).",
+          "states": [],
+          "elements": [
+           {
+            "name": "Search with the scanned tag",
+            "shows": "The tag in the field, ✕ to clear it, the scan button; the one pig under its unit",
+            "logic": "Scanner preview: the prototype reads a sample tag from the list. ✕ empties the field and the whole list returns.",
+            "source": "markedPage()"
+           }
+          ],
+          "controls": [],
+          "copy": [
+           "(raw)"
+          ],
+          "edge": [],
+          "rules": [],
+          "issues": []
+         }
+        },
+        {
+         "id": "workbench.to-treat-none",
+         "name": "To treat · no match",
+         "zh": "待治疗 · 无结果",
+         "status": "in-design",
+         "url": "/ux/system/home-astra-prototype.html?section=gestation&sheet=treat",
+         "preset": "",
+         "steps": [
+          {
+           "fill": "[data-mk-search]",
+           "text": "9999"
+          }
+         ],
+         "figma": "",
+         "notes": {
+          "purpose": "A search that finds no pig on the list.",
+          "states": [],
+          "elements": [
+           {
+            "name": "No pigs found",
+            "shows": "\"No pigs found · Check the ear tag, or scan it.\"",
+            "logic": "The list's own empty state; the field keeps what was typed.",
+            "source": "markedPage()"
+           }
+          ],
+          "controls": [],
+          "copy": [
+           "(raw)"
+          ],
+          "edge": [],
+          "rules": [],
+          "issues": []
+         }
+        },
+        {
+         "id": "workbench.monitoring",
+         "name": "Monitoring",
+         "zh": "观察中",
+         "status": "in-design",
+         "url": "/ux/system/home-astra-prototype.html?section=gestation&sheet=monitor",
+         "preset": "",
+         "figma": "",
+         "notes": {
+          "purpose": "Tapping Monitoring on the Overview: the pigs marked Monitor, on the same page as To treat.",
+          "states": [],
+          "elements": [
+           {
+            "name": "Search and filter",
+            "shows": "The search field (ear tag or pen) with Scan ear tag inside it, and the filter button, held at the top while the list scrolls",
+            "logic": "Typing narrows the list at once: a tag as typed, or a pen code across units. A scan fills the field with the tag read (search and scan go together, owner 2026-10-20). Every facet (unit, care, condition) is in the filter; the button carries the number applied.",
+            "source": "markedPage()"
+           },
+           {
+            "name": "Watched pigs, one card per unit",
+            "shows": "Tag over \"Pen A2\", the condition on the right",
+            "logic": "The same rows; a watched pig has no care or wait.",
+            "source": "markedPage()"
            }
           ],
           "controls": [],
@@ -2566,7 +2799,7 @@
          }
         }
        ],
-       "prd": "# Workbench 工作台\n\n## Problem\n\nA worker opens the app to see the active work in the chosen area, not how the farm is doing. Home must show which tasks are in progress, scheduled, or assigned, let the worker work either by task across units or by place inside one unit, and show what is saved on the phone when there is no signal. The old Figma (首页 › 工作台) says the same: a workbench, not a data page.\n\n## Who\n\nDaily floor workers in a section (Breeding, Gestation, Farrowing, Nursery): gloved, one-handed, often offline. A supervisor can open the same task cards; task completion remains in the owning task flow.\n\n## Anchor\n\nNone. Home has no lifecycle of its own; each card inherits the lifecycle of its task. Screens are grouped by scope: section Overview, unit, drawers, task preview, settings.\n\n## Rules\n\n- The Overview is three sections: Production, Health, Other (see \"Overview and Schedule · 2026-10-19\" below). The unit page is \"Today's work\": one card per task instance in the unit, until its own redesign. On the unit page an authoritative in-progress task stays in the main list even when its next action is later; rank confirmed exceptions, explicit overdue work, today's work, previously scheduled but unstarted work, assigned undated work, and other in-progress tasks. Equal ranks keep a stable order.\n- Home placement follows the authoritative task status. Records and a full progress bar inform the card content but never create a separate \"ready to complete\" state or closure call to action. Only an authoritative completed or ended-early task enters Closed. Task closure belongs to the owning task detail.\n- A unit card has identity (task, batch, context), timing (\"Day N of N\", contextual, never a completion measure), one task-specific headline fact, at most one supporting line and an optional named progress bar when its denominator is reliable. The Overview uses the four-slot tile instead. Eligible-now counts are never guessed as total minus done.\n- Counts are unique animals or litters in the selected scope. A unit narrows the counts, never the batch time.\n- Task-specific rules: Farrowing = underway, past expected date, due today, next expected; Piglet processing = litters with care due, next care, waiting; Pregnancy = open windows, then next check; Heat and Return-heat show no completion bar for observation.\n- Unit scope: inspection, attention, environment and devices entrances sit at the unit; Inspection owns the pen walk.\n- Offline: the app header shows the upload icon alone on Home and other non-task pages, and each task card with records still on the phone carries \"↑ N\" in its footer (that task's records). The icon turns to a red \"!\" only when a person must act: signed out, or work stuck on the phone. A usable connection starts upload automatically; nothing pops up as records upload. Task pages show the icon with that task's own count. The record lifecycle, Saved work and the rules belong to [Data sync](../data-sync/PRD.md) (owner, 2026-10-18 to 2026-10-20).\n- Closed tasks never revive due counts.\n- Tapping the section name in the Home header opens the section chooser with a 260 ms horizontal slide and fade: the chooser enters from the right by about one third of the page width while Home exits left by about one sixth. Back or choosing a section reverses the motion. The bottom navigation stays fixed; reduced-motion preference removes the animation.\n\n### Home list contract · 2026-10-14\n\n- A task instance is identified by farm, source type and task ID; keep the batch and any genuinely separate check instance in its identity. Do not merge different batches or split one cross-unit task into several Overview cards. An authoritative in-progress task belongs in Today's work regardless of whether an action is due now. A scheduled task that has not started belongs there from its start day; an assigned, executable undated task also belongs there. Drafts, unscheduled work and permanent tool entrances do not generate task cards.\n- Use farm-local dates. Only an explicit deadline makes a task overdue; passing its start date alone does not. A future, unstarted task is not on Home: it is on the Schedule. An unknown backend state is read-only “Status to confirm”; it produces no due count, overdue marker or end action.\n- The unit page sorts confirmed actionable exceptions, explicitly overdue tasks, today's scheduled/action tasks, previously scheduled unstarted tasks, assigned executable undated tasks, then other in-progress tasks. Ties use explicit action time, start time and stable task ID. The Overview orders Production by stage instead (below).\n- Every open task instance is listed; neither the Overview nor the unit page folds the list behind \"See all\". Counts in the section chooser are **distinct open task instances in that section** across Production, Health and Other; the unit picker counts the unit's production task instances until the unit page carries health and other work. Waiting tasks count; task types and unfinished animal rows don't. Complete sorting and counts before pagination; the first fetched page cannot establish the total.\n- Closed contains only authoritative completed and ended-early tasks that ended today in the farm timezone. It is collapsed by default, newest first; older receipts live in Records. A full progress bar or all currently due records do not move an open task to Closed. Home has no inferred Ready-to-complete state or completion button.\n- A task may have no reliable headline number or denominator. Show an accurate status/next-time line and omit an invented bar. Distinguish loading, empty, no permission and read failure. The detailed local-record/upload-failure/offline-snapshot behavior belongs to Data sync and the Android implementation contract, outside this design handoff.\n\n### Overview and Schedule · 2026-10-19\n\nOwner decisions from the redesign (record: [overview-redesign.md](overview-redesign.md)).\n\n- **Overview = Production, Health, Other**, in that order, with no strip of headline numbers. Each section heading may carry \"Schedule ›\" (Production, Health), which opens the Schedule filtered to that section.\n- **Production** is a 2-column grid of tiles, one per open task instance, every one listed. Order: the sow's cycle (Heat check, Breeding, Return heat, Pregnancy check, Farrowing, Piglet processing, Weaning), then oldest batch first. Overdue is a mark on the tile, never a re-sort.\n- **The tile has four fixed slots**, each with one kind of message, at the same height in every tile: (1) the task, one line, a short name of at most about 15 characters (\"Return heat\", \"Processing\"); (2) the batch; (3) to-do: one line that says it all, with no second line under it (owner, 2026-10-19): the count due now with a short word (\"10 to watch\"); an overdue part follows on the same line and only it is red (\"5 now · 2 overdue\"); when nothing is due yet, the next count in grey (\"8 tomorrow\") or \"None now\". Timers and later windows (\"4 more from Sat\") are in the task and on the Schedule, not the tile; (4) the run: one segment per day of the plan and \"Day N of N\". There is no done state: a multi-day task stays a tile until the task closes. A task past its planned end says how many are overdue (\"6 overdue\"), its run grows one red segment per day over and reads \"1 day overdue\". **One coloured signal per tile at most** (owner, 2026-10-19): the overdue part or the days over, never a red edge or red words beside them. **Ready to close** (owner, 2026-10-19, reversing the 2026-10-12 decision below): when everything the task asks for is recorded and the task is still open, the tile's count line reads \"Ready to close\" with a quiet tick; it is a reminder, and closing stays inside the task (Home has no close button). A closed task leaves the grid for one quiet, muted \"N closed today\" line across the content width, ending in a chevron like \"Schedule ›\" so it reads as a tap (owner, 2026-10-19); it opens a drawer listing them.\n- **Health** is reactive first: one card with **To treat** (pigs marked Treat in place or Hospital pen and not yet treated or moved; \"N waiting since yesterday\", plain, else its units; \"Nothing marked\" at 0) and **Monitoring** (pigs marked Monitor, with units). Each opens one pig list across the section's units, unit by unit (owner, 2026-10-19): the tag over its pen, how it is treated (\"Hospital\", \"In place\") and \"1d\" when waiting since yesterday, the condition as a plain tag; no row is coloured, since the title already says what to do. A pig opens its unit's walk on the Health lens. Planned health work (vaccination plans, treatment orders) are tasks, shown as tiles under the card. Walk coverage, withdrawal and deaths are not on Home.\n- **Other** is one flat list with no category headers: type icon, what the work is and where (\"Move to Farrowing, Unit 6\" · \"From Units 7, 8\"), pigs or pens due on the right. Order numbers stay on the task page. Withdrawal shows in red on the outbound or transfer row it blocks.\n- **Schedule** (the week board): full screen; ✕ closes back to Home (owner, 2026-10-19); no page header and no bottom bar. The date range is the only text at the top, the week number a small label, ⓘ \"How to read the board\" top right. Natural Mon–Sun weeks, paged in the 56px footer: the earlier week is the footer's back slot (\"‹ Week 26\"), the later week its primary (\"Week 28 ›\"). A segment filters All, Production, Health, Other; All is one card with a band per section: a rule, the section icon and its name (no fill: a surface inside the board breaks the no-nested-cards law).\n- **Rows and cells:** every row is one line (owner, 2026-10-19: no second row kind): a 36px gutter under the task type written once holds the shortest label that tells the row from its siblings, about 4 characters at most: the batch (\"B31\"), a pickup time (\"14:00\"), a transfer's batch when it moves one (\"B29\"), otherwise \"Mixed\" (owner, 2026-10-19: no destination codes, unit counts or order numbers), a sample or product (\"PRRS\", \"Amox\"). The full name heads the drawer the row opens. A whole row is the tap target and opens that task's week, count first (\"11 done\" over \"Wednesday 7 Jul\"). A task type carries a note only when it explains the cells (\"estimated returns\"); no count of the rows under it. Each cell holds that day's count: done (past days, can be 0), today, planned (exact), estimate (\"~6\", dashed: heat, returns, farrowing), waiting on today (\"–\"), nothing due (\"·\"), past its plan (a red edge on the cell; nothing else red). There is no \"late\" state and no grace period: unfinished work carries on. Counts up to 999 print in full; actual counts from 1,000 shorten to \"1.2k\", estimates to \"~1k\". No daily total.\n\n## Scope\n\nIn: section chooser, Overview (Production tiles, Health, Other), the Schedule (week board), unit picker, unit hub, status-driven task cards (in progress, scheduled, closed), the app-header Saved work badge (details belong to Data sync), Toolbox and Records, the unit attention states, task preview, end-early confirmation, closed-task receipt.\n\nOut: Assistant (its own feature), Scan and Find a pig (Find a pig), the Data sync page; task detail pages (their own features); Environment & devices (its own feature). Language and Log out exist in the old design and are not built here (placeholder).\n\nThe Assistant, Scan and Toolbox controls are visible prototype navigation to separate sample pages, not part of the Home delivery. A Home-only native preview may open an explicit \"UI preview · not connected\" explanation for these controls; it must not imply that an agent, camera, search or record action ran. Production navigation waits for the owning feature's design and implementation.\n\n## Decisions\n\n- Decided: one Overview plus unit scope; Assistant has no badge on Home; the last section is remembered; the unit picker has no search (about 15 units at most); completion stays inside the task.\n- Superseded 2026-10-19 (owner): the Overview tile shows a tick and \"Ready to close\" when everything is recorded and the task is open; closure still belongs to the task. The Android Home PRD needs the same change.\n- Decided (2026-10-12; aligned 2026-10-14): remove Home's inferred \"ready to complete\" state. An in-progress task remains in Today's work regardless of record progress. The [Android Home PRD](../../../Sentri-Android-App/docs/home-prd.md) defines the target card fields and source-data fallback. The Workbench state map and current interactive prototypes now omit the old Ready state; historical review snapshots do not override this decision.\n- Open: where language and log out live; what the real \"Not designed yet\" page shows per task; how the real queue feeds the app-header badge; what \"Day N of N\" means for tasks with no batch window.\n- Open (data): the Home card uses Piglet processing Batch 27 (8 pens, 2 units), while its linked piglet-processing prototype uses Batch 40 (12 pens). These are independent design fixtures; the click-through demonstrates the intended destination, not continuity of one task instance. Align the fixtures before using this flow for connected-data acceptance.\n- Open (date): `Sample · Thu, 8 Jul` is a fixed prototype date, not the device clock or a real work schedule. The connected Home date source and formatting still need definition.\n",
+       "prd": "# Workbench 工作台\n\n## Problem\n\nA worker opens the app to see the active work in the chosen area, not how the farm is doing. Home must show which tasks are in progress, scheduled, or assigned, let the worker work either by task across units or by place inside one unit, and show what is saved on the phone when there is no signal. The old Figma (首页 › 工作台) says the same: a workbench, not a data page.\n\n## Who\n\nDaily floor workers in a section (Breeding, Gestation, Farrowing, Nursery): gloved, one-handed, often offline. A supervisor can open the same task cards; task completion remains in the owning task flow.\n\n## Anchor\n\nNone. Home has no lifecycle of its own; each card inherits the lifecycle of its task. Screens are grouped by scope: section Overview, unit, drawers, task preview, settings.\n\n## Rules\n\n- The Overview is three sections: Production, Health, Other (see \"Overview and Schedule · 2026-10-19\" below). The unit page is \"Today's work\": one card per task instance in the unit, until its own redesign. On the unit page an authoritative in-progress task stays in the main list even when its next action is later; rank confirmed exceptions, explicit overdue work, today's work, previously scheduled but unstarted work, assigned undated work, and other in-progress tasks. Equal ranks keep a stable order.\n- Home placement follows the authoritative task status. Records and a full progress bar inform the card content but never create a separate \"ready to complete\" state or closure call to action. Only an authoritative completed or ended-early task enters Closed. Task closure belongs to the owning task detail.\n- A unit card has identity (task, batch, context), timing (\"Day N of N\", contextual, never a completion measure), one task-specific headline fact, at most one supporting line and an optional named progress bar when its denominator is reliable. The Overview uses the four-slot tile instead. Eligible-now counts are never guessed as total minus done.\n- Counts are unique animals or litters in the selected scope. A unit narrows the counts, never the batch time.\n- Task-specific rules: Farrowing = underway, past expected date, due today, next expected; Piglet processing = litters with care due, next care, waiting; Pregnancy = open windows, then next check; Heat and Return-heat show no completion bar for observation.\n- Unit scope: inspection, attention, environment and devices entrances sit at the unit; Inspection owns the pen walk.\n- Offline: the app header shows the upload icon alone on Home and other non-task pages, and each task card with records still on the phone carries \"↑ N\" in its footer (that task's records). The icon turns to a red \"!\" only when a person must act: signed out, or work stuck on the phone. A usable connection starts upload automatically; nothing pops up as records upload. Task pages show the icon with that task's own count. The record lifecycle, Saved work and the rules belong to [Data sync](../data-sync/PRD.md) (owner, 2026-10-18 to 2026-10-20).\n- Closed tasks never revive due counts.\n- Tapping the section name in the Home header opens the section chooser with a 260 ms horizontal slide and fade: the chooser enters from the right by about one third of the page width while Home exits left by about one sixth. Back or choosing a section reverses the motion. The bottom navigation stays fixed; reduced-motion preference removes the animation.\n\n### Home list contract · 2026-10-14\n\n- A task instance is identified by farm, source type and task ID; keep the batch and any genuinely separate check instance in its identity. Do not merge different batches or split one cross-unit task into several Overview cards. An authoritative in-progress task belongs in Today's work regardless of whether an action is due now. A scheduled task that has not started belongs there from its start day; an assigned, executable undated task also belongs there. Drafts, unscheduled work and permanent tool entrances do not generate task cards.\n- Use farm-local dates. Only an explicit deadline makes a task overdue; passing its start date alone does not. A future, unstarted task is not on Home: it is on the Schedule. An unknown backend state is read-only “Status to confirm”; it produces no due count, overdue marker or end action.\n- The unit page sorts confirmed actionable exceptions, explicitly overdue tasks, today's scheduled/action tasks, previously scheduled unstarted tasks, assigned executable undated tasks, then other in-progress tasks. Ties use explicit action time, start time and stable task ID. The Overview orders Production by stage instead (below).\n- Every open task instance is listed; neither the Overview nor the unit page folds the list behind \"See all\". Counts in the section chooser are **distinct open task instances in that section** across Production, Health and Other; the unit picker counts the unit's production task instances until the unit page carries health and other work. Waiting tasks count; task types and unfinished animal rows don't. Complete sorting and counts before pagination; the first fetched page cannot establish the total.\n- Closed contains only authoritative completed and ended-early tasks that ended today in the farm timezone. It is collapsed by default, newest first; older receipts live in Records. A full progress bar or all currently due records do not move an open task to Closed. Home has no inferred Ready-to-complete state or completion button.\n- A task may have no reliable headline number or denominator. Show an accurate status/next-time line and omit an invented bar. Distinguish loading, empty, no permission and read failure. The detailed local-record/upload-failure/offline-snapshot behavior belongs to Data sync and the Android implementation contract, outside this design handoff.\n\n### Overview and Schedule · 2026-10-19\n\nOwner decisions from the redesign (record: [overview-redesign.md](overview-redesign.md)).\n\n- **Overview = Production, Health, Other**, in that order, with no strip of headline numbers. Each section heading may carry \"Schedule ›\" (Production, Health), which opens the Schedule filtered to that section.\n- **Production** is a 2-column grid of tiles, one per open task instance, every one listed. Order: the sow's cycle (Heat check, Breeding, Return heat, Pregnancy check, Farrowing, Piglet processing, Weaning), then oldest batch first. Overdue is a mark on the tile, never a re-sort.\n- **The tile has four fixed slots**, each with one kind of message, at the same height in every tile: (1) the task, one line, a short name of at most about 15 characters (\"Return heat\", \"Processing\"); (2) the batch; (3) to-do: one line that says it all, with no second line under it (owner, 2026-10-19): the count due now with a short word (\"10 to watch\"); an overdue part follows on the same line and only it is red (\"5 now · 2 overdue\"); when nothing is due yet, the next count in grey (\"8 tomorrow\") or \"None now\". Timers and later windows (\"4 more from Sat\") are in the task and on the Schedule, not the tile; (4) the run: one segment per day of the plan and \"Day N of N\". There is no done state: a multi-day task stays a tile until the task closes. A task past its planned end says how many are overdue (\"6 overdue\"), its run grows one red segment per day over and reads \"1 day overdue\". **One coloured signal per tile at most** (owner, 2026-10-19): the overdue part or the days over, never a red edge or red words beside them. **Ready to close** (owner, 2026-10-19, reversing the 2026-10-12 decision below): when everything the task asks for is recorded and the task is still open, the tile's count line reads \"Ready to close\" with a quiet tick; it is a reminder, and closing stays inside the task (Home has no close button). A closed task leaves the grid for one quiet, muted \"N closed today\" line across the content width, ending in a chevron like \"Schedule ›\" so it reads as a tap (owner, 2026-10-19); it opens a drawer listing them.\n- **Health** is reactive first: one card with **To treat** (pigs marked Treat in place or Hospital pen and not yet treated or moved; \"N waiting since yesterday\", plain, else its units; \"Nothing marked\" at 0) and **Monitoring** (pigs marked Monitor, with units). Each opens a list page of those pigs across the section's units, unit by unit (owner, 2026-10-19), built to hold about 100 (owner, 2026-10-20): a search at the top (ear tag or pen, Scan ear tag inside it) with the filter beside it (unit, care, condition), then the rows: the tag over its pen, how it is treated (\"Hospital\", \"In place\") and \"1d\" when waiting since yesterday, the condition as a plain tag; no row is coloured, since the title already says what to do. A pig opens its unit's walk on the Health lens. Planned health work (vaccination plans, treatment orders) are tasks, shown as tiles under the card. Walk coverage, withdrawal and deaths are not on Home.\n- **Other** is one flat list with no category headers: type icon, what the work is and where (\"Move to Farrowing, Unit 6\" · \"From Units 7, 8\"), pigs or pens due on the right. Order numbers stay on the task page. Withdrawal shows in red on the outbound or transfer row it blocks.\n- **Schedule** (the week board): full screen; ✕ closes back to Home (owner, 2026-10-19); no page header and no bottom bar. The date range is the only text at the top, the week number a small label, ⓘ \"How to read the board\" top right. Natural Mon–Sun weeks, paged in the 56px footer: the earlier week is the footer's back slot (\"‹ Week 26\"), the later week its primary (\"Week 28 ›\"). A segment filters All, Production, Health, Other; All is one card with a band per section: a rule, the section icon and its name (no fill: a surface inside the board breaks the no-nested-cards law).\n- **Rows and cells:** every row is one line (owner, 2026-10-19: no second row kind): a 36px gutter under the task type written once holds the shortest label that tells the row from its siblings, about 4 characters at most: the batch (\"B31\"), a pickup time (\"14:00\"), a transfer's batch when it moves one (\"B29\"), otherwise \"Mixed\" (owner, 2026-10-19: no destination codes, unit counts or order numbers), a sample or product (\"PRRS\", \"Amox\"). The full name heads the drawer the row opens. A whole row is the tap target and opens that task's week, count first (\"11 done\" over \"Wednesday 7 Jul\"). A task type carries a note only when it explains the cells (\"estimated returns\"); no count of the rows under it. Each cell holds that day's count: done (past days, can be 0), today, planned (exact), estimate (\"~6\", dashed: heat, returns, farrowing), waiting on today (\"–\"), nothing due (\"·\"), past its plan (a red edge on the cell; nothing else red). There is no \"late\" state and no grace period: unfinished work carries on. Counts up to 999 print in full; actual counts from 1,000 shorten to \"1.2k\", estimates to \"~1k\". No daily total.\n\n## Scope\n\nIn: section chooser, Overview (Production tiles, Health, Other), the Schedule (week board), unit picker, unit hub, status-driven task cards (in progress, scheduled, closed), the app-header Saved work badge (details belong to Data sync), Toolbox and Records, the unit attention states, task preview, end-early confirmation, closed-task receipt.\n\nOut: Assistant (its own feature), Scan and Find a pig (Find a pig), the Data sync page; task detail pages (their own features); Environment & devices (its own feature). Language and Log out exist in the old design and are not built here (placeholder).\n\nThe Assistant, Scan and Toolbox controls are visible prototype navigation to separate sample pages, not part of the Home delivery. A Home-only native preview may open an explicit \"UI preview · not connected\" explanation for these controls; it must not imply that an agent, camera, search or record action ran. Production navigation waits for the owning feature's design and implementation.\n\n## Decisions\n\n- Decided: one Overview plus unit scope; Assistant has no badge on Home; the last section is remembered; the unit picker has no search (about 15 units at most); completion stays inside the task.\n- Superseded 2026-10-19 (owner): the Overview tile shows a tick and \"Ready to close\" when everything is recorded and the task is open; closure still belongs to the task. The Android Home PRD needs the same change.\n- Decided (2026-10-12; aligned 2026-10-14): remove Home's inferred \"ready to complete\" state. An in-progress task remains in Today's work regardless of record progress. The [Android Home PRD](../../../Sentri-Android-App/docs/home-prd.md) defines the target card fields and source-data fallback. The Workbench state map and current interactive prototypes now omit the old Ready state; historical review snapshots do not override this decision.\n- Open: where language and log out live; what the real \"Not designed yet\" page shows per task; how the real queue feeds the app-header badge; what \"Day N of N\" means for tasks with no batch window.\n- Open (data): the Home card uses Piglet processing Batch 27 (8 pens, 2 units), while its linked piglet-processing prototype uses Batch 40 (12 pens). These are independent design fixtures; the click-through demonstrates the intended destination, not continuity of one task instance. Align the fixtures before using this flow for connected-data acceptance.\n- Open (date): `Sample · Thu, 8 Jul` is a fixed prototype date, not the device clock or a real work schedule. The connected Home date source and formatting still need definition.\n",
        "scenarios": {
         "treeDoc": false,
         "tree": null,
@@ -6747,7 +6980,7 @@
          "preset": "count",
          "steps": [
           "Actions",
-          "Edit note"
+          "[data-action=\"sow-host-action\"][data-value=\"marker\"]"
          ],
          "figma": "",
          "notes": {
@@ -16829,7 +17062,7 @@
          "steps": [
           "[data-action=\"room-sow\"][data-value=\"000392\"]",
           "Actions",
-          "Mark not in pig"
+          "[data-action=\"sow-host-action\"][data-value=\"not-in-pig\"]"
          ]
         }
        ],
@@ -26972,6 +27205,7 @@
       "variants": [
        "facet",
        "lens",
+       "scope",
        "two-line-lens",
        "view-switch"
       ]
@@ -29038,7 +29272,8 @@
       "variants": [
        "done",
        "offline",
-       "plain"
+       "plain",
+       "standing"
       ]
      }
     },

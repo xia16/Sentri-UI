@@ -2,14 +2,16 @@
   {
     "id": "page",
     "name": "Page header",
-    "use": "the top of every page and of every top page of a task: Back at the top left, the title beside it, an optional header line, then 24px to the body",
-    "notUse": "a drawer or a dialog (use the sheet header); it never holds a control besides Back and the subject chip, a count, a status or an aside",
+    "use": "the top of every page and of every top page of a task: Back at the top left, the title beside it, an optional header line, an optional page action at the top right (one IconButton: past uploads, or the sync badge), then 24px to the body",
+    "notUse": "a drawer or a dialog (use the sheet header); it never holds a control besides Back, the subject chip and its one page action, nor a count in the title or line, a status or an aside",
     "states": [
       "Default",
       "Back pressed",
       "Fact line (a hub)",
       "Longest title that fits beside Back at 360",
-      "Chinese"
+      "Chinese",
+      "Page action",
+      "Page action · the sync badge"
     ]
   },
   {

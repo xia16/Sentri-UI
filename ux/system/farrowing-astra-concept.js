@@ -552,10 +552,10 @@ function penSubpage(s,c){
 function validPenFault(draft){return !!draft.device&&!!draft.description?.trim()&&(draft.device!=='Other'||!!draft.name?.trim());}
 function handlePenAction(s,c,a,v){
  const destinations={'room-pen-feed':'roomPenFeed','room-pen-read-note':'roomPenReadNote','room-pen-note':'roomPenNote','room-pen-fault':'roomPenFault','room-pen-fault-record':'roomPenFaultRecord'};
- if(destinations[a]){const pe=penInfo(c),drafts=pe.drafts||(pe.drafts={}),key=a==='room-pen-note'?'note':a==='room-pen-fault'?'fault':a==='room-pen-fault-record'?'resolve:'+v:'';c.penDraft=key?(drafts[key]||(drafts[key]=a==='room-pen-note'?{note:pe.note}:{})):{};if(a==='room-pen-fault-record')c.penFaultId=v;s.view=destinations[a];return;}
- if(a==='room-pen-save-note'&&c.penDraft?.note?.trim()){const pe=penInfo(c),note=c.penDraft.note.trim();penEvent(c,pe.note?'Pen note updated':'Pen note added',note);pe.note=note;pe.noteBy='G.H · Today · 09:41';delete pe.drafts?.note;s.view='roomPenDetail';}
- if(a==='room-pen-save-fault'&&validPenFault(c.penDraft)){const d=c.penDraft,pe=penInfo(c),fault={id:String(pe.faults.length+1),device:d.device==='Other'?d.name.trim():d.device,description:d.description.trim(),time:'09:41',who:'G. Hansen',open:true};pe.faults.push(fault);penEvent(c,'Equipment fault reported',fault.device+' · '+fault.description);delete pe.drafts?.fault;s.view='roomPenDetail';}
- if(a==='room-pen-resolve-fault'){const f=penInfo(c).faults.find(x=>x.id===c.penFaultId);if(f?.open){f.open=false;f.resolution=c.penDraft.resolution?.trim()||'';penEvent(c,'Equipment fault resolved',f.device+(f.resolution?' · '+f.resolution:''));delete penInfo(c).drafts?.['resolve:'+f.id];s.view='roomPenDetail';}}
+ if(destinations[a]){const keep=(c.penKeeps||{})[destinations[a]+'|'+c.detailPen+(a==='room-pen-fault-record'?'|'+v:'')];c.penDraft=keep?clone(keep):a==='room-pen-note'?{note:penInfo(c).note}:{};if(a==='room-pen-fault-record')c.penFaultId=v;s.view=destinations[a];return;}
+ if(a==='room-pen-save-note'&&c.penDraft?.note?.trim()){const pe=penInfo(c),note=c.penDraft.note.trim();penEvent(c,pe.note?'Pen note updated':'Pen note added',note);pe.note=note;pe.noteBy='G.H · Today · 09:41';delete c.penKeeps?.['roomPenNote|'+c.detailPen];s.view='roomPenDetail';}
+ if(a==='room-pen-save-fault'&&validPenFault(c.penDraft)){const d=c.penDraft,pe=penInfo(c),fault={id:String(pe.faults.length+1),device:d.device==='Other'?d.name.trim():d.device,description:d.description.trim(),time:'09:41',who:'G. Hansen',open:true};pe.faults.push(fault);penEvent(c,'Equipment fault reported',fault.device+' · '+fault.description);delete c.penKeeps?.['roomPenFault|'+c.detailPen];s.view='roomPenDetail';}
+ if(a==='room-pen-resolve-fault'){const f=penInfo(c).faults.find(x=>x.id===c.penFaultId);if(f?.open){f.open=false;f.resolution=c.penDraft.resolution?.trim()||'';penEvent(c,'Equipment fault resolved',f.device+(f.resolution?' · '+f.resolution:''));delete c.penKeeps?.['roomPenFaultRecord|'+c.detailPen+'|'+f.id];s.view='roomPenDetail';}}
 }
 /* A log group is a day: Today, Yesterday, a weekday, or a date ("Aug 27"). "N days ago" is turned into one of those. */
 function dayLabel(day){const m=String(day).match(/^(\d+) days? ago$/);return m?SentriUI.logDay(new Date(Date.now()-Number(m[1])*864e5)):day;}
@@ -624,17 +624,17 @@ function roomOverlay(s){const c=roomContext(s),unitSheet=(title,body,actions,cls
 }
 function roomAction(i,a,v){if(!a.startsWith('room-'))return false;const s=states[i],c=roomContext(s);if(a!=='room-pen'&&atlasStill())c.highlightUntil=0;const list=document.querySelector(`[data-card="${i}"] .room-scroll`);if(list)c.scroll=list.scrollTop;const intro=list?list.querySelector('.room-context-strip').offsetHeight+10:0;const nextScroll=c.scroll>=intro?intro:0;
   if(a==='room-sow'){const hit=findSow(c,v),r=hit?.record;if(r){const from=s.view;if(from==='roomScan'||from==='roomSearch')c.returnToTaskReview=from;states[i]=r;r.view=recordView(r);if(r.view==='history')r.pageBack='room';if(hit.unit.id===c.unitId)c.currentPen=r.pen;if(from!=='roomSearch')c.query='';}}   // Back returns to the list she was opened from; Find a sow keeps what was typed   // Farrowing is one task across its units: a sow in another unit opens the same drawer
- if(a==='room-back'||a==='room-return'){c.returnToTaskReview=false;if(s.view==='roomPenDetail')c.returnFocusPen=c.detailPen;const from=s.view;s.view=from==='roomScanActions'?'roomScan':from==='roomPicker'&&c.picker?c.picker.returnView:from==='roomEndTask'?'roomOverview':from==='roomTaskSows'?c.taskListBack||'roomEndTask':from==='roomTaskReceipt'?'roomHome':penParent(from);if(from==='roomPicker')c.picker=null;}
+ if(a==='room-back'||a==='room-return'){c.returnToTaskReview=false;if(s.view==='roomPenDetail')c.returnFocusPen=c.detailPen;const from=s.view;if(from==='roomFilter')c.filterKeep=clone(c.filterDraft);if(from==='roomPenNote'||from==='roomPenFault'||from==='roomPenFaultRecord')(c.penKeeps=c.penKeeps||{})[from+'|'+c.detailPen+(from==='roomPenFaultRecord'?'|'+c.penFaultId:'')]=clone(c.penDraft||{});if(from==='roomPenDetail'&&c.penKeeps)for(const k of Object.keys(c.penKeeps))if(k.endsWith('|'+c.detailPen))delete c.penKeeps[k];s.view=from==='roomScanActions'?'roomScan':from==='roomPicker'&&c.picker?c.picker.returnView:from==='roomEndTask'?'roomOverview':from==='roomTaskSows'?c.taskListBack||'roomEndTask':from==='roomTaskReceipt'?'roomHome':penParent(from);if(from==='roomPicker')c.picker=null;}
  handlePenAction(s,c,a,v);
  if(a==='room-pen-log')s.view='roomPenLog';
  if(a==='room-pen-detail'&&c.records.some(r=>r.pen===v)){c.detailPen=v;c.currentPen=v;s.view='roomPenDetail';}
  if(a==='room-home')s.view='roomHome';
  if(a==='room-lens'){c.lens=v;c.scroll=nextScroll;c.tailSpace=0;s.view='room';}
- if(a==='room-filter'){c.filterDraft=clone(c.filter);s.view='roomFilter';}
+ if(a==='room-filter'){c.filterDraft=clone(c.filterKeep||c.filter);s.view='roomFilter';}
  if(a==='room-parity')c.filterDraft.parity=v;
  if(a==='room-reset-filter')c.filterDraft=defaultRoomFilter();
- if(a==='room-apply-filter'){c.filter=clone(c.filterDraft);c.scroll=nextScroll;c.tailSpace=0;s.view='room';}
- if(a==='room-clear-filter'){c.filter=defaultRoomFilter();c.scroll=nextScroll;c.tailSpace=0;}
+ if(a==='room-apply-filter'){c.filterKeep=null;c.filter=clone(c.filterDraft);c.scroll=nextScroll;c.tailSpace=0;s.view='room';}
+ if(a==='room-clear-filter'){c.filterKeep=null;c.filter=defaultRoomFilter();c.scroll=nextScroll;c.tailSpace=0;}
  if(a==='room-grid')s.view='roomGrid';
  if(a==='room-pen'){const L=landMs();c.currentPen=v;c.jump=v;c.highlightUntil=Date.now()+L.hold+L.fade;c.highlightPen=v;c.highlightLevel=penLevels(c)[v]||'plain';s.view='room';}
 

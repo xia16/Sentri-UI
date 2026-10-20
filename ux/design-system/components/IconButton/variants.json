@@ -2,7 +2,7 @@
   {
     "id": "bordered",
     "name": "Bordered",
-    "use": "Use for header returns and toolbar Search, Filter or Scan.",
+    "use": "Use for header returns, toolbar Search, Filter or Scan, a page header's one page action, and the sync badge (a glyph with a count).",
     "notUse": "Not for recording an act — use Button.",
     "states": [
       "Default",
@@ -10,7 +10,9 @@
       "Disabled",
       "Long / Chinese",
       "Selected",
-      "Badge"
+      "Badge",
+      "Count",
+      "Count · attention"
     ]
   },
   {

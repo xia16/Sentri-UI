@@ -1007,6 +1007,16 @@
     var want = qs.get('dose'), recs = (qs.get('double') || '').split(/[+ ]/).filter(Boolean);
     return pairs().filter(function (p) { return (!want || p.dose === want) && recs.every(function (r) { return p.records.indexOf(r) >= 0; }); })[0] || null;
   }
+  /* The picked answer is kept on this phone, per litter and dose, until Save: Back and the scrim leave the page, reopening restores it. */
+  function dblKey(p) { p = p || dblPair(); return p ? 'pp-dbl-draft:' + store.name + ':' + crate + ':' + p.dose : ''; }
+  function keepDbl(p) {
+    var k = dblKey(p); if (!k) return;
+    try { if (dbl.answer) sessionStorage.setItem(k, JSON.stringify(dbl)); else sessionStorage.removeItem(k); } catch (err) {}
+  }
+  function restoreDbl() {
+    var k = dblKey(); if (!k) return;
+    try { var kept = JSON.parse(sessionStorage.getItem(k) || 'null'); if (kept && kept.answer) dbl = { answer: kept.answer, withdraw: kept.withdraw || '' }; } catch (err) {}
+  }
   function dblDraft(p) { return store.select.doubleDraft(store.derived, { litter: crate, dose: p.dose, records: p.records, answer: dbl.answer || null, withdraw: dbl.withdraw || undefined }, stamp()); }
   function recTitle(r) { return r.castration ? PP.t('pp.common.mark.castrated', { c: r.castration.castrated || 0 }) : pigsText(r.n); }
   // One question over the room: the two records, what happened, which record; Back + Save. Answered, it says what it
@@ -1176,6 +1186,8 @@
     if (from === 'count') return PP.href('count.html', { state: 'explain', crate: crate, data: store.name });
     if (from === 'room') return PP.href('room.html', { unit: L().room, data: data });
     if (from === 'end') {
+      var bk = qs.get('back') || '';
+      if (/^end\.html(\?[^#]*)?$/.test(bk)) return bk;                 // End says which of its pages opened this: Back returns there
       var over = (store.derived.tasks || []).some(function (T) { return T.id === L().task && T.ended && T.ended.event; });
       return PP.href('end.html', { state: over ? 'ended' : 'end-review', unit: qs.get('unit') || '', data: data });
     }
@@ -1211,7 +1223,7 @@
     var r = store.commit(r0.event);
     if (!r.ok) { render(); return; }
     dblSaved = Object.assign({ dose: p.dose }, r0.event);
-    dbl = { answer: '', withdraw: '' };
+    dbl = { answer: '', withdraw: '' }; keepDbl(p);
     setUrl('double', { dose: p.dose });
     render();
   }
@@ -1341,8 +1353,8 @@
       location.href = PP.href('edit.html', { state: 'record-page', crate: crate, data: store.name });
     } else if (a === 'open-double') {
       persist(); location.href = doubleHref(v);
-    } else if (a === 'dbl-answer') { dbl.answer = v; if (v !== 'same') dbl.withdraw = ''; dblSaved = null; render();
-    } else if (a === 'dbl-withdraw') { dbl.withdraw = v; render();
+    } else if (a === 'dbl-answer') { dbl.answer = v; if (v !== 'same') dbl.withdraw = ''; dblSaved = null; keepDbl(); render();
+    } else if (a === 'dbl-withdraw') { dbl.withdraw = v; keepDbl(); render();
     } else if (a === 'clear') {
       if (!dirty()) return;                                          // greyed: nothing to clear
       // Clear discards the draft, with Undo for 5 seconds (Banner)
@@ -1419,6 +1431,7 @@
       }
     }
     if (view === 'double' && own && st.answer) dbl = Object.assign({ answer: '', withdraw: '' }, st.answer);
+    if (view === 'double') restoreDbl();                              // an answer picked before Back or the scrim comes back until Save
     // Arriving on a row (the identity table's row, ?row= its tag, notch or id): it opens in place.
     var want = qs.get('row') || (own ? st.row : null);
     if (want) { var hit = L().identity.rows.filter(function (r) { return r.rowId === want || r.tag === want || r.notch === want; })[0]; if (hit) rowOpen = hit.rowId; }

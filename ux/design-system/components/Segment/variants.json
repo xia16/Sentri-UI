@@ -50,5 +50,17 @@
       "Disabled",
       "Long-label"
     ]
+  },
+  {
+    "id": "scope",
+    "name": "Scope",
+    "use": "Use to show a whole list or one part of it, the part picked in a drawer: All units with its count, then a door naming the picked unit (or Choose unit). Data sync's task log.",
+    "notUse": "Not for fixed states of one list (use the two-line lens), not for subjects of a sheet (use the view switch), never more than the two options.",
+    "states": [
+      "All",
+      "A part picked",
+      "Pressed",
+      "Chinese"
+    ]
   }
 ]
