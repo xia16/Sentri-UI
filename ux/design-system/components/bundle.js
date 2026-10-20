@@ -1400,8 +1400,10 @@
      segment per planned day, red segments for days past the plan).
      Slot 3 is one of: the count due now and a short word, with an optional overdue part after it ("5 now · 2 overdue");
      the next count in grey when nothing is due yet ("8 tomorrow"); a tick and "Ready to close" when all is recorded.
-     taskTile({ id, title, sub, todo:{value,label,tone,also:{text,tone}}|{next:{value,label}}|{done}|{none}, days:{day,total,over,text}, late, action, entry }) */
-  function taskTile({id='',title='',sub='',todo={},days={},late=false,action='',entry=''}={}){
+     Saved work (owner, 2026-10-18): a task with records still on this phone carries "↑ N" at the right of the run line, quiet ink,
+     N being that task's records; nothing when it has none.
+     taskTile({ id, title, sub, todo:{value,label,tone,also:{text,tone}}|{next:{value,label}}|{done}|{none}, days:{day,total,over,text}, late, saved, action, entry }) */
+  function taskTile({id='',title='',sub='',todo={},days={},late=false,saved=0,action='',entry=''}={}){
     const n=Math.max(1,days.total||1),d=Math.max(0,Math.min(n,days.day||0)),over=Math.max(0,days.over||0);
     const act=t=>t==='act'||t==='red';
     // One coloured signal at most (owner, 2026-10-19): red only on the overdue part or the days over; "Ready to close" is a quiet tick.
@@ -1413,10 +1415,11 @@
     const todoText=todo.done||todo.none||(todo.next?`${todo.next.value} ${todo.next.label}`:[`${todo.value} ${todo.label}`,todo.also&&todo.also.text].filter(Boolean).join(', '));
     const segs=Array.from({length:n},(_,i)=>`<i${i<d?' data-on=""':''}></i>`).join('')+Array.from({length:over},()=>'<i data-over=""></i>').join('');
     const dayText=days.text||(over?`${over} ${over===1?'day':'days'} overdue`:`Day ${d} of ${n}`);
-    const name=[title,sub,todoText,dayText].filter(Boolean).join(', ');
+    const savedText=saved>0?`${saved} ${saved===1?'record':'records'} waiting to upload`:'';
+    const name=[title,sub,todoText,dayText,savedText].filter(Boolean).join(', ');
     return `<button type="button" class="st-tile" data-ds="TaskTile"${late?' data-late=""':''}${id?` data-card="${esc(id)}"`:''}${action?` data-action="${esc(action)}" data-value="${esc(id)}"`:''}${entry?` data-entry="${esc(entry)}"`:''} aria-label="Open ${esc(name)}">`+
       `<span class="st-tile-name">${esc(title)}</span><span class="st-tile-sub">${esc(sub)}</span>${todoHtml}`+
-      `<span class="st-tile-run"><span class="st-tile-segs" aria-hidden="true">${segs}</span><span class="st-tile-day"${over?' data-tone="act"':''}>${esc(dayText)}</span></span></button>`;
+      `<span class="st-tile-run"><span class="st-tile-segs" aria-hidden="true">${segs}</span>${saved>0?`<span class="st-tile-saved" aria-hidden="true">${glyph('upload')}${esc(saved)}</span>`:''}<span class="st-tile-day"${over?' data-tone="act"':''}>${esc(dayText)}</span></span></button>`;
   }
   /* WeekBoard: a week of work, one line per task under its type, a cell per day holding that day's count (owner, 2026-10-19).
      Cell codes: '' nothing · n running, nothing due · u waiting on today · dN done · oN due today · pN planned · eN estimate ·

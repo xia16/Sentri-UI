@@ -129,10 +129,13 @@
   const requestedSection=params.get('section')||rememberedSection;
   const initialSection = sections.some(s=>s.id===requestedSection) ? requestedSection : 'gestation';
   let state = {page:'home',section:initialSection,unit:null,task:null,workUnit:null,expandedTasks:params.get('tasks')==='expanded',expandedUpcoming:false,assistantTab:'findings',chat:[],answered:false,notes:[],log:[],overlay:null};
-  // UI-only queue: no device database or upload service is connected to this study.
-  const pendingExamples=[{title:'Pregnancy check · 000308',context:'Gestation · Unit 7 · Batch 31',time:'09:32'},{title:'Pen note · C2',context:'Gestation · Unit 8',time:'09:35'},{title:'Feed adjustment · 000267',context:'Gestation · Unit 7 · Pen C1',time:'09:38'}];
-  const syncPreset=params.get('sync')||(params.get('connection')==='online'?'online':'offline');
-  const sync={connection:syncPreset==='offline'?'offline':'online',pending:syncPreset==='synced'?[]:syncPreset==='failed'?[pendingExamples[2]]:syncPreset==='conflict'?pendingExamples.slice(0,2):[...pendingExamples],status:syncPreset==='synced'?'synced':syncPreset==='failed'?'failed':syncPreset==='conflict'?'conflict':syncPreset==='online'?'uploading':'waiting'};
+  // UI-only: the records still on this phone, per task, as in the Data sync study (PRD, PR 235). No device database or upload service is connected.
+  // ?sync= offline | online | partial | expired | synced; the older failed/conflict links read as partial.
+  const syncPresetOf=v=>['failed','conflict'].includes(v)?'partial':['offline','online','partial','expired','synced'].includes(v)?v:'offline';
+  const syncPreset=syncPresetOf(params.get('sync')||(params.get('connection')==='online'?'online':'offline'));
+  const syncFor=p=>({preset:p,connection:p==='offline'?'offline':'online',saved:p==='synced'?{}:p==='partial'?{preg31:4}:{preg31:9,return30:3},other:p==='synced'||p==='partial'?0:2,signedOut:p==='expired'});
+  let sync=syncFor(syncPreset);
+  const savedTotal=()=>Object.values(sync.saved).reduce((a,b)=>a+b,0)+sync.other;
   if(params.get('view')==='sections')state.page='sections';
   if(params.get('view')==='toolbox')state.page='toolbox';
   // Atlas-only start states for the screens a tap cannot reach (typing an answer): ?answered=1 (answer on file), ?view=finding.
@@ -327,9 +330,9 @@
     const k=cardFields[t.id]?t.id:(t.base||t.id),f=cardFields[k]||{},tf=tileFields[t.id]||tileFields[k]||{},current=workPreview==='mixed'?(f.state||'active'):workPreview;
     let due=tf.due!=null?tf.due:(f.due?Object.values(f.due).reduce((a,b)=>a+b,0):0);
     if(t.id==='farrow28')due=taskRecords(t).filter(r=>r.active).length;
-    if(tf.ready)return {id:t.id,title:shortName[t.type]||t.type,sub:t.sub||t.batch,todo:{done:'Ready to close'},days:{day:tf.days,total:tf.days}};
+    if(tf.ready)return {id:t.id,title:shortName[t.type]||t.type,sub:t.sub||t.batch,saved:sync.saved[t.id]||0,todo:{done:'Ready to close'},days:{day:tf.days,total:tf.days}};
     const none=current==='waiting'||!due,day=tf.day||f.day||1,days=tf.days||f.days||1;
-    return {id:t.id,entry:({farrow28:'farrowing',piglet27:'piglet-processing'})[t.id],title:shortName[t.type]||t.type,sub:t.sub||t.batch,
+    return {id:t.id,entry:({farrow28:'farrowing',piglet27:'piglet-processing'})[t.id],title:shortName[t.type]||t.type,sub:t.sub||t.batch,saved:sync.saved[t.id]||0,
       todo:none?(tf.soon?{next:tf.soon}:{none:'None now'}):{value:due,label:tf.label||'due now',tone:tf.tone,also:tf.also},late:!!tf.late,
       days:{day,total:days,over:tf.over||0,text:tf.text||(!tf.over&&day===days&&days>1?`Day ${day} of ${days} · last day`:undefined)}};
   }
@@ -500,18 +503,17 @@
     const toggle=open.length>5?btn('toggle-tasks',state.expandedTasks?'Show first 5 tasks':`See all ${open.length} tasks${hiddenAlerts?' · '+hiddenAlerts+' exceptions':''}${hiddenOverdue?' · '+hiddenOverdue+' overdue':''}`,'task-list-toggle','','aria-expanded="'+state.expandedTasks+'"'):'';
     return header()+scopeRail()+`<div class="app-scroll screen-enter">${state.unit?unitStrip():''}<div class="work-section-heading"><h2>Today’s work</h2><span>Sample · Thu, 8 Jul</span></div>${cards?`<div class="home-task-list">${cards}</div>${toggle}`:`<div class="empty-state"><div class="complete-mark">${icon('check')}</div><h3>No tasks in progress</h3><p>${state.unit?'You can still inspect this unit and record anything you find.':'Select a unit to inspect pens or record anything you find.'}</p></div>`}${comingUp()}${completedHTML}</div>`+nav();
   }
+  // The saved-work control (owner, 2026-10-18): the icon alone, quiet ink, only while records are on this phone; red only when signed out.
+  // The counts live on the task tiles. It follows records, not the connection.
   function globalSync(){
-    const n=sync.pending.length;
+    const n=savedTotal();
     if(!n)return '';
-    const zh=params.get('lang')==='zh',error=['failed','conflict'].includes(sync.status),busy=sync.status==='uploading';
-    const island=params.get('indicator')==='island';
-    const title=zh?(error?`${n} 条记录需要处理`:busy?`正在上传 ${n} 条记录`:`${n} 条记录保存在本机`):(error?`${n} record${n===1?'':'s'} ${n===1?'needs':'need'} attention`:busy?`Uploading ${n} saved records`:`${n} records saved on this phone`);
-    const detail=zh?(error?'查看原因':busy?'自动上传中':'联网后自动上传'):(error?'Review records':busy?'Automatic upload':'Uploads when connected');
-    const short=zh?(error?'异常':busy?'上传':'待传'):(error?'Fix':busy?'Sending':'Saved');
-    return `<div class="global-sync ${error?'needs-attention':busy?'uploading':'waiting'}">${btn('sync',`<span class="global-sync-mark" aria-hidden="true">${busy?'↻':error?'!':'↑'}</span>${island||error?`<span class="global-sync-short">${short}</span>`:''}<strong class="global-sync-count">${n}</strong>`,'global-sync-control','','aria-label="'+esc(title+'. '+detail)+'"'+(busy?' aria-busy="true"':''))}</div>`;
+    const zh=params.get('lang')==='zh',out=sync.signedOut;
+    const label=zh?(out?`登录后继续上传，本机 ${n} 条记录`:`本机记录，${n} 条`):(out?`Sign in to keep uploading, ${n} records on this phone`:`Saved work, ${n} records on this phone`);
+    return `<div class="global-sync" data-sync="${out?'signed-out':'waiting'}">${SentriUI.iconButton({action:'sync',icon:icon(out?'alert':'upload'),label,tone:out?'attention':''})}</div>`;
   }
   function showSync(){
-    const scenario=sync.pending.length===0?'done':sync.status==='uploading'?'syncing':sync.status==='failed'?'partial':sync.status==='conflict'?'conflict':sync.connection==='offline'?'offline':'syncing';
+    const scenario={synced:'done',online:'syncing',partial:'partial',expired:'expired',offline:'offline'}[sync.preset];
     const url=new URL('data-sync-astra-prototype.html',location.href);
     url.searchParams.set('scenario',scenario);
     url.searchParams.set('from','home');
@@ -537,7 +539,7 @@
     history.replaceState(null,'',homeURL);location.assign(url.href);
   }
   function openTask(id,unit=null){
-    if(id==='farrow28'){openDesigned('farrowing-astra-concept.html',unit,unit?'unit':'overview',null,sync.pending.length?'other':'done');return;}
+    if(id==='farrow28'){openDesigned('farrowing-astra-concept.html',unit,unit?'unit':'overview',null,savedTotal()?'other':'done');return;}
     if(id==='piglet27'){openDesigned('../tasks/piglet-processing/simple/index.html',unit,unit?'unit':'overview');return;}
     push('placeholder',{task:id,workUnit:unit});
   }
@@ -590,14 +592,12 @@
     return hit?hit.id:null;
   }
   function render(){
-    const island=params.get('indicator')==='island',badge=globalSync();
-    app.classList.toggle('has-global-sync',!!badge);
-    app.classList.toggle('island-sync',island);
-    app.innerHTML=(island?badge:'')+(pages[state.page]||home)();
+    const badge=globalSync();
+    app.innerHTML=(pages[state.page]||home)();
     app.classList.toggle('schedule-open',state.page==='schedule');
     if(state.page==='marked'&&SentriUI.rowFitTags)requestAnimationFrame(()=>SentriUI.rowFitTags(app));
     // The list page holds no records of its own, so its one header corner stays free (Headers law), as on the Schedule.
-    if(badge&&!island&&!['schedule','marked'].includes(state.page))(app.querySelector('.app-header,.page-head,.st-page-header')||app).insertAdjacentHTML('beforeend',badge);
+    if(badge&&!['schedule','marked'].includes(state.page))(app.querySelector('.app-header,.page-head,.st-page-header')||app).insertAdjacentHTML('beforeend',badge);
     window.AtlasBare&&AtlasBare.watch(atlasScreen);
     document.querySelectorAll('[data-demo]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.demo===(state.page==='sections'?'sections':state.unit?'unit':'overview'))));
   }
@@ -704,12 +704,7 @@
   document.addEventListener('input',e=>{if(e.target.matches?.('[data-mk-search]')&&state.page==='marked'){state.marked.q=e.target.value;app.querySelector('.mk-clear')?.toggleAttribute('hidden',!e.target.value);const l=app.querySelector('.mk-list');if(l){l.innerHTML=markedList();if(SentriUI.rowFitTags)SentriUI.rowFitTags(l);}}});
   document.addEventListener('input',e=>{if(e.target.name==='question'&&e.target.closest('#ask-form'))state.askDraft=e.target.value;if(e.target.id==='answer')state.answerDraft=e.target.value;});
   document.addEventListener('keydown',e=>{if(!overlay.children.length)return;if(e.key==='Escape'){closeDrawer();return;}if(e.key==='Tab'){const focusable=[...overlay.querySelectorAll('.sheet button,.sheet input,.sheet textarea,.sheet a[href],.dialog button')].filter(el=>!el.disabled);const first=focusable[0],last=focusable.at(-1);if(e.shiftKey&&(document.activeElement===first||document.activeElement===overlay.querySelector('.sheet,.dialog'))){e.preventDefault();last?.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first?.focus();}}});
-  $('#sync-demo').addEventListener('change',e=>{
-    sync.connection=e.target.value==='offline'?'offline':'online';
-    sync.pending=e.target.value==='synced'?[]:e.target.value==='failed'?[pendingExamples[2]]:e.target.value==='conflict'?pendingExamples.slice(0,2):[...pendingExamples];
-    sync.status=e.target.value==='synced'?'synced':e.target.value==='failed'?'failed':e.target.value==='conflict'?'conflict':e.target.value==='online'?'uploading':'waiting';
-    renderSync();
-  });
+  $('#sync-demo').addEventListener('change',e=>{sync=syncFor(syncPresetOf(e.target.value));renderSync();});
   $('#sync-demo').value=syncPreset;
   $('#attention-preview').value=attentionPreview;
   $('#attention-preview').addEventListener('change',e=>{attentionPreview=e.target.value;maintenanceCache.clear();const url=new URL(location.href);url.searchParams.set('attention',attentionPreview);history.replaceState(null,'',url);goHome();});

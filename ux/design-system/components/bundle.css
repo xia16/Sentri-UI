@@ -1245,6 +1245,8 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 .st-tile-segs i{flex:1;border-radius:2px;background:var(--well)}
 .st-tile-segs i[data-on]{background:var(--ink-2)}
 .st-tile-segs i[data-over]{background:var(--red)}
+.st-tile-saved{float:right;display:inline-flex;align-items:center;gap:3px;margin:6px 0 0 8px;font:500 13px/18px var(--font-mono);color:var(--ink-2)}
+.st-tile-saved svg{width:14px;height:14px;flex:none}
 .st-tile-day{display:block;margin-top:6px;font-size:13px;line-height:18px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 @media (max-width:370px){.st-tile{padding:12px}.st-tile-name{font-size:15px}}
 

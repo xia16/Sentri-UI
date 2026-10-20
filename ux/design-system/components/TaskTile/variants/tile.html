@@ -8,6 +8,7 @@
 <section data-state="Past its plan"></section>
 <section data-state="All recorded"></section>
 <section data-state="Last day"></section>
+<section data-state="Saved work"></section>
 <section data-state="Pressed"></section>
 <section data-state="Long label / Chinese"></section>
 <script>
@@ -19,6 +20,7 @@ const S={
   'Past its plan':[T({id:'v21',title:'Vaccination',sub:'PRRS · Units 7, 8',todo:{value:6,label:'overdue',tone:'act'},days:{day:3,total:3,over:1},late:true})],
   'All recorded':[T({id:'p28',title:'Pregnancy check',sub:'Batch 28',todo:{done:'Ready to close'},days:{day:3,total:3}})],
   'Last day':[T({id:'w25',title:'Weaning',sub:'Batch 25',todo:{value:4,label:'pens ready'},days:{day:2,total:2,text:'Day 2 of 2 · last day'}})],
+  'Saved work':[T({id:'p31',title:'Pregnancy check',sub:'Batch 31',todo:{value:5,label:'now',also:{text:'2 overdue',tone:'act'}},days:{day:1,total:3},saved:9}),T({id:'r30',title:'Return heat',sub:'Batch 30',todo:{value:10,label:'to watch'},days:{day:3,total:7},saved:3})],
   'Pressed':[T({id:'f28',title:'Farrowing',sub:'Batch 28',todo:{value:2,label:'farrowing'},days:{day:2,total:7}}).replace('class="st-tile"','class="st-tile" style="background:var(--press)"')],
   'Long label / Chinese':[T({id:'pp27',title:'Processing',sub:'Batch 127',todo:{value:128,label:'litters due'},days:{day:3,total:14}}),T({id:'zh31',title:'妊娠检查',sub:'批次 31',todo:{value:5,label:'待检',also:{text:'2 头逾期',tone:'act'}},days:{day:1,total:3,text:'第 1 天，共 3 天'}})]
 };

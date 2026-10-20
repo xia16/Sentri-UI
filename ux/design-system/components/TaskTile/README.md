@@ -23,7 +23,7 @@ Four fixed slots, each with one kind of message, at the same height in every til
 1. **Task**: 16px / 500 (15px at 370px and below, where the tile also pads 12px), one line, a short name of at most about 15 characters ("Return heat", "Processing"); ellipsis is only a guard.
 2. **Batch**: 13px muted, one line ("Batch 31"; for health work what and where: "PRRS · Units 7, 8").
 3. **To-do**: one line that says it all (owner, 2026-10-19: no second line under it). The count due now in 26px mono with a 13px word ("10 to watch"); when part is overdue, the overdue part follows on the same line and only it is red ("5 now · 2 overdue"). When nothing is due yet, the next count in grey ("8 tomorrow"), or "None now". When everything is recorded, a tick and "Ready to close" (16px / 500, ink-2). Timers and later windows ("4 more from Sat") live in the task and on the Schedule, not the tile.
-4. **Run**: a hairline, then one 6px segment per planned day (filled up to today) and "Day N of N". A task past its planned end adds one red segment per day over and reads "1 day overdue"; its to-do says how many are overdue ("6 overdue"). The red segment is the only colour on that tile.
+4. **Run**: a hairline, then one 6px segment per planned day (filled up to today) and "Day N of N". A task past its planned end adds one red segment per day over and reads "1 day overdue"; its to-do says how many are overdue ("6 overdue"). The red segment is the only colour on that tile. When the task has records still on this phone, "↑ N" (an upload glyph and the count of that task's records, 13px mono, ink-2) sits at the right end of the day line (owner, 2026-10-18: the Home header shows the icon alone; the tiles carry the counts). Nothing when the task has none.
 
 White on the tinted page, 1px `line` border, `radius-panel`, 14px padding. **One coloured signal at most** (owner, 2026-10-19): red only on the overdue part or the days over; no red edge, no red words beside it.
 
@@ -41,6 +41,7 @@ White on the tinted page, 1px `line` border, `radius-panel`, 14px padding. **One
 | Past its plan | "6 overdue"; a red run segment per day over (the only colour); "1 day overdue". |
 | All recorded | Everything recorded, task still open: a tick and "Ready to close" in the count line, the run full. A reminder only: closing stays inside the task. |
 | Last day | "Day 3 of 3 · last day". |
+| Saved work | "↑ 9" at the right of the day line, in ink-2: the task's records still on this phone. Quiet; never red. |
 | Pressed | One step deeper (`press`). |
 | Long label / Chinese | Name and batch end in an ellipsis; the count never wraps; the Chinese task name fits one line. |
 
@@ -48,7 +49,7 @@ No designed focus or hover (touch only). The whole tile is one target (at least 
 
 ## API
 
-`SentriUI.taskTile({ id, title, sub, todo: { value, label, tone, also: { text, tone } } | { next: { value, label } } | { done } | { none }, days: { day, total, over, text }, late, entry, action })`. `tone: 'act'` marks overdue (on `todo` for a task past its plan, on `also` for an overdue part). `id` is written as `data-card` for the host's routing; `entry` as `data-entry` for the atlas. The accessible name reads every slot in order.
+`SentriUI.taskTile({ id, title, sub, todo: { value, label, tone, also: { text, tone } } | { next: { value, label } } | { done } | { none }, days: { day, total, over, text }, late, saved, entry, action })`. `saved` is the number of the task's records still on this phone (0 draws nothing). `tone: 'act'` marks overdue (on `todo` for a task past its plan, on `also` for an overdue part). `id` is written as `data-card` for the host's routing; `entry` as `data-entry` for the atlas. The accessible name reads every slot in order.
 
 ## Copy
 
@@ -61,4 +62,5 @@ Do keep every slot in its place, even empty. Don't add a done state, a second li
 ## Changelog
 
 2026-10-19: built from the Overview redesign (owner rounds 2026-10-18/19).
+2026-10-20: `saved`: the task's records still on this phone, "↑ N" on the run line (offline sync ruling, owner 2026-10-18; PRD, PR 235).
 2026-10-19: the quiet line under the count is gone (owner): the count line carries the overdue part, the next count and Ready to close; the tile is 26px shorter. `next` removed from the API.
