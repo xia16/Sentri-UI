@@ -794,3 +794,5 @@
 
 /* The Selected page (owner, 2026-10-17): its groups sit a section apart. */
 .inspection-phone .sheet-body > .review-list + .st-heading.st-heading { margin-top: var(--space-section); }
+/* Find a pig: the design system's Lookup find page (components/Lookup) fills the phone over the walk, as a page does. */
+.inspection-phone>.st-find{position:absolute;inset:0;z-index:5}

@@ -13,7 +13,7 @@
 /* Compact fixed navigation; overview scrolls, filters and pen headers pin. */
 .room-scroll{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;--room-sticky-height:64px;scroll-padding-top:var(--room-sticky-height)}
 /* The phone scrolls by touch: no desktop scrollbar takes width inside it (the list jumped sideways when it first overflowed). Same law as bundle.css .device scrollers. */
-.room-scroll::-webkit-scrollbar,.find-results::-webkit-scrollbar,.scan-body::-webkit-scrollbar{display:none;width:0;height:0}
+.room-scroll::-webkit-scrollbar{display:none;width:0;height:0}
 
 
 
@@ -58,42 +58,10 @@
 /* The pen header scrolls with its card: a pinned one only left an empty stub under the tabs while the card scrolled away. */
 .farrowing-phone .room-list .pen-top{position:static}
 
-/* Find a sow and Scan ear tags: two full pages (owner decisions 2026-10-12). Find a sow sits on white, Scan on the tinted app background with white cards. */
-.find-page{flex:1;min-height:0;display:flex;flex-direction:column}
-.room-surface.find-surface{background:var(--paper)}
-.room-surface:has(.scan-page){background:var(--app-background)}
-.find-top{flex:none;display:flex;align-items:center;gap:10px;padding:6px 16px 12px;border-bottom:1px solid var(--line)}
-.find-field{flex:1;min-width:0;display:flex;align-items:center;gap:8px;min-height:52px;padding:0 0 0 14px;border:2px solid var(--ink);border-radius:var(--radius-12);background:var(--paper)}
-.find-field>svg{flex:none;width:18px;height:18px;color:var(--muted)}
-.find-field input{flex:1;min-width:0;padding:0;border:0;outline:0;background:transparent;color:var(--ink);font:500 17px var(--font-sans)}
-.find-field input::placeholder{color:var(--ink-2);opacity:1;font-size:15px;font-weight:400}
-.find-clear[hidden]{display:none}
-.find-clear,.find-scan{flex:none}
-.find-cancel{flex:none}
-.scan-selected{display:flex;align-items:center;min-height:48px;margin:0 auto 0 0;font:600 15px var(--font-sans)}
-.find-results{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;padding:14px 16px 24px}
-.find-results .st-heading.st-heading,.scan-body .st-heading.st-heading{margin:16px 2px 8px}
-.find-list{--st-panel-bg:var(--app-background);margin-bottom:16px}
-.find-hint{margin:4px 2px;color:var(--muted);font:400 14px/20px var(--font-sans)}
-/* The typed part is bold ink; the rest of the tag is muted. */
-.find-row .st-animal-id{color:var(--ink-2);font-weight:500}
-.find-row .st-animal-id b,.find-row .st-animal-state b{color:var(--ink);font-weight:700}
-/* The list carries the page's side gutter itself (the sheet body's is cleared; the Sheet page rule loads later, hence the phone class), so its cards sit where the room list's and Find a sow's do. */
-.farrowing-phone .sheet.scan-page>.sheet-body{padding-left:0;padding-right:0}
-.scan-body{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;padding:4px 16px 24px}
-.scan-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 36px 40px;text-align:center}
-.scan-empty svg{width:44px;height:44px;margin-bottom:14px;color:var(--muted)}
-.scan-empty strong{font:600 17px var(--font-sans)}
-.scan-empty p{margin:6px 0 0;color:var(--muted);font:400 14px/20px var(--font-sans)}
-.scan-foot .scan-toggle{flex:1}
-/* A sow just scanned: her row takes the pale progress wash, then it fades once her moment is over. Not the well tint: a ticked row wears that. */
-.scan-card [data-scan-tag]{transition:background-color .9s ease-out}
-.scan-card [data-scan-tag].scan-lit{background-color:var(--progress-wash);transition-duration:.12s}
-@media(prefers-reduced-motion:reduce){.scan-card [data-scan-tag]{transition:none}}
+/* Find a sow and Scan ear tags are the design system's Lookup pages (components/Lookup): their look lives in bundle.css. */
 .other-sow-log{margin-top:var(--space-section)}
 /* Prototype controls, outside the phone frame. */
 .demo-scan{min-height:38px;padding:0 12px;border:1px solid #d1d5c7;border-radius:8px;background:var(--paper);color:var(--ink);font:500 13px var(--font-sans)}
 .demo-scan[hidden]{display:none}
 .demo-scan:disabled{color:var(--muted)}
-.room-surface.find-surface>.statusbar{background:var(--paper)}
 

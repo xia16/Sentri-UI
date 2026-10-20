@@ -500,7 +500,7 @@
   function finding(){return legacyHead('Movement needs clarification','Assistant · overnight review','<span class="preview-badge">PREVIEW</span>',false)+`<div class="app-scroll screen-enter"><div class="scope-label">${icon('place')}Gestation / Unit 7 / Pen A2</div><div class="assistant-hero"><p class="overline">YOUR INPUT NEEDED</p><h3>Where did these pigs go?</h3><p>The overnight review found a movement note without a destination.</p></div><div class="evidence"><strong>Movement note · yesterday, 15:40</strong><p>“Moved 4 pigs out of A2.”<br>Recorded by G. Hansen · Unit 7</p></div><div class="evidence"><strong>What is missing</strong><p>The destination unit and pen. No movement record has been changed.</p></div>${state.answered?`<div class="message">Your answer: ${esc(state.answer)}<br>Saved in this preview. No live record was changed.</div>`:`<form id="answer-form">${SentriUI.field({label:`Destination or clarification`,control:`<textarea id="answer" name="answer" placeholder="For example: Unit 8, pen B3" required maxlength="500">${esc(state.answerDraft||'')}</textarea>`})}</form>`}<p class="work-note">Sample decision for reviewing the Assistant experience.</p>${btn('finding-unit','View Unit 7','secondary')}</div>${SentriUI.sheetFooter({content:SentriUI.backButton({action:'back'})+(state.answered?'':'<button class="primary" type="submit" form="answer-form">Send clarification</button>'),className:'page-footer'})}`;}
   function toolbox(){const rows=[...(state.unit?[{action:'maintenance',icon:icon('wrench'),title:'Maintenance',description:'Unit '+state.unit+' · equipment issues'}]:[]),{action:'search',icon:icon('search'),title:'Find a pig or pen',description:'Search by ear tag or pen code'},{action:'records',icon:icon('note'),title:'Records',description:'Updates made in this preview'},{action:'sections',icon:icon('barn'),title:'Sections & units',description:'Browse the farm'},{action:'assistant',icon:icon('spark'),title:'Assistant',description:'Questions, findings and decisions'}];return head('Toolbox')+'<div class="app-scroll screen-enter">'+SentriUI.panel(rows.map(r=>SentriUI.row(r)).join(''),{className:'st-row-group'})+'</div>'+nav('toolbox');}
   function recordLog(){return head('Records')+'<div class="app-scroll screen-enter">'+SentriUI.log(SentriUI.logGroups(state.log.map(l=>({title:l.title,detail:l.context,at:l.at,by:'G. Hansen'}))),{empty:'No new records yet. Answers to overnight findings will appear here.'})+'</div>'+nav('toolbox');}
-  const pages={home,sections:sectionChooser,placeholder,environment,maintenance,assistant,finding,toolbox,records:recordLog,schedule:schedulePage};
+  const pages={home,sections:sectionChooser,placeholder,environment,maintenance,assistant,finding,toolbox,records:recordLog,schedule:schedulePage,find:findPage,scan:scanPage,pig:pigPage};
   // The atlas follows the demo (?screen=): the screen whose url holds this scope (view, section, unit, work, attention), else null.
   function atlasScreen(screens){
     const dr=overlay.querySelector('.sheet,.dialog');
@@ -515,13 +515,15 @@
     if(state.page==='finding')return state.answered?'assistant.answered':'assistant.finding';
     if(state.page==='toolbox'&&!dr)return 'workbench.toolbox';
     if(state.page==='records')return 'workbench.records';
+    if(state.page==='find'&&!dr)return !lookup.query.trim()?'find-pig.search':findHits().length?'find-pig.results':'find-pig.search-none';
+    if(state.page==='scan'&&!dr){const sc=lookup.scan;return !sc.connected?'find-pig.scan-no-reader':!sc.items.length?'find-pig.scan':sc.picked.length?'find-pig.scan-ticked':!sc.listening?'find-pig.scan-stopped':'find-pig.scan-list';}
+
     if(state.page==='maintenance'){if(dr)return dr.querySelector('#fault-form')?'environment.report-issue':maintenanceRecords().find(f=>f.id===state.faultId)?.resolved?'environment.issue-resolved':'environment.issue-detail';return maintenanceRecords().length?'environment.maintenance':'environment.maintenance-empty';}
     if(dr){
       if(dr.classList.contains('closed-today'))return 'workbench.closed-today';
       if(dr.classList.contains('marked-treat'))return 'workbench.to-treat';
       if(dr.classList.contains('unit-picker'))return 'workbench.choose-unit';
-      if(dr.querySelector('#lookup-form'))return dr.querySelector('#tag')?'find-pig.scan':'find-pig.search';
-      if((dr.querySelector('[data-action="lookup-result"]')||/No matching sample pig/.test(dr.textContent)))return 'find-pig.results';
+      if(dr.classList.contains('scan-actions-sheet'))return 'find-pig.scan-actions';
       return state.page==='placeholder'&&dr.querySelector('[data-action="confirm-end-task"]')?'workbench.end-task-early':null;
     }
     if(state.page==='placeholder'){const t=task();return t.completedAt||t.terminatedAt?'workbench.closed-task':'workbench.task-preview';}
@@ -537,7 +539,11 @@
     app.classList.toggle('island-sync',island);
     app.innerHTML=(island?badge:'')+(pages[state.page]||home)();
     app.classList.toggle('schedule-open',state.page==='schedule');
-    if(badge&&!island&&state.page!=='schedule')(app.querySelector('.app-header,.page-head,.st-page-header')||app).insertAdjacentHTML('beforeend',badge);
+    if(badge&&!island&&!['schedule','find','pig'].includes(state.page))(app.querySelector('.app-header,.page-head,.st-page-header')||app).insertAdjacentHTML('beforeend',badge);
+    if(state.page==='find'&&document.activeElement?.closest?.('#app')==null)app.querySelector('[data-find-input]')?.focus({preventScroll:true});
+    if(state.page==='scan')SentriUI.scanArrive(app,lookup.scan);
+    if(state.page==='pig')connectPig();
+    const demo=document.querySelector('[data-demo-scan]');if(demo){demo.hidden=state.page!=='scan'||!lookup.scan.connected;demo.disabled=!lookup.scan.listening;}
     window.AtlasBare&&AtlasBare.watch(atlasScreen);
     document.querySelectorAll('[data-demo]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.demo===(state.page==='sections'?'sections':state.unit?'unit':'overview'))));
   }
@@ -566,8 +572,33 @@
     if(unit)url.searchParams.set('unit',unit);else url.searchParams.delete('unit');
     history.replaceState(null,'',url);goHome();
   }
-  function scan(){drawer('Scan an ear tag',`<div class="scan-frame">${icon('scan')}</div><p>Scanner preview. Use a sample ear tag to try the lookup.</p><form id="lookup-form">${SentriUI.field({label:'Ear tag',control:`<input id="tag" name="tag" inputmode="numeric" placeholder="${taskRecords(taskBy('preg31'),7)[2].id}" required maxlength="12">`})}<button type="submit" class="button primary">Find sample pig</button></form>${btn('sample-scan','Use a sample tag','secondary')}`);}
-  function lookup(query){const term=query.trim().toLowerCase();const matches=[];tasks.forEach(t=>Object.keys(t.counts).forEach(u=>taskRecords(t,+u).filter(r=>r.id===term||r.pen.toLowerCase()===term).forEach(r=>matches.push({t,u,r}))));drawer('Search results',matches.length?SentriUI.panel(matches.slice(0,12).map(({t,u,r})=>SentriUI.row({title:r.id+' · Pen '+r.pen,description:'Unit '+u+' · '+t.type+' · '+t.batch,action:'lookup-result',value:t.id+':'+u+':'+r.id})).join(''),{className:'st-row-group'}):'<p>No matching sample pig or pen. Try the suggested sample tag or pen A1.</p>'+btn('search','Search again','secondary'));}
+  /* ---- Find a pig and Scan ear tags: the design system's Lookup pages (components/Lookup; owner decisions 2026-10-12 and 2026-10-20) ----
+     Both reach every unit of the section the worker is in. Find: type, tap one; nothing is listed before typing. Scan: the reader always
+     listens, each scan adds the pig to a list, newest first; a tick selects for Actions. A pig opens her pig record (the owner, 2026-10-20). */
+  const lookupPigs=()=>{const seen=new Map(),marked=Object.values(markedPigs[state.section]||{}).flat();
+    marked.forEach(p=>seen.set(p.tag,{tag:p.tag,pen:p.pen,unit:p.unit,cond:p.cond}));
+    tasks.filter(t=>t.section===state.section).forEach(t=>Object.keys(t.counts).forEach(u=>taskRecords(t,+u).forEach(r=>{if(!seen.has(r.id))seen.set(r.id,{tag:r.id,pen:r.pen,unit:+u,cond:''});})));
+    return [...seen.values()];};
+  // One card per unit under a plain "Unit 7" heading, the unit the worker is in first.
+  const byUnit=list=>{const here=state.unit||state.workUnit;return [...new Set(list.map(p=>p.unit))].sort((a,b)=>(b===here)-(a===here)||a-b).map(u=>({unit:u,list:list.filter(p=>p.unit===u)}));};
+  const lookup={query:'',scan:{connected:params.get('scan')!=='none',listening:true,items:[],picked:[],seq:0,fresh:{},last:''}};
+  if(['list','ticked'].includes(params.get('scan'))){lookup.scan.items=lookupPigs().filter((p,i)=>i%5===0).slice(0,3).map(p=>p.tag).reverse();lookup.scan.seq=3;if(params.get('scan')==='ticked')lookup.scan.picked=lookup.scan.items.slice(1);}
+  function findHits(){const q=lookup.query.trim().toLowerCase();if(!q)return [];const rank=p=>p.tag.startsWith(q)?0:p.tag.includes(q)?1:2;return lookupPigs().filter(p=>p.tag.includes(q)||p.pen.toLowerCase().includes(q)).sort((a,b)=>rank(a)-rank(b)||a.tag.localeCompare(b.tag));}
+  function findBody(){const q=lookup.query.trim().toLowerCase();return SentriUI.findResults({query:lookup.query,groups:byUnit(findHits()).map(g=>({title:'Unit '+g.unit,rows:g.list.map(p=>SentriUI.findRow({code:p.tag,place:'Pen '+p.pen,query:q,action:'lookup-pig',value:p.tag}))})),hint:'Type part of an ear tag or a pen, or scan a tag. Searches every unit.',none:'No pig matching “'+lookup.query.trim()+'” in any unit.'});}
+  function findPage(){return SentriUI.findPage({query:lookup.query,placeholder:'Ear tag or pen',results:findBody(),scan:{action:'scan',label:'Scan ear tag'},clear:{action:'find-clear',label:'Clear'},cancel:{action:'back',label:'Cancel'},className:'home-find'});}
+  // A scanned pig's row: her tag over her pen, and her marked condition on the right when she has one (as To treat and Monitoring draw her).
+  function scanRow(p){const sc=lookup.scan;return SentriUI.rowSelectDoor({code:p.tag,description:'Pen '+p.pen,right:p.cond?{kind:'tags',tags:[{name:p.cond,level:'ongoing'}]}:null,checked:sc.picked.includes(p.tag),action:'scan-pick',value:p.tag,openAction:'lookup-pig',openValue:p.tag,attrs:{'data-scan-tag':p.tag},inputAttrs:{'data-value':p.tag,'aria-label':'Select '+p.tag}});}
+  function scanPage(){const sc=lookup.scan,all=lookupPigs(),items=sc.items.map(t=>all.find(p=>p.tag===t)).filter(Boolean);
+    return SentriUI.scanPage({title:'Scan ear tags',back:{action:'back'},connected:sc.connected,listening:sc.listening,groups:byUnit(items).map(g=>({title:'Unit '+g.unit,rows:g.list.map(scanRow)})),picked:sc.picked.length,selected:n=>n+' '+(n===1?'pig':'pigs')+' selected',actions:{action:'scan-actions',label:'Actions'},toggle:{action:'scan-toggle'},empty:{text:'Each pig you scan appears here.',stoppedText:'Resume scanning to add pigs.'}});}
+  // "Simulate scan" (outside the phone): the reader reads the next sample pig; a pig already listed is lit again, not added twice.
+  function scanAdd(){const sc=lookup.scan;if(state.page!=='scan'||!sc.connected||!sc.listening)return;const pool=lookupPigs().filter((p,i)=>i%5===0).slice(0,8),tag=pool[sc.seq++%pool.length].tag;if(!sc.items.includes(tag))sc.items.unshift(tag);sc.fresh[tag]=Date.now()+1600;sc.last=tag;const before=SentriUI.scanPlaces(app);render();SentriUI.scanGlide(app,before);}
+  // Actions for the ticked pigs: the general actions (the owner, 2026-10-12), More actions' everyday verbs.
+  function scanActions(){const n=lookup.scan.picked.length;drawer('Actions',SentriUI.rowGrid([['transfer','Transfer'],['condition','Condition'],['treat','Treat'],['note','Note']].map(([k,label])=>({label,title:label+' · '+n+' '+(n===1?'pig':'pigs'),icon:icon(k),action:'scan-act',value:label})),{label:'Actions for the ticked pigs'}),{surface:'menu'});overlay.querySelector('.sheet')?.classList.add('scan-actions-sheet');}
+  /* A pig's record: the Inspection pig record, embedded as Farrowing embeds it. Its own Back returns here. */
+  function pigPage(){return '<iframe class="home-pig-frame" title="Pig record · '+esc(state.pig)+'" src="inspection-astra-concept.html?layout=focus&embed=sow'+(params.get('lang')==='zh'?'&lang=zh':'')+'"></iframe>';}
+  function connectPig(){const frame=app.querySelector('.home-pig-frame');if(!frame)return;const p=lookupPigs().find(x=>x.tag===state.pig);if(!p)return;
+    frame.addEventListener('load',()=>frame.contentWindow.postMessage({type:'open-sow-detail',record:{id:p.tag,pen:p.pen,unit:'Unit '+p.unit,stage:({gestation:'Gestating',breeding:'Open',farrowing:'Lactating',nursery:'Nursery'})[state.section]||'',events:[]},tasks:[],destinations:section().units.map(u=>({id:u,name:'Unit '+u,pens:[]})),entry:'pig',actions:[]},location.origin),{once:true});}
+  window.addEventListener('message',e=>{if(e.origin!==location.origin||state.page!=='pig'||e.data?.type!=='sow-detail-close')return;back();});
   function chat(question){state.assistantTab='chat';state.chat.push({who:'user',text:question},{who:'assistant',text:'This is a preview of the conversation entrance. In the connected app, I would use your current '+(state.workUnit?'Unit '+state.workUnit:section().name)+' context to investigate this request and ask for any missing details. No analysis or farm action has been performed.'});render();const scroller=app.querySelector('.app-scroll');scroller.scrollTop=scroller.scrollHeight;}
   SentriUI.holdBind(document.body,{onCommit(el){if(el.dataset.action==='confirm-end-task'){task().terminatedAt='Today · just now';closeDrawer();goHome();}}});
   document.addEventListener('click',e=>{
@@ -616,19 +647,24 @@
     if(a==='finding-unit'){state.section='gestation';state.unit=7;goHome();return;}
     if(a==='toolbox'){push('toolbox');return;}
     if(a==='records'){push('records');return;}
-    if(a==='scan'){scan();return;}
-    if(a==='sample-scan'){lookup(taskRecords(taskBy('preg31'),7)[2].id);return;}
-    if(a==='search'){drawer('Find a pig or pen',`<form id="lookup-form">${SentriUI.field({label:'Ear tag or pen code',control:`<input id="query" name="tag" placeholder="${taskRecords(taskBy('preg31'),7)[2].id} or A1" required maxlength="30">`})}<button type="submit" class="button primary">Search</button></form>`,{size:'short'});return;}
-    if(a==='lookup-result'){const [tid,u]=v.split(':');closeDrawer();state.section=taskBy(tid).section;openTask(tid,+u);return;}
+    if(a==='scan'){push('scan');return;}
+    if(a==='search'){lookup.query='';push('find');return;}
+    if(a==='find-clear'){lookup.query='';render();return;}
+    if(a==='scan-toggle'){if(lookup.scan.connected)lookup.scan.listening=!lookup.scan.listening;render();return;}
+    if(a==='scan-pick'){const k=lookup.scan.picked.indexOf(v);if(k<0)lookup.scan.picked.push(v);else lookup.scan.picked.splice(k,1);render();app.querySelector(`[data-scan-tag="${v}"] input`)?.focus({preventScroll:true});return;}
+    if(a==='scan-actions'){scanActions();return;}
+    if(a==='scan-act'){const n=lookup.scan.picked.length;closeDrawer();toast(v+' · '+n+' '+(n===1?'pig':'pigs')+': not built in this preview');return;}
+    if(a==='lookup-pig'){push('pig',{pig:v});return;}
   });
   document.addEventListener('input',e=>{if(e.target.id!=='fan-speed')return;const d=unitDevices()[0];d.draftSpeed=+e.target.value;document.getElementById('fan-speed-value').textContent=d.draftSpeed+'%';app.querySelector('[data-action="apply-device"]').disabled=sync.connection==='offline'||d.mode===d.draftMode&&d.speed===d.draftSpeed;});
   document.addEventListener('submit',e=>{
-    if(!['ask-form','answer-form','note-form','lookup-form','fault-form'].includes(e.target.id))return;e.preventDefault();const data=new FormData(e.target);
+    if(!['ask-form','answer-form','note-form','fault-form'].includes(e.target.id))return;e.preventDefault();const data=new FormData(e.target);
     if(e.target.id==='fault-form'){const device=String(data.get('device')).trim(),pen=String(data.get('location')).trim(),note=String(data.get('note')).trim();if(!device||!pen||!note)return;maintenanceRecords().unshift({id:'fault-'+Date.now(),device,pen,note,by:'G. Hansen · just now',resolved:false});closeDrawer();render();toast('Issue saved in this preview');}
     if(e.target.id==='ask-form'){const q=String(data.get('question')).trim();if(q){state.askDraft='';chat(q);}}
     if(e.target.id==='answer-form'){const answer=String(data.get('answer')).trim();if(!answer)return;state.answerDraft='';state.answered=true;state.answer=answer;state.log.unshift({at:Date.now(),title:'Movement clarification received',context:'Unit 7 · Pen A2 · '+answer});render();toast('Clarification saved in this preview');}
-    if(e.target.id==='lookup-form')lookup(String(data.get('tag')));
   });
+  document.addEventListener('input',e=>{if(!e.target.matches('[data-find-input]'))return;lookup.query=e.target.value;const page=e.target.closest('.st-find');page.querySelector('.st-find-results').innerHTML=findBody();page.querySelector('.st-find-clear').hidden=!lookup.query;window.AtlasBare&&AtlasBare.watch(atlasScreen);});
+  document.addEventListener('click',e=>{if(e.target.closest('[data-demo-scan]'))scanAdd();});
   document.addEventListener('input',e=>{if(e.target.name==='question'&&e.target.closest('#ask-form'))state.askDraft=e.target.value;if(e.target.id==='answer')state.answerDraft=e.target.value;});
   document.addEventListener('keydown',e=>{if(!overlay.children.length)return;if(e.key==='Escape'){closeDrawer();return;}if(e.key==='Tab'){const focusable=[...overlay.querySelectorAll('.sheet button,.sheet input,.sheet textarea,.sheet a[href],.dialog button')].filter(el=>!el.disabled);const first=focusable[0],last=focusable.at(-1);if(e.shiftKey&&(document.activeElement===first||document.activeElement===overlay.querySelector('.sheet,.dialog'))){e.preventDefault();last?.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first?.focus();}}});
   $('#sync-demo').addEventListener('change',e=>{

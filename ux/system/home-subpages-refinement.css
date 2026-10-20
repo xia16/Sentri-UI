@@ -238,3 +238,15 @@ body:has(#detail) #detail .lifecycle-actions [data-confirm-end] {
 /* Status bar: the same signal and battery glyphs as the other screens. */
 .device .device-status{display:flex;align-items:center;gap:6px}
 .device .device-status svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+/* Find a pig and Scan ear tags: the design system's Lookup pages (components/Lookup). Find fills the app under the device's status bar, which
+   turns white with it; Scan is a Sheet page in the app's box; a pig's record is the Inspection pig record, embedded over the whole device. */
+.device:has(#app .st-find)>.statusbar{background:var(--paper)}
+.device:has(.home-pig-frame)>.statusbar{display:none}
+.device:has(.home-pig-frame)>#app{height:100%}
+#app>.home-pig-frame{position:absolute;inset:0;z-index:5;width:100%;height:100%;border:0;background:transparent}
+/* Prototype control, outside the phone: the tag reader reads the next sample pig. */
+.demo-scan{min-height:38px;margin-top:12px;padding:0 12px;border:1px solid #d1d5c7;border-radius:8px;background:var(--paper);color:var(--ink);font:500 13px var(--font-sans)}
+.demo-scan[hidden]{display:none}
+.demo-scan:disabled{color:var(--muted)}
+/* Home's own base (button{border:0}, .secondary 500) outranks the design system's layered base: the Lookup pages keep the system's secondary button. */
+.device .st-scan .button.secondary{border:var(--border-width) solid var(--control-border);background:var(--paper);font-weight:600}
