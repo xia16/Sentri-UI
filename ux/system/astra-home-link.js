@@ -8,6 +8,9 @@
   const returnUnit = query.get('returnUnit');
   home.searchParams.set('view', returnUnit ? 'unit' : 'overview');
   if (/^\d+$/.test(returnUnit || '')) home.searchParams.set('unit', returnUnit);
+  // A pig opened from Home's To treat or Monitoring drawer: Back reopens that drawer, one level up, not bare Home.
+  const returnSheet = query.get('returnSheet');
+  if (!returnUnit && ['treat', 'monitor'].includes(returnSheet)) home.searchParams.set('sheet', returnSheet);
   const unit = /^\d+$/.test(query.get('unit') || '') ? query.get('unit') : null;
   window.SentriHomeLink = {
     unit,

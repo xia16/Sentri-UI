@@ -776,6 +776,10 @@ button.st-row[data-variant="tick"]:active:not(:disabled){background:var(--st-pre
 
 .st-row[data-variant="select-door"]{padding:0 var(--space-row-x) 0 0;gap:0}
 .st-row[data-variant="select-door"][data-ticked],.st-row[data-variant="select-door"]:has(input:checked){background:var(--well)}
+/* Just scanned (data-arrival, Farrowing's scan list, owner 2026-10-20): the pale progress wash for a moment, never the ticked well; "off" fades it back before the host drops the attribute. A ticked row keeps its well. */
+.st-row[data-variant="select-door"][data-arrival]{transition:background-color .9s ease-out}
+.st-row[data-variant="select-door"][data-arrival="on"]{background:var(--progress-wash);transition-duration:.12s}
+@media(prefers-reduced-motion:reduce){.st-row[data-variant="select-door"][data-arrival]{transition:none}}
 .st-row[data-variant="select-door"] .st-row-door{padding:var(--space-row-y) 0}
 label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-row-x) var(--space-row-y) 0;gap:0}
 
