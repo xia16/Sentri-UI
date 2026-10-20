@@ -86,9 +86,9 @@
 .scan-empty strong{font:600 17px var(--font-sans)}
 .scan-empty p{margin:6px 0 0;color:var(--muted);font:400 14px/20px var(--font-sans)}
 .scan-foot .scan-toggle{flex:1}
-/* A sow just scanned: her row takes the icon-well tint (never the ticked tint), then the tint fades once her moment is over. */
+/* A sow just scanned: her row takes the pale progress wash, then it fades once her moment is over. Not the well tint: a ticked row wears that. */
 .scan-card [data-scan-tag]{transition:background-color .9s ease-out}
-.scan-card [data-scan-tag].scan-lit{background-color:var(--well);transition-duration:.12s}
+.scan-card [data-scan-tag].scan-lit{background-color:var(--progress-wash);transition-duration:.12s}
 @media(prefers-reduced-motion:reduce){.scan-card [data-scan-tag]{transition:none}}
 .other-sow-log{margin-top:var(--space-section)}
 /* Prototype controls, outside the phone frame. */
