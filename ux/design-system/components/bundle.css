@@ -287,7 +287,8 @@ button.st-row:disabled{cursor:default}
 .st-row-tile{display:flex;flex-direction:column;align-items:center;gap:var(--space-8);min-width:0;min-height:var(--tap-min);padding:0;border:0;background:none;color:var(--ink);font:500 var(--type-meta-size)/1.3 var(--font-sans);text-align:center;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .st-row-tile-icon{display:grid;place-items:center;width:var(--tap-min);height:var(--tap-min);border-radius:var(--radius-14);background:var(--row-icon-bg);color:var(--row-icon-ink)}
 .st-row-tile-icon svg{width:var(--size-22);height:var(--size-22)}
-.st-row-tile-label{max-width:100%;overflow-wrap:anywhere}
+/* A label breaks between words, never inside one: "Condition" in a five-across grid at 360 is a hair wider than its column and broke as "Conditio / n". */
+.st-row-tile-label{max-width:100%;overflow-wrap:normal}
 .st-row-tile:active .st-row-tile-icon,.st-row-tile[data-preview="pressed"] .st-row-tile-icon{background:var(--choice-press)}
 .st-row-tile.is-danger{color:var(--red-ink)}
 .st-row-tile.is-danger .st-row-tile-icon{background:var(--red-wash);color:var(--red-ink)}
