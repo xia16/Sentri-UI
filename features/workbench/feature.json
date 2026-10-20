@@ -18,8 +18,19 @@
         "workbench.quiet-section",
         "workbench.all-quiet",
         "workbench.work-waiting",
-        "workbench.closed-today",
-        "workbench.to-treat"
+        "workbench.closed-today"
+      ]
+    ],
+    [
+      "To treat / Monitoring",
+      [
+        "workbench.to-treat",
+        "workbench.to-treat-many",
+        "workbench.to-treat-filter",
+        "workbench.to-treat-condition",
+        "workbench.to-treat-scanned",
+        "workbench.to-treat-none",
+        "workbench.monitoring"
       ]
     ],
     [
@@ -166,6 +177,26 @@
       "workbench.gestation",
       "workbench.to-treat",
       "tap To treat"
+    ],
+    [
+      "workbench.gestation",
+      "workbench.monitoring",
+      "tap Monitoring"
+    ],
+    [
+      "workbench.to-treat-many",
+      "workbench.to-treat-filter",
+      "tap Filter pigs"
+    ],
+    [
+      "workbench.to-treat-filter",
+      "workbench.to-treat-condition",
+      "tap Any condition"
+    ],
+    [
+      "workbench.to-treat",
+      "workbench.to-treat-scanned",
+      "tap Scan ear tag"
     ]
   ],
   "screens": [
@@ -1657,21 +1688,223 @@
     },
     {
       "id": "workbench.to-treat",
-      "name": "Overview · to treat",
-      "zh": "总览 · 待治疗",
+      "name": "To treat",
+      "zh": "待治疗",
       "status": "in-design",
       "url": "/ux/system/home-astra-prototype.html?section=gestation&sheet=treat",
       "preset": "",
       "figma": "",
       "notes": {
-        "purpose": "Tapping To treat on the Overview: every pig marked to treat across the section's units, unit by unit (owner, 2026-10-19). Monitoring opens the same list for the pigs marked Monitor.",
+        "purpose": "Tapping To treat on the Overview: a page listing every pig marked to treat across the section's units (owner, 2026-10-20: a list with filters that holds up at 100 pigs; \"everything goes inside the filter, search bar at top, flat list\").",
         "states": [],
         "elements": [
           {
-            "name": "Marked pigs, one group per unit",
-            "shows": "Unit 7, then its pigs: tag over \"Pen B2 · Hospital · 1d\", the condition as a plain tag on the right",
-            "logic": "Row · Animal with tags. No row is coloured: the title already says what to do. \"Hospital\" or \"In place\" is how the pig is treated; \"1d\" marks a pig waiting since yesterday. A pig opens its unit's walk on the Health lens.",
-            "source": "markedList()"
+            "name": "Search and filter",
+            "shows": "The search field (ear tag or pen) with Scan ear tag inside it, and the filter button, held at the top while the list scrolls",
+            "logic": "Typing narrows the list at once: a tag as typed, or a pen code across units. A scan fills the field with the tag read (search and scan go together, owner 2026-10-20). Every facet (unit, care, condition) is in the filter; the button carries the number applied.",
+            "source": "markedPage()"
+          },
+          {
+            "name": "Marked pigs, one card per unit",
+            "shows": "A plain \"Unit 7\" section heading over one card of its pigs in walking order (the same unit heading as Farrowing's Find a sow and Scan ear tags): tag over \"Pen B2 · Hospital · 1d\", the condition as a plain tag on the right",
+            "logic": "Row · Animal with tags. No row is coloured: the title already says what to do. \"Hospital\" or \"In place\" is how the pig is treated; \"1d\" marks a pig waiting since yesterday. A pig opens its unit's walk on the Health lens; Back from there reopens this list.",
+            "source": "markedPage()"
+          }
+        ],
+        "controls": [],
+        "copy": [
+          "(raw)"
+        ],
+        "edge": [],
+        "rules": [],
+        "issues": []
+      }
+    },
+    {
+      "id": "workbench.to-treat-many",
+      "name": "To treat · 104 pigs",
+      "zh": "待治疗 · 104 头",
+      "status": "in-design",
+      "url": "/ux/system/home-astra-prototype.html?section=gestation&sheet=treat&marked=many",
+      "preset": "",
+      "figma": "",
+      "notes": {
+        "purpose": "A heavy day: 104 pigs to treat across Units 7–9. The list keeps today's rows; search and the filter narrow it.",
+        "states": [],
+        "elements": [
+          {
+            "name": "Search and filter",
+            "shows": "The search field (ear tag or pen) with Scan ear tag inside it, and the filter button, held at the top while the list scrolls",
+            "logic": "Typing narrows the list at once: a tag as typed, or a pen code across units. A scan fills the field with the tag read (search and scan go together, owner 2026-10-20). Every facet (unit, care, condition) is in the filter; the button carries the number applied.",
+            "source": "markedPage()"
+          },
+          {
+            "name": "Marked pigs, one card per unit",
+            "shows": "A plain \"Unit 7\" section heading over one card of its pigs in walking order (the same unit heading as Farrowing's Find a sow and Scan ear tags): tag over \"Pen B2 · Hospital · 1d\", the condition as a plain tag on the right",
+            "logic": "Row · Animal with tags. No row is coloured: the title already says what to do. \"Hospital\" or \"In place\" is how the pig is treated; \"1d\" marks a pig waiting since yesterday. A pig opens its unit's walk on the Health lens; Back from there reopens this list.",
+            "source": "markedPage()"
+          }
+        ],
+        "controls": [],
+        "copy": [
+          "(raw)"
+        ],
+        "edge": [],
+        "rules": [],
+        "issues": []
+      }
+    },
+    {
+      "id": "workbench.to-treat-filter",
+      "name": "To treat · filter",
+      "zh": "待治疗 · 筛选",
+      "status": "in-design",
+      "url": "/ux/system/home-astra-prototype.html?section=gestation&sheet=treat&marked=many",
+      "preset": "",
+      "steps": [
+        "Filter pigs"
+      ],
+      "figma": "",
+      "notes": {
+        "purpose": "The filter: unit (when the list spans more than one), care, and the condition. \"Show N pigs\" applies it; Reset appears once a facet is set.",
+        "states": [],
+        "elements": [
+          {
+            "name": "Filter pigs",
+            "shows": "Unit · Care as facets, Condition as a picker, Back and \"Show 104 pigs\"",
+            "logic": "FilterSheet. Monitoring has no care facet: a mark to watch has none. No waiting facet (owner, 2026-10-20): \"1d\" on the row is enough.",
+            "source": "markedPage()"
+          }
+        ],
+        "controls": [],
+        "copy": [
+          "(raw)"
+        ],
+        "edge": [],
+        "rules": [],
+        "issues": []
+      }
+    },
+    {
+      "id": "workbench.to-treat-condition",
+      "name": "To treat · condition",
+      "zh": "待治疗 · 病症",
+      "status": "in-design",
+      "url": "/ux/system/home-astra-prototype.html?section=gestation&sheet=treat&marked=many",
+      "preset": "",
+      "steps": [
+        "Filter pigs",
+        "Any condition"
+      ],
+      "figma": "",
+      "notes": {
+        "purpose": "The filter's second level: one condition, with how many pigs carry it under the other facets.",
+        "states": [],
+        "elements": [
+          {
+            "name": "Condition",
+            "shows": "Any condition, then each condition with its count",
+            "logic": "A single pick returns to the filter. Back returns without a change; ✕ closes the filter (ruling B).",
+            "source": "markedPage()"
+          }
+        ],
+        "controls": [],
+        "copy": [
+          "(raw)"
+        ],
+        "edge": [],
+        "rules": [],
+        "issues": []
+      }
+    },
+    {
+      "id": "workbench.to-treat-scanned",
+      "name": "To treat · scanned",
+      "zh": "待治疗 · 已扫描",
+      "status": "in-design",
+      "url": "/ux/system/home-astra-prototype.html?section=gestation&sheet=treat",
+      "preset": "",
+      "steps": [
+        "Scan ear tag"
+      ],
+      "figma": "",
+      "notes": {
+        "purpose": "A scanned ear tag fills the search, so the list shows that pig (owner, 2026-10-20: scan and search go together).",
+        "states": [],
+        "elements": [
+          {
+            "name": "Search with the scanned tag",
+            "shows": "The tag in the field, ✕ to clear it, the scan button; the one pig under its unit",
+            "logic": "Scanner preview: the prototype reads a sample tag from the list. ✕ empties the field and the whole list returns.",
+            "source": "markedPage()"
+          }
+        ],
+        "controls": [],
+        "copy": [
+          "(raw)"
+        ],
+        "edge": [],
+        "rules": [],
+        "issues": []
+      }
+    },
+    {
+      "id": "workbench.to-treat-none",
+      "name": "To treat · no match",
+      "zh": "待治疗 · 无结果",
+      "status": "in-design",
+      "url": "/ux/system/home-astra-prototype.html?section=gestation&sheet=treat",
+      "preset": "",
+      "steps": [
+        {
+          "fill": "[data-mk-search]",
+          "text": "9999"
+        }
+      ],
+      "figma": "",
+      "notes": {
+        "purpose": "A search that finds no pig on the list.",
+        "states": [],
+        "elements": [
+          {
+            "name": "No pigs found",
+            "shows": "\"No pigs found · Check the ear tag, or scan it.\"",
+            "logic": "The list's own empty state; the field keeps what was typed.",
+            "source": "markedPage()"
+          }
+        ],
+        "controls": [],
+        "copy": [
+          "(raw)"
+        ],
+        "edge": [],
+        "rules": [],
+        "issues": []
+      }
+    },
+    {
+      "id": "workbench.monitoring",
+      "name": "Monitoring",
+      "zh": "观察中",
+      "status": "in-design",
+      "url": "/ux/system/home-astra-prototype.html?section=gestation&sheet=monitor",
+      "preset": "",
+      "figma": "",
+      "notes": {
+        "purpose": "Tapping Monitoring on the Overview: the pigs marked Monitor, on the same page as To treat.",
+        "states": [],
+        "elements": [
+          {
+            "name": "Search and filter",
+            "shows": "The search field (ear tag or pen) with Scan ear tag inside it, and the filter button, held at the top while the list scrolls",
+            "logic": "Typing narrows the list at once: a tag as typed, or a pen code across units. A scan fills the field with the tag read (search and scan go together, owner 2026-10-20). Every facet (unit, care, condition) is in the filter; the button carries the number applied.",
+            "source": "markedPage()"
+          },
+          {
+            "name": "Watched pigs, one card per unit",
+            "shows": "Tag over \"Pen A2\", the condition on the right",
+            "logic": "The same rows; a watched pig has no care or wait.",
+            "source": "markedPage()"
           }
         ],
         "controls": [],

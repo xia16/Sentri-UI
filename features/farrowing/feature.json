@@ -74,6 +74,7 @@
       "farrowing.scan",
       "farrowing.scan-no-reader",
       "farrowing.scan-list",
+      "farrowing.scan-new",
       "farrowing.scan-ticked",
       "farrowing.scan-stopped",
       "farrowing.scan-actions",
@@ -514,6 +515,11 @@
       "farrowing.scan-no-reader",
       "farrowing.room",
       "Back arrow"
+    ],
+    [
+      "farrowing.scan-list",
+      "farrowing.scan-new",
+      "the reader reads another sow: her row slides in and holds a tint"
     ],
     [
       "farrowing.scan-list",
@@ -3167,27 +3173,27 @@
         "purpose": "Show every sow that matches what is typed, her own unit first.",
         "states": [
           "Matches in this unit and in other units: both groups",
-          "Matches in only one place: the other group is left out"
+          "Matches in one unit only: one card"
         ],
         "elements": [
           {
             "name": "Results",
-            "at": "Other units",
-            "shows": "The results update as the worker types, in two groups, each in one tinted card: \"In Unit 7\" first (the ear tag, then \"Pen B4\" and a chevron), then \"Other units\" (the ear tag, then \"Unit 6\" over \"Pen A2\" and a chevron). The typed part of the ear tag is bold ink and the rest of the tag is muted. Each row is the design system's Row, animal variant.",
+            "at": "Unit 6",
+            "shows": "The results update as the worker types, one tinted card per unit under its plain section heading (\"Unit 7\", \"Unit 6\"), this unit first and then the others in unit order. Each row is the ear tag, then \"Pen B4\" and a chevron: the heading names the unit, so no row repeats it. The typed part of the ear tag is bold ink and the rest of the tag is muted. Each row is the design system's Row, animal variant.",
             "logic": "Case-insensitive contains-match on the ear tag or the pen code (\"B4\"), over every sow still on a task list in every unit; a sow that left the list is not found. Order: tags that start with the typed text, then tags that only contain it, then pen matches; ties by ear tag. Where a pen matched, the matching part of the pen is bold too.",
-            "rule": "Every result opens her farrowing drawer, a sow in another unit exactly as a sow in this unit (Farrowing is one task across its units). Her drawer's subtitle says where she is (\"Unit 6 · A2 / Parity 4\") when she is in another unit than the room's, so it is clear she is elsewhere. Search never switches the room's unit by itself.",
+            "rule": "Every result opens her farrowing drawer, a sow in another unit exactly as a sow in this unit (Farrowing is one task across its units). Her drawer's subtitle says where she is (\"Unit 6 · A2 / Parity 4\") when she is in another unit than the room's, so it is clear she is elsewhere. Search never switches the room's unit by itself. Back from her drawer returns to Find a sow with the typed text and its results kept.",
             "source": "farrowing-astra-concept.js findHits(), findRow(), searchBody()"
           }
         ],
         "copy": [
-          "(raw) In Unit 7 · Other units",
-          "(raw) Pen B4 · Unit 6 · Pen A2"
+          "(raw) Unit 7 · Unit 6 · Unit 8",
+          "(raw) Pen B4"
         ],
         "edge": [
           "Typing updates the results in place: the page does not reload and the field keeps focus."
         ],
         "rules": [
-          "Owner decision 2026-10-12: results are grouped \"In Unit 7\" then \"Other units\"; pen codes match too."
+          "Owner decision 2026-10-12: results are grouped by unit, this unit first; pen codes match too. Owner, 2026-10-20: one card per unit under a plain \"Unit 7\" section heading, the same unit heading as Home's To treat."
         ],
         "issues": []
       }
@@ -3246,26 +3252,8 @@
           {
             "name": "Empty line",
             "at": "Hold the reader to an ear tag",
-            "shows": "A scan icon, \"Hold the reader to an ear tag\" and \"Each sow you scan appears here.\" Nothing else on the page but the header, the Scanning pill and the footer's Stop scanning.",
+            "shows": "A scan icon, \"Hold the reader to an ear tag\" and \"Each sow you scan appears here.\" Nothing else on the page but the header and the footer's Stop scanning.",
             "rule": "The first scan replaces this with the list. If the worker stops scanning before any scan, the line reads \"Scanning is stopped\" / \"Resume scanning to add sows.\"",
-            "source": "farrowing-astra-concept.js scanPage()"
-          },
-          {
-            "name": "Scanner status",
-            "at": "Scanning",
-            "shows": "A small pill at the right of the header: a filled ink dot and \"Scanning\", or a ring and \"Stopped\". The dot is ink, never green. Not drawn when the reader is not connected.",
-            "states": [
-              {
-                "state": "Scanning",
-                "when": "The reader is connected and listening",
-                "shows": "Filled dot, \"Scanning\""
-              },
-              {
-                "state": "Stopped",
-                "when": "The worker tapped Stop scanning",
-                "shows": "Ring, \"Stopped\", muted"
-              }
-            ],
             "source": "farrowing-astra-concept.js scanPage()"
           },
           {
@@ -3289,7 +3277,7 @@
                 "shows": "The plain count \"N sows selected\" and the primary \"Actions\""
               }
             ],
-            "rule": "Stop scanning only pauses listening: the list stays.",
+            "rule": "Stop scanning only pauses listening: the list stays. The footer is the only Scanning status (owner, 2026-10-20: a second status in the body repeated it).",
             "source": "farrowing-astra-concept.js scanPage()"
           }
         ],
@@ -3304,7 +3292,6 @@
           "(raw) Scan ear tags · Farrowing · Unit 7",
           "(raw) Hold the reader to an ear tag",
           "(raw) Each sow you scan appears here.",
-          "(raw) Scanning · Stopped",
           "(raw) Stop scanning · Resume scanning",
           "(raw) Scanning is stopped · Resume scanning to add sows."
         ],
@@ -3313,7 +3300,7 @@
         ],
         "rules": [
           "Owner decision 2026-10-12: the scanner always listens; each scan adds the sow to a list; a repeat scan highlights her row; ticks are for bulk.",
-          "A sub-page of the room, drawn as a Sheet page (like the Farrowing log): the head is the title, the subtitle \"Farrowing · <unit>\" and the Scanning/Stopped status, with no back button in the head; Back sits in the footer beside Stop or Resume scanning. With sows ticked the footer is the plain count and Actions; with no scanner connected it is Back alone (owner, 2026-10-12)."
+          "A sub-page of the room, drawn as a Sheet page (like the Farrowing log): the head is the title and the subtitle \"Farrowing · <unit>\", with no back button in the head; Back sits in the footer beside Stop or Resume scanning. With sows ticked the footer is the plain count and Actions; with no scanner connected it is Back alone (owner, 2026-10-12)."
         ],
         "issues": []
       }
@@ -3329,7 +3316,7 @@
       "notes": {
         "purpose": "Say that no tag reader is paired, and what to do about it.",
         "states": [
-          "No reader paired: the scan icon, \"Scanner not connected\" and the instruction; no status pill, no list, no footer"
+          "No reader paired: the scan icon, \"Scanner not connected\" and the instruction; no list, no footer"
         ],
         "elements": [
           {
@@ -3365,27 +3352,63 @@
         "purpose": "Show the sows scanned in this visit, newest first, and let the worker open one or tick several.",
         "states": [
           "Sows in this unit and in other units: both groups",
-          "Sows in only one place: the other group is left out"
+          "Sows in one unit only: one card"
         ],
         "elements": [
           {
             "name": "Scan list",
-            "at": "Other units",
-            "shows": "The sows scanned in this visit, in two white cards: \"In Unit 7 · n\" and \"Other units · n\", newest scan first. Every row is the design system's Row, animal variant with the sow's Farrowing state on the right (the room's row, without the initials so the line under the ear tag stays on one line (\"Pen B1 · 1h ago\"); in another unit it says only \"Unit 6 · Pen A2\"), drawn as a select + door.",
-            "logic": "A sow is added the first time she is scanned. Scanning her again adds nothing: her existing row is highlighted briefly and scrolled into view. The list stays while the worker opens a sow and comes back.",
+            "at": "Unit 6",
+            "shows": "The sows scanned in this visit, one white card per unit under its plain section heading (\"Unit 7\", \"Unit 6\"), this unit first, newest scan first within each card; no count beside the heading. Every row is the design system's Row, animal variant with the sow's Farrowing state on the right (the room's row, without the initials so the line under the ear tag stays on one line (\"Pen B1 · 1h ago\"), the same in every unit because the heading names the unit), drawn as a select + door.",
+            "logic": "A sow is added the first time she is scanned: her row slides in at the top of her unit's card and the rows under it glide down (no jump); a unit's card fades in with its heading the first time one of its sows is scanned. Scanning her again adds nothing. Either way her row takes a soft tint for 1.6 s, then fades, and is brought into view, so the worker finds her after looking up from the pig. Each row keeps its own tint, so scans in quick succession light row after row and none cuts another short. The list stays while the worker opens a sow and comes back.",
             "rule": "The tick box selects; the rest of the row opens her. A sow in this unit opens her farrowing drawer, and Back returns to this list; a sow in another unit opens the same drawer (its subtitle names her unit, \"Unit 6 · A2 / Parity 4\"), and Back returns here too. The scanner is always listening: there is no \"ready for the next tag\" banner and no \"not found\" row.",
             "source": "farrowing-astra-concept.js scanPage(), scanAdd(), sowRow()"
           }
         ],
         "controls": [],
         "copy": [
-          "(raw) In Unit 7 · n · Other units · n"
+          "(raw) Unit 7 · Unit 6"
         ],
         "edge": [
           "The prototype has no reader: \"Simulate scan\", above the phone and outside the frame, adds the next sample sow; the sample sows repeat, which shows the repeat-scan highlight."
         ],
         "rules": [
           "Owner decision 2026-10-12: each scan adds the sow to a list; a repeat scan highlights her row."
+        ],
+        "issues": []
+      }
+    },
+    {
+      "id": "farrowing.scan-new",
+      "name": "Scan · a sow just scanned",
+      "zh": "刚扫描的母猪",
+      "status": "in-design",
+      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+      "preset": "scan-new",
+      "figma": "",
+      "notes": {
+        "purpose": "Show the moment after a scan: where the sow just read landed in the list.",
+        "states": [
+          "The newest scan, 004318 in Unit 6, holds the arrival tint (the still frame of a cue that fades after 1.6 s)"
+        ],
+        "elements": [
+          {
+            "name": "Arrival tint",
+            "at": "004318",
+            "shows": "Her row takes the pale progress wash (blue), the same for a new sow and for a repeat scan. Not the well tint, which marks a ticked row, and not amber or red, which are status.",
+            "logic": "Every scan lights its row on its own clock and brings it into view smoothly; the tint fades over about a second when its 1.6 s are up. A new row slides in and the rows under it glide down. Reduced motion keeps the tint and drops the slide and the fade.",
+            "source": "farrowing-astra-concept.js scanAdd(), scanLights(), scanGlide(); Row's Just scanned state (data-arrival, design system)"
+          }
+        ],
+        "controls": [],
+        "copy": [
+          "(raw) Unit 7 · Unit 6"
+        ],
+        "edge": [
+          "A real reader can read the same tag twice in a row while it is held to the ear: the second read only lights her row again.",
+          "On the phone, each read should also give a short haptic tick with the reader's beep, so the worker need not look; the prototype cannot."
+        ],
+        "rules": [
+          "Owner, 2026-10-20: a new scan must not appear abruptly; scans in quick succession stay readable."
         ],
         "issues": []
       }
@@ -3433,7 +3456,7 @@
       "notes": {
         "purpose": "Show that scanning is paused, with the list kept, and how to resume.",
         "states": [
-          "Stopped, nothing ticked: the pill reads \"Stopped\" with a ring; the footer's primary is \"Resume scanning\" (scan glyph)"
+          "Stopped, nothing ticked: the footer's primary is \"Resume scanning\" (scan glyph); it is the only stopped status"
         ],
         "elements": [
           {
@@ -3445,7 +3468,7 @@
           }
         ],
         "copy": [
-          "(raw) Stopped · Resume scanning"
+          "(raw) Resume scanning"
         ],
         "edge": [
           "While sows are ticked the footer is the selection bar, so Resume scanning comes back when the last sow is unticked."
@@ -3465,19 +3488,19 @@
       "notes": {
         "purpose": "Offer the shared generic actions for the ticked sows.",
         "states": [
-          "Actions over the Scan page: title \"Actions\", subtitle \"2 sows\", four rows, Back"
+          "Actions over the Scan page: title \"Actions\", one tile grid of four verbs, Back"
         ],
         "elements": [
           {
-            "name": "Action rows",
+            "name": "Verb tiles",
             "at": "Transfer",
-            "shows": "Transfer, Disease or symptom, Record treatment and Add a note: the shared generic actions, for the ticked sows only. They are the existing More actions rows (Transfer sow, Record health and Record treatment from Inspection's actions, Add a note from the sow's note page). No Farrowing action is offered here.",
+            "shows": "Transfer, Condition, Treat and Note: the shared generic actions, for the ticked sows only, drawn as More actions' everyday verbs (the design system's Row tile grid: an icon well over one word, two rows of two). Each tile's accessible name keeps the full action (\"Condition, Disease or symptom\", \"Treat, Record treatment\", \"Note, Add a note\"). No count line: the footer under the sheet already said \"N sows selected\". No Farrowing action is offered here.",
             "rule": "Each row opens its real flow, in the existing sow actions page, for the first ticked sow only: the prototype has no flow that takes several sows at once, so a selection of two or more is a gap (the shared flow should take the whole selection). Back from the flow returns to the Scan list with the ticks kept.",
             "source": "farrowing-astra-concept.js scanActionsSheet(), room-scan-act, deepLinkInto(); inspection-astra-concept.js actionCatalogue()"
           }
         ],
         "copy": [
-          "(raw) Actions · N sows · Transfer · Disease or symptom · Record treatment · Add a note"
+          "(raw) Actions · Transfer · Condition · Treat · Note"
         ],
         "edge": [
           "With more than one sow ticked, the flow that opens is for the first one ticked."
@@ -3673,7 +3696,7 @@
       "preset": "count",
       "steps": [
         "Actions",
-        "Edit note"
+        "[data-action=\"sow-host-action\"][data-value=\"marker\"]"
       ],
       "figma": "",
       "notes": {

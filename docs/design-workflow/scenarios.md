@@ -152,6 +152,6 @@ a data attribute, a preset, read-only state access) that draws nothing, and list
 
 ## When it runs
 
-Behaviour changes rerun the walk-throughs they touch (390/360, EN/ZH); shared components rerun every feature that uses
+Behaviour changes rerun the walk-throughs they touch (390/360, EN/ZH); shared components rerun their own features and, for propagation, the features in progress that use
 them. The evidence records the commit it ran on. Fixing a failure is design work on the feature's own branch; the
 gate never edits the expectation to make a leaf pass.

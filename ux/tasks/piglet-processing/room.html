@@ -505,10 +505,10 @@
     var ks = lensKeys(), lens = curLens();
     var tabs = ks.map(function (k) {
       var n = lensOf(k).length;
-      return { text: P('pp.room.lens.w.' + k), count: P('pp.room.lead.figure', { n: n }), value: k, pressed: k === lens, label: P('pp.room.lens.' + k, { n: n }) };
+      return { text: P('pp.room.lens.w.' + k), count: P('pp.room.lead.figure', { n: n }), value: k, pressed: k === lens, label: PP.t('pp.room.lens.' + k, { n: n }) };
     });
-    tabs.label = P('pp.room.lens.aria');
-    var f = !ended() && (roomTx().length || S.filter.length) ? { action: 'filter', label: P('pp.room.aria.filter') } : null;
+    tabs.label = PP.t('pp.room.lens.aria');
+    var f = !ended() && (roomTx().length || S.filter.length) ? { action: 'filter', label: PP.t('pp.room.aria.filter') } : null;
     return K.lens({ tabs: tabs, action: 'lens', filter: f });
   }
   function filterWhat() {
@@ -765,9 +765,18 @@
     }
     var s = p.toString(); return location.pathname + (s ? '?' + s : '');
   }
+  /* A page that opened the litter drawer by a door (End's handoff, `back=end.html?...`) is where Back and ✕ return to. */
+  var BACK = (function () { var b = qs.get('back') || ''; return /^[a-z-]+\.html(\?[^#]*)?$/.test(b) ? b : ''; })();
+  function leaveTo(url, n) {
+    // came by a tap: step back through the drawer's own entries to it; opened by a link: replace this page
+    var ref = ''; try { ref = document.referrer && new URL(document.referrer).href; } catch (e) {}
+    if (ref && ref === new URL(url, location.href).href) { history.go(-(n + 1)); return; }
+    location.replace(url);
+  }
   function drawerUrl(c, key) {
     var p = new URLSearchParams();
     p.set('state', 'litter'); p.set('crate', c);
+    if (BACK) p.set('back', BACK);
     var u = qs.get('unit') || (ROOM !== 7 ? String(ROOM) : '');
     if (u) p.set('unit', u);
     if (store.name !== 'base') p.set('data', store.name);
@@ -795,6 +804,7 @@
     if (r === 'close') {
       var back = hs().n || 0;
       LD.close();
+      if (BACK) { leaveTo(BACK, back); return; }
       if (back > 0) { history.go(-back); render(); return; }
       try { history.replaceState(null, '', roomUrl()); } catch (e) {}
       render(); return;
