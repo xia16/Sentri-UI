@@ -1405,15 +1405,15 @@ function installV2(){
  else if(a==='selected-pen-note'){const key=[...c.selectedPens].sort().join(' ');if(c.penNoteDraft?.key!==key)c.penNoteDraft={key,note:''};c.form=c.penNoteDraft;c.view='selected-pen-note';} // the form is the draft: Back keeps it (drawer law)
  else if(a==='save-selected-note'&&c.form.note?.trim()){const ids=[...c.selectedPens];ids.forEach(id=>{pen(c,id).note=c.form.note.trim();pen(c,id).noteBy='G. Hansen · today · 09:41';});addEvent(c,'Pen note',ids,c.form.note.trim());c.penNoteDraft=null;c.selected.clear();c.selectedPens.clear();c.reviewOnly=false;c.view='list';}
  else if(a==='batch-detail'){c.batchId=v;c.view='batch-detail';}
- else if(a==='show-batch'){c.batchFilter=v;c.stage='All';c.healthFilter='All';c.healthStatus='All';c.manualOnly=false;c.triageFilter='All';c.lens='All';c.scroll=0;c.view='list';}
+ else if(a==='show-batch'){c.filterKeep=false;c.batchFilter=v;c.stage='All';c.healthFilter='All';c.healthStatus='All';c.manualOnly=false;c.triageFilter='All';c.lens='All';c.scroll=0;c.view='list';}
  else if(a==='environment')c.view='environment';
  else if(a==='back'&&['selected-pen-note','choose-fault-pen'].includes(c.view))c.view='actions';
- else if(a==='stage'){c.stage=c.stage===v?'All':v;c.scroll=0;}
- else if(a==='scope-stage'){c.stage=v;c.scroll=0;c.view='list';}
- else if(a==='reset-filters'){Object.assign(c,{batchFilter:'All',stage:'All',healthFilter:'All',healthStatus:'All',manualOnly:false,triageFilter:'All',lens:'All',reviewOnly:false,scroll:0});}
- else if(a==='filters'){c.filterDraft={stage:c.stage,healthFilter:c.healthFilter,healthStatus:c.healthStatus,manualOnly:c.manualOnly,triageFilter:c.triageFilter};c.view='filters';}
+ else if(a==='stage'){c.filterKeep=false;c.stage=c.stage===v?'All':v;c.scroll=0;}
+ else if(a==='scope-stage'){c.filterKeep=false;c.stage=v;c.scroll=0;c.view='list';}
+ else if(a==='reset-filters'){c.filterKeep=false;Object.assign(c,{batchFilter:'All',stage:'All',healthFilter:'All',healthStatus:'All',manualOnly:false,triageFilter:'All',lens:'All',reviewOnly:false,scroll:0});}
+ else if(a==='filters'){if(!c.filterKeep||!c.filterDraft)c.filterDraft={stage:c.stage,healthFilter:c.healthFilter,healthStatus:c.healthStatus,manualOnly:c.manualOnly,triageFilter:c.triageFilter};c.filterKeep=true;c.view='filters';} // Back keeps the unsaved pick until Show pigs or the applied filters change
  else if(a==='filter-reset'){c.filterDraft={stage:'All',healthFilter:'All',healthStatus:'All',manualOnly:false,triageFilter:'All'};}
- else if(a==='filter-apply'){Object.assign(c,c.filterDraft);c.reviewOnly=false;c.view='list';c.scroll=0;}
+ else if(a==='filter-apply'){c.filterKeep=false;Object.assign(c,c.filterDraft);c.reviewOnly=false;c.view='list';c.scroll=0;}
  else if(a==='unit-detail'||a==='equipment'){c.view=a;}
  else if(['pen-detail','pen-faults','pen-log'].includes(a)){c.penId=v;c.view=a;if(a==='pen-log'){c.penLogFilter='All';c.penLogDate={preset:'all'};}}
  else if(a==='new-fault'){c.penId=v;const d=(c.penDrafts||={});d['fault:'+v]||={device:'',name:'',description:''};c.form=d['fault:'+v];c.view='fault-form';}
@@ -1676,9 +1676,9 @@ function handleRecordAction(c,a,v){
  if(a==='save-production-task'){saveProductionTask(c);return true;}
  if(a==='save-batch-membership'){saveBatchMembership(c);return true;}
  if(bulkActionKinds.includes(a)&&(picked(c).length||a==='health'&&c.selectedNoTags?.size)){openBulkAction(c,a);return true;}
- if(a==='notags-count-open'){c.countDraft={pen:v,value:String(noTagsCountOf(c,v)),suggested:true};c.countReturn=c.view;c.view='notags-count';return true;}
+ if(a==='notags-count-open'){const base=noTagsCountOf(c,v),keep=(c.countKeeps||={})[v];c.countDraft=keep&&keep.base===base?keep:(c.countKeeps[v]={pen:v,value:String(base),suggested:true,base}); /* Back keeps the typed count until Done */c.countReturn=c.view;c.view='notags-count';return true;}
  if(a==='notags-all'){const d=c.countDraft;d.value=String(pen(c,d.pen).untagged.count);d.suggested=true;return true;}
- if(a==='notags-count-done'){const d=c.countDraft,max=pen(c,d.pen).untagged.count,n=Number(d.value||0);if(!n||n>max)return true;(c.noTagsCount||={})[d.pen]=n;c.view=c.countReturn||'list';delete c.countDraft;return true;}
+ if(a==='notags-count-done'){const d=c.countDraft,max=pen(c,d.pen).untagged.count,n=Number(d.value||0);if(!n||n>max)return true;(c.noTagsCount||={})[d.pen]=n;delete c.countKeeps?.[d.pen];c.view=c.countReturn||'list';delete c.countDraft;return true;}
  if(a==='notags-count-back'){c.view=c.countReturn||'list';delete c.countDraft;return true;}
  if(a==='health-catalog-section'){c.form.catalogSection=v;c.form.catalogGroup='';return true;}
  if(a==='health-catalog-group'){if(c.form.kind==='Symptom'&&!c.form.catalogSection)c.form.catalogSection=healthCatalogue(c.form).find(item=>item.kind==='Symptom'&&item.group===v)?.section||'';c.form.catalogGroup=v;return true;}

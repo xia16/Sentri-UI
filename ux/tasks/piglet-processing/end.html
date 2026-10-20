@@ -714,7 +714,8 @@
     return PP.href(page, Object.assign({ state: state, crate: code, unit: UNIT, sow: sow.sow, task: S.ended ? 'ended' : '', data: store.name !== 'base' ? store.name : '' }, extra || {}));
   }
   function roomHref() { return PP.href('room.html', { unit: UNIT !== 7 ? UNIT : '', data: store.name !== 'base' ? store.name : '' }); }
-  function litterHref(code) { return PP.href('room.html', { state: 'litter', crate: code, unit: UNIT !== 7 ? UNIT : '', task: S.ended ? 'ended' : '', data: store.name !== 'base' ? store.name : '' }); }
+  // `back` = this page as it stands: the litter drawer's Back and ✕ return here (to the handoff, not to the room)
+  function litterHref(code) { return PP.href('room.html', { state: 'litter', crate: code, unit: UNIT !== 7 ? UNIT : '', task: S.ended ? 'ended' : '', data: store.name !== 'base' ? store.name : '', back: 'end.html' + location.search }); }
 
   /* ---- hold to End (Button's hold, ADR 0002): 850ms, released early it says so; the keyboard is a two-step. On commit the
      server rechecks every litter; the hold is then settled done (the receipt), failed (the reason, the review again) or
@@ -774,7 +775,7 @@
       // the same doors as the room's review list: a held body and a count conflict on the count sheet, a crossed correction on
       // the record page; a possible double on its answer sheet
       var p = { crate: r.litter, unit: UNIT !== 7 ? UNIT : '', data: store.name };
-      location.href = r.kind === 'double' ? PP.href('edit.html', Object.assign({ state: 'double', dose: r.dose, from: 'end' }, p))
+      location.href = r.kind === 'double' ? PP.href('edit.html', Object.assign({ state: 'double', dose: r.dose, from: 'end', back: 'end.html' + location.search }, p))
         : r.kind === 'held' ? PP.href('count.html', Object.assign({ state: 'held-body' }, p))
           : r.kind === 'count' ? PP.href('count.html', Object.assign({ state: 'count-conflict' }, p))
             : PP.href('edit.html', Object.assign({ state: 'record-page' }, p));
