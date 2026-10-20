@@ -38,6 +38,32 @@ test('a run without recorded images still carries by shot identity', () => {
   assert.deepEqual(r.carried.walk.map((w) => w.screen), ['s1']);
 });
 
+test('a judged change with no pair carries across a main move: G15 walks carry when the screen runs the same inputs (PR 240)', async () => {
+  const { checkVerdict } = await import('../scripts/loop-rules.mjs');
+  const screens = { same: [{ id: 'w1' }, { id: 'w2' }], diff: [], new: [], gone: [] };
+  const old = { candidate: 'C1', base: 'M1', screens, pairs: [], walkNeed: ['w1', 'w2'], walkIdentity: { w1: 'i1', w2: 'i2' } };
+  const parts = [{ pass: true, candidate: 'C1', base: 'M1', walk: [{ screen: 'w1', ok: true }, { screen: 'w2', ok: true }], defects: [], pairs: [], calibration: [{ pair: 'c1', verdict: 'same' }] }];
+  const mech = (ids) => ({ candidate: 'C2', base: 'M2', screens, pairs: [], walkNeed: ['w1', 'w2'], walkIdentity: ids, pass: true, outcome: 'pass', mode: 'normal', class: { effective: 'behaviour' } });
+  // main moved by files neither screen runs: the whole verdict carries and passes the new run as it is
+  const same = mech({ w1: 'i1', w2: 'i2' });
+  const a = carryJudgements({ mech: old, parts }, same);
+  assert.deepEqual([a.need, a.walkNeed], [[], []]);
+  assert.deepEqual(a.carried.walk.map((w) => w.screen), ['w1', 'w2']);
+  assert.deepEqual(a.carried.calibration, parts[0].calibration);
+  assert.deepEqual(checkVerdict(a.carried, same).problems, []);
+  // main moved by something w2 runs: w2 is walked again, w1's walk carries
+  const b = carryJudgements({ mech: old, parts }, mech({ w1: 'i1', w2: 'i2-new' }));
+  assert.deepEqual(b.walkNeed, ['w2']);
+  assert.deepEqual(b.carried.walk.map((w) => w.screen), ['w1']);
+  // a run that recorded no walk inputs proves nothing about them: every G15 screen is walked again
+  const c = carryJudgements({ mech: { ...old, walkIdentity: undefined }, parts }, same);
+  assert.deepEqual(c.walkNeed, ['w1', 'w2']);
+  assert.deepEqual(c.carried.walk, []);
+  // a screen the new run names that was never walked is walked
+  const d = carryJudgements({ mech: old, parts }, { ...same, walkNeed: ['w1', 'w2', 'w3'], walkIdentity: { w1: 'i1', w2: 'i2', w3: 'i3' } });
+  assert.deepEqual(d.walkNeed, ['w3']);
+});
+
 test('coverage is compared leaf by leaf: a leaf made pending, weakened or replaced is lost, whatever the count (G14)', () => {
   const leaf = (id, extra = {}) => ({ type: 'outcome', id, visible: [{ text: 'a' }, { text: 'b' }], ...extra });
   const spec = (...leaves) => ({ tree: [{ type: 'state', id: 'st', reset: { url: '/p.html' }, children: leaves }] });
