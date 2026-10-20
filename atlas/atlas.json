@@ -898,6 +898,7 @@
           "workbench.many-tasks",
           "workbench.work-due",
           "workbench.quiet-section",
+          "workbench.all-quiet",
           "workbench.work-waiting",
           "workbench.closed-today",
           "workbench.to-treat"
@@ -1421,14 +1422,42 @@
          "preset": "",
          "figma": "",
          "notes": {
-          "purpose": "A section with nothing open: Production says \"Nothing open\", Health shows its rows at 0 or a small count, Other says \"Nothing open\".",
+          "purpose": "A section with little open: Production and Other each say so in their own card; Health shows only Monitoring (To treat is 0, so its row is absent).",
           "states": [],
           "elements": [
            {
             "name": "Empty sections",
-            "shows": "\"Nothing open\" in Production and Other; To treat \"Nothing marked\" (no chevron)",
-            "logic": "Sections shrink but never disappear, so the worker sees they were checked.",
-            "source": "overview()"
+            "shows": "\"No production work open\" and \"Nothing else open\", each one quiet line with a tick in a white card",
+            "logic": "Home's sections stay put (owner, 2026-10-20), so the worker sees each was checked and learns where things are; a zero row is absent.",
+            "source": "overview(), Panel empty"
+           }
+          ],
+          "controls": [],
+          "copy": [
+           "(raw)"
+          ],
+          "edge": [],
+          "rules": [],
+          "issues": []
+         }
+        },
+        {
+         "id": "workbench.all-quiet",
+         "name": "Overview · everything empty",
+         "zh": "总览 · 全部为空",
+         "status": "in-design",
+         "url": "/ux/system/home-astra-prototype.html?section=nursery&marked=none",
+         "preset": "",
+         "figma": "",
+         "notes": {
+          "purpose": "Nothing open and no pigs marked: all three sections stay, each says so in one quiet line; the Schedule links stay on Production and Health.",
+          "states": [],
+          "elements": [
+           {
+            "name": "Empty cards",
+            "shows": "\"No production work open\", \"No pigs marked to treat or watch\", \"Nothing else open\"",
+            "logic": "Health's card says it when there are no marks and no planned health work.",
+            "source": "overview(), Panel empty"
            }
           ],
           "controls": [],
@@ -16743,14 +16772,17 @@
        "platform": "mobile",
        "section": "health",
        "newFeature": false,
-       "duplicates": "built inside Inspection — see inspection / health-record",
+       "duplicates": "",
        "groups": [
         [
-         "Add condition",
+         "Add a condition",
          [
           "disease.add-select",
           "disease.add-drawer",
           "disease.catalogue",
+          "disease.catalogue-area",
+          "disease.catalogue-add",
+          "disease.add-ready",
           "disease.add-committed"
          ]
         ],
@@ -16759,100 +16791,495 @@
          [
           "disease.resolve-one",
           "disease.resolve-many",
+          "disease.resolve-outcome",
           "disease.resolve-in-place",
           "disease.resolve-committed"
          ]
         ]
        ],
+       "entryPoints": [
+        {
+         "section": "Inspection",
+         "label": "Pigs ticked on the walk: Actions",
+         "from": "inspection.walk",
+         "control": "Actions",
+         "lands": "disease.add-select"
+        },
+        {
+         "section": "Pigs",
+         "label": "One pig: Actions on its record",
+         "from": "pig-profile.full",
+         "control": "Actions → Resolve",
+         "lands": "disease.resolve-one"
+        }
+       ],
        "screens": [
         {
          "id": "disease.add-select",
-         "name": "Select pigs · verb sheet",
-         "zh": "选择猪只",
+         "name": "Two pigs ticked · Actions",
+         "zh": "已选两头 · 操作",
+         "aliasOf": "inspection.actions",
          "status": "in-design",
-         "url": "/ux/archive/workflows.html?sec=wf-condition&slide=1",
-         "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "selected",
          "notes": {
-          "purpose": "Two ticked pigs raise the verb sheet; Condition is a tile under Health.",
-          "rules": [
-           "Blocked verbs are omitted, not greyed; one line accounts for them."
+          "purpose": "One menu drawer of actions for the ticked pigs or pens: the everyday verbs as a grid of icon tiles, over the list it acts on. Here two pigs are selected.",
+          "elements": [
+           {
+            "name": "Verb grid",
+            "at": "Condition",
+            "shows": "Health then Routine verbs as one card of icon tiles, one word each from the strings registry (Condition, Treat, Edit, Resolve, Care, Note, Transfer, Measure, Feed)",
+            "states": [
+             {
+              "state": "Two rows",
+              "when": "Two or more verbs",
+              "shows": "Two rows, split evenly: 5 = 3+2, 6 = 3+3, 8 = 4+4, 10 = 5+5"
+             },
+             {
+              "state": "More",
+              "when": "More than ten verbs",
+              "shows": "Nine tiles and More just before Death (Death never folds); More opens every tile in even rows of at most five, the one case of a third row"
+             },
+             {
+              "state": "Death",
+              "when": "Record sow death is offered",
+              "shows": "The last tile, in red ink"
+             }
+            ],
+            "rule": "The word under the icon is the short verb; the accessible name always contains it: the full action name when that holds the word as a whole word (Add a note), else the word, then the full name (Condition, Disease or symptom). A verb whose line is content (an existing sow note) keeps its described row under the grid."
+           },
+           {
+            "name": "Action row availability",
+            "shows": "Rows in Health and General groups",
+            "states": [
+             {
+              "state": "Record a health finding / treatment",
+              "when": "At least one selected pig is alive",
+              "shows": "Shown"
+             },
+             {
+              "state": "Edit conditions",
+              "when": "Two or more selected AND one has a condition",
+              "shows": "Shown; bulk only"
+             },
+             {
+              "state": "Resolve conditions · Care instructions",
+              "when": "A selected pig has a condition",
+              "shows": "Shown; otherwise unavailable (\"No open conditions to resolve.\" / \"Record a health finding first.\")"
+             },
+             {
+              "state": "Adjust feed",
+              "when": "At least one pig can be fed (not ad-lib, not dead, has a plan)",
+              "shows": "Shown; otherwise unavailable with the reason"
+             },
+             {
+              "state": "Add a note",
+              "when": "Live pigs",
+              "shows": "Always shown"
+             },
+             {
+              "state": "Production group",
+              "when": "Exactly one pig",
+              "shows": "Hidden for several pigs or pens so a group never gets a single-sow workflow"
+             },
+             {
+              "state": "Adjust feed unavailable",
+              "when": "No selected pig can be fed",
+              "shows": "Reason is that of the first selected pig only (Pig has died / Ad-lib feeding has no fixed daily allowance / No feeding plan recorded)"
+             },
+             {
+              "state": "Health group empty",
+              "when": "No selected pig is alive",
+              "shows": "Group and its rows are absent"
+             }
+            ],
+            "logic": "Rows that do not apply move to \"Unavailable actions (N)\" with the reason. Dead sows get only a note.",
+            "source": "ASTRA-BULK-ACTIONS",
+            "at": "Edit conditions"
+           },
+           {
+            "name": "Measurements & condition menu",
+            "shows": "Body condition, weight, backfat, temperature",
+            "logic": "Weight takes a separate value per pig. Backfat for sows and gilts only. Temperature is offered for one pig only.",
+            "rule": "Batch save applies only to included, changed rows; an invalid entered value blocks the whole save.",
+            "at": "Measurements & condition"
+           },
+           {
+            "name": "Footer tabs",
+            "shows": "Health · General",
+            "logic": "Jump to a group; the active tab follows the scroll.",
+            "at": "General"
+           }
           ],
-          "edge": [
-           "A missing Production strip (growers) is a reading, not a gap."
+          "controls": [],
+          "copy": [
+           "Actions (raw)",
+           "Disease or symptom (raw)",
+           "Record treatment (raw)",
+           "Adjust feed (raw)",
+           "Unavailable actions (raw)"
+          ],
+          "issues": [
+           "Health and General groups sit in one long scroll with tabs at the foot; two small groups do not need tabs.",
+           "Edit conditions, Resolve conditions and Care instructions all edit a finding: three doors for one record.",
+           "Measurements & condition puts body condition (a health record) next to weight and backfat.",
+           "The sheet header says only \"2 pigs\"; it does not name them."
           ]
          }
         },
         {
          "id": "disease.add-drawer",
-         "name": "Add condition · one drawer",
-         "zh": "添加疾病 / 症状",
+         "name": "Record health · two pigs",
+         "zh": "记录健康 · 两头",
+         "aliasOf": "health-record.record-health",
+         "preset": "selected",
+         "steps": [
+          "[data-action=\"health\"]"
+         ],
          "status": "in-design",
-         "url": "/ux/archive/workflows.html?sec=wf-condition&slide=2",
-         "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
          "notes": {
-          "purpose": "The whole add flow is one sheet: conditions, triage preset and the primary that says what it writes.",
+          "purpose": "Add one or more diseases or symptoms to the pigs chosen on the walk list, in one move. The selection is made first and is fixed here: Record health is a page of fields like Record treatment, with no pig list (owner, 2026-10-17).",
+          "states": [
+           "One pig or many, the same page: Conditions, Care, Note (optional) and Save · N. To change who, go Back and use the Selected page."
+          ],
           "elements": [
            {
-            "name": "Triage",
-            "at": "Triage",
-            "shows": "Inline Choice with Monitor preselected",
-            "rule": "Triage rides inline with the preset Monitor because no null level exists. Its option hints carry the consequences."
+            "name": "Care default",
+            "shows": "Care · No action needed",
+            "logic": "The same care is given to every added condition. The default is No action needed, so a newly recorded Fever does not need attention unless Care is changed.",
+            "rule": "Care is the only editable condition state: No action needed, Monitor, Treat in place, Move to hospital pen. A condition needs attention for every choice except No action needed.",
+            "at": "No action needed"
+           },
+           {
+            "name": "Save",
+            "shows": "Save · N pigs",
+            "rule": "Waits until a condition is chosen. N counts the tagged pigs and the pigs without ear tags chosen on their group rows (2 tagged + 3 of 14 = Save · 5 pigs). A tap while it waits marks Conditions \"Required\". Writes one finding per tagged pig and name, and the count on each group row; a condition a pig already has is skipped and keeps its start date. Returns to the walk list; several pigs confirm with a toast (\"Condition recorded · 5 pigs\"), one pig with its new tag on the row.",
+            "at": "Save"
            }
           ],
+          "controls": [],
+          "copy": [
+           "Record health (raw)",
+           "Required (raw)",
+           "Care (raw)",
+           "Add note (raw)",
+           "No action needed (raw)"
+          ],
           "rules": [
-           "The drawer is the review: the picker step, the confirm card, the read-only roster and the toast were removed.",
-           "view > filters the live list, which can still deselect."
+           "One searchable disease/symptom catalogue for one or many pigs."
+          ],
+          "issues": [
+           "Default Care \"No action needed\" makes the quickest path (choose Fever, Save) record a fever as a non-alert (filed To confirm).",
+           "The catalogue needs three levels (tab, door, item) for a gloved worker."
           ]
          }
         },
         {
          "id": "disease.catalogue",
-         "name": "Condition catalogue",
-         "zh": "疾病目录",
+         "name": "Choose conditions",
+         "zh": "选择病症",
+         "aliasOf": "health-record.condition-picker",
+         "preset": "selected",
+         "steps": [
+          "[data-action=\"health\"]",
+          "[data-action=\"bulk-pick-health\"]"
+         ],
          "status": "in-design",
-         "url": "/ux/archive/workflows.html?sec=wf-condition&slide=3",
-         "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
          "notes": {
-          "purpose": "One flat list under body-system groups with search; each entry carries its class silently.",
+          "purpose": "Search or browse one conditions catalogue and tick one or more: symptoms by where you look, diseases by body system (features/conditions).",
           "elements": [
            {
-            "name": "Condition row",
-            "shows": "Name, class behind the info icon, and how many of the selected pigs already carry it",
-            "logic": "The per-item count answers \"already carrying\" before the tick. A fever writes a case with a day count; a hernia writes a characteristic on the pig page.",
-            "source": "wf-condition, slide 3"
+            "name": "Catalogue",
+            "shows": "Search; On these pigs; Recent; Symptoms (six areas); Diseases (six body systems), each area a row with an icon and a line of examples",
+            "states": [
+             {
+              "state": "First level",
+              "when": "Opened",
+              "shows": "Symptoms: Whole animal, Breathing, Head, Skin, Legs and feet, Rear and belly. Diseases: Respiratory, Gut, Reproductive, Udder, Joints skin and nerves, Whole body. Each row: icon tile, name, examples (\"Coughing, breathing hard, sneezing\"), or \"1 selected\" once something inside is ticked."
+             },
+             {
+              "state": "A level",
+              "when": "A row tapped",
+              "shows": "The area as the title; ✕ closes the picker and keeps the ticks; the footer Back goes up one level (owner ruling B, 2026-10-16). A symptom with types (Diarrhoea, Lame, Off feed, Nasal discharge…) opens its types plus \"Not sure which\"."
+             },
+             {
+              "state": "Search",
+              "when": "Text typed",
+              "shows": "Searches the whole catalogue (names and other names); every result names its area; with no match, one card: Add \"…\""
+             },
+             {
+              "state": "Add a condition",
+              "when": "Add \"…\" tapped",
+              "shows": "Name (pre-filled) and Category (one pick: a symptom area or a disease system, so the kind is chosen with it); Back, Add. Adding lists it for the farm and ticks it. Anyone may add a symptom or a disease."
+             }
+            ],
+            "logic": "A reportable disease (ASF, FMD, CSF, PRRS, PED) stays in its system, marked \"Reportable\"; there is no separate Report a disease. Deaths, abortions and pen-wide observations are not conditions. The drawer keeps one height from open to close.",
+            "at": "Breathing"
+           },
+           {
+            "name": "Done",
+            "shows": "Done · N",
+            "rule": "Done · N applies the ticks to the Conditions field and closes. Back goes up one level; at Conditions it closes without applying, and so does the ✕ from any level; ticks wait for the next open (the scrim does the same). Done waits while nothing is ticked and nothing was applied.",
+            "at": "Done"
            }
           ],
-          "rules": [
-           "Groups are body words (Belly), never the class (Standing). The footnote states a consequence: a tick adds no second case."
+          "controls": [],
+          "copy": [
+           "Conditions (raw)",
+           "Symptoms (raw)",
+           "Diseases (raw)",
+           "Search all options (raw)",
+           "Add “{name}” (raw)",
+           "Add a condition (raw)",
+           "Done · N (raw)"
           ],
           "edge": [
-           "Ambiguous entries split in the catalogue (injury versus chronic lameness) rather than asking the farmer."
+           "The catalogue is ux/system/conditions-catalogue.js: one list, three kinds (symptom, event, disease), English and Chinese."
+          ],
+          "rules": [
+           "Diseases and symptoms are one catalogue and one picker."
+          ],
+          "issues": [
+           "\"Link condition\" (for a treatment) reuses this catalogue with another layout: two near-identical pickers.",
+           "No recently used list: a frequent condition sits two doors deep each time."
+          ]
+         }
+        },
+        {
+         "id": "disease.catalogue-area",
+         "name": "Choose conditions · a body area",
+         "zh": "选择病症 · 部位",
+         "aliasOf": "health-record.condition-picker",
+         "preset": "selected",
+         "steps": [
+          "[data-action=\"health\"]",
+          "[data-action=\"bulk-pick-health\"]",
+          "[data-action=\"condition-level\"][data-value=\"g:breathing\"]"
+         ],
+         "status": "in-design",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "notes": {
+          "purpose": "Search or browse one conditions catalogue and tick one or more: symptoms by where you look, diseases by body system (features/conditions).",
+          "elements": [
+           {
+            "name": "Catalogue",
+            "shows": "Search; On these pigs; Recent; Symptoms (six areas); Diseases (six body systems), each area a row with an icon and a line of examples",
+            "states": [
+             {
+              "state": "First level",
+              "when": "Opened",
+              "shows": "Symptoms: Whole animal, Breathing, Head, Skin, Legs and feet, Rear and belly. Diseases: Respiratory, Gut, Reproductive, Udder, Joints skin and nerves, Whole body. Each row: icon tile, name, examples (\"Coughing, breathing hard, sneezing\"), or \"1 selected\" once something inside is ticked."
+             },
+             {
+              "state": "A level",
+              "when": "A row tapped",
+              "shows": "The area as the title; ✕ closes the picker and keeps the ticks; the footer Back goes up one level (owner ruling B, 2026-10-16). A symptom with types (Diarrhoea, Lame, Off feed, Nasal discharge…) opens its types plus \"Not sure which\"."
+             },
+             {
+              "state": "Search",
+              "when": "Text typed",
+              "shows": "Searches the whole catalogue (names and other names); every result names its area; with no match, one card: Add \"…\""
+             },
+             {
+              "state": "Add a condition",
+              "when": "Add \"…\" tapped",
+              "shows": "Name (pre-filled) and Category (one pick: a symptom area or a disease system, so the kind is chosen with it); Back, Add. Adding lists it for the farm and ticks it. Anyone may add a symptom or a disease."
+             }
+            ],
+            "logic": "A reportable disease (ASF, FMD, CSF, PRRS, PED) stays in its system, marked \"Reportable\"; there is no separate Report a disease. Deaths, abortions and pen-wide observations are not conditions. The drawer keeps one height from open to close.",
+            "at": "Breathing"
+           },
+           {
+            "name": "Done",
+            "shows": "Done · N",
+            "rule": "Done · N applies the ticks to the Conditions field and closes. Back goes up one level; at Conditions it closes without applying, and so does the ✕ from any level; ticks wait for the next open (the scrim does the same). Done waits while nothing is ticked and nothing was applied.",
+            "at": "Done"
+           }
+          ],
+          "controls": [],
+          "copy": [
+           "Conditions (raw)",
+           "Symptoms (raw)",
+           "Diseases (raw)",
+           "Search all options (raw)",
+           "Add “{name}” (raw)",
+           "Add a condition (raw)",
+           "Done · N (raw)"
+          ],
+          "edge": [
+           "The catalogue is ux/system/conditions-catalogue.js: one list, three kinds (symptom, event, disease), English and Chinese."
+          ],
+          "rules": [
+           "Diseases and symptoms are one catalogue and one picker."
+          ],
+          "issues": [
+           "\"Link condition\" (for a treatment) reuses this catalogue with another layout: two near-identical pickers.",
+           "No recently used list: a frequent condition sits two doors deep each time."
+          ]
+         }
+        },
+        {
+         "id": "disease.catalogue-add",
+         "name": "Add a condition",
+         "zh": "添加病症",
+         "aliasOf": "health-record.condition-picker",
+         "preset": "selected",
+         "steps": [
+          "[data-action=\"health\"]",
+          "[data-action=\"bulk-pick-health\"]",
+          {
+           "fill": "[data-v2=\"search\"]",
+           "text": "Bitten ear"
+          },
+          "[data-action=\"condition-add\"]"
+         ],
+         "status": "in-design",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "notes": {
+          "purpose": "Search or browse one conditions catalogue and tick one or more: symptoms by where you look, diseases by body system (features/conditions).",
+          "elements": [
+           {
+            "name": "Catalogue",
+            "shows": "Search; On these pigs; Recent; Symptoms (six areas); Diseases (six body systems), each area a row with an icon and a line of examples",
+            "states": [
+             {
+              "state": "First level",
+              "when": "Opened",
+              "shows": "Symptoms: Whole animal, Breathing, Head, Skin, Legs and feet, Rear and belly. Diseases: Respiratory, Gut, Reproductive, Udder, Joints skin and nerves, Whole body. Each row: icon tile, name, examples (\"Coughing, breathing hard, sneezing\"), or \"1 selected\" once something inside is ticked."
+             },
+             {
+              "state": "A level",
+              "when": "A row tapped",
+              "shows": "The area as the title; ✕ closes the picker and keeps the ticks; the footer Back goes up one level (owner ruling B, 2026-10-16). A symptom with types (Diarrhoea, Lame, Off feed, Nasal discharge…) opens its types plus \"Not sure which\"."
+             },
+             {
+              "state": "Search",
+              "when": "Text typed",
+              "shows": "Searches the whole catalogue (names and other names); every result names its area; with no match, one card: Add \"…\""
+             },
+             {
+              "state": "Add a condition",
+              "when": "Add \"…\" tapped",
+              "shows": "Name (pre-filled) and Category (one pick: a symptom area or a disease system, so the kind is chosen with it); Back, Add. Adding lists it for the farm and ticks it. Anyone may add a symptom or a disease."
+             }
+            ],
+            "logic": "A reportable disease (ASF, FMD, CSF, PRRS, PED) stays in its system, marked \"Reportable\"; there is no separate Report a disease. Deaths, abortions and pen-wide observations are not conditions. The drawer keeps one height from open to close.",
+            "at": "Breathing"
+           },
+           {
+            "name": "Done",
+            "shows": "Done · N",
+            "rule": "Done · N applies the ticks to the Conditions field and closes. Back goes up one level; at Conditions it closes without applying, and so does the ✕ from any level; ticks wait for the next open (the scrim does the same). Done waits while nothing is ticked and nothing was applied.",
+            "at": "Done"
+           }
+          ],
+          "controls": [],
+          "copy": [
+           "Conditions (raw)",
+           "Symptoms (raw)",
+           "Diseases (raw)",
+           "Search all options (raw)",
+           "Add “{name}” (raw)",
+           "Add a condition (raw)",
+           "Done · N (raw)"
+          ],
+          "edge": [
+           "The catalogue is ux/system/conditions-catalogue.js: one list, three kinds (symptom, event, disease), English and Chinese."
+          ],
+          "rules": [
+           "Diseases and symptoms are one catalogue and one picker."
+          ],
+          "issues": [
+           "\"Link condition\" (for a treatment) reuses this catalogue with another layout: two near-identical pickers.",
+           "No recently used list: a frequent condition sits two doors deep each time."
+          ]
+         }
+        },
+        {
+         "id": "disease.add-ready",
+         "name": "Record health · a condition chosen",
+         "zh": "记录健康 · 已选病症",
+         "aliasOf": "health-record.record-health",
+         "preset": "selected",
+         "steps": [
+          "[data-action=\"health\"]",
+          "[data-action=\"bulk-pick-health\"]",
+          "[data-condition=\"Coughing\"]",
+          "[data-action=\"bulk-health-done\"]"
+         ],
+         "status": "in-design",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "notes": {
+          "purpose": "Add one or more diseases or symptoms to the pigs chosen on the walk list, in one move. The selection is made first and is fixed here: Record health is a page of fields like Record treatment, with no pig list (owner, 2026-10-17).",
+          "states": [
+           "One pig or many, the same page: Conditions, Care, Note (optional) and Save · N. To change who, go Back and use the Selected page."
+          ],
+          "elements": [
+           {
+            "name": "Care default",
+            "shows": "Care · No action needed",
+            "logic": "The same care is given to every added condition. The default is No action needed, so a newly recorded Fever does not need attention unless Care is changed.",
+            "rule": "Care is the only editable condition state: No action needed, Monitor, Treat in place, Move to hospital pen. A condition needs attention for every choice except No action needed.",
+            "at": "No action needed"
+           },
+           {
+            "name": "Save",
+            "shows": "Save · N pigs",
+            "rule": "Waits until a condition is chosen. N counts the tagged pigs and the pigs without ear tags chosen on their group rows (2 tagged + 3 of 14 = Save · 5 pigs). A tap while it waits marks Conditions \"Required\". Writes one finding per tagged pig and name, and the count on each group row; a condition a pig already has is skipped and keeps its start date. Returns to the walk list; several pigs confirm with a toast (\"Condition recorded · 5 pigs\"), one pig with its new tag on the row.",
+            "at": "Save"
+           }
+          ],
+          "controls": [],
+          "copy": [
+           "Record health (raw)",
+           "Required (raw)",
+           "Care (raw)",
+           "Add note (raw)",
+           "No action needed (raw)"
+          ],
+          "rules": [
+           "One searchable disease/symptom catalogue for one or many pigs."
+          ],
+          "issues": [
+           "Default Care \"No action needed\" makes the quickest path (choose Fever, Save) record a fever as a non-alert (filed To confirm).",
+           "The catalogue needs three levels (tab, door, item) for a gloved worker."
           ]
          }
         },
         {
          "id": "disease.add-committed",
-         "name": "After adding · list is the receipt",
-         "zh": "添加完成",
+         "name": "Saved: the walk list, with the toast",
+         "zh": "已保存 · 巡栏列表",
          "status": "in-design",
-         "url": "/ux/archive/workflows.html?sec=wf-condition&slide=4",
-         "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "selected",
+         "steps": [
+          "[data-action=\"health\"]",
+          "[data-action=\"bulk-pick-health\"]",
+          "[data-condition=\"Coughing\"]",
+          "[data-action=\"bulk-health-done\"]",
+          "[data-action=\"bulk-save\"]"
+         ],
+         "figma": "",
          "notes": {
-          "purpose": "The walk list after commit: rows update in place, selection clears, scroll is kept.",
+          "purpose": "After Save the walk list is back: each pig's row carries the new tag, the selection clears and a toast counts the pigs.",
           "elements": [
            {
-            "name": "What prints",
-            "shows": "The walk list after commit: rows update in place, selection clears, scroll is kept.",
+            "name": "Pig row",
+            "at": "000254",
+            "shows": "The new condition on the row's one line (Coughing)",
             "states": [
              {
               "state": "Newly added",
-              "when": "Pig did not carry the condition",
-              "shows": "Opens at today with the amber dot (Monitor preset: dot, no trail means watching)"
+              "when": "The pig did not have it",
+              "shows": "The condition joins the row, ordered by care level; No action needed prints as plain text, a care level that needs attention as its tag"
              },
              {
-              "state": "Already carried",
-              "when": "Pig already had it open",
-              "shows": "No duplicate case; day count keeps aging"
+              "state": "Already had it",
+              "when": "The condition was open on the pig",
+              "shows": "No second finding; the tag keeps its start date"
              }
             ]
            }
@@ -16863,92 +17290,286 @@
          "id": "disease.resolve-one",
          "name": "Resolve · one pig",
          "zh": "康复 / 移除 · 单只",
+         "aliasOf": "health-record.resolve-conditions",
          "status": "in-design",
-         "url": "/ux/archive/workflows.html?sec=wf-resolve&slide=1",
-         "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "profile-full",
+         "steps": [
+          "[data-action=\"pig-actions\"]",
+          "[data-action=\"resolve\"]"
+         ],
          "notes": {
-          "purpose": "One pig: her open cases as verdict lines, Recover (big tick, left) and Strike (small chip, right).",
+          "purpose": "Recover or correct one chosen condition across the selected pigs.",
           "elements": [
            {
-            "name": "Verdict line",
-            "shows": "One open condition with its trail",
-            "rule": "Left tick = Recover (the outcome, the walk's normal act). Right chip \"wrong\" = Strike (correction of a wrong entry). Characteristics never appear."
+            "name": "Pig row",
+            "shows": "Thin → Recovered",
+            "states": [
+             {
+              "state": "Outcome not chosen",
+              "when": "Condition chosen only",
+              "shows": "\"Thin · choose outcome\""
+             },
+             {
+              "state": "Outcome chosen",
+              "when": "Recovered or Entered in error",
+              "shows": "\"Thin → Recovered\""
+             },
+             {
+              "state": "Pig lacks it",
+              "when": "No such condition",
+              "shows": "\"No X\""
+             },
+             {
+              "state": "Feed-linked",
+              "when": "Body-condition finding with feed adjustment",
+              "shows": "Note \"Resets linked feed adjustment\"; factor returns to 1"
+             }
+            ],
+            "logic": "Condition options are the names found on the selected pigs.",
+            "at": "Condition"
+           },
+           {
+            "name": "Save",
+            "shows": "Save · N pigs",
+            "rule": "Closes each case and logs \"Recovered\" or \"Record corrected\". Recovery keeps the case in history; entered in error marks a correction.",
+            "at": "Save"
            }
           ],
-          "edge": [
-           "A hernia ends by correction on the pig record, not here."
+          "controls": [],
+          "copy": [
+           "Resolve conditions (raw)",
+           "Recovered (raw)",
+           "Entered in error (raw)"
+          ],
+          "issues": [
+           "Log wording differs: \"Recovered\" / \"Record corrected\" here, \"Finding entered in error\" in the single-pig form."
           ]
          }
         },
         {
          "id": "disease.resolve-many",
-         "name": "Resolve · verdict page",
-         "zh": "康复 / 移除 · 多只",
+         "name": "Resolve conditions · two pigs",
+         "zh": "解除病症 · 两头",
+         "aliasOf": "health-record.resolve-conditions",
+         "preset": "selected",
+         "steps": [
+          "[data-action=\"resolve\"]"
+         ],
          "status": "in-design",
-         "url": "/ux/archive/workflows.html?sec=wf-resolve&slide=2",
-         "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
          "notes": {
-          "purpose": "Several pigs: one line per pig and open condition, pen-grouped, in the walk row grammar.",
-          "rules": [
-           "The master row and pen headers are recover-all shortcuts.",
-           "The primary is disabled at zero verdicts.",
-           "The zero rule keeps pigs with nothing open off the page; the footnote counts them."
+          "purpose": "Recover or correct one chosen condition across the selected pigs.",
+          "elements": [
+           {
+            "name": "Pig row",
+            "shows": "Thin → Recovered",
+            "states": [
+             {
+              "state": "Outcome not chosen",
+              "when": "Condition chosen only",
+              "shows": "\"Thin · choose outcome\""
+             },
+             {
+              "state": "Outcome chosen",
+              "when": "Recovered or Entered in error",
+              "shows": "\"Thin → Recovered\""
+             },
+             {
+              "state": "Pig lacks it",
+              "when": "No such condition",
+              "shows": "\"No X\""
+             },
+             {
+              "state": "Feed-linked",
+              "when": "Body-condition finding with feed adjustment",
+              "shows": "Note \"Resets linked feed adjustment\"; factor returns to 1"
+             }
+            ],
+            "logic": "Condition options are the names found on the selected pigs.",
+            "at": "Condition"
+           },
+           {
+            "name": "Save",
+            "shows": "Save · N pigs",
+            "rule": "Closes each case and logs \"Recovered\" or \"Record corrected\". Recovery keeps the case in history; entered in error marks a correction.",
+            "at": "Save"
+           }
           ],
-          "edge": [
-           "Production was condition-major (one line per disease across 10 pigs); this page is pig-major and the condition-major shortcuts are cut."
+          "controls": [],
+          "copy": [
+           "Resolve conditions (raw)",
+           "Recovered (raw)",
+           "Entered in error (raw)"
+          ],
+          "issues": [
+           "Log wording differs: \"Recovered\" / \"Record corrected\" here, \"Finding entered in error\" in the single-pig form."
+          ]
+         }
+        },
+        {
+         "id": "disease.resolve-outcome",
+         "name": "Resolve · Recovered or Entered in error",
+         "zh": "解除病症 · 结果",
+         "aliasOf": "health-record.resolve-conditions",
+         "preset": "selected",
+         "steps": [
+          "[data-action=\"resolve\"]",
+          "[data-action=\"open-picker\"][data-picker-key=\"target\"]",
+          "[data-action=\"picker-select\"][data-value=\"Thin\"]",
+          "[data-action=\"open-picker\"][data-picker-key=\"outcome\"]"
+         ],
+         "status": "in-design",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "notes": {
+          "purpose": "Recover or correct one chosen condition across the selected pigs.",
+          "elements": [
+           {
+            "name": "Pig row",
+            "shows": "Thin → Recovered",
+            "states": [
+             {
+              "state": "Outcome not chosen",
+              "when": "Condition chosen only",
+              "shows": "\"Thin · choose outcome\""
+             },
+             {
+              "state": "Outcome chosen",
+              "when": "Recovered or Entered in error",
+              "shows": "\"Thin → Recovered\""
+             },
+             {
+              "state": "Pig lacks it",
+              "when": "No such condition",
+              "shows": "\"No X\""
+             },
+             {
+              "state": "Feed-linked",
+              "when": "Body-condition finding with feed adjustment",
+              "shows": "Note \"Resets linked feed adjustment\"; factor returns to 1"
+             }
+            ],
+            "logic": "Condition options are the names found on the selected pigs.",
+            "at": "Condition"
+           },
+           {
+            "name": "Save",
+            "shows": "Save · N pigs",
+            "rule": "Closes each case and logs \"Recovered\" or \"Record corrected\". Recovery keeps the case in history; entered in error marks a correction.",
+            "at": "Save"
+           }
+          ],
+          "controls": [],
+          "copy": [
+           "Resolve conditions (raw)",
+           "Recovered (raw)",
+           "Entered in error (raw)"
+          ],
+          "issues": [
+           "Log wording differs: \"Recovered\" / \"Record corrected\" here, \"Finding entered in error\" in the single-pig form."
           ]
          }
         },
         {
          "id": "disease.resolve-in-place",
-         "name": "Resolve · verdicts in place",
-         "zh": "康复 / 移除 · 已选",
+         "name": "Resolve · outcome chosen",
+         "zh": "解除病症 · 已选结果",
+         "aliasOf": "health-record.resolve-conditions",
+         "preset": "selected",
+         "steps": [
+          "[data-action=\"resolve\"]",
+          "[data-action=\"open-picker\"][data-picker-key=\"target\"]",
+          "[data-action=\"picker-select\"][data-value=\"Thin\"]",
+          "[data-action=\"open-picker\"][data-picker-key=\"outcome\"]",
+          "[data-action=\"picker-select\"][data-value=\"recover\"]"
+         ],
          "status": "in-design",
-         "url": "/ux/archive/workflows.html?sec=wf-resolve&slide=3",
-         "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
          "notes": {
-          "purpose": "Mixed verdicts on one page: recover some, strike one, one commit.",
+          "purpose": "Recover or correct one chosen condition across the selected pigs.",
           "elements": [
            {
-            "name": "Verdict lines",
-            "shows": "Mixed verdicts on one page: recover some, strike one, one commit.",
+            "name": "Pig row",
+            "shows": "Thin → Recovered",
             "states": [
              {
-              "state": "Recover ticked",
-              "when": "Big tick pressed",
-              "shows": "Line marked to close as recovered"
+              "state": "Outcome not chosen",
+              "when": "Condition chosen only",
+              "shows": "\"Thin · choose outcome\""
              },
              {
-              "state": "Struck",
-              "when": "Wrong chip pressed",
-              "shows": "Row struck through (struck · wrong entry) with an undo"
+              "state": "Outcome chosen",
+              "when": "Recovered or Entered in error",
+              "shows": "\"Thin → Recovered\""
              },
              {
-              "state": "Group line",
-              "when": "Un-identified group",
-              "shows": "Recovers by count; an inline stepper lowers the number (12 to 5)"
+              "state": "Pig lacks it",
+              "when": "No such condition",
+              "shows": "\"No X\""
+             },
+             {
+              "state": "Feed-linked",
+              "when": "Body-condition finding with feed adjustment",
+              "shows": "Note \"Resets linked feed adjustment\"; factor returns to 1"
              }
-            ]
+            ],
+            "logic": "Condition options are the names found on the selected pigs.",
+            "at": "Condition"
+           },
+           {
+            "name": "Save",
+            "shows": "Save · N pigs",
+            "rule": "Closes each case and logs \"Recovered\" or \"Record corrected\". Recovery keeps the case in history; entered in error marks a correction.",
+            "at": "Save"
            }
           ],
-          "rules": [
-           "One commit carries both verbs; no mode switch, no leave guard.",
-           "Strike is plain human-error correction: no KPI language; the audit keeps the record."
+          "controls": [],
+          "copy": [
+           "Resolve conditions (raw)",
+           "Recovered (raw)",
+           "Entered in error (raw)"
+          ],
+          "issues": [
+           "Log wording differs: \"Recovered\" / \"Record corrected\" here, \"Finding entered in error\" in the single-pig form."
           ]
          }
         },
         {
          "id": "disease.resolve-committed",
-         "name": "After resolving",
-         "zh": "完成",
+         "name": "Resolved: the walk list, with the toast",
+         "zh": "已解除 · 巡栏列表",
          "status": "in-design",
-         "url": "/ux/archive/workflows.html?sec=wf-resolve&slide=4",
-         "figma": "https://www.figma.com/design/4GZGPBauEOWQQjnRrzoUgF?node-id=60-408",
+         "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+         "preset": "selected",
+         "steps": [
+          "[data-action=\"resolve\"]",
+          "[data-action=\"open-picker\"][data-picker-key=\"target\"]",
+          "[data-action=\"picker-select\"][data-value=\"Thin\"]",
+          "[data-action=\"open-picker\"][data-picker-key=\"outcome\"]",
+          "[data-action=\"picker-select\"][data-value=\"recover\"]",
+          "[data-action=\"bulk-save\"]"
+         ],
+         "figma": "",
          "notes": {
-          "purpose": "The walk list after commit: what remains is what prints.",
-          "rules": [
-           "Recovery prints as silence: closed lines vanish and nothing says \"recovered\". The group ledger re-aggregates (12 to 7).",
-           "A struck entry prints nothing anywhere; audit keeps it, history lines do not. No toast."
+          "purpose": "After Save the walk list is back: the resolved tag leaves the row and a toast names what was saved.",
+          "elements": [
+           {
+            "name": "Toast",
+            "at": "Marked recovered",
+            "shows": "Marked recovered with the pig's ear tag",
+            "states": [
+             {
+              "state": "Recovered",
+              "when": "Outcome Recovered",
+              "shows": "The tag leaves the row; the case stays in the pig's history as recovered"
+             },
+             {
+              "state": "Entered in error",
+              "when": "Outcome Entered in error",
+              "shows": "The tag leaves the row; the log keeps a record correction"
+             }
+            ]
+           }
           ]
          }
         }
@@ -16957,40 +17578,60 @@
         [
          "disease.add-select",
          "disease.add-drawer",
-         "tap Condition in the verb sheet"
+         "tap Condition"
         ],
         [
          "disease.add-drawer",
          "disease.catalogue",
-         "tap the Conditions field"
+         "tap Conditions"
         ],
         [
          "disease.catalogue",
-         "disease.add-drawer",
-         "tap a condition"
+         "disease.catalogue-area",
+         "tap a body area"
         ],
         [
-         "disease.add-drawer",
+         "disease.catalogue",
+         "disease.catalogue-add",
+         "search with no match, tap Add"
+        ],
+        [
+         "disease.catalogue",
+         "disease.add-ready",
+         "tick a condition, tap Done"
+        ],
+        [
+         "disease.add-ready",
          "disease.add-committed",
-         "tap Record"
+         "tap Save"
+        ],
+        [
+         "disease.add-select",
+         "disease.resolve-many",
+         "tap Resolve"
+        ],
+        [
+         "disease.resolve-many",
+         "disease.resolve-outcome",
+         "choose the condition, tap Outcome"
+        ],
+        [
+         "disease.resolve-outcome",
+         "disease.resolve-in-place",
+         "tap Recovered"
+        ],
+        [
+         "disease.resolve-in-place",
+         "disease.resolve-committed",
+         "tap Save"
         ],
         [
          "disease.resolve-one",
          "disease.resolve-committed",
-         "tap Recover or the wrong-entry chip"
-        ],
-        [
-         "disease.resolve-many",
-         "disease.resolve-in-place",
-         "tick verdicts"
-        ],
-        [
-         "disease.resolve-in-place",
-         "disease.resolve-committed",
-         "tap the primary"
+         "tap Save"
         ]
        ],
-       "prd": "# Disease and symptom 疾病与症状\n\n> Draft — compiled from existing docs, not yet confirmed.\n\n## Problem\n\nA farmer who sees a pig with scours or a limp needs to put that on the record and later close it, without choosing between a disease list and a symptom list and without a chain of confirmation screens. Production used five screens to add and four plus a dialog to remove.\n\n## Who\n\nAnyone on the walk (stockperson, supervisor) recording what they see on one or many pigs; the same record is read by the vet.\n\n## Anchor\n\nAnchor: The condition (a case with a day count, or a characteristic on the pig page) opened or closed on a pig.\n\n## Rules\n\n- One catalogue, one Conditions field: disease versus symptom is taxonomy the catalogue carries silently. An entry that is a characteristic (a hernia) writes a fact on the pig page, not a case.\n- Triage rides inline on Add condition with the preset Monitor (no null level exists); the distribution card is cut from Add.\n- Commit is idempotent for a carrier: a pig already carrying the condition gets no second case and its day count keeps aging. The drawer footnote states the subtraction before commit.\n- No toast and no result screen: the list rows are the receipt, the selection clears and the walk keeps its scroll.\n- Resolve has two verbs with unequal weight: Recover (the outcome, big tick on the left) and Strike (a correction of a wrong entry, small chip on the right). One commit carries mixed verdicts; characteristics are never listed in Resolve.\n- Resolve at one pig is a drawer; at several pigs it is a verdict page, one line per pig by open condition, grouped by pen, with recover-all on the master row and pen headers. The primary is disabled at zero verdicts.\n- The zero rule: pigs with nothing open stay off the page and a footnote counts them. Recovery prints as silence: the closed line disappears and nothing says \"recovered\". A struck entry prints nothing anywhere; the audit keeps it.\n\n## Scope\n\nIn: Select pigs · verb sheet; Add condition · one drawer; Condition catalogue; After adding · list is the receipt; Resolve · one pig; Resolve · verdict page; Resolve · verdicts in place; After resolving.\n\nOut: see the neighbouring features of the same section for what the same sheet does elsewhere; nothing outside the screens above is designed here.\n\n## Decisions\n\nOpen questions and items to confirm:\n\n- How this feature relates to the Health record built in the Inspection prototype (filed as a decision).\n- The deck states the decisions were taken from production frames; confirm the catalogue contents with the farm vet.\n\nSources:\n\n- The event workflow deck: `ux/system/workflows/health.html` (all decks render in `ux/archive/workflows.html`).\n- The ops requirements: `ux/research/ops/health.md` and `ux/research/ops/SYNTHESIS.md`.\n",
+       "prd": "# Disease and symptom 疾病与症状\n\n## Problem\n\nA worker who sees a pig with scours or a limp needs to put that on the record and later close it, without choosing between a disease list and a symptom list and without a chain of confirmation screens. Production used five screens to add and four plus a dialog to remove.\n\n## Who\n\nAnyone on the walk (stockperson, supervisor) recording what they see on one or many pigs; the same record is read by the vet.\n\n## Anchor\n\nAnchor: the condition on a pig (a finding in [Health record](../health-record/PRD.md)): open with a care level, then closed as Recovered or Entered in error.\n\n## Rules\n\nThis feature is the walk's path through Health record's pages; the rules are Health record's and [Conditions](../conditions/PRD.md)'s, not repeated here. In short:\n\n- The selection is made first on the walk list and is fixed: Actions → Condition opens Record health, a page of fields (Conditions, Care, Note) with Save · N and no pig list.\n- One catalogue for diseases and symptoms: symptoms by where you look, diseases by body system, search across all, and Add “…” when nothing matches (Name and Category, like Add medicine).\n- A pig that already has the condition gets no second finding; it keeps its start date.\n- Save returns to the walk list: the tags are on the rows and a toast counts the pigs.\n- Resolve picks one condition across the selected pigs and an outcome: Recovered (kept in history) or Entered in error (a correction). Pigs without that condition are listed as unchanged.\n\n## Scope\n\nIn: Actions on two ticked pigs; Record health; Choose conditions (first level, a body area, Add a condition); the walk list after saving; Resolve conditions for one pig and for several, its outcome, and the walk list after resolving.\n\nOut: the pig record as a health view, the finding and its edit forms, Care instructions (Health record); giving medicine (Treatment); pen-wide observations, deaths and abortions (not conditions; see Conditions).\n\n## Decisions\n\n- 2026-10-20 (owner): the Health record built in the Inspection prototype is the design. The event deck's Add condition and Resolve (one drawer with triage inline, Recover and Strike, silent prints) are earlier designs and are no longer this feature's screens; they stay viewable in `ux/archive/workflows.html` (`wf-condition`, `wf-resolve`). This feature's screens are the live prototype's states, most of them the same screens as Health record's with two pigs selected.\n\nOpen questions are Health record's and Conditions' (default care, folding, group counts, reporting); confirm the catalogue contents with the farm vet.\n\nSources:\n\n- The prototype: `ux/system/inspection-astra-concept.html` and the catalogue `ux/system/conditions-catalogue.js`.\n- The ops requirements: `ux/research/ops/health.md` and `ux/research/ops/SYNTHESIS.md`.\n",
        "scenarios": {
         "treeDoc": false,
         "tree": null,
@@ -17666,7 +18307,7 @@
              {
               "state": "No condition chosen",
               "when": "Condition picker empty",
-              "shows": "The pig's conditions or \"No open conditions\""
+              "shows": "The pig's conditions or \"Nothing open\""
              },
              {
               "state": "Chosen, pig has it",
@@ -17676,7 +18317,7 @@
              {
               "state": "Chosen, pig lacks it",
               "when": "Pig without that condition",
-              "shows": "\"No Thin · unchanged\""
+              "shows": "\"No Thin\""
              },
              {
               "state": "Not eligible",
@@ -17861,7 +18502,7 @@
              {
               "state": "Pig lacks it",
               "when": "No such condition",
-              "shows": "\"No X · unchanged\""
+              "shows": "\"No X\""
              },
              {
               "state": "Feed-linked",
@@ -22454,23 +23095,19 @@
           "data-sync.global-upload",
           "data-sync.global-error",
           "data-sync.task-badge",
-          "data-sync.task-list",
           "data-sync.list",
-          "data-sync.grouped",
-          "data-sync.category",
-          "data-sync.detail"
+          "data-sync.syncing",
+          "data-sync.upload",
+          "data-sync.task-list",
+          "data-sync.units",
+          "data-sync.unit",
+          "data-sync.history"
          ]
         ],
         [
-         "异常与结果",
+         "未被接受与身份",
          [
-          "data-sync.failed",
-          "data-sync.conflict",
-          "data-sync.blocked",
-          "data-sync.dependent-delete",
-          "data-sync.upload",
-          "data-sync.receipt",
-          "data-sync.reconciled",
+          "data-sync.not-accepted",
           "data-sync.switch",
           "data-sync.auth"
          ]
@@ -22579,259 +23216,162 @@
          }
         },
         {
-         "id": "data-sync.task-list",
-         "name": "Records from this task",
-         "zh": "本任务记录列表",
-         "status": "in-design",
-         "url": "/ux/system/data-sync-astra-prototype.html?scenario=offline&taskId=farrow28&from=task",
-         "notes": {
-          "purpose": "只显示稳定任务实例 farrow28 下跨单元/栏位的未上传记录，提供本机全部记录入口。",
-          "issues": [
-           "真实 taskId 和每条离线操作的归属需在 Android 业务功能与队列交接时接通。"
-          ]
-         }
-        },
-        {
          "id": "data-sync.list",
-         "name": "Saved work (sync list)",
-         "zh": "数据同步列表",
+         "name": "Saved work",
+         "zh": "本机记录",
          "status": "in-design",
+         "url": "/ux/system/data-sync-astra-prototype.html?scenario=offline",
          "notes": {
-          "purpose": "本机记录总览。异常与待上传记录逐条呈现；已确认上传仅显示近30天总数，不铺历史记录行。",
+          "purpose": "Every task with records still on this phone, one row each with its count; Other records last. The connection is said once, in the group title (PRD 2026-10-19).",
           "states": [
            {
-            "state": "Offline",
-            "when": "无网络",
-            "shows": "保留本机记录，说明网络恢复后自动上传"
-           },
-           {
-            "state": "Syncing",
-            "when": "网络可用且自动发送中",
-            "shows": "同步中，可离开页面"
-           },
-           {
-            "state": "Partial",
-            "when": "部分记录已同步",
-            "shows": "已上传显示近30天总数，未解决记录仍逐条可见"
-           },
-           {
-            "state": "Recent history",
-            "when": "已确认上传记录跨越30天期限",
-            "shows": "仅期限内记录计入本机已上传合计；过期且无未上传依赖的本机副本可清理"
+            "state": "Waiting",
+            "when": "No connection",
+            "shows": "Waiting to upload; each task's count; a task with records not accepted says so on its row"
            }
           ],
           "issues": [
-           "样例未接入其他功能原型的真实操作。"
-          ]
-         },
-         "url": "/ux/system/data-sync-astra-prototype.html?scenario=offline"
-        },
-        {
-         "id": "data-sync.detail",
-         "name": "Sync detail",
-         "zh": "数据同步-详情",
-         "status": "in-design",
-         "notes": {
-          "purpose": "单条本机记录的身份、状态、保存时间、错误原因与安全恢复。",
-          "states": [
-           {
-            "state": "Failed",
-            "when": "服务端未处理",
-            "shows": "保留本机记录与重试入口"
-           },
-           {
-            "state": "Conflict",
-            "when": "服务端状态冲突",
-            "shows": "停止自动同步；可人工重试或经确认删除"
-           },
-           {
-            "state": "Blocked",
-            "when": "前置操作未解决",
-            "shows": "指出阻断原因，不显示为已发送"
-           }
-          ],
-          "issues": [
-           "真实服务端差异获取与条件写入需 Android/后端契约验证。"
-          ]
-         },
-         "url": "/ux/system/data-sync-astra-prototype.html?scenario=conflict",
-         "steps": [
-          {
-           "tap": "[data-action=\"open-record\"]"
-          }
-         ]
-        },
-        {
-         "id": "data-sync.grouped",
-         "name": "Many saved records by work category",
-         "zh": "大量本机记录按类别汇总",
-         "status": "in-design",
-         "url": "/ux/system/data-sync-astra-prototype.html?scenario=busy",
-         "notes": {
-          "purpose": "30 条样例中需要处理的记录直接可见，普通待传按业务类别汇总。",
-          "issues": [
-           "样例仅覆盖分散在四类中的记录；真实类别和任务类型由业务数据提供。"
-          ],
-          "states": [
-           {
-            "state": "Threshold",
-            "when": "九条待传跨两类，浏览中自动确认一条",
-            "shows": "分类入口保留、待传数更新为八；重新进入才重判布局。可用 scenario=threshold 验证。"
-           }
+           "Fictional records on one phone; the real Android queue, server receipts and refusal reasons are not connected."
           ]
          }
         },
         {
-         "id": "data-sync.category",
-         "name": "Saved records within a category",
-         "zh": "类别内查看本机记录",
+         "id": "data-sync.syncing",
+         "name": "Saved work, uploading",
+         "zh": "本机记录·上传中",
          "status": "in-design",
-         "url": "/ux/system/data-sync-astra-prototype.html?scenario=busy",
-         "steps": [
-          {
-           "tap": "[data-action=\"open-category\"][data-value=\"production\"]"
-          }
-         ],
+         "url": "/ux/system/data-sync-astra-prototype.html?scenario=syncing",
          "notes": {
-          "purpose": "点入业务类别后直接看到本机记录，可逐条打开并返回；不强制再走任务类型和任务两级。"
+          "purpose": "The same page with a connection: Uploading. Counts go down as the server confirms; nothing pops up.",
+          "issues": [
+           "Fictional records on one phone; the real Android queue, server receipts and refusal reasons are not connected."
+          ]
          }
         },
         {
          "id": "data-sync.upload",
-         "name": "All uploaded on this phone",
-         "zh": "本机暂无待上传",
+         "name": "Everything has uploaded",
+         "zh": "全部已上传",
          "status": "in-design",
+         "url": "/ux/system/data-sync-astra-prototype.html?scenario=done",
          "notes": {
-          "purpose": "本机无待处理队列；仅显示近30天已上传总数，不列逐条历史。",
-          "states": [
-           {
-            "state": "Empty",
-            "when": "待上传及异常都为零",
-            "shows": "仅声明本机暂无待上传记录，并附上近30天已上传合计；不推断团队数据完整"
-           }
+          "purpose": "Nothing on this phone is waiting: one line, past uploads still behind the clock.",
+          "issues": [
+           "Fictional records on one phone; the real Android queue, server receipts and refusal reasons are not connected."
+          ]
+         }
+        },
+        {
+         "id": "data-sync.task-list",
+         "name": "A task's records",
+         "zh": "任务记录",
+         "status": "in-design",
+         "url": "/ux/system/data-sync-astra-prototype.html?scenario=offline&taskId=preg31",
+         "notes": {
+          "purpose": "One task: the standing Toast (records not accepted), the unit switch with the count inside, then one log of everything still on the phone, newest first (PRD 2026-10-20).",
+          "issues": [
+           "Fictional records on one phone; the real Android queue, server receipts and refusal reasons are not connected."
+          ]
+         }
+        },
+        {
+         "id": "data-sync.units",
+         "name": "Choose a unit",
+         "zh": "选择单元",
+         "status": "in-design",
+         "url": "/ux/system/data-sync-astra-prototype.html?scenario=offline&taskId=preg31",
+         "notes": {
+          "purpose": "The menu drawer that picks one unit; each row says how many records it has on this phone.",
+          "issues": [
+           "Fictional records on one phone; the real Android queue, server receipts and refusal reasons are not connected."
           ]
          },
-         "url": "/ux/system/data-sync-astra-prototype.html?scenario=done"
-        },
-        {
-         "id": "data-sync.failed",
-         "name": "Partial upload and failure",
-         "zh": "部分上传与失败",
-         "status": "in-design",
-         "url": "/ux/system/data-sync-astra-prototype.html?scenario=partial",
-         "notes": {
-          "purpose": "逐条结果与失败恢复。",
-          "states": [
-           {
-            "state": "Partial",
-            "when": "三条中两条成功一条失败",
-            "shows": "成功的已上传，失败的留在本机，可查看原因并重试"
-           }
-          ]
-         }
-        },
-        {
-         "id": "data-sync.receipt",
-         "name": "Checking a missing receipt",
-         "zh": "核对丢失回执",
-         "status": "in-design",
-         "url": "/ux/system/data-sync-astra-prototype.html?scenario=uncertain&receipt=hold",
-         "notes": {
-          "purpose": "请求可能已由服务端处理但本机未收到回执时，按原操作 ID 查询；查询期间保留本机记录，暂不重发。",
-          "issues": [
-           "原型使用本地定时结果；Android/后端交接时核对查询接口与回执结构。"
-          ]
-         }
-        },
-        {
-         "id": "data-sync.reconciled",
-         "name": "Receipt confirmed by server",
-         "zh": "服务端确认已处理",
-         "status": "in-design",
-         "url": "/ux/system/data-sync-astra-prototype.html?scenario=uncertain&receipt=resolved",
-         "notes": {
-          "purpose": "按操作 ID 查到服务端已处理后才将本机记录标为已上传，不再次发送。",
-          "issues": [
-           "原型为本地样例，不代表真实查询接口已接入。"
-          ]
-         }
-        },
-        {
-         "id": "data-sync.conflict",
-         "name": "Conflict awaiting manual action",
-         "zh": "冲突待人工处理",
-         "status": "in-design",
-         "url": "/ux/system/data-sync-astra-prototype.html?scenario=conflict",
-         "notes": {
-          "purpose": "冲突停止自动同步，可查看详情、人工重试或确认删除。",
-          "issues": [
-           "交互样例未接真实账号、猪场或服务端数据。"
-          ]
-         }
-        },
-        {
-         "id": "data-sync.blocked",
-         "name": "Later operation blocked",
-         "zh": "后续操作受阻",
-         "status": "in-design",
-         "url": "/ux/system/data-sync-astra-prototype.html?scenario=blocked",
-         "notes": {
-          "purpose": "前置操作失败时，后续操作保留在本机并明确说明原因。",
-          "issues": [
-           "交互样例未接真实账号、猪场或服务端数据。"
-          ]
-         }
-        },
-        {
-         "id": "data-sync.dependent-delete",
-         "name": "Blocked after predecessor deletion",
-         "zh": "前置删除后续受阻",
-         "status": "in-design",
-         "url": "/ux/system/data-sync-astra-prototype.html?scenario=conflict",
          "steps": [
           {
-           "tap": "[data-action=\"open-record\"][data-value=\"first\"]"
-          },
-          {
-           "tap": "[data-action=\"ask-delete\"]"
-          },
-          {
-           "tap": "[data-action=\"confirm-delete\"]"
-          },
-          {
-           "tap": "[data-action=\"open-record\"][data-value=\"second\"]"
+           "tap": "[data-action=\"scope\"][data-value=\"unit\"]"
           }
-         ],
+         ]
+        },
+        {
+         "id": "data-sync.unit",
+         "name": "One unit's records",
+         "zh": "单个单元的记录",
+         "status": "in-design",
+         "url": "/ux/system/data-sync-astra-prototype.html?scenario=offline&taskId=preg31",
          "notes": {
-          "purpose": "前置冲突已删除；后续记录只可查看或经确认逐条删除，不自动发送或重试。",
+          "purpose": "The task log narrowed to one unit; entries drop the unit they share. All units goes back.",
           "issues": [
-           "样例未接真实依赖队列；所有直接与间接依赖项都需按同一规则处理。"
+           "Fictional records on one phone; the real Android queue, server receipts and refusal reasons are not connected."
           ]
-         }
+         },
+         "steps": [
+          {
+           "tap": "[data-action=\"scope\"][data-value=\"unit\"]"
+          },
+          {
+           "tap": "[data-action=\"pick-unit\"][data-value=\"7\"]"
+          }
+         ]
+        },
+        {
+         "id": "data-sync.history",
+         "name": "Past uploads",
+         "zh": "已上传记录",
+         "status": "in-design",
+         "url": "/ux/system/data-sync-astra-prototype.html?scenario=syncing",
+         "notes": {
+          "purpose": "Behind the clock at the top right: the last 30 days on this phone, by day, in the scope it was opened from.",
+          "issues": [
+           "Fictional records on one phone; the real Android queue, server receipts and refusal reasons are not connected."
+          ]
+         },
+         "steps": [
+          {
+           "tap": "[data-action=\"past\"]"
+          }
+         ]
+        },
+        {
+         "id": "data-sync.not-accepted",
+         "name": "Not accepted",
+         "zh": "未被接受",
+         "status": "in-design",
+         "url": "/ux/system/data-sync-astra-prototype.html?scenario=offline&taskId=preg31",
+         "notes": {
+          "purpose": "A read-only log in two groups: Already recorded (the farm's value first, yours under it) and Couldn't be accepted (the reason). Nothing to press (PRD 2026-10-20).",
+          "issues": [
+           "Fictional records on one phone; the real Android queue, server receipts and refusal reasons are not connected."
+          ]
+         },
+         "steps": [
+          {
+           "tap": "[data-action=\"not-accepted\"]"
+          }
+         ]
         },
         {
          "id": "data-sync.switch",
-         "name": "Account or farm switch blocked",
-         "zh": "切换账号或猪场受阻",
+         "name": "Switching farm with records waiting",
+         "zh": "有待传记录时切换猪场",
          "status": "in-design",
          "url": "/ux/system/data-sync-astra-prototype.html?scenario=switch",
          "notes": {
-          "purpose": "有未上传记录时阻止切换并引导处理。",
+          "purpose": "Switching account or farm is stopped while records wait: Upload first, with the way to Saved work.",
           "issues": [
-           "交互样例未接真实账号、猪场或服务端数据。"
+           "Fictional records on one phone; the real Android queue, server receipts and refusal reasons are not connected."
           ]
          }
         },
         {
          "id": "data-sync.auth",
-         "name": "Original account sign-in needed",
-         "zh": "原账号登录后续传",
+         "name": "Signed out",
+         "zh": "登录失效",
          "status": "in-design",
          "url": "/ux/system/data-sync-astra-prototype.html?scenario=expired",
          "notes": {
-          "purpose": "登录失效时暂停发送并保留原账号/猪场绑定。重新登录原账号后自动续传。",
+          "purpose": "Uploads pause: the standing Toast in its attention tone asks to sign in as the same person; records stay safe on this phone.",
           "issues": [
-           "样例点击只模拟原账号验证成功；真实凭证验证由账号流程提供。"
+           "Fictional records on one phone; the real Android queue, server receipts and refusal reasons are not connected."
           ]
          }
         }
@@ -22840,82 +23380,67 @@
         [
          "data-sync.banner",
          "data-sync.list",
-         "tap local records"
+         "tap the header icon"
         ],
         [
          "data-sync.global-upload",
          "data-sync.list",
-         "tap app-shell upload status"
+         "tap the header icon"
         ],
         [
          "data-sync.global-error",
-         "data-sync.failed",
-         "tap app-shell exception status"
+         "data-sync.list",
+         "tap the header icon"
         ],
         [
          "data-sync.task-badge",
          "data-sync.task-list",
-         "open task-owned records"
+         "tap the task's badge"
+        ],
+        [
+         "data-sync.list",
+         "data-sync.task-list",
+         "open a task"
+        ],
+        [
+         "data-sync.list",
+         "data-sync.syncing",
+         "the connection returns"
+        ],
+        [
+         "data-sync.syncing",
+         "data-sync.upload",
+         "the last record is confirmed"
         ],
         [
          "data-sync.task-list",
-         "data-sync.list",
-         "view all records on this phone"
+         "data-sync.units",
+         "choose unit"
         ],
         [
-         "data-sync.grouped",
-         "data-sync.category",
-         "open work category"
-        ],
-        [
-         "data-sync.list",
-         "data-sync.detail",
-         "open a record"
+         "data-sync.units",
+         "data-sync.unit",
+         "pick a unit"
         ],
         [
          "data-sync.list",
-         "data-sync.failed",
-         "one record fails"
+         "data-sync.history",
+         "tap the clock"
         ],
         [
-         "data-sync.list",
-         "data-sync.conflict",
-         "server conflict"
-        ],
-        [
-         "data-sync.list",
-         "data-sync.blocked",
-         "earlier operation unresolved"
-        ],
-        [
-         "data-sync.list",
-         "data-sync.upload",
-         "all local work uploaded"
-        ],
-        [
-         "data-sync.list",
-         "data-sync.receipt",
-         "local response missing"
-        ],
-        [
-         "data-sync.receipt",
-         "data-sync.reconciled",
-         "query by operation ID confirms the original request"
+         "data-sync.task-list",
+         "data-sync.not-accepted",
+         "tap the standing Toast"
         ],
         [
          "data-sync.list",
          "data-sync.switch",
-         "request account or farm switch with unsent work"
+         "switch farm with records waiting"
         ],
         [
          "data-sync.list",
          "data-sync.auth",
-         "session expires with unsent records"
-        ],
-        [
-         "data-sync.conflict",
-         "data-sync.dependent-delete",
-         "delete conflicted predecessor with dependent records"
+         "sign-in expires"
         ]
        ],
        "entryPoints": [
@@ -22930,7 +23455,7 @@
          "section": "Farrowing task",
          "label": "via this-task header badge",
          "from": "farrowing.room",
-         "control": "Task 2",
+         "control": "Task sync badge",
          "lands": "data-sync.task-list"
         }
        ],
@@ -22941,29 +23466,29 @@
          {
           "type": "entry",
           "id": "ds-a3-offline-entry.entry",
-          "label": "Offline queue remains on this phone",
+          "label": "Saved work lists tasks while offline",
           "children": [
            {
             "type": "state",
             "id": "ds-a3-offline-entry.state",
-            "label": "Study fixture: offline",
+            "label": "Study fixture: scenario=offline",
             "tree": "A",
             "children": [
              {
               "type": "outcome",
               "id": "ds-a3-offline-entry",
-              "label": "Offline queue remains on this phone",
+              "label": "Saved work lists tasks while offline",
               "tree": "A-3",
               "gwt": {
-               "given": "A worker has three records saved on this phone and no connection.",
+               "given": "A worker has records saved on this phone and no connection.",
                "when": "They open Saved work.",
-               "then": "Three records remain waiting, and the screen says they will upload automatically when connected."
+               "then": "Each task with records waiting is one row with its count, under Waiting to upload."
               },
               "authority": [
                {
                 "src": "PRD",
-                "at": "Rules and Decisions 2026-10-12",
-                "says": "Three records remain waiting, and the screen says they will upload automatically when connected."
+                "at": "Rules and Decisions 2026-10-18 to 2026-10-20 (PR 235)",
+                "says": "Each task with records waiting is one row with its count, under Waiting to upload."
                }
               ],
               "result": "pass"
@@ -22975,29 +23500,29 @@
          {
           "type": "entry",
           "id": "ds-a5-empty.entry",
-          "label": "Empty local queue is stated narrowly",
+          "label": "Nothing waiting says everything has uploaded",
           "children": [
            {
             "type": "state",
             "id": "ds-a5-empty.state",
-            "label": "Study fixture: done",
+            "label": "Study fixture: scenario=done",
             "tree": "A",
             "children": [
              {
               "type": "outcome",
               "id": "ds-a5-empty",
-              "label": "Empty local queue is stated narrowly",
+              "label": "Nothing waiting says everything has uploaded",
               "tree": "A-5",
               "gwt": {
-               "given": "This phone has no waiting or abnormal records.",
+               "given": "Every record on this phone has uploaded.",
                "when": "The worker opens Saved work.",
-               "then": "The screen says this phone has no records waiting; it makes no farm-wide completion claim."
+               "then": "One line says everything has uploaded."
               },
               "authority": [
                {
                 "src": "PRD",
-                "at": "Rules and Decisions 2026-10-12",
-                "says": "The screen says this phone has no records waiting; it makes no farm-wide completion claim."
+                "at": "Rules and Decisions 2026-10-18 to 2026-10-20 (PR 235)",
+                "says": "One line says everything has uploaded."
                }
               ],
               "result": "pass"
@@ -23009,34 +23534,34 @@
          {
           "type": "entry",
           "id": "ds-b1-reconnected.entry",
-          "label": "Reconnect starts upload without a tap",
+          "label": "A returning connection starts the upload",
           "children": [
            {
             "type": "state",
             "id": "ds-b1-reconnected.state",
-            "label": "Study fixture: offline, then usable connection",
+            "label": "Study fixture: scenario=offline",
             "tree": "B",
             "children": [
              {
               "type": "action",
               "id": "ds-b1-reconnected.act",
-              "label": "The network is lost, then restored without tapping Upload.",
+              "label": "The connection returns.",
               "children": [
                {
                 "type": "outcome",
                 "id": "ds-b1-reconnected",
-                "label": "Reconnect starts upload without a tap",
+                "label": "A returning connection starts the upload",
                 "tree": "B-1",
                 "gwt": {
-                 "given": "This phone has waiting records and its connection returns.",
-                 "when": "The network becomes usable.",
-                 "then": "The records start uploading without an Upload button press."
+                 "given": "Records are waiting with no connection.",
+                 "when": "The connection returns.",
+                 "then": "Saved work says Uploading without anything to press."
                 },
                 "authority": [
                  {
                   "src": "PRD",
-                  "at": "Rules and Decisions 2026-10-12",
-                  "says": "The records start uploading without an Upload button press."
+                  "at": "Rules and Decisions 2026-10-18 to 2026-10-20 (PR 235)",
+                  "says": "Saved work says Uploading without anything to press."
                  }
                 ],
                 "result": "pass"
@@ -23050,29 +23575,29 @@
          {
           "type": "entry",
           "id": "ds-b4-partial.entry",
-          "label": "Partial success stays split",
+          "label": "Records settle one by one",
           "children": [
            {
             "type": "state",
             "id": "ds-b4-partial.state",
-            "label": "Study fixture: partial",
+            "label": "Study fixture: scenario=partial",
             "tree": "B",
             "children": [
              {
               "type": "outcome",
               "id": "ds-b4-partial",
-              "label": "Partial success stays split",
+              "label": "Records settle one by one",
               "tree": "B-4",
               "gwt": {
-               "given": "Three local records are being sent.",
-               "when": "Two succeed and one fails.",
-               "then": "Two are shown as uploaded and one is still marked for attention."
+               "given": "Some records have uploaded and some have not.",
+               "when": "The worker opens Saved work.",
+               "then": "Only tasks still holding records are listed, each with what is left, and a task with records not accepted says so."
               },
               "authority": [
                {
                 "src": "PRD",
-                "at": "Rules and Decisions 2026-10-12",
-                "says": "Two are shown as uploaded and one is still marked for attention."
+                "at": "Rules and Decisions 2026-10-18 to 2026-10-20 (PR 235)",
+                "says": "Only tasks still holding records are listed, each with what is left, and a task with records not accepted says so."
                }
               ],
               "result": "pass"
@@ -23084,34 +23609,34 @@
          {
           "type": "entry",
           "id": "ds-c1-failed-detail.entry",
-          "label": "Failed record keeps a reason and retry",
+          "label": "A refused record shows its reason, read only",
           "children": [
            {
             "type": "state",
             "id": "ds-c1-failed-detail.state",
-            "label": "Study fixture: partial",
+            "label": "Study fixture: scenario=offline&taskId=preg31",
             "tree": "C",
             "children": [
              {
               "type": "action",
               "id": "ds-c1-failed-detail.act",
-              "label": "The worker opens the failed record.",
+              "label": "The worker opens Not accepted from the task.",
               "children": [
                {
                 "type": "outcome",
                 "id": "ds-c1-failed-detail",
-                "label": "Failed record keeps a reason and retry",
+                "label": "A refused record shows its reason, read only",
                 "tree": "C-1",
                 "gwt": {
-                 "given": "One record failed to upload while two succeeded.",
-                 "when": "The worker opens the failed record.",
-                 "then": "The original record and failure reason remain visible with a Retry action."
+                 "given": "The server refused a record and another person recorded a sow first.",
+                 "when": "The worker opens Not accepted from the task.",
+                 "then": "Each record shows what the farm kept or why it was refused; nothing asks for an action."
                 },
                 "authority": [
                  {
                   "src": "PRD",
-                  "at": "Rules and Decisions 2026-10-12",
-                  "says": "The original record and failure reason remain visible with a Retry action."
+                  "at": "Rules and Decisions 2026-10-18 to 2026-10-20 (PR 235)",
+                  "says": "Each record shows what the farm kept or why it was refused; nothing asks for an action."
                  }
                 ],
                 "result": "pass"
@@ -23125,34 +23650,34 @@
          {
           "type": "entry",
           "id": "ds-c5-cancel-delete.entry",
-          "label": "Cancelling conflict deletion keeps record",
+          "label": "Not accepted records offer no delete",
           "children": [
            {
             "type": "state",
             "id": "ds-c5-cancel-delete.state",
-            "label": "Study fixture: conflict",
+            "label": "Study fixture: scenario=offline&taskId=preg31",
             "tree": "C",
             "children": [
              {
               "type": "action",
               "id": "ds-c5-cancel-delete.act",
-              "label": "The worker opens it, asks to delete, then backs out.",
+              "label": "The worker opens Not accepted.",
               "children": [
                {
                 "type": "outcome",
                 "id": "ds-c5-cancel-delete",
-                "label": "Cancelling conflict deletion keeps record",
+                "label": "Not accepted records offer no delete",
                 "tree": "C-5",
                 "gwt": {
-                 "given": "A conflict is saved on this phone.",
-                 "when": "The worker opens it, asks to delete, then backs out.",
-                 "then": "The conflicted record remains on this phone."
+                 "given": "A record was not accepted.",
+                 "when": "The worker opens Not accepted.",
+                 "then": "There is no Delete or Discard: the record is information only."
                 },
                 "authority": [
                  {
                   "src": "PRD",
-                  "at": "Rules and Decisions 2026-10-12",
-                  "says": "The conflicted record remains on this phone."
+                  "at": "Rules and Decisions 2026-10-18 to 2026-10-20 (PR 235)",
+                  "says": "There is no Delete or Discard: the record is information only."
                  }
                 ],
                 "result": "pass"
@@ -23166,34 +23691,34 @@
          {
           "type": "entry",
           "id": "ds-c6-confirm-delete.entry",
-          "label": "Confirmed conflict deletion removes one local record",
+          "label": "A not accepted record stays readable",
           "children": [
            {
             "type": "state",
             "id": "ds-c6-confirm-delete.state",
-            "label": "Study fixture: conflict",
+            "label": "Study fixture: scenario=offline&taskId=preg31",
             "tree": "C",
             "children": [
              {
               "type": "action",
               "id": "ds-c6-confirm-delete.act",
-              "label": "The worker opens the conflict and confirms deletion.",
+              "label": "The worker opens Not accepted.",
               "children": [
                {
                 "type": "outcome",
                 "id": "ds-c6-confirm-delete",
-                "label": "Confirmed conflict deletion removes one local record",
+                "label": "A not accepted record stays readable",
                 "tree": "C-6",
                 "gwt": {
-                 "given": "A conflict and other records are saved on this phone.",
-                 "when": "The worker opens the conflict and confirms deletion.",
-                 "then": "Only the conflicted record leaves the local queue; the other records remain."
+                 "given": "Another person recorded sow 000412 first.",
+                 "when": "The worker opens Not accepted.",
+                 "then": "The record stays listed with the farm's value; there is no retry."
                 },
                 "authority": [
                  {
                   "src": "PRD",
-                  "at": "Rules and Decisions 2026-10-12",
-                  "says": "Only the conflicted record leaves the local queue; the other records remain."
+                  "at": "Rules and Decisions 2026-10-18 to 2026-10-20 (PR 235)",
+                  "says": "The record stays listed with the farm's value; there is no retry."
                  }
                 ],
                 "result": "pass"
@@ -23207,29 +23732,29 @@
          {
           "type": "entry",
           "id": "ds-c7-blocked.entry",
-          "label": "Later operation names its unresolved predecessor",
+          "label": "A record waiting on an earlier one is an ordinary entry",
           "children": [
            {
             "type": "state",
             "id": "ds-c7-blocked.state",
-            "label": "Study fixture: blocked",
+            "label": "Study fixture: scenario=offline&taskId=preg31",
             "tree": "C",
             "children": [
              {
               "type": "outcome",
               "id": "ds-c7-blocked",
-              "label": "Later operation names its unresolved predecessor",
+              "label": "A record waiting on an earlier one is an ordinary entry",
               "tree": "C-7",
               "gwt": {
-               "given": "An earlier operation for the same object failed.",
-               "when": "The worker reviews the waiting records.",
-               "then": "The later operation is marked blocked and is still on the phone."
+               "given": "A later record on sow 000308 waits for an earlier one.",
+               "when": "The worker opens the task.",
+               "then": "It is listed like any other record, with no blocked state."
               },
               "authority": [
                {
                 "src": "PRD",
-                "at": "Rules and Decisions 2026-10-12",
-                "says": "The later operation is marked blocked and is still on the phone."
+                "at": "Rules and Decisions 2026-10-18 to 2026-10-20 (PR 235)",
+                "says": "It is listed like any other record, with no blocked state."
                }
               ],
               "result": "pass"
@@ -23241,29 +23766,29 @@
          {
           "type": "entry",
           "id": "ds-d1-switch-blocked.entry",
-          "label": "Unsent work blocks an account or farm switch",
+          "label": "Switching farm is stopped while records wait",
           "children": [
            {
             "type": "state",
             "id": "ds-d1-switch-blocked.state",
-            "label": "Study fixture: switch",
+            "label": "Study fixture: scenario=switch",
             "tree": "D",
             "children": [
              {
               "type": "outcome",
               "id": "ds-d1-switch-blocked",
-              "label": "Unsent work blocks an account or farm switch",
+              "label": "Switching farm is stopped while records wait",
               "tree": "D-1",
               "gwt": {
-               "given": "There are records on this phone that have not uploaded.",
-               "when": "The worker tries to change account or farm.",
-               "then": "The switch is stopped and the worker is directed to the saved records."
+               "given": "Records are still on this phone.",
+               "when": "The worker tries to switch farm.",
+               "then": "Upload first stops the switch and names the farm."
               },
               "authority": [
                {
                 "src": "PRD",
-                "at": "Rules and Decisions 2026-10-12",
-                "says": "The switch is stopped and the worker is directed to the saved records."
+                "at": "Rules and Decisions 2026-10-18 to 2026-10-20 (PR 235)",
+                "says": "Upload first stops the switch and names the farm."
                }
               ],
               "result": "pass"
@@ -23275,34 +23800,34 @@
          {
           "type": "entry",
           "id": "ds-c9-manual-conflict-contract.entry",
-          "label": "Conflict retry never overwrites the server",
+          "label": "The team's record is kept and shown first",
           "children": [
            {
             "type": "state",
             "id": "ds-c9-manual-conflict-contract.state",
-            "label": "Study fixture: conflict",
+            "label": "Study fixture: scenario=offline&taskId=preg31",
             "tree": "C",
             "children": [
              {
               "type": "action",
               "id": "ds-c9-manual-conflict-contract.act",
-              "label": "The worker compares both values and retries the conflict.",
+              "label": "They open Not accepted.",
               "children": [
                {
                 "type": "outcome",
                 "id": "ds-c9-manual-conflict-contract",
-                "label": "Conflict retry never overwrites the server",
+                "label": "The team's record is kept and shown first",
                 "tree": "C-9",
                 "gwt": {
-                 "given": "The saved result differs from the current team record.",
-                 "when": "The worker compares both values and manually retries.",
-                 "then": "The server record is not overwritten and this record remains in conflict."
+                 "given": "The worker recorded Pregnant, and another person had recorded Not pregnant first.",
+                 "when": "They open Not accepted.",
+                 "then": "The farm's value leads; theirs is the line under it."
                 },
                 "authority": [
                  {
                   "src": "PRD",
-                  "at": "Decisions 2026-10-12",
-                  "says": "Show both values before retry; retry cannot overwrite the server."
+                  "at": "Rules and Decisions 2026-10-18 to 2026-10-20 (PR 235)",
+                  "says": "The farm's value leads; theirs is the line under it."
                  }
                 ],
                 "result": "pass"
@@ -23316,39 +23841,32 @@
          {
           "type": "entry",
           "id": "ds-c10-deleted-predecessor.entry",
-          "label": "Dependent record stays blocked after deletion",
+          "label": "A later record isn't held back by one that wasn't accepted",
           "children": [
            {
             "type": "state",
             "id": "ds-c10-deleted-predecessor.state",
-            "label": "Study fixture: blocked",
+            "label": "Study fixture: scenario=offline&taskId=preg31",
             "tree": "C",
             "children": [
              {
-              "type": "action",
-              "id": "ds-c10-deleted-predecessor.act",
-              "label": "The worker deletes the conflict and opens the dependent record.",
-              "children": [
+              "type": "outcome",
+              "id": "ds-c10-deleted-predecessor",
+              "label": "A later record isn't held back by one that wasn't accepted",
+              "tree": "C-10",
+              "gwt": {
+               "given": "A check on sow 000412 was not accepted, and a recheck was saved after it.",
+               "when": "The worker opens the task.",
+               "then": "The recheck waits as an ordinary record and uploads on its own; nothing is blocked or deleted."
+              },
+              "authority": [
                {
-                "type": "outcome",
-                "id": "ds-c10-deleted-predecessor",
-                "label": "Dependent record stays blocked after deletion",
-                "tree": "C-10",
-                "gwt": {
-                 "given": "A later local record depends on a conflicted record.",
-                 "when": "The conflicted predecessor is deleted.",
-                 "then": "The later record remains blocked on this phone; it can only be viewed or deleted, and does not upload."
-                },
-                "authority": [
-                 {
-                  "src": "PRD",
-                  "at": "Decisions 2026-10-12",
-                  "says": "After deleting a conflicted predecessor, dependent records remain blocked and can only be viewed or deleted."
-                 }
-                ],
-                "result": "pass"
+                "src": "PRD",
+                "at": "Rules and Decisions 2026-10-18 to 2026-10-20 (PR 235)",
+                "says": "The recheck waits as an ordinary record and uploads on its own; nothing is blocked or deleted."
                }
-              ]
+              ],
+              "result": "pass"
              }
             ]
            }
@@ -23357,34 +23875,34 @@
          {
           "type": "entry",
           "id": "ds-c11-delete-blocked-dependent.entry",
-          "label": "A blocked dependent can be deleted after review",
+          "label": "Nothing in Not accepted is deleted",
           "children": [
            {
             "type": "state",
             "id": "ds-c11-delete-blocked-dependent.state",
-            "label": "Study fixture: conflict with dependent",
+            "label": "Study fixture: scenario=offline&taskId=preg31",
             "tree": "C",
             "children": [
              {
               "type": "action",
               "id": "ds-c11-delete-blocked-dependent.act",
-              "label": "The worker deletes the conflicted predecessor, reviews the blocked dependent, then confirms its deletion.",
+              "label": "The worker reads Not accepted.",
               "children": [
                {
                 "type": "outcome",
                 "id": "ds-c11-delete-blocked-dependent",
-                "label": "A blocked dependent can be deleted after review",
+                "label": "Nothing in Not accepted is deleted",
                 "tree": "C-11",
                 "gwt": {
-                 "given": "A conflicted predecessor was deleted and the later record is blocked.",
-                 "when": "The worker reviews the later record and confirms its deletion.",
-                 "then": "Only that local record is deleted; uploaded history remains, and this phone has no unsent records."
+                 "given": "Records were not accepted.",
+                 "when": "The worker reads Not accepted.",
+                 "then": "No record is deleted or discarded there."
                 },
                 "authority": [
                  {
                   "src": "PRD",
-                  "at": "Decisions 2026-10-12",
-                  "says": "A dependent blocked by a deleted conflict can only be viewed or deleted individually with confirmation."
+                  "at": "Rules and Decisions 2026-10-18 to 2026-10-20 (PR 235)",
+                  "says": "No record is deleted or discarded there."
                  }
                 ],
                 "result": "pass"
@@ -23398,34 +23916,34 @@
          {
           "type": "entry",
           "id": "ds-d3-expired-login.entry",
-          "label": "Original-account sign-in resumes upload",
+          "label": "Signing back in as the same person resumes uploads",
           "children": [
            {
             "type": "state",
             "id": "ds-d3-expired-login.state",
-            "label": "Study fixture: offline",
+            "label": "Study fixture: scenario=expired",
             "tree": "D",
             "children": [
              {
               "type": "action",
               "id": "ds-d3-expired-login.act",
-              "label": "The worker signs in again to the original account.",
+              "label": "The worker signs in again as G. Hansen.",
               "children": [
                {
                 "type": "outcome",
                 "id": "ds-d3-expired-login",
-                "label": "Original-account sign-in resumes upload",
+                "label": "Signing back in as the same person resumes uploads",
                 "tree": "D-3",
                 "gwt": {
-                 "given": "Upload stopped because the original account session expired, while three records remain on this phone.",
-                 "when": "The worker signs in again with the original account.",
-                 "then": "The records remain tied to that account and automatic upload resumes after verification."
+                 "given": "The sign-in expired with records on this phone.",
+                 "when": "The worker signs in again as G. Hansen.",
+                 "then": "Uploads resume and the sign-in bar goes."
                 },
                 "authority": [
                  {
                   "src": "PRD",
-                  "at": "Decisions 2026-10-12",
-                  "says": "Reauthenticate the original account, then resume automatic upload without changing queue ownership."
+                  "at": "Rules and Decisions 2026-10-18 to 2026-10-20 (PR 235)",
+                  "says": "Uploads resume and the sign-in bar goes."
                  }
                 ],
                 "result": "pass"
@@ -23439,39 +23957,32 @@
          {
           "type": "entry",
           "id": "ds-b7-uncertain-receipt.entry",
-          "label": "Q3 — Request accepted without local receipt",
+          "label": "A record whose receipt is being checked shows as uploading",
           "children": [
            {
             "type": "state",
             "id": "ds-b7-uncertain-receipt.state",
-            "label": "Study fixture: receipt unknown",
+            "label": "Study fixture: scenario=uncertain",
             "tree": "B",
             "children": [
              {
-              "type": "action",
-              "id": "ds-b7-uncertain-receipt.act",
-              "label": "The app queries the server by operation ID before any resend.",
-              "children": [
+              "type": "outcome",
+              "id": "ds-b7-uncertain-receipt",
+              "label": "A record whose receipt is being checked shows as uploading",
+              "tree": "B-7",
+              "gwt": {
+               "given": "A record reached the server but the phone lost the reply.",
+               "when": "The worker opens Saved work.",
+               "then": "It counts as uploading; no checking state is shown."
+              },
+              "authority": [
                {
-                "type": "outcome",
-                "id": "ds-b7-uncertain-receipt",
-                "label": "Q3 — Request accepted without local receipt",
-                "tree": "B-7",
-                "gwt": {
-                 "given": "The server accepted an operation but its receipt did not reach the phone.",
-                 "when": "The app checks the final result using the original operation ID.",
-                 "then": "The server-confirmed record becomes Uploaded without a duplicate send; no record remains waiting on this phone."
-                },
-                "authority": [
-                 {
-                  "src": "PRD",
-                  "at": "Decisions 2026-10-12",
-                  "says": "The server guarantees deduplication and final-result lookup by stable operation ID; confirm the result before marking the local record uploaded."
-                 }
-                ],
-                "result": "pass"
+                "src": "PRD",
+                "at": "Rules and Decisions 2026-10-18 to 2026-10-20 (PR 235)",
+                "says": "It counts as uploading; no checking state is shown."
                }
-              ]
+              ],
+              "result": "pass"
              }
             ]
            }
@@ -23480,7 +23991,7 @@
          {
           "type": "entry",
           "id": "ds-a7-global-wait.entry",
-          "label": "Saved work remains visible outside Home",
+          "label": "Home's icon opens Saved work",
           "children": [
            {
             "type": "state",
@@ -23496,18 +24007,18 @@
                {
                 "type": "outcome",
                 "id": "ds-a7-global-wait",
-                "label": "Saved work remains visible outside Home",
+                "label": "Home's icon opens Saved work",
                 "tree": "A-7",
                 "gwt": {
-                 "given": "Three operations are saved on this phone while it is offline.",
-                 "when": "The worker checks the toolbox page.",
-                 "then": "A compact global badge still shows three unsent local records, and opening it provides the automatic-upload explanation."
+                 "given": "Records wait on this phone while another page is open.",
+                 "when": "The worker taps the header's saved-work control.",
+                 "then": "Saved work lists the tasks still holding records."
                 },
                 "authority": [
                  {
                   "src": "PRD",
-                  "at": "Design feedback 2026-10-13",
-                  "says": "Show global saved-work status outside Home."
+                  "at": "Rules and Decisions 2026-10-18 to 2026-10-20 (PR 235)",
+                  "says": "Saved work lists the tasks still holding records."
                  }
                 ],
                 "result": "pass"
@@ -23562,7 +24073,7 @@
          {
           "type": "entry",
           "id": "ds-a7-global-error.entry",
-          "label": "A sync exception stays visible outside Home",
+          "label": "A task with records not accepted says so",
           "children": [
            {
             "type": "state",
@@ -23578,18 +24089,18 @@
                {
                 "type": "outcome",
                 "id": "ds-a7-global-error",
-                "label": "An exception outside Home opens saved work",
+                "label": "A task with records not accepted says so",
                 "tree": "A-7",
                 "gwt": {
-                 "given": "A saved operation failed to upload while the worker has another page open.",
-                 "when": "They use the global saved-work status.",
-                 "then": "The same saved-work view opens with the failed operation available for review."
+                 "given": "Some records were not accepted.",
+                 "when": "The worker opens Saved work from the header.",
+                 "then": "The task with records not accepted says so on its row."
                 },
                 "authority": [
                  {
                   "src": "PRD",
-                  "at": "Design feedback 2026-10-13",
-                  "says": "A global exception entry remains available outside Home."
+                  "at": "Rules and Decisions 2026-10-18 to 2026-10-20 (PR 235)",
+                  "says": "The task with records not accepted says so on its row."
                  }
                 ],
                 "result": "pass"
@@ -23603,34 +24114,68 @@
          {
           "type": "entry",
           "id": "ds-a8-grouped-records.entry",
-          "label": "Many record kinds remain findable",
+          "label": "Many records are one log, not categories",
           "children": [
            {
             "type": "state",
             "id": "ds-a8-grouped-records.state",
-            "label": "Study fixture: 30 records in four categories",
+            "label": "Study fixture: scenario=offline&taskId=preg31",
             "tree": "A",
             "children": [
              {
+              "type": "outcome",
+              "id": "ds-a8-grouped-records",
+              "label": "Many records are one log, not categories",
+              "tree": "A-8",
+              "gwt": {
+               "given": "A task has records in several units.",
+               "when": "The worker opens the task.",
+               "then": "They see one log with the unit switch; there is no category layer."
+              },
+              "authority": [
+               {
+                "src": "PRD",
+                "at": "Rules and Decisions 2026-10-18 to 2026-10-20 (PR 235)",
+                "says": "They see one log with the unit switch; there is no category layer."
+               }
+              ],
+              "result": "pass"
+             }
+            ]
+           }
+          ]
+         },
+         {
+          "type": "entry",
+          "id": "ds-b8-recent-upload-total.entry",
+          "label": "Past uploads sit behind the clock",
+          "children": [
+           {
+            "type": "state",
+            "id": "ds-b8-recent-upload-total.state",
+            "label": "Study fixture: scenario=syncing",
+            "tree": "B",
+            "children": [
+             {
               "type": "action",
-              "id": "ds-a8-grouped-records.act",
-              "label": "The worker opens the production category after seeing direct exceptions.",
+              "id": "ds-b8-recent-upload-total.act",
+              "label": "The worker taps the clock on Saved work.",
               "children": [
                {
                 "type": "outcome",
-                "id": "ds-a8-grouped-records",
-                "label": "Many record kinds remain findable",
-                "tree": "A-8",
+                "id": "ds-b8-recent-upload-total",
+                "label": "Past uploads sit behind the clock",
+                "tree": "B-8",
                 "gwt": {
-                 "given": "This phone has thirty saved records across several kinds of work.",
-                 "when": "The worker opens the production category after seeing the direct exception rows.",
-                 "then": "The category shows its waiting records directly and can return to the status overview."
+                 "given": "Records uploaded over the last days.",
+                 "when": "The worker taps the clock on Saved work.",
+                 "then": "Past uploads opens, by day, for the last 30 days on this phone."
                 },
                 "authority": [
                  {
                   "src": "PRD",
-                  "at": "Design feedback 2026-10-13",
-                  "says": "Show exceptions directly and group many ordinary waiting records by work category."
+                  "at": "Rules and Decisions 2026-10-18 to 2026-10-20 (PR 235)",
+                  "says": "Past uploads opens, by day, for the last 30 days on this phone."
                  }
                 ],
                 "result": "pass"
@@ -23643,42 +24188,8 @@
          },
          {
           "type": "entry",
-          "id": "ds-b8-recent-upload-total.entry",
-          "label": "Only recent confirmed uploads count locally",
-          "children": [
-           {
-            "type": "state",
-            "id": "ds-b8-recent-upload-total.state",
-            "label": "Study fixture: two recent uploads and one older than 30 days",
-            "tree": "B",
-            "children": [
-             {
-              "type": "outcome",
-              "id": "ds-b8-recent-upload-total",
-              "label": "Only recent confirmed uploads count locally",
-              "tree": "B-8",
-              "gwt": {
-               "given": "The phone has two confirmed uploads within 30 days and one older uploaded fixture.",
-               "when": "The worker opens Saved work.",
-               "then": "Only the last-30-days total is shown; the older unreferenced uploaded fixture is pruned locally and individual uploaded history does not fill the work list."
-              },
-              "authority": [
-               {
-                "src": "PRD",
-                "at": "Decisions 2026-10-13",
-                "says": "Show only a recent uploaded total and keep confirmed local upload history for 30 days."
-               }
-              ],
-              "result": "pass"
-             }
-            ]
-           }
-          ]
-         },
-         {
-          "type": "entry",
           "id": "ds-a9-task-scope.entry",
-          "label": "Task-owned saved records",
+          "label": "A task's badge opens that task's records",
           "children": [
            {
             "type": "state",
@@ -23695,18 +24206,18 @@
                {
                 "type": "outcome",
                 "id": "ds-a9-task-scope",
-                "label": "Task scope stays explicit",
+                "label": "A task's badge opens that task's records",
                 "tree": "A-9",
                 "gwt": {
-                 "given": "Two unsent records belong to Farrowing task 28 and one belongs to a different task.",
-                 "when": "The worker opens the task header badge.",
-                 "then": "Only the two Farrowing records appear first, with an explicit path to all three unsent phone records."
+                 "given": "Farrowing has two records on this phone.",
+                 "when": "The worker taps the task's badge.",
+                 "then": "Farrowing's own records open with the unit switch; no other task's records are listed."
                 },
                 "authority": [
                  {
                   "src": "PRD",
-                  "at": "Decisions 2026-10-13",
-                  "says": "Task pages show this task first, with a path to all records on this phone."
+                  "at": "Rules and Decisions 2026-10-18 to 2026-10-20 (PR 235)",
+                  "says": "Farrowing's own records open with the unit switch; no other task's records are listed."
                  }
                 ],
                 "result": "pass"
@@ -23720,40 +24231,32 @@
          {
           "type": "entry",
           "id": "ds-a9-task-all.entry",
-          "label": "Task-owned saved records",
+          "label": "A task's records have no link to the whole phone",
           "children": [
            {
             "type": "state",
             "id": "ds-a9-task-all.state",
-            "label": "Study fixture: Farrowing task has two pending records and this phone has three",
+            "label": "Study fixture: scenario=offline&taskId=farrow28&from=task",
             "tree": "A",
-            "screen": "data-sync.task-list",
             "children": [
              {
-              "type": "action",
-              "id": "ds-a9-task-all.act",
-              "label": "The worker taps All records on this phone from the task list.",
-              "children": [
+              "type": "outcome",
+              "id": "ds-a9-task-all",
+              "label": "A task's records have no link to the whole phone",
+              "tree": "A-9",
+              "gwt": {
+               "given": "The worker opened Farrowing's records from its badge.",
+               "when": "They read the task page.",
+               "then": "It shows this task with the unit switch; the whole phone is Home's, not a link here."
+              },
+              "authority": [
                {
-                "type": "outcome",
-                "id": "ds-a9-task-all",
-                "label": "Task scope stays explicit",
-                "tree": "A-9",
-                "gwt": {
-                 "given": "Two unsent records belong to Farrowing task 28 and one belongs to a different task.",
-                 "when": "The worker taps All records on this phone from the task list.",
-                 "then": "The phone-wide list shows three unsent records, including the different task."
-                },
-                "authority": [
-                 {
-                  "src": "PRD",
-                  "at": "Decisions 2026-10-13",
-                  "says": "Task pages show this task first, with a path to all records on this phone."
-                 }
-                ],
-                "result": "pass"
+                "src": "PRD",
+                "at": "Rules and Decisions 2026-10-18 to 2026-10-20 (PR 235)",
+                "says": "It shows this task with the unit switch; the whole phone is Home's, not a link here."
                }
-              ]
+              ],
+              "result": "pass"
              }
             ]
            }
@@ -23804,7 +24307,7 @@
          {
           "type": "entry",
           "id": "ds-a12-other-task.entry",
-          "label": "Phone-wide fallback stays explicit",
+          "label": "From a task with none of its own, the badge opens Saved work",
           "children": [
            {
             "type": "state",
@@ -23821,18 +24324,18 @@
                {
                 "type": "outcome",
                 "id": "ds-a12-other-task",
-                "label": "Other tasks do not masquerade as this task",
+                "label": "From a task with none of its own, the badge opens Saved work",
                 "tree": "A-12",
                 "gwt": {
-                 "given": "This Farrowing task has no unsent work, while three records from other tasks remain on this phone.",
-                 "when": "The worker opens the header status.",
-                 "then": "The header says All 3 and opens the phone-wide list of three waiting records."
+                 "given": "This Farrowing task has nothing waiting but other tasks do.",
+                 "when": "The worker opens the records.",
+                 "then": "Saved work lists the tasks still holding records."
                 },
                 "authority": [
                  {
                   "src": "PRD",
-                  "at": "Rules 2026-10-13",
-                  "says": "The task header marks task and phone scopes explicitly."
+                  "at": "Rules and Decisions 2026-10-18 to 2026-10-20 (PR 235)",
+                  "says": "Saved work lists the tasks still holding records."
                  }
                 ],
                 "result": "pass"
@@ -23887,34 +24390,34 @@
          {
           "type": "entry",
           "id": "ds-a10-grouping-stable.entry",
-          "label": "Grouping stays stable while a record uploads",
+          "label": "The log keeps its layout as the connection changes",
           "children": [
            {
             "type": "state",
             "id": "ds-a10-grouping-stable.state",
-            "label": "Nine waiting records span production and inspections",
+            "label": "Study fixture: scenario=offline&taskId=preg31",
             "tree": "A",
             "children": [
              {
               "type": "action",
               "id": "ds-a10-grouping-stable.act",
-              "label": "Connection returns and one of nine records is confirmed uploaded",
+              "label": "The connection drops and returns.",
               "children": [
                {
                 "type": "outcome",
                 "id": "ds-a10-grouping-stable",
-                "label": "Nine-to-eight transition does not rearrange the list",
+                "label": "The log keeps its layout as the connection changes",
                 "tree": "A-10",
                 "gwt": {
-                 "given": "The worker opened a grouped view of nine waiting records from two categories.",
-                 "when": "The connection returns and one record is confirmed uploaded.",
-                 "then": "The count becomes eight, the category entry remains in place, and the uploaded total rises to one."
+                 "given": "The worker has a task's log open.",
+                 "when": "The connection drops and returns.",
+                 "then": "The log and the unit switch stay as they were; no category layout appears."
                 },
                 "authority": [
                  {
                   "src": "PRD",
-                  "at": "Rules 2026-10-13",
-                  "says": "Choose grouping on entry and keep that layout stable while automatic uploads update counts."
+                  "at": "Rules and Decisions 2026-10-18 to 2026-10-20 (PR 235)",
+                  "says": "The log and the unit switch stay as they were; no category layout appears."
                  }
                 ],
                 "result": "pass"
@@ -26246,6 +26749,7 @@
       "variants": [
        "facet",
        "lens",
+       "scope",
        "two-line-lens",
        "view-switch"
       ]
@@ -28645,24 +29149,6 @@
     {
      "severity": "high",
      "source": "populate-events",
-     "id": "events-2",
-     "target": {
-      "kind": "feature",
-      "id": "disease"
-     },
-     "kind": "decision",
-     "title": "Disease vs health-record",
-     "detail": "Add condition and Resolve in the event deck and the Health record built in Inspection both cover recording and closing a condition. They differ: the deck has one Conditions field with triage inline (Monitor preset), Recover and Strike verbs with silent prints, and no care instructions; the Health record has care levels (No action needed, Monitor, Treat in place, Move to hospital pen) as the editable state, per-pig change preview, and Recovered or Entered in error that keep the case in history. Both are in-design and cannot both be the feature.",
-     "options": [
-      "The Health record is the one design; the deck's Add and Resolve become its history only",
-      "The deck is the design and the Health record is rebuilt to it",
-      "Merge: the deck's verdict page and silent prints with the Health record's care levels"
-     ],
-     "recommendation": "Decide with the vet which of the two models of recovery (closed line vanishes vs kept in history) is right, then keep one."
-    },
-    {
-     "severity": "high",
-     "source": "populate-events",
      "id": "events-3",
      "target": {
       "kind": "feature",
@@ -29315,18 +29801,6 @@
       "Drop the page; use Inspection's list"
      ],
      "recommendation": "Search and filter only, opening Pig profile; Edit pig info joins its actions."
-    },
-    {
-     "severity": "medium",
-     "source": "sweep",
-     "id": "home-and-placeholders-43",
-     "target": {
-      "kind": "feature",
-      "id": "disease"
-     },
-     "kind": "design",
-     "title": "Duplicates Health record; keep only the missing parts",
-     "detail": "Add, remove or recover and triage are built as Health record (record health, resolve conditions, care instructions). Left over: second confirmations. Mark as duplicate or reduce to the catalogue."
     },
     {
      "severity": "medium",

@@ -574,6 +574,9 @@ export async function evaluate(opts) {
       if (!perPage.has(pageOf(x.url))) perPage.set(pageOf(x.url), id);
     }
     mech.walkNeed = [...perPage.values()];
+    // what each named screen runs on the candidate, so a walk of it carries across a main move that leaves those inputs alone
+    // (carryJudgements): the screen's inputs by blob, the harness that serves it and the visit code
+    mech.walkIdentity = Object.fromEntries(mech.walkNeed.map((id) => [id, sha(canonical({ screen: screenInputs('cand', id), harness: harness('cand'), code: code.visit }))]));
     if (mech.walkNeed.length) log(`walk: ${mech.walkNeed.length} screen(s) run changed code and draw the same (G15): ${mech.walkNeed.slice(0, 5).join(', ')}${mech.walkNeed.length > 5 ? ' …' : ''}`);
   }
   if (mode === 'refactor') check('refactor: every screen identical', !moved.length, moved.map((s) => s.id).slice(0, 5).join(', '));
