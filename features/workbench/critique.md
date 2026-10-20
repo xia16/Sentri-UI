@@ -60,3 +60,18 @@ Keep: the board's layout, cells and colours; today as the one ringed date and th
 - Every date sits in the same 28px box, 2px under its label, so all seven labels share one line and the ring has room.
 - The key gains "Continues · Runs into next week, or from last" as its last row. Its drawer is `long` (85% cap, sized to content), so all eight rows show at 360 without scrolling.
 - **Better because** the header reads as one line again, and every mark on the board is in the key.
+
+## Empty sections and the closed line (2026-10-20)
+
+Scope: the Overview's three sections when they hold nothing, and the "closed today" line. The owner asked for both ("we need an empty status … for production too?"; "for the closed today there needs to be a border around it"), was shown two directions and three versions mocked in the live page (review/mockups/), and picked A and version 2.
+
+Keep: the three sections, their headings and Schedule links; the tiles, rows and cards as they are when there is work; the closed line's words, tick and chevron.
+
+- **major** · An empty Production or Other was a bare grey "Nothing open" line floating on the tint, with no surface, so it read as leftover text rather than a state, and it broke the README's "empty is absent" law without replacing it.
+- **minor** · Health kept a dead row when nothing was marked ("To treat · Nothing marked", no chevron): a row that looks tappable but leads nowhere, saying a zero.
+- **minor** · "1 closed today" had no edge, so on the tint it read as a caption, not a door to the closed tasks.
+
+#### Final look (the gate's pairs at 390 and 360)
+- An empty section keeps its place and says so in a white card, one quiet line with a tick ("No production work open", "Nothing else open"); with no marks and no planned health work, Health says "No pigs marked to treat or watch". A zero row is absent.
+- The closed line has a hairline edge and no fill, the quietest framed target, so it reads as a tap without competing with the tiles above it.
+- **Better because** every section reads as checked and in its usual place, nothing on the page is a dead row, and the closed tasks have a visible door.

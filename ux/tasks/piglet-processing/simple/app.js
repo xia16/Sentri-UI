@@ -124,7 +124,7 @@
     var items = [{ value: '', label: S('chips.all'), checked: V.chip === '', aria: T('chips.all') }]
       .concat(chipCounts().map(function (c) { return { value: c.k, label: S(chipKey(c.k)), count: S('fig', { v: c.n }), checked: V.chip === c.k, aria: T('chip.aria', { name: chipName(c.k), n: c.n }) }; }))
       ;
-    return '<div class="sp-list-lens">'+UI.segment({variant:'two-line-lens',options:[['todo',K.T(S('lens.todo')),{count:all.length-done}],['done',K.T(S('lens.done'))]],active:V.lens,action:'list-lens',ariaLabel:T('chips.label')})+'</div>' + (V.lens==='todo'?K.chips({ items: items, action: 'chip', key: 'chips', label: T('chips.label') }):'');
+    return '<div class="sp-list-lens">'+UI.segment({variant:'two-line-lens',options:[['todo',K.T(S('lens.todo')),{count:all.length-done}],['done',K.T(S('lens.done'))]],active:V.lens,action:'list-lens',ariaLabel:T('chips.label')})+'</div>' + (V.lens==='todo'?UI.filterChips({ items: items.map(function (i) { return Object.assign({}, i, { label: K.T(i.label), count: i.count == null ? null : K.T(i.count) }); }), action: 'chip', key: 'chips', label: T('chips.label') }):'');
   }
   /* the task's overall checker: piglets the records cannot account for (set counts lower than the record), batch level only */
   function batchLine() { var u = P.s.unaccounted || 0; return u > 0 ? S('batch.unacc', { b: P.BATCH.name, n: u }) : S('batch', { b: P.BATCH.name }); }
