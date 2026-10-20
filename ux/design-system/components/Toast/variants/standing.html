@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><style>
+/* The real container: the bottom of the walk list, two rows of pigs, the toast over the second as after a save, the dock under it. */
+.ph{position:relative;height:262px;overflow:hidden;background:var(--app-background);border:1px solid var(--line);border-radius:0 0 var(--radius-device,28px) var(--radius-device,28px)}
+.ph-list{margin:16px var(--space-gutter) 0;border-radius:var(--radius-panel);background:var(--paper,#fff);border:1px solid var(--line);overflow:hidden}
+.ph-row{display:flex;flex-direction:column;justify-content:center;gap:4px;height:68px;padding:0 16px;box-sizing:border-box}
+.ph-row+.ph-row{border-top:1px solid var(--line)}
+.ph-row b{font:600 16px/1.2 var(--font-mono,ui-monospace,monospace);color:var(--ink)}
+.ph-row i{font:400 13px/1.2 var(--font-sans);font-style:normal;color:var(--muted)}
+.ph-dock{position:absolute;left:0;right:0;bottom:0;height:94px;display:grid;grid-template-columns:96px 1fr 56px;gap:10px;align-items:start;padding:14px var(--space-gutter) 0;box-sizing:border-box;border-top:1px solid var(--line);background:var(--paper,#fff)}
+.ph-dock span{height:56px;border-radius:16px;border:1px solid var(--line);background:var(--paper,#fff)}
+</style></head><body>
+<section data-state="Notice" id="standing-0"></section>
+<section data-state="Notice · pressed" id="standing-1"></section>
+<section data-state="Attention" id="standing-2"></section>
+<section data-state="Chinese" id="standing-3"></section>
+<script>
+/* The real container: the top of a task page, the bar in the page's flow above its list. */
+const wrap=(html)=>'<div class="ph" style="padding:16px var(--space-gutter) 0;box-sizing:border-box">'+html+'<div class="ph-list" style="margin:16px 0 0"><div class="ph-row"><b>000254</b><i>Gestation · 40d</i></div><div class="ph-row"><b>000281</b><i>Gestation · 46d</i></div></div></div>';
+const put=(id,html)=>document.querySelectorAll('[data-state]').forEach(el=>{if(el.id===id)el.innerHTML=wrap(html)});
+put('standing-0',SentriUI.toast('3 records not accepted',{tone:'notice',standing:{action:'open',value:'not-accepted'}}));
+put('standing-1',SentriUI.toast('3 records not accepted',{tone:'notice',standing:{action:'open',value:'not-accepted'}}).replace('data-variant="standing"','data-variant="standing" data-preview="pressed"'));
+put('standing-2',SentriUI.toast('Sign in to keep uploading',{detail:'Your records are safe on this phone',tone:'attention',standing:{action:'sign-in',value:''}}));
+put('standing-3',SentriUI.toast('3 条记录未被接受',{tone:'notice',standing:{action:'open',value:'not-accepted'}}));
+</script>
+</body></html>

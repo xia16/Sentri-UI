@@ -122,7 +122,7 @@ A save confirms itself where the worker's eye lands, once, and never louder than
 - **Repeated entries inside a task** (counts, weights, piglet processing): the task's own rows and receipt confirm them. No toast per entry.
 - **Saved with no connection**: the same toast in its offline form, "Saved on this phone · Uploads when connected · 000267". Never "uploaded" or "synced" until the server confirms. The toast is never the only offline signal: the header badge carries it after the toast has gone (Data sync).
 - **An upload that succeeds later**: nothing pops up; the count goes down.
-- **A failure is never a toast.** A save that fails keeps its sheet open with the error; an upload that fails stays in the badge and in Data sync until someone deals with it.
+- **A failure is never a toast.** A save that fails keeps its sheet open with the error. Records the farm didn't accept are told on Data sync's task page by the Toast's **standing** form (notice), never by a passing toast (owner, 2026-10-20).
 
 ### Headers (law; owner, 2026-10-13)
 

@@ -27170,6 +27170,7 @@
       "variants": [
        "facet",
        "lens",
+       "scope",
        "two-line-lens",
        "view-switch"
       ]
@@ -29236,7 +29237,8 @@
       "variants": [
        "done",
        "offline",
-       "plain"
+       "plain",
+       "standing"
       ]
      }
     },
