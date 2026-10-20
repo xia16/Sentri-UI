@@ -576,11 +576,11 @@ House reference held against: Inspection's pen page (`inspection.pen`, its sibli
 - Keep: the title and Back as on main; every verb and where it goes (Note → Add / Edit pen note, Feed → Feed guidance, Fault → Report equipment fault, Pen log); faults before the note; a resolved fault leaves the page. The note's text keeps ink weight as a row title, its hand and time under it.
 - Squint test: the three tiles, then `Needs attention` with its rows when something is open, then the two Now figures. The worker's first questions are what can I do here, does anything need me, how is the pen: in that order, which is the owner's order (verbs on top, 2026-10-19).
 - Cluttered, flat or bulky: four rows with explanatory lines became three tiles and two quiet facts; one more card (Now) carries state the page lacked. No bold, no colour added; the amber fault card became an ink row (state is said by the heading).
-- **Known issue, pending an owner ruling:** three verbs draw 2 + 1, which leaves the right half of row two empty. The grid's "at least two rows, split evenly" is the owner's own ruling (2026-10-19, PR #224), so the component stays as it is. Whether 2–3 tiles may sit in one row has gone to the owner; if yes, that change goes in its own PR.
+- **Resolved (PR 238, owner 2026-10-20):** three verbs drew 2 + 1 under the earlier grid rule. The Row tile grid now puts one to five tiles in one row, so Note, Feed and Fault sit in one row with no gap.
 - **Better because** the pen page now says how the pen is and what needs someone, in the same order as Inspection's pen page, and nothing typed is lost on Back.
 
 **Final look** (the gate's pairs on 81eaf18 against main d006a15, EN 390 / 360, ZH 360; the critique edit after it changes no screen):
-- `farrowing.pen`: tiles, Now (Sows 1 · Farrowing; Piglets alive 9 · 5 dead), Pen log; nothing clips at 360; ZH reads `B1栏 · 备注 / 饲喂 / 故障 · 当前 · 本栏记录`. The 2 + 1 grid leaves the right half of row two empty (the component's law; follow-up filed).
+- `farrowing.pen`: tiles, Now (Sows 1 · Farrowing; Piglets alive 9 · 5 dead), Pen log; nothing clips at 360; ZH reads `B1栏 · 备注 / 饲喂 / 故障 · 当前 · 本栏记录`. (At that commit the grid drew 2 + 1; PR 238 since puts the three tiles in one row.)
 - `farrowing.pen-attention` (new): the fault row, then the note row in one white group under `Needs attention`; the descriptions wrap without breaking the rows at 360.
 - `farrowing.pen-note`, `-fault`, `-fault-record`, `-read-note`: the sheets are unchanged; only the page dimmed behind them moved. Their own copy stays English under `?lang=zh` on both sides: Farrowing's prototype translates its rows and, now, the pen page; its form sheets are outside this change.
 
