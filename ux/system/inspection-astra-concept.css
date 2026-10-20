@@ -648,7 +648,6 @@
 .bulk-pig-row{align-items:center;min-height:68px;padding:10px 12px;border-top:1px solid #e7e9e3;background:#fff}
 .bulk-pig-row:first-child{border-top:0}
 .bulk-pig-row.is-changed{background:#fbfcf8}
-.bulk-pig-row.is-excluded .bulk-pig-copy{opacity:.55}
 .bulk-pig-check{display:flex;align-items:center;justify-content:center;width:28px;min-height:44px;flex-shrink:0}
 .bulk-pig-check input{width:18px;height:18px;accent-color:#526847}
 .bulk-pig-copy{display:flex;flex-direction:column;gap:4px;flex:1;min-width:0}
