@@ -2552,7 +2552,7 @@
            {
             "name": "Marked pigs, one card per unit",
             "shows": "A plain \"Unit 7\" section heading over one card of its pigs (the same unit heading as Farrowing's Find a sow and Scan ear tags): tag over \"Pen B2 · Hospital · 1d\", the condition as a plain tag on the right",
-            "logic": "Row · Animal with tags. No row is coloured: the title already says what to do. \"Hospital\" or \"In place\" is how the pig is treated; \"1d\" marks a pig waiting since yesterday. A pig opens its unit's walk on the Health lens.",
+            "logic": "Row · Animal with tags. No row is coloured: the title already says what to do. \"Hospital\" or \"In place\" is how the pig is treated; \"1d\" marks a pig waiting since yesterday. A pig opens its unit's walk on the Health lens; Back from there reopens this drawer (Monitoring likewise).",
             "source": "markedList()"
            }
           ],
@@ -6178,7 +6178,7 @@
             "at": "Unit 6",
             "shows": "The results update as the worker types, one tinted card per unit under its plain section heading (\"Unit 7\", \"Unit 6\"), this unit first and then the others in unit order. Each row is the ear tag, then \"Pen B4\" and a chevron: the heading names the unit, so no row repeats it. The typed part of the ear tag is bold ink and the rest of the tag is muted. Each row is the design system's Row, animal variant.",
             "logic": "Case-insensitive contains-match on the ear tag or the pen code (\"B4\"), over every sow still on a task list in every unit; a sow that left the list is not found. Order: tags that start with the typed text, then tags that only contain it, then pen matches; ties by ear tag. Where a pen matched, the matching part of the pen is bold too.",
-            "rule": "Every result opens her farrowing drawer, a sow in another unit exactly as a sow in this unit (Farrowing is one task across its units). Her drawer's subtitle says where she is (\"Unit 6 · A2 / Parity 4\") when she is in another unit than the room's, so it is clear she is elsewhere. Search never switches the room's unit by itself.",
+            "rule": "Every result opens her farrowing drawer, a sow in another unit exactly as a sow in this unit (Farrowing is one task across its units). Her drawer's subtitle says where she is (\"Unit 6 · A2 / Parity 4\") when she is in another unit than the room's, so it is clear she is elsewhere. Search never switches the room's unit by itself. Back from her drawer returns to Find a sow with the typed text and its results kept.",
             "source": "farrowing-astra-concept.js findHits(), findRow(), searchBody()"
            }
           ],
