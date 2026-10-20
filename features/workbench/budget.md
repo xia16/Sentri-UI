@@ -51,6 +51,10 @@ Cut from the Overview: phase, supporting counts, outcomes, progress labels, "All
 
 To treat / Monitoring drawer (2026-10-19): which pig (tag), where (unit as the group, pen), how it is treated ("Hospital", "In place"), how long it waited ("1d"), what it has (condition tag). Cut: colour on every row (the title says what to do), the mark time, who marked it.
 
+How to read the board (2026-10-20): one row per mark a cell can carry, each the cell as drawn, a name and one plain line: Done, Today, Planned, Estimate, Waiting on today, Past its plan, Nothing due, Continues. The question is "what does this cell mean?", so every mark on the board has a row and nothing else does. Continues was added because the arrow had no row.
+
+Empty sections (2026-10-20): the question is "is anything here for me?", so an empty section answers it in one quiet line in its own card, in the section's usual place, and says nothing else: no zero, no count, no next date (the Schedule link on the heading holds what comes later). Cut: the "Nothing marked" row with no chevron (a zero row is absent).
+
 ## To treat / Monitoring page (2026-10-20)
 
 The drawer becomes a page (owner, 2026-10-20: "what if we have 100 pigs that need treatment in that list? … we need to make it a list with filters"; then "everything goes inside the filter, search bar at top, flat list"; "scan and search goes hand in hand"; no waiting filter). Real volume: a heavy Gestation day has about 100 pigs to treat across three units, 3–5 in a pen, and about 60 under watch.
@@ -72,7 +76,3 @@ Questions, in order, for a worker opening the list: 1 Which pigs, where (unit, t
 | The total and counts per facet | Settled | The filter's "Show N pigs" and the condition list, not the page |
 
 Cut from the page: a waiting facet (owner: "1d" on the row says it), a dock (scan sits in the search), a lens or chips above the list (the owner put every facet in the filter), the total on the page (the Overview row shows it; the filter's commit shows the narrowed count), who marked it and when (the walk's record holds them), colour on any row, pen cards (marked pigs are 1–5 a pen, so a card per pen spent a header on every one or two rows). Monitoring drops care: a mark to watch has none.
-
-How to read the board (2026-10-20): one row per mark a cell can carry, each the cell as drawn, a name and one plain line: Done, Today, Planned, Estimate, Waiting on today, Past its plan, Nothing due, Continues. The question is "what does this cell mean?", so every mark on the board has a row and nothing else does. Continues was added because the arrow had no row.
-
-Empty sections (2026-10-20): the question is "is anything here for me?", so an empty section answers it in one quiet line in its own card, in the section's usual place, and says nothing else: no zero, no count, no next date (the Schedule link on the heading holds what comes later). Cut: the "Nothing marked" row with no chevron (a zero row is absent).
