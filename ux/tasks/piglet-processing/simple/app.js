@@ -37,6 +37,22 @@
   function chipOf(kind, k) { var o = S(k); o.kind = kind; return o; }
   function S(k, a, tone) { var o = { text: T(k, a), str: 'sp.' + L.key(k, a), args: a || undefined }; if (tone) o.tone = tone; return o; }
   function H(k, a) { return '<span data-str="sp.' + esc(L.key(k, a)) + '">' + esc(T(k, a)) + '</span>'; }
+  /* One animal as the design system's Animal row (farrowing's room row, owner 2026-10-11): the ID over one context line on the
+     left; on the right the one thing that changes what the worker does, a figure over a state word, weighted by level
+     (act · live · soon · settled). Every slot is an S() text slot, so the registry ids travel with the words. */
+  function part(o) { return { text: o.text, strs: o.str ? { text: o.str } : undefined, args: o.args ? { text: o.args } : undefined, tone: o.tone }; }
+  function animal(o) {
+    var f = o.figure, w = o.word, r = { kind: 'state', level: o.level || 'settled', figure: f ? f.text : '', word: w ? w.text : '', strs: {}, args: {} };
+    if (f && f.str) { r.strs.figure = f.str; r.args.figure = f.args; }
+    if (w && w.str) { r.strs.word = w.str; r.args.word = w.args; }
+    return UI.row({ variant: 'animal', code: o.code.text, strs: o.code.str ? { code: o.code.str } : undefined, args: o.code.args ? { code: o.code.args } : undefined,
+      description: (o.context || []).filter(function (x) { return x && !x.sep; }).map(part), right: r,
+      action: o.action || '', value: o.value || '', trail: o.trail || 'auto', attrs: o.label ? { 'aria-label': o.label } : {} });
+  }
+  /* End task's context: `2 left · weak` stays whole; otherwise the status word goes (the right side says Late) and the amount stays */
+  function leftOrAmount(m) { return m[0] && m[0].str && m[0].str.indexOf('sp.left') === 0 ? m : m.slice(2); }
+  /* what is owed, as one figure: the first job in the day's order, then how many more (`Castrate +2`) */
+  function owed(keys) { return keys.length > 1 ? S('next.more', { tr: chipName(keys[0]), n: keys.length - 1 }) : S(chipKey(keys[0])); }
   function btn(k, a, o) { return UI.button(Object.assign({ label: T(k, a), strs: { label: 'sp.' + L.key(k, a) } }, o || {})); }
   var chipKey = function (k) { return k === 'id' ? 'chip.id.' + scheme() : 'tr.' + k; };
   function pen() { return P.s.pens[V.pen]; }
@@ -77,25 +93,23 @@
     /* the lens above already says To do / Done; the row keeps only what differs (Late, Sow died) */
     return null;
   }
-  /* The pen's card, exactly farrowing's room list: the pen header (`A03 · 1 sow ›`, TaskGroup) and the sow's row under it
-     (TaskRow): mono sow ID with its one chip; the headline is what is due (or, with nothing due, farrowing's figure:
-     `12 piglets`, or the forecast `Iron in 2 days` as farrowing's `Due tomorrow`); the meta is one mono line,
-     `12 piglets · day 4 · 08:20 · G.H` (farrowing's `born 14 · 1h ago · G.H`). Done rows end in farrowing's edit pencil. */
+  /* The pen's card, as farrowing's room list: the pen header (`A03 · 1 sow ›`, TaskGroup), then the sow as an Animal row.
+     To do: the litter (`12 piglets · day 5`) and what is owed (`Castrate +2`); Late or Sow died is the state word, in red.
+     Coming: the next job and when, grey. Done: the litter and Done; ended: the litter alone (the card says it ended); both with when · who it was last recorded. */
   function penCard(p) {
-    var td = P.todo(p), c = P.coming(p), headline, tone = '', figure = false;
-    var lastR = newest(P.recs(p.code));
-    if (P.s.ended) { headline = [S('ended.row')]; tone = 'forecast'; }
-    else if (td.length) headline = names(td);
+    var td = P.todo(p), c = P.coming(p), lastR = newest(P.recs(p.code));
+    var litter = [S('piglets', { n: p.alive }), S('day.n', { d: p.age })];
+    var when = lastR ? [S('fig', { v: sameDay(lastR.at) ? hm(lastR.at) : md(lastR.at) }), S('fig', { v: short(lastR.who) })] : [S('day.n', { d: p.age })];
+    var late = td.some(function (k) { return P.status(p, k) === 'late'; });
+    var a;
+    if (P.s.ended) a = { context: when, figure: S('piglets', { n: p.alive }), level: 'settled' };   // the card above says the task ended
+    else if (td.length) a = { context: litter, figure: owed(td), word: late ? S('chip.late') : p.sowDied ? S('chip.sow') : null, level: late || p.sowDied ? 'act' : 'soon' };
     else if (c.length) {
       var next = Math.min.apply(null, c.map(function (k) { return P.plan(k).from; }));
-      headline = [S('st.in', { tr: chipName(c.filter(function (k) { return P.plan(k).from === next; })[0]), n: next - p.age })]; tone = 'forecast';
-    } else { headline = [S('piglets', { n: p.alive })]; figure = true; }
-    var meta = figure ? [] : [S('piglets', { n: p.alive }), SEP];
-    meta.push(S('day.n', { d: p.age }));
-    if (lastR) meta.push(SEP, S('fig', { v: sameDay(lastR.at) ? hm(lastR.at) : md(lastR.at) }), SEP, S('fig', { v: short(lastR.who) }));
-    var done = !P.s.ended && !td.length && !c.length;
-    var row = K.row({ id: S('code', { c: p.sow }), chip: sowChip(p), headline: headline, tone: tone, meta: meta, action: 'pen', value: p.code, trail: 'chevron' });
-    return K.group({ title: S('code', { c: p.code }), meta: S('sows.one'), door: { action: 'pen', value: p.code, label: T('pen.aria', { pen: p.code }) }, rows: row });
+      a = { context: litter, figure: S(chipKey(c.filter(function (k) { return P.plan(k).from === next; })[0])), word: S('in.days', { n: next - p.age }), level: 'settled' };
+    } else a = { context: when, figure: S('piglets', { n: p.alive }), word: S('day.done.s'), level: 'settled' };
+    a.code = S('code', { c: p.sow }); a.action = 'pen'; a.value = p.code;
+    return K.group({ title: S('code', { c: p.code }), meta: S('sows.one'), door: { action: 'pen', value: p.code, label: T('pen.aria', { pen: p.code }) }, rows: animal(a) });
   }
   function isDone(p) { return P.todo(p).length === 0; }
   /* The lens selects To do / Done; tags narrow jobs within To do. */
@@ -283,8 +297,9 @@
     var rows = p.ids.slice().reverse().map(function (x) {
       var id = [x.tag, x.notch].filter(Boolean).join(' · ');
       var mark = UI.iconButton({ action: ended ? 'noop' : 'breeder', value: x.no, icon: I('bookmark'), label: T(x.keep ? 'mark.off' : 'mark.on', { no: x.no }), variant: 'plain', selected: !!x.keep, className: 'sp-mark' });
-      var row = K.row({ id: id, headline: T(x.sex) + (x.kg != null ? ' · ' + T('kg', { w: x.kg }) : ''),
-        meta: (sameDay(x.at) ? hm(x.at) + ' · ' : '') + short(x.who), action: ended ? '' : 'give-fix', value: x.no, trail: '', still: ended, label: T('fix.aria', { no: x.no }) });
+      // the piglet: its tag over when · who tagged it; its sex over its weight, grey (a record, nothing to do)
+      var row = animal({ code: { text: id }, context: [S('fig', { v: (sameDay(x.at) ? hm(x.at) + ' · ' : '') + short(x.who) })],
+        figure: S(x.sex), word: x.kg != null ? S('kg', { w: x.kg }) : null, level: 'settled', action: ended ? '' : 'give-fix', value: x.no, trail: 'none', label: T('fix.aria', { no: x.no }) });
       return '<div class="sp-pigrow" data-ds="Row">' + row + mark + '</div>';
     });
     var body = (!ended && p.ids.length ? '<p class="sp-quiet">' + esc(T('tagged.hint')) + '</p>' : '') +
@@ -449,7 +464,9 @@
       segments: [{ tone: 'done', share: d / all.length * 100 }, { tone: 'rest', share: notDone.length / all.length * 100 }], max: all.length, now: d });
     if (notDone.length) {
       body += K.list([K.group({ title: T(ended ? 'sec.notgiven' : 'end.notdone'), face: 'word', meta: T('row.pens', { n: notDone.length }), rows: notDone.map(function (p) {
-        return K.row({ id: p.code, headline: P.todo(p).map(chipName).join(' · '), meta: ended ? '' : todoMeta(p), still: true, trail: '' });
+        var td = P.todo(p), late = !ended && td.some(function (k) { return P.status(p, k) === 'late'; });
+        return animal({ code: { text: p.code }, context: ended ? [] : leftOrAmount(todoMeta(p)),
+          figure: owed(td), word: late ? S('chip.late') : null, level: late ? 'act' : 'soon' });
       }) })]);
     }
     var soon = all.filter(function (p) { return P.coming(p).length; });

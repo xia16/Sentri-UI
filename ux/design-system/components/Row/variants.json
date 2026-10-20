@@ -50,7 +50,7 @@
   {
     "id": "animal",
     "name": "Animal",
-    "use": "Use for one animal in a list: the ID over a 13px context line, and on the right either its state (figure over word, weighted by level) or one line of condition tags. Designed from Farrowing room + Inspection walk, owner-approved 2026-10-11/12. The classic face (a chip under the ID, a headline, a mono meta line) stays only for the lists that still use it until they migrate.",
+    "use": "Use for one animal in a list: the ID over a 13px context line, and on the right either its state (figure over word, weighted by level) or one line of condition tags. Designed from Farrowing room + Inspection walk, owner-approved 2026-10-11/12. The classic face (a chip under the ID, a headline, a mono meta line) is drawn only by the older full-task Piglet processing pages, which are left as they are.",
     "notUse": "Not for navigation — use navigation; not for a list that selects for a bulk act — use select + door; no new lists on the classic face.",
     "states": [
       "Default · live",
@@ -82,7 +82,9 @@
       "workbench.to-treat",
       "piglet-processing.pen-list",
       "weaning.handoff",
-      "fostering.type"
+      "fostering.type",
+      "piglet-processing.tagged-list",
+      "piglet-processing.end-task"
     ]
   },
   {
