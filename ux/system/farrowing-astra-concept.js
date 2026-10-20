@@ -470,7 +470,7 @@ function findPage(s){const c=roomContext(s),under=pageUnder(s,c);return under===
 // verbs (owner, 2026-10-19): one Row tile grid of an icon and one word, the full action name kept as each tile's accessible name.
 function scanActionsSheet(c){
  const tiles=[['transfer','Transfer','转栏','Transfer','transfer'],['condition','Condition','疾病','Disease or symptom','health'],['treat','Treat','治疗','Record treatment','treatment'],['note','Note','备注','Add a note','marker']]
-  .map(([symbol,en,zh,title,value])=>({label:ZH?zh:en,title,icon:icon(symbol),action:'room-scan-act',value}));
+  .map(([symbol,en,zh,title,value])=>({label:ZH?zh:en,title,icon:icon(symbol),action:'room-scan-act',value,attrs:value==='transfer'?{'data-entry':'move'}:{}}));
  // No count line: the footer under it already said "N sows selected", and More actions has none.
  return roomSheet('Actions',SentriUI.rowGrid(tiles,{label:'Actions for the ticked sows'}),footer(SentriUI.backButton({action:'room-back'})),'scan-actions-sheet','menu');
 }

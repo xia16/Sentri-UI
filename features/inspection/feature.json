@@ -1143,7 +1143,7 @@
             "name": "Selection bar",
             "at": "Actions",
             "shows": "The plain count \"2 pigs selected\" and the primary Actions.",
-            "rule": "Actions is the walk's own Actions page for the ticked pigs, the one the walk's selection opens (conditions, treatment, notes, measures, feed). It has no Transfer yet, on main as here (a follow-up). Back from it returns here.",
+            "rule": "Actions is the walk's own Actions page for the ticked pigs, the one the walk's selection opens. Its everyday verbs include Transfer, the entry point to the Transfer feature (move), which is not designed yet (owner, 2026-10-20): the tile shows the notice \"Transfer is not designed yet\". Back from it returns here.",
             "source": "SentriUI.scanPage (components/Lookup); inspection-astra-concept.js actionsPage()"
           }
         ],

@@ -251,7 +251,7 @@ Scope: the walk's Search and Scan ear tag, which opened one drawer for both jobs
 
 - The walk's roster row (owner approved 2026-10-12): the tag over the stage line, the condition tags on the right, the tick box beside the door. Scan's rows are that row, unchanged.
 - Opening a pig: a result still opens her pig record here, and Back returns to where the worker was.
-- The walk's Actions for ticked pigs (the page the walk's own selection opens): Scan's Actions is that page, unchanged. It has no Transfer, on main as here: a bulk transfer in Inspection is a follow-up.
+- The walk's Actions for ticked pigs (the page the walk's own selection opens): Scan's Actions is that page.
 - The dock: Scan ear tag stays the primary, Search the icon beside it.
 
 ## Problems
@@ -261,6 +261,7 @@ Scope: the walk's Search and Scan ear tag, which opened one drawer for both jobs
 - **major** · Search covered this unit only ("No matching pigs in this unit."); the owner ruled search global, results grouped by unit.
 - **minor** · The result row said the pen and the raw stage ("Pen C1 · Gestating") under the tag with an empty right side, not the animal row's tag-left, place-right shape.
 - **minor** · Scanned pigs were not collected: each scan replaced the last.
+- **minor** · The walk's Actions had no Transfer, one of the general actions (owner, 2026-10-12). It joins the everyday verbs as the entry point to the Transfer feature, which is not designed yet (owner, 2026-10-20): the tile says so in a notice.
 
 ## Parts
 

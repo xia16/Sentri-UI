@@ -26,7 +26,7 @@ const stPickerField=o=>SentriUI.pickerField(o);
 const stChooserList=(content,options={})=>SentriUI.chooserList(content,options);
 const stPickerOptions=o=>SentriUI.pickerOptions(o);
 // Entry markers (read by the atlas): a control that is a way into another feature says which one; a pig row with a health tag is also a way into Health record.
-const entryOf={feed:'feed-plan','feed-edit-pen':'feed-plan','feed-edit-selected':'feed-plan','pig-feed':'feed-plan',pig:'pig-profile',health:'health-record',finding:'health-record',scan:'inspection',search:'inspection'};
+const entryOf={transfer:'move',feed:'feed-plan','feed-edit-pen':'feed-plan','feed-edit-selected':'feed-plan','pig-feed':'feed-plan',pig:'pig-profile',health:'health-record',finding:'health-record',scan:'inspection',search:'inspection'};
 const entryFor=(a,label='')=>entryOf[a]?(a==='pig'&&/data-ds="ConditionTag"[^>]*data-care="(attention|ongoing)"/.test(label)?'pig-profile health-record':entryOf[a]):'';
 const button=(a,label,cls='button',v='',disabled=false)=>{
  if(cls==='dock-search')return SentriUI.iconButton({action:a,value:v,icon:icon('search'),label:'Search ear tag',className:cls});
@@ -1289,7 +1289,10 @@ function actionCatalogue(c){
  const measurements=live?[item('measurements-menu','measure','Measurements & condition',single?'Weight, condition, backfat':'Body condition and measurements')]:[];
  const adjustFeed=live&&rows.some(p=>!feedUnavailableReason(p,penOf(c,p.id)))?[item('feed-edit-selected','feed','Adjust feed','Review the current daily allowance')]:[];
  if(live&&!adjustFeed.length)unavailable.push({title:'Adjust feed',group:'routine',k:'feed',reason:feedUnavailableReason(rows[0],penOf(c,rows[0].id))+'.'});
- add('routine','Routine',[...hostGeneral.map(x=>Object.assign(item('sow-host-action',x.icon||'note',x.title,x.sub,x.id),{content:!!x.content})),...(!hasUnifiedNote&&rows.length?[item('note','note','Add a note',single?'Leave a note for this sow':'The same note for these pigs')]:[]),...hostRecords.map(x=>item('sow-host-action',x.icon||'note',x.title,x.sub,x.id)),...measurements,...adjustFeed]);
+ /* Transfer: one of the general actions (owner, 2026-10-12), an entry point to the Transfer feature, which is not designed yet (owner, 2026-10-20).
+    A host that brings its own Transfer (Farrowing's sow record) keeps it. */
+ const transfer=live&&rows.length&&!host.some(x=>x.id==='transfer')?[item('transfer','transfer','Transfer',single?'Move this pig to another pen':'Move these pigs to another pen')]:[];
+ add('routine','Routine',[...transfer,...hostGeneral.map(x=>Object.assign(item('sow-host-action',x.icon||'note',x.title,x.sub,x.id),{content:!!x.content})),...(!hasUnifiedNote&&rows.length?[item('note','note','Add a note',single?'Leave a note for this sow':'The same note for these pigs')]:[]),...hostRecords.map(x=>item('sow-host-action',x.icon||'note',x.title,x.sub,x.id)),...measurements,...adjustFeed]);
  if(!fed&&live&&single)unavailable.push({title:'Body condition adjustment',group:'routine',k:'measure',reason:'Ad-lib pigs do not have an individual ration.'});
  const order=['health','routine','production'];groups.sort((a,b)=>order.indexOf(a.id)-order.indexOf(b.id));
  return {groups,unavailable};
@@ -1308,7 +1311,7 @@ function actionSections(c,groups,disabled=false,flat=false){return groups.map(g=
 function unavailableActionGroups(c){const rows=actionCatalogue(c).unavailable;return [['health','Health'],['routine','Routine'],['production','Production']].map(([id,label])=>({id,label,items:rows.filter(x=>(x.group||'routine')===id).map(x=>({a:'unavailable-action',k:x.k||'note',title:x.title,sub:x.reason,value:'',section:x.section||''}))})).filter(g=>g.items.length);}
 /* More actions is a menu drawer (owner, 2026-10-19): the everyday verbs (Health, then Routine) are one grid of an icon and one word;
    Production keeps described rows, because its verbs are stage-bound and need their line; up to three rows share one card, more are grouped by task. */
-const verbShort={health:'condition',treatment:'treat','edit-conditions':'edit',resolve:'resolve',triage:'care',note:'note','measurements-menu':'measure','feed-edit-selected':'feed'},hostVerbShort={marker:'note',transfer:'transfer','sow-death':'death'},dangerVerbs=new Set(['sow-death']);
+const verbShort={transfer:'transfer',health:'condition',treatment:'treat','edit-conditions':'edit',resolve:'resolve',triage:'care',note:'note','measurements-menu':'measure','feed-edit-selected':'feed'},hostVerbShort={marker:'note',transfer:'transfer','sow-death':'death'},dangerVerbs=new Set(['sow-death']);
 const verbLabel=x=>{const k=x.a==='sow-host-action'?hostVerbShort[x.value]:verbShort[x.a];return k?str('actions.tile.'+k):x.title;};
 /* The grid and its two-row rule are the design system's (Row tile, SentriUI.rowGrid). Death is the danger tile, always last. */
 function verbGrid(c,items){
@@ -2226,6 +2229,7 @@ gallery.addEventListener('click',e=>{const el=e.target.closest('[data-action]');
  else if(a==='check-in'){c.checkedIn=true;c.view='complete';}
  else if(a==='jump'){if(c.peek===v){c.peek=null;return;}if(!pen(c,v)||!visiblePigs(c,pen(c,v)).length)return;c.currentPen=v;c.jump=v;c.view='list';}
  else if(a==='find-clear')c.query='';
+ else if(a==='transfer')notify(c,'Transfer is not designed yet');   // the entry point only: the Transfer feature (move) is not designed yet
  else if(a==='scan-toggle'&&c.scan.connected)c.scan.listening=!c.scan.listening;
  else if(['history','finish','home','grid','search','scan'].includes(a)){c.query='';c.view=a;}
  render(i,old===c.view?{a,v}:null);

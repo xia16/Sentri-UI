@@ -2477,6 +2477,7 @@
     "feed.copy.lookup.stop": {"en": "Stop scanning", "zh": "停止扫描", "kind": "action"},
     "feed.copy.lookup.resume": {"en": "Resume scanning", "zh": "继续扫描", "kind": "action"},
     "feed.copy.lookup.selected": {"en": "{n} pigs selected", "zh": "已选 {n} 头猪", "kind": "status"},
+    "feed.copy.lookup.transfer": {"en": "Transfer is not designed yet", "zh": "转栏功能尚未设计", "kind": "status"},
     "feed.copy.104": {"en": "Last check-in", "zh": "最近签到", "kind": "label"},
     "feed.copy.105": {"en": "Gestating", "zh": "妊娠", "kind": "label"},
     "feed.copy.106": {"en": "Grower", "zh": "育肥", "kind": "label"},
