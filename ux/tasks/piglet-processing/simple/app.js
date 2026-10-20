@@ -14,7 +14,7 @@
   /* What is open on the phone (not kept: a reload starts on the pen list) */
   function fresh(keep) {
     return { lens: 'todo', chip: '', pen: null, tab: 'proc', draft: {}, over: null, adj: null, death: null, move: null, count: null, weight: null, give: null,
-      end: null, flash: null, open: {}, keepOpen: {}, justRec: [], demoOpen: keep ? keep.demoOpen : false };
+      end: null, flash: null, open: {}, keepOpen: {}, justRec: [], keep: {}, tickDrafts: {}, demoOpen: keep ? keep.demoOpen : false };
   }
   var V = fresh();
 
@@ -40,6 +40,11 @@
   function btn(k, a, o) { return UI.button(Object.assign({ label: T(k, a), strs: { label: 'sp.' + L.key(k, a) } }, o || {})); }
   var chipKey = function (k) { return k === 'id' ? 'chip.id.' + scheme() : 'tr.' + k; };
   function pen() { return P.s.pens[V.pen]; }
+  /* K.footer, with the screen-reader-only status line (Pick why fewer, Type the weight...) first in the footer: it sits at the footer's
+     top-left, so the reading order follows what is on the screen. The line is out of flow, so nothing moves. */
+  function foot(o) {
+    return K.footer(o).replace(/(<div class="sheet-footer[^>]*>)([^]*?)(<p class="sheet-status st-visually-hidden"[^]*?<\/p>)<\/div>$/, '$1$3$2</div>');
+  }
   function newest(list) { return list.slice().sort(function (a, b) { return b.at - a.at; })[0]; }
   /* the ID step in words: `4 of 12 tagged`, `1 breeder picked` */
   function idKey(p) { return scheme() === 'breeders' ? ['id.picked', { n: P.breeders(p) }] : ['id.of.' + scheme(), { n: P.idCount(p), m: p.alive }]; }
@@ -263,22 +268,22 @@
     if (!ended) body += toolRow();
     body += processing(p);
     var n = Object.keys(V.draft).length;
-    var foot = K.footer({ back: { action: 'back', label: T('back') }, primary: ended ? null : { label: T('submit.n', { n: n }), action: 'submit', register: 'primary', waiting: !n }, status: !n ? T('sr.items') : null });
+    var fo = foot({ back: { action: 'back', label: T('back') }, primary: ended ? null : { label: T('submit.n', { n: n }), action: 'submit', register: 'primary', waiting: !n }, status: !n ? T('sr.items') : null });
     /* The pen sheet is the hub: the route line, the sow's chip and her pen, the one fact that tells her apart in this task. */
     var line = { chip: { id: p.sow, action: 'sow', value: p.sow, label: T('sow.open', { tag: p.sow }) }, facts: [p.code] };
     return K.drawer({ title: T('task'), line: line, size: 'long', height: 'full', view: 'pen', inert: inert, close: { action: 'back', label: T('close.pen') },
-      body: body, footer: foot });
+      body: body, footer: fo });
   }
   /* ---- boars · gilts: two steppers ---- */
   function countsSheet() {
     var p = pen(), c = V.counts;
     return K.drawer({ title: T('cnt.title'), size: 'long', view: 'counts',
       body: stepper('boar', T('idf.boars'), c.boar) + stepper('gilt', T('idf.gilts'), c.gilt),
-      footer: K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('rec.counts'), action: 'counts-save', register: 'primary' } }) });
+      footer: foot({ back: { action: 'back', label: T('back') }, primary: { label: T('rec.counts'), action: 'counts-save', register: 'primary' } }) });
   }
   /* ---- Piglets: the pen's identified piglets (tag/notch · sex · weight), each with its breeder flag; tap a row to fix it;
      one primary "Tag a piglet" opens the one-piglet run, which comes back here ---- */
-  function taggedPage() {
+  function taggedPage(inert) {
     var p = pen(), ended = !!P.s.ended;
     var rows = p.ids.slice().reverse().map(function (x) {
       var id = [x.tag, x.notch].filter(Boolean).join(' · ');
@@ -292,8 +297,8 @@
         rows: rows.length ? rows : '<p class="sp-empty">' + esc(T('id.none.yet')) + '</p>' })]);
     if (scheme() === 'breeders' && !p.picked && !ended) body += UI.button({ label: T('id.done.pick', { n: P.breeders(p) }), register: 'secondary', action: 'pick-done', className: 'sp-wide' });
     // Give IDs comes back here, so this page carries the route (the sow's chip, the pen): the litter is on screen or one Back away.
-    return K.page({ title: T('pl.title'), back: { action: 'back', label: T('back') }, line: { chip: { id: p.sow, action: 'sow', value: p.sow, label: T('sow.open', { tag: p.sow }) }, facts: [p.code] }, view: 'tagged', body: body,
-      footer: ended ? false : K.footer({ back: false, primary: { label: T('add.' + scheme()), action: 'give-new', register: 'primary' } }) });
+    return K.page({ title: T('pl.title'), back: { action: 'back', label: T('back') }, line: { chip: { id: p.sow, action: 'sow', value: p.sow, label: T('sow.open', { tag: p.sow }) }, facts: [p.code] }, view: 'tagged', inert: inert, body: body,
+      footer: ended ? false : foot({ back: false, primary: { label: T('add.' + scheme()), action: 'give-new', register: 'primary' } }) });
   }
 
   /* ---- More: Move piglets · Set count · Litter weight · Boars and gilts (the figures the Piglets card only reads) ---- */
@@ -301,7 +306,7 @@
     return K.drawer({ title: T('more.title'), size: 'medium', view: 'more', surface: 'menu',
       body: K.doors({ card: true, items: [{ title: T('move.title'), icon: 'transfer', action: 'tool', value: 'move' }, { title: T('tool.count'), icon: 'edit', action: 'tool', value: 'count' },
         { title: T('w.title'), icon: 'weight', action: 'weight-open', value: '' }, { title: T('cnt.title'), icon: 'profile', action: 'counts-open', value: '' }] }),
-      footer: K.footer({ back: { action: 'back', label: T('back') } }) });
+      footer: foot({ back: { action: 'back', label: T('back') } }) });
   }
   /* ---- fewer piglets for one ticked item: a stepper; a shortfall asks one reason ---- */
   function stepper(key, label, value, o) {
@@ -316,7 +321,7 @@
       body += '<p class="sp-quiet">' + esc(T('treat.later', { n: n - d.n })) + '</p>';
     }
     return K.drawer({ title: tr(d.k), size: 'long', view: 'adjust', body: body,
-      footer: K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('adj.use', { n: d.n }), action: 'adjust-use', register: 'primary', waiting: less && !d.why }, status: less && !d.why ? T('sr.why') : null }) });
+      footer: foot({ back: { action: 'back', label: T('back') }, primary: { label: T('adj.use', { n: d.n }), action: 'adjust-use', register: 'primary', waiting: less && !d.why }, status: less && !d.why ? T('sr.why') : null }) });
   }
 
   /* ---- Give IDs: one piglet at a time (farrowing's identity pattern, research/per-piglet-proposal.md flow a) ----
@@ -360,7 +365,7 @@
     var ready = !giveUsed(p) && giveNo(p) && g.sex;
     var primary = { label: T(g.edit ? 'give.fix' : 'give.save'), action: 'give-save', register: 'primary', waiting: !ready };
     return K.page({ title: T(br ? 'tr.id.breeders' : 'give.title'), back: { action: 'back', label: T('back') }, view: 'give', body: body,
-      footer: givePad() + (ended ? '' : K.footer({ back: false, primary: primary, status: !ready ? T('sr.id') : null })) });
+      footer: givePad() + (ended ? '' : foot({ back: false, primary: primary, status: !ready ? T('sr.id') : null })) });
   }
   /* the litter weight from the Piglets tab: one Measure on the same Numpad */
   function weightSheet() {
@@ -368,7 +373,7 @@
     return K.drawer({ title: T('w.title'), size: 'long', view: 'weight',
       body: UI.measure({ label: T('w.kg'), value: w.kg, unit: 'kg', placeholder: '—', active: true, action: 'noop', key: 'w', className: 'sp-give-measure' }),
       footer: UI.numpad({ value: w.kg, unit: 'kg', action: 'pad', key: 'w', compact: true, decimals: 1, intLength: 3 }) +
-        K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('rec.weight'), action: 'weight-save', register: 'primary', waiting: !(+w.kg > 0) }, status: !(+w.kg > 0) ? T('sr.kg') : null }) });
+        foot({ back: { action: 'back', label: T('back') }, primary: { label: T('rec.weight'), action: 'weight-save', register: 'primary', waiting: !(+w.kg > 0) }, status: !(+w.kg > 0) ? T('sr.kg') : null }) });
   }
   /* ---- the pen log: born, deaths, moves, counts, treatments, IDs — the history, newest first ---- */
   /* One recorded act is one entry: the IDs given on one day are one line ("IDs given · 8", the range under it); the group is the
@@ -407,7 +412,7 @@
     var p = pen(), d = V.death, k = CAUSES.reduce(function (s, c) { return s + d.c[c]; }, 0);
     var body = CAUSES.map(function (c) { return stepper(c, T('c.' + c), d.c[c], { max: p.alive }); }).join('');
     return K.drawer({ title: T('death.title'), size: 'long', view: 'death', body: body,
-      footer: K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('rec.death', { n: k }), action: 'death-save', register: 'primary', waiting: !k }, status: !k ? T('sr.dead') : null }) });
+      footer: foot({ back: { action: 'back', label: T('back') }, primary: { label: T('rec.death', { n: k }), action: 'death-save', register: 'primary', waiting: !k }, status: !k ? T('sr.dead') : null }) });
   }
   /* ---- move piglets: only the other pens of this batch (there is nowhere else); for what was given here: had it? ---- */
   function moveAsks(p) {
@@ -430,14 +435,14 @@
     });
     var ready = d.to && d.n > 0 && asks.every(function (k) { return d.had[k] != null; });
     return K.page({ title: T('move.title'), back: { action: 'back', label: T('back') }, view: 'move', body: body,
-      footer: K.footer({ back: false, primary: { label: T('move.save', { n: pigs(d.n) }), action: 'move-save', register: 'primary', waiting: !ready }, status: !ready ? T(d.to ? 'sr.had' : 'move.pick') : null }) });
+      footer: foot({ back: false, primary: { label: T('move.save', { n: pigs(d.n) }), action: 'move-save', register: 'primary', waiting: !ready }, status: !ready ? T(d.to ? 'sr.had' : 'move.pick') : null }) });
   }
   /* ---- set count: the record becomes what is there now ---- */
   function countSheet() {
     var p = pen(), d = V.count;
     return K.drawer({ title: T('count.title'), size: 'long', view: 'count',
       body: stepper('count', T('count.label'), d.n, { variant: 'count', min: 0, hint: '' }),
-      footer: K.footer({ back: { action: 'back', label: T('back') }, primary: { label: T('rec.count', { n: d.n }), action: 'count-save', register: 'primary', waiting: d.n === p.alive }, status: d.n === p.alive ? T('sr.count') : null }) });
+      footer: foot({ back: { action: 'back', label: T('back') }, primary: { label: T('rec.count', { n: d.n }), action: 'count-save', register: 'primary', waiting: d.n === p.alive }, status: d.n === p.alive ? T('sr.count') : null }) });
   }
 
   /* ================= End task (the supervisor) ================= */
@@ -458,7 +463,7 @@
       body += '<p class="sp-quiet">' + esc(T('end.coming', { n: soon.length, list: nm.join(', ') })) + '</p>';
     }
     if ((P.s.unaccounted || 0) > 0) body += '<p class="sp-quiet">' + esc(T('end.unacc', { n: P.s.unaccounted })) + '</p>';
-    var f = ended ? false : K.footer({ back: false, hold: { label: T('end.hold'), caption: T('end.caption'), action: 'end-commit', tone: 'danger' } });
+    var f = ended ? false : foot({ back: false, hold: { label: T('end.hold'), caption: T('end.caption'), action: 'end-commit', tone: 'danger' } });
     return K.page({ title: ended ? T('end.done.title') : T('end.title'), back: { action: 'back', label: T('back') }, view: 'end', body: body, footer: f });
   }
 
@@ -485,7 +490,7 @@
     if (o === 'weight') html += weightSheet();
     if (o === 'move') html += movePage();
     if (o === 'counts') html += countsSheet();
-    if (o === 'tagged') html += taggedPage();
+    if (o === 'tagged') html += taggedPage(V.sub === 'give');   // Give IDs is over this page: the page underneath is inert
     if (o === 'tagged' && V.sub === 'give') html += givePage();
     if (o === 'log') html += logPage();
     if (V.end) html += endPage();
@@ -583,12 +588,46 @@
     if (!Object.keys(V.keepOpen).length) return;
     openTimer = setTimeout(function () { if (V.over || V.end) { keepOpenSoon(); return; } V.keepOpen = {}; render(); }, 4000);
   }
-  function closePen() { V.sub = null; V.pen = null; V.flash = null; V.open = {}; V.keepOpen = {}; V.draft = {}; V.tab = 'proc'; clearTimeout(openTimer); }
+  /* Drafts survive Back (footer Back, scrim, Escape) and come back on reopen: a weight being typed, the deaths being counted, the
+     piglet being identified (per pen, and per piglet when fixing one) and the pen's ticked items. Each clears on its own save; the
+     first three also when the pen closes (V.keep), the ticked items on Submit (V.tickDrafts). */
+  function keepKey(kind, extra) { return kind + '|' + V.pen + (extra ? '|' + extra : ''); }
+  function giveDirty(p, g) {
+    if (g.edit) { var o = giveFixed(p, g.edit); return !o || o.id.value !== g.id.value || o.sex !== g.sex || o.kg !== g.kg; }
+    return !!(g.sex || g.kg || !g.id.suggested);
+  }
+  function giveFixed(p, no) {
+    var y = p.ids.filter(function (z) { return z.no === no; })[0]; if (!y) return null;
+    var idv = notch() ? String(y.notch).split('-')[1] : y.tag;
+    return Object.assign(giveBlank(p), { id: { value: idv, suggested: false, suggestion: idv }, sex: y.sex, kg: y.kg == null ? '' : String(y.kg), keep: y.keep, edit: y.no });
+  }
+  function stashTicks() {
+    var t = {};
+    Object.keys(V.draft).forEach(function (k) { t[k] = V.draft[k]; });
+    if (Object.keys(t).length) V.tickDrafts[V.pen] = t; else delete V.tickDrafts[V.pen];
+  }
+  function restoreTicks(code) {
+    var p = P.s.pens[code], t = V.tickDrafts[code], d = {};
+    if (!t || P.s.ended) return d;
+    Object.keys(t).forEach(function (k) {
+      var need = P.need(p, k), st = P.status(p, k);
+      if (st === 'done' || !(need > 0)) return;   // done meanwhile (the other phone, or Submit)
+      var n = Math.min(t[k].n, need);
+      d[k] = { n: n, why: n < need ? t[k].why : '' };
+    });
+    return d;
+  }
+  function closePen() { V.sub = null; V.pen = null; V.flash = null; V.open = {}; V.keepOpen = {}; V.draft = {}; V.adjDrafts = {}; V.keep = {}; V.tab = 'proc'; clearTimeout(openTimer); }
   function closeTop() {
     if (V.end) V.end = null;
-    else if (V.sub) V.sub = null;
-    else if (V.over) V.over = null;
-    else if (V.pen) closePen();
+    else if (V.sub) { if (V.give && giveDirty(pen(), V.give)) V.keep[keepKey('give', V.give.edit || 'new')] = V.give; V.sub = null; }
+    else if (V.over) {
+      if (V.over === 'adjust' && V.adj) (V.adjDrafts = V.adjDrafts || {})[V.pen + '|' + V.adj.k] = V.adj; // Back keeps the Adjust draft (count and reason) until Use
+      if (V.over === 'weight' && V.weight && V.weight.kg) V.keep[keepKey('weight')] = V.weight;
+      if (V.over === 'death' && V.death && CAUSES.some(function (c) { return V.death.c[c]; })) V.keep[keepKey('death')] = V.death;
+      V.over = null;
+    }
+    else if (V.pen) { stashTicks(); closePen(); }
   }
   function saved(key, args) { V.flash = { pen: V.pen, key: key, args: args, undo: true }; }
   function act(a, v, el) {
@@ -596,7 +635,7 @@
     switch (a) {
       case 'list-lens': V.lens = v; break;
       case 'chip': if (v === V.chip) return; V.chip = v; break;
-      case 'pen': V.pen = v; V.flash = null; V.open = {}; V.draft = {}; V.tab = 'proc'; break;
+      case 'pen': V.pen = v; V.flash = null; V.open = {}; V.draft = restoreTicks(v); V.adjDrafts = {}; V.keep = {}; V.tab = 'proc'; break;
       case 'dismiss': case 'back': closeTop(); break;
       case 'noop': return;
       // Back from the pen list goes where the Farrowing room's goes: Today (the Home prototype).
@@ -606,18 +645,18 @@
       case 'end': V.end = true; break;
       case 'day': V.open[v] = !V.open[v]; break;
       case 'item':
-        if (V.draft[v]) delete V.draft[v];
+        if (V.draft[v]) { delete V.draft[v]; if (V.adjDrafts) delete V.adjDrafts[V.pen + '|' + v]; }
         else { V.draft[v] = { n: P.need(p, v), why: '' }; V.justTick = v; }
         break;
-      case 'adjust': V.over = 'adjust'; V.adj = { k: v, n: V.draft[v].n, why: V.draft[v].why }; break;
-      case 'adjust-use': V.draft[V.adj.k] = { n: V.adj.n, why: V.adj.n < P.need(p, V.adj.k) ? V.adj.why : '' }; V.over = null; break;
+      case 'adjust': V.over = 'adjust'; V.adj = (V.adjDrafts && V.adjDrafts[V.pen + '|' + v]) || { k: v, n: V.draft[v].n, why: V.draft[v].why }; break;
+      case 'adjust-use': V.draft[V.adj.k] = { n: V.adj.n, why: V.adj.n < P.need(p, V.adj.k) ? V.adj.why : '' }; if (V.adjDrafts) delete V.adjDrafts[V.pen + '|' + V.adj.k]; V.over = null; break;
       case 'why': V.adj.why = v; break;
       case 'submit': {
         var items = Object.keys(V.draft).map(function (k) { return { k: k, n: V.draft[k].n, why: V.draft[k].why }; });
         var recs = P.submit(p.code, items) || [];
         recs.forEach(function (r) { V.keepOpen[r.tr] = true; });
         V.justRec = recs.map(function (r) { return r.id; });
-        V.draft = {};
+        V.draft = {}; V.adjDrafts = {}; delete V.tickDrafts[p.code];
         V.flash = { pen: p.code, key: 'flash.items', args: { n: recs.length }, undoIds: V.justRec.slice() };
         keepOpenSoon();
         break;
@@ -635,22 +674,22 @@
       }
       case 'tool':
         V.over = v;
-        if (v === 'death') V.death = { c: { crushed: 0, scours: 0, starve: 0, other: 0 } };
+        if (v === 'death') V.death = V.keep[keepKey('death')] || { c: { crushed: 0, scours: 0, starve: 0, other: 0 } };
         if (v === 'move') V.move = { to: '', n: 1, had: {} };
         if (v === 'count') V.count = { n: p.alive };
         break;
       case 'count-open': V.over = 'count'; V.count = { n: p.alive }; break;
-      case 'weight-open': V.over = 'weight'; V.weight = { kg: '' }; break;
-      case 'weight-save': P.setWeight(p.code, UI.numpadCommit(V.weight.kg, { decimals: 1 })); V.over = null; saved('log.weight', { w: UI.numpadCommit(V.weight.kg, { decimals: 1 }) }); break;
+      case 'weight-open': V.over = 'weight'; V.weight = V.keep[keepKey('weight')] || { kg: '' }; break;
+      case 'weight-save': delete V.keep[keepKey('weight')]; P.setWeight(p.code, UI.numpadCommit(V.weight.kg, { decimals: 1 })); V.over = null; saved('log.weight', { w: UI.numpadCommit(V.weight.kg, { decimals: 1 }) }); break;
       case 'log-open': V.over = 'log'; V.pageTop = true; break;
-      case 'tool-death': V.over = 'death'; V.death = { c: { crushed: 0, scours: 0, starve: 0, other: 0 } }; break;
+      case 'tool-death': V.over = 'death'; V.death = V.keep[keepKey('death')] || { c: { crushed: 0, scours: 0, starve: 0, other: 0 } }; break;
       case 'counts-open': { var sx = p.sex || { boar: 0, gilt: 0 }; if (P.hasId() && scheme() !== 'breeders' && P.idCount(p) >= p.alive) sx = { boar: p.ids.filter(function (x) { return x.sex === 'boar'; }).length, gilt: p.ids.filter(function (x) { return x.sex === 'gilt'; }).length }; V.over = 'counts'; V.counts = { boar: sx.boar, gilt: sx.gilt }; break; }
       case 'counts-save': P.setLitter(p.code, { boar: V.counts.boar, gilt: V.counts.gilt }); V.over = null; saved('flash.counts', { b: V.counts.boar, g: V.counts.gilt }); break;
       case 'tagged-open': V.over = 'tagged'; V.pageTop = true; break;
       case 'breeder': P.toggleBreeder(p.code, v); break;
       case 'pick-done': { var nb = P.donePicking(p.code); V.flash = { pen: p.code, key: 'flash.pick', args: { n: T('breeders.n', { n: nb }) } }; V.over = null; break; }
       case 'id-open': V.over = 'tagged'; V.sub = null; V.pageTop = true; break;
-      case 'give-new': V.sub = 'give'; V.give = giveBlank(p); V.pageTop = true; break;
+      case 'give-new': V.sub = 'give'; V.give = V.keep[keepKey('give', 'new')] || giveBlank(p); V.pageTop = true; break;
       case 'give-field': V.give.field = V.give.field === v ? '' : v; break;
       case 'pad': padKey(v, el.getAttribute('data-key')); break;
       case 'give-scan': {   // a scan reads the tag in the ear (the demo reads the next one on the strip): it replaces what is there
@@ -660,7 +699,7 @@
       case 'give-sex': V.give.sex = v; if (v === 'boar' && scheme() !== 'breeders') V.give.keep = false; break;
       case 'give-keep': V.give.keep = !!el.checked; break;
       case 'give-save': {
-        var g = V.give, no = giveNo(p), pig = { tag: notch() ? '' : no, notch: notch() ? no : '', sex: g.sex, kg: UI.numpadCommit(g.kg, { decimals: 1 }), keep: g.edit ? (p.ids.filter(function (z) { return z.no === g.edit; })[0] || {}).keep : false };
+        var g = V.give, no = giveNo(p); delete V.keep[keepKey('give', g.edit || 'new')]; var pig = { tag: notch() ? '' : no, notch: notch() ? no : '', sex: g.sex, kg: UI.numpadCommit(g.kg, { decimals: 1 }), keep: g.edit ? (p.ids.filter(function (z) { return z.no === g.edit; })[0] || {}).keep : false };
         if (g.edit) { P.fixPig(p.code, g.edit, pig); V.sub = null; V.give = null; break; }   // a fix goes back to the list
         else { var x = P.givePig(p.code, pig); V.give = giveBlank(p, x); }
         V.pageTop = true;   // the next piglet's tag readout is back at the top
@@ -668,14 +707,13 @@
       }
       case 'give-undo': P.removePig(p.code, V.give.last.no); V.give = giveBlank(p); V.pageTop = true; break;
       case 'give-fix': {
-        var y = p.ids.filter(function (z) { return z.no === v; })[0]; if (!y) break;
-        var idv = notch() ? String(y.notch).split('-')[1] : y.tag;
-        V.give = Object.assign(giveBlank(p), { id: { value: idv, suggested: false, suggestion: idv }, sex: y.sex, kg: y.kg == null ? '' : String(y.kg), keep: y.keep, edit: y.no }); V.sub = 'give';
+        var fx = giveFixed(p, v); if (!fx) break;
+        V.give = V.keep[keepKey('give', v)] || fx; V.sub = 'give';
         V.pageTop = true;
         break;
       }
       case 'death-save': {
-        var k = P.death(p.code, V.death.c);
+        var k = P.death(p.code, V.death.c); delete V.keep[keepKey('death')];
         V.over = null; saved('flash.death', { n: pigs(k) });
         break;
       }

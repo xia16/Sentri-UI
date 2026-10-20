@@ -26,7 +26,7 @@ The farm legibility check (`scripts/check-legibility.mjs`, law in `ux/design-sys
 | Who | Decides |
 |---|---|
 | **Agents** | Every design call: layout, hierarchy, copy within the rules, components and variants. They make the call, build it well and ship it behind the gates. They don't ask first. |
-| **Gates** | Whether a change merges. Merges are automatic once every gate for the change class passes. A change that moves any screen merges only on `GATE PASS`: the mechanical checks AND the blind judge. A mechanical pass alone merges only a change that moves no screen. A design-system component page (the atlas's Components → <Name> → <variant>) counts as a screen: the page teaches the law, so it must follow it, and a change that moves one is judged before/after like any screen, never as copy only. |
+| **Gates** | Whether a change merges. Owner ruling (2026-10-20): the owner's "PR it" is the design approval. A PR merges on the machine gate alone: `node scripts/gate.mjs` posts `sentri/gate` success on a mechanical pass, moved screens included, and a PR merges on that green status (`gh pr merge <n> --squash --match-head-commit <sha>`). The blind judge ([briefs/gate.md](briefs/gate.md)) is advice a builder may ask for before showing the owner; it never holds a merge. A design-system component page (the atlas's Components → <Name> → <variant>) counts as a screen for the machine's checks. |
 | **Owner** | Product rules (behaviour, scope, what is saved, permissions) and approval of screens. The owner reacts to built work afterwards. Only **product rules** go to the backlog as decision items; design calls never do. |
 
 An agent score is never shown as approval. The approved version of a screen stays visible until the owner promotes the new one.
@@ -53,8 +53,8 @@ The design system and the rules above are a floor, not a ceiling (owner, 2026-10
 - **Budget first, then explore.** Visual and blind explorations start from the agreed attention budget. Every candidate is judged against the current screen, never only against the other candidates.
 - **When a job is only adequate, look wider.** Before you build, sketch at least one alternative that departs from the current pattern. Then build the one that serves the farmer best.
 - **The gate decides, not familiarity.** The new design must beat what it replaces, side by side. Being different never makes it worse, and matching the system never makes it better.
-- **Only a much better design is worth the change.** The system stays consistent. A small improvement isn't built; a much better one is propagated to every feature that uses it.
-- **Prove it in a feature, then share it.** An enhancement starts in the feature that needs it. It reaches other features only as a shared-component change, gated on every feature that uses it, and never by restyling an approved screen to match.
+- **Only a much better design is worth the change.** The system stays consistent. A small improvement isn't built; a much better one is built in the shared component, so every feature that uses it gets it.
+- **Prove it in a feature, then share it.** An enhancement starts in the feature that needs it. It reaches other features only as a shared-component change, and never by restyling an approved screen to match. The gate checks that change on the features in progress, for propagation only (owner, 2026-10-20).
 - **The owner rules still bind.** They are what keeps the product one product. Everything they don't fix is open.
 
 ## The scenario framework
@@ -93,7 +93,7 @@ One entry point drives them all: `/design <feature>` ([.claude/skills/design/](.
 2. **References**: find what exists for the job and capture the baselines before building ([build.md §1](briefs/build.md#1-start-from-what-exists-p1)).
 3. **Build** on a branch in a worktree off `origin/main` ([build.md](briefs/build.md)).
 4. **Gate** it on the exact merge candidate. A different agent from the builder runs [gate.md](briefs/gate.md).
-5. **Merge** it automatically once the gates pass. Merge main forward (`git fetch origin && git merge origin/main`); never rebase or force-push. Rerun the checks on the merged result.
+5. **Merge** it automatically once the gates pass. Merge main forward with `node scripts/merge-main.mjs` (it regenerates `atlas/atlas.json` and `tokens.css`); never rebase or force-push. Rerun the checks on the merged result.
 6. **File** owner-only product questions as decision items, with options and a recommendation.
 
 ## Gates by change class
@@ -103,9 +103,9 @@ One entry point drives them all: `/design <feature>` ([.claude/skills/design/](.
 | Copy only | Copy budget and wrapping rules, verb registry (`ux/laws/strings.json`), EN/ZH render of the touched screens |
 | Presentation in one feature | The above, plus the mechanical checks (incl. `node scripts/check-states.mjs`), plus before/after on the feature's screens |
 | Behaviour | The above, plus the scenario leaves and walks that touch it (390/360, EN/ZH), screen-reader order and keyboard cover |
-| Shared component | All of the above on **every** feature that uses it. A refactor must be identical. Any change to a frozen screen needs the owner's approval. |
+| Shared component | All of the above on the PR's own features and the component's atlas pages, plus the library fit. On the features in progress (`features/_in-progress.json`), propagation only: the part arrived and renders correctly. No other feature is checked. A refactor must be identical everywhere. Any change to a frozen screen needs the owner's approval. |
 
-**Up to date with main, no queue.** Main requires a branch to be up to date before it merges, and the `sentri/gate` status on its head (gate-simplify.md G2). So two sessions changing the bundle can't undo each other: the second merges main forward and is gated against the new main, and that re-gate reuses every result whose identity is unchanged, carrying every judgement whose two images are the same. A change is shared when it touches the bundle, the tokens, the bare-screen harness, a shared stylesheet or any file that pages of two or more features load; `gate.mjs` decides that itself, and a shared change is judged on every feature it moves.
+**Up to date with main, no queue.** Main requires a branch to be up to date before it merges, and the `sentri/gate` status on its head (gate-simplify.md G2). So two sessions changing the bundle can't undo each other: the second merges main forward and is gated against the new main, and that re-gate reuses every result whose identity is unchanged, carrying every judgement whose two images are the same. A change is shared when it touches the bundle, the tokens, the bare-screen harness, a shared stylesheet or any file that pages of two or more features load; `gate.mjs` decides that itself, and scopes a shared change as the table above says.
 
 Every rejected owner example is a fixture each gate must fail ([gate.md](briefs/gate.md#rejected-examples)). All evidence records the commit it was taken on.
 
@@ -121,7 +121,7 @@ Every rejected owner example is a fixture each gate must fail ([gate.md](briefs/
 | `node scripts/run-scenarios.mjs` | Runs a feature's executable leaves (`features/<id>/scenarios.json`). A tap waits up to 5 seconds for its control to appear and hold still (a drawer still opening), so a loaded machine never reads as a missing control; a control that never appears still fails. A run that fails only on a navigation timeout runs once more; twice is reported as a slow machine, not a design failure. The gate runs the same leaves (`scripts/scenario-runner.mjs`) in its own scheduler |
 | `node scripts/gate.mjs --candidate <branch> [--scope <features>]` | The mechanical gate on the exact merge candidate, `evaluate(base, candidate, mode)` → pass, fail or blocked ([gate-v2.md](gate-v2.md)): every check, the screens and leaves whose evidence identity the change alters diffed against main in full (nothing else is shot), the before/after pairs for the judge ([gate.md](briefs/gate.md)). Evidence is kept by identity and reused whenever its identity is unchanged, so a rerun, or a gate after main moved, recomputes only what changed. One gate at a time per machine, all its browser work through one scheduler (four at once), and no other browser run from this repo beside it (each waits for the other). An unstable screen or a machine error twice blocks; a GitHub call that fails on the network is retried twice |
 | `node scripts/gate.mjs --audit` | Not a gate, run by hand weekly on main: every screen drawn afresh at every run and compared with the stored shot of the same identity. A difference is an identity that misses an input, or a screen that doesn't draw the same twice ([gate-simplify.md](gate-simplify.md) K12). |
-| `node scripts/gate.mjs --verdict <out>` | Checks the judge's verdict against the run and posts `sentri/gate`. When the PR head or main has moved since, it gates again (reusing every result whose identity is unchanged) and carries every judgement whose pair shows the same two images; only pairs whose images changed go back to a judge |
+| `node scripts/gate.mjs --verdict <out>` | Advice only: checks an optional judge's verdict against the run and prints the result; it posts no status. When the PR head or main has moved since, it gates again and carries every judgement whose pair shows the same two images |
 | `node scripts/polish-loop.mjs <command> <feature>` | The polish loop's ledger: baseline, rounds, grades, stop conditions and the review packet ([polish-loop.md](briefs/polish-loop.md)) |
 | `node scripts/feature-state.mjs <feature>` | Where a feature stands and what `/design` drives next: chart, plan, scenarios, build, polish, review or freeze |
 | `node scripts/component-jobs.mjs [word]` | One line per design-system component saying what job it does, so a builder names the existing component before building a new one |
@@ -132,7 +132,7 @@ Every rejected owner example is a fixture each gate must fail ([gate.md](briefs/
 | Brief | Used by |
 |---|---|
 | [briefs/build.md](briefs/build.md) | The builder of a screen, feature or component |
-| [briefs/gate.md](briefs/gate.md) | The single gate. It replaces `component-judge` and the checklist judge, which are **retired**. |
+| [briefs/gate.md](briefs/gate.md) | The design review a builder may ask for before showing the owner: advice, never a merge condition (owner, 2026-10-20). It replaces `component-judge` and the checklist judge, which are **retired**. |
 | [briefs/walk.md](briefs/walk.md) | A persona walker or the breaker in a scenario round |
 | [briefs/polish-loop.md](briefs/polish-loop.md) | The polish-loop driver, run with the `/polish-loop <feature>` skill |
 | [briefs/grade.md](briefs/grade.md) | The grader at the start of each polish-loop round |
