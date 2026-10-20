@@ -2658,7 +2658,7 @@
     "feed.copy.pig.119": {"en": "Any care", "zh": "任意护理", "kind": "label"},
     "feed.copy.pig.120": {"en": "Show pigs", "zh": "显示猪只", "kind": "label"},
     "feed.copy.pig.121": {"en": "Tap a pen to go to its pigs. Hold to peek.", "zh": "点按栏位查看其中的猪。长按可预览。", "kind": "label"},
-    "feed.copy.pig.122": {"en": "Not in unit", "zh": "不在本单元", "kind": "label"},
+    "feed.copy.pig.122": {"en": "Not in unit", "zh": "非本单元", "kind": "label"},
     "feed.copy.pig.123": {"en": "{n} health", "zh": "{n}头异常", "kind": "label"},
     "feed.copy.pig.124": {"en": "Pen layout · only pens matching this view can be opened.", "zh": "栏位布局 · 只能打开符合当前视图的栏位。", "kind": "label"},
     "feed.copy.pig.125": {"en": "Camera scanning is not connected in this prototype.", "zh": "此原型未接入摄像头扫描。", "kind": "label"},
