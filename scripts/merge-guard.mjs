@@ -12,7 +12,7 @@
 //   worktrees: removed only through  node scripts/worktree-remove.mjs <dir>  (git deletes through a node_modules junction on Windows
 //              and empties the main checkout's), and node_modules is never linked into one (SENTRI_PLAYWRIGHT finds Playwright).
 
-const block = (why) => { console.error(`merge guard: ${why}\nMerges run only behind GATE PASS (docs/design-workflow/briefs/gate.md): node scripts/gate.mjs --verdict <out>, then, as a command of its own:\n  gh pr merge <n> --squash --match-head-commit <sha>\nPushes name their branch: git push origin <branch>.`); process.exit(2); };
+const block = (why) => { console.error(`merge guard: ${why}\nMerges run only behind a green sentri/gate (the machine gate: node scripts/gate.mjs --candidate <ref>), then, as a command of its own:\n  gh pr merge <n> --squash --match-head-commit <sha>\nPushes name their branch: git push origin <branch>.`); process.exit(2); };
 process.on('uncaughtException', (e) => block(`the guard failed (${e.message}), so it blocks`));
 
 let input = '';

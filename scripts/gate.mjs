@@ -32,7 +32,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { checkVerdict, calibrationProblems, passesWithoutJudge, carryJudgements, resultsBlock, mergeLibrary } from './loop-rules.mjs';
+import { checkVerdict, calibrationProblems, machinePass, carryJudgements, resultsBlock, mergeLibrary } from './loop-rules.mjs';
 import { takeTurn, waitForRuns } from './gate-queue.mjs';
 import { postStatus as post } from './github.mjs';
 import { evaluate, toolsDiffer } from './evaluate.mjs';
@@ -116,13 +116,13 @@ async function runGate({ ref, base, out, mode, scope, audit = false, keep = fals
     res = { outcome: 'blocked', mech: { outcome: 'blocked', pass: false, ref, mode, scope, class: {}, blocked: [`the gate crashed: ${String(e.message || e).split('\n')[0]}`], checks: [], gaps: [], pairs: [] } };
   }
   const mech = { ...res.mech, waited: waited + 's', testBase: testBase || undefined };
-  if (!testBase && !audit && passesWithoutJudge(mech)) {
+  if (!testBase && !audit && machinePass(mech)) {
     mech.gatePass = true;
-    const posted = postStatus(mech.candidate, 'success', `GATE PASS against ${short(mech.base)} · no screen moved`);
+    const moved = ['diff', 'new', 'gone'].reduce((n, k) => n + mech.screens[k].length, 0);
+    const posted = postStatus(mech.candidate, 'success', `GATE PASS against ${short(mech.base)} · ${moved ? `${moved} screen(s) moved; machine checks only (the owner approved the design)` : 'no screen moved'}`);
     if (!posted.ok) console.log(`  - the sentri/gate status was not posted (${posted.why}): gate again; until then GitHub refuses the merge`);
   } else if (!testBase && !audit && mech.candidate) {
-    const failed = mech.outcome !== 'pass';
-    postStatus(mech.candidate, failed ? 'failure' : 'pending', failed ? `MECHANICAL ${String(mech.outcome).toUpperCase()} against ${short(mech.base)}` : `mechanical pass against ${short(mech.base)}: waiting for the judge's verdict`);
+    postStatus(mech.candidate, 'failure', `MECHANICAL ${String(mech.outcome).toUpperCase()} against ${short(mech.base)}`);
   }
   fs.writeFileSync(path.join(out, 'mechanical.json'), JSON.stringify(mech, null, 2));
   // the PR's Results block (gate-simplify.md S8): the gate's own measurements, pasted whole into the PR body
@@ -133,11 +133,12 @@ async function runGate({ ref, base, out, mode, scope, audit = false, keep = fals
   const word = (audit ? { pass: 'AUDIT PASS', fail: 'AUDIT FAIL', blocked: 'AUDIT BLOCKED' } : { pass: 'MECHANICAL PASS', fail: 'MECHANICAL FAIL', blocked: 'MECHANICAL BLOCKED' })[mech.outcome] || 'MECHANICAL FAIL';
   console.log(`${word} ${short(mech.candidate)} on base ${short(mech.base)} (${mech.class?.effective || '?'}, ${mode}) — ${out}`);
   for (const b of mech.blocked || []) console.log('  blocked:', b);
-  if (mech.gatePass) console.log(`GATE PASS (no screen moved, so no judge): gh pr merge <n> --squash --match-head-commit ${mech.candidate}`);
+  if (mech.gatePass) console.log(`GATE PASS (machine checks; the owner's "PR it" approved the design): gh pr merge <n> --squash --match-head-commit ${mech.candidate}`);
   return mech;
 }
 
-// ---------- --verdict <out>: check the judge's verdict against the mechanical result ----------
+// ---------- --verdict <out>: advice only. Check an optional judge's verdict against the mechanical result ----------
+// Owner ruling (2026-10-20): the judge no longer holds a merge, so --verdict posts no status; the machine's pass is the gate.
 if (opt('verdict')) {
   let dir = opt('verdict');
   const readIn = (d, f) => { try { return JSON.parse(fs.readFileSync(path.join(d, f), 'utf8')); } catch (e) { console.log(`GATE FAIL — ${path.join(d, f)}: ${e.message.split('\n')[0]}`); process.exit(1); } };
@@ -197,9 +198,7 @@ if (opt('verdict')) {
   // The merge names the gated commit, so GitHub refuses it if the PR head has moved since.
   // The same result as a commit status on GitHub: branch protection on main can require "sentri/gate", which makes GitHub itself
   // refuse an ungated merge however it is attempted (the local merge guard is only a convenience).
-  const posted = postStatus(mech.candidate, ok ? 'success' : 'failure', `${ok ? 'GATE PASS' : 'GATE FAIL'} against ${short(mech.base)}`);
-  if (!posted.ok) console.log(`  - the sentri/gate status was not posted (${posted.why}): run --verdict again; until then GitHub ${ok ? 'refuses the merge' : 'may still show an earlier status'}`);
-  if (!testBase && ok) console.log(`merge: gh pr merge <n> --squash --match-head-commit ${mech.candidate}`);
+  console.log('  (advice only: the judge does not hold the merge; sentri/gate is the machine\'s result)');
   process.exit(ok ? 0 : 1);
 }
 

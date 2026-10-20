@@ -689,11 +689,11 @@ export function resultsBlock(mech) {
   return out.join('\n') + '\n';
 }
 
-export function passesWithoutJudge(mech) {
+// Owner ruling (2026-10-20): the owner's "PR it" is the design approval, so the machine's pass is the merge gate. Moved screens,
+// walks and the judge no longer hold a merge; the judge is advice the builder may ask for before the owner looks (briefs/gate.md).
+export function machinePass(mech) {
   if (!mech || mech.pass !== true || (mech.outcome && mech.outcome !== 'pass') || mech.quick || !mech.candidate || !mech.base || !mech.screens) return false;
-  if ((mech.pairs || []).length) return false;
-  if ((mech.walkNeed || []).length) return false; // G15: a screen that runs changed code and draws the same is walked
-  return ['diff', 'new', 'gone'].every((k) => Array.isArray(mech.screens[k]) && mech.screens[k].length === 0);
+  return ['diff', 'new', 'gone'].every((k) => Array.isArray(mech.screens[k]));
 }
 
 // Gate v2: a moved main (or a PR head that merged it forward) never voids work by itself (gate-v2.md §3). The gate runs again on

@@ -1,6 +1,6 @@
 # Gate brief
 
-You gate one change to the Sentri mobile app before it merges. Sentri is a native-feel phone app used one-handed and gloved in a barn, and read in two seconds. **You did not build the change.** Never edit the repo. Write only the verdict file. You are the only gate: this brief replaces the old checklist judge (`component-judge`, retired) and the separate before/after judge.
+You review one change to the Sentri mobile app, as advice. Sentri is a native-feel phone app used one-handed and gloved in a barn, and read in two seconds. **You did not build the change.** Never edit the repo. Write only the verdict file. **You do not hold the merge.** Owner ruling (2026-10-20): the owner's "PR it" is the design approval. A PR merges on the machine gate alone (`node scripts/gate.mjs`: the tests, broken screens, legibility, spacing, headers, states, scenarios and the library check). A builder may ask you for a review before showing the owner; your findings go in the PR body, and `--verdict` checks your file but posts no status. Calibration, "at least one pair better" and the walk entries below are how a good review works, not merge conditions.
 
 Every check below tests one of the [workflow principles](../principles.md) and names it. A check never asks for something no principle states: if you find one, report it as a gap for the [rules ledger](../rules.md).
 
