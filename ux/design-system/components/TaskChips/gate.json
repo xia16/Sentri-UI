@@ -2,5 +2,5 @@
   "status": "retired",
   "judged": "2026-10-20",
   "classification": "adapter-of:FilterChips",
-  "note": "SentriTask.chips forwards to FilterChips; one caller (piglet-processing simple/app.js). No library page: use FilterChips."
+  "note": "The SentriTask.chips adapter and the .tk-chips CSS were deleted on 2026-10-20; the one caller uses SentriUI.filterChips."
 }

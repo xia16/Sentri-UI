@@ -130,7 +130,7 @@
       const v=i.value==null||i.value===''?'—':i.value;
       return i.mono?`<span class="st-fact-id">${esc(v)}</span>`:esc(v);
     };
-    const lead=i=>i.action?`<button type="button" class="st-fact-link" data-action="${esc(i.action)}" data-value="${esc(i.value_||'')}"${i.ariaLabel?` aria-label="${esc(i.ariaLabel)}"`:''}>${tx(i.label,i,'label')}${arrow}</button>`:tx(i.label,i,'label');
+    const lead=i=>tx(i.label,i,'label'); // Facts never act: a fact that opens something is a Row
     const rec=variant==='record';
     return `<dl class="${rec?'':'st-panel '}st-facts ${esc(className)}" data-ds="Facts" data-columns="${cols}"${variant?` data-variant="${esc(variant)}"`:''}>${items.map(i=>`<div class="st-fact${i.inline?' st-fact-inline':''}"><dt>${lead(i)}</dt><dd>${valueOf(i)}</dd>${i.meta||has(i,'meta')?`<small>${tx(i.meta,i,'meta')}</small>`:''}</div>`).join('')}</dl>`;
   }
