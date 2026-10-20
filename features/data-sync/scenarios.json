@@ -882,7 +882,7 @@
             {
               "type": "action",
               "id": "ds-a7-global-wait.act",
-              "label": "The worker checks saved work while using the toolbox.",
+              "label": "The worker taps the header's saved-work icon on the toolbox page.",
               "taps": [
                 {
                   "expect": [
@@ -893,14 +893,15 @@
                       }
                     },
                     {
-                      "el": ".global-sync.waiting .global-sync-control"
+                      "el": ".global-sync[data-sync=\"waiting\"] [data-action=\"sync\"]"
                     },
                     {
                       "text": {
                         "en": "3",
                         "zh": "3"
                       },
-                      "in": ".global-sync"
+                      "in": ".global-sync",
+                      "absent": true
                     }
                   ]
                 },
@@ -948,7 +949,7 @@
     {
       "type": "entry",
       "id": "ds-a7-global-upload.entry",
-      "label": "Automatic upload stays visible outside Home",
+      "label": "The header's saved-work icon stays quiet while records upload",
       "children": [
         {
           "type": "state",
@@ -980,29 +981,30 @@
                   "type": "outcome",
                   "id": "ds-a7-global-upload",
                   "tree": "A-7",
-                  "label": "Automatic upload stays visible outside Home",
+                  "label": "The header's saved-work icon stays quiet while records upload",
                   "gwt": {
-                    "given": "Three records are being uploaded automatically.",
+                    "given": "Records on this phone are uploading automatically.",
                     "when": "The worker checks the toolbox page.",
-                    "then": "The app still shows the upload state and provides a path to saved work."
+                    "then": "The header shows the saved-work icon alone, with no number and no uploading form; it still opens Saved work."
                   },
                   "authority": [
                     {
                       "src": "PRD",
-                      "at": "Design feedback 2026-10-13",
-                      "says": "Show the global local-record state on Home and other app pages."
+                      "at": "Decisions 2026-10-18 (owner): Home's header shows the icon alone; the tiles carry the counts (PR 235)",
+                      "says": "The saved-work control is the icon alone, quiet, while records are on this phone; red only when signed out."
                     }
                   ],
                   "visible": [
                     {
-                      "el": ".global-sync.uploading .global-sync-control"
+                      "el": ".global-sync [data-action=\"sync\"][aria-label*=\"records on this phone\"]"
                     },
                     {
                       "text": {
                         "en": "3",
                         "zh": "3"
                       },
-                      "in": ".global-sync"
+                      "in": ".global-sync",
+                      "absent": true
                     }
                   ]
                 }
@@ -1029,19 +1031,20 @@
             {
               "type": "action",
               "id": "ds-a7-global-error.act",
-              "label": "The worker opens another page, then checks the exception.",
+              "label": "The worker opens Saved work from the header's icon on another page.",
               "taps": [
                 {
                   "expect": [
                     {
-                      "el": ".global-sync.needs-attention .global-sync-control"
+                      "el": ".global-sync[data-sync=\"waiting\"] [data-action=\"sync\"]"
                     },
                     {
                       "text": {
                         "en": "1",
                         "zh": "1"
                       },
-                      "in": ".global-sync"
+                      "in": ".global-sync",
+                      "absent": true
                     }
                   ]
                 },

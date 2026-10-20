@@ -103,3 +103,19 @@ Also fixed on the way: IconButton's count badge was styled only inside the Inspe
 - Squint (104 pigs): the title, the search field, the first tags. The search leads, as the owner asked; the rows read as before.
 - Against the original: one control row added (search with scan, and the filter); nothing added to the rows.
 - **Better because** a worker with 100 pigs can find the one in front of them or keep only their unit, where before they could only scroll a drawer.
+
+## Saved work on Home (2026-10-21)
+
+Scope: the header's saved-work control on Home and its other pages, and the Overview tiles of tasks with records still on this phone. Owner ruling 2026-10-18 (PRD of Data sync, PR 235): quiet by default; Home's header shows the icon alone; the tiles carry the counts; red only when signed out.
+
+Keep: the header's section trigger and Assistant door, their order and alignment; every tile's four slots; the control opening Saved work.
+
+- **major** · The control was a yellow pill with a shadow ("↑ 3"), the loudest thing in the header, for a state that needs nothing from the worker; uploading turned it blue with a spinning mark, failure red with "Fix". Colour meant three things, none of them a call to act.
+- **major** · Its number counted every record on the phone, while the tasks the records belong to said nothing, so the worker couldn't tell which work was still on the phone.
+- **minor** · The island variant (`?indicator=island`) and the per-state classes were study leftovers with no ruling behind them.
+
+| Part | Drawn by | Component | Keep / fix / cut |
+|---|---|---|---|
+| Saved-work control | page-drawn pill (data-sync-shell.css) | IconButton · bordered (upload; alert in red when signed out) | **fix** |
+| Task tile's records | none | TaskTile `saved` ("↑ N" on the run line) | **new** |
+| Island variant, state classes | page | none | **cut** |
