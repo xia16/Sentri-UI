@@ -63,15 +63,6 @@ test('logs retain source ordering, correction text and attachments', () => {
   assert.match(result,/data-action="photo"/);
   assert.match(ui.log([{label:'Today',entries:[]}]),/No activity recorded yet/);
 });
-test('category footer preserves navigation actions and one current category', () => {
-  const result=ui.categoryFooter({categories:[{id:'production',label:'Production'},{id:'health',label:'Health'}],active:'health',backAction:'return-pig'});
-  assert.match(result,/data-action="return-pig"/);
-  assert.match(result,/data-value="health" aria-current="location"/);
-  assert.equal((result.match(/aria-current="location"/g)||[]).length,1);
-  assert.equal((result.match(/<span>Back<\/span>/g)||[]).length,1);
-  assert.match(ui.categoryFooter({categories:[{id:'first',label:'First'}],active:'missing'}),/data-value="first" aria-current="location"/);
-});
-
 test('chooser groups remain flat and expose meaningful accessible subtitles', () => {
  const html=ui.pickerOptions({options:[['mL','mL','Millilitres','Liquid'],['mg','mg','Milligrams','Weight'],['g','g','Grams','Weight']],selected:'mg'});
  assert.equal((html.match(/class="st-panel st-choice-panel"/g)||[]).length,2);

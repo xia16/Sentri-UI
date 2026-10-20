@@ -83,10 +83,12 @@
       dock: K.dock({ unit: { icon: 'grid', framed: true, label: s('tk.demo.dock.penmap', 'Pen map'), action: 'go-pen' }, primary: { icon: 'scan', label: s('act.scan', 'Scan ear tag'), action: 'scan' }, tools: tools }) });
   }
 
-  // TaskStepper: the Stepper card in farrowing's face (row: outlined keys, 15px label, 18px mono value).
+  // Stepper (row, well, count): the Stepper card in farrowing's face (row: outlined keys, 15px label, 18px mono value).
   function stepper(key, str, text, v, more) {
-    return K.stepper(Object.assign({ label: text, value: v, key: key, action: 'step',
-      strs: { label: str, value: 'tk.demo.n', decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase' } }, more || {}));
+    var p = Object.assign({ label: text, value: v, key: key, action: 'step',
+      strs: { label: str, value: 'tk.demo.n', decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase' } }, more || {});
+    p.variant = p.face || (p.variant === 'hero' ? 'well' : p.variant || 'row');
+    return UI.stepper(p);
   }
 
   // ---- Finish farrowing: a drawer sized to its content, closed by a hold ----
@@ -109,7 +111,7 @@
       title: s('tk.demo.dead.title', 'Record dead'), corner: { label: s('act.clear', 'Clear'), action: 'clear' },
       body: UI.segment({ action: 'dead-mode', active: 'piglets', ariaLabel: 'Who died', options: [['piglets', '', { strs: { label: 'tk.demo.piglets' } }], ['sow', '', { strs: { label: 'tk.demo.sow' } }]] }) +
         causes.map(function (c) { return stepper(c[0], c[1], c[2], c[3], c[0] === 'crushed' ? { draft: true, min: 2 } : { min: c[3] }); }).join('') +
-        K.photos({ label: 'Photos', optional: 'Optional', key: 'photos', strs: { label: 'ds.c2.photos.label', optional: 'ds.field.optional', camera: 'ds.c2.aria.camera' } }),
+        UI.photos({ label: 'Photos', optional: 'Optional', key: 'photos', strs: { label: 'ds.c2.photos.label', optional: 'ds.field.optional', camera: 'ds.c2.aria.camera' } }),
       footer: K.footer({ back: { action: 'back' }, primary: { label: s('act.save', 'Save'), action: 'save' } }) });
   }
 
@@ -190,7 +192,7 @@
     return K.drawer({ size: 'long', height: 'full', view: 'sow', title: s('tk.demo.sow.title', 'Sow died'), corner: { label: s('act.clear', 'Clear'), action: 'clear' },
       body: '<div class="tk-demo-stack">' + UI.segment({ action: 'dead-mode', active: 'sow', ariaLabel: 'Who died', options: [['piglets', '', { strs: { label: 'tk.demo.piglets' } }], ['sow', '', { strs: { label: 'tk.demo.sow' } }]] }) +
         K.radios({ label: '', action: 'cause', key: 'cause', options: causes.map(function (c) { return { value: c[0], label: c[2], strs: { label: c[1] } }; }) }) +
-        K.photos({ label: 'Photos', optional: 'Optional', key: 'photos', strs: { label: 'ds.c2.photos.label', optional: 'ds.field.optional', camera: 'ds.c2.aria.camera' } }) + band + '</div>',
+        UI.photos({ label: 'Photos', optional: 'Optional', key: 'photos', strs: { label: 'ds.c2.photos.label', optional: 'ds.field.optional', camera: 'ds.c2.aria.camera' } }) + band + '</div>',
       footer: K.footer({ back: { action: 'back' }, hold: { label: s('act.save', 'Save'), caption: s('tk.demo.sow.hold', 'HOLD TO SAVE'), action: 'save', tone: 'primary', waiting: true } }) });
   }
 
@@ -278,7 +280,7 @@
     b.parentNode.querySelectorAll('.tk-lens-tab').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
   });
   var t = function (id) { return window.PP ? window.PP.t(id) : id; };
-  var holds = K.holdBind(document.body, { t: t, onCommit: function (x) { setTimeout(function () { holds.settle(x, 'done'); }, 600); } });
+  var holds = UI.holdBind(document.body, { t: t, onCommit: function (x) { setTimeout(function () { holds.settle(x, 'done'); }, 600); } });
 })();
 </script>
 <script src="/ux/tasks/piglet-processing/shell.js"></script>

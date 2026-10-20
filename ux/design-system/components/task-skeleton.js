@@ -109,13 +109,7 @@
     return root.SentriUI.row(props);
   }
 
-  // Compatibility adapter; Stepper owns every face and its implementation.
-  function stepper(props = {}) {
-    return root.SentriUI.stepper({...props,variant:props.face||(props.variant==='hero'?'well':props.variant||'row')});
-  }
 
-  /* TaskPhotos: compatibility alias; Photos owns the optional line face. */
-  function photos(props = {}) { return root.SentriUI.photos(props); }
 
   /* ---- door (alias of SentriUI.row / rowAction — use Row): a row with no id column (farrowing's .disclosure): a title, one muted description line, a chevron.
      For a non-animal door inside a sheet or a page (`Record here › Move piglets`). ---- */
@@ -185,8 +179,6 @@
     return `<section class="tk-day" data-ds="TaskDay"${L(label ?? title)}><header class="tk-day-head"><strong>${parts(title)}</strong>${status ? `<span>${parts(status)}</span>` : ''}</header>${rows}</section>`;
   }
 
-  // Compatibility alias: Button owns the hold face and interaction.
-  const holdBind = (scope, opts = {}) => root.SentriUI.holdBind(scope, opts);
 
   /* ---- TaskDoors: a list of doors. card: false (default) — flat door rows (SentriTask.door, no id column).
      card: true — farrowing's Pen page / sow-actions list: an optional section title with its icon, then the doors in one
@@ -251,7 +243,6 @@
 
   /* ---- Footer, Back, drawer, page, dialog: the Sheet card (SentriUI.sheet / sheetFooter / backButton) — one implementation.
      These keep the skeleton's call signatures; see Sheet/README.md. ---- */
-  const back = o => root.SentriUI.backButton(o || {});
   const footer = o => root.SentriUI.sheetFooter(o || {});
   function scrim(o = {}) { return root.SentriUI.scrim(o); }
   /* sheet: the drawer without its scrim (the host places scrim() before it); drawer: scrim + sheet. height 'full' = Sheet's
@@ -265,16 +256,7 @@
   }
   function dialog(o = {}) { return root.SentriUI.sheet(Object.assign({}, o, { variant: 'dialog' })); }
 
-  /* ---- TaskChips (candidate): one row of filter chips over a task list — `All · Iron 4 · Castrate 6 · Done 3`. One is
-     chosen at a time (a radio group: role=radiogroup, each chip role=radio with aria-checked and a roving tab stop; wire the
-     arrow keys with SentriUI.radioBind). The row scrolls sideways; its end keeps a gutter so the last chip is never cut.
-     items: [{ value, label, count, checked, aria }] (label and count are text slots; count is drawn in mono inside the
-     chip). action: the one data-action for every chip. key: the group's data-field (radioBind's field). ---- */
-  function chips({ items = [], action = 'chip', key = 'chips', label } = {}) {
-    return window.SentriUI.filterChips({items:items.map(i=>({...i,label:T(i.label),count:i.count==null?null:T(i.count)})),action,key,label});
-  }
-
-  const api = { T, statusbar, phone, screen, header, summary, progress, lens, chips, list, group, row, door, doors, radios, warning, section, receipt, day, holdBind, table, metrics, stepper, photos, choice, totals, dock, back, footer, scrim, sheet, drawer, page, dialog, glyph };
+  const api = { T, statusbar, phone, screen, header, summary, progress, lens, list, group, row, door, doors, radios, warning, section, receipt, day, table, metrics, choice, totals, dock, footer, scrim, sheet, drawer, page, dialog, glyph };
   root.SentriTask = api;
   if (typeof module !== 'undefined') module.exports = api;
 })(globalThis);

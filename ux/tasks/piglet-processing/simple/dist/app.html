@@ -32,7 +32,11 @@
   if (!id) return;
 
   var root = document.documentElement, ready = false, fn = null, prev = null;
-  root.classList.add('atlas-bare');
+  /* Motion is frozen (atlas-still) while the screen is put in its state, so the preset and steps land at once and every shot
+     of the same commit is the same picture. A person browsing the atlas then gets the motion back: after Ready the freeze is
+     lifted, so taps animate as they would on the phone. Automation (navigator.webdriver, as under Playwright) and ?still keep it. */
+  var keepStill = navigator.webdriver === true || q.has('still');
+  root.classList.add('atlas-bare', 'atlas-still');
   var css = document.createElement('style');
   css.textContent =
     'html.atlas-bare,html.atlas-bare body{margin:0!important;padding:0!important;width:390px!important;height:844px!important;overflow:hidden!important;background:#fff!important}' +
@@ -42,8 +46,8 @@
     'overflow:visible!important;transform:none!important;filter:none!important;background:none!important;box-shadow:none!important;border-radius:0!important;contain:none!important;opacity:1!important}' +
     'html.atlas-bare .atlas-phone{position:fixed!important;left:0!important;top:0!important;right:auto!important;bottom:auto!important;width:390px!important;height:844px!important;min-width:0!important;max-width:none!important;min-height:0!important;max-height:none!important;' +
     'margin:0!important;border:0!important;border-radius:0!important;box-shadow:none!important;outline:0!important;transform:none!important;overflow:hidden!important;z-index:1}' +
-    'html.atlas-bare *,html.atlas-bare *::before,html.atlas-bare *::after{animation-duration:0s!important;animation-delay:0s!important;transition-duration:0s!important;transition-delay:0s!important;caret-color:transparent}' +
-    'html.atlas-bare *,html.atlas-bare *::before,html.atlas-bare *::after{animation-duration:0s!important;animation-delay:0s!important;transition-duration:0s!important;transition-delay:0s!important;caret-color:transparent}' +
+    'html.atlas-still *,html.atlas-still *::before,html.atlas-still *::after{animation-duration:0s!important;animation-delay:0s!important;transition-duration:0s!important;transition-delay:0s!important;caret-color:transparent}' +
+    'html.atlas-still,html.atlas-still *{scroll-behavior:auto!important}' +
     'html.atlas-bare .atlas-phone::before,html.atlas-bare .atlas-phone::after{box-shadow:none!important}';
   document.head.appendChild(css);
 
@@ -52,12 +56,20 @@
   var dataUrl = here ? new URL('../../atlas/atlas.json', here).href : '/atlas/atlas.json';
   var data = fetch(dataUrl).then(function (r) { return r.json(); }).catch(function () { return null; });
 
+  /* A page gets only what renders of a screen: its id, url, preset and steps. Notes, names and status describe a screen and draw
+     nothing, and the gate hashes only these of the atlas (scripts/atlas-screens.mjs renderDef), so a page must not read the rest. */
+  function rendered(c) {
+    var r = { id: c.id, url: c.url };
+    if (c.preset !== undefined) r.preset = c.preset;
+    if (c.steps !== undefined) r.steps = c.steps;
+    return r;
+  }
   function findScreen(d) {
     var found = null, path = location.pathname;
     if (!d) return;
     d.platforms.forEach(function (p) { p.sections.forEach(function (s) { s.features.forEach(function (f) { f.screens.forEach(function (c) {
-      if (c.id === id) found = c;
-      if (c.url && c.url.split('?')[0] === path) AB.screens.push(c);
+      if (c.id === id) found = rendered(c);
+      if (c.url && c.url.split('?')[0] === path) AB.screens.push(rendered(c));
     }); }); }); });
     AB.screen = found;
   }
@@ -99,6 +111,18 @@
   function frameReady(f) {   // loaded (not the initial about:blank) and not waiting for its host
     var d = frameDoc(f); if (!d) return true;   // cross-origin: nothing to wait for
     return d.readyState === 'complete' && !(f.getAttribute('src') && d.URL === 'about:blank') && !d.documentElement.hasAttribute('data-atlas-pending');
+  }
+  /* A page that scrolls itself into place after it loads (Home's focus=task-fold) is only ready when its scroll positions stop
+     moving: Ready waits until no element's scroll offset has changed for 8 frames in a row (at most 1.5 s), so a shot never
+     catches a scroll still under way. Where the page scrolls to is the page's own: it must measure after its fonts load (Home
+     does), or a font that lands later moves the target and the shot with it. */
+  function scrollSettled() {
+    var t0 = Date.now(), last = null, same = 0;
+    var sig = function () { return [].map.call(document.querySelectorAll('*'), function (e) { return e.scrollTop || e.scrollLeft ? e.scrollTop + ',' + e.scrollLeft : ''; }).join('|') + '|' + scrollX + ',' + scrollY; };
+    return new Promise(function (res) { (function tick() {
+      var s = sig(); if (s === last) same++; else { same = 0; last = s; }
+      if (same >= 8) res(); else if (Date.now() - t0 > 1500) { console.warn('atlas-bare: scroll still moving after 1.5 s'); res(); } else requestAnimationFrame(tick);
+    })(); });
   }
   function framesReady(phone) {   // every iframe in the phone ready, then two frames for it to paint
     var t0 = Date.now();
@@ -185,8 +209,9 @@
       (steps.length ? frames().then(function () { return replay(phone, steps); }) : Promise.resolve()).then(function () { return framesReady(phone); }).then(function () {
       hideAround(phone);
       var fonts = document.fonts && document.fonts.ready ? Promise.race([document.fonts.ready, new Promise(function (r) { setTimeout(r, 250); })]) : Promise.resolve();
-      fonts.then(function () { requestAnimationFrame(function () { requestAnimationFrame(function () {
+      fonts.then(scrollSettled).then(function () { requestAnimationFrame(function () { requestAnimationFrame(function () {
         root.classList.add('atlas-ready'); ready = true;
+        if (!keepStill) root.classList.remove('atlas-still');
         if (fn) { try { prev = fn(AB.screens); } catch (e) { prev = null; } }   // the state the screen opens in is not a change
         parent.postMessage({ atlasReady: id }, '*');
       }); }); });
@@ -244,6 +269,10 @@
   --count-key: #28734b;
   --ink-2: #465143;
   --amber-wash-strong: #f6e7bf;
+  --amber-fill: #fede82;
+  --amber-fill-ink: #5c3f00;
+  --progress-fill: #c1ddfd;
+  --progress-fill-ink: #1f4470;
   --scrim: #37402c24;
   --dialog-backdrop: #20271f55;
   --frame-border: #c7d0bd;
@@ -414,6 +443,8 @@
   --sheet-out: 180ms;
   --fade: 200ms;
   --ease-arrive: cubic-bezier(.22,1,.36,1);
+  --land-hold: 900ms;
+  --land-fade: 700ms;
   --drawer-compact-max: 42%;
   --drawer-short-max: 58%;
   --drawer-medium-max: 76%;
@@ -528,11 +559,24 @@ svg{width:var(--size-20);height:var(--size-20);display:block;flex-shrink:0;fill:
    the body starts space-section (24px) below it. Nothing in it acts but the subject chip and, in a drawer with levels, ‹ Parent. */
 .utility-header{flex:none;display:flex;align-items:center;gap:var(--space-10);margin:0;padding:var(--space-5) var(--space-gutter) var(--space-17);border-bottom:1px solid var(--line);text-align:center}
 .sheet-titles{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center}
-.sheet-titles>.sheet-up{align-self:flex-start}
+/* Corner actions (owner, 2026-10-14, ruling C): Clear or Reset at the top right, a ✕ (unused today) at the top left. Each is a
+   48px target vertically centred on the text block (the title + its line), its edge 10px from the sheet's (the word ends on the
+   18px gutter). The title keeps 12px clear of each target: the room is the sheet less 2 × (10 + 48 + 12). */
+.sheet-text{position:relative;align-self:stretch;display:flex;flex-direction:column;align-items:center}
+.sheet-text>.sheet-title{max-width:calc(100% + 2 * var(--space-gutter) - 2 * (var(--space-10) + var(--tap-min) + var(--space-12)))}
+.sheet-text>.st-sheet-corner.st-sheet-corner{position:absolute;top:50%;transform:translateY(-50%);min-width:var(--tap-min);min-height:var(--tap-min);margin:0;padding:0 var(--space-8);border:0;border-radius:var(--radius-control);background:transparent;color:var(--ink);font:500 var(--font-size-14)/1.3 var(--font-sans);white-space:nowrap;cursor:pointer}
+.sheet-text>.st-sheet-corner[data-corner="end"]{right:calc(var(--space-10) - var(--space-gutter))}
+.sheet-text>.st-sheet-corner[data-corner="start"]{left:calc(var(--space-10) - var(--space-gutter));display:grid;place-items:center;width:var(--tap-min);padding:0}
+.st-sheet-corner[data-corner="start"]>svg{width:var(--size-20);height:var(--size-20);fill:none;stroke:currentColor;stroke-width:var(--icon-stroke);stroke-linecap:round;stroke-linejoin:round}
+.sheet-text>.st-sheet-corner:active{background:var(--press)}
 .sheet-title{margin:0;font:500 var(--type-sheet-title-size)/1.3 var(--font-sans);letter-spacing:var(--tracking-sheet);color:var(--ink);overflow-wrap:anywhere}
 /* The header line: one quiet line, never wrapped or truncated (copy that does not fit belongs in the body). */
 .st-header-line{margin:var(--space-6) 0 0;font:var(--type-description-size)/1.5 var(--font-sans);color:var(--muted);white-space:nowrap}
 .st-header-line[data-line="route"]{display:flex;align-items:center;justify-content:center;gap:var(--space-8)}
+.st-header-line[data-line="key"]{display:flex;align-items:center;justify-content:center;gap:var(--space-16);font-weight:var(--type-weight-medium)}
+.st-header-line[data-line="key"] span{display:inline-flex;align-items:center;gap:var(--space-6)}
+.st-header-line[data-line="key"] i{flex:none;width:var(--space-12);height:var(--space-12);border-radius:var(--radius-4)}
+.st-header-line[data-line="key"] b{font-weight:var(--type-weight-semibold);color:var(--ink)}
 .st-header-line strong{font-weight:500;color:var(--ink)}
 .st-header-line .st-sep{margin:0 3px}
 .st-header-facts{min-width:0}
@@ -552,10 +596,6 @@ svg{width:var(--size-20);height:var(--size-20);display:block;flex-shrink:0;fill:
 .st-page-title{margin:0;font:500 var(--type-page-title-size)/1.25 var(--font-sans);letter-spacing:-0.6px;color:var(--ink);overflow-wrap:anywhere}
 .st-page-header .st-header-line{justify-content:flex-start;margin-top:var(--space-2);text-align:left}
 /* Up one level (a drawer with levels only): "‹ Parent" above the title. It names the parent; the title names this level. */
-.sheet-up{display:flex;align-items:center;gap:var(--space-2);max-width:100%;min-height:var(--tap-min);margin:calc(-1 * var(--space-12)) 0 calc(-1 * var(--space-6)) calc(-1 * var(--space-8));padding:0 var(--space-8);border:0;border-radius:var(--radius-control);background:transparent;color:var(--ink);font:500 var(--font-size-14)/1.3 var(--font-sans);text-align:left;cursor:pointer}
-.sheet-up>span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.sheet-up>svg{flex:none;width:var(--size-18);height:var(--size-18);fill:none;stroke:currentColor;stroke-width:var(--icon-stroke);stroke-linecap:round;stroke-linejoin:round}
-.sheet-up:active{background:var(--press)}
 
 /* Body: the one scroller. */
 .sheet-body{flex:0 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:0 var(--space-gutter);scrollbar-width:none;-webkit-overflow-scrolling:touch}
@@ -574,9 +614,6 @@ svg{width:var(--size-20);height:var(--size-20);display:block;flex-shrink:0;fill:
 .sheet-footer>.button:not(.surface-back){flex:1;min-width:0;min-height:var(--footer-height);margin:0;padding:var(--space-10) var(--space-17);border-radius:var(--radius-control);font:500 var(--type-button-size)/1.3 var(--font-sans)}
 /* Back: the one exit of every footer. Alone it fills the bar in the primary's face. */
 .button.surface-back{flex:none;display:flex;align-items:center;justify-content:center;gap:var(--space-4);width:var(--back-width);min-width:var(--back-width);min-height:var(--footer-height);margin:0;padding:var(--space-8);background:var(--paper);border:1px solid var(--back-border);border-radius:var(--radius-control);box-shadow:none;color:var(--ink);font:500 var(--type-button-size) var(--font-sans);white-space:nowrap;touch-action:manipulation}
-.sheet-footer>.st-footer-quiet{flex:none;align-self:center;margin:0 calc(-1 * var(--space-4));padding:0 var(--space-4);font-weight:500}
-/* The header owns the 24px: the body's first element brings no top margin of its own (a field's, a note's). */
-.sheet>.sheet-body>:first-child{margin-top:0}
 .surface-back>svg{width:var(--size-16);height:var(--size-16);flex:none;transform:none}
 .surface-back:active{background:var(--back-press)}
 .surface-back:only-child{flex:1 1 auto;width:auto;min-width:0;background:var(--ink);border-color:var(--ink);color:var(--paper);font-weight:600}
@@ -631,7 +668,8 @@ svg{width:var(--size-20);height:var(--size-20);display:block;flex-shrink:0;fill:
 :is(.farrowing-phone,.inspection-phone) .page-background>.sheet{z-index:1}
 .inspection-phone .sheet[data-presentation="page"].single-action-sheet>.sheet-body{display:block}
 .inspection-phone .sheet[data-presentation="page"].single-action-sheet .bulk-controls{max-width:100%}
-.inspection-phone .sheet[data-presentation="page"].single-action-sheet .bulk-controls{padding:var(--space-16);gap:var(--space-20)}
+.inspection-phone .sheet[data-presentation="page"].single-action-sheet .bulk-controls{padding:0 0 var(--space-16);gap:var(--space-20)}
+@media(max-width:370px){.inspection-phone .sheet[data-presentation="page"].single-action-sheet>.sheet-body{padding-left:var(--space-gutter-narrow);padding-right:var(--space-gutter-narrow)}}
 .inspection-phone .sheet[data-presentation="page"].single-action-sheet .field{font-size:var(--font-size-13);gap:var(--space-8)}
 .inspection-phone .sheet[data-presentation="page"].single-action-sheet :is(.field input,.field select){min-height:var(--tap-min);font-size:var(--font-size-14);padding:var(--space-12)}
 .inspection-phone .sheet[data-presentation="page"].single-action-sheet .feed-optional-open{min-height:var(--tap-min)}
@@ -726,6 +764,15 @@ button.st-row:disabled{cursor:default}
 .st-row[aria-current="location"] .st-row-chevron{color:var(--ink)}
 .st-row[aria-current="location"] .st-row-chevron svg{width:var(--size-20);height:var(--size-20);stroke-width:2}
 .st-panel.st-row-group{padding:0;overflow:hidden}
+/* Row tile and its grid (More actions' everyday verbs): the panel is the only box; the well is the navigation icon's colours, larger for a gloved thumb. */
+.st-panel.st-row-grid{display:grid;grid-template-columns:repeat(var(--st-row-grid-cols,5),minmax(0,1fr));row-gap:var(--space-16);padding:var(--space-16) var(--space-8)}
+.st-row-tile{display:flex;flex-direction:column;align-items:center;gap:var(--space-8);min-width:0;min-height:var(--tap-min);padding:0;border:0;background:none;color:var(--ink);font:500 var(--type-meta-size)/1.3 var(--font-sans);text-align:center;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.st-row-tile-icon{display:grid;place-items:center;width:var(--tap-min);height:var(--tap-min);border-radius:var(--radius-14);background:var(--row-icon-bg);color:var(--row-icon-ink)}
+.st-row-tile-icon svg{width:var(--size-22);height:var(--size-22)}
+.st-row-tile-label{max-width:100%;overflow-wrap:anywhere}
+.st-row-tile:active .st-row-tile-icon,.st-row-tile[data-preview="pressed"] .st-row-tile-icon{background:var(--choice-press)}
+.st-row-tile.is-danger{color:var(--red-ink)}
+.st-row-tile.is-danger .st-row-tile-icon{background:var(--red-wash);color:var(--red-ink)}
 .st-row-group>.st-row-group-label.st-heading{margin:0;padding:var(--space-14) var(--space-14) 0}
 /* Category titles inherit the standard section style; nesting establishes hierarchy. */
 .st-action-section.st-action-section{margin:0}
@@ -759,23 +806,6 @@ button.st-row:disabled{cursor:default}
 .device .drawer[data-st-context="drawer"][data-size="long"]{max-height:var(--drawer-long-max)}
 .device .sheet-footer .primary{margin:0;min-width:0;flex:1;min-height:var(--footer-height);background:var(--st-ink)}
 [data-st-context="drawer"] .evidence,.device .drawer[data-st-context="drawer"] .evidence{background:var(--st-panel-bg)}
-
-/* Section navigation footer: preserve the approved Back + underlined categories. */
-.st-category-footer.st-category-footer{display:grid;grid-template-columns:var(--back-width) minmax(0,1fr);align-items:center;gap:var(--space-16);position:relative;flex:none;min-width:0;padding:var(--space-footer-top) var(--space-gutter) var(--space-footer-bottom);border-top:var(--border-width) solid var(--st-line);background:var(--st-paper);container-type:inline-size}
-.st-category-footer.st-category-footer[data-back="none"]{grid-template-columns:minmax(0,1fr)}
-.st-category-footer .st-category-tabs{display:flex;min-width:0;gap:var(--space-2);overflow-x:auto;overscroll-behavior-x:contain;padding:0;margin:0;border:0;background:transparent;scrollbar-width:none}
-.st-category-tabs::-webkit-scrollbar{display:none}
-/* Overflow cue: tabs snap to their start, and the strip fades at whichever edge has more to scroll. No overflow, no fade. */
-@property --st-fade-l{syntax:"<length>";inherits:false;initial-value:0px}
-@property --st-fade-r{syntax:"<length>";inherits:false;initial-value:0px}
-.st-category-footer .st-category-tabs{scroll-snap-type:x proximity;--st-fade-l:0px;--st-fade-r:0px;-webkit-mask-image:linear-gradient(to right,transparent,#000 var(--st-fade-l),#000 calc(100% - var(--st-fade-r)),transparent);mask-image:linear-gradient(to right,transparent,#000 var(--st-fade-l),#000 calc(100% - var(--st-fade-r)),transparent);animation:st-tabs-fade linear both;animation-timeline:scroll(self inline)}
-.st-category-footer .st-category-tabs button{scroll-snap-align:start}
-@keyframes st-tabs-fade{0%{--st-fade-l:0px;--st-fade-r:var(--space-24)}8%{--st-fade-l:var(--space-24);--st-fade-r:var(--space-24)}92%{--st-fade-l:var(--space-24);--st-fade-r:var(--space-24)}100%{--st-fade-l:var(--space-24);--st-fade-r:0px}}
-.st-category-footer .st-category-tabs button{position:relative;flex:1 0 auto;min-width:var(--tap-min);min-height:var(--footer-height);margin:0;padding:0 var(--space-8);border:0;border-radius:0;background:transparent;color:var(--tab-ink);font:500 var(--font-size-12) var(--font-sans);white-space:nowrap;touch-action:manipulation}
-.st-category-footer .st-category-tabs button[aria-current="location"]{background:transparent;color:var(--tab-ink-active);font-weight:700}
-.st-category-tabs button[aria-current="location"]:after{content:"";position:absolute;bottom:var(--border-width);left:var(--space-8);right:var(--space-8);height:var(--size-3);border-radius:var(--radius-2);background:var(--current-marker)}
-.st-category-footer .st-category-tabs button:is(:active,[data-preview="pressed"]){background:var(--press)}
-@container(max-width:310px){.st-category-footer .st-category-tabs button{padding-left:var(--space-4);padding-right:var(--space-4);font-size:var(--font-size-11)}}
 
 /* Picker field: the mobile-standard choice control that replaces native selects.
    The trigger echoes text-input geometry; the sheet lists options as tappable rows. */
@@ -846,7 +876,26 @@ button.st-row:disabled{cursor:default}
 .st-picker-body .st-choice-row.st-choice-row{padding-block:var(--space-8)}
 /* Search stays at the top of the sheet while the one list scrolls under it (sticky in the sheet body, never a second scroller). */
 .sheet-body>.st-picker-body>.st-choice-search,.sheet-body>*>.st-picker-body>.st-choice-search{position:sticky;top:calc(-1 * var(--space-section));z-index:1;margin:calc(-1 * var(--space-section)) calc(-1 * var(--space-gutter-sheet)) var(--space-12);padding:var(--space-section) var(--space-gutter-sheet) var(--space-8);background:var(--paper)}
+/* Toast: what was just saved, on the ink above the page's dock (the Android snackbar). Solid, never see-through: it is read in sun
+   and glare. A glyph says how it went (done: a check on the green; offline: no-signal, saved on this phone), the title what was done,
+   the second line for whom or where it went. It rises in once and never takes a tap. */
+.st-toast{position:absolute;bottom:var(--toast-bottom,104px);left:var(--space-gutter);right:var(--space-gutter);z-index:7;display:flex;align-items:center;gap:var(--space-12);min-height:56px;box-sizing:border-box;padding:var(--space-10) var(--space-16);border-radius:var(--radius-inset);background:var(--ink);color:#fff;box-shadow:0 8px 24px #141c1238;cursor:default;animation:st-toast-in .2s ease-out both}
+.st-toast-glyph{display:grid;place-items:center;flex:none;width:28px;height:28px;border-radius:50%;background:#ffffff24;color:#fff}
+.st-toast--done .st-toast-glyph{background:var(--green)}
+.st-toast-glyph svg{width:16px;height:16px}
+.st-toast-copy{display:flex;flex-direction:column;gap:2px;min-width:0}
+.st-toast-title{font:600 var(--type-row-title-size)/1.3 var(--font-sans)}
+.st-toast-detail{font:400 var(--font-size-13)/1.35 var(--font-sans);color:#ffffffc7}
+@keyframes st-toast-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.st-toast{animation:none}}
 .st-choice-empty{margin:0;padding:var(--space-24) var(--space-17);font:400 var(--font-size-13)/1.5 var(--font-sans);color:var(--st-muted)}
+/* An empty collection the worker can add to (a farm's brands for a medicine): the native "nothing here yet" — a glyph on the tint, a
+   title that names what is missing, one line that says how to add it. Centred under the search, which stays the way in. */
+.st-choice-empty.st-choice-empty--lead{display:flex;flex-direction:column;align-items:center;gap:var(--space-8);padding:var(--space-32) var(--space-24) var(--space-24);text-align:center}
+.st-choice-empty-icon{display:grid;place-items:center;width:56px;height:56px;margin-bottom:var(--space-8);border-radius:50%;background:var(--well);color:var(--ink-2)}
+.st-choice-empty-icon svg{width:26px;height:26px}
+.st-choice-empty-title{font:600 var(--type-row-title-size)/1.35 var(--font-sans);color:var(--st-ink)}
+.st-choice-empty-text{max-width:280px;text-wrap:balance;font:400 var(--font-size-14)/1.5 var(--font-sans);color:var(--st-muted)}
 
 /* 6 · Field cards (candidate, ADR 0001): Stepper, Measure, Numpad.
    Tokens only, including the candidate sizes (stepper-row-min, hero-key, glyph-*, caret-width, status-dot, space-key-gap). */
@@ -856,7 +905,7 @@ button.st-row:disabled{cursor:default}
 .st-stepper-face,.st-numpad-key.st-numpad-key{display:grid;place-items:center;border:1px solid var(--control-border);border-radius:var(--radius-control);background:var(--paper);color:var(--ink);transition:transform 120ms ease}
 :is(.st-stepper-face,.st-numpad-key) svg{fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round}
 /* the floor-gray: a key with nothing to do (DS README, States) */
-.st-stepper-key[aria-disabled="true"] .st-stepper-face,.st-numpad-key.st-numpad-key[aria-disabled="true"]{background:var(--disabled-fill);border-color:var(--disabled-fill);color:var(--disabled-ink);cursor:default}
+.st-stepper-key[aria-disabled="true"] .st-stepper-face,.st-numpad-key.st-numpad-key[aria-disabled="true"]{background:var(--disabled-surface);border-color:var(--control-border);border-style:dashed;color:var(--ink-2);cursor:default}
 .st-stepper-key:not([aria-disabled="true"]):is(:active,[data-preview~="pressed"]) .st-stepper-face,.st-numpad-key.st-numpad-key:not([aria-disabled="true"]):is(:active,[data-preview~="pressed"]){transform:scale(.96);background:var(--press);border-color:var(--ink-2)}
 .st-field-hint.st-field-hint{display:flex;align-items:center;flex-wrap:wrap;gap:var(--space-6);margin:0;padding:0;font:400 var(--font-size-14)/1.4 var(--font-sans);color:var(--muted)}
 .st-field-hint[data-reserve="text"]{min-height:calc(var(--font-size-14) * 1.4)}
@@ -1007,8 +1056,9 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 .st-text-action.st-text-action{justify-content:center;min-width:var(--tap-min)}
 .st-text-action:not([aria-disabled="true"]):is(:active,[data-preview~="pressed"]){color:var(--ink);background:var(--press);border-radius:var(--radius-control)}
 .st-text-action.st-text-action[aria-disabled="true"]{color:var(--muted);background:transparent;cursor:default}
-/* waiting: present, quiet, focusable (aria-disabled); outranks every register's fill */
-.button.button[aria-disabled="true"]{background:var(--disabled-fill);border-color:var(--disabled-border);color:var(--ink);cursor:default;filter:none;transform:none}
+/* waiting or disabled: present, quiet, focusable when waiting (aria-disabled); outranks every register's fill, a page's register paint
+   (`.phone .button.task-end-confirm`) and a page's base fade (`button:disabled{opacity:.45}`): unavailable is the surface and the dashed rim */
+.button.button.button:is(:disabled,[aria-disabled="true"]){background:var(--disabled-fill);border:var(--border-width) dashed var(--control-border);color:var(--ink);opacity:1;cursor:default;filter:none;transform:none}
 .button[data-busy]{cursor:progress}
 /* hold: the sweep fills the button over hold-commit; the caption rides under the verb */
 .button.st-hold{position:relative;overflow:hidden;flex-direction:column;gap:var(--space-4);touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
@@ -1020,8 +1070,8 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 .st-hold[data-phase="holding"][data-preview~="still"]::before{transform:scaleX(.5);transition:none}
 .st-hold:is([data-phase="pending"],[data-phase="done"])::before{transform:scaleX(1);transition:none}
 /* the pending and done faces keep their register (no disabled rim); unknown takes the waiting face */
-.button.button.st-hold.danger:is([data-phase="pending"],[data-phase="done"]){background:var(--red);border-color:var(--red);color:var(--paper)}
-.button.button.st-hold.primary:is([data-phase="pending"],[data-phase="done"]){background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.button.button.st-hold.danger:is([data-phase="pending"],[data-phase="done"]){background:var(--red);border-color:var(--red);border-style:solid;color:var(--paper)}
+.button.button.st-hold.primary:is([data-phase="pending"],[data-phase="done"]){background:var(--ink);border-color:var(--ink);border-style:solid;color:var(--paper)}
 .st-hold[data-phase="unknown"] .st-hold-caption{opacity:1}
 .st-hold[data-phase="armed"]{outline:var(--size-3) solid var(--focus);outline-offset:var(--size-2)}
 
@@ -1085,7 +1135,7 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 /* OptionalRow: the one look of every optional input: label (row-title) · muted "Optional" · trailing icon action. See Field/README. */
 .st-optional-row{display:flex;align-items:center;gap:12px;width:100%;min-height:44px;margin:12px 0 0;padding:0 0 0 14px;border:0;border-radius:10px;background:var(--inset);text-align:left;font-family:var(--font-sans);color:var(--ink);touch-action:manipulation}
 .st-optional-row:active{background:var(--press)}
-.st-optional-row:disabled{opacity:.5}
+.st-optional-row:disabled{opacity:1;background:var(--disabled-surface);outline:var(--border-width) dashed var(--control-border);outline-offset:calc(-1 * var(--border-width));color:var(--ink);cursor:default}
 .st-optional-copy{display:flex;flex-direction:column;flex:1;min-width:0;padding:var(--space-7) 0}
 .st-optional-head{display:flex;align-items:baseline;gap:var(--space-8);min-width:0}
 .st-optional-label{font:500 13px/1.5 var(--font-sans);color:var(--ink)}
@@ -1104,7 +1154,8 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 .st-picker-value{min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left}
 .st-picker-trigger:is(:active,[data-preview="pressed"]){background:var(--choice-press)}
 .st-choice-row:is(:active,[data-preview="pressed"]){background:var(--st-press)}
-.st-picker-trigger[aria-disabled="true"],.st-choice-row[aria-disabled="true"]{opacity:1;background:var(--disabled-surface);color:var(--disabled-ink)}
+.st-picker-trigger[aria-disabled="true"],.st-choice-row[aria-disabled="true"]{opacity:1;background:var(--disabled-surface);color:var(--ink)}
+.st-picker-trigger.st-picker-trigger[aria-disabled="true"]{border-style:dashed}
 .st-picker-trigger[aria-invalid="true"]{border-color:var(--red)}
 .st-picker-hint{font:var(--font-size-13)/1.4 var(--font-sans);color:var(--muted)}
 .st-picker-field.error .st-picker-hint{color:var(--red)}
@@ -1137,10 +1188,14 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 .st-segment[data-variant=two-line-lens] button{flex-direction:column}
 .st-segment[data-variant=two-line-lens] .st-selection-count:empty{min-height:1.4em}
 .st-segment button:not([aria-pressed=true]):not(:disabled):active,.st-filter-chips button:not([aria-checked=true]):not(:disabled):active,[data-state=Pressed].st-segment button:nth-child(2),[data-state=Pressed].st-filter-chips button:nth-child(2){background:var(--handle)}
-.st-segment button:disabled,.st-filter-chips button:disabled{cursor:default;border:1px dashed var(--control-border)}
+.st-segment button:disabled,.st-filter-chips button:disabled{cursor:default;border:1px dashed var(--control-border);color:var(--ink);opacity:1}
+/* a whole segment unavailable: one dashed rim on a flat disabled surface; the current option keeps its weight but loses the raised pill */
+.st-segment:not(:has(button:not(:disabled))){background:var(--disabled-surface);border-style:dashed;border-color:var(--control-border)}
+.st-segment:not(:has(button:not(:disabled))) button:disabled{border-color:transparent;background:transparent;box-shadow:none}
 .st-selection-reason{margin:var(--space-6) 0;color:var(--muted);font:400 var(--type-description-size)/1.4 var(--font-sans)}
 .st-filter-chips{min-width:0;padding:var(--space-6) 0}
-.st-filter-chips-track{display:flex;gap:var(--space-key-gap);overflow-x:auto;padding:var(--space-4) var(--space-gutter);scrollbar-width:thin}
+.st-filter-chips-track{display:flex;gap:var(--space-key-gap);overflow-x:auto;padding:var(--space-4) var(--space-gutter);scrollbar-width:none}
+.st-filter-chips-track::-webkit-scrollbar{display:none;width:0;height:0}
 .st-filter-chips button{flex:none;max-width:100%;padding:var(--space-6) calc(var(--space-row-x) + (var(--size-16) + var(--space-3)) / 2);border:1px solid var(--line);border-radius:var(--radius-control);background:var(--well)}
 .st-filter-chips button[aria-checked=true]{background:var(--paper);font-weight:500;padding-inline:var(--space-row-x)}
 .st-chip-check{display:flex;width:var(--size-16);flex:none}
@@ -1152,8 +1207,7 @@ label.st-row[data-select]:active,button.st-row[data-preview~="pressed"]{backgrou
 .button .st-button-label{min-width:0;overflow-wrap:anywhere}
 .button.danger:not(:disabled):not([aria-disabled="true"]){color:var(--paper)}
 .button.tool .st-button-label{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.button.tool:is(:disabled,[aria-disabled="true"]){background:#fff;border-color:var(--line);color:var(--ink);opacity:.45}
-.st-text-action:disabled{color:var(--muted);background:transparent;opacity:.5;cursor:default}
+.st-text-action:disabled{color:var(--muted);background:transparent;opacity:1;cursor:default}
 .task-header>.button.finish-walk{flex:none;min-width:auto}
 .button.tool svg{width:16px;height:16px;flex:none}
 .icon-button.icon-button{box-sizing:border-box;flex:none;width:var(--tap-min);min-width:var(--tap-min);height:var(--tap-min);min-height:var(--tap-min);padding:0;border:var(--border-width) solid var(--line);border-radius:var(--radius-control);background:var(--paper);color:var(--ink)}
@@ -1191,6 +1245,8 @@ button.st-row[data-variant="tick"]:active:not(:disabled){background:var(--st-pre
 label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-row-x) var(--space-row-y) 0;gap:0}
 
 .field .st-field-message{font:400 var(--type-description-size)/1.5 var(--font-sans);color:var(--muted)}
+/* Field / PickerField optional: the muted word beside the label. */
+.st-field-optional{margin-left:var(--space-6);font:400 var(--type-description-size)/1.5 var(--font-sans);color:var(--muted)}
 .field.error .st-field-message{color:var(--red)}
 .field :is(input,textarea):disabled{background:var(--well);color:var(--muted)}
 .st-stepper[data-variant="well"] .st-stepper-keys{padding:var(--space-row-y);background:var(--well);border-radius:var(--radius-inset)}
@@ -1200,6 +1256,9 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
 .st-stepper-value{display:grid;place-items:center;min-width:var(--control-height);min-height:var(--control-height)}
 .st-stepper[data-error] .st-stepper-hint{color:var(--red)}
 .st-text-action{min-height:var(--tap-min)}
+/* Button text register, align: the word on the content edge ('start') or the right edge ('end') instead of centred in its target. */
+.st-text-action.st-text-action--start{justify-content:flex-start;padding-left:0}
+.st-text-action.st-text-action--end{justify-content:flex-end;padding-left:0}
 .st-optional-body .field textarea{height:auto;field-sizing:content;resize:none}
 
 /* Field owns its skin in phone hosts as well as standalone variant pages. */
@@ -1302,7 +1361,7 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
 .st-stepper[data-variant="count"] .st-stepper-key[data-step^="-"]:not([aria-disabled="true"]) .st-stepper-face{color:#345841}
 .st-stepper[data-variant="count"] .st-stepper-key[data-step^="-"]:not([aria-disabled="true"]) .st-stepper-face{background:var(--paper)}
 .st-stepper[data-variant="count"] .st-stepper-key:not([data-step^="-"]):not([aria-disabled="true"]) .st-stepper-face{background:var(--green);border-color:var(--green);color:#fff;box-shadow:0 3px 8px #225d3520}
-.st-stepper[data-variant="count"] .st-stepper-key[aria-disabled="true"] .st-stepper-face{background:#f8fbf8;border-color:#d9e4da;color:#a0b3a5}
+.st-stepper[data-variant="count"] .st-stepper-key[aria-disabled="true"] .st-stepper-face{background:var(--disabled-surface);border-color:var(--control-border);border-style:dashed;color:var(--ink-2)}
 .st-stepper[data-variant="count"] .st-stepper-value{display:block;min-width:0;min-height:0;color:#203d2b;line-height:1.15;letter-spacing:-3px}
 .st-stepper[data-variant="count"][data-zero] .st-stepper-value{color:#203d2b}
 .st-stepper[data-variant="count"] .st-stepper-hint.receipt{margin-top:4px;min-height:30px;font:13px/1.5 var(--font-sans);color:#52705c}
@@ -1314,7 +1373,7 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
 .st-panel.st-panel.st-panel.pen-card{box-shadow:0 2px 8px #20291f0a}
 .st-heading-action svg{color:var(--muted)}
 .sheet-footer>.button.surface-back.surface-back{border-color:var(--back-border)}
-.st-heading-action .st-text-action:disabled{color:var(--muted);background:transparent;opacity:.5}
+.st-heading-action .st-text-action:disabled{color:var(--muted);background:transparent;opacity:1}
 /* Stepper, row (an entry row: label left, minus / value / plus right) */
 .st-stepper[data-variant="row"]{min-height:66px;column-gap:8px;border-top:0;border-bottom:1px solid var(--line)}
 .st-stepper[data-variant="row"] .st-stepper-label{font:500 16px/normal var(--font-sans)}
@@ -1322,7 +1381,7 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
 .st-stepper[data-variant="row"] .st-stepper-key.st-stepper-key{width:44px;min-width:44px;min-height:44px;align-self:center}
 .st-stepper[data-variant="row"] .st-stepper-face{width:44px;height:44px;min-width:44px;min-height:44px;border-radius:12px;border-color:var(--task-key-border)}
 .st-stepper[data-variant="row"] .st-stepper-face svg{width:17px;height:17px;stroke-width:2.2}
-.st-stepper[data-variant="row"] .st-stepper-key[aria-disabled="true"] .st-stepper-face{background:var(--disabled-surface);border-color:var(--disabled-border);color:var(--disabled-ink)}
+.st-stepper[data-variant="row"] .st-stepper-key[aria-disabled="true"] .st-stepper-face{background:var(--disabled-surface);border-color:var(--control-border);border-style:dashed;color:var(--ink-2)}
 .st-stepper[data-variant="row"][data-zero] .st-stepper-value{color:var(--ink)}
 .st-stepper[data-variant="row"] .st-stepper-value{display:block;min-width:3ch;min-height:0;width:3ch;font:600 18px/normal var(--font-mono)}
 /* Segment, view switch and facet */
@@ -1348,8 +1407,6 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
 .st-facts[data-variant="record"] dd{font:500 14px/1.4 var(--font-sans);font-variant-numeric:tabular-nums}
 .st-facts[data-variant="record"] .st-fact-inline{grid-column:1/-1;display:flex;align-items:baseline;gap:12px;padding-top:2px}
 
-.st-fact-link{display:flex;align-items:center;gap:4px;min-height:44px;min-width:44px;margin:-10px 0;padding:0;background:transparent;font:inherit;color:inherit;white-space:nowrap}
-.st-fact-link svg{width:12px;height:12px;color:var(--muted)}
 @media(max-width:370px){.st-facts[data-variant="record"]{gap:16px 10px}.st-facts[data-variant="record"] dd{font-size:13px}}
 .sheet-footer>.button.surface-back.surface-back{min-height:var(--footer-height)}
 .sheet-footer>.button.surface-back.surface-back:only-child{background:var(--ink);border-color:var(--ink);color:var(--paper);font-weight:600}
@@ -1366,7 +1423,7 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
 .st-stepper[data-variant="bare"] .st-stepper-key.st-stepper-key{width:44px;min-width:44px;min-height:44px;align-self:center}
 .st-stepper[data-variant="bare"] .st-stepper-face{width:44px;height:44px;min-width:44px;min-height:44px;border-radius:12px;border-color:var(--task-key-border)}
 .st-stepper[data-variant="bare"] .st-stepper-face svg{width:17px;height:17px;stroke-width:2.2}
-.st-stepper[data-variant="bare"] .st-stepper-key[aria-disabled="true"] .st-stepper-face{background:var(--disabled-surface);border-color:var(--disabled-border);color:var(--disabled-ink)}
+.st-stepper[data-variant="bare"] .st-stepper-key[aria-disabled="true"] .st-stepper-face{background:var(--disabled-surface);border-color:var(--control-border);border-style:dashed;color:var(--ink-2)}
 .st-stepper[data-variant="bare"] .st-stepper-value{display:block;min-width:45px;min-height:0;font:600 25px/normal var(--font-mono);color:var(--ink)}
 .st-stepper[data-variant="bare"] .st-stepper-hint:empty{display:none}
 .dialog .st-selection{margin:16px 0 1px}
@@ -1429,17 +1486,30 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
 .st-optional-list>.st-choice-inline,.st-optional-body>.st-choice-inline{display:flex;justify-content:flex-start;min-height:48px;padding:0 var(--space-6);border:1px solid var(--line);border-radius:12px;background:var(--st-panel-bg)}
 .st-optional-list .st-optional-body,.st-optional-list>.finish-field,.st-optional-list>.st-choice-inline{grid-column:1/-1;margin:0}
 .st-photos .st-optional-row{margin:0}
-.st-photos-camera{width:calc(50% - 5px)}
+/* OptionalRow face "row" (face:'row'): the full-width optional row, empty or filled: the label and the muted Optional word
+   on the left, the outlined action at the right. Photos always draws it (README "line", the one face for optional evidence);
+   a sheet whose optionals sit beside Photos gives them the same face, so one sheet has one optional face on one track. */
+.st-optional-row[data-face="row"]{width:100%;justify-content:flex-start;gap:var(--space-12);padding:var(--space-4) var(--space-4) var(--space-4) var(--space-row-x);text-align:left;color:var(--ink)}
+.st-optional-row[data-face="row"] .st-optional-copy{flex:1 1 0;align-items:flex-start}
+.st-optional-row[data-face="row"] .st-optional-head{justify-content:flex-start;gap:var(--space-8)}
+.st-optional-row[data-face="row"] .st-optional-label{font:400 14px/1.4 var(--font-sans);color:var(--ink)}
+.st-optional-row[data-face="row"] .st-optional-word{display:inline;font:400 13px/1.4 var(--font-sans);color:var(--muted)}
+.st-optional-row[data-face="row"] .st-optional-act{order:0;flex:none;display:grid;place-items:center;width:44px;height:44px;color:var(--ink)}
+.st-optional-row[data-face="row"] .st-optional-act svg{box-sizing:content-box;width:var(--size-16);height:var(--size-16);padding:var(--space-6);border:var(--ring-width-fine) solid var(--muted);border-radius:50%;background:var(--paper)}
+.st-optional-row[data-face="row"][aria-disabled="true"] .st-optional-act{color:var(--disabled-ink)}
+.st-optional-row[data-face="row"][aria-disabled="true"] .st-optional-act svg{border-style:dashed}
+/* Photos waiting (inactive): the floor-gray. The row stays, its camera dashed; the reason is the row's description for a
+   screen reader and shows in the hint line only while a tap is answered (guard's data-answer), never as a standing line. */
+.st-photos[data-inactive]>.st-photos-hint:not([data-answer]){position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 /* hit extenders: invisible, so the visible box stays the approved 44 while the target reaches 48 */
 .st-segment button,.farrowing-phone .key{position:relative}
 .st-segment button::after{content:"";position:absolute;inset:-3px 0}
 .farrowing-phone .key::after{content:"";position:absolute;inset:-2px}
 /* transparent targets grow by padding and a matching negative margin: no pseudo-element, layout unchanged */
 .room-pen-name,.edit-finish-door{min-height:48px;margin-top:-2px;margin-bottom:-2px}
-.st-fact-link{min-height:48px;min-width:48px;margin:-12px 0}
 .dialog .sheet-footer>.button.secondary{background:#fff;border:1px solid var(--back-border)}
-/* a tap leaves no ring: only keyboard focus may draw one */
-:is(.farrowing-phone,.inspection-phone,.phone,.device,.atlas-phone) :focus:not(:focus-visible){outline:none}
+/* a tap leaves no ring: only keyboard focus may draw one; [data-touch-focus] marks focus a tap handed back (a pick returning to its field) */
+:is(.farrowing-phone,.inspection-phone,.phone,.device,.atlas-phone) :is(:focus:not(:focus-visible),[data-touch-focus]:focus){outline:none}
 /* stepper keys and value in rows: the target is 48, the face stays 44, the margins give the space back */
 .st-stepper[data-variant="row"] .st-stepper-key.st-stepper-key,.st-stepper[data-variant="bare"] .st-stepper-key.st-stepper-key{width:48px;min-width:48px;min-height:48px;margin:-2px}
 .st-stepper[data-variant="row"] .st-stepper-value{display:grid;place-items:center;min-width:calc(3ch + 12px);width:calc(3ch + 12px);min-height:48px;margin:-12px -6px}
@@ -1452,8 +1522,6 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
 .surface-back:only-child:active{background:var(--back-press);border-color:var(--back-border);color:var(--ink)}
 /* Record facts: labels in muted ink; the drill-in label keeps the row's line, its target grows by a pseudo-element */
 .st-facts[data-variant="record"] dt{color:var(--muted);font-size:13px}
-.st-fact-link{position:relative;min-height:0;min-width:0;margin:0}
-.st-fact-link::after{content:"";position:absolute;inset:-16px -4px}
 .death-breakdown-link{position:relative}
 .death-breakdown-link::after{content:"";position:absolute;inset:-16px -8px}
 /* Heading action: the target grows by a pseudo-element, so nothing clips it and the heading keeps its height */
@@ -1473,12 +1541,216 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 .st-row[data-tone="forecast"] .st-row-copy strong{color:var(--ink-2)}
 /* the record tools: two tools share the row when Edit is not offered yet */
 .record-inline-actions .record-action-group{display:grid;grid-auto-flow:column;grid-auto-columns:1fr}
-.record-inline-actions .record-action-group:has(>:nth-child(3)){grid-template-columns:.65fr 1.15fr 1.15fr}
+.record-inline-actions .record-action-group:has(>:nth-child(3)){grid-template-columns:.7fr 1.3fr 1fr}
 .st-banner[data-tone="danger"] .st-banner-headline{color:var(--red-ink)}
 /* A landmark focused by script (tabindex=-1: a list, a sheet) is not a control: no ring. */
 :is(.phone,.tk-phone,.atlas-phone,.device,.st-phone,.sp-phone,[data-st-context]) [tabindex="-1"]:focus{outline:none}
 /* A waiting or disabled control says so with its surface and rim; its text stays readable (4.5:1, farm legibility law). */
-.st-hold[aria-disabled="true"] :is(.st-hold-label,.st-hold-caption){color:var(--ink);opacity:1}
+.st-hold[aria-disabled="true"]:not([data-phase="pending"]):not([data-phase="done"]) :is(.st-hold-label,.st-hold-caption){color:var(--ink);opacity:1}
+/* PenMap: the room as a map of pens (components/PenMap/README.md). A tile says its pen code and nothing else; its colour is its status. */
+.sheet-body:has(>.st-pen-map){display:flex;flex-direction:column;overflow:hidden}
+.st-pen-map{--pm-tile:var(--size-56);--pm-gap:var(--space-8);--pm-label:var(--size-22);--pm-head:var(--size-20);display:flex;flex-direction:column;flex:0 1 auto;min-width:0;min-height:0}
+.st-pen-map[data-wide]{--pm-label:calc(var(--size-24) + var(--space-6))}
+.st-pen-entrance{flex:none;display:flex;align-items:center;justify-content:center;gap:var(--space-8);min-height:calc(var(--size-34) + var(--size-2));margin:0 0 var(--space-10);border-radius:var(--radius-segment);background:var(--well);color:var(--ink);font:var(--type-weight-semibold) var(--type-meta-size) var(--font-sans)}
+.st-pen-entrance svg{width:var(--size-16);height:var(--size-16);stroke-width:var(--icon-pad-stroke)}
+.st-pen-field{position:relative;display:flex;flex:0 1 auto;min-height:0}
+.st-pen-scroll{scroll-snap-type:both proximity;scroll-padding:calc(var(--pm-head) + var(--pm-gap)) 0 0 calc(var(--pm-label) + var(--pm-gap));position:relative;flex:1 1 auto;min-width:0;min-height:0;overflow:auto;overscroll-behavior:contain;scrollbar-width:none;border-radius:var(--radius-control);-webkit-overflow-scrolling:touch}
+.st-pen-scroll::-webkit-scrollbar{display:none;width:0;height:0}
+.st-pen-grid{--pm-lanes:1;display:grid;grid-template-rows:var(--pm-head);grid-template-columns:var(--pm-label) repeat(var(--pm-lanes),minmax(var(--pm-tile),1fr));gap:var(--pm-gap);width:max-content;min-width:100%}
+.st-pen-col,.st-pen-row{display:grid;place-items:center;background:var(--st-context-bg,var(--app-background));color:var(--muted);font:var(--type-weight-medium) var(--type-identifier-size) var(--font-mono)}
+/* The letters and numbers stick, and each carries its own ground 8px past its edge (the grid gap), so a tile scrolling under it is cut clean at the gap and never shows as a sliver beside the label. */
+.st-pen-col{position:sticky;top:0;z-index:3;box-shadow:0 var(--pm-gap) 0 0 var(--st-context-bg,var(--app-background))}
+.st-pen-row{position:sticky;left:0;z-index:2;box-shadow:var(--pm-gap) 0 0 0 var(--st-context-bg,var(--app-background))}
+.st-pen-col.st-pen-row{z-index:4;box-shadow:var(--pm-gap) 0 0 0 var(--st-context-bg,var(--app-background)),0 var(--pm-gap) 0 0 var(--st-context-bg,var(--app-background)),var(--pm-gap) var(--pm-gap) 0 0 var(--st-context-bg,var(--app-background))}
+.st-pen-tile{scroll-snap-align:start;display:grid;place-items:center;width:100%;min-width:var(--pm-tile);min-height:var(--pm-tile);margin:0;padding:0;border:var(--border-width) solid var(--line);border-radius:var(--radius-control);background:var(--st-panel-bg);color:var(--ink);font:var(--type-weight-semibold) var(--size-15)/1 var(--font-mono);touch-action:manipulation;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.st-pen-tile[data-level=act]{border-color:transparent;background:var(--amber-fill);color:var(--amber-fill-ink)}
+.st-pen-tile[data-level=live]{border-color:transparent;background:var(--progress-fill);color:var(--progress-fill-ink)}
+.st-pen-tile:is([data-level=empty],[data-level=hidden]){border-color:transparent;background:var(--well);color:var(--muted);font-weight:var(--type-weight-medium)}
+.st-pen-tile[data-level=plain]:is(:active,[data-preview~=pressed]){background:var(--st-press)}
+.st-pen-tile:is([data-level=act],[data-level=live]):is(:active,[data-preview~=pressed]){filter:brightness(.94)}
+.st-pen-peek{position:absolute;left:0;right:0;bottom:0;z-index:5;padding:0 var(--space-card-x) var(--space-4);border:var(--border-width) solid var(--line);border-radius:var(--radius-panel);background:var(--st-panel-bg);color:var(--ink);pointer-events:none}
+.st-pen-peek[data-at=top]{top:0;bottom:auto}
+.st-pen-peek[hidden]{display:none}
+.st-pen-peek .st-pen-peek-row.st-row{min-height:0;padding:var(--space-4) 0}
+.st-pen-peek-head{display:flex;align-items:baseline;gap:var(--space-8);padding:var(--space-14) 0 var(--space-4)}
+.st-pen-peek-head b{font:var(--type-weight-semibold) var(--size-15) var(--font-mono)}
+.st-pen-peek-head span{color:var(--muted);font-size:var(--type-meta-size)}
+.st-pen-ranges{flex:1 1 0;min-width:0;display:flex;gap:var(--space-2);height:var(--footer-height);padding:var(--space-4);border-radius:var(--radius-inset);background:var(--well);overflow-x:auto;scrollbar-width:none;scroll-padding:0 var(--space-24)}
+.st-pen-ranges::-webkit-scrollbar{display:none;width:0;height:0}
+.st-pen-ranges[data-more=end]{mask-image:linear-gradient(to right,#000 calc(100% - var(--space-32)),transparent)}
+.st-pen-ranges[data-more=start]{mask-image:linear-gradient(to left,#000 calc(100% - var(--space-32)),transparent)}
+.st-pen-ranges[data-more="start end"]{mask-image:linear-gradient(to right,transparent,#000 var(--space-32),#000 calc(100% - var(--space-32)),transparent)}
+.st-pen-ranges button{flex:1 0 auto;min-width:var(--size-56);margin:0;padding:0 var(--space-8);border:0;border-radius:var(--radius-segment);background:transparent;color:var(--ink);font:var(--type-weight-semibold) var(--type-identifier-size) var(--font-mono);white-space:nowrap}
+.st-pen-ranges button[aria-checked=true]{background:var(--paper);box-shadow:0 1px 2px #20291f22}
+.st-pen-ranges button[aria-checked=false]:active{background:var(--handle)}
+/* PenMap · landing ("colour carries over"). The host marks the pen it lands on with data-pen-land (the tapped tile's level) and that pen's
+   header with data-pen-land-head: the header takes the tile's fill, holds it (--land-hold) and fades back (--land-fade); a pen whose tile
+   is white (plain) gets a 2px ink ring on the marked element instead, drawn inside its edge (an outline at -2px: it covers the card's
+   own border and nothing sticky above can hide it). --land-elapsed resumes a re-rendered pen part-way. One cue; nothing else moves. */
+[data-pen-land] [data-pen-land-head]{animation:st-pen-land-act var(--land-fade) ease-in-out calc(var(--land-hold) - var(--land-elapsed,0ms)) both}
+[data-pen-land=live] [data-pen-land-head]{animation-name:st-pen-land-live}
+/* the header's text and icons take the fill's own ink while the fill holds (muted on a fill reads under 4.5:1), and fade back with it */
+[data-pen-land=act] [data-pen-land-head] *{animation:st-pen-land-act-ink var(--land-fade) ease-in-out calc(var(--land-hold) - var(--land-elapsed,0ms)) both}
+[data-pen-land=live] [data-pen-land-head] *{animation:st-pen-land-live-ink var(--land-fade) ease-in-out calc(var(--land-hold) - var(--land-elapsed,0ms)) both}
+[data-pen-land=plain] [data-pen-land-head]{animation:none}
+[data-pen-land=plain]{outline:2px solid transparent;outline-offset:-2px;animation:st-pen-land-ring var(--land-fade) ease-in-out calc(var(--land-hold) - var(--land-elapsed,0ms)) both}
+@keyframes st-pen-land-act{from{background-color:var(--amber-fill)}}
+@keyframes st-pen-land-live{from{background-color:var(--progress-fill)}}
+@keyframes st-pen-land-act-ink{from{color:var(--amber-fill-ink)}}
+@keyframes st-pen-land-live-ink{from{color:var(--progress-fill-ink)}}
+@keyframes st-pen-land-ring{from{outline-color:var(--ink)}to{outline-color:transparent}}
+/* the held frame (data-pen-land-held): the cue at its hold, without motion, for a still render (the atlas shoots it; the gate judges it) */
+[data-pen-land][data-pen-land-held],[data-pen-land][data-pen-land-held] [data-pen-land-head]{animation:none}
+[data-pen-land=act][data-pen-land-held] [data-pen-land-head]{background-color:var(--amber-fill)}
+[data-pen-land][data-pen-land-held] [data-pen-land-head] *{animation:none}
+[data-pen-land=act][data-pen-land-held] [data-pen-land-head] *{color:var(--amber-fill-ink)}
+[data-pen-land=live][data-pen-land-held] [data-pen-land-head] *{color:var(--progress-fill-ink)}
+[data-pen-land=live][data-pen-land-held] [data-pen-land-head]{background-color:var(--progress-fill)}
+[data-pen-land=plain][data-pen-land-held]{outline-color:var(--ink)}
+
+/* ChoiceList · Inline Choice, key face (opt-in: `face: 'key'`). The same radiogroup, drawn as boxed keys in the Stepper row's column:
+   the first key's left edge to the last key's right edge, 3 × field-height less one key gap (136px), an 8px key gap. Each key is the
+   stepper key's face (paper, 1px task-key-border, radius-control, 16px/500, 44px tall) inside a field-height hit area, so the target
+   stays 48px. The chosen key takes the system's selected mark: a 2px ink ring (the border and an inset line, so the key never changes
+   size) and a 600 label; never a fill. Pressed is the keys' press. A row of this face sits in a flat list of rows with a 1px line
+   between them. */
+.st-choice-inline[data-face="key"]{--st-key-face:44px;--st-key-column:calc(3 * var(--field-height) - var(--space-key-gap));border-bottom:1px solid var(--line)}
+.st-choice-inline[data-face="key"]:last-child{border-bottom:0}
+.st-choice-inline[data-face="key"] .st-choice-inline-label{font-weight:var(--type-weight-medium)}
+.st-choice-inline[data-face="key"] .st-choice-inline-opts{align-self:center;width:var(--st-key-column);gap:var(--space-key-gap)}
+.st-choice-inline[data-face="key"] .st-choice-inline-opt.st-choice-inline-opt{display:grid;place-items:center;flex:1 1 0;min-width:0;min-height:var(--field-height);height:var(--field-height);padding:0;border:0;border-radius:0;background:transparent;font-weight:var(--type-weight-medium)}
+.st-choice-inline-face{display:grid;place-items:center;box-sizing:border-box;width:100%;height:var(--st-key-face);border:1px solid var(--task-key-border);border-radius:var(--radius-control);background:var(--paper);transition:transform 120ms ease}
+.st-choice-inline-opt[aria-checked="true"] .st-choice-inline-face{border-color:var(--ink);box-shadow:inset 0 0 0 calc(var(--ring-width) - 1px) var(--ink);font-weight:var(--type-weight-semibold)}
+.st-choice-inline[data-face="key"] .st-choice-inline-opt.st-choice-inline-opt:not([aria-disabled="true"]):is(:active,[data-preview~="pressed"]){background:transparent}
+.st-choice-inline-opt:not([aria-disabled="true"]):is(:active,[data-preview~="pressed"]) .st-choice-inline-face{transform:scale(.96);background:var(--press);border-color:var(--ink-2)}
+.st-choice-inline[data-face="key"] .st-choice-inline-opt.st-choice-inline-opt[aria-disabled="true"]{background:transparent}
+.st-choice-inline-opt[aria-disabled="true"] .st-choice-inline-face{border-style:dashed;background:var(--disabled-surface);color:var(--ink)}
+@media (prefers-reduced-motion:reduce){.st-choice-inline-face{transition:none}.st-choice-inline-opt:is(:active,[data-preview~="pressed"]) .st-choice-inline-face{transform:none}}
+
+/* Measure · row (opt-in: `layout: 'row'`). The Stepper row's silhouette: the label left (16px/500, with its muted "Optional"), the
+   value box in the same 136px column at the right, the stepper face's height (44px, a 48px hit area), value and unit at its two
+   ends, a 60px row with a 1px line between rows. The hint and note run under the row. Everything else is the Measure: the pad opens
+   on a tap (or, with input:'system', the phone's decimal keyboard), an empty box shows the muted dash. */
+.st-measure.st-measure[data-layout="row"]{--st-key-face:44px;--st-key-column:calc(3 * var(--field-height) - var(--space-key-gap));display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;column-gap:var(--space-row-y);row-gap:0;min-height:var(--stepper-row-min);border-bottom:1px solid var(--line)}
+.st-measure[data-layout="row"]:last-child{border-bottom:0}
+.st-measure[data-layout="row"] .st-measure-label{font-weight:var(--type-weight-medium)}
+.st-measure[data-layout="row"] .st-measure-box.st-measure-box{position:relative;align-items:center;justify-content:space-between;width:var(--st-key-column);min-height:var(--st-key-face);height:var(--st-key-face);padding:0 var(--space-row-x)}
+.st-measure[data-layout="row"] .st-measure-box::before{content:"";position:absolute;left:0;top:calc((var(--st-key-face) - var(--tap-min)) / 2);width:100%;height:var(--tap-min)}
+.st-measure[data-layout="row"]:not([data-active]) .st-measure-box.st-measure-box{border-color:var(--task-key-border)}
+.st-measure[data-layout="row"] .st-measure-value{font-size:var(--type-step-value-size);line-height:1}
+/* the empty dash is a placeholder, quiet: under 16px so the 7:1 floor for a primary value does not apply (muted holds 5.2:1) */
+.st-measure[data-layout="row"][data-empty]:not([data-active]) .st-measure-value{font-size:15px}
+.st-measure[data-layout="row"] :is(.st-measure-hint,.st-measure-note){grid-column:1/-1}
+.st-measure[data-layout="row"] :is(.st-measure-hint,.st-measure-note):empty{display:none}
+.st-measure[data-layout="row"] :is(.st-measure-hint,.st-measure-note):not(:empty){padding-bottom:var(--space-row-y)}
+
+/* Measure · system input (opt-in: `input: 'system'`). The same box, holding a native text field on the phone's decimal keyboard:
+   the value in the box's mono, the dash as its placeholder, the unit at the end. Typing is the field's active state (the ink ring
+   the pad's active Measure has); a tap anywhere in the box (its 48px hit area) puts the caret in it. */
+.st-measure-box[data-input="system"]{cursor:text}
+.st-measure-input{flex:1 1 auto;min-width:0;width:100%;margin:0;padding:0;border:0;border-radius:0;background:transparent;outline:none;box-shadow:none;appearance:none;-webkit-appearance:none;font:500 var(--type-figure-size)/1.2 var(--font-mono);font-variant-numeric:tabular-nums;color:var(--ink);caret-color:var(--ink)}
+.st-measure-input::placeholder{color:var(--muted);opacity:1}
+.st-measure.st-measure .st-measure-box.st-measure-box[data-input="system"]:focus-within{border-color:var(--ink);box-shadow:inset 0 0 0 calc(var(--caret-width) - 1px) var(--ink)}
+.st-measure[data-layout="row"] .st-measure-input{font-size:var(--type-step-value-size);line-height:1}
+.st-measure[data-layout="row"] .st-measure-input:placeholder-shown{font-size:15px}
+
+/* Button · text register, quiet: a settled line that still opens something (Home's "1 closed today"): muted 13px / 400, the same 48px target. */
+.st-text-action.st-text-action.st-text-action--quiet{color:var(--muted);font-weight:400;font-size:var(--type-description-size)}
+/* A quiet line that opens a list: the whole content width is the target and it ends in the row chevron, like "Schedule ›". */
+.st-text-action.st-text-action[data-chevron]{display:flex;width:100%;gap:6px}
+.st-text-action[data-chevron] .st-button-label{flex:1;min-width:0;text-align:left}
+.st-text-action[data-chevron]>.st-button-chevron{display:inline-flex;color:var(--muted)}
+.st-text-action[data-chevron] svg{width:14px;height:14px;flex:none}
+
+/* TaskTile: one open task on the Overview (components/TaskTile/README.md). Four fixed slots at the same height in every tile. */
+.st-tile{display:grid;grid-template-rows:auto auto auto auto auto;align-content:start;min-width:0;width:100%;text-align:left;padding:14px;border:1px solid var(--line);border-radius:var(--radius-panel);background:var(--paper);color:var(--ink);font-family:var(--font-sans);cursor:pointer}
+.st-tile:active{background:var(--press)}
+.st-tile-name{font-size:16px;line-height:22px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.st-tile-sub{font-size:13px;line-height:18px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.st-tile-todo{display:flex;align-items:baseline;gap:6px;height:28px;margin-top:14px;white-space:nowrap}
+.st-tile-todo b{font:400 26px/28px var(--font-mono);letter-spacing:-.5px;color:var(--ink)}
+.st-tile-todo span{font-size:13px;color:var(--muted)}
+.st-tile-todo[data-none] b,.st-tile-todo[data-done] b{font:500 16px/28px var(--font-sans);letter-spacing:0;color:var(--ink-2)}
+.st-tile-todo[data-done]{align-items:center}
+.st-tile-todo[data-done] svg{width:15px;height:15px;flex:none;color:var(--ink-2)}
+.st-tile-todo[data-next] b{color:var(--ink-2)}
+.st-tile-todo .st-tile-also[data-tone="act"]{color:var(--red-ink)}
+.st-tile-run{display:block;margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+.st-tile-segs{display:flex;gap:3px;height:6px}
+.st-tile-segs i{flex:1;border-radius:2px;background:var(--well)}
+.st-tile-segs i[data-on]{background:var(--ink-2)}
+.st-tile-segs i[data-over]{background:var(--red)}
+.st-tile-day{display:block;margin-top:6px;font-size:13px;line-height:18px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:370px){.st-tile{padding:12px}.st-tile-name{font-size:15px}}
+
+/* WeekBoard: a week of work, one line per task, a count per day (components/WeekBoard/README.md). */
+.st-week{position:relative;padding:4px 14px 6px;background:var(--paper);border:1px solid var(--line);border-radius:var(--radius-panel);font-family:var(--font-sans);color:var(--ink)}
+.st-week-days,.st-week-row{display:grid;grid-template-columns:36px 1fr;gap:4px;align-items:center}
+.st-week-days{position:relative;z-index:1}
+.st-week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.st-week-day{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:44px;color:var(--muted);font:500 11px var(--font-sans)}
+.st-week-day b{font:400 15px/1.2 var(--font-mono);color:var(--ink)}
+.st-week-day[data-past] b{color:var(--muted)}
+.st-week-day[data-today] b{display:inline-flex;width:28px;height:28px;align-items:center;justify-content:center;border:2px solid var(--ink);border-radius:14px}
+.st-week-type{position:relative;z-index:1;border-top:1px solid var(--line)}
+.st-week-type-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding:12px 0 4px}
+.st-week-type-head span{font:600 14px var(--font-sans);color:var(--ink)}
+.st-week-type-head small{font:400 13px var(--font-sans);color:var(--muted)}
+.st-week-row{min-height:48px;position:relative;z-index:1;width:100%;padding:0;border:0;background:none;text-align:left;font:inherit;color:inherit;cursor:pointer;border-radius:8px}
+.st-week-row:active{background:var(--press)}
+.st-week-batch{font:500 13px var(--font-sans);font-variant-numeric:tabular-nums;letter-spacing:-.3px;color:var(--ink);white-space:nowrap;overflow:hidden}
+.st-week-cell{height:30px;border-radius:6px;display:flex;align-items:center;justify-content:center;font:500 13px var(--font-mono);color:var(--ink);position:relative;min-width:0}
+.st-week-cell[data-kind="done"]{background:var(--well);color:var(--ink-2)}
+.st-week-cell[data-kind="today"]{background:var(--ink-2);color:var(--paper)}
+.st-week-cell[data-kind="plan"]{border:1.5px solid var(--ink-2)}
+.st-week-cell[data-kind="est"]{border:1.5px dashed var(--ink-2);color:var(--ink-2)}
+.st-week-cell[data-kind="wait"]{border:1.5px solid var(--line);color:var(--muted)}
+.st-week-cell[data-kind="nil"]{background:var(--well);color:var(--muted)}
+.st-week-cell[data-kind="late"]{border:1.5px solid var(--red);color:var(--ink)}
+.st-week-cell[data-kind="latedone"]{background:var(--well);border:1.5px solid var(--red);color:var(--ink-2)}
+.st-week-cell[data-cont]{border-top-right-radius:0;border-bottom-right-radius:0}
+.st-week-cell[data-cont]::after{content:"";position:absolute;right:3px;top:50%;margin-top:-5px;border-left:5px solid currentColor;border-top:5px solid transparent;border-bottom:5px solid transparent}
+.st-week-cell[data-from]{border-top-left-radius:0;border-bottom-left-radius:0}
+.st-week-cell[data-from]::before{content:"";position:absolute;left:3px;top:50%;margin-top:-5px;border-right:5px solid currentColor;border-top:5px solid transparent;border-bottom:5px solid transparent}
+.st-week-today{position:absolute;top:4px;bottom:6px;background:var(--press);border-radius:8px;pointer-events:none;z-index:0}
+.st-week-band{position:relative;z-index:1;display:flex;align-items:center;gap:10px;margin:12px -14px 0;padding:12px 14px 4px;border-top:1px solid var(--line)}
+.st-week-band+.st-week-type{border-top:0}
+.st-week-band-icon{width:28px;height:28px;border-radius:8px;background:var(--row-icon-bg);display:flex;align-items:center;justify-content:center;color:var(--ink-2)}
+.st-week-band-icon svg{width:16px;height:16px}
+.st-week-band b{font:600 15px var(--font-sans);color:var(--ink)}
+.st-week-none{margin:0;padding:12px 0 8px;color:var(--muted);font:400 13px var(--font-sans);position:relative;z-index:1}
+.st-week-none[data-week]{border-top:1px solid var(--line);padding:16px 0 10px}
+.st-week-key{padding:0}
+.st-week-key-row{display:grid;grid-template-columns:48px 1fr;gap:12px;align-items:center;padding:10px 14px;min-height:52px}
+.st-week-key-row+.st-week-key-row{border-top:1px solid var(--line)}
+.st-week-key-row .st-week-grid[data-one]{grid-template-columns:1fr}
+.st-week-key-row strong{display:block;font:500 15px var(--font-sans);color:var(--ink)}
+.st-week-key-row small{display:block;font:400 13px var(--font-sans);color:var(--muted)}
+
+/* The header owns the 24px under it: the body's first element brings no top margin of its own (a field's, a note's, a banner's).
+   Last in the file, so a part's own margin rule of the same weight does not win here. */
+.sheet>.sheet-body>:first-child,.sheet>.sheet-body>:first-child>:first-child{margin-top:0}
+
+/* ChoiceList: a group heading may lead with an icon (2026-10-17), as Heading's section titles do. */
+/* With an icon, the heading starts at the card edge, as Heading's section titles do on the Actions page. */
+.st-choice-heading.st-choice-heading:has(> svg) { display: flex; align-items: center; gap: 6px; padding-left: 0; }
+.st-choice-heading > svg { width: 16px; height: 16px; flex: none; }
+
+/* Row · select: fill:false (a box whose tick doesn't tint its cell; the Inspection pen header, owner 2026-10-18). */
+.st-row[data-variant="select-door"][data-fill="none"]:has(input:checked){background:transparent}
+/* Row · Animal · group (owner, 2026-10-18): animals without an ID as one row. The name ("14 pigs") leads with a muted glyph and is
+   sans, the tags take the context line, the door has no chevron, and a 48px count field ends the row: idle (not ticked) its
+   number is ink-2 at 500, which holds 7:1 at 17px. The padding keeps the Animal row's height. */
+.st-row[data-group] .st-animal-body{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:2px;min-width:0}
+.st-row[data-group] .st-animal-left{width:auto}
+.st-row[data-group] .st-animal-id{font-family:var(--font-sans);font-weight:600}
+.st-row[data-group] .st-animal-id>svg{display:inline-block;width:18px;height:18px;margin-right:6px;vertical-align:-3px;color:var(--st-muted,var(--muted))}
+.st-row[data-group] .st-animal-tags{justify-content:flex-start;width:100%}
+.st-row[data-group] .st-row-chevron{display:none}
+.st-row[data-variant="select-door"][data-group] .st-row-door.st-row-door{padding-top:8px;padding-bottom:8px}
+.st-row-count{flex:none;display:flex;align-items:center;padding-right:6px}
+.st-row-count input{width:52px;height:48px;box-sizing:border-box;margin:0;padding:0;border:1px solid var(--control-border,var(--line));border-radius:var(--radius-10);background:var(--paper,#fff);color:var(--ink);font:600 17px/1 var(--font-sans);text-align:center}
+.st-row-count[data-idle] input{color:var(--ink-2);font-weight:500}
 
 </style>
 <style>/* ../../../design-system/components/task-skeleton.css */
@@ -1514,7 +1786,9 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 .tk-statusbar-icons svg { width: 16px; height: 16px; stroke-width: 2; }
 /* The task surface under the status bar: header, the one scroller, and the dock. */
 .tk-screen { flex: 1; min-height: 0; display: flex; flex-direction: column; }
-.tk-scroll { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; background: var(--app-background); }
+.tk-scroll { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; background: var(--app-background); }
+/* the phone scrolls by touch: no desktop scrollbar takes width inside it (L27; the same law as bundle.css .device scrollers) */
+.tk-scroll::-webkit-scrollbar { display: none; width: 0; height: 0; }
 
 /* ---- TaskHeader: the page header (SentriUI.pageHeader, bundle.css .st-page-header) ---- */
 
@@ -1699,12 +1973,16 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 .tk-day-head > strong { font: 700 var(--type-row-title-size)/1.25 var(--font-sans); color: var(--ink); }
 .tk-day-head > span { font: var(--type-meta-size)/1.3 var(--font-mono); color: var(--muted); }
 
-/* TaskDock unit: the labelled place control (B1 / Go to pen). */
+/* TaskDock unit: the labelled place control (frameless, with a caption) or, framed, farrowing's Pen map: the IconButton frame around the icon and a label. */
 .tk-dock-unit { flex: none; display: flex; align-items: center; gap: 9px; min-height: var(--footer-height); margin: 0; padding: 0 3px; border: 0; background: var(--paper); color: var(--ink); text-align: left; }
 .tk-dock-unit > svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .tk-dock-unit > span { display: flex; flex-direction: column; gap: 4px; }
 .tk-dock-unit strong { font: 600 var(--type-row-title-size)/1.2 var(--font-mono); }
 .tk-dock-unit small { font: var(--type-dock-caption-size)/1.2 var(--font-sans); color: var(--muted); }
+.tk-dock-unit[data-framed] { gap: var(--space-8); padding: 0 var(--space-14); border: var(--border-width) solid var(--line); border-radius: var(--radius-control); white-space: nowrap; }
+.tk-dock-unit[data-framed] strong { font: 600 var(--type-dock-caption-size)/1.2 var(--font-sans); }
+.tk-dock-unit[data-framed]:active { background: var(--press); transform: translateY(var(--size-2)); }
+@media (prefers-reduced-motion: reduce) { .tk-dock-unit[data-framed]:active { transform: none; } }
 
 /* TaskDoors: flat door rows, or (card) a section title with its icon and one card of icon doors (the Pen page). */
 .tk-doors[data-card] { display: flex; flex-direction: column; gap: var(--space-heading); }
@@ -1712,21 +1990,6 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 
 @media (prefers-reduced-motion: reduce) { .tk-summary-task { transition: none; } }
 
-/* ---- TaskChips (candidate): one row of filter chips over a task list (README: TaskChips/README.md) ----
-   Farrowing's segment faces on separate chips: a `well` chip with a 1px `line`, `radius-segment`; the chosen chip is the
-   pressed segment (`paper`, `ink` 500, the segment shadow). 48px targets; the count in mono inside the chip. The track
-   scrolls sideways; a trailing spacer the gutter's width keeps the last chip clear of the edge fade. */
-.tk-chips { padding: 6px 0 9px; background: var(--app-background); }
-.tk-chips-track { display: flex; gap: var(--space-key-gap); overflow-x: auto; padding: 0 0 0 var(--space-gutter); scrollbar-width: none;
-  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - var(--space-gutter)), transparent); mask-image: linear-gradient(to right, #000 calc(100% - var(--space-gutter)), transparent); }
-.tk-chips-track::-webkit-scrollbar { display: none; }
-.tk-chips-track::after { content: ""; flex: none; width: var(--space-gutter); }
-.tk-chips-chip { flex: none; display: inline-flex; align-items: center; gap: var(--space-key-gap); min-height: var(--tap-min); margin: 0; padding: 0 var(--space-row-x);
-  border: 1px solid var(--line); border-radius: var(--radius-segment); background: var(--well); color: var(--tab-ink);
-  font: 400 var(--type-row-title-size)/1.2 var(--font-sans); white-space: nowrap; cursor: pointer; }
-.tk-chips-chip[aria-checked="true"] { background: var(--paper); color: var(--ink); font-weight: 500; box-shadow: 0 1px 3px #20271f0d; }
-.tk-chips-count { font: 500 var(--type-meta-size)/1 var(--font-mono); color: var(--muted); }
-.tk-chips-chip:active { background: var(--press); }
 .tk-radios .st-choice-row[data-mode="radio"][aria-checked="true"] .st-choice-label,.tk-radios[data-face="row"] .st-choice-inline-opt[aria-checked="true"]{font-weight:var(--type-weight-strong)}
 
 </style>
@@ -1849,7 +2112,7 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 <main class="tk-phone inspection-phone" data-ds="TaskPhone" data-st-context="page" id="phone"></main>
 <aside class="sp-demo" id="demo"></aside>
 <script>/* ../../../design-system/components/bundle.js */
-/* @ds-bundle: {"format":4,"namespace":"SentriUI","components":[{"name":"Heading"},{"name":"Panel"},{"name":"Facts"},{"name":"Row"},{"name":"Log"},{"name":"Segment"},{"name":"IconButton"},{"name":"Button"},{"name":"Field"},{"name":"PickerField"},{"name":"ChoiceList"},{"name":"CategoryFooter"},{"name":"Sheet"},{"name":"FilterSheet"},{"name":"RangeSlider"},{"name":"Icon"},{"name":"Stepper"},{"name":"Measure"},{"name":"Numpad"},{"name":"Status"},{"name":"ConditionTag"},{"name":"Banner"},{"name":"Photos"}]} */
+/* @ds-bundle: {"format":4,"namespace":"SentriUI","components":[{"name":"Heading"},{"name":"Panel"},{"name":"Facts"},{"name":"Row"},{"name":"Log"},{"name":"Segment"},{"name":"IconButton"},{"name":"Button"},{"name":"Field"},{"name":"PickerField"},{"name":"ChoiceList"},{"name":"CategoryFooter"},{"name":"Sheet"},{"name":"FilterSheet"},{"name":"RangeSlider"},{"name":"PenMap"},{"name":"TaskTile"},{"name":"WeekBoard"},{"name":"Icon"},{"name":"Stepper"},{"name":"Measure"},{"name":"Numpad"},{"name":"Status"},{"name":"ConditionTag"},{"name":"Banner"},{"name":"Photos"}]} */
 /* SentriIcons (sentri-icons.js) and the SentriUI parts, in one file. */
 /* Shared icon registry for the Sentri prototypes. One path vocabulary so every
    app renders the same glyphs; apps keep a local fallback for source-only checks. */
@@ -1862,6 +2125,8 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
     hospital:'M13 3h8v18h-8M17 3v18M13 7h8M13 17h8M2 12h12M9 8l5 4-5 4',
     profile:'M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0M4 21v-2a8 8 0 0 1 16 0v2',
     chart:'M4 20V10M12 20V4M20 20v-7',
+    production:'M6 19V9m6 10V4m6 15v-6',
+    care:'M9 3h6v6h6v6h-6v6H9v-6H3V9h6z',
     back:'M15 5l-7 7 7 7M8 12h13',
     chevron:'M9 5l7 7-7 7',
     up:'M15 5l-7 7 7 7',
@@ -1887,16 +2152,19 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
     camera:'M3 7h4l2-3h6l2 3h4v14H3zM16 13a4 4 0 1 1-8 0 4 4 0 0 1 8 0',
     edit:'M4 20l4-1L20 7l-4-4L4 15zM13 6l4 4',
     wrench:'M14 3a6 6 0 0 0-7 8L2 16a3 3 0 0 0 4 4l5-5a6 6 0 0 0 8-7l-4 4-3-3 4-4z',
-    details:'M4 6h16M4 12h16M4 18h16M8 3v6M16 9v6M10 15v6',
+    details:'M4 6h16M4 12h16M4 18h16M8 3v6M16 9v6M10 15v6',info:'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 11v6M12 7.5v.5',
     calendar:'M4 5h16v16H4zM8 3v4M16 3v4M4 10h16',
-    bookmark:'M6 3h12v18l-6-4-6 4z',tag:'M3.5 4.5v6.3a1 1 0 0 0 .3.7l8.7 8.7a1.5 1.5 0 0 0 2.1 0l5.6-5.6a1.5 1.5 0 0 0 0-2.1L11.5 3.8a1 1 0 0 0-.7-.3H4.5a1 1 0 0 0-1 1zM8 8h.01',
+    bookmark:'M6 3h12v18l-6-4-6 4z',tag:'M3.5 4.5v6.3a1 1 0 0 0 .3.7l8.7 8.7a1.5 1.5 0 0 0 2.1 0l5.6-5.6a1.5 1.5 0 0 0 0-2.1L11.5 3.8a1 1 0 0 0-.7-.3H4.5a1 1 0 0 0-1 1zM8 8h.01','tag-off':'M3.5 4.5v6.3a1 1 0 0 0 .3.7l8.7 8.7a1.5 1.5 0 0 0 2.1 0l5.6-5.6a1.5 1.5 0 0 0 0-2.1L11.5 3.8a1 1 0 0 0-.7-.3H4.5a1 1 0 0 0-1 1zM3 3l18 18',pig:'M5 12.5a5 4.5 0 0 1 5-4.5h5a4.5 4.5 0 0 1 4.3 3.2H21v3.3h-1.7a4.5 4.5 0 0 1-2.3 2.3V19h-2.2v-2h-5.6v2H7v-2.4a4.5 4.5 0 0 1-2-4.1zM16.5 10.6h.01M5 12.5H3.5',lungs:'M12 4v7.5M12 11.5l-2.5 2M12 11.5l2.5 2M9.5 7.5C6.6 7.5 4.5 11.4 4.5 15.4c0 2.2 1 3.6 2.8 3.6 1.6 0 2.7-1 2.7-2.8V10M14.5 7.5c2.9 0 5 3.9 5 7.9 0 2.2-1 3.6-2.8 3.6-1.6 0-2.7-1-2.7-2.8V10',head:'M7.5 8.5 5.5 4l4.3 2.4M16.5 8.5 18.5 4l-4.3 2.4M6 13.5a6 6 0 1 0 12 0 6 6 0 1 0-12 0M9.8 15.2h4.4a1 1 0 0 1 1 1v.6a1 1 0 0 1-1 1H9.8a1 1 0 0 1-1-1v-.6a1 1 0 0 1 1-1zM10 11.5h.01M14 11.5h.01',skin:'M4 8.5c2.7-1.8 5.3 1.8 8 0s5.3-1.8 8 0M4 13c2.7-1.8 5.3 1.8 8 0s5.3-1.8 8 0M4 17.5c2.7-1.8 5.3 1.8 8 0s5.3-1.8 8 0',leg:'M10 3.5v10.5l-2.2 5.5h3.4l.8-2.6.8 2.6h3.4L14 14V3.5',tail:'M4.5 12.5h6.5c2.2 0 4 1.6 4 3.6 0 1.5-1.1 2.6-2.4 2.6-1.1 0-1.9-.8-1.9-1.8 0-1.6 1.6-2.5 3.3-2.5 2.6 0 4.5 1.9 4.5 4.1M4.5 8.5h11',gut:'M8 4.5h8a2.8 2.8 0 0 1 0 5.6H8a2.8 2.8 0 0 0 0 5.6h8a2.8 2.8 0 0 1 0 5.6',repro:'M12 4a4.8 4.8 0 1 0 0 9.6A4.8 4.8 0 1 0 12 4M12 13.6V21M8.8 17.6h6.4',drop:'M12 3.5c3 4 6 7 6 10.8a6 6 0 0 1-12 0C6 10.5 9 7.5 12 3.5z',bone:'M9.2 9.2l5.6 5.6M8 10.4a2.3 2.3 0 1 1-2.4-3.9 2.3 2.3 0 1 1 3.9-2.4M16 13.6a2.3 2.3 0 1 1 2.4 3.9 2.3 2.3 0 1 1-3.9 2.4',
     transfer:'M7 7h11l-3-3M18 7l-3 3M17 17H6l3-3M6 17l3 3',
     down:'m6 9 6 6 6-6',
+    'arrow-down':'M12 5v14M6 13l6 6 6-6',
     'trend-down':'M3 6l7 7 4-4 7 7M21 11v5h-5',
     place:'M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0M15 10a3 3 0 1 1-6 0 3 3 0 0 1 6 0',
     home:'m3 10 9-7 9 7v11h-6v-7H9v7H3z',
     toolbox:'M3 8h18v12H3zM8 8V4h8v4M3 13h18M10 12v3h4v-3',
     spark:'m12 3 2.4 6.6L21 12l-6.6 2.4L12 21l-2.4-6.6L3 12l6.6-2.4z',
+    pill:'M10.5 20.5a4.95 4.95 0 0 1-7-7l6-6a4.95 4.95 0 0 1 7 7zM8.5 8.5l7 7',
+    bug:'M8 10a4 4 0 0 1 8 0v4a4 4 0 0 1-8 0zM12 10v8M8 12H4M16 12h4M8 16l-3 2M16 16l3 2M8.5 8 6 6M15.5 8 18 6M10 6 9 3M14 6l1-3',
     heat:'M12 3c1 5-4 5-4 9 0 2 2 3 3 3-1-3 3-4 3-7 4 4 6 7 4 10-2 4-9 4-12 0-3-5 3-10 6-15z',
     pregnancy:'M3 15h4l3-8 4 12 3-7h4M3 4h18',
     farrow:'M3 12h4l3-7 4 14 3-7h4',
@@ -1909,7 +2177,8 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
     air:'M3 8h12a3 3 0 1 0-3-3M3 12h16a3 3 0 1 1-3 3M3 16h5',
     upload:'M12 16V4m-4 4 4-4 4 4M4 15v6h16v-6',
     backspace:'M9 5h12v14H9l-6-7zM12 9l6 6M18 9l-6 6',
-    offline:'m3 3 18 18M4 9a13 13 0 0 1 2-1M10 6a14 14 0 0 1 10 3M7 13a8 8 0 0 1 3-1M14 12a8 8 0 0 1 3 1M10 17a3 3 0 0 1 4 0M12 21h.01'
+    offline:'m3 3 18 18M4 9a13 13 0 0 1 2-1M10 6a14 14 0 0 1 10 3M7 13a8 8 0 0 1 3-1M14 12a8 8 0 0 1 3 1M10 17a3 3 0 0 1 4 0M12 21h.01',
+    stop:'M8.5 6.5h7a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-7a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2z'
   };
   const aliases=Object.freeze({origin:'place',arrow:'chevron',condition:'plus'});
   // Compatibility aliases do not add duplicate glyphs to the enumerable registry.
@@ -1973,12 +2242,35 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
       const v=i.value==null||i.value===''?'—':i.value;
       return i.mono?`<span class="st-fact-id">${esc(v)}</span>`:esc(v);
     };
-    const lead=i=>i.action?`<button type="button" class="st-fact-link" data-action="${esc(i.action)}" data-value="${esc(i.value_||'')}"${i.ariaLabel?` aria-label="${esc(i.ariaLabel)}"`:''}>${tx(i.label,i,'label')}${arrow}</button>`:tx(i.label,i,'label');
+    const lead=i=>tx(i.label,i,'label'); // Facts never act: a fact that opens something is a Row
     const rec=variant==='record';
     return `<dl class="${rec?'':'st-panel '}st-facts ${esc(className)}" data-ds="Facts" data-columns="${cols}"${variant?` data-variant="${esc(variant)}"`:''}>${items.map(i=>`<div class="st-fact${i.inline?' st-fact-inline':''}"><dt>${lead(i)}</dt><dd>${valueOf(i)}</dd>${i.meta||has(i,'meta')?`<small>${tx(i.meta,i,'meta')}</small>`:''}</div>`).join('')}</dl>`;
   }
   function rowGroup(content,{title='',level=5,className='',strs,args}={}){
     return panel((title||has({strs},'title')?heading({title,kind:'group',level,className:'st-row-group-label',strs,args}):'')+content,{className:'st-row-group '+className,ds:'Row'});
+  }
+  /* Row tile (owner, 2026-10-19): one action as an icon well over one word, for the grid of everyday verbs in More actions.
+     The word is the short verb ("Treat"); the accessible name always contains that word (label in name: voice control says what it sees):
+     it is the full action name when that holds the word as a whole word ("Add a note"), else the word, then the full name ("Condition, Disease or symptom", "Treat, Record treatment"). tone 'danger' is
+     the one irreversible verb (Death): red ink on its well and word, nothing louder. */
+  function rowTile({label,title='',icon='',action='',value='',tone='',attrs={},className=''}={}){
+    const word=new RegExp('(^|[^\\p{L}\\p{N}])'+String(label).replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'($|[^\\p{L}\\p{N}])','iu');
+    const holds=/\p{Script=Han}/u.test(String(label))?String(title).includes(String(label)):word.test(String(title)); // Chinese has no spaces: containment is the word test
+    const danger=tone==='danger',name=title&&!holds?label+', '+title:(title||label);
+    return `<button type="button" class="st-row-tile${danger?' is-danger':''}${className?' '+esc(className):''}" data-ds="Row" data-variant="tile" data-action="${esc(action)}" data-value="${esc(value)}" aria-label="${esc(name)}"${safeAttr(attrs)}><span class="st-row-tile-icon" aria-hidden="true">${icon}</span><span class="st-row-tile-label">${esc(label)}</span></button>`;
+  }
+  /* The tile grid: one panel, always two rows (one only for a single tile), split evenly so row two is never short by more than one
+     (5 = 3+2, 6 = 3+3, 8 = 4+4, 10 = 5+5), at most five across. Danger tiles never fold and are always the last tile. Over ten,
+     nine show and `more` (a tile that opens the rest in place) sits just before the danger tiles; `expanded` shows them all in
+     even rows of at most five (11 = 4+4+3). */
+  function rowGrid(tiles=[],{more=null,expanded=false,label='',className=''}={}){
+    const calm=tiles.filter(t=>t.tone!=='danger'),danger=tiles.filter(t=>t.tone==='danger'),ordered=[...calm,...danger];
+    const folded=ordered.length>10&&!expanded&&!!more,shown=folded?[...calm.slice(0,Math.max(0,9-danger.length)),...danger]:ordered,slots=shown.length+(folded?1:0);
+    if(!slots)return '';
+    const rows=slots<2?1:Math.max(2,Math.ceil(slots/5)),cols=Math.ceil(slots/rows);
+    const moreTile=folded?rowTile(Object.assign({label:'More',title:`${ordered.length-9} more actions`,icon:SentriIcons.icon('more')},more)):'';
+    const calmShown=shown.filter(t=>t.tone!=='danger'),dangerShown=shown.filter(t=>t.tone==='danger');
+    return `<div class="st-panel st-row-grid${className?' '+esc(className):''}" data-ds="Row" role="group"${label?` aria-label="${esc(label)}"`:''} style="--st-row-grid-cols:${cols}">${calmShown.map(rowTile).join('')}${moreTile}${dangerShown.map(rowTile).join('')}</div>`;
   }
   /* Row family: button or inert row, select label and sibling door + act targets.
      All variants share the copy renderer, Status chips and token-based layout. */
@@ -2016,18 +2308,22 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
     return `<${tag} class="st-row ${esc(className)}" data-ds="Row" data-variant="${esc(variant)}"${id?` id="${esc(id)}"`:''}${action?` type="button" data-action="${esc(action)}" data-value="${esc(value)}"${disabled?' disabled aria-disabled="true"':''}`:''}${wrap?' data-wrap=""':''}${safeAttr(attrs)}>${rowMark(mark)}${icon&&!code&&variant==='navigation'?`<span class="st-row-icon">${icon}</span>`:''}${code?`<span class="st-row-identity">${c.codeHtml}${rowChip(chip,trailing,'Row')}</span>`:c.codeHtml}<span class="st-row-copy">${c.strong()}${c.small}</span>${code?'':rowChip(chip,trailing,'Row')}${trailHtml}${railHtml}</${tag}>`;
   }
   /* rowSelect: the select + door variant without the door (a select-only list): the whole row is a <label>, leading box. Payload is change-only: rowSelectChange(event) → { value, checked }. */
-  function rowSelect({title,description='',code='',mono=false,chip=null,wrap=false,tight=false,checked=false,action='select',value='',id='',className='',attrs={},strs,args,inputAttrs={},disabled=false,reason=''}={}){
+  function rowSelect({title,description='',code='',mono=false,chip=null,wrap=false,tight=false,checked=false,action='select',value='',id='',className='',attrs={},strs,args,inputAttrs={},disabled=false,reason='',fill=true}={}){
     if(disabled) description=reason||description||'Unavailable — try again later';
     const o={strs,args},c=rowCopy({title,description,code,mono,tight,o});
-    return `<label class="st-row ${esc(className)}" data-ds="Row" data-variant="select-door" data-select=""${id?` id="${esc(id)}"`:''}${wrap?' data-wrap=""':''}${safeAttr(attrs)}><span class="st-choice-trail"><input type="checkbox"${action?` data-action="${esc(action)}"`:''} value="${esc(value)}"${checked?' checked':''}${disabled?' disabled':''}${safeAttr(inputAttrs)}></span>${title||description||code?`${code?`<span class="st-row-identity">${c.codeHtml}${rowChip(chip,'','Row')}</span>`:c.codeHtml}<span class="st-row-copy">${c.strong()}${c.small}</span>${code?'':rowChip(chip,'','Row')}`:''}</label>`;
+    return `<label class="st-row ${esc(className)}" data-ds="Row" data-variant="select-door" data-select=""${fill?'':' data-fill="none"'}${id?` id="${esc(id)}"`:''}${wrap?' data-wrap=""':''}${safeAttr(attrs)}><span class="st-choice-trail"><input type="checkbox"${action?` data-action="${esc(action)}"`:''} value="${esc(value)}"${checked?' checked':''}${disabled?' disabled':''}${safeAttr(inputAttrs)}></span>${title||description||code?`${code?`<span class="st-row-identity">${c.codeHtml}${rowChip(chip,'','Row')}</span>`:c.codeHtml}<span class="st-row-copy">${c.strong()}${c.small}</span>${code?'':rowChip(chip,'','Row')}`:''}</label>`;
   }
   /* rowSelectDoor: a list that both selects (a bulk act) and opens. Two sibling targets, none nested: the checkbox (48px hit area,
      the same box as rowSelect) toggles; the door (copy + ›) opens. contentHtml: trusted markup in place of the title/description copy. */
-  function rowSelectDoor({title='',description='',code='',mono=false,wrap=false,tight=false,checked=false,action='select',value='',openAction='open',openValue='',label='',id='',className='',doorClass='',attrs={},strs,args,inputAttrs={},contentHtml='',right=null,contextWidth=''}={}){
+  function rowSelectDoor({title='',description='',code='',mono=false,wrap=false,tight=false,checked=false,action='select',value='',openAction='open',openValue='',label='',id='',className='',doorClass='',attrs={},strs,args,inputAttrs={},contentHtml='',right=null,contextWidth='',lead='',count=null}={}){
     const o={strs,args},c=rowCopy({title,description,code,mono,tight,o});
     const an=right?animalBody({code,description,right,contextWidth,tight,o}):null;
+    /* Group (an Animal row for animals without an ID, owner 2026-10-18): a lead glyph before the name, the tags on the line under it,
+       and a count field after the door, always there, so the row keeps the Animal row's height ticked or not. */
+    if(an&&lead)an.html=an.html.replace('<strong class="st-animal-id">','<strong class="st-animal-id">'+(root.SentriIcons?root.SentriIcons.icon(lead):''));
+    const countHtml=count?`<label class="st-row-count"${count.idle?' data-idle=""':''}><input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" value="${esc(String(count.value??''))}"${safeAttr(count.attrs||{})}></label>`:'';
     const copy=contentHtml||(an?an.html:'')||`${c.codeHtml}<span class="st-row-copy">${c.strong()}${c.small}</span>`;
-    return `<div class="st-row ${esc(className)}" data-ds="Row" data-variant="select-door"${an?` data-animal="${an.kind}"`:''} data-select=""${id?` id="${esc(id)}"`:''}${wrap?' data-wrap=""':''}${safeAttr(attrs)}><label class="st-choice-trail"><input type="checkbox"${action?` data-action="${esc(action)}"`:''} value="${esc(value)}"${checked?' checked':''}${safeAttr(inputAttrs)}></label><button type="button" class="st-row-door ${esc(doorClass)}" data-action="${esc(openAction)}" data-value="${esc(openValue)}"${label?` aria-label="${esc(label)}"`:''}>${copy}<span class="st-row-chevron">${arrow}</span></button></div>`;
+    return `<div class="st-row ${esc(className)}" data-ds="Row" data-variant="select-door"${an?` data-animal="${an.kind}"`:''}${count?' data-group=""':''} data-select=""${id?` id="${esc(id)}"`:''}${wrap?' data-wrap=""':''}${safeAttr(attrs)}><label class="st-choice-trail"><input type="checkbox"${action?` data-action="${esc(action)}"`:''} value="${esc(value)}"${checked?' checked':''}${safeAttr(inputAttrs)}></label><button type="button" class="st-row-door ${esc(doorClass)}" data-action="${esc(openAction)}" data-value="${esc(openValue)}"${label?` aria-label="${esc(label)}"`:''}>${copy}<span class="st-row-chevron">${arrow}</span></button>${countHtml}</div>`;
   }
   function rowSelectChange(ev){
     const t=ev&&ev.target;
@@ -2104,16 +2400,12 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
     };
     return mark(panel(nonempty.map(g=>`<section class="st-log-group">${g.label||has(g,'label')?heading({title:g.label,kind:'group',description:g.description||'',strs:has(g,'label')||has(g,'description')?{title:g.strs.label,description:g.strs.description}:undefined,args:g.args&&(g.args.label||g.args.description)?{title:g.args.label,description:g.args.description}:undefined}):''}<ol class="st-log-entries">${g.entries.map(entry).join('')}</ol></section>`).join(''),{className:'st-log '+className,ds:'Log'}));
   }
-  /* strs.back = the Back text; categories[i].strs.label = each tab. The nav aria-label stays plain text. backAction false: no Back
-     (on a page, whose Back is in its page header; Headers law, 2026-10-13); with no categories either, it returns ''. */
-  function categoryFooter({categories=[],active='',backAction='back',categoryAction='action-category',label='Action categories',className='',strs,args}={}){
-    const current=categories.some(c=>c.id===active)?active:categories[0]?.id;
-    if(backAction===false&&!categories.length)return '';
-    return `<footer class="sheet-footer st-category-footer ${esc(className)}" data-ds="CategoryFooter"${backAction===false?' data-back="none"':''}>${backAction===false?'':backButton({action:backAction,label:strs&&strs.back?{text:'Back',str:strs.back,args:args&&args.back}:'Back'})}<nav class="st-category-tabs action-category-nav" aria-label="${esc(label)}">${categories.map(c=>`<button type="button" data-action="${esc(categoryAction)}" data-value="${esc(c.id)}" aria-current="${c.id===current?'location':'false'}">${tx(c.label,c,'label')}</button>`).join('')}</nav></footer>`;
-  }
   const chevron=root.SentriIcons.icon('chevron');
   const check=root.SentriIcons.icon('check');
-  function field({label='',control='',className='',ds='Field',variant='text',value='',unit='',hint='',error='',disabled=false,reason='',id='',placeholder='',labelHidden=false}={}){
+  /* optional: a muted "Optional" beside the label (the treatment's optional fields, owner 2026-10-16). true draws the registry word
+     (ds.field.optional); a string is the word already in the page's language. */
+  const optionalWord=on=>on===true?` <small class="st-field-optional"><span data-str="ds.field.optional">Optional</span></small>`:on?` <small class="st-field-optional">${esc(on)}</small>`:'';
+  function field({label='',control='',className='',ds='Field',variant='text',value='',unit='',hint='',error='',disabled=false,reason='',id='',placeholder='',labelHidden=false,optional=false}={}){
     const fid=id||fieldId('st-field'),hid=fid+'-hint';
     const bad=!!error||className.split(' ').includes('error');
     const message=error|| (bad?'Invalid value. Enter a valid value.':disabled?(reason||'This record cannot be edited.'):hint);
@@ -2125,12 +2417,12 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
       if(bad)attrs=attrs.replace(/\saria-invalid=["'][^"']*["']/i,'');
       return `<${tag}${attrs}${label&&!/aria-label(?:ledby)?=/.test(attrs)?` aria-labelledby="${esc(fid)}-label"`:""}${message?` aria-describedby="${esc([previous,hid].filter(Boolean).join(' '))}"`:''}${bad?' aria-invalid="true"':''}${disabled&&!/\bdisabled\b/.test(attrs)?' disabled':''}>`;
     });
-    return `<label class="field ${bad?'error ':''}${esc(className)}" data-ds="${esc(ds||'Field')}" data-variant="${esc(variant)}">${label||unit?`<span${labelHidden?' class="visually-hidden"':''} id="${esc(fid)}-label">${label}${unit?` (${esc(unit)})`:''}</span>`: ''}${control}${message?`<span class="st-field-message" id="${esc(hid)}" role="${bad?'alert':'status'}">${esc(message)}</span>`:''}</label>`;
+    return `<label class="field ${bad?'error ':''}${esc(className)}" data-ds="${esc(ds||'Field')}" data-variant="${esc(variant)}">${label||unit?`<span${labelHidden?' class="visually-hidden"':''} id="${esc(fid)}-label">${label}${unit?` (${esc(unit)})`:''}${optionalWord(optional)}</span>`: ''}${control}${message?`<span class="st-field-message" id="${esc(hid)}" role="${bad?'alert':'status'}">${esc(message)}</span>`:''}</label>`;
   }
   /* Mobile-standard choice control: a trigger button that opens a picker sheet.
      Replaces native <select>; the host app owns the picker view and state.
      strs: label (raw label wrapped in a span), display or value (the shown value), placeholder. */
-  function pickerField({label='',value='',display='',placeholder='Select',action='open-picker',key='',disabled=false,reason='',error='',loading=false,variant='single',selected=[],names=[],path=[],pressed=false,active=false,required=false,ariaLabel='',className='',strs,args}={}){
+  function pickerField({label='',value='',display='',placeholder='Select',action='open-picker',key='',disabled=false,reason='',error='',loading=false,variant='single',selected=[],names=[],path=[],pressed=false,active=false,required=false,optional=false,ariaLabel='',className='',strs,args}={}){
     const multi=variant.includes('multi'), named=multi&&names.length>0;
     /* Record forms show the chosen names in up to two lines, then +n: names are kept while they fit a two-line budget
        (about 30 characters a line at the narrowest phone; CJK counts double), so the line is never clamped mid-name; the first name is always shown. */
@@ -2139,7 +2431,7 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
     const text=named?shownNames.join(' · ')+(hiddenN?' · +'+hiddenN:''):multi?(selected.length?selected.length+' selected':'None'):path.length?path[path.length-1]:display||value;
     const more=named&&hiddenN?'+'+hiddenN:'';
     const shown=text!==''&&text!=null, id=fieldId('st-picker'), hint=error||reason||(loading?'Loading options…':'');
-    return `<div class="field st-picker-field ${esc(className)}${error?' error':''}" data-ds="PickerField" data-variant="${esc(variant)}"${required?' data-required=""':''}><span id="${id}-label">${tx(label,{strs,args},'label')}</span><button type="button" class="st-picker-trigger${shown?'':' is-placeholder'}" ${ariaLabel?`aria-label="${esc(ariaLabel)}, ${esc(shown?text:placeholder)}"`:`aria-labelledby="${id}-label ${id}-value"`} aria-haspopup="dialog" aria-expanded="${active}"${hint?` aria-describedby="${id}-hint"`:''}${error?' aria-invalid="true"':''}${disabled||loading?' aria-disabled="true"':''}${loading?' aria-busy="true"':''}${pressed?' data-preview="pressed"':''} data-action="${esc(action)}" data-picker-key="${esc(key)}"><span id="${id}-value" class="st-picker-value${named?' is-names':''}"${named?'':sa(multi?(strs?.display|| (selected.length?'ds.picker.selected':'ds.picker.none')):shown?(strs?.display||strs?.value):(strs?.placeholder||(placeholder==='Select'?'ds.picker.select':undefined)),multi?{n:selected.length,...args?.display}:args?.display||args?.value)}>${named?`<span class="st-picker-names">${esc(shownNames.join(' · '))}</span>${more?`<span class="st-picker-more">${esc(more)}</span>`:''}`:esc(shown?text:placeholder)}</span>${chevron}</button>${hint?`<span id="${id}-hint" class="st-picker-hint" role="status">${esc(hint)}</span>`:''}</div>`;
+    return `<div class="field st-picker-field ${esc(className)}${error?' error':''}" data-ds="PickerField" data-variant="${esc(variant)}"${required?' data-required=""':''}><span id="${id}-label">${tx(label,{strs,args},'label')}${optionalWord(optional)}</span><button type="button" class="st-picker-trigger${shown?'':' is-placeholder'}" ${ariaLabel?`aria-label="${esc(ariaLabel)}, ${esc(shown?text:placeholder)}"`:`aria-labelledby="${id}-label ${id}-value"`} aria-haspopup="dialog" aria-expanded="${active}"${hint?` aria-describedby="${id}-hint"`:''}${error?' aria-invalid="true"':''}${disabled||loading?' aria-disabled="true"':''}${loading?' aria-busy="true"':''}${pressed?' data-preview="pressed"':''} data-action="${esc(action)}" data-picker-key="${esc(key)}"><span id="${id}-value" class="st-picker-value${named?' is-names':''}"${named?'':sa(multi?(strs?.display|| (selected.length?'ds.picker.selected':'ds.picker.none')):shown?(strs?.display||strs?.value):(strs?.placeholder||(placeholder==='Select'?'ds.picker.select':undefined)),multi?{n:selected.length,...args?.display}:args?.display||args?.value)}>${named?`<span class="st-picker-names">${esc(shownNames.join(' · '))}</span>${more?`<span class="st-picker-more">${esc(more)}</span>`:''}`:esc(shown?text:placeholder)}</span>${chevron}</button>${hint?`<span id="${id}-hint" class="st-picker-hint" role="status">${esc(hint)}</span>`:''}</div>`;
   }
   // Shared chooser surface: flat catalogue lists or a muted inset for short choices.
   function chooserList(content,{className='',tone='flat',ds='ChoiceList'}={}){
@@ -2169,7 +2461,7 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
       return row+extra;
     });
     const search=here?choiceSearch({label:'Search in '+here.label,value:query,attrs:searchAttrs,strs:{label:'ds.picker.search_in',placeholder:'ds.picker.search_in'},args:{level:here.label}}):choiceSearch({label:'Search all options',value:query,attrs:searchAttrs,strs:{label:strs.search||'ds.picker.search',placeholder:strs.search||'ds.picker.search'}});
-    /* No breadcrumb: the sheet's header carries the level (pickerHead: "‹ Parent" and the level's title). */
+    /* No breadcrumb: the sheet's title names the level (pickerHead); the footer's Back goes up one. */
     const groups=[];
     visible.forEach((n,i)=>{const title=n.group||n.trail?.join(' › ')||'';let group=groups.find(g=>g.title===title);if(!group){group={title,rows:[]};groups.push(group);}group.rows.push(rows[i]);});
     const list=!cascade&&!q?groups.map(g=>choiceGroup(g.rows,{title:g.title})).join(''):choiceGroup(rows);
@@ -2177,23 +2469,27 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
     return `<div class="st-picker-body" data-ds="PickerField" data-variant="${esc(variant)}">${search}${content}</div>`;
   }
 
-  /* The cascade level in the sheet's header, so the body needs no breadcrumb: at the root the sheet's own title and no up
-     control; one level down, "‹ <rootLabel>" and the level's name; deeper, "‹ <parent level>" and the level's name.
-     Spread the result into sheet(): sheet({...pickerHead({…}), body, footer}). `up.value` is the path length to keep, so the
-     host's stepAction slices the path exactly as before. */
-  function pickerHead({items=[],path=[],title='',rootLabel='',stepAction='picker-step'}={}){
+  /* A drawer with levels (owner ruling B, 2026-10-16): the title names the level you are on; a ✕ at the top left closes the
+     whole drawer from any level; the footer's Back goes up one level, and at the first level it leaves (the draft is kept).
+     No "‹ Parent" in the header. Spread title, cross and rows into sheet(): sheet({...pickerHead({…}), body, footer}), and
+     hand `levelBack` to the footer: pickerFooter({back: head.levelBack}) or sheetFooter({back: head.levelBack}). Below the
+     root `levelBack` is { action: stepAction, value }: the path length to keep, so the host's stepAction slices the path
+     exactly as before; at the root it is { action: backAction } (leave). `cross` uses closeAction, which the host handles as
+     leaving (the scrim's action by default). */
+  function pickerHead({items=[],path=[],title='',stepAction='picker-step',backAction='back',closeAction='dismiss'}={}){
     let nodes=items;const steps=[];
     for(const value of path){const n=nodes.find(n=>n.value===value);if(!n?.children)break;steps.push(n);nodes=n.children;}
     const most=list=>Math.max(list.length,...list.filter(n=>n.children).map(n=>most(n.children)));
-    const rows=most(items);
-    if(!steps.length)return {title,up:null,rows};
-    const here=steps[steps.length-1],parent=steps.length>1?steps[steps.length-2]:null;
+    const rows=most(items),cross={action:closeAction,label:{text:'Close',str:'act.close'}};
+    if(!steps.length)return {title,cross,levelBack:{action:backAction},rows};
+    const here=steps[steps.length-1];
     const name=n=>n.strs?.label?{text:n.label,str:n.strs.label,args:n.args?.label}:n.label;
-    return {title:name(here),up:{label:parent?name(parent):(rootLabel||title),action:stepAction,value:String(steps.length-1)},rows};
+    return {title:name(here),cross,levelBack:{action:stepAction,value:String(steps.length-1)},rows};
   }
-  /* Back leaves and keeps the draft (pure navigation); Done confirms it. A single pick commits, so single has Back alone. */
-  function pickerFooter({selected=[],multi=false,waiting=false,backAction='back',doneAction='picker-done',strs={},args={}}={}){
-    const backBtn=backButton({action:backAction,label:strs.back?{text:'Back',str:strs.back}:{text:'Back',str:'act.back'}});
+  /* Back goes up one level (back: pickerHead().levelBack) and at the first level leaves, keeping the draft (pure navigation);
+     Done confirms it. A single pick commits, so single has Back alone. The word is always Back. */
+  function pickerFooter({selected=[],multi=false,waiting=false,back=null,backAction='back',doneAction='picker-done',strs={},args={}}={}){
+    const backBtn=backButton({action:back?.action||backAction,value:back?.value??'',label:strs.back?{text:'Back',str:strs.back}:{text:'Back',str:'act.back'}});
     if(!multi)return sheetFooter({content:backBtn,className:'st-picker-footer'});
     return sheetFooter({content:backBtn+`<button type="button" class="button primary" data-ds="Button" data-register="primary" data-action="${esc(doneAction)}"${waiting?' aria-disabled="true"':''}>${tx('Done · '+selected.length,{strs:{done:strs.done||'ds.picker.done_count'},args:{done:{n:selected.length,...args.done}}},'done')}</button>`,className:'st-picker-footer'});
   }
@@ -2217,11 +2513,11 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
   }
   // lead: optional control between heading and panel (e.g. a segment that filters only this group).
   // radio (candidate, ADR 0002): the panel is the radiogroup, labelled by the heading.
-  function choiceGroup(rows,{title='',lead='',className='',radio=false,aside='',id='',strs,args}={}){
+  function choiceGroup(rows,{title='',lead='',className='',radio=false,aside='',id='',icon='',strs,args}={}){
     const body=Array.isArray(rows)?rows.join(''):rows;
     const showTitle=title||has({strs},'title');
     const hid=radio&&showTitle?(id||fieldId('st-choice'))+'-title':'';
-    return `<section class="st-choice-group ${esc(className)}" data-ds="ChoiceList"${title?` aria-label="${esc(title)}"`:''}>${showTitle?(aside?`<div class="st-choice-heading-row"><h5 class="st-choice-heading"${hid?` id="${esc(hid)}"`:''}>${tx(title,{strs,args},'title')}</h5>${aside}</div>`:`<h5 class="st-choice-heading"${hid?` id="${esc(hid)}"`:''}>${tx(title,{strs,args},'title')}</h5>`):''}${lead?`<div class="st-choice-lead">${lead}</div>`:''}<div class="st-panel st-choice-panel"${radio?` role="radiogroup"${hid?` aria-labelledby="${esc(hid)}"`:''}`:''}>${body}</div></section>`;
+    return `<section class="st-choice-group ${esc(className)}" data-ds="ChoiceList"${title?` aria-label="${esc(title)}"`:''}>${showTitle?(aside?`<div class="st-choice-heading-row"><h5 class="st-choice-heading"${hid?` id="${esc(hid)}"`:''}>${icon?glyph(icon):''}${tx(title,{strs,args},'title')}</h5>${aside}</div>`:`<h5 class="st-choice-heading"${hid?` id="${esc(hid)}"`:''}>${icon?glyph(icon):''}${tx(title,{strs,args},'title')}</h5>`):''}${lead?`<div class="st-choice-lead">${lead}</div>`:''}<div class="st-panel st-choice-panel"${radio?` role="radiogroup"${hid?` aria-labelledby="${esc(hid)}"`:''}`:''}>${body}</div></section>`;
   }
   /* Search: the browser's cancel glyph is hidden; while there is text, a Clear text action empties it and fires `input`, so
      the host's own input handler refreshes the list. */
@@ -2230,7 +2526,10 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
     const clear=value?`<button type="button" class="st-text-action st-search-clear" data-search-clear=""><span data-str="act.clear">Clear</span></button>`:'';
     return `<label class="field catalog-search st-choice-search" data-ds="ChoiceList"><span class="st-search-box"><input type="search" aria-label="${esc(label)}"${strs.label?` data-str-attr="aria-label:${esc(strs.label)}${strs.placeholder?`;placeholder:${esc(strs.placeholder)}`:''}"${sArgs(args)}`:''} placeholder="${esc(placeholder||label)}" value="${esc(value)}"${extra}>${clear}</span></label>`;
   }
-  function choiceEmpty(text,{strs,args}={}){return `<p class="st-choice-empty" data-ds="ChoiceList" role="status">${tx(text,{strs,args},'text')}</p>`;}
+  /* Toast: what was just saved, over the page above its dock, for a few seconds. title: what was done; detail: for whom, or where it went;
+     tone 'done' (a check on the green) or 'offline' (no-signal on the ink: saved on this phone), else no glyph. */
+  function toast(title,{detail='',tone='',strs,args}={}){const glyph=tone==='done'?'check':tone==='offline'?'offline':'';return `<div class="st-toast${tone?' st-toast--'+tone:''}" data-ds="Toast" role="status">${glyph&&root.SentriIcons?`<span class="st-toast-glyph" aria-hidden="true">${root.SentriIcons.icon(glyph)}</span>`:''}<span class="st-toast-copy"><strong class="st-toast-title">${tx(title,{strs,args},'title')}</strong>${detail?`<span class="st-toast-detail">${tx(detail,{strs,args},'detail')}</span>`:''}</span></div>`}
+  function choiceEmpty(text,{strs,args,title,icon}={}){if(title)return `<div class="st-choice-empty st-choice-empty--lead" data-ds="ChoiceList" role="status">${icon&&globalThis.SentriIcons?`<span class="st-choice-empty-icon" aria-hidden="true">${globalThis.SentriIcons.icon(icon)}</span>`:''}<strong class="st-choice-empty-title">${tx(title,{strs,args},'title')}</strong><span class="st-choice-empty-text">${tx(text,{strs,args},'text')}</span></div>`;return `<p class="st-choice-empty" data-ds="ChoiceList" role="status">${tx(text,{strs,args},'text')}</p>`;}
   /* options: [value,label,{strs:{label},args:{label}}?]; label is raw HTML, kept as the span's fallback. */
   function segment({options=[],active='',action='',className='',ariaLabel='',variant='two-line-lens',state='Default',disabled=false,reason=''}={}){
     if(!options.length)return '';
@@ -2321,8 +2620,10 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
     return `<${tag} class="st-measure-box"${unitGap?'':' data-unit-gap="none"'}${attrs}><span class="st-measure-value"${vid?` id="${esc(vid)}"`:''}${live?' aria-live="polite" aria-atomic="true"':''}${sid?sa(sid,sargs):''}>${esc(shown)}</span>${unit||has(o,'unit')?`<span class="st-measure-unit"${uid?` id="${esc(uid)}"`:''}>${tx(unit,o,'unit')}</span>`:''}</${tag}>`;
   }
   /* Measure: one measured value, mono, unit always written. A button that opens the docked Numpad (active).
+     input:'system' (opt-in) draws the same box as a native text field on the phone's decimal keyboard instead: for one
+     optional value inside a form, where a pad would be heavier than the job (the Numpad stays for runs of typed values).
      range is evaluated only when the pad is closed (active false), never per keystroke. */
-  function measure({label='',optional='',value='',unit='',unitGap=true,placeholder='—',action='open-numpad',key='',active=false,controls='',range=null,tone='',changed=false,hint='',note='',id='',className='',strs,args}={}){
+  function measure({label='',optional='',value='',unit='',unitGap=true,placeholder='—',action='open-numpad',key='',active=false,controls='',range=null,tone='',changed=false,hint='',note='',id='',className='',layout='',input='',inputAttrs='',strs,args}={}){
     const o={strs,args},lid=id||fieldId('st-measure'),v=value==null?'':String(value),num=parseFloat(v);
     const out=!active&&Array.isArray(range)&&v!==''&&!Number.isNaN(num)&&(num<range[0]||num>range[1]);
     const t=tone==='refused'?'refused':tone==='warn'||out?'warn':'';
@@ -2330,10 +2631,12 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
     const lab=`<span class="st-measure-label" id="${esc(lid)}"><span${sa(o.strs&&o.strs.label,o.args&&o.args.label)}>${esc(label)}</span>${optional||has(o,'optional')?`<small>${tx(optional,o,'optional')}</small>`:''}</span>`;
     const vid=lid+'-value',uid=lid+'-unit',hid=lid+'-hint',nid=lid+'-note';
     const hasNote=!!(note||has(o,'note'));
-    const box=valueBox('button',{value:v,unit,unitGap,placeholder,active,live:active,vid,uid,attrs:` type="button" data-action="${esc(action)}" data-value="${esc(key)}" aria-labelledby="${esc(lid)} ${esc(vid)} ${esc(uid)}" aria-describedby="${esc(hid)}${hasNote?' '+esc(nid):''}" aria-expanded="${active?'true':'false'}"${controls?` aria-controls="${esc(controls)}"`:''}`},o);
+    const sys=oneOf('Measure','input',input||'pad',['pad','system'],'pad')==='system';
+    const box=sys?`<label class="st-measure-box" data-input="system"${unitGap?'':' data-unit-gap="none"'}><input class="st-measure-input" id="${esc(vid)}" type="text" inputmode="decimal" enterkeyhint="done" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="${esc(placeholder)}" value="${esc(v)}" aria-labelledby="${esc(lid)} ${esc(uid)}" aria-describedby="${esc(hid)}${hasNote?' '+esc(nid):''}" ${inputAttrs}>${unit||has(o,'unit')?`<span class="st-measure-unit" id="${esc(uid)}">${tx(unit,o,'unit')}</span>`:''}</label>`
+      :valueBox('button',{value:v,unit,unitGap,placeholder,active,live:active,vid,uid,attrs:` type="button" data-action="${esc(action)}" data-value="${esc(key)}" aria-labelledby="${esc(lid)} ${esc(vid)} ${esc(uid)}" aria-describedby="${esc(hid)}${hasNote?' '+esc(nid):''}" aria-expanded="${active?'true':'false'}"${controls?` aria-controls="${esc(controls)}"`:''}`},o);
     const hl=hintLine('st-measure-hint',{id:hid,text:hint,tone:t,o});
     const nl=hasNote?`<p class="st-field-hint st-measure-note" id="${esc(nid)}" data-tone="muted">${tx(note,o,'note')}</p>`:'';
-    return `<div class="st-measure ${esc(className)}" data-ds="Measure" data-field="${esc(key)}"${v===''?' data-empty=""':''}${active?' data-active=""':''}${t?` data-tone="${t}"`:''}${isChanged?' data-changed=""':''}>${lab}${box}${hl}${nl}</div>`;
+    return `<div class="st-measure ${esc(className)}" data-ds="Measure"${oneOf('Measure','layout',layout||'stack',['stack','row'],'stack')==='row'?' data-layout="row"':''} data-field="${esc(key)}"${v===''?' data-empty=""':''}${active?' data-active=""':''}${sys?' data-input="system"':''}${t?` data-tone="${t}"`:''}${isChanged?' data-changed=""':''}>${lab}${box}${hl}${nl}</div>`;
   }
   /* Numpad: the one type-to-set pad, for real typed input only (ear tags, weights), docked above the bar.
      1–9 · [. or a gap] 0 ⌫. No commit key: the bar's primary commits. Keys never move: the feedback region
@@ -2613,7 +2916,7 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
     const pending=list.filter(it=>it.pending).length;
     const value=count==null?(list.length?`${list.length} attached${pending?` · ${pending} waiting to upload`:''}`:''):Array.isArray(count)?count.map(x=>typeof x==='string'?x:x.text||'').join(' · '):typeof count==='object'?count.text:count;
     const blocked=disabledReason||(!active?'Record a death first · photos ride that record':full?`${max} photos at most`:'');
-    let head=optionalRow({label,value,optionalWord:optional,icon:glyph('camera'),action,key,className:'st-photos-head',attrs:{'aria-describedby':hid,...(reason||disabledReason||adding?{'aria-disabled':'true','data-reason':reason||'busy'}:{}),...(adding?{'aria-busy':'true'}:{}),...(preview?{'data-preview':preview}:{})}}).replace('<button type="button"','<button type="button" id="'+esc(pid)+'-camera"').replace('class="st-optional-row ', 'class="st-optional-row st-photos-camera ');
+    let head=optionalRow({label,value,optionalWord:optional,icon:glyph('camera'),action,key,face:'row',className:'st-photos-head',attrs:{'aria-describedby':hid,...(reason||disabledReason||adding?{'aria-disabled':'true','data-reason':reason||'busy'}:{}),...(adding?{'aria-busy':'true'}:{}),...(preview?{'data-preview':preview}:{})}}).replace('<button type="button"','<button type="button" id="'+esc(pid)+'-camera"').replace('class="st-optional-row ', 'class="st-optional-row st-photos-camera ');
     head=head.replace(`<span class="st-optional-label">${esc(label)}</span>`,`<span class="st-optional-label"${sa(s.label,a.label)}>${esc(label)}</span>`).replace(`<small class="st-optional-word">${esc(optional)}</small>`,`<small class="st-optional-word"${sa(s.optional,a.optional)}>${esc(optional)}</small>`);
     const countParts=count==null?(list.length?tx(`${list.length} attached`,{strs:{attached:'ds.c2.photos.attached'},args:{attached:{n:list.length}}},'attached')+(pending?' · '+tx(`${pending} waiting to upload`,{strs:{waiting:'ds.c2.photos.waiting'},args:{waiting:{n:pending}}},'waiting'):''):''):Array.isArray(count)?toks(count,{dot:true}):part(count);
     head=head.replace(`<span class="st-optional-answer" role="status">${esc(value||'')}</span>`,`<span class="st-optional-answer" role="status">${countParts}</span>`);
@@ -2629,11 +2932,14 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
      word, 13/700 ink-2, no container, ≥48px) · danger. waiting: the waiting face — present, quiet,
      focusable (aria-disabled, never disabled); guard() answers its tap. busy: sent, until the host settles. */
   const REGISTER={primary:'button primary',secondary:'button secondary',tool:'button tool',danger:'button danger',caution:'button caution'};
-  function button({label='',register='secondary',action='',value='',waiting=false,disabled=false,busy=false,icon='',reason='',describedby='',labelledby='',id='',attrs={},className='',strs,args}={}){
+  /* chevron (text register): the button spans the content width and ends in the row chevron, for a quiet line that opens a list ("1 closed today ›"). */
+  function button({align='',label='',register='secondary',action='',value='',waiting=false,disabled=false,busy=false,icon='',reason='',describedby='',labelledby='',id='',attrs={},className='',chevron=false,strs,args}={}){
     const o={strs,args},r=oneOf('Button','register',register,['primary','secondary','tool','text','danger','caution'],'secondary');
-    const cls=r==='text'?'st-text-action':REGISTER[r];
+    /* align (text register only): 'start' sets the word on the content edge (a Delete under a form's fields); 'end' ends it on the
+       right edge (a short word over a list). Default: centred in its 48px target. */
+    const cls=r==='text'?'st-text-action'+(align==='start'?' st-text-action--start':align==='end'?' st-text-action--end':''):REGISTER[r];
     const rid=reason?(describedby||fieldId('st-button-reason')):describedby;
-    return `<button type="button" class="${cls}${className?' '+esc(className):''}" data-ds="Button" data-register="${r}"${id?` id="${esc(id)}"`:''} data-action="${esc(action)}" data-value="${esc(value)}"${waiting||busy?' aria-disabled="true"':''}${disabled?' disabled':''}${busy?' aria-busy="true" data-busy=""':''}${rid?` aria-describedby="${esc(rid)}"`:''}${labelledby?` aria-labelledby="${esc(labelledby)}"`:''}${r==='tool'&&typeof label==='string'&&label&&!strs?` title="${esc(label)}"`:''}${safeAttr(attrs)}>${icon?`<span aria-hidden="true">${icon}</span>`:''}<span class="st-button-label">${tx(label,o,'label')}</span>${busy?'<span class="st-button-busy" aria-hidden="true">…</span>':''}</button>${reason?buttonReason({id:rid,text:reason}):''}`;
+    return `<button type="button" class="${cls}${className?' '+esc(className):''}" data-ds="Button" data-register="${r}"${chevron&&r==='text'?' data-chevron=""':''}${id?` id="${esc(id)}"`:''} data-action="${esc(action)}" data-value="${esc(value)}"${waiting||busy?' aria-disabled="true"':''}${disabled?' disabled':''}${busy?' aria-busy="true" data-busy=""':''}${rid?` aria-describedby="${esc(rid)}"`:''}${labelledby?` aria-labelledby="${esc(labelledby)}"`:''}${r==='tool'&&typeof label==='string'&&label&&!strs?` title="${esc(label)}"`:''}${safeAttr(attrs)}>${icon?`<span aria-hidden="true">${icon}</span>`:''}<span class="st-button-label">${tx(label,o,'label')}</span>${chevron&&r==='text'?`<span class="st-button-chevron" aria-hidden="true">${glyph('chevron')}</span>`:''}${busy?'<span class="st-button-busy" aria-hidden="true">…</span>':''}</button>${reason?buttonReason({id:rid,text:reason}):''}`;
   }
   /* The reason a waiting button waits, one persistent status line beside the bar (row-title size). */
   function buttonReason({text='',id='',actions=[],className='',strs,args}={}){
@@ -2779,9 +3085,11 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
      row (the sex field). Roving tab stop (radioBind moves it). An optional field clears through a visible `Clear` text
      action while a value is chosen (data-action "<action>-clear"); focus then returns to the group's tab stop. */
   const MONO_OK=/^[A-Za-z0-9 .·:/-]*$/;
-  function choiceRadios({label='',optional='',options=[],selected='',action='choose',key='',layout='rows',lead='',clear='Clear',id='',className='',disabled=false,reason='',pressed=false,labelHidden=false,strs,args}={}){
+  function choiceRadios({label='',optional='',options=[],selected='',action='choose',key='',layout='rows',face='',lead='',clear='Clear',id='',className='',disabled=false,reason='',pressed=false,labelHidden=false,strs,args}={}){
     const o={strs,args},s=strs||{},a=args||{},rid=id||fieldId('st-radios');
     const lay=oneOf('ChoiceList','layout',layout,['rows','plain','inline'],'rows');
+    /* face (inline only, opt-in): 'key' draws each option as a boxed key in the Stepper's 136px column instead of a ring and a word. */
+    const keyFace=oneOf('ChoiceList','face',face||'default',['default','key'],'default')==='key'&&lay==='inline';
     options.forEach(x=>{if(x.mono&&!MONO_OK.test(String(x.label||'')))warn('ChoiceList',`mono is for Latin and digit codes only: "${x.label}"`);});
     const chosen=options.some(x=>x.value===selected),stop=chosen?selected:(options[0]&&options[0].value);
     const isOptional=!!(optional||has(o,'optional'));
@@ -2791,8 +3099,8 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
       return choiceGroup(rows,{title:label,lead,radio:true,aside:clearBtn,id:rid,className:(lay==='plain'?'st-choice-plain ':'')+className,strs:s.label?{title:s.label}:undefined,args:a.label?{title:a.label}:undefined});
     }
     const lid=rid+'-label';
-    const opt=x=>`<button type="button" class="st-choice-inline-opt"${disabled?' aria-disabled="true"':''}${pressed&&x===options[0]?' data-preview="pressed"':''} role="radio" aria-checked="${x.value===selected?'true':'false'}" tabindex="${x.value===stop?0:-1}" data-action="${esc(action)}" data-value="${esc(x.value)}"><span class="st-radio" aria-hidden="true"></span><span${x.mono?' data-mono=""':''}>${tx(x.label,x,'label')}</span></button>`;
-    return `<div class="st-choice-inline ${esc(className)}" data-ds="ChoiceList" data-mode="radio" id="${esc(rid)}" data-field="${esc(key)}"><span class="st-choice-inline-label"><span id="${esc(lid)}"${labelHidden?' class="st-visually-hidden"':''}><span${sa(s.label,a.label)}>${esc(label)}</span>${isOptional?`<small>${tx(optional,o,'optional')}</small>`:''}</span>${isOptional?`<span class="st-choice-inline-clear">${clearBtn}</span>`:''}</span><span class="st-choice-inline-opts" role="radiogroup" aria-labelledby="${esc(lid)}">${options.map(opt).join('')}</span>${reason?`<span class="st-choice-meta" role="status">${esc(reason)}</span>`:''}</div>`;
+    const opt=x=>`<button type="button" class="st-choice-inline-opt"${disabled?' aria-disabled="true"':''}${pressed&&x===options[0]?' data-preview="pressed"':''} role="radio" aria-checked="${x.value===selected?'true':'false'}" tabindex="${x.value===stop?0:-1}" data-action="${esc(action)}" data-value="${esc(x.value)}">${keyFace?'<span class="st-choice-inline-face">':'<span class="st-radio" aria-hidden="true"></span>'}<span${x.mono?' data-mono=""':''}>${tx(x.label,x,'label')}</span>${keyFace?'</span>':''}</button>`;
+    return `<div class="st-choice-inline ${esc(className)}" data-ds="ChoiceList" data-mode="radio"${keyFace?' data-face="key"':''} id="${esc(rid)}" data-field="${esc(key)}"><span class="st-choice-inline-label"><span id="${esc(lid)}"${labelHidden?' class="st-visually-hidden"':''}><span${sa(s.label,a.label)}>${esc(label)}</span>${isOptional?`<small>${tx(optional,o,'optional')}</small>`:''}</span>${isOptional?`<span class="st-choice-inline-clear">${clearBtn}</span>`:''}</span><span class="st-choice-inline-opts" role="radiogroup" aria-labelledby="${esc(lid)}">${options.map(opt).join('')}</span>${reason?`<span class="st-choice-meta" role="status">${esc(reason)}</span>`:''}</div>`;
   }
   /* The radio keyboard model, pure: ArrowDown/ArrowRight → next, ArrowUp/ArrowLeft → previous (both wrap), Home → first,
      End → last. Returns the value to select and focus, or null for any other key. */
@@ -2828,12 +3136,12 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
      a trailing icon action. Empty it shows `icon`; filled it shows the value as its answer line and `editIcon`.
      Host mode: `action` makes the row a button that asks the host to open the editor (picker, note page, camera).
      Inline mode: `inline` (the field's own markup) is revealed under the row on tap; the row tracks its value as the answer line. */
-  function optionalRow({label='',value='',icon='',editIcon='',action='',key='',inline='',open=false,optionalWord='Optional',editLabel='Edit',disabled=false,className='',attrs={}}={}){
+  function optionalRow({label='',value='',icon='',editIcon='',action='',key='',inline='',open=false,optionalWord='Optional',editLabel='Edit',disabled=false,className='',face='',attrs={}}={}){
     const filled=value!=null&&String(value).trim()!=='',glyph=filled?(editIcon||icon):icon,extra=Object.entries(attrs).filter(([k])=>/^(?:data|aria)-[a-z0-9-]+$/.test(k)).map(([k,v])=>` ${k}="${esc(v)}"`).join('');
     const copy=`<span class="st-optional-copy"><span class="st-optional-head"><span class="st-optional-label">${esc(label)}</span><small class="st-optional-word">${esc(optionalWord)}</small></span><span class="st-optional-answer" role="status">${filled&&!(inline&&open)?esc(value):''}</span></span><span class="st-optional-act" aria-hidden="true">${glyph}</span>`;
     const aria=` aria-label="${esc(filled?`${editLabel} ${label.toLowerCase()}, ${value}`:`${label}, ${optionalWord.toLowerCase()}`)}"`;
-    if(!inline)return `<button type="button" data-ds="OptionalRow" class="st-optional-row ${esc(className)}" data-filled="${filled}" data-action="${esc(action)}" data-value="${esc(key)}"${disabled?' disabled':''}${aria}${extra}>${copy}</button>`;
-    return `<div data-ds="OptionalRow" class="st-optional ${esc(className)}" data-open="${open}" data-filled="${filled}"><button type="button" class="st-optional-row" data-filled="${filled}" data-st-optional aria-expanded="${open}"${aria}${extra}>${copy}</button><div class="st-optional-body"${open?'':' hidden'}>${inline}</div></div>`;
+    if(!inline)return `<button type="button" data-ds="OptionalRow" class="st-optional-row ${esc(className)}" data-filled="${filled}"${face==='row'?' data-face="row"':''} data-action="${esc(action)}" data-value="${esc(key)}"${disabled?' disabled':''}${aria}${extra}>${copy}</button>`;
+    return `<div data-ds="OptionalRow" class="st-optional ${esc(className)}" data-open="${open}" data-filled="${filled}"><button type="button" class="st-optional-row" data-filled="${filled}"${face==='row'?' data-face="row"':''} data-st-optional aria-expanded="${open}"${aria}${extra}>${copy}</button><div class="st-optional-body"${open?'':' hidden'}>${inline}</div></div>`;
   }
   if(typeof document!=='undefined'){
     document.addEventListener('click',e=>{const control=e.target.closest('.st-picker-trigger[aria-disabled="true"],.st-choice-row[aria-disabled="true"],.st-choice-inline-opt[aria-disabled="true"]');if(control){e.preventDefault();e.stopImmediatePropagation();}},true);
@@ -2869,6 +3177,11 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
       const chip=`<button type="button" class="st-subject-chip"${sA(c.action||'open-subject',c.value??id.text)}${sL(c.label,{text:'Open '+(id.text??'')})}>${sGlyph('tag')}<span class="st-subject-chip-id">#${sT(id)}</span>${sGlyph('chevron')}</button>`;
       return `<p class="st-header-line" data-line="route">${chip}${facts.length?`<span class="st-header-facts">${facts.map(sParts).join(SEP)}</span>`:''}</p>`;
     }
+    /* key: the colour key of a body that is colour-coded (the pen map): swatch, count, label. Plain text, never tappable (owner, 2026-10-14). */
+    if(line.key){
+      const items=line.key.filter(k=>k&&k.count!=null&&k.label);
+      return items.length?`<p class="st-header-line" data-line="key">${items.map(k=>`<span><i aria-hidden="true" style="background:var(${/^--[\w-]+$/.test(k.fill||'')?k.fill:'--line'})"></i><b>${esc(k.count)}</b> ${esc(k.label)}</span>`).join('')}</p>`:'';
+    }
     const t=line.text??line;
     return t==null||t===''?'':`<p class="st-header-line" data-line="fact">${sParts(t)}</p>`;
   }
@@ -2900,7 +3213,7 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
      status { text, str, args, id, tone, visible, action }: a line above the bar for a hold's progress (its statusId) or a text
      action. It is drawn only when `visible` is set or it carries an action; a waiting button gives no reason line: it stands alone. `content` is trusted
      footer markup in place of back/primary/hold (a host's own two controls); className adds a page hook. */
-  function sheetFooter({back:b={},quiet:qa=null,primary,hold:h,status:st,content='',className=''}={}){
+  function sheetFooter({back:b={},primary,hold:h,status:st,content='',className=''}={}){
     let line='';
     if(!st&&primary&&typeof primary==='object'&&primary.reason){st=sObj(primary.reason);primary=Object.assign({},primary,{reason:''});}
     if(st){
@@ -2915,9 +3228,9 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
       if(primary&&typeof primary==='object'&&!primary.describedby)primary=Object.assign({},primary,{describedby:id});
     }
     if(content){content=content.replace(/<p class="st-field-hint st-button-reason[^]*?<\/p>/g,reason=>{line+=/<button/.test(reason)?reason.replace('<p class="','<p data-action-slot class="'):reason.replace('st-button-reason','st-button-reason st-visually-hidden');return '';});}
-    /* quiet { label, action, value }: Reset or Clear, a quiet text action left of the primary (never in a header). */
-    const q=qa?sButton(Object.assign({register:'text'},qa,{className:'st-footer-quiet'+(qa.className?' '+qa.className:'')})):'';
-    const inner=content||`${b?backButton(b):''}${q}${h?sHold(h):sButton(primary)}`;
+    /* Reset and Clear are not footer controls: they are the sheet header's corner action (sheet({ corner })). The footer's
+       old `quiet` option is retired (owner, 2026-10-14) and ignored. */
+    const inner=content||`${b?backButton(b):''}${h?sHold(h):sButton(primary)}`;
     /* A hidden reason lives inside the footer (after the two targets), so nothing above the bar is drawn or measured. */
     const quiet=line&&!/class="sheet-status"|data-action-slot/.test(line);
     return `${quiet?'':line}<div class="sheet-footer${className?' '+esc(className):''}" data-ds="Sheet">${inner}${quiet?line:''}</div>`;
@@ -2929,8 +3242,20 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
   function scrim({action='dismiss',value='',label={text:'Dismiss sheet',str:'tk.sheet.dismiss'},layer=0}={}){
     return `<button type="button" class="scrim" data-ds="Sheet"${sLayer(layer)}${sA(action,value)}${sL(label)}></button>`;
   }
+  /* The sheet header's text block: the centred title on one line, then the optional header line. Corner actions (owner,
+     2026-10-14, ruling C): corner { label, action, value } is Clear or Reset, quiet text at the top right, passed only while
+     there is something to clear or reset; cross { action, value, label } is a ✕ at the top left, used by a drawer with levels
+     (owner ruling B, 2026-10-16: it closes the whole drawer from any level; pickerHead().cross). Each is a 48px target vertically centred on this block (title + line), never on
+     the title alone or the header box; the title keeps 12px clear of each target. Without corners the block is as before. */
+  function sheetText(title,line,corner,cross){
+    const t=`<h2 class="sheet-title">${sT(title)}</h2>${headerLine(line)}`;
+    if(!corner&&!cross)return t;
+    const x=cross?`<button type="button" class="st-sheet-corner" data-corner="start" data-ds="Sheet"${sA(cross.action||'dismiss',cross.value)}${sL(cross.label,{text:'Close',str:'act.close'})}>${sGlyph('close')}</button>`:'';
+    const c=corner?sButton(Object.assign({register:'text'},corner,{className:'st-sheet-corner'+(corner.className?' '+corner.className:''),attrs:Object.assign({'data-corner':'end'},corner.attrs||{})})):'';
+    return `<div class="sheet-text" data-corners="${cross&&corner?'both':corner?'end':'start'}">${x}${t}${c}</div>`;
+  }
   const SHEET_SIZES=['compact','short','medium','long'];
-  function sheet({variant='drawer',surface='',headClass='',title,line=null,back=null,description,icon='',close={action:'dismiss'},up=null,holdRows=0,lead='',above='',body='',bodyClass='',footer:f,size='medium',sizing='content',label,view='',className='',id='',layer=0,inert=false,bar='',scrim:sc={},attrs={}}={}){
+  function sheet({variant='drawer',surface='',headClass='',title,line=null,corner=null,cross=null,back=null,description,icon='',close={action:'dismiss'},holdRows=0,lead='',above='',body='',bodyClass='',footer:f,size='medium',sizing='content',label,view='',className='',id='',layer=0,inert=false,bar='',scrim:sc={},attrs={}}={}){
     const v=oneOf('Sheet','variant',variant,['drawer','page','dialog'],'drawer'),sz=oneOf('Sheet','size',size,SHEET_SIZES,'medium');
     /* surface (drawer only): '' is a content or input drawer (white, tinted cards). 'menu' is a drawer whose every row is an option or a verb
        (Choose a unit, More actions, Go to pen): the tint with white cards, like a page. See SURFACES.md. */
@@ -2939,15 +3264,14 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
     if(v==='dialog'){
       return `<div class="dialog-backdrop" data-ds="Sheet" data-variant="dialog"${sLayer(layer)}><div class="dialog${cls}" role="dialog" aria-modal="true" tabindex="-1"${id?` id="${esc(id)}"`:''}${vw}${inert?' inert':''}${sL(label??title)}${ex}><div class="dialog-body${bodyClass?' '+esc(bodyClass):''}"><h2 class="dialog-title">${icon?sGlyph(icon):''}${sT(title)}</h2>${description?`<p class="dialog-desc">${sParts(description)}</p>`:''}${body}</div>${foot}</div></div>`;
     }
-    /* No ✕ on any sheet: Back in the footer is the way out, and the scrim and a swipe down do what Back does. `close` is kept
-       for old callers and ignored. `up` { label, action, value } is the header's "‹ Parent" control, only in a drawer with
-       levels: it goes up one level and names the parent; it is never labelled Back. */
-    const upHtml=up&&(up.label!=null)?`<button type="button" class="sheet-up" data-ds="Sheet"${sA(up.action||'up',up.value)}>${sGlyph('up')}<span>${sT(up.label)}</span></button>`:'';
+    /* Back in the footer is the way out, and the scrim and a swipe down do what Back does. `close` is kept for old callers and
+       ignored. A drawer with levels (owner ruling B, 2026-10-16) adds `cross`, the ✕ at the top left that closes the whole
+       drawer from any level; its footer Back goes up one level (pickerHead). There is no "‹ Parent" control. */
     /* The sheet header (a drawer): the centred title, the optional header line, the 1px hairline; the body starts 24px below.
        A page takes the page header instead (pageHeader: Back top left, the title left-aligned). */
     const head=v==='page'
       ?pageHeader({title,back,line,className:headClass})
-      :`<header class="utility-header${headClass?' '+esc(headClass):''}${upHtml?' has-up':''}">${lead}<div class="sheet-titles">${upHtml}<h2 class="sheet-title">${sT(title)}</h2>${headerLine(line)}</div></header>`;
+      :`<header class="utility-header${headClass?' '+esc(headClass):''}">${lead}<div class="sheet-titles">${sheetText(title,line,corner,cross)}</div></header>`;
     const common=`data-ds="Sheet" tabindex="-1"${sLayer(layer)}${inert?' inert':''}${id?` id="${esc(id)}"`:''}${vw}${sL(label??title)}${ex}`;
     const main=`${head}${above}<div class="sheet-body${bodyClass?' '+esc(bodyClass):''}">${body}</div>${foot}`;
     if(v==='page')return `<section class="sheet${cls}" ${common} role="region" data-st-context="page" data-presentation="page">${bar}${main}</section>`;
@@ -2988,16 +3312,17 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
     const names=root.dataset.names.split(',');
     root.dispatchEvent(new CustomEvent('sentri-range-change',{bubbles:true,detail:{key:root.dataset.key,values:{[names[0]]:a,[names[1]]:b}}}));
   }
-  /* FilterSheet: the drawer that narrows a list. It is a Sheet whose footer holds Back (keeps the draft), Reset (quiet text)
-     and the one commit, whose label carries the live count ("Show 4 sows"; the host rewrites it as the draft changes).
+  /* FilterSheet: the drawer that narrows a list. It is a Sheet whose header carries Reset (quiet text, the top-right corner
+     action), and whose footer holds Back (keeps the draft) and the one commit, whose label carries the live count ("Show 4 sows"; the host rewrites it as the draft changes).
      filterSheet({ title, sections:[{ title, icon, content, help }] | body, apply:{label, action}, reset:{label, action} | false,
      backAction, closeAction, className, size }). A section is a titled group; sections come as the host's own controls
      (a rangeSlider, a segment) so the sheet owns only the frame, the spacing and the exits. Without `sections`, `body` is used as is. */
   function filterSheet({title='Filter',sections=[],body='',apply={},reset={},backAction='filter-back',backLabel='Back',closeAction='',className='',size='medium',label}={}){
     const exit=closeAction||backAction,list=sections.map(x=>`<section class="st-filter-section">${x.title?heading({title:x.title,icon:x.icon||'',kind:'section',level:4,className:'st-filter-title'}):''}${x.content||''}${x.help?`<p class="st-filter-help">${esc(x.help)}</p>`:''}</section>`).join('');
-    /* Reset is quiet text in the footer, left of the commit (Headers law: nothing in a header acts); reset:false leaves it out. */
-    const resetHtml=reset===false?'':button({label:reset.label||'Reset',register:'text',action:reset.action||'filter-reset',className:'st-footer-quiet'});
-    return sheet({title,size,label:label||title,className:'st-filter-sheet'+(className?' '+esc(className):''),body:list||body,footer:sheetFooter({content:backButton({action:backAction,label:backLabel})+resetHtml+button({label:apply.label||'Show',register:'primary',action:apply.action||'filter-apply'})}),close:{action:exit,label:'Close '+title},scrim:{action:exit,label:'Dismiss '+title}});
+    /* Reset is the header's corner action, top right (Headers law, owner 2026-10-14); the host passes reset:false while the
+       draft is at its defaults, so Reset shows only when there is something to reset. */
+    const corner=reset===false?null:{label:reset.label||'Reset',action:reset.action||'filter-reset'};
+    return sheet({title,corner,size,label:label||title,className:'st-filter-sheet'+(className?' '+esc(className):''),body:list||body,footer:sheetFooter({content:backButton({action:backAction,label:backLabel})+button({label:apply.label||'Show',register:'primary',action:apply.action||'filter-apply'})}),close:{action:exit,label:'Close '+title},scrim:{action:exit,label:'Dismiss '+title}});
   }
   if(typeof document!=='undefined'){
     let drag=null;
@@ -3013,7 +3338,172 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
     const end=()=>{drag=null;};
     document.addEventListener('pointerup',end);document.addEventListener('pointercancel',end);if(typeof globalThis.addEventListener==='function')globalThis.addEventListener('blur',end);
   }
-  const api=Object.freeze({headerLine,pageHeader,rangeSlider,filterSheet,optionalRow,heading,panel,facts,row,rowGroup,log,logDay,logStamp,logGroups,categoryFooter,field,pickerField,pickerOptions,pickerBody,pickerHead,pickerFooter,filterChips,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowSelectDoor,rowAction,rowSelectChange,status,conditionTag,rowFitTags,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
+  /* PenMap: the room as a map of pens, so a worker finds the pen in front of her by where it is. Letters are always the
+     columns and numbers always the rows, so the map uses the phone's height; it is drawn as seen from the door (the
+     Entrance band): pen 1 is nearest it, at the top. A tile is a button that goes to its pen and says nothing but the pen
+     code; its colour is its status. When the lanes do not fit at 56px the map scrolls sideways; the tiles never shrink.
+     penMap({ lanes, depth, pens:{ B3:'act'|'live'|'plain'|'hidden' }, current, action, key, rangeSize, entrance,
+     labels, peek }): the Entrance band and the map. A pen missing from `pens` is empty; 'hidden' is a pen with
+     sows the current list does not show. Empty and hidden tiles are disabled. The colour key is the sheet's header line: penMapKey({ pens, words }) gives its items, the count of pens at each
+     coloured level, and a level with none is left out. `peek(code)` returns the HTML of the hold-to-peek card for a pen (see penPeek).
+     penMapFooter({ back, depth, rangeSize, label }): Back, and beside it the range control when a row has more than
+     rangeSize pens. The map opens scrolled so its current pen is in view; the range control follows the map's scroll. */
+  const PEN_LEVELS=['act','live','plain','hidden'],PEN_HOLD_MS=350,PEN_SLOP=12,PEN_GAP=8,penPeeks=new Map();
+  let penHold=null,penSwallow=false;
+  const penLabels=o=>Object.assign({map:'Pens',act:'needs you',live:'farrowing',plain:'has sows',empty:'empty',hidden:'no sows match',pen:c=>'Pen '+c},o);
+  function penMap({lanes=['A','B','C','D'],depth=6,pens={},current='',action='pen',key='pen-map',rangeSize=20,entrance='Entrance',labels={},peek=null,className=''}={}){
+    const L=penLabels(labels),rows=Array.from({length:Math.max(1,depth|0)},(_,i)=>i+1);
+    if(typeof peek==='function')penPeeks.set(key,peek);else penPeeks.delete(key);
+    const level=c=>PEN_LEVELS.includes(pens[c])?pens[c]:'empty';
+    const tile=c=>{const l=level(c),off=l==='empty'||l==='hidden';
+      return `<button type="button" class="st-pen-tile" data-level="${l}" data-pen="${esc(c)}"${off?' disabled':` data-action="${esc(action)}" data-value="${esc(c)}"`} aria-label="${esc(L.pen(c)+', '+L[l])}">${esc(c)}</button>`;};
+    const grid=`<div class="st-pen-grid" style="--pm-lanes:${lanes.length}"><span class="st-pen-col st-pen-row" aria-hidden="true"></span>${lanes.map(c=>`<span class="st-pen-col" aria-hidden="true">${esc(c)}</span>`).join('')}${rows.map(n=>`<span class="st-pen-row" data-row="${n}" aria-hidden="true">${n}</span>${lanes.map(c=>tile(c+n)).join('')}`).join('')}</div>`;
+    return `<div class="st-pen-map${className?' '+esc(className):''}" data-ds="PenMap" data-key="${esc(key)}"${current?` data-current="${esc(current)}"`:''}${rows.length>99?' data-wide':''}><div class="st-pen-entrance">${sGlyph('arrow-down')}<span>${esc(entrance)}</span></div><div class="st-pen-field"><div class="st-pen-scroll" role="group" aria-label="${esc(L.map)}">${grid}</div><div class="st-pen-peek" hidden></div></div></div>`;
+  }
+  /* penMapKey({ pens, words:{ act, live } }): the items of the sheet's key line: sheet({ line:{ key: penMapKey(...) } }). */
+  function penMapKey({pens={},words={}}={}){
+    const w=Object.assign({act:'need you',live:'farrowing'},words),n=l=>Object.values(pens).filter(v=>v===l).length;
+    return [['act','--amber-fill'],['live','--progress-fill']].filter(([l])=>n(l)).map(([l,fill])=>({fill,count:n(l),label:w[l]}));
+  }
+  /* penPeek({ title, meta, rows }): the body of the peek card: the pen code with its count, then one animal Row per sow,
+     the same row as the room list (`rows` are Row props: code and right:{ kind:'state', figure, word, level }). */
+  function penPeek({title='',meta='',rows=[]}={}){
+    return `<div class="st-pen-peek-head"><b>${esc(title)}</b>${meta?`<span>${esc(meta)}</span>`:''}</div>${rows.map(r=>row(Object.assign({variant:'animal',className:'st-pen-peek-row'},r))).join('')}`;
+  }
+  function penMapFooter({back={action:'back'},depth=0,rangeSize=20,label='Jump to pens'}={}){
+    const size=Math.max(1,rangeSize|0);
+    if(!(depth>size))return sheetFooter({back});
+    const ranges=Array.from({length:Math.ceil(depth/size)},(_,i)=>[i*size+1,Math.min(depth,(i+1)*size)]);
+    return sheetFooter({content:backButton(back)+`<div class="st-pen-ranges" data-ds="PenMap" role="radiogroup" aria-label="${esc(label)}">${ranges.map(([a,b],i)=>`<button type="button" role="radio" data-from="${a}" data-to="${b}" aria-checked="${i===0}">${a}–${b}</button>`).join('')}</div>`});
+  }
+  /* The map's own behaviour. A pen map is found by its markup, so any host that draws one gets it without a call:
+     it opens centred on its current pen; the range control (in the sheet's footer) follows the top visible row, and a tap
+     on a range scrolls its first row to just under the column letters; a hold shows the peek (350ms; a move of more than
+     12px, a scroll or a release hides it), and the tap after a peek only closes it. */
+  const penHead=map=>map.querySelector('.st-pen-col'),penSheet=el=>el.closest('.sheet,.phone')||document.body;
+  function penTopRow(map){
+    const h=penHead(map).getBoundingClientRect().bottom;
+    for(const l of map.querySelectorAll('.st-pen-row[data-row]'))if(l.getBoundingClientRect().bottom>h+4)return +l.dataset.row;
+    return 1;
+  }
+  function penMark(map){
+    const ranges=penSheet(map).querySelector('.st-pen-ranges');if(!ranges)return;
+    const btns=[...ranges.children],atEnd=map.scrollHeight>map.clientHeight+1&&map.scrollTop+map.clientHeight>=map.scrollHeight-1,n=penTopRow(map);
+    const on=atEnd?btns[btns.length-1]:btns.find(b=>n>=+b.dataset.from&&n<=+b.dataset.to);
+    btns.forEach(b=>b.setAttribute('aria-checked',String(b===on)));
+    if(on){const r=on.getBoundingClientRect(),q=ranges.getBoundingClientRect();if(r.left<q.left)ranges.scrollLeft+=r.left-q.left;else if(r.right>q.right)ranges.scrollLeft+=r.right-q.right;}
+    penEdges(ranges);
+  }
+  /* ranges that overflow fade on the side that has more, so a cut range reads as "more this way", never as clipped */
+  function penEdges(r){
+    const s=r.scrollLeft,more=[s>1&&'start',s+r.clientWidth<r.scrollWidth-1&&'end'].filter(Boolean).join(' ');
+    if(more)r.dataset.more=more;else delete r.dataset.more;
+  }
+  function penMount(scope){
+    const maps=!scope||!scope.querySelectorAll?[]:scope.matches&&scope.matches('.st-pen-map')?[scope]:[...scope.querySelectorAll('.st-pen-map')];
+    for(const m of maps){
+      if(m.dataset.mounted)continue;m.dataset.mounted='1';
+      const map=m.querySelector('.st-pen-scroll'),cur=m.dataset.current&&[...map.querySelectorAll('.st-pen-tile')].find(t=>t.dataset.pen===m.dataset.current);
+      if(cur){
+        const box=map.getBoundingClientRect(),head=penHead(map).getBoundingClientRect(),side=map.querySelector('.st-pen-row').getBoundingClientRect(),r=cur.getBoundingClientRect();
+        map.scrollTop+=r.top+r.height/2-(head.bottom+box.bottom)/2;map.scrollLeft+=r.left+r.width/2-(side.right+box.right)/2;
+        /* then rest on a whole row and column: the tile edge sits PEN_GAP under the letters and beside the numbers */
+        const snap=(d,pitch)=>{d=((d%pitch)+pitch)%pitch;return d>pitch/2?d-pitch:d;},at=cur.getBoundingClientRect();
+        map.scrollTop+=snap(at.top-(head.bottom+PEN_GAP),at.height+PEN_GAP);
+        if(map.scrollWidth>map.clientWidth+1)map.scrollLeft+=snap(at.left-(side.right+PEN_GAP),at.width+PEN_GAP);
+      }
+      penMark(map);
+    }
+  }
+  function penStop(){
+    const p=penHold;if(!p)return;
+    clearTimeout(p.timer);penHold=null;p.map.querySelector('.st-pen-peek').hidden=true;
+  }
+  if(typeof document!=='undefined'){
+    if(typeof MutationObserver!=='undefined')new MutationObserver(ms=>{for(const m of ms)for(const n of m.addedNodes)if(n.nodeType===1)penMount(n);}).observe(document,{childList:true,subtree:true});
+    if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>penMount(document));else penMount(document);
+    let frame=0;
+    document.addEventListener('scroll',e=>{const t=e.target;if(t.classList&&t.classList.contains('st-pen-ranges')){penEdges(t);return;}if(!t.classList||!t.classList.contains('st-pen-scroll'))return;penStop();cancelAnimationFrame(frame);frame=requestAnimationFrame(()=>penMark(t));},true);
+    document.addEventListener('click',e=>{
+      const b=e.target.closest&&e.target.closest('.st-pen-ranges button');
+      if(b){
+        const map=penSheet(b).querySelector('.st-pen-scroll'),l=map&&map.querySelector(`.st-pen-row[data-row="${b.dataset.from}"]`);
+        if(l)map.scrollTop+=l.getBoundingClientRect().top-penHead(map).getBoundingClientRect().bottom-PEN_GAP;
+        return;
+      }
+      if(penSwallow&&e.target.closest&&e.target.closest('.st-pen-tile')){penSwallow=false;e.stopImmediatePropagation();e.preventDefault();}
+    },true);
+    document.addEventListener('pointerdown',e=>{
+      penSwallow=false;penStop();
+      const t=e.target.closest&&e.target.closest('.st-pen-tile:not(:disabled)');if(!t||e.button!==0)return;
+      const root=t.closest('.st-pen-map'),fn=penPeeks.get(root.dataset.key);if(!fn)return;
+      penHold={map:root,x:e.clientX,y:e.clientY,timer:setTimeout(()=>{
+        const card=root.querySelector('.st-pen-peek'),code=t.dataset.pen;
+        card.innerHTML=fn(code);card.dataset.at='bottom';card.hidden=false;penSwallow=true;
+        /* over the lower part of the map, and over the upper part when the held tile would sit under it */
+        const c=card.getBoundingClientRect(),r=t.getBoundingClientRect();
+        if(r.bottom>c.top&&r.top<c.bottom)card.dataset.at='top';
+        root.dispatchEvent(new CustomEvent('sentri-pen-peek',{bubbles:true,detail:{pen:code}}));
+      },PEN_HOLD_MS)};
+    });
+    document.addEventListener('pointermove',e=>{if(penHold&&Math.hypot(e.clientX-penHold.x,e.clientY-penHold.y)>PEN_SLOP)penStop();});
+    for(const n of ['pointerup','pointercancel'])document.addEventListener(n,penStop);
+    document.addEventListener('contextmenu',e=>{if(e.target.closest&&e.target.closest('.st-pen-tile'))e.preventDefault();});
+    if(typeof globalThis.addEventListener==='function')globalThis.addEventListener('blur',penStop);
+  }
+  /* TaskTile: one open task instance as a tile on the Overview (owner, 2026-10-18). Four fixed slots, each with one kind of
+     message, at the same height in every tile, so a row of tiles scans line by line: 1 the task (one line, a short name),
+     2 the batch (or what and where), 3 to-do: one line that says it all (owner, 2026-10-19, no second line), 4 the run (one
+     segment per planned day, red segments for days past the plan).
+     Slot 3 is one of: the count due now and a short word, with an optional overdue part after it ("5 now · 2 overdue");
+     the next count in grey when nothing is due yet ("8 tomorrow"); a tick and "Ready to close" when all is recorded.
+     taskTile({ id, title, sub, todo:{value,label,tone,also:{text,tone}}|{next:{value,label}}|{done}|{none}, days:{day,total,over,text}, late, action, entry }) */
+  function taskTile({id='',title='',sub='',todo={},days={},late=false,action='',entry=''}={}){
+    const n=Math.max(1,days.total||1),d=Math.max(0,Math.min(n,days.day||0)),over=Math.max(0,days.over||0);
+    const act=t=>t==='act'||t==='red';
+    // One coloured signal at most (owner, 2026-10-19): red only on the overdue part or the days over; "Ready to close" is a quiet tick.
+    const also=todo.also?`<span class="st-tile-also"${act(todo.also.tone)?' data-tone="act"':''}>· ${esc(todo.also.text)}</span>`:'';
+    const todoHtml=todo.done?`<span class="st-tile-todo" data-done="">${glyph('check')}<b>${esc(todo.done)}</b></span>`
+      :todo.next?`<span class="st-tile-todo" data-next=""><b>${esc(todo.next.value)}</b><span>${esc(todo.next.label)}</span></span>`
+      :todo.none?`<span class="st-tile-todo" data-none=""><b>${esc(todo.none)}</b></span>`
+      :`<span class="st-tile-todo"${act(todo.tone)?' data-tone="act"':''}><b>${esc(todo.value)}</b><span>${esc(todo.label)}</span>${also}</span>`;
+    const todoText=todo.done||todo.none||(todo.next?`${todo.next.value} ${todo.next.label}`:[`${todo.value} ${todo.label}`,todo.also&&todo.also.text].filter(Boolean).join(', '));
+    const segs=Array.from({length:n},(_,i)=>`<i${i<d?' data-on=""':''}></i>`).join('')+Array.from({length:over},()=>'<i data-over=""></i>').join('');
+    const dayText=days.text||(over?`${over} ${over===1?'day':'days'} overdue`:`Day ${d} of ${n}`);
+    const name=[title,sub,todoText,dayText].filter(Boolean).join(', ');
+    return `<button type="button" class="st-tile" data-ds="TaskTile"${late?' data-late=""':''}${id?` data-card="${esc(id)}"`:''}${action?` data-action="${esc(action)}" data-value="${esc(id)}"`:''}${entry?` data-entry="${esc(entry)}"`:''} aria-label="Open ${esc(name)}">`+
+      `<span class="st-tile-name">${esc(title)}</span><span class="st-tile-sub">${esc(sub)}</span>${todoHtml}`+
+      `<span class="st-tile-run"><span class="st-tile-segs" aria-hidden="true">${segs}</span><span class="st-tile-day"${over?' data-tone="act"':''}>${esc(dayText)}</span></span></button>`;
+  }
+  /* WeekBoard: a week of work, one line per task under its type, a cell per day holding that day's count (owner, 2026-10-19).
+     Cell codes: '' nothing · n running, nothing due · u waiting on today · dN done · oN due today · pN planned · eN estimate ·
+     vN past its plan, today · wN past its plan, a past day; a trailing '>' runs into next week, a leading '<' came from last week.
+     Counts up to 999 print in full; actual counts from 1,000 shorten to "1.2k", estimates to "~1k".
+     weekBoard({ days:[{label,date,today,past}], groups:[{band:{icon,label}|null, types:[{title,sub,rows:[{label,late,action,value,aria,cells}]}]}], empty })
+     weekCell(code) draws one cell; weekBoardKey([[code,title,line]]) the legend rows for the "How to read the board" drawer. */
+  const weekFmt=(n,est)=>n>=1000?(est?'~'+Math.round(n/1000)+'k':(Math.round(n/100)/10)+'k'):(est?'~':'')+n;
+  function weekCell(code){
+    if(!code)return '<span class="st-week-cell"></span>';
+    let c=String(code),cont='',from='';
+    if(c.endsWith('>')){cont=' data-cont=""';c=c.slice(0,-1);}
+    if(c.startsWith('<')){from=' data-from=""';c=c.slice(1);}
+    const k=c[0],n=+c.slice(1);
+    const map={n:['nil','·'],u:['wait','–'],d:['done',weekFmt(n)],o:['today',weekFmt(n)],p:['plan',weekFmt(n)],e:['est',weekFmt(n,true)],v:['late',weekFmt(n)],w:['latedone',weekFmt(n)]};
+    const [kind,text]=map[k]||['',''];
+    return `<span class="st-week-cell" data-kind="${kind}"${cont}${from}>${esc(text)}</span>`;
+  }
+  function weekBoard({days=[],groups=[],empty=''}={}){
+    const today=days.findIndex(d=>d.today);
+    const head=`<div class="st-week-days"><span></span><span class="st-week-grid">${days.map(d=>`<span class="st-week-day"${d.today?' data-today=""':''}${d.past?' data-past=""':''}><span>${esc(d.label)}</span><b>${esc(d.date)}</b></span>`).join('')}</span></div>`;
+    const body=groups.map(g=>(g.band?`<div class="st-week-band"><span class="st-week-band-icon">${g.band.icon||''}</span><b>${esc(g.band.label)}</b></div>`:'')+
+      ((g.types||[]).map(t=>`<div class="st-week-type"><div class="st-week-type-head"><span>${esc(t.title)}</span><small>${esc(t.sub||'')}</small></div>${(t.rows||[]).map(r=>`<button type="button" class="st-week-row"${r.action?` data-action="${esc(r.action)}" data-value="${esc(r.value)}"`:''} aria-label="${esc(r.aria||r.label)}"><span class="st-week-batch"${r.late?' data-late=""':''}>${esc(r.label)}</span><span class="st-week-grid">${(r.cells||[]).map(weekCell).join('')}</span></button>`).join('')}</div>`).join('')||(g.band&&g.none?`<p class="st-week-none">${esc(g.none)}</p>`:''))).join('');
+    const band=today>=0?`<span class="st-week-today" aria-hidden="true" style="left:calc(54px + (100% - 86px) / 7 * ${today} + ${3*today}px);width:calc((100% - 86px) / 7)"></span>`:'';
+    return `<div class="st-week" data-ds="WeekBoard">${head}${empty?`<p class="st-week-none" data-week="">${esc(empty)}</p>`:body+band}</div>`;
+  }
+  function weekBoardKey(rows=[]){
+    return `<div class="st-panel st-week-key" data-ds="WeekBoard">${rows.map(([c,t,l])=>`<div class="st-week-key-row"><span class="st-week-grid" data-one="">${weekCell(c)}</span><div><strong>${esc(t)}</strong><small>${esc(l)}</small></div></div>`).join('')}</div>`;
+  }
+  const api=Object.freeze({taskTile,weekBoard,weekCell,weekBoardKey,headerLine,pageHeader,rangeSlider,filterSheet,penMap,penMapKey,penMapFooter,penPeek,penMapMount:penMount,optionalRow,heading,panel,facts,row,rowGroup,log,logDay,logStamp,logGroups,field,rowTile,rowGrid,pickerField,pickerOptions,pickerBody,pickerHead,pickerFooter,filterChips,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,toast,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowSelectDoor,rowAction,rowSelectChange,status,conditionTag,rowFitTags,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
   root.SentriUI=api;
   if(typeof module!=='undefined')module.exports=api;
 })(globalThis);
@@ -3131,13 +3621,7 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
     return root.SentriUI.row(props);
   }
 
-  // Compatibility adapter; Stepper owns every face and its implementation.
-  function stepper(props = {}) {
-    return root.SentriUI.stepper({...props,variant:props.face||(props.variant==='hero'?'well':props.variant||'row')});
-  }
 
-  /* TaskPhotos: compatibility alias; Photos owns the optional line face. */
-  function photos(props = {}) { return root.SentriUI.photos(props); }
 
   /* ---- door (alias of SentriUI.row / rowAction — use Row): a row with no id column (farrowing's .disclosure): a title, one muted description line, a chevron.
      For a non-animal door inside a sheet or a page (`Record here › Move piglets`). ---- */
@@ -3207,8 +3691,6 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
     return `<section class="tk-day" data-ds="TaskDay"${L(label ?? title)}><header class="tk-day-head"><strong>${parts(title)}</strong>${status ? `<span>${parts(status)}</span>` : ''}</header>${rows}</section>`;
   }
 
-  // Compatibility alias: Button owns the hold face and interaction.
-  const holdBind = (scope, opts = {}) => root.SentriUI.holdBind(scope, opts);
 
   /* ---- TaskDoors: a list of doors. card: false (default) — flat door rows (SentriTask.door, no id column).
      card: true — farrowing's Pen page / sow-actions list: an optional section title with its icon, then the doors in one
@@ -3261,10 +3743,11 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
   }
 
   /* ---- TaskDock ---- */
-  /* unit: farrowing's labelled place control at the dock's start (B1 / Go to pen): { icon = 'grid', label, caption, action,
-     value, aria } — the place in 13px/600 mono over a 9px caption, the icon left, no frame. */
+  /* unit: the place control at the dock's start. framed: farrowing's Pen map, the Search button's frame holding the icon and a 13px/600
+     label (no caption, no place figure). Without framed it is the older frameless form with a caption (Piglet processing's room, until
+     it migrates): { icon = 'grid', label, caption, action, value, aria, framed }. */
   function dock({ primary, tools = [], unit } = {}) {
-    const u = unit ? `<button type="button" class="tk-dock-unit"${A(unit.action || 'unit', unit.value)}${L(unit.aria)}>${glyph(unit.icon || 'grid')}<span><strong>${T(unit.label)}</strong>${unit.caption ? `<small>${T(unit.caption)}</small>` : ''}</span></button>` : '';
+    const u = unit ? `<button type="button" class="tk-dock-unit"${unit.framed ? ' data-framed' : ''}${A(unit.action || 'unit', unit.value)}${L(unit.aria)}>${glyph(unit.icon || 'grid')}<span><strong>${T(unit.label)}</strong>${unit.caption && !unit.framed ? `<small>${T(unit.caption)}</small>` : ''}</span></button>` : '';
     const p = u + (primary ? `<button type="button" class="tk-dock-primary"${A(primary.action, primary.value)}>${primary.icon ? glyph(primary.icon) : ''}<span>${T(primary.label)}</span></button>` : '');
     const t = tools.map(x => `<button type="button" class="tk-dock-tool"${A(x.action, x.value)}${L(x.label)}>${glyph(x.icon)}</button>`).join('');
     return `<nav class="tk-dock" data-ds="TaskDock"${L(tools.label)}>${p}${t}</nav>`;
@@ -3272,7 +3755,6 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 
   /* ---- Footer, Back, drawer, page, dialog: the Sheet card (SentriUI.sheet / sheetFooter / backButton) — one implementation.
      These keep the skeleton's call signatures; see Sheet/README.md. ---- */
-  const back = o => root.SentriUI.backButton(o || {});
   const footer = o => root.SentriUI.sheetFooter(o || {});
   function scrim(o = {}) { return root.SentriUI.scrim(o); }
   /* sheet: the drawer without its scrim (the host places scrim() before it); drawer: scrim + sheet. height 'full' = Sheet's
@@ -3286,16 +3768,7 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
   }
   function dialog(o = {}) { return root.SentriUI.sheet(Object.assign({}, o, { variant: 'dialog' })); }
 
-  /* ---- TaskChips (candidate): one row of filter chips over a task list — `All · Iron 4 · Castrate 6 · Done 3`. One is
-     chosen at a time (a radio group: role=radiogroup, each chip role=radio with aria-checked and a roving tab stop; wire the
-     arrow keys with SentriUI.radioBind). The row scrolls sideways; its end keeps a gutter so the last chip is never cut.
-     items: [{ value, label, count, checked, aria }] (label and count are text slots; count is drawn in mono inside the
-     chip). action: the one data-action for every chip. key: the group's data-field (radioBind's field). ---- */
-  function chips({ items = [], action = 'chip', key = 'chips', label } = {}) {
-    return window.SentriUI.filterChips({items:items.map(i=>({...i,label:T(i.label),count:i.count==null?null:T(i.count)})),action,key,label});
-  }
-
-  const api = { T, statusbar, phone, screen, header, summary, progress, lens, chips, list, group, row, door, doors, radios, warning, section, receipt, day, holdBind, table, metrics, stepper, photos, choice, totals, dock, back, footer, scrim, sheet, drawer, page, dialog, glyph };
+  const api = { T, statusbar, phone, screen, header, summary, progress, lens, list, group, row, door, doors, radios, warning, section, receipt, day, table, metrics, choice, totals, dock, footer, scrim, sheet, drawer, page, dialog, glyph };
   root.SentriTask = api;
   if (typeof module !== 'undefined') module.exports = api;
 })(globalThis);
@@ -4027,7 +4500,7 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
     var items = [{ value: '', label: S('chips.all'), checked: V.chip === '', aria: T('chips.all') }]
       .concat(chipCounts().map(function (c) { return { value: c.k, label: S(chipKey(c.k)), count: S('fig', { v: c.n }), checked: V.chip === c.k, aria: T('chip.aria', { name: chipName(c.k), n: c.n }) }; }))
       ;
-    return '<div class="sp-list-lens">'+UI.segment({variant:'two-line-lens',options:[['todo',K.T(S('lens.todo')),{count:all.length-done}],['done',K.T(S('lens.done'))]],active:V.lens,action:'list-lens',ariaLabel:T('chips.label')})+'</div>' + (V.lens==='todo'?K.chips({ items: items, action: 'chip', key: 'chips', label: T('chips.label') }):'');
+    return '<div class="sp-list-lens">'+UI.segment({variant:'two-line-lens',options:[['todo',K.T(S('lens.todo')),{count:all.length-done}],['done',K.T(S('lens.done'))]],active:V.lens,action:'list-lens',ariaLabel:T('chips.label')})+'</div>' + (V.lens==='todo'?UI.filterChips({ items: items.map(function (i) { return Object.assign({}, i, { label: K.T(i.label), count: i.count == null ? null : K.T(i.count) }); }), action: 'chip', key: 'chips', label: T('chips.label') }):'');
   }
   /* the task's overall checker: piglets the records cannot account for (set counts lower than the record), batch level only */
   function batchLine() { var u = P.s.unaccounted || 0; return u > 0 ? S('batch.unacc', { b: P.BATCH.name, n: u }) : S('batch', { b: P.BATCH.name }); }

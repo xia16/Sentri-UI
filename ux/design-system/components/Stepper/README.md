@@ -48,7 +48,7 @@ Group is labelled by the visible label; value is a spinbutton with aria-valuenow
 Do use row for repeated fields and count for the primary count. Do reject refused deltas in the host and explain why. Don’t type counts or use colour alone for drafts. Don’t reserve a blank hint beneath every row.
 
 ## API and tokens
-SentriUI.stepper({variant, label, description, value, min, max, step, key, action, draft, changed, status, hint, hintHtml, pointers, reserveHint, disabled, reason, error, loading, pressed, strs, args}). In `SentriUI.stepper` the legacy `hero` maps to `count`; in `SentriTask.stepper` it maps to `well`. `SentriTask.stepper` is a compatibility adapter only; `face` maps to variant.
+SentriUI.stepper({variant, label, description, value, min, max, step, key, action, draft, changed, status, hint, hintHtml, pointers, reserveHint, disabled, reason, error, loading, pressed, strs, args}). The legacy `hero` maps to `count`; pass the variant you mean.
 
 CSS variables: tap-min, control-height, field-height, stepper-row-min, hero-key, glyph-key, glyph-key-hero, space-key-gap, space-row-y, space-8, space-panel, radius-control, radius-count, radius-inset, font-sans, font-mono, type-entry-label-size, type-step-value-size, type-section-title-size, type-hero-count-size, type-figure-well-size, type-description-size, ink, muted, paper, well, control-border, disabled-surface, ink-2, press, amber, green, size-2, size-3. All sizing and colour resolve to tokens.
 

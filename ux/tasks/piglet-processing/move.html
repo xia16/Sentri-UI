@@ -334,7 +334,7 @@ html.atlas-bare:root, html.atlas-bare:root body, html.atlas-bare:root .atlas-pho
     if (!src) return '';
     var a = alive(src), ids = liveRows(src), small = a <= 8 || L(src).sowDied;
     if (S.explains && !gainOnly()) {                         // locked: the count the loss and gain already wrote
-      return K.stepper({ variant: 'hero', face: 'well', label: '', description: '', value: count(), min: count(), max: count(), key: 'n',
+      return UI.stepper({ variant: 'well', label: '', description: '', value: count(), min: count(), max: count(), key: 'n',
         strs: { label: 'label.piglets', description: pl('pp.move.count.of', a), value: 'ds.field.figure', decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase' },
         args: { description: { n: a, code: src } } });
     }
@@ -349,18 +349,18 @@ html.atlas-bare:root, html.atlas-bare:root body, html.atlas-bare:root .atlas-pho
           return UI.choiceRow({ label: '', mode: 'multi', mono: true, action: 'pick-row', value: r.rowId, attrs: { 'aria-label': rowLabel(r) }, selected: S.rows.indexOf(r.rowId) >= 0,
             strs: { label: r.tag ? 'pp.move.rows.tag' : 'pp.move.rows.notch' }, args: { label: r.tag ? { tag: r.tag } : { notch: r.notch } } });
         })) +
-        (rem ? K.stepper({ face: 'row', label: '', description: '', value: S.untagged, min: 0, max: rem, key: 'untagged', hint: '', reserveHint: S.untagged >= rem,
+        (rem ? UI.stepper({ variant: 'row', label: '', description: '', value: S.untagged, min: 0, max: rem, key: 'untagged', hint: '', reserveHint: S.untagged >= rem,
           strs: { label: 'pp.move.rows.untagged', description: pl('pp.move.rows.untagged_of', rem), value: 'ds.field.figure', hint: S.untagged >= rem ? pl('pp.move.rows.untagged_ceiling', rem) : undefined,
                   decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase' }, args: { description: { n: rem }, hint: { n: rem } } }) : '') +
         '</section>';
     }
     if (gainOnly()) {                                        // at most the gain: a larger move is a plain Move of its own
       var g = gainOpen(), mx = Math.min(a, g), capHint = S.n >= mx ? (mx === g ? pl('pp.move.explain.gain_cap', g) : pl('pp.move.count.ceiling', a)) : undefined;
-      return K.stepper({ variant: 'hero', face: 'well', label: '', description: '', value: S.n, min: 1, max: mx, key: 'n', hint: '', reserveHint: true,
+      return UI.stepper({ variant: 'well', label: '', description: '', value: S.n, min: 1, max: mx, key: 'n', hint: '', reserveHint: true,
         strs: { label: 'label.piglets', description: pl('pp.move.count.of', a), value: 'ds.field.figure', hint: capHint, decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase' },
         args: { description: { n: a, code: src }, hint: { n: mx === g ? g : a, code: src, to: receiver() } } });
     }
-    return K.stepper({ variant: 'hero', face: 'well', label: '', description: '', value: S.n, min: 1, max: a, key: 'n', hint: '', pointers: ptr, reserveHint: ptr.length > 0 || S.n >= a,
+    return UI.stepper({ variant: 'well', label: '', description: '', value: S.n, min: 1, max: a, key: 'n', hint: '', pointers: ptr, reserveHint: ptr.length > 0 || S.n >= a,
       strs: { label: 'label.piglets', description: pl('pp.move.count.of', a), value: 'ds.field.figure', hint: S.n >= a && !ptr.length ? pl('pp.move.count.ceiling', a) : undefined,
               decrease: 'ds.field.aria.decrease', increase: 'ds.field.aria.increase' },
       args: { description: { n: a, code: src }, hint: { n: a, code: src } } });

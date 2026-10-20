@@ -1,7 +1,7 @@
 {
   "status": "retired",
   "judged": "2026-10-20",
-  "note": "No live screen draws it: the actions pages moved to Row tiles and a Sheet footer. Only the components study page calls SentriUI.categoryFooter. No library page; the renderer and its CSS go when the study page stops calling it.",
+  "note": "No live screen drew it. The renderer, CSS, types and specimens were deleted on 2026-10-20.",
   "previous": {
     "status": "agent-checked",
     "round": 1,

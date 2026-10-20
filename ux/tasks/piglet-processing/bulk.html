@@ -349,7 +349,7 @@
     }
     render();
     // The review closes with a hold (TaskHold): the record is one act for every ticked litter.
-    holds = K.holdBind(scr, { t: function (id) { return PP.t(id); },
+    holds = UI.holdBind(scr, { t: function (id) { return PP.t(id); },
       cues: { keep: 'pp.bulk.hold.keep', tap: 'pp.bulk.hold.tap', released: 'pp.bulk.hold.released', disarmed: 'pp.bulk.hold.released', again: 'pp.bulk.hold.again', early: 'pp.bulk.hold.again' },
       onCommit: function (el) {
         holds.settle(el, 'done');
