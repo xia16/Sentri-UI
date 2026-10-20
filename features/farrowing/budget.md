@@ -23,10 +23,10 @@
 ## Levels
 
 - **Act now**: the worker's own input (the field in Find a sow; the scan itself, which needs no tap). In a Scan row the one act-now fact is her overdue state, exactly as in the room (red figure, one "!").
-- **Watch**: the scanner state (the pill), and the selection count once something is ticked.
-- **Settled**: group counts, the context line, her place on the right in Find a sow (ink, 16px; the typed part of the tag is the only bold).
+- **Watch**: the selection count once something is ticked (the footer's "N sows selected"), and, for 1.6 s after a read, the progress wash on the row just scanned (Row's Just scanned state; it fades, so it never competes with a red overdue state for long).
+- **Settled**: the unit heading over each card ("Unit 7", 16px ink, no count), the context line, her place on the right in Find a sow (ink, 16px; the typed part of the tag is the only bold). The scanner state is the footer's Stop / Resume scanning, the one control of the page (2026-10-20).
 - **Audit**: nothing: no times, no names beyond the row's own context line.
-- Cut list: the "N sows found" line, the unit in the search header, the "ready for the next tag" banner, the "Not found" row, the Scanner preview and Try sample tag, the old second search door inside Scan.
+- Cut list: the "N sows found" line, the unit in the search header, the "ready for the next tag" banner, the "Not found" row, the Scanner preview and Try sample tag, the old second search door inside Scan. Cut 2026-10-20: the Scanning / Stopped pill (the footer says it), the group counts beside the unit headings (the cards show them), "In" and "Other units" (one plain heading per unit; rows no longer repeat the unit), and Scan Actions' "2 sows" line (the footer had just said it).
 
 ## Headers (2026-10-13)
 
