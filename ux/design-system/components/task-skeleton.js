@@ -251,7 +251,6 @@
 
   /* ---- Footer, Back, drawer, page, dialog: the Sheet card (SentriUI.sheet / sheetFooter / backButton) — one implementation.
      These keep the skeleton's call signatures; see Sheet/README.md. ---- */
-  const back = o => root.SentriUI.backButton(o || {});
   const footer = o => root.SentriUI.sheetFooter(o || {});
   function scrim(o = {}) { return root.SentriUI.scrim(o); }
   /* sheet: the drawer without its scrim (the host places scrim() before it); drawer: scrim + sheet. height 'full' = Sheet's
@@ -265,16 +264,7 @@
   }
   function dialog(o = {}) { return root.SentriUI.sheet(Object.assign({}, o, { variant: 'dialog' })); }
 
-  /* ---- TaskChips (candidate): one row of filter chips over a task list — `All · Iron 4 · Castrate 6 · Done 3`. One is
-     chosen at a time (a radio group: role=radiogroup, each chip role=radio with aria-checked and a roving tab stop; wire the
-     arrow keys with SentriUI.radioBind). The row scrolls sideways; its end keeps a gutter so the last chip is never cut.
-     items: [{ value, label, count, checked, aria }] (label and count are text slots; count is drawn in mono inside the
-     chip). action: the one data-action for every chip. key: the group's data-field (radioBind's field). ---- */
-  function chips({ items = [], action = 'chip', key = 'chips', label } = {}) {
-    return window.SentriUI.filterChips({items:items.map(i=>({...i,label:T(i.label),count:i.count==null?null:T(i.count)})),action,key,label});
-  }
-
-  const api = { T, statusbar, phone, screen, header, summary, progress, lens, chips, list, group, row, door, doors, radios, warning, section, receipt, day, holdBind, table, metrics, stepper, photos, choice, totals, dock, back, footer, scrim, sheet, drawer, page, dialog, glyph };
+  const api = { T, statusbar, phone, screen, header, summary, progress, lens, list, group, row, door, doors, radios, warning, section, receipt, day, holdBind, table, metrics, stepper, photos, choice, totals, dock, footer, scrim, sheet, drawer, page, dialog, glyph };
   root.SentriTask = api;
   if (typeof module !== 'undefined') module.exports = api;
 })(globalThis);
