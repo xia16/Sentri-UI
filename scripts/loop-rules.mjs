@@ -545,7 +545,8 @@ export function passesWithoutJudge(mech) {
 // nothing (#192, 2026-10-17: 0 of 112 judgements carried twice, with 108 and then 112 pairs pixel-identical). Older runs, without
 // `image`, match by shot identity as before.
 //   old: { mech, parts: [verdict files] } of the judged run · now: the new run's mechanical.json
-// → { carried: a verdict part for the new run (or null when nothing carries), need: [pair names], goneNeed: [screen ids] }
+// → { carried: a verdict part for the new run (null when there is no verdict to carry), need: [pair names], goneNeed: [screen ids],
+//     walkNeed: [screens to walk again] }
 export function carryJudgements(old, now) {
   const name = (p) => `${p.screen} ${p.lang}-${p.width}`;
   // a pair's keys: by its two images when the run recorded them, and by its two shot identities; a judgement carries on either
@@ -587,10 +588,18 @@ export function carryJudgements(old, now) {
   const first = (old.parts || [])[0] || {};
   const cat = (k) => (old.parts || []).flatMap((p) => p[k] || []);
   // A walk is about behaviour, so it carries only for screens whose inputs are unchanged; a screen carried by its picture alone
-  // is walked again (walkNeed). Its pair judgements still carry.
-  const walk = cat('walk').filter((w) => !sameImageNewInputs.has(w.screen));
-  const walkNeed = [...new Set(cat('walk').filter((w) => sameImageNewInputs.has(w.screen)).map((w) => w.screen))];
-  const carried = pairs.length || gone.length ? {
+  // is walked again (walkNeed). Its pair judgements still carry. A screen the new run must walk because it runs changed code and
+  // draws the same (G15) has no pair to compare: its walk carries when both runs recorded its candidate inputs (walkIdentity) and
+  // they are equal, so a main merged forward that touches nothing it runs keeps its walk (PR 240, 2026-10-20: main moved four
+  // times under a walked, judged, 0-pair change, and each move cost the whole walk and judge again).
+  const before = old.mech?.walkIdentity || {}, after = now.walkIdentity || {};
+  const g15 = new Set(now.walkNeed || []);
+  const walkAgain = (s) => sameImageNewInputs.has(s) || (g15.has(s) && !(before[s] && before[s] === after[s]));
+  const walk = cat('walk').filter((w) => !walkAgain(w.screen));
+  const walked = new Set(walk.map((w) => w.screen));
+  const walkNeed = [...new Set([...cat('walk').map((w) => w.screen).filter(walkAgain), ...[...g15].filter((s) => !walked.has(s))])];
+  // The judged run's verdict carries whole, even with no pair to carry: its walks, calibration and claims are still this change's.
+  const carried = (old.parts || []).length ? {
     // a part's pass is about its own pairs (no worse, no defect); "at least one better" is checkVerdict's, over every part (G13)
     pass: (old.parts || []).every((p) => p.pass === true), candidate: now.candidate, base: now.base, class: first.class, mode: first.mode,
     mechanical: first.mechanical || [], walk, pairs, defects: cat('defects'), gone, calibration: first.calibration || [],
