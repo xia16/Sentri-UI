@@ -8,7 +8,7 @@ Switch a fixed set of 2–5 views or choices of the same list or sheet. Use [Fil
 - **Lens (inline count):** use only for a 2-state split inside a card or sheet header where a second text line would not fit, and no filter button sits beside it. Not for the main list of a task: use the two-line lens.
 - **View switch:** use for 2–3 subjects of one sheet.
 - **Facet:** use for one fixed single-choice filter in a filter sheet.
-- **Scope** (owner, 2026-10-20; from Home's Overview | Choose unit): the whole list or one part of it, the part picked in a drawer. Two options: the whole, with its count, and a door (`door: true`, a down chevron, `aria-haspopup`) that names the current part with its count, or "Choose unit" when none is picked. Data sync's task log (All units · Unit 7).
+- **Scope** (owner, 2026-10-20; from Home's Overview | Choose unit): the whole list or one part of it, the part picked in a drawer. Two options: the whole, with its count, and a door (`door: true`, a down chevron, `aria-haspopup`) that names the current part with its count, or "Choose unit" when none is picked. The picked part's label is ink and its count `ink-2` (7:1: the number the worker reads to choose); the other part reads muted, label and count, like any unpicked option. Data sync's task log (All units · Unit 7).
 
 ## When not to use
 

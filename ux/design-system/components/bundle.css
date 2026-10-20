@@ -974,6 +974,7 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
 .st-segment[data-variant=scope] button[aria-haspopup]{justify-content:flex-start}
 .st-segment[data-variant=scope] button[aria-pressed=true]{color:var(--ink);font-weight:500;box-shadow:0 1px 3px #20271f0d}
 .st-segment[data-variant=scope] .st-selection-count{font:500 13px var(--font-mono);color:var(--muted)}
+.st-segment[data-variant=scope] button[aria-pressed=true] .st-selection-count{color:var(--ink-2)}
 .st-segment-door{display:grid;place-items:center;margin-left:auto;color:var(--muted)}
 .st-segment-door svg{width:16px;height:16px}
 
