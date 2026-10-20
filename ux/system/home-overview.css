@@ -23,11 +23,9 @@
 
 
 /* ---------- To treat / Monitoring: a list page (owner, 2026-10-20) ---------- */
-/* The search (with scan in it) and the filter stay at the top while the list scrolls. */
+/* The search (with scan in it) and the filter head the list and scroll with it. */
 .app-scroll.mk-scroll{padding:0 var(--space-gutter) var(--space-section)}
-/* TaskLens is the sticky bar (its own background); this page sets only where it sits: flush with the page edges, cards' gutter inside. */
-.mk-bar.tk-lens{margin:0 calc(-1 * var(--space-gutter));padding:0 0 var(--space-heading)}
-.mk-bar>.tk-lens-bar{align-items:center;gap:var(--space-8);margin:0 var(--space-gutter)}
+.mk-bar{display:flex;align-items:center;gap:var(--space-8);margin-bottom:var(--space-heading)}
 .mk-bar .st-choice-search.st-choice-search{flex:1;min-width:0;margin:0}
 .mk-bar .mk-field-tools{position:absolute;top:0;right:0;bottom:0;display:flex;align-items:center}
 .mk-bar .mk-field-tools>[hidden]{display:none}

@@ -459,7 +459,7 @@
     const tools='<span class="mk-field-tools">'+SentriUI.iconButton({variant:'plain',action:'mk-clear',icon:icon('close'),label:'Clear',className:'mk-clear'}).replace('<button','<button'+(m.q?'':' hidden'))+SentriUI.iconButton({variant:'plain',action:'mk-scan',icon:icon('scan'),label:'Scan ear tag',className:'mk-scan'})+'</span>';
     const search=SentriUI.choiceSearch({label:'Search ear tag or pen',placeholder:'Ear tag or pen',value:m.q||'',attrs:{'data-mk-search':''}}).replace(/<button[^>]*st-search-clear[\s\S]*?<\/button>/,'').replace(/<\/span><\/label>$/,tools+'</span></label>');
     const filter=SentriUI.iconButton({action:'marked-filter',icon:icon('filter'),label:'Filter pigs'+(n?', '+n+' applied':''),badge:n||'',className:'mk-filter'});
-    return head(title)+`<div class="app-scroll mk-scroll"><div class="tk-lens mk-bar"><div class="tk-lens-bar">${search}${filter}</div></div><div class="mk-list">${markedList()}</div></div>`;
+    return head(title)+`<div class="app-scroll mk-scroll"><div class="mk-bar">${search}${filter}</div><div class="mk-list">${markedList()}</div></div>`;
   }
   // The filter holds every facet: unit (when the list spans more than one), care (To treat), and the condition.
   function markedFilter(){
@@ -468,7 +468,7 @@
     if(m.picking){
       const conds=[...new Set(markedAll().map(p=>p.cond))].sort(),inScope=markedAll().filter(p=>markedMatch(p,{...d,cond:'any'}));
       const rows=[['any','Any condition',''],...conds.map(c=>[c,c,String(inScope.filter(p=>p.cond===c).length)])].map(([v,l,meta])=>SentriUI.choiceRow({label:l,meta:meta?meta+(meta==='1'?' pig':' pigs'):'',mode:'single',action:'mk-cond',value:v,selected:d.cond===v}));
-      overlay.innerHTML=SentriUI.sheet({title:'Condition',cross:{action:'close',label:'Close filter'},size:'medium',label:'Condition',body:SentriUI.choiceGroup(rows.join('')),footer:SentriUI.pickerFooter({back:{action:'mk-cond-back'}}),close:{action:'close'},scrim:{action:'close',label:'Close filter'}});
+      overlay.innerHTML=SentriUI.sheet({title:'Condition',cross:{action:'close',label:{text:'Close',str:'act.close'}},size:'medium',label:'Condition',body:SentriUI.choiceGroup(rows.join('')),footer:SentriUI.pickerFooter({back:{action:'mk-cond-back'}}),close:{action:'close'},scrim:{action:'close',label:'Close filter'}});
     }else{
       const sections=[
         ...(units.length>1?[{title:'Unit',icon:icon('grid'),content:SentriUI.segment({variant:'facet',options:[['all','Any'],...units.map(u=>[String(u),'Unit '+u])],active:String(d.unit),action:'mk-unit',ariaLabel:'Unit'})}]:[]),
@@ -594,7 +594,8 @@
     app.innerHTML=(island?badge:'')+(pages[state.page]||home)();
     app.classList.toggle('schedule-open',state.page==='schedule');
     if(state.page==='marked'&&SentriUI.rowFitTags)requestAnimationFrame(()=>SentriUI.rowFitTags(app));
-    if(badge&&!island&&state.page!=='schedule')(app.querySelector('.app-header,.page-head,.st-page-header')||app).insertAdjacentHTML('beforeend',badge);
+    // The list page holds no records of its own, so its one header corner stays free (Headers law), as on the Schedule.
+    if(badge&&!island&&!['schedule','marked'].includes(state.page))(app.querySelector('.app-header,.page-head,.st-page-header')||app).insertAdjacentHTML('beforeend',badge);
     window.AtlasBare&&AtlasBare.watch(atlasScreen);
     document.querySelectorAll('[data-demo]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.demo===(state.page==='sections'?'sections':state.unit?'unit':'overview'))));
   }
