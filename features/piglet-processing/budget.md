@@ -1,19 +1,36 @@
-# piglet-processing: headers, information budget
+# piglet-processing: animal lists, information budget
 
-Scope: the headers only (the shared Headers change). Bodies keep their own budgets.
+Scope: the rows of the three animal lists. These are the pen list (To do / Done), End task's not-done pens and a pen's tagged piglets. They move from the classic row onto the approved Animal row, following the Farrowing room (owner 2026-10-11). The headers are kept, under Headers below.
 
 ## Inventory
 
-- The task name, the last record (time, hand), the sow's tag, the pen, parity, the alive count, the piglets' age in days, the batch, items done, a correction in progress (`Fixing 001216`).
+- **Pen list:** the sow's tag; the pen (its card header); every job owed today, in the day's order; each job's state (due, late, piglets left); sow died; the litter size; its age in days; the last record's time and hand; jobs coming later and when; done; task ended.
+- **End task:** the pen; the jobs not done; late with its day; the amount left; why it is left (weak, sick).
+- **Tagged piglets:** the tag (· notch); sex; weight; when and who tagged it; kept for breeding.
 
 ## Questions
 
-1. Which pen am I at? 2. Is this the right sow? 3. Can I trust the list (last record)? 4. What is left to do here? (the body: the processing days)
+1. **Pen list:** Which litter needs me? Is anything late, or did the sow die? What do I bring to this pen? How many piglets?
+2. **End task:** What is still open, and is any of it late?
+3. **Tagged piglets:** Is this the piglet I mean? Is its record right? Is it kept for breeding?
 
 ## Levels
 
-- **Settled**, header line: last record on the list; chip and pen on the pen sheet. Parity is cut: it answers nothing in processing (the owner's example: it matters at farrowing and may not elsewhere). Alive count and day are on the Piglets card and the processing days. Batch is on the summary card.
-- Cut list: `B05 · parity 3 · 11 piglets · day 1`, `A03 · day 4`, `A03 · 12 alive`, `A02 · Sow 000238`, `A02 · sow 000238 · 8 without ID`, `Fixing 001216`, `Piglet processing · Batch 40`.
+- **Act** (red, the one "!"): Late; Sow died.
+- **Soon** (regular ink): the job owed today, as one figure. That is the first job in the day's order and how many more (`Castrate +2`); the job chips above the list name and count every job.
+- **Settled** (grey):
+  - a coming job and when (`Iron` · `In 2 days`);
+  - Done, with the litter;
+  - a tagged piglet's sex over its weight.
+- **Context** (left, under the ID): `12 piglets · day 5` on To do rows. On Done and ended rows it is when · who, as Farrowing shows for recorded sows.
+- **Cut:**
+  - the whole job list in the headline, since the chips and the pen sheet carry it;
+  - the Late chip under the ID, now the state word;
+  - the mono meta line;
+  - the last record's time on To do rows, which is history and not direction;
+  - `due today` (the To do lens and End task already say it);
+  - `Task ended` on every row after the end (the card above says it once);
+  - the chevron beside the tagged piglet's breeding flag.
 
 ## Headers (2026-10-13)
 
