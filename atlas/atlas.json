@@ -6404,7 +6404,7 @@
             "at": "004318",
             "shows": "Her row takes the pale progress wash (blue), the same for a new sow and for a repeat scan. Not the well tint, which marks a ticked row, and not amber or red, which are status.",
             "logic": "Every scan lights its row on its own clock and brings it into view smoothly; the tint fades over about a second when its 1.6 s are up. A new row slides in and the rows under it glide down. Reduced motion keeps the tint and drops the slide and the fade.",
-            "source": "farrowing-astra-concept.js scanAdd(); SentriUI.scanArrive(), scanPlaces(), scanGlide() and bundle.css .st-scan-lit (components/Lookup)"
+            "source": "farrowing-astra-concept.js scanAdd(); SentriUI.scanArrive(), scanPlaces(), scanGlide() (components/Lookup); Row's Just scanned state (data-arrival, design system)"
            }
           ],
           "controls": [],
@@ -14590,7 +14590,7 @@
             "name": "Arrival tint",
             "at": "000306",
             "shows": "Her row takes the pale progress wash, for a new pig and a repeat scan alike; not the well tint of a ticked row.",
-            "source": "SentriUI.scanArrive(), scanGlide(); bundle.css .st-scan-lit (components/Lookup)",
+            "source": "SentriUI.scanArrive(), scanGlide() (components/Lookup); Row's Just scanned state (data-arrival)",
             "logic": "Every scan lights its row for 1.6 s and brings it into view; a new row slides in and the rows under it glide down. Reduced motion keeps the tint and drops the slide."
            }
           ],

@@ -44,7 +44,7 @@ Classification: **component**. It was lifted from Farrowing's Find a sow and Sca
 | Opened | the field focused, the hint, nothing listed | "Hold the reader to an ear tag", Stop scanning |
 | Content | unit cards of results | unit cards of scanned animals |
 | None | "No pig matching “909” in any unit." | not possible: a scan always adds a row (no Not-found row, owner 2026-10-12) |
-| Arrival | n/a | the row just read takes `progress-wash` for 1.6 s, then fades; the row is brought into view |
+| Arrival | n/a | the row just read takes Row's Just scanned state (`data-arrival`, `progress-wash`) for 1.6 s, then fades; the row is brought into view |
 | Ticked | n/a | ticked rows take the selected tint; the footer becomes the count and Actions |
 | Stopped | n/a | the list stays; Resume scanning is the primary |
 | No reader | no scan icon in the field | "Scanner not connected" and how to pair it; no footer |
@@ -81,7 +81,7 @@ Find maps to a search screen with a pinned search bar (iOS `UISearchController` 
 
 ## Tokens used
 
-`paper`, `app-background`, `line`, `ink`, `ink-2`, `muted`, `progress-wash`, `radius-12`, `footer-height`, `font-sans`.
+`paper`, `app-background`, `line`, `ink`, `ink-2`, `muted`, `radius-12`, `footer-height`, `font-sans`.
 
 ## Used by
 

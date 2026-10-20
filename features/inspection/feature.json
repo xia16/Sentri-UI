@@ -1105,7 +1105,7 @@
             "name": "Arrival tint",
             "at": "000306",
             "shows": "Her row takes the pale progress wash, for a new pig and a repeat scan alike; not the well tint of a ticked row.",
-            "source": "SentriUI.scanArrive(), scanGlide(); bundle.css .st-scan-lit (components/Lookup)",
+            "source": "SentriUI.scanArrive(), scanGlide() (components/Lookup); Row's Just scanned state (data-arrival)",
             "logic": "Every scan lights its row for 1.6 s and brings it into view; a new row slides in and the rows under it glide down. Reduced motion keeps the tint and drops the slide."
           }
         ],

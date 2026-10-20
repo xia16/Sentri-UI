@@ -1451,16 +1451,16 @@
       sheetFooter({content:button({label:listening?(toggle.stop||'Stop scanning'):(toggle.resume||'Resume scanning'),icon:SentriIcons.icon(listening?'stop':'scan'),register:listening?'secondary':'primary',className:'st-scan-toggle',action:toggle.action}),className:'st-scan-foot'});
     return sheet({variant:'page',title,back,body,footer:foot,className:'st-scan'+(className?' '+className:''),label:title,bar,attrs:{'data-lookup':'scan'}});
   }
-  /* An animal just scanned keeps a soft progress tint for a moment, so the eye finds her row after looking up from the pig; the tint then
-     fades. The row just read is brought into view (smoothly); the rest of the list keeps its place. scan = { fresh:{ tag: until (ms, or
-     Infinity for the held frame) }, last }. Rows carry data-scan-tag. */
+  /* An animal just scanned keeps Row's Just scanned state for a moment (data-arrival="on", the progress wash), so the eye finds her row after
+     looking up from the pig; "off" then fades it back and the attribute goes. The row just read is brought into view (smoothly); the rest of
+     the list keeps its place. scan = { fresh:{ tag: until (ms, or Infinity for the held frame) }, last }. Rows carry data-scan-tag. */
   function scanArrive(root,sc){
     if(!root||!sc)return;const now=Date.now();sc.fresh=sc.fresh||{};
     for(const [tag,until] of Object.entries(sc.fresh)){
       if(until<=now){delete sc.fresh[tag];continue;}
       const r=root.querySelector(`[data-scan-tag="${tag}"]`);if(!r)continue;
-      r.classList.add('st-scan-lit');
-      if(until!==Infinity)setTimeout(()=>r.classList.remove('st-scan-lit'),until-now);
+      r.dataset.arrival='on';
+      if(until!==Infinity)setTimeout(()=>{r.dataset.arrival='off';setTimeout(()=>r.removeAttribute('data-arrival'),900);},until-now);
     }
     const r=sc.last&&root.querySelector(`[data-scan-tag="${sc.last}"]`);sc.last='';
     if(r)r.scrollIntoView({block:'nearest',behavior:'smooth'});
