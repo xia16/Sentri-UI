@@ -7,11 +7,14 @@
     "states": [
       "Default",
       "Empty",
+      "Empty, place kept",
       "Long label / Chinese"
     ],
     "usedBy": [
       "farrowing.finish",
-      "inspection.pen"
+      "inspection.pen",
+      "workbench.quiet-section",
+      "workbench.all-quiet"
     ]
   },
   {

@@ -110,8 +110,10 @@
     const showDesc=description||has(o,'description'),showMeta=meta||has(o,'meta');
     return `<div class="st-heading ${esc(className)}" data-ds="Heading" data-kind="${k}"${icon?' data-has-icon="true"':''}><div class="st-heading-main"><h${h} class="st-heading-title">${icon?`<span class="st-heading-icon">${icon}</span>`:''}<span${sa(strs&&strs.title,args&&args.title)}>${esc(title)}</span></h${h}>${showDesc?`<p class="st-heading-description">${tx(description,o,'description')}</p>`:''}</div>${showMeta||act?`<div class="st-heading-aside">${showMeta?`<span class="st-heading-meta">${tx(meta,o,'meta')}</span>`:''}${act?`<span class="st-heading-action">${act}</span>`:''}</div>`:''}</div>`;
   }
-  function panel(content,{className='',tag='div',ds='Panel'}={}){
-    if(!content||!String(content).trim())return '';
+  /* empty: a panel with nothing in it is absent, unless the host keeps its place and names what is missing: then it is one quiet
+     line with a tick ("No production work open"; Home's Overview, owner 2026-10-20). */
+  function panel(content,{className='',tag='div',ds='Panel',empty=''}={}){
+    if(!content||!String(content).trim())return empty?`<div class="st-panel st-panel--empty ${esc(className)}" data-ds="${esc(ds)}"><span aria-hidden="true">${check}</span><p>${esc(empty)}</p></div>`:'';
     const t=['div','section','article','aside','dl'].includes(tag)?tag:'div';
     return `<${t} class="st-panel ${esc(className)}" data-ds="${esc(ds)}">${content}</${t}>`;
   }
