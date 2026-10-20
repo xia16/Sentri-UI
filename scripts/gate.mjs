@@ -32,7 +32,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { checkVerdict, calibrationProblems, lockState, passesWithoutJudge, carryJudgements, resultsBlock } from './loop-rules.mjs';
+import { checkVerdict, calibrationProblems, lockState, passesWithoutJudge, carryJudgements, resultsBlock, mergeLibrary } from './loop-rules.mjs';
 import { selfStart } from './process-start.mjs';
 import { postStatus as post } from './github.mjs';
 import { evaluate, toolsDiffer } from './evaluate.mjs';
@@ -211,7 +211,7 @@ if (opt('verdict')) {
   // Each part's pass is about its own pairs: no worse or failed pair, no defect, no failed walk, no contradicted claim. "At least
   // one pair better" is the whole change's, which checkVerdict applies over every part's pairs together (G13): a part that is all
   // "same", or all new screens, passes on its own.
-  const verdict = { ...parts[0], pass: parts.every((p) => p.pass === true), pairs: cat('pairs'), walk: cat('walk'), defects: cat('defects'), gone: cat('gone'), rejected: cat('rejected'), contradicted: cat('contradicted') };
+  const verdict = { ...parts[0], pass: parts.every((p) => p.pass === true), pairs: cat('pairs'), walk: cat('walk'), defects: cat('defects'), gone: cat('gone'), rejected: cat('rejected'), contradicted: cat('contradicted'), library: mergeLibrary(parts) };
   for (const p of parts) if (p.candidate !== verdict.candidate || p.base !== verdict.base) verdict.candidate = 'mixed verdicts';
   const v = checkVerdict(verdict, mech);
   // a screen whose walk could not carry (same picture, changed inputs) needs a walk in this verdict

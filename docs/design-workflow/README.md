@@ -53,8 +53,8 @@ The design system and the rules above are a floor, not a ceiling (owner, 2026-10
 - **Budget first, then explore.** Visual and blind explorations start from the agreed attention budget. Every candidate is judged against the current screen, never only against the other candidates.
 - **When a job is only adequate, look wider.** Before you build, sketch at least one alternative that departs from the current pattern. Then build the one that serves the farmer best.
 - **The gate decides, not familiarity.** The new design must beat what it replaces, side by side. Being different never makes it worse, and matching the system never makes it better.
-- **Only a much better design is worth the change.** The system stays consistent. A small improvement isn't built; a much better one is propagated to every feature that uses it.
-- **Prove it in a feature, then share it.** An enhancement starts in the feature that needs it. It reaches other features only as a shared-component change, gated on every feature that uses it, and never by restyling an approved screen to match.
+- **Only a much better design is worth the change.** The system stays consistent. A small improvement isn't built; a much better one is built in the shared component, so every feature that uses it gets it.
+- **Prove it in a feature, then share it.** An enhancement starts in the feature that needs it. It reaches other features only as a shared-component change, and never by restyling an approved screen to match. The gate checks that change on the features in progress, for propagation only (owner, 2026-10-20).
 - **The owner rules still bind.** They are what keeps the product one product. Everything they don't fix is open.
 
 ## The scenario framework
@@ -93,7 +93,7 @@ One entry point drives them all: `/design <feature>` ([.claude/skills/design/](.
 2. **References**: find what exists for the job and capture the baselines before building ([build.md §1](briefs/build.md#1-start-from-what-exists-p1)).
 3. **Build** on a branch in a worktree off `origin/main` ([build.md](briefs/build.md)).
 4. **Gate** it on the exact merge candidate. A different agent from the builder runs [gate.md](briefs/gate.md).
-5. **Merge** it automatically once the gates pass. Merge main forward (`git fetch origin && git merge origin/main`); never rebase or force-push. Rerun the checks on the merged result.
+5. **Merge** it automatically once the gates pass. Merge main forward with `node scripts/merge-main.mjs` (it regenerates `atlas/atlas.json` and `tokens.css`); never rebase or force-push. Rerun the checks on the merged result.
 6. **File** owner-only product questions as decision items, with options and a recommendation.
 
 ## Gates by change class
@@ -103,9 +103,9 @@ One entry point drives them all: `/design <feature>` ([.claude/skills/design/](.
 | Copy only | Copy budget and wrapping rules, verb registry (`ux/laws/strings.json`), EN/ZH render of the touched screens |
 | Presentation in one feature | The above, plus the mechanical checks (incl. `node scripts/check-states.mjs`), plus before/after on the feature's screens |
 | Behaviour | The above, plus the scenario leaves and walks that touch it (390/360, EN/ZH), screen-reader order and keyboard cover |
-| Shared component | All of the above on **every** feature that uses it. A refactor must be identical. Any change to a frozen screen needs the owner's approval. |
+| Shared component | All of the above on the PR's own features and the component's atlas pages, plus the library fit. On the features in progress (`features/_in-progress.json`), propagation only: the part arrived and renders correctly. No other feature is checked. A refactor must be identical everywhere. Any change to a frozen screen needs the owner's approval. |
 
-**Up to date with main, no queue.** Main requires a branch to be up to date before it merges, and the `sentri/gate` status on its head (gate-simplify.md G2). So two sessions changing the bundle can't undo each other: the second merges main forward and is gated against the new main, and that re-gate reuses every result whose identity is unchanged, carrying every judgement whose two images are the same. A change is shared when it touches the bundle, the tokens, the bare-screen harness, a shared stylesheet or any file that pages of two or more features load; `gate.mjs` decides that itself, and a shared change is judged on every feature it moves.
+**Up to date with main, no queue.** Main requires a branch to be up to date before it merges, and the `sentri/gate` status on its head (gate-simplify.md G2). So two sessions changing the bundle can't undo each other: the second merges main forward and is gated against the new main, and that re-gate reuses every result whose identity is unchanged, carrying every judgement whose two images are the same. A change is shared when it touches the bundle, the tokens, the bare-screen harness, a shared stylesheet or any file that pages of two or more features load; `gate.mjs` decides that itself, and scopes a shared change as the table above says.
 
 Every rejected owner example is a fixture each gate must fail ([gate.md](briefs/gate.md#rejected-examples)). All evidence records the commit it was taken on.
 
