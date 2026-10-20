@@ -222,7 +222,7 @@
       const body = '<div class="sync-content"><div class="sync-intro">' +
         S.statusLine([{text:t('categoryWaiting')}]) + '</div><div class="sync-groups">' +
         group(t('waiting'), categoryItems) + '</div></div>';
-      app.innerHTML = S.sheet({variant:'page',title:t(state.category),body,
+      app.innerHTML = S.sheet({variant:'page',title:t(state.category),back:{action:'back-to-all'},body,
         footer:S.sheetFooter({back:{action:'back-to-all',label:t('back')}})});
       renderDialog();
       return;
@@ -240,7 +240,7 @@
       (state.groupingMode && !state.taskScope ? categoryGroups(waiting) : group(t('waiting'), waiting)) +
       recentUploadSummary(items) + '</div></div>';
     app.innerHTML = S.sheet({
-      variant:'page', title:t(state.taskScope ? 'taskTitle' : 'title'), body,
+      variant:'page', title:t(state.taskScope ? 'taskTitle' : 'title'), back:{action:'go-home'}, body,
       footer:S.sheetFooter({back:{action:'go-home',label:t('back')}})
     });
     if (state.scenario === 'switch' && !state.switchPromptShown) {
@@ -275,7 +275,7 @@
     const primary = failed || conflict
       ? {label:state.retrying ? t('retrying') : t('retry'), action:'retry', busy:state.retrying} : null;
     app.innerHTML = S.sheet({
-      variant:'page', title:t('detail'), body,
+      variant:'page', title:t('detail'), back:{action:'back-to-list'}, body,
       footer:S.sheetFooter({back:{action:'back-to-list',label:t('back')},primary})
     });
     renderDialog();

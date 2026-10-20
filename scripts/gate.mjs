@@ -195,7 +195,7 @@ if (opt('verdict')) {
     const { carried, need, goneNeed, walkNeed = [], problems: refused } = carryJudgements({ mech, parts }, now);
     if (refused.length) { console.log(`GATE FAIL ${short(now.candidate)}: the judged run's verdicts can't be carried`); for (const p of refused) console.log('  -', p); process.exit(1); }
     if (carried) fs.writeFileSync(path.join(again, 'verdict-carried.json'), JSON.stringify({ ...carried, walkNeed }, null, 2));
-    console.log(`carried ${carried?.pairs.length || 0} judgement(s) of ${now.pairs.length} pair(s) by image or identity${carried?.gone.length ? `, and ${carried.gone.length} removed screen reason(s)` : ''}`);
+    console.log(`carried ${carried?.pairs.length || 0} judgement(s) of ${now.pairs.length} pair(s) by image or identity${carried?.gone.length ? `, and ${carried.gone.length} removed screen reason(s)` : ''}, and ${carried?.walk.length || 0} walk entr(ies) whose screen's inputs are unchanged`);
     if (need.length || goneNeed.length || walkNeed.length) {
       console.log(`GATE FAIL ${short(now.candidate)}: ${need.length} pair(s) show different images now${goneNeed.length ? ` and ${goneNeed.length} removed screen(s) need a reason` : ''}${walkNeed.length ? `; ${walkNeed.length} screen(s) look the same from changed inputs and are walked again` : ''}; a judge decides only those`);
       for (const n of need.slice(0, 20)) console.log('  - judge', n);

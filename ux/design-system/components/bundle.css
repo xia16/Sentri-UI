@@ -49,6 +49,10 @@ svg{width:var(--size-20);height:var(--size-20);display:block;flex-shrink:0;fill:
 .sheet[data-sizing="full"][data-size="long"]{height:var(--drawer-long-max)}
 /* Hold: a drawer with levels keeps one height from open to close (across levels and while typing a search): the rows its
    tallest level needs plus its chrome, never above its size's max. */
+/* Keyboard lift (bundle.js keyboardLift): while a field in the sheet has focus and the keyboard covers its bottom, the sheet's bottom sits on the keyboard's top and its height is capped to what stays visible. */
+.sheet[data-keyboard]{bottom:var(--st-keyboard-lift,0px);max-height:calc(100% - var(--size-80) - var(--st-keyboard-lift,0px))}
+.sheet[data-presentation="page"][data-keyboard]{bottom:var(--st-keyboard-lift,0px);height:auto;max-height:none}
+[data-st-keyboard-host][data-keyboard]{box-sizing:border-box;padding-bottom:var(--st-keyboard-lift,0px)}
 .sheet[data-sizing="hold"]{--sheet-hold-chrome:313px;height:calc(var(--sheet-hold-chrome) + var(--hold-rows,4) * var(--size-56))} /* chrome: grab 24 + head with up 79 + search 111 + footer 99 */
 .sheet[data-sizing="hold"]>.sheet-body{flex:1 1 auto}
 /* Page: the whole canvas, square, no scrim; Back is in its footer. */

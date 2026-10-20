@@ -1723,12 +1723,12 @@ function handleRecordAction(c,a,v){
  else if(a==='feed-breakdown'){c.view='feed-breakdown';}
  else if(a==='feed-edit-mode'){c.form.mode=v;}
  else if(a==='feed-edit-hold'){c.form.mode=feedEditorHeld(c)?'adjust':'hold';}
- else if(a==='feed-optional-open'){c.form.optionalDraft=c.form[v]||'';c.view=v==='until'?'feed-date':'feed-note';}
- else if(a==='feed-optional-save'){if(!optionalEditorChanged(c))return true;const key=c.view==='feed-date'?'until':'reason',value=(c.form.optionalDraft||'').trim();if(key==='until'&&value&&value<walkDate)return true;c.form[key]=value;c.form.metadataDirty=true;delete c.form.optionalDraft;c.view='feed-editor';}
+ else if(a==='feed-optional-open'){c.form.optionalDraft=(c.form.optionalDrafts?.[v]??c.form[v])||'';c.view=v==='until'?'feed-date':'feed-note';}
+ else if(a==='feed-optional-save'){if(!optionalEditorChanged(c))return true;const key=c.view==='feed-date'?'until':'reason',value=(c.form.optionalDraft||'').trim();if(key==='until'&&value&&value<walkDate)return true;c.form[key]=value;c.form.metadataDirty=true;delete c.form.optionalDraft;delete c.form.optionalDrafts?.[key];c.view='feed-editor';}
  else if(a==='feed-optional-clear'){c.form[v]='';c.form.metadataDirty=true;}
- else if(a==='feed-optional-remove'){c.form[c.view==='feed-date'?'until':'reason']='';c.form.metadataDirty=true;delete c.form.optionalDraft;c.view='feed-editor';}
+ else if(a==='feed-optional-remove'){c.form[c.view==='feed-date'?'until':'reason']='';c.form.metadataDirty=true;delete c.form.optionalDraft;delete c.form.optionalDrafts?.[c.view==='feed-date'?'until':'reason'];c.view='feed-editor';}
  else if(a==='feed-edit-reset'){Object.assign(c.form,{mode:'resume',percent:0,mixed:false,until:''});c.form.amount=Number(feedTotals(c).after.toFixed(2));}
- else if(a==='feed-edit-save'){saveFeedEditor(c);}
+ else if(a==='feed-edit-save'){const key=c.form.draftKey;if(saveFeedEditor(c))delete c.feedDrafts?.[key];}
  else if(a==='finding'){const [id,name]=v.split('|');c.pigId=id;c.findingName=name;c.view='finding';c.form={};}
  else if(a==='finding-edit'){const k=currentFinding(c);c.form={findingLabel:k.name,triage:k.triage||'None',issueStatus:issueStatus(k),caseNote:k.note||''};c.view='finding-edit';}
  else if(a==='finding-close'){c.form={outcome:'recover',closeNote:''};c.view='finding-close';}
@@ -1748,12 +1748,15 @@ function handleRecordAction(c,a,v){
 // Shared, in-memory feed editor: scope changes, interaction stays the same.
 function openFeedEditor(c,kind,ids){
  // A pen is only an entry point: capture its current pigs as the edit subjects.
- const subjects=kind==='pens'?ids.flatMap(id=>pen(c,id).pigs.map(p=>p.id)):ids;
+ const subjects=kind==='pens'?ids.flatMap(id=>pen(c,id).pigs.map(p=>p.id)):ids,draftKey=kind+':'+ids.join(',');
+ // Unsaved, the adjustment is a draft for these subjects: Back keeps it, and opening the editor again offers it (drawer law).
+ if(c.feedDrafts?.[draftKey]){c.form=c.feedDrafts[draftKey];c.view='feed-editor';return;}
  c.form={feedScope:'pigs',feedIds:[...new Set(subjects)],mode:'keep',percent:0,until:'',reason:''};c.view='feed-editor';
  const rows=feedEditorTargets(c).filter(t=>!t.blocked).flatMap(t=>t.rows),b=feedBasis(c);
  c.form.percent=b.variable?Number(((b.current/b.variable-1)*100).toFixed(8)):0;
  c.form.amount=Number(b.current.toFixed(2));c.form.mixed=new Set(rows.map(p=>p.noFeed?'stop':Number.isFinite(p.feedHold)?'hold:'+p.feedHold:p.factor??1)).size>1;
  if(rows.length===1){c.form.until=rows[0].ends==='when recovered'?'':rows[0].ends||'';c.form.reason=rows[0].adjustmentReason||'';}
+ c.form.draftKey=draftKey;(c.feedDrafts||={})[draftKey]=c.form;
 }
 function feedUnavailableReason(p,pe){return p?.stage==='Sow died'?'Pig has died':pe.mode==='adlib'?'Ad-lib feeding has no fixed daily allowance':pe.mode==='unknown'||!Number.isFinite(p?.base)||p.base<=0?'No feeding plan recorded':'';}
 function feedEditorTargets(c){
@@ -1904,7 +1907,7 @@ gallery.addEventListener('click',e=>{const toastEl=e.target.closest('[data-ds="T
 gallery.addEventListener('click',e=>{const el=e.target.closest('[data-ds="Button"],[data-ds="IconButton"]');if(el&&el.getAttribute('aria-disabled')==='true'&&['bulk-save','record-optional-save','medicine-add-save','condition-add-save'].includes(el.dataset.action))revealRequired(el);if(el&&SentriUI.guard(el)){e.preventDefault();e.stopImmediatePropagation();}},true);
 /* A waiting commit stands alone: tapping it marks the empty required fields "Required" and scrolls to the first. */
 function revealRequired(el){const root=el.closest('[data-card]');if(!root)return;const i=+root.dataset.card,c=states[i];if(!c.form)return;if(el.dataset.action==='medicine-add-save'&&c.form.med?.add)c.form.med.add.showRequired=true;else c.form.showRequired=true;render(i);const sheet=[...root.querySelectorAll('.phone > .sheet')].pop(),first=sheet?.querySelector('[aria-invalid="true"],.field.error');first?.scrollIntoView({block:'center'});}
-gallery.innerHTML=examples.map((e,i)=>`<article class="spec" data-card="${i}"><div class="spec-head"><div class="spec-title"><span>0${i+1}</span>${e.title}</div><select class="scenario" aria-label="Example for ${e.title}">${scenarios.map(([v,t])=>`<option value="${v}"${e.initial===v?' selected':''}>${t}</option>`).join('')}</select></div><div class="phone inspection-phone"></div><p class="caption">${e.caption}</p></article>`).join('');
+gallery.innerHTML=examples.map((e,i)=>`<article class="spec" data-card="${i}"><div class="spec-head"><div class="spec-title"><span>0${i+1}</span>${e.title}</div><select class="scenario" aria-label="Example for ${e.title}">${scenarios.map(([v,t])=>`<option value="${v}"${e.initial===v?' selected':''}>${t}</option>`).join('')}</select></div><div class="phone inspection-phone" data-st-keyboard-host></div><p class="caption">${e.caption}</p></article>`).join('');
 function feedLabel(pe){return pe.mode==='adlib'?'Ad-lib':pe.mode==='station'?'Station-fed':quantity(allocation(pe))+' kg';}
 // Choose a standard height for the form; catalogues grow with their available rows.
 function drawerSize(view,c){
@@ -2113,7 +2116,7 @@ function installDetailNavigation(){
   if(c.view==='record-optional'&&(a==='back'||a==='dismiss')){e.stopImmediatePropagation();c.view=c.form.optionalReturn;delete c.form.optionalDraft;render(i);return;}
   if(c.view==='picker'&&(a==='back'||a==='dismiss')){e.stopImmediatePropagation();c.view=c.form.pickerReturn||'list';delete c.form.pickerKey;delete c.form.pickerReturn;render(i);return;}
   if(c.view==='bulk-health-picker'&&(a==='back'||a==='dismiss')){e.stopImmediatePropagation();leaveConditionPicker(c);render(i);return;}
-  if((c.view==='feed-date'||c.view==='feed-note')&&(a==='back'||a==='dismiss')){e.stopImmediatePropagation();delete c.form.optionalDraft;c.view='feed-editor';render(i);return;}
+  if((c.view==='feed-date'||c.view==='feed-note')&&(a==='back'||a==='dismiss')){e.stopImmediatePropagation();(c.form.optionalDrafts||={})[c.view==='feed-date'?'until':'reason']=c.form.optionalDraft;delete c.form.optionalDraft;c.view='feed-editor';render(i);return;}
   if(c.view==='pen-observe'&&a==='back'){e.stopImmediatePropagation();c.view='pen-detail';render(i);return;}
   if(a==='back'&&c.navTrail?.length){e.stopImmediatePropagation();parkBulkDraft(c);const parent=c.navTrail.pop();Object.assign(c,parent);c.restoreSheetScroll=parent.sheetScroll;render(i);return;}
   if(a==='dismiss'){c.navTrail=[];delete c.navOrigin;return;}
