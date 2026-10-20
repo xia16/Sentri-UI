@@ -3,7 +3,8 @@
 //             (the bottom of its title block or Back, whichever is lower) to the first body content (text, a control, a box),
 //             measured at rest: a screen whose body is scrolled down is judged as if scrolled to its top
 //   contents  a header holds a control other than Back (a page's; a drawer's Back is in its footer, and a drawer with levels goes up with it:
-//             no ‹ Parent in a header, owner ruling B 2026-10-16), the subject chip and a sheet
+//             no ‹ Parent in a header, owner ruling B 2026-10-16), the subject chip, a page's one icon action at the top right
+//             (owner 2026-10-20: a glyph and at most a number, named, held to the corner rules) and a sheet
 //             header's corner actions (Clear or Reset at the top right, a ✕ at the top left), an aside, or a number-with-unit
 //             count ("2 sows", "3 unsaved", "7 / 18", "11 头") in its title or header line
 //   corner    a corner action whose vertical centre is more than 2px off the centre of the header's text block (the title's
@@ -60,8 +61,15 @@ function auditHeaders({ TOL, checks }) {
   const allowed = (el) => el.matches('.st-page-back, .st-subject-chip') || /(^|[-_\s])back($|[-_\s])/i.test(typeof el.className === 'string' ? el.className : '') || /^(back|返回)\b/i.test((el.getAttribute('aria-label') || txt(el)).trim());
   // A corner action (sheet header only; owner ruling C, 2026-10-14): Clear or Reset as quiet text at the top right, a ✕ at the
   // top left. Which corner is told by where the control sits in its header.
+  // A page action (page header only; owner, 2026-10-20): one icon control at the top right, named for the screen reader, whose
+  // visible content is a glyph and at most a number (the sync badge's count), never a word. The first such control is the page's
+  // corner; a second is a control the header must not hold.
+  const pageActionOf = (h, el) => {
+    const hr = h.getBoundingClientRect(), r = el.getBoundingClientRect();
+    return (r.left + r.right) / 2 > (hr.left + hr.right) / 2 && !!el.querySelector('svg') && /^\d*$/.test(txt(el).replace(/\s+/g, '')) && !!(el.getAttribute('aria-label') || '').trim();
+  };
   const cornerOf = (h, el) => {
-    if (isPage(h)) return null;
+    if (isPage(h)) { const first = [...h.querySelectorAll('button, a[href], [role="button"]')].find((c) => vis(c) && !allowed(c) && pageActionOf(h, c)); return first === el ? 'right' : null; }
     const hr = h.getBoundingClientRect(), r = el.getBoundingClientRect(), mid = (r.left + r.right) / 2, centre = (hr.left + hr.right) / 2;
     const label = (el.getAttribute('aria-label') || txt(el)).trim();
     if (/^(clear|reset|清除|重置)$/i.test(label) && mid > centre) return 'right';
@@ -104,7 +112,7 @@ function auditHeaders({ TOL, checks }) {
     // ---- contents ----
     if (checks.includes('contents')) {
       const acts = controls.filter((el) => !allowed(el) && !cornerOf(h, el));
-      for (const a of acts) out.push({ check: 'contents', at: Math.round(a.getBoundingClientRect().top), detail: `${where(h)} holds a control "${(a.getAttribute('aria-label') || txt(a)).slice(0, 30)}": nothing in a header acts but Back, the subject chip and a sheet's corner actions (Clear or Reset top right, ✕ top left)` });
+      for (const a of acts) out.push({ check: 'contents', at: Math.round(a.getBoundingClientRect().top), detail: `${where(h)} holds a control "${(a.getAttribute('aria-label') || txt(a)).slice(0, 30)}": nothing in a header acts but Back, the subject chip, a sheet's corner actions (Clear or Reset top right, ✕ top left) and a page's one icon action at the top right` });
       if (h.querySelector('.sheet-aside')) out.push({ check: 'contents', at: Math.round(h.getBoundingClientRect().top), detail: `${where(h)} has an aside: nothing sits beside the title` });
       for (const el of [title, ...lines].filter(Boolean)) {
         const m = txt(el).match(COUNT);

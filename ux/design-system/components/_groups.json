@@ -3,5 +3,6 @@
   { "group": "Inputs and filters", "components": ["FilterSheet", "RangeSlider"] },
   { "group": "Fields", "components": ["Field", "PickerField", "Stepper", "Measure", "Numpad"] },
   { "group": "Status and feedback", "components": ["Status", "ConditionTag", "Banner", "Toast", "Photos"] },
+  { "group": "Home", "components": ["TaskTile", "WeekBoard"] },
   { "group": "Task skeleton", "components": ["TaskPhone", "TaskHeader", "TaskSummary", "TaskGroup", "TaskDock", "TaskTotals", "TaskProgress", "TaskChoice", "TaskRadios", "TaskTable", "TaskMetrics", "TaskSection", "TaskReceipt", "TaskDay"] }
 ]

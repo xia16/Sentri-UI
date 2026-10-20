@@ -548,18 +548,6 @@
   "recommendation": "Search and filter only, opening Pig profile; Edit pig info joins its actions."
  },
  {
-  "id": "home-and-placeholders-43",
-  "target": {
-   "kind": "feature",
-   "id": "disease"
-  },
-  "kind": "design",
-  "severity": "medium",
-  "title": "Duplicates Health record; keep only the missing parts",
-  "detail": "Add, remove or recover and triage are built as Health record (record health, resolve conditions, care instructions). Left over: second confirmations. Mark as duplicate or reduce to the catalogue.",
-  "source": "sweep"
- },
- {
   "id": "home-and-placeholders-44",
   "target": {
    "kind": "feature",

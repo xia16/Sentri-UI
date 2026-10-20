@@ -323,21 +323,22 @@
   // A section heading with its icon (owner, 2026-10-19), and "Schedule ›" as the heading's own action.
   const sectionIcons={Production:'production',Health:'health',Other:'transfer'};
   function overviewHeading(title,link){return SentriUI.heading({title,kind:'section',level:2,icon:icon(sectionIcons[title]),className:'ov-heading',action:link?{label:'Schedule',action:'schedule',value:link,ariaLabel:'Schedule, '+title}:''});}
-  const quietGroup=text=>SentriUI.heading({title:text,kind:'group',level:3,className:'ov-empty'});
+  // Home keeps its three sections (owner, 2026-10-20): an empty one says so in its own card, one quiet line (README, "empty is absent").
+  const emptyCard=text=>SentriUI.panel('',{empty:text});
   function overview(){
     const all=tasks.filter(t=>t.section===state.section),open=all.filter(t=>!t.completedAt&&!t.terminatedAt),closed=all.filter(t=>t.completedAt||t.terminatedAt);
     const prod=open.filter(t=>!t.category).sort(byStage),health=open.filter(t=>t.category==='health').sort(byStage),other=open.filter(t=>t.category==='other').sort((a,b)=>a.type.localeCompare(b.type)||a.batch.localeCompare(b.batch));
     const tiles=list=>`<div class="ov-tiles">${list.map(t=>SentriUI.taskTile(tileModel(t))).join('')}</div>`;
     // The closed line (owner, 2026-10-19): just "N closed today", quiet and muted; it opens a drawer listing them.
-    const closedLine=closed.length?`<div class="ov-closed">${SentriUI.button({register:'text',align:'start',className:'st-text-action--quiet',icon:icon('check'),label:`${closed.length} closed today`,action:'closed-today',chevron:true})}</div>`:'';
-    const m=marks[state.section]||{treat:0,monitor:0,treatUnits:[],monitorUnits:[]};
-    const care=SentriUI.rowGroup(
-      SentriUI.row({variant:'navigation',icon:icon('treat'),title:'To treat',description:m.treat?(m.sinceYesterday?`${m.sinceYesterday} waiting since yesterday`:unitList(m.treatUnits)):'Nothing marked',trailing:m.treat?{text:String(m.treat)}:'',action:m.treat?'to-treat':'',trail:m.treat?'auto':'none'})+
-      SentriUI.row({variant:'navigation',icon:icon('monitor'),title:'Monitoring',description:m.monitor?unitList(m.monitorUnits):'Nothing marked',trailing:m.monitor?{text:String(m.monitor)}:'',action:m.monitor?'monitoring':'',trail:m.monitor?'auto':'none'})
-    );
-    const otherRows=other.length?SentriUI.rowGroup(other.map(t=>SentriUI.row({variant:'navigation',icon:icon(t.icon||'note'),title:t.title||`${t.type} · ${t.batch}`,description:t.warn?[t.line,{text:t.warn,tone:'red'}]:(t.line||''),trailing:{text:`${t.due} ${t.unit}`},action:'task',value:t.id})).join('')):quietGroup('Nothing open');
+    const closedLine=closed.length?`<div class="ov-closed">${SentriUI.button({register:'text',align:'start',className:'st-text-action--quiet st-text-action--framed',icon:icon('check'),label:`${closed.length} closed today`,action:'closed-today',chevron:true})}</div>`:'';
+    const none={treat:0,monitor:0,treatUnits:[],monitorUnits:[]},m=params.get('marked')==='none'?none:marks[state.section]||none;
+    // A zero row is absent; with no marks and no planned health work, the section's card says so.
+    const careRows=(m.treat?SentriUI.row({variant:'navigation',icon:icon('treat'),title:'To treat',description:m.sinceYesterday?`${m.sinceYesterday} waiting since yesterday`:unitList(m.treatUnits),trailing:{text:String(m.treat)},action:'to-treat'}):'')+
+      (m.monitor?SentriUI.row({variant:'navigation',icon:icon('monitor'),title:'Monitoring',description:unitList(m.monitorUnits),trailing:{text:String(m.monitor)},action:'monitoring'}):'');
+    const care=careRows?SentriUI.rowGroup(careRows):health.length?'':emptyCard('No pigs marked to treat or watch');
+    const otherRows=other.length?SentriUI.rowGroup(other.map(t=>SentriUI.row({variant:'navigation',icon:icon(t.icon||'note'),title:t.title||`${t.type} · ${t.batch}`,description:t.warn?[t.line,{text:t.warn,tone:'red'}]:(t.line||''),trailing:{text:`${t.due} ${t.unit}`},action:'task',value:t.id})).join('')):emptyCard('Nothing else open');
     return header()+scopeRail()+`<div class="app-scroll screen-enter ov-page">
-      <section class="ov-section">${overviewHeading('Production','production')}${prod.length?tiles(prod):quietGroup('Nothing open')}${closedLine}</section>
+      <section class="ov-section">${overviewHeading('Production','production')}${prod.length?tiles(prod):emptyCard('No production work open')}${closedLine}</section>
       <section class="ov-section">${overviewHeading('Health','health')}${care}${health.length?tiles(health):''}</section>
       <section class="ov-section">${overviewHeading('Other','')}${otherRows}</section>
     </div>`+nav();
@@ -399,8 +400,8 @@
       ${foot}`;
   }
   function scheduleKey(){
-    const rows=[['d12','Done','How many were recorded that day'],['o10','Today','Due today'],['p8','Planned','Exact number, already known'],['e6','Estimate','Expected: heat, returns, farrowing'],['u','Waiting on today','Known after today’s results'],['v4','Past its plan','Should have ended; carries on'],['n','Nothing due','Running, nothing to do that day']];
-    drawer('How to read the board',SentriUI.heading({title:'Tap a row to see its week in numbers',kind:'group',level:3})+SentriUI.weekBoardKey(rows),{size:'medium'});
+    const rows=[['d12','Done','How many were recorded that day'],['o10','Today','Due today'],['p8','Planned','Exact number, already known'],['e6','Estimate','Expected: heat, returns, farrowing'],['u','Waiting on today','Known after today’s results'],['v4','Past its plan','Should have ended; carries on'],['n','Nothing due','Running, nothing to do that day'],['p5>','Continues','Runs into next week, or from last']];
+    drawer('How to read the board',SentriUI.heading({title:'Tap a row to see its week in numbers',kind:'group',level:3})+SentriUI.weekBoardKey(rows),{size:'long'});
     overlay.querySelector('.sheet,.dialog')?.classList.add('schedule-key');
   }
   // A row's week in words: each day it runs, what kind of count it is, and the exact number (the cells stay short).

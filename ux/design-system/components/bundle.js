@@ -110,8 +110,10 @@
     const showDesc=description||has(o,'description'),showMeta=meta||has(o,'meta');
     return `<div class="st-heading ${esc(className)}" data-ds="Heading" data-kind="${k}"${icon?' data-has-icon="true"':''}><div class="st-heading-main"><h${h} class="st-heading-title">${icon?`<span class="st-heading-icon">${icon}</span>`:''}<span${sa(strs&&strs.title,args&&args.title)}>${esc(title)}</span></h${h}>${showDesc?`<p class="st-heading-description">${tx(description,o,'description')}</p>`:''}</div>${showMeta||act?`<div class="st-heading-aside">${showMeta?`<span class="st-heading-meta">${tx(meta,o,'meta')}</span>`:''}${act?`<span class="st-heading-action">${act}</span>`:''}</div>`:''}</div>`;
   }
-  function panel(content,{className='',tag='div',ds='Panel'}={}){
-    if(!content||!String(content).trim())return '';
+  /* empty: a panel with nothing in it is absent, unless the host keeps its place and names what is missing: then it is one quiet
+     line with a tick ("No production work open"; Home's Overview, owner 2026-10-20). */
+  function panel(content,{className='',tag='div',ds='Panel',empty=''}={}){
+    if(!content||!String(content).trim())return empty?`<div class="st-panel st-panel--empty ${esc(className)}" data-ds="${esc(ds)}"><span aria-hidden="true">${check}</span><p>${esc(empty)}</p></div>`:'';
     const t=['div','section','article','aside','dl'].includes(tag)?tag:'div';
     return `<${t} class="st-panel ${esc(className)}" data-ds="${esc(ds)}">${content}</${t}>`;
   }
@@ -128,7 +130,7 @@
       const v=i.value==null||i.value===''?'—':i.value;
       return i.mono?`<span class="st-fact-id">${esc(v)}</span>`:esc(v);
     };
-    const lead=i=>i.action?`<button type="button" class="st-fact-link" data-action="${esc(i.action)}" data-value="${esc(i.value_||'')}"${i.ariaLabel?` aria-label="${esc(i.ariaLabel)}"`:''}>${tx(i.label,i,'label')}${arrow}</button>`:tx(i.label,i,'label');
+    const lead=i=>tx(i.label,i,'label'); // Facts never act: a fact that opens something is a Row
     const rec=variant==='record';
     return `<dl class="${rec?'':'st-panel '}st-facts ${esc(className)}" data-ds="Facts" data-columns="${cols}"${variant?` data-variant="${esc(variant)}"`:''}>${items.map(i=>`<div class="st-fact${i.inline?' st-fact-inline':''}"><dt>${lead(i)}</dt><dd>${valueOf(i)}</dd>${i.meta||has(i,'meta')?`<small>${tx(i.meta,i,'meta')}</small>`:''}</div>`).join('')}</dl>`;
   }
@@ -1171,6 +1173,46 @@
     const scrimHtml=sc===false?'':scrim(Object.assign({layer},sc));
     return `${scrimHtml}<section class="sheet${cls}" ${common} role="dialog" aria-modal="true" data-st-context="${ctx}" data-size="${sz}"${sizing==='full'?' data-sizing="full"':sizing==='hold'?` data-sizing="hold" style="--hold-rows:${Math.max(1,Number(holdRows)||1)}"`:' data-sizing="content"'}><div class="grab" aria-hidden="true"></div>${main}</section>`;
   }
+  /* Keyboard lift (owner, 2026-10-20): the on-screen keyboard never covers a sheet's footer. While a text field inside a sheet
+     (drawer or page) has focus, the visible viewport (visualViewport) has shrunk for the keyboard and ends above the sheet's bottom, the sheet's bottom is raised
+     to the keyboard's top (data-keyboard, --st-keyboard-lift) and its height is capped to what stays visible, so the footer with
+     Save, Done or Send sits just above the keys and the focused field scrolls into the body's view. Behaviour only: without a
+     keyboard nothing moves. keyboardLift is the measure: how far the sheet's resting bottom sits under the visible bottom.
+     A host screen that is not a Sheet but ends in its own footer or dock (a composer, a list with fields) marks its root
+     data-st-keyboard-host: it takes the lift as bottom padding, so its list shrinks and its footer rides above the keys the same way. */
+  function keyboardLift(sheetBottom,lift,viewBottom){return Math.max(0,Math.round((sheetBottom||0)+(lift||0)-(viewBottom||0)));}
+  if(typeof document!=='undefined'&&typeof window!=='undefined'){
+    const typed=el=>!!el&&!!el.matches&&el.matches('textarea,[contenteditable="true"],input:not([type="range"]):not([type="checkbox"]):not([type="radio"]):not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="file"]):not([type="color"])');
+    let lifted=null;
+    // The keyboard is the visible viewport shrinking: its full height is taken while no text field has focus, and a sheet lifts only
+    // when the view has lost at least a keyboard's worth (KEYBOARD_MIN). A sheet merely below the fold (a phone lower on a study page) never moves.
+    // The full height only ever rises (a field left while the keyboard is still closing must not lower it); a change of width (a rotation)
+    // takes it afresh.
+    const KEYBOARD_MIN=120,view=()=>window.visualViewport?window.visualViewport.height:window.innerHeight;let full=view(),wide=window.innerWidth;
+    // Where the surface rests, ignoring transforms: a drawer still rising (drawer-enter, sheet-in) or a page sliding in is measured where it will stop.
+    const rest=x=>{const p=x.offsetParent;return (p?p.getBoundingClientRect().top+p.clientTop:0)+x.offsetTop+x.offsetHeight;};
+    const drop=()=>{if(!lifted)return;lifted.removeAttribute('data-keyboard');lifted.style.removeProperty('--st-keyboard-lift');lifted=null;};
+    const fit=()=>{
+      const vv=window.visualViewport,el=document.activeElement,sheet=typed(el)?el.closest('.sheet,[data-st-keyboard-host]'):null;
+      if(lifted&&(lifted!==sheet||!lifted.isConnected))drop();
+      if(window.innerWidth!==wide){wide=window.innerWidth;full=view();}
+      if(!typed(el))full=Math.max(full,view());
+      if(!sheet||!vv)return;
+      const was=parseFloat(sheet.style.getPropertyValue('--st-keyboard-lift'))||0;
+      const lift=full-vv.height<KEYBOARD_MIN?0:keyboardLift(rest(sheet),sheet.classList.contains('sheet')?was:0,vv.offsetTop+vv.height); // a sheet moves up by its lift; a host's box stays and only its padding grows
+      if(!lift){if(was){lifted=sheet;drop();}return;}
+      if(lift!==was)sheet.style.setProperty('--st-keyboard-lift',lift+'px');
+      sheet.setAttribute('data-keyboard','');lifted=sheet;
+      // The field scrolls into view in its own scroller: the sheet's body, or a host's list.
+      let body=el.closest('.sheet-body');
+      for(let n=el.parentElement;!body&&n&&n!==sheet;n=n.parentElement){const o=getComputedStyle(n).overflowY;if(o==='auto'||o==='scroll')body=n;}
+      if(body){const f=el.getBoundingClientRect(),b=body.getBoundingClientRect();if(f.bottom>b.bottom)body.scrollTop+=f.bottom-b.bottom;else if(f.top<b.top)body.scrollTop-=b.top-f.top;}
+    };
+    const soon=()=>requestAnimationFrame(fit);
+    document.addEventListener('focusin',soon);document.addEventListener('focusout',soon);document.addEventListener('input',soon);
+    if(window.visualViewport){window.visualViewport.addEventListener('resize',fit);window.visualViewport.addEventListener('scroll',fit);}
+    window.addEventListener('resize',fit);
+  }
   if(typeof document!=='undefined')document.addEventListener('keydown',e=>{
     const b=e.target.closest?.('.st-segment button,.st-filter-chips button');if(!b||b.disabled)return;
     const host=b.closest('.spec,.tk-phone,.phone')||document;
@@ -1396,7 +1438,7 @@
   function weekBoardKey(rows=[]){
     return `<div class="st-panel st-week-key" data-ds="WeekBoard">${rows.map(([c,t,l])=>`<div class="st-week-key-row"><span class="st-week-grid" data-one="">${weekCell(c)}</span><div><strong>${esc(t)}</strong><small>${esc(l)}</small></div></div>`).join('')}</div>`;
   }
-  const api=Object.freeze({taskTile,weekBoard,weekCell,weekBoardKey,headerLine,pageHeader,rangeSlider,filterSheet,penMap,penMapKey,penMapFooter,penPeek,penMapMount:penMount,optionalRow,heading,panel,facts,row,rowGroup,log,logDay,logStamp,logGroups,categoryFooter,field,rowTile,rowGrid,pickerField,pickerOptions,pickerBody,pickerHead,pickerFooter,filterChips,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,toast,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowSelectDoor,rowAction,rowSelectChange,status,conditionTag,rowFitTags,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
+  const api=Object.freeze({taskTile,weekBoard,weekCell,weekBoardKey,headerLine,pageHeader,rangeSlider,filterSheet,penMap,penMapKey,penMapFooter,penPeek,penMapMount:penMount,optionalRow,keyboardLift,heading,panel,facts,row,rowGroup,log,logDay,logStamp,logGroups,categoryFooter,field,rowTile,rowGrid,pickerField,pickerOptions,pickerBody,pickerHead,pickerFooter,filterChips,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,toast,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowSelectDoor,rowAction,rowSelectChange,status,conditionTag,rowFitTags,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
   root.SentriUI=api;
   if(typeof module!=='undefined')module.exports=api;
 })(globalThis);

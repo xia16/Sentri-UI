@@ -42,4 +42,36 @@ The owner's rounds of 2026-10-18/19 named each of these on the live Overview.
 - Keep as strong: the header and switch are untouched; the count due now is still the one large figure, now in the same place on every tile.
 - Squint (Gestation): the section switch, the tiles' large counts, the red "2 overdue".
 - Against the original: less, and every fact in a fixed place; no fact the worker acts on was dropped (phase, outcomes and the bar label moved to the task page).
+- A continuing cell now has no border on its open side, so the run reads as going on past the week and the arrow stands clear.
 - **Better because** the first screen answers "what's on and how far along" for every task at once, in the same place on each tile.
+
+## Schedule fixes (2026-10-20)
+
+Scope: the Schedule's day header and its "How to read the board" drawer, plus WeekBoard's own atlas pages. A blind gate judge flagged these when the pages entered the gate's reach (ledger L23). The rest of the Schedule keeps its design.
+
+Keep: the board's layout, cells and colours; today as the one ringed date and the one filled cell; the key's seven rows and their order.
+
+- **minor** · Today's day label ("Thu") sat about 5px above the other labels and almost touched its ring: the ringed date is 28px tall and the others 18px, and each column centred its own pair.
+- **minor** · The board marks a run that continues into the next or last week with an open edge and an arrow, but the key never said what the arrow means.
+- **minor** · A run that continues into the next or last week is meant to end in an open edge with an arrow (README, Cell), but the cell kept its border on that side, so the arrow sat on the line ("~4▸").
+- **minor** · WeekBoard's atlas pages capped the board at 348px, so it sat flush left with a dead gutter; the Past its plan specimen showed a red "0" the Schedule never draws.
+
+#### Final look (the gate's pairs at 390 and 360, EN and ZH)
+- Every date sits in the same 28px box, 2px under its label, so all seven labels share one line and the ring has room.
+- The key gains "Continues · Runs into next week, or from last" as its last row. Its drawer is `long` (85% cap, sized to content), so all eight rows show at 360 without scrolling.
+- **Better because** the header reads as one line again, and every mark on the board is in the key.
+
+## Empty sections and the closed line (2026-10-20)
+
+Scope: the Overview's three sections when they hold nothing, and the "closed today" line. The owner asked for both ("we need an empty status … for production too?"; "for the closed today there needs to be a border around it"), was shown two directions and three versions mocked in the live page (review/mockups/), and picked A and version 2.
+
+Keep: the three sections, their headings and Schedule links; the tiles, rows and cards as they are when there is work; the closed line's words, tick and chevron.
+
+- **major** · An empty Production or Other was a bare grey "Nothing open" line floating on the tint, with no surface, so it read as leftover text rather than a state, and it broke the README's "empty is absent" law without replacing it.
+- **minor** · Health kept a dead row when nothing was marked ("To treat · Nothing marked", no chevron): a row that looks tappable but leads nowhere, saying a zero.
+- **minor** · "1 closed today" had no edge, so on the tint it read as a caption, not a door to the closed tasks.
+
+#### Final look (the gate's pairs at 390 and 360)
+- An empty section keeps its place and says so in a white card, one quiet line with a tick ("No production work open", "Nothing else open"); with no marks and no planned health work, Health says "No pigs marked to treat or watch". A zero row is absent.
+- The closed line has a hairline edge and no fill, the quietest framed target, so it reads as a tap without competing with the tiles above it.
+- **Better because** every section reads as checked and in its usual place, nothing on the page is a dead row, and the closed tasks have a visible door.

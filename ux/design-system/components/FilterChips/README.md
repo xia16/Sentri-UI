@@ -52,7 +52,7 @@ Named role=radiogroup; buttons expose role=radio and aria-checked, read as one c
 
 ## API and tokens
 
-`SentriUI.filterChips({ items: [{value, label, count, checked, disabled}], action, key, label, state, reason })`. TaskChips is a compatibility adapter into this implementation.
+`SentriUI.filterChips({ items: [{value, label, count, checked, disabled}], action, key, label, state, reason })`. (The TaskChips adapter was deleted on 2026-10-20.)
 
 CSS uses tap-min, well, line, paper, ink, muted, press, control-border, radius-segment, radius-control, radius-8, space-2/3/4/6, space-key-gap, space-row-x, space-gutter, size-16, type-row-title-size, type-description-size, type-meta-size, font-sans and font-mono. No prototype scope is required.
 
