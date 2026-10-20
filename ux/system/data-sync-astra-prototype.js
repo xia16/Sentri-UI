@@ -1,381 +1,198 @@
-/* Data-sync design study. Fictional in-memory records; no server or shared queue. */
+/* Data sync (features/data-sync/PRD.md, PR 235; owner 2026-10-18 to 2026-10-20): Saved work, a task's log, past uploads and
+   Not accepted. Fictional records on one phone: nothing is sent, and no other prototype shares this queue. */
 (() => {
   const S = window.SentriUI;
+  const I = window.SentriIcons;
   const app = document.getElementById('app');
   const overlay = document.getElementById('overlay');
   const scenarioSelect = document.getElementById('scenario');
   const languageSelect = document.getElementById('language');
   const params = new URLSearchParams(location.search);
+  // Home and the task pages open this page with their own scenario names; each lands on one of five.
+  const SCENARIOS = { offline: 'offline', syncing: 'syncing', partial: 'syncing', conflict: 'syncing', uncertain: 'syncing', done: 'done', history: 'syncing', expired: 'expired', switch: 'switch' };
   const state = {
-    scenario: params.get('scenario') || 'offline',
-    taskScope: params.get('taskId') === 'farrow28' ? 'farrow28' : '',
-    groupingMode: null,
-    uploadedOne: false,
+    scenario: SCENARIOS[params.get('scenario')] || 'offline',
     lang: params.get('lang') === 'zh' ? 'zh' : 'en',
-    detail: '',
-    category: '',
-    dialog: '',
-    switchPromptShown: false,
-    deleted: false,
-    deletedDependent: false,
-    retrying: false,
-    retryResult: false,
-    receiptResolved: params.get('receipt') === 'resolved'
+    from: params.get('from') || '',
+    view: params.get('taskId') ? 'task' : 'phone',
+    task: params.get('taskId') || '',
+    unit: '',
+    back: [],
+    drawer: false,
+    dialog: params.get('scenario') === 'switch' ? 'switch' : '',
+    signedOut: params.get('scenario') === 'expired'
   };
-  scenarioSelect.value = state.scenario;
+  scenarioSelect.value = params.get('scenario') || 'offline';
   languageSelect.value = state.lang;
 
-  const copy = {
-    en: {
-      title: 'Saved work', detail: 'Record detail', back: 'Back', waiting: 'Waiting to upload',
-      taskTitle: 'Farrowing · saved work', taskScopeHint: 'Only records from this Farrowing task, across its units and pens.', allPhone: 'All records on this phone', taskSaved: 'Farrowing count · sow 000418', taskNote: 'Pen note · B2', taskOther: 'Pregnancy check · sow 000308', taskPlace: 'Farrowing · Unit 7 · Pen B1', taskNotePlace: 'Farrowing · Unit 8 · Pen B2',
-      production: 'Production work', inspection: 'Inspections', vaccination: 'Vaccinations', transfer: 'Transfers', other: 'Other work',
-      categoryHint: 'Select a work category to find a saved record.', categoryWaiting: 'Records in this category upload automatically when connected.',
-      categoryCount: 'waiting records',
-      needs: 'Needs you', uploaded: 'Uploaded', uploadedRecent: 'Uploaded in last 30 days', syncing: 'Uploading automatically',
-      offline: 'No connection · saved on this phone', online: 'Connection restored · uploading automatically',
-      thresholdOffline: 'Connection unstable · work saved on this phone', thresholdOnline: 'Connection restored · one record confirmed',
-      poor: 'Waiting for a usable connection', connected: 'Connection available', failed: 'Upload failed', conflict: 'Conflict',
-      blocked: 'Waiting for an earlier operation', done: 'No records waiting on this phone',
-      checkingReceipt: 'Checking server result', checking: 'Checking server result', checkingShort: 'Checking result', checkingReceiptHint: 'This record stays on this phone while its final result is checked. It will not be sent again yet.',
-      reconciledHint: 'The server confirmed this operation was already received. The same operation was not sent again.',
-      local: 'Saved on this phone', team: 'Received by the team', retry: 'Retry now',
-      delete: 'Delete local record', deleteTitle: 'Delete this conflicted record?',
-      deleteBody: 'This record cannot be restored and will never upload. Dependent records stay blocked; review and delete each one separately.',
-      deleteBlockedTitle: 'Delete this blocked record?',
-      deleteBlockedBody: 'The earlier record was deleted. This record cannot upload. Deleting it cannot be undone.',
-      deleteConfirm: 'Delete record', switchTitle: 'Finish saved work first',
-      switchBody: 'Records on this phone have not uploaded. Handle them before changing account or farm.',
-      expiredTitle: 'Sign in to the original account', expiredHint: 'Upload is paused. These records belong to G. Hansen · Green Valley Farm and remain on this phone.',
-      reauth: 'Sign in again', reauthTitle: 'Continue as G. Hansen',
-      reauthBody: 'Use the original account at Green Valley Farm. After sign-in succeeds, saved records upload automatically.',
-      review: 'View saved work', noDelete: 'Record kept on this phone',
-      retrying: 'Retrying this record', retryResult: 'The server still reports a conflict. This record stays on this phone.',
-      retryFailedResult: 'This attempt did not complete. The record remains on this phone.',
-      received: 'Received at 09:41', saved: 'Saved at 09:32', reason: 'Reason',
-      reasonFailed: 'The server could not process this record. Check the details, then retry.',
-      reasonConflict: 'Another worker changed this task before this record arrived.',
-      reasonBlocked: 'Pregnancy check for this pig is unresolved. This later operation has not been sent.',
-      reasonBlockedDeleted: 'The earlier record was deleted. This later record will not upload. Review it, then delete it if you are ready.',
-      blockedDeletedStatus: 'Blocked · review and delete',
-      compare: 'Compare before retrying', phoneValue: 'On this phone', serverValue: 'On the server now',
-      localChange: 'Pregnancy result: Pregnant · saved at 09:32', serverChange: 'Pregnancy result: Not pregnant · changed by M. Li at 09:36',
-      safeRetry: 'Retry checks the server again. If these values still differ, the record stays in conflict; it never overwrites the team record.',
-      work: 'Work', place: 'Place', status: 'Status', time: 'Saved time', account: 'Account', farm: 'Farm',
-      first: 'Pregnancy check · 000308', second: 'Pen note · C2', third: 'Feed adjustment · 000267',
-      p1: 'Gestation · Unit 7 · Batch 31', p2: 'Gestation · Unit 8', p3: 'Gestation · Unit 7 · Pen C1',
-      waitingShort: 'Waiting', syncingShort: 'Uploading', failedShort: 'Failed',
-      blockedShort: 'Blocked', conflictShort: 'Conflict', uploadedShort: 'Uploaded',
-      pendingHint: 'These records upload automatically when connected.',
-      syncingHint: 'You can leave this page while upload continues.',
-      partialHint: 'Two records arrived. One still needs attention.',
-      conflictHint: 'This record will not upload again unless you retry it.',
-      deletedHint: 'The dependent record remains blocked. Review and delete it separately.',
-      allResolvedHint: 'No records are waiting on this phone. The recent upload total is below.',
-      blockedHint: 'Resolve the earlier operation before this one can upload.',
-      doneHint: 'Only records saved on this phone are counted here.'
-    },
-    zh: {
-      title: '本机记录', detail: '记录详情', back: '返回', waiting: '待上传',
-      taskTitle: '分娩任务 · 本机记录', taskScopeHint: '仅展示本次分娩任务在各单元、栏位保存的记录。', allPhone: '查看本机全部记录', taskSaved: '分娩计数 · 母猪 000418', taskNote: '栏位备注 · B2', taskOther: '孕检 · 母猪 000308', taskPlace: '分娩 · 7 单元 · B1 栏', taskNotePlace: '分娩 · 8 单元 · B2 栏',
-      production: '生产操作', inspection: '巡检', vaccination: '免疫', transfer: '转群', other: '其他操作',
-      categoryHint: '按业务类别查看本机记录。', categoryWaiting: '本类别记录联网后会自动上传。',
-      categoryCount: '条待上传记录',
-      needs: '需要处理', uploaded: '已上传', uploadedRecent: '近30天已上传', syncing: '正在自动上传',
-      offline: '无网络 · 已保存在本机', online: '网络已恢复 · 正在自动上传',
-      thresholdOffline: '网络不稳定 · 记录已保存在本机', thresholdOnline: '网络已恢复 · 1 条已确认上传',
-      poor: '等待可用网络', connected: '网络可用', failed: '上传失败', conflict: '冲突',
-      blocked: '等待前置操作', done: '本机暂无待上传记录',
-      checkingReceipt: '正在核对服务端结果', checking: '正在核对服务端结果', checkingShort: '核对结果中', checkingReceiptHint: '核对最终结果期间，记录仍保留在本机，暂不再次发送。',
-      reconciledHint: '服务端确认已收到这条操作；本机没有再次发送同一操作。',
-      local: '已保存在本机', team: '团队已收到', retry: '立即重试',
-      delete: '删除本机记录', deleteTitle: '删除这条冲突记录？',
-      deleteBody: '删除后无法恢复，也不会再上传。依赖它的后续记录仍受阻，需逐条查看并删除。',
-      deleteBlockedTitle: '删除这条受阻记录？',
-      deleteBlockedBody: '前置记录已删除，这条记录无法上传。删除后不能恢复。',
-      deleteConfirm: '删除记录', switchTitle: '请先处理本机记录',
-      switchBody: '本机还有未上传记录。处理完成后才能切换账号或猪场。',
-      expiredTitle: '请重新登录原账号', expiredHint: '上传已暂停。这些记录属于 G. Hansen · Green Valley Farm，仍保存在本机。',
-      reauth: '重新登录', reauthTitle: '以 G. Hansen 继续',
-      reauthBody: '请使用 Green Valley Farm 的原账号。登录成功后，本机记录会继续自动上传。',
-      review: '查看本机记录', noDelete: '记录仍保留在本机',
-      retrying: '正在重试这条记录', retryResult: '服务端仍报告冲突，记录继续保留在本机。',
-      retryFailedResult: '本次重试未完成，记录继续保留在本机。',
-      received: '09:41 团队已收到', saved: '09:32 保存在本机', reason: '原因',
-      reasonFailed: '服务端未能处理这条记录。查看内容后可重试。',
-      reasonConflict: '另一位工人在本记录到达前修改了此任务。',
-      reasonBlocked: '这头猪的孕检记录尚未解决，后续操作还未发送。',
-      reasonBlockedDeleted: '前置记录已删除。这条后续记录不会上传，请查看后逐条删除。',
-      blockedDeletedStatus: '受阻 · 查看并删除',
-      compare: '重试前核对差异', phoneValue: '本机记录', serverValue: '服务端现值',
-      localChange: '孕检结果：已怀孕 · 09:32 保存', serverChange: '孕检结果：未怀孕 · 李某 09:36 修改',
-      safeRetry: '重试会再次核对服务端。若差异仍在，记录继续保留为冲突，不会覆盖团队记录。',
-      work: '操作', place: '位置', status: '状态', time: '保存时间', account: '账号', farm: '猪场',
-      first: '孕检 · 000308', second: '栏位备注 · C2', third: '饲喂调整 · 000267',
-      p1: '妊娠区 · 7 单元 · 31 批', p2: '妊娠区 · 8 单元', p3: '妊娠区 · 7 单元 · C1 栏',
-      waitingShort: '待上传', syncingShort: '上传中', failedShort: '失败',
-      blockedShort: '受阻', conflictShort: '冲突', uploadedShort: '已上传',
-      pendingHint: '网络恢复后会自动上传这些记录。',
-      syncingHint: '离开此页后仍会继续上传。',
-      partialHint: '2 条已上传，1 条仍需处理。',
-      conflictHint: '这条记录不会自动重试，需由你手动处理。',
-      deletedHint: '依赖它的后续记录仍受阻，需逐条查看并删除。',
-      allResolvedHint: '本机暂无待上传记录；下方显示近期已上传总数。',
-      blockedHint: '先处理前置操作，后续记录才会上传。',
-      doneHint: '这里只统计这台手机保存的记录。'
-    }
+  const L = (en, zh) => ({ en, zh });
+  const t = (v) => (v && typeof v === 'object' && 'en' in v ? v[state.lang] : v);
+  const C = {
+    title: L('Saved work', '本机记录'),
+    uploading: L('Uploading', '上传中'), waiting: L('Waiting to upload', '等待上传'),
+    done: L('Everything has uploaded.', '全部已上传。'),
+    past: L('Past uploads', '已上传记录'), lastDays: L('last 30 days', '最近 30 天'),
+    today: L('Today', '今天'), yesterday: L('Yesterday', '昨天'),
+    allUnits: L('All units', '全部单元'), chooseUnit: L('Choose unit', '选择单元'), unitChooser: L('Choose a unit', '选择单元'),
+    unit: (u) => L(`Unit ${u}`, `${u} 号单元`), onPhone: (n) => L(`${n} records on this phone`, `本机 ${n} 条记录`),
+    notAccepted: L('Not accepted', '未被接受'), notAcceptedN: (n) => L(`${n} records not accepted`, `${n} 条记录未被接受`),
+    notAcceptedShort: (n) => L(`${n} not accepted`, `${n} 条未被接受`),
+    already: L('Already recorded', '已有记录'), refused: L("Couldn't be accepted", '无法接受'),
+    youRecorded: (v) => L(`You recorded ${v.en}`, `你记录的是“${v.zh}”`),
+    signIn: L('Sign in to keep uploading', '登录后继续上传'), safe: L('Your records are safe on this phone', '记录已安全保存在本机'),
+    continueAs: L('Continue as G. Hansen', '以 G. Hansen 继续'),
+    continueBody: L('Sign in again with the same account at Green Valley Farm. Saved records upload by themselves after that.', '请用 Green Valley Farm 的原账号重新登录，之后本机记录会自动上传。'),
+    signInAct: L('Sign in', '登录'),
+    switchTitle: L('Upload first', '先上传'),
+    switchBody: L('Records from Green Valley Farm are still on this phone. Switching now would leave them stuck.', 'Green Valley Farm 的记录仍在本机，现在切换会让它们无法上传。'),
+    seeSaved: L('See saved work', '查看本机记录'),
+    pastUploads: L('Past uploads', '已上传记录'),
+    back: L('Back', '返回'), unitLabel: L('Unit', '单元')
   };
-  const t = key => copy[state.lang][key] || key;
-  let dialogReturnAction = '';
-  const records = () => {
-    if (params.get('taskId') === 'farrow28') {
-      const statuses = state.scenario === 'syncing' ? ['syncing','waiting','waiting','uploaded'] : state.scenario === 'partial' ? ['failed','waiting','waiting','uploaded'] : ['waiting','waiting','waiting','uploaded'];
-      return [
-        {id:'task-count',taskId:'farrow28',category:'production',titleEn:copy.en.taskSaved,titleZh:copy.zh.taskSaved,placeEn:copy.en.taskPlace,placeZh:copy.zh.taskPlace,at:'09:32',status:statuses[0]},
-        {id:'task-note',taskId:'farrow28',category:'production',titleEn:copy.en.taskNote,titleZh:copy.zh.taskNote,placeEn:copy.en.taskNotePlace,placeZh:copy.zh.taskNotePlace,at:'09:35',status:statuses[1]},
-        {id:'other-task',taskId:'preg31',category:'production',titleEn:copy.en.taskOther,titleZh:copy.zh.taskOther,placeEn:'Gestation · Unit 8',placeZh:'妊娠区 · 8 单元',at:'09:38',status:statuses[2]},
-        {id:'inspection-task',taskId:'inspect7',category:'inspection',titleEn:'Unit inspection · 7',titleZh:'单元巡检 · 7',placeEn:'Unit 7',placeZh:'7 单元',at:'09:39',status:statuses[3]}
-      ].map(item=>({...item,syncedAt:new Date(Date.now()-86400000).toISOString()}));
-    }
-    if (state.scenario === 'threshold') return Array.from({length:9}, (_,index)=>({
-      id:'threshold-'+index, category:index%2?'inspection':'production',
-      titleEn:(index%2?'Unit inspection':'Pregnancy check')+' · '+String(300+index).padStart(6,'0'),
-      titleZh:(index%2?'单元巡检':'孕检')+' · '+String(300+index).padStart(6,'0'),
-      placeEn:'Unit '+(7+index%2),placeZh:(7+index%2)+' 单元',at:'09:'+String(10+index).padStart(2,'0'),
-      status:index===0&&state.uploadedOne?'uploaded':'waiting',syncedAt:new Date().toISOString()
-    }));
-    const base = [
-      { id: 'first', at: '09:32', place: 'p1', category: 'production' },
-      { id: 'second', at: '09:35', place: 'p2', category: 'inspection' },
-      { id: 'third', at: '09:38', place: 'p3', category: 'production' }
-    ];
-    if (state.scenario === 'busy') {
-      const types = [
-        {category:'production', en:'Pregnancy check', zh:'孕检', type:'pregnancy'},
-        {category:'inspection', en:'Unit inspection', zh:'单元巡检', type:'unit-inspection'},
-        {category:'vaccination', en:'Vaccination', zh:'免疫', type:'vaccination'},
-        {category:'transfer', en:'Transfer', zh:'转群', type:'transfer'}
-      ];
-      return Array.from({length:30}, (_, index) => {
-        const kind = types[index === 1 ? 0 : index % types.length];
-        const tag = String(300 + index).padStart(6, '0');
-        return {id:'busy-'+index, category:kind.category, type:kind.type, titleEn:kind.en+' · '+tag,
-          titleZh:kind.zh+' · '+tag, placeEn:'Unit '+(7 + index % 3), placeZh:(7 + index % 3)+' 单元',
-          at:'09:'+String(10 + index).padStart(2,'0'), status:index===0?'failed':index===1?'conflict':index>=26?'uploaded':'waiting'};
-      });
-    }
-    const modes = {
-      offline: ['waiting','waiting','waiting'],
-      syncing: ['syncing','waiting','waiting'],
-      partial: ['uploaded','uploaded','failed'],
-      conflict: ['conflict','blocked','uploaded'],
-      blocked: ['failed','blocked','waiting'],
-      done: ['uploaded','uploaded','uploaded'],
-      history: ['uploaded','uploaded','uploaded'],
-      switch: ['waiting','waiting','uploaded'],
-      expired: ['waiting','waiting','waiting']
-    };
-    modes.uncertain = state.receiptResolved ? ['uploaded','uploaded','uploaded'] : ['checking','uploaded','uploaded'];
-    const candidates = base.map((item, index) => ({...item, status: modes[state.scenario][index],
-      dependsOn: item.id === 'second' ? ['first'] : [],
-      syncedAt: state.scenario === 'history' ? new Date(Date.now() - [2,12,45][index] * 86400000).toISOString() : new Date(Date.now() - 86400000).toISOString()}))
-      .filter(item => !(state.deleted && item.id === 'first') && !(state.deletedDependent && item.id === 'second'));
-    const stillReferenced = new Set(candidates.filter(item => item.status !== 'uploaded').flatMap(item => item.dependsOn));
-    const cutoff = Date.now() - 30 * 86400000;
-    return candidates.filter(item => item.status !== 'uploaded' || Date.parse(item.syncedAt) >= cutoff || stillReferenced.has(item.id));
+  const R = {
+    pregnant: L('Pregnant', '已孕'), open: L('Not pregnant', '未孕'), recheck: L('Recheck in 7 days', '7 天后复检'),
+    heat: L('In heat', '发情'), noHeat: L('Not in heat', '未发情'),
+    litter: L('9 alive · 5 dead', '9 活 · 5 死'), penNote: L('Pen note', '栏位备注'),
+    treatment: L('Treatment recorded', '已记录治疗'), note: L('Note added', '已添加备注')
   };
-  const humanStatus = status => status === 'blocked' && state.deleted ? t('blockedDeletedStatus') : t(status);
-  const shortStatus = status => t(status + 'Short');
-  const itemTitle = item => item[state.lang === 'zh' ? 'titleZh' : 'titleEn'] || t(item.id);
-  const itemPlace = item => item[state.lang === 'zh' ? 'placeZh' : 'placeEn'] || t(item.place);
-  const row = item => S.row({
-    title: itemTitle(item),
-    description: itemPlace(item) + ' · ' + item.at,
-    trailing: {text: shortStatus(item.status), tone: item.status === 'failed' || item.status === 'conflict' ? 'red' : item.status === 'uploaded' ? 'green' : 'muted'},
-    action: 'open-record', value: item.id, wrap: true,
-    attrs: {'aria-label': itemTitle(item) + ' · ' + humanStatus(item.status)}
+  // One record: who it is about, what was recorded, where, when and by whom.
+  const rec = (id, what, unit, pen, at) => ({ id, what, unit, pen, at });
+  const TASKS = [
+    { id: 'preg31', title: L('Pregnancy check', '孕检'), line: L('Batch 31', '31 批'), records: [
+      rec('000320', R.pregnant, '7', 'A1', '12:40'), rec('000318', R.pregnant, '7', 'B2', '12:38'), rec('000316', R.open, '7', 'C3', '12:36'),
+      rec('000412', R.recheck, '7', 'B3', '12:34'), rec('000308', R.recheck, '7', 'B1', '12:32'),
+      rec('000352', R.pregnant, '8', 'C1', '12:20'), rec('000350', R.pregnant, '8', 'C2', '12:18'), rec('000347', R.open, '8', 'A4', '12:16'), rec('000344', R.pregnant, '8', 'A2', '12:14')
+    ], past: [
+      { day: 'today', records: [rec('000296', R.pregnant, '7', 'A1', '07:50'), rec('000295', R.pregnant, '7', 'A1', '07:48'), rec('000294', R.open, '7', 'A1', '07:46')] },
+      { day: 'yesterday', records: [rec('000288', R.pregnant, '7', 'A1', '16:20'), rec('000287', R.open, '7', 'A1', '16:18'), rec('000285', R.pregnant, '8', 'C4', '16:11')] }
+    ], notAccepted: [
+      { group: 'already', id: '000412', kept: R.open, yours: R.pregnant, at: '08:04' },
+      { group: 'refused', id: L('Unit 7', '7 号单元'), what: L('Finished checks', '完成检查'), reason: L('Sow 000267 had already left the unit', '母猪 000267 已离开该单元'), at: '08:04' }
+    ] },
+    { id: 'ret30', title: L('Return-heat check', '返情检查'), line: L('Batch 30', '30 批'), records: [
+      rec('000281', R.noHeat, '7', 'A2', '11:10'), rec('000279', R.heat, '7', 'A3', '11:06'), rec('000276', R.noHeat, '7', 'B1', '11:02')
+    ], past: [], notAccepted: [] },
+    { id: 'farrow28', title: L('Farrowing', '分娩'), line: L('Week 42', '第 42 周'), records: [
+      rec('000418', R.litter, '7', 'B1', '09:32'), rec('B2', R.penNote, '8', 'B2', '09:35')
+    ], past: [], notAccepted: [] },
+    { id: 'other', title: L('Other records', '其他记录'), line: L('Notes and treatments', '备注与治疗'), records: [
+      rec('000267', R.treatment, '7', 'C1', '10:12'), rec('C2', R.note, '8', 'C2', '10:20')
+    ], past: [], notAccepted: [] }
+  ];
+  const taskOf = (id) => TASKS.find((x) => x.id === id);
+  const online = () => state.scenario === 'syncing' && !state.signedOut;
+  const empty = () => state.scenario === 'done';
+  const recordsOf = (x) => (empty() ? [] : x.records);
+  const unitsOf = (x) => [...new Set(recordsOf(x).map((r) => r.unit))];
+  const entry = (r, withUnit) => ({
+    title: `${t(r.id)} · ${t(r.what)}`,
+    detail: [withUnit ? t(C.unit(r.unit)) : '', r.pen, r.at, 'G.H'].filter(Boolean).join(' · ')
   });
-  const group = (title, items) => items.length
-    ? S.rowGroup(items.map(row).join(''), {title: title + ' · ' + items.length, level: 3}) : '';
-  const categoryFor = item => ['production','inspection','vaccination','transfer'].includes(item.category) ? item.category : 'other';
-  const categoryGroups = items => {
-    const keys = ['production','inspection','vaccination','transfer','other'].filter(category => items.some(item => categoryFor(item) === category));
-    return S.rowGroup(keys.map(category => {
-      const count = items.filter(item => categoryFor(item) === category).length;
-      return S.row({title:t(category), description:count + ' ' + t('categoryCount'),
-        action:'open-category', value:category, wrap:true});
-    }).join(''), {title:t('waiting')+' · '+items.length, level:3});
-  };
-  const recentUploadSummary = items => {
-    const cutoff = Date.now() - 30 * 86400000;
-    const count = items.filter(item => item.status === 'uploaded' && Date.parse(item.syncedAt) >= cutoff).length;
-    return count ? `<p class="sync-uploaded-summary">${t('uploadedRecent')} · ${count}</p>` : '';
-  };
 
-  function listView() {
-    const items = records().filter(item => !state.taskScope || item.taskId === state.taskScope && item.status !== 'uploaded');
-    const needs = items.filter(x => x.status === 'failed' || x.status === 'conflict');
-    const checking = items.filter(x => x.status === 'checking');
-    const waiting = items.filter(x => x.status === 'waiting' || x.status === 'syncing' || x.status === 'blocked');
-    if (state.category) {
-      const categoryItems = waiting.filter(item => categoryFor(item) === state.category);
-      const body = '<div class="sync-content"><div class="sync-intro">' +
-        S.statusLine([{text:t('categoryWaiting')}]) + '</div><div class="sync-groups">' +
-        group(t('waiting'), categoryItems) + '</div></div>';
-      app.innerHTML = S.sheet({variant:'page',title:t(state.category),body,
-        footer:S.sheetFooter({back:{action:'back-to-all',label:t('back')}})});
-      renderDialog();
-      return;
-    }
-    const mode = state.scenario;
-    const line = mode === 'threshold' ? t(state.uploadedOne ? 'thresholdOnline' : 'thresholdOffline') : mode === 'offline' || mode === 'switch' || mode === 'busy' ? t('offline') : mode === 'expired' ? t('expiredTitle') : mode === 'syncing' ? t('online') : mode === 'uncertain' ? t(state.receiptResolved ? 'done' : 'checkingReceipt') : mode === 'done' || mode === 'history' ? t('done') : t('connected');
-    const hint = mode === 'busy' ? t('categoryHint') : mode === 'threshold' || mode === 'offline' || mode === 'switch' ? t('pendingHint') : mode === 'expired' ? t('expiredHint') : mode === 'syncing' ? t('syncingHint') : mode === 'uncertain' ? t(state.receiptResolved ? 'reconciledHint' : 'checkingReceiptHint') : mode === 'partial' ? t('partialHint') : mode === 'conflict' ? t(state.deletedDependent ? 'allResolvedHint' : state.deleted ? 'deletedHint' : 'conflictHint') : mode === 'blocked' ? t('blockedHint') : t('doneHint');
-    const lead = S.statusLine([{text: line}], {className:'sync-summary-line'}) +
-      S.statusLine([{text: state.taskScope ? t('taskScopeHint') : hint}], {className:'sync-summary-line'});
-    const reauth = mode === 'expired' ? S.button({label:t('reauth'),register:'primary',action:'open-reauth'}) : '';
-    const allPhone = state.taskScope ? `<button type="button" class="sync-all-phone" data-action="show-all">${t('allPhone')} · ${records().filter(item=>item.status!=='uploaded').length} →</button>` : '';
-    if (state.groupingMode === null) state.groupingMode = waiting.length >= 9 && new Set(waiting.map(categoryFor)).size >= 2;
-    const body = '<div class="sync-content"><div class="sync-intro">' + lead + reauth + allPhone + '</div>' +
-      '<div class="sync-groups">' + group(t('needs'), needs) + group(t('checkingReceipt'), checking) +
-      (state.groupingMode && !state.taskScope ? categoryGroups(waiting) : group(t('waiting'), waiting)) +
-      recentUploadSummary(items) + '</div></div>';
-    app.innerHTML = S.sheet({
-      variant:'page', title:t(state.taskScope ? 'taskTitle' : 'title'), body,
-      footer:S.sheetFooter({back:{action:'go-home',label:t('back')}})
-    });
-    if (state.scenario === 'switch' && !state.switchPromptShown) {
-      state.dialog = 'switch';
-      state.switchPromptShown = true;
-    }
-    renderDialog();
+  // ---- pages ----
+  const page = (title, line, body, { pageAction = null } = {}) => S.sheet({ variant: 'page', title, line: line ? { text: line } : null, back: { action: 'back', label: t(C.back) }, pageAction, body, footer: false });
+  const clock = (scope) => ({ icon: I.icon('clock'), label: t(C.pastUploads), action: 'past', value: scope });
+  const bar = (x) => {
+    if (state.signedOut) return S.toast(t(C.signIn), { detail: t(C.safe), tone: 'attention', standing: { action: 'open-reauth', value: '' } });
+    const n = x ? x.notAccepted.length : 0;
+    return n && !empty() ? S.toast(t(C.notAcceptedN(n)), { tone: 'notice', standing: { action: 'not-accepted', value: x.id } }) : '';
+  };
+  const stack = (...parts) => `<div class="sync-stack">${parts.filter(Boolean).join('')}</div>`;
+
+  function phonePage() {
+    if (empty()) return page(t(C.title), '', stack(S.statusLine([{ text: t(C.done) }])), { pageAction: clock('phone') });
+    const rows = TASKS.filter((x) => recordsOf(x).length).map((x) => S.row({
+      title: t(x.title),
+      description: x.notAccepted.length ? [{ text: t(x.line) }, { text: t(C.notAcceptedShort(x.notAccepted.length)) }] : t(x.line),
+      trailing: { text: String(recordsOf(x).length) }, action: 'open-task', value: x.id, wrap: true
+    })).join('');
+    return page(t(C.title), '', stack(state.signedOut ? bar(null) : '', S.rowGroup(rows, { title: t(online() ? C.uploading : C.waiting) })), { pageAction: clock('phone') });
   }
-  function detailView() {
-    const item = records().filter(x => !state.taskScope || x.taskId === state.taskScope).find(x => x.id === state.detail);
-    if (!item) { state.detail = ''; listView(); return; }
-    const failed = item.status === 'failed', conflict = item.status === 'conflict';
-    const reason = failed ? t('reasonFailed') : conflict ? t('reasonConflict') : item.status === 'blocked' ? t(state.deleted ? 'reasonBlockedDeleted' : 'reasonBlocked') : '';
-    const facts = S.facts([
-      {label:t('work'), value:itemTitle(item)},
-      {label:t('status'), value:humanStatus(item.status)},
-      {label:t('place'), value:itemPlace(item)},
-      {label:t('account'), value:'G. Hansen'},
-      {label:t('farm'), value:'Green Valley Farm'},
-      {label:t('time'), value:item.at}
-    ], {columns:1});
-    const alert = reason ? S.banner({tone: conflict || failed ? 'danger' : 'notice', headline: t('reason'), consequence:reason}) : '';
-    const retryResult = state.retryResult ? S.statusLine([{text:t(failed ? 'retryFailedResult' : 'retryResult')}]) : '';
-    const deletion = conflict || (item.status === 'blocked' && state.deleted) ? '<div class="sync-detail-actions">' +
-      S.button({label:t('delete'), register:'text', action:'ask-delete'}) + '</div>' : '';
-    const receipt = S.statusLine([{text:item.status === 'uploaded' ? t('received') : t('saved')}]);
-    const comparison = conflict ? '<div class="sync-compare">' +
-      S.heading({title:t('compare'),kind:'section',level:3}) +
-      S.facts([{label:t('phoneValue'),value:t('localChange')},{label:t('serverValue'),value:t('serverChange')}],{columns:1}) +
-      S.statusLine([{text:t('safeRetry')}]) + '</div>' : '';
-    const body = '<div class="sync-detail">' + receipt + alert + comparison + retryResult + facts + deletion + '</div>';
-    const primary = failed || conflict
-      ? {label:state.retrying ? t('retrying') : t('retry'), action:'retry', busy:state.retrying} : null;
-    app.innerHTML = S.sheet({
-      variant:'page', title:t('detail'), body,
-      footer:S.sheetFooter({back:{action:'back-to-list',label:t('back')},primary})
-    });
-    renderDialog();
+  function taskPage() {
+    const x = taskOf(state.task);
+    const all = recordsOf(x), list = state.unit ? all.filter((r) => r.unit === state.unit) : all;
+    const scope = S.segment({ variant: 'scope', action: 'scope', ariaLabel: t(C.unitLabel), active: state.unit ? 'unit' : 'all', options: [
+      ['all', t(C.allUnits), { count: all.length }],
+      ['unit', state.unit ? t(C.unit(state.unit)) : t(C.chooseUnit), state.unit ? { count: list.length, door: true } : { door: true }]
+    ] });
+    const log = list.length ? S.log([{ label: t(C.today), entries: list.map((r) => entry(r, !state.unit)) }]) : S.statusLine([{ text: t(C.done) }]);
+    return page(t(x.title), t(x.line), stack(bar(x), scope, log), { pageAction: clock(x.id) });
   }
-  function renderDialog() {
-    const hadDialog = Boolean(overlay.firstElementChild);
-    overlay.innerHTML = '';
-    app.toggleAttribute('inert', Boolean(state.dialog));
-    if (!state.dialog) {
-      if (hadDialog) app.querySelector(`[data-action="${dialogReturnAction}"]`)?.focus();
-      return;
-    }
-    const deleting = state.dialog === 'delete', reauth = state.dialog === 'reauth';
-    const dependent = deleting && state.detail === 'second' && state.deleted;
-    const body = deleting ? t(dependent ? 'deleteBlockedBody' : 'deleteBody') : reauth ? t('reauthBody') : t('switchBody');
-    overlay.innerHTML = S.sheet({
-      variant:'dialog', title:deleting ? t(dependent ? 'deleteBlockedTitle' : 'deleteTitle') : reauth ? t('reauthTitle') : t('switchTitle'),
-      subtitle:body,
-      footer:S.sheetFooter({
-        back:{action:deleting ? 'cancel-delete' : reauth ? 'cancel-reauth' : 'cancel-switch',label:t('back')},
-        primary:deleting
-          ? {label:t('deleteConfirm'), action:'confirm-delete', register:'danger'}
-          : reauth ? {label:t('reauth'), action:'complete-reauth', register:'primary'}
-          : {label:t('review'), action:'review-records', register:'primary'}
-      })
-    });
-    overlay.querySelector('[role="dialog"]')?.focus();
+  function pastPage() {
+    const scope = state.pastScope;
+    const x = scope && scope !== 'phone' ? taskOf(scope) : null;
+    const days = (x ? [x] : TASKS).flatMap((y) => y.past).reduce((m, g) => { (m[g.day] = m[g.day] || []).push(...g.records); return m; }, {});
+    const groups = ['today', 'yesterday'].filter((d) => days[d]).map((d) => ({ label: t(C[d]), entries: days[d].map((r) => entry(r, true)) }));
+    const line = `${x ? t(x.title) + ' · ' : ''}${t(C.lastDays)}`;
+    return page(t(C.past), line, stack(S.log(groups)));
   }
+  function notAcceptedPage() {
+    const x = taskOf(state.notAcceptedTask);
+    const g = (k) => x.notAccepted.filter((n) => n.group === k);
+    const groups = [
+      { label: t(C.already), entries: g('already').map((n) => ({ title: `${t(n.id)} · ${t(n.kept)}`, detail: `${t(C.youRecorded(n.yours))} · ${n.at} · G.H` })) },
+      { label: t(C.refused), entries: g('refused').map((n) => ({ title: `${t(n.id)} · ${t(n.what)}`, detail: `${t(n.reason)} · ${n.at} · G.H` })) }
+    ];
+    return page(t(C.notAccepted), `${t(x.title)} · ${t(x.line)}`, stack(S.log(groups)));
+  }
+
+  // ---- overlays ----
+  function unitDrawer() {
+    const x = taskOf(state.task);
+    const rows = unitsOf(x).map((u) => S.row({ variant: 'navigation', icon: I.icon('grid'), title: t(C.unit(u)), description: t(C.onPhone(recordsOf(x).filter((r) => r.unit === u).length)), trail: 'none', attrs: state.unit === u ? { 'aria-current': 'location' } : {}, action: 'pick-unit', value: u })).join('');
+    return S.sheet({ title: t(C.unitChooser), surface: 'menu', label: t(C.unitChooser), body: S.rowGroup(rows), footer: S.sheetFooter({ back: { action: 'close-units' } }), close: { action: 'close-units' }, scrim: { action: 'close-units', label: t(C.back) } });
+  }
+  function dialog() {
+    if (state.dialog === 'switch') return S.sheet({ variant: 'dialog', title: t(C.switchTitle), description: t(C.switchBody), body: '', footer: S.sheetFooter({ back: { action: 'close-dialog' }, primary: { label: t(C.seeSaved), action: 'close-dialog' } }) });
+    if (state.dialog === 'reauth') return S.sheet({ variant: 'dialog', title: t(C.continueAs), description: t(C.continueBody), body: '', footer: S.sheetFooter({ back: { action: 'close-dialog' }, primary: { label: t(C.signInAct), action: 'complete-reauth' } }) });
+    return '';
+  }
+
   function render() {
     document.documentElement.lang = state.lang === 'zh' ? 'zh-CN' : 'en';
-    if (state.detail) detailView(); else listView();
+    app.innerHTML = state.view === 'task' ? taskPage() : state.view === 'past' ? pastPage() : state.view === 'not-accepted' ? notAcceptedPage() : phonePage();
+    overlay.innerHTML = (state.drawer ? unitDrawer() : '') + dialog();
+    window.AtlasBare && window.AtlasBare.watch(atlasScreen);
   }
-  document.addEventListener('click', event => {
+  const atlasScreen = () => state.dialog === 'switch' ? 'data-sync.switch' : state.signedOut ? 'data-sync.auth' : state.drawer ? 'data-sync.units' : state.view === 'past' ? 'data-sync.history' : state.view === 'not-accepted' ? 'data-sync.not-accepted' : state.view === 'task' ? (state.unit ? 'data-sync.unit' : 'data-sync.task-list') : empty() ? 'data-sync.upload' : online() ? 'data-sync.syncing' : 'data-sync.list';
+
+  const go = (view, extra = {}) => { state.back.push({ view: state.view, task: state.task, unit: state.unit, pastScope: state.pastScope, notAcceptedTask: state.notAcceptedTask }); Object.assign(state, { view }, extra); };
+  function goBack() {
+    const prev = state.back.pop();
+    if (prev) { Object.assign(state, prev); return; }
+    if (state.from === 'task') location.assign(new URL('farrowing-astra-concept.html?layout=focus&taskSync=offline', location.href).href);
+    else if (state.from === 'home') location.assign(new URL('home-astra-prototype.html?section=gestation', location.href).href);
+  }
+  document.addEventListener('click', (event) => {
     const button = event.target.closest('[data-action]');
-    if (!button || S.guard(button)) return;
-    const action = button.dataset.action;
-    if (action === 'open-record') { state.detail = button.dataset.value; state.retryResult = false; }
-    else if (action === 'open-category') state.category = button.dataset.value;
-    else if (action === 'back-to-all') state.category = '';
-    else if (action === 'back-to-list') state.detail = '';
-    else if (action === 'show-all') { state.taskScope = ''; state.groupingMode = null; }
-    else if (action === 'go-home') {
-      if (params.get('from') === 'home' || params.get('from') === 'task') history.back();
-      else location.href = 'home-astra-prototype.html?layout=focus';
-    }
-    else if (action === 'ask-delete') { dialogReturnAction = 'ask-delete'; state.dialog = 'delete'; }
-    else if (action === 'open-reauth') { dialogReturnAction = 'open-reauth'; state.dialog = 'reauth'; }
-    else if (action === 'cancel-delete' || action === 'cancel-switch' || action === 'cancel-reauth' || action === 'review-records') state.dialog = '';
-    else if (action === 'complete-reauth') { state.dialog = ''; state.scenario = 'syncing'; }
-    else if (action === 'confirm-delete') {
-      if (state.detail === 'second' && state.deleted) state.deletedDependent = true;
-      else state.deleted = true;
-      state.detail = ''; state.dialog = '';
-    }
-    else if (action === 'retry') {
-      state.retrying = true; render();
-      window.setTimeout(() => { state.retrying = false; state.retryResult = true; render(); }, 700);
-      return;
-    }
-    if (action === 'review-records') state.scenario = 'offline';
-    render();
-  });
-  scenarioSelect.addEventListener('change', () => {
-    state.scenario = scenarioSelect.value;
-    state.groupingMode = null;
-    state.detail = ''; state.category = ''; state.dialog = ''; state.switchPromptShown = false;
-    state.deleted = false; state.deletedDependent = false; state.retrying = false; state.retryResult = false;
-    state.receiptResolved = false;
-    state.uploadedOne = false;
-    render();
-    scheduleReceiptResolution();
-  });
-  languageSelect.addEventListener('change', () => { state.lang = languageSelect.value; render(); });
-  // Preview the handoff from an offline local queue to automatic upload. No server call is made.
-  window.addEventListener('online', () => {
-    if (state.scenario === 'threshold') { state.uploadedOne = true; render(); return; }
-    if (state.scenario !== 'offline') return;
-    state.scenario = 'syncing';
-    render();
-  });
-  window.addEventListener('offline', () => {
-    if (state.scenario !== 'syncing') return;
-    state.scenario = 'offline';
-    render();
-  });
-  document.addEventListener('keydown', event => {
-    if (event.key !== 'Escape') return;
-    if (state.dialog) state.dialog = '';
-    else if (state.detail) state.detail = '';
+    if (!button) return;
+    const action = button.dataset.action, value = button.dataset.value;
+    if (action === 'back') goBack();
+    else if (action === 'open-task') go('task', { task: value, unit: '' });
+    else if (action === 'past') go('past', { pastScope: value });
+    else if (action === 'not-accepted') go('not-accepted', { notAcceptedTask: value });
+    else if (action === 'scope') { if (value === 'all') state.unit = ''; else state.drawer = true; }
+    else if (action === 'pick-unit') { state.unit = value; state.drawer = false; }
+    else if (action === 'close-units') state.drawer = false;
+    else if (action === 'open-reauth') state.dialog = 'reauth';
+    else if (action === 'complete-reauth') { state.dialog = ''; state.signedOut = false; state.scenario = 'syncing'; }
+    else if (action === 'close-dialog') state.dialog = '';
     else return;
     render();
   });
-  function scheduleReceiptResolution() {
-    if (state.scenario !== 'uncertain' || params.get('receipt') === 'hold' || state.receiptResolved) return;
-    window.setTimeout(() => {
-      if (state.scenario !== 'uncertain') return;
-      state.receiptResolved = true;
-      render();
-    }, params.get('receipt') === 'delayed' ? 10000 : 850);
-  }
+  scenarioSelect.addEventListener('change', () => {
+    const v = scenarioSelect.value;
+    Object.assign(state, { scenario: SCENARIOS[v] || 'offline', view: 'phone', task: '', unit: '', back: [], drawer: false, dialog: v === 'switch' ? 'switch' : '', signedOut: v === 'expired' });
+    render();
+  });
+  languageSelect.addEventListener('change', () => { state.lang = languageSelect.value; render(); });
+  // The badge follows records, not the connection (owner, 2026-10-18): getting a connection back starts the upload.
+  window.addEventListener('online', () => { if (state.scenario === 'offline') { state.scenario = 'syncing'; render(); } });
+  window.addEventListener('offline', () => { if (state.scenario === 'syncing') { state.scenario = 'offline'; render(); } });
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape') return;
+    if (state.dialog) state.dialog = ''; else if (state.drawer) state.drawer = false; else return;
+    render();
+  });
   render();
-  scheduleReceiptResolution();
 })();

@@ -113,3 +113,36 @@ Home 里默认的三条固定样例都不属于分娩任务；从 Home 进入分
 ## Main branch header review retained
 
 The earlier shared-header review found that the old Saved work drawer used text below the farm legibility floor and put repeated context or actions in page and sheet headers. The new Data sync flow keeps page titles and Back in shared headers, puts record facts in the body at the design system's text floor, and treats the phone-wide status badge as an app-shell control. Native review must check the 24px header-to-body spacing and ensure an expanded exception badge does not crowd Back or adjacent actions at 360px.
+
+## 2026-10-20: rebuilt to the PRD (PR 235)
+
+Baseline: origin/main, the study above (`data-sync.list`, `grouped`, `category`, `detail`, `failed`, `conflict`, `blocked`, `dependent-delete`, `receipt`, `reconciled`) and Farrowing's "Task 2" / "All 3" badge. The owner reworked the whole flow with us from 2026-10-18 to 2026-10-20; the PRD of PR 235 records the rulings. This section is the critique for the rebuild; where it overrides an earlier Keep it says so.
+
+### Keep
+
+- **This phone, not the team:** the page is still "Saved work", and every count says records on this phone. A record is gone from it only when the farm has it.
+- **Every record can be found:** one log by day, each entry the tag and what was recorded, then unit, pen, time and who (the house Log).
+- **Upload is automatic:** no Upload button, no retry; a returning connection only changes the counts.
+- **The connection said once, in words:** the group title says "Waiting to upload" or "Uploading"; no colour stands in for it.
+- **The task's scope stays explicit:** a task page names its task; the whole phone is Home's.
+
+### Problems
+
+- **Major, attention (Saved work):** a network card, three status sections and a category layer stacked before the records; per-row state words repeated the section titles. Now one group of task rows with counts (Other records last), the connection in the group title, past uploads behind the clock at the top right (Headers law, PR 239).
+- **Major, wrong model (record details):** the detail, failed, conflict, blocked and dependent-delete screens offered retry, discard and delete. The PRD has none of them: a record the farm did not accept is information only. They are replaced by one read-only Not accepted page, opened from the standing Toast at the top of the task's records, in two groups: Already recorded (the farm's value first, "You recorded X" under it) and Couldn't be accepted (the reason). A later record is never blocked; it uploads as its own entry.
+- **Major, two scopes in one control (task badge):** "Task 2" and "All 3" put words and two scopes in one header control. Now an upload icon and this task's count (IconButton · count), as the page header's one action, and nothing when the task has no records (Home holds the whole phone).
+- **Major, a task's records:** chain cards and a flat needs-you section; a 300-record task would be one long page with no way in. Now the standing Toast (when something wasn't accepted), the unit switch with the count inside ("All units 296", "Unit 7 64", opening Choose a unit), and one flat log by day.
+- **Minor, history:** "Uploaded in the last 30 days · N" said a number nobody acts on. Past uploads is now a log behind the clock, by day, in the scope it was opened from.
+- **Minor, footer Back (overrides the earlier Keep):** these pages are read only, and the house pages that only read (Toolbox, Records, Unit) go back from the header's Back; a footer holds a commit. A second Back in a footer would be the same action twice.
+- **Minor, copy:** "Fix N", "Needs you", "Checking server result" are gone with their states; the vocabulary is Saved → Uploaded → Not accepted.
+
+### Gone
+
+| Screen | Where its job went |
+|---|---|
+| `data-sync.grouped`, `data-sync.category` | No category layer: the task's records page is one log with the unit switch (`data-sync.task-list`, `data-sync.unit`). |
+| `data-sync.detail` | A saved record is a log entry; nothing more to open. |
+| `data-sync.failed`, `data-sync.conflict` | `data-sync.not-accepted`, read only: Couldn't be accepted and Already recorded. |
+| `data-sync.blocked`, `data-sync.dependent-delete` | No blocked state and no delete: a later record waits as an ordinary entry and uploads on its own (C-7, C-10, C-11). |
+| `data-sync.receipt` | A record whose reply was lost counts as uploading (B-7); no separate state. |
+| `data-sync.reconciled` | Uploaded records sit in Past uploads (`data-sync.history`). |

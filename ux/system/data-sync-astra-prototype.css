@@ -2,16 +2,6 @@
 .stage{grid-template-columns:minmax(280px,400px) 390px;gap:48px;justify-content:center}
 .device{width:390px;height:844px}
 #app{position:relative;height:calc(100% - 27px);overflow:hidden}
-.sync-content{display:flex;flex-direction:column;gap:var(--space-section);padding-bottom:var(--space-section)}
-.sync-groups{display:flex;flex-direction:column;gap:var(--space-section)}
-.sync-detail{display:flex;flex-direction:column;gap:var(--space-section)}
-.sync-compare{display:flex;flex-direction:column;gap:var(--space-8)}
-.sync-detail-actions{display:flex;justify-content:flex-start}
-.sync-intro{display:flex;flex-direction:column;gap:var(--space-8)}
-.sync-summary-line{margin:0}
-.sync-empty{padding:var(--space-section)}
-.sync-dialog-body{display:flex;flex-direction:column;gap:var(--space-8)}
-.sync-uploaded-summary{margin:0;padding:2px 0;color:#596755;font-size:13px;line-height:1.5}
-.sync-all-phone{align-self:flex-start;min-height:48px;padding:8px 0;border:0;background:transparent;color:#315c3a;font:600 14px var(--font-sans);text-align:left;cursor:pointer}
+.sync-stack{display:flex;flex-direction:column;gap:var(--space-section);padding-bottom:var(--space-section)}
 @media(max-width:800px){.stage{display:block;padding:0}.design-notes,.studio-header{display:none}.device{margin:0 auto}}
 @media(max-width:480px){.device{width:100%;height:100dvh;min-height:560px}.statusbar{height:27px}#app{height:calc(100% - 27px)}}
