@@ -1176,8 +1176,8 @@
      to the keyboard's top (data-keyboard, --st-keyboard-lift) and its height is capped to what stays visible, so the footer with
      Save, Done or Send sits just above the keys and the focused field scrolls into the body's view. Behaviour only: without a
      keyboard nothing moves. keyboardLift is the measure: how far the sheet's resting bottom sits under the visible bottom.
-     A host screen that is not a Sheet but ends in its own footer (a composer) marks its root data-st-keyboard-host: it takes the
-     lift as bottom padding, so its footer rides above the keys the same way. */
+     A host screen that is not a Sheet but ends in its own footer or dock (a composer, a list with fields) marks its root
+     data-st-keyboard-host: it takes the lift as bottom padding, so its list shrinks and its footer rides above the keys the same way. */
   function keyboardLift(sheetBottom,lift,viewBottom){return Math.max(0,Math.round((sheetBottom||0)+(lift||0)-(viewBottom||0)));}
   if(typeof document!=='undefined'&&typeof window!=='undefined'){
     const typed=el=>!!el&&!!el.matches&&el.matches('textarea,[contenteditable="true"],input:not([type="range"]):not([type="checkbox"]):not([type="radio"]):not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="file"]):not([type="color"])');
@@ -1201,7 +1201,9 @@
       if(!lift){if(was){lifted=sheet;drop();}return;}
       if(lift!==was)sheet.style.setProperty('--st-keyboard-lift',lift+'px');
       sheet.setAttribute('data-keyboard','');lifted=sheet;
-      const body=el.closest('.sheet-body,[data-st-keyboard-host] .app-scroll');
+      // The field scrolls into view in its own scroller: the sheet's body, or a host's list.
+      let body=el.closest('.sheet-body');
+      for(let n=el.parentElement;!body&&n&&n!==sheet;n=n.parentElement){const o=getComputedStyle(n).overflowY;if(o==='auto'||o==='scroll')body=n;}
       if(body){const f=el.getBoundingClientRect(),b=body.getBoundingClientRect();if(f.bottom>b.bottom)body.scrollTop+=f.bottom-b.bottom;else if(f.top<b.top)body.scrollTop-=b.top-f.top;}
     };
     const soon=()=>requestAnimationFrame(fit);
