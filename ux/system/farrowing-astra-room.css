@@ -80,7 +80,7 @@
 .find-row .st-animal-id b,.find-row .st-animal-state b{color:var(--ink);font-weight:700}
 /* The list carries the page's side gutter itself (the sheet body's is cleared; the Sheet page rule loads later, hence the phone class), so its cards sit where the room list's and Find a sow's do. */
 .farrowing-phone .sheet.scan-page>.sheet-body{padding-left:0;padding-right:0}
-.scan-body{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;padding:4px 16px 24px}
+.scan-body{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;padding:0 16px 24px}
 .scan-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 36px 40px;text-align:center}
 .scan-empty svg{width:44px;height:44px;margin-bottom:14px;color:var(--muted)}
 .scan-empty strong{font:600 17px var(--font-sans)}
