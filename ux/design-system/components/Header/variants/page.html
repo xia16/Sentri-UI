@@ -19,6 +19,8 @@
 <div class="ph" data-state="Fact line (a hub)" data-demo="fact"><div class="over"></div></div>
 <div class="ph" data-state="Longest title that fits beside Back at 360" data-demo="longest"><div class="over"></div></div>
 <div class="ph" data-state="Chinese" data-demo="zh"><div class="over"></div></div>
+<div class="ph" data-state="Page action" data-demo="action"><div class="over"></div></div>
+<div class="ph" data-state="Page action · the sync badge" data-demo="badge"><div class="over"></div></div>
 <script>
 const UI=window.SentriUI;
 const bar='<div class="bar" aria-hidden="true"><span>9:41</span></div>';
@@ -28,6 +30,8 @@ const R={
   default:()=>page({title:'Pen log'}),
   fact:()=>page({title:'Farrowing',back:{action:'today',label:'Back to Today'},line:{text:[{text:'Last record '},{text:'08:41',strong:true},{text:' · G.H'}]},body:rows(2,'Sow')}),
   longest:()=>page({title:'Farrowing room log'}),
+  action:()=>page({title:'Saved work',pageAction:{icon:window.SentriIcons.icon('clock'),label:'Past uploads',action:'past-uploads'},body:rows(2,'Task')}),
+  badge:()=>page({title:'Farrowing',back:{action:'today',label:'Back to Today'},line:{text:[{text:'Last record '},{text:'08:41',strong:true},{text:' · G.H'}]},pageAction:{icon:window.SentriIcons.icon('upload'),count:2,label:'2 records from this task waiting to upload',action:'task-sync'},body:rows(2,'Sow')}),
   zh:()=>page({title:'分娩舍 3 号',back:{action:'back',label:'返回'},line:{text:[{text:'最近记录 '},{text:'08:41',strong:true},{text:' · G.H'}]},body:rows(2,'母猪')})
 };
 document.querySelectorAll('[data-state]').forEach(el=>{const r=R[el.getAttribute('data-demo')];if(r)el.querySelector('.over').innerHTML=r();});

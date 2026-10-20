@@ -4,7 +4,7 @@ The top of a surface: the **page header** on a page, the **sheet header** on a d
 
 The title inside it is a [Heading](../Heading/README.md) (the page or sheet title). A header owns everything around that title: Back, the corners, the line, the hairline and the gap to the body. A block or a run of rows is named by a Section or Group heading, never by a header.
 
-Built by [Sheet](../Sheet/README.md): `SentriUI.sheet({ variant: 'page', title, back, line })` draws the page header, and `SentriUI.sheet({ title, line, corner, cross })` draws the sheet header. `SentriUI.pageHeader({ title, back, line })` is the page header alone (TaskHeader draws it). `SentriUI.headerLine(line)` is the line alone. Types are in `index.d.ts`.
+Built by [Sheet](../Sheet/README.md): `SentriUI.sheet({ variant: 'page', title, back, line, pageAction })` draws the page header, and `SentriUI.sheet({ title, line, corner, cross })` draws the sheet header. `SentriUI.pageHeader({ title, back, line, action })` is the page header alone (TaskHeader draws it). `SentriUI.headerLine(line)` is the line alone. Types are in `index.d.ts`.
 
 ## Which header
 
@@ -31,9 +31,10 @@ Which one depends on whether the surface covers the page, not on which feature i
   - **Clear** or **Reset** sits at the top right as quiet text. It is present only while there is something to clear, or something away from its defaults.
   - A **✕** sits at the top left, only in a drawer with levels, at every level. It closes the whole drawer, keeping the draft (owner ruling B, 2026-10-16; [board](../../evidence/2026-10-16-drawer-levels.png)). A drawer without levels has none.
   - Each is a 48px target, vertically centred on the header's text block (the title, plus its line when there is one).
+- **Page action** (page header; owner, 2026-10-20): one [IconButton](../IconButton/README.md) at the top right, named for the screen reader, centred on the text block by the header's own alignment. It opens something about the whole page (Saved work's past uploads, behind a clock) or is the sync badge (an upload glyph with a task's record count). `pageAction` on `sheet({ variant: 'page' })`, `action` on `pageHeader()`. Never a text button, never two.
 - **Hairline** (sheet header): 1px `line` under the header. It belongs to the header.
 
-Nothing else goes in a header: no counts, status, Save or asides. Status is the first thing in the body.
+Nothing else goes in a header: no counts in the title or line, no status, Save or asides. Status is the first thing in the body.
 
 ## Variants
 

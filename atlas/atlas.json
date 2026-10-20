@@ -28312,7 +28312,8 @@
       "variants": [
        "done",
        "offline",
-       "plain"
+       "plain",
+       "standing"
       ]
      }
     },

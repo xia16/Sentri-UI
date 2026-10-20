@@ -211,6 +211,10 @@ export interface SegmentProps {
 
 export interface IconButtonProps {
   variant?: 'bordered' | 'plain';
+  /** The sync badge (owner 2026-10-18): a number beside the glyph; the button widens to fit. */
+  count?: number | string;
+  /** 'attention': the glyph in red, when a person must act. */
+  tone?: '' | 'attention';
   pressed?: boolean;
   selected?: boolean;
   reason?: string;
@@ -689,7 +693,7 @@ export interface SentriUI {
   choiceGroup(rows: string | string[], options?: { title?: string; /** A registry glyph before the title (clock, grid, tag, health). */ icon?: string; lead?: string; className?: string; radio?: boolean; /** Raw HTML at the heading's right end (a radio field's Clear). */ aside?: string; id?: string; strs?: Strs<'title'>; args?: StrArgs<'title'> }): string;
   /** While value is set, a Clear text action empties the field and fires `input`. args fill the strs ({ level } for ds.picker.search_in). */
   choiceSearch(props?: { label?: string; placeholder?: string; value?: string; attrs?: SafeAttrs; strs?: Strs<'label' | 'placeholder'>; args?: Record<string, unknown> }): string;
-  toast(title: string, options?: { detail?: string; tone?: 'done' | 'offline'; strs?: Strs<'title' | 'detail'>; args?: StrArgs<'title' | 'detail'> }): string;
+  toast(title: string, options?: { detail?: string; tone?: 'done' | 'offline' | 'notice' | 'attention'; standing?: { action?: string; value?: string; label?: string } | null; strs?: Strs<'title' | 'detail'>; args?: StrArgs<'title' | 'detail'> }): string;
   choiceEmpty(text: string, options?: { strs?: Strs<'text' | 'title'>; args?: StrArgs<'text' | 'title'>; title?: string; icon?: string }): string;
   segment(props: SegmentProps): string;
   filterChips(props: { items: { value: string; label: string; count?: string | number; checked?: boolean; disabled?: boolean; aria?: string }[]; action?: string; key?: string; label?: string; state?: string; reason?: string }): string;
@@ -708,6 +712,8 @@ export type HeaderLine =
   | { text: SheetText | SheetParts }
   | { key: Array<{ fill: string; count: number | string; label: string }> };
 export interface SheetProps {
+  /** Page only (Headers law, owner 2026-10-20): the page header's one action at the top right, an IconButton's props. */
+  pageAction?: Record<string, unknown> | null;
   /** drawer (default): over the page, sized to its content, a handle, the sheet header (centred title, line, hairline) · page: the whole canvas, the page header (Back top left, title, line), no Back in the footer · dialog: one small decision rising from the bottom. */
   variant?: 'drawer' | 'page' | 'dialog';
   /** Drawer only: '' (default) is a content or input drawer, white with tinted cards; 'menu' is a drawer whose every row is an option or a verb (Choose a unit, More actions, Go to pen), the tint with white cards. See SURFACES.md. */
@@ -772,7 +778,7 @@ export interface SheetFooterProps {
 export interface SentriUI {
   sheet(props: SheetProps): string;
   /** The page header: Back (48px) top left, the title, the optional header line, 24px to the body. TaskHeader draws it too. */
-  pageHeader(props: { title: SheetText; back?: { action?: string; value?: string; label?: SheetText }; line?: HeaderLine | null; level?: 1 | 2; ds?: string; className?: string }): string;
+  pageHeader(props: { title: SheetText; back?: { action?: string; value?: string; label?: SheetText }; line?: HeaderLine | null; level?: 1 | 2; ds?: string; className?: string; action?: string | Record<string, unknown> | null }): string;
   /** The header line alone (a host that draws its own header slot). */
   headerLine(line: HeaderLine | null): string;
   sheetFooter(props?: SheetFooterProps): string;
