@@ -3015,6 +3015,7 @@
          "farrowing.scan",
          "farrowing.scan-no-reader",
          "farrowing.scan-list",
+         "farrowing.scan-new",
          "farrowing.scan-ticked",
          "farrowing.scan-stopped",
          "farrowing.scan-actions",
@@ -3455,6 +3456,11 @@
          "farrowing.scan-no-reader",
          "farrowing.room",
          "Back arrow"
+        ],
+        [
+         "farrowing.scan-list",
+         "farrowing.scan-new",
+         "the reader reads another sow: her row slides in and holds a tint"
         ],
         [
          "farrowing.scan-list",
@@ -6332,7 +6338,7 @@
             "name": "Scan list",
             "at": "Unit 6",
             "shows": "The sows scanned in this visit, one white card per unit under its plain section heading (\"Unit 7\", \"Unit 6\"), this unit first, newest scan first within each card; no count beside the heading. Every row is the design system's Row, animal variant with the sow's Farrowing state on the right (the room's row, without the initials so the line under the ear tag stays on one line (\"Pen B1 · 1h ago\"), the same in every unit because the heading names the unit), drawn as a select + door.",
-            "logic": "A sow is added the first time she is scanned. Scanning her again adds nothing: her existing row is highlighted briefly and scrolled into view. The list stays while the worker opens a sow and comes back.",
+            "logic": "A sow is added the first time she is scanned: her row slides in at the top of her unit's card and the rows under it glide down (no jump); a unit's card fades in with its heading the first time one of its sows is scanned. Scanning her again adds nothing. Either way her row takes a soft tint for 1.6 s, then fades, and is brought into view, so the worker finds her after looking up from the pig. Each row keeps its own tint, so scans in quick succession light row after row and none cuts another short. The list stays while the worker opens a sow and comes back.",
             "rule": "The tick box selects; the rest of the row opens her. A sow in this unit opens her farrowing drawer, and Back returns to this list; a sow in another unit opens the same drawer (its subtitle names her unit, \"Unit 6 · A2 / Parity 4\"), and Back returns here too. The scanner is always listening: there is no \"ready for the next tag\" banner and no \"not found\" row.",
             "source": "farrowing-astra-concept.js scanPage(), scanAdd(), sowRow()"
            }
@@ -6346,6 +6352,42 @@
           ],
           "rules": [
            "Owner decision 2026-10-12: each scan adds the sow to a list; a repeat scan highlights her row."
+          ],
+          "issues": []
+         }
+        },
+        {
+         "id": "farrowing.scan-new",
+         "name": "Scan · a sow just scanned",
+         "zh": "刚扫描的母猪",
+         "status": "in-design",
+         "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+         "preset": "scan-new",
+         "figma": "",
+         "notes": {
+          "purpose": "Show the moment after a scan: where the sow just read landed in the list.",
+          "states": [
+           "The newest scan, 004318 in Unit 6, holds the arrival tint (the still frame of a cue that fades after 1.6 s)"
+          ],
+          "elements": [
+           {
+            "name": "Arrival tint",
+            "at": "004318",
+            "shows": "Her row takes the icon-well tint, the same tint for a new sow and for a repeat scan; never the ticked tint.",
+            "logic": "Every scan lights its row on its own clock and brings it into view smoothly; the tint fades over about a second when its 1.6 s are up. A new row slides in and the rows under it glide down. Reduced motion keeps the tint and drops the slide and the fade.",
+            "source": "farrowing-astra-concept.js scanAdd(), scanLights(), scanGlide(); farrowing-astra-room.css .scan-lit"
+           }
+          ],
+          "controls": [],
+          "copy": [
+           "(raw) Unit 7 · Unit 6"
+          ],
+          "edge": [
+           "A real reader can read the same tag twice in a row while it is held to the ear: the second read only lights her row again.",
+           "On the phone, each read should also give a short haptic tick with the reader's beep, so the worker need not look; the prototype cannot."
+          ],
+          "rules": [
+           "Owner, 2026-10-20: a new scan must not appear abruptly; scans in quick succession stay readable."
           ],
           "issues": []
          }

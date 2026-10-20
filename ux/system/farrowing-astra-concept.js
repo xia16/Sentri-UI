@@ -201,7 +201,7 @@ function atlasScreen(s,c){
  if(v==='profile'&&s.actionsEntry)return 'farrowing.sow-actions';
  return null;
 }
-const presets=[['room','Room list'],['count','Counting'],['before','Before first count'],['draft','Death entry'],['finish','Finish'],['leave','Leave edit with changes'],['locked','Locked record'],['edit','Edit counts'],['born','Correct born'],['history','Farrowing log'],['ended','Sow died'],['allocate','Sow died · allocate piglets'],['task-blocked','End task · active sows'],['task-ready','End task · awaiting sows'],['task-complete','End task · all finished'],['task-outcomes','End task · production outcomes'],['foster','Foster piglets'],['reconcile','Reconcile piglet count'],['search-empty','Find a sow'],['search-results','Find a sow · results'],['search-none','Find a sow · no match'],['scan-none','Scan · reader not connected'],['scan-empty','Scan · nothing scanned'],['scan-list','Scan · sows scanned'],['scan-ticked','Scan · sows ticked'],['scan-repeat','Scan · repeat scan'],['scan-stopped','Scan · stopped'],['scan-actions','Scan · Actions']];
+const presets=[['room','Room list'],['count','Counting'],['before','Before first count'],['draft','Death entry'],['finish','Finish'],['leave','Leave edit with changes'],['locked','Locked record'],['edit','Edit counts'],['born','Correct born'],['history','Farrowing log'],['ended','Sow died'],['allocate','Sow died · allocate piglets'],['task-blocked','End task · active sows'],['task-ready','End task · awaiting sows'],['task-complete','End task · all finished'],['task-outcomes','End task · production outcomes'],['foster','Foster piglets'],['reconcile','Reconcile piglet count'],['search-empty','Find a sow'],['search-results','Find a sow · results'],['search-none','Find a sow · no match'],['scan-none','Scan · reader not connected'],['scan-empty','Scan · nothing scanned'],['scan-list','Scan · sows scanned'],['scan-ticked','Scan · sows ticked'],['scan-repeat','Scan · repeat scan'],['scan-new','Scan · a sow just scanned'],['scan-stopped','Scan · stopped'],['scan-actions','Scan · Actions']];
 const cards=[{title:'Find the next sow',caption:'<strong>The room, in context.</strong> Filter by state, jump to a pen, and open each sow’s live record.',initial:'room'},{title:'Finish with confidence',caption:'<strong>Two observations, then the lock.</strong> Clear rows, optional details and a deliberate final action.',initial:'finish'},{title:'Read the whole litter',caption:'<strong>Current facts, with their context.</strong> Finish details stay readable; the history opens on its own page.',initial:'locked'}];
 const states=cards.map(c=>{const r=seed(c.initial);restoreDraft(r);return r;});
 // Scenario gate hook (scripts/run-scenarios.mjs): read-only access to the live records for record assertions. Draws nothing.
@@ -448,17 +448,21 @@ function searchPage(c){
  return `${status()}<div class="find-page find-search"><div class="find-top"><div class="find-field">${icon('search')}<input data-room-search type="text" inputmode="text" enterkeyhint="search" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" placeholder="Ear tag or pen" aria-label="Ear tag or pen" value="${esc(q)}">${SentriUI.iconButton({variant:'plain',action:'room-search-clear',icon:icon('close'),label:'Clear',className:'find-clear'}).replace('<button',`<button${q?'':' hidden'}`)}${SentriUI.iconButton({action:'room-scan',icon:icon('scan'),label:'Scan ear tag',className:'find-scan'})}</div>${SentriUI.button({label:'Cancel',register:'text',action:'room-back',className:'find-cancel'})}</div><div class="room-search-results find-results" role="region" aria-label="Search results" aria-live="polite">${searchBody(c)}</div></div>`;
 }
 function scanSetup(c,preset=''){
- const scanning=/^scan-/.test(preset),scanned=['scan-list','scan-repeat','scan-ticked','scan-stopped','scan-actions'].includes(preset),ticked=['scan-ticked','scan-actions'].includes(preset);
+ const scanning=/^scan-/.test(preset),scanned=['scan-list','scan-new','scan-repeat','scan-ticked','scan-stopped','scan-actions'].includes(preset),ticked=['scan-ticked','scan-actions'].includes(preset);
  const items=scanned?['004318','000431','000418']:[];   // newest first
- c.scan={connected:preset==='scan-none'?false:scanning?true:!scannerOff,listening:preset!=='scan-stopped',items,picked:ticked?['000431','000418']:[],seq:items.length,flash:'',flashUntil:0,scroll:0};
+ c.scan={connected:preset==='scan-none'?false:scanning?true:!scannerOff,listening:preset!=='scan-stopped',items,picked:ticked?['000431','000418']:[],seq:items.length,fresh:{},last:'',scroll:0};
+ if(preset==='scan-new')c.scan.fresh['004318']=Infinity;   // the held frame of the arrival tint: 004318, the newest scan, stays lit
  if(/^search-/.test(preset))c.query=preset==='search-results'?'43':preset==='search-none'?'909':'';
  if(preset==='scan-repeat'){c.scan.seq=1;scanAdd(c);}   // the reader reads 000431 again: still one row, highlighted
 }
-// "Simulate scan": the reader reads the next sample sow. A sow already on the list is not added twice; her row is highlighted instead.
+// "Simulate scan": the reader reads the next sample sow. A sow already on the list is not added twice; her row is lit again instead.
+// Every scan, new or repeat, lights its row for scanLit ms on its own clock, so a burst of scans lights each row in turn.
+const scanLit=1600;
 function scanAdd(c){
  const sc=c.scan;if(!sc.connected||!sc.listening)return false;
  const tag=scanSequence[sc.seq++%scanSequence.length];
- if(sc.items.includes(tag)){sc.flash=tag;sc.flashUntil=Date.now()+1100;}else{sc.items.unshift(tag);sc.scroll=0;}
+ if(!sc.items.includes(tag))sc.items.unshift(tag);
+ sc.fresh[tag]=Date.now()+scanLit;sc.last=tag;
  return true;
 }
 function scanAction(s,c,a,v){
@@ -622,11 +626,37 @@ function pageAfterRender(i,s,c,root){
  const demo=root.querySelector('[data-demo-scan]');if(demo){demo.hidden=s.view!=='roomScan'||!c.scan.connected;demo.disabled=!c.scan.listening;}
  // Find a sow opens with the field focused; Scan highlights the row of a sow that was scanned again.
  if(pageUnder(s,c)==='roomSearch'&&s.view==='roomSearch')root.querySelector('[data-room-search]')?.focus({preventScroll:true,focusVisible:false});
- clearTimeout(scanFlashTimers[i]);
  const list=root.querySelector('.scan-body');if(list)list.scrollTop=c.scan.scroll||0;
- if(s.view==='roomScan'&&c.scan.flash&&c.scan.flashUntil>Date.now()){const row=root.querySelector(`[data-scan-tag="${c.scan.flash}"]`);if(row){row.classList.add('scan-arrival');row.scrollIntoView({block:'nearest'});scanFlashTimers[i]=setTimeout(()=>{row.classList.remove('scan-arrival');c.scan.flash='';},c.scan.flashUntil-Date.now());}}
+ if(s.view==='roomScan')scanLights(c,root);
 }
-const scanFlashTimers=[];
+// A sow just scanned keeps a soft tint for a moment, so the eye finds her row after looking up from the pig; the tint then fades.
+// The row just read is brought into view (smoothly: the worker sees where she landed); the rest of the list keeps its place.
+function scanLights(c,root){
+ const sc=c.scan,now=Date.now();
+ for(const [tag,until] of Object.entries(sc.fresh)){
+  if(until<=now){delete sc.fresh[tag];continue;}
+  const row=root.querySelector(`[data-scan-tag="${tag}"]`);if(!row)continue;
+  row.classList.add('scan-lit');
+  if(until!==Infinity)setTimeout(()=>row.classList.remove('scan-lit'),until-now);
+ }
+ const row=sc.last&&root.querySelector(`[data-scan-tag="${sc.last}"]`);sc.last='';
+ if(row)row.scrollIntoView({block:'nearest',behavior:'smooth'});
+}
+// A new row arrives without a jump: it slides in at the top of its unit's card and everything under it glides down to its new place
+// (measured before and after the render, then animated back from the old place). A card that is new fades in with its heading.
+// Rows move with their card, so a row's glide is measured against its card. Reduced motion and the atlas's still frames skip it.
+const scanKey=e=>e.dataset.scanTag?'r'+e.dataset.scanTag:e.classList.contains('scan-card')?'c'+e.previousElementSibling?.textContent:'h'+e.textContent;
+const scanMovers=card=>[...card.querySelectorAll('.scan-body .st-heading,.scan-body .scan-card,.scan-body [data-scan-tag]')];
+function scanTops(card){const m=new Map();for(const e of scanMovers(card)){const own=e.getBoundingClientRect().top,box=e.dataset.scanTag?e.closest('.scan-card').getBoundingClientRect().top:0;m.set(scanKey(e),own-box);}return m;}
+function scanGlide(card,before){
+ if(document.documentElement.classList.contains('atlas-still')||matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+ const ease={duration:280,easing:'cubic-bezier(.22,1,.36,1)'};
+ for(const e of scanMovers(card)){
+  const was=before.get(scanKey(e)),box=e.dataset.scanTag?e.closest('.scan-card').getBoundingClientRect().top:0,now=e.getBoundingClientRect().top-box;
+  if(was===undefined)e.animate([{opacity:0,transform:'translateY(-10px)'},{opacity:1,transform:'none'}],ease);
+  else if(Math.abs(was-now)>.5)e.animate([{transform:`translateY(${was-now}px)`},{transform:'none'}],ease);
+ }
+}
 /* Landing on a pen: the list is placed on the pen first, under the sheet (no scroll the worker sees); the sheet then leaves with its own Sheet
    exit (data-leave, --sheet-out) and the pen's header takes the tapped tile's colour (--land-hold, fading over --land-fade). The atlas freezes motion
    (atlas-still) and reduced motion drops the slide, so there the pen is reached at once and the end state is the plain list. */
@@ -823,7 +853,7 @@ const gallery=document.getElementById('gallery');gallery.innerHTML=cards.map((c,
 gallery.addEventListener('sentri-range-change',e=>{const root=e.target.closest('[data-card]'),c=roomContext(states[+root.dataset.card]);Object.assign(c.filterDraft,e.detail.values);const n=visibleRoomRecords(c,c.filterDraft).length;e.target.closest('.sheet').querySelector('[data-action="room-apply-filter"]').textContent='Show '+n+' '+(n===1?'sow':'sows');});
 gallery.addEventListener('input',e=>{if(!e.target.matches('[data-room-search]'))return;const i=+e.target.closest('[data-card]').dataset.card,c=roomContext(states[i]),page=e.target.closest('.find-page');c.query=e.target.value;page.querySelector('.room-search-results').innerHTML=searchBody(c);page.querySelector('.find-clear').hidden=!c.query;if(i===0&&window.AtlasBare)AtlasBare.watch(()=>atlasScreen(states[0],c));});
 // The demo's own control, outside the phone: the reader reads the next sample sow.
-document.addEventListener('click',e=>{const b=e.target.closest('[data-demo-scan]');if(!b||b.disabled)return;const i=+b.closest('[data-card]').dataset.card,c=roomContext(states[i]);if(scanAdd(c))render(i);});
+document.addEventListener('click',e=>{const b=e.target.closest('[data-demo-scan]');if(!b||b.disabled)return;const card=b.closest('[data-card]'),i=+card.dataset.card,c=roomContext(states[i]),before=scanTops(card);if(scanAdd(c)){render(i);scanGlide(card,before);}});
 gallery.addEventListener('scroll',e=>{if(e.target.matches('.scan-body')){roomContext(states[+e.target.closest('[data-card]').dataset.card]).scan.scroll=e.target.scrollTop;return;}if(!e.target.matches('.room-scroll'))return;const list=e.target,i=+list.closest('[data-card]').dataset.card,c=roomContext(states[i]);c.scroll=list.scrollTop;if(states[i].view!=='room')return;const top=list.getBoundingClientRect().top+list.querySelector('.room-controls').offsetHeight;const pen=[...list.querySelectorAll('[data-pen]')].find(p=>p.getBoundingClientRect().bottom>top+35);if(pen){c.currentPen=pen.dataset.pen;const label=list.closest('.phone').querySelector('.dock-pen>span');if(label)label.innerHTML=`${c.currentPen}<small>Go to pen</small>`;}},true);
 let grabStart=null;
 SentriUI.holdBind(gallery,{onCommit(el){const i=+el.closest('[data-card]').dataset.card,record=states[i];if(!roomAction(i,el.dataset.action,el.dataset.value))act(record,el.dataset.action);render(i);}});

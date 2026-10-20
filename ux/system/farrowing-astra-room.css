@@ -78,15 +78,18 @@
 /* The typed part is bold ink; the rest of the tag is muted. */
 .find-row .st-animal-id{color:var(--ink-2);font-weight:500}
 .find-row .st-animal-id b,.find-row .st-animal-state b{color:var(--ink);font-weight:700}
+/* The list carries the page's side gutter itself (the sheet body's is cleared; the Sheet page rule loads later, hence the phone class), so its cards sit where the room list's and Find a sow's do. */
+.farrowing-phone .sheet.scan-page>.sheet-body{padding-left:0;padding-right:0}
 .scan-body{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;padding:4px 16px 24px}
 .scan-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 36px 40px;text-align:center}
 .scan-empty svg{width:44px;height:44px;margin-bottom:14px;color:var(--muted)}
 .scan-empty strong{font:600 17px var(--font-sans)}
 .scan-empty p{margin:6px 0 0;color:var(--muted);font:400 14px/20px var(--font-sans)}
 .scan-foot .scan-toggle{flex:1}
-.scan-arrival{animation:scan-arrival .9s cubic-bezier(.22,1,.36,1) both}
-@keyframes scan-arrival{0%,100%{background:transparent}16%{background:var(--well)}}
-@media(prefers-reduced-motion:reduce){.scan-arrival{animation:none;background:var(--well)}}
+/* A sow just scanned: her row takes the icon-well tint (never the ticked tint), then the tint fades once her moment is over. */
+.scan-card [data-scan-tag]{transition:background-color .9s ease-out}
+.scan-card [data-scan-tag].scan-lit{background-color:var(--well);transition-duration:.12s}
+@media(prefers-reduced-motion:reduce){.scan-card [data-scan-tag]{transition:none}}
 .other-sow-log{margin-top:var(--space-section)}
 /* Prototype controls, outside the phone frame. */
 .demo-scan{min-height:38px;padding:0 12px;border:1px solid #d1d5c7;border-radius:8px;background:var(--paper);color:var(--ink);font:500 13px var(--font-sans)}

@@ -4402,6 +4402,49 @@
     },
     {
      "type": "state",
+     "id": "scan.new",
+     "label": "Scan ear tags, a sow just scanned",
+     "tree": "S5",
+     "reset": {
+      "preset": "scan-new"
+     },
+     "children": [
+      {
+       "type": "outcome",
+       "id": "fa-s26-a-new-scan-lights-her-row",
+       "tree": "S-26",
+       "label": "The sow just scanned is lit, so the worker finds her",
+       "gwt": {
+        "given": "Three sows are listed and 004318 was the last one read.",
+        "when": "The worker looks up from the pig.",
+        "then": "004318 is lit with the arrival tint in the Unit 6 card; no other row is lit, and nothing is ticked."
+       },
+       "authority": [
+        {
+         "src": "owner",
+         "at": "2026-10-20",
+         "says": "A new scan must not appear abruptly; scans in quick succession stay readable"
+        }
+       ],
+       "visible": [
+        {
+         "el": ".scan-page [data-scan-tag='004318'].scan-lit",
+         "says": "her row holds the arrival tint",
+         "hard": "broken-ruling"
+        }
+       ],
+       "record": [
+        {
+         "expr": "document.querySelectorAll('.scan-page .scan-lit').length === 1 && c.scan.picked.length === 0",
+         "says": "only the sow just scanned is lit, and lighting ticks nothing",
+         "hard": "wrong-fact"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "type": "state",
      "id": "scan.repeat",
      "label": "Scan ear tags, a sow scanned again",
      "tree": "S5",

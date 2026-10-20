@@ -203,6 +203,7 @@ States: S1 Find a sow, empty field · S2 Scan, no reader paired · S3 Scan, read
 | S-23 | S4 | tick, open another sow, Back | → the tick is kept | I — as S-22 | `fa-s23-ticks-survive-opening-a-sow` |
 | S-24 | S4 | tap a row in another unit | → her farrowing drawer (the same drawer), subtitle "Unit 6 · A2" | S — owner decision 2026-10-12 | `fa-s24-scan-row-in-another-unit-opens-her-drawer` |
 | S-25 | S5 | the reader reads a listed sow again | → still one row (highlighted briefly) | S — owner decision 2026-10-12 | `fa-s25-repeat-scan-does-not-duplicate` |
+| S-26 | S5 | the reader reads a sow | → her row slides in and holds the arrival tint; nothing ticked | S — owner 2026-10-20 | `fa-s26-a-new-scan-lights-her-row` |
 | S-26 | S4 | Actions with two ticked, then Add a note | → the note page for the first ticked sow (no flow takes several sows yet) | S — owner decision 2026-10-12 | `fa-s26-actions-note-opens-the-note-for-the-first-sow` |
 
 E-11 is superseded: a scan no longer opens her sheet by itself; it adds her to the list (S-13) and her sheet opens from her row (S-21).
