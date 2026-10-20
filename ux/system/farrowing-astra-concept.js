@@ -636,8 +636,8 @@ function scanLights(c,root){
  for(const [tag,until] of Object.entries(sc.fresh)){
   if(until<=now){delete sc.fresh[tag];continue;}
   const row=root.querySelector(`[data-scan-tag="${tag}"]`);if(!row)continue;
-  row.classList.add('scan-lit');
-  if(until!==Infinity)setTimeout(()=>row.classList.remove('scan-lit'),until-now);
+  row.dataset.arrival='on';   // Row's Just scanned state (design system): "off" fades it back, then the attribute goes
+  if(until!==Infinity)setTimeout(()=>{row.dataset.arrival='off';setTimeout(()=>row.removeAttribute('data-arrival'),900);},until-now);
  }
  const row=sc.last&&root.querySelector(`[data-scan-tag="${sc.last}"]`);sc.last='';
  if(row)row.scrollIntoView({block:'nearest',behavior:'smooth'});

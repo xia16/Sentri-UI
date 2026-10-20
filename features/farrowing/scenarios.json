@@ -3691,6 +3691,12 @@
          "text": "Turn on the tag reader and pair it in your phone's Bluetooth settings. Scanning starts as soon as it connects."
         },
         {
+         "text": "Stop scanning",
+         "absent": true,
+         "hard": "broken-ruling",
+         "says": "no footer act when no reader is paired"
+        },
+        {
          "el": ".scan-empty button",
          "is": "absent",
          "hard": "broken-ruling",
@@ -3908,6 +3914,12 @@
          "visible": [
           {
            "text": "Resume scanning"
+          },
+          {
+           "text": "Stop scanning",
+           "absent": true,
+           "hard": "wrong-fact",
+           "says": "the footer offers Resume, not Stop, while stopped"
           }
          ],
          "record": [
@@ -3946,6 +3958,12 @@
            "visible": [
             {
              "text": "Stop scanning"
+            },
+            {
+             "text": "Resume scanning",
+             "absent": true,
+             "hard": "wrong-fact",
+             "says": "the footer offers Stop again once listening"
             }
            ],
            "record": [
@@ -4428,14 +4446,14 @@
        ],
        "visible": [
         {
-         "el": ".scan-page [data-scan-tag='004318'].scan-lit",
+         "el": ".scan-page [data-scan-tag='004318'][data-arrival='on']",
          "says": "her row holds the arrival tint",
          "hard": "broken-ruling"
         }
        ],
        "record": [
         {
-         "expr": "document.querySelectorAll('.scan-page .scan-lit').length === 1 && c.scan.picked.length === 0",
+         "expr": "document.querySelectorAll('.scan-page [data-arrival=on]').length === 1 && c.scan.picked.length === 0",
          "says": "only the sow just scanned is lit, and lighting ticks nothing",
          "hard": "wrong-fact"
         }
