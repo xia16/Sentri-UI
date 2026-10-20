@@ -416,7 +416,8 @@ button.st-row:disabled{cursor:default}
 .st-toast--attention .st-toast-glyph{background:var(--red)}
 /* The standing form (owner, 2026-10-20): in the page's flow, not over it; the whole box is a door; no entrance motion. */
 .st-toast--standing{position:relative;bottom:auto;left:auto;right:auto;z-index:auto;width:100%;border:0;box-shadow:none;animation:none;text-align:left;font:inherit;cursor:pointer}
-.st-toast--standing:is(:active,[data-preview~="pressed"]){filter:brightness(1.18)}
+.st-toast--standing:is(:active,[data-preview~="pressed"]){background:var(--ink-2);transform:translateY(var(--size-2))}
+@media(prefers-reduced-motion:reduce){.st-toast--standing:is(:active,[data-preview~="pressed"]){transform:none}}
 .st-toast-chevron{display:grid;place-items:center;flex:none;margin-left:auto;color:#ffffffc7}
 .st-toast-chevron svg{width:18px;height:18px}
 /* IconButton with a count (the sync badge, owner 2026-10-18): the glyph and the number side by side; the button widens to fit. */
