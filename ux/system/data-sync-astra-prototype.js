@@ -311,9 +311,7 @@
   document.addEventListener('click', event => {
     const button = event.target.closest('[data-action]');
     if (!button || S.guard(button)) return;
-    let action = button.dataset.action;
-    // The page header's Back goes up one level, as the footer's does: record, then list, then categories, then where the page was opened from.
-    if (action === 'back') action = state.detail ? 'back-to-list' : state.category ? 'back-to-all' : 'go-home';
+    const action = button.dataset.action;
     if (action === 'open-record') { state.detail = button.dataset.value; state.retryResult = false; }
     else if (action === 'open-category') state.category = button.dataset.value;
     else if (action === 'back-to-all') state.category = '';
