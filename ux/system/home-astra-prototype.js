@@ -539,7 +539,7 @@
     app.classList.toggle('island-sync',island);
     app.innerHTML=(island?badge:'')+(pages[state.page]||home)();
     app.classList.toggle('schedule-open',state.page==='schedule');
-    if(badge&&!island&&!['schedule','find','pig'].includes(state.page))(app.querySelector('.app-header,.page-head,.st-page-header')||app).insertAdjacentHTML('beforeend',badge);
+    if(badge&&!island&&!['schedule','find','scan','pig'].includes(state.page))(app.querySelector('.app-header,.page-head,.st-page-header')||app).insertAdjacentHTML('beforeend',badge);
     if(state.page==='find'&&document.activeElement?.closest?.('#app')==null)app.querySelector('[data-find-input]')?.focus({preventScroll:true});
     if(state.page==='scan')SentriUI.scanArrive(app,lookup.scan);
     if(state.page==='pig')connectPig();
