@@ -840,3 +840,46 @@ export interface SentriUI {
   /** Mounts the maps under a node; a map is also mounted by itself when it enters the document. */
   penMapMount(scope?: ParentNode): void;
 }
+
+/** Lookup (components/Lookup): Find and Scan, the two ways to reach an animal by her ear tag. */
+export interface LookupGroup { title: string; rows: string[] }
+export interface FindPageProps {
+  query?: string; placeholder?: string; label?: string;
+  /** The results area's HTML: findResults(...). */
+  results?: string;
+  /** The scan icon in the field; null when the host has no reader. */
+  scan?: { action: string; label?: string } | null;
+  clear?: { action: string; label?: string }; cancel?: { action: string; label?: string };
+  /** Attributes for the input, which always carries data-find-input. */
+  inputAttrs?: SafeAttrs;
+  /** The host's status bar, drawn inside the white page. */
+  bar?: string; className?: string;
+}
+export interface ScanState { fresh?: Record<string, number>; last?: string }
+export interface ScanPageProps {
+  title?: string; back?: { action?: string; label?: SheetText };
+  connected?: boolean; listening?: boolean;
+  /** One card per unit, the worker's unit first; rows are the context's own select + door animal rows, each with data-scan-tag. */
+  groups?: LookupGroup[];
+  /** How many rows are ticked; with any, the footer is the count and Actions. */
+  picked?: number; selected?: (n: number) => string;
+  actions?: { action: string; label?: string };
+  toggle?: { action: string; stop?: string; resume?: string };
+  empty?: { title?: string; text?: string; stoppedTitle?: string; stoppedText?: string; offTitle?: string; offText?: string };
+  bar?: string; className?: string;
+}
+export interface SentriUI {
+  lookupGroups(groups: LookupGroup[], opts?: { variant?: 'find' | 'scan' }): string;
+  findPage(props?: FindPageProps): string;
+  /** The hint before typing, the no-match line, or the unit cards. */
+  findResults(props?: { query?: string; groups?: LookupGroup[]; hint?: string; none?: string }): string;
+  /** A result row: the tag (the typed part marked) and where the animal is. */
+  findRow(props?: { code?: string; place?: string; query?: string; action?: string; value?: string; className?: string }): string;
+  findMark(text: string, query: string): string;
+  scanPage(props?: ScanPageProps): string;
+  /** Lights the rows in scan.fresh until their time is up and brings scan.last into view. */
+  scanArrive(root: ParentNode, scan: ScanState): void;
+  /** Measures the scan list before a render, for scanGlide after it. */
+  scanPlaces(root: ParentNode): Map<string, number>;
+  scanGlide(root: ParentNode, before: Map<string, number>): void;
+}

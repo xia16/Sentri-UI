@@ -1,0 +1,63 @@
+[
+  {
+    "id": "find",
+    "name": "Find",
+    "use": "Use to reach one animal by typing part of her ear tag or her pen, from anywhere: type, tap one, act. A white input page with the field pinned and focused; nothing is listed before typing; results are one card per unit, this unit first. Farrowing's Find a sow, Inspection's and Home's Find a pig.",
+    "notUse": "Not for picking from a short known list (use ChoiceList or a picker); not for narrowing a list already on screen (use FilterSheet); not for collecting several animals (use Scan).",
+    "states": [
+      "Empty · nothing listed before typing",
+      "Results · this unit first, then the others",
+      "No match",
+      "Long tag · 12 digits",
+      "No reader · no scan icon",
+      "Chinese · results"
+    ],
+    "usedBy": [
+      "farrowing.search",
+      "farrowing.search-results",
+      "farrowing.search-none",
+      "inspection.search",
+      "inspection.find-pig",
+      "inspection.search-none",
+      "find-pig.search",
+      "find-pig.results",
+      "find-pig.search-none"
+    ]
+  },
+  {
+    "id": "scan",
+    "name": "Scan",
+    "use": "Use to collect animals hands-free with the tag reader: every scan adds her to a list, newest first; a repeat scan lights her row; tap one to open her, or tick several for the context's Actions. A Sheet page on the tint whose rows are the context's own animal row with its tick box.",
+    "notUse": "Not for finding one animal by typing (use Find); never with a Not-found row or a Select button (owner, 2026-10-12).",
+    "states": [
+      "Nothing scanned · listening",
+      "Reader not connected",
+      "Scanned · two units (Farrowing's sow rows)",
+      "Scanned · condition tags (Inspection's roster rows)",
+      "A pig just scanned · arrival tint",
+      "Ticked · N selected and Actions",
+      "Stopped · list kept",
+      "Long tag · 12 digits",
+      "Chinese · ticked"
+    ],
+    "usedBy": [
+      "farrowing.scan",
+      "farrowing.scan-no-reader",
+      "farrowing.scan-list",
+      "farrowing.scan-new",
+      "farrowing.scan-ticked",
+      "farrowing.scan-stopped",
+      "inspection.scan",
+      "inspection.scan-no-reader",
+      "inspection.scan-list",
+      "inspection.scan-new",
+      "inspection.scan-ticked",
+      "inspection.scan-stopped",
+      "find-pig.scan",
+      "find-pig.scan-no-reader",
+      "find-pig.scan-list",
+      "find-pig.scan-ticked",
+      "find-pig.scan-stopped"
+    ]
+  }
+]

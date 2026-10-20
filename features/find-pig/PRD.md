@@ -12,27 +12,29 @@ Floor workers, gloved and one-handed, who have a tag in front of them.
 
 ## Anchor
 
-None. Two entrances lead to one result list.
+None. Two entrances, two pages: Find (Toolbox) and Scan (the Home bar's Scan). Both are the design system's [Lookup](../../ux/design-system/components/Lookup/README.md), the same pages as Farrowing's and Inspection's.
 
 ## Rules
 
-- Scan is the centre button of the Home bar. Find a pig or pen sits in Toolbox. Both are drawers over the current page.
-- Search takes one field: an ear tag or a pen code (required, up to 30 characters), matched whole.
-- Scan reads the tag with the camera or tag reader; the study offers a sample tag instead.
-- A result row shows the tag and pen, and the unit, task and batch it belongs to. Tapping it opens that task in its unit.
-- No match says so and offers Search again.
-- Camera, tag reader and the real pig list are not connected; the study searches its sample task records.
+- Search and scan are different jobs (owner decision, 2026-10-12). **Find**: type, tap one, act. **Scan**: hands-free; each scan adds the pig to a list; tap one, or tick several for Actions.
+- Both are full pages, not drawers. Both reach every unit of the section the worker is in.
+- Find: the field is pinned and focused; nothing is listed before typing; part of a tag or a pen matches; results are one card per unit under a plain "Unit 7" heading, the worker's unit first (owner, 2026-10-20). No match says so in one line.
+- Scan: the reader always listens; a repeat scan lights her row instead of adding one; no "Not found" row and no Select button; the footer's Stop / Resume scanning is the only scanning status. A row is her tag over her pen, with her marked condition on the right when she has one.
+- A pig, found or scanned, opens her pig record (owner, 2026-10-20). Back returns to the list.
+- Actions for ticked pigs are the general ones (Transfer, Condition, Treat, Note); Home has no task of its own.
+- The tag reader is not connected; the study's "Simulate scan" reads sample pigs.
 
 ## Scope
 
-In: the search drawer, the scan drawer, the results.
+In: Find a pig, Scan ear tags, the general Actions for ticked pigs, opening a pig's record.
 
-Out: ear-notch search, untagged groups, filters, the pig record itself (Pig profile), a real camera or reader.
+Out: ear-notch search, untagged groups, filters, the pig record itself (Pig profile), the four actions' own pages from Home, a real reader.
 
 ## Decisions
 
 - Decided (ASTRA-HOME-DIRECTION): Home keeps Home / Scan / Toolbox.
-- Open: where the feature lives and whether a result opens the pig's record rather than a task (filed under To confirm).
+- Decided (owner, 2026-10-12): search and scan are separate pages with one pattern across features.
+- Decided (owner, 2026-10-20): a pig from Home opens her pig record, not a task.
 
 ## Sources
 

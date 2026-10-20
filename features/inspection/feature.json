@@ -15,7 +15,9 @@
         "inspection.animal-types",
         "inspection.filters",
         "inspection.go-to-pen",
-        "inspection.find-pig"
+        "inspection.search",
+        "inspection.find-pig",
+        "inspection.search-none"
       ]
     ],
     [
@@ -81,6 +83,17 @@
         "inspection.finish",
         "inspection.walk-recorded"
       ]
+    ],
+    [
+      "Scan",
+      [
+        "inspection.scan",
+        "inspection.scan-no-reader",
+        "inspection.scan-list",
+        "inspection.scan-new",
+        "inspection.scan-ticked",
+        "inspection.scan-stopped"
+      ]
     ]
   ],
   "entryPoints": [
@@ -93,10 +106,17 @@
     },
     {
       "section": "Inspection",
-      "label": "Search or scan from the dock",
+      "label": "Search from the dock",
       "from": "inspection.walk",
-      "control": "Scan ear tag · Search",
-      "lands": "inspection.find-pig"
+      "control": "Search",
+      "lands": "inspection.search"
+    },
+    {
+      "section": "Inspection",
+      "label": "Scan from the dock",
+      "from": "inspection.walk",
+      "control": "Scan ear tag",
+      "lands": "inspection.scan"
     }
   ],
   "flow": [
@@ -112,8 +132,38 @@
     ],
     [
       "inspection.walk",
+      "inspection.search",
+      "tap Search"
+    ],
+    [
+      "inspection.search",
       "inspection.find-pig",
-      "tap Scan ear tag or Search"
+      "type part of a tag or pen"
+    ],
+    [
+      "inspection.search",
+      "inspection.scan",
+      "tap the scan icon"
+    ],
+    [
+      "inspection.walk",
+      "inspection.scan",
+      "tap Scan ear tag"
+    ],
+    [
+      "inspection.scan",
+      "inspection.scan-list",
+      "scan a tag"
+    ],
+    [
+      "inspection.scan-list",
+      "inspection.scan-ticked",
+      "tick a pig"
+    ],
+    [
+      "inspection.scan-ticked",
+      "inspection.actions",
+      "tap Actions"
     ],
     [
       "inspection.walk",
@@ -793,57 +843,348 @@
       }
     },
     {
-      "id": "inspection.find-pig",
-      "name": "Find or scan a pig",
-      "zh": "搜索 / 扫码",
+      "id": "inspection.search",
+      "name": "Find a pig",
+      "zh": "查找猪只",
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
-      "preset": "walk",
-      "steps": [
-        "[data-action=\"scan\"]"
-      ],
+      "preset": "search-empty",
       "figma": "",
       "notes": {
-        "purpose": "Find a pig by ear tag or pen.",
+        "controls": [],
+        "issues": [],
+        "purpose": "Find a pig in any unit by part of her ear tag or her pen, from the walk's Search.",
+        "states": [
+          "Empty field: nothing is listed, only the hint",
+          "Typed: results grouped by unit (Find a pig · results)",
+          "Nothing matches (Find a pig · no match)"
+        ],
         "elements": [
           {
-            "name": "Result list",
-            "shows": "7 pigs found; 000254 · C1 · Gestating",
-            "states": [
-              {
-                "state": "Empty box",
-                "when": "Nothing typed",
-                "shows": "All pigs of the unit"
-              },
-              {
-                "state": "Typed",
-                "when": "Text matches tag or pen",
-                "shows": "Filtered rows"
-              },
-              {
-                "state": "No match",
-                "when": "Nothing matches",
-                "shows": "\"No matching pigs in this unit.\""
-              },
-              {
-                "state": "Scan",
-                "when": "Opened from Scan ear tag",
-                "shows": "Same sheet plus \"Camera scanning is not connected in this prototype.\" and \"Try sample tag 000306\""
-              }
-            ],
-            "logic": "Row shows the pen id and the raw stage name. Search and scan only navigate; saving a record is the only write.",
-            "at": "7 pigs found"
+            "name": "Search field",
+            "at": "Ear tag or pen",
+            "shows": "A full-height white page over the walk. The field is pinned at the top and focused: a search icon, the typed text, a clear ✕ once something is typed, the scan icon and Cancel. The header names no unit: the search covers every unit.",
+            "rule": "Cancel returns to the walk; ✕ empties the field; the scan icon opens Scan ear tags.",
+            "source": "inspection-astra-concept.js findPage() on SentriUI.findPage (components/Lookup)"
           }
         ],
-        "controls": [],
         "copy": [
-          "Find a pig (raw)",
-          "Scan ear tag (raw)",
-          "Try sample tag 000306 (raw)"
+          "(raw) Ear tag or pen",
+          "(raw) Cancel",
+          "(raw) Type part of an ear tag or a pen, or scan a tag. Searches every unit."
         ],
-        "issues": [
-          "Ear-notch search (named in the identity notes) is not here.",
-          "Scan and Search open nearly the same sheet."
+        "rules": [
+          "Owner decision 2026-10-12: search is global (every unit), nothing is listed until something is typed, and a result opens that animal in the current context. One card per unit under a plain \"Unit 7\" heading, this unit first (owner, 2026-10-20).",
+          "Drawn by the design system's Lookup (components/Lookup), the same page as Farrowing's.",
+          "Replaces the old Find a pig drawer, which listed every pig of the walk's unit before anything was typed and searched this unit only."
+        ]
+      }
+    },
+    {
+      "id": "inspection.find-pig",
+      "name": "Find a pig · results",
+      "zh": "查找结果",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "search-results",
+      "figma": "",
+      "notes": {
+        "controls": [
+          {
+            "control": "A result",
+            "does": "opens that pig's record here, in her own unit and pen; Back returns to the results with the text kept",
+            "goesTo": "pig-profile.full"
+          }
+        ],
+        "issues": [],
+        "purpose": "Show every pig that matches what is typed, this unit first.",
+        "states": [
+          "Matches in this unit and another: both cards",
+          "Matches in one unit only: one card"
+        ],
+        "elements": [
+          {
+            "name": "Results",
+            "at": "Unit 6",
+            "shows": "One tinted card per unit under its plain section heading (\"Unit 7\", \"Unit 6\"), this unit first. Each row is the tag, with the typed part bold and the rest muted, and her pen on the right.",
+            "logic": "Tags that start with the typed text come first, then tags that contain it, then a pen that matches.",
+            "source": "inspection-astra-concept.js findHits(), searchBody()"
+          }
+        ],
+        "copy": [
+          "(raw) Unit 7 · Unit 6 · Pen C2"
+        ],
+        "rules": [
+          "Owner decision 2026-10-12: search is global (every unit), nothing is listed until something is typed, and a result opens that animal in the current context. One card per unit under a plain \"Unit 7\" heading, this unit first (owner, 2026-10-20)."
+        ]
+      }
+    },
+    {
+      "id": "inspection.search-none",
+      "name": "Find a pig · no match",
+      "zh": "无匹配",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "search-none",
+      "figma": "",
+      "notes": {
+        "controls": [],
+        "issues": [],
+        "purpose": "Say that nothing matches, in every unit.",
+        "states": [
+          "Nothing matches: \"No pig matching “909” in any unit.\""
+        ],
+        "elements": [
+          {
+            "name": "No-match line",
+            "at": "No pig matching",
+            "shows": "One quiet line in place of the cards, quoting what was typed.",
+            "rule": "The field keeps focus and ✕ is shown, so the worker corrects the number at once.",
+            "source": "SentriUI.findResults (components/Lookup)"
+          }
+        ],
+        "copy": [
+          "(raw) No pig matching “909” in any unit."
+        ],
+        "rules": [
+          "Owner decision 2026-10-12: search is global (every unit), nothing is listed until something is typed, and a result opens that animal in the current context. One card per unit under a plain \"Unit 7\" heading, this unit first (owner, 2026-10-20)."
+        ]
+      }
+    },
+    {
+      "id": "inspection.scan",
+      "name": "Scan ear tags",
+      "zh": "扫描耳标",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "scan-empty",
+      "figma": "",
+      "notes": {
+        "controls": [
+          {
+            "control": "Back",
+            "does": "returns to the walk; the scanned list is kept for the next visit, and ticked pigs stay the walk's selection",
+            "goesTo": "inspection.walk"
+          }
+        ],
+        "issues": [],
+        "purpose": "Scan pigs one after another during the walk and collect them; open one, or tick several for the walk's Actions. The page as it opens: the reader is connected and nothing has been scanned yet.",
+        "states": [
+          "Reader not connected (Scan · reader not connected)",
+          "Nothing scanned yet (this screen)",
+          "Pigs scanned (Scan · pigs scanned)",
+          "Ticked (Scan · pigs ticked)",
+          "Stopped (Scan · stopped)"
+        ],
+        "elements": [
+          {
+            "name": "Empty line",
+            "at": "Hold the reader to an ear tag",
+            "shows": "A scan icon, \"Hold the reader to an ear tag\" and \"Each pig you scan appears here.\"",
+            "rule": "The first scan replaces it with the list.",
+            "source": "SentriUI.scanPage (components/Lookup)"
+          },
+          {
+            "name": "Footer",
+            "at": "Stop scanning",
+            "shows": "\"Stop scanning\" (secondary), or \"Resume scanning\" (primary) once stopped; with pigs ticked, \"N pigs selected\" and Actions.",
+            "source": "SentriUI.scanPage (components/Lookup)",
+            "rule": "Stop scanning only pauses listening: the list stays. It is the only scanning status (owner, 2026-10-20)."
+          }
+        ],
+        "copy": [
+          "(raw) Scan ear tags",
+          "(raw) Hold the reader to an ear tag",
+          "(raw) Each pig you scan appears here.",
+          "(raw) Stop scanning · Resume scanning"
+        ],
+        "edge": [
+          "A real scan comes from a Bluetooth tag reader. The prototype has none: \"Simulate scan\" above the phone (outside the frame, hidden in the atlas) reads the next sample pig. ?scanner=off opens it as if no reader were paired."
+        ],
+        "rules": [
+          "Owner decision 2026-10-12: the scanner always listens; each scan adds the animal to a list, newest first; a repeat scan lights her row; every row has its tick box and ticks are for bulk. No \"Not found\" row, no Select button. The footer's Stop / Resume scanning is the only scanning status (owner, 2026-10-20).",
+          "Drawn by the design system's Lookup (components/Lookup), the same page as Farrowing's.",
+          "Replaces the old Scan ear tag drawer (\"Camera scanning is not connected\", \"Try sample tag 000306\")."
+        ]
+      }
+    },
+    {
+      "id": "inspection.scan-no-reader",
+      "name": "Scan · reader not connected",
+      "zh": "读取器未连接",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "scan-none",
+      "figma": "",
+      "notes": {
+        "controls": [],
+        "issues": [],
+        "purpose": "Say that no tag reader is paired, and what to do about it.",
+        "states": [
+          "No reader: the scan icon, \"Scanner not connected\" and the instruction; no list, no footer"
+        ],
+        "elements": [
+          {
+            "name": "Not-connected message",
+            "at": "Scanner not connected",
+            "shows": "\"Turn on the tag reader and pair it in your phone's Bluetooth settings. Scanning starts as soon as it connects.\"",
+            "source": "SentriUI.scanPage (components/Lookup)",
+            "rule": "Scanning starts by itself once a reader connects; there is nothing to tap."
+          }
+        ],
+        "copy": [
+          "(raw) Scanner not connected"
+        ],
+        "rules": [
+          "Owner decision 2026-10-12: the scanner always listens; each scan adds the animal to a list, newest first; a repeat scan lights her row; every row has its tick box and ticks are for bulk. No \"Not found\" row, no Select button. The footer's Stop / Resume scanning is the only scanning status (owner, 2026-10-20)."
+        ]
+      }
+    },
+    {
+      "id": "inspection.scan-list",
+      "name": "Scan · pigs scanned",
+      "zh": "已扫描猪只",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "scan-list",
+      "figma": "",
+      "notes": {
+        "controls": [
+          {
+            "control": "A row",
+            "does": "opens that pig's record; Back returns to the list",
+            "goesTo": "pig-profile.full"
+          },
+          {
+            "control": "A tick box",
+            "does": "adds the pig to the walk's selection",
+            "goesTo": "inspection.scan-ticked"
+          }
+        ],
+        "issues": [],
+        "purpose": "Show the pigs scanned in this walk, newest first, and let the worker open one or tick several.",
+        "states": [
+          "Pigs in this unit: one card under \"Unit 7\"",
+          "A pig from another unit: her own card under her unit"
+        ],
+        "elements": [
+          {
+            "name": "Scan list",
+            "at": "000306",
+            "shows": "The walk's own roster rows: a tick box, the tag over the stage line, the condition tags on the right (most urgent first, +N for the rest), and the door to her record.",
+            "logic": "A repeat scan does not add a second row; it lights hers again.",
+            "source": "inspection-astra-concept.js scanPage(), pigRow()"
+          }
+        ],
+        "copy": [
+          "(raw) Unit 7"
+        ],
+        "rules": [
+          "Owner decision 2026-10-12: the scanner always listens; each scan adds the animal to a list, newest first; a repeat scan lights her row; every row has its tick box and ticks are for bulk. No \"Not found\" row, no Select button. The footer's Stop / Resume scanning is the only scanning status (owner, 2026-10-20).",
+          "The rows are Inspection's condition-tag rows (Animal row ruling, 2026-10-11), the same as the walk's."
+        ]
+      }
+    },
+    {
+      "id": "inspection.scan-new",
+      "name": "Scan · a pig just scanned",
+      "zh": "刚扫描的猪只",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "scan-new",
+      "figma": "",
+      "notes": {
+        "controls": [],
+        "issues": [],
+        "purpose": "Show the moment after a scan: where the pig just read landed in the list.",
+        "states": [
+          "The newest scan, 000306, holds the arrival tint (the still frame of a cue that fades after 1.6 s)"
+        ],
+        "elements": [
+          {
+            "name": "Arrival tint",
+            "at": "000306",
+            "shows": "Her row takes the pale progress wash, for a new pig and a repeat scan alike; not the well tint of a ticked row.",
+            "source": "SentriUI.scanArrive(), scanGlide(); bundle.css .st-scan-lit (components/Lookup)",
+            "logic": "Every scan lights its row for 1.6 s and brings it into view; a new row slides in and the rows under it glide down. Reduced motion keeps the tint and drops the slide."
+          }
+        ],
+        "copy": [
+          "(raw) Unit 7"
+        ],
+        "rules": [
+          "Owner, 2026-10-20: a new scan must not appear abruptly; scans in quick succession stay readable."
+        ]
+      }
+    },
+    {
+      "id": "inspection.scan-ticked",
+      "name": "Scan · pigs ticked",
+      "zh": "已勾选",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "scan-ticked",
+      "figma": "",
+      "notes": {
+        "controls": [
+          {
+            "control": "Actions",
+            "does": "opens the walk's Actions for the ticked pigs",
+            "goesTo": "inspection.actions"
+          }
+        ],
+        "issues": [],
+        "purpose": "Select several scanned pigs for the walk's Actions.",
+        "states": [
+          "One or more ticked: the ticked rows take the selected tint, and the footer becomes \"N pigs selected\" and Actions"
+        ],
+        "elements": [
+          {
+            "name": "Selection bar",
+            "at": "Actions",
+            "shows": "The plain count \"2 pigs selected\" and the primary Actions.",
+            "rule": "Actions is the walk's own: the task's actions and the general ones (transfer, condition, treatment, note) for the ticked pigs. Back from it returns here.",
+            "source": "SentriUI.scanPage (components/Lookup); inspection-astra-concept.js actionsPage()"
+          }
+        ],
+        "copy": [
+          "(raw) 2 pigs selected · Actions"
+        ],
+        "rules": [
+          "Owner decision 2026-10-12: the scanner always listens; each scan adds the animal to a list, newest first; a repeat scan lights her row; every row has its tick box and ticks are for bulk. No \"Not found\" row, no Select button. The footer's Stop / Resume scanning is the only scanning status (owner, 2026-10-20).",
+          "A tick is the walk's selection: there is one selection per walk."
+        ]
+      }
+    },
+    {
+      "id": "inspection.scan-stopped",
+      "name": "Scan · stopped",
+      "zh": "已停止",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "scan-stopped",
+      "figma": "",
+      "notes": {
+        "controls": [],
+        "issues": [],
+        "purpose": "Show that scanning is paused, with the list kept, and how to resume.",
+        "states": [
+          "Stopped, nothing ticked: the footer's primary is \"Resume scanning\""
+        ],
+        "elements": [
+          {
+            "name": "Resume scanning",
+            "at": "Resume scanning",
+            "shows": "The footer's one full-width button, now primary with the scan glyph.",
+            "rule": "While stopped the reader adds nothing.",
+            "source": "SentriUI.scanPage (components/Lookup)"
+          }
+        ],
+        "copy": [
+          "(raw) Resume scanning"
+        ],
+        "rules": [
+          "Owner decision 2026-10-12: the scanner always listens; each scan adds the animal to a list, newest first; a repeat scan lights her row; every row has its tick box and ticks are for bulk. No \"Not found\" row, no Select button. The footer's Stop / Resume scanning is the only scanning status (owner, 2026-10-20)."
         ]
       }
     },

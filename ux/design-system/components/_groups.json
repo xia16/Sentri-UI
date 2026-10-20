@@ -1,5 +1,5 @@
 [
-  { "group": "Base", "components": ["Button", "IconButton", "Icon", "Heading", "Header", "Row", "Panel", "Facts", "Log", "Sheet", "PenMap", "Segment", "FilterChips", "ChoiceList"] },
+  { "group": "Base", "components": ["Button", "IconButton", "Icon", "Heading", "Header", "Row", "Panel", "Facts", "Log", "Sheet", "PenMap", "Lookup", "Segment", "FilterChips", "ChoiceList"] },
   { "group": "Inputs and filters", "components": ["FilterSheet", "RangeSlider"] },
   { "group": "Fields", "components": ["Field", "PickerField", "Stepper", "Measure", "Numpad"] },
   { "group": "Status and feedback", "components": ["Status", "ConditionTag", "Banner", "Toast", "Photos"] },

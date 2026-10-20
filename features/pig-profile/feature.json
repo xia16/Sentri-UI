@@ -61,9 +61,16 @@
     },
     {
       "section": "Inspection",
-      "label": "Search or scan a tag",
+      "label": "Find a pig",
       "from": "inspection.find-pig",
       "control": "A result",
+      "lands": "pig-profile.full"
+    },
+    {
+      "section": "Inspection",
+      "label": "Scan ear tags",
+      "from": "inspection.scan-list",
+      "control": "A scanned pig",
       "lands": "pig-profile.full"
     },
     {
