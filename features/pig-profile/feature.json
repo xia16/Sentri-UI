@@ -719,9 +719,9 @@
             "shows": "Health then Routine verbs as one card of icon tiles, one word each from the strings registry (Condition, Treat, Edit, Resolve, Care, Note, Transfer, Measure, Feed)",
             "states": [
               {
-                "state": "Two rows",
+                "state": "Rows",
                 "when": "Two or more verbs",
-                "shows": "Two rows, split evenly: 5 = 3+2, 6 = 3+3, 8 = 4+4, 10 = 5+5"
+                "shows": "One row up to five; from six, two rows split evenly: 6 = 3+3, 7 = 4+3, 8 = 4+4, 9 = 5+4, 10 = 5+5"
               },
               {
                 "state": "More",
@@ -1258,7 +1258,7 @@
       "steps": [
         "[data-action=\"room-sow\"][data-value=\"000392\"]",
         "Actions",
-        "Mark not in pig"
+        "[data-action=\"sow-host-action\"][data-value=\"not-in-pig\"]"
       ]
     }
   ]

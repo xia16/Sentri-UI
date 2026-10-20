@@ -1,7 +1,7 @@
 // The gate's and the polish loop's rules (scripts/loop-rules.mjs).
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { passesWithoutJudge, aimdStep, newScenarioFailures, calibrationProblems, budgetProblems, critiqueProblems, pageStyling, addedLines, effectiveClass, classifyScreens, checkVerdict, checkGrades, worstFirst, isClean, loopStatus, touchesSystem, touchesTools, regressions,
+import { machinePass, aimdStep, newScenarioFailures, calibrationProblems, budgetProblems, critiqueProblems, pageStyling, addedLines, effectiveClass, classifyScreens, checkVerdict, checkGrades, worstFirst, isClean, loopStatus, touchesSystem, touchesTools, regressions,
   pageOf, pageAssets, sharedFiles, outcomeLeaves, coverageLost, reachOf, reachLine, timedOutOnly, lockState, scenarioDebt, ghNetworkError,
   componentPage, componentPagesOf, componentsTouched, idPath } from '../scripts/loop-rules.mjs';
 
@@ -492,19 +492,19 @@ test('scenario runs at once grow while runs stay fast, halve on a timeout or a s
   assert.equal(s.limit, 8, 'never above max');
 });
 
-test("a mechanical pass that moves no screen is a gate pass without a judge; anything else still needs one", () => {
+test("owner ruling 2026-10-20: a mechanical pass is the gate pass, moved screens and walks included; the judge is advice", () => {
   const ok = { pass: true, candidate: "c", base: "b", quick: false, screens: { diff: [], new: [], gone: [] }, pairs: [] };
-  assert.equal(passesWithoutJudge(ok), true);
-  assert.equal(passesWithoutJudge({ ...ok, pass: false }), false);
-  assert.equal(passesWithoutJudge({ ...ok, quick: true }), false);
-  assert.equal(passesWithoutJudge({ ...ok, screens: null }), false);
-  assert.equal(passesWithoutJudge({ ...ok, screens: { diff: [{ id: "farrowing.pen-map" }], new: [], gone: [] } }), false);
-  assert.equal(passesWithoutJudge({ ...ok, screens: { diff: [], new: [{ id: "x" }], gone: [] } }), false);
-  assert.equal(passesWithoutJudge({ ...ok, screens: { diff: [], new: [], gone: [{ id: "x" }] } }), false);
-  assert.equal(passesWithoutJudge({ ...ok, screens: { diff: [], new: [] } }), false);
-  assert.equal(passesWithoutJudge({ ...ok, pairs: [{ screen: "x" }] }), false);
-  assert.equal(passesWithoutJudge({ ...ok, candidate: "" }), false);
-  assert.equal(passesWithoutJudge({ ...ok, outcome: "blocked" }), false, "gate v2: a blocked gate is never a pass");
+  assert.equal(machinePass(ok), true);
+  assert.equal(machinePass({ ...ok, screens: { diff: [{ id: "farrowing.pen-map" }], new: [], gone: [] }, pairs: [{ screen: "farrowing.pen-map" }] }), true, "moved screens: the owner approved the design");
+  assert.equal(machinePass({ ...ok, screens: { diff: [], new: [{ id: "x" }], gone: [{ id: "y" }] } }), true);
+  assert.equal(machinePass({ ...ok, walkNeed: ["a"] }), true, "a walk is advice now");
+  assert.equal(machinePass({ ...ok, pass: false }), false);
+  assert.equal(machinePass({ ...ok, quick: true }), false);
+  assert.equal(machinePass({ ...ok, screens: null }), false);
+  assert.equal(machinePass({ ...ok, screens: { diff: [], new: [] } }), false, "an incomplete inventory is never a pass");
+  assert.equal(machinePass({ ...ok, candidate: "" }), false);
+  assert.equal(machinePass({ ...ok, outcome: "blocked" }), false, "gate v2: a blocked gate is never a pass");
+  assert.equal(machinePass({ ...ok, outcome: "fail" }), false);
 });
 
 // L25: motion has a held frame. The case it came from: #195 added the pen-map landing keyframes and no screen showed them.
@@ -559,10 +559,8 @@ test('the class comes from the change: behaviour for a page-runnable script, cop
 });
 
 test('a change that moves no screen but runs changed code needs a walk (G15), and its verdict passes on that walk', async () => {
-  const { passesWithoutJudge, checkVerdict } = await import('../scripts/loop-rules.mjs');
+  const { checkVerdict } = await import('../scripts/loop-rules.mjs');
   const mech = { pass: true, outcome: 'pass', candidate: 'C', base: 'M', mode: 'normal', class: { effective: 'behaviour' }, screens: { diff: [], new: [], gone: [], same: [{ id: 'a' }] }, pairs: [] };
-  assert.equal(passesWithoutJudge(mech), true);
-  assert.equal(passesWithoutJudge({ ...mech, walkNeed: ['a'] }), false, 'a judge walks it first');
   const v = { pass: true, candidate: 'C', base: 'M', calibration: [], pairs: [], defects: [], walk: [{ screen: 'a', ok: true }] };
   assert.deepEqual(checkVerdict(v, { ...mech, walkNeed: ['a'] }).problems, [], 'the gate\'s own class is what makes a no-pixel change a behaviour change');
   assert.match(checkVerdict(v, { ...mech, class: { effective: 'presentation' } }).problems.join(' | '), /class presentation/);

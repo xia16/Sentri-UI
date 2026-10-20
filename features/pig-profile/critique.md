@@ -269,3 +269,49 @@ Directions, each mocked at 390 before the build (owner, 2026-10-19): (A) the arc
 - Farrowing sow (5 verbs + 5 Production rows): 3 + 2; Production keeps its task headings and scrolls inside the drawer.
 - Judge round 3 (2026-10-19): a verb whose second line is content is not a bare verb. A Farrowing sow's existing note (`Edit note · Red line on left shoulder · monitor overnight`) is handover information, so it keeps its described row directly under the grid; only verbs whose line merely explains them become tiles. The Farrowing embed now follows `?lang=zh`, so its drawer, tiles included, renders in Chinese.
 - Known, not fixed: the Death tile (danger, always last) has no caller yet: Farrowing does not pass `Record sow death` into the drawer, and Inspection has no death verb.
+
+---
+
+# Actions grid: one row up to five (2026-10-20)
+
+Scope: the everyday verb grid of the Actions drawer (`pig-profile.actions`, and the same renderer in `inspection.actions` and `farrowing.sow-actions`). The facts drawn are unchanged: no verb is added, cut or renamed (budget unchanged). Owner ruling 2026-10-20: one row up to five tiles, two rows only from six.
+
+## Keep
+
+- Every verb, its word, its icon well and its order; Death last; More past ten.
+- The drawer, its subject line, the Production rows and Back.
+
+## Problems
+
+- **major** · A grid of four or five verbs drew two rows (2 + 2, 3 + 2), leaving a short second row and a gap: the owner, shown the 4-tile Actions drawer, "looks really dumb" (2026-10-20). Seen on a Farrowing sow (5 verbs, 3 + 2) and on pens and pigs whose stage offers four or five verbs.
+
+## Parts
+
+| Part | Drawn by | Keep / fix / cut |
+|---|---|---|
+| Everyday verbs | Row `tile` in `rowGrid` | **fix** (the grid's rule: one row up to five) |
+| Everything else | unchanged | keep |
+
+## Self-crit
+
+- **Better because** four or five verbs read as one line of choices, with no half-empty second row; six and more keep two even rows.
+
+# Chinese pass (PR 244), critique
+
+Scope: the words only. At `?lang=zh` these screens read in English where the Inspection prototype draws them: the pig record (Current tasks, General details, Sow cycle, Feeding's View plan, the record links), Production stats, Origin (its facts, dates and identities), the pig log, the measure, batch-membership and abortion sheets, Unavailable actions, and the embedded Not in pig sheet. Nothing is added, moved or cut in EN.
+
+## Keep
+
+- Every surface, row, order, weight and colour as it is: the change replaces English words with Chinese in the same place, in the same component, at the same weight.
+- EN exactly as it is.
+- Ear tags, pen codes, medicine and brand names, the worker's name, RFID, record numbers and the units mL and °C stay in Latin script; kg reads 公斤 (as on main) and mm reads 毫米.
+
+## Problems
+
+- **major** · At ZH 360 the parts above read in English beside Chinese, so a Chinese-reading worker reads two languages on one screen (P2: read in two seconds).
+- **minor** · Dates read in English forms (`1 Aug 2026`, `Aug 1`, `Thu`) and day counts as `40d`.
+- **minor** · Copy that is longer in Chinese has to fit its component at 360 (a pen-map tile holds four characters: `Not in unit` reads 非本单元).
+
+## Attention budget
+
+Unchanged: each screen shows the same information in the same order as on main, in Chinese. Cut list: nothing is cut.

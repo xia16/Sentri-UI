@@ -79,7 +79,7 @@ These carry the safety. Each has caught something real:
 - **K6.** The inventory: added screens need a verdict, removed screens a reason, and missing evidence blocks.
 - **K7.** Legibility, spacing and headers on changed screens, with main's existing defects kept as main's; `check-states`; `npm test`.
 - **K8.** Leaves: a failure counts only once it repeats (L26), and main's debt is matched run by run.
-- **K9.** The blind judge with calibration, and judges split by feature.
+- **K9.** The blind judge with calibration, and judges split by feature. Since 2026-10-20 (owner) a shared change is judged in full only on its own features and component pages; the features in progress get propagation pairs (propagated or broken), and the rest are not shot (gate-machine.md).
 - **K10.** The re-gate after main moves, carrying judgements by image.
 - **K11.** One browser gate at a time, and the required `sentri/gate` status.
 - **K12.** **New: an audit run** (`--audit`), started by hand on main, say weekly.

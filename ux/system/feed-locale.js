@@ -24,14 +24,25 @@ function conditionName(value){
   }
   return conditionNames.get(value.toLowerCase());
 }
+/* A date the prototype writes in English ("1 Aug 2026", "Aug 1", "Aug 1, 2025", "13 Sep") or a log's weekday ("Thu"), in Chinese. */
+const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],WEEKDAYS={Mon:'周一',Tue:'周二',Wed:'周三',Thu:'周四',Fri:'周五',Sat:'周六',Sun:'周日'};
+function dateText(value){
+  let m=/^(\d{1,2}) ([A-Z][a-z]{2})(?: (\d{4}))?$/.exec(value);
+  if(m&&MONTHS.includes(m[2]))return (m[3]?m[3]+'年':'')+(MONTHS.indexOf(m[2])+1)+'月'+(+m[1])+'日';
+  m=/^([A-Z][a-z]{2}) (\d{1,2})(?:, (\d{4}))?$/.exec(value);
+  if(m&&MONTHS.includes(m[1]))return (m[3]?m[3]+'年':'')+(MONTHS.indexOf(m[1])+1)+'月'+(+m[2])+'日';
+  return WEEKDAYS[value]||null;
+}
 function translated(text){
   text = text.replace(/\u00a0/g, ' ');
   const value = text.trim();
   if(!value)return null;
+  const date=dateText(value);if(date)return {text:text.replace(value,date)};
   for(const entry of entries){
     const match=entry.pattern.exec(value);if(!match)continue;
-    /* A health string's {name} is a condition: it reads only when the condition does ("No Thin" → "无偏瘦"). */
-    const args=Object.fromEntries(entry.keys.map((key,i)=>[key,entry.id.startsWith('feed.copy.health.')&&key==='name'?conditionName(match[i+1])||translated(match[i+1])?.text:match[i+1]]));
+    /* A health string's {name} is a condition: it reads only when the condition does ("No Thin" → "无偏瘦"). Any other free
+       argument that is a date reads as one ("Recorded 12 Sep" → "记录于9月12日"). */
+    const args=Object.fromEntries(entry.keys.map((key,i)=>[key,entry.id.startsWith('feed.copy.health.')&&key==='name'?conditionName(match[i+1])||translated(match[i+1])?.text:['n','code','delta'].includes(key)?match[i+1]:dateText(match[i+1])||match[i+1]]));
     if(Object.values(args).some(arg=>arg==null))continue;
     return {id:entry.id,text:text.replace(value,entry.copy[language].replace(/\{(\w+)\}/g,(_,key)=>args[key]))};
   }

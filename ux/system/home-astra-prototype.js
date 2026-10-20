@@ -86,6 +86,20 @@
       monitor:[{unit:6,tag:'200912',pen:'A02',cond:'Off feed'},{unit:6,tag:'201120',pen:'C07',cond:'Thin'},{unit:7,tag:'201305',pen:'A09',cond:'Coughing'}]},
     nursery:{monitor:[{unit:12,tag:'312044',pen:'4',cond:'Coughing'},{unit:12,tag:'312071',pen:'7',cond:'Scours'},{unit:12,tag:'312096',pen:'9',cond:'Coughing'}]}
   };
+  // A heavy day (?marked=many, owner 2026-10-20: "what if we have 100 pigs that need treatment?"): Gestation with 104 pigs to treat
+  // and 61 under watch across Units 7–9, spread over their pens in walking order. Fictional, deterministic tags.
+  if(new URLSearchParams(location.search).get('marked')==='many'){
+    const pensOf=u=>(u===8?['A1','A2','A3','A4','B1','B2','B3','B4','C1','C2']:['A1','A2','A3','A4','B1','B2','B3','B4','C1','C2','C3','C4']);
+    const make=(kind,per,conds)=>Object.entries(per).flatMap(([u,n])=>{const pens=pensOf(+u);
+      return Array.from({length:n},(_,i)=>({unit:+u,tag:String(200000+(+u)*1000+(i*137+(kind==='treat'?11:509))%997).padStart(6,'0'),pen:pens[Math.floor(i*pens.length/n)],
+        care:kind==='treat'?(i%3===0?'Hospital pen':'Treat in place'):undefined,cond:conds[i%conds.length],wait:kind==='treat'?(i%9===0?2:i%4===1?1:0):0}));});
+    markedPigs.gestation={treat:make('treat',{7:44,8:31,9:29},['Lameness','Fever','Shoulder sore','Lameness','Vulva bite','Abscess','Fever']),
+      monitor:make('monitor',{7:26,8:19,9:16},['Coughing','Off feed','Thin','Coughing','Vulva discharge','Off feed'])};
+    const g=markedPigs.gestation;
+    marks.gestation={...marks.gestation,treat:g.treat.length,sinceYesterday:g.treat.filter(p=>p.wait).length,monitor:g.monitor.length};
+  }
+  // The day a mark was set, as days waited: 'yesterday' in the sample data reads 1.
+  Object.values(markedPigs).forEach(s=>Object.values(s).forEach(list=>list.forEach(p=>{if(p.wait==null)p.wait=p.since==='yesterday'?1:0;})));
   // Extra fictional task instances for the list-overflow review URL: ?section=gestation&many=1.
   if(new URLSearchParams(location.search).get('many')==='1'){
     [33,34,35,36].forEach(n=>tasks.push({...tasks[0],id:'preg'+n,batch:'Batch '+n,base:'preg31',counts:{7:[4,1],8:[5,2]}}));
@@ -420,17 +434,52 @@
   // Today's closed tasks (completed or ended early in farm time): each opens its receipt. Older receipts live in Records.
   // To treat / Monitoring: the marked pigs across units, one card per unit under its section heading (as Farrowing's scan and search; Row · Animal: tag over pen and care, the condition tag right).
   // A pig opens its unit's walk on the Health lens, where it is treated or its mark changed.
-  function markedList(kind){
-    state.markedKind=kind;   // a pig opened from this list comes back to it (openDesigned's returnSheet)
-    const pigs=(markedPigs[state.section]||{})[kind]||[],units=[...new Set(pigs.map(p=>p.unit))];
-    const body=units.map(u=>{const list=pigs.filter(p=>p.unit===u);
-      return SentriUI.heading({title:'Unit '+u,kind:'section',level:3})+SentriUI.rowGroup(list.map(p=>SentriUI.row({variant:'animal',code:p.tag,
-        // Plain tags: the list's title already says what to do, so no row is coloured; "1d" marks a pig waiting since yesterday.
-        description:['Pen '+p.pen,({'Hospital pen':'Hospital','Treat in place':'In place'})[p.care]||'',p.since?'1d':''].filter(Boolean).join(' · '),right:{kind:'tags',tags:[{name:p.cond,level:'ongoing'}]},action:'marked-pig',value:String(u)})).join(''));}).join('');
-    drawer(kind==='treat'?'To treat':'Monitoring',body,{size:'medium'});
-    overlay.querySelector('.sheet,.dialog')?.classList.add('marked-'+kind);
-    if(SentriUI.rowFitTags)requestAnimationFrame(()=>SentriUI.rowFitTags(overlay));
+  // To treat / Monitoring is a list page (owner, 2026-10-20: "what if we have 100 pigs?… everything goes inside the filter, search
+  // bar at top, flat list"): the search at the top with the filter beside it, then today's list, one card per unit, pigs in walking order.
+  const careShort={'Hospital pen':'Hospital','Treat in place':'In place'};
+  const markedDefaults=()=>({unit:'all',care:'any',cond:'any'});
+  function markedAll(){return ((markedPigs[state.section]||{})[state.marked.kind]||[]);}
+  const markedUnits=()=>[...new Set(markedAll().map(p=>p.unit))].sort((a,b)=>a-b);
+  function markedMatch(p,f){return (f.unit==='all'||p.unit===+f.unit)&&(f.care==='any'||p.care===f.care)&&(f.cond==='any'||p.cond===f.cond);}
+  function markedFilterCount(f){return (f.unit!=='all')+(f.care!=='any')+(f.cond!=='any');}
+  const penOrder=(a,b)=>a.unit-b.unit||a.pen.localeCompare(b.pen,'en',{numeric:true})||a.tag.localeCompare(b.tag);
+  // The search matches an ear tag as typed, or a pen code.
+  function markedShown(){const m=state.marked,q=(m.q||'').trim().toLowerCase();return markedAll().filter(p=>markedMatch(p,m.filter)&&(!q||p.tag.includes(q)||p.pen.toLowerCase()===q)).sort(penOrder);}
+  function markedList(){
+    const shown=markedShown();
+    if(!shown.length)return `<div class="mk-empty">${SentriUI.choiceEmpty(state.marked.q?(markedFilterCount(state.marked.filter)?'The filter may be hiding it.':'Check the ear tag, or scan it.'):'No pig matches the filter.',{title:'No pigs found',icon:'search'})}${markedFilterCount(state.marked.filter)?SentriUI.button({register:'text',label:'Show all pigs',action:'marked-reset'}):''}</div>`;
+    return [...new Set(shown.map(p=>p.unit))].map(u=>SentriUI.heading({title:'Unit '+u,kind:'section',level:3})+SentriUI.rowGroup(shown.filter(p=>p.unit===u).map(p=>
+      // Plain tags: the title says what to do, so no row is coloured; "1d" marks a pig waiting since yesterday.
+      SentriUI.row({variant:'animal',code:p.tag,description:['Pen '+p.pen,careShort[p.care]||'',p.wait?p.wait+'d':''].filter(Boolean).join(' · '),right:{kind:'tags',tags:[{name:p.cond,level:'ongoing'}]},action:'marked-pig',value:String(p.unit)})).join(''))).join('');
   }
+  function markedPage(){
+    const m=state.marked,n=markedFilterCount(m.filter),title=m.kind==='treat'?'To treat':'Monitoring';
+    // Search and scan go together (owner, 2026-10-20), as on Farrowing's search: ✕ clears what was typed (shown only then), the scan
+    // button sits at the field's end, and a scanned tag fills the field.
+    const tools='<span class="mk-field-tools">'+SentriUI.iconButton({variant:'plain',action:'mk-clear',icon:icon('close'),label:'Clear',className:'mk-clear'}).replace('<button','<button'+(m.q?'':' hidden'))+SentriUI.iconButton({variant:'plain',action:'mk-scan',icon:icon('scan'),label:'Scan ear tag',className:'mk-scan'})+'</span>';
+    const search=SentriUI.choiceSearch({label:'Search ear tag or pen',placeholder:'Ear tag or pen',value:m.q||'',attrs:{'data-mk-search':''}}).replace(/<button[^>]*st-search-clear[\s\S]*?<\/button>/,'').replace(/<\/span><\/label>$/,tools+'</span></label>');
+    const filter=SentriUI.iconButton({action:'marked-filter',icon:icon('filter'),label:'Filter pigs'+(n?', '+n+' applied':''),badge:n||'',className:'mk-filter'});
+    return head(title)+`<div class="app-scroll mk-scroll"><div class="mk-bar">${search}${filter}</div><div class="mk-list">${markedList()}</div></div>`;
+  }
+  // The filter holds every facet: unit (when the list spans more than one), care (To treat), and the condition.
+  function markedFilter(){
+    const m=state.marked,d=m.draft,units=markedUnits(),n=markedAll().filter(p=>markedMatch(p,d)).length;
+    returnFocus=returnFocus||document.activeElement;app.inert=true;
+    if(m.picking){
+      const conds=[...new Set(markedAll().map(p=>p.cond))].sort(),inScope=markedAll().filter(p=>markedMatch(p,{...d,cond:'any'}));
+      const rows=[['any','Any condition',''],...conds.map(c=>[c,c,String(inScope.filter(p=>p.cond===c).length)])].map(([v,l,meta])=>SentriUI.choiceRow({label:l,meta:meta?meta+(meta==='1'?' pig':' pigs'):'',mode:'single',action:'mk-cond',value:v,selected:d.cond===v}));
+      overlay.innerHTML=SentriUI.sheet({title:'Condition',cross:{action:'close',label:{text:'Close',str:'act.close'}},size:'medium',label:'Condition',body:SentriUI.choiceGroup(rows.join('')),footer:SentriUI.pickerFooter({back:{action:'mk-cond-back'}}),close:{action:'close'},scrim:{action:'close',label:'Close filter'}});
+    }else{
+      const sections=[
+        ...(units.length>1?[{title:'Unit',icon:icon('grid'),content:SentriUI.segment({variant:'facet',options:[['all','Any'],...units.map(u=>[String(u),'Unit '+u])],active:String(d.unit),action:'mk-unit',ariaLabel:'Unit'})}]:[]),
+        ...(m.kind==='treat'?[{title:'Care',icon:icon('treat'),content:SentriUI.segment({variant:'facet',options:[['any','Any'],['Hospital pen','Hospital'],['Treat in place','In place']],active:d.care,action:'mk-care',ariaLabel:'Care'})}]:[]),
+        {title:'Condition',icon:icon('health'),content:SentriUI.pickerField({label:'',ariaLabel:'Condition',value:d.cond==='any'?'':d.cond,display:d.cond==='any'?'Any condition':d.cond,placeholder:'Any condition',action:'mk-cond-pick',key:'cond'})}
+      ];
+      overlay.innerHTML=SentriUI.filterSheet({title:'Filter pigs',sections,apply:{label:`Show ${n} ${n===1?'pig':'pigs'}`,action:'mk-apply'},reset:markedFilterCount(d)?{label:'Reset',action:'mk-reset'}:false,backAction:'close',className:'mk-filter-sheet',size:'long'});
+    }
+    overlay.querySelector('.sheet')?.focus({preventScroll:true});
+  }
+  function openMarked(kind){push('marked',{marked:{kind,q:'',filter:markedDefaults(),draft:markedDefaults(),picking:false}});}
   function closedToday(){
     const closed=tasks.filter(t=>t.section===state.section&&(t.completedAt||t.terminatedAt));
     drawer('Closed today',SentriUI.rowGroup(closed.map(t=>SentriUI.row({variant:'navigation',icon:icon('check'),title:`${shortName[t.type]||t.type} · ${t.batch}`,description:(t.terminatedAt?'Ended early · ':'Completed · ')+String(t.completedAt||t.terminatedAt).replace('Today, ',''),action:'closed-task',value:t.id})).join('')),{size:'medium'});
@@ -503,7 +552,7 @@
   function finding(){return legacyHead('Movement needs clarification','Assistant · overnight review','<span class="preview-badge">PREVIEW</span>',false)+`<div class="app-scroll screen-enter"><div class="scope-label">${icon('place')}Gestation / Unit 7 / Pen A2</div><div class="assistant-hero"><p class="overline">YOUR INPUT NEEDED</p><h3>Where did these pigs go?</h3><p>The overnight review found a movement note without a destination.</p></div><div class="evidence"><strong>Movement note · yesterday, 15:40</strong><p>“Moved 4 pigs out of A2.”<br>Recorded by G. Hansen · Unit 7</p></div><div class="evidence"><strong>What is missing</strong><p>The destination unit and pen. No movement record has been changed.</p></div>${state.answered?`<div class="message">Your answer: ${esc(state.answer)}<br>Saved in this preview. No live record was changed.</div>`:`<form id="answer-form">${SentriUI.field({label:`Destination or clarification`,control:`<textarea id="answer" name="answer" placeholder="For example: Unit 8, pen B3" required maxlength="500">${esc(state.answerDraft||'')}</textarea>`})}</form>`}<p class="work-note">Sample decision for reviewing the Assistant experience.</p>${btn('finding-unit','View Unit 7','secondary')}</div>${SentriUI.sheetFooter({content:SentriUI.backButton({action:'back'})+(state.answered?'':'<button class="primary" type="submit" form="answer-form">Send clarification</button>'),className:'page-footer'})}`;}
   function toolbox(){const rows=[...(state.unit?[{action:'maintenance',icon:icon('wrench'),title:'Maintenance',description:'Unit '+state.unit+' · equipment issues'}]:[]),{action:'search',icon:icon('search'),title:'Find a pig or pen',description:'Search by ear tag or pen code'},{action:'records',icon:icon('note'),title:'Records',description:'Updates made in this preview'},{action:'sections',icon:icon('barn'),title:'Sections & units',description:'Browse the farm'},{action:'assistant',icon:icon('spark'),title:'Assistant',description:'Questions, findings and decisions'}];return head('Toolbox')+'<div class="app-scroll screen-enter">'+SentriUI.panel(rows.map(r=>SentriUI.row(r)).join(''),{className:'st-row-group'})+'</div>'+nav('toolbox');}
   function recordLog(){return head('Records')+'<div class="app-scroll screen-enter">'+SentriUI.log(SentriUI.logGroups(state.log.map(l=>({title:l.title,detail:l.context,at:l.at,by:'G. Hansen'}))),{empty:'No new records yet. Answers to overnight findings will appear here.'})+'</div>'+nav('toolbox');}
-  const pages={home,sections:sectionChooser,placeholder,environment,maintenance,assistant,finding,toolbox,records:recordLog,schedule:schedulePage};
+  const pages={home,sections:sectionChooser,placeholder,environment,maintenance,assistant,finding,toolbox,records:recordLog,schedule:schedulePage,marked:markedPage};
   // The atlas follows the demo (?screen=): the screen whose url holds this scope (view, section, unit, work, attention), else null.
   function atlasScreen(screens){
     const dr=overlay.querySelector('.sheet,.dialog');
@@ -513,6 +562,13 @@
       if(dr)return w===0&&f==='production'?(dr.classList.contains('schedule-key')?'workbench.schedule-key':dr.classList.contains('schedule-row')?'workbench.schedule-row':null):null;
       return w===1&&f==='production'?'workbench.schedule-next':w===0&&f==='all'?'workbench.schedule-all':w===0&&f==='production'?'workbench.schedule':null;
     }
+    // To treat / Monitoring: the Gestation list page, its filter and the condition level; ?marked=many is the heavy day.
+    if(state.page==='marked'){
+      const m=state.marked,many=params.get('marked')==='many';if(state.section!=='gestation'||markedFilterCount(m.filter))return null;
+      if(dr)return m.kind==='treat'&&many&&!m.q?(m.picking?'workbench.to-treat-condition':'workbench.to-treat-filter'):null;
+      if(m.q){const n=markedShown().length;return m.kind!=='treat'||many?null:!n?'workbench.to-treat-none':n===1?'workbench.to-treat-scanned':null;}
+      return m.kind==='treat'?(many?'workbench.to-treat-many':'workbench.to-treat'):(many?null:'workbench.monitoring');
+    }
     if(state.page==='environment')return unitDevices()[0]?.draftMode==='manual'?'environment.fan-manual':state.sensorRange==='week'?'environment.sensor-week':(state.sensor||0)>0?'environment.sensor-other':'environment.page';
     if(state.page==='assistant')return state.assistantTab==='chat'?(state.chat.length?'assistant.conversation':'assistant.conversations'):state.answered?'assistant.up-to-date':'assistant.needs-you';
     if(state.page==='finding')return state.answered?'assistant.answered':'assistant.finding';
@@ -521,7 +577,6 @@
     if(state.page==='maintenance'){if(dr)return dr.querySelector('#fault-form')?'environment.report-issue':maintenanceRecords().find(f=>f.id===state.faultId)?.resolved?'environment.issue-resolved':'environment.issue-detail';return maintenanceRecords().length?'environment.maintenance':'environment.maintenance-empty';}
     if(dr){
       if(dr.classList.contains('closed-today'))return 'workbench.closed-today';
-      if(dr.classList.contains('marked-treat'))return 'workbench.to-treat';
       if(dr.classList.contains('unit-picker'))return 'workbench.choose-unit';
       if(dr.querySelector('#lookup-form'))return dr.querySelector('#tag')?'find-pig.scan':'find-pig.search';
       if((dr.querySelector('[data-action="lookup-result"]')||/No matching sample pig/.test(dr.textContent)))return 'find-pig.results';
@@ -540,7 +595,9 @@
     app.classList.toggle('island-sync',island);
     app.innerHTML=(island?badge:'')+(pages[state.page]||home)();
     app.classList.toggle('schedule-open',state.page==='schedule');
-    if(badge&&!island&&state.page!=='schedule')(app.querySelector('.app-header,.page-head,.st-page-header')||app).insertAdjacentHTML('beforeend',badge);
+    if(state.page==='marked'&&SentriUI.rowFitTags)requestAnimationFrame(()=>SentriUI.rowFitTags(app));
+    // The list page holds no records of its own, so its one header corner stays free (Headers law), as on the Schedule.
+    if(badge&&!island&&!['schedule','marked'].includes(state.page))(app.querySelector('.app-header,.page-head,.st-page-header')||app).insertAdjacentHTML('beforeend',badge);
     window.AtlasBare&&AtlasBare.watch(atlasScreen);
     document.querySelectorAll('[data-demo]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.demo===(state.page==='sections'?'sections':state.unit?'unit':'overview'))));
   }
@@ -587,8 +644,20 @@
     if(a==='closed-task'){closeDrawer();openTask(v);return;}
     if(a==='closed-today'){closedToday();return;}
     // Marked pigs: one list across units; a pig opens its unit's walk on the Health lens.
-    if(a==='to-treat'||a==='monitoring'){markedList(a==='to-treat'?'treat':'monitor');return;}
-    if(a==='marked-pig'){openDesigned('inspection-astra-concept.html',+v,'unit','Health','',state.markedKind);return;}
+    if(a==='to-treat'||a==='monitoring'){openMarked(a==='to-treat'?'treat':'monitor');return;}
+    if(a==='marked-filter'){state.marked.draft={...state.marked.filter};state.marked.picking=false;returnFocus=null;markedFilter();return;}
+    // Scanner preview: a scan fills the search with the tag read, so the list shows that pig.
+    if(a==='mk-scan'){const pig=markedAll().slice().sort(penOrder)[2]||markedAll()[0];if(pig){state.marked.q=pig.tag;render();}return;}
+    if(a==='mk-clear'){state.marked.q='';render();app.querySelector('[data-mk-search]')?.focus();return;}
+    if(a==='mk-unit'||a==='mk-care'){state.marked.draft[a.slice(3)]=v;markedFilter();return;}
+    if(a==='mk-cond-pick'){state.marked.picking=true;markedFilter();return;}
+    if(a==='mk-cond'){state.marked.draft.cond=v;state.marked.picking=false;markedFilter();return;}
+    if(a==='mk-cond-back'){state.marked.picking=false;markedFilter();return;}
+    if(a==='mk-reset'){state.marked.draft=markedDefaults();markedFilter();return;}
+    if(a==='mk-apply'){state.marked.filter={...state.marked.draft};closeDrawer();render();return;}
+    if(a==='marked-reset'){state.marked.filter=markedDefaults();state.marked.q='';render();return;}
+    // Back from the pig's walk reopens this list (openDesigned's returnSheet).
+    if(a==='marked-pig'){openDesigned('inspection-astra-concept.html',+v,'unit','Health','',state.marked.kind);return;}
     if(a==='toggle-tasks'){const scroll=app.querySelector('.app-scroll')?.scrollTop||0;state.expandedTasks=!state.expandedTasks;render();app.querySelector('.app-scroll').scrollTop=scroll;return;}
     if(a==='toggle-upcoming'){const scroll=app.querySelector('.app-scroll')?.scrollTop||0;state.expandedUpcoming=!state.expandedUpcoming;render();app.querySelector('.app-scroll').scrollTop=scroll;return;}
     if(a==='end-task-early'){dialog('End task early?','Unfinished work will remain incomplete. Existing records are kept.',{label:'End task early',action:'confirm-end-task'});return;}
@@ -632,6 +701,7 @@
     if(e.target.id==='answer-form'){const answer=String(data.get('answer')).trim();if(!answer)return;state.answerDraft='';state.answered=true;state.answer=answer;state.log.unshift({at:Date.now(),title:'Movement clarification received',context:'Unit 7 · Pen A2 · '+answer});render();toast('Clarification saved in this preview');}
     if(e.target.id==='lookup-form')lookup(String(data.get('tag')));
   });
+  document.addEventListener('input',e=>{if(e.target.matches?.('[data-mk-search]')&&state.page==='marked'){state.marked.q=e.target.value;app.querySelector('.mk-clear')?.toggleAttribute('hidden',!e.target.value);const l=app.querySelector('.mk-list');if(l){l.innerHTML=markedList();if(SentriUI.rowFitTags)SentriUI.rowFitTags(l);}}});
   document.addEventListener('input',e=>{if(e.target.name==='question'&&e.target.closest('#ask-form'))state.askDraft=e.target.value;if(e.target.id==='answer')state.answerDraft=e.target.value;});
   document.addEventListener('keydown',e=>{if(!overlay.children.length)return;if(e.key==='Escape'){closeDrawer();return;}if(e.key==='Tab'){const focusable=[...overlay.querySelectorAll('.sheet button,.sheet input,.sheet textarea,.sheet a[href],.dialog button')].filter(el=>!el.disabled);const first=focusable[0],last=focusable.at(-1);if(e.shiftKey&&(document.activeElement===first||document.activeElement===overlay.querySelector('.sheet,.dialog'))){e.preventDefault();last?.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first?.focus();}}});
   $('#sync-demo').addEventListener('change',e=>{
@@ -650,7 +720,7 @@
   render();
   // Atlas start states for the Schedule's drawers: ?view=schedule&sheet=key, or &sheet=row&row=production.1.1 (Pregnancy check B31).
   if(state.page==='home'&&!state.unit&&params.get('sheet')==='closed')closedToday();
-  if(state.page==='home'&&!state.unit&&['treat','monitor'].includes(params.get('sheet')))markedList(params.get('sheet'));
+  if(state.page==='home'&&!state.unit&&['treat','monitor'].includes(params.get('sheet')))openMarked(params.get('sheet'));
   if(state.page==='schedule'&&params.get('sheet')==='key')scheduleKey();
   if(state.page==='schedule'&&params.get('sheet')==='row')scheduleRow(params.get('row')||'production.1.1');
   // The fold is measured once the fonts have loaded: measured before, the toggle sits a few pixels off and the page lands short.
