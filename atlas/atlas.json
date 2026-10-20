@@ -898,6 +898,7 @@
           "workbench.many-tasks",
           "workbench.work-due",
           "workbench.quiet-section",
+          "workbench.all-quiet",
           "workbench.work-waiting",
           "workbench.closed-today"
          ]
@@ -1452,14 +1453,42 @@
          "preset": "",
          "figma": "",
          "notes": {
-          "purpose": "A section with nothing open: Production says \"Nothing open\", Health shows its rows at 0 or a small count, Other says \"Nothing open\".",
+          "purpose": "A section with little open: Production and Other each say so in their own card; Health shows only Monitoring (To treat is 0, so its row is absent).",
           "states": [],
           "elements": [
            {
             "name": "Empty sections",
-            "shows": "\"Nothing open\" in Production and Other; To treat \"Nothing marked\" (no chevron)",
-            "logic": "Sections shrink but never disappear, so the worker sees they were checked.",
-            "source": "overview()"
+            "shows": "\"No production work open\" and \"Nothing else open\", each one quiet line with a tick in a white card",
+            "logic": "Home's sections stay put (owner, 2026-10-20), so the worker sees each was checked and learns where things are; a zero row is absent.",
+            "source": "overview(), Panel empty"
+           }
+          ],
+          "controls": [],
+          "copy": [
+           "(raw)"
+          ],
+          "edge": [],
+          "rules": [],
+          "issues": []
+         }
+        },
+        {
+         "id": "workbench.all-quiet",
+         "name": "Overview · everything empty",
+         "zh": "总览 · 全部为空",
+         "status": "in-design",
+         "url": "/ux/system/home-astra-prototype.html?section=nursery&marked=none",
+         "preset": "",
+         "figma": "",
+         "notes": {
+          "purpose": "Nothing open and no pigs marked: all three sections stay, each says so in one quiet line; the Schedule links stay on Production and Health.",
+          "states": [],
+          "elements": [
+           {
+            "name": "Empty cards",
+            "shows": "\"No production work open\", \"No pigs marked to treat or watch\", \"Nothing else open\"",
+            "logic": "Health's card says it when there are no marks and no planned health work.",
+            "source": "overview(), Panel empty"
            }
           ],
           "controls": [],

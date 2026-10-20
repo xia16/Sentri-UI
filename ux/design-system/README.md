@@ -13,7 +13,7 @@ Sentri copy says what to do, where, and how much. It is operational, not friendl
 - **Time: working judgments stay elapsed, records stay absolute.** Past events read elapsed ("Mated 21 days ago", "Signs · 10h ago"); scheduled ones read until ("Due in 5 days"). Open rows carry relative times only, never clock stamps. Done rows and records carry the stamp: `Jul 8 · 07:14 · G.H`. Durations always carry a unit: `45m`, `9h`, `3d`.
 - **A forecast admits it is one.** A state the task asks about prints at full weight ("Due · today"); a prediction prints lighter with a word that says so ("Expected · in 5 days").
 - **IDs are set in mono and written as the barn writes them:** ear tags `000254`, pens `A2`, semen batches `JY001`. People are initials on records (`G.H`), full name on a check-in stamp (`G. Hansen`).
-- **Missing is not zero, and empty is absent.** An empty section does not render — no "None" heading. A picker with nothing chosen reads "Select"; a multi-picker reads "None"; an empty log reads "No activity recorded yet".
+- **Missing is not zero, and empty is absent.** An empty section does not render — no "None" heading. One exception (owner, 2026-10-20): Home's Overview keeps its three sections (Production, Health, Other) in place, so the worker learns where things are and sees each was checked; an empty one says so in its own card, one quiet line with a tick (Panel `empty`: "No production work open"), and a zero row inside a section is still absent. A picker with nothing chosen reads "Select"; a multi-picker reads "None"; an empty log reads "No activity recorded yet".
 - **Avoid:** "Unchecked" (reads as a defect, not a queue), an ellipsis on a status word, emoji, exclamation marks, "please".
 
 ## Visual foundations
