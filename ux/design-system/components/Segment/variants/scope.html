@@ -1,0 +1,20 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"></head><body>
+<section data-state="All"><h2>All</h2><div id="state-All"></div></section>
+<section data-state="A part picked"><h2>A part picked</h2><div id="state-Part"></div></section>
+<section data-state="Pressed"><h2>Pressed</h2><div id="state-Pressed"></div></section>
+<section data-state="Chinese"><h2>Chinese</h2><div id="state-Chinese"></div></section>
+<script>
+// Each state renders in its own iframe in the atlas: draw only the states present.
+var opts = function (unit, zh) { return zh ? [['all', '全部单元', {count: 296}], ['unit', unit ? '7 号单元' : '选择单元', unit ? {count: 64, door: true} : {door: true}]] : [['all', 'All units', {count: 296}], ['unit', unit ? 'Unit 7' : 'Choose unit', unit ? {count: 64, door: true} : {door: true}]]; };
+var RENDER = {
+  "state-All": function () { return SentriUI.segment({variant: 'scope', options: opts(false), active: 'all', action: 'scope', ariaLabel: 'Unit'}); },
+  "state-Part": function () { return SentriUI.segment({variant: 'scope', options: opts(true), active: 'unit', action: 'scope', ariaLabel: 'Unit'}); },
+  "state-Pressed": function () { return SentriUI.segment({variant: 'scope', options: opts(false), active: 'all', action: 'scope', ariaLabel: 'Unit', state: 'Pressed'}); },
+  "state-Chinese": function () { return SentriUI.segment({variant: 'scope', options: opts(true, true), active: 'unit', action: 'scope', ariaLabel: '单元'}); }
+};
+document.querySelectorAll('[data-state]').forEach(function (s) {
+  var t = RENDER[s.id] ? s : s.querySelector('[id]');
+  if (t && RENDER[t.id]) t.innerHTML = RENDER[t.id]();
+});
+</script>
+</body></html>

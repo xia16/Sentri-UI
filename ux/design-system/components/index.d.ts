@@ -197,12 +197,12 @@ export interface ChoiceRowProps {
 }
 
 export interface SegmentProps {
-  variant?: 'lens' | 'two-line-lens' | 'view-switch' | 'facet';
+  variant?: 'lens' | 'two-line-lens' | 'view-switch' | 'facet' | 'scope';
   state?: string;
   disabled?: boolean;
   reason?: string;
   /** [value, label, ids?] — the label is raw HTML so a count can be marked up. */
-  options: [string, string, { strs?: Strs<'label'>; args?: StrArgs<'label'>; count?: string | number; disabled?: boolean; ariaLabel?: string }?][];
+  options: [string, string, { strs?: Strs<'label'>; args?: StrArgs<'label'>; count?: string | number; disabled?: boolean; ariaLabel?: string; /** scope only: the option that opens the drawer to pick a part */ door?: boolean }?][];
   active?: string;
   action?: string;
   ariaLabel?: string;

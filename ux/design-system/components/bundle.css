@@ -967,6 +967,15 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
 .st-stepper[data-variant="bare"] .st-stepper-hint:empty{display:none}
 .dialog .st-selection{margin:16px 0 1px}
 .dialog .st-segment{border-width:0}
+.st-segment[data-variant=scope]{gap:var(--space-4);padding:var(--space-4);border-width:1px;border-style:solid;border-color:var(--line);border-radius:var(--radius-control)}
+.st-segment[data-variant=scope] button{flex:1 1 0;min-width:0;min-height:var(--tap-min);gap:var(--space-6);padding:0 var(--space-12);border-radius:var(--radius-8);font-size:var(--font-size-14);color:var(--muted)}
+.st-segment[data-variant=scope] button:first-child{flex:0 0 38%}
+.st-segment[data-variant=scope] button[aria-haspopup]{justify-content:flex-start}
+.st-segment[data-variant=scope] button[aria-pressed=true]{color:var(--ink);font-weight:500;box-shadow:0 1px 3px #20271f0d}
+.st-segment[data-variant=scope] .st-selection-count{font:500 13px var(--font-mono);color:var(--muted)}
+.st-segment-door{display:grid;place-items:center;margin-left:auto;color:var(--muted)}
+.st-segment-door svg{width:16px;height:16px}
+
 .st-choice-plain .st-radio{border:1px solid #767676}
 .st-choice-plain [aria-checked="true"] .st-radio{border:0;background:radial-gradient(circle at center,var(--ink) 0 6px,var(--paper) 6.5px 8.5px,var(--ink) 9px 10px)}
 .st-choice-plain [aria-checked="true"] .st-radio::after{display:none}
