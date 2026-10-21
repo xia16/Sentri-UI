@@ -4,7 +4,7 @@
   - The design panel (worker, steward, interaction, developer) **accepted every card with changes**, and those changes are applied (see *What the panel changed*).
   - Pages adopt the cards in a later step (see *Adoption*). No task page changes here.
 - **Map:** [Piglet processing design map, issue #3](https://github.com/xia16/Sentri-UI/issues/3).
-- **Demo:** every state, en and zh, on the strict page `components/candidates-2-demo.html` (lint page `ds-candidates-2`).
+- **Demo:** every state, en and zh, on the strict page `archive/design-system/demos/candidates-2-demo.html` (archived) (lint page `ds-candidates-2`).
 - **Tests:** `tests/candidates-2.test.mjs` covers:
   - the hold's rules: the repeat guard, the 400ms arm floor, settle and `unknown`, and the token parity;
   - `radioNext`;

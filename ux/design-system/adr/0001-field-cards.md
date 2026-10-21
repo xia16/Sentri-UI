@@ -3,7 +3,7 @@
 - **Status:** candidate. On 2026-09-29 the design panel accepted the cards with changes, and a refute pass by the other model family found six majors, all accepted. Both sets of changes are applied on `ds/field-cards`.
 - **Not every ruling is honoured as written.** The cards keep **two deviations** from owner rulings, and each waits on the owner's nod (see *Deviations for the owner's nod*).
 - **Map:** [Piglet processing design map, issue #3](https://github.com/xia16/Sentri-UI/issues/3).
-- **Cards:** [Stepper](../components/Stepper/README.md) · [Measure](../components/Measure/README.md) · [Numpad](../components/Numpad/README.md). You can see every state on the strict demo page `components/field-cards-demo.html` (lint page `ds-field-cards`).
+- **Cards:** [Stepper](../components/Stepper/README.md) · [Measure](../components/Measure/README.md) · [Numpad](../components/Numpad/README.md). You can see every state on the strict demo page `archive/design-system/demos/field-cards-demo.html` (archived) (lint page `ds-field-cards`).
 
 ## Context
 

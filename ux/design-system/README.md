@@ -169,6 +169,15 @@ Selection names the subject; the sheet holds the verbs — verbs only, no facts 
 
 It reads; it never acts. The fact line puts words left and the trail (when · who · qualifier) right. Sections are keyed, and an empty section is absent. The tail is history, or the end-act. The page outlives its subject: a departed animal keeps its page with a terminal line in `red`.
 
+## The library (owner, 2026-10-21)
+
+The components are a library a developer browses to find the one part whose job something is, so nobody builds a parallel one (extend before adding: rules ledger L29). The atlas's Components view draws it from these files.
+
+- **Groups follow the job**, in `components/_groups.json`: Foundations, Actions, Inputs and choices, Find and filter, Rows and information, Status and feedback, Surfaces, Overviews, Task page parts, then Compatibility and retired. Every component folder is in one group. A group's `words` are what a developer types for a part's job ("Stepper": "count pigs …"); a `see` entry names a part documented inside another (Optional input → Field) or an old name and what replaced it (TaskLens → Segment).
+- **A component folder** holds a `README.md` whose first plain sentence is the part's job (the atlas, its search and `node scripts/component-jobs.mjs` show it), then when to use it and when not, its anatomy, its states and the API it owns (`SentriUI.x({…})`, typed in `components/index.d.ts`; a task page part's `SentriTask.x`). It has a `gate.json` with its maturity (`in-design`, `agent-checked`, `approved`; a README saying candidate reads as candidate). Its variants are `variants.json` with `variants/<id>.html` state pages; a part with none shows the first screen that draws it.
+- **Lifecycle.** A part is current, compatibility (an old name kept as an adapter because frozen pages still call it; listed under Compatibility and retired, never used in new work) or retired. A retired part leaves `components/`: its folder moves to `archive/design-system/components/`, its code and CSS go once nothing calls them, and its old name stays a `see` line pointing to its replacement. A demo, proof or record that no longer describes the library moves to `archive/design-system/` too.
+- **Usage is measured, not written.** `node scripts/component-usage.mjs` opens every atlas screen and records the parts it draws (`data-ds`) and the source files that call each part's API (`atlas/component-usage.json`). Rerun it when screens or components change; a part seen nowhere reads "not observed", never "unused".
+
 ## Iconography
 
 - One registry, `SentriIcons` (in `components/bundle.js`): canonical glyph count from `Object.keys(SentriIcons.paths).length`, with paths on a 24×24 grid, drawn as open strokes. `SentriIcons.icon(name)` returns the `<svg>`; the stylesheet supplies `fill:none; stroke:currentColor; stroke-linecap:round; stroke-linejoin:round`.
