@@ -24548,7 +24548,7 @@
          {
           "type": "entry",
           "id": "ds-a11-task-layer.entry",
-          "label": "Task status survives opening a sow",
+          "label": "The task's badge stays on the page under a sow's drawer",
           "children": [
            {
             "type": "state",
@@ -24560,23 +24560,23 @@
              {
               "type": "action",
               "id": "ds-a11-task-layer.act",
-              "label": "Open the sow count from the task room",
+              "label": "Open a sow from the task list",
               "children": [
                {
                 "type": "outcome",
                 "id": "ds-a11-task-layer",
-                "label": "Current task count remains available in the sow drawer",
+                "label": "The task's badge stays on the page under a sow's drawer",
                 "tree": "A-11",
                 "gwt": {
-                 "given": "Farrowing task 28 has two unsent records across its pens.",
-                 "when": "The worker opens a sow count drawer.",
-                 "then": "The same task-owned status remains visible in the drawer header and still opens the task record list."
+                 "given": "Farrowing task 28 has two records on this phone.",
+                 "when": "The worker opens a sow's drawer from the task list.",
+                 "then": "The task page under the drawer keeps its badge with the task's count, 2; no 'Task 2' word."
                 },
                 "authority": [
                  {
                   "src": "PRD",
-                  "at": "Rules and Decisions 2026-10-13",
-                  "says": "The task header keeps one task-instance scope through the task hierarchy."
+                  "at": "Decisions 2026-10-13 and 2026-10-18 (owner): a task's badge is an upload icon and that task's record count; none when the task has none (PR 235)",
+                  "says": "Every page of the task carries the same badge, the task's record count."
                  }
                 ],
                 "result": "pass"
@@ -24590,40 +24590,33 @@
          {
           "type": "entry",
           "id": "ds-a12-other-task.entry",
-          "label": "From a task with none of its own, the badge opens Saved work",
+          "label": "A task with no records of its own shows no badge",
           "children": [
            {
             "type": "state",
             "id": "ds-a12-other-task.state",
-            "label": "No Farrowing record, three elsewhere on the phone",
+            "label": "No Farrowing record, records from other tasks on the phone",
             "tree": "A",
             "screen": "data-sync.task-badge",
             "children": [
              {
-              "type": "action",
-              "id": "ds-a12-other-task.act",
-              "label": "Tap the explicit All 3 header status",
-              "children": [
+              "type": "outcome",
+              "id": "ds-a12-other-task",
+              "label": "A task with no records of its own shows no badge",
+              "tree": "A-12",
+              "gwt": {
+               "given": "This Farrowing task has nothing on the phone, while other tasks do.",
+               "when": "The worker reads the task page.",
+               "then": "There is no badge in its header; the whole phone is Home's, not this task's."
+              },
+              "authority": [
                {
-                "type": "outcome",
-                "id": "ds-a12-other-task",
-                "label": "From a task with none of its own, the badge opens Saved work",
-                "tree": "A-12",
-                "gwt": {
-                 "given": "This Farrowing task has nothing waiting but other tasks do.",
-                 "when": "The worker opens the records.",
-                 "then": "Saved work lists the tasks still holding records."
-                },
-                "authority": [
-                 {
-                  "src": "PRD",
-                  "at": "Rules and Decisions 2026-10-18 to 2026-10-20 (PR 235)",
-                  "says": "Saved work lists the tasks still holding records."
-                 }
-                ],
-                "result": "pass"
+                "src": "PRD",
+                "at": "Decisions 2026-10-13 and 2026-10-18 (owner): a task's badge is an upload icon and that task's record count; none when the task has none (PR 235)",
+                "says": "A task's badge counts only its own records and is absent when it has none."
                }
-              ]
+              ],
+              "result": "pass"
              }
             ]
            }
@@ -24632,7 +24625,7 @@
          {
           "type": "entry",
           "id": "ds-a13-home-to-task.entry",
-          "label": "Home to task keeps phone-wide fallback",
+          "label": "From Home into a task with none of its own: no badge",
           "children": [
            {
             "type": "state",
@@ -24648,18 +24641,18 @@
                {
                 "type": "outcome",
                 "id": "ds-a13-home-to-task",
-                "label": "Task page retains explicit phone-wide access",
+                "label": "From Home into a task with none of its own: no badge",
                 "tree": "A-13",
                 "gwt": {
-                 "given": "Home reports three unsent records from other work and the Farrowing task has none.",
-                 "when": "The worker enters the Farrowing task.",
-                 "then": "The task page still has an All 3 status that opens all records on this phone."
+                 "given": "Home has records from other work and the Farrowing task has none.",
+                 "when": "The worker enters the Farrowing task from Home.",
+                 "then": "The task page shows no badge; Home's icon holds the phone's records."
                 },
                 "authority": [
                  {
                   "src": "PRD",
-                  "at": "Rules 2026-10-13",
-                  "says": "The task page keeps phone-wide access when only other tasks have unsent work."
+                  "at": "Decisions 2026-10-13 and 2026-10-18 (owner): a task's badge is an upload icon and that task's record count; none when the task has none (PR 235)",
+                  "says": "A task's badge counts only its own records and is absent when it has none."
                  }
                 ],
                 "result": "pass"
