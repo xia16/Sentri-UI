@@ -115,6 +115,8 @@ test('a redirection is not part of a push, and a merge named in a message or her
     `git commit -m "done $(git push origin main)"`,
     // round 2: a quote inside the substitution ends the string scan early; an unclosed $( still counts
     `echo "$(${merge} "6" --squash)"`,
+    // round 3: a quoted subcommand cuts the scan off after `gh pr`; that fails closed
+    `echo "$(gh pr "merge" 6 --squash)"`,
   ]) assert.equal(guard(c), 2, c);
   for (const c of [
     `git commit -m "built on $(date +%F)" && git push origin workflow/x`,

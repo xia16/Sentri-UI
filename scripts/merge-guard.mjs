@@ -100,7 +100,8 @@ const gits = segs.map(gitCmd).filter(Boolean);
 // A `gh pr <sub>` that runs (not one quoted in a message, a heredoc body or a script): 2026-10-21, a heredoc that only named
 // `gh pr merge` was blocked as a merge.
 // Anywhere in a parsed command, so `echo \`gh pr merge 6\`` still counts; quoted strings and heredoc bodies are placeholders there.
-const ranPr = segs.flatMap((g) => [...g.matchAll(/\bgh pr (\S+)/gi)].map((m) => m[1]));
+// A `gh pr` whose subcommand can't be read (a quote cut the scan off) fails closed: it counts as a merge (Codex round 3).
+const ranPr = segs.flatMap((g) => [...g.matchAll(/\bgh pr\b(?: +(\S+))?/gi)].map((m) => m[1] ?? ''));
 const ranMerge = ranPr.some((s) => !SAFE_PR.test(s));
 const pushes = gits.filter((g) => g.sub === 'push');
 for (const { seg, opts } of pushes) {

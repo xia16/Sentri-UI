@@ -121,8 +121,9 @@ async function runGate({ ref, base, out, mode, scope, audit = false, keep = fals
   git(['fetch', '-q', 'origin']);
   const candidate = sha(ref);
   if (candidate) turn.relabel(candidate); // the lock names what it gates
+  // first the local record, then the network: a run killed even inside the pending post stays 'running', and --post refuses
+  if (candidate && !audit && !testBase) recordLast(candidate, out, 'running');
   if (candidate && !audit) postStatus(candidate, 'pending', `gate running against ${short(sha(base))}`); // an earlier pass for this commit no longer stands
-  if (candidate && !audit && !testBase) recordLast(candidate, out, 'running'); // a run killed before it ends stays 'running': --post refuses
   let res;
   try {
     res = await evaluate({ root, out, base, candidate: ref, ref, mode, scope, audit, keep, env, testBase, ownTools: tryRun });
