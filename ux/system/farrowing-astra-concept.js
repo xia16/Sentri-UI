@@ -499,12 +499,41 @@ function scanActionsSheet(c){
 function penInfo(c){const pens=c.unit.penDetails||(c.unit.penDetails={});return pens[c.detailPen]||(pens[c.detailPen]={note:'',noteBy:'',faults:[],events:[],feed:null});}
 function penEvent(c,text,note=''){penInfo(c).events.unshift({text,note,day:'Today',time:'09:41',who:'G. Hansen'});}
 function penActionRow(action,symbol,title,sub,value=''){return SentriUI.row({action,icon:icon(symbol),title,description:sub,value});}
-function penNotice(action,kind,title,copy,meta,value='',tone=''){return btn(action,`<span class="pen-notice-heading"><span>${kind}</span><strong>${esc(title)}</strong>${icon('chevron')}</span>${copy?`<span class="pen-notice-copy">${esc(copy)}</span>`:''}<small>${esc(meta)}</small>`,'pen-notice '+tone,value);}
+/* The pen page (owner, 2026-10-19; the sibling of Inspection's, PR #229): the pen is a door, not a tick. Everything done to the pen as a whole
+   happens here, for this one pen: its verbs on top (Row tiles), then what needs someone (open faults, then the note, as rows in one group) only when
+   something is open, then how the pen is now, then the door to its log. Only Farrowing's own verbs: Note, Feed, Fault.
+   Names are the registry's (ux/laws/strings.json: actions.tile.*, pen.*, feed.copy.122-124, fr.pen.*), drawn in the page's language. */
+const penPage={
+ actions:ZH?'本栏操作':'Pen actions',note:ZH?'备注':'Note',feed:ZH?'饲喂':'Feed',fault:ZH?'故障':'Fault',
+ noteAdd:ZH?'添加本栏备注':'Add pen note',noteEdit:ZH?'修改本栏备注':'Edit pen note',feedTitle:ZH?'饲喂指导':'Feed guidance',faultTitle:ZH?'上报设备故障':'Report equipment fault',
+ attention:ZH?'需要处理':'Needs attention',now:ZH?'当前':'Now',log:ZH?'本栏记录':'Pen log',logLine:ZH?'全部已记录的操作':'All recorded activity',
+ sows:ZH?'母猪':'Sows',piglets:ZH?'存活仔猪':'Piglets alive',
+ state:{Awaiting:ZH?'待产':'awaiting',Active:ZH?'分娩中':'farrowing',Done:ZH?'已完成':'done'}
+};
+// Where the pen's task sows are: one word when they share a state ("Farrowing"), else each state with its count ("2 awaiting · 1 done").
+function penSowStates(rows){
+ const counts=roomLenses.filter(l=>l!=='All').map(l=>[l,rows.filter(r=>roomState(r)===l).length]).filter(([,n])=>n);
+ if(counts.length===1){const w=penPage.state[counts[0][0]];return ZH?w:w[0].toUpperCase()+w.slice(1);}
+ return counts.map(([l,n])=>ZH?penPage.state[l]+n+'头':n+' '+penPage.state[l]).join(' · ');
+}
 function penDetails(c){
- const pe=penInfo(c),rows=c.listed.filter(r=>r.pen===c.detailPen);
- const notices=pe.faults.filter(f=>f.open).map(f=>penNotice('room-pen-fault-record','Equipment',f.device,f.description,'Open · Reported '+f.time+' · '+initials(f.who),f.id,'pen-notice-fault'));
- if(pe.note)notices.push(penNotice('room-pen-read-note','Note',pe.note,'',pe.noteBy));
- return roomSheet('Pen '+c.detailPen,`${notices.length?`<div class="pen-notices" aria-label="Reported faults and notes">${notices.join('')}</div>`:''}<section class="pen-information"><div class="compact-actions st-panel st-row-group">${penActionRow('room-pen-feed','feed','Feed guidance',pe.feed?pe.feed.formula+' · '+pe.feed.mode:'View feeding information')}${penActionRow('room-pen-fault','wrench','Report equipment fault','Name the device and what is wrong')}${penActionRow('room-pen-note','record',pe.note?'Edit pen note':'Add pen note',pe.note?'Update the note for this pen':'Leave information for the next person')}${penActionRow('room-pen-log','clock','Pen log','All recorded activity')}</div></section>`,false,'pen-detail-sheet');
+ const pe=penInfo(c),rows=c.listed.filter(r=>r.pen===c.detailPen),faults=pe.faults.filter(f=>f.open);
+ const verbs=SentriUI.rowGrid([
+  {label:penPage.note,title:pe.note?penPage.noteEdit:penPage.noteAdd,icon:icon('note'),action:'room-pen-note'},
+  {label:penPage.feed,title:penPage.feedTitle,icon:icon('feed'),action:'room-pen-feed'},
+  {label:penPage.fault,title:penPage.faultTitle,icon:icon('wrench'),action:'room-pen-fault'}
+ ],{label:penPage.actions});
+ const faultRows=faults.map(f=>SentriUI.row({variant:'navigation',action:'room-pen-fault-record',value:f.id,icon:icon('wrench'),title:f.device,description:f.description,wrap:true}));
+ // The note is a row like the faults (one white group on the page's tint, SURFACES.md): its text over its hand and time, the door to the note.
+ const attention=[...faultRows,...(pe.note?[SentriUI.row({variant:'navigation',action:'room-pen-read-note',icon:icon('note'),title:pe.note,description:pe.noteBy,wrap:true})]:[])];
+ const farrowed=rows.filter(r=>born(r)>0),alive=sum(farrowed.map(r=>r.alive)),dead=sum(farrowed.map(r=>sum(r.dead)));
+ const now=[{label:penPage.sows,value:String(rows.length),meta:penSowStates(rows)},...(farrowed.length?[{label:penPage.piglets,value:String(alive),meta:dead?rowText.dead(dead):''}]:[]),...(pe.feed?[{label:penPage.feed,value:pe.feed.formula,meta:pe.feed.mode}]:[])];
+ const section=(title,k,body)=>`<section class="pen-page-section">${SentriUI.heading({title,icon:icon(k),kind:'section',level:4})}${body}</section>`;
+ return roomSheet(ZH?rowText.pen(c.detailPen):'Pen '+c.detailPen,
+  `<section class="pen-page-section">${verbs}</section>`+
+  (attention.length?section(penPage.attention,'alert',`<div class="compact-actions st-panel st-row-group">${attention.join('')}</div>`):'')+
+  section(penPage.now,'details',SentriUI.facts(now,{columns:now.length}))+
+  `<section class="pen-page-section"><div class="compact-actions st-panel st-row-group">${penActionRow('room-pen-log','clock',penPage.log,penPage.logLine)}</div></section>`,false,'pen-detail-sheet');
 }
 function penSubpage(s,c){
  if(!['roomPenFeed','roomPenReadNote','roomPenNote','roomPenFault','roomPenFaultRecord'].includes(s.view))return null;
@@ -516,17 +545,17 @@ function penSubpage(s,c){
  if(s.view==='roomPenFault')return sheet('Report fault',`${SentriUI.pickerField({label:'Device',value:draft.device||'',placeholder:'Select',key:'pen:device',className:'pen-field'})}${draft.device==='Other'?SentriUI.field({label:'Device name',control:`<input data-pen-field="name" value="${esc(draft.name||'')}">`,className:'pen-field'}):''}${SentriUI.field({label:'Description',control:`<textarea data-pen-field="description" placeholder="What is broken or not working?">${esc(draft.description||'')}</textarea>`,className:'pen-field'})}`,btn('room-pen-save-fault','Report fault','button primary','',!validPenFault(draft)));
  if(s.view==='roomPenFaultRecord'){
   const f=pe.faults.find(x=>x.id===c.penFaultId);if(!f)return sheet('Equipment fault','<p class="detail-empty">No fault found.</p>');
-  return sheet(f.device,`<p class="pen-detail-copy">${esc(f.description)}</p><p class="pen-detail-meta">${f.open?'Open':'Resolved'} · Reported ${f.time} · ${esc(initials(f.who))}</p>${f.open?SentriUI.optionalRow({label:'Resolution note',inline:SentriUI.field({label:'Resolution note',labelHidden:true,control:'<textarea data-pen-field="resolution"></textarea>',className:'pen-field'})}):`<p class="pen-detail-copy">${esc(f.resolution||'')}</p>`}`,f.open?btn('room-pen-resolve-fault','Resolve fault','button primary'):'');
+  return sheet(f.device,`<p class="pen-detail-copy">${esc(f.description)}</p><p class="pen-detail-meta">${f.open?'Open':'Resolved'} · Reported ${f.time} · ${esc(initials(f.who))}</p>${f.open?SentriUI.optionalRow({label:'Resolution note',value:draft.resolution||'',open:!!draft.resolution?.trim(),inline:SentriUI.field({label:'Resolution note',labelHidden:true,control:`<textarea data-pen-field="resolution">${esc(draft.resolution||'')}</textarea>`,className:'pen-field'})}):`<p class="pen-detail-copy">${esc(f.resolution||'')}</p>`}`,f.open?btn('room-pen-resolve-fault','Resolve fault','button primary'):'');
  }
  return null;
 }
 function validPenFault(draft){return !!draft.device&&!!draft.description?.trim()&&(draft.device!=='Other'||!!draft.name?.trim());}
 function handlePenAction(s,c,a,v){
  const destinations={'room-pen-feed':'roomPenFeed','room-pen-read-note':'roomPenReadNote','room-pen-note':'roomPenNote','room-pen-fault':'roomPenFault','room-pen-fault-record':'roomPenFaultRecord'};
- if(destinations[a]){const keep=(c.penKeeps||{})[destinations[a]+'|'+c.detailPen];c.penDraft=keep?clone(keep):a==='room-pen-note'?{note:penInfo(c).note}:{};if(a==='room-pen-fault-record')c.penFaultId=v;s.view=destinations[a];return;}
+ if(destinations[a]){const keep=(c.penKeeps||{})[destinations[a]+'|'+c.detailPen+(a==='room-pen-fault-record'?'|'+v:'')];c.penDraft=keep?clone(keep):a==='room-pen-note'?{note:penInfo(c).note}:{};if(a==='room-pen-fault-record')c.penFaultId=v;s.view=destinations[a];return;}
  if(a==='room-pen-save-note'&&c.penDraft?.note?.trim()){const pe=penInfo(c),note=c.penDraft.note.trim();penEvent(c,pe.note?'Pen note updated':'Pen note added',note);pe.note=note;pe.noteBy='G.H · Today · 09:41';delete c.penKeeps?.['roomPenNote|'+c.detailPen];s.view='roomPenDetail';}
  if(a==='room-pen-save-fault'&&validPenFault(c.penDraft)){const d=c.penDraft,pe=penInfo(c),fault={id:String(pe.faults.length+1),device:d.device==='Other'?d.name.trim():d.device,description:d.description.trim(),time:'09:41',who:'G. Hansen',open:true};pe.faults.push(fault);penEvent(c,'Equipment fault reported',fault.device+' · '+fault.description);delete c.penKeeps?.['roomPenFault|'+c.detailPen];s.view='roomPenDetail';}
- if(a==='room-pen-resolve-fault'){const f=penInfo(c).faults.find(x=>x.id===c.penFaultId);if(f?.open){f.open=false;f.resolution=c.penDraft.resolution?.trim()||'';penEvent(c,'Equipment fault resolved',f.device+(f.resolution?' · '+f.resolution:''));s.view='roomPenDetail';}}
+ if(a==='room-pen-resolve-fault'){const f=penInfo(c).faults.find(x=>x.id===c.penFaultId);if(f?.open){f.open=false;f.resolution=c.penDraft.resolution?.trim()||'';penEvent(c,'Equipment fault resolved',f.device+(f.resolution?' · '+f.resolution:''));delete c.penKeeps?.['roomPenFaultRecord|'+c.detailPen+'|'+f.id];s.view='roomPenDetail';}}
 }
 /* A log group is a day: Today, Yesterday, a weekday, or a date ("Aug 27"). "N days ago" is turned into one of those. */
 function dayLabel(day){const m=String(day).match(/^(\d+) days? ago$/);return m?SentriUI.logDay(new Date(Date.now()-Number(m[1])*864e5)):day;}
@@ -595,7 +624,7 @@ function roomOverlay(s){const c=roomContext(s),unitSheet=(title,body,actions,cls
 }
 function roomAction(i,a,v){if(!a.startsWith('room-'))return false;const s=states[i],c=roomContext(s);if(a!=='room-pen'&&atlasStill())c.highlightUntil=0;const list=document.querySelector(`[data-card="${i}"] .room-scroll`);if(list)c.scroll=list.scrollTop;const intro=list?list.querySelector('.room-context-strip').offsetHeight+10:0;const nextScroll=c.scroll>=intro?intro:0;
   if(a==='room-sow'){const hit=findSow(c,v),r=hit?.record;if(r){const from=s.view;if(from==='roomScan'||from==='roomSearch')c.returnToTaskReview=from;states[i]=r;r.view=recordView(r);if(r.view==='history')r.pageBack='room';if(hit.unit.id===c.unitId)c.currentPen=r.pen;if(from!=='roomSearch')c.query='';}}   // Back returns to the list she was opened from; Find a sow keeps what was typed   // Farrowing is one task across its units: a sow in another unit opens the same drawer
- if(a==='room-back'||a==='room-return'){c.returnToTaskReview=false;if(s.view==='roomPenDetail')c.returnFocusPen=c.detailPen;const from=s.view;if(from==='roomFilter')c.filterKeep=clone(c.filterDraft);if(from==='roomPenNote'||from==='roomPenFault')(c.penKeeps=c.penKeeps||{})[from+'|'+c.detailPen]=clone(c.penDraft||{});if(from==='roomPenDetail'&&c.penKeeps)for(const k of Object.keys(c.penKeeps))if(k.endsWith('|'+c.detailPen))delete c.penKeeps[k];s.view=from==='roomScanActions'?'roomScan':from==='roomPicker'&&c.picker?c.picker.returnView:from==='roomEndTask'?'roomOverview':from==='roomTaskSows'?c.taskListBack||'roomEndTask':from==='roomTaskReceipt'?'roomHome':penParent(from);if(from==='roomPicker')c.picker=null;}
+ if(a==='room-back'||a==='room-return'){c.returnToTaskReview=false;if(s.view==='roomPenDetail')c.returnFocusPen=c.detailPen;const from=s.view;if(from==='roomFilter')c.filterKeep=clone(c.filterDraft);if(from==='roomPenNote'||from==='roomPenFault'||from==='roomPenFaultRecord')(c.penKeeps=c.penKeeps||{})[from+'|'+c.detailPen+(from==='roomPenFaultRecord'?'|'+c.penFaultId:'')]=clone(c.penDraft||{});if(from==='roomPenDetail'&&c.penKeeps)for(const k of Object.keys(c.penKeeps))if(k.endsWith('|'+c.detailPen))delete c.penKeeps[k];s.view=from==='roomScanActions'?'roomScan':from==='roomPicker'&&c.picker?c.picker.returnView:from==='roomEndTask'?'roomOverview':from==='roomTaskSows'?c.taskListBack||'roomEndTask':from==='roomTaskReceipt'?'roomHome':penParent(from);if(from==='roomPicker')c.picker=null;}
  handlePenAction(s,c,a,v);
  if(a==='room-pen-log')s.view='roomPenLog';
  if(a==='room-pen-detail'&&c.records.some(r=>r.pen===v)){c.detailPen=v;c.currentPen=v;s.view='roomPenDetail';}
