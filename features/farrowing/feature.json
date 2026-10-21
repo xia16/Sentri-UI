@@ -62,6 +62,7 @@
       "farrowing.pen-landed-live",
       "farrowing.pen-landed-plain",
       "farrowing.pen",
+      "farrowing.pen-attention",
       "farrowing.pen-log",
       "farrowing.pen-note",
       "farrowing.pen-read-note",
@@ -584,12 +585,12 @@
     [
       "farrowing.pen",
       "farrowing.pen-note",
-      "Add / Edit pen note"
+      "Note"
     ],
     [
       "farrowing.pen",
       "farrowing.pen-read-note",
-      "tap the Note notice"
+      "tap the note card"
     ],
     [
       "farrowing.pen-read-note",
@@ -599,17 +600,17 @@
     [
       "farrowing.pen",
       "farrowing.pen-feed",
-      "Feed guidance"
+      "Feed"
     ],
     [
       "farrowing.pen",
       "farrowing.pen-fault",
-      "Report equipment fault"
+      "Fault"
     ],
     [
       "farrowing.pen",
       "farrowing.pen-fault-record",
-      "tap an Equipment notice"
+      "tap a fault row under Needs attention"
     ],
     [
       "farrowing.pen-note",
@@ -2851,59 +2852,92 @@
       "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
       "preset": "room",
       "steps": [
-        "Pen B1, 1 sow, view details"
+        "[data-action=\"room-pen-detail\"][data-value=\"B1\"]"
       ],
       "figma": "",
       "notes": {
-        "purpose": "One pen's information and tools, reached from a pen header in the room list.",
+        "purpose": "One pen's page, reached from a pen header in the room list (the pen is a door, owner 2026-10-19). Everything done to the pen as a whole happens here, for this one pen, laid out as its sibling on Inspection (inspection.pen): the pen's verbs on top, then what needs someone, then how the pen is now, then its log.",
         "states": [
-          "No notices: only the four tool rows.",
-          "A note on the pen: a \"Note\" notice above the tools, opening the note.",
-          "An open equipment fault: an amber \"Equipment\" notice (device, description, \"Open · Reported 09:41 · G.H\") opening the fault.",
-          "Both: faults first, then the note."
+          "Nothing open: the verbs, Now and Pen log.",
+          "An open equipment fault or a note: a \"Needs attention\" group under the verbs, the faults first as rows, then the note as its card (farrowing.pen-attention).",
+          "Feed recorded for the pen: a Feed fact in Now (formula, method). No pen in the prototype has feed data."
         ],
         "elements": [
           {
-            "name": "Notices",
-            "at": "Pen B1",
-            "shows": "Faults and the note, listed above the tools only when they exist.",
+            "name": "Pen verbs",
+            "at": "Note",
+            "shows": "Note, Feed, Fault as Row tiles (SentriUI.rowGrid): only the verbs Farrowing has. Note opens Add / Edit pen note, Feed the feed guidance, Fault Report equipment fault.",
+            "logic": "Each tile's accessible name is its full action (\"Add pen note\", \"Feed guidance\", \"Report equipment fault\").",
+            "source": "farrowing-astra-concept.js penDetails()"
+          },
+          {
+            "name": "Needs attention",
+            "at": "Needs attention",
+            "shows": "Open faults as rows (device over its description), then the pen note as its card (text, hand and time); left out when nothing is open.",
             "logic": "Only open faults are listed; a resolved fault leaves the page and stays in the pen log. A pen holds one note.",
             "source": "farrowing-astra-concept.js penDetails(), penInfo()"
           },
           {
-            "name": "Tool rows",
-            "at": "Add pen note",
-            "shows": "Feed guidance, Report equipment fault, Add / Edit pen note, Pen log.",
-            "states": [
-              {
-                "state": "No note",
-                "when": "The pen has no note",
-                "shows": "\"Add pen note: Leave information for the next person\""
-              },
-              {
-                "state": "Has a note",
-                "when": "A note was saved",
-                "shows": "\"Edit pen note: Update the note for this pen\""
-              },
-              {
-                "state": "Feed known",
-                "when": "The pen has feed data",
-                "shows": "The feed row reads \"formula · method\"; otherwise \"View feeding information\""
-              }
-            ],
-            "source": "farrowing-astra-concept.js penDetails()"
+            "name": "Now",
+            "at": "Now",
+            "shows": "Sows: the pen's task sows and where they are (\"Farrowing\", or \"2 awaiting · 1 done\"); Piglets alive with the dead beside them, once a sow in the pen has farrowed; Feed when recorded.",
+            "logic": "Counts every task sow in the pen on the room list, ignoring the current tab and filter (as the pen header does). No zeros: Piglets is left out before any sow farrows, and dead is said only when there are any.",
+            "source": "farrowing-astra-concept.js penDetails(), penSowStates()"
           }
         ],
         "edge": [
-          "The header counts every task sow in the pen, ignoring the current tab and filter.",
-          "Notes, faults and log entries belong to the pen, not the sow, and are shared by every drawer of that pen within the unit. The prototype starts with none and forgets them on reload."
+          "Notes, faults, drafts and log entries belong to the pen, not the sow, and are shared by every drawer of that pen within the unit. The prototype starts with none and forgets them on reload."
         ],
         "issues": [
-          "Whose feature the pen tools are is unclear: the same pen sheet, note, fault and log flows are drawn in Inspection (see the decision \"Pen tools are drawn in Farrowing and in Inspection\")."
+          "Whose feature the pen tools are is unclear: the same pen page, note, fault and log flows are drawn in Inspection (see the decision \"Pen tools are drawn in Farrowing and in Inspection\")."
         ],
         "rules": [
-          "The sheet's title is the job, so it has no second heading \"Pen information\" over the tool rows (Owner decision 2026-10-10)."
+          "The pen is a door, not a tick; its verbs on top, then what needs someone (owner, 2026-10-19).",
+          "The page's title is the pen, so it has no second heading such as \"Pen information\" (Owner decision 2026-10-10)."
         ]
+      }
+    },
+    {
+      "id": "farrowing.pen-attention",
+      "name": "Pen · needs attention",
+      "zh": "栏位 · 需要处理",
+      "status": "in-design",
+      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+      "preset": "room",
+      "steps": [
+        "[data-action=\"room-pen-detail\"][data-value=\"B1\"]",
+        "[data-action=\"room-pen-fault\"]",
+        "[data-picker-key=\"pen:device\"]",
+        "[data-action=\"picker-select\"][data-value=\"Feeding station\"]",
+        {
+          "fill": "[data-pen-field=\"description\"]",
+          "text": "Feeder is jammed and drops no feed."
+        },
+        "[data-action=\"room-pen-save-fault\"]",
+        "[data-action=\"room-pen-note\"]",
+        {
+          "fill": "[data-pen-field=\"note\"]",
+          "text": "Water line leaks at the back of the pen. Check again after feeding."
+        },
+        "[data-action=\"room-pen-save-note\"]"
+      ],
+      "figma": "",
+      "notes": {
+        "purpose": "The pen page with an open equipment fault and a note: Needs attention sits under the verbs, the fault row first, then the note card.",
+        "states": [
+          "The fault row opens its record (Resolve lives there); the note card opens the note."
+        ],
+        "elements": [
+          {
+            "name": "Needs attention",
+            "at": "Needs attention",
+            "shows": "The open fault (Feeding station · Feeder is jammed and drops no feed.), then the note with its hand and time.",
+            "source": "farrowing-astra-concept.js penDetails()",
+            "logic": "Faults first, then the note; both are doors (the fault to its record, the note to its page)."
+          }
+        ],
+        "edge": [],
+        "issues": []
       }
     },
     {
@@ -2914,8 +2948,8 @@
       "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
       "preset": "room",
       "steps": [
-        "Pen B1, 1 sow, view details",
-        "Pen log"
+        "[data-action=\"room-pen-detail\"][data-value=\"B1\"]",
+        "[data-action=\"room-pen-log\"]"
       ],
       "figma": "",
       "notes": {
@@ -2946,8 +2980,8 @@
       "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
       "preset": "room",
       "steps": [
-        "Pen B1, 1 sow, view details",
-        "Add pen note"
+        "[data-action=\"room-pen-detail\"][data-value=\"B1\"]",
+        "[data-action=\"room-pen-note\"]"
       ],
       "figma": "",
       "notes": {
@@ -2962,7 +2996,7 @@
           }
         ],
         "edge": [
-          "Back discards the draft; nothing is kept for the pen until Save."
+          "Back keeps the draft for this pen; it is offered again on reopen and dropped only by Save."
         ],
         "issues": []
       }
@@ -2975,13 +3009,13 @@
       "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
       "preset": "room",
       "steps": [
-        "Pen B1, 1 sow, view details",
-        "Add pen note",
+        "[data-action=\"room-pen-detail\"][data-value=\"B1\"]",
+        "[data-action=\"room-pen-note\"]",
         {
           "fill": "[data-pen-field=\"note\"]",
           "text": "Water line leaks at the back of the pen. Check again after feeding."
         },
-        "Save note",
+        "[data-action=\"room-pen-save-note\"]",
         "[data-action=\"room-pen-read-note\"]"
       ],
       "figma": "",
@@ -2997,7 +3031,7 @@
           }
         ],
         "edge": [
-          "The page exists only while the pen has a note; the pen page shows the \"Note\" notice that opens it."
+          "The page exists only while the pen has a note; the pen page shows the note card that opens it."
         ],
         "issues": []
       }
@@ -3010,8 +3044,8 @@
       "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
       "preset": "room",
       "steps": [
-        "Pen B1, 1 sow, view details",
-        "Feed guidance"
+        "[data-action=\"room-pen-detail\"][data-value=\"B1\"]",
+        "[data-action=\"room-pen-feed\"]"
       ],
       "figma": "",
       "notes": {
@@ -3036,8 +3070,8 @@
       "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
       "preset": "room",
       "steps": [
-        "Pen B1, 1 sow, view details",
-        "Report equipment fault"
+        "[data-action=\"room-pen-detail\"][data-value=\"B1\"]",
+        "[data-action=\"room-pen-fault\"]"
       ],
       "figma": "",
       "notes": {
@@ -3066,7 +3100,7 @@
           }
         ],
         "edge": [
-          "Back drops the draft."
+          "Back keeps the draft for this pen (device, name, description); Report fault drops it."
         ],
         "issues": []
       }
@@ -3079,10 +3113,10 @@
       "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
       "preset": "room",
       "steps": [
-        "Pen B1, 1 sow, view details",
-        "Report equipment fault",
-        "Select",
-        "Feeding station",
+        "[data-action=\"room-pen-detail\"][data-value=\"B1\"]",
+        "[data-action=\"room-pen-fault\"]",
+        "[data-picker-key=\"pen:device\"]",
+        "[data-action=\"picker-select\"][data-value=\"Feeding station\"]",
         {
           "fill": "[data-pen-field=\"description\"]",
           "text": "Feeder is jammed and drops no feed."
@@ -3108,7 +3142,8 @@
           }
         ],
         "edge": [
-          "The Resolved state is built but no door reaches it: a resolved fault leaves the pen page, and pen log entries are not links."
+          "The Resolved state is built but no door reaches it: a resolved fault leaves the pen page, and pen log entries are not links.",
+          "A typed resolution note is kept for that fault through Back, until Resolve fault."
         ],
         "issues": []
       }
@@ -3137,7 +3172,7 @@
             "at": "Ear tag or pen",
             "shows": "A full-height page, not a drawer. The field is pinned at the top and focused when the page opens: a search icon, the typed text, a clear ✕ (only once something is typed), a scan icon button inside the field and Cancel beside it. No unit is named in the header: the search covers every unit.",
             "rule": "Cancel returns to the room list; the clear ✕ empties the field and keeps the page; the scan icon opens Scan ear tags. The prototype's field asks for plain text with no auto-capital and no suggestions, because a web page cannot ask for a number-first keyboard. Natively the keyboard is number-first with an ABC switch: iOS numbersAndPunctuation, and on Android a number-first keyboard with a 123/ABC toggle.",
-            "source": "farrowing-astra-concept.js searchPage()"
+            "source": "farrowing-astra-concept.js searchPage() on SentriUI.findPage (components/Lookup)"
           }
         ],
         "controls": [
@@ -3254,7 +3289,7 @@
             "at": "Hold the reader to an ear tag",
             "shows": "A scan icon, \"Hold the reader to an ear tag\" and \"Each sow you scan appears here.\" Nothing else on the page but the header and the footer's Stop scanning.",
             "rule": "The first scan replaces this with the list. If the worker stops scanning before any scan, the line reads \"Scanning is stopped\" / \"Resume scanning to add sows.\"",
-            "source": "farrowing-astra-concept.js scanPage()"
+            "source": "farrowing-astra-concept.js scanPage() on SentriUI.scanPage (components/Lookup)"
           },
           {
             "name": "Footer",
@@ -3278,7 +3313,7 @@
               }
             ],
             "rule": "Stop scanning only pauses listening: the list stays. The footer is the only Scanning status (owner, 2026-10-20: a second status in the body repeated it).",
-            "source": "farrowing-astra-concept.js scanPage()"
+            "source": "farrowing-astra-concept.js scanPage() on SentriUI.scanPage (components/Lookup)"
           }
         ],
         "controls": [
@@ -3324,7 +3359,7 @@
             "at": "Scanner not connected",
             "shows": "A scan icon, \"Scanner not connected\" and \"Turn on the tag reader and pair it in your phone's Bluetooth settings. Scanning starts as soon as it connects.\" There are no buttons: the back arrow leaves.",
             "rule": "The page changes to \"Hold the reader to an ear tag\" by itself once a reader connects.",
-            "source": "farrowing-astra-concept.js scanPage()"
+            "source": "farrowing-astra-concept.js scanPage() on SentriUI.scanPage (components/Lookup)"
           }
         ],
         "copy": [
@@ -3361,7 +3396,7 @@
             "shows": "The sows scanned in this visit, one white card per unit under its plain section heading (\"Unit 7\", \"Unit 6\"), this unit first, newest scan first within each card; no count beside the heading. Every row is the design system's Row, animal variant with the sow's Farrowing state on the right (the room's row, without the initials so the line under the ear tag stays on one line (\"Pen B1 · 1h ago\"), the same in every unit because the heading names the unit), drawn as a select + door.",
             "logic": "A sow is added the first time she is scanned: her row slides in at the top of her unit's card and the rows under it glide down (no jump); a unit's card fades in with its heading the first time one of its sows is scanned. Scanning her again adds nothing. Either way her row takes a soft tint for 1.6 s, then fades, and is brought into view, so the worker finds her after looking up from the pig. Each row keeps its own tint, so scans in quick succession light row after row and none cuts another short. The list stays while the worker opens a sow and comes back.",
             "rule": "The tick box selects; the rest of the row opens her. A sow in this unit opens her farrowing drawer, and Back returns to this list; a sow in another unit opens the same drawer (its subtitle names her unit, \"Unit 6 · A2 / Parity 4\"), and Back returns here too. The scanner is always listening: there is no \"ready for the next tag\" banner and no \"not found\" row.",
-            "source": "farrowing-astra-concept.js scanPage(), scanAdd(), sowRow()"
+            "source": "farrowing-astra-concept.js scanPage() on SentriUI.scanPage (components/Lookup), scanAdd(), sowRow()"
           }
         ],
         "controls": [],
@@ -3396,7 +3431,7 @@
             "at": "004318",
             "shows": "Her row takes the pale progress wash (blue), the same for a new sow and for a repeat scan. Not the well tint, which marks a ticked row, and not amber or red, which are status.",
             "logic": "Every scan lights its row on its own clock and brings it into view smoothly; the tint fades over about a second when its 1.6 s are up. A new row slides in and the rows under it glide down. Reduced motion keeps the tint and drops the slide and the fade.",
-            "source": "farrowing-astra-concept.js scanAdd(), scanLights(), scanGlide(); Row's Just scanned state (data-arrival, design system)"
+            "source": "farrowing-astra-concept.js scanAdd(); SentriUI.scanArrive(), scanPlaces(), scanGlide() (components/Lookup); Row's Just scanned state (data-arrival, design system)"
           }
         ],
         "controls": [],
@@ -3432,7 +3467,7 @@
             "at": "Actions",
             "shows": "The count \"2 sows selected\" on the left, as plain text with nothing to tap, and the primary \"Actions\" (the word Actions, with the more glyph) on the right, in place of Stop scanning.",
             "rule": "To untick a sow, tap her box in the list; there is no separate review of the selection. Actions opens the Actions sheet. Scanning goes on while sows are ticked, and a new scan arrives unticked. Unticking the last sow brings Stop scanning back.",
-            "source": "farrowing-astra-concept.js scanPage(), scanAction()"
+            "source": "farrowing-astra-concept.js scanPage() on SentriUI.scanPage (components/Lookup), scanAction()"
           }
         ],
         "copy": [
@@ -3464,7 +3499,7 @@
             "at": "Resume scanning",
             "shows": "The footer's one full-width button, now primary with the scan glyph.",
             "rule": "While stopped the reader adds nothing (a scan is ignored). The list and any ticks stay, and ticking still works. Resume scanning listens again.",
-            "source": "farrowing-astra-concept.js scanPage(), scanAction()"
+            "source": "farrowing-astra-concept.js scanPage() on SentriUI.scanPage (components/Lookup), scanAction()"
           }
         ],
         "copy": [

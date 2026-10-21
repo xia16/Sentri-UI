@@ -57,3 +57,38 @@ The law and its boards fix the design (two headers, the line's three tests); the
 - Footers: fostering's primary stays on one line at 56px in Chinese at 390; Find a pig's primary is "Search".
 - Reach: 153 screens move, all in this change's features; 138 identical; none broken. npm test 674 pass; legibility and spacing pass on every moved screen; farrowing scenarios 87 of 87 in EN (ZH blocked on main as well).
 - **Better because** each header says one thing the same way everywhere, and every fact it no longer carries has a designed place in the body.
+
+# Find a pig and Scan ear tags (2026-10-20)
+
+Scope: Home's scan drawer (bottom bar) and Find a pig or pen drawer (Toolbox), and their results drawer. They now open the design system's Lookup pages, as Farrowing and Inspection do.
+
+## Keep
+
+- The two entrances: Scan in the middle of the bottom bar, Find a pig or pen in Toolbox.
+- Search by part of a tag or a pen.
+- One Back returns to where the worker came from.
+
+## Problems
+
+- **major** · Scan was a form: a typed tag and "Find sample pig" (owner 2026-10-12: the reader always listens, each scan adds the pig to a list).
+- **major** · Search needed a whole tag or pen code and a Search button, then opened a second drawer of results.
+- **major** · A result opened a task in its unit, not the pig (owner, 2026-10-20: from Home a pig opens her pig record).
+- **minor** · The result row was a title "000320 · Pen A1" with a task and batch line, not the animal row.
+
+## Parts
+
+| Part | Drawn by today | The component whose job it is | Keep / fix / cut |
+|---|---|---|---|
+| Scan drawer | page-built (`home-astra-prototype.js` scan()) | Lookup (scan) | **fix** |
+| Find drawer and results drawer | page-built form and Row list | Lookup (find) | **fix** |
+| A pig's record | none (a task opened) | the Inspection pig record, embedded | **fix** |
+| Bulk Actions | none | More actions' verb grid (Row tile) | **new** |
+
+## Self-crit
+
+#### Final look (the pushed head of claude/adoring-antonelli-34e06a; its screens are b61dca2's, which the gate rendered at 390 and 360 against main 6f747c0: mechanical pass)
+- Problems fixed: scan collects pigs hands-free; Find follows typing on one page; a pig opens her record; rows are the animal row.
+- Keep as strong: both entrances unchanged; Back returns to Home or Toolbox in one tap.
+- Squint: Find, the field, then the first card; Scan, the title, the rows, the footer's one act.
+- **Better because** Home's Scan and Find are the same pages the worker uses in Farrowing and Inspection, and a pig opens the pig.
+- Known gap: the four bulk actions open nothing yet from Home (a notice says so).

@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lookup · find</title><style>
+.ph{position:relative;display:flex;flex-direction:column;height:var(--phone-height);max-width:var(--phone-width);margin:0 auto var(--space-16);overflow:hidden;background:var(--paper);font-family:var(--font-sans);color:var(--ink);border:1px solid var(--line);border-radius:var(--radius-device)}
+.ph .statusbar{display:flex;justify-content:space-between;align-items:center;height:var(--statusbar-height);padding:0 var(--space-24);font:700 var(--type-panel-title-size) var(--font-sans)}
+</style></head><body>
+<div class="ph" data-state="Empty · nothing listed before typing" data-demo="empty"></div>
+<div class="ph" data-state="Results · this unit first, then the others" data-demo="results"></div>
+<div class="ph" data-state="No match" data-demo="none"></div>
+<div class="ph" data-state="Long tag · 12 digits" data-demo="long"></div>
+<div class="ph" data-state="No reader · no scan icon" data-demo="noscan"></div>
+<div class="ph" data-state="Chinese · results" data-demo="zh"></div>
+<script>
+// Calls copied from the live screens: Farrowing's Find a sow, Inspection's and Home's Find a pig.
+const UI=window.SentriUI;
+const bar='<div class="statusbar" aria-hidden="true"><span>9:41</span></div>';
+const EN={placeholder:'Ear tag or pen',hint:'Type part of an ear tag or a pen, or scan a tag. Searches every unit.',none:q=>'No pig matching “'+q+'” in any unit.',pen:p=>'Pen '+p,unit:u=>'Unit '+u,cancel:'Cancel',clear:'Clear',scan:'Scan ear tag'};
+const ZH={placeholder:'耳标或栏位',hint:'输入耳标或栏位的一部分，或扫描耳标。搜索所有单元。',none:q=>'所有单元中没有与“'+q+'”匹配的猪只。',pen:p=>p+'栏',unit:u=>u+'单元',cancel:'取消',clear:'清除',scan:'扫描耳标'};
+const PIGS=[{code:'000306',pen:'C2',unit:7},{code:'000430',pen:'A2',unit:6},{code:'003012',pen:'A4',unit:6}];
+function page(query,pigs,t=EN,o={}){
+ const q=query.trim().toLowerCase(),units=[...new Set(pigs.map(p=>p.unit))];
+ const groups=units.map(u=>({title:t.unit(u),rows:pigs.filter(p=>p.unit===u).map(p=>UI.findRow({code:p.code,place:t.pen(p.pen),query:q,action:'open',value:p.code}))}));
+ return UI.findPage(Object.assign({query,placeholder:t.placeholder,results:UI.findResults({query,groups,hint:t.hint,none:t.none(query.trim())}),scan:{action:'scan',label:t.scan},clear:{action:'clear',label:t.clear},cancel:{action:'back',label:t.cancel},bar},o));
+}
+const R={
+ empty:()=>page('',[]),
+ results:()=>page('30',PIGS),
+ none:()=>page('909',[]),
+ long:()=>page('4471',[{code:'276000144710',pen:'B12',unit:7},{code:'276000144719',pen:'B14',unit:7}]),
+ noscan:()=>page('30',PIGS,EN,{scan:null}),
+ zh:()=>page('30',PIGS,ZH)
+};
+document.querySelectorAll('[data-state]').forEach(el=>{el.innerHTML=R[el.dataset.demo]();});
+</script></body></html>
