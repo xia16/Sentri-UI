@@ -25,12 +25,28 @@ const navItem = (nav, key, html, count, onclick) => {
 
 /* ---------- Components ---------- */
 let initialVariant = new URLSearchParams(location.search).get('variant');
-/* the groups come from atlas.json (ux/design-system/components/_groups.json), filled in renderComponents */
+/* the groups come from atlas.json (ux/design-system/components/_groups.json), filled in renderComponents; they follow the
+   developer's job (owner, 2026-10-21), the task page's parts last, then the old names that still resolve */
 let COMPONENT_GROUPS = [];
-/* the task page's README-only parts: one nav entry, the skeleton demo, until each is merged into its group */
-const TASK_GROUP = 'Task pages';
+const TASK_GROUP = 'Task page parts', COMPAT_GROUP = 'Compatibility and retired';
 const SKELETON_DEMO = `${DS}/components/task-skeleton-demo.html`;
+/* measured, not guessed: which atlas screens draw each part (scripts/component-usage.mjs) */
+const USAGE = '/atlas/component-usage.json';
+const MATURITY = Object.assign({}, STATUS, { candidate: 'Candidate', retired: 'Retired' });
 const nameWords = (n) => n.replace(/([a-z])([A-Z])/g, '$1 $2');
+
+/* what a component's README says first: its job (the first plain sentence; a status line is history, as in
+   scripts/component-jobs.mjs), the APIs it names, the parts it links to, and whether it calls itself a candidate */
+function readmeFacts(readme, name) {
+  const lines = readme.split(/\r?\n/).map((l) => l.trim()).filter((l) => l && !/^[#>|`!-]/.test(l));
+  const plain = lines.find((l) => !l.startsWith('**')) || lines[0] || '';
+  const job = plain.replace(/\[([^\]]+)\]\([^)]*\)/g, '$1').replace(/[*`]/g, '').split(/(?<=\.)\s/)[0];
+  const all = [...new Set(readme.match(/\bSentri(?:UI|Task)\.[a-zA-Z]+\b/g) || [])], own = '.' + name.replace(/^Task(?=[A-Z])/, '').toLowerCase();
+  const rank = (a) => (a.toLowerCase().endsWith(own) ? 0 : a.toLowerCase().includes(own) ? 1 : 2);
+  const apis = all.map((a, i) => [a, i]).sort((x, y) => rank(x[0]) - rank(y[0]) || x[1] - y[1]).map((x) => x[0]); // its own first
+  const near = [...new Set([...readme.matchAll(/\(\.\.\/([A-Z][A-Za-z]+)\/README\.md[^)]*\)/g)].map((m) => m[1]).filter((n) => n !== name))];
+  return { job, apis, near, candidate: /\bcandidate\b/i.test(readme.slice(0, 400)) };
+}
 
 /* a preview rendered styled: the previews expect a host that preloads tokens, the bundle and the fonts */
 async function styledPreview(name, file = 'preview.html') {
@@ -54,9 +70,15 @@ async function styledPreview(name, file = 'preview.html') {
   return box;
 }
 
-function usedBy(name) {
-  const re = new RegExp('\\b(' + [name, nameWords(name)].filter((v, i, a) => a.indexOf(v) === i).map((v) => v.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')\\b', 'i');
-  return Object.values(screenIndex()).filter((s) => s.notes && re.test(JSON.stringify([s.notes.elements, s.notes.controls])));
+/* a part with no specimen of its own (most task page parts): the first atlas screen that draws it, live at 390 */
+function sourceFrame(id) {
+  const s = screenIndex()[id];
+  if (!s || !s.url) return null;
+  const box = el(`<figure class="srcframe"><figcaption>On its screen: <a href="?feature=${esc(s.feature.id)}&screen=${esc(id)}" data-sid="${esc(id)}">${esc(s.feature.name)} · ${esc(s.name)}</a></figcaption></figure>`);
+  const f = el('<iframe title="Source screen"></iframe>');
+  f.src = s.url + (s.url.includes('?') ? '&' : '?') + 'screen=' + encodeURIComponent(id);
+  box.append(f);
+  return box;
 }
 
 const SCORE_KEYS = ['clarity', 'budget', 'hierarchy', 'spacing', 'broken'], PASS = 8;
@@ -83,6 +105,12 @@ function gateBlock(g, status) {
   box.querySelectorAll('.fl').forEach((b2) => { b2.onclick = () => { const d = b2.nextElementSibling; d.hidden = !d.hidden; b2.classList.toggle('open', !d.hidden); }; });
   return box;
 }
+/* the agent review, last on a page and closed: a developer reads the job and the API first */
+function reviewBlock(g, status) {
+  const v = verdictOf(g), box = el(`<details class="crev"><summary>Review history${v ? ' · ' + esc(v.text) : ''}</summary></details>`);
+  box.append(gateBlock(g, status));
+  return box;
+}
 
 /* the state grid: every [data-state] element of <dir>variants/<id>.html in its own labelled cell, at phone width (null when the file is missing or has no states) */
 async function stateGridAt(dir, id, opts = {}) {
@@ -98,7 +126,7 @@ async function stateGridAt(dir, id, opts = {}) {
   const grid = el(`<div class="sgrid${opts.bare ? ' bare' : ''}"></div>`);
   states.forEach((s) => {
     { const h = s.querySelector(':scope > h2, :scope > h3'); if (h && h.textContent.trim().toLowerCase() === s.getAttribute('data-state').trim().toLowerCase()) h.remove(); } // the cell caption already names the state
-    const cell = el(`<figure class="scell"><figcaption>${esc(opts.caption || s.getAttribute('data-state'))}</figcaption></figure>`), f = el('<iframe title="State"></iframe>');
+    const cell = el(`<figure class="scell"><figcaption>${opts.captionHtml || esc(opts.caption || s.getAttribute('data-state'))}</figcaption></figure>`), f = el('<iframe title="State"></iframe>');
     f.style.height = '20px'; f.scrolling = 'no'; f.srcdoc = `<!doctype html><html><head>${inject}${head}<style>html,body{margin:0;overflow:hidden;background:var(--app-background);color:var(--ink);font-family:var(--font-sans)}body{padding:${opts.bare ? '0' : 'var(--space-16)'}}</style></head><body>${s.outerHTML}${tail}</body></html>`;
     f.onload = () => { try { const d = f.contentDocument, w = d.defaultView;
       const own = [...d.querySelectorAll('[data-state] *')].slice(0, 12).find((x) => { const c = w.getComputedStyle(x), r = x.getBoundingClientRect(); return parseFloat(c.borderTopWidth) > 0 && c.borderTopStyle !== 'none' && r.width > d.documentElement.clientWidth * 0.8; });
@@ -121,37 +149,92 @@ async function renderComponents() {
     comps.forEach((c) => { if (!by[c.group]) { by[c.group] = []; order.push(c.group); } by[c.group].push(c.name); });
     COMPONENT_GROUPS = order.map((g) => [g, by[g]]);
   }
+  let usage = null; try { usage = await getJson(USAGE); } catch (_) {}
+  /* a "see" entry names a part documented inside another component (Optional input → Field), so it is found by its own name */
+  /* and a part's job words ("Stepper": "count pigs …"), what a developer types for the job, searched with its name */
+  let sees = [], jobWords = {}; try { const gs = await getJson(`${DS}/components/_groups.json`); sees = gs.flatMap((g) => (g.see || []).map((s) => Object.assign({ group: g.group }, s))); jobWords = Object.assign({}, ...gs.map((g) => g.words || {})); } catch (_) {}
+  const groupOf = (n) => (COMPONENT_GROUPS.find((g) => g[1].includes(n)) || [''])[0];
   const stOf = (n) => (CI[n] && CI[n].status) || 'in-design';
-  const { pane, nav } = libShell('Mobile app components', 'The mobile design system. A component is set when the first feature that uses it freezes.');
-  const count = COMPONENT_GROUPS.reduce((n, g) => n + g[1].length, 0) + 1;
+  const lifeOf = (n) => (groupOf(n) !== COMPAT_GROUP ? 'Current' : stOf(n) === 'retired' ? 'Retired' : 'Compatibility');
+  const readmes = {};
+  const factsOf = (n) => readmes[n] || (readmes[n] = getText(`${DS}/components/${n}/README.md`).then((t) => Object.assign({ text: t }, readmeFacts(t, n)), () => ({ text: '', job: '', apis: [], near: [], candidate: false })));
+  const maturityOf = (n, f) => (stOf(n) === 'in-design' && f && f.candidate ? 'candidate' : stOf(n));
+  const count = COMPONENT_GROUPS.filter((g) => g[0] !== COMPAT_GROUP).reduce((n, g) => n + g[1].length, 0);
+  const { pane, nav } = libShell('Mobile app components', `Mobile app · ${count} parts, grouped by the job they do. A part is set when the first feature using it freezes.`);
   let ds = {}; try { ds = await getJson(`${DS}/design-system.json`); } catch (_) {}
-  const pages = { _brand: 'Brand book', _foundations: 'Foundations', _icons: 'Icons' };
+  const pages = { _brand: 'Brand book', _foundations: 'Tokens', _icons: 'Icons' };
+  const compat = el(`<details class="compat"><summary>${esc(COMPAT_GROUP)}</summary></details>`);
   const go = (key) => {
-    setParam('component', key === 'Cover' ? null : key);
+    setParam('component', key === 'Overview' ? null : key);
     setParam('variant', null);
     nav.querySelectorAll('button').forEach((b) => b.setAttribute('aria-current', b.dataset.k === key));
+    if (groupOf(key) === COMPAT_GROUP) compat.open = true;
     pane.scrollTop = 0; pane.innerHTML = '';
-    ({ Cover: pageCover, _brand: pageBrand, _foundations: pageFoundations, _icons: pageIcons, _task: pageTask }[key] || pageComponent)(key);
+    ({ Overview: pageOverview, _brand: pageBrand, _foundations: pageFoundations, _icons: pageIcons, _task: pageTask }[key] || pageComponent)(key);
   };
-  navItem(nav, 'Cover', 'Cover', null, () => go('Cover'));
+
+  /* navigation: the job search, the start pages, then the groups; the old names collapse at the foot */
+  const search = el('<input class="libsearch" type="search" placeholder="Find a part: count pigs, choose a medicine…" aria-label="Find a component by its job, name or API">');
+  nav.before(search);
+  navItem(nav, 'Overview', 'Overview', null, () => go('Overview'));
   Object.entries(pages).forEach(([k, n]) => navItem(nav, k, n, null, () => go(k)));
-  COMPONENT_GROUPS.filter((g) => g[0] !== TASK_GROUP).forEach(([g, names]) => {
-    nav.append(el(`<h5>${esc(g)}</h5>`));
-    names.forEach((n) => navItem(nav, n, `${dot(stOf(n))}${esc(n)}`, null, () => go(n)));
-  });
-  nav.append(el(`<h5>${TASK_GROUP}</h5>`));
-  navItem(nav, '_task', `${dot('in-design')}Task skeleton (to be merged)`, null, () => go('_task'));
-  document.querySelector('.lib aside > p').textContent = `Mobile app · ${count} parts. ` + 'A part is set when the first feature using it freezes.';
+  for (const [g, names] of COMPONENT_GROUPS) {
+    const host = g === COMPAT_GROUP ? compat : nav;
+    if (g === COMPAT_GROUP) { compat.querySelector('summary').textContent = `${g} · ${names.length}`; nav.append(compat); } else nav.append(el(`<h5>${esc(g)}</h5>`));
+    if (g === TASK_GROUP) navItem(host, '_task', `${dot('in-design')}Task skeleton`, null, () => go('_task'));
+    names.forEach((n) => navItem(host, n, `${dot(stOf(n))}${esc(n)}`, null, () => go(n)));
+    sees.filter((s) => s.group === g).forEach((s) => navItem(host, 'see:' + s.name, `<span class="see">${esc(s.name)} → ${esc(s.component)}</span>`, null, () => go(s.component)));
+  }
+  /* the search reads each part's name, its APIs, its job and its README; every word typed must appear somewhere. The nav keeps
+     the matches in their groups; the best ones (name or API first, then the job, then how often the README says it) are listed
+     under the field, and Enter opens the first */
+  const index = {};
+  const entry = (k, head, job, text) => { index[k] = { head: head.toLowerCase(), job: (job || '').toLowerCase(), text: (text || '').toLowerCase() }; };
+  Object.entries(pages).forEach(([k, n]) => entry(k, n));
+  entry('Overview', 'overview start'); entry('_task', 'task skeleton', 'how a task page is built from shared parts');
+  sees.forEach((s) => entry('see:' + s.name, `${s.name} ${s.component}`, s.words));
+  const label = (k) => (k.startsWith('see:') ? k.slice(4) : pages[k] || (k === '_task' ? 'Task skeleton' : k));
+  const words = (q) => q.toLowerCase().split(/\s+/).filter((w) => w.length > 1).map((w) => (w.length > 3 ? w.replace(/s$/, '') : w));
+  const score = (k, ws) => {
+    const x = index[k] || { head: k.toLowerCase(), job: '', text: '' };
+    // every word somewhere, or one in the name or the job (the job says "animals" where the worker types "pigs")
+    let s = 0, all = true, strong = false;
+    for (const w of ws) { if (x.head.includes(w)) { s += 1000; strong = true; } else if (x.job.includes(w)) { s += 50; strong = true; } else if (x.text.includes(w)) s += Math.min(9, x.text.split(w).length - 1); else all = false; }
+    return all || strong ? s : 0;
+  };
+  const best = el('<div class="libbest" hidden></div>');
+  search.after(best);
+  function filter() {
+    const ws = words(search.value), on = !!ws.length;
+    const scored = [...nav.querySelectorAll('button[data-k]')].map((b) => [b, on ? score(b.dataset.k, ws) : 1]);
+    scored.forEach(([b, s]) => { b.hidden = !s; });
+    nav.querySelectorAll('h5').forEach((h) => { let n = h.nextElementSibling, any = false; while (n && n.tagName === 'BUTTON') { if (!n.hidden) any = true; n = n.nextElementSibling; } h.hidden = on && !any; });
+    compat.hidden = on && ![...compat.querySelectorAll('button')].some((b) => !b.hidden); if (on && !compat.hidden) compat.open = true;
+    const top = on ? scored.filter(([, s]) => s).sort((a, b) => b[1] - a[1]).slice(0, 4) : [];
+    best.hidden = !top.length; best.innerHTML = '';
+    top.forEach(([b]) => { const a = el(`<button type="button">${esc(label(b.dataset.k))}</button>`); a.onclick = () => b.click(); best.append(a); });
+  }
+  Promise.all(COMPONENT_GROUPS.flatMap((g) => g[1]).map(async (n) => { const f = await factsOf(n); entry(n, [n, nameWords(n), jobWords[n] || '', f.apis.join(' ')].join(' '), f.job, f.text); })).then(() => { if (search.value) filter(); });
+  search.addEventListener('input', filter);
+  search.addEventListener('keydown', (e) => { if (e.key !== 'Enter') return; const b = best.querySelector('button'); if (b) b.click(); });
 
   const compLink = (u) => { const m = u.match(/(?:^|\/)([A-Za-z]+)\/README\.md$/); return m && COMPONENT_GROUPS.some((g) => g[1].includes(m[1])) ? '?view=components&component=' + m[1] : null; };
   pane.addEventListener('click', (e) => { const a = e.target.closest('a[href^="?view=components&component="]'); if (a) { e.preventDefault(); go(new URLSearchParams(a.getAttribute('href')).get('component')); } });
+  const wireChips = (root) => root.querySelectorAll('a[data-sid]').forEach((a2) => { a2.onclick = (e) => { e.preventDefault(); const s = screenIndex()[a2.dataset.sid]; openFeature(s.feature.id, s.id); }; });
+  const compA = (n) => `<a href="?view=components&component=${esc(n)}">${esc(n)}</a>`;
 
-  async function pageCover() {
-    const f = await styledPreview('Cover'); pane.append(f || el(FAILED('the cover')));
-    const by = (st) => comps.filter((c) => c.status === st);
-    const bits = [['agent-checked', 'agent-checked'], ['in-design', 'in design'], ['placeholder', 'placeholder']].filter(([st]) => by(st).length)
-      .map(([st, w]) => `<a href="#" data-st="${st}">${by(st).length} ${w}</a>`);
-    if (bits.length) { const line = el(`<p class="cstat">${bits.join(' · ')}</p>`); pane.append(line); line.querySelectorAll('a').forEach((a) => { a.onclick = (e) => { e.preventDefault(); go(by(a.dataset.st)[0].name); }; }); }
+  /* the start page: every part with its job, by group, so a developer finds the one part whose job it is */
+  async function pageOverview() {
+    pane.append(el('<h2>Mobile app components</h2>'));
+    pane.append(el(`<p class="cjob" style="max-width:760px">Grouped by the job a part does. Search above by a job (“count pigs”), a part or an API name. Each page opens with the job, its status, its API and the screens that draw it.</p>`));
+    pane.append(el(`<p class="cline">${['agent-checked', 'in-design'].map((s) => `${dot(s)} ${esc(MATURITY[s])}`).join(' &nbsp; ')} &nbsp; Agent-checked is an agent's review, never the owner's approval.</p>`));
+    for (const [g, names] of COMPONENT_GROUPS) {
+      const facts = await Promise.all(names.map(factsOf));
+      const rows = names.map((n, i) => `<div class="jobrow">${dot(stOf(n))}${compA(n)}<span>${esc(facts[i].job)}</span></div>`).join('') +
+        sees.filter((s) => s.group === g).map((s) => `<div class="jobrow"><span class="see">${esc(s.name)}</span><span>Documented with ${compA(s.component)}</span></div>`).join('');
+      const block = g === COMPAT_GROUP ? el(`<details class="jobgroup"><summary>${esc(g)} · ${names.length}: old names that still resolve, and retired parts</summary><div class="jobs">${rows}</div></details>`) : el(`<section class="jobgroup"><h3>${esc(g)}</h3><div class="jobs">${g === TASK_GROUP ? `<div class="jobrow">${dot('in-design')}<a href="?view=components&component=_task">Task skeleton</a><span>How Farrowing's task page is built from the parts below.</span></div>` : ''}${rows}</div></section>`);
+      pane.append(block);
+    }
   }
   async function pageBrand() {
     pane.append(el('<h2>Brand book</h2>'));
@@ -170,7 +253,7 @@ async function renderComponents() {
     pane.append(el(`<ul class="aliases">${al.map(([a, n]) => `<li><span>${esc(a)}</span><span class="muted">draws</span><span>${esc(n)}</span></li>`).join('')}</ul>`));
   }
   async function pageFoundations() {
-    pane.append(el('<h2>Foundations</h2>'));
+    pane.append(el('<h2>Tokens</h2>'));
     let t; try { t = await getJson(`${DS}/tokens.json`); } catch (_) { pane.append(el(FAILED('the tokens'))); return; }
     const themes = t.color.themes || [{ id: 'light', name: 'Light' }];
     themes.forEach((th) => {
@@ -188,18 +271,34 @@ async function renderComponents() {
     pane.append(el(`<div class="scale">${t.radius.tokens.map((s) => `<div>${esc(s.name)}<code>${esc(s.value)}</code></div><div><div class="box" style="border-radius:${esc(s.value)}"></div></div><small>${esc(s.usage)}</small>`).join('')}</div>`));
   }
   async function pageTask() {
-    pane.append(el('<h2>Task skeleton (to be merged)</h2>'));
-    pane.append(el(`<div class="cmeta">${dot('in-design')}<span class="t">${esc(STATUS['in-design'])}</span></div>`));
-    pane.append(el('<p class="muted" style="max-width:720px;margin:0 0 14px">Extracted from Farrowing in one go (ADR 0003). Most of these are the task page’s structure; several duplicate a part in another group (TaskRadios is ChoiceList’s radio, TaskSection a Panel, TaskTotals and TaskMetrics are Facts) and are folded into it one merge at a time.</p>'));
-    pane.append(el(`<iframe class="preview" title="Task skeleton demo" src="${SKELETON_DEMO}" style="width:100%;height:900px;border:1px solid var(--line)"></iframe>`));
-    pane.append(el('<h3>Parts</h3>'));
+    pane.append(el('<h2>Task skeleton</h2>'));
+    pane.append(el(`<div class="cmeta"><span class="t">${esc(TASK_GROUP)}</span></div>`));
+    pane.append(el('<p class="cjob" style="max-width:760px">How Farrowing’s task page is built from shared parts (ADR 0003): the signed-off reference beside the same screen built from the parts. Each part has its own page.</p>'));
     const names = (COMPONENT_GROUPS.find((g) => g[0] === TASK_GROUP) || [0, []])[1];
-    pane.append(el(`<div class="usedby">${names.map((n) => `<a href="${DS}/components/${esc(n)}/README.md" target="_blank" rel="noopener">${esc(n)}</a>`).join('')}</div>`));
+    pane.append(el(`<p class="cline">Parts: ${names.map(compA).join(' · ')}</p>`));
+    pane.append(el(`<iframe class="preview" title="Task skeleton demo" src="${SKELETON_DEMO}" style="width:100%;height:900px;border:1px solid var(--line)"></iframe>`));
   }
+  /* the screens that draw a part, measured; zero is "not observed", never "unused" (a later state may draw it) */
+  function drawnOn(n) {
+    const u = usage && usage.components && usage.components[n];
+    if (!usage) return { ids: [], line: 'Usage not measured yet (node scripts/component-usage.mjs).' };
+    const when = `measured ${esc(usage.measured)} at ${esc(usage.commit)}`;
+    if (!u) return { ids: [], line: `Not measured (${when}).` };
+    const feats = u.features.map((f) => esc((allFeatures().find((x) => x.id === f) || { name: f }).name)).join(', ');
+    const files = u.files.length ? ` · <details class="cfiles"><summary>called from ${u.files.length} source file${u.files.length === 1 ? '' : 's'}</summary>${u.files.map((f) => `<code>${esc(f)}</code>`).join('<br>')}</details>` : '';
+    const seen = u.screens.length ? `Drawn on <b>${u.screens.length}</b> atlas screen${u.screens.length === 1 ? '' : 's'} in ${u.features.length} feature${u.features.length === 1 ? '' : 's'}: ${feats}` : 'Not observed on the atlas’s screens (each is measured in its first state)';
+    return { ids: u.screens, line: `${seen} <span class="muted">(${when})</span>${files}` };
+  }
+  /* the screen a part is shown on: one of a feature in progress first (features/_in-progress.json), the newest designs */
+  let inProgress = []; try { inProgress = (await getJson('/features/_in-progress.json')).features || []; } catch (_) {}
+  const firstShown = (ids) => { // in the atlas's own screen order, so a feature's main screen comes before its drawers
+    const ix = screenIndex(), order = Object.keys(ix).filter((id) => ids.includes(id));
+    return order.find((id) => inProgress.includes(ix[id].feature.id)) || order[0];
+  };
   async function pageComponent(name) {
-    const group = (COMPONENT_GROUPS.find((g) => g[1].includes(name)) || [''])[0];
+    const group = groupOf(name);
     const head = el(`<h2>${esc(name)}</h2>`); pane.append(head);
-    const st = stOf(name), meta = el(`<div class="cmeta">${st === 'placeholder' ? dot(st) : ''}<span class="t">${st === 'placeholder' ? esc(STATUS[st]) + ' · ' : ''}Mobile app component · ${esc(group)}</span></div>`); pane.append(meta);
+    const st = stOf(name), meta = el(`<div class="cmeta">${st === 'placeholder' ? dot(st) : ''}<span class="t">${st === 'placeholder' ? esc(STATUS[st]) + ' · ' : ''}${esc(group)}</span></div>`); pane.append(meta);
     if (st === 'placeholder') {
       const c = CI[name], idx2 = screenIndex();
       const links = (c.seenIn || []).map((id) => idx2[id] ? `<a href="?feature=${esc(idx2[id].feature.id)}&screen=${esc(id)}" data-sid="${esc(id)}">${esc(idx2[id].feature.name)} · ${esc(idx2[id].name)}</a>` : '').filter(Boolean).join(', ');
@@ -210,9 +309,12 @@ async function renderComponents() {
     }
     const gate = CI[name] && CI[name].gate;
     const slug = (t) => String(t).split(' (')[0].toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-    let readme = ''; try { readme = await getText(`${DS}/components/${name}/README.md`); } catch (_) {}
-    const cand = /candidate/i.test(readme.slice(0, 300)), adr = (readme.slice(0, 400).match(/ADR (\d{4})/) || [])[1];
-    if (cand) meta.querySelector('.t').textContent += ` · candidate${adr ? ' (ADR ' + adr + ')' : ''}`;
+    const facts = await factsOf(name), readme = facts.text;
+    /* the first screen: the job, maturity and lifecycle, the API, the screens that draw it, the parts nearby */
+    const mat = maturityOf(name, facts), life = lifeOf(name), use = drawnOn(name);
+    const near = facts.near.filter((n) => groupOf(n)).slice(0, 6);
+    const api = facts.apis.slice(0, 5).map((a) => `<code>${esc(a)}</code>`).join(' · ');
+    pane.append(el(`<div class="cintro">${facts.job ? `<p class="cjob">${esc(facts.job)}</p>` : ''}<p class="clabels"><span class="pill">${dot(mat === 'candidate' ? 'in-design' : mat)}${esc(MATURITY[mat] || mat)}</span><span class="pill life-${esc(life.toLowerCase())}">${esc(life)}</span></p>${api ? `<p class="cline">${api}${facts.apis.some((a) => a.startsWith('SentriUI.')) ? ' <span class="muted">· types in <code>components/index.d.ts</code></span>' : facts.apis.length ? ' <span class="muted">· <code>components/task-skeleton.js</code></span>' : ''}</p>` : ''}<div class="cline">${use.line}</div>${near.length ? `<p class="cline">Nearby: ${near.map(compA).join(' · ')}</p>` : ''}</div>`));
     /* variants: variants.json (the component pass) wins; else the gate's own list. A variant gets a tab only when its states are drawn. */
     const have = (CI[name] && CI[name].files) || null;   // what exists on disk (atlas.json); asking only for those keeps the console free of 404s
     let vj = null; if (!have || have.variantsJson) { try { vj = await getJson(`${DS}/components/${name}/variants.json`); } catch (_) {} }
@@ -227,33 +329,29 @@ async function renderComponents() {
     const bar = el('<div class="vtabs" role="tablist"></div>'), body = el('<div class="vbody"></div>');
     if (withStates.length) pane.append(bar);
     pane.append(body);
-    const chipsFor = (ids) => {
+    const chipsFor = (ids, none) => {
       const ix = screenIndex(), ok = (ids || []).map((x) => String(x).split(' ')[0]).filter((x) => ix[x]);
-      if (!ok.length) return '<p class="none">No screen uses this yet.</p>';
+      if (!ok.length) return `<p class="none">${esc(none)}</p>`;
       return `<div class="usedby">${ok.slice(0, 16).map((x) => `<a href="?feature=${esc(ix[x].feature.id)}&screen=${esc(x)}" data-sid="${esc(x)}">${esc(ix[x].feature.name)} · ${esc(ix[x].name)}</a>`).join('')}${ok.length > 16 ? `<span class="muted">+${ok.length - 16} more</span>` : ''}</div>`;
     };
-    const wireChips = (root) => root.querySelectorAll('a[data-sid]').forEach((a2) => { a2.onclick = (e) => { e.preventDefault(); const s = screenIndex()[a2.dataset.sid]; openFeature(s.feature.id, s.id); }; });
     const same = (v) => JSON.stringify([v.scores || null, v.findings || null]) === JSON.stringify([gate && gate.scores || null, gate && gate.findings || null]);
     async function show(id) {
       bar.querySelectorAll('button').forEach((b2) => b2.setAttribute('aria-pressed', String(b2.dataset.id === id)));
       setParam('variant', id === 'overview' ? null : id); body.innerHTML = '';
       if (id === 'overview') {
-        body.append(gateBlock(gate, st));
         // a single-variant component shows its own preview.html; without one (or with several variants) the overview is one
-        // captioned example per drawn variant, so a component that has a variant page never shows an empty overview
+        // captioned example per drawn variant, each with its own status; a part with neither shows the first screen that draws it
         const own = withStates.length > 1 ? null : await styledPreview(name);
         if (own) body.append(own);
         else if (withStates.length) { // the states live in the variant tabs
           const g = el('<div class="sgrid ovgrid"></div>');
-          for (const v of withStates) { const one = await stateGridAt(dirOf, v.id, { one: true, bare: true, caption: v.name }); if (one) g.append(...one.children); }
+          for (const v of withStates) { const vs = v.status || st; const one = await stateGridAt(dirOf, v.id, { one: true, bare: true, captionHtml: `${esc(v.name)}${vs !== st ? ` <span class="vst">${dot(vs)}${esc(MATURITY[vs] || vs)}</span>` : ''}` }); if (one) g.append(...one.children); }
           body.append(g);
-        } else body.append(el('<div class="nopreview">No preview of its own yet — built in the component pass</div>'));
+        } else body.append(sourceFrame(firstShown(use.ids)) || el('<div class="nopreview">No specimen of its own yet, and not observed on an atlas screen</div>'));
         if (without.length) body.append(el(`<p class="muted" style="margin:0 0 14px;font-size:12.5px">Variants (to be drawn in the component pass): ${without.map((v) => esc(v.name)).join(' · ')}</p>`));
-        else if (!variants.length) body.append(el('<p class="muted" style="margin:0 0 14px;font-size:12px">Variants and their states are written in the component pass.</p>'));
         if (readme) { body.append(el('<h3>Guidelines</h3>')); body.append(el(`<div class="guide doc">${md(readme.replace(/^\s*#\s+.*\r?\n/, ''), { link: compLink })}</div>`)); }
-        /* real screen ids: the variants' own usedBy plus any screen whose notes name the component */
-        const ids = [...new Set([...variants.flatMap((v) => v.usedBy || []), ...usedBy(name).map((x) => x.id)])];
-        body.append(el('<h3>Used by</h3>')); body.append(el(chipsFor(ids)));
+        body.append(el('<h3>Screens that draw it</h3>')); body.append(el(chipsFor(use.ids, 'Not observed on the atlas’s screens.')));
+        body.append(reviewBlock(gate, st));
         wireChips(body); return;
       }
       const v = variants.find((x) => x.id === id); if (!v) return;
@@ -263,16 +361,16 @@ async function renderComponents() {
         u.querySelectorAll('[data-vt]').forEach((a2) => { a2.onclick = (e) => { e.preventDefault(); if (tabs.some((t) => t.id === a2.dataset.vt)) show(a2.dataset.vt); }; });
         body.append(u);
       }
-      if (!same(v) && (v.scores || v.findings)) body.append(gateBlock({ scores: v.scores, findings: v.findings }, v.status || 'in-design'));
       body.append(drawn[v.id]);
-      body.append(el('<h3>Used by</h3>')); body.append(el(chipsFor(v.usedBy))); wireChips(body);
+      body.append(el('<h3>Listed for this variant</h3>')); body.append(el(chipsFor(v.usedBy, 'No screen listed for this variant.')));
+      if (!same(v) && (v.scores || v.findings)) body.append(reviewBlock({ scores: v.scores, findings: v.findings }, v.status || 'in-design'));
+      wireChips(body);
     }
     tabs.forEach((t) => { const b2 = el(`<button role="tab" data-id="${esc(t.id)}" aria-pressed="false">${t.id !== 'overview' ? dot(t.status || 'in-design') : ''}${esc(t.name)}</button>`); b2.onclick = () => show(t.id); bar.append(b2); });
     show(tabs.some((t) => t.id === want) ? want : 'overview');
   }
   const want = q.get('component');
-  const inTask = want && (COMPONENT_GROUPS.find((g) => g[0] === TASK_GROUP) || [0, []])[1].includes(want);
-  go(inTask || want === '_task' ? '_task' : want && (pages[want] || want === 'Cover' || COMPONENT_GROUPS.some((g) => g[1].includes(want))) ? want : 'Cover');
+  go(want && (pages[want] || want === '_task' || COMPONENT_GROUPS.some((g) => g[1].includes(want))) ? want : 'Overview');
 }
 
 /* ---------- Copy: one registry; screens refer to strings by id ---------- */
