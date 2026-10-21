@@ -10,6 +10,8 @@ export const HARD = ['wrong-fact', 'lost-draft', 'dead-end', 'unreachable-contro
 
 export { screensOf, DS_FEATURE, componentPage, idPath, componentPagesOf, componentsTouched, pageOf, pageAssets } from './atlas-screens.mjs';
 import { DS_FEATURE, componentPage, componentsTouched, pageOf } from './atlas-screens.mjs';
+import { ASSERTION_KINDS } from './scenario-tree.mjs';
+import { parse } from './vendor/acorn.mjs';
 import { holderAlive, pidAlive, startOf } from './process-start.mjs';
 
 // file -> the features whose screens load it: each screen's page, and what that page loads (assetsOf: page -> files).
@@ -42,20 +44,83 @@ export function outcomeLeaves(spec) {
   return n;
 }
 
-// A spec's outcome leaves by id: { status, checks: how many assertions the leaf makes (visible and record) }.
+// A spec's outcome leaves by id: { status, checks: how many assertions the leaf makes (visible and record), node, runs: the
+// language-width pairs it asks for }.
 function outcomesById(spec) {
-  const m = new Map();
-  (function walk(nodes) { for (const x of nodes || []) { if (x.type === 'outcome') m.set(x.id, { status: x.status || null, checks: (x.visible || []).length + (x.record || []).length }); walk(x.children); } })(spec?.tree);
+  const m = new Map(), D = spec?.defaults || {};
+  const runs = (x) => (x.langs || D.langs || ['en']).flatMap((g) => (x.widths || D.widths || [390]).map((w) => `${g}-${w}`));
+  (function walk(nodes) { for (const x of nodes || []) { if (x.type === 'outcome') m.set(x.id, { status: x.status || null, checks: (x.visible || []).length + (x.record || []).length, node: x, runs: runs(x) }); walk(x.children); } })(spec?.tree);
   return m;
 }
 
+// ---------- assertion contracts (Codex audit, 2026-10-21) ----------
+// What an assertion holds is its contract: everything but its prose (`says`). Comparing counts let `window.saved === true` become
+// `true`. A contract can't be ranked in general, so a kept leaf's assertions are compared by target (the kind and what it looks
+// at): the same target with a weaker qualifier, or a new assertion that holds on any page, is lost coverage; a new target (a design
+// change rewrote what the leaf checks) is listed for the owner and kept.
+const kindOf = (a) => (a && typeof a === 'object' ? ASSERTION_KINDS.find((k) => k in a) || null : null);
+const enOf = (t) => (typeof t === 'string' ? t : t && typeof t === 'object' ? t.en ?? null : null);
+// keys sorted at every depth ({ en, zh } included: a replacer list would drop nested keys)
+const sortedJson = (v) => (Array.isArray(v) ? `[${v.map(sortedJson).join(',')}]` : v && typeof v === 'object' ? `{${Object.keys(v).sort().map((k) => `${JSON.stringify(k)}:${sortedJson(v[k])}`).join(',')}}` : JSON.stringify(v ?? null));
+const contractOf = (a) => { const { says, ...rest } = a || {}; return sortedJson(rest); };
+const shown = (a) => !(a.absent || a.is === 'absent');
+const targetOf = (a) => { const k = kindOf(a); return JSON.stringify([k, k === 'text' || k === 'verb' ? enOf(a[k]) : a[k], shown(a)]); };
+const scopeOf = (a) => (a.in && a.in !== 'phone' ? a.in : 'phone');
+// why c (same target) holds less than b, or null
+function weaker(b, c) {
+  if (b.hard && !c.hard) return `drops hard ${b.hard}`;
+  const k = kindOf(b);
+  if ((k === 'text' || k === 'verb') && b[k]?.zh && !c[k]?.zh) return 'no longer checks zh';
+  if (k === 'el' && ['enabled', 'disabled'].includes(b.is) && c.is !== b.is) return `${b.is} → ${c.is || 'present'}`;
+  if (scopeOf(b) !== scopeOf(c)) {
+    // looking wider is weaker for something shown; looking narrower is weaker for something absent
+    if (shown(b) && scopeOf(c) === 'phone') return `looks in the phone, not ${scopeOf(b)}`;
+    if (!shown(b) && scopeOf(b) === 'phone') return `looks for its absence only in ${scopeOf(c)}`;
+  }
+  return null;
+}
+// An assertion any page satisfies: a constant expression (or one ORed with a truthy literal), the whole document, the empty text.
+function vacuous(a) {
+  const k = kindOf(a);
+  if (k === 'el') return shown(a) && /^\s*(\*|html|body|:root|html\s+body)\s*$/i.test(String(a.el));
+  if (k === 'text' || k === 'verb') return shown(a) && typeof enOf(a[k]) === 'string' && !enOf(a[k]).trim();
+  if (k !== 'expr') return false;
+  let ast; try { ast = parse(String(a.expr), { ecmaVersion: 'latest' }); } catch { return false; }
+  const e = ast.body.length === 1 && ast.body[0].type === 'ExpressionStatement' ? ast.body[0].expression : null;
+  if (!e) return false;
+  const constant = (n) => { let named = false; (function w(x) { if (!x || typeof x.type !== 'string') return; if ((x.type === 'Identifier' && !['undefined', 'NaN', 'Infinity'].includes(x.name)) || x.type === 'ThisExpression' || x.type === 'MetaProperty') named = true; for (const v of Object.values(x)) if (Array.isArray(v)) v.forEach(w); else if (v && typeof v.type === 'string') w(v); })(n); return !named; };
+  const truthy = (n) => n.type === 'Literal' && !!n.value;
+  return constant(e) || (e.type === 'LogicalExpression' && e.operator === '||' && (truthy(e.left) || truthy(e.right)));
+}
+// A kept leaf b → c: { lost: [why], rewritten: [why] }.
+function contractChanges(b, c) {
+  const lost = [], rewritten = [];
+  const all = (x) => [...(x.visible || []), ...(x.record || [])];
+  const B = all(b), C = all(c), had = new Set(B.map(contractOf)), has = new Set(C.map(contractOf)), explained = new Set();
+  for (const a of C) if (!had.has(contractOf(a)) && vacuous(a)) {
+    const was = B.find((x) => !has.has(contractOf(x)) && !explained.has(x) && kindOf(x) === kindOf(a));
+    if (was) explained.add(was);
+    lost.push(`asserts nothing: ${contractOf(a)}${was ? ` (was ${contractOf(was)})` : ''}`);
+  }
+  for (const a of B) {
+    if (has.has(contractOf(a))) continue;
+    const same = C.filter((x) => targetOf(x) === targetOf(a));
+    if (!same.length) { if (!explained.has(a)) rewritten.push(`no longer asserts ${contractOf(a)}`); continue; }
+    const why = same.map((x) => weaker(a, x));
+    if (why.every(Boolean)) lost.push(`${contractOf(a)} ${why[0]}`);
+  }
+  if (b.clip !== false && c.clip === false) lost.push('no longer checks clipping (clip: false)');
+  return { lost, rewritten };
+}
+
 // Behaviour coverage a candidate drops, per side { runner: bool, specs: { feature: parsed scenarios.json | null } }:
-// the runner, a feature's scenarios.json, or a leaf. Removing coverage is a workflow change, never a design PR's.
+// the runner, a feature's scenarios.json, or a leaf. Removing coverage is a workflow change, never a design PR's. A kept leaf is also
+// compared assertion by assertion (contractChanges): one weakened is lost; one rewritten to a new target goes in `rewritten`.
 // A leaf is compared by its id, not counted (G14): a leaf that runs on base and is gone, made pending, or makes fewer assertions on
 // the candidate is lost coverage, even when the feature's count of leaves holds (a failing leaf made pending kept the count).
 // A leaf that moves to another feature keeping its id (features merged or split) is kept coverage where it lands, under the
 // same tests; a scenarios.json whose every leaf moved is not lost.
-export function coverageLost(base, cand) {
+export function coverageLost(base, cand, rewritten = []) {
   const lost = [];
   if (base.runner && !cand.runner) lost.push('scripts/run-scenarios.mjs is gone');
   const landed = new Map();
@@ -74,6 +139,13 @@ export function coverageLost(base, cand) {
       if (!x) lost.push(`${f}: leaf ${id} is gone`);
       else if (x.status === 'pending') lost.push(`${f}: leaf ${id} runs on base and is pending here`);
       else if (x.checks < b.checks) lost.push(`${f}: leaf ${id} makes ${x.checks} assertion(s), ${b.checks} on base`);
+      else {
+        const ch = contractChanges(b.node, x.node);
+        for (const w of ch.lost) lost.push(`${f}: leaf ${id} ${w}`);
+        for (const w of ch.rewritten) rewritten.push(`${f}: leaf ${id} ${w}`);
+        const fewer = b.runs.filter((r) => !x.runs.includes(r));
+        if (fewer.length) lost.push(`${f}: leaf ${id} runs at fewer widths or languages (${fewer.join(', ')} no longer)`);
+      }
     }
   }
   return lost;
@@ -486,15 +558,31 @@ export const critiqueProblems = notesProblems('critique.md', CRITIQUE_HEADINGS);
 // identity gives the same result"), so a one-off failure (a tap racing a sheet's arrival) would stand for every later gate. A fresh
 // failure gets one confirming run on the same identity: the same failure again is stored, confirmed; a pass (or any other result)
 // is an unstable leaf, which blocks and is stored as nothing; a confirming run lost to a machine error confirms nothing.
+// The same failure is the same assertion contract broken the same way (as scenarioDebt reads it); a failure the runner gave no
+// contract is compared by what failed. A confirming run that fails differently is a disagreement, so unstable (Codex audit,
+// 2026-10-21: a second, different failure confirmed the first); one that could not run confirms nothing and blocks.
 // x, y: the scheduler's results ({ run } or { machine } or { error }).
+const failureKeys = (run) => [...new Set((run?.failures || []).map((f) => (f.contract && f.category ? `${f.contract}|${f.category}` : `what:${f.what}`)))].sort().join('\n');
+// A stored failure confirmed this way carries CONFIRMED; `confirmed: true` was written when any second failure confirmed the first,
+// so it is run again (Codex review, 2026-10-21), not reused.
+export const CONFIRMED = 'same-failure';
 export function confirmLeaf(x, y) {
-  if (!y || y.machine || y.error) return { store: false, unstable: false };
-  if (y.run?.result === 'fail') return { store: true, unstable: false };
+  if (!y || y.machine || y.error) return { store: false, unstable: false, blocked: `its confirming run could not run (${y?.machine || String(y?.error || 'no result').split('\n')[0].slice(0, 100)})` };
+  if (y.run?.result === 'fail') return failureKeys(y.run) === failureKeys(x?.run) ? { store: true, unstable: false } : { store: false, unstable: true, why: 'failed differently' };
   return { store: false, unstable: true, why: y.run?.result === 'pass' ? 'passed' : `came back ${y.run?.result}` };
 }
+// A fresh leaf run, before anything is stored: a pass is stored (the same identity gives the same result); a failure gets its
+// confirming run; a run that came back blocked could not render its language (only required languages run in the gate: ZH only on a
+// frozen feature), so it is no evidence: it blocks the gate and is never stored. A declared decision-blocker is a row, never a run.
+export function firstRun(run) {
+  if (run?.result === 'pass') return { store: true };
+  if (run?.result === 'fail') return { confirm: true };
+  return { blocked: `could not run (${(run?.notes || [])[0] || `came back ${run?.result}`})` };
+}
 // A stored leaf result is reused only when it is a pass, or a failure that was confirmed (a store written before L26 holds
-// unconfirmed failures: they are run again).
-export const reusableLeaf = (record) => !!record?.run && (record.run.result !== 'fail' || record.confirmed === true);
+// unconfirmed failures, and one written before 2026-10-21 may hold a blocked run or a failure confirmed by a different one: they are
+// run again).
+export const reusableLeaf = (record) => !!record?.run && (record.run.result === 'pass' || (record.run.result === 'fail' && record.confirmed === CONFIRMED));
 
 // Design-system components only (owner, 2026-10-11): visual styling added in a page's own CSS, markup or scripts is an improvised
 // component. Layout (margin, padding, gap, grid, flex, size, position) is the page's; looks belong to ux/design-system. A line
@@ -570,57 +658,6 @@ export function calibrationProblems(parts, answers) {
   return out;
 }
 
-// ---------- the lighter gate: reach by files, the lock ----------
-
-// Files that decide pixels on every screen besides SYSTEM: the shooter and what it loads, the server, the atlas and its sections,
-// the vendored fonts and the installed packages (Playwright's version is the browser's).
-const RENDERS = [
-  /^scripts\/(shoot-screens|serve-ux|font-route|playwright-path)\.(mjs|cjs)$/,
-  /^(atlas|sections|vendor)\//,
-  /^package(-lock)?\.json$/,
-];
-// Files that can't draw a pixel: the workflow's text and other prose outside ux/, CI, tests, agent settings and every other
-// script (the gate and the checks). A page that loads one of them reaches its feature first (pages are read before this list).
-const NO_PIXEL = [/^docs\//, /^\.github\//, /^tests\//, /^\.claude\//, /^scripts\//, /^(?!ux\/).*\.md$/i];
-
-// What a change can reach, from its files alone (P2): { all, features, why }. files: the changed paths (both sides of a rename);
-// screens: every atlas screen on base and candidate; assets: page -> the files it loads (pageAssets); shared: sharedFiles of the
-// same. Unsure is all: a file nothing says is harmless reaches every screen.
-export function reachOf({ files, screens = [], assets = {}, shared = {}, scope = [] }) {
-  const users = new Map();
-  for (const s of screens) { const p = pageOf(s.url); for (const f of [p, ...(assets[p] || [])]) { if (!users.has(f)) users.set(f, new Set()); users.get(f).add(s.feature); } }
-  const features = new Set(scope), notes = new Map();
-  let all = false;
-  const note = (why, f) => { if (!notes.has(why)) notes.set(why, []); notes.get(why).push(f); };
-  for (const f of files) {
-    const own = f.match(/^features\/([^/]+)\//);
-    if (own) { features.add(own[1]); note(`${own[1]}'s own files`, f); continue; }
-    if (SYSTEM.some((re) => re.test(f)) || RENDERS.some((re) => re.test(f))) { all = true; note('draws on every screen', f); continue; }
-    const u = users.get(f);
-    if (Object.hasOwn(shared, f) || u?.size > 1) { all = true; note(`loaded by pages of ${(shared[f] || [...u]).length} features`, f); continue; }
-    if (u) { for (const x of u) features.add(x); note(`a page of ${[...u][0]} or what it loads`, f); continue; }
-    // A component's own pages and notes (its variant pages, variants.json, gate.json, README) are read by the atlas, never loaded
-    // by a screen's page: they reach that component's pages (ds:<Name>/…, feature design-system), not every screen.
-    const doc = f.match(/^ux\/design-system\/components\/([^/]+)\/(variants\/[^/]+\.html|variants\.json|gate\.json|README\.md)$/);
-    if (doc) { features.add(DS_FEATURE); note(`${doc[1]}'s component pages`, f); continue; }
-    if (NO_PIXEL.some((re) => re.test(f))) { note('draws no pixel', f); continue; }
-    all = true;
-    note(f.startsWith('ux/') ? 'no page loads it by name, and a page may fetch it' : 'not known to draw nothing', f);
-  }
-  const list = (fs) => fs.slice(0, 3).join(', ') + (fs.length > 3 ? ` and ${fs.length - 3} more` : '');
-  const why = [...notes].sort(([a], [b]) => (a === 'draws no pixel') - (b === 'draws no pixel')).map(([w, fs]) => `${list(fs)}: ${w}`);
-  if (scope.length) why.push(`scope ${scope.join(', ')}`);
-  return { all, features: [...features].sort(), why };
-}
-
-// The one line the gate prints, given how many screens the reach covers.
-export function reachLine(reach, n) {
-  const why = reach.why.length ? ` (${reach.why.join('; ')})` : '';
-  if (reach.all) return `reach: all screens${why}`;
-  if (!reach.features.length) return `reach: no screen${why}`;
-  return `reach: ${n} screen(s) in features ${reach.features.join(', ')}${why}`;
-}
-
 // Machine errors, the navigation-timeout retry and the AIMD window live in scripts/machine.mjs (the runner and the scheduler use them
 // without the gate's rules); re-exported here for the callers that import them from the rules.
 export { timedOutOnly, aimdStep, classifyMachineError, machineErrorOf } from './machine.mjs';
@@ -628,25 +665,6 @@ export { timedOutOnly, aimdStep, classifyMachineError, machineErrorOf } from './
 // A failed gh / GitHub API call that is the network, not an answer: EOF, TLS, a timeout, a reset or refused connection, a name that
 // doesn't resolve, a 5xx. It is retried; anything else is GitHub's answer and never is.
 export const ghNetworkError = (stderr) => /\bEOF\b|\bTLS\b|handshake|timed? ?out|timeout|connection (was )?(reset|refused|closed)|dial tcp|proxyconnect|actively refused|forcibly closed|network is unreachable|ECONNRESET|ECONNREFUSED|ETIMEDOUT|ENOTFOUND|EAI_AGAIN|could not resolve|no such host|HTTP 5\d\d|\b50[0234]\b|Bad Gateway|Service Unavailable/i.test(String(stderr || ''));
-
-// The gate's lock (one gate per machine): free, held by a live gate, or stale (its process is gone, or its pid now belongs to
-// another process: scripts/process-start.mjs).
-export function lockState(lock, alive = pidAlive, start = startOf) {
-  if (!lock) return 'free';
-  return holderAlive(lock, { alive, start }) ? 'held' : 'stale';
-}
-
-// Scenario leaves, base against candidate (owner, 2026-10-15): a leaf the candidate fails is the change's only when the same leaf
-// passes on base. One already failing on main is main's debt, named as a gap, the way check-states and the header checks already
-// count a problem main has. candFailed: the leaf ids the candidate's report marks fail. baseOut: the base runner's stdout for those
-// leaves (`run-scenarios.mjs <feature> --only a,b`, one "<result>  <id>" line per leaf). A leaf base doesn't have, or doesn't print,
-// is new, so its failure is the change's.
-export function newScenarioFailures(candFailed, baseOut) {
-  const onBase = new Map();
-  for (const line of String(baseOut || '').split('\n')) { const m = /^(pass|fail|blocked|pending)\s+(\S+)/.exec(line); if (m) onBase.set(m[2], m[1]); }
-  const debt = candFailed.filter((id) => onBase.get(id) === 'fail');
-  return { added: candFailed.filter((id) => onBase.get(id) !== 'fail'), debt };
-}
 
 // Main's scenario debt, run by run (review of the gate, 2026-10-16). A candidate failure is main's debt only when base fails the
 // same leaf in the same language at the same width with the same failure: the same assertion contract and failure category.
