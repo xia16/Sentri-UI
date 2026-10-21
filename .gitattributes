@@ -1,0 +1,3 @@
+# Each PR appends its own section to a feature critique, so a forward merge keeps both sides (git's built-in union driver),
+# never conflict markers (2026-10-21: three critique.md conflicts on one forward merge).
+features/*/critique.md merge=union

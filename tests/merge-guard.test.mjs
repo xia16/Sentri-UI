@@ -85,6 +85,41 @@ test('the word "push" is not a push: only a command that runs git push is checke
     'git push origin "main"', '"git" push origin main', 'git.exe push origin main', 'GIT_TRACE=1 git push origin main', 'cd x && git push origin main',
     '(git push origin main)', 'echo $(git push origin main)', 'if git push origin main; then echo ok; fi', 'git commit -m "x" && git push origin HEAD',
     'node -e "a.push(1)" && git push origin main', 'bash -c "git push origin main"', "sh -c 'cd x && git push origin main'", 'cmd /c "git push origin main"',
-    "bash <<'EOF'\ngit push origin main\nEOF", 'git push origin feat \\\n  main', 'git push origin feat > log.txt',
+    "bash <<'EOF'\ngit push origin main\nEOF", 'git push origin feat \\\n  main',
   ]) assert.equal(guard(c), 2, c);
+});
+
+test('a redirection is not part of a push, and a merge named in a message or heredoc is not a merge (2026-10-21)', () => {
+  const merge = ['gh', 'pr', 'merge'].join(' ');
+  for (const c of [
+    'git push origin workflow/x 2>&1',
+    'git push origin workflow/x 2>&1 | tail -2',
+    'git push origin workflow/x > push.log 2>&1',
+    'git push origin feat > log.txt',
+    'git push -q origin workflow/x 2>/dev/null',
+    `cat > notes.md <<'EOF'\nthen: ${merge} 7 --squash --match-head-commit ${sha}\nEOF\ngit status`,
+    `git commit -q -m "merge with ${merge} 7 later" && git push origin workflow/x`,
+    `node -e "console.log('${merge} 6 --squash')"`,
+  ]) assert.equal(guard(c), 0, c);
+  for (const c of [
+    'git push origin main 2>&1',
+    'git push origin HEAD:main > x.log 2>&1',
+    'git push --force origin workflow/x 2>&1',
+    `echo \`${merge} 6 --squash\``,
+    `echo $(${merge} 6 --squash)`,
+    `bash <<'EOF'\n${merge} 6 --squash\nEOF`,
+    `${merge} 6 --squash --match-head-commit ${sha} 2>&1`,
+    // Codex review round 1: substitutions inside double quotes and expanding heredocs run
+    `echo "$(${merge} 6 --squash)"`,
+    `cat <<EOF\n$(${merge} 6 --squash)\nEOF`,
+    `git commit -m "done $(git push origin main)"`,
+    // round 2: a quote inside the substitution ends the string scan early; an unclosed $( still counts
+    `echo "$(${merge} "6" --squash)"`,
+    // round 3: a quoted subcommand cuts the scan off after `gh pr`; that fails closed
+    `echo "$(gh pr "merge" 6 --squash)"`,
+  ]) assert.equal(guard(c), 2, c);
+  for (const c of [
+    `git commit -m "built on $(date +%F)" && git push origin workflow/x`,
+    `cat <<'EOF'\n$(${merge} 6 --squash)\nEOF`, // a quoted delimiter: the body is data
+  ]) assert.equal(guard(c), 0, c);
 });

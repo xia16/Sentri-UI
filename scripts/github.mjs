@@ -18,17 +18,3 @@ export function gh(args, cwd) {
 
 export const postStatus = (cwd, sha, state, description) => gh(['api', '--method', 'POST', `repos/{owner}/{repo}/statuses/${sha}`, '-f', `state=${state}`, '-f', 'context=sentri/gate', '-f', `description=${description}`], cwd);
 
-// The open PRs in the shape `gh pr list --json number,headRefName,headRefOid,createdAt,isDraft,files,statusCheckRollup` gives,
-// read over REST: GraphQL (which gh pr list uses) is blocked in cloud sessions.
-export function openPrs(cwd) {
-  // Pages by number: --paginate follows Link headers with numeric-ID paths, which the cloud proxy refuses.
-  const page = (p, jq) => { const r = gh(['api', p, '--jq', jq], cwd); if (!r.ok) throw new Error(`gh api ${p}: ${r.why}`); return r.out.trim().split('\n').filter(Boolean).map((l) => JSON.parse(l)); };
-  const api = (p, jq) => { const all = []; for (let n = 1; n <= 30; n++) { const got = page(`${p}&page=${n}`, jq); all.push(...got); if (got.length < 100) break; } return all; };
-  try {
-    return api('repos/{owner}/{repo}/pulls?state=open&per_page=100', '.[] | {number, headRefName: .head.ref, headRefOid: .head.sha, createdAt: .created_at, isDraft: .draft}').map((p) => ({
-      ...p,
-      files: api(`repos/{owner}/{repo}/pulls/${p.number}/files?per_page=100`, '.[] | {path: .filename}'),
-      statusCheckRollup: api(`repos/{owner}/{repo}/commits/${p.headRefOid}/statuses?per_page=100`, '.[] | {context, state: (.state | ascii_upcase)}'),
-    }));
-  } catch (e) { return { error: e.message }; }
-}

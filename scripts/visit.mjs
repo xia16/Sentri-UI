@@ -50,7 +50,8 @@ const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 export function contextPool() {
   const idle = new Map(), all = new Set();
   return {
-    async take(key, make) { const l = idle.get(key) || []; while (l.length) { const c = l.pop(); if (all.has(c)) return c; } const c = await make(); all.add(c); return c; },
+    // a context of a browser that has gone is dropped, never reused (2026-10-21)
+    async take(key, make) { const l = idle.get(key) || []; while (l.length) { const c = l.pop(); if (!all.has(c)) continue; if (c.browser?.()?.isConnected?.() === false) { all.delete(c); continue; } return c; } const c = await make(); all.add(c); return c; },
     give(key, c) { if (!idle.has(key)) idle.set(key, []); idle.get(key).push(c); },
     async drop(c) { all.delete(c); await c.close().catch(() => {}); },
     async close() { for (const c of all) await c.close().catch(() => {}); all.clear(); idle.clear(); },

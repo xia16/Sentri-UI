@@ -12,7 +12,12 @@ import { WORKERS, LAUNCH_ARGS, aimdStep, classifyMachineError } from './machine.
 // A result with `machine` set (or a throw whose message is a machine error) is a machine error. Another throw is { error }.
 export function createScheduler({ playwright, workers = WORKERS, log = () => {} }) {
   let browser = null, launching = null;
-  const ensure = () => browser ? Promise.resolve(browser) : (launching ||= playwright().chromium.launch({ args: LAUNCH_ARGS }).then((b) => (browser = b)));
+  // A browser that crashed or closed is replaced (2026-10-21): a crash is a machine error and is retried, and a retry handed the dead
+  // browser would only crash again.
+  const ensure = () => {
+    if (browser && browser.isConnected?.() === false) { browser = null; launching = null; }
+    return browser ? Promise.resolve(browser) : (launching ||= playwright().chromium.launch({ args: LAUNCH_ARGS }).then((b) => (browser = b)));
+  };
   const queue = [], retries = [];
   let busy = 0, running = 0, ctl = { limit: workers, min: 1, max: workers, baseline: null };
   const stats = { byKind: {}, retried: 0, machineTwice: 0, lowest: workers, started: Date.now(), firstAt: {}, lastAt: {} };

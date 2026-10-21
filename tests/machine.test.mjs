@@ -88,3 +88,31 @@ test('scheduler: after a machine error halves it, a run of clean tasks brings it
   for (let i = 0; i < 200; i++) await s.run(task('visit', async () => ({ ok: true })));
   assert.equal(s.limit, 4);
 });
+
+test('scheduler: a browser that disconnected is replaced before the next task, never handed out again (2026-10-21)', async () => {
+  let launches = 0;
+  const browsers = [];
+  const playwright = () => ({ chromium: { launch: async () => { const b = { n: ++launches, connected: true, isConnected() { return this.connected; }, close: async () => {} }; browsers.push(b); return b; } } });
+  const s = createScheduler({ playwright, workers: 1 });
+  const first = await s.run({ kind: 'visit', label: 'a', run: async ({ browser }) => browser.n });
+  assert.equal(first, 1);
+  browsers[0].connected = false; // the browser crashed under the run
+  const second = await s.run({ kind: 'visit', label: 'b', run: async ({ browser }) => browser.n });
+  assert.equal(second, 2, 'a fresh browser');
+  assert.equal(launches, 2);
+  const third = await s.run({ kind: 'visit', label: 'c', run: async ({ browser }) => browser.n });
+  assert.equal(third, 2, 'a live browser is kept');
+  await s.close();
+});
+
+test('contextPool: a context of a browser that has gone is dropped, never reused (2026-10-21)', async () => {
+  const { contextPool } = await import('../scripts/visit.mjs');
+  const pool = contextPool();
+  const live = { ok: true };
+  const dead = { closed: false, browser: () => ({ isConnected: () => false }), close: async () => {} };
+  const c1 = await pool.take('k', async () => dead);
+  pool.give('k', c1);
+  const c2 = await pool.take('k', async () => live);
+  assert.equal(c2, live, 'the dead context is skipped and a new one made');
+  assert.equal(pool.size, 1);
+});

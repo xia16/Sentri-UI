@@ -77,7 +77,8 @@ export async function evaluate(opts) {
   {
     // gate.mjs runs itself from a worktree of the base when its checkout's tools differ; this is the backstop for a base that moved
     // while it started
-    const stale = toolsDiffer(root, mech.base);
+    const stale = opts.ownTools ? [] : toolsDiffer(root, mech.base); // --try runs this checkout's tools on purpose
+    if (opts.ownTools) mech.tryRun = true;
     if (stale.length) { block(`the gate runs the base's own tools: this checkout's ${stale.slice(0, 3).join(', ')} differ from ${short(mech.base)} (the base moved while the gate started: run it again)`); return finish(); }
   }
   const contains = git(['merge-base', '--is-ancestor', mech.base, mech.candidate], root).code === 0;
@@ -130,7 +131,10 @@ export async function evaluate(opts) {
   // README says so. Known before anything is shot, so the visits know whether base needs its legibility audit.
   // English first (owner, 2026-10-21): ZH runs and ZH leaves only for frozen features
   const zhFrozen = new Set([...frozenFeatures(S.base.atlas), ...frozenFeatures(S.cand.atlas)]);
-  mech.zh = { frozen: [...zhFrozen].sort() };
+  // A feature that freezes in this change gets its Chinese shots now (2026-10-21): approvals render nothing, so no identity changes
+  const wasFrozen = frozenFeatures(S.base.atlas);
+  const newlyFrozen = [...frozenFeatures(S.cand.atlas)].filter((f) => !wasFrozen.has(f));
+  mech.zh = { frozen: [...zhFrozen].sort(), ...(newlyFrozen.length ? { newlyFrozen } : {}) };
   const strictLeg = !sharedByFiles && /^Legibility gate: strict\s*$/m.test(fs.readFileSync(path.join(S.cand.dir, 'docs/design-workflow/README.md'), 'utf8'));
   mark('setup');
 
@@ -252,6 +256,11 @@ export async function evaluate(opts) {
     if (S.base.shape && S.cand.shape) lp.push(...newExportProblems({ before: new Set(exportStamps(S.base.shape).keys()), after: exportStamps(S.cand.shape), library: libs.cand }));
     else if (files.includes(BUNDLE_JS)) gaps.push('the bundle does not parse on one side: new exports are not checked against the groups');
     mech.library = { required: files.some((f) => f.startsWith('ux/design-system/components/')), problems: lp };
+    // A ux/system stylesheet is one page's or the whole system's, and nothing in the diff says which (2026-10-21: a Home stylesheet
+    // edit owned no feature, so Home's own screens went unchecked). A change that edits one and names no feature is asked to.
+    const pageCss = files.filter((f) => /^ux\/system\/[^/]+\.css$/.test(f));
+    if (pageCss.length && !scope.length && !files.some((f) => /^features\/[^/_][^/]*\//.test(f)) && mode !== 'refactor')
+      check('a stylesheet edit names its feature', false, `${pageCss.slice(0, 2).join(', ')}: name the feature with --scope <feature> (its own stylesheet), or --scope design-system (a shared one), or include that feature's notes`);
     check('library organisation (every part in a group)', !lp.length, lp.length ? `${lp.length}: ${lp.slice(0, 3).join(' | ')}` : '');
     const debt = now.filter((p) => was.has(p));
     if (debt.length) gaps.push(`library: ${debt.length} folder(s) already outside every group on main (${debt.slice(0, 3).join('; ')})`);
@@ -339,6 +348,7 @@ export async function evaluate(opts) {
       log(`scope: own ${own.join(', ') || '(none)'}; propagation only on ${inProgress.join(', ')} (${sc.propagation.size} screen(s)); ${sc.outOfScope.screens} screens in ${sc.outOfScope.features.length} features not checked: not in progress${sc.outOfScope.componentPages ? `; ${sc.outOfScope.componentPages} component page(s) of parts the change doesn't call` : ''}`);
     }
   }
+  if (!audit) for (const x of S.cand.screens) if (newlyFrozen.includes(x.feature)) reachIds.add(x.id);
   log(`reach: ${reachIds.size} of ${total} screens${mech.reach.changed !== undefined ? ` (${mech.reach.changed} whose identity changed, ${mech.reach.added} added, ${mech.reach.removed} removed)` : ` (${mech.reach.why[0]})`}`);
   const runsOf = (x) => (inReach(x) ? RUNS.filter((r) => (!componentPage(x.id) || r.lang === 'en') && (r.lang === 'en' || checksChinese(x.feature, zhFrozen))).map(({ width, lang }) => ({ width, lang })) : []);
   const visitChecks = (side, x, width, lang) => {
@@ -788,6 +798,10 @@ export async function evaluate(opts) {
   const leafItemsOf = (side, f, only) => {
     const spec = specOf(side, f); if (!spec) return null;
     const { leaves, nodeCount, problems } = walkTree(spec);
+    // an empty run list would run nothing and look like a pass (2026-10-21)
+    const empty = (a) => Array.isArray(a) && !a.length;
+    if (empty(spec.defaults?.langs) || empty(spec.defaults?.widths)) problems.push('defaults.langs or defaults.widths is empty: no leaf would run');
+    for (const l of leaves) if (empty(l.node.langs) || empty(l.node.widths)) problems.push(`${l.node.id}: langs or widths is empty: the leaf would never run`);
     if (problems.length) return { problems };
     // S5: a leaf runs at the narrowest width its spec lists (360), unless the leaf names its own widths
     const D = spec.defaults || {}, langs = (D.langs || ['en']).filter((g) => g === 'en' || checksChinese(f, zhFrozen)), widths = [Math.min(...(D.widths || [390]))];
@@ -858,6 +872,8 @@ export async function evaluate(opts) {
       // a leaf is in reach when one of its runs has another identity on base, or none
       for (const id of new Set(pc.its.filter((i) => i.kind).map((i) => i.leaf.node.id))) if ([...c].some(([k, v]) => k.startsWith(id + ' ') && b.get(k) !== v)) leafSet.add(id);
     }
+    // a feature that freezes now runs every leaf, its new ZH runs included (2026-10-21: identities alone left 16 of 94 out)
+    for (const f of newlyFrozen) { const spec = specOf('cand', f); if (spec) for (const l of walkTree(spec).leaves) leafSet.add(l.node.id); }
     mech.reach.leaves = leafSet.size;
   }
   const leafFeatures = featuresWithLeaves('cand').filter((f) => {

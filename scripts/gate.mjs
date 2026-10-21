@@ -50,9 +50,20 @@ const VERDICT_FILE = /^verdict(-[\w.-]+)?\.json$/;
 // G2): there are no local pass records.
 const gateDir = () => path.join(path.resolve(root, git(['rev-parse', '--git-common-dir']).out.trim()), 'sentri-gate');
 // A run against a test base (--base) never reaches GitHub or the merge guard.
-const testBase = !!opt('base');
+// --try (2026-10-21): run THIS checkout's tools on a candidate against origin/main, posting nothing. It is how a change to the
+// gate's own tools is tried on a real PR before it merges (it was a hand-built base and candidate). Never mergeable.
+const tryRun = flag('try');
+const testBase = !!opt('base') || tryRun;
 const mainRef = opt('base') || 'origin/main';
 const postStatus = (sha, state, description) => (testBase ? { ok: true } : post(root, sha, state, description));
+const passDescription = (mech) => { const moved = ['diff', 'new', 'gone'].reduce((n, k) => n + (mech.screens?.[k]?.length || 0), 0); return `GATE PASS against ${short(mech.base)} · ${moved ? `${moved} screen(s) moved; machine checks only (the owner approved the design)` : 'no screen moved'}`; };
+// A ref that passed once (its re-checks go first). Local, per machine; a stale record only ever buys a queue place.
+const passFile = (ref) => path.join(gateDir(), 'passed', `${String(ref).replace(/[^\w.-]+/g, '_')}.json`);
+// The latest run on each commit (2026-10-21): --post refuses a saved pass when a later run on the same commit replaced it.
+const lastFile = (commit) => path.join(gateDir(), 'last', `${commit}.json`);
+// Fails closed: when the record can't be written, the old one goes, so no earlier pass can stand for this commit.
+const recordLast = (commit, out, outcome) => { try { fs.mkdirSync(path.dirname(lastFile(commit)), { recursive: true }); fs.writeFileSync(lastFile(commit), JSON.stringify({ out: path.resolve(out), outcome, at: new Date().toISOString() })); } catch { try { fs.rmSync(lastFile(commit), { force: true }); } catch {} } };
+const recordPass = (ref, commit) => { try { fs.mkdirSync(path.dirname(passFile(ref)), { recursive: true }); fs.writeFileSync(passFile(ref), JSON.stringify({ ref, commit, at: new Date().toISOString() })); } catch {} };
 function git(args, cwd = root) { const r = spawnSync('git', args, { cwd, encoding: 'utf8', maxBuffer: 64 << 20 }); return { code: r.status, out: r.stdout || '', err: r.stderr || '' }; }
 const sha = (r) => (r ? git(['rev-parse', '--verify', '--quiet', `${r}^{commit}`]).out.trim() : '');
 
@@ -61,7 +72,7 @@ const sha = (r) => (r ? git(['rev-parse', '--verify', '--quiet', `${r}^{commit}`
 // differ from the base, this run starts the base's own gate.mjs from a detached worktree of the base, with the same arguments and
 // working directory, and removes that worktree when it ends. Before, such a run blocked until the driver checked main out (three
 // blocks on 2026-10-17/18). SENTRI_GATE_TOOLS marks the run inside, so it never goes round again.
-if (!process.env.SENTRI_GATE_TOOLS) {
+if (!process.env.SENTRI_GATE_TOOLS && !tryRun) {
   if (!testBase) git(['fetch', '-q', 'origin']);
   const base = sha(mainRef);
   const stale = base ? toolsDiffer(root, base) : [];
@@ -70,7 +81,9 @@ if (!process.env.SENTRI_GATE_TOOLS) {
     const added = git(['worktree', 'add', '--detach', dir, base]);
     if (added.code) { console.log(`GATE BLOCKED — this checkout's tools differ from ${short(base)}, and a worktree of it could not be made: ${added.err.trim().split('\n')[0]}`); process.exit(3); }
     console.log(`this checkout's ${stale.slice(0, 3).join(', ')}${stale.length > 3 ? ' …' : ''} differ from ${mainRef} (${short(base)}): the gate runs ${short(base)}'s own tools, from ${dir}`);
-    const r = spawnSync(process.execPath, [path.join(dir, 'scripts/gate.mjs'), ...argv], { stdio: 'inherit', cwd: process.cwd(), env: { ...process.env, SENTRI_GATE_TOOLS: base, ...(pwPath ? { SENTRI_PLAYWRIGHT: pwPath } : {}) } });
+    // HEAD (or @) names this checkout's commit; inside the base's worktree it would name the base (2026-10-21)
+    const fwd = argv.map((a, i) => (argv[i - 1] === '--candidate' && /^(HEAD|@)/.test(a) && sha(a) ? sha(a) : a));
+    const r = spawnSync(process.execPath, [path.join(dir, 'scripts/gate.mjs'), ...fwd], { stdio: 'inherit', cwd: process.cwd(), env: { ...process.env, SENTRI_GATE_TOOLS: base, ...(pwPath ? { SENTRI_PLAYWRIGHT: pwPath } : {}) } });
     removeWorktree(dir, { cwd: root });
     process.exit(r.status ?? 1);
   }
@@ -100,40 +113,45 @@ async function acquireLock(ref, priority) {
 // for a run against a test base or an audit.
 async function runGate({ ref, base, out, mode, scope, audit = false, keep = false, priority = false }) {
   fs.mkdirSync(out, { recursive: true });
-  // A rerun into the same folder starts clean: old shots, pairs and verdicts are about a mechanical run that no longer exists.
-  for (const f of ['shots', 'pairs', 'leaves', 'scenarios', 'npm-test.log', 'mechanical.json', ...fs.readdirSync(out).filter((f) => VERDICT_FILE.test(f))]) fs.rmSync(path.join(out, f), { recursive: true, force: true });
   const waited = await acquireLock(ref, priority);
+  // A rerun into the same folder starts clean: old shots, pairs and verdicts are about a mechanical run that no longer exists. Cleared
+  // only once this run holds the lock, so a queued run never deletes a running one's output (2026-10-21).
+  for (const f of ['shots', 'pairs', 'leaves', 'scenarios', 'npm-test.log', 'mechanical.json', ...fs.readdirSync(out).filter((f) => VERDICT_FILE.test(f))]) fs.rmSync(path.join(out, f), { recursive: true, force: true });
   const env = { ...process.env, ...(pwPath ? { SENTRI_PLAYWRIGHT: pwPath } : {}) };
   git(['fetch', '-q', 'origin']);
   const candidate = sha(ref);
   if (candidate) turn.relabel(candidate); // the lock names what it gates
+  // first the local record, then the network: a run killed even inside the pending post stays 'running', and --post refuses
+  if (candidate && !audit && !testBase) recordLast(candidate, out, 'running');
   if (candidate && !audit) postStatus(candidate, 'pending', `gate running against ${short(sha(base))}`); // an earlier pass for this commit no longer stands
   let res;
   try {
-    res = await evaluate({ root, out, base, candidate: ref, ref, mode, scope, audit, keep, env, testBase });
+    res = await evaluate({ root, out, base, candidate: ref, ref, mode, scope, audit, keep, env, testBase, ownTools: tryRun });
   } catch (e) {
     console.error(e.stack || e);
-    res = { outcome: 'blocked', mech: { outcome: 'blocked', pass: false, ref, mode, scope, class: {}, blocked: [`the gate crashed: ${String(e.message || e).split('\n')[0]}`], checks: [], gaps: [], pairs: [] } };
+    res = { outcome: 'blocked', mech: { outcome: 'blocked', pass: false, ref, candidate: candidate || undefined, mode, scope, class: {}, blocked: [`the gate crashed: ${String(e.message || e).split('\n')[0]}`], checks: [], gaps: [], pairs: [] } };
   }
   const mech = { ...res.mech, waited: waited + 's', testBase: testBase || undefined };
   if (!testBase && !audit && machinePass(mech)) {
     mech.gatePass = true;
-    const moved = ['diff', 'new', 'gone'].reduce((n, k) => n + mech.screens[k].length, 0);
-    const posted = postStatus(mech.candidate, 'success', `GATE PASS against ${short(mech.base)} · ${moved ? `${moved} screen(s) moved; machine checks only (the owner approved the design)` : 'no screen moved'}`);
-    if (!posted.ok) console.log(`  - the sentri/gate status was not posted (${posted.why}): gate again; until then GitHub refuses the merge`);
+    const posted = postStatus(mech.candidate, 'success', passDescription(mech));
+    if (!posted.ok) { mech.gatePass = false; mech.notPosted = posted.why; }
+    else recordPass(ref, mech.candidate);
   } else if (!testBase && !audit && mech.candidate) {
     postStatus(mech.candidate, 'failure', `MECHANICAL ${String(mech.outcome).toUpperCase()} against ${short(mech.base)}`);
   }
   fs.writeFileSync(path.join(out, 'mechanical.json'), JSON.stringify(mech, null, 2));
+  if (!testBase && !audit && mech.candidate) recordLast(mech.candidate, out, mech.outcome);
   // the PR's Results block (gate-simplify.md S8): the gate's own measurements, pasted whole into the PR body
   fs.writeFileSync(path.join(out, 'results.md'), resultsBlock(mech));
   const t = mech.timings || {};
   console.log(`\ntimings (s): ${Object.entries(t).map(([k, v]) => `${k} ${v}`).join(', ')}`);
   if (mech.evidence) console.log(`evidence: ${JSON.stringify(mech.evidence.byKind || {})}; scheduler ${JSON.stringify(mech.evidence.scheduler?.busy || {})}`);
   const word = (audit ? { pass: 'AUDIT PASS', fail: 'AUDIT FAIL', blocked: 'AUDIT BLOCKED' } : { pass: 'MECHANICAL PASS', fail: 'MECHANICAL FAIL', blocked: 'MECHANICAL BLOCKED' })[mech.outcome] || 'MECHANICAL FAIL';
-  console.log(`${word} ${short(mech.candidate)} on base ${short(mech.base)} (${mech.class?.effective || '?'}, ${mode}) — ${out}`);
+  console.log(`${word} ${short(mech.candidate)} on base ${short(mech.base)} (${mech.class?.effective || '?'}, ${mode})${tryRun ? ' — TRY RUN: this checkout\'s tools, no status posted, never mergeable' : ''} — ${out}`);
   for (const b of mech.blocked || []) console.log('  blocked:', b);
   if (mech.gatePass) console.log(`GATE PASS (machine checks; the owner's "PR it" approved the design): gh pr merge <n> --squash --match-head-commit ${mech.candidate}`);
+  if (mech.notPosted) console.log(`NOT POSTED: the machine passed, but GitHub did not take the sentri/gate status (${mech.notPosted}), so GitHub refuses the merge. Post it without gating again: node scripts/gate.mjs --post ${out}`);
   return mech;
 }
 
@@ -202,6 +220,27 @@ if (opt('verdict')) {
   process.exit(ok ? 0 : 1);
 }
 
+// ---------- --post <out>: post a machine pass GitHub did not take, without gating again (2026-10-21) ----------
+// This machine's GitHub calls often fail on TLS/EOF. A pass is posted only for the same head and the same main it was gated on.
+if (opt('post')) {
+  const dir = opt('post');
+  let mech; try { mech = JSON.parse(fs.readFileSync(path.join(dir, 'mechanical.json'), 'utf8')); } catch (e) { console.log(`NOT POSTED — ${path.join(dir, 'mechanical.json')}: ${e.message.split('\n')[0]}`); process.exit(1); }
+  if (mech.testBase || mech.tryRun || !machinePass(mech)) { console.log(`NOT POSTED — that run is not a machine pass against main (${mech.outcome}${mech.tryRun ? ', a try run' : ''})`); process.exit(1); }
+  await acquireLock(mech.ref, true); // never while a gate on this machine is running, which could replace the result
+  let last = null; try { last = JSON.parse(fs.readFileSync(lastFile(mech.candidate), 'utf8')); } catch {}
+  if (!last || last.out !== path.resolve(dir) || last.outcome !== 'pass') { console.log(`NOT POSTED — a later gate run on ${short(mech.candidate)} replaced this one${last ? ` (${last.outcome}, ${last.out})` : ''}: post that run's result, or gate again`); process.exit(1); }
+  const fetched = git(['fetch', '-q', 'origin']);
+  if (fetched.code !== 0) { console.log(`NOT POSTED — git fetch origin failed: ${fetched.err.trim().split('\n')[0]}`); process.exit(4); }
+  const head = sha(mech.ref), main = sha(mainRef);
+  if (head !== mech.candidate) { console.log(`NOT POSTED — ${mech.ref} is ${short(head)} now, not the gated ${short(mech.candidate)}: gate again`); process.exit(1); }
+  if (main !== mech.base) { console.log(`NOT POSTED — ${mainRef} is ${short(main)} now, not ${short(mech.base)}: merge main forward and gate again`); process.exit(1); }
+  const posted = post(root, mech.candidate, 'success', passDescription(mech));
+  if (!posted.ok) { console.log(`NOT POSTED — GitHub: ${posted.why}. Run it again.`); process.exit(4); }
+  recordPass(mech.ref, mech.candidate);
+  console.log(`POSTED GATE PASS on ${short(mech.candidate)} against ${short(mech.base)}: gh pr merge <n> --squash --match-head-commit ${mech.candidate}`);
+  process.exit(0);
+}
+
 // ---------- --carry: replaced by evidence reuse ----------
 // Gate v2 (gate-v2.md §3): there is no carried pass. --verdict on a run whose head or main has moved gates again, reusing every result
 // and judgement whose identity did not change.
@@ -223,11 +262,14 @@ for (const gone of ['quick', 'class']) if (argv.includes('--' + gone)) { console
 const mode = opt('mode') || 'normal';
 const scope = (opt('scope') || '').split(',').map((s) => s.trim()).filter(Boolean);
 if (!ref || !['normal', 'refactor'].includes(mode)) {
-  console.error('usage: node scripts/gate.mjs --candidate <ref> [--scope <feature,...>] [--mode normal|refactor] [--out <dir>] [--keep] [--base <ref>]');
+  console.error('usage: node scripts/gate.mjs --candidate <ref> [--scope <feature,...>] [--mode normal|refactor] [--out <dir>] [--keep] [--base <ref>] [--try]');
+  console.error('       node scripts/gate.mjs --post <out dir>   (post a machine pass GitHub did not take)');
   console.error('       node scripts/gate.mjs --verdict <out dir> [--base <ref>]');
   console.error('       node scripts/gate.mjs --audit [--out <dir>]');
   process.exit(2);
 }
 const out = path.resolve(opt('out') || path.join(os.tmpdir(), `sentri-gate-${Date.now()}`));
-const mech = await runGate({ ref, base: mainRef, out, mode, scope, keep: flag('keep') });
-process.exit(mech.outcome === 'pass' ? 0 : mech.outcome === 'blocked' ? 3 : 1);
+// A ref that has passed before is re-checked ahead of first gates (2026-10-21): after main moves, or a small fix, the re-check is what
+// stands between an approved PR and its merge. Priority was --verdict's only, which the machine-only workflow no longer runs.
+const mech = await runGate({ ref, base: mainRef, out, mode, scope, keep: flag('keep'), priority: !testBase && fs.existsSync(passFile(ref)) });
+process.exit(mech.notPosted ? 4 : mech.outcome === 'pass' ? 0 : mech.outcome === 'blocked' ? 3 : 1);
