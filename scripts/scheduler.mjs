@@ -11,10 +11,11 @@ import { WORKERS, LAUNCH_ARGS, aimdStep, classifyMachineError } from './machine.
 // task: { kind, label, weight = 1, priority = 0 (lower first), run: async ({ browser }) => result }
 // A result with `machine` set (or a throw whose message is a machine error) is a machine error. Another throw is { error }.
 export function createScheduler({ playwright, workers = WORKERS, log = () => {} }) {
-  let browser = null, launching = null;
+  let browser = null, launching = null, closed = false;
   // A browser that crashed or closed is replaced (2026-10-21): a crash is a machine error and is retried, and a retry handed the dead
-  // browser would only crash again.
+  // browser would only crash again. Never once the scheduler is closed: a stopping gate must not open a browser it won't close.
   const ensure = () => {
+    if (closed) return Promise.reject(new Error('the scheduler is closed: the gate stopped'));
     if (browser && browser.isConnected?.() === false) { browser = null; launching = null; }
     return browser ? Promise.resolve(browser) : (launching ||= playwright().chromium.launch({ args: LAUNCH_ARGS }).then((b) => (browser = b)));
   };
@@ -48,6 +49,7 @@ export function createScheduler({ playwright, workers = WORKERS, log = () => {} 
     return r;
   }
   function pump() {
+    if (closed) return;
     queue.sort((a, b) => a.priority - b.priority || a.seq - b.seq);
     while (queue.length && !solo) {
       const t = queue[0], w = Math.min(t.weight, ctl.limit);
@@ -55,7 +57,8 @@ export function createScheduler({ playwright, workers = WORKERS, log = () => {} 
       queue.shift(); busy += w; running++;
       exec(t, false).then((r) => {
         busy -= w; running--;
-        if (machineOf(r)) { stats.retried++; log(`machine error, retried alone once the queue drains: ${t.label} (${r.machine}: ${String(r.error || '').slice(0, 120)})`); retries.push({ t, first: r }); }
+        if (closed && !running) for (const w of idleWaiters.splice(0)) w();
+        if (machineOf(r) && !closed) { stats.retried++; log(`machine error, retried alone once the queue drains: ${t.label} (${r.machine}: ${String(r.error || '').slice(0, 120)})`); retries.push({ t, first: r }); }
         else t.resolve(r);
         pump();
       });
@@ -66,6 +69,7 @@ export function createScheduler({ playwright, workers = WORKERS, log = () => {} 
       running++; solo = true;
       exec(t, true).then((r) => {
         running--; solo = false;
+        if (closed && !running) for (const w of idleWaiters.splice(0)) w();
         if (machineOf(r)) { stats.machineTwice++; t.resolve({ ...r, retried: true, firstError: first.error }); }
         else t.resolve({ ...r, retried: true, firstError: first.error });
         pump();
@@ -76,11 +80,23 @@ export function createScheduler({ playwright, workers = WORKERS, log = () => {} 
   }
   let seq = 0;
   return {
-    run(task) { return new Promise((resolve) => { queue.push({ weight: 1, priority: 0, ...task, seq: seq++, resolve }); pump(); }); },
+    run(task) { if (closed) return Promise.resolve({ error: 'not run: the gate stopped' }); return new Promise((resolve) => { queue.push({ weight: 1, priority: 0, ...task, seq: seq++, resolve }); pump(); }); },
     drained() { return new Promise((r) => { if (!queue.length && !running && !retries.length) r(); else idleWaiters.push(r); }); },
     browser: ensure,
     get limit() { return ctl.limit; },
     stats,
-    async close() { if (browser) await browser.close().catch(() => {}); browser = null; launching = null; },
+    // Closing stops the scheduler first (Codex review, 2026-10-21: a task crashing on the closed browser was retried in a new one):
+    // queued tasks and pending retries settle as stopped, a running task's result stands unretried, and a browser still launching
+    // is awaited and closed too.
+    async close() {
+      closed = true;
+      const stopped = { error: 'not run: the gate stopped' };
+      for (const t of queue.splice(0)) t.resolve(stopped);
+      for (const { t, first } of retries.splice(0)) t.resolve({ ...first, retried: false });
+      const open = browser || (launching ? await launching.catch(() => null) : null);
+      if (open) await open.close().catch(() => {});
+      browser = null; launching = null;
+      if (!running) for (const w of idleWaiters.splice(0)) w();
+    },
   };
 }

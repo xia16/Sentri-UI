@@ -14,11 +14,12 @@ import os from 'node:os';
 import path from 'node:path';
 import { pwPath, playwright } from './playwright-path.mjs';
 import { removeWorktree } from './worktree-remove.mjs';
-import { CLASSES, classOfFiles, DS_FEATURE, componentPage, componentPagesOf, componentsTouched, idPath, screensOf, pageOf, pageAssets, sharedFiles, coverageLost, effectiveClass, classifyScreens, touchesSystem, touchesTools, budgetProblems, critiqueProblems, pageStyling, addedLines, scenarioDebt, isMotionFile, unheldMotion, heldOf, confirmLeaf, reusableLeaf, IN_PROGRESS, readInProgress, ownFeatures, scopeReach, componentScope, exportStamps, readLibrary, libraryProblems, newExportProblems, frozenFeatures, checksChinese } from './loop-rules.mjs';
+import { closer } from './process-start.mjs';
+import { CLASSES, classOfFiles, DS_FEATURE, componentPage, componentPagesOf, componentsTouched, idPath, screensOf, pageOf, pageAssets, sharedFiles, coverageLost, effectiveClass, classifyScreens, touchesSystem, touchesTools, budgetProblems, critiqueProblems, pageStyling, addedLines, scenarioDebt, isMotionFile, unheldMotion, heldOf, confirmLeaf, CONFIRMED, firstRun, reusableLeaf, IN_PROGRESS, readInProgress, ownFeatures, scopeReach, componentScope, exportStamps, readLibrary, libraryProblems, newExportProblems, frozenFeatures, checksChinese } from './loop-rules.mjs';
 import { bundleShape, bundleChange } from './bundle-graph.mjs';
 // The analyser (gate-v2 §2): static and conservative, over both revisions. It says what each screen's and each leaf's evidence
 // depends on; the reach is every screen and leaf whose evidence identity that makes differs between the two (gate-simplify.md X1).
-import { identityInputs, leafInputs } from './static-reach.mjs';
+import { identityInputs, leafInputs, variantInputs } from './static-reach.mjs';
 import { EvidenceStore, identityOf, treeOf, blobsHash, codeHash, sha, canonical, reconcileInventory, planEvidence, inputsDigest, identityDiff } from './evidence.mjs';
 import { createScheduler } from './scheduler.mjs';
 import { WORKERS, LAUNCH_ARGS, machineErrorOf, classifyMachineError } from './machine.mjs';
@@ -50,7 +51,17 @@ function git(args, cwd) { const r = spawnSync('git', args, { cwd, encoding: 'utf
 export const TOOL_PATHS = ['scripts', 'docs/design-workflow', 'package.json'];
 export const toolsDiffer = (root, base) => git(['diff', '--name-only', base, '--', ...TOOL_PATHS], root).out.trim().split(/\r?\n/).filter(Boolean);
 
+// One evaluation, cleaned up on every exit through one awaited path (process-start.mjs closer): its return, a throw, and a signal to
+// the gate, which calls the closer it was handed (opts.onClose) before its lock goes (Codex audit, 2026-10-21: the signal handler
+// exited at once, leaving browsers, servers, worktrees and npm test's tree running).
 export async function evaluate(opts) {
+  const own = { kids: [], cleanups: [] };
+  const close = closer(own.kids, own.cleanups);
+  opts.onClose?.(close);
+  try { return await evaluateIn(opts, own); } finally { await close(); }
+}
+
+async function evaluateIn(opts, { kids, cleanups }) {
   const { root, out, mode = 'normal', scope = [], audit = false, keep = false, log = console.log, env = process.env } = opts;
   const t0 = Date.now(), at = {};
   const mark = (k) => { at[k] = Date.now(); };
@@ -58,10 +69,7 @@ export async function evaluate(opts) {
   const check = (name, ok, detail = '') => { checks.push({ check: name, result: ok === null ? 'skipped' : ok ? 'pass' : 'fail', detail }); log((ok === null ? 'SKIP' : ok ? 'PASS' : 'FAIL').padEnd(5), name, detail ? '— ' + String(detail).split('\n')[0] : ''); };
   const block = (why) => { blocked.push(why); log('BLOCK', why); };
   const mech = { outcome: null, pass: false, candidate: '', base: '', ref: opts.ref || opts.candidate, mode, scope, class: {}, checks, gaps, blocked, screens: null, pairs: [], inventory: null, evidence: null, timings: {} };
-  const kids = [], cleanups = [];
   const finish = () => {
-    for (const k of kids) try { k.kill(); } catch {}
-    for (const c of cleanups.reverse()) try { c(); } catch {}
     mech.outcome = blocked.length ? 'blocked' : checks.some((c) => c.result === 'fail') ? 'fail' : 'pass';
     mech.pass = mech.outcome === 'pass';
     mech.timings.total = secs(Date.now() - t0);
@@ -232,8 +240,11 @@ export async function evaluate(opts) {
     const leavesIn = (dir) => (fs.existsSync(path.join(dir, 'features')) ? fs.readdirSync(path.join(dir, 'features')) : []).filter((f) => fs.existsSync(path.join(dir, 'features', f, 'scenarios.json')));
     const withLeaves = [...new Set([...leavesIn(S.base.dir), ...leavesIn(S.cand.dir)])];
     const coverage = (dir) => ({ runner: fs.existsSync(path.join(dir, 'scripts/run-scenarios.mjs')), specs: Object.fromEntries(withLeaves.map((f) => { try { return [f, JSON.parse(fs.readFileSync(path.join(dir, 'features', f, 'scenarios.json'), 'utf8'))]; } catch { return [f, null]; } })) });
-    const lost = coverageLost(coverage(S.base.dir), coverage(S.cand.dir));
+    const rewritten = [];
+    const lost = coverageLost(coverage(S.base.dir), coverage(S.cand.dir), rewritten);
     check('behaviour coverage kept', !lost.length, lost.length ? `removes behaviour coverage (${lost.slice(0, 3).join('; ')}): do it in its own workflow PR` : `${withLeaves.length} feature(s) with leaves`);
+    // a design change may rewrite what a leaf checks: kept, and listed so the owner sees it beside the design
+    if (rewritten.length) gaps.push(`${rewritten.length} leaf assertion(s) rewritten to a new target (kept coverage; check they still test the outcome): ${rewritten.slice(0, 4).join('; ')}`);
   }
   {
     // P2: visual declarations belong to the design system. Read from the diff, so it holds whether or not a screen moves.
@@ -275,10 +286,10 @@ export async function evaluate(opts) {
 
   // ---------- the browser ----------
   const sched = createScheduler({ playwright, log });
-  cleanups.push(() => { sched.close(); });
+  cleanups.push(() => sched.close());
   const browser = await sched.browser();
   const pool = contextPool();
-  cleanups.push(() => { pool.close(); });
+  cleanups.push(() => pool.close());
   const render = { playwright: pwVersion, browser: browser.version(), platform: process.platform, launch: LAUNCH_ARGS, clock: CLOCK, height: HEIGHT, dsf: 1, bounds: BOUNDS };
 
   // ---------- servers ----------
@@ -336,7 +347,7 @@ export async function evaluate(opts) {
       for (const id of sc.keep) reachIds.add(id);
       for (const id of [...identityChanged]) if (!reachIds.has(id)) identityChanged.delete(id);
       mech.reach.screens = reachIds.size;
-      scoped = { own, inProgress, propagation: sc.propagation, touched };
+      scoped = { own, inProgress, propagation: sc.propagation, touched, keepPage };
       mech.ownFeatures = own;
       mech.inProgress = inProgress;
       mech.outOfScope = sc.outOfScope;
@@ -410,19 +421,34 @@ export async function evaluate(opts) {
     },
   });
 
-  // ---------- state checks: every variant file on each side ----------
-  const variantFiles = (side) => [...S[side].tree.keys()].filter((f) => /^ux\/design-system\/components\/[^/]+\/variants\/[^/]+\.html$/.test(f)).sort();
-  const dsInputs = (side) => ({ tokens: blob(side, 'ux/design-system/tokens.css'), css: blob(side, 'ux/design-system/components/bundle.css'), js: blob(side, BUNDLE_JS), fonts: harness(side).fonts });
-  const stateItems = [];
-  for (const side of audit ? [] : ['base', 'cand']) for (const f of variantFiles(side)) {
+  // ---------- state checks: the variant files the change reaches ----------
+  // A state check's identity is its variant file and what it depends on (variantInputs: what the file loads, and the bundle units its
+  // scripts can call with every start-up effect), plus the tokens, the bundle's CSS and the fonts every state is drawn with. So a
+  // bundle edit re-checks only the variants that can run what changed (Codex audit, 2026-10-21: every identity hashed the whole
+  // bundle.js). As for shots (gate-simplify.md X1), a variant with the same identity on both sides gives the same result and is not
+  // checked, and a shared change checks only the component pages its scope keeps (componentScope's keepPage).
+  const VARIANT = /^ux\/design-system\/components\/([^/]+)\/variants\/([^/]+)\.html$/;
+  const variantFiles = (side) => [...S[side].tree.keys()].filter((f) => VARIANT.test(f)).sort();
+  const dsInputs = (side) => ({ tokens: blob(side, 'ux/design-system/tokens.css'), css: blob(side, 'ux/design-system/components/bundle.css'), fonts: harness(side).fonts });
+  const stateIdOf = (side, f) => {
     const html = fs.readFileSync(path.join(S[side].dir, f), 'utf8');
     const loads = pageAssets(html, f);
     // a specimen whose own scripts load by a computed URL depends on the whole page tree
     const computed = /\bfetch\s*\(|\bimport\s*\(|XMLHttpRequest|\.src\s*=|setAttribute\(\s*['"](src|href)/.test(html);
-    const id = identityOf('state', { file: blob(side, f), loads: blobsHash(S[side].tree, loads), tree: computed ? blobsHash(S[side].tree, S[side].runtime) : null, ds: dsInputs(side), vw: STATE_VW, render, checker: code.states });
-    const [, comp, variant] = /^ux\/design-system\/components\/([^/]+)\/variants\/([^/]+)\.html$/.exec(f);
+    let deps = null;
+    try { deps = inputsDigest(variantInputs(S[side].side, f), S[side].tree, S[side].runtime).digest; } catch (e) { gaps.push(`variantInputs(${side}, ${f}) threw (${e.message}): its state check hashes the whole bundle`); }
+    return identityOf('state', { file: blob(side, f), loads: blobsHash(S[side].tree, loads), tree: computed ? blobsHash(S[side].tree, S[side].runtime) : null, ds: dsInputs(side), deps: deps || { js: blob(side, BUNDLE_JS) }, vw: STATE_VW, render, checker: code.states });
+  };
+  const stateIds = audit ? null : { base: new Map(variantFiles('base').map((f) => [f, stateIdOf('base', f)])), cand: new Map(variantFiles('cand').map((f) => [f, stateIdOf('cand', f)])) };
+  const stateItems = [];
+  let statesOutOfScope = 0;
+  for (const side of audit ? [] : ['base', 'cand']) for (const [f, id] of stateIds[side]) {
+    if (stateIds[side === 'base' ? 'cand' : 'base'].get(f) === id) continue;
+    const [, comp, variant] = VARIANT.exec(f);
+    if (scoped && !scoped.keepPage(`ds:${comp}/${variant}`)) { if (side === 'cand' || !stateIds.cand.has(f)) statesOutOfScope++; continue; }
     stateItems.push({ kind: 'state', id, side, file: f, comp, variant });
   }
+  if (stateIds) mech.reach.states = { variants: new Set([...stateIds.base.keys(), ...stateIds.cand.keys()]).size, checked: new Set(stateItems.map((i) => i.file)).size, ...(statesOutOfScope ? { outOfScope: statesOutOfScope } : {}) };
   const statePlan = plan_(stateItems);
   for (const { item, record } of statePlan.reuse) results.set(item.id, { ...record, reused: true });
   const stateTask = (it) => ({
@@ -783,7 +809,7 @@ export async function evaluate(opts) {
   // with the bundle units that closure can run (leafInputs). Whatever it can't bound means the leaf hashes every page-loadable file.
   // one context pool per side (its server's origin), shared by every leaf run of that side
   const leafPools = { base: leafContextPool(), cand: leafContextPool() };
-  cleanups.push(() => { leafPools.base.close(); leafPools.cand.close(); });
+  cleanups.push(() => Promise.all([leafPools.base.close(), leafPools.cand.close()]));
   const leafMemo = new Map();
   const leafReach = (side, l, D) => {
     const fx = l.state?.reset || {}, url = leafEntryUrl(fx, D), k = `${side} ${url} ${fx.screen || ''}`;
@@ -836,11 +862,14 @@ export async function evaluate(opts) {
       if (x.machine) { results.set(it.id, { ...x.run, machine: x.machine }); return; }
       if (x.error) { results.set(it.id, { lang: it.lang, width: it.width, result: 'fail', failures: [{ what: 'run', got: x.error, tag: null }], skipped: [], notes: [], evidence: [] }); return; }
       results.set(it.id, x.run);
-      if (x.run.result !== 'fail') { store.put('leaf', it.id, { run: x.run }); return; } // a pass: the same identity gives the same result
-      // a fresh failure is a design result only once it repeats (L26): one confirming run on the same identity
+      const first = firstRun(x.run);
+      if (first.store) store.put('leaf', it.id, { run: x.run }); // a pass: the same identity gives the same result
+      if (!first.confirm) return; // a run that could not render its language is no evidence: never stored (blocked below)
+      // a fresh failure is a design result only once it repeats (L26): one confirming run on the same identity, failing the same way
       const c = confirmLeaf(x, await runOnce(it, true));
-      if (c.store) store.put('leaf', it.id, { run: x.run, confirmed: true });
+      if (c.store) store.put('leaf', it.id, { run: x.run, confirmed: CONFIRMED });
       if (c.unstable) block(`scenarios ${f}: ${it.leaf.node.id} ${side} ${it.lang}-${it.width} failed, then ${c.why} on the same identity: an unstable leaf, not a design result (fix the leaf or the page's race)`);
+      if (c.blocked) block(`scenarios ${f}: ${it.leaf.node.id} ${side} ${it.lang}-${it.width} failed, and ${c.blocked}: its failure is unconfirmed (rerun the gate when the machine is idle)`);
     });
     // X8: another language only where its start renders it. The runner checks that once a leaf's start is set up (its reset
     // fixture: page, preset, fixture taps); one run per start and language goes first, and when it finds no rendering, the other
@@ -857,6 +886,11 @@ export async function evaluate(opts) {
       return null;
     }));
     for (const it of plan.its.filter((i) => i.kind)) { const r = results.get(it.id); if (r?.machine) block(`scenarios ${f}: ${it.leaf.node.id} ${side} ${it.lang}-${it.width}: machine error twice (${r.machine}: ${String(r.failures?.[0]?.got || '').slice(0, 100)})`); }
+    // Every run here is required (a ZH run only on a frozen feature), so a candidate run that came back blocked (its page renders no
+    // Chinese) is missing evidence, never a pass (Codex audit, 2026-10-21). A base run is asked only whether a failure is main's
+    // debt: blocked there, the failure stays the change's. A decision-blocker is a row of the report, not a run, and stays as it is.
+    const unrun = side === 'cand' ? plan.its.filter((i) => { const r = i.kind && results.get(i.id); return r && !r.machine && firstRun(r).blocked; }) : [];
+    if (unrun.length) block(`scenarios ${f}: ${unrun.length} required run(s) ${firstRun(results.get(unrun[0].id)).blocked}, e.g. ${unrun.slice(0, 3).map((i) => `${i.leaf.node.id} ${i.lang}-${i.width}`).join(', ')}: a frozen feature's page must render its language`);
     const rows = [];
     for (const l of new Set(plan.its.map((i) => i.leaf))) rows.push(leafRow(l, plan.its.filter((i) => i.leaf === l && i.kind).map((i) => results.get(i.id)).filter((r) => r && !r.machine)));
     return reportOf({ feature: f, commit: S[side].sha, base: S[side].url, langs: plan.langs, widths: plan.widths, nodeCount: plan.nodeCount, rows });

@@ -36,3 +36,28 @@ export function holderAlive(rec, { alive = pidAlive, start = startOf } = {}) {
   const s = start(rec.pid);
   return s === null || Math.abs(s - rec.start) <= START_SLACK_MS;
 }
+
+// End a child and every process it started. On Windows a shell child (`npm test` is spawned with shell: true) is cmd.exe, and
+// killing it leaves npm and node --test with their browsers running: taskkill /T ends the whole tree. Elsewhere the child is signalled.
+export function killTree(child) {
+  if (!child?.pid || child.exitCode !== null || child.signalCode !== null) return;
+  if (process.platform === 'win32') { try { execFileSync('taskkill', ['/pid', String(child.pid), '/T', '/F'], { stdio: 'ignore', windowsHide: true, timeout: 15000 }); return; } catch {} }
+  try { child.kill(); } catch {}
+}
+
+// A gate's one cleanup (Codex audit, 2026-10-21): its children ended first (servers, npm test), then its cleanups awaited newest
+// first (browsers and pools, then the worktrees they used), each failure ignored. Every caller (the evaluation's finally, a signal)
+// gets the same promise, so a stopped gate releases its lock only after its browsers, servers and npm test are gone. The evaluation
+// may still be starting while it closes (a server spawned once a browser launch it awaited resolves): from the moment closing begins,
+// a child registered is ended at once and a cleanup registered runs before the close ends (Codex review, 2026-10-21).
+export function closer(kids, cleanups, kill = killTree) {
+  let done = null;
+  return () => (done ||= (async () => {
+    const late = [];
+    kids.push = (...ps) => { for (const k of ps) { try { kill(k); } catch {} } return kids.length; };
+    cleanups.push = (...cs) => { late.push(...cs); return cleanups.length; };
+    for (const k of kids) { try { kill(k); } catch {} }
+    for (const c of [...cleanups].reverse()) { try { await c(); } catch {} }
+    while (late.length) { try { await late.pop()(); } catch {} }
+  })());
+}
