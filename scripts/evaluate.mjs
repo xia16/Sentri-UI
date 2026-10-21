@@ -15,7 +15,7 @@ import path from 'node:path';
 import { pwPath, playwright } from './playwright-path.mjs';
 import { removeWorktree } from './worktree-remove.mjs';
 import { closer } from './process-start.mjs';
-import { CLASSES, classOfFiles, DS_FEATURE, componentPage, componentPagesOf, componentsTouched, idPath, screensOf, pageOf, pageAssets, sharedFiles, coverageLost, effectiveClass, classifyScreens, touchesSystem, touchesTools, budgetProblems, critiqueProblems, pageStyling, addedLines, scenarioDebt, isMotionFile, unheldMotion, heldOf, confirmLeaf, firstRun, reusableLeaf, IN_PROGRESS, readInProgress, ownFeatures, scopeReach, componentScope, exportStamps, readLibrary, libraryProblems, newExportProblems, frozenFeatures, checksChinese } from './loop-rules.mjs';
+import { CLASSES, classOfFiles, DS_FEATURE, componentPage, componentPagesOf, componentsTouched, idPath, screensOf, pageOf, pageAssets, sharedFiles, coverageLost, effectiveClass, classifyScreens, touchesSystem, touchesTools, budgetProblems, critiqueProblems, pageStyling, addedLines, scenarioDebt, isMotionFile, unheldMotion, heldOf, confirmLeaf, CONFIRMED, firstRun, reusableLeaf, IN_PROGRESS, readInProgress, ownFeatures, scopeReach, componentScope, exportStamps, readLibrary, libraryProblems, newExportProblems, frozenFeatures, checksChinese } from './loop-rules.mjs';
 import { bundleShape, bundleChange } from './bundle-graph.mjs';
 // The analyser (gate-v2 §2): static and conservative, over both revisions. It says what each screen's and each leaf's evidence
 // depends on; the reach is every screen and leaf whose evidence identity that makes differs between the two (gate-simplify.md X1).
@@ -867,7 +867,7 @@ async function evaluateIn(opts, { kids, cleanups }) {
       if (!first.confirm) return; // a run that could not render its language is no evidence: never stored (blocked below)
       // a fresh failure is a design result only once it repeats (L26): one confirming run on the same identity, failing the same way
       const c = confirmLeaf(x, await runOnce(it, true));
-      if (c.store) store.put('leaf', it.id, { run: x.run, confirmed: true });
+      if (c.store) store.put('leaf', it.id, { run: x.run, confirmed: CONFIRMED });
       if (c.unstable) block(`scenarios ${f}: ${it.leaf.node.id} ${side} ${it.lang}-${it.width} failed, then ${c.why} on the same identity: an unstable leaf, not a design result (fix the leaf or the page's race)`);
       if (c.blocked) block(`scenarios ${f}: ${it.leaf.node.id} ${side} ${it.lang}-${it.width} failed, and ${c.blocked}: its failure is unconfirmed (rerun the gate when the machine is idle)`);
     });

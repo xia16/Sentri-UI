@@ -60,7 +60,9 @@ function outcomesById(spec) {
 // change rewrote what the leaf checks) is listed for the owner and kept.
 const kindOf = (a) => (a && typeof a === 'object' ? ASSERTION_KINDS.find((k) => k in a) || null : null);
 const enOf = (t) => (typeof t === 'string' ? t : t && typeof t === 'object' ? t.en ?? null : null);
-const contractOf = (a) => { const { says, ...rest } = a || {}; return JSON.stringify(rest, Object.keys(rest).sort()); };
+// keys sorted at every depth ({ en, zh } included: a replacer list would drop nested keys)
+const sortedJson = (v) => (Array.isArray(v) ? `[${v.map(sortedJson).join(',')}]` : v && typeof v === 'object' ? `{${Object.keys(v).sort().map((k) => `${JSON.stringify(k)}:${sortedJson(v[k])}`).join(',')}}` : JSON.stringify(v ?? null));
+const contractOf = (a) => { const { says, ...rest } = a || {}; return sortedJson(rest); };
 const shown = (a) => !(a.absent || a.is === 'absent');
 const targetOf = (a) => { const k = kindOf(a); return JSON.stringify([k, k === 'text' || k === 'verb' ? enOf(a[k]) : a[k], shown(a)]); };
 const scopeOf = (a) => (a.in && a.in !== 'phone' ? a.in : 'phone');
@@ -561,6 +563,9 @@ export const critiqueProblems = notesProblems('critique.md', CRITIQUE_HEADINGS);
 // 2026-10-21: a second, different failure confirmed the first); one that could not run confirms nothing and blocks.
 // x, y: the scheduler's results ({ run } or { machine } or { error }).
 const failureKeys = (run) => [...new Set((run?.failures || []).map((f) => (f.contract && f.category ? `${f.contract}|${f.category}` : `what:${f.what}`)))].sort().join('\n');
+// A stored failure confirmed this way carries CONFIRMED; `confirmed: true` was written when any second failure confirmed the first,
+// so it is run again (Codex review, 2026-10-21), not reused.
+export const CONFIRMED = 'same-failure';
 export function confirmLeaf(x, y) {
   if (!y || y.machine || y.error) return { store: false, unstable: false, blocked: `its confirming run could not run (${y?.machine || String(y?.error || 'no result').split('\n')[0].slice(0, 100)})` };
   if (y.run?.result === 'fail') return failureKeys(y.run) === failureKeys(x?.run) ? { store: true, unstable: false } : { store: false, unstable: true, why: 'failed differently' };
@@ -575,8 +580,9 @@ export function firstRun(run) {
   return { blocked: `could not run (${(run?.notes || [])[0] || `came back ${run?.result}`})` };
 }
 // A stored leaf result is reused only when it is a pass, or a failure that was confirmed (a store written before L26 holds
-// unconfirmed failures, and one written before 2026-10-21 may hold a blocked run: they are run again).
-export const reusableLeaf = (record) => !!record?.run && (record.run.result === 'pass' || (record.run.result === 'fail' && record.confirmed === true));
+// unconfirmed failures, and one written before 2026-10-21 may hold a blocked run or a failure confirmed by a different one: they are
+// run again).
+export const reusableLeaf = (record) => !!record?.run && (record.run.result === 'pass' || (record.run.result === 'fail' && record.confirmed === CONFIRMED));
 
 // Design-system components only (owner, 2026-10-11): visual styling added in a page's own CSS, markup or scripts is an improvised
 // component. Layout (margin, padding, gap, grid, flex, size, position) is the page's; looks belong to ux/design-system. A line

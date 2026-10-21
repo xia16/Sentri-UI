@@ -2,7 +2,7 @@
 // run that could not render its language blocks and is never stored; a confirming run is compared failure by failure.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { coverageLost, confirmLeaf, reusableLeaf, firstRun } from '../scripts/loop-rules.mjs';
+import { coverageLost, confirmLeaf, reusableLeaf, firstRun, CONFIRMED } from '../scripts/loop-rules.mjs';
 
 const spec = (...leaves) => ({ tree: [{ type: 'state', id: 'st', reset: { url: '/p.html' }, children: leaves }] });
 const leaf = (id, visible = [], record = [], extra = {}) => ({ type: 'outcome', id, visible, record, ...extra });
@@ -63,5 +63,34 @@ test('a required run that could not render its language blocks and is never stor
   assert.deepEqual(firstRun(zh), { blocked: 'could not run (no zh rendering: ?lang=zh is ignored (no "返回"))' });
   assert.equal(reusableLeaf({ run: zh }), false, 'a stored blocked run (written before 2026-10-21) is run again');
   assert.equal(reusableLeaf({ run: { result: 'pass' } }), true);
-  assert.equal(reusableLeaf({ run: { result: 'fail' }, confirmed: true }), true);
+  assert.equal(reusableLeaf({ run: { result: 'fail' }, confirmed: CONFIRMED }), true);
+});
+
+test('a closed scheduler launches nothing more: queued tasks and retries settle, a running task\'s crash is not retried', async () => {
+  const { createScheduler } = await import('../scripts/scheduler.mjs');
+  const events = [];
+  let n = 0;
+  const playwright = () => ({ chromium: { launch: async () => { const i = n++; events.push(`launch ${i}`); let up = true; return { isConnected: () => up, close: async () => { up = false; events.push(`close ${i}`); } }; } } });
+  const sched = createScheduler({ playwright, workers: 1 });
+  let release;
+  const first = sched.run({ kind: 'state', label: 'a', run: async ({ browser }) => { await new Promise((r) => { release = r; }); return browser.isConnected() ? { ok: true } : { machine: 'browser-crash' }; } });
+  const second = sched.run({ kind: 'state', label: 'b', run: async () => ({ ok: true }) });
+  while (!release) await new Promise((r) => setTimeout(r, 5));
+  const closing = sched.close();
+  release();
+  await closing;
+  const [a, b] = await Promise.all([first, second]);
+  assert.ok(a.machine && !a.retried, 'the running task\'s crash is reported, not retried in a new browser');
+  assert.match(b.error, /stopped/, 'the queued task never runs');
+  await sched.drained();
+  assert.deepEqual(events, ['launch 0', 'close 0']);
+  await assert.rejects(sched.browser(), /closed/);
+});
+
+test('Codex review round 1: a contract is compared at every depth, and a failure confirmed under the old rule is run again', () => {
+  const zh = leaf('l1', [{ text: { en: 'Saved', zh: '已保存' } }]);
+  assert.match(lost(zh, leaf('l1', [{ text: { en: 'Saved' } }]))[0] || '', /no longer checks zh/, 'zh dropped from the object');
+  assert.match(lost(zh, leaf('l1', [{ text: { en: '', zh: '已保存' } }]))[0] || '', /asserts nothing/, 'English emptied inside the object');
+  assert.equal(reusableLeaf({ run: { result: 'fail' }, confirmed: true }), false, 'confirmed: true may be a different second failure');
+  assert.equal(reusableLeaf({ run: { result: 'fail' }, confirmed: CONFIRMED }), true);
 });
