@@ -456,8 +456,9 @@ test('leaf: a fresh failure is stored only when a confirming run fails too; a pa
   assert.deepEqual(confirmLeaf(fail, fail), { store: true, unstable: false }, 'the same failure twice: a design result');
   assert.deepEqual(confirmLeaf(fail, pass), { store: false, unstable: true, why: 'passed' }, 'fa-s26: failed, then passed: unstable, stored as nothing');
   assert.equal(confirmLeaf(fail, { run: { result: 'blocked' } }).unstable, true, 'any other result is a disagreement');
-  assert.deepEqual(confirmLeaf(fail, { machine: 'navigation-timeout' }), { store: false, unstable: false }, 'a lost confirming run confirms nothing');
-  assert.deepEqual(confirmLeaf(fail, { error: 'boom' }), { store: false, unstable: false });
+  // a lost confirming run confirms nothing, and blocks (Codex audit, 2026-10-21; tests/gate-fixes-2.test.mjs)
+  assert.equal(confirmLeaf(fail, { machine: 'navigation-timeout' }).store, false);
+  assert.match(confirmLeaf(fail, { error: 'boom' }).blocked, /could not run \(boom\)/);
   // reuse: a pass, or a confirmed failure; never a failure stored before L26
   assert.equal(reusableLeaf({ run: { result: 'pass' } }), true);
   assert.equal(reusableLeaf({ run: { result: 'fail' }, confirmed: true }), true);

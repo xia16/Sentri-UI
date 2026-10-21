@@ -14,7 +14,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { pwPath, playwright } from './playwright-path.mjs';
 import { removeWorktree } from './worktree-remove.mjs';
-import { CLASSES, classOfFiles, DS_FEATURE, componentPage, componentPagesOf, componentsTouched, idPath, screensOf, pageOf, pageAssets, sharedFiles, coverageLost, effectiveClass, classifyScreens, touchesSystem, touchesTools, budgetProblems, critiqueProblems, pageStyling, addedLines, scenarioDebt, isMotionFile, unheldMotion, heldOf, confirmLeaf, reusableLeaf, IN_PROGRESS, readInProgress, ownFeatures, scopeReach, componentScope, exportStamps, readLibrary, libraryProblems, newExportProblems, frozenFeatures, checksChinese } from './loop-rules.mjs';
+import { CLASSES, classOfFiles, DS_FEATURE, componentPage, componentPagesOf, componentsTouched, idPath, screensOf, pageOf, pageAssets, sharedFiles, coverageLost, effectiveClass, classifyScreens, touchesSystem, touchesTools, budgetProblems, critiqueProblems, pageStyling, addedLines, scenarioDebt, isMotionFile, unheldMotion, heldOf, confirmLeaf, firstRun, reusableLeaf, IN_PROGRESS, readInProgress, ownFeatures, scopeReach, componentScope, exportStamps, readLibrary, libraryProblems, newExportProblems, frozenFeatures, checksChinese } from './loop-rules.mjs';
 import { bundleShape, bundleChange } from './bundle-graph.mjs';
 // The analyser (gate-v2 §2): static and conservative, over both revisions. It says what each screen's and each leaf's evidence
 // depends on; the reach is every screen and leaf whose evidence identity that makes differs between the two (gate-simplify.md X1).
@@ -232,8 +232,11 @@ export async function evaluate(opts) {
     const leavesIn = (dir) => (fs.existsSync(path.join(dir, 'features')) ? fs.readdirSync(path.join(dir, 'features')) : []).filter((f) => fs.existsSync(path.join(dir, 'features', f, 'scenarios.json')));
     const withLeaves = [...new Set([...leavesIn(S.base.dir), ...leavesIn(S.cand.dir)])];
     const coverage = (dir) => ({ runner: fs.existsSync(path.join(dir, 'scripts/run-scenarios.mjs')), specs: Object.fromEntries(withLeaves.map((f) => { try { return [f, JSON.parse(fs.readFileSync(path.join(dir, 'features', f, 'scenarios.json'), 'utf8'))]; } catch { return [f, null]; } })) });
-    const lost = coverageLost(coverage(S.base.dir), coverage(S.cand.dir));
+    const rewritten = [];
+    const lost = coverageLost(coverage(S.base.dir), coverage(S.cand.dir), rewritten);
     check('behaviour coverage kept', !lost.length, lost.length ? `removes behaviour coverage (${lost.slice(0, 3).join('; ')}): do it in its own workflow PR` : `${withLeaves.length} feature(s) with leaves`);
+    // a design change may rewrite what a leaf checks: kept, and listed so the owner sees it beside the design
+    if (rewritten.length) gaps.push(`${rewritten.length} leaf assertion(s) rewritten to a new target (kept coverage; check they still test the outcome): ${rewritten.slice(0, 4).join('; ')}`);
   }
   {
     // P2: visual declarations belong to the design system. Read from the diff, so it holds whether or not a screen moves.
@@ -836,11 +839,14 @@ export async function evaluate(opts) {
       if (x.machine) { results.set(it.id, { ...x.run, machine: x.machine }); return; }
       if (x.error) { results.set(it.id, { lang: it.lang, width: it.width, result: 'fail', failures: [{ what: 'run', got: x.error, tag: null }], skipped: [], notes: [], evidence: [] }); return; }
       results.set(it.id, x.run);
-      if (x.run.result !== 'fail') { store.put('leaf', it.id, { run: x.run }); return; } // a pass: the same identity gives the same result
-      // a fresh failure is a design result only once it repeats (L26): one confirming run on the same identity
+      const first = firstRun(x.run);
+      if (first.store) store.put('leaf', it.id, { run: x.run }); // a pass: the same identity gives the same result
+      if (!first.confirm) return; // a run that could not render its language is no evidence: never stored (blocked below)
+      // a fresh failure is a design result only once it repeats (L26): one confirming run on the same identity, failing the same way
       const c = confirmLeaf(x, await runOnce(it, true));
       if (c.store) store.put('leaf', it.id, { run: x.run, confirmed: true });
       if (c.unstable) block(`scenarios ${f}: ${it.leaf.node.id} ${side} ${it.lang}-${it.width} failed, then ${c.why} on the same identity: an unstable leaf, not a design result (fix the leaf or the page's race)`);
+      if (c.blocked) block(`scenarios ${f}: ${it.leaf.node.id} ${side} ${it.lang}-${it.width} failed, and ${c.blocked}: its failure is unconfirmed (rerun the gate when the machine is idle)`);
     });
     // X8: another language only where its start renders it. The runner checks that once a leaf's start is set up (its reset
     // fixture: page, preset, fixture taps); one run per start and language goes first, and when it finds no rendering, the other
@@ -857,6 +863,11 @@ export async function evaluate(opts) {
       return null;
     }));
     for (const it of plan.its.filter((i) => i.kind)) { const r = results.get(it.id); if (r?.machine) block(`scenarios ${f}: ${it.leaf.node.id} ${side} ${it.lang}-${it.width}: machine error twice (${r.machine}: ${String(r.failures?.[0]?.got || '').slice(0, 100)})`); }
+    // Every run here is required (a ZH run only on a frozen feature), so a candidate run that came back blocked (its page renders no
+    // Chinese) is missing evidence, never a pass (Codex audit, 2026-10-21). A base run is asked only whether a failure is main's
+    // debt: blocked there, the failure stays the change's. A decision-blocker is a row of the report, not a run, and stays as it is.
+    const unrun = side === 'cand' ? plan.its.filter((i) => { const r = i.kind && results.get(i.id); return r && !r.machine && firstRun(r).blocked; }) : [];
+    if (unrun.length) block(`scenarios ${f}: ${unrun.length} required run(s) ${firstRun(results.get(unrun[0].id)).blocked}, e.g. ${unrun.slice(0, 3).map((i) => `${i.leaf.node.id} ${i.lang}-${i.width}`).join(', ')}: a frozen feature's page must render its language`);
     const rows = [];
     for (const l of new Set(plan.its.map((i) => i.leaf))) rows.push(leafRow(l, plan.its.filter((i) => i.leaf === l && i.kind).map((i) => results.get(i.id)).filter((r) => r && !r.machine)));
     return reportOf({ feature: f, commit: S[side].sha, base: S[side].url, langs: plan.langs, widths: plan.widths, nodeCount: plan.nodeCount, rows });
