@@ -77,7 +77,8 @@ export async function evaluate(opts) {
   {
     // gate.mjs runs itself from a worktree of the base when its checkout's tools differ; this is the backstop for a base that moved
     // while it started
-    const stale = toolsDiffer(root, mech.base);
+    const stale = opts.ownTools ? [] : toolsDiffer(root, mech.base); // --try runs this checkout's tools on purpose
+    if (opts.ownTools) mech.tryRun = true;
     if (stale.length) { block(`the gate runs the base's own tools: this checkout's ${stale.slice(0, 3).join(', ')} differ from ${short(mech.base)} (the base moved while the gate started: run it again)`); return finish(); }
   }
   const contains = git(['merge-base', '--is-ancestor', mech.base, mech.candidate], root).code === 0;

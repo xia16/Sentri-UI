@@ -31,9 +31,7 @@ const wtBlock = (why) => { console.error(`worktree guard: ${why}`); process.exit
 if (/\bgit\b[^;&|\n]*\bworktree\s+remove\b/i.test(plain)) wtBlock('remove a worktree with "node scripts/worktree-remove.mjs <dir>": it unlinks a junction or symlink inside first. git worktree remove --force deletes through a node_modules junction on Windows and empties the main checkout\'s node_modules.');
 if (/node_modules/i.test(plain) && /\bmklink\b|ItemType\s+(Junction|SymbolicLink)|\bln\s+-\w*s|symlinkSync/i.test(plain)) wtBlock('never link node_modules into a worktree: a removal can delete through the link. Set SENTRI_PLAYWRIGHT to the main checkout\'s node_modules/playwright instead.');
 const SAFE_PR = /^(view|list|create|edit|comment|checks|diff|status|checkout|ready|close|reopen|review)$/;
-const prSub = [...plain.matchAll(/\bgh\s+pr\s+(\S+)/gi)].map((m) => m[1]);
-const isMerge = prSub.some((s) => !SAFE_PR.test(s))
-  || /pulls\/\d+\/merge|\/merges\b|mergePullRequest|PullRequestAutoMerge|auto-merge|git\/refs/i.test(plain);
+const isMerge = /pulls\/\d+\/merge|\/merges\b|mergePullRequest|PullRequestAutoMerge|auto-merge|git\/refs/i.test(plain);
 
 // Pushes: every push must name a branch that isn't main; a command that pushes may not switch to main first.
 // Only what runs as `git push` counts (2026-10-20): the word in a grep, a script, a message or a heredoc body is not a push, but a
@@ -75,6 +73,9 @@ const segments = (src, depth = 0) => {
     else if (c === '#' && (i === 0 || /\s/.test(s[i - 1]))) { while (i < s.length && s[i] !== '\n') i++; }
     else { out += c; i++; }
   }
+  // A redirection is not part of the command (2026-10-21: `git push origin x 2>&1` read as "git push origin x 2>"): fd duplications
+  // (2>&1, >&2) and redirections to a file or from one are dropped before the split, since `&` would otherwise split them.
+  out = out.replace(/(^|\s)\d*[<>]{1,2}&(?:\d+|-)(?=\s|$)/g, '$1').replace(/(^|\s)\d*(?:>>?|<)\s*(?![&|;])[^\s;&|()]+/g, '$1');
   const segs = out.split(/;|&&|\|\||\||&|\n|[(){}]/).map((g) => g.replace(/\.exe\b/gi, '').replace(/\s+/g, ' ').trim()
     .replace(/^(?:(?:[A-Za-z_]\w*=\S*|if|then|else|elif|do|while|until|time|exec|command|env|sudo|nohup|xargs|!) )+/, ''));
   if (depth < 4) for (const n of nested) segs.push(...segments(n, depth + 1));
@@ -89,14 +90,20 @@ const gitCmd = (seg) => {
   while (k < t.length && t[k].startsWith('-')) { opts = true; k += GIT_ARG.test(t[k]) ? 2 : 1; }
   return { seg, sub: (t[k] || '').toLowerCase(), opts, args: t.slice(k + 1) };
 };
-const gits = segments(cmd).map(gitCmd).filter(Boolean);
+const segs = segments(cmd);
+const gits = segs.map(gitCmd).filter(Boolean);
+// A `gh pr <sub>` that runs (not one quoted in a message, a heredoc body or a script): 2026-10-21, a heredoc that only named
+// `gh pr merge` was blocked as a merge.
+// Anywhere in a parsed command, so `echo \`gh pr merge 6\`` still counts; quoted strings and heredoc bodies are placeholders there.
+const ranPr = segs.flatMap((g) => [...g.matchAll(/\bgh pr (\S+)/gi)].map((m) => m[1]));
+const ranMerge = ranPr.some((s) => !SAFE_PR.test(s));
 const pushes = gits.filter((g) => g.sub === 'push');
 for (const { seg, opts } of pushes) {
   const m = !opts && (seg.match(/^git push(?: -q| --quiet)?(?: -u| --set-upstream)? origin ([\w./][\w./-]*)$/) || seg.match(/^git push origin (?:--delete|-d) ([\w./][\w./-]*)$/));
   if (!m || /^(main|master|HEAD)$/i.test(m[1])) block(`a push must be one plain "git push origin <branch>", or "git push origin --delete <branch>", naming a branch that isn't main: "${seg.replaceAll(STR, '"…"')}"`);
 }
 if (pushes.length && gits.some((g) => /^(checkout|switch)$/.test(g.sub) && g.args.some((a) => /^(main|master)$/i.test(a)))) block('a command that pushes may not switch to main');
-if (!isMerge) process.exit(0);
+if (!isMerge && !ranMerge) process.exit(0);
 
 const m = cmd.trim().match(/^gh pr merge (\d+)(?: (?:-R|--repo) [\w.-]+\/[\w.-]+)? --squash(?: --delete-branch)? --match-head-commit ([0-9a-f]{40})$/);
 if (!m) block('a merge must be one command on its own, exactly: gh pr merge <n> --squash --match-head-commit <full sha>');

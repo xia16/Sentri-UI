@@ -50,7 +50,10 @@ const VERDICT_FILE = /^verdict(-[\w.-]+)?\.json$/;
 // G2): there are no local pass records.
 const gateDir = () => path.join(path.resolve(root, git(['rev-parse', '--git-common-dir']).out.trim()), 'sentri-gate');
 // A run against a test base (--base) never reaches GitHub or the merge guard.
-const testBase = !!opt('base');
+// --try (2026-10-21): run THIS checkout's tools on a candidate against origin/main, posting nothing. It is how a change to the
+// gate's own tools is tried on a real PR before it merges (it was a hand-built base and candidate). Never mergeable.
+const tryRun = flag('try');
+const testBase = !!opt('base') || tryRun;
 const mainRef = opt('base') || 'origin/main';
 const postStatus = (sha, state, description) => (testBase ? { ok: true } : post(root, sha, state, description));
 function git(args, cwd = root) { const r = spawnSync('git', args, { cwd, encoding: 'utf8', maxBuffer: 64 << 20 }); return { code: r.status, out: r.stdout || '', err: r.stderr || '' }; }
@@ -61,7 +64,7 @@ const sha = (r) => (r ? git(['rev-parse', '--verify', '--quiet', `${r}^{commit}`
 // differ from the base, this run starts the base's own gate.mjs from a detached worktree of the base, with the same arguments and
 // working directory, and removes that worktree when it ends. Before, such a run blocked until the driver checked main out (three
 // blocks on 2026-10-17/18). SENTRI_GATE_TOOLS marks the run inside, so it never goes round again.
-if (!process.env.SENTRI_GATE_TOOLS) {
+if (!process.env.SENTRI_GATE_TOOLS && !tryRun) {
   if (!testBase) git(['fetch', '-q', 'origin']);
   const base = sha(mainRef);
   const stale = base ? toolsDiffer(root, base) : [];
@@ -110,7 +113,7 @@ async function runGate({ ref, base, out, mode, scope, audit = false, keep = fals
   if (candidate && !audit) postStatus(candidate, 'pending', `gate running against ${short(sha(base))}`); // an earlier pass for this commit no longer stands
   let res;
   try {
-    res = await evaluate({ root, out, base, candidate: ref, ref, mode, scope, audit, keep, env, testBase });
+    res = await evaluate({ root, out, base, candidate: ref, ref, mode, scope, audit, keep, env, testBase, ownTools: tryRun });
   } catch (e) {
     console.error(e.stack || e);
     res = { outcome: 'blocked', mech: { outcome: 'blocked', pass: false, ref, mode, scope, class: {}, blocked: [`the gate crashed: ${String(e.message || e).split('\n')[0]}`], checks: [], gaps: [], pairs: [] } };
@@ -131,7 +134,7 @@ async function runGate({ ref, base, out, mode, scope, audit = false, keep = fals
   console.log(`\ntimings (s): ${Object.entries(t).map(([k, v]) => `${k} ${v}`).join(', ')}`);
   if (mech.evidence) console.log(`evidence: ${JSON.stringify(mech.evidence.byKind || {})}; scheduler ${JSON.stringify(mech.evidence.scheduler?.busy || {})}`);
   const word = (audit ? { pass: 'AUDIT PASS', fail: 'AUDIT FAIL', blocked: 'AUDIT BLOCKED' } : { pass: 'MECHANICAL PASS', fail: 'MECHANICAL FAIL', blocked: 'MECHANICAL BLOCKED' })[mech.outcome] || 'MECHANICAL FAIL';
-  console.log(`${word} ${short(mech.candidate)} on base ${short(mech.base)} (${mech.class?.effective || '?'}, ${mode}) — ${out}`);
+  console.log(`${word} ${short(mech.candidate)} on base ${short(mech.base)} (${mech.class?.effective || '?'}, ${mode})${tryRun ? ' — TRY RUN: this checkout\'s tools, no status posted, never mergeable' : ''} — ${out}`);
   for (const b of mech.blocked || []) console.log('  blocked:', b);
   if (mech.gatePass) console.log(`GATE PASS (machine checks; the owner's "PR it" approved the design): gh pr merge <n> --squash --match-head-commit ${mech.candidate}`);
   return mech;
@@ -223,7 +226,7 @@ for (const gone of ['quick', 'class']) if (argv.includes('--' + gone)) { console
 const mode = opt('mode') || 'normal';
 const scope = (opt('scope') || '').split(',').map((s) => s.trim()).filter(Boolean);
 if (!ref || !['normal', 'refactor'].includes(mode)) {
-  console.error('usage: node scripts/gate.mjs --candidate <ref> [--scope <feature,...>] [--mode normal|refactor] [--out <dir>] [--keep] [--base <ref>]');
+  console.error('usage: node scripts/gate.mjs --candidate <ref> [--scope <feature,...>] [--mode normal|refactor] [--out <dir>] [--keep] [--base <ref>] [--try]');
   console.error('       node scripts/gate.mjs --verdict <out dir> [--base <ref>]');
   console.error('       node scripts/gate.mjs --audit [--out <dir>]');
   process.exit(2);
