@@ -76,3 +76,10 @@ Questions, in order, for a worker opening the list: 1 Which pigs, where (unit, t
 | The total and counts per facet | Settled | The filter's "Show N pigs" and the condition list, not the page |
 
 Cut from the page: a waiting facet (owner: "1d" on the row says it), a dock (scan sits in the search), a lens or chips above the list (the owner put every facet in the filter), the total on the page (the Overview row shows it; the filter's commit shows the narrowed count), who marked it and when (the walk's record holds them), colour on any row, pen cards (marked pigs are 1–5 a pen, so a card per pen spent a header on every one or two rows). Monitoring drops care: a mark to watch has none.
+
+## Saved work on Home (2026-10-21)
+
+| Part | First | Then | Quiet | Cut |
+|---|---|---|---|---|
+| Header control | That records are on this phone (the icon is there at all) | Signed out: the alert glyph in red | Ink, no number | The pill, its colours, the spinning mark, "Fix", the island |
+| Task tile | The task's to-do and run, as before | "↑ N": that task's records still on this phone | Ink-2 on the run line, never red | Nothing else added to the tile |
