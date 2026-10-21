@@ -694,7 +694,10 @@ export interface SentriUI {
   /** radio (candidate): the panel is a radiogroup labelled by the heading. */
   choiceGroup(rows: string | string[], options?: { title?: string; /** A registry glyph before the title (clock, grid, tag, health). */ icon?: string; lead?: string; className?: string; radio?: boolean; /** Raw HTML at the heading's right end (a radio field's Clear). */ aside?: string; id?: string; strs?: Strs<'title'>; args?: StrArgs<'title'> }): string;
   /** While value is set, a Clear text action empties the field and fires `input`. args fill the strs ({ level } for ds.picker.search_in). */
-  choiceSearch(props?: { label?: string; placeholder?: string; value?: string; attrs?: SafeAttrs; strs?: Strs<'label' | 'placeholder'>; args?: Record<string, unknown> }): string;
+  /** The shared search field (searchBox) in a picker or a list: glyph, ✕ Clear while typing (the host's clear.action, else it empties the field and fires input), scan when the host has a reader. */
+  choiceSearch(props?: { label?: string; placeholder?: string; value?: string; attrs?: SafeAttrs; scan?: { action: string; label?: string } | null; clear?: { action?: string; label?: string }; strs?: Strs<'label' | 'placeholder'>; args?: Record<string, unknown> }): string;
+  /** The search field itself, one look wherever a worker types to narrow: the host's <input>, ✕ Clear while it holds text, the scan glyph when scan is given. */
+  searchBox(props?: { input?: string; value?: string; scan?: { action: string; label?: string } | null; clear?: { action?: string; label?: string }; tag?: string; className?: string }): string;
   toast(title: string, options?: { detail?: string; tone?: 'done' | 'offline' | 'notice' | 'attention'; standing?: { action?: string; value?: string; label?: string } | null; strs?: Strs<'title' | 'detail'>; args?: StrArgs<'title' | 'detail'> }): string;
   choiceEmpty(text: string, options?: { strs?: Strs<'text' | 'title'>; args?: StrArgs<'text' | 'title'>; title?: string; icon?: string }): string;
   segment(props: SegmentProps): string;

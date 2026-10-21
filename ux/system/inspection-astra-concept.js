@@ -942,7 +942,7 @@ function dosageAdjustLine(c){
 function customDosesPage(c){
  const f=c.form,q=(f.doseSearch||'').trim(),rows=bulkRows(c),canRemove=treatmentLive(c).length>1;
  const tools=f.removeMode?'<div class="dose-list-tools">'+SentriUI.button({label:str('medicines.pigs.done'),register:'text',align:'end',action:'dose-remove-mode',value:'off'})+'</div>':canRemove?'<div class="dose-list-tools">'+SentriUI.button({label:str('medicines.pigs.remove_mode'),register:'text',align:'end',action:'dose-remove-mode',value:'on'})+'</div>':'';
- const search='<div class="custom-doses-search">'+SentriUI.choiceSearch({label:str('medicines.dose.search'),value:f.doseSearch||'',attrs:{'data-dose-search':''}})+stIconButton({action:'dose-scan',icon:icon('scan'),label:str('medicines.dose.scan')})+'</div>';
+ const search='<div class="custom-doses-search">'+SentriUI.choiceSearch({label:str('medicines.dose.search'),value:f.doseSearch||'',attrs:{'data-dose-search':''},scan:{action:'dose-scan',label:str('medicines.dose.scan')}})+'</div>';
  return sheet({...c,view:'pig-doses'},str('medicines.dose.per_pig'),'',search+tools+'<section class="pig-review-card bulk-pigs is-short" data-bulk-kind="treatment"><div class="pig-review-list bulk-pig-list" role="region" aria-label="'+esc(str('medicines.dose.per_pig'))+'" tabindex="0" data-bulk-rows>'+(rows||SentriUI.choiceEmpty(str('medicines.dose.no_match',{q})))+'</div></section>','').replace('class="sheet"','class="sheet bulk-action-sheet custom-doses-sheet"');
 }
 /* Scan (no camera in the prototype): reads a sample tag, the last included pig's, and jumps to its dose box. */
