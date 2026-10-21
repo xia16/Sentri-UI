@@ -131,7 +131,10 @@ export async function evaluate(opts) {
   // README says so. Known before anything is shot, so the visits know whether base needs its legibility audit.
   // English first (owner, 2026-10-21): ZH runs and ZH leaves only for frozen features
   const zhFrozen = new Set([...frozenFeatures(S.base.atlas), ...frozenFeatures(S.cand.atlas)]);
-  mech.zh = { frozen: [...zhFrozen].sort() };
+  // A feature that freezes in this change gets its Chinese shots now (2026-10-21): approvals render nothing, so no identity changes
+  const wasFrozen = frozenFeatures(S.base.atlas);
+  const newlyFrozen = [...frozenFeatures(S.cand.atlas)].filter((f) => !wasFrozen.has(f));
+  mech.zh = { frozen: [...zhFrozen].sort(), ...(newlyFrozen.length ? { newlyFrozen } : {}) };
   const strictLeg = !sharedByFiles && /^Legibility gate: strict\s*$/m.test(fs.readFileSync(path.join(S.cand.dir, 'docs/design-workflow/README.md'), 'utf8'));
   mark('setup');
 
@@ -340,6 +343,7 @@ export async function evaluate(opts) {
       log(`scope: own ${own.join(', ') || '(none)'}; propagation only on ${inProgress.join(', ')} (${sc.propagation.size} screen(s)); ${sc.outOfScope.screens} screens in ${sc.outOfScope.features.length} features not checked: not in progress${sc.outOfScope.componentPages ? `; ${sc.outOfScope.componentPages} component page(s) of parts the change doesn't call` : ''}`);
     }
   }
+  if (!audit) for (const x of S.cand.screens) if (newlyFrozen.includes(x.feature)) reachIds.add(x.id);
   log(`reach: ${reachIds.size} of ${total} screens${mech.reach.changed !== undefined ? ` (${mech.reach.changed} whose identity changed, ${mech.reach.added} added, ${mech.reach.removed} removed)` : ` (${mech.reach.why[0]})`}`);
   const runsOf = (x) => (inReach(x) ? RUNS.filter((r) => (!componentPage(x.id) || r.lang === 'en') && (r.lang === 'en' || checksChinese(x.feature, zhFrozen))).map(({ width, lang }) => ({ width, lang })) : []);
   const visitChecks = (side, x, width, lang) => {
@@ -789,6 +793,10 @@ export async function evaluate(opts) {
   const leafItemsOf = (side, f, only) => {
     const spec = specOf(side, f); if (!spec) return null;
     const { leaves, nodeCount, problems } = walkTree(spec);
+    // an empty run list would run nothing and look like a pass (2026-10-21)
+    const empty = (a) => Array.isArray(a) && !a.length;
+    if (empty(spec.defaults?.langs) || empty(spec.defaults?.widths)) problems.push('defaults.langs or defaults.widths is empty: no leaf would run');
+    for (const l of leaves) if (empty(l.node.langs) || empty(l.node.widths)) problems.push(`${l.node.id}: langs or widths is empty: the leaf would never run`);
     if (problems.length) return { problems };
     // S5: a leaf runs at the narrowest width its spec lists (360), unless the leaf names its own widths
     const D = spec.defaults || {}, langs = (D.langs || ['en']).filter((g) => g === 'en' || checksChinese(f, zhFrozen)), widths = [Math.min(...(D.widths || [390]))];
