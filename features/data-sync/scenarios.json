@@ -1426,7 +1426,7 @@
               "gwt": {
                 "given": "This Farrowing task has nothing on the phone, while other tasks do.",
                 "when": "The worker reads the task page.",
-                "then": "There is no badge in its header; the whole phone is Home's, not this task's."
+                "then": "There is no badge in its header; Home holds the phone's records."
               },
               "authority": [
                 {
