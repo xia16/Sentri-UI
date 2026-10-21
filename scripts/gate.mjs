@@ -59,6 +59,9 @@ const postStatus = (sha, state, description) => (testBase ? { ok: true } : post(
 const passDescription = (mech) => { const moved = ['diff', 'new', 'gone'].reduce((n, k) => n + (mech.screens?.[k]?.length || 0), 0); return `GATE PASS against ${short(mech.base)} · ${moved ? `${moved} screen(s) moved; machine checks only (the owner approved the design)` : 'no screen moved'}`; };
 // A ref that passed once (its re-checks go first). Local, per machine; a stale record only ever buys a queue place.
 const passFile = (ref) => path.join(gateDir(), 'passed', `${String(ref).replace(/[^\w.-]+/g, '_')}.json`);
+// The latest run on each commit (2026-10-21): --post refuses a saved pass when a later run on the same commit replaced it.
+const lastFile = (commit) => path.join(gateDir(), 'last', `${commit}.json`);
+const recordLast = (commit, out, outcome) => { try { fs.mkdirSync(path.dirname(lastFile(commit)), { recursive: true }); fs.writeFileSync(lastFile(commit), JSON.stringify({ out: path.resolve(out), outcome, at: new Date().toISOString() })); } catch {} };
 const recordPass = (ref, commit) => { try { fs.mkdirSync(path.dirname(passFile(ref)), { recursive: true }); fs.writeFileSync(passFile(ref), JSON.stringify({ ref, commit, at: new Date().toISOString() })); } catch {} };
 function git(args, cwd = root) { const r = spawnSync('git', args, { cwd, encoding: 'utf8', maxBuffer: 64 << 20 }); return { code: r.status, out: r.stdout || '', err: r.stderr || '' }; }
 const sha = (r) => (r ? git(['rev-parse', '--verify', '--quiet', `${r}^{commit}`]).out.trim() : '');
@@ -135,6 +138,7 @@ async function runGate({ ref, base, out, mode, scope, audit = false, keep = fals
     postStatus(mech.candidate, 'failure', `MECHANICAL ${String(mech.outcome).toUpperCase()} against ${short(mech.base)}`);
   }
   fs.writeFileSync(path.join(out, 'mechanical.json'), JSON.stringify(mech, null, 2));
+  if (!testBase && !audit && mech.candidate) recordLast(mech.candidate, out, mech.outcome);
   // the PR's Results block (gate-simplify.md S8): the gate's own measurements, pasted whole into the PR body
   fs.writeFileSync(path.join(out, 'results.md'), resultsBlock(mech));
   const t = mech.timings || {};
@@ -219,6 +223,9 @@ if (opt('post')) {
   const dir = opt('post');
   let mech; try { mech = JSON.parse(fs.readFileSync(path.join(dir, 'mechanical.json'), 'utf8')); } catch (e) { console.log(`NOT POSTED — ${path.join(dir, 'mechanical.json')}: ${e.message.split('\n')[0]}`); process.exit(1); }
   if (mech.testBase || mech.tryRun || !machinePass(mech)) { console.log(`NOT POSTED — that run is not a machine pass against main (${mech.outcome}${mech.tryRun ? ', a try run' : ''})`); process.exit(1); }
+  await acquireLock(mech.ref, true); // never while a gate on this machine is running, which could replace the result
+  let last = null; try { last = JSON.parse(fs.readFileSync(lastFile(mech.candidate), 'utf8')); } catch {}
+  if (!last || last.out !== path.resolve(dir) || last.outcome !== 'pass') { console.log(`NOT POSTED — a later gate run on ${short(mech.candidate)} replaced this one${last ? ` (${last.outcome}, ${last.out})` : ''}: post that run's result, or gate again`); process.exit(1); }
   const fetched = git(['fetch', '-q', 'origin']);
   if (fetched.code !== 0) { console.log(`NOT POSTED — git fetch origin failed: ${fetched.err.trim().split('\n')[0]}`); process.exit(4); }
   const head = sha(mech.ref), main = sha(mainRef);

@@ -867,6 +867,8 @@ export async function evaluate(opts) {
       // a leaf is in reach when one of its runs has another identity on base, or none
       for (const id of new Set(pc.its.filter((i) => i.kind).map((i) => i.leaf.node.id))) if ([...c].some(([k, v]) => k.startsWith(id + ' ') && b.get(k) !== v)) leafSet.add(id);
     }
+    // a feature that freezes now runs every leaf, its new ZH runs included (2026-10-21: identities alone left 16 of 94 out)
+    for (const f of newlyFrozen) { const spec = specOf('cand', f); if (spec) for (const l of walkTree(spec).leaves) leafSet.add(l.node.id); }
     mech.reach.leaves = leafSet.size;
   }
   const leafFeatures = featuresWithLeaves('cand').filter((f) => {

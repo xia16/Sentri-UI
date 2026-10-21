@@ -109,5 +109,13 @@ test('a redirection is not part of a push, and a merge named in a message or her
     `echo $(${merge} 6 --squash)`,
     `bash <<'EOF'\n${merge} 6 --squash\nEOF`,
     `${merge} 6 --squash --match-head-commit ${sha} 2>&1`,
+    // Codex review round 1: substitutions inside double quotes and expanding heredocs run
+    `echo "$(${merge} 6 --squash)"`,
+    `cat <<EOF\n$(${merge} 6 --squash)\nEOF`,
+    `git commit -m "done $(git push origin main)"`,
   ]) assert.equal(guard(c), 2, c);
+  for (const c of [
+    `git commit -m "built on $(date +%F)" && git push origin workflow/x`,
+    `cat <<'EOF'\n$(${merge} 6 --squash)\nEOF`, // a quoted delimiter: the body is data
+  ]) assert.equal(guard(c), 0, c);
 });

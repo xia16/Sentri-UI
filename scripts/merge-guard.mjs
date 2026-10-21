@@ -37,7 +37,10 @@ const isMerge = /pulls\/\d+\/merge|\/merges\b|mergePullRequest|PullRequestAutoMe
 // Only what runs as `git push` counts (2026-10-20): the word in a grep, a script, a message or a heredoc body is not a push, but a
 // string or heredoc handed to a shell (bash -c "…", bash <<EOF, cmd /c "…") is read as commands too.
 const LAUNCHER = /(?:^|[\s;&|(){}/\\])(?:(?:(?:ba|z|da)?sh|pwsh|powershell|cmd)(?:\.exe)?(?:\s+[-/][\w-]+)*|eval|iex|Invoke-Expression)\s*$/i;
-const STR = '\x01'; // what a quoted string becomes: never a branch name, never a command
+const STR = '\x01';
+// The commands a double-quoted string or an expanding heredoc runs: its $( ) and backtick substitutions (2026-10-21: `echo "$(gh pr
+// merge 6)"` ran a merge the guard read as text). Nested parentheses one level deep are enough for a command line.
+const substitutions = (text) => [...String(text).matchAll(/\$\(((?:[^()]|\([^()]*\))*)\)|`([^`]*)`/g)].map((m) => m[1] ?? m[2]).filter((x) => x && x.trim()); // what a quoted string becomes: never a branch name, never a command
 const segments = (src, depth = 0) => {
   const nested = [], lines = String(src).split('\n'), kept = [];
   // Heredoc and PowerShell here-string bodies are data unless a shell reads them.
@@ -54,6 +57,7 @@ const segments = (src, depth = 0) => {
       const body = [];
       for (k++; k < lines.length && lines[k].trim() !== h[2]; k++) body.push(lines[k]);
       if (LAUNCHER.test(line.slice(0, h.index))) nested.push(body.join('\n'));
+      else if (!h[1]) nested.push(...substitutions(body.join('\n'))); // an unquoted delimiter expands $( ) and backticks (2026-10-21)
     }
   }
   // Quoted strings become one placeholder (a bare word in quotes is just that word); escapes and comments go.
@@ -67,7 +71,7 @@ const segments = (src, depth = 0) => {
   for (let i = 0; i < s.length;) {
     const c = s[i];
     if (c === "'") { const e = s.indexOf("'", i + 1); if (e < 0) { i++; continue; } out += str(s.slice(i + 1, e)); i = e + 1; }
-    else if (c === '"') { let e = i + 1; while (e < s.length && s[e] !== '"') e += s[e] === '\\' || s[e] === '`' ? 2 : 1; out += str(s.slice(i + 1, e)); i = e + 1; }
+    else if (c === '"') { let e = i + 1; while (e < s.length && s[e] !== '"') e += s[e] === '\\' || s[e] === '`' ? 2 : 1; const body = s.slice(i + 1, e); nested.push(...substitutions(body)); out += str(body); i = e + 1; }
     else if (c === '\\' || c === '`') { const n = /^\r?\n/.exec(s.slice(i + 1)); out += n ? ' ' : c === '\\' ? (s[i + 1] ?? '') : ''; i += n ? 1 + n[0].length : c === '\\' ? 2 : 1; }
     else if (c === '^') i++;
     else if (c === '#' && (i === 0 || /\s/.test(s[i - 1]))) { while (i < s.length && s[i] !== '\n') i++; }
