@@ -4,6 +4,7 @@ Parts and pages that no longer describe the mobile library, kept for history. No
 
 | Here | What it was | Use instead |
 |---|---|---|
+| `components/TaskHeader/` | The task screen's page header (`SentriTask.header` still draws it) | [Header](../../ux/design-system/components/Header/README.md), on a task screen |
 | `components/TaskHold/` | The task skeleton's hold-to-commit button | [Button](../../ux/design-system/components/Button/README.md) hold, `SentriUI.holdBind` |
 | `components/TaskLens/` | The task list's sticky lens host | [Segment](../../ux/design-system/components/Segment/README.md)'s two-line lens with an IconButton |
 | `components/TaskStepper/` | The task skeleton's stepper faces | [Stepper](../../ux/design-system/components/Stepper/README.md) (row, count, well) |

@@ -30072,16 +30072,6 @@
      }
     },
     {
-     "name": "TaskHeader",
-     "group": "Compatibility and retired",
-     "status": "in-design",
-     "gate": null,
-     "files": {
-      "variantsJson": false,
-      "variants": []
-     }
-    },
-    {
      "name": "TaskRadios",
      "group": "Compatibility and retired",
      "status": "in-design",

@@ -41,7 +41,7 @@
     return `<div class="tk-screen"${inert ? ' inert' : ''}>${header}<div class="tk-scroll" role="region" tabindex="-1"${L(label)}>${body}</div>${dock}</div>`;
   }
 
-  /* ---- TaskHeader: the page header of a task screen (Headers law, 2026-10-13) ----
+  /* ---- The task page header: Header's page header on a task screen (Headers law, 2026-10-13; TaskHeader is its old name) ----
      Back (always: every top page of a task has it; it goes where the task came from, Today), the task's name left-aligned,
      the optional header line under it (`Last record 08:41 · G.H`: a fact; or a route), then 24px to the body. It is
      SentriUI.pageHeader, the same header a sheet page draws. line: { text } | { chip, facts } (see SentriUI.headerLine);
@@ -49,7 +49,7 @@
   function header({ title, back, backLabel, line = null } = {}) {
     const b = Object.assign({ action: 'back' }, back || {});
     if (backLabel != null && b.label == null) b.label = backLabel;
-    return root.SentriUI.pageHeader({ title, back: b, line, level: 1, ds: 'TaskHeader', className: 'tk-header' });
+    return root.SentriUI.pageHeader({ title, back: b, line, level: 1, ds: 'Header', className: 'tk-header' });
   }
 
   /* ---- TaskSummary ---- */

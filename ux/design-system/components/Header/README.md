@@ -41,6 +41,8 @@ Nothing else goes in a header: no counts in the title or line, no status, Save o
 - **Page header**: [variants/page.html](variants/page.html).
 - **Sheet header**: [variants/sheet.html](variants/sheet.html).
 
+**On a task screen** the page header is `SentriTask.header({ title, back, backLabel, line })` (`.st-page-header.tk-header`, `data-ds="Header"`): Back always, going where the task came from (Today); the title is the task (`Farrowing`, `Piglet processing`), never the unit, which lives on [TaskSummary](../TaskSummary/README.md); the optional line is the fact the next worker needs to trust the screen (`Last record` **`08:41`** `· G.H`), or `No records yet`. It is `SentriUI.pageHeader` at `level: 1`; TaskHeader is its old name (archived).
+
 ## States
 
 | State | Rendering |

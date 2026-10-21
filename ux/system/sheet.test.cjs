@@ -61,13 +61,13 @@ test('headers: the sheet header takes a route line (chip + at most two facts) or
   assert.match(fact, /data-line="fact">Last record <strong>08:41<\/strong><\/p>/);
   assert.doesNotMatch(UI.sheet({ title: 'Record dead' }), /st-header-line/, 'absent by default');
 });
-test('headers: a page takes the page header (Back top left, title, line); TaskHeader draws the same', () => {
+test('headers: a page takes the page header (Back top left, title, line); a task page header draws the same', () => {
   const page = UI.sheet({ variant: 'page', title: 'Scan ear tags', back: { action: 'scan-back' }, footer: false });
   assert.match(page, /<header class="st-page-header" data-ds="Sheet"><button type="button" class="st-page-back" data-action="scan-back"/);
   assert.doesNotMatch(page, /utility-header|sheet-footer/);
   require('../design-system/components/task-skeleton.js');
   const th = globalThis.SentriTask.header({ title: 'Farrowing', back: { action: 'room-home' }, line: { text: 'Last record 08:41' } });
-  assert.match(th, /class="st-page-header tk-header" data-ds="TaskHeader"><button type="button" class="st-page-back" data-action="room-home"/);
+  assert.match(th, /class="st-page-header tk-header" data-ds="Header"><button type="button" class="st-page-back" data-action="room-home"/);
   assert.match(th, /<h1 class="st-page-title">Farrowing<\/h1><p class="st-header-line" data-line="fact">Last record 08:41<\/p>/);
   assert.match(globalThis.SentriTask.header({ title: 'Piglet processing' }), /class="st-page-back" data-action="back"/, 'Back always');
 });
