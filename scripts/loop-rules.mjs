@@ -164,15 +164,20 @@ export function readInProgress(text) {
 // one Home change (PR 243's dry run).
 const SHARED_PART = [...SYSTEM, /^ux\/design-system\//, /^ux\/laws\//, /^atlas\//];
 export function ownFeatures({ files, scope = [], usersOf = () => null }) {
-  const own = new Set(scope);
+  const own = new Set(scope), loaders = new Set();
   for (const f of files) {
     const m = /^features\/([^/]+)\//.exec(f);
     if (m) { own.add(m[1]); continue; }
     if (SHARED_PART.some((re) => re.test(f))) continue;
     const users = [...(usersOf(f) || [])];
     if (users.length === 1) own.add(users[0]);
+    for (const u of users) loaders.add(u);
   }
   own.delete(DS_FEATURE);
+  // A change that edits page files and names no feature (no features/<id>/ file, no scope, no page file only one feature loads)
+  // owns every feature that loads them, as before scoping: otherwise a stylesheet-only edit to one feature's page would check
+  // nothing of its own (2026-10-21, a try run of a Home stylesheet change owned no feature).
+  if (!own.size) for (const u of loaders) if (u !== DS_FEATURE) own.add(u);
   return [...own].sort();
 }
 // The reach, scoped: every screen of an own feature; a component page when keepPage says so; a screen of an in-progress feature,
