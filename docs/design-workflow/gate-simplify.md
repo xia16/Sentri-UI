@@ -120,8 +120,8 @@ With most gates at 1–3 minutes, the lock queue shrinks with them, so G11 (smal
 1. **Done (#211):** S1 + S2: fail fast, and main's tools from the base worktree. One rule changed meaning: design-system-only is read from the diff whether or not a screen moves.
 2. **Done (2026-10-18):** K3, then X1 + X2: identity hardening first (stylesheets and `<style>` blocks in the checked syntax), so
    the identity can carry the reach alone. Then the reach set, the tripwire, `--all`, `identityMisses` and `widenByIdentity` are
-   cut, and `--audit` is added. `reachOf` stays in `static-reach.mjs` for its tests and the planning step (change-map); the gate
-   no longer calls it.
+   cut, and `--audit` is added. `reachOf` stayed in `static-reach.mjs` for its tests until 2026-10-21, when it was removed with
+   loop-rules' file reach (`reachOf`, `reachLine`): its tests now read the identities.
 3. **Done (2026-10-18):** S3: checker identities hash only what computes. `scripts/playwright-path.mjs` and
    `scripts/process-start.mjs` are left out of every code closure (`NOT_RESULTS` in evidence.mjs).
 4. **Done (2026-10-18):** S4, S5, X8: the run matrix. A moved screen is shot at EN 390, EN 360 and ZH 360 (`RUNS` in

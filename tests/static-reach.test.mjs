@@ -1,10 +1,14 @@
-// Gate v2 §2, the static reach analyser (scripts/static-reach.mjs), on two miniature checkouts: base and candidate.
+// Gate v2 §2, the static analyser (scripts/static-reach.mjs), on two miniature checkouts: base and candidate. The gate's reach is
+// what the identities say (gate-simplify.md X1): a screen is in it when its identity differs between the two sides.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { reachOf, identityInputs } from '../scripts/static-reach.mjs';
+import { createHash } from 'node:crypto';
+import { identityInputs } from '../scripts/static-reach.mjs';
+import { inputsDigest, canonical } from '../scripts/evidence.mjs';
+import { screensOf } from '../scripts/atlas-screens.mjs';
 
 // The miniature: a bundle (a helper tok that Row and Picker share, a start-up DEFAULTS object, Sheet), four features on four pages.
 //   farrowing.html  → farrowing.js: SentriUI.row only; fetch('../data/rooms.json') literally; steps on farrowing.finish
@@ -54,112 +58,80 @@ function checkout(o = {}, atlas = ATLAS()) {
   return { dir, atlas };
 }
 const BASE = checkout();
-const reach = (candOpts, files, atlas) => reachOf(BASE, checkout(candOpts, atlas), { files });
-const BJS = ['ux/design-system/components/bundle.js'];
+// A checkout as the gate hashes it: every file by its content, and the files a page can load (what an unbounded load hashes).
+function treeOf(dir) {
+  const t = new Map();
+  (function w(d) { for (const e of fs.readdirSync(path.join(dir, d), { withFileTypes: true })) { const f = d ? `${d}/${e.name}` : e.name; if (e.isDirectory()) w(f); else t.set(f, createHash('sha1').update(fs.readFileSync(path.join(dir, f))).digest('hex')); } })('');
+  return t;
+}
+// what no page can load, as the gate says (evaluate.mjs NOT_LOADED)
+const runtimeOf = (t) => [...t.keys()].filter((f) => !/^(docs|\.github|tests|\.claude|scripts)\//.test(f) && !/^(?!ux\/).*\.md$/i.test(f)).sort();
+const digest = (side, id) => { const ii = identityInputs(side, id); if (!ii) return null; const t = treeOf(side.dir); return canonical(inputsDigest(ii, t, runtimeOf(t)).digest); };
+// The screens whose identity differs between base and candidate, or that only one side has: the gate's reach.
+const moved = (b, c) => [...new Set([b, c].flatMap((s) => screensOf(s.atlas).map((x) => x.id)))].sort().filter((id) => digest(b, id) !== digest(c, id));
+const EVERY = ['farrowing.finish', 'farrowing.room', 'inspection.room', 'reports.week', 'workbench.today'];
 
-// ---------- must not pass: each puts what it can affect in reach ----------
-test('a changed shared helper reaches every page that uses an export over it (and every aliasing page)', () => {
-  const r = reach({ bundle: { tok: "'<b class=\"st-tok\">'+v+'</b>'" } }, BJS);
-  assert.deepEqual(r.functions, ['SentriUI.picker', 'SentriUI.row']);
-  assert.deepEqual(r.screens, ['farrowing.finish', 'farrowing.room', 'inspection.room', 'reports.week', 'workbench.today'], 'row, picker, the alias, and the report that embeds farrowing');
+// ---------- must not pass: a change moves the identity of every screen it can affect ----------
+test('a changed shared helper moves every page that uses an export over it (and every aliasing page)', () => {
+  assert.deepEqual(moved(BASE, checkout({ bundle: { tok: "'<b class=\"st-tok\">'+v+'</b>'" } })), EVERY, 'row, picker, the alias, and the report that embeds farrowing');
 });
 
-test('a changed start-up constant reaches its readers', () => {
-  const r = reach({ bundle: { defaults: "{size:'compact'}" } }, BJS);
-  assert.deepEqual(r.functions, ['SentriUI.picker']);
-  assert.ok(r.screens.includes('inspection.room') && r.screens.includes('workbench.today'));
-  assert.ok(!r.screens.includes('farrowing.room'), 'farrowing uses row only');
-});
-
-test('a mutation reaches the readers of what it mutates', () => {
+test('a mutation moves the readers of what it mutates', () => {
   const extra = "function grow(){DEFAULTS.size='large';}";
-  const base = checkout({ bundle: { extra, exports: ',grow' } });
-  const r = reachOf(base, checkout({ bundle: { extra: "function grow(){DEFAULTS.size='huge';}", exports: ',grow' } }), { files: BJS });
-  assert.deepEqual(r.functions, ['SentriUI.grow', 'SentriUI.picker']);
+  const r = moved(checkout({ bundle: { extra, exports: ',grow' } }), checkout({ bundle: { extra: "function grow(){DEFAULTS.size='huge';}", exports: ',grow' } }));
+  assert.ok(r.includes('inspection.room'), 'the picker reads DEFAULTS, which grow writes');
+  assert.ok(r.includes('workbench.today'), 'the alias runs every unit');
 });
 
-test('a computed export name, or a start-up change, reaches every screen', () => {
+test('a start-up change (a constant, a new binding built at load, a setup statement) moves every screen that loads the bundle', () => {
+  assert.deepEqual(moved(BASE, checkout({ bundle: { defaults: "{size:'compact'}" } })), EVERY, 'an initialiser runs at load on every page');
   const computed = checkout({ bundle: { extra: "const k='row';" } });
-  const r = reachOf(computed, checkout({ bundle: { extra: "const k='row';const api2=Object.freeze({[k]:row});" } }), { files: BJS });
-  assert.equal(r.all, true, 'a new binding built by a call at start-up (Object.freeze) runs on every page, even though nothing exports it (review of #194, round 2)');
-  assert.match(r.why[0], /api2 is a new binding whose initialiser runs at start-up/);
-  assert.equal(reachOf(computed, checkout({ bundle: { extra: "const k='row';const k2='sheet';" } }), { files: BJS }).all, false, 'a new constant of literals does nothing at load: it is just a constant');
-  const viaApi = reachOf(BASE, checkout({ bundle: { extra: 'function pick(n){return api[n];}', exports: ',pick' } }), { files: BJS });
-  assert.equal(viaApi.all, true);
-  const startUp = reachOf(BASE, checkout({ bundle: { extra: "DEFAULTS.size='compact';" } }), { files: BJS });
-  assert.equal(startUp.all, true);
-  assert.match(startUp.why[0], /setup code changed/);
+  assert.deepEqual(moved(computed, checkout({ bundle: { extra: "const k='row';const api2=Object.freeze({[k]:row});" } })), EVERY, 'review of #194, round 2: nothing exports it, and it still runs');
+  assert.deepEqual(moved(BASE, checkout({ bundle: { extra: "DEFAULTS.size='compact';" } })), EVERY, 'a setup statement');
+  assert.deepEqual(moved(BASE, checkout({ bundle: { extra: 'function pick(n){return api[n];}', exports: ',pick' } })), EVERY, 'a new export: the exports object every page builds at load changed');
 });
 
-test('a page aliasing SentriUI uses every export: any bundle change reaches it', () => {
-  const r = reach({ bundle: { sheet: "return '<section class=\"st-sheet st-sheet--v2\">'+title+'</section>';" } }, BJS);
-  assert.deepEqual(r.functions, ['SentriUI.sheet']);
-  assert.deepEqual(r.screens, ['farrowing.finish', 'workbench.today'], 'the aliasing page, and farrowing.finish, whose steps may tap through to Home');
-  const id = identityInputs(BASE, 'workbench.today');
-  assert.equal(id.bundle.all, true);
+test('a page aliasing SentriUI uses every export: any bundle change moves it', () => {
+  const r = moved(BASE, checkout({ bundle: { sheet: "return '<section class=\"st-sheet st-sheet--v2\">'+title+'</section>';" } }));
+  assert.deepEqual(r, ['farrowing.finish', 'reports.week', 'workbench.today'], 'the aliasing page, farrowing.finish, whose steps may tap through to Home, and the report, whose computed fetch hashes every page-loadable file');
+  assert.equal(identityInputs(BASE, 'workbench.today').bundle.all, true);
 });
 
-test('a computed fetch beside a literal consumer: both are in reach', () => {
-  const r = reach({ rooms: '{"B1":2}' }, ['ux/data/rooms.json']);
-  assert.ok(r.screens.includes('farrowing.room'), 'names it literally');
-  assert.ok(r.screens.includes('reports.week'), 'fetches by a computed URL; the literal consumer does not let it off');
-  assert.ok(!r.screens.includes('inspection.room'));
+test('a computed fetch beside a literal consumer: both move', () => {
+  const r = moved(BASE, checkout({ rooms: '{"B1":2}' }));
+  assert.ok(r.includes('farrowing.room'), 'names it literally');
+  assert.ok(r.includes('reports.week'), 'fetches by a computed URL; the literal consumer does not let it off');
+  assert.ok(!r.includes('inspection.room'));
 });
 
-test('a cross-feature dependency: a page that embeds another feature is in reach when that feature changes', () => {
-  const r = reach({ farrowingJs: "fetch('../data/rooms.json');document.querySelector('.phone').innerHTML=SentriUI.row({title:'B2'});\nconst back=()=>location.assign('home.html');" }, ['ux/system/farrowing.js']);
-  assert.ok(r.screens.includes('reports.week'), 'the report embeds farrowing.html');
-  assert.ok(r.screens.includes('farrowing.room'));
+test('a cross-feature dependency: a page that embeds another feature moves when that feature changes', () => {
+  const r = moved(BASE, checkout({ farrowingJs: "fetch('../data/rooms.json');document.querySelector('.phone').innerHTML=SentriUI.row({title:'B2'});\nconst back=()=>location.assign('home.html');" }));
+  assert.ok(r.includes('reports.week'), 'the report embeds farrowing.html');
+  assert.ok(r.includes('farrowing.room'));
+  assert.ok(!r.includes('inspection.room'));
 });
 
-test('CSS, the harness, fonts and packages reach every screen', () => {
-  for (const f of ['ux/design-system/components/bundle.css', 'ux/design-system/tokens.css', 'ux/system/atlas-bare.js', 'package.json', 'vendor/fonts/x.woff2']) assert.equal(reachOf(BASE, BASE, { files: [f] }).all, true, f);
-  assert.equal(reachOf(BASE, BASE, { files: ['ux/system/page.css'] }).all, true, 'a stylesheet pages of several features load');
+test('a stylesheet every page loads moves every screen', () => {
+  assert.deepEqual(moved(BASE, checkout({ more: { 'ux/system/page.css': '.phone{width:391px}' } })), EVERY);
 });
 
-test('an added and a removed screen are in reach; a changed atlas definition reaches its screen', () => {
-  const added = reachOf(BASE, checkout({}, ATLAS([{ id: 'workbench.new', url: '/ux/system/home.html' }])), { files: ['atlas/atlas.json'] });
-  assert.deepEqual(added.screens, ['workbench.new']);
-  const removed = reachOf(checkout({}, ATLAS([{ id: 'workbench.old', url: '/ux/system/home.html' }])), BASE, { files: ['atlas/atlas.json'] });
-  assert.deepEqual(removed.screens, ['workbench.old']);
+test('an added and a removed screen are in reach; a changed atlas definition moves its screen', () => {
+  // the report fetches by a computed URL, so it could read atlas.json: the gate keeps the whole file in its identity (atlasDigest)
+  assert.deepEqual(moved(BASE, checkout({}, ATLAS([{ id: 'workbench.new', url: '/ux/system/home.html' }]))), ['reports.week', 'workbench.new']);
+  assert.deepEqual(moved(checkout({}, ATLAS([{ id: 'workbench.old', url: '/ux/system/home.html' }])), BASE), ['reports.week', 'workbench.old']);
   const a = ATLAS(); a.platforms[0].sections[0].features[1].screens[0].preset = 'filters';
-  assert.deepEqual(reachOf(BASE, checkout({}, a), { files: ['atlas/atlas.json'] }).screens, ['inspection.room']);
-});
-
-test("a feature's own files add its screens; leaves run for every affected feature and every leaf whose navigation can touch the reach", () => {
-  const r = reachOf(BASE, BASE, { files: ['features/inspection/budget.json'] });
-  assert.deepEqual(r.screens, ['inspection.room']);
-  assert.deepEqual(r.leaves, ['in-1']);
-  const f = reach({ farrowingJs: "fetch('../data/rooms.json');document.querySelector('.phone').innerHTML=SentriUI.row({title:'B2'});\nconst back=()=>location.assign('home.html');" }, ['ux/system/farrowing.js']);
-  assert.ok(f.leaves.includes('fa-1') && f.leaves.includes('fa-2'));
-  assert.ok(f.leaves.includes('wb-1') === false || f.screens.includes('workbench.today'), 'workbench leaves only when home can reach farrowing');
+  assert.deepEqual(moved(BASE, checkout({}, a)), ['inspection.room', 'reports.week']);
 });
 
 // ---------- must stay fast ----------
-test('a localised one-function edit stays localised', () => {
-  const r = reach({ bundle: { sheet: "return '<section class=\"st-sheet\" data-v=\"2\">'+title+'</section>';" } }, BJS);
-  assert.equal(r.all, false);
-  assert.deepEqual(r.screens, ['farrowing.finish', 'workbench.today'], 'Home, and the one farrowing state whose steps can reach Home');
-  assert.ok(!r.leaves.includes('in-1'), 'inspection is untouched and its leaves cannot navigate to Home');
+test('an intended default change moves its callers only', () => {
+  assert.deepEqual(moved(BASE, checkout({ bundle: { placeholder: "'Pick one'" } })), ['farrowing.finish', 'inspection.room', 'reports.week', 'workbench.today']);
 });
 
-test('an intended default change is selected (its callers in reach, the export named), not rejected', () => {
-  const r = reach({ bundle: { placeholder: "'Pick one'" } }, BJS);
-  assert.deepEqual([r.all, r.functions], [false, ['SentriUI.picker']]);
-  assert.deepEqual(r.screens, ['farrowing.finish', 'inspection.room', 'workbench.today']);
-});
-
-test('docs, tests and the type file reach no screen', () => {
-  const r = reachOf(BASE, BASE, { files: ['docs/x.md', 'tests/y.test.mjs', 'ux/design-system/components/index.d.ts'] });
-  assert.deepEqual([r.all, r.screens, r.leaves], [false, [], []]);
-});
-
-test("the atlas's prose reaches no screen; its code still reaches every one", () => {
-  // #200 edited atlas/SCHEMA.md and ran all 404 screens: a markdown file the atlas never loads can't draw
-  const prose = reachOf(BASE, BASE, { files: ['atlas/SCHEMA.md', 'sections/home/notes.md'] });
-  assert.deepEqual([prose.all, prose.screens, prose.leaves], [false, [], []]);
-  for (const f of ['atlas/library.js', 'atlas/app.css', 'atlas/index.html']) assert.equal(reachOf(BASE, BASE, { files: [f] }).all, true, f);
-  assert.equal(reachOf(BASE, BASE, { files: ['atlas/SCHEMA.md', 'atlas/library.js'] }).all, true, 'prose beside code: the code still widens');
+test("docs, tests, the scripts and prose move no screen; a file no page names moves only a page that fetches by a computed URL", () => {
+  // #200 edited atlas/SCHEMA.md and ran all 404 screens: a file no page can load can't draw
+  assert.deepEqual(moved(BASE, checkout({ more: { 'docs/x.md': '# x', 'tests/y.test.mjs': '//', 'scripts/z.mjs': '//', 'atlas/SCHEMA.md': '# s', 'sections/home/notes.md': '# n', 'features/inspection/budget.md': '# b' } })), []);
+  assert.deepEqual(moved(BASE, checkout({ more: { 'ux/design-system/components/index.d.ts': 'export {}', 'features/inspection/budget.json': '{}' } })), ['reports.week']);
 });
 
 // ---------- how a page reads the namespace, and what its URLs can name ----------
@@ -279,8 +251,6 @@ test('a start-up initialiser change is a new identity for every screen that load
   const extra = (v) => `const OPACITY=${v};const formats=new Map([['a',OPACITY]]);if(typeof document!=='undefined')document.documentElement.style.opacity=String(formats.get('a'));`;
   const mk = (v) => { const o = { bundle: { extra: extra(v) } }; const c = checkout(o); const t = new Map(Object.keys(FILES(o)).map((f) => [f, createHash('sha1').update(fs.readFileSync(path.join(c.dir, f))).digest('hex')])); return { side: { ...c, rev: `o${++n}` }, tree: t }; };
   const b = mk('1'), c = mk('0.99');
-  const r = reachOf(b.side, c.side, { files: BJS });
-  assert.equal(r.all, true, 'a changed start-up effect reaches every screen');
   const rt = (t) => [...t.keys()].filter((f) => !/^(features|docs|tests|scripts)\//.test(f)).sort();
   for (const id of ['inspection.room', 'farrowing.room', 'reports.week']) {
     const d = (x) => canonical(inputsDigest(identityInputs(x.side, id), x.tree, rt(x.tree)).digest);
@@ -296,10 +266,6 @@ test('the probe: a new DOMContentLoaded initialiser that dims one page at 360 on
   const probe = "const boot=typeof document!=='undefined'&&document.addEventListener('DOMContentLoaded',()=>{if(innerWidth===360&&/report/.test(location.pathname))document.documentElement.style.opacity='0.5';});";
   const mk = (o) => { const c = checkout(o); const t = new Map(Object.keys(FILES(o)).map((f) => [f, createHash('sha1').update(fs.readFileSync(path.join(c.dir, f))).digest('hex')])); return { side: { ...c, rev: `p${++n}` }, tree: t }; };
   const b = mk({}), c = mk({ bundle: { extra: probe } });
-  // reach selection: before the fix, all=false, functions=[] and no screen
-  const r = reachOf(b.side, c.side, { files: BJS });
-  assert.equal(r.all, true, 'a new binding whose initialiser runs at start-up reaches every bundle-loading screen');
-  assert.match(r.why[0], /boot is a new binding whose initialiser runs at start-up/);
   // the reach by identity: the dimmed page's identity changed, so it is shot in full
   const rt = (t) => [...t.keys()].filter((f) => !/^(features|docs|tests|scripts)\//.test(f)).sort();
   const changed = (id) => canonical(inputsDigest(identityInputs(b.side, id), b.tree, rt(b.tree)).digest) !== canonical(inputsDigest(identityInputs(c.side, id), c.tree, rt(c.tree)).digest);

@@ -1,34 +1,21 @@
 // Gate v2 §2 (docs/design-workflow/gate-v2.md): static, conservative reach over both revisions. Nothing here runs a browser; a
 // recording of what pages call is never an input: nothing here is narrowed by what a run happened to do.
 //
-//   reachOf(base, candidate, { files }) -> { all, screens: [ids], functions: [exports] | [] | null, leaves: [ids], why: [] }
 //   identityInputs(side, screenId)       -> { files, unbounded, bundle: { all, exports, units, unitHashes, setupHash }, screen }
 //   leafInputs(side, { url, screen })    -> the same for a scenario leaf's run: its entry page and everything its taps can reach
 //
-// base / candidate: { dir: a checkout, atlas: its parsed atlas/atlas.json }. files: the changed paths (default: git diff of the two
-// checkouts' HEADs). Unsure is everything: a file that won't parse, a namespace used any way but `SentriUI.X` / `SentriUI['X']`, a
-// load whose URL can't be bounded, CSS, the harness, the shooter, fonts and packages all widen the reach; owning a feature only adds.
+// side: { dir: a checkout, atlas: its parsed atlas/atlas.json, rev? }. Unsure is everything: a file that won't parse, a namespace
+// used any way but `SentriUI.X` / `SentriUI['X']`, or a load whose URL can't be bounded widens what an identity hashes.
 import fs from 'node:fs';
 import { createHash } from 'node:crypto';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { parse } from './vendor/acorn.mjs';
-import { bundleShape, bundleChange, bundleHashes } from './bundle-graph.mjs';
+import { bundleShape, bundleHashes } from './bundle-graph.mjs';
 import { screensOf, pageOf, renderDef } from './atlas-screens.mjs';
-import { leafEntryUrl } from './scenario-tree.mjs';
 
 export const BUNDLE_JS = 'ux/design-system/components/bundle.js';
 const ROOTISH = new Set(['window', 'globalThis', 'self', 'root', 'parent', 'top']);
-// Always every screen: any stylesheet (no CSS proof in v1), the harness, the shooter and server, fonts, vendored assets, packages,
-// the atlas's own code.
-const EVERYTHING = [
-  /^ux\/design-system\/components\/bundle\.css$/, /^ux\/design-system\/tokens\.(css|json)$/, /^ux\/system\/atlas-bare\.js$/,
-  /^scripts\/(shoot-screens|serve-ux|font-route|playwright-path)\.(mjs|cjs)$/, /^vendor\//, /^package(-lock)?\.json$/,
-  /^sections\//, /^atlas\/(?!atlas\.json$)/,
-];
-// Files that can't draw or run on a page: the workflow's text, prose outside ux/, CI, tests, agent settings, the other scripts.
-const PROSE = /^(?!ux\/).*\.md$/i;
-const INERT = [/^docs\//, /^\.github\//, /^tests\//, /^\.claude\//, /^scripts\//, PROSE, /^features\/[^/]+\/.*\.md$/i, /^ux\/design-system\/components\/index\.d\.ts$/];
 
 const read = (dir, f) => { try { return fs.readFileSync(path.join(dir, f), 'utf8'); } catch { return null; } };
 const isLocal = (u) => !!u && !/^([a-z][a-z\d+.-]*:|\/\/|#)/i.test(u);
@@ -206,7 +193,6 @@ function aliasUses(ast, name, ns) {
 const MEDIA = /\.(png|jpe?g|gif|webp|avif|svg|ico|bmp|mp4|webm|mov|mp3|wav|ogg|m4a|vtt)$/i;
 export const fileType = (f) => (MEDIA.test(f) ? 'media' : /\.(m?js|cjs)$/i.test(f) ? 'script' : /\.css$/i.test(f) ? 'style' : 'other');
 const TAG_TYPE = { img: 'media', source: 'media', video: 'media', audio: 'media', track: 'media', input: 'media', script: 'script' };
-const typeFits = (mask, f) => mask.has('any') || mask.has(fileType(f));
 
 // The paths a URL expression can name, or null when it can't be bounded: a literal; new URL(literal, base) (against the script when
 // the base is its own src or import.meta.url, against the page when it is location/document, against both when unknown); .href,
@@ -513,114 +499,6 @@ function sideOf(side) {
   const s = { dir: side.dir, src, shape, namespaces, screens, defs, page: pageAnalyser(side.dir, namespaces, shape) };
   sides.set(key, s);
   return s;
-}
-
-// The leaves of a feature's scenarios.json: [{ id, feature, entry: the page its nearest reset opens, or null }]. The entry comes
-// from leafEntryUrl, the resolver the gate's leaf identities use: it read `defaults.reset.url`, which no spec has (they say
-// `defaults.url`), so 95 of Farrowing's 97 leaves had no entry and counted as in reach on every change.
-function leavesOf(dir, feature) {
-  const spec = (() => { try { return JSON.parse(read(dir, `features/${feature}/scenarios.json`) || 'null'); } catch { return null; } })();
-  const D = spec?.defaults || {}, out = [];
-  const entryOf = (reset) => { const u = leafEntryUrl(reset, D); return u ? pageOf(u) : null; };
-  (function w(nodes, entry) {
-    for (const n of nodes || []) {
-      const e = n.reset ? entryOf(n.reset) : entry;
-      if (n.type === 'outcome') out.push({ id: n.id, feature, entry: e });
-      w(n.children, e);
-    }
-  })(spec?.tree, entryOf(null));
-  return out;
-}
-
-// ---------- reach ----------
-export function reachOf(base, candidate, { files } = {}) {
-  const B = sideOf(base), C = sideOf(candidate);
-  const changed = files || gitDiff(base.dir, candidate.dir);
-  const why = [];
-  const allIds = [...new Set([...B.screens, ...C.screens].map((s) => s.id))].sort();
-  const featureOf = new Map([...B.screens, ...C.screens].map((s) => [s.id, s.feature]));
-  const everything = (w, functions = null) => ({ all: true, screens: allIds, functions, leaves: allLeaves(base, candidate, [...new Set(featureOf.values())]), why: [w] });
-
-  // 1. what can't be narrowed
-  // any stylesheet is every screen: there is no CSS proof in v1 (gate-v2 §2), so not even one page's own stylesheet is narrowed
-  // (prose outside ux/ is never loaded, even under atlas/ or sections/: the atlas reads only ux/'s READMEs)
-  const wide = changed.filter((f) => !PROSE.test(f) && (EVERYTHING.some((re) => re.test(f)) || /\.css$/i.test(f)));
-  if (wide.length) return everything(`${wide.slice(0, 3).join(', ')}: CSS, the harness, the shooter, fonts or packages reach every screen`);
-
-  // 2. the bundle
-  let functions = [];
-  if (changed.includes(BUNDLE_JS)) {
-    const ch = bundleChange(B.src || '', C.src || '');
-    if (ch.all) return everything(`the bundle: ${ch.why[0]}`);
-    functions = ch.exports;
-    why.push(`the bundle: ${ch.why[0]}${functions.length ? ` (${functions.slice(0, 4).join(', ')}${functions.length > 4 ? ' …' : ''})` : ''}`);
-  }
-  const fnSet = new Set(functions);
-  const usesChanged = (use) => Object.entries(use).some(([ns, u]) => (u.all && functions.some((f) => f.startsWith(ns + '.'))) || [...u.names].some((x) => fnSet.has(`${ns}.${x}`)));
-
-  // 3. screens
-  const reach = new Set(), reasons = new Map();
-  const hit = (id, w) => { reach.add(id); if (!reasons.has(w)) reasons.set(w, 0); reasons.set(w, reasons.get(w) + 1); };
-  const rest = changed.filter((f) => f !== BUNDLE_JS && !INERT.some((re) => re.test(f)));
-  const runtime = rest.filter((f) => f !== 'atlas/atlas.json' && !/^features\//.test(f));
-  const inClosure = new Set();
-  for (const side of [B, C]) for (const s of side.screens) {
-    const pg = screenDeps(side, s);
-    if (pg.missing) hit(s.id, 'its page is missing on one side');
-    if (functions.length && usesChanged(pg.use)) hit(s.id, 'its page uses a changed export (or the namespace as a whole)');
-    for (const f of runtime) if (pg.files.has(f)) { inClosure.add(f); hit(s.id, 'its page loads a changed file'); }
-    // a load the analyser can't bound depends on every changed runtime file it could fetch, even one another page names literally
-    for (const f of runtime) { const u = pg.unbounded.find((x) => typeFits(new Set([x.type]), f)); if (u) hit(s.id, `its page loads by a computed URL (${u.why})`); }
-  }
-  // the atlas: a screen whose definition (url, preset, steps: what renders) changed, and a screen only one side has
-  for (const id of allIds) {
-    const b = B.defs.get(id), c = C.defs.get(id);
-    if (!b || !c) hit(id, 'only one side has it');
-    else if (JSON.stringify(renderDef(b)) !== JSON.stringify(renderDef(c))) hit(id, 'its atlas definition changed');
-  }
-  // a feature's own files add its screens; owning a feature never removes a dependency
-  const ownFeatures = new Set(changed.map((f) => f.match(/^features\/([^/]+)\//)?.[1]).filter(Boolean));
-  for (const id of allIds) if (ownFeatures.has(featureOf.get(id))) hit(id, "its feature's own files changed");
-  for (const [w, n] of reasons) why.push(`${n} screen(s): ${w}`);
-  const orphans = runtime.filter((f) => !inClosure.has(f));
-  if (orphans.length) why.push(`${orphans.slice(0, 3).join(', ')}: no page loads it (pages with computed loads are in reach)`);
-
-  // 4. behaviour: every leaf of an affected feature, and any leaf whose entry page can navigate to a page in reach
-  const features = [...new Set([...reach].map((id) => featureOf.get(id)).concat([...ownFeatures]))];
-  const leaves = leavesInReach(base, candidate, features, reach);
-  return { all: false, screens: [...reach].sort(), functions, leaves, why };
-}
-
-function allLeaves(base, candidate, features) {
-  return [...new Set([base, candidate].flatMap((side) => features.flatMap((f) => leavesOf(side.dir, f).map((l) => l.id))))].sort();
-}
-function leavesInReach(base, candidate, features, reach) {
-  const out = new Set(allLeaves(base, candidate, features));
-  for (const side of [base, candidate]) {
-    const S = sideOf(side);
-    const reachPages = new Set(S.screens.filter((s) => reach.has(s.id)).map((s) => pageOf(s.url)));
-    if (!reachPages.size) continue;
-    const allFeatures = [...new Set(S.screens.map((s) => s.feature))];
-    for (const f of allFeatures) for (const l of leavesOf(side.dir, f)) {
-      if (out.has(l.id)) continue;
-      if (!l.entry) { out.add(l.id); continue; } // an entry it can't name: unsure
-      // the pages it can reach by navigation, from its entry; an unbounded one can reach anything
-      const seen = new Set([l.entry]), q = [l.entry];
-      let touches = false;
-      while (q.length && !touches) {
-        const p = q.shift(), pg = S.page(p);
-        if (reachPages.has(p) || pg.navUnbounded) { touches = true; break; }
-        for (const n of pg.nav) if (!seen.has(n)) { seen.add(n); q.push(n); }
-      }
-      if (touches) out.add(l.id);
-    }
-  }
-  return [...out].sort();
-}
-
-function gitDiff(a, b) {
-  const sha = (d) => execFileSync('git', ['-C', d, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
-  return execFileSync('git', ['-C', b, 'diff', '--name-only', '--no-renames', sha(a), sha(b)], { encoding: 'utf8' }).split(/\r?\n/).filter(Boolean);
 }
 
 // ---------- identity ----------

@@ -3,7 +3,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { holderAlive, startOf, selfStart, START_SLACK_MS } from '../scripts/process-start.mjs';
-import { lockState } from '../scripts/loop-rules.mjs';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { gateAhead } from '../scripts/gate-queue.mjs';
 
 const T = Date.parse('2026-10-18T00:16:32Z');
 const alive = (pid) => pid === 2348;
@@ -18,11 +21,16 @@ test('a holder is alive only while its pid runs the process that wrote the recor
   assert.equal(holderAlive({ start: T }, { alive: () => true }), false, 'no pid');
 });
 
-test('the gate lock reads the same rule: free, held, or stale when its pid is gone or reused', () => {
-  assert.equal(lockState(null, alive, () => T), 'free');
-  assert.equal(lockState({ pid: 2348, start: T, sha: 'abc' }, alive, () => T), 'held');
-  assert.equal(lockState({ pid: 2348, start: T, sha: 'abc' }, alive, () => T + START_SLACK_MS + 1), 'stale');
-  assert.equal(lockState({ pid: 9, start: T, sha: 'abc' }, alive, () => T), 'stale');
+test('the gate lock reads the same rule (gate-queue gateAhead): free, held, or stale when its pid is gone or reused', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'process-start-test-'));
+  const lock = (rec) => fs.writeFileSync(path.join(dir, 'gate.lock'), JSON.stringify(rec));
+  const ahead = (start) => gateAhead(dir, { live: (r) => holderAlive(r, { alive, start }) });
+  assert.equal(ahead(() => T), null, 'free');
+  lock({ pid: 2348, start: T, sha: 'abc' });
+  assert.equal(ahead(() => T)?.pid, 2348, 'held');
+  assert.equal(ahead(() => T + START_SLACK_MS + 1), null, 'stale: the pid now belongs to a process that started later');
+  lock({ pid: 9, start: T, sha: 'abc' });
+  assert.equal(ahead(() => T), null, 'stale: its process is gone');
 });
 
 test("this machine's own start time reads back as this process, and a pid that doesn't exist reads as unknown", () => {

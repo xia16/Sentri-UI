@@ -570,57 +570,6 @@ export function calibrationProblems(parts, answers) {
   return out;
 }
 
-// ---------- the lighter gate: reach by files, the lock ----------
-
-// Files that decide pixels on every screen besides SYSTEM: the shooter and what it loads, the server, the atlas and its sections,
-// the vendored fonts and the installed packages (Playwright's version is the browser's).
-const RENDERS = [
-  /^scripts\/(shoot-screens|serve-ux|font-route|playwright-path)\.(mjs|cjs)$/,
-  /^(atlas|sections|vendor)\//,
-  /^package(-lock)?\.json$/,
-];
-// Files that can't draw a pixel: the workflow's text and other prose outside ux/, CI, tests, agent settings and every other
-// script (the gate and the checks). A page that loads one of them reaches its feature first (pages are read before this list).
-const NO_PIXEL = [/^docs\//, /^\.github\//, /^tests\//, /^\.claude\//, /^scripts\//, /^(?!ux\/).*\.md$/i];
-
-// What a change can reach, from its files alone (P2): { all, features, why }. files: the changed paths (both sides of a rename);
-// screens: every atlas screen on base and candidate; assets: page -> the files it loads (pageAssets); shared: sharedFiles of the
-// same. Unsure is all: a file nothing says is harmless reaches every screen.
-export function reachOf({ files, screens = [], assets = {}, shared = {}, scope = [] }) {
-  const users = new Map();
-  for (const s of screens) { const p = pageOf(s.url); for (const f of [p, ...(assets[p] || [])]) { if (!users.has(f)) users.set(f, new Set()); users.get(f).add(s.feature); } }
-  const features = new Set(scope), notes = new Map();
-  let all = false;
-  const note = (why, f) => { if (!notes.has(why)) notes.set(why, []); notes.get(why).push(f); };
-  for (const f of files) {
-    const own = f.match(/^features\/([^/]+)\//);
-    if (own) { features.add(own[1]); note(`${own[1]}'s own files`, f); continue; }
-    if (SYSTEM.some((re) => re.test(f)) || RENDERS.some((re) => re.test(f))) { all = true; note('draws on every screen', f); continue; }
-    const u = users.get(f);
-    if (Object.hasOwn(shared, f) || u?.size > 1) { all = true; note(`loaded by pages of ${(shared[f] || [...u]).length} features`, f); continue; }
-    if (u) { for (const x of u) features.add(x); note(`a page of ${[...u][0]} or what it loads`, f); continue; }
-    // A component's own pages and notes (its variant pages, variants.json, gate.json, README) are read by the atlas, never loaded
-    // by a screen's page: they reach that component's pages (ds:<Name>/…, feature design-system), not every screen.
-    const doc = f.match(/^ux\/design-system\/components\/([^/]+)\/(variants\/[^/]+\.html|variants\.json|gate\.json|README\.md)$/);
-    if (doc) { features.add(DS_FEATURE); note(`${doc[1]}'s component pages`, f); continue; }
-    if (NO_PIXEL.some((re) => re.test(f))) { note('draws no pixel', f); continue; }
-    all = true;
-    note(f.startsWith('ux/') ? 'no page loads it by name, and a page may fetch it' : 'not known to draw nothing', f);
-  }
-  const list = (fs) => fs.slice(0, 3).join(', ') + (fs.length > 3 ? ` and ${fs.length - 3} more` : '');
-  const why = [...notes].sort(([a], [b]) => (a === 'draws no pixel') - (b === 'draws no pixel')).map(([w, fs]) => `${list(fs)}: ${w}`);
-  if (scope.length) why.push(`scope ${scope.join(', ')}`);
-  return { all, features: [...features].sort(), why };
-}
-
-// The one line the gate prints, given how many screens the reach covers.
-export function reachLine(reach, n) {
-  const why = reach.why.length ? ` (${reach.why.join('; ')})` : '';
-  if (reach.all) return `reach: all screens${why}`;
-  if (!reach.features.length) return `reach: no screen${why}`;
-  return `reach: ${n} screen(s) in features ${reach.features.join(', ')}${why}`;
-}
-
 // Machine errors, the navigation-timeout retry and the AIMD window live in scripts/machine.mjs (the runner and the scheduler use them
 // without the gate's rules); re-exported here for the callers that import them from the rules.
 export { timedOutOnly, aimdStep, classifyMachineError, machineErrorOf } from './machine.mjs';
@@ -628,25 +577,6 @@ export { timedOutOnly, aimdStep, classifyMachineError, machineErrorOf } from './
 // A failed gh / GitHub API call that is the network, not an answer: EOF, TLS, a timeout, a reset or refused connection, a name that
 // doesn't resolve, a 5xx. It is retried; anything else is GitHub's answer and never is.
 export const ghNetworkError = (stderr) => /\bEOF\b|\bTLS\b|handshake|timed? ?out|timeout|connection (was )?(reset|refused|closed)|dial tcp|proxyconnect|actively refused|forcibly closed|network is unreachable|ECONNRESET|ECONNREFUSED|ETIMEDOUT|ENOTFOUND|EAI_AGAIN|could not resolve|no such host|HTTP 5\d\d|\b50[0234]\b|Bad Gateway|Service Unavailable/i.test(String(stderr || ''));
-
-// The gate's lock (one gate per machine): free, held by a live gate, or stale (its process is gone, or its pid now belongs to
-// another process: scripts/process-start.mjs).
-export function lockState(lock, alive = pidAlive, start = startOf) {
-  if (!lock) return 'free';
-  return holderAlive(lock, { alive, start }) ? 'held' : 'stale';
-}
-
-// Scenario leaves, base against candidate (owner, 2026-10-15): a leaf the candidate fails is the change's only when the same leaf
-// passes on base. One already failing on main is main's debt, named as a gap, the way check-states and the header checks already
-// count a problem main has. candFailed: the leaf ids the candidate's report marks fail. baseOut: the base runner's stdout for those
-// leaves (`run-scenarios.mjs <feature> --only a,b`, one "<result>  <id>" line per leaf). A leaf base doesn't have, or doesn't print,
-// is new, so its failure is the change's.
-export function newScenarioFailures(candFailed, baseOut) {
-  const onBase = new Map();
-  for (const line of String(baseOut || '').split('\n')) { const m = /^(pass|fail|blocked|pending)\s+(\S+)/.exec(line); if (m) onBase.set(m[2], m[1]); }
-  const debt = candFailed.filter((id) => onBase.get(id) === 'fail');
-  return { added: candFailed.filter((id) => onBase.get(id) !== 'fail'), debt };
-}
 
 // Main's scenario debt, run by run (review of the gate, 2026-10-16). A candidate failure is main's debt only when base fails the
 // same leaf in the same language at the same width with the same failure: the same assertion contract and failure category.

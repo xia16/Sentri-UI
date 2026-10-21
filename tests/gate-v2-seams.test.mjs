@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { reachOf, identityInputs } from '../scripts/static-reach.mjs';
+import { identityInputs } from '../scripts/static-reach.mjs';
 import { leafRow, reportOf } from '../scripts/scenario-runner.mjs';
 import { scenarioDebt } from '../scripts/loop-rules.mjs';
 import { legibilityWorse } from '../scripts/check-legibility.mjs';
@@ -13,13 +13,8 @@ import { legibilityWorse } from '../scripts/check-legibility.mjs';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const atlas = JSON.parse(fs.readFileSync(path.join(root, 'atlas/atlas.json'), 'utf8'));
 
-test('the reach analyser answers the interface the evidence half reads: screens, leaves, and identity inputs with unit hashes', () => {
+test('the analyser answers the interface the evidence half reads: identity inputs with unit hashes', () => {
   const side = { dir: root, atlas };
-  const r = reachOf(side, side, { files: ['ux/design-system/components/bundle.css'] });
-  assert.equal(r.all, true, 'any stylesheet is every screen (no CSS proof in v1)');
-  const one = reachOf(side, side, { files: ['docs/design-workflow/README.md'] });
-  assert.equal(one.all, false);
-  assert.deepEqual(one.screens, []);
   const ii = identityInputs(side, 'farrowing.room');
   assert.ok(ii.files.includes('ux/design-system/components/bundle.js'));
   assert.ok(Array.isArray(ii.unbounded));
