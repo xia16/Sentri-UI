@@ -47,11 +47,17 @@ export function killTree(child) {
 
 // A gate's one cleanup (Codex audit, 2026-10-21): its children ended first (servers, npm test), then its cleanups awaited newest
 // first (browsers and pools, then the worktrees they used), each failure ignored. Every caller (the evaluation's finally, a signal)
-// gets the same promise, so a stopped gate releases its lock only after its browsers, servers and npm test are gone.
+// gets the same promise, so a stopped gate releases its lock only after its browsers, servers and npm test are gone. The evaluation
+// may still be starting while it closes (a server spawned once a browser launch it awaited resolves): from the moment closing begins,
+// a child registered is ended at once and a cleanup registered runs before the close ends (Codex review, 2026-10-21).
 export function closer(kids, cleanups, kill = killTree) {
   let done = null;
   return () => (done ||= (async () => {
+    const late = [];
+    kids.push = (...ps) => { for (const k of ps) { try { kill(k); } catch {} } return kids.length; };
+    cleanups.push = (...cs) => { late.push(...cs); return cleanups.length; };
     for (const k of kids) { try { kill(k); } catch {} }
     for (const c of [...cleanups].reverse()) { try { await c(); } catch {} }
+    while (late.length) { try { await late.pop()(); } catch {} }
   })());
 }

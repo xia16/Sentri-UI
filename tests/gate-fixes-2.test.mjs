@@ -94,3 +94,19 @@ test('Codex review round 1: a contract is compared at every depth, and a failure
   assert.equal(reusableLeaf({ run: { result: 'fail' }, confirmed: true }), false, 'confirmed: true may be a different second failure');
   assert.equal(reusableLeaf({ run: { result: 'fail' }, confirmed: CONFIRMED }), true);
 });
+
+test('a drain waiter settles when a retry that was running at close ends (Codex review round 2)', async () => {
+  const { createScheduler } = await import('../scripts/scheduler.mjs');
+  const playwright = () => ({ chromium: { launch: async () => ({ isConnected: () => true, close: async () => {} }) } });
+  const sched = createScheduler({ playwright, workers: 1 });
+  let tries = 0, release;
+  const task = sched.run({ kind: 'state', label: 'a', run: async () => (++tries === 1 ? { machine: 'navigation-timeout' } : new Promise((r) => { release = () => r({ ok: true }); })) });
+  while (!release) await new Promise((r) => setTimeout(r, 5));
+  let drained = false;
+  sched.drained().then(() => { drained = true; });
+  await sched.close();
+  release();
+  await task;
+  await new Promise((r) => setImmediate(r));
+  assert.equal(drained, true);
+});

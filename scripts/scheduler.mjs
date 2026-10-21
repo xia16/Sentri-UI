@@ -69,6 +69,7 @@ export function createScheduler({ playwright, workers = WORKERS, log = () => {} 
       running++; solo = true;
       exec(t, true).then((r) => {
         running--; solo = false;
+        if (closed && !running) for (const w of idleWaiters.splice(0)) w();
         if (machineOf(r)) { stats.machineTwice++; t.resolve({ ...r, retried: true, firstError: first.error }); }
         else t.resolve({ ...r, retried: true, firstError: first.error });
         pump();

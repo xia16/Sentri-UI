@@ -67,3 +67,20 @@ test('killTree ends a shell child and the processes it started (npm test runs un
   for (let i = 0; i < 50 && pidAlive(pid); i++) await new Promise((r) => setTimeout(r, 100));
   assert.equal(pidAlive(pid), false, 'the grandchild is gone too');
 });
+
+test('what a gate registers while it is closing is closed too: a child at once, a cleanup before the close ends (Codex review round 2)', async () => {
+  const { closer } = await import('../scripts/process-start.mjs');
+  const order = [], kids = [], cleanups = [];
+  let resume;
+  cleanups.push(async () => { order.push('worktrees'); });
+  cleanups.push(() => new Promise((r) => { resume = r; }).then(() => order.push('browser closed')));
+  const close = closer(kids, cleanups, (k) => order.push(`kill ${k.pid}`));
+  const done = close();
+  while (!resume) await new Promise((r) => setTimeout(r, 5));
+  // evaluate's start-up, still running while the browser closes: a server spawned, its pool registered
+  kids.push({ pid: 7 });
+  cleanups.push(async () => { order.push('late pool'); });
+  resume();
+  await done;
+  assert.deepEqual(order, ['kill 7', 'browser closed', 'worktrees', 'late pool']);
+});
