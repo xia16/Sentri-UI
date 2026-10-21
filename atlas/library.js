@@ -55,17 +55,11 @@ async function styledPreview(name, file = 'preview.html') {
   const hint = (html.match(/dsCard[^>]*?height=(\d+)/) || [])[1];
   const inject = `<base href="${dir}"><link rel="stylesheet" href="${DS}/tokens.css"><link rel="stylesheet" href="${DS}/components/bundle.css"><script src="${DS}/components/bundle.js"><\/script>`;
   const doc = /<head[^>]*>/i.test(html) ? html.replace(/<head[^>]*>/i, (m) => m + inject) : inject + html;
-  const wide = name === 'Cover', f = el('<iframe class="preview" title="Preview"></iframe>');
+  const f = el('<iframe class="preview" title="Preview"></iframe>');
   const box = el('<div class="pv"></div>'); box.append(f);
-  f.style.width = wide ? '960px' : '440px'; f.style.height = (hint ? +hint + 8 : 420) + 'px'; f.srcdoc = doc;
-  f.onload = async () => {
-    try {
-      const d = f.contentDocument;
-      if (wide) { f.style.width = Math.max(960, d.documentElement.scrollWidth) + 'px'; await new Promise((r) => setTimeout(r, 60)); }
-      const h = Math.max(d.documentElement.scrollHeight, d.body.scrollHeight), w = f.offsetWidth;
-      f.style.height = h + 'px';
-      if (wide) { box.style.display = 'block'; box.style.padding = '0'; box.style.border = '0'; box.style.background = 'none'; const k = Math.min(1, box.clientWidth / w); if (k < 1) { f.style.transformOrigin = '0 0'; f.style.transform = `scale(${k})`; box.style.height = h * k + 'px'; } }
-    } catch (_) {}
+  f.style.width = '440px'; f.style.height = (hint ? +hint + 8 : 420) + 'px'; f.srcdoc = doc;
+  f.onload = () => {
+    try { const d = f.contentDocument; f.style.height = Math.max(d.documentElement.scrollHeight, d.body.scrollHeight) + 'px'; } catch (_) {}
   };
   return box;
 }
@@ -314,7 +308,7 @@ async function renderComponents() {
     const mat = maturityOf(name, facts), life = lifeOf(name), use = drawnOn(name);
     const near = facts.near.filter((n) => groupOf(n)).slice(0, 6);
     const api = facts.apis.slice(0, 5).map((a) => `<code>${esc(a)}</code>`).join(' · ');
-    pane.append(el(`<div class="cintro">${facts.job ? `<p class="cjob">${esc(facts.job)}</p>` : ''}<p class="clabels"><span class="pill">${dot(mat === 'candidate' ? 'in-design' : mat)}${esc(MATURITY[mat] || mat)}</span><span class="pill life-${esc(life.toLowerCase())}">${esc(life)}</span></p>${api ? `<p class="cline">${api}${facts.apis.some((a) => a.startsWith('SentriUI.')) ? ' <span class="muted">· types in <code>components/index.d.ts</code></span>' : facts.apis.length ? ' <span class="muted">· <code>components/task-skeleton.js</code></span>' : ''}</p>` : ''}<div class="cline">${use.line}</div>${near.length ? `<p class="cline">Nearby: ${near.map(compA).join(' · ')}</p>` : ''}<p class="cline specw">Specimens at <button type="button" data-w="390">390</button><button type="button" data-w="360">360</button></p></div>`));
+    pane.append(el(`<div class="cintro">${facts.job ? `<p class="cjob">${esc(facts.job)}</p>` : ''}<p class="clabels">${mat === 'retired' ? '' : `<span class="pill">${dot(mat === 'candidate' ? 'in-design' : mat)}${esc(MATURITY[mat] || mat)}</span>`}<span class="pill life-${esc(life.toLowerCase())}">${esc(life)}</span></p>${api ? `<p class="cline">${api}${facts.apis.some((a) => a.startsWith('SentriUI.')) ? ' <span class="muted">· types in <code>components/index.d.ts</code></span>' : facts.apis.length ? ' <span class="muted">· <code>components/task-skeleton.js</code></span>' : ''}</p>` : ''}<div class="cline">${use.line}</div>${near.length ? `<p class="cline">Nearby: ${near.map(compA).join(' · ')}</p>` : ''}<p class="cline specw">Specimens at <button type="button" data-w="390">390</button><button type="button" data-w="360">360</button></p></div>`));
     /* the phone widths a part must hold: 390 by default, 360 the narrow phone; kept for this viewer only */
     const setW = (w) => { pane.style.setProperty('--spec-w', w + 'px'); pane.querySelectorAll('.specw button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.w === String(w)))); try { localStorage.setItem('atlas.specw', w); } catch (_) {} };
     pane.querySelectorAll('.specw button').forEach((b) => { b.onclick = () => setW(b.dataset.w); });

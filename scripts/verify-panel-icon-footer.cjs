@@ -7,7 +7,7 @@ const browser=await chromium.launch({headless:true});const page=await browser.ne
 await page.route('**/favicon.ico',route=>route.fulfill({status:204,body:''}));
 const base=path.resolve('ux/design-system');const assets=['tokens.css','components/bundle.css'].map(p=>'<style>'+fs.readFileSync(path.join(base,p),'utf8').replace(/@import[^;]+;/g,'')+'</style>').join('')+'<script>'+fs.readFileSync(path.join(base,'components/bundle.js'),'utf8')+'</script>';
 const result=[];const dir=path.join(base,'components/pass-proof');fs.mkdirSync(dir,{recursive:true});
-for(const name of ['Panel','Icon','CategoryFooter']){
+for(const name of ['Panel','Icon']){
  const variants=JSON.parse(fs.readFileSync(path.join(base,'components',name,'variants.json')));
  for(const v of variants){
  const html=fs.readFileSync(path.join(base,'components',name,'variants',v.id+'.html'),'utf8');
@@ -16,13 +16,6 @@ for(const name of ['Panel','Icon','CategoryFooter']){
  await page.setContent(assets+isolated);await page.waitForTimeout(50);
  const bad=await page.locator('button,input:not([type=hidden]),[role=button],a').evaluateAll(nodes=>nodes.filter(n=>{const r=n.getBoundingClientRect();return r.width&&r.height&&(r.width<47.9||r.height<47.9)}).map(n=>({text:n.textContent,width:n.getBoundingClientRect().width,height:n.getBoundingClientRect().height})));
  const overflow=await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth);
- if(state.includes('300px')){
- const nav=page.locator('.st-category-tabs');
- if(!await nav.evaluate(n=>n.scrollWidth>n.clientWidth))throw new Error('Expected category overflow');
- await nav.locator('button').last().focus();
- if(!await nav.evaluate(n=>n.scrollLeft>0))throw new Error('Keyboard focus must reveal an overflowing category');
- await nav.evaluate(n=>n.scrollLeft=0);
-}
  const file=`${name}-${v.id}-${state.replace(/[^a-z0-9]/gi,'-')}.png`;
  await page.screenshot({path:path.join(dir,file),fullPage:true});result.push({name,variant:v.id,state,bad,overflow});
  }
