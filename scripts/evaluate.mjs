@@ -713,7 +713,9 @@ export async function evaluate(opts) {
       let debt = 0;
       for (const id of changed) {
         const C = [], B = [];
-        for (const r of HEADER_RUNS) {
+        // English first (#254): a ZH header run exists only for a frozen feature's screen
+        const feat = (S.cand.screens.find((s) => s.id === id) || S.base.screens.find((s) => s.id === id))?.feature;
+        for (const r of HEADER_RUNS.filter((h) => h.lang === 'en' || checksChinese(feat, zhFrozen))) {
           const c = evOf('cand', id, r.width, r.lang, 'headers'), b = onBase(id) ? evOf('base', id, r.width, r.lang, 'headers') : null;
           if (!c?.ok) { missingCheck('headers', 'cand', id, `${r.lang}-${r.width}`, c); continue; }
           if (onBase(id) && !b?.ok) { missingCheck('headers', 'base', id, `${r.lang}-${r.width}`, b); continue; }
@@ -803,9 +805,11 @@ export async function evaluate(opts) {
     const runner = leafRunner({ base: S[side].url, defaults: plan.D, verbs: verbsOf(side), evidenceDir: path.join(out, 'leaves', side, f), pool: leafPools[side] });
     const planned = plan_(plan.its.filter((i) => i.kind));
     // an unconfirmed stored failure (written before L26) is run again, not reused
-    const stale = planned.reuse.filter((x) => !reusableLeaf(x.record));
+    // a stored machine error is never reused (2026-10-21: crashed leaves from a killed gate were stored before crashes were machine errors)
+    const reuseOk = (r) => reusableLeaf(r) && !(r.run?.result === 'fail' && machineErrorOf(r.run.failures));
+    const stale = planned.reuse.filter((x) => !reuseOk(x.record));
     for (const { item } of stale) { tally[item.kind].reused--; tally[item.kind].computed++; }
-    const todo = { reuse: planned.reuse.filter((x) => reusableLeaf(x.record)), compute: [...planned.compute, ...stale.map((x) => x.item)] };
+    const todo = { reuse: planned.reuse.filter((x) => reuseOk(x.record)), compute: [...planned.compute, ...stale.map((x) => x.item)] };
     for (const { item, record } of todo.reuse) results.set(item.id, { ...record.run, reused: true });
     const runOnce = (it, again = false) => sched.run({ kind: 'leaf', label: `${side} ${it.leaf.node.id} ${it.lang}-${it.width}${again ? ' (confirming)' : ''}`, priority: 2, run: async ({ browser: b }) => {
       let r;
