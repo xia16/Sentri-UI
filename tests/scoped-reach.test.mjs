@@ -100,7 +100,7 @@ test("main's library is organised: every component folder is grouped or retired"
   const lib = readLibrary(root);
   assert.ok(lib.folders.length >= 40, 'the folders are read');
   assert.deepEqual(libraryProblems(lib), []);
-  assert.ok(lib.folders.find((f) => f.name === 'TaskHold').retired, 'TaskHold is retired by its gate.json');
+  assert.deepEqual(lib.folders.filter((f) => f.retired).map((f) => f.name), [], 'a retired part is archived (archive/design-system/), not kept among the components');
 });
 
 test('a component folder outside every group, or a new export with no grouped home, fails the library check', () => {

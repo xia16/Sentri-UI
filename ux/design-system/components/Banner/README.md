@@ -50,7 +50,7 @@ Do name the consequence once and place the commit below it. Don't nest buttons i
 `space-row-y`, `space-row-x`, `space-4`, `space-8`, `tap-min`, `control-height`, `border-width`, `size-2`, `size-3`, `radius-control`, `danger-border`, `red-wash`, `red`, `pending-border`, `amber-wash`, `ink`, `muted`, `press`, `glyph-pad`, `type-weight-regular`, `type-weight-medium`, `type-weight-semibold`, `type-weight-strong`, `type-choice-label-size`, `type-choice-meta-size`, `font-sans`, `font-mono`. No local colour or size values.
 
 ## Related and classification
-Generic **component**, shared across sections. [Button](../Button/README.md) owns text-action targets. [Status](../Status/README.md) owns quiet feedback. [TaskWarning](../TaskWarning/README.md) is its retired compatibility alias. Door and size are properties (the icon follows the tone), not copies.
+Generic **component**, shared across sections. [Button](../Button/README.md) owns text-action targets. [Status](../Status/README.md) owns quiet feedback. TaskWarning (an old name, archived) is its retired compatibility alias. Door and size are properties (the icon follows the tone), not copies.
 
 ## Changelog
 2026-10-10: merged TaskWarning and Home offline banner; added notice/door, padded targets, rendered Cleared and Chinese states. See [verification](verification.md).

@@ -1,6 +1,6 @@
 {
  "measured": "2026-10-21",
- "commit": "fcca8a70",
+ "commit": "d533a82d",
  "screens": 362,
  "failed": [],
  "components": {
@@ -1421,6 +1421,7 @@
     "inspection"
    ],
    "apis": [
+    "SentriUI.searchBox",
     "SentriUI.findPage",
     "SentriUI.findResults",
     "SentriUI.findRow",
@@ -3094,40 +3095,6 @@
     "ux/tasks/piglet-processing/simple/dist/app.html"
    ]
   },
-  "TaskHold": {
-   "screens": [],
-   "features": [],
-   "apis": [
-    "SentriUI.holdBind",
-    "SentriTask.footer",
-    "SentriTask.holdBind"
-   ],
-   "files": [
-    "ux/system/farrowing-astra-concept.js",
-    "ux/system/home-astra-prototype.js",
-    "ux/tasks/piglet-processing/bulk.html",
-    "ux/tasks/piglet-processing/count.html",
-    "ux/tasks/piglet-processing/dead.html",
-    "ux/tasks/piglet-processing/edit.html",
-    "ux/tasks/piglet-processing/end.html",
-    "ux/tasks/piglet-processing/id.html",
-    "ux/tasks/piglet-processing/litter.js",
-    "ux/tasks/piglet-processing/move.html",
-    "ux/tasks/piglet-processing/room.html",
-    "ux/tasks/piglet-processing/simple/app.js",
-    "ux/tasks/piglet-processing/simple/dist/app.html"
-   ]
-  },
-  "TaskLens": {
-   "screens": [],
-   "features": [],
-   "apis": [
-    "SentriTask.lens"
-   ],
-   "files": [
-    "ux/tasks/piglet-processing/room.html"
-   ]
-  },
   "TaskMetrics": {
    "screens": [],
    "features": [],
@@ -3193,16 +3160,6 @@
     "ux/tasks/piglet-processing/simple/dist/app.html"
    ]
   },
-  "TaskPhotos": {
-   "screens": [],
-   "features": [],
-   "apis": [
-    "SentriTask.photos"
-   ],
-   "files": [
-    "ux/tasks/piglet-processing/dead.html"
-   ]
-  },
   "TaskProgress": {
    "screens": [
     "piglet-processing.end-task"
@@ -3263,26 +3220,6 @@
    ],
    "files": [
     "ux/tasks/piglet-processing/end.html"
-   ]
-  },
-  "TaskStepper": {
-   "screens": [],
-   "features": [],
-   "apis": [
-    "SentriTask.stepper",
-    "SentriUI.stepper"
-   ],
-   "files": [
-    "ux/system/farrowing-astra-concept.js",
-    "ux/system/inspection-astra-concept.js",
-    "ux/tasks/piglet-processing/count.html",
-    "ux/tasks/piglet-processing/dead.html",
-    "ux/tasks/piglet-processing/edit.html",
-    "ux/tasks/piglet-processing/id.html",
-    "ux/tasks/piglet-processing/litter.js",
-    "ux/tasks/piglet-processing/move.html",
-    "ux/tasks/piglet-processing/simple/app.js",
-    "ux/tasks/piglet-processing/simple/dist/app.html"
    ]
   },
   "TaskSummary": {
@@ -3370,20 +3307,6 @@
    "files": [
     "ux/tasks/piglet-processing/bulk.html",
     "ux/tasks/piglet-processing/end.html"
-   ]
-  },
-  "TaskWarning": {
-   "screens": [],
-   "features": [],
-   "apis": [
-    "SentriTask.warning"
-   ],
-   "files": [
-    "ux/tasks/piglet-processing/dead.html",
-    "ux/tasks/piglet-processing/end.html",
-    "ux/tasks/piglet-processing/move.html",
-    "ux/tasks/piglet-processing/simple/app.js",
-    "ux/tasks/piglet-processing/simple/dist/app.html"
    ]
   },
   "Toast": {
