@@ -43,6 +43,8 @@ Two groups of systems emerge. The **design-guidance** systems (M3, Apple, Atlass
 
 **Page tab structure.** Atlassian splits each component into Examples, Code, Usage, Changelog ([Text field](https://atlassian.design/components/textfield/usage)). M3 splits into Overview, Specs, Guidelines, Accessibility ([bottom sheets accessibility tab](https://m3.material.io/components/bottom-sheets/accessibility)). Apple has a Change log at the foot of the page ([text fields](https://developer.apple.com/design/human-interface-guidelines/text-fields)). Shape to copy: one page with the sections above, plus a changelog.
 
+**Sentri's component page (owner, 2026-10-21).** The atlas's Components view is the page, drawn from the component's folder. Its first screen answers a developer: the name, the one-line job (the README's first sentence), the maturity (in design, candidate, agent-checked, approved) and the lifecycle (current, compatibility, retired), the API the part owns, the screens that draw it (measured by `scripts/component-usage.mjs`, never written by hand), and the parts nearby. Then the variants with their own status and states at phone width (390, with 360), the guidelines, and the screens that draw it; the agent review is folded at the foot. The library's rules are in `ux/design-system/README.md`, "The library".
+
 ---
 
 ## 2. Variant vs state vs property
@@ -207,6 +209,7 @@ A component page and its HTML/CSS/JS pass if:
 13. **Overlays**: modal overlays have a visible close/cancel, one overlay at a time, and unsaved-change exit asks first (Apple [sheets](https://developer.apple.com/design/human-interface-guidelines/sheets)).
 14. **Related and classification**: page links related components and states whether it is a new component, a variant of one, or a pattern (see section 3 rule).
 15. **Rendered proof**: a screenshot of the component in every state at the 375px phone width, with no overflow or clipped text (a Sentri-side requirement, not from the sources).
+16. **Library place**: the component is in one group of `components/_groups.json` (by its job), with the words a developer would type for that job; an old name it replaces is a `see` line; nothing parallel to it exists in the library (extend before adding, L29).
 
 ---
 
@@ -249,3 +252,6 @@ A component page and its HTML/CSS/JS pass if:
 3. A `README.md` in this standard's anatomy: purpose, when / when not, anatomy, variants, states, behaviour, content and wrapping rules, accessibility, do / don't, related, classification. Its first sentence states the job: `scripts/component-jobs.mjs` lists it.
 4. The implementation in `bundle.js` + `bundle.css` (+ `index.d.ts`). Keep call signatures working or update every caller.
 5. Migrate every prototype that hand-builds this job onto the component, and delete the copies. Rebuild any generated prototype (e.g. `ux/tasks/piglet-processing/simple/build.mjs`).
+6. Place it in `components/_groups.json`: the group of its job and its `words`; an old name it replaces becomes a `see` line pointing to it.
+7. Rerun `node scripts/component-usage.mjs` so the atlas shows the screens that draw it.
+8. Retiring a part: its folder moves to `archive/design-system/components/` (listed in that folder's README), its code and CSS go once nothing calls them, and its name stays a `see` line to its replacement. A compatibility adapter that frozen pages still call stays in code, listed under Compatibility and retired, and is never used in new work.
