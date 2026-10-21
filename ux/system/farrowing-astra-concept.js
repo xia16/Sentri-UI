@@ -194,7 +194,7 @@ function atlasScreen(s,c){
  if(v==='roomTaskReceipt')return 'farrowing.task-receipt';
  if(v==='editFinish')return 'farrowing.edit-finished';
  if(v==='roomEndTask'){const r=taskClosureReview(c);return r.blocked?'farrowing.task-blocked':r.awaiting.length?'farrowing.task-ready':r.abortions.length?'farrowing.task-outcomes':'farrowing.task-complete';}
- if(v==='roomSearch'){const f=findHits(c);return !f?'farrowing.search':f.count?'farrowing.search-results':'farrowing.search-none';}
+ if(v==='roomSearch'){const f=findHits(c);return !f?'farrowing.search':f.hits.length?'farrowing.search-results':'farrowing.search-none';}
  if(v==='roomScan'){const sc=c.scan;return !sc.connected?'farrowing.scan-no-reader':!sc.items.length?'farrowing.scan':sc.picked.length?'farrowing.scan-ticked':!sc.listening?'farrowing.scan-stopped':'farrowing.scan-list';}
  if(v==='roomScanActions')return 'farrowing.scan-actions';
  const more={roomFilter:'filter',roomGrid:'pen-map',roomPenDetail:'pen',roomPenLog:'pen-log',roomPenNote:'pen-note',roomPenReadNote:'pen-read-note',roomPenFeed:'pen-feed',roomPenFault:'pen-fault',roomPenFaultRecord:'pen-fault-record',roomTaskSows:'task-sows',roomHome:'today',deathBreakdown:'death-breakdown',marker:'note',pigletCare:'piglet-care',pigletEdit:'piglet-identity',pigletDeath:'piglet-death'};
@@ -419,7 +419,6 @@ function findSow(c,tag){for(const unit of c.units){const record=unit.records.fin
 // One card per unit under a plain "Unit 7" section heading, this unit first, then the others in unit order (as Home's To treat groups pigs).
 // The heading names the unit, so no row repeats it.
 function byUnit(c,hits){return c.units.filter(u=>hits.some(h=>h.unit.id===u.id)).sort((a,b)=>(b.id===c.unitId)-(a.id===c.unitId)).map(unit=>({unit,list:hits.filter(h=>h.unit.id===unit.id)}));}
-const unitCards=(c,hits,row,className)=>byUnit(c,hits).map(({unit,list})=>SentriUI.heading({title:unit.name,kind:'section',level:3})+SentriUI.panel(list.map(row).join(''),{className:'st-row-group '+className})).join('');
 // Every unit, one list. Tags that start with the typed text come first, then tags that contain it, then a pen that matches; her own unit leads.
 function findHits(c){
  const q=c.query.trim().toLowerCase();if(!q)return null;
@@ -427,26 +426,14 @@ function findHits(c){
  const hits=c.units.flatMap(unit=>unit.records.filter(onList).filter(r=>r.tag.includes(q)||r.pen.toLowerCase().includes(q)).map(record=>({record,unit}))).sort((a,b)=>rank(a.record)-rank(b.record)||a.record.tag.localeCompare(b.record.tag));
  return {q,hits};
 }
-// The typed part bold, the rest muted (the page's CSS mutes the tag; this only marks the part that matched).
-const markHit=(text,q)=>{const i=q?String(text).toLowerCase().indexOf(q):-1;return i<0?esc(text):esc(text.slice(0,i))+'<b>'+esc(text.slice(i,i+q.length))+'</b>'+esc(text.slice(i+q.length));};
-function findRow({record:r},q){
- const pen=rowText.pen(r.pen);
- let html=SentriUI.row({variant:'animal',code:r.tag,right:{kind:'state',figure:pen,word:'',level:'settled'},action:'room-sow',value:r.tag,className:'find-row'});
- html=html.replace(`<strong class="st-animal-id">${esc(r.tag)}</strong>`,`<strong class="st-animal-id">${markHit(r.tag,q)}</strong>`);
- if(r.pen.toLowerCase().includes(q))html=html.replace(`>${esc(pen)}<`,`>${markHit(pen,q)}<`);
- return html;
-}
+function findRow({record:r},q){return SentriUI.findRow({code:r.tag,place:rowText.pen(r.pen),query:q,action:'room-sow',value:r.tag});}
 function searchBody(c){
  const f=findHits(c);
- if(!f)return '<p class="find-hint">Type part of an ear tag or a pen, or scan a tag. Searches every unit.</p>';
- if(!f.hits.length)return `<p class="find-hint">No sow matching “${esc(c.query.trim())}” in any unit.</p>`;
- return unitCards(c,f.hits,h=>findRow(h,f.q),'find-list');
+ return SentriUI.findResults({query:c.query,groups:f?byUnit(c,f.hits).map(({unit,list})=>({title:unit.name,rows:list.map(h=>findRow(h,f.q))})):[],hint:'Type part of an ear tag or a pen, or scan a tag. Searches every unit.',none:`No sow matching “${c.query.trim()}” in any unit.`});
 }
-// The field is pinned and focused. Natively this is the number-first keyboard with an ABC switch (iOS numbersAndPunctuation, Android's number-first
-// keyboard with a 123/ABC toggle); the web has no such input mode, so the field asks for plain text with no auto-capital fixes and no suggestions.
+// Find a sow is the design system's Lookup find page (components/Lookup): the field pinned and focused, Clear, the scan icon and Cancel.
 function searchPage(c){
- const q=c.query;
- return `${status()}<div class="find-page find-search"><div class="find-top"><div class="find-field">${icon('search')}<input data-room-search type="text" inputmode="text" enterkeyhint="search" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" placeholder="Ear tag or pen" aria-label="Ear tag or pen" value="${esc(q)}">${SentriUI.iconButton({variant:'plain',action:'room-search-clear',icon:icon('close'),label:'Clear',className:'find-clear'}).replace('<button',`<button${q?'':' hidden'}`)}${SentriUI.iconButton({action:'room-scan',icon:icon('scan'),label:'Scan ear tag',className:'find-scan'})}</div>${SentriUI.button({label:'Cancel',register:'text',action:'room-back',className:'find-cancel'})}</div><div class="room-search-results find-results" role="region" aria-label="Search results" aria-live="polite">${searchBody(c)}</div></div>`;
+ return SentriUI.findPage({query:c.query,placeholder:'Ear tag or pen',results:searchBody(c),scan:{action:'room-scan',label:'Scan ear tag'},clear:{action:'room-search-clear',label:'Clear'},cancel:{action:'room-back',label:'Cancel'},inputAttrs:{'data-room-search':''},bar:status()});
 }
 function scanSetup(c,preset=''){
  const scanning=/^scan-/.test(preset),scanned=['scan-list','scan-new','scan-repeat','scan-ticked','scan-stopped','scan-actions'].includes(preset),ticked=['scan-ticked','scan-actions'].includes(preset);
@@ -473,18 +460,10 @@ function scanAction(s,c,a,v){
  else if(a==='room-scan-actions')s.view='roomScanActions';
 
 }
-const scanEmpty=(title,text)=>`<div class="scan-empty">${icon('scan')}<strong>${title}</strong><p>${text}</p></div>`;
+// Scan ear tags is the design system's Lookup scan page (components/Lookup): the rows are this task's sow rows with their tick box.
 function scanPage(c){
  const sc=c.scan,items=sc.items.map(t=>findSow(c,t)).filter(Boolean),n=sc.picked.length;
- const body=!sc.connected?scanEmpty('Scanner not connected',"Turn on the tag reader and pair it in your phone's Bluetooth settings. Scanning starts as soon as it connects."):
-  !items.length?(sc.listening?scanEmpty('Hold the reader to an ear tag','Each sow you scan appears here.'):scanEmpty('Scanning is stopped','Resume scanning to add sows.')):
-  `<div class="scan-body">${unitCards(c,items,h=>sowRow(h.record,{flat:true,select:{checked:sc.picked.includes(h.record.tag)}}),'scan-card')}</div>`;
- // A page (it fills the screen), so the page header: Back at the top left, the title, no line (Headers law, 2026-10-13). The footer says
- // whether the reader listens (Stop scanning / Resume scanning), so the body carries no second Scanning status. The footer has no Back:
- // the act alone, or, with sows ticked, the count and Actions (as Inspection's selection footer does); with no reader there is no footer.
- const foot=!sc.connected?false:n?footer(`<p class="scan-selected">${n} ${n===1?'sow':'sows'} selected</p>`,SentriUI.button({label:'Actions',icon:icon('more'),register:'primary',action:'room-scan-actions'}),'scan-foot'):
-  pageFooter(SentriUI.button({label:sc.listening?'Stop scanning':'Resume scanning',icon:icon(sc.listening?'stop':'scan'),register:sc.listening?'secondary':'primary',className:'scan-toggle',action:'room-scan-toggle'}),'scan-foot');
- return SentriUI.sheet({variant:'page',title:'Scan ear tags',back:{action:'room-back'},body,footer:foot,className:'feature-page scan-page',label:'Scan ear tags',bar:status()});
+ return SentriUI.scanPage({title:'Scan ear tags',back:{action:'room-back'},connected:sc.connected,listening:sc.listening,groups:byUnit(c,items).map(({unit,list})=>({title:unit.name,rows:list.map(h=>sowRow(h.record,{flat:true,select:{checked:sc.picked.includes(h.record.tag)}}))})),picked:n,selected:n=>`${n} ${n===1?'sow':'sows'} selected`,actions:{action:'room-scan-actions',label:'Actions'},toggle:{action:'room-scan-toggle'},empty:{text:'Each sow you scan appears here.',stoppedText:'Resume scanning to add sows.'},bar:status()});
 }
 const pageUnder=(s,c)=>s.view==='roomScanActions'?'roomScan':s.view;
 function findPage(s){const c=roomContext(s),under=pageUnder(s,c);return under==='roomSearch'?searchPage(c):under==='roomScan'?scanPage(c):'';}
@@ -492,7 +471,7 @@ function findPage(s){const c=roomContext(s),under=pageUnder(s,c);return under===
 // verbs (owner, 2026-10-19): one Row tile grid of an icon and one word, the full action name kept as each tile's accessible name.
 function scanActionsSheet(c){
  const tiles=[['transfer','Transfer','转栏','Transfer','transfer'],['condition','Condition','疾病','Disease or symptom','health'],['treat','Treat','治疗','Record treatment','treatment'],['note','Note','备注','Add a note','marker']]
-  .map(([symbol,en,zh,title,value])=>({label:ZH?zh:en,title,icon:icon(symbol),action:'room-scan-act',value}));
+  .map(([symbol,en,zh,title,value])=>({label:ZH?zh:en,title,icon:icon(symbol),action:'room-scan-act',value,attrs:value==='transfer'?{'data-entry':'move'}:{}}));
  // No count line: the footer under it already said "N sows selected", and More actions has none.
  return roomSheet('Actions',SentriUI.rowGrid(tiles,{label:'Actions for the ticked sows'}),footer(SentriUI.backButton({action:'room-back'})),'scan-actions-sheet','menu');
 }
@@ -500,12 +479,41 @@ function scanActionsSheet(c){
 function penInfo(c){const pens=c.unit.penDetails||(c.unit.penDetails={});return pens[c.detailPen]||(pens[c.detailPen]={note:'',noteBy:'',faults:[],events:[],feed:null});}
 function penEvent(c,text,note=''){penInfo(c).events.unshift({text,note,day:'Today',time:'09:41',who:'G. Hansen'});}
 function penActionRow(action,symbol,title,sub,value=''){return SentriUI.row({action,icon:icon(symbol),title,description:sub,value});}
-function penNotice(action,kind,title,copy,meta,value='',tone=''){return btn(action,`<span class="pen-notice-heading"><span>${kind}</span><strong>${esc(title)}</strong>${icon('chevron')}</span>${copy?`<span class="pen-notice-copy">${esc(copy)}</span>`:''}<small>${esc(meta)}</small>`,'pen-notice '+tone,value);}
+/* The pen page (owner, 2026-10-19; the sibling of Inspection's, PR #229): the pen is a door, not a tick. Everything done to the pen as a whole
+   happens here, for this one pen: its verbs on top (Row tiles), then what needs someone (open faults, then the note, as rows in one group) only when
+   something is open, then how the pen is now, then the door to its log. Only Farrowing's own verbs: Note, Feed, Fault.
+   Names are the registry's (ux/laws/strings.json: actions.tile.*, pen.*, feed.copy.122-124, fr.pen.*), drawn in the page's language. */
+const penPage={
+ actions:ZH?'本栏操作':'Pen actions',note:ZH?'备注':'Note',feed:ZH?'饲喂':'Feed',fault:ZH?'故障':'Fault',
+ noteAdd:ZH?'添加本栏备注':'Add pen note',noteEdit:ZH?'修改本栏备注':'Edit pen note',feedTitle:ZH?'饲喂指导':'Feed guidance',faultTitle:ZH?'上报设备故障':'Report equipment fault',
+ attention:ZH?'需要处理':'Needs attention',now:ZH?'当前':'Now',log:ZH?'本栏记录':'Pen log',logLine:ZH?'全部已记录的操作':'All recorded activity',
+ sows:ZH?'母猪':'Sows',piglets:ZH?'存活仔猪':'Piglets alive',
+ state:{Awaiting:ZH?'待产':'awaiting',Active:ZH?'分娩中':'farrowing',Done:ZH?'已完成':'done'}
+};
+// Where the pen's task sows are: one word when they share a state ("Farrowing"), else each state with its count ("2 awaiting · 1 done").
+function penSowStates(rows){
+ const counts=roomLenses.filter(l=>l!=='All').map(l=>[l,rows.filter(r=>roomState(r)===l).length]).filter(([,n])=>n);
+ if(counts.length===1){const w=penPage.state[counts[0][0]];return ZH?w:w[0].toUpperCase()+w.slice(1);}
+ return counts.map(([l,n])=>ZH?penPage.state[l]+n+'头':n+' '+penPage.state[l]).join(' · ');
+}
 function penDetails(c){
- const pe=penInfo(c),rows=c.listed.filter(r=>r.pen===c.detailPen);
- const notices=pe.faults.filter(f=>f.open).map(f=>penNotice('room-pen-fault-record','Equipment',f.device,f.description,'Open · Reported '+f.time+' · '+initials(f.who),f.id,'pen-notice-fault'));
- if(pe.note)notices.push(penNotice('room-pen-read-note','Note',pe.note,'',pe.noteBy));
- return roomSheet('Pen '+c.detailPen,`${notices.length?`<div class="pen-notices" aria-label="Reported faults and notes">${notices.join('')}</div>`:''}<section class="pen-information"><div class="compact-actions st-panel st-row-group">${penActionRow('room-pen-feed','feed','Feed guidance',pe.feed?pe.feed.formula+' · '+pe.feed.mode:'View feeding information')}${penActionRow('room-pen-fault','wrench','Report equipment fault','Name the device and what is wrong')}${penActionRow('room-pen-note','record',pe.note?'Edit pen note':'Add pen note',pe.note?'Update the note for this pen':'Leave information for the next person')}${penActionRow('room-pen-log','clock','Pen log','All recorded activity')}</div></section>`,false,'pen-detail-sheet');
+ const pe=penInfo(c),rows=c.listed.filter(r=>r.pen===c.detailPen),faults=pe.faults.filter(f=>f.open);
+ const verbs=SentriUI.rowGrid([
+  {label:penPage.note,title:pe.note?penPage.noteEdit:penPage.noteAdd,icon:icon('note'),action:'room-pen-note'},
+  {label:penPage.feed,title:penPage.feedTitle,icon:icon('feed'),action:'room-pen-feed'},
+  {label:penPage.fault,title:penPage.faultTitle,icon:icon('wrench'),action:'room-pen-fault'}
+ ],{label:penPage.actions});
+ const faultRows=faults.map(f=>SentriUI.row({variant:'navigation',action:'room-pen-fault-record',value:f.id,icon:icon('wrench'),title:f.device,description:f.description,wrap:true}));
+ // The note is a row like the faults (one white group on the page's tint, SURFACES.md): its text over its hand and time, the door to the note.
+ const attention=[...faultRows,...(pe.note?[SentriUI.row({variant:'navigation',action:'room-pen-read-note',icon:icon('note'),title:pe.note,description:pe.noteBy,wrap:true})]:[])];
+ const farrowed=rows.filter(r=>born(r)>0),alive=sum(farrowed.map(r=>r.alive)),dead=sum(farrowed.map(r=>sum(r.dead)));
+ const now=[{label:penPage.sows,value:String(rows.length),meta:penSowStates(rows)},...(farrowed.length?[{label:penPage.piglets,value:String(alive),meta:dead?rowText.dead(dead):''}]:[]),...(pe.feed?[{label:penPage.feed,value:pe.feed.formula,meta:pe.feed.mode}]:[])];
+ const section=(title,k,body)=>`<section class="pen-page-section">${SentriUI.heading({title,icon:icon(k),kind:'section',level:4})}${body}</section>`;
+ return roomSheet(ZH?rowText.pen(c.detailPen):'Pen '+c.detailPen,
+  `<section class="pen-page-section">${verbs}</section>`+
+  (attention.length?section(penPage.attention,'alert',`<div class="compact-actions st-panel st-row-group">${attention.join('')}</div>`):'')+
+  section(penPage.now,'details',SentriUI.facts(now,{columns:now.length}))+
+  `<section class="pen-page-section"><div class="compact-actions st-panel st-row-group">${penActionRow('room-pen-log','clock',penPage.log,penPage.logLine)}</div></section>`,false,'pen-detail-sheet');
 }
 function penSubpage(s,c){
  if(!['roomPenFeed','roomPenReadNote','roomPenNote','roomPenFault','roomPenFaultRecord'].includes(s.view))return null;
@@ -517,17 +525,17 @@ function penSubpage(s,c){
  if(s.view==='roomPenFault')return sheet('Report fault',`${SentriUI.pickerField({label:'Device',value:draft.device||'',placeholder:'Select',key:'pen:device',className:'pen-field'})}${draft.device==='Other'?SentriUI.field({label:'Device name',control:`<input data-pen-field="name" value="${esc(draft.name||'')}">`,className:'pen-field'}):''}${SentriUI.field({label:'Description',control:`<textarea data-pen-field="description" placeholder="What is broken or not working?">${esc(draft.description||'')}</textarea>`,className:'pen-field'})}`,btn('room-pen-save-fault','Report fault','button primary','',!validPenFault(draft)));
  if(s.view==='roomPenFaultRecord'){
   const f=pe.faults.find(x=>x.id===c.penFaultId);if(!f)return sheet('Equipment fault','<p class="detail-empty">No fault found.</p>');
-  return sheet(f.device,`<p class="pen-detail-copy">${esc(f.description)}</p><p class="pen-detail-meta">${f.open?'Open':'Resolved'} · Reported ${f.time} · ${esc(initials(f.who))}</p>${f.open?SentriUI.optionalRow({label:'Resolution note',inline:SentriUI.field({label:'Resolution note',labelHidden:true,control:'<textarea data-pen-field="resolution"></textarea>',className:'pen-field'})}):`<p class="pen-detail-copy">${esc(f.resolution||'')}</p>`}`,f.open?btn('room-pen-resolve-fault','Resolve fault','button primary'):'');
+  return sheet(f.device,`<p class="pen-detail-copy">${esc(f.description)}</p><p class="pen-detail-meta">${f.open?'Open':'Resolved'} · Reported ${f.time} · ${esc(initials(f.who))}</p>${f.open?SentriUI.optionalRow({label:'Resolution note',value:draft.resolution||'',open:!!draft.resolution?.trim(),inline:SentriUI.field({label:'Resolution note',labelHidden:true,control:`<textarea data-pen-field="resolution">${esc(draft.resolution||'')}</textarea>`,className:'pen-field'})}):`<p class="pen-detail-copy">${esc(f.resolution||'')}</p>`}`,f.open?btn('room-pen-resolve-fault','Resolve fault','button primary'):'');
  }
  return null;
 }
 function validPenFault(draft){return !!draft.device&&!!draft.description?.trim()&&(draft.device!=='Other'||!!draft.name?.trim());}
 function handlePenAction(s,c,a,v){
  const destinations={'room-pen-feed':'roomPenFeed','room-pen-read-note':'roomPenReadNote','room-pen-note':'roomPenNote','room-pen-fault':'roomPenFault','room-pen-fault-record':'roomPenFaultRecord'};
- if(destinations[a]){const keep=(c.penKeeps||{})[destinations[a]+'|'+c.detailPen];c.penDraft=keep?clone(keep):a==='room-pen-note'?{note:penInfo(c).note}:{};if(a==='room-pen-fault-record')c.penFaultId=v;s.view=destinations[a];return;}
+ if(destinations[a]){const keep=(c.penKeeps||{})[destinations[a]+'|'+c.detailPen+(a==='room-pen-fault-record'?'|'+v:'')];c.penDraft=keep?clone(keep):a==='room-pen-note'?{note:penInfo(c).note}:{};if(a==='room-pen-fault-record')c.penFaultId=v;s.view=destinations[a];return;}
  if(a==='room-pen-save-note'&&c.penDraft?.note?.trim()){const pe=penInfo(c),note=c.penDraft.note.trim();penEvent(c,pe.note?'Pen note updated':'Pen note added',note);pe.note=note;pe.noteBy='G.H · Today · 09:41';delete c.penKeeps?.['roomPenNote|'+c.detailPen];s.view='roomPenDetail';}
  if(a==='room-pen-save-fault'&&validPenFault(c.penDraft)){const d=c.penDraft,pe=penInfo(c),fault={id:String(pe.faults.length+1),device:d.device==='Other'?d.name.trim():d.device,description:d.description.trim(),time:'09:41',who:'G. Hansen',open:true};pe.faults.push(fault);penEvent(c,'Equipment fault reported',fault.device+' · '+fault.description);delete c.penKeeps?.['roomPenFault|'+c.detailPen];s.view='roomPenDetail';}
- if(a==='room-pen-resolve-fault'){const f=penInfo(c).faults.find(x=>x.id===c.penFaultId);if(f?.open){f.open=false;f.resolution=c.penDraft.resolution?.trim()||'';penEvent(c,'Equipment fault resolved',f.device+(f.resolution?' · '+f.resolution:''));s.view='roomPenDetail';}}
+ if(a==='room-pen-resolve-fault'){const f=penInfo(c).faults.find(x=>x.id===c.penFaultId);if(f?.open){f.open=false;f.resolution=c.penDraft.resolution?.trim()||'';penEvent(c,'Equipment fault resolved',f.device+(f.resolution?' · '+f.resolution:''));delete c.penKeeps?.['roomPenFaultRecord|'+c.detailPen+'|'+f.id];s.view='roomPenDetail';}}
 }
 /* A log group is a day: Today, Yesterday, a weekday, or a date ("Aug 27"). "N days ago" is turned into one of those. */
 function dayLabel(day){const m=String(day).match(/^(\d+) days? ago$/);return m?SentriUI.logDay(new Date(Date.now()-Number(m[1])*864e5)):day;}
@@ -596,7 +604,7 @@ function roomOverlay(s){const c=roomContext(s),unitSheet=(title,body,actions,cls
 }
 function roomAction(i,a,v){if(!a.startsWith('room-'))return false;const s=states[i],c=roomContext(s);if(a!=='room-pen'&&atlasStill())c.highlightUntil=0;const list=document.querySelector(`[data-card="${i}"] .room-scroll`);if(list)c.scroll=list.scrollTop;const intro=list?list.querySelector('.room-context-strip').offsetHeight+10:0;const nextScroll=c.scroll>=intro?intro:0;
   if(a==='room-sow'){const hit=findSow(c,v),r=hit?.record;if(r){const from=s.view;if(from==='roomScan'||from==='roomSearch')c.returnToTaskReview=from;states[i]=r;r.view=recordView(r);if(r.view==='history')r.pageBack='room';if(hit.unit.id===c.unitId)c.currentPen=r.pen;if(from!=='roomSearch')c.query='';}}   // Back returns to the list she was opened from; Find a sow keeps what was typed   // Farrowing is one task across its units: a sow in another unit opens the same drawer
- if(a==='room-back'||a==='room-return'){c.returnToTaskReview=false;if(s.view==='roomPenDetail')c.returnFocusPen=c.detailPen;const from=s.view;if(from==='roomFilter')c.filterKeep=clone(c.filterDraft);if(from==='roomPenNote'||from==='roomPenFault')(c.penKeeps=c.penKeeps||{})[from+'|'+c.detailPen]=clone(c.penDraft||{});if(from==='roomPenDetail'&&c.penKeeps)for(const k of Object.keys(c.penKeeps))if(k.endsWith('|'+c.detailPen))delete c.penKeeps[k];s.view=from==='roomScanActions'?'roomScan':from==='roomPicker'&&c.picker?c.picker.returnView:from==='roomEndTask'?'roomOverview':from==='roomTaskSows'?c.taskListBack||'roomEndTask':from==='roomTaskReceipt'?'roomHome':penParent(from);if(from==='roomPicker')c.picker=null;}
+ if(a==='room-back'||a==='room-return'){c.returnToTaskReview=false;if(s.view==='roomPenDetail')c.returnFocusPen=c.detailPen;const from=s.view;if(from==='roomFilter')c.filterKeep=clone(c.filterDraft);if(from==='roomPenNote'||from==='roomPenFault'||from==='roomPenFaultRecord')(c.penKeeps=c.penKeeps||{})[from+'|'+c.detailPen+(from==='roomPenFaultRecord'?'|'+c.penFaultId:'')]=clone(c.penDraft||{});if(from==='roomPenDetail'&&c.penKeeps)for(const k of Object.keys(c.penKeeps))if(k.endsWith('|'+c.detailPen))delete c.penKeeps[k];s.view=from==='roomScanActions'?'roomScan':from==='roomPicker'&&c.picker?c.picker.returnView:from==='roomEndTask'?'roomOverview':from==='roomTaskSows'?c.taskListBack||'roomEndTask':from==='roomTaskReceipt'?'roomHome':penParent(from);if(from==='roomPicker')c.picker=null;}
  handlePenAction(s,c,a,v);
  if(a==='room-pen-log')s.view='roomPenLog';
  if(a==='room-pen-detail'&&c.records.some(r=>r.pen===v)){c.detailPen=v;c.currentPen=v;s.view='roomPenDetail';}
@@ -627,38 +635,8 @@ function pageAfterRender(i,s,c,root){
  const demo=root.querySelector('[data-demo-scan]');if(demo){demo.hidden=s.view!=='roomScan'||!c.scan.connected;demo.disabled=!c.scan.listening;}
  // Find a sow opens with the field focused; Scan highlights the row of a sow that was scanned again.
  if(pageUnder(s,c)==='roomSearch'&&s.view==='roomSearch')root.querySelector('[data-room-search]')?.focus({preventScroll:true,focusVisible:false});
- const list=root.querySelector('.scan-body');if(list)list.scrollTop=c.scan.scroll||0;
- if(s.view==='roomScan')scanLights(c,root);
-}
-// A sow just scanned keeps a soft tint for a moment, so the eye finds her row after looking up from the pig; the tint then fades.
-// The row just read is brought into view (smoothly: the worker sees where she landed); the rest of the list keeps its place.
-function scanLights(c,root){
- const sc=c.scan,now=Date.now();
- for(const [tag,until] of Object.entries(sc.fresh)){
-  if(until<=now){delete sc.fresh[tag];continue;}
-  const row=root.querySelector(`[data-scan-tag="${tag}"]`);if(!row)continue;
-  row.dataset.arrival='on';   // Row's Just scanned state (design system): "off" fades it back, then the attribute goes
-  if(until!==Infinity)setTimeout(()=>{row.dataset.arrival='off';setTimeout(()=>row.removeAttribute('data-arrival'),900);},until-now);
- }
- const row=sc.last&&root.querySelector(`[data-scan-tag="${sc.last}"]`);sc.last='';
- if(row)row.scrollIntoView({block:'nearest',behavior:'smooth'});
-}
-// A new row arrives without a jump: it slides in at the top of its unit's card and everything under it glides down to its new place
-// (measured before and after the render, then animated back from the old place). A card that is new fades in with its heading.
-// Rows move with their card, so a row's glide is measured against its card. Reduced motion and the atlas's still frames skip it.
-const scanKey=e=>e.dataset.scanTag?'r'+e.dataset.scanTag:e.classList.contains('scan-card')?'c'+e.previousElementSibling?.textContent:'h'+e.textContent;
-const scanMovers=card=>[...card.querySelectorAll('.scan-body .st-heading,.scan-body .scan-card,.scan-body [data-scan-tag]')];
-function scanTops(card){const m=new Map();for(const e of scanMovers(card)){const own=e.getBoundingClientRect().top,box=e.dataset.scanTag?e.closest('.scan-card').getBoundingClientRect().top:0;m.set(scanKey(e),own-box);if(e.classList.contains('scan-card'))m.set('H'+scanKey(e),e.getBoundingClientRect().height);}return m;}
-function scanGlide(card,before){
- if(document.documentElement.classList.contains('atlas-still')||matchMedia('(prefers-reduced-motion: reduce)').matches)return;
- const ease={duration:280,easing:'cubic-bezier(.22,1,.36,1)'};
- for(const e of scanMovers(card)){
-  const was=before.get(scanKey(e)),box=e.dataset.scanTag?e.closest('.scan-card').getBoundingClientRect().top:0,now=e.getBoundingClientRect().top-box;
-  if(was===undefined)e.animate([{opacity:0,transform:'translateY(-10px)'},{opacity:1,transform:'none'}],ease);
-  else if(Math.abs(was-now)>.5)e.animate([{transform:`translateY(${was-now}px)`},{transform:'none'}],ease);
-  // A card that gained a row grows with it, so no empty strip opens under its last row while the rows glide.
-  const h=before.get('H'+scanKey(e));if(h!==undefined&&Math.abs(h-e.getBoundingClientRect().height)>.5)e.animate([{height:h+'px',overflow:'hidden'},{height:e.getBoundingClientRect().height+'px',overflow:'hidden'}],ease);
- }
+ const list=root.querySelector('.st-scan-body');if(list)list.scrollTop=c.scan.scroll||0;
+ if(s.view==='roomScan')SentriUI.scanArrive(root,c.scan);
 }
 /* Landing on a pen: the list is placed on the pen first, under the sheet (no scroll the worker sees); the sheet then leaves with its own Sheet
    exit (data-leave, --sheet-out) and the pen's header takes the tapped tile's colour (--land-hold, fading over --land-fade). The atlas freezes motion
@@ -850,17 +828,17 @@ function farrowingBackground(s){
  if(!['count','finish'].includes(parent))return '';
  return '<div class="page-background" inert aria-hidden="true">'+farrowingRecordSurface({...s,view:parent})+'</div>';
 }
-function render(i,focusKey){const s=states[i],context=roomContext(s);persistDraft(s);if(s.view==='profile'&&s.actionsEntry)s.actionReturn=false; /* back at the actions drawer: the pending return is spent, or the drawer's own Back would reopen it */if(s.actionReturn&&['count','locked'].includes(s.view)){s.actionReturn=false;if(!s.ended){s.view='profile';s.actionsEntry=true;}}if(s.view==='room'&&context.returnToTaskReview){s.view=context.returnToTaskReview;context.returnToTaskReview=false;}const root=document.querySelector(`[data-card="${i}"]`);clearTimeout(reminderTimers[i]);if(s.view!=='count')s.pointers=false;if(s.pointers)reminderTimers[i]=setTimeout(()=>{if(states[i]!==s||s.view!=='count')return;s.pointers=false;const status=root.querySelector('.receipt');if(status)status.innerHTML=receipt(s);},4000);const active=root.contains(document.activeElement)?document.activeElement:null,field=active?.dataset?.field,fieldValue=active?.value;if(root.dataset.view==='roomOverview')context.overviewScroll=root.querySelector('.phone > .sheet > .sheet-body')?.scrollTop||0;const previousPopup=root.dataset.popup||'';const popupChanged=previousPopup!==(s.popup?.kind||'');root.dataset.popup=s.popup?.kind||'';const sameView=root.dataset.view===s.view;const scroll=sameView?root.querySelector('.phone > .sheet > .sheet-body')?.scrollTop||0:0;root.dataset.view=s.view;root.querySelector('.phone').innerHTML=`<div class="room-surface${pageUnder(s,context)==='roomSearch'?' find-surface':''}"${!['room','roomHome','roomSearch','roomScan'].includes(s.view)?' inert':''}>${room(s)}</div>`+farrowingBackground(s)+farrowingRecordSurface(s)+roomOverlay(s)+capabilitySurface(s)+(s.view==='history'?history(s):s.view==='profile'?profile(s):s.view==='deathBreakdown'?deathBreakdown(s):'')+popup(s);placeTaskSyncBadge(root);connectSowDetail(root,s);if(root.querySelector('.phone > .sheet > .sheet-body'))root.querySelector('.phone > .sheet > .sheet-body').scrollTop=s.view==='roomOverview'?(context.overviewScroll||0):scroll;if(s.popup&&s.popup.kind!=='born'){root.querySelectorAll('.phone > :not(.dialog-backdrop)').forEach(e=>e.setAttribute('inert',''));root.querySelector('.record-page')?.setAttribute('inert','');}if(!sameView){root.querySelector('.phone > .sheet,.phone > .record-page')?.focus({preventScroll:true,focusVisible:false});}if(popupChanged&&s.popup)root.querySelector('.dialog input,.dialog button')?.focus({preventScroll:true,focusVisible:false});else if(popupChanged&&previousPopup==='born')root.querySelector('[data-action="bornPopup"]')?.focus({preventScroll:true,focusVisible:false});if(field){[...root.querySelectorAll('.phone > .sheet [data-field]')].find(x=>x.dataset.field===field&&(x.type!=='radio'||x.value===fieldValue))?.focus({preventScroll:true,focusVisible:false});}if(focusKey){const target=Array.from(root.querySelectorAll('.phone > .sheet [data-action]')).find(e=>e.dataset.action===focusKey.a&&e.dataset.value===focusKey.v);const focusTarget=target&&!target.disabled?target:target?.closest('.st-stepper')?.querySelector('button:not(:disabled)')||root.querySelector('.phone > .sheet,.phone > .record-page');focusTarget?.focus({preventScroll:true,focusVisible:false});}SentriUI.liveFill(root,{delay:0});if(popupChanged&&previousPopup==='photo'&&!s.popup){const origin=s.photoOrigin;root.querySelector(`[data-action="${origin?.action||'addPhoto'}"][data-value="${origin?.index??'photos'}"]`)?.focus();}roomAfterRender(i);if(i===0&&window.AtlasBare)AtlasBare.watch(()=>atlasScreen(s,context)); }
+function render(i,focusKey){const s=states[i],context=roomContext(s);persistDraft(s);if(s.view==='profile'&&s.actionsEntry)s.actionReturn=false; /* back at the actions drawer: the pending return is spent, or the drawer's own Back would reopen it */if(s.actionReturn&&['count','locked'].includes(s.view)){s.actionReturn=false;if(!s.ended){s.view='profile';s.actionsEntry=true;}}if(s.view==='room'&&context.returnToTaskReview){s.view=context.returnToTaskReview;context.returnToTaskReview=false;}const root=document.querySelector(`[data-card="${i}"]`);clearTimeout(reminderTimers[i]);if(s.view!=='count')s.pointers=false;if(s.pointers)reminderTimers[i]=setTimeout(()=>{if(states[i]!==s||s.view!=='count')return;s.pointers=false;const status=root.querySelector('.receipt');if(status)status.innerHTML=receipt(s);},4000);const active=root.contains(document.activeElement)?document.activeElement:null,field=active?.dataset?.field,fieldValue=active?.value;if(root.dataset.view==='roomOverview')context.overviewScroll=root.querySelector('.phone > .sheet > .sheet-body')?.scrollTop||0;const previousPopup=root.dataset.popup||'';const popupChanged=previousPopup!==(s.popup?.kind||'');root.dataset.popup=s.popup?.kind||'';const sameView=root.dataset.view===s.view;const scroll=sameView?root.querySelector('.phone > .sheet > .sheet-body')?.scrollTop||0:0;root.dataset.view=s.view;root.querySelector('.phone').innerHTML=`<div class="room-surface"${!['room','roomHome','roomSearch','roomScan'].includes(s.view)?' inert':''}>${room(s)}</div>`+farrowingBackground(s)+farrowingRecordSurface(s)+roomOverlay(s)+capabilitySurface(s)+(s.view==='history'?history(s):s.view==='profile'?profile(s):s.view==='deathBreakdown'?deathBreakdown(s):'')+popup(s);placeTaskSyncBadge(root);connectSowDetail(root,s);if(root.querySelector('.phone > .sheet > .sheet-body'))root.querySelector('.phone > .sheet > .sheet-body').scrollTop=s.view==='roomOverview'?(context.overviewScroll||0):scroll;if(s.popup&&s.popup.kind!=='born'){root.querySelectorAll('.phone > :not(.dialog-backdrop)').forEach(e=>e.setAttribute('inert',''));root.querySelector('.record-page')?.setAttribute('inert','');}if(!sameView){root.querySelector('.phone > .sheet,.phone > .record-page')?.focus({preventScroll:true,focusVisible:false});}if(popupChanged&&s.popup)root.querySelector('.dialog input,.dialog button')?.focus({preventScroll:true,focusVisible:false});else if(popupChanged&&previousPopup==='born')root.querySelector('[data-action="bornPopup"]')?.focus({preventScroll:true,focusVisible:false});if(field){[...root.querySelectorAll('.phone > .sheet [data-field]')].find(x=>x.dataset.field===field&&(x.type!=='radio'||x.value===fieldValue))?.focus({preventScroll:true,focusVisible:false});}if(focusKey){const target=Array.from(root.querySelectorAll('.phone > .sheet [data-action]')).find(e=>e.dataset.action===focusKey.a&&e.dataset.value===focusKey.v);const focusTarget=target&&!target.disabled?target:target?.closest('.st-stepper')?.querySelector('button:not(:disabled)')||root.querySelector('.phone > .sheet,.phone > .record-page');focusTarget?.focus({preventScroll:true,focusVisible:false});}SentriUI.liveFill(root,{delay:0});if(popupChanged&&previousPopup==='photo'&&!s.popup){const origin=s.photoOrigin;root.querySelector(`[data-action="${origin?.action||'addPhoto'}"][data-value="${origin?.index??'photos'}"]`)?.focus();}roomAfterRender(i);if(i===0&&window.AtlasBare)AtlasBare.watch(()=>atlasScreen(s,context)); }
 // Pointer taps keep keyboard focus position without drawing a keyboard-only ring.
 document.addEventListener('pointerdown',()=>document.documentElement.dataset.inputMode='pointer',true);
 document.addEventListener('keydown',()=>delete document.documentElement.dataset.inputMode,true);
 const gallery=document.getElementById('gallery');gallery.innerHTML=cards.map((c,i)=>`<article class="spec" data-card="${i}"><div class="spec-head"><div class="spec-title"><span>0${i+1}</span>${c.title}</div><button type="button" class="demo-scan" data-demo-scan hidden>Simulate scan</button><select class="scenario" aria-label="Example for ${c.title}">${presets.map(([v,l])=>`<option value="${v}"${v===c.initial?' selected':''}>${l}</option>`).join('')}</select></div><div class="phone farrowing-phone"></div><p class="caption">${c.caption}</p></article>`).join('');states.forEach((_,i)=>render(i));
 // The range slider reports each change; keep the draft and the live count in step.
 gallery.addEventListener('sentri-range-change',e=>{const root=e.target.closest('[data-card]'),c=roomContext(states[+root.dataset.card]);Object.assign(c.filterDraft,e.detail.values);const n=visibleRoomRecords(c,c.filterDraft).length;e.target.closest('.sheet').querySelector('[data-action="room-apply-filter"]').textContent='Show '+n+' '+(n===1?'sow':'sows');});
-gallery.addEventListener('input',e=>{if(!e.target.matches('[data-room-search]'))return;const i=+e.target.closest('[data-card]').dataset.card,c=roomContext(states[i]),page=e.target.closest('.find-page');c.query=e.target.value;page.querySelector('.room-search-results').innerHTML=searchBody(c);page.querySelector('.find-clear').hidden=!c.query;if(i===0&&window.AtlasBare)AtlasBare.watch(()=>atlasScreen(states[0],c));});
+gallery.addEventListener('input',e=>{if(!e.target.matches('[data-room-search]'))return;const i=+e.target.closest('[data-card]').dataset.card,c=roomContext(states[i]),page=e.target.closest('.st-find');c.query=e.target.value;page.querySelector('.st-find-results').innerHTML=searchBody(c);page.querySelector('.st-find-clear').hidden=!c.query;if(i===0&&window.AtlasBare)AtlasBare.watch(()=>atlasScreen(states[0],c));});
 // The demo's own control, outside the phone: the reader reads the next sample sow.
-document.addEventListener('click',e=>{const b=e.target.closest('[data-demo-scan]');if(!b||b.disabled)return;const card=b.closest('[data-card]'),i=+card.dataset.card,c=roomContext(states[i]),before=scanTops(card);if(scanAdd(c)){render(i);scanGlide(card,before);}});
-gallery.addEventListener('scroll',e=>{if(e.target.matches('.scan-body')){roomContext(states[+e.target.closest('[data-card]').dataset.card]).scan.scroll=e.target.scrollTop;return;}if(!e.target.matches('.room-scroll'))return;const list=e.target,i=+list.closest('[data-card]').dataset.card,c=roomContext(states[i]);c.scroll=list.scrollTop;if(states[i].view!=='room')return;const top=list.getBoundingClientRect().top+list.querySelector('.room-controls').offsetHeight;const pen=[...list.querySelectorAll('[data-pen]')].find(p=>p.getBoundingClientRect().bottom>top+35);if(pen){c.currentPen=pen.dataset.pen;const label=list.closest('.phone').querySelector('.dock-pen>span');if(label)label.innerHTML=`${c.currentPen}<small>Go to pen</small>`;}},true);
+document.addEventListener('click',e=>{const b=e.target.closest('[data-demo-scan]');if(!b||b.disabled)return;const card=b.closest('[data-card]'),i=+card.dataset.card,c=roomContext(states[i]),before=SentriUI.scanPlaces(card);if(scanAdd(c)){render(i);SentriUI.scanGlide(card,before);}});
+gallery.addEventListener('scroll',e=>{if(e.target.matches('.st-scan-body')){roomContext(states[+e.target.closest('[data-card]').dataset.card]).scan.scroll=e.target.scrollTop;return;}if(!e.target.matches('.room-scroll'))return;const list=e.target,i=+list.closest('[data-card]').dataset.card,c=roomContext(states[i]);c.scroll=list.scrollTop;if(states[i].view!=='room')return;const top=list.getBoundingClientRect().top+list.querySelector('.room-controls').offsetHeight;const pen=[...list.querySelectorAll('[data-pen]')].find(p=>p.getBoundingClientRect().bottom>top+35);if(pen){c.currentPen=pen.dataset.pen;const label=list.closest('.phone').querySelector('.dock-pen>span');if(label)label.innerHTML=`${c.currentPen}<small>Go to pen</small>`;}},true);
 let grabStart=null;
 SentriUI.holdBind(gallery,{onCommit(el){const i=+el.closest('[data-card]').dataset.card,record=states[i];if(!roomAction(i,el.dataset.action,el.dataset.value))act(record,el.dataset.action);render(i);}});
 gallery.addEventListener('pointerdown',e=>{if(e.button!==0)return;if(e.target.closest('.grab'))grabStart={y:e.clientY,i:+e.target.closest('[data-card]').dataset.card};});

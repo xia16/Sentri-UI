@@ -1449,7 +1449,92 @@
   function weekBoardKey(rows=[]){
     return `<div class="st-panel st-week-key" data-ds="WeekBoard">${rows.map(([c,t,l])=>`<div class="st-week-key-row"><span class="st-week-grid" data-one="">${weekCell(c)}</span><div><strong>${esc(t)}</strong><small>${esc(l)}</small></div></div>`).join('')}</div>`;
   }
-  const api=Object.freeze({taskTile,weekBoard,weekCell,weekBoardKey,headerLine,pageHeader,rangeSlider,filterSheet,penMap,penMapKey,penMapFooter,penPeek,penMapMount:penMount,optionalRow,keyboardLift,heading,panel,facts,row,rowGroup,log,logDay,logStamp,logGroups,categoryFooter,field,rowTile,rowGrid,pickerField,pickerOptions,pickerBody,pickerHead,pickerFooter,filterChips,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,toast,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowSelectDoor,rowAction,rowSelectChange,status,conditionTag,rowFitTags,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
+  /* Lookup: the two ways to reach an animal by its ear tag, Find and Scan, one part for every feature (owner decisions
+     2026-10-12 and 2026-10-20; first built in Farrowing, #143). They are different jobs and never merge.
+     Find (findPage): type, tap one, act. The field is pinned and focused, nothing is listed before typing, and the results are one
+       card per unit under a plain "Unit 7" heading, this unit first. Tapping a result opens that animal in the host's context.
+     Scan (scanPage): hands-free. The reader always listens; each scan adds the animal to a list, newest first, and a repeat scan
+       lights its row again. Every row has its tick box; ticking replaces the footer with "N selected" and Actions. The footer's
+       Stop / Resume scanning is the only scanning status. No "Not found" row, no Select button.
+     The host passes its own animal row (Row · Animal in Find, rowSelectDoor in Scan) and its own Actions; Lookup draws the page around them.
+     lookupGroups([{title,rows:[html]}],{variant:'find'|'scan'}) · findPage({query,placeholder,results,scan,clear,cancel,inputAttrs,bar})
+     findResults({query,groups,hint,none}) · findRow({code,place,query,action,value}) · findMark(text,query)
+     scanPage({title,back,connected,listening,groups,picked,selected,actions,toggle,empty,bar}) · scanArrive(root,scan) · scanPlaces(root) · scanGlide(root,before) */
+  function lookupGroups(groups=[],{variant='find'}={}){
+    const card=variant==='scan'?'st-scan-card':'st-find-list';
+    return groups.filter(g=>g&&(g.rows||[]).length).map(g=>heading({title:g.title,kind:'section',level:3})+panel(g.rows.join(''),{className:'st-row-group '+card})).join('');
+  }
+  /* The typed part bold, the rest muted (.st-find-row mutes the tag; this marks only the part that matched). */
+  function findMark(text,q){const t=String(text??''),i=q?t.toLowerCase().indexOf(String(q).toLowerCase()):-1;return i<0?esc(t):esc(t.slice(0,i))+'<b>'+esc(t.slice(i,i+q.length))+'</b>'+esc(t.slice(i+q.length));}
+  /* A result: the tag on the left, where the animal is on the right; the part of either that matched is marked. */
+  function findRow({code='',place='',query='',action='',value=code,className=''}={}){
+    const q=String(query||'').trim().toLowerCase();
+    let html=row({variant:'animal',code,right:{kind:'state',figure:place,word:'',level:'settled'},action,value,className:'st-find-row'+(className?' '+className:'')});
+    html=html.replace(`<strong class="st-animal-id">${esc(code)}</strong>`,`<strong class="st-animal-id">${findMark(code,q)}</strong>`);
+    if(place&&String(place).toLowerCase().includes(q))html=html.replace(`>${esc(place)}<`,`>${findMark(place,q)}<`);
+    return html;
+  }
+  /* What the results area says: the hint before typing, the no-match line, or the unit cards. */
+  function findResults({query='',groups=[],hint='',none=''}={}){
+    if(!String(query).trim())return hint?`<p class="st-find-hint">${esc(hint)}</p>`:'';
+    if(!groups.some(g=>(g.rows||[]).length))return `<p class="st-find-hint">${esc(none)}</p>`;
+    return lookupGroups(groups,{variant:'find'});
+  }
+  /* The field is pinned and focused (the host focuses [data-find-input] once it has rendered). Natively this is the number-first keyboard
+     with an ABC switch (iOS numbersAndPunctuation, Android's 123/ABC toggle); the web has no such input mode, so the field asks for plain
+     text with no auto-capitals and no suggestions. A white page (an input surface): the field, Clear while something is typed, the scan
+     icon when the host has a reader, and Cancel. */
+  function findPage({query='',placeholder='Ear tag or pen',label=placeholder,results='',scan=null,clear={action:'find-clear',label:'Clear'},cancel={action:'back',label:'Cancel'},inputAttrs={},bar='',className=''}={}){
+    const q=String(query??'');
+    const clearBtn=iconButton({variant:'plain',action:clear.action,icon:SentriIcons.icon('close'),label:clear.label||'Clear',className:'st-find-clear'}).replace('<button',`<button${q?'':' hidden'}`);
+    const scanBtn=scan?iconButton({action:scan.action,icon:SentriIcons.icon('scan'),label:scan.label||'Scan ear tag',className:'st-find-scan'}):'';
+    return `<section class="st-find${className?' '+esc(className):''}" data-ds="Lookup" data-variant="find" data-st-context="drawer" role="region"${sL(label)}>${bar}<div class="st-find-top"><div class="st-find-field">${SentriIcons.icon('search')}<input data-find-input${safeAttr(inputAttrs)} type="text" inputmode="text" enterkeyhint="search" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" placeholder="${esc(placeholder)}" aria-label="${esc(label)}" value="${esc(q)}">${clearBtn}${scanBtn}</div>${button({label:cancel.label||'Cancel',register:'text',action:cancel.action,className:'st-find-cancel'})}</div><div class="st-find-results" role="region" aria-label="Search results" aria-live="polite">${results}</div></section>`;
+  }
+  const scanEmpty=(title,text)=>`<div class="st-scan-empty">${SentriIcons.icon('scan')}<strong>${esc(title)}</strong><p>${esc(text)}</p></div>`;
+  /* A page (it fills the screen): Back at the top left and the title, no line (Headers law). The footer says whether the reader listens,
+     so the body carries no second scanning status. With rows ticked the footer is the plain count and Actions (no Back); with no reader
+     there is no footer. `selected(n)` and `empty` carry the host's noun ("2 sows selected", "Each pig you scan appears here."). */
+  function scanPage({title='Scan ear tags',back={action:'back'},connected=true,listening=true,groups=[],picked=0,selected=n=>n+' selected',actions={action:'scan-actions',label:'Actions'},toggle={action:'scan-toggle'},empty={},bar='',className=''}={}){
+    const e=Object.assign({offTitle:'Scanner not connected',offText:"Turn on the tag reader and pair it in your phone's Bluetooth settings. Scanning starts as soon as it connects.",title:'Hold the reader to an ear tag',text:'Each animal you scan appears here.',stoppedTitle:'Scanning is stopped',stoppedText:'Resume scanning to add more.'},empty);
+    const has=groups.some(g=>(g.rows||[]).length);
+    const body=!connected?scanEmpty(e.offTitle,e.offText):!has?(listening?scanEmpty(e.title,e.text):scanEmpty(e.stoppedTitle,e.stoppedText)):`<div class="st-scan-body">${lookupGroups(groups,{variant:'scan'})}</div>`;
+    const foot=!connected?false:picked?sheetFooter({content:`<p class="st-scan-selected">${esc(selected(picked))}</p>`+button({label:actions.label||'Actions',icon:SentriIcons.icon('more'),register:'primary',action:actions.action}),className:'st-scan-foot'}):
+      sheetFooter({content:button({label:listening?(toggle.stop||'Stop scanning'):(toggle.resume||'Resume scanning'),icon:SentriIcons.icon(listening?'stop':'scan'),register:listening?'secondary':'primary',className:'st-scan-toggle',action:toggle.action}),className:'st-scan-foot'});
+    return sheet({variant:'page',title,back,body,footer:foot,className:'st-scan'+(className?' '+className:''),label:title,bar,attrs:{'data-lookup':'scan'}});
+  }
+  /* An animal just scanned keeps Row's Just scanned state for a moment (data-arrival="on", the progress wash), so the eye finds her row after
+     looking up from the pig; "off" then fades it back and the attribute goes. The row just read is brought into view (smoothly); the rest of
+     the list keeps its place. scan = { fresh:{ tag: until (ms, or Infinity for the held frame) }, last }. Rows carry data-scan-tag. */
+  function scanArrive(root,sc){
+    if(!root||!sc)return;const now=Date.now();sc.fresh=sc.fresh||{};
+    for(const [tag,until] of Object.entries(sc.fresh)){
+      if(until<=now){delete sc.fresh[tag];continue;}
+      const r=root.querySelector(`[data-scan-tag="${tag}"]`);if(!r)continue;
+      r.dataset.arrival='on';
+      if(until!==Infinity)setTimeout(()=>{r.dataset.arrival='off';setTimeout(()=>r.removeAttribute('data-arrival'),900);},until-now);
+    }
+    const r=sc.last&&root.querySelector(`[data-scan-tag="${sc.last}"]`);sc.last='';
+    if(r)r.scrollIntoView({block:'nearest',behavior:'smooth'});
+  }
+  /* A new row arrives without a jump: it slides in at the top of its card and everything under it glides to its new place (measured before
+     and after the render with scanPlaces, then animated back from the old place by scanGlide). A new card fades in with its heading, and a card
+     that gains a row grows with it. Rows move with their card, so a row is measured against its card. Reduced motion and the atlas's still frames skip it. */
+  const scanKey=e=>e.dataset.scanTag?'r'+e.dataset.scanTag:e.classList.contains('st-scan-card')?'c'+e.previousElementSibling?.textContent:'h'+e.textContent;
+  const scanMovers=root=>[...root.querySelectorAll('.st-scan-body .st-heading,.st-scan-body .st-scan-card,.st-scan-body [data-scan-tag]')];
+  const scanTop=e=>e.getBoundingClientRect().top-(e.dataset.scanTag?e.closest('.st-scan-card').getBoundingClientRect().top:0);
+  function scanPlaces(root){const m=new Map();if(root)for(const e of scanMovers(root)){m.set(scanKey(e),scanTop(e));if(e.classList.contains('st-scan-card'))m.set('H'+scanKey(e),e.getBoundingClientRect().height);}return m;}
+  function scanGlide(root,before){
+    if(!root||document.documentElement.classList.contains('atlas-still')||matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+    const ease={duration:280,easing:'cubic-bezier(.22,1,.36,1)'};
+    for(const e of scanMovers(root)){
+      const was=before.get(scanKey(e)),now=scanTop(e);
+      if(was===undefined)e.animate([{opacity:0,transform:'translateY(-10px)'},{opacity:1,transform:'none'}],ease);
+      else if(Math.abs(was-now)>.5)e.animate([{transform:`translateY(${was-now}px)`},{transform:'none'}],ease);
+      // A card that gained a row grows with it, so no empty strip opens under its last row while the rows glide.
+      const h=before.get('H'+scanKey(e)),hn=e.getBoundingClientRect().height;if(h!==undefined&&Math.abs(h-hn)>.5)e.animate([{height:h+'px',overflow:'hidden'},{height:hn+'px',overflow:'hidden'}],ease);
+    }
+  }
+  const api=Object.freeze({lookupGroups,findPage,findResults,findRow,findMark,scanPage,scanArrive,scanPlaces,scanGlide,taskTile,weekBoard,weekCell,weekBoardKey,headerLine,pageHeader,rangeSlider,filterSheet,penMap,penMapKey,penMapFooter,penPeek,penMapMount:penMount,optionalRow,keyboardLift,heading,panel,facts,row,rowGroup,log,logDay,logStamp,logGroups,categoryFooter,field,rowTile,rowGrid,pickerField,pickerOptions,pickerBody,pickerHead,pickerFooter,filterChips,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,toast,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowSelectDoor,rowAction,rowSelectChange,status,conditionTag,rowFitTags,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
   root.SentriUI=api;
   if(typeof module!=='undefined')module.exports=api;
 })(globalThis);

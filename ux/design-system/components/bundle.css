@@ -287,7 +287,8 @@ button.st-row:disabled{cursor:default}
 .st-row-tile{display:flex;flex-direction:column;align-items:center;gap:var(--space-8);min-width:0;min-height:var(--tap-min);padding:0;border:0;background:none;color:var(--ink);font:500 var(--type-meta-size)/1.3 var(--font-sans);text-align:center;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .st-row-tile-icon{display:grid;place-items:center;width:var(--tap-min);height:var(--tap-min);border-radius:var(--radius-14);background:var(--row-icon-bg);color:var(--row-icon-ink)}
 .st-row-tile-icon svg{width:var(--size-22);height:var(--size-22)}
-.st-row-tile-label{max-width:100%;overflow-wrap:anywhere}
+/* A label breaks between words, never inside one: "Condition" in a five-across grid at 360 is a hair wider than its column and broke as "Conditio / n". */
+.st-row-tile-label{max-width:100%;overflow-wrap:normal}
 .st-row-tile:active .st-row-tile-icon,.st-row-tile[data-preview="pressed"] .st-row-tile-icon{background:var(--choice-press)}
 .st-row-tile.is-danger{color:var(--red-ink)}
 .st-row-tile.is-danger .st-row-tile-icon{background:var(--red-wash);color:var(--red-ink)}
@@ -981,7 +982,7 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
 .dialog .st-selection{margin:16px 0 1px}
 .dialog .st-segment{border-width:0}
 .st-segment[data-variant=scope]{gap:var(--space-4);padding:var(--space-4);border-width:1px;border-style:solid;border-color:var(--line);border-radius:var(--radius-control)}
-.st-segment[data-variant=scope] button{flex:1 1 0;min-width:0;min-height:var(--tap-min);gap:var(--space-6);padding:0 var(--space-12);border-radius:var(--radius-8);font-size:var(--type-row-title-size);color:var(--muted)}
+.st-segment[data-variant=scope] button{flex:1 1 0;min-width:0;min-height:var(--tap-min);gap:var(--space-6);padding:0 var(--space-12);border-radius:var(--radius-8);font-size:var(--type-row-title-size);color:var(--ink-2)}
 .st-segment[data-variant=scope] button:first-child{flex:0 0 auto}
 .st-segment[data-variant=scope] button{align-items:baseline;align-content:center} /* the count sits on the label's baseline, the pair centred (the button wraps) */
 .st-segment[data-variant=scope] button[aria-haspopup]{justify-content:flex-start}
@@ -1318,3 +1319,32 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 .st-row-count{flex:none;display:flex;align-items:center;padding-right:6px}
 .st-row-count input{width:52px;height:48px;box-sizing:border-box;margin:0;padding:0;border:1px solid var(--control-border,var(--line));border-radius:var(--radius-10);background:var(--paper,#fff);color:var(--ink);font:600 17px/1 var(--font-sans);text-align:center}
 .st-row-count[data-idle] input{color:var(--ink-2);font-weight:500}
+/* Lookup: Find and Scan, the two ways to reach an animal by its ear tag (components/Lookup/README.md). Find is a white input page with the
+   field pinned at the top; Scan is a Sheet page on the tint, its list carrying the page gutter itself. Unit cards sit under plain section headings. */
+.st-find{flex:1;min-height:0;display:flex;flex-direction:column;background:var(--paper)}
+.st-find.st-find>.statusbar{flex:none;background:var(--paper)}
+.st-find-top{flex:none;display:flex;align-items:center;gap:10px;padding:6px 16px 12px;border-bottom:1px solid var(--line)}
+.st-find-field{flex:1;min-width:0;display:flex;align-items:center;gap:8px;min-height:52px;padding:0 0 0 14px;border:2px solid var(--ink);border-radius:var(--radius-12);background:var(--paper)}
+.st-find-field>svg{flex:none;width:18px;height:18px;color:var(--muted)}
+.st-find-field input{flex:1;min-width:0;padding:0;border:0;outline:0;background:transparent;color:var(--ink);font:500 17px var(--font-sans)}
+.st-find-field input::placeholder{color:var(--ink-2);opacity:1;font-size:15px;font-weight:400}
+.st-find-clear[hidden]{display:none}
+.st-find-clear,.st-find-scan,.st-find-cancel{flex:none}
+.st-find-results,.st-scan-body{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none}
+.st-find-results::-webkit-scrollbar,.st-scan-body::-webkit-scrollbar{display:none;width:0;height:0}
+.st-find-results{padding:14px 16px 24px}
+.st-find-results .st-heading.st-heading,.st-scan-body .st-heading.st-heading{margin:16px 2px 8px}
+.st-find-list{--st-panel-bg:var(--app-background);margin-bottom:16px}
+.st-find-hint{margin:4px 2px;color:var(--muted);font:400 14px/20px var(--font-sans)}
+/* The typed part is bold ink; the rest of the tag is muted. */
+.st-find-row .st-animal-id{color:var(--ink-2);font-weight:500}
+.st-find-row .st-animal-id b,.st-find-row .st-animal-state b{color:var(--ink);font-weight:700}
+.sheet.st-scan[data-presentation="page"]>.sheet-body{display:flex;flex-direction:column;padding-left:0;padding-right:0}
+.st-scan-body{padding:0 16px 24px}
+.st-scan-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 36px 40px;text-align:center}
+.st-scan-empty svg{width:44px;height:44px;margin-bottom:14px;color:var(--muted)}
+.st-scan-empty strong{font:600 17px var(--font-sans)}
+.st-scan-empty p{margin:6px 0 0;color:var(--muted);font:400 14px/20px var(--font-sans)}
+.st-scan-selected{display:flex;align-items:center;min-height:48px;margin:0 auto 0 0;font:600 15px var(--font-sans)}
+.st-scan-foot .st-scan-toggle{flex:1}
+.st-scan-foot>.button.secondary.st-scan-toggle{border:var(--border-width) solid var(--control-border);background:var(--paper)}

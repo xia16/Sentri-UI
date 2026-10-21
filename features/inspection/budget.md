@@ -62,3 +62,35 @@ Owner ruling, 2026-10-19: the pen is a door, not a tick. The pen header's `›` 
 | Pen log | door | What has happened here? | kept as one row at the end: a preview repeated the note, which is already on the page |
 
 Cut: the `Pen information` heading; the verb rows' second lines; the pen header's checkbox on the walk (it ticked the pen and its pigs; `Tick all` does that from the pen page). Count (`Set count`) is not a verb Inspection has today, so it is not drawn.
+
+# Find a pig and Scan ear tags (2026-10-20)
+
+The walk's Search and Scan ear tag open the design system's Lookup pages (owner decisions 2026-10-12 and 2026-10-20), as Farrowing's do.
+
+## Inventory
+
+- Find: the typed text, the hint, every unit's matches, each match's tag, pen, stage, conditions and unit, the count of matches, the no-match line.
+- Scan: each pig read, her tag, stage and days in it, conditions with their care level, her pen and unit, the order of reading, the reader's state, what is ticked, the walk's Actions.
+
+## Questions
+
+1. Find: is this the pig whose tag I am reading? Where is she? 2. Scan: which pigs have I read? Does any of them need me? Which do I act on?
+
+## Levels
+
+| Fact | Find | Scan |
+|---|---|---|
+| Tag | settled, the typed part in ink and the rest muted | settled (mono, the row's lead) |
+| Pen | settled, right ("Pen C2"): the answer to "where is she" | cut: the worker is at the pig when the reader reads her; her record (one tap) has the pen |
+| Unit | the card's heading, this unit first | the card's heading |
+| Stage and days | cut: not the question when looking a tag up | settled context line, as on the walk |
+| Conditions | cut: shown on her record, one tap | the walk's roster tags, the most urgent first (act / watch / ongoing levels) |
+| Reader state | n/a | the footer's Stop / Resume scanning, nothing else |
+| Ticks | n/a | the tick box; the footer becomes "N pigs selected" and Actions |
+
+## Cut list
+
+- The old drawer's "7 pigs found" count and the whole unit listed before typing (a browse list is not a search).
+- The header's unit line: Find covers every unit.
+- "Camera scanning is not connected in this prototype" and "Try sample tag 000306": the reader always listens; the prototype's own Simulate scan sits outside the phone.
+- The search field's label above the field: the placeholder names it (Lookup's field).
