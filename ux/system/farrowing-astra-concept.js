@@ -10,24 +10,25 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const assistanceLabel=value=>value===true?'Yes':value===false?'No':'Not recorded';
 const icon=k=>SentriIcons.icon(k);
 const taskSyncPreview=typeof location==='undefined'?null:new URLSearchParams(location.search).get('taskSync');
+// The task's saved-work badge (owner, 2026-10-13 and 2026-10-18): an upload icon and this task's record count, as the page action of
+// every page in the task; nothing when this task has no records on this phone, even if other tasks do (Home holds the whole phone).
+// Red only when signed out. ?taskSync= offline | syncing | failed (read as uploading with some not accepted) | expired | other | done.
 function openTaskSync(){
  const url=new URL('data-sync-astra-prototype.html',location.href);
- if(taskSyncPreview!=='other')url.searchParams.set('taskId','farrow28');
- url.searchParams.set('scenario',taskSyncPreview==='failed'?'partial':taskSyncPreview==='syncing'?'syncing':'offline');
+ url.searchParams.set('taskId','farrow28');
+ url.searchParams.set('scenario',{failed:'partial',syncing:'syncing',expired:'expired'}[taskSyncPreview]||'offline');
  url.searchParams.set('from','task');
  location.assign(url.href);
 }
 function taskSyncBadge(){
- if(taskSyncPreview==='other')return '<button type="button" class="task-sync-badge waiting" data-action="open-task-sync" aria-label="No records from this Farrowing task are waiting. 3 records from other tasks remain on this phone; view all records"><span aria-hidden="true">↑</span><strong>All 3</strong></button>';
- if(!['offline','syncing','failed'].includes(taskSyncPreview))return '';
- const failed=taskSyncPreview==='failed',uploading=taskSyncPreview==='syncing';
- const label=failed?'This Farrowing task: 2 records remain, 1 needs attention':uploading?'This Farrowing task: 2 records uploading automatically':'This Farrowing task: 2 records saved on this phone, waiting to upload';
- return `<button type="button" class="task-sync-badge ${failed?'needs-attention':uploading?'uploading':'waiting'}" data-action="open-task-sync" aria-label="${label}"><span aria-hidden="true">${failed?'!':uploading?'↻':'↑'}</span><strong>Task 2</strong></button>`;
+ if(!['offline','syncing','failed','expired'].includes(taskSyncPreview))return '';
+ const out=taskSyncPreview==='expired';
+ return SentriUI.iconButton({action:'open-task-sync',icon:icon(out?'alert':'upload'),count:2,tone:out?'attention':'',label:out?'Sign in to keep uploading. This Farrowing task: 2 records on this phone':'This Farrowing task: 2 records on this phone'});
 }
 function placeTaskSyncBadge(root){
  const badge=taskSyncBadge();if(!badge)return;
  root.querySelectorAll('.phone .st-page-header').forEach(header=>{
-  if(!header.closest('[inert]')&&header.getClientRects().length)header.insertAdjacentHTML('beforeend',badge);
+  if(header.getClientRects().length)header.insertAdjacentHTML('beforeend',badge);
  });
 }
 // People are initials on every record stamp: "G. Hansen" is "G.H".
