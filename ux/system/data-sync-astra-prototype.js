@@ -152,6 +152,7 @@
     document.documentElement.lang = state.lang === 'zh' ? 'zh-CN' : 'en';
     app.innerHTML = state.view === 'task' ? taskPage() : state.view === 'past' ? pastPage() : state.view === 'not-accepted' ? notAcceptedPage() : phonePage();
     overlay.innerHTML = (state.drawer ? unitDrawer() : '') + dialog();
+    app.inert = !!(state.drawer || state.dialog); // the page under a drawer or dialog is out of reach and out of the reading order
     window.AtlasBare && window.AtlasBare.watch(atlasScreen);
   }
   const atlasScreen = () => state.dialog === 'switch' ? 'data-sync.switch' : state.signedOut ? 'data-sync.auth' : state.drawer ? 'data-sync.units' : state.view === 'past' ? 'data-sync.history' : state.view === 'not-accepted' ? 'data-sync.not-accepted' : state.view === 'task' ? (state.unit ? 'data-sync.unit' : 'data-sync.task-list') : empty() ? 'data-sync.upload' : online() ? 'data-sync.syncing' : 'data-sync.list';
