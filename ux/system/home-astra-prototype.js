@@ -457,10 +457,9 @@
   }
   function markedPage(){
     const m=state.marked,n=markedFilterCount(m.filter),title=m.kind==='treat'?'To treat':'Monitoring';
-    // Search and scan go together (owner, 2026-10-20), as on Farrowing's search: ✕ clears what was typed (shown only then), the scan
-    // button sits at the field's end, and a scanned tag fills the field.
-    const tools='<span class="mk-field-tools">'+SentriUI.iconButton({variant:'plain',action:'mk-clear',icon:icon('close'),label:'Clear',className:'mk-clear'}).replace('<button','<button'+(m.q?'':' hidden'))+SentriUI.iconButton({variant:'plain',action:'mk-scan',icon:icon('scan'),label:'Scan ear tag',className:'mk-scan'})+'</span>';
-    const search=SentriUI.choiceSearch({label:'Search ear tag or pen',placeholder:'Ear tag or pen',value:m.q||'',attrs:{'data-mk-search':''}}).replace(/<button[^>]*st-search-clear[\s\S]*?<\/button>/,'').replace(/<\/span><\/label>$/,tools+'</span></label>');
+    // Search and scan go together (owner, 2026-10-20), as on Farrowing's search: the shared search field, ✕ clears what was typed
+    // (shown only then), the scan button sits at the field's end, and a scanned tag fills the field.
+    const search=SentriUI.choiceSearch({label:'Search ear tag or pen',placeholder:'Ear tag or pen',value:m.q||'',attrs:{'data-mk-search':''},clear:{action:'mk-clear'},scan:{action:'mk-scan',label:'Scan ear tag'}});
     const filter=SentriUI.iconButton({action:'marked-filter',icon:icon('filter'),label:'Filter pigs'+(n?', '+n+' applied':''),badge:n||'',className:'mk-filter'});
     return head(title)+`<div class="app-scroll mk-scroll"><div class="mk-bar">${search}${filter}</div><div class="mk-list">${markedList()}</div></div>`;
   }

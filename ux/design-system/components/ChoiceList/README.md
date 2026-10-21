@@ -13,7 +13,7 @@ Use [Segment](../Segment/README.md) for changing a lens. Use [Field](../Field/RE
 
 ## Anatomy
 
-Group heading (optional); lead control (optional); option label; meta line (optional, only to distinguish options); trailing check, checkbox, ring or chevron; search (optional); empty/status line; Clear text action (optional field only); secondary removal action (optional, for a session-defined option).
+Group heading (optional); lead control (optional); option label; meta line (optional, only to distinguish options); trailing check, checkbox, ring or chevron; search (optional: the shared search field, [Lookup](../Lookup/README.md)'s `searchBox`, with ✕ Clear while typing and the scan glyph when the host passes `scan`); empty/status line; Clear text action (optional field only); secondary removal action (optional, for a session-defined option).
 
 ## Variants
 

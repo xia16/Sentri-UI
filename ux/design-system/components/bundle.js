@@ -407,12 +407,24 @@
     const hid=radio&&showTitle?(id||fieldId('st-choice'))+'-title':'';
     return `<section class="st-choice-group ${esc(className)}" data-ds="ChoiceList"${title?` aria-label="${esc(title)}"`:''}>${showTitle?(aside?`<div class="st-choice-heading-row"><h5 class="st-choice-heading"${hid?` id="${esc(hid)}"`:''}>${icon?glyph(icon):''}${tx(title,{strs,args},'title')}</h5>${aside}</div>`:`<h5 class="st-choice-heading"${hid?` id="${esc(hid)}"`:''}>${icon?glyph(icon):''}${tx(title,{strs,args},'title')}</h5>`):''}${lead?`<div class="st-choice-lead">${lead}</div>`:''}<div class="st-panel st-choice-panel"${radio?` role="radiogroup"${hid?` aria-labelledby="${esc(hid)}"`:''}`:''}>${body}</div></section>`;
   }
-  /* Search: the browser's cancel glyph is hidden; while there is text, a Clear text action empties it and fires `input`, so
-     the host's own input handler refreshes the list. */
-  function choiceSearch({label='Search',placeholder='',value='',attrs={},strs={},args}={}){
+  /* The search field, one look wherever a worker types to narrow (Lookup's Find, a picker's catalogue, a list's ear-tag search):
+     the search glyph, the text, Clear (✕, only while something is typed) and the scan icon when the host has a reader. `input` is
+     the host's <input>; `clear.action` is the host's, else the shared handler below empties the field and fires `input`. */
+  function searchBox({input='',value='',scan=null,clear={},tag='div',className=''}={}){
+    let clearBtn=iconButton({variant:'plain',action:clear.action||'',icon:SentriIcons.icon('close'),label:clear.label||'Clear',className:'st-find-clear',attrs:clear.label?{}:{'data-str-attr':'aria-label:act.clear'}}).replace('<button',`<button${value?'':' hidden'}${clear.action?'':' data-search-clear=""'}`);
+    // the shared Clear is no host action: an empty data-action would reach the host's own action handler first
+    if(!clear.action)clearBtn=clearBtn.replace(' data-action=""','');
+    const scanBtn=scan?iconButton({variant:'plain',action:scan.action,icon:SentriIcons.icon('scan'),label:scan.label||'Scan ear tag',className:'st-find-scan'}):'';
+    return `<${tag} class="st-find-field${className?' '+esc(className):''}">${SentriIcons.icon('search')}${input}${clearBtn}${scanBtn}</${tag}>`;
+  }
+  /* Search: the browser's cancel glyph is hidden; the shared search field (searchBox) with its ✕ Clear, and the scan icon when the
+     host passes `scan`. Clear empties the field and fires `input`, so the host's own input handler refreshes the list. */
+  function choiceSearch({label='Search',placeholder='',value='',attrs={},scan=null,clear={},strs={},args}={}){
     const extra=Object.entries(attrs).filter(([k])=>/^(?:data|aria)-[a-z0-9-]+$/.test(k)).map(([k,v])=>` ${k}="${esc(v)}"`).join('');
-    const clear=value?`<button type="button" class="st-text-action st-search-clear" data-search-clear=""><span data-str="act.clear">Clear</span></button>`:'';
-    return `<label class="field catalog-search st-choice-search" data-ds="ChoiceList"><span class="st-search-box"><input type="search" aria-label="${esc(label)}"${strs.label?` data-str-attr="aria-label:${esc(strs.label)}${strs.placeholder?`;placeholder:${esc(strs.placeholder)}`:''}"${sArgs(args)}`:''} placeholder="${esc(placeholder||label)}" value="${esc(value)}"${extra}>${clear}</span></label>`;
+    const input=`<input type="search" aria-label="${esc(label)}"${strs.label?` data-str-attr="aria-label:${esc(strs.label)}${strs.placeholder?`;placeholder:${esc(strs.placeholder)}`:''}"${sArgs(args)}`:''} placeholder="${esc(placeholder||label)}" value="${esc(value)}"${extra}>`;
+    /* The wrapper places the field (a picker pins it in a sticky band); the label is the field itself, one surface: the glyph, the
+       input, ✕ and scan sit directly in it. */
+    return `<div class="catalog-search st-choice-search" data-ds="ChoiceList">${searchBox({input,value,scan,clear,tag:'label',className:'st-search-box'})}</div>`;
   }
   /* Toast: what was just saved, over the page above its dock, for a few seconds. title: what was done; detail: for whom, or where it went;
      tone 'done' (a check on the green) or 'offline' (no-signal on the ink: saved on this phone), else no glyph. */
@@ -491,8 +503,12 @@
   if(typeof document!=='undefined')document.addEventListener('click',e=>{
     const b=e.target.closest?.('[data-search-clear]');if(!b)return;
     const i=b.closest('.st-search-box')?.querySelector('input');if(!i)return;
-    e.preventDefault();i.value='';i.dispatchEvent(new Event('input',{bubbles:true}));
-  });
+    e.preventDefault();e.stopPropagation();i.value='';i.dispatchEvent(new Event('input',{bubbles:true}));i.focus();
+  },true); // captured: the field empties before any host handler sees the tap
+  /* The search field's ✕ shows only while something is typed, also when the host does not redraw on input. */
+  if(typeof document!=='undefined')document.addEventListener('input',e=>{
+    const f=e.target.closest?.('.st-find-field');if(f&&e.target.matches('input'))f.querySelector('.st-find-clear')?.toggleAttribute('hidden',!e.target.value);
+  },true);
   if(typeof document!=='undefined')document.addEventListener('keydown',e=>{
     const spin=e.target.closest('[data-st-spin]');if(!spin||!['ArrowUp','ArrowDown'].includes(e.key))return;
     e.preventDefault();
@@ -1479,9 +1495,8 @@
      icon when the host has a reader, and Cancel. */
   function findPage({query='',placeholder='Ear tag or pen',label=placeholder,results='',scan=null,clear={action:'find-clear',label:'Clear'},cancel={action:'back',label:'Cancel'},inputAttrs={},bar='',className=''}={}){
     const q=String(query??'');
-    const clearBtn=iconButton({variant:'plain',action:clear.action,icon:SentriIcons.icon('close'),label:clear.label||'Clear',className:'st-find-clear'}).replace('<button',`<button${q?'':' hidden'}`);
-    const scanBtn=scan?iconButton({action:scan.action,icon:SentriIcons.icon('scan'),label:scan.label||'Scan ear tag',className:'st-find-scan'}):'';
-    return `<section class="st-find${className?' '+esc(className):''}" data-ds="Lookup" data-variant="find" data-st-context="drawer" role="region"${sL(label)}>${bar}<div class="st-find-top"><div class="st-find-field">${SentriIcons.icon('search')}<input data-find-input${safeAttr(inputAttrs)} type="text" inputmode="text" enterkeyhint="search" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" placeholder="${esc(placeholder)}" aria-label="${esc(label)}" value="${esc(q)}">${clearBtn}${scanBtn}</div>${button({label:cancel.label||'Cancel',register:'text',action:cancel.action,className:'st-find-cancel'})}</div><div class="st-find-results" role="region" aria-label="Search results" aria-live="polite">${results}</div></section>`;
+    const input=`<input data-find-input${safeAttr(inputAttrs)} type="text" inputmode="text" enterkeyhint="search" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" placeholder="${esc(placeholder)}" aria-label="${esc(label)}" value="${esc(q)}">`;
+    return `<section class="st-find${className?' '+esc(className):''}" data-ds="Lookup" data-variant="find" data-st-context="drawer" role="region"${sL(label)}>${bar}<div class="st-find-top">${searchBox({input,value:q,scan,clear})}${button({label:cancel.label||'Cancel',register:'text',action:cancel.action,className:'st-find-cancel'})}</div><div class="st-find-results" role="region" aria-label="Search results" aria-live="polite">${results}</div></section>`;
   }
   const scanEmpty=(title,text)=>`<div class="st-scan-empty">${SentriIcons.icon('scan')}<strong>${esc(title)}</strong><p>${esc(text)}</p></div>`;
   /* A page (it fills the screen): Back at the top left and the title, no line (Headers law). The footer says whether the reader listens,
