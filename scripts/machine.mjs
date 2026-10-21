@@ -17,12 +17,15 @@ export const LAUNCH_ARGS = ['--num-raster-threads=1', '--disable-partial-raster'
 const NAV_TIMEOUT = /\b(page|frame)\.(goto|reload|goBack|goForward|waitForLoadState|waitForURL|waitForNavigation): (Timeout \d+ms exceeded|net::ERR_[A-Z_]+)/;
 export const timedOutOnly = (failures) => failures.length > 0 && failures.every((f) => NAV_TIMEOUT.test(String(f.got)));
 
-// The recognised machine errors (gate-v2.md §4): a navigation that timed out, and a request the network or the server dropped
-// (net::ERR_*). Everything else — an assertion, a missing control, a page error, a Ready that never came — is a design result
-// and stands. Returns 'navigation-timeout', 'net-error' or null.
+// The recognised machine errors (gate-v2.md §4): a navigation that timed out, a request the network or the server dropped
+// (net::ERR_*), and a browser that crashed or was closed under the run (2026-10-21: an app restart killed a gate mid-run, and three
+// "Target crashed" leaves were stored as design failures and reused). Everything else — an assertion, a missing control, a page
+// error, a Ready that never came — is a design result and stands. Returns 'navigation-timeout', 'net-error', 'browser-crash' or null.
 const NET_ERROR = /\bnet::ERR_[A-Z_]+\b/;
+const BROWSER_CRASH = /\b(Target crashed|Target closed|Target page, context or browser has been closed|[Bb]rowser has been closed|[Bb]rowser has disconnected)\b/;
 export function classifyMachineError(text) {
   const s = String(text || '');
+  if (BROWSER_CRASH.test(s)) return 'browser-crash';
   if (NET_ERROR.test(s)) return 'net-error';
   if (NAV_TIMEOUT.test(s)) return 'navigation-timeout';
   return null;
