@@ -40,3 +40,30 @@ test("this machine's own start time reads back as this process, and a pid that d
   assert.equal(holderAlive({ pid: process.pid, start: selfStart() }), true, 'a live gate is never taken over');
   assert.equal(startOf(2 ** 31 - 2), null);
 });
+
+// ---------- Codex audit, 2026-10-21: a stopped gate cleans up before its lock goes ----------
+test('a gate closes once, awaited: its children first, then its cleanups newest first, whatever throws; a second call waits on the first', async () => {
+  const { closer } = await import('../scripts/process-start.mjs');
+  const order = [];
+  const kids = [{ pid: 1 }, { pid: 2 }], cleanups = [async () => { await new Promise((r) => setTimeout(r, 20)); order.push('worktrees'); }, () => { throw new Error('pool gone'); }, async () => order.push('browsers')];
+  const close = closer(kids, cleanups, (k) => order.push(`kill ${k.pid}`));
+  const [a, b] = [close(), close()];
+  assert.equal(a, b, 'one cleanup, however many ask');
+  await a;
+  assert.deepEqual(order, ['kill 1', 'kill 2', 'browsers', 'worktrees'], 'awaited to the end: the worktrees go last, after the browsers and servers using them');
+});
+
+test('killTree ends a shell child and the processes it started (npm test runs under a shell)', { skip: process.platform !== 'win32' && 'the tree kill is taskkill /T, Windows only; elsewhere the child alone is signalled' }, async () => {
+  const { killTree, pidAlive } = await import('../scripts/process-start.mjs');
+  const { spawn } = await import('node:child_process');
+  const out = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'kill-tree-')), 'grandchild.pid');
+  // a shell that starts a node grandchild, which writes its pid and waits
+  const grand = `require('fs').writeFileSync(${JSON.stringify(out)}, String(process.pid)); setInterval(() => {}, 1000);`;
+  const p = spawn(`"${process.execPath}" -e "${grand.replace(/"/g, '\\"')}"`, { shell: true, stdio: 'ignore' });
+  let pid = null;
+  for (let i = 0; i < 100 && !pid; i++) { await new Promise((r) => setTimeout(r, 100)); try { pid = Number(fs.readFileSync(out, 'utf8')) || null; } catch {} }
+  assert.ok(pid && pidAlive(pid), 'the grandchild runs');
+  killTree(p);
+  for (let i = 0; i < 50 && pidAlive(pid); i++) await new Promise((r) => setTimeout(r, 100));
+  assert.equal(pidAlive(pid), false, 'the grandchild is gone too');
+});

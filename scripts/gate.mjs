@@ -94,10 +94,14 @@ if (!process.env.SENTRI_GATE_TOOLS && !tryRun) {
 // --verdict that has to gate again, holds one lock in the gate's folder for its whole run. Gates take it in turn
 // (scripts/gate-queue.mjs): first come, first served, except that a --verdict re-gate goes ahead of ordinary gates. A lock or
 // ticket whose process is gone, or whose pid now belongs to another process (a reboot reuses pids), is stale and dropped. The lock
-// goes on every exit: finish, a signal, a crash.
-let turn = null;
-for (const sig of ['SIGINT', 'SIGTERM', 'SIGHUP', 'SIGBREAK']) process.on(sig, () => { console.log(`
-${sig}: the gate stops`); process.exit(130); });
+// goes on every exit: finish, a signal, a crash. A signal first awaits the running evaluation's one cleanup (its browsers, servers,
+// worktrees and npm test's process tree), so the lock never goes while they still run; a second signal exits at once.
+let turn = null, closeEvaluation = null, stopping = null;
+for (const sig of ['SIGINT', 'SIGTERM', 'SIGHUP', 'SIGBREAK']) process.on(sig, () => {
+  if (stopping) { console.log(`${sig} again: the gate exits now`); process.exit(130); }
+  console.log(`\n${sig}: the gate stops${closeEvaluation ? ' (closing its browsers, servers and npm test first)' : ''}`);
+  stopping = Promise.resolve(closeEvaluation?.()).catch(() => {}).finally(() => process.exit(130));
+});
 async function acquireLock(ref, priority) {
   turn = await takeTurn(gateDir(), { ref, sha: sha(ref), priority });
   // The gate's own checks open browsers without waiting on it (scripts/playwright-path.mjs); every other browser run from this
@@ -126,11 +130,12 @@ async function runGate({ ref, base, out, mode, scope, audit = false, keep = fals
   if (candidate && !audit) postStatus(candidate, 'pending', `gate running against ${short(sha(base))}`); // an earlier pass for this commit no longer stands
   let res;
   try {
-    res = await evaluate({ root, out, base, candidate: ref, ref, mode, scope, audit, keep, env, testBase, ownTools: tryRun });
+    res = await evaluate({ root, out, base, candidate: ref, ref, mode, scope, audit, keep, env, testBase, ownTools: tryRun, onClose: (close) => { closeEvaluation = close; } });
   } catch (e) {
     console.error(e.stack || e);
     res = { outcome: 'blocked', mech: { outcome: 'blocked', pass: false, ref, candidate: candidate || undefined, mode, scope, class: {}, blocked: [`the gate crashed: ${String(e.message || e).split('\n')[0]}`], checks: [], gaps: [], pairs: [] } };
   }
+  if (stopping) await stopping; // stopped: no status and no record; the exit after the cleanup releases the lock
   const mech = { ...res.mech, waited: waited + 's', testBase: testBase || undefined };
   if (!testBase && !audit && machinePass(mech)) {
     mech.gatePass = true;

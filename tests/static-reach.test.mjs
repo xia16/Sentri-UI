@@ -315,3 +315,26 @@ test('srcset names several candidates, so it is an unbounded media load wherever
   }
   assert.ok(page('<img src="a.png" srcset="a.png 1x, b.png 2x">', '').files.includes('ux/system/a.png'), 'its src is still a literal load');
 });
+
+// ---------- Codex audit, 2026-10-21: a state check's identity is its variant's dependencies, not the whole bundle ----------
+test('a variant file depends on the bundle units its scripts can call and every start-up effect: a body edit re-checks only its callers', async () => {
+  const { variantInputs } = await import('../scripts/static-reach.mjs');
+  const PICKER = 'ux/design-system/components/Picker/variants/standard.html', SHEET = 'ux/design-system/components/Sheet/variants/page.html';
+  const more = {
+    [PICKER]: "<div data-state=\"Empty\"></div><script>document.querySelector('[data-state]').innerHTML=SentriUI.picker({});</script>",
+    [SHEET]: "<div data-state=\"Open\"></div><script>const UI = window.SentriUI; document.querySelector('[data-state]').innerHTML=UI.sheet({title:'x'});</script>",
+  };
+  const variant = (o) => checkout({ ...o, more });
+  const state = (side, f) => { const t = treeOf(side.dir); return canonical(inputsDigest(variantInputs(side, f), t, runtimeOf(t)).digest); };
+  const changed = (o) => [PICKER, SHEET].filter((f) => state(variant({}), f) !== state(variant(o), f)).map((f) => f.split('/')[3]);
+  const ii = variantInputs(variant({}), PICKER);
+  assert.deepEqual([ii.bundle.all, ii.bundle.exports], [false, ['SentriUI.picker']]);
+  assert.ok(ii.files.includes('ux/design-system/components/bundle.js'), 'the harness draws every state with the bundle');
+  assert.deepEqual(changed({ bundle: { sheet: "return '<section class=\"st-sheet st-sheet--v2\">'+title+'</section>';" } }), ['Sheet'], 'a Sheet body edit leaves the Picker\'s state check reused');
+  assert.deepEqual(changed({ bundle: { placeholder: "'Pick one'" } }), ['Picker']);
+  assert.deepEqual(changed({ bundle: { defaults: "{size:'compact'}" } }), ['Picker', 'Sheet'], 'a start-up effect runs before every state');
+  const loose = variantInputs(checkout({ more: { [PICKER]: '<script>render(SentriUI);</script>' } }), PICKER);
+  assert.equal(loose.bundle.all, true, 'a namespace passed along may call anything');
+  // 20 of main's 73 calling variants write `var UI = window.SentriUI`: a var can be reassigned, so they hash every unit, as a page would
+  assert.equal(variantInputs(checkout({ more: { [PICKER]: '<script>var UI = window.SentriUI; UI.picker({});</script>' } }), PICKER).bundle.all, true);
+});

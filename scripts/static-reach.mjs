@@ -3,6 +3,7 @@
 //
 //   identityInputs(side, screenId)       -> { files, unbounded, bundle: { all, exports, units, unitHashes, setupHash }, screen }
 //   leafInputs(side, { url, screen })    -> the same for a scenario leaf's run: its entry page and everything its taps can reach
+//   variantInputs(side, file)            -> the same for a design-system state check: a variant file drawn with the bundle
 //
 // side: { dir: a checkout, atlas: its parsed atlas/atlas.json, rev? }. Unsure is everything: a file that won't parse, a namespace
 // used any way but `SentriUI.X` / `SentriUI['X']`, or a load whose URL can't be bounded widens what an identity hashes.
@@ -529,6 +530,19 @@ export function leafInputs(side, { url, screen } = {}) {
   const pg = navClosure(S, start, `the leaf from ${start}`);
   if (pg.missing) pg.unbounded.push({ why: `its entry page ${start} is missing`, type: 'any' });
   return { files: [...pg.files].sort(), unbounded: pg.unbounded, bundle: bundleInputs(S, pg), screen: screen ? S.defs.get(screen) || null : null, pages: pg.pages };
+}
+
+// What one design-system state check depends on: a variant file (ux/design-system/components/<Name>/variants/<v>.html) as
+// check-states draws it, with the tokens, bundle.css and bundle.js before the file's own head and scripts. Its closure is read like a
+// page's, plus the bundle: the units its scripts can call, every start-up effect, and the bundle's computed loads those units make.
+// The caller hashes the tokens, the bundle's CSS and the fonts itself (they draw every state).
+export function variantInputs(side, file) {
+  const S = sideOf(side), pg = S.page(file);
+  const drawn = { ...pg, files: new Set([...pg.files, BUNDLE_JS]), unbounded: [...pg.unbounded] };
+  if (pg.missing) drawn.unbounded.push({ why: `${file} is missing`, type: 'any' });
+  const bundle = bundleInputs(S, drawn), runs = bundle.all ? null : new Set(bundle.units);
+  for (const b of bundleLoads(S.shape)) if (!runs || runs.has(b.unit)) drawn.unbounded.push({ why: b.why, type: b.type });
+  return { files: [...drawn.files].sort(), unbounded: drawn.unbounded, bundle, screen: null };
 }
 
 // The bundle part of an identity: the exports a closure uses, the units those can run (all when a namespace is used as a whole), and

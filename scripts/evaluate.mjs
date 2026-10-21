@@ -14,11 +14,12 @@ import os from 'node:os';
 import path from 'node:path';
 import { pwPath, playwright } from './playwright-path.mjs';
 import { removeWorktree } from './worktree-remove.mjs';
+import { closer } from './process-start.mjs';
 import { CLASSES, classOfFiles, DS_FEATURE, componentPage, componentPagesOf, componentsTouched, idPath, screensOf, pageOf, pageAssets, sharedFiles, coverageLost, effectiveClass, classifyScreens, touchesSystem, touchesTools, budgetProblems, critiqueProblems, pageStyling, addedLines, scenarioDebt, isMotionFile, unheldMotion, heldOf, confirmLeaf, firstRun, reusableLeaf, IN_PROGRESS, readInProgress, ownFeatures, scopeReach, componentScope, exportStamps, readLibrary, libraryProblems, newExportProblems, frozenFeatures, checksChinese } from './loop-rules.mjs';
 import { bundleShape, bundleChange } from './bundle-graph.mjs';
 // The analyser (gate-v2 §2): static and conservative, over both revisions. It says what each screen's and each leaf's evidence
 // depends on; the reach is every screen and leaf whose evidence identity that makes differs between the two (gate-simplify.md X1).
-import { identityInputs, leafInputs } from './static-reach.mjs';
+import { identityInputs, leafInputs, variantInputs } from './static-reach.mjs';
 import { EvidenceStore, identityOf, treeOf, blobsHash, codeHash, sha, canonical, reconcileInventory, planEvidence, inputsDigest, identityDiff } from './evidence.mjs';
 import { createScheduler } from './scheduler.mjs';
 import { WORKERS, LAUNCH_ARGS, machineErrorOf, classifyMachineError } from './machine.mjs';
@@ -50,7 +51,17 @@ function git(args, cwd) { const r = spawnSync('git', args, { cwd, encoding: 'utf
 export const TOOL_PATHS = ['scripts', 'docs/design-workflow', 'package.json'];
 export const toolsDiffer = (root, base) => git(['diff', '--name-only', base, '--', ...TOOL_PATHS], root).out.trim().split(/\r?\n/).filter(Boolean);
 
+// One evaluation, cleaned up on every exit through one awaited path (process-start.mjs closer): its return, a throw, and a signal to
+// the gate, which calls the closer it was handed (opts.onClose) before its lock goes (Codex audit, 2026-10-21: the signal handler
+// exited at once, leaving browsers, servers, worktrees and npm test's tree running).
 export async function evaluate(opts) {
+  const own = { kids: [], cleanups: [] };
+  const close = closer(own.kids, own.cleanups);
+  opts.onClose?.(close);
+  try { return await evaluateIn(opts, own); } finally { await close(); }
+}
+
+async function evaluateIn(opts, { kids, cleanups }) {
   const { root, out, mode = 'normal', scope = [], audit = false, keep = false, log = console.log, env = process.env } = opts;
   const t0 = Date.now(), at = {};
   const mark = (k) => { at[k] = Date.now(); };
@@ -58,10 +69,7 @@ export async function evaluate(opts) {
   const check = (name, ok, detail = '') => { checks.push({ check: name, result: ok === null ? 'skipped' : ok ? 'pass' : 'fail', detail }); log((ok === null ? 'SKIP' : ok ? 'PASS' : 'FAIL').padEnd(5), name, detail ? '— ' + String(detail).split('\n')[0] : ''); };
   const block = (why) => { blocked.push(why); log('BLOCK', why); };
   const mech = { outcome: null, pass: false, candidate: '', base: '', ref: opts.ref || opts.candidate, mode, scope, class: {}, checks, gaps, blocked, screens: null, pairs: [], inventory: null, evidence: null, timings: {} };
-  const kids = [], cleanups = [];
   const finish = () => {
-    for (const k of kids) try { k.kill(); } catch {}
-    for (const c of cleanups.reverse()) try { c(); } catch {}
     mech.outcome = blocked.length ? 'blocked' : checks.some((c) => c.result === 'fail') ? 'fail' : 'pass';
     mech.pass = mech.outcome === 'pass';
     mech.timings.total = secs(Date.now() - t0);
@@ -278,10 +286,10 @@ export async function evaluate(opts) {
 
   // ---------- the browser ----------
   const sched = createScheduler({ playwright, log });
-  cleanups.push(() => { sched.close(); });
+  cleanups.push(() => sched.close());
   const browser = await sched.browser();
   const pool = contextPool();
-  cleanups.push(() => { pool.close(); });
+  cleanups.push(() => pool.close());
   const render = { playwright: pwVersion, browser: browser.version(), platform: process.platform, launch: LAUNCH_ARGS, clock: CLOCK, height: HEIGHT, dsf: 1, bounds: BOUNDS };
 
   // ---------- servers ----------
@@ -339,7 +347,7 @@ export async function evaluate(opts) {
       for (const id of sc.keep) reachIds.add(id);
       for (const id of [...identityChanged]) if (!reachIds.has(id)) identityChanged.delete(id);
       mech.reach.screens = reachIds.size;
-      scoped = { own, inProgress, propagation: sc.propagation, touched };
+      scoped = { own, inProgress, propagation: sc.propagation, touched, keepPage };
       mech.ownFeatures = own;
       mech.inProgress = inProgress;
       mech.outOfScope = sc.outOfScope;
@@ -413,19 +421,34 @@ export async function evaluate(opts) {
     },
   });
 
-  // ---------- state checks: every variant file on each side ----------
-  const variantFiles = (side) => [...S[side].tree.keys()].filter((f) => /^ux\/design-system\/components\/[^/]+\/variants\/[^/]+\.html$/.test(f)).sort();
-  const dsInputs = (side) => ({ tokens: blob(side, 'ux/design-system/tokens.css'), css: blob(side, 'ux/design-system/components/bundle.css'), js: blob(side, BUNDLE_JS), fonts: harness(side).fonts });
-  const stateItems = [];
-  for (const side of audit ? [] : ['base', 'cand']) for (const f of variantFiles(side)) {
+  // ---------- state checks: the variant files the change reaches ----------
+  // A state check's identity is its variant file and what it depends on (variantInputs: what the file loads, and the bundle units its
+  // scripts can call with every start-up effect), plus the tokens, the bundle's CSS and the fonts every state is drawn with. So a
+  // bundle edit re-checks only the variants that can run what changed (Codex audit, 2026-10-21: every identity hashed the whole
+  // bundle.js). As for shots (gate-simplify.md X1), a variant with the same identity on both sides gives the same result and is not
+  // checked, and a shared change checks only the component pages its scope keeps (componentScope's keepPage).
+  const VARIANT = /^ux\/design-system\/components\/([^/]+)\/variants\/([^/]+)\.html$/;
+  const variantFiles = (side) => [...S[side].tree.keys()].filter((f) => VARIANT.test(f)).sort();
+  const dsInputs = (side) => ({ tokens: blob(side, 'ux/design-system/tokens.css'), css: blob(side, 'ux/design-system/components/bundle.css'), fonts: harness(side).fonts });
+  const stateIdOf = (side, f) => {
     const html = fs.readFileSync(path.join(S[side].dir, f), 'utf8');
     const loads = pageAssets(html, f);
     // a specimen whose own scripts load by a computed URL depends on the whole page tree
     const computed = /\bfetch\s*\(|\bimport\s*\(|XMLHttpRequest|\.src\s*=|setAttribute\(\s*['"](src|href)/.test(html);
-    const id = identityOf('state', { file: blob(side, f), loads: blobsHash(S[side].tree, loads), tree: computed ? blobsHash(S[side].tree, S[side].runtime) : null, ds: dsInputs(side), vw: STATE_VW, render, checker: code.states });
-    const [, comp, variant] = /^ux\/design-system\/components\/([^/]+)\/variants\/([^/]+)\.html$/.exec(f);
+    let deps = null;
+    try { deps = inputsDigest(variantInputs(S[side].side, f), S[side].tree, S[side].runtime).digest; } catch (e) { gaps.push(`variantInputs(${side}, ${f}) threw (${e.message}): its state check hashes the whole bundle`); }
+    return identityOf('state', { file: blob(side, f), loads: blobsHash(S[side].tree, loads), tree: computed ? blobsHash(S[side].tree, S[side].runtime) : null, ds: dsInputs(side), deps: deps || { js: blob(side, BUNDLE_JS) }, vw: STATE_VW, render, checker: code.states });
+  };
+  const stateIds = audit ? null : { base: new Map(variantFiles('base').map((f) => [f, stateIdOf('base', f)])), cand: new Map(variantFiles('cand').map((f) => [f, stateIdOf('cand', f)])) };
+  const stateItems = [];
+  let statesOutOfScope = 0;
+  for (const side of audit ? [] : ['base', 'cand']) for (const [f, id] of stateIds[side]) {
+    if (stateIds[side === 'base' ? 'cand' : 'base'].get(f) === id) continue;
+    const [, comp, variant] = VARIANT.exec(f);
+    if (scoped && !scoped.keepPage(`ds:${comp}/${variant}`)) { if (side === 'cand' || !stateIds.cand.has(f)) statesOutOfScope++; continue; }
     stateItems.push({ kind: 'state', id, side, file: f, comp, variant });
   }
+  if (stateIds) mech.reach.states = { variants: new Set([...stateIds.base.keys(), ...stateIds.cand.keys()]).size, checked: new Set(stateItems.map((i) => i.file)).size, ...(statesOutOfScope ? { outOfScope: statesOutOfScope } : {}) };
   const statePlan = plan_(stateItems);
   for (const { item, record } of statePlan.reuse) results.set(item.id, { ...record, reused: true });
   const stateTask = (it) => ({
@@ -786,7 +809,7 @@ export async function evaluate(opts) {
   // with the bundle units that closure can run (leafInputs). Whatever it can't bound means the leaf hashes every page-loadable file.
   // one context pool per side (its server's origin), shared by every leaf run of that side
   const leafPools = { base: leafContextPool(), cand: leafContextPool() };
-  cleanups.push(() => { leafPools.base.close(); leafPools.cand.close(); });
+  cleanups.push(() => Promise.all([leafPools.base.close(), leafPools.cand.close()]));
   const leafMemo = new Map();
   const leafReach = (side, l, D) => {
     const fx = l.state?.reset || {}, url = leafEntryUrl(fx, D), k = `${side} ${url} ${fx.screen || ''}`;
