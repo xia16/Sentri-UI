@@ -61,7 +61,8 @@ const passDescription = (mech) => { const moved = ['diff', 'new', 'gone'].reduce
 const passFile = (ref) => path.join(gateDir(), 'passed', `${String(ref).replace(/[^\w.-]+/g, '_')}.json`);
 // The latest run on each commit (2026-10-21): --post refuses a saved pass when a later run on the same commit replaced it.
 const lastFile = (commit) => path.join(gateDir(), 'last', `${commit}.json`);
-const recordLast = (commit, out, outcome) => { try { fs.mkdirSync(path.dirname(lastFile(commit)), { recursive: true }); fs.writeFileSync(lastFile(commit), JSON.stringify({ out: path.resolve(out), outcome, at: new Date().toISOString() })); } catch {} };
+// Fails closed: when the record can't be written, the old one goes, so no earlier pass can stand for this commit.
+const recordLast = (commit, out, outcome) => { try { fs.mkdirSync(path.dirname(lastFile(commit)), { recursive: true }); fs.writeFileSync(lastFile(commit), JSON.stringify({ out: path.resolve(out), outcome, at: new Date().toISOString() })); } catch { try { fs.rmSync(lastFile(commit), { force: true }); } catch {} } };
 const recordPass = (ref, commit) => { try { fs.mkdirSync(path.dirname(passFile(ref)), { recursive: true }); fs.writeFileSync(passFile(ref), JSON.stringify({ ref, commit, at: new Date().toISOString() })); } catch {} };
 function git(args, cwd = root) { const r = spawnSync('git', args, { cwd, encoding: 'utf8', maxBuffer: 64 << 20 }); return { code: r.status, out: r.stdout || '', err: r.stderr || '' }; }
 const sha = (r) => (r ? git(['rev-parse', '--verify', '--quiet', `${r}^{commit}`]).out.trim() : '');
@@ -121,12 +122,13 @@ async function runGate({ ref, base, out, mode, scope, audit = false, keep = fals
   const candidate = sha(ref);
   if (candidate) turn.relabel(candidate); // the lock names what it gates
   if (candidate && !audit) postStatus(candidate, 'pending', `gate running against ${short(sha(base))}`); // an earlier pass for this commit no longer stands
+  if (candidate && !audit && !testBase) recordLast(candidate, out, 'running'); // a run killed before it ends stays 'running': --post refuses
   let res;
   try {
     res = await evaluate({ root, out, base, candidate: ref, ref, mode, scope, audit, keep, env, testBase, ownTools: tryRun });
   } catch (e) {
     console.error(e.stack || e);
-    res = { outcome: 'blocked', mech: { outcome: 'blocked', pass: false, ref, mode, scope, class: {}, blocked: [`the gate crashed: ${String(e.message || e).split('\n')[0]}`], checks: [], gaps: [], pairs: [] } };
+    res = { outcome: 'blocked', mech: { outcome: 'blocked', pass: false, ref, candidate: candidate || undefined, mode, scope, class: {}, blocked: [`the gate crashed: ${String(e.message || e).split('\n')[0]}`], checks: [], gaps: [], pairs: [] } };
   }
   const mech = { ...res.mech, waited: waited + 's', testBase: testBase || undefined };
   if (!testBase && !audit && machinePass(mech)) {

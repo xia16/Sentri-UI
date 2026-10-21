@@ -256,6 +256,11 @@ export async function evaluate(opts) {
     if (S.base.shape && S.cand.shape) lp.push(...newExportProblems({ before: new Set(exportStamps(S.base.shape).keys()), after: exportStamps(S.cand.shape), library: libs.cand }));
     else if (files.includes(BUNDLE_JS)) gaps.push('the bundle does not parse on one side: new exports are not checked against the groups');
     mech.library = { required: files.some((f) => f.startsWith('ux/design-system/components/')), problems: lp };
+    // A ux/system stylesheet is one page's or the whole system's, and nothing in the diff says which (2026-10-21: a Home stylesheet
+    // edit owned no feature, so Home's own screens went unchecked). A change that edits one and names no feature is asked to.
+    const pageCss = files.filter((f) => /^ux\/system\/[^/]+\.css$/.test(f));
+    if (pageCss.length && !scope.length && !files.some((f) => /^features\/[^/_][^/]*\//.test(f)) && mode !== 'refactor')
+      check('a stylesheet edit names its feature', false, `${pageCss.slice(0, 2).join(', ')}: name the feature with --scope <feature> (its own stylesheet), or --scope design-system (a shared one), or include that feature's notes`);
     check('library organisation (every part in a group)', !lp.length, lp.length ? `${lp.length}: ${lp.slice(0, 3).join(' | ')}` : '');
     const debt = now.filter((p) => was.has(p));
     if (debt.length) gaps.push(`library: ${debt.length} folder(s) already outside every group on main (${debt.slice(0, 3).join('; ')})`);

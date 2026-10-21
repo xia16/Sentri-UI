@@ -40,7 +40,8 @@ const LAUNCHER = /(?:^|[\s;&|(){}/\\])(?:(?:(?:ba|z|da)?sh|pwsh|powershell|cmd)(
 const STR = '\x01';
 // The commands a double-quoted string or an expanding heredoc runs: its $( ) and backtick substitutions (2026-10-21: `echo "$(gh pr
 // merge 6)"` ran a merge the guard read as text). Nested parentheses one level deep are enough for a command line.
-const substitutions = (text) => [...String(text).matchAll(/\$\(((?:[^()]|\([^()]*\))*)\)|`([^`]*)`/g)].map((m) => m[1] ?? m[2]).filter((x) => x && x.trim()); // what a quoted string becomes: never a branch name, never a command
+// An unclosed $( (a quote inside it ended the string being scanned) runs to the end of the text: what can't be parsed counts.
+const substitutions = (text) => [...String(text).matchAll(/\$\(((?:[^()]|\([^()]*\))*)\)|`([^`]*)`|\$\(([^()]*)$/g)].map((m) => m[1] ?? m[2] ?? m[3]).filter((x) => x && x.trim()); // what a quoted string becomes: never a branch name, never a command
 const segments = (src, depth = 0) => {
   const nested = [], lines = String(src).split('\n'), kept = [];
   // Heredoc and PowerShell here-string bodies are data unless a shell reads them.
