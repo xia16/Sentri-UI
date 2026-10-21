@@ -46,3 +46,15 @@
 ## Header law retained from main
 
 The Data sync pages and sheets use the shared page and sheet headers: a title, Back at the upper left, no repeated farm/unit/description line, and the shared 24px separation to the body. The phone-wide sync badge occupies the app shell's trailing status slot; it does not add a page-specific subtitle or move Back to the footer. Moving record facts out of a header must keep row text at the design system's legibility floor.
+
+## Budget for the rebuilt screens (PRD, PR 235; 2026-10-20)
+
+| Screen | First | Then | Quiet | Cut |
+|---|---|---|---|---|
+| Saved work | Which tasks still hold records, each with its count | A task with records not accepted says so on its row | Group title says the connection once (Uploading / Waiting to upload); past uploads behind the clock | Network card, status sections, categories, footer Back, per-row state words |
+| A task's records | The standing Toast when records weren't accepted | Unit switch with the count inside | One log by day: tag · result, then pen · time · who | Status line, filter sheet, time filter, chain cards, "All records on this phone" link |
+| Choose a unit | Each unit with records here and how many | The current unit ticked | — | Units with nothing on the phone |
+| Past uploads | What arrived, by day | Scope it was opened from (header line) | — | Detail screens, per-row state |
+| Not accepted | What the farm kept, or why it refused | What the worker recorded, under it | Time and who | Retry, compare, delete, names of who won |
+| Upload first | That switching is stopped and why | The way to Saved work | — | Counts and lists in the dialog |
+| Signed out | Sign in to keep uploading (attention) | Records are safe on this phone | The list under it | A separate sign-in screen |

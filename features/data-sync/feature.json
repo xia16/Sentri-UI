@@ -14,23 +14,19 @@
         "data-sync.global-upload",
         "data-sync.global-error",
         "data-sync.task-badge",
-        "data-sync.task-list",
         "data-sync.list",
-        "data-sync.grouped",
-        "data-sync.category",
-        "data-sync.detail"
+        "data-sync.syncing",
+        "data-sync.upload",
+        "data-sync.task-list",
+        "data-sync.units",
+        "data-sync.unit",
+        "data-sync.history"
       ]
     ],
     [
-      "异常与结果",
+      "未被接受与身份",
       [
-        "data-sync.failed",
-        "data-sync.conflict",
-        "data-sync.blocked",
-        "data-sync.dependent-delete",
-        "data-sync.upload",
-        "data-sync.receipt",
-        "data-sync.reconciled",
+        "data-sync.not-accepted",
         "data-sync.switch",
         "data-sync.auth"
       ]
@@ -139,259 +135,162 @@
       }
     },
     {
-      "id": "data-sync.task-list",
-      "name": "Records from this task",
-      "zh": "本任务记录列表",
-      "status": "in-design",
-      "url": "/ux/system/data-sync-astra-prototype.html?scenario=offline&taskId=farrow28&from=task",
-      "notes": {
-        "purpose": "只显示稳定任务实例 farrow28 下跨单元/栏位的未上传记录，提供本机全部记录入口。",
-        "issues": [
-          "真实 taskId 和每条离线操作的归属需在 Android 业务功能与队列交接时接通。"
-        ]
-      }
-    },
-    {
       "id": "data-sync.list",
-      "name": "Saved work (sync list)",
-      "zh": "数据同步列表",
+      "name": "Saved work",
+      "zh": "本机记录",
       "status": "in-design",
+      "url": "/ux/system/data-sync-astra-prototype.html?scenario=offline",
       "notes": {
-        "purpose": "本机记录总览。异常与待上传记录逐条呈现；已确认上传仅显示近30天总数，不铺历史记录行。",
+        "purpose": "Every task with records still on this phone, one row each with its count; Other records last. The connection is said once, in the group title (PRD 2026-10-19).",
         "states": [
           {
-            "state": "Offline",
-            "when": "无网络",
-            "shows": "保留本机记录，说明网络恢复后自动上传"
-          },
-          {
-            "state": "Syncing",
-            "when": "网络可用且自动发送中",
-            "shows": "同步中，可离开页面"
-          },
-          {
-            "state": "Partial",
-            "when": "部分记录已同步",
-            "shows": "已上传显示近30天总数，未解决记录仍逐条可见"
-          },
-          {
-            "state": "Recent history",
-            "when": "已确认上传记录跨越30天期限",
-            "shows": "仅期限内记录计入本机已上传合计；过期且无未上传依赖的本机副本可清理"
+            "state": "Waiting",
+            "when": "No connection",
+            "shows": "Waiting to upload; each task's count; a task with records not accepted says so on its row"
           }
         ],
         "issues": [
-          "样例未接入其他功能原型的真实操作。"
-        ]
-      },
-      "url": "/ux/system/data-sync-astra-prototype.html?scenario=offline"
-    },
-    {
-      "id": "data-sync.detail",
-      "name": "Sync detail",
-      "zh": "数据同步-详情",
-      "status": "in-design",
-      "notes": {
-        "purpose": "单条本机记录的身份、状态、保存时间、错误原因与安全恢复。",
-        "states": [
-          {
-            "state": "Failed",
-            "when": "服务端未处理",
-            "shows": "保留本机记录与重试入口"
-          },
-          {
-            "state": "Conflict",
-            "when": "服务端状态冲突",
-            "shows": "停止自动同步；可人工重试或经确认删除"
-          },
-          {
-            "state": "Blocked",
-            "when": "前置操作未解决",
-            "shows": "指出阻断原因，不显示为已发送"
-          }
-        ],
-        "issues": [
-          "真实服务端差异获取与条件写入需 Android/后端契约验证。"
-        ]
-      },
-      "url": "/ux/system/data-sync-astra-prototype.html?scenario=conflict",
-      "steps": [
-        {
-          "tap": "[data-action=\"open-record\"]"
-        }
-      ]
-    },
-    {
-      "id": "data-sync.grouped",
-      "name": "Many saved records by work category",
-      "zh": "大量本机记录按类别汇总",
-      "status": "in-design",
-      "url": "/ux/system/data-sync-astra-prototype.html?scenario=busy",
-      "notes": {
-        "purpose": "30 条样例中需要处理的记录直接可见，普通待传按业务类别汇总。",
-        "issues": [
-          "样例仅覆盖分散在四类中的记录；真实类别和任务类型由业务数据提供。"
-        ],
-        "states": [
-          {
-            "state": "Threshold",
-            "when": "九条待传跨两类，浏览中自动确认一条",
-            "shows": "分类入口保留、待传数更新为八；重新进入才重判布局。可用 scenario=threshold 验证。"
-          }
+          "Fictional records on one phone; the real Android queue, server receipts and refusal reasons are not connected."
         ]
       }
     },
     {
-      "id": "data-sync.category",
-      "name": "Saved records within a category",
-      "zh": "类别内查看本机记录",
+      "id": "data-sync.syncing",
+      "name": "Saved work, uploading",
+      "zh": "本机记录·上传中",
       "status": "in-design",
-      "url": "/ux/system/data-sync-astra-prototype.html?scenario=busy",
-      "steps": [
-        {
-          "tap": "[data-action=\"open-category\"][data-value=\"production\"]"
-        }
-      ],
+      "url": "/ux/system/data-sync-astra-prototype.html?scenario=syncing",
       "notes": {
-        "purpose": "点入业务类别后直接看到本机记录，可逐条打开并返回；不强制再走任务类型和任务两级。"
+        "purpose": "The same page with a connection: Uploading. Counts go down as the server confirms; nothing pops up.",
+        "issues": [
+          "Fictional records on one phone; the real Android queue, server receipts and refusal reasons are not connected."
+        ]
       }
     },
     {
       "id": "data-sync.upload",
-      "name": "All uploaded on this phone",
-      "zh": "本机暂无待上传",
+      "name": "Everything has uploaded",
+      "zh": "全部已上传",
       "status": "in-design",
+      "url": "/ux/system/data-sync-astra-prototype.html?scenario=done",
       "notes": {
-        "purpose": "本机无待处理队列；仅显示近30天已上传总数，不列逐条历史。",
-        "states": [
-          {
-            "state": "Empty",
-            "when": "待上传及异常都为零",
-            "shows": "仅声明本机暂无待上传记录，并附上近30天已上传合计；不推断团队数据完整"
-          }
+        "purpose": "Nothing on this phone is waiting: one line, past uploads still behind the clock.",
+        "issues": [
+          "Fictional records on one phone; the real Android queue, server receipts and refusal reasons are not connected."
+        ]
+      }
+    },
+    {
+      "id": "data-sync.task-list",
+      "name": "A task's records",
+      "zh": "任务记录",
+      "status": "in-design",
+      "url": "/ux/system/data-sync-astra-prototype.html?scenario=offline&taskId=preg31",
+      "notes": {
+        "purpose": "One task: the standing Toast (records not accepted), the unit switch with the count inside, then one log of everything still on the phone, newest first (PRD 2026-10-20).",
+        "issues": [
+          "Fictional records on one phone; the real Android queue, server receipts and refusal reasons are not connected."
+        ]
+      }
+    },
+    {
+      "id": "data-sync.units",
+      "name": "Choose a unit",
+      "zh": "选择单元",
+      "status": "in-design",
+      "url": "/ux/system/data-sync-astra-prototype.html?scenario=offline&taskId=preg31",
+      "notes": {
+        "purpose": "The menu drawer that picks one unit; each row says how many records it has on this phone.",
+        "issues": [
+          "Fictional records on one phone; the real Android queue, server receipts and refusal reasons are not connected."
         ]
       },
-      "url": "/ux/system/data-sync-astra-prototype.html?scenario=done"
-    },
-    {
-      "id": "data-sync.failed",
-      "name": "Partial upload and failure",
-      "zh": "部分上传与失败",
-      "status": "in-design",
-      "url": "/ux/system/data-sync-astra-prototype.html?scenario=partial",
-      "notes": {
-        "purpose": "逐条结果与失败恢复。",
-        "states": [
-          {
-            "state": "Partial",
-            "when": "三条中两条成功一条失败",
-            "shows": "成功的已上传，失败的留在本机，可查看原因并重试"
-          }
-        ]
-      }
-    },
-    {
-      "id": "data-sync.receipt",
-      "name": "Checking a missing receipt",
-      "zh": "核对丢失回执",
-      "status": "in-design",
-      "url": "/ux/system/data-sync-astra-prototype.html?scenario=uncertain&receipt=hold",
-      "notes": {
-        "purpose": "请求可能已由服务端处理但本机未收到回执时，按原操作 ID 查询；查询期间保留本机记录，暂不重发。",
-        "issues": [
-          "原型使用本地定时结果；Android/后端交接时核对查询接口与回执结构。"
-        ]
-      }
-    },
-    {
-      "id": "data-sync.reconciled",
-      "name": "Receipt confirmed by server",
-      "zh": "服务端确认已处理",
-      "status": "in-design",
-      "url": "/ux/system/data-sync-astra-prototype.html?scenario=uncertain&receipt=resolved",
-      "notes": {
-        "purpose": "按操作 ID 查到服务端已处理后才将本机记录标为已上传，不再次发送。",
-        "issues": [
-          "原型为本地样例，不代表真实查询接口已接入。"
-        ]
-      }
-    },
-    {
-      "id": "data-sync.conflict",
-      "name": "Conflict awaiting manual action",
-      "zh": "冲突待人工处理",
-      "status": "in-design",
-      "url": "/ux/system/data-sync-astra-prototype.html?scenario=conflict",
-      "notes": {
-        "purpose": "冲突停止自动同步，可查看详情、人工重试或确认删除。",
-        "issues": [
-          "交互样例未接真实账号、猪场或服务端数据。"
-        ]
-      }
-    },
-    {
-      "id": "data-sync.blocked",
-      "name": "Later operation blocked",
-      "zh": "后续操作受阻",
-      "status": "in-design",
-      "url": "/ux/system/data-sync-astra-prototype.html?scenario=blocked",
-      "notes": {
-        "purpose": "前置操作失败时，后续操作保留在本机并明确说明原因。",
-        "issues": [
-          "交互样例未接真实账号、猪场或服务端数据。"
-        ]
-      }
-    },
-    {
-      "id": "data-sync.dependent-delete",
-      "name": "Blocked after predecessor deletion",
-      "zh": "前置删除后续受阻",
-      "status": "in-design",
-      "url": "/ux/system/data-sync-astra-prototype.html?scenario=conflict",
       "steps": [
         {
-          "tap": "[data-action=\"open-record\"][data-value=\"first\"]"
-        },
-        {
-          "tap": "[data-action=\"ask-delete\"]"
-        },
-        {
-          "tap": "[data-action=\"confirm-delete\"]"
-        },
-        {
-          "tap": "[data-action=\"open-record\"][data-value=\"second\"]"
+          "tap": "[data-action=\"scope\"][data-value=\"unit\"]"
         }
-      ],
+      ]
+    },
+    {
+      "id": "data-sync.unit",
+      "name": "One unit's records",
+      "zh": "单个单元的记录",
+      "status": "in-design",
+      "url": "/ux/system/data-sync-astra-prototype.html?scenario=offline&taskId=preg31",
       "notes": {
-        "purpose": "前置冲突已删除；后续记录只可查看或经确认逐条删除，不自动发送或重试。",
+        "purpose": "The task log narrowed to one unit; entries drop the unit they share. All units goes back.",
         "issues": [
-          "样例未接真实依赖队列；所有直接与间接依赖项都需按同一规则处理。"
+          "Fictional records on one phone; the real Android queue, server receipts and refusal reasons are not connected."
         ]
-      }
+      },
+      "steps": [
+        {
+          "tap": "[data-action=\"scope\"][data-value=\"unit\"]"
+        },
+        {
+          "tap": "[data-action=\"pick-unit\"][data-value=\"7\"]"
+        }
+      ]
+    },
+    {
+      "id": "data-sync.history",
+      "name": "Past uploads",
+      "zh": "已上传记录",
+      "status": "in-design",
+      "url": "/ux/system/data-sync-astra-prototype.html?scenario=syncing",
+      "notes": {
+        "purpose": "Behind the clock at the top right: the last 30 days on this phone, by day, in the scope it was opened from.",
+        "issues": [
+          "Fictional records on one phone; the real Android queue, server receipts and refusal reasons are not connected."
+        ]
+      },
+      "steps": [
+        {
+          "tap": "[data-action=\"past\"]"
+        }
+      ]
+    },
+    {
+      "id": "data-sync.not-accepted",
+      "name": "Not accepted",
+      "zh": "未被接受",
+      "status": "in-design",
+      "url": "/ux/system/data-sync-astra-prototype.html?scenario=offline&taskId=preg31",
+      "notes": {
+        "purpose": "A read-only log in two groups: Already recorded (the farm's value first, yours under it) and Couldn't be accepted (the reason). Nothing to press (PRD 2026-10-20).",
+        "issues": [
+          "Fictional records on one phone; the real Android queue, server receipts and refusal reasons are not connected."
+        ]
+      },
+      "steps": [
+        {
+          "tap": "[data-action=\"not-accepted\"]"
+        }
+      ]
     },
     {
       "id": "data-sync.switch",
-      "name": "Account or farm switch blocked",
-      "zh": "切换账号或猪场受阻",
+      "name": "Switching farm with records waiting",
+      "zh": "有待传记录时切换猪场",
       "status": "in-design",
       "url": "/ux/system/data-sync-astra-prototype.html?scenario=switch",
       "notes": {
-        "purpose": "有未上传记录时阻止切换并引导处理。",
+        "purpose": "Switching account or farm is stopped while records wait: Upload first, with the way to Saved work.",
         "issues": [
-          "交互样例未接真实账号、猪场或服务端数据。"
+          "Fictional records on one phone; the real Android queue, server receipts and refusal reasons are not connected."
         ]
       }
     },
     {
       "id": "data-sync.auth",
-      "name": "Original account sign-in needed",
-      "zh": "原账号登录后续传",
+      "name": "Signed out",
+      "zh": "登录失效",
       "status": "in-design",
       "url": "/ux/system/data-sync-astra-prototype.html?scenario=expired",
       "notes": {
-        "purpose": "登录失效时暂停发送并保留原账号/猪场绑定。重新登录原账号后自动续传。",
+        "purpose": "Uploads pause: the standing Toast in its attention tone asks to sign in as the same person; records stay safe on this phone.",
         "issues": [
-          "样例点击只模拟原账号验证成功；真实凭证验证由账号流程提供。"
+          "Fictional records on one phone; the real Android queue, server receipts and refusal reasons are not connected."
         ]
       }
     }
@@ -400,82 +299,67 @@
     [
       "data-sync.banner",
       "data-sync.list",
-      "tap local records"
+      "tap the header icon"
     ],
     [
       "data-sync.global-upload",
       "data-sync.list",
-      "tap app-shell upload status"
+      "tap the header icon"
     ],
     [
       "data-sync.global-error",
-      "data-sync.failed",
-      "tap app-shell exception status"
+      "data-sync.list",
+      "tap the header icon"
     ],
     [
       "data-sync.task-badge",
       "data-sync.task-list",
-      "open task-owned records"
+      "tap the task's badge"
+    ],
+    [
+      "data-sync.list",
+      "data-sync.task-list",
+      "open a task"
+    ],
+    [
+      "data-sync.list",
+      "data-sync.syncing",
+      "the connection returns"
+    ],
+    [
+      "data-sync.syncing",
+      "data-sync.upload",
+      "the last record is confirmed"
     ],
     [
       "data-sync.task-list",
-      "data-sync.list",
-      "view all records on this phone"
+      "data-sync.units",
+      "choose unit"
     ],
     [
-      "data-sync.grouped",
-      "data-sync.category",
-      "open work category"
-    ],
-    [
-      "data-sync.list",
-      "data-sync.detail",
-      "open a record"
+      "data-sync.units",
+      "data-sync.unit",
+      "pick a unit"
     ],
     [
       "data-sync.list",
-      "data-sync.failed",
-      "one record fails"
+      "data-sync.history",
+      "tap the clock"
     ],
     [
-      "data-sync.list",
-      "data-sync.conflict",
-      "server conflict"
-    ],
-    [
-      "data-sync.list",
-      "data-sync.blocked",
-      "earlier operation unresolved"
-    ],
-    [
-      "data-sync.list",
-      "data-sync.upload",
-      "all local work uploaded"
-    ],
-    [
-      "data-sync.list",
-      "data-sync.receipt",
-      "local response missing"
-    ],
-    [
-      "data-sync.receipt",
-      "data-sync.reconciled",
-      "query by operation ID confirms the original request"
+      "data-sync.task-list",
+      "data-sync.not-accepted",
+      "tap the standing Toast"
     ],
     [
       "data-sync.list",
       "data-sync.switch",
-      "request account or farm switch with unsent work"
+      "switch farm with records waiting"
     ],
     [
       "data-sync.list",
       "data-sync.auth",
-      "session expires with unsent records"
-    ],
-    [
-      "data-sync.conflict",
-      "data-sync.dependent-delete",
-      "delete conflicted predecessor with dependent records"
+      "sign-in expires"
     ]
   ],
   "entryPoints": [
@@ -490,7 +374,7 @@
       "section": "Farrowing task",
       "label": "via this-task header badge",
       "from": "farrowing.room",
-      "control": "Task 2",
+      "control": "Task sync badge",
       "lands": "data-sync.task-list"
     }
   ]

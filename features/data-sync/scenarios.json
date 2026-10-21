@@ -1,6 +1,6 @@
 {
   "feature": "data-sync",
-  "about": "Executable leaves of features/data-sync/scenario-tree.md. Fictional study fixtures; Android and backend interface details remain to be verified.",
+  "about": "Executable leaves of features/data-sync/scenario-tree.md, answered by the PRD of PR 235 (owner, 2026-10-18 to 2026-10-20). Fictional study fixtures; Android and backend interface details remain to be verified.",
   "defaults": {
     "url": "/ux/system/data-sync-astra-prototype.html?scenario=offline",
     "clock": "2026-10-12T09:41:00",
@@ -19,12 +19,12 @@
     {
       "type": "entry",
       "id": "ds-a3-offline-entry.entry",
-      "label": "Offline queue remains on this phone",
+      "label": "Saved work lists tasks while offline",
       "children": [
         {
           "type": "state",
           "id": "ds-a3-offline-entry.state",
-          "label": "Study fixture: offline",
+          "label": "Study fixture: scenario=offline",
           "tree": "A",
           "reset": {
             "url": "/ux/system/data-sync-astra-prototype.html?scenario=offline"
@@ -34,30 +34,30 @@
               "type": "outcome",
               "id": "ds-a3-offline-entry",
               "tree": "A-3",
-              "label": "Offline queue remains on this phone",
+              "label": "Saved work lists tasks while offline",
               "gwt": {
-                "given": "A worker has three records saved on this phone and no connection.",
+                "given": "A worker has records saved on this phone and no connection.",
                 "when": "They open Saved work.",
-                "then": "Three records remain waiting, and the screen says they will upload automatically when connected."
+                "then": "Each task with records waiting is one row with its count, under Waiting to upload."
               },
               "authority": [
                 {
                   "src": "PRD",
-                  "at": "Rules and Decisions 2026-10-12",
-                  "says": "Three records remain waiting, and the screen says they will upload automatically when connected."
+                  "at": "Rules and Decisions 2026-10-18 to 2026-10-20 (PR 235)",
+                  "says": "Each task with records waiting is one row with its count, under Waiting to upload."
                 }
               ],
               "visible": [
                 {
                   "text": {
-                    "en": "No connection",
-                    "zh": "无网络"
+                    "en": "Waiting to upload",
+                    "zh": "等待上传"
                   }
                 },
                 {
                   "text": {
-                    "en": "Waiting to upload",
-                    "zh": "待上传"
+                    "en": "Pregnancy check",
+                    "zh": "孕检"
                   }
                 }
               ]
@@ -69,12 +69,12 @@
     {
       "type": "entry",
       "id": "ds-a5-empty.entry",
-      "label": "Empty local queue is stated narrowly",
+      "label": "Nothing waiting says everything has uploaded",
       "children": [
         {
           "type": "state",
           "id": "ds-a5-empty.state",
-          "label": "Study fixture: done",
+          "label": "Study fixture: scenario=done",
           "tree": "A",
           "reset": {
             "url": "/ux/system/data-sync-astra-prototype.html?scenario=done"
@@ -84,24 +84,24 @@
               "type": "outcome",
               "id": "ds-a5-empty",
               "tree": "A-5",
-              "label": "Empty local queue is stated narrowly",
+              "label": "Nothing waiting says everything has uploaded",
               "gwt": {
-                "given": "This phone has no waiting or abnormal records.",
+                "given": "Every record on this phone has uploaded.",
                 "when": "The worker opens Saved work.",
-                "then": "The screen says this phone has no records waiting; it makes no farm-wide completion claim."
+                "then": "One line says everything has uploaded."
               },
               "authority": [
                 {
                   "src": "PRD",
-                  "at": "Rules and Decisions 2026-10-12",
-                  "says": "The screen says this phone has no records waiting; it makes no farm-wide completion claim."
+                  "at": "Rules and Decisions 2026-10-18 to 2026-10-20 (PR 235)",
+                  "says": "One line says everything has uploaded."
                 }
               ],
               "visible": [
                 {
                   "text": {
-                    "en": "No records waiting on this phone",
-                    "zh": "本机暂无待上传记录"
+                    "en": "Everything has uploaded.",
+                    "zh": "全部已上传。"
                   }
                 }
               ]
@@ -113,12 +113,12 @@
     {
       "type": "entry",
       "id": "ds-b1-reconnected.entry",
-      "label": "Reconnect starts upload without a tap",
+      "label": "A returning connection starts the upload",
       "children": [
         {
           "type": "state",
           "id": "ds-b1-reconnected.state",
-          "label": "Study fixture: offline, then usable connection",
+          "label": "Study fixture: scenario=offline",
           "tree": "B",
           "reset": {
             "url": "/ux/system/data-sync-astra-prototype.html?scenario=offline"
@@ -127,7 +127,7 @@
             {
               "type": "action",
               "id": "ds-b1-reconnected.act",
-              "label": "The network is lost, then restored without tapping Upload.",
+              "label": "The connection returns.",
               "taps": [
                 {
                   "offline": true
@@ -141,24 +141,24 @@
                   "type": "outcome",
                   "id": "ds-b1-reconnected",
                   "tree": "B-1",
-                  "label": "Reconnect starts upload without a tap",
+                  "label": "A returning connection starts the upload",
                   "gwt": {
-                    "given": "This phone has waiting records and its connection returns.",
-                    "when": "The network becomes usable.",
-                    "then": "The records start uploading without an Upload button press."
+                    "given": "Records are waiting with no connection.",
+                    "when": "The connection returns.",
+                    "then": "Saved work says Uploading without anything to press."
                   },
                   "authority": [
                     {
                       "src": "PRD",
-                      "at": "Rules and Decisions 2026-10-12",
-                      "says": "The records start uploading without an Upload button press."
+                      "at": "Rules and Decisions 2026-10-18 to 2026-10-20 (PR 235)",
+                      "says": "Saved work says Uploading without anything to press."
                     }
                   ],
                   "visible": [
                     {
                       "text": {
-                        "en": "uploading automatically",
-                        "zh": "正在自动上传"
+                        "en": "Uploading",
+                        "zh": "上传中"
                       }
                     }
                   ]
@@ -172,12 +172,12 @@
     {
       "type": "entry",
       "id": "ds-b4-partial.entry",
-      "label": "Partial success stays split",
+      "label": "Records settle one by one",
       "children": [
         {
           "type": "state",
           "id": "ds-b4-partial.state",
-          "label": "Study fixture: partial",
+          "label": "Study fixture: scenario=partial",
           "tree": "B",
           "reset": {
             "url": "/ux/system/data-sync-astra-prototype.html?scenario=partial"
@@ -187,36 +187,36 @@
               "type": "outcome",
               "id": "ds-b4-partial",
               "tree": "B-4",
-              "label": "Partial success stays split",
+              "label": "Records settle one by one",
               "gwt": {
-                "given": "Three local records are being sent.",
-                "when": "Two succeed and one fails.",
-                "then": "Two are shown as uploaded and one is still marked for attention."
+                "given": "Some records have uploaded and some have not.",
+                "when": "The worker opens Saved work.",
+                "then": "Only tasks still holding records are listed, each with what is left, and a task with records not accepted says so."
               },
               "authority": [
                 {
                   "src": "PRD",
-                  "at": "Rules and Decisions 2026-10-12",
-                  "says": "Two are shown as uploaded and one is still marked for attention."
+                  "at": "Rules and Decisions 2026-10-18 to 2026-10-20 (PR 235)",
+                  "says": "Only tasks still holding records are listed, each with what is left, and a task with records not accepted says so."
                 }
               ],
               "visible": [
                 {
                   "text": {
-                    "en": "Needs you",
-                    "zh": "需要处理"
+                    "en": "Uploading",
+                    "zh": "上传中"
                   }
                 },
                 {
                   "text": {
-                    "en": "Uploaded in last 30 days · 2",
-                    "zh": "近30天已上传 · 2"
+                    "en": "2 not accepted",
+                    "zh": "2 条未被接受"
                   }
                 },
                 {
                   "text": {
-                    "en": "Failed",
-                    "zh": "失败"
+                    "en": "Other records",
+                    "zh": "其他记录"
                   }
                 }
               ]
@@ -228,65 +228,65 @@
     {
       "type": "entry",
       "id": "ds-c1-failed-detail.entry",
-      "label": "Failed record keeps a reason and retry",
+      "label": "A refused record shows its reason, read only",
       "children": [
         {
           "type": "state",
           "id": "ds-c1-failed-detail.state",
-          "label": "Study fixture: partial",
+          "label": "Study fixture: scenario=offline&taskId=preg31",
           "tree": "C",
           "reset": {
-            "url": "/ux/system/data-sync-astra-prototype.html?scenario=partial"
+            "url": "/ux/system/data-sync-astra-prototype.html?scenario=offline&taskId=preg31"
           },
           "children": [
             {
               "type": "action",
               "id": "ds-c1-failed-detail.act",
-              "label": "The worker opens the failed record.",
+              "label": "The worker opens Not accepted from the task.",
               "taps": [
-                "[data-action=\"open-record\"][data-value=\"third\"]"
+                "[data-action=\"not-accepted\"]"
               ],
               "children": [
                 {
                   "type": "outcome",
                   "id": "ds-c1-failed-detail",
                   "tree": "C-1",
-                  "label": "Failed record keeps a reason and retry",
+                  "label": "A refused record shows its reason, read only",
                   "gwt": {
-                    "given": "One record failed to upload while two succeeded.",
-                    "when": "The worker opens the failed record.",
-                    "then": "The original record and failure reason remain visible with a Retry action."
+                    "given": "The server refused a record and another person recorded a sow first.",
+                    "when": "The worker opens Not accepted from the task.",
+                    "then": "Each record shows what the farm kept or why it was refused; nothing asks for an action."
                   },
                   "authority": [
                     {
                       "src": "PRD",
-                      "at": "Rules and Decisions 2026-10-12",
-                      "says": "The original record and failure reason remain visible with a Retry action."
+                      "at": "Rules and Decisions 2026-10-18 to 2026-10-20 (PR 235)",
+                      "says": "Each record shows what the farm kept or why it was refused; nothing asks for an action."
                     }
                   ],
                   "visible": [
                     {
                       "text": {
-                        "en": "The server could not process",
-                        "zh": "服务端未能处理"
+                        "en": "Couldn't be accepted",
+                        "zh": "无法接受"
                       }
                     },
                     {
                       "text": {
-                        "en": "Retry now",
-                        "zh": "立即重试"
+                        "en": "Sow 000267 had already left the unit",
+                        "zh": "母猪 000267 已离开该单元"
                       }
                     },
                     {
                       "text": {
-                        "en": "G. Hansen",
-                        "zh": "G. Hansen"
+                        "en": "Already recorded",
+                        "zh": "已有记录"
                       }
                     },
                     {
                       "text": {
-                        "en": "Green Valley Farm",
-                        "zh": "Green Valley Farm"
+                        "en": "You recorded Pregnant",
+                        "zh": "你记录的是“已孕”"
                       }
                     }
                   ]
@@ -300,57 +300,56 @@
     {
       "type": "entry",
       "id": "ds-c5-cancel-delete.entry",
-      "label": "Cancelling conflict deletion keeps record",
+      "label": "Not accepted records offer no delete",
       "children": [
         {
           "type": "state",
           "id": "ds-c5-cancel-delete.state",
-          "label": "Study fixture: conflict",
+          "label": "Study fixture: scenario=offline&taskId=preg31",
           "tree": "C",
           "reset": {
-            "url": "/ux/system/data-sync-astra-prototype.html?scenario=conflict"
+            "url": "/ux/system/data-sync-astra-prototype.html?scenario=offline&taskId=preg31"
           },
           "children": [
             {
               "type": "action",
               "id": "ds-c5-cancel-delete.act",
-              "label": "The worker opens it, asks to delete, then backs out.",
+              "label": "The worker opens Not accepted.",
               "taps": [
-                "[data-action=\"open-record\"][data-value=\"first\"]",
-                "[data-action=\"ask-delete\"]",
-                "[data-action=\"cancel-delete\"]",
-                "[data-action=\"back-to-list\"]"
+                "[data-action=\"not-accepted\"]"
               ],
               "children": [
                 {
                   "type": "outcome",
                   "id": "ds-c5-cancel-delete",
                   "tree": "C-5",
-                  "label": "Cancelling conflict deletion keeps record",
+                  "label": "Not accepted records offer no delete",
                   "gwt": {
-                    "given": "A conflict is saved on this phone.",
-                    "when": "The worker opens it, asks to delete, then backs out.",
-                    "then": "The conflicted record remains on this phone."
+                    "given": "A record was not accepted.",
+                    "when": "The worker opens Not accepted.",
+                    "then": "There is no Delete or Discard: the record is information only."
                   },
                   "authority": [
                     {
                       "src": "PRD",
-                      "at": "Rules and Decisions 2026-10-12",
-                      "says": "The conflicted record remains on this phone."
+                      "at": "Rules and Decisions 2026-10-18 to 2026-10-20 (PR 235)",
+                      "says": "There is no Delete or Discard: the record is information only."
                     }
                   ],
                   "visible": [
                     {
                       "text": {
-                        "en": "Pregnancy check",
-                        "zh": "孕检"
-                      }
+                        "en": "Delete",
+                        "zh": "删除"
+                      },
+                      "absent": true
                     },
                     {
                       "text": {
-                        "en": "Conflict",
-                        "zh": "冲突"
-                      }
+                        "en": "Discard",
+                        "zh": "放弃"
+                      },
+                      "absent": true
                     }
                   ]
                 }
@@ -363,57 +362,55 @@
     {
       "type": "entry",
       "id": "ds-c6-confirm-delete.entry",
-      "label": "Confirmed conflict deletion removes one local record",
+      "label": "A not accepted record stays readable",
       "children": [
         {
           "type": "state",
           "id": "ds-c6-confirm-delete.state",
-          "label": "Study fixture: conflict",
+          "label": "Study fixture: scenario=offline&taskId=preg31",
           "tree": "C",
           "reset": {
-            "url": "/ux/system/data-sync-astra-prototype.html?scenario=conflict"
+            "url": "/ux/system/data-sync-astra-prototype.html?scenario=offline&taskId=preg31"
           },
           "children": [
             {
               "type": "action",
               "id": "ds-c6-confirm-delete.act",
-              "label": "The worker opens the conflict and confirms deletion.",
+              "label": "The worker opens Not accepted.",
               "taps": [
-                "[data-action=\"open-record\"][data-value=\"first\"]",
-                "[data-action=\"ask-delete\"]",
-                "[data-action=\"confirm-delete\"]"
+                "[data-action=\"not-accepted\"]"
               ],
               "children": [
                 {
                   "type": "outcome",
                   "id": "ds-c6-confirm-delete",
                   "tree": "C-6",
-                  "label": "Confirmed conflict deletion removes one local record",
+                  "label": "A not accepted record stays readable",
                   "gwt": {
-                    "given": "A conflict and other records are saved on this phone.",
-                    "when": "The worker opens the conflict and confirms deletion.",
-                    "then": "Only the conflicted record leaves the local queue; the other records remain."
+                    "given": "Another person recorded sow 000412 first.",
+                    "when": "The worker opens Not accepted.",
+                    "then": "The record stays listed with the farm's value; there is no retry."
                   },
                   "authority": [
                     {
                       "src": "PRD",
-                      "at": "Rules and Decisions 2026-10-12",
-                      "says": "Only the conflicted record leaves the local queue; the other records remain."
+                      "at": "Rules and Decisions 2026-10-18 to 2026-10-20 (PR 235)",
+                      "says": "The record stays listed with the farm's value; there is no retry."
                     }
                   ],
                   "visible": [
                     {
                       "text": {
-                        "en": "Pregnancy check",
-                        "zh": "孕检"
-                      },
-                      "absent": true
+                        "en": "000412 · Not pregnant",
+                        "zh": "000412 · 未孕"
+                      }
                     },
                     {
                       "text": {
-                        "en": "Pen note",
-                        "zh": "栏位备注"
-                      }
+                        "en": "Retry",
+                        "zh": "重试"
+                      },
+                      "absent": true
                     }
                   ]
                 }
@@ -426,46 +423,47 @@
     {
       "type": "entry",
       "id": "ds-c7-blocked.entry",
-      "label": "Later operation names its unresolved predecessor",
+      "label": "A record waiting on an earlier one is an ordinary entry",
       "children": [
         {
           "type": "state",
           "id": "ds-c7-blocked.state",
-          "label": "Study fixture: blocked",
+          "label": "Study fixture: scenario=offline&taskId=preg31",
           "tree": "C",
           "reset": {
-            "url": "/ux/system/data-sync-astra-prototype.html?scenario=blocked"
+            "url": "/ux/system/data-sync-astra-prototype.html?scenario=offline&taskId=preg31"
           },
           "children": [
             {
               "type": "outcome",
               "id": "ds-c7-blocked",
               "tree": "C-7",
-              "label": "Later operation names its unresolved predecessor",
+              "label": "A record waiting on an earlier one is an ordinary entry",
               "gwt": {
-                "given": "An earlier operation for the same object failed.",
-                "when": "The worker reviews the waiting records.",
-                "then": "The later operation is marked blocked and is still on the phone."
+                "given": "A later record on sow 000308 waits for an earlier one.",
+                "when": "The worker opens the task.",
+                "then": "It is listed like any other record, with no blocked state."
               },
               "authority": [
                 {
                   "src": "PRD",
-                  "at": "Rules and Decisions 2026-10-12",
-                  "says": "The later operation is marked blocked and is still on the phone."
+                  "at": "Rules and Decisions 2026-10-18 to 2026-10-20 (PR 235)",
+                  "says": "It is listed like any other record, with no blocked state."
                 }
               ],
               "visible": [
                 {
                   "text": {
-                    "en": "Blocked",
-                    "zh": "受阻"
+                    "en": "000308 · Recheck in 7 days",
+                    "zh": "000308 · 7 天后复检"
                   }
                 },
                 {
                   "text": {
-                    "en": "Failed",
-                    "zh": "失败"
-                  }
+                    "en": "Waiting for an earlier operation",
+                    "zh": "等待前置操作"
+                  },
+                  "absent": true
                 }
               ]
             }
@@ -476,12 +474,12 @@
     {
       "type": "entry",
       "id": "ds-d1-switch-blocked.entry",
-      "label": "Unsent work blocks an account or farm switch",
+      "label": "Switching farm is stopped while records wait",
       "children": [
         {
           "type": "state",
           "id": "ds-d1-switch-blocked.state",
-          "label": "Study fixture: switch",
+          "label": "Study fixture: scenario=switch",
           "tree": "D",
           "reset": {
             "url": "/ux/system/data-sync-astra-prototype.html?scenario=switch"
@@ -491,30 +489,30 @@
               "type": "outcome",
               "id": "ds-d1-switch-blocked",
               "tree": "D-1",
-              "label": "Unsent work blocks an account or farm switch",
+              "label": "Switching farm is stopped while records wait",
               "gwt": {
-                "given": "There are records on this phone that have not uploaded.",
-                "when": "The worker tries to change account or farm.",
-                "then": "The switch is stopped and the worker is directed to the saved records."
+                "given": "Records are still on this phone.",
+                "when": "The worker tries to switch farm.",
+                "then": "Upload first stops the switch and names the farm."
               },
               "authority": [
                 {
                   "src": "PRD",
-                  "at": "Rules and Decisions 2026-10-12",
-                  "says": "The switch is stopped and the worker is directed to the saved records."
+                  "at": "Rules and Decisions 2026-10-18 to 2026-10-20 (PR 235)",
+                  "says": "Upload first stops the switch and names the farm."
                 }
               ],
               "visible": [
                 {
                   "text": {
-                    "en": "Finish saved work first",
-                    "zh": "请先处理本机记录"
+                    "en": "Upload first",
+                    "zh": "先上传"
                   }
                 },
                 {
                   "text": {
-                    "en": "View saved work",
-                    "zh": "查看本机记录"
+                    "en": "Green Valley Farm",
+                    "zh": "Green Valley Farm"
                   }
                 }
               ]
@@ -526,79 +524,53 @@
     {
       "type": "entry",
       "id": "ds-c9-manual-conflict-contract.entry",
-      "label": "Conflict retry never overwrites the server",
+      "label": "The team's record is kept and shown first",
       "children": [
         {
           "type": "state",
           "id": "ds-c9-manual-conflict-contract.state",
-          "label": "Study fixture: conflict",
+          "label": "Study fixture: scenario=offline&taskId=preg31",
           "tree": "C",
           "reset": {
-            "url": "/ux/system/data-sync-astra-prototype.html?scenario=conflict"
+            "url": "/ux/system/data-sync-astra-prototype.html?scenario=offline&taskId=preg31"
           },
           "children": [
             {
               "type": "action",
               "id": "ds-c9-manual-conflict-contract.act",
-              "label": "The worker compares both values and retries the conflict.",
+              "label": "They open Not accepted.",
               "taps": [
-                "[data-action=\"open-record\"][data-value=\"first\"]",
-                {
-                  "expect": [
-                    {
-                      "text": {
-                        "en": "Compare before retrying",
-                        "zh": "重试前核对差异"
-                      }
-                    },
-                    {
-                      "text": {
-                        "en": "Pregnancy result: Pregnant",
-                        "zh": "孕检结果：已怀孕"
-                      }
-                    },
-                    {
-                      "text": {
-                        "en": "Pregnancy result: Not pregnant",
-                        "zh": "孕检结果：未怀孕"
-                      }
-                    }
-                  ]
-                },
-                "[data-action=\"retry\"]",
-                {
-                  "wait": 800
-                }
+                "[data-action=\"not-accepted\"]"
               ],
               "children": [
                 {
                   "type": "outcome",
                   "id": "ds-c9-manual-conflict-contract",
                   "tree": "C-9",
-                  "label": "Conflict retry never overwrites the server",
+                  "label": "The team's record is kept and shown first",
                   "gwt": {
-                    "given": "The saved result differs from the current team record.",
-                    "when": "The worker compares both values and manually retries.",
-                    "then": "The server record is not overwritten and this record remains in conflict."
+                    "given": "The worker recorded Pregnant, and another person had recorded Not pregnant first.",
+                    "when": "They open Not accepted.",
+                    "then": "The farm's value leads; theirs is the line under it."
                   },
                   "authority": [
                     {
                       "src": "PRD",
-                      "at": "Decisions 2026-10-12",
-                      "says": "Show both values before retry; retry cannot overwrite the server."
+                      "at": "Rules and Decisions 2026-10-18 to 2026-10-20 (PR 235)",
+                      "says": "The farm's value leads; theirs is the line under it."
                     }
                   ],
                   "visible": [
                     {
                       "text": {
-                        "en": "The server still reports a conflict",
-                        "zh": "服务端仍报告冲突"
+                        "en": "000412 · Not pregnant",
+                        "zh": "000412 · 未孕"
                       }
                     },
                     {
                       "text": {
-                        "en": "On the server now",
-                        "zh": "服务端现值"
+                        "en": "You recorded Pregnant",
+                        "zh": "你记录的是“已孕”"
                       }
                     }
                   ]
@@ -612,69 +584,60 @@
     {
       "type": "entry",
       "id": "ds-c10-deleted-predecessor.entry",
-      "label": "Dependent record stays blocked after deletion",
+      "label": "A later record isn't held back by one that wasn't accepted",
       "children": [
         {
           "type": "state",
           "id": "ds-c10-deleted-predecessor.state",
-          "label": "Study fixture: blocked",
+          "label": "Study fixture: scenario=offline&taskId=preg31",
           "tree": "C",
           "reset": {
-            "url": "/ux/system/data-sync-astra-prototype.html?scenario=conflict"
+            "url": "/ux/system/data-sync-astra-prototype.html?scenario=offline&taskId=preg31"
           },
           "children": [
             {
-              "type": "action",
-              "id": "ds-c10-deleted-predecessor.act",
-              "label": "The worker deletes the conflict and opens the dependent record.",
-              "taps": [
-                "[data-action=\"open-record\"][data-value=\"first\"]",
-                "[data-action=\"ask-delete\"]",
-                "[data-action=\"confirm-delete\"]",
-                "[data-action=\"open-record\"][data-value=\"second\"]"
-              ],
-              "children": [
+              "type": "outcome",
+              "id": "ds-c10-deleted-predecessor",
+              "tree": "C-10",
+              "label": "A later record isn't held back by one that wasn't accepted",
+              "gwt": {
+                "given": "A check on sow 000412 was not accepted, and a recheck was saved after it.",
+                "when": "The worker opens the task.",
+                "then": "The recheck waits as an ordinary record and uploads on its own; nothing is blocked or deleted."
+              },
+              "authority": [
                 {
-                  "type": "outcome",
-                  "id": "ds-c10-deleted-predecessor",
-                  "tree": "C-10",
-                  "label": "Dependent record stays blocked after deletion",
-                  "gwt": {
-                    "given": "A later local record depends on a conflicted record.",
-                    "when": "The conflicted predecessor is deleted.",
-                    "then": "The later record remains blocked on this phone; it can only be viewed or deleted, and does not upload."
+                  "src": "PRD",
+                  "at": "Rules and Decisions 2026-10-18 to 2026-10-20 (PR 235)",
+                  "says": "The recheck waits as an ordinary record and uploads on its own; nothing is blocked or deleted."
+                }
+              ],
+              "visible": [
+                {
+                  "text": {
+                    "en": "000412 · Recheck in 7 days",
+                    "zh": "000412 · 7 天后复检"
+                  }
+                },
+                {
+                  "text": {
+                    "en": "B3",
+                    "zh": "B3"
+                  }
+                },
+                {
+                  "text": {
+                    "en": "Blocked",
+                    "zh": "受阻"
                   },
-                  "authority": [
-                    {
-                      "src": "PRD",
-                      "at": "Decisions 2026-10-12",
-                      "says": "After deleting a conflicted predecessor, dependent records remain blocked and can only be viewed or deleted."
-                    }
-                  ],
-                  "visible": [
-                    {
-                      "text": {
-                        "en": "The earlier record was deleted",
-                        "zh": "前置记录已删除"
-                      }
-                    },
-                    {
-                      "text": {
-                        "en": "will not upload",
-                        "zh": "不会上传"
-                      }
-                    },
-                    {
-                      "text": {
-                        "en": "Blocked",
-                        "zh": "受阻"
-                      }
-                    },
-                    {
-                      "el": "[data-action=\"ask-delete\"]",
-                      "is": "enabled"
-                    }
-                  ]
+                  "absent": true
+                },
+                {
+                  "text": {
+                    "en": "Delete",
+                    "zh": "删除"
+                  },
+                  "absent": true
                 }
               ]
             }
@@ -685,86 +648,62 @@
     {
       "type": "entry",
       "id": "ds-c11-delete-blocked-dependent.entry",
-      "label": "A blocked dependent can be deleted after review",
+      "label": "Nothing in Not accepted is deleted",
       "children": [
         {
           "type": "state",
           "id": "ds-c11-delete-blocked-dependent.state",
-          "label": "Study fixture: conflict with dependent",
+          "label": "Study fixture: scenario=offline&taskId=preg31",
           "tree": "C",
           "reset": {
-            "url": "/ux/system/data-sync-astra-prototype.html?scenario=conflict"
+            "url": "/ux/system/data-sync-astra-prototype.html?scenario=offline&taskId=preg31"
           },
           "children": [
             {
               "type": "action",
               "id": "ds-c11-delete-blocked-dependent.act",
-              "label": "The worker deletes the conflicted predecessor, reviews the blocked dependent, then confirms its deletion.",
+              "label": "The worker reads Not accepted.",
               "taps": [
-                "[data-action=\"open-record\"][data-value=\"first\"]",
-                "[data-action=\"ask-delete\"]",
-                "[data-action=\"confirm-delete\"]",
-                "[data-action=\"open-record\"][data-value=\"second\"]",
-                {
-                  "expect": [
-                    {
-                      "text": {
-                        "en": "The earlier record was deleted",
-                        "zh": "前置记录已删除"
-                      }
-                    }
-                  ]
-                },
-                "[data-action=\"ask-delete\"]",
-                {
-                  "expect": [
-                    {
-                      "text": {
-                        "en": "Delete this blocked record?",
-                        "zh": "删除这条受阻记录？"
-                      }
-                    }
-                  ]
-                },
-                "[data-action=\"confirm-delete\"]"
+                "[data-action=\"not-accepted\"]"
               ],
               "children": [
                 {
                   "type": "outcome",
                   "id": "ds-c11-delete-blocked-dependent",
                   "tree": "C-11",
-                  "label": "A blocked dependent can be deleted after review",
+                  "label": "Nothing in Not accepted is deleted",
                   "gwt": {
-                    "given": "A conflicted predecessor was deleted and the later record is blocked.",
-                    "when": "The worker reviews the later record and confirms its deletion.",
-                    "then": "Only that local record is deleted; uploaded history remains, and this phone has no unsent records."
+                    "given": "Records were not accepted.",
+                    "when": "The worker reads Not accepted.",
+                    "then": "No record is deleted or discarded there."
                   },
                   "authority": [
                     {
                       "src": "PRD",
-                      "at": "Decisions 2026-10-12",
-                      "says": "A dependent blocked by a deleted conflict can only be viewed or deleted individually with confirmation."
+                      "at": "Rules and Decisions 2026-10-18 to 2026-10-20 (PR 235)",
+                      "says": "No record is deleted or discarded there."
                     }
                   ],
                   "visible": [
                     {
                       "text": {
-                        "en": "No records are waiting on this phone",
-                        "zh": "本机暂无待上传记录"
-                      }
-                    },
-                    {
-                      "text": {
-                        "en": "Uploaded in last 30 days · 1",
-                        "zh": "近30天已上传 · 1"
-                      }
-                    },
-                    {
-                      "text": {
-                        "en": "Pen note",
-                        "zh": "栏位备注"
+                        "en": "Discard",
+                        "zh": "放弃"
                       },
                       "absent": true
+                    },
+                    {
+                      "text": {
+                        "en": "Delete",
+                        "zh": "删除"
+                      },
+                      "absent": true
+                    },
+                    {
+                      "text": {
+                        "en": "Already recorded",
+                        "zh": "已有记录"
+                      }
                     }
                   ]
                 }
@@ -777,12 +716,12 @@
     {
       "type": "entry",
       "id": "ds-d3-expired-login.entry",
-      "label": "Original-account sign-in resumes upload",
+      "label": "Signing back in as the same person resumes uploads",
       "children": [
         {
           "type": "state",
           "id": "ds-d3-expired-login.state",
-          "label": "Study fixture: offline",
+          "label": "Study fixture: scenario=expired",
           "tree": "D",
           "reset": {
             "url": "/ux/system/data-sync-astra-prototype.html?scenario=expired"
@@ -791,18 +730,21 @@
             {
               "type": "action",
               "id": "ds-d3-expired-login.act",
-              "label": "The worker signs in again to the original account.",
+              "label": "The worker signs in again as G. Hansen.",
               "taps": [
                 {
                   "expect": [
                     {
                       "text": {
-                        "en": "Sign in to the original account",
-                        "zh": "请重新登录原账号"
+                        "en": "Sign in to keep uploading",
+                        "zh": "登录后继续上传"
                       }
                     },
                     {
-                      "text": "G. Hansen"
+                      "text": {
+                        "en": "Your records are safe on this phone",
+                        "zh": "记录已安全保存在本机"
+                      }
                     }
                   ]
                 },
@@ -824,120 +766,30 @@
                   "type": "outcome",
                   "id": "ds-d3-expired-login",
                   "tree": "D-3",
-                  "label": "Original-account sign-in resumes upload",
+                  "label": "Signing back in as the same person resumes uploads",
                   "gwt": {
-                    "given": "Upload stopped because the original account session expired, while three records remain on this phone.",
-                    "when": "The worker signs in again with the original account.",
-                    "then": "The records remain tied to that account and automatic upload resumes after verification."
+                    "given": "The sign-in expired with records on this phone.",
+                    "when": "The worker signs in again as G. Hansen.",
+                    "then": "Uploads resume and the sign-in bar goes."
                   },
                   "authority": [
                     {
                       "src": "PRD",
-                      "at": "Decisions 2026-10-12",
-                      "says": "Reauthenticate the original account, then resume automatic upload without changing queue ownership."
+                      "at": "Rules and Decisions 2026-10-18 to 2026-10-20 (PR 235)",
+                      "says": "Uploads resume and the sign-in bar goes."
                     }
                   ],
                   "visible": [
-                    {
-                      "text": {
-                        "en": "Uploading automatically",
-                        "zh": "正在自动上传"
-                      }
-                    },
                     {
                       "text": {
                         "en": "Uploading",
                         "zh": "上传中"
                       }
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "type": "entry",
-      "id": "ds-b7-uncertain-receipt.entry",
-      "label": "Q3 — Request accepted without local receipt",
-      "children": [
-        {
-          "type": "state",
-          "id": "ds-b7-uncertain-receipt.state",
-          "label": "Study fixture: receipt unknown",
-          "tree": "B",
-          "reset": {
-            "url": "/ux/system/data-sync-astra-prototype.html?scenario=uncertain&receipt=delayed"
-          },
-          "children": [
-            {
-              "type": "action",
-              "id": "ds-b7-uncertain-receipt.act",
-              "label": "The app queries the server by operation ID before any resend.",
-              "taps": [
-                {
-                  "expect": [
-                    {
-                      "text": {
-                        "en": "Checking server result",
-                        "zh": "正在核对服务端结果"
-                      }
                     },
                     {
                       "text": {
-                        "en": "Checking result",
-                        "zh": "核对结果中"
-                      }
-                    }
-                  ]
-                },
-                {
-                  "advance": "11s"
-                }
-              ],
-              "children": [
-                {
-                  "type": "outcome",
-                  "id": "ds-b7-uncertain-receipt",
-                  "tree": "B-7",
-                  "label": "Q3 — Request accepted without local receipt",
-                  "gwt": {
-                    "given": "The server accepted an operation but its receipt did not reach the phone.",
-                    "when": "The app checks the final result using the original operation ID.",
-                    "then": "The server-confirmed record becomes Uploaded without a duplicate send; no record remains waiting on this phone."
-                  },
-                  "authority": [
-                    {
-                      "src": "PRD",
-                      "at": "Decisions 2026-10-12",
-                      "says": "The server guarantees deduplication and final-result lookup by stable operation ID; confirm the result before marking the local record uploaded."
-                    }
-                  ],
-                  "visible": [
-                    {
-                      "text": {
-                        "en": "No records waiting on this phone",
-                        "zh": "本机暂无待上传记录"
-                      }
-                    },
-                    {
-                      "text": {
-                        "en": "Uploaded in last 30 days · 3",
-                        "zh": "近30天已上传 · 3"
-                      }
-                    },
-                    {
-                      "text": {
-                        "en": "The server confirmed this operation was already received",
-                        "zh": "服务端确认已收到这条操作"
-                      }
-                    },
-                    {
-                      "text": {
-                        "en": "Checking result",
-                        "zh": "核对结果中"
+                        "en": "Sign in to keep uploading",
+                        "zh": "登录后继续上传"
                       },
                       "absent": true
                     }
@@ -951,8 +803,72 @@
     },
     {
       "type": "entry",
+      "id": "ds-b7-uncertain-receipt.entry",
+      "label": "A record whose receipt is being checked shows as uploading",
+      "children": [
+        {
+          "type": "state",
+          "id": "ds-b7-uncertain-receipt.state",
+          "label": "Study fixture: scenario=uncertain",
+          "tree": "B",
+          "reset": {
+            "url": "/ux/system/data-sync-astra-prototype.html?scenario=uncertain"
+          },
+          "children": [
+            {
+              "type": "outcome",
+              "id": "ds-b7-uncertain-receipt",
+              "tree": "B-7",
+              "label": "A record whose receipt is being checked shows as uploading",
+              "gwt": {
+                "given": "A record reached the server but the phone lost the reply.",
+                "when": "The worker opens Saved work.",
+                "then": "It counts as uploading; no checking state is shown."
+              },
+              "authority": [
+                {
+                  "src": "PRD",
+                  "at": "Rules and Decisions 2026-10-18 to 2026-10-20 (PR 235)",
+                  "says": "It counts as uploading; no checking state is shown."
+                }
+              ],
+              "visible": [
+                {
+                  "text": {
+                    "en": "Uploading",
+                    "zh": "上传中"
+                  }
+                },
+                {
+                  "text": {
+                    "en": "Checking result",
+                    "zh": "核对结果中"
+                  },
+                  "absent": true
+                },
+                {
+                  "text": {
+                    "en": "Checking server result",
+                    "zh": "正在核对服务端结果"
+                  },
+                  "absent": true
+                },
+                {
+                  "text": {
+                    "en": "Pregnancy check",
+                    "zh": "孕检"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "entry",
       "id": "ds-a7-global-wait.entry",
-      "label": "Saved work remains visible outside Home",
+      "label": "Home's icon opens Saved work",
       "children": [
         {
           "type": "state",
@@ -995,30 +911,30 @@
                   "type": "outcome",
                   "id": "ds-a7-global-wait",
                   "tree": "A-7",
-                  "label": "Saved work remains visible outside Home",
+                  "label": "Home's icon opens Saved work",
                   "gwt": {
-                    "given": "Three operations are saved on this phone while it is offline.",
-                    "when": "The worker checks the toolbox page.",
-                    "then": "A compact global badge still shows three unsent local records, and opening it provides the automatic-upload explanation."
+                    "given": "Records wait on this phone while another page is open.",
+                    "when": "The worker taps the header's saved-work control.",
+                    "then": "Saved work lists the tasks still holding records."
                   },
                   "authority": [
                     {
                       "src": "PRD",
-                      "at": "Design feedback 2026-10-13",
-                      "says": "Show global saved-work status outside Home."
+                      "at": "Rules and Decisions 2026-10-18 to 2026-10-20 (PR 235)",
+                      "says": "Saved work lists the tasks still holding records."
                     }
                   ],
                   "visible": [
                     {
                       "text": {
-                        "en": "Waiting to upload · 3",
-                        "zh": "待上传 · 3"
+                        "en": "Waiting to upload",
+                        "zh": "等待上传"
                       }
                     },
                     {
                       "text": {
-                        "en": "These records upload automatically when connected",
-                        "zh": "网络恢复后会自动上传这些记录"
+                        "en": "Pregnancy check",
+                        "zh": "孕检"
                       }
                     }
                   ]
@@ -1099,7 +1015,7 @@
     {
       "type": "entry",
       "id": "ds-a7-global-error.entry",
-      "label": "A sync exception stays visible outside Home",
+      "label": "A task with records not accepted says so",
       "children": [
         {
           "type": "state",
@@ -1136,30 +1052,30 @@
                   "type": "outcome",
                   "id": "ds-a7-global-error",
                   "tree": "A-7",
-                  "label": "An exception outside Home opens saved work",
+                  "label": "A task with records not accepted says so",
                   "gwt": {
-                    "given": "A saved operation failed to upload while the worker has another page open.",
-                    "when": "They use the global saved-work status.",
-                    "then": "The same saved-work view opens with the failed operation available for review."
+                    "given": "Some records were not accepted.",
+                    "when": "The worker opens Saved work from the header.",
+                    "then": "The task with records not accepted says so on its row."
                   },
                   "authority": [
                     {
                       "src": "PRD",
-                      "at": "Design feedback 2026-10-13",
-                      "says": "A global exception entry remains available outside Home."
+                      "at": "Rules and Decisions 2026-10-18 to 2026-10-20 (PR 235)",
+                      "says": "The task with records not accepted says so on its row."
                     }
                   ],
                   "visible": [
                     {
                       "text": {
-                        "en": "Needs you · 1",
-                        "zh": "需要处理 · 1"
+                        "en": "2 not accepted",
+                        "zh": "2 条未被接受"
                       }
                     },
                     {
                       "text": {
-                        "en": "Failed",
-                        "zh": "失败"
+                        "en": "Pregnancy check",
+                        "zh": "孕检"
                       }
                     }
                   ]
@@ -1173,134 +1089,48 @@
     {
       "type": "entry",
       "id": "ds-a8-grouped-records.entry",
-      "label": "Many record kinds remain findable",
+      "label": "Many records are one log, not categories",
       "children": [
         {
           "type": "state",
           "id": "ds-a8-grouped-records.state",
-          "label": "Study fixture: 30 records in four categories",
+          "label": "Study fixture: scenario=offline&taskId=preg31",
           "tree": "A",
           "reset": {
-            "url": "/ux/system/data-sync-astra-prototype.html?scenario=busy"
-          },
-          "children": [
-            {
-              "type": "action",
-              "id": "ds-a8-grouped-records.act",
-              "label": "The worker opens the production category after seeing direct exceptions.",
-              "taps": [
-                {
-                  "expect": [
-                    {
-                      "text": {
-                        "en": "Needs you · 2",
-                        "zh": "需要处理 · 2"
-                      }
-                    },
-                    {
-                      "text": {
-                        "en": "Waiting to upload · 24",
-                        "zh": "待上传 · 24"
-                      }
-                    },
-                    {
-                      "text": {
-                        "en": "Production work",
-                        "zh": "生产操作"
-                      }
-                    }
-                  ]
-                },
-                "[data-action=\"open-category\"][data-value=\"production\"]"
-              ],
-              "children": [
-                {
-                  "type": "outcome",
-                  "id": "ds-a8-grouped-records",
-                  "tree": "A-8",
-                  "label": "Many record kinds remain findable",
-                  "gwt": {
-                    "given": "This phone has thirty saved records across several kinds of work.",
-                    "when": "The worker opens the production category after seeing the direct exception rows.",
-                    "then": "The category shows its waiting records directly and can return to the status overview."
-                  },
-                  "authority": [
-                    {
-                      "src": "PRD",
-                      "at": "Design feedback 2026-10-13",
-                      "says": "Show exceptions directly and group many ordinary waiting records by work category."
-                    }
-                  ],
-                  "visible": [
-                    {
-                      "text": {
-                        "en": "Waiting to upload · 6",
-                        "zh": "待上传 · 6"
-                      }
-                    },
-                    {
-                      "text": {
-                        "en": "Pregnancy check",
-                        "zh": "孕检"
-                      }
-                    },
-                    {
-                      "text": {
-                        "en": "Unit inspection",
-                        "zh": "单元巡检"
-                      },
-                      "absent": true
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "type": "entry",
-      "id": "ds-b8-recent-upload-total.entry",
-      "label": "Only recent confirmed uploads count locally",
-      "children": [
-        {
-          "type": "state",
-          "id": "ds-b8-recent-upload-total.state",
-          "label": "Study fixture: two recent uploads and one older than 30 days",
-          "tree": "B",
-          "reset": {
-            "url": "/ux/system/data-sync-astra-prototype.html?scenario=history"
+            "url": "/ux/system/data-sync-astra-prototype.html?scenario=offline&taskId=preg31"
           },
           "children": [
             {
               "type": "outcome",
-              "id": "ds-b8-recent-upload-total",
-              "tree": "B-8",
-              "label": "Only recent confirmed uploads count locally",
+              "id": "ds-a8-grouped-records",
+              "tree": "A-8",
+              "label": "Many records are one log, not categories",
               "gwt": {
-                "given": "The phone has two confirmed uploads within 30 days and one older uploaded fixture.",
-                "when": "The worker opens Saved work.",
-                "then": "Only the last-30-days total is shown; the older unreferenced uploaded fixture is pruned locally and individual uploaded history does not fill the work list."
+                "given": "A task has records in several units.",
+                "when": "The worker opens the task.",
+                "then": "They see one log with the unit switch; there is no category layer."
               },
               "authority": [
                 {
                   "src": "PRD",
-                  "at": "Decisions 2026-10-13",
-                  "says": "Show only a recent uploaded total and keep confirmed local upload history for 30 days."
+                  "at": "Rules and Decisions 2026-10-18 to 2026-10-20 (PR 235)",
+                  "says": "They see one log with the unit switch; there is no category layer."
                 }
               ],
               "visible": [
                 {
                   "text": {
-                    "en": "Uploaded in last 30 days · 2",
-                    "zh": "近30天已上传 · 2"
+                    "en": "All units",
+                    "zh": "全部单元"
                   }
                 },
                 {
+                  "el": ".st-log"
+                },
+                {
                   "text": {
-                    "en": "Pregnancy check",
-                    "zh": "孕检"
+                    "en": "Production work",
+                    "zh": "生产操作"
                   },
                   "absent": true
                 }
@@ -1312,8 +1142,68 @@
     },
     {
       "type": "entry",
+      "id": "ds-b8-recent-upload-total.entry",
+      "label": "Past uploads sit behind the clock",
+      "children": [
+        {
+          "type": "state",
+          "id": "ds-b8-recent-upload-total.state",
+          "label": "Study fixture: scenario=syncing",
+          "tree": "B",
+          "reset": {
+            "url": "/ux/system/data-sync-astra-prototype.html?scenario=syncing"
+          },
+          "children": [
+            {
+              "type": "action",
+              "id": "ds-b8-recent-upload-total.act",
+              "label": "The worker taps the clock on Saved work.",
+              "taps": [
+                "[data-action=\"past\"]"
+              ],
+              "children": [
+                {
+                  "type": "outcome",
+                  "id": "ds-b8-recent-upload-total",
+                  "tree": "B-8",
+                  "label": "Past uploads sit behind the clock",
+                  "gwt": {
+                    "given": "Records uploaded over the last days.",
+                    "when": "The worker taps the clock on Saved work.",
+                    "then": "Past uploads opens, by day, for the last 30 days on this phone."
+                  },
+                  "authority": [
+                    {
+                      "src": "PRD",
+                      "at": "Rules and Decisions 2026-10-18 to 2026-10-20 (PR 235)",
+                      "says": "Past uploads opens, by day, for the last 30 days on this phone."
+                    }
+                  ],
+                  "visible": [
+                    {
+                      "text": {
+                        "en": "Past uploads",
+                        "zh": "已上传记录"
+                      }
+                    },
+                    {
+                      "text": {
+                        "en": "Today",
+                        "zh": "今天"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "entry",
       "id": "ds-a9-task-scope.entry",
-      "label": "Task-owned saved records",
+      "label": "A task's badge opens that task's records",
       "children": [
         {
           "type": "state",
@@ -1339,42 +1229,42 @@
                   "type": "outcome",
                   "id": "ds-a9-task-scope",
                   "tree": "A-9",
-                  "label": "Task scope stays explicit",
+                  "label": "A task's badge opens that task's records",
                   "gwt": {
-                    "given": "Two unsent records belong to Farrowing task 28 and one belongs to a different task.",
-                    "when": "The worker opens the task header badge.",
-                    "then": "Only the two Farrowing records appear first, with an explicit path to all three unsent phone records."
+                    "given": "Farrowing has two records on this phone.",
+                    "when": "The worker taps the task's badge.",
+                    "then": "Farrowing's own records open with the unit switch; no other task's records are listed."
                   },
                   "authority": [
                     {
                       "src": "PRD",
-                      "at": "Decisions 2026-10-13",
-                      "says": "Task pages show this task first, with a path to all records on this phone."
+                      "at": "Rules and Decisions 2026-10-18 to 2026-10-20 (PR 235)",
+                      "says": "Farrowing's own records open with the unit switch; no other task's records are listed."
                     }
                   ],
                   "visible": [
                     {
                       "text": {
-                        "en": "Farrowing · saved work",
-                        "zh": "分娩任务 · 本机记录"
+                        "en": "Farrowing",
+                        "zh": "分娩"
                       }
                     },
                     {
                       "text": {
-                        "en": "Waiting to upload · 2",
-                        "zh": "待上传 · 2"
+                        "en": "000418 · 9 alive · 5 dead",
+                        "zh": "000418 · 9 活 · 5 死"
                       }
                     },
                     {
                       "text": {
-                        "en": "All records on this phone · 3",
-                        "zh": "查看本机全部记录 · 3"
+                        "en": "All units",
+                        "zh": "全部单元"
                       }
                     },
                     {
                       "text": {
-                        "en": "Pregnancy check · sow 000308",
-                        "zh": "孕检 · 母猪 000308"
+                        "en": "Pregnancy check",
+                        "zh": "孕检"
                       },
                       "absent": true
                     }
@@ -1392,65 +1282,53 @@
     {
       "type": "entry",
       "id": "ds-a9-task-all.entry",
-      "label": "Task-owned saved records",
+      "label": "A task's records have no link to the whole phone",
       "children": [
         {
           "type": "state",
           "id": "ds-a9-task-all.state",
-          "label": "Study fixture: Farrowing task has two pending records and this phone has three",
+          "label": "Study fixture: scenario=offline&taskId=farrow28&from=task",
           "tree": "A",
           "reset": {
-            "url": "/ux/system/data-sync-astra-prototype.html?scenario=offline&taskId=farrow28&from=task",
-            "screen": "data-sync.task-list"
+            "url": "/ux/system/data-sync-astra-prototype.html?scenario=offline&taskId=farrow28&from=task"
           },
           "children": [
             {
-              "type": "action",
-              "id": "ds-a9-task-all.act",
-              "label": "The worker taps All records on this phone from the task list.",
-              "taps": [
+              "type": "outcome",
+              "id": "ds-a9-task-all",
+              "tree": "A-9",
+              "label": "A task's records have no link to the whole phone",
+              "gwt": {
+                "given": "The worker opened Farrowing's records from its badge.",
+                "when": "They read the task page.",
+                "then": "It shows this task with the unit switch; the whole phone is Home's, not a link here."
+              },
+              "authority": [
                 {
-                  "tap": "[data-action=\"show-all\"]"
+                  "src": "PRD",
+                  "at": "Rules and Decisions 2026-10-18 to 2026-10-20 (PR 235)",
+                  "says": "It shows this task with the unit switch; the whole phone is Home's, not a link here."
                 }
               ],
-              "children": [
+              "visible": [
                 {
-                  "type": "outcome",
-                  "id": "ds-a9-task-all",
-                  "tree": "A-9",
-                  "label": "Task scope stays explicit",
-                  "gwt": {
-                    "given": "Two unsent records belong to Farrowing task 28 and one belongs to a different task.",
-                    "when": "The worker taps All records on this phone from the task list.",
-                    "then": "The phone-wide list shows three unsent records, including the different task."
+                  "text": {
+                    "en": "All records on this phone",
+                    "zh": "查看本机全部记录"
                   },
-                  "authority": [
-                    {
-                      "src": "PRD",
-                      "at": "Decisions 2026-10-13",
-                      "says": "Task pages show this task first, with a path to all records on this phone."
-                    }
-                  ],
-                  "visible": [
-                    {
-                      "text": {
-                        "en": "Saved work",
-                        "zh": "本机记录"
-                      }
-                    },
-                    {
-                      "text": {
-                        "en": "Waiting to upload · 3",
-                        "zh": "待上传 · 3"
-                      }
-                    },
-                    {
-                      "text": {
-                        "en": "Pregnancy check · sow 000308",
-                        "zh": "孕检 · 母猪 000308"
-                      }
-                    }
-                  ]
+                  "absent": true
+                },
+                {
+                  "text": {
+                    "en": "Week 42",
+                    "zh": "第 42 周"
+                  }
+                },
+                {
+                  "text": {
+                    "en": "All units",
+                    "zh": "全部单元"
+                  }
                 }
               ]
             }
@@ -1522,7 +1400,7 @@
     {
       "type": "entry",
       "id": "ds-a12-other-task.entry",
-      "label": "Phone-wide fallback stays explicit",
+      "label": "From a task with none of its own, the badge opens Saved work",
       "children": [
         {
           "type": "state",
@@ -1555,28 +1433,34 @@
                   "type": "outcome",
                   "id": "ds-a12-other-task",
                   "tree": "A-12",
-                  "label": "Other tasks do not masquerade as this task",
+                  "label": "From a task with none of its own, the badge opens Saved work",
                   "langs": [
                     "en"
                   ],
                   "gwt": {
-                    "given": "This Farrowing task has no unsent work, while three records from other tasks remain on this phone.",
-                    "when": "The worker opens the header status.",
-                    "then": "The header says All 3 and opens the phone-wide list of three waiting records."
+                    "given": "This Farrowing task has nothing waiting but other tasks do.",
+                    "when": "The worker opens the records.",
+                    "then": "Saved work lists the tasks still holding records."
                   },
                   "authority": [
                     {
                       "src": "PRD",
-                      "at": "Rules 2026-10-13",
-                      "says": "The task header marks task and phone scopes explicitly."
+                      "at": "Rules and Decisions 2026-10-18 to 2026-10-20 (PR 235)",
+                      "says": "Saved work lists the tasks still holding records."
                     }
                   ],
                   "visible": [
                     {
-                      "text": "Saved work"
+                      "text": {
+                        "en": "Saved work",
+                        "zh": "本机记录"
+                      }
                     },
                     {
-                      "text": "Waiting to upload · 3"
+                      "text": {
+                        "en": "Other records",
+                        "zh": "其他记录"
+                      }
                     }
                   ]
                 }
@@ -1649,34 +1533,28 @@
     {
       "type": "entry",
       "id": "ds-a10-grouping-stable.entry",
-      "label": "Grouping stays stable while a record uploads",
+      "label": "The log keeps its layout as the connection changes",
       "children": [
         {
           "type": "state",
           "id": "ds-a10-grouping-stable.state",
-          "label": "Nine waiting records span production and inspections",
+          "label": "Study fixture: scenario=offline&taskId=preg31",
           "tree": "A",
           "reset": {
-            "url": "/ux/system/data-sync-astra-prototype.html?scenario=threshold"
+            "url": "/ux/system/data-sync-astra-prototype.html?scenario=offline&taskId=preg31"
           },
           "children": [
             {
               "type": "action",
               "id": "ds-a10-grouping-stable.act",
-              "label": "Connection returns and one of nine records is confirmed uploaded",
+              "label": "The connection drops and returns.",
               "taps": [
                 {
                   "expect": [
                     {
                       "text": {
-                        "en": "Waiting to upload · 9",
-                        "zh": "待上传 · 9"
-                      }
-                    },
-                    {
-                      "text": {
-                        "en": "Production work",
-                        "zh": "生产操作"
+                        "en": "All units",
+                        "zh": "全部单元"
                       }
                     }
                   ]
@@ -1693,42 +1571,40 @@
                   "type": "outcome",
                   "id": "ds-a10-grouping-stable",
                   "tree": "A-10",
-                  "label": "Nine-to-eight transition does not rearrange the list",
+                  "label": "The log keeps its layout as the connection changes",
                   "gwt": {
-                    "given": "The worker opened a grouped view of nine waiting records from two categories.",
-                    "when": "The connection returns and one record is confirmed uploaded.",
-                    "then": "The count becomes eight, the category entry remains in place, and the uploaded total rises to one."
+                    "given": "The worker has a task's log open.",
+                    "when": "The connection drops and returns.",
+                    "then": "The log and the unit switch stay as they were; no category layout appears."
                   },
                   "authority": [
                     {
                       "src": "PRD",
-                      "at": "Rules 2026-10-13",
-                      "says": "Choose grouping on entry and keep that layout stable while automatic uploads update counts."
+                      "at": "Rules and Decisions 2026-10-18 to 2026-10-20 (PR 235)",
+                      "says": "The log and the unit switch stay as they were; no category layout appears."
                     }
                   ],
                   "visible": [
                     {
                       "text": {
-                        "en": "Waiting to upload · 8",
-                        "zh": "待上传 · 8"
+                        "en": "All units",
+                        "zh": "全部单元"
                       }
+                    },
+                    {
+                      "el": ".st-log"
                     },
                     {
                       "text": {
                         "en": "Production work",
                         "zh": "生产操作"
-                      }
+                      },
+                      "absent": true
                     },
                     {
                       "text": {
-                        "en": "Uploaded in last 30 days · 1",
-                        "zh": "近30天已上传 · 1"
-                      }
-                    },
-                    {
-                      "text": {
-                        "en": "Pregnancy check · 000300",
-                        "zh": "孕检 · 000300"
+                        "en": "Waiting to upload · 9",
+                        "zh": "待上传 · 9"
                       },
                       "absent": true
                     }

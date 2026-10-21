@@ -18,25 +18,18 @@
     <div class="stage">
       <aside class="design-notes">
         <p class="eyebrow">SAVED ON THIS PHONE</p>
-        <h1>Keep work safe.<br>Make status clear.</h1>
-        <p class="intro">Records upload automatically when the connection is usable. A failed or conflicted record remains visible for review.</p>
+        <h1>Quiet while work is safe.<br>Told when it isn't accepted.</h1>
+        <p class="intro">Saved work lists tasks; a task is one log of what is still on the phone. Records the farm didn't accept are told, never asked about.</p>
         <div class="sync-demo">
           <label for="scenario">Scenario preview</label>
           <select id="scenario" class="scenario">
-            <option value="offline">Offline · waiting on this phone</option>
-            <option value="busy">Many kinds of saved work · grouped</option>
-            <option value="threshold">Nine to eight records · grouping stays put</option>
-            <option value="syncing">Connection restored · syncing</option>
-            <option value="uncertain">Response lost · check server result</option>
-            <option value="partial">Partial success · one failed</option>
-            <option value="conflict">Conflict · manual action</option>
-            <option value="blocked">Later operation blocked</option>
-            <option value="done">All uploaded</option>
-            <option value="history">Uploaded history · 30-day boundary</option>
-            <option value="switch">Account change blocked</option>
-            <option value="expired">Original account sign-in needed</option>
+            <option value="offline">No connection · waiting to upload</option>
+            <option value="syncing">Connected · uploading</option>
+            <option value="done">Everything has uploaded</option>
+            <option value="expired">Signed out · sign in to keep uploading</option>
+            <option value="switch">Switching farm with records waiting</option>
           </select>
-          <p>Illustrative local records. No server request is sent.</p>
+          <p>Illustrative records on one phone. Nothing is sent.</p>
         </div>
         <div class="sync-demo"><label for="language">Language preview</label><select id="language"><option value="en">English</option><option value="zh">中文</option></select></div>
       </aside>
