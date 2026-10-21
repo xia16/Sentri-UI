@@ -25,13 +25,10 @@ const navItem = (nav, key, html, count, onclick) => {
 
 /* ---------- Components ---------- */
 let initialVariant = new URLSearchParams(location.search).get('variant');
-let COMPONENT_GROUPS = [
-  ['Base', ['Button', 'IconButton', 'Icon', 'Heading', 'Row', 'Panel', 'Facts', 'Log', 'Sheet', 'Segment', 'ChoiceList', 'CategoryFooter']],
-  ['Inputs and filters', ['FilterSheet', 'RangeSlider']],
-  ['Fields', ['Field', 'PickerField', 'Stepper', 'Measure', 'Numpad']],
-  ['Status and feedback', ['Status', 'ConditionTag', 'Banner', 'Photos']],
-  ['Task skeleton', ['TaskPhone', 'TaskHeader', 'TaskSummary', 'TaskLens', 'TaskGroup', 'TaskDock', 'TaskHold', 'TaskTotals', 'TaskProgress', 'TaskStepper', 'TaskPhotos', 'TaskChoice', 'TaskRadios', 'TaskWarning', 'TaskTable', 'TaskMetrics', 'TaskSection', 'TaskReceipt', 'TaskDay', 'TaskChips']],
-];
+/* the groups come from atlas.json (ux/design-system/components/_groups.json), filled in renderComponents */
+let COMPONENT_GROUPS = [];
+/* the task page's README-only parts: one nav entry, the skeleton demo, until each is merged into its group */
+const TASK_GROUP = 'Task pages';
 const SKELETON_DEMO = `${DS}/components/task-skeleton-demo.html`;
 const nameWords = (n) => n.replace(/([a-z])([A-Z])/g, '$1 $2');
 
@@ -138,12 +135,12 @@ async function renderComponents() {
   };
   navItem(nav, 'Cover', 'Cover', null, () => go('Cover'));
   Object.entries(pages).forEach(([k, n]) => navItem(nav, k, n, null, () => go(k)));
-  COMPONENT_GROUPS.filter((g) => g[0] !== 'Task skeleton').forEach(([g, names]) => {
+  COMPONENT_GROUPS.filter((g) => g[0] !== TASK_GROUP).forEach(([g, names]) => {
     nav.append(el(`<h5>${esc(g)}</h5>`));
     names.forEach((n) => navItem(nav, n, `${dot(stOf(n))}${esc(n)}`, null, () => go(n)));
   });
-  nav.append(el('<h5>Task skeleton</h5>'));
-  navItem(nav, '_task', `${dot('in-design')}Task skeleton (to be organised)`, null, () => go('_task'));
+  nav.append(el(`<h5>${TASK_GROUP}</h5>`));
+  navItem(nav, '_task', `${dot('in-design')}Task skeleton (to be merged)`, null, () => go('_task'));
   document.querySelector('.lib aside > p').textContent = `Mobile app · ${count} parts. ` + 'A part is set when the first feature using it freezes.';
 
   const compLink = (u) => { const m = u.match(/(?:^|\/)([A-Za-z]+)\/README\.md$/); return m && COMPONENT_GROUPS.some((g) => g[1].includes(m[1])) ? '?view=components&component=' + m[1] : null; };
@@ -191,12 +188,12 @@ async function renderComponents() {
     pane.append(el(`<div class="scale">${t.radius.tokens.map((s) => `<div>${esc(s.name)}<code>${esc(s.value)}</code></div><div><div class="box" style="border-radius:${esc(s.value)}"></div></div><small>${esc(s.usage)}</small>`).join('')}</div>`));
   }
   async function pageTask() {
-    pane.append(el('<h2>Task skeleton (to be organised)</h2>'));
+    pane.append(el('<h2>Task skeleton (to be merged)</h2>'));
     pane.append(el(`<div class="cmeta">${dot('in-design')}<span class="t">${esc(STATUS['in-design'])}</span></div>`));
-    pane.append(el('<p class="muted" style="max-width:720px;margin:0 0 14px">Extracted from Farrowing in one go (ADR 0003). Most of these are the task page’s structure (they belong on the Tasks section’s Task skeleton page), some duplicate base components, two belong to Piglet processing. Organised in the component pass (#45).</p>'));
+    pane.append(el('<p class="muted" style="max-width:720px;margin:0 0 14px">Extracted from Farrowing in one go (ADR 0003). Most of these are the task page’s structure; several duplicate a part in another group (TaskRadios is ChoiceList’s radio, TaskSection a Panel, TaskTotals and TaskMetrics are Facts) and are folded into it one merge at a time.</p>'));
     pane.append(el(`<iframe class="preview" title="Task skeleton demo" src="${SKELETON_DEMO}" style="width:100%;height:900px;border:1px solid var(--line)"></iframe>`));
     pane.append(el('<h3>Parts</h3>'));
-    const names = (COMPONENT_GROUPS.find((g) => g[0] === 'Task skeleton') || [0, []])[1];
+    const names = (COMPONENT_GROUPS.find((g) => g[0] === TASK_GROUP) || [0, []])[1];
     pane.append(el(`<div class="usedby">${names.map((n) => `<a href="${DS}/components/${esc(n)}/README.md" target="_blank" rel="noopener">${esc(n)}</a>`).join('')}</div>`));
   }
   async function pageComponent(name) {
@@ -274,7 +271,7 @@ async function renderComponents() {
     show(tabs.some((t) => t.id === want) ? want : 'overview');
   }
   const want = q.get('component');
-  const inTask = want && (COMPONENT_GROUPS.find((g) => g[0] === 'Task skeleton') || [0, []])[1].includes(want);
+  const inTask = want && (COMPONENT_GROUPS.find((g) => g[0] === TASK_GROUP) || [0, []])[1].includes(want);
   go(inTask || want === '_task' ? '_task' : want && (pages[want] || want === 'Cover' || COMPONENT_GROUPS.some((g) => g[1].includes(want))) ? want : 'Cover');
 }
 
