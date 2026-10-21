@@ -3172,7 +3172,7 @@
             "at": "Ear tag or pen",
             "shows": "A full-height page, not a drawer. The field is pinned at the top and focused when the page opens: a search icon, the typed text, a clear ✕ (only once something is typed), a scan icon button inside the field and Cancel beside it. No unit is named in the header: the search covers every unit.",
             "rule": "Cancel returns to the room list; the clear ✕ empties the field and keeps the page; the scan icon opens Scan ear tags. The prototype's field asks for plain text with no auto-capital and no suggestions, because a web page cannot ask for a number-first keyboard. Natively the keyboard is number-first with an ABC switch: iOS numbersAndPunctuation, and on Android a number-first keyboard with a 123/ABC toggle.",
-            "source": "farrowing-astra-concept.js searchPage()"
+            "source": "farrowing-astra-concept.js searchPage() on SentriUI.findPage (components/Lookup)"
           }
         ],
         "controls": [
@@ -3289,7 +3289,7 @@
             "at": "Hold the reader to an ear tag",
             "shows": "A scan icon, \"Hold the reader to an ear tag\" and \"Each sow you scan appears here.\" Nothing else on the page but the header and the footer's Stop scanning.",
             "rule": "The first scan replaces this with the list. If the worker stops scanning before any scan, the line reads \"Scanning is stopped\" / \"Resume scanning to add sows.\"",
-            "source": "farrowing-astra-concept.js scanPage()"
+            "source": "farrowing-astra-concept.js scanPage() on SentriUI.scanPage (components/Lookup)"
           },
           {
             "name": "Footer",
@@ -3313,7 +3313,7 @@
               }
             ],
             "rule": "Stop scanning only pauses listening: the list stays. The footer is the only Scanning status (owner, 2026-10-20: a second status in the body repeated it).",
-            "source": "farrowing-astra-concept.js scanPage()"
+            "source": "farrowing-astra-concept.js scanPage() on SentriUI.scanPage (components/Lookup)"
           }
         ],
         "controls": [
@@ -3359,7 +3359,7 @@
             "at": "Scanner not connected",
             "shows": "A scan icon, \"Scanner not connected\" and \"Turn on the tag reader and pair it in your phone's Bluetooth settings. Scanning starts as soon as it connects.\" There are no buttons: the back arrow leaves.",
             "rule": "The page changes to \"Hold the reader to an ear tag\" by itself once a reader connects.",
-            "source": "farrowing-astra-concept.js scanPage()"
+            "source": "farrowing-astra-concept.js scanPage() on SentriUI.scanPage (components/Lookup)"
           }
         ],
         "copy": [
@@ -3396,7 +3396,7 @@
             "shows": "The sows scanned in this visit, one white card per unit under its plain section heading (\"Unit 7\", \"Unit 6\"), this unit first, newest scan first within each card; no count beside the heading. Every row is the design system's Row, animal variant with the sow's Farrowing state on the right (the room's row, without the initials so the line under the ear tag stays on one line (\"Pen B1 · 1h ago\"), the same in every unit because the heading names the unit), drawn as a select + door.",
             "logic": "A sow is added the first time she is scanned: her row slides in at the top of her unit's card and the rows under it glide down (no jump); a unit's card fades in with its heading the first time one of its sows is scanned. Scanning her again adds nothing. Either way her row takes a soft tint for 1.6 s, then fades, and is brought into view, so the worker finds her after looking up from the pig. Each row keeps its own tint, so scans in quick succession light row after row and none cuts another short. The list stays while the worker opens a sow and comes back.",
             "rule": "The tick box selects; the rest of the row opens her. A sow in this unit opens her farrowing drawer, and Back returns to this list; a sow in another unit opens the same drawer (its subtitle names her unit, \"Unit 6 · A2 / Parity 4\"), and Back returns here too. The scanner is always listening: there is no \"ready for the next tag\" banner and no \"not found\" row.",
-            "source": "farrowing-astra-concept.js scanPage(), scanAdd(), sowRow()"
+            "source": "farrowing-astra-concept.js scanPage() on SentriUI.scanPage (components/Lookup), scanAdd(), sowRow()"
           }
         ],
         "controls": [],
@@ -3431,7 +3431,7 @@
             "at": "004318",
             "shows": "Her row takes the pale progress wash (blue), the same for a new sow and for a repeat scan. Not the well tint, which marks a ticked row, and not amber or red, which are status.",
             "logic": "Every scan lights its row on its own clock and brings it into view smoothly; the tint fades over about a second when its 1.6 s are up. A new row slides in and the rows under it glide down. Reduced motion keeps the tint and drops the slide and the fade.",
-            "source": "farrowing-astra-concept.js scanAdd(), scanLights(), scanGlide(); Row's Just scanned state (data-arrival, design system)"
+            "source": "farrowing-astra-concept.js scanAdd(); SentriUI.scanArrive(), scanPlaces(), scanGlide() (components/Lookup); Row's Just scanned state (data-arrival, design system)"
           }
         ],
         "controls": [],
@@ -3467,7 +3467,7 @@
             "at": "Actions",
             "shows": "The count \"2 sows selected\" on the left, as plain text with nothing to tap, and the primary \"Actions\" (the word Actions, with the more glyph) on the right, in place of Stop scanning.",
             "rule": "To untick a sow, tap her box in the list; there is no separate review of the selection. Actions opens the Actions sheet. Scanning goes on while sows are ticked, and a new scan arrives unticked. Unticking the last sow brings Stop scanning back.",
-            "source": "farrowing-astra-concept.js scanPage(), scanAction()"
+            "source": "farrowing-astra-concept.js scanPage() on SentriUI.scanPage (components/Lookup), scanAction()"
           }
         ],
         "copy": [
@@ -3499,7 +3499,7 @@
             "at": "Resume scanning",
             "shows": "The footer's one full-width button, now primary with the scan glyph.",
             "rule": "While stopped the reader adds nothing (a scan is ignored). The list and any ticks stay, and ticking still works. Resume scanning listens again.",
-            "source": "farrowing-astra-concept.js scanPage(), scanAction()"
+            "source": "farrowing-astra-concept.js scanPage() on SentriUI.scanPage (components/Lookup), scanAction()"
           }
         ],
         "copy": [
