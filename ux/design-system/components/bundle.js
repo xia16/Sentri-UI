@@ -1096,7 +1096,7 @@
   }
   /* The page header: Back (48px, the bordered icon button) at the top left, the title left-aligned, the optional header line
      under it, then space-section (24px) to the body. Every page and every top page of a task has it; its footer has no Back.
-     ds names the part for the atlas (Sheet for a sheet page, TaskHeader for a task screen). */
+     ds names the part for the atlas (Sheet for a sheet page, Header for a task screen). */
   function pageHeader({title,back={action:'back'},line=null,level=2,ds='Sheet',className='',action=null}={}){
     const b=back||{action:'back'},h=level===1?'h1':'h2';
     const backHtml=`<button type="button" class="st-page-back"${sA(b.action||'back',b.value)}${sL(b.label,{text:'Back',str:'act.back'})}>${sGlyph('back-chevron')}</button>`;
