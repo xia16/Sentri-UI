@@ -1,4 +1,6 @@
-# Panel, Icon and CategoryFooter verification
+# Panel and Icon verification
+
+CategoryFooter's proof was removed with the component (2026-10-21); its history is in git.
 
 2026-10-10, branch `45-panel-icon-footer`. Implementation and owner laws were checked against [the component standard](../../../../docs/design-workflow/research/component-standard.md). The primary reference is the ADM / TDesign guidance recorded there: explicit usage, one component with variants, token properties and complete examples. M3 / Apple inform states, target sizes and accessible content. This is a self-check; original frontier-model scores in gate.json are preserved alongside resolution notes.
 

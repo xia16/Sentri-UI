@@ -119,21 +119,6 @@ export interface LogEntry {
 export interface LogDayOptions { now?: Date | number | string; lang?: string; today?: string; yesterday?: string }
 export interface LogGroup { label?: string; description?: string; entries: LogEntry[]; strs?: Strs<'label' | 'description'>; args?: StrArgs<'label' | 'description'> }
 
-export interface Category { id: string; label: string; strs?: Strs<'label'>; args?: StrArgs<'label'> }
-export interface CategoryFooterProps {
-  categories: Category[];
-  active?: string;
-  /** Default "back". */
-  backAction?: string;
-  /** Default "action-category". */
-  categoryAction?: string;
-  /** Accessible name of the tab nav; default "Action categories". */
-  label?: string;
-  className?: string;
-  /** back = the Back text. The nav `label` is an aria-label and has no twin. */
-  strs?: Strs<'back'>;
-  args?: StrArgs<'back'>;
-}
 
 export interface PickerItem { group?: string; disabled?: boolean; reason?: string; strs?: Strs<'label' | 'meta'>; args?: StrArgs<'label' | 'meta'>; value: string; label: string; meta?: string; aliases?: string[]; secondaryAction?: {label: string; action: string}; children?: PickerItem[]; attrs?: SafeAttrs }
 export interface PickerBodyProps { variant?: 'single' | 'multi' | 'cascade' | 'cascade-multi'; items?: PickerItem[]; selected?: string[]; path?: string[]; query?: string; action?: string; stepAction?: string; searchAttrs?: SafeAttrs; loading?: boolean; error?: string; strs?: Strs<'search' | 'all' | 'loading' | 'error' | 'empty' | 'noMatch'>; args?: StrArgs<'search' | 'all' | 'loading' | 'error' | 'empty' | 'noMatch'> }
@@ -677,7 +662,6 @@ export interface SentriUI {
   /** Flat entries with `at` become newest-first day groups; undated entries go last under `earlier`. */
   logGroups(entries: LogEntry[], options?: LogDayOptions & { earlier?: string }): LogGroup[];
   log(groups: LogGroup[], options?: { empty?: string; kind?: 'day' | 'categorised'; correctedLabel?: string; className?: string; strs?: Strs<'empty'>; args?: StrArgs<'empty'> }): string;
-  categoryFooter(props: CategoryFooterProps): string;
   field(props: { label?: string; control?: string; className?: string; ds?: string; variant?: 'text' | 'number' | 'textarea'; value?: string; unit?: string; hint?: string; error?: string; disabled?: boolean; reason?: string; id?: string; placeholder?: string; labelHidden?: boolean; focus?: boolean; /** The muted "Optional" word beside the label (true: registry ds.field.optional; a string: the word already localized). */ optional?: boolean | string }): string;
   pickerField(props: PickerFieldProps): string;
   pickerOptions(props: { options: PickerOption[]; selected?: string | string[]; action?: string; className?: string; variant?: 'single' | 'multi'; loading?: boolean; error?: string }): string;
