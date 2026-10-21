@@ -142,7 +142,7 @@ Used by Inspection: Record health, Edit conditions, Care instructions, Resolve c
 
 ## Related
 
-[Button](../Button/README.md) (footer actions, the waiting face, hold) · [IconButton](../IconButton/README.md) · [Heading](../Heading/README.md) · [Panel](../Panel/README.md) (panels inside a drawer are `inset`, on a page `paper`) · [Banner](../Banner/README.md) · [Status](../Status/README.md) · [CategoryFooter](../CategoryFooter/README.md) (a footer with section tabs, built on Back).
+[Button](../Button/README.md) (footer actions, the waiting face, hold) · [IconButton](../IconButton/README.md) · [Heading](../Heading/README.md) · [Panel](../Panel/README.md) (panels inside a drawer are `inset`, on a page `paper`) · [Banner](../Banner/README.md) · [Status](../Status/README.md).
 
 ## Tokens used
 

@@ -100,8 +100,7 @@ test("main's library is organised: every component folder is grouped or retired"
   const lib = readLibrary(root);
   assert.ok(lib.folders.length >= 40, 'the folders are read');
   assert.deepEqual(libraryProblems(lib), []);
-  assert.ok(!lib.folders.find((f) => f.name === 'Cover').component, 'Cover (a preview card, no README, gate or variants) is not a part');
-  assert.ok(lib.folders.find((f) => f.name === 'CategoryFooter').retired, 'CategoryFooter is retired by its gate.json');
+  assert.ok(lib.folders.find((f) => f.name === 'TaskHold').retired, 'TaskHold is retired by its gate.json');
 });
 
 test('a component folder outside every group, or a new export with no grouped home, fails the library check', () => {

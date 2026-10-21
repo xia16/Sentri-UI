@@ -1,6 +1,6 @@
 {
  "measured": "2026-10-21",
- "commit": "3f307fe0",
+ "commit": "fcca8a70",
  "screens": 362,
  "failed": [],
  "components": {
@@ -290,16 +290,6 @@
    ],
    "apis": [],
    "files": []
-  },
-  "CategoryFooter": {
-   "screens": [],
-   "features": [],
-   "apis": [
-    "SentriUI.categoryFooter"
-   ],
-   "files": [
-    "ux/system/sentri-components-study.js"
-   ]
   },
   "ChoiceList": {
    "screens": [
@@ -2747,19 +2737,6 @@
     "ux/tasks/piglet-processing/id.html",
     "ux/tasks/piglet-processing/litter.js",
     "ux/tasks/piglet-processing/move.html",
-    "ux/tasks/piglet-processing/simple/app.js",
-    "ux/tasks/piglet-processing/simple/dist/app.html"
-   ]
-  },
-  "TaskChips": {
-   "screens": [],
-   "features": [],
-   "apis": [
-    "SentriUI.filterChips",
-    "SentriTask.chips",
-    "SentriTask.T"
-   ],
-   "files": [
     "ux/tasks/piglet-processing/simple/app.js",
     "ux/tasks/piglet-processing/simple/dist/app.html"
    ]
