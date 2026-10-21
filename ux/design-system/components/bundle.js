@@ -147,15 +147,15 @@
     const danger=tone==='danger',name=title&&!holds?label+', '+title:(title||label);
     return `<button type="button" class="st-row-tile${danger?' is-danger':''}${className?' '+esc(className):''}" data-ds="Row" data-variant="tile" data-action="${esc(action)}" data-value="${esc(value)}" aria-label="${esc(name)}"${safeAttr(attrs)}><span class="st-row-tile-icon" aria-hidden="true">${icon}</span><span class="st-row-tile-label">${esc(label)}</span></button>`;
   }
-  /* The tile grid: one panel, always two rows (one only for a single tile), split evenly so row two is never short by more than one
-     (5 = 3+2, 6 = 3+3, 8 = 4+4, 10 = 5+5), at most five across. Danger tiles never fold and are always the last tile. Over ten,
+  /* The tile grid: one panel. One to five tiles sit in one row (owner, 2026-10-20: two rows only from six); six to ten take two rows,
+     split as evenly as possible (6 = 3+3, 7 = 4+3, 8 = 4+4, 9 = 5+4, 10 = 5+5), at most five across. Danger tiles never fold and are always the last tile. Over ten,
      nine show and `more` (a tile that opens the rest in place) sits just before the danger tiles; `expanded` shows them all in
      even rows of at most five (11 = 4+4+3). */
   function rowGrid(tiles=[],{more=null,expanded=false,label='',className=''}={}){
     const calm=tiles.filter(t=>t.tone!=='danger'),danger=tiles.filter(t=>t.tone==='danger'),ordered=[...calm,...danger];
     const folded=ordered.length>10&&!expanded&&!!more,shown=folded?[...calm.slice(0,Math.max(0,9-danger.length)),...danger]:ordered,slots=shown.length+(folded?1:0);
     if(!slots)return '';
-    const rows=slots<2?1:Math.max(2,Math.ceil(slots/5)),cols=Math.ceil(slots/rows);
+    const rows=Math.ceil(slots/5),cols=Math.ceil(slots/rows);
     const moreTile=folded?rowTile(Object.assign({label:'More',title:`${ordered.length-9} more actions`,icon:SentriIcons.icon('more')},more)):'';
     const calmShown=shown.filter(t=>t.tone!=='danger'),dangerShown=shown.filter(t=>t.tone==='danger');
     return `<div class="st-panel st-row-grid${className?' '+esc(className):''}" data-ds="Row" role="group"${label?` aria-label="${esc(label)}"`:''} style="--st-row-grid-cols:${cols}">${calmShown.map(rowTile).join('')}${moreTile}${dangerShown.map(rowTile).join('')}</div>`;
@@ -423,23 +423,28 @@
   }
   /* Toast: what was just saved, over the page above its dock, for a few seconds. title: what was done; detail: for whom, or where it went;
      tone 'done' (a check on the green) or 'offline' (no-signal on the ink: saved on this phone), else no glyph. */
-  function toast(title,{detail='',tone='',strs,args}={}){const glyph=tone==='done'?'check':tone==='offline'?'offline':'';return `<div class="st-toast${tone?' st-toast--'+tone:''}" data-ds="Toast" role="status">${glyph&&root.SentriIcons?`<span class="st-toast-glyph" aria-hidden="true">${root.SentriIcons.icon(glyph)}</span>`:''}<span class="st-toast-copy"><strong class="st-toast-title">${tx(title,{strs,args},'title')}</strong>${detail?`<span class="st-toast-detail">${tx(detail,{strs,args},'detail')}</span>`:''}</span></div>`}
+  /* Toast: a save confirmed for a few seconds (done, offline, plain). standing ({ action, value, label }): the standing form (owner,
+     2026-10-20) — it stays in the page's flow until what it reports is looked at, and the whole box is one door with a chevron.
+     notice (a neutral note glyph): records that weren't accepted; attention (a red disc): a person must act (signed out). */
+  function toast(title,{detail='',tone='',standing=null,strs,args}={}){const glyph=tone==='done'?'check':tone==='offline'?'offline':tone==='notice'?'note':tone==='attention'?'alert':'';const inner=`${glyph&&root.SentriIcons?`<span class="st-toast-glyph" aria-hidden="true">${root.SentriIcons.icon(glyph)}</span>`:''}<span class="st-toast-copy"><strong class="st-toast-title">${tx(title,{strs,args},'title')}</strong>${detail?`<span class="st-toast-detail">${tx(detail,{strs,args},'detail')}</span>`:''}</span>`;if(standing)return `<button type="button" class="st-toast st-toast--standing${tone?' st-toast--'+tone:''}" data-ds="Toast" data-variant="standing" data-action="${esc(standing.action||'')}" data-value="${esc(standing.value||'')}"${standing.label?` aria-label="${esc(standing.label)}"`:''}>${inner}<span class="st-toast-chevron" aria-hidden="true">${root.SentriIcons?root.SentriIcons.icon('chevron'):''}</span></button>`;return `<div class="st-toast${tone?' st-toast--'+tone:''}" data-ds="Toast" role="status">${inner}</div>`}
   function choiceEmpty(text,{strs,args,title,icon}={}){if(title)return `<div class="st-choice-empty st-choice-empty--lead" data-ds="ChoiceList" role="status">${icon&&globalThis.SentriIcons?`<span class="st-choice-empty-icon" aria-hidden="true">${globalThis.SentriIcons.icon(icon)}</span>`:''}<strong class="st-choice-empty-title">${tx(title,{strs,args},'title')}</strong><span class="st-choice-empty-text">${tx(text,{strs,args},'text')}</span></div>`;return `<p class="st-choice-empty" data-ds="ChoiceList" role="status">${tx(text,{strs,args},'text')}</p>`;}
   /* options: [value,label,{strs:{label},args:{label}}?]; label is raw HTML, kept as the span's fallback. */
+  /* variant 'scope' (owner, 2026-10-20; from Home's Overview | Choose unit): the whole list, or one part of it picked in a drawer.
+     Two options: the whole (with its count) and a door ({door:true}) that names the current part, or "Choose …" when none is picked. */
   function segment({options=[],active='',action='',className='',ariaLabel='',variant='two-line-lens',state='Default',disabled=false,reason=''}={}){
     if(!options.length)return '';
-    return `<div class="st-selection"><div class="st-segment ${esc(className)}" data-ds="Segment" data-variant="${esc(variant)}" data-state="${esc(state)}" role="group" aria-label="${esc(ariaLabel)}">${options.map(([v,label,x={}])=>{const blocked=disabled||x.disabled;return `<button type="button" data-action="${esc(action)}" data-value="${esc(v)}" aria-pressed="${v===active}"${x.ariaLabel?` aria-label="${esc(x.ariaLabel)}"`:""}${blocked?' disabled':''}><span class="st-selection-label"${has(x,'label')?sa(x.strs.label,x.args&&x.args.label):''}>${label}</span>${x.count!=null?`<span class="st-selection-count">${x.count}</span>`:variant==='two-line-lens'?'<span class="st-selection-count" aria-hidden="true"></span>':''}</button>`;}).join('')}</div>${reason?`<p class="st-selection-reason">${esc(reason)}</p>`:''}</div>`;
+    return `<div class="st-selection"><div class="st-segment ${esc(className)}" data-ds="Segment" data-variant="${esc(variant)}" data-state="${esc(state)}" role="group" aria-label="${esc(ariaLabel)}">${options.map(([v,label,x={}])=>{const blocked=disabled||x.disabled;return `<button type="button" data-action="${esc(action)}" data-value="${esc(v)}" aria-pressed="${v===active}"${x.ariaLabel?` aria-label="${esc(x.ariaLabel)}"`:""}${x.door?' aria-haspopup="dialog"':''}${blocked?' disabled':''}><span class="st-selection-label"${has(x,'label')?sa(x.strs.label,x.args&&x.args.label):''}>${label}</span>${x.count!=null?`<span class="st-selection-count">${x.count}</span>`:variant==='two-line-lens'?'<span class="st-selection-count" aria-hidden="true"></span>':''}${x.door&&root.SentriIcons?`<span class="st-segment-door" aria-hidden="true">${root.SentriIcons.icon('down')}</span>`:''}</button>`;}).join('')}</div>${reason?`<p class="st-selection-reason">${esc(reason)}</p>`:''}</div>`;
   }
   function filterChips({items=[],action='chip',key='chips',label='',state='Default',reason=''}={}){
     if(!items.length)return '';
     const on=(items.find(i=>i.checked)||items[0]).value;
     return `<div class="st-filter-chips" data-ds="FilterChips" data-field="${esc(key)}" data-state="${esc(state)}"><div class="st-filter-chips-track" role="radiogroup" aria-label="${esc(label)}">${items.map(i=>`<button type="button" role="radio" aria-checked="${i.value===on}" tabindex="${i.value===on?0:-1}" data-action="${esc(action)}" data-value="${esc(i.value)}"${i.aria?` aria-label="${esc(i.aria)}"`:""}${i.disabled?' disabled':''}>${i.value===on?`<span class="st-chip-check" aria-hidden="true">${globalThis.SentriIcons?globalThis.SentriIcons.icon('check'):''}</span>`:''}<span class="st-selection-label">${i.label}</span>${i.count!=null?`<span class="st-selection-count">${i.count}</span>`:''}</button>`).join('')}</div>${reason?`<p class="st-selection-reason">${esc(reason)}</p>`:''}</div>`;
   }
-  function iconButton({action='',icon='',label='',variant='bordered',className='',value='',badge='',disabled=false,pressed=false,selected=null,reason='',describedby='',attrs={},strs,args}={}){
+  function iconButton({action='',icon='',label='',variant='bordered',className='',value='',badge='',count='',tone='',disabled=false,pressed=false,selected=null,reason='',describedby='',attrs={},strs,args}={}){
     const o={strs,args},hasBadge=(badge!==''&&badge!=null)||has(o,'badge');
     const v=oneOf('IconButton','variant',variant,['bordered','plain'],'bordered');
     const rid=reason?(describedby||fieldId('st-icon-reason')):describedby;
-    return `<button type="button" class="icon-button ${esc(className)}" data-ds="IconButton" data-variant="${v}" data-action="${esc(action)}" data-value="${esc(value)}" aria-label="${esc(label)}"${disabled?' aria-disabled="true"':''}${pressed?' data-preview="pressed"':''}${selected!=null?` aria-pressed="${!!selected}"`:''}${rid?` aria-describedby="${esc(rid)}"`:''}${safeAttr(attrs)}><span aria-hidden="true">${icon}</span>${selected?`<span class="st-icon-selected" aria-hidden="true">${sGlyph('check')}</span>`:''}${hasBadge?`<span class="filter-badge">${tx(badge,o,'badge')}</span>`:''}</button>${reason?buttonReason({id:rid,text:reason}):''}`;
+    return `<button type="button" class="icon-button ${esc(className)}" data-ds="IconButton" data-variant="${v}" data-action="${esc(action)}" data-value="${esc(value)}" aria-label="${esc(label)}"${count!==''&&count!=null?' data-count=""':''}${tone==='attention'?' data-tone="attention"':''}${disabled?' aria-disabled="true"':''}${pressed?' data-preview="pressed"':''}${selected!=null?` aria-pressed="${!!selected}"`:''}${rid?` aria-describedby="${esc(rid)}"`:''}${safeAttr(attrs)}><span aria-hidden="true">${icon}</span>${count!==''&&count!=null?`<span class="icon-button-count" aria-hidden="true">${esc(count)}</span>`:''}${selected?`<span class="st-icon-selected" aria-hidden="true">${sGlyph('check')}</span>`:''}${hasBadge?`<span class="filter-badge">${tx(badge,o,'badge')}</span>`:''}</button>${reason?buttonReason({id:rid,text:reason}):''}`;
   }
   /* ---- Field cards (candidate, ADR 0001): Stepper, Measure, Numpad ----
      Event contract: every control is a <button data-action> whose data-value is the caller's field key;
@@ -1083,10 +1088,13 @@
   /* The page header: Back (48px, the bordered icon button) at the top left, the title left-aligned, the optional header line
      under it, then space-section (24px) to the body. Every page and every top page of a task has it; its footer has no Back.
      ds names the part for the atlas (Sheet for a sheet page, TaskHeader for a task screen). */
-  function pageHeader({title,back={action:'back'},line=null,level=2,ds='Sheet',className=''}={}){
+  function pageHeader({title,back={action:'back'},line=null,level=2,ds='Sheet',className='',action=null}={}){
     const b=back||{action:'back'},h=level===1?'h1':'h2';
     const backHtml=`<button type="button" class="st-page-back"${sA(b.action||'back',b.value)}${sL(b.label,{text:'Back',str:'act.back'})}>${sGlyph('back-chevron')}</button>`;
-    return `<header class="st-page-header${className?' '+esc(className):''}" data-ds="${esc(ds)}">${backHtml}<div class="st-page-titles"><${h} class="st-page-title">${sT(title)}</${h}>${headerLine(line)}</div></header>`;
+    /* The page action (Headers law, owner 2026-10-20): one IconButton at the top right, centred on the text block by the header's own
+       alignment; an object is passed to iconButton, a string is trusted markup of one. */
+    const actHtml=!action?'':typeof action==='string'?action:iconButton(Object.assign({variant:'bordered'},action));
+    return `<header class="st-page-header${className?' '+esc(className):''}" data-ds="${esc(ds)}">${backHtml}<div class="st-page-titles"><${h} class="st-page-title">${sT(title)}</${h}>${headerLine(line)}</div>${actHtml}</header>`;
   }
   /* Back: the footer's exit, the same on every sheet (a 16px chevron + the word). Alone in a footer it fills the bar. */
   function backButton({action='back',value='',label={text:'Back',str:'act.back'},className=''}={}){
@@ -1150,7 +1158,7 @@
     return `<div class="sheet-text" data-corners="${cross&&corner?'both':corner?'end':'start'}">${x}${t}${c}</div>`;
   }
   const SHEET_SIZES=['compact','short','medium','long'];
-  function sheet({variant='drawer',surface='',headClass='',title,line=null,corner=null,cross=null,back=null,description,icon='',close={action:'dismiss'},holdRows=0,lead='',above='',body='',bodyClass='',footer:f,size='medium',sizing='content',label,view='',className='',id='',layer=0,inert=false,bar='',scrim:sc={},attrs={}}={}){
+  function sheet({variant='drawer',surface='',headClass='',title,line=null,pageAction=null,corner=null,cross=null,back=null,description,icon='',close={action:'dismiss'},holdRows=0,lead='',above='',body='',bodyClass='',footer:f,size='medium',sizing='content',label,view='',className='',id='',layer=0,inert=false,bar='',scrim:sc={},attrs={}}={}){
     const v=oneOf('Sheet','variant',variant,['drawer','page','dialog'],'drawer'),sz=oneOf('Sheet','size',size,SHEET_SIZES,'medium');
     /* surface (drawer only): '' is a content or input drawer (white, tinted cards). 'menu' is a drawer whose every row is an option or a verb
        (Choose a unit, More actions, Go to pen): the tint with white cards, like a page. See SURFACES.md. */
@@ -1165,7 +1173,7 @@
     /* The sheet header (a drawer): the centred title, the optional header line, the 1px hairline; the body starts 24px below.
        A page takes the page header instead (pageHeader: Back top left, the title left-aligned). */
     const head=v==='page'
-      ?pageHeader({title,back,line,className:headClass})
+      ?pageHeader({title,back,line,className:headClass,action:pageAction})
       :`<header class="utility-header${headClass?' '+esc(headClass):''}">${lead}<div class="sheet-titles">${sheetText(title,line,corner,cross)}</div></header>`;
     const common=`data-ds="Sheet" tabindex="-1"${sLayer(layer)}${inert?' inert':''}${id?` id="${esc(id)}"`:''}${vw}${sL(label??title)}${ex}`;
     const main=`${head}${above}<div class="sheet-body${bodyClass?' '+esc(bodyClass):''}">${body}</div>${foot}`;

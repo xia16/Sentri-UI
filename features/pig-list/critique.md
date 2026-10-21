@@ -165,3 +165,23 @@ Scope: Record health and Edit conditions reached from the pig list. The owner's 
 ### Self-crit
 
 - **Better because** the record is its fields alone, as Record treatment.
+
+# Chinese pass (PR 244), critique
+
+Scope: the words only. At `?lang=zh` these screens read in English where the Inspection prototype draws them: the pig record opened from the list (Current tasks and their lines, General details and its facts, Sow cycle, the record links), the pig log (Activity, Dates, `N entries · Newest first`, event titles and lines, weekdays and dates) and the edit sheets. Nothing is added, moved or cut in EN.
+
+## Keep
+
+- Every surface, row, order, weight and colour as it is: the change replaces English words with Chinese in the same place, in the same component, at the same weight.
+- EN exactly as it is.
+- Ear tags, pen codes, medicine and brand names, the worker's name, RFID, record numbers and the units mL and °C stay in Latin script; kg reads 公斤 (as on main) and mm reads 毫米.
+
+## Problems
+
+- **major** · At ZH 360 the parts above read in English beside Chinese, so a Chinese-reading worker reads two languages on one screen (P2: read in two seconds).
+- **minor** · Dates read in English forms (`1 Aug 2026`, `Aug 1`, `Thu`) and day counts as `40d`.
+- **minor** · Copy that is longer in Chinese has to fit its component at 360 (a pen-map tile holds four characters: `Not in unit` reads 非本单元).
+
+## Attention budget
+
+Unchanged: each screen shows the same information in the same order as on main, in Chinese. Cut list: nothing is cut.

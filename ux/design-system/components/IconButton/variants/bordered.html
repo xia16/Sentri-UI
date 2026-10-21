@@ -6,13 +6,15 @@
 <section class="example" data-state="Long / Chinese"><h2>Long / Chinese</h2><div class="demo"></div></section>
 <section class="example" data-state="Selected"><h2>Selected</h2><div class="demo"></div></section>
 <section class="example" data-state="Badge"><h2>Badge</h2><div class="demo"></div></section>
+<section class="example" data-state="Count"><h2>Count</h2><div class="demo"></div></section>
+<section class="example" data-state="Count · attention"><h2>Count · attention</h2><div class="demo"></div></section>
 <script>
 (()=>{
 const UI=window.SentriUI;
 for(const el of document.querySelectorAll('[data-state]')){
  const state=el.dataset.state;
  const label=state==='Long / Chinese'?'关闭当前仔猪处理记录窗口':"Filter pigs";
- el.querySelector('.demo').innerHTML=UI.iconButton({variant:'bordered',icon:window.SentriIcons.icon('filter'),label:state==='Badge'?'Filter pigs, 2 applied':label,pressed:state==='Pressed',disabled:state==='Disabled',selected:state==='Selected'?true:null,badge:state==='Badge'?2:''});
+ el.querySelector('.demo').innerHTML=state.startsWith('Count')?UI.iconButton({variant:'bordered',icon:window.SentriIcons.icon(state==='Count'?'upload':'alert'),count:2,tone:state==='Count'?'':'attention',label:state==='Count'?'2 records from this task waiting to upload':'2 records from this task, one needs you'}):UI.iconButton({variant:'bordered',icon:window.SentriIcons.icon('filter'),label:state==='Badge'?'Filter pigs, 2 applied':label,pressed:state==='Pressed',disabled:state==='Disabled',selected:state==='Selected'?true:null,badge:state==='Badge'?2:''});
 }
 })();
 </script>

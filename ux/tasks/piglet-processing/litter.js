@@ -164,7 +164,7 @@
             var meta = g.kind === 'today' ? ['pp.litter.gm.today'] : g.kind === 'late' ? [one('pp.litter.gm.late', g.arg), { k: g.arg }]
               : g.kind === 'missed' ? ['pp.litter.gm.missed', { d: g.arg }] : g.kind === 'recorded' ? ['pp.litter.gm.recorded']
               : g.arg === 1 ? ['pp.litter.gm.tomorrow'] : [one('pp.litter.gm.in', g.arg), { n: g.arg }];
-            return K.day({ title: toParts([P('pp.litter.gm.day', { d: g.day })]), status: toParts([P(meta[0], meta[1])]), items: g.rows });
+            return K.day({ title: toParts([P('pp.litter.gm.day', { d: g.day })]), status: toParts([P(meta[0], meta[1])]), label: PP.t('pp.litter.gm.day', { d: g.day }) + ', ' + PP.t(meta[0], meta[1]), items: g.rows }); // a plain-text name: the parts are objects
           }).join('');
         }
       };

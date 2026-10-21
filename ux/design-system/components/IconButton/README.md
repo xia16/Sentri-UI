@@ -18,7 +18,7 @@ Use [Button](../Button/README.md) for Record, Move or Set count. Use [ChoiceList
 
 | Variant | Use | API |
 | --- | --- | --- |
-| [Bordered](variants/bordered.html) | Header returns and toolbar search, filter or scan. | `iconButton({variant:"bordered"})` |
+| [Bordered](variants/bordered.html) | Header returns, toolbar search, filter or scan, a page header's one page action, and the sync badge. | `iconButton({variant:"bordered"})` |
 | [Plain](variants/plain.html) | Sheet close, more actions or a breeder mark. | `iconButton({variant:"plain"})` |
 
 ## States
@@ -31,6 +31,8 @@ Use [Button](../Button/README.md) for Record, Move or Set count. Use [ChoiceList
 | Long / Chinese | The target stays 48 x 48; the accessible name stays complete in both languages. |
 | Selected | Optional `aria-pressed` plus a visible check, for the breeder mark. |
 | Badge | Count is visible and included in the accessible name, e.g. “Filter pigs, 2 applied”. |
+| Count | `count`: the glyph and a number side by side, the button widening to fit (the sync badge, owner 2026-10-18: a task's records still on the phone). The accessible name says what the number counts, e.g. “2 records from this task waiting to upload”. |
+| Count · attention | `tone: 'attention'`: the glyph in `red` (a red “!”), when a person must act. The number keeps its meaning. |
 
 No empty state: omit an action with no label. No field error state: put validation on the relevant field and explain the waiting action once.
 

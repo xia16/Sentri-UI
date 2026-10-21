@@ -62,6 +62,7 @@
       "farrowing.pen-landed-live",
       "farrowing.pen-landed-plain",
       "farrowing.pen",
+      "farrowing.pen-attention",
       "farrowing.pen-log",
       "farrowing.pen-note",
       "farrowing.pen-read-note",
@@ -584,12 +585,12 @@
     [
       "farrowing.pen",
       "farrowing.pen-note",
-      "Add / Edit pen note"
+      "Note"
     ],
     [
       "farrowing.pen",
       "farrowing.pen-read-note",
-      "tap the Note notice"
+      "tap the note card"
     ],
     [
       "farrowing.pen-read-note",
@@ -599,17 +600,17 @@
     [
       "farrowing.pen",
       "farrowing.pen-feed",
-      "Feed guidance"
+      "Feed"
     ],
     [
       "farrowing.pen",
       "farrowing.pen-fault",
-      "Report equipment fault"
+      "Fault"
     ],
     [
       "farrowing.pen",
       "farrowing.pen-fault-record",
-      "tap an Equipment notice"
+      "tap a fault row under Needs attention"
     ],
     [
       "farrowing.pen-note",
@@ -2851,59 +2852,92 @@
       "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
       "preset": "room",
       "steps": [
-        "Pen B1, 1 sow, view details"
+        "[data-action=\"room-pen-detail\"][data-value=\"B1\"]"
       ],
       "figma": "",
       "notes": {
-        "purpose": "One pen's information and tools, reached from a pen header in the room list.",
+        "purpose": "One pen's page, reached from a pen header in the room list (the pen is a door, owner 2026-10-19). Everything done to the pen as a whole happens here, for this one pen, laid out as its sibling on Inspection (inspection.pen): the pen's verbs on top, then what needs someone, then how the pen is now, then its log.",
         "states": [
-          "No notices: only the four tool rows.",
-          "A note on the pen: a \"Note\" notice above the tools, opening the note.",
-          "An open equipment fault: an amber \"Equipment\" notice (device, description, \"Open · Reported 09:41 · G.H\") opening the fault.",
-          "Both: faults first, then the note."
+          "Nothing open: the verbs, Now and Pen log.",
+          "An open equipment fault or a note: a \"Needs attention\" group under the verbs, the faults first as rows, then the note as its card (farrowing.pen-attention).",
+          "Feed recorded for the pen: a Feed fact in Now (formula, method). No pen in the prototype has feed data."
         ],
         "elements": [
           {
-            "name": "Notices",
-            "at": "Pen B1",
-            "shows": "Faults and the note, listed above the tools only when they exist.",
+            "name": "Pen verbs",
+            "at": "Note",
+            "shows": "Note, Feed, Fault as Row tiles (SentriUI.rowGrid): only the verbs Farrowing has. Note opens Add / Edit pen note, Feed the feed guidance, Fault Report equipment fault.",
+            "logic": "Each tile's accessible name is its full action (\"Add pen note\", \"Feed guidance\", \"Report equipment fault\").",
+            "source": "farrowing-astra-concept.js penDetails()"
+          },
+          {
+            "name": "Needs attention",
+            "at": "Needs attention",
+            "shows": "Open faults as rows (device over its description), then the pen note as its card (text, hand and time); left out when nothing is open.",
             "logic": "Only open faults are listed; a resolved fault leaves the page and stays in the pen log. A pen holds one note.",
             "source": "farrowing-astra-concept.js penDetails(), penInfo()"
           },
           {
-            "name": "Tool rows",
-            "at": "Add pen note",
-            "shows": "Feed guidance, Report equipment fault, Add / Edit pen note, Pen log.",
-            "states": [
-              {
-                "state": "No note",
-                "when": "The pen has no note",
-                "shows": "\"Add pen note: Leave information for the next person\""
-              },
-              {
-                "state": "Has a note",
-                "when": "A note was saved",
-                "shows": "\"Edit pen note: Update the note for this pen\""
-              },
-              {
-                "state": "Feed known",
-                "when": "The pen has feed data",
-                "shows": "The feed row reads \"formula · method\"; otherwise \"View feeding information\""
-              }
-            ],
-            "source": "farrowing-astra-concept.js penDetails()"
+            "name": "Now",
+            "at": "Now",
+            "shows": "Sows: the pen's task sows and where they are (\"Farrowing\", or \"2 awaiting · 1 done\"); Piglets alive with the dead beside them, once a sow in the pen has farrowed; Feed when recorded.",
+            "logic": "Counts every task sow in the pen on the room list, ignoring the current tab and filter (as the pen header does). No zeros: Piglets is left out before any sow farrows, and dead is said only when there are any.",
+            "source": "farrowing-astra-concept.js penDetails(), penSowStates()"
           }
         ],
         "edge": [
-          "The header counts every task sow in the pen, ignoring the current tab and filter.",
-          "Notes, faults and log entries belong to the pen, not the sow, and are shared by every drawer of that pen within the unit. The prototype starts with none and forgets them on reload."
+          "Notes, faults, drafts and log entries belong to the pen, not the sow, and are shared by every drawer of that pen within the unit. The prototype starts with none and forgets them on reload."
         ],
         "issues": [
-          "Whose feature the pen tools are is unclear: the same pen sheet, note, fault and log flows are drawn in Inspection (see the decision \"Pen tools are drawn in Farrowing and in Inspection\")."
+          "Whose feature the pen tools are is unclear: the same pen page, note, fault and log flows are drawn in Inspection (see the decision \"Pen tools are drawn in Farrowing and in Inspection\")."
         ],
         "rules": [
-          "The sheet's title is the job, so it has no second heading \"Pen information\" over the tool rows (Owner decision 2026-10-10)."
+          "The pen is a door, not a tick; its verbs on top, then what needs someone (owner, 2026-10-19).",
+          "The page's title is the pen, so it has no second heading such as \"Pen information\" (Owner decision 2026-10-10)."
         ]
+      }
+    },
+    {
+      "id": "farrowing.pen-attention",
+      "name": "Pen · needs attention",
+      "zh": "栏位 · 需要处理",
+      "status": "in-design",
+      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+      "preset": "room",
+      "steps": [
+        "[data-action=\"room-pen-detail\"][data-value=\"B1\"]",
+        "[data-action=\"room-pen-fault\"]",
+        "[data-picker-key=\"pen:device\"]",
+        "[data-action=\"picker-select\"][data-value=\"Feeding station\"]",
+        {
+          "fill": "[data-pen-field=\"description\"]",
+          "text": "Feeder is jammed and drops no feed."
+        },
+        "[data-action=\"room-pen-save-fault\"]",
+        "[data-action=\"room-pen-note\"]",
+        {
+          "fill": "[data-pen-field=\"note\"]",
+          "text": "Water line leaks at the back of the pen. Check again after feeding."
+        },
+        "[data-action=\"room-pen-save-note\"]"
+      ],
+      "figma": "",
+      "notes": {
+        "purpose": "The pen page with an open equipment fault and a note: Needs attention sits under the verbs, the fault row first, then the note card.",
+        "states": [
+          "The fault row opens its record (Resolve lives there); the note card opens the note."
+        ],
+        "elements": [
+          {
+            "name": "Needs attention",
+            "at": "Needs attention",
+            "shows": "The open fault (Feeding station · Feeder is jammed and drops no feed.), then the note with its hand and time.",
+            "source": "farrowing-astra-concept.js penDetails()",
+            "logic": "Faults first, then the note; both are doors (the fault to its record, the note to its page)."
+          }
+        ],
+        "edge": [],
+        "issues": []
       }
     },
     {
@@ -2914,8 +2948,8 @@
       "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
       "preset": "room",
       "steps": [
-        "Pen B1, 1 sow, view details",
-        "Pen log"
+        "[data-action=\"room-pen-detail\"][data-value=\"B1\"]",
+        "[data-action=\"room-pen-log\"]"
       ],
       "figma": "",
       "notes": {
@@ -2946,8 +2980,8 @@
       "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
       "preset": "room",
       "steps": [
-        "Pen B1, 1 sow, view details",
-        "Add pen note"
+        "[data-action=\"room-pen-detail\"][data-value=\"B1\"]",
+        "[data-action=\"room-pen-note\"]"
       ],
       "figma": "",
       "notes": {
@@ -2962,7 +2996,7 @@
           }
         ],
         "edge": [
-          "Back discards the draft; nothing is kept for the pen until Save."
+          "Back keeps the draft for this pen; it is offered again on reopen and dropped only by Save."
         ],
         "issues": []
       }
@@ -2975,13 +3009,13 @@
       "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
       "preset": "room",
       "steps": [
-        "Pen B1, 1 sow, view details",
-        "Add pen note",
+        "[data-action=\"room-pen-detail\"][data-value=\"B1\"]",
+        "[data-action=\"room-pen-note\"]",
         {
           "fill": "[data-pen-field=\"note\"]",
           "text": "Water line leaks at the back of the pen. Check again after feeding."
         },
-        "Save note",
+        "[data-action=\"room-pen-save-note\"]",
         "[data-action=\"room-pen-read-note\"]"
       ],
       "figma": "",
@@ -2997,7 +3031,7 @@
           }
         ],
         "edge": [
-          "The page exists only while the pen has a note; the pen page shows the \"Note\" notice that opens it."
+          "The page exists only while the pen has a note; the pen page shows the note card that opens it."
         ],
         "issues": []
       }
@@ -3010,8 +3044,8 @@
       "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
       "preset": "room",
       "steps": [
-        "Pen B1, 1 sow, view details",
-        "Feed guidance"
+        "[data-action=\"room-pen-detail\"][data-value=\"B1\"]",
+        "[data-action=\"room-pen-feed\"]"
       ],
       "figma": "",
       "notes": {
@@ -3036,8 +3070,8 @@
       "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
       "preset": "room",
       "steps": [
-        "Pen B1, 1 sow, view details",
-        "Report equipment fault"
+        "[data-action=\"room-pen-detail\"][data-value=\"B1\"]",
+        "[data-action=\"room-pen-fault\"]"
       ],
       "figma": "",
       "notes": {
@@ -3066,7 +3100,7 @@
           }
         ],
         "edge": [
-          "Back drops the draft."
+          "Back keeps the draft for this pen (device, name, description); Report fault drops it."
         ],
         "issues": []
       }
@@ -3079,10 +3113,10 @@
       "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
       "preset": "room",
       "steps": [
-        "Pen B1, 1 sow, view details",
-        "Report equipment fault",
-        "Select",
-        "Feeding station",
+        "[data-action=\"room-pen-detail\"][data-value=\"B1\"]",
+        "[data-action=\"room-pen-fault\"]",
+        "[data-picker-key=\"pen:device\"]",
+        "[data-action=\"picker-select\"][data-value=\"Feeding station\"]",
         {
           "fill": "[data-pen-field=\"description\"]",
           "text": "Feeder is jammed and drops no feed."
@@ -3108,7 +3142,8 @@
           }
         ],
         "edge": [
-          "The Resolved state is built but no door reaches it: a resolved fault leaves the pen page, and pen log entries are not links."
+          "The Resolved state is built but no door reaches it: a resolved fault leaves the pen page, and pen log entries are not links.",
+          "A typed resolution note is kept for that fault through Back, until Resolve fault."
         ],
         "issues": []
       }
@@ -3696,7 +3731,7 @@
       "preset": "count",
       "steps": [
         "Actions",
-        "Edit note"
+        "[data-action=\"sow-host-action\"][data-value=\"marker\"]"
       ],
       "figma": "",
       "notes": {

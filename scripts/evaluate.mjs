@@ -14,7 +14,8 @@ import os from 'node:os';
 import path from 'node:path';
 import { pwPath, playwright } from './playwright-path.mjs';
 import { removeWorktree } from './worktree-remove.mjs';
-import { CLASSES, classOfFiles, DS_FEATURE, componentPage, componentPagesOf, componentsTouched, idPath, screensOf, pageOf, pageAssets, sharedFiles, coverageLost, effectiveClass, classifyScreens, touchesSystem, touchesTools, budgetProblems, critiqueProblems, pageStyling, addedLines, scenarioDebt, isMotionFile, unheldMotion, heldOf, confirmLeaf, reusableLeaf } from './loop-rules.mjs';
+import { CLASSES, classOfFiles, DS_FEATURE, componentPage, componentPagesOf, componentsTouched, idPath, screensOf, pageOf, pageAssets, sharedFiles, coverageLost, effectiveClass, classifyScreens, touchesSystem, touchesTools, budgetProblems, critiqueProblems, pageStyling, addedLines, scenarioDebt, isMotionFile, unheldMotion, heldOf, confirmLeaf, reusableLeaf, IN_PROGRESS, readInProgress, ownFeatures, scopeReach, componentScope, exportStamps, readLibrary, libraryProblems, newExportProblems, frozenFeatures, checksChinese } from './loop-rules.mjs';
+import { bundleShape, bundleChange } from './bundle-graph.mjs';
 // The analyser (gate-v2 §2): static and conservative, over both revisions. It says what each screen's and each leaf's evidence
 // depends on; the reach is every screen and leaf whose evidence identity that makes differs between the two (gate-simplify.md X1).
 import { identityInputs, leafInputs } from './static-reach.mjs';
@@ -80,7 +81,7 @@ export async function evaluate(opts) {
     if (stale.length) { block(`the gate runs the base's own tools: this checkout's ${stale.slice(0, 3).join(', ')} differ from ${short(mech.base)} (the base moved while the gate started: run it again)`); return finish(); }
   }
   const contains = git(['merge-base', '--is-ancestor', mech.base, mech.candidate], root).code === 0;
-  check('candidate contains the base', contains, contains ? short(mech.base) : 'merge main forward first: git fetch origin && git merge origin/main (R10, R12)');
+  check('candidate contains the base', contains, contains ? short(mech.base) : 'merge main forward first: node scripts/merge-main.mjs (R10, R12)');
   if (!contains) return finish();
   const files = git(['diff', '--name-only', '--no-renames', mech.base, mech.candidate], root).out.split(/\r?\n/).filter(Boolean);
   mech.files = files;
@@ -127,6 +128,9 @@ export async function evaluate(opts) {
   log(`class: ${byFiles.cls}${byFiles.why.length ? ` (${byFiles.why.join('; ')})` : ''}`);
   // A shared-component change is held to no worse than main on legibility (README, Legibility gate); otherwise strict while the
   // README says so. Known before anything is shot, so the visits know whether base needs its legibility audit.
+  // English first (owner, 2026-10-21): ZH runs and ZH leaves only for frozen features
+  const zhFrozen = new Set([...frozenFeatures(S.base.atlas), ...frozenFeatures(S.cand.atlas)]);
+  mech.zh = { frozen: [...zhFrozen].sort() };
   const strictLeg = !sharedByFiles && /^Legibility gate: strict\s*$/m.test(fs.readFileSync(path.join(S.cand.dir, 'docs/design-workflow/README.md'), 'utf8'));
   mark('setup');
 
@@ -233,6 +237,25 @@ export async function evaluate(opts) {
     mech.pageStyling = ps;
     check('design-system components only', !ps.length, ps.length ? `${ps.length} visual declaration(s) added outside ux/design-system (${ps.slice(0, 3).map((p) => p.file.split('/').pop() + ' ' + p.prop).join(', ')}): use a SentriUI component, or build the part in the design system (P2, briefs/build.md §3)` : '');
   }
+  // the bundle as the graph reads it, each side (the library check and the scoped reach use it); null when it won't parse
+  for (const k of ['base', 'cand']) {
+    try { S[k].bundleSrc = fs.readFileSync(path.join(S[k].dir, BUNDLE_JS), 'utf8'); } catch { S[k].bundleSrc = ''; }
+    try { S[k].shape = bundleShape(S[k].bundleSrc); } catch { S[k].shape = null; }
+  }
+  {
+    // Library organisation (owner, 2026-10-20): every component folder is in _groups.json or retired in its gate.json, and a new
+    // SentriUI export belongs to a grouped component. A folder main already leaves out is main's. A change that touches a component
+    // also needs the judge's library fit (gate.md §5), which --verdict asks for.
+    const libs = { base: readLibrary(S.base.dir), cand: readLibrary(S.cand.dir) };
+    const was = new Set(libraryProblems(libs.base)), now = libraryProblems(libs.cand);
+    const lp = now.filter((p) => !was.has(p));
+    if (S.base.shape && S.cand.shape) lp.push(...newExportProblems({ before: new Set(exportStamps(S.base.shape).keys()), after: exportStamps(S.cand.shape), library: libs.cand }));
+    else if (files.includes(BUNDLE_JS)) gaps.push('the bundle does not parse on one side: new exports are not checked against the groups');
+    mech.library = { required: files.some((f) => f.startsWith('ux/design-system/components/')), problems: lp };
+    check('library organisation (every part in a group)', !lp.length, lp.length ? `${lp.length}: ${lp.slice(0, 3).join(' | ')}` : '');
+    const debt = now.filter((p) => was.has(p));
+    if (debt.length) gaps.push(`library: ${debt.length} folder(s) already outside every group on main (${debt.slice(0, 3).join('; ')})`);
+  }
   // Fail fast (gate-simplify.md S1): a rule the diff decides has failed, so nothing a browser could show changes the outcome. The
   // gate stops before it starts one: such failures used to arrive after full runs of 3 to 15 minutes (2026-10-17/18).
   if (checks.some((c) => c.result === 'fail')) {
@@ -266,7 +289,7 @@ export async function evaluate(opts) {
   // both sides shares one shot, so its diff is 0 by definition: shooting it proved nothing, and the tripwire and "every screen" for
   // CSS that did were removed. Identity completeness is the guarantee (gate-v2.md §3, the stylesheet syntax the analyser checks), and
   // `--audit` checks it off the merge path. The scope is a declaration only (X7): it brings in no screen of its own. A screen in the
-  // reach is shot at RUNS (EN 390 and 360, ZH 360; a
+  // reach is shot at RUNS (EN 390 and 360, and ZH 360 for a frozen feature's screen; a
   // component page in EN only) and gets its visit checks; nothing else is shot.
   const sideList = (k) => [...S[k].screens, ...S[k].ds];
   const idAt = (side, x) => shotId(side, x, 390, 'en', componentPage(x.id) ? 'grid' : 'screen');
@@ -278,8 +301,46 @@ export async function evaluate(opts) {
     for (const id of d.changed) identityChanged.add(id);
     mech.reach = { screens: reachIds.size, of: total, changed: d.changed.length, added: d.added.length, removed: d.removed.length };
   }
+  // The scoped reach of a shared change (owner, 2026-10-20; gate.md §4). Of what the identities reach, a shared change keeps: every
+  // screen of the PR's own features (ownFeatures), the component pages of the parts it touches or calls (a page whose variant calls
+  // none of the changed exports is left out only when the bundle's JS is the one design-system input that changed), and the screens
+  // of the in-progress features (features/_in-progress.json, read from the base so a change can't set its own scope), which are
+  // propagation screens: judged only on whether the shared part arrived and renders correctly. Every other screen is out of scope
+  // and not shot. The identities themselves are untouched. A change that isn't shared, a refactor (identical is checked everywhere,
+  // with no judge to pay for it) and an audit keep the whole reach.
+  let scoped = null;
+  if (!audit && sharedByFiles && mode !== 'refactor') {
+    let inProgress = null;
+    try { inProgress = readInProgress(fs.readFileSync(path.join(S.base.dir, IN_PROGRESS), 'utf8')); } catch {}
+    if (!inProgress) gaps.push(`${IN_PROGRESS} is missing or unreadable on the base: this shared change is checked in full on every feature it reaches`);
+    else {
+      const users = new Map();
+      for (const side of ['base', 'cand']) for (const x of S[side].screens) for (const f of iiOf.get(`${side} ${x.id}`)?.files || []) { if (!users.has(f)) users.set(f, new Set()); users.get(f).add(x.feature); }
+      const own = ownFeatures({ files, scope, usersOf: (f) => users.get(f) });
+      const bc = files.includes(BUNDLE_JS) ? bundleChange(S.base.bundleSrc, S.cand.bundleSrc) : null;
+      const readVariant = (c, v) => { for (const k of ['cand', 'base']) { try { return fs.readFileSync(path.join(S[k].dir, `ux/design-system/components/${c}/variants/${v}.html`), 'utf8'); } catch {} } return null; };
+      const { touched, keepPage } = componentScope({ files, change: bc, stamps: exportStamps(S.cand.shape), readVariant });
+      const featureOf = new Map([...S.base.screens, ...S.cand.screens].map((x) => [x.id, x.feature]));
+      const sc = scopeReach({ reach: reachIds, featureOf: (id) => featureOf.get(id), own, inProgress, keepPage });
+      mech.reach.identity = reachIds.size;
+      reachIds.clear();
+      for (const id of sc.keep) reachIds.add(id);
+      for (const id of [...identityChanged]) if (!reachIds.has(id)) identityChanged.delete(id);
+      mech.reach.screens = reachIds.size;
+      scoped = { own, inProgress, propagation: sc.propagation, touched };
+      mech.ownFeatures = own;
+      mech.inProgress = inProgress;
+      mech.outOfScope = sc.outOfScope;
+      // what each propagation screen calls of the touched exports (its page closure's SentriUI calls); all when it uses the namespace whole
+      mech.propagation = [...sc.propagation].sort().map((id) => {
+        const ii = iiOf.get(`cand ${id}`) || iiOf.get(`base ${id}`), all = !ii || ii.bundle?.all;
+        return { screen: id, feature: featureOf.get(id), uses: all ? [...touched].sort() : (ii.bundle?.exports || []).filter((e) => touched.has(e)), ...(all ? { all: true } : {}) };
+      });
+      log(`scope: own ${own.join(', ') || '(none)'}; propagation only on ${inProgress.join(', ')} (${sc.propagation.size} screen(s)); ${sc.outOfScope.screens} screens in ${sc.outOfScope.features.length} features not checked: not in progress${sc.outOfScope.componentPages ? `; ${sc.outOfScope.componentPages} component page(s) of parts the change doesn't call` : ''}`);
+    }
+  }
   log(`reach: ${reachIds.size} of ${total} screens${mech.reach.changed !== undefined ? ` (${mech.reach.changed} whose identity changed, ${mech.reach.added} added, ${mech.reach.removed} removed)` : ` (${mech.reach.why[0]})`}`);
-  const runsOf = (x) => (inReach(x) ? RUNS.filter((r) => !componentPage(x.id) || r.lang === 'en').map(({ width, lang }) => ({ width, lang })) : []);
+  const runsOf = (x) => (inReach(x) ? RUNS.filter((r) => (!componentPage(x.id) || r.lang === 'en') && (r.lang === 'en' || checksChinese(x.feature, zhFrozen))).map(({ width, lang }) => ({ width, lang })) : []);
   const visitChecks = (side, x, width, lang) => {
     if (audit || !inReach(x) || componentPage(x.id)) return [];
     const out = [];
@@ -480,6 +541,8 @@ export async function evaluate(opts) {
   mech.screens = screens;
   log(`screens: ${screens.same.length} same, ${screens.diff.length} changed, ${screens.new.length} new, ${screens.gone.length} gone, ${screens.broken.length} broken${screens.bothBroken.length ? `, ${screens.bothBroken.length} with a run broken on both` : ''}`);
   for (const d of screens.diff) log(`  DIFF ${String(d.pct).padStart(7)}%  ${d.id}  ${d.runs.join(' ')}`);
+  // a propagation screen that moved but calls none of the touched exports draws the part some other way: likely a local copy
+  if (scoped?.touched.size) { const movedIds = new Set([...screens.diff, ...screens.new].map((s) => s.id)); for (const p of mech.propagation || []) if (!p.uses.length && movedIds.has(p.screen)) p.notUsingShared = true; }
   check('no screen broken by the change', !screens.broken.length, screens.broken.map((s) => `${s.id} ${s.error}`).slice(0, 3).join(' | '));
   if (screens.bothBroken.length) gaps.push(`${screens.bothBroken.length} screen(s) have a run that renders on neither base nor candidate (main's debt): ${screens.bothBroken.map((s) => `${s.id} (${s.error})`).slice(0, 5).join(', ')}`);
   mark('compare');
@@ -532,7 +595,7 @@ export async function evaluate(opts) {
     // image: each side's shot by its bytes, so a judgement carries to a pair that shows the same two pictures even when an input
     // nothing renders from changed both shots' identities (carryJudgements, G17)
     const imageOf = (x) => { try { return x?.ok && x.png ? sha(fs.readFileSync(x.png)) : null; } catch { return null; } };
-    mech.pairs.push({ screen: s.id, feature: s.feature, lang, width, kind, pct: kind === 'changed' ? round4(pct[k] ?? 0) : null, file: path.relative(out, file).replace(/\\/g, '/'), identity: { base: b?.ok ? b.id : null, cand: c?.ok ? c.id : null }, image: { base: imageOf(b), cand: imageOf(c) } });
+    mech.pairs.push({ screen: s.id, feature: s.feature, lang, width, kind, ...(scoped?.propagation.has(s.id) ? { propagation: true } : {}), pct: kind === 'changed' ? round4(pct[k] ?? 0) : null, file: path.relative(out, file).replace(/\\/g, '/'), identity: { base: b?.ok ? b.id : null, cand: c?.ok ? c.id : null }, image: { base: imageOf(b), cand: imageOf(c) } });
     pairJobs.push({ file, b, c, lang, width, noZh });
   }
   if (pairJobs.length) await sched.run({ kind: 'pairs', label: `${pairJobs.length} pair image(s)`, priority: 0, run: async ({ browser: b }) => {
@@ -583,7 +646,8 @@ export async function evaluate(opts) {
   const tools = touchesTools(files);
   const readCand = (p) => { const f = path.join(S.cand.dir, p); return fs.existsSync(f) ? fs.readFileSync(f, 'utf8') : null; };
   if (moved.length) {
-    const feats = [...screens.diff, ...screens.new].map((s) => s.feature).filter((f) => f !== DS_FEATURE);
+    // a propagation screen is not redesigned: its feature's budget and critique are not asked for
+    const feats = [...screens.diff, ...screens.new].filter((s) => !scoped?.propagation.has(s.id)).map((s) => s.feature).filter((f) => f !== DS_FEATURE);
     const bp = budgetProblems(feats, readCand);
     check('information budget before layout', !bp.length, bp.length ? bp.join('; ') + ' (P3: write it first, briefs/build.md §2)' : '');
     const cp = critiqueProblems(feats, readCand);
@@ -603,7 +667,9 @@ export async function evaluate(opts) {
   // There is no shared-component queue (gate-simplify.md X4): main requires a branch to be up to date before it merges, so a change
   // merges only on a gate against main as it is, and a re-gate after main moves reuses every result whose identity is unchanged.
   if (ec.cls === 'shared') {
-    gaps.push('shared-component change: every changed screen on every feature is judged (split the judges by feature if needed)');
+    gaps.push(scoped
+      ? `shared-component change: judged in full on ${scoped.own.join(', ') || 'no feature of its own'} and the component pages; ${scoped.propagation.size} screen(s) of ${scoped.inProgress.join(', ')} for propagation only (propagated or broken); ${mech.outOfScope.screens} screens in ${mech.outOfScope.features.length} features not checked: not in progress`
+      : 'shared-component change: every changed screen on every feature it reaches is judged (split the judges by feature if needed)');
   }
 
   // ---------- 6. the visit checks on the changed and new screens, from the evidence ----------
@@ -647,7 +713,9 @@ export async function evaluate(opts) {
       let debt = 0;
       for (const id of changed) {
         const C = [], B = [];
-        for (const r of HEADER_RUNS) {
+        // English first (#254): a ZH header run exists only for a frozen feature's screen
+        const feat = (S.cand.screens.find((s) => s.id === id) || S.base.screens.find((s) => s.id === id))?.feature;
+        for (const r of HEADER_RUNS.filter((h) => h.lang === 'en' || checksChinese(feat, zhFrozen))) {
           const c = evOf('cand', id, r.width, r.lang, 'headers'), b = onBase(id) ? evOf('base', id, r.width, r.lang, 'headers') : null;
           if (!c?.ok) { missingCheck('headers', 'cand', id, `${r.lang}-${r.width}`, c); continue; }
           if (onBase(id) && !b?.ok) { missingCheck('headers', 'base', id, `${r.lang}-${r.width}`, b); continue; }
@@ -722,14 +790,14 @@ export async function evaluate(opts) {
     const { leaves, nodeCount, problems } = walkTree(spec);
     if (problems.length) return { problems };
     // S5: a leaf runs at the narrowest width its spec lists (360), unless the leaf names its own widths
-    const D = spec.defaults || {}, langs = D.langs || ['en'], widths = [Math.min(...(D.widths || [390]))];
+    const D = spec.defaults || {}, langs = (D.langs || ['en']).filter((g) => g === 'en' || checksChinese(f, zhFrozen)), widths = [Math.min(...(D.widths || [390]))];
     const its = [];
     for (const l of leaves) {
       if (only && !only.has(l.node.id)) continue;
       if (l.node.type !== 'outcome' || l.node.status === 'pending') { its.push({ leaf: l, row: true }); continue; }
       const { children, ...node } = l.node;
       const walked = { node, state: l.state ? { reset: l.state.reset, clock: l.state.clock } : null, taps: l.taps, defaults: D };
-      for (const lang of l.node.langs || langs) for (const width of l.node.widths || widths) its.push({ kind: 'leaf', leaf: l, lang, width, side, feature: f, id: identityOf('leaf', { walked, lang, width, reach: leafReach(side, l, D), strings: blob(side, 'ux/laws/strings.json'), render: { ...render, locale: lang === 'zh' ? 'zh-CN' : 'en-GB' }, runner: code.leaf }) });
+      for (const lang of (l.node.langs || langs).filter((g) => g === 'en' || checksChinese(f, zhFrozen))) for (const width of l.node.widths || widths) its.push({ kind: 'leaf', leaf: l, lang, width, side, feature: f, id: identityOf('leaf', { walked, lang, width, reach: leafReach(side, l, D), strings: blob(side, 'ux/laws/strings.json'), render: { ...render, locale: lang === 'zh' ? 'zh-CN' : 'en-GB' }, runner: code.leaf }) });
     }
     return { its, nodeCount, D, langs, widths };
   };
@@ -737,9 +805,11 @@ export async function evaluate(opts) {
     const runner = leafRunner({ base: S[side].url, defaults: plan.D, verbs: verbsOf(side), evidenceDir: path.join(out, 'leaves', side, f), pool: leafPools[side] });
     const planned = plan_(plan.its.filter((i) => i.kind));
     // an unconfirmed stored failure (written before L26) is run again, not reused
-    const stale = planned.reuse.filter((x) => !reusableLeaf(x.record));
+    // a stored machine error is never reused (2026-10-21: crashed leaves from a killed gate were stored before crashes were machine errors)
+    const reuseOk = (r) => reusableLeaf(r) && !(r.run?.result === 'fail' && machineErrorOf(r.run.failures));
+    const stale = planned.reuse.filter((x) => !reuseOk(x.record));
     for (const { item } of stale) { tally[item.kind].reused--; tally[item.kind].computed++; }
-    const todo = { reuse: planned.reuse.filter((x) => reusableLeaf(x.record)), compute: [...planned.compute, ...stale.map((x) => x.item)] };
+    const todo = { reuse: planned.reuse.filter((x) => reuseOk(x.record)), compute: [...planned.compute, ...stale.map((x) => x.item)] };
     for (const { item, record } of todo.reuse) results.set(item.id, { ...record.run, reused: true });
     const runOnce = (it, again = false) => sched.run({ kind: 'leaf', label: `${side} ${it.leaf.node.id} ${it.lang}-${it.width}${again ? ' (confirming)' : ''}`, priority: 2, run: async ({ browser: b }) => {
       let r;
@@ -794,6 +864,11 @@ export async function evaluate(opts) {
     const spec = specOf('cand', f);
     const ids = spec ? walkTree(spec).leaves.map((l) => l.node.id) : [];
     return unreadable.has(f) || ids.some((id) => leafSet.has(id));
+  }).filter((f) => {
+    // a shared change runs the leaves of its own and the in-progress features only (owner, 2026-10-20)
+    if (!scoped || scoped.own.includes(f) || scoped.inProgress.includes(f)) return true;
+    (mech.outOfScope.leafFeatures ||= []).push(f);
+    return false;
   });
   const noLeaves = [...new Set([...scope, ...moved.map((s) => s.feature)])].filter((f) => f !== DS_FEATURE && !featuresWithLeaves('cand').includes(f));
   mech.leaves = {};

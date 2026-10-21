@@ -25,12 +25,13 @@ Toast says what was just saved, for a few seconds, over the page the worker land
 | Title | What was done, past tense: 16px / 600 (a row title's size), white. |
 | Second line | For whom, or where it went: 13px / 400, white at 78%. Left out, never left empty, when there is nothing to say. |
 
-The check on the green is the only colour; green means done (design law: colour). No tone draws red or amber: a problem is never a toast.
+The check on the green is the only colour on a save; green means done (design law: colour). A failed save is never a toast. The standing form's attention tone is the one red, for a state a person must act on.
 
 ## Variants
 - **Done** (`tone: 'done'`): a check on the green. "Treatment recorded · 000267"; several pigs: "Treatment recorded · 12 pigs"; "Vaccination recorded".
 - **Offline** (`tone: 'offline'`): no-signal on the ink. "Saved on this phone · Uploads when connected · 000267". Never "uploaded" or "synced": nothing has reached the team yet.
 - **Plain** (no tone): a title, no glyph. Only where a host has not moved its older saves to a tone yet (Inspection's "Weights saved"); new saves use done or offline.
+- **Standing** (`standing: { action, value, label }`; owner, 2026-10-20): the same box, but in the page's flow at the top of the page, not over it; it stays until what it reports has been looked at, and the whole box is one door with a chevron. **Notice** (`tone: 'notice'`, a note glyph): records that weren't accepted ("3 records not accepted", Data sync). **Attention** (`tone: 'attention'`, a red disc): a person must act ("Sign in to keep uploading"). One at a time; no entrance motion. [variants/standing.html](variants/standing.html)
 
 ## States
 | State | Rendering and behaviour | Drawn on the component page |

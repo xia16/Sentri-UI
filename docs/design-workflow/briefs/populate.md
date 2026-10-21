@@ -25,7 +25,7 @@ The driver fills in **BATCH** (a name) and **FEATURES**, with a scope note listi
 - `atlas/atlas.json` is generated. Run `npm run atlas` to check your data builds, then `npm run check`. Commit the regenerated file only if the driver says this PR is the one that regenerates it; parallel batches leave it out (`git checkout -- atlas/atlas.json`).
 - `npm test` passes.
 - Other batches run in parallel. Touch only your features' folders, your prototype mapping, and your features' lines in `sections.json`.
-- Merge main forward before pushing (`git fetch origin && git merge origin/main`). Never force-push.
+- Merge main forward before pushing (`node scripts/merge-main.mjs`). Never force-push.
 
 ## Ship
 

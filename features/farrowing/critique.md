@@ -532,6 +532,60 @@ Scope: the sow's Actions page. The owner's rounds on conditions and selection, b
 
 - **Better because** the title says what the page is, the button names it, and the tool row reads as one row at every width.
 
+---
+
+# Pen page (2026-10-20)
+
+Scope: the room's pen page (`farrowing.pen`) and the pen forms it opens (`farrowing.pen-note`, `farrowing.pen-fault`). Its sibling with the same job is the Inspection pen page (`inspection.pen`, PR #229, the owner's ruling of 2026-10-19: the pen is a door, its verbs on top, then what needs someone). Budget: `budget.md` → Pen page. Base: origin/main 7c22bed.
+
+## Keep
+
+- The page header `Pen B1` and Back, as a page (not a drawer), reached from the pen header on the room list.
+- Every pen verb and where it goes: Feed guidance, Report equipment fault, Add / Edit pen note, Pen log; Resolve lives on the fault's record.
+- The note's text, author and time, and its door to the note page.
+- Open faults listed before the note; a resolved fault leaves the page and stays in the log.
+
+## Problems
+
+- **major** · The pen page shows no state of the pen: who is in it, the piglets and its feed are not on it, and the page reads as four tool rows (sibling: Inspection's pen page leads with its verbs and then says how the pen is).
+- **major** · It does not match its sibling with the same job: Inspection's pen page (owner ruling 2026-10-19) puts the verbs on top as a tile grid, then Needs attention, then Now, then one Pen log row. A worker who walks both tasks learns two pen pages.
+- **major** · Drafts are lost on Back: a pen note or a fault half typed is gone when the worker opens it again (atlas edge: "Back discards the draft"; walk law: drafts survive Back and reopen).
+- **minor** · The fault and note notices are tinted cards on the page's tint base (SURFACES.md: a card is the opposite of its base; gate R17), each in its own frame, with a kind chip (`Equipment`, `Note`) the section heading now says.
+- **minor** · Every verb row carries a second line that explains it rather than a state; at 360 the note row's line clips (`Leave information for the next pers…`).
+- **minor** · In Chinese the pen page is all English (`?lang=zh`: `Feed guidance`, `Pen log`, …): the page draws no names from the registry.
+- **minor** · The atlas steps to the pen screens tap English names (`Pen B1, 1 sow, view details`, `Add pen note`, `Select`, `Feeding station`), which a translated page breaks; they become selectors.
+
+## Parts
+
+| Part | Drawn by today | The component whose job it is | Keep / fix / cut |
+|---|---|---|---|
+| Pen verbs | Row navigation, four rows in one group | Row `tile` in `rowGrid` (as on Inspection's pen page and More actions) | **fix** |
+| Open faults | page-built `pen-notice` card (amber) | Row navigation in a white group under `Needs attention` (as on Inspection) | **fix** |
+| Pen note | page-built `pen-notice` card (tint on tint) | Row navigation in the same group, after the faults: the note's text (wrapping) over its hand and time | **fix** (the page-built `penNotice` is retired) |
+| Sows, piglets, feed | absent (feed: the second line of a verb row) | Facts | **fix** |
+| Pen log | a row in the verb list | Row navigation, alone at the end | keep |
+
+## Self-crit
+
+House reference held against: Inspection's pen page (`inspection.pen`, its sibling) and More actions (`farrowing.sow-actions`).
+
+**Round 1** (verbs as tiles; faults as rows; the note kept as its `pen-notice` card): the fault row and the note card touched with no gap, and the note card was a tint card on the page's tint (R17). Not handed over.
+
+**Round 2** (the note as a row after the faults, in one white group):
+- Problems: state on the page (Sows, Piglets alive with dead, Feed when recorded) **fixed**; the sibling's order (verbs, Needs attention, Now, Pen log) **fixed**; drafts kept per pen through Back (note, fault, a fault's resolution) **fixed** (walked live: typed, Back, reopened, saved, reopened empty); the clipped second lines **fixed** (cut); Chinese names **fixed** (`B1栏`, `备注 / 饲喂 / 故障`, `需要处理`, `当前`, `本栏记录`); atlas steps as selectors **fixed**; tint-on-tint notices **fixed**.
+- Keep: the title and Back as on main; every verb and where it goes (Note → Add / Edit pen note, Feed → Feed guidance, Fault → Report equipment fault, Pen log); faults before the note; a resolved fault leaves the page. The note's text keeps ink weight as a row title, its hand and time under it.
+- Squint test: the three tiles, then `Needs attention` with its rows when something is open, then the two Now figures. The worker's first questions are what can I do here, does anything need me, how is the pen: in that order, which is the owner's order (verbs on top, 2026-10-19).
+- Cluttered, flat or bulky: four rows with explanatory lines became three tiles and two quiet facts; one more card (Now) carries state the page lacked. No bold, no colour added; the amber fault card became an ink row (state is said by the heading).
+- **Resolved (PR 238, owner 2026-10-20):** three verbs drew 2 + 1 under the earlier grid rule. The Row tile grid now puts one to five tiles in one row, so Note, Feed and Fault sit in one row with no gap.
+- **Better because** the pen page now says how the pen is and what needs someone, in the same order as Inspection's pen page, and nothing typed is lost on Back.
+
+**Final look** (the gate's pairs on 81eaf18 against main d006a15, EN 390 / 360, ZH 360; the critique edit after it changes no screen):
+- `farrowing.pen`: tiles, Now (Sows 1 · Farrowing; Piglets alive 9 · 5 dead), Pen log; nothing clips at 360; ZH reads `B1栏 · 备注 / 饲喂 / 故障 · 当前 · 本栏记录`. (At that commit the grid drew 2 + 1; PR 238 since puts the three tiles in one row.)
+- `farrowing.pen-attention` (new): the fault row, then the note row in one white group under `Needs attention`; the descriptions wrap without breaking the rows at 360.
+- `farrowing.pen-note`, `-fault`, `-fault-record`, `-read-note`: the sheets are unchanged; only the page dimmed behind them moved. Their own copy stays English under `?lang=zh` on both sides: Farrowing's prototype translates its rows and, now, the pen page; its form sheets are outside this change.
+
+Walk (gate, 298bd9e): every pen screen passed. Three screens the gate walks because they share changed files (the strings registry) failed, all also on main. In `data-sync.category` and `data-sync.task-badge`, the page header's Back did nothing (no handler for `back`); it now goes up one level as the footer's does. In `feed-plan.editor`, a typed note or end date and an unsaved adjustment were lost on Back; the adjustment is now kept per set of subjects, and the note and date per field, until Save or Clear. Both fixes change behaviour only.
+
 
 # Scan and search tidy (2026-10-20, PR 247)
 
@@ -568,3 +622,47 @@ Scope: Farrowing's Scan ear tags and Find a sow, its Scan Actions sheet, Home's 
 - **Squint test:** on Scan, the sow ids and her red overdue state, then the footer's one control. On Find a sow, the field, then the unit headings, then the tags. On To treat, the title, the ids, then the unit headings.
 - **Cluttered, flat or bulky:** two facts went (the pill and the counts) and nothing was added beside them. The arrival wash is temporary. The verb grid is the house grid.
 - **Better because** each fact is said once, every unit list reads the same way, the scan list lines up with the room, a scan lands where the eye can find it, and Back goes one level up.
+
+---
+
+# Tile grid: one row up to five (2026-10-20)
+
+Scope: the verb grids in Farrowing's drawers: `farrowing.sow-actions` (a sow's Actions) and `farrowing.scan-actions` (the ticked sows' Actions after a scan: Transfer, Condition, Treat, Note). No verb, word or icon changes (budget unchanged). Owner ruling 2026-10-20: one row up to five tiles, two rows only from six.
+
+## Keep
+
+- Every verb, its word and icon, the order, Back alone in the footer.
+
+## Problems
+
+- **major** · Four or five verbs drew two rows (2 + 2, 3 + 2): a short second row and a gap (owner, 2026-10-20: "looks really dumb").
+
+## Parts
+
+| Part | Drawn by | Keep / fix / cut |
+|---|---|---|
+| Verb grid | Row `tile` in `rowGrid` | **fix** (one row up to five) |
+
+## Self-crit
+
+- **Better because** the scan drawer's four verbs are one line under Actions and the drawer is shorter, so more of the ticked sows stay in view above it.
+
+# Chinese pass (PR 244), critique
+
+Scope: the words only. At `?lang=zh` these screens read in English where the Inspection prototype draws them: the Inspection sheets Farrowing embeds (`embed=sow`): sow Actions (the note row and its note, Production, Record abortion, Piglet processing, Reconcile piglet count, Foster piglets, Shared, Unavailable actions). Nothing is added, moved or cut in EN.
+
+## Keep
+
+- Every surface, row, order, weight and colour as it is: the change replaces English words with Chinese in the same place, in the same component, at the same weight.
+- EN exactly as it is.
+- Ear tags, pen codes, medicine and brand names, the worker's name, RFID, record numbers and the units mL and °C stay in Latin script; kg reads 公斤 (as on main) and mm reads 毫米.
+
+## Problems
+
+- **major** · At ZH 360 the parts above read in English beside Chinese, so a Chinese-reading worker reads two languages on one screen (P2: read in two seconds).
+- **minor** · Dates read in English forms (`1 Aug 2026`, `Aug 1`, `Thu`) and day counts as `40d`.
+- **minor** · Copy that is longer in Chinese has to fit its component at 360 (a pen-map tile holds four characters: `Not in unit` reads 非本单元).
+
+## Attention budget
+
+Unchanged: each screen shows the same information in the same order as on main, in Chinese. Cut list: nothing is cut.

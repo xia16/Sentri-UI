@@ -2,6 +2,7 @@
 // Scripts: scripts/gate.mjs (the mechanical gate), scripts/polish-loop.mjs (the round ledger), scripts/shoot-screens.mjs.
 // Briefs: docs/design-workflow/briefs/gate.md and polish-loop.md.
 import path from 'node:path';
+import _fs from 'node:fs';
 
 export const CLASSES = ['copy', 'presentation', 'behaviour', 'shared'];
 export const DIMENSIONS = ['hierarchy', 'alignment', 'legibility', 'touch', 'state', 'native'];
@@ -146,9 +147,154 @@ export function classifyScreens(baseRuns, candRuns, pctOf) {
   return out;
 }
 
+// ---------- the scoped reach of a shared change (owner, 2026-10-20) ----------
+// A shared change is checked in full on the PR's own features and on the component pages it moves. Of every other feature, only
+// those in progress (features/_in-progress.json, read from the base) are checked, and only for propagation: the shared part arrived
+// and renders correctly there. Every other feature is not checked.
+export const IN_PROGRESS = 'features/_in-progress.json';
+// The in-progress features, or null when the list can't be read (the gate then scopes nothing: it checks everything, as before).
+export function readInProgress(text) {
+  try { const j = JSON.parse(text); return Array.isArray(j?.features) && j.features.every((f) => typeof f === 'string' && f) ? [...j.features] : null; } catch { return null; }
+}
+// The PR's own features: those whose features/<id>/ files it changes, those its scope names, and the one feature of a page file only
+// that feature's pages load (usersOf: file -> the features whose screens' closures hold it). A file two or more features load is
+// shared, like the system files, the design system, the strings registry and the atlas: it owns no feature, and its other users are
+// checked only where they are in progress (owner, 2026-10-20). On main 81 of the 84 files the closures hold are loaded by two or more
+// features, so a PR names its features by its features/<id>/ files or its scope; "every feature that loads it" owned 15 features for
+// one Home change (PR 243's dry run).
+const SHARED_PART = [...SYSTEM, /^ux\/design-system\//, /^ux\/laws\//, /^atlas\//];
+export function ownFeatures({ files, scope = [], usersOf = () => null }) {
+  const own = new Set(scope);
+  for (const f of files) {
+    const m = /^features\/([^/]+)\//.exec(f);
+    if (m) { own.add(m[1]); continue; }
+    if (SHARED_PART.some((re) => re.test(f))) continue;
+    const users = [...(usersOf(f) || [])];
+    if (users.length === 1) own.add(users[0]);
+  }
+  own.delete(DS_FEATURE);
+  return [...own].sort();
+}
+// The reach, scoped: every screen of an own feature; a component page when keepPage says so; a screen of an in-progress feature,
+// as a propagation screen. Everything else is out of scope and not shot. inProgress null: nothing is scoped (the list is unreadable).
+export function scopeReach({ reach, featureOf, own = [], inProgress, keepPage = () => true }) {
+  const keep = new Set(), propagation = new Set(), dropped = new Map();
+  let pages = 0;
+  for (const id of reach) {
+    if (componentPage(id)) { if (keepPage(id)) keep.add(id); else pages++; continue; }
+    const f = featureOf(id);
+    if (!inProgress || own.includes(f)) keep.add(id);
+    else if (inProgress.includes(f)) { keep.add(id); propagation.add(id); }
+    else dropped.set(f, (dropped.get(f) || 0) + 1);
+  }
+  const screens = [...dropped.values()].reduce((a, b) => a + b, 0);
+  return { keep, propagation, outOfScope: { screens, features: [...dropped.keys()].sort(), componentPages: pages } };
+}
+// The SentriUI exports a component page's variant file calls: `SentriUI.x`, `SentriUI['x']`, and the same through a plain alias
+// (`var UI = window.SentriUI`). null when it uses the namespace any other way: it may call anything.
+export function variantCalls(html) {
+  const src = String(html || '');
+  const names = ['SentriUI'];
+  for (const m of src.matchAll(/\b(?:var|let|const)\s+([A-Za-z_$][\w$]*)\s*=\s*(?:window\.)?SentriUI\s*[;,\n]/g)) names.push(m[1]);
+  const calls = new Set();
+  for (const n of names) {
+    const esc = n.replace(/\$/g, '\\$');
+    for (const m of src.matchAll(new RegExp(`(?<![\\w$.])${esc}\\s*(?:\\.\\s*([A-Za-z_$][\\w$]*)|\\[\\s*['"]([\\w$]+)['"]\\s*\\])`, 'g'))) calls.add(m[1] || m[2]);
+  }
+  // any other use of the namespace (passed along, aliased some other way, indexed by a variable) can't be bounded
+  const bare = src.replace(/\b(?:var|let|const)\s+[A-Za-z_$][\w$]*\s*=\s*(?:window\.)?SentriUI\s*(?=[;,\n])/g, '').replace(/(?<![\w$.])SentriUI\s*(?:\.\s*[A-Za-z_$][\w$]*|\[\s*['"][\w$]+['"]\s*\])/g, '');
+  if (/(?<![\w$])SentriUI(?![\w$])/.test(bare)) return null;
+  return [...calls].map((x) => `SentriUI.${x}`).sort();
+}
+// Which component pages a shared change keeps, and the exports it touches. touched: the exports the bundle graph says may behave
+// differently (change: bundleChange's answer, null when the bundle is untouched) and those that draw a component whose folder it
+// edits (stamps: exportStamps). keepPage(id): a touched component's page always; any page when a design-system input other than
+// the bundle's JS changed (CSS, tokens, the atlas's code, the strings: no proof of which parts they draw) or the bundle can't be
+// narrowed; otherwise a page whose variant calls a touched export, or whose calls can't be bounded (readVariant: its html or null).
+export function componentScope({ files, change = null, stamps = new Map(), readVariant = () => null }) {
+  const BUNDLE = 'ux/design-system/components/bundle.js';
+  const own = componentsTouched(files);
+  const touched = new Set([...(change && !change.all ? change.exports : []), ...[...stamps].filter(([, st]) => st.some((c) => own.includes(c))).map(([e]) => e)]);
+  const dsInputs = files.filter((f) => /^(atlas|ux\/design-system|ux\/laws|vendor|review)\//.test(f) && f !== 'atlas/atlas.json' && !/^ux\/design-system\/components\/[A-Z][^/]*\//.test(f));
+  const narrow = !(change && change.all) && dsInputs.every((f) => f === BUNDLE);
+  const keepPage = (id) => {
+    const p = componentPage(id);
+    if (!p || !narrow || own.includes(p.component)) return true;
+    const html = readVariant(p.component, p.variant), calls = html == null ? null : variantCalls(html);
+    return calls === null || calls.some((c) => touched.has(c));
+  };
+  return { touched, keepPage, narrow };
+}
+// The components each export of a bundle shape stamps (`data-ds="<Name>"` in the export's own units), by export: SentriUI.row → [Row].
+export function exportStamps(shape, namespace = 'SentriUI') {
+  const out = new Map();
+  for (const f of shape?.iifes || []) {
+    if (f.namespace !== namespace) continue;
+    for (const [e, locals] of f.exports) {
+      const st = new Set();
+      for (const l of String(locals).split(',')) { const u = f.units.get(l); if (u) for (const m of String(u.text).matchAll(/data-ds=\\?["']([A-Z]\w*)|dataset\.ds\s*=\s*["']([A-Z]\w*)/g)) st.add(m[1] || m[2]); }
+      out.set(`${namespace}.${e}`, [...st].sort());
+    }
+  }
+  return out;
+}
+
+// ---------- library organisation (owner, 2026-10-20) ----------
+// Every component folder (a PascalCase folder under ux/design-system/components/ holding a README.md, gate.json, variants.json or
+// variants/) is listed in _groups.json or marked retired in its gate.json. A folder with none of these (Cover: the library's cover
+// card) is not a part. A new SentriUI export stamps a grouped component or is named in a grouped component's README.
+const COMPONENTS_DIR = 'ux/design-system/components';
+export function readLibrary(dir, { fsImpl } = {}) {
+  const fsx = fsImpl || _fs;
+  const root = path.join(dir, COMPONENTS_DIR);
+  const readJson = (f) => { try { return JSON.parse(fsx.readFileSync(f, 'utf8')); } catch { return null; } };
+  const groups = readJson(path.join(root, '_groups.json'));
+  const folders = [];
+  let names = [];
+  try { names = fsx.readdirSync(root, { withFileTypes: true }).filter((d) => d.isDirectory() && /^[A-Z]/.test(d.name)).map((d) => d.name).sort(); } catch {}
+  for (const name of names) {
+    const has = (f) => fsx.existsSync(path.join(root, name, f));
+    const gate = has('gate.json') ? readJson(path.join(root, name, 'gate.json')) : null;
+    let readme = '';
+    try { readme = has('README.md') ? fsx.readFileSync(path.join(root, name, 'README.md'), 'utf8') : ''; } catch {}
+    folders.push({ name, component: ['README.md', 'gate.json', 'variants.json', 'variants'].some(has), retired: gate?.status === 'retired', readme });
+  }
+  return { groups, folders };
+}
+export function libraryProblems({ groups, folders }) {
+  if (!Array.isArray(groups)) return [`${COMPONENTS_DIR}/_groups.json is unreadable`];
+  const grouped = new Set(groups.flatMap((g) => g.components || []));
+  return folders.filter((f) => f.component && !grouped.has(f.name) && !f.retired).map((f) => `${f.name}: in no group of _groups.json and not retired (gate.json "status": "retired")`);
+}
+// before: the exports base has; after: export -> the components it stamps (exportStamps); library: readLibrary of the candidate.
+export function newExportProblems({ before, after, library }) {
+  const grouped = new Set((Array.isArray(library?.groups) ? library.groups : []).flatMap((g) => g.components || []));
+  const live = (library?.folders || []).filter((f) => grouped.has(f.name));
+  const out = [];
+  for (const [e, stamps] of after) {
+    if (before.has(e)) continue;
+    const word = e.split('.').pop();
+    if (stamps.some((s) => grouped.has(s))) continue;
+    if (live.some((f) => new RegExp(`(?<![\\w$])${word.replace(/\$/g, '\\$')}(?![\\w$])`).test(f.readme))) continue;
+    out.push(`${e} is new and belongs to no grouped component: stamp data-ds="<Name>" of a component in _groups.json, or name it in that component's README`);
+  }
+  return out;
+}
+// The judge's library fit, over every verdict part: the worst one decides, and the notes are kept together.
+export const LIBRARY_FIT = ['ok', 'restructure-needed', 'extend-existing'];
+export function mergeLibrary(parts) {
+  const libs = (parts || []).map((p) => p?.library).filter(Boolean);
+  if (!libs.length) return undefined;
+  const rank = (x) => (LIBRARY_FIT.includes(x) ? LIBRARY_FIT.indexOf(x) : LIBRARY_FIT.length); // an unknown fit is the worst: checkVerdict names it
+  const fit = libs.map((l) => l.fit).reduce((a, b) => (rank(b) > rank(a) ? b : a));
+  return { fit, note: [...new Set(libs.map((l) => String(l.note || '').trim()).filter(Boolean))].join(' · ') };
+}
+
 // What a judge may say about a pair: a pair with both sides is better, same or worse; a pair with one side (a new screen,
-// or a removed one) passes or fails.
+// or a removed one) passes or fails. A propagation pair (a screen of an in-progress feature a shared change reaches) is
+// propagated or broken: only whether the shared part arrived and renders correctly is judged there.
 const VERDICTS = { changed: ['better', 'same', 'worse'], new: ['pass', 'fail'], gone: ['pass', 'fail'] };
+const PROPAGATION = ['propagated', 'broken'];
 
 // The judge's verdict must be about this candidate, judge every pair the gate built, and agree with the mechanical result.
 export function checkVerdict(verdict, mech) {
@@ -174,23 +320,34 @@ export function checkVerdict(verdict, mech) {
   const manifest = new Set(listed.map(name));
   for (const p of pairs) if (!manifest.has(name(p))) problems.push(`the verdict judges pair ${name(p)}, which is not in the evidence manifest (mechanical.json pairs): judge this run's pairs`);
   for (const p of listed) {
-    const kind = p.kind || 'changed', allowed = VERDICTS[kind] || [], v = said.get(name(p)) || [];
+    const kind = p.kind || 'changed', allowed = p.propagation ? PROPAGATION : VERDICTS[kind] || [], v = said.get(name(p)) || [];
     if (!v.length) { problems.push(`no judgement for pair ${name(p)}`); continue; }
     if (new Set(v).size > 1) problems.push(`pair ${name(p)} is judged ${[...new Set(v)].join(' and ')}`);
-    for (const x of new Set(v)) if (!allowed.includes(x)) problems.push(`pair ${name(p)} has ${kind === 'changed' ? 'both sides' : 'one side'}: its verdict is ${allowed.join(' or ') || '(unknown pair kind)'}, not "${x}"`);
-    if (kind === 'changed' && p.pct === 0 && v.some((x) => x !== 'same')) problems.push(`pair ${name(p)} is pixel-identical: it can only be same`);
+    for (const x of new Set(v)) if (!allowed.includes(x)) problems.push(`pair ${name(p)} ${p.propagation ? 'is a propagation pair (an in-progress feature the shared change reaches)' : `has ${kind === 'changed' ? 'both sides' : 'one side'}`}: its verdict is ${allowed.join(' or ') || '(unknown pair kind)'}, not "${x}"`);
+    if (!p.propagation && kind === 'changed' && p.pct === 0 && v.some((x) => x !== 'same')) problems.push(`pair ${name(p)} is pixel-identical: it can only be same`);
   }
   // Gate v2 has no flaky list: a changed screen is visited again on both sides and either draws its own shot again or blocks.
-  const moving = listed.filter((p) => (p.kind || 'changed') === 'changed' && p.pct !== 0);
+  // A propagation pair is judged only propagated or broken, so it never counts toward "at least one better".
+  const shows = (p) => (p.kind || 'changed') !== 'changed' || p.pct !== 0;
+  const moving = listed.filter((p) => !p.propagation && (p.kind || 'changed') === 'changed' && p.pct !== 0);
   const better = moving.filter((p) => (said.get(name(p)) || []).includes('better'));
-  const worse = pairs.filter((p) => p.verdict === 'worse' || p.verdict === 'fail');
+  const worse = pairs.filter((p) => p.verdict === 'worse' || p.verdict === 'fail' || p.verdict === 'broken');
+  // The library fit (owner, 2026-10-20): a change that touches a component says whether it belongs where it was built. A new parallel
+  // part where an existing component or variant has the job fails; a grouping that no longer makes sense passes, naming the restructure.
+  if (mech.library?.required) {
+    const lib = verdict.library;
+    if (!lib || !LIBRARY_FIT.includes(lib.fit)) problems.push(`this change touches a component: the verdict needs "library": { "fit": "ok" | "extend-existing" | "restructure-needed", "note" }${lib ? `, not fit "${lib.fit}"` : ''}`);
+    else if (lib.fit === 'extend-existing') problems.push(`library fit is extend-existing: a new parallel part where an existing component or variant has the job (${lib.note || 'no note'}): extend that one instead`);
+    else if (lib.fit === 'restructure-needed' && !String(lib.note || '').trim()) problems.push('library fit is restructure-needed: its note must name the restructure');
+  }
   if (verdict.pass) {
-    if (worse.length) problems.push(`passes with ${worse.length} worse or failed pair(s): ${worse.map(name).slice(0, 3).join(', ')}`);
+    if (worse.length) problems.push(`passes with ${worse.length} worse or failed pair(s) (broken counts as failed): ${worse.map(name).slice(0, 3).join(', ')}`);
     if ((verdict.defects || []).length) problems.push(`passes with ${verdict.defects.length} cold-look defect(s)`);
     if ((verdict.contradicted || []).length) problems.push('passes with contradicted claims');
     if ((verdict.walk || []).some((w) => w.ok !== true)) problems.push('passes with a walk entry that is not ok');
     if (mech.mode === 'refactor') { if (pairs.some((p) => p.verdict !== 'same')) problems.push('a refactor passes with a pair that is not the same'); }
     else if (moving.length && !better.length) problems.push('passes with no pair better (same is not enough)');
+    else if (!listed.some((p) => !p.propagation && shows(p)) && listed.some((p) => p.propagation && shows(p))) problems.push("only propagation pairs moved: the change shows on no page of its own (its component's atlas page ds:<Name>/… or the PR's own feature), so nothing is judged better");
     else if (!(mech.screens?.diff || []).length && !(mech.screens?.new || []).length) {
       // Nothing visible changed: only a behaviour fix (which may leave every first frame alone) passes, and on a walk.
       const behaviour = ['behaviour', 'shared'].includes(mech.class?.effective || mech.class?.declared);
@@ -514,14 +671,30 @@ export function scenarioDebt(candReport, baseReport) {
 // one (not --quick) whose screens were classified, with nothing changed, new or gone and no pair listed.
 // The PR's Results block (gate-simplify.md S8), from one gate run's mechanical.json: every number in it was measured on the gated
 // commit, so a PR body that pastes it never carries a stale claim (#163, #192). Markdown; the driver pastes it whole.
+// English first (owner, 2026-10-21): Chinese is checked only on a frozen feature, one whose every current screen is approved (the
+// atlas's own status, build-atlas.mjs statusOf). Until a feature freezes, its ZH runs and ZH leaves don't gate: copy and layout are
+// still moving, and the Chinese pass belongs to the freeze (freeze-checklist.md). A feature frozen on either side keeps its Chinese.
+export function frozenFeatures(atlas) {
+  const out = new Set();
+  for (const p of atlas?.platforms || []) for (const s of p.sections || []) for (const f of s.features || []) if (f?.status === 'frozen') out.add(f.id);
+  return out;
+}
+export const checksChinese = (feature, frozen) => !!feature && frozen.has(feature);
+
 export function resultsBlock(mech) {
   const short = (s) => String(s || '?').slice(0, 7);
   const n = (a) => (Array.isArray(a) ? a.length : 0);
   const r = mech.reach || {}, sc = mech.screens || {};
   const word = { pass: 'MECHANICAL PASS', fail: 'MECHANICAL FAIL', blocked: 'MECHANICAL BLOCKED' }[mech.outcome] || 'MECHANICAL ?';
   const out = [`### Results`, '', `The gate's, on \`${short(mech.candidate)}\` against main \`${short(mech.base)}\` (\`node scripts/gate.mjs\`, ${mech.timings?.total ?? '?'} s).`, ''];
-  out.push(`- **${word}**${mech.gatePass ? ' · GATE PASS (no screen moved)' : ''}, class **${mech.class?.effective || '?'}**${mech.stoppedEarly ? ` · stopped before any browser work: ${mech.stoppedEarly}` : ''}`);
+  out.push(`- **${word}**${mech.gatePass ? ' · GATE PASS' : ''}, class **${mech.class?.effective || '?'}**${mech.stoppedEarly ? ` · stopped before any browser work: ${mech.stoppedEarly}` : ''}`);
   if (r.of) out.push(`- Reach: ${r.screens} of ${r.of} screens${r.changed !== undefined ? ` (${r.changed} changed identity, ${r.added} added, ${r.removed} removed)` : ''}${r.leaves !== undefined ? `, ${r.leaves} leaves` : ''}`);
+  // the scoped reach of a shared change (owner, 2026-10-20), in one line, and the propagation pairs
+  const os = mech.outOfScope;
+  if (os) out.push(`- Scope: checked in full on ${(mech.ownFeatures || []).join(', ') || 'no feature of its own'} and the component pages; propagation only on ${(mech.inProgress || []).join(', ') || 'none'} (in progress)${os.screens ? `; ${os.screens} screens in ${os.features.length} features not checked: not in progress` : ''}${os.componentPages ? `; ${os.componentPages} component page(s) of parts the change doesn't call` : ''}`);
+  const prop = (mech.pairs || []).filter((p) => p.propagation).length, notUsing = (mech.propagation || []).filter((p) => p.notUsingShared).map((p) => p.screen);
+  if (prop || notUsing.length) out.push(`- Propagation: ${prop} pair(s) checked by the machine${notUsing.length ? `; calls none of the changed exports (a local copy?): ${notUsing.slice(0, 4).join(', ')}${notUsing.length > 4 ? ' …' : ''}` : ''}`);
+  if (mech.zh) out.push(`- Chinese: checked only on frozen features (English first, owner 2026-10-21): ${mech.zh.frozen.length ? mech.zh.frozen.join(', ') : 'none frozen, so no ZH runs or ZH leaves'}`);
   if (mech.screens) out.push(`- Screens: ${n(sc.diff)} changed, ${n(sc.new)} new, ${n(sc.gone)} gone, ${n(sc.broken)} broken; ${n(mech.pairs)} pair(s) to judge${n(mech.walkNeed) ? `; ${mech.walkNeed.length} screen(s) to walk (${mech.walkNeed.slice(0, 4).join(', ')}${mech.walkNeed.length > 4 ? ' …' : ''})` : ''}`);
   for (const c of mech.checks || []) out.push(`- ${c.result === 'pass' ? '✓' : c.result === 'fail' ? '✗' : '–'} ${c.check}${c.detail ? `: ${String(c.detail).split('\n')[0].slice(0, 160)}` : ''}`);
   for (const b of mech.blocked || []) out.push(`- ⛔ ${String(b).slice(0, 200)}`);
@@ -529,11 +702,11 @@ export function resultsBlock(mech) {
   return out.join('\n') + '\n';
 }
 
-export function passesWithoutJudge(mech) {
+// Owner ruling (2026-10-20): the owner's "PR it" is the design approval, so the machine's pass is the merge gate. Moved screens,
+// walks and the judge no longer hold a merge; the judge is advice the builder may ask for before the owner looks (briefs/gate.md).
+export function machinePass(mech) {
   if (!mech || mech.pass !== true || (mech.outcome && mech.outcome !== 'pass') || mech.quick || !mech.candidate || !mech.base || !mech.screens) return false;
-  if ((mech.pairs || []).length) return false;
-  if ((mech.walkNeed || []).length) return false; // G15: a screen that runs changed code and draws the same is walked
-  return ['diff', 'new', 'gone'].every((k) => Array.isArray(mech.screens[k]) && mech.screens[k].length === 0);
+  return ['diff', 'new', 'gone'].every((k) => Array.isArray(mech.screens[k]));
 }
 
 // Gate v2: a moved main (or a PR head that merged it forward) never voids work by itself (gate-v2.md §3). The gate runs again on
@@ -603,7 +776,7 @@ export function carryJudgements(old, now) {
     // a part's pass is about its own pairs (no worse, no defect); "at least one better" is checkVerdict's, over every part (G13)
     pass: (old.parts || []).every((p) => p.pass === true), candidate: now.candidate, base: now.base, class: first.class, mode: first.mode,
     mechanical: first.mechanical || [], walk, pairs, defects: cat('defects'), gone, calibration: first.calibration || [],
-    rejected: cat('rejected'), contradicted: cat('contradicted'),
+    rejected: cat('rejected'), contradicted: cat('contradicted'), ...(mergeLibrary(old.parts) ? { library: mergeLibrary(old.parts) } : {}),
     notes: `carried by image or identity from the verdict on ${String(old.mech?.candidate).slice(0, 7)} against ${String(old.mech?.base).slice(0, 7)}${first.notes ? `; ${first.notes}` : ''}`,
     carriedFrom: { candidate: old.mech?.candidate, base: old.mech?.base },
   } : null;

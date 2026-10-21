@@ -42,5 +42,18 @@
       "Chinese"
     ],
     "usedBy": []
+  },
+  {
+    "id": "standing",
+    "name": "Standing",
+    "use": "Use at the top of a page for what stays true until looked at: records that weren't accepted (notice), or a person must act, such as signing back in (attention). The whole box opens the page that explains it.",
+    "notUse": "Not for a save (use done or offline, which go by themselves), not over the page (it sits in the flow), never two at once, never for a failed save (the sheet keeps its error).",
+    "states": [
+      "Notice",
+      "Notice · pressed",
+      "Attention",
+      "Chinese"
+    ],
+    "usedBy": []
   }
 ]
