@@ -551,7 +551,7 @@
          ],
          "record": [
           {
-           "expr": "(() => { const t = document.querySelector('.atlas-phone .room-search-results').innerText; return !/born \\d/i.test(t) && !/\\b0 dead/.test(t) && !document.querySelector('.atlas-phone .room-search-results [data-rail=\"edit\"]'); })()",
+           "expr": "(() => { const t = document.querySelector('.atlas-phone .st-find-results').innerText; return !/born \\d/i.test(t) && !/\\b0 dead/.test(t) && !document.querySelector('.atlas-phone .st-find-results [data-rail=\"edit\"]'); })()",
            "hard": "wrong-fact"
           }
          ]
@@ -3337,14 +3337,14 @@
          "text": "Type part of an ear tag or a pen, or scan a tag. Searches every unit."
         },
         {
-         "el": ".find-row",
+         "el": ".st-find-row",
          "is": "absent",
          "hard": "wrong-fact",
          "says": "no sow is listed before typing"
         },
         {
          "text": "Unit 7",
-         "in": ".find-top",
+         "in": ".st-find-top",
          "absent": true,
          "hard": "broken-ruling",
          "says": "the search header names no unit"
@@ -3399,7 +3399,7 @@
          ],
          "record": [
           {
-           "expr": "JSON.stringify([...document.querySelectorAll('.room-search-results .find-list')].map(l=>l.previousElementSibling.textContent.trim()+':'+[...l.querySelectorAll('.st-animal-id')].map(e=>e.textContent).join())) === JSON.stringify(['Unit 7:000431','Unit 6:000437,004318','Unit 8:000943'])",
+           "expr": "JSON.stringify([...document.querySelectorAll('.st-find-results .st-find-list')].map(l=>l.previousElementSibling.textContent.trim()+':'+[...l.querySelectorAll('.st-animal-id')].map(e=>e.textContent).join())) === JSON.stringify(['Unit 7:000431','Unit 6:000437,004318','Unit 8:000943'])",
            "says": "the cards are Unit 7: 000431, Unit 6: 000437, 004318, Unit 8: 000943",
            "hard": "wrong-fact"
           }
@@ -3484,7 +3484,7 @@
          ],
          "record": [
           {
-           "expr": "JSON.stringify([...document.querySelectorAll('.room-search-results .find-list')].filter(l=>l.previousElementSibling.textContent.trim()==='Unit 6').map(l=>[...l.querySelectorAll('.st-animal-id')].map(e=>e.textContent).join())[0]) === JSON.stringify('004318,000437')",
+           "expr": "JSON.stringify([...document.querySelectorAll('.st-find-results .st-find-list')].filter(l=>l.previousElementSibling.textContent.trim()==='Unit 6').map(l=>[...l.querySelectorAll('.st-animal-id')].map(e=>e.textContent).join())[0]) === JSON.stringify('004318,000437')",
            "says": "004318 is listed before 000437",
            "hard": "wrong-fact"
           }
@@ -3570,7 +3570,7 @@
            "text": "No sow matching “909” in any unit."
           },
           {
-           "el": ".find-row",
+           "el": ".st-find-row",
            "is": "absent",
            "hard": "wrong-fact"
           }
@@ -3697,7 +3697,7 @@
          "says": "no footer act when no reader is paired"
         },
         {
-         "el": ".scan-empty button",
+         "el": ".st-scan-empty button",
          "is": "absent",
          "hard": "broken-ruling",
          "says": "no button in the message"
@@ -3792,7 +3792,7 @@
          "text": "Stop scanning"
         },
         {
-         "el": ".scan-page .sheet-body .scan-live",
+         "el": ".st-scan .sheet-body .scan-live",
          "is": "absent",
          "hard": "broken-ruling",
          "says": "the footer says the reader is listening; the body has no second status"
@@ -3847,7 +3847,7 @@
        ],
        "record": [
         {
-         "expr": "[...document.querySelectorAll('.scan-page [data-scan-tag]')].map(e=>e.dataset.scanTag).join() === '000431,000418,004318'",
+         "expr": "[...document.querySelectorAll('.st-scan [data-scan-tag]')].map(e=>e.dataset.scanTag).join() === '000431,000418,004318'",
          "says": "the rows are 000431, 000418, 004318",
          "hard": "wrong-fact"
         }
@@ -3880,7 +3880,7 @@
        ],
        "record": [
         {
-         "expr": "[...document.querySelectorAll('.scan-page [data-scan-tag]')].every(r => r.querySelector('input[type=checkbox]') && r.querySelector('.st-row-door'))",
+         "expr": "[...document.querySelectorAll('.st-scan [data-scan-tag]')].every(r => r.querySelector('input[type=checkbox]') && r.querySelector('.st-row-door'))",
          "says": "every row has a tick box and a door",
          "hard": "broken-ruling"
         }
@@ -4051,13 +4051,13 @@
            "text": "1 sow selected"
           },
           {
-           "el": ".scan-foot .scan-selected",
+           "el": ".st-scan-foot .st-scan-selected",
            "is": "present"
           }
          ],
          "record": [
           {
-           "expr": "!document.querySelector('.scan-foot .scan-selected').closest('button') && !document.querySelector('.scan-foot .scan-selected svg')",
+           "expr": "!document.querySelector('.st-scan-foot .st-scan-selected').closest('button') && !document.querySelector('.st-scan-foot .st-scan-selected svg')",
            "says": "the count is not a button and has no chevron",
            "hard": "broken-ruling"
           }
@@ -4446,14 +4446,14 @@
        ],
        "visible": [
         {
-         "el": ".scan-page [data-scan-tag='004318'][data-arrival='on']",
+         "el": ".st-scan [data-scan-tag='004318'][data-arrival='on']",
          "says": "her row holds the arrival tint",
          "hard": "broken-ruling"
         }
        ],
        "record": [
         {
-         "expr": "document.querySelectorAll('.scan-page [data-arrival=on]').length === 1 && c.scan.picked.length === 0",
+         "expr": "document.querySelectorAll('.st-scan [data-arrival=on]').length === 1 && c.scan.picked.length === 0",
          "says": "only the sow just scanned is lit, and lighting ticks nothing",
          "hard": "wrong-fact"
         }
@@ -4489,7 +4489,7 @@
        ],
        "record": [
         {
-         "expr": "[...document.querySelectorAll('.scan-page [data-scan-tag]')].map(e=>e.dataset.scanTag).join() === '000431,000418,004318' && c.scan.items.length === 3",
+         "expr": "[...document.querySelectorAll('.st-scan [data-scan-tag]')].map(e=>e.dataset.scanTag).join() === '000431,000418,004318' && c.scan.items.length === 3",
          "says": "each sow is listed once",
          "hard": "wrong-fact"
         }

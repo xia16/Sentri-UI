@@ -10,6 +10,9 @@ test('machine errors: a navigation timeout and net::ERR only; an assertion, a mi
   assert.equal(classifyMachineError('net::ERR_CONNECTION_RESET http://127.0.0.1:5000/ux/system/a.js'), 'net-error');
   assert.equal(classifyMachineError('page.goto: net::ERR_EMPTY_RESPONSE at http://127.0.0.1'), 'net-error');
   assert.equal(classifyMachineError("page.goto: net::ERR_NO_BUFFER_SPACE at http://127.0.0.1:5000/"), "net-error", "#190: a navigation the network refused");
+  assert.equal(classifyMachineError('browserContext.newPage: Target crashed'), 'browser-crash', '2026-10-21: an app restart killed the gate mid-run');
+  assert.equal(classifyMachineError('page.click: Target page, context or browser has been closed'), 'browser-crash');
+  assert.equal(classifyMachineError('browser has disconnected'), 'browser-crash');
   for (const design of ['page.waitForSelector: Timeout 10000ms exceeded', 'control not found: Done', 'expected "Saved" shown, got absent', 'TypeError: x is undefined', '', null]) assert.equal(classifyMachineError(design), null, String(design));
 });
 

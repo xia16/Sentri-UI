@@ -208,3 +208,43 @@ Only Weak, Deformed and Assisted ask for an action, and each is one row of one 4
 ### Edit finish details
 
 The same three rows with the same controls (the totals panel does not appear there). Kept facts and their questions are the Edit record's (what was recorded, what changes). The `was N` notes on the steppers and the changes summary behind the Save correction button are kept. For an old record whose Assisted was never recorded (null), the keys show neither chosen and the read-only facts still read `Not recorded`; history is not rewritten.
+
+---
+
+## Pen page (2026-10-20)
+
+Scope: the room's pen page (`farrowing.pen`, `roomPenDetail`), moved onto the layout of its sibling, the Inspection pen page (`inspection.pen`, PR #229). Owner ruling 2026-10-19: the pen is a door; everything done to the pen as a whole happens on its page; its verbs on top. Base: origin/main 7c22bed.
+
+### Inventory
+
+- Title `Pen B1`; Back.
+- The pen's verbs today: Feed guidance, Report equipment fault, Add / Edit pen note, Pen log (each with an explanatory second line).
+- Open equipment faults: device, description, `Open · Reported 09:41 · G.H`.
+- The pen note: its text, who and when.
+- The pen's feed (formula, method), when recorded; no pen in the prototype has any.
+- The task sows in the pen and their states (Awaiting, Farrowing, Done; sow died, aborted).
+- Piglets alive and dead across the pen's sows.
+- The pen log (pen events and every sow event in the pen).
+
+### Questions
+
+1. Which pen am I on? (the title)
+2. What can I do to this pen? (its verbs)
+3. Does anything here need someone? (an open fault, the note left for me)
+4. How is the pen now? (who is in it and where they are; the piglets; what it eats)
+5. What has happened here? (the log)
+
+### Levels
+
+| Fact | Level | Question it answers | Change |
+|---|---|---|---|
+| `Pen B1` | header | Which pen? | kept (no second line: the sow count is said once, in Now) |
+| Pen verbs: Note, Feed, Fault | Act now (one grid, Row tile) | What can I do to this pen? | verbs move to the top as tiles; their explanatory second lines are cut. Only the verbs Farrowing has: no Observe, no Tick all (Farrowing's room list has no ticking) |
+| Open equipment fault (device, its description) | Needs attention | Is something broken here? | kept, as a Row navigation row (as on Inspection), under `Needs attention`; the reported stamp is on the fault's record, one tap in |
+| Pen note (its text, who and when) | Needs attention | What did the last person leave me? | kept, as a row after the faults in the same white group (its text in ink, who and when under it); its `Note` chip is cut (the row's note icon and the heading say it) |
+| Sows (`1`, `Farrowing`; `3`, `Awaiting`; `2`, `1 done · 1 sow died`) | Now | Who is in this pen, and where are they? | new on the page (today only on the room list's rows) |
+| Piglets alive (`9`, `5 dead`) | Now | How many piglets are here? | new on the page; left out when no sow in the pen has farrowed (no zeros); dead is said only when there are any |
+| Feed (formula, method) | Now | What does this pen eat? | new on the page (was the second line of Feed guidance); left out when nothing is recorded |
+| Pen log (`All recorded activity`) | door | What has happened here? | kept as one row at the end |
+
+Cut: the notices' kind chips (`Equipment`, `Note`); the verb rows' second lines (`View feeding information`, `Name the device and what is wrong`, `Leave information for the next person`, `Update the note for this pen`); the fault notice's `Equipment` chip and its stamp line on the pen page (the fault row is the door to both). No `Observe` or `Tick all` tile: Farrowing has neither verb, and none is invented.

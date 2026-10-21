@@ -243,6 +243,44 @@ Walk (gate): the Assistant's composer and finding answer lost their text on tab 
 
 Order (owner, 2026-10-19, confirmed after judge round 1): the pen verbs stay on top; Needs attention follows them. Round 1 (void, calibration miss) asked for Needs attention first; the owner kept actions first.
 
+# Find a pig and Scan ear tags (2026-10-20)
+
+Scope: the walk's Search and Scan ear tag, which opened one drawer for both jobs. They now open the design system's Lookup pages, as Farrowing's Find a sow and Scan ear tags do (owner decision 2026-10-12: search and scan are different jobs; the pattern is shared).
+
+## Keep
+
+- The walk's roster row (owner approved 2026-10-12): the tag over the stage line, the condition tags on the right, the tick box beside the door. Scan's rows are that row, unchanged.
+- Opening a pig: a result still opens her pig record here, and Back returns to where the worker was.
+- The walk's Actions for ticked pigs (the page the walk's own selection opens): Scan's Actions is that page.
+- The dock: Scan ear tag stays the primary, Search the icon beside it.
+
+## Problems
+
+- **major** · One drawer did two jobs: Scan opened the search drawer with "Camera scanning is not connected" and "Try sample tag 000306"; the owner ruled search and scan different jobs (2026-10-12).
+- **major** · Search listed every pig of the unit before anything was typed ("7 pigs found"): a browse list, not a search (owner: nothing is listed before typing).
+- **major** · Search covered this unit only ("No matching pigs in this unit."); the owner ruled search global, results grouped by unit.
+- **minor** · The result row said the pen and the raw stage ("Pen C1 · Gestating") under the tag with an empty right side, not the animal row's tag-left, place-right shape.
+- **minor** · Scanned pigs were not collected: each scan replaced the last.
+- **minor** · The walk's Actions had no Transfer, one of the general actions (owner, 2026-10-12). It joins the everyday verbs as the entry point to the Transfer feature, which is not designed yet (owner, 2026-10-20): the tile says so in a notice.
+
+## Parts
+
+| Part | Drawn by today | The component whose job it is | Keep / fix / cut |
+|---|---|---|---|
+| Search and scan drawer | page-built (`inspection-astra-concept.js`, a Sheet with a Field) | Lookup (find, scan) | **fix**: two Lookup pages |
+| Result row | Row · Animal with an empty right | Lookup's find row (Row · Animal, the place on the right) | **fix** |
+| Sample-tag button, camera note | page-built | (prototype chrome) | **cut** |
+| Scan row | none | the walk's roster row (Row · select + door) | **keep** (reused) |
+
+## Self-crit
+
+#### Final look (the pushed head of claude/adoring-antonelli-34e06a; its screens are b61dca2's, which the gate rendered at 390 and 360 in EN and ZH against main 6f747c0: mechanical pass)
+- Problems fixed: two pages for two jobs; nothing listed before typing; every unit searched, one card per unit, this unit first; the result row is tag left, pen right; scans collect, newest first, a repeat lights its row.
+- Keep as strong: Scan's rows are the walk's roster rows, unchanged; a pig opens her record and Back comes back; Actions is the walk's.
+- Squint: Find, the field, then the first card's tags; Scan, the title, the first card's rows and their tags, then the footer's one act.
+- House reference: Farrowing's Find a sow and Scan ear tags (the same part).
+- **Better because** each job has its own page that does only that job, and the worker sees the same pages in Inspection as in Farrowing.
+
 ---
 
 # Tile grid: one row up to five (2026-10-20)

@@ -15,6 +15,10 @@
     "commit": "fc98e360417f0ba10b86bc3249f0258ee4a53949",
     "date": "2026-10-12",
     "by": "owner",
-    "note": "Owner approved the animal row (Farrowing) and the compact-tag roster row (Inspection), 2026-10-12"
+    "note": "Owner approved the animal row (Farrowing) and the compact-tag roster row (Inspection), 2026-10-12",
+    "changed": {
+      "since": "claude/adoring-antonelli-34e06a",
+      "why": "Find a pig is now the shared Lookup page: global, nothing listed before typing, one card per unit; the old drawer is retired"
+    }
   }
 ]
