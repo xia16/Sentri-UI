@@ -299,3 +299,19 @@ test("a page's identity follows its stylesheets' checked imports, and a styleshe
   const blockLoose = ii({ 'ux/system/farrowing.html': PAGE('<style>.a{} @import "leaf.css";</style><script src="farrowing.js"></script>') });
   assert.match(blockLoose.unbounded.find((u) => u.type === 'style')?.why || '', /farrowing\.html <style>/);
 });
+
+// ---------- Codex audit, 2026-10-21: srcset (latent, no page uses it) ----------
+test('srcset names several candidates, so it is an unbounded media load wherever it is written, never its first file', () => {
+  const page = (body, js) => identityInputs(checkout({ farrowingJs: js, more: body ? { 'ux/system/farrowing.html': PAGE(`${body}<script src="farrowing.js"></script>`) } : {} }), 'farrowing.room');
+  for (const ii of [
+    page('<img src="a.png" srcset="a.png 1x, b.png 2x">', 'SentriUI.row({});'),
+    page('<picture><source srcset="wide.png 800w, narrow.png 400w"><img src="narrow.png"></picture>', 'SentriUI.row({});'),
+    page(null, "el.innerHTML='<img srcset=\"a.png 1x, b.png 2x\">';"),
+    page(null, "img.srcset='a.png 1x, b.png 2x';"),
+    page(null, "img.setAttribute('srcset','a.png 1x, b.png 2x');"),
+  ]) {
+    assert.ok(ii.unbounded.some((u) => u.type === 'media' && /srcset can name several files/.test(u.why)), JSON.stringify(ii.unbounded));
+    assert.ok(!ii.files.some((f) => /\s|,/.test(f)), 'no candidate list is read as a file name');
+  }
+  assert.ok(page('<img src="a.png" srcset="a.png 1x, b.png 2x">', '').files.includes('ux/system/a.png'), 'its src is still a literal load');
+});

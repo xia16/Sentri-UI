@@ -193,6 +193,9 @@ function aliasUses(ast, name, ns) {
 const MEDIA = /\.(png|jpe?g|gif|webp|avif|svg|ico|bmp|mp4|webm|mov|mp3|wav|ogg|m4a|vtt)$/i;
 export const fileType = (f) => (MEDIA.test(f) ? 'media' : /\.(m?js|cjs)$/i.test(f) ? 'script' : /\.css$/i.test(f) ? 'style' : 'other');
 const TAG_TYPE = { img: 'media', source: 'media', video: 'media', audio: 'media', track: 'media', input: 'media', script: 'script' };
+// srcset lists candidates ("a.png 1x, b.png 2x"), and the browser picks one by the screen: the analyser doesn't read the list, so
+// any srcset is an unbounded media load (Codex audit, 2026-10-21: only the first candidate was recorded). None is in use today.
+const SRCSET = (why) => ({ why: `${why}: srcset can name several files`, type: 'media' });
 
 // The paths a URL expression can name, or null when it can't be bounded: a literal; new URL(literal, base) (against the script when
 // the base is its own src or import.meta.url, against the page when it is location/document, against both when unknown); .href,
@@ -307,17 +310,19 @@ function scriptLoads(ast, file, page) {
       if (name === 'open' && c.type === 'MemberExpression' && n.arguments.length >= 2 && literalOf(n.arguments[0]) !== null && /^[A-Z]+$/.test(literalOf(n.arguments[0]))) arg(n.arguments[1], page, 'XMLHttpRequest.open()');
       if (name === 'open' && c.type === 'MemberExpression' && c.object.type === 'Identifier' && ROOTISH.has(c.object.name) && n.arguments.length) go(n.arguments[0], 'window.open()');
       if (['assign', 'replace'].includes(name) && c.type === 'MemberExpression' && isLocation(c.object) && n.arguments.length) go(n.arguments[0], `location.${name}()`);
-      if (name === 'setAttribute' && n.arguments.length >= 2 && LOAD_PROPS.has(literalOf(n.arguments[0]))) arg(n.arguments[1], page, `setAttribute('${literalOf(n.arguments[0])}')`);
+      if (name === 'setAttribute' && n.arguments.length >= 2 && literalOf(n.arguments[0]) === 'srcset') unbounded.push(SRCSET(`${file}: setAttribute('srcset')`));
+      else if (name === 'setAttribute' && n.arguments.length >= 2 && LOAD_PROPS.has(literalOf(n.arguments[0]))) arg(n.arguments[1], page, `setAttribute('${literalOf(n.arguments[0])}')`);
     }
     // `x.src = url` loads; `PP.href = function () {…}` only stores a function
     if (n.type === 'AssignmentExpression' && !/Function/.test(n.right.type)) {
       const l = n.left;
       if (isLocation(l) || (l.type === 'MemberExpression' && !l.computed && l.property.name === 'href' && isLocation(l.object))) go(n.right, 'location =');
+      else if (l.type === 'MemberExpression' && !l.computed && l.property.name === 'srcset') unbounded.push(SRCSET(`${file}: .srcset =`));
       else if (l.type === 'MemberExpression' && !l.computed && LOAD_PROPS.has(l.property.name)) arg(n.right, page, `.${l.property.name} =`);
     }
     // markup built in strings: src="…" / href="…" inside a literal or a template's fixed parts. A value with an expression in it
     // (<img src="${url}">) can't be bounded; the tag says what it can load. A link (<a href>) is navigation, not a load.
-    const markup = (text) => { for (const m of text.matchAll(/<(\w+)\b[^<>]*?\b(?:src|href|data|srcset|poster)\s*=\s*(["'])([^"']*)\2/gi)) { if (m[1].toLowerCase() !== 'a') add(m[3], page); else { const f = resolveRef(m[3], page); if (f) nav.add(f); } } };
+    const markup = (text) => { for (const m of text.matchAll(/<(\w+)\b[^<>]*?\b(src|href|data|srcset|poster)\s*=\s*(["'])([^"']*)\3/gi)) { if (m[2].toLowerCase() === 'srcset') unbounded.push(SRCSET(`${file}: <${m[1]} srcset> markup`)); else if (m[1].toLowerCase() !== 'a') add(m[4], page); else { const f = resolveRef(m[4], page); if (f) nav.add(f); } } };
     if (n.type === 'Literal' && typeof n.value === 'string') markup(n.value);
     if (n.type === 'TemplateLiteral') {
       n.quasis.forEach((q, i) => {
@@ -395,6 +400,7 @@ function pageAnalyser(dir, namespaces, shape) {
     const queue = [];
     for (const m of markup.matchAll(/<(a|script|link|img|iframe|frame|source|embed|object|video|audio|track|input)\b([^>]*)>/gi)) {
       for (const a of m[2].matchAll(/\b(src|href|data|srcset|poster)\s*=\s*(["'])([^"']*)\2/gi)) {
+        if (a[1].toLowerCase() === 'srcset') { out.unbounded.push(SRCSET(`${p}: <${m[1]} srcset>`)); continue; }
         const f = resolveRef(a[3].split(/\s/)[0], p);
         if (!f) continue;
         if (m[1].toLowerCase() === 'a') { if (/\.html?$/.test(f)) out.nav.add(f); continue; } // a link is navigation, not a load
