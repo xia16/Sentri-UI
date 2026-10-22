@@ -33,6 +33,7 @@ Words are the design workflow's ([glossary](../docs/design-workflow/GLOSSARY.md)
                  { "id": "finished", "name": "Finished", "screens": ["..."] }],
     "exits": [{ "id": "died", "name": "Died", "screens": ["farrowing.ended"] }],
     "any": ["farrowing.room", "farrowing.history"],          // reachable in any status
+    "groups": [["Find and scan", ["farrowing.search", "..."]]],   // also reachable in any status, in named bands after `any`
     "task": [{ "id": "in-progress", "name": "Task in progress" },
              { "id": "ending", "name": "Ending the task", "screens": ["farrowing.task-ready", "..."] }]
   },
@@ -62,7 +63,7 @@ Words are the design workflow's ([glossary](../docs/design-workflow/GLOSSARY.md)
 }
 ```
 
-Rules the generator checks: ids unique across all features; every id in `anchor`, `groups`, `flow`, `entryPoints.lands` is one of the feature's screens; every `entryPoints.from` and `addsTo.screen` is a screen of some feature (or `null` for the app's start); a screen sits in exactly one anchor status, exit, `any` or task band; `url` and `placeholder` exclude each other.
+Rules the generator checks: ids unique across all features; every id in `anchor`, `groups`, `flow`, `entryPoints.lands` is one of the feature's screens; every `entryPoints.from` and `addsTo.screen` is a screen of some feature (or `null` for the app's start); a screen sits in exactly one anchor status, exit, `any`, anchor group or task band (an anchored feature names its bands in `anchor.groups`, never top-level `groups`); `url` and `placeholder` exclude each other.
 
 ## `steps`: screens only a tap reaches
 
