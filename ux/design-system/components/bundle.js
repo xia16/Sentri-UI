@@ -401,11 +401,11 @@
   }
   // lead: optional control between heading and panel (e.g. a segment that filters only this group).
   // radio (candidate, ADR 0002): the panel is the radiogroup, labelled by the heading.
-  function choiceGroup(rows,{title='',lead='',className='',radio=false,aside='',id='',icon='',strs,args}={}){
+  function choiceGroup(rows,{title='',lead='',className='',radio=false,aside='',id='',icon='',face='',strs,args}={}){
     const body=Array.isArray(rows)?rows.join(''):rows;
     const showTitle=title||has({strs},'title');
     const hid=radio&&showTitle?(id||fieldId('st-choice'))+'-title':'';
-    return `<section class="st-choice-group ${esc(className)}" data-ds="ChoiceList"${title?` aria-label="${esc(title)}"`:''}>${showTitle?(aside?`<div class="st-choice-heading-row"><h5 class="st-choice-heading"${hid?` id="${esc(hid)}"`:''}>${icon?glyph(icon):''}${tx(title,{strs,args},'title')}</h5>${aside}</div>`:`<h5 class="st-choice-heading"${hid?` id="${esc(hid)}"`:''}>${icon?glyph(icon):''}${tx(title,{strs,args},'title')}</h5>`):''}${lead?`<div class="st-choice-lead">${lead}</div>`:''}<div class="st-panel st-choice-panel"${radio?` role="radiogroup"${hid?` aria-labelledby="${esc(hid)}"`:''}`:''}>${body}</div></section>`;
+    return `<section class="st-choice-group ${esc(className)}" data-ds="ChoiceList"${face?` data-face="${esc(face)}"`:''}${title?` aria-label="${esc(title)}"`:''}>${showTitle?(aside?`<div class="st-choice-heading-row"><h5 class="st-choice-heading"${hid?` id="${esc(hid)}"`:''}>${icon?glyph(icon):''}${tx(title,{strs,args},'title')}</h5>${aside}</div>`:`<h5 class="st-choice-heading"${hid?` id="${esc(hid)}"`:''}>${icon?glyph(icon):''}${tx(title,{strs,args},'title')}</h5>`):''}${lead?`<div class="st-choice-lead">${lead}</div>`:''}<div class="st-panel st-choice-panel"${radio?` role="radiogroup"${hid?` aria-labelledby="${esc(hid)}"`:''}`:''}>${body}</div></section>`;
   }
   /* The search field's ends, one look wherever a worker types to narrow (Lookup's Find, a picker's catalogue, a list's ear-tag
      search): Clear (✕, only while something is typed) and the scan glyph when the host has a reader. `clear.action` is the host's,
@@ -1001,19 +1001,21 @@
   function choiceRadios({label='',optional='',options=[],selected='',action='choose',key='',layout='rows',face='',lead='',clear='Clear',id='',className='',disabled=false,reason='',pressed=false,labelHidden=false,strs,args}={}){
     const o={strs,args},s=strs||{},a=args||{},rid=id||fieldId('st-radios');
     const lay=oneOf('ChoiceList','layout',layout,['rows','plain','inline'],'rows');
-    /* face (inline only, opt-in): 'key' draws each option as a boxed key in the Stepper's 136px column instead of a ring and a word. */
-    const keyFace=oneOf('ChoiceList','face',face||'default',['default','key'],'default')==='key'&&lay==='inline';
+    /* face (opt-in): 'key' (inline) draws each option as a boxed key in the Stepper's 136px column instead of a ring and a word;
+       'row' (inline) draws the options as outlined pills beside the label; 'flat' (rows) draws the field with no panel: 60px rows, a line under each, a thin ring. */
+    const faceName=oneOf('ChoiceList','face',face||'default',['default','key','row','flat'],'default');
+    const keyFace=faceName==='key'&&lay==='inline',rowFace=faceName==='row'&&lay==='inline',flatFace=faceName==='flat'&&lay==='rows';
     options.forEach(x=>{if(x.mono&&!MONO_OK.test(String(x.label||'')))warn('ChoiceList',`mono is for Latin and digit codes only: "${x.label}"`);});
     const chosen=options.some(x=>x.value===selected),stop=chosen?selected:(options[0]&&options[0].value);
     const isOptional=!!(optional||has(o,'optional'));
     const clearBtn=isOptional&&chosen?button({label:clear,register:'text',action:action+'-clear',value:key,id:rid+'-clear',strs:s.clear?{label:s.clear}:undefined}):'';
     if(lay==='rows'||lay==='plain'){
       const rows=options.map(x=>choiceRow({mode:'radio',label:x.label,meta:x.meta||'',value:x.value,action,selected:x.value===selected,mono:!!x.mono,disabled,reason,pressed,tabindex:x.value===stop?0:-1,attrs:{'data-field':key},strs:x.strs,args:x.args}));
-      return choiceGroup(rows,{title:label,lead,radio:true,aside:clearBtn,id:rid,className:(lay==='plain'?'st-choice-plain ':'')+className,strs:s.label?{title:s.label}:undefined,args:a.label?{title:a.label}:undefined});
+      return choiceGroup(rows,{title:label,lead,radio:true,aside:clearBtn,id:rid,face:flatFace?'flat':'',className:(lay==='plain'?'st-choice-plain ':'')+className,strs:s.label?{title:s.label}:undefined,args:a.label?{title:a.label}:undefined});
     }
     const lid=rid+'-label';
     const opt=x=>`<button type="button" class="st-choice-inline-opt"${disabled?' aria-disabled="true"':''}${pressed&&x===options[0]?' data-preview="pressed"':''} role="radio" aria-checked="${x.value===selected?'true':'false'}" tabindex="${x.value===stop?0:-1}" data-action="${esc(action)}" data-value="${esc(x.value)}">${keyFace?'<span class="st-choice-inline-face">':'<span class="st-radio" aria-hidden="true"></span>'}<span${x.mono?' data-mono=""':''}>${tx(x.label,x,'label')}</span>${keyFace?'</span>':''}</button>`;
-    return `<div class="st-choice-inline ${esc(className)}" data-ds="ChoiceList" data-mode="radio"${keyFace?' data-face="key"':''} id="${esc(rid)}" data-field="${esc(key)}"><span class="st-choice-inline-label"><span id="${esc(lid)}"${labelHidden?' class="st-visually-hidden"':''}><span${sa(s.label,a.label)}>${esc(label)}</span>${isOptional?`<small>${tx(optional,o,'optional')}</small>`:''}</span>${isOptional?`<span class="st-choice-inline-clear">${clearBtn}</span>`:''}</span><span class="st-choice-inline-opts" role="radiogroup" aria-labelledby="${esc(lid)}">${options.map(opt).join('')}</span>${reason?`<span class="st-choice-meta" role="status">${esc(reason)}</span>`:''}</div>`;
+    return `<div class="st-choice-inline ${esc(className)}" data-ds="ChoiceList"${rowFace?' data-face="row"':''} data-mode="radio"${keyFace?' data-face="key"':''} id="${esc(rid)}" data-field="${esc(key)}"><span class="st-choice-inline-label"><span id="${esc(lid)}"${labelHidden?' class="st-visually-hidden"':''}><span${sa(s.label,a.label)}>${esc(label)}</span>${isOptional?`<small>${tx(optional,o,'optional')}</small>`:''}</span>${isOptional?`<span class="st-choice-inline-clear">${clearBtn}</span>`:''}</span><span class="st-choice-inline-opts" role="radiogroup" aria-labelledby="${esc(lid)}">${options.map(opt).join('')}</span>${reason?`<span class="st-choice-meta" role="status">${esc(reason)}</span>`:''}</div>`;
   }
   /* The radio keyboard model, pure: ArrowDown/ArrowRight → next, ArrowUp/ArrowLeft → previous (both wrap), Home → first,
      End → last. Returns the value to select and focus, or null for any other key. */

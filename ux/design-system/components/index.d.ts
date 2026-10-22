@@ -531,8 +531,8 @@ export interface HoldBindOptions {
 }
 export interface RadioOption { value: string; label: string; meta?: string; /** Latin and digit codes only (warns in dev otherwise). */ mono?: boolean; strs?: Strs<'label' | 'meta'>; args?: StrArgs<'label' | 'meta'> }
 export interface ChoiceRadiosProps {
-  /** Candidate, `layout: 'inline'` only: 'key' draws each option as a boxed key in the Stepper row's right column (the chosen key takes a 2px ink ring). */
-  face?: 'default' | 'key';
+  /** Candidate, opt-in. `layout: 'inline'`: 'key' draws each option as a boxed key in the Stepper row's right column (the chosen key takes a 2px ink ring); 'row' draws outlined pills beside the label. `layout: 'rows'`: 'flat' draws the rows with no panel (60px, a line under each, a thin ring on the right), for a recorded outcome inside a form. */
+  face?: 'default' | 'key' | 'row' | 'flat';
   /** Hide only the field label when an enclosing optional row already names it; accessible label and Clear remain. */
   labelHidden?: boolean;
   disabled?: boolean;

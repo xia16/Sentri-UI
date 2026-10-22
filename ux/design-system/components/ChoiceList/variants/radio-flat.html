@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ChoiceList · flat radio</title><style>
+.ph{position:relative;width:390px;max-width:100%;height:720px;margin:0 auto;overflow:hidden;background:var(--app-background);border:1px solid var(--line);border-radius:var(--radius-device,28px);font-family:var(--font-sans);color:var(--ink)}
+.ph-page{padding:0 var(--space-gutter)}
+.ph-bar{display:flex;align-items:center;height:var(--statusbar-height);padding:0 var(--space-6);font:600 var(--font-size-13) var(--font-sans)}
+.ph-form{display:flex;flex-direction:column;gap:var(--space-16)}
+</style></head><body>
+<div data-state="Default" id="state-Default"></div>
+<div data-state="Selected" id="state-Selected"></div>
+<div data-state="Disabled" id="state-Disabled"></div>
+<div data-state="Long-label" id="state-Long-label"></div>
+<script>
+var UI = window.SentriUI;
+/* The real container: a 390px phone; the form is a drawer over the sow's page. The flat face is a recorded outcome listed as 60px rows in the form itself, a line under each row. */
+function page(){return '<div class="ph-page"><div class="ph-bar" aria-hidden="true">9:41</div>'+UI.heading({title:'000418',kind:'page',description:'B1 · Farrowing'})+UI.panel(UI.row({title:'Farrowing',description:'9 alive · 5 dead'}),{className:'st-row-group'})+'</div>';}
+function phone(over){return '<div class="ph" data-st-context="page">'+page()+over+'</div>';}
+function form(fields,ready){return phone(UI.sheet({title:'Sow died',size:'medium',body:'<div class="ph-form">'+fields+'</div>',footer:UI.sheetFooter({back:{action:'back'},primary:{label:'Save',action:'save',waiting:!ready}})}));}
+var CAUSES = [{"value": "crushed", "label": "Crushed"}, {"value": "illness", "label": "Illness"}, {"value": "other", "label": "Other"}];
+function radios(o){return UI.choiceRadios(Object.assign({"label": "Cause", "face": "flat", "options": CAUSES, "selected": "", "key": "cause", "action": "cause"}, o));}
+var RENDER = {
+  "state-Default": () => form(radios({}),false),
+  "state-Selected": () => form(radios({"selected": "illness"}),true),
+  "state-Disabled": () => form(radios({"selected": "illness", "disabled": true, "reason": "Unavailable offline. Reconnect to select."}),false),
+  "state-Long-label": () => form(radios({"label": "死亡原因", "options": [{"value": "a", "label": "压死，在产栏里被母猪压到并导致窒息，已由饲养员在清晨巡查时确认"}, {"value": "b", "label": "疾病"}, {"value": "c", "label": "其他"}], "selected": "a"}),true)
+};
+document.querySelectorAll('[data-state]').forEach(function (s) { if (RENDER[s.id]) s.innerHTML = RENDER[s.id](); });
+</script></body></html>
