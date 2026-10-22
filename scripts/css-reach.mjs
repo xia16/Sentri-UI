@@ -99,7 +99,11 @@ export function cssUnits(text) {
       if (end < 0 || end > to) { problems.push(`an unclosed block: ${prelude.slice(0, 40)}`); break; }
       const body = src.slice(j + 1, end);
       if (prelude.startsWith('@')) {
-        if (BLOCKS.test(prelude)) walk(j + 1, end, `${context}${prelude.replace(/\s+/g, ' ')}{`);
+        if (BLOCKS.test(prelude)) {
+          // the block itself is a unit that styles nothing, so an empty `@media x{}` still ends the stylesheet's head (@import)
+          units.push({ key: `${context}${prelude.replace(/\s+/g, ' ')}{`, kind: 'group', selectors: [], reaches: 'classes' });
+          walk(j + 1, end, `${context}${prelude.replace(/\s+/g, ' ')}{`);
+        }
         else {
           const kf = /^@(?:-webkit-)?keyframes\s+([\w-]+)$/i.exec(prelude);
           units.push({ key: `${context}${prelude}{${body}}`, kind: 'at-rule', selectors: null, reaches: kf ? 'keyframes' : 'all', ...(kf ? { name: kf[1] } : {}), why: prelude.slice(0, 40) });

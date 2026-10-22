@@ -15,9 +15,9 @@ test('the stylesheet splits into rules, with their at-rule context; comments cha
   const css = '@import url("x.css");\n:root{--a:1}\n/* c */\n@layer base{body{margin:0}.button{color:red}}\n@media(max-width:370px){.st-row{gap:0}}\n@keyframes st-in{from{opacity:0}to{opacity:1}}\n.st-toast{animation:st-in 1s}';
   const { units, problems } = cssUnits(css);
   assert.deepEqual(problems, []);
-  assert.deepEqual(units.map((u) => u.kind), ['statement', 'rule', 'rule', 'rule', 'rule', 'at-rule', 'rule']);
-  assert.equal(units[3].key, '@layer base{.button{color:red}');
-  assert.equal(units[4].key, '@media(max-width:370px){.st-row{gap:0}');
+  assert.deepEqual(units.map((u) => u.kind), ['statement', 'rule', 'group', 'rule', 'rule', 'group', 'rule', 'at-rule', 'rule']);
+  assert.equal(units[4].key, '@layer base{.button{color:red}');
+  assert.equal(units[6].key, '@media(max-width:370px){.st-row{gap:0}');
   assert.equal(cssChange(css, css.replace('/* c */', '/* changed */')).units.length, 0);
   assert.equal(cssChange(css, css.replace('color:red', 'color:/* x */red')).units.length, 2, 'a comment inside a rule is part of it');
   assert.equal(cssUnits('.a{').problems.length, 1);
@@ -29,7 +29,7 @@ test("a changed rule is narrowed by its selectors; anything it can't name reache
   assert.equal(one.all, false);
   assert.deepEqual(one.units.map((u) => u.selectors), [['.st-banner'], ['.st-banner']]);
   // moved into a media query: changed
-  assert.equal(cssChange(base, base.replace('.st-row{gap:0}', '@media(min-width:1px){.st-row{gap:0}}')).units.length, 2);
+  assert.equal(cssChange(base, base.replace('.st-row{gap:0}', '@media(min-width:1px){.st-row{gap:0}}')).units.length, 3, 'the rule on each side, and the new block');
   // reordered: one of the two rules that swapped is changed, so the elements whose cascade can change are in reach
   const moved = cssChange(base, '.st-row{gap:0}\n' + base.replace('.st-row{gap:0}\n', ''));
   assert.equal(moved.all, false);
@@ -45,6 +45,10 @@ test("a changed rule is narrowed by its selectors; anything it can't name reache
   assert.equal(cssChange(imp, imp.replace('.st-banner{color:red}', '.st-banner{color:blue}')).all, false, 'an import that stays at the head');
   assert.equal(cssChange(imp, '.st-pen-map{}\n' + imp).all, true, 'a rule added before the import');
   assert.equal(cssChange(base, base + '\n@import url("f.css");').all, true, 'an import after a rule');
+  // round 2: an empty grouping block before the import turns it off too
+  assert.equal(cssChange(imp, '@media screen{}\n' + imp).all, true, 'an empty @media before the import');
+  assert.equal(cssChange(imp, '@supports (display:grid){}\n' + imp).all, true, 'an empty @supports before the import');
+  assert.equal(cssChange(base, base + '\n@media print{}').all, false, 'an empty block anywhere else styles nothing');
   // a keyframes edit reaches what its users reach
   const kf = cssChange(base, base.replace('from{opacity:0}', 'from{opacity:.5}'));
   assert.equal(kf.all, false);
