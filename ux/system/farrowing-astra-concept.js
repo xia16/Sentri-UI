@@ -525,7 +525,7 @@ function batchRows(c){
   let html=SentriUI.rowSelect({code:p.tag,description:context,right,checked:b.picked.includes(p.tag),action:'room-batch-pick',value:p.tag,attrs:{'data-scan-tag':p.tag},inputAttrs:{'data-value':p.tag,'aria-label':'Choose '+p.tag}});
   return q?html.replace(`<strong class="st-animal-id">${p.tag}</strong>`,`<strong class="st-animal-id">${SentriUI.findMark(p.tag,q)}</strong>`):html;};
  const pens=[...new Set(shown.map(p=>p.pen))].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true}));
- if(!pens.length)return `<p class="batch-none">${q?`No pig in ${esc(c.unit.name)} matching “${esc(b.q.trim())}”.`:'No pigs match the filter.'}</p>`;
+ if(!pens.length)return `<p class="st-find-hint">${q?`No pig in ${esc(c.unit.name)} matching “${esc(b.q.trim())}”.`:'No pigs match the filter.'}</p>`;
  return pens.map(pen=>{const rows=shown.filter(p=>p.pen===pen);return `<section class="st-panel pen-card batch-pen" data-pen="${pen}"><header class="pen-top"><span class="room-pen-name"><strong>${pen}</strong><small>· ${rows.length} ${rows.length===1?'pig':'pigs'}</small></span></header>${rows.map(pick).join('')}</section>`;}).join('');
 }
 // Choose pigs: To treat's page. The bar is the shared search field with scan at its end, and the filter; scanning turns that bar into its
@@ -536,9 +536,10 @@ function batchPickPage(c){
  const bar=b.scanning?SentriUI.scanBar({state:b.scanning==='waiting'?'waiting':'scanning',device:'Reader 1',stop:{action:'room-batch-scan-stop'}})
   :SentriUI.choiceSearch({label:'Search ear tag or pen',placeholder:'Ear tag or pen',value:b.q,attrs:{'data-batch-search':''},clear:{action:'room-batch-clear'},scan:{action:'room-batch-scan',label:'Scan ear tags'}});
  const filter=SentriUI.iconButton({action:'room-batch-filter',icon:icon('filter'),label:'Filter pigs'+(fn?', '+fn+' applied':''),badge:fn||'',className:'batch-filter'});
- const body=`<div class="batch-top"><div class="batch-bar">${bar}${filter}</div></div><p class="batch-hint"><b>${esc(verb)}</b> · tick each pig in ${esc(c.unit.name)}, or scan.</p><div class="batch-list">${batchMissedRows(c)}${batchRows(c)}</div>`;
+ const above=`<div class="batch-bar">${bar}${filter}</div>`;   // pinned over the list (Sheet's band above the body), as Inspection's log filter
+ const body=`<p class="st-find-hint batch-hint"><b>${esc(verb)}</b> · tick each pig in ${esc(c.unit.name)}, or scan.</p><div class="batch-list">${batchMissedRows(c)}${batchRows(c)}</div>`;
  const next=SentriUI.button({label:n?`Next · ${n} ${n===1?'pig':'pigs'}`:'Next',register:'primary',action:'room-batch-next',disabled:!n});
- return SentriUI.sheet({variant:'page',title:'Choose pigs',back:{action:'room-back'},body,footer:footer(SentriUI.backButton({action:'room-back'}),next),className:'room-utility batch-pick',label:'Choose pigs',bar:status()});
+ return SentriUI.sheet({variant:'page',title:'Choose pigs',back:{action:'room-back'},above,body,footer:footer(SentriUI.backButton({action:'room-back'}),next),className:'room-utility batch-pick',label:'Choose pigs',bar:status()});
 }
 // The filter, as To treat's: which pigs (in Farrowing or not) and whether she has a condition. Show N pigs applies it.
 function batchFilterSheet(c){
@@ -548,7 +549,7 @@ function batchFilterSheet(c){
  return SentriUI.filterSheet({title:'Filter pigs',sections,apply:{label:`Show ${n} ${n===1?'pig':'pigs'}`,action:'room-batch-filter-apply'},reset:batchFilterCount(d)?{label:'Reset',action:'room-batch-filter-reset'}:false,backAction:'room-batch-filter-back',className:'batch-filter-sheet',size:'medium'});
 }
 // The verb's own form: Inspection's, embedded as her pig record is, for every pig chosen. Saving returns to the room with the count.
-function batchFormPage(c){return `<iframe class="room-pig-frame batch-form-frame" title="${esc((batchVerbs.find(x=>x[0]===c.batch.verb)||[])[3]||'')}" src="inspection-astra-concept.html?layout=focus&embed=sow${ZH?'&lang=zh':''}"></iframe>`;}
+function batchFormPage(c){return `<iframe class="sow-detail-frame room-pig-frame batch-form-frame" data-room-pig title="${esc((batchVerbs.find(x=>x[0]===c.batch.verb)||[])[3]||'')}" src="inspection-astra-concept.html?layout=focus&embed=sow${ZH?'&lang=zh':''}"></iframe>`;}
 function connectBatchForm(root,c){
  const frame=root.querySelector('.batch-form-frame');if(!frame)return;
  const pigs=unitPigs(c).filter(p=>c.batch.picked.includes(p.tag)).map(p=>p.rec?{id:p.tag,pen:p.pen,unit:c.unit.name,stage:'Lactating',parity:p.rec.parity}:{id:p.tag,pen:p.pen,unit:c.unit.name,stage:p.pig.stage});
@@ -566,7 +567,7 @@ const pageUnder=(s,c)=>s.view==='roomPig'?c.pigFrom:!/^room/.test(s.view)&&['roo
 function findPage(s){const c=roomContext(s),under=pageUnder(s,c);return under==='roomSearch'?searchPage(c):under==='roomScan'?scanPage(c):'';}
 // A pig not on the farrowing list opens her pig profile (the Inspection pig record, embedded as Home embeds it), over the page she was found
 // on. Its line says she is not in Farrowing, so the worker knows why no farrowing drawer opened; its Back returns to that page.
-function pigPage(c){return `<iframe class="room-pig-frame" title="${esc((ZH?'猪只档案 · ':'Pig record · ')+c.pig)}" src="inspection-astra-concept.html?layout=focus&embed=sow${ZH?'&lang=zh':''}"></iframe>`;}
+function pigPage(c){return `<iframe class="sow-detail-frame room-pig-frame" data-room-pig title="${esc((ZH?'猪只档案 · ':'Pig record · ')+c.pig)}" src="inspection-astra-concept.html?layout=focus&embed=sow${ZH?'&lang=zh':''}"></iframe>`;}
 // Her record's line says first what matters most: that she is gone ("Died 14 Oct"), else, opened from Find or Scan, that she is not in
 // Farrowing; opened from Choose pigs (the other-unit note) it is her plain line, which already names her unit.
 function connectPig(root,c){
@@ -865,7 +866,7 @@ function sowActionCatalogue(s){return [
 const deepSelectors={transfer:'[data-action="sow-host-action"][data-value="transfer"]',marker:'[data-action="sow-host-action"][data-value="marker"]',health:'[data-action="health"]',treatment:'[data-action="treatment"]'};
 function deepLinkInto(frame,key){let n=0;const t=setInterval(()=>{const el=frame.contentDocument?.querySelector(deepSelectors[key]);if(el){clearInterval(t);el.click();}else if(++n>50)clearInterval(t);},60);}
 function connectSowDetail(root,s){
- const frame=root.querySelector('.sow-detail-frame');if(!frame)return;
+ const frame=root.querySelector('.sow-detail-frame:not([data-room-pig])');if(!frame)return;
  frame.addEventListener('load',()=>{
   const events=s.pending?[{text:(s.pending>0?'+':'')+s.pending+' alive · this visit',day:'Today',time:s.stamp,who:'G. Hansen'},...s.events]:s.events;
   const tasks=!s.productionOutcome&&!s.ended?[{id:'farrowing',title:'Farrowing',type:'Production',status:s.locked?'Finished':born(s)?'In progress':'Awaiting',summary:born(s)?s.alive+' alive · '+sum(s.dead)+' dead':'Record this sow’s litter'},...(born(s)?[{id:'piglet-processing',title:'Piglet processing',type:'Production',status:s.processingTasks.some(t=>!t.done)?'Due today':'Up to date',summary:s.processingTasks.filter(t=>t.done).length+' of '+s.processingTasks.length+' care steps done'}]:[]),...(s.tag==='000418'?[{id:'vaccination',title:'Vaccination',type:'Health',status:'Due today',summary:'Scheduled vaccination'},{id:'treatment-task',title:'Treatment',type:'Health',status:'Due today',summary:'Scheduled treatment'}]:[])]:[];

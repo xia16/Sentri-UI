@@ -218,18 +218,10 @@
 
 /* Litter summary on the count drawer: Born and Dead sit on the panel's own edge, no second box inside it. */
 .farrowing-phone .count-record-surface .st-facts[data-variant="figures"]{margin-bottom:12px}
-.farrowing-phone .room-pig-frame{position:absolute;inset:0;z-index:5;width:100%;height:100%;border:0;background:transparent}
-/* Actions · Choose pigs: To treat's bar (the search field with scan inside, the filter), a quiet line naming the verb, then the
-   unit's pen cards, each pig a select row. Scanning puts Lookup's scan bar in the search field's place; a read from another unit leaves a standing notice under it. */
-.farrowing-phone .batch-pick .batch-top{position:sticky;top:0;z-index:2;margin:0 0 12px;padding:4px 0 8px;background:var(--app-background)}
-.farrowing-phone .batch-pick .batch-bar{display:flex;align-items:center;gap:var(--space-8)}
-.farrowing-phone .batch-pick .batch-top .st-toast{margin:8px 0 0;width:100%}
+/* Actions · Choose pigs: To treat's bar (the search field with scan inside, the filter) pinned over the list in the sheet's band above
+   its body; Lookup's quiet line naming the verb; then the unit's pen cards, each pig a select row. Layout only: every colour is a part's. */
+.farrowing-phone .batch-pick .batch-bar{display:flex;align-items:center;gap:var(--space-8);padding:4px var(--space-gutter) 12px}
 .farrowing-phone .batch-pick .batch-bar .st-choice-search.st-choice-search{flex:1;min-width:0;margin:0}
 .farrowing-phone .batch-pick .batch-filter{width:var(--tap-min);height:var(--tap-min);flex:none}
-.farrowing-phone .batch-pick .batch-hint{margin:0 2px 12px;color:var(--muted);font:400 14px/20px var(--font-sans)}
-.farrowing-phone .batch-pick .batch-hint b{color:var(--ink);font-weight:600}
-.farrowing-phone .batch-pick .batch-pen{margin:0 0 12px}
-.farrowing-phone .batch-pick .batch-none{margin:4px 2px;color:var(--muted);font:400 14px/20px var(--font-sans)}
-.farrowing-phone .batch-pick .batch-missed{margin:0 0 12px}
-.farrowing-phone .batch-pick .batch-missed .st-row[data-arrival]{transition:background-color .9s ease-out}
-.farrowing-phone .batch-pick .batch-missed .st-row[data-arrival="on"]{background:var(--progress-wash);transition-duration:.12s}
+.farrowing-phone .batch-pick .batch-hint{margin:0 2px 12px}
+.farrowing-phone .batch-pick .batch-pen,.farrowing-phone .batch-pick .batch-missed{margin:0 0 12px}
