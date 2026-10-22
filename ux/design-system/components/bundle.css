@@ -818,7 +818,8 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
 .st-stepper[data-variant="well"] :is(.st-stepper-key,.st-stepper-face){width:var(--control-height);min-height:var(--control-height);height:var(--control-height)}
 .field{font-family:var(--font-sans)}
 /* Surface consumers own layout; Panel owns border, radius and context fill. */
-.st-panel.pen-card{padding:0;box-shadow:0 2px 8px #20291f0a}
+.st-panel.pen-card{padding:0;overflow:clip}   /* the pen card is one box: no shadow, its corners clip its header (Inspection's pen card) */
+.pen-card>.pen-top{background:#f8faf5;border-bottom-color:var(--rule);border-radius:0}
 
 /* FilterSheet: a Sheet that narrows a list. Sections sit 28 apart; the last one has no gap before the footer. */
 .st-filter-section{margin:0 0 var(--space-28);padding:0}
@@ -914,7 +915,6 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
 .icon-button.room-filter-button{width:48px;min-width:48px;height:48px}
 .room-dock>.icon-button.icon-button{width:48px;min-width:48px;height:auto;min-height:var(--footer-height);align-self:stretch}
 .room-dock>.icon-button svg{width:19px;height:19px}
-.st-panel.st-panel.st-panel.pen-card{box-shadow:0 2px 8px #20291f0a}
 .st-heading-action svg{color:var(--muted)}
 .sheet-footer>.button.surface-back.surface-back{border-color:var(--back-border)}
 .st-heading-action .st-text-action:disabled{color:var(--muted);background:transparent;opacity:1}
@@ -948,6 +948,8 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
 /* Facts, record (the finished litter: three across, a drill-in label, a wide inline fact) */
 .st-facts[data-variant="record"]{padding:0;gap:20px 16px;margin:0;border:0;background:transparent}
 .st-facts[data-variant="record"] dt{display:flex;align-items:center;min-height:16px;margin:0 0 5px;font:400 13px/1.4 var(--font-sans);color:var(--muted)}
+/* A door under a facts card (Farrowing's Death causes): its own row card, a group gap below the facts */
+.facts-surface+.st-row-group{margin-top:var(--space-12)}
 .st-facts[data-variant="record"] dd{font:500 14px/1.4 var(--font-sans);font-variant-numeric:tabular-nums}
 .st-facts[data-variant="record"] .st-fact-inline{grid-column:1/-1;display:flex;align-items:baseline;gap:12px;padding-top:2px}
 
@@ -1084,18 +1086,13 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
 .surface-back:only-child:active{background:var(--back-press);border-color:var(--back-border);color:var(--ink)}
 /* Record facts: labels in muted ink; the drill-in label keeps the row's line, its target grows by a pseudo-element */
 .st-facts[data-variant="record"] dt{color:var(--muted);font-size:13px}
-.death-breakdown-link{position:relative}
-.death-breakdown-link::after{content:"";position:absolute;inset:-16px -8px}
 /* Heading action: the target grows by a pseudo-element, so nothing clips it and the heading keeps its height */
 .st-heading .st-heading-action :is(button,a){min-height:0;margin:0}
 .st-heading .st-heading-action :is(button,a)::after{content:"";position:absolute;inset:-16px -8px}
 .st-heading .st-heading-action :is(button,a){position:relative}
 .st-photos{margin:12px 0}
-.facts-surface .finish-totals{margin:0 0 20px;padding:0;border:0;background:none}
 .farrowing-phone .sheet[data-view=death] .st-choice-heading{padding-left:0;margin-top:16px}
 .st-photos{margin:8px 0 12px}
-.death-breakdown-link{display:inline-flex;align-items:center;gap:4px;padding:0;background:transparent;font:inherit;color:inherit;white-space:nowrap}
-.death-breakdown-link svg{width:12px;height:12px;color:var(--muted)}
 /* Placeholders are read text: ink-2, never pale grey (the farm legibility law) */
 input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 /* Caution: the red outline and wash stay, the word is ink (red on the wash is under 7:1 at 16px) */
