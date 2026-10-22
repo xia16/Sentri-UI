@@ -961,6 +961,7 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
 .st-facts[data-variant="figures"] .st-fact dt{font-size:13px;line-height:1.5;color:var(--muted);margin:0}
 .st-facts[data-variant="figures"] .st-fact dd{font:600 23px/1.3 var(--font-sans);font-variant-numeric:tabular-nums;margin:4px 0 0}
 .facts-surface .st-facts[data-variant="figures"]{margin:0 0 20px}
+.facts-surface .st-facts[data-variant="figures"]:last-child{margin-bottom:0}
 .sheet-footer>.button.surface-back.surface-back{min-height:var(--footer-height)}
 .sheet-footer>.button.surface-back.surface-back:only-child{background:var(--ink);border-color:var(--ink);color:var(--paper);font-weight:600}
 /* ChoiceList, plain (flat radio rows with a rule between them, the radio on the right) */

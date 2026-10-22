@@ -218,7 +218,6 @@ const status=()=>`<div class="statusbar"><span>9:41</span><span class="status-ic
 function causes(dead){return `<div class="causes">${dead.map((n,i)=>n?`<span>${types[i]} <b>${n}</b></span>`:'').join('')||'<span>No deaths recorded</span>'}</div>`;}
 /* Born · Alive · Dead: Facts, figures. The one exception is the finished litter's Dead, which carries a door to the death breakdown; Facts never act, so that call keeps this own markup (open question: where the door lives). */
 function metrics(items,{panel=true}={}){return SentriUI.facts(items.map(([label,value])=>({label,value})),{variant:'figures',panel});}
-function summary(s){return SentriUI.panel(metrics([['Born',born(s)],[s.locked?'Alive now':'Alive',s.alive],['Dead',sum(s.dead)]],{panel:false})+causes(s.dead),{className:'summary facts-surface'});}
 function recordStamp(s){
  if(!s.locked)return '';
  const event=s.events.find(e=>e.text.startsWith(s.ended?'Sow died':'Farrowing finished'));
@@ -264,13 +263,17 @@ const bodyLead=text=>SentriUI.heading({title:text,kind:'group',level:4,className
 function hold(action,label,off=false,danger=false){
  return SentriUI.holdButton({action,label,tone:danger?'danger':'primary',waiting:off,className:action==='room-end-confirm'&&danger?'task-end-confirm':'',caption:'HOLD TO '+(action==='lock'?'FINISH':action==='room-end-confirm'?(label==='End task'?'END':'END EARLY'):'RECORD')});
 }
-/* The finished litter, read-only: Facts, three across. The death breakdown is one link below, not a button in a fact. */
-function finishFacts(s){
+/* A finished litter, read-only (finished, sow died, aborted): Born · Alive now · Dead as Facts, three across, and anything else read
+   under them. The death breakdown is one link below, not a button in a fact. */
+function finishedFigures(s,extra=''){
  const dead=sum(s.dead);
- const items=[['Weak',s.weak],['Deformed',s.deformed],['Assisted',assistanceLabel(s.assisted)],['Litter weight',s.weight?s.weight+' kg':null]].map(([label,value])=>({label,value,...(label==='Litter weight'?{inline:true}:{})}));
  // the figures read (Facts never acts); the death causes are a door of their own under them, only when there are deaths (owner, 2026-10-22)
  const door=dead>0?SentriUI.rowGroup(SentriUI.row({title:'Death causes',action:'deathBreakdown',trail:'chevron'}),{className:'death-causes-door'}):'';
- return SentriUI.panel(SentriUI.facts([{label:'Born',value:born(s)},{label:'Alive now',value:s.alive},{label:'Dead',value:dead}],{variant:'figures',panel:false})+SentriUI.facts(items,{columns:3,variant:'record'}),{className:'facts-surface'})+door;
+ return SentriUI.panel(SentriUI.facts([{label:'Born',value:born(s)},{label:'Alive now',value:s.alive},{label:'Dead',value:dead}],{variant:'figures',panel:false})+extra,{className:'facts-surface'})+door;
+}
+function finishFacts(s){
+ const items=[['Weak',s.weak],['Deformed',s.deformed],['Assisted',assistanceLabel(s.assisted)],['Litter weight',s.weight?s.weight+' kg':null]].map(([label,value])=>({label,value,...(label==='Litter weight'?{inline:true}:{})}));
+ return finishedFigures(s,SentriUI.facts(items,{columns:3,variant:'record'}));
 }
 // Room fixtures and navigation share each sow's existing farrowing state.
 const roomContexts=[];
@@ -687,7 +690,7 @@ function allocate(s){
 function locked(s){
  const e=s.events[0];
  const ab=s.productionOutcome==='abortion'?s.events.find(e=>e.text.startsWith('Abortion')):null;
- const body=ab?` ${SentriUI.banner({tone:'danger',size:'inline',headline:['Aborted',ab.text.replace(/^Abortion · ?/,''),[ab.day,ab.time].filter(Boolean).join(' '),initials(ab.who)].filter(Boolean).join(' · ')})}<section class="read-section reading-section">${litterHeading()}${summary(s)}</section>`:s.ended?` ${SentriUI.banner({tone:'danger',size:'inline',headline:['Sow died',s.sowCause.toLowerCase(),...diedStamp(s)].join(' · ')})}<section class="read-section reading-section">${litterHeading()}${summary(s)}</section>`:`${recordStamp(s)?bodyLead(recordStamp(s)):''}<section class="read-section reading-section finish-record">${litterHeading()}${finishFacts(s)}</section>`;
+ const body=ab?` ${SentriUI.banner({tone:'danger',size:'inline',headline:['Aborted',ab.text.replace(/^Abortion · ?/,''),[ab.day,ab.time].filter(Boolean).join(' '),initials(ab.who)].filter(Boolean).join(' · ')})}<section class="read-section reading-section">${litterHeading()}${finishedFigures(s)}</section>`:s.ended?` ${SentriUI.banner({tone:'danger',size:'inline',headline:['Sow died',s.sowCause.toLowerCase(),...diedStamp(s)].join(' · ')})}<section class="read-section reading-section">${litterHeading()}${finishedFigures(s)}</section>`:`${recordStamp(s)?bodyLead(recordStamp(s)):''}<section class="read-section reading-section finish-record">${litterHeading()}${finishFacts(s)}</section>`;
  return {cls:'completed-record-body',body:`${body}${recordActions(s)}`,footer:recordNavigation()};
 }
 function death(s){const n=sum(s.deathDraft),sow=s.mode==='sow';return {cls:'',body:`${s.ended?'':SentriUI.segment({variant:'view-switch',options:s.ended?[['piglets','Piglets']]:[['piglets','Piglets'],['sow','The sow']],active:s.mode,action:'mode',ariaLabel:'Record death for'})}${sow?SentriUI.choiceRadios({label:'Cause',key:'sowCause',action:'sowCause',options:['Farrowing','Prolapse','Found dead','Other'].map(label=>({value:label,label})),selected:s.sowCause||''})+(s.sowCause==='Other'?SentriUI.optionalRow({label:'Details',value:s.sowNote||'',face:'row',icon:icon('note'),inline:SentriUI.field({label:'Details',labelHidden:true,control:`<input aria-label="Details" data-field="sowNote" value="${esc(s.sowNote)}">`})}):''):types.map((t,i)=>row(t,s.dead[i]+s.deathDraft[i],'deadStep',i+',',s.dead[i],s.locked?s.dead[i]+s.alive-n+s.deathDraft[i]:null,s.deathDraft[i]?'draft-value':'',s.deathDraft[i]?`+${s.deathDraft[i]} unsaved`:'')).join('')}<div class="photo-field">${SentriUI.photos({items:s.photos.map((src,i)=>({id:String(i),src})),action:'addPhoto',viewAction:'photo',active:sow?!!s.sowCause:!!n})}<input type="file" data-field="photo" accept="image/*" capture="environment" class="visually-hidden" tabindex="-1"></div>${sow?SentriUI.banner({tone:'danger',headline:'Saving ends farrowing',consequence:`${s.alive} alive stay under piglet care`}):''}`,corner:n||s.sowCause?cornerClear('clearDeath'):null,footer:footer(SentriUI.backButton({action:'back'}),sow?hold('saveDeath','Record sow death',!s.sowCause||!!sum(s.deathDraft)||!!changes(s).length,true):btn('saveDeath',n?`Record ${n} ${n===1?'death':'deaths'}`:'Record deaths','button primary','',!n),'death-footer')};
@@ -723,7 +726,7 @@ function history(s){
 function popup(s){const p=s.popup;if(!p)return'';if(p.kind==='leaveEdit')return SentriUI.sheet({variant:'dialog',title:'Save correction?',body:'',footer:footer(btn('leaveDiscard','Discard','button secondary'),btn('leaveSave','Save','button primary'))});if(p.kind==='photo')return SentriUI.sheet({variant:'dialog',title:'Photo',body:`<img src="${esc(p.src)}" alt="Death record attachment">`,footer:footer(SentriUI.backButton({action:'cancelPopup'}),p.editable?btn('deletePhoto','Delete','button primary danger'):'')});
 return '';
 }
-function deathBreakdown(s){return detailSheet(s,'Death breakdown',SentriUI.facts([...s.dead.map((n,i)=>n?{label:types[i],value:n}:null).filter(Boolean),{label:'Total dead',value:sum(s.dead)}]),'compact');}
+function deathBreakdown(s){return detailSheet(s,'Death breakdown',SentriUI.facts([...s.dead.map((n,i)=>n?{label:types[i],value:n}:null).filter(Boolean),{label:'Total dead',value:sum(s.dead)}]));}   // sized to its content: the compact cap cut Total dead under the footer
 function profile(s){return `<iframe class="sow-detail-frame" title="Sow details · ${esc(s.tag)}" src="inspection-astra-concept.html?layout=focus&embed=sow&v=stage-actions-15${ZH?'&lang=zh':''}"></iframe>`;}
 const sowDetailContexts=new WeakMap();
 function sowActionCatalogue(s){return [
