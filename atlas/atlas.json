@@ -3264,27 +3264,26 @@
          "farrowing.pen-landed",
          "farrowing.pen-landed-live",
          "farrowing.pen-landed-plain",
-         "farrowing.pen",
-         "farrowing.pen-attention",
-         "farrowing.pen-log",
-         "farrowing.pen-note",
-         "farrowing.pen-read-note",
-         "farrowing.pen-feed",
-         "farrowing.pen-fault",
-         "farrowing.pen-fault-record",
-         "farrowing.search",
-         "farrowing.search-results",
-         "farrowing.search-none",
-         "farrowing.scan",
-         "farrowing.scan-no-reader",
-         "farrowing.scan-list",
-         "farrowing.scan-new",
-         "farrowing.scan-ticked",
-         "farrowing.scan-stopped",
-         "farrowing.scan-actions",
          "farrowing.today",
          "farrowing.sow-actions",
          "farrowing.note"
+        ],
+        "groups": [
+         [
+          "Find and scan",
+          [
+           "farrowing.search",
+           "farrowing.search-results",
+           "farrowing.search-none",
+           "farrowing.scan",
+           "farrowing.scan-no-reader",
+           "farrowing.scan-list",
+           "farrowing.scan-new",
+           "farrowing.scan-ticked",
+           "farrowing.scan-stopped",
+           "farrowing.scan-actions"
+          ]
+         ]
         ],
         "task": [
          {
@@ -3776,56 +3775,6 @@
          "Continue from pen"
         ],
         [
-         "farrowing.room",
-         "farrowing.pen",
-         "tap a pen header"
-        ],
-        [
-         "farrowing.pen",
-         "farrowing.pen-log",
-         "Pen log"
-        ],
-        [
-         "farrowing.pen",
-         "farrowing.pen-note",
-         "Note"
-        ],
-        [
-         "farrowing.pen",
-         "farrowing.pen-read-note",
-         "tap the note card"
-        ],
-        [
-         "farrowing.pen-read-note",
-         "farrowing.pen-note",
-         "Edit note"
-        ],
-        [
-         "farrowing.pen",
-         "farrowing.pen-feed",
-         "Feed"
-        ],
-        [
-         "farrowing.pen",
-         "farrowing.pen-fault",
-         "Fault"
-        ],
-        [
-         "farrowing.pen",
-         "farrowing.pen-fault-record",
-         "tap a fault row under Needs attention"
-        ],
-        [
-         "farrowing.pen-note",
-         "farrowing.pen",
-         "Save note or Back"
-        ],
-        [
-         "farrowing.pen-fault",
-         "farrowing.pen",
-         "Report fault or Back"
-        ],
-        [
          "farrowing.task-blocked",
          "farrowing.task-sows",
          "tap Still farrowing"
@@ -4103,7 +4052,7 @@
            },
            {
             "name": "Pen header",
-            "shows": "Pen code, sow count, chevron (opens the pen sheet), and \"N shown\" when rows are hidden.",
+            "shows": "Pen code, sow count, chevron (opens the pen page, Inspection's), and \"N shown\" when rows are hidden.",
             "states": [
              {
               "state": "All shown",
@@ -4143,7 +4092,8 @@
           "controls": [
            {
             "control": "Pen header",
-            "does": "opens a Pen sheet (not a separate screen): notices, Feed guidance, Report equipment fault, Add/Edit pen note, Pen log"
+            "does": "opens the pen page: Note, Feed and Fault for this one pen, then what needs attention, Now and its log. The pen page and its tools are Inspection's (owner, 2026-10-22).",
+            "goesTo": "inspection.farrowing-pen"
            },
            {
             "control": "Search",
@@ -4185,7 +4135,6 @@
            "Prototype hard-codes amber (belowTarget = true); never shows the neutral state.",
            "Row recency and hand are hard-coded; \"1h ago\" never ticks. Overdue rows lack the ruled \"induced yesterday · L.M\" second line.",
            "Last record line repeats each row's recency; the ruled one-sentence task copy under it is missing.",
-           "Pen headers open pen tools (feed, fault, note, log) although the rulings call them census-only dead zones; unclear whose feature that is.",
            "Entry mismatch: Home's whole-farm card is meant to land here but opens the Task overview sheet over it first."
           ]
          },
@@ -6064,310 +6013,6 @@
          }
         },
         {
-         "id": "farrowing.pen",
-         "name": "Pen",
-         "zh": "栏位",
-         "status": "in-design",
-         "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
-         "preset": "room",
-         "steps": [
-          "[data-action=\"room-pen-detail\"][data-value=\"B1\"]"
-         ],
-         "figma": "",
-         "notes": {
-          "purpose": "One pen's page, reached from a pen header in the room list (the pen is a door, owner 2026-10-19). Everything done to the pen as a whole happens here, for this one pen, laid out as its sibling on Inspection (inspection.pen): the pen's verbs on top, then what needs someone, then how the pen is now, then its log.",
-          "states": [
-           "Nothing open: the verbs, Now and Pen log.",
-           "An open equipment fault or a note: a \"Needs attention\" group under the verbs, the faults first as rows, then the note as its card (farrowing.pen-attention).",
-           "Feed recorded for the pen: a Feed fact in Now (formula, method). No pen in the prototype has feed data."
-          ],
-          "elements": [
-           {
-            "name": "Pen verbs",
-            "at": "Note",
-            "shows": "Note, Feed, Fault as Row tiles (SentriUI.rowGrid): only the verbs Farrowing has. Note opens Add / Edit pen note, Feed the feed guidance, Fault Report equipment fault.",
-            "logic": "Each tile's accessible name is its full action (\"Add pen note\", \"Feed guidance\", \"Report equipment fault\").",
-            "source": "farrowing-astra-concept.js penDetails()"
-           },
-           {
-            "name": "Needs attention",
-            "at": "Needs attention",
-            "shows": "Open faults as rows (device over its description), then the pen note as its card (text, hand and time); left out when nothing is open.",
-            "logic": "Only open faults are listed; a resolved fault leaves the page and stays in the pen log. A pen holds one note.",
-            "source": "farrowing-astra-concept.js penDetails(), penInfo()"
-           },
-           {
-            "name": "Now",
-            "at": "Now",
-            "shows": "Sows: the pen's task sows and where they are (\"Farrowing\", or \"2 awaiting · 1 done\"); Piglets alive with the dead beside them, once a sow in the pen has farrowed; Feed when recorded.",
-            "logic": "Counts every task sow in the pen on the room list, ignoring the current tab and filter (as the pen header does). No zeros: Piglets is left out before any sow farrows, and dead is said only when there are any.",
-            "source": "farrowing-astra-concept.js penDetails(), penSowStates()"
-           }
-          ],
-          "edge": [
-           "Notes, faults, drafts and log entries belong to the pen, not the sow, and are shared by every drawer of that pen within the unit. The prototype starts with none and forgets them on reload."
-          ],
-          "issues": [
-           "Whose feature the pen tools are is unclear: the same pen page, note, fault and log flows are drawn in Inspection (see the decision \"Pen tools are drawn in Farrowing and in Inspection\")."
-          ],
-          "rules": [
-           "The pen is a door, not a tick; its verbs on top, then what needs someone (owner, 2026-10-19).",
-           "The page's title is the pen, so it has no second heading such as \"Pen information\" (Owner decision 2026-10-10)."
-          ]
-         }
-        },
-        {
-         "id": "farrowing.pen-attention",
-         "name": "Pen · needs attention",
-         "zh": "栏位 · 需要处理",
-         "status": "in-design",
-         "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
-         "preset": "room",
-         "steps": [
-          "[data-action=\"room-pen-detail\"][data-value=\"B1\"]",
-          "[data-action=\"room-pen-fault\"]",
-          "[data-picker-key=\"pen:device\"]",
-          "[data-action=\"picker-select\"][data-value=\"Feeding station\"]",
-          {
-           "fill": "[data-pen-field=\"description\"]",
-           "text": "Feeder is jammed and drops no feed."
-          },
-          "[data-action=\"room-pen-save-fault\"]",
-          "[data-action=\"room-pen-note\"]",
-          {
-           "fill": "[data-pen-field=\"note\"]",
-           "text": "Water line leaks at the back of the pen. Check again after feeding."
-          },
-          "[data-action=\"room-pen-save-note\"]"
-         ],
-         "figma": "",
-         "notes": {
-          "purpose": "The pen page with an open equipment fault and a note: Needs attention sits under the verbs, the fault row first, then the note card.",
-          "states": [
-           "The fault row opens its record (Resolve lives there); the note card opens the note."
-          ],
-          "elements": [
-           {
-            "name": "Needs attention",
-            "at": "Needs attention",
-            "shows": "The open fault (Feeding station · Feeder is jammed and drops no feed.), then the note with its hand and time.",
-            "source": "farrowing-astra-concept.js penDetails()",
-            "logic": "Faults first, then the note; both are doors (the fault to its record, the note to its page)."
-           }
-          ],
-          "edge": [],
-          "issues": []
-         }
-        },
-        {
-         "id": "farrowing.pen-log",
-         "name": "Pen log",
-         "zh": "栏位记录",
-         "status": "in-design",
-         "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
-         "preset": "room",
-         "steps": [
-          "[data-action=\"room-pen-detail\"][data-value=\"B1\"]",
-          "[data-action=\"room-pen-log\"]"
-         ],
-         "figma": "",
-         "notes": {
-          "purpose": "Everything recorded in this pen, newest first.",
-          "states": [
-           "Empty: \"No activity recorded for this pen.\""
-          ],
-          "elements": [
-           {
-            "name": "Entries",
-            "at": "Pen log",
-            "shows": "Entries grouped by day; each has a title, a detail line, time and hand.",
-            "logic": "Merges the pen's own events (note added or updated, fault reported or resolved) with the events of every sow in that pen, sorted by day and time. A sow event carries \"Sow 000418\" as its detail; a pen event carries its note text or \"device · description\". Photos attached to an event show as thumbnails that open a viewer.",
-            "source": "farrowing-astra-concept.js penLogEvents(), penLog()"
-           }
-          ],
-          "edge": [
-           "Days read relative within the week (Today, Yesterday, N days ago), then as dates."
-          ],
-          "issues": []
-         }
-        },
-        {
-         "id": "farrowing.pen-note",
-         "name": "Pen note",
-         "zh": "栏位备注",
-         "status": "in-design",
-         "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
-         "preset": "room",
-         "steps": [
-          "[data-action=\"room-pen-detail\"][data-value=\"B1\"]",
-          "[data-action=\"room-pen-note\"]"
-         ],
-         "figma": "",
-         "notes": {
-          "purpose": "Write or edit the one note for this pen, to leave information for the next person.",
-          "elements": [
-           {
-            "name": "Save note",
-            "at": "Save note",
-            "shows": "Primary action, disabled until the text is not empty.",
-            "rule": "A pen has one note: saving replaces it, and the log records \"Pen note added\" or \"Pen note updated\" with the new text (the old text stays only in the log). Opened from an existing note, the field starts with that text. The stamp is the hand and time of the save.",
-            "source": "farrowing-astra-concept.js room-pen-save-note"
-           }
-          ],
-          "edge": [
-           "Back keeps the draft for this pen; it is offered again on reopen and dropped only by Save."
-          ],
-          "issues": []
-         }
-        },
-        {
-         "id": "farrowing.pen-read-note",
-         "name": "Read pen note",
-         "zh": "查看栏位备注",
-         "status": "in-design",
-         "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
-         "preset": "room",
-         "steps": [
-          "[data-action=\"room-pen-detail\"][data-value=\"B1\"]",
-          "[data-action=\"room-pen-note\"]",
-          {
-           "fill": "[data-pen-field=\"note\"]",
-           "text": "Water line leaks at the back of the pen. Check again after feeding."
-          },
-          "[data-action=\"room-pen-save-note\"]",
-          "[data-action=\"room-pen-read-note\"]"
-         ],
-         "figma": "",
-         "notes": {
-          "purpose": "Read the pen's note as saved: its text, who wrote it and when.",
-          "elements": [
-           {
-            "name": "Edit note",
-            "at": "Edit note",
-            "shows": "Primary action on a read-only page.",
-            "rule": "Opens the pen note editor with the current text; reading never changes the note. The stamp (\"G.H · Today · 09:41\") is fixed sample text in the prototype.",
-            "source": "farrowing-astra-concept.js penSubpage(), room-pen-note"
-           }
-          ],
-          "edge": [
-           "The page exists only while the pen has a note; the pen page shows the note card that opens it."
-          ],
-          "issues": []
-         }
-        },
-        {
-         "id": "farrowing.pen-feed",
-         "name": "Pen feed guidance",
-         "zh": "栏位饲喂",
-         "status": "in-design",
-         "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
-         "preset": "room",
-         "steps": [
-          "[data-action=\"room-pen-detail\"][data-value=\"B1\"]",
-          "[data-action=\"room-pen-feed\"]"
-         ],
-         "figma": "",
-         "notes": {
-          "purpose": "Show what this pen is fed, as guidance for whoever is working in the pen.",
-          "states": [
-           "With feed data: a \"Feeding\" section with Formula and Method, and the guidance text when there is any.",
-           "Without: \"No feed guidance recorded for this pen.\""
-          ],
-          "edge": [
-           "Every pen in the prototype is the empty state: no feed data is ever supplied, so the populated layout cannot be reached in the demo."
-          ],
-          "issues": [
-           "The populated state (Formula, Method, guidance) is built but has no sample data, so it cannot be reviewed. Feed itself is the feed-plan feature in Inspection."
-          ]
-         }
-        },
-        {
-         "id": "farrowing.pen-fault",
-         "name": "Report equipment fault",
-         "zh": "报告设备故障",
-         "status": "in-design",
-         "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
-         "preset": "room",
-         "steps": [
-          "[data-action=\"room-pen-detail\"][data-value=\"B1\"]",
-          "[data-action=\"room-pen-fault\"]"
-         ],
-         "figma": "",
-         "notes": {
-          "purpose": "Report broken equipment in the pen: which device and what is wrong.",
-          "elements": [
-           {
-            "name": "Device",
-            "at": "Device",
-            "shows": "A picker: Feeding station, Drinking station, Other.",
-            "states": [
-             {
-              "state": "Other chosen",
-              "when": "Device = Other",
-              "shows": "A \"Device name\" field appears and becomes required"
-             }
-            ],
-            "logic": "The fault is stored under the device name (the typed name for Other).",
-            "source": "farrowing-astra-concept.js validPenFault()"
-           },
-           {
-            "name": "Report fault",
-            "at": "Report fault",
-            "shows": "Primary action.",
-            "rule": "Disabled until a device and a description are filled (and a name for Other). Saving adds an open fault to the pen, an \"Equipment\" notice on the pen page and an \"Equipment fault reported\" log entry, then returns to the pen page.",
-            "source": "farrowing-astra-concept.js room-pen-save-fault"
-           }
-          ],
-          "edge": [
-           "Back keeps the draft for this pen (device, name, description); Report fault drops it."
-          ],
-          "issues": []
-         }
-        },
-        {
-         "id": "farrowing.pen-fault-record",
-         "name": "Equipment fault",
-         "zh": "设备故障",
-         "status": "in-design",
-         "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
-         "preset": "room",
-         "steps": [
-          "[data-action=\"room-pen-detail\"][data-value=\"B1\"]",
-          "[data-action=\"room-pen-fault\"]",
-          "[data-picker-key=\"pen:device\"]",
-          "[data-action=\"picker-select\"][data-value=\"Feeding station\"]",
-          {
-           "fill": "[data-pen-field=\"description\"]",
-           "text": "Feeder is jammed and drops no feed."
-          },
-          "[data-action=\"room-pen-save-fault\"]",
-          "[data-action=\"room-pen-fault-record\"]"
-         ],
-         "figma": "",
-         "notes": {
-          "purpose": "Read one equipment fault and, while it is open, resolve it.",
-          "states": [
-           "Open: description, \"Open · Reported 09:41 · G.H\", an optional Resolution note and \"Resolve fault\".",
-           "Resolved: description, the resolution text and \"Resolved · Reported …\"; no action.",
-           "Not found: \"No fault found.\""
-          ],
-          "elements": [
-           {
-            "name": "Resolve fault",
-            "at": "Resolve fault",
-            "shows": "Primary action on an open fault.",
-            "rule": "Needs no note (the Resolution note is optional). Resolving removes the fault's notice from the pen page and logs \"Equipment fault resolved · device · note\"; it does not delete the fault.",
-            "source": "farrowing-astra-concept.js room-pen-resolve-fault"
-           }
-          ],
-          "edge": [
-           "The Resolved state is built but no door reaches it: a resolved fault leaves the pen page, and pen log entries are not links.",
-           "A typed resolution note is kept for that fault through Back, until Resolve fault."
-          ],
-          "issues": []
-         }
-        },
-        {
          "id": "farrowing.search",
          "name": "Find a sow",
          "zh": "查找母猪",
@@ -7139,7 +6784,7 @@
          }
         }
        ],
-       "prd": "# Farrowing (分娩)\n\nSection: Tasks · Platform: mobile · Prototype: `ux/system/farrowing-astra-concept.html?layout=focus` · Rulings: `ux/research/farrowing/RULINGS.md` (headings quoted below) · State contract: `ux/system/farrowing-contract.html`\n\n## Problem\n\nA sow can farrow for hours, across shifts, with wet gloves, one hand on the crate and no signal guarantee. The worker needs to count the piglets as they arrive without ever feeling the count is unsaved, record the dead by cause, fix a wrong figure without erasing the first one, and close the litter with a few deliberate facts. The supervisor needs the same records to roll up into one task: how many sows have farrowed, which are still going, which are still waiting, and a clean way to end the batch's farrowing task. The old UI scattered these over several screens and corrections had many doors; this feature keeps one familiar flow with a clearer place for every number.\n\n## Who\n\n- Farrowing-house worker (gloved, one-handed, often at night): counts, records deaths, finishes litters.\n- Next-shift worker: reads the room list to see who is farrowing and who was last touched, then continues from the same record.\n- Unit lead / supervisor: reads the unit and task progress, corrects posted figures, ends the task.\n- Anyone may amend a finished record; provenance (stamp, original kept) replaces permissions.\n\n## Anchor\n\nThe anchor is the **sow** (her litter session). Statuses: **Awaiting** (nothing recorded; live total zero) → **Farrowing** (live total above zero, not finished) → **Finished** (Born locked). Exits: **Sow died** (her death ends the session without Finish; she stays in the room while her piglets still need a place) and **Aborted** (an abortion with a live piglet keeps her row; with none she leaves the list). Both are finished states; sows that have left the list are counted once on the Task overview as \"Left the task\". Reachable in any status: the **Room list** and the **Farrowing log**. Task bands: **Task in progress** (the whole-task overview) and **Ending the task** (the four End task reviews and the receipt).\n\nStatus is derived, never set by a ceremony: \"registers derive from the live total (posted + open pending)\" (RULINGS *Starting and ending a session*).\n\n## Rules\n\nFrom RULINGS.md, quoted short:\n\n- **Model**: \"Born = Alive + Σ Dead + fostered out − fostered in. Derived, never entered, locks at Finish.\"\n- **Model**: Alive is one classless number; \"+ is free; − drains pending and clamps at the floor\" (B\\* minus the dead recorded). Born can never drop silently.\n- **Model**: five default dead types plus Other (stillborn, mummified, crushed, scours, starve-out).\n- **Model**: \"No WHEN anywhere, absolutely … The stamp is the date.\"\n- **Model**: \"Classification (weak/deformed) happens at Finish, commits per tap\"; \"Healthy has no form row\"; litter weight is optional; assisted is a required No / Yes, No preselected (owner, 2026-10-15; see Decisions).\n- **Model**: Active row line 2 is \"born 14 · 1h ago · G.H\"; \"No staleness tracking on Active sows\"; the interval chip is retired. \"Every litter row carries its three numbers\" (alive · dead, born).\n- **Model**: \"The overdue signal ends at the first record\"; rows speak in days from due (due = service + 114), never gestation day; \"Overdue · 3 days\" colours only the number.\n- **Model**: \"The hero owns the total; the receipt owns the change\" (`Saved · +4 this visit`).\n- **Surfaces & entrances**: \"ONE dead drawer product-wide\", opened by Record dead; staged: Save commits, Back keeps the draft, Clear discards.\n- **Surfaces & entrances**: \"ONE correction door: Edit … ONE SCREEN\"; \"What Edit adjusts: the observations, never the derivation\"; a missed fact is a recording, never an Edit.\n- **Surfaces & entrances**: \"Type-to-set is retired on count figures\"; one stepper shape, − n +, everywhere.\n- **Surfaces & entrances**: \"Identity is sheet-first … the room row offers no sow-page target.\"\n- **Surfaces & entrances**: \"`Finish` is `Finish farrowing`\"; the hold-to-lock is \"the second guard\".\n- **Starting and ending a session**: \"Farrowing starts at the first recorded event — full stop.\"\n- **Starting and ending a session**: the sow's death lives in the drawer (`Piglets · The sow`), \"hold-to-commit\"; \"She stays in the room\".\n- **Starting and ending a session**: \"A non-empty ledger is never unreachable\"; a draft never crosses the lock.\n- **After the lock**: \"The record face IS the record\"; \"One ledger surface, the Farrowing record page\"; \"History is the chevron on the fact line\"; \"The correction mark is the amber value\".\n- **After the lock**: Born is amended through the Edit ceremony, which opens in place under the Born row (`More born` / `Count was wrong`; never a drawer on a drawer); \"Anyone may amend born post-lock — open ✎, stamped, no role gate.\" Fostering is **parked**.\n- **Names and glyphs**: \"words carry actions, icons carry objects\"; dates speak relative within the week.\n- **Piglet processing, Round 5**: all tasks look the same (farrowing's skeleton); \"The exit word is always **Back**.\"\n- **Owner calls for this atlas**: *Edit record* is editing while she is still farrowing; *Correct born* exists only after farrowing has finished. Home's Farrowing card and Choose unit both land on the room list.\n\n## Scope\n\nIn:\n\n- Room list: unit card, whole-task card, Awaiting / Active / Done / All tabs, due and parity filter, pen grouping, Pen map, Scan ear tag, Search.\n- Find a sow (a full page that searches every unit) and Scan ear tags (a full page, always listening, that collects scanned sows). A sow in any unit opens her farrowing drawer.\n- The sow sheet in its faces: Before first count, Counting, Finish (and its blocked form), Locked record, Sow died.\n- Death entry (piglets and the sow), Edit record, Edit of a finished litter and the Correct born correction (in place), the Farrowing log.\n- Whole-task overview, End task reviews (blocked, awaiting, all finished, outcomes) and the task receipt. One count everywhere: Done · Active · Awaiting over every sow of the task (a sow that died or has an outcome is Done), the same on the overview, End task, the receipt and the room tabs.\n- Farrowing's rows on the pig's Actions sheet (Edit litter record, Record abortion, Mark not in pig).\n- When a sow dies: the allocation sheet (move her piglets to other sows, hand-rear them in her crate, or move them to a rearing pen), the Move page it opens (`farrowing.foster`), and her row's life on the list until every piglet has a place.\n\nOut:\n\n- Fostering outside the sow-died case (parked until the owner reopens it; see Decisions, 2026-10-10).\n- Piglet processing and its identity work (separate feature; Move opens after the lock). The prototype's own Piglet processing, identity and mortality pages are mapped as screens; see the decision \"Piglet processing is drawn in Farrowing and as its own feature\".\n- The sow page itself and the rest of the Actions sheet (pig-profile).\n- Pen tools reachable from a pen header (feed guidance, equipment fault, pen note, pen log): present in the prototype, unclear whose feature; recorded in the Room list issues. The pen pages are mapped as screens; see the decision \"Pen tools are drawn in Farrowing and in Inspection\".\n- Console reporting, anomaly queues, per-hand audit views, merge-review UI, notifications.\n- Role gates, batch-close disposition doors beyond what the End task reviews show.\n\n## Decisions\n\n- Born is derived and frozen at Finish; Alive and the dead types are the observations — RULINGS *Model*.\n- Born floor: \"+\" free, \"−\" clamps at B\\* minus current dead — RULINGS *Model*.\n- Five dead types plus Other; no WHEN chips — RULINGS *Model*.\n- Weak and deformed asked at Finish only; Healthy derived — RULINGS *Model*.\n- Row line 2 carries recency in words; interval chip retired — RULINGS *Model*.\n- Overdue signal stops at the first record — RULINGS *Model*.\n- Days from due on rows, gestation day on the sheet header only — RULINGS *Model*.\n- Receipt `Saved · +4 this visit`; hero numeral plain, no typing — RULINGS *Model*.\n- Edit folds weak, deformed, weight and assisted into one `At finish` row — RULINGS *Model*.\n- Dead drawer is the only dead entrance, staged (Back/Clear/Save) — RULINGS *Surfaces & entrances*.\n- Edit is the only correction door and one screen — RULINGS *Surfaces & entrances*.\n- Count figures are stepper-only — RULINGS *Surfaces & entrances*.\n- Sheet-first identity: only the sheet header opens the sow page — RULINGS *Surfaces & entrances*.\n- Exit grammar: bars hold exits only; Finish farrowing is a hold — RULINGS *Surfaces & entrances*.\n- Farrowing starts at the first record; no started mark — RULINGS *Starting and ending a session*.\n- The sow's death is a hold-to-commit mode of the drawer; she stays in the room — RULINGS *Starting and ending a session*.\n- Merge contract: signed deltas, flag instead of silently applying a breach — RULINGS *Starting and ending a session*.\n- Fostering parked — RULINGS *After the lock*.\n- The locked record is designed as a record, with one ledger page — RULINGS *After the lock*.\n- Anyone may amend Born after the lock — RULINGS *After the lock*.\n- Words for actions, icons for objects — RULINGS *Names and glyphs*.\n- Relative dates inside a week — RULINGS *Names and glyphs*.\n- Farrowing's skeleton is the model for all tasks; exit word Back — RULINGS *Piglet processing, Round 5*.\n- Task end: manual, hold-to-commit with receipt, blocked while farrowing is open — RULINGS *Piglet processing, Q5*; closure details in `ux/research/farrowing/ASTRA-TASK-CLOSURE.md`.\n- Edit record vs Correct born split by status; Home entries land on the room list — owner calls for this atlas.\n\n### Owner decisions, 2026-10-10\n\n- **Room rows** (the room, Find a sow, Scan results, the task's sow list) are one row, owner-approved 2026-10-12 (the design system's Row · animal, state side). Left, two lines: the ear tag exactly as stored (16px/600 mono, always ink, even for a sow that died) over 13px muted context (`Parity 5` on a waiting sow; `when · who` on a recorded one, such as `05:58 · G.H`, `1h ago · G.H`, `yesterday · L.M`; `Pen B3 · …` in a flat result; `Unit 6 · Pen A2` for a sow in another unit in Scan; Find a sow's rows carry her place on the right, `Pen B4` or `Unit 6` over `Pen A2`, instead of her state). Right, two lines, right-aligned: the figure over the state word. Farrowing: `9 alive · 5 dead` / Farrowing. Due: `Tomorrow`, `Today` or `In 2 days` / Due. Overdue: `3 days` / Overdue. Done: `11 alive · 2 dead` / Done. Sow died: `7 to allocate` / Sow died, or `2 hand-reared` / Sow died. Aborted: `1 alive` / Aborted. Levels set weight and colour: act now (overdue; a sow died with piglets to allocate) is red with the one \"!\" icon in a row; live (farrowing) is bold; coming up (due today or tomorrow) has an ink figure and a muted word; settled (done, due in 2+ days, aborted) is muted (the 16px figure in ink-2, so it keeps 7:1 contrast). Only recorded counts show: alive, and `· N dead` only above zero; never *born*, never an expected or carried count. One quiet chevron, no pencil and no chip: tapping the row opens the record, and Edit is inside it. Pen headers say the pen and the count only: no need counts or dots.\n- **Statuses.** In progress: **Awaiting**, **Active**. Finished: **Done** (green), **Sow died** (red), **Aborted** (red; 流产).\n- **Sow died.** Right after the hold records her death the sheet becomes `N piglets to allocate` (subtitle `<ID> · <pen> · sow died <time>`) with three options: **Move to other sows** (opens the move page, sending out of this litter with her piglets pre-selected; several receiving sows may split them), **Hand-rear here** (the piglets stay on her record and piglet care continues) and **Move to a rearing pen** (shown only when the farm config says the farm has one; the prototype flag is on for the demo, `?rearing=off` turns it off). Footer **Back** means later: no ✕, no extra question line.\n- **Her row while piglets remain.** A red tile `N / to allocate`, facts `Sow died · yesterday · L.M`; tapping it opens the same sheet. After Hand-rear: a neutral tile `N / hand-reared`, facts `Sow died · 09:40 · L.M`; the row stays while hand-reared piglets remain. A partial allocation keeps the remaining count; her row never says `5 moved`. A piglet that dies or is put down is recorded through Record dead and the count drops. She **leaves the room list** once every piglet is on another sow, in a rearing pen, or recorded dead.\n- **Aborted.** *Abortion* is the one word (never *miscarriage*). No live piglet: she leaves the room list at once. Any live piglet: the row stays with the tile `1 / alive` and the facts `Aborted · 08:10 · G.H` (recorded counts only).\n- **Task overview** counts the sows that left the list: `Left the task · n aborted · n sow died`. She is then outside Done · Active · Awaiting, so every total still adds up (7 / 18 farrowed once one of 19 has left).\n- **Sheet titles name the job; subtitles name the animal and context.** Record dead is titled `Record dead` (it was `Dead 6` / `The sow`); the pen sheet no longer repeats `Pen` as its only heading.\n- **Fostering is in scope for the sow-died case** (and only there; elsewhere it stays parked).\n- **An orphan litter can stay in the task, hand-reared** on her record.\n- **A rearing pen is a farm-level option.** Its configuration is still open: filed as the To confirm item `farrowing-room-list-1` in `review/farrowing-room-list.json`.\n- **Abortion rule.** No live piglets: she leaves the list. Any live piglet: an Aborted row stays.\n- The glossary words (*abortion / aborted*, *to allocate*, *hand-reared*, *left the task*) are in `ux/laws/glossary.md` and `ux/laws/strings.json`; \"Abortion vs miscarriage\" (`events-1`) is closed by this decision.\n\n### Owner decisions, 2026-10-12 · Find a sow and Scan ear tags\n\n- **Find a sow is global.** The dock's Search button opens a full-height page (no drawer): the field is pinned at the top and focused, with a search icon, a clear ✕, a scan icon button that opens Scan, and Cancel. It searches every unit and the header names no unit. Nothing is listed until something is typed; the page says \"Type part of an ear tag or a pen, or scan a tag. Searches every unit.\" Results update as the worker types, one card per unit under a plain **Unit 7** section heading, this unit first and then the others in unit order (tag, `Pen B4`, chevron; the heading names the unit, so no row repeats it). Tags that start with the typed text rank before tags that only contain it; the typed part is bold and the rest of the tag muted; pen codes match too. No match reads \"No sow matching “43” in any unit.\" Natively the keyboard is number-first with an ABC switch (iOS `numbersAndPunctuation`; on Android a number-first keyboard with a 123/ABC toggle).\n- **Opening a result.** Every result opens her farrowing drawer, a sow in another unit exactly as a sow in this unit: Farrowing is one task across all its units. The drawer's subtitle names where she is (`Unit 6 · A2 / Parity 4`) when she is in another unit. Search never switches the room's unit by itself.\n- **Scan always listens.** The dock's Scan ear tag button, and the scan icon in Find a sow, open **Scan ear tags**, a full page. The reader is always listening: there is no \"ready for the next tag\" banner and no \"Not found\" row. The footer's Stop scanning / Resume scanning is the only scanning status (owner, 2026-10-20: the body's Scanning pill repeated it and is gone). Not connected: a scan icon, \"Scanner not connected\" and the pairing instruction, with no buttons (the back arrow leaves). Connected and nothing scanned: \"Hold the reader to an ear tag\". Each scan adds the sow to a list, one card per unit under the same plain **Unit 7** heading as Find a sow (no count), this unit first, newest first; a repeat scan adds nothing and briefly highlights her existing row. Nothing arrives abruptly (owner, 2026-10-20): a new row slides in at the top of its unit card while the rows under it glide down, and every scan, new or repeat, lights its row for 1.6 s on its own clock and brings it into view, so scans in quick succession light row after row. Each row is the Row · animal variant with her Farrowing state, as a select + door: the tick box selects, the rest of the row opens her farrowing drawer, in this unit or another.\n- **Ticks are for bulk, with generic Actions only.** Nothing ticked: one full-width button, **Stop scanning** (it becomes **Resume scanning** while stopped). One or more ticked: **N sows selected** (a plain count: no chevron, nothing to tap; to untick, tap the box) and the primary **Actions**, which opens the shared generic actions for the selection only, as More actions' verb tiles (owner, 2026-10-20): Transfer, Condition, Treat, Note. Scan offers no Farrowing action. In the prototype each Action opens its existing single-sow flow for the first ticked sow, because no shared flow takes a whole selection yet (a gap for the shared Actions).\n- **The selection bar's button says \"Actions\"**, not \"More actions\".\n- Prototype only: `?scanner=off` opens Scan as if no reader were paired, and a \"Simulate scan\" control outside the phone frame adds the next sample sow. The `stop` glyph is in the shared icon registry.\n\n### Owner decisions, 2026-10-15 · Finish farrowing\n\n- **Assisted is required, No preselected.** On Finish farrowing and in Edit finish details it is a No / Yes choice (the Inline Choice, key face) with **No chosen on a new finish**. There is no unanswered state and no Clear. A record saved before this ruling whose assisted was never recorded stays null and still reads \"Not recorded\" in the read-only facts (history is not rewritten); its correction form shows neither key chosen until the worker answers.\n- **Litter weight stays optional.** Blank means not recorded (never 0). It is typed on the phone's own decimal keyboard (one decimal; a locale's comma becomes a point), and Done closes the keyboard (owner, 2026-10-16: one optional value in a form takes the system keyboard; the Numpad stays for runs of typed values such as the piglet weigh run).\n- **One titled form.** Finish farrowing and Edit finish details show the same rows under the section heading \"Piglet condition\": Weak, Deformed, Assisted, Litter weight (with \"Optional\" beside its label). The description line \"Among the N alive piglets · 0 if none\" is cut: Alive is on screen and the steppers stop at it.\n",
+       "prd": "# Farrowing (分娩)\n\nSection: Tasks · Platform: mobile · Prototype: `ux/system/farrowing-astra-concept.html?layout=focus` · Rulings: `ux/research/farrowing/RULINGS.md` (headings quoted below) · State contract: `ux/system/farrowing-contract.html`\n\n## Problem\n\nA sow can farrow for hours, across shifts, with wet gloves, one hand on the crate and no signal guarantee. The worker needs to count the piglets as they arrive without ever feeling the count is unsaved, record the dead by cause, fix a wrong figure without erasing the first one, and close the litter with a few deliberate facts. The supervisor needs the same records to roll up into one task: how many sows have farrowed, which are still going, which are still waiting, and a clean way to end the batch's farrowing task. The old UI scattered these over several screens and corrections had many doors; this feature keeps one familiar flow with a clearer place for every number.\n\n## Who\n\n- Farrowing-house worker (gloved, one-handed, often at night): counts, records deaths, finishes litters.\n- Next-shift worker: reads the room list to see who is farrowing and who was last touched, then continues from the same record.\n- Unit lead / supervisor: reads the unit and task progress, corrects posted figures, ends the task.\n- Anyone may amend a finished record; provenance (stamp, original kept) replaces permissions.\n\n## Anchor\n\nThe anchor is the **sow** (her litter session). Statuses: **Awaiting** (nothing recorded; live total zero) → **Farrowing** (live total above zero, not finished) → **Finished** (Born locked). Exits: **Sow died** (her death ends the session without Finish; she stays in the room while her piglets still need a place) and **Aborted** (an abortion with a live piglet keeps her row; with none she leaves the list). Both are finished states; sows that have left the list are counted once on the Task overview as \"Left the task\". Reachable in any status: the **Room list** and the **Farrowing log**. Task bands: **Task in progress** (the whole-task overview) and **Ending the task** (the four End task reviews and the receipt).\n\nStatus is derived, never set by a ceremony: \"registers derive from the live total (posted + open pending)\" (RULINGS *Starting and ending a session*).\n\n## Rules\n\nFrom RULINGS.md, quoted short:\n\n- **Model**: \"Born = Alive + Σ Dead + fostered out − fostered in. Derived, never entered, locks at Finish.\"\n- **Model**: Alive is one classless number; \"+ is free; − drains pending and clamps at the floor\" (B\\* minus the dead recorded). Born can never drop silently.\n- **Model**: five default dead types plus Other (stillborn, mummified, crushed, scours, starve-out).\n- **Model**: \"No WHEN anywhere, absolutely … The stamp is the date.\"\n- **Model**: \"Classification (weak/deformed) happens at Finish, commits per tap\"; \"Healthy has no form row\"; litter weight is optional; assisted is a required No / Yes, No preselected (owner, 2026-10-15; see Decisions).\n- **Model**: Active row line 2 is \"born 14 · 1h ago · G.H\"; \"No staleness tracking on Active sows\"; the interval chip is retired. \"Every litter row carries its three numbers\" (alive · dead, born).\n- **Model**: \"The overdue signal ends at the first record\"; rows speak in days from due (due = service + 114), never gestation day; \"Overdue · 3 days\" colours only the number.\n- **Model**: \"The hero owns the total; the receipt owns the change\" (`Saved · +4 this visit`).\n- **Surfaces & entrances**: \"ONE dead drawer product-wide\", opened by Record dead; staged: Save commits, Back keeps the draft, Clear discards.\n- **Surfaces & entrances**: \"ONE correction door: Edit … ONE SCREEN\"; \"What Edit adjusts: the observations, never the derivation\"; a missed fact is a recording, never an Edit.\n- **Surfaces & entrances**: \"Type-to-set is retired on count figures\"; one stepper shape, − n +, everywhere.\n- **Surfaces & entrances**: \"Identity is sheet-first … the room row offers no sow-page target.\"\n- **Surfaces & entrances**: \"`Finish` is `Finish farrowing`\"; the hold-to-lock is \"the second guard\".\n- **Starting and ending a session**: \"Farrowing starts at the first recorded event — full stop.\"\n- **Starting and ending a session**: the sow's death lives in the drawer (`Piglets · The sow`), \"hold-to-commit\"; \"She stays in the room\".\n- **Starting and ending a session**: \"A non-empty ledger is never unreachable\"; a draft never crosses the lock.\n- **After the lock**: \"The record face IS the record\"; \"One ledger surface, the Farrowing record page\"; \"History is the chevron on the fact line\"; \"The correction mark is the amber value\".\n- **After the lock**: Born is amended through the Edit ceremony, which opens in place under the Born row (`More born` / `Count was wrong`; never a drawer on a drawer); \"Anyone may amend born post-lock — open ✎, stamped, no role gate.\" Fostering is **parked**.\n- **Names and glyphs**: \"words carry actions, icons carry objects\"; dates speak relative within the week.\n- **Piglet processing, Round 5**: all tasks look the same (farrowing's skeleton); \"The exit word is always **Back**.\"\n- **Owner calls for this atlas**: *Edit record* is editing while she is still farrowing; *Correct born* exists only after farrowing has finished. Home's Farrowing card and Choose unit both land on the room list.\n\n## Scope\n\nIn:\n\n- Room list: unit card, whole-task card, Awaiting / Active / Done / All tabs, due and parity filter, pen grouping, Pen map, Scan ear tag, Search.\n- Find a sow (a full page that searches every unit) and Scan ear tags (a full page, always listening, that collects scanned sows). A sow in any unit opens her farrowing drawer.\n- The sow sheet in its faces: Before first count, Counting, Finish (and its blocked form), Locked record, Sow died.\n- Death entry (piglets and the sow), Edit record, Edit of a finished litter and the Correct born correction (in place), the Farrowing log.\n- Whole-task overview, End task reviews (blocked, awaiting, all finished, outcomes) and the task receipt. One count everywhere: Done · Active · Awaiting over every sow of the task (a sow that died or has an outcome is Done), the same on the overview, End task, the receipt and the room tabs.\n- Farrowing's rows on the pig's Actions sheet (Edit litter record, Record abortion, Mark not in pig).\n- When a sow dies: the allocation sheet (move her piglets to other sows, hand-rear them in her crate, or move them to a rearing pen), the Move page it opens (`farrowing.foster`), and her row's life on the list until every piglet has a place.\n\nOut:\n\n- Fostering outside the sow-died case (parked until the owner reopens it; see Decisions, 2026-10-10).\n- Piglet processing and its identity work (separate feature; Move opens after the lock). The prototype's own Piglet processing, identity and mortality pages are mapped as screens; see the decision \"Piglet processing is drawn in Farrowing and as its own feature\".\n- The sow page itself and the rest of the Actions sheet (pig-profile).\n- The pen page and its tools (Note, Feed guidance, equipment fault, pen log): Inspection's (owner, 2026-10-22). Farrowing's pen header `›` is the door; the pages Farrowing's prototype draws are mapped under Inspection, in its band \"Pen in Farrowing\".\n- Console reporting, anomaly queues, per-hand audit views, merge-review UI, notifications.\n- Role gates, batch-close disposition doors beyond what the End task reviews show.\n\n## Decisions\n\n- Born is derived and frozen at Finish; Alive and the dead types are the observations — RULINGS *Model*.\n- Born floor: \"+\" free, \"−\" clamps at B\\* minus current dead — RULINGS *Model*.\n- Five dead types plus Other; no WHEN chips — RULINGS *Model*.\n- Weak and deformed asked at Finish only; Healthy derived — RULINGS *Model*.\n- Row line 2 carries recency in words; interval chip retired — RULINGS *Model*.\n- Overdue signal stops at the first record — RULINGS *Model*.\n- Days from due on rows, gestation day on the sheet header only — RULINGS *Model*.\n- Receipt `Saved · +4 this visit`; hero numeral plain, no typing — RULINGS *Model*.\n- Edit folds weak, deformed, weight and assisted into one `At finish` row — RULINGS *Model*.\n- Dead drawer is the only dead entrance, staged (Back/Clear/Save) — RULINGS *Surfaces & entrances*.\n- Edit is the only correction door and one screen — RULINGS *Surfaces & entrances*.\n- Count figures are stepper-only — RULINGS *Surfaces & entrances*.\n- Sheet-first identity: only the sheet header opens the sow page — RULINGS *Surfaces & entrances*.\n- Exit grammar: bars hold exits only; Finish farrowing is a hold — RULINGS *Surfaces & entrances*.\n- Farrowing starts at the first record; no started mark — RULINGS *Starting and ending a session*.\n- The sow's death is a hold-to-commit mode of the drawer; she stays in the room — RULINGS *Starting and ending a session*.\n- Merge contract: signed deltas, flag instead of silently applying a breach — RULINGS *Starting and ending a session*.\n- Fostering parked — RULINGS *After the lock*.\n- The locked record is designed as a record, with one ledger page — RULINGS *After the lock*.\n- Anyone may amend Born after the lock — RULINGS *After the lock*.\n- Words for actions, icons for objects — RULINGS *Names and glyphs*.\n- Relative dates inside a week — RULINGS *Names and glyphs*.\n- Farrowing's skeleton is the model for all tasks; exit word Back — RULINGS *Piglet processing, Round 5*.\n- Task end: manual, hold-to-commit with receipt, blocked while farrowing is open — RULINGS *Piglet processing, Q5*; closure details in `ux/research/farrowing/ASTRA-TASK-CLOSURE.md`.\n- Edit record vs Correct born split by status; Home entries land on the room list — owner calls for this atlas.\n\n### Owner decisions, 2026-10-10\n\n- **Room rows** (the room, Find a sow, Scan results, the task's sow list) are one row, owner-approved 2026-10-12 (the design system's Row · animal, state side). Left, two lines: the ear tag exactly as stored (16px/600 mono, always ink, even for a sow that died) over 13px muted context (`Parity 5` on a waiting sow; `when · who` on a recorded one, such as `05:58 · G.H`, `1h ago · G.H`, `yesterday · L.M`; `Pen B3 · …` in a flat result; `Unit 6 · Pen A2` for a sow in another unit in Scan; Find a sow's rows carry her place on the right, `Pen B4` or `Unit 6` over `Pen A2`, instead of her state). Right, two lines, right-aligned: the figure over the state word. Farrowing: `9 alive · 5 dead` / Farrowing. Due: `Tomorrow`, `Today` or `In 2 days` / Due. Overdue: `3 days` / Overdue. Done: `11 alive · 2 dead` / Done. Sow died: `7 to allocate` / Sow died, or `2 hand-reared` / Sow died. Aborted: `1 alive` / Aborted. Levels set weight and colour: act now (overdue; a sow died with piglets to allocate) is red with the one \"!\" icon in a row; live (farrowing) is bold; coming up (due today or tomorrow) has an ink figure and a muted word; settled (done, due in 2+ days, aborted) is muted (the 16px figure in ink-2, so it keeps 7:1 contrast). Only recorded counts show: alive, and `· N dead` only above zero; never *born*, never an expected or carried count. One quiet chevron, no pencil and no chip: tapping the row opens the record, and Edit is inside it. Pen headers say the pen and the count only: no need counts or dots.\n- **Statuses.** In progress: **Awaiting**, **Active**. Finished: **Done** (green), **Sow died** (red), **Aborted** (red; 流产).\n- **Sow died.** Right after the hold records her death the sheet becomes `N piglets to allocate` (subtitle `<ID> · <pen> · sow died <time>`) with three options: **Move to other sows** (opens the move page, sending out of this litter with her piglets pre-selected; several receiving sows may split them), **Hand-rear here** (the piglets stay on her record and piglet care continues) and **Move to a rearing pen** (shown only when the farm config says the farm has one; the prototype flag is on for the demo, `?rearing=off` turns it off). Footer **Back** means later: no ✕, no extra question line.\n- **Her row while piglets remain.** A red tile `N / to allocate`, facts `Sow died · yesterday · L.M`; tapping it opens the same sheet. After Hand-rear: a neutral tile `N / hand-reared`, facts `Sow died · 09:40 · L.M`; the row stays while hand-reared piglets remain. A partial allocation keeps the remaining count; her row never says `5 moved`. A piglet that dies or is put down is recorded through Record dead and the count drops. She **leaves the room list** once every piglet is on another sow, in a rearing pen, or recorded dead.\n- **Aborted.** *Abortion* is the one word (never *miscarriage*). No live piglet: she leaves the room list at once. Any live piglet: the row stays with the tile `1 / alive` and the facts `Aborted · 08:10 · G.H` (recorded counts only).\n- **Task overview** counts the sows that left the list: `Left the task · n aborted · n sow died`. She is then outside Done · Active · Awaiting, so every total still adds up (7 / 18 farrowed once one of 19 has left).\n- **Sheet titles name the job; subtitles name the animal and context.** Record dead is titled `Record dead` (it was `Dead 6` / `The sow`); the pen sheet no longer repeats `Pen` as its only heading.\n- **Fostering is in scope for the sow-died case** (and only there; elsewhere it stays parked).\n- **An orphan litter can stay in the task, hand-reared** on her record.\n- **A rearing pen is a farm-level option.** Its configuration is still open: filed as the To confirm item `farrowing-room-list-1` in `review/farrowing-room-list.json`.\n- **Abortion rule.** No live piglets: she leaves the list. Any live piglet: an Aborted row stays.\n- The glossary words (*abortion / aborted*, *to allocate*, *hand-reared*, *left the task*) are in `ux/laws/glossary.md` and `ux/laws/strings.json`; \"Abortion vs miscarriage\" (`events-1`) is closed by this decision.\n\n### Owner decisions, 2026-10-12 · Find a sow and Scan ear tags\n\n- **Find a sow is global.** The dock's Search button opens a full-height page (no drawer): the field is pinned at the top and focused, with a search icon, a clear ✕, a scan icon button that opens Scan, and Cancel. It searches every unit and the header names no unit. Nothing is listed until something is typed; the page says \"Type part of an ear tag or a pen, or scan a tag. Searches every unit.\" Results update as the worker types, one card per unit under a plain **Unit 7** section heading, this unit first and then the others in unit order (tag, `Pen B4`, chevron; the heading names the unit, so no row repeats it). Tags that start with the typed text rank before tags that only contain it; the typed part is bold and the rest of the tag muted; pen codes match too. No match reads \"No sow matching “43” in any unit.\" Natively the keyboard is number-first with an ABC switch (iOS `numbersAndPunctuation`; on Android a number-first keyboard with a 123/ABC toggle).\n- **Opening a result.** Every result opens her farrowing drawer, a sow in another unit exactly as a sow in this unit: Farrowing is one task across all its units. The drawer's subtitle names where she is (`Unit 6 · A2 / Parity 4`) when she is in another unit. Search never switches the room's unit by itself.\n- **Scan always listens.** The dock's Scan ear tag button, and the scan icon in Find a sow, open **Scan ear tags**, a full page. The reader is always listening: there is no \"ready for the next tag\" banner and no \"Not found\" row. The footer's Stop scanning / Resume scanning is the only scanning status (owner, 2026-10-20: the body's Scanning pill repeated it and is gone). Not connected: a scan icon, \"Scanner not connected\" and the pairing instruction, with no buttons (the back arrow leaves). Connected and nothing scanned: \"Hold the reader to an ear tag\". Each scan adds the sow to a list, one card per unit under the same plain **Unit 7** heading as Find a sow (no count), this unit first, newest first; a repeat scan adds nothing and briefly highlights her existing row. Nothing arrives abruptly (owner, 2026-10-20): a new row slides in at the top of its unit card while the rows under it glide down, and every scan, new or repeat, lights its row for 1.6 s on its own clock and brings it into view, so scans in quick succession light row after row. Each row is the Row · animal variant with her Farrowing state, as a select + door: the tick box selects, the rest of the row opens her farrowing drawer, in this unit or another.\n- **Ticks are for bulk, with generic Actions only.** Nothing ticked: one full-width button, **Stop scanning** (it becomes **Resume scanning** while stopped). One or more ticked: **N sows selected** (a plain count: no chevron, nothing to tap; to untick, tap the box) and the primary **Actions**, which opens the shared generic actions for the selection only, as More actions' verb tiles (owner, 2026-10-20): Transfer, Condition, Treat, Note. Scan offers no Farrowing action. In the prototype each Action opens its existing single-sow flow for the first ticked sow, because no shared flow takes a whole selection yet (a gap for the shared Actions).\n- **The selection bar's button says \"Actions\"**, not \"More actions\".\n- Prototype only: `?scanner=off` opens Scan as if no reader were paired, and a \"Simulate scan\" control outside the phone frame adds the next sample sow. The `stop` glyph is in the shared icon registry.\n\n### Owner decisions, 2026-10-15 · Finish farrowing\n\n- **Assisted is required, No preselected.** On Finish farrowing and in Edit finish details it is a No / Yes choice (the Inline Choice, key face) with **No chosen on a new finish**. There is no unanswered state and no Clear. A record saved before this ruling whose assisted was never recorded stays null and still reads \"Not recorded\" in the read-only facts (history is not rewritten); its correction form shows neither key chosen until the worker answers.\n- **Litter weight stays optional.** Blank means not recorded (never 0). It is typed on the phone's own decimal keyboard (one decimal; a locale's comma becomes a point), and Done closes the keyboard (owner, 2026-10-16: one optional value in a form takes the system keyboard; the Numpad stays for runs of typed values such as the piglet weigh run).\n- **One titled form.** Finish farrowing and Edit finish details show the same rows under the section heading \"Piglet condition\": Weak, Deformed, Assisted, Litter weight (with \"Optional\" beside its label). The description line \"Among the N alive piglets · 0 if none\" is cut: Alive is on screen and the steppers stop at it.\n\n### Owner decision, 2026-10-22 · The pen tools are Inspection's\n\n- The pen page and everything on it (Note, Feed, Fault, the pen log) live in **Inspection**, where pens are walked and looked after. Farrowing keeps the room, Pen map and the pen header's `›` that opens the pen page; its map no longer lists the pen screens.\n- **Find a sow and Scan ear tags** stay in Farrowing's scope and are their own band on its map (\"Find and scan\"), apart from the room.\n",
        "scenarios": {
         "treeDoc": true,
         "tree": [
@@ -9299,7 +8944,7 @@
                   "gwt": {
                    "given": "The worker has searched for 43 and 004318, a sow in Unit 6, is a result.",
                    "when": "They tap her.",
-                   "then": "Her farrowing drawer opens on her Awaiting face, the same drawer a sow in this unit opens, and its subtitle names her unit and pen."
+                   "then": "Her farrowing drawer opens on her Awaiting face, the same drawer a sow in this unit opens, and its subtitle names her unit and pen. Under the drawer is Find a sow with 43 still typed, not the room."
                   },
                   "authority": [
                    {
@@ -9768,7 +9413,7 @@
                 "gwt": {
                  "given": "Scan ear tags is open with 000418, in Unit 7, scanned.",
                  "when": "The worker taps her row.",
-                 "then": "Her farrowing drawer opens on Counting."
+                 "then": "Her farrowing drawer opens on Counting, over Scan ear tags (not the room)."
                 },
                 "authority": [
                  {
@@ -13761,6 +13406,19 @@
          ]
         ],
         [
+         "Pen in Farrowing",
+         [
+          "inspection.farrowing-pen",
+          "inspection.farrowing-pen-attention",
+          "inspection.farrowing-pen-log",
+          "inspection.farrowing-pen-note",
+          "inspection.farrowing-pen-read-note",
+          "inspection.farrowing-pen-feed",
+          "inspection.farrowing-pen-fault",
+          "inspection.farrowing-pen-fault-record"
+         ]
+        ],
+        [
          "Select and act",
          [
           "inspection.actions",
@@ -13848,6 +13506,13 @@
          "from": "inspection.walk",
          "control": "Scan ear tag",
          "lands": "inspection.scan"
+        },
+        {
+         "section": "Farrowing",
+         "label": "from a pen in the room",
+         "from": "farrowing.room",
+         "control": "B1",
+         "lands": "inspection.farrowing-pen"
         }
        ],
        "flow": [
@@ -14020,6 +13685,51 @@
          "inspection.set-count",
          "inspection.count-recorded",
          "close the sheet"
+        ],
+        [
+         "inspection.farrowing-pen",
+         "inspection.farrowing-pen-log",
+         "Pen log"
+        ],
+        [
+         "inspection.farrowing-pen",
+         "inspection.farrowing-pen-note",
+         "Note"
+        ],
+        [
+         "inspection.farrowing-pen",
+         "inspection.farrowing-pen-read-note",
+         "tap the note card"
+        ],
+        [
+         "inspection.farrowing-pen-read-note",
+         "inspection.farrowing-pen-note",
+         "Edit note"
+        ],
+        [
+         "inspection.farrowing-pen",
+         "inspection.farrowing-pen-feed",
+         "Feed"
+        ],
+        [
+         "inspection.farrowing-pen",
+         "inspection.farrowing-pen-fault",
+         "Fault"
+        ],
+        [
+         "inspection.farrowing-pen",
+         "inspection.farrowing-pen-fault-record",
+         "tap a fault row under Needs attention"
+        ],
+        [
+         "inspection.farrowing-pen-note",
+         "inspection.farrowing-pen",
+         "Save note or Back"
+        ],
+        [
+         "inspection.farrowing-pen-fault",
+         "inspection.farrowing-pen",
+         "Report fault or Back"
         ]
        ],
        "screens": [
@@ -14374,8 +14084,7 @@
            "Pen log (raw)"
           ],
           "issues": [
-           "Count (Set count, pen-ops 2.3) is not a verb Inspection has yet, so it is not a tile.",
-           "Farrowing's pen page (Pen B1) still lists four verb rows; it moves onto this page next."
+           "Count (Set count, pen-ops 2.3) is not a verb Inspection has yet, so it is not a tile."
           ]
          }
         },
@@ -15733,9 +15442,312 @@
            "Drawn in the pen workflow deck (ux/system/workflows/pen.html); the Astra prototype has no control that opens it."
           ]
          }
+        },
+        {
+         "id": "inspection.farrowing-pen",
+         "name": "Pen · Farrowing",
+         "zh": "栏位",
+         "status": "in-design",
+         "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+         "preset": "room",
+         "steps": [
+          "[data-action=\"room-pen-detail\"][data-value=\"B1\"]"
+         ],
+         "figma": "",
+         "notes": {
+          "purpose": "One pen's page, reached from a pen header in the room list (the pen is a door, owner 2026-10-19). Everything done to the pen as a whole happens here, for this one pen, laid out as its sibling on Inspection (inspection.pen): the pen's verbs on top, then what needs someone, then how the pen is now, then its log.",
+          "states": [
+           "Nothing open: the verbs, Now and Pen log.",
+           "An open equipment fault or a note: a \"Needs attention\" group under the verbs, the faults first as rows, then the note as its card (inspection.farrowing-pen-attention).",
+           "Feed recorded for the pen: a Feed fact in Now (formula, method). No pen in the prototype has feed data."
+          ],
+          "elements": [
+           {
+            "name": "Pen verbs",
+            "at": "Note",
+            "shows": "Note, Feed, Fault as Row tiles (SentriUI.rowGrid): only the verbs Farrowing has. Note opens Add / Edit pen note, Feed the feed guidance, Fault Report equipment fault.",
+            "logic": "Each tile's accessible name is its full action (\"Add pen note\", \"Feed guidance\", \"Report equipment fault\").",
+            "source": "farrowing-astra-concept.js penDetails()"
+           },
+           {
+            "name": "Needs attention",
+            "at": "Needs attention",
+            "shows": "Open faults as rows (device over its description), then the pen note as its card (text, hand and time); left out when nothing is open.",
+            "logic": "Only open faults are listed; a resolved fault leaves the page and stays in the pen log. A pen holds one note.",
+            "source": "farrowing-astra-concept.js penDetails(), penInfo()"
+           },
+           {
+            "name": "Now",
+            "at": "Now",
+            "shows": "Sows: the pen's task sows and where they are (\"Farrowing\", or \"2 awaiting · 1 done\"); Piglets alive with the dead beside them, once a sow in the pen has farrowed; Feed when recorded.",
+            "logic": "Counts every task sow in the pen on the room list, ignoring the current tab and filter (as the pen header does). No zeros: Piglets is left out before any sow farrows, and dead is said only when there are any.",
+            "source": "farrowing-astra-concept.js penDetails(), penSowStates()"
+           }
+          ],
+          "edge": [
+           "Notes, faults, drafts and log entries belong to the pen, not the sow, and are shared by every drawer of that pen within the unit. The prototype starts with none and forgets them on reload."
+          ],
+          "issues": [],
+          "rules": [
+           "Owner, 2026-10-22: the pen page and its tools are Inspection's, drawn here in Farrowing's prototype; Farrowing's pen header › opens them.",
+           "The pen is a door, not a tick; its verbs on top, then what needs someone (owner, 2026-10-19).",
+           "The page's title is the pen, so it has no second heading such as \"Pen information\" (Owner decision 2026-10-10)."
+          ]
+         }
+        },
+        {
+         "id": "inspection.farrowing-pen-attention",
+         "name": "Pen · needs attention · Farrowing",
+         "zh": "栏位 · 需要处理",
+         "status": "in-design",
+         "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+         "preset": "room",
+         "steps": [
+          "[data-action=\"room-pen-detail\"][data-value=\"B1\"]",
+          "[data-action=\"room-pen-fault\"]",
+          "[data-picker-key=\"pen:device\"]",
+          "[data-action=\"picker-select\"][data-value=\"Feeding station\"]",
+          {
+           "fill": "[data-pen-field=\"description\"]",
+           "text": "Feeder is jammed and drops no feed."
+          },
+          "[data-action=\"room-pen-save-fault\"]",
+          "[data-action=\"room-pen-note\"]",
+          {
+           "fill": "[data-pen-field=\"note\"]",
+           "text": "Water line leaks at the back of the pen. Check again after feeding."
+          },
+          "[data-action=\"room-pen-save-note\"]"
+         ],
+         "figma": "",
+         "notes": {
+          "purpose": "The pen page with an open equipment fault and a note: Needs attention sits under the verbs, the fault row first, then the note card.",
+          "states": [
+           "The fault row opens its record (Resolve lives there); the note card opens the note."
+          ],
+          "elements": [
+           {
+            "name": "Needs attention",
+            "at": "Needs attention",
+            "shows": "The open fault (Feeding station · Feeder is jammed and drops no feed.), then the note with its hand and time.",
+            "source": "farrowing-astra-concept.js penDetails()",
+            "logic": "Faults first, then the note; both are doors (the fault to its record, the note to its page)."
+           }
+          ],
+          "edge": [],
+          "issues": []
+         }
+        },
+        {
+         "id": "inspection.farrowing-pen-log",
+         "name": "Pen log · Farrowing",
+         "zh": "栏位记录",
+         "status": "in-design",
+         "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+         "preset": "room",
+         "steps": [
+          "[data-action=\"room-pen-detail\"][data-value=\"B1\"]",
+          "[data-action=\"room-pen-log\"]"
+         ],
+         "figma": "",
+         "notes": {
+          "purpose": "Everything recorded in this pen, newest first.",
+          "states": [
+           "Empty: \"No activity recorded for this pen.\""
+          ],
+          "elements": [
+           {
+            "name": "Entries",
+            "at": "Pen log",
+            "shows": "Entries grouped by day; each has a title, a detail line, time and hand.",
+            "logic": "Merges the pen's own events (note added or updated, fault reported or resolved) with the events of every sow in that pen, sorted by day and time. A sow event carries \"Sow 000418\" as its detail; a pen event carries its note text or \"device · description\". Photos attached to an event show as thumbnails that open a viewer.",
+            "source": "farrowing-astra-concept.js penLogEvents(), penLog()"
+           }
+          ],
+          "edge": [
+           "Days read relative within the week (Today, Yesterday, N days ago), then as dates."
+          ],
+          "issues": []
+         }
+        },
+        {
+         "id": "inspection.farrowing-pen-note",
+         "name": "Pen note · Farrowing",
+         "zh": "栏位备注",
+         "status": "in-design",
+         "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+         "preset": "room",
+         "steps": [
+          "[data-action=\"room-pen-detail\"][data-value=\"B1\"]",
+          "[data-action=\"room-pen-note\"]"
+         ],
+         "figma": "",
+         "notes": {
+          "purpose": "Write or edit the one note for this pen, to leave information for the next person.",
+          "elements": [
+           {
+            "name": "Save note",
+            "at": "Save note",
+            "shows": "Primary action, disabled until the text is not empty.",
+            "rule": "A pen has one note: saving replaces it, and the log records \"Pen note added\" or \"Pen note updated\" with the new text (the old text stays only in the log). Opened from an existing note, the field starts with that text. The stamp is the hand and time of the save.",
+            "source": "farrowing-astra-concept.js room-pen-save-note"
+           }
+          ],
+          "edge": [
+           "Back keeps the draft for this pen; it is offered again on reopen and dropped only by Save."
+          ],
+          "issues": []
+         }
+        },
+        {
+         "id": "inspection.farrowing-pen-read-note",
+         "name": "Read pen note · Farrowing",
+         "zh": "查看栏位备注",
+         "status": "in-design",
+         "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+         "preset": "room",
+         "steps": [
+          "[data-action=\"room-pen-detail\"][data-value=\"B1\"]",
+          "[data-action=\"room-pen-note\"]",
+          {
+           "fill": "[data-pen-field=\"note\"]",
+           "text": "Water line leaks at the back of the pen. Check again after feeding."
+          },
+          "[data-action=\"room-pen-save-note\"]",
+          "[data-action=\"room-pen-read-note\"]"
+         ],
+         "figma": "",
+         "notes": {
+          "purpose": "Read the pen's note as saved: its text, who wrote it and when.",
+          "elements": [
+           {
+            "name": "Edit note",
+            "at": "Edit note",
+            "shows": "Primary action on a read-only page.",
+            "rule": "Opens the pen note editor with the current text; reading never changes the note. The stamp (\"G.H · Today · 09:41\") is fixed sample text in the prototype.",
+            "source": "farrowing-astra-concept.js penSubpage(), room-pen-note"
+           }
+          ],
+          "edge": [
+           "The page exists only while the pen has a note; the pen page shows the note card that opens it."
+          ],
+          "issues": []
+         }
+        },
+        {
+         "id": "inspection.farrowing-pen-feed",
+         "name": "Pen feed guidance · Farrowing",
+         "zh": "栏位饲喂",
+         "status": "in-design",
+         "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+         "preset": "room",
+         "steps": [
+          "[data-action=\"room-pen-detail\"][data-value=\"B1\"]",
+          "[data-action=\"room-pen-feed\"]"
+         ],
+         "figma": "",
+         "notes": {
+          "purpose": "Show what this pen is fed, as guidance for whoever is working in the pen.",
+          "states": [
+           "With feed data: a \"Feeding\" section with Formula and Method, and the guidance text when there is any.",
+           "Without: \"No feed guidance recorded for this pen.\""
+          ],
+          "edge": [
+           "Every pen in the prototype is the empty state: no feed data is ever supplied, so the populated layout cannot be reached in the demo."
+          ],
+          "issues": [
+           "The populated state (Formula, Method, guidance) is built but has no sample data, so it cannot be reviewed. Feed itself is the feed-plan feature in Inspection."
+          ]
+         }
+        },
+        {
+         "id": "inspection.farrowing-pen-fault",
+         "name": "Report equipment fault · Farrowing",
+         "zh": "报告设备故障",
+         "status": "in-design",
+         "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+         "preset": "room",
+         "steps": [
+          "[data-action=\"room-pen-detail\"][data-value=\"B1\"]",
+          "[data-action=\"room-pen-fault\"]"
+         ],
+         "figma": "",
+         "notes": {
+          "purpose": "Report broken equipment in the pen: which device and what is wrong.",
+          "elements": [
+           {
+            "name": "Device",
+            "at": "Device",
+            "shows": "A picker: Feeding station, Drinking station, Other.",
+            "states": [
+             {
+              "state": "Other chosen",
+              "when": "Device = Other",
+              "shows": "A \"Device name\" field appears and becomes required"
+             }
+            ],
+            "logic": "The fault is stored under the device name (the typed name for Other).",
+            "source": "farrowing-astra-concept.js validPenFault()"
+           },
+           {
+            "name": "Report fault",
+            "at": "Report fault",
+            "shows": "Primary action.",
+            "rule": "Disabled until a device and a description are filled (and a name for Other). Saving adds an open fault to the pen, an \"Equipment\" notice on the pen page and an \"Equipment fault reported\" log entry, then returns to the pen page.",
+            "source": "farrowing-astra-concept.js room-pen-save-fault"
+           }
+          ],
+          "edge": [
+           "Back keeps the draft for this pen (device, name, description); Report fault drops it."
+          ],
+          "issues": []
+         }
+        },
+        {
+         "id": "inspection.farrowing-pen-fault-record",
+         "name": "Equipment fault · Farrowing",
+         "zh": "设备故障",
+         "status": "in-design",
+         "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+         "preset": "room",
+         "steps": [
+          "[data-action=\"room-pen-detail\"][data-value=\"B1\"]",
+          "[data-action=\"room-pen-fault\"]",
+          "[data-picker-key=\"pen:device\"]",
+          "[data-action=\"picker-select\"][data-value=\"Feeding station\"]",
+          {
+           "fill": "[data-pen-field=\"description\"]",
+           "text": "Feeder is jammed and drops no feed."
+          },
+          "[data-action=\"room-pen-save-fault\"]",
+          "[data-action=\"room-pen-fault-record\"]"
+         ],
+         "figma": "",
+         "notes": {
+          "purpose": "Read one equipment fault and, while it is open, resolve it.",
+          "states": [
+           "Open: description, \"Open · Reported 09:41 · G.H\", an optional Resolution note and \"Resolve fault\".",
+           "Resolved: description, the resolution text and \"Resolved · Reported …\"; no action.",
+           "Not found: \"No fault found.\""
+          ],
+          "elements": [
+           {
+            "name": "Resolve fault",
+            "at": "Resolve fault",
+            "shows": "Primary action on an open fault.",
+            "rule": "Needs no note (the Resolution note is optional). Resolving removes the fault's notice from the pen page and logs \"Equipment fault resolved · device · note\"; it does not delete the fault.",
+            "source": "farrowing-astra-concept.js room-pen-resolve-fault"
+           }
+          ],
+          "edge": [
+           "The Resolved state is built but no door reaches it: a resolved fault leaves the pen page, and pen log entries are not links.",
+           "A typed resolution note is kept for that fault through Back, until Resolve fault."
+          ],
+          "issues": []
+         }
         }
        ],
-       "prd": "# Inspection 巡检\n\n## Problem\n\nA worker walks one unit and has to see every pig, spot the ones that need care or feed attention, and record what they find without leaving the place they are standing. Today's old UI spreads this over many screens in the Inspection Figma file. The built prototype (`ux/system/inspection-astra-concept.html`) puts it in one list with a dock, but several parts of it are built and never reachable (unit summary, sensors, batch tracker, equipment faults), and the list repeats facts that the pig record also shows.\n\n## Who\n\nThe barn worker doing the morning or evening walk, often wearing gloves, one hand free. The supervisor reads the same list to see what was recorded (\"Log\", \"Check in\"). The unit is the scope: there is no cohort.\n\n## Anchor\n\nNo anchor. The walk has no lifecycle that changes what work is available: it can be checked in again at any time (\"Check in again\"), and nothing is blocked before or after. The screens are therefore grouped by what the worker is doing: walk the list, open a pen, select and act, unit batches, unit environment and equipment (built, not reachable), finish.\n\n## Rules\n\n- Selection is not an inspection result. A pig checkbox never selects its pen; a pen checkbox selects the pen and the pigs shown (ROUND-3).\n- Notes belong to the pen, not to its pigs. A pen has one note; closing it moves it into the pen log.\n- Feed is guidance, not a completion checklist: nothing on the walk can be \"done\" for feed.\n- The stage on a row is days in the stage, never lifetime age; the walk date is fixed in the sample (12 Sep 2026).\n- Care is the only editable condition state; attention is derived from it (ASTRA-BULK-ACTIONS).\n- One Actions sheet for one pig or many; Production actions exist only for one pig.\n- Finishing a walk records that the unit was walked; it does not mark pigs healthy or tasks done.\n\n## Scope\n\nIn: the unit walk list (lens All / Health / Feed, filter, pen map, find and scan), the pen sheet with note and log, the selection and Actions sheet, the walk log and check-in, the unit batches that change the stage text, and the built-but-unreachable unit summary, sensors, batch sheet and equipment fault flow.\n\nOut (owned by other features): the pig record and its actions (pig-profile), feed reading and editing (feed-plan), conditions, care and treatment (health-record). The Farrowing task is opened from here but belongs to Tasks.\n\n## Decisions\n\nTaken from the research notes and the code:\n\n- The roster shows every pig (the earlier \"quiet pigs collapsed\" idea was dropped). Owner-approved 2026-10-12: a pig is a two-line row. Left, a fixed 112px column: the pig ID over the stage line (\"Gestation · 42d\"; \"d\" is the one allowed abbreviation; no stage date, the stage alone; the stage ends in an ellipsis rather than widening the column). Right, one line of compact condition tags that fills the space up to the chevron: the name only (no day, no care word; Poor appetite is the trend-down icon and \"Appetite\", Diarrhoea is \"Scours\"), ordered by urgency then day (Treat in place and Hospital pen, then Monitor, then ongoing). Act now is a red wash with the \"!\" icon and bold red text; monitor is white with a thin border; ongoing is muted text with no box.\n- The tag line is one line only. Tags are added in priority order until the line is full, then \"+N\" says how many are left; the urgent tag is never the hidden one.\n- There is no feed tag on a pig row. A trough pen can't feed one pig, so feed is read and changed at the pen (the pen header keeps its feed summary).\n- The row is the design system's Row · animal (select + door), with the compact ConditionTag.\n- Home opens this page through the \"Inspect unit\" card with the unit kept in the link; Back returns to Home with the unit.\n- Pen map copies Farrowing's four-column, six-row map and 350 ms hold-to-peek.\n\nOpen (recorded on the screens as issues):\n\n- The unit summary card (pig and pen counts, faults, sensors, batch tracker) is in the code and not placed on the walk. Draw it or remove it.\n- Equipment faults have a full report-and-resolve flow in the prototype's code but no control reaches it; the pen workflow deck draws the same flow (and Set count) as screens, listed under Equipment faults and Pen head count.\n- \"Health\" and \"Feed\" lens counts do not say what they count.\n- The care level shows on a row only by the tag's look (red wash with \"!\", outlined, plain); the care word and the day are on the record.\n- Fixed author \"G. Hansen\" and times 06:40 and 09:41 stand in for the signed-in worker and real times.\n",
+       "prd": "# Inspection 巡检\n\n## Problem\n\nA worker walks one unit and has to see every pig, spot the ones that need care or feed attention, and record what they find without leaving the place they are standing. Today's old UI spreads this over many screens in the Inspection Figma file. The built prototype (`ux/system/inspection-astra-concept.html`) puts it in one list with a dock, but several parts of it are built and never reachable (unit summary, sensors, batch tracker, equipment faults), and the list repeats facts that the pig record also shows.\n\n## Who\n\nThe barn worker doing the morning or evening walk, often wearing gloves, one hand free. The supervisor reads the same list to see what was recorded (\"Log\", \"Check in\"). The unit is the scope: there is no cohort.\n\n## Anchor\n\nNo anchor. The walk has no lifecycle that changes what work is available: it can be checked in again at any time (\"Check in again\"), and nothing is blocked before or after. The screens are therefore grouped by what the worker is doing: walk the list, open a pen, select and act, unit batches, unit environment and equipment (built, not reachable), finish.\n\n## Rules\n\n- Selection is not an inspection result. A pig checkbox never selects its pen; a pen checkbox selects the pen and the pigs shown (ROUND-3).\n- Notes belong to the pen, not to its pigs. A pen has one note; closing it moves it into the pen log.\n- Feed is guidance, not a completion checklist: nothing on the walk can be \"done\" for feed.\n- The stage on a row is days in the stage, never lifetime age; the walk date is fixed in the sample (12 Sep 2026).\n- Care is the only editable condition state; attention is derived from it (ASTRA-BULK-ACTIONS).\n- One Actions sheet for one pig or many; Production actions exist only for one pig.\n- Finishing a walk records that the unit was walked; it does not mark pigs healthy or tasks done.\n\n## Scope\n\nIn: the unit walk list (lens All / Health / Feed, filter, pen map, find and scan), the pen page and its tools (note, feed, fault, log) wherever a task opens it, Farrowing's room included (owner, 2026-10-22: the screens Farrowing's prototype draws are mapped here, \"Pen in Farrowing\"), the selection and Actions sheet, the walk log and check-in, the unit batches that change the stage text, and the built-but-unreachable unit summary, sensors, batch sheet and equipment fault flow.\n\nOut (owned by other features): the pig record and its actions (pig-profile), feed reading and editing (feed-plan), conditions, care and treatment (health-record). The Farrowing task is opened from here but belongs to Tasks.\n\n## Decisions\n\n- Owner, 2026-10-22: the pen page and its tools are Inspection's. Farrowing's pen header `›` opens the pen page; Farrowing's own drawing of it (Note, Feed, Fault, Needs attention, Now, Pen log) is listed under \"Pen in Farrowing\" until the two prototypes share one page.\n\nTaken from the research notes and the code:\n\n- The roster shows every pig (the earlier \"quiet pigs collapsed\" idea was dropped). Owner-approved 2026-10-12: a pig is a two-line row. Left, a fixed 112px column: the pig ID over the stage line (\"Gestation · 42d\"; \"d\" is the one allowed abbreviation; no stage date, the stage alone; the stage ends in an ellipsis rather than widening the column). Right, one line of compact condition tags that fills the space up to the chevron: the name only (no day, no care word; Poor appetite is the trend-down icon and \"Appetite\", Diarrhoea is \"Scours\"), ordered by urgency then day (Treat in place and Hospital pen, then Monitor, then ongoing). Act now is a red wash with the \"!\" icon and bold red text; monitor is white with a thin border; ongoing is muted text with no box.\n- The tag line is one line only. Tags are added in priority order until the line is full, then \"+N\" says how many are left; the urgent tag is never the hidden one.\n- There is no feed tag on a pig row. A trough pen can't feed one pig, so feed is read and changed at the pen (the pen header keeps its feed summary).\n- The row is the design system's Row · animal (select + door), with the compact ConditionTag.\n- Home opens this page through the \"Inspect unit\" card with the unit kept in the link; Back returns to Home with the unit.\n- Pen map copies Farrowing's four-column, six-row map and 350 ms hold-to-peek.\n\nOpen (recorded on the screens as issues):\n\n- The unit summary card (pig and pen counts, faults, sensors, batch tracker) is in the code and not placed on the walk. Draw it or remove it.\n- Equipment faults have a full report-and-resolve flow in the prototype's code but no control reaches it; the pen workflow deck draws the same flow (and Set count) as screens, listed under Equipment faults and Pen head count.\n- \"Health\" and \"Feed\" lens counts do not say what they count.\n- The care level shows on a row only by the tag's look (red wash with \"!\", outlined, plain); the care word and the day are on the record.\n- Fixed author \"G. Hansen\" and times 06:40 and 09:41 stand in for the signed-in worker and real times.\n",
        "scenarios": {
         "treeDoc": false,
         "tree": null,
@@ -32454,23 +32466,6 @@
       "Keep both: farrowing.foster before the lock, Move after (needs the owner to reopen the farrowing park)"
      ],
      "recommendation": "Follow the rulings: Move after the lock is the feature. Owner decision 2026-10-10 reopens the park for one case only: when a sow dies, farrowing.foster (the move page, sending out of her litter) is how her piglets go to other sows. Elsewhere it stays parked."
-    },
-    {
-     "severity": "medium",
-     "source": "populate batch 3; features/farrowing/PRD.md Scope (Out); ux/system/farrowing-astra-concept.js penDetails()",
-     "id": "populate-farrowing-1",
-     "target": {
-      "kind": "feature",
-      "id": "farrowing"
-     },
-     "kind": "decision",
-     "title": "Pen tools are drawn in Farrowing and in Inspection",
-     "detail": "Farrowing's room opens a pen page with Feed guidance, Report equipment fault, Add pen note and Pen log (farrowing.pen, pen-log, pen-note, pen-read-note, pen-feed, pen-fault, pen-fault-record). Inspection draws the same flows (inspection.pen, pen-note, pen-log, pen-faults, fault-report, fault-resolve, pen-actions) and feed-plan owns pen feeding. The Farrowing PRD lists the pen tools as present in the prototype but unclear whose feature. Farrowing's feed guidance has no data and only shows its empty state.",
-     "options": [
-      "One pen page owned by Inspection, reused by every task; Farrowing's copies become aliases or are dropped",
-      "Each task keeps its own pen page with the same parts",
-      "Farrowing keeps only Go to pen and the pen header; the pen tools live in Inspection"
-     ]
     },
     {
      "severity": "medium",
