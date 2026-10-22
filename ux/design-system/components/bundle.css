@@ -388,6 +388,17 @@ button.st-row:disabled{cursor:default}
 .st-choice-trail input[type="checkbox"]{width:var(--size-20);height:var(--size-20);margin:0;accent-color:var(--st-ink)}
 .st-choice-search.st-choice-search{position:relative;margin:0 0 var(--space-20)}
 .st-choice-search input::-webkit-search-cancel-button,.st-choice-search input::-webkit-search-decoration{-webkit-appearance:none;appearance:none;display:none}
+/* The search field in a picker, a sheet or a list (choiceSearch): the host sizes the input, which stays the box; the search glyph
+   sits in its left padding and the ends (✕ Clear while typing, scan) in its right, so the look is Find's and no layout moves. */
+.st-search-box{position:relative;display:block}
+.st-search-box>input{width:100%;box-sizing:border-box}
+.st-search-box>svg{position:absolute;left:calc(var(--ring-width-fine) + var(--space-12));top:50%;width:18px;height:18px;margin-top:-9px;color:var(--muted);pointer-events:none}
+.st-search-box.st-search-box>input{padding-left:calc(var(--space-12) + 18px + var(--space-8))}
+.st-search-ends{position:absolute;top:0;right:0;bottom:0;display:flex;align-items:center}
+.st-search-ends>[hidden]{display:none}
+.st-search-ends>.icon-button{flex:none}
+.st-search-box.st-search-box:has(.st-search-ends>:not([hidden]))>input{padding-right:calc(var(--tap-min) + var(--space-4))}
+.st-search-box.st-search-box:has(.st-search-ends>:not([hidden])+:not([hidden]))>input{padding-right:calc(2 * var(--tap-min) + var(--space-4))}
 /* An empty or loading line in a sheet body starts on the sheet's gutter, under the title. */
 .sheet-body .st-choice-empty{padding-inline:0}
 /* In a picker sheet every option row is one height: one line and a wrapped two-line label both fit the 56px row. */
@@ -1309,7 +1320,6 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
    page's only control and focused on open: 52px, 17px / 500 text, the ink border. Clear and scan are plain glyphs at its end. */
 .st-find-field{flex:1;min-width:0;display:flex;align-items:center;gap:8px;min-height:var(--field-height);padding:0 0 0 13px;border:1px solid var(--control-border);border-radius:var(--radius-12);background:var(--paper)}
 .st-find-field:focus-within{padding-left:12px;border:2px solid var(--ink)}
-.st-search-box>.icon-button{align-self:stretch;height:auto;min-height:0}
 .st-find .st-find-field{min-height:52px;padding-left:14px;border:2px solid var(--ink)}
 .st-find-field>svg{flex:none;width:18px;height:18px;color:var(--muted)}
 .st-find-field.st-find-field input{flex:1;min-width:0;width:auto;min-height:0;padding:0;border:0;border-radius:0;outline:0;background:transparent;color:var(--ink);font:400 16px var(--font-sans)}
