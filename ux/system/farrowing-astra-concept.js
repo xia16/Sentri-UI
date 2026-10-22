@@ -182,7 +182,7 @@ if(typeof document==='undefined')return;
 function atlasScreen(s,c){
  const v=s.view;
  if(!/^room/.test(v)&&c.returnToTaskReview==='roomScan')return 'farrowing.scan-read';   // a sow the reader opened, over Scan
- if(v==='room')return 'farrowing.room';
+ if(v==='room')return c.toast?.title?'farrowing.batch-saved':'farrowing.room';
  if(v==='count')return born(s)?'farrowing.count':'farrowing.before';
  if(v==='death')return 'farrowing.death';
  if(v==='finish')return 'farrowing.finish';
