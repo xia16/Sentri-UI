@@ -3792,7 +3792,7 @@
         [
          "farrowing.locked",
          "farrowing.death-breakdown",
-         "tap the death breakdown link"
+         "tap Death causes"
         ],
         [
          "farrowing.count",
@@ -4750,7 +4750,7 @@
               "shows": "Alive now falls; Born never moves except through Correct born"
              }
             ],
-            "logic": "Born is frozen at finish. Alive now = Born − dead recorded. Dead = all dead types; with Dead above zero it is a link to a Death breakdown sheet (each type with a count and Total dead).",
+            "logic": "Born is frozen at finish. Alive now = Born − dead recorded. Dead = all dead types. The three figures read (Facts never acts); with Dead above zero a Death causes row under the card opens the Death breakdown sheet (each type with a count and Total dead).",
             "source": "farrowing-astra-concept.js finishFacts(), deathBreakdown()",
             "at": "Alive now"
            }
@@ -6485,7 +6485,7 @@
          "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
          "preset": "locked",
          "steps": [
-          "View death breakdown"
+          "Death causes"
          ],
          "figma": "",
          "notes": {
