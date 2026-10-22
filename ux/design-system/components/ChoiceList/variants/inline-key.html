@@ -11,7 +11,7 @@
 <div data-state="Empty" id="state-Empty"></div>
 <div data-state="Long-label" id="state-Long-label"></div>
 <script>
-var UI = window.SentriUI;
+const UI = window.SentriUI;
 /* The real container: a 390px phone; the form is a drawer over the sow's page. The key face is a row of a flat list of rows: here under a Stepper row, in the same right column. */
 function page(){return '<div class="ph-page"><div class="ph-bar" aria-hidden="true">9:41</div>'+UI.heading({title:'000418',kind:'page',description:'B1 \u00b7 Parity 3'})+UI.panel(UI.row({title:'Farrowing',description:'9 alive \u00b7 5 dead'}),{className:'st-row-group'})+'</div>';}
 function phone(over){return '<div class="ph" data-st-context="page">'+page()+over+'</div>';}

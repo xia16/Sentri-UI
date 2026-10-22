@@ -1,7 +1,7 @@
 // The gate's and the polish loop's rules (scripts/loop-rules.mjs).
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { machinePass, aimdStep, calibrationProblems, budgetProblems, critiqueProblems, pageStyling, addedLines, effectiveClass, classifyScreens, checkVerdict, checkGrades, worstFirst, isClean, loopStatus, touchesSystem, touchesTools, regressions,
+import { machinePass, aimdStep, calibrationProblems, budgetProblems, critiqueProblems, pageStyling, addedLines, removedLines, effectiveClass, classifyScreens, checkVerdict, checkGrades, worstFirst, isClean, loopStatus, touchesSystem, touchesTools, regressions,
   pageOf, pageAssets, sharedFiles, outcomeLeaves, coverageLost, timedOutOnly, scenarioDebt, ghNetworkError,
   componentPage, componentPagesOf, componentsTouched, idPath } from '../scripts/loop-rules.mjs';
 
@@ -256,6 +256,17 @@ test('visual styling added in a page is an improvised component; layout and the 
     '+++ b/ux/system/home.js', "+  return `<div class=\"t\" style=\"display:grid;color:red\">`;", '+  el.style.marginTop = "4px";', '+  el.style.backgroundColor = "#fff";',
     '+++ b/ux/design-system/components/bundle.css', '+.st-tile{border:1px solid var(--line)}'].join('\n');
   assert.deepEqual(pageStyling(addedLines(diff)).map((p) => p.file.split('/').pop() + ' ' + p.prop), ['home.css border-bottom', 'home.css font-size', 'home.js color', 'home.js background-color']);
+});
+
+test('a rule deleted from a one-line stylesheet re-adds the line, not its styling; a new or changed value still counts', () => {
+  const kept = '.a{font-size:13px;color:var(--muted)}.b{gap:8px}';
+  const styled = (diff) => pageStyling(addedLines(diff), removedLines(diff)).map((p) => p.file.split('/').pop() + ' ' + p.prop);
+  const rewrap = (after) => ['--- a/ux/system/room.css', '+++ b/ux/system/room.css', '@@ -10 +10 @@', `-${kept}.dead{font-size:14px;border:1px solid #ccc}`, `+${after}`].join('\n');
+  assert.deepEqual(styled(rewrap(kept)), []);
+  assert.deepEqual(styled(rewrap(kept + '.new{font-size:15px}')), ['room.css font-size']);
+  assert.deepEqual(styled(rewrap(kept.replace('13px', '12px'))), ['room.css font-size']);
+  // what one file removes does not excuse another file
+  assert.deepEqual(styled(['--- a/ux/system/a.css', '+++ b/ux/system/a.css', '-.x{color:red}', '--- a/ux/system/b.css', '+++ b/ux/system/b.css', '+.x{color:red}'].join('\n')), ['b.css color']);
 });
 
 test('a judge that rates an owner-rejected calibration pair better, or skips one, is not used', () => {
