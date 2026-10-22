@@ -3421,7 +3421,7 @@
            "gwt": {
             "given": "The worker has searched for 43 and 004318, a sow in Unit 6, is a result.",
             "when": "They tap her.",
-            "then": "Her farrowing drawer opens on her Awaiting face, the same drawer a sow in this unit opens, and its subtitle names her unit and pen."
+            "then": "Her farrowing drawer opens on her Awaiting face, the same drawer a sow in this unit opens, and its subtitle names her unit and pen. Under the drawer is Find a sow with 43 still typed, not the room."
            },
            "authority": [
             {
@@ -3447,6 +3447,62 @@
              "expr": "s.tag === '004318' && c.unitId === '7'",
              "says": "her record is open and the room is still Unit 7",
              "hard": "wrong-fact"
+            },
+            {
+             "expr": "document.querySelector('.room-surface .st-find [data-room-search]')?.value === '43'",
+             "says": "the page under her drawer is Find a sow, with what was typed",
+             "hard": "wrong-fact"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "type": "action",
+         "id": "search.empty.43.scan",
+         "label": "tap the scan icon in the field",
+         "taps": [
+          "[data-action='room-scan']"
+         ],
+         "children": [
+          {
+           "type": "action",
+           "id": "search.empty.43.scan.back",
+           "label": "tap the back arrow",
+           "taps": [
+            "[data-action='room-back']"
+           ],
+           "children": [
+            {
+             "type": "outcome",
+             "id": "fa-s27-back-from-scan-returns-to-find-a-sow",
+             "tree": "S-27",
+             "label": "Back from Scan opened in Find a sow returns to Find a sow, with what was typed",
+             "gwt": {
+              "given": "The worker has typed 43 in Find a sow and opened Scan ear tags from the scan icon in the field.",
+              "when": "They tap the back arrow.",
+              "then": "Find a sow is in front again with 43 still typed and its results, not the room list."
+             },
+             "authority": [
+              {
+               "src": "design-system",
+               "at": "README · Back",
+               "says": "Back leaves and returns to where you came from, keeping the draft"
+              }
+             ],
+             "visible": [
+              {
+               "screen": "farrowing.search-results",
+               "hard": "dead-end"
+              }
+             ],
+             "record": [
+              {
+               "expr": "document.querySelector('[data-room-search]')?.value === '43'",
+               "says": "the field still holds 43",
+               "hard": "wrong-fact"
+              }
+             ]
             }
            ]
           }
@@ -4253,7 +4309,7 @@
          "gwt": {
           "given": "Scan ear tags is open with 000418, in Unit 7, scanned.",
           "when": "The worker taps her row.",
-          "then": "Her farrowing drawer opens on Counting."
+          "then": "Her farrowing drawer opens on Counting, over Scan ear tags (not the room)."
          },
          "authority": [
           {
@@ -4272,6 +4328,11 @@
           {
            "expr": "s.tag === '000418'",
            "says": "her record is open",
+           "hard": "wrong-fact"
+          },
+          {
+           "expr": "!!document.querySelector('.room-surface .st-scan-body')",
+           "says": "the page under her drawer is Scan ear tags",
            "hard": "wrong-fact"
           }
          ]

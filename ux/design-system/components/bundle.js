@@ -459,6 +459,16 @@
     const rid=reason?(describedby||fieldId('st-icon-reason')):describedby;
     return `<button type="button" class="icon-button ${esc(className)}" data-ds="IconButton" data-variant="${v}" data-action="${esc(action)}" data-value="${esc(value)}" aria-label="${esc(label)}"${count!==''&&count!=null?' data-count=""':''}${tone==='attention'?' data-tone="attention"':''}${disabled?' aria-disabled="true"':''}${pressed?' data-preview="pressed"':''}${selected!=null?` aria-pressed="${!!selected}"`:''}${rid?` aria-describedby="${esc(rid)}"`:''}${safeAttr(attrs)}><span aria-hidden="true">${icon}</span>${count!==''&&count!=null?`<span class="icon-button-count" aria-hidden="true">${esc(count)}</span>`:''}${selected?`<span class="st-icon-selected" aria-hidden="true">${sGlyph('check')}</span>`:''}${hasBadge?`<span class="filter-badge">${tx(badge,o,'badge')}</span>`:''}</button>${reason?buttonReason({id:rid,text:reason}):''}`;
   }
+  /* TaskDock: a task page's bottom bar, lifted unchanged from Farrowing's room dock (owner proposal, 2026-10-21). The place (a
+     framed button: Farrowing's pen map, Inspection's pen), the one primary tool (Scan ear tag) and icon tools (Search). A host's own
+     bar for the moment (Inspection's selection: the count and Actions) takes the dock's place through `content`. The frozen
+     piglet-processing room keeps SentriTask.dock's older face. */
+  function taskDock({label='Task tools',place=null,primary=null,tools=[],content='',className=''}={}){
+    const pl=place?`<button data-framed type="button" class="tk-dock-unit dock-map"${place.aria?` aria-label="${esc(place.aria)}"`:''} data-action="${esc(place.action)}" data-value="${esc(place.value??'')}">${SentriIcons.icon(place.icon||'grid')}<span><strong>${esc(place.label)}</strong></span></button>`:'';
+    const pr=primary?button({label:'',register:'primary',action:primary.action,value:primary.value??'',className:'dock-scan',attrs:primary.attrs||{}}).replace('<span class="st-button-label"></span>',`${SentriIcons.icon(primary.icon||'scan')}<span>${esc(primary.label)}</span>`):'';
+    const tl=tools.map(x=>iconButton({action:x.action,value:x.value??'',icon:SentriIcons.icon(x.icon),label:x.label,className:x.className||''})).join('');
+    return `<nav class="room-dock${className?' '+esc(className):''}" data-ds="TaskDock" aria-label="${esc(label)}">${content||pl+pr+tl}</nav>`;
+  }
   /* ---- Field cards (candidate, ADR 0001): Stepper, Measure, Numpad ----
      Event contract: every control is a <button data-action> whose data-value is the caller's field key;
      Stepper keys add data-step (a requested delta, −step | step), Numpad keys add data-key (0–9 | . | back),
@@ -1325,10 +1335,12 @@
     const w=Object.assign({act:'need you',live:'farrowing'},words),n=l=>Object.values(pens).filter(v=>v===l).length;
     return [['act','--amber-fill'],['live','--progress-fill']].filter(([l])=>n(l)).map(([l,fill])=>({fill,count:n(l),label:w[l]}));
   }
-  /* penPeek({ title, meta, rows }): the body of the peek card: the pen code with its count, then one animal Row per sow,
-     the same row as the room list (`rows` are Row props: code and right:{ kind:'state', figure, word, level }). */
-  function penPeek({title='',meta='',rows=[]}={}){
-    return `<div class="st-pen-peek-head"><b>${esc(title)}</b>${meta?`<span>${esc(meta)}</span>`:''}</div>${rows.map(r=>row(Object.assign({variant:'animal',className:'st-pen-peek-row'},r))).join('')}`;
+  /* penPeek({ title, meta, rows, more }): the body of the peek card: the pen code with its count, then one animal Row per
+     animal, the same row as the room list (`rows` are Row props: code and right:{ kind:'state', figure, word, level } or
+     right:{ kind:'tags', tags }). A pen with more animals than the card holds passes the rows it shows and `more`, one quiet
+     line after them ("+12 more"). */
+  function penPeek({title='',meta='',rows=[],more=''}={}){
+    return `<div class="st-pen-peek-head"><b>${esc(title)}</b>${meta?`<span>${esc(meta)}</span>`:''}</div>${rows.map(r=>row(Object.assign({variant:'animal',className:'st-pen-peek-row'},r))).join('')}${more?`<p class="st-pen-peek-more">${esc(more)}</p>`:''}`;
   }
   function penMapFooter({back={action:'back'},depth=0,rangeSize=20,label='Jump to pens'}={}){
     const size=Math.max(1,rangeSize|0);
@@ -1550,7 +1562,7 @@
       const h=before.get('H'+scanKey(e)),hn=e.getBoundingClientRect().height;if(h!==undefined&&Math.abs(h-hn)>.5)e.animate([{height:h+'px',overflow:'hidden'},{height:hn+'px',overflow:'hidden'}],ease);
     }
   }
-  const api=Object.freeze({lookupGroups,findPage,findResults,findRow,findMark,scanPage,scanArrive,scanPlaces,scanGlide,taskTile,weekBoard,weekCell,weekBoardKey,headerLine,pageHeader,rangeSlider,filterSheet,penMap,penMapKey,penMapFooter,penPeek,penMapMount:penMount,optionalRow,keyboardLift,heading,panel,facts,row,rowGroup,log,logDay,logStamp,logGroups,field,rowTile,rowGrid,pickerField,pickerOptions,pickerBody,pickerHead,pickerFooter,filterChips,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,toast,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowSelectDoor,rowAction,rowSelectChange,status,conditionTag,rowFitTags,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
+  const api=Object.freeze({taskDock,lookupGroups,findPage,findResults,findRow,findMark,scanPage,scanArrive,scanPlaces,scanGlide,taskTile,weekBoard,weekCell,weekBoardKey,headerLine,pageHeader,rangeSlider,filterSheet,penMap,penMapKey,penMapFooter,penPeek,penMapMount:penMount,optionalRow,keyboardLift,heading,panel,facts,row,rowGroup,log,logDay,logStamp,logGroups,field,rowTile,rowGrid,pickerField,pickerOptions,pickerBody,pickerHead,pickerFooter,filterChips,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,toast,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowSelectDoor,rowAction,rowSelectChange,status,conditionTag,rowFitTags,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
   root.SentriUI=api;
   if(typeof module!=='undefined')module.exports=api;
 })(globalThis);

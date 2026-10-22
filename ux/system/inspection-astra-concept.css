@@ -41,9 +41,7 @@
 .inspection-phone .empty-inspect{padding:25px 10px;font-size:var(--type-meta-size);color:var(--muted);line-height:1.7}.inspection-phone .empty-inspect strong{display:block;color:var(--ink);font-size:var(--type-row-title-size);margin-bottom:8px}
 .walk-complete{text-align:center;padding:8px 0 18px}.walk-complete>.complete-mark{height:52px;width:52px;margin:0 auto 17px;background:#e6efe0;border-radius:50%;display:grid;place-items:center;color:#42633a}.walk-complete h4{font-size:22px;margin:0 0 12px;letter-spacing:-.5px}.walk-complete p{font-size:var(--type-meta-size);line-height:1.8;color:var(--muted)}
 .inspect-search{margin:0 0 16px}.inspect-search input{font-size:15px}
-.inspect-pen.arrival{animation:pen-arrival-ring .9s ease-out}
 @media(max-width:370px){.inspect-list{padding-left:12px;padding-right:12px}.inspect-controls{padding-left:12px;padding-right:12px}.inspect-overview{margin-left:12px;margin-right:12px}.pig-id{font-size:var(--type-row-title-size)}.pen-feed strong{font-size:var(--type-row-title-size)}.inspect-header h2{font-size:23px}.pig-line,.pig-instruction{font-size:var(--type-meta-size)}}
-@media(prefers-reduced-motion:reduce){.inspect-pen.arrival{animation:none;border-color:#8b9f7b}}
 /* Unit composition sits above the same counted controls used by farrowing. */
 .unit-composition{margin:0 16px 14px;padding:12px 14px 0;background:#f6f4eb;border:1px solid #cdd2c1;border-radius:14px;overflow:hidden}
 .composition-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:var(--type-row-title-size);color:var(--muted)}
