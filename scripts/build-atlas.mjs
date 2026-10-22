@@ -107,7 +107,9 @@ for (const f of features) {
   if (a) {
     for (const st of [...(a.statuses || []), ...(a.exits || []), ...(a.task || [])]) placed.push(...(st.screens || []));
     placed.push(...(a.any || []));
+    for (const [, ids] of a.groups || []) placed.push(...ids);
   } else for (const [, ids] of f.groups || []) placed.push(...ids);
+  if (a && f.groups) problems.push(`${where}: an anchored feature names its bands in anchor.groups, not groups`);
   const seen = new Set();
   for (const id of placed) {
     if (!own.has(id)) problems.push(`${where}: layout names ${id}, which is not one of its screens`);

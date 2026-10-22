@@ -164,6 +164,7 @@ function layoutFlow(f, entries, avail, open = new Set()) {
   const a = f.anchor, ownIds = f.screens.map((s) => s.id);
   if (a) {
     strip('In any status', a.any || []);
+    (a.groups || []).forEach(([name, ids]) => strip(name, ids)); // named bands, also reachable in any status (Find and scan)
     const [t1, t2] = a.task || [];
     band(t1 ? t1.name : a.name);
     const top = ((t1 && t1.screens) || []).filter((i) => !placed.has(i));
