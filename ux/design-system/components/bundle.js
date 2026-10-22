@@ -1496,38 +1496,47 @@
      generic row (her condition tags, or nothing). The host knows its list, so it passes each row's right side: findRow({right}).
      A single-action task's Scan opens her (read:'open'): nothing is listed and the host opens her on each read. A multi-select task's Scan
      ticks her as she is read, and its footer may carry the task's own actions directly (actions:[{label,action}]).
-     lookupGroups([{title,rows:[html]}],{variant:'find'|'scan'}) · findPage({query,placeholder,results,scan,clear,cancel,inputAttrs,bar})
+     A multi-select place with no task list of its own (Home) searches and scans on one page: Find's field, whose scan icon turns it into
+     the scan bar (findPage({scanning,footer})); each read ticks her, and the ticks stay through searching.
+     lookupGroups([{title,rows:[html]}],{variant:'find'|'scan'}) · findPage({query,placeholder,results,scan,clear,cancel,inputAttrs,bar,scanning,footer})
      findResults({query,groups,hint,none}) · findRow({code,place,query,action,value,right}) · findMark(text,query)
      scanPage({title,back,read,connected,listening,groups,picked,selected,actions,toggle,empty,bar}) · scanArrive(root,scan) · scanPlaces(root) · scanGlide(root,before) */
+  /* A group's `rows` are one card for its unit. Its `pens` are one card each instead, as Inspection's unit list draws them (owner,
+     2026-10-22): the pen code and how many are listed in the card's header, the typed part marked (`query`), then the pigs. */
   function lookupGroups(groups=[],{variant='find'}={}){
     const card=variant==='scan'?'st-scan-card':'st-find-list';
-    return groups.filter(g=>g&&(g.rows||[]).length).map(g=>heading({title:g.title,kind:'section',level:3})+panel(g.rows.join(''),{className:'st-row-group '+card})).join('');
+    const pen=(g,p)=>panel(`<header class="st-lookup-pen-head"><strong>${findMark(p.title,p.query)}</strong>${p.meta?`<small>· ${esc(p.meta)}</small>`:''}</header>${p.rows.join('')}`,{tag:'section',className:'st-row-group st-lookup-pen'+(variant==='scan'?' st-scan-card':'')}).replace('<section ',`<section data-lookup-key="${esc(g.title+'/'+p.title)}" `);
+    const pens=g=>(g.pens||[]).filter(p=>(p.rows||[]).length);
+    return groups.filter(g=>g&&((g.rows||[]).length||pens(g).length)).map(g=>heading({title:g.title,kind:'section',level:3})+(g.pens?pens(g).map(p=>pen(g,p)).join(''):panel(g.rows.join(''),{className:'st-row-group '+card}))).join('');
   }
   /* The typed part bold, the rest muted (.st-find-row mutes the tag; this marks only the part that matched). */
   function findMark(text,q){const t=String(text??''),i=q?t.toLowerCase().indexOf(String(q).toLowerCase()):-1;return i<0?esc(t):esc(t.slice(0,i))+'<b>'+esc(t.slice(i,i+q.length))+'</b>'+esc(t.slice(i+q.length));}
   /* A result: the tag over where the animal is, and the host's right side: the task's state for a pig on the task's list, her condition
      tags (or nothing) for any other pig (owner, 2026-10-22). The part of the tag or the place that matched is marked. */
-  function findRow({code='',place='',query='',action='',value=code,className='',right=null}={}){
+  /* `markPlace: false` when the line under the tag is not searched (her stage line, the pen being the card's header). */
+  function findRow({code='',place='',query='',action='',value=code,className='',right=null,contextWidth='',markPlace=true}={}){
     const q=String(query||'').trim().toLowerCase();
-    let html=row({variant:'animal',code,description:place,right:right||{kind:'state',figure:'',word:'',level:'settled'},action,value,className:'st-find-row'+(className?' '+className:'')});
+    let html=row({variant:'animal',code,description:place,right:right||{kind:'state',figure:'',word:'',level:'settled'},action,value,className:'st-find-row'+(className?' '+className:''),contextWidth});
     html=html.replace(`<strong class="st-animal-id">${esc(code)}</strong>`,`<strong class="st-animal-id">${findMark(code,q)}</strong>`);
-    if(place&&String(place).toLowerCase().includes(q))html=html.replace(`<span class="st-animal-context">${esc(place)}<`,`<span class="st-animal-context">${findMark(place,q)}<`);
+    if(markPlace&&place&&String(place).toLowerCase().includes(q))html=html.replace(`<span class="st-animal-context">${esc(place)}<`,`<span class="st-animal-context">${findMark(place,q)}<`);
     return html;
   }
   /* What the results area says: the hint before typing, the no-match line, or the unit cards. */
   function findResults({query='',groups=[],hint='',none=''}={}){
     if(!String(query).trim())return hint?`<p class="st-find-hint">${esc(hint)}</p>`:'';
-    if(!groups.some(g=>(g.rows||[]).length))return `<p class="st-find-hint">${esc(none)}</p>`;
+    if(!groups.some(g=>(g.rows||[]).length||(g.pens||[]).some(p=>(p.rows||[]).length)))return `<p class="st-find-hint">${esc(none)}</p>`;
     return lookupGroups(groups,{variant:'find'});
   }
   /* The field is pinned and focused (the host focuses [data-find-input] once it has rendered). Natively this is the number-first keyboard
      with an ABC switch (iOS numbersAndPunctuation, Android's 123/ABC toggle); the web has no such input mode, so the field asks for plain
      text with no auto-capitals and no suggestions. A white page (an input surface): the field, Clear while something is typed, the scan
-     icon when the host has a reader, and Cancel. */
-  function findPage({query='',placeholder='Ear tag or pen',label=placeholder,results='',scan=null,clear={action:'find-clear',label:'Clear'},cancel={action:'back',label:'Cancel'},inputAttrs={},bar='',className=''}={}){
+     icon when the host has a reader, and Cancel.
+     A multi-select host searches and scans on this one page (Home, owner 2026-10-22): `scanning` is the scan bar, drawn in the field's place
+     while the reader is on, and `footer` is the count and Actions once a pig is ticked. Without them the page is Find as before. */
+  function findPage({query='',placeholder='Ear tag or pen',label=placeholder,results='',scan=null,clear={action:'find-clear',label:'Clear'},cancel={action:'back',label:'Cancel'},inputAttrs={},bar='',scanning='',footer='',className=''}={}){
     const q=String(query??'');
     const input=`<input data-find-input${safeAttr(inputAttrs)} type="text" inputmode="text" enterkeyhint="search" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" placeholder="${esc(placeholder)}" aria-label="${esc(label)}" value="${esc(q)}">`;
-    return `<section class="st-find${className?' '+esc(className):''}" data-ds="Lookup" data-variant="find" data-st-context="drawer" role="region"${sL(label)}>${bar}<div class="st-find-top">${searchBox({input,value:q,scan,clear})}${button({label:cancel.label||'Cancel',register:'text',action:cancel.action,className:'st-find-cancel'})}</div><div class="st-find-results" role="region" aria-label="Search results" aria-live="polite">${results}</div></section>`;
+    return `<section class="st-find${className?' '+esc(className):''}" data-ds="Lookup" data-variant="find" data-st-context="drawer" role="region"${sL(label)}>${bar}<div class="st-find-top">${scanning||searchBox({input,value:q,scan,clear})}${button({label:cancel.label||'Cancel',register:'text',action:cancel.action,className:'st-find-cancel'})}</div><div class="st-find-results" role="region" aria-label="Search results" aria-live="polite">${results}</div>${footer}</section>`;
   }
   /* Scanning on a list (owner, 2026-10-22: a list that chooses animals scans in place, no Scan page). The host's search bar becomes this
      one status while the reader is on: 'scanning' in the scan hue (the progress wash that Row's Just scanned state uses), or 'waiting' in
@@ -1543,7 +1552,7 @@
   function scanPage({title='Scan ear tags',back={action:'back'},read='list',connected=true,listening=true,groups=[],picked=0,selected=n=>n+' selected',actions={action:'scan-actions',label:'Actions'},toggle={action:'scan-toggle'},empty={},bar='',className=''}={}){
     const e=Object.assign({offTitle:'Scanner not connected',offText:"Turn on the tag reader and pair it in your phone's Bluetooth settings. Scanning starts as soon as it connects.",title:'Hold the reader to an ear tag',text:'Each animal you scan appears here.',stoppedTitle:'Scanning is stopped',stoppedText:'Resume scanning to add more.'},empty);
     // read:'open' (a single-action task): nothing is listed, because each read opens her; the page only says that it listens.
-    const has=read!=='open'&&groups.some(g=>(g.rows||[]).length);
+    const has=read!=='open'&&groups.some(g=>(g.rows||[]).length||(g.pens||[]).some(p=>(p.rows||[]).length));
     const body=!connected?scanEmpty(e.offTitle,e.offText):!has?(listening?scanEmpty(e.title,e.text):scanEmpty(e.stoppedTitle,e.stoppedText)):`<div class="st-scan-body">${lookupGroups(groups,{variant:'scan'})}</div>`;
     // A multi-select task may put its own actions in the footer directly (actions:[{label,action}], the last one primary); else the count and Actions.
     const direct=Array.isArray(actions)?actions.map((x,k)=>button({label:x.label,register:x.register||(k===actions.length-1?'primary':'secondary'),action:x.action,value:x.value})).join(''):'';
@@ -1568,7 +1577,7 @@
   /* A new row arrives without a jump: it slides in at the top of its card and everything under it glides to its new place (measured before
      and after the render with scanPlaces, then animated back from the old place by scanGlide). A new card fades in with its heading, and a card
      that gains a row grows with it. Rows move with their card, so a row is measured against its card. Reduced motion and the atlas's still frames skip it. */
-  const scanKey=e=>e.dataset.scanTag?'r'+e.dataset.scanTag:e.classList.contains('st-scan-card')?'c'+e.previousElementSibling?.textContent:'h'+e.textContent;
+  const scanKey=e=>e.dataset.scanTag?'r'+e.dataset.scanTag:e.classList.contains('st-scan-card')?'c'+(e.dataset.lookupKey||e.previousElementSibling?.textContent):'h'+e.textContent;
   const scanMovers=root=>[...root.querySelectorAll('.st-scan-body .st-heading,.st-scan-body .st-scan-card,.st-scan-body [data-scan-tag]')];
   const scanTop=e=>e.getBoundingClientRect().top-(e.dataset.scanTag?e.closest('.st-scan-card').getBoundingClientRect().top:0);
   function scanPlaces(root){const m=new Map();if(root)for(const e of scanMovers(root)){m.set(scanKey(e),scanTop(e));if(e.classList.contains('st-scan-card'))m.set('H'+scanKey(e),e.getBoundingClientRect().height);}return m;}

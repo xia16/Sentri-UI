@@ -840,7 +840,10 @@ export interface SentriUI {
 }
 
 /** Lookup (components/Lookup): Find and Scan, the two ways to reach an animal by her ear tag. */
-export interface LookupGroup { title: string; rows: string[] }
+/** A pen card inside a unit: the pen code (its typed part marked by `query`) and how many are listed ("2 pigs") in its header. */
+export interface LookupPen { title: string; meta?: string; query?: string; rows: string[] }
+/** A unit under its plain heading: `rows` as one card, or `pens` as one card each (Inspection's unit list). */
+export interface LookupGroup { title: string; rows?: string[]; pens?: LookupPen[] }
 export interface FindPageProps {
   query?: string; placeholder?: string; label?: string;
   /** The results area's HTML: findResults(...). */
@@ -852,6 +855,10 @@ export interface FindPageProps {
   inputAttrs?: SafeAttrs;
   /** The host's status bar, drawn inside the white page. */
   bar?: string; className?: string;
+  /** A multi-select host that searches and scans on this page (Home): scanBar(...) in the field's place while the reader is on. */
+  scanning?: string;
+  /** The count and Actions once a pig is ticked: sheetFooter(...). */
+  footer?: string;
 }
 export interface ScanState { fresh?: Record<string, number>; last?: string }
 export interface ScanPageProps {
@@ -875,7 +882,7 @@ export interface SentriUI {
   /** The hint before typing, the no-match line, or the unit cards. */
   findResults(props?: { query?: string; groups?: LookupGroup[]; hint?: string; none?: string }): string;
   /** A result row: the tag (the typed part marked) over where the animal is, and the host's right side: the task's state for a pig on its list, her condition tags (or nothing) for any other. */
-  findRow(props?: { code?: string; place?: string; query?: string; action?: string; value?: string; className?: string; right?: AnimalRight | null }): string;
+  findRow(props?: { code?: string; place?: string; query?: string; action?: string; value?: string; className?: string; right?: AnimalRight | null; contextWidth?: string; markPlace?: boolean }): string;
   findMark(text: string, query: string): string;
   scanPage(props?: ScanPageProps): string;
   /** Scanning on a list: the host's search bar becomes this one status while the reader is on. 'waiting' until it connects. */

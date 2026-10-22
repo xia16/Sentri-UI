@@ -8,7 +8,7 @@
   "duplicates": "",
   "groups": [
     [
-      "Find",
+      "Search",
       [
         "find-pig.search",
         "find-pig.results",
@@ -30,17 +30,10 @@
   "entryPoints": [
     {
       "section": "Home",
-      "label": "via Toolbox",
-      "from": "workbench.toolbox",
-      "control": "Find a pig or pen",
-      "lands": "find-pig.search"
-    },
-    {
-      "section": "Home",
-      "label": "via the Scan button",
+      "label": "via the bottom bar",
       "from": "workbench.today",
-      "control": "Scan (bottom bar)",
-      "lands": "find-pig.scan"
+      "control": "Search and scan (the middle button, a magnifier)",
+      "lands": "find-pig.search"
     }
   ],
   "addsTo": [],
@@ -53,20 +46,25 @@
     [
       "find-pig.search",
       "find-pig.scan",
-      "tap the scan icon"
+      "tap the scan icon in the field"
     ],
     [
       "find-pig.scan",
       "find-pig.scan-list",
-      "scan a tag"
+      "the reader reads a tag: she is ticked"
     ],
     [
       "find-pig.scan-list",
       "find-pig.scan-ticked",
-      "tick a pig"
+      "untick a pig"
     ],
     [
-      "find-pig.scan-ticked",
+      "find-pig.scan-list",
+      "find-pig.scan-stopped",
+      "Stop"
+    ],
+    [
+      "find-pig.scan-list",
       "find-pig.scan-actions",
       "tap Actions"
     ]
@@ -74,30 +72,36 @@
   "screens": [
     {
       "id": "find-pig.search",
-      "name": "Find a pig",
-      "zh": "查找猪只",
+      "name": "Search and scan",
+      "zh": "搜索与扫描",
       "status": "in-design",
       "url": "/ux/system/home-astra-prototype.html?section=gestation",
       "steps": [
-        "Toolbox",
-        "Find a pig or pen"
+        "Search and scan"
       ],
       "figma": "",
       "notes": {
-        "controls": [],
+        "controls": [
+          {
+            "control": "Scan icon in the field",
+            "does": "turns the field into the scan bar",
+            "goesTo": "find-pig.scan"
+          }
+        ],
         "issues": [],
-        "purpose": "Find a pig in any unit of the section by part of her ear tag or her pen, from Toolbox.",
         "states": [
-          "Empty field: nothing is listed, only the hint",
-          "Typed: results grouped by unit (Find a pig · results)",
-          "Nothing matches (Find a pig · no match)"
+          "Empty field: only the hint (this screen)",
+          "Typed: results grouped by unit (Search · results)",
+          "Nothing matches (Search · no match)",
+          "Scanning (the scan icon)",
+          "Pigs ticked, scanning stopped (Stopped · the ticks kept)"
         ],
         "elements": [
           {
             "name": "Search field",
             "at": "Ear tag or pen",
             "shows": "A full-height white page (the status bar turns white with it). The field is pinned and focused: the search icon, the typed text, ✕ once something is typed, the scan icon and Cancel.",
-            "rule": "Cancel returns to Toolbox; the scan icon opens Scan ear tags.",
+            "rule": "Cancel returns to Home and keeps the ticks for the next visit; the scan icon turns the field into the scan bar.",
             "source": "home-astra-prototype.js findPage() on SentriUI.findPage (components/Lookup)"
           }
         ],
@@ -107,21 +111,21 @@
           "(raw) Type part of an ear tag or a pen, or scan a tag. Searches every unit."
         ],
         "rules": [
-          "Owner decision 2026-10-12: search is global (every unit), nothing is listed until something is typed, and a result opens that animal in the current context. One card per unit under a plain \"Unit 7\" heading, this unit first (owner, 2026-10-20).",
-          "Drawn by the design system's Lookup (components/Lookup), the same page as Farrowing's.",
-          "Replaces the Find a pig or pen drawer (a form with Search that matched whole tags only and opened the task, not the pig)."
-        ]
+          "Owner, 2026-10-22: Home searches and scans on one page. The middle button of the bottom bar opens it (a magnifier, no word); the field searches, and its scan icon turns it into the scan bar, as Choose pigs does. Each read ticks the pig; the ticks stay through searching and Stop.",
+          "Owner decision 2026-10-12: search and scan are different jobs (type, tap one; hands-free reads). Owner, 2026-10-22: a multi-select place ticks each pig as she is read (Search and scan, features/find-pig). One card per unit under a plain \"Unit 7\" heading, this unit first (owner, 2026-10-20).",
+          "Replaces Home's two ways in (Toolbox › Find a pig or pen, and the Scan ear tags page from the bottom bar's Scan)."
+        ],
+        "purpose": "Reach any pig of the section by her ear tag or pen, from the bottom bar's middle button: type to search, or tap the scan icon to scan. The page as it opens: nothing typed, nothing ticked."
       }
     },
     {
       "id": "find-pig.results",
-      "name": "Find a pig · results",
-      "zh": "查找结果",
+      "name": "Search · results",
+      "zh": "搜索结果",
       "status": "in-design",
       "url": "/ux/system/home-astra-prototype.html?section=gestation",
       "steps": [
-        "Toolbox",
-        "Find a pig or pen",
+        "Search and scan",
         {
           "fill": "[data-find-input]",
           "text": "4318"
@@ -131,43 +135,48 @@
       "notes": {
         "controls": [
           {
-            "control": "A result",
-            "does": "opens her pig record (the Inspection pig record, embedded over the device); its Back returns here with the text kept",
+            "control": "A row's tick box",
+            "does": "ticks her for Actions; the count and Actions appear in the footer"
+          },
+          {
+            "control": "The rest of the row",
+            "does": "opens her pig record (the Inspection pig record, embedded over the device); its Back returns here with the text and the ticks kept",
             "goesTo": "pig-profile.full"
           }
         ],
         "issues": [],
-        "purpose": "Show every pig of the section that matches what is typed, the unit the worker is in first.",
         "states": [
-          "Matches in one unit or several: one card per unit"
+          "Matches in one unit or several: one card per unit",
+          "Pigs already ticked keep their ticks"
         ],
         "elements": [
           {
             "name": "Results",
             "at": "Unit 7",
-            "shows": "One tinted card per unit under its plain heading. Each row is the tag, the typed part bold and the rest muted, over her pen, with her marked condition on the right when she has one (the generic row: Home is not a task).",
-            "source": "home-astra-prototype.js findHits(), findBody()",
-            "logic": "Tags that start with the typed text come first, then tags that contain it, then a pen that matches. The unit the worker is in leads."
+            "shows": "Under each plain unit heading (the worker's unit first), one card per pen in walking order, as Inspection's unit list: the pen code in mono and how many are listed (\"B2 · 1 pig\") in the card's tinted header (owner, 2026-10-22: the pen is the header, the row is the pig). Each row is Inspection's walk row: the tick box, the tag over her stage line (\"Gestation · 28d\"), her marked condition on the right at its urgency (to treat: red with the one \"!\"; monitoring: outlined), then the door to her record. The typed part of the tag, or of the pen code in the header, is bold ink, the rest muted, as Find marks it.",
+            "source": "home-astra-prototype.js pigRow(), findBody()",
+            "logic": "Tags that start with the typed text come first, then tags that contain it, then a pen that matches. The unit the worker is in leads. A pig ticked here joins the list, so she is still there once the field is cleared."
           }
         ],
         "copy": [
-          "(raw) Unit 7 · Pen B2"
+          "(raw) Unit 7 · B2 · 1 pig"
         ],
         "rules": [
-          "Owner decision 2026-10-12: search is global (every unit), nothing is listed until something is typed, and a result opens that animal in the current context. One card per unit under a plain \"Unit 7\" heading, this unit first (owner, 2026-10-20).",
+          "Owner, 2026-10-22: Home searches and scans on one page. The middle button of the bottom bar opens it (a magnifier, no word); the field searches, and its scan icon turns it into the scan bar, as Choose pigs does. Each read ticks the pig; the ticks stay through searching and Stop.",
+          "Owner decision 2026-10-12: search and scan are different jobs (type, tap one; hands-free reads). Owner, 2026-10-22: a multi-select place ticks each pig as she is read (Search and scan, features/find-pig). One card per unit under a plain \"Unit 7\" heading, this unit first (owner, 2026-10-20).",
           "Owner, 2026-10-20: from Home a pig opens her pig record."
-        ]
+        ],
+        "purpose": "Show every pig of the section that matches what is typed, the unit the worker is in first. Each can be ticked here or opened."
       }
     },
     {
       "id": "find-pig.search-none",
-      "name": "Find a pig · no match",
+      "name": "Search · no match",
       "zh": "无匹配",
       "status": "in-design",
       "url": "/ux/system/home-astra-prototype.html?section=gestation",
       "steps": [
-        "Toolbox",
-        "Find a pig or pen",
+        "Search and scan",
         {
           "fill": "[data-find-input]",
           "text": "909"
@@ -177,7 +186,6 @@
       "notes": {
         "controls": [],
         "issues": [],
-        "purpose": "Say that nothing matches, in every unit.",
         "states": [
           "\"No pig matching “909” in any unit.\""
         ],
@@ -194,103 +202,104 @@
           "(raw) No pig matching “909” in any unit."
         ],
         "rules": [
-          "Owner decision 2026-10-12: search is global (every unit), nothing is listed until something is typed, and a result opens that animal in the current context. One card per unit under a plain \"Unit 7\" heading, this unit first (owner, 2026-10-20)."
-        ]
+          "Owner decision 2026-10-12: search and scan are different jobs (type, tap one; hands-free reads). Owner, 2026-10-22: a multi-select place ticks each pig as she is read (Search and scan, features/find-pig). One card per unit under a plain \"Unit 7\" heading, this unit first (owner, 2026-10-20)."
+        ],
+        "purpose": "Say that nothing matches, in every unit."
       }
     },
     {
       "id": "find-pig.scan",
-      "name": "Scan ear tags",
-      "zh": "扫描耳标",
+      "name": "Scanning",
+      "zh": "扫描中",
       "status": "in-design",
       "url": "/ux/system/home-astra-prototype.html?section=gestation",
       "steps": [
-        "Scan"
+        "Search and scan",
+        "Scan ear tag"
       ],
       "figma": "",
       "notes": {
         "controls": [
           {
-            "control": "Back",
-            "does": "returns to Home; the list is kept for the next visit",
-            "goesTo": "workbench.today"
+            "control": "Stop",
+            "does": "ends scanning; the search field returns",
+            "goesTo": "find-pig.scan-stopped"
           }
         ],
         "issues": [],
-        "purpose": "Scan pigs one after another from Home's Scan button: each read arrives ticked for the general Actions (owner, 2026-10-22: walking past three sick pigs, scan them, act on all three). The page as it opens: nothing scanned yet.",
         "states": [
-          "Reader not connected",
-          "Nothing scanned yet (this screen)",
-          "Pigs scanned",
-          "Ticked",
-          "Stopped"
+          "Nothing read yet (this screen)",
+          "Waiting for the reader",
+          "Pigs ticked",
+          "One unticked by hand"
         ],
         "elements": [
           {
-            "name": "Empty line",
-            "at": "Hold the reader to an ear tag",
-            "shows": "A scan icon, \"Hold the reader to an ear tag\" and \"Each pig you scan is ticked here.\"",
-            "source": "SentriUI.scanPage (components/Lookup)",
-            "rule": "The first scan replaces it with the list; stopped before any scan, it reads \"Scanning is stopped\"."
+            "name": "Scan bar",
+            "at": "Scanning",
+            "shows": "Lookup's scan bar in the field's place, at the field's height, in the scan hue: \"Scanning\" / \"Scan to tick pigs\", and Stop. Cancel stays beside it.",
+            "source": "SentriUI.scanBar({state:'scanning'}) in SentriUI.findPage({scanning})",
+            "rule": "Stop returns the search field with the ticks kept. The bar is the only scanning status (owner, 2026-10-20)."
           }
         ],
         "copy": [
-          "(raw) Scan ear tags",
-          "(raw) Stop scanning · Resume scanning"
-        ],
-        "edge": [
-          "The prototype has no reader: \"Simulate scan\" beside the phone reads the next sample pig. ?scan=list, ?scan=ticked and ?scan=none open the page with sample scans, ticks, or no reader."
+          "(raw) Scanning · Scan to tick pigs · Stop",
+          "(raw) Hold the reader to an ear tag."
         ],
         "rules": [
-          "Owner decision 2026-10-12: the scanner always listens; each scan adds the animal to a list, newest first; a repeat scan lights her row; every row has its tick box and ticks are for bulk. No \"Not found\" row, no Select button. The footer's Stop / Resume scanning is the only scanning status (owner, 2026-10-20).",
-          "Drawn by the design system's Lookup (components/Lookup), the same page as Farrowing's.",
-          "Replaces the Scan an ear tag drawer (\"Scanner preview\", a typed tag and \"Use a sample tag\").",
-          "Owner, 2026-10-22: a multi-select place ticks each pig as she is read (Search and scan, features/find-pig)."
+          "Owner decision 2026-10-12: search and scan are different jobs (type, tap one; hands-free reads). Owner, 2026-10-22: a multi-select place ticks each pig as she is read (Search and scan, features/find-pig). One card per unit under a plain \"Unit 7\" heading, this unit first (owner, 2026-10-20)."
+        ],
+        "purpose": "Scan pigs one after another: each read arrives ticked for the general Actions (owner, 2026-10-22: walking past three sick pigs, scan them, act on all three). Nothing read yet.",
+        "edge": [
+          "The prototype has no reader: \"Simulate scan\" beside the phone reads the next sample pig. ?scan=list, ?scan=ticked and ?scan=none open the page with sample reads, one unticked, or no reader."
         ]
       }
     },
     {
       "id": "find-pig.scan-no-reader",
-      "name": "Scan · reader not connected",
-      "zh": "读取器未连接",
+      "name": "Scanning · waiting for the reader",
+      "zh": "等待读取器",
       "status": "in-design",
       "url": "/ux/system/home-astra-prototype.html?section=gestation&scan=none",
       "steps": [
-        "Scan"
+        "Search and scan",
+        "Scan ear tag"
       ],
       "figma": "",
       "notes": {
         "controls": [],
         "issues": [],
-        "purpose": "Say that no tag reader is paired, and what to do about it.",
         "states": [
-          "No reader: no list, no footer"
+          "Waiting: the bar in the pending colours"
         ],
         "elements": [
           {
-            "name": "Not-connected message",
-            "at": "Scanner not connected",
-            "shows": "\"Turn on the tag reader and pair it in your phone's Bluetooth settings. Scanning starts as soon as it connects.\"",
-            "source": "SentriUI.scanPage (components/Lookup)",
-            "rule": "Scanning starts by itself once a reader connects; there is nothing to tap."
+            "name": "Scan bar, waiting",
+            "at": "Waiting for reader",
+            "shows": "\"Waiting for reader\" / \"Make sure Reader 1 is on\" (the paired reader's name), and Stop; the line under it says scanning starts as soon as the reader connects.",
+            "source": "SentriUI.scanBar({state:'waiting'})",
+            "rule": "It turns to Scanning by itself when the reader connects; there is nothing to tap. As Choose pigs."
           }
         ],
         "copy": [
-          "(raw) Scanner not connected"
+          "(raw) Waiting for reader · Make sure Reader 1 is on",
+          "(raw) Scanning starts as soon as the reader connects."
         ],
         "rules": [
-          "Owner decision 2026-10-12: the scanner always listens; each scan adds the animal to a list, newest first; a repeat scan lights her row; every row has its tick box and ticks are for bulk. No \"Not found\" row, no Select button. The footer's Stop / Resume scanning is the only scanning status (owner, 2026-10-20)."
-        ]
+          "Owner decision 2026-10-12: search and scan are different jobs (type, tap one; hands-free reads). Owner, 2026-10-22: a multi-select place ticks each pig as she is read (Search and scan, features/find-pig). One card per unit under a plain \"Unit 7\" heading, this unit first (owner, 2026-10-20)."
+        ],
+        "purpose": "Say that the tag reader is not connected yet, and that scanning starts by itself once it is."
       }
     },
     {
       "id": "find-pig.scan-list",
-      "name": "Scan · pigs scanned",
-      "zh": "已扫描猪只",
+      "name": "Scanning · pigs ticked",
+      "zh": "已勾选猪只",
       "status": "in-design",
       "url": "/ux/system/home-astra-prototype.html?section=gestation&scan=list",
       "steps": [
-        "Scan"
+        "Search and scan",
+        "Scan ear tag"
       ],
       "figma": "",
       "notes": {
@@ -299,43 +308,7 @@
             "control": "A row",
             "does": "opens her pig record",
             "goesTo": "pig-profile.full"
-          }
-        ],
-        "issues": [],
-        "purpose": "Show the pigs scanned, newest first, one card per unit, each ticked as she was read.",
-        "states": [
-          "Pigs in several units: a card each, the worker's unit first"
-        ],
-        "elements": [
-          {
-            "name": "Scan list",
-            "at": "Unit 7",
-            "shows": "A tick box (ticked as she was read), the tag over her pen, and her marked condition on the right when she has one (as To treat and Monitoring draw it), then the door to her record. The rows are drawn exactly as before the change; only the ticking is new.",
-            "source": "home-astra-prototype.js scanRow(), scanPage()",
-            "logic": "Newest scan first within its unit; a repeat scan adds no second row and lights hers again."
-          }
-        ],
-        "copy": [
-          "(raw) Unit 7 · Unit 9"
-        ],
-        "rules": [
-          "Owner decision 2026-10-12: the scanner always listens; each scan adds the animal to a list, newest first; a repeat scan lights her row; every row has its tick box and ticks are for bulk. No \"Not found\" row, no Select button. The footer's Stop / Resume scanning is the only scanning status (owner, 2026-10-20).",
-          "Owner, 2026-10-22: a multi-select place ticks each pig as she is read (Search and scan, features/find-pig)."
-        ]
-      }
-    },
-    {
-      "id": "find-pig.scan-ticked",
-      "name": "Scan · pigs ticked",
-      "zh": "已勾选",
-      "status": "in-design",
-      "url": "/ux/system/home-astra-prototype.html?section=gestation&scan=ticked",
-      "steps": [
-        "Scan"
-      ],
-      "figma": "",
-      "notes": {
-        "controls": [
+          },
           {
             "control": "Actions",
             "does": "opens the general actions for the ticked pigs",
@@ -343,71 +316,112 @@
           }
         ],
         "issues": [],
-        "purpose": "One pig unticked by hand: the count and Actions follow the ticks.",
         "states": [
-          "Ticked: \"N pigs selected\" and Actions in the footer"
+          "Pigs in several units and pens: a heading per unit, a card per pen"
         ],
         "elements": [
           {
+            "name": "Scan list",
+            "at": "Unit 7",
+            "shows": "Under each plain unit heading (the worker's unit first), one card per pen in walking order, as Inspection's unit list: the pen code in mono and how many are listed (\"B2 · 1 pig\") in the card's tinted header (owner, 2026-10-22: the pen is the header, the row is the pig). Each row is Inspection's walk row: the tick box, the tag over her stage line (\"Gestation · 28d\"), her marked condition on the right at its urgency (to treat: red with the one \"!\"; monitoring: outlined), then the door to her record.",
+            "source": "home-astra-prototype.js pigRow(), findBody()",
+            "logic": "A read lands in her pen's card, which is brought into view and lit; a repeat read adds no second row and lights hers again."
+          },
+          {
             "name": "Selection bar",
             "at": "Actions",
-            "shows": "The plain count and the primary Actions.",
-            "source": "SentriUI.scanPage (components/Lookup)",
-            "rule": "The count is plain text, not a button; the ticks in the list are the selection. Ticking nothing brings Stop scanning back."
+            "shows": "The plain count (\"3 pigs selected\") and the primary Actions.",
+            "source": "SentriUI.sheetFooter in SentriUI.findPage({footer})",
+            "rule": "The count is plain text, not a button; the ticks in the list are the selection."
+          }
+        ],
+        "copy": [
+          "(raw) Unit 7 · B2 · 1 pig · Gestation · 28d",
+          "(raw) 3 pigs selected · Actions"
+        ],
+        "rules": [
+          "Owner decision 2026-10-12: search and scan are different jobs (type, tap one; hands-free reads). Owner, 2026-10-22: a multi-select place ticks each pig as she is read (Search and scan, features/find-pig). One card per unit under a plain \"Unit 7\" heading, this unit first (owner, 2026-10-20)."
+        ],
+        "purpose": "Show the pigs read, newest first, one card per unit, each ticked as she was read."
+      }
+    },
+    {
+      "id": "find-pig.scan-ticked",
+      "name": "Scanning · one unticked",
+      "zh": "取消一项",
+      "status": "in-design",
+      "url": "/ux/system/home-astra-prototype.html?section=gestation&scan=ticked",
+      "steps": [
+        "Search and scan",
+        "Scan ear tag"
+      ],
+      "figma": "",
+      "notes": {
+        "controls": [],
+        "issues": [],
+        "states": [
+          "\"2 pigs selected\" and Actions in the footer; ticking nothing removes the footer"
+        ],
+        "elements": [
+          {
+            "name": "Unticked row",
+            "at": "Unit 7",
+            "shows": "Her row stays where it was, unticked.",
+            "source": "home-astra-prototype.js pigRow()",
+            "rule": "Unticking never removes her from the list; ticking her again counts her again."
           }
         ],
         "copy": [
           "(raw) 2 pigs selected · Actions"
         ],
         "rules": [
-          "Owner decision 2026-10-12: the scanner always listens; each scan adds the animal to a list, newest first; a repeat scan lights her row; every row has its tick box and ticks are for bulk. No \"Not found\" row, no Select button. The footer's Stop / Resume scanning is the only scanning status (owner, 2026-10-20).",
-          "Owner, 2026-10-22: a multi-select place ticks each pig as she is read (Search and scan, features/find-pig)."
-        ]
+          "Owner decision 2026-10-12: search and scan are different jobs (type, tap one; hands-free reads). Owner, 2026-10-22: a multi-select place ticks each pig as she is read (Search and scan, features/find-pig). One card per unit under a plain \"Unit 7\" heading, this unit first (owner, 2026-10-20)."
+        ],
+        "purpose": "One pig unticked by hand: she stays listed, and the count and Actions follow the ticks."
       }
     },
     {
       "id": "find-pig.scan-stopped",
-      "name": "Scan · stopped",
-      "zh": "已停止",
+      "name": "Stopped · the ticks kept",
+      "zh": "已停止 · 保留勾选",
       "status": "in-design",
       "url": "/ux/system/home-astra-prototype.html?section=gestation&scan=list",
       "steps": [
-        "Scan",
-        "Stop scanning"
+        "Search and scan"
       ],
       "figma": "",
       "notes": {
         "controls": [],
         "issues": [],
-        "purpose": "Show that scanning is paused, with the list kept.",
         "states": [
-          "Stopped: the footer's primary is \"Resume scanning\""
+          "The field over the list; the count and Actions in the footer"
         ],
         "elements": [
           {
-            "name": "Resume scanning",
-            "at": "Resume scanning",
-            "shows": "The footer's one full-width button, primary with the scan glyph.",
-            "source": "SentriUI.scanPage (components/Lookup)",
-            "rule": "While stopped the reader adds nothing; the list is kept."
+            "name": "Ticked list",
+            "at": "Unit 7",
+            "shows": "The list as scanning left it, under the empty field. Typing narrows to the results; clearing brings the list back.",
+            "source": "home-astra-prototype.js findBody()",
+            "rule": "Leaving the page keeps the list for the next visit."
           }
         ],
         "copy": [
-          "(raw) Resume scanning"
+          "(raw) Ear tag or pen"
         ],
         "rules": [
-          "Owner decision 2026-10-12: the scanner always listens; each scan adds the animal to a list, newest first; a repeat scan lights her row; every row has its tick box and ticks are for bulk. No \"Not found\" row, no Select button. The footer's Stop / Resume scanning is the only scanning status (owner, 2026-10-20)."
-        ]
+          "Owner decision 2026-10-12: search and scan are different jobs (type, tap one; hands-free reads). Owner, 2026-10-22: a multi-select place ticks each pig as she is read (Search and scan, features/find-pig). One card per unit under a plain \"Unit 7\" heading, this unit first (owner, 2026-10-20)."
+        ],
+        "purpose": "Scanning stopped, or never started: the search field is back and the pigs ticked so far stay listed, ready to search for one more or to act."
       }
     },
     {
       "id": "find-pig.scan-actions",
-      "name": "Scan · Actions",
+      "name": "Actions",
       "zh": "操作",
       "status": "in-design",
-      "url": "/ux/system/home-astra-prototype.html?section=gestation&scan=ticked",
+      "url": "/ux/system/home-astra-prototype.html?section=gestation&scan=list",
       "steps": [
-        "Scan",
+        "Search and scan",
         "Actions"
       ],
       "figma": "",
@@ -416,9 +430,8 @@
         "issues": [
           "The four actions open nothing yet from Home."
         ],
-        "purpose": "Offer the general actions for the ticked pigs.",
         "states": [
-          "A menu drawer over Scan: Transfer, Condition, Treat, Note as More actions' verb grid, and Back"
+          "A menu drawer over the page: Transfer, Condition, Treat, Note as More actions' verb grid, and Back"
         ],
         "elements": [
           {
@@ -434,7 +447,8 @@
         ],
         "rules": [
           "Owner decision 2026-10-12: bulk actions are the task's own where it has them, plus the general ones everywhere."
-        ]
+        ],
+        "purpose": "Offer the general actions for the ticked pigs."
       }
     }
   ]

@@ -1029,8 +1029,8 @@
           {
             "name": "Results",
             "at": "Unit 6",
-            "shows": "One tinted card per unit under its plain section heading (\"Unit 7\", \"Unit 6\"), this unit first. Each row is the tag, the typed part bold and the rest muted, over her pen, with her condition tags on the right as the walk draws them (owner, 2026-10-22: every row has its right side).",
-            "logic": "Tags that start with the typed text come first, then tags that contain it, then a pen that matches.",
+            "shows": "Under each plain unit heading (this unit first), one card per pen in walking order, as the walk's own list: the pen code in mono and how many are listed (\"C1 · 2 pigs\") in the card's tinted header (owner, 2026-10-22: the pen is the header, the row is the pig). Each row is the walk's row: the tag, the typed part bold and the rest muted, over her stage line, with her condition tags on the right as the walk draws them (owner, 2026-10-22: every row has its right side). The typed part of a pen code is marked in its header.",
+            "logic": "Tags that start with the typed text come first, then tags that contain it; a pen that matches lists its pigs. Within a unit the pens keep walking order.",
             "source": "inspection-astra-concept.js findHits(), searchBody()"
           }
         ],
@@ -1195,8 +1195,8 @@
           {
             "name": "Scan list",
             "at": "000306",
-            "shows": "The walk's own roster rows, each ticked as it was read: a tick box, the tag over the stage line, the condition tags on the right (most urgent first, +N for the rest), and the door to her record. The footer is \"3 pigs selected\" and Actions.",
-            "logic": "A repeat scan does not add a second row; it lights hers again.",
+            "shows": "Under each plain unit heading (this unit first), one card per pen in walking order, as the walk's own list: the pen code in mono and how many are listed (\"C1 · 2 pigs\") in the card's tinted header (owner, 2026-10-22: the pen is the header, the row is the pig). Each row is the walk's roster row, ticked as it was read: a tick box, the tag over the stage line, the condition tags on the right (most urgent first, +N for the rest), and the door to her record. The footer is \"3 pigs selected\" and Actions.",
+            "logic": "A read lands in her pen's card, newest first within the pen; a repeat scan does not add a second row, it lights hers again.",
             "source": "inspection-astra-concept.js scanPage(), pigRow()"
           }
         ],
