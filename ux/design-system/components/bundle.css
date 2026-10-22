@@ -1393,6 +1393,11 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 .st-scan-bar .st-scan-bar-stop{flex:none;color:inherit}
 .st-scan-bar[data-state="waiting"]{border-color:var(--pending-border);background:var(--pending-surface);color:var(--amber-fill-ink)}
 .st-scan-bar[data-state="waiting"] .st-scan-bar-copy small{color:var(--amber)}
+/* On Find's page the bar takes the field's place at the field's height, so the page under it doesn't move when scanning starts or stops.
+   The pigs read there are listed in Find's results area, as Find's cards on its white page (one scroller, no second inset). */
+.st-find-top>.st-scan-bar{min-height:52px}
+.st-find-results>.st-scan-body{flex:none;overflow:visible;padding:0}
+.st-find-results .st-scan-card{--st-panel-bg:var(--app-background);margin-bottom:16px}
 /* Toast · door (a tap target with a chevron) and dismiss (a ✕ at the left; the toast stays until closed). With both, the ✕ and the door are
    two sibling buttons in one box: the ✕ a 44px square at the left edge, the door the rest. */
 .st-toast--door{border:0;font:inherit;text-align:left;cursor:pointer}

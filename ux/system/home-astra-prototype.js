@@ -189,7 +189,8 @@
     const update=()=>{state.page='home';navStack=[];render();};
     if(fromSections)sectionMotion('back',update);else update();
   }
-  function nav(active='home'){return `<nav class="bottom-nav" aria-label="Main navigation">${btn('home',icon('home')+'Home',active==='home'?'active':'')}${btn('scan',icon('scan')+'Scan','scan-button')}${btn('toolbox',icon('toolbox')+'Toolbox',active==='toolbox'?'active':'','',state.unit?'data-entry="environment" data-entry-via="toolbox"':'')}</nav>`;}
+  // The middle button opens Search and scan; its magnifier says it without a word (owner, 2026-10-22).
+  function nav(active='home'){return `<nav class="bottom-nav" aria-label="Main navigation">${btn('home',icon('home')+'Home',active==='home'?'active':'')}${btn('search',icon('search'),'scan-button','','aria-label="Search and scan"')}${btn('toolbox',icon('toolbox')+'Toolbox',active==='toolbox'?'active':'','',state.unit?'data-entry="environment" data-entry-via="toolbox"':'')}</nav>`;}
   /* The page header (Headers law, 2026-10-13): Back at the top left, the title, no line on these pages (scope, sources and
      descriptions are not header facts); 24px to the body. Every page has Back; its footer has none. */
   function head(title,extra=''){const h=SentriUI.pageHeader({title,back:{action:'back',label:'Back'},level:2});return extra?h.replace(/<\/header>$/,extra+'</header>'):h;}
@@ -551,9 +552,9 @@
   }
   function assistant(){const showFinding=!state.answered;return legacyHead('Assistant',state.workUnit?`${section().name} · Unit ${state.workUnit}`:section().name,'<span class="preview-badge">PREVIEW</span>')+`<div class="app-scroll screen-enter"><div class="assistant-hero"><div class="assistant-orbit">${icon('spark')}</div><h3>A second look.<br>A little less to carry.</h3><p>Ask about your work, or pick up a finding from the overnight review.</p></div><div class="assistant-tabs">${btn('assistant-tab','Needs you'+(showFinding?' · 1':''),'','findings',`aria-pressed="${state.assistantTab==='findings'}"`)}${btn('assistant-tab','Conversations','','chat',`aria-pressed="${state.assistantTab==='chat'}"`)}</div>${state.assistantTab==='findings'?(showFinding?btn('finding',`<span class="overline">INPUT NEEDED · OVERNIGHT REVIEW</span><h3>Where did the 4 pigs from Unit 7 go?</h3><p>A movement note names Pen A2, but its destination is missing.</p><footer><span>Gestation · reviewed at 05:30</span>${icon('arrow')}</footer>`,'finding'):`<div class="empty-state"><div class="complete-mark">${icon('check')}</div><h3>You're up to date</h3><p>Your answer is saved in this preview. There are no other decisions waiting.</p></div>`)+`<div class="evidence"><strong>Overnight review</strong><p>Sample finding for this design. A background agent is not connected to this prototype.</p></div>`:`${state.chat.length?state.chat.map(m=>`<div class="message ${m.who}">${esc(m.text)}</div>`).join(''):`<p class="work-note">What would you like to look into?</p>${btn('suggestion','Help me plan a move','choice','Help me plan a move')}${btn('suggestion','Review records in this unit','choice','Review records in this unit')}`}`}</div><footer class="page-footer"><form id="ask-form" class="composer"><input name="question" aria-label="Ask Assistant" placeholder="Ask about your work…" autocomplete="off" required maxlength="1000" value="${esc(state.askDraft||'')}"><button aria-label="Send preview request">${icon('send')}</button></form><p class="helper">Preview only · requests are not sent to an agent.</p></footer>`;}
   function finding(){return legacyHead('Movement needs clarification','Assistant · overnight review','<span class="preview-badge">PREVIEW</span>',false)+`<div class="app-scroll screen-enter"><div class="scope-label">${icon('place')}Gestation / Unit 7 / Pen A2</div><div class="assistant-hero"><p class="overline">YOUR INPUT NEEDED</p><h3>Where did these pigs go?</h3><p>The overnight review found a movement note without a destination.</p></div><div class="evidence"><strong>Movement note · yesterday, 15:40</strong><p>“Moved 4 pigs out of A2.”<br>Recorded by G. Hansen · Unit 7</p></div><div class="evidence"><strong>What is missing</strong><p>The destination unit and pen. No movement record has been changed.</p></div>${state.answered?`<div class="message">Your answer: ${esc(state.answer)}<br>Saved in this preview. No live record was changed.</div>`:`<form id="answer-form">${SentriUI.field({label:`Destination or clarification`,control:`<textarea id="answer" name="answer" placeholder="For example: Unit 8, pen B3" required maxlength="500">${esc(state.answerDraft||'')}</textarea>`})}</form>`}<p class="work-note">Sample decision for reviewing the Assistant experience.</p>${btn('finding-unit','View Unit 7','secondary')}</div>${SentriUI.sheetFooter({content:SentriUI.backButton({action:'back'})+(state.answered?'':'<button class="primary" type="submit" form="answer-form">Send clarification</button>'),className:'page-footer'})}`;}
-  function toolbox(){const rows=[...(state.unit?[{action:'maintenance',icon:icon('wrench'),title:'Maintenance',description:'Unit '+state.unit+' · equipment issues'}]:[]),{action:'search',icon:icon('search'),title:'Find a pig or pen',description:'Search by ear tag or pen code'},{action:'records',icon:icon('note'),title:'Records',description:'Updates made in this preview'},{action:'sections',icon:icon('barn'),title:'Sections & units',description:'Browse the farm'},{action:'assistant',icon:icon('spark'),title:'Assistant',description:'Questions, findings and decisions'}];return head('Toolbox')+'<div class="app-scroll screen-enter">'+SentriUI.panel(rows.map(r=>SentriUI.row(r)).join(''),{className:'st-row-group'})+'</div>'+nav('toolbox');}
+  function toolbox(){const rows=[...(state.unit?[{action:'maintenance',icon:icon('wrench'),title:'Maintenance',description:'Unit '+state.unit+' · equipment issues'}]:[]),{action:'records',icon:icon('note'),title:'Records',description:'Updates made in this preview'},{action:'sections',icon:icon('barn'),title:'Sections & units',description:'Browse the farm'},{action:'assistant',icon:icon('spark'),title:'Assistant',description:'Questions, findings and decisions'}];return head('Toolbox')+'<div class="app-scroll screen-enter">'+SentriUI.panel(rows.map(r=>SentriUI.row(r)).join(''),{className:'st-row-group'})+'</div>'+nav('toolbox');}
   function recordLog(){return head('Records')+'<div class="app-scroll screen-enter">'+SentriUI.log(SentriUI.logGroups(state.log.map(l=>({title:l.title,detail:l.context,at:l.at,by:'G. Hansen'}))),{empty:'No new records yet. Answers to overnight findings will appear here.'})+'</div>'+nav('toolbox');}
-  const pages={home,sections:sectionChooser,placeholder,environment,maintenance,assistant,finding,toolbox,records:recordLog,schedule:schedulePage,marked:markedPage,find:findPage,scan:scanPage,pig:pigPage};
+  const pages={home,sections:sectionChooser,placeholder,environment,maintenance,assistant,finding,toolbox,records:recordLog,schedule:schedulePage,marked:markedPage,find:findPage,pig:pigPage};
   // The atlas follows the demo (?screen=): the screen whose url holds this scope (view, section, unit, work, attention), else null.
   function atlasScreen(screens){
     const dr=overlay.querySelector('.sheet,.dialog');
@@ -575,8 +576,9 @@
     if(state.page==='finding')return state.answered?'assistant.answered':'assistant.finding';
     if(state.page==='toolbox'&&!dr)return 'workbench.toolbox';
     if(state.page==='records')return 'workbench.records';
-    if(state.page==='find'&&!dr)return !lookup.query.trim()?'find-pig.search':findHits().length?'find-pig.results':'find-pig.search-none';
-    if(state.page==='scan'&&!dr){const sc=lookup.scan;return !sc.connected?'find-pig.scan-no-reader':!sc.items.length?'find-pig.scan':sc.picked.length?'find-pig.scan-ticked':!sc.listening?'find-pig.scan-stopped':'find-pig.scan-list';}
+    if(state.page==='find'&&!dr){const sc=lookup.scan;
+      if(sc.on)return !sc.connected?'find-pig.scan-no-reader':!sc.items.length?'find-pig.scan':sc.picked.length<sc.items.length?'find-pig.scan-ticked':'find-pig.scan-list';
+      return lookup.query.trim()?(findHits().length?'find-pig.results':'find-pig.search-none'):sc.items.length?'find-pig.scan-stopped':'find-pig.search';}
 
     if(state.page==='maintenance'){if(dr)return dr.querySelector('#fault-form')?'environment.report-issue':maintenanceRecords().find(f=>f.id===state.faultId)?.resolved?'environment.issue-resolved':'environment.issue-detail';return maintenanceRecords().length?'environment.maintenance':'environment.maintenance-empty';}
     if(dr){
@@ -598,11 +600,11 @@
     app.classList.toggle('schedule-open',state.page==='schedule');
     if(state.page==='marked'&&SentriUI.rowFitTags)requestAnimationFrame(()=>SentriUI.rowFitTags(app));
     // The list page holds no records of its own, so its one header corner stays free (Headers law), as on the Schedule.
-    if(badge&&!['schedule','marked','find','scan','pig'].includes(state.page))(app.querySelector('.app-header,.page-head,.st-page-header')||app).insertAdjacentHTML('beforeend',badge);
+    if(badge&&!['schedule','marked','find','pig'].includes(state.page))(app.querySelector('.app-header,.page-head,.st-page-header')||app).insertAdjacentHTML('beforeend',badge);
     if(state.page==='find'&&document.activeElement?.closest?.('#app')==null)app.querySelector('[data-find-input]')?.focus({preventScroll:true});
-    if(state.page==='scan')SentriUI.scanArrive(app,lookup.scan);
+    if(state.page==='find')SentriUI.scanArrive(app,lookup.scan);
     if(state.page==='pig')connectPig();
-    const demo=document.querySelector('[data-demo-scan]');if(demo){demo.hidden=state.page!=='scan'||!lookup.scan.connected;demo.disabled=!lookup.scan.listening;}
+    const demo=document.querySelector('[data-demo-scan]');if(demo)demo.hidden=state.page!=='find'||!lookup.scan.on||!lookup.scan.connected;
     window.AtlasBare&&AtlasBare.watch(atlasScreen);
     document.querySelectorAll('[data-demo]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.demo===(state.page==='sections'?'sections':state.unit?'unit':'overview'))));
   }
@@ -631,27 +633,43 @@
     if(unit)url.searchParams.set('unit',unit);else url.searchParams.delete('unit');
     history.replaceState(null,'',url);goHome();
   }
-  /* ---- Find a pig and Scan ear tags: the design system's Lookup pages (components/Lookup; owner decisions 2026-10-12, 2026-10-20, 2026-10-22) ----
-     Both reach every unit of the section the worker is in. Find: type, tap one; nothing is listed before typing. Scan: the reader always
-     listens, and each scan adds the pig to a list, newest first, already ticked for Actions (owner, 2026-10-22: a worker walking past three
-     sick pigs scans them and acts on all three). A pig opens her pig record (the owner, 2026-10-20). */
+  /* ---- Search and scan: one page, the design system's Lookup (components/Lookup; owner decisions 2026-10-12, 2026-10-20, 2026-10-22) ----
+     It reaches every unit of the section the worker is in. The field searches; nothing is listed before typing. Its scan icon turns it into
+     the scan bar, and each read adds the pig to the list, newest first, already ticked for Actions (owner, 2026-10-22: a worker walking past
+     three sick pigs scans them and acts on all three). A result ticks the same way, and the ticks stay through searching and Stop.
+     A pig opens her pig record (the owner, 2026-10-20). */
   const lookupPigs=()=>{const seen=new Map(),marked=Object.values(markedPigs[state.section]||{}).flat();
     marked.forEach(p=>seen.set(p.tag,{tag:p.tag,pen:p.pen,unit:p.unit,cond:p.cond}));
     tasks.filter(t=>t.section===state.section).forEach(t=>Object.keys(t.counts).forEach(u=>taskRecords(t,+u).forEach(r=>{if(!seen.has(r.id))seen.set(r.id,{tag:r.id,pen:r.pen,unit:+u,cond:''});})));
     return [...seen.values()];};
   // One card per unit under a plain "Unit 7" heading, the unit the worker is in first.
   const byUnit=list=>{const here=state.unit||state.workUnit;return [...new Set(list.map(p=>p.unit))].sort((a,b)=>(b===here)-(a===here)||a-b).map(u=>({unit:u,list:list.filter(p=>p.unit===u)}));};
-  const lookup={query:'',scan:{connected:params.get('scan')!=='none',listening:true,items:[],picked:[],seq:0,fresh:{},last:''}};
+  // scan.on: the scan bar is in the field's place (the reader listens); scan.items: every pig read or ticked, newest first; scan.picked: the ticks.
+  const lookup={query:'',scan:{connected:params.get('scan')!=='none',on:false,items:[],picked:[],seq:0,fresh:{},last:''}};
   if(['list','ticked'].includes(params.get('scan'))){lookup.scan.items=lookupPigs().filter((p,i)=>i%5===0).slice(0,3).map(p=>p.tag).reverse();lookup.scan.seq=3;lookup.scan.picked=params.get('scan')==='ticked'?lookup.scan.items.slice(1):lookup.scan.items.slice();}
   function findHits(){const q=lookup.query.trim().toLowerCase();if(!q)return [];const rank=p=>p.tag.startsWith(q)?0:p.tag.includes(q)?1:2;return lookupPigs().filter(p=>p.tag.includes(q)||p.pen.toLowerCase().includes(q)).sort((a,b)=>rank(a)-rank(b)||a.tag.localeCompare(b.tag));}
-  function findBody(){const q=lookup.query.trim().toLowerCase();return SentriUI.findResults({query:lookup.query,groups:byUnit(findHits()).map(g=>({title:'Unit '+g.unit,rows:g.list.map(p=>SentriUI.findRow({code:p.tag,place:'Pen '+p.pen,query:q,right:p.cond?{kind:'tags',tags:[{name:p.cond,level:'ongoing'}]}:null,action:'lookup-pig',value:p.tag}))})),hint:'Type part of an ear tag or a pen, or scan a tag. Searches every unit.',none:'No pig matching “'+lookup.query.trim()+'” in any unit.'});}
-  function findPage(){return SentriUI.findPage({query:lookup.query,placeholder:'Ear tag or pen',results:findBody(),scan:{action:'scan',label:'Scan ear tag'},clear:{action:'find-clear',label:'Clear'},cancel:{action:'back',label:'Cancel'},className:'home-find',bar:document.querySelector('.device>.statusbar')?.outerHTML||''});}
-  // A scanned pig's row: her tag over her pen, and her marked condition on the right when she has one (as To treat and Monitoring draw her).
-  function scanRow(p){const sc=lookup.scan;return SentriUI.rowSelectDoor({code:p.tag,description:'Pen '+p.pen,right:p.cond?{kind:'tags',tags:[{name:p.cond,level:'ongoing'}]}:null,checked:sc.picked.includes(p.tag),action:'scan-pick',value:p.tag,openAction:'lookup-pig',openValue:p.tag,attrs:{'data-scan-tag':p.tag},inputAttrs:{'data-value':p.tag,'aria-label':'Select '+p.tag}});}
-  function scanPage(){const sc=lookup.scan,all=lookupPigs(),items=sc.items.map(t=>all.find(p=>p.tag===t)).filter(Boolean);
-    return SentriUI.scanPage({title:'Scan ear tags',back:{action:'back'},connected:sc.connected,listening:sc.listening,groups:byUnit(items).map(g=>({title:'Unit '+g.unit,rows:g.list.map(scanRow)})),picked:sc.picked.length,selected:n=>n+' '+(n===1?'pig':'pigs')+' selected',actions:{action:'scan-actions',label:'Actions'},toggle:{action:'scan-toggle'},empty:{text:'Each pig you scan is ticked here.',stoppedText:'Resume scanning to add pigs.'}});}
+  // A pig's row, in the list and in the results alike: the tick box, her tag over her pen and her marked condition on the right when she has
+  // one (as To treat and Monitoring draw her), then the door to her record. In the results the typed part is bold, as Find marks it.
+  function pigRow(p,q=''){
+    let html=SentriUI.rowSelectDoor({code:p.tag,description:'Pen '+p.pen,right:p.cond?{kind:'tags',tags:[{name:p.cond,level:'ongoing'}]}:{kind:'state',figure:'',word:'',level:'settled'},checked:lookup.scan.picked.includes(p.tag),action:'scan-pick',value:p.tag,openAction:'lookup-pig',openValue:p.tag,className:q?'st-find-row':'',attrs:{'data-scan-tag':p.tag},inputAttrs:{'data-value':p.tag,'aria-label':'Select '+p.tag}});
+    if(!q)return html;
+    html=html.replace(`<strong class="st-animal-id">${esc(p.tag)}</strong>`,`<strong class="st-animal-id">${SentriUI.findMark(p.tag,q)}</strong>`);
+    return ('pen '+p.pen.toLowerCase()).includes(q)?html.replace(`<span class="st-animal-context">Pen ${esc(p.pen)}<`,`<span class="st-animal-context">${SentriUI.findMark('Pen '+p.pen,q)}<`):html;
+  }
+  // Typed: the results. Otherwise the pigs read or ticked so far, or one line saying what to do.
+  function findBody(){const sc=lookup.scan,q=lookup.query.trim().toLowerCase();
+    if(q&&!sc.on)return SentriUI.findResults({query:q,groups:byUnit(findHits()).map(g=>({title:'Unit '+g.unit,rows:g.list.map(p=>pigRow(p,q))})),none:'No pig matching “'+lookup.query.trim()+'” in any unit.'});
+    const all=lookupPigs(),items=sc.items.map(t=>all.find(p=>p.tag===t)).filter(Boolean);
+    if(!items.length)return `<p class="st-find-hint">${esc(!sc.on?'Type part of an ear tag or a pen, or scan a tag. Searches every unit.':sc.connected?'Hold the reader to an ear tag.':'Scanning starts as soon as the reader connects.')}</p>`;
+    return `<div class="st-scan-body">${SentriUI.lookupGroups(byUnit(items).map(g=>({title:'Unit '+g.unit,rows:g.list.map(p=>pigRow(p))})),{variant:'scan'})}</div>`;}
+  function findPage(){const sc=lookup.scan,n=sc.picked.length;
+    return SentriUI.findPage({query:lookup.query,placeholder:'Ear tag or pen',results:findBody(),scan:{action:'scan',label:'Scan ear tag'},clear:{action:'find-clear',label:'Clear'},cancel:{action:'back',label:'Cancel'},
+      // Scanning: the bar in the field's place, waiting until the reader connects (Reader 1 is the phone's paired reader), as Choose pigs.
+      scanning:sc.on?SentriUI.scanBar({state:sc.connected?'scanning':'waiting',device:'Reader 1',stop:{action:'scan-stop'}}):'',
+      footer:n?SentriUI.sheetFooter({content:`<p class="st-scan-selected">${n} ${n===1?'pig':'pigs'} selected</p>`+SentriUI.button({label:'Actions',icon:icon('more'),register:'primary',action:'scan-actions'}),className:'st-scan-foot'}):'',
+      className:'home-find',bar:document.querySelector('.device>.statusbar')?.outerHTML||''});}
   // "Simulate scan" (outside the phone): the reader reads the next sample pig; a pig already listed is lit again, not added twice.
-  function scanAdd(){const sc=lookup.scan;if(state.page!=='scan'||!sc.connected||!sc.listening)return;const pool=lookupPigs().filter((p,i)=>i%5===0).slice(0,8),tag=pool[sc.seq++%pool.length].tag;if(!sc.items.includes(tag))sc.items.unshift(tag);if(!sc.picked.includes(tag))sc.picked.push(tag);sc.fresh[tag]=Date.now()+1600;sc.last=tag;const before=SentriUI.scanPlaces(app);render();SentriUI.scanGlide(app,before);}
+  function scanAdd(){const sc=lookup.scan;if(state.page!=='find'||!sc.on||!sc.connected)return;const pool=lookupPigs().filter((p,i)=>i%5===0).slice(0,8),tag=pool[sc.seq++%pool.length].tag;if(!sc.items.includes(tag))sc.items.unshift(tag);if(!sc.picked.includes(tag))sc.picked.push(tag);sc.fresh[tag]=Date.now()+1600;sc.last=tag;const before=SentriUI.scanPlaces(app);render();SentriUI.scanGlide(app,before);}
   // Actions for the ticked pigs: the general actions (the owner, 2026-10-12), More actions' everyday verbs.
   function scanActions(){const n=lookup.scan.picked.length;drawer('Actions',SentriUI.rowGrid([['transfer','Transfer'],['condition','Condition'],['treat','Treat'],['note','Note']].map(([k,label])=>({label,title:label+' · '+n+' '+(n===1?'pig':'pigs'),icon:icon(k),action:'scan-act',value:label,attrs:k==='transfer'?{'data-entry':'move'}:{}})),{label:'Actions for the ticked pigs'}),{surface:'menu'});overlay.querySelector('.sheet')?.classList.add('scan-actions-sheet');}
   /* A pig's record: the Inspection pig record, embedded as Farrowing embeds it. Its own Back returns here. */
@@ -719,11 +737,12 @@
     if(a==='finding-unit'){state.section='gestation';state.unit=7;goHome();return;}
     if(a==='toolbox'){push('toolbox');return;}
     if(a==='records'){push('records');return;}
-    if(a==='scan'){push('scan');return;}
-    if(a==='search'){lookup.query='';push('find');return;}
+    if(a==='search'){lookup.query='';lookup.scan.on=false;push('find');return;}
     if(a==='find-clear'){lookup.query='';render();return;}
-    if(a==='scan-toggle'){if(lookup.scan.connected)lookup.scan.listening=!lookup.scan.listening;render();return;}
-    if(a==='scan-pick'){const k=lookup.scan.picked.indexOf(v);if(k<0)lookup.scan.picked.push(v);else lookup.scan.picked.splice(k,1);render();app.querySelector(`[data-scan-tag="${v}"] input`)?.focus({preventScroll:true});return;}
+    if(a==='scan'){lookup.query='';lookup.scan.on=true;render();return;}
+    if(a==='scan-stop'){lookup.scan.on=false;render();return;}
+    // A pig ticked from the results joins the list, so she is still there once the field is cleared.
+    if(a==='scan-pick'){const sc=lookup.scan,k=sc.picked.indexOf(v);if(k<0){sc.picked.push(v);if(!sc.items.includes(v))sc.items.unshift(v);}else sc.picked.splice(k,1);render();app.querySelector(`[data-scan-tag="${v}"] input`)?.focus({preventScroll:true});return;}
     if(a==='scan-actions'){scanActions();return;}
     if(a==='scan-act'){const n=lookup.scan.picked.length;closeDrawer();toast(v+' · '+n+' '+(n===1?'pig':'pigs')+': not built in this preview');return;}
     if(a==='lookup-pig'){push('pig',{pig:v});return;}

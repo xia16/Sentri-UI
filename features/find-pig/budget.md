@@ -58,3 +58,22 @@ Home's Scan (the bottom bar) and Toolbox › Find a pig or pen open the design s
 - The scan drawer's "Scanner preview", its typed tag and "Use a sample tag".
 - The result row's task and batch line ("Unit 7 · Pregnancy check · Batch 31").
 - The sync badge in Find's and Scan's headers (Headers law: one icon action, and the pages are a task in hand); Home keeps it.
+
+# Search and scan, one page (2026-10-22)
+
+Home's two ways in (Toolbox › Find a pig or pen, and the bottom bar's Scan, which opened its own page) become one page. The owner asked for it: the field searches, and its scan icon turns the field into the scan bar, as Choose pigs does. The middle button is a magnifier with no word.
+
+## Levels
+
+| Fact | Where |
+|---|---|
+| Scanning or not | the bar alone (the field, or the scan bar with Stop); no footer toggle, no second status |
+| Which pigs are ticked | the ticks in the rows; the footer's plain count beside Actions |
+| A pig's tag, pen, condition | one row, the same in the list and in the results (tick, tag over pen, condition right, door) |
+
+## Cut list
+
+- The Scan ear tags page and its title, and its footer's Stop / Resume scanning: Stop is in the bar, and resuming is the field's scan icon.
+- "Scanner not connected" as a page: the bar says "Waiting for reader", as on Choose pigs.
+- Toolbox › Find a pig or pen: one way in.
+- The word under the middle button.

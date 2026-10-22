@@ -852,6 +852,10 @@ export interface FindPageProps {
   inputAttrs?: SafeAttrs;
   /** The host's status bar, drawn inside the white page. */
   bar?: string; className?: string;
+  /** A multi-select host that searches and scans on this page (Home): scanBar(...) in the field's place while the reader is on. */
+  scanning?: string;
+  /** The count and Actions once a pig is ticked: sheetFooter(...). */
+  footer?: string;
 }
 export interface ScanState { fresh?: Record<string, number>; last?: string }
 export interface ScanPageProps {

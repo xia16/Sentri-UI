@@ -1496,7 +1496,9 @@
      generic row (her condition tags, or nothing). The host knows its list, so it passes each row's right side: findRow({right}).
      A single-action task's Scan opens her (read:'open'): nothing is listed and the host opens her on each read. A multi-select task's Scan
      ticks her as she is read, and its footer may carry the task's own actions directly (actions:[{label,action}]).
-     lookupGroups([{title,rows:[html]}],{variant:'find'|'scan'}) · findPage({query,placeholder,results,scan,clear,cancel,inputAttrs,bar})
+     A multi-select place with no task list of its own (Home) searches and scans on one page: Find's field, whose scan icon turns it into
+     the scan bar (findPage({scanning,footer})); each read ticks her, and the ticks stay through searching.
+     lookupGroups([{title,rows:[html]}],{variant:'find'|'scan'}) · findPage({query,placeholder,results,scan,clear,cancel,inputAttrs,bar,scanning,footer})
      findResults({query,groups,hint,none}) · findRow({code,place,query,action,value,right}) · findMark(text,query)
      scanPage({title,back,read,connected,listening,groups,picked,selected,actions,toggle,empty,bar}) · scanArrive(root,scan) · scanPlaces(root) · scanGlide(root,before) */
   function lookupGroups(groups=[],{variant='find'}={}){
@@ -1523,11 +1525,13 @@
   /* The field is pinned and focused (the host focuses [data-find-input] once it has rendered). Natively this is the number-first keyboard
      with an ABC switch (iOS numbersAndPunctuation, Android's 123/ABC toggle); the web has no such input mode, so the field asks for plain
      text with no auto-capitals and no suggestions. A white page (an input surface): the field, Clear while something is typed, the scan
-     icon when the host has a reader, and Cancel. */
-  function findPage({query='',placeholder='Ear tag or pen',label=placeholder,results='',scan=null,clear={action:'find-clear',label:'Clear'},cancel={action:'back',label:'Cancel'},inputAttrs={},bar='',className=''}={}){
+     icon when the host has a reader, and Cancel.
+     A multi-select host searches and scans on this one page (Home, owner 2026-10-22): `scanning` is the scan bar, drawn in the field's place
+     while the reader is on, and `footer` is the count and Actions once a pig is ticked. Without them the page is Find as before. */
+  function findPage({query='',placeholder='Ear tag or pen',label=placeholder,results='',scan=null,clear={action:'find-clear',label:'Clear'},cancel={action:'back',label:'Cancel'},inputAttrs={},bar='',scanning='',footer='',className=''}={}){
     const q=String(query??'');
     const input=`<input data-find-input${safeAttr(inputAttrs)} type="text" inputmode="text" enterkeyhint="search" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" placeholder="${esc(placeholder)}" aria-label="${esc(label)}" value="${esc(q)}">`;
-    return `<section class="st-find${className?' '+esc(className):''}" data-ds="Lookup" data-variant="find" data-st-context="drawer" role="region"${sL(label)}>${bar}<div class="st-find-top">${searchBox({input,value:q,scan,clear})}${button({label:cancel.label||'Cancel',register:'text',action:cancel.action,className:'st-find-cancel'})}</div><div class="st-find-results" role="region" aria-label="Search results" aria-live="polite">${results}</div></section>`;
+    return `<section class="st-find${className?' '+esc(className):''}" data-ds="Lookup" data-variant="find" data-st-context="drawer" role="region"${sL(label)}>${bar}<div class="st-find-top">${scanning||searchBox({input,value:q,scan,clear})}${button({label:cancel.label||'Cancel',register:'text',action:cancel.action,className:'st-find-cancel'})}</div><div class="st-find-results" role="region" aria-label="Search results" aria-live="polite">${results}</div>${footer}</section>`;
   }
   /* Scanning on a list (owner, 2026-10-22: a list that chooses animals scans in place, no Scan page). The host's search bar becomes this
      one status while the reader is on: 'scanning' in the scan hue (the progress wash that Row's Just scanned state uses), or 'waiting' in

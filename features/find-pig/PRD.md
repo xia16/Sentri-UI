@@ -21,6 +21,7 @@ The design system's [Lookup](../../ux/design-system/components/Lookup/README.md)
   - **Opens.** A single-action task (Farrowing) opens the pig on each read; there's no list. Its Scan page only listens. While she is open, the reader waits.
   - **Ticks.** A multi-select place (Home, Inspection's walk, Choose pigs, the heat check when it's designed) ticks each pig as she is read. The bar becomes the actions for the ticked pigs: the count and Actions, or the task's own actions directly. A repeat read keeps her ticked and lights her row.
   - **Scans on a list.** A page that chooses pigs from a list (Choose pigs) scans in place, with no Scan page. The scan button turns the search bar into the scan bar.
+  - **Home searches and scans on one page** (owner, 2026-10-22). The bottom bar's middle button opens it. The button is a magnifier with no word, since the icon says it. The field searches, and its scan icon turns it into the scan bar, as on Choose pigs. Each read ticks the pig. A result can be ticked too. The ticks stay through searching, Stop and leaving the page. Home has no separate Scan page, and Toolbox no longer has Find a pig or pen.
 - **Task membership:** "in the task" means on the task's own list, not just in the same unit. A pig on the list shows the task's row; any other pig shows the generic row (her tag over her pen, her condition tags). The host passes the row's right side.
 - **Where a pig opens:** a task opens her in the task's context (Farrowing: her farrowing drawer, in any unit). A pig outside the task, or anywhere outside a task, opens her pig record. Back returns to the page she was opened from, with the text, the ticks and the scanning kept.
 - **Pens stay the grouping** inside a unit, as the header of each card. Units are plain section headings ("Unit 7"), the worker's unit first.
@@ -36,7 +37,7 @@ The design system's [Lookup](../../ux/design-system/components/Lookup/README.md)
 | No longer on the farm (died, sold, culled, moved to another farm) | Her record · "Died 14 Oct · …" | Not added (proposed) | Not added: "Pig not on the farm · 000512 · Died 14 Oct" | Open question 2 |
 | No pig has this tag (a new, empty tag, or not synced to this phone yet) | A toast on Scan: "No pig with this tag · 000999 · New tag, or not synced yet" | Not added (proposed) | Not added: the same toast | "No pig matching" |
 | Read again | — (the reader waits while she is open) | Stays ticked, row lights | Stays ticked, row lights | — |
-| Reader not connected, or it drops | Scan page · "Scanner not connected" | The same | The bar · "Waiting for reader · Make sure Reader 1 is on" | — |
+| Reader not connected, or it drops | Scan page · "Scanner not connected" | Inspection: the same. Home: the bar · "Waiting for reader · Make sure Reader 1 is on" | The bar · "Waiting for reader · Make sure Reader 1 is on" | — |
 
 **Not added** is one toast at the bottom. It shows a category, then her tag and the reason. It stays, with a ✕ at its left, until the worker closes it or leaves; tapping the rest opens her record (a tag with no pig opens nothing). Reads that miss while it shows pile into it ("2 pigs not added", their tags). Tapping it then lists them, each with its reason. The ticks and the count always show what was added.
 
@@ -70,10 +71,11 @@ Out: ear-notch search, untagged groups, the pig record itself (Pig profile), eac
 
 ## Decisions
 
-- Decided (ASTRA-HOME-DIRECTION): Home keeps Home / Scan / Toolbox.
+- Decided (ASTRA-HOME-DIRECTION): Home keeps Home / Scan / Toolbox. Amended by the owner on 2026-10-22: the middle button is now Search and scan, a magnifier with no word.
 - Decided (owner, 2026-10-12): search and scan are separate pages with one pattern across features.
 - Decided (owner, 2026-10-20): a pig from Home opens her pig record, not a task.
 - Decided (owner, 2026-10-22): scan opens in single-action tasks and ticks in multi-select places, Home included; search rows follow task membership; search and scan is one feature set across every task.
+- Decided (owner, 2026-10-22, later): Home searches and scans on one page. The field's scan icon turns it into the scan bar. The bottom bar's middle button opens the page and shows only a magnifier.
 
 ## Sources
 
