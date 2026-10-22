@@ -24,5 +24,17 @@
       "Long label wraps",
       "Chinese"
     ]
+  },
+  {
+    "id": "figures",
+    "name": "Figures",
+    "use": "the two or three figures a sheet is about to commit (Born 14 · Alive 9 · Dead 5), or a summary of counts: label over a large figure",
+    "notUse": "a figure the worker taps or edits (use Row); a fact with a unit, a trail or a long value (use Two-column); more than three figures; a figure that opens something, because facts never act",
+    "states": [
+      "Default",
+      "Long label / long value",
+      "Two figures",
+      "Three figures"
+    ]
   }
 ]
