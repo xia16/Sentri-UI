@@ -1,6 +1,6 @@
 {
- "measured": "2026-10-21",
- "commit": "7fd9ca9a",
+ "measured": "2026-10-22",
+ "commit": "9fe0ff56",
  "screens": 362,
  "failed": [],
  "components": {
@@ -397,8 +397,18 @@
     "treat",
     "workbench"
    ],
-   "apis": [],
-   "files": []
+   "apis": [
+    "SentriTask.radios"
+   ],
+   "files": [
+    "ux/tasks/piglet-processing/count.html",
+    "ux/tasks/piglet-processing/dead.html",
+    "ux/tasks/piglet-processing/edit.html",
+    "ux/tasks/piglet-processing/id.html",
+    "ux/tasks/piglet-processing/litter.js",
+    "ux/tasks/piglet-processing/simple/app.js",
+    "ux/tasks/piglet-processing/simple/dist/app.html"
+   ]
   },
   "ConditionTag": {
    "screens": [
@@ -3159,26 +3169,6 @@
    ],
    "files": [
     "ux/tasks/piglet-processing/end.html",
-    "ux/tasks/piglet-processing/simple/app.js",
-    "ux/tasks/piglet-processing/simple/dist/app.html"
-   ]
-  },
-  "TaskRadios": {
-   "screens": [],
-   "features": [],
-   "apis": [
-    "SentriUI.choiceRadios",
-    "SentriTask.radios"
-   ],
-   "files": [
-    "ux/system/farrowing-astra-concept.js",
-    "ux/system/inspection-astra-concept.js",
-    "ux/tasks/piglet-processing/count.html",
-    "ux/tasks/piglet-processing/dead.html",
-    "ux/tasks/piglet-processing/edit.html",
-    "ux/tasks/piglet-processing/id.html",
-    "ux/tasks/piglet-processing/litter.js",
-    "ux/tasks/piglet-processing/move.html",
     "ux/tasks/piglet-processing/simple/app.js",
     "ux/tasks/piglet-processing/simple/dist/app.html"
    ]

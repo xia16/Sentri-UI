@@ -1353,6 +1353,26 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 .st-scan-selected{display:flex;align-items:center;min-height:48px;margin:0 auto 0 0;font:600 15px var(--font-sans)}
 .st-scan-foot .st-scan-toggle{flex:1}
 .st-scan-foot>.button.secondary.st-scan-toggle{border:var(--border-width) solid var(--control-border);background:var(--paper)}
+
+/* ChoiceList radio, flat face (face:'flat', layout 'rows'; candidate): a recorded outcome listed inside a form, farrowing's .radio-row: 60px rows, a line under each, a 14px/400 label, the radio right on a thin ring. The prefix is :where() so each rule keeps the specificity it had as .tk-radios (task-skeleton.css): the panel rule below is still outranked by .st-panel.st-panel.st-panel, as it always was, so callers draw as before. */
+:where([data-ds="ChoiceList"])[data-face="flat"] .st-choice-panel{background:transparent;border:0;border-radius:0}
+:where([data-ds="ChoiceList"])[data-face="flat"] .st-choice-row.st-choice-row{min-height:var(--radio-row-min);padding:0;gap:10px;border-bottom:1px solid var(--line)}
+:where([data-ds="ChoiceList"])[data-face="flat"] .st-choice-row.st-choice-row+.st-choice-row{border-top:0}
+:where([data-ds="ChoiceList"])[data-face="flat"] .st-choice-label{font:400 var(--type-button-size)/1.4 var(--font-sans)}
+:where([data-ds="ChoiceList"])[data-face="flat"] .st-choice-row .st-radio{order:2;margin-left:auto;border-width:var(--ring-width-fine);border-color:var(--muted)}
+:where([data-ds="ChoiceList"])[data-face="flat"] .st-choice-row[aria-checked="true"] .st-radio{border-color:var(--ink)}
+:where([data-ds="ChoiceList"])[data-face="flat"] .st-choice-row[data-mode="radio"][aria-checked="true"] .st-choice-label{font-weight:var(--type-weight-strong)}
+/* ChoiceList radio, row face (face:'row', layout 'inline'; candidate): farrowing's inline field, the label (Optional tag, Clear) left, outlined option pills right. */
+.st-choice-inline[data-ds="ChoiceList"][data-face="row"]{display:flex;align-items:center;justify-content:space-between;gap:var(--space-row-y);min-height:64px}
+.st-choice-inline[data-face="row"] .st-choice-inline-label{flex:1;min-width:0;flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:flex-start;column-gap:var(--space-key-gap);font:500 var(--type-entry-label-size)/1.4 var(--font-sans)}
+.st-choice-inline[data-face="row"] .st-choice-inline-label small{font:400 var(--type-meta-size)/1.4 var(--font-sans)}
+.st-choice-inline[data-face="row"] .st-choice-inline-clear{min-height:var(--tap-min)}
+.st-choice-inline[data-face="row"] .st-choice-inline-opts{flex:none;display:grid;grid-auto-flow:column;grid-auto-columns:minmax(66px,1fr);gap:6px;align-self:center}
+.st-choice-inline[data-face="row"] .st-choice-inline-opt.st-choice-inline-opt{justify-content:center;gap:5px;min-width:0;min-height:var(--tap-min);padding:0 var(--space-row-y);border:1px solid var(--control-border);border-radius:11px;font:500 var(--type-row-title-size)/1.3 var(--font-sans)}
+.st-choice-inline[data-face="row"] .st-choice-inline-opt[aria-checked="true"]{border-color:var(--ink);background:var(--press);font-weight:var(--type-weight-strong)}
+.st-choice-inline[data-face="row"] .st-radio{width:14px;height:14px;border-width:var(--ring-width-fine);border-color:var(--muted)}
+.st-choice-inline[data-face="row"] .st-radio::after{width:8px;height:8px}
+.st-choice-inline[data-face="row"] [aria-checked="true"] .st-radio{border-color:var(--ink)}
 /* TaskDock's place (Farrowing's pen map, Inspection's pen): a framed button beside the primary tool; the unframed face is the
    frozen piglet-processing room's (SentriTask.dock). */
 .tk-dock-unit { flex: none; display: flex; align-items: center; gap: 9px; min-height: var(--footer-height); margin: 0; padding: 0 3px; border: 0; background: var(--paper); color: var(--ink); text-align: left; }

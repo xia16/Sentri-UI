@@ -21,6 +21,8 @@ Group heading (optional); lead control (optional); option label; meta line (opti
 - **Single** (`single`): use for one value in a catalogue; use radio for visible unselected outcomes instead.
 - **Multi** (`multi`): use for independent values with trailing checkboxes; use single for one value instead.
 - **Radio rows** (`radio`): use for two to four recorded outcomes with visible rings; use PickerField for five or more outcomes instead.
+- **Radio rows, flat face** (`radio-flat`, `face: 'flat'`, candidate): a recorded outcome listed as flat rows inside a form (the sow-death causes, a record's why). The face asks for no panel; each row `radio-row-min` (60px), padding 0, a 10px gap and a 1px `line` under each row (the last too). The label is 14px/400 `ink` (chosen: still 400, as farrowing); the radio is at the right, `radio-size` 20px, a `ring-width-fine` ring in `muted`; chosen: the ring `ink` with the `radio-dot`. Use it when the options are the form's own content and a panel would nest a surface; use the paneled radio rows when the list sits alone in a drawer or a card, `PickerField` for five or more outcomes, and the inline Choice for two or three short ones in one row. Not for a pick that opens a level or commits on tap (single). **Open:** the panel rule (transparent, no border) is outranked by `.st-panel.st-panel.st-panel`, as it was in TaskRadios, so today the rows still sit on the panel's surface, as Piglet processing draws them; making the face truly flat changes those screens and waits for the owner.
+- **Inline Choice, row face** (`inline` with `face: 'row'`, candidate): farrowing's Finish field (`Assisted farrowing  (○ No) (○ Yes)`): one row at least 64px, the label 15px/500 with its Optional tag (10px `muted`) and Clear on the left (they wrap under the label when the row is short), the options right as 44px outlined pills (1px `control-border`, 11px radius, 13px/500, a 14px radio, 6px apart); chosen: the pill's edge `ink` on `press`. Same keys, events and Clear as the inline Choice.
 - **Inline Choice** (`inline`): use for two or three short required outcomes in one 60px row; use radio rows for long labels, and an optional row for an optional input.
 - **Inline Choice, key face** (`inline` with `face: 'key'`, candidate): the same radiogroup drawn as two or three boxed keys in the Stepper row's right column, for a required No / Yes among Stepper rows and Measures (Finish farrowing: Assisted). Each key is the stepper key's face: `paper`, 1px `task-key-border`, `radius-control`, 16px/500, 44px tall in a 48px hit area, an 8px gap; the column runs from the first key's left edge to the last key's right edge (136px). The chosen key takes the selected mark, a 2px `ink` ring and a 600 label, never a fill. Pressed is the keys' press (`press`, scale .96). A row of this face carries a 1px `line` below it, none when last, like a Stepper row. Opt-in: every other inline caller renders as before. Use it only for a required answer; an optional one stays an optional row.
 
@@ -35,7 +37,7 @@ Group heading (optional); lead control (optional); option label; meta line (opti
 | Loading | Loading options status in place of rows. |
 | Empty | No options or no search match; never a blank panel. |
 | Empty, can add | A collection the worker fills (a farm's brands for a medicine): `choiceEmpty(hint, { title, icon })` draws the native "nothing here yet": a glyph on the tint, a title that names what is missing, one line that says how to add it, centred under the search. The search stays the way in: no button beside it. |
-| Long label | Labels and meta wrap, including Chinese; rows grow, never truncate. |
+| Long label | Labels and meta wrap, including Chinese; rows grow, never truncate. The flat face keeps its 60px minimum and grows with the label, the ring staying at the right. |
 
 Every state is in `variants/<id>.html`, drawn in its real container: navigate, single and multi in a picker drawer; radio and inline in a record drawer; each in the 390px phone.
 
@@ -53,7 +55,7 @@ Rows meet `tap-min` (radio and inline rows `radio-row-min`). Single rows expose 
 
 ## API and tokens
 
-`choiceRow`, `choiceGroup`, `choiceSearch`, `choiceEmpty` (`title` and `icon` for the can-add empty state), `choiceRadios` (`layout: 'inline'`, `face: 'key'`), `radioBind`; `pickerOptions` is a compatibility adapter. `secondaryAction` exposes a separately named removal control. `labelHidden` hides only the field label when an enclosing optional row already names it; the accessible label and Clear remain. Types in `../index.d.ts`.
+`choiceRow`, `choiceGroup`, `choiceSearch`, `choiceEmpty` (`title` and `icon` for the can-add empty state), `choiceRadios` (`layout: 'inline'`, `face: 'key'` or `'row'`; `face: 'flat'` on the radio rows), `radioBind`; `pickerOptions` is a compatibility adapter. `secondaryAction` exposes a separately named removal control. `labelHidden` hides only the field label when an enclosing optional row already names it; the accessible label and Clear remain. Types in `../index.d.ts`. `SentriTask.radios` (task-skeleton.js) is a compatibility alias of `choiceRadios` with the flat face (layout `'row'`: the inline field in the row face); the frozen Piglet processing pages still call it. It was the part TaskRadios (archived, [archive/design-system/components/TaskRadios](../../../../archive/design-system/components/TaskRadios/README.md)).
 
 Tokens: `tap-min`, `choice-row-min`, `radio-row-min`, `rule`, `paper`, `ink`, `muted`, `green`, `choice-press`, `disabled-surface`, `font-sans`, `font-size-14`, `type-weight-strong`, `space-8`, `space-12`, `size-20`, `size-24`.
 
@@ -89,6 +91,8 @@ Component: generic and shared across sections. Selection modes are variants of t
 Wheels (`UIPickerView`, `NumberPicker`) are for long ordered values only (dates, times, numbers), never for named options: they are poor with gloves and hide options a farmer should see at once.
 
 ## Changelog
+
+2026-10-22 (library merge, TaskRadios): TaskRadios folds in. The flat radio is `choiceRadios({ face: 'flat' })` and the inline pill field is `face: 'row'`; their CSS moved from task-skeleton.css to bundle.css; `SentriTask.radios` stays as a thin alias with the same markup, so every caller draws as before. The TaskRadios folder is archived; variant `radio-flat`.
 
 2026-10-16 (medicines, owner decision 3): adding starts from a search with no match (one `Add “<typed>”` card, then an add level); the always-shown "Add a brand" row is retired with the Brand field. A secondary group (recently used) takes a group heading.
 

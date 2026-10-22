@@ -27026,6 +27026,7 @@
        "multi",
        "navigate",
        "radio",
+       "radio-flat",
        "single"
       ]
      }
@@ -30169,16 +30170,6 @@
     {
      "name": "TaskReceipt",
      "group": "Task page parts",
-     "status": "in-design",
-     "gate": null,
-     "files": {
-      "variantsJson": false,
-      "variants": []
-     }
-    },
-    {
-     "name": "TaskRadios",
-     "group": "Compatibility and retired",
      "status": "in-design",
      "gate": null,
      "files": {
