@@ -163,7 +163,7 @@ function auditFrame(TOL) {
   // field rule's 48px min-height reached the rows' checkboxes, 12px low on 56px rows). A row is a row-like element (label, button,
   // link, list item, a row role or a Row part) at least 44px tall; the control sits in its right part.
   const ROWISH = 'label, button, a, li, [role="button"], [role="option"], [role="row"], [role="listitem"], [role="menuitem"], [role="link"], [data-ds="Row"]';
-  const CONTROL = 'input[type="checkbox"], input[type="radio"], [role="switch"], [role="checkbox"], [role="radio"], [class*="chevron"]';
+  const CONTROL = 'input[type="checkbox"], input[type="radio"], [role="switch"], [role="checkbox"], [role="radio"], [class*="chevron"], .st-choice-trail > svg'; // the shared ChoiceList navigation slot draws its chevron as a bare svg (Codex review)
   const judged = new Set();
   for (const c of document.querySelectorAll(CONTROL)) {
     if (!scope.contains(c) || !vis(c) || pinned(c) || [...judged].some((j) => j.contains(c))) continue;

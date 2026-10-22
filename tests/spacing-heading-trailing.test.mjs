@@ -65,6 +65,19 @@ test("a row's trailing control off its row's centre is a spacing defect", async 
     assert.equal((await trailing(page('<div class="panel"><a class="row" href="#"><span>Breathing</span><i class="row-chevron" style="width:15px;height:15px;margin-top:30px;background:#888"></i></a></div>'))).length, 1, 'a low chevron');
     assert.deepEqual(await trailing(page('<div class="panel"><a class="row" href="#"><span>Breathing</span><i class="row-chevron" style="width:15px;height:15px;background:#888"></i></a></div>')), [], 'a centred chevron');
     assert.equal((await trailing(page('<div class="panel"><label class="row" style="align-items:flex-start;padding-top:4px"><span>Alerts</span><span role="switch" style="flex:none;width:40px;height:24px;background:#888"></span></label></div>'))).length, 1, 'a switch at the top of its row');
+    // the shared ChoiceList's navigation row, from its own generated markup: its chevron is a bare svg in .st-choice-trail (Codex review)
+    {
+      await p.setContent('<!doctype html><html><head></head><body><div id="m" style="padding:24px 18px"></div></body></html>');
+      await p.addStyleTag({ path: 'ux/design-system/tokens.css' });
+      await p.addStyleTag({ path: 'ux/design-system/components/bundle.css' });
+      await p.addScriptTag({ path: 'ux/design-system/components/bundle.js' });
+      const nav = async (extra) => {
+        await p.evaluate((x) => { document.getElementById('m').innerHTML = '<div class="st-choice-group">' + window.SentriUI.choiceRow({ label: 'Breathing', mode: 'navigate', action: 'condition-level', value: 'Breathing' }) + '</div>'; const s = document.createElement('style'); s.textContent = x; document.head.appendChild(s); }, extra);
+        return (await auditSpacingPage(p)).filter((d) => d.check === 'trailing');
+      };
+      assert.deepEqual(await nav(''), [], 'the shared navigation row, centred');
+      assert.equal((await nav('.st-choice-trail svg{position:relative;top:14px}')).length, 1, 'the shared navigation row, its chevron 14px low');
+    }
     assert.deepEqual(await trailing(page('<div class="panel"><label class="row" style="min-height:40px;align-items:flex-start"><span>Short</span><input class="check" type="checkbox"></label></div>')), [], 'a row under 44px is not judged');
   } finally { await browser.close(); }
 });

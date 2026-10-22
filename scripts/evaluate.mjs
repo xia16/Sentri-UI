@@ -602,6 +602,8 @@ async function evaluateIn(opts, { kids, cleanups }) {
   const confirm = [];
   let confirmedBefore = 0;
   for (const d of screens.diff) {
+    // a screen outside the scope is listed, not judged on its pixels: its failures are rule defects, so no confirmation visits (Codex review)
+    if (isOutside(d.id)) continue;
     const t = d.runs.find((x) => pct[`${d.id} ${x}`] > 0);
     if (!t) continue;
     const [lang, w] = t.split('-');
