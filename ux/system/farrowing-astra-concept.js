@@ -465,7 +465,7 @@ function scanPage(c){
  const sc=c.scan,items=sc.items.map(t=>findSow(c,t)).filter(Boolean),n=sc.picked.length;
  return SentriUI.scanPage({title:'Scan ear tags',back:{action:'room-back'},connected:sc.connected,listening:sc.listening,groups:byUnit(c,items).map(({unit,list})=>({title:unit.name,rows:list.map(h=>sowRow(h.record,{flat:true,select:{checked:sc.picked.includes(h.record.tag)}}))})),picked:n,selected:n=>`${n} ${n===1?'sow':'sows'} selected`,actions:{action:'room-scan-actions',label:'Actions'},toggle:{action:'room-scan-toggle'},empty:{text:'Each sow you scan appears here.',stoppedText:'Resume scanning to add sows.'},bar:status()});
 }
-const pageUnder=(s,c)=>s.view==='roomScanActions'?'roomScan':s.view;
+const pageUnder=(s,c)=>s.view==='roomScanActions'?'roomScan':!/^room/.test(s.view)&&['roomSearch','roomScan'].includes(c.returnToTaskReview)?c.returnToTaskReview:s.view;   // a sow opened from Find a sow or Scan rises over that page, where her Back returns
 function findPage(s){const c=roomContext(s),under=pageUnder(s,c);return under==='roomSearch'?searchPage(c):under==='roomScan'?scanPage(c):'';}
 // The shared generic actions, for the ticked sows only: no farrowing action here (the owner, 2026-10-12). They are More actions' everyday
 // verbs (owner, 2026-10-19): one Row tile grid of an icon and one word, the full action name kept as each tile's accessible name.

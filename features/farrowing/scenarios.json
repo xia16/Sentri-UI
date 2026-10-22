@@ -3421,7 +3421,7 @@
            "gwt": {
             "given": "The worker has searched for 43 and 004318, a sow in Unit 6, is a result.",
             "when": "They tap her.",
-            "then": "Her farrowing drawer opens on her Awaiting face, the same drawer a sow in this unit opens, and its subtitle names her unit and pen."
+            "then": "Her farrowing drawer opens on her Awaiting face, the same drawer a sow in this unit opens, and its subtitle names her unit and pen. Under the drawer is Find a sow with 43 still typed, not the room."
            },
            "authority": [
             {
@@ -3446,6 +3446,11 @@
             {
              "expr": "s.tag === '004318' && c.unitId === '7'",
              "says": "her record is open and the room is still Unit 7",
+             "hard": "wrong-fact"
+            },
+            {
+             "expr": "document.querySelector('.room-surface .st-find [data-room-search]')?.value === '43'",
+             "says": "the page under her drawer is Find a sow, with what was typed",
              "hard": "wrong-fact"
             }
            ]
@@ -4253,7 +4258,7 @@
          "gwt": {
           "given": "Scan ear tags is open with 000418, in Unit 7, scanned.",
           "when": "The worker taps her row.",
-          "then": "Her farrowing drawer opens on Counting."
+          "then": "Her farrowing drawer opens on Counting, over Scan ear tags (not the room)."
          },
          "authority": [
           {
@@ -4272,6 +4277,11 @@
           {
            "expr": "s.tag === '000418'",
            "says": "her record is open",
+           "hard": "wrong-fact"
+          },
+          {
+           "expr": "!!document.querySelector('.room-surface .st-scan-body')",
+           "says": "the page under her drawer is Scan ear tags",
            "hard": "wrong-fact"
           }
          ]
