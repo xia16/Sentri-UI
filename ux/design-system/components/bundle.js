@@ -119,7 +119,11 @@
   }
   /* Facts: read-only label–value pairs. They never act: no button or link in a value (valueHtml is for markup such as an
      ID in mono, and is refused when it holds a control). columns: 2 (default), 3 (short counts) or 1 (a long value that needs the full width). mono: true sets an ID. */
-  function facts(items,{className='',columns=2,variant=''}={}){
+  function facts(items,{className='',columns,variant='',panel=true}={}){
+    if(variant==='figures'){ /* figures: the two or three figures a sheet is about to commit, or a summary of counts: label over a large figure. A plain read: a figure never acts. panel: false when the host already is the surface. */
+      const n=columns===2||columns===3?columns:Math.min(3,Math.max(2,items.length));
+      return `<dl class="${panel?'st-panel ':''}st-facts ${esc(className)}" data-ds="Facts" data-variant="figures" data-columns="${n}">${items.map(i=>`<div class="st-fact"><dt>${tx(i.label,i,'label')}</dt><dd>${has(i,'value')?tx(i.value,i,'value'):esc(i.value==null||i.value===''?'—':i.value)}</dd></div>`).join('')}</dl>`;
+    }
     const cols=columns===3?3:columns===1?1:2;
     const valueOf=i=>{
       if(i.valueHtml!=null){
@@ -401,11 +405,11 @@
   }
   // lead: optional control between heading and panel (e.g. a segment that filters only this group).
   // radio (candidate, ADR 0002): the panel is the radiogroup, labelled by the heading.
-  function choiceGroup(rows,{title='',lead='',className='',radio=false,aside='',id='',icon='',strs,args}={}){
+  function choiceGroup(rows,{title='',lead='',className='',radio=false,aside='',id='',icon='',face='',strs,args}={}){
     const body=Array.isArray(rows)?rows.join(''):rows;
     const showTitle=title||has({strs},'title');
     const hid=radio&&showTitle?(id||fieldId('st-choice'))+'-title':'';
-    return `<section class="st-choice-group ${esc(className)}" data-ds="ChoiceList"${title?` aria-label="${esc(title)}"`:''}>${showTitle?(aside?`<div class="st-choice-heading-row"><h5 class="st-choice-heading"${hid?` id="${esc(hid)}"`:''}>${icon?glyph(icon):''}${tx(title,{strs,args},'title')}</h5>${aside}</div>`:`<h5 class="st-choice-heading"${hid?` id="${esc(hid)}"`:''}>${icon?glyph(icon):''}${tx(title,{strs,args},'title')}</h5>`):''}${lead?`<div class="st-choice-lead">${lead}</div>`:''}<div class="st-panel st-choice-panel"${radio?` role="radiogroup"${hid?` aria-labelledby="${esc(hid)}"`:''}`:''}>${body}</div></section>`;
+    return `<section class="st-choice-group ${esc(className)}" data-ds="ChoiceList"${face?` data-face="${esc(face)}"`:''}${title?` aria-label="${esc(title)}"`:''}>${showTitle?(aside?`<div class="st-choice-heading-row"><h5 class="st-choice-heading"${hid?` id="${esc(hid)}"`:''}>${icon?glyph(icon):''}${tx(title,{strs,args},'title')}</h5>${aside}</div>`:`<h5 class="st-choice-heading"${hid?` id="${esc(hid)}"`:''}>${icon?glyph(icon):''}${tx(title,{strs,args},'title')}</h5>`):''}${lead?`<div class="st-choice-lead">${lead}</div>`:''}<div class="st-panel st-choice-panel"${radio?` role="radiogroup"${hid?` aria-labelledby="${esc(hid)}"`:''}`:''}>${body}</div></section>`;
   }
   /* The search field's ends, one look wherever a worker types to narrow (Lookup's Find, a picker's catalogue, a list's ear-tag
      search): Clear (✕, only while something is typed) and the scan glyph when the host has a reader. `clear.action` is the host's,
@@ -454,6 +458,16 @@
     const v=oneOf('IconButton','variant',variant,['bordered','plain'],'bordered');
     const rid=reason?(describedby||fieldId('st-icon-reason')):describedby;
     return `<button type="button" class="icon-button ${esc(className)}" data-ds="IconButton" data-variant="${v}" data-action="${esc(action)}" data-value="${esc(value)}" aria-label="${esc(label)}"${count!==''&&count!=null?' data-count=""':''}${tone==='attention'?' data-tone="attention"':''}${disabled?' aria-disabled="true"':''}${pressed?' data-preview="pressed"':''}${selected!=null?` aria-pressed="${!!selected}"`:''}${rid?` aria-describedby="${esc(rid)}"`:''}${safeAttr(attrs)}><span aria-hidden="true">${icon}</span>${count!==''&&count!=null?`<span class="icon-button-count" aria-hidden="true">${esc(count)}</span>`:''}${selected?`<span class="st-icon-selected" aria-hidden="true">${sGlyph('check')}</span>`:''}${hasBadge?`<span class="filter-badge">${tx(badge,o,'badge')}</span>`:''}</button>${reason?buttonReason({id:rid,text:reason}):''}`;
+  }
+  /* TaskDock: a task page's bottom bar, lifted unchanged from Farrowing's room dock (owner proposal, 2026-10-21). The place (a
+     framed button: Farrowing's pen map, Inspection's pen), the one primary tool (Scan ear tag) and icon tools (Search). A host's own
+     bar for the moment (Inspection's selection: the count and Actions) takes the dock's place through `content`. The frozen
+     piglet-processing room keeps SentriTask.dock's older face. */
+  function taskDock({label='Task tools',place=null,primary=null,tools=[],content='',className=''}={}){
+    const pl=place?`<button data-framed type="button" class="tk-dock-unit dock-map"${place.aria?` aria-label="${esc(place.aria)}"`:''} data-action="${esc(place.action)}" data-value="${esc(place.value??'')}">${SentriIcons.icon(place.icon||'grid')}<span><strong>${esc(place.label)}</strong></span></button>`:'';
+    const pr=primary?button({label:'',register:'primary',action:primary.action,value:primary.value??'',className:'dock-scan',attrs:primary.attrs||{}}).replace('<span class="st-button-label"></span>',`${SentriIcons.icon(primary.icon||'scan')}<span>${esc(primary.label)}</span>`):'';
+    const tl=tools.map(x=>iconButton({action:x.action,value:x.value??'',icon:SentriIcons.icon(x.icon),label:x.label,className:x.className||''})).join('');
+    return `<nav class="room-dock${className?' '+esc(className):''}" data-ds="TaskDock" aria-label="${esc(label)}">${content||pl+pr+tl}</nav>`;
   }
   /* ---- Field cards (candidate, ADR 0001): Stepper, Measure, Numpad ----
      Event contract: every control is a <button data-action> whose data-value is the caller's field key;
@@ -1001,19 +1015,21 @@
   function choiceRadios({label='',optional='',options=[],selected='',action='choose',key='',layout='rows',face='',lead='',clear='Clear',id='',className='',disabled=false,reason='',pressed=false,labelHidden=false,strs,args}={}){
     const o={strs,args},s=strs||{},a=args||{},rid=id||fieldId('st-radios');
     const lay=oneOf('ChoiceList','layout',layout,['rows','plain','inline'],'rows');
-    /* face (inline only, opt-in): 'key' draws each option as a boxed key in the Stepper's 136px column instead of a ring and a word. */
-    const keyFace=oneOf('ChoiceList','face',face||'default',['default','key'],'default')==='key'&&lay==='inline';
+    /* face (opt-in): 'key' (inline) draws each option as a boxed key in the Stepper's 136px column instead of a ring and a word;
+       'row' (inline) draws the options as outlined pills beside the label; 'flat' (rows) draws the field with no panel: 60px rows, a line under each, a thin ring. */
+    const faceName=oneOf('ChoiceList','face',face||'default',['default','key','row','flat'],'default');
+    const keyFace=faceName==='key'&&lay==='inline',rowFace=faceName==='row'&&lay==='inline',flatFace=faceName==='flat'&&lay==='rows';
     options.forEach(x=>{if(x.mono&&!MONO_OK.test(String(x.label||'')))warn('ChoiceList',`mono is for Latin and digit codes only: "${x.label}"`);});
     const chosen=options.some(x=>x.value===selected),stop=chosen?selected:(options[0]&&options[0].value);
     const isOptional=!!(optional||has(o,'optional'));
     const clearBtn=isOptional&&chosen?button({label:clear,register:'text',action:action+'-clear',value:key,id:rid+'-clear',strs:s.clear?{label:s.clear}:undefined}):'';
     if(lay==='rows'||lay==='plain'){
       const rows=options.map(x=>choiceRow({mode:'radio',label:x.label,meta:x.meta||'',value:x.value,action,selected:x.value===selected,mono:!!x.mono,disabled,reason,pressed,tabindex:x.value===stop?0:-1,attrs:{'data-field':key},strs:x.strs,args:x.args}));
-      return choiceGroup(rows,{title:label,lead,radio:true,aside:clearBtn,id:rid,className:(lay==='plain'?'st-choice-plain ':'')+className,strs:s.label?{title:s.label}:undefined,args:a.label?{title:a.label}:undefined});
+      return choiceGroup(rows,{title:label,lead,radio:true,aside:clearBtn,id:rid,face:flatFace?'flat':'',className:(lay==='plain'?'st-choice-plain ':'')+className,strs:s.label?{title:s.label}:undefined,args:a.label?{title:a.label}:undefined});
     }
     const lid=rid+'-label';
     const opt=x=>`<button type="button" class="st-choice-inline-opt"${disabled?' aria-disabled="true"':''}${pressed&&x===options[0]?' data-preview="pressed"':''} role="radio" aria-checked="${x.value===selected?'true':'false'}" tabindex="${x.value===stop?0:-1}" data-action="${esc(action)}" data-value="${esc(x.value)}">${keyFace?'<span class="st-choice-inline-face">':'<span class="st-radio" aria-hidden="true"></span>'}<span${x.mono?' data-mono=""':''}>${tx(x.label,x,'label')}</span>${keyFace?'</span>':''}</button>`;
-    return `<div class="st-choice-inline ${esc(className)}" data-ds="ChoiceList" data-mode="radio"${keyFace?' data-face="key"':''} id="${esc(rid)}" data-field="${esc(key)}"><span class="st-choice-inline-label"><span id="${esc(lid)}"${labelHidden?' class="st-visually-hidden"':''}><span${sa(s.label,a.label)}>${esc(label)}</span>${isOptional?`<small>${tx(optional,o,'optional')}</small>`:''}</span>${isOptional?`<span class="st-choice-inline-clear">${clearBtn}</span>`:''}</span><span class="st-choice-inline-opts" role="radiogroup" aria-labelledby="${esc(lid)}">${options.map(opt).join('')}</span>${reason?`<span class="st-choice-meta" role="status">${esc(reason)}</span>`:''}</div>`;
+    return `<div class="st-choice-inline ${esc(className)}" data-ds="ChoiceList"${rowFace?' data-face="row"':''} data-mode="radio"${keyFace?' data-face="key"':''} id="${esc(rid)}" data-field="${esc(key)}"><span class="st-choice-inline-label"><span id="${esc(lid)}"${labelHidden?' class="st-visually-hidden"':''}><span${sa(s.label,a.label)}>${esc(label)}</span>${isOptional?`<small>${tx(optional,o,'optional')}</small>`:''}</span>${isOptional?`<span class="st-choice-inline-clear">${clearBtn}</span>`:''}</span><span class="st-choice-inline-opts" role="radiogroup" aria-labelledby="${esc(lid)}">${options.map(opt).join('')}</span>${reason?`<span class="st-choice-meta" role="status">${esc(reason)}</span>`:''}</div>`;
   }
   /* The radio keyboard model, pure: ArrowDown/ArrowRight → next, ArrowUp/ArrowLeft → previous (both wrap), Home → first,
      End → last. Returns the value to select and focus, or null for any other key. */
@@ -1548,7 +1564,7 @@
       const h=before.get('H'+scanKey(e)),hn=e.getBoundingClientRect().height;if(h!==undefined&&Math.abs(h-hn)>.5)e.animate([{height:h+'px',overflow:'hidden'},{height:hn+'px',overflow:'hidden'}],ease);
     }
   }
-  const api=Object.freeze({lookupGroups,findPage,findResults,findRow,findMark,scanPage,scanArrive,scanPlaces,scanGlide,taskTile,weekBoard,weekCell,weekBoardKey,headerLine,pageHeader,rangeSlider,filterSheet,penMap,penMapKey,penMapFooter,penPeek,penMapMount:penMount,optionalRow,keyboardLift,heading,panel,facts,row,rowGroup,log,logDay,logStamp,logGroups,field,rowTile,rowGrid,pickerField,pickerOptions,pickerBody,pickerHead,pickerFooter,filterChips,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,toast,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowSelectDoor,rowAction,rowSelectChange,status,conditionTag,rowFitTags,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
+  const api=Object.freeze({taskDock,lookupGroups,findPage,findResults,findRow,findMark,scanPage,scanArrive,scanPlaces,scanGlide,taskTile,weekBoard,weekCell,weekBoardKey,headerLine,pageHeader,rangeSlider,filterSheet,penMap,penMapKey,penMapFooter,penPeek,penMapMount:penMount,optionalRow,keyboardLift,heading,panel,facts,row,rowGroup,log,logDay,logStamp,logGroups,field,rowTile,rowGrid,pickerField,pickerOptions,pickerBody,pickerHead,pickerFooter,filterChips,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,toast,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowSelectDoor,rowAction,rowSelectChange,status,conditionTag,rowFitTags,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
   root.SentriUI=api;
   if(typeof module!=='undefined')module.exports=api;
 })(globalThis);

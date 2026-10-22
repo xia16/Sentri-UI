@@ -4,7 +4,7 @@
 
 ## Recommended core
 
-The walk is a place-based list of pens and identified pigs, with fast ad-hoc recording. Keep room identity, grouped animal rows, readable findings, distinct selection targets, a persistent selection count, and a short action sheet. Reading a pig and selecting a pig must remain different gestures. A saved finding returns to the same place and updates the affected rows. Ending a walk records attendance; it does not certify that every pig is healthy or that every ration was delivered. These follow [components §05](../../system/components.html) and [check-in §§06a–g](../../system/check-in.html).
+The walk is a place-based list of pens and identified pigs, with fast ad-hoc recording. Keep room identity, grouped animal rows, readable findings, distinct selection targets, a persistent selection count, and a short action sheet. Reading a pig and selecting a pig must remain different gestures. A saved finding returns to the same place and updates the affected rows. Ending a walk records attendance; it does not certify that every pig is healthy or that every ration was delivered. These follow [components §05](../../archive/components.html) and [check-in §§06a–g](../../system/check-in.html).
 
 The husbandry basis is broader than scheduled production work: Defra's England code describes inspection of animals and equipment plus recording findings and actions. It includes appetite, condition and lameness among observable concerns. Use these as observation vocabulary; do not generate diagnoses, medical urgency thresholds or treatments from elapsed days. This is a husbandry reference, not an assertion of the prototype farm's jurisdiction. [Defra, inspection §§25–27](https://www.gov.uk/government/publications/pigs-on-farm-welfare/caring-for-pigs#inspection).
 
@@ -12,12 +12,12 @@ The husbandry basis is broader than scheduled production work: Defra's England c
 
 | Interaction | Recommendation | Repository basis |
 |---|---|---|
-| Tagged pig checkbox | Toggle identity without navigating; preserve a visible total across pens and filters. | [Components §05](../../system/components.html) |
+| Tagged pig checkbox | Toggle identity without navigating; preserve a visible total across pens and filters. | [Components §05](../../archive/components.html) |
 | Pig row body | Open readable identity, findings, active instructions and history. | [Check-in §06d](../../system/check-in.html) |
 | Pen checkbox | The new study selects visible pigs only, with that scope stated explicitly. Keep pen feeding entry separate. This intentionally differs from the reference, where ticking a pen adds both the pen and its pigs. | [Check-in §06b](../../system/check-in.html) |
 | Bulk condition or note | One payload applied to reviewed identities; sheet repeats the count and lets the selection be inspected. | [Health operations, shared decisions](../ops/health.md) |
-| Weight | One value for each identified pig, using a next-pig sequence. Never stamp one weight across a bulk selection. | [Components §04, Weigh arity](../../system/components.html) |
-| Mixed eligibility | Explain excluded subjects; do not silently claim that all selected pigs received the action. | [Components §04, roster](../../system/components.html) |
+| Weight | One value for each identified pig, using a next-pig sequence. Never stamp one weight across a bulk selection. | [Components §04, Weigh arity](../../archive/components.html) |
+| Mixed eligibility | Explain excluded subjects; do not silently claim that all selected pigs received the action. | [Components §04, roster](../../archive/components.html) |
 | Reproductive events | Preserve action-specific arity; several production events are single-pig only. They are outside the first compact demo rather than bulk shortcuts. | [Inspection production extraction](../inspection/part-c1.md) |
 
 An individual ear tag names the animal; an untagged group's count is not a synthetic identity. This study explicitly uses two sample tagged growers in D4. That fixture does not stand in for an untagged population; an untagged pen needs its own group record. [Health operations, group rows](../ops/health.md).

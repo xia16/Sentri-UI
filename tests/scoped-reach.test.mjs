@@ -62,7 +62,7 @@ test("a component page's variant names the exports it calls, through an alias to
   assert.equal(variantCalls('var UI = SentriUI || {}; UI.row()'), null);
 });
 
-test("a shared change keeps the component pages of the parts it touches or calls; CSS can't be narrowed", () => {
+test('a shared change keeps the component pages of the parts it touches, calls or styles', () => {
   const variants = { 'Row/navigation': 'SentriUI.rowGroup(SentriUI.row({}))', 'Sheet/page': 'SentriUI.sheet({})', 'Toast/default': 'render(SentriUI)' };
   const readVariant = (c, v) => variants[`${c}/${v}`] ?? null;
   const stamps = new Map([['SentriUI.row', ['Row']], ['SentriUI.sheet', ['Sheet']], ['SentriUI.toast', ['Toast']]]);
@@ -81,6 +81,18 @@ test("a shared change keeps the component pages of the parts it touches or calls
   // the stylesheet, or a bundle the graph can't narrow: every page
   assert.equal(componentScope({ files: ['ux/design-system/components/bundle.css'], stamps, readVariant }).keepPage('ds:Sheet/page'), true);
   assert.equal(componentScope({ files: ['ux/design-system/components/bundle.js'], change: { all: true, exports: [] }, stamps, readVariant }).keepPage('ds:Sheet/page'), true);
+  // a stylesheet edit narrowed by its rules (css-reach.mjs): a page a changed rule may style, plus what the JS keeps
+  const css = { change: { all: false, units: [] }, mayStyle: (c) => c === 'Row' };
+  const styled = componentScope({ files: ['ux/design-system/components/bundle.css'], stamps, readVariant, css });
+  assert.equal(styled.narrow, true);
+  assert.equal(styled.keepPage('ds:Row/navigation'), true, 'a changed rule may style it');
+  assert.equal(styled.keepPage('ds:Sheet/page'), false, 'no changed rule can');
+  assert.equal(styled.keepPage('ds:Toast/default'), true, "its calls can't be bounded");
+  const both = componentScope({ files: ['ux/design-system/components/bundle.css', 'ux/design-system/components/bundle.js'], change: { all: false, exports: ['SentriUI.sheet'] }, stamps, readVariant, css });
+  assert.equal(both.keepPage('ds:Sheet/page'), true, 'its variant calls a touched export');
+  assert.equal(both.keepPage('ds:Row/navigation'), true, 'a changed rule may style it');
+  assert.equal(componentScope({ files: ['ux/design-system/components/bundle.css'], stamps, readVariant, css: { change: { all: true, units: [] }, mayStyle: () => false } }).keepPage('ds:Sheet/page'), true, 'a rule that can match any page');
+  assert.equal(componentScope({ files: ['ux/design-system/components/bundle.css', 'ux/design-system/tokens.css'], stamps, readVariant, css }).keepPage('ds:Sheet/page'), true, 'tokens: every page');
 });
 
 const BUNDLE = (extra = '', exp = '') => `(function(root){'use strict';

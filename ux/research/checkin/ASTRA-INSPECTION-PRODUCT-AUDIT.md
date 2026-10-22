@@ -27,7 +27,7 @@ Date: 2026-09-12. Scope: source audit for the inspection concept; not a replacem
 ### Feed contradictions that must remain explicit
 
 - `system/check-in.html:648` says pen Feed can adjust the pen by %, single-pig Feed is N=1, and shared percentages across arbitrary selected pigs are deliberately impossible.
-- The same file at `:704` says bulk Thin/Fat marks **replace pen feed adjustment**. `system/components.html:1082` says Feed is never a verb: adjustments are a case consequence. `research/ops/pen-ops.md:7–9` repeats the latter rule.
+- The same file at `:704` says bulk Thin/Fat marks **replace pen feed adjustment**. `archive/components.html:1082` says Feed is never a verb: adjustments are a case consequence. `research/ops/pen-ops.md:7–9` repeats the latter rule.
 - The Feed PRD extraction itself does not map pen/batch-scoped adjustments to a clear execution model (`feed-mobile.md:113,290`). Therefore a free whole-pen percentage editor cannot be called a settled production requirement.
 - Recommended resolution for this concept: follow the coherent case-led / farm-configured preset model in components + operations, keep pen feeding readable, and retain the direct-pen-percentage dispute as an open product decision.
 - Formula assignment permissions also conflict: stock-out can automatically invoke a configured fallback, while manual substitute assignment belongs to a manager (`research/ops/pen-ops.md:62–69`). A farmer can record an actual switch to an already configured due formula without being granted arbitrary formula authoring; label this a proposed workflow where the source has no barn screen.

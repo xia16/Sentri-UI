@@ -531,8 +531,8 @@ export interface HoldBindOptions {
 }
 export interface RadioOption { value: string; label: string; meta?: string; /** Latin and digit codes only (warns in dev otherwise). */ mono?: boolean; strs?: Strs<'label' | 'meta'>; args?: StrArgs<'label' | 'meta'> }
 export interface ChoiceRadiosProps {
-  /** Candidate, `layout: 'inline'` only: 'key' draws each option as a boxed key in the Stepper row's right column (the chosen key takes a 2px ink ring). */
-  face?: 'default' | 'key';
+  /** Candidate, opt-in. `layout: 'inline'`: 'key' draws each option as a boxed key in the Stepper row's right column (the chosen key takes a 2px ink ring); 'row' draws outlined pills beside the label. `layout: 'rows'`: 'flat' draws the rows with no panel (60px, a line under each, a thin ring on the right), for a recorded outcome inside a form. */
+  face?: 'default' | 'key' | 'row' | 'flat';
   /** Hide only the field label when an enclosing optional row already names it; accessible label and Clear remain. */
   labelHidden?: boolean;
   disabled?: boolean;
@@ -648,7 +648,7 @@ export interface SentriUI {
   numpadScanner(options: { onKey?: (key: NumpadKey) => void; onScan?: (digits: string) => void; gap?: number; minKeys?: number; now?: () => number; later?: (f: () => void, ms: number) => unknown; cancel?: (handle: unknown) => void }): { handle(event: Pick<KeyboardEvent, 'key'>): boolean; flush(): void };
   heading(props: HeadingProps): string;
   panel(content: string, options?: PanelOptions & { ds?: string }): string;
-  facts(items: Fact[], options?: { columns?: 1 | 2 | 3; className?: string }): string;
+  facts(items: Fact[], options?: { columns?: 1 | 2 | 3; className?: string; variant?: 'record' | 'figures'; panel?: boolean }): string;
   row(props: RowProps): string;
   /** One action as an icon well over one word (More actions' everyday verbs). The accessible name is the word, then `title` (the full action name) when it does not already hold the word. */
   rowTile(props: { label: string; title?: string; icon?: string; action?: string; value?: string; tone?: 'danger' | ''; attrs?: Record<string, string>; className?: string }): string;
@@ -681,6 +681,8 @@ export interface SentriUI {
   /** The shared search field (searchBox) in a picker or a list: glyph, ✕ Clear while typing (the host's clear.action, else it empties the field and fires input), scan when the host has a reader. */
   choiceSearch(props?: { label?: string; placeholder?: string; value?: string; attrs?: SafeAttrs; scan?: { action: string; label?: string } | null; clear?: { action?: string; label?: string }; strs?: Strs<'label' | 'placeholder'>; args?: Record<string, unknown> }): string;
   /** Find's search field (Lookup): a box holding the search glyph, the host's <input>, ✕ Clear while it holds text, the scan glyph when scan is given. choiceSearch draws the same look on the host's own input. */
+  /** TaskDock: a task page's bottom bar (Farrowing's room dock): the framed place, the one primary tool, icon tools; content replaces them for a host's own bar. */
+  taskDock(props?: { label?: string; place?: { action: string; label: string; icon?: string; aria?: string; value?: string } | null; primary?: { action: string; label: string; icon?: string; value?: string; attrs?: SafeAttrs } | null; tools?: { action: string; icon: string; label: string; className?: string; value?: string }[]; content?: string; className?: string }): string;
   searchBox(props?: { input?: string; value?: string; scan?: { action: string; label?: string } | null; clear?: { action?: string; label?: string }; tag?: string; className?: string }): string;
   toast(title: string, options?: { detail?: string; tone?: 'done' | 'offline' | 'notice' | 'attention'; standing?: { action?: string; value?: string; label?: string } | null; strs?: Strs<'title' | 'detail'>; args?: StrArgs<'title' | 'detail'> }): string;
   choiceEmpty(text: string, options?: { strs?: Strs<'text' | 'title'>; args?: StrArgs<'text' | 'title'>; title?: string; icon?: string }): string;

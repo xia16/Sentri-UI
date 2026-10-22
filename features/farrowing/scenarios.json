@@ -3456,6 +3456,57 @@
            ]
           }
          ]
+        },
+        {
+         "type": "action",
+         "id": "search.empty.43.scan",
+         "label": "tap the scan icon in the field",
+         "taps": [
+          "[data-action='room-scan']"
+         ],
+         "children": [
+          {
+           "type": "action",
+           "id": "search.empty.43.scan.back",
+           "label": "tap the back arrow",
+           "taps": [
+            "[data-action='room-back']"
+           ],
+           "children": [
+            {
+             "type": "outcome",
+             "id": "fa-s27-back-from-scan-returns-to-find-a-sow",
+             "tree": "S-27",
+             "label": "Back from Scan opened in Find a sow returns to Find a sow, with what was typed",
+             "gwt": {
+              "given": "The worker has typed 43 in Find a sow and opened Scan ear tags from the scan icon in the field.",
+              "when": "They tap the back arrow.",
+              "then": "Find a sow is in front again with 43 still typed and its results, not the room list."
+             },
+             "authority": [
+              {
+               "src": "design-system",
+               "at": "README · Back",
+               "says": "Back leaves and returns to where you came from, keeping the draft"
+              }
+             ],
+             "visible": [
+              {
+               "screen": "farrowing.search-results",
+               "hard": "dead-end"
+              }
+             ],
+             "record": [
+              {
+               "expr": "document.querySelector('[data-room-search]')?.value === '43'",
+               "says": "the field still holds 43",
+               "hard": "wrong-fact"
+              }
+             ]
+            }
+           ]
+          }
+         ]
         }
        ]
       },

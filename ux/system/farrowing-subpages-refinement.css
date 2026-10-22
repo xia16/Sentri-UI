@@ -36,7 +36,7 @@
 .farrowing-phone .pen-notice-fault{background:#fff8ea;border-color:#ead9b8}
 .farrowing-phone .pen-detail-copy{font-size:13px;line-height:1.7}
 .farrowing-phone .pen-detail-meta{font-family:var(--font-mono);font-size:13px}
-.farrowing-phone .sheet[data-view=finish] .finish-totals,.farrowing-phone .sheet[data-view=locked] .facts-surface{padding:14px}
+.farrowing-phone .sheet[data-view=locked] .facts-surface{padding:14px}
 .farrowing-phone .sheet[data-view=death] .segment{border:1px solid var(--line)}
 .farrowing-phone .sheet[data-view=locked] .record-inline-actions{padding-top:4px}
 

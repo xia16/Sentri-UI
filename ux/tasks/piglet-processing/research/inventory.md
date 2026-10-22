@@ -29,7 +29,7 @@ most complete renderings of the task are in the **archive** (static mocks from t
 | `home-astra-prototype.js:243-248` `placeholder()` | Generic page: header = task type + batch/unit; empty state `Task preview` / "This task page is still to come. The task stays open between scheduled work."; footer `Back` + `End task early` (or `Complete task` when ready). Completed variant: `Task complete` + "Results page not designed yet." | `head()`, `.empty-state`, `page-footer` | **Pure placeholder** |
 | `ux/system/astra-home-task-card.js:115-128` `"piglet"` | Card rules: title, label `litters with care due`, next `Next care`, dependency `farrowing`, priority list, support/completion rules ("All required items across the entire age-day schedule recorded AND farrowing closed"), source → PRD | home task card | Real rule text (card spec) |
 | `astra-home-task-card.js:208-210` | Fallback line: `Next care · …` / `Waiting for next scheduled care` | same | real |
-| `ux/system/task-cards-astra-prototype.js:11` `id:'piglet'` | Card gallery entry: Batch 28 · `litters with work due` · kind `milestones` · day 3/7 · rule/timing/inside notes | task card gallery | Gallery only; no click-through |
+| `ux/archive/task-cards-astra-prototype.js:11` `id:'piglet'` | Card gallery entry: Batch 28 · `litters with work due` · kind `milestones` · day 3/7 · rule/timing/inside notes | task card gallery | Gallery only; no click-through |
 | `task-cards-astra-prototype.js:32` | Scenarios: `Care due now` · `Next scheduled care` · `Unit waiting` (+ common) | same | real |
 | `ux/system/astra-task-overview.js:26` | Task-overview KPI entry: `On time` 90% · `Target ≥ 90%` · `100/200 Pens completed` · `Day 3 window` | task overview card | sample, reused shape |
 
@@ -64,7 +64,7 @@ with sample data. There is no room/list, filter, bulk, task header, end-task or 
 
 | File · anchor | Content |
 |---|---|
-| `ux/system/components.html` §01b (`:576-579`) | Row-grammar table row `Piglet proc.`: `12 piglets · day 3` · `teeth · tail · castrate · tag/weigh` · done `All done · 9 piglets` ✎ |
+| `ux/archive/components.html` §01b (`:576-579`) | Row-grammar table row `Piglet proc.`: `12 piglets · day 3` · `teeth · tail · castrate · tag/weigh` · done `All done · 9 piglets` ✎ |
 | `components.html` §04 (`:636-641`, `:684`) | Field kit: Checklist sample (`Teeth clipping`, `Castration done Jul 6 · G.H`); Numpad rule "per-piglet tag / weight"; note "Composites… treatments + per-piglet identity" |
 | `components.html` §04d (`:766`), §05 (`:882-884`, `:1133-1157`) | Chassis: composite = weaning & piglet processing; treatments = C1 checklist bulk per litter; tag/weigh = C5 whose section is a C3, per-piglet numpad run; "母猪流产 had no business in a piglet-processing menu" |
 | `components.html` §02 (`:1257`, `:1311-1320`) | Pen picker slide `Piglet processing` — `Go to pen · Unit 7 · due today`, grid cells done/due/late |

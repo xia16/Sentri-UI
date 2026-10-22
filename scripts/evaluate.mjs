@@ -15,8 +15,9 @@ import path from 'node:path';
 import { pwPath, playwright } from './playwright-path.mjs';
 import { removeWorktree } from './worktree-remove.mjs';
 import { closer } from './process-start.mjs';
-import { CLASSES, classOfFiles, DS_FEATURE, componentPage, componentPagesOf, componentsTouched, idPath, screensOf, pageOf, pageAssets, sharedFiles, coverageLost, effectiveClass, classifyScreens, touchesSystem, touchesTools, budgetProblems, critiqueProblems, pageStyling, addedLines, scenarioDebt, isMotionFile, unheldMotion, heldOf, confirmLeaf, CONFIRMED, firstRun, reusableLeaf, IN_PROGRESS, readInProgress, ownFeatures, scopeReach, outsideLine, componentScope, exportStamps, readLibrary, libraryProblems, newExportProblems, frozenFeatures, checksChinese } from './loop-rules.mjs';
+import { CLASSES, classOfFiles, DS_FEATURE, componentPage, componentPagesOf, componentsTouched, idPath, screensOf, pageOf, pageAssets, sharedFiles, coverageLost, effectiveClass, classifyScreens, touchesSystem, touchesTools, budgetProblems, critiqueProblems, pageStyling, addedLines, removedLines, scenarioDebt, isMotionFile, unheldMotion, heldOf, confirmLeaf, CONFIRMED, firstRun, reusableLeaf, IN_PROGRESS, readInProgress, ownFeatures, scopeReach, outsideLine, componentScope, exportStamps, readLibrary, libraryProblems, newExportProblems, frozenFeatures, checksChinese } from './loop-rules.mjs';
 import { bundleShape, bundleChange } from './bundle-graph.mjs';
+import { cssChange, markupWords, unitMayReach, variantTexts } from './css-reach.mjs';
 // The analyser (gate-v2 §2): static and conservative, over both revisions. It says what each screen's and each leaf's evidence
 // depends on; the reach is every screen and leaf whose evidence identity that makes differs between the two (gate-simplify.md X1).
 import { identityInputs, leafInputs, variantInputs } from './static-reach.mjs';
@@ -39,6 +40,7 @@ import { leafRunner, leafRow, reportOf, leafContextPool } from './scenario-runne
 // for fit; ZH at 390 showed nothing ZH 360 didn't. A component page is EN only (its Chinese cells are its own states).
 export const RUNS = [{ width: 390, lang: 'en' }, { width: 360, lang: 'en' }, { width: 360, lang: 'zh' }];
 const BUNDLE_JS = 'ux/design-system/components/bundle.js';
+const BUNDLE_CSS = 'ux/design-system/components/bundle.css';
 // What no page can load: the analyser's own rule (static-reach), repeated for the files an `unbounded` load folds in.
 const NOT_LOADED = [/^docs\//, /^\.github\//, /^tests\//, /^\.claude\//, /^scripts\//, /^(?!ux\/).*\.md$/i];
 const short = (s) => String(s || '?').slice(0, 7);
@@ -248,7 +250,8 @@ async function evaluateIn(opts, { kids, cleanups }) {
   }
   {
     // P2: visual declarations belong to the design system. Read from the diff, so it holds whether or not a screen moves.
-    const ps = pageStyling(addedLines(git(['diff', '-U0', mech.base, mech.candidate, '--', 'ux'], root).out));
+    const uxDiff = git(['diff', '-U0', mech.base, mech.candidate, '--', 'ux'], root).out;
+    const ps = pageStyling(addedLines(uxDiff), removedLines(uxDiff));
     mech.pageStyling = ps;
     check('design-system components only', !ps.length, ps.length ? `${ps.length} visual declaration(s) added outside ux/design-system (${ps.slice(0, 3).map((p) => p.file.split('/').pop() + ' ' + p.prop).join(', ')}): use a SentriUI component, or build the part in the design system (P2, briefs/build.md §3)` : '');
   }
@@ -344,7 +347,32 @@ async function evaluateIn(opts, { kids, cleanups }) {
       const own = ownFeatures({ files, scope, usersOf: (f) => users.get(f) });
       const bc = files.includes(BUNDLE_JS) ? bundleChange(S.base.bundleSrc, S.cand.bundleSrc) : null;
       const readVariant = (c, v) => { for (const k of ['cand', 'base']) { try { return fs.readFileSync(path.join(S[k].dir, `ux/design-system/components/${c}/variants/${v}.html`), 'utf8'); } catch {} } return null; };
-      const { touched, keepPage } = componentScope({ files, change: bc, stamps: exportStamps(S.cand.shape), readVariant });
+      // a bundle.css edit keeps the component pages a changed rule may style: every class one of its selectors requires can occur
+      // in the markup the page's closure can make, on either side (css-reach.mjs; its proof is scripts/css-reach-proof.mjs)
+      let css = null;
+      if (files.includes(BUNDLE_CSS)) {
+        const text = (k) => { try { return fs.readFileSync(path.join(S[k].dir, BUNDLE_CSS), 'utf8'); } catch { return null; } };
+        const [bt, ct] = [text('base'), text('cand')];
+        const change = bt == null || ct == null ? { all: true, why: ['bundle.css is missing on one side'], units: [] } : cssChange(bt, ct);
+        const styles = new Map();
+        const mayStyle = (c, v) => { const k = `${c}/${v}`; if (!styles.has(k)) styles.set(k, styledBy(c, v)); return styles.get(k); };
+        const styledBy = (c, v) => {
+          const f = `ux/design-system/components/${c}/variants/${v}.html`, texts = [];
+          for (const k of ['base', 'cand']) {
+            if (!S[k].tree.has(f)) continue;
+            let t = null;
+            try { t = variantTexts({ inputs: variantInputs(S[k].side, f), read: (x) => { try { return fs.readFileSync(path.join(S[k].dir, x), 'utf8'); } catch { return null; } }, shape: S[k].shape, bundleSrc: S[k].bundleSrc }); } catch {}
+            if (!t) return true;
+            texts.push(...t);
+          }
+          if (!texts.length) return true;
+          const words = markupWords(texts);
+          return change.units.some((u) => unitMayReach(u, words));
+        };
+        css = { change, mayStyle };
+        mech.cssReach = { rules: change.units.length, all: change.all, why: change.why };
+      }
+      const { touched, keepPage } = componentScope({ files, change: bc, stamps: exportStamps(S.cand.shape), readVariant, css });
       const featureOf = new Map([...S.base.screens, ...S.cand.screens].map((x) => [x.id, x.feature]));
       const sc = scopeReach({ reach: reachIds, featureOf: (id) => featureOf.get(id), own, inProgress, keepPage });
       mech.reach.identity = reachIds.size;
@@ -363,7 +391,7 @@ async function evaluateIn(opts, { kids, cleanups }) {
         const ii = iiOf.get(`cand ${id}`) || iiOf.get(`base ${id}`), all = !ii || ii.bundle?.all;
         return { screen: id, feature: featureOf.get(id), uses: all ? [...touched].sort() : (ii.bundle?.exports || []).filter((e) => touched.has(e)), ...(all ? { all: true } : {}) };
       });
-      log(`scope: own ${own.join(', ') || '(none)'}; propagation only on ${inProgress.join(', ')} (${sc.propagation.size} screen(s)); ${sc.outOfScope.screens} screens in ${sc.outOfScope.features.length} features outside the scope: quick check only (390 EN)${sc.outOfScope.componentPages ? `; ${sc.outOfScope.componentPages} component page(s) of parts the change doesn't call` : ''}`);
+      log(`scope: own ${own.join(', ') || '(none)'}; propagation only on ${inProgress.join(', ')} (${sc.propagation.size} screen(s)); ${sc.outOfScope.screens} screens in ${sc.outOfScope.features.length} features outside the scope: quick check only (390 EN)${sc.outOfScope.componentPages ? `; ${sc.outOfScope.componentPages} component page(s) of parts the change doesn't call${css && !css.change.all ? ' or style' : ''}` : ''}`);
     }
   }
   if (!audit) for (const x of S.cand.screens) if (newlyFrozen.includes(x.feature)) reachIds.add(x.id);
