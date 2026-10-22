@@ -6,7 +6,7 @@
 <section data-state="Long-label"><h2>Long-label</h2><div id="state-Long-label"></div></section>
 <script>
 // Each state renders in its own iframe in the atlas: draw only the states present.
-var UI = window.SentriUI;
+const UI = window.SentriUI;
 var RENDER = {
   "state-Default": () => SentriUI.segment({variant:'facet',options:[['any','Any'],['0','0'],['1','1'],['2','2–5'],['6','6+']],active:'any',ariaLabel:'Facet',state:'Default',disabled:false,reason:''}),
   "state-Pressed": () => SentriUI.segment({variant:'facet',options:[['any','Any'],['0','0'],['1','1'],['2','2–5'],['6','6+']],active:'any',ariaLabel:'Facet',state:'Pressed',disabled:false,reason:''}),
