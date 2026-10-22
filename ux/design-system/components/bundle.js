@@ -1526,6 +1526,13 @@
     const input=`<input data-find-input${safeAttr(inputAttrs)} type="text" inputmode="text" enterkeyhint="search" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" placeholder="${esc(placeholder)}" aria-label="${esc(label)}" value="${esc(q)}">`;
     return `<section class="st-find${className?' '+esc(className):''}" data-ds="Lookup" data-variant="find" data-st-context="drawer" role="region"${sL(label)}>${bar}<div class="st-find-top">${searchBox({input,value:q,scan,clear})}${button({label:cancel.label||'Cancel',register:'text',action:cancel.action,className:'st-find-cancel'})}</div><div class="st-find-results" role="region" aria-label="Search results" aria-live="polite">${results}</div></section>`;
   }
+  /* Scanning on a list (owner, 2026-10-22: a list that chooses animals scans in place, no Scan page). The host's search bar becomes this
+     one status while the reader is on: 'scanning' in the scan hue (the progress wash that Row's Just scanned state uses), or 'waiting' in
+     the pending colours until the reader connects. Stop ends it either way and the search field returns. */
+  function scanBar({state='scanning',title='',text='',device='',stop={action:'scan-stop',label:'Stop'}}={}){
+    const waiting=state==='waiting',t=title||(waiting?'Waiting for reader':'Scanning'),x=text||(waiting?`Make sure ${device||'your tag reader'} is on`:'Scan to tick pigs');
+    return `<div class="st-scan-bar" data-ds="Lookup" data-variant="scan-bar" data-state="${waiting?'waiting':'scanning'}" role="status">${SentriIcons.icon('scan')}<span class="st-scan-bar-copy"><strong>${esc(t)}</strong><small>${esc(x)}</small></span>${button({label:stop.label||'Stop',register:'text',action:stop.action,className:'st-scan-bar-stop'})}</div>`;
+  }
   const scanEmpty=(title,text)=>`<div class="st-scan-empty">${SentriIcons.icon('scan')}<strong>${esc(title)}</strong><p>${esc(text)}</p></div>`;
   /* A page (it fills the screen): Back at the top left and the title, no line (Headers law). The footer says whether the reader listens,
      so the body carries no second scanning status. With rows ticked the footer is the plain count and Actions (no Back); with no reader
@@ -1573,7 +1580,7 @@
       const h=before.get('H'+scanKey(e)),hn=e.getBoundingClientRect().height;if(h!==undefined&&Math.abs(h-hn)>.5)e.animate([{height:h+'px',overflow:'hidden'},{height:hn+'px',overflow:'hidden'}],ease);
     }
   }
-  const api=Object.freeze({taskDock,lookupGroups,findPage,findResults,findRow,findMark,scanPage,scanArrive,scanPlaces,scanGlide,taskTile,weekBoard,weekCell,weekBoardKey,headerLine,pageHeader,rangeSlider,filterSheet,penMap,penMapKey,penMapFooter,penPeek,penMapMount:penMount,optionalRow,keyboardLift,heading,panel,facts,row,rowGroup,log,logDay,logStamp,logGroups,field,rowTile,rowGrid,pickerField,pickerOptions,pickerBody,pickerHead,pickerFooter,filterChips,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,toast,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowSelectDoor,rowAction,rowSelectChange,status,conditionTag,rowFitTags,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
+  const api=Object.freeze({taskDock,lookupGroups,findPage,findResults,findRow,findMark,scanPage,scanBar,scanArrive,scanPlaces,scanGlide,taskTile,weekBoard,weekCell,weekBoardKey,headerLine,pageHeader,rangeSlider,filterSheet,penMap,penMapKey,penMapFooter,penPeek,penMapMount:penMount,optionalRow,keyboardLift,heading,panel,facts,row,rowGroup,log,logDay,logStamp,logGroups,field,rowTile,rowGrid,pickerField,pickerOptions,pickerBody,pickerHead,pickerFooter,filterChips,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,toast,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowSelectDoor,rowAction,rowSelectChange,status,conditionTag,rowFitTags,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
   root.SentriUI=api;
   if(typeof module!=='undefined')module.exports=api;
 })(globalThis);

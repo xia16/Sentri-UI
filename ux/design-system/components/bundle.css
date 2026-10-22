@@ -1383,3 +1383,13 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 .tk-dock-unit[data-framed] strong { font: 600 var(--type-dock-caption-size)/1.2 var(--font-sans); }
 .tk-dock-unit[data-framed]:active { background: var(--press); transform: translateY(var(--size-2)); }
 @media (prefers-reduced-motion: reduce) { .tk-dock-unit[data-framed]:active { transform: none; } }
+/* Lookup · scan bar: scanning on a list, in place of the host's search bar. Scanning wears the scan hue (progress, as Row's Just scanned);
+   waiting for the reader wears the pending colours. One status: no second one in the body or the footer. */
+.st-scan-bar{flex:1;min-width:0;display:flex;align-items:center;gap:10px;min-height:var(--tap-min);padding:0 4px 0 14px;border:1px solid var(--chip-progress-border);border-radius:var(--radius-control);background:var(--progress-wash);color:var(--progress-fill-ink)}
+.st-scan-bar>svg{width:20px;height:20px;flex:none}
+.st-scan-bar-copy{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.2}
+.st-scan-bar-copy strong{font:600 15px var(--font-sans)}
+.st-scan-bar-copy small{color:var(--progress);font:400 13px var(--font-sans)}
+.st-scan-bar .st-scan-bar-stop{flex:none;color:inherit}
+.st-scan-bar[data-state="waiting"]{border-color:var(--pending-border);background:var(--pending-surface);color:var(--amber-fill-ink)}
+.st-scan-bar[data-state="waiting"] .st-scan-bar-copy small{color:var(--amber)}
