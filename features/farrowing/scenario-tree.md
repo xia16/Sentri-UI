@@ -45,7 +45,7 @@ States: E0 Home, Farrowing section · E1 Home, Choose unit · E2 room list (Unit
 | E-8 | E2 | tap an Active row | → Counting | S — PRD Anchor; flow | `fa-e8-active-row-opens-counting` |
 | E-9 | E2 | tap a Done row | → the locked record, no counter | S — RUL After the lock | `fa-e9-done-row-opens-record` |
 | E-10 | E2 | tap a Sow died row with piglets to allocate | → the allocation sheet (the same sheet as right after her death) | S — owner decision 2026-10-10 (was RUL: her ended record) | `fa-e10-died-row-opens-ended-record` |
-| E-11 | E2 | Scan ear tag | → ~~her sheet~~ superseded 2026-10-12: Scan ear tags lists each scanned sow; see §8b | S — PRD Scope, then owner decision 2026-10-12 | pending `fa-e11-scan-ear-tag` (superseded by S-21) |
+| E-11 | E2 | Scan ear tag | → ~~her sheet~~ superseded 2026-10-12 (Scan listed each scanned sow), then amended 2026-10-22: a read in Scan ear tags opens her farrowing drawer over Scan, not the room; see §8b S-32 | S — PRD Scope, then owner decisions 2026-10-12 and 2026-10-22 | pending `fa-e11-scan-ear-tag` (superseded by S-32; the read is the demo control, which the runner cannot tap) |
 | E-12 | E2 | read every row | → recorded counts only: no "born N", no "0 dead", no pencil | owner decision 2026-10-10 | `fa-e12-rows-recorded-counts-only` |
 | E-13 | E3 | Find a sow, type 4 | → the same rows, same rules | owner decision 2026-10-10 | `fa-e13-search-rows-recorded-counts-only` |
 | E-14 | E2 | tap a pen header | ? pen tools (feed, fault, note, log) are out of scope by PRD; review tasks-built-2 | S (open) — PRD Scope Out | — |
@@ -175,12 +175,12 @@ States: K0 room with sows still farrowing · K1 End review, all finished · K2 E
 
 ## 8b · Find a sow and Scan ear tags (S)
 
-States: S1 Find a sow, empty field · S2 Scan, no reader paired · S3 Scan, reader connected, nothing scanned · S4 Scan, sows scanned · S5 Scan, a sow scanned again. All S — owner decision 2026-10-12 (PRD, *Owner decisions, 2026-10-12 · Find a sow and Scan ear tags*).
+States: S1 Find a sow, empty field · S2 Scan, no reader paired · S3 Scan, reader connected, listening · S4 Scan, a sow on the farrowing list read (her drawer over Scan) · S5 Scan, any other pig read (her pig record) · S6 Scan, a tag no pig has read (a toast). S-1 to S-12 are owner decision 2026-10-12 (PRD, *Owner decisions, 2026-10-12 · Find a sow and Scan ear tags*). **Owner decision 2026-10-22 amends them:** Farrowing is a single-action task, so Scan ear tags lists nothing and each read opens that sow at once (a multi-select place ticks instead: §8d); and Find a sow's rows follow task membership. The demo control "Simulate scan" (outside the phone) reads 000431, 000434, 004318, 000999, 000418 and on; the runner cannot tap it (hidden in the atlas), so the reads themselves are **pending** and the states they produce are leaves.
 
 | # | State | Event | Result | Src | Leaf |
 |---|---|---|---|---|---|
 | S-1 | S1 | open, before typing | → only the hint; nothing listed; no unit in the header; field focused | S — owner decision 2026-10-12 | `fa-s1-search-lists-nothing-until-typed` |
-| S-2 | S1 | type 43 | → "Unit 7" (000431), then "Unit 6" (000437, 004318), then "Unit 8" (000943) | S — owner decision 2026-10-12 | `fa-s2-search-groups-this-unit-first` |
+| S-2 | S1 | type 43 | → "Unit 7" (000431, 004305), then "Unit 3" (000434, 004329), "Unit 6" (000437, 004318) and "Unit 8" (000943): every pig, a sow on the list or not (amended 2026-10-22; was Unit 7, 6, 8 sows only) | S — owner decision 2026-10-12, 2026-10-22 | `fa-s2-search-groups-this-unit-first` |
 | S-3 | S1 | type 004 | → a tag that starts with it ranks before a tag that contains it | S — owner decision 2026-10-12 | `fa-s3-tags-starting-with-the-text-rank-first` |
 | S-4 | S1 | type B4 | → the sows of pen B4; pen codes match | S — owner decision 2026-10-12 | `fa-s4-pen-codes-match` |
 | S-5 | S1 | type 909 | → "No sow matching “909” in any unit." | S — owner decision 2026-10-12 | `fa-s5-no-match-says-so` |
@@ -188,26 +188,43 @@ States: S1 Find a sow, empty field · S2 Scan, no reader paired · S3 Scan, read
 | S-8 | S1 | tap the scan icon in the field | → Scan ear tags | S — owner decision 2026-10-12 | `fa-s8-search-scan-icon-opens-scan` |
 | S-27 | S1 | type 43, tap the scan icon, then the back arrow | → Find a sow again with 43 typed and its results, not the room | I — Back returns to where you came from (design system, Back) | `fa-s27-back-from-scan-returns-to-find-a-sow` |
 | S-9 | S1 | Cancel | → the room list | S — owner decision 2026-10-12 | `fa-s9-cancel-returns-to-the-room` |
+| S-28 | S1 + 43 | read the rows | → a sow on the farrowing list: tag over "Pen B4", her farrowing state on the right ("3 days" / "Overdue" for 000431); any other pig: tag over her pen, her condition tag or nothing (000434 in Unit 3 "Thin"; 004329 nothing) | S — owner decision 2026-10-22 | `fa-s28-rows-follow-task-membership` |
+| S-29 | S1 + 43 | tap a pig that is not on the list (000434) | → her pig record, not a farrowing drawer; its line "Not in Farrowing · Unit 3 · A2"; Back returns to Find a sow with 43 typed | S — owner decision 2026-10-22 | `fa-s29-a-pig-not-on-the-list-opens-her-pig-record` |
 | S-10 | S2 | open | → "Scanner not connected" and the pairing instruction; no pill, no list, no button | S — owner decision 2026-10-12 | `fa-s10-no-reader-says-so-with-no-buttons` |
 | S-11 | S2 | back arrow | → the room list | S — owner decision 2026-10-12 | `fa-s11-back-arrow-leaves-scan` |
-| S-12 | S3 | open | → "Hold the reader to an ear tag"; Stop scanning (the only status); no banner, no "Not found" | S — owner decision 2026-10-12 | `fa-s12-connected-empty-says-hold-the-reader` |
-| S-13 | S4 | read the list | → one card per unit, this unit first, newest first | S — owner decision 2026-10-12 | `fa-s13-scans-listed-newest-first-in-two-groups` |
-| S-14 | S4 | read a row | → tick box + the animal row with her Farrowing state | S — owner decision 2026-10-12 | `fa-s14-scan-rows-are-select-and-door` |
-| S-15 | S4 | Stop scanning | → Resume scanning; the list is kept | S — owner decision 2026-10-12 | `fa-s15-stop-scanning-pauses-and-keeps-the-list` |
-| S-16 | S4 | Resume scanning | → Stop scanning | S — owner decision 2026-10-12 | `fa-s16-resume-scanning-listens-again` |
-| S-17 | S4 | tick one sow | → "1 sow selected" + Actions (never "More actions") | S — owner decision 2026-10-12 | `fa-s17-one-ticked-shows-the-selection-bar` |
-| S-18 | S4 | Actions with two ticked | → the verb tiles Transfer, Condition, Treat, Note; no Farrowing action | S — owner decision 2026-10-12 | `fa-s18-actions-offer-the-generic-actions-only` |
-| S-19 | S4 | read the footer with a sow ticked | → "N sows selected" as plain text, no chevron, nothing to tap | S — owner decision 2026-10-12 | `fa-s19-selection-count-is-plain-text` |
-| S-20 | S4 | tap the box of the last ticked sow again | → unticked; Stop scanning returns | S — owner decision 2026-10-12 | `fa-s20-unticking-the-last-sow-brings-stop-scanning-back` |
-| S-21 | S4 | tap a row in this unit | → her farrowing drawer | S — owner decision 2026-10-12 | `fa-s21-scan-row-opens-her-drawer` |
-| S-22 | S4 | Back from her drawer | → the scan list, unchanged | I — a scan visit is work in progress | `fa-s22-back-returns-to-the-scan-list` |
-| S-23 | S4 | tick, open another sow, Back | → the tick is kept | I — as S-22 | `fa-s23-ticks-survive-opening-a-sow` |
-| S-24 | S4 | tap a row in another unit | → her farrowing drawer (the same drawer), subtitle "Unit 6 · A2" | S — owner decision 2026-10-12 | `fa-s24-scan-row-in-another-unit-opens-her-drawer` |
-| S-25 | S5 | the reader reads a listed sow again | → still one row (highlighted briefly) | S — owner decision 2026-10-12 | `fa-s25-repeat-scan-does-not-duplicate` |
-| S-26 | S5 | the reader reads a sow | → her row slides in and holds the arrival tint; nothing ticked | S — owner 2026-10-20 | `fa-s26-a-new-scan-lights-her-row` |
-| S-26 | S4 | Actions with two ticked, then Add a note | → the note page for the first ticked sow (no flow takes several sows yet) | S — owner decision 2026-10-12 | `fa-s26-actions-note-opens-the-note-for-the-first-sow` |
+| S-12 | S3 | open | → "Hold the reader to an ear tag" / "Each sow opens as soon as her tag is read."; lists nothing, nothing to tick; Stop scanning (the only status); no banner, no "Not found" (amended 2026-10-22; was "Each sow you scan appears here.") | S — owner decision 2026-10-12, 2026-10-22 | `fa-s12-connected-empty-says-hold-the-reader` |
+| S-30 | S3 | Stop scanning | → "Scanning is stopped" / "Resume scanning to open the next sow."; the footer offers Resume scanning | S — owner decision 2026-10-12, 2026-10-22 | `fa-s30-stop-scanning-pauses-the-reader` |
+| S-31 | S3 stopped | Resume scanning | → Stop scanning; listening again | S — owner decision 2026-10-12 | `fa-s31-resume-scanning-listens-again` |
+| S-32 | S4 | the reader reads a sow on the farrowing list | → her farrowing drawer over Scan, at once; nothing is added to a list | S — owner decision 2026-10-22 | `fa-s32-a-sow-on-the-list-opens-her-drawer`, pending `fa-s35-a-read-opens-her-at-once-with-no-list` |
+| S-33 | S4 | Back from her drawer | → Scan, still listening | S — owner decision 2026-10-22 | `fa-s33-back-from-her-drawer-returns-to-scan-still-listening` |
+| S-34 | S4 | the reader reads a sow on the list in another unit (004318) | → her farrowing drawer (the same drawer), subtitle "Unit 6 · A2" | S — owner decision 2026-10-12, 2026-10-22 | pending `fa-s34-a-sow-in-another-unit-opens-her-drawer` (the read) |
+| S-35 | S5 | the reader reads a pig that is not on the list (000434) | → her pig record, line "Not in Farrowing · Unit 3 · A2" | S — owner decision 2026-10-22 | `fa-s36-a-pig-not-on-the-list-opens-her-pig-record` |
+| S-36 | S5 | the reader reads a pig that died or was sold (000512) | → her pig record with "Died 14 Oct" first, not "Not in Farrowing" | S — owner decision 2026-10-22 | `fa-s37-a-pig-that-died-opens-her-record-with-died-first` |
+| S-37 | S6 | the reader reads a tag no pig has (000999) | → nothing opens; a toast on Scan: "No pig with this tag" / "000999 · New tag, or not synced yet", a ✕ at its left, the rest one door to her pig profile | S — owner decision 2026-10-22 | `fa-s38-an-unknown-tag-gives-a-toast-on-scan` |
+| S-38 | S6 | tap the toast's ✕ | → the toast closes; Scan keeps listening | S — owner decision 2026-10-22 | `fa-s39-the-toast-x-closes-it` |
+| S-39 | S6 | tap the rest of the toast | → her pig profile (deals with a new tag), line "No pig with this tag" | S — owner decision 2026-10-22 | `fa-s40-the-toast-door-opens-her-pig-profile` |
 
-E-11 is superseded: a scan no longer opens her sheet by itself; it adds her to the list (S-13) and her sheet opens from her row (S-21).
+**Superseded 2026-10-22 (kept for history).** Scan ear tags used to list each scanned sow with a tick box, a selection bar and its own Actions sheet (owner decision 2026-10-12). It lists nothing now; choosing many pigs and acting on them moved to §8d. These rows and their leaves are retired; each assertion that still holds has a new leaf above.
+
+| # | State | Event | Result | Src | Leaf |
+|---|---|---|---|---|---|
+| S-13 | S4 | read the list | → ~~one card per unit, this unit first, newest first~~ superseded: Scan lists nothing (S-12) | S — owner decision 2026-10-12, then 2026-10-22 | retired `fa-s13-scans-listed-newest-first-in-two-groups` |
+| S-14 | S4 | read a row | → ~~tick box + the animal row with her Farrowing state~~ superseded: no rows, no tick boxes (S-12) | S — owner decision 2026-10-12, then 2026-10-22 | retired `fa-s14-scan-rows-are-select-and-door` |
+| S-15 | S4 | Stop scanning | → ~~Resume scanning; the list is kept~~ superseded: Resume scanning, nothing to keep (S-30) | S — owner decision 2026-10-12, then 2026-10-22 | retired `fa-s15-stop-scanning-pauses-and-keeps-the-list` |
+| S-16 | S4 | Resume scanning | → ~~Stop scanning~~ carried on as S-31 | S — owner decision 2026-10-12 | retired `fa-s16-resume-scanning-listens-again` |
+| S-17 | S4 | tick one sow | → ~~"1 sow selected" + Actions~~ superseded: no ticks in Scan; many pigs are chosen in §8d | S — owner decision 2026-10-12, then 2026-10-22 | retired `fa-s17-one-ticked-shows-the-selection-bar` |
+| S-18 | S4 | Actions with two ticked | → ~~the verb tiles Transfer, Condition, Treat, Note~~ superseded: the verbs are §8d B-2 | S — owner decision 2026-10-12, then 2026-10-22 | retired `fa-s18-actions-offer-the-generic-actions-only` |
+| S-19 | S4 | read the footer with a sow ticked | → ~~"N sows selected" as plain text~~ superseded: no selection bar in Scan | S — owner decision 2026-10-12, then 2026-10-22 | retired `fa-s19-selection-count-is-plain-text` |
+| S-20 | S4 | tap the box of the last ticked sow again | → ~~unticked; Stop scanning returns~~ superseded: no ticks in Scan | S — owner decision 2026-10-12, then 2026-10-22 | retired `fa-s20-unticking-the-last-sow-brings-stop-scanning-back` |
+| S-21 | S4 | tap a row in this unit | → ~~her farrowing drawer~~ superseded: the read itself opens her (S-32) | S — owner decision 2026-10-12, then 2026-10-22 | retired `fa-s21-scan-row-opens-her-drawer` |
+| S-22 | S4 | Back from her drawer | → ~~the scan list, unchanged~~ superseded: Scan, still listening (S-33) | I — a scan visit is work in progress | retired `fa-s22-back-returns-to-the-scan-list` |
+| S-23 | S4 | tick, open another sow, Back | → ~~the tick is kept~~ superseded: no ticks in Scan | I — as S-22 | retired `fa-s23-ticks-survive-opening-a-sow` |
+| S-24 | S4 | tap a row in another unit | → ~~her farrowing drawer, subtitle "Unit 6 · A2"~~ superseded: the read opens her (S-34) | S — owner decision 2026-10-12, then 2026-10-22 | retired `fa-s24-scan-row-in-another-unit-opens-her-drawer` |
+| S-25 | S5 | the reader reads a listed sow again | → ~~still one row~~ superseded: no list to duplicate | S — owner decision 2026-10-12, then 2026-10-22 | retired `fa-s25-repeat-scan-does-not-duplicate` |
+| S-26 | S5 | the reader reads a sow | → ~~her row slides in and holds the arrival tint~~ superseded: no rows (the arrival tint lives on in §8d B-12) | S — owner 2026-10-20, then 2026-10-22 | retired `fa-s26-a-new-scan-lights-her-row` |
+| S-26 | S4 | Actions with two ticked, then Add a note | → ~~the note page for the first ticked sow~~ superseded: many-pig actions are §8d | S — owner decision 2026-10-12, then 2026-10-22 | retired `fa-s26-actions-note-opens-the-note-for-the-first-sow` |
+
+E-11 is superseded twice: a scan no longer opens her sheet from the room by itself (owner decision 2026-10-12: it listed her), and, amended 2026-10-22, a read in Scan ear tags opens her farrowing drawer over Scan, not the room (S-32); the read cannot be driven by the runner, so `fa-e11-scan-ear-tag` stays pending.
 
 ## 8c · Pen map (P)
 
@@ -220,6 +237,28 @@ States: P1 the room open on its map · P2 the room on its Active tab, then the m
 | P-3 | P1 | read an empty pen | → disabled, its code and nothing else | S — owner decision 2026-10-14 | `fa-p3-empty-pens-are-disabled` |
 | P-4 | P1 | open Pen map again after going to B4 | → B4 in view, no ring or fill | S — owner decision 2026-10-14 | `fa-p4-map-opens-on-the-current-pen` |
 | P-5 | P2 | open the map on the Active tab | → pens the tab hides are disabled; the legend follows the tab | S — owner decision 2026-10-14 | `fa-p5-a-pen-the-tab-hides-is-disabled` (EN only: the room list behind the map is not drawn in Chinese) |
+
+## 8d · Actions for pigs in this unit (B)
+
+States: B1 the room list · B2 the room list, no tag reader paired · B3 Choose pigs, scanning · B4 Choose pigs, reads that cannot join · B5 Choose pigs, three pigs ticked · B6 the room after saving. All S — owner decision 2026-10-22 (feature.json *Actions for pigs in this unit*; owner story: perform other actions on the pigs of this unit without switching to Inspection). The room dock's ··· opens the menu "Actions" with the line "Pigs in Unit 7"; a verb comes first, then the pigs of this unit (the farrowing sows and the other pigs, not a sow that died, not another unit), chosen in Choose pigs (search with scan inside it, a filter, tick rows by pen); Next opens the verb's own form (Inspection's), saved once for every pig chosen. Death is not a verb: it cannot be undone, so it stays one pig at a time. In Choose pigs a scan **ticks**; a read that cannot join (another unit, a pig that died or was sold, a tag no pig has) is not lost and not ticked: it goes into a card at the top of the list. The demo control reads 000431, 004305, 000434, 000512, … while scanning (and reads "Simulate reader on" while the bar waits for the reader); the runner cannot tap it, so the reads are **pending** and the states they produce are leaves.
+
+| # | State | Event | Result | Src | Leaf |
+|---|---|---|---|---|---|
+| B-1 | B1 | tap ··· (Actions) in the dock | → the menu "Actions", line "Pigs in Unit 7" | S — owner decision 2026-10-22 | `fa-b1-dock-actions-opens-the-pigs-sheet` |
+| B-2 | B1 + menu | read the verbs | → Condition, Treat, Care, Note, Measure, Feed, Transfer; no Death, no Record dead | S — owner decision 2026-10-22 (death can't be undone) | `fa-b2-verbs-are-the-everyday-ones-and-death-is-not-one` |
+| B-3 | B1 + menu | tap Condition | → Choose pigs: search field "Ear tag or pen" with a scan button, a filter button, "Condition · tick each pig in Unit 7, or scan.", footer Back + Next (off) | S — owner decision 2026-10-22 | `fa-b3-a-verb-opens-choose-pigs` |
+| B-4 | B1 + Choose pigs | read the list | → Unit 7's living pigs in pen cards (B1, B2, B3, B4, D2): sows with their farrowing row, other pigs with the generic row; the dead sow 000399 is not listed; no pig of another unit | S — owner decision 2026-10-22 | `fa-b4-choose-pigs-lists-this-unit-only-and-no-dead-sow` |
+| B-5 | B1 + Choose pigs | tick a pig; tick another; untick the last | → "Next · 1 pig", "Next · 2 pigs" (a pig outside Farrowing counts too); with none ticked Next is off again | S — owner decision 2026-10-22 | `fa-b5-ticking-a-pig-turns-next-on-with-the-count`, `fa-b6-the-count-follows-the-ticks`, `fa-b7-unticking-the-last-pig-turns-next-off`, `fa-b21-three-ticked-offers-next-with-three-pigs` |
+| B-6 | B1 + Choose pigs | type 43 in the field | → only Unit 7's matches: 000431 (B4) and 004305 (D2); Unit 3's 000434 and 004329 are not offered | S — owner decision 2026-10-22 | `fa-b8-search-narrows-the-unit-list` |
+| B-7 | B1 + Choose pigs | tap the filter button; choose Has a condition; Show N pigs | → the sheet "Filter pigs" with "Show 8 pigs"; the count follows the choice ("Show 1 pig"); applied, the list is 004305 and the button says one filter is applied | S — owner decision 2026-10-22 (the filter as To treat's) | `fa-b9-filter-sheet-counts-the-pigs-it-shows`, `fa-b10-filter-count-follows-the-choice`, `fa-b11-applied-filter-narrows-the-list` |
+| B-8 | B1 + Choose pigs | tap the scan button (reader connected) | → the field becomes the bar "Scanning" / "Scan to tick pigs" with Stop; the list stays | S — owner decision 2026-10-22 | `fa-b12-scan-button-turns-the-bar-to-scanning` |
+| B-9 | B1 + Choose pigs | Back | → the menu "Actions" | I — Back returns up a level (design system, Back) | `fa-b13-back-from-choose-pigs-returns-to-the-menu` |
+| B-10 | B2 | tap the scan button, no reader yet | → the bar "Waiting for reader" / "Make sure Reader 1 is on" with Stop | S — owner decision 2026-10-22 | `fa-b14-scan-with-no-reader-waits-for-it` |
+| B-11 | B2 | the reader connects | → the bar becomes "Scanning" by itself | S — owner decision 2026-10-22 | pending `fa-b15-reader-connects-scanning-starts` (the demo control) |
+| B-12 | B3 | the reader reads a pig of this unit | → she is ticked where she is, her row marked as the arrival; the count follows ("Next · 2 pigs"); a repeat read keeps her ticked | S — owner decision 2026-10-22 | `fa-b16-a-read-of-a-pig-in-this-unit-ticks-her`, pending `fa-b17-reading-the-next-pig-ticks-her-too` (the read) |
+| B-13 | B4 | the reader reads a pig of another unit, a pig that died or was sold, a tag no pig has | → not ticked, no tick box: cards at the top, newest first: "Unit 3" (000434), "Not on the farm" (000622 Sold 2 Oct, 000512 Died 14 Oct), "No pig with this tag" (000999); then the heading "Unit 7" and the pens; the count stays | S — owner decision 2026-10-22 | `fa-b18-reads-that-cannot-join-go-in-the-top-cards`, `fa-b19-reads-that-cannot-join-are-not-ticked`, pending `fa-b20-the-next-read-from-elsewhere-joins-the-top-cards` (the read) |
+| B-14 | B5 | Next · 3 pigs | → the verb's own form (Inspection's Record health), "Save · 3 pigs" | S — owner decision 2026-10-22 | `fa-b22-next-opens-the-verbs-own-form-for-all-three` |
+| B-15 | B6 | save the form | → back on the room list with the toast "Condition recorded · 3 pigs" (the leaf checks the state after saving: the form's own picker is Inspection's) | S — owner decision 2026-10-22 | `fa-b23-saving-returns-to-the-room-with-the-count` |
 
 ## Walk personas (for `docs/design-workflow/briefs/walk.md`)
 
