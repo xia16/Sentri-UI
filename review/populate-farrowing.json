@@ -1,19 +1,5 @@
 [
  {
-  "id": "populate-farrowing-1",
-  "target": { "kind": "feature", "id": "farrowing" },
-  "kind": "decision",
-  "severity": "medium",
-  "title": "Pen tools are drawn in Farrowing and in Inspection",
-  "detail": "Farrowing's room opens a pen page with Feed guidance, Report equipment fault, Add pen note and Pen log (farrowing.pen, pen-log, pen-note, pen-read-note, pen-feed, pen-fault, pen-fault-record). Inspection draws the same flows (inspection.pen, pen-note, pen-log, pen-faults, fault-report, fault-resolve, pen-actions) and feed-plan owns pen feeding. The Farrowing PRD lists the pen tools as present in the prototype but unclear whose feature. Farrowing's feed guidance has no data and only shows its empty state.",
-  "options": [
-   "One pen page owned by Inspection, reused by every task; Farrowing's copies become aliases or are dropped",
-   "Each task keeps its own pen page with the same parts",
-   "Farrowing keeps only Go to pen and the pen header; the pen tools live in Inspection"
-  ],
-  "source": "populate batch 3; features/farrowing/PRD.md Scope (Out); ux/system/farrowing-astra-concept.js penDetails()"
- },
- {
   "id": "populate-farrowing-2",
   "target": { "kind": "feature", "id": "farrowing" },
   "kind": "decision",

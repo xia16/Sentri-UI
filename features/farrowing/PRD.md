@@ -62,7 +62,7 @@ Out:
 - Fostering outside the sow-died case (parked until the owner reopens it; see Decisions, 2026-10-10).
 - Piglet processing and its identity work (separate feature; Move opens after the lock). The prototype's own Piglet processing, identity and mortality pages are mapped as screens; see the decision "Piglet processing is drawn in Farrowing and as its own feature".
 - The sow page itself and the rest of the Actions sheet (pig-profile).
-- Pen tools reachable from a pen header (feed guidance, equipment fault, pen note, pen log): present in the prototype, unclear whose feature; recorded in the Room list issues. The pen pages are mapped as screens; see the decision "Pen tools are drawn in Farrowing and in Inspection".
+- The pen page and its tools (Note, Feed guidance, equipment fault, pen log): Inspection's (owner, 2026-10-22). Farrowing's pen header `›` is the door; the pages Farrowing's prototype draws are mapped under Inspection, in its band "Pen in Farrowing".
 - Console reporting, anomaly queues, per-hand audit views, merge-review UI, notifications.
 - Role gates, batch-close disposition doors beyond what the End task reviews show.
 
@@ -123,3 +123,8 @@ Out:
 - **Assisted is required, No preselected.** On Finish farrowing and in Edit finish details it is a No / Yes choice (the Inline Choice, key face) with **No chosen on a new finish**. There is no unanswered state and no Clear. A record saved before this ruling whose assisted was never recorded stays null and still reads "Not recorded" in the read-only facts (history is not rewritten); its correction form shows neither key chosen until the worker answers.
 - **Litter weight stays optional.** Blank means not recorded (never 0). It is typed on the phone's own decimal keyboard (one decimal; a locale's comma becomes a point), and Done closes the keyboard (owner, 2026-10-16: one optional value in a form takes the system keyboard; the Numpad stays for runs of typed values such as the piglet weigh run).
 - **One titled form.** Finish farrowing and Edit finish details show the same rows under the section heading "Piglet condition": Weak, Deformed, Assisted, Litter weight (with "Optional" beside its label). The description line "Among the N alive piglets · 0 if none" is cut: Alive is on screen and the steppers stop at it.
+
+### Owner decision, 2026-10-22 · The pen tools are Inspection's
+
+- The pen page and everything on it (Note, Feed, Fault, the pen log) live in **Inspection**, where pens are walked and looked after. Farrowing keeps the room, Pen map and the pen header's `›` that opens the pen page; its map no longer lists the pen screens.
+- **Find a sow and Scan ear tags** stay in Farrowing's scope and are their own band on its map ("Find and scan"), apart from the room.
