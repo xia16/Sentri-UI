@@ -1,8 +1,8 @@
 # PenMap
 
-A pen map shows a room as a map of pens, each pen a tile that goes to that pen and is coloured by its status, so a worker finds the pen in front of her by where it is and sees at once which ones need her. It is Farrowing's Pen map. It sits in a menu drawer ([Sheet](../Sheet/README.md), `surface: 'menu'`) and does not record a farm fact.
+A pen map shows a room as a map of pens, each pen a tile that goes to that pen and is coloured by its status, so a worker finds the pen in front of her by where it is and sees at once which ones need her. It is Farrowing's and Inspection's Pen map. It sits in a menu drawer ([Sheet](../Sheet/README.md), `surface: 'menu'`) and does not record a farm fact.
 
-`SentriUI.penMap({ lanes, depth, pens, current, action, key, rangeSize, entrance, labels, peek })` draws the body: the Entrance band and the map. `SentriUI.penMapKey({ pens, words })` gives the items of the sheet's key line (the legend; see below). `SentriUI.penMapFooter({ back, depth, rangeSize, label })` draws the footer. `SentriUI.penPeek({ title, meta, rows })` draws the hold-to-peek card's content. Types are in `index.d.ts`.
+`SentriUI.penMap({ lanes, depth, pens, current, action, key, rangeSize, entrance, labels, peek })` draws the body: the Entrance band and the map. `SentriUI.penMapKey({ pens, words })` gives the items of the sheet's key line (the legend; see below). `SentriUI.penMapFooter({ back, depth, rangeSize, label })` draws the footer. `SentriUI.penPeek({ title, meta, rows, more })` draws the hold-to-peek card's content. Types are in `index.d.ts`.
 
 Classification: **component** (a new job; no existing component draws a map of places). One variant today, the map.
 
@@ -23,16 +23,16 @@ Classification: **component** (a new job; no existing component draws a map of p
 2. **Entrance band**: a full-width band on `well`, 36px tall, a down arrow and "Entrance", 13px / 600 ink, the first thing in the body, 24px under the hairline (the header owns the gap). It says the map is drawn as seen from the door: pen 1 is nearest it, at the top.
 3. **Column letters** (A, B, C…) and **row numbers** (1, 2, 3…): muted 13px mono on the sheet's tint. Letters are always the columns and numbers always the rows, so the map uses the phone's height. Letters stick to the top and numbers to the left. The number column is 22px, or 30px when a row has 100 pens or more.
 4. **Tile**: a button, at least 56 × 56, 8px gaps, 12px radius, the pen code in 15px / 600 mono and nothing else. Columns are `minmax(56px, 1fr)`: when the lanes do not fit at 56px the map scrolls sideways and the tiles never shrink.
-5. **Peek** (on hold): a white card with a 1px `line` border over the lower part of the map, clear of the footer.
+5. **Peek** (on hold): a white card with a 1px `line` border over the lower part of the map, clear of the footer: the pen code and its count, the host's animal rows, and, when a pen has more animals than the card shows, one muted 13px line (`+26 more`).
 6. **Range control** (footer, only when a row has more than 20 pens): a segmented control beside Back, one button per 20 pens (`1–20`, `21–40`…), each as wide as its label (at least 56px) and sharing the spare width, the control 56px tall. Up to three ranges (60 pens a row) fit beside Back at 360. More scroll sideways, with no visible scrollbar: the next range shows cut at the edge, which says there is more.
 
 ## Variants
 
-- [Map](variants/map.html): the one map, in a menu drawer. Specimens: Unit 7 (4 × 6), 2 × 60, 2 × 100, 2 × 160, 8 × 20 (sideways scroll), a filtered map, an empty map, the peek, a pressed tile and the Chinese key.
+- [Map](variants/map.html): the one map, in a menu drawer. Specimens: Unit 7 (4 × 6), 2 × 60, 2 × 100, 2 × 160, 8 × 20 (sideways scroll), a filtered map, an empty map, the peek (state rows, and Inspection's tag rows for a pen of 30), a pressed tile and the Chinese key.
 
 ## States
 
-A pen takes one face: the loudest level among the animals the list shows in it (the colour rule below). Farrowing's animals are sows.
+A pen takes one face: the loudest level among the animals the list shows in it (the colour rule below). Farrowing's animals are sows; Inspection's are pigs.
 
 | State | When | Tile | Fill | Text |
 |---|---|---|---|---|
@@ -53,11 +53,11 @@ Selected, Error and Loading do not apply: tapping a tile leaves the sheet.
 
 - **One pen, one colour.** A pen shows the loudest level among the animals the current list shows in it. Change the tab or filter and the colours follow.
 - **A fixed ladder, loudest first:** Needs you (amber) > In progress (blue) > Has animals (white) > Empty / filtered out (quiet, disabled). Severity never adds a colour: a worse "needs you" is still amber, and the detail lives in the peek or on the page the tile opens.
-- **The task supplies the levels.** It says which of its row states sit on which rung; the component never decides. A task with no "in progress" state simply never draws blue. Each task varies only through a mapping table in its `budget.md`: [Farrowing's](../../../../features/farrowing/budget.md#pen-colours-the-mapping-table). Inspection, breeding, heat-check and pregnancy add theirs when they adopt PenMap.
+- **The task supplies the levels.** It says which of its row states sit on which rung; the component never decides. A task with no "in progress" state simply never draws blue. Each task varies only through a mapping table in its `budget.md`: [Farrowing's](../../../../features/farrowing/budget.md#pen-colours-the-mapping-table), [Inspection's](../../../../features/inspection/budget.md#pen-colours-the-mapping-table). Breeding, heat-check and pregnancy add theirs when they adopt PenMap.
 - **A tile shows only the pen code.** Counts go in the colour key (the sheet's header line), never in the tile.
 - **The map follows the list.** It uses the list's current tab and filter: a pen the list hides is drawn as filtered out.
 - **Severity never adds a colour.** An Inspection red marker becomes Needs you (amber); how bad it is stays in the peek or on the page.
-- **Open (Inspection):** how the walk shows checked against not-yet-checked pens is still to be decided.
+- **Progress through a task is not a level.** A pen the walk has been through and one it has not take the same face (Inspection, 2026-10-22): a pen with nothing to record leaves no trace, so a checked mark would call a healthy pen unchecked, and it would be a second channel in the tile. The map answers "where was I" by opening on the pen at the top of the list. [The decision](../../../../features/inspection/budget.md#checked-and-not-checked).
 
 ## Landing on the pen
 
@@ -80,7 +80,7 @@ The cue is the component's, so every task lands the same way: the host marks the
 - Pen codes are the lane then the row (`B3`, `A120`); they are never shortened, translated or wrapped, and they are set in mono.
 - A tile says its pen code only. A tile's accessible name adds the state (`Pen B3, needs you`).
 - Strings are in the registry (`ds.penmap.*`).
-- The peek rows are the host's animal [Row](../Row/README.md) rows: the same tag, state word and figure as its list.
+- The peek rows are the host's animal [Row](../Row/README.md) rows: the same tag, state word and figure as its list (or, for a list of condition tags, the same tags). Past four rows the host shows the most urgent four and `more` ("+26 more"); a peek never scrolls.
 
 ## Accessibility
 
@@ -118,9 +118,10 @@ The cue is the component's, so every task lands the same way: the host marks the
 ## Used by
 
 - `farrowing.pen-map` (Pen map).
-- **Until migrated:** `inspection.go-to-pen` still draws its own map and peek (`ux/system/inspection-astra-concept.js`, `penMapSheet`); it moves onto PenMap in the next change.
+- `inspection.go-to-pen` (Pen map), and its landing (`inspection.pen-landed`, `-plain`).
 
 ## Changelog
 
 2026-10-14: new. Farrowing's Go to pen moves onto it. Adds the `arrow-down` glyph and the tokens `amber-fill`, `amber-fill-ink`, `progress-fill` and `progress-fill-ink`.
 2026-10-17: Farrowing's dock entry is a framed Pen map button (the sheet is titled Pen map, formerly Go to pen). Adds the colour rule, the landing cue and the tokens `land-hold` and `land-fade`.
+2026-10-22: Inspection's Go to pen moves onto it, with the framed Pen map button and the landing cue. The peek takes `more` (one muted line past the rows it shows); the colour rule settles that a task's progress (checked or not) is not a level.

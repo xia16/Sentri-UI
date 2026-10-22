@@ -1321,10 +1321,12 @@
     const w=Object.assign({act:'need you',live:'farrowing'},words),n=l=>Object.values(pens).filter(v=>v===l).length;
     return [['act','--amber-fill'],['live','--progress-fill']].filter(([l])=>n(l)).map(([l,fill])=>({fill,count:n(l),label:w[l]}));
   }
-  /* penPeek({ title, meta, rows }): the body of the peek card: the pen code with its count, then one animal Row per sow,
-     the same row as the room list (`rows` are Row props: code and right:{ kind:'state', figure, word, level }). */
-  function penPeek({title='',meta='',rows=[]}={}){
-    return `<div class="st-pen-peek-head"><b>${esc(title)}</b>${meta?`<span>${esc(meta)}</span>`:''}</div>${rows.map(r=>row(Object.assign({variant:'animal',className:'st-pen-peek-row'},r))).join('')}`;
+  /* penPeek({ title, meta, rows, more }): the body of the peek card: the pen code with its count, then one animal Row per
+     animal, the same row as the room list (`rows` are Row props: code and right:{ kind:'state', figure, word, level } or
+     right:{ kind:'tags', tags }). A pen with more animals than the card holds passes the rows it shows and `more`, one quiet
+     line after them ("+12 more"). */
+  function penPeek({title='',meta='',rows=[],more=''}={}){
+    return `<div class="st-pen-peek-head"><b>${esc(title)}</b>${meta?`<span>${esc(meta)}</span>`:''}</div>${rows.map(r=>row(Object.assign({variant:'animal',className:'st-pen-peek-row'},r))).join('')}${more?`<p class="st-pen-peek-more">${esc(more)}</p>`:''}`;
   }
   function penMapFooter({back={action:'back'},depth=0,rangeSize=20,label='Jump to pens'}={}){
     const size=Math.max(1,rangeSize|0);
