@@ -43,7 +43,7 @@ Classification: **component**. It was lifted from Farrowing's Find a sow and Sca
 ## Variants
 
 - [Find](variants/find.html): empty, results in two units, no match, a 12-digit tag, no reader (no scan icon), and Chinese.
-- [Scan](variants/scan.html): nothing scanned, no reader, each read ticked, a multi-select task's own actions, a single-action task's opening page, stopped, and Chinese.
+- [Scan](variants/scan.html): nothing scanned, no reader, condition-tag rows, a single-action task's opening page, stopped, and Chinese. A row's ticked and Just scanned faces are [Row · select + door](../Row/variants/select-door.html)'s own states; the page with rows ticked as they were read is on the live screens (Inspection's and Home's Scan · scanned). A multi-select task's own actions in the footer (`actions: [...]`) are a shape for the heat check, which isn't designed yet.
 - [Scan bar](variants/scan-bar.html): scanning, waiting for the reader, waiting with no reader name, and Chinese. A row's ticked and Just scanned faces are [Row · select + door](../Row/variants/select-door.html)'s own states; the page with rows ticked is on the live screens (Farrowing's and Inspection's Scan · ticked).
 
 ## States

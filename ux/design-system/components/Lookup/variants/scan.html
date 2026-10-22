@@ -5,8 +5,7 @@
 </style></head><body>
 <div class="ph" data-state="Nothing scanned · listening" data-demo="empty"></div>
 <div class="ph" data-state="Reader not connected" data-demo="off"></div>
-<div class="ph" data-state="Ticks · each read ticked (a multi-select place)" data-demo="ticks"></div>
-<div class="ph" data-state="Its own actions · a multi-select task" data-demo="direct"></div>
+<div class="ph" data-state="Scanned · condition tags (Inspection's roster rows)" data-demo="pigs"></div>
 <div class="ph" data-state="Opens · a single-action task lists nothing" data-demo="opens"></div>
 <div class="ph" data-state="Stopped · list kept" data-demo="stopped"></div>
 <div class="ph" data-state="Chinese · scanned" data-demo="zh"></div>
@@ -25,9 +24,9 @@ const page=(o)=>UI.scanPage(Object.assign({title:'Scan ear tags',back:{action:'b
 const R={
  empty:()=>page({groups:[]}),
  off:()=>page({connected:false,groups:[]}),
- ticks:()=>page({groups:PIGS(['000306','000267','000254']),picked:3}),
- // A multi-select task with two actions of its own shows them directly (the heat check, not designed yet: the shape only).
- direct:()=>page({groups:PIGS(['000306','000267']),picked:2,actions:[{label:'Signs',action:'signs'},{label:'Mark 2 in heat',action:'heat'}]}),
+ // A multi-select host ticks each read: a row's ticked face is Row · select + door's own state, and the page with rows ticked is on the
+ // live screens (Inspection's and Home's Scan · scanned). Here every row is at rest.
+ pigs:()=>page({groups:PIGS()}),
  opens:()=>page({read:'open',groups:[],empty:{text:'Each sow opens as soon as her tag is read.',stoppedText:'Resume scanning to open the next sow.'}}),
  stopped:()=>page({listening:false,groups:PIGS()}),
  zh:()=>UI.scanPage({title:'扫描耳标',back:{action:'back',label:'返回'},groups:PIGS([],'zh'),toggle:{action:'toggle',stop:'停止扫描',resume:'继续扫描'},bar})

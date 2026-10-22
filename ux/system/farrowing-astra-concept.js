@@ -695,8 +695,8 @@ function roomOverlay(s){const c=roomContext(s),unitSheet=(title,body,actions,cls
  if(s.view==='roomGrid')return penMapSheet(c,unitSheet);
  if(s.view==='roomPig')return pigPage(c);
  if(s.view==='roomBatch')return batchSheet(c);
- if(s.view==='roomBatchPick')return batchPickPage(c)+(c.batch.filtering?batchFilterSheet(c):'');
- if(s.view==='roomBatchForm')return batchPickPage(c)+batchFormPage(c);
+ if(s.view==='roomBatchPick')return c.batch.filtering?'<div class="page-background" inert aria-hidden="true">'+batchPickPage(c)+'</div>'+batchFilterSheet(c):batchPickPage(c);   // under the filter, Choose pigs is the page behind
+ if(s.view==='roomBatchForm')return '<div class="page-background" inert aria-hidden="true">'+batchPickPage(c)+'</div>'+batchFormPage(c);
  if(s.view==='roomOverview'){
   const {units,totals:t}=taskOverview(c),review=taskClosureReview(c);
   const columns=['Done','Active','Awaiting'],dotClass={Done:'farrowed',Active:'active',Awaiting:'awaiting'};

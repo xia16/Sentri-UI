@@ -33,8 +33,7 @@
     "states": [
       "Nothing scanned · listening",
       "Reader not connected",
-      "Ticks · each read ticked (a multi-select place)",
-      "Its own actions · a multi-select task",
+      "Scanned · condition tags (Inspection's roster rows)",
       "Opens · a single-action task lists nothing",
       "Stopped · list kept",
       "Chinese · scanned"
