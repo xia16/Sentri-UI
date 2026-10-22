@@ -55,5 +55,20 @@
       "Chinese"
     ],
     "usedBy": []
+  },
+  {
+    "id": "dismiss",
+    "name": "Door and dismiss",
+    "use": "Use when a read or an action could not do what the page does and the worker may want to look: the floating box with a ✕ at its left that stays until closed (no timer), the rest one door with a chevron. Farrowing's Scan: a tag no pig has (owner, 2026-10-22).",
+    "notUse": "Not for a save (use Done or Offline, which go by themselves); not for several things at once (put them in the page's list instead); never stacked: a newer one replaces it.",
+    "states": [
+      "Door and ✕",
+      "Door and ✕ · pressed",
+      "✕ only",
+      "Chinese"
+    ],
+    "usedBy": [
+      "farrowing.scan-unknown"
+    ]
   }
 ]

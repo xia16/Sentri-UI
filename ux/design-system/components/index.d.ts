@@ -582,7 +582,7 @@ export interface RowCopyProps {
   strs?: Strs<'title' | 'description' | 'code'>;
   args?: StrArgs<'title' | 'description' | 'code'>;
 }
-export interface RowSelectProps extends RowCopyProps { inputAttrs?: SafeAttrs; checked?: boolean; /** Default 'select'. */ action?: string; value: string; /** false: the tick doesn't tint the cell (a box beside its own door). */ fill?: boolean }
+export interface RowSelectProps extends RowCopyProps { inputAttrs?: SafeAttrs; checked?: boolean; /** Default 'select'. */ action?: string; value: string; /** false: the tick doesn't tint the cell (a box beside its own door). */ fill?: boolean; /** With code: an animal's right side, as Row · Animal (a list that only chooses animals). */ right?: AnimalRight | null; contextWidth?: string }
 export interface RowActionProps extends RowCopyProps {
   /** The door (the copy, with an inline ›). */
   action: string;
@@ -684,7 +684,7 @@ export interface SentriUI {
   /** TaskDock: a task page's bottom bar (Farrowing's room dock): the framed place, the one primary tool, icon tools; content replaces them for a host's own bar. */
   taskDock(props?: { label?: string; place?: { action: string; label: string; icon?: string; aria?: string; value?: string } | null; primary?: { action: string; label: string; icon?: string; value?: string; attrs?: SafeAttrs } | null; tools?: { action: string; icon: string; label: string; className?: string; value?: string }[]; content?: string; className?: string }): string;
   searchBox(props?: { input?: string; value?: string; scan?: { action: string; label?: string } | null; clear?: { action?: string; label?: string }; tag?: string; className?: string }): string;
-  toast(title: string, options?: { detail?: string; tone?: 'done' | 'offline' | 'notice' | 'attention'; standing?: { action?: string; value?: string; label?: string } | null; strs?: Strs<'title' | 'detail'>; args?: StrArgs<'title' | 'detail'> }): string;
+  toast(title: string, options?: { detail?: string; tone?: 'done' | 'offline' | 'notice' | 'attention'; standing?: { action?: string; value?: string; label?: string } | null; /** The floating toast as a door with a chevron. */ door?: { action?: string; value?: string; label?: string } | null; /** A ✕ at the left; the toast stays until closed. */ dismiss?: { action?: string; label?: string } | null; strs?: Strs<'title' | 'detail'>; args?: StrArgs<'title' | 'detail'> }): string;
   choiceEmpty(text: string, options?: { strs?: Strs<'text' | 'title'>; args?: StrArgs<'text' | 'title'>; title?: string; icon?: string }): string;
   segment(props: SegmentProps): string;
   filterChips(props: { items: { value: string; label: string; count?: string | number; checked?: boolean; disabled?: boolean; aria?: string }[]; action?: string; key?: string; label?: string; state?: string; reason?: string }): string;
@@ -856,12 +856,15 @@ export interface FindPageProps {
 export interface ScanState { fresh?: Record<string, number>; last?: string }
 export interface ScanPageProps {
   title?: string; back?: { action?: string; label?: SheetText };
+  /** 'list' (default): reads are listed (a multi-select host ticks each as she is read). 'open': a single-action task opens her on each read, so nothing is listed. */
+  read?: 'list' | 'open';
   connected?: boolean; listening?: boolean;
   /** One card per unit, the worker's unit first; rows are the context's own select + door animal rows, each with data-scan-tag. */
   groups?: LookupGroup[];
   /** How many rows are ticked; with any, the footer is the count and Actions. */
   picked?: number; selected?: (n: number) => string;
-  actions?: { action: string; label?: string };
+  /** The count and Actions; or a multi-select task's own actions, shown directly (the last is primary). */
+  actions?: { action: string; label?: string } | { label: string; action: string; value?: string; register?: string }[];
   toggle?: { action: string; stop?: string; resume?: string };
   empty?: { title?: string; text?: string; stoppedTitle?: string; stoppedText?: string; offTitle?: string; offText?: string };
   bar?: string; className?: string;
@@ -871,10 +874,12 @@ export interface SentriUI {
   findPage(props?: FindPageProps): string;
   /** The hint before typing, the no-match line, or the unit cards. */
   findResults(props?: { query?: string; groups?: LookupGroup[]; hint?: string; none?: string }): string;
-  /** A result row: the tag (the typed part marked) and where the animal is. */
-  findRow(props?: { code?: string; place?: string; query?: string; action?: string; value?: string; className?: string }): string;
+  /** A result row: the tag (the typed part marked) over where the animal is, and the host's right side: the task's state for a pig on its list, her condition tags (or nothing) for any other. */
+  findRow(props?: { code?: string; place?: string; query?: string; action?: string; value?: string; className?: string; right?: AnimalRight | null }): string;
   findMark(text: string, query: string): string;
   scanPage(props?: ScanPageProps): string;
+  /** Scanning on a list: the host's search bar becomes this one status while the reader is on. 'waiting' until it connects. */
+  scanBar(props?: { state?: 'scanning' | 'waiting'; title?: string; text?: string; device?: string; stop?: { action: string; label?: string } }): string;
   /** Lights the rows in scan.fresh until their time is up and brings scan.last into view. */
   scanArrive(root: ParentNode, scan: ScanState): void;
   /** Measures the scan list before a render, for scanGlide after it. */

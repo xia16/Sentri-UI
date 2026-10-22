@@ -200,10 +200,11 @@
     return `<${tag} class="st-row ${esc(className)}" data-ds="Row" data-variant="${esc(variant)}"${id?` id="${esc(id)}"`:''}${action?` type="button" data-action="${esc(action)}" data-value="${esc(value)}"${disabled?' disabled aria-disabled="true"':''}`:''}${wrap?' data-wrap=""':''}${safeAttr(attrs)}>${rowMark(mark)}${icon&&!code&&variant==='navigation'?`<span class="st-row-icon">${icon}</span>`:''}${code?`<span class="st-row-identity">${c.codeHtml}${rowChip(chip,trailing,'Row')}</span>`:c.codeHtml}<span class="st-row-copy">${c.strong()}${c.small}</span>${code?'':rowChip(chip,trailing,'Row')}${trailHtml}${railHtml}</${tag}>`;
   }
   /* rowSelect: the select + door variant without the door (a select-only list): the whole row is a <label>, leading box. Payload is change-only: rowSelectChange(event) → { value, checked }. */
-  function rowSelect({title,description='',code='',mono=false,chip=null,wrap=false,tight=false,checked=false,action='select',value='',id='',className='',attrs={},strs,args,inputAttrs={},disabled=false,reason='',fill=true}={}){
+  /* right: an animal's right side (state or tags, as Row · Animal), for a list that only chooses animals (Actions for several sows). */
+  function rowSelect({title,description='',code='',mono=false,chip=null,wrap=false,tight=false,checked=false,action='select',value='',id='',className='',attrs={},strs,args,inputAttrs={},disabled=false,reason='',fill=true,right=null,contextWidth=''}={}){
     if(disabled) description=reason||description||'Unavailable — try again later';
-    const o={strs,args},c=rowCopy({title,description,code,mono,tight,o});
-    return `<label class="st-row ${esc(className)}" data-ds="Row" data-variant="select-door" data-select=""${fill?'':' data-fill="none"'}${id?` id="${esc(id)}"`:''}${wrap?' data-wrap=""':''}${safeAttr(attrs)}><span class="st-choice-trail"><input type="checkbox"${action?` data-action="${esc(action)}"`:''} value="${esc(value)}"${checked?' checked':''}${disabled?' disabled':''}${safeAttr(inputAttrs)}></span>${title||description||code?`${code?`<span class="st-row-identity">${c.codeHtml}${rowChip(chip,'','Row')}</span>`:c.codeHtml}<span class="st-row-copy">${c.strong()}${c.small}</span>${code?'':rowChip(chip,'','Row')}`:''}</label>`;
+    const o={strs,args},c=rowCopy({title,description,code,mono,tight,o}),an=right&&code?animalBody({code,description,right,contextWidth,tight,o}):null;
+    return `<label class="st-row ${esc(className)}" data-ds="Row" data-variant="select-door"${an?` data-animal="${an.kind}"`:''} data-select=""${fill?'':' data-fill="none"'}${id?` id="${esc(id)}"`:''}${wrap?' data-wrap=""':''}${safeAttr(attrs)}><span class="st-choice-trail"><input type="checkbox"${action?` data-action="${esc(action)}"`:''} value="${esc(value)}"${checked?' checked':''}${disabled?' disabled':''}${safeAttr(inputAttrs)}></span>${an?an.html:title||description||code?`${code?`<span class="st-row-identity">${c.codeHtml}${rowChip(chip,'','Row')}</span>`:c.codeHtml}<span class="st-row-copy">${c.strong()}${c.small}</span>${code?'':rowChip(chip,'','Row')}`:''}</label>`;
   }
   /* rowSelectDoor: a list that both selects (a bulk act) and opens. Two sibling targets, none nested: the checkbox (48px hit area,
      the same box as rowSelect) toggles; the door (copy + ›) opens. contentHtml: trusted markup in place of the title/description copy. */
@@ -439,7 +440,10 @@
   /* Toast: a save confirmed for a few seconds (done, offline, plain). standing ({ action, value, label }): the standing form (owner,
      2026-10-20) — it stays in the page's flow until what it reports is looked at, and the whole box is one door with a chevron.
      notice (a neutral note glyph): records that weren't accepted; attention (a red disc): a person must act (signed out). */
-  function toast(title,{detail='',tone='',standing=null,strs,args}={}){const glyph=tone==='done'?'check':tone==='offline'?'offline':tone==='notice'?'note':tone==='attention'?'alert':'';const inner=`${glyph&&root.SentriIcons?`<span class="st-toast-glyph" aria-hidden="true">${root.SentriIcons.icon(glyph)}</span>`:''}<span class="st-toast-copy"><strong class="st-toast-title">${tx(title,{strs,args},'title')}</strong>${detail?`<span class="st-toast-detail">${tx(detail,{strs,args},'detail')}</span>`:''}</span>`;if(standing)return `<button type="button" class="st-toast st-toast--standing${tone?' st-toast--'+tone:''}" data-ds="Toast" data-variant="standing" data-action="${esc(standing.action||'')}" data-value="${esc(standing.value||'')}"${standing.label?` aria-label="${esc(standing.label)}"`:''}>${inner}<span class="st-toast-chevron" aria-hidden="true">${root.SentriIcons?root.SentriIcons.icon('chevron'):''}</span></button>`;return `<div class="st-toast${tone?' st-toast--'+tone:''}" data-ds="Toast" role="status">${inner}</div>`}
+  /* door (owner, 2026-10-22): the floating toast as a tap target with a chevron (a pig a scan couldn't add opens her record).
+     dismiss: a ✕ at the toast's left. A toast with it stays until the worker closes it or the host replaces it (no timer); without a door
+     it is only the ✕ and the message. */
+  function toast(title,{detail='',tone='',standing=null,door=null,dismiss=null,strs,args}={}){const glyph=dismiss?'':tone==='done'?'check':tone==='offline'?'offline':tone==='notice'?'note':tone==='attention'?'alert':'';const inner=`${glyph&&root.SentriIcons?`<span class="st-toast-glyph" aria-hidden="true">${root.SentriIcons.icon(glyph)}</span>`:''}<span class="st-toast-copy"><strong class="st-toast-title">${tx(title,{strs,args},'title')}</strong>${detail?`<span class="st-toast-detail">${tx(detail,{strs,args},'detail')}</span>`:''}</span>`;if(standing)return `<button type="button" class="st-toast st-toast--standing${tone?' st-toast--'+tone:''}" data-ds="Toast" data-variant="standing" data-action="${esc(standing.action||'')}" data-value="${esc(standing.value||'')}"${standing.label?` aria-label="${esc(standing.label)}"`:''}>${inner}<span class="st-toast-chevron" aria-hidden="true">${root.SentriIcons?root.SentriIcons.icon('chevron'):''}</span></button>`;const x=dismiss?`<button type="button" class="st-toast-close" data-action="${esc(dismiss.action||'')}" aria-label="${esc(dismiss.label||'Close')}">${root.SentriIcons?root.SentriIcons.icon('close'):'✕'}</button>`:'';const chev=`<span class="st-toast-chevron" aria-hidden="true">${root.SentriIcons?root.SentriIcons.icon('chevron'):''}</span>`;if(door&&x)return `<div class="st-toast st-toast--door st-toast--dismiss${tone?' st-toast--'+tone:''}" data-ds="Toast" data-variant="door" role="status">${x}<button type="button" class="st-toast-door" data-action="${esc(door.action||'')}" data-value="${esc(door.value||'')}"${door.label?` aria-label="${esc(door.label)}"`:''}>${inner}${chev}</button></div>`;if(door)return `<button type="button" class="st-toast st-toast--door${tone?' st-toast--'+tone:''}" data-ds="Toast" data-variant="door" data-action="${esc(door.action||'')}" data-value="${esc(door.value||'')}"${door.label?` aria-label="${esc(door.label)}"`:''}>${inner}${chev}</button>`;return `<div class="st-toast${tone?' st-toast--'+tone:''}${x?' st-toast--dismiss':''}" data-ds="Toast" role="status">${x}${inner}</div>`}
   function choiceEmpty(text,{strs,args,title,icon}={}){if(title)return `<div class="st-choice-empty st-choice-empty--lead" data-ds="ChoiceList" role="status">${icon&&globalThis.SentriIcons?`<span class="st-choice-empty-icon" aria-hidden="true">${globalThis.SentriIcons.icon(icon)}</span>`:''}<strong class="st-choice-empty-title">${tx(title,{strs,args},'title')}</strong><span class="st-choice-empty-text">${tx(text,{strs,args},'text')}</span></div>`;return `<p class="st-choice-empty" data-ds="ChoiceList" role="status">${tx(text,{strs,args},'text')}</p>`;}
   /* options: [value,label,{strs:{label},args:{label}}?]; label is raw HTML, kept as the span's fallback. */
   /* variant 'scope' (owner, 2026-10-20; from Home's Overview | Choose unit): the whole list, or one part of it picked in a drawer.
@@ -1488,21 +1492,26 @@
        lights its row again. Every row has its tick box; ticking replaces the footer with "N selected" and Actions. The footer's
        Stop / Resume scanning is the only scanning status. No "Not found" row, no Select button.
      The host passes its own animal row (Row · Animal in Find, rowSelectDoor in Scan) and its own Actions; Lookup draws the page around them.
+     Task membership (owner, 2026-10-22): a pig on the task's own list shows the task's row (its state on the right); any other pig shows the
+     generic row (her condition tags, or nothing). The host knows its list, so it passes each row's right side: findRow({right}).
+     A single-action task's Scan opens her (read:'open'): nothing is listed and the host opens her on each read. A multi-select task's Scan
+     ticks her as she is read, and its footer may carry the task's own actions directly (actions:[{label,action}]).
      lookupGroups([{title,rows:[html]}],{variant:'find'|'scan'}) · findPage({query,placeholder,results,scan,clear,cancel,inputAttrs,bar})
-     findResults({query,groups,hint,none}) · findRow({code,place,query,action,value}) · findMark(text,query)
-     scanPage({title,back,connected,listening,groups,picked,selected,actions,toggle,empty,bar}) · scanArrive(root,scan) · scanPlaces(root) · scanGlide(root,before) */
+     findResults({query,groups,hint,none}) · findRow({code,place,query,action,value,right}) · findMark(text,query)
+     scanPage({title,back,read,connected,listening,groups,picked,selected,actions,toggle,empty,bar}) · scanArrive(root,scan) · scanPlaces(root) · scanGlide(root,before) */
   function lookupGroups(groups=[],{variant='find'}={}){
     const card=variant==='scan'?'st-scan-card':'st-find-list';
     return groups.filter(g=>g&&(g.rows||[]).length).map(g=>heading({title:g.title,kind:'section',level:3})+panel(g.rows.join(''),{className:'st-row-group '+card})).join('');
   }
   /* The typed part bold, the rest muted (.st-find-row mutes the tag; this marks only the part that matched). */
   function findMark(text,q){const t=String(text??''),i=q?t.toLowerCase().indexOf(String(q).toLowerCase()):-1;return i<0?esc(t):esc(t.slice(0,i))+'<b>'+esc(t.slice(i,i+q.length))+'</b>'+esc(t.slice(i+q.length));}
-  /* A result: the tag on the left, where the animal is on the right; the part of either that matched is marked. */
-  function findRow({code='',place='',query='',action='',value=code,className=''}={}){
+  /* A result: the tag over where the animal is, and the host's right side: the task's state for a pig on the task's list, her condition
+     tags (or nothing) for any other pig (owner, 2026-10-22). The part of the tag or the place that matched is marked. */
+  function findRow({code='',place='',query='',action='',value=code,className='',right=null}={}){
     const q=String(query||'').trim().toLowerCase();
-    let html=row({variant:'animal',code,right:{kind:'state',figure:place,word:'',level:'settled'},action,value,className:'st-find-row'+(className?' '+className:'')});
+    let html=row({variant:'animal',code,description:place,right:right||{kind:'state',figure:'',word:'',level:'settled'},action,value,className:'st-find-row'+(className?' '+className:'')});
     html=html.replace(`<strong class="st-animal-id">${esc(code)}</strong>`,`<strong class="st-animal-id">${findMark(code,q)}</strong>`);
-    if(place&&String(place).toLowerCase().includes(q))html=html.replace(`>${esc(place)}<`,`>${findMark(place,q)}<`);
+    if(place&&String(place).toLowerCase().includes(q))html=html.replace(`<span class="st-animal-context">${esc(place)}<`,`<span class="st-animal-context">${findMark(place,q)}<`);
     return html;
   }
   /* What the results area says: the hint before typing, the no-match line, or the unit cards. */
@@ -1520,15 +1529,25 @@
     const input=`<input data-find-input${safeAttr(inputAttrs)} type="text" inputmode="text" enterkeyhint="search" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" placeholder="${esc(placeholder)}" aria-label="${esc(label)}" value="${esc(q)}">`;
     return `<section class="st-find${className?' '+esc(className):''}" data-ds="Lookup" data-variant="find" data-st-context="drawer" role="region"${sL(label)}>${bar}<div class="st-find-top">${searchBox({input,value:q,scan,clear})}${button({label:cancel.label||'Cancel',register:'text',action:cancel.action,className:'st-find-cancel'})}</div><div class="st-find-results" role="region" aria-label="Search results" aria-live="polite">${results}</div></section>`;
   }
+  /* Scanning on a list (owner, 2026-10-22: a list that chooses animals scans in place, no Scan page). The host's search bar becomes this
+     one status while the reader is on: 'scanning' in the scan hue (the progress wash that Row's Just scanned state uses), or 'waiting' in
+     the pending colours until the reader connects. Stop ends it either way and the search field returns. */
+  function scanBar({state='scanning',title='',text='',device='',stop={action:'scan-stop',label:'Stop'}}={}){
+    const waiting=state==='waiting',t=title||(waiting?'Waiting for reader':'Scanning'),x=text||(waiting?`Make sure ${device||'your tag reader'} is on`:'Scan to tick pigs');
+    return `<div class="st-scan-bar" data-ds="Lookup" data-variant="scan-bar" data-state="${waiting?'waiting':'scanning'}" role="status">${SentriIcons.icon('scan')}<span class="st-scan-bar-copy"><strong>${esc(t)}</strong><small>${esc(x)}</small></span>${button({label:stop.label||'Stop',register:'text',action:stop.action,className:'st-scan-bar-stop'})}</div>`;
+  }
   const scanEmpty=(title,text)=>`<div class="st-scan-empty">${SentriIcons.icon('scan')}<strong>${esc(title)}</strong><p>${esc(text)}</p></div>`;
   /* A page (it fills the screen): Back at the top left and the title, no line (Headers law). The footer says whether the reader listens,
      so the body carries no second scanning status. With rows ticked the footer is the plain count and Actions (no Back); with no reader
      there is no footer. `selected(n)` and `empty` carry the host's noun ("2 sows selected", "Each pig you scan appears here."). */
-  function scanPage({title='Scan ear tags',back={action:'back'},connected=true,listening=true,groups=[],picked=0,selected=n=>n+' selected',actions={action:'scan-actions',label:'Actions'},toggle={action:'scan-toggle'},empty={},bar='',className=''}={}){
+  function scanPage({title='Scan ear tags',back={action:'back'},read='list',connected=true,listening=true,groups=[],picked=0,selected=n=>n+' selected',actions={action:'scan-actions',label:'Actions'},toggle={action:'scan-toggle'},empty={},bar='',className=''}={}){
     const e=Object.assign({offTitle:'Scanner not connected',offText:"Turn on the tag reader and pair it in your phone's Bluetooth settings. Scanning starts as soon as it connects.",title:'Hold the reader to an ear tag',text:'Each animal you scan appears here.',stoppedTitle:'Scanning is stopped',stoppedText:'Resume scanning to add more.'},empty);
-    const has=groups.some(g=>(g.rows||[]).length);
+    // read:'open' (a single-action task): nothing is listed, because each read opens her; the page only says that it listens.
+    const has=read!=='open'&&groups.some(g=>(g.rows||[]).length);
     const body=!connected?scanEmpty(e.offTitle,e.offText):!has?(listening?scanEmpty(e.title,e.text):scanEmpty(e.stoppedTitle,e.stoppedText)):`<div class="st-scan-body">${lookupGroups(groups,{variant:'scan'})}</div>`;
-    const foot=!connected?false:picked?sheetFooter({content:`<p class="st-scan-selected">${esc(selected(picked))}</p>`+button({label:actions.label||'Actions',icon:SentriIcons.icon('more'),register:'primary',action:actions.action}),className:'st-scan-foot'}):
+    // A multi-select task may put its own actions in the footer directly (actions:[{label,action}], the last one primary); else the count and Actions.
+    const direct=Array.isArray(actions)?actions.map((x,k)=>button({label:x.label,register:x.register||(k===actions.length-1?'primary':'secondary'),action:x.action,value:x.value})).join(''):'';
+    const foot=!connected?false:picked&&has?sheetFooter({content:direct||`<p class="st-scan-selected">${esc(selected(picked))}</p>`+button({label:actions.label||'Actions',icon:SentriIcons.icon('more'),register:'primary',action:actions.action}),className:'st-scan-foot'+(direct?' st-scan-foot-direct':'')}):
       sheetFooter({content:button({label:listening?(toggle.stop||'Stop scanning'):(toggle.resume||'Resume scanning'),icon:SentriIcons.icon(listening?'stop':'scan'),register:listening?'secondary':'primary',className:'st-scan-toggle',action:toggle.action}),className:'st-scan-foot'});
     return sheet({variant:'page',title,back,body,footer:foot,className:'st-scan'+(className?' '+className:''),label:title,bar,attrs:{'data-lookup':'scan'}});
   }
@@ -1564,7 +1583,7 @@
       const h=before.get('H'+scanKey(e)),hn=e.getBoundingClientRect().height;if(h!==undefined&&Math.abs(h-hn)>.5)e.animate([{height:h+'px',overflow:'hidden'},{height:hn+'px',overflow:'hidden'}],ease);
     }
   }
-  const api=Object.freeze({taskDock,lookupGroups,findPage,findResults,findRow,findMark,scanPage,scanArrive,scanPlaces,scanGlide,taskTile,weekBoard,weekCell,weekBoardKey,headerLine,pageHeader,rangeSlider,filterSheet,penMap,penMapKey,penMapFooter,penPeek,penMapMount:penMount,optionalRow,keyboardLift,heading,panel,facts,row,rowGroup,log,logDay,logStamp,logGroups,field,rowTile,rowGrid,pickerField,pickerOptions,pickerBody,pickerHead,pickerFooter,filterChips,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,toast,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowSelectDoor,rowAction,rowSelectChange,status,conditionTag,rowFitTags,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
+  const api=Object.freeze({taskDock,lookupGroups,findPage,findResults,findRow,findMark,scanPage,scanBar,scanArrive,scanPlaces,scanGlide,taskTile,weekBoard,weekCell,weekBoardKey,headerLine,pageHeader,rangeSlider,filterSheet,penMap,penMapKey,penMapFooter,penPeek,penMapMount:penMount,optionalRow,keyboardLift,heading,panel,facts,row,rowGroup,log,logDay,logStamp,logGroups,field,rowTile,rowGrid,pickerField,pickerOptions,pickerBody,pickerHead,pickerFooter,filterChips,chooserList,choiceRow,choiceGroup,choiceSearch,choiceEmpty,toast,segment,iconButton,stepper,measure,numpad,numpadInput,numpadScan,numpadCommit,numpadKey,numpadScanner,rowSelect,rowSelectDoor,rowAction,rowSelectChange,status,conditionTag,rowFitTags,statusLine,statusText,announce,liveFill,banner,photos,button,buttonReason,guard,handFocus,holdButton,holdStep,holdBind,HOLD,choiceRadios,radioNext,radioBind,sheet,sheetFooter,backButton,scrim});
   root.SentriUI=api;
   if(typeof module!=='undefined')module.exports=api;
 })(globalThis);

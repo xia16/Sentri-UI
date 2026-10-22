@@ -1,44 +1,83 @@
-# Find a pig 查找猪只
+# Search and scan 搜索与扫描
 
-Draft: compiled from existing docs, not yet confirmed.
+Draft, in design (owner reviews, 2026-10-22). It grew out of Home's Find a pig, which stays its first host. The feature id stays `find-pig`.
 
 ## Problem
 
-A worker standing at a pen needs to find a pig or a pen by its ear tag or pen code, by typing or by scanning, from anywhere in the app without choosing a section first.
+A worker reaches pigs by ear tag in every part of the app: one pig to look at, or several to act on, from Home, inside a task, or while choosing pigs for an action. Each place used to decide for itself what a search or a scan does. Search and scan are one feature set. Each task or feature adds only its own display logic on top.
 
 ## Who
 
-Floor workers, gloved and one-handed, who have a tag in front of them.
+Floor workers, gloved and one-handed, with a tag in front of them or a reader in their hand.
 
 ## Anchor
 
-None. Two entrances, two pages: Find (Toolbox) and Scan (the Home bar's Scan). Both are the design system's [Lookup](../../ux/design-system/components/Lookup/README.md), the same pages as Farrowing's and Inspection's.
+The design system's [Lookup](../../ux/design-system/components/Lookup/README.md): Find (`findPage`), Scan (`scanPage`), and the scan bar for scanning on a list (`scanBar`). Every host draws these parts. No host copies them.
 
-## Rules
+## Rules (every host)
 
-- Search and scan are different jobs (owner decision, 2026-10-12). **Find**: type, tap one, act. **Scan**: hands-free; each scan adds the pig to a list; tap one, or tick several for Actions.
-- Both are full pages, not drawers. Both reach every unit of the section the worker is in.
-- Find: the field is pinned and focused; nothing is listed before typing; part of a tag or a pen matches; results are one card per unit under a plain "Unit 7" heading, the worker's unit first (owner, 2026-10-20). No match says so in one line.
-- Scan: the reader always listens; a repeat scan lights her row instead of adding one; no "Not found" row and no Select button; the footer's Stop / Resume scanning is the only scanning status. A row is her tag over her pen, with her marked condition on the right when she has one.
-- A pig, found or scanned, opens her pig record (owner, 2026-10-20). Back returns to the list.
-- Actions for ticked pigs are the general ones (Transfer, Condition, Treat, Note); Home has no task of its own.
-- The tag reader is not connected; the study's "Simulate scan" reads sample pigs.
+- **Search and scan are different jobs** (owner, 2026-10-12). Find: type, tap one, act. Scan: hands-free reads.
+- **What a scan does depends on the host's job** (owner, 2026-10-22):
+  - **Opens.** A single-action task (Farrowing) opens the pig on each read; there's no list. Its Scan page only listens. While she is open, the reader waits.
+  - **Ticks.** A multi-select place (Home, Inspection's walk, Choose pigs, the heat check when it's designed) ticks each pig as she is read. The bar becomes the actions for the ticked pigs: the count and Actions, or the task's own actions directly. A repeat read keeps her ticked and lights her row.
+  - **Scans on a list.** A page that chooses pigs from a list (Choose pigs) scans in place, with no Scan page. The scan button turns the search bar into the scan bar.
+- **Task membership:** "in the task" means on the task's own list, not just in the same unit. A pig on the list shows the task's row; any other pig shows the generic row (her tag over her pen, her condition tags). The host passes the row's right side.
+- **Where a pig opens:** a task opens her in the task's context (Farrowing: her farrowing drawer, in any unit). A pig outside the task, or anywhere outside a task, opens her pig record. Back returns to the page she was opened from, with the text, the ticks and the scanning kept.
+- **Pens stay the grouping** inside a unit, as the header of each card. Units are plain section headings ("Unit 7"), the worker's unit first.
+- **Unchanged display:** a host's change of behaviour never changes its rows. Home's scan ticks now, but draws its rows exactly as before.
+
+## What a read can find, and what each host does
+
+| The tag's record says | Opens (Farrowing Scan) | Ticks (Home, Inspection) | Choose pigs (this unit only) | Find (typed) |
+|---|---|---|---|---|
+| On the task's list | Her task drawer | Ticked | Ticked, the task's row | The task's row |
+| In the unit, not on the list | Her record · "Not in Farrowing · Unit 7 · D2" | Ticked | Ticked, the generic row | The generic row |
+| Another unit | On the list: her drawer. Otherwise her record · "Not in Farrowing · Unit 3 · A2" | Ticked, under her unit | Not added: "Pig in another unit · 000434 · Unit 3" | Under her unit |
+| No longer on the farm (died, sold, culled, moved to another farm) | Her record · "Died 14 Oct · …" | Not added (proposed) | Not added: "Pig not on the farm · 000512 · Died 14 Oct" | Open question 2 |
+| No pig has this tag (a new, empty tag, or not synced to this phone yet) | A toast on Scan: "No pig with this tag · 000999 · New tag, or not synced yet" | Not added (proposed) | Not added: the same toast | "No pig matching" |
+| Read again | — (the reader waits while she is open) | Stays ticked, row lights | Stays ticked, row lights | — |
+| Reader not connected, or it drops | Scan page · "Scanner not connected" | The same | The bar · "Waiting for reader · Make sure Reader 1 is on" | — |
+
+**Not added** is one toast at the bottom. It shows a category, then her tag and the reason. It stays, with a ✕ at its left, until the worker closes it or leaves; tapping the rest opens her record (a tag with no pig opens nothing). Reads that miss while it shows pile into it ("2 pigs not added", their tags). Tapping it then lists them, each with its reason. The ticks and the count always show what was added.
+
+## What a host supplies
+
+1. Its list (who is "in the task") and its row for those pigs.
+2. Its job: opens or ticks.
+3. Its actions for ticked pigs: its own, plus the general ones (Transfer, Condition, Treat, Note).
+4. Where a pig opens in its context.
+
+Everything else (the pages, the bar, the reader states, the not-added toast and list) is Lookup's.
 
 ## Scope
 
-In: Find a pig, Scan ear tags, the general Actions for ticked pigs, opening a pig's record.
+In: Find, Scan (opens and ticks), scanning on a list, the reader states, the not-added messages, opening a pig, the general Actions for ticked pigs from Home.
 
-Out: ear-notch search, untagged groups, filters, the pig record itself (Pig profile), the four actions' own pages from Home, a real reader.
+Out: ear-notch search, untagged groups, the pig record itself (Pig profile), each action's own pages, the real reader and pairing.
+
+## Not supported
+
+- Searching by anything other than tag or pen (batch, stage, condition): use a list's filter.
+- Several readers paired to one phone.
+- Registering a new pig from a scan of an empty tag (it belongs to tagging, which isn't designed). Here an empty tag only says so.
+
+## Open questions (owner)
+
+1. **An empty tag:** when tagging, workers scan a new tag first to add the pig. Should a read of an unknown tag offer "Add a pig with this tag" once tagging exists? Should "not synced yet" stay one message with it?
+2. **Dead and sold pigs in Find:** list them last, under "Not on the farm", grey, opening her record (recommended), or hide them?
+3. **A pig in transit** (move saved, not yet arrived): follow the record, so she belongs to the new unit (recommended)?
+4. **Home and Inspection scan:** use the same not-added toast for pigs that died, were sold, or have no record (proposed, not built).
 
 ## Decisions
 
 - Decided (ASTRA-HOME-DIRECTION): Home keeps Home / Scan / Toolbox.
 - Decided (owner, 2026-10-12): search and scan are separate pages with one pattern across features.
 - Decided (owner, 2026-10-20): a pig from Home opens her pig record, not a task.
+- Decided (owner, 2026-10-22): scan opens in single-action tasks and ticks in multi-select places, Home included; search rows follow task membership; search and scan is one feature set across every task.
 
 ## Sources
 
 - ux/research/home/ASTRA-HOME-DIRECTION.md
 - ux/research/home/SENTRI-DRAWER-INVENTORY.md
 - ux/research/home/UI-AUDIT-HOME-TASKS.md
-- Prototype: ux/system/home-astra-prototype.html
+- Prototype: ux/system/home-astra-prototype.html, ux/system/farrowing-astra-concept.html
