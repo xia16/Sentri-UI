@@ -219,7 +219,6 @@ const status=()=>`<div class="statusbar"><span>9:41</span><span class="status-ic
 function causes(dead){return `<div class="causes">${dead.map((n,i)=>n?`<span>${types[i]} <b>${n}</b></span>`:'').join('')||'<span>No deaths recorded</span>'}</div>`;}
 /* Born · Alive · Dead: Facts, figures. The one exception is the finished litter's Dead, which carries a door to the death breakdown; Facts never act, so that call keeps this own markup (open question: where the door lives). */
 function metrics(items,{panel=true}={}){return SentriUI.facts(items.map(([label,value])=>({label,value})),{variant:'figures',panel});}
-function metricsDoor(items,{panel=true}={}){return `<dl class="finish-totals${panel?' st-panel':''}">${items.map(([l,n,link])=>`<div><dt>${link?`<button type="button" class="death-breakdown-link" data-action="deathBreakdown" aria-label="View death breakdown">${l}${icon('chevron')}</button>`:l}</dt><dd>${n}</dd></div>`).join('')}</dl>`;}
 function summary(s){return SentriUI.panel(metrics([['Born',born(s)],[s.locked?'Alive now':'Alive',s.alive],['Dead',sum(s.dead)]],{panel:false})+causes(s.dead),{className:'summary facts-surface'});}
 function recordStamp(s){
  if(!s.locked)return '';
@@ -270,7 +269,9 @@ function hold(action,label,off=false,danger=false){
 function finishFacts(s){
  const dead=sum(s.dead);
  const items=[['Weak',s.weak],['Deformed',s.deformed],['Assisted',assistanceLabel(s.assisted)],['Litter weight',s.weight?s.weight+' kg':null]].map(([label,value])=>({label,value,...(label==='Litter weight'?{inline:true}:{})}));
- return SentriUI.panel(metricsDoor([['Born',born(s)],['Alive now',s.alive],['Dead',dead,dead>0]],{panel:false})+SentriUI.facts(items,{columns:3,variant:'record'}),{className:'facts-surface'});
+ // the figures read (Facts never acts); the death causes are a door of their own under them, only when there are deaths (owner, 2026-10-22)
+ const door=dead>0?SentriUI.rowGroup(SentriUI.row({title:'Death causes',action:'deathBreakdown',trail:'chevron'}),{className:'death-causes-door'}):'';
+ return SentriUI.panel(SentriUI.facts([{label:'Born',value:born(s)},{label:'Alive now',value:s.alive},{label:'Dead',value:dead}],{variant:'figures',panel:false})+SentriUI.facts(items,{columns:3,variant:'record'}),{className:'facts-surface'})+door;
 }
 // Room fixtures and navigation share each sow's existing farrowing state.
 const roomContexts=[];

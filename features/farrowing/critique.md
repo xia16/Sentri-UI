@@ -716,3 +716,34 @@ Home's Find a pig (Toolbox), the same Lookup part: Find → scan icon → Scan �
 ## Self-crit
 
 - **Better because** a worker who reached for the reader mid-search gets the search back, and nothing on Scan moves. Leaf `fa-s27` checks it (it fails on `50ab217`).
+
+# Room list: the pen card is one box (2026-10-22), critique
+
+Scope: the room list's pen card (`.pen-card`, `.pen-top`). Baselined on `origin/main` at `7a9ae71` (after the shared TaskDock, PR 279) by walking the room and its doors (Find a sow, Scan, Pen map, filter, a pen's `›`) at 390, and by reading the card's computed styles beside Inspection's walk.
+
+## Keep
+
+- Everything the room says and its order: the header and Last record line, the unit and Task overview card, the lens with counts, the filter, one card per pen with the pen and its count, the approved animal rows, the dock (now `SentriUI.taskDock`).
+
+## Problems
+
+- **major** · The pen card was shadowed (`0 2px 8px rgba(32,41,31,.04)`): the law says no card is shadowed.
+- **major** · Its header band was the page's own colour (`#f6f7f1`), so the card's top border read as a stray rule above a white box rather than one box; the header's 12px corners sat inside the card's 18px ones.
+
+## Attention budget
+
+Unchanged (budget.md, hub rows): who needs me now (red, one "!"), who is farrowing (bold), who is due next, where (the pen header), how the unit and task are going (the unit card). Nothing is added or cut.
+
+## House pattern
+
+Inspection's walk pen card, computed: no shadow, header `#f8faf5` over a `#e8eddf` rule, clipped by the card's 18px corners. Farrowing's pen card now matches it.
+
+## Parts
+
+| Part | Drawn by | Keep / fix / cut |
+|---|---|---|
+| Pen card | `.pen-card` in bundle.css (TaskGroup is its candidate part, not yet rendered); Farrowing's CSS no longer sets its surface | **fix** (Inspection's surface, in the design system) |
+
+## Self-crit
+
+- **Better because** each pen reads as one bordered box, as on Inspection, and the law's no-shadow holds; the spacing audit is clean on all 364 screens.
