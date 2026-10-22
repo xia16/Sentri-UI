@@ -407,24 +407,28 @@
     const hid=radio&&showTitle?(id||fieldId('st-choice'))+'-title':'';
     return `<section class="st-choice-group ${esc(className)}" data-ds="ChoiceList"${title?` aria-label="${esc(title)}"`:''}>${showTitle?(aside?`<div class="st-choice-heading-row"><h5 class="st-choice-heading"${hid?` id="${esc(hid)}"`:''}>${icon?glyph(icon):''}${tx(title,{strs,args},'title')}</h5>${aside}</div>`:`<h5 class="st-choice-heading"${hid?` id="${esc(hid)}"`:''}>${icon?glyph(icon):''}${tx(title,{strs,args},'title')}</h5>`):''}${lead?`<div class="st-choice-lead">${lead}</div>`:''}<div class="st-panel st-choice-panel"${radio?` role="radiogroup"${hid?` aria-labelledby="${esc(hid)}"`:''}`:''}>${body}</div></section>`;
   }
-  /* The search field, one look wherever a worker types to narrow (Lookup's Find, a picker's catalogue, a list's ear-tag search):
-     the search glyph, the text, Clear (✕, only while something is typed) and the scan icon when the host has a reader. `input` is
-     the host's <input>; `clear.action` is the host's, else the shared handler below empties the field and fires `input`. */
-  function searchBox({input='',value='',scan=null,clear={},tag='div',className=''}={}){
-    let clearBtn=iconButton({variant:'plain',action:clear.action||'',icon:SentriIcons.icon('close'),label:clear.label||'Clear',className:'st-find-clear',attrs:clear.label?{}:{'data-str-attr':'aria-label:act.clear'}}).replace('<button',`<button${value?'':' hidden'}${clear.action?'':' data-search-clear=""'}`);
+  /* The search field's ends, one look wherever a worker types to narrow (Lookup's Find, a picker's catalogue, a list's ear-tag
+     search): Clear (✕, only while something is typed) and the scan glyph when the host has a reader. `clear.action` is the host's,
+     else the shared handler below empties the field and fires `input`. */
+  function searchTools({value='',scan=null,clear={}}={}){
+    let clearBtn=iconButton({variant:'plain',action:clear.action||'',icon:SentriIcons.icon('close'),label:clear.label||'Clear',className:'st-find-clear st-search-clear',attrs:clear.label?{}:{'data-str-attr':'aria-label:act.clear'}}).replace('<button',`<button${value?'':' hidden'}${clear.action?'':' data-search-clear=""'}`);
     // the shared Clear is no host action: an empty data-action would reach the host's own action handler first
     if(!clear.action)clearBtn=clearBtn.replace(' data-action=""','');
     const scanBtn=scan?iconButton({variant:'plain',action:scan.action,icon:SentriIcons.icon('scan'),label:scan.label||'Scan ear tag',className:'st-find-scan'}):'';
-    return `<${tag} class="st-find-field${className?' '+esc(className):''}">${SentriIcons.icon('search')}${input}${clearBtn}${scanBtn}</${tag}>`;
+    return clearBtn+scanBtn;
   }
-  /* Search: the browser's cancel glyph is hidden; the shared search field (searchBox) with its ✕ Clear, and the scan icon when the
-     host passes `scan`. Clear empties the field and fires `input`, so the host's own input handler refreshes the list. */
+  /* Find's field (Lookup): a box of its own holding the search glyph, the host's <input> and the ends. */
+  function searchBox({input='',value='',scan=null,clear={},tag='div',className=''}={}){
+    return `<${tag} class="st-find-field${className?' '+esc(className):''}">${SentriIcons.icon('search')}${input}${searchTools({value,scan,clear})}</${tag}>`;
+  }
+  /* Search in a picker, a sheet or a list (ChoiceList): the same look as Find's field, built on the field every host already sizes:
+     the input is the box (each host keeps its own height and width), the search glyph sits in its left padding and the ends
+     (✕ Clear, scan) in its right. The browser's cancel glyph is hidden. Clear empties the field and fires `input`, so the host's
+     own input handler refreshes the list. */
   function choiceSearch({label='Search',placeholder='',value='',attrs={},scan=null,clear={},strs={},args}={}){
     const extra=Object.entries(attrs).filter(([k])=>/^(?:data|aria)-[a-z0-9-]+$/.test(k)).map(([k,v])=>` ${k}="${esc(v)}"`).join('');
     const input=`<input type="search" aria-label="${esc(label)}"${strs.label?` data-str-attr="aria-label:${esc(strs.label)}${strs.placeholder?`;placeholder:${esc(strs.placeholder)}`:''}"${sArgs(args)}`:''} placeholder="${esc(placeholder||label)}" value="${esc(value)}"${extra}>`;
-    /* The wrapper places the field (a picker pins it in a sticky band); the label is the field itself, one surface: the glyph, the
-       input, ✕ and scan sit directly in it. */
-    return `<div class="catalog-search st-choice-search" data-ds="ChoiceList">${searchBox({input,value,scan,clear,tag:'label',className:'st-search-box'})}</div>`;
+    return `<label class="field catalog-search st-choice-search" data-ds="ChoiceList"><span class="st-search-box">${SentriIcons.icon('search')}${input}<span class="st-search-ends">${searchTools({value,scan,clear})}</span></span></label>`;
   }
   /* Toast: what was just saved, over the page above its dock, for a few seconds. title: what was done; detail: for whom, or where it went;
      tone 'done' (a check on the green) or 'offline' (no-signal on the ink: saved on this phone), else no glyph. */
@@ -507,7 +511,7 @@
   },true); // captured: the field empties before any host handler sees the tap
   /* The search field's ✕ shows only while something is typed, also when the host does not redraw on input. */
   if(typeof document!=='undefined')document.addEventListener('input',e=>{
-    const f=e.target.closest?.('.st-find-field');if(f&&e.target.matches('input'))f.querySelector('.st-find-clear')?.toggleAttribute('hidden',!e.target.value);
+    const f=e.target.closest?.('.st-find-field, .st-search-box');if(f&&e.target.matches('input'))f.querySelector('.st-find-clear')?.toggleAttribute('hidden',!e.target.value);
   },true);
   if(typeof document!=='undefined')document.addEventListener('keydown',e=>{
     const spin=e.target.closest('[data-st-spin]');if(!spin||!['ArrowUp','ArrowDown'].includes(e.key))return;

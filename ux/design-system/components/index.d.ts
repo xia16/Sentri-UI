@@ -680,7 +680,7 @@ export interface SentriUI {
   /** While value is set, a Clear text action empties the field and fires `input`. args fill the strs ({ level } for ds.picker.search_in). */
   /** The shared search field (searchBox) in a picker or a list: glyph, ✕ Clear while typing (the host's clear.action, else it empties the field and fires input), scan when the host has a reader. */
   choiceSearch(props?: { label?: string; placeholder?: string; value?: string; attrs?: SafeAttrs; scan?: { action: string; label?: string } | null; clear?: { action?: string; label?: string }; strs?: Strs<'label' | 'placeholder'>; args?: Record<string, unknown> }): string;
-  /** The search field itself, one look wherever a worker types to narrow: the host's <input>, ✕ Clear while it holds text, the scan glyph when scan is given. */
+  /** Find's search field (Lookup): a box holding the search glyph, the host's <input>, ✕ Clear while it holds text, the scan glyph when scan is given. choiceSearch draws the same look on the host's own input. */
   searchBox(props?: { input?: string; value?: string; scan?: { action: string; label?: string } | null; clear?: { action?: string; label?: string }; tag?: string; className?: string }): string;
   toast(title: string, options?: { detail?: string; tone?: 'done' | 'offline' | 'notice' | 'attention'; standing?: { action?: string; value?: string; label?: string } | null; strs?: Strs<'title' | 'detail'>; args?: StrArgs<'title' | 'detail'> }): string;
   choiceEmpty(text: string, options?: { strs?: Strs<'text' | 'title'>; args?: StrArgs<'text' | 'title'>; title?: string; icon?: string }): string;
