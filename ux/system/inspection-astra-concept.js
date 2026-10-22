@@ -46,7 +46,8 @@ const footer=(left,right)=>SentriUI.sheetFooter({content:left+(right||'')});
 // something to clear or reset; the footer keeps Back and the primary.
 const corner=(action,label='Clear')=>({label:{text:label,str:label==='Reset'?'act.reset':'act.clear'},action});
 const status=()=>`<div class="statusbar"><span>9:41</span><span class="status-icons">${icon('signal')}${icon('battery')}</span></div>`;
-const countLabel=n=>`${n} ${n===1?'pig':'pigs'}`;
+let hostNoun=null;   // a host's own noun for its animals (Farrowing: sows), when it opens one of the walk's forms
+const countLabel=n=>`${n} ${n===1?(hostNoun?.[0]||'pig'):(hostNoun?.[1]||'pigs')}`;
 const quantity=n=>(Math.round(n*10)/10).toFixed(1);
 function baseSeed(){return {view:'list',lens:'All',selected:new Set(),scroll:0,reviewOnly:false,query:'',events:[],checkedIn:false,form:{},toast:'',toastUntil:0,pens:[
 {id:'C1',mode:'trough',formula:'Gestation 1',issue:'',pigs:[{id:'000254',stage:'Gestating',parity:3,base:2.6,factor:1,instruction:''},{id:'000267',stage:'Gestating',parity:2,base:2.4,factor:1.1,condition:'Thin',review:7},{id:'000281',stage:'Gestating',parity:4,base:2.4,factor:1}]},
@@ -1453,6 +1454,7 @@ function installV2(){
  else if(a==='batch-detail'){c.batchId=v;c.view='batch-detail';}
  else if(a==='show-batch'){c.filterKeep=false;c.batchFilter=v;c.stage='All';c.healthFilter='All';c.healthStatus='All';c.manualOnly=false;c.triageFilter='All';c.lens='All';c.scroll=0;c.view='list';}
  else if(a==='environment')c.view='environment';
+ else if(a==='back'&&c.batchHost&&['health','treatment','note','body','triage','weight','temperature','backfat'].includes(c.view)){c.form={};c.view='list';}   // a host's form for several animals: Back returns to the host (its Choose sows)
  else if(a==='back'&&['selected-pen-note','choose-fault-pen'].includes(c.view))c.view='actions';
  else if(a==='stage'){c.filterKeep=false;c.stage=c.stage===v?'All':v;c.scroll=0;}
  else if(a==='scope-stage'){c.filterKeep=false;c.stage=v;c.scroll=0;c.view='list';}
@@ -1919,7 +1921,8 @@ if(typeof document==='undefined')return;
 const embeddedSow=window.parent!==window&&new URLSearchParams(location.search).get('embed')==='sow';
 let embeddedSowReady=false;
 if(embeddedSow){document.documentElement.classList.add('inspection-embedded');document.documentElement.setAttribute('data-atlas-pending','');}   // the atlas waits until the host has sent the sow
-function sendSowDetail(type,c){window.parent.postMessage({type,context:{...c,toastTimer:undefined}},location.origin);}
+// A host's form for several animals (Farrowing's Actions for several sows): closing after a save tells the host what was saved, in its noun.
+function sendSowDetail(type,c){const t=c.batchHost&&type==='sow-detail-close'&&c.toast?String(c.toast.title||c.toast):'',[one,many]=c.hostNoun||['pig','pigs'];window.parent.postMessage({type,context:{...c,toastTimer:undefined},saved:t.replace(/(\d+) pigs?/,(m,n)=>n+' '+(n==='1'?one:many))},location.origin);}
 
 /* Unit 6, for Find: the walk is one unit, but Find searches every unit. */
 function lookupSeed(c,type){
@@ -2282,6 +2285,15 @@ if(embeddedSow)window.addEventListener('message',e=>{
  if(e.origin!==location.origin||e.source!==window.parent||e.data?.type!=='open-sow-detail')return;
  const r=e.data.record;if(!r||typeof r.id!=='string'||typeof r.pen!=='string')return;
  states[0]=sowDetailContext(r,e.data.context);states[0].hostActions=e.data.actions||[];states[0].hostNote=e.data.note||'';states[0].transferDestinations=e.data.destinations||[];const origin=states[0].transferDestinations.find(u=>u.name===r.unit);states[0].transferOrigin=origin?{unit:origin.id,name:origin.name}:null;states[0].hostTasks=(e.data.tasks||[]).filter(t=>!states[0].completedHostTasks?.includes(t.id));if(e.data.entry==='actions'){states[0].selected=new Set([r.id]);states[0].actionScope='pigs';states[0].view='actions';states[0].actionEntry=r.id;states[0].restoreSheetScroll=states[0].actionMenuScroll||0;}else delete states[0].actionEntry;embeddedSowReady=true;document.documentElement.classList.add('inspection-embedded-ready');document.documentElement.removeAttribute('data-atlas-pending');render(0);
+});
+/* A host opens one of the walk's forms for animals it chose (Farrowing: Actions for several sows): the form is filled once and saved for all. */
+if(embeddedSow)window.addEventListener('message',e=>{
+ if(e.origin!==location.origin||e.source!==window.parent||e.data?.type!=='open-bulk-action')return;
+ const list=(e.data.pigs||[]).filter(r=>r&&typeof r.id==='string'&&typeof r.pen==='string');if(!list.length)return;
+ const c=seed();c.pens=[];c.batches=[];
+ for(const r of list){let pe=c.pens.find(x=>x.id===r.pen);if(!pe)c.pens.push(pe={id:r.pen,mode:'unknown',formula:'',faults:[],pigs:[],untagged:{count:0,cases:[]}});pe.pigs.push({id:r.id,base:0,factor:1,cases:[],registry:{type:'Sow'},initialRecords:[],parity:r.parity,stage:r.stage});}
+ hostNoun=Array.isArray(e.data.noun)?e.data.noun:null;Object.assign(c,{unitLabel:list[0].unit,hostNoun:e.data.noun,batchHost:true,navTrail:[],toast:'',scroll:0});c.selected=new Set(list.map(r=>r.id));c.selectedPens.clear();
+ openBulkAction(c,e.data.view);states[0]=c;embeddedSowReady=true;document.documentElement.classList.add('inspection-embedded-ready');document.documentElement.removeAttribute('data-atlas-pending');render(0);
 });
 states.forEach((_,i)=>render(i));if(new URLSearchParams(location.search).get('layout')==='overview')document.querySelector('[data-layout="overview"]').click();
 })();
