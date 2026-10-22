@@ -24,11 +24,13 @@ No anchor. The walk has no lifecycle that changes what work is available: it can
 
 ## Scope
 
-In: the unit walk list (lens All / Health / Feed, filter, pen map, find and scan), the pen sheet with note and log, the selection and Actions sheet, the walk log and check-in, the unit batches that change the stage text, and the built-but-unreachable unit summary, sensors, batch sheet and equipment fault flow.
+In: the unit walk list (lens All / Health / Feed, filter, pen map, find and scan), the pen page and its tools (note, feed, fault, log) wherever a task opens it, Farrowing's room included (owner, 2026-10-22: the screens Farrowing's prototype draws are mapped here, "Pen in Farrowing"), the selection and Actions sheet, the walk log and check-in, the unit batches that change the stage text, and the built-but-unreachable unit summary, sensors, batch sheet and equipment fault flow.
 
 Out (owned by other features): the pig record and its actions (pig-profile), feed reading and editing (feed-plan), conditions, care and treatment (health-record). The Farrowing task is opened from here but belongs to Tasks.
 
 ## Decisions
+
+- Owner, 2026-10-22: the pen page and its tools are Inspection's. Farrowing's pen header `›` opens the pen page; Farrowing's own drawing of it (Note, Feed, Fault, Needs attention, Now, Pen log) is listed under "Pen in Farrowing" until the two prototypes share one page.
 
 Taken from the research notes and the code:
 
