@@ -691,3 +691,28 @@ Scan's Actions drawer over Scan ear tags (`roomScanActions`). Read from computed
 ## Self-crit
 
 - **Better because** what is under the scrim is now where Back goes, on both Find a sow and Scan, and nothing on either page moves. The leaves `fa-s6` and `fa-s21` now check the page under her drawer (they fail on `e74efe4`).
+
+# Scan ear tags: Back returns to Find a sow (2026-10-22), critique
+
+Scope: where Back from Scan ear tags goes. Baselined on `origin/main` at `50ab217` by walking Find a sow → type 43 → the field's scan icon → Scan → back arrow, and the room's dock → Scan → back arrow, at 390; every Scan state (`farrowing.scan`, `-no-reader`, `-list`, `-new`, `-ticked`, `-stopped`, `-actions`) checked against the rulings of 2026-10-12 and 2026-10-20.
+
+## Keep
+
+- Every Scan state as it is: the page header, the empty and not-connected states, one card per unit, the select + door rows, Stop / Resume scanning, the selection bar and the Actions verb grid.
+- Back from Scan opened from the room's dock: the room.
+
+## Problems
+
+- **major** · Scan opened from Find a sow's scan icon went Back to the room: the typed text and its results were gone, and Search started empty again. Back returns to where you came from (design system, Back). Evidence: the walk on `50ab217`.
+
+## Attention budget
+
+Unchanged (budget.md). Nothing is added or cut on the page; Back gives back the search the worker had typed.
+
+## House pattern
+
+Home's Find a pig (Toolbox), the same Lookup part: Find → scan icon → Scan → Back returns to Find with the text kept (its page stack). Farrowing now does the same.
+
+## Self-crit
+
+- **Better because** a worker who reached for the reader mid-search gets the search back, and nothing on Scan moves. Leaf `fa-s27` checks it (it fails on `50ab217`).
