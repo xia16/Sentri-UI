@@ -8956,6 +8956,39 @@
                   "result": "pass"
                  }
                 ]
+               },
+               {
+                "type": "action",
+                "id": "search.empty.43.scan",
+                "label": "tap the scan icon in the field",
+                "children": [
+                 {
+                  "type": "action",
+                  "id": "search.empty.43.scan.back",
+                  "label": "tap the back arrow",
+                  "children": [
+                   {
+                    "type": "outcome",
+                    "id": "fa-s27-back-from-scan-returns-to-find-a-sow",
+                    "label": "Back from Scan opened in Find a sow returns to Find a sow, with what was typed",
+                    "tree": "S-27",
+                    "gwt": {
+                     "given": "The worker has typed 43 in Find a sow and opened Scan ear tags from the scan icon in the field.",
+                     "when": "They tap the back arrow.",
+                     "then": "Find a sow is in front again with 43 still typed and its results, not the room list."
+                    },
+                    "authority": [
+                     {
+                      "src": "design-system",
+                      "at": "README · Back",
+                      "says": "Back leaves and returns to where you came from, keeping the draft"
+                     }
+                    ],
+                    "result": "not-run"
+                   }
+                  ]
+                 }
+                ]
                }
               ]
              },
@@ -26993,6 +27026,7 @@
        "multi",
        "navigate",
        "radio",
+       "radio-flat",
        "single"
       ]
      }
@@ -28655,6 +28689,7 @@
      "files": {
       "variantsJson": true,
       "variants": [
+       "figures",
        "three-column",
        "two-column"
       ]
@@ -30135,16 +30170,6 @@
     {
      "name": "TaskReceipt",
      "group": "Task page parts",
-     "status": "in-design",
-     "gate": null,
-     "files": {
-      "variantsJson": false,
-      "variants": []
-     }
-    },
-    {
-     "name": "TaskRadios",
-     "group": "Compatibility and retired",
      "status": "in-design",
      "gate": null,
      "files": {

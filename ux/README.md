@@ -6,7 +6,7 @@
 | [home-astra-prototype.html](system/home-astra-prototype.html) | Home / today — the entrance |
 | [inspection-astra-concept.html](system/inspection-astra-concept.html) | The inspection walk |
 | [farrowing-astra-concept.html](system/farrowing-astra-concept.html) | The farrowing flow |
-| [components.html](system/components.html) | The parts and the laws: row grammar, record-sheet shell + field kit, the chassis, the entrance (verb sheet), detail-page grammar, the consistency contract |
+| [components.html](archive/components.html) | **Archived**: superseded by the design system ([ux/design-system/README.md](design-system/README.md), the atlas's Components). Was the parts and the laws: row grammar, record-sheet shell + field kit, the chassis, the entrance (verb sheet), detail-page grammar, the consistency contract |
 | [motion.html](system/motion.html) | Mark-to-move motion spec, with the front-end implementation contract |
 | [farrowing-contract.html](system/farrowing-contract.html) | The farrowing state contract (developer handoff) |
 

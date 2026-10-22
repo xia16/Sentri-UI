@@ -2,6 +2,8 @@
 
 # TaskTotals (the figures a sheet commits)
 
+> New work uses [Facts](../Facts/README.md) · Figures (`SentriUI.facts(items, { variant: 'figures' })`), which is this grid lifted from Farrowing into the shared library. TaskTotals stays for the frozen Piglet processing pages that still call `SentriTask.totals`.
+
 The two or three figures a sheet is about to commit, at the top of its body: `Born 14 · Alive 9 · Dead 5` before Finish farrowing, `Litters 4 · Piglets 46` before a bulk record.
 
 **Anatomy** (`dl.st-panel.tk-totals`, `data-ds="TaskTotals"`)

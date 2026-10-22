@@ -2,7 +2,7 @@
 
 Ops brief for FARROWING production screen 8 (耳标/耳缺/体重 编辑态) — the heaviest manual
 data-entry surface: assigning identity and weight to every piglet in a litter, done with wet
-gloves while physically handling squirming animals. Anchored on `ux/system/components.html`
+gloves while physically handling squirming animals. Anchored on `ux/archive/components.html`
 §04 (Numpad kit, lines 639–641), §04d (C3 Conveyor, line 764; coverage row 884 — "Piglet
 tag / weigh: **C5 whose section is a C3** · per-piglet numpad run"), the Assign-identity
 conveyor in `ux/research/ops/place-identity.md` §2.2, and `ux/research/tasks/piglet-processing.html`

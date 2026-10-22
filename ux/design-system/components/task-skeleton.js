@@ -132,15 +132,13 @@
     return `<div class="tk-choice" data-ds="TaskChoice" role="group" data-count="${options.length}"${L(label)}>${b}</div>`;
   }
 
-  /* ---- TaskRadios: farrowing's flat radio rows (.radio-row: 60px, a line under each, a 14px label, the radio at the
-     right). The design system's ChoiceList radio field (SentriUI.choiceRadios: role=radio buttons, roving tab stop,
-     radioBind, an optional Clear) in farrowing's face. Every prop is choiceRadios'; layout is always 'rows'. ---- */
-  /* layout 'row': farrowing's inline field (Finish · Assisted farrowing: No | Yes): the label (with its Optional tag and
-     Clear) left, the options as two 44px outlined pills right, all on one row (the ChoiceList's 'inline' layout). */
+  /* ---- radios: compatibility alias of SentriUI.choiceRadios (TaskRadios is archived; ChoiceList owns the flat radio).
+     The default is ChoiceList's flat face (face 'flat': farrowing's .radio-row: no panel, 60px, a line under each, the radio at
+     the right); layout 'row' is its inline field in the 'row' face (Finish · Assisted farrowing: No | Yes). Every other prop is
+     choiceRadios'. The tk-radios class stays so older callers and styles still find it. ---- */
   function radios(props = {}) {
-    const UI = root.SentriUI, row = props.layout === 'row';
-    const html = UI.choiceRadios(Object.assign({}, props, { layout: row ? 'inline' : 'rows', className: `tk-radios${props.className ? ' ' + props.className : ''}` }));
-    return html.replace('data-ds="ChoiceList"', `data-ds="ChoiceList" data-face="${row ? 'row' : 'flat'}"`);
+    const row = props.layout === 'row';
+    return root.SentriUI.choiceRadios(Object.assign({}, props, { layout: row ? 'inline' : 'rows', face: row ? 'row' : 'flat', className: `tk-radios${props.className ? ' ' + props.className : ''}` }));
   }
 
   /* TaskWarning: legacy slot/tone adapter; Banner owns rendering and styles. */

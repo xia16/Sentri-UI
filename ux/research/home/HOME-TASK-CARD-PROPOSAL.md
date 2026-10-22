@@ -2,7 +2,7 @@
 
 > Superseded by [Home task-card component](HOME-TASK-CARD-COMPONENT.md). The owner rejected removal of progress bars and promotion of small Inspection actions to full tasks. The current review uses one shared component, labelled task-specific progress and elapsed/remaining time. The notes below record the earlier proposal, not the current design.
 
-Status: information hierarchy demonstrated in `../../system/task-cards-astra-prototype.html`, a separate review gallery linked from Home's studio header and Toolbox. Existing Home task lists and inner task pages have not been replaced by the gallery.
+Status: information hierarchy demonstrated in `../../archive/task-cards-astra-prototype.html`, a separate review gallery linked from Home's studio header and Toolbox. Existing Home task lists and inner task pages have not been replaced by the gallery.
 
 ## Sources and limits
 

@@ -174,7 +174,7 @@ async function renderComponents() {
   Object.entries(pages).forEach(([k, n]) => navItem(nav, k, n, null, () => go(k)));
   for (const [g, names] of COMPONENT_GROUPS) {
     const host = g === COMPAT_GROUP ? compat : nav;
-    if (g === COMPAT_GROUP) { compat.querySelector('summary').textContent = `${g} · ${names.length}`; nav.append(compat); } else nav.append(el(`<h5>${esc(g)}</h5>`));
+    if (g === COMPAT_GROUP) { compat.querySelector('summary').textContent = `${g} · ${names.length + sees.filter((s) => s.group === g).length}`; nav.append(compat); } else nav.append(el(`<h5>${esc(g)}</h5>`));
     if (g === TASK_GROUP) navItem(host, '_task', `${dot('in-design')}Task skeleton`, null, () => go('_task'));
     names.forEach((n) => navItem(host, n, `${dot(stOf(n))}${esc(n)}`, null, () => go(n)));
     sees.filter((s) => s.group === g).forEach((s) => navItem(host, 'see:' + s.name, `<span class="see">${esc(s.name)} → ${esc(s.component)}</span>`, null, () => go(s.component)));
@@ -226,7 +226,7 @@ async function renderComponents() {
       const facts = await Promise.all(names.map(factsOf));
       const rows = names.map((n, i) => `<div class="jobrow">${dot(stOf(n))}${compA(n)}<span>${esc(facts[i].job)}</span></div>`).join('') +
         sees.filter((s) => s.group === g).map((s) => `<div class="jobrow"><span class="see">${esc(s.name)}</span><span>Documented with ${compA(s.component)}</span></div>`).join('');
-      const block = g === COMPAT_GROUP ? el(`<details class="jobgroup"><summary>${esc(g)} · ${names.length}: old names that still resolve, and retired parts</summary><div class="jobs">${rows}</div></details>`) : el(`<section class="jobgroup"><h3>${esc(g)}</h3><div class="jobs">${g === TASK_GROUP ? `<div class="jobrow">${dot('in-design')}<a href="?view=components&component=_task">Task skeleton</a><span>How Farrowing's task page is built from the parts below.</span></div>` : ''}${rows}</div></section>`);
+      const block = g === COMPAT_GROUP ? el(`<details class="jobgroup"><summary>${esc(g)} · ${names.length + sees.filter((s) => s.group === g).length}: old names that still resolve, and retired parts</summary><div class="jobs">${rows}</div></details>`) : el(`<section class="jobgroup"><h3>${esc(g)}</h3><div class="jobs">${g === TASK_GROUP ? `<div class="jobrow">${dot('in-design')}<a href="?view=components&component=_task">Task skeleton</a><span>How Farrowing's task page is built from the parts below.</span></div>` : ''}${rows}</div></section>`);
       pane.append(block);
     }
   }
