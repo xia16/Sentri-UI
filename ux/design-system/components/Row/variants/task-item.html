@@ -10,7 +10,7 @@
 <script>
 // Each state renders in its own iframe in the atlas: draw only the states present.
 // One item of a task's day list (TaskDay draws these): due ring, ticked disc, one-tap act, or saved with Done and Edit.
-var UI = window.SentriUI;
+const UI = window.SentriUI;
 var DONE = {"variant": "chip", "kind": "done", "text": "Done", "strs": {"text": "ds.row.done"}};
 function item(p) { return SentriUI.row(Object.assign({"action": "open-dose", "value": "tail", "trail": "none", "wrap": true, "mono": true}, p)); }
 function acted(p, act) { return SentriUI.rowAction(Object.assign({"action": "open-dose", "value": "iron", "wrap": true, "mono": true, "mark": "due", "attrs": {"aria-pressed": "false"}}, p, {"act": Object.assign({"action": "record", "value": "iron", "busy": false}, act)})); }

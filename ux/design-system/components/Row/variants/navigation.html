@@ -9,7 +9,7 @@
 <script>
 // Each state renders in its own iframe in the atlas: draw only the states present.
 // Calls copied from the live screens: Workbench's unit list (current unit), Farrowing's task end (counts), Fostering's record doors (Edit).
-var UI = window.SentriUI;
+const UI = window.SentriUI;
 function unit(u, desc, attrs) { return SentriUI.row({"variant": "navigation", "icon": SentriIcons.icon('grid'), "title": u, "description": desc, "trail": "none", "attrs": attrs || {}, "action": "pick-unit", "value": u}); }
 var RENDER = {
   "navigation-state-0": () => SentriUI.rowGroup(SentriUI.row({"title": "Farrowing", "description": "3 sows due today · room 3", "action": "open", "value": "A02", "variant": "navigation", "wrap": true, "attrs": {}, "icon": SentriIcons.icon('farrow')})),

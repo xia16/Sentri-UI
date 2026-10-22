@@ -10,7 +10,7 @@
 <script>
 // Each state renders in its own iframe in the atlas: draw only the states present.
 // Calls copied from the live screens: Inspection's walk (tags, the group without ear tags), Farrowing's scan list (state).
-var UI = window.SentriUI;
+const UI = window.SentriUI;
 var TAGS = {"kind": "tags", "tags": [{"name": "Lame", "level": "watch"}, {"name": "Arthritis", "level": "ongoing"}]};
 function pig(p) { return SentriUI.rowSelectDoor(Object.assign({"code": "000306", "description": "Gestation · 42d", "contextWidth": "112px", "right": TAGS, "action": "", "value": "000306", "openAction": "pig", "openValue": "000306", "inputAttrs": {"aria-label": "Select pig 000306"}}, p)); }
 var RENDER = {
