@@ -74,11 +74,9 @@
           "farrowing.search-none",
           "farrowing.scan",
           "farrowing.scan-no-reader",
-          "farrowing.scan-list",
-          "farrowing.scan-new",
-          "farrowing.scan-ticked",
-          "farrowing.scan-stopped",
-          "farrowing.scan-actions"
+          "farrowing.scan-read",
+          "farrowing.pig-not-in-task",
+          "farrowing.scan-stopped"
         ]
       ]
     ],
@@ -2744,7 +2742,10 @@
     },
     {
       "id": "farrowing.pen-landed",
-      "holds": ["st-pen-land-act", "st-pen-land-act-ink"],
+      "holds": [
+        "st-pen-land-act",
+        "st-pen-land-act-ink"
+      ],
       "name": "Landed on a pen · needs you",
       "zh": "落到栏位 · 需处理",
       "status": "in-design",
@@ -2761,7 +2762,10 @@
     },
     {
       "id": "farrowing.pen-landed-live",
-      "holds": ["st-pen-land-live", "st-pen-land-live-ink"],
+      "holds": [
+        "st-pen-land-live",
+        "st-pen-land-live-ink"
+      ],
       "name": "Landed on a pen · farrowing",
       "zh": "落到栏位 · 分娩中",
       "status": "in-design",
@@ -2778,7 +2782,9 @@
     },
     {
       "id": "farrowing.pen-landed-plain",
-      "holds": ["st-pen-land-ring"],
+      "holds": [
+        "st-pen-land-ring"
+      ],
       "name": "Landed on a pen · has sows",
       "zh": "落到栏位 · 有母猪",
       "status": "in-design",
@@ -3021,106 +3027,57 @@
       }
     },
     {
-      "id": "farrowing.scan-list",
-      "name": "Scan · sows scanned",
-      "zh": "已扫描母猪",
+      "id": "farrowing.scan-read",
+      "name": "Scan · her drawer opened",
+      "zh": "扫描后打开",
       "status": "in-design",
       "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
-      "preset": "scan-list",
       "figma": "",
+      "preset": "scan-read",
       "notes": {
-        "purpose": "Show the sows scanned in this visit, newest first, and let the worker open one or tick several.",
+        "purpose": "A read opens that sow at once: Farrowing is a single-action task, so there is no scanned list (owner, 2026-10-22).",
         "states": [
-          "Sows in this unit and in other units: both groups",
-          "Sows in one unit only: one card"
+          "A sow on the farrowing list: her farrowing drawer over Scan ear tags"
         ],
         "elements": [
           {
-            "name": "Scan list",
-            "at": "Unit 6",
-            "shows": "The sows scanned in this visit, one white card per unit under its plain section heading (\"Unit 7\", \"Unit 6\"), this unit first, newest scan first within each card; no count beside the heading. Every row is the design system's Row, animal variant with the sow's Farrowing state on the right (the room's row, without the initials so the line under the ear tag stays on one line (\"Pen B1 · 1h ago\"), the same in every unit because the heading names the unit), drawn as a select + door.",
-            "logic": "A sow is added the first time she is scanned: her row slides in at the top of her unit's card and the rows under it glide down (no jump); a unit's card fades in with its heading the first time one of its sows is scanned. Scanning her again adds nothing. Either way her row takes a soft tint for 1.6 s, then fades, and is brought into view, so the worker finds her after looking up from the pig. Each row keeps its own tint, so scans in quick succession light row after row and none cuts another short. The list stays while the worker opens a sow and comes back.",
-            "rule": "The tick box selects; the rest of the row opens her. A sow in this unit opens her farrowing drawer, and Back returns to this list; a sow in another unit opens the same drawer (its subtitle names her unit, \"Unit 6 · A2 / Parity 4\"), and Back returns here too. The scanner is always listening: there is no \"ready for the next tag\" banner and no \"not found\" row.",
-            "source": "farrowing-astra-concept.js scanPage() on SentriUI.scanPage (components/Lookup), scanAdd(), sowRow()"
+            "name": "Her drawer",
+            "at": "000418",
+            "shows": "The sow's own farrowing drawer, exactly as from the room, risen over Scan ear tags.",
+            "rule": "Her Back returns to Scan, still listening, for the next sow. While she is open the reader waits.",
+            "source": "farrowing-astra-concept.js scanRead(), roomAction room-sow"
           }
         ],
         "controls": [],
-        "copy": [
-          "(raw) Unit 7 · Unit 6"
-        ],
-        "edge": [
-          "The prototype has no reader: \"Simulate scan\", above the phone and outside the frame, adds the next sample sow; the sample sows repeat, which shows the repeat-scan highlight."
-        ],
-        "rules": [
-          "Owner decision 2026-10-12: each scan adds the sow to a list; a repeat scan highlights her row."
-        ],
+        "copy": [],
         "issues": []
       }
     },
     {
-      "id": "farrowing.scan-new",
-      "name": "Scan · a sow just scanned",
-      "zh": "刚扫描的母猪",
+      "id": "farrowing.pig-not-in-task",
+      "name": "A pig not in Farrowing",
+      "zh": "不在分娩任务中的猪",
       "status": "in-design",
       "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
-      "preset": "scan-new",
       "figma": "",
+      "preset": "scan-pig",
       "notes": {
-        "purpose": "Show the moment after a scan: where the sow just read landed in the list.",
+        "purpose": "A pig found or scanned in Farrowing who is not on the farrowing list opens her pig profile, not a farrowing drawer (owner proposal, 2026-10-22).",
         "states": [
-          "The newest scan, 004318 in Unit 6, holds the arrival tint (the still frame of a cue that fades after 1.6 s)"
+          "Opened from Scan or from Find a sow"
         ],
         "elements": [
           {
-            "name": "Arrival tint",
-            "at": "004318",
-            "shows": "Her row takes the pale progress wash (blue), the same for a new sow and for a repeat scan. Not the well tint, which marks a ticked row, and not amber or red, which are status.",
-            "logic": "Every scan lights its row on its own clock and brings it into view smoothly; the tint fades over about a second when its 1.6 s are up. A new row slides in and the rows under it glide down. Reduced motion keeps the tint and drops the slide and the fade.",
-            "source": "farrowing-astra-concept.js scanAdd(); SentriUI.scanArrive(), scanPlaces(), scanGlide() (components/Lookup); Row's Just scanned state (data-arrival, design system)"
+            "name": "Header line",
+            "at": "Not in Farrowing",
+            "shows": "\"Not in Farrowing · Unit 3 · A2\": why no farrowing drawer opened, then where she is.",
+            "rule": "Her Back returns to the page she was found on.",
+            "source": "farrowing-astra-concept.js pigPage(), inspection-astra-concept.js pigOverview()"
           }
         ],
         "controls": [],
         "copy": [
-          "(raw) Unit 7 · Unit 6"
-        ],
-        "edge": [
-          "A real reader can read the same tag twice in a row while it is held to the ear: the second read only lights her row again.",
-          "On the phone, each read should also give a short haptic tick with the reader's beep, so the worker need not look; the prototype cannot."
-        ],
-        "rules": [
-          "Owner, 2026-10-20: a new scan must not appear abruptly; scans in quick succession stay readable."
-        ],
-        "issues": []
-      }
-    },
-    {
-      "id": "farrowing.scan-ticked",
-      "name": "Scan · sows ticked",
-      "zh": "已勾选",
-      "status": "in-design",
-      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
-      "preset": "scan-ticked",
-      "figma": "",
-      "notes": {
-        "purpose": "Select several scanned sows for the shared Actions.",
-        "states": [
-          "One or more rows ticked: the ticked rows take the selected tint and a check, and the footer becomes the plain count \"N sows selected\" and the primary \"Actions\""
-        ],
-        "elements": [
-          {
-            "name": "Selection bar",
-            "at": "Actions",
-            "shows": "The count \"2 sows selected\" on the left, as plain text with nothing to tap, and the primary \"Actions\" (the word Actions, with the more glyph) on the right, in place of Stop scanning.",
-            "rule": "To untick a sow, tap her box in the list; there is no separate review of the selection. Actions opens the Actions sheet. Scanning goes on while sows are ticked, and a new scan arrives unticked. Unticking the last sow brings Stop scanning back.",
-            "source": "farrowing-astra-concept.js scanPage() on SentriUI.scanPage (components/Lookup), scanAction()"
-          }
-        ],
-        "copy": [
-          "(raw) N sows selected · Actions"
-        ],
-        "edge": [],
-        "rules": [
-          "Owner decision 2026-10-12: the selection bar's button says \"Actions\", not \"More actions\"."
+          "(raw) Not in Farrowing"
         ],
         "issues": []
       }
@@ -3155,42 +3112,6 @@
         ],
         "rules": [],
         "issues": []
-      }
-    },
-    {
-      "id": "farrowing.scan-actions",
-      "name": "Scan · Actions",
-      "zh": "操作",
-      "status": "in-design",
-      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
-      "preset": "scan-actions",
-      "figma": "",
-      "notes": {
-        "purpose": "Offer the shared generic actions for the ticked sows.",
-        "states": [
-          "Actions over the Scan page: title \"Actions\", one tile grid of four verbs, Back"
-        ],
-        "elements": [
-          {
-            "name": "Verb tiles",
-            "at": "Transfer",
-            "shows": "Transfer, Condition, Treat and Note: the shared generic actions, for the ticked sows only, drawn as More actions' everyday verbs (the design system's Row tile grid: an icon well over one word, two rows of two). Each tile's accessible name keeps the full action (\"Condition, Disease or symptom\", \"Treat, Record treatment\", \"Note, Add a note\"). No count line: the footer under the sheet already said \"N sows selected\". No Farrowing action is offered here.",
-            "rule": "Each row opens its real flow, in the existing sow actions page, for the first ticked sow only: the prototype has no flow that takes several sows at once, so a selection of two or more is a gap (the shared flow should take the whole selection). Back from the flow returns to the Scan list with the ticks kept.",
-            "source": "farrowing-astra-concept.js scanActionsSheet(), room-scan-act, deepLinkInto(); inspection-astra-concept.js actionCatalogue()"
-          }
-        ],
-        "copy": [
-          "(raw) Actions · Transfer · Condition · Treat · Note"
-        ],
-        "edge": [
-          "With more than one sow ticked, the flow that opens is for the first one ticked."
-        ],
-        "rules": [
-          "Owner decision 2026-10-12: Scan offers the generic Actions only; no Farrowing-specific action."
-        ],
-        "issues": [
-          "The Transfer, health and note flows run for the first ticked sow only; a flow for the whole selection is not built in the prototype."
-        ]
       }
     },
     {

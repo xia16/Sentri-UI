@@ -1379,7 +1379,7 @@ function findHits(c){
  return all.flatMap(({pe,unit})=>pe.pigs.filter(p=>p.id.includes(q)||pe.id.toLowerCase().includes(q)).map(p=>({p,pe,unit}))).sort((a,b)=>rank(a.p)-rank(b.p)||a.p.id.localeCompare(b.p.id));
 }
 function searchBody(c){
- const q=c.query.trim().toLowerCase(),groups=unitGroups(c,findHits(c)).map(g=>({title:g.title,rows:g.rows.map(h=>SentriUI.findRow({code:h.p.id,place:'Pen '+h.pe.id,query:q,action:'search-pig',value:h.p.id}))}));
+ const q=c.query.trim().toLowerCase(),groups=unitGroups(c,findHits(c)).map(g=>({title:g.title,rows:g.rows.map(h=>SentriUI.findRow({code:h.p.id,place:'Pen '+h.pe.id,query:q,right:{kind:'tags',tags:rowConditionTags(cases(h.p))},action:'search-pig',value:h.p.id}))}));
  return SentriUI.findResults({query:c.query,groups,hint:'Type part of an ear tag or a pen, or scan a tag. Searches every unit.',none:'No pig matching “'+c.query.trim()+'” in any unit.'});
 }
 function findPage(c){
@@ -1389,12 +1389,14 @@ function scanSetup(c,type=''){
  const scanned=['scan-list','scan-ticked','scan-stopped','scan-new'].includes(type),items=scanned?['000306','000267','000254']:[];   // newest first
  c.scan={connected:type==='scan-none'?false:/^scan-/.test(type)?true:!scannerOff,listening:type!=='scan-stopped',items,seq:items.length,fresh:{},last:''};
  if(type==='scan-new')c.scan.fresh['000306']=Infinity;   // the held frame of the arrival tint: 000306, the newest scan, stays lit
- if(type==='scan-ticked')c.selected=new Set(['000267','000254']);
+ // Inspection is a multi-select task (owner, 2026-10-22): a read ticks her. Scan · ticked shows one pig the worker has unticked again.
+ c.selected=new Set(type==='scan-ticked'?['000267','000254']:items);
 }
 function scanAdd(c){
  const sc=c.scan;if(!sc.connected||!sc.listening)return false;
  const tag=scanSequence[sc.seq++%scanSequence.length];
  if(!sc.items.includes(tag))sc.items.unshift(tag);
+ c.selected.add(tag);   // a read ticks her (a multi-select task); a repeat read keeps her ticked
  sc.fresh[tag]=Date.now()+1600;sc.last=tag;
  return true;
 }
@@ -2025,7 +2027,8 @@ function back(){return SentriUI.backButton({action:'back'});}
    or exactly one Back away. Her own page carries her identity facts (where she is, what she is); a surface that the record forms
    come back to (More actions, Measurements & condition, a finding) carries the route: her chip, then her pen. */
 function pigWhat(p){const type=animalType(p);return type!=='Sow'?type:(p.stage==='Off production'&&p.breedingStatus==='Open'?'Open':null)||({Gestating:'Gestation',Lactating:'Lactation'})[p.stage]||p.stage||'';}
-function pigFacts(c,p){return {text:[{text:pigUnit(c,p.id)+' · '+penOf(c,p.id).id},...(pigWhat(p)?[{sep:true},{text:pigWhat(p)}]:[])]};}
+// A host that opened a pig who is not in its task says so first (Farrowing: "Not in Farrowing", owner 2026-10-22), then where she is.
+function pigFacts(c,p){if(c.hostNote)return {text:[{text:c.hostNote},{sep:true},{text:pigUnit(c,p.id)+' · '+penOf(c,p.id).id}]};return {text:[{text:pigUnit(c,p.id)+' · '+penOf(c,p.id).id},...(pigWhat(p)?[{sep:true},{text:pigWhat(p)}]:[])]};}
 function pigRoute(c,p){return {chip:{id:p.id,action:'pig',value:p.id,label:'Open pig '+p.id},facts:[penOf(c,p.id).id]};}
 function scope(c){const ids=c.form.subjects||[...c.selected],pens=[...new Set(ids.map(id=>penOf(c,id)?.id))];return `${countLabel(ids.length)} · ${pens.join(' / ')}`;}
 function action(a,k,title,sub,v='',disabled=false){return stRow({action:a,title,description:sub,icon:icon(k),value:v,disabled,className:'action-item',attrs:entryFor(a)?{'data-entry':entryFor(a)}:{}});}
@@ -2278,7 +2281,7 @@ document.querySelectorAll('[data-layout]').forEach(b=>b.onclick=()=>{gallery.cla
 if(embeddedSow)window.addEventListener('message',e=>{
  if(e.origin!==location.origin||e.source!==window.parent||e.data?.type!=='open-sow-detail')return;
  const r=e.data.record;if(!r||typeof r.id!=='string'||typeof r.pen!=='string')return;
- states[0]=sowDetailContext(r,e.data.context);states[0].hostActions=e.data.actions||[];states[0].transferDestinations=e.data.destinations||[];const origin=states[0].transferDestinations.find(u=>u.name===r.unit);states[0].transferOrigin=origin?{unit:origin.id,name:origin.name}:null;states[0].hostTasks=(e.data.tasks||[]).filter(t=>!states[0].completedHostTasks?.includes(t.id));if(e.data.entry==='actions'){states[0].selected=new Set([r.id]);states[0].actionScope='pigs';states[0].view='actions';states[0].actionEntry=r.id;states[0].restoreSheetScroll=states[0].actionMenuScroll||0;}else delete states[0].actionEntry;embeddedSowReady=true;document.documentElement.classList.add('inspection-embedded-ready');document.documentElement.removeAttribute('data-atlas-pending');render(0);
+ states[0]=sowDetailContext(r,e.data.context);states[0].hostActions=e.data.actions||[];states[0].hostNote=e.data.note||'';states[0].transferDestinations=e.data.destinations||[];const origin=states[0].transferDestinations.find(u=>u.name===r.unit);states[0].transferOrigin=origin?{unit:origin.id,name:origin.name}:null;states[0].hostTasks=(e.data.tasks||[]).filter(t=>!states[0].completedHostTasks?.includes(t.id));if(e.data.entry==='actions'){states[0].selected=new Set([r.id]);states[0].actionScope='pigs';states[0].view='actions';states[0].actionEntry=r.id;states[0].restoreSheetScroll=states[0].actionMenuScroll||0;}else delete states[0].actionEntry;embeddedSowReady=true;document.documentElement.classList.add('inspection-embedded-ready');document.documentElement.removeAttribute('data-atlas-pending');render(0);
 });
 states.forEach((_,i)=>render(i));if(new URLSearchParams(location.search).get('layout')==='overview')document.querySelector('[data-layout="overview"]').click();
 })();

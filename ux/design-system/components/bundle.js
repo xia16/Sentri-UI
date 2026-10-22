@@ -1488,21 +1488,26 @@
        lights its row again. Every row has its tick box; ticking replaces the footer with "N selected" and Actions. The footer's
        Stop / Resume scanning is the only scanning status. No "Not found" row, no Select button.
      The host passes its own animal row (Row · Animal in Find, rowSelectDoor in Scan) and its own Actions; Lookup draws the page around them.
+     Task membership (owner, 2026-10-22): a pig on the task's own list shows the task's row (its state on the right); any other pig shows the
+     generic row (her condition tags, or nothing). The host knows its list, so it passes each row's right side: findRow({right}).
+     A single-action task's Scan opens her (read:'open'): nothing is listed and the host opens her on each read. A multi-select task's Scan
+     ticks her as she is read, and its footer may carry the task's own actions directly (actions:[{label,action}]).
      lookupGroups([{title,rows:[html]}],{variant:'find'|'scan'}) · findPage({query,placeholder,results,scan,clear,cancel,inputAttrs,bar})
-     findResults({query,groups,hint,none}) · findRow({code,place,query,action,value}) · findMark(text,query)
-     scanPage({title,back,connected,listening,groups,picked,selected,actions,toggle,empty,bar}) · scanArrive(root,scan) · scanPlaces(root) · scanGlide(root,before) */
+     findResults({query,groups,hint,none}) · findRow({code,place,query,action,value,right}) · findMark(text,query)
+     scanPage({title,back,read,connected,listening,groups,picked,selected,actions,toggle,empty,bar}) · scanArrive(root,scan) · scanPlaces(root) · scanGlide(root,before) */
   function lookupGroups(groups=[],{variant='find'}={}){
     const card=variant==='scan'?'st-scan-card':'st-find-list';
     return groups.filter(g=>g&&(g.rows||[]).length).map(g=>heading({title:g.title,kind:'section',level:3})+panel(g.rows.join(''),{className:'st-row-group '+card})).join('');
   }
   /* The typed part bold, the rest muted (.st-find-row mutes the tag; this marks only the part that matched). */
   function findMark(text,q){const t=String(text??''),i=q?t.toLowerCase().indexOf(String(q).toLowerCase()):-1;return i<0?esc(t):esc(t.slice(0,i))+'<b>'+esc(t.slice(i,i+q.length))+'</b>'+esc(t.slice(i+q.length));}
-  /* A result: the tag on the left, where the animal is on the right; the part of either that matched is marked. */
-  function findRow({code='',place='',query='',action='',value=code,className=''}={}){
+  /* A result: the tag over where the animal is, and the host's right side: the task's state for a pig on the task's list, her condition
+     tags (or nothing) for any other pig (owner, 2026-10-22). The part of the tag or the place that matched is marked. */
+  function findRow({code='',place='',query='',action='',value=code,className='',right=null}={}){
     const q=String(query||'').trim().toLowerCase();
-    let html=row({variant:'animal',code,right:{kind:'state',figure:place,word:'',level:'settled'},action,value,className:'st-find-row'+(className?' '+className:'')});
+    let html=row({variant:'animal',code,description:place,right:right||{kind:'state',figure:'',word:'',level:'settled'},action,value,className:'st-find-row'+(className?' '+className:'')});
     html=html.replace(`<strong class="st-animal-id">${esc(code)}</strong>`,`<strong class="st-animal-id">${findMark(code,q)}</strong>`);
-    if(place&&String(place).toLowerCase().includes(q))html=html.replace(`>${esc(place)}<`,`>${findMark(place,q)}<`);
+    if(place&&String(place).toLowerCase().includes(q))html=html.replace(`<span class="st-animal-context">${esc(place)}<`,`<span class="st-animal-context">${findMark(place,q)}<`);
     return html;
   }
   /* What the results area says: the hint before typing, the no-match line, or the unit cards. */
@@ -1524,11 +1529,14 @@
   /* A page (it fills the screen): Back at the top left and the title, no line (Headers law). The footer says whether the reader listens,
      so the body carries no second scanning status. With rows ticked the footer is the plain count and Actions (no Back); with no reader
      there is no footer. `selected(n)` and `empty` carry the host's noun ("2 sows selected", "Each pig you scan appears here."). */
-  function scanPage({title='Scan ear tags',back={action:'back'},connected=true,listening=true,groups=[],picked=0,selected=n=>n+' selected',actions={action:'scan-actions',label:'Actions'},toggle={action:'scan-toggle'},empty={},bar='',className=''}={}){
+  function scanPage({title='Scan ear tags',back={action:'back'},read='list',connected=true,listening=true,groups=[],picked=0,selected=n=>n+' selected',actions={action:'scan-actions',label:'Actions'},toggle={action:'scan-toggle'},empty={},bar='',className=''}={}){
     const e=Object.assign({offTitle:'Scanner not connected',offText:"Turn on the tag reader and pair it in your phone's Bluetooth settings. Scanning starts as soon as it connects.",title:'Hold the reader to an ear tag',text:'Each animal you scan appears here.',stoppedTitle:'Scanning is stopped',stoppedText:'Resume scanning to add more.'},empty);
-    const has=groups.some(g=>(g.rows||[]).length);
+    // read:'open' (a single-action task): nothing is listed, because each read opens her; the page only says that it listens.
+    const has=read!=='open'&&groups.some(g=>(g.rows||[]).length);
     const body=!connected?scanEmpty(e.offTitle,e.offText):!has?(listening?scanEmpty(e.title,e.text):scanEmpty(e.stoppedTitle,e.stoppedText)):`<div class="st-scan-body">${lookupGroups(groups,{variant:'scan'})}</div>`;
-    const foot=!connected?false:picked?sheetFooter({content:`<p class="st-scan-selected">${esc(selected(picked))}</p>`+button({label:actions.label||'Actions',icon:SentriIcons.icon('more'),register:'primary',action:actions.action}),className:'st-scan-foot'}):
+    // A multi-select task may put its own actions in the footer directly (actions:[{label,action}], the last one primary); else the count and Actions.
+    const direct=Array.isArray(actions)?actions.map((x,k)=>button({label:x.label,register:x.register||(k===actions.length-1?'primary':'secondary'),action:x.action,value:x.value})).join(''):'';
+    const foot=!connected?false:picked&&has?sheetFooter({content:direct||`<p class="st-scan-selected">${esc(selected(picked))}</p>`+button({label:actions.label||'Actions',icon:SentriIcons.icon('more'),register:'primary',action:actions.action}),className:'st-scan-foot'+(direct?' st-scan-foot-direct':'')}):
       sheetFooter({content:button({label:listening?(toggle.stop||'Stop scanning'):(toggle.resume||'Resume scanning'),icon:SentriIcons.icon(listening?'stop':'scan'),register:listening?'secondary':'primary',className:'st-scan-toggle',action:toggle.action}),className:'st-scan-foot'});
     return sheet({variant:'page',title,back,body,footer:foot,className:'st-scan'+(className?' '+className:''),label:title,bar,attrs:{'data-lookup':'scan'}});
   }
