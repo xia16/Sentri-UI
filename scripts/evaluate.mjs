@@ -15,7 +15,7 @@ import path from 'node:path';
 import { pwPath, playwright } from './playwright-path.mjs';
 import { removeWorktree } from './worktree-remove.mjs';
 import { closer } from './process-start.mjs';
-import { CLASSES, classOfFiles, DS_FEATURE, componentPage, componentPagesOf, componentsTouched, idPath, screensOf, pageOf, pageAssets, sharedFiles, coverageLost, effectiveClass, classifyScreens, touchesSystem, touchesTools, budgetProblems, critiqueProblems, pageStyling, addedLines, scenarioDebt, isMotionFile, unheldMotion, heldOf, confirmLeaf, CONFIRMED, firstRun, reusableLeaf, IN_PROGRESS, readInProgress, ownFeatures, scopeReach, outsideLine, componentScope, exportStamps, readLibrary, libraryProblems, newExportProblems, frozenFeatures, checksChinese } from './loop-rules.mjs';
+import { CLASSES, classOfFiles, DS_FEATURE, componentPage, componentPagesOf, componentsTouched, idPath, screensOf, pageOf, pageAssets, sharedFiles, coverageLost, effectiveClass, classifyScreens, touchesSystem, touchesTools, budgetProblems, critiqueProblems, pageStyling, addedLines, removedLines, scenarioDebt, isMotionFile, unheldMotion, heldOf, confirmLeaf, CONFIRMED, firstRun, reusableLeaf, IN_PROGRESS, readInProgress, ownFeatures, scopeReach, outsideLine, componentScope, exportStamps, readLibrary, libraryProblems, newExportProblems, frozenFeatures, checksChinese } from './loop-rules.mjs';
 import { bundleShape, bundleChange } from './bundle-graph.mjs';
 import { cssChange, markupWords, unitMayReach, variantTexts } from './css-reach.mjs';
 // The analyser (gate-v2 §2): static and conservative, over both revisions. It says what each screen's and each leaf's evidence
@@ -250,7 +250,8 @@ async function evaluateIn(opts, { kids, cleanups }) {
   }
   {
     // P2: visual declarations belong to the design system. Read from the diff, so it holds whether or not a screen moves.
-    const ps = pageStyling(addedLines(git(['diff', '-U0', mech.base, mech.candidate, '--', 'ux'], root).out));
+    const uxDiff = git(['diff', '-U0', mech.base, mech.candidate, '--', 'ux'], root).out;
+    const ps = pageStyling(addedLines(uxDiff), removedLines(uxDiff));
     mech.pageStyling = ps;
     check('design-system components only', !ps.length, ps.length ? `${ps.length} visual declaration(s) added outside ux/design-system (${ps.slice(0, 3).map((p) => p.file.split('/').pop() + ' ' + p.prop).join(', ')}): use a SentriUI component, or build the part in the design system (P2, briefs/build.md §3)` : '');
   }
