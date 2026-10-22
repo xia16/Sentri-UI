@@ -1346,3 +1346,14 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 .st-scan-selected{display:flex;align-items:center;min-height:48px;margin:0 auto 0 0;font:600 15px var(--font-sans)}
 .st-scan-foot .st-scan-toggle{flex:1}
 .st-scan-foot>.button.secondary.st-scan-toggle{border:var(--border-width) solid var(--control-border);background:var(--paper)}
+/* TaskDock's place (Farrowing's pen map, Inspection's pen): a framed button beside the primary tool; the unframed face is the
+   frozen piglet-processing room's (SentriTask.dock). */
+.tk-dock-unit { flex: none; display: flex; align-items: center; gap: 9px; min-height: var(--footer-height); margin: 0; padding: 0 3px; border: 0; background: var(--paper); color: var(--ink); text-align: left; }
+.tk-dock-unit > svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.tk-dock-unit > span { display: flex; flex-direction: column; gap: 4px; }
+.tk-dock-unit strong { font: 600 var(--type-row-title-size)/1.2 var(--font-mono); }
+.tk-dock-unit small { font: var(--type-dock-caption-size)/1.2 var(--font-sans); color: var(--muted); }
+.tk-dock-unit[data-framed] { gap: var(--space-8); padding: 0 var(--space-14); border: var(--border-width) solid var(--line); border-radius: var(--radius-control); white-space: nowrap; }
+.tk-dock-unit[data-framed] strong { font: 600 var(--type-dock-caption-size)/1.2 var(--font-sans); }
+.tk-dock-unit[data-framed]:active { background: var(--press); transform: translateY(var(--size-2)); }
+@media (prefers-reduced-motion: reduce) { .tk-dock-unit[data-framed]:active { transform: none; } }
