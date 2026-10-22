@@ -15,7 +15,7 @@ import path from 'node:path';
 import { pwPath, playwright } from './playwright-path.mjs';
 import { removeWorktree } from './worktree-remove.mjs';
 import { closer } from './process-start.mjs';
-import { CLASSES, classOfFiles, DS_FEATURE, componentPage, componentPagesOf, componentsTouched, idPath, screensOf, pageOf, pageAssets, sharedFiles, coverageLost, effectiveClass, classifyScreens, touchesSystem, touchesTools, budgetProblems, critiqueProblems, pageStyling, addedLines, scenarioDebt, isMotionFile, unheldMotion, heldOf, confirmLeaf, CONFIRMED, firstRun, reusableLeaf, IN_PROGRESS, readInProgress, ownFeatures, scopeReach, componentScope, exportStamps, readLibrary, libraryProblems, newExportProblems, frozenFeatures, checksChinese } from './loop-rules.mjs';
+import { CLASSES, classOfFiles, DS_FEATURE, componentPage, componentPagesOf, componentsTouched, idPath, screensOf, pageOf, pageAssets, sharedFiles, coverageLost, effectiveClass, classifyScreens, touchesSystem, touchesTools, budgetProblems, critiqueProblems, pageStyling, addedLines, scenarioDebt, isMotionFile, unheldMotion, heldOf, confirmLeaf, CONFIRMED, firstRun, reusableLeaf, IN_PROGRESS, readInProgress, ownFeatures, scopeReach, outsideLine, componentScope, exportStamps, readLibrary, libraryProblems, newExportProblems, frozenFeatures, checksChinese } from './loop-rules.mjs';
 import { bundleShape, bundleChange } from './bundle-graph.mjs';
 // The analyser (gate-v2 §2): static and conservative, over both revisions. It says what each screen's and each leaf's evidence
 // depends on; the reach is every screen and leaf whose evidence identity that makes differs between the two (gate-simplify.md X1).
@@ -325,10 +325,15 @@ async function evaluateIn(opts, { kids, cleanups }) {
   // screen of the PR's own features (ownFeatures), the component pages of the parts it touches or calls (a page whose variant calls
   // none of the changed exports is left out only when the bundle's JS is the one design-system input that changed), and the screens
   // of the in-progress features (features/_in-progress.json, read from the base so a change can't set its own scope), which are
-  // propagation screens: judged only on whether the shared part arrived and renders correctly. Every other screen is out of scope
-  // and not shot. The identities themselves are untouched. A change that isn't shared, a refactor (identical is checked everywhere,
-  // with no judge to pay for it) and an audit keep the whole reach.
+  // propagation screens: judged only on whether the shared part arrived and renders correctly. Every other screen the identities
+  // reach gets the quick check (owner, 2026-10-22, after #264 broke Health record's Conditions sheet out of scope): one run, EN at
+  // 390, on both sides, with that run's visit checks (spacing, legibility, headers) and "no screen broken"; a new defect against base
+  // fails as on a changed screen. No 360, no ZH, no leaves; its pairs are marked `outside`. The identities themselves are untouched.
+  // A change that isn't shared, a refactor (identical is checked everywhere, with no judge to pay for it) and an audit keep the
+  // whole reach.
   let scoped = null;
+  const quickIds = new Set();
+  const quick = (x) => quickIds.has(x.id);
   if (!audit && sharedByFiles && mode !== 'refactor') {
     let inProgress = null;
     try { inProgress = readInProgress(fs.readFileSync(path.join(S.base.dir, IN_PROGRESS), 'utf8')); } catch {}
@@ -345,8 +350,10 @@ async function evaluateIn(opts, { kids, cleanups }) {
       mech.reach.identity = reachIds.size;
       reachIds.clear();
       for (const id of sc.keep) reachIds.add(id);
+      for (const id of sc.dropped) quickIds.add(id);
       for (const id of [...identityChanged]) if (!reachIds.has(id)) identityChanged.delete(id);
       mech.reach.screens = reachIds.size;
+      mech.reach.outside = quickIds.size;
       scoped = { own, inProgress, propagation: sc.propagation, touched, keepPage };
       mech.ownFeatures = own;
       mech.inProgress = inProgress;
@@ -356,14 +363,16 @@ async function evaluateIn(opts, { kids, cleanups }) {
         const ii = iiOf.get(`cand ${id}`) || iiOf.get(`base ${id}`), all = !ii || ii.bundle?.all;
         return { screen: id, feature: featureOf.get(id), uses: all ? [...touched].sort() : (ii.bundle?.exports || []).filter((e) => touched.has(e)), ...(all ? { all: true } : {}) };
       });
-      log(`scope: own ${own.join(', ') || '(none)'}; propagation only on ${inProgress.join(', ')} (${sc.propagation.size} screen(s)); ${sc.outOfScope.screens} screens in ${sc.outOfScope.features.length} features not checked: not in progress${sc.outOfScope.componentPages ? `; ${sc.outOfScope.componentPages} component page(s) of parts the change doesn't call` : ''}`);
+      log(`scope: own ${own.join(', ') || '(none)'}; propagation only on ${inProgress.join(', ')} (${sc.propagation.size} screen(s)); ${sc.outOfScope.screens} screens in ${sc.outOfScope.features.length} features outside the scope: quick check only (390 EN)${sc.outOfScope.componentPages ? `; ${sc.outOfScope.componentPages} component page(s) of parts the change doesn't call` : ''}`);
     }
   }
   if (!audit) for (const x of S.cand.screens) if (newlyFrozen.includes(x.feature)) reachIds.add(x.id);
   log(`reach: ${reachIds.size} of ${total} screens${mech.reach.changed !== undefined ? ` (${mech.reach.changed} whose identity changed, ${mech.reach.added} added, ${mech.reach.removed} removed)` : ` (${mech.reach.why[0]})`}`);
-  const runsOf = (x) => (inReach(x) ? RUNS.filter((r) => (!componentPage(x.id) || r.lang === 'en') && (r.lang === 'en' || checksChinese(x.feature, zhFrozen))).map(({ width, lang }) => ({ width, lang })) : []);
+  // an out-of-scope screen's quick check is the one run EN 390 (a screen the reach keeps, e.g. a newly frozen one, gets every run)
+  const runsOf = (x) => (inReach(x) ? RUNS.filter((r) => (!componentPage(x.id) || r.lang === 'en') && (r.lang === 'en' || checksChinese(x.feature, zhFrozen))).map(({ width, lang }) => ({ width, lang })) : quick(x) ? [{ width: 390, lang: 'en' }] : []);
+  const isOutside = (id) => quickIds.has(id) && !reachIds.has(id);
   const visitChecks = (side, x, width, lang) => {
-    if (audit || !inReach(x) || componentPage(x.id)) return [];
+    if (audit || !(inReach(x) || quick(x)) || componentPage(x.id)) return [];
     const out = [];
     const hr = HEADER_RUNS.find((r) => r.width === width && r.lang === lang);
     if (hr) out.push({ name: 'headers', params: { checks: hr.checks } });
@@ -579,7 +588,10 @@ async function evaluateIn(opts, { kids, cleanups }) {
   for (const d of screens.diff) log(`  DIFF ${String(d.pct).padStart(7)}%  ${d.id}  ${d.runs.join(' ')}`);
   // a propagation screen that moved but calls none of the touched exports draws the part some other way: likely a local copy
   if (scoped?.touched.size) { const movedIds = new Set([...screens.diff, ...screens.new].map((s) => s.id)); for (const p of mech.propagation || []) if (!p.uses.length && movedIds.has(p.screen)) p.notUsingShared = true; }
-  check('no screen broken by the change', !screens.broken.length, screens.broken.map((s) => `${s.id} ${s.error}`).slice(0, 3).join(' | '));
+  // an out-of-scope screen's quick check: what it found, counted for the Results line
+  const tag = (id) => (isOutside(id) ? `${id} (outside the scope, quick check)` : id);
+  let outsideNew = screens.broken.filter((s) => isOutside(s.id)).length;
+  check('no screen broken by the change', !screens.broken.length, screens.broken.map((s) => `${tag(s.id)} ${s.error}`).slice(0, 3).join(' | '));
   if (screens.bothBroken.length) gaps.push(`${screens.bothBroken.length} screen(s) have a run that renders on neither base nor candidate (main's debt): ${screens.bothBroken.map((s) => `${s.id} (${s.error})`).slice(0, 5).join(', ')}`);
   mark('compare');
 
@@ -590,6 +602,8 @@ async function evaluateIn(opts, { kids, cleanups }) {
   const confirm = [];
   let confirmedBefore = 0;
   for (const d of screens.diff) {
+    // a screen outside the scope is listed, not judged on its pixels: its failures are rule defects, so no confirmation visits (Codex review)
+    if (isOutside(d.id)) continue;
     const t = d.runs.find((x) => pct[`${d.id} ${x}`] > 0);
     if (!t) continue;
     const [lang, w] = t.split('-');
@@ -631,7 +645,7 @@ async function evaluateIn(opts, { kids, cleanups }) {
     // image: each side's shot by its bytes, so a judgement carries to a pair that shows the same two pictures even when an input
     // nothing renders from changed both shots' identities (carryJudgements, G17)
     const imageOf = (x) => { try { return x?.ok && x.png ? sha(fs.readFileSync(x.png)) : null; } catch { return null; } };
-    mech.pairs.push({ screen: s.id, feature: s.feature, lang, width, kind, ...(scoped?.propagation.has(s.id) ? { propagation: true } : {}), pct: kind === 'changed' ? round4(pct[k] ?? 0) : null, file: path.relative(out, file).replace(/\\/g, '/'), identity: { base: b?.ok ? b.id : null, cand: c?.ok ? c.id : null }, image: { base: imageOf(b), cand: imageOf(c) } });
+    mech.pairs.push({ screen: s.id, feature: s.feature, lang, width, kind, ...(scoped?.propagation.has(s.id) ? { propagation: true } : {}), ...(isOutside(s.id) ? { outside: true } : {}), pct: kind === 'changed' ? round4(pct[k] ?? 0) : null, file: path.relative(out, file).replace(/\\/g, '/'), identity: { base: b?.ok ? b.id : null, cand: c?.ok ? c.id : null }, image: { base: imageOf(b), cand: imageOf(c) } });
     pairJobs.push({ file, b, c, lang, width, noZh });
   }
   if (pairJobs.length) await sched.run({ kind: 'pairs', label: `${pairJobs.length} pair image(s)`, priority: 0, run: async ({ browser: b }) => {
@@ -682,8 +696,9 @@ async function evaluateIn(opts, { kids, cleanups }) {
   const tools = touchesTools(files);
   const readCand = (p) => { const f = path.join(S.cand.dir, p); return fs.existsSync(f) ? fs.readFileSync(f, 'utf8') : null; };
   if (moved.length) {
-    // a propagation screen is not redesigned: its feature's budget and critique are not asked for
-    const feats = [...screens.diff, ...screens.new].filter((s) => !scoped?.propagation.has(s.id)).map((s) => s.feature).filter((f) => f !== DS_FEATURE);
+    // a propagation screen is not redesigned: its feature's budget and critique are not asked for;
+    // nor is an out-of-scope screen the quick check visits
+    const feats = [...screens.diff, ...screens.new].filter((s) => !scoped?.propagation.has(s.id) && !isOutside(s.id)).map((s) => s.feature).filter((f) => f !== DS_FEATURE);
     const bp = budgetProblems(feats, readCand);
     check('information budget before layout', !bp.length, bp.length ? bp.join('; ') + ' (P3: write it first, briefs/build.md §2)' : '');
     const cp = critiqueProblems(feats, readCand);
@@ -704,7 +719,7 @@ async function evaluateIn(opts, { kids, cleanups }) {
   // merges only on a gate against main as it is, and a re-gate after main moves reuses every result whose identity is unchanged.
   if (ec.cls === 'shared') {
     gaps.push(scoped
-      ? `shared-component change: judged in full on ${scoped.own.join(', ') || 'no feature of its own'} and the component pages; ${scoped.propagation.size} screen(s) of ${scoped.inProgress.join(', ')} for propagation only (propagated or broken); ${mech.outOfScope.screens} screens in ${mech.outOfScope.features.length} features not checked: not in progress`
+      ? `shared-component change: judged in full on ${scoped.own.join(', ') || 'no feature of its own'} and the component pages; ${scoped.propagation.size} screen(s) of ${scoped.inProgress.join(', ')} for propagation only (propagated or broken); ${mech.outOfScope.screens} screens in ${mech.outOfScope.features.length} features outside the scope, quick-checked at 390 EN`
       : 'shared-component change: every changed screen on every feature it reaches is judged (split the judges by feature if needed)');
   }
 
@@ -720,11 +735,11 @@ async function evaluateIn(opts, { kids, cleanups }) {
     for (const id of changed) {
       const c = evOf('cand', id, 390, 'en', 'legibility');
       if (!c?.ok) { missingCheck('legibility', 'cand', id, 'en-390', c); continue; }
-      if (strictLeg) { if (legFailing(c.result.audit)) bad.push(`${id}: ${legCount(c.result.audit.small)} small, ${legCount(c.result.audit.c45) + legCount(c.result.audit.c7)} contrast, ${legCount(c.result.audit.taps)} targets`); continue; }
+      if (strictLeg) { if (legFailing(c.result.audit)) bad.push(`${tag(id)}: ${legCount(c.result.audit.small)} small, ${legCount(c.result.audit.c45) + legCount(c.result.audit.c7)} contrast, ${legCount(c.result.audit.taps)} targets`); continue; }
       const b = onBase(id) ? evOf('base', id, 390, 'en', 'legibility') : null;
       if (onBase(id) && !b?.ok) { missingCheck('legibility', 'base', id, 'en-390', b); continue; }
       const w = legibilityWorse(b?.ok ? b.result : null, c.result);
-      if (w.worse) bad.push(`${id}: ${w.why.join('; ')}`);
+      if (w.worse) { bad.push(`${tag(id)}: ${w.why.join('; ')}`); if (isOutside(id)) outsideNew++; }
     }
     check(name, !bad.length, bad.length ? `${bad.length} screen(s): ${bad.slice(0, 2).join(' | ')}` : `${changed.length} screen(s)`);
     // P4: clearly wrong spacing; a defect main already has on that screen is main's debt
@@ -737,9 +752,10 @@ async function evaluateIn(opts, { kids, cleanups }) {
         if (!c?.ok) { missingCheck('spacing', 'cand', id, 'en-390', c); continue; }
         if (onBase(id) && !b?.ok) { missingCheck('spacing', 'base', id, 'en-390', b); continue; }
         const was = new Set((b?.result || []).map(k));
-        for (const d of c.result) { if (was.has(k(d))) debt++; else added.push(`${id}: ${d.check} — ${d.detail}`); }
+        for (const d of c.result) { if (was.has(k(d))) debt++; else { added.push(`${tag(id)}: ${d.check} — ${d.detail}`); if (isOutside(id)) outsideNew++; } }
       }
-      check('clear spacing on changed screens (P4)', !added.length, added.length ? `${added.length} new: ${added.slice(0, 2).join(' | ')}` : debt ? `${debt} defect(s) already on main` : '');
+      const on = [...new Set(added.map((a) => a.split(':')[0]))];
+      check('clear spacing on changed screens (P4)', !added.length, added.length ? `${added.length} new on ${on.slice(0, 4).join(', ')}${on.length > 4 ? ' …' : ''}: ${added.slice(0, 2).join(' | ')}` : debt ? `${debt} defect(s) already on main` : '');
       if (debt) gaps.push(`spacing: ${debt} defect(s) on changed screens are already on main`);
     }
     // P3: the Headers law, base against candidate
@@ -751,14 +767,15 @@ async function evaluateIn(opts, { kids, cleanups }) {
         const C = [], B = [];
         // English first (#254): a ZH header run exists only for a frozen feature's screen
         const feat = (S.cand.screens.find((s) => s.id === id) || S.base.screens.find((s) => s.id === id))?.feature;
-        for (const r of HEADER_RUNS.filter((h) => h.lang === 'en' || checksChinese(feat, zhFrozen))) {
+        // an out-of-scope screen has the quick check's one run, EN 390
+        for (const r of HEADER_RUNS.filter((h) => (h.lang === 'en' || checksChinese(feat, zhFrozen)) && (!isOutside(id) || (h.width === 390 && h.lang === 'en')))) {
           const c = evOf('cand', id, r.width, r.lang, 'headers'), b = onBase(id) ? evOf('base', id, r.width, r.lang, 'headers') : null;
           if (!c?.ok) { missingCheck('headers', 'cand', id, `${r.lang}-${r.width}`, c); continue; }
           if (onBase(id) && !b?.ok) { missingCheck('headers', 'base', id, `${r.lang}-${r.width}`, b); continue; }
           C.push(...c.result); B.push(...(b?.result || []));
         }
         const was = new Set(dedupeHeaders(B).map(k));
-        for (const d of dedupeHeaders(C)) { if (was.has(k(d))) debt++; else added.push(`${id}: ${d.check} (${d.lang}-${d.width}) — ${d.detail}`); }
+        for (const d of dedupeHeaders(C)) { if (was.has(k(d))) debt++; else { added.push(`${tag(id)}: ${d.check} (${d.lang}-${d.width}) — ${d.detail}`); if (isOutside(id)) outsideNew++; } }
       }
       check('headers on changed screens (P3)', !added.length, added.length ? `${added.length} new: ${added.slice(0, 2).join(' | ')}` : debt ? `${debt} defect(s) already on main` : '');
       if (debt) gaps.push(`headers: ${debt} defect(s) on changed screens are already on main`);
@@ -795,6 +812,11 @@ async function evaluateIn(opts, { kids, cleanups }) {
     }
     check('component pages follow the Headers law (P3)', !added.length, added.length ? `${added.length} new: ${added.slice(0, 2).join(' | ')}` : debt ? `${debt} defect(s) already on main` : `${changedPages.length} page(s)`);
     if (debt) gaps.push(`headers: ${debt} defect(s) on moved component pages are already on main`);
+  }
+  if (quickIds.size) {
+    const outsideOnly = [...quickIds].filter(isOutside);
+    mech.outside = { screens: outsideOnly.length, moved: [...screens.diff, ...screens.new, ...screens.gone].map((s) => s.id).filter(isOutside).sort(), newDefects: outsideNew };
+    log(outsideLine(mech.outside));
   }
   mark('checks');
 

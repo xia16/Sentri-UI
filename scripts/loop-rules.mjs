@@ -253,19 +253,28 @@ export function ownFeatures({ files, scope = [], usersOf = () => null }) {
   return [...own].sort();
 }
 // The reach, scoped: every screen of an own feature; a component page when keepPage says so; a screen of an in-progress feature,
-// as a propagation screen. Everything else is out of scope and not shot. inProgress null: nothing is scoped (the list is unreadable).
+// as a propagation screen. Every other screen is out of scope: `dropped` names them, and the gate gives each one the quick check
+// (EN at 390 on both sides, the visit checks, no new defect: owner, 2026-10-22, after #264 broke Health record's Conditions sheet
+// out of scope). A dropped component page is not checked. inProgress null: nothing is scoped (the list is unreadable).
 export function scopeReach({ reach, featureOf, own = [], inProgress, keepPage = () => true }) {
-  const keep = new Set(), propagation = new Set(), dropped = new Map();
+  const keep = new Set(), propagation = new Set(), dropped = new Map(), ids = [];
   let pages = 0;
   for (const id of reach) {
     if (componentPage(id)) { if (keepPage(id)) keep.add(id); else pages++; continue; }
     const f = featureOf(id);
     if (!inProgress || own.includes(f)) keep.add(id);
     else if (inProgress.includes(f)) { keep.add(id); propagation.add(id); }
-    else dropped.set(f, (dropped.get(f) || 0) + 1);
+    else { dropped.set(f, (dropped.get(f) || 0) + 1); ids.push(id); }
   }
   const screens = [...dropped.values()].reduce((a, b) => a + b, 0);
-  return { keep, propagation, outOfScope: { screens, features: [...dropped.keys()].sort(), componentPages: pages } };
+  return { keep, propagation, dropped: ids.sort(), outOfScope: { screens, features: [...dropped.keys()].sort(), componentPages: pages } };
+}
+// The quick check's line in the Results block (owner, 2026-10-22): how many out-of-scope screens were checked, which moved, and how
+// many defects they gained. q: mech.outside { screens, moved: [ids], newDefects }.
+export function outsideLine(q) {
+  if (!q) return null;
+  const m = q.moved || [];
+  return `Outside the scope: ${q.screens} screens checked (390 EN), ${m.length} moved${m.length ? `: ${m.slice(0, 4).join(', ')}${m.length > 4 ? ' …' : ''}` : ''}; ${q.newDefects || 0} new defects`;
 }
 // The SentriUI exports a component page's variant file calls: `SentriUI.x`, `SentriUI['x']`, and the same through a plain alias
 // (`var UI = window.SentriUI`). null when it uses the namespace any other way: it may call anything.
@@ -396,17 +405,19 @@ export function checkVerdict(verdict, mech) {
   // A judgement of a pair the manifest doesn't list is about other evidence (an earlier run, another commit): the verdict is stale.
   const manifest = new Set(listed.map(name));
   for (const p of pairs) if (!manifest.has(name(p))) problems.push(`the verdict judges pair ${name(p)}, which is not in the evidence manifest (mechanical.json pairs): judge this run's pairs`);
+  // An outside pair (an out-of-scope screen's quick check, owner 2026-10-22) is the machine's: it needs no judgement, and one given
+  // is propagated or broken, as for a propagation pair.
   for (const p of listed) {
-    const kind = p.kind || 'changed', allowed = p.propagation ? PROPAGATION : VERDICTS[kind] || [], v = said.get(name(p)) || [];
-    if (!v.length) { problems.push(`no judgement for pair ${name(p)}`); continue; }
+    const kind = p.kind || 'changed', allowed = p.propagation || p.outside ? PROPAGATION : VERDICTS[kind] || [], v = said.get(name(p)) || [];
+    if (!v.length) { if (!p.outside) problems.push(`no judgement for pair ${name(p)}`); continue; }
     if (new Set(v).size > 1) problems.push(`pair ${name(p)} is judged ${[...new Set(v)].join(' and ')}`);
-    for (const x of new Set(v)) if (!allowed.includes(x)) problems.push(`pair ${name(p)} ${p.propagation ? 'is a propagation pair (an in-progress feature the shared change reaches)' : `has ${kind === 'changed' ? 'both sides' : 'one side'}`}: its verdict is ${allowed.join(' or ') || '(unknown pair kind)'}, not "${x}"`);
-    if (!p.propagation && kind === 'changed' && p.pct === 0 && v.some((x) => x !== 'same')) problems.push(`pair ${name(p)} is pixel-identical: it can only be same`);
+    for (const x of new Set(v)) if (!allowed.includes(x)) problems.push(`pair ${name(p)} ${p.outside ? 'is an outside pair (a screen outside the scope, quick-checked by the machine)' : p.propagation ? 'is a propagation pair (an in-progress feature the shared change reaches)' : `has ${kind === 'changed' ? 'both sides' : 'one side'}`}: its verdict is ${allowed.join(' or ') || '(unknown pair kind)'}, not "${x}"`);
+    if (!p.propagation && !p.outside && kind === 'changed' && p.pct === 0 && v.some((x) => x !== 'same')) problems.push(`pair ${name(p)} is pixel-identical: it can only be same`);
   }
   // Gate v2 has no flaky list: a changed screen is visited again on both sides and either draws its own shot again or blocks.
   // A propagation pair is judged only propagated or broken, so it never counts toward "at least one better".
   const shows = (p) => (p.kind || 'changed') !== 'changed' || p.pct !== 0;
-  const moving = listed.filter((p) => !p.propagation && (p.kind || 'changed') === 'changed' && p.pct !== 0);
+  const moving = listed.filter((p) => !p.propagation && !p.outside && (p.kind || 'changed') === 'changed' && p.pct !== 0);
   const better = moving.filter((p) => (said.get(name(p)) || []).includes('better'));
   const worse = pairs.filter((p) => p.verdict === 'worse' || p.verdict === 'fail' || p.verdict === 'broken');
   // The library fit (owner, 2026-10-20): a change that touches a component says whether it belongs where it was built. A new parallel
@@ -424,7 +435,7 @@ export function checkVerdict(verdict, mech) {
     if ((verdict.walk || []).some((w) => w.ok !== true)) problems.push('passes with a walk entry that is not ok');
     if (mech.mode === 'refactor') { if (pairs.some((p) => p.verdict !== 'same')) problems.push('a refactor passes with a pair that is not the same'); }
     else if (moving.length && !better.length) problems.push('passes with no pair better (same is not enough)');
-    else if (!listed.some((p) => !p.propagation && shows(p)) && listed.some((p) => p.propagation && shows(p))) problems.push("only propagation pairs moved: the change shows on no page of its own (its component's atlas page ds:<Name>/… or the PR's own feature), so nothing is judged better");
+    else if (!listed.some((p) => !p.propagation && !p.outside && shows(p)) && listed.some((p) => (p.propagation || p.outside) && shows(p))) problems.push("only propagation pairs moved: the change shows on no page of its own (its component's atlas page ds:<Name>/… or the PR's own feature), so nothing is judged better");
     else if (!(mech.screens?.diff || []).length && !(mech.screens?.new || []).length) {
       // Nothing visible changed: only a behaviour fix (which may leave every first frame alone) passes, and on a walk.
       const behaviour = ['behaviour', 'shared'].includes(mech.class?.effective || mech.class?.declared);
@@ -714,7 +725,9 @@ export function resultsBlock(mech) {
   if (r.of) out.push(`- Reach: ${r.screens} of ${r.of} screens${r.changed !== undefined ? ` (${r.changed} changed identity, ${r.added} added, ${r.removed} removed)` : ''}${r.leaves !== undefined ? `, ${r.leaves} leaves` : ''}`);
   // the scoped reach of a shared change (owner, 2026-10-20), in one line, and the propagation pairs
   const os = mech.outOfScope;
-  if (os) out.push(`- Scope: checked in full on ${(mech.ownFeatures || []).join(', ') || 'no feature of its own'} and the component pages; propagation only on ${(mech.inProgress || []).join(', ') || 'none'} (in progress)${os.screens ? `; ${os.screens} screens in ${os.features.length} features not checked: not in progress` : ''}${os.componentPages ? `; ${os.componentPages} component page(s) of parts the change doesn't call` : ''}`);
+  if (os) out.push(`- Scope: checked in full on ${(mech.ownFeatures || []).join(', ') || 'no feature of its own'} and the component pages; propagation only on ${(mech.inProgress || []).join(', ') || 'none'} (in progress)${os.componentPages ? `; ${os.componentPages} component page(s) of parts the change doesn't call` : ''}`);
+  // the out-of-scope screens' quick check (owner, 2026-10-22), in place of "N screens in M features not checked"
+  if (os && mech.outside) out.push(`- ${outsideLine(mech.outside)}`);
   const prop = (mech.pairs || []).filter((p) => p.propagation).length, notUsing = (mech.propagation || []).filter((p) => p.notUsingShared).map((p) => p.screen);
   if (prop || notUsing.length) out.push(`- Propagation: ${prop} pair(s) checked by the machine${notUsing.length ? `; calls none of the changed exports (a local copy?): ${notUsing.slice(0, 4).join(', ')}${notUsing.length > 4 ? ' …' : ''}` : ''}`);
   if (mech.zh) out.push(`- Chinese: checked only on frozen features (English first, owner 2026-10-21): ${mech.zh.frozen.length ? mech.zh.frozen.join(', ') : 'none frozen, so no ZH runs or ZH leaves'}`);
@@ -768,7 +781,7 @@ export function carryJudgements(old, now) {
   const idKey = (p) => keysOf(p).find((x) => !x.includes(' image '));
   for (const p of now.pairs || []) {
     const k = keysOf(p).find((x) => judged.has(x));
-    if (!k) { need.push(name(p)); continue; }
+    if (!k) { if (!p.outside) need.push(name(p)); continue; } // an outside pair needs no judgement
     pairs.push({ ...judged.get(k), carried: true });
     // the same picture from changed inputs (a page script, a handler): what it looks like carries, how it behaves does not
     if (!judged.has(idKey(p))) sameImageNewInputs.add(p.screen);

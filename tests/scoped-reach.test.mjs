@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { IN_PROGRESS, readInProgress, ownFeatures, scopeReach, componentScope, variantCalls, exportStamps, readLibrary, libraryProblems, newExportProblems, mergeLibrary, checkVerdict, carryJudgements, resultsBlock } from '../scripts/loop-rules.mjs';
+import { IN_PROGRESS, readInProgress, ownFeatures, scopeReach, componentScope, variantCalls, exportStamps, readLibrary, libraryProblems, newExportProblems, mergeLibrary, checkVerdict, carryJudgements, resultsBlock, outsideLine } from '../scripts/loop-rules.mjs';
 import { bundleShape } from '../scripts/bundle-graph.mjs';
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -42,12 +42,16 @@ test('a shared change keeps its own features in full, the in-progress ones as pr
   assert.deepEqual([...r.keep].sort(), ['ds:Row/navigation', 'farrowing.end', 'farrowing.room', 'move.pick']);
   assert.deepEqual([...r.propagation].sort(), ['farrowing.end', 'farrowing.room']);
   assert.deepEqual(r.outOfScope, { screens: 3, features: ['inspection', 'wean'], componentPages: 1 });
+  // the dropped screens by id, for the quick check (owner, 2026-10-22); a dropped component page is not among them
+  assert.deepEqual(r.dropped, ['inspection.pen', 'inspection.room', 'wean.list']);
   // an own feature that is also in progress is judged in full
   assert.deepEqual([...scopeReach({ reach, featureOf, own: ['farrowing'], inProgress: ['farrowing'] }).propagation], []);
   // no readable list: the whole reach, judged in full, as before
   const all = scopeReach({ reach, featureOf, own: [], inProgress: null });
   assert.equal(all.keep.size, reach.size);
   assert.equal(all.propagation.size, 0);
+  assert.deepEqual(all.dropped, [], 'nothing is dropped, so nothing is quick-checked');
+  assert.deepEqual(scopeReach({ reach, featureOf, own: ['move', 'inspection', 'wean'], inProgress: ['farrowing'] }).dropped, []);
 });
 
 test("a component page's variant names the exports it calls, through an alias too; any other use is unbounded", () => {
@@ -124,6 +128,17 @@ const mech = (pairs, extra = {}) => ({ pass: true, outcome: 'pass', candidate: '
   screens: { diff: [...new Set(pairs.map((p) => p.screen))].map((id) => ({ id })), new: [], gone: [] }, pairs, ...extra });
 const said = (screen, verdict, lang = 'en', width = 390) => ({ screen, lang, width, verdict, why: 'x' });
 
+test("an outside pair (the quick check's) needs no judgement, isn't the change's own page, and carries nothing to judge", () => {
+  const out = mp('health-record.condition-picker', 'en', 390, { outside: true });
+  const m = mech([mp('ds:Row/navigation', 'en', 390), out]);
+  assert.deepEqual(checkVerdict({ pass: true, candidate: 'c1', base: 'b1', pairs: [said('ds:Row/navigation', 'better')] }, m).problems, []);
+  assert.match(checkVerdict({ pass: true, candidate: 'c1', base: 'b1', pairs: [said('ds:Row/navigation', 'better'), said('health-record.condition-picker', 'broken')] }, m).problems.join(), /worse or failed pair/);
+  assert.match(checkVerdict({ pass: true, candidate: 'c1', base: 'b1', pairs: [said('ds:Row/navigation', 'better'), said('health-record.condition-picker', 'better')] }, m).problems.join(), /outside pair .*propagated or broken, not "better"/);
+  assert.match(checkVerdict({ pass: true, candidate: 'c1', base: 'b1', pairs: [] }, mech([out])).problems.join(), /shows on no page of its own/);
+  const carried = carryJudgements({ mech: { candidate: 'c1', base: 'b1', pairs: [] }, parts: [] }, { candidate: 'c2', base: 'b2', pairs: [{ ...out, identity: { base: 'x', cand: 'y' } }], screens: { gone: [] } });
+  assert.deepEqual(carried.need, []);
+});
+
 test('a propagation pair is judged propagated or broken, never better or worse, and broken fails', () => {
   const m = mech([mp('ds:Row/navigation', 'en', 390), prop('farrowing.room')]);
   assert.deepEqual(checkVerdict({ pass: true, candidate: 'c1', base: 'b1', pairs: [said('ds:Row/navigation', 'better'), said('farrowing.room', 'propagated')] }, m).problems, []);
@@ -163,10 +178,15 @@ test("the library fit of split verdicts is the worst part's, and it carries acro
   assert.deepEqual(carryJudgements(old, { candidate: 'c2', base: 'b2', pairs: [], screens: { gone: [] } }).carried.library, { fit: 'ok', note: 'Row variant' });
 });
 
-test('the Results block says in one line what a shared change left unchecked', () => {
-  const md = resultsBlock({ outcome: 'pass', candidate: 'c1', base: 'b1', class: { effective: 'shared' }, checks: [], ownFeatures: ['move'], inProgress: ['farrowing', 'piglet-processing'],
-    outOfScope: { screens: 120, features: ['inspection', 'wean', 'treat'], componentPages: 0 }, pairs: [prop('farrowing.room'), mp('move.pick', 'en', 390)], propagation: [{ screen: 'farrowing.room', uses: [], notUsingShared: true }] });
-  assert.match(md, /- Scope: checked in full on move and the component pages; propagation only on farrowing, piglet-processing \(in progress\); 120 screens in 3 features not checked: not in progress/);
+test('the Results block says in one line what the quick check found outside the scope of a shared change', () => {
+  const md = resultsBlock({ outcome: 'fail', candidate: 'c1', base: 'b1', class: { effective: 'shared' }, checks: [], ownFeatures: ['move'], inProgress: ['farrowing', 'piglet-processing'],
+    outOfScope: { screens: 120, features: ['inspection', 'wean', 'treat'], componentPages: 0 }, outside: { screens: 120, moved: ['health-record.condition-picker', 'treat.pick', 'treat.dose', 'disease.list', 'inspection.pen'], newDefects: 4 },
+    pairs: [prop('farrowing.room'), mp('move.pick', 'en', 390)], propagation: [{ screen: 'farrowing.room', uses: [], notUsingShared: true }] });
+  assert.match(md, /- Scope: checked in full on move and the component pages; propagation only on farrowing, piglet-processing \(in progress\)\n/);
+  assert.match(md, /- Outside the scope: 120 screens checked \(390 EN\), 5 moved: health-record.condition-picker, treat.pick, treat.dose, disease.list …; 4 new defects\n/);
+  assert.doesNotMatch(md, /not checked/, 'the old "N screens in M features not checked" line is gone');
+  assert.equal(outsideLine({ screens: 7, moved: [], newDefects: 0 }), 'Outside the scope: 7 screens checked (390 EN), 0 moved; 0 new defects');
+  assert.equal(outsideLine(null), null);
   assert.match(md, /- Propagation: 1 pair\(s\) checked by the machine; calls none of the changed exports \(a local copy\?\): farrowing.room/);
   assert.doesNotMatch(resultsBlock({ outcome: 'pass', checks: [] }), /Scope:/);
 });
