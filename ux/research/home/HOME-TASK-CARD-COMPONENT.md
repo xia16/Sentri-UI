@@ -8,7 +8,7 @@ Supersedes the earlier 18-card gallery and its no-progress-bar proposal. The own
 
 ## Review surface
 
-`../../system/task-cards-astra-prototype.html` remains linked from Sentri Home's header and Toolbox. It now opens an annotated component with Task, Scope and State controls. Tabs expose major-task examples and source-linked rules. The shared renderer and stylesheet are `astra-home-task-card.js` and `astra-home-task-card.css`; examples provide data rather than separate markup per task.
+`../../archive/task-cards-astra-prototype.html` remains linked from Sentri Home's header and Toolbox. It now opens an annotated component with Task, Scope and State controls. Tabs expose major-task examples and source-linked rules. The shared renderer and stylesheet are `astra-home-task-card.js` and `astra-home-task-card.css`; examples provide data rather than separate markup per task.
 
 The reviewed component is now used by the Home prototype in both Overview and unit scopes. Each existing task instance has its own card; repeated group headings and the old grouped rows are removed. Existing task destinations remain linked, and unfinished destinations retain their placeholder. The gallery includes eight earlier production types, an end-nursery Home handoff, and three proposed operational types: treatments, vaccinations and transfers.
 

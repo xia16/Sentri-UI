@@ -1,6 +1,6 @@
 # Component alignment review
 
-The live reference is `ux/system/sentri-components-study.html`, linked from the Home study header and Toolbox. Its Components and Assembled screens views use the same SentriUI and AstraSurfaces implementations as the app.
+The live reference is `ux/archive/sentri-components-study.html`, linked from the Home study header and Toolbox. Its Components and Assembled screens views use the same SentriUI and AstraSurfaces implementations as the app.
 
 ## Reviewed in the browser
 

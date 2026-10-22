@@ -1,6 +1,6 @@
 # Farrowing room — parity audit
 
-Reference: `ux/system/farrowing.html`, section 09, with the shared controls in `ux/system/components.html` sections 01c and 02. The latest dated farrowing rulings and subsequent owner messages supersede older explanatory prose.
+Reference: `ux/system/farrowing.html`, section 09, with the shared controls in `ux/archive/components.html` sections 01c and 02. The latest dated farrowing rulings and subsequent owner messages supersede older explanatory prose.
 
 | Area | Reference requirement | Astra gap / direction |
 | --- | --- | --- |

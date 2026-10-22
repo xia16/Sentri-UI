@@ -20,7 +20,7 @@ The targeted Skip flow search returned Taco Bell instead; it is recorded under i
 ## Local design evidence
 
 - [Earlier seven-action inventory and eligibility table](../tasks/pig-actions.html): treatment, health records, abortion, fostering, count check, transfer and death. Its count-check availability is explicitly deferred.
-- [Later action-sheet examples](../../system/components.html): the single-subject entrance is in the record header. The later rule omits blocked actions and exposes a link with their reasons, superseding the earlier greyed-row proposal. The full operation matrix is broader than the seven-action inventory.
+- [Later action-sheet examples](../../archive/components.html): the single-subject entrance is in the record header. The later rule omits blocked actions and exposes a link with their reasons, superseding the earlier greyed-row proposal. The full operation matrix is broader than the seven-action inventory.
 - The current Inspection implementation already has labeled rows and Health / Records / Feed groups. Production, transfer and death are not all implemented in that menu. A shortcut alone would not provide the missing forms or eligibility rules.
 
 ## Recommended refinement
