@@ -1,4 +1,4 @@
-<!-- @dsCard group="Structure" height=300 subtitle="two-column · three-column" -->
+<!-- @dsCard group="Structure" height=300 subtitle="two-column · three-column · figures" -->
 <!doctype html>
 <html lang="en">
 <head><meta charset="utf-8"><style>html,body{margin:0;background:var(--app-background)}.stack>*+*{margin-top:var(--space-24)}</style></head>
@@ -14,6 +14,7 @@
     { label: 'Ear tag', value: '000254', mono: true }, { label: 'Pen', value: 'B4', mono: true }, { label: 'Parity', value: 4 },
     { label: 'Farrowed', value: '2 days ago', meta: 'Jul 8 · 07:14 · G.H' }, { label: 'Born alive', value: '11' }, { label: 'Weaning weight', value: null }]));
   parts.push(UI.facts([{ label: 'Alive litter', value: 11 }, { label: 'Identified', value: 8 }, { label: 'Without identity', value: 3 }], { columns: 3 }));
+  parts.push(UI.facts([{ label: 'Born', value: 14 }, { label: 'Alive', value: 9 }, { label: 'Dead', value: 5 }], { variant: 'figures' }));
   root.innerHTML = parts.map(function (h) { return '<div>' + h + '</div>'; }).join('');
 })();
 </script>

@@ -8,6 +8,7 @@ Parts and pages that no longer describe the mobile library, kept for history. No
 | `components/TaskHold/` | The task skeleton's hold-to-commit button | [Button](../../ux/design-system/components/Button/README.md) hold, `SentriUI.holdBind` |
 | `components/TaskLens/` | The task list's sticky lens host | [Segment](../../ux/design-system/components/Segment/README.md)'s two-line lens with an IconButton |
 | `components/TaskStepper/` | The task skeleton's stepper faces | [Stepper](../../ux/design-system/components/Stepper/README.md) (row, count, well) |
+| `components/TaskRadios/` | The task skeleton's flat radio rows (`SentriTask.radios` still draws them) | [ChoiceList](../../ux/design-system/components/ChoiceList/README.md)'s flat radio (`face: 'flat'`) |
 | `components/TaskPhotos/` | The task skeleton's photo line | [Photos](../../ux/design-system/components/Photos/README.md) |
 | `components/TaskWarning/` | The task skeleton's danger band | [Banner](../../ux/design-system/components/Banner/README.md) |
 | `demos/field-cards-demo.html` | ADR 0001's strict demo of the field cards (Stepper, Measure, Numpad) | Their component pages in the atlas |

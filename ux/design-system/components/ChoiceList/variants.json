@@ -64,6 +64,18 @@
     ]
   },
   {
+    "id": "radio-flat",
+    "name": "Radio rows, flat",
+    "use": "Use for a recorded outcome listed as 60px rows with a line under each inside a form (the sow-death causes).",
+    "notUse": "Not for a list alone in a drawer or card (radio rows) or five or more outcomes (PickerField).",
+    "states": [
+      "Default",
+      "Selected",
+      "Disabled",
+      "Long-label"
+    ]
+  },
+  {
     "id": "inline",
     "name": "Inline Choice",
     "use": "Use for two or three short recorded outcomes.",
