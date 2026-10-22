@@ -39,6 +39,12 @@ test("a changed rule is narrowed by its selectors; anything it can't name reache
   assert.equal(cssChange(base, base + '\n.x,svg{fill:none}').all, true, 'one selector of the list names no class');
   assert.equal(cssChange(base, base + '\n@font-face{font-family:x}').all, true, 'an at-rule');
   assert.equal(cssChange(base, base + '\n.a{').all, true, 'unsplittable');
+  // review of this change, round 1: nested rules need not require the outer selector; a rule before an @import turns it off
+  assert.equal(cssChange(base, base.replace('.st-banner{color:red}', '.st-banner{color:red;:is(&, .st-row){gap:1px}}')).all, true, 'nested rules');
+  const imp = '@import url("f.css");\n' + base;
+  assert.equal(cssChange(imp, imp.replace('.st-banner{color:red}', '.st-banner{color:blue}')).all, false, 'an import that stays at the head');
+  assert.equal(cssChange(imp, '.st-pen-map{}\n' + imp).all, true, 'a rule added before the import');
+  assert.equal(cssChange(base, base + '\n@import url("f.css");').all, true, 'an import after a rule');
   // a keyframes edit reaches what its users reach
   const kf = cssChange(base, base.replace('from{opacity:0}', 'from{opacity:.5}'));
   assert.equal(kf.all, false);

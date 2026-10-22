@@ -69,8 +69,8 @@ export function requiredClasses(selector) {
 
 // The stylesheet as units: [{ key, kind, selectors: [string] | null, reaches: 'all' | 'classes' | 'keyframes', name?, why? }].
 // key is the unit's text with its enclosing at-rule preludes (so moving a rule into another @media changes it). A style rule is one
-// unit (with any nested rules inside it: they require its selector too). @keyframes is one unit named by its animation name; every
-// other at-rule (@import, @font-face, @property, a @layer statement…) reaches every page. problems: text it couldn't split.
+// unit; one with rules nested in it reaches every page. @keyframes is one unit named by its animation name; every other at-rule
+// (@import, @font-face, @property, a @layer statement…) reaches every page. problems: text it couldn't split.
 export function cssUnits(text) {
   const src = stripComments(String(text || '').replace(/\r\n?/g, '\n'));
   const units = [], problems = [];
@@ -105,8 +105,9 @@ export function cssUnits(text) {
           units.push({ key: `${context}${prelude}{${body}}`, kind: 'at-rule', selectors: null, reaches: kf ? 'keyframes' : 'all', ...(kf ? { name: kf[1] } : {}), why: prelude.slice(0, 40) });
         }
       } else {
-        const selectors = splitList(prelude);
-        units.push({ key: `${context}${prelude}{${body}}`, kind: 'rule', selectors, reaches: 'classes' });
+        // a rule with rules nested in it reaches every page: a nested selector need not require the outer one (`:is(&, .x)`)
+        const nested = /[{}]/.test(body.replace(/"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'/g, ''));
+        units.push({ key: `${context}${prelude}{${body}}`, kind: 'rule', selectors: splitList(prelude), reaches: nested ? 'all' : 'classes', ...(nested ? { why: `${prelude.slice(0, 40)} has nested rules` } : {}) });
       }
       i = end + 1;
     }
@@ -116,9 +117,15 @@ export function cssUnits(text) {
 
 // The units of base and candidate that differ: those outside a longest common subsequence of the two unit lists (by key). A rule that
 // moved is in it on one side, so the elements whose cascade the move can change (those it matches) are in its reach.
+const HEAD = /^@(charset|import|layer)\b[^{]*;$/i;
 export function cssChange(baseText, candText) {
   const B = cssUnits(baseText), C = cssUnits(candText);
   if (B.problems.length || C.problems.length) return { all: true, why: [`the stylesheet can't be split into rules: ${[...B.problems, ...C.problems][0]}`], units: [] };
+  // an @import counts only before every other rule (after @charset and @layer statements): a rule added before it, or one anywhere
+  // the analyser can't place, turns it on or off for every page
+  const head = (side) => { const i = side.units.findIndex((u) => !HEAD.test(u.key)); return i < 0 ? side.units.length : i; };
+  const late = (side) => side.units.slice(head(side)).some((u) => /^[^\w{]*@import\b/i.test(u.key));
+  if (late(B) || late(C) || head(B) !== head(C)) return { all: true, why: ['an @import is not (or no longer) at the head of the stylesheet'], units: [] };
   const a = B.units, b = C.units, n = a.length, m = b.length;
   // trim the common head and tail, then LCS on the middle
   let s = 0; while (s < n && s < m && a[s].key === b[s].key) s++;
