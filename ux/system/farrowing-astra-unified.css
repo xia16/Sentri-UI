@@ -230,3 +230,6 @@
 .farrowing-phone .batch-pick .batch-hint b{color:var(--ink);font-weight:600}
 .farrowing-phone .batch-pick .batch-pen{margin:0 0 12px}
 .farrowing-phone .batch-pick .batch-none{margin:4px 2px;color:var(--muted);font:400 14px/20px var(--font-sans)}
+.farrowing-phone .batch-pick .batch-missed{margin:0 0 12px}
+.farrowing-phone .batch-pick .batch-missed .st-row[data-arrival]{transition:background-color .9s ease-out}
+.farrowing-phone .batch-pick .batch-missed .st-row[data-arrival="on"]{background:var(--progress-wash);transition-duration:.12s}

@@ -2031,7 +2031,7 @@ function back(){return SentriUI.backButton({action:'back'});}
    come back to (More actions, Measurements & condition, a finding) carries the route: her chip, then her pen. */
 function pigWhat(p){const type=animalType(p);return type!=='Sow'?type:(p.stage==='Off production'&&p.breedingStatus==='Open'?'Open':null)||({Gestating:'Gestation',Lactating:'Lactation'})[p.stage]||p.stage||'';}
 // A host that opened a pig who is not in its task says so first (Farrowing: "Not in Farrowing", owner 2026-10-22), then where she is.
-function pigFacts(c,p){if(c.hostNote)return {text:[{text:c.hostNote},{sep:true},{text:pigUnit(c,p.id)+' · '+penOf(c,p.id).id}]};return {text:[{text:pigUnit(c,p.id)+' · '+penOf(c,p.id).id},...(pigWhat(p)?[{sep:true},{text:pigWhat(p)}]:[])]};}
+function pigFacts(c,p){if(c.hostNote){const where=[c.unitLabel,penOf(c,p.id).id].filter(Boolean).join(' · ');return {text:[{text:c.hostNote},...(where?[{sep:true},{text:where}]:[])]};}return {text:[{text:pigUnit(c,p.id)+' · '+penOf(c,p.id).id},...(pigWhat(p)?[{sep:true},{text:pigWhat(p)}]:[])]};}
 function pigRoute(c,p){return {chip:{id:p.id,action:'pig',value:p.id,label:'Open pig '+p.id},facts:[penOf(c,p.id).id]};}
 function scope(c){const ids=c.form.subjects||[...c.selected],pens=[...new Set(ids.map(id=>penOf(c,id)?.id))];return `${countLabel(ids.length)} · ${pens.join(' / ')}`;}
 function action(a,k,title,sub,v='',disabled=false){return stRow({action:a,title,description:sub,icon:icon(k),value:v,disabled,className:'action-item',attrs:entryFor(a)?{'data-entry':entryFor(a)}:{}});}
