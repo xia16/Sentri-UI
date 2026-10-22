@@ -1,14 +1,19 @@
-// The spacing check: only what is clearly wrong, never "off by a few pixels". Five defects, each with a tolerance:
+// The spacing check: only what is clearly wrong, never "off by a few pixels". Seven defects, each with a tolerance:
 //   inversion  a block sits closer to a list than the list's own rows sit to each other, so it reads as part of the list
 //              (gap < 60% of the list's row rhythm, rhythm at least 20px)
 //   crowding   two different boxed blocks (a surface or border each) less than 8px apart, one above the other, nothing between
 //   double     two horizontal edges (hairline, border, box edge) within 6px of each other: two lines doing one job
 //   scrollbar  a scroll container whose desktop scrollbar shows (it takes width when the content overflows, and the content jumps)
 //   sideways   a scroll container that scrolls sideways (more than 1px) though its content is not a row
+//   heading    a section heading (short text, no surface, border or control) closer to the block above it (a control or a boxed
+//              block) than to the content it labels, so it reads as that block's tail: gap above < 8px, or gap above + 4px
+//              < gap below (more than 4px nearer the block above than its content)
+//   trailing   a row's trailing control (checkbox, radio, switch, chevron) off its row's centre by more than 6px, row 44px+
+// A sticky block taller than half the viewport is content, not chrome, and is judged like the rest.
 // Renders every atlas screen bare at 390 x 844 and audits the first screen. Writes review/spacing.json.
 // Usage: node scripts/check-spacing.mjs [--base <url>] [--feature <id>] [--screens id,id] [--changed <ids>] [--strict] [--out <file.json>]
 //   --changed  exit 1 only when one of these screens has a defect; --strict: exit 1 on any defect.
-// Principle: P4 (judge it by eye) made measurable; rules ledger L16. Spacing law: ux/design-system/README.md, "Spacing".
+// Principle: P4 (judge it by eye) made measurable; rules ledger L16, L27, L28, L33. Spacing law: ux/design-system/README.md, "Space groups".
 import { spawn } from 'node:child_process';
 import { createServer } from 'node:net';
 import fs from 'node:fs';
@@ -22,7 +27,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const argv = process.argv.slice(2);
 const val = (n) => { const i = argv.indexOf(n); return i >= 0 && argv[i + 1] && !argv[i + 1].startsWith('--') ? argv[i + 1] : null; };
 const list = (n) => (val(n) || '').split(',').map((s) => s.trim()).filter(Boolean);
-export const TOL = { inversion: 0.6, rhythmMin: 20, crowd: 8, double: 6 };
+export const TOL = { inversion: 0.6, rhythmMin: 20, crowd: 8, double: 6, headingMin: 8, headingLead: 4, trailing: 6, rowMin: 44 };
 
 /* ---------- runs inside every frame ---------- */
 function auditFrame(TOL) {
@@ -39,7 +44,9 @@ function auditFrame(TOL) {
   // app bar, dock, footer) is placed by design and is not judged here.
   const tops = [...document.querySelectorAll('[role="dialog"], .sheet, [data-ds="Sheet"], [data-st-context="drawer"]')].filter((el) => vis(el) && el.getBoundingClientRect().height > H * 0.3);
   const scope = tops.length ? tops[tops.length - 1] : document.body;
-  const pinned = (el) => { for (let e = el; e && e !== scope; e = e.parentElement) { const p = getComputedStyle(e).position; if (p === 'fixed' || p === 'sticky') return true; if (/^(HEADER|FOOTER|NAV)$/.test(e.tagName) || /(^|[-_\s])(footer|dock|statusbar|appbar)/i.test(typeof e.className === 'string' ? e.className : '')) return true; } return false; };
+  // A sticky block taller than half the viewport is not chrome but content that sticks (#264: the picker's sticky search wrapper
+  // swallowed the whole list, and nothing under it was judged).
+  const pinned = (el) => { for (let e = el; e && e !== scope; e = e.parentElement) { const p = getComputedStyle(e).position; if (p === 'fixed' || (p === 'sticky' && e.getBoundingClientRect().height < H * 0.5)) return true; if (/^(HEADER|FOOTER|NAV)$/.test(e.tagName) || /(^|[-_\s])(footer|dock|statusbar|appbar)/i.test(typeof e.className === 'string' ? e.className : '')) return true; } return false; };
   const interactive = (el) => el.matches('button, a, input, select, textarea, [role="tab"], [role="radio"], [role="button"]') || !!el.querySelector('button, a, input, select, textarea, [role="tab"], [role="radio"], [role="button"]');
   const surfaceOf = (el) => { for (let e = el.parentElement; e && e !== scope; e = e.parentElement) if (painted(e)) return e; return null; };
   const all = [...scope.querySelectorAll('*')].filter((el) => !['SCRIPT', 'STYLE', 'IFRAME', 'svg', 'path'].includes(el.tagName) && vis(el) && !pinned(el));
@@ -121,6 +128,55 @@ function auditFrame(TOL) {
     out.push({ check: 'sideways', at: Math.round(box.top), detail: `${name(el)} scrolls ${over}px sideways though its content is not a row${wide ? ` (${name(wide)} reaches past it)` : ''}: fix what overflows, or clip it (overflow-x: hidden)` });
   }
 
+  // heading: a section heading that sits closer to the block above it than to the content it labels, so it reads as the tail of the
+  // block above (#264 on Health record's Conditions sheet: the "Recent" heading went from 20px under the search field to 0). A
+  // heading is a short text-only block (no surface, no border, no control; an icon is fine) directly followed by the content it
+  // labels; the block above is a different block, a control or a boxed one, as for inversion (a heading under a paragraph is prose).
+  // Measured from the heading's text, to the box above and to the first thing drawn in the content below.
+  const drawnTop = (el) => {
+    if (painted(el) || interactive(el)) return el.getBoundingClientRect().top;
+    const tops = lines(el).map((l) => l.top);
+    for (const k of el.querySelectorAll('*')) if (vis(k) && (painted(k) || k.matches('img, svg, input, canvas, video, button'))) tops.push(k.getBoundingClientRect().top);
+    return tops.length ? Math.min(...tops) : el.getBoundingClientRect().top;
+  };
+  const prevBlock = (el) => { let node = el; for (let lvl = 0; lvl < 3 && node && node !== scope; lvl++) { let p = node.previousElementSibling; while (p && !all.includes(p)) p = p.previousElementSibling; if (p) return p; node = node.parentElement; } return null; };
+  const textOnly = (el) => !interactive(el) && !painted(el) && !el.querySelector('img, canvas, video, input') && ![...el.querySelectorAll('*')].some((k) => vis(k) && painted(k));
+  const headed = new Set();
+  for (const h of all) {
+    const hr = h.getBoundingClientRect();
+    if (hr.height < 10 || hr.height > 48 || hr.width < W * 0.3 || !textOnly(h)) continue;
+    // it reads as a heading: a heading element or role, or bold text (a field's plain hint under it belongs to the field)
+    if (!(/^(H[1-6]|LEGEND)$/.test(h.tagName) || h.getAttribute('role') === 'heading' || +getComputedStyle(h).fontWeight >= 600)) continue;
+    const ls = lines(h); if (!ls.length || new Set(ls.map((l) => Math.round(l.top))).size > 2) continue;
+    // the content it labels: its next visible sibling, directly below it, bigger than a line and not another line of text
+    let next = h.nextElementSibling; while (next && !all.includes(next)) next = next.nextElementSibling;
+    if (!next || textOnly(next)) continue;
+    const nr = next.getBoundingClientRect(); if (nr.top < hr.bottom - 1 || nr.height < 24) continue;
+    const above = prevBlock(h);
+    if (!above || headed.has(above) || above.contains(h) || !(interactive(above) || painted(above))) continue;
+    const a = above.getBoundingClientRect(); if (a.height < 8 || a.width < W * 0.3) continue;
+    const t = ink(h), up = t.top - a.bottom, down = drawnTop(next) - t.bottom;
+    if (up < -1 || down < 0 || a.bottom > hr.top + 1) continue;
+    if (up < TOL.headingMin || up + TOL.headingLead < down) { headed.add(above); out.push({ check: 'heading', at: Math.round(hr.top), detail: `the heading "${h.textContent.trim().slice(0, 24)}" is ${Math.round(up)}px under ${name(above)} and ${Math.round(down)}px over the ${name(next)} it labels: it reads as the tail of the block above` }); }
+  }
+  // trailing: a row's trailing control (checkbox, radio, switch, chevron) not centred on its row (#264 on the Conditions sheet: the
+  // field rule's 48px min-height reached the rows' checkboxes, 12px low on 56px rows). A row is a row-like element (label, button,
+  // link, list item, a row role or a Row part) at least 44px tall; the control sits in its right part.
+  const ROWISH = 'label, button, a, li, [role="button"], [role="option"], [role="row"], [role="listitem"], [role="menuitem"], [role="link"], [data-ds="Row"]';
+  const CONTROL = 'input[type="checkbox"], input[type="radio"], [role="switch"], [role="checkbox"], [role="radio"], [class*="chevron"]';
+  const judged = new Set();
+  for (const c of document.querySelectorAll(CONTROL)) {
+    if (!scope.contains(c) || !vis(c) || pinned(c) || [...judged].some((j) => j.contains(c))) continue;
+    let row = c.parentElement;
+    while (row && row !== scope && !(row.matches(ROWISH) || (typeof row.className === 'string' && /(^|[-_])row$/i.test(row.className.trim().split(/\s+/).find((k) => /row$/i.test(k)) || '')))) row = row.parentElement;
+    if (!row || row === scope) continue;
+    const r = row.getBoundingClientRect(), b = c.getBoundingClientRect();
+    if (r.height < TOL.rowMin || r.height > 160 || r.width < W * 0.5 || b.height > r.height || b.left < r.left + r.width * 0.6) continue;
+    judged.add(c);
+    const off = (b.top + b.bottom) / 2 - (r.top + r.bottom) / 2;
+    if (Math.abs(off) > TOL.trailing) out.push({ check: 'trailing', at: Math.round(r.top), detail: `${name(c)} sits ${Math.round(Math.abs(off))}px ${off > 0 ? 'below' : 'above'} the centre of its ${Math.round(r.height)}px ${name(row)}: a trailing control is centred on its row` });
+  }
+
   // one finding per check and place
   const key = new Set(); return out.filter((o) => { const k = o.check + '|' + Math.round(o.at / 10); if (key.has(k)) return false; key.add(k); return true; });
 }
@@ -164,7 +220,8 @@ await browser.close(); if (server) server.kill();
 if (!only.length && !val('--feature')) fs.writeFileSync(path.join(root, 'review/spacing.json'), JSON.stringify({ tolerances: TOL, screens: results }, null, 1));
 if (val('--out')) fs.writeFileSync(val('--out'), JSON.stringify(results));
 const bad = results.filter((r) => r.defects.length);
-console.log(`spacing: ${results.length} screens, ${bad.length} with a clear defect (inversion ${bad.flatMap((r) => r.defects).filter((d) => d.check === 'inversion').length}, crowding ${bad.flatMap((r) => r.defects).filter((d) => d.check === 'crowding').length}, double ${bad.flatMap((r) => r.defects).filter((d) => d.check === 'double').length}, scrollbar ${bad.flatMap((r) => r.defects).filter((d) => d.check === 'scrollbar').length}, sideways ${bad.flatMap((r) => r.defects).filter((d) => d.check === 'sideways').length})`);
+const per = (c) => bad.flatMap((r) => r.defects).filter((d) => d.check === c).length;
+console.log(`spacing: ${results.length} screens, ${bad.length} with a clear defect (${['inversion', 'crowding', 'double', 'scrollbar', 'sideways', 'heading', 'trailing'].map((c) => `${c} ${per(c)}`).join(', ')})`);
 const failing = list('--changed').length ? bad.filter((r) => list('--changed').includes(r.screen)) : argv.includes('--strict') ? bad : [];
 process.exit(failing.length ? 1 : 0);
 }
