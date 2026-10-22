@@ -648,7 +648,7 @@ export interface SentriUI {
   numpadScanner(options: { onKey?: (key: NumpadKey) => void; onScan?: (digits: string) => void; gap?: number; minKeys?: number; now?: () => number; later?: (f: () => void, ms: number) => unknown; cancel?: (handle: unknown) => void }): { handle(event: Pick<KeyboardEvent, 'key'>): boolean; flush(): void };
   heading(props: HeadingProps): string;
   panel(content: string, options?: PanelOptions & { ds?: string }): string;
-  facts(items: Fact[], options?: { columns?: 1 | 2 | 3; className?: string }): string;
+  facts(items: Fact[], options?: { columns?: 1 | 2 | 3; className?: string; variant?: 'record' | 'figures'; panel?: boolean }): string;
   row(props: RowProps): string;
   /** One action as an icon well over one word (More actions' everyday verbs). The accessible name is the word, then `title` (the full action name) when it does not already hold the word. */
   rowTile(props: { label: string; title?: string; icon?: string; action?: string; value?: string; tone?: 'danger' | ''; attrs?: Record<string, string>; className?: string }): string;

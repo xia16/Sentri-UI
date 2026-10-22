@@ -119,7 +119,11 @@
   }
   /* Facts: read-only label–value pairs. They never act: no button or link in a value (valueHtml is for markup such as an
      ID in mono, and is refused when it holds a control). columns: 2 (default), 3 (short counts) or 1 (a long value that needs the full width). mono: true sets an ID. */
-  function facts(items,{className='',columns=2,variant=''}={}){
+  function facts(items,{className='',columns,variant='',panel=true}={}){
+    if(variant==='figures'){ /* figures: the two or three figures a sheet is about to commit, or a summary of counts: label over a large figure. A plain read: a figure never acts. panel: false when the host already is the surface. */
+      const n=columns===2||columns===3?columns:Math.min(3,Math.max(2,items.length));
+      return `<dl class="${panel?'st-panel ':''}st-facts ${esc(className)}" data-ds="Facts" data-variant="figures" data-columns="${n}">${items.map(i=>`<div class="st-fact"><dt>${tx(i.label,i,'label')}</dt><dd>${has(i,'value')?tx(i.value,i,'value'):esc(i.value==null||i.value===''?'—':i.value)}</dd></div>`).join('')}</dl>`;
+    }
     const cols=columns===3?3:columns===1?1:2;
     const valueOf=i=>{
       if(i.valueHtml!=null){

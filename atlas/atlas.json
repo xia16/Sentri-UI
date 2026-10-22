@@ -28584,6 +28584,7 @@
      "files": {
       "variantsJson": true,
       "variants": [
+       "figures",
        "three-column",
        "two-column"
       ]
