@@ -1355,7 +1355,9 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 .st-scan-foot>.button.secondary.st-scan-toggle{border:var(--border-width) solid var(--control-border);background:var(--paper)}
 
 /* ChoiceList radio, flat face (face:'flat', layout 'rows'; candidate): a recorded outcome listed inside a form, farrowing's .radio-row: 60px rows, a line under each, a 14px/400 label, the radio right on a thin ring. The prefix is :where() so each rule keeps the specificity it had as .tk-radios (task-skeleton.css): the panel rule below is still outranked by .st-panel.st-panel.st-panel, as it always was, so callers draw as before. */
-:where([data-ds="ChoiceList"])[data-face="flat"] .st-choice-panel{background:transparent;border:0;border-radius:0}
+/* flat means flat: no panel (it must beat .st-panel's own three-class surface rule) */
+[data-ds="ChoiceList"][data-face="flat"] .st-choice-panel.st-panel.st-panel.st-panel{background:transparent;border:0;border-radius:0}
+[data-ds="ChoiceList"][data-face="flat"] .st-choice-heading.st-choice-heading{padding-left:0} /* the label on the rows' gutter, as Farrowing's death sheet */
 :where([data-ds="ChoiceList"])[data-face="flat"] .st-choice-row.st-choice-row{min-height:var(--radio-row-min);padding:0;gap:10px;border-bottom:1px solid var(--line)}
 :where([data-ds="ChoiceList"])[data-face="flat"] .st-choice-row.st-choice-row+.st-choice-row{border-top:0}
 :where([data-ds="ChoiceList"])[data-face="flat"] .st-choice-label{font:400 var(--type-button-size)/1.4 var(--font-sans)}
