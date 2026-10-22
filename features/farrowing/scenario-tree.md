@@ -186,6 +186,7 @@ States: S1 Find a sow, empty field · S2 Scan, no reader paired · S3 Scan, read
 | S-5 | S1 | type 909 | → "No sow matching “909” in any unit." | S — owner decision 2026-10-12 | `fa-s5-no-match-says-so` |
 | S-6 | S1 | tap a result in another unit | → her farrowing drawer (the same drawer), subtitle "Unit 6 · A2"; the room stays Unit 7 | S — owner decision 2026-10-12 | `fa-s6-other-unit-result-opens-her-farrowing-drawer` |
 | S-8 | S1 | tap the scan icon in the field | → Scan ear tags | S — owner decision 2026-10-12 | `fa-s8-search-scan-icon-opens-scan` |
+| S-27 | S1 | type 43, tap the scan icon, then the back arrow | → Find a sow again with 43 typed and its results, not the room | I — Back returns to where you came from (design system, Back) | `fa-s27-back-from-scan-returns-to-find-a-sow` |
 | S-9 | S1 | Cancel | → the room list | S — owner decision 2026-10-12 | `fa-s9-cancel-returns-to-the-room` |
 | S-10 | S2 | open | → "Scanner not connected" and the pairing instruction; no pill, no list, no button | S — owner decision 2026-10-12 | `fa-s10-no-reader-says-so-with-no-buttons` |
 | S-11 | S2 | back arrow | → the room list | S — owner decision 2026-10-12 | `fa-s11-back-arrow-leaves-scan` |
