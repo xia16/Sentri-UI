@@ -7,6 +7,10 @@ import assert from 'node:assert/strict';
 import { playwright } from '../scripts/playwright-path.mjs';
 import { auditSpacingPage } from '../scripts/check-spacing.mjs';
 
+// Inline pages load nothing, so the DOM is the whole page: no wait for load, and room for a loaded machine (2026-10-22: two 30 s
+// setContent timeouts inside a gate while other sessions' gates ran; passed alone).
+const LOAD = { waitUntil: 'domcontentloaded', timeout: 120000 };
+
 const css = `html,body{margin:0;font:16px/1.25 system-ui;background:#fff}
 .body{padding:24px 18px}
 .search{display:flex;align-items:center;height:48px;border:1px solid #888;border-radius:12px;padding:0 14px}
@@ -28,7 +32,7 @@ test('a section heading closer to the block above than to the content it labels 
   const browser = await pw.chromium.launch();
   try {
     const p = await (await browser.newContext({ viewport: { width: 390, height: 844 } })).newPage();
-    const headings = async (html) => { await p.setContent(html); return (await auditSpacingPage(p)).filter((d) => d.check === 'heading'); };
+    const headings = async (html) => { await p.setContent(html, LOAD); return (await auditSpacingPage(p)).filter((d) => d.check === 'heading'); };
     // #264: the heading right under the search field
     const found = await headings(sheet(0));
     assert.equal(found.length, 1, '#264: "Recent" hugged the search field');
@@ -54,7 +58,7 @@ test("a row's trailing control off its row's centre is a spacing defect", async 
   const browser = await pw.chromium.launch();
   try {
     const p = await (await browser.newContext({ viewport: { width: 390, height: 844 } })).newPage();
-    const trailing = async (html) => { await p.setContent(html); return (await auditSpacingPage(p)).filter((d) => d.check === 'trailing'); };
+    const trailing = async (html) => { await p.setContent(html, LOAD); return (await auditSpacingPage(p)).filter((d) => d.check === 'trailing'); };
     // #264: the field rule's 48px min-height reached the checkboxes, so each sat 14px low in its 56px row
     const found = await trailing(sheet(20, '.check{position:relative;top:14px}'));
     assert.equal(found.length, 3, '#264: every row');
@@ -67,7 +71,7 @@ test("a row's trailing control off its row's centre is a spacing defect", async 
     assert.equal((await trailing(page('<div class="panel"><label class="row" style="align-items:flex-start;padding-top:4px"><span>Alerts</span><span role="switch" style="flex:none;width:40px;height:24px;background:#888"></span></label></div>'))).length, 1, 'a switch at the top of its row');
     // the shared ChoiceList's navigation row, from its own generated markup: its chevron is a bare svg in .st-choice-trail (Codex review)
     {
-      await p.setContent('<!doctype html><html><head></head><body><div id="m" style="padding:24px 18px"></div></body></html>');
+      await p.setContent('<!doctype html><html><head></head><body><div id="m" style="padding:24px 18px"></div></body></html>', LOAD);
       await p.addStyleTag({ path: 'ux/design-system/tokens.css' });
       await p.addStyleTag({ path: 'ux/design-system/components/bundle.css' });
       await p.addScriptTag({ path: 'ux/design-system/components/bundle.js' });
