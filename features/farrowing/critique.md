@@ -742,7 +742,7 @@ Inspection's walk pen card, computed: no shadow, header `#f8faf5` over a `#e8edd
 
 | Part | Drawn by | Keep / fix / cut |
 |---|---|---|
-| Pen card | page-built `.pen-card` (TaskGroup is its candidate part, not yet rendered) | **fix** (Inspection's surface) |
+| Pen card | `.pen-card` in bundle.css (TaskGroup is its candidate part, not yet rendered); Farrowing's CSS no longer sets its surface | **fix** (Inspection's surface, in the design system) |
 
 ## Self-crit
 

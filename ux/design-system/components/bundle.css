@@ -818,7 +818,8 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
 .st-stepper[data-variant="well"] :is(.st-stepper-key,.st-stepper-face){width:var(--control-height);min-height:var(--control-height);height:var(--control-height)}
 .field{font-family:var(--font-sans)}
 /* Surface consumers own layout; Panel owns border, radius and context fill. */
-.st-panel.pen-card{padding:0}
+.st-panel.pen-card{padding:0;overflow:clip}   /* the pen card is one box: no shadow, its corners clip its header (Inspection's pen card) */
+.pen-card>.pen-top{background:#f8faf5;border-bottom-color:var(--rule);border-radius:0}
 
 /* FilterSheet: a Sheet that narrows a list. Sections sit 28 apart; the last one has no gap before the footer. */
 .st-filter-section{margin:0 0 var(--space-28);padding:0}

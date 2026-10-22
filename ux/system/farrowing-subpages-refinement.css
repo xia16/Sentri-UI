@@ -7,8 +7,8 @@
 .farrowing-phone .room-scroll{background:var(--app-background,#f6f7f1)}
 .farrowing-phone .room-controls{background:var(--app-background,#f6f7f1);border-bottom:1px solid transparent}
 .farrowing-phone .room-list{gap:12px;padding-bottom:22px}
-.farrowing-phone .pen-card{border-color:var(--line);border-radius:var(--subpage-radius);box-shadow:none;overflow:clip}   /* no card is shadowed; the card clips its header, as Inspection's pen card */
-.farrowing-phone .room-list .pen-top{background:#f8faf5;border-color:#e8eddf;border-radius:0;padding-left:14px;padding-right:14px}   /* Inspection's pen header: a shade off the page, so the card reads as one box */
+.farrowing-phone .pen-card{border-color:var(--line);border-radius:var(--subpage-radius)}
+.farrowing-phone .room-list .pen-top{padding-left:14px;padding-right:14px}
 .farrowing-phone .room-sow-row{min-height:76px;padding:13px 14px;border-color:var(--line)}
 .farrowing-phone .room-sow-row:active{background:var(--press)}
 .farrowing-phone .room-sow-row .row-main{font-weight:500}
