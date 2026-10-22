@@ -465,7 +465,7 @@ function scanSetup(c,preset=''){
  if(preset==='scan-dead')Object.assign(c,{pig:'000512',pigFrom:'roomScan'});   // the reader read 000512, who died on 14 Oct   // the reader read 000434, a sow not on the list
  if(/^batch-/.test(preset)){
   const picked={'batch-pick':['000431','004305','000392'],'batch-scanning':['000431','004305'],'batch-missed':['000431','004305'],'batch-search':['000431'],'batch-filter':['000431','004305','000392'],'batch-form':['000431','004305','000392']}[preset]||[];
-  c.scan.connected=true;c.batch={verb:'health',picked,q:preset==='batch-search'?'43':'',scanning:preset==='batch-waiting'?'waiting':['batch-scanning','batch-missed'].includes(preset),filter:{pigs:'any',cond:'any'},fresh:preset==='batch-scanning'?{'004305':Infinity}:{},last:preset==='batch-scanning'?'004305':'',filtering:preset==='batch-filter',seq:0};
+  c.scan.connected=true;c.batch={verb:'health',picked,q:preset==='batch-search'?'43':'',scanning:preset==='batch-waiting'?'waiting':['batch-scanning','batch-missed'].includes(preset),filter:{pigs:'any',cond:'any'},fresh:preset==='batch-scanning'?{'004305':Infinity}:{},last:'',filtering:preset==='batch-filter',seq:0};   // last:'' — the held frame stays at the list's top; a live read scrolls to her
   if(preset==='batch-filter')c.batch.draft={...c.batch.filter};
   if(preset==='batch-waiting')c.scan.connected=false;
   c.batch.missed=preset==='batch-missed'?['000999','000622','000434','000512'].map(t=>missOf(c,t)):[];   // newest first: a tag with no pig, a sold sow, a sow in Unit 3, one that died
