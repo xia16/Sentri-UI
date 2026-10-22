@@ -37,8 +37,9 @@ function seed(preset='count'){
  const s={preset,view:'count',back:'count',finishAlive:9,due:'Due today · day 114',alive:9,dead:[1,1,2,0,0,1],anchor:10,pending:4,weak:1,deformed:1,weight:'',assisted:false,locked:false,ended:false,frozen:14,tag:'000418',pen:'B1',parity:3,deathDraft:[0,0,0,0,0,0],moved:0,handReared:null,mode:'piglets',sowCause:'',sowNote:'',photos:[],edit:null,expanded:false,popup:null,pointers:false,lens:'All',stamp:'08:41',finished:'Aug 27 · 08:12',markers:[{text:'Red line on left shoulder · monitor overnight',meta:'Today · 06:20 · G.H'}],markerDraft:null,pigletTab:'care',processingDirty:false,processingTasks:[{id:'dry',day:1,title:'Dry and warm',done:true,meta:'Aug 26 · 07:18 · G.H'},{id:'navel',day:1,title:'Disinfect navel',done:true,meta:'Aug 26 · 07:24 · G.H'},{id:'iron',day:3,title:'Iron supplement',done:false,meta:'Due today'},{id:'identity',day:3,title:'Ear tag, notch and weight',done:false,meta:'3 identified · 6 without identity'},{id:'health',day:5,title:'Health check',done:false,meta:'In 2 days'}],piglets:[{tag:'418001',notch:'36-38',sex:'Female',weight:'1.4',state:'Alive'},{tag:'418002',notch:'36-41',sex:'Male',weight:'1.5',state:'Alive'},{tag:'418003',notch:'',sex:'Female',weight:'',state:'Alive'}],unidentified:6,pigletQuery:'',pigletSelected:[],pigletDraft:null,pigletEditIndex:-1,fosterDraft:{direction:'out',target:'000392',count:1},mortalityDraft:{cause:'',unidentified:0,photos:[]},countDraft:9,countReason:'',events:[{text:'Crushed 3 → 2',day:'Aug 26',time:'08:20',who:'G. Hansen',kind:'correction'},{text:'+3 crushed · +1 other',day:'Aug 26',time:'08:12',who:'G. Hansen'},{text:'+5 alive',day:'Aug 26',time:'07:52',who:'G. Hansen'},{text:'+1 stillborn · +1 mummified',day:'Aug 26',time:'07:30',who:'G. Hansen'}]};
  if(preset==='room')s.view='room';
  if(/^search-/.test(preset))s.view='roomSearch';
- if(/^scan-/.test(preset))s.view=preset==='scan-actions'?'roomScanActions':'roomScan';
+ if(/^scan-/.test(preset)&&preset!=='scan-read')s.view=['scan-pig','scan-dead'].includes(preset)?'roomPig':'roomScan';   // scan-read: her drawer (the default view) over Scan
  if(preset.startsWith('task-'))s.view='roomEndTask';
+ if(preset.startsWith('batch-'))s.view=preset==='batch-sheet'?'roomBatch':preset==='batch-form'?'roomBatchForm':preset==='batch-saved'?'room':'roomBatchPick';
  if(preset==='before'){Object.assign(s,{alive:0,dead:[0,0,0,0,0,0],anchor:0,pending:0,weak:0,deformed:0,tag:'000455',pen:'B4',events:[],stamp:'',parity:2});}
  if(preset==='finish')s.view='finish';
  if(preset==='draft'){s.deathDraft[2]=1;s.view='death';}
@@ -180,7 +181,8 @@ if(typeof document==='undefined')return;
 // The atlas follows the demo (?screen=): which of the feature's screens this state is. Null when no screen is that state.
 function atlasScreen(s,c){
  const v=s.view;
- if(v==='room')return 'farrowing.room';
+ if(!/^room/.test(v)&&c.returnToTaskReview==='roomScan')return 'farrowing.scan-read';   // a sow the reader opened, over Scan
+ if(v==='room')return c.toast?.title?'farrowing.batch-saved':'farrowing.room';
  if(v==='count')return born(s)?'farrowing.count':'farrowing.before';
  if(v==='death')return 'farrowing.death';
  if(v==='finish')return 'farrowing.finish';
@@ -195,14 +197,17 @@ function atlasScreen(s,c){
  if(v==='editFinish')return 'farrowing.edit-finished';
  if(v==='roomEndTask'){const r=taskClosureReview(c);return r.blocked?'farrowing.task-blocked':r.awaiting.length?'farrowing.task-ready':r.abortions.length?'farrowing.task-outcomes':'farrowing.task-complete';}
  if(v==='roomSearch'){const f=findHits(c);return !f?'farrowing.search':f.hits.length?'farrowing.search-results':'farrowing.search-none';}
- if(v==='roomScan'){const sc=c.scan;return !sc.connected?'farrowing.scan-no-reader':!sc.items.length?'farrowing.scan':sc.picked.length?'farrowing.scan-ticked':!sc.listening?'farrowing.scan-stopped':'farrowing.scan-list';}
- if(v==='roomScanActions')return 'farrowing.scan-actions';
+ if(v==='roomScan'){const sc=c.scan;return !sc.connected?'farrowing.scan-no-reader':!sc.listening?'farrowing.scan-stopped':c.toast?.on==='roomScan'?'farrowing.scan-unknown':'farrowing.scan';}
+ if(v==='roomPig')return farmPigs.find(p=>p.tag===c.pig)?.gone?'farrowing.pig-gone':'farrowing.pig-not-in-task';
+ if(v==='roomBatch')return 'farrowing.batch';
+ if(v==='roomBatchPick'){const b=c.batch||{};return b.filtering?'farrowing.batch-filter':b.missed?.length?'farrowing.batch-missed':b.scanning==='waiting'?'farrowing.batch-waiting':b.scanning?'farrowing.batch-scanning':b.q?'farrowing.batch-search':b.picked?.length?'farrowing.batch-pick':'farrowing.batch-pick-none';}
+ if(v==='roomBatchForm')return 'farrowing.batch-form';
  const more={roomFilter:'filter',roomGrid:'pen-map',roomPenDetail:'pen',roomPenLog:'pen-log',roomPenNote:'pen-note',roomPenReadNote:'pen-read-note',roomPenFeed:'pen-feed',roomPenFault:'pen-fault',roomPenFaultRecord:'pen-fault-record',roomTaskSows:'task-sows',roomHome:'today',deathBreakdown:'death-breakdown',marker:'note',pigletCare:'piglet-care',pigletEdit:'piglet-identity',pigletDeath:'piglet-death'};
  if(more[v])return 'farrowing.'+more[v];
  if(v==='profile'&&s.actionsEntry)return 'farrowing.sow-actions';
  return null;
 }
-const presets=[['room','Room list'],['count','Counting'],['before','Before first count'],['draft','Death entry'],['finish','Finish'],['leave','Leave edit with changes'],['locked','Locked record'],['edit','Edit counts'],['born','Correct born'],['history','Farrowing log'],['ended','Sow died'],['allocate','Sow died · allocate piglets'],['task-blocked','End task · active sows'],['task-ready','End task · awaiting sows'],['task-complete','End task · all finished'],['task-outcomes','End task · production outcomes'],['foster','Foster piglets'],['reconcile','Reconcile piglet count'],['search-empty','Find a sow'],['search-results','Find a sow · results'],['search-none','Find a sow · no match'],['scan-none','Scan · reader not connected'],['scan-empty','Scan · nothing scanned'],['scan-list','Scan · sows scanned'],['scan-ticked','Scan · sows ticked'],['scan-repeat','Scan · repeat scan'],['scan-new','Scan · a sow just scanned'],['scan-stopped','Scan · stopped'],['scan-actions','Scan · Actions']];
+const presets=[['room','Room list'],['count','Counting'],['before','Before first count'],['draft','Death entry'],['finish','Finish'],['leave','Leave edit with changes'],['locked','Locked record'],['edit','Edit counts'],['born','Correct born'],['history','Farrowing log'],['ended','Sow died'],['allocate','Sow died · allocate piglets'],['task-blocked','End task · active sows'],['task-ready','End task · awaiting sows'],['task-complete','End task · all finished'],['task-outcomes','End task · production outcomes'],['foster','Foster piglets'],['reconcile','Reconcile piglet count'],['search-empty','Find a sow'],['search-results','Find a sow · results'],['search-none','Find a sow · no match'],['scan-none','Scan · reader not connected'],['scan-empty','Scan · listening'],['scan-read','Scan · her drawer opened'],['scan-pig','Scan · a pig not in Farrowing'],['scan-dead','Scan · a pig that died'],['scan-unknown','Scan · a tag with no pig'],['scan-stopped','Scan · stopped'],['batch-sheet','Actions · pigs in this unit'],['batch-none','Choose pigs · none yet'],['batch-pick','Choose pigs · 3 chosen'],['batch-search','Choose pigs · search'],['batch-filter','Choose pigs · filter'],['batch-scanning','Choose pigs · scanning'],['batch-waiting','Choose pigs · waiting for the reader'],['batch-missed','Choose pigs · reads that cannot join'],['batch-form','Actions · the form'],['batch-saved','Actions · saved']];
 const cards=[{title:'Find the next sow',caption:'<strong>The room, in context.</strong> Filter by state, jump to a pen, and open each sow’s live record.',initial:'room'},{title:'Finish with confidence',caption:'<strong>Two observations, then the lock.</strong> Clear rows, optional details and a deliberate final action.',initial:'finish'},{title:'Read the whole litter',caption:'<strong>Current facts, with their context.</strong> Finish details stay readable; the history opens on its own page.',initial:'locked'}];
 const states=cards.map(c=>{const r=seed(c.initial);restoreDraft(r);return r;});
 // Scenario gate hook (scripts/run-scenarios.mjs): read-only access to the live records for record assertions. Draws nothing.
@@ -368,14 +373,11 @@ function sowFacts(r){
  else{word=ZH?'完成':'Done';figure=counts(r.alive);level='settled';context=at(r.finished.split(' · ').at(-1),'G.H');}
  return {word,figure,level,context};
 }
-// place: a sow in another unit says only where she is ("Unit 6 · Pen A2"). select: Scan's row, a tick box beside the door.
-function sowRow(r,{flat=false,where='',place='',action='room-sow',value=r.tag,select=null}={}){
+// place: a sow in another unit says only where she is ("Unit 6 · Pen A2").
+function sowRow(r,{flat=false,where='',place='',action='room-sow',value=r.tag}={}){
  const f=sowFacts(r);let context=f.context;
- if(select)context=context.split(' · ').filter(t=>!/^[A-Z]\.[A-Z]$/.test(t)).join(' · ');   // a row with a tick box has less width: no initials
  if(place)context=place;else if(flat||where)context=[where||rowText.pen(r.pen),context].filter(Boolean).join(' · ');
- const props={code:r.tag,description:context,right:{kind:'state',figure:f.figure,word:f.word,level:f.level}};
- if(!select)return SentriUI.row({variant:'animal',...props,action,value});
- return SentriUI.rowSelectDoor({...props,checked:select.checked,action:'room-scan-pick',value:r.tag,openAction:action,openValue:value,attrs:{'data-scan-tag':r.tag},inputAttrs:{'data-value':r.tag,'aria-label':'Select '+r.tag}});
+ return SentriUI.row({variant:'animal',code:r.tag,description:context,right:{kind:'state',figure:f.figure,word:f.word,level:f.level},action,value});
 }
 function room(s){
  const page=findPage(s);if(page)return page;
@@ -385,7 +387,7 @@ function room(s){
  if(!pens.includes(c.currentPen))c.currentPen=pens[0]||'';
  const latest=c.records.some(r=>r.stamp==='09:41')?'09:41':'08:41';
  if(s.view==='roomHome'||c.completion)return roomHome(c);
- return `${status()}${SentriTask.header({title:'Farrowing',back:{action:'room-home'},backLabel:'Back to Today',line:{text:[{text:'Last record '},{text:latest,strong:true},{text:' · G.H'}]}})}<div class="room-scroll" tabindex="-1" role="region" aria-label="${esc(c.unit.name)} farrowing sows"><div class="room-context-strip overview-host">${AstraTaskOverview.render({headingIcons:true,unit:{name:c.unit.name,value:avg,metric:'Live / litter',target:'Target 12',belowTarget:true},task:{value:allCounts.Done,total:allCounts.ProgressTotal,label:'Done',statuses:{farrowed:allCounts.Done,active:allCounts.Active,awaiting:allCounts.Awaiting}}})}</div><div class="room-controls"><div class="room-lensbar">${SentriUI.segment({variant:'two-line-lens',options:roomLenses.map(l=>[l,l,{count:counts[l]}]),active:c.lens,action:'room-lens',ariaLabel:'Farrowing state'})}${SentriUI.iconButton({action:'room-filter',icon:roomIcon('filter'),label:'Filter sows',className:'room-filter-button',badge:roomFilterCount(c.filter)||''})}</div>${roomFilterCount(c.filter)?`<div class="room-filter-summary"><span>${esc(roomFilterLabel(c.filter))}</span>${btn('room-clear-filter','Clear','text-button')}</div>`:''}</div><div class="room-list">${!visible.length?`<div class="room-empty"><strong>No ${c.lens==='All'?'matching':c.lens.toLowerCase()} sows</strong><p>${roomFilterCount(c.filter)?'Adjust the filters to see more task sows.':'Choose another status to see the other task sows in this unit.'}</p></div>`:''}${pens.map(p=>{const all=c.listed.filter(r=>r.pen===p),rows=visible.filter(r=>r.pen===p);return `<section class="st-panel pen-card" data-pen="${p}"><header class="pen-top">${btn('room-pen-detail',`<strong>${p}</strong><small>· ${all.length} ${all.length===1?'sow':'sows'}</small>${icon('chevron')}`,'room-pen-name',p).replace('<button',`<button aria-label="Pen ${p}, ${all.length} ${all.length===1?'sow':'sows'}, view details"`)}${rows.length!==all.length?`<span class="pen-visible-count">${rows.length} shown</span>`:''}</header>${rows.map(r=>sowRow(r)).join('')}</section>`;}).join('')}</div></div>${SentriUI.taskDock({label:'Farrowing tools',place:{action:'room-grid',label:penText.title},primary:{action:'room-scan',label:'Scan ear tag'},tools:[{action:'room-search',icon:'search',label:'Search ear tag'}]})}`;
+ return `${status()}${SentriTask.header({title:'Farrowing',back:{action:'room-home'},backLabel:'Back to Today',line:{text:[{text:'Last record '},{text:latest,strong:true},{text:' · G.H'}]}})}<div class="room-scroll" tabindex="-1" role="region" aria-label="${esc(c.unit.name)} farrowing sows"><div class="room-context-strip overview-host">${AstraTaskOverview.render({headingIcons:true,unit:{name:c.unit.name,value:avg,metric:'Live / litter',target:'Target 12',belowTarget:true},task:{value:allCounts.Done,total:allCounts.ProgressTotal,label:'Done',statuses:{farrowed:allCounts.Done,active:allCounts.Active,awaiting:allCounts.Awaiting}}})}</div><div class="room-controls"><div class="room-lensbar">${SentriUI.segment({variant:'two-line-lens',options:roomLenses.map(l=>[l,l,{count:counts[l]}]),active:c.lens,action:'room-lens',ariaLabel:'Farrowing state'})}${SentriUI.iconButton({action:'room-filter',icon:roomIcon('filter'),label:'Filter sows',className:'room-filter-button',badge:roomFilterCount(c.filter)||''})}</div>${roomFilterCount(c.filter)?`<div class="room-filter-summary"><span>${esc(roomFilterLabel(c.filter))}</span>${btn('room-clear-filter','Clear','text-button')}</div>`:''}</div><div class="room-list">${!visible.length?`<div class="room-empty"><strong>No ${c.lens==='All'?'matching':c.lens.toLowerCase()} sows</strong><p>${roomFilterCount(c.filter)?'Adjust the filters to see more task sows.':'Choose another status to see the other task sows in this unit.'}</p></div>`:''}${pens.map(p=>{const all=c.listed.filter(r=>r.pen===p),rows=visible.filter(r=>r.pen===p);return `<section class="st-panel pen-card" data-pen="${p}"><header class="pen-top">${btn('room-pen-detail',`<strong>${p}</strong><small>· ${all.length} ${all.length===1?'sow':'sows'}</small>${icon('chevron')}`,'room-pen-name',p).replace('<button',`<button aria-label="Pen ${p}, ${all.length} ${all.length===1?'sow':'sows'}, view details"`)}${rows.length!==all.length?`<span class="pen-visible-count">${rows.length} shown</span>`:''}</header>${rows.map(r=>sowRow(r)).join('')}</section>`;}).join('')}</div></div>${SentriUI.taskDock({label:'Farrowing tools',place:{action:'room-grid',label:penText.title},primary:{action:'room-scan',label:'Scan',attrs:{'aria-label':'Scan ear tag'}},tools:[{action:'room-search',icon:'search',label:'Search ear tag'},{action:'room-batch',icon:'more',label:'Actions'}]})}`;
 }
 function roomHome(c){if(c.completion)return `${status()}<div class="room-home"><p class="home-eyebrow">All units</p><h2>Today</h2><p class="home-intro">Ended tasks</p>${btn('room-task-receipt',`<span class="home-task-title">Farrowing ${icon('chevron')}</span><span class="home-task-states">Task ended · ${c.completion.finished} finished</span><span class="home-resume">View receipt</span>`,'home-task')}</div>`;const n=roomCounts(c.listed);return `${status()}<div class="room-home"><p class="home-eyebrow">${esc(c.unit.name)}</p><h2>Today</h2><p class="home-intro">Your work in this unit</p>${btn('room-return',`<span class="home-task-title">Farrowing ${icon('chevron')}</span><span class="home-task-states"><b>${n.Active} active</b> · ${n.Awaiting} awaiting · ${n.Done} done</span><span class="home-resume">Continue from pen ${c.currentPen}</span>`,'home-task')}</div>`;}
 function roomSheet(title,body,actions,cls='',surface='',line=null){
@@ -415,24 +417,40 @@ function penMapSheet(c,sheet){
   labels:{map:penText.map,pen:penText.pen,act:penText.act,live:penText.live,plain:penText.plain,empty:penText.empty,hidden:penText.hidden},peek});
  return sheet(penText.title,body,SentriUI.penMapFooter({back:{action:'room-back',label:{text:penText.back,str:'act.back'}},depth:penDepth,label:penText.jump}),'picker-sheet','menu',{key:SentriUI.penMapKey({pens,words:{act:penText.need,live:penText.farrowing}})});
 }
-/* ---- Find a sow and Scan ear tags (owner decisions 2026-10-12) ----
+/* ---- Find a sow and Scan ear tags (owner decisions 2026-10-12, amended 2026-10-22) ----
    Two full pages that replace the old search drawer and scan preview. Both look across every unit; neither switches unit by itself.
-   Find a sow: nothing is listed until something is typed; results are grouped by unit, this unit first.
-   Scan ear tags: the reader is always listening; every scan adds a sow to a list, newest first; a tick box selects for the shared Actions. */
+   Find a sow: nothing is listed until something is typed; results are grouped by unit, this unit first. A sow on the farrowing list shows
+   her farrowing row; any other pig the generic row.
+   Scan ear tags: Farrowing is a single-action task, so each read opens her (no list): a sow on the list opens her farrowing drawer over Scan,
+   any other pig her pig profile. Her Back returns to Scan, still listening. */
 const scannerOff=/[?&]scanner=(off|0|no)(&|$)/.test(globalThis.location?.search||'');   // ?scanner=off: the tag reader is not connected
-const scanSequence=['000418','000431','004318','000437','000943','000392','000455','000467'];   // what "Simulate scan" scans, in turn
-function findSow(c,tag){for(const unit of c.units){const record=unit.records.find(r=>r.tag===tag);if(record)return {record,unit};}return null;}
+const scanSequence=['000431','000434','004318','000999','000418','000943','000392','000455','000467'];   // what "Simulate scan" scans, in turn
+function findSow(c,tag){for(const unit of c.units){const record=unit.records.find(r=>r.tag===tag&&onList(r));if(record)return {record,unit};}return null;}
+// Pigs that are not on the farrowing list (owner, 2026-10-22). Find and Scan reach every pig, but only a sow on this task's list is a
+// farrowing sow: any other pig shows the generic row (her pen, her condition) and opens her pig profile, whose line says she is not in
+// Farrowing. 004305 lives in Unit 7 but is not on the list: "in the task" is the list, not the unit.
+const farmPigs=[{tag:'004305',unit:'7',pen:'D2',stage:'Gestating',cond:'Lameness'},{tag:'000434',unit:'3',pen:'A2',stage:'Gestating',cond:'Thin'},{tag:'004329',unit:'3',pen:'A4',stage:'Gestating',cond:''},{tag:'004811',unit:'7',pen:'D2',stage:'Gilt',cond:''},
+ // Pigs no longer on the farm keep their tag: one died, one was sold. A read finds her record; she is never ticked or listed for work.
+ {tag:'000512',unit:'7',pen:'B2',stage:'Gestating',cond:'',gone:{kind:'died',on:'14 Oct'}},{tag:'000622',unit:'7',pen:'C1',stage:'Gestating',cond:'',gone:{kind:'sold',on:'2 Oct'}}];
+// What a gone pig's record says first: "Died 14 Oct", "Sold 2 Oct".
+const goneLine=g=>g?(g.kind==='died'?'Died ':'Sold ')+g.on:'';
+const farmUnit=(c,id)=>c.units.find(u=>u.id===id)||{id,name:ZH?id+'单元':'Unit '+id};
 // One card per unit under a plain "Unit 7" section heading, this unit first, then the others in unit order (as Home's To treat groups pigs).
 // The heading names the unit, so no row repeats it.
-function byUnit(c,hits){return c.units.filter(u=>hits.some(h=>h.unit.id===u.id)).sort((a,b)=>(b.id===c.unitId)-(a.id===c.unitId)).map(unit=>({unit,list:hits.filter(h=>h.unit.id===unit.id)}));}
+function byUnit(c,hits){return [...new Map(hits.map(h=>[h.unit.id,h.unit])).values()].sort((a,b)=>(b.id===c.unitId)-(a.id===c.unitId)||a.id-b.id).map(unit=>({unit,list:hits.filter(h=>h.unit.id===unit.id)}));}
 // Every unit, one list. Tags that start with the typed text come first, then tags that contain it, then a pen that matches; her own unit leads.
 function findHits(c){
  const q=c.query.trim().toLowerCase();if(!q)return null;
- const rank=r=>r.tag.startsWith(q)?0:r.tag.includes(q)?1:2;
- const hits=c.units.flatMap(unit=>unit.records.filter(onList).filter(r=>r.tag.includes(q)||r.pen.toLowerCase().includes(q)).map(record=>({record,unit}))).sort((a,b)=>rank(a.record)-rank(b.record)||a.record.tag.localeCompare(b.record.tag));
+ const rank=h=>{const t=(h.record||h.pig).tag;return t.startsWith(q)?0:t.includes(q)?1:2;},match=r=>r.tag.includes(q)||r.pen.toLowerCase().includes(q);
+ const hits=[...c.units.flatMap(unit=>unit.records.filter(onList).filter(match).map(record=>({record,unit}))),...farmPigs.filter(p=>!p.gone&&match(p)).map(pig=>({pig,unit:farmUnit(c,pig.unit)}))]
+  .sort((a,b)=>rank(a)-rank(b)||(a.record||a.pig).tag.localeCompare((b.record||b.pig).tag));
  return {q,hits};
 }
-function findRow({record:r},q){return SentriUI.findRow({code:r.tag,place:rowText.pen(r.pen),query:q,action:'room-sow',value:r.tag});}
+// A sow on the list: her farrowing state on the right, as the room shows her. Any other pig: her condition, or nothing.
+function findRow({record:r,pig:p},q){
+ const f=r&&sowFacts(r),right=r?{kind:'state',figure:f.figure,word:f.word,level:f.level}:p.cond?{kind:'tags',tags:[{name:p.cond,level:'ongoing'}]}:null;
+ return SentriUI.findRow({code:(r||p).tag,place:rowText.pen((r||p).pen),query:q,right,action:r?'room-sow':'room-pig',value:(r||p).tag});
+}
 function searchBody(c){
  const f=findHits(c);
  return SentriUI.findResults({query:c.query,groups:f?byUnit(c,f.hits).map(({unit,list})=>({title:unit.name,rows:list.map(h=>findRow(h,f.q))})):[],hint:'Type part of an ear tag or a pen, or scan a tag. Searches every unit.',none:`No sow matching “${c.query.trim()}” in any unit.`});
@@ -442,44 +460,125 @@ function searchPage(c){
  return SentriUI.findPage({query:c.query,placeholder:'Ear tag or pen',results:searchBody(c),scan:{action:'room-scan',label:'Scan ear tag'},clear:{action:'room-search-clear',label:'Clear'},cancel:{action:'room-back',label:'Cancel'},inputAttrs:{'data-room-search':''},bar:status()});
 }
 function scanSetup(c,preset=''){
- const scanning=/^scan-/.test(preset),scanned=['scan-list','scan-new','scan-repeat','scan-ticked','scan-stopped','scan-actions'].includes(preset),ticked=['scan-ticked','scan-actions'].includes(preset);
- const items=scanned?['004318','000431','000418']:[];   // newest first
- c.scan={connected:preset==='scan-none'?false:scanning?true:!scannerOff,listening:preset!=='scan-stopped',items,picked:ticked?['000431','000418']:[],seq:items.length,fresh:{},last:'',scroll:0};
- if(preset==='scan-new')c.scan.fresh['004318']=Infinity;   // the held frame of the arrival tint: 004318, the newest scan, stays lit
+ const scanning=/^scan-/.test(preset);
+ c.scan={connected:preset==='scan-none'?false:scanning?true:!scannerOff,listening:preset!=='scan-stopped',seq:0};
  if(/^search-/.test(preset))c.query=preset==='search-results'?'43':preset==='search-none'?'909':'';
- if(preset==='scan-repeat'){c.scan.seq=1;scanAdd(c);}   // the reader reads 000431 again: still one row, highlighted
-}
-// "Simulate scan": the reader reads the next sample sow. A sow already on the list is not added twice; her row is lit again instead.
-// Every scan, new or repeat, lights its row for scanLit ms on its own clock, so a burst of scans lights each row in turn.
-const scanLit=1600;
-function scanAdd(c){
- const sc=c.scan;if(!sc.connected||!sc.listening)return false;
- const tag=scanSequence[sc.seq++%scanSequence.length];
- if(!sc.items.includes(tag))sc.items.unshift(tag);
- sc.fresh[tag]=Date.now()+scanLit;sc.last=tag;
- return true;
-}
-function scanAction(s,c,a,v){
- const sc=c.scan;
- if(a==='room-scan-toggle'&&sc.connected)sc.listening=!sc.listening;
- else if(a==='room-scan-pick'){const k=sc.picked.indexOf(v);if(k<0)sc.picked.push(v);else sc.picked.splice(k,1);}
- else if(a==='room-scan-actions')s.view='roomScanActions';
+ if(preset==='scan-read')c.returnToTaskReview='roomScan';   // the reader read 000418: her drawer over Scan
+ if(preset==='scan-pig')Object.assign(c,{pig:'000434',pigFrom:'roomScan'});
+ if(preset==='scan-dead')Object.assign(c,{pig:'000512',pigFrom:'roomScan'});   // the reader read 000512, who died on 14 Oct   // the reader read 000434, a sow not on the list
+ if(/^batch-/.test(preset)){
+  const picked={'batch-pick':['000431','004305','000392'],'batch-scanning':['000431','004305'],'batch-missed':['000431','004305'],'batch-search':['000431'],'batch-filter':['000431','004305','000392'],'batch-form':['000431','004305','000392']}[preset]||[];
+  c.scan.connected=true;c.batch={verb:'health',picked,q:preset==='batch-search'?'43':'',scanning:preset==='batch-waiting'?'waiting':['batch-scanning','batch-missed'].includes(preset),filter:{pigs:'any',cond:'any'},fresh:preset==='batch-scanning'?{'004305':Infinity}:{},last:'',filtering:preset==='batch-filter',seq:0};   // last:'' — the held frame stays at the list's top; a live read scrolls to her
+  if(preset==='batch-filter')c.batch.draft={...c.batch.filter};
+  if(preset==='batch-waiting')c.scan.connected=false;
+  c.batch.missed=preset==='batch-missed'?['000999','000622','000434','000512'].map(t=>missOf(c,t)):[];   // newest first: a tag with no pig, a sold sow, a sow in Unit 3, one that died
 
+ }
+ if(preset==='batch-saved')c.toast={title:'Condition recorded · 3 pigs',until:Infinity};
+ if(preset==='scan-unknown')c.toast=scanUnknownToast('000999');
 }
-// Scan ear tags is the design system's Lookup scan page (components/Lookup): the rows are this task's sow rows with their tick box.
+/* ---- Actions for the pigs in this unit (owner story, 2026-10-22; reviewed twice the same day) ----
+   "Perform other actions on pigs in this unit easily, without switching to Inspection." The room's dock carries ···: the everyday verbs
+   for many pigs at once. The verb comes first, then the pigs: every pig in this unit, the farrowing sows and the rest (a gilt, a sow not on
+   the list), and only this unit. Choosing is To treat's page (owner, 2026-10-20): the search field with scan inside it, the filter, the
+   list. Scan turns the list itself to scanning: each read ticks her and marks her row; a pig from another unit is not added. Then the verb's
+   own form (Inspection's), filled once and saved for every pig chosen. Death is not here: it can't be undone, so it stays one pig at a time.
+   Copy (owner): the sheet is plain "Actions", its line "Pigs in Unit 7"; not "For several sows", "Many pigs at once" or "bulk". */
+const batchVerbs=[['health','condition','Condition','Disease or symptom'],['treatment','treat','Treat','Record treatment'],['triage','alert','Care','Care instructions'],['note','note','Note','Add a note'],['body','measure','Measure','Measurements & condition'],['feed','feed','Feed','Adjust feed'],['transfer','transfer','Transfer','Transfer']];
+const batchScans=['000431','004305','000434','000512','000392','000999','000622','004811','000437'];   // what "Simulate scan" reads while choosing: 000434 is in Unit 3, 000512 died, 000622 was sold, 000437 farrows in Unit 6
+/* A read that can't join this list adds nothing (owner reviews, 2026-10-22), but it is not lost: it goes into the list itself, at the top,
+   where the eye is after a read, with no tick box, each row a door to her record. Why, in the order that matters: no pig has this tag (a
+   new, empty tag, or one not synced to this phone yet: her pig profile deals with it) · she is no longer on the farm ("Not on the farm",
+   labelled Died or Sold) · she is in another unit (under that unit's plain heading, as Find groups pigs). The list is this unit's. */
+const scanUnknown=tag=>({tag,kind:'unknown',reason:ZH?'新耳标，或尚未同步':'New tag, or not synced yet'});
+function missOf(c,tag){
+ const f=farmPigs.find(x=>x.tag===tag),hit=c.units.flatMap(u=>u.records.filter(r=>r.tag===tag).map(record=>({record,unit:u})))[0];
+ if(!f&&!hit)return scanUnknown(tag);
+ const gone=f?.gone||(hit?.record.ended?{kind:'died',on:'today'}:null),unit=f?farmUnit(c,f.unit):hit.unit,pen=f?f.pen:hit.record.pen;
+ if(gone)return {tag,kind:'gone',gone,pen,unit};
+ return {tag,kind:'unit',unit,pen,cond:f?.cond||''};
+}
+// The reads that can't join, newest first, above this unit's pens: other units under their own heading, then Not on the farm, then tags with no pig.
+function batchMissedRows(c){
+ const m=c.batch.missed;if(!m.length)return '';
+ const card=(title,rows)=>SentriUI.heading({title,kind:'section',level:3})+SentriUI.panel(rows.join(''),{className:'st-row-group batch-missed'});
+ const row=(x,description,right)=>SentriUI.row({variant:'animal',code:x.tag,description,right:right||{kind:'state',figure:'',word:'',level:'settled'},action:'room-pig',value:x.tag,attrs:{'data-scan-tag':x.tag}});
+ const units=[...new Map(m.filter(x=>x.kind==='unit').map(x=>[x.unit.id,x.unit])).values()],gone=m.filter(x=>x.kind==='gone'),unknown=m.filter(x=>x.kind==='unknown');
+ return units.map(u=>card(u.name,m.filter(x=>x.kind==='unit'&&x.unit.id===u.id).map(x=>row(x,rowText.pen(x.pen),x.cond?{kind:'tags',tags:[{name:x.cond,level:'ongoing'}]}:null)))).join('')
+  +(gone.length?card(ZH?'已不在场':'Not on the farm',gone.map(x=>row(x,`${x.unit.name} · ${rowText.pen(x.pen)}`,{kind:'state',figure:x.gone.kind==='died'?(ZH?'死亡':'Died'):(ZH?'已售':'Sold'),word:x.gone.on==='today'?(ZH?'今天':'Today'):x.gone.on,level:'settled'}))):'')
+  +(unknown.length?card(ZH?'没有猪只使用此耳标':'No pig with this tag',unknown.map(x=>row(x,x.reason))):'')
+  +SentriUI.heading({title:c.unit.name,kind:'section',level:3});
+}
+// Farrowing's Scan has no list: a tag no pig has gives a toast on Scan, with a ✕ at its left and one tap to her pig profile, until closed or the next read.
+function scanUnknownToast(tag){const x=scanUnknown(tag);return {title:ZH?'没有猪只使用此耳标':'No pig with this tag',detail:`${tag} · ${x.reason}`,tone:'notice',dismiss:{action:'room-miss-close',label:'Close'},door:{action:'room-pig',value:tag,label:`No pig with tag ${tag}. Open her pig profile`},on:'roomScan'};}
+function batchSheet(c){
+ const tiles=batchVerbs.map(([value,symbol,label,title])=>({label,title,icon:icon(symbol),action:'room-batch-verb',value,attrs:value==='transfer'?{'data-entry':'move'}:{}}));
+ return roomSheet('Actions',SentriUI.rowGrid(tiles,{label:'Actions for pigs in '+c.unit.name}),footer(SentriUI.backButton({action:'room-back'})),'batch-sheet','menu',{text:[{text:'Pigs in '+c.unit.name}]});
+}
+// Every pig in this unit: the sows on the farrowing list (not one that died) with their farrowing row, then every other pig with the generic row.
+function unitPigs(c){
+ return [...c.listed.filter(r=>!r.ended).map(r=>({tag:r.tag,pen:r.pen,rec:r})),...farmPigs.filter(p=>p.unit===c.unitId&&!p.gone).map(p=>({tag:p.tag,pen:p.pen,pig:p}))];
+}
+const batchMatch=(p,f)=>(f.pigs==='any'||(f.pigs==='task')===!!p.rec)&&(f.cond==='any'||!!p.pig?.cond);
+const batchFilterCount=f=>(f.pigs!=='any')+(f.cond!=='any');
+function batchRows(c){
+ const b=c.batch,q=b.q.trim().toLowerCase(),shown=unitPigs(c).filter(p=>batchMatch(p,b.filter)&&(!q||p.tag.includes(q)||p.pen.toLowerCase().includes(q)));
+ const pick=p=>{const f=p.rec&&sowFacts(p.rec),right=p.rec?{kind:'state',figure:f.figure,word:f.word,level:f.level}:p.pig.cond?{kind:'tags',tags:[{name:p.pig.cond,level:'ongoing'}]}:{kind:'state',figure:'',word:'',level:'settled'};   // no condition: the animal row with nothing on the right
+  const context=p.rec?f.context.split(' · ').filter(t=>!/^[A-Z]\.[A-Z]$/.test(t)).join(' · '):p.pig.stage;
+  let html=SentriUI.rowSelect({code:p.tag,description:context,right,checked:b.picked.includes(p.tag),action:'room-batch-pick',value:p.tag,attrs:{'data-scan-tag':p.tag},inputAttrs:{'data-value':p.tag,'aria-label':'Choose '+p.tag}});
+  return q?html.replace(`<strong class="st-animal-id">${p.tag}</strong>`,`<strong class="st-animal-id">${SentriUI.findMark(p.tag,q)}</strong>`):html;};
+ const pens=[...new Set(shown.map(p=>p.pen))].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true}));
+ if(!pens.length)return `<p class="st-find-hint">${q?`No pig in ${esc(c.unit.name)} matching “${esc(b.q.trim())}”.`:'No pigs match the filter.'}</p>`;
+ return pens.map(pen=>{const rows=shown.filter(p=>p.pen===pen);return `<section class="st-panel pen-card batch-pen" data-pen="${pen}"><header class="pen-top"><span class="room-pen-name"><strong>${pen}</strong><small>· ${rows.length} ${rows.length===1?'pig':'pigs'}</small></span></header>${rows.map(pick).join('')}</section>`;}).join('');
+}
+// Choose pigs: To treat's page. The bar is the shared search field with scan at its end, and the filter; scanning turns that bar into its
+// one status ("Scanning", with Stop), and each read ticks her where she is in the list. The first quiet line names the verb.
+function batchPickPage(c){
+ const b=c.batch,verb=(batchVerbs.find(x=>x[0]===b.verb)||[])[2]||'',n=b.picked.length,fn=batchFilterCount(b.filter);
+ // Scanning is the Lookup scan bar in place of the search field: waiting until the reader connects (Reader 1 is the phone's paired reader).
+ const bar=b.scanning?SentriUI.scanBar({state:b.scanning==='waiting'?'waiting':'scanning',device:'Reader 1',stop:{action:'room-batch-scan-stop'}})
+  :SentriUI.choiceSearch({label:'Search ear tag or pen',placeholder:'Ear tag or pen',value:b.q,attrs:{'data-batch-search':''},clear:{action:'room-batch-clear'},scan:{action:'room-batch-scan',label:'Scan ear tags'}});
+ const filter=SentriUI.iconButton({action:'room-batch-filter',icon:icon('filter'),label:'Filter pigs'+(fn?', '+fn+' applied':''),badge:fn||'',className:'batch-filter'});
+ const above=`<div class="batch-bar">${bar}${filter}</div>`;   // pinned over the list (Sheet's band above the body), as Inspection's log filter
+ const body=`<p class="st-find-hint batch-hint"><b>${esc(verb)}</b> · tick each pig in ${esc(c.unit.name)}, or scan.</p><div class="batch-list">${batchMissedRows(c)}${batchRows(c)}</div>`;
+ const next=SentriUI.button({label:n?`Next · ${n} ${n===1?'pig':'pigs'}`:'Next',register:'primary',action:'room-batch-next',disabled:!n});
+ return SentriUI.sheet({variant:'page',title:'Choose pigs',back:{action:'room-back'},above,body,footer:footer(SentriUI.backButton({action:'room-back'}),next),className:'room-utility batch-pick',label:'Choose pigs',bar:status()});
+}
+// The filter, as To treat's: which pigs (in Farrowing or not) and whether she has a condition. Show N pigs applies it.
+function batchFilterSheet(c){
+ const b=c.batch,d=b.draft,n=unitPigs(c).filter(p=>batchMatch(p,d)).length;
+ const sections=[{title:'Pigs',icon:icon('pig'),content:SentriUI.segment({variant:'facet',options:[['any','Any'],['task','In Farrowing'],['other','Others']],active:d.pigs,action:'room-batch-facet-pigs',ariaLabel:'Pigs'})},
+  {title:'Condition',icon:icon('health'),content:SentriUI.segment({variant:'facet',options:[['any','Any'],['some','Has a condition']],active:d.cond,action:'room-batch-facet-cond',ariaLabel:'Condition'})}];
+ return SentriUI.filterSheet({title:'Filter pigs',sections,apply:{label:`Show ${n} ${n===1?'pig':'pigs'}`,action:'room-batch-filter-apply'},reset:batchFilterCount(d)?{label:'Reset',action:'room-batch-filter-reset'}:false,backAction:'room-batch-filter-back',className:'batch-filter-sheet',size:'medium'});
+}
+// The verb's own form: Inspection's, embedded as her pig record is, for every pig chosen. Saving returns to the room with the count.
+function batchFormPage(c){return `<iframe class="sow-detail-frame room-pig-frame batch-form-frame" data-room-pig title="${esc((batchVerbs.find(x=>x[0]===c.batch.verb)||[])[3]||'')}" src="inspection-astra-concept.html?layout=focus&embed=sow${ZH?'&lang=zh':''}"></iframe>`;}
+function connectBatchForm(root,c){
+ const frame=root.querySelector('.batch-form-frame');if(!frame)return;
+ const pigs=unitPigs(c).filter(p=>c.batch.picked.includes(p.tag)).map(p=>p.rec?{id:p.tag,pen:p.pen,unit:c.unit.name,stage:'Lactating',parity:p.rec.parity}:{id:p.tag,pen:p.pen,unit:c.unit.name,stage:p.pig.stage});
+ frame.addEventListener('load',()=>frame.contentWindow.postMessage({type:'open-bulk-action',view:c.batch.verb,pigs},location.origin),{once:true});
+}
+// "Simulate scan": the reader reads the next sample tag. While a sow is open the reader waits: only Scan itself listens.
+function scanRead(c){const sc=c.scan;if(!sc.connected||!sc.listening)return '';return scanSequence[sc.seq++%scanSequence.length];}
+function scanAction(s,c,a){if(a==='room-scan-toggle'&&c.scan.connected)c.scan.listening=!c.scan.listening;}
+// Scan ear tags is the design system's Lookup scan page (components/Lookup) in its single-action form: nothing is listed, each read opens her.
 function scanPage(c){
- const sc=c.scan,items=sc.items.map(t=>findSow(c,t)).filter(Boolean),n=sc.picked.length;
- return SentriUI.scanPage({title:'Scan ear tags',back:{action:'room-back'},connected:sc.connected,listening:sc.listening,groups:byUnit(c,items).map(({unit,list})=>({title:unit.name,rows:list.map(h=>sowRow(h.record,{flat:true,select:{checked:sc.picked.includes(h.record.tag)}}))})),picked:n,selected:n=>`${n} ${n===1?'sow':'sows'} selected`,actions:{action:'room-scan-actions',label:'Actions'},toggle:{action:'room-scan-toggle'},empty:{text:'Each sow you scan appears here.',stoppedText:'Resume scanning to add sows.'},bar:status()});
+ const sc=c.scan;
+ return SentriUI.scanPage({title:'Scan ear tags',back:{action:'room-back'},read:'open',connected:sc.connected,listening:sc.listening,toggle:{action:'room-scan-toggle'},empty:{text:'Each sow opens as soon as her tag is read.',stoppedText:'Resume scanning to open the next sow.'},bar:status()});
 }
-const pageUnder=(s,c)=>s.view==='roomScanActions'?'roomScan':!/^room/.test(s.view)&&['roomSearch','roomScan'].includes(c.returnToTaskReview)?c.returnToTaskReview:s.view;   // a sow opened from Find a sow or Scan rises over that page, where her Back returns
+const pageUnder=(s,c)=>s.view==='roomPig'?c.pigFrom:!/^room/.test(s.view)&&['roomSearch','roomScan'].includes(c.returnToTaskReview)?c.returnToTaskReview:s.view;   // a sow opened from Find a sow or Scan rises over that page, where her Back returns
 function findPage(s){const c=roomContext(s),under=pageUnder(s,c);return under==='roomSearch'?searchPage(c):under==='roomScan'?scanPage(c):'';}
-// The shared generic actions, for the ticked sows only: no farrowing action here (the owner, 2026-10-12). They are More actions' everyday
-// verbs (owner, 2026-10-19): one Row tile grid of an icon and one word, the full action name kept as each tile's accessible name.
-function scanActionsSheet(c){
- const tiles=[['transfer','Transfer','转栏','Transfer','transfer'],['condition','Condition','疾病','Disease or symptom','health'],['treat','Treat','治疗','Record treatment','treatment'],['note','Note','备注','Add a note','marker']]
-  .map(([symbol,en,zh,title,value])=>({label:ZH?zh:en,title,icon:icon(symbol),action:'room-scan-act',value,attrs:value==='transfer'?{'data-entry':'move'}:{}}));
- // No count line: the footer under it already said "N sows selected", and More actions has none.
- return roomSheet('Actions',SentriUI.rowGrid(tiles,{label:'Actions for the ticked sows'}),footer(SentriUI.backButton({action:'room-back'})),'scan-actions-sheet','menu');
+// A pig not on the farrowing list opens her pig profile (the Inspection pig record, embedded as Home embeds it), over the page she was found
+// on. Its line says she is not in Farrowing, so the worker knows why no farrowing drawer opened; its Back returns to that page.
+function pigPage(c){return `<iframe class="sow-detail-frame room-pig-frame" data-room-pig title="${esc((ZH?'猪只档案 · ':'Pig record · ')+c.pig)}" src="inspection-astra-concept.html?layout=focus&embed=sow${ZH?'&lang=zh':''}"></iframe>`;}
+// Her record's line says first what matters most: that she is gone ("Died 14 Oct"), else, opened from Find or Scan, that she is not in
+// Farrowing; opened from Choose pigs (the other-unit note) it is her plain line, which already names her unit.
+function connectPig(root,c){
+ const frame=root.querySelector('.room-pig-frame');if(!frame)return;
+ const hit=findSow(c,c.pig)||c.units.flatMap(u=>u.records.filter(r=>r.tag===c.pig).map(record=>({record,unit:u})))[0],f=farmPigs.find(x=>x.tag===c.pig);
+ const p=f?{tag:f.tag,pen:f.pen,unit:farmUnit(c,f.unit).name,stage:f.stage,gone:f.gone}:hit?{tag:c.pig,pen:hit.record.pen,unit:hit.unit.name,stage:hit.record.ended?'Sow died':'Lactating',gone:hit.record.ended?{kind:'died',on:'today'}:null}:{tag:c.pig,pen:'',unit:'',stage:'',unknown:true};   // a tag no pig has: her pig profile deals with it (owner, 2026-10-22)
+ const note=p.unknown?(ZH?'没有猪只使用此耳标':'No pig with this tag'):p.gone?goneLine(p.gone):['roomScan','roomSearch'].includes(c.pigFrom)?(ZH?'不在分娩任务中':'Not in Farrowing'):'';
+ frame.addEventListener('load',()=>frame.contentWindow.postMessage({type:'open-sow-detail',record:{id:p.tag,pen:p.pen,unit:p.unit,stage:p.stage,events:[]},tasks:[],destinations:c.units.map(u=>({id:u.id,name:u.name,pens:[...new Set(u.records.map(r=>r.pen))]})),entry:'pig',actions:[],note},location.origin),{once:true});
 }
 // Pen context is shared by its drawers within the unit; task rows stay sow-focused.
 function penInfo(c){const pens=c.unit.penDetails||(c.unit.penDetails={});return pens[c.detailPen]||(pens[c.detailPen]={note:'',noteBy:'',faults:[],events:[],feed:null});}
@@ -597,7 +696,10 @@ function roomOverlay(s){const c=roomContext(s),unitSheet=(title,body,actions,cls
  if(s.view==='roomPenDetail')return penDetails(c);
  if(s.view==='roomPenLog')return penLog(c);
  if(s.view==='roomGrid')return penMapSheet(c,unitSheet);
- if(s.view==='roomScanActions')return scanActionsSheet(c);
+ if(s.view==='roomPig')return pigPage(c);
+ if(s.view==='roomBatch')return batchSheet(c);
+ if(s.view==='roomBatchPick')return c.batch.filtering?'<div class="page-background" inert aria-hidden="true">'+batchPickPage(c)+'</div>'+batchFilterSheet(c):batchPickPage(c);   // under the filter, Choose pigs is the page behind
+ if(s.view==='roomBatchForm')return '<div class="page-background" inert aria-hidden="true">'+batchPickPage(c)+'</div>'+batchFormPage(c);
  if(s.view==='roomOverview'){
   const {units,totals:t}=taskOverview(c),review=taskClosureReview(c);
   const columns=['Done','Active','Awaiting'],dotClass={Done:'farrowed',Active:'active',Awaiting:'awaiting'};
@@ -610,7 +712,7 @@ function roomOverlay(s){const c=roomContext(s),unitSheet=(title,body,actions,cls
 }
 function roomAction(i,a,v){if(!a.startsWith('room-'))return false;const s=states[i],c=roomContext(s);if(a!=='room-pen'&&atlasStill())c.highlightUntil=0;const list=document.querySelector(`[data-card="${i}"] .room-scroll`);if(list)c.scroll=list.scrollTop;const intro=list?list.querySelector('.room-context-strip').offsetHeight+10:0;const nextScroll=c.scroll>=intro?intro:0;
   if(a==='room-sow'){const hit=findSow(c,v),r=hit?.record;if(r){const from=s.view;if(from==='roomScan'||from==='roomSearch')c.returnToTaskReview=from;states[i]=r;r.view=recordView(r);if(r.view==='history')r.pageBack='room';if(hit.unit.id===c.unitId)c.currentPen=r.pen;if(from!=='roomSearch')c.query='';}}   // Back returns to the list she was opened from; Find a sow keeps what was typed   // Farrowing is one task across its units: a sow in another unit opens the same drawer
- if(a==='room-back'||a==='room-return'){c.returnToTaskReview=false;if(s.view==='roomPenDetail')c.returnFocusPen=c.detailPen;const from=s.view;if(from==='roomFilter')c.filterKeep=clone(c.filterDraft);if(from==='roomPenNote'||from==='roomPenFault'||from==='roomPenFaultRecord')(c.penKeeps=c.penKeeps||{})[from+'|'+c.detailPen+(from==='roomPenFaultRecord'?'|'+c.penFaultId:'')]=clone(c.penDraft||{});if(from==='roomPenDetail'&&c.penKeeps)for(const k of Object.keys(c.penKeeps))if(k.endsWith('|'+c.detailPen))delete c.penKeeps[k];s.view=from==='roomScanActions'?'roomScan':from==='roomScan'&&c.scanFrom?c.scanFrom:from==='roomPicker'&&c.picker?c.picker.returnView:from==='roomEndTask'?'roomOverview':from==='roomTaskSows'?c.taskListBack||'roomEndTask':from==='roomTaskReceipt'?'roomHome':penParent(from);if(from==='roomPicker')c.picker=null;}
+ if(a==='room-back'||a==='room-return'){c.returnToTaskReview=false;if(s.view==='roomPenDetail')c.returnFocusPen=c.detailPen;const from=s.view;if(from==='roomFilter')c.filterKeep=clone(c.filterDraft);if(from==='roomPenNote'||from==='roomPenFault'||from==='roomPenFaultRecord')(c.penKeeps=c.penKeeps||{})[from+'|'+c.detailPen+(from==='roomPenFaultRecord'?'|'+c.penFaultId:'')]=clone(c.penDraft||{});if(from==='roomPenDetail'&&c.penKeeps)for(const k of Object.keys(c.penKeeps))if(k.endsWith('|'+c.detailPen))delete c.penKeeps[k];s.view=from==='roomBatchPick'?'roomBatch':from==='roomScanActions'?'roomScan':from==='roomScan'&&c.scanFrom?c.scanFrom:from==='roomPicker'&&c.picker?c.picker.returnView:from==='roomEndTask'?'roomOverview':from==='roomTaskSows'?c.taskListBack||'roomEndTask':from==='roomTaskReceipt'?'roomHome':penParent(from);if(from==='roomPicker')c.picker=null;}
  handlePenAction(s,c,a,v);
  if(a==='room-pen-log')s.view='roomPenLog';
  if(a==='room-pen-detail'&&c.records.some(r=>r.pen===v)){c.detailPen=v;c.currentPen=v;s.view='roomPenDetail';}
@@ -626,7 +728,22 @@ function roomAction(i,a,v){if(!a.startsWith('room-'))return false;const s=states
 
  if(a==='room-search'||a==='room-scan'){c.scanFrom=a==='room-scan'&&s.view==='roomSearch'?'roomSearch':'';if(!c.scanFrom)c.query='';s.view=a==='room-search'?'roomSearch':'roomScan';}   // Scan opened from Find a sow goes back to it, with what was typed
  if(a==='room-search-clear')c.query='';
- if(a==='room-scan-act'){const hit=findSow(c,c.scan.picked[0]);if(hit){const r=hit.record;states[i]=r;r.view='roomScan';r.deepLink=v;r.scanDeep='armed';act(r,'sowActions');}}
+ if(a==='room-pig'){c.pigFrom=s.view;c.pig=v;s.view='roomPig';c.toast=null;}
+ if(a==='room-batch'){c.batch={verb:'',picked:[],q:'',scanning:false,filter:{pigs:'any',cond:'any'},fresh:{},seq:0,missed:[]};c.toast=null;s.view='roomBatch';}
+ if(a==='room-batch-scan'){c.batch.scanning=c.scan.connected?true:'waiting';c.batch.q='';}   // no reader yet: wait for it, then scan
+ if(a==='room-batch-scan-stop')c.batch.scanning=false;
+
+ if(a==='room-miss-close')c.toast=null;
+ if(a==='room-batch-clear')c.batch.q='';
+ if(a==='room-batch-filter'){c.batch.filtering=true;c.batch.draft={...c.batch.filter};}
+ if(a==='room-batch-facet-pigs')c.batch.draft.pigs=v;
+ if(a==='room-batch-facet-cond')c.batch.draft.cond=v;
+ if(a==='room-batch-filter-reset')c.batch.draft={pigs:'any',cond:'any'};
+ if(a==='room-batch-filter-apply'){c.batch.filter={...c.batch.draft};c.batch.filtering=false;}
+ if(a==='room-batch-filter-back')c.batch.filtering=false;
+ if(a==='room-batch-verb'){c.batch.verb=v;s.view='roomBatchPick';}
+ if(a==='room-batch-pick'){const b=c.batch,k=b.picked.indexOf(v);if(k<0)b.picked.push(v);else b.picked.splice(k,1);}
+ if(a==='room-batch-next'&&c.batch.picked.length)s.view='roomBatchForm';
  else if(a.startsWith('room-scan-'))scanAction(s,c,a,v);
  if(a==='room-overview')s.view=c.completion?'roomTaskReceipt':'roomOverview';
  if(a==='room-end-review')s.view=c.completion?'roomTaskReceipt':'roomEndTask';
@@ -638,11 +755,16 @@ function roomAction(i,a,v){if(!a.startsWith('room-'))return false;const s=states
  return true;
 }
 function pageAfterRender(i,s,c,root){
- const demo=root.querySelector('[data-demo-scan]');if(demo){demo.hidden=s.view!=='roomScan'||!c.scan.connected;demo.disabled=!c.scan.listening;}
+ const demo=root.querySelector('[data-demo-scan]');if(demo){demo.hidden=s.view==='roomBatchPick'?!c.batch?.scanning:s.view!=='roomScan'||!c.scan.connected;demo.disabled=s.view==='roomScan'&&!c.scan.listening;demo.textContent=s.view==='roomBatchPick'&&c.batch?.scanning==='waiting'?'Simulate reader on':'Simulate scan';}
+ if(s.view==='roomPig')connectPig(root,c);
+ if(s.view==='roomBatchForm')connectBatchForm(root,c);
+ // The pig just read is brought into view where she is, and her row keeps Row's Just scanned state for a moment.
+ if(s.view==='roomBatchPick'&&c.batch.scanning){const r=root.querySelector(`.batch-list [data-scan-tag="${c.batch.last}"]`),body=r?.closest('.sheet-body');if(r&&body)body.scrollTop+=r.getBoundingClientRect().top-body.getBoundingClientRect().top-body.clientHeight/2+r.offsetHeight/2;SentriUI.scanArrive(root,{fresh:c.batch.fresh});c.batch.last='';}
+ // A toast over a page with a footer sits 12px above that footer, whatever its height at this width.
+ const pageFoot=root.querySelector('.phone .batch-pick .sheet-footer');root.querySelector('.phone').style.setProperty('--toast-bottom',pageFoot?pageFoot.getBoundingClientRect().height+12+'px':'');
+ if(c.toast&&s.view===(c.toast.on||'room')){const t=c.toast;root.querySelector('.phone').insertAdjacentHTML('beforeend',SentriUI.toast(t.title,{detail:t.detail||'',tone:t.tone||'done',door:t.door||null,dismiss:t.dismiss||null}));if(!t.dismiss&&t.until!==Infinity)setTimeout(()=>{if(c.toast===t){c.toast=null;root.querySelector('.phone .st-toast')?.remove();}},3200);}   // a toast with a ✕ stays until closed
  // Find a sow opens with the field focused; Scan highlights the row of a sow that was scanned again.
  if(pageUnder(s,c)==='roomSearch'&&s.view==='roomSearch')root.querySelector('[data-room-search]')?.focus({preventScroll:true,focusVisible:false});
- const list=root.querySelector('.st-scan-body');if(list)list.scrollTop=c.scan.scroll||0;
- if(s.view==='roomScan')SentriUI.scanArrive(root,c.scan);
 }
 /* Landing on a pen: the list is placed on the pen first, under the sheet (no scroll the worker sees); the sheet then leaves with its own Sheet
    exit (data-leave, --sheet-out) and the pen's header takes the tapped tile's colour (--land-hold, fading over --land-fade). The atlas freezes motion
@@ -747,7 +869,7 @@ function sowActionCatalogue(s){return [
 const deepSelectors={transfer:'[data-action="sow-host-action"][data-value="transfer"]',marker:'[data-action="sow-host-action"][data-value="marker"]',health:'[data-action="health"]',treatment:'[data-action="treatment"]'};
 function deepLinkInto(frame,key){let n=0;const t=setInterval(()=>{const el=frame.contentDocument?.querySelector(deepSelectors[key]);if(el){clearInterval(t);el.click();}else if(++n>50)clearInterval(t);},60);}
 function connectSowDetail(root,s){
- const frame=root.querySelector('.sow-detail-frame');if(!frame)return;
+ const frame=root.querySelector('.sow-detail-frame:not([data-room-pig])');if(!frame)return;
  frame.addEventListener('load',()=>{
   const events=s.pending?[{text:(s.pending>0?'+':'')+s.pending+' alive · this visit',day:'Today',time:s.stamp,who:'G. Hansen'},...s.events]:s.events;
   const tasks=!s.productionOutcome&&!s.ended?[{id:'farrowing',title:'Farrowing',type:'Production',status:s.locked?'Finished':born(s)?'In progress':'Awaiting',summary:born(s)?s.alive+' alive · '+sum(s.dead)+' dead':'Record this sow’s litter'},...(born(s)?[{id:'piglet-processing',title:'Piglet processing',type:'Production',status:s.processingTasks.some(t=>!t.done)?'Due today':'Up to date',summary:s.processingTasks.filter(t=>t.done).length+' of '+s.processingTasks.length+' care steps done'}]:[]),...(s.tag==='000418'?[{id:'vaccination',title:'Vaccination',type:'Health',status:'Due today',summary:'Scheduled vaccination'},{id:'treatment-task',title:'Treatment',type:'Health',status:'Due today',summary:'Scheduled treatment'}]:[])]:[];
@@ -841,10 +963,23 @@ document.addEventListener('keydown',()=>delete document.documentElement.dataset.
 const gallery=document.getElementById('gallery');gallery.innerHTML=cards.map((c,i)=>`<article class="spec" data-card="${i}"><div class="spec-head"><div class="spec-title"><span>0${i+1}</span>${c.title}</div><button type="button" class="demo-scan" data-demo-scan hidden>Simulate scan</button><select class="scenario" aria-label="Example for ${c.title}">${presets.map(([v,l])=>`<option value="${v}"${v===c.initial?' selected':''}>${l}</option>`).join('')}</select></div><div class="phone farrowing-phone"></div><p class="caption">${c.caption}</p></article>`).join('');states.forEach((_,i)=>render(i));
 // The range slider reports each change; keep the draft and the live count in step.
 gallery.addEventListener('sentri-range-change',e=>{const root=e.target.closest('[data-card]'),c=roomContext(states[+root.dataset.card]);Object.assign(c.filterDraft,e.detail.values);const n=visibleRoomRecords(c,c.filterDraft).length;e.target.closest('.sheet').querySelector('[data-action="room-apply-filter"]').textContent='Show '+n+' '+(n===1?'sow':'sows');});
+// Choose pigs: typing narrows the list where it is, so the field keeps focus; Clear shows only while something is typed.
+gallery.addEventListener('input',e=>{if(!e.target.matches('[data-batch-search]'))return;const i=+e.target.closest('[data-card]').dataset.card,c=roomContext(states[i]),page=e.target.closest('.batch-pick');c.batch.q=e.target.value;page.querySelector('.batch-list').innerHTML=batchRows(c);page.querySelector('[data-action="room-batch-clear"]')?.toggleAttribute('hidden',!c.batch.q);});
 gallery.addEventListener('input',e=>{if(!e.target.matches('[data-room-search]'))return;const i=+e.target.closest('[data-card]').dataset.card,c=roomContext(states[i]),page=e.target.closest('.st-find');c.query=e.target.value;page.querySelector('.st-find-results').innerHTML=searchBody(c);page.querySelector('.st-find-clear').hidden=!c.query;if(i===0&&window.AtlasBare)AtlasBare.watch(()=>atlasScreen(states[0],c));});
 // The demo's own control, outside the phone: the reader reads the next sample sow.
-document.addEventListener('click',e=>{const b=e.target.closest('[data-demo-scan]');if(!b||b.disabled)return;const card=b.closest('[data-card]'),i=+card.dataset.card,c=roomContext(states[i]),before=SentriUI.scanPlaces(card);if(scanAdd(c)){render(i);SentriUI.scanGlide(card,before);}});
-gallery.addEventListener('scroll',e=>{if(e.target.matches('.st-scan-body')){roomContext(states[+e.target.closest('[data-card]').dataset.card]).scan.scroll=e.target.scrollTop;return;}if(!e.target.matches('.room-scroll'))return;const list=e.target,i=+list.closest('[data-card]').dataset.card,c=roomContext(states[i]);c.scroll=list.scrollTop;if(states[i].view!=='room')return;const top=list.getBoundingClientRect().top+list.querySelector('.room-controls').offsetHeight;const pen=[...list.querySelectorAll('[data-pen]')].find(p=>p.getBoundingClientRect().bottom>top+35);if(pen)c.currentPen=pen.dataset.pen;},true);
+document.addEventListener('click',e=>{const b=e.target.closest('[data-demo-scan]');if(!b||b.disabled)return;const i=+b.closest('[data-card]').dataset.card,s=states[i],c=roomContext(s);
+ // Choosing pigs, scanning: a read ticks her and marks her row (a repeat read keeps her ticked); a pig from another unit isn't added (a toast says where she is).
+ if(s.view==='roomBatchPick'&&c.batch.scanning){const b=c.batch,tag=b.scanning==='waiting'?'':batchScans[b.seq++%batchScans.length],p=unitPigs(c).find(x=>x.tag===tag);if(b.scanning==='waiting'){c.scan.connected=true;b.scanning=true;render(i);return;}   // the reader connects: scanning starts
+  if(p){if(!b.picked.includes(tag))b.picked.push(tag);}else b.missed=[missOf(c,tag),...b.missed.filter(x=>x.tag!==tag)];
+  b.fresh[tag]=Date.now()+1600;b.last=tag;render(i);return;}
+ // Scan (single-action): a read opens her; a tag no pig has opens nothing, and a toast on Scan says so until closed or the next read.
+ const tag=scanRead(c);if(tag){if(missOf(c,tag).kind==='unknown')c.toast=scanUnknownToast(tag);else{if(c.toast?.on==='roomScan')c.toast=null;roomAction(i,findSow(c,tag)?'room-sow':'room-pig',tag);}render(i);}});
+// A pig profile's own Back returns to the page she was found on.
+window.addEventListener('message',e=>{if(e.origin!==location.origin||e.data?.type!=='sow-detail-close')return;const i=states.findIndex((s,k)=>['roomPig','roomBatchForm'].includes(s.view)&&document.querySelector(`[data-card="${k}"] .room-pig-frame`)?.contentWindow===e.source);if(i<0)return;const s=states[i],c=roomContext(s);
+ // The form's Back returns to Choose sows; its save returns to the room, which names the count.
+ if(s.view==='roomBatchForm'){if(e.data.saved){c.toast={title:e.data.saved,until:Date.now()+3200};c.batch=null;s.view='room';}else s.view='roomBatchPick';render(i);return;}
+ s.view=c.pigFrom||'room';render(i);});
+gallery.addEventListener('scroll',e=>{if(!e.target.matches('.room-scroll'))return;const list=e.target,i=+list.closest('[data-card]').dataset.card,c=roomContext(states[i]);c.scroll=list.scrollTop;if(states[i].view!=='room')return;const top=list.getBoundingClientRect().top+list.querySelector('.room-controls').offsetHeight;const pen=[...list.querySelectorAll('[data-pen]')].find(p=>p.getBoundingClientRect().bottom>top+35);if(pen)c.currentPen=pen.dataset.pen;},true);
 let grabStart=null;
 SentriUI.holdBind(gallery,{onCommit(el){const i=+el.closest('[data-card]').dataset.card,record=states[i];if(!roomAction(i,el.dataset.action,el.dataset.value))act(record,el.dataset.action);render(i);}});
 gallery.addEventListener('pointerdown',e=>{if(e.button!==0)return;if(e.target.closest('.grab'))grabStart={y:e.clientY,i:+e.target.closest('[data-card]').dataset.card};});

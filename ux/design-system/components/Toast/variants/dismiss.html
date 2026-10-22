@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><style>
+/* The real container: the bottom of Farrowing's Scan ear tags, the toast over the page just above its footer (Stop scanning). */
+.ph{position:relative;height:262px;overflow:hidden;background:var(--app-background);border:1px solid var(--line);border-radius:0 0 var(--radius-device,28px) var(--radius-device,28px);--toast-bottom:104px}
+.ph-foot{position:absolute;left:0;right:0;bottom:0;height:92px;padding:12px var(--space-gutter) 0;box-sizing:border-box;border-top:1px solid var(--line)}
+.ph-foot span{display:block;height:56px;border-radius:16px;border:1px solid var(--line);background:var(--paper,#fff)}
+</style></head><body>
+<section data-state="Door and ✕" id="dismiss-0"></section>
+<section data-state="Door and ✕ · pressed" id="dismiss-1"></section>
+<section data-state="✕ only" id="dismiss-2"></section>
+<section data-state="Chinese" id="dismiss-3"></section>
+<script>
+// Calls copied from the live screen: Farrowing's Scan reads a tag no pig has (owner, 2026-10-22). The ✕ closes it; the rest opens her
+// pig profile, which deals with a new tag. It stays until closed or replaced: no timer.
+const wrap=(html)=>'<div class="ph">'+html+'<div class="ph-foot"><span></span></div></div>';
+const put=(id,html)=>document.querySelectorAll('[data-state]').forEach(el=>{if(el.id===id)el.innerHTML=wrap(html)});
+const t=(o={})=>SentriUI.toast(o.title||'No pig with this tag',{detail:o.detail||'000999 · New tag, or not synced yet',tone:'notice',dismiss:{action:'close',label:o.close||'Close'},door:o.door===null?null:{action:'open',value:'000999',label:'No pig with tag 000999. Open her pig profile'}});
+put('dismiss-0',t());
+put('dismiss-1',t().replace('class="st-toast-door"','class="st-toast-door" data-preview="pressed"'));
+put('dismiss-2',t({door:null}));
+put('dismiss-3',t({title:'没有猪只使用此耳标',detail:'000999 · 新耳标，或尚未同步',close:'关闭'}));
+</script>

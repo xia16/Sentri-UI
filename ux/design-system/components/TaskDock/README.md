@@ -6,6 +6,8 @@ The room's bottom bar: **one primary tool (Scan ear tag) and icon tools**. It is
 
 **One part (2026-10-22).** `SentriUI.taskDock({ label, place, primary, tools, content, className })` draws the dock of every task page: Farrowing's room and Inspection's walk call it, and it is drawn exactly as Farrowing's room dock was (`nav.room-dock`, `data-ds="TaskDock"`). `place` is the framed place control (`{ action, label, icon?, aria? }`: the Pen map); `primary` the one primary tool (`{ action, label, icon?, attrs? }`: Scan ear tag); `tools` the icon tools (`[{ action, icon, label, className? }]`: Search). A host's own bar for the moment takes the dock's place through `content` (Inspection's selection: the count and Actions). `SentriTask.dock` below is the older face the frozen piglet-processing room still calls; new work uses `SentriUI.taskDock`.
 
+**Four slots at most (2026-10-22).** Farrowing's room adds a second tool, ··· (aria "Actions": everyday actions for pigs in this unit). Measured: with Pen map (110px), two 48px tools and 9px gaps, the primary is 125px at 390 and about 109px at 360, and "Scan ear tag" (≈131px with its glyph) wraps. So the primary reads **Scan** (the glyph says ear tag; its accessible name stays "Scan ear tag"), in every task's dock so the docks stay one look. The header's one icon action was not used: it is the sync badge whenever records wait.
+
 **Anatomy** (`.tk-dock`, `data-ds="TaskDock"`, a `nav`)
 - `paper`, 1px `line` on top, padded `space-heading space-panel space-section`, 9px gaps; the 92×4 `handle` bar 8px from the bottom.
 - **Primary** (`.tk-dock-primary`): flex 1, `tap-min` tall, `ink` with a `paper` label, `radius-control`, the glyph 8px before a 12px/500 label.
@@ -31,3 +33,4 @@ The room's bottom bar: **one primary tool (Scan ear tag) and icon tools**. It is
 **Changelog**
 - 2026-10-17: the place control gains a framed form (Pen map) and loses the pen number in farrowing's dock; the sheet it opens is titled Pen map (was Go to pen). Farrowing's room dock uses the framed form (`.tk-dock-unit[data-framed]`, its markup built in the room page); the skeleton demo uses `framed`.
 - 2026-10-22: Inspection's walk dock takes the framed Pen map button too (its old `Pens / Go to pen` place control is retired).
+- 2026-10-22: the primary's label is "Scan" (accessible name "Scan ear tag"); Farrowing's room adds the ··· Actions tool.

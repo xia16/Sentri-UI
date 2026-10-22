@@ -32,6 +32,7 @@ The check on the green is the only colour on a save; green means done (design la
 - **Offline** (`tone: 'offline'`): no-signal on the ink. "Saved on this phone · Uploads when connected · 000267". Never "uploaded" or "synced": nothing has reached the team yet.
 - **Plain** (no tone): a title, no glyph. Only where a host has not moved its older saves to a tone yet (Inspection's "Weights saved"); new saves use done or offline.
 - **Standing** (`standing: { action, value, label }`; owner, 2026-10-20): the same box, but in the page's flow at the top of the page, not over it; it stays until what it reports has been looked at, and the whole box is one door with a chevron. **Notice** (`tone: 'notice'`, a note glyph): records that weren't accepted ("3 records not accepted", Data sync). **Attention** (`tone: 'attention'`, a red disc): a person must act ("Sign in to keep uploading"). One at a time; no entrance motion. [variants/standing.html](variants/standing.html)
+- **Door and dismiss** (`door: { action, value, label }`, `dismiss: { action, label }`; owner, 2026-10-22): the floating box, but it stays until the worker closes it with the ✕ at its left (a 44px square), or the host replaces it; no timer. The rest is one door with a chevron. Without a door it is the ✕ and the message. Farrowing's Scan, when a read finds no pig: "No pig with this tag" over "000999 · New tag, or not synced yet", the door to her pig profile. [variants/dismiss.html](variants/dismiss.html)
 
 ## States
 | State | Rendering and behaviour | Drawn on the component page |
@@ -47,15 +48,16 @@ The check on the green is the only colour on a save; green means done (design la
 | Cleared by the next view | It belongs to the view it landed on: opening a pig, a sheet or another page clears it at once | — |
 | Dismissed by a tap | A tap on it dismisses it and never reaches the row or control it covers | — |
 | Gone | Removed after its time; nothing replaces it | — |
+| Stays (dismiss) | With a ✕ it has no time: it goes when the ✕ is tapped, a newer toast replaces it, or the worker leaves the page | Door and dismiss |
 | Held (atlas) | While the atlas holds a screen still, it stays on screen so the gate can see it (rules ledger L25) | `treat.saved`, `…-saved-offline` |
 
 There is no pressed, disabled, loading or error state: it takes no action, and a failure is never a toast.
 
 ## Behaviour
 - **One at a time.** The host keeps one toast; a newer one replaces it.
-- **About 3 seconds**, then gone. It is not a record the worker can return to: the record itself, the log and (offline) the header badge are.
+- **About 3 seconds**, then gone (Door and dismiss excepted: it stays until its ✕). It is not a record the worker can return to: the record itself, the log and (offline) the header badge are.
 - **It belongs to the view it landed on.** The next view clears it, so it never sits over a sheet it wasn't about.
-- **A tap dismisses it** and is not passed through: a gloved thumb on the toast never opens the row hidden under it.
+- **A tap dismisses it** (on Door and dismiss, a tap opens its door and the ✕ closes it) and is not passed through: a gloved thumb on the toast never opens the row hidden under it.
 - **Screen readers** hear it once (`role="status"`); it takes no focus.
 - **Reduced motion**: it appears without rising.
 - **In the atlas** a held screen keeps it; the gate shoots it like any screen.
@@ -67,13 +69,15 @@ There is no pressed, disabled, loading or error state: it takes no action, and a
 - Strings live in `ux/laws/strings.json` (`save.*`) with their Chinese.
 
 ## API
-`SentriUI.toast(title, { detail, tone, strs, args })` returns the markup.
+`SentriUI.toast(title, { detail, tone, standing, door, dismiss, strs, args })` returns the markup.
 
 | Option | Type | Meaning |
 | --- | --- | --- |
 | `title` | string | What was done (required) |
 | `detail` | string | For whom, or where it went (optional; left out when empty) |
 | `tone` | `'done'` \| `'offline'` | The glyph; omitted for the plain form |
+| `door` | `{ action, value, label }` | The floating box as one tap target with a chevron |
+| `dismiss` | `{ action, label }` | A ✕ at the left; with it the toast stays until closed. With `door` too, the ✕ and the door are two sibling buttons |
 | `strs`, `args` | string ids | `{ title, detail }` string ids and their arguments, so the page's language switch reaches them |
 
 The host owns timing, replacement, clearing on the next view and the tap: see Inspection's `notify` and `saveToast` (`ux/system/inspection-astra-concept.js`).
@@ -94,7 +98,7 @@ Inspection's record actions, through one rule (`saveFeedback` in `ux/system/insp
 | Body condition, care instructions, edit conditions | as Record health: none only when the row is in view with every tag | "… · 12 pigs" |
 | Record abortion, batch membership | "Abortion recorded" / "Batch updated · 000267" | one pig only |
 
-None after a save that returns to its finding (the finding shows it). Moving a pig is saved by Farrowing's host, which owns its own feedback. Older plain toasts ("Weights saved", "Saved to pen …", "Task completed") remain where Inspection's older flows draw them.
+None after a save that returns to its finding (the finding shows it). Moving a pig is saved by Farrowing's host, which owns its own feedback. Farrowing's Scan draws Door and dismiss for a tag no pig has; its Actions for pigs in this unit draws Done ("Condition recorded · 3 pigs") on the room after a save. Older plain toasts ("Weights saved", "Saved to pen …", "Task completed") remain where Inspection's older flows draw them.
 
 ## Related
 [Banner](../Banner/README.md) · [Status](../Status/README.md) · [TaskReceipt](../TaskReceipt/README.md) (a finished task's receipt, which stays) · the design law's Feedback after saving.

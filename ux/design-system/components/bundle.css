@@ -781,9 +781,9 @@ button.st-row[data-variant="tick"]:active:not(:disabled){background:var(--st-pre
 
 .st-row[data-variant="select-door"]{padding:0 var(--space-row-x) 0 0;gap:0}
 .st-row[data-variant="select-door"][data-ticked],.st-row[data-variant="select-door"]:has(input:checked){background:var(--well)}
-/* Just scanned (data-arrival, Farrowing's scan list, owner 2026-10-20): the pale progress wash for a moment, never the ticked well; "off" fades it back before the host drops the attribute. A ticked row keeps its well. */
-.st-row[data-variant="select-door"][data-arrival]{transition:background-color .9s ease-out}
-.st-row[data-variant="select-door"][data-arrival="on"]{background:var(--progress-wash);transition-duration:.12s}
+/* Just scanned (data-arrival, owner 2026-10-20; any row a read lands on, 2026-10-22): the pale progress wash for a moment, never the ticked well; "off" fades it back before the host drops the attribute. A ticked row keeps its well. */
+.st-row[data-arrival]{transition:background-color .9s ease-out}
+.st-row[data-arrival="on"]{background:var(--progress-wash);transition-duration:.12s}
 @media(prefers-reduced-motion:reduce){.st-row[data-variant="select-door"][data-arrival]{transition:none}}
 .st-row[data-variant="select-door"] .st-row-door{padding:var(--space-row-y) 0}
 label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-row-x) var(--space-row-y) 0;gap:0}
@@ -1341,7 +1341,7 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 .st-find-hint{margin:4px 2px;color:var(--muted);font:400 14px/20px var(--font-sans)}
 /* The typed part is bold ink; the rest of the tag is muted. */
 .st-find-row .st-animal-id{color:var(--ink-2);font-weight:500}
-.st-find-row .st-animal-id b,.st-find-row .st-animal-state b{color:var(--ink);font-weight:700}
+.st-find-row .st-animal-id b,.st-find-row .st-animal-context b{color:var(--ink);font-weight:700}
 .sheet.st-scan[data-presentation="page"]>.sheet-body{display:flex;flex-direction:column;padding-left:0;padding-right:0}
 .st-scan-body{padding:0 16px 24px}
 .st-scan-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 36px 40px;text-align:center}
@@ -1384,3 +1384,22 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 .tk-dock-unit[data-framed] strong { font: 600 var(--type-dock-caption-size)/1.2 var(--font-sans); }
 .tk-dock-unit[data-framed]:active { background: var(--press); transform: translateY(var(--size-2)); }
 @media (prefers-reduced-motion: reduce) { .tk-dock-unit[data-framed]:active { transform: none; } }
+/* Lookup · scan bar: scanning on a list, in place of the host's search bar. Scanning wears the scan hue (progress, as Row's Just scanned);
+   waiting for the reader wears the pending colours. One status: no second one in the body or the footer. */
+.st-scan-bar{flex:1;min-width:0;display:flex;align-items:center;gap:10px;min-height:var(--tap-min);padding:0 4px 0 14px;border:1px solid var(--chip-progress-border);border-radius:var(--radius-control);background:var(--progress-wash);color:var(--progress-fill-ink)}
+.st-scan-bar>svg{width:20px;height:20px;flex:none}
+.st-scan-bar-copy{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.2}
+.st-scan-bar-copy strong{font:600 15px var(--font-sans)}
+.st-scan-bar-copy small{color:var(--progress);font:400 13px var(--font-sans)}
+.st-scan-bar .st-scan-bar-stop{flex:none;color:inherit}
+.st-scan-bar[data-state="waiting"]{border-color:var(--pending-border);background:var(--pending-surface);color:var(--amber-fill-ink)}
+.st-scan-bar[data-state="waiting"] .st-scan-bar-copy small{color:var(--amber)}
+/* Toast · door (a tap target with a chevron) and dismiss (a ✕ at the left; the toast stays until closed). With both, the ✕ and the door are
+   two sibling buttons in one box: the ✕ a 44px square at the left edge, the door the rest. */
+.st-toast--door{border:0;font:inherit;text-align:left;cursor:pointer}
+.st-toast--door:is(:active,[data-preview~="pressed"]),.st-toast-door:is(:active,[data-preview~="pressed"]){background:var(--ink-2)}
+.st-toast--dismiss{padding-left:var(--space-4);gap:var(--space-4)}
+.st-toast-close{display:grid;place-items:center;flex:none;width:var(--tap-min);height:var(--tap-min);border:0;border-radius:var(--radius-control);background:transparent;color:#ffffffc7;cursor:pointer}
+.st-toast-close svg{width:18px;height:18px}
+.st-toast-close:is(:active,[data-preview~="pressed"]){background:#ffffff1f}
+.st-toast-door{flex:1;min-width:0;display:flex;align-items:center;gap:var(--space-12);min-height:var(--tap-min);padding:0 var(--space-8) 0 var(--space-4);border:0;border-radius:var(--radius-control);background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer}

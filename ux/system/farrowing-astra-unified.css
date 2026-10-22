@@ -218,3 +218,10 @@
 
 /* Litter summary on the count drawer: Born and Dead sit on the panel's own edge, no second box inside it. */
 .farrowing-phone .count-record-surface .st-facts[data-variant="figures"]{margin-bottom:12px}
+/* Actions · Choose pigs: To treat's bar (the search field with scan inside, the filter) pinned over the list in the sheet's band above
+   its body; Lookup's quiet line naming the verb; then the unit's pen cards, each pig a select row. Layout only: every colour is a part's. */
+.farrowing-phone .batch-pick .batch-bar{display:flex;align-items:center;gap:var(--space-8);padding:0 var(--space-gutter) 12px}
+.farrowing-phone .batch-pick .batch-bar .st-choice-search.st-choice-search{flex:1;min-width:0;margin:0}
+.farrowing-phone .batch-pick .batch-filter{width:var(--tap-min);height:var(--tap-min);flex:none}
+.farrowing-phone .batch-pick .batch-hint{margin:0 2px 12px}
+.farrowing-phone .batch-pick .batch-pen,.farrowing-phone .batch-pick .batch-missed{margin:0 0 12px}

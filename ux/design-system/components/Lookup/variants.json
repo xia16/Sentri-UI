@@ -2,11 +2,12 @@
   {
     "id": "find",
     "name": "Find",
-    "use": "Use to reach one animal by typing part of her ear tag or her pen, from anywhere: type, tap one, act. A white input page with the field pinned and focused; nothing is listed before typing; results are one card per unit, this unit first. Farrowing's Find a sow, Inspection's and Home's Find a pig.",
+    "use": "Use to reach one animal by typing part of her ear tag or her pen, from anywhere: type, tap one, act. A white input page with the field pinned and focused; nothing is listed before typing; results are one card per unit, this unit first. Each row is the tag over her pen with the host's right side: a pig on the task's list shows the task's state, any other pig her condition tags (owner, 2026-10-22). Farrowing's Find a sow, Inspection's and Home's Find a pig.",
     "notUse": "Not for picking from a short known list (use ChoiceList or a picker); not for narrowing a list already on screen (use FilterSheet); not for collecting several animals (use Scan).",
     "states": [
       "Empty · nothing listed before typing",
       "Results · this unit first, then the others",
+      "In a task · its row for pigs on its list",
       "No match",
       "Long tag · 12 digits",
       "No reader · no scan icon",
@@ -27,22 +28,21 @@
   {
     "id": "scan",
     "name": "Scan",
-    "use": "Use to collect animals hands-free with the tag reader: every scan adds her to a list, newest first; a repeat scan lights her row; tap one to open her, or tick several for the context's Actions. A Sheet page on the tint whose rows are the context's own animal row with its tick box.",
-    "notUse": "Not for finding one animal by typing (use Find); never with a Not-found row or a Select button (owner, 2026-10-12).",
+    "use": "Use to read tags hands-free with the reader. What a read does is the host's job (owner, 2026-10-22): a multi-select place (Home, Inspection's walk) ticks each pig as she is read, newest first, and the footer becomes the count and Actions, or a task's own actions directly; a single-action task (Farrowing) opens her on each read, so nothing is listed (read:'open'). A Sheet page on the tint whose rows are the context's own animal row with its tick box.",
+    "notUse": "Not for finding one animal by typing (use Find); not for choosing pigs from a list already on screen (scan on the list with the scan bar); never a Select button.",
     "states": [
       "Nothing scanned · listening",
       "Reader not connected",
-      "Scanned · two units (Farrowing's sow rows)",
       "Scanned · condition tags (Inspection's roster rows)",
+      "Opens · a single-action task lists nothing",
       "Stopped · list kept",
       "Chinese · scanned"
     ],
     "usedBy": [
       "farrowing.scan",
       "farrowing.scan-no-reader",
-      "farrowing.scan-list",
-      "farrowing.scan-new",
-      "farrowing.scan-ticked",
+      "farrowing.scan-read",
+      "farrowing.scan-unknown",
       "farrowing.scan-stopped",
       "inspection.scan",
       "inspection.scan-no-reader",
@@ -55,6 +55,23 @@
       "find-pig.scan-list",
       "find-pig.scan-ticked",
       "find-pig.scan-stopped"
+    ]
+  },
+  {
+    "id": "scan-bar",
+    "name": "Scan bar",
+    "use": "Use when a page that chooses animals from a list scans in place (owner, 2026-10-22): the page's scan button turns its search bar into this bar while the reader is on. Scanning wears the scan hue (the progress wash Row's Just scanned uses); waiting for the reader wears the pending colours until it connects. Stop ends either and the search field returns.",
+    "notUse": "Not as a page header or a footer, and never beside a second scanning status; not on Scan's own page (its footer's Stop / Resume scanning is the status there).",
+    "states": [
+      "Scanning",
+      "Waiting for the reader",
+      "Waiting · no reader name",
+      "Chinese · scanning"
+    ],
+    "usedBy": [
+      "farrowing.batch-waiting",
+      "farrowing.batch-scanning",
+      "farrowing.batch-missed"
     ]
   }
 ]
