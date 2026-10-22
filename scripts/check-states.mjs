@@ -24,9 +24,12 @@ function audit(stateName) {
   const all = [st, ...st.querySelectorAll('*')].filter((e) => !['SCRIPT', 'STYLE'].includes(e.tagName));
   const vis = (e) => { const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0 && cs(e).visibility !== 'hidden'; };
   const scrolls = (e) => /auto|scroll/.test(cs(e).overflowY);
-  const lines = (e) => { const r = document.createRange(); r.selectNodeContents(e); return new Set([...r.getClientRects()].filter((x) => x.width > 0).map((x) => Math.round(x.top / 4))).size; };
-  const textRect = (e) => { const w = document.createTreeWalker(e, NodeFilter.SHOW_TEXT); let n; while ((n = w.nextNode())) if (n.nodeValue.trim()) { const r = document.createRange(); r.selectNodeContents(n); const rs = [...r.getClientRects()].filter((x) => x.width > 0); if (rs.length) return rs[0]; } return null; };
-  const lastTextRect = (e) => { const w = document.createTreeWalker(e, NodeFilter.SHOW_TEXT); let n, last = null; while ((n = w.nextNode())) if (n.nodeValue.trim()) { const r = document.createRange(); r.selectNodeContents(n); const rs = [...r.getClientRects()].filter((x) => x.width > 0); if (rs.length) last = rs[0]; } return last; };
+  // the text the eye sees: skip text a screen reader hears only (a visually-hidden span, or any box clipped to 1px), whose clipped rect would read as another line
+  const unseen = (n, e) => { for (let x = n.parentElement; x && x !== e.parentElement; x = x.parentElement) { if (x.matches('.st-visually-hidden,.sr-only,[hidden]')) return true; const b = x.getBoundingClientRect(); if (b.width <= 1 && b.height <= 1 && /hidden|clip/.test(cs(x).overflow)) return true; } return false; };
+  const textRects = (e) => { const w = document.createTreeWalker(e, NodeFilter.SHOW_TEXT), out = []; let n; while ((n = w.nextNode())) if (n.nodeValue.trim() && !unseen(n, e)) { const r = document.createRange(); r.selectNodeContents(n); const rs = [...r.getClientRects()].filter((x) => x.width > 0); if (rs.length) out.push(rs); } return out; };
+  const lines = (e) => new Set(textRects(e).flat().map((x) => Math.round(x.top / 4))).size;
+  const textRect = (e) => { const t = textRects(e); return t.length ? t[0][0] : null; };
+  const lastTextRect = (e) => { const t = textRects(e); return t.length ? t[t.length - 1][0] : null; };
   const bgOf = (c) => { const m = c.backgroundColor.match(/[\d.]+/g) || []; return m.length > 3 ? px(m[3]) > 0 : !/rgba?\(0, 0, 0, 0\)|transparent/.test(c.backgroundColor); };
   const boxBorder = (c) => ['Top', 'Right', 'Bottom', 'Left'].filter((s) => px(c['border' + s + 'Width']) > 0 && c['border' + s + 'Style'] !== 'none').length >= 3;
   const surface = (e) => { const c = cs(e); return bgOf(c) || boxBorder(c) || (c.boxShadow && c.boxShadow !== 'none'); };
