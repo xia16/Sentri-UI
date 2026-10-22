@@ -818,7 +818,8 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
 .st-stepper[data-variant="well"] :is(.st-stepper-key,.st-stepper-face){width:var(--control-height);min-height:var(--control-height);height:var(--control-height)}
 .field{font-family:var(--font-sans)}
 /* Surface consumers own layout; Panel owns border, radius and context fill. */
-.st-panel.pen-card{padding:0;box-shadow:0 2px 8px #20291f0a}
+.st-panel.pen-card{padding:0;overflow:clip}   /* the pen card is one box: no shadow, its corners clip its header (Inspection's pen card) */
+.pen-card>.pen-top{background:#f8faf5;border-bottom-color:var(--rule);border-radius:0}
 
 /* FilterSheet: a Sheet that narrows a list. Sections sit 28 apart; the last one has no gap before the footer. */
 .st-filter-section{margin:0 0 var(--space-28);padding:0}
@@ -914,7 +915,6 @@ label.st-row[data-variant="select-door"]{padding:var(--space-row-y) var(--space-
 .icon-button.room-filter-button{width:48px;min-width:48px;height:48px}
 .room-dock>.icon-button.icon-button{width:48px;min-width:48px;height:auto;min-height:var(--footer-height);align-self:stretch}
 .room-dock>.icon-button svg{width:19px;height:19px}
-.st-panel.st-panel.st-panel.pen-card{box-shadow:0 2px 8px #20291f0a}
 .st-heading-action svg{color:var(--muted)}
 .sheet-footer>.button.surface-back.surface-back{border-color:var(--back-border)}
 .st-heading-action .st-text-action:disabled{color:var(--muted);background:transparent;opacity:1}
