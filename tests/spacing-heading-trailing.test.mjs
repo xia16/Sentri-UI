@@ -6,6 +6,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { playwright } from '../scripts/playwright-path.mjs';
 import { auditSpacingPage } from '../scripts/check-spacing.mjs';
+import { routeFonts } from '../scripts/font-route.mjs';
 
 // Inline pages load nothing, so the DOM is the whole page: no wait for load, and room for a loaded machine (2026-10-22: two 30 s
 // setContent timeouts inside a gate while other sessions' gates ran; passed alone).
@@ -57,7 +58,10 @@ test("a row's trailing control off its row's centre is a spacing defect", async 
   try { pw = playwright(); } catch { t.skip('Playwright is not installed'); return; }
   const browser = await pw.chromium.launch();
   try {
-    const p = await (await browser.newContext({ viewport: { width: 390, height: 844 } })).newPage();
+    // bundle.css @imports Google Fonts: serve them from vendor/fonts/, so a network blip can't fail the style tag (twice, 2026-10-22)
+    const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+    await routeFonts(context, process.cwd());
+    const p = await context.newPage();
     const trailing = async (html) => { await p.setContent(html, LOAD); return (await auditSpacingPage(p)).filter((d) => d.check === 'trailing'); };
     // #264: the field rule's 48px min-height reached the checkboxes, so each sat 14px low in its 56px row
     const found = await trailing(sheet(20, '.check{position:relative;top:14px}'));
