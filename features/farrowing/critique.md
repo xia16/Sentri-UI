@@ -666,3 +666,28 @@ Scope: the words only. At `?lang=zh` these screens read in English where the Ins
 ## Attention budget
 
 Unchanged: each screen shows the same information in the same order as on main, in Chinese. Cut list: nothing is cut.
+
+# Find a sow: her drawer over the search (2026-10-22), critique
+
+Scope: what is under a sow's drawer when she is opened from Find a sow or Scan ear tags. Baselined on `origin/main` at `e74efe4` by walking room → Search → type 43 → 000437 → Back → Record dead → Back → Back → Cancel, and Scan → 000418 → Back, at 390. Find a sow itself was checked against the owner's spec (2026-10-12, and Lookup since PR 248/264/268) and meets it; it does not move.
+
+## Keep
+
+- Find a sow as it is: the pinned, focused field (search icon, clear ✕, scan icon, Cancel), the hint before typing, one card per unit under a plain heading with this unit first, rows of tag and pen only, the no-match line, Back keeping the typed text.
+- Scan ear tags as it is.
+
+## Problems
+
+- **major** · A result's drawer rose over the room (unit card, tabs, rows) although its Back returns to Find a sow with the text kept: the page under the scrim named the wrong destination. The same on Scan ear tags. Evidence: the walk on `e74efe4`, `fa-s6` and `fa-s21`.
+
+## Attention budget
+
+The page is unchanged (budget.md). Under her drawer the room's unit card, tabs and rows are replaced by the page she was opened from: the worker's fourth question, "where does Back take me?", is answered by what is behind the drawer. Cut: the room behind her drawer.
+
+## House pattern
+
+Scan's Actions drawer over Scan ear tags (`roomScanActions`). Read from computed styles: the same scrim, rgba(55, 64, 44, 0.14) with a 1.4px backdrop blur; her drawer stays white (a content drawer), Actions the tint (a menu).
+
+## Self-crit
+
+- **Better because** what is under the scrim is now where Back goes, on both Find a sow and Scan, and nothing on either page moves. The leaves `fa-s6` and `fa-s21` now check the page under her drawer (they fail on `e74efe4`).
