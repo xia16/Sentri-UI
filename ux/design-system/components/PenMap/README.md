@@ -28,7 +28,7 @@ Classification: **component** (a new job; no existing component draws a map of p
 
 ## Variants
 
-- [Map](variants/map.html): the one map, in a menu drawer. Specimens: Unit 7 (4 × 6), 2 × 60, 2 × 100, 2 × 160, 8 × 20 (sideways scroll), a filtered map, an empty map, the peek (state rows, and Inspection's tag rows for a pen of 30), a pressed tile and the Chinese key.
+- [Map](variants/map.html): the one map, in a menu drawer. Specimens: Unit 7 (4 × 6), 2 × 60, 2 × 100, 2 × 160, 8 × 20 (sideways scroll), a filtered map, an empty map, the peek (and a pen of 30 with `+26 more`), a pressed tile and the Chinese key.
 
 ## States
 

@@ -7,7 +7,7 @@
 <div class="ph" data-state="Default · Unit 7, 4 × 6" data-demo="unit7"><div class="bg"></div><div class="over"></div></div>
 <div class="ph" data-state="Pressed" data-demo="pressed"><div class="bg"></div><div class="over"></div></div>
 <div class="ph" data-state="Hold to peek" data-demo="peek"><div class="bg"></div><div class="over"></div></div>
-<div class="ph" data-state="Hold to peek · tags, a pen of 30 (Inspection)" data-demo="peektags"><div class="bg"></div><div class="over"></div></div>
+<div class="ph" data-state="Hold to peek · a pen of 30, +N more" data-demo="peekmore"><div class="bg"></div><div class="over"></div></div>
 <div class="ph" data-state="Filtered · a pen the list hides is empty" data-demo="filtered"><div class="bg"></div><div class="over"></div></div>
 <div class="ph" data-state="Empty · no sows shown" data-demo="empty"><div class="bg"></div><div class="over"></div></div>
 <div class="ph" data-state="Range control · 2 × 60" data-demo="b60"><div class="bg"></div><div class="over"></div></div>
@@ -30,10 +30,10 @@ const BARNS={
  b160:{lanes:L(2),depth:160,pens:{A2:'plain',B2:'plain',A5:'act',B5:'live',B9:'plain',A90:'act',B133:'act',B159:'live'},current:'A5'},
  b8:{lanes:L(8),depth:20,pens:{B4:'live',G3:'act',C3:'plain',D3:'plain',H2:'plain',F9:'plain',G11:'live'},current:'E3'}
 };
-const bg=k=>'<div class="bar" aria-hidden="true"><span>9:41</span></div>'+(k==='peektags'?UI.heading({title:'Inspection',kind:'page',description:'Unit 7'}):UI.heading({title:'Farrowing',kind:'page',description:'Last record 08:41 · G.H'}))+UI.panel(UI.row({title:'Unit 7',description:'Task overview'}),{className:'st-row-group'});
+const bg=()=>'<div class="bar" aria-hidden="true"><span>9:41</span></div>'+UI.heading({title:'Farrowing',kind:'page',description:'Last record 08:41 · G.H'})+UI.panel(UI.row({title:'Unit 7',description:'Task overview'}),{className:'st-row-group'});
 const peekRows=[{code:'000418',right:{kind:'state',figure:'2 days',word:'Overdue',level:'act'}},{code:'000431',right:{kind:'state',figure:'Tomorrow',word:'Due',level:'soon'}}];
-/* Inspection's peek: the walk's rows (ID over the stage line, condition tags), the most urgent first, four at most, then how many more */
-const tagRows=[['000306','Gestation · 42d',[{name:'Fever',level:'act'},{name:'Appetite',icon:'trend-down',level:'watch'}]],['000267','Gestation · 42d',[{name:'Thin',level:'watch'}]],['000281','Gestation · 46d',[{name:'Arthritis',level:'ongoing'}]],['000254','Gestation · 40d',[]]].map(([code,description,tags])=>({code,description,contextWidth:'112px',right:{kind:'tags',tags}}));
+/* a pen with more animals than the card holds: the host's four most urgent rows, then how many more */
+const moreRows=[...peekRows,{code:'000447',right:{kind:'state',figure:'In 3 days',word:'Due',level:'settled'}},{code:'000452',right:{kind:'state',figure:'In 4 days',word:'Due',level:'settled'}}];
 const open=(name,lang,o)=>{
  const b=BARNS[name],t=lang==='zh'?ZH:EN;
  const peek=code=>UI.penPeek({title:code,meta:lang==='zh'?'2头母猪':'2 sows',rows:peekRows});
@@ -44,22 +44,22 @@ const R={
  unit7:()=>open('unit7','en'),
  pressed:()=>open('unit7','en'),
  peek:()=>open('unit7','en'),
- peektags:()=>open('unit7','en',{pens:{C1:'plain',C2:'act',D4:'plain'},current:'C1'}),
+ peekmore:()=>open('unit7','en'),
  filtered:()=>open('filtered','en'),
  empty:()=>open('empty','en'),
  b60:()=>open('b60','en'),b100:()=>open('b100','en'),b160:()=>open('b160','en'),b8:()=>open('b8','en'),
  zh7:()=>open('unit7','zh'),zh100:()=>open('b100','zh')
 };
 document.querySelectorAll('[data-state]').forEach(el=>{
- const k=el.getAttribute('data-demo');el.querySelector('.bg').innerHTML=bg(k);el.querySelector('.over').innerHTML=R[k]();
+ const k=el.getAttribute('data-demo');el.querySelector('.bg').innerHTML=bg();el.querySelector('.over').innerHTML=R[k]();
  if(k==='pressed')el.querySelector('.st-pen-tile[data-pen="B2"]').setAttribute('data-preview','pressed');
  if(k==='peek'){
   const card=el.querySelector('.st-pen-peek'),t=el.querySelector('.st-pen-tile[data-pen="B3"]');
   card.innerHTML=UI.penPeek({title:'B3',meta:'2 sows',rows:peekRows});card.dataset.at='bottom';card.hidden=false;
  }
- if(k==='peektags'){
+ if(k==='peekmore'){
   const card=el.querySelector('.st-pen-peek');
-  card.innerHTML=UI.penPeek({title:'C2',meta:'30 pigs',rows:tagRows,more:'+26 more'});card.dataset.at='bottom';card.hidden=false;UI.rowFitTags(card);
+  card.innerHTML=UI.penPeek({title:'B3',meta:'30 sows',rows:moreRows,more:'+26 more'});card.dataset.at='bottom';card.hidden=false;
  }
 });
 </script></body></html>
