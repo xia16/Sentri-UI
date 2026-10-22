@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lookup · scan bar</title><style>
+.ph{position:relative;max-width:var(--phone-width);margin:0 auto var(--space-16);padding:var(--space-16);background:var(--app-background);font-family:var(--font-sans);color:var(--ink);border:1px solid var(--line);border-radius:var(--radius-device)}
+.ph .row{display:flex;align-items:center;gap:var(--space-8)}
+.ph .row>.st-icon-button{flex:none;width:var(--tap-min);height:var(--tap-min)}
+</style></head><body>
+<div class="ph" data-state="Scanning" data-demo="scanning"></div>
+<div class="ph" data-state="Waiting for the reader" data-demo="waiting"></div>
+<div class="ph" data-state="Waiting · no reader name" data-demo="noname"></div>
+<div class="ph" data-state="Chinese · scanning" data-demo="zh"></div>
+<script>
+// Calls copied from the live screen: Farrowing's Actions → Choose pigs, where the scan button turns the search bar into this bar (owner, 2026-10-22).
+// The filter beside it is the page's own, as To treat's bar has it.
+const UI=window.SentriUI;
+const filter=UI.iconButton({action:'filter',icon:SentriIcons.icon('filter'),label:'Filter pigs'});
+const wrap=bar=>`<div class="row">${bar}${filter}</div>`;
+const R={
+ scanning:()=>wrap(UI.scanBar({state:'scanning',stop:{action:'stop'}})),
+ waiting:()=>wrap(UI.scanBar({state:'waiting',device:'Reader 1',stop:{action:'stop'}})),
+ noname:()=>wrap(UI.scanBar({state:'waiting',stop:{action:'stop'}})),
+ zh:()=>wrap(UI.scanBar({state:'scanning',title:'扫描中',text:'扫描以勾选猪只',stop:{action:'stop',label:'停止'}}))
+};
+document.querySelectorAll('[data-state]').forEach(el=>{el.innerHTML=R[el.dataset.demo]();});
+</script></body></html>
