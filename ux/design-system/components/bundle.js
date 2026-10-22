@@ -1501,9 +1501,13 @@
      lookupGroups([{title,rows:[html]}],{variant:'find'|'scan'}) · findPage({query,placeholder,results,scan,clear,cancel,inputAttrs,bar,scanning,footer})
      findResults({query,groups,hint,none}) · findRow({code,place,query,action,value,right}) · findMark(text,query)
      scanPage({title,back,read,connected,listening,groups,picked,selected,actions,toggle,empty,bar}) · scanArrive(root,scan) · scanPlaces(root) · scanGlide(root,before) */
+  /* A group's `rows` are one card for its unit. Its `pens` are one card each instead, as Inspection's unit list draws them (owner,
+     2026-10-22): the pen code and how many are listed in the card's header, the typed part marked (`query`), then the pigs. */
   function lookupGroups(groups=[],{variant='find'}={}){
     const card=variant==='scan'?'st-scan-card':'st-find-list';
-    return groups.filter(g=>g&&(g.rows||[]).length).map(g=>heading({title:g.title,kind:'section',level:3})+panel(g.rows.join(''),{className:'st-row-group '+card})).join('');
+    const pen=(g,p)=>panel(`<header class="st-lookup-pen-head"><strong>${findMark(p.title,p.query)}</strong>${p.meta?`<small>· ${esc(p.meta)}</small>`:''}</header>${p.rows.join('')}`,{tag:'section',className:'st-row-group st-lookup-pen'+(variant==='scan'?' st-scan-card':'')}).replace('<section ',`<section data-lookup-key="${esc(g.title+'/'+p.title)}" `);
+    const pens=g=>(g.pens||[]).filter(p=>(p.rows||[]).length);
+    return groups.filter(g=>g&&((g.rows||[]).length||pens(g).length)).map(g=>heading({title:g.title,kind:'section',level:3})+(g.pens?pens(g).map(p=>pen(g,p)).join(''):panel(g.rows.join(''),{className:'st-row-group '+card}))).join('');
   }
   /* The typed part bold, the rest muted (.st-find-row mutes the tag; this marks only the part that matched). */
   function findMark(text,q){const t=String(text??''),i=q?t.toLowerCase().indexOf(String(q).toLowerCase()):-1;return i<0?esc(t):esc(t.slice(0,i))+'<b>'+esc(t.slice(i,i+q.length))+'</b>'+esc(t.slice(i+q.length));}
@@ -1519,7 +1523,7 @@
   /* What the results area says: the hint before typing, the no-match line, or the unit cards. */
   function findResults({query='',groups=[],hint='',none=''}={}){
     if(!String(query).trim())return hint?`<p class="st-find-hint">${esc(hint)}</p>`:'';
-    if(!groups.some(g=>(g.rows||[]).length))return `<p class="st-find-hint">${esc(none)}</p>`;
+    if(!groups.some(g=>(g.rows||[]).length||(g.pens||[]).some(p=>(p.rows||[]).length)))return `<p class="st-find-hint">${esc(none)}</p>`;
     return lookupGroups(groups,{variant:'find'});
   }
   /* The field is pinned and focused (the host focuses [data-find-input] once it has rendered). Natively this is the number-first keyboard
@@ -1572,7 +1576,7 @@
   /* A new row arrives without a jump: it slides in at the top of its card and everything under it glides to its new place (measured before
      and after the render with scanPlaces, then animated back from the old place by scanGlide). A new card fades in with its heading, and a card
      that gains a row grows with it. Rows move with their card, so a row is measured against its card. Reduced motion and the atlas's still frames skip it. */
-  const scanKey=e=>e.dataset.scanTag?'r'+e.dataset.scanTag:e.classList.contains('st-scan-card')?'c'+e.previousElementSibling?.textContent:'h'+e.textContent;
+  const scanKey=e=>e.dataset.scanTag?'r'+e.dataset.scanTag:e.classList.contains('st-scan-card')?'c'+(e.dataset.lookupKey||e.previousElementSibling?.textContent):'h'+e.textContent;
   const scanMovers=root=>[...root.querySelectorAll('.st-scan-body .st-heading,.st-scan-body .st-scan-card,.st-scan-body [data-scan-tag]')];
   const scanTop=e=>e.getBoundingClientRect().top-(e.dataset.scanTag?e.closest('.st-scan-card').getBoundingClientRect().top:0);
   function scanPlaces(root){const m=new Map();if(root)for(const e of scanMovers(root)){m.set(scanKey(e),scanTop(e));if(e.classList.contains('st-scan-card'))m.set('H'+scanKey(e),e.getBoundingClientRect().height);}return m;}

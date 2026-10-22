@@ -598,7 +598,7 @@
     const badge=globalSync();
     app.innerHTML=(pages[state.page]||home)();
     app.classList.toggle('schedule-open',state.page==='schedule');
-    if(state.page==='marked'&&SentriUI.rowFitTags)requestAnimationFrame(()=>SentriUI.rowFitTags(app));
+    if(['marked','find'].includes(state.page)&&SentriUI.rowFitTags)requestAnimationFrame(()=>SentriUI.rowFitTags(app));
     // The list page holds no records of its own, so its one header corner stays free (Headers law), as on the Schedule.
     if(badge&&!['schedule','marked','find','pig'].includes(state.page))(app.querySelector('.app-header,.page-head,.st-page-header')||app).insertAdjacentHTML('beforeend',badge);
     if(state.page==='find'&&document.activeElement?.closest?.('#app')==null)app.querySelector('[data-find-input]')?.focus({preventScroll:true});
@@ -638,30 +638,34 @@
      the scan bar, and each read adds the pig to the list, newest first, already ticked for Actions (owner, 2026-10-22: a worker walking past
      three sick pigs scans them and acts on all three). A result ticks the same way, and the ticks stay through searching and Stop.
      A pig opens her pig record (the owner, 2026-10-20). */
-  const lookupPigs=()=>{const seen=new Map(),marked=Object.values(markedPigs[state.section]||{}).flat();
-    marked.forEach(p=>seen.set(p.tag,{tag:p.tag,pen:p.pen,unit:p.unit,cond:p.cond}));
+  // A marked condition keeps the urgency Inspection's walk gives it: to treat acts now, monitoring is watched.
+  const lookupPigs=()=>{const seen=new Map(),m=markedPigs[state.section]||{};
+    [['treat','act'],['monitor','watch']].forEach(([k,level])=>(m[k]||[]).forEach(p=>seen.set(p.tag,{tag:p.tag,pen:p.pen,unit:p.unit,cond:p.cond,level})));
     tasks.filter(t=>t.section===state.section).forEach(t=>Object.keys(t.counts).forEach(u=>taskRecords(t,+u).forEach(r=>{if(!seen.has(r.id))seen.set(r.id,{tag:r.id,pen:r.pen,unit:+u,cond:''});})));
     return [...seen.values()];};
-  // One card per unit under a plain "Unit 7" heading, the unit the worker is in first.
+  // A plain "Unit 7" heading per unit, the unit the worker is in first; under it one card per pen in walking order, the pen code and how
+  // many are listed in its header, as Inspection's unit list (owner, 2026-10-22: the pen is the header, the row is the pig).
   const byUnit=list=>{const here=state.unit||state.workUnit;return [...new Set(list.map(p=>p.unit))].sort((a,b)=>(b===here)-(a===here)||a-b).map(u=>({unit:u,list:list.filter(p=>p.unit===u)}));};
+  const byPen=(list,q)=>[...new Set(list.map(p=>p.pen))].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true})).map(pen=>{const rows=list.filter(p=>p.pen===pen);return {title:pen,meta:rows.length+' '+(rows.length===1?'pig':'pigs'),query:q,rows:rows.map(p=>pigRow(p,q))};});
+  const lookupList=(list,q='')=>byUnit(list).map(g=>({title:'Unit '+g.unit,pens:byPen(g.list,q)}));
+  // Her stage line, as Inspection's walk writes it ("Gestation · 40d"). The days are sample data drawn from her tag.
+  const stageLine=p=>({breeding:'Breeding',gestation:'Gestation',farrowing:'Lactation',nursery:'Nursery'}[state.section]||section().name)+' · '+(10+Number(p.tag.slice(-3))%100)+'d';
   // scan.on: the scan bar is in the field's place (the reader listens); scan.items: every pig read or ticked, newest first; scan.picked: the ticks.
   const lookup={query:'',scan:{connected:params.get('scan')!=='none',on:false,items:[],picked:[],seq:0,fresh:{},last:''}};
   if(['list','ticked'].includes(params.get('scan'))){lookup.scan.items=lookupPigs().filter((p,i)=>i%5===0).slice(0,3).map(p=>p.tag).reverse();lookup.scan.seq=3;lookup.scan.picked=params.get('scan')==='ticked'?lookup.scan.items.slice(1):lookup.scan.items.slice();}
   function findHits(){const q=lookup.query.trim().toLowerCase();if(!q)return [];const rank=p=>p.tag.startsWith(q)?0:p.tag.includes(q)?1:2;return lookupPigs().filter(p=>p.tag.includes(q)||p.pen.toLowerCase().includes(q)).sort((a,b)=>rank(a)-rank(b)||a.tag.localeCompare(b.tag));}
-  // A pig's row, in the list and in the results alike: the tick box, her tag over her pen and her marked condition on the right when she has
-  // one (as To treat and Monitoring draw her), then the door to her record. In the results the typed part is bold, as Find marks it.
+  // A pig's row, in the list and in the results alike: Inspection's walk row. The tick box, her tag over her stage line, her marked condition
+  // on the right at its urgency, then the door to her record. In the results the typed part of the tag is bold, as Find marks it.
   function pigRow(p,q=''){
-    let html=SentriUI.rowSelectDoor({code:p.tag,description:'Pen '+p.pen,right:p.cond?{kind:'tags',tags:[{name:p.cond,level:'ongoing'}]}:{kind:'state',figure:'',word:'',level:'settled'},checked:lookup.scan.picked.includes(p.tag),action:'scan-pick',value:p.tag,openAction:'lookup-pig',openValue:p.tag,className:q?'st-find-row':'',attrs:{'data-scan-tag':p.tag},inputAttrs:{'data-value':p.tag,'aria-label':'Select '+p.tag}});
-    if(!q)return html;
-    html=html.replace(`<strong class="st-animal-id">${esc(p.tag)}</strong>`,`<strong class="st-animal-id">${SentriUI.findMark(p.tag,q)}</strong>`);
-    return ('pen '+p.pen.toLowerCase()).includes(q)?html.replace(`<span class="st-animal-context">Pen ${esc(p.pen)}<`,`<span class="st-animal-context">${SentriUI.findMark('Pen '+p.pen,q)}<`):html;
+    const html=SentriUI.rowSelectDoor({code:p.tag,description:stageLine(p),contextWidth:'112px',right:{kind:'tags',tags:p.cond?[{name:p.cond,level:p.level}]:[]},checked:lookup.scan.picked.includes(p.tag),action:'scan-pick',value:p.tag,openAction:'lookup-pig',openValue:p.tag,className:q?'st-find-row':'',attrs:{'data-scan-tag':p.tag},inputAttrs:{'data-value':p.tag,'aria-label':'Select '+p.tag}});
+    return q?html.replace(`<strong class="st-animal-id">${esc(p.tag)}</strong>`,`<strong class="st-animal-id">${SentriUI.findMark(p.tag,q)}</strong>`):html;
   }
   // Typed: the results. Otherwise the pigs read or ticked so far, or one line saying what to do.
   function findBody(){const sc=lookup.scan,q=lookup.query.trim().toLowerCase();
-    if(q&&!sc.on)return SentriUI.findResults({query:q,groups:byUnit(findHits()).map(g=>({title:'Unit '+g.unit,rows:g.list.map(p=>pigRow(p,q))})),none:'No pig matching “'+lookup.query.trim()+'” in any unit.'});
+    if(q&&!sc.on)return SentriUI.findResults({query:q,groups:lookupList(findHits(),q),none:'No pig matching “'+lookup.query.trim()+'” in any unit.'});
     const all=lookupPigs(),items=sc.items.map(t=>all.find(p=>p.tag===t)).filter(Boolean);
     if(!items.length)return `<p class="st-find-hint">${esc(!sc.on?'Type part of an ear tag or a pen, or scan a tag. Searches every unit.':sc.connected?'Hold the reader to an ear tag.':'Scanning starts as soon as the reader connects.')}</p>`;
-    return `<div class="st-scan-body">${SentriUI.lookupGroups(byUnit(items).map(g=>({title:'Unit '+g.unit,rows:g.list.map(p=>pigRow(p))})),{variant:'scan'})}</div>`;}
+    return `<div class="st-scan-body">${SentriUI.lookupGroups(lookupList(items),{variant:'scan'})}</div>`;}
   function findPage(){const sc=lookup.scan,n=sc.picked.length;
     return SentriUI.findPage({query:lookup.query,placeholder:'Ear tag or pen',results:findBody(),scan:{action:'scan',label:'Scan ear tag'},clear:{action:'find-clear',label:'Clear'},cancel:{action:'back',label:'Cancel'},
       // Scanning: the bar in the field's place, waiting until the reader connects (Reader 1 is the phone's paired reader), as Choose pigs.
@@ -755,7 +759,7 @@
     if(e.target.id==='answer-form'){const answer=String(data.get('answer')).trim();if(!answer)return;state.answerDraft='';state.answered=true;state.answer=answer;state.log.unshift({at:Date.now(),title:'Movement clarification received',context:'Unit 7 · Pen A2 · '+answer});render();toast('Clarification saved in this preview');}
   });
   document.addEventListener('input',e=>{if(e.target.matches?.('[data-mk-search]')&&state.page==='marked'){state.marked.q=e.target.value;app.querySelector('.mk-clear')?.toggleAttribute('hidden',!e.target.value);const l=app.querySelector('.mk-list');if(l){l.innerHTML=markedList();if(SentriUI.rowFitTags)SentriUI.rowFitTags(l);}}});
-  document.addEventListener('input',e=>{if(!e.target.matches('[data-find-input]'))return;lookup.query=e.target.value;const page=e.target.closest('.st-find');page.querySelector('.st-find-results').innerHTML=findBody();page.querySelector('.st-find-clear').hidden=!lookup.query;window.AtlasBare&&AtlasBare.watch(atlasScreen);});
+  document.addEventListener('input',e=>{if(!e.target.matches('[data-find-input]'))return;lookup.query=e.target.value;const page=e.target.closest('.st-find');const res=page.querySelector('.st-find-results');res.innerHTML=findBody();if(SentriUI.rowFitTags)SentriUI.rowFitTags(res);page.querySelector('.st-find-clear').hidden=!lookup.query;window.AtlasBare&&AtlasBare.watch(atlasScreen);});
   document.addEventListener('click',e=>{if(e.target.closest('[data-demo-scan]'))scanAdd();});
   document.addEventListener('input',e=>{if(e.target.name==='question'&&e.target.closest('#ask-form'))state.askDraft=e.target.value;if(e.target.id==='answer')state.answerDraft=e.target.value;});
   document.addEventListener('keydown',e=>{if(!overlay.children.length)return;if(e.key==='Escape'){closeDrawer();return;}if(e.key==='Tab'){const focusable=[...overlay.querySelectorAll('.sheet button,.sheet input,.sheet textarea,.sheet a[href],.dialog button')].filter(el=>!el.disabled);const first=focusable[0],last=focusable.at(-1);if(e.shiftKey&&(document.activeElement===first||document.activeElement===overlay.querySelector('.sheet,.dialog'))){e.preventDefault();last?.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first?.focus();}}});

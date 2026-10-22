@@ -840,7 +840,10 @@ export interface SentriUI {
 }
 
 /** Lookup (components/Lookup): Find and Scan, the two ways to reach an animal by her ear tag. */
-export interface LookupGroup { title: string; rows: string[] }
+/** A pen card inside a unit: the pen code (its typed part marked by `query`) and how many are listed ("2 pigs") in its header. */
+export interface LookupPen { title: string; meta?: string; query?: string; rows: string[] }
+/** A unit under its plain heading: `rows` as one card, or `pens` as one card each (Inspection's unit list). */
+export interface LookupGroup { title: string; rows?: string[]; pens?: LookupPen[] }
 export interface FindPageProps {
   query?: string; placeholder?: string; label?: string;
   /** The results area's HTML: findResults(...). */
