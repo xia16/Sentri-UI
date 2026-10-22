@@ -1393,11 +1393,12 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 .st-scan-bar .st-scan-bar-stop{flex:none;color:inherit}
 .st-scan-bar[data-state="waiting"]{border-color:var(--pending-border);background:var(--pending-surface);color:var(--amber-fill-ink)}
 .st-scan-bar[data-state="waiting"] .st-scan-bar-copy small{color:var(--amber)}
-/* Toast · door (one tap target over the page) and countdown (a ring round the glyph drains over --toast-time; --toast-delay resumes it). */
+/* Toast · door (a tap target with a chevron) and dismiss (a ✕ at the left; the toast stays until closed). With both, the ✕ and the door are
+   two sibling buttons in one box: the ✕ a 44px square at the left edge, the door the rest. */
 .st-toast--door{border:0;font:inherit;text-align:left;cursor:pointer}
-.st-toast--door:is(:active,[data-preview~="pressed"]){background:var(--ink-2)}
-.st-toast-glyph{position:relative}
-.st-toast-glyph .st-toast-ring{position:absolute;inset:-3px;width:34px;height:34px;transform:rotate(-90deg);pointer-events:none}
-.st-toast-ring circle{fill:none;stroke:#ffffffd9;stroke-width:2;stroke-linecap:round;stroke-dasharray:100.53;stroke-dashoffset:0;animation:st-toast-drain var(--toast-time,6s) linear var(--toast-delay,0s) forwards}
-@keyframes st-toast-drain{to{stroke-dashoffset:100.53}}
-.atlas-still .st-toast-ring circle{animation:none;stroke-dashoffset:40.2}
+.st-toast--door:is(:active,[data-preview~="pressed"]),.st-toast-door:is(:active,[data-preview~="pressed"]){background:var(--ink-2)}
+.st-toast--dismiss{padding-left:var(--space-4);gap:var(--space-4)}
+.st-toast-close{display:grid;place-items:center;flex:none;width:var(--tap-min);height:var(--tap-min);border:0;border-radius:var(--radius-control);background:transparent;color:#ffffffc7;cursor:pointer}
+.st-toast-close svg{width:18px;height:18px}
+.st-toast-close:is(:active,[data-preview~="pressed"]){background:#ffffff1f}
+.st-toast-door{flex:1;min-width:0;display:flex;align-items:center;gap:var(--space-12);min-height:var(--tap-min);padding:0 var(--space-8) 0 var(--space-4);border:0;border-radius:var(--radius-control);background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer}

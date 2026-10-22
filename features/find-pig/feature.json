@@ -1,7 +1,7 @@
 {
   "id": "find-pig",
-  "name": "Find a pig",
-  "zh": "查找猪只",
+  "name": "Search and scan",
+  "zh": "搜索与扫描",
   "platform": "mobile",
   "section": "pigs",
   "newFeature": true,
