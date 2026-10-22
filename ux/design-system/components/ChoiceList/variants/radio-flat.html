@@ -10,7 +10,7 @@
 <div data-state="Disabled" id="state-Disabled"></div>
 <div data-state="Long-label" id="state-Long-label"></div>
 <script>
-var UI = window.SentriUI;
+const UI = window.SentriUI;
 /* The real container: a 390px phone; the form is a drawer over the sow's page. The flat face is a recorded outcome listed as 60px rows in the form itself, a line under each row. */
 function page(){return '<div class="ph-page"><div class="ph-bar" aria-hidden="true">9:41</div>'+UI.heading({title:'000418',kind:'page',description:'B1 · Farrowing'})+UI.panel(UI.row({title:'Farrowing',description:'9 alive · 5 dead'}),{className:'st-row-group'})+'</div>';}
 function phone(over){return '<div class="ph" data-st-context="page">'+page()+over+'</div>';}

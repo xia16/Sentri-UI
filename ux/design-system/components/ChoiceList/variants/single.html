@@ -14,7 +14,7 @@
 <div data-state="Empty-add" id="state-Empty-add"></div>
 <div data-state="Long-label" id="state-Long-label"></div>
 <script>
-var UI = window.SentriUI;
+const UI = window.SentriUI;
 /* The real container: a 390px phone; a picker or a form is a drawer over the pig's page (never a drawer on a drawer). */
 function page(){return '<div class="ph-page"><div class="ph-bar" aria-hidden="true">9:41</div>'+UI.heading({title:'000267',kind:'page',description:'C1 \u00b7 Gestation \u00b7 42 days'})+UI.panel(UI.row({title:'Thin',description:'Day 12 \u00b7 monitor'}),{className:'st-row-group'})+'</div>';}
 function phone(over){return '<div class="ph" data-st-context="page">'+page()+over+'</div>';}

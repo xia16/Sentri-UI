@@ -602,17 +602,30 @@ export const reusableLeaf = (record) => !!record?.run && (record.run.result === 
 // Design-system components only (owner, 2026-10-11): visual styling added in a page's own CSS, markup or scripts is an improvised
 // component. Layout (margin, padding, gap, grid, flex, size, position) is the page's; looks belong to ux/design-system. A line
 // marked `ds-exception` is a workaround and counts too: the part is built in the design system instead (P2, briefs/build.md §3).
+// Only net-new declarations count: a prop:value the same diff removes from the same file is a line rewritten around it (a rule
+// deleted from a one-line stylesheet re-adds the whole line), not new styling. A changed value is still new.
 const VISUAL = /^(color|background(-color|-image)?|border(-(top|right|bottom|left))?(-(color|width|style))?|border(-[a-z]+)?-radius|box-shadow|outline(-[a-z]+)?|font(-(size|weight|family|style))?|text-decoration(-[a-z]+)?|text-transform|letter-spacing|opacity|fill|stroke(-width)?|filter|backdrop-filter)$/;
 export const isPageFile = (f) => /^ux\//.test(f) && !/^ux\/(design-system|archive)\//.test(f) && /\.(css|html|js|mjs)$/.test(f);
-export function pageStyling(addedByFile) {
+// a line's visual declarations, one list per chunk (a CSS line; a style attribute or .style assignment in markup or a script)
+function visualDecls(file, line) {
+  const chunks = /\.css$/.test(file) ? [line]
+    : [...line.matchAll(/style\s*=\s*["'`]([^"'`]*)/g)].map((m) => m[1])
+      .concat([...line.matchAll(/\.style\.([a-zA-Z]+)\s*=\s*([^;]*)/g)].map((m) => ' ' + m[1].replace(/[A-Z]/g, (c) => '-' + c.toLowerCase()) + ':' + (m[2].trim() || 'x')));
+  return chunks.map((c) => [...c.matchAll(/(?:^|[{;\s])([a-z-]+)\s*:\s*([^;{}]+)/g)].filter((m) => VISUAL.test(m[1]))
+    .map((m) => ({ prop: m[1], key: m[1] + ':' + m[2].trim().replace(/\s+/g, ' ') })));
+}
+export function pageStyling(addedByFile, removedByFile = {}) {
   const out = [];
   for (const [file, lines] of Object.entries(addedByFile)) {
     if (!isPageFile(file)) continue;
+    const gone = new Map();
+    for (const line of removedByFile[file] || []) for (const decls of visualDecls(file, line)) for (const d of decls) gone.set(d.key, (gone.get(d.key) || 0) + 1);
     for (const line of lines) {
-      const chunks = /\.css$/.test(file) ? [line]
-        : [...line.matchAll(/style\s*=\s*["'`]([^"'`]*)/g)].map((m) => m[1])
-          .concat([...line.matchAll(/\.style\.([a-zA-Z]+)\s*=/g)].map((m) => ' ' + m[1].replace(/[A-Z]/g, (c) => '-' + c.toLowerCase()) + ':x'));
-      for (const c of chunks) for (const m of c.matchAll(/(?:^|[{;\s])([a-z-]+)\s*:\s*[^;{}]+/g)) if (VISUAL.test(m[1])) { out.push({ file, prop: m[1], line: line.trim().slice(0, 120) }); break; }
+      for (const decls of visualDecls(file, line)) {
+        let fresh = null;
+        for (const d of decls) { const n = gone.get(d.key) || 0; if (n) gone.set(d.key, n - 1); else fresh ||= d; }
+        if (fresh) out.push({ file, prop: fresh.prop, line: line.trim().slice(0, 120) });
+      }
     }
   }
   return out;
@@ -655,6 +668,15 @@ export function addedLines(diff) {
   for (const l of diff.split(/\r?\n/)) {
     if (l.startsWith('+++ ')) { file = l.slice(4).replace(/^b\//, ''); continue; }
     if (file && l.startsWith('+') && !l.startsWith('+++')) (out[file] ||= []).push(l.slice(1));
+  }
+  return out;
+}
+// The removed lines of a unified diff, by file (the old path).
+export function removedLines(diff) {
+  const out = {}; let file = null;
+  for (const l of diff.split(/\r?\n/)) {
+    if (l.startsWith('--- ')) { file = l.slice(4).replace(/^a\//, ''); continue; }
+    if (file && l.startsWith('-') && !l.startsWith('--- ')) (out[file] ||= []).push(l.slice(1));
   }
   return out;
 }
