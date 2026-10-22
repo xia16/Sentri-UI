@@ -200,7 +200,7 @@ function atlasScreen(s,c){
  if(v==='roomScan'){const sc=c.scan;return !sc.connected?'farrowing.scan-no-reader':!sc.listening?'farrowing.scan-stopped':'farrowing.scan';}
  if(v==='roomPig')return 'farrowing.pig-not-in-task';
  if(v==='roomBatch')return 'farrowing.batch';
- if(v==='roomBatchPick'){const b=c.batch||{};return b.filtering?'farrowing.batch-filter':b.outside?'farrowing.batch-outside':b.scanning==='waiting'?'farrowing.batch-waiting':b.scanning?'farrowing.batch-scanning':b.q?'farrowing.batch-search':b.picked?.length?'farrowing.batch-pick':'farrowing.batch-pick-none';}
+ if(v==='roomBatchPick'){const b=c.batch||{};return b.filtering?'farrowing.batch-filter':c.toast?.on==='roomBatchPick'?'farrowing.batch-outside':b.scanning==='waiting'?'farrowing.batch-waiting':b.scanning?'farrowing.batch-scanning':b.q?'farrowing.batch-search':b.picked?.length?'farrowing.batch-pick':'farrowing.batch-pick-none';}
  if(v==='roomBatchForm')return 'farrowing.batch-form';
  const more={roomFilter:'filter',roomGrid:'pen-map',roomPenDetail:'pen',roomPenLog:'pen-log',roomPenNote:'pen-note',roomPenReadNote:'pen-read-note',roomPenFeed:'pen-feed',roomPenFault:'pen-fault',roomPenFaultRecord:'pen-fault-record',roomTaskSows:'task-sows',roomHome:'today',deathBreakdown:'death-breakdown',marker:'note',pigletCare:'piglet-care',pigletEdit:'piglet-identity',pigletDeath:'piglet-death'};
  if(more[v])return 'farrowing.'+more[v];
@@ -460,9 +460,10 @@ function scanSetup(c,preset=''){
  if(preset==='scan-pig')Object.assign(c,{pig:'000434',pigFrom:'roomScan'});   // the reader read 000434, a sow not on the list
  if(/^batch-/.test(preset)){
   const picked={'batch-pick':['000431','004305','000392'],'batch-scanning':['000431','004305'],'batch-outside':['000431','004305'],'batch-search':['000431'],'batch-filter':['000431','004305','000392'],'batch-form':['000431','004305','000392']}[preset]||[];
-  c.scan.connected=true;c.batch={verb:'health',picked,q:preset==='batch-search'?'43':'',scanning:preset==='batch-waiting'?'waiting':['batch-scanning','batch-outside'].includes(preset),outside:preset==='batch-outside'?'000434':'',filter:{pigs:'any',cond:'any'},fresh:preset==='batch-scanning'?{'004305':Infinity}:{},last:preset==='batch-scanning'?'004305':'',filtering:preset==='batch-filter',seq:0};
+  c.scan.connected=true;c.batch={verb:'health',picked,q:preset==='batch-search'?'43':'',scanning:preset==='batch-waiting'?'waiting':['batch-scanning','batch-outside'].includes(preset),filter:{pigs:'any',cond:'any'},fresh:preset==='batch-scanning'?{'004305':Infinity}:{},last:preset==='batch-scanning'?'004305':'',filtering:preset==='batch-filter',seq:0};
   if(preset==='batch-filter')c.batch.draft={...c.batch.filter};
   if(preset==='batch-waiting')c.scan.connected=false;
+  if(preset==='batch-outside')c.toast=batchOutside(c,'000434',Infinity);
  }
  if(preset==='batch-saved')c.toast={title:'Condition recorded · 3 pigs',until:Infinity};
 }
@@ -475,6 +476,8 @@ function scanSetup(c,preset=''){
    Copy (owner): the sheet is plain "Actions", its line "Pigs in Unit 7"; not "For several sows", "Many pigs at once" or "bulk". */
 const batchVerbs=[['health','condition','Condition','Disease or symptom'],['treatment','treat','Treat','Record treatment'],['triage','alert','Care','Care instructions'],['note','note','Note','Add a note'],['body','measure','Measure','Measurements & condition'],['feed','feed','Feed','Adjust feed'],['transfer','transfer','Transfer','Transfer']];
 const batchScans=['000431','004305','000434','000392','004811','000406'];   // what "Simulate scan" reads while choosing: 000434 is in Unit 3
+// A read from another unit adds nothing: a toast says where she is (the page already says the list is this unit's), and is one tap to her pig record while its ring runs (6 s).
+function batchOutside(c,tag,until=Date.now()+6000){const u=farmPigs.find(x=>x.tag===tag),where=u?farmUnit(c,u.unit).name:(ZH?'其他单元':'another unit');return {title:`${tag} is in ${where}`,tone:'notice',door:{action:'room-pig',value:tag,label:`${tag} is in ${where}, not ${c.unit.name}. Open her pig record`},on:'roomBatchPick',total:6000,until};}
 function batchSheet(c){
  const tiles=batchVerbs.map(([value,symbol,label,title])=>({label,title,icon:icon(symbol),action:'room-batch-verb',value,attrs:value==='transfer'?{'data-entry':'move'}:{}}));
  return roomSheet('Actions',SentriUI.rowGrid(tiles,{label:'Actions for pigs in '+c.unit.name}),footer(SentriUI.backButton({action:'room-back'})),'batch-sheet','menu',{text:[{text:'Pigs in '+c.unit.name}]});
@@ -503,9 +506,7 @@ function batchPickPage(c){
  const bar=b.scanning?SentriUI.scanBar({state:b.scanning==='waiting'?'waiting':'scanning',device:'Reader 1',stop:{action:'room-batch-scan-stop'}})
   :SentriUI.choiceSearch({label:'Search ear tag or pen',placeholder:'Ear tag or pen',value:b.q,attrs:{'data-batch-search':''},clear:{action:'room-batch-clear'},scan:{action:'room-batch-scan',label:'Scan ear tags'}});
  const filter=SentriUI.iconButton({action:'room-batch-filter',icon:icon('filter'),label:'Filter pigs'+(fn?', '+fn+' applied':''),badge:fn||'',className:'batch-filter'});
- // A read from another unit: a standing notice under the bar, one door to her pig record; it stays until the next read or Stop.
- const notice=b.outside?(()=>{const u=farmPigs.find(x=>x.tag===b.outside),where=u?farmUnit(c,u.unit).name:'another unit';return SentriUI.toast(`${b.outside} is in ${where}, not ${c.unit.name}`,{tone:'notice',standing:{action:'room-pig',value:b.outside,label:`${b.outside} is in ${where}, not ${c.unit.name}. Open her pig record`}});})():'';
- const body=`<div class="batch-top"><div class="batch-bar">${bar}${filter}</div>${notice}</div><p class="batch-hint"><b>${esc(verb)}</b> · tick each pig in ${esc(c.unit.name)}, or scan.</p><div class="batch-list">${batchRows(c)}</div>`;
+ const body=`<div class="batch-top"><div class="batch-bar">${bar}${filter}</div></div><p class="batch-hint"><b>${esc(verb)}</b> · tick each pig in ${esc(c.unit.name)}, or scan.</p><div class="batch-list">${batchRows(c)}</div>`;
  const next=SentriUI.button({label:n?`Next · ${n} ${n===1?'pig':'pigs'}`:'Next',register:'primary',action:'room-batch-next',disabled:!n});
  return SentriUI.sheet({variant:'page',title:'Choose pigs',back:{action:'room-back'},body,footer:footer(SentriUI.backButton({action:'room-back'}),next),className:'room-utility batch-pick',label:'Choose pigs',bar:status()});
 }
@@ -688,10 +689,10 @@ function roomAction(i,a,v){if(!a.startsWith('room-'))return false;const s=states
 
  if(a==='room-search'||a==='room-scan'){c.scanFrom=a==='room-scan'&&s.view==='roomSearch'?'roomSearch':'';if(!c.scanFrom)c.query='';s.view=a==='room-search'?'roomSearch':'roomScan';}   // Scan opened from Find a sow goes back to it, with what was typed
  if(a==='room-search-clear')c.query='';
- if(a==='room-pig'){c.pigFrom=s.view;c.pig=v;s.view='roomPig';}
+ if(a==='room-pig'){c.pigFrom=s.view;c.pig=v;s.view='roomPig';c.toast=null;}
  if(a==='room-batch'){c.batch={verb:'',picked:[],q:'',scanning:false,filter:{pigs:'any',cond:'any'},fresh:{},seq:0};c.toast=null;s.view='roomBatch';}
  if(a==='room-batch-scan'){c.batch.scanning=c.scan.connected?true:'waiting';c.batch.q='';}   // no reader yet: wait for it, then scan
- if(a==='room-batch-scan-stop'){c.batch.scanning=false;c.batch.outside='';}
+ if(a==='room-batch-scan-stop'){c.batch.scanning=false;if(c.toast?.on)c.toast=null;}
  if(a==='room-batch-clear')c.batch.q='';
  if(a==='room-batch-filter'){c.batch.filtering=true;c.batch.draft={...c.batch.filter};}
  if(a==='room-batch-facet-pigs')c.batch.draft.pigs=v;
@@ -718,7 +719,9 @@ function pageAfterRender(i,s,c,root){
  if(s.view==='roomBatchForm')connectBatchForm(root,c);
  // The pig just read is brought into view where she is, and her row keeps Row's Just scanned state for a moment.
  if(s.view==='roomBatchPick'&&c.batch.scanning){const r=root.querySelector(`.batch-list [data-scan-tag="${c.batch.last}"]`),body=r?.closest('.sheet-body');if(r&&body)body.scrollTop+=r.getBoundingClientRect().top-body.getBoundingClientRect().top-body.clientHeight/2+r.offsetHeight/2;SentriUI.scanArrive(root,{fresh:c.batch.fresh});c.batch.last='';}
- if(c.toast&&s.view===(c.toast.on||'room')){root.querySelector('.phone').insertAdjacentHTML('beforeend',SentriUI.toast(c.toast.title,{tone:c.toast.tone||'done'}));if(c.toast.until!==Infinity){const t=c.toast;setTimeout(()=>{if(c.toast===t){c.toast=null;root.querySelector('.phone .st-toast')?.remove();}},3200);}}
+ // A toast over a page with a footer sits 12px above that footer, whatever its height at this width.
+ const pageFoot=root.querySelector('.phone .batch-pick .sheet-footer');root.querySelector('.phone').style.setProperty('--toast-bottom',pageFoot?pageFoot.getBoundingClientRect().height+12+'px':'');
+ if(c.toast&&s.view===(c.toast.on||'room')){const t=c.toast,left=t.until===Infinity?t.total:Math.max(0,t.until-Date.now());root.querySelector('.phone').insertAdjacentHTML('beforeend',SentriUI.toast(t.title,{tone:t.tone||'done',door:t.door||null,countdown:t.total?{total:t.total,left}:null}));if(t.until!==Infinity)setTimeout(()=>{if(c.toast===t){c.toast=null;root.querySelector('.phone .st-toast')?.remove();}},t.total?left:3200);}
  // Find a sow opens with the field focused; Scan highlights the row of a sow that was scanned again.
  if(pageUnder(s,c)==='roomSearch'&&s.view==='roomSearch')root.querySelector('[data-room-search]')?.focus({preventScroll:true,focusVisible:false});
 }
@@ -924,10 +927,9 @@ gallery.addEventListener('input',e=>{if(!e.target.matches('[data-batch-search]')
 gallery.addEventListener('input',e=>{if(!e.target.matches('[data-room-search]'))return;const i=+e.target.closest('[data-card]').dataset.card,c=roomContext(states[i]),page=e.target.closest('.st-find');c.query=e.target.value;page.querySelector('.st-find-results').innerHTML=searchBody(c);page.querySelector('.st-find-clear').hidden=!c.query;if(i===0&&window.AtlasBare)AtlasBare.watch(()=>atlasScreen(states[0],c));});
 // The demo's own control, outside the phone: the reader reads the next sample sow.
 document.addEventListener('click',e=>{const b=e.target.closest('[data-demo-scan]');if(!b||b.disabled)return;const i=+b.closest('[data-card]').dataset.card,s=states[i],c=roomContext(s);
- // Choosing sows: a read ticks her (a repeat read keeps her ticked); a pig from outside the room joins above the pens.
- // Choosing pigs, scanning: a read ticks her and marks her row (a repeat read keeps her ticked); a pig from another unit is not added.
+ // Choosing pigs, scanning: a read ticks her and marks her row (a repeat read keeps her ticked); a pig from another unit isn't added (a toast says where she is).
  if(s.view==='roomBatchPick'&&c.batch.scanning){const b=c.batch,tag=b.scanning==='waiting'?'':batchScans[b.seq++%batchScans.length],p=unitPigs(c).find(x=>x.tag===tag);if(b.scanning==='waiting'){c.scan.connected=true;b.scanning=true;render(i);return;}   // the reader connects: scanning starts
-  if(p){if(!b.picked.includes(tag))b.picked.push(tag);b.fresh[tag]=Date.now()+1600;b.last=tag;b.outside='';}else b.outside=tag;render(i);return;}
+  if(p){if(!b.picked.includes(tag))b.picked.push(tag);b.fresh[tag]=Date.now()+1600;b.last=tag;}else c.toast=batchOutside(c,tag);render(i);return;}
  const tag=scanRead(c);if(tag){roomAction(i,findSow(c,tag)?'room-sow':'room-pig',tag);render(i);}});
 // A pig profile's own Back returns to the page she was found on.
 window.addEventListener('message',e=>{if(e.origin!==location.origin||e.data?.type!=='sow-detail-close')return;const i=states.findIndex((s,k)=>['roomPig','roomBatchForm'].includes(s.view)&&document.querySelector(`[data-card="${k}"] .room-pig-frame`)?.contentWindow===e.source);if(i<0)return;const s=states[i],c=roomContext(s);
