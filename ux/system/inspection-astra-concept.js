@@ -1373,6 +1373,9 @@ function transferPage(c){const p=picked(c)[0],d=c.transferDraft||{},units=c.tran
 const scanSequence=['000306','000267','000254','000801','000281','000312','000802'];   // what "Simulate scan" reads, in turn
 const scannerOff=/[?&]scanner=(off|0|no)(&|$)/.test(globalThis.location?.search||'');
 const unitGroups=(c,hits)=>[{title:unitName(c),rows:hits.filter(h=>!h.unit)},...(c.otherUnits||[]).map(u=>({title:u.name,rows:hits.filter(h=>h.unit===u)}))];
+// Under each unit, one card per pen in walking order, the pen code and how many are listed in its header: the walk's own list (owner,
+// 2026-10-22: Find and Scan read like the unit list, the pen the header, the row the pig).
+const penGroups=(c,hits,row,q='')=>unitGroups(c,hits).map(g=>({title:g.title,pens:[...new Set(g.rows.map(h=>h.pe.id))].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true})).map(id=>{const rows=g.rows.filter(h=>h.pe.id===id);return {title:id,meta:countLabel(rows.length),query:q,rows:rows.map(row)};})}));
 function findHits(c){
  const q=c.query.trim().toLowerCase();if(!q)return [];
  const rank=p=>p.id.startsWith(q)?0:p.id.includes(q)?1:2;
@@ -1380,7 +1383,8 @@ function findHits(c){
  return all.flatMap(({pe,unit})=>pe.pigs.filter(p=>p.id.includes(q)||pe.id.toLowerCase().includes(q)).map(p=>({p,pe,unit}))).sort((a,b)=>rank(a.p)-rank(b.p)||a.p.id.localeCompare(b.p.id));
 }
 function searchBody(c){
- const q=c.query.trim().toLowerCase(),groups=unitGroups(c,findHits(c)).map(g=>({title:g.title,rows:g.rows.map(h=>SentriUI.findRow({code:h.p.id,place:'Pen '+h.pe.id,query:q,right:{kind:'tags',tags:rowConditionTags(cases(h.p))},action:'search-pig',value:h.p.id}))}));
+ // A result reads as the walk's row (her stage line, the pen being the card's header) and opens her record: Find ticks nothing.
+ const q=c.query.trim().toLowerCase(),groups=penGroups(c,findHits(c),h=>SentriUI.findRow({code:h.p.id,place:stageSummary(h.p).replace(/ (days|day)( old)?$/,'d'),contextWidth:'112px',markPlace:false,query:q,right:{kind:'tags',tags:rowConditionTags(cases(h.p))},action:'search-pig',value:h.p.id}),q);
  return SentriUI.findResults({query:c.query,groups,hint:'Type part of an ear tag or a pen, or scan a tag. Searches every unit.',none:'No pig matching “'+c.query.trim()+'” in any unit.'});
 }
 function findPage(c){
@@ -1402,8 +1406,8 @@ function scanAdd(c){
  return true;
 }
 function scanPage(c){
- const sc=c.scan,hits=sc.items.map(id=>({p:pig(c,id),unit:(c.otherUnits||[]).find(u=>u.pens.some(pe=>pe.pigs.some(x=>x.id===id)))||null})).filter(h=>h.p);
- const groups=unitGroups(c,hits).map(g=>({title:g.title,rows:g.rows.map(h=>pigRow(c,h.p,{'data-scan-tag':h.p.id}))}));
+ const sc=c.scan,hits=sc.items.map(id=>({p:pig(c,id),pe:penOf(c,id),unit:(c.otherUnits||[]).find(u=>u.pens.some(pe=>pe.pigs.some(x=>x.id===id)))||null})).filter(h=>h.p&&h.pe);
+ const groups=penGroups(c,hits,h=>pigRow(c,h.p,{'data-scan-tag':h.p.id}));
  return SentriUI.scanPage({title:'Scan ear tags',back:{action:'back'},connected:sc.connected,listening:sc.listening,groups,picked:c.selected.size,selected:n=>countLabel(n)+' selected',actions:{action:'actions',label:'Actions'},toggle:{action:'scan-toggle'},empty:{text:'Each pig you scan is ticked here.',stoppedText:'Resume scanning to add pigs.'},bar:status()});
 }
 
@@ -2276,7 +2280,7 @@ gallery.addEventListener('click',e=>{const el=e.target.closest('[data-action]');
  render(i,old===c.view?{a,v}:null);
 });
 gallery.addEventListener('change',e=>{const el=e.target,root=el.closest('[data-card]');if(!root)return;const i=+root.dataset.card,c=states[i];if(el.matches('.scenario')){clearTimeout(c.toastTimer);states[i]=makeExample(el.value);render(i);return;}if(el.dataset.pigSelect){c.actionScope='pigs';el.checked?c.selected.add(el.dataset.pigSelect):c.selected.delete(el.dataset.pigSelect);if(!c.selected.size)c.reviewOnly=false;endEmptyReview(c);render(i,{p:el.dataset.pigSelect});}else if(el.dataset.notagsSelect){const nt=(c.selectedNoTags||=new Set()),id=el.dataset.notagsSelect;c.noTagsCount||={};if(el.checked){nt.add(id);c.noTagsCount[id]=pen(c,id).untagged.count;}else{nt.delete(id);delete c.noTagsCount[id];}endEmptyReview(c);render(i);}else if(el.dataset.penSelect){el.checked?c.selectedPens.add(el.dataset.penSelect):c.selectedPens.delete(el.dataset.penSelect);{const pu=pen(c,el.dataset.penSelect),nt=(c.selectedNoTags||=new Set());if(pu?.untagged?.count){c.noTagsCount||={};if(el.checked){nt.add(pu.id);c.noTagsCount[pu.id]=pu.untagged.count;}else{nt.delete(pu.id);delete c.noTagsCount[pu.id];}}}c.actionScope='pigs';displayPigs(c,pen(c,el.dataset.penSelect)).forEach(p=>el.checked?c.selected.add(p.id):c.selected.delete(p.id));if(!c.selected.size)c.reviewOnly=false;endEmptyReview(c);render(i,{pe:el.dataset.penSelect});}else if(el.dataset.field&&el.type!=='textarea'&&el.type!=='number'){c.form[el.dataset.field]=el.value;render(i,{f:el.dataset.field,v:el.value});}});
-gallery.addEventListener('input',e=>{const el=e.target,i=+el.closest('[data-card]').dataset.card,c=states[i];if(el.matches('[data-find-input]')){c.query=el.value;const page=el.closest('.st-find');page.querySelector('.st-find-results').innerHTML=searchBody(c);page.querySelector('.st-find-clear').hidden=!c.query;localizeFeed(page.querySelector('.st-find-results'));if(i===0&&window.AtlasBare)AtlasBare.watch(()=>atlasScreen(c));return;}if(el.dataset.field){c.form[el.dataset.field]=el.value;const save=el.closest('.sheet')?.querySelector('[data-action="save-record"],[data-action="save-weight"],[data-action="save-pen"]');if(save)setCommitWaiting(save,!valid(c));}});
+gallery.addEventListener('input',e=>{const el=e.target,i=+el.closest('[data-card]').dataset.card,c=states[i];if(el.matches('[data-find-input]')){c.query=el.value;const page=el.closest('.st-find');page.querySelector('.st-find-results').innerHTML=searchBody(c);page.querySelector('.st-find-clear').hidden=!c.query;localizeFeed(page.querySelector('.st-find-results'));SentriUI.rowFitTags(page.querySelector('.st-find-results'));if(i===0&&window.AtlasBare)AtlasBare.watch(()=>atlasScreen(c));return;}if(el.dataset.field){c.form[el.dataset.field]=el.value;const save=el.closest('.sheet')?.querySelector('[data-action="save-record"],[data-action="save-weight"],[data-action="save-pen"]');if(save)setCommitWaiting(save,!valid(c));}});
 gallery.addEventListener('keydown',e=>{const root=e.target.closest('[data-card]');if(!root)return;const i=+root.dataset.card,c=states[i];/* A condition's name is one line: the keyboard's Done closes the keyboard, as on a Measure box, so Add is in reach. */if(e.key==='Enter'&&e.target.matches('[data-condition-add-name]')){e.preventDefault();e.target.blur();return;}if(e.key==='Escape'){if(c.logDatePicker){e.preventDefault();handleRecordAction(c,'log-date-cancel');render(i);return;}if(c.view!=='list'){backTo(c);render(i);}else if(c.selected.size||c.selectedPens.size){c.selected.clear();c.selectedPens?.clear();c.reviewOnly=false;render(i);}return;}const sheet=e.target.closest('.sheet');if(e.key==='Tab'&&sheet){const items=[...sheet.querySelectorAll('button:not(:disabled),input,textarea,select,summary')],first=items[0],last=items.at(-1);if(e.shiftKey&&e.target===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&e.target===last){e.preventDefault();first.focus();}}});
 document.addEventListener('pointerdown',()=>document.documentElement.dataset.inputMode='pointer',true);document.addEventListener('keydown',()=>delete document.documentElement.dataset.inputMode,true);
 document.getElementById('reset-all').onclick=()=>{states.forEach((c,i)=>{clearTimeout(c.toastTimer);states[i]=makeExample(examples[i].initial);gallery.querySelector(`[data-card="${i}"] .scenario`).value=examples[i].initial;render(i);});};

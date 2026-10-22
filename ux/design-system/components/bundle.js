@@ -1513,11 +1513,12 @@
   function findMark(text,q){const t=String(text??''),i=q?t.toLowerCase().indexOf(String(q).toLowerCase()):-1;return i<0?esc(t):esc(t.slice(0,i))+'<b>'+esc(t.slice(i,i+q.length))+'</b>'+esc(t.slice(i+q.length));}
   /* A result: the tag over where the animal is, and the host's right side: the task's state for a pig on the task's list, her condition
      tags (or nothing) for any other pig (owner, 2026-10-22). The part of the tag or the place that matched is marked. */
-  function findRow({code='',place='',query='',action='',value=code,className='',right=null}={}){
+  /* `markPlace: false` when the line under the tag is not searched (her stage line, the pen being the card's header). */
+  function findRow({code='',place='',query='',action='',value=code,className='',right=null,contextWidth='',markPlace=true}={}){
     const q=String(query||'').trim().toLowerCase();
-    let html=row({variant:'animal',code,description:place,right:right||{kind:'state',figure:'',word:'',level:'settled'},action,value,className:'st-find-row'+(className?' '+className:'')});
+    let html=row({variant:'animal',code,description:place,right:right||{kind:'state',figure:'',word:'',level:'settled'},action,value,className:'st-find-row'+(className?' '+className:''),contextWidth});
     html=html.replace(`<strong class="st-animal-id">${esc(code)}</strong>`,`<strong class="st-animal-id">${findMark(code,q)}</strong>`);
-    if(place&&String(place).toLowerCase().includes(q))html=html.replace(`<span class="st-animal-context">${esc(place)}<`,`<span class="st-animal-context">${findMark(place,q)}<`);
+    if(markPlace&&place&&String(place).toLowerCase().includes(q))html=html.replace(`<span class="st-animal-context">${esc(place)}<`,`<span class="st-animal-context">${findMark(place,q)}<`);
     return html;
   }
   /* What the results area says: the hint before typing, the no-match line, or the unit cards. */
@@ -1551,7 +1552,7 @@
   function scanPage({title='Scan ear tags',back={action:'back'},read='list',connected=true,listening=true,groups=[],picked=0,selected=n=>n+' selected',actions={action:'scan-actions',label:'Actions'},toggle={action:'scan-toggle'},empty={},bar='',className=''}={}){
     const e=Object.assign({offTitle:'Scanner not connected',offText:"Turn on the tag reader and pair it in your phone's Bluetooth settings. Scanning starts as soon as it connects.",title:'Hold the reader to an ear tag',text:'Each animal you scan appears here.',stoppedTitle:'Scanning is stopped',stoppedText:'Resume scanning to add more.'},empty);
     // read:'open' (a single-action task): nothing is listed, because each read opens her; the page only says that it listens.
-    const has=read!=='open'&&groups.some(g=>(g.rows||[]).length);
+    const has=read!=='open'&&groups.some(g=>(g.rows||[]).length||(g.pens||[]).some(p=>(p.rows||[]).length));
     const body=!connected?scanEmpty(e.offTitle,e.offText):!has?(listening?scanEmpty(e.title,e.text):scanEmpty(e.stoppedTitle,e.stoppedText)):`<div class="st-scan-body">${lookupGroups(groups,{variant:'scan'})}</div>`;
     // A multi-select task may put its own actions in the footer directly (actions:[{label,action}], the last one primary); else the count and Actions.
     const direct=Array.isArray(actions)?actions.map((x,k)=>button({label:x.label,register:x.register||(k===actions.length-1?'primary':'secondary'),action:x.action,value:x.value})).join(''):'';

@@ -882,7 +882,7 @@ export interface SentriUI {
   /** The hint before typing, the no-match line, or the unit cards. */
   findResults(props?: { query?: string; groups?: LookupGroup[]; hint?: string; none?: string }): string;
   /** A result row: the tag (the typed part marked) over where the animal is, and the host's right side: the task's state for a pig on its list, her condition tags (or nothing) for any other. */
-  findRow(props?: { code?: string; place?: string; query?: string; action?: string; value?: string; className?: string; right?: AnimalRight | null }): string;
+  findRow(props?: { code?: string; place?: string; query?: string; action?: string; value?: string; className?: string; right?: AnimalRight | null; contextWidth?: string; markPlace?: boolean }): string;
   findMark(text: string, query: string): string;
   scanPage(props?: ScanPageProps): string;
   /** Scanning on a list: the host's search bar becomes this one status while the reader is on. 'waiting' until it connects. */
