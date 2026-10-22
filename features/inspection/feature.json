@@ -15,6 +15,8 @@
         "inspection.animal-types",
         "inspection.filters",
         "inspection.go-to-pen",
+        "inspection.pen-landed",
+        "inspection.pen-landed-plain",
         "inspection.search",
         "inspection.find-pig",
         "inspection.search-none"
@@ -148,7 +150,12 @@
     [
       "inspection.walk",
       "inspection.go-to-pen",
-      "tap Go to pen"
+      "tap Pen map"
+    ],
+    [
+      "inspection.go-to-pen",
+      "inspection.pen-landed",
+      "tap a pen"
     ],
     [
       "inspection.walk",
@@ -469,12 +476,12 @@
           },
           {
             "name": "Dock",
-            "shows": "Go to pen, Scan ear tag, Search; or the selection",
+            "shows": "Pen map, Scan ear tag, Search; or the selection",
             "states": [
               {
                 "state": "Nothing selected",
                 "when": "No pig or pen ticked",
-                "shows": "Go to pen (shows \"Pens\" until the list is scrolled, then the pen at the top), Scan ear tag, Search"
+                "shows": "Pen map (a framed button: the grid icon and \"Pen map\", as Farrowing's room), Scan ear tag, Search"
               },
               {
                 "state": "Selection",
@@ -517,7 +524,7 @@
           "Finish walk (raw)",
           "Check in again (raw)",
           "Last check-in (raw)",
-          "Go to pen (raw)",
+          "Pen map (raw)",
           "Scan ear tag (raw)",
           "No pigs match (raw)"
         ],
@@ -838,72 +845,124 @@
     },
     {
       "id": "inspection.go-to-pen",
-      "name": "Go to pen (pen map)",
-      "zh": "前往栏位",
+      "name": "Pen map",
+      "zh": "栏位图",
       "status": "in-design",
       "url": "/ux/system/inspection-astra-concept.html?layout=focus",
       "preset": "walk",
       "steps": [
-        "[data-action=\"grid\"]"
+        ".dock-map"
       ],
       "figma": "",
       "notes": {
-        "purpose": "Jump to a pen on the list by its place in the unit.",
+        "purpose": "Jump to a pen by where it is, not by scrolling the walk: a map of the unit, one tile per pen, coloured by the pigs the walk list shows in it. It is the design system's PenMap, as Farrowing's Pen map; drawn as seen from the door, pen 1 nearest the entrance, at the top.",
         "elements": [
           {
-            "name": "Pen cell",
-            "shows": "C1 · 2 health",
+            "name": "Colour key",
+            "at": "needs you",
+            "shows": "The sheet's header line, under the title: the count of pens that need the worker, with the amber swatch (\"1 needs you\", \"2 need you\").",
             "states": [
               {
-                "state": "Pen with conditions",
-                "when": "Pigs with any condition, ongoing included",
-                "shows": "\"N health\""
+                "state": "Pens need the worker",
+                "when": "At least one pen is amber under the current lens and filter",
+                "shows": "\"1 needs you\" / \"N need you\""
               },
               {
-                "state": "Pen without conditions",
-                "when": "None",
-                "shows": "\"N pigs\""
-              },
-              {
-                "state": "Disabled",
-                "when": "Pen not in unit or no pig matches the filter",
-                "shows": "\"Not in unit\" / \"No matches\""
-              },
-              {
-                "state": "Current pen",
-                "when": "It is at the top of the list",
-                "shows": "Outlined cell"
-              },
-              {
-                "state": "Filtered view",
-                "when": "A filter is on",
-                "shows": "Counts and \"No matches\" use only the pigs the filter shows"
-              },
-              {
-                "state": "Peek preview",
-                "when": "Hold 350 ms",
-                "shows": "Pen id and pigs, \"N pigs in this view\" when filtered, feed line, \"Formula change due\", up to 3 pigs with conditions then \"+N more pigs with health findings\", manual-feed count, \"Pen note available\""
+                "state": "None",
+                "when": "No pen is amber",
+                "shows": "no header line; the Entrance band is the first thing in the body"
               }
             ],
-            "rule": "Holding a cell 350 ms shows a preview (pig count, feed, conditions, manual-feed pigs, note) without navigating, same as farrowing. Tapping scrolls the list so the pen sits under the sticky controls.",
-            "logic": "Same four-column, six-row map as farrowing; positions are sample positions, not the real layout.",
-            "at": "2 health"
+            "logic": "Counts pens, not pigs. Inspection has no in-progress level, so the key never has a blue item."
+          },
+          {
+            "name": "Pen tile",
+            "at": "C2",
+            "shows": "The pen code and nothing else. The tile's colour is the pen's status.",
+            "states": [
+              {
+                "state": "Needs you",
+                "when": "A pig the walk shows in the pen, or its group of pigs without tags, carries an act-now tag (Treat in place, Hospital pen, a reportable disease: the red \"!\" tag)",
+                "shows": "amber fill, dark amber code, no border"
+              },
+              {
+                "state": "Has pigs",
+                "when": "Shown pigs, none at act now (Monitor, ongoing, or no condition)",
+                "shows": "white, ink code, 1px line"
+              },
+              {
+                "state": "Empty",
+                "when": "No pen there, or no pigs in it",
+                "shows": "quiet tile on the well, muted code, disabled"
+              },
+              {
+                "state": "No pigs match",
+                "when": "The pen has pigs but the lens or the filter hides them all",
+                "shows": "the empty face, disabled (screen reader: no pigs match)"
+              }
+            ],
+            "logic": "A pen takes the loudest level among the rows the walk list shows in it (budget.md, the mapping table): the same levels as the roster's condition tags (rowConditionTags). A pen the walk has been through and one it has not take the same face: the walk is checked in as a unit, and a pen with nothing to record leaves no trace, so a checked mark would call a healthy pen unchecked.",
+            "rule": "Tap: the list settles on the pen under the map, the map slides away and the pen's header takes the tile's amber (a white tile: a 2px ink ring on the pen card), held and faded within 1.6 s. Hold 350 ms for a peek. Empty and no-match tiles cannot be opened. The map opens scrolled to the pen at the top of the walk list.",
+            "source": "inspection-astra-concept.js penMapSheet(), penLevels(); ux/design-system/components/PenMap/README.md"
+          },
+          {
+            "name": "Peek",
+            "at": "C2",
+            "shows": "The pen code and its pig count, then the pen's rows as the walk draws them (ID over the stage line, condition tags; the group of pigs without tags after the struck tag), the most urgent first, at most four, then \"+N more\".",
+            "rule": "Hold a tile 350 ms; read-only. Moving more than 12 px, scrolling or lifting hides it; the tap after a peek only closes it."
           }
         ],
         "controls": [],
         "copy": [
-          "Go to pen (raw)",
-          "Tap a pen to go to its pigs. Hold to peek. (raw)"
+          "Pen map (raw)",
+          "needs you (raw)",
+          "Entrance (raw)"
         ],
         "edge": [
-          "The filter stays on; a pen with no matching pig cannot be opened."
+          "The lens and the filter stay on: a pen whose pigs they hide is drawn empty and cannot be opened; the walk list gives the way back (another lens, or Clear)."
         ],
         "issues": [
-          "\"N health\" counts ongoing conditions and reads like a pig count.",
-          "The peek preview has a fault line that is never filled.",
-          "Long-press may be unsuitable on mobile (audit).",
-          "The peek feed line labels a pen of unknown feeding mode as \"Ad-lib\"."
+          "Same four-column, six-row layout as Farrowing's; the positions are sample positions, not the unit's real layout."
         ]
+      }
+    },
+    {
+      "id": "inspection.pen-landed",
+      "holds": [
+        "st-pen-land-act",
+        "st-pen-land-act-ink"
+      ],
+      "name": "Landed on a pen · needs you",
+      "zh": "落到栏位 · 需处理",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "walk",
+      "steps": [
+        ".dock-map",
+        "[data-ds=\"PenMap\"] button[data-value=\"C2\"]"
+      ],
+      "figma": "",
+      "notes": {
+        "purpose": "The walk the moment after pen C2 is tapped on the Pen map, at the landing cue's held frame (PenMap README, Landing on the pen): the pen's header takes the tapped tile's amber fill. On the phone it holds for land-hold (900ms) and fades over land-fade (700ms); the atlas shows the held frame so the gate can judge it."
+      }
+    },
+    {
+      "id": "inspection.pen-landed-plain",
+      "holds": [
+        "st-pen-land-ring"
+      ],
+      "name": "Landed on a pen · has pigs",
+      "zh": "落到栏位 · 有猪",
+      "status": "in-design",
+      "url": "/ux/system/inspection-astra-concept.html?layout=focus",
+      "preset": "walk",
+      "steps": [
+        ".dock-map",
+        "[data-ds=\"PenMap\"] button[data-value=\"C1\"]"
+      ],
+      "figma": "",
+      "notes": {
+        "purpose": "The walk the moment after pen C1 is tapped on the Pen map, at the landing cue's held frame: a white tile has no fill to carry, so the pen card takes a 2px ink ring drawn just inside its edge. On the phone it holds for land-hold (900ms) and fades over land-fade (700ms); the atlas shows the held frame so the gate can judge it."
       }
     },
     {
