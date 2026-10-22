@@ -295,19 +295,23 @@ export function variantCalls(html) {
 // Which component pages a shared change keeps, and the exports it touches. touched: the exports the bundle graph says may behave
 // differently (change: bundleChange's answer, null when the bundle is untouched) and those that draw a component whose folder it
 // edits (stamps: exportStamps). keepPage(id): a touched component's page always; any page when a design-system input other than
-// the bundle's JS changed (CSS, tokens, the atlas's code, the strings: no proof of which parts they draw) or the bundle can't be
-// narrowed; otherwise a page whose variant calls a touched export, or whose calls can't be bounded (readVariant: its html or null).
-export function componentScope({ files, change = null, stamps = new Map(), readVariant = () => null }) {
-  const BUNDLE = 'ux/design-system/components/bundle.js';
+// the bundle's JS and CSS changed (tokens, the atlas's code, the strings: no proof of which parts they draw) or the bundle can't be
+// narrowed; otherwise a page whose variant calls a touched export, or whose calls can't be bounded (readVariant: its html or null),
+// or one a changed bundle.css rule may style (css: { change: css-reach.mjs cssChange's answer, mayStyle(component, variant) }; a
+// CSS edit without it, or one cssChange can't narrow, keeps every page).
+export function componentScope({ files, change = null, stamps = new Map(), readVariant = () => null, css = null }) {
+  const BUNDLE = 'ux/design-system/components/bundle.js', BUNDLE_CSS = 'ux/design-system/components/bundle.css';
   const own = componentsTouched(files);
   const touched = new Set([...(change && !change.all ? change.exports : []), ...[...stamps].filter(([, st]) => st.some((c) => own.includes(c))).map(([e]) => e)]);
   const dsInputs = files.filter((f) => /^(atlas|ux\/design-system|ux\/laws|vendor|review)\//.test(f) && f !== 'atlas/atlas.json' && !/^ux\/design-system\/components\/[A-Z][^/]*\//.test(f));
-  const narrow = !(change && change.all) && dsInputs.every((f) => f === BUNDLE);
+  const styled = files.includes(BUNDLE_CSS), cssNarrow = !!css?.change && !css.change.all;
+  const narrow = !(change && change.all) && dsInputs.every((f) => f === BUNDLE || (f === BUNDLE_CSS && cssNarrow));
   const keepPage = (id) => {
     const p = componentPage(id);
     if (!p || !narrow || own.includes(p.component)) return true;
     const html = readVariant(p.component, p.variant), calls = html == null ? null : variantCalls(html);
-    return calls === null || calls.some((c) => touched.has(c));
+    if (calls === null || calls.some((c) => touched.has(c))) return true;
+    return styled && css.mayStyle(p.component, p.variant) !== false;
   };
   return { touched, keepPage, narrow };
 }

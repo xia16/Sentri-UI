@@ -39,7 +39,7 @@ Taken from the research notes and the code:
 - There is no feed tag on a pig row. A trough pen can't feed one pig, so feed is read and changed at the pen (the pen header keeps its feed summary).
 - The row is the design system's Row · animal (select + door), with the compact ConditionTag.
 - Home opens this page through the "Inspect unit" card with the unit kept in the link; Back returns to Home with the unit.
-- Pen map copies Farrowing's four-column, six-row map and 350 ms hold-to-peek.
+- Pen map is the design system's PenMap, as Farrowing's (2026-10-22): the framed Pen map button in the dock, tiles coloured by the walk's row levels (amber for a pig at act now, never blue), the peek with the walk's rows, and the colour-carries-over landing. A pen the walk has been through and one it has not look the same: there is no per-pen check (budget.md, Pen map).
 
 Open (recorded on the screens as issues):
 

@@ -823,7 +823,8 @@ export interface PenMapProps {
   peek?: (pen: string) => string;
   className?: string;
 }
-export interface PenPeekProps { title?: string; meta?: string; rows?: RowProps[] }
+/** more: one quiet line after the rows when a pen has more than the card shows ("+12 more"). */
+export interface PenPeekProps { title?: string; meta?: string; rows?: RowProps[]; more?: string }
 export interface PenMapFooterProps { back?: { action?: string; value?: string; label?: SheetText }; depth?: number; rangeSize?: number; label?: string }
 export interface SentriUI {
   penMap(props?: PenMapProps): string;
