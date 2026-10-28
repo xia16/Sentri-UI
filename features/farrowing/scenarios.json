@@ -1177,12 +1177,29 @@
              "is": "enabled",
              "says": "Save is the primary",
              "hard": "dead-end"
+            },
+            {
+             "el": "[data-action='lock']",
+             "is": "absent",
+             "says": "no lock to hold while the visit waits",
+             "hard": "broken-ruling"
+            },
+            {
+             "text": "Not saved yet",
+             "in": "sheet",
+             "says": "the card says the visit waits",
+             "hard": "lost-draft"
             }
            ],
            "record": [
             {
-             "expr": "s.locked === false && s.deathDraft[2] === 1",
-             "says": "not locked, the draft still there",
+             "expr": "s.locked === false",
+             "says": "not locked",
+             "hard": "broken-ruling"
+            },
+            {
+             "expr": "s.deathDraft[2] === 1",
+             "says": "the draft is still there",
              "hard": "lost-draft"
             }
            ]
