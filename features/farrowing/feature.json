@@ -21,6 +21,8 @@
         "name": "Farrowing",
         "screens": [
           "farrowing.count",
+          "farrowing.count-draft",
+          "farrowing.litter",
           "farrowing.death",
           "farrowing.finish",
           "farrowing.leave-edit",
@@ -183,23 +185,13 @@
     ],
     [
       "farrowing.before",
-      "farrowing.count",
-      "tap + (first piglet)"
-    ],
-    [
-      "farrowing.before",
       "farrowing.death",
-      "Record death"
+      "Report death"
     ],
     [
       "farrowing.before",
       "farrowing.room",
       "Back"
-    ],
-    [
-      "farrowing.count",
-      "farrowing.before",
-      "tap - back to zero"
     ],
     [
       "farrowing.count",
@@ -214,17 +206,7 @@
     [
       "farrowing.count",
       "farrowing.death",
-      "Record death"
-    ],
-    [
-      "farrowing.count",
-      "farrowing.edit",
-      "Edit"
-    ],
-    [
-      "farrowing.count",
-      "farrowing.history",
-      "View log"
+      "Report death"
     ],
     [
       "farrowing.finish",
@@ -238,8 +220,8 @@
     ],
     [
       "farrowing.death",
-      "farrowing.count",
-      "Save, or Back (keeps the draft)"
+      "farrowing.count-draft",
+      "Done (the counts join the visit, not saved)"
     ],
     [
       "farrowing.death",
@@ -750,6 +732,46 @@
       "farrowing.room",
       "farrowing.locked",
       "tap an Aborted row (a live piglet remains)"
+    ],
+    [
+      "farrowing.before",
+      "farrowing.count-draft",
+      "tap + on Born alive"
+    ],
+    [
+      "farrowing.count",
+      "farrowing.count-draft",
+      "tap + on Born alive"
+    ],
+    [
+      "farrowing.count-draft",
+      "farrowing.count",
+      "Save, or Clear"
+    ],
+    [
+      "farrowing.count-draft",
+      "farrowing.death",
+      "Report death"
+    ],
+    [
+      "farrowing.count",
+      "farrowing.litter",
+      "tap the Alive card"
+    ],
+    [
+      "farrowing.litter",
+      "farrowing.edit",
+      "Edit record"
+    ],
+    [
+      "farrowing.litter",
+      "farrowing.history",
+      "Farrowing log"
+    ],
+    [
+      "farrowing.litter",
+      "farrowing.count",
+      "Back"
     ]
   ],
   "screens": [
@@ -1020,162 +1042,107 @@
       "preset": "count",
       "figma": "",
       "notes": {
-        "purpose": "Keep the live count while she farrows: one big Alive number whose + and − save at once, with the litter so far.",
+        "purpose": "Count her litter while she farrows: alive now as one figure, Born alive taps and deaths held as this visit's draft until Save (owner, 2026-10-23).",
         "states": [
-          "Death draft waiting (kept with Back): Finish farrowing shows its waiting look and takes the worker back to the Record dead draft; no blocked sheet (owner decision 2026-10-10)",
-          "Visit with nothing changed: receipt reads just \"Saved\""
+          "Nothing entered: the card's right side is the quiet last-save line (\"Saved Aug 26 08:20\", or \"✓ Saved\" right after a Save); the bar is Back · Finish farrowing · ···",
+          "A visit entered: see Counting · not saved yet (farrowing.count-draft)"
         ],
         "elements": [
           {
-            "name": "Alive stepper",
-            "shows": "Large − and + keys around the Alive number (not typeable).",
-            "states": [
-              {
-                "state": "Above the floor",
-                "when": "Alive is more than anchor − dead recorded",
-                "shows": "− and + both live; each tap changes Alive and the open visit and is saved at once"
-              },
-              {
-                "state": "At the floor",
-                "when": "Alive equals the floor (sample 10 − 5 = 5)",
-                "shows": "− is greyed (aria-disabled); a tap writes nothing and shows the pointer text for 4 s in place of the receipt"
-              },
-              {
-                "state": "Zero",
-                "when": "Alive is 0 and no events",
-                "shows": "Number is grey; she reads as Before first count"
-              }
-            ],
-            "logic": "Alive = posted + this visit. + is always allowed; the first + makes an Awaiting sow Active. Recording a death lowers the floor, so − becomes possible again. Counting down to zero makes her Awaiting again.",
-            "source": "farrowing-astra-concept.js act(\"alive\"), floor()",
-            "at": "Alive"
+            "name": "Alive card",
+            "at": "Alive",
+            "shows": "\"Alive\", Details › top right, alive now as a 64px figure, the last-save line at its right.",
+            "logic": "Alive now = saved Alive + Born alive drafted − died after birth drafted. Born dead never lowers it. The card keeps one height in every state, so the drawer never jumps.",
+            "source": "farrowing-astra-concept.js aliveCard()"
           },
           {
-            "name": "Receipt",
-            "shows": "Status line under the number.",
-            "states": [
-              {
-                "state": "Saved",
-                "when": "Visit changed nothing",
-                "shows": "\"Saved\""
-              },
-              {
-                "state": "Added",
-                "when": "Net + this visit",
-                "shows": "\"Saved · +4 this visit\""
-              },
-              {
-                "state": "Removed",
-                "when": "Net − this visit",
-                "shows": "\"Saved · 2 died this visit\""
-              },
-              {
-                "state": "Pointer",
-                "when": "A greyed − was tapped, for 4 s",
-                "shows": "\"Use Record dead for deaths. Use Edit for corrections.\""
-              }
-            ],
-            "logic": "The visit folds into one log line (\"+4 alive\") when the sheet is left by any exit.",
-            "source": "farrowing-astra-concept.js receipt(), fold()",
-            "at": "Saved"
+            "name": "Born alive",
+            "at": "Born alive",
+            "shows": "The count Stepper: − n + for the piglets born alive this visit, from 0.",
+            "logic": "Each tap changes the draft only; nothing is saved until Save. − stops at 0.",
+            "source": "farrowing-astra-concept.js act(\"bornAlive\")"
           },
           {
-            "name": "Litter summary",
-            "shows": "Born and Dead figures, the causes line and View log.",
-            "states": [
-              {
-                "state": "Deaths recorded",
-                "when": "Dead above zero",
-                "shows": "One chip per type with a non-zero count: Stillborn 1 · Mummified 1 · Crushed 2 · Other 1"
-              },
-              {
-                "state": "No deaths",
-                "when": "Dead is 0",
-                "shows": "Causes line is hidden"
-              },
-              {
-                "state": "No events",
-                "when": "Nothing recorded and no pending count",
-                "shows": "View log is disabled"
-              }
-            ],
-            "logic": "Born = Alive + all dead (derived, never typed). Dead = sum of the six types.",
-            "source": "farrowing-astra-concept.js born(), causes(), litterHeading()",
-            "at": "Litter summary"
+            "name": "Report death",
+            "at": "Report death",
+            "shows": "One outlined tool button under the stepper.",
+            "logic": "Opens Report death, a level of this drawer (farrowing.death).",
+            "source": "farrowing-astra-concept.js count()"
           },
           {
-            "name": "Edit · Record death",
-            "shows": "Two of the three quick actions (the third is More actions).",
-            "states": [
-              {
-                "state": "Edit disabled",
-                "when": "Nothing posted: no events and Born is 0",
-                "shows": "Greyed"
-              },
-              {
-                "state": "Record death with draft",
-                "when": "A piglet death draft exists",
-                "shows": "\"N unsaved\" in small text under the label while a draft is open (Back keeps the draft, and a reload keeps it for the session)"
-              }
-            ],
-            "source": "farrowing-astra-concept.js recordActions()",
-            "at": "Record death"
-          },
-          {
-            "name": "Finish farrowing",
-            "shows": "Primary button in the bar.",
-            "states": [
-              {
-                "state": "Disabled",
-                "when": "Born is 0",
-                "shows": "Greyed"
-              },
-              {
-                "state": "Enabled",
-                "when": "Born above zero",
-                "shows": "Opens the Finish sheet. While piglet deaths are drafted the button is in its waiting look and tapping it opens the Record dead sheet with the draft, so the deaths are saved first (owner decision 2026-10-10)"
-              }
-            ],
-            "source": "farrowing-astra-concept.js count()",
-            "at": "Finish farrowing"
+            "name": "Bar",
+            "at": "Finish farrowing",
+            "shows": "Back · Finish farrowing · ··· (the sow's actions).",
+            "logic": "Finish farrowing is disabled while Born is 0 and is only offered with no draft. ··· opens her actions.",
+            "source": "farrowing-astra-concept.js count()"
           }
         ],
         "controls": [
           {
-            "control": "− / + keys",
-            "does": "each tap is saved at once; − at the floor is refused with the pointer text"
+            "control": "Born alive − / +",
+            "does": "change this visit's draft; Save commits it"
           }
         ],
         "copy": [
-          "(raw) Alive",
-          "(raw) Saved · +N this visit",
-          "(raw) Saved · N died this visit",
-          "(raw) Use Record dead for deaths. Use Edit for corrections.",
-          "(raw) Litter summary · View log",
-          "(raw) Born · Dead",
-          "(raw) Edit · Record death · Actions",
+          "(raw) Alive · Details",
+          "(raw) Saved Aug 26 08:20",
+          "(raw) Born alive",
+          "(raw) Report death",
           "(raw) Back · Finish farrowing"
         ],
         "edge": [
-          "Leaving by any exit folds the visit; reopening shows the folded total",
-          "An Edit draft kept with Back is not lost; Finish then opens blocked"
+          "Closing the drawer keeps the draft on the phone; reopening her finds it"
         ],
         "rules": [
           "\"Born = Alive + Σ Dead … Derived, never entered\" (Model)",
-          "\"The Born floor … + is free; − drains pending and clamps at the floor\" (Model)",
-          "\"The hero numeral is plain … the keys own the input\" (Model)",
-          "\"Type-to-set is retired on count figures\" (Surfaces & entrances)",
-          "\"The hero owns the total; the receipt owns the change\" — \"Saved · +4 this visit\" (Model)",
-          "\"Farrowing starts at the first recorded event — full stop\" (Starting and ending a session)",
-          "\"The exit word is always Back\" (Piglet processing, Round 5)"
+          "A visit is a draft until Save; died after birth lowers Alive, born dead does not (owner, 2026-10-23)"
         ],
-        "issues": [
-          "Four exits for one sheet (X, Back, handle, backdrop); the rulings keep the handle, backdrop and a bar exit but no close button.",
-          "Born and Dead repeat on Finish, the locked record and the log.",
-          "Header lacks the ruled recency stamp and day count; its status word \"Farrowing\" repeats the room chip.",
-          "Pointer text differs from the ruled two-pointer copy and replaces the receipt, so the layout moves; \"Record death\" should read \"Record dead\".",
-          "Minus at the floor is only aria-disabled; whether it looks disabled depends on CSS."
-        ]
+        "issues": []
+      }
+    },
+    {
+      "id": "farrowing.count-draft",
+      "name": "Counting · not saved yet",
+      "zh": "计数 · 未保存",
+      "status": "in-design",
+      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+      "preset": "visit",
+      "figma": "",
+      "notes": {
+        "purpose": "The same drawer with a visit entered and not saved: what this visit changes, and Save.",
+        "elements": [
+          {
+            "name": "Alive card",
+            "at": "Not saved yet",
+            "shows": "\"Alive · Not saved yet\" in amber; the figure is alive after Save; at its right one chip per kind of change: +3 born, −1 died, 1 born dead.",
+            "logic": "Chips: born (sage, the farrow icon), died (red, trend-down), born dead (grey, minus); a kind with nothing entered is left out.",
+            "source": "farrowing-astra-concept.js aliveCard()"
+          },
+          {
+            "name": "Clear",
+            "at": "Clear",
+            "shows": "Top right of the header, only while something is entered.",
+            "logic": "Empties the visit's draft (births, deaths, photos).",
+            "source": "farrowing-astra-concept.js act(\"clearVisit\")"
+          },
+          {
+            "name": "Save",
+            "at": "Save",
+            "shows": "Back · Save in the bar.",
+            "logic": "Save adds the births to Alive, takes died after birth off it, adds every death to Dead, and writes one log line (\"+3 born alive · 1 stillborn · 1 crushed\"). The card then reads ✓ Saved.",
+            "source": "farrowing-astra-concept.js act(\"saveVisit\")"
+          }
+        ],
+        "copy": [
+          "(raw) Alive · Not saved yet",
+          "(raw) +3 born · −1 died · 1 born dead",
+          "(raw) Clear",
+          "(raw) Back · Save"
+        ],
+        "edge": [
+          "Back closes the drawer and keeps the draft"
+        ],
+        "issues": []
       }
     },
     {
@@ -1288,155 +1255,92 @@
     },
     {
       "id": "farrowing.death",
-      "name": "Death entry",
+      "name": "Report death",
       "zh": "死亡登记",
       "status": "in-design",
       "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
       "preset": "draft",
       "figma": "",
       "notes": {
-        "purpose": "The one dead drawer: tally piglets born dead or died by cause, or record the sow's own death, with optional photos riding the save.",
+        "purpose": "Report deaths while she farrows, as a level of her drawer: what died, then how many by cause. The counts join this visit's draft; the sow's own death is recorded here too.",
         "states": [
-          "Photo dialog over the drawer (tap a thumbnail): Back, Delete",
-          "Opened from Before first count, Finish, the locked record or the ended record: same drawer, returns to where it was opened"
+          "After Finish or after the sow died: the earlier Record dead drawer (all six causes, saved straight away), unchanged"
         ],
         "elements": [
           {
-            "name": "Type rows",
-            "shows": "Stillborn · Mummified · Crushed · Scours · Starve-out · Other, each with − n +.",
-            "states": [
-              {
-                "state": "Before finish",
-                "when": "Litter not locked",
-                "shows": "+ has no limit; deaths raise Born, never Alive"
-              },
-              {
-                "state": "After finish",
-                "when": "Litter locked",
-                "shows": "+ stops when drafted deaths equal Alive now; saving lowers Alive now"
-              }
-            ],
-            "logic": "Value = saved total + this draft (\"+1 unsaved\" in muted ink beside the label). − only undoes the draft and is disabled at 0 draft. Clear (top right of the header) appears only while something is drafted.",
-            "source": "farrowing-astra-concept.js death(), act(\"deadStep\")",
-            "at": "Crushed"
+            "name": "What died",
+            "at": "Died after birth",
+            "shows": "TaskChoice, three tiles: Born dead · Died after birth · The sow (not offered once she has died).",
+            "logic": "Opens on Died after birth, or Born dead when only born-dead counts are drafted.",
+            "source": "farrowing-astra-concept.js reportDeath(), act(\"deathGroup\")"
           },
           {
-            "name": "Piglets | The sow",
-            "shows": "Two-way switch at the top of the body, 24px above the first cause row (or the sow's Cause).",
-            "states": [
-              {
-                "state": "Both",
-                "when": "Sow still alive",
-                "shows": "Piglets and The sow"
-              },
-              {
-                "state": "Piglets only",
-                "when": "Sow already died",
-                "shows": "The sow segment is not offered"
-              }
-            ],
-            "source": "SentriUI.segment; death()",
-            "at": "The sow"
+            "name": "Causes",
+            "at": "Crushed",
+            "shows": "Born dead: Stillborn, Mummified. Died after birth: Crushed, Scours, Starve-out, Other. Each a Stepper from 0.",
+            "logic": "Died after birth stops when it would take Alive below 0 (saved Alive + born drafted).",
+            "source": "farrowing-astra-concept.js act(\"deadStep\")"
           },
           {
             "name": "The sow",
-            "shows": "Radio causes Farrowing · Prolapse · Found dead · Other, a red band and a hold-to-save bar.",
-            "states": [
-              {
-                "state": "No cause",
-                "when": "Nothing chosen",
-                "shows": "Save disabled"
-              },
-              {
-                "state": "Draft waiting",
-                "when": "A piglet draft or an Edit draft exists",
-                "shows": "Band adds \"Save or clear the pending piglet deaths / correction before ending\" with Review; Save disabled"
-              },
-              {
-                "state": "Ready",
-                "when": "Cause chosen, no draft",
-                "shows": "Save enabled; \"Other\" adds an optional Details row (the same full-width face as Photos)"
-              }
-            ],
-            "rule": "Saving is a 0.85 s hold: ends farrowing, freezes Born, writes \"Sow died · cause\". Band always reads \"Saving ends farrowing · 7 alive stay under piglet care\" (current Alive).",
-            "source": "farrowing-astra-concept.js death(), act(\"saveDeath\")",
-            "at": "The sow"
+            "at": "The sow",
+            "shows": "Cause radios, Photos, the red \"Saving ends farrowing\" band and a hold to record.",
+            "logic": "Unchanged: the hold ends farrowing; it waits while piglet counts or a correction are drafted.",
+            "source": "farrowing-astra-concept.js act(\"saveDeath\")"
           },
           {
-            "name": "Photos",
-            "shows": "The optional photo row, always shown last in capture order and whole on the first frame: full width, \"Photos\" with the muted \"Optional\" and an outlined camera at the right; with photos, \"N attached\" under the label and the thumbnails below.",
-            "source": "farrowing-astra-concept.js death() photo-field",
-            "at": "Photos",
-            "states": [
-              {
-                "state": "Waiting",
-                "when": "No death drafted (Piglets) or no cause chosen (The sow)",
-                "shows": "The camera's outline is dashed; no line under the row. A tap shows \"Record a death first · photos ride that record\" in the row's hint line for a few seconds (the screen reader hears it as the row's description) and opens no camera"
-              },
-              {
-                "state": "Ready",
-                "when": "A death drafted or a cause chosen",
-                "shows": "No hint; a tap opens the camera"
-              },
-              {
-                "state": "With photos",
-                "when": "One or more photos taken (12 at most)",
-                "shows": "\"N attached\" under the label, thumbnails below (the body scrolls); a thumbnail opens the photo with Back and Delete"
-              }
-            ],
-            "rule": "Photos ride the save; Clear drops them with the draft."
-          },
-          {
-            "name": "Save and Back",
-            "shows": "Bar.",
-            "rule": "Save (piglets) adds the draft to the dead types and writes one log line such as \"+3 crushed · +1 other\". Back keeps the draft; only Clear discards it (and any sow cause); the ruling says they should keep it.",
-            "source": "farrowing-astra-concept.js act(\"saveDeath\"), act(\"back\")",
-            "at": "Save"
-          }
-        ],
-        "controls": [
-          {
-            "control": "Save (piglets)",
-            "does": "commits the deaths and returns to the screen it was opened from",
-            "goesTo": "farrowing.count"
-          },
-          {
-            "control": "Save · hold (the sow)",
-            "does": "ends farrowing with her death",
-            "goesTo": "farrowing.ended"
-          },
-          {
-            "control": "Review (inside the sow band)",
-            "does": "goes back to Piglets mode or to Edit to resolve the draft",
-            "goesTo": "farrowing.edit"
+            "name": "Bar",
+            "at": "Done",
+            "shows": "Back · Done; Clear top right while counts are entered.",
+            "logic": "Done takes the counts to the visit's draft and returns to the record (still not saved). Back returns without what this level entered.",
+            "source": "farrowing-astra-concept.js act(\"doneDeath\")"
           }
         ],
         "copy": [
-          "(raw) Piglets · The sow",
-          "(raw) Stillborn · Mummified · Crushed · Scours · Starve-out · Other",
-          "(raw) Photos · Record a death first · photos ride that record",
-          "(raw) Farrowing · Prolapse · Found dead · Other",
-          "(raw) Saving ends farrowing · N alive stay under piglet care",
-          "(raw) Back · Save · HOLD TO SAVE"
+          "(raw) Report death",
+          "(raw) Born dead · Died after birth · The sow",
+          "(raw) Back · Done"
         ],
         "edge": [
-          "Sow cannot be saved dead twice: sow mode disappears once ended",
-          "A piglet draft or an Edit draft blocks saving the sow's death",
-          "The drawer is held 56px under the phone's top so the causes, the optional rows and the sow's banner are whole on the first frame in every state at 390 and 360; opening Details scrolls the banner back into view; thumbnails scroll."
+          "A draft kept on the record reopens here with its counts"
         ],
-        "rules": [
-          "\"ONE dead drawer product-wide\" (Surfaces & entrances)",
-          "\"Dead: five default types — stillborn · mummified · crushed · scours · starve-out — plus Other\" (Model)",
-          "\"Stillborn entry stays in the drawer — no sheet shortcut\" (Surfaces & entrances)",
-          "\"Sow dies mid-farrowing … Piglets · The sow\" and \"Saving the sow's death is hold-to-commit\" (Starting and ending a session)",
-          "\"Photos are optional on both drawer modes\" (Starting and ending a session)",
-          "\"No WHEN anywhere, absolutely\" (Model)",
-          "Sheet title names the job (\"Record dead\"), subtitle the animal (\"<ID> · <pen>\") (Owner decision 2026-10-10)."
+        "issues": []
+      }
+    },
+    {
+      "id": "farrowing.litter",
+      "name": "Litter details",
+      "zh": "窝详情",
+      "status": "in-design",
+      "url": "/ux/system/farrowing-astra-concept.html?layout=focus",
+      "preset": "litter",
+      "figma": "",
+      "notes": {
+        "purpose": "The saved litter in full, one tap from the Alive card: the totals, every line, and the doors to correct it or read its log.",
+        "elements": [
+          {
+            "name": "Litter",
+            "at": "Total born",
+            "shows": "The finished record's facts card: Total born · Dead · Alive as figures, then the six causes three across; a cause with none reads –.",
+            "logic": "Total born = Alive + Dead (+ moved).",
+            "source": "farrowing-astra-concept.js litter()"
+          },
+          {
+            "name": "Doors",
+            "at": "Edit record",
+            "shows": "Edit record › and Farrowing log ›.",
+            "logic": "Edit record opens the correction drawer; its Back returns here.",
+            "source": "farrowing-astra-concept.js litter()"
+          }
         ],
-        "issues": [
-          "Back keeps the draft, as the ruling says; Finish has no banner.",
-          "No sow id or pen is shown; the worker cannot see which sow is being recorded."
-        ]
+        "copy": [
+          "(raw) Litter details",
+          "(raw) Total born · Dead · Alive",
+          "(raw) Stillborn · Mummified · Crushed · Scours · Starve-out · Other",
+          "(raw) Edit record · Farrowing log"
+        ],
+        "edge": [],
+        "issues": []
       }
     },
     {
