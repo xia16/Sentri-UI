@@ -747,3 +747,41 @@ Inspection's walk pen card, computed: no shadow, header `#f8faf5` over a `#e8edd
 ## Self-crit
 
 - **Better because** each pen reads as one bordered box, as on Inspection, and the law's no-shadow holds; the spacing audit is clean on all 364 screens.
+
+# Counting: a visit is a draft until Save (2026-10-28), critique
+
+Scope: the sow's record while she farrows (Counting, Report death) and the new Litter details. Baselined on `origin/main` at `f66affd` by walking the drawer at 390 and 360; the design is the owner's v17 prototype (2026-10-23).
+
+## Keep
+
+- The drawer, its header (Farrowing record, the route line), the Stepper count face and its 56px footer.
+- Record dead after Finish and after the sow died, and the sow's own death (cause, photos, the hold).
+
+## Problems
+
+- **major** · Alive auto-saved on every tap: a mis-tap was a saved record, and − was refused at a floor the worker could not see.
+- **major** · A death raised Born instead of lowering Alive; a crushed piglet left Alive unchanged.
+- **major** · Edit, Record dead and Actions were three equal buttons in the body, so the correction door was as loud as counting.
+
+## Attention budget
+
+First: alive now (the figure). Second: what this visit changes, until Save (the chips). Then the two acts: Born alive, Report death. Total born, dead and the causes move to Litter details; the log and Edit record go with them.
+
+## House pattern
+
+Foster piglets' TaskChoice (two or three big tiles that change the form below) for what died; the Stepper count face for Born alive; the finished record's facts card for Litter details.
+
+## Parts
+
+| Part | Drawn by | Keep / fix / cut |
+|---|---|---|
+| Alive card | `.alive-card` in bundle.css | **new** (v17) |
+| Born alive | SentriUI.stepper count | keep |
+| What died | SentriTask.choice | keep |
+| Litter details | SentriUI.facts in a panel, Row doors | keep |
+| Litter summary, receipt, quick actions on Counting | | **cut** |
+
+## Self-crit
+
+- **Better because** nothing is saved by accident, Alive always means alive now, and a death never inflates Born.
+- Before first count still shows Alive 0; the due card and Start farrowing are the next PR.

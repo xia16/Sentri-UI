@@ -580,19 +580,20 @@
       {
        "type": "action",
        "id": "counting.awaiting.plus",
-       "label": "tap + once",
+       "label": "tap + on Born alive, then Save",
        "taps": [
-        "[data-action='alive'][data-value='1']"
+        "[data-action='bornAlive'][data-value='1']",
+        "[data-action='saveVisit']"
        ],
        "children": [
         {
          "type": "outcome",
          "id": "fa-a1-first-piglet-starts-farrowing",
          "tree": "A-1",
-         "label": "The first + makes her Farrowing; nothing else to press",
+         "label": "The first saved birth makes her Farrowing; nothing else to press",
          "gwt": {
           "given": "Sow 000455 is open on her Awaiting face, with nothing recorded.",
-          "when": "The worker taps + once.",
+          "when": "The worker taps + once on Born alive and taps Save.",
           "then": "She is now Farrowing and the count shows 1 alive and 1 born. There is nothing else to press to start."
          },
          "authority": [
@@ -600,6 +601,11 @@
            "src": "RUL",
            "at": "Starting and ending a session",
            "says": "Farrowing starts at the first recorded event — full stop."
+          },
+          {
+           "src": "PRD",
+           "at": "Decisions · owner decisions 2026-10-23 (Counting)",
+           "says": "A visit is a draft until Save; died after birth lowers Alive, born dead does not; Report death is a level with Back · Done"
           }
          ],
          "visible": [
@@ -615,44 +621,51 @@
            "hard": "wrong-fact"
           }
          ]
-        },
+        }
+       ]
+      },
+      {
+       "type": "action",
+       "id": "counting.awaiting.plus-minus",
+       "label": "tap + then − on Born alive (nothing saved)",
+       "taps": [
+        "[data-action='bornAlive'][data-value='1']",
+        "[data-action='bornAlive'][data-value='-1']"
+       ],
+       "children": [
         {
-         "type": "action",
-         "id": "counting.awaiting.plus-minus",
-         "label": "then − once",
-         "taps": [
-          "[data-action='alive'][data-value='-1']"
-         ],
-         "children": [
+         "type": "outcome",
+         "id": "fa-a2-recount-to-zero-reads-awaiting",
+         "tree": "A-2",
+         "label": "A + taken back before Save leaves her Awaiting, nothing recorded",
+         "gwt": {
+          "given": "Sow 000455 is Awaiting, with nothing recorded.",
+          "when": "The worker taps + on Born alive, then −, and saves nothing.",
+          "then": "Nothing was recorded: she reads Awaiting with born zero and an empty log."
+         },
+         "authority": [
           {
-           "type": "outcome",
-           "id": "fa-a2-recount-to-zero-reads-awaiting",
-           "tree": "A-2",
-           "label": "A stray + undone reads Awaiting again",
-           "gwt": {
-            "given": "Sow 000455 is Awaiting, with nothing recorded.",
-            "when": "The worker taps + once, then taps − once.",
-            "then": "She reads Awaiting again, with born back at zero."
-           },
-           "authority": [
-            {
-             "src": "RUL",
-             "at": "Starting and ending a session",
-             "says": "registers derive from the live total (posted + open pending)"
-            }
-           ],
-           "visible": [
-            {
-             "screen": "farrowing.before",
-             "hard": "wrong-fact"
-            }
-           ],
-           "record": [
-            {
-             "expr": "F.born(s) === 0",
-             "hard": "wrong-fact"
-            }
-           ]
+           "src": "RUL",
+           "at": "Starting and ending a session",
+           "says": "registers derive from the live total (posted + open pending)"
+          },
+          {
+           "src": "PRD",
+           "at": "Decisions · owner decisions 2026-10-23 (Counting)",
+           "says": "A visit is a draft until Save; died after birth lowers Alive, born dead does not; Report death is a level with Back · Done"
+          }
+         ],
+         "visible": [
+          {
+           "screen": "farrowing.before",
+           "hard": "wrong-fact"
+          }
+         ],
+         "record": [
+          {
+           "expr": "F.born(s) === 0 && s.events.length === 0 && !s.bornDraft",
+           "says": "born 0, nothing posted, no draft",
+           "hard": "wrong-fact"
           }
          ]
         }
@@ -661,11 +674,13 @@
       {
        "type": "action",
        "id": "counting.awaiting.stillborn",
-       "label": "Record dead, + Stillborn, Save",
+       "label": "Report death, Born dead, + Stillborn, Done, Save",
        "taps": [
         "[data-action='death']",
+        "[data-action='deathGroup'][data-value='bornDead']",
         "[data-action='deadStep'][data-value='0,1']",
-        "[data-action='saveDeath']"
+        "[data-action='doneDeath']",
+        "[data-action='saveVisit']"
        ],
        "children": [
         {
@@ -675,7 +690,7 @@
          "label": "A stillborn can be the first record; she becomes Farrowing",
          "gwt": {
           "given": "Sow 000455 is Awaiting, with nothing recorded.",
-          "when": "The worker opens Record dead, adds one stillborn and saves.",
+          "when": "The worker reports one stillborn (Report death, Born dead) and saves the visit.",
           "then": "She becomes Farrowing. One stillborn is posted and born is 1."
          },
          "authority": [
@@ -706,7 +721,7 @@
     {
      "type": "state",
      "id": "counting.active",
-     "label": "Sow 000418, Farrowing: alive 9, dead 1·1·2·0·0·1, +4 this visit",
+     "label": "Sow 000418, Farrowing: alive 9, dead 1·1·2·0·0·1, nothing entered",
      "tree": "C",
      "reset": {
       "screen": "farrowing.count",
@@ -717,26 +732,27 @@
        "type": "outcome",
        "id": "fa-c1-receipt-says-saved",
        "tree": "C-1",
-       "label": "The receipt says the visit is saved",
+       "label": "The Alive card says when the record was last saved",
        "gwt": {
         "given": "Sow 000418 is Farrowing with 9 alive and 5 dead, and 4 piglets were added in this visit.",
         "when": "The worker looks at the counting sheet.",
-        "then": "The receipt says the visit is saved: +4 this visit, Saved."
+        "then": "The Alive card shows 9 and, at its right, when the record was last saved (Saved Aug 26 08:20)."
        },
        "authority": [
         {
          "src": "RUL",
          "at": "After the lock",
          "says": "Saved · +4 this visit"
+        },
+        {
+         "src": "PRD",
+         "at": "Decisions · owner decisions 2026-10-23 (Counting)",
+         "says": "A visit is a draft until Save; died after birth lowers Alive, born dead does not; Report death is a level with Back · Done"
         }
        ],
        "visible": [
         {
-         "text": "+4 this visit",
-         "in": "sheet"
-        },
-        {
-         "text": "Saved",
+         "text": "Saved Aug 26 08:20",
          "in": "sheet"
         }
        ]
@@ -745,27 +761,22 @@
        "type": "outcome",
        "id": "fa-c2-tool-reads-record-dead",
        "tree": "C-2",
-       "label": "The death tool reads Record dead",
+       "label": "The death tool reads Report death",
        "gwt": {
         "given": "Sow 000418 is Farrowing and her counting sheet is open.",
         "when": "The worker looks for the tool that records deaths.",
-        "then": "It is called Record dead."
+        "then": "It is called Report death."
        },
        "authority": [
         {
-         "src": "RUL",
-         "at": "Surfaces & entrances",
-         "says": "ONE dead drawer product-wide, opened by the Record dead button"
-        },
-        {
-         "src": "review",
-         "at": "tasks-built-17",
-         "says": "recommendation: Record dead, as ruled"
+         "src": "PRD",
+         "at": "Decisions · owner decisions 2026-10-23 (Counting)",
+         "says": "A visit is a draft until Save; died after birth lowers Alive, born dead does not; Report death is a level with Back · Done"
         }
        ],
        "visible": [
         {
-         "text": "Record dead",
+         "text": "Report death",
          "in": "sheet",
          "hard": "broken-ruling"
         }
@@ -774,42 +785,40 @@
       {
        "type": "action",
        "id": "counting.active.minus-4",
-       "label": "tap − four times (pending is 4; the floor is born 10 − 5 dead = 5)",
+       "label": "tap + then − on Born alive",
        "taps": [
-        "[data-action='alive'][data-value='-1']",
-        "[data-action='alive'][data-value='-1']",
-        "[data-action='alive'][data-value='-1']",
-        "[data-action='alive'][data-value='-1']"
+        "[data-action='bornAlive'][data-value='1']",
+        "[data-action='bornAlive'][data-value='-1']"
        ],
        "children": [
         {
          "type": "outcome",
          "id": "fa-c3-minus-clamps-at-floor",
          "tree": "C-3",
-         "label": "− drains the visit and stops at the floor; Born never drops silently",
+         "label": "Born alive − stops at 0; a saved count is corrected only in Edit record",
          "gwt": {
-          "given": "Sow 000418 is Farrowing with 9 alive and 5 dead, and 4 piglets were added in this visit. Born was 10 before the visit.",
-          "when": "The worker taps − four times.",
-          "then": "The visit's four piglets come off and − stops there. Alive is 5 and born stays at 10. − is greyed. Born never drops silently."
+          "given": "Sow 000418 is Farrowing with 9 alive and 5 dead, nothing entered this visit.",
+          "when": "The worker taps + on Born alive, then −.",
+          "then": "Born alive is back at 0 and its − is greyed. Alive is still 9 and born 14: nothing saved can be lowered from here."
          },
          "authority": [
           {
-           "src": "RUL",
-           "at": "Model",
-           "says": "+ is free; − drains pending and clamps at the floor"
+           "src": "PRD",
+           "at": "Decisions · owner decisions 2026-10-23 (Counting)",
+           "says": "A visit is a draft until Save; died after birth lowers Alive, born dead does not; Report death is a level with Back · Done"
           }
          ],
          "visible": [
           {
-           "el": "[data-action='alive'][data-value='-1']",
+           "el": "[data-action='bornAlive'][data-value='-1']",
            "is": "disabled",
-           "says": "− greys at the floor (the one ruled greyed control)"
+           "says": "− greys at 0"
           }
          ],
          "record": [
           {
-           "expr": "s.alive === 5 && F.born(s) === 10",
-           "says": "alive 5 (the floor), born 10",
+           "expr": "s.alive === 9 && F.born(s) === 14 && !s.bornDraft",
+           "says": "alive 9, born 14, no draft",
            "hard": "wrong-fact"
           }
          ]
@@ -839,71 +848,52 @@
       {
        "type": "action",
        "id": "counting.active.draft",
-       "label": "Record dead, + Crushed once (the draft)",
+       "label": "Report death, + Crushed once",
        "taps": [
         "[data-action='death']",
-        "[data-action='deadStep'][data-value='2,1']",
-        {
-         "expect": [
-          {
-           "text": "1 unsaved",
-           "in": "sheet",
-           "says": "the drawer says 1 unsaved"
-          }
-         ]
-        }
+        "[data-action='deadStep'][data-value='2,1']"
        ],
        "children": [
         {
          "type": "action",
          "id": "counting.active.draft.back",
-         "label": "Back",
+         "label": "Done",
          "taps": [
-          "[data-action='back']"
+          "[data-action='doneDeath']"
          ],
          "children": [
           {
            "type": "outcome",
            "id": "fa-d1-back-keeps-death-draft",
            "tree": "D-1",
-           "label": "Back keeps the draft on the device; the host says 1 unsaved; posted deaths unchanged",
+           "label": "Done takes the death to the visit, not saved; posted deaths unchanged",
            "gwt": {
-            "given": "Sow 000418 is Farrowing and the Record dead drawer is open with 1 crushed piglet added but not saved.",
-            "when": "The worker taps Back.",
-            "then": "Counting is shown again. The draft stays on the device and the Record dead tool says 1 unsaved. Posted deaths are unchanged."
+            "given": "Sow 000418 is Farrowing and Report death is open with 1 crushed piglet added.",
+            "when": "The worker taps Done.",
+            "then": "The record is shown again with the death in the visit: Alive reads 8 and Not saved yet, with a −1 died chip. Posted deaths are unchanged."
            },
            "authority": [
             {
-             "src": "RUL",
-             "at": "Starting and ending a session",
-             "says": "Back navigates away and KEEPS the draft on the device"
-            },
-            {
-             "src": "contract",
-             "at": "C1 dead_tally",
-             "says": "Back/dismiss keeps the draft on the device; Clear discards it."
-            },
-            {
-             "src": "strings",
-             "at": "verbs.Back",
-             "says": "leave a screen and keep any draft on the device"
+             "src": "PRD",
+             "at": "Decisions · owner decisions 2026-10-23 (Counting)",
+             "says": "A visit is a draft until Save; died after birth lowers Alive, born dead does not; Report death is a level with Back · Done"
             }
            ],
            "visible": [
             {
-             "screen": "farrowing.count"
+             "screen": "farrowing.count-draft"
             },
             {
-             "text": "1 unsaved",
+             "text": "Not saved yet",
              "in": "sheet",
-             "says": "the Record dead tool stacks 1 unsaved",
+             "says": "the card says the visit is not saved",
              "hard": "lost-draft"
             }
            ],
            "record": [
             {
              "expr": "s.deathDraft[2] === 1",
-             "says": "the draft still holds 1 crushed",
+             "says": "the visit still holds 1 crushed",
              "hard": "lost-draft"
             },
             {
@@ -925,11 +915,11 @@
              "type": "outcome",
              "id": "fa-d2-reopen-restores-draft",
              "tree": "D-2",
-             "label": "Reopening the drawer shows the draft, still 1 unsaved (in muted ink)",
+             "label": "Reopening Report death finds the count",
              "gwt": {
               "given": "The worker left the Record dead drawer with Back while 1 crushed piglet was unsaved.",
               "when": "They open Record dead again.",
-              "then": "The draft is still there and the drawer says 1 unsaved, in muted ink and not in the green used for recorded counts. Posted deaths are unchanged."
+              "then": "Crushed reads 1 and its − is live. Posted deaths are unchanged."
              },
              "authority": [
               {
@@ -948,8 +938,9 @@
                "screen": "farrowing.death"
               },
               {
-               "text": "1 unsaved",
-               "in": "sheet",
+               "el": "[data-action='deadStep'][data-value='2,-1']",
+               "is": "enabled",
+               "says": "the drafted crushed can be taken back",
                "hard": "lost-draft"
               }
              ],
@@ -981,7 +972,7 @@
                "gwt": {
                 "given": "The worker reopened Record dead and the kept draft holds 1 crushed piglet.",
                 "when": "They add one more crushed piglet.",
-                "then": "The drawer says 2 unsaved. Nothing is posted, and posted crushed deaths stay at 2."
+                "then": "Crushed reads 2. Nothing is posted, and posted crushed deaths stay at 2."
                },
                "authority": [
                 {
@@ -990,13 +981,7 @@
                  "says": "tallies and the cause are a DRAFT until Save"
                 }
                ],
-               "visible": [
-                {
-                 "text": "2 unsaved",
-                 "in": "sheet",
-                 "hard": "lost-draft"
-                }
-               ],
+               "visible": [],
                "record": [
                 {
                  "expr": "s.deathDraft[2] === 2 && s.dead[2] === 2",
@@ -1023,7 +1008,7 @@
                "gwt": {
                 "given": "The worker reopened Record dead and the kept draft holds 1 crushed piglet.",
                 "when": "They tap Clear.",
-                "then": "The draft is gone and the drawer no longer says unsaved. Clear disappears with it. Posted deaths are unchanged."
+                "then": "The counts are gone and Clear disappears with them. Posted deaths are unchanged."
                },
                "authority": [
                 {
@@ -1037,11 +1022,6 @@
                  "el": "[data-action='clearDeath']",
                  "is": "absent",
                  "says": "Clear gone with the draft"
-                },
-                {
-                 "text": "unsaved",
-                 "in": "sheet",
-                 "absent": true
                 }
                ],
                "record": [
@@ -1056,26 +1036,27 @@
             {
              "type": "action",
              "id": "counting.active.draft.back.reopen.save",
-             "label": "Save",
+             "label": "Done, then Save",
              "taps": [
-              "[data-action='saveDeath']"
+              "[data-action='doneDeath']",
+              "[data-action='saveVisit']"
              ],
              "children": [
               {
                "type": "outcome",
                "id": "fa-d5-save-posts-one-event",
                "tree": "D-5",
-               "label": "Save posts the kept draft as one stamped event and empties it",
+               "label": "Save posts the visit as one event; the crushed piglet comes off Alive",
                "gwt": {
                 "given": "The worker reopened Record dead and the kept draft holds 1 crushed piglet.",
                 "when": "They tap Save.",
-                "then": "The draft is posted as one stamped event, so crushed deaths go from 2 to 3. The draft is empty, the sheet returns to Counting, and the newest log line is the crushed death with its time and who."
+                "then": "The visit is posted as one stamped event: crushed deaths go from 2 to 3 and Alive from 9 to 8. The draft is empty and the newest log line is the crushed death with its time and who."
                },
                "authority": [
                 {
-                 "src": "RUL",
-                 "at": "Surfaces & entrances",
-                 "says": "Save commits the draft as one stamped event"
+                 "src": "PRD",
+                 "at": "Decisions · owner decisions 2026-10-23 (Counting)",
+                 "says": "A visit is a draft until Save; died after birth lowers Alive, born dead does not; Report death is a level with Back · Done"
                 }
                ],
                "visible": [
@@ -1083,15 +1064,15 @@
                  "screen": "farrowing.count"
                 },
                 {
-                 "text": "unsaved",
+                 "text": "Not saved yet",
                  "in": "sheet",
                  "absent": true
                 }
                ],
                "record": [
                 {
-                 "expr": "s.dead[2] === 3 && sum(s.deathDraft) === 0",
-                 "says": "crushed 3 posted, draft empty",
+                 "expr": "s.dead[2] === 3 && s.alive === 8 && sum(s.deathDraft) === 0",
+                 "says": "crushed 3 posted, alive 8, draft empty",
                  "hard": "wrong-fact"
                 },
                 {
@@ -1106,10 +1087,94 @@
            ]
           },
           {
+           "type": "outcome",
+           "id": "fa-f2-draft-never-crosses-lock",
+           "tree": "F-2",
+           "label": "A draft never crosses the lock: with the draft waiting nothing locks",
+           "gwt": {
+            "given": "Sow 000418 is Farrowing and a death draft is waiting on the device.",
+            "when": "The worker looks at the bar after Done.",
+            "then": "Nothing locks. The sow is not finished and the draft is still there."
+           },
+           "authority": [
+            {
+             "src": "RUL",
+             "at": "Starting and ending a session",
+             "says": "A draft never crosses the lock"
+            },
+            {
+             "src": "owner",
+             "at": "decision 2026-10-10",
+             "says": "Finish waits while a death draft is open; there is no lock to hold."
+            }
+           ],
+           "record": [
+            {
+             "expr": "s.locked === false",
+             "hard": "broken-ruling"
+            },
+            {
+             "expr": "s.deathDraft[2] === 1",
+             "says": "the draft is still there",
+             "hard": "lost-draft"
+            }
+           ]
+          },
+          {
+           "type": "outcome",
+           "id": "fa-f1-finish-blocked-by-death-draft",
+           "tree": "F-1",
+           "label": "With a visit open the bar offers Save, not Finish farrowing",
+           "gwt": {
+            "given": "Sow 000418 is Farrowing and a death draft of 1 is waiting on the device.",
+            "when": "The worker looks at the bar after Done.",
+            "then": "The bar is Back · Save: Finish farrowing is not offered until the visit is saved or cleared, so nothing can lock with a draft."
+           },
+           "authority": [
+            {
+             "src": "RUL",
+             "at": "Starting and ending a session",
+             "says": "Lock born N waits in the floor-gray family with the pointer 1 death unsaved · Record dead"
+            },
+            {
+             "src": "owner",
+             "at": "decision 2026-10-10",
+             "says": "A death draft still blocks Finish, shown as the design system now draws it: Finish disabled, its tap leads to Record dead (1 unsaved). No banner, no reason line."
+            },
+            {
+             "src": "PRD",
+             "at": "Decisions · owner decisions 2026-10-23 (Counting)",
+             "says": "A visit is a draft until Save; died after birth lowers Alive, born dead does not; Report death is a level with Back · Done"
+            }
+           ],
+           "visible": [
+            {
+             "el": "[data-action='finish']",
+             "is": "absent",
+             "says": "no Finish while the visit waits",
+             "hard": "broken-ruling"
+            },
+            {
+             "el": "[data-action='saveVisit']",
+             "is": "enabled",
+             "says": "Save is the primary",
+             "hard": "dead-end"
+            }
+           ],
+           "record": [
+            {
+             "expr": "s.locked === false && s.deathDraft[2] === 1",
+             "says": "not locked, the draft still there",
+             "hard": "lost-draft"
+            }
+           ]
+          },
+          {
            "type": "action",
-           "id": "counting.active.draft.back.finish",
-           "label": "Finish farrowing (pressed while the draft waits)",
+           "id": "counting.active.draft.back.finish.resolve",
+           "label": "Save the visit, then Finish farrowing",
            "taps": [
+            "[data-action='saveVisit']",
             {
              "tap": "[data-action='finish']",
              "hold": 60
@@ -1118,227 +1183,125 @@
            "children": [
             {
              "type": "outcome",
-             "id": "fa-f2-draft-never-crosses-lock",
-             "tree": "F-2",
-             "label": "A draft never crosses the lock: with the draft waiting nothing locks",
+             "id": "fa-f3-resolved-finish-unblocked",
+             "tree": "F-3",
+             "label": "Once the draft is saved, Finish is live and the lock can be held",
              "gwt": {
-              "given": "Sow 000418 is Farrowing and a death draft is waiting on the device.",
-              "when": "The worker holds Finish farrowing.",
-              "then": "Nothing locks. The sow is not finished and the draft is still there."
+              "given": "A death draft blocked Finish, and the worker saved it in Record dead.",
+              "when": "They open Finish farrowing.",
+              "then": "The Finish sheet opens and its lock control is live, so the lock can be held."
              },
              "authority": [
               {
                "src": "RUL",
                "at": "Starting and ending a session",
-               "says": "A draft never crosses the lock"
-              },
-              {
-               "src": "owner",
-               "at": "decision 2026-10-10",
-               "says": "Finish waits while a death draft is open; there is no lock to hold."
-              }
-             ],
-             "record": [
-              {
-               "expr": "s.locked === false",
-               "hard": "broken-ruling"
-              },
-              {
-               "expr": "s.deathDraft[2] === 1",
-               "says": "the draft is still there",
-               "hard": "lost-draft"
-              }
-             ]
-            },
-            {
-             "type": "outcome",
-             "id": "fa-f1-finish-blocked-by-death-draft",
-             "tree": "F-1",
-             "label": "With a death draft waiting, Finish waits; tapping it brings you to the Record dead tool, which says 1 unsaved",
-             "gwt": {
-              "given": "Sow 000418 is Farrowing and a death draft of 1 is waiting on the device.",
-              "when": "The worker taps Finish farrowing.",
-              "then": "Finish waits and takes them to the Record dead tool, which says 1 unsaved. The sow is not locked, there is no lock to hold, and the draft is still there."
-             },
-             "authority": [
-              {
-               "src": "RUL",
-               "at": "Starting and ending a session",
-               "says": "Lock born N waits in the floor-gray family with the pointer 1 death unsaved · Record dead"
-              },
-              {
-               "src": "owner",
-               "at": "decision 2026-10-10",
-               "says": "A death draft still blocks Finish, shown as the design system now draws it: Finish disabled, its tap leads to Record dead (1 unsaved). No banner, no reason line."
+               "says": "this is a guard on the lock, not a gate on recording"
               }
              ],
              "visible": [
               {
-               "screen": "farrowing.death",
-               "says": "the tap on the waiting Finish opens the Record dead tool",
-               "hard": "broken-ruling"
-              },
-              {
-               "text": "1 unsaved",
-               "in": "sheet",
-               "says": "the tool says 1 unsaved",
-               "hard": "broken-ruling"
+               "screen": "farrowing.finish"
               },
               {
                "el": "[data-action='lock']",
-               "is": "absent",
-               "says": "no lock to hold while the draft waits",
-               "hard": "broken-ruling"
-              }
-             ],
-             "record": [
-              {
-               "expr": "s.view === 'death' && s.locked === false",
-               "says": "on the Record dead tool, not locked",
-               "hard": "broken-ruling"
-              },
-              {
-               "expr": "s.deathDraft[2] === 1",
-               "says": "the draft is still there",
-               "hard": "lost-draft"
+               "is": "enabled",
+               "hard": "dead-end"
               }
              ]
             },
             {
              "type": "action",
-             "id": "counting.active.draft.back.finish.resolve",
-             "label": "Save the draft in Record dead, then Finish farrowing",
+             "id": "counting.active.draft.back.finish.resolve.lock",
+             "label": "hold Finish farrowing",
              "taps": [
-              "[data-action='saveDeath']",
               {
-               "tap": "[data-action='finish']",
-               "hold": 60
+               "tap": "[data-action='lock']",
+               "hold": 1100
               }
              ],
              "children": [
               {
                "type": "outcome",
-               "id": "fa-f3-resolved-finish-unblocked",
-               "tree": "F-3",
-               "label": "Once the draft is saved, Finish is live and the lock can be held",
+               "id": "fa-f4-lock-gives-locked-record",
+               "tree": "F-4",
+               "label": "The hold locks Born (15, with the saved death) and opens the record",
                "gwt": {
-                "given": "A death draft blocked Finish, and the worker saved it in Record dead.",
-                "when": "They open Finish farrowing.",
-                "then": "The Finish sheet opens and its lock control is live, so the lock can be held."
+                "given": "The worker saved the death draft and the Finish sheet is open with its lock live.",
+                "when": "They hold Finish farrowing until it commits.",
+                "then": "Born locks at 14, counting the saved death. The locked record opens and has no counting stepper."
                },
                "authority": [
                 {
                  "src": "RUL",
-                 "at": "Starting and ending a session",
-                 "says": "this is a guard on the lock, not a gate on recording"
+                 "at": "Model",
+                 "says": "Born = Alive + Σ Dead … Derived, never entered, locks at Finish."
+                },
+                {
+                 "src": "RUL",
+                 "at": "Surfaces & entrances",
+                 "says": "Lock born N is hold-to-commit"
                 }
                ],
                "visible": [
                 {
-                 "screen": "farrowing.finish"
+                 "screen": "farrowing.locked",
+                 "hard": "dead-end"
                 },
                 {
-                 "el": "[data-action='lock']",
-                 "is": "enabled",
-                 "hard": "dead-end"
-                }
-               ]
-              },
-              {
-               "type": "action",
-               "id": "counting.active.draft.back.finish.resolve.lock",
-               "label": "hold Finish farrowing",
-               "taps": [
-                {
-                 "tap": "[data-action='lock']",
-                 "hold": 1100
+                 "el": "[data-action='bornAlive'][data-value='1']",
+                 "is": "absent",
+                 "says": "no counting stepper after the lock",
+                 "hard": "wrong-fact"
                 }
                ],
-               "children": [
+               "record": [
                 {
-                 "type": "outcome",
-                 "id": "fa-f4-lock-gives-locked-record",
-                 "tree": "F-4",
-                 "label": "The hold locks Born (15, with the saved death) and opens the record",
-                 "gwt": {
-                  "given": "The worker saved the death draft and the Finish sheet is open with its lock live.",
-                  "when": "They hold Finish farrowing until it commits.",
-                  "then": "Born locks at 15, counting the saved death. The locked record opens and has no counting stepper."
-                 },
-                 "authority": [
-                  {
-                   "src": "RUL",
-                   "at": "Model",
-                   "says": "Born = Alive + Σ Dead … Derived, never entered, locks at Finish."
-                  },
-                  {
-                   "src": "RUL",
-                   "at": "Surfaces & entrances",
-                   "says": "Lock born N is hold-to-commit"
-                  }
-                 ],
-                 "visible": [
-                  {
-                   "screen": "farrowing.locked",
-                   "hard": "dead-end"
-                  },
-                  {
-                   "el": "[data-action='alive']",
-                   "is": "absent",
-                   "says": "no counting stepper after the lock",
-                   "hard": "wrong-fact"
-                  }
-                 ],
-                 "record": [
-                  {
-                   "expr": "s.locked && s.frozen === s.alive + sum(s.dead) && s.dead[2] === 3",
-                   "says": "locked; frozen Born = alive + dead; crushed 3",
-                   "hard": "wrong-fact"
-                  }
-                 ]
+                 "expr": "s.locked && s.frozen === s.alive + sum(s.dead) && s.dead[2] === 3",
+                 "says": "locked; frozen Born = alive + dead; crushed 3",
+                 "hard": "wrong-fact"
                 }
                ]
               }
              ]
             }
            ]
-          }
-         ]
-        },
-        {
-         "type": "action",
-         "id": "counting.active.draft.dismiss",
-         "label": "dismiss the drawer: tap (or swipe down on) its handle; the scrim does the same",
-         "taps": [
-          ".grab"
-         ],
-         "children": [
+          },
           {
-           "type": "outcome",
-           "id": "fa-d6-dismiss-keeps-death-draft",
-           "tree": "D-6",
-           "label": "Dismissing the drawer (its handle or the scrim) keeps the draft like Back",
-           "gwt": {
-            "given": "The Record dead drawer is open with 1 crushed piglet added but not saved.",
-            "when": "The worker dismisses the drawer by its handle (the scrim does the same).",
-            "then": "The draft is kept, exactly as with Back: 1 crushed piglet is still unsaved."
-           },
-           "authority": [
-            {
-             "src": "RUL",
-             "at": "Surfaces & entrances",
-             "says": "Back or the dismiss gesture keeps it on the device"
-            },
-            {
-             "src": "owner",
-             "at": "decision 2026-10-10",
-             "says": "Drawers have no ✕: the footer Back is the exit; swiping down on the handle or tapping the scrim is Back."
-            }
+           "type": "action",
+           "id": "counting.active.draft.dismiss",
+           "label": "dismiss the drawer after Done: tap (or swipe down on) its handle",
+           "taps": [
+            ".grab"
            ],
-           "record": [
+           "children": [
             {
-             "expr": "s.deathDraft[2] === 1",
-             "hard": "lost-draft"
+             "type": "outcome",
+             "id": "fa-d6-dismiss-keeps-death-draft",
+             "tree": "D-6",
+             "label": "Dismissing the drawer keeps the visit on the device",
+             "gwt": {
+              "given": "The Record dead drawer is open with 1 crushed piglet added but not saved.",
+              "when": "The worker dismisses the drawer by its handle (the scrim does the same).",
+              "then": "The drawer closes and the visit is kept: 1 crushed piglet is still not saved."
+             },
+             "authority": [
+              {
+               "src": "RUL",
+               "at": "Surfaces & entrances",
+               "says": "Back or the dismiss gesture keeps it on the device"
+              },
+              {
+               "src": "owner",
+               "at": "decision 2026-10-10",
+               "says": "Drawers have no ✕: the footer Back is the exit; swiping down on the handle or tapping the scrim is Back."
+              }
+             ],
+             "record": [
+              {
+               "expr": "s.deathDraft[2] === 1",
+               "hard": "lost-draft"
+              }
+             ]
             }
            ]
           }
@@ -1623,12 +1586,13 @@
     {
      "type": "state",
      "id": "edit.during",
-     "label": "Counting, Edit open",
+     "label": "Counting, Litter details, Edit record open",
      "tree": "X",
      "reset": {
       "screen": "farrowing.count",
       "preset": "count",
       "taps": [
+       "[data-action='litter']",
        "[data-action='edit']"
       ]
      },
@@ -1831,7 +1795,7 @@
              "gwt": {
               "given": "The Save correction? question is open over Edit, with one unsaved change.",
               "when": "The worker taps Discard.",
-              "then": "Counting is shown again. The change is dropped, nothing is posted, and the log still has the same four lines."
+              "then": "Litter details is shown again. The change is dropped, nothing is posted, and the log still has the same four lines."
              },
              "authority": [
               {
@@ -1842,7 +1806,7 @@
              ],
              "visible": [
               {
-               "screen": "farrowing.count",
+               "screen": "farrowing.litter",
                "hard": "dead-end"
               }
              ],
@@ -1877,7 +1841,7 @@
              "gwt": {
               "given": "The Save correction? question is open over Edit, with one unsaved change lowering Crushed from 2 to 1.",
               "when": "The worker taps Save.",
-              "then": "One stamped correction is posted and Counting is shown. Crushed is 1. The open visit is folded into a line, followed by one correction line saying Crushed 2 to 1."
+              "then": "One stamped correction is posted and Counting is shown. Crushed is 1, and the newest log line is the correction saying Crushed 2 to 1."
              },
              "authority": [
               {
@@ -1894,8 +1858,8 @@
              ],
              "record": [
               {
-               "expr": "s.dead[2] === 1 && s.events.length === 6 && s.events[0].kind === 'correction' && s.events[0].text.includes('Crushed 2 → 1')",
-               "says": "crushed 1, the open visit folded to a line plus one correction line (Crushed 2 → 1)",
+               "expr": "s.dead[2] === 1 && s.events.length === 5 && s.events[0].kind === 'correction' && s.events[0].text.includes('Crushed 2 → 1')",
+               "says": "crushed 1, one correction line (Crushed 2 → 1)",
                "hard": "wrong-fact"
               }
              ]
@@ -2042,14 +2006,14 @@
     {
      "type": "state",
      "id": "sow-death.during",
-     "label": "Counting, Record dead, The sow",
+     "label": "Counting, Report death, The sow",
      "tree": "M",
      "reset": {
       "screen": "farrowing.count",
       "preset": "count",
       "taps": [
        "[data-action='death']",
-       "[data-action='mode'][data-value='sow']"
+       "[data-action='deathGroup'][data-value='sow']"
       ]
      },
      "children": [
@@ -2891,9 +2855,10 @@
       {
        "type": "action",
        "id": "sow-death.abortion-live.record",
-       "label": "count 1 alive, More actions, Record abortion, reason, Save, Back",
+       "label": "count 1 alive and Save, More actions, Record abortion, reason, Save, Back",
        "taps": [
-        "[data-action='alive'][data-value='1']",
+        "[data-action='bornAlive'][data-value='1']",
+        "[data-action='saveVisit']",
         "[data-action='sowActions']",
         "Record abortion",
         {

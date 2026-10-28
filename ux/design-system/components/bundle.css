@@ -1412,3 +1412,29 @@ input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
 .st-toast-close svg{width:18px;height:18px}
 .st-toast-close:is(:active,[data-preview~="pressed"]){background:#ffffff1f}
 .st-toast-door{flex:1;min-width:0;display:flex;align-items:center;gap:var(--space-12);min-height:var(--tap-min);padding:0 var(--space-8) 0 var(--space-4);border:0;border-radius:var(--radius-control);background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer}
+
+/* Farrowing · counting (owner, 2026-10-23): the Alive card is alive now, the visit's unsaved changes as chips at its right; one height in
+   every state, so the drawer never jumps. Below it Born alive (Stepper count) and Report death; Report death is a level of the drawer. */
+.farrowing-phone .alive-card{position:relative;display:block;width:100%;box-sizing:border-box;margin:0 0 16px;padding:16px;border:1px solid var(--line);border-radius:20px;background:#f6f7f1;color:var(--ink);font:inherit;text-align:left;cursor:pointer}
+.farrowing-phone .alive-card:active{background:#eef1e7}
+.alive-card .alive-label{display:block;font:400 14px/20px var(--font-sans);color:var(--muted)}
+.alive-card .alive-draft{color:#8a5a1d;font-weight:600}
+.alive-card .alive-go{position:absolute;top:16px;right:16px;display:flex;align-items:center;gap:4px;font:600 13px/20px var(--font-sans);color:var(--ink)}
+.alive-card .alive-go svg{width:14px;height:14px}
+.alive-card .alive-row{display:flex;align-items:center;justify-content:space-between;gap:16px;height:84px;margin-top:12px}
+.alive-card .alive-figure{font:600 64px/1 var(--font-mono);letter-spacing:-1px;font-variant-numeric:tabular-nums}
+.alive-card .alive-chips{display:flex;flex-direction:column;align-items:flex-end;gap:5px}
+.alive-card .alive-chip{display:inline-flex;align-items:center;gap:5px;width:134px;height:24px;box-sizing:border-box;padding:0 10px;border-radius:999px;font:500 13px/1 var(--font-sans);background:#eceee7;color:#4b5547}
+.alive-card .alive-chip b{flex:none;width:24px;text-align:right;font:600 14px/1 var(--font-mono)}
+.alive-card .alive-chip svg{display:block;flex:none;width:15px;height:15px;stroke-width:2}
+.alive-card .alive-chip[data-tone="add"]{background:#e3ecdb;color:#2f5a2c}
+.alive-card .alive-chip[data-tone="sub"]{background:#f6e1dc;color:#8a2a1c}
+.alive-card .alive-quiet{display:flex;align-items:center;gap:5px;font:400 13px var(--font-sans);color:var(--muted)}
+.alive-card .alive-quiet svg{width:14px;height:14px;color:#2f6b3a}
+.farrowing-phone .report-death{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:64px;margin-top:16px;border:1px solid var(--control-border);border-radius:16px;background:#fff;color:var(--ink);font:600 17px var(--font-sans);cursor:pointer}
+.farrowing-phone .report-death svg{width:20px;height:20px}
+.farrowing-phone .report-death:active{background:#eef1e7}
+.farrowing-phone .count-footer .icon-button{flex:none;width:56px;height:56px}
+.farrowing-phone .sheet[data-view="death"] .death-causes{margin-top:16px}
+.farrowing-phone .sheet[data-view="death"] .tk-choice+.photo-field,.farrowing-phone .sheet[data-view="death"] .death-causes+.photo-field{margin-top:16px}
+.farrowing-phone .litter-doors{margin-top:16px}

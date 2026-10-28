@@ -24,14 +24,14 @@ Status is derived, never set by a ceremony: "registers derive from the live tota
 From RULINGS.md, quoted short:
 
 - **Model**: "Born = Alive + Σ Dead + fostered out − fostered in. Derived, never entered, locks at Finish."
-- **Model**: Alive is one classless number; "+ is free; − drains pending and clamps at the floor" (B\* minus the dead recorded). Born can never drop silently.
+- **Model**: Alive is one classless number. Superseded for counting on 2026-10-23 (see Decisions): Born alive is entered as a visit draft, and Alive follows from it.
 - **Model**: five default dead types plus Other (stillborn, mummified, crushed, scours, starve-out).
 - **Model**: "No WHEN anywhere, absolutely … The stamp is the date."
 - **Model**: "Classification (weak/deformed) happens at Finish, commits per tap"; "Healthy has no form row"; litter weight is optional; assisted is a required No / Yes, No preselected (owner, 2026-10-15; see Decisions).
 - **Model**: Active row line 2 is "born 14 · 1h ago · G.H"; "No staleness tracking on Active sows"; the interval chip is retired. "Every litter row carries its three numbers" (alive · dead, born).
 - **Model**: "The overdue signal ends at the first record"; rows speak in days from due (due = service + 114), never gestation day; "Overdue · 3 days" colours only the number.
-- **Model**: "The hero owns the total; the receipt owns the change" (`Saved · +4 this visit`).
-- **Surfaces & entrances**: "ONE dead drawer product-wide", opened by Record dead; staged: Save commits, Back keeps the draft, Clear discards.
+- **Model**: "The hero owns the total; the receipt owns the change". Since 2026-10-23 the change is the visit's chips beside Alive, until Save.
+- **Surfaces & entrances**: "ONE dead drawer product-wide". While she farrows it is Report death, a level of her drawer whose counts join the visit (2026-10-23); after Finish it is Record dead: Save commits, Back keeps the draft, Clear discards.
 - **Surfaces & entrances**: "ONE correction door: Edit … ONE SCREEN"; "What Edit adjusts: the observations, never the derivation"; a missed fact is a recording, never an Edit.
 - **Surfaces & entrances**: "Type-to-set is retired on count figures"; one stepper shape, − n +, everywhere.
 - **Surfaces & entrances**: "Identity is sheet-first … the room row offers no sow-page target."
@@ -123,6 +123,16 @@ Out:
 - **Assisted is required, No preselected.** On Finish farrowing and in Edit finish details it is a No / Yes choice (the Inline Choice, key face) with **No chosen on a new finish**. There is no unanswered state and no Clear. A record saved before this ruling whose assisted was never recorded stays null and still reads "Not recorded" in the read-only facts (history is not rewritten); its correction form shows neither key chosen until the worker answers.
 - **Litter weight stays optional.** Blank means not recorded (never 0). It is typed on the phone's own decimal keyboard (one decimal; a locale's comma becomes a point), and Done closes the keyboard (owner, 2026-10-16: one optional value in a form takes the system keyboard; the Numpad stays for runs of typed values such as the piglet weigh run).
 - **One titled form.** Finish farrowing and Edit finish details show the same rows under the section heading "Piglet condition": Weak, Deformed, Assisted, Litter weight (with "Optional" beside its label). The description line "Among the N alive piglets · 0 if none" is cut: Alive is on screen and the steppers stop at it.
+
+### Owner decisions, 2026-10-23 · Counting
+
+- **A visit is a draft until Save.** Nothing saves on a tap any more. Born alive is a count Stepper from 0 for this visit; deaths reported join the same draft. Save commits the visit as one log line; Clear (header, top right, only while something is entered) empties it; closing the drawer keeps it on the phone.
+- **Alive is the figure; born and dead are stats.** The Alive card shows alive now with the draft applied, `· Not saved yet` while there is one, and the visit's changes as chips at its right (+N born, −N died, N born dead). Total born and the causes are read in Litter details, opened from the card.
+- **Two kinds of piglet death.** Born dead (stillborn, mummified) never lowers Alive. Died after birth (crushed, scours, starve-out, other) lowers Alive on Save. Total born stays Alive + Dead: the stored record is unchanged, only what the actions mean.
+- **Report death is a level of the drawer, not a page.** What died is one choice: Born dead, Died after birth, or the sow. Its bar is Back · Done: Done takes the counts to the visit, Back leaves without them.
+- **The bar.** With a draft: Back · Save. Without: Back · Finish farrowing · ··· (the sow's actions).
+- **Edit record moves into Litter details**, with the log: the back door for re-tallies and mistakes.
+- Next, each in its own PR: before farrowing (due card, Start farrowing), the full Litter details ledger (spreadsheet edit logged as an override, Missing), production-only actions and Assisted farrowing. The approved reference is the v17 prototype.
 
 ### Owner decision, 2026-10-22 · The pen tools are Inspection's
 

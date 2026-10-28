@@ -56,53 +56,53 @@ States: A0 Awaiting, nothing recorded (000455).
 
 | # | State | Event | Result | Src | Leaf |
 |---|---|---|---|---|---|
-| A-1 | A0 | tap + | → Farrowing at once: alive 1, born 1; no start ceremony | S — RUL Starting and ending ("starts at the first recorded event") | `fa-a1-first-piglet-starts-farrowing` |
-| A-2 | A0 + 1 | tap − back to zero | → reads Awaiting again; the log keeps the lines | S — RUL Starting and ending ("registers derive from the live total") | `fa-a2-recount-to-zero-reads-awaiting` |
-| A-3 | A0 | Record dead, + Stillborn, Save | → Farrowing: born 1, a stillborn can be the first record | S — RUL Surfaces (Record dead live pre-start) | `fa-a3-stillborn-first-record` |
+| A-1 | A0 | tap + on Born alive, Save | → Farrowing at once: alive 1, born 1; no start ceremony | S — RUL Starting and ending ("starts at the first recorded event"); owner decisions 2026-10-23 (Counting) | `fa-a1-first-piglet-starts-farrowing` |
+| A-2 | A0 | tap + then − on Born alive, save nothing | → nothing recorded: reads Awaiting, born 0, empty log | S — owner decisions 2026-10-23 (Counting) (a visit is a draft until Save) | `fa-a2-recount-to-zero-reads-awaiting` |
+| A-3 | A0 | Report death, Born dead, + Stillborn, Done, Save | → Farrowing: born 1, a stillborn can be the first record | S — RUL Surfaces (the dead drawer live pre-start); owner decisions 2026-10-23 (Counting) | `fa-a3-stillborn-first-record` |
 | A-4 | A0 | Edit, Finish farrowing | → present but unavailable until there is something to correct or lock | S — RUL Surfaces ("One layout across states") | — |
 | A-5 | A0 | sow dies before farrowing | → Record dead › The sow; session ends, stage *before* | S — RUL Starting and ending (sow mode) | — |
 
 ## 3 · Sow · Farrowing, counting (C)
 
-States: C0 Farrowing, no draft (000418: alive 9, dead 1·1·2·0·0·1, +4 this visit).
+States: C0 Farrowing, nothing entered (000418: alive 9, dead 1·1·2·0·0·1).
 
 | # | State | Event | Result | Src | Leaf |
 |---|---|---|---|---|---|
-| C-1 | C0 | open | → the receipt says saved (`Saved · +4 this visit`) | S — RUL After the lock (receipt copy) | `fa-c1-receipt-says-saved` |
-| C-2 | C0 | read the death tool | → it reads **Record dead** | S — RUL Surfaces; review tasks-built-17 (recommends as ruled) | `fa-c2-tool-reads-record-dead` |
-| C-3 | C0 | − until it stops | → drains the visit, clamps at the floor (B* − dead); − greys there; Born never drops | S — RUL Model | `fa-c3-minus-clamps-at-floor` |
+| C-1 | C0 | open | → the Alive card says when the record was last saved (`Saved Aug 26 08:20`) | S — owner decisions 2026-10-23 (Counting) | `fa-c1-receipt-says-saved` |
+| C-2 | C0 | read the death tool | → it reads **Report death** | S — owner decisions 2026-10-23 (Counting) | `fa-c2-tool-reads-record-dead` |
+| C-3 | C0 | + then − on Born alive | → Born alive − greys at 0; Alive 9 and born 14 unchanged (a saved count is corrected in Edit record) | S — owner decisions 2026-10-23 (Counting) | `fa-c3-minus-clamps-at-floor` |
 | C-4 | C0 | idle 90 min | → the visit folds into one log line | S — RUL Surfaces (visit ends after ~90 min idle); contract C3 (draft) | pending `fa-c4-idle-fold` |
-| C-5 | C0 | Record dead | → the dead drawer (§4) | S — RUL Surfaces | via D-* |
-| C-6 | C0 | Edit | → the one correction screen (§6) | S — RUL Surfaces | via X-* |
+| C-5 | C0 | Report death | → the Report death level (§4) | S — owner decisions 2026-10-23 (Counting) | via D-* |
+| C-6 | C0 | the Alive card › Edit record | → Litter details, then the one correction screen (§6) | S — owner decisions 2026-10-23 (Counting) | via X-* |
 | C-7 | C0 | More actions › Foster piglets | ? Q1 | S (conflict) — RUL After the lock (parked) vs feature.json foster screen | blocker `fa-z1-fostering-scope` |
 
 ## 4 · The dead drawer draft (D)
 
-States: D0 drawer open over C0 with a draft of 1 crushed · D1 C0 with that draft kept (host shows `1 unsaved`).
+States: D0 Report death open over C0 with 1 crushed entered · D1 C0 after Done, the visit holding that death (`Not saved yet`).
 
 | # | State | Event | Result | Src | Leaf |
 |---|---|---|---|---|---|
-| D-1 | D0 | Back | → D1: the draft stays on the device; the host's Record dead tool stacks `1 unsaved`; posted deaths unchanged | S — RUL Starting and ending ("Back … KEEPS the draft"); contract C1; STR Back | `fa-d1-back-keeps-death-draft` |
-| D-2 | D1 | reopen Record dead | → the draft is there, `1 unsaved` in muted ink | S — RUL Starting and ending ("green" is superseded: owner decision 2026-10-10, no green for drafts) | `fa-d2-reopen-restores-draft` |
-| D-3 | D1 → D0 | + again (resume) | → `2 unsaved`; nothing posted | S — RUL Starting and ending | `fa-d3-resume-adds-to-draft` |
-| D-4 | D1 → D0 | Clear | → draft gone, Clear gone; posted unchanged | S — RUL Starting and ending | `fa-d4-clear-discards-draft` |
-| D-5 | D1 → D0 | Save | → one stamped death event; draft empty | S — RUL Surfaces | `fa-d5-save-posts-one-event` |
-| D-6 | D0 | dismiss (swipe down or tap the handle, or tap the scrim) | → as Back; there is no ✕ | S — RUL Surfaces ("Back or the dismiss gesture keeps it"); owner decision 2026-10-10 (no ✕) | `fa-d6-dismiss-keeps-death-draft` |
+| D-1 | D0 | Done | → D1: the death joins the visit, not saved: Alive 8, `Not saved yet`, a −1 died chip; posted deaths unchanged | S — owner decisions 2026-10-23 (Counting) | `fa-d1-back-keeps-death-draft` |
+| D-2 | D1 | reopen Report death | → Crushed reads 1, its − live | S — owner decisions 2026-10-23 (Counting) | `fa-d2-reopen-restores-draft` |
+| D-3 | D1 → D0 | + again (resume) | → Crushed 2; nothing posted | S — RUL Starting and ending | `fa-d3-resume-adds-to-draft` |
+| D-4 | D1 → D0 | Clear | → counts gone, Clear gone; posted unchanged | S — RUL Starting and ending | `fa-d4-clear-discards-draft` |
+| D-5 | D1 → D0 | Done, Save | → one stamped event; crushed 3, Alive 8; draft empty | S — owner decisions 2026-10-23 (Counting) | `fa-d5-save-posts-one-event` |
+| D-6 | D1 | dismiss (swipe down or tap the handle, or tap the scrim) | → the drawer closes and keeps the visit | S — RUL Surfaces ("Back or the dismiss gesture keeps it"); owner decisions 2026-10-23 (Counting) | `fa-d6-dismiss-keeps-death-draft` |
 | D-7 | D0 | app closed and reopened | → the draft survives the restart | S — contract C5 ("persisted across background and restart") | `fa-d7-restart-keeps-death-draft` |
 | D-8 | D0 | add a photo, Save | → the photo rides the death's log line | S — RUL Starting and ending (photos) | — |
 | D-9 | D0 on two phones | both save | → signed deltas merge; a breach holds at the floor with a sync review line | S — RUL Starting and ending (merge contract, draft) | pending `fa-d9-two-phones` |
-| D-10 | D0 | Back, then Finish farrowing | → §5 F-1 | S | via F-1 |
+| D-10 | D1 | look at the bar | → §5 F-1 | S | via F-1 |
 
 ## 5 · Finish and the lock (F)
 
-States: F0 the record with a death draft waiting (from D1; Finish waits) · F1 *retired* (Finish with an Edit draft: an unsaved correction cannot reach Finish, see X-10) · F2 Finish, nothing waiting.
+States: F0 the record with a visit waiting (from D1) · F1 *retired* (Finish with an Edit draft: an unsaved correction cannot reach Finish, see X-10) · F2 Finish, nothing waiting.
 
 | # | State | Event | Result | Src | Leaf |
 |---|---|---|---|---|---|
-| F-1 | F0 | press Finish farrowing | → Finish waits (floor-gray, no banner, no reason line) and the press brings you to the Record dead tool, which says `1 unsaved` | S — RUL Starting and ending ("Finish with a draft waiting"); owner decision 2026-10-10 (how it is shown) | `fa-f1-finish-blocked-by-death-draft` |
-| F-2 | F0 | press Finish farrowing | → nothing locks (there is no lock to hold while the draft waits); the draft is still there | S — RUL Starting and ending ("A draft never crosses the lock") | `fa-f2-draft-never-crosses-lock` |
-| F-3 | F0 | Save in Record dead, Finish farrowing | → F2: the lock is live | S — RUL ("a guard on the lock, not a gate on recording") | `fa-f3-resolved-finish-unblocked` |
-| F-4 | F2 (after F-3) | hold Finish farrowing | → locked; Born frozen = alive + dead (15); the record face | S — RUL Model; RUL Surfaces | `fa-f4-lock-gives-locked-record` |
+| F-1 | F0 | look at the bar | → Back · Save: Finish farrowing is not offered until the visit is saved or cleared | S — RUL Starting and ending ("Finish with a draft waiting"); owner decisions 2026-10-23 (Counting) | `fa-f1-finish-blocked-by-death-draft` |
+| F-2 | F0 | look at the bar | → nothing can lock; the draft is still there | S — RUL Starting and ending ("A draft never crosses the lock") | `fa-f2-draft-never-crosses-lock` |
+| F-3 | F0 | Save, Finish farrowing | → F2: the lock is live | S — RUL ("a guard on the lock, not a gate on recording") | `fa-f3-resolved-finish-unblocked` |
+| F-4 | F2 (after F-3) | hold Finish farrowing | → locked; Born frozen = alive + dead (14); the record face | S — RUL Model; RUL Surfaces | `fa-f4-lock-gives-locked-record` |
 | F-5 | F1 | *retired* | an unsaved correction cannot reach Finish (X-10); leaf `fa-f5-finish-blocked-by-edit-draft` retired | owner decision 2026-10-10 | — |
 | F-6 | F1 | *retired* | replaced by X-12; leaf `fa-f6-saved-correction-returns-to-finish` retired | owner decision 2026-10-10 | — |
 | F-7 | F2 | tap (no hold) | → nothing locks | S — RUL Surfaces (hold-to-lock is the second guard) | `fa-f7-tap-does-not-lock` |
@@ -128,12 +128,12 @@ States: X0 Edit open while counting · X1 Edit open on a locked record.
 | X-8 | X0 | lower Alive below the counting floor | ? Q7 — how a pre-lock Alive correction restates Born | S (open) — review tasks-built-33 | — |
 | X-9 | X0 | first change | → the changed row shows its new value in ink with a muted `was N` beside the label; no banner, no Corrected tag; Save correction live | owner decision 2026-10-10 | `fa-x9-changed-row-shows-was` |
 | X-10 | X0 + change | Back | → the shared dialog asks `Save correction?` (Save / Discard); the screen stays on Edit until answered; nothing posted | owner decision 2026-10-10 | `fa-x10-back-with-change-asks-save` |
-| X-11 | X-10 | Discard | → the change is dropped, back on the record, nothing posted | owner decision 2026-10-10 | `fa-x11-ask-discard-drops-change` |
+| X-11 | X-10 | Discard | → the change is dropped, back on Litter details, nothing posted | owner decision 2026-10-10; owner decisions 2026-10-23 (Counting) | `fa-x11-ask-discard-drops-change` |
 | X-12 | X-10 | Save | → one stamped correction (who and old → new go to the log), back on the record | owner decision 2026-10-10 | `fa-x12-ask-save-posts-correction` |
 
 ## 7 · Sow death (M)
 
-States: M0 drawer in The sow mode over C0 · M1 Ended (sow died).
+States: M0 Report death on The sow over C0 · M1 Ended (sow died).
 
 | # | State | Event | Result | Src | Leaf |
 |---|---|---|---|---|---|
