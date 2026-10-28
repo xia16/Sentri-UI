@@ -754,6 +754,12 @@
         {
          "text": "Saved Aug 26 08:20",
          "in": "sheet"
+        },
+        {
+         "text": "Not saved yet",
+         "in": "sheet",
+         "absent": true,
+         "says": "nothing waits to be saved"
         }
        ]
       },
@@ -981,7 +987,14 @@
                  "says": "tallies and the cause are a DRAFT until Save"
                 }
                ],
-               "visible": [],
+               "visible": [
+                {
+                 "el": "[data-action='doneDeath']",
+                 "is": "enabled",
+                 "says": "Done takes the counts to the visit",
+                 "hard": "dead-end"
+                }
+               ],
                "record": [
                 {
                  "expr": "s.deathDraft[2] === 2 && s.dead[2] === 2",
@@ -1022,6 +1035,11 @@
                  "el": "[data-action='clearDeath']",
                  "is": "absent",
                  "says": "Clear gone with the draft"
+                },
+                {
+                 "el": "[data-action='deadStep'][data-value='2,-1']",
+                 "is": "disabled",
+                 "says": "nothing left to take back"
                 }
                ],
                "record": [

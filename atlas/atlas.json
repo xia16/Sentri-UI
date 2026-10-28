@@ -7470,21 +7470,7 @@
                   "says": "A visit is a draft until Save; died after birth lowers Alive, born dead does not; Report death is a level with Back · Done"
                  }
                 ],
-                "result": "fail",
-                "hard": [
-                 "unreachable-control"
-                ],
-                "failures": [
-                 {
-                  "what": "tap [data-action='alive'][data-value='1']",
-                  "got": "control not found: [data-action='alive'][data-value='1']",
-                  "tag": "unreachable-control",
-                  "runs": [
-                   "en 360",
-                   "en 390"
-                  ]
-                 }
-                ]
+                "result": "pass"
                }
               ]
              },
@@ -7515,21 +7501,7 @@
                   "says": "A visit is a draft until Save; died after birth lowers Alive, born dead does not; Report death is a level with Back · Done"
                  }
                 ],
-                "result": "fail",
-                "hard": [
-                 "unreachable-control"
-                ],
-                "failures": [
-                 {
-                  "what": "tap [data-action='alive'][data-value='1']",
-                  "got": "control not found: [data-action='alive'][data-value='1']",
-                  "tag": "unreachable-control",
-                  "runs": [
-                   "en 360",
-                   "en 390"
-                  ]
-                 }
-                ]
+                "result": "pass"
                }
               ]
              },
@@ -7555,21 +7527,7 @@
                   "says": "Record dead live (a stillborn can be the first record)"
                  }
                 ],
-                "result": "fail",
-                "hard": [
-                 "unreachable-control"
-                ],
-                "failures": [
-                 {
-                  "what": "tap [data-action='deadStep'][data-value='0,1']",
-                  "got": "control not found: [data-action='deadStep'][data-value='0,1']",
-                  "tag": "unreachable-control",
-                  "runs": [
-                   "en 360",
-                   "en 390"
-                  ]
-                 }
-                ]
+                "result": "pass"
                }
               ]
              }
@@ -7604,18 +7562,7 @@
                 "says": "A visit is a draft until Save; died after birth lowers Alive, born dead does not; Report death is a level with Back · Done"
                }
               ],
-              "result": "fail",
-              "failures": [
-               {
-                "what": "\"+4 this visit\" shown",
-                "got": "absent",
-                "tag": "",
-                "runs": [
-                 "en 360",
-                 "en 390"
-                ]
-               }
-              ]
+              "result": "pass"
              },
              {
               "type": "outcome",
@@ -7634,21 +7581,7 @@
                 "says": "A visit is a draft until Save; died after birth lowers Alive, born dead does not; Report death is a level with Back · Done"
                }
               ],
-              "result": "fail",
-              "hard": [
-               "broken-ruling"
-              ],
-              "failures": [
-               {
-                "what": "\"Record dead\" shown",
-                "got": "absent",
-                "tag": "broken-ruling",
-                "runs": [
-                 "en 360",
-                 "en 390"
-                ]
-               }
-              ]
+              "result": "pass"
              },
              {
               "type": "action",
@@ -7672,21 +7605,7 @@
                   "says": "A visit is a draft until Save; died after birth lowers Alive, born dead does not; Report death is a level with Back · Done"
                  }
                 ],
-                "result": "fail",
-                "hard": [
-                 "unreachable-control"
-                ],
-                "failures": [
-                 {
-                  "what": "tap [data-action='alive'][data-value='-1']",
-                  "got": "control not found: [data-action='alive'][data-value='-1']",
-                  "tag": "unreachable-control",
-                  "runs": [
-                   "en 360",
-                   "en 390"
-                  ]
-                 }
-                ]
+                "result": "pass"
                }
               ]
              },
@@ -7737,39 +7656,7 @@
                     "says": "A visit is a draft until Save; died after birth lowers Alive, born dead does not; Report death is a level with Back · Done"
                    }
                   ],
-                  "result": "fail",
-                  "hard": [
-                   "lost-draft"
-                  ],
-                  "failures": [
-                   {
-                    "what": "the drawer says 1 unsaved",
-                    "got": "absent",
-                    "tag": "",
-                    "runs": [
-                     "en 360",
-                     "en 390"
-                    ]
-                   },
-                   {
-                    "what": "the Record dead tool stacks 1 unsaved",
-                    "got": "absent",
-                    "tag": "lost-draft",
-                    "runs": [
-                     "en 360",
-                     "en 390"
-                    ]
-                   },
-                   {
-                    "what": "the draft still holds 1 crushed",
-                    "got": "false",
-                    "tag": "lost-draft",
-                    "runs": [
-                     "en 360",
-                     "en 390"
-                    ]
-                   }
-                  ]
+                  "result": "pass"
                  },
                  {
                   "type": "action",
@@ -7798,39 +7685,7 @@
                       "says": "No green for drafts: an unsaved draft is muted ink, never the recorded green."
                      }
                     ],
-                    "result": "fail",
-                    "hard": [
-                     "lost-draft"
-                    ],
-                    "failures": [
-                     {
-                      "what": "the drawer says 1 unsaved",
-                      "got": "absent",
-                      "tag": "",
-                      "runs": [
-                       "en 360",
-                       "en 390"
-                      ]
-                     },
-                     {
-                      "what": "\"1 unsaved\" shown",
-                      "got": "absent",
-                      "tag": "lost-draft",
-                      "runs": [
-                       "en 360",
-                       "en 390"
-                      ]
-                     },
-                     {
-                      "what": "s.deathDraft[2] === 1",
-                      "got": "false",
-                      "tag": "lost-draft",
-                      "runs": [
-                       "en 360",
-                       "en 390"
-                      ]
-                     }
-                    ]
+                    "result": "pass"
                    },
                    {
                     "type": "action",
@@ -7854,39 +7709,7 @@
                         "says": "tallies and the cause are a DRAFT until Save"
                        }
                       ],
-                      "result": "fail",
-                      "hard": [
-                       "lost-draft"
-                      ],
-                      "failures": [
-                       {
-                        "what": "the drawer says 1 unsaved",
-                        "got": "absent",
-                        "tag": "",
-                        "runs": [
-                         "en 360",
-                         "en 390"
-                        ]
-                       },
-                       {
-                        "what": "\"2 unsaved\" shown",
-                        "got": "absent",
-                        "tag": "lost-draft",
-                        "runs": [
-                         "en 360",
-                         "en 390"
-                        ]
-                       },
-                       {
-                        "what": "draft 2, posted crushed still 2",
-                        "got": "false",
-                        "tag": "lost-draft",
-                        "runs": [
-                         "en 360",
-                         "en 390"
-                        ]
-                       }
-                      ]
+                      "result": "pass"
                      }
                     ]
                    },
@@ -7912,30 +7735,7 @@
                         "says": "Clear discards the draft (a text action on the title row, present only while a draft exists)"
                        }
                       ],
-                      "result": "fail",
-                      "hard": [
-                       "unreachable-control"
-                      ],
-                      "failures": [
-                       {
-                        "what": "the drawer says 1 unsaved",
-                        "got": "absent",
-                        "tag": "",
-                        "runs": [
-                         "en 360",
-                         "en 390"
-                        ]
-                       },
-                       {
-                        "what": "tap [data-action='clearDeath']",
-                        "got": "control not found: [data-action='clearDeath']",
-                        "tag": "unreachable-control",
-                        "runs": [
-                         "en 360",
-                         "en 390"
-                        ]
-                       }
-                      ]
+                      "result": "pass"
                      }
                     ]
                    },
@@ -7961,30 +7761,7 @@
                         "says": "A visit is a draft until Save; died after birth lowers Alive, born dead does not; Report death is a level with Back · Done"
                        }
                       ],
-                      "result": "fail",
-                      "hard": [
-                       "unreachable-control"
-                      ],
-                      "failures": [
-                       {
-                        "what": "the drawer says 1 unsaved",
-                        "got": "absent",
-                        "tag": "",
-                        "runs": [
-                         "en 360",
-                         "en 390"
-                        ]
-                       },
-                       {
-                        "what": "tap [data-action='saveDeath']",
-                        "got": "control not found: [data-action='saveDeath']",
-                        "tag": "unreachable-control",
-                        "runs": [
-                         "en 360",
-                         "en 390"
-                        ]
-                       }
-                      ]
+                      "result": "pass"
                      }
                     ]
                    }
@@ -8012,30 +7789,7 @@
                     "says": "Finish waits while a death draft is open; there is no lock to hold."
                    }
                   ],
-                  "result": "fail",
-                  "hard": [
-                   "lost-draft"
-                  ],
-                  "failures": [
-                   {
-                    "what": "the drawer says 1 unsaved",
-                    "got": "absent",
-                    "tag": "",
-                    "runs": [
-                     "en 360",
-                     "en 390"
-                    ]
-                   },
-                   {
-                    "what": "the draft is still there",
-                    "got": "false",
-                    "tag": "lost-draft",
-                    "runs": [
-                     "en 360",
-                     "en 390"
-                    ]
-                   }
-                  ]
+                  "result": "pass"
                  },
                  {
                   "type": "outcome",
@@ -8064,67 +7818,7 @@
                     "says": "A visit is a draft until Save; died after birth lowers Alive, born dead does not; Report death is a level with Back · Done"
                    }
                   ],
-                  "result": "fail",
-                  "hard": [
-                   "broken-ruling",
-                   "lost-draft"
-                  ],
-                  "failures": [
-                   {
-                    "what": "the drawer says 1 unsaved",
-                    "got": "absent",
-                    "tag": "",
-                    "runs": [
-                     "en 360",
-                     "en 390"
-                    ]
-                   },
-                   {
-                    "what": "the tap on the waiting Finish opens the Record dead tool",
-                    "got": "farrowing.finish",
-                    "tag": "broken-ruling",
-                    "runs": [
-                     "en 360",
-                     "en 390"
-                    ]
-                   },
-                   {
-                    "what": "the tool says 1 unsaved",
-                    "got": "absent",
-                    "tag": "broken-ruling",
-                    "runs": [
-                     "en 360",
-                     "en 390"
-                    ]
-                   },
-                   {
-                    "what": "no lock to hold while the draft waits",
-                    "got": "enabled",
-                    "tag": "broken-ruling",
-                    "runs": [
-                     "en 360",
-                     "en 390"
-                    ]
-                   },
-                   {
-                    "what": "on the Record dead tool, not locked",
-                    "got": "false",
-                    "tag": "broken-ruling",
-                    "runs": [
-                     "en 360",
-                     "en 390"
-                    ]
-                   },
-                   {
-                    "what": "the draft is still there",
-                    "got": "false",
-                    "tag": "lost-draft",
-                    "runs": [
-                     "en 360",
-                     "en 390"
-                    ]
-                   }
-                  ]
+                  "result": "pass"
                  },
                  {
                   "type": "action",
@@ -8148,30 +7842,7 @@
                       "says": "this is a guard on the lock, not a gate on recording"
                      }
                     ],
-                    "result": "fail",
-                    "hard": [
-                     "unreachable-control"
-                    ],
-                    "failures": [
-                     {
-                      "what": "the drawer says 1 unsaved",
-                      "got": "absent",
-                      "tag": "",
-                      "runs": [
-                       "en 360",
-                       "en 390"
-                      ]
-                     },
-                     {
-                      "what": "tap [data-action='saveDeath']",
-                      "got": "control not found: [data-action='saveDeath']",
-                      "tag": "unreachable-control",
-                      "runs": [
-                       "en 360",
-                       "en 390"
-                      ]
-                     }
-                    ]
+                    "result": "pass"
                    },
                    {
                     "type": "action",
@@ -8200,30 +7871,7 @@
                         "says": "Lock born N is hold-to-commit"
                        }
                       ],
-                      "result": "fail",
-                      "hard": [
-                       "unreachable-control"
-                      ],
-                      "failures": [
-                       {
-                        "what": "the drawer says 1 unsaved",
-                        "got": "absent",
-                        "tag": "",
-                        "runs": [
-                         "en 360",
-                         "en 390"
-                        ]
-                       },
-                       {
-                        "what": "tap [data-action='saveDeath']",
-                        "got": "control not found: [data-action='saveDeath']",
-                        "tag": "unreachable-control",
-                        "runs": [
-                         "en 360",
-                         "en 390"
-                        ]
-                       }
-                      ]
+                      "result": "pass"
                      }
                     ]
                    }
@@ -8256,30 +7904,7 @@
                       "says": "Drawers have no ✕: the footer Back is the exit; swiping down on the handle or tapping the scrim is Back."
                      }
                     ],
-                    "result": "fail",
-                    "hard": [
-                     "lost-draft"
-                    ],
-                    "failures": [
-                     {
-                      "what": "the drawer says 1 unsaved",
-                      "got": "absent",
-                      "tag": "",
-                      "runs": [
-                       "en 360",
-                       "en 390"
-                      ]
-                     },
-                     {
-                      "what": "s.deathDraft[2] === 1",
-                      "got": "false",
-                      "tag": "lost-draft",
-                      "runs": [
-                       "en 360",
-                       "en 390"
-                      ]
-                     }
-                    ]
+                    "result": "pass"
                    }
                   ]
                  }
@@ -8307,18 +7932,7 @@
                     "says": "Back and the dismiss gesture … KEEP the draft on the device (persisted across background and restart)"
                    }
                   ],
-                  "result": "fail",
-                  "failures": [
-                   {
-                    "what": "the drawer says 1 unsaved",
-                    "got": "absent",
-                    "tag": "",
-                    "runs": [
-                     "en 360",
-                     "en 390"
-                    ]
-                   }
-                  ]
+                  "result": "pass"
                  }
                 ]
                }
@@ -8408,7 +8022,7 @@
                   "says": "Assisted is required, No preselected; no Clear"
                  }
                 ],
-                "result": "pass"
+                "result": "not-run"
                }
               ]
              },
@@ -8434,7 +8048,7 @@
                   "says": "Litter weight stays optional, typed on the phone's own decimal keyboard (Done closes it)"
                  }
                 ],
-                "result": "pass"
+                "result": "not-run"
                }
               ]
              },
@@ -8507,21 +8121,7 @@
                   "says": "A changed row shows its new value in normal ink with a small muted \"was 2\" beside the label; no banner, no Corrected tag; one Save correction in the footer."
                  }
                 ],
-                "result": "fail",
-                "hard": [
-                 "dead-end"
-                ],
-                "failures": [
-                 {
-                  "what": "run",
-                  "got": "fixture: control not found: [data-action='edit']",
-                  "tag": "dead-end",
-                  "runs": [
-                   "en 360",
-                   "en 390"
-                  ]
-                 }
-                ]
+                "result": "pass"
                },
                {
                 "type": "action",
@@ -8550,21 +8150,7 @@
                     "says": "Born has no door pre-lock (it heals when its inputs heal)"
                    }
                   ],
-                  "result": "fail",
-                  "hard": [
-                   "dead-end"
-                  ],
-                  "failures": [
-                   {
-                    "what": "run",
-                    "got": "fixture: control not found: [data-action='edit']",
-                    "tag": "dead-end",
-                    "runs": [
-                     "en 360",
-                     "en 390"
-                    ]
-                   }
-                  ]
+                  "result": "pass"
                  }
                 ]
                },
@@ -8590,21 +8176,7 @@
                     "says": "Clear (text action on the summary row) discards it"
                    }
                   ],
-                  "result": "fail",
-                  "hard": [
-                   "dead-end"
-                  ],
-                  "failures": [
-                   {
-                    "what": "run",
-                    "got": "fixture: control not found: [data-action='edit']",
-                    "tag": "dead-end",
-                    "runs": [
-                     "en 360",
-                     "en 390"
-                    ]
-                   }
-                  ]
+                  "result": "pass"
                  }
                 ]
                },
@@ -8630,21 +8202,7 @@
                     "says": "Leaving Edit with unsaved changes asks \"Save correction?\" (Save / Discard) in the shared dialog, so an unsaved correction can never reach Finish."
                    }
                   ],
-                  "result": "fail",
-                  "hard": [
-                   "dead-end"
-                  ],
-                  "failures": [
-                   {
-                    "what": "run",
-                    "got": "fixture: control not found: [data-action='edit']",
-                    "tag": "dead-end",
-                    "runs": [
-                     "en 360",
-                     "en 390"
-                    ]
-                   }
-                  ]
+                  "result": "pass"
                  },
                  {
                   "type": "action",
@@ -8668,21 +8226,7 @@
                       "says": "Discard in the Save correction? ask drops the unsaved change."
                      }
                     ],
-                    "result": "fail",
-                    "hard": [
-                     "dead-end"
-                    ],
-                    "failures": [
-                     {
-                      "what": "run",
-                      "got": "fixture: control not found: [data-action='edit']",
-                      "tag": "dead-end",
-                      "runs": [
-                       "en 360",
-                       "en 390"
-                      ]
-                     }
-                    ]
+                    "result": "pass"
                    }
                   ]
                  },
@@ -8708,21 +8252,7 @@
                       "says": "Save in the Save correction? ask commits the correction (who, old → new in the log) and returns."
                      }
                     ],
-                    "result": "fail",
-                    "hard": [
-                     "dead-end"
-                    ],
-                    "failures": [
-                     {
-                      "what": "run",
-                      "got": "fixture: control not found: [data-action='edit']",
-                      "tag": "dead-end",
-                      "runs": [
-                       "en 360",
-                       "en 390"
-                      ]
-                     }
-                    ]
+                    "result": "pass"
                    }
                   ]
                  }
@@ -8859,21 +8389,7 @@
                   "says": "Right after the hold records the death, the sheet becomes 'N piglets to allocate'"
                  }
                 ],
-                "result": "fail",
-                "hard": [
-                 "dead-end"
-                ],
-                "failures": [
-                 {
-                  "what": "run",
-                  "got": "fixture: control not found: [data-action='mode'][data-value='sow']",
-                  "tag": "dead-end",
-                  "runs": [
-                   "en 360",
-                   "en 390"
-                  ]
-                 }
-                ]
+                "result": "pass"
                },
                {
                 "type": "action",
@@ -8902,21 +8418,7 @@
                     "says": "Room row while piglets remain unallocated: chip Sow died, headline 'N to allocate'"
                    }
                   ],
-                  "result": "fail",
-                  "hard": [
-                   "dead-end"
-                  ],
-                  "failures": [
-                   {
-                    "what": "run",
-                    "got": "fixture: control not found: [data-action='mode'][data-value='sow']",
-                    "tag": "dead-end",
-                    "runs": [
-                     "en 360",
-                     "en 390"
-                    ]
-                   }
-                  ]
+                  "result": "pass"
                  },
                  {
                   "type": "outcome",
@@ -8935,21 +8437,7 @@
                     "says": "Room row while piglets remain unallocated: her ID muted grey, chip Sow died, headline 'N to allocate' in the to-do colour"
                    }
                   ],
-                  "result": "fail",
-                  "hard": [
-                   "dead-end"
-                  ],
-                  "failures": [
-                   {
-                    "what": "run",
-                    "got": "fixture: control not found: [data-action='mode'][data-value='sow']",
-                    "tag": "dead-end",
-                    "runs": [
-                     "en 360",
-                     "en 390"
-                    ]
-                   }
-                  ]
+                  "result": "pass"
                  },
                  {
                   "type": "action",
@@ -8973,21 +8461,7 @@
                       "says": "Tapping the row opens the same sheet"
                      }
                     ],
-                    "result": "fail",
-                    "hard": [
-                     "dead-end"
-                    ],
-                    "failures": [
-                     {
-                      "what": "run",
-                      "got": "fixture: control not found: [data-action='mode'][data-value='sow']",
-                      "tag": "dead-end",
-                      "runs": [
-                       "en 360",
-                       "en 390"
-                      ]
-                     }
-                    ]
+                    "result": "pass"
                    },
                    {
                     "type": "action",
@@ -9011,21 +8485,7 @@
                         "says": "Partial allocation: the remaining count stays; never show '5 moved' on her row"
                        }
                       ],
-                      "result": "fail",
-                      "hard": [
-                       "dead-end"
-                      ],
-                      "failures": [
-                       {
-                        "what": "run",
-                        "got": "fixture: control not found: [data-action='mode'][data-value='sow']",
-                        "tag": "dead-end",
-                        "runs": [
-                         "en 360",
-                         "en 390"
-                        ]
-                       }
-                      ]
+                      "result": "pass"
                      },
                      {
                       "type": "action",
@@ -9049,21 +8509,7 @@
                           "says": "After hand-rear: headline 'N hand-reared'; the remaining count stays after a partial move"
                          }
                         ],
-                        "result": "fail",
-                        "hard": [
-                         "dead-end"
-                        ],
-                        "failures": [
-                         {
-                          "what": "run",
-                          "got": "fixture: control not found: [data-action='mode'][data-value='sow']",
-                          "tag": "dead-end",
-                          "runs": [
-                           "en 360",
-                           "en 390"
-                          ]
-                         }
-                        ]
+                        "result": "pass"
                        }
                       ]
                      }
@@ -9097,21 +8543,7 @@
                   "says": "Saving the sow's death is hold-to-commit"
                  }
                 ],
-                "result": "fail",
-                "hard": [
-                 "dead-end"
-                ],
-                "failures": [
-                 {
-                  "what": "run",
-                  "got": "fixture: control not found: [data-action='mode'][data-value='sow']",
-                  "tag": "dead-end",
-                  "runs": [
-                   "en 360",
-                   "en 390"
-                  ]
-                 }
-                ]
+                "result": "pass"
                }
               ]
              }
@@ -9454,21 +8886,7 @@
                   "says": "Abortion: any live piglet, the row stays, chip Aborted, headline '1 alive' (recorded counts only)"
                  }
                 ],
-                "result": "fail",
-                "hard": [
-                 "unreachable-control"
-                ],
-                "failures": [
-                 {
-                  "what": "tap [data-action='alive'][data-value='1']",
-                  "got": "control not found: [data-action='alive'][data-value='1']",
-                  "tag": "unreachable-control",
-                  "runs": [
-                   "en 360",
-                   "en 390"
-                  ]
-                 }
-                ]
+                "result": "pass"
                }
               ]
              }
@@ -9845,7 +9263,7 @@
                       "says": "Back leaves and returns to where you came from, keeping the draft"
                      }
                     ],
-                    "result": "pass"
+                    "result": "not-run"
                    }
                   ]
                  }
@@ -9892,7 +9310,7 @@
                     "says": "A non-list pig opens her pig record with \"Not in Farrowing\"; Back returns to the page she was found on"
                    }
                   ],
-                  "result": "pass"
+                  "result": "not-run"
                  }
                 ]
                }
@@ -10335,7 +9753,7 @@
                 "says": "A pig not on the list opens her pig record, line \"Not in Farrowing · Unit 3 · A2\""
                }
               ],
-              "result": "pass"
+              "result": "not-run"
              }
             ]
            },
@@ -10363,7 +9781,7 @@
                 "says": "A pig that died or was sold opens her pig record with \"Died 14 Oct\" first"
                }
               ],
-              "result": "pass"
+              "result": "not-run"
              }
             ]
            },
@@ -10391,7 +9809,7 @@
                 "says": "A tag no pig has: a toast on Scan, \"No pig with this tag\" / \"000999 · New tag, or not synced yet\", a ✕ at its left, the rest a door to her pig profile"
                }
               ],
-              "result": "pass"
+              "result": "not-run"
              },
              {
               "type": "action",
@@ -10415,7 +9833,7 @@
                   "says": "The ✕ closes the toast"
                  }
                 ],
-                "result": "pass"
+                "result": "not-run"
                }
               ]
              },
@@ -10441,7 +9859,7 @@
                   "says": "The rest of the toast is one door to her pig profile, which deals with a new tag"
                  }
                 ],
-                "result": "pass"
+                "result": "not-run"
                }
               ]
              }
@@ -10638,7 +10056,7 @@
                   "says": "The room dock carries ···; the menu is plain \"Actions\" with the line \"Pigs in Unit 7\""
                  }
                 ],
-                "result": "pass"
+                "result": "not-run"
                },
                {
                 "type": "outcome",
@@ -10657,7 +10075,7 @@
                   "says": "Verbs: Condition, Treat, Care, Note, Measure, Feed, Transfer. Death is not here: it cannot be undone"
                  }
                 ],
-                "result": "pass"
+                "result": "not-run"
                },
                {
                 "type": "action",
@@ -10681,7 +10099,7 @@
                     "says": "A verb opens Choose pigs: the search field with scan inside it, the filter, the line \"Condition · tick each pig in Unit 7, or scan.\", footer Back + Next (off until a tick)"
                    }
                   ],
-                  "result": "pass"
+                  "result": "not-run"
                  },
                  {
                   "type": "outcome",
@@ -10700,7 +10118,7 @@
                     "says": "Every pig in this unit, the farrowing sows and the rest, and only this unit; a dead sow is not listed"
                    }
                   ],
-                  "result": "pass"
+                  "result": "not-run"
                  },
                  {
                   "type": "action",
@@ -10724,7 +10142,7 @@
                       "says": "Ticking a pig gives \"Next · N pigs\""
                      }
                     ],
-                    "result": "pass"
+                    "result": "not-run"
                    },
                    {
                     "type": "action",
@@ -10748,7 +10166,7 @@
                         "says": "Every pig in this unit, the farrowing sows and the rest, can be chosen"
                        }
                       ],
-                      "result": "pass"
+                      "result": "not-run"
                      }
                     ]
                    },
@@ -10774,7 +10192,7 @@
                         "says": "Next is off until a pig is ticked"
                        }
                       ],
-                      "result": "pass"
+                      "result": "not-run"
                      }
                     ]
                    }
@@ -10802,7 +10220,7 @@
                       "says": "Search narrows the unit's list where it is; only this unit"
                      }
                     ],
-                    "result": "pass"
+                    "result": "not-run"
                    }
                   ]
                  },
@@ -10828,7 +10246,7 @@
                       "says": "Filter: which pigs (in Farrowing or not) and whether she has a condition; the button says Show N pigs"
                      }
                     ],
-                    "result": "pass"
+                    "result": "not-run"
                    },
                    {
                     "type": "action",
@@ -10852,7 +10270,7 @@
                         "says": "The filter button says Show N pigs"
                        }
                       ],
-                      "result": "pass"
+                      "result": "not-run"
                      },
                      {
                       "type": "action",
@@ -10876,7 +10294,7 @@
                           "says": "The filter narrows the list; the button shows how many are applied"
                          }
                         ],
-                        "result": "pass"
+                        "result": "not-run"
                        }
                       ]
                      }
@@ -10906,7 +10324,7 @@
                       "says": "Scan turns the list itself to scanning: the bar reads Scanning / Scan to tick pigs, with Stop"
                      }
                     ],
-                    "result": "pass"
+                    "result": "not-run"
                    }
                   ]
                  },
@@ -10937,7 +10355,7 @@
                       "says": "Back leaves and returns to where you came from"
                      }
                     ],
-                    "result": "pass"
+                    "result": "not-run"
                    }
                   ]
                  }
@@ -10976,7 +10394,7 @@
                   "says": "Scan with no reader yet: the bar waits (\"Waiting for reader\" / \"Make sure Reader 1 is on\" / Stop)"
                  }
                 ],
-                "result": "pass"
+                "result": "not-run"
                },
                {
                 "type": "outcome",
@@ -11026,7 +10444,7 @@
                 "says": "Scan: each read ticks her and marks her row; a pig of this unit is ticked"
                }
               ],
-              "result": "pass"
+              "result": "not-run"
              },
              {
               "type": "outcome",
@@ -11089,7 +10507,7 @@
                 "says": "In Choose pigs a read ticks her and marks her row"
                }
               ],
-              "result": "pass"
+              "result": "not-run"
              }
             ]
            },
@@ -11117,7 +10535,7 @@
                 "says": "A read that cannot join goes into the list at the top: other unit under its heading, Not on the farm (Died / Sold), No pig with this tag, then the unit's pens"
                }
               ],
-              "result": "pass"
+              "result": "not-run"
              },
              {
               "type": "outcome",
@@ -11136,7 +10554,7 @@
                 "says": "A pig from another unit, a dead pig and an unknown tag are never ticked; each row is a door to her record"
                }
               ],
-              "result": "pass"
+              "result": "not-run"
              },
              {
               "type": "outcome",
@@ -11203,7 +10621,7 @@
                 "says": "Ticking gives \"Next · N pigs\""
                }
               ],
-              "result": "pass"
+              "result": "not-run"
              },
              {
               "type": "action",
@@ -11227,7 +10645,7 @@
                   "says": "Next opens the verb's own form (Inspection's), filled once and saved for every pig chosen"
                  }
                 ],
-                "result": "pass"
+                "result": "not-run"
                }
               ]
              }
@@ -11257,7 +10675,7 @@
                 "says": "Saving returns to the room with the count: \"Condition recorded · 3 pigs\""
                }
               ],
-              "result": "pass"
+              "result": "not-run"
              }
             ]
            },
@@ -11434,15 +10852,15 @@
          }
         ],
         "run": {
-         "commit": "9f2f3d7",
-         "dirty": true,
-         "ran": "2026-10-28T13:49:07.407Z",
+         "commit": "a3ce0ed",
+         "dirty": false,
+         "ran": "2026-10-14T11:18:33.160Z",
          "langs": [
           "en"
          ],
          "widths": [
-          360,
-          390
+          390,
+          360
          ]
         },
         "notSupported": null
