@@ -1,0 +1,546 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Farrowing drawer v17 · prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../design-system/tokens.css">
+<link rel="stylesheet" href="../design-system/components/bundle.css">
+<style>
+/* Throwaway prototype (not committed): a visit is a draft shown as a sum (12 + 3 born − 1 died = 14), saved with Save. */
+*{box-sizing:border-box}
+body{margin:0;background:#e9ebe4;color:var(--ink);font:14px var(--font-sans);-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;cursor:pointer}
+.studio{display:flex;gap:28px;align-items:flex-start;justify-content:center;padding:24px 16px 48px;flex-wrap:wrap}
+.side{width:320px;display:flex;flex-direction:column;gap:16px}
+.side h1{font-size:20px;font-weight:600;margin:0}.side p{margin:0;color:var(--muted);font-size:13px;line-height:1.5}
+.reset{border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px 12px;align-self:flex-start}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 14px;font-size:13px}
+.card h2{font-size:13px;margin:0 0 8px;font-weight:600}
+.card ol{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px;max-height:220px;overflow:auto}
+.card li{display:flex;justify-content:space-between;gap:8px}.card li small{color:var(--muted);font-family:var(--font-mono)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.grid div{font-size:12px;color:var(--muted)}.grid b{display:block;font:600 18px var(--font-mono);color:var(--ink)}
+
+.phone{position:relative;width:390px;height:844px;border-radius:44px;background:#d9ddd2;overflow:hidden;box-shadow:0 0 0 10px #1d231c,0 20px 50px rgba(0,0,0,.25);flex:none}
+.statusbar{position:absolute;top:0;left:0;right:0;height:44px;display:flex;align-items:center;padding:0 28px;font:600 15px var(--font-sans);z-index:9}
+.room{position:absolute;inset:0;padding:60px 18px;filter:blur(2px);opacity:.55}.room div{height:120px;border-radius:18px;background:#fff;margin-bottom:12px}
+.drawer,.sheet{position:absolute;left:0;right:0;bottom:0;background:var(--paper);border-radius:28px 28px 0 0;box-shadow:0 -8px 30px rgba(32,41,31,.12);display:flex;flex-direction:column}
+.sheet{z-index:6;background:#f6f7f1}
+.scrim{position:absolute;inset:0;background:rgba(32,41,31,.25);z-index:5}
+.grab{width:40px;height:4px;border-radius:2px;background:#cdd2c6;margin:10px auto 6px;flex:none}
+.head{position:relative;text-align:center;padding:4px 18px 14px;border-bottom:1px solid var(--line);flex:none}
+.head h2{font:500 20px var(--font-sans);margin:0 0 6px}
+.head .corner{position:absolute;right:8px;top:-6px}
+.route{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.chip{font:600 13px var(--font-mono);color:var(--ink);background:#eef1e7;border-radius:999px;padding:4px 10px}
+.textbtn{border:0;background:none;padding:10px 10px;min-height:44px;font-weight:600;color:var(--ink);font-size:15px}
+.body{padding:16px 18px;display:flex;flex-direction:column;gap:12px}
+/* the result: a sum while something is entered, the plain number otherwise */
+.result{background:#edf3e8;border-radius:20px;padding:14px 12px 12px;text-align:center}
+.result .lbl{font-size:14px;color:#3f5a3c}
+.result .num{font:600 72px/1 var(--font-mono);margin:6px 0 2px}
+.sum{display:flex;align-items:flex-end;justify-content:center;gap:8px;margin:4px 0 0}
+.sum .term{display:flex;flex-direction:column;align-items:center;gap:2px}
+.sum .term b{font:600 26px/1.1 var(--font-mono)}
+.sum .term small{font-size:12px;color:#3f5a3c}
+.sum .op{font:500 22px/1.6 var(--font-mono);color:#3f5a3c}
+.sum .eq b{font-size:44px;line-height:1}
+.sum .add b{color:#2f6b3a}.sum .sub b{color:#8a2a1c}
+.also{font-size:13px;color:var(--muted);margin-top:8px}
+.saved{display:flex;align-items:center;justify-content:center;gap:6px;font-size:13px;color:var(--muted);min-height:24px}.saved svg{display:inline-block;width:14px;height:14px}
+/* the main action: Born alive, a big counter for this visit */
+.bornbox{border:1px solid var(--line);border-radius:20px;padding:12px;display:grid;grid-template-columns:72px 1fr 1fr;gap:10px;align-items:center}
+.bornbox .minus{height:96px;border-radius:16px;border:1px dashed var(--control-border);background:#f3f5ee;font:600 30px var(--font-sans)}
+.bornbox .minus[aria-disabled=true]{opacity:1;color:#8b9486}
+.bornbox .minus:not([aria-disabled=true]){border-style:solid;background:#fff}
+.bornbox .n{text-align:center}.bornbox .n b{display:block;font:600 40px/1 var(--font-mono)}.bornbox .n small{font-size:13px;color:var(--muted)}
+.bornbox .plus{grid-column:3;height:96px;border:0;border-radius:16px;background:#2b6a3a;color:#fff;font:600 19px var(--font-sans);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.bornbox .plus svg{width:26px;height:26px}
+.bornbox .plus:active{background:#245a31}
+.death{min-height:64px;border:1px solid var(--control-border);background:#fff;border-radius:16px;font:600 17px var(--font-sans);display:flex;align-items:center;justify-content:center;gap:8px}
+.death svg{width:18px;height:18px;color:var(--muted)}.death small{font:500 14px var(--font-sans);color:#8a2a1c}
+.foot{display:flex;gap:10px;padding:14px 18px 28px;border-top:1px solid var(--line);flex:none;background:var(--paper)}
+.foot button{min-height:56px;border-radius:12px;font-size:16px;font-weight:500}
+.foot .back{border:1px solid var(--line);background:#fff;padding:0 16px}
+.foot .primary{flex:1;border:0;background:#1d231c;color:#fff;font-weight:600;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.foot .primary small{font:500 13px var(--font-sans);opacity:.85;margin-top:2px}
+.foot .primary .cap{font-size:11px;letter-spacing:.06em}
+.foot .primary:disabled{background:#e4e8dd;color:#4b5547;border:1px dashed var(--control-border)}
+.foot .more{width:56px;border:1px solid var(--line);background:#fff;display:flex;align-items:center;justify-content:center}.foot .more svg{width:20px;height:20px}
+/* v7: the Alive card is a door to Litter details */
+.alivecard{display:block;width:100%;border:0;background:#f6f7f1;border:1px solid var(--line);border-radius:20px;padding:14px 16px 12px;text-align:left;position:relative}
+.alivecard .lbl{font-size:14px;color:var(--muted)}
+.alivecard .row{display:flex;align-items:baseline;gap:12px;margin-top:2px}
+.alivecard .big{font:600 56px/1.05 var(--font-mono)}
+.alivecard .from{font:600 30px/1 var(--font-mono);color:var(--muted)}
+.alivecard .arrow{font:500 24px var(--font-sans);color:var(--muted)}
+.alivecard .what{font-size:13px;color:var(--muted);margin-top:4px}
+.alivecard .what b{color:#2f6b3a;font-weight:600}
+.alivecard .what svg{display:inline-block;width:14px;height:14px;vertical-align:-2px;color:#2f6b3a}
+.alivecard .go{position:absolute;right:14px;top:14px;display:flex;align-items:center;gap:4px;font-size:13px;color:var(--ink);font-weight:600}
+.alivecard .go svg{width:14px;height:14px}
+.death{position:relative}
+.death .corner-badge{position:absolute;top:-8px;right:-6px;min-width:26px;height:26px;border-radius:13px;background:#8a2a1c;color:#fff;font:600 13px/26px var(--font-sans);padding:0 7px}
+.details .facts{background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px 16px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.details .facts div{font-size:13px;color:var(--muted)}.details .facts b{display:block;font:600 22px var(--font-mono);color:var(--ink);margin-top:2px}
+.details .sub{font-size:13px;color:var(--muted);margin:0 2px}
+.details .list{background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden}
+.details .list button{display:flex;align-items:center;gap:12px;width:100%;border:0;border-top:1px solid var(--line);background:#fff;min-height:64px;padding:10px 16px;text-align:left}
+.details .list button:first-child{border-top:0}.details .list svg{width:18px;height:18px;color:var(--muted);flex:none}
+.details .list .t{flex:1;display:flex;flex-direction:column;gap:2px;font-size:16px}.details .list .t small{font-size:13px;color:var(--muted)}
+.ctl{display:flex;flex-direction:column;gap:6px}.ctl b{font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.seg{display:flex;background:#dfe3d8;border-radius:10px;padding:3px;gap:3px}.seg button{flex:1;border:0;background:transparent;border-radius:8px;padding:8px 6px;font-size:13px}.seg button[aria-pressed=true]{background:#fff;font-weight:600}
+/* v8: the newest Alive never moves; the change shows beside or under it */
+.ac{display:block;width:100%;background:#f6f7f1;border:1px solid var(--line);border-radius:20px;padding:14px 16px 14px;text-align:left;position:relative;min-height:132px}
+.ac .lbl{font-size:14px;color:var(--muted)}
+.ac .go{position:absolute;right:14px;top:14px;display:flex;align-items:center;gap:4px;font-size:13px;color:var(--ink);font-weight:600}.ac .go svg{width:14px;height:14px}
+.ac .main{display:flex;align-items:flex-end;gap:14px;margin-top:2px}
+.ac .big{font:600 56px/1.05 var(--font-mono);display:inline-block}
+.ac .was{font:500 15px var(--font-sans);color:var(--muted);margin-bottom:10px}.ac .was s{font-family:var(--font-mono)}
+.ac .line{font-size:13px;color:var(--muted);margin-top:6px}.ac .line svg{display:inline-block;width:14px;height:14px;vertical-align:-2px;color:#2f6b3a}
+.ac .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.ac .chip2{font:600 13px var(--font-sans);border-radius:999px;padding:4px 10px;background:#eef1e7;color:var(--ink)}
+.ac .chip2.add{background:#e3efdc;color:#2f6b3a}.ac .chip2.sub{background:#f6e1dc;color:#8a2a1c}.ac .chip2.quiet{background:transparent;color:var(--muted);padding-left:2px;font-weight:500}
+.ac .ledger{margin-bottom:6px;display:grid;grid-template-columns:auto auto;column-gap:10px;row-gap:1px;font-size:13px;color:var(--muted)}
+.ac .ledger b{font:600 14px var(--font-mono);text-align:right;color:var(--ink)}.ac .ledger .add{color:#2f6b3a}.ac .ledger .sub{color:#8a2a1c}
+.ac .eqn{display:flex;align-items:baseline;gap:8px;flex-wrap:nowrap}.ac .eqn .t{font:600 30px/1 var(--font-mono)}.ac .eqn .t.add{color:#2f6b3a}.ac .eqn .t.sub{color:#8a2a1c}.ac .eqn .op{font:500 26px var(--font-mono);color:var(--muted)}.ac .eqn .res{font:600 56px/1.05 var(--font-mono)}
+.ac .status{display:inline-flex;align-items:center;gap:6px;font:600 13px var(--font-sans);border-radius:999px;padding:4px 10px;margin-top:8px}.ac .status.draft{background:#fbf0d9;color:#7a5410}.ac .status.saved{background:transparent;color:var(--muted);padding-left:0;font-weight:500}.ac .status svg{display:inline-block;width:14px;height:14px}.ac .status .m{font-family:var(--font-mono);font-weight:600}
+.ac .unsaved{font-size:13px;color:#8a5a1d;margin-top:6px}
+.ac .big.bump{animation:bump .22s ease}@keyframes bump{50%{transform:scale(1.07)}}
+/* drawer levels: the next level slides in from the right, Back slides it out */
+.lvl{animation:in-right .24s ease both}.lvl.back{animation:in-left .24s ease both}
+@keyframes in-right{from{transform:translateX(40px);opacity:0}}@keyframes in-left{from{transform:translateX(-40px);opacity:0}}
+.drawer.hold{height:600px}.drawer.hold .body{flex:1;overflow:auto}.drawer.hold .body>*{flex:none}
+.head .xclose{position:absolute;left:8px;top:-6px;width:48px;height:48px;border:0;background:none;display:flex;align-items:center;justify-content:center}.head .xclose svg{width:20px;height:20px}
+.ac .ns{color:#8a5a1d;font-weight:600}
+.details2 .page-head .corner{display:flex;align-items:center;gap:4px}.details2 .page-head .corner svg{display:inline-block;width:14px;height:14px}
+.details2 .hint{margin:0 2px;font-size:13px;color:var(--muted)}
+.ledger2{background:#fff;border:1px solid var(--line);border-radius:18px;padding:6px 16px 4px}
+.ledger2 .lsec{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:12px 0 2px}
+.ledger2 .lgroup{display:flex;justify-content:space-between;font:600 15px var(--font-sans);padding:8px 0 2px}
+.ledger2 .lgroup span{font-family:var(--font-mono)}
+.ledger2 .lrow{display:flex;justify-content:space-between;align-items:baseline;padding:6px 0;font-size:15px}
+.ledger2 .lrow.ind{padding-left:16px;color:#3c4639}
+.ledger2 .lrow.ed{display:block;padding:0}.ledger2 .lrow.ed.ind{padding-left:12px}
+.ledger2 .lval{font:600 16px var(--font-mono)}
+.ledger2 .ltotal{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--ink);margin-top:10px;padding:10px 0 8px}
+.ledger2 .ltotal+.ltotal{border-top:1px solid var(--line);margin-top:0}
+.ledger2 .ltotal .lname{font:600 16px var(--font-sans);display:flex;flex-direction:column}
+.ledger2 .ltotal small{font:400 12px var(--font-sans);color:var(--muted);margin-top:2px}
+.ledger2 .ltotal .lval{font-size:22px}
+.ledger2 .ltotal.big .lval{font-size:34px}
+.logbox{background:#fff;border:1px solid var(--line);border-radius:18px;padding:4px 16px 2px}
+.logbox .lsec{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:12px 0 6px}
+.logbox ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.logbox li{display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-top:1px solid var(--line);font-size:14px}.logbox li:first-child{border-top:0}
+.logbox li small{font-size:12px;color:var(--muted);white-space:nowrap}
+.logbox .textbtn{display:flex;align-items:center;gap:4px;padding-left:0}.logbox .textbtn svg{display:inline-block;width:14px;height:14px}
+.details2 .foot{background:#f6f7f1}
+.details3 .page-head .corner{display:flex;align-items:center;gap:4px}.details3 .page-head .corner svg{display:inline-block;width:14px;height:14px}
+.ledger3{background:#fff;border:1px solid var(--line);border-radius:18px;padding:4px 16px}
+.ledger3 .lrow{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-top:1px solid var(--line)}.ledger3 .lrow:first-child{border-top:0}
+.ledger3 .lname{display:flex;flex-direction:column;font:500 16px var(--font-sans)}
+.ledger3 small{font:400 13px var(--font-sans);color:var(--muted);margin-top:2px}
+.ledger3 .lval{font:600 18px var(--font-mono)}
+.ledger3 .ltotal{display:flex;justify-content:space-between;align-items:center;border-top:1.5px solid var(--ink);padding:12px 0 10px}
+.ledger3 .ltotal+.ltotal{border-top:1px solid var(--line)}
+.ledger3 .ltotal .lname{font-weight:600}.ledger3 .ltotal .lval{font-size:24px}.ledger3 .ltotal.big .lval{font-size:36px}
+.logrow{display:flex;align-items:center;gap:12px;width:100%;min-height:64px;padding:10px 16px;border:1px solid var(--line);border-radius:18px;background:#fff;text-align:left}
+.logrow svg{width:18px;height:18px;color:var(--muted);flex:none}.logrow span{flex:1;display:flex;flex-direction:column;font-size:16px}.logrow small{font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:250px}
+.sheet3{background:#fff;border:1px solid var(--line);border-radius:18px;padding:2px 14px 6px}
+.sheet3 .cgroup{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:14px 0 2px}
+.sheet3 .cell{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:56px;border-top:1px solid var(--line)}
+.sheet3 .cell:first-child{border-top:0}.sheet3 .cgroup+.cell{border-top:0}
+.sheet3 .cname{display:flex;flex-direction:column;font:500 16px var(--font-sans)}.sheet3 .cname small{font-size:12px;color:#8a5a1d;min-height:0}
+.sheet3 input{width:76px;height:48px;border:1px solid var(--control-border);border-radius:12px;text-align:right;padding:0 12px;font:600 18px var(--font-mono);color:var(--ink);background:#fff}
+.sheet3 input:focus{outline:none;border:2px solid var(--ink);padding:0 11px}
+.sheet3 .cell.changed input{border-color:#c79a3d;background:#fdf6e6;color:#7a5410}
+.effect{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:10px 18px;border-top:1px solid var(--line);background:#fff;font-size:14px;color:var(--muted)}
+.effect .elbl{font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+.effect b{font:600 16px var(--font-mono);color:var(--ink)}.effect s{font-family:var(--font-mono)}.effect .ch b{color:#7a5410}
+.details3 .foot{background:#f6f7f1}
+.details4 .page-head .corner{display:flex;align-items:center;gap:4px}.details4 .page-head .corner svg{display:inline-block;width:14px;height:14px}
+.ledger4{background:#fff;border:1px solid var(--line);border-radius:18px;padding:8px 16px 0}
+.ledger4 .lrow{display:flex;justify-content:space-between;align-items:center;min-height:40px}
+.ledger4.editing .lrow:not(.grp){min-height:54px}
+.ledger4 .lrow.ind{padding-left:16px}
+.ledger4 .lrow.grp{margin-top:6px}
+.ledger4 .lname{display:flex;flex-direction:column;font:500 16px var(--font-sans)}
+.ledger4 .lrow.ind .lname{font-weight:400;color:#3c4639}
+.ledger4 .lrow.grp .lname,.ledger4 .lrow.grp .lval{font-weight:600}
+.ledger4 .lname small{font:500 12px var(--font-sans);color:#8a5a1d}.ledger4 .lname small:empty{display:none}
+.ledger4 .lval{font:600 17px var(--font-mono);min-width:32px;text-align:right}
+.ledger4 .lval.none{color:var(--muted);font-weight:500}
+.ledger4.editing .lrow.grp .lval{color:var(--muted)}
+.ledger4 input{width:72px;height:46px;border:1px solid var(--control-border);border-radius:12px;text-align:right;padding:0 12px;font:600 17px var(--font-mono);color:var(--ink);background:#fff}
+.ledger4 input:focus{outline:none;border:2px solid var(--ink);padding:0 11px}
+.ledger4 .lrow.changed input{border-color:#c79a3d;background:#fdf6e6;color:#7a5410}
+.ledger4 .totals{border-top:1.5px solid var(--ink);margin-top:8px;background:#fff}
+.ledger4.editing .totals{position:sticky;bottom:-12px;box-shadow:0 -10px 14px #fff;padding-bottom:4px}
+.ledger4 .ltotal{display:flex;justify-content:space-between;align-items:center;padding:10px 0}
+.ledger4 .ltotal+.ltotal{border-top:1px solid var(--line)}
+.ledger4 .ltotal .lname{font-weight:600}.ledger4 .ltotal small{font:400 12px var(--font-sans);color:var(--muted);margin-top:2px}
+.ledger4 .ltotal .lval{font-size:22px}.ledger4 .ltotal.big .lval{font-size:34px}
+.ledger4 .ltotal s{font-size:16px;color:var(--muted);font-weight:500}
+.details4 .foot{background:#f6f7f1}
+.ac.due{min-height:0;padding-bottom:12px}.ac .duew{color:var(--ink);font-weight:600}
+.pasthead .asst{font:600 12px var(--font-sans);color:#7a5410}
+.lastl{display:flex;gap:24px;font-size:14px;color:var(--muted)}.lastl b{font:600 24px var(--font-mono);color:var(--ink);margin-right:5px}.lastl .warn b{color:#8a2a1c}.ac.due .big{font-size:48px}.past{background:#f6f7f1;border:1px solid var(--line);border-radius:20px;padding:12px 16px 12px;display:flex;flex-direction:column;gap:4px}
+.pasthead{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:4px}.pasthead b{font:600 14px var(--font-mono);color:var(--ink)}
+.plrow{display:grid;grid-template-columns:1fr 64px 62px;align-items:center;padding:8px 0;border-top:1px solid var(--line)}
+.pln{display:flex;flex-direction:column;font:500 15px var(--font-sans)}.pln small{font-size:12px;color:var(--muted)}.pln .asst{font:600 12px var(--font-sans);color:#7a5410;margin-left:6px}.pln{flex-direction:row!important;align-items:baseline}
+.plf{text-align:right;font-size:13px;color:var(--muted)}.plf b{font:600 17px var(--font-mono);color:var(--ink)}.plf.warn b{color:#8a2a1c}
+.snote{display:flex;gap:10px;align-items:flex-start;background:#fbf6e8;border:1px solid #efe2c2;border-radius:16px;padding:10px 14px;font:500 14px var(--font-sans);color:#4a3b17}
+.snote svg{width:16px;height:16px;flex:none;margin-top:2px;color:#8a6a1d}.snote span{display:flex;flex-direction:column}.snote small{font:400 12px var(--font-sans);color:#7a6a45;margin-top:2px}
+.preg{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;background:#f6f7f1;border:1px solid var(--line);border-radius:18px;padding:12px 14px}
+.preg div{display:flex;flex-direction:column;font-size:12px;color:var(--muted);gap:3px}.preg b{font:600 15px var(--font-sans);color:var(--ink)}.preg b.ok{color:#2f6b3a}
+.ac .dayw{font:600 26px var(--font-sans);margin-bottom:6px}.ac.due .main{gap:8px}.ac .duechip{display:inline-block;margin-left:6px;font:600 12px var(--font-sans);color:var(--ink);background:#e7ebdf;border-radius:999px;padding:2px 8px;vertical-align:1px}
+.startbtn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;width:100%;min-height:104px;border:0;border-radius:20px;background:#2b6a3a;color:#fff;font:600 22px var(--font-sans)}
+.startbtn svg{width:26px;height:26px;margin-bottom:2px}.startbtn small{font:500 13px var(--font-sans);opacity:.85}
+.sheet.menu2{background:#f6f7f1;max-height:85%}
+.menu2 .head{background:#f6f7f1;border-radius:28px 28px 0 0}
+.menu2 .menu-body{flex:1 1 auto;overflow:auto;padding:16px 18px 18px;gap:12px}.menu2 .menu-body>*{flex:none}
+.menu2 .foot{background:#f6f7f1}.foot .back.wide{flex:1}
+.tiles.three{grid-template-columns:1fr 1fr 1fr}.tiles.three .tile{min-height:96px;padding:12px}
+.tile[aria-pressed=true]{border:2px solid var(--ink)}
+.assist-note{margin-top:4px}
+/* v13 awaiting face */
+.due3{background:#f6f7f1;border:1px solid var(--line);border-radius:20px;padding:16px 16px 12px}
+.dtop{display:flex;justify-content:space-between;align-items:flex-start}
+.dhead{font:600 22px var(--font-sans)}.dsub{font-size:13px;color:var(--muted);margin-top:2px}
+.dday{font:600 40px/1 var(--font-mono);text-align:right}.dday small{display:block;font:500 12px var(--font-sans);color:var(--muted);margin-bottom:2px}
+.track{position:relative;height:10px;border-radius:5px;background:#e3e7dc;margin:22px 4px 0}
+.track .fill{position:absolute;left:0;top:0;bottom:0;border-radius:5px;background:#9fb38f}
+.track .over{position:absolute;top:0;bottom:0;right:0;border-radius:0 5px 5px 0;background:repeating-linear-gradient(135deg,#f1dcb0 0 4px,#f8ecd2 4px 8px)}
+.track i{position:absolute;top:12px;width:1px;height:5px;background:#c3c9bb}.track i.due{height:9px;width:2px;background:var(--ink)}
+.track .me{position:absolute;top:50%;width:20px;height:20px;margin:-10px 0 0 -10px;border-radius:50%;background:#fff;border:4px solid var(--ink);box-sizing:border-box}
+.tlabels{position:relative;height:18px;margin:10px 4px 0;font-size:12px;color:var(--muted)}
+.tlabels span{position:absolute;transform:translateX(-50%);white-space:nowrap}.tlabels span:first-child{transform:none}.tlabels .o{color:#8a5a1d}
+.past3{background:#f6f7f1;border:1px solid var(--line);border-radius:20px;padding:14px 16px}
+.phead{display:flex;justify-content:space-between;font:600 15px var(--font-sans)}.pmeta{font:400 13px var(--font-sans);color:var(--muted)}.pmeta b{color:#7a5410;font-weight:600}
+.dots{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 10px}.dots i{width:16px;height:16px;border-radius:50%;background:var(--ink)}.dots i.d{background:transparent;border:2.5px solid #a3412f;box-sizing:border-box}
+.pcap{font-size:14px;color:var(--muted)}.pcap b{font:600 16px var(--font-mono);color:var(--ink)}.pcap b.r{color:#8a2a1c}.pcap .sep{margin:0 4px}
+.past3.dots-sage .dots i{background:#7f9a6c}.past3.dots-sage .dots i.d{background:#b8513d;border:0}
+.past3.dots-green .dots i{background:#2b6a3a}.past3.dots-green .dots i.d{background:transparent}
+.past3.dots-quiet .dots i.d{background:#dfe3d8;border:0}.past3.dots-quiet .pcap b.r{color:var(--muted)}
+/* no visible scrollbars inside the phone (the phone has none) */
+.phone *{scrollbar-width:none}.phone *::-webkit-scrollbar{display:none}
+/* the Alive card keeps one height: its last line is reserved for Started / the chips */
+.ac{min-height:136px}.ac .line,.ac .chips{min-height:28px;margin-top:6px;display:flex;align-items:center;gap:6px;flex-wrap:nowrap}
+.ac .chips .chip2{padding:3px 9px}
+/* the real Actions sheet's rhythm: the group label sits close over its card */
+.menu2 .st-heading{margin:4px 0 -4px}
+/* v14: the Alive card drawn */
+.dotscard .main{margin-top:0}.dotscard .big{font-size:52px}
+.ldots{display:flex;flex-wrap:wrap;gap:5px;min-height:14px;margin:6px 0 8px}
+.ldots i{width:14px;height:14px;border-radius:50%;box-sizing:border-box}
+.ldots i.a{background:#7f9a6c}.ldots i.d{background:#b8513d}
+.ldots i.new{background:transparent!important;border:2.5px solid}
+.ldots i.a.new{border-color:#7f9a6c}.ldots i.d.new{border-color:#b8513d}
+.dcap{min-height:20px;font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.dcap b{font:600 15px var(--font-mono)}.dcap b.g{color:#2f6b3a}.dcap b.r{color:#8a2a1c}.dcap .sep{color:#c3c9bb}.dcap svg{display:inline-block;width:14px;height:14px;color:#2f6b3a}
+/* v15: the litter drawing scales: one row, items shrink to fit, groups of five */
+.litter{display:flex;flex-wrap:nowrap;align-items:center;gap:3px;height:16px;margin:8px 0 8px;width:100%}
+.litter i{flex:none;width:var(--d);height:var(--d);border-radius:50%;box-sizing:border-box}
+.litter b.g5{flex:0 0 4px}
+.litter i.a{background:#7f9a6c}.litter i.d{background:#b8513d}
+.litter i.new{background:transparent!important;border:2px solid}.litter i.a.new{border-color:#7f9a6c}.litter i.d.new{border-color:#b8513d}
+.litter.bar{gap:2px}.litter.bar i{flex:1 1 0;width:auto;height:14px;border-radius:3px}
+.litter.bar i.new{background:repeating-linear-gradient(135deg,currentColor 0 2px,transparent 2px 5px)!important;border:0}.litter.bar i.a.new{color:#7f9a6c}.litter.bar i.d.new{color:#b8513d}
+.litter.bar b.g5{flex:0 0 3px}
+.past3 .litter{margin:12px 0 10px}
+/* v16: a health bar. Smooth when saved; granular only where this visit changed it */
+.hbar{display:flex;gap:3px;height:16px;margin:10px 0 10px;width:100%}
+.hblock{border-radius:5px;min-width:6px}.hblock.a{background:#7f9a6c}.hblock.d{background:#b8513d}
+.hchunk{display:flex;gap:2px;min-width:6px}
+.hchunk i{flex:1 1 0;border-radius:3px}
+.hchunk.a.new i{background:#c9d8bd;box-shadow:inset 0 0 0 1.5px #7f9a6c}
+.hchunk.d.drained i{background:repeating-linear-gradient(135deg,#b8513d 0 2px,#f3d9d2 2px 5px);box-shadow:inset 0 0 0 1.5px #b8513d}
+.hchunk.d.new i{background:#f3d9d2;box-shadow:inset 0 0 0 1.5px #b8513d}
+.past3 .hbar{margin:12px 0 10px}
+/* v17: the Alive card is the number and a small ledger of the visit */
+.ac.v17{min-height:0;padding:16px}
+.ac.v17 .lbl{line-height:20px}.ac.v17 .go{top:16px;right:16px;line-height:20px}
+.v17row{display:flex;align-items:center;justify-content:space-between;gap:16px;height:84px;margin-top:12px}
+.v17row .big{font:600 64px/1 var(--font-mono);letter-spacing:-1px}
+.vledger{display:grid;grid-template-columns:auto auto;column-gap:18px;row-gap:0;align-items:baseline;line-height:20px;padding:0 2px}
+.vledger .ll{font-size:13px;color:var(--muted)}
+.vledger .lv{font:600 16px var(--font-mono);text-align:right;color:var(--ink)}
+.vledger .lv.r{color:#8a2a1c}.vledger .lv.q{color:var(--muted);font-weight:500}
+.vledger .lrule{grid-column:1/3;height:1px;background:var(--line);margin:2px 0}
+.vquiet{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:5px}.vquiet svg{display:inline-block;width:14px;height:14px;color:#2f6b3a}
+.vchips{display:flex;flex-direction:column;align-items:flex-end;gap:5px}
+.vc{display:inline-flex;align-items:center;gap:5px;width:134px;height:24px;box-sizing:border-box;font:500 13px/1 var(--font-sans);border-radius:999px;padding:0 10px;background:#eef1e7;color:var(--ink)}
+.vc b{font:600 14px/1 var(--font-mono);width:24px;text-align:right;flex:none}
+.vc svg{display:block;flex:none;width:15px;height:15px;stroke-width:2}
+.vc.add{background:#e3ecdb;color:#2f5a2c}.vc.sub{background:#f6e1dc;color:#8a2a1c}.vc.q{background:#eceee7;color:#4b5547}
+/* the death page */
+.page{position:absolute;inset:0;background:#f6f7f1;z-index:7;display:flex;flex-direction:column}
+.page-head{position:relative;display:flex;align-items:center;gap:14px;padding:56px 18px 14px}
+.page-head .pb{width:48px;height:48px;border-radius:12px;border:1px solid var(--line);background:#fff;display:flex;align-items:center;justify-content:center;flex:none}.page-head .pb svg{width:20px;height:20px}
+.page-head h2{font:500 22px var(--font-sans);margin:0}.page-head p{margin:2px 0 0;font-size:13px;color:var(--muted)}
+.page-head .corner{margin-left:auto}
+.page-body{flex:1;overflow:auto;padding:6px 18px 12px;display:flex;flex-direction:column;gap:14px}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tile{position:relative;min-height:88px;border-radius:18px;border:1px solid var(--line);background:#fff;padding:14px;display:flex;flex-direction:column;justify-content:flex-end;text-align:left;gap:2px}
+.tile b{font:600 17px var(--font-sans)}.tile span{font-size:13px;color:var(--muted)}
+.tile .cnt{position:absolute;top:10px;right:12px;font:600 13px var(--font-sans);color:#8a2a1c}
+.tile[aria-pressed=true]{border:2px solid var(--ink);padding:13px}
+.causes{background:#fff;border:1px solid var(--line);border-radius:18px;padding:2px 14px}
+.causes .st-stepper+.st-stepper{border-top:1px solid var(--line)}
+.page .foot{background:#f6f7f1}
+.menu .list{margin:0 18px;background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden}
+.menu .list button{display:flex;align-items:center;gap:12px;width:100%;border:0;border-top:1px solid var(--line);background:#fff;min-height:64px;padding:10px 16px;text-align:left}
+.menu .list button:first-child{border-top:0}.menu .list svg{width:18px;height:18px;color:var(--muted);flex:none}
+.menu .list .t{flex:1;display:flex;flex-direction:column;gap:2px;font-size:16px}.menu .list .t small{font-size:13px;color:var(--muted)}
+.menu h3{text-align:center;font:500 20px var(--font-sans);margin:2px 0 14px}
+.menu .mb{margin:14px 18px 28px}.menu .mb button{width:100%;min-height:56px;border:1px solid var(--line);background:#fff;border-radius:12px;font-size:16px}
+.closed{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:40px;text-align:center;background:#f6f7f1;z-index:8}
+.closed p{margin:0;color:var(--muted)}.closed button{min-height:56px;border-radius:12px;border:0;background:#1d231c;color:#fff;padding:0 24px;font-weight:600}
+@media(max-width:760px){.side{width:100%;max-width:390px}}
+</style></head>
+<body>
+<main class="studio">
+ <section class="side">
+  <div><h1>v12: Due → Start farrowing; the real Actions sheet; Assisted farrowing</h1><p>Throwaway prototype. An awaiting sow shows when she is due and <b>Start farrowing</b>; started, she shows Alive 0 and the counting face. <b>···</b> opens her Actions as the real sheet (verb grid, note, Production). <b>Assisted farrowing</b> is a new Production action.</p></div>
+  <div class="ctl"><b>Sow</b><div class="seg" data-ctl="sow"><button data-v="awaiting">Awaiting (due today)</button><button data-v="farrowing">Already farrowing</button></div><b style="margin-top:6px">Dot colours</b><div class="seg" data-ctl="dots"><button data-v="ink">Ink</button><button data-v="sage">Sage</button><button data-v="green">Green</button><button data-v="quiet">Quiet</button></div><b style="margin-top:6px">Litter drawing</b><div class="seg" data-ctl="lit"><button data-v="dots">Dots in fives</button><button data-v="bar">Segment bar</button><button data-v="health">Health bar</button></div>
+  <b style="margin-top:6px">Test litter size (already farrowing)</b><div class="seg" data-ctl="size"><button data-v="9">9 born</button><button data-v="14">14</button><button data-v="22">22</button><button data-v="28">28</button></div>
+  <b style="margin-top:6px">History</b><div class="seg" data-ctl="hist"><button data-v="sow">Has a last litter</button><button data-v="gilt">First litter (gilt)</button></div><b style="margin-top:6px">Her note</b><div class="seg" data-ctl="note"><button data-v="none">No note</button><button data-v="has">Has a note</button></div></div>
+  <div class="ctl"><b>How the change shows</b><div class="seg" data-ctl="card"><button data-v="was">was 11</button><button data-v="pills">Chips</button><button data-v="receipt">Receipt</button><button data-v="sum">12 +3 = 15</button></div><div class="seg" data-ctl="card" style="margin-top:4px"><button data-v="status">Codex A: Draft status</button><button data-v="blend">A + your sum</button></div></div>
+  <div class="card"><h2>Saved record</h2><div class="grid"><div>Born alive<b id="t-ba"></b></div><div>Born dead<b id="t-bd"></b></div><div>Died<b id="t-di"></b></div><div>Alive<b id="t-al"></b></div><div>Total born<b id="t-tb"></b></div></div></div>
+  <div class="card"><h2>Saves</h2><ol id="log"></ol></div>
+  <button class="reset" data-act="reset">Reset ↻</button>
+ </section>
+ <div class="phone" id="phone"></div>
+</main>
+<script src="../design-system/components/bundle.js"></script>
+<script>
+const I=n=>SentriIcons.icon(n);
+const BORN_DEAD=[['stillborn','Stillborn'],['mummified','Mummified']];
+const DIED=[['crushed','Crushed'],['scours','Scours'],['starve','Starve-out'],['other','Other']];
+let st;
+function blank(){return {born:0,dead:{}};}
+function reset(){const aw=(window.__sow||'awaiting')==='awaiting';st={rec:aw?{bornAlive:0,missing:0,started:false,startedAt:'',assists:[],dead:{stillborn:0,mummified:0,crushed:0,scours:0,starve:0,other:0}}:(()=>{const n=+(window.__size||14),dead=Math.max(1,Math.round(n/7)),sb=Math.ceil(dead/2),cr=dead-sb;return {bornAlive:n-sb,missing:0,started:true,startedAt:'05:40',assists:[],dead:{stillborn:sb,mummified:0,crushed:cr,scours:0,starve:0,other:0}};})(),draft:blank(),page:null,menu:false,closed:false,log:[],justSaved:''};}
+reset();
+const sumKeys=(o,list)=>list.reduce((a,[k])=>a+(o[k]||0),0);
+const aliveOf=r=>r.bornAlive-sumKeys(r.dead,DIED)-(r.missing||0);
+const totalBorn=r=>r.bornAlive+sumKeys(r.dead,BORN_DEAD);
+const d=()=>st.draft,dBorn=()=>d().born,dBD=()=>sumKeys(d().dead,BORN_DEAD),dDied=()=>sumKeys(d().dead,DIED);
+const hasDraft=()=>dBorn()+dBD()+dDied()>0;
+const before=()=>aliveOf(st.rec),after=()=>before()+dBorn()-dDied();
+const time=()=>new Date().toTimeString().slice(0,8);
+const summary=()=>[dBorn()?`+${dBorn()} born`:'',dBD()?`${dBD()} born dead`:'',dDied()?`${dDied()} died`:''].filter(Boolean).join(' · ');
+const opt={card:'pills',sow:'awaiting',note:'none',dots:'sage',hist:'sow',lit:'health',size:'14'};
+// The Alive card: the newest Alive is always the big number, in one place; the visit's change shows beside or under it.
+function healthBar(p){
+ // p: {alive, dead, newAlive, newDied, newBornDead}; widths follow the count of piglets, the saved blocks have no inner divisions
+ const cells=(n,c)=>Array.from({length:n},()=>`<i class="${c}"></i>`).join('');
+ const chunk=(n,c)=>n?`<span class="hchunk ${c}" style="flex-grow:${n}">${cells(n,'c')}</span>`:'';
+ const block=(n,c)=>n?`<span class="hblock ${c}" style="flex-grow:${n}"></span>`:'';
+ return `<div class="hbar">${block(p.alive,'a')}${chunk(p.newAlive,'a new')}${chunk(p.newDied,'d drained')}${block(p.dead,'d')}${chunk(p.newBornDead,'d new')}</div>`;
+}
+function litterRow(items){const n=items.length,groups=Math.floor((n-1)/5),d=Math.max(6,Math.min(14,Math.floor((316-(n-1+groups)*3-groups*4)/n)));return `<div class="litter ${opt.lit}" style="--d:${d}px">${items.map((x,i)=>(i&&i%5===0?'<b class="g5"></b>':'')+x).join('')}</div>`;}
+function litterDots(){
+ if(opt.lit==='health'){const r=st.rec;return healthBar({alive:aliveOf(r)-dDied(),dead:sumKeys(r.dead,BORN_DEAD)+sumKeys(r.dead,DIED),newAlive:dBorn(),newDied:dDied(),newBornDead:dBD()});}
+ const r=st.rec,savedDead=sumKeys(r.dead,BORN_DEAD)+sumKeys(r.dead,DIED),savedAlive=aliveOf(r);
+ const nb=dBorn(),nd=dDied(),nbd=dBD();
+ const dot=c=>`<i class="${c}"></i>`,out=[];const wrap=s=>s;
+ // alive first, then dead; a piglet entered this visit is a hollow ring that fills when saved
+ for(let i=0;i<savedAlive-nd;i++)out.push(dot('a'));
+ for(let i=0;i<nb;i++)out.push(dot('a new'));
+ for(let i=0;i<savedDead;i++)out.push(dot('d'));
+ for(let i=0;i<nd+nbd;i++)out.push(dot('d new'));
+ return litterRow(out);
+}
+function aliveDots(go){
+ const born=dBorn(),died=dDied(),bd=dBD(),dr=hasDraft();
+ const row=(l,v,c)=>`<span class="ll">${l}</span><span class="lv ${c||''}">${v}</span>`;
+ const ledger=dr?`<div class="vchips">${born?`<span class="vc add">${I('farrow')}<b>+${born}</b> born</span>`:''}${died?`<span class="vc sub">${I('trend-down')}<b>−${died}</b> died</span>`:''}${bd?`<span class="vc q">${I('minus')}<b>${bd}</b> born dead</span>`:''}</div>`
+  :`<div class="vquiet">${st.justSaved?`${I('check')} Saved`:(st.rec.startedAt?'Started '+st.rec.startedAt:'')}</div>`;
+ return `<button class="ac v17" data-act="details"><div class="lbl">Alive${dr?' <span class="ns">· Not saved yet</span>':''}</div><div class="v17row"><span class="big${st.bump?' bump':''}">${after()}</span>${ledger}</div>${go}</button>`;
+}
+function aliveDots_v16(go){
+ const born=dBorn(),died=dDied(),bd=dBD(),dr=hasDraft();
+ const cap=dr?[born?`<b class="g">+${born}</b> born`:'',died?`<b class="r">−${died}</b> died`:'',bd?`<b class="r">${bd}</b> born dead`:''].filter(Boolean).join('<span class="sep">·</span>'):(st.justSaved?`${I('check')} Saved`:(st.rec.startedAt?'Started '+st.rec.startedAt:''));
+ return `<button class="ac dotscard" data-act="details"><div class="lbl">Alive${dr?' <span class="ns">· Not saved yet</span>':''}</div><div class="main"><span class="big${st.bump?' bump':''}">${after()}</span></div>${litterDots()}<div class="dcap">${cap}</div>${go}</button>`;
+}
+function result(){
+ const go=`<span class="go">Details ${I('chevron')}</span>`,dr=hasDraft(),now=after(),bump=st.bump?' bump':'';
+ if(!dr&&opt.card==='pills')return aliveDots(go);
+ if(!dr)return `<button class="ac" data-act="details"><div class="lbl">Alive</div><div class="main"><span class="big${bump}">${now}</span></div><div class="line">${st.justSaved?`${I('check')} Saved · ${st.justSaved}`:[st.rec.startedAt?'Started '+st.rec.startedAt:'',st.rec.assists.length?'Assisted '+st.rec.assists[st.rec.assists.length-1].t.slice(0,5):''].filter(Boolean).join(' · ')||'Total born, deaths, log and edits'}</div>${go}</button>`;
+ const born=dBorn(),died=dDied(),bd=dBD();
+ if(opt.card==='was')return `<button class="ac" data-act="details"><div class="lbl">Alive</div><div class="main"><span class="big${bump}">${now}</span><span class="was">was <s>${before()}</s></span></div><div class="unsaved">${summary()} · not saved yet</div>${go}</button>`;
+ if(opt.card==='pills')return aliveDots(go);
+ // Codex A: one big number (Alive after Save), never moving; a fixed status line says Draft or Saved
+ if(opt.card==='status'||opt.card==='blend'){const eq=opt.card==='blend'?` · <span class="m">${before()}${born?' +'+born:''}${died?' −'+died:''}</span>${bd?' · '+bd+' born dead':''}`:'';return `<button class="ac" data-act="details"><div class="lbl">Alive</div><div class="main"><span class="big${bump}">${now}</span></div><span class="status draft">Not saved yet${eq}</span>${go}</button>`;}
+ // the owner's equation: the saved number stays put, the visit is written after it
+ if(opt.card==='sum')return `<button class="ac" data-act="details"><div class="lbl">Alive</div><div class="main eqn"><span class="big">${before()}</span>${born?`<span class="t add">+${born}</span>`:''}${died?`<span class="t sub">−${died}</span>`:''}<span class="op">=</span><span class="res${bump}" style="display:inline-block">${now}</span></div><div class="unsaved">${bd?bd+' born dead (not in Alive) · ':''}not saved yet</div>${go}</button>`;
+ return `<button class="ac" data-act="details"><div class="lbl">Alive</div><div class="main"><span class="big${bump}">${now}</span><span class="ledger"><span>saved</span><b>${before()}</b>${born?`<span>born</span><b class="add">+${born}</b>`:''}${died?`<span>died</span><b class="sub">−${died}</b>`:''}${bd?`<span>born dead</span><b>${bd}</b>`:''}</span></div><div class="unsaved">Not saved yet</div>${go}</button>`;
+}
+// Report death as a level inside the drawer: the two tiles, then the chosen group's causes
+function deathLevel(){
+ const p=st.page,pd=p.dead,group=p.group,list=group==='bornDead'?BORN_DEAD:DIED;
+ const nBD=sumKeys(pd,BORN_DEAD),nDi=sumKeys(pd,DIED);
+ const tile=(k,ti,s,cnt)=>`<button class="tile" data-act="group" data-k="${k}" aria-pressed="${group===k}">${cnt?`<span class="cnt">${cnt}</span>`:''}<b>${ti}</b><span>${s}</span></button>`;
+ const maxDied=before()+dBorn();
+ return `<div class="tiles">${tile('bornDead','Born dead','Never breathed',nBD)}${tile('died','Died after birth','Was alive',nDi)}</div>
+ ${group?`<div class="causes">${list.map(([k,l])=>SentriUI.stepper({label:l,value:pd[k]||0,min:0,max:group==='died'?(pd[k]||0)+Math.max(0,maxDied-nDi):null,action:'cause',key:k,reserveHint:false})).join('')}</div>`:'<p style="text-align:center;color:var(--muted);font-size:13px;margin:8px 0">Pick one</p>'}`;
+}
+function page(){
+ const p=st.page;if(!p)return '';
+ const pd=p.dead,group=p.group,list=group==='bornDead'?BORN_DEAD:DIED;
+ const nBD=sumKeys(pd,BORN_DEAD),nDi=sumKeys(pd,DIED),n=nBD+nDi;
+ const tile=(k,t,s,cnt)=>`<button class="tile" data-act="group" data-k="${k}" aria-pressed="${group===k}">${cnt?`<span class="cnt">${cnt}</span>`:''}<b>${t}</b><span>${s}</span></button>`;
+ const label=[nBD?`${nBD} born dead`:'',nDi?`${nDi} died`:''].filter(Boolean).join(' · ');
+ const maxDied=before()+dBorn();
+ return `<div class="page"><div class="page-head"><button class="pb" data-act="page-back" aria-label="Back">${I('back')}</button><div><h2>Report death</h2><p>#000418 · B1</p></div>${n?'<button class="textbtn corner" data-act="page-clear">Clear</button>':''}</div>
+ <div class="page-body"><div class="tiles">${tile('bornDead','Born dead','Never breathed',nBD)}${tile('died','Died after birth','Was alive',nDi)}</div>
+ ${group?`<div class="causes">${list.map(([k,l])=>SentriUI.stepper({label:l,value:pd[k]||0,min:0,max:group==='died'?(pd[k]||0)+Math.max(0,maxDied-nDi):null,action:'cause',key:k,reserveHint:false})).join('')}</div>`:''}</div>
+ <div class="foot"><button class="primary" data-act="page-done" ${n?'':'disabled'}>${n?`Done · ${label}`:'Done'}</button></div></div>`;
+}
+// Litter details: one ledger for reading and editing. Same rows, same order; Edit turns each recorded value into a field
+// in place. Every cause always shows ("–" when none). The totals sit under a rule, and stick to the bottom while editing.
+const LINES=[['bornAlive','Born alive'],['stillborn','Stillborn'],['mummified','Mummified'],['crushed','Crushed'],['scours','Scours'],['starve','Starve-out'],['other','Other'],['missing','Missing (no body)']];
+const getv=(r,k)=>k==='bornAlive'?r.bornAlive:k==='missing'?(r.missing||0):(r.dead[k]||0);
+const setv=(r,k,v)=>{if(k==='bornAlive')r.bornAlive=v;else if(k==='missing')r.missing=v;else r.dead[k]=v;};
+const clone=r=>({bornAlive:r.bornAlive,missing:r.missing||0,dead:{...r.dead}});
+const totals=r=>{const bd=sumKeys(r.dead,BORN_DEAD),di=sumKeys(r.dead,DIED),mi=r.missing||0;return {bd,di,mi,born:r.bornAlive+bd,alive:r.bornAlive-di-mi};};
+const dash=v=>v?v:'–';
+function ledger(r,editing){
+ const o=st.rec,t=totals(r),ot=totals(o);
+ const leaf=(k,l,ind)=>{const v=getv(r,k),was=getv(o,k),ch=editing&&v!==was;
+  const val=editing?`<input inputmode="numeric" pattern="[0-9]*" data-field="${k}" value="${v}" aria-label="${l}">`:`<span class="lval${v?'':' none'}">${dash(v)}</span>`;
+  return `<label class="lrow${ind?' ind':''}${ch?' changed':''}" data-cell="${k}"><span class="lname">${l}<small>${ch?'was '+was:''}</small></span>${val}</label>`;};
+ const group=(key,l,v)=>`<div class="lrow grp"><span class="lname">${l}</span><span class="lval" data-sub="${key}">${dash(v)}</span></div>`;
+ const tot=(key,l,v,ov,formula,big)=>`<div class="ltotal${big?' big':''}"><span class="lname">${l}<small data-formula="${key}">${formula}</small></span><span class="lval" data-tot="${key}">${editing&&v!==ov?`<s>${ov}</s> `:''}${v}</span></div>`;
+ return `<div class="ledger4${editing?' editing':''}">
+  ${leaf('bornAlive','Born alive')}
+  ${group('bd','Born dead',t.bd)}${BORN_DEAD.map(([k,l])=>leaf(k,l,1)).join('')}
+  ${group('di','Died after birth',t.di)}${DIED.map(([k,l])=>leaf(k,l,1)).join('')}
+  ${leaf('missing','Missing (no body)')}
+  <div class="totals">${tot('born','Total born',t.born,ot.born,`${r.bornAlive} born alive + ${t.bd} born dead`)}${tot('alive','Alive',t.alive,ot.alive,`${r.bornAlive} born alive − ${t.di} died${t.mi?' − '+t.mi+' missing':''}`,1)}</div>
+ </div>`;
+}
+const editChanges=()=>LINES.filter(([k])=>getv(st.edit,k)!==getv(st.rec,k));
+function details(){
+ if(!st.details)return '';
+ const editing=!!st.edit,n=editing?editChanges().length:0,r=editing?st.edit:st.rec;
+ return `<div class="page details4"><div class="page-head"><button class="pb" data-act="${editing?'edit-cancel':'details-back'}" aria-label="Back">${I('back')}</button><div><h2>${editing?'Edit record':'Litter details'}</h2><p>#000418 · B1</p></div>${editing?'':`<button class="textbtn corner" data-act="edit">${I('edit')} Edit</button>`}</div>
+ <div class="page-body">${ledger(r,editing)}${editing?'':`<button class="logrow" data-act="noop">${I('clock')}<span>Log<small>${st.log[0]?st.log[0].text:'Every record, with who and when'}</small></span>${I('chevron')}</button>`}</div>
+ ${editing?`<div class="foot"><button class="back" data-act="edit-cancel">Cancel</button><button class="primary" data-act="edit-save" id="edit-save" ${n?'':'disabled'}>${n?`Save override · ${n}`:'Save override'}<small>Logged as an override</small></button></div>`:''}</div>`;
+}
+// typing updates the override draft and every derived figure in place (no redraw, so the keyboard stays up)
+document.addEventListener('input',e=>{
+ const k=e.target.dataset.field;if(!k||!st.edit)return;
+ const v=Math.max(0,parseInt(e.target.value.replace(/\D/g,''),10)||0);setv(st.edit,k,v);
+ const was=getv(st.rec,k),cell=e.target.closest('.lrow');cell.classList.toggle('changed',v!==was);cell.querySelector('small').textContent=v!==was?'was '+was:'';
+ const t=totals(st.edit),ot=totals(st.rec),q=s=>document.querySelector(s);
+ q('[data-sub="bd"]').textContent=dash(t.bd);q('[data-sub="di"]').textContent=dash(t.di);
+ q('[data-tot="born"]').innerHTML=(t.born!==ot.born?`<s>${ot.born}</s> `:'')+t.born;q('[data-tot="alive"]').innerHTML=(t.alive!==ot.alive?`<s>${ot.alive}</s> `:'')+t.alive;
+ q('[data-formula="born"]').textContent=`${st.edit.bornAlive} born alive + ${t.bd} born dead`;q('[data-formula="alive"]').textContent=`${st.edit.bornAlive} born alive − ${t.di} died${t.mi?' − '+t.mi+' missing':''}`;
+ const n=editChanges().length,btn=document.getElementById('edit-save');btn.disabled=!n;btn.innerHTML=(n?`Save override · ${n}`:'Save override')+'<small>Logged as an override</small>';
+});
+// v12: before farrowing the sow shows when she is due; Start farrowing records the start and opens the counting face.
+// v13: the awaiting face drawn, not written.
+// Where she is in the farrowing window: a track from day 108 to 120, due at 114, overdue from 117.
+const GDAY=114,WIN=[108,120];
+function track(){
+ const pos=d=>((d-WIN[0])/(WIN[1]-WIN[0])*100).toFixed(2)+'%';
+ const ticks=[];for(let d=WIN[0];d<=WIN[1];d++)ticks.push(`<i style="left:${pos(d)}" class="${d===114?'due':''}"></i>`);
+ return `<div class="track"><div class="over" style="left:${pos(117)}"></div><div class="fill" style="width:${pos(GDAY)}"></div>${ticks.join('')}<span class="me" style="left:${pos(GDAY)}"></span></div>
+ <div class="tlabels"><span style="left:${pos(108)}">108</span><span style="left:${pos(114)}">Due</span><span class="o" style="left:${pos(117)}">Overdue</span></div>`;
+}
+// Her last litter, one dot per piglet: filled = alive, hollow red = dead.
+const LASTN=()=>{const n=+(window.__size||14),d=Math.max(1,Math.round(n/7));return {when:'Mar 2026',alive:n-d,dead:d,assisted:true};};
+function pastLitters(){
+ const LAST=LASTN();
+ if(opt.hist==='gilt')return '';
+ const items=[...Array(LAST.alive).fill('<i class="a"></i>'),...Array(LAST.dead).fill('<i class="d"></i>')];const dots=true?healthBar({alive:LAST.alive,dead:LAST.dead,newAlive:0,newDied:0,newBornDead:0}):litterRow(items);
+ return `<div class="past3 dots-${opt.dots}"><div class="phead"><span>Last litter</span><span class="pmeta">${LAST.when}${LAST.assisted?' · <b>Assisted</b>':''}</span></div>${dots}<div class="pcap"><b>${LAST.alive}</b> alive <span class="sep">·</span> <b class="r">${LAST.dead}</b> dead</div></div>`;
+}
+// the note a worker left on her (the same note as her Actions sheet)
+function sowNote(){if(opt.note!=='has')return '';return `<div class="snote">${I('note')}<span>Red line on left shoulder · monitor overnight<small>G. Hansen · yesterday 18:20</small></span></div>`;}
+// this pregnancy, ready to farrow: body condition and the vaccines before farrowing
+function pregnancy(){return `<div class="preg"><div><span>Body condition</span><b>3.5</b></div><div><span>E. coli vaccine</span><b class="ok">Oct 1 ✓</b></div><div><span>Treatments</span><b>None</b></div></div>`;}
+function dueCard(){
+ return `<div class="due3"><div class="dtop"><div><div class="dhead">Due today</div><div class="dsub">${opt.hist==='gilt'?'Gilt · first litter':'Parity 3'} · in the crate 4 days</div></div><div class="dday"><small>Day</small>${GDAY}</div></div>${track()}</div>${sowNote()}${pastLitters()}`;
+}
+// the sow's Actions sheet, as the real one: the verb grid, her note, then Production: only this task's actions (Farrowing)
+function menu(){
+ if(!st.menu)return '';
+ const grid=SentriUI.rowGrid([{label:'Condition',icon:I('plus'),action:'noop'},{label:'Treat',icon:I('treat'),action:'noop'},{label:'Transfer',icon:I('transfer'),action:'noop'},{label:'Measure',icon:I('measure'),action:'noop'}],{label:'Everyday actions'});
+ const note=SentriUI.rowGroup(SentriUI.row({variant:'navigation',icon:I('note'),title:'Edit note',description:'Red line on left shoulder · monitor overnight',action:'noop'}));
+ const assistDesc=st.rec.assists.length?`Assisted ${st.rec.assists.length}× · last ${st.rec.assists[st.rec.assists.length-1].t.slice(0,5)}`:'Record help with a birth';
+ const farrowing=SentriUI.rowGroup(SentriUI.row({variant:'navigation',icon:I('care'),title:'Assisted farrowing',description:assistDesc,action:'assist'})+SentriUI.row({variant:'navigation',icon:I('production'),title:'Record abortion',description:'Record a pregnancy loss',action:'noop'}));
+ return `<div class="scrim" data-act="menu-close"></div><div class="sheet menu2"><div class="grab"></div><div class="head" style="border-bottom:1px solid var(--line)"><h2>Actions</h2><span class="route"><span class="chip">#000418 ›</span>B1</span></div>
+ <div class="body menu-body">${grid}${note}${SentriUI.heading({title:'Production',icon:I('chart'),kind:'section'})}${SentriUI.heading({title:'Farrowing',kind:'group'})}${farrowing}</div>
+ <div class="foot"><button class="back wide" data-act="menu-close">‹ Back</button></div></div>`;
+}
+// Assisted farrowing: what the worker did, saved as a stamped event; it also answers Finish's "Assisted" later
+const HELP=[['hand','By hand','Pulled a piglet'],['oxytocin','Oxytocin','Gave an injection'],['other','Other','Something else']];
+function assistPage(){
+ const a=st.assist;if(!a)return '';
+ const tile=([k,t,s])=>`<button class="tile" data-act="help" data-k="${k}" aria-pressed="${a.how.includes(k)}"><b>${t}</b><span>${s}</span></button>`;
+ return `<div class="page"><div class="page-head"><button class="pb" data-act="assist-back" aria-label="Back">${I('back')}</button><div><h2>Assisted farrowing</h2><p>#000418 · B1 · ${new Date().toTimeString().slice(0,5)}</p></div></div>
+ <div class="page-body"><p class="q" style="margin:0 2px">How did you help? <span style="color:var(--muted);font-weight:400">Pick all that apply</span></p><div class="tiles three">${HELP.map(tile).join('')}</div>
+ <div class="assist-note">${SentriUI.field({label:'Note (optional)',variant:'textarea',placeholder:'e.g. piglet stuck, came out alive'})}</div></div>
+ <div class="foot"><button class="primary" data-act="assist-save" ${a.how.length?'':'disabled'}>${a.how.length?'Save · '+a.how.map(k=>HELP.find(h=>h[0]===k)[1]).join(' · '):'Save'}</button></div></div>`;
+}
+function render(){
+ document.querySelectorAll('.seg').forEach(s=>s.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(opt[s.dataset.ctl]===b.dataset.v))));
+ const dr=hasDraft(),lv=st.page?'death':'main',anim=st.anim?(st.anim==='back'?' lvl back':' lvl'):'';
+ let head,body,foot;
+ if(lv==='main'){
+  const deathsInDraft=dBD()+dDied();
+  head=`${dr?'<button class="textbtn corner" data-act="clear">Clear</button>':''}<h2>Farrowing record</h2><span class="route"><span class="chip">#000418 ›</span>B1 · Parity 3</span>`;
+  body=!st.rec.started?dueCard():`${result()}${SentriUI.stepper({variant:'count',label:'Born alive',value:dBorn(),min:0,action:'born',reserveHint:false})}<button class="death" data-act="report">${I('alert')}Report death${deathsInDraft?`<span class="corner-badge">${deathsInDraft}</span>`:''}</button>`;
+  foot=dr?`<button class="back" data-act="leave">‹ Back</button><button class="primary" data-act="save">Save<small>${summary()}</small></button>`:`<button class="back" data-act="leave">‹ Back</button>${st.rec.started?'<button class="primary" data-act="noop">Finish farrowing<small class="cap">HOLD TO FINISH</small></button>':'<button class="primary" data-act="start">Start farrowing</button>'}<button class="more" data-act="menu" aria-label="Sow actions">${I('more')}</button>`;
+ }else{
+  const nBD=sumKeys(st.page.dead,BORN_DEAD),nDi=sumKeys(st.page.dead,DIED),n=nBD+nDi;
+  const label=[nBD?nBD+' born dead':'',nDi?nDi+' died':''].filter(Boolean).join(' · ');
+  // a drawer with levels: ✕ top left closes the whole drawer (keeping the draft); the title names the level
+  head=`<button class="xclose" data-act="close-all" aria-label="Close">${I('close')}</button>${n?'<button class="textbtn corner" data-act="page-clear">Clear</button>':''}<h2>Report death</h2><span class="route"><span class="chip">#000418 ›</span>B1</span>`;
+  body=deathLevel();
+  foot=`<button class="back" data-act="page-back">‹ Back</button><button class="primary" data-act="page-done" ${n?'':'disabled'}>${n?`Done · ${label}`:'Done'}</button>`;
+ }
+ document.getElementById('phone').innerHTML=`<div class="statusbar">9:41</div><div class="room"><div></div><div></div><div></div><div></div></div>
+ ${st.closed?`<div class="closed"><b>Drawer closed</b><p>${dr?`Not saved yet: ${summary()}. Kept on this phone; still here when you open her again.`:'Everything is saved.'}</p><button data-act="reopen">Open 000418 again</button></div>`:''}
+ <div class="drawer${st.rec.started?' hold':''}"><div class="grab"></div><div class="head">${head}</div><div class="body${anim}">${body}</div><div class="foot">${foot}</div></div>${menu()}${details()}${assistPage()}`;
+ st.anim='';st.bump=false;
+ const set=(id,v)=>document.getElementById(id).textContent=v,r=st.rec;
+ set('t-ba',r.bornAlive);set('t-bd',sumKeys(r.dead,BORN_DEAD));set('t-di',sumKeys(r.dead,DIED));set('t-al',aliveOf(r));set('t-tb',totalBorn(r));
+ document.getElementById('log').innerHTML=st.log.length?st.log.map(l=>`<li><span>${l.text}</span><small>${l.t}</small></li>`).join(''):'<li><span>Nothing saved this session</span></li>';
+}
+document.addEventListener('click',e=>{
+ const seg=e.target.closest('.seg button');if(seg){opt[seg.parentElement.dataset.ctl]=seg.dataset.v;if(seg.parentElement.dataset.ctl==='sow'){window.__sow=seg.dataset.v;reset();}if(seg.parentElement.dataset.ctl==='size'){window.__size=seg.dataset.v;reset();}render();return;}
+ if(e.target.closest('.ledger4 input'))return;const b=e.target.closest('[data-act],[data-action]');if(!b)return;
+ const a=b.dataset.act||b.dataset.action,k=b.dataset.k||b.dataset.value;
+ if(a==='born'){st.bump=true;const dd=+(b.dataset.step||b.dataset.d);if(dd<0&&!dBorn())return;d().born+=dd;st.justSaved='';}
+ else if(a==='details')st.details=true;else if(a==='details-back')st.details=false;
+ else if(a==='edit')st.edit=clone(st.rec);
+ else if(a==='edit-cancel')st.edit=null;
+ else if(a==='ed'){if(b.getAttribute('aria-disabled')==='true')return;setv(st.edit,k,Math.max(0,getv(st.edit,k)+(+b.dataset.step)));}
+ else if(a==='edit-save'){const ch=editChanges().map(([x,l])=>l.replace(' (no body)','')+' '+getv(st.rec,x)+' → '+getv(st.edit,x));st.rec=st.edit;st.edit=null;st.log.unshift({text:'Override · '+ch.join(' · '),t:time()});}
+ else if(a==='report'){st.page={group:null,dead:{...d().dead}};st.anim='in';}
+ else if(a==='close-all'){st.page=null;st.closed=true;}
+ else if(a==='group')st.page.group=k;
+ else if(a==='cause'){if(b.getAttribute('aria-disabled')==='true')return;st.page.dead[k]=Math.max(0,(st.page.dead[k]||0)+(+b.dataset.step));}
+ else if(a==='page-clear'){st.page.dead={};}
+ else if(a==='page-back'){st.page=null;st.anim='back';}
+ else if(a==='page-done'){d().dead=st.page.dead;st.page=null;st.justSaved='';st.anim='back';st.bump=true;}
+ else if(a==='clear'){st.draft=blank();}
+ else if(a==='save'){const r=st.rec,s=summary();r.bornAlive+=dBorn();for(const[k,n]of Object.entries(d().dead))r.dead[k]=(r.dead[k]||0)+n;st.log.unshift({text:s,t:time()});st.justSaved=s;st.draft=blank();}
+ else if(a==='start'){st.rec.started=true;st.rec.startedAt=time().slice(0,5);st.log.unshift({text:'Farrowing started',t:time()});}
+ else if(a==='assist'){st.assist={how:[]};}
+ else if(a==='help'){const h=st.assist.how;st.assist.how=h.includes(k)?h.filter(x=>x!==k):[...h,k];}
+ else if(a==='assist-back')st.assist=null;
+ else if(a==='assist-save'){const how=st.assist.how.map(x=>HELP.find(h=>h[0]===x)[1]);st.rec.assists.push({how,t:time()});st.log.unshift({text:'Assisted · '+how.join(' · '),t:time()});st.assist=null;st.menu=false;st.justSaved='assisted ('+how.join(', ')+')';}
+ else if(a==='menu')st.menu=true;else if(a==='menu-close')st.menu=false;
+ else if(a==='leave')st.closed=true;else if(a==='reopen'){st.closed=false;st.justSaved='';}
+ else if(a==='reset')reset();
+ else if(a==='fix')alert('Edit record: re-tally, fix a mistake, a missing piglet. Next topic.');
+ else return;
+ render();
+});
+render();
+</script>
+</body></html>
