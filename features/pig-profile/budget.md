@@ -119,3 +119,7 @@ Owner: the tinted banners and task cards look cluttered when a sow has problems,
 
 Owner, on round 2: "cleaner, but I can't tell the difference between tasks and conditions; they are all bundled together." The kind is now the first thing read: **Health** (conditions under care by urgency, then ongoing ones, quiet), **Tasks** (due first, then coming; replaces the Now panel's Next task), **Note**: each its heading over one white group of same-shaped rows, absent when empty. Ongoing conditions move from the doors into Health. A quiet sow shows only what she has (000254: Tasks with one row, then Now).
 
+## Round 4 (2026-10-30): a shape per kind, no headings
+
+Owner: "not using titles but unique UI layout to help differentiate these two." Each kind keeps its group but has its own shape: **conditions** are state rows (care mark lead, care word as the line, "Day 2" as a figure on the right); **tasks** are an agenda (the date block leads: Today, Now, Late, or "13 SEP"); **the note** is the pen page's note card (one look for a note anywhere). The three headings go.
+

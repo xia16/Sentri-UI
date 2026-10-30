@@ -459,23 +459,34 @@ function overviewNextTask(p,c){
 function ageLabel(days){if(!Number.isFinite(days)||days<0)return null;if(days<60)return days+' days';const m=Math.floor(days/30.44);if(m<24)return m+' months';return Math.floor(m/12)+' yr'+(m%12?' '+m%12+' mo':'');}
 // One fact for Facts: an empty value draws the em dash and no trail.
 function factItem(label,value,unit='',meta='',mono=false){const has=hasRecordValue(value);return {label,value:has?value+(unit?(unit==='%'?'':' ')+unit:''):null,meta:has?meta:'',mono};}
-/* The record's top (owner, 2026-10-30): no tinted banners or task cards. What needs someone is grouped by kind, so a condition never
-   reads as a task: Health, then Tasks, then the note, each its heading over one white group of rows, absent when it has nothing.
-   Every row has one shape (lead · title · line · chevron); only the care mark carries colour. A sow with nothing opens on Now. */
-const recordSection=(cls,title,k,rows)=>rows.length?'<section class="detail-section '+cls+'">'+stHeading({title,icon:icon(k),kind:'section',level:4})+'<div class="compact-actions st-panel st-row-group st-action-list">'+rows.join('')+'</div></section>':'';
+/* The record's top (owner, 2026-10-30): no tinted banners, no task cards and no headings. Each kind has its own shape, so a condition
+   never reads as a task: Health is rows led by the care mark with the day as a figure on the right (a state); Tasks is an agenda,
+   rows led by their date (a schedule); the note is the pen page's note card. Each is absent when empty; a sow with nothing opens on Now. */
+const recordGroup=(cls,html)=>html?'<section class="detail-section '+cls+'">'+html+'</section>':'';
+const recordRows=rows=>rows.length?'<div class="compact-actions st-panel st-row-group st-action-list">'+rows.join('')+'</div>':'';
 /* Health: conditions under care by urgency (hospital, treat, monitor), then the ones with no action needed, quiet. */
 function pigHealth(p){
  const rank={'Hospital pen':0,'Treat in place':1,Monitor:2},all=cases(p),care=all.filter(needsHealthAttention).sort((a,b)=>rank[a.triage]-rank[b.triage]);
- const rows=care.map(k=>{const a=careAppearance(k);return SentriUI.row({variant:'navigation',icon:SentriUI.conditionTag({variant:'mark',care:a.care,level:a.level,icon:a.symbol}),title:k.name,description:[k.triage,Number.isFinite(k.day)?'Day '+k.day:''].filter(Boolean).join(' · '),action:'finding',value:p.id+'|'+k.name,className:'action-item'});});
- rows.push(...all.filter(k=>!needsHealthAttention(k)).map(k=>action('finding','health',k.name,[Number.isFinite(k.day)?k.day+' days':'','No action needed'].filter(Boolean).join(' · '),p.id+'|'+k.name)));
- return recordSection('pig-health','Health','health',rows);
+ const day=k=>Number.isFinite(k.day)?{text:needsHealthAttention(k)?'Day '+k.day:k.day+' days'}:'';
+ const rows=care.map(k=>{const a=careAppearance(k);return SentriUI.row({variant:'navigation',icon:SentriUI.conditionTag({variant:'mark',care:a.care,level:a.level,icon:a.symbol}),title:k.name,description:k.triage,trailing:day(k),action:'finding',value:p.id+'|'+k.name,className:'action-item'});});
+ rows.push(...all.filter(k=>!needsHealthAttention(k)).map(k=>SentriUI.row({variant:'navigation',icon:icon('health'),title:k.name,description:'No action needed',trailing:day(k),action:'finding',value:p.id+'|'+k.name,className:'action-item'})));
+ return recordGroup('pig-health',recordRows(rows));
+}
+/* A task's date lead: Now (in progress), Today, Overdue, else the day and month it is due. The words beside it keep the rest. */
+function taskWhen(t){
+ const s=t.status||'',date=/(\d{1,2}) ([A-Z][a-z]{2})/.exec(s);
+ if(/in progress/i.test(s))return {lead:'<span class="pig-task-date is-now"><b>Now</b></span>',line:''};
+ if(/overdue/i.test(s))return {lead:'<span class="pig-task-date is-late"><b>Late</b></span>',line:s};
+ if(/today/i.test(s))return {lead:'<span class="pig-task-date is-now"><b>Today</b></span>',line:''};
+ if(date)return {lead:'<span class="pig-task-date"><b>'+date[1]+'</b><small>'+date[2]+'</small></span>',line:s.replace(date[0],'').replace(/^[\s·]+|[\s·]+$/g,'')};
+ return {lead:'<span class="pig-task-date">'+icon('calendar')+'</span>',line:s};
 }
 /* Tasks: due ones first (in progress, today, overdue), then what is coming; her own batch is left out of the line (Now says it). */
 function pigTasks(c,p){
- const tasks=currentTasksForPig(c,p);
- return recordSection('pig-tasks','Tasks','calendar',tasks.map(t=>SentriUI.row({variant:'navigation',icon:icon('calendar'),title:t.title,description:[t.status,t.batchId&&t.summary==='Batch '+t.batchId?'':t.summary].filter(Boolean).join(' · '),action:t.action||'sow-current-task',value:t.value||t.id,className:'action-item'})));
+ return recordGroup('pig-tasks',recordRows(currentTasksForPig(c,p).map(t=>{const w=taskWhen(t);return SentriUI.row({variant:'navigation',icon:w.lead,title:t.title,description:[w.line,t.batchId&&t.summary==='Batch '+t.batchId?'':t.summary].filter(Boolean).join(' · '),action:t.action||'sow-current-task',value:t.value||t.id,className:'action-item'});})));
 }
-function pigNote(p){return p.note?recordSection('pig-note','Note','note',[SentriUI.row({variant:'navigation',icon:icon('note'),title:p.note,wrap:true,action:'pig-log',value:p.id,className:'action-item'})]):'';}
+/* The note: the pen page's note card, one look for a note wherever it is. */
+function pigNote(p){return p.note?recordGroup('pig-note','<div class="record-card-stack" aria-label="Pig note">'+recordCard({kind:'Note',title:p.note,tone:'record-neutral record-note-preview',link:'pig-log',value:p.id})+'</div>'):'';}
 /* The facts that follow the animal type, for the type block (General details) and the record's Now panel. */
 function typeFacts(p){
  const r=p.registry||{},type=animalType(p);
