@@ -177,13 +177,6 @@ function careLabel(value){return careOptions.find(([key])=>key===value)?.[1]||'N
 function issueStatus(k){return needsHealthAttention(k)?'attention':'ongoing';}
 function needsHealthAttention(k){return ['Monitor','Treat in place','Hospital pen'].includes(k.triage);}
 function healthStateFields(c){return fieldSelect(c,'Care','triage',careOptions,c.form.triage||'None');}
-function attentionOverview(p){
- const active=cases(p).filter(needsHealthAttention);
- const row=(type,title,detail,link,value,tone='',mark='')=>button(link,(mark||'<span class="attention-type">'+esc(type)+'</span>')+'<span class="attention-copy"><strong>'+esc(title)+'</strong>'+(detail?'<small>'+esc(detail)+'</small>':'')+'</span>'+icon('chevron'),'attention-row '+tone,value);
- const records=active.map(k=>row('Health',k.name,[k.triage&&k.triage!=='None'?k.triage:'', 'Day '+k.day].filter(Boolean).join(' · '),'finding',p.id+'|'+k.name,careAppearance(k).cls,SentriUI.conditionTag((a=>({variant:'mark',care:a.care,level:a.level,icon:a.symbol}))(careAppearance(k)))));
- if(p.note)records.push(row('Note',p.note,'','pig-log',p.id));
- return records.length?'<div class="attention-overview"><div class="attention-list" aria-label="Current notifications">'+records.join('')+'</div></div>':'';
-}
 function feedAdjustmentReason(p){return p.adjustmentReason||bands.find(x=>x[0]===p.band)?.[1]||'Individual adjustment';}
 function conditionDefinition(f,name){return ccDefinition(name)||catalog.find(k=>k.name===name&&(!f?.conditionKinds?.[name]||k.kind===f.conditionKinds[name]))||f?.customConditions?.[name]||catalog.find(k=>k.name===name);}
 function saveHealth(c){const f=c.form;if(!f.conditions?.length)return false;for(const id of f.subjects){const p=pig(c,id);for(const name of f.conditions){if(cases(p).some(k=>k.name===name))continue;const item=conditionDefinition(f,name);if(item)p.cases.push({name,kind:item.kind,day:1,triage:f.triage||'None',issueStatus:issueStatus(f),recordedDate:'12 Sep 2026',recordedBy:'G. Hansen'});}p.last='Health record updated just now';}addEvent(c,'Health recorded',f.subjects,f.conditions.join(' · ')+' · '+careLabel(f.triage));c.selected.clear();c.selectedPens?.clear();c.reviewOnly=false;c.view='list';return true;}
@@ -408,11 +401,6 @@ function recordCard({kind,title,meta='',badge='',copy='',qualification='',tone='
  const body='<span class="record-notice-heading"><span class="record-type">'+esc(type)+'</span><strong>'+esc(title)+'</strong>'+(link?icon('chevron'):'')+'</span>'+(copy?'<span class="record-notice-issue">'+esc(copy)+'</span>':'')+(qualification?'<strong class="record-notice-qualification">'+esc(qualification)+'</strong>':'')+(context||health&&badge?'<span class="record-notice-bottom"><span class="record-notice-context">'+esc(context)+'</span>'+(health&&badge?'<span class="notice-care '+(badge==='Monitor'?'is-monitor':'')+'" aria-label="Care: '+esc(badge)+'">'+esc(badge)+'</span>':'')+'</span>':'');
  return link?button(link,body,'record-card '+tone,value):'<article class="record-card '+tone+'">'+body+'</article>';
 }
-function pigRecordCards(p){
- const ongoing=cases(p).filter(k=>!needsHealthAttention(k));
- const rows=ongoing.length?SentriUI.rowGroup(ongoing.map(k=>SentriUI.row({title:k.name,description:[Number.isFinite(k.day)?k.day+' days':'', 'No action needed'].filter(Boolean).join(' · '),action:'finding',value:p.id+'|'+k.name,trail:'chevron'})).join(''),{className:'ongoing-findings'}):'';
- return attentionOverview(p)+rows+(p.treatment?'<div class="recent-treatment"><span>Last treatment</span><strong>'+esc(p.treatment.medicine)+'</strong><small>'+esc(p.treatment.dose+' '+p.treatment.unit+' · '+p.treatment.method)+'</small></div>':'');
-}
 function currentTasksForPig(c,p){
  if(!p)return [];
  const completed=new Set(c.completedHostTasks||[]),tasks=[...(c.hostTasks||[]),...(p.currentTasks||[]),...(p.tasks||[])];
@@ -456,12 +444,6 @@ function saveProductionTask(c){
  addEvent(c,f.taskTitle||'Production task',[p.id],outcome+(f.taskNote?.trim()?' · '+f.taskNote.trim():''),'Production');
  c.pigId=p.id;c.selected.clear();c.navTrail=[];c.form={};c.view='pig';return true;
 }
-function pigCurrentTasks(c){
- const tasks=currentTasksForPig(c,pig(c,c.pigId));if(!tasks.length)return '';
- const taskIcon=t=>t.id==='vaccination'||/vaccin/i.test(t.title||'')?'treat':(t.type||'').toLowerCase()==='production'?'chart':'condition';
- const heading=stHeading({title:'Current tasks',icon:icon('note'),kind:'section',level:4,className:'pig-current-tasks-heading'});
- return '<section class="pig-current-tasks" aria-label="Current tasks">'+heading+'<div class="pig-current-task-list" role="region" aria-label="Current task cards" tabindex="0" data-task-count="'+tasks.length+'">'+tasks.map(t=>{const type=t.type||'General',slug=type.toLowerCase().replace(/[^a-z0-9]+/g,'-'),state=/in progress/i.test(t.status||'')?' is-active':/due today|today/i.test(t.status||'')?' is-due':'';return button(t.action||'sow-current-task','<span class="pig-current-task-icon">'+icon(taskIcon(t))+'</span><span class="pig-current-task-copy"><strong>'+esc(t.title)+'</strong><small>'+esc([t.status,t.batchId&&t.summary==='Batch '+t.batchId?'':t.summary].filter(Boolean).join(' · '))+'</small></span>'+icon('chevron'),'pig-current-task-entry task-'+slug+state,t.value||t.id);}).join('')+'</div></section>';
-}
 function daysFromWalk(date){
  if(!date)return null;const value=Date.parse(date),today=Date.parse(walkDate);return Number.isFinite(value)?Math.floor((today-value)/86400000):null;
 }
@@ -477,6 +459,21 @@ function overviewNextTask(p,c){
 function ageLabel(days){if(!Number.isFinite(days)||days<0)return null;if(days<60)return days+' days';const m=Math.floor(days/30.44);if(m<24)return m+' months';return Math.floor(m/12)+' yr'+(m%12?' '+m%12+' mo':'');}
 // One fact for Facts: an empty value draws the em dash and no trail.
 function factItem(label,value,unit='',meta='',mono=false){const has=hasRecordValue(value);return {label,value:has?value+(unit?(unit==='%'?'':' ')+unit:''):null,meta:has?meta:'',mono};}
+/* The record's top (owner, 2026-10-30: the tinted banners and task cards read as clutter): what needs someone now, in one group of rows,
+   the pen page's Needs attention. Conditions under care lead (hospital, treat), then tasks due now, then conditions to monitor, then the note.
+   The lead says what kind of thing each row is: the care mark (its level's colour), a calendar for a task, a note.
+   Nothing to do: no group and no heading; the record opens on Now. Tasks that are not due yet are the Now panel's Next task. */
+const taskDue=t=>/in progress|today|overdue/i.test(t.status||'');
+function pigNeeds(c,p){
+ const rank={'Hospital pen':0,'Treat in place':1,Monitor:3},rows=[];
+ for(const k of cases(p).filter(needsHealthAttention)){const a=careAppearance(k);rows.push([rank[k.triage],SentriUI.row({variant:'navigation',icon:SentriUI.conditionTag({variant:'mark',care:a.care,level:a.level,icon:a.symbol}),title:k.name,description:[k.triage,Number.isFinite(k.day)?'Day '+k.day:''].filter(Boolean).join(' · '),action:'finding',value:p.id+'|'+k.name,className:'action-item'})]);}
+ for(const t of currentTasksForPig(c,p).filter(taskDue))rows.push([2,SentriUI.row({variant:'navigation',icon:icon('calendar'),title:t.title,description:[t.status,t.batchId&&t.summary==='Batch '+t.batchId?'':t.summary].filter(Boolean).join(' · '),action:t.action||'sow-current-task',value:t.value||t.id,className:'action-item'})]);
+ if(p.note)rows.push([4,SentriUI.row({variant:'navigation',icon:icon('note'),title:p.note,description:'Note',wrap:true,action:'pig-log',value:p.id,className:'action-item'})]);
+ if(!rows.length)return '';
+ return '<section class="detail-section pig-needs">'+stHeading({title:'Needs attention',icon:icon('alert'),kind:'section',level:4})+'<div class="compact-actions st-panel st-row-group st-action-list">'+rows.sort((a,b)=>a[0]-b[0]).map(r=>r[1]).join('')+'</div></section>';
+}
+/* Conditions with no action needed are history, not news: quiet rows with the doors. */
+function pigOngoingRows(p){return cases(p).filter(k=>!needsHealthAttention(k)).map(k=>action('finding','health',k.name,[Number.isFinite(k.day)?k.day+' days':'','No action needed'].filter(Boolean).join(' · '),p.id+'|'+k.name)).join('');}
 /* The facts that follow the animal type, for the type block (General details) and the record's Now panel. */
 function typeFacts(p){
  const r=p.registry||{},type=animalType(p);
@@ -497,12 +494,12 @@ function typeDetails(p,c){
 }
 /* The record's Now panel (owner, 2026-10-30: the record was too much for one screen): the pen page's pattern, one panel of how she is now.
    Parity and the date the worker plans around lead, then her batch and her latest readings. Cut from the record: Age, Type, Breed and
-   On farm (who she is: Origin; the header line says her stage), Next task (the task cards say it). */
-function pigNowFacts(p){
- const type=animalType(p),items=typeFacts(p).items.map(([label,value,unit,meta,mono])=>factItem(label,shortDate(value),unit,meta,mono));
+   On farm (who she is: Origin; the header line says her stage). Next task is the soonest task not yet due (a due one is in Needs attention). */
+function pigNowFacts(c,p){
+ const next=currentTasksForPig(c,p).find(t=>!taskDue(t)),type=animalType(p),items=typeFacts(p).items.map(([label,value,unit,meta,mono])=>factItem(label,shortDate(value),unit,meta,mono));
  const take=label=>{const i=items.findIndex(x=>x.label===label);return i<0?null:items.splice(i,1)[0];};
  const due=take('Expected farrowing'),backfat=take('Backfat'),teats=take('Teat count');
- const facts=knownFacts([...(['Sow','Gilt'].includes(type)?[factItem('Parity',p.parity)]:[]),due,...items,factItem('Batch',p.batchId),factItem('Weight',p.weight,'kg',measurementAge(p,'weight')),backfat,factItem('Temperature',p.temperature,'°C',measurementAge(p,'temperature')),teats]);
+ const facts=knownFacts([...(next?[{label:'Next task',value:next.title,meta:next.status||''}]:[]),due,...(['Sow','Gilt'].includes(type)?[factItem('Parity',p.parity)]:[]),...items,factItem('Batch',p.batchId),factItem('Weight',p.weight,'kg',measurementAge(p,'weight')),backfat,factItem('Temperature',p.temperature,'°C',measurementAge(p,'temperature')),teats,...(p.treatment?[{label:'Last treatment',value:p.treatment.medicine,meta:p.treatment.dose+' '+p.treatment.unit+' · '+p.treatment.method}]:[])]);
  return facts.length?'<section class="detail-section pig-now">'+stHeading({title:'Now',icon:icon('details'),kind:'section',level:4})+stFacts(facts)+'</section>':'';
 }
 /* Feeding is a door now, with its figures as the line: the plan, the ration and any change to it. */
@@ -519,7 +516,7 @@ function pigRecordToolbar(p){return SentriUI.sheetFooter({content:back()+button(
 function pigOverview(c){
  const p=pig(c,c.pigId),pe=penOf(c,p.id);
 
- return sheet(c,p.id,pigUnit(c,p.id)+' · '+pe.id+' · '+stageSummary(p),pigRecordCards(p)+pigCurrentTasks(c)+pigNowFacts(p)+'<section class="detail-section reading-section pig-record-links"><div class="compact-actions detail-destinations st-panel st-row-group">'+pigFeedRow(p,pe)+action('pig-production','chart','Production stats','Averages and batch records',p.id)+action('pig-origin','origin','Origin','Provenance, dates and identities',p.id)+action('pig-log','clock','Log','Production, health and movement',p.id)+'</div></section>',pigRecordToolbar(p),'',pigFacts(c,p));
+ return sheet(c,p.id,pigUnit(c,p.id)+' · '+pe.id+' · '+stageSummary(p),pigNeeds(c,p)+pigNowFacts(c,p)+'<section class="detail-section reading-section pig-record-links"><div class="compact-actions detail-destinations st-panel st-row-group">'+pigOngoingRows(p)+pigFeedRow(p,pe)+action('pig-production','chart','Production stats','Averages and batch records',p.id)+action('pig-origin','origin','Origin','Provenance, dates and identities',p.id)+action('pig-log','clock','Log','Production, health and movement',p.id)+'</div></section>',pigRecordToolbar(p),'',pigFacts(c,p));
 }
 /* The pen page (owner, 2026-10-19): the pen is a door, not a tick. Everything done to the pen as a whole happens here, for this one pen:
    its verbs on top (the More actions grid), then what needs someone (open faults, then the pen note as its card), then how the pen is now, then the door to its log.
@@ -1925,7 +1922,7 @@ function sowDetailContext(record,previous){
  c.selected.clear();c.selectedPens.clear();return c;
 }
 // Model exports permit small, isolated checks without starting the UI.
-globalThis.InspectionStudy={catalog,verbGrid,tickPen,penOverview,main,rowCheckAfterRender,medFarm,medRecents,medicinePickerBody,brandPickerBody,medicinesPage,medicineSheet,pickMedicine,atlasScreen:c=>atlasScreen(c),healthList,conditionDefinition,batchTaskForPig,batchTrackerRows,unitOverview,overlay,inspectionSurface,drawerSize,actionCatalogue,productionActionsForPig,sowTaskCard,pigCurrentTasks,currentTasksForPig,openProductionTask,saveProductionTask,saveBatchMembership,saveMiscarriage,openBulkAction,parkBulkDraft,bulkChanges,bulkActionValid,saveBulkAction,bulkActionPage,sowDetailContext,seed,animalType,typeDetails,productionOverview,productionAverages,productionRecords,feedBasis,feedTotals,updateFeedInput,openFeedEditor,feedEditorTargets,proposedPigAllocation,feedEditorValid,saveFeedEditor,pigAllocation,feedPreview,stageSummary,penFeedEntry,penFeedStatus,baseAllocation,feedBody,careAppearance,pigFeedTags,pigRow,measurementAge,daysFromWalk,attentionOverview,validIndependentAdjustment,issueStatus,needsHealthAttention,closePenNote,undoPenNoteClose,eventCategory,filterLogEntries,logEntryDate,logDateBounds,visibleLogEntries,logDateDraftError,logFilterBar,categorizedLog,addEvent,penLogEntries,pigs,pig,penOf,picked,allocation,visiblePigs,applyRecord,saveHealth,saveBody,cases,matches,displayPigs,saveFinding,closeFinding,handleRecordAction};
+globalThis.InspectionStudy={catalog,verbGrid,tickPen,penOverview,main,rowCheckAfterRender,medFarm,medRecents,medicinePickerBody,brandPickerBody,medicinesPage,medicineSheet,pickMedicine,atlasScreen:c=>atlasScreen(c),healthList,conditionDefinition,batchTaskForPig,batchTrackerRows,unitOverview,overlay,inspectionSurface,drawerSize,actionCatalogue,productionActionsForPig,sowTaskCard,currentTasksForPig,openProductionTask,saveProductionTask,saveBatchMembership,saveMiscarriage,openBulkAction,parkBulkDraft,bulkChanges,bulkActionValid,saveBulkAction,bulkActionPage,sowDetailContext,seed,animalType,typeDetails,productionOverview,productionAverages,productionRecords,feedBasis,feedTotals,updateFeedInput,openFeedEditor,feedEditorTargets,proposedPigAllocation,feedEditorValid,saveFeedEditor,pigAllocation,feedPreview,stageSummary,penFeedEntry,penFeedStatus,baseAllocation,feedBody,careAppearance,pigFeedTags,pigRow,measurementAge,daysFromWalk,validIndependentAdjustment,issueStatus,needsHealthAttention,closePenNote,undoPenNoteClose,eventCategory,filterLogEntries,logEntryDate,logDateBounds,visibleLogEntries,logDateDraftError,logFilterBar,categorizedLog,addEvent,penLogEntries,pigs,pig,penOf,picked,allocation,visiblePigs,applyRecord,saveHealth,saveBody,cases,matches,displayPigs,saveFinding,closeFinding,handleRecordAction};
 if(typeof document==='undefined')return;
 const embeddedSow=window.parent!==window&&new URLSearchParams(location.search).get('embed')==='sow';
 let embeddedSowReady=false;

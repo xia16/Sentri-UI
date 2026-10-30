@@ -104,3 +104,14 @@ Header: tag, unit, pen, stage. Conditions needing care (Fever · Treat in place 
 
 Result at 390: the body scrolls 554px instead of 894px for 000306, and 321px instead of 762px for 000267; no fact the worker acts on is cut.
 
+## The top of the record (2026-10-30, round 2)
+
+Owner: the tinted banners and task cards look cluttered when a sow has problems, and the record must still look good when she has none (the usual case).
+
+- **Questions**: Is anything wrong with her, or due for her, right now? If so, what first?
+- **Act now / watch**: conditions under care, tasks due (in progress, today, overdue), the note: **one group of rows** under "Needs attention" (the pen page's section), ordered hospital → treat → task due → monitor → note. Every row has the same shape (lead · title · line · chevron); only the care mark carries colour.
+- **Coming up**: the soonest task not yet due is the Now panel's **Next task** (a fact, not a card).
+- **Settled**: conditions with no action needed are quiet rows at the head of the doors.
+- **Nothing to do**: no group, no heading, no "all clear" line: the record opens on Now (000254 fits one screen).
+- **Cut**: the tinted banner boxes, the "Current tasks" heading and its cards, the separate white card for ongoing conditions. Busy sow 000306 with a note: six boxes in three styles become one group of four rows.
+

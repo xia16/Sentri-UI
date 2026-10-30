@@ -296,6 +296,29 @@ Scope: the everyday verb grid of the Actions drawer (`pig-profile.actions`, and 
 
 - **Better because** four or five verbs read as one line of choices, with no half-empty second row; six and more keep two even rows.
 
+# The record's top: one Needs attention group (2026-10-30)
+
+Scope: the pig record above Now (`pig-profile.full`, `.tasks`, `.empty`, `.partial`). House pattern: the pen page's Needs attention (one white group of navigation rows under a heading).
+
+## Problems
+
+- **major** · A busy sow draws six boxes in three styles: tinted banners per condition, a tinted note banner, a white ongoing card, a heading with a count, and a white card per task with a type word. It reads as clutter, and the eye can't find the order.
+- **major** · Urgency is split by kind, not by level: a vaccination due today sits under the monitor-only banners, in a quieter style.
+- **minor** · A task not yet due (tomorrow) takes a card as large as one due now.
+
+## Parts
+
+| Part | Drawn by today | Should be | Keep / fix / cut |
+|---|---|---|---|
+| Condition banners, note banner | page-built tinted `attention-row` | Row `navigation` with the ConditionTag `mark` as its lead | **fix** |
+| Task cards and their heading | page-built `pig-current-task-entry` | Row `navigation` (due) or a Facts item (Next task) | **fix** |
+| Ongoing conditions card | Row group of its own | Row `navigation` in the doors group | **fix** |
+
+## Self-crit
+
+- **Better because** one look for everything that needs someone, ordered by urgency across kinds, and a sow with nothing wrong opens straight on how she is now.
+- **Worse in one place, accepted:** the condition's name drops from a 20px bold banner title to the 16px row title; the care mark's colour and the order now carry the urgency.
+
 # Chinese pass (PR 244), critique
 
 Scope: the words only. At `?lang=zh` these screens read in English where the Inspection prototype draws them: the pig record (Current tasks, General details, Sow cycle, Feeding's View plan, the record links), Production stats, Origin (its facts, dates and identities), the pig log, the measure, batch-membership and abortion sheets, Unavailable actions, and the embedded Not in pig sheet. Nothing is added, moved or cut in EN.
