@@ -36,11 +36,10 @@ Out: health forms and findings (health-record), feed editing and the pig's feed 
 - One Actions sheet for one pig or twenty; the Production group appears only for one.
 - Tasks are shown as cards on the record and as rows in Actions; Farrowing and Piglet processing open the Farrowing task.
 - Body condition is recorded from Measurements & condition and creates a health finding with Monitor care.
+- The record follows the pen page (2026-10-30): what needs attention, the tasks, one Now panel of how she is, then the doors (Feed plan, Production stats, Origin, Log). Who she is (Age, Breed) is on Origin; nothing is said twice.
 
 Open (recorded on the screens as issues):
 
-- Next task and Batch are repeated in the task card, the grid and the type block; stage and days appear in the header, the grid and the type block.
-- Age is in days for a sow.
 - Saving a reading or a note returns to the walk list, not to the pig record; the task, abortion and batch forms return to the record.
 - The pig's lifetime figures (litters, born total, rates) are in the data but not shown.
 - Mark-not-in-pig, remove-from-batch and transfer cannot be reviewed outside Farrowing.

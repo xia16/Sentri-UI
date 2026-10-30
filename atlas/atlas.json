@@ -17841,7 +17841,7 @@
          "preset": "profile-full",
          "figma": "",
          "notes": {
-          "purpose": "Read one pig on the spot: what needs attention, what to do next, who she is, how she is fed. Populated example: sow 000267 (Duroc, parity 2, Thin · Monitor).",
+          "purpose": "Read one pig on the spot, in the pen page's order: what needs attention, what is due, how she is now, then the doors to more. Populated example: sow 000267 (parity 2, Thin · Monitor).",
           "states": [
            "Pig dead (stage \"Sow died\"): Actions offers a note only.",
            "Embedded in Farrowing: the same sheet opens inside the sow drawer with Farrowing's production actions added."
@@ -17888,91 +17888,65 @@
            },
            {
             "name": "Current tasks rail",
-            "shows": "Task cards, e.g. Pregnancy check · Tomorrow · 13 Sep · Batch 20",
-            "logic": "Absent when the pig has no task. States and ordering are on pig-profile.tasks.",
+            "shows": "Task cards, e.g. Pregnancy check · Tomorrow · 13 Sep",
+            "logic": "Absent when the pig has no task. No count and no Health / Production word: the icon tells them apart. A task's batch is left out of its line when it is her batch (the Now panel says it). States and ordering are on pig-profile.tasks.",
             "at": "Current tasks"
            },
            {
-            "name": "General details",
-            "shows": "Age, Type · Breed, Batch, Weight, Temperature, On farm, Health",
-            "states": [
-             {
-              "state": "Value known",
-              "when": "Field present",
-              "shows": "Value; Weight and Temperature add reading age: Today / 1 day ago / N days ago / Date unknown"
-             },
-             {
-              "state": "Unknown",
-              "when": "Field missing",
-              "shows": "\"—\""
-             },
-             {
-              "state": "Reading date missing or in the future",
-              "when": "Weight or Temperature has no date, or a date after the walk",
-              "shows": "Age note reads \"Date unknown\"; \"1 day ago\" for one day"
-             }
-            ],
-            "logic": "Age: age field, else days since birth date. Type: registry type, else type field, else \"Sow\" if the pig has a parity, else its stage.",
-            "source": "registry; p.age; p.weightReadings",
-            "at": "General details"
-           },
-           {
-            "name": "Type block",
-            "shows": "Sow cycle / Gilt breeding / Boar breeding / Piglet growth / Growth",
+            "name": "Now panel",
+            "shows": "Parity, Expected farrowing, Last service, Batch, Weight, Backfat, Temperature, Teat count",
             "states": [
              {
               "state": "Sow",
               "when": "Type is sow",
-              "shows": "Last service, Expected farrowing, Backfat, Teat count, Next task, Parity"
+              "shows": "Parity, Expected farrowing, Last service, Batch, Weight, Backfat, Temperature, Teat count"
              },
              {
               "state": "Gilt not gestating",
               "when": "Type is gilt",
-              "shows": "First heat, Next heat"
+              "shows": "Parity, First heat, Next heat, Batch, Weight, Backfat, Temperature, Teat count"
              },
              {
               "state": "Boar",
               "when": "Type is boar",
-              "shows": "Last service, Breeding number"
+              "shows": "Last service, Breeding number, Batch, Weight, Temperature"
              },
              {
               "state": "Piglet",
               "when": "Type is piglet",
-              "shows": "Birth weight, Weaning date, Dam, Weaning weight"
+              "shows": "Birth weight, Weaning date, Dam, Weaning weight, Batch, Weight, Temperature"
              },
              {
               "state": "Grower, finisher, weaner",
               "when": "Those types",
-              "shows": "Entry weight, Entry date"
+              "shows": "Entry weight, Entry date, Batch, Weight, Temperature"
              },
              {
-              "state": "Unknown type",
-              "when": "Type not known",
-              "shows": "Block absent"
+              "state": "Value missing",
+              "when": "A field is not recorded",
+              "shows": "The fact is left out; the panel is absent when none is known"
              }
             ],
-            "logic": "Last service = date plus days before the walk date (12 Sep 2026); blank age when the date is in the future. Expected farrowing: \"Today\", \"In N days\" or \"N days past expected\". Next task (batch): \"Today\", \"In N days\" or \"N days overdue\" once the date has passed; dash when no batch.",
-            "source": "typeDetails",
-            "at": "Sow cycle"
+            "logic": "One panel, the pen page's Now. Readings carry their age: Today / 1 day ago / N days ago / Date unknown. Expected farrowing: \"Today\", \"In N days\" or \"N days past expected\". Cut from the record: Age, Type, Breed, On farm, Next task (Age and Breed are on Origin).",
+            "source": "typeFacts; p.weight, p.backfat, p.temperature",
+            "at": "Now"
            },
            {
-            "name": "Feeding block",
-            "shows": "Gestation 1 · Included in pen allocation · 2.6 kg/day · Feed +10% Thin · mild",
-            "logic": "Formula, delivery context, the pig's allowance and its tags with their reason. \"No feeding plan recorded\" for a pen with unknown mode.",
-            "at": "Feeding"
+            "name": "Doors",
+            "shows": "Feed plan (Gestation 1 · 2.6 kg/day · +10%), Production stats, Origin, Log",
+            "logic": "One group, no heading. Feed plan's line is the plan, the ration and any change to it; absent for a pen with unknown feeding mode.",
+            "at": "Feed plan"
            }
           ],
           "controls": [],
           "copy": [
-           "General details (raw)",
-           "Pig record (raw)",
            "Production stats (raw)",
            "Origin (raw)",
            "Log (raw)",
            "Actions (raw)",
            "Current tasks (raw)",
-           "Feeding (raw)",
-           "View plan (raw)"
+           "Now (raw)",
+           "Feed plan (raw)"
           ],
           "edge": [
            "A pig in no batch shows a dash for Batch and no Next task value."
@@ -17981,12 +17955,7 @@
            "Human-entered records lead; derived plans and stable facts stay in reading sections."
           ],
           "issues": [
-           "The same facts repeat: Pregnancy check as task card and Next task; Batch 20 in the card and General details; stage and days in the header and sow cycle.",
-           "Six blocks on one sheet; a worker at a pen needs the care and next action first, not breed, on-farm and teat count.",
-           "Age is in days for a sow (\"966 days\"), unreadable at a glance.",
            "A temperature of 39.5 C gets no mark beside a Fever finding.",
-           "Type appears three times: General details Type, the block title, the stage.",
-           "Empty fields draw a row with \"—\" instead of leaving the row out.",
            "Last service reads \"1 days ago\" and Age \"1 days\": plural is not handled."
           ]
          }
@@ -18923,7 +18892,7 @@
          ]
         }
        ],
-       "prd": "# Pig profile 猪只详情\n\n## Problem\n\nWhen a worker taps a pig they need, in this order: what needs attention, what to do next, who she is, how she is fed, where to read more, and the actions they can take. The old Figma draws pig detail twice: inside Inspection and in the pig list (猪只列表) file. The built version (inside the Inspection prototype) is one sheet with six blocks and many repeated facts.\n\n## Who\n\nA worker on the walk or in a task who reaches a single pig; the same sheet opens inside Farrowing's sow drawer. A supervisor reading history uses Production stats, Origin and Log.\n\n## Anchor\n\nNo anchor. The record is the same for a pig at any stage; what changes is which blocks and which actions apply. Screens are grouped as The record, Read more, Actions - Production, Actions - General and Actions - Unavailable.\n\n## Rules\n\n- Human-entered records lead; derived plans and stable facts sit in reading sections.\n- The blocks follow the animal type (Sow cycle, Gilt breeding, Boar breeding, Piglet growth, Growth).\n- An empty production-average section is absent; facts missing from the registry show a dash.\n- The Actions sheet has three groups, Production, Health and General. Production is for one pig only and holds only the rows that fit her stage and tasks; blocked rows are listed with the reason in \"Unavailable actions\".\n- Farrowing opens the shared health and measurement flows rather than copying them; it adds its own Production rows when embedded (piglet processing, piglet deaths, count reconciliation, fostering, litter edit, remove from batch, not in pig, transfer).\n- Not in pig, abortion and batch removal take a sow out of her batch and return her to rebreed watch; saved records are kept.\n- Weight, temperature and backfat take one value per pig.\n- A dead sow offers a note only.\n\n## Scope\n\nIn: the record (full, partial, empty, with tasks), Production stats and a batch record, Origin, the pig Log, the Actions sheet for one pig, the task outcome form, abortion, batch membership, the measurement menu and forms, body condition, notes and the unavailable list.\n\nEntry points: Inspection (a pig row, search or scan), Tasks (a sow in the Farrowing room list), Pigs (the pig list; that feature is a placeholder written elsewhere, so this entry has no source screen yet).\n\nOut: health forms and findings (health-record), feed editing and the pig's feed plan (feed-plan), the unit walk (inspection). Transfer sow, Mark not in pig and Remove from batch render only inside Farrowing's drawer. Mark not in pig is shown as a screen, opened through Farrowing's sow sheet. Remove from batch has a built page but no control opens it (Batch membership's Remove option replaced it); it is not shown.\n\n## Decisions\n\n- One Actions sheet for one pig or twenty; the Production group appears only for one.\n- Tasks are shown as cards on the record and as rows in Actions; Farrowing and Piglet processing open the Farrowing task.\n- Body condition is recorded from Measurements & condition and creates a health finding with Monitor care.\n\nOpen (recorded on the screens as issues):\n\n- Next task and Batch are repeated in the task card, the grid and the type block; stage and days appear in the header, the grid and the type block.\n- Age is in days for a sow.\n- Saving a reading or a note returns to the walk list, not to the pig record; the task, abortion and batch forms return to the record.\n- The pig's lifetime figures (litters, born total, rates) are in the data but not shown.\n- Mark-not-in-pig, remove-from-batch and transfer cannot be reviewed outside Farrowing.\n",
+       "prd": "# Pig profile 猪只详情\n\n## Problem\n\nWhen a worker taps a pig they need, in this order: what needs attention, what to do next, who she is, how she is fed, where to read more, and the actions they can take. The old Figma draws pig detail twice: inside Inspection and in the pig list (猪只列表) file. The built version (inside the Inspection prototype) is one sheet with six blocks and many repeated facts.\n\n## Who\n\nA worker on the walk or in a task who reaches a single pig; the same sheet opens inside Farrowing's sow drawer. A supervisor reading history uses Production stats, Origin and Log.\n\n## Anchor\n\nNo anchor. The record is the same for a pig at any stage; what changes is which blocks and which actions apply. Screens are grouped as The record, Read more, Actions - Production, Actions - General and Actions - Unavailable.\n\n## Rules\n\n- Human-entered records lead; derived plans and stable facts sit in reading sections.\n- The blocks follow the animal type (Sow cycle, Gilt breeding, Boar breeding, Piglet growth, Growth).\n- An empty production-average section is absent; facts missing from the registry show a dash.\n- The Actions sheet has three groups, Production, Health and General. Production is for one pig only and holds only the rows that fit her stage and tasks; blocked rows are listed with the reason in \"Unavailable actions\".\n- Farrowing opens the shared health and measurement flows rather than copying them; it adds its own Production rows when embedded (piglet processing, piglet deaths, count reconciliation, fostering, litter edit, remove from batch, not in pig, transfer).\n- Not in pig, abortion and batch removal take a sow out of her batch and return her to rebreed watch; saved records are kept.\n- Weight, temperature and backfat take one value per pig.\n- A dead sow offers a note only.\n\n## Scope\n\nIn: the record (full, partial, empty, with tasks), Production stats and a batch record, Origin, the pig Log, the Actions sheet for one pig, the task outcome form, abortion, batch membership, the measurement menu and forms, body condition, notes and the unavailable list.\n\nEntry points: Inspection (a pig row, search or scan), Tasks (a sow in the Farrowing room list), Pigs (the pig list; that feature is a placeholder written elsewhere, so this entry has no source screen yet).\n\nOut: health forms and findings (health-record), feed editing and the pig's feed plan (feed-plan), the unit walk (inspection). Transfer sow, Mark not in pig and Remove from batch render only inside Farrowing's drawer. Mark not in pig is shown as a screen, opened through Farrowing's sow sheet. Remove from batch has a built page but no control opens it (Batch membership's Remove option replaced it); it is not shown.\n\n## Decisions\n\n- One Actions sheet for one pig or twenty; the Production group appears only for one.\n- Tasks are shown as cards on the record and as rows in Actions; Farrowing and Piglet processing open the Farrowing task.\n- Body condition is recorded from Measurements & condition and creates a health finding with Monitor care.\n- The record follows the pen page (2026-10-30): what needs attention, the tasks, one Now panel of how she is, then the doors (Feed plan, Production stats, Origin, Log). Who she is (Age, Breed) is on Origin; nothing is said twice.\n\nOpen (recorded on the screens as issues):\n\n- Saving a reading or a note returns to the walk list, not to the pig record; the task, abortion and batch forms return to the record.\n- The pig's lifetime figures (litters, born total, rates) are in the data but not shown.\n- Mark-not-in-pig, remove-from-batch and transfer cannot be reviewed outside Farrowing.\n",
        "scenarios": {
         "treeDoc": false,
         "tree": null,

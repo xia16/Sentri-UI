@@ -187,7 +187,7 @@
       "preset": "profile-full",
       "figma": "",
       "notes": {
-        "purpose": "Read one pig on the spot: what needs attention, what to do next, who she is, how she is fed. Populated example: sow 000267 (Duroc, parity 2, Thin · Monitor).",
+        "purpose": "Read one pig on the spot, in the pen page's order: what needs attention, what is due, how she is now, then the doors to more. Populated example: sow 000267 (parity 2, Thin · Monitor).",
         "states": [
           "Pig dead (stage \"Sow died\"): Actions offers a note only.",
           "Embedded in Farrowing: the same sheet opens inside the sow drawer with Farrowing's production actions added."
@@ -234,91 +234,65 @@
           },
           {
             "name": "Current tasks rail",
-            "shows": "Task cards, e.g. Pregnancy check · Tomorrow · 13 Sep · Batch 20",
-            "logic": "Absent when the pig has no task. States and ordering are on pig-profile.tasks.",
+            "shows": "Task cards, e.g. Pregnancy check · Tomorrow · 13 Sep",
+            "logic": "Absent when the pig has no task. No count and no Health / Production word: the icon tells them apart. A task's batch is left out of its line when it is her batch (the Now panel says it). States and ordering are on pig-profile.tasks.",
             "at": "Current tasks"
           },
           {
-            "name": "General details",
-            "shows": "Age, Type · Breed, Batch, Weight, Temperature, On farm, Health",
-            "states": [
-              {
-                "state": "Value known",
-                "when": "Field present",
-                "shows": "Value; Weight and Temperature add reading age: Today / 1 day ago / N days ago / Date unknown"
-              },
-              {
-                "state": "Unknown",
-                "when": "Field missing",
-                "shows": "\"—\""
-              },
-              {
-                "state": "Reading date missing or in the future",
-                "when": "Weight or Temperature has no date, or a date after the walk",
-                "shows": "Age note reads \"Date unknown\"; \"1 day ago\" for one day"
-              }
-            ],
-            "logic": "Age: age field, else days since birth date. Type: registry type, else type field, else \"Sow\" if the pig has a parity, else its stage.",
-            "source": "registry; p.age; p.weightReadings",
-            "at": "General details"
-          },
-          {
-            "name": "Type block",
-            "shows": "Sow cycle / Gilt breeding / Boar breeding / Piglet growth / Growth",
+            "name": "Now panel",
+            "shows": "Parity, Expected farrowing, Last service, Batch, Weight, Backfat, Temperature, Teat count",
             "states": [
               {
                 "state": "Sow",
                 "when": "Type is sow",
-                "shows": "Last service, Expected farrowing, Backfat, Teat count, Next task, Parity"
+                "shows": "Parity, Expected farrowing, Last service, Batch, Weight, Backfat, Temperature, Teat count"
               },
               {
                 "state": "Gilt not gestating",
                 "when": "Type is gilt",
-                "shows": "First heat, Next heat"
+                "shows": "Parity, First heat, Next heat, Batch, Weight, Backfat, Temperature, Teat count"
               },
               {
                 "state": "Boar",
                 "when": "Type is boar",
-                "shows": "Last service, Breeding number"
+                "shows": "Last service, Breeding number, Batch, Weight, Temperature"
               },
               {
                 "state": "Piglet",
                 "when": "Type is piglet",
-                "shows": "Birth weight, Weaning date, Dam, Weaning weight"
+                "shows": "Birth weight, Weaning date, Dam, Weaning weight, Batch, Weight, Temperature"
               },
               {
                 "state": "Grower, finisher, weaner",
                 "when": "Those types",
-                "shows": "Entry weight, Entry date"
+                "shows": "Entry weight, Entry date, Batch, Weight, Temperature"
               },
               {
-                "state": "Unknown type",
-                "when": "Type not known",
-                "shows": "Block absent"
+                "state": "Value missing",
+                "when": "A field is not recorded",
+                "shows": "The fact is left out; the panel is absent when none is known"
               }
             ],
-            "logic": "Last service = date plus days before the walk date (12 Sep 2026); blank age when the date is in the future. Expected farrowing: \"Today\", \"In N days\" or \"N days past expected\". Next task (batch): \"Today\", \"In N days\" or \"N days overdue\" once the date has passed; dash when no batch.",
-            "source": "typeDetails",
-            "at": "Sow cycle"
+            "logic": "One panel, the pen page's Now. Readings carry their age: Today / 1 day ago / N days ago / Date unknown. Expected farrowing: \"Today\", \"In N days\" or \"N days past expected\". Cut from the record: Age, Type, Breed, On farm, Next task (Age and Breed are on Origin).",
+            "source": "typeFacts; p.weight, p.backfat, p.temperature",
+            "at": "Now"
           },
           {
-            "name": "Feeding block",
-            "shows": "Gestation 1 · Included in pen allocation · 2.6 kg/day · Feed +10% Thin · mild",
-            "logic": "Formula, delivery context, the pig's allowance and its tags with their reason. \"No feeding plan recorded\" for a pen with unknown mode.",
-            "at": "Feeding"
+            "name": "Doors",
+            "shows": "Feed plan (Gestation 1 · 2.6 kg/day · +10%), Production stats, Origin, Log",
+            "logic": "One group, no heading. Feed plan's line is the plan, the ration and any change to it; absent for a pen with unknown feeding mode.",
+            "at": "Feed plan"
           }
         ],
         "controls": [],
         "copy": [
-          "General details (raw)",
-          "Pig record (raw)",
           "Production stats (raw)",
           "Origin (raw)",
           "Log (raw)",
           "Actions (raw)",
           "Current tasks (raw)",
-          "Feeding (raw)",
-          "View plan (raw)"
+          "Now (raw)",
+          "Feed plan (raw)"
         ],
         "edge": [
           "A pig in no batch shows a dash for Batch and no Next task value."
@@ -327,12 +301,7 @@
           "Human-entered records lead; derived plans and stable facts stay in reading sections."
         ],
         "issues": [
-          "The same facts repeat: Pregnancy check as task card and Next task; Batch 20 in the card and General details; stage and days in the header and sow cycle.",
-          "Six blocks on one sheet; a worker at a pen needs the care and next action first, not breed, on-farm and teat count.",
-          "Age is in days for a sow (\"966 days\"), unreadable at a glance.",
           "A temperature of 39.5 C gets no mark beside a Fever finding.",
-          "Type appears three times: General details Type, the block title, the stage.",
-          "Empty fields draw a row with \"—\" instead of leaving the row out.",
           "Last service reads \"1 days ago\" and Age \"1 days\": plural is not handled."
         ]
       }

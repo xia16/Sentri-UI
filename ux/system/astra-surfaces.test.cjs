@@ -158,11 +158,20 @@ test('pig task queue merges and prioritizes simultaneous task sources', () => {
   const tasks = model.currentTasksForPig(c, p);
   assert.deepEqual(tasks.map(task => task.title), ['Vaccination', 'Pregnancy check']);
   const html = model.overlay(c);
-  assert.match(html, /2 tasks/);
+  assert.doesNotMatch(html, /2 tasks|pig-current-task-type/, 'no count and no Health / Production word: the cards and their icons say it');
   assert.match(html, /task-health is-due/);
+  assert.match(html, /Pregnancy check<\/strong><small>Tomorrow · 13 Sep<\/small>/, 'her own batch is left out of the line: the Now panel says it');
   assert.match(html, /Vaccination/);
   assert.match(html, /Pregnancy check/);
   assert.match(html, /data-action="sow-current-task" data-value="batch-20-next"/);
+});
+test('the pig record follows the pen page: one Now panel, then the doors; nothing said twice', () => {
+  const c = context('pig');
+  const html = model.overlay(c);
+  assert.match(html, /<section class="detail-section pig-now">[\s\S]*?>Now<[\s\S]*?Parity[\s\S]*?Batch[\s\S]*?Weight/);
+  assert.doesNotMatch(html, />General details<|>Sow cycle<|>Feeding<|>Pig record<|>Next task<|>On farm<|>Type</, 'one panel; no type, next task or on-farm fact');
+  assert.ok(html.indexOf('pig-now') < html.indexOf('data-action="pig-feed"'), 'the doors follow the Now panel');
+  assert.match(html, /data-action="pig-feed"[\s\S]*?Feed plan[\s\S]*?data-action="pig-production"[\s\S]*?data-action="pig-origin"[\s\S]*?data-action="pig-log"/);
 });
 test('production task cards open an actionable outcome drawer', () => {
   const c = context('pig');
