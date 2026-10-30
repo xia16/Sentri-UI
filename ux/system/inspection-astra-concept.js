@@ -472,18 +472,18 @@ function pigHealth(p){
  rows.push(...all.filter(k=>!needsHealthAttention(k)).map(k=>SentriUI.row({variant:'navigation',icon:icon('health'),title:k.name,description:'No action needed',trailing:day(k),action:'finding',value:p.id+'|'+k.name,className:'action-item'})));
  return recordGroup('pig-health',recordRows(rows));
 }
-/* A task's date lead: Now (in progress), Today, Overdue, else the day and month it is due. The words beside it keep the rest. */
+/* A task's date lead (Row's date): Now (in progress), Today, Late (overdue, red), else the day and month it is due; the rest of its status is the line. */
 function taskWhen(t){
  const s=t.status||'',date=/(\d{1,2}) ([A-Z][a-z]{2})/.exec(s);
- if(/in progress/i.test(s))return {lead:'<span class="pig-task-date is-now"><b>Now</b></span>',line:''};
- if(/overdue/i.test(s))return {lead:'<span class="pig-task-date is-late"><b>Late</b></span>',line:s};
- if(/today/i.test(s))return {lead:'<span class="pig-task-date is-now"><b>Today</b></span>',line:''};
- if(date)return {lead:'<span class="pig-task-date"><b>'+date[1]+'</b><small>'+date[2]+'</small></span>',line:s.replace(date[0],'').replace(/^[\s·]+|[\s·]+$/g,'')};
- return {lead:'<span class="pig-task-date">'+icon('calendar')+'</span>',line:s};
+ if(/in progress/i.test(s))return {date:{word:'Now'},line:''};
+ if(/overdue/i.test(s))return {date:{word:'Late',tone:'act'},line:s};
+ if(/today/i.test(s))return {date:{word:'Today'},line:''};
+ if(date)return {date:{day:date[1],month:date[2]},line:s.replace(date[0],'').replace(/^[\s·]+|[\s·]+$/g,'')};
+ return {date:null,line:s};
 }
 /* Tasks: due ones first (in progress, today, overdue), then what is coming; her own batch is left out of the line (Now says it). */
 function pigTasks(c,p){
- return recordGroup('pig-tasks',recordRows(currentTasksForPig(c,p).map(t=>{const w=taskWhen(t);return SentriUI.row({variant:'navigation',icon:w.lead,title:t.title,description:[w.line,t.batchId&&t.summary==='Batch '+t.batchId?'':t.summary].filter(Boolean).join(' · '),action:t.action||'sow-current-task',value:t.value||t.id,className:'action-item'});})));
+ return recordGroup('pig-tasks',recordRows(currentTasksForPig(c,p).map(t=>{const w=taskWhen(t);return SentriUI.row({variant:'navigation',date:w.date,icon:w.date?'':icon('calendar'),title:t.title,description:[w.line,t.batchId&&t.summary==='Batch '+t.batchId?'':t.summary].filter(Boolean).join(' · '),action:t.action||'sow-current-task',value:t.value||t.id,className:'action-item'});})));
 }
 /* The note: the pen page's note card, one look for a note wherever it is. */
 function pigNote(p){return p.note?recordGroup('pig-note','<div class="record-card-stack" aria-label="Pig note">'+recordCard({kind:'Note',title:p.note,tone:'record-neutral record-note-preview',link:'pig-log',value:p.id})+'</div>'):'';}

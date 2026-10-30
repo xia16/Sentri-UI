@@ -146,7 +146,7 @@ test('the verb words come from the strings registry, and Transfer is not the reg
 test('current tasks live on pig detail as an agenda, and stay out of Actions', () => {
   const c = context('pig');
   c.hostTasks = [{ id: 'farrowing', title: 'Farrowing', type: 'Production', status: 'In progress', summary: '9 alive' }];
-  assert.match(model.overlay(c), /class="detail-section pig-tasks"[\s\S]*?data-action="sow-current-task"[^>]*data-value="farrowing"[\s\S]*?pig-task-date is-now"><b>Now</);
+  assert.match(model.overlay(c), /class="detail-section pig-tasks"[\s\S]*?data-action="sow-current-task"[^>]*data-value="farrowing"[\s\S]*?st-row-date is-word" aria-hidden="true"><b>Now</);
   c.selected.add(c.pigId); c.view = 'actions';
   assert.doesNotMatch(model.overlay(c), /pig-tasks|sow-task-rail/);
 });
@@ -170,7 +170,7 @@ test('the pig record follows the pen page: one Now panel, then the doors; nothin
   assert.doesNotMatch(html, />General details<|>Sow cycle<|>Feeding<|>Pig record<|>On farm<|>Type<|attention-row|>Health<|>Tasks</, 'one panel; no banners, no kind headings, no type or on-farm fact');
   const p = model.pig(c, c.pigId); p.note = 'Red line on left shoulder'; p.cases = [{ name: 'Fever', kind: 'Symptom', day: 2, triage: 'Treat in place' }, { name: 'Arthritis', kind: 'Disease', day: 120, triage: 'None' }];
   const busy = model.overlay(c);
-  assert.match(busy, /pig-health[\s\S]*?Fever[\s\S]*?Day 2[\s\S]*?Arthritis[\s\S]*?120 days[\s\S]*?pig-tasks[\s\S]*?pig-task-date[\s\S]*?pig-note[\s\S]*?record-card[\s\S]*?Red line on left shoulder[\s\S]*?pig-now/, 'each kind has its own shape: Health with its day on the right, Tasks led by their date, the note card, then Now');
+  assert.match(busy, /pig-health[\s\S]*?Fever[\s\S]*?Day 2[\s\S]*?Arthritis[\s\S]*?120 days[\s\S]*?pig-tasks[\s\S]*?st-row-date[\s\S]*?pig-note[\s\S]*?record-card[\s\S]*?Red line on left shoulder[\s\S]*?pig-now/, 'each kind has its own shape: Health with its day on the right, Tasks led by their date, the note card, then Now');
   assert.ok(html.indexOf('pig-now') < html.indexOf('data-action="pig-feed"'), 'the doors follow the Now panel');
   assert.match(html, /data-action="pig-feed"[\s\S]*?Feed plan[\s\S]*?data-action="pig-production"[\s\S]*?data-action="pig-origin"[\s\S]*?data-action="pig-log"/);
 });

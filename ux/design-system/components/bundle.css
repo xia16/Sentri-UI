@@ -266,6 +266,11 @@ body{background:var(--ground);color:var(--ink)}
 .st-row.st-row{display:flex;align-items:center;gap:var(--space-12);width:100%;min-height:var(--row-min);margin:0;padding:var(--space-row-y) var(--space-row-x);border:0;border-radius:0;background:transparent;text-align:left;text-decoration:none;font-family:var(--font-sans);color:var(--st-ink)}
 .st-row+.st-row{border-top:1px solid var(--st-rule)}
 .st-row.st-row .st-row-icon{display:grid;place-items:center;width:var(--size-34);height:var(--size-34);border-radius:var(--radius-10);background:var(--row-icon-bg);color:var(--row-icon-ink);flex:none}
+.st-row.st-row .st-row-date{display:flex;flex-direction:column;align-items:center;justify-content:center;width:var(--size-52);height:var(--size-52);border-radius:var(--radius-10);background:var(--row-icon-bg);color:var(--ink);line-height:1.1;flex:none}
+.st-row-date b{font:var(--type-weight-semibold) var(--size-16)/1.1 var(--font-sans)}
+.st-row-date small{font:var(--type-weight-medium) var(--font-size-11)/1.2 var(--font-sans);color:var(--ink-2);text-transform:uppercase;letter-spacing:.04em}
+.st-row-date.is-word b{font-size:var(--type-meta-size)}
+.st-row-date.is-act{color:var(--red-ink)}
 .st-row-icon svg{width:var(--size-18);height:var(--size-18);fill:none;stroke:currentColor;stroke-width:var(--icon-stroke);stroke-linecap:round;stroke-linejoin:round}
 .st-row.st-row .st-row-copy{display:flex;flex:1;min-width:0;flex-direction:column;gap:var(--space-4)}
 .st-row.st-row .st-row-copy strong{font-size:var(--font-size-13);line-height:1.5;font-weight:500;letter-spacing:0;color:inherit}
