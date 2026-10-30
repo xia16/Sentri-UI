@@ -459,17 +459,8 @@ function saveProductionTask(c){
 function pigCurrentTasks(c){
  const tasks=currentTasksForPig(c,pig(c,c.pigId));if(!tasks.length)return '';
  const taskIcon=t=>t.id==='vaccination'||/vaccin/i.test(t.title||'')?'treat':(t.type||'').toLowerCase()==='production'?'chart':'condition';
- const heading=stHeading({title:'Current tasks',icon:icon('note'),meta:tasks.length+' '+(tasks.length===1?'task':'tasks'),kind:'section',level:4,className:'pig-current-tasks-heading'});
- return '<section class="pig-current-tasks" aria-label="Current tasks">'+heading+'<div class="pig-current-task-list" role="region" aria-label="Current task cards" tabindex="0" data-task-count="'+tasks.length+'">'+tasks.map(t=>{const type=t.type||'General',slug=type.toLowerCase().replace(/[^a-z0-9]+/g,'-'),state=/in progress/i.test(t.status||'')?' is-active':/due today|today/i.test(t.status||'')?' is-due':'';return button(t.action||'sow-current-task','<span class="pig-current-task-icon">'+icon(taskIcon(t))+'</span><span class="pig-current-task-copy"><strong>'+esc(t.title)+'</strong><small>'+esc([t.status,t.summary].filter(Boolean).join(' · '))+'</small></span><span class="pig-current-task-type">'+esc(type)+'</span>'+icon('chevron'),'pig-current-task-entry task-'+slug+state,t.value||t.id);}).join('')+'</div></section>';
-}
-function pigFeedFacts(p,pe){
- if(pe.mode==='unknown')return '';
- const amount=pe.mode==='adlib'?'Ad-lib':quantity(pigAllocation(p,pe))+' <small>kg/day</small>';
- const context=pe.mode==='station'?'Station-fed':pe.mode==='trough'?'Included in pen allocation':'No fixed ration';
- const tags=pigFeedTags(p).map(t=>t.kind==='ration'?{...t,label:'Feed '+t.delta,day:feedAdjustmentReason(p)}:t);
- const heading=stHeading({title:'Feeding',icon:icon('feed'),kind:'section',level:4,action:button('pig-feed','View plan '+icon('chevron'),'profile-details-link',p.id)});
- const inner='<div class="pig-feed-fact-row"><span class="pig-feed-copy"><strong>'+esc(pe.formula)+'</strong><small>'+esc(context)+'</small></span><span class="pig-feed-amount">'+amount+'</span></div>'+(tags.length?'<div class="feeding-status-tags">'+tags.map(recordedTag).join('')+'</div>':'');
- return '<section class="detail-section reading-section pig-feeding-facts">'+heading+stPanel(inner,{className:'facts-surface'})+'</section>';
+ const heading=stHeading({title:'Current tasks',icon:icon('note'),kind:'section',level:4,className:'pig-current-tasks-heading'});
+ return '<section class="pig-current-tasks" aria-label="Current tasks">'+heading+'<div class="pig-current-task-list" role="region" aria-label="Current task cards" tabindex="0" data-task-count="'+tasks.length+'">'+tasks.map(t=>{const type=t.type||'General',slug=type.toLowerCase().replace(/[^a-z0-9]+/g,'-'),state=/in progress/i.test(t.status||'')?' is-active':/due today|today/i.test(t.status||'')?' is-due':'';return button(t.action||'sow-current-task','<span class="pig-current-task-icon">'+icon(taskIcon(t))+'</span><span class="pig-current-task-copy"><strong>'+esc(t.title)+'</strong><small>'+esc([t.status,t.batchId&&t.summary==='Batch '+t.batchId?'':t.summary].filter(Boolean).join(' · '))+'</small></span>'+icon('chevron'),'pig-current-task-entry task-'+slug+state,t.value||t.id);}).join('')+'</div></section>';
 }
 function daysFromWalk(date){
  if(!date)return null;const value=Date.parse(date),today=Date.parse(walkDate);return Number.isFinite(value)?Math.floor((today-value)/86400000):null;
@@ -482,27 +473,43 @@ function overviewNextTask(p,c){
  const days=daysFromWalk(batch?.nextDate),timing=days===null?'':days===0?'Today':days<0?'In '+(-days)+' '+(days===-1?'day':'days'):(days===1?'1 day':days+' days')+' overdue';
  return {label:'Next task',value:name||null,meta:name&&timing?timing:''};
 }
+/* Age the way a person says it: days for a young pig, then months, then years and months ("2 yr 11 mo", not "1080 days"). */
+function ageLabel(days){if(!Number.isFinite(days)||days<0)return null;if(days<60)return days+' days';const m=Math.floor(days/30.44);if(m<24)return m+' months';return Math.floor(m/12)+' yr'+(m%12?' '+m%12+' mo':'');}
 // One fact for Facts: an empty value draws the em dash and no trail.
 function factItem(label,value,unit='',meta='',mono=false){const has=hasRecordValue(value);return {label,value:has?value+(unit?(unit==='%'?'':' ')+unit:''):null,meta:has?meta:'',mono};}
-function overviewDetails(p,c){
- const r=p.registry||{},facts=[factItem('Age',p.age??daysFromWalk(r.birthDate),'days'),factItem('Type',animalType(p)),{...factItem('Breed',r.breed),inline:String(r.breed||'').length>12},factItem('Batch',p.batchId)];
- for(const [key,label,unit] of [['weight','Weight','kg'],['temperature','Temperature','°C']])facts.push(factItem(label,p[key],unit,measurementAge(p,key)));
- facts.push(factItem('On farm',r.onFarm===undefined?null:r.onFarm?'Yes':'No'));
- 
- const known=knownFacts(facts);return known.length?stFacts(known):'';
+/* The facts that follow the animal type, for the type block (General details) and the record's Now panel. */
+function typeFacts(p){
+ const r=p.registry||{},type=animalType(p);
+ if(type==='Sow'||type==='Gilt'){
+  if(type==='Gilt'&&p.stage!=='Gestating')return {title:'Gilt breeding',items:[['First heat',r.firstHeat],['Next heat',r.expectedHeat],['Backfat',p.backfat,'mm',measurementAge(p,'backfat')],['Teat count',r.teats]]};
+  return {title:type==='Sow'?'Sow cycle':'Gilt breeding',items:[['Last service',r.serviceDate,'',r.serviceDate?measurementDateAge(r.serviceDate):''],['Expected farrowing',r.expectedFarrowing,'',r.expectedFarrowing?dueDateLabel(r.expectedFarrowing):''],['Backfat',p.backfat,'mm',measurementAge(p,'backfat')],['Teat count',r.teats]]};
+ }
+ if(type==='Boar')return {title:'Boar breeding',items:[['Last service',r.serviceDate,'',r.serviceDate?measurementDateAge(r.serviceDate):''],['Breeding number',r.breedingId]]};
+ if(type==='Piglet')return {title:'Piglet growth',items:[['Birth weight',r.birthWeight,'kg'],['Weaning date',r.weaningDate],['Dam',r.dam],['Weaning weight',r.weaningWeight,'kg']]};
+ if(['Grower','Finisher','Weaner'].includes(type))return {title:'Growth',items:[['Entry weight',r.entryWeight,'kg'],['Entry date',r.growthEntryDate]]};
+ return {title:'',items:[]};
 }
 function typeDetails(p,c){
- const r=p.registry||{},type=animalType(p);let title='',items=[];
- if(type==='Sow'||type==='Gilt'){
-  title=type==='Sow'?'Sow cycle':'Gilt breeding';
-  items=[['Last service',r.serviceDate,'',r.serviceDate?measurementDateAge(r.serviceDate):''],['Expected farrowing',r.expectedFarrowing,'',r.expectedFarrowing?dueDateLabel(r.expectedFarrowing):''],['Backfat',p.backfat,'mm',measurementAge(p,'backfat')],['Teat count',r.teats]];
-  if(type==='Gilt'&&p.stage!=='Gestating')items=[['First heat',r.firstHeat],['Next heat',r.expectedHeat],['Backfat',p.backfat,'mm',measurementAge(p,'backfat')],['Teat count',r.teats]];
- }else if(type==='Boar'){title='Boar breeding';items=[['Last service',r.serviceDate,'',r.serviceDate?measurementDateAge(r.serviceDate):''],['Breeding number',r.breedingId]];}
- else if(type==='Piglet'){title='Piglet growth';items=[['Birth weight',r.birthWeight,'kg'],['Weaning date',r.weaningDate],['Dam',r.dam],['Weaning weight',r.weaningWeight,'kg']];}
- else if(['Grower','Finisher','Weaner'].includes(type)){title='Growth';items=[['Entry weight',r.entryWeight,'kg'],['Entry date',r.growthEntryDate]];}
+ const type=animalType(p),{title,items}=typeFacts(p);
  if(!title)return '';
  const titleHeading=stHeading({title,icon:icon(type==='Sow'||type==='Gilt'?'clock':type==='Boar'?'profile':'weight'),kind:'section',level:4});
  const known=knownFacts([...items.map(([label,value,unit,meta,mono])=>factItem(label,shortDate(value),unit,meta,mono)),overviewNextTask(p,c),...(['Sow','Gilt'].includes(type)?[factItem('Parity',p.parity)]:[])]);return known.length?'<section class="detail-section reading-section animal-type-section">'+titleHeading+stFacts(known)+'</section>':'';
+}
+/* The record's Now panel (owner, 2026-10-30: the record was too much for one screen): the pen page's pattern, one panel of how she is now.
+   Parity and the date the worker plans around lead, then her batch and her latest readings. Cut from the record: Age, Type, Breed and
+   On farm (who she is: Origin; the header line says her stage), Next task (the task cards say it). */
+function pigNowFacts(p){
+ const type=animalType(p),items=typeFacts(p).items.map(([label,value,unit,meta,mono])=>factItem(label,shortDate(value),unit,meta,mono));
+ const take=label=>{const i=items.findIndex(x=>x.label===label);return i<0?null:items.splice(i,1)[0];};
+ const due=take('Expected farrowing'),backfat=take('Backfat'),teats=take('Teat count');
+ const facts=knownFacts([...(['Sow','Gilt'].includes(type)?[factItem('Parity',p.parity)]:[]),due,...items,factItem('Batch',p.batchId),factItem('Weight',p.weight,'kg',measurementAge(p,'weight')),backfat,factItem('Temperature',p.temperature,'°C',measurementAge(p,'temperature')),teats]);
+ return facts.length?'<section class="detail-section pig-now">'+stHeading({title:'Now',icon:icon('details'),kind:'section',level:4})+stFacts(facts)+'</section>':'';
+}
+/* Feeding is a door now, with its figures as the line: the plan, the ration and any change to it. */
+function pigFeedRow(p,pe){
+ if(pe.mode==='unknown')return '';
+ const amount=pe.mode==='adlib'?'Ad-lib':quantity(pigAllocation(p,pe))+' kg/day';
+ return action('pig-feed','feed','Feed plan',[pe.formula,amount,...pigFeedTags(p).map(t=>t.kind==='ration'?t.delta:t.label)].filter(Boolean).join(' · '),p.id);
 }
 /* A date the way the rest of the app writes it: "May 21", with the year only when it is not this one. */
 function shortDate(date){const m=/^([0-9]{4})-([0-9]{2})-([0-9]{2})$/.exec(date||'');if(!m)return date;const name=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+m[2]-1];return name+' '+(+m[3])+(m[1]!==walkDate.slice(0,4)?', '+m[1]:'');}
@@ -512,9 +519,7 @@ function pigRecordToolbar(p){return SentriUI.sheetFooter({content:back()+button(
 function pigOverview(c){
  const p=pig(c,c.pigId),pe=penOf(c,p.id);
 
- const general=stHeading({title:'General details',icon:icon('profile'),kind:'section',level:4});
- const record=stHeading({title:'Pig record',icon:icon('note'),kind:'section',level:4});
- return sheet(c,p.id,pigUnit(c,p.id)+' · '+pe.id+' · '+stageSummary(p),pigRecordCards(p)+pigCurrentTasks(c)+(()=>{const d=overviewDetails(p,c);return d?'<section class="detail-section reading-section pig-overview-facts">'+general+d+'</section>':''})()+typeDetails(p,c)+pigFeedFacts(p,pe)+'<section class="detail-section reading-section pig-record-links">'+record+'<div class="compact-actions detail-destinations st-panel st-row-group">'+action('pig-production','chart','Production stats','Averages and batch records',p.id)+action('pig-origin','origin','Origin','Provenance, dates and identities',p.id)+action('pig-log','clock','Log','Production, health and movement',p.id)+'</div></section>',pigRecordToolbar(p),'',pigFacts(c,p));
+ return sheet(c,p.id,pigUnit(c,p.id)+' · '+pe.id+' · '+stageSummary(p),pigRecordCards(p)+pigCurrentTasks(c)+pigNowFacts(p)+'<section class="detail-section reading-section pig-record-links"><div class="compact-actions detail-destinations st-panel st-row-group">'+pigFeedRow(p,pe)+action('pig-production','chart','Production stats','Averages and batch records',p.id)+action('pig-origin','origin','Origin','Provenance, dates and identities',p.id)+action('pig-log','clock','Log','Production, health and movement',p.id)+'</div></section>',pigRecordToolbar(p),'',pigFacts(c,p));
 }
 /* The pen page (owner, 2026-10-19): the pen is a door, not a tick. Everything done to the pen as a whole happens here, for this one pen:
    its verbs on top (the More actions grid), then what needs someone (open faults, then the pen note as its card), then how the pen is now, then the door to its log.
@@ -1630,7 +1635,7 @@ function pigRecordPage(c){
  if(tab==='production')body=productionOverview(c,p);
  if(tab==='provenance')body=
   profileFacts('Origin & dates',[
-   ['Entry type',r.entryType],['Birth date',r.birthDate],['Arrival date',r.arrivalDate],['First heat',r.firstHeat],['Birth farm',r.birthFarm],['Genetic line',r.geneticLine],['Dam',r.dam,'',true],['Sire',r.sire,'',true]
+   ['Entry type',r.entryType],['Breed',r.breed],['Birth date',r.birthDate],['Age',ageLabel(p.age??daysFromWalk(r.birthDate))],['Arrival date',r.arrivalDate],['First heat',r.firstHeat],['Birth farm',r.birthFarm],['Genetic line',r.geneticLine],['Dam',r.dam,'',true],['Sire',r.sire,'',true]
   ])+
   profileFacts('Identity records',[
    ['Current ear tag',p.id,'',true],['Breeding number',r.breedingId,'',true],['Other ear tag',r.otherTag,'',true]
@@ -1920,7 +1925,7 @@ function sowDetailContext(record,previous){
  c.selected.clear();c.selectedPens.clear();return c;
 }
 // Model exports permit small, isolated checks without starting the UI.
-globalThis.InspectionStudy={catalog,verbGrid,tickPen,penOverview,main,rowCheckAfterRender,medFarm,medRecents,medicinePickerBody,brandPickerBody,medicinesPage,medicineSheet,pickMedicine,atlasScreen:c=>atlasScreen(c),healthList,conditionDefinition,batchTaskForPig,batchTrackerRows,unitOverview,overlay,inspectionSurface,drawerSize,actionCatalogue,productionActionsForPig,sowTaskCard,pigCurrentTasks,currentTasksForPig,openProductionTask,saveProductionTask,saveBatchMembership,saveMiscarriage,openBulkAction,parkBulkDraft,bulkChanges,bulkActionValid,saveBulkAction,bulkActionPage,sowDetailContext,seed,animalType,typeDetails,productionOverview,productionAverages,productionRecords,feedBasis,feedTotals,updateFeedInput,openFeedEditor,feedEditorTargets,proposedPigAllocation,feedEditorValid,saveFeedEditor,pigAllocation,feedPreview,stageSummary,penFeedEntry,penFeedStatus,baseAllocation,feedBody,careAppearance,pigFeedTags,pigRow,overviewDetails,measurementAge,daysFromWalk,attentionOverview,validIndependentAdjustment,issueStatus,needsHealthAttention,closePenNote,undoPenNoteClose,eventCategory,filterLogEntries,logEntryDate,logDateBounds,visibleLogEntries,logDateDraftError,logFilterBar,categorizedLog,addEvent,penLogEntries,pigs,pig,penOf,picked,allocation,visiblePigs,applyRecord,saveHealth,saveBody,cases,matches,displayPigs,saveFinding,closeFinding,handleRecordAction};
+globalThis.InspectionStudy={catalog,verbGrid,tickPen,penOverview,main,rowCheckAfterRender,medFarm,medRecents,medicinePickerBody,brandPickerBody,medicinesPage,medicineSheet,pickMedicine,atlasScreen:c=>atlasScreen(c),healthList,conditionDefinition,batchTaskForPig,batchTrackerRows,unitOverview,overlay,inspectionSurface,drawerSize,actionCatalogue,productionActionsForPig,sowTaskCard,pigCurrentTasks,currentTasksForPig,openProductionTask,saveProductionTask,saveBatchMembership,saveMiscarriage,openBulkAction,parkBulkDraft,bulkChanges,bulkActionValid,saveBulkAction,bulkActionPage,sowDetailContext,seed,animalType,typeDetails,productionOverview,productionAverages,productionRecords,feedBasis,feedTotals,updateFeedInput,openFeedEditor,feedEditorTargets,proposedPigAllocation,feedEditorValid,saveFeedEditor,pigAllocation,feedPreview,stageSummary,penFeedEntry,penFeedStatus,baseAllocation,feedBody,careAppearance,pigFeedTags,pigRow,measurementAge,daysFromWalk,attentionOverview,validIndependentAdjustment,issueStatus,needsHealthAttention,closePenNote,undoPenNoteClose,eventCategory,filterLogEntries,logEntryDate,logDateBounds,visibleLogEntries,logDateDraftError,logFilterBar,categorizedLog,addEvent,penLogEntries,pigs,pig,penOf,picked,allocation,visiblePigs,applyRecord,saveHealth,saveBody,cases,matches,displayPigs,saveFinding,closeFinding,handleRecordAction};
 if(typeof document==='undefined')return;
 const embeddedSow=window.parent!==window&&new URLSearchParams(location.search).get('embed')==='sow';
 let embeddedSowReady=false;
