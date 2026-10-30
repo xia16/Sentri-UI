@@ -187,43 +187,67 @@
       "preset": "profile-full",
       "figma": "",
       "notes": {
-        "purpose": "Read one pig on the spot, in the pen page's order: what needs attention (one group, absent when nothing does), how she is now, then the doors to more. Populated example: sow 000267 (parity 2, Thin · Monitor).",
+        "purpose": "Read one pig on the spot: her Health, her Tasks and her Note, each under its own heading and absent when empty, then how she is Now, then the doors to more. Populated example: sow 000267 (parity 2, Thin · Monitor).",
         "states": [
           "Pig dead (stage \"Sow died\"): Actions offers a note only.",
           "Embedded in Farrowing: the same sheet opens inside the sow drawer with Farrowing's production actions added."
         ],
         "elements": [
           {
-            "name": "Needs attention",
-            "shows": "One group of rows: Fever · Treat in place · Day 2; Vaccination · Due today · Influenza booster; Poor appetite · Monitor · Day 2; the note",
+            "name": "Health",
+            "shows": "Fever · Treat in place · Day 2; Poor appetite · Monitor · Day 2; Arthritis · 120 days · No action needed",
             "states": [
               {
-                "state": "Condition under care",
+                "state": "Under care",
                 "when": "Care is Hospital pen, Treat in place or Monitor",
-                "shows": "Row: the care mark (its level's colour) as the lead, the condition, then care · Day N; opens the finding"
+                "shows": "Row: the care mark (its level's colour) as the lead, the condition, then care · Day N; ordered hospital, treat, monitor"
               },
               {
-                "state": "Task due",
-                "when": "A task is in progress, due today or overdue",
-                "shows": "Row: a calendar lead, the task, then its status and summary (her own batch left out); opens the task"
+                "state": "Ongoing",
+                "when": "Care is No action needed",
+                "shows": "Row after the ones under care: a plain health lead, then N days · No action needed"
               },
               {
-                "state": "Note",
-                "when": "p.note is set",
-                "shows": "Row: a note lead, the note's text (wraps), then \"Note\"; opens the pig log"
-              },
-              {
-                "state": "Nothing",
-                "when": "No condition under care, no task due and no note",
-                "shows": "No group and no heading: the record opens on Now"
+                "state": "None",
+                "when": "No conditions",
+                "shows": "No section"
               }
             ],
-            "logic": "Ordered by urgency: hospital, treat in place, tasks due, monitor, the note. One look for every item (owner, 2026-10-30: the tinted banners and task cards read as clutter); colour only on the care mark.",
-            "at": "Needs attention"
+            "logic": "Each row opens the finding.",
+            "at": "Health"
+          },
+          {
+            "name": "Tasks",
+            "shows": "Vaccination · Due today · Influenza booster; Pregnancy check · Tomorrow · 13 Sep",
+            "states": [
+              {
+                "state": "Due",
+                "when": "In progress, due today or overdue",
+                "shows": "First, in that order"
+              },
+              {
+                "state": "Coming",
+                "when": "Later",
+                "shows": "After the due ones; her own batch is left out of the line (Now says it)"
+              },
+              {
+                "state": "None",
+                "when": "No task",
+                "shows": "No section"
+              }
+            ],
+            "logic": "Calendar lead on every task row; each opens its task.",
+            "at": "Tasks"
+          },
+          {
+            "name": "Note",
+            "shows": "The pig's note, wrapping",
+            "logic": "No section without a note; the row opens the pig log.",
+            "at": "Note"
           },
           {
             "name": "Now panel",
-            "shows": "Next task, Expected farrowing, Parity, Last service, Batch, Weight, Backfat, Temperature, Teat count, Last treatment",
+            "shows": "Expected farrowing, Parity, Last service, Batch, Weight, Backfat, Temperature, Teat count, Last treatment",
             "states": [
               {
                 "state": "Sow",
@@ -256,14 +280,14 @@
                 "shows": "The fact is left out; the panel is absent when none is known"
               }
             ],
-            "logic": "One panel, the pen page's Now. Readings carry their age: Today / 1 day ago / N days ago / Date unknown. Expected farrowing: \"Today\", \"In N days\" or \"N days past expected\". Next task is the soonest task not yet due (Pregnancy check · Tomorrow · 13 Sep); a due one is in Needs attention. Last treatment when one is recorded. Cut from the record: Age, Type, Breed, On farm (Age and Breed are on Origin).",
+            "logic": "One panel, the pen page's Now. Readings carry their age: Today / 1 day ago / N days ago / Date unknown. Expected farrowing: \"Today\", \"In N days\" or \"N days past expected\". Last treatment when one is recorded. Cut from the record: Age, Type, Breed, On farm (Age and Breed are on Origin).",
             "source": "typeFacts; p.weight, p.backfat, p.temperature",
             "at": "Now"
           },
           {
             "name": "Doors",
-            "shows": "Ongoing conditions (Arthritis · 120 days · No action needed), Feed plan, Production stats, Origin, Log",
-            "logic": "One group, no heading. Conditions with no action needed lead it as quiet rows (history, not news). Feed plan's line is the plan, the ration and any change to it; absent for a pen with unknown feeding mode.",
+            "shows": "Feed plan (Gestation 1 · 2.6 kg/day · +10%), Production stats, Origin, Log",
+            "logic": "One group, no heading. Feed plan's line is the plan, the ration and any change to it; absent for a pen with unknown feeding mode.",
             "at": "Feed plan"
           }
         ],
@@ -275,7 +299,9 @@
           "Actions (raw)",
           "Now (raw)",
           "Feed plan (raw)",
-          "Needs attention (raw)"
+          "Health (raw)",
+          "Tasks (raw)",
+          "Note (raw)"
         ],
         "edge": [
           "A pig in no batch shows a dash for Batch and no Next task value."
@@ -372,14 +398,14 @@
       "preset": "pig-tasks",
       "figma": "",
       "notes": {
-        "purpose": "One pig can have several tasks at once. A task due now (Vaccination, due today) is a row in Needs attention; the soonest one not yet due (her batch's Pregnancy check, tomorrow) is the Now panel's Next task.",
+        "purpose": "One pig can have several tasks at once: they are rows under Tasks, due ones first. Sow 000254 has a Vaccination (due today) and her batch's Pregnancy check (tomorrow).",
         "states": [
           "No task: the whole section is absent."
         ],
         "elements": [
           {
             "name": "Task row",
-            "shows": "Vaccination · Due today · Influenza booster, with a calendar lead, in Needs attention",
+            "shows": "Vaccination · Due today · Influenza booster, with a calendar lead, under Tasks",
             "states": [
               {
                 "state": "In progress",

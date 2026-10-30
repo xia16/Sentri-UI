@@ -296,7 +296,7 @@ Scope: the everyday verb grid of the Actions drawer (`pig-profile.actions`, and 
 
 - **Better because** four or five verbs read as one line of choices, with no half-empty second row; six and more keep two even rows.
 
-# The record's top: one Needs attention group (2026-10-30)
+# The record's top: Health, Tasks, Note (2026-10-30)
 
 Scope: the pig record above Now (`pig-profile.full`, `.tasks`, `.empty`, `.partial`). House pattern: the pen page's Needs attention (one white group of navigation rows under a heading).
 
@@ -316,7 +316,8 @@ Scope: the pig record above Now (`pig-profile.full`, `.tasks`, `.empty`, `.parti
 
 ## Self-crit
 
-- **Better because** one look for everything that needs someone, ordered by urgency across kinds, and a sow with nothing wrong opens straight on how she is now.
+- Round 2 put every item in one Needs attention group ordered by urgency; the owner could not tell tasks from conditions. Round 3 groups by kind under three headings, each absent when empty.
+- **Better because** one look for every row, the kind said once by its heading, and a sow with nothing wrong opens straight on how she is now.
 - **Worse in one place, accepted:** the condition's name drops from a 20px bold banner title to the 16px row title; the care mark's colour and the order now carry the urgency.
 
 # Chinese pass (PR 244), critique

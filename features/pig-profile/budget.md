@@ -115,3 +115,7 @@ Owner: the tinted banners and task cards look cluttered when a sow has problems,
 - **Nothing to do**: no group, no heading, no "all clear" line: the record opens on Now (000254 fits one screen).
 - **Cut**: the tinted banner boxes, the "Current tasks" heading and its cards, the separate white card for ongoing conditions. Busy sow 000306 with a note: six boxes in three styles become one group of four rows.
 
+## Round 3 (2026-10-30): grouped by kind
+
+Owner, on round 2: "cleaner, but I can't tell the difference between tasks and conditions; they are all bundled together." The kind is now the first thing read: **Health** (conditions under care by urgency, then ongoing ones, quiet), **Tasks** (due first, then coming; replaces the Now panel's Next task), **Note**: each its heading over one white group of same-shaped rows, absent when empty. Ongoing conditions move from the doors into Health. A quiet sow shows only what she has (000254: Tasks with one row, then Now).
+

@@ -459,21 +459,23 @@ function overviewNextTask(p,c){
 function ageLabel(days){if(!Number.isFinite(days)||days<0)return null;if(days<60)return days+' days';const m=Math.floor(days/30.44);if(m<24)return m+' months';return Math.floor(m/12)+' yr'+(m%12?' '+m%12+' mo':'');}
 // One fact for Facts: an empty value draws the em dash and no trail.
 function factItem(label,value,unit='',meta='',mono=false){const has=hasRecordValue(value);return {label,value:has?value+(unit?(unit==='%'?'':' ')+unit:''):null,meta:has?meta:'',mono};}
-/* The record's top (owner, 2026-10-30: the tinted banners and task cards read as clutter): what needs someone now, in one group of rows,
-   the pen page's Needs attention. Conditions under care lead (hospital, treat), then tasks due now, then conditions to monitor, then the note.
-   The lead says what kind of thing each row is: the care mark (its level's colour), a calendar for a task, a note.
-   Nothing to do: no group and no heading; the record opens on Now. Tasks that are not due yet are the Now panel's Next task. */
-const taskDue=t=>/in progress|today|overdue/i.test(t.status||'');
-function pigNeeds(c,p){
- const rank={'Hospital pen':0,'Treat in place':1,Monitor:3},rows=[];
- for(const k of cases(p).filter(needsHealthAttention)){const a=careAppearance(k);rows.push([rank[k.triage],SentriUI.row({variant:'navigation',icon:SentriUI.conditionTag({variant:'mark',care:a.care,level:a.level,icon:a.symbol}),title:k.name,description:[k.triage,Number.isFinite(k.day)?'Day '+k.day:''].filter(Boolean).join(' · '),action:'finding',value:p.id+'|'+k.name,className:'action-item'})]);}
- for(const t of currentTasksForPig(c,p).filter(taskDue))rows.push([2,SentriUI.row({variant:'navigation',icon:icon('calendar'),title:t.title,description:[t.status,t.batchId&&t.summary==='Batch '+t.batchId?'':t.summary].filter(Boolean).join(' · '),action:t.action||'sow-current-task',value:t.value||t.id,className:'action-item'})]);
- if(p.note)rows.push([4,SentriUI.row({variant:'navigation',icon:icon('note'),title:p.note,description:'Note',wrap:true,action:'pig-log',value:p.id,className:'action-item'})]);
- if(!rows.length)return '';
- return '<section class="detail-section pig-needs">'+stHeading({title:'Needs attention',icon:icon('alert'),kind:'section',level:4})+'<div class="compact-actions st-panel st-row-group st-action-list">'+rows.sort((a,b)=>a[0]-b[0]).map(r=>r[1]).join('')+'</div></section>';
+/* The record's top (owner, 2026-10-30): no tinted banners or task cards. What needs someone is grouped by kind, so a condition never
+   reads as a task: Health, then Tasks, then the note, each its heading over one white group of rows, absent when it has nothing.
+   Every row has one shape (lead · title · line · chevron); only the care mark carries colour. A sow with nothing opens on Now. */
+const recordSection=(cls,title,k,rows)=>rows.length?'<section class="detail-section '+cls+'">'+stHeading({title,icon:icon(k),kind:'section',level:4})+'<div class="compact-actions st-panel st-row-group st-action-list">'+rows.join('')+'</div></section>':'';
+/* Health: conditions under care by urgency (hospital, treat, monitor), then the ones with no action needed, quiet. */
+function pigHealth(p){
+ const rank={'Hospital pen':0,'Treat in place':1,Monitor:2},all=cases(p),care=all.filter(needsHealthAttention).sort((a,b)=>rank[a.triage]-rank[b.triage]);
+ const rows=care.map(k=>{const a=careAppearance(k);return SentriUI.row({variant:'navigation',icon:SentriUI.conditionTag({variant:'mark',care:a.care,level:a.level,icon:a.symbol}),title:k.name,description:[k.triage,Number.isFinite(k.day)?'Day '+k.day:''].filter(Boolean).join(' · '),action:'finding',value:p.id+'|'+k.name,className:'action-item'});});
+ rows.push(...all.filter(k=>!needsHealthAttention(k)).map(k=>action('finding','health',k.name,[Number.isFinite(k.day)?k.day+' days':'','No action needed'].filter(Boolean).join(' · '),p.id+'|'+k.name)));
+ return recordSection('pig-health','Health','health',rows);
 }
-/* Conditions with no action needed are history, not news: quiet rows with the doors. */
-function pigOngoingRows(p){return cases(p).filter(k=>!needsHealthAttention(k)).map(k=>action('finding','health',k.name,[Number.isFinite(k.day)?k.day+' days':'','No action needed'].filter(Boolean).join(' · '),p.id+'|'+k.name)).join('');}
+/* Tasks: due ones first (in progress, today, overdue), then what is coming; her own batch is left out of the line (Now says it). */
+function pigTasks(c,p){
+ const tasks=currentTasksForPig(c,p);
+ return recordSection('pig-tasks','Tasks','calendar',tasks.map(t=>SentriUI.row({variant:'navigation',icon:icon('calendar'),title:t.title,description:[t.status,t.batchId&&t.summary==='Batch '+t.batchId?'':t.summary].filter(Boolean).join(' · '),action:t.action||'sow-current-task',value:t.value||t.id,className:'action-item'})));
+}
+function pigNote(p){return p.note?recordSection('pig-note','Note','note',[SentriUI.row({variant:'navigation',icon:icon('note'),title:p.note,wrap:true,action:'pig-log',value:p.id,className:'action-item'})]):'';}
 /* The facts that follow the animal type, for the type block (General details) and the record's Now panel. */
 function typeFacts(p){
  const r=p.registry||{},type=animalType(p);
@@ -494,12 +496,12 @@ function typeDetails(p,c){
 }
 /* The record's Now panel (owner, 2026-10-30: the record was too much for one screen): the pen page's pattern, one panel of how she is now.
    Parity and the date the worker plans around lead, then her batch and her latest readings. Cut from the record: Age, Type, Breed and
-   On farm (who she is: Origin; the header line says her stage). Next task is the soonest task not yet due (a due one is in Needs attention). */
-function pigNowFacts(c,p){
- const next=currentTasksForPig(c,p).find(t=>!taskDue(t)),type=animalType(p),items=typeFacts(p).items.map(([label,value,unit,meta,mono])=>factItem(label,shortDate(value),unit,meta,mono));
+   On farm (who she is: Origin; the header line says her stage), Next task (Tasks lists it). */
+function pigNowFacts(p){
+ const type=animalType(p),items=typeFacts(p).items.map(([label,value,unit,meta,mono])=>factItem(label,shortDate(value),unit,meta,mono));
  const take=label=>{const i=items.findIndex(x=>x.label===label);return i<0?null:items.splice(i,1)[0];};
  const due=take('Expected farrowing'),backfat=take('Backfat'),teats=take('Teat count');
- const facts=knownFacts([...(next?[{label:'Next task',value:next.title,meta:next.status||''}]:[]),due,...(['Sow','Gilt'].includes(type)?[factItem('Parity',p.parity)]:[]),...items,factItem('Batch',p.batchId),factItem('Weight',p.weight,'kg',measurementAge(p,'weight')),backfat,factItem('Temperature',p.temperature,'°C',measurementAge(p,'temperature')),teats,...(p.treatment?[{label:'Last treatment',value:p.treatment.medicine,meta:p.treatment.dose+' '+p.treatment.unit+' · '+p.treatment.method}]:[])]);
+ const facts=knownFacts([due,...(['Sow','Gilt'].includes(type)?[factItem('Parity',p.parity)]:[]),...items,factItem('Batch',p.batchId),factItem('Weight',p.weight,'kg',measurementAge(p,'weight')),backfat,factItem('Temperature',p.temperature,'°C',measurementAge(p,'temperature')),teats,...(p.treatment?[{label:'Last treatment',value:p.treatment.medicine,meta:p.treatment.dose+' '+p.treatment.unit+' · '+p.treatment.method}]:[])]);
  return facts.length?'<section class="detail-section pig-now">'+stHeading({title:'Now',icon:icon('details'),kind:'section',level:4})+stFacts(facts)+'</section>':'';
 }
 /* Feeding is a door now, with its figures as the line: the plan, the ration and any change to it. */
@@ -516,7 +518,7 @@ function pigRecordToolbar(p){return SentriUI.sheetFooter({content:back()+button(
 function pigOverview(c){
  const p=pig(c,c.pigId),pe=penOf(c,p.id);
 
- return sheet(c,p.id,pigUnit(c,p.id)+' · '+pe.id+' · '+stageSummary(p),pigNeeds(c,p)+pigNowFacts(c,p)+'<section class="detail-section reading-section pig-record-links"><div class="compact-actions detail-destinations st-panel st-row-group">'+pigOngoingRows(p)+pigFeedRow(p,pe)+action('pig-production','chart','Production stats','Averages and batch records',p.id)+action('pig-origin','origin','Origin','Provenance, dates and identities',p.id)+action('pig-log','clock','Log','Production, health and movement',p.id)+'</div></section>',pigRecordToolbar(p),'',pigFacts(c,p));
+ return sheet(c,p.id,pigUnit(c,p.id)+' · '+pe.id+' · '+stageSummary(p),pigHealth(p)+pigTasks(c,p)+pigNote(p)+pigNowFacts(p)+'<section class="detail-section reading-section pig-record-links"><div class="compact-actions detail-destinations st-panel st-row-group">'+pigFeedRow(p,pe)+action('pig-production','chart','Production stats','Averages and batch records',p.id)+action('pig-origin','origin','Origin','Provenance, dates and identities',p.id)+action('pig-log','clock','Log','Production, health and movement',p.id)+'</div></section>',pigRecordToolbar(p),'',pigFacts(c,p));
 }
 /* The pen page (owner, 2026-10-19): the pen is a door, not a tick. Everything done to the pen as a whole happens here, for this one pen:
    its verbs on top (the More actions grid), then what needs someone (open faults, then the pen note as its card), then how the pen is now, then the door to its log.

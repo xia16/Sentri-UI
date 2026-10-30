@@ -143,12 +143,12 @@ test('the verb words come from the strings registry, and Transfer is not the reg
   const registry=require('../laws/strings.json').strings;
   for(const label of labels)assert.ok(Object.entries(registry).some(([id,s])=>id.startsWith('actions.tile.')&&s.en===label&&s.zh),label);
 });
-test('a task in progress needs attention on pig detail and stays out of Actions', () => {
+test('current tasks live on pig detail, under Tasks, and stay out of Actions', () => {
   const c = context('pig');
   c.hostTasks = [{ id: 'farrowing', title: 'Farrowing', type: 'Production', status: 'In progress', summary: '9 alive' }];
-  assert.match(model.overlay(c), /class="detail-section pig-needs"[\s\S]*?data-action="sow-current-task"[^>]*data-value="farrowing"/);
+  assert.match(model.overlay(c), /class="detail-section pig-tasks"[\s\S]*?>Tasks<[\s\S]*?data-action="sow-current-task"[^>]*data-value="farrowing"/);
   c.selected.add(c.pigId); c.view = 'actions';
-  assert.doesNotMatch(model.overlay(c), /pig-needs|sow-task-rail/);
+  assert.doesNotMatch(model.overlay(c), /pig-tasks|sow-task-rail/);
 });
 test('pig task queue merges and prioritizes simultaneous task sources', () => {
   const c = context('pig');
@@ -157,9 +157,8 @@ test('pig task queue merges and prioritizes simultaneous task sources', () => {
   const tasks = model.currentTasksForPig(c, p);
   assert.deepEqual(tasks.map(task => task.title), ['Vaccination', 'Pregnancy check']);
   const html = model.overlay(c);
-  assert.doesNotMatch(html, /Current tasks|2 tasks|pig-current-task/, 'no task cards: a due task is a row in Needs attention, the next one a fact');
-  assert.match(html, /pig-needs[\s\S]*?Vaccination[\s\S]*?Due today · Influenza booster/);
-  assert.match(html, /pig-now[\s\S]*?Next task[\s\S]*?Pregnancy check[\s\S]*?Tomorrow · 13 Sep</, 'not due yet: the Now panel, without her own batch');
+  assert.doesNotMatch(html, /Current tasks|2 tasks|pig-current-task|>Next task</, 'no task cards and no Next task fact: Tasks lists them');
+  assert.match(html, /pig-tasks[\s\S]*?Vaccination[\s\S]*?Due today · Influenza booster[\s\S]*?Pregnancy check[\s\S]*?Tomorrow · 13 Sep</, 'due first; her own batch left out of the line');
   assert.match(html, /Vaccination/);
   assert.match(html, /Pregnancy check/);
   assert.match(html, /data-action="sow-current-task"[^>]*data-value="vaccination"/);
@@ -169,6 +168,9 @@ test('the pig record follows the pen page: one Now panel, then the doors; nothin
   const html = model.overlay(c);
   assert.match(html, /<section class="detail-section pig-now">[\s\S]*?>Now<[\s\S]*?Parity[\s\S]*?Batch[\s\S]*?Weight/);
   assert.doesNotMatch(html, />General details<|>Sow cycle<|>Feeding<|>Pig record<|>On farm<|>Type<|attention-row|record-card/, 'one panel; no banners, no type or on-farm fact');
+  const p = model.pig(c, c.pigId); p.note = 'Red line on left shoulder'; p.cases = [{ name: 'Fever', kind: 'Symptom', day: 2, triage: 'Treat in place' }, { name: 'Arthritis', kind: 'Disease', day: 120, triage: 'None' }];
+  const busy = model.overlay(c);
+  assert.match(busy, /pig-health[\s\S]*?>Health<[\s\S]*?Fever[\s\S]*?Arthritis[\s\S]*?pig-tasks[\s\S]*?>Tasks<[\s\S]*?pig-note[\s\S]*?>Note<[\s\S]*?Red line on left shoulder[\s\S]*?pig-now/, 'each kind under its own heading: Health, Tasks, Note, then Now');
   assert.ok(html.indexOf('pig-now') < html.indexOf('data-action="pig-feed"'), 'the doors follow the Now panel');
   assert.match(html, /data-action="pig-feed"[\s\S]*?Feed plan[\s\S]*?data-action="pig-production"[\s\S]*?data-action="pig-origin"[\s\S]*?data-action="pig-log"/);
 });
