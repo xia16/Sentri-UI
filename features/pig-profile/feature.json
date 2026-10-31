@@ -195,7 +195,7 @@
         "elements": [
           {
             "name": "Health",
-            "shows": "Rows: Fever · Treat in place, Day 2 on the right; Poor appetite · Monitor, Day 2; Arthritis · No action needed, 120 days",
+            "shows": "One-line rows: Fever · Treat · Day 2; Poor appetite · Monitor · Day 2; Arthritis · 120 days",
             "states": [
               {
                 "state": "Under care",
@@ -213,12 +213,12 @@
                 "shows": "No section"
               }
             ],
-            "logic": "No heading: the shape says it. The care mark leads, the care word is the line, the day is a figure on the right (a state). Each row opens the finding.",
+            "logic": "No heading: the shape says it. One line each (Row compact, 56px): the care mark leads, the name, then care and day on the right. Each row opens the finding.",
             "at": "Health"
           },
           {
             "name": "Tasks",
-            "shows": "An agenda: [Today] Vaccination · Influenza booster; [13 SEP] Pregnancy check · Tomorrow",
+            "shows": "An agenda of one-line rows: [Today] Vaccination · Influenza booster; [13 SEP] Pregnancy check · Tomorrow",
             "states": [
               {
                 "state": "Due",

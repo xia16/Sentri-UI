@@ -123,3 +123,7 @@ Owner, on round 2: "cleaner, but I can't tell the difference between tasks and c
 
 Owner: "not using titles but unique UI layout to help differentiate these two." Each kind keeps its group but has its own shape: **conditions** are state rows (care mark lead, care word as the line, "Day 2" as a figure on the right); **tasks** are an agenda (the date block leads: Today, Now, Late, or "13 SEP"); **the note** is the pen page's note card (one look for a note anywhere). The three headings go.
 
+## Round 5 (2026-10-30): compact
+
+Owner: "more compact, not taking up the whole screen with 1 note, 2 tasks and 3 health things." Rows are one line (Row `compact`, 56px instead of 68px): line 2's words move to the right (`Treat · Day 2`, `Tomorrow`); the date lead lies flat (`13 SEP`); the three cards sit 12px apart instead of 24px (Now keeps the section gap). Busy sow 000306: the block above Now drops from about 478px to 374px, and Now's first two facts show on the first screen.
+

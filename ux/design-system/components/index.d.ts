@@ -87,6 +87,8 @@ export interface RowProps {
   contextWidth?: string;
   /** Navigation only: a date lead in the icon's place, for an agenda of tasks: the day over the month, or one word (tone 'act' is red). */
   date?: { day: string; month: string } | { word: string; tone?: 'act' } | null;
+  /** Navigation only: one line, 56px; line 2's words move to `trailing`. */
+  compact?: boolean;
   /** Candidate: the row's one status chip (a Status word). Not with trailing. */
   chip?: StatusProps;
   /** Candidate: title and description wrap instead of truncating (evidence lines, long mono tokens). */

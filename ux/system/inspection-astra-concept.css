@@ -794,3 +794,6 @@
 .inspection-phone .sheet-body > .review-list + .st-heading.st-heading { margin-top: var(--space-section); }
 /* Find a pig: the design system's Lookup find page (components/Lookup) fills the phone over the walk, as a page does. */
 .inspection-phone>.st-find{position:absolute;inset:0;z-index:5}
+/* The pig record's top (owner, 2026-10-30: compact): conditions, tasks and the note are one block, a card apart; Now keeps the section gap. */
+.inspection-phone .detail-section:is(.pig-health,.pig-tasks):has(+ .detail-section:is(.pig-tasks,.pig-note)){margin-bottom:var(--space-12)}
+

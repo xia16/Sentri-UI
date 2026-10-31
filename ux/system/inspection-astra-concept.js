@@ -460,16 +460,17 @@ function ageLabel(days){if(!Number.isFinite(days)||days<0)return null;if(days<60
 // One fact for Facts: an empty value draws the em dash and no trail.
 function factItem(label,value,unit='',meta='',mono=false){const has=hasRecordValue(value);return {label,value:has?value+(unit?(unit==='%'?'':' ')+unit:''):null,meta:has?meta:'',mono};}
 /* The record's top (owner, 2026-10-30): no tinted banners, no task cards and no headings. Each kind has its own shape, so a condition
-   never reads as a task: Health is rows led by the care mark with the day as a figure on the right (a state); Tasks is an agenda,
-   rows led by their date (a schedule); the note is the pen page's note card. Each is absent when empty; a sow with nothing opens on Now. */
+   never reads as a task: Health is rows led by the care mark with care and day on the right (a state); Tasks is an agenda,
+   rows led by their date (a schedule); the note is the pen page's note card. Rows are one line (Row compact, 56px), so a busy sow
+   (three conditions, two tasks, a note) leaves room for Now on the first screen. Each is absent when empty; a sow with nothing opens on Now. */
 const recordGroup=(cls,html)=>html?'<section class="detail-section '+cls+'">'+html+'</section>':'';
 const recordRows=rows=>rows.length?'<div class="compact-actions st-panel st-row-group st-action-list">'+rows.join('')+'</div>':'';
 /* Health: conditions under care by urgency (hospital, treat, monitor), then the ones with no action needed, quiet. */
 function pigHealth(p){
  const rank={'Hospital pen':0,'Treat in place':1,Monitor:2},all=cases(p),care=all.filter(needsHealthAttention).sort((a,b)=>rank[a.triage]-rank[b.triage]);
- const day=k=>Number.isFinite(k.day)?{text:needsHealthAttention(k)?'Day '+k.day:k.day+' days'}:'';
- const rows=care.map(k=>{const a=careAppearance(k);return SentriUI.row({variant:'navigation',icon:SentriUI.conditionTag({variant:'mark',care:a.care,level:a.level,icon:a.symbol}),title:k.name,description:k.triage,trailing:day(k),action:'finding',value:p.id+'|'+k.name,className:'action-item'});});
- rows.push(...all.filter(k=>!needsHealthAttention(k)).map(k=>SentriUI.row({variant:'navigation',icon:icon('health'),title:k.name,description:'No action needed',trailing:day(k),action:'finding',value:p.id+'|'+k.name,className:'action-item'})));
+ const day=k=>Number.isFinite(k.day)?(needsHealthAttention(k)?'Day '+k.day:k.day+' days'):'',careShort={'Hospital pen':'Hospital','Treat in place':'Treat',Monitor:'Monitor'};
+ const rows=care.map(k=>{const a=careAppearance(k);return SentriUI.row({variant:'navigation',compact:true,icon:SentriUI.conditionTag({variant:'mark',care:a.care,level:a.level,icon:a.symbol}),title:k.name,trailing:{text:[careShort[k.triage],day(k)].filter(Boolean).join(' · ')},action:'finding',value:p.id+'|'+k.name,className:'action-item'});});
+ rows.push(...all.filter(k=>!needsHealthAttention(k)).map(k=>SentriUI.row({variant:'navigation',compact:true,icon:icon('health'),title:k.name,trailing:{text:day(k)},action:'finding',value:p.id+'|'+k.name,className:'action-item'})));
  return recordGroup('pig-health',recordRows(rows));
 }
 /* A task's date lead (Row's date): Now (in progress), Today, Late (overdue, red), else the day and month it is due; the rest of its status is the line. */
@@ -483,7 +484,7 @@ function taskWhen(t){
 }
 /* Tasks: due ones first (in progress, today, overdue), then what is coming; her own batch is left out of the line (Now says it). */
 function pigTasks(c,p){
- return recordGroup('pig-tasks',recordRows(currentTasksForPig(c,p).map(t=>{const w=taskWhen(t);return SentriUI.row({variant:'navigation',date:w.date,icon:w.date?'':icon('calendar'),title:t.title,description:[w.line,t.batchId&&t.summary==='Batch '+t.batchId?'':t.summary].filter(Boolean).join(' · '),action:t.action||'sow-current-task',value:t.value||t.id,className:'action-item'});})));
+ return recordGroup('pig-tasks',recordRows(currentTasksForPig(c,p).map(t=>{const w=taskWhen(t);return SentriUI.row({variant:'navigation',compact:true,date:w.date,icon:w.date?'':icon('calendar'),title:t.title,trailing:{text:(t.batchId&&t.summary==='Batch '+t.batchId?'':t.summary)||w.line},action:t.action||'sow-current-task',value:t.value||t.id,className:'action-item'});})));
 }
 /* The note: the pen page's note card, one look for a note wherever it is. */
 function pigNote(p){return p.note?recordGroup('pig-note','<div class="record-card-stack" aria-label="Pig note">'+recordCard({kind:'Note',title:p.note,tone:'record-neutral record-note-preview',link:'pig-log',value:p.id})+'</div>'):'';}

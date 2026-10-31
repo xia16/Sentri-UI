@@ -171,6 +171,7 @@ test('the pig record follows the pen page: one Now panel, then the doors; nothin
   const p = model.pig(c, c.pigId); p.note = 'Red line on left shoulder'; p.cases = [{ name: 'Fever', kind: 'Symptom', day: 2, triage: 'Treat in place' }, { name: 'Arthritis', kind: 'Disease', day: 120, triage: 'None' }];
   const busy = model.overlay(c);
   assert.match(busy, /pig-health[\s\S]*?Fever[\s\S]*?Day 2[\s\S]*?Arthritis[\s\S]*?120 days[\s\S]*?pig-tasks[\s\S]*?st-row-date[\s\S]*?pig-note[\s\S]*?record-card[\s\S]*?Red line on left shoulder[\s\S]*?pig-now/, 'each kind has its own shape: Health with its day on the right, Tasks led by their date, the note card, then Now');
+  assert.match(busy, /pig-health[\s\S]*?data-compact=""[\s\S]*?Fever[\s\S]*?st-row-trailing">Treat · Day 2</, 'one-line rows: care and day on the right');
   assert.ok(html.indexOf('pig-now') < html.indexOf('data-action="pig-feed"'), 'the doors follow the Now panel');
   assert.match(html, /data-action="pig-feed"[\s\S]*?Feed plan[\s\S]*?data-action="pig-production"[\s\S]*?data-action="pig-origin"[\s\S]*?data-action="pig-log"/);
 });
