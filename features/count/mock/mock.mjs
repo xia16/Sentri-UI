@@ -56,11 +56,13 @@ const CSS = `
   .m-receipt .st-row-group{margin-bottom:8px}
   .m-receipt .m-hint{margin-top:12px}
   .m-count .inspect-pen-head{display:flex;align-items:center}
-  .m-count .m-inline-bar{margin:0 0 10px}
+  .m-count .m-inline-bar{margin:0 0 8px}
+  .m-count .m-inline-bar .st-choice-search{margin-bottom:0}
   .m-count .m-total-field{margin-left:10px;display:flex}
   .m-count .m-total-field>*{box-sizing:border-box;width:56px;height:44px;border:1px solid #bdc7b6;border-radius:12px;background:#fff;text-align:center;font:600 16px/42px 'IBM Plex Mono',monospace;color:#20291f;padding:0}
   .m-count .m-total-field>[data-idle],.m-count .m-total-field>.is-idle{color:#657060}
-  .m-count .m-away .st-row-copy small{color:var(--amber,#896017)}
+  .m-count .m-away .st-row-copy small,.m-count .m-away .st-animal-context{color:var(--amber,#896017)}
+  .m-count .m-inline-bar+*{margin-top:0!important}
   .m-count .m-hint b{font-family:var(--font-mono,'IBM Plex Mono',monospace)}
   .m-count .m-trail{margin-left:auto;font-size:13px;color:var(--ink-2,#5b625d);font-variant-numeric:tabular-nums}
   .m-count .m-trail.m-short{color:var(--ink,#1d221e);font-weight:600}
@@ -116,14 +118,16 @@ for (const [name, fewer] of [['mock-3-count-pen.png', true], ['mock-3b-count-pen
     const { U, ic, page, footer, primary } = window.M;
     const all = 16;
     const added = fewer
-      ? [['000801', 'Grower · 63d'], ['000802', 'Grower · 63d'], ['000512', 'Currently in Unit 9 · C3', true], ['000733', 'Currently in D2', true]]
+      ? [['000801', 'Grower · 63d'], ['000802', 'Grower · 63d'], ['000512', 'Currently in Unit 9 · C3', true], ['000733', 'Currently in D2', true], ['000915', 'Currently in D5', true, true]]
       : [['000801', 'Grower · 63d'], ['000802', 'Grower · 63d'], ['000803', 'Grower · 63d']];
     const notAdded = fewer ? ['000803'] : [];
-    const tagged = added.length + notAdded.length, untagged = all - tagged, expected = 13, diff = untagged - expected;
-    const row = ([id, ctx, away]) => U.row({ code: id, description: ctx, trail: 'chevron', action: 'x', className: 'm-added' + (away ? ' m-away' : '') });
-    const count = '<section class="feature-section">' + U.stepper({ variant: 'well', label: 'All pigs in D4', value: all, min: added.length, max: 80, action: 'x', reserveHint: false }) + '</section>';
+    // Every pig added is a ticked row; untick one read by mistake (a pig in the next pen through the bars) and it leaves the count.
+    const kept = added.filter((a) => !a[3]);
+    const tagged = kept.length + notAdded.length, untagged = all - tagged, expected = 13, diff = untagged - expected;
+    const row = ([id, ctx, away, off]) => U.rowSelectDoor({ code: id, description: ctx, contextWidth: '240px', right: { kind: 'tags', tags: [] }, checked: !off, value: id, action: '', openAction: 'pig', openValue: id, className: 'inspect-pig roster-pig' + (off ? '' : ' selected') + (away ? ' m-away' : ''), label: id });
+    const count = '<section class="feature-section">' + U.stepper({ variant: 'well', label: 'All pigs in D4', value: all, min: kept.length, max: 80, action: 'x', reserveHint: false }) + '</section>';
     const search = U.choiceSearch({ label: 'Search ear tag', placeholder: 'Ear tag', value: '', clear: { action: 'x' }, scan: { action: 'x', label: 'Scan ear tags' } });
-    const tags = '<section class="feature-section">' + U.heading({ title: 'Ear tags · ' + added.length + ' added', icon: ic('tag'), kind: 'section', level: 3 })
+    const tags = '<section class="feature-section inspect-list m-list">' + U.heading({ title: 'Ear tags · ' + kept.length, icon: ic('tag'), kind: 'section', level: 3 })
       + '<div class="m-inline-bar">' + search + '</div>'
       + U.rowGroup(added.map(row).join(''))
       + (notAdded.length ? '<p class="m-hint">Recorded here, not added yet: <b>' + notAdded.join(', ') + '</b></p>' : '')
