@@ -39,11 +39,11 @@ This mode is done only when the ledger says **settled**. On capped or stuck, com
 
 A product question becomes a grilling ticket on the feature's map. For a feature with no map, open a small one, with the question as its first ticket.
 
-**build.** Screens first, components from the feature. One builder per change with [build.md](../../../docs/design-workflow/briefs/build.md), gated by `scripts/gate.mjs`, merged behind the merge guard.
+**build.** Canvas first: draw the screens on `features/<id>/canvas.html` (`node scripts/canvas.mjs`), send it to the owner and stop until they agree ([Canvas first](../../../docs/design-workflow/README.md#canvas-first)). Then build what was agreed: screens first, components from the feature. One builder per change with [build.md](../../../docs/design-workflow/briefs/build.md), gated by `scripts/gate.mjs`, merged behind the merge guard.
 
 **polish.** Follow [.claude/skills/polish-loop/SKILL.md](../polish-loop/SKILL.md) to its stop.
 
-**review.** The loop is done. Publish its packet for the owner; approvals are theirs.
+**review.** The loop is done. Publish its packet for the owner as a canvas; approvals are theirs, and nothing the loop changed reaches the atlas before they agree.
 
 **freeze.** Every screen is approved. Run [freeze-checklist.md](../../../docs/design-workflow/freeze-checklist.md) by hand; there's no automation yet.
 
