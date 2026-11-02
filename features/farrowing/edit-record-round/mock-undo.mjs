@@ -198,7 +198,7 @@ async function cardLast(p, what, when, mine) {
 
 // Variant E (owner, 2026-11-02: "header should be the time and who, with all the results of that run below it"): the stamp is the
 // line's header, and the run's results sit under it as the same chips the unsaved visit wears (+3 born, −1 died, 1 born dead),
-// on one line under the header (at most three kinds: born, died, born dead), so a saved run looks as it did before Save, in the quiet tone (saved: colour no longer means "not yet"). Undo is a small key on the right, centred on the run: the return glyph over a 13px word.
+// on one line under the header (at most three kinds: born, died, born dead), so a saved run looks as it did before Save, in the quiet tone (saved: colour no longer means "not yet"). Undo is a quiet text action on the right, centred on the run.
 async function cardRun(p, stamp, chips, figure, mine) {
   await p.evaluate(({ stamp, chips, figure, mine }) => {
     const ic = (k) => window.SentriIcons.icon(k);
@@ -208,7 +208,9 @@ async function cardRun(p, stamp, chips, figure, mine) {
     const wrap = document.createElement('div'); wrap.className = 'mock-alive';
     card.replaceWith(wrap); wrap.append(card);
     const chip = ([tone, glyph, n, word]) => `<span class="alive-chip" data-tone="${tone}"><b>${n}</b>${word}</span>`; // no glyph: the word says it, and three always fit one line
-    const undo = mine ? `<button type="button" class="button secondary mock-undo" data-ds="Button" data-register="secondary">${ic('return')}<span>Undo</span></button>` : '';
+    // Undo is a quiet text action (Piglet processing's receipt Undo, the Button's text register): small glyph + word, no box,
+    // a 44px hit area that does not show.
+    const undo = mine ? `<button type="button" class="st-text-action mock-undo" data-ds="Button" data-register="text">${ic('return')}<span>Undo</span></button>` : '';
     wrap.insertAdjacentHTML('beforeend', `<div class="mock-run"><div class="mock-run-copy"><small>${stamp}</small><span class="mock-run-chips">${chips.map(chip).join('')}</span></div>${undo}</div>`);
     const st = document.createElement('style');
     st.textContent = `.farrowing-phone .mock-alive{margin:0 0 16px;border:1px solid var(--line);border-radius:20px;background:#f6f7f1;overflow:hidden}
@@ -220,8 +222,8 @@ async function cardRun(p, stamp, chips, figure, mine) {
       .mock-run .alive-chip{display:inline-flex;align-items:center;gap:5px;height:24px;box-sizing:border-box;padding:0 7px;border-radius:999px;font:500 13px/1 var(--font-sans);background:#eceee7;color:#4b5547;white-space:nowrap}
       .mock-run .alive-chip b{flex:none;font:600 14px/1 var(--font-mono)}
       .mock-run .alive-chip svg{display:block;flex:none;width:15px;height:15px;stroke-width:2}
-      .farrowing-phone .mock-run .mock-undo{flex:none;display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;width:56px;min-width:0;height:56px;min-height:0;padding:0;border-radius:14px;font:500 13px/16px var(--font-sans)}
-      .farrowing-phone .mock-run .mock-undo svg{width:20px;height:20px}`;
+      .farrowing-phone .mock-run .mock-undo{flex:none;display:inline-flex;align-items:center;gap:5px;height:44px;min-height:44px;margin-right:-8px;padding:0 8px;border:0;background:none;font:600 13px/16px var(--font-sans);color:var(--ink)}
+      .farrowing-phone .mock-run .mock-undo svg{width:16px;height:16px;stroke-width:2}`;
     document.head.append(st);
   }, { stamp, chips, figure, mine });
 }
