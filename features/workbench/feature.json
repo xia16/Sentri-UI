@@ -234,7 +234,7 @@
               {
                 "state": "Past its plan",
                 "when": "The task has run past its planned last day and is still open",
-                "shows": "\"6 overdue\"; one red run segment per day over (the only colour on the tile); \"1 day overdue\""
+                "shows": "\"6 overdue\"; one yellow run segment per day past the plan (late-mark; done days green, today blue); \"1 day late\" in amber"
               },
               {
                 "state": "All recorded",
@@ -469,7 +469,7 @@
               {
                 "state": "Past its plan",
                 "when": "The task has run past its planned last day and is still open",
-                "shows": "\"6 overdue\"; one red run segment per day over (the only colour on the tile); \"1 day overdue\""
+                "shows": "\"6 overdue\"; one yellow run segment per day past the plan (late-mark; done days green, today blue); \"1 day late\" in amber"
               },
               {
                 "state": "All recorded",
@@ -541,7 +541,7 @@
               {
                 "state": "Past its plan",
                 "when": "The task has run past its planned last day and is still open",
-                "shows": "\"6 overdue\"; one red run segment per day over (the only colour on the tile); \"1 day overdue\""
+                "shows": "\"6 overdue\"; one yellow run segment per day past the plan (late-mark; done days green, today blue); \"1 day late\" in amber"
               },
               {
                 "state": "All recorded",
@@ -935,7 +935,7 @@
               {
                 "state": "Past its plan",
                 "when": "The task has run past its planned last day and is still open",
-                "shows": "\"6 overdue\"; one red run segment per day over (the only colour on the tile); \"1 day overdue\""
+                "shows": "\"6 overdue\"; one yellow run segment per day past the plan (late-mark; done days green, today blue); \"1 day late\" in amber"
               },
               {
                 "state": "All recorded",
@@ -1198,7 +1198,7 @@
               {
                 "state": "Past its plan",
                 "when": "The task has run past its planned last day and is still open",
-                "shows": "\"6 overdue\"; one red run segment per day over (the only colour on the tile); \"1 day overdue\""
+                "shows": "\"6 overdue\"; one yellow run segment per day past the plan (late-mark; done days green, today blue); \"1 day late\" in amber"
               },
               {
                 "state": "All recorded",
@@ -1285,12 +1285,12 @@
               {
                 "state": "Done",
                 "when": "A past day",
-                "shows": "How many were recorded (can be 0); light fill"
+                "shows": "How many were recorded (can be 0); light green (done-fill), the number in dark green"
               },
               {
                 "state": "Today",
                 "when": "Today",
-                "shows": "Due today; filled"
+                "shows": "Due today; light blue (progress-fill), the number in dark blue; today's date ringed in blue"
               },
               {
                 "state": "Planned",
@@ -1310,7 +1310,7 @@
               {
                 "state": "Past its plan",
                 "when": "A day after the planned end of a task still open",
-                "shows": "Red edge; the batch label turns red"
+                "shows": "Light yellow (amber-fill), the number in dark brown: late, not overdue (status convention, 2026-11-02)"
               },
               {
                 "state": "Nothing due",
@@ -1361,12 +1361,12 @@
               {
                 "state": "Done",
                 "when": "A past day",
-                "shows": "How many were recorded (can be 0); light fill"
+                "shows": "How many were recorded (can be 0); light green (done-fill), the number in dark green"
               },
               {
                 "state": "Today",
                 "when": "Today",
-                "shows": "Due today; filled"
+                "shows": "Due today; light blue (progress-fill), the number in dark blue; today's date ringed in blue"
               },
               {
                 "state": "Planned",
@@ -1386,7 +1386,7 @@
               {
                 "state": "Past its plan",
                 "when": "A day after the planned end of a task still open",
-                "shows": "Red edge; the batch label turns red"
+                "shows": "Light yellow (amber-fill), the number in dark brown: late, not overdue (status convention, 2026-11-02)"
               },
               {
                 "state": "Nothing due",
@@ -1437,12 +1437,12 @@
               {
                 "state": "Done",
                 "when": "A past day",
-                "shows": "How many were recorded (can be 0); light fill"
+                "shows": "How many were recorded (can be 0); light green (done-fill), the number in dark green"
               },
               {
                 "state": "Today",
                 "when": "Today",
-                "shows": "Due today; filled"
+                "shows": "Due today; light blue (progress-fill), the number in dark blue; today's date ringed in blue"
               },
               {
                 "state": "Planned",
@@ -1462,7 +1462,7 @@
               {
                 "state": "Past its plan",
                 "when": "A day after the planned end of a task still open",
-                "shows": "Red edge; the batch label turns red"
+                "shows": "Light yellow (amber-fill), the number in dark brown: late, not overdue (status convention, 2026-11-02)"
               },
               {
                 "state": "Nothing due",
@@ -1513,12 +1513,12 @@
               {
                 "state": "Done",
                 "when": "A past day",
-                "shows": "How many were recorded (can be 0); light fill"
+                "shows": "How many were recorded (can be 0); light green (done-fill), the number in dark green"
               },
               {
                 "state": "Today",
                 "when": "Today",
-                "shows": "Due today; filled"
+                "shows": "Due today; light blue (progress-fill), the number in dark blue; today's date ringed in blue"
               },
               {
                 "state": "Planned",
@@ -1538,7 +1538,7 @@
               {
                 "state": "Past its plan",
                 "when": "A day after the planned end of a task still open",
-                "shows": "Red edge; the batch label turns red"
+                "shows": "Light yellow (amber-fill), the number in dark brown: late, not overdue (status convention, 2026-11-02)"
               },
               {
                 "state": "Nothing due",
@@ -1595,12 +1595,12 @@
               {
                 "state": "Done",
                 "when": "A past day",
-                "shows": "How many were recorded (can be 0); light fill"
+                "shows": "How many were recorded (can be 0); light green (done-fill), the number in dark green"
               },
               {
                 "state": "Today",
                 "when": "Today",
-                "shows": "Due today; filled"
+                "shows": "Due today; light blue (progress-fill), the number in dark blue; today's date ringed in blue"
               },
               {
                 "state": "Planned",
@@ -1620,7 +1620,7 @@
               {
                 "state": "Past its plan",
                 "when": "A day after the planned end of a task still open",
-                "shows": "Red edge; the batch label turns red"
+                "shows": "Light yellow (amber-fill), the number in dark brown: late, not overdue (status convention, 2026-11-02)"
               },
               {
                 "state": "Nothing due",
